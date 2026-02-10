@@ -189,6 +189,13 @@ M3_API int M3_CALL m3_router_clear(M3Router *router);
 M3_API int M3_CALL m3_router_test_set_cstr_limit(m3_usize max_len);
 
 /**
+ * @brief Force router C-string length checks to fail on a given call count.
+ * @param call_index Call index to fail on (0 disables failure).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_router_test_set_cstr_fail_after(m3_u32 call_index);
+
+/**
  * @brief Test hook to force slice equality failure.
  * @param enable Whether to force failure.
  * @return M3_OK on success or a failure code.

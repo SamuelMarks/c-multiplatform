@@ -4,6 +4,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define M3_LIST_TEST_FAIL_NONE 0u
+#define M3_LIST_TEST_FAIL_CONTENT_EXTENT_NEGATIVE 1u
+#define M3_LIST_TEST_FAIL_VISIBLE_STRIDE 2u
+#define M3_LIST_TEST_FAIL_VISIBLE_END 3u
+#define M3_LIST_TEST_FAIL_VISIBLE_LAST_BEFORE_FIRST 4u
+#define M3_LIST_TEST_FAIL_VISIBLE_LAST_AFTER_OVERSCAN 5u
+#define M3_LIST_TEST_FAIL_GRID_LINE_COUNT_ZERO 6u
+#define M3_LIST_TEST_FAIL_GRID_STRIDE 7u
+#define M3_LIST_TEST_FAIL_GRID_END 8u
+#define M3_LIST_TEST_FAIL_GRID_END_NEGATIVE 9u
+#define M3_LIST_TEST_FAIL_GRID_LAST_TOO_LARGE 10u
+#define M3_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST 11u
+#define M3_LIST_TEST_FAIL_RESERVE_NODE_BYTES 12u
+#define M3_LIST_TEST_FAIL_RESERVE_COPY_BYTES 13u
+
 typedef struct TestAllocator {
     m3_usize alloc_calls;
     m3_usize realloc_calls;
@@ -296,6 +311,315 @@ int main(void)
     M3_TEST_ASSERT(list_style.item_extent == M3_LIST_DEFAULT_ITEM_EXTENT);
     M3_TEST_ASSERT(list_style.overscan == M3_LIST_DEFAULT_OVERSCAN);
 
+    {
+        M3Color color;
+        M3LayoutEdges edges;
+        M3Rect rect;
+        M3MeasureSpec spec;
+        M3ListStyle style;
+        M3GridStyle grid_style_local;
+        M3Scalar extent;
+        m3_usize first;
+        m3_usize last;
+        m3_usize count;
+        m3_usize huge_span;
+        M3ListView temp_list;
+        M3GridView temp_grid;
+
+        M3_TEST_EXPECT(m3_list_test_validate_color(NULL), M3_ERR_INVALID_ARGUMENT);
+        color.r = -0.1f;
+        color.g = 0.5f;
+        color.b = 0.5f;
+        color.a = 0.5f;
+        M3_TEST_EXPECT(m3_list_test_validate_color(&color), M3_ERR_RANGE);
+        color.r = 0.0f;
+        color.g = 1.5f;
+        M3_TEST_EXPECT(m3_list_test_validate_color(&color), M3_ERR_RANGE);
+        color.g = 0.0f;
+        color.b = -0.2f;
+        M3_TEST_EXPECT(m3_list_test_validate_color(&color), M3_ERR_RANGE);
+        color.b = 0.0f;
+        color.a = 2.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_color(&color), M3_ERR_RANGE);
+        color.a = 1.0f;
+        M3_TEST_OK(m3_list_test_validate_color(&color));
+
+        M3_TEST_EXPECT(m3_list_test_validate_edges(NULL), M3_ERR_INVALID_ARGUMENT);
+        edges.left = -1.0f;
+        edges.right = 0.0f;
+        edges.top = 0.0f;
+        edges.bottom = 0.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_edges(&edges), M3_ERR_RANGE);
+        edges.left = 0.0f;
+        edges.right = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_edges(&edges), M3_ERR_RANGE);
+        edges.right = 0.0f;
+        edges.top = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_edges(&edges), M3_ERR_RANGE);
+        edges.top = 0.0f;
+        edges.bottom = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_edges(&edges), M3_ERR_RANGE);
+        edges.bottom = 0.0f;
+        M3_TEST_OK(m3_list_test_validate_edges(&edges));
+
+        M3_TEST_EXPECT(m3_list_test_validate_rect(NULL), M3_ERR_INVALID_ARGUMENT);
+        rect.x = 0.0f;
+        rect.y = 0.0f;
+        rect.width = -1.0f;
+        rect.height = 1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_rect(&rect), M3_ERR_RANGE);
+        rect.width = 1.0f;
+        rect.height = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_rect(&rect), M3_ERR_RANGE);
+        rect.height = 1.0f;
+        M3_TEST_OK(m3_list_test_validate_rect(&rect));
+
+        spec.mode = 99u;
+        spec.size = 1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_measure_spec(spec), M3_ERR_INVALID_ARGUMENT);
+        spec.mode = M3_MEASURE_EXACTLY;
+        spec.size = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_measure_spec(spec), M3_ERR_RANGE);
+        spec.mode = M3_MEASURE_AT_MOST;
+        spec.size = 1.0f;
+        M3_TEST_OK(m3_list_test_validate_measure_spec(spec));
+
+        M3_TEST_OK(m3_list_style_init(&style));
+        M3_TEST_EXPECT(m3_list_test_validate_style(NULL), M3_ERR_INVALID_ARGUMENT);
+        style.orientation = 99u;
+        M3_TEST_EXPECT(m3_list_test_validate_style(&style), M3_ERR_RANGE);
+        style.orientation = M3_LIST_ORIENTATION_VERTICAL;
+        style.spacing = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_style(&style), M3_ERR_RANGE);
+        style.spacing = M3_LIST_DEFAULT_SPACING;
+        style.item_extent = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_style(&style), M3_ERR_RANGE);
+        style.item_extent = M3_LIST_DEFAULT_ITEM_EXTENT;
+        style.padding.left = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_style(&style), M3_ERR_RANGE);
+        style.padding.left = 0.0f;
+        style.background_color.g = 2.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_style(&style), M3_ERR_RANGE);
+        style.background_color.g = 0.0f;
+        M3_TEST_OK(m3_list_test_validate_style(&style));
+
+        M3_TEST_OK(m3_grid_style_init(&grid_style_local));
+        M3_TEST_EXPECT(m3_list_test_validate_grid_style(NULL), M3_ERR_INVALID_ARGUMENT);
+        grid_style_local.scroll_axis = 99u;
+        M3_TEST_EXPECT(m3_list_test_validate_grid_style(&grid_style_local), M3_ERR_RANGE);
+        grid_style_local.scroll_axis = M3_GRID_SCROLL_VERTICAL;
+        grid_style_local.span = 0u;
+        M3_TEST_EXPECT(m3_list_test_validate_grid_style(&grid_style_local), M3_ERR_RANGE);
+        grid_style_local.span = 2u;
+        grid_style_local.spacing_x = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_grid_style(&grid_style_local), M3_ERR_RANGE);
+        grid_style_local.spacing_x = 0.0f;
+        grid_style_local.spacing_y = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_grid_style(&grid_style_local), M3_ERR_RANGE);
+        grid_style_local.spacing_y = 0.0f;
+        grid_style_local.item_width = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_grid_style(&grid_style_local), M3_ERR_RANGE);
+        grid_style_local.item_width = M3_GRID_DEFAULT_ITEM_WIDTH;
+        grid_style_local.item_height = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_grid_style(&grid_style_local), M3_ERR_RANGE);
+        grid_style_local.item_height = M3_GRID_DEFAULT_ITEM_HEIGHT;
+        grid_style_local.padding.left = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_grid_style(&grid_style_local), M3_ERR_RANGE);
+        grid_style_local.padding.left = 0.0f;
+        grid_style_local.background_color.a = 2.0f;
+        M3_TEST_EXPECT(m3_list_test_validate_grid_style(&grid_style_local), M3_ERR_RANGE);
+        grid_style_local.background_color.a = 0.0f;
+        M3_TEST_OK(m3_list_test_validate_grid_style(&grid_style_local));
+
+        M3_TEST_EXPECT(m3_list_test_compute_content_extent(1u, 1.0f, 1.0f, 0.0f, 0.0f, NULL), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_list_test_compute_content_extent(1u, -1.0f, 1.0f, 0.0f, 0.0f, &extent), M3_ERR_RANGE);
+        M3_TEST_OK(m3_list_test_compute_content_extent(0u, 1.0f, 1.0f, 1.0f, 2.0f, &extent));
+        M3_TEST_ASSERT(extent > 2.999f && extent < 3.001f);
+        M3_TEST_EXPECT(m3_list_test_compute_content_extent(1u, 0.0f, 1.0f, 0.0f, 0.0f, &extent), M3_ERR_RANGE);
+        M3_TEST_OK(m3_list_test_compute_content_extent(2u, 1.0f, 1.0f, 0.0f, 0.0f, &extent));
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_CONTENT_EXTENT_NEGATIVE));
+        M3_TEST_EXPECT(m3_list_test_compute_content_extent(2u, 1.0f, 1.0f, 0.0f, 0.0f, &extent), M3_ERR_RANGE);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+
+        M3_TEST_EXPECT(m3_list_test_compute_visible_range(1u, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0u, NULL, &last, &count),
+            M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_OK(m3_list_test_compute_visible_range(0u, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0u, &first, &last, &count));
+        M3_TEST_ASSERT(count == 0u);
+        M3_TEST_OK(m3_list_test_compute_visible_range(1u, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0u, &first, &last, &count));
+        M3_TEST_EXPECT(m3_list_test_compute_visible_range(1u, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0u, &first, &last, &count),
+            M3_ERR_RANGE);
+        M3_TEST_EXPECT(m3_list_test_compute_visible_range(1u, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0u, &first, &last, &count),
+            M3_ERR_RANGE);
+        M3_TEST_EXPECT(m3_list_test_compute_visible_range(1u, 1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0u, &first, &last, &count),
+            M3_ERR_RANGE);
+        M3_TEST_OK(m3_list_test_compute_visible_range(1u, 1.0f, 0.0f, 5.0f, 0.0f, 1.0f, 0u, &first, &last, &count));
+        M3_TEST_OK(m3_list_test_compute_visible_range(1u, 1.0f, 0.0f, 0.0f, -10.0f, 5.0f, 0u, &first, &last, &count));
+        M3_TEST_OK(m3_list_test_compute_visible_range(2u, 1.0f, 0.0f, 0.0f, 0.0f, 0.00005f, 0u, &first, &last, &count));
+        M3_TEST_OK(m3_list_test_compute_visible_range(1u, 1.0f, 0.0f, 0.0f, 100.0f, 1.0f, 0u, &first, &last, &count));
+        M3_TEST_OK(m3_list_test_compute_visible_range(2u, 1.0f, 0.0f, 0.0f, 0.0f, 10.0f, 0u, &first, &last, &count));
+        M3_TEST_OK(m3_list_test_compute_visible_range(3u, 1.0f, 0.0f, 0.0f, 0.0f, 1.1f, 1u, &first, &last, &count));
+        M3_TEST_OK(m3_list_test_compute_visible_range(3u, 1.0f, 0.0f, 0.0f, 0.0f, 1.1f, 10u, &first, &last, &count));
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_VISIBLE_STRIDE));
+        M3_TEST_EXPECT(m3_list_test_compute_visible_range(1u, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0u, &first, &last, &count),
+            M3_ERR_RANGE);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_VISIBLE_END));
+        M3_TEST_OK(m3_list_test_compute_visible_range(1u, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0u, &first, &last, &count));
+        M3_TEST_ASSERT(count == 0u);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_VISIBLE_LAST_BEFORE_FIRST));
+        M3_TEST_OK(m3_list_test_compute_visible_range(20u, 1.0f, 0.0f, 0.0f, 10.0f, 1.0f, 0u, &first, &last, &count));
+        M3_TEST_ASSERT(count == 0u);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_VISIBLE_LAST_AFTER_OVERSCAN));
+        M3_TEST_OK(m3_list_test_compute_visible_range(20u, 1.0f, 0.0f, 0.0f, 2.0f, 1.0f, 1u, &first, &last, &count));
+        M3_TEST_ASSERT(count == 0u);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_VISIBLE_LAST_BEFORE_FIRST));
+        M3_TEST_OK(m3_list_test_compute_visible_range(5u, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0u, &first, &last, &count));
+        M3_TEST_ASSERT(count == 1u);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_VISIBLE_LAST_AFTER_OVERSCAN));
+        M3_TEST_OK(m3_list_test_compute_visible_range(5u, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0u, &first, &last, &count));
+        M3_TEST_ASSERT(count == 1u);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+
+        memset(&temp_list, 0, sizeof(temp_list));
+        temp_list.item_count = 2u;
+        M3_TEST_EXPECT(m3_list_test_compute_item_bounds(NULL, 0u, &rect), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_list_test_compute_item_bounds(&temp_list, 2u, &rect), M3_ERR_NOT_FOUND);
+        temp_list.style.item_extent = 0.0f;
+        temp_list.style.spacing = 0.0f;
+        M3_TEST_EXPECT(m3_list_test_compute_item_bounds(&temp_list, 0u, &rect), M3_ERR_RANGE);
+        temp_list.style.item_extent = 10.0f;
+        temp_list.style.spacing = 1.0f;
+        temp_list.bounds.width = 0.0f;
+        temp_list.style.padding.left = 2.0f;
+        temp_list.style.padding.right = 2.0f;
+        M3_TEST_EXPECT(m3_list_test_compute_item_bounds(&temp_list, 0u, &rect), M3_ERR_RANGE);
+        temp_list.bounds.width = 20.0f;
+        temp_list.bounds.height = 20.0f;
+        temp_list.style.padding.left = 0.0f;
+        temp_list.style.padding.right = 0.0f;
+        temp_list.style.padding.top = 0.0f;
+        temp_list.style.padding.bottom = 0.0f;
+        temp_list.style.orientation = M3_LIST_ORIENTATION_VERTICAL;
+        M3_TEST_OK(m3_list_test_compute_item_bounds(&temp_list, 0u, &rect));
+
+        memset(&temp_grid, 0, sizeof(temp_grid));
+        M3_TEST_EXPECT(m3_list_test_grid_compute_visible_range(NULL, &first, &last, &count), M3_ERR_INVALID_ARGUMENT);
+        temp_grid.style = grid_style_local;
+        temp_grid.item_count = 0u;
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        temp_grid.item_count = 1u;
+        temp_grid.style.item_height = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count), M3_ERR_RANGE);
+        temp_grid.style.item_height = 10.0f;
+        temp_grid.bounds.height = 0.0f;
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        temp_grid.bounds.height = 10.0f;
+        temp_grid.style.padding.top = 20.0f;
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        temp_grid.style.padding.top = 0.0f;
+        temp_grid.style.span = 2u;
+        temp_grid.item_count = 3u;
+        temp_grid.style.spacing_y = 0.0f;
+        temp_grid.scroll_offset = 0.0f;
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        temp_grid.scroll_offset = 100.0f;
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_GRID_LINE_COUNT_ZERO));
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        M3_TEST_ASSERT(count == 0u);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_GRID_STRIDE));
+        M3_TEST_EXPECT(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count), M3_ERR_RANGE);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_GRID_END));
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        M3_TEST_ASSERT(count == 0u);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_GRID_END_NEGATIVE));
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_GRID_LAST_TOO_LARGE));
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST));
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        M3_TEST_ASSERT(count == 0u);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+
+        temp_grid.item_count = 4u;
+        temp_grid.style.span = 2u;
+        temp_grid.style.scroll_axis = M3_GRID_SCROLL_VERTICAL;
+        temp_grid.style.item_height = 10.0f;
+        temp_grid.style.spacing_y = 0.0f;
+        temp_grid.style.padding.top = 0.0f;
+        temp_grid.style.padding.bottom = 0.0f;
+        temp_grid.bounds.height = 25.0f;
+        temp_grid.scroll_offset = 0.0f;
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_GRID_LAST_TOO_LARGE));
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        M3_TEST_ASSERT(count > 0u);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+
+        temp_grid.item_count = 6u;
+        temp_grid.style.span = 2u;
+        temp_grid.style.scroll_axis = M3_GRID_SCROLL_VERTICAL;
+        temp_grid.style.item_height = 10.0f;
+        temp_grid.style.spacing_y = 0.0f;
+        temp_grid.style.padding.top = 0.0f;
+        temp_grid.style.padding.bottom = 0.0f;
+        temp_grid.bounds.height = 5.0f;
+        temp_grid.scroll_offset = 15.0f;
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST));
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        M3_TEST_ASSERT(count == 0u);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+
+        temp_grid.scroll_offset = 0.0f;
+        M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST));
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        M3_TEST_ASSERT(count > 0u);
+        M3_TEST_OK(m3_list_test_clear_fail_points());
+
+        temp_grid.item_count = 6u;
+        temp_grid.style.span = 2u;
+        temp_grid.style.overscan = 2u;
+        temp_grid.bounds.height = 15.0f;
+        temp_grid.scroll_offset = 0.0f;
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        M3_TEST_ASSERT(count > 0u);
+
+        huge_span = ((m3_usize)~(m3_usize)0 / 2u) + 2u;
+        memset(&temp_grid, 0, sizeof(temp_grid));
+        temp_grid.style.scroll_axis = M3_GRID_SCROLL_VERTICAL;
+        temp_grid.style.span = huge_span;
+        temp_grid.style.item_height = 1.0f;
+        temp_grid.style.spacing_y = 0.0f;
+        temp_grid.style.padding.top = 0.0f;
+        temp_grid.style.padding.bottom = 0.0f;
+        temp_grid.item_count = huge_span + 1u;
+        temp_grid.bounds.height = 1.0f;
+        temp_grid.scroll_offset = 1.2f;
+        M3_TEST_OK(m3_list_test_grid_compute_visible_range(&temp_grid, &first, &last, &count));
+        M3_TEST_ASSERT(count == 0u);
+
+        memset(&temp_grid, 0, sizeof(temp_grid));
+        temp_grid.style = grid_style_local;
+        temp_grid.item_count = 1u;
+
+        M3_TEST_EXPECT(m3_list_test_grid_compute_item_bounds(NULL, 0u, &rect), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_list_test_grid_compute_item_bounds(&temp_grid, 10u, &rect), M3_ERR_NOT_FOUND);
+        temp_grid.style.item_width = 0.0f;
+        M3_TEST_EXPECT(m3_list_test_grid_compute_item_bounds(&temp_grid, 0u, &rect), M3_ERR_RANGE);
+        temp_grid.style.item_width = 10.0f;
+        temp_grid.style.item_height = 10.0f;
+        M3_TEST_OK(m3_list_test_grid_compute_item_bounds(&temp_grid, 0u, &rect));
+    }
+
     M3_TEST_EXPECT(m3_list_view_init(NULL, &list_style, NULL, 0, 0), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_list_view_init(&list, NULL, NULL, 0, 0), M3_ERR_INVALID_ARGUMENT);
 
@@ -315,6 +639,67 @@ int main(void)
     M3_TEST_EXPECT(m3_list_view_get_content_extent(NULL, &content_extent), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_list_view_get_required_slots(NULL, &visible_count), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_list_view_update(NULL), M3_ERR_INVALID_ARGUMENT);
+
+    {
+        M3ListView metrics_view;
+        M3ListStyle metrics_style;
+
+        M3_TEST_EXPECT(m3_list_test_update_metrics(NULL), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_OK(m3_list_style_init(&metrics_style));
+        M3_TEST_OK(m3_list_view_init(&metrics_view, &metrics_style, NULL, 0, 0));
+        metrics_view.bounds.height = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_update_metrics(&metrics_view), M3_ERR_RANGE);
+        metrics_view.bounds.height = 10.0f;
+        metrics_view.scroll_offset = -5.0f;
+        M3_TEST_OK(m3_list_test_update_metrics(&metrics_view));
+        M3_TEST_ASSERT(metrics_view.scroll_offset == 0.0f);
+        metrics_view.scroll_offset = 5.0f;
+        M3_TEST_OK(m3_list_test_update_metrics(&metrics_view));
+        M3_TEST_OK(metrics_view.widget.vtable->destroy(metrics_view.widget.ctx));
+    }
+
+    {
+        M3GridView metrics_grid;
+        M3GridStyle metrics_grid_style;
+
+        M3_TEST_EXPECT(m3_list_test_grid_update_metrics(NULL), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_OK(m3_grid_style_init(&metrics_grid_style));
+        M3_TEST_OK(m3_grid_view_init(&metrics_grid, &metrics_grid_style, NULL, 0, 0));
+        metrics_grid.style.spacing_y = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_grid_update_metrics(&metrics_grid), M3_ERR_RANGE);
+        metrics_grid.style.spacing_y = 0.0f;
+        metrics_grid.style.span = 0u;
+        M3_TEST_EXPECT(m3_list_test_grid_update_metrics(&metrics_grid), M3_ERR_RANGE);
+        metrics_grid.style.span = 1u;
+        metrics_grid.item_count = 0u;
+        metrics_grid.bounds.height = 10.0f;
+        M3_TEST_OK(m3_list_test_grid_update_metrics(&metrics_grid));
+        metrics_grid.item_count = 2u;
+        metrics_grid.style.item_height = 0.0f;
+        M3_TEST_EXPECT(m3_list_test_grid_update_metrics(&metrics_grid), M3_ERR_RANGE);
+        metrics_grid.style.item_height = metrics_grid_style.item_height;
+        metrics_grid.bounds.height = -1.0f;
+        M3_TEST_EXPECT(m3_list_test_grid_update_metrics(&metrics_grid), M3_ERR_RANGE);
+        metrics_grid.bounds.height = 10.0f;
+        metrics_grid.scroll_offset = -5.0f;
+        M3_TEST_OK(m3_list_test_grid_update_metrics(&metrics_grid));
+        M3_TEST_ASSERT(metrics_grid.scroll_offset == 0.0f);
+        metrics_grid.scroll_offset = 50.0f;
+        M3_TEST_OK(m3_list_test_grid_update_metrics(&metrics_grid));
+        M3_TEST_OK(metrics_grid.widget.vtable->destroy(metrics_grid.widget.ctx));
+    }
+
+    {
+        M3ListSlot *slots;
+        M3RenderNode **nodes;
+        m3_usize capacity;
+
+        slots = NULL;
+        nodes = NULL;
+        capacity = 0;
+        M3_TEST_EXPECT(m3_list_test_reserve_slots(NULL, NULL, NULL, NULL, 1), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_list_test_reserve_slots(&slots, &nodes, &capacity, NULL, 1), M3_ERR_INVALID_ARGUMENT);
+    }
 
     M3_TEST_EXPECT(m3_list_test_mul_overflow(1, 1, NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(m3_list_test_mul_overflow(2, 3, &overflow_value));
@@ -345,6 +730,35 @@ int main(void)
     M3_TEST_ASSERT(list.visible_nodes != NULL);
     M3_TEST_OK(m3_list_view_reserve(&list, 2));
     M3_TEST_EXPECT(m3_list_view_reserve(&list, overflow_value), M3_ERR_OVERFLOW);
+    M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_RESERVE_NODE_BYTES));
+    M3_TEST_EXPECT(m3_list_view_reserve(&list, 8), M3_ERR_OVERFLOW);
+    M3_TEST_OK(m3_list_test_clear_fail_points());
+    M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_RESERVE_COPY_BYTES));
+    M3_TEST_EXPECT(m3_list_view_reserve(&list, 8), M3_ERR_OVERFLOW);
+    M3_TEST_OK(m3_list_test_clear_fail_points());
+    {
+        M3ListView list_bad;
+
+        list_bad = list;
+        list_bad.allocator.alloc = NULL;
+        list_bad.allocator.free = NULL;
+        M3_TEST_EXPECT(m3_list_view_reserve(&list_bad, 1), M3_ERR_INVALID_ARGUMENT);
+    }
+    {
+        M3ListView list_fail;
+        TestAllocator alloc_fail;
+        M3Allocator alloc_iface_fail;
+
+        test_allocator_init(&alloc_fail);
+        alloc_fail.fail_alloc_on = 2;
+        alloc_iface_fail.ctx = &alloc_fail;
+        alloc_iface_fail.alloc = test_alloc;
+        alloc_iface_fail.realloc = test_realloc;
+        alloc_iface_fail.free = test_free;
+        M3_TEST_OK(m3_list_view_init(&list_fail, &list_style, &alloc_iface_fail, 0, 0));
+        M3_TEST_EXPECT(m3_list_view_reserve(&list_fail, 1), M3_ERR_OUT_OF_MEMORY);
+        M3_TEST_OK(list_fail.widget.vtable->destroy(list_fail.widget.ctx));
+    }
     {
         M3ListView list_bad;
         memset(&list_bad, 0, sizeof(list_bad));
@@ -376,6 +790,22 @@ int main(void)
     M3_TEST_OK(m3_list_view_set_item_count(&list, 5));
 
     width_spec.mode = M3_MEASURE_AT_MOST;
+    width_spec.size = 5.0f;
+    height_spec.mode = M3_MEASURE_AT_MOST;
+    height_spec.size = 30.0f;
+    M3_TEST_EXPECT(list.widget.vtable->measure(NULL, width_spec, height_spec, &measured), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec, height_spec, NULL), M3_ERR_INVALID_ARGUMENT);
+
+    list_style = list.style;
+    list.style.orientation = 99u;
+    M3_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec, height_spec, &measured), M3_ERR_RANGE);
+    list.style = list_style;
+
+    list.bounds.height = -1.0f;
+    M3_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec, height_spec, &measured), M3_ERR_RANGE);
+    list.bounds.height = 0.0f;
+
+    width_spec.mode = M3_MEASURE_AT_MOST;
     width_spec.size = -1.0f;
     height_spec.mode = M3_MEASURE_AT_MOST;
     height_spec.size = 10.0f;
@@ -388,6 +818,14 @@ int main(void)
     M3_TEST_OK(list.widget.vtable->measure(list.widget.ctx, width_spec, height_spec, &measured));
     M3_TEST_ASSERT(measured.width == 2.0f);
     M3_TEST_ASSERT(measured.height == 30.0f);
+
+    width_spec.mode = M3_MEASURE_UNSPECIFIED;
+    width_spec.size = 0.0f;
+    height_spec.mode = M3_MEASURE_UNSPECIFIED;
+    height_spec.size = 0.0f;
+    M3_TEST_OK(list.widget.vtable->measure(list.widget.ctx, width_spec, height_spec, &measured));
+    M3_TEST_ASSERT(measured.width == 2.0f);
+    M3_TEST_ASSERT(measured.height == 60.0f);
 
     width_spec.mode = M3_MEASURE_EXACTLY;
     width_spec.size = 100.0f;
@@ -406,6 +844,7 @@ int main(void)
     bounds.width = -1.0f;
     bounds.height = 10.0f;
     M3_TEST_EXPECT(list.widget.vtable->layout(list.widget.ctx, bounds), M3_ERR_RANGE);
+    M3_TEST_EXPECT(list.widget.vtable->layout(NULL, bounds), M3_ERR_INVALID_ARGUMENT);
 
     bounds.width = 50.0f;
     bounds.height = 0.0f;
@@ -491,6 +930,15 @@ int main(void)
     paint_ctx.gfx = &gfx;
     paint_ctx.clip = bounds;
     paint_ctx.dpi_scale = 1.0f;
+    M3_TEST_EXPECT(list.widget.vtable->paint(NULL, &paint_ctx), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(list.widget.vtable->paint(list.widget.ctx, NULL), M3_ERR_INVALID_ARGUMENT);
+    {
+        M3PaintContext bad_ctx;
+
+        bad_ctx = paint_ctx;
+        bad_ctx.gfx = NULL;
+        M3_TEST_EXPECT(list.widget.vtable->paint(list.widget.ctx, &bad_ctx), M3_ERR_INVALID_ARGUMENT);
+    }
     list.style.background_color.a = 1.0f;
     M3_TEST_OK(list.widget.vtable->paint(list.widget.ctx, &paint_ctx));
     M3_TEST_ASSERT(gfx_backend.draw_rect_calls == 1);
@@ -504,6 +952,8 @@ int main(void)
 
     {
         M3Semantics semantics;
+        M3_TEST_EXPECT(list.widget.vtable->get_semantics(NULL, &semantics), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(list.widget.vtable->get_semantics(list.widget.ctx, NULL), M3_ERR_INVALID_ARGUMENT);
         M3_TEST_OK(list.widget.vtable->get_semantics(list.widget.ctx, &semantics));
         M3_TEST_ASSERT(semantics.role == M3_SEMANTIC_NONE);
     }
@@ -511,6 +961,9 @@ int main(void)
     memset(&event, 0, sizeof(event));
     event.type = M3_INPUT_POINTER_DOWN;
     handled = M3_TRUE;
+    M3_TEST_EXPECT(list.widget.vtable->event(NULL, &event, &handled), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(list.widget.vtable->event(list.widget.ctx, NULL, &handled), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(list.widget.vtable->event(list.widget.ctx, &event, NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(list.widget.vtable->event(list.widget.ctx, &event, &handled));
     M3_TEST_ASSERT(handled == M3_FALSE);
 
@@ -569,6 +1022,7 @@ int main(void)
     M3_TEST_OK(list.widget.vtable->event(list.widget.ctx, &event, &handled));
     M3_TEST_ASSERT(handled == M3_TRUE);
 
+    M3_TEST_EXPECT(list.widget.vtable->destroy(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(list.widget.vtable->destroy(list.widget.ctx));
 
     M3_TEST_OK(m3_grid_style_init(&grid_style));
@@ -616,6 +1070,22 @@ int main(void)
     M3_TEST_OK(m3_grid_view_set_bind(&grid, test_bind, &bind_ctx));
 
     width_spec.mode = M3_MEASURE_AT_MOST;
+    width_spec.size = 20.0f;
+    height_spec.mode = M3_MEASURE_AT_MOST;
+    height_spec.size = 25.0f;
+    M3_TEST_EXPECT(grid.widget.vtable->measure(NULL, width_spec, height_spec, &measured), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(grid.widget.vtable->measure(grid.widget.ctx, width_spec, height_spec, NULL), M3_ERR_INVALID_ARGUMENT);
+
+    grid_style = grid.style;
+    grid.style.span = 0u;
+    M3_TEST_EXPECT(grid.widget.vtable->measure(grid.widget.ctx, width_spec, height_spec, &measured), M3_ERR_RANGE);
+    grid.style = grid_style;
+
+    grid.bounds.height = -1.0f;
+    M3_TEST_EXPECT(grid.widget.vtable->measure(grid.widget.ctx, width_spec, height_spec, &measured), M3_ERR_RANGE);
+    grid.bounds.height = 0.0f;
+
+    width_spec.mode = M3_MEASURE_AT_MOST;
     width_spec.size = -1.0f;
     height_spec.mode = M3_MEASURE_AT_MOST;
     height_spec.size = 10.0f;
@@ -627,8 +1097,17 @@ int main(void)
     M3_TEST_ASSERT(measured.width == 20.0f);
     M3_TEST_ASSERT(measured.height == 25.0f);
 
+    width_spec.mode = M3_MEASURE_UNSPECIFIED;
+    width_spec.size = 0.0f;
+    height_spec.mode = M3_MEASURE_UNSPECIFIED;
+    height_spec.size = 0.0f;
+    M3_TEST_OK(grid.widget.vtable->measure(grid.widget.ctx, width_spec, height_spec, &measured));
+    M3_TEST_ASSERT(measured.width == 24.0f);
+    M3_TEST_ASSERT(measured.height == 30.0f);
+
     bounds.width = 30.0f;
     bounds.height = 20.0f;
+    M3_TEST_EXPECT(grid.widget.vtable->layout(NULL, bounds), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(grid.widget.vtable->layout(grid.widget.ctx, bounds));
     M3_TEST_OK(m3_grid_view_set_bind(&grid, NULL, NULL));
     M3_TEST_EXPECT(m3_grid_view_update(&grid), M3_ERR_STATE);
@@ -645,6 +1124,9 @@ int main(void)
     memset(&event, 0, sizeof(event));
     event.type = M3_INPUT_POINTER_DOWN;
     handled = M3_TRUE;
+    M3_TEST_EXPECT(grid.widget.vtable->event(NULL, &event, &handled), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(grid.widget.vtable->event(grid.widget.ctx, NULL, &handled), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(grid.widget.vtable->event(grid.widget.ctx, &event, NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(grid.widget.vtable->event(grid.widget.ctx, &event, &handled));
     M3_TEST_ASSERT(handled == M3_FALSE);
 
@@ -692,6 +1174,15 @@ int main(void)
     gfx_backend.draw_rect_calls = 0;
     gfx.vtable = &g_test_gfx_vtable;
     grid.style.background_color.a = 1.0f;
+    M3_TEST_EXPECT(grid.widget.vtable->paint(NULL, &paint_ctx), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(grid.widget.vtable->paint(grid.widget.ctx, NULL), M3_ERR_INVALID_ARGUMENT);
+    {
+        M3PaintContext bad_ctx;
+
+        bad_ctx = paint_ctx;
+        bad_ctx.gfx = NULL;
+        M3_TEST_EXPECT(grid.widget.vtable->paint(grid.widget.ctx, &bad_ctx), M3_ERR_INVALID_ARGUMENT);
+    }
     M3_TEST_OK(grid.widget.vtable->paint(grid.widget.ctx, &paint_ctx));
     M3_TEST_ASSERT(gfx_backend.draw_rect_calls == 1);
 
@@ -703,10 +1194,13 @@ int main(void)
 
     {
         M3Semantics semantics;
+        M3_TEST_EXPECT(grid.widget.vtable->get_semantics(NULL, &semantics), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(grid.widget.vtable->get_semantics(grid.widget.ctx, NULL), M3_ERR_INVALID_ARGUMENT);
         M3_TEST_OK(grid.widget.vtable->get_semantics(grid.widget.ctx, &semantics));
         M3_TEST_ASSERT(semantics.role == M3_SEMANTIC_NONE);
     }
 
+    M3_TEST_EXPECT(grid.widget.vtable->destroy(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(grid.widget.vtable->destroy(grid.widget.ctx));
 
     return 0;

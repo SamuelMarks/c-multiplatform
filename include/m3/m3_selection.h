@@ -344,6 +344,21 @@ M3_API int M3_CALL m3_radio_set_label(M3Radio *radio, const char *utf8_label, m3
  */
 M3_API int M3_CALL m3_radio_set_on_change(M3Radio *radio, M3RadioOnChange on_change, void *ctx);
 
+#ifdef M3_TESTING
+/**
+ * @brief Set a selection test fail point.
+ * @param point Fail point identifier.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_selection_test_set_fail_point(m3_u32 point);
+
+/**
+ * @brief Clear selection test fail points.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_selection_test_clear_fail_points(void);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

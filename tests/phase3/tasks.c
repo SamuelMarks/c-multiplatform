@@ -267,6 +267,8 @@ int main(void)
         M3_TEST_ASSERT(type_id == 1u);
         M3_TEST_EXPECT(m3_tasks_test_object_op(M3_TASKS_TEST_OBJECT_OP_RETAIN_NULL, &type_id), M3_ERR_INVALID_ARGUMENT);
         M3_TEST_EXPECT(m3_tasks_test_object_op(M3_TASKS_TEST_OBJECT_OP_RELEASE_NULL, &type_id), M3_ERR_INVALID_ARGUMENT);
+
+        M3_TEST_OK(m3_tasks_test_call_noop());
     }
 
     {
@@ -274,6 +276,8 @@ int main(void)
         M3_TEST_OK(m3_tasks_test_worker_case(M3_TASKS_TEST_WORKER_CASE_WAIT_FAIL));
         M3_TEST_OK(m3_tasks_test_worker_case(M3_TASKS_TEST_WORKER_CASE_TIMEDWAIT_TIMEOUT));
         M3_TEST_OK(m3_tasks_test_worker_case(M3_TASKS_TEST_WORKER_CASE_TASK_ERROR));
+        M3_TEST_OK(m3_tasks_test_worker_case(M3_TASKS_TEST_WORKER_CASE_PICK_ERROR));
+        M3_TEST_OK(m3_tasks_test_worker_case(M3_TASKS_TEST_WORKER_CASE_UNLOCK_FAIL));
     }
 
     {
@@ -453,42 +457,31 @@ int main(void)
 
 #ifdef M3_TESTING
     {
-        M3Tasks tasks;
-        M3TasksDefaultConfig config;
-        TaskState state;
-        m3_u32 max_delay;
+        M3_TEST_EXPECT(m3_tasks_test_post_case(M3_TASKS_TEST_POST_CASE_LOCK_FAIL), M3_ERR_UNKNOWN);
+        M3_TEST_EXPECT(m3_tasks_test_post_case(M3_TASKS_TEST_POST_CASE_SIGNAL_FAIL), M3_ERR_UNKNOWN);
+        M3_TEST_EXPECT(m3_tasks_test_post_case(M3_TASKS_TEST_POST_CASE_UNLOCK_FAIL), M3_ERR_UNKNOWN);
+        M3_TEST_EXPECT(m3_tasks_test_post_case(M3_TASKS_TEST_POST_CASE_BUSY), M3_ERR_BUSY);
 
-        M3_TEST_OK(m3_tasks_default_config_init(&config));
-        config.worker_count = 1;
-        config.queue_capacity = 2;
-        config.handle_capacity = 4;
-        M3_TEST_OK(m3_tasks_default_create(&config, &tasks));
+        M3_TEST_EXPECT(m3_tasks_test_post_delayed_case(M3_TASKS_TEST_POST_DELAYED_CASE_TIME_FAIL), M3_ERR_UNKNOWN);
+        M3_TEST_EXPECT(m3_tasks_test_post_delayed_case(M3_TASKS_TEST_POST_DELAYED_CASE_LOCK_FAIL), M3_ERR_UNKNOWN);
+        M3_TEST_EXPECT(m3_tasks_test_post_delayed_case(M3_TASKS_TEST_POST_DELAYED_CASE_SIGNAL_FAIL), M3_ERR_UNKNOWN);
+        M3_TEST_EXPECT(m3_tasks_test_post_delayed_case(M3_TASKS_TEST_POST_DELAYED_CASE_UNLOCK_FAIL), M3_ERR_UNKNOWN);
+        M3_TEST_EXPECT(m3_tasks_test_post_delayed_case(M3_TASKS_TEST_POST_DELAYED_CASE_BUSY), M3_ERR_BUSY);
+        M3_TEST_EXPECT(m3_tasks_test_post_delayed_case(M3_TASKS_TEST_POST_DELAYED_CASE_OVERFLOW), M3_ERR_OVERFLOW);
 
-        state.tasks = tasks;
-        state.counter = 0;
-        state.fail = 0;
-        M3_TEST_OK(tasks.vtable->mutex_create(tasks.ctx, &state.mutex));
+        {
+            M3Tasks tasks;
+            M3TasksDefaultConfig config;
 
-        M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_MUTEX_LOCK));
-        M3_TEST_EXPECT(tasks.vtable->task_post(tasks.ctx, task_increment, &state), M3_ERR_UNKNOWN);
-
-        M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_COND_SIGNAL));
-        M3_TEST_EXPECT(tasks.vtable->task_post(tasks.ctx, task_increment, &state), M3_ERR_UNKNOWN);
-
-        M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_MUTEX_UNLOCK));
-        M3_TEST_EXPECT(tasks.vtable->task_post(tasks.ctx, task_increment, &state), M3_ERR_UNKNOWN);
-
-        M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_TIME_NOW));
-        M3_TEST_EXPECT(tasks.vtable->task_post_delayed(tasks.ctx, task_increment, &state, 1), M3_ERR_UNKNOWN);
-
-        max_delay = (m3_u32)~(m3_u32)0;
-        M3_TEST_EXPECT(tasks.vtable->task_post_delayed(tasks.ctx, task_increment, &state, max_delay), M3_ERR_OVERFLOW);
-
-        M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_SLEEP));
-        M3_TEST_EXPECT(tasks.vtable->sleep_ms(tasks.ctx, 1), M3_ERR_UNKNOWN);
-
-        M3_TEST_OK(tasks.vtable->mutex_destroy(tasks.ctx, state.mutex));
-        M3_TEST_OK(m3_tasks_default_destroy(&tasks));
+            M3_TEST_OK(m3_tasks_default_config_init(&config));
+            config.worker_count = 1;
+            config.queue_capacity = 1;
+            config.handle_capacity = 1;
+            M3_TEST_OK(m3_tasks_default_create(&config, &tasks));
+            M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_SLEEP));
+            M3_TEST_EXPECT(tasks.vtable->sleep_ms(tasks.ctx, 1), M3_ERR_UNKNOWN);
+            M3_TEST_OK(m3_tasks_default_destroy(&tasks));
+        }
     }
 
     {

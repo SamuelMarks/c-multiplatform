@@ -2,6 +2,39 @@
 
 #include <math.h>
 
+#ifdef M3_TESTING
+#define M3_VISUALS_TEST_FAIL_NONE 0u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_INIT_RADIUS 1u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_INIT_OPACITY 2u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_START_RADIUS_INIT 3u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_START_OPACITY_INIT 4u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_START_TIMING 5u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_RELEASE_TIMING 6u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_RUNNING 7u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_STEP 8u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_VALUE 9u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_RUNNING 10u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_STEP 11u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_VALUE 12u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_FADE_RUNNING 13u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_STOP_RADIUS 14u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_STOP_OPACITY 15u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_PAINT_RECT 16u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_PAINT_COLOR 17u
+#define M3_VISUALS_TEST_FAIL_SHADOW_NORM 18u
+
+static m3_u32 g_m3_visuals_test_fail_point = M3_VISUALS_TEST_FAIL_NONE;
+
+static M3Bool m3_visuals_test_fail_point_match(m3_u32 point)
+{
+    if (g_m3_visuals_test_fail_point != point) {
+        return M3_FALSE;
+    }
+    g_m3_visuals_test_fail_point = M3_VISUALS_TEST_FAIL_NONE;
+    return M3_TRUE;
+}
+#endif
+
 static int m3_visuals_validate_rect(const M3Rect *rect)
 {
     if (rect == NULL) {
@@ -53,10 +86,20 @@ int M3_CALL m3_ripple_init(M3Ripple *ripple)
     }
 
     rc = m3_anim_controller_init(&ripple->radius_anim);
+#ifdef M3_TESTING
+    if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_INIT_RADIUS)) {
+        rc = M3_ERR_IO;
+    }
+#endif
     if (rc != M3_OK) {
         return rc;
     }
     rc = m3_anim_controller_init(&ripple->opacity_anim);
+#ifdef M3_TESTING
+    if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_INIT_OPACITY)) {
+        rc = M3_ERR_IO;
+    }
+#endif
     if (rc != M3_OK) {
         return rc;
     }
@@ -95,15 +138,30 @@ int M3_CALL m3_ripple_start(M3Ripple *ripple, M3Scalar center_x, M3Scalar center
     }
 
     rc = m3_anim_controller_init(&ripple->radius_anim);
+#ifdef M3_TESTING
+    if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_START_RADIUS_INIT)) {
+        rc = M3_ERR_IO;
+    }
+#endif
     if (rc != M3_OK) {
         return rc;
     }
     rc = m3_anim_controller_init(&ripple->opacity_anim);
+#ifdef M3_TESTING
+    if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_START_OPACITY_INIT)) {
+        rc = M3_ERR_IO;
+    }
+#endif
     if (rc != M3_OK) {
         return rc;
     }
 
     rc = m3_anim_controller_start_timing(&ripple->radius_anim, 0.0f, max_radius, expand_duration, M3_ANIM_EASE_OUT);
+#ifdef M3_TESTING
+    if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_START_TIMING)) {
+        rc = M3_ERR_IO;
+    }
+#endif
     if (rc != M3_OK) {
         return rc;
     }
@@ -139,6 +197,11 @@ int M3_CALL m3_ripple_release(M3Ripple *ripple, M3Scalar fade_duration)
     }
 
     rc = m3_anim_controller_start_timing(&ripple->opacity_anim, ripple->opacity, 0.0f, fade_duration, M3_ANIM_EASE_OUT);
+#ifdef M3_TESTING
+    if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_RELEASE_TIMING)) {
+        rc = M3_ERR_IO;
+    }
+#endif
     if (rc != M3_OK) {
         return rc;
     }
@@ -170,11 +233,21 @@ int M3_CALL m3_ripple_step(M3Ripple *ripple, M3Scalar dt, M3Bool *out_finished)
     }
 
     rc = m3_anim_controller_is_running(&ripple->radius_anim, &running);
+#ifdef M3_TESTING
+    if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_RUNNING)) {
+        rc = M3_ERR_IO;
+    }
+#endif
     if (rc != M3_OK) {
         return rc;
     }
     if (running) {
         rc = m3_anim_controller_step(&ripple->radius_anim, dt, &value, &finished);
+#ifdef M3_TESTING
+        if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_STEP)) {
+            rc = M3_ERR_IO;
+        }
+#endif
         if (rc != M3_OK) {
             return rc;
         }
@@ -184,6 +257,11 @@ int M3_CALL m3_ripple_step(M3Ripple *ripple, M3Scalar dt, M3Bool *out_finished)
         }
     } else {
         rc = m3_anim_controller_get_value(&ripple->radius_anim, &value);
+#ifdef M3_TESTING
+        if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_VALUE)) {
+            rc = M3_ERR_IO;
+        }
+#endif
         if (rc != M3_OK) {
             return rc;
         }
@@ -191,17 +269,32 @@ int M3_CALL m3_ripple_step(M3Ripple *ripple, M3Scalar dt, M3Bool *out_finished)
     }
 
     rc = m3_anim_controller_is_running(&ripple->opacity_anim, &running);
+#ifdef M3_TESTING
+    if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_RUNNING)) {
+        rc = M3_ERR_IO;
+    }
+#endif
     if (rc != M3_OK) {
         return rc;
     }
     if (running) {
         rc = m3_anim_controller_step(&ripple->opacity_anim, dt, &value, &finished);
+#ifdef M3_TESTING
+        if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_STEP)) {
+            rc = M3_ERR_IO;
+        }
+#endif
         if (rc != M3_OK) {
             return rc;
         }
         ripple->opacity = value;
     } else {
         rc = m3_anim_controller_get_value(&ripple->opacity_anim, &value);
+#ifdef M3_TESTING
+        if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_VALUE)) {
+            rc = M3_ERR_IO;
+        }
+#endif
         if (rc != M3_OK) {
             return rc;
         }
@@ -210,16 +303,31 @@ int M3_CALL m3_ripple_step(M3Ripple *ripple, M3Scalar dt, M3Bool *out_finished)
 
     if (ripple->state == M3_RIPPLE_STATE_FADING) {
         rc = m3_anim_controller_is_running(&ripple->opacity_anim, &running);
+#ifdef M3_TESTING
+        if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_FADE_RUNNING)) {
+            rc = M3_ERR_IO;
+        }
+#endif
         if (rc != M3_OK) {
             return rc;
         }
         if (!running) {
             ripple->opacity = 0.0f;
             rc = m3_anim_controller_stop(&ripple->radius_anim);
+#ifdef M3_TESTING
+            if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_STOP_RADIUS)) {
+                rc = M3_ERR_IO;
+            }
+#endif
             if (rc != M3_OK) {
                 return rc;
             }
             rc = m3_anim_controller_stop(&ripple->opacity_anim);
+#ifdef M3_TESTING
+            if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_STOP_OPACITY)) {
+                rc = M3_ERR_IO;
+            }
+#endif
             if (rc != M3_OK) {
                 return rc;
             }
@@ -352,6 +460,11 @@ int M3_CALL m3_ripple_paint(const M3Ripple *ripple, M3Gfx *gfx, const M3Rect *cl
     rect.y = ripple->center_y - ripple->radius;
     rect.width = ripple->radius * 2.0f;
     rect.height = ripple->radius * 2.0f;
+#ifdef M3_TESTING
+    if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_PAINT_RECT)) {
+        rect.width = -1.0f;
+    }
+#endif
 
     rc = m3_visuals_validate_rect(&rect);
     if (rc != M3_OK) {
@@ -360,6 +473,11 @@ int M3_CALL m3_ripple_paint(const M3Ripple *ripple, M3Gfx *gfx, const M3Rect *cl
 
     color = ripple->color;
     color.a = color.a * ripple->opacity;
+#ifdef M3_TESTING
+    if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_RIPPLE_PAINT_COLOR)) {
+        color.a = 2.0f;
+    }
+#endif
 
     rc = m3_visuals_validate_color(&color);
     if (rc != M3_OK) {
@@ -495,6 +613,11 @@ int M3_CALL m3_shadow_paint(const M3Shadow *shadow, M3Gfx *gfx, const M3Rect *re
 
     norm = (M3Scalar)shadow->layers;
     norm = norm * (norm + 1.0f) / 2.0f;
+#ifdef M3_TESTING
+    if (m3_visuals_test_fail_point_match(M3_VISUALS_TEST_FAIL_SHADOW_NORM)) {
+        norm = 0.0f;
+    }
+#endif
     if (norm <= 0.0f) {
         return M3_ERR_RANGE;
     }
@@ -537,3 +660,32 @@ int M3_CALL m3_shadow_paint(const M3Shadow *shadow, M3Gfx *gfx, const M3Rect *re
 
     return draw_rc;
 }
+
+#ifdef M3_TESTING
+int M3_CALL m3_visuals_test_set_fail_point(m3_u32 fail_point)
+{
+    g_m3_visuals_test_fail_point = fail_point;
+    return M3_OK;
+}
+
+int M3_CALL m3_visuals_test_clear_fail_points(void)
+{
+    g_m3_visuals_test_fail_point = M3_VISUALS_TEST_FAIL_NONE;
+    return M3_OK;
+}
+
+int M3_CALL m3_visuals_test_validate_rect(const M3Rect *rect)
+{
+    return m3_visuals_validate_rect(rect);
+}
+
+int M3_CALL m3_visuals_test_validate_color(const M3Color *color)
+{
+    return m3_visuals_validate_color(color);
+}
+
+int M3_CALL m3_visuals_test_validate_gfx(const M3Gfx *gfx)
+{
+    return m3_visuals_validate_gfx(gfx);
+}
+#endif

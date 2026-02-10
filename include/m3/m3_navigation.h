@@ -177,6 +177,128 @@ M3_API int M3_CALL m3_navigation_set_on_select(M3Navigation *nav, M3NavigationOn
  */
 M3_API int M3_CALL m3_navigation_get_mode(const M3Navigation *nav, m3_u32 *out_mode);
 
+#ifdef M3_TESTING
+/**
+ * @brief Test wrapper for navigation color validation.
+ * @param color Color to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_validate_color(const M3Color *color);
+
+/**
+ * @brief Test wrapper for navigation edge validation.
+ * @param edges Padding edges.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_validate_edges(const M3LayoutEdges *edges);
+
+/**
+ * @brief Test wrapper for navigation text style validation.
+ * @param style Text style descriptor.
+ * @param require_family M3_TRUE to require family name.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_validate_text_style(const M3TextStyle *style, M3Bool require_family);
+
+/**
+ * @brief Test wrapper for navigation style validation.
+ * @param style Navigation style descriptor.
+ * @param require_family M3_TRUE to require family name.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_validate_style(const M3NavigationStyle *style, M3Bool require_family);
+
+/**
+ * @brief Test wrapper for navigation item validation.
+ * @param items Item array.
+ * @param count Item count.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_validate_items(const M3NavigationItem *items, m3_usize count);
+
+/**
+ * @brief Test wrapper for measure spec validation.
+ * @param spec Measure spec to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_validate_measure_spec(M3MeasureSpec spec);
+
+/**
+ * @brief Test wrapper for rectangle validation.
+ * @param rect Rectangle to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_validate_rect(const M3Rect *rect);
+
+/**
+ * @brief Test wrapper for navigation mode resolution.
+ * @param style Navigation style descriptor.
+ * @param width Available width.
+ * @param out_mode Receives resolved mode.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_resolve_mode(const M3NavigationStyle *style, M3Scalar width, m3_u32 *out_mode);
+
+/**
+ * @brief Test wrapper for measuring navigation content.
+ * @param style Navigation style descriptor.
+ * @param mode Navigation mode.
+ * @param item_count Number of items.
+ * @param out_width Receives content width.
+ * @param out_height Receives content height.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_measure_content(const M3NavigationStyle *style, m3_u32 mode, m3_usize item_count,
+    M3Scalar *out_width, M3Scalar *out_height);
+
+/**
+ * @brief Test layout snapshot for navigation widgets.
+ */
+typedef struct M3NavigationLayoutTest {
+    m3_u32 mode; /**< Resolved navigation mode. */
+    M3Scalar start_x; /**< Layout origin X. */
+    M3Scalar start_y; /**< Layout origin Y. */
+    M3Scalar item_width; /**< Item width in pixels. */
+    M3Scalar item_height; /**< Item height in pixels. */
+    M3Scalar spacing; /**< Item spacing in pixels. */
+    M3Scalar content_width; /**< Content width in pixels. */
+    M3Scalar content_height; /**< Content height in pixels. */
+} M3NavigationLayoutTest;
+
+/**
+ * @brief Test wrapper for computing navigation layout.
+ * @param nav Navigation instance.
+ * @param out_layout Receives computed layout.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_compute_layout(const M3Navigation *nav, M3NavigationLayoutTest *out_layout);
+
+/**
+ * @brief Test wrapper for navigation hit testing.
+ * @param nav Navigation instance.
+ * @param layout Layout snapshot.
+ * @param x X coordinate in pixels.
+ * @param y Y coordinate in pixels.
+ * @param out_index Receives hit index or M3_NAV_INVALID_INDEX.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_hit_test(const M3Navigation *nav, const M3NavigationLayoutTest *layout, m3_i32 x, m3_i32 y,
+    m3_usize *out_index);
+
+/**
+ * @brief Set a navigation test fail point.
+ * @param point Fail point identifier.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_set_fail_point(m3_u32 point);
+
+/**
+ * @brief Clear navigation test fail points.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_navigation_test_clear_fail_points(void);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

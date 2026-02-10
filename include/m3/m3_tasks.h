@@ -105,10 +105,24 @@ M3_API int M3_CALL m3_tasks_default_destroy(M3Tasks *tasks);
 #define M3_TASKS_TEST_QUEUE_CASE_SWAP 7u
 #define M3_TASKS_TEST_QUEUE_CASE_BUSY 8u
 
+#define M3_TASKS_TEST_POST_CASE_LOCK_FAIL 1u
+#define M3_TASKS_TEST_POST_CASE_SIGNAL_FAIL 2u
+#define M3_TASKS_TEST_POST_CASE_UNLOCK_FAIL 3u
+#define M3_TASKS_TEST_POST_CASE_BUSY 4u
+
+#define M3_TASKS_TEST_POST_DELAYED_CASE_TIME_FAIL 1u
+#define M3_TASKS_TEST_POST_DELAYED_CASE_LOCK_FAIL 2u
+#define M3_TASKS_TEST_POST_DELAYED_CASE_SIGNAL_FAIL 3u
+#define M3_TASKS_TEST_POST_DELAYED_CASE_UNLOCK_FAIL 4u
+#define M3_TASKS_TEST_POST_DELAYED_CASE_BUSY 5u
+#define M3_TASKS_TEST_POST_DELAYED_CASE_OVERFLOW 6u
+
 #define M3_TASKS_TEST_WORKER_CASE_LOCK_FAIL 1u
 #define M3_TASKS_TEST_WORKER_CASE_WAIT_FAIL 2u
 #define M3_TASKS_TEST_WORKER_CASE_TIMEDWAIT_TIMEOUT 3u
 #define M3_TASKS_TEST_WORKER_CASE_TASK_ERROR 4u
+#define M3_TASKS_TEST_WORKER_CASE_PICK_ERROR 5u
+#define M3_TASKS_TEST_WORKER_CASE_UNLOCK_FAIL 6u
 
 #define M3_TASKS_TEST_OBJECT_OP_RETAIN 1u
 #define M3_TASKS_TEST_OBJECT_OP_RELEASE 2u
@@ -129,9 +143,16 @@ M3_API int M3_CALL m3_tasks_test_call_native(m3_u32 op);
 M3_API int M3_CALL m3_tasks_test_thread_destroy_case(m3_u32 mode);
 M3_API int M3_CALL m3_tasks_test_mutex_destroy_case(m3_u32 mode);
 M3_API int M3_CALL m3_tasks_test_queue_case(m3_u32 mode, m3_u32 *out_wait_ms, m3_u32 *out_due_time, m3_usize *out_count);
+M3_API int M3_CALL m3_tasks_test_post_case(m3_u32 mode);
+M3_API int M3_CALL m3_tasks_test_post_delayed_case(m3_u32 mode);
 M3_API int M3_CALL m3_tasks_test_worker_case(m3_u32 mode);
 M3_API int M3_CALL m3_tasks_test_object_op(m3_u32 mode, m3_u32 *out_type_id);
 M3_API int M3_CALL m3_tasks_test_timedwait_case(m3_u32 mode);
+/**
+ * @brief Invoke the internal noop task used by task posting helpers.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_tasks_test_call_noop(void);
 #endif
 
 #ifdef __cplusplus

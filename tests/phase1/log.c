@@ -70,6 +70,10 @@ int main(void)
     M3_TEST_EXPECT(m3_log_test_cstrlen("x", NULL), M3_ERR_INVALID_ARGUMENT);
 
     M3_TEST_EXPECT(m3_log_shutdown(), M3_ERR_STATE);
+    sink.ctx = &state;
+    sink.write = test_sink_write;
+    M3_TEST_EXPECT(m3_log_set_sink(&sink), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_log_get_sink(&current), M3_ERR_STATE);
     M3_TEST_EXPECT(m3_log_write(M3_LOG_LEVEL_INFO, "core", "msg"), M3_ERR_STATE);
     M3_TEST_EXPECT(m3_log_write(M3_LOG_LEVEL_INFO, "core", NULL), M3_ERR_INVALID_ARGUMENT);
 
@@ -93,6 +97,12 @@ int main(void)
     sink.ctx = NULL;
     sink.write = NULL;
     M3_TEST_EXPECT(m3_log_set_sink(&sink), M3_ERR_INVALID_ARGUMENT);
+
+    M3_TEST_OK(m3_log_test_set_mutex_failures(M3_FALSE, M3_TRUE, M3_FALSE, M3_FALSE));
+    sink.ctx = &state;
+    sink.write = test_sink_write;
+    M3_TEST_EXPECT(m3_log_set_sink(&sink), M3_ERR_UNKNOWN);
+    M3_TEST_OK(m3_log_test_set_mutex_failures(M3_FALSE, M3_FALSE, M3_FALSE, M3_FALSE));
 
     M3_TEST_EXPECT(m3_log_get_sink(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(m3_log_get_sink(&current));

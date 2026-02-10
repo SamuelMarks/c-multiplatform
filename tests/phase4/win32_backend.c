@@ -8,6 +8,7 @@ int main(void)
 {
     M3Win32BackendConfig config;
     M3Win32Backend *backend;
+    M3Allocator default_alloc;
     M3Bool available;
 
     M3_TEST_EXPECT(m3_win32_backend_config_init(NULL), M3_ERR_INVALID_ARGUMENT);
@@ -16,6 +17,12 @@ int main(void)
     M3_TEST_ASSERT(config.clipboard_limit != 0);
     M3_TEST_ASSERT(config.enable_logging == M3_TRUE);
     M3_TEST_ASSERT(config.inline_tasks == M3_TRUE);
+
+    M3_TEST_EXPECT(m3_win32_backend_test_validate_config(NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_OK(m3_get_default_allocator(&default_alloc));
+    M3_TEST_OK(m3_win32_backend_config_init(&config));
+    config.allocator = &default_alloc;
+    M3_TEST_OK(m3_win32_backend_test_validate_config(&config));
 
     M3_TEST_EXPECT(m3_win32_backend_is_available(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(m3_win32_backend_is_available(&available));

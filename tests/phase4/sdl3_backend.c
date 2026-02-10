@@ -8,6 +8,7 @@ int main(void)
 {
     M3SDL3BackendConfig config;
     M3SDL3Backend *backend;
+    M3Allocator default_alloc;
     M3Bool available;
 
     M3_TEST_EXPECT(m3_sdl3_backend_config_init(NULL), M3_ERR_INVALID_ARGUMENT);
@@ -16,6 +17,12 @@ int main(void)
     M3_TEST_ASSERT(config.renderer_flags != 0);
     M3_TEST_ASSERT(config.enable_logging == M3_TRUE);
     M3_TEST_ASSERT(config.enable_tasks == M3_TRUE);
+
+    M3_TEST_EXPECT(m3_sdl3_backend_test_validate_config(NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_OK(m3_get_default_allocator(&default_alloc));
+    M3_TEST_OK(m3_sdl3_backend_config_init(&config));
+    config.allocator = &default_alloc;
+    M3_TEST_OK(m3_sdl3_backend_test_validate_config(&config));
 
     M3_TEST_EXPECT(m3_sdl3_backend_is_available(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(m3_sdl3_backend_is_available(&available));

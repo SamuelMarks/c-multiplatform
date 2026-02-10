@@ -56,6 +56,13 @@ static int m3_cocoa_backend_validate_config(const M3CocoaBackendConfig *config)
     return M3_OK;
 }
 
+#ifdef M3_TESTING
+int M3_CALL m3_cocoa_backend_test_validate_config(const M3CocoaBackendConfig *config)
+{
+    return m3_cocoa_backend_validate_config(config);
+}
+#endif
+
 int M3_CALL m3_cocoa_backend_create(const M3CocoaBackendConfig *config, M3CocoaBackend **out_backend)
 {
     M3CocoaBackendConfig local_config;

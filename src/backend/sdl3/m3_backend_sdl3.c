@@ -57,6 +57,13 @@ static int m3_sdl3_backend_validate_config(const M3SDL3BackendConfig *config)
     return M3_OK;
 }
 
+#ifdef M3_TESTING
+int M3_CALL m3_sdl3_backend_test_validate_config(const M3SDL3BackendConfig *config)
+{
+    return m3_sdl3_backend_validate_config(config);
+}
+#endif
+
 int M3_CALL m3_sdl3_backend_is_available(M3Bool *out_available)
 {
     if (out_available == NULL) {

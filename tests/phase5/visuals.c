@@ -3,6 +3,26 @@
 
 #include <string.h>
 
+#define M3_VISUALS_TEST_FAIL_NONE 0u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_INIT_RADIUS 1u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_INIT_OPACITY 2u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_START_RADIUS_INIT 3u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_START_OPACITY_INIT 4u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_START_TIMING 5u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_RELEASE_TIMING 6u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_RUNNING 7u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_STEP 8u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_VALUE 9u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_RUNNING 10u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_STEP 11u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_VALUE 12u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_FADE_RUNNING 13u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_STOP_RADIUS 14u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_STEP_STOP_OPACITY 15u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_PAINT_RECT 16u
+#define M3_VISUALS_TEST_FAIL_RIPPLE_PAINT_COLOR 17u
+#define M3_VISUALS_TEST_FAIL_SHADOW_NORM 18u
+
 typedef struct TestGfxBackend {
     int draw_rect_calls;
     int push_clip_calls;
@@ -151,11 +171,56 @@ int main(void)
     color.b = 0.0f;
     color.a = 0.0f;
 
+    M3_TEST_EXPECT(m3_visuals_test_validate_rect(NULL), M3_ERR_INVALID_ARGUMENT);
+    rect.x = 0.0f;
+    rect.y = 0.0f;
+    rect.width = -1.0f;
+    rect.height = 1.0f;
+    M3_TEST_EXPECT(m3_visuals_test_validate_rect(&rect), M3_ERR_RANGE);
+    rect.width = 1.0f;
+    rect.height = -1.0f;
+    M3_TEST_EXPECT(m3_visuals_test_validate_rect(&rect), M3_ERR_RANGE);
+    rect.height = 1.0f;
+    M3_TEST_OK(m3_visuals_test_validate_rect(&rect));
+
+    M3_TEST_EXPECT(m3_visuals_test_validate_color(NULL), M3_ERR_INVALID_ARGUMENT);
+    color.r = -0.1f;
+    M3_TEST_EXPECT(m3_visuals_test_validate_color(&color), M3_ERR_RANGE);
+    color.r = 0.0f;
+    color.g = 1.2f;
+    M3_TEST_EXPECT(m3_visuals_test_validate_color(&color), M3_ERR_RANGE);
+    color.g = 0.0f;
+    color.b = 1.2f;
+    M3_TEST_EXPECT(m3_visuals_test_validate_color(&color), M3_ERR_RANGE);
+    color.b = 0.0f;
+    color.a = 1.2f;
+    M3_TEST_EXPECT(m3_visuals_test_validate_color(&color), M3_ERR_RANGE);
+    color.a = 0.0f;
+    M3_TEST_OK(m3_visuals_test_validate_color(&color));
+
+    M3_TEST_EXPECT(m3_visuals_test_validate_gfx(NULL), M3_ERR_INVALID_ARGUMENT);
+    test_gfx_backend_init(&backend);
+    gfx.ctx = &backend;
+    gfx.vtable = NULL;
+    gfx.text_vtable = NULL;
+    M3_TEST_EXPECT(m3_visuals_test_validate_gfx(&gfx), M3_ERR_INVALID_ARGUMENT);
+    gfx.vtable = &g_test_vtable_no_draw;
+    M3_TEST_EXPECT(m3_visuals_test_validate_gfx(&gfx), M3_ERR_UNSUPPORTED);
+    gfx.vtable = &g_test_vtable;
+    M3_TEST_OK(m3_visuals_test_validate_gfx(&gfx));
+
     M3_TEST_EXPECT(m3_ripple_init(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_shadow_init(NULL), M3_ERR_INVALID_ARGUMENT);
 
     M3_TEST_OK(m3_ripple_init(&ripple));
     M3_TEST_OK(m3_shadow_init(&shadow));
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_INIT_RADIUS));
+    M3_TEST_EXPECT(m3_ripple_init(&ripple), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_INIT_OPACITY));
+    M3_TEST_EXPECT(m3_ripple_init(&ripple), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+    M3_TEST_OK(m3_ripple_init(&ripple));
 
     M3_TEST_EXPECT(m3_ripple_is_active(NULL, &active), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_ripple_is_active(&ripple, NULL), M3_ERR_INVALID_ARGUMENT);
@@ -172,6 +237,25 @@ int main(void)
     color.r = -0.1f;
     M3_TEST_EXPECT(m3_ripple_start(&ripple, 0.0f, 0.0f, 1.0f, 0.1f, color), M3_ERR_RANGE);
     color.r = 0.2f;
+    color.g = -0.1f;
+    M3_TEST_EXPECT(m3_ripple_start(&ripple, 0.0f, 0.0f, 1.0f, 0.1f, color), M3_ERR_RANGE);
+    color.g = 0.3f;
+    color.b = -0.1f;
+    M3_TEST_EXPECT(m3_ripple_start(&ripple, 0.0f, 0.0f, 1.0f, 0.1f, color), M3_ERR_RANGE);
+    color.b = 0.4f;
+    color.a = 1.2f;
+    M3_TEST_EXPECT(m3_ripple_start(&ripple, 0.0f, 0.0f, 1.0f, 0.1f, color), M3_ERR_RANGE);
+    color.a = 0.5f;
+
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_START_RADIUS_INIT));
+    M3_TEST_EXPECT(m3_ripple_start(&ripple, 5.0f, 6.0f, 10.0f, 0.0f, color), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_START_OPACITY_INIT));
+    M3_TEST_EXPECT(m3_ripple_start(&ripple, 5.0f, 6.0f, 10.0f, 0.0f, color), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_START_TIMING));
+    M3_TEST_EXPECT(m3_ripple_start(&ripple, 5.0f, 6.0f, 10.0f, 0.0f, color), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
 
     M3_TEST_OK(m3_ripple_start(&ripple, 5.0f, 6.0f, 10.0f, 0.0f, color));
     M3_TEST_OK(m3_ripple_is_active(&ripple, &active));
@@ -179,10 +263,56 @@ int main(void)
 
     M3_TEST_EXPECT(m3_ripple_release(NULL, 0.1f), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_ripple_release(&ripple, -0.1f), M3_ERR_RANGE);
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_RELEASE_TIMING));
+    M3_TEST_EXPECT(m3_ripple_release(&ripple, 0.1f), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
 
     M3_TEST_EXPECT(m3_ripple_step(NULL, 0.1f, &finished), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_ripple_step(&ripple, 0.1f, NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_ripple_step(&ripple, -0.1f, &finished), M3_ERR_RANGE);
+
+    ripple.radius_anim.running = M3_TRUE;
+    ripple.opacity_anim.running = M3_TRUE;
+    ripple.radius_anim.mode = M3_ANIM_MODE_TIMING;
+    ripple.opacity_anim.mode = M3_ANIM_MODE_TIMING;
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_RUNNING));
+    M3_TEST_EXPECT(m3_ripple_step(&ripple, 0.0f, &finished), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_STEP));
+    M3_TEST_EXPECT(m3_ripple_step(&ripple, 0.0f, &finished), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+    ripple.radius_anim.running = M3_FALSE;
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_RADIUS_VALUE));
+    M3_TEST_EXPECT(m3_ripple_step(&ripple, 0.0f, &finished), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+
+    ripple.radius_anim.running = M3_TRUE;
+    ripple.opacity_anim.running = M3_TRUE;
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_RUNNING));
+    M3_TEST_EXPECT(m3_ripple_step(&ripple, 0.0f, &finished), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_STEP));
+    M3_TEST_EXPECT(m3_ripple_step(&ripple, 0.0f, &finished), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+    ripple.opacity_anim.running = M3_FALSE;
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_VALUE));
+    M3_TEST_EXPECT(m3_ripple_step(&ripple, 0.0f, &finished), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+
+    ripple.state = M3_RIPPLE_STATE_FADING;
+    ripple.opacity_anim.running = M3_TRUE;
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_FADE_RUNNING));
+    M3_TEST_EXPECT(m3_ripple_step(&ripple, 0.0f, &finished), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+
+    ripple.opacity_anim.running = M3_FALSE;
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_STOP_RADIUS));
+    M3_TEST_EXPECT(m3_ripple_step(&ripple, 0.0f, &finished), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_STEP_STOP_OPACITY));
+    M3_TEST_EXPECT(m3_ripple_step(&ripple, 0.0f, &finished), M3_ERR_IO);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+    ripple.state = M3_RIPPLE_STATE_EXPANDING;
 
     M3_TEST_OK(m3_ripple_step(&ripple, 0.0f, &finished));
     M3_TEST_ASSERT(ripple.radius == 10.0f);
@@ -193,6 +323,8 @@ int main(void)
     M3_TEST_ASSERT(finished == M3_TRUE);
     M3_TEST_OK(m3_ripple_is_active(&ripple, &active));
     M3_TEST_ASSERT(active == M3_FALSE);
+    M3_TEST_OK(m3_ripple_step(&ripple, 0.0f, &finished));
+    M3_TEST_ASSERT(finished == M3_TRUE);
 
     M3_TEST_EXPECT(m3_ripple_release(&ripple, 0.1f), M3_ERR_STATE);
     ripple.state = M3_RIPPLE_STATE_FADING;
@@ -213,6 +345,12 @@ int main(void)
     bounds.height = 10.0f;
     M3_TEST_OK(m3_ripple_compute_max_radius(&bounds, 5.0f, 5.0f, &radius));
     M3_TEST_ASSERT(m3_near(radius, 7.071f, 0.01f));
+    M3_TEST_OK(m3_ripple_compute_max_radius(&bounds, 0.0f, 0.0f, &radius));
+    M3_TEST_ASSERT(m3_near(radius, 14.142f, 0.02f));
+    bounds.height = 20.0f;
+    M3_TEST_OK(m3_ripple_compute_max_radius(&bounds, 10.0f, 0.0f, &radius));
+    M3_TEST_ASSERT(m3_near(radius, 22.360f, 0.02f));
+    bounds.height = 10.0f;
 
     test_gfx_backend_init(&backend);
     gfx.ctx = &backend;
@@ -261,6 +399,13 @@ int main(void)
     M3_TEST_ASSERT(backend.pop_clip_calls == 1);
     M3_TEST_ASSERT(m3_near(backend.last_rect.width, 8.0f, 0.0001f));
     M3_TEST_ASSERT(m3_near(backend.last_color.a, 0.4f, 0.0001f));
+
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_PAINT_RECT));
+    M3_TEST_EXPECT(m3_ripple_paint(&ripple, &gfx, NULL, 0.0f), M3_ERR_RANGE);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_RIPPLE_PAINT_COLOR));
+    M3_TEST_EXPECT(m3_ripple_paint(&ripple, &gfx, NULL, 0.0f), M3_ERR_RANGE);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
 
     test_gfx_backend_init(&backend);
     gfx.ctx = &backend;
@@ -317,6 +462,12 @@ int main(void)
     color.g = 0.1f;
     color.b = 0.1f;
     color.a = 0.8f;
+    color.g = -0.2f;
+    M3_TEST_EXPECT(m3_shadow_set(&shadow, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1, color), M3_ERR_RANGE);
+    color.g = 0.1f;
+    color.b = -0.2f;
+    M3_TEST_EXPECT(m3_shadow_set(&shadow, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1, color), M3_ERR_RANGE);
+    color.b = 0.1f;
     M3_TEST_EXPECT(m3_shadow_set(&shadow, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1, color), M3_ERR_RANGE);
     M3_TEST_EXPECT(m3_shadow_set(&shadow, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1, color), M3_ERR_RANGE);
     M3_TEST_EXPECT(m3_shadow_set(&shadow, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 1, color), M3_ERR_RANGE);
@@ -344,6 +495,10 @@ int main(void)
     gfx.vtable = &g_test_vtable_no_draw;
     M3_TEST_EXPECT(m3_shadow_paint(&shadow, &gfx, &rect, NULL), M3_ERR_UNSUPPORTED);
     gfx.vtable = &g_test_vtable;
+
+    M3_TEST_OK(m3_visuals_test_set_fail_point(M3_VISUALS_TEST_FAIL_SHADOW_NORM));
+    M3_TEST_EXPECT(m3_shadow_paint(&shadow, &gfx, &rect, NULL), M3_ERR_RANGE);
+    M3_TEST_OK(m3_visuals_test_clear_fail_points());
 
     rect.width = -1.0f;
     M3_TEST_EXPECT(m3_shadow_paint(&shadow, &gfx, &rect, NULL), M3_ERR_RANGE);

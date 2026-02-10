@@ -12,21 +12,26 @@ This project is architected specifically for **Context-Window Scalability**, dec
 *   **Flex-style Layout:** A constraint-based layout engine similar to Flexbox.
 *   **Physics-based Animation:** Spring simulation and timing controllers built-in.
 *   **Redux-style State Store:** Deterministic state management with time-travel debugging capabilities (Undo/Redo).
-*   **Component Suite:** Buttons, selection controls, and text fields (with cursor, selection, and label animation).
-*   **Modular Backends:**
+*   **Widget Toolkit:** Visuals/text primitives plus buttons, selection controls, text fields, lists, navigation, dialogs, and progress indicators.
+*   **Plugin APIs:** Storage, camera, and network helpers that bind to backend IO/sensors/tasking.
+*   **Modular Backends (platform-gated):**
     *   **Null Backend:** For headless testing and logic verification.
-    *   **SDL3 Backend:** For desktop development and debugging.
+    *   **SDL3 Backend:** Desktop debug backend (optional SDL3_ttf text rendering).
     *   **GTK4 Backend:** Linux desktop backend using GTK4/Cairo.
-    *   *(Planned)*: Native Connectors for Win32 GDI, Cocoa, Android, and Web/WASM.
+    *   **Cocoa Backend:** macOS backend using Cocoa/CoreGraphics/CoreText.
+    *   **Win32 Backend:** Windows backend using GDI + WinHTTP.
+    *   **Web Backend:** Emscripten backend (WebGL; optional WebGPU).
+    *   **iOS Backend:** UIKit-based backend with AVFoundation integration.
+    *   **Android Backend:** NDK backend with Camera2 integration (API 24+).
 *   **Interface-Driven:** Pure virtual table architecture separates API definitions from execution logic.
 
 ## 📂 Architecture Strategy
 
 The project structure is designed to separate the **Contract** (Phase 0) from the **Implementation**.
 
-*   **`include/m3/`**: Contains only header-only definitions, types, and V-Tables. These files represent the total API surface area. When extending the library, an LLM only needs to see the specific `*_interface.h` relevant to the task, keeping context utilization low.
-*   **`src/core/`**: Pure logic implementations (Math, Color, Layout, Router, Redux). These have no platform dependencies.
-*   **`src/backend/`**: Platform-specific glue code implementation of the V-Tables defined in `m3_api_*.h`.
+*   **`include/m3/`**: ABI contracts (`m3_api_*`) plus public module headers (core systems, widgets, and plugins).
+*   **`src/core/`**: Pure logic implementations (math, color, layout, animation, router, render, event, tasks, widgets, plugins).
+*   **`src/backend/`**: Platform-specific implementations of the `m3_api_*` V-Tables (per backend subdirectory).
 
 ## 📚 Documentation
 
@@ -38,11 +43,15 @@ The project structure is designed to separate the **Contract** (Phase 0) from th
 
 LibM3C uses **CMake**. Ensure you have CMake 3.16+ installed.
 
-### Prerequisites for SDL3 Backend (Optional)
-If you wish to run the visual backend, ensure SDL3 is installed on your system. If not found, the build will proceed with only the Null backend and Core library.
+### Backend Prerequisites (Optional)
+Backends are opt-in and will compile as stubs when their platform or dependencies are missing. Use `m3_*_backend_is_available` at runtime to check support.
 
-### Prerequisites for GTK4 Backend (Optional)
-To enable the GTK4 backend, install GTK4 development packages and ensure `pkg-config` can locate `gtk4`. If not found, the GTK4 backend will be stubbed.
+* **SDL3:** Install SDL3; enable SDL3_ttf for text rendering if needed.
+* **GTK4:** Install GTK4 dev packages and ensure `pkg-config` can locate `gtk4`.
+* **Cocoa/iOS:** Requires Apple toolchains with Objective-C and system frameworks.
+* **Win32:** Requires a Windows toolchain with user32/gdi32/winhttp.
+* **Web:** Requires Emscripten; WebGPU is optional.
+* **Android:** Requires the Android NDK; Camera2 integration targets API 24+.
 
 ### Compile
 
@@ -59,10 +68,17 @@ cmake --build .
 | :--- | :--- | :--- |
 | `M3_WARNINGS_AS_ERRORS` | `ON` | Treat compiler warnings as errors. |
 | `M3_ENABLE_SDL3` | `OFF` | Enable the SDL3 debug backend. |
+| `M3_ENABLE_SDL3_TTF` | `OFF` | Enable SDL3_ttf text rendering for the SDL3 backend. |
 | `M3_ENABLE_GTK4` | `OFF` | Enable the GTK4 backend (Linux). |
+| `M3_ENABLE_COCOA` | `OFF` | Enable the Cocoa backend (macOS). |
+| `M3_ENABLE_WIN32` | `ON` | Enable the Win32 backend (Windows). |
+| `M3_ENABLE_WEB` | `OFF` | Enable the Web (Emscripten) backend. |
+| `M3_ENABLE_WEBGPU` | `OFF` | Enable WebGPU for the Web backend. |
+| `M3_ENABLE_IOS` | `OFF` | Enable the iOS backend. |
+| `M3_ENABLE_ANDROID` | `ON (Android), OFF otherwise` | Enable the Android backend. |
 | `M3_ENABLE_LIBCURL` | `ON` | Enable libcurl-backed network support. |
 | `M3_APPLE_USE_CFNETWORK_C` | `ON` | Use CFNetwork C APIs for Apple network backends (OFF uses Foundation). |
-| `M3_REQUIRE_DOXYGEN` | `ON` | Fail configuration if Doxygen is missing. |
+| `M3_REQUIRE_DOXYGEN` | `OFF` | Fail configuration if Doxygen is missing. |
 | `M3_ENABLE_COVERAGE` | `OFF` | Enable code coverage (GCC/Clang only). |
 
 ### Running Tests
@@ -74,10 +90,15 @@ cd build
 ctest --output-on-failure
 ```
 
-To run a specific backend test manually:
+To run a specific backend test manually (platform-dependent):
 ```bash
 ./m3_phase4_sdl3_backend
 ./m3_phase4_gtk4_backend
+./m3_phase4_cocoa_backend
+./m3_phase4_win32_backend
+./m3_phase4_web_backend
+./m3_phase4_ios_backend
+./m3_phase4_android_backend
 ```
 
 ## 📦 Usage Example
@@ -158,10 +179,10 @@ int main(void) {
 | Phase | Description | Status |
 | :--- | :--- | :--- |
 | **0. Protocols** | Core, GFX, Env, and Widget Interface definitions | ✅ Complete |
-| **1. Infra** | Build system, Allocators, Logging, Redux Store | ✅ Complete |
-| **2. Core Logic** | Math, HCT Color, Flex Layout, Springs, Router | ✅ Complete |
-| **3. Engine** | Render Tree Builders, Event Dispatching, Task Runner | ✅ Complete |
-| **4. Backends** | Null Backend, SDL3 Debug Backend, GTK4 (Linux) | 🚧 In Progress |
-| **5. Components** | Buttons, Text Fields, Lists (Native Widgets) | 🚧 In Progress (5.1–5.5 complete) |
-| **6. Plugins** | Camera, Network, Storage implementations | 🚧 In Progress (Storage core complete) |
+| **1. Infra** | Build system, allocators, logging, handles, store | ✅ Complete |
+| **2. Core Logic** | Math, HCT color, flex layout, springs, router | ✅ Complete |
+| **3. Engine** | Render lists, event dispatching, task runner | ✅ Complete |
+| **4. Backends** | Null, SDL3, GTK4, Cocoa, Win32, Web, iOS, Android (platform-gated) | ✅ Implemented (platform-gated) |
+| **5. Components** | Visuals, text, buttons, selection, text fields, lists, navigation, dialogs, progress | ✅ Complete |
+| **6. Plugins** | Storage, camera, network | ✅ Core APIs complete (backend support varies) |
 | **7. Release** | Packaging logic for Mobile/Web/Desktop | 🚧 Planned |

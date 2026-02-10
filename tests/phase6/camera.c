@@ -320,6 +320,36 @@ static int test_camera_init_errors(void)
     M3_TEST_EXPECT(m3_camera_init(&session, &config), M3_ERR_IO);
     cam_state.fail_open = 0;
 
+    M3_TEST_OK(test_camera_state_reset(&cam_state));
+    M3_TEST_OK(test_env_reset(&env_state, &cam_state, &g_test_camera_vtable));
+    config.env = &env_state.env;
+
+    vtable_missing = g_test_camera_vtable;
+    vtable_missing.open_with_config = NULL;
+    env_state.camera.vtable = &vtable_missing;
+    memset(&session, 0, sizeof(session));
+    M3_TEST_OK(m3_camera_init(&session, &config));
+    M3_TEST_ASSERT(cam_state.open_calls == 1);
+    M3_TEST_OK(m3_camera_shutdown(&session));
+
+    M3_TEST_OK(test_camera_state_reset(&cam_state));
+    M3_TEST_OK(test_env_reset(&env_state, &cam_state, &vtable_missing));
+    config.env = &env_state.env;
+    cam_state.fail_open = 1;
+    memset(&session, 0, sizeof(session));
+    M3_TEST_EXPECT(m3_camera_init(&session, &config), M3_ERR_IO);
+    cam_state.fail_open = 0;
+
+    vtable_missing = g_test_camera_vtable;
+    vtable_missing.open = NULL;
+    vtable_missing.open_with_config = NULL;
+    env_state.camera.vtable = &vtable_missing;
+    memset(&session, 0, sizeof(session));
+    M3_TEST_EXPECT(m3_camera_test_set_skip_vtable_check(2), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_OK(m3_camera_test_set_skip_vtable_check(M3_TRUE));
+    M3_TEST_EXPECT(m3_camera_init(&session, &config), M3_ERR_UNSUPPORTED);
+    M3_TEST_OK(m3_camera_test_set_skip_vtable_check(M3_FALSE));
+
     return 0;
 }
 
@@ -343,6 +373,18 @@ static int test_camera_shutdown_errors(void)
     vtable_missing.close = NULL;
     M3_TEST_OK(test_session_reset(&session, &cam_state, &vtable_missing, M3_TRUE, M3_FALSE));
     M3_TEST_EXPECT(m3_camera_shutdown(&session), M3_ERR_UNSUPPORTED);
+
+    M3_TEST_OK(test_camera_state_reset(&cam_state));
+    M3_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable, M3_TRUE, M3_TRUE));
+    cam_state.fail_stop = 1;
+    M3_TEST_EXPECT(m3_camera_shutdown(&session), M3_ERR_IO);
+    cam_state.fail_stop = 0;
+
+    M3_TEST_OK(test_camera_state_reset(&cam_state));
+    M3_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable, M3_TRUE, M3_FALSE));
+    cam_state.fail_close = 1;
+    M3_TEST_EXPECT(m3_camera_shutdown(&session), M3_ERR_IO);
+    cam_state.fail_close = 0;
 
     return 0;
 }

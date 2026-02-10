@@ -1,5 +1,8 @@
 #include "m3/m3_event.h"
 
+#ifdef M3_TESTING
+static M3Bool g_m3_event_force_contains_error = M3_FALSE;
+#endif
 static int m3_event_validate_rect(const M3Rect *rect)
 {
     if (rect == NULL) {
@@ -56,7 +59,15 @@ static int m3_event_hit_test(const M3RenderNode *node, M3Scalar x, M3Scalar y, M
         return rc;
     }
 
+#ifdef M3_TESTING
+    if (g_m3_event_force_contains_error == M3_TRUE) {
+        rc = m3_rect_contains_point(&node->bounds, x, y, NULL);
+    } else {
+        rc = m3_rect_contains_point(&node->bounds, x, y, &contains);
+    }
+#else
     rc = m3_rect_contains_point(&node->bounds, x, y, &contains);
+#endif
     if (rc != M3_OK) {
         return rc;
     }
@@ -315,3 +326,40 @@ int M3_CALL m3_event_dispatch(M3EventDispatcher *dispatcher, const M3RenderNode 
             return M3_ERR_INVALID_ARGUMENT;
     }
 }
+
+#ifdef M3_TESTING
+int M3_CALL m3_event_test_validate_rect(const M3Rect *rect)
+{
+    return m3_event_validate_rect(rect);
+}
+
+int M3_CALL m3_event_test_widget_focusable(const M3Widget *widget, M3Bool *out_focusable)
+{
+    if (out_focusable == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    *out_focusable = m3_event_widget_focusable(widget);
+    return M3_OK;
+}
+
+int M3_CALL m3_event_test_hit_test(const M3RenderNode *node, M3Scalar x, M3Scalar y, M3Widget **out_widget)
+{
+    return m3_event_hit_test(node, x, y, out_widget);
+}
+
+int M3_CALL m3_event_test_dispatch_to_widget(M3Widget *widget, const M3InputEvent *event, M3Bool *out_handled)
+{
+    return m3_event_dispatch_to_widget(widget, event, out_handled);
+}
+
+int M3_CALL m3_event_test_set_force_contains_error(M3Bool enable)
+{
+    if (enable != M3_FALSE && enable != M3_TRUE) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    g_m3_event_force_contains_error = enable ? M3_TRUE : M3_FALSE;
+    return M3_OK;
+}
+#endif

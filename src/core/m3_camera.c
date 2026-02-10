@@ -2,6 +2,10 @@
 
 #include <string.h>
 
+#ifdef M3_TESTING
+static M3Bool g_m3_camera_skip_vtable_check = M3_FALSE;
+#endif
+
 #define M3_CAMERA_VTABLE_HAS_OPEN(vtable) \
     ((vtable)->open != NULL || (vtable)->open_with_config != NULL)
 #define M3_CAMERA_VTABLE_COMPLETE(vtable) \
@@ -48,9 +52,17 @@ int M3_CALL m3_camera_init(M3CameraSession *session, const M3CameraSessionConfig
     if (camera.ctx == NULL || camera.vtable == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
+#ifdef M3_TESTING
+    if (g_m3_camera_skip_vtable_check == M3_FALSE) {
+        if (!M3_CAMERA_VTABLE_COMPLETE(camera.vtable)) {
+            return M3_ERR_UNSUPPORTED;
+        }
+    }
+#else
     if (!M3_CAMERA_VTABLE_COMPLETE(camera.vtable)) {
         return M3_ERR_UNSUPPORTED;
     }
+#endif
 
     if (camera.vtable->open_with_config != NULL) {
         rc = camera.vtable->open_with_config(camera.ctx, &config->config);
@@ -218,3 +230,15 @@ int M3_CALL m3_camera_copy_frame(const M3CameraFrame *frame, void *dst, m3_usize
     *out_size = frame->size;
     return M3_OK;
 }
+
+#ifdef M3_TESTING
+int M3_CALL m3_camera_test_set_skip_vtable_check(M3Bool enable)
+{
+    if (enable != M3_FALSE && enable != M3_TRUE) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    g_m3_camera_skip_vtable_check = enable ? M3_TRUE : M3_FALSE;
+    return M3_OK;
+}
+#endif

@@ -336,6 +336,19 @@ M3_API int M3_CALL m3_grid_view_get_visible(const M3GridView *view, M3RenderNode
 
 #ifdef M3_TESTING
 /**
+ * @brief Set a list test fail point.
+ * @param fail_point Fail point identifier.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_set_fail_point(m3_u32 fail_point);
+
+/**
+ * @brief Clear list test fail points.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_clear_fail_points(void);
+
+/**
  * @brief Test hook for list multiply-overflow helper.
  * @param a First operand.
  * @param b Second operand.
@@ -343,6 +356,120 @@ M3_API int M3_CALL m3_grid_view_get_visible(const M3GridView *view, M3RenderNode
  * @return M3_OK on success or a failure code.
  */
 M3_API int M3_CALL m3_list_test_mul_overflow(m3_usize a, m3_usize b, m3_usize *out_value);
+/**
+ * @brief Test hook for validating list colors.
+ * @param color Color to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_validate_color(const M3Color *color);
+/**
+ * @brief Test hook for validating list layout edges.
+ * @param edges Edges to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_validate_edges(const M3LayoutEdges *edges);
+/**
+ * @brief Test hook for validating rectangles.
+ * @param rect Rectangle to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_validate_rect(const M3Rect *rect);
+/**
+ * @brief Test hook for validating measure specs.
+ * @param spec Measure spec to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_validate_measure_spec(M3MeasureSpec spec);
+/**
+ * @brief Test hook for validating list styles.
+ * @param style Style to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_validate_style(const M3ListStyle *style);
+/**
+ * @brief Test hook for validating grid styles.
+ * @param style Style to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_validate_grid_style(const M3GridStyle *style);
+/**
+ * @brief Test hook for computing list content extents.
+ * @param item_count Number of items.
+ * @param item_extent Extent of each item.
+ * @param spacing Item spacing.
+ * @param padding_start Start padding.
+ * @param padding_end End padding.
+ * @param out_extent Receives computed extent.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_compute_content_extent(m3_usize item_count, M3Scalar item_extent, M3Scalar spacing,
+    M3Scalar padding_start, M3Scalar padding_end, M3Scalar *out_extent);
+/**
+ * @brief Test hook for computing list visible ranges.
+ * @param item_count Number of items.
+ * @param item_extent Extent of each item.
+ * @param spacing Item spacing.
+ * @param padding_start Start padding.
+ * @param scroll Scroll offset.
+ * @param viewport Viewport size.
+ * @param overscan Overscan count.
+ * @param out_first Receives first visible index.
+ * @param out_last Receives last visible index.
+ * @param out_count Receives visible count.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_compute_visible_range(m3_usize item_count, M3Scalar item_extent, M3Scalar spacing,
+    M3Scalar padding_start, M3Scalar scroll, M3Scalar viewport, m3_usize overscan, m3_usize *out_first, m3_usize *out_last,
+    m3_usize *out_count);
+/**
+ * @brief Test hook for computing grid visible ranges.
+ * @param view Grid view to inspect.
+ * @param out_first Receives first visible index.
+ * @param out_last Receives last visible index.
+ * @param out_count Receives visible count.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_grid_compute_visible_range(const M3GridView *view, m3_usize *out_first, m3_usize *out_last,
+    m3_usize *out_count);
+/**
+ * @brief Test hook for computing list item bounds.
+ * @param view List view.
+ * @param index Item index.
+ * @param out_bounds Receives bounds.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_compute_item_bounds(const M3ListView *view, m3_usize index, M3Rect *out_bounds);
+/**
+ * @brief Test hook for computing grid item bounds.
+ * @param view Grid view.
+ * @param index Item index.
+ * @param out_bounds Receives bounds.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_grid_compute_item_bounds(const M3GridView *view, m3_usize index, M3Rect *out_bounds);
+/**
+ * @brief Test hook for updating list metrics.
+ * @param view List view instance.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_update_metrics(M3ListView *view);
+/**
+ * @brief Test hook for updating grid metrics.
+ * @param view Grid view instance.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_grid_update_metrics(M3GridView *view);
+/**
+ * @brief Test hook for reserving list slot storage.
+ * @param slots Slot array pointer.
+ * @param visible_nodes Visible node array pointer.
+ * @param slot_capacity Slot capacity pointer.
+ * @param allocator Allocator to use.
+ * @param capacity Requested capacity.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_list_test_reserve_slots(M3ListSlot **slots, M3RenderNode ***visible_nodes, m3_usize *slot_capacity,
+    const M3Allocator *allocator, m3_usize capacity);
 #endif
 
 #ifdef __cplusplus

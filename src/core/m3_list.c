@@ -2,6 +2,34 @@
 
 #include <string.h>
 
+#ifdef M3_TESTING
+#define M3_LIST_TEST_FAIL_NONE 0u
+#define M3_LIST_TEST_FAIL_CONTENT_EXTENT_NEGATIVE 1u
+#define M3_LIST_TEST_FAIL_VISIBLE_STRIDE 2u
+#define M3_LIST_TEST_FAIL_VISIBLE_END 3u
+#define M3_LIST_TEST_FAIL_VISIBLE_LAST_BEFORE_FIRST 4u
+#define M3_LIST_TEST_FAIL_VISIBLE_LAST_AFTER_OVERSCAN 5u
+#define M3_LIST_TEST_FAIL_GRID_LINE_COUNT_ZERO 6u
+#define M3_LIST_TEST_FAIL_GRID_STRIDE 7u
+#define M3_LIST_TEST_FAIL_GRID_END 8u
+#define M3_LIST_TEST_FAIL_GRID_END_NEGATIVE 9u
+#define M3_LIST_TEST_FAIL_GRID_LAST_TOO_LARGE 10u
+#define M3_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST 11u
+#define M3_LIST_TEST_FAIL_RESERVE_NODE_BYTES 12u
+#define M3_LIST_TEST_FAIL_RESERVE_COPY_BYTES 13u
+
+static m3_u32 g_m3_list_test_fail_point = M3_LIST_TEST_FAIL_NONE;
+
+static M3Bool m3_list_test_fail_point_match(m3_u32 point)
+{
+    if (g_m3_list_test_fail_point != point) {
+        return M3_FALSE;
+    }
+    g_m3_list_test_fail_point = M3_LIST_TEST_FAIL_NONE;
+    return M3_TRUE;
+}
+#endif
+
 static m3_usize m3_list_usize_max_value(void)
 {
     return (m3_usize)~(m3_usize)0;
@@ -156,6 +184,11 @@ static int m3_list_compute_content_extent(m3_usize item_count, M3Scalar item_ext
     }
 
     *out_extent = padding_start + padding_end + item_extent * (M3Scalar)item_count + spacing * (M3Scalar)(item_count - 1);
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_CONTENT_EXTENT_NEGATIVE)) {
+        *out_extent = -1.0f;
+    }
+#endif
     if (*out_extent < 0.0f) {
         return M3_ERR_RANGE;
     }
@@ -187,6 +220,11 @@ static int m3_list_compute_visible_range(m3_usize item_count, M3Scalar item_exte
     }
 
     stride = item_extent + spacing;
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_VISIBLE_STRIDE)) {
+        stride = 0.0f;
+    }
+#endif
     if (stride <= 0.0f) {
         return M3_ERR_RANGE;
     }
@@ -203,6 +241,11 @@ static int m3_list_compute_visible_range(m3_usize item_count, M3Scalar item_exte
     }
 
     end = scroll + viewport - padding_start;
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_VISIBLE_END)) {
+        end = 0.0f;
+    }
+#endif
     if (end <= 0.0f) {
         return M3_OK;
     }
@@ -218,6 +261,15 @@ static int m3_list_compute_visible_range(m3_usize item_count, M3Scalar item_exte
     if (last >= item_count) {
         last = item_count - 1;
     }
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_VISIBLE_LAST_BEFORE_FIRST)) {
+        if (first > 0) {
+            last = first - 1;
+        } else {
+            last = 0;
+        }
+    }
+#endif
     if (last < first) {
         return M3_OK;
     }
@@ -237,6 +289,15 @@ static int m3_list_compute_visible_range(m3_usize item_count, M3Scalar item_exte
         }
     }
 
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_VISIBLE_LAST_AFTER_OVERSCAN)) {
+        if (first > 0) {
+            last = first - 1;
+        } else {
+            last = 0;
+        }
+    }
+#endif
     if (last < first) {
         return M3_OK;
     }
@@ -298,11 +359,21 @@ static int m3_grid_compute_visible_range(const M3GridView *view, m3_usize *out_f
     if (view->item_count % view->style.span != 0) {
         line_count += 1;
     }
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_GRID_LINE_COUNT_ZERO)) {
+        line_count = 0;
+    }
+#endif
     if (line_count == 0) {
         return M3_OK;
     }
 
     stride = item_main + spacing_main;
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_GRID_STRIDE)) {
+        stride = 0.0f;
+    }
+#endif
     if (stride <= 0.0f) {
         return M3_ERR_RANGE;
     }
@@ -319,10 +390,20 @@ static int m3_grid_compute_visible_range(const M3GridView *view, m3_usize *out_f
     }
 
     end = view->scroll_offset + viewport - padding_main;
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_GRID_END)) {
+        end = 0.0f;
+    }
+#endif
     if (end <= 0.0f) {
         return M3_OK;
     }
     end -= 0.0001f;
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_GRID_END_NEGATIVE)) {
+        end = -1.0f;
+    }
+#endif
     if (end < 0.0f) {
         end = 0.0f;
     }
@@ -331,9 +412,23 @@ static int m3_grid_compute_visible_range(const M3GridView *view, m3_usize *out_f
     if (first_line >= line_count) {
         return M3_OK;
     }
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_GRID_LAST_TOO_LARGE)) {
+        last_line = line_count;
+    }
+#endif
     if (last_line >= line_count) {
         last_line = line_count - 1;
     }
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST)) {
+        if (first_line > 0) {
+            last_line = first_line - 1;
+        } else {
+            last_line = 0;
+        }
+    }
+#endif
     if (last_line < first_line) {
         return M3_OK;
     }
@@ -596,6 +691,11 @@ static int m3_list_reserve_slots(M3ListSlot **slots, M3RenderNode ***visible_nod
         return rc;
     }
     rc = m3_list_mul_overflow(capacity, (m3_usize)sizeof(M3RenderNode *), &node_bytes);
+#ifdef M3_TESTING
+    if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_RESERVE_NODE_BYTES)) {
+        rc = M3_ERR_OVERFLOW;
+    }
+#endif
     if (rc != M3_OK) {
         return rc;
     }
@@ -614,6 +714,11 @@ static int m3_list_reserve_slots(M3ListSlot **slots, M3RenderNode ***visible_nod
     if (*slots != NULL && *slot_capacity > 0) {
         m3_usize copy_bytes;
         rc = m3_list_mul_overflow(*slot_capacity, (m3_usize)sizeof(M3ListSlot), &copy_bytes);
+#ifdef M3_TESTING
+        if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_RESERVE_COPY_BYTES)) {
+            rc = M3_ERR_OVERFLOW;
+        }
+#endif
         if (rc != M3_OK) {
             allocator->free(allocator->ctx, new_nodes);
             allocator->free(allocator->ctx, new_slots);
@@ -1770,8 +1875,96 @@ int M3_CALL m3_grid_view_get_visible(const M3GridView *view, M3RenderNode ***out
 }
 
 #ifdef M3_TESTING
+int M3_CALL m3_list_test_set_fail_point(m3_u32 fail_point)
+{
+    g_m3_list_test_fail_point = fail_point;
+    return M3_OK;
+}
+
+int M3_CALL m3_list_test_clear_fail_points(void)
+{
+    g_m3_list_test_fail_point = M3_LIST_TEST_FAIL_NONE;
+    return M3_OK;
+}
+
 int M3_CALL m3_list_test_mul_overflow(m3_usize a, m3_usize b, m3_usize *out_value)
 {
     return m3_list_mul_overflow(a, b, out_value);
+}
+
+int M3_CALL m3_list_test_validate_color(const M3Color *color)
+{
+    return m3_list_validate_color(color);
+}
+
+int M3_CALL m3_list_test_validate_edges(const M3LayoutEdges *edges)
+{
+    return m3_list_validate_edges(edges);
+}
+
+int M3_CALL m3_list_test_validate_rect(const M3Rect *rect)
+{
+    return m3_list_validate_rect(rect);
+}
+
+int M3_CALL m3_list_test_validate_measure_spec(M3MeasureSpec spec)
+{
+    return m3_list_validate_measure_spec(spec);
+}
+
+int M3_CALL m3_list_test_validate_style(const M3ListStyle *style)
+{
+    return m3_list_validate_style(style);
+}
+
+int M3_CALL m3_list_test_validate_grid_style(const M3GridStyle *style)
+{
+    return m3_grid_validate_style(style);
+}
+
+int M3_CALL m3_list_test_compute_content_extent(m3_usize item_count, M3Scalar item_extent, M3Scalar spacing,
+    M3Scalar padding_start, M3Scalar padding_end, M3Scalar *out_extent)
+{
+    return m3_list_compute_content_extent(item_count, item_extent, spacing, padding_start, padding_end, out_extent);
+}
+
+int M3_CALL m3_list_test_compute_visible_range(m3_usize item_count, M3Scalar item_extent, M3Scalar spacing,
+    M3Scalar padding_start, M3Scalar scroll, M3Scalar viewport, m3_usize overscan, m3_usize *out_first, m3_usize *out_last,
+    m3_usize *out_count)
+{
+    return m3_list_compute_visible_range(item_count, item_extent, spacing, padding_start, scroll, viewport, overscan, out_first,
+        out_last, out_count);
+}
+
+int M3_CALL m3_list_test_grid_compute_visible_range(const M3GridView *view, m3_usize *out_first, m3_usize *out_last,
+    m3_usize *out_count)
+{
+    return m3_grid_compute_visible_range(view, out_first, out_last, out_count);
+}
+
+int M3_CALL m3_list_test_compute_item_bounds(const M3ListView *view, m3_usize index, M3Rect *out_bounds)
+{
+    return m3_list_compute_item_bounds(view, index, out_bounds);
+}
+
+int M3_CALL m3_list_test_grid_compute_item_bounds(const M3GridView *view, m3_usize index, M3Rect *out_bounds)
+{
+    return m3_grid_compute_item_bounds(view, index, out_bounds);
+}
+
+int M3_CALL m3_list_test_update_metrics(M3ListView *view)
+{
+    return m3_list_view_update_metrics(view);
+}
+
+int M3_CALL m3_list_test_grid_update_metrics(M3GridView *view)
+{
+    return m3_grid_view_update_metrics(view);
+}
+
+int M3_CALL m3_list_test_reserve_slots(M3ListSlot **slots, M3RenderNode ***visible_nodes, m3_usize *slot_capacity,
+    const M3Allocator *allocator, m3_usize capacity)
+{
+    return m3_list_reserve_slots(slots, visible_nodes, slot_capacity, allocator, capacity);
 }
 #endif

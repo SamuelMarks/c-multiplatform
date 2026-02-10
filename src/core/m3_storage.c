@@ -758,13 +758,14 @@ int M3_CALL m3_storage_test_add_overflow(m3_usize a, m3_usize b, m3_usize *out_v
     return m3_storage_add_overflow(a, b, out_value);
 }
 
+int M3_CALL m3_storage_test_grow(M3Storage *storage, m3_usize min_capacity)
+{
+    return m3_storage_grow(storage, min_capacity);
+}
+
 int M3_CALL m3_storage_test_u32_from_usize(m3_usize value, m3_u32 *out_value)
 {
     return m3_storage_u32_from_usize(value, out_value);
 }
 
-int M3_CALL m3_storage_test_grow(M3Storage *storage, m3_usize min_capacity)
-{
-    return m3_storage_grow(storage, min_capacity);
-}
 #endif

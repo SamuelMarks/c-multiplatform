@@ -29,6 +29,13 @@ static int m3_ios_backend_validate_config(const M3IOSBackendConfig *config)
     return M3_OK;
 }
 
+#ifdef M3_TESTING
+int M3_CALL m3_ios_backend_test_validate_config(const M3IOSBackendConfig *config)
+{
+    return m3_ios_backend_validate_config(config);
+}
+#endif
+
 int M3_CALL m3_ios_backend_is_available(M3Bool *out_available)
 {
     if (out_available == NULL) {

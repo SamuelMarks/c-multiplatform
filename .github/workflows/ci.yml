@@ -14,6 +14,11 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
+      - name: Install libcurl (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev
       - name: Configure
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
       - name: Build
@@ -38,7 +43,8 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" \
             -DANDROID_ABI=armeabi-v7a \
             -DANDROID_PLATFORM=android-21 \
-            -DANDROID_STL=c++_static
+            -DANDROID_STL=c++_static \
+            -DM3_ENABLE_LIBCURL=OFF
       - name: Build
         run: cmake --build build-android
 
@@ -50,7 +56,7 @@ jobs:
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v12
       - name: Configure
-        run: emcmake cmake -S . -B build-web -DCMAKE_BUILD_TYPE=Release
+        run: emcmake cmake -S . -B build-web -DCMAKE_BUILD_TYPE=Release -DM3_ENABLE_LIBCURL=OFF
       - name: Build
         run: cmake --build build-web
 
@@ -62,9 +68,9 @@ jobs:
       - name: Install Doxygen
         run: |
           sudo apt-get update
-          sudo apt-get install -y doxygen
+          sudo apt-get install -y doxygen graphviz libcurl4-openssl-dev
       - name: Configure
-        run: cmake -S . -B build-docs -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B build-docs -DCMAKE_BUILD_TYPE=Release -DM3_REQUIRE_DOXYGEN=ON
       - name: Generate Docs (Doxygen)
         run: ctest --test-dir build-docs -R m3_docs --output-on-failure
 
@@ -76,7 +82,7 @@ jobs:
       - name: Install gcovr
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcovr
+          sudo apt-get install -y gcovr libcurl4-openssl-dev
       - name: Configure
         env:
           CC: gcc

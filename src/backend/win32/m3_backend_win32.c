@@ -9,7 +9,10 @@
 
 #if defined(M3_WIN32_AVAILABLE)
 #ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501
+#define _WIN32_WINNT 0x0600
+#endif
+#ifndef WINVER
+#define WINVER 0x0600
 #endif
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -52,6 +55,13 @@ static int m3_win32_backend_validate_config(const M3Win32BackendConfig *config)
     }
     return M3_OK;
 }
+
+#ifdef M3_TESTING
+int M3_CALL m3_win32_backend_test_validate_config(const M3Win32BackendConfig *config)
+{
+    return m3_win32_backend_validate_config(config);
+}
+#endif
 
 int M3_CALL m3_win32_backend_is_available(M3Bool *out_available)
 {
@@ -206,7 +216,9 @@ static int m3_win32_network_error_from_winhttp(DWORD error_code)
     case ERROR_WINHTTP_CANNOT_CONNECT:
     case ERROR_WINHTTP_CONNECTION_ERROR:
     case ERROR_WINHTTP_AUTO_PROXY_SERVICE_ERROR:
+#ifdef ERROR_WINHTTP_AUTO_PROXY_SERVICE_FAILED
     case ERROR_WINHTTP_AUTO_PROXY_SERVICE_FAILED:
+#endif
         return M3_ERR_IO;
     default:
         return M3_ERR_IO;

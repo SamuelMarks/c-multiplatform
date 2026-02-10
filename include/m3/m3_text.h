@@ -154,6 +154,65 @@ M3_API int M3_CALL m3_text_widget_set_style(M3TextWidget *widget, const M3TextSt
  */
 M3_API int M3_CALL m3_text_widget_get_metrics(M3TextWidget *widget, M3TextMetrics *out_metrics);
 
+#ifdef M3_TESTING
+/**
+ * @brief Test wrapper for color validation.
+ * @param color Color to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_text_test_validate_color(const M3Color *color);
+
+/**
+ * @brief Test wrapper for style validation.
+ * @param style Style to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_text_test_validate_style(const M3TextStyle *style);
+
+/**
+ * @brief Test wrapper for backend validation.
+ * @param backend Backend to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_text_test_validate_backend(const M3TextBackend *backend);
+
+/**
+ * @brief Test wrapper for measure spec validation.
+ * @param spec Measure spec to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_text_test_validate_measure_spec(M3MeasureSpec spec);
+
+/**
+ * @brief Test wrapper for rectangle validation.
+ * @param rect Rectangle to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_text_test_validate_rect(const M3Rect *rect);
+
+/**
+ * @brief Test wrapper to update widget metrics.
+ * @param widget Text widget instance.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_text_test_metrics_update(M3TextWidget *widget);
+
+/**
+ * @brief Test wrapper for C-string length helper.
+ * @param cstr Null-terminated string.
+ * @param out_len Receives string length.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_text_test_cstrlen(const char *cstr, m3_usize *out_len);
+
+/**
+ * @brief Override the maximum C-string length used by text helpers.
+ * @param max_len Maximum allowed length (0 disables override).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_text_test_set_cstr_limit(m3_usize max_len);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

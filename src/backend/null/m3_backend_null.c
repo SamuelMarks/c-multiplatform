@@ -1818,4 +1818,31 @@ int M3_CALL m3_null_backend_test_set_initialized(M3NullBackend *backend, M3Bool 
     backend->initialized = initialized ? M3_TRUE : M3_FALSE;
     return M3_OK;
 }
+
+int M3_CALL m3_null_backend_test_object_retain(M3ObjectHeader *obj)
+{
+    if (obj == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    return m3_null_object_retain(obj);
+}
+
+int M3_CALL m3_null_backend_test_object_release(M3ObjectHeader *obj)
+{
+    if (obj == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    return m3_null_object_release(obj);
+}
+
+int M3_CALL m3_null_backend_test_object_get_type_id(M3ObjectHeader *obj, m3_u32 *out_type_id)
+{
+    if (obj == NULL || out_type_id == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    return m3_null_object_get_type_id(obj, out_type_id);
+}
 #endif

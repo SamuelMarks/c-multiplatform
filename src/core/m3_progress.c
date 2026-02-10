@@ -3,6 +3,41 @@
 #include <math.h>
 #include <string.h>
 
+#ifdef M3_TESTING
+#define M3_PROGRESS_TEST_FAIL_NONE 0u
+#define M3_PROGRESS_TEST_FAIL_COLOR_SET 1u
+#define M3_PROGRESS_TEST_FAIL_COLOR_WITH_ALPHA 2u
+#define M3_PROGRESS_TEST_FAIL_LINEAR_CORNER_RANGE 3u
+#define M3_PROGRESS_TEST_FAIL_LINEAR_FILL_CORNER_RANGE 4u
+#define M3_PROGRESS_TEST_FAIL_LINEAR_FILL_CORNER_CLAMP 5u
+#define M3_PROGRESS_TEST_FAIL_SLIDER_SNAP_COUNT_NEGATIVE 6u
+#define M3_PROGRESS_TEST_FAIL_SLIDER_SNAP_CLAMP_MIN 7u
+#define M3_PROGRESS_TEST_FAIL_SLIDER_SNAP_CLAMP_MAX 8u
+#define M3_PROGRESS_TEST_FAIL_SLIDER_FRACTION_NEGATIVE 9u
+#define M3_PROGRESS_TEST_FAIL_SLIDER_FRACTION_POSITIVE 10u
+#define M3_PROGRESS_TEST_FAIL_SLIDER_FROM_X_FRACTION_HIGH 11u
+#define M3_PROGRESS_TEST_FAIL_SLIDER_CORNER_RANGE 12u
+#define M3_PROGRESS_TEST_FAIL_LINEAR_RESOLVE_COLORS 13u
+#define M3_PROGRESS_TEST_FAIL_CIRCULAR_RESOLVE_COLORS 14u
+#define M3_PROGRESS_TEST_FAIL_SLIDER_RESOLVE_COLORS 15u
+#define M3_PROGRESS_TEST_FAIL_SLIDER_CORNER_CLAMP 16u
+
+static m3_u32 g_m3_progress_test_fail_point = M3_PROGRESS_TEST_FAIL_NONE;
+static m3_u32 g_m3_progress_test_color_set_calls = 0u;
+static m3_u32 g_m3_progress_test_color_set_fail_after = 0u;
+static m3_u32 g_m3_progress_test_color_alpha_calls = 0u;
+static m3_u32 g_m3_progress_test_color_alpha_fail_after = 0u;
+
+static M3Bool m3_progress_test_fail_point_match(m3_u32 point)
+{
+    if (g_m3_progress_test_fail_point != point) {
+        return M3_FALSE;
+    }
+    g_m3_progress_test_fail_point = M3_PROGRESS_TEST_FAIL_NONE;
+    return M3_TRUE;
+}
+#endif
+
 #define M3_PROGRESS_PI 3.14159265358979323846f
 
 static int m3_progress_validate_color(const M3Color *color)
@@ -30,6 +65,16 @@ static int m3_progress_color_set(M3Color *color, M3Scalar r, M3Scalar g, M3Scala
     if (color == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
+#ifdef M3_TESTING
+    g_m3_progress_test_color_set_calls += 1u;
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_COLOR_SET)) {
+        return M3_ERR_RANGE;
+    }
+    if (g_m3_progress_test_color_set_fail_after > 0u
+        && g_m3_progress_test_color_set_calls >= g_m3_progress_test_color_set_fail_after) {
+        return M3_ERR_RANGE;
+    }
+#endif
     if (!(r >= 0.0f && r <= 1.0f)) {
         return M3_ERR_RANGE;
     }
@@ -56,6 +101,16 @@ static int m3_progress_color_with_alpha(const M3Color *base, M3Scalar alpha, M3C
     if (base == NULL || out_color == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
+#ifdef M3_TESTING
+    g_m3_progress_test_color_alpha_calls += 1u;
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_COLOR_WITH_ALPHA)) {
+        return M3_ERR_RANGE;
+    }
+    if (g_m3_progress_test_color_alpha_fail_after > 0u
+        && g_m3_progress_test_color_alpha_calls >= g_m3_progress_test_color_alpha_fail_after) {
+        return M3_ERR_RANGE;
+    }
+#endif
     if (!(alpha >= 0.0f && alpha <= 1.0f)) {
         return M3_ERR_RANGE;
     }
@@ -170,6 +225,11 @@ static int m3_linear_progress_resolve_colors(const M3LinearProgress *progress, M
     if (progress == NULL || out_track == NULL || out_indicator == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
+#ifdef M3_TESTING
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_LINEAR_RESOLVE_COLORS)) {
+        return M3_ERR_IO;
+    }
+#endif
 
     if (progress->widget.flags & M3_WIDGET_FLAG_DISABLED) {
         *out_track = progress->style.disabled_track_color;
@@ -281,6 +341,11 @@ static int m3_linear_progress_widget_paint(void *widget, M3PaintContext *ctx)
 
     bounds = progress->bounds;
     corner = progress->style.corner_radius;
+#ifdef M3_TESTING
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_LINEAR_CORNER_RANGE)) {
+        corner = -1.0f;
+    }
+#endif
     if (corner > bounds.height * 0.5f) {
         corner = bounds.height * 0.5f;
     }
@@ -300,12 +365,22 @@ static int m3_linear_progress_widget_paint(void *widget, M3PaintContext *ctx)
         fill = bounds;
         fill.width = fill_width;
         fill_corner = corner;
+#ifdef M3_TESTING
+        if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_LINEAR_FILL_CORNER_CLAMP)) {
+            fill_corner = fill.height;
+        }
+#endif
         if (fill_corner > fill.height * 0.5f) {
             fill_corner = fill.height * 0.5f;
         }
         if (fill_corner > fill.width * 0.5f) {
             fill_corner = fill.width * 0.5f;
         }
+#ifdef M3_TESTING
+        if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_LINEAR_FILL_CORNER_RANGE)) {
+            fill_corner = -1.0f;
+        }
+#endif
         if (fill_corner < 0.0f) {
             return M3_ERR_RANGE;
         }
@@ -550,6 +625,11 @@ static int m3_circular_progress_resolve_colors(const M3CircularProgress *progres
     if (progress == NULL || out_track == NULL || out_indicator == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
+#ifdef M3_TESTING
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_CIRCULAR_RESOLVE_COLORS)) {
+        return M3_ERR_IO;
+    }
+#endif
 
     if (progress->widget.flags & M3_WIDGET_FLAG_DISABLED) {
         *out_track = progress->style.disabled_track_color;
@@ -1034,11 +1114,24 @@ static int m3_slider_snap_value(M3Scalar value, M3Scalar min_value, M3Scalar max
     }
 
     count = (clamped - min_value) / step;
+#ifdef M3_TESTING
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_SLIDER_SNAP_COUNT_NEGATIVE)) {
+        count = -1.0f;
+    }
+#endif
     if (count < 0.0f) {
         count = 0.0f;
     }
     steps = (m3_i32)(count + 0.5f);
     clamped = min_value + ((M3Scalar)steps) * step;
+#ifdef M3_TESTING
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_SLIDER_SNAP_CLAMP_MIN)) {
+        clamped = min_value - 1.0f;
+    }
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_SLIDER_SNAP_CLAMP_MAX)) {
+        clamped = max_value + 1.0f;
+    }
+#endif
     if (clamped < min_value) {
         clamped = min_value;
     }
@@ -1066,6 +1159,14 @@ static int m3_slider_value_to_fraction(const M3Slider *slider, M3Scalar *out_fra
     }
 
     *out_fraction = (slider->value - slider->min_value) / range;
+#ifdef M3_TESTING
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_SLIDER_FRACTION_NEGATIVE)) {
+        *out_fraction = -1.0f;
+    }
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_SLIDER_FRACTION_POSITIVE)) {
+        *out_fraction = 2.0f;
+    }
+#endif
     if (*out_fraction < 0.0f) {
         *out_fraction = 0.0f;
     }
@@ -1094,6 +1195,11 @@ static int m3_slider_value_from_x(const M3Slider *slider, M3Scalar x, M3Scalar *
     }
 
     fraction = (x - slider->bounds.x) / slider->bounds.width;
+#ifdef M3_TESTING
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_SLIDER_FROM_X_FRACTION_HIGH)) {
+        fraction = 2.0f;
+    }
+#endif
     if (fraction < 0.0f) {
         fraction = 0.0f;
     }
@@ -1117,6 +1223,11 @@ static int m3_slider_resolve_colors(const M3Slider *slider, M3Color *out_track, 
     if (slider == NULL || out_track == NULL || out_active == NULL || out_thumb == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
+#ifdef M3_TESTING
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_SLIDER_RESOLVE_COLORS)) {
+        return M3_ERR_IO;
+    }
+#endif
 
     if (slider->widget.flags & M3_WIDGET_FLAG_DISABLED) {
         *out_track = slider->style.disabled_track_color;
@@ -1286,9 +1397,19 @@ static int m3_slider_widget_paint(void *widget, M3PaintContext *ctx)
     track.x = bounds.x;
     track.y = bounds.y + (bounds.height - track.height) * 0.5f;
     corner = slider->style.track_corner_radius;
+#ifdef M3_TESTING
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_SLIDER_CORNER_CLAMP)) {
+        corner = track.height;
+    }
+#endif
     if (corner > track.height * 0.5f) {
         corner = track.height * 0.5f;
     }
+#ifdef M3_TESTING
+    if (m3_progress_test_fail_point_match(M3_PROGRESS_TEST_FAIL_SLIDER_CORNER_RANGE)) {
+        corner = -1.0f;
+    }
+#endif
     if (corner < 0.0f) {
         return M3_ERR_RANGE;
     }
@@ -1661,3 +1782,130 @@ int M3_CALL m3_slider_set_on_change(M3Slider *slider, M3SliderOnChange on_change
     slider->on_change_ctx = ctx;
     return M3_OK;
 }
+
+#ifdef M3_TESTING
+int M3_CALL m3_progress_test_set_fail_point(m3_u32 fail_point)
+{
+    g_m3_progress_test_fail_point = fail_point;
+    return M3_OK;
+}
+
+int M3_CALL m3_progress_test_clear_fail_points(void)
+{
+    g_m3_progress_test_fail_point = M3_PROGRESS_TEST_FAIL_NONE;
+    g_m3_progress_test_color_set_calls = 0u;
+    g_m3_progress_test_color_set_fail_after = 0u;
+    g_m3_progress_test_color_alpha_calls = 0u;
+    g_m3_progress_test_color_alpha_fail_after = 0u;
+    return M3_OK;
+}
+
+int M3_CALL m3_progress_test_set_color_set_fail_after(m3_u32 call_count)
+{
+    g_m3_progress_test_color_set_calls = 0u;
+    g_m3_progress_test_color_set_fail_after = call_count;
+    return M3_OK;
+}
+
+int M3_CALL m3_progress_test_set_color_alpha_fail_after(m3_u32 call_count)
+{
+    g_m3_progress_test_color_alpha_calls = 0u;
+    g_m3_progress_test_color_alpha_fail_after = call_count;
+    return M3_OK;
+}
+
+int M3_CALL m3_progress_test_validate_color(const M3Color *color)
+{
+    return m3_progress_validate_color(color);
+}
+
+int M3_CALL m3_progress_test_color_set(M3Color *color, M3Scalar r, M3Scalar g, M3Scalar b, M3Scalar a)
+{
+    return m3_progress_color_set(color, r, g, b, a);
+}
+
+int M3_CALL m3_progress_test_color_with_alpha(const M3Color *base, M3Scalar alpha, M3Color *out_color)
+{
+    return m3_progress_color_with_alpha(base, alpha, out_color);
+}
+
+int M3_CALL m3_progress_test_validate_measure_spec(M3MeasureSpec spec)
+{
+    return m3_progress_validate_measure_spec(spec);
+}
+
+int M3_CALL m3_progress_test_apply_measure(M3Scalar desired, M3MeasureSpec spec, M3Scalar *out_size)
+{
+    return m3_progress_apply_measure(desired, spec, out_size);
+}
+
+int M3_CALL m3_progress_test_validate_rect(const M3Rect *rect)
+{
+    return m3_progress_validate_rect(rect);
+}
+
+int M3_CALL m3_progress_test_validate_value01(M3Scalar value)
+{
+    return m3_progress_validate_value01(value);
+}
+
+int M3_CALL m3_progress_test_linear_validate_style(const M3LinearProgressStyle *style)
+{
+    return m3_linear_progress_validate_style(style);
+}
+
+int M3_CALL m3_progress_test_linear_resolve_colors(const M3LinearProgress *progress, M3Color *out_track,
+    M3Color *out_indicator)
+{
+    return m3_linear_progress_resolve_colors(progress, out_track, out_indicator);
+}
+
+int M3_CALL m3_progress_test_circular_validate_style(const M3CircularProgressStyle *style)
+{
+    return m3_circular_progress_validate_style(style);
+}
+
+int M3_CALL m3_progress_test_circular_resolve_colors(const M3CircularProgress *progress, M3Color *out_track,
+    M3Color *out_indicator)
+{
+    return m3_circular_progress_resolve_colors(progress, out_track, out_indicator);
+}
+
+int M3_CALL m3_progress_test_circular_draw_arc(M3Gfx *gfx, M3Scalar cx, M3Scalar cy, M3Scalar radius, M3Scalar start_angle,
+    M3Scalar end_angle, M3Color color, M3Scalar thickness, m3_u32 segments)
+{
+    return m3_circular_progress_draw_arc(gfx, cx, cy, radius, start_angle, end_angle, color, thickness, segments);
+}
+
+int M3_CALL m3_progress_test_slider_validate_style(const M3SliderStyle *style)
+{
+    return m3_slider_validate_style(style);
+}
+
+int M3_CALL m3_progress_test_slider_value_to_fraction(const M3Slider *slider, M3Scalar *out_fraction)
+{
+    return m3_slider_value_to_fraction(slider, out_fraction);
+}
+
+int M3_CALL m3_progress_test_slider_value_from_x(const M3Slider *slider, M3Scalar x, M3Scalar *out_value)
+{
+    return m3_slider_value_from_x(slider, x, out_value);
+}
+
+int M3_CALL m3_progress_test_slider_snap_value(M3Scalar value, M3Scalar min_value, M3Scalar max_value, M3Scalar step,
+    M3Scalar *out_value)
+{
+    return m3_slider_snap_value(value, min_value, max_value, step, out_value);
+}
+
+int M3_CALL m3_progress_test_slider_resolve_colors(const M3Slider *slider, M3Color *out_track, M3Color *out_active,
+    M3Color *out_thumb)
+{
+    return m3_slider_resolve_colors(slider, out_track, out_active, out_thumb);
+}
+
+int M3_CALL m3_progress_test_slider_update_value(M3Slider *slider, M3Scalar next_value, M3Bool notify)
+{
+    return m3_slider_update_value(slider, next_value, notify);
+}
+#endif

@@ -11,6 +11,9 @@ typedef struct TestAlloc {
     int alloc_calls;
     int realloc_calls;
     int free_calls;
+    int mutate_on_alloc;
+    m3_usize *mutate_target;
+    m3_usize mutate_value;
 } TestAlloc;
 
 static int test_alloc_reset(TestAlloc *alloc)
@@ -43,6 +46,11 @@ static int test_alloc_fn(void *ctx, m3_usize size, void **out_ptr)
     ptr = malloc((size_t)size);
     if (ptr == NULL) {
         return M3_ERR_OUT_OF_MEMORY;
+    }
+
+    if (alloc->mutate_on_alloc && alloc->mutate_target != NULL) {
+        *alloc->mutate_target = alloc->mutate_value;
+        alloc->mutate_on_alloc = 0;
     }
 
     *out_ptr = ptr;
@@ -439,7 +447,145 @@ static int test_storage_put_errors(void)
     max_value = (m3_usize)~(m3_usize)0;
     M3_TEST_EXPECT(m3_storage_put(&storage, "a", max_value, "b", 1u, M3_TRUE), M3_ERR_OVERFLOW);
 
+    M3_TEST_OK(m3_storage_put(&storage, "alpha", 5u, "one", 3u, M3_FALSE));
+
+    test_alloc.alloc_calls = 0;
+    test_alloc.fail_alloc_on_call = 1;
+    M3_TEST_EXPECT(m3_storage_put(&storage, "alpha", 5u, "two", 3u, M3_TRUE), M3_ERR_OUT_OF_MEMORY);
+    test_alloc.fail_alloc_on_call = 0;
+
+    test_alloc.free_calls = 0;
+    test_alloc.fail_free_on_call = 1;
+    M3_TEST_EXPECT(m3_storage_put(&storage, "alpha", 5u, "two", 3u, M3_TRUE), M3_ERR_IO);
+    test_alloc.fail_free_on_call = 0;
+
+    storage.entry_capacity = 1u;
+    storage.allocator.realloc = NULL;
+    M3_TEST_EXPECT(m3_storage_put(&storage, "beta", 4u, "two", 3u, M3_FALSE), M3_ERR_INVALID_ARGUMENT);
+    storage.allocator.realloc = test_realloc_fn;
+    storage.entry_capacity = 2u;
+
+    test_alloc.free_calls = 0;
+    test_alloc.fail_free_on_call = 1;
+    M3_TEST_EXPECT(m3_storage_put(&storage, "alpha", 5u, NULL, 0u, M3_TRUE), M3_ERR_IO);
+    test_alloc.fail_free_on_call = 0;
+
     M3_TEST_OK(m3_storage_shutdown(&storage));
+    return 0;
+}
+
+static int test_storage_access_errors(void)
+{
+    M3Storage storage;
+    M3StorageConfig config;
+    M3Allocator allocator;
+    TestAlloc test_alloc;
+    M3Bool exists;
+    m3_usize value_size;
+    char buffer[8];
+
+    memset(&storage, 0, sizeof(storage));
+
+    M3_TEST_EXPECT(m3_storage_get(NULL, "a", 1u, buffer, sizeof(buffer), &value_size), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_storage_get(&storage, "a", 1u, buffer, sizeof(buffer), &value_size), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_storage_get(&storage, "a", 1u, buffer, sizeof(buffer), NULL), M3_ERR_INVALID_ARGUMENT);
+
+    M3_TEST_EXPECT(m3_storage_contains(NULL, "a", 1u, &exists), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_storage_contains(&storage, "a", 1u, &exists), M3_ERR_STATE);
+
+    M3_TEST_EXPECT(m3_storage_remove(NULL, "a", 1u), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_storage_remove(&storage, "a", 1u), M3_ERR_STATE);
+
+    M3_TEST_EXPECT(m3_storage_clear(NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_storage_clear(&storage), M3_ERR_STATE);
+
+    M3_TEST_EXPECT(m3_storage_count(NULL, &value_size), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_storage_count(&storage, NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_storage_count(&storage, &value_size), M3_ERR_STATE);
+
+    M3_TEST_OK(test_alloc_reset(&test_alloc));
+    allocator.ctx = &test_alloc;
+    allocator.alloc = test_alloc_fn;
+    allocator.realloc = test_realloc_fn;
+    allocator.free = test_free_fn;
+
+    M3_TEST_OK(m3_storage_config_init(&config));
+    config.allocator = &allocator;
+    config.entry_capacity = 1u;
+    M3_TEST_OK(m3_storage_init(&storage, &config));
+
+    M3_TEST_EXPECT(m3_storage_get(&storage, NULL, 1u, buffer, sizeof(buffer), &value_size), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_storage_get(&storage, "a", 1u, NULL, 1u, &value_size), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_storage_contains(&storage, NULL, 1u, &exists), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_storage_contains(&storage, "a", 1u, NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_storage_remove(&storage, NULL, 1u), M3_ERR_INVALID_ARGUMENT);
+
+    M3_TEST_OK(m3_storage_shutdown(&storage));
+    return 0;
+}
+
+static int test_storage_release_errors(void)
+{
+    M3Storage storage;
+    M3StorageConfig config;
+    M3Allocator allocator;
+    TestAlloc test_alloc;
+
+    memset(&storage, 0, sizeof(storage));
+    M3_TEST_OK(test_alloc_reset(&test_alloc));
+
+    allocator.ctx = &test_alloc;
+    allocator.alloc = test_alloc_fn;
+    allocator.realloc = test_realloc_fn;
+    allocator.free = test_free_fn;
+
+    M3_TEST_OK(m3_storage_config_init(&config));
+    config.allocator = &allocator;
+    config.entry_capacity = 1u;
+    M3_TEST_OK(m3_storage_init(&storage, &config));
+    M3_TEST_OK(m3_storage_put(&storage, "alpha", 5u, "one", 3u, M3_FALSE));
+
+    test_alloc.free_calls = 0;
+    test_alloc.fail_free_on_call = 2;
+    M3_TEST_EXPECT(m3_storage_clear(&storage), M3_ERR_IO);
+    test_alloc.fail_free_on_call = 0;
+
+    M3_TEST_OK(m3_storage_put(&storage, "alpha", 5u, "one", 3u, M3_FALSE));
+    storage.allocator.free = NULL;
+    M3_TEST_EXPECT(m3_storage_shutdown(&storage), M3_ERR_INVALID_ARGUMENT);
+    storage.allocator.free = test_free_fn;
+
+    test_alloc.free_calls = 0;
+    test_alloc.fail_free_on_call = 3;
+    M3_TEST_EXPECT(m3_storage_shutdown(&storage), M3_ERR_IO);
+    test_alloc.fail_free_on_call = 0;
+
+    return 0;
+}
+
+static int test_storage_grow_overflow(void)
+{
+    M3Storage storage;
+    M3Allocator allocator;
+    TestAlloc test_alloc;
+    m3_usize max_value;
+    int rc;
+
+    memset(&storage, 0, sizeof(storage));
+    M3_TEST_OK(test_alloc_reset(&test_alloc));
+
+    allocator.ctx = &test_alloc;
+    allocator.alloc = test_alloc_fn;
+    allocator.realloc = test_realloc_fn;
+    allocator.free = test_free_fn;
+
+    storage.allocator = allocator;
+    storage.entries = (M3StorageEntry *)1;
+    max_value = (m3_usize)~(m3_usize)0;
+    storage.entry_capacity = max_value / sizeof(M3StorageEntry) + 1u;
+
+    rc = m3_storage_test_grow(&storage, storage.entry_capacity);
+    M3_TEST_EXPECT(rc, M3_ERR_OVERFLOW);
     return 0;
 }
 
@@ -755,6 +901,22 @@ static int test_storage_save_errors(void)
         storage.entries[0].value_len = saved_value_len;
     }
 
+    if (max_u32 < (m3_usize)~(m3_usize)0) {
+        test_alloc.mutate_on_alloc = 1;
+        test_alloc.mutate_target = &storage.entries[0].key_len;
+        test_alloc.mutate_value = max_u32 + 1u;
+        M3_TEST_EXPECT(m3_storage_save(&storage, &io, "mem"), M3_ERR_RANGE);
+        storage.entries[0].key_len = saved_key_len;
+        test_alloc.mutate_target = NULL;
+
+        test_alloc.mutate_on_alloc = 1;
+        test_alloc.mutate_target = &storage.entries[0].value_len;
+        test_alloc.mutate_value = max_u32 + 1u;
+        M3_TEST_EXPECT(m3_storage_save(&storage, &io, "mem"), M3_ERR_RANGE);
+        storage.entries[0].value_len = saved_value_len;
+        test_alloc.mutate_target = NULL;
+    }
+
     test_alloc.alloc_calls = 0;
     test_alloc.fail_alloc_on_call = 1;
     M3_TEST_EXPECT(m3_storage_save(&storage, &io, "mem"), M3_ERR_OUT_OF_MEMORY);
@@ -927,6 +1089,9 @@ int main(void)
     M3_TEST_ASSERT(test_storage_init_errors() == 0);
     M3_TEST_ASSERT(test_storage_init_shutdown() == 0);
     M3_TEST_ASSERT(test_storage_put_errors() == 0);
+    M3_TEST_ASSERT(test_storage_access_errors() == 0);
+    M3_TEST_ASSERT(test_storage_release_errors() == 0);
+    M3_TEST_ASSERT(test_storage_grow_overflow() == 0);
     M3_TEST_ASSERT(test_storage_put_get_remove() == 0);
     M3_TEST_ASSERT(test_storage_overwrite_and_grow() == 0);
     M3_TEST_ASSERT(test_storage_alloc_failures() == 0);

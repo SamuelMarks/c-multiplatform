@@ -55,6 +55,13 @@ static int m3_web_backend_validate_config(const M3WebBackendConfig *config)
     return M3_OK;
 }
 
+#ifdef M3_TESTING
+int M3_CALL m3_web_backend_test_validate_config(const M3WebBackendConfig *config)
+{
+    return m3_web_backend_validate_config(config);
+}
+#endif
+
 int M3_CALL m3_web_backend_is_available(M3Bool *out_available)
 {
     if (out_available == NULL) {

@@ -93,6 +93,15 @@ M3_API int M3_CALL m3_sdl3_backend_get_gfx(M3SDL3Backend *backend, M3Gfx *out_gf
  */
 M3_API int M3_CALL m3_sdl3_backend_get_env(M3SDL3Backend *backend, M3Env *out_env);
 
+#ifdef M3_TESTING
+/**
+ * @brief Test wrapper for SDL3 backend config validation.
+ * @param config Backend configuration.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_sdl3_backend_test_validate_config(const M3SDL3BackendConfig *config);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

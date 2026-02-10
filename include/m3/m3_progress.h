@@ -311,6 +311,198 @@ M3_API int M3_CALL m3_slider_set_label(M3Slider *slider, const char *utf8_label,
  */
 M3_API int M3_CALL m3_slider_set_on_change(M3Slider *slider, M3SliderOnChange on_change, void *ctx);
 
+#ifdef M3_TESTING
+/**
+ * @brief Set a progress test fail point.
+ * @param fail_point Fail point identifier.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_set_fail_point(m3_u32 fail_point);
+
+/**
+ * @brief Clear progress test fail points.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_clear_fail_points(void);
+
+/**
+ * @brief Set the call index that forces color_set to fail.
+ * @param call_count Call index at or after which color_set fails (0 disables).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_set_color_set_fail_after(m3_u32 call_count);
+
+/**
+ * @brief Set the call index that forces color_with_alpha to fail.
+ * @param call_count Call index at or after which color_with_alpha fails (0 disables).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_set_color_alpha_fail_after(m3_u32 call_count);
+
+/**
+ * @brief Test wrapper for progress color validation.
+ * @param color Color to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_validate_color(const M3Color *color);
+
+/**
+ * @brief Test wrapper for progress color assignment.
+ * @param color Output color pointer.
+ * @param r Red channel (0..1).
+ * @param g Green channel (0..1).
+ * @param b Blue channel (0..1).
+ * @param a Alpha channel (0..1).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_color_set(M3Color *color, M3Scalar r, M3Scalar g, M3Scalar b, M3Scalar a);
+
+/**
+ * @brief Test wrapper for alpha modulation helper.
+ * @param base Base color.
+ * @param alpha Alpha multiplier (0..1).
+ * @param out_color Receives the modulated color.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_color_with_alpha(const M3Color *base, M3Scalar alpha, M3Color *out_color);
+
+/**
+ * @brief Test wrapper for measure spec validation.
+ * @param spec Measure spec to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_validate_measure_spec(M3MeasureSpec spec);
+
+/**
+ * @brief Test wrapper for measure application helper.
+ * @param desired Desired size in pixels.
+ * @param spec Measure spec to apply.
+ * @param out_size Receives the resolved size.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_apply_measure(M3Scalar desired, M3MeasureSpec spec, M3Scalar *out_size);
+
+/**
+ * @brief Test wrapper for rectangle validation.
+ * @param rect Rectangle to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_validate_rect(const M3Rect *rect);
+
+/**
+ * @brief Test wrapper for value range validation (0..1).
+ * @param value Value to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_validate_value01(M3Scalar value);
+
+/**
+ * @brief Test wrapper for linear progress style validation.
+ * @param style Style descriptor.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_linear_validate_style(const M3LinearProgressStyle *style);
+
+/**
+ * @brief Test wrapper for linear progress color resolution.
+ * @param progress Linear progress instance.
+ * @param out_track Receives resolved track color.
+ * @param out_indicator Receives resolved indicator color.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_linear_resolve_colors(const M3LinearProgress *progress, M3Color *out_track,
+    M3Color *out_indicator);
+
+/**
+ * @brief Test wrapper for circular progress style validation.
+ * @param style Style descriptor.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_circular_validate_style(const M3CircularProgressStyle *style);
+
+/**
+ * @brief Test wrapper for circular progress color resolution.
+ * @param progress Circular progress instance.
+ * @param out_track Receives resolved track color.
+ * @param out_indicator Receives resolved indicator color.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_circular_resolve_colors(const M3CircularProgress *progress, M3Color *out_track,
+    M3Color *out_indicator);
+
+/**
+ * @brief Test wrapper for circular arc drawing helper.
+ * @param gfx Graphics backend.
+ * @param cx Center X coordinate.
+ * @param cy Center Y coordinate.
+ * @param radius Arc radius.
+ * @param start_angle Start angle in radians.
+ * @param end_angle End angle in radians.
+ * @param color Arc color.
+ * @param thickness Stroke thickness.
+ * @param segments Segment count.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_circular_draw_arc(M3Gfx *gfx, M3Scalar cx, M3Scalar cy, M3Scalar radius,
+    M3Scalar start_angle, M3Scalar end_angle, M3Color color, M3Scalar thickness, m3_u32 segments);
+
+/**
+ * @brief Test wrapper for slider style validation.
+ * @param style Style descriptor.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_slider_validate_style(const M3SliderStyle *style);
+
+/**
+ * @brief Test wrapper for slider value-to-fraction conversion.
+ * @param slider Slider instance.
+ * @param out_fraction Receives the fraction (0..1).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_slider_value_to_fraction(const M3Slider *slider, M3Scalar *out_fraction);
+
+/**
+ * @brief Test wrapper for slider X-coordinate to value conversion.
+ * @param slider Slider instance.
+ * @param x X coordinate.
+ * @param out_value Receives the slider value.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_slider_value_from_x(const M3Slider *slider, M3Scalar x, M3Scalar *out_value);
+
+/**
+ * @brief Test wrapper for slider snapping helper.
+ * @param value Raw value.
+ * @param min_value Minimum value.
+ * @param max_value Maximum value.
+ * @param step Step size.
+ * @param out_value Receives the snapped value.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_slider_snap_value(M3Scalar value, M3Scalar min_value, M3Scalar max_value, M3Scalar step,
+    M3Scalar *out_value);
+
+/**
+ * @brief Test wrapper for slider color resolution.
+ * @param slider Slider instance.
+ * @param out_track Receives track color.
+ * @param out_active Receives active track color.
+ * @param out_thumb Receives thumb color.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_slider_resolve_colors(const M3Slider *slider, M3Color *out_track, M3Color *out_active,
+    M3Color *out_thumb);
+
+/**
+ * @brief Test wrapper for slider value update helper.
+ * @param slider Slider instance.
+ * @param next_value Next value to apply.
+ * @param notify M3_TRUE to invoke the change callback.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_progress_test_slider_update_value(M3Slider *slider, M3Scalar next_value, M3Bool notify);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

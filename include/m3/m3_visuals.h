@@ -146,6 +146,42 @@ M3_API int M3_CALL m3_shadow_set(M3Shadow *shadow, M3Scalar offset_x, M3Scalar o
  */
 M3_API int M3_CALL m3_shadow_paint(const M3Shadow *shadow, M3Gfx *gfx, const M3Rect *rect, const M3Rect *clip);
 
+#ifdef M3_TESTING
+/**
+ * @brief Set a visuals test fail point.
+ * @param fail_point Fail point identifier.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_visuals_test_set_fail_point(m3_u32 fail_point);
+
+/**
+ * @brief Clear visuals test fail points.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_visuals_test_clear_fail_points(void);
+
+/**
+ * @brief Test wrapper for rectangle validation.
+ * @param rect Rectangle to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_visuals_test_validate_rect(const M3Rect *rect);
+
+/**
+ * @brief Test wrapper for color validation.
+ * @param color Color to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_visuals_test_validate_color(const M3Color *color);
+
+/**
+ * @brief Test wrapper for graphics backend validation.
+ * @param gfx Graphics backend.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_visuals_test_validate_gfx(const M3Gfx *gfx);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

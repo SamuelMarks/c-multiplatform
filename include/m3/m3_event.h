@@ -86,6 +86,49 @@ M3_API int M3_CALL m3_event_dispatcher_set_focus_visible(M3EventDispatcher *disp
 M3_API int M3_CALL m3_event_dispatch(M3EventDispatcher *dispatcher, const M3RenderNode *root, const M3InputEvent *event,
     M3Widget **out_target, M3Bool *out_handled);
 
+#ifdef M3_TESTING
+/**
+ * @brief Test wrapper for validating a render rectangle.
+ * @param rect Rectangle to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_event_test_validate_rect(const M3Rect *rect);
+
+/**
+ * @brief Test wrapper to query whether a widget is focusable.
+ * @param widget Widget to query (may be NULL).
+ * @param out_focusable Receives M3_TRUE when focusable.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_event_test_widget_focusable(const M3Widget *widget, M3Bool *out_focusable);
+
+/**
+ * @brief Test wrapper for hit testing.
+ * @param node Render node to test.
+ * @param x X coordinate in pixels.
+ * @param y Y coordinate in pixels.
+ * @param out_widget Receives the hit widget (may be NULL).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_event_test_hit_test(const M3RenderNode *node, M3Scalar x, M3Scalar y, M3Widget **out_widget);
+
+/**
+ * @brief Test wrapper to dispatch directly to a widget.
+ * @param widget Target widget (may be NULL).
+ * @param event Event to dispatch.
+ * @param out_handled Receives M3_TRUE when handled.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_event_test_dispatch_to_widget(M3Widget *widget, const M3InputEvent *event, M3Bool *out_handled);
+
+/**
+ * @brief Force hit-test to surface a containment error (tests only).
+ * @param enable M3_TRUE to force errors, M3_FALSE to disable.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_event_test_set_force_contains_error(M3Bool enable);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

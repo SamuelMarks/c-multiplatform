@@ -92,6 +92,15 @@ M3_API int M3_CALL m3_android_backend_get_gfx(M3AndroidBackend *backend, M3Gfx *
  */
 M3_API int M3_CALL m3_android_backend_get_env(M3AndroidBackend *backend, M3Env *out_env);
 
+#ifdef M3_TESTING
+/**
+ * @brief Test wrapper for Android backend config validation.
+ * @param config Backend configuration.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_android_backend_test_validate_config(const M3AndroidBackendConfig *config);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

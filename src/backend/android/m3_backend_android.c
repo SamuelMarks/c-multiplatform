@@ -52,6 +52,13 @@ static int m3_android_backend_validate_config(const M3AndroidBackendConfig *conf
     return M3_OK;
 }
 
+#ifdef M3_TESTING
+int M3_CALL m3_android_backend_test_validate_config(const M3AndroidBackendConfig *config)
+{
+    return m3_android_backend_validate_config(config);
+}
+#endif
+
 int M3_CALL m3_android_backend_is_available(M3Bool *out_available)
 {
     if (out_available == NULL) {

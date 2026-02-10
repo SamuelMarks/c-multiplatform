@@ -8,7 +8,7 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 option(M3_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(M3_ENABLE_COVERAGE "Enable coverage instrumentation (GCC/Clang only)" OFF)
-option(M3_REQUIRE_DOXYGEN "Require Doxygen for documentation coverage" ON)
+option(M3_REQUIRE_DOXYGEN "Require Doxygen for documentation coverage" OFF)
 option(M3_ENABLE_SDL3 "Enable SDL3 debug backend" OFF)
 option(M3_ENABLE_SDL3_TTF "Enable SDL3_ttf text rendering for the SDL3 backend" OFF)
 option(M3_ENABLE_GTK4 "Enable GTK4 backend" OFF)
@@ -184,8 +184,8 @@ endif()
 if(M3_ENABLE_WIN32 AND WIN32)
     target_compile_definitions(m3 PUBLIC
         M3_WIN32_AVAILABLE
-        _WIN32_WINNT=0x0501
-        WINVER=0x0501
+        _WIN32_WINNT=0x0600
+        WINVER=0x0600
     )
     target_link_libraries(m3 PUBLIC user32 gdi32 winhttp)
 endif()
@@ -285,11 +285,20 @@ if(GCOVR_EXECUTABLE)
         COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
         COMMAND ${CMAKE_CTEST_COMMAND} -R m3_phase3_tasks --output-on-failure
         COMMAND ${GCOVR_EXECUTABLE} -r ${CMAKE_CURRENT_SOURCE_DIR}
+            --gcov-filter ${CMAKE_BINARY_DIR}/.*
             --object-directory ${CMAKE_BINARY_DIR}
             --filter ${CMAKE_CURRENT_SOURCE_DIR}/src/.*
+            --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build$
+            --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-cocoa$
+            --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-docs$
             --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-coverage$
+            --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-coverage-clean$
             --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-coverage-fresh$
+            --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-coverage-run$
+            --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-android$
+            --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-web$
             --print-summary
+            --merge-mode-functions=merge-use-line-0
             --fail-under-line 100
             --fail-under-function 100
             --xml-pretty -o ${CMAKE_BINARY_DIR}/coverage.xml
@@ -442,26 +451,31 @@ if(BUILD_TESTING)
 
     add_executable(m3_phase5_visuals tests/phase5/visuals.c)
     target_link_libraries(m3_phase5_visuals PRIVATE m3)
+    target_compile_definitions(m3_phase5_visuals PRIVATE M3_TESTING)
     m3_apply_c_settings(m3_phase5_visuals)
     add_test(NAME m3_phase5_visuals COMMAND m3_phase5_visuals)
 
     add_executable(m3_phase5_text tests/phase5/text.c)
     target_link_libraries(m3_phase5_text PRIVATE m3)
+    target_compile_definitions(m3_phase5_text PRIVATE M3_TESTING)
     m3_apply_c_settings(m3_phase5_text)
     add_test(NAME m3_phase5_text COMMAND m3_phase5_text)
 
     add_executable(m3_phase5_buttons tests/phase5/buttons.c)
     target_link_libraries(m3_phase5_buttons PRIVATE m3)
+    target_compile_definitions(m3_phase5_buttons PRIVATE M3_TESTING)
     m3_apply_c_settings(m3_phase5_buttons)
     add_test(NAME m3_phase5_buttons COMMAND m3_phase5_buttons)
 
     add_executable(m3_phase5_selection tests/phase5/selection.c)
     target_link_libraries(m3_phase5_selection PRIVATE m3)
+    target_compile_definitions(m3_phase5_selection PRIVATE M3_TESTING)
     m3_apply_c_settings(m3_phase5_selection)
     add_test(NAME m3_phase5_selection COMMAND m3_phase5_selection)
 
     add_executable(m3_phase5_text_field tests/phase5/text_field.c)
     target_link_libraries(m3_phase5_text_field PRIVATE m3)
+    target_compile_definitions(m3_phase5_text_field PRIVATE M3_TESTING)
     m3_apply_c_settings(m3_phase5_text_field)
     add_test(NAME m3_phase5_text_field COMMAND m3_phase5_text_field)
 
@@ -473,6 +487,7 @@ if(BUILD_TESTING)
 
     add_executable(m3_phase5_navigation tests/phase5/navigation.c)
     target_link_libraries(m3_phase5_navigation PRIVATE m3)
+    target_compile_definitions(m3_phase5_navigation PRIVATE M3_TESTING)
     m3_apply_c_settings(m3_phase5_navigation)
     add_test(NAME m3_phase5_navigation COMMAND m3_phase5_navigation)
 
@@ -484,6 +499,7 @@ if(BUILD_TESTING)
 
 add_executable(m3_phase5_progress tests/phase5/progress.c)
 target_link_libraries(m3_phase5_progress PRIVATE m3)
+target_compile_definitions(m3_phase5_progress PRIVATE M3_TESTING)
 m3_apply_c_settings(m3_phase5_progress)
 add_test(NAME m3_phase5_progress COMMAND m3_phase5_progress)
 

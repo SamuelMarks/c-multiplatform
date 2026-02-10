@@ -5,6 +5,8 @@
 #ifdef M3_TESTING
 static m3_usize g_router_cstr_limit_override = 0;
 static M3Bool g_router_force_slice_equals_fail = M3_FALSE;
+static m3_u32 g_router_cstr_fail_after = 0u;
+static m3_u32 g_router_cstr_call_count = 0u;
 #endif
 
 static const char g_router_root_path[] = "/";
@@ -32,6 +34,15 @@ static int m3_router_cstrlen(const char *cstr, m3_usize *out_len)
     if (cstr == NULL || out_len == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
+
+#ifdef M3_TESTING
+    if (g_router_cstr_fail_after != 0u) {
+        g_router_cstr_call_count += 1u;
+        if (g_router_cstr_call_count >= g_router_cstr_fail_after) {
+            return M3_ERR_OVERFLOW;
+        }
+    }
+#endif
 
     max_len = m3_router_cstr_limit();
     len = 0;
@@ -897,6 +908,13 @@ int M3_CALL m3_router_clear(M3Router *router)
 int M3_CALL m3_router_test_set_cstr_limit(m3_usize max_len)
 {
     g_router_cstr_limit_override = max_len;
+    return M3_OK;
+}
+
+int M3_CALL m3_router_test_set_cstr_fail_after(m3_u32 call_index)
+{
+    g_router_cstr_fail_after = call_index;
+    g_router_cstr_call_count = 0u;
     return M3_OK;
 }
 

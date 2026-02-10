@@ -459,5 +459,50 @@ int main(void)
         M3_TEST_OK(m3_event_dispatcher_shutdown(&dispatcher));
     }
 
+    {
+        M3Rect rect;
+        M3Bool focusable;
+        M3Widget widget;
+        M3RenderNode node;
+        M3Widget *hit;
+        M3InputEvent event;
+        M3Bool handled;
+
+        rect.x = 0.0f;
+        rect.y = 0.0f;
+        rect.width = -1.0f;
+        rect.height = 1.0f;
+        M3_TEST_EXPECT(m3_event_test_validate_rect(NULL), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_event_test_validate_rect(&rect), M3_ERR_RANGE);
+        rect.width = 0.0f;
+        M3_TEST_OK(m3_event_test_validate_rect(&rect));
+
+        M3_TEST_EXPECT(m3_event_test_widget_focusable(NULL, NULL), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_OK(m3_event_test_widget_focusable(NULL, &focusable));
+        M3_TEST_ASSERT(focusable == M3_FALSE);
+
+        memset(&widget, 0, sizeof(widget));
+        memset(&node, 0, sizeof(node));
+        node.widget = &widget;
+        node.bounds.x = 0.0f;
+        node.bounds.y = 0.0f;
+        node.bounds.width = 10.0f;
+        node.bounds.height = 10.0f;
+
+        M3_TEST_EXPECT(m3_event_test_hit_test(NULL, 0.0f, 0.0f, &hit), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_event_test_hit_test(&node, 0.0f, 0.0f, NULL), M3_ERR_INVALID_ARGUMENT);
+
+        M3_TEST_EXPECT(m3_event_test_set_force_contains_error(2), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_OK(m3_event_test_set_force_contains_error(M3_TRUE));
+        M3_TEST_EXPECT(m3_event_test_hit_test(&node, 1.0f, 1.0f, &hit), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_OK(m3_event_test_set_force_contains_error(M3_FALSE));
+
+        memset(&event, 0, sizeof(event));
+        event.type = M3_INPUT_POINTER_DOWN;
+        M3_TEST_EXPECT(m3_event_test_dispatch_to_widget(&widget, &event, NULL), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_event_test_dispatch_to_widget(NULL, &event, &handled), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_event_test_dispatch_to_widget(&widget, NULL, &handled), M3_ERR_INVALID_ARGUMENT);
+    }
+
     return 0;
 }

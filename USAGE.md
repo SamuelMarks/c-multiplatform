@@ -2,6 +2,7 @@ USAGE
 =====
 
 This guide shows how to build LibM3C and wire core widgets (including text fields) into a simple loop.
+Backends are opt-in and compiled behind CMake flags.
 
 Build
 -----
@@ -10,6 +11,17 @@ Build
 cmake -S . -B build -D CMAKE_BUILD_TYPE=Debug
 cmake --build build
 ctest --test-dir build --output-on-failure
+```
+
+Backend Selection
+-----------------
+
+Backends are enabled with CMake flags and may compile as stubs if their platform/dependencies are missing.
+Use `m3_*_backend_is_available` at runtime to confirm support.
+
+```
+cmake -S . -B build -D M3_ENABLE_SDL3=ON -D M3_ENABLE_SDL3_TTF=ON
+cmake -S . -B build -D M3_ENABLE_WEB=ON -D M3_ENABLE_WEBGPU=ON
 ```
 
 Text Field Example
@@ -168,3 +180,47 @@ int fetch_url(M3Env *env, const char *url) {
     return m3_network_shutdown(&client);
 }
 ```
+
+Storage Example
+---------------
+
+The storage helper provides a simple key/value store with optional file persistence via `M3IO`.
+
+```c
+#include "m3/m3_storage.h"
+
+int save_prefs(M3Env *env) {
+    M3Storage storage;
+    M3StorageConfig config;
+    M3IO io;
+    int rc;
+
+    rc = m3_storage_config_init(&config);
+    if (rc != M3_OK) return rc;
+
+    rc = m3_storage_init(&storage, &config);
+    if (rc != M3_OK) return rc;
+
+    rc = m3_storage_put(&storage, "theme", 5, "dark", 4, M3_TRUE);
+    if (rc != M3_OK) {
+        m3_storage_shutdown(&storage);
+        return rc;
+    }
+
+    rc = env->vtable->get_io(env->ctx, &io);
+    if (rc != M3_OK) {
+        m3_storage_shutdown(&storage);
+        return rc;
+    }
+
+    rc = m3_storage_save(&storage, &io, "prefs.m3s");
+    if (rc != M3_OK) {
+        m3_storage_shutdown(&storage);
+        return rc;
+    }
+
+    return m3_storage_shutdown(&storage);
+}
+```
+
+Use `m3_storage_load` to restore a previously saved store.

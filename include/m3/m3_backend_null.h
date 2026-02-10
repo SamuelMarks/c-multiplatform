@@ -83,6 +83,28 @@ M3_API int M3_CALL m3_null_backend_get_env(M3NullBackend *backend, M3Env *out_en
  * @return M3_OK on success or a failure code.
  */
 M3_API int M3_CALL m3_null_backend_test_set_initialized(M3NullBackend *backend, M3Bool initialized);
+
+/**
+ * @brief Test wrapper for null backend object retain.
+ * @param obj Object header to retain.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_null_backend_test_object_retain(M3ObjectHeader *obj);
+
+/**
+ * @brief Test wrapper for null backend object release.
+ * @param obj Object header to release.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_null_backend_test_object_release(M3ObjectHeader *obj);
+
+/**
+ * @brief Test wrapper for null backend object type query.
+ * @param obj Object header to query.
+ * @param out_type_id Receives the type identifier.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_null_backend_test_object_get_type_id(M3ObjectHeader *obj, m3_u32 *out_type_id);
 #endif
 
 #ifdef __cplusplus

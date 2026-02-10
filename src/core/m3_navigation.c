@@ -2,6 +2,40 @@
 
 #include <string.h>
 
+#ifdef M3_TESTING
+#define M3_NAV_TEST_FAIL_NONE 0u
+#define M3_NAV_TEST_FAIL_RESOLVE_MODE 1u
+#define M3_NAV_TEST_FAIL_LAYOUT_ITEM_WIDTH_NEGATIVE 2u
+#define M3_NAV_TEST_FAIL_LAYOUT_MODE_INVALID 3u
+#define M3_NAV_TEST_FAIL_INDICATOR_RECT_NEGATIVE 4u
+#define M3_NAV_TEST_FAIL_ITEM_RECT_NEGATIVE 5u
+#define M3_NAV_TEST_FAIL_STYLE_INIT 6u
+#define M3_NAV_TEST_FAIL_HIT_TEST_POS_NEGATIVE 7u
+
+static m3_u32 g_m3_nav_test_fail_point = M3_NAV_TEST_FAIL_NONE;
+
+static M3Bool m3_nav_test_consume_fail(m3_u32 point)
+{
+    if (g_m3_nav_test_fail_point != point) {
+        return M3_FALSE;
+    }
+    g_m3_nav_test_fail_point = M3_NAV_TEST_FAIL_NONE;
+    return M3_TRUE;
+}
+
+int M3_CALL m3_navigation_test_set_fail_point(m3_u32 point)
+{
+    g_m3_nav_test_fail_point = point;
+    return M3_OK;
+}
+
+int M3_CALL m3_navigation_test_clear_fail_points(void)
+{
+    g_m3_nav_test_fail_point = M3_NAV_TEST_FAIL_NONE;
+    return M3_OK;
+}
+#endif
+
 typedef struct M3NavigationLayout {
     m3_u32 mode;
     M3Scalar start_x;
@@ -196,6 +230,11 @@ static int m3_navigation_validate_rect(const M3Rect *rect)
 
 static int m3_navigation_resolve_mode(const M3NavigationStyle *style, M3Scalar width, m3_u32 *out_mode)
 {
+#ifdef M3_TESTING
+    if (m3_nav_test_consume_fail(M3_NAV_TEST_FAIL_RESOLVE_MODE)) {
+        return M3_ERR_UNKNOWN;
+    }
+#endif
     if (style == NULL || out_mode == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
@@ -298,6 +337,11 @@ static int m3_navigation_compute_layout(const M3Navigation *nav, M3NavigationLay
     if (rc != M3_OK) {
         return rc;
     }
+#ifdef M3_TESTING
+    if (m3_nav_test_consume_fail(M3_NAV_TEST_FAIL_LAYOUT_MODE_INVALID)) {
+        mode = 99u;
+    }
+#endif
 
     spacing = style.item_spacing;
     if (spacing < 0.0f) {
@@ -327,6 +371,11 @@ static int m3_navigation_compute_layout(const M3Navigation *nav, M3NavigationLay
                 return M3_ERR_RANGE;
             }
             out_layout->item_width = (available_width - total_spacing) / (M3Scalar)nav->item_count;
+#ifdef M3_TESTING
+            if (m3_nav_test_consume_fail(M3_NAV_TEST_FAIL_LAYOUT_ITEM_WIDTH_NEGATIVE)) {
+                out_layout->item_width = -1.0f;
+            }
+#endif
             if (out_layout->item_width < 0.0f) {
                 return M3_ERR_RANGE;
             }
@@ -392,6 +441,11 @@ static int m3_navigation_hit_test(const M3Navigation *nav, const M3NavigationLay
             return M3_ERR_RANGE;
         }
         pos = fx - layout->start_x;
+#ifdef M3_TESTING
+        if (m3_nav_test_consume_fail(M3_NAV_TEST_FAIL_HIT_TEST_POS_NEGATIVE)) {
+            pos = -1.0f;
+        }
+#endif
         if (pos < 0.0f) {
             return M3_OK;
         }
@@ -417,6 +471,11 @@ static int m3_navigation_hit_test(const M3Navigation *nav, const M3NavigationLay
         return M3_ERR_RANGE;
     }
     pos = fy - layout->start_y;
+#ifdef M3_TESTING
+    if (m3_nav_test_consume_fail(M3_NAV_TEST_FAIL_HIT_TEST_POS_NEGATIVE)) {
+        pos = -1.0f;
+    }
+#endif
     if (pos < 0.0f) {
         return M3_OK;
     }
@@ -597,6 +656,11 @@ static int m3_navigation_widget_paint(void *widget, M3PaintContext *ctx)
         } else {
             indicator_rect.width = indicator_thickness;
         }
+#ifdef M3_TESTING
+        if (m3_nav_test_consume_fail(M3_NAV_TEST_FAIL_INDICATOR_RECT_NEGATIVE)) {
+            indicator_rect.width = -1.0f;
+        }
+#endif
 
         if (indicator_rect.width < 0.0f || indicator_rect.height < 0.0f) {
             return M3_ERR_RANGE;
@@ -628,6 +692,11 @@ static int m3_navigation_widget_paint(void *widget, M3PaintContext *ctx)
             item_rect.y += (layout.item_height + layout.spacing) * (M3Scalar)i;
         }
 
+#ifdef M3_TESTING
+        if (m3_nav_test_consume_fail(M3_NAV_TEST_FAIL_ITEM_RECT_NEGATIVE)) {
+            item_rect.width = -1.0f;
+        }
+#endif
         if (item_rect.width < 0.0f || item_rect.height < 0.0f) {
             return M3_ERR_RANGE;
         }
@@ -809,6 +878,11 @@ int M3_CALL m3_navigation_style_init(M3NavigationStyle *style)
     memset(style, 0, sizeof(*style));
 
     rc = m3_text_style_init(&style->text_style);
+#ifdef M3_TESTING
+    if (m3_nav_test_consume_fail(M3_NAV_TEST_FAIL_STYLE_INIT)) {
+        rc = M3_ERR_UNKNOWN;
+    }
+#endif
     if (rc != M3_OK) {
         return rc;
     }
@@ -1007,3 +1081,99 @@ int M3_CALL m3_navigation_get_mode(const M3Navigation *nav, m3_u32 *out_mode)
 
     return m3_navigation_resolve_mode(&nav->style, nav->bounds.width, out_mode);
 }
+
+#ifdef M3_TESTING
+int M3_CALL m3_navigation_test_validate_color(const M3Color *color)
+{
+    return m3_navigation_validate_color(color);
+}
+
+int M3_CALL m3_navigation_test_validate_edges(const M3LayoutEdges *edges)
+{
+    return m3_navigation_validate_edges(edges);
+}
+
+int M3_CALL m3_navigation_test_validate_text_style(const M3TextStyle *style, M3Bool require_family)
+{
+    return m3_navigation_validate_text_style(style, require_family);
+}
+
+int M3_CALL m3_navigation_test_validate_style(const M3NavigationStyle *style, M3Bool require_family)
+{
+    return m3_navigation_validate_style(style, require_family);
+}
+
+int M3_CALL m3_navigation_test_validate_items(const M3NavigationItem *items, m3_usize count)
+{
+    return m3_navigation_validate_items(items, count);
+}
+
+int M3_CALL m3_navigation_test_validate_measure_spec(M3MeasureSpec spec)
+{
+    return m3_navigation_validate_measure_spec(spec);
+}
+
+int M3_CALL m3_navigation_test_validate_rect(const M3Rect *rect)
+{
+    return m3_navigation_validate_rect(rect);
+}
+
+int M3_CALL m3_navigation_test_resolve_mode(const M3NavigationStyle *style, M3Scalar width, m3_u32 *out_mode)
+{
+    return m3_navigation_resolve_mode(style, width, out_mode);
+}
+
+int M3_CALL m3_navigation_test_measure_content(const M3NavigationStyle *style, m3_u32 mode, m3_usize item_count,
+    M3Scalar *out_width, M3Scalar *out_height)
+{
+    return m3_navigation_measure_content(style, mode, item_count, out_width, out_height);
+}
+
+int M3_CALL m3_navigation_test_compute_layout(const M3Navigation *nav, M3NavigationLayoutTest *out_layout)
+{
+    M3NavigationLayout layout;
+    M3NavigationLayout *layout_ptr;
+    int rc;
+
+    layout_ptr = (out_layout == NULL) ? NULL : &layout;
+    rc = m3_navigation_compute_layout(nav, layout_ptr);
+    if (rc != M3_OK) {
+        return rc;
+    }
+    if (out_layout == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    out_layout->mode = layout.mode;
+    out_layout->start_x = layout.start_x;
+    out_layout->start_y = layout.start_y;
+    out_layout->item_width = layout.item_width;
+    out_layout->item_height = layout.item_height;
+    out_layout->spacing = layout.spacing;
+    out_layout->content_width = layout.content_width;
+    out_layout->content_height = layout.content_height;
+    return M3_OK;
+}
+
+int M3_CALL m3_navigation_test_hit_test(const M3Navigation *nav, const M3NavigationLayoutTest *layout, m3_i32 x, m3_i32 y,
+    m3_usize *out_index)
+{
+    M3NavigationLayout internal;
+    const M3NavigationLayout *layout_ptr;
+
+    layout_ptr = NULL;
+    if (layout != NULL) {
+        internal.mode = layout->mode;
+        internal.start_x = layout->start_x;
+        internal.start_y = layout->start_y;
+        internal.item_width = layout->item_width;
+        internal.item_height = layout->item_height;
+        internal.spacing = layout->spacing;
+        internal.content_width = layout->content_width;
+        internal.content_height = layout->content_height;
+        layout_ptr = &internal;
+    }
+
+    return m3_navigation_hit_test(nav, layout_ptr, x, y, out_index);
+}
+#endif

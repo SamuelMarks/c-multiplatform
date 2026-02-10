@@ -3,11 +3,21 @@
 
 #include <string.h>
 
+#ifdef M3_TESTING
+#define M3_SELECTION_TEST_FAIL_CHECKBOX_RESOLVE_COLORS 1u
+#define M3_SELECTION_TEST_FAIL_SWITCH_RESOLVE_COLORS 2u
+#define M3_SELECTION_TEST_FAIL_RADIO_RESOLVE_COLORS 3u
+#define M3_SELECTION_TEST_FAIL_CHECKBOX_CHECK_THICKNESS_NEGATIVE 4u
+#define M3_SELECTION_TEST_FAIL_RADIO_DOT_RADIUS_NEGATIVE 5u
+#endif
+
 typedef struct TestSelectionBackend {
     int draw_rect_calls;
     int draw_line_calls;
     int fail_draw_rect;
     int fail_draw_line;
+    int fail_draw_rect_after;
+    int fail_draw_line_after;
     M3Rect last_rect;
     M3Color last_rect_color;
     M3Scalar last_corner;
@@ -33,6 +43,8 @@ static int test_backend_init(TestSelectionBackend *backend)
     memset(backend, 0, sizeof(*backend));
     backend->fail_draw_rect = M3_OK;
     backend->fail_draw_line = M3_OK;
+    backend->fail_draw_rect_after = 0;
+    backend->fail_draw_line_after = 0;
     return M3_OK;
 }
 
@@ -49,6 +61,9 @@ static int test_gfx_draw_rect(void *gfx, const M3Rect *rect, M3Color color, M3Sc
     backend->last_rect = *rect;
     backend->last_rect_color = color;
     backend->last_corner = corner_radius;
+    if (backend->fail_draw_rect_after > 0 && backend->draw_rect_calls == backend->fail_draw_rect_after) {
+        return M3_ERR_IO;
+    }
     if (backend->fail_draw_rect != M3_OK) {
         return backend->fail_draw_rect;
     }
@@ -72,6 +87,9 @@ static int test_gfx_draw_line(void *gfx, M3Scalar x0, M3Scalar y0, M3Scalar x1, 
     backend->last_line_y1 = y1;
     backend->last_line_color = color;
     backend->last_line_thickness = thickness;
+    if (backend->fail_draw_line_after > 0 && backend->draw_line_calls == backend->fail_draw_line_after) {
+        return M3_ERR_IO;
+    }
     if (backend->fail_draw_line != M3_OK) {
         return backend->fail_draw_line;
     }
@@ -265,6 +283,8 @@ int main(void)
     M3_TEST_OK(m3_checkbox_init(&checkbox, &checkbox_style, M3_FALSE));
     M3_TEST_ASSERT(checkbox.widget.ctx == &checkbox);
     M3_TEST_ASSERT(checkbox.widget.vtable != NULL);
+    M3_TEST_EXPECT(m3_checkbox_set_style(NULL, &checkbox_style), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_checkbox_set_style(&checkbox, NULL), M3_ERR_INVALID_ARGUMENT);
 
     M3_TEST_EXPECT(m3_checkbox_set_checked(NULL, M3_TRUE), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_checkbox_set_checked(&checkbox, 2), M3_ERR_INVALID_ARGUMENT);
@@ -286,6 +306,13 @@ int main(void)
     M3_TEST_EXPECT(m3_checkbox_set_style(&checkbox, &other_checkbox_style), M3_ERR_RANGE);
     M3_TEST_OK(m3_checkbox_set_style(&checkbox, &checkbox_style));
 
+#ifdef M3_TESTING
+    M3_TEST_OK(test_backend_init(&backend));
+    M3_TEST_OK(m3_selection_test_set_fail_point(M3_SELECTION_TEST_FAIL_CHECKBOX_RESOLVE_COLORS));
+    M3_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx), M3_ERR_UNKNOWN);
+    M3_TEST_OK(m3_selection_test_clear_fail_points());
+#endif
+
     M3_TEST_EXPECT(m3_checkbox_set_on_change(NULL, test_checkbox_on_change, NULL), M3_ERR_INVALID_ARGUMENT);
     counter.calls = 0;
     counter.last_state = M3_FALSE;
@@ -296,6 +323,8 @@ int main(void)
     width_spec.size = 0.0f;
     height_spec.mode = M3_MEASURE_UNSPECIFIED;
     height_spec.size = 0.0f;
+    M3_TEST_EXPECT(checkbox.widget.vtable->measure(NULL, width_spec, height_spec, &size), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(checkbox.widget.vtable->measure(checkbox.widget.ctx, width_spec, height_spec, NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(checkbox.widget.vtable->measure(checkbox.widget.ctx, width_spec, height_spec, &size), M3_ERR_INVALID_ARGUMENT);
 
     width_spec.mode = M3_MEASURE_AT_MOST;
@@ -326,6 +355,7 @@ int main(void)
 
     bounds.width = 20.0f;
     bounds.height = 20.0f;
+    M3_TEST_EXPECT(checkbox.widget.vtable->layout(NULL, bounds), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(checkbox.widget.vtable->layout(checkbox.widget.ctx, bounds));
 
     M3_TEST_OK(test_backend_init(&backend));
@@ -344,6 +374,35 @@ int main(void)
     checkbox.style.border_width = 15.0f;
     M3_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx), M3_ERR_RANGE);
     checkbox.style.border_width = checkbox_style.border_width;
+
+    checkbox.style.corner_radius = 0.5f;
+    checkbox.style.border_width = 2.0f;
+    M3_TEST_OK(test_backend_init(&backend));
+    M3_TEST_OK(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx));
+    checkbox.style.corner_radius = checkbox_style.corner_radius;
+    checkbox.style.border_width = checkbox_style.border_width;
+
+    checkbox.bounds.width = 2.0f;
+    checkbox.bounds.height = 2.0f;
+    M3_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx), M3_ERR_RANGE);
+    checkbox.bounds = bounds;
+
+    M3_TEST_OK(test_backend_init(&backend));
+    backend.fail_draw_rect_after = 2;
+    M3_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx), M3_ERR_IO);
+    backend.fail_draw_rect_after = 0;
+
+#ifdef M3_TESTING
+    M3_TEST_OK(m3_checkbox_set_checked(&checkbox, M3_TRUE));
+    M3_TEST_OK(m3_selection_test_set_fail_point(M3_SELECTION_TEST_FAIL_CHECKBOX_CHECK_THICKNESS_NEGATIVE));
+    M3_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx), M3_ERR_RANGE);
+    M3_TEST_OK(m3_selection_test_clear_fail_points());
+#endif
+
+    M3_TEST_OK(test_backend_init(&backend));
+    backend.fail_draw_line_after = 2;
+    M3_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx), M3_ERR_IO);
+    backend.fail_draw_line_after = 0;
 
     checkbox.bounds.width = -1.0f;
     M3_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx), M3_ERR_RANGE);
@@ -372,6 +431,13 @@ int main(void)
     M3_TEST_ASSERT(m3_color_near(backend.last_rect_color, checkbox_style.disabled_checked.fill, 0.001f));
     checkbox.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
 
+    M3_TEST_OK(m3_checkbox_set_checked(&checkbox, M3_FALSE));
+    checkbox.widget.flags |= M3_WIDGET_FLAG_DISABLED;
+    M3_TEST_OK(test_backend_init(&backend));
+    M3_TEST_OK(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx));
+    M3_TEST_ASSERT(m3_color_near(backend.last_rect_color, checkbox_style.disabled_unchecked.fill, 0.001f));
+    checkbox.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
+
     backend.fail_draw_line = M3_ERR_IO;
     M3_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx), M3_ERR_IO);
     backend.fail_draw_line = M3_OK;
@@ -386,10 +452,19 @@ int main(void)
     M3_TEST_ASSERT(handled == M3_FALSE);
     checkbox.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
 
+    checkbox.checked = 2;
+    M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 5, 6));
+    M3_TEST_EXPECT(checkbox.widget.vtable->event(checkbox.widget.ctx, &event, &handled), M3_ERR_INVALID_ARGUMENT);
+    checkbox.checked = M3_FALSE;
+
     checkbox.pressed = M3_TRUE;
     M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 5, 6));
     M3_TEST_EXPECT(checkbox.widget.vtable->event(checkbox.widget.ctx, &event, &handled), M3_ERR_STATE);
     checkbox.pressed = M3_FALSE;
+
+    M3_TEST_OK(init_pointer_event(&event, M3_INPUT_KEY_UP, 0, 0));
+    M3_TEST_OK(checkbox.widget.vtable->event(checkbox.widget.ctx, &event, &handled));
+    M3_TEST_ASSERT(handled == M3_FALSE);
 
     M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_UP, 5, 6));
     M3_TEST_OK(checkbox.widget.vtable->event(checkbox.widget.ctx, &event, &handled));
@@ -418,6 +493,12 @@ int main(void)
     M3_TEST_ASSERT(semantics.role == M3_SEMANTIC_CHECKBOX);
     M3_TEST_ASSERT(semantics.utf8_label == checkbox.utf8_label);
 
+    checkbox.widget.flags |= M3_WIDGET_FLAG_DISABLED;
+    M3_TEST_OK(checkbox.widget.vtable->get_semantics(checkbox.widget.ctx, &semantics));
+    M3_TEST_ASSERT((semantics.flags & M3_SEMANTIC_FLAG_DISABLED) != 0u);
+    checkbox.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
+
+    M3_TEST_EXPECT(checkbox.widget.vtable->destroy(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(checkbox.widget.vtable->destroy(checkbox.widget.ctx));
 
     M3_TEST_EXPECT(m3_switch_style_init(NULL), M3_ERR_INVALID_ARGUMENT);
@@ -435,6 +516,8 @@ int main(void)
 
     M3_TEST_OK(m3_switch_init(&sw, &switch_style, M3_FALSE));
     M3_TEST_ASSERT(sw.widget.ctx == &sw);
+    M3_TEST_EXPECT(m3_switch_set_style(NULL, &switch_style), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_switch_set_style(&sw, NULL), M3_ERR_INVALID_ARGUMENT);
 
     M3_TEST_EXPECT(m3_switch_set_on(NULL, M3_TRUE), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_switch_set_on(&sw, 3), M3_ERR_INVALID_ARGUMENT);
@@ -449,6 +532,11 @@ int main(void)
     M3_TEST_EXPECT(m3_switch_set_style(&sw, &other_switch_style), M3_ERR_RANGE);
     other_switch_style = switch_style;
     other_switch_style.on.track.a = 2.0f;
+    M3_TEST_EXPECT(m3_switch_set_style(&sw, &other_switch_style), M3_ERR_RANGE);
+    other_switch_style = switch_style;
+    other_switch_style.track_height = 20.0f;
+    other_switch_style.track_width = 20.0f;
+    other_switch_style.thumb_inset = 10.0f;
     M3_TEST_EXPECT(m3_switch_set_style(&sw, &other_switch_style), M3_ERR_RANGE);
     M3_TEST_OK(m3_switch_set_style(&sw, &switch_style));
 
@@ -465,6 +553,8 @@ int main(void)
     width_spec.size = 0.0f;
     height_spec.mode = M3_MEASURE_UNSPECIFIED;
     height_spec.size = 0.0f;
+    M3_TEST_EXPECT(sw.widget.vtable->measure(NULL, width_spec, height_spec, &size), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(sw.widget.vtable->measure(sw.widget.ctx, width_spec, height_spec, NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(sw.widget.vtable->measure(sw.widget.ctx, width_spec, height_spec, &size), M3_ERR_INVALID_ARGUMENT);
 
     width_spec.mode = M3_MEASURE_AT_MOST;
@@ -487,31 +577,67 @@ int main(void)
 
     bounds.width = switch_style.track_width;
     bounds.height = switch_style.track_height;
+    M3_TEST_EXPECT(sw.widget.vtable->layout(NULL, bounds), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(sw.widget.vtable->layout(sw.widget.ctx, bounds));
+
+    M3_TEST_EXPECT(sw.widget.vtable->paint(NULL, &paint_ctx), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, NULL), M3_ERR_INVALID_ARGUMENT);
+    paint_ctx.gfx = NULL;
+    M3_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx), M3_ERR_INVALID_ARGUMENT);
+    paint_ctx.gfx = &gfx;
 
     gfx.vtable = &g_test_vtable_no_rect;
     M3_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx), M3_ERR_UNSUPPORTED);
     gfx.vtable = &g_test_vtable;
+
+#ifdef M3_TESTING
+    M3_TEST_OK(test_backend_init(&backend));
+    M3_TEST_OK(m3_selection_test_set_fail_point(M3_SELECTION_TEST_FAIL_SWITCH_RESOLVE_COLORS));
+    M3_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx), M3_ERR_UNKNOWN);
+    M3_TEST_OK(m3_selection_test_clear_fail_points());
+#endif
 
     M3_TEST_OK(m3_switch_set_style(&sw, &switch_style));
     sw.style.thumb_inset = 30.0f;
     M3_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx), M3_ERR_RANGE);
     sw.style.thumb_inset = switch_style.thumb_inset;
 
+    sw.bounds.height = 2.0f;
+    M3_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx), M3_ERR_RANGE);
+    sw.bounds = bounds;
+
     M3_TEST_OK(test_backend_init(&backend));
     backend.fail_draw_rect = M3_ERR_IO;
     M3_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx), M3_ERR_IO);
     M3_TEST_OK(test_backend_init(&backend));
+
+    M3_TEST_OK(test_backend_init(&backend));
+    backend.fail_draw_rect_after = 2;
+    M3_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx), M3_ERR_IO);
+    backend.fail_draw_rect_after = 0;
 
     M3_TEST_OK(m3_switch_set_on(&sw, M3_FALSE));
     M3_TEST_OK(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx));
     M3_TEST_ASSERT(backend.draw_rect_calls == 2);
     M3_TEST_ASSERT(m3_color_near(backend.last_rect_color, switch_style.off.thumb, 0.001f));
 
+    M3_TEST_OK(test_backend_init(&backend));
+    M3_TEST_OK(m3_switch_set_on(&sw, M3_TRUE));
+    M3_TEST_OK(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx));
+    M3_TEST_ASSERT(backend.draw_rect_calls == 2);
+    M3_TEST_ASSERT(m3_color_near(backend.last_rect_color, switch_style.on.thumb, 0.001f));
+
     sw.widget.flags |= M3_WIDGET_FLAG_DISABLED;
     M3_TEST_OK(test_backend_init(&backend));
     M3_TEST_OK(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx));
     M3_TEST_ASSERT(m3_color_near(backend.last_rect_color, switch_style.disabled_off.thumb, 0.001f));
+    sw.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
+
+    sw.widget.flags |= M3_WIDGET_FLAG_DISABLED;
+    M3_TEST_OK(test_backend_init(&backend));
+    M3_TEST_OK(m3_switch_set_on(&sw, M3_TRUE));
+    M3_TEST_OK(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx));
+    M3_TEST_ASSERT(m3_color_near(backend.last_rect_color, switch_style.disabled_on.thumb, 0.001f));
     sw.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
 
     M3_TEST_EXPECT(sw.widget.vtable->event(NULL, &event, &handled), M3_ERR_INVALID_ARGUMENT);
@@ -524,10 +650,19 @@ int main(void)
     M3_TEST_ASSERT(handled == M3_FALSE);
     sw.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
 
+    sw.on = 2;
+    M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 5, 6));
+    M3_TEST_EXPECT(sw.widget.vtable->event(sw.widget.ctx, &event, &handled), M3_ERR_INVALID_ARGUMENT);
+    sw.on = M3_FALSE;
+
     sw.pressed = M3_TRUE;
     M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 5, 6));
     M3_TEST_EXPECT(sw.widget.vtable->event(sw.widget.ctx, &event, &handled), M3_ERR_STATE);
     sw.pressed = M3_FALSE;
+
+    M3_TEST_OK(init_pointer_event(&event, M3_INPUT_KEY_UP, 0, 0));
+    M3_TEST_OK(sw.widget.vtable->event(sw.widget.ctx, &event, &handled));
+    M3_TEST_ASSERT(handled == M3_FALSE);
 
     M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_UP, 5, 6));
     M3_TEST_OK(sw.widget.vtable->event(sw.widget.ctx, &event, &handled));
@@ -551,9 +686,16 @@ int main(void)
     M3_TEST_ASSERT(sw.on == M3_TRUE);
     counter.fail = 0;
 
+    M3_TEST_EXPECT(sw.widget.vtable->get_semantics(NULL, &semantics), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(sw.widget.vtable->get_semantics(sw.widget.ctx, &semantics));
     M3_TEST_ASSERT(semantics.role == M3_SEMANTIC_SWITCH);
 
+    sw.widget.flags |= M3_WIDGET_FLAG_DISABLED;
+    M3_TEST_OK(sw.widget.vtable->get_semantics(sw.widget.ctx, &semantics));
+    M3_TEST_ASSERT((semantics.flags & M3_SEMANTIC_FLAG_DISABLED) != 0u);
+    sw.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
+
+    M3_TEST_EXPECT(sw.widget.vtable->destroy(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(sw.widget.vtable->destroy(sw.widget.ctx));
 
     M3_TEST_EXPECT(m3_radio_style_init(NULL), M3_ERR_INVALID_ARGUMENT);
@@ -570,6 +712,8 @@ int main(void)
 
     M3_TEST_OK(m3_radio_init(&radio, &radio_style, M3_FALSE));
     M3_TEST_ASSERT(radio.widget.ctx == &radio);
+    M3_TEST_EXPECT(m3_radio_set_style(NULL, &radio_style), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_radio_set_style(&radio, NULL), M3_ERR_INVALID_ARGUMENT);
 
     M3_TEST_EXPECT(m3_radio_set_selected(NULL, M3_TRUE), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_radio_set_selected(&radio, 3), M3_ERR_INVALID_ARGUMENT);
@@ -600,6 +744,8 @@ int main(void)
     width_spec.size = 0.0f;
     height_spec.mode = M3_MEASURE_UNSPECIFIED;
     height_spec.size = 0.0f;
+    M3_TEST_EXPECT(radio.widget.vtable->measure(NULL, width_spec, height_spec, &size), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(radio.widget.vtable->measure(radio.widget.ctx, width_spec, height_spec, NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(radio.widget.vtable->measure(radio.widget.ctx, width_spec, height_spec, &size), M3_ERR_INVALID_ARGUMENT);
 
     width_spec.mode = M3_MEASURE_AT_MOST;
@@ -622,21 +768,72 @@ int main(void)
 
     bounds.width = radio_style.size;
     bounds.height = radio_style.size;
+    M3_TEST_EXPECT(radio.widget.vtable->layout(NULL, bounds), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(radio.widget.vtable->layout(radio.widget.ctx, bounds));
+
+    M3_TEST_EXPECT(radio.widget.vtable->paint(NULL, &paint_ctx), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, NULL), M3_ERR_INVALID_ARGUMENT);
+    paint_ctx.gfx = NULL;
+    M3_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx), M3_ERR_INVALID_ARGUMENT);
+    paint_ctx.gfx = &gfx;
 
     gfx.vtable = &g_test_vtable_no_rect;
     M3_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx), M3_ERR_UNSUPPORTED);
     gfx.vtable = &g_test_vtable;
+
+#ifdef M3_TESTING
+    M3_TEST_OK(test_backend_init(&backend));
+    M3_TEST_OK(m3_selection_test_set_fail_point(M3_SELECTION_TEST_FAIL_RADIO_RESOLVE_COLORS));
+    M3_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx), M3_ERR_UNKNOWN);
+    M3_TEST_OK(m3_selection_test_clear_fail_points());
+#endif
 
     M3_TEST_OK(m3_radio_set_style(&radio, &radio_style));
     radio.style.border_width = 15.0f;
     M3_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx), M3_ERR_RANGE);
     radio.style.border_width = radio_style.border_width;
 
+    radio.bounds.width = -1.0f;
+    M3_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx), M3_ERR_RANGE);
+    radio.bounds = bounds;
+
+    radio.style.border_width = 8.0f;
+    radio.bounds.width = 20.0f;
+    radio.bounds.height = 10.0f;
+    M3_TEST_OK(test_backend_init(&backend));
+    M3_TEST_OK(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx));
+    radio.style.border_width = radio_style.border_width;
+    radio.bounds = bounds;
+
+    radio.style.border_width = 8.0f;
+    radio.bounds.width = 10.0f;
+    radio.bounds.height = 10.0f;
+    M3_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx), M3_ERR_RANGE);
+    radio.style.border_width = radio_style.border_width;
+    radio.bounds = bounds;
+
+    M3_TEST_OK(test_backend_init(&backend));
+    backend.fail_draw_rect_after = 2;
+    M3_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx), M3_ERR_IO);
+    backend.fail_draw_rect_after = 0;
+
+#ifdef M3_TESTING
+    M3_TEST_OK(m3_radio_set_selected(&radio, M3_TRUE));
+    M3_TEST_OK(m3_selection_test_set_fail_point(M3_SELECTION_TEST_FAIL_RADIO_DOT_RADIUS_NEGATIVE));
+    M3_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx), M3_ERR_RANGE);
+    M3_TEST_OK(m3_selection_test_clear_fail_points());
+#endif
+
     M3_TEST_OK(test_backend_init(&backend));
     backend.fail_draw_rect = M3_ERR_IO;
     M3_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx), M3_ERR_IO);
     M3_TEST_OK(test_backend_init(&backend));
+
+    M3_TEST_OK(test_backend_init(&backend));
+    backend.fail_draw_rect_after = 3;
+    M3_TEST_OK(m3_radio_set_selected(&radio, M3_TRUE));
+    M3_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx), M3_ERR_IO);
+    backend.fail_draw_rect_after = 0;
 
     M3_TEST_OK(m3_radio_set_selected(&radio, M3_FALSE));
     M3_TEST_OK(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx));
@@ -646,6 +843,17 @@ int main(void)
     M3_TEST_OK(m3_radio_set_selected(&radio, M3_TRUE));
     M3_TEST_OK(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx));
     M3_TEST_ASSERT(backend.draw_rect_calls == 3);
+
+    radio.widget.flags |= M3_WIDGET_FLAG_DISABLED;
+    M3_TEST_OK(test_backend_init(&backend));
+    M3_TEST_OK(m3_radio_set_selected(&radio, M3_TRUE));
+    M3_TEST_OK(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx));
+    M3_TEST_ASSERT(m3_color_near(backend.last_rect_color, radio_style.disabled_checked.mark, 0.001f));
+    M3_TEST_OK(test_backend_init(&backend));
+    M3_TEST_OK(m3_radio_set_selected(&radio, M3_FALSE));
+    M3_TEST_OK(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx));
+    M3_TEST_ASSERT(m3_color_near(backend.last_rect_color, radio_style.disabled_unchecked.fill, 0.001f));
+    radio.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
 
     M3_TEST_EXPECT(radio.widget.vtable->event(NULL, &event, &handled), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(radio.widget.vtable->event(radio.widget.ctx, NULL, &handled), M3_ERR_INVALID_ARGUMENT);
@@ -657,10 +865,19 @@ int main(void)
     M3_TEST_ASSERT(handled == M3_FALSE);
     radio.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
 
+    radio.selected = 2;
+    M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 5, 6));
+    M3_TEST_EXPECT(radio.widget.vtable->event(radio.widget.ctx, &event, &handled), M3_ERR_INVALID_ARGUMENT);
+    radio.selected = M3_FALSE;
+
     radio.pressed = M3_TRUE;
     M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 5, 6));
     M3_TEST_EXPECT(radio.widget.vtable->event(radio.widget.ctx, &event, &handled), M3_ERR_STATE);
     radio.pressed = M3_FALSE;
+
+    M3_TEST_OK(init_pointer_event(&event, M3_INPUT_KEY_UP, 0, 0));
+    M3_TEST_OK(radio.widget.vtable->event(radio.widget.ctx, &event, &handled));
+    M3_TEST_ASSERT(handled == M3_FALSE);
 
     M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_UP, 5, 6));
     M3_TEST_OK(radio.widget.vtable->event(radio.widget.ctx, &event, &handled));
@@ -691,9 +908,18 @@ int main(void)
     M3_TEST_ASSERT(radio.selected == M3_FALSE);
     counter.fail = 0;
 
+    M3_TEST_EXPECT(radio.widget.vtable->get_semantics(NULL, &semantics), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(radio.widget.vtable->get_semantics(radio.widget.ctx, &semantics));
     M3_TEST_ASSERT(semantics.role == M3_SEMANTIC_RADIO);
 
+    radio.selected = M3_TRUE;
+    radio.widget.flags |= M3_WIDGET_FLAG_DISABLED;
+    M3_TEST_OK(radio.widget.vtable->get_semantics(radio.widget.ctx, &semantics));
+    M3_TEST_ASSERT((semantics.flags & M3_SEMANTIC_FLAG_SELECTED) != 0u);
+    M3_TEST_ASSERT((semantics.flags & M3_SEMANTIC_FLAG_DISABLED) != 0u);
+    radio.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
+
+    M3_TEST_EXPECT(radio.widget.vtable->destroy(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(radio.widget.vtable->destroy(radio.widget.ctx));
 
     return 0;

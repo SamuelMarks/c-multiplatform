@@ -2,6 +2,38 @@
 
 #include <string.h>
 
+#ifdef M3_TESTING
+#define M3_SELECTION_TEST_FAIL_NONE 0u
+#define M3_SELECTION_TEST_FAIL_CHECKBOX_RESOLVE_COLORS 1u
+#define M3_SELECTION_TEST_FAIL_SWITCH_RESOLVE_COLORS 2u
+#define M3_SELECTION_TEST_FAIL_RADIO_RESOLVE_COLORS 3u
+#define M3_SELECTION_TEST_FAIL_CHECKBOX_CHECK_THICKNESS_NEGATIVE 4u
+#define M3_SELECTION_TEST_FAIL_RADIO_DOT_RADIUS_NEGATIVE 5u
+
+static m3_u32 g_m3_selection_test_fail_point = M3_SELECTION_TEST_FAIL_NONE;
+
+static M3Bool m3_selection_test_consume_fail(m3_u32 point)
+{
+    if (g_m3_selection_test_fail_point != point) {
+        return M3_FALSE;
+    }
+    g_m3_selection_test_fail_point = M3_SELECTION_TEST_FAIL_NONE;
+    return M3_TRUE;
+}
+
+int M3_CALL m3_selection_test_set_fail_point(m3_u32 point)
+{
+    g_m3_selection_test_fail_point = point;
+    return M3_OK;
+}
+
+int M3_CALL m3_selection_test_clear_fail_points(void)
+{
+    g_m3_selection_test_fail_point = M3_SELECTION_TEST_FAIL_NONE;
+    return M3_OK;
+}
+#endif
+
 static int m3_selection_validate_bool(M3Bool value)
 {
     if (value != M3_FALSE && value != M3_TRUE) {
@@ -145,6 +177,11 @@ static int m3_radio_validate_style(const M3RadioStyle *style)
 
 static int m3_checkbox_resolve_colors(const M3Checkbox *checkbox, M3SelectionColors *out_colors)
 {
+#ifdef M3_TESTING
+    if (m3_selection_test_consume_fail(M3_SELECTION_TEST_FAIL_CHECKBOX_RESOLVE_COLORS)) {
+        return M3_ERR_UNKNOWN;
+    }
+#endif
     if (checkbox->widget.flags & M3_WIDGET_FLAG_DISABLED) {
         if (checkbox->checked == M3_TRUE) {
             *out_colors = checkbox->style.disabled_checked;
@@ -163,6 +200,11 @@ static int m3_checkbox_resolve_colors(const M3Checkbox *checkbox, M3SelectionCol
 
 static int m3_switch_resolve_colors(const M3Switch *widget, M3SwitchColors *out_colors)
 {
+#ifdef M3_TESTING
+    if (m3_selection_test_consume_fail(M3_SELECTION_TEST_FAIL_SWITCH_RESOLVE_COLORS)) {
+        return M3_ERR_UNKNOWN;
+    }
+#endif
     if (widget->widget.flags & M3_WIDGET_FLAG_DISABLED) {
         if (widget->on == M3_TRUE) {
             *out_colors = widget->style.disabled_on;
@@ -181,6 +223,11 @@ static int m3_switch_resolve_colors(const M3Switch *widget, M3SwitchColors *out_
 
 static int m3_radio_resolve_colors(const M3Radio *radio, M3SelectionColors *out_colors)
 {
+#ifdef M3_TESTING
+    if (m3_selection_test_consume_fail(M3_SELECTION_TEST_FAIL_RADIO_RESOLVE_COLORS)) {
+        return M3_ERR_UNKNOWN;
+    }
+#endif
     if (radio->widget.flags & M3_WIDGET_FLAG_DISABLED) {
         if (radio->selected == M3_TRUE) {
             *out_colors = radio->style.disabled_checked;
@@ -323,6 +370,11 @@ static int m3_checkbox_widget_paint(void *widget, M3PaintContext *ctx)
             return M3_ERR_UNSUPPORTED;
         }
         check_thickness = checkbox->style.check_thickness;
+#ifdef M3_TESTING
+        if (m3_selection_test_consume_fail(M3_SELECTION_TEST_FAIL_CHECKBOX_CHECK_THICKNESS_NEGATIVE)) {
+            check_thickness = -1.0f;
+        }
+#endif
         if (check_thickness <= 0.0f) {
             return M3_ERR_RANGE;
         }
@@ -808,6 +860,11 @@ static int m3_radio_widget_paint(void *widget, M3PaintContext *ctx)
 
     if (radio->selected == M3_TRUE) {
         dot_radius = radio->style.dot_radius;
+#ifdef M3_TESTING
+        if (m3_selection_test_consume_fail(M3_SELECTION_TEST_FAIL_RADIO_DOT_RADIUS_NEGATIVE)) {
+            dot_radius = -1.0f;
+        }
+#endif
         if (dot_radius < 0.0f) {
             return M3_ERR_RANGE;
         }

@@ -20,6 +20,12 @@
 #define M3_TEXT_FIELD_TEST_FAIL_TEXT_STYLE_INIT 13u
 #define M3_TEXT_FIELD_TEST_FAIL_LABEL_STYLE_INIT 14u
 #define M3_TEXT_FIELD_TEST_FAIL_ANIM_INIT 15u
+#define M3_TEXT_FIELD_TEST_FAIL_LABEL_FONT_METRICS 16u
+#define M3_TEXT_FIELD_TEST_FAIL_OUTLINE_RANGE 17u
+#define M3_TEXT_FIELD_TEST_FAIL_CORNER_RANGE 18u
+#define M3_TEXT_FIELD_TEST_FAIL_SELECTION_WIDTH_NEGATIVE 19u
+#define M3_TEXT_FIELD_TEST_FAIL_CURSOR_WIDTH_NEGATIVE 20u
+#define M3_TEXT_FIELD_TEST_FAIL_CURSOR_HEIGHT_NEGATIVE 21u
 
 int M3_CALL m3_text_field_test_set_fail_point(m3_u32 fail_point);
 int M3_CALL m3_text_field_test_set_color_fail_after(m3_u32 call_count);
@@ -69,7 +75,9 @@ typedef struct TestFieldBackend {
     int fail_destroy;
     int fail_measure;
     int fail_draw;
+    int fail_draw_after;
     int fail_draw_rect;
+    int fail_draw_rect_after;
     int fail_push_clip;
     int fail_pop_clip;
     int fail_create_after;
@@ -83,6 +91,15 @@ typedef struct TestFieldBackend {
     m3_usize last_text_len;
     M3Color last_text_color;
 } TestFieldBackend;
+
+static int g_m3_text_field_trace = 0;
+
+static void m3_text_field_trace_step(int step)
+{
+    if (g_m3_text_field_trace) {
+        fprintf(stderr, "m3_phase5_text_field step %d\n", step);
+    }
+}
 
 static void test_backend_init(TestFieldBackend *backend)
 {
@@ -191,6 +208,9 @@ static int test_text_draw_text(void *text, M3Handle font, const char *utf8, m3_u
     if (backend->fail_draw) {
         return M3_ERR_IO;
     }
+    if (backend->fail_draw_after > 0 && backend->draw_calls >= backend->fail_draw_after) {
+        return M3_ERR_IO;
+    }
 
     backend->last_text_x = x;
     backend->last_text_y = y;
@@ -213,6 +233,9 @@ static int test_gfx_draw_rect(void *gfx, const M3Rect *rect, M3Color color, M3Sc
     backend->last_rect_color = color;
     backend->last_corner = corner_radius;
     if (backend->fail_draw_rect) {
+        return M3_ERR_IO;
+    }
+    if (backend->fail_draw_rect_after > 0 && backend->draw_rect_calls >= backend->fail_draw_rect_after) {
         return M3_ERR_IO;
     }
     return M3_OK;
@@ -517,6 +540,11 @@ int main(void)
     char invalid_utf8[2];
     char multi_utf8[3];
     char ascii_utf8[4];
+    const char *trace_env;
+
+    trace_env = getenv("M3_TEXT_FIELD_TRACE");
+    g_m3_text_field_trace = (trace_env != NULL && trace_env[0] != '\0') ? 1 : 0;
+    m3_text_field_trace_step(1);
 
     test_backend_init(&backend);
     text_backend.ctx = &backend;
@@ -548,6 +576,8 @@ int main(void)
 
     on_change_state.calls = 0;
     on_change_state.fail = 0;
+
+    m3_text_field_trace_step(2);
 
     M3_TEST_EXPECT(m3_text_field_style_init(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(m3_text_field_style_init(&style));
@@ -615,6 +645,8 @@ int main(void)
     M3_TEST_OK(m3_text_field_test_validate_text_style(&text_style, M3_FALSE));
     text_style.utf8_family = "Test";
     M3_TEST_OK(m3_text_field_test_validate_text_style(&text_style, M3_TRUE));
+
+    m3_text_field_trace_step(3);
 
     M3_TEST_EXPECT(m3_text_field_test_validate_style(NULL, M3_TRUE, M3_FALSE), M3_ERR_INVALID_ARGUMENT);
     style_temp = style;
@@ -751,6 +783,8 @@ int main(void)
     style_temp.handle_color.r = 2.0f;
     M3_TEST_EXPECT(m3_text_field_test_validate_style(&style_temp, M3_TRUE, M3_TRUE), M3_ERR_RANGE);
 
+    m3_text_field_trace_step(4);
+
     M3_TEST_EXPECT(m3_text_field_test_validate_backend(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_text_field_test_validate_backend(&text_backend_bad), M3_ERR_INVALID_ARGUMENT);
     text_backend_bad.vtable = &g_test_text_vtable_no_draw;
@@ -763,6 +797,8 @@ int main(void)
     M3_TEST_EXPECT(m3_text_field_test_validate_backend(&text_backend_bad), M3_ERR_UNSUPPORTED);
     text_backend_bad.vtable = &g_test_text_vtable;
     M3_TEST_OK(m3_text_field_test_validate_backend(&text_backend_bad));
+
+    m3_text_field_trace_step(5);
 
     width_spec.mode = 99u;
     width_spec.size = 0.0f;
@@ -829,10 +865,24 @@ int main(void)
     M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_RESERVE_REALLOC));
     M3_TEST_EXPECT(m3_text_field_test_reserve(&reserve_field, 1u), M3_ERR_IO);
     M3_TEST_OK(m3_text_field_test_clear_fail_points());
+    {
+        m3_usize required_large;
+
+        reserve_field.utf8 = NULL;
+        reserve_field.utf8_capacity = 1u;
+        reserve_field.allocator.realloc = test_alloc_realloc_static;
+        M3_TEST_OK(m3_text_field_test_add_overflow(max_value / 2u, 2u, &required_large));
+        M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_RESERVE_REALLOC));
+        M3_TEST_EXPECT(m3_text_field_test_reserve(&reserve_field, required_large), M3_ERR_IO);
+        M3_TEST_OK(m3_text_field_test_clear_fail_points());
+        reserve_field.allocator.realloc = test_alloc_realloc;
+    }
     if (alloc_state.last_ptr != NULL) {
         test_alloc_free(&alloc_state, alloc_state.last_ptr);
         alloc_state.last_ptr = NULL;
     }
+    reserve_field.utf8 = NULL;
+    reserve_field.utf8_capacity = 0u;
     alloc_state.fail_realloc = 1;
     M3_TEST_EXPECT(m3_text_field_test_reserve(&reserve_field, 1u), M3_ERR_IO);
     alloc_state.fail_realloc = 0;
@@ -907,6 +957,8 @@ int main(void)
     M3_TEST_ASSERT(offset_value == 3u);
     M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
+    m3_text_field_trace_step(6);
+
     M3_TEST_EXPECT(m3_text_field_init(NULL, &text_backend, &style, NULL, "", 0), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_text_field_init(&field, NULL, &style, NULL, "", 0), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_text_field_init(&field, &text_backend, NULL, NULL, "", 0), M3_ERR_INVALID_ARGUMENT);
@@ -943,6 +995,9 @@ int main(void)
     M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_ANIM_INIT));
     M3_TEST_EXPECT(m3_text_field_init(&temp_field, &text_backend, &style, NULL, "", 0), M3_ERR_IO);
     M3_TEST_OK(m3_text_field_test_clear_fail_points());
+    M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_UTF8_VALIDATE));
+    M3_TEST_EXPECT(m3_text_field_init(&temp_field, &text_backend, &style, NULL, "X", 1), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
     M3_TEST_OK(m3_text_field_init(&temp_field, &text_backend, &style, &custom_alloc, "", 0));
     M3_TEST_OK(temp_field.widget.vtable->destroy(temp_field.widget.ctx));
 
@@ -964,6 +1019,8 @@ int main(void)
     gfx.ctx = &backend;
     M3_TEST_OK(m3_text_field_init(&field, &text_backend, &style, NULL, "Hi", 2));
     M3_TEST_ASSERT(backend.create_calls == 1);
+
+    m3_text_field_trace_step(7);
 
     M3_TEST_EXPECT(m3_text_field_test_update_text_metrics(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_text_field_test_update_label_metrics(NULL), M3_ERR_INVALID_ARGUMENT);
@@ -1014,6 +1071,16 @@ int main(void)
     M3_TEST_OK(m3_text_field_test_set_font_metrics_fail_after(2u));
     M3_TEST_EXPECT(m3_text_field_test_update_font_metrics(&temp_field), M3_ERR_IO);
     M3_TEST_OK(m3_text_field_test_clear_fail_points());
+    temp_field.font_metrics_valid = M3_FALSE;
+    temp_field.label_font = temp_field.text_font;
+    M3_TEST_OK(m3_text_field_test_set_font_metrics_fail_after(1u));
+    M3_TEST_EXPECT(m3_text_field_test_update_font_metrics(&temp_field), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+    temp_field.font_metrics_valid = M3_FALSE;
+    temp_field.label_font = temp_field.text_font;
+    M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_LABEL_FONT_METRICS));
+    M3_TEST_EXPECT(m3_text_field_test_update_font_metrics(&temp_field), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
     temp_field.utf8_label = NULL;
     temp_field.label_len = 0u;
@@ -1036,6 +1103,8 @@ int main(void)
     M3_TEST_EXPECT(m3_text_field_test_sync_label(&temp_field), M3_ERR_IO);
     M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
+    m3_text_field_trace_step(8);
+
     M3_TEST_EXPECT(m3_text_field_test_set_text_internal(NULL, "", 0u, M3_FALSE), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_UTF8_VALIDATE));
     M3_TEST_EXPECT(m3_text_field_test_set_text_internal(&temp_field, "X", 1u, M3_FALSE), M3_ERR_IO);
@@ -1053,10 +1122,10 @@ int main(void)
     M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_ANIM_START));
     M3_TEST_EXPECT(m3_text_field_test_set_text_internal(&temp_field, "X", 1u, M3_FALSE), M3_ERR_IO);
     M3_TEST_OK(m3_text_field_test_clear_fail_points());
-    if (alloc_state.last_ptr != NULL) {
+    if (alloc_state.last_ptr != NULL && temp_field.utf8 == NULL) {
         test_alloc_free(&alloc_state, alloc_state.last_ptr);
-        alloc_state.last_ptr = NULL;
     }
+    alloc_state.last_ptr = NULL;
     on_change_state.calls = 0;
     on_change_state.fail = 1;
     temp_field.on_change = test_on_change;
@@ -1073,6 +1142,8 @@ int main(void)
     M3_TEST_EXPECT(m3_text_field_test_delete_range(&temp_field, 0u, temp_field.utf8_len, M3_TRUE), M3_ERR_IO);
     on_change_state.fail = 0;
     M3_TEST_OK(m3_text_field_test_delete_range(&temp_field, 0u, temp_field.utf8_len, M3_TRUE));
+
+    m3_text_field_trace_step(9);
 
     M3_TEST_EXPECT(m3_text_field_test_measure_prefix(NULL, 0u, &width_value), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_text_field_test_measure_prefix(&temp_field, 0u, NULL), M3_ERR_INVALID_ARGUMENT);
@@ -1092,6 +1163,8 @@ int main(void)
     M3_TEST_EXPECT(m3_text_field_test_measure_prefix(&temp_field, 1u, &width_value), M3_ERR_IO);
     M3_TEST_OK(m3_text_field_test_clear_fail_points());
     M3_TEST_OK(m3_text_field_test_measure_prefix(&temp_field, 1u, &width_value));
+
+    m3_text_field_trace_step(10);
 
     M3_TEST_EXPECT(m3_text_field_test_offset_for_x(NULL, 0.0f, &offset_value), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_text_field_test_offset_for_x(&temp_field, 0.0f, NULL), M3_ERR_INVALID_ARGUMENT);
@@ -1118,10 +1191,15 @@ int main(void)
     M3_TEST_OK(m3_text_field_test_offset_for_x(&temp_field, 5.0f, &offset_value));
     M3_TEST_ASSERT(offset_value <= temp_field.utf8_len);
 
+    m3_text_field_trace_step(11);
+
     temp_field.utf8 = temp_utf8_ptr;
     temp_field.utf8_len = temp_utf8_len;
     temp_field.utf8_capacity = temp_utf8_capacity;
+    m3_text_field_trace_step(12);
     M3_TEST_OK(temp_field.widget.vtable->destroy(temp_field.widget.ctx));
+
+    m3_text_field_trace_step(13);
 
     M3_TEST_OK(m3_text_field_get_text(&field, &text_ptr, &text_len));
     M3_TEST_ASSERT(text_len == 2);
@@ -1462,6 +1540,11 @@ int main(void)
     M3_TEST_OK(field.widget.vtable->event(field.widget.ctx, &event, &handled));
     M3_TEST_ASSERT(handled == M3_TRUE);
 
+    M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_ANIM_START));
+    M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 30, 10));
+    M3_TEST_EXPECT(field.widget.vtable->event(field.widget.ctx, &event, &handled), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
     M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_MOVE, 60, 10));
     M3_TEST_OK(field.widget.vtable->event(field.widget.ctx, &event, &handled));
     M3_TEST_ASSERT(handled == M3_TRUE);
@@ -1477,6 +1560,13 @@ int main(void)
     M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_UP, 60, 10));
     M3_TEST_OK(field.widget.vtable->event(field.widget.ctx, &event, &handled));
     M3_TEST_ASSERT(handled == M3_FALSE);
+
+    field.selecting = M3_TRUE;
+    M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_UTF8_ITER_INIT));
+    M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_MOVE, 60, 10));
+    M3_TEST_EXPECT(field.widget.vtable->event(field.widget.ctx, &event, &handled), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+    field.selecting = M3_FALSE;
 
     field.widget.flags |= M3_WIDGET_FLAG_DISABLED;
     M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 30, 10));
@@ -1494,6 +1584,9 @@ int main(void)
     M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_UTF8_VALIDATE));
     M3_TEST_EXPECT(field.widget.vtable->event(field.widget.ctx, &event, &handled), M3_ERR_IO);
     M3_TEST_OK(m3_text_field_test_clear_fail_points());
+    M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_ANIM_START));
+    M3_TEST_EXPECT(field.widget.vtable->event(field.widget.ctx, &event, &handled), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
     memset(&event, 0, sizeof(event));
     event.type = M3_INPUT_TEXT;
@@ -1507,6 +1600,9 @@ int main(void)
     event.data.text_utf8.length = 1u;
     M3_TEST_OK(field.widget.vtable->event(field.widget.ctx, &event, &handled));
     M3_TEST_ASSERT(handled == M3_TRUE);
+    M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_ANIM_START));
+    M3_TEST_EXPECT(field.widget.vtable->event(field.widget.ctx, &event, &handled), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
     memset(&event, 0, sizeof(event));
     event.type = M3_INPUT_TEXT_UTF8;
@@ -1519,10 +1615,16 @@ int main(void)
     event.type = M3_INPUT_TEXT_EDIT;
     M3_TEST_OK(field.widget.vtable->event(field.widget.ctx, &event, &handled));
     M3_TEST_ASSERT(handled == M3_TRUE);
+    M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_ANIM_START));
+    M3_TEST_EXPECT(field.widget.vtable->event(field.widget.ctx, &event, &handled), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
     M3_TEST_OK(init_key_event(&event, 8u));
     M3_TEST_OK(field.widget.vtable->event(field.widget.ctx, &event, &handled));
     M3_TEST_ASSERT(handled == M3_TRUE);
+    M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_ANIM_START));
+    M3_TEST_EXPECT(field.widget.vtable->event(field.widget.ctx, &event, &handled), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
     M3_TEST_OK(init_key_event(&event, 46u));
     M3_TEST_OK(field.widget.vtable->event(field.widget.ctx, &event, &handled));
@@ -1535,9 +1637,13 @@ int main(void)
     M3_TEST_EXPECT(field.widget.vtable->event(field.widget.ctx, &event, &handled), M3_ERR_IO);
     M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
+    M3_TEST_OK(m3_text_field_set_cursor(&field, 0));
     M3_TEST_OK(init_key_event(&event, 39u));
     M3_TEST_OK(field.widget.vtable->event(field.widget.ctx, &event, &handled));
     M3_TEST_ASSERT(handled == M3_TRUE);
+    M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_UTF8_ITER_INIT));
+    M3_TEST_EXPECT(field.widget.vtable->event(field.widget.ctx, &event, &handled), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
     M3_TEST_OK(init_key_event(&event, 36u));
     M3_TEST_OK(field.widget.vtable->event(field.widget.ctx, &event, &handled));
@@ -1548,6 +1654,11 @@ int main(void)
     M3_TEST_ASSERT(handled == M3_TRUE);
 
     M3_TEST_OK(init_key_event(&event, 123u));
+    M3_TEST_OK(field.widget.vtable->event(field.widget.ctx, &event, &handled));
+    M3_TEST_ASSERT(handled == M3_FALSE);
+
+    memset(&event, 0, sizeof(event));
+    event.type = M3_INPUT_KEY_UP;
     M3_TEST_OK(field.widget.vtable->event(field.widget.ctx, &event, &handled));
     M3_TEST_ASSERT(handled == M3_FALSE);
 
@@ -1628,6 +1739,52 @@ int main(void)
     M3_TEST_OK(field.widget.vtable->measure(field.widget.ctx, width_spec, height_spec, &size));
     M3_TEST_ASSERT(m3_near(size.width, 80.0f, 0.001f));
     M3_TEST_ASSERT(m3_near(size.height, 40.0f, 0.001f));
+    {
+        M3TextField measure_field;
+
+        measure_field = field;
+        measure_field.widget.ctx = &measure_field;
+        measure_field.text_metrics_valid = M3_TRUE;
+        measure_field.label_metrics_valid = M3_TRUE;
+        measure_field.placeholder_metrics_valid = M3_TRUE;
+        measure_field.font_metrics_valid = M3_TRUE;
+        measure_field.text_metrics.width = 10.0f;
+        measure_field.label_metrics.width = 5.0f;
+        measure_field.placeholder_metrics.width = 30.0f;
+        measure_field.text_font_metrics.height = 10.0f;
+        measure_field.label_font_metrics.height = 25.0f;
+        measure_field.utf8_label = NULL;
+        measure_field.label_len = 0u;
+        width_spec.mode = M3_MEASURE_UNSPECIFIED;
+        width_spec.size = 0.0f;
+        height_spec.mode = M3_MEASURE_EXACTLY;
+        height_spec.size = 22.0f;
+        M3_TEST_OK(measure_field.widget.vtable->measure(measure_field.widget.ctx, width_spec, height_spec, &size));
+        M3_TEST_ASSERT(size.width >= 30.0f);
+        M3_TEST_ASSERT(m3_near(size.height, 22.0f, 0.001f));
+    }
+    {
+        M3TextField measure_field;
+
+        measure_field = field;
+        measure_field.widget.ctx = &measure_field;
+        measure_field.text_metrics_valid = M3_TRUE;
+        measure_field.label_metrics_valid = M3_TRUE;
+        measure_field.placeholder_metrics_valid = M3_TRUE;
+        measure_field.font_metrics_valid = M3_TRUE;
+        measure_field.text_metrics.width = 10.0f;
+        measure_field.label_metrics.width = 25.0f;
+        measure_field.placeholder_metrics.width = 5.0f;
+        measure_field.text_font_metrics.height = 8.0f;
+        measure_field.label_font_metrics.height = 9.0f;
+        width_spec.mode = M3_MEASURE_AT_MOST;
+        width_spec.size = 20.0f;
+        height_spec.mode = M3_MEASURE_AT_MOST;
+        height_spec.size = 15.0f;
+        M3_TEST_OK(measure_field.widget.vtable->measure(measure_field.widget.ctx, width_spec, height_spec, &size));
+        M3_TEST_ASSERT(size.width <= 20.0f);
+        M3_TEST_ASSERT(size.height <= 15.0f);
+    }
 
     M3_TEST_EXPECT(field.widget.vtable->paint(field.widget.ctx, NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(field.widget.vtable->paint(NULL, &paint_ctx), M3_ERR_INVALID_ARGUMENT);
@@ -1638,6 +1795,10 @@ int main(void)
     field.bounds.width = -1.0f;
     M3_TEST_EXPECT(field.widget.vtable->paint(field.widget.ctx, &paint_ctx), M3_ERR_RANGE);
     field.bounds = temp_rect;
+    style_temp = field.style;
+    field.style.padding_x = -1.0f;
+    M3_TEST_EXPECT(field.widget.vtable->paint(field.widget.ctx, &paint_ctx), M3_ERR_RANGE);
+    field.style = style_temp;
     field.text_metrics_valid = M3_FALSE;
     field.label_metrics_valid = M3_FALSE;
     field.placeholder_metrics_valid = M3_FALSE;
@@ -1673,6 +1834,12 @@ int main(void)
     M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_RESOLVE_COLORS));
     M3_TEST_EXPECT(field.widget.vtable->paint(field.widget.ctx, &paint_ctx), M3_ERR_IO);
     M3_TEST_OK(m3_text_field_test_clear_fail_points());
+    M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_OUTLINE_RANGE));
+    M3_TEST_EXPECT(field.widget.vtable->paint(field.widget.ctx, &paint_ctx), M3_ERR_RANGE);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+    M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_CORNER_RANGE));
+    M3_TEST_EXPECT(field.widget.vtable->paint(field.widget.ctx, &paint_ctx), M3_ERR_RANGE);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
     style_temp = field.style;
     field.style.outline_width = 50.0f;
     field.bounds.width = 20.0f;
@@ -1696,6 +1863,191 @@ int main(void)
     M3_TEST_OK(field.widget.vtable->paint(field.widget.ctx, &paint_ctx));
     gfx.vtable = &g_test_gfx_vtable;
     M3_TEST_OK(m3_text_field_set_text(&field, "AB", 2));
+
+    {
+        M3TextField paint_field;
+
+        paint_field = field;
+        paint_field.widget.ctx = &paint_field;
+        paint_field.text_metrics_valid = M3_TRUE;
+        paint_field.label_metrics_valid = M3_TRUE;
+        paint_field.placeholder_metrics_valid = M3_TRUE;
+        paint_field.font_metrics_valid = M3_TRUE;
+        paint_field.text_metrics.width = 10.0f;
+        paint_field.label_metrics.width = 5.0f;
+        paint_field.placeholder_metrics.width = 6.0f;
+        paint_field.text_font_metrics.height = 12.0f;
+        paint_field.text_font_metrics.baseline = 8.0f;
+        paint_field.label_font_metrics.height = 12.0f;
+        paint_field.label_font_metrics.baseline = 8.0f;
+        paint_field.utf8_label = NULL;
+        paint_field.label_len = 0u;
+        paint_field.utf8_placeholder = NULL;
+        paint_field.placeholder_len = 0u;
+        paint_field.selection_start = 0u;
+        paint_field.selection_end = 0u;
+        paint_field.focused = M3_FALSE;
+        paint_field.cursor_visible = M3_FALSE;
+
+        paint_field.style.outline_width = 0.0f;
+        paint_field.style.container_color.a = 0.0f;
+        backend.draw_rect_calls = 0;
+        backend.draw_calls = 0;
+        gfx.vtable = &g_test_gfx_vtable;
+        gfx.text_vtable = &g_test_text_vtable;
+        M3_TEST_OK(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx));
+
+        paint_field.style.outline_width = 6.0f;
+        paint_field.style.corner_radius = 2.0f;
+        paint_field.bounds.width = 100.0f;
+        paint_field.bounds.height = 40.0f;
+        M3_TEST_OK(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx));
+
+        paint_field.style.outline_width = 0.0f;
+        paint_field.style.padding_x = 10.0f;
+        paint_field.style.padding_y = 10.0f;
+        paint_field.bounds.width = 5.0f;
+        paint_field.bounds.height = 5.0f;
+        M3_TEST_OK(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx));
+
+        paint_field.bounds.width = 50.0f;
+        paint_field.bounds.height = 20.0f;
+        paint_field.style.padding_x = 0.0f;
+        paint_field.style.padding_y = 0.0f;
+        paint_field.text_font_metrics.height = -5.0f;
+        paint_field.text_font_metrics.baseline = 0.0f;
+        paint_field.selection_start = 2u;
+        paint_field.selection_end = 0u;
+        paint_field.style.selection_color.a = 1.0f;
+        M3_TEST_OK(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx));
+        paint_field.text_font_metrics.height = 12.0f;
+        paint_field.text_font_metrics.baseline = 8.0f;
+
+        paint_field.selection_start = 0u;
+        paint_field.selection_end = 0u;
+        paint_field.style.selection_color.a = 0.0f;
+        paint_field.style.handle_color.a = 0.0f;
+        paint_field.utf8_len = 0u;
+        paint_field.utf8_placeholder = "PH";
+        paint_field.placeholder_len = 2u;
+        paint_field.label_value = 1.0f;
+        backend.fail_draw_after = 1;
+        M3_TEST_EXPECT(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx), M3_ERR_IO);
+        backend.fail_draw_after = 0;
+        paint_field.utf8_placeholder = NULL;
+        paint_field.placeholder_len = 0u;
+
+        paint_field.utf8_label = "Lbl";
+        paint_field.label_len = 3u;
+        paint_field.label_font.id = 1u;
+        paint_field.label_font.generation = 1u;
+        backend.fail_draw_after = 1;
+        M3_TEST_EXPECT(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx), M3_ERR_IO);
+        backend.fail_draw_after = 0;
+        paint_field.utf8_label = NULL;
+        paint_field.label_len = 0u;
+
+        paint_field.selection_start = 0u;
+        paint_field.selection_end = 0u;
+        paint_field.focused = M3_FALSE;
+        paint_field.cursor_visible = M3_FALSE;
+        paint_field.style.selection_color.a = 0.0f;
+        paint_field.style.handle_color.a = 0.0f;
+        paint_field.style.outline_width = 0.0f;
+        paint_field.style.container_color.a = 1.0f;
+        backend.fail_draw_rect_after = 1;
+        M3_TEST_EXPECT(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx), M3_ERR_IO);
+        backend.fail_draw_rect_after = 0;
+        paint_field.style.container_color.a = 0.0f;
+
+        paint_field.utf8 = "AB";
+        paint_field.utf8_len = 2u;
+        paint_field.selection_start = 0u;
+        paint_field.selection_end = 2u;
+        paint_field.style.selection_color.a = 1.0f;
+        paint_field.style.handle_color.a = 0.0f;
+        backend.fail_draw_rect_after = 1;
+        M3_TEST_EXPECT(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx), M3_ERR_IO);
+        backend.fail_draw_rect_after = 0;
+        paint_field.style.selection_color.a = 0.0f;
+
+        paint_field.selection_start = 0u;
+        paint_field.selection_end = 5u;
+        paint_field.style.handle_color.a = 1.0f;
+        M3_TEST_EXPECT(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx), M3_ERR_RANGE);
+        paint_field.selection_end = 2u;
+
+        backend.fail_draw_rect_after = 2;
+        M3_TEST_EXPECT(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx), M3_ERR_IO);
+        backend.fail_draw_rect_after = 0;
+
+        paint_field.selection_start = 0u;
+        paint_field.selection_end = 0u;
+        paint_field.cursor = 0u;
+        paint_field.focused = M3_TRUE;
+        paint_field.cursor_visible = M3_TRUE;
+        paint_field.style.cursor_width = 1.0f;
+        paint_field.style.selection_color.a = 0.0f;
+        paint_field.style.handle_color.a = 0.0f;
+        M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_MEASURE_PREFIX));
+        M3_TEST_EXPECT(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx), M3_ERR_IO);
+        M3_TEST_OK(m3_text_field_test_clear_fail_points());
+        M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_CURSOR_WIDTH_NEGATIVE));
+        M3_TEST_OK(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx));
+        M3_TEST_OK(m3_text_field_test_clear_fail_points());
+        M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_CURSOR_HEIGHT_NEGATIVE));
+        M3_TEST_OK(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx));
+        M3_TEST_OK(m3_text_field_test_clear_fail_points());
+        backend.fail_draw_rect_after = 1;
+        M3_TEST_EXPECT(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx), M3_ERR_IO);
+        backend.fail_draw_rect_after = 0;
+        paint_field.focused = M3_FALSE;
+        paint_field.cursor_visible = M3_FALSE;
+
+        paint_field.utf8 = "AB";
+        paint_field.utf8_len = 2u;
+        paint_field.cursor = 0u;
+        paint_field.selection_start = 0u;
+        paint_field.selection_end = 2u;
+        paint_field.style.handle_radius = 6.0f;
+        paint_field.style.handle_height = 4.0f;
+        paint_field.style.handle_color.a = 1.0f;
+        backend.fail_draw_rect_after = 2;
+        M3_TEST_EXPECT(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx), M3_ERR_IO);
+        backend.fail_draw_rect_after = 0;
+
+        paint_field.selection_start = 0u;
+        paint_field.selection_end = 2u;
+        paint_field.style.selection_color.a = 1.0f;
+        M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_SELECTION_WIDTH_NEGATIVE));
+        M3_TEST_OK(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx));
+        M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+        paint_field.selection_start = 0u;
+        paint_field.selection_end = 5u;
+        paint_field.style.selection_color.a = 1.0f;
+        paint_field.style.handle_color.a = 0.0f;
+        M3_TEST_EXPECT(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx), M3_ERR_RANGE);
+        paint_field.selection_start = 0u;
+        paint_field.selection_end = 2u;
+        paint_field.style.selection_color.a = 0.0f;
+        paint_field.style.handle_color.a = 1.0f;
+        M3_TEST_OK(m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_MEASURE_PREFIX));
+        M3_TEST_EXPECT(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx), M3_ERR_IO);
+        M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+        paint_field.selection_start = 0u;
+        paint_field.selection_end = 0u;
+        paint_field.style.selection_color.a = 0.0f;
+        paint_field.style.handle_color.a = 0.0f;
+        paint_field.cursor = 0u;
+        paint_field.focused = M3_TRUE;
+        paint_field.cursor_visible = M3_TRUE;
+        paint_field.style.cursor_width = 1.0f;
+        M3_TEST_OK(paint_field.widget.vtable->paint(paint_field.widget.ctx, &paint_ctx));
+        paint_field.focused = M3_FALSE;
+        paint_field.cursor_visible = M3_FALSE;
+    }
 
     backend.draw_rect_calls = 0;
     backend.draw_calls = 0;
@@ -1743,6 +2095,10 @@ int main(void)
     M3_TEST_OK(m3_text_field_step(&field, 0.1f, &changed));
     M3_TEST_OK(m3_text_field_step(&field, 0.1f, &changed));
     M3_TEST_ASSERT(changed == M3_TRUE || changed == M3_FALSE);
+    M3_TEST_OK(m3_anim_controller_start_timing(&field.label_anim, 0.0f, 1.0f, 1.0f, M3_ANIM_EASE_LINEAR));
+    field.label_value = -1.0f;
+    M3_TEST_OK(m3_text_field_step(&field, 0.1f, &changed));
+    M3_TEST_ASSERT(changed == M3_TRUE);
 
     M3_TEST_EXPECT(m3_text_field_set_on_change(NULL, NULL, NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(m3_text_field_set_on_change(&field, test_on_change, &on_change_state));
@@ -1755,6 +2111,10 @@ int main(void)
     backend.fail_destroy = 1;
     M3_TEST_EXPECT(destroy_field.widget.vtable->destroy(destroy_field.widget.ctx), M3_ERR_IO);
     backend.fail_destroy = 0;
+    backend.fail_destroy_after = 2;
+    M3_TEST_OK(m3_text_field_init(&destroy_field, &text_backend, &style_with_label, NULL, "", 0));
+    M3_TEST_EXPECT(destroy_field.widget.vtable->destroy(destroy_field.widget.ctx), M3_ERR_IO);
+    backend.fail_destroy_after = 0;
     M3_TEST_OK(m3_text_field_init(&destroy_field_no_destroy, &text_backend, &style_with_label, NULL, "", 0));
     destroy_field_no_destroy.text_backend.vtable = &g_test_text_vtable_no_destroy;
     M3_TEST_EXPECT(destroy_field_no_destroy.widget.vtable->destroy(destroy_field_no_destroy.widget.ctx), M3_ERR_UNSUPPORTED);

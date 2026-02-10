@@ -8,6 +8,7 @@ int main(void)
 {
     M3AndroidBackendConfig config;
     M3AndroidBackend *backend;
+    M3Allocator default_alloc;
     M3Bool available;
 
     M3_TEST_EXPECT(m3_android_backend_config_init(NULL), M3_ERR_INVALID_ARGUMENT);
@@ -18,6 +19,14 @@ int main(void)
     M3_TEST_ASSERT(config.inline_tasks == M3_TRUE);
     M3_TEST_ASSERT(config.java_vm == NULL);
     M3_TEST_ASSERT(config.activity == NULL);
+
+    M3_TEST_EXPECT(m3_android_backend_test_validate_config(NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_OK(m3_get_default_allocator(&default_alloc));
+    M3_TEST_OK(m3_android_backend_config_init(&config));
+    config.allocator = &default_alloc;
+    config.java_vm = (void *)1;
+    config.activity = (void *)1;
+    M3_TEST_OK(m3_android_backend_test_validate_config(&config));
 
     M3_TEST_EXPECT(m3_android_backend_is_available(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(m3_android_backend_is_available(&available));

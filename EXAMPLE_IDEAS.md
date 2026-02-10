@@ -6,6 +6,15 @@ Notes on the checkboxes in the table:
 - A checked item indicates a **clear, practical advantage** for that stack on this app.
 - The advantage text is the **primary reason** to pick that stack, not an exhaustive list.
 
+## LibM3C Surface Alignment (Current Backends)
+
+LibM3C currently ships with platform backends that map to the surfaces below:
+
+- **Desktop:** SDL3, GTK4, Win32, Cocoa
+- **Web:** Emscripten (WebGL; optional WebGPU)
+- **Mobile:** iOS, Android
+- **Headless:** Null backend (tests/automation)
+
 ## Ideas
 
 1) **Autonomous Fleet Traffic Control**

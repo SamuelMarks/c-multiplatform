@@ -14,6 +14,7 @@ typedef struct TestAllocator {
     m3_usize fail_alloc_on;
     m3_usize fail_realloc_on;
     m3_usize fail_free_on;
+    void *fail_free_ptr;
 } TestAllocator;
 
 static int test_allocator_reset(TestAllocator *alloc)
@@ -27,6 +28,7 @@ static int test_allocator_reset(TestAllocator *alloc)
     alloc->fail_alloc_on = 0;
     alloc->fail_realloc_on = 0;
     alloc->fail_free_on = 0;
+    alloc->fail_free_ptr = NULL;
     return M3_OK;
 }
 
@@ -91,6 +93,9 @@ static int test_free(void *ctx, void *ptr)
 
     alloc = (TestAllocator *)ctx;
     alloc->free_calls += 1;
+    if (alloc->fail_free_ptr != NULL && alloc->fail_free_ptr == ptr) {
+        return M3_ERR_UNKNOWN;
+    }
     if (alloc->fail_free_on != 0 && alloc->free_calls == alloc->fail_free_on) {
         return M3_ERR_UNKNOWN;
     }
@@ -165,6 +170,40 @@ static int test_task_fail(void *user)
     state->last_value = -1;
     return M3_ERR_UNKNOWN;
 }
+
+static int test_obj_destroy(void *obj)
+{
+    M3_UNUSED(obj);
+    return M3_OK;
+}
+
+static int test_obj_retain(void *obj)
+{
+    M3_UNUSED(obj);
+    return M3_OK;
+}
+
+static int test_obj_release(void *obj)
+{
+    M3_UNUSED(obj);
+    return M3_OK;
+}
+
+static int test_obj_get_type_id(void *obj, m3_u32 *out_type_id)
+{
+    if (obj == NULL || out_type_id == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+    *out_type_id = 42u;
+    return M3_OK;
+}
+
+static const M3ObjectVTable g_test_object_vtable = {
+    test_obj_retain,
+    test_obj_release,
+    test_obj_destroy,
+    test_obj_get_type_id
+};
 
 int main(void)
 {
@@ -269,6 +308,24 @@ int main(void)
         M3_TEST_EXPECT(m3_null_backend_destroy(backend), M3_ERR_UNKNOWN);
         M3_TEST_OK(m3_log_test_set_mutex_failures(M3_FALSE, M3_FALSE, M3_FALSE, M3_FALSE));
         M3_TEST_OK(m3_log_shutdown());
+    }
+
+    {
+        M3NullBackendConfig config;
+        M3NullBackend *backend;
+        TestAllocator alloc_state;
+        M3Allocator alloc;
+
+        M3_TEST_OK(test_allocator_reset(&alloc_state));
+        alloc_state.fail_free_on = 1;
+        M3_TEST_OK(test_allocator_make(&alloc_state, &alloc));
+        M3_TEST_OK(m3_null_backend_config_init(&config));
+        config.allocator = &alloc;
+        config.handle_capacity = 4;
+        config.enable_logging = M3_FALSE;
+        config.inline_tasks = M3_TRUE;
+        M3_TEST_OK(m3_null_backend_create(&config, &backend));
+        M3_TEST_EXPECT(m3_null_backend_destroy(backend), M3_ERR_UNKNOWN);
     }
 
     {
@@ -812,6 +869,124 @@ int main(void)
         M3_TEST_EXPECT(tasks.vtable->task_post(tasks.ctx, test_task_ok, &task_state), M3_ERR_UNSUPPORTED);
         M3_TEST_EXPECT(tasks.vtable->task_post_delayed(tasks.ctx, test_task_ok, &task_state, 1), M3_ERR_UNSUPPORTED);
         M3_TEST_OK(m3_null_backend_destroy(backend));
+    }
+
+    {
+        M3ObjectHeader obj;
+        m3_u32 type_id;
+
+        M3_TEST_EXPECT(m3_null_backend_test_set_initialized(NULL, M3_TRUE), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_null_backend_test_object_retain(NULL), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_null_backend_test_object_release(NULL), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_null_backend_test_object_get_type_id(NULL, &type_id), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_null_backend_test_object_get_type_id(&obj, NULL), M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_OK(m3_object_header_init(&obj, 42u, 0u, &g_test_object_vtable));
+        M3_TEST_OK(m3_null_backend_test_object_retain(&obj));
+        M3_TEST_OK(m3_null_backend_test_object_get_type_id(&obj, &type_id));
+        M3_TEST_ASSERT(type_id == 42u);
+        M3_TEST_OK(m3_null_backend_test_object_release(&obj));
+    }
+
+    {
+        M3NullBackendConfig config;
+        M3NullBackend *backend;
+        M3Env env;
+        M3Camera camera;
+        M3CameraConfig cam_config;
+
+        M3_TEST_OK(m3_null_backend_config_init(&config));
+        config.enable_logging = M3_FALSE;
+        config.handle_capacity = 4;
+        M3_TEST_OK(m3_null_backend_create(&config, &backend));
+        M3_TEST_OK(m3_null_backend_get_env(backend, &env));
+        M3_TEST_OK(env.vtable->get_camera(env.ctx, &camera));
+        M3_TEST_EXPECT(camera.vtable->open_with_config(camera.ctx, NULL), M3_ERR_INVALID_ARGUMENT);
+        cam_config.camera_id = 1u;
+        cam_config.facing = M3_CAMERA_FACING_UNSPECIFIED;
+        cam_config.width = 0u;
+        cam_config.height = 0u;
+        cam_config.format = M3_CAMERA_FORMAT_ANY;
+        M3_TEST_EXPECT(camera.vtable->open_with_config(camera.ctx, &cam_config), M3_ERR_UNSUPPORTED);
+        M3_TEST_OK(m3_null_backend_destroy(backend));
+    }
+
+    {
+        M3NullBackendConfig config;
+        M3NullBackend *backend;
+        TestAllocator alloc_state;
+        M3Allocator alloc;
+        int rc;
+
+        rc = m3_log_shutdown();
+        M3_TEST_ASSERT(rc == M3_OK || rc == M3_ERR_STATE);
+
+        M3_TEST_OK(test_allocator_reset(&alloc_state));
+        alloc_state.fail_alloc_on = 2;
+        M3_TEST_OK(test_allocator_make(&alloc_state, &alloc));
+        M3_TEST_OK(m3_null_backend_config_init(&config));
+        config.allocator = &alloc;
+        config.handle_capacity = 4;
+        config.enable_logging = M3_TRUE;
+        backend = NULL;
+        M3_TEST_EXPECT(m3_null_backend_create(&config, &backend), M3_ERR_OUT_OF_MEMORY);
+
+        M3_TEST_EXPECT(m3_log_shutdown(), M3_ERR_STATE);
+    }
+
+    {
+        M3NullBackendConfig config;
+        M3NullBackend *backend;
+        TestAllocator alloc_state;
+        M3Allocator alloc;
+        M3WS ws;
+
+        M3_TEST_OK(test_allocator_reset(&alloc_state));
+        M3_TEST_OK(test_allocator_make(&alloc_state, &alloc));
+        M3_TEST_OK(m3_null_backend_config_init(&config));
+        config.allocator = &alloc;
+        config.handle_capacity = 4;
+        config.enable_logging = M3_FALSE;
+        M3_TEST_OK(m3_null_backend_create(&config, &backend));
+        M3_TEST_OK(m3_null_backend_get_ws(backend, &ws));
+        M3_TEST_OK(ws.vtable->set_clipboard_text(ws.ctx, "clip"));
+        alloc_state.fail_free_on = 2;
+        M3_TEST_EXPECT(m3_null_backend_destroy(backend), M3_ERR_UNKNOWN);
+    }
+
+    {
+        M3NullBackendConfig config;
+        M3NullBackend *backend;
+        TestAllocator alloc_state;
+        M3Allocator alloc;
+        M3WS ws;
+
+        M3_TEST_OK(test_allocator_reset(&alloc_state));
+        M3_TEST_OK(test_allocator_make(&alloc_state, &alloc));
+        M3_TEST_OK(m3_null_backend_config_init(&config));
+        config.allocator = &alloc;
+        config.handle_capacity = 4;
+        config.enable_logging = M3_FALSE;
+        M3_TEST_OK(m3_null_backend_create(&config, &backend));
+        M3_TEST_OK(m3_null_backend_get_ws(backend, &ws));
+        M3_TEST_OK(ws.vtable->set_clipboard_text(ws.ctx, "clip"));
+        alloc_state.fail_free_on = 3;
+        M3_TEST_EXPECT(m3_null_backend_destroy(backend), M3_ERR_UNKNOWN);
+    }
+
+    {
+        M3NullBackendConfig config;
+        M3NullBackend *backend;
+        TestAllocator alloc_state;
+        M3Allocator alloc;
+
+        M3_TEST_OK(test_allocator_reset(&alloc_state));
+        M3_TEST_OK(test_allocator_make(&alloc_state, &alloc));
+        M3_TEST_OK(m3_null_backend_config_init(&config));
+        config.allocator = &alloc;
+        config.handle_capacity = 4;
+        M3_TEST_OK(m3_null_backend_create(&config, &backend));
+        alloc_state.fail_free_ptr = backend;
+        M3_TEST_EXPECT(m3_null_backend_destroy(backend), M3_ERR_UNKNOWN);
     }
 
     return 0;

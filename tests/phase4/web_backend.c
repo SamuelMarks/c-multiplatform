@@ -8,6 +8,7 @@ int main(void)
 {
     M3WebBackendConfig config;
     M3WebBackend *backend;
+    M3Allocator default_alloc;
     M3Bool available;
 
     M3_TEST_EXPECT(m3_web_backend_config_init(NULL), M3_ERR_INVALID_ARGUMENT);
@@ -17,6 +18,12 @@ int main(void)
     M3_TEST_ASSERT(config.utf8_canvas_id != NULL);
     M3_TEST_ASSERT(config.enable_logging == M3_TRUE);
     M3_TEST_ASSERT(config.inline_tasks == M3_TRUE);
+
+    M3_TEST_EXPECT(m3_web_backend_test_validate_config(NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_OK(m3_get_default_allocator(&default_alloc));
+    M3_TEST_OK(m3_web_backend_config_init(&config));
+    config.allocator = &default_alloc;
+    M3_TEST_OK(m3_web_backend_test_validate_config(&config));
 
     M3_TEST_EXPECT(m3_web_backend_is_available(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(m3_web_backend_is_available(&available));

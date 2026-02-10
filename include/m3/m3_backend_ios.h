@@ -82,6 +82,15 @@ M3_API int M3_CALL m3_ios_backend_get_gfx(M3IOSBackend *backend, M3Gfx *out_gfx)
  */
 M3_API int M3_CALL m3_ios_backend_get_env(M3IOSBackend *backend, M3Env *out_env);
 
+#ifdef M3_TESTING
+/**
+ * @brief Test wrapper for iOS backend config validation.
+ * @param config Backend configuration.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_ios_backend_test_validate_config(const M3IOSBackendConfig *config);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

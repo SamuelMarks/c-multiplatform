@@ -89,6 +89,15 @@ M3_API int M3_CALL m3_camera_read_frame(M3CameraSession *session, M3CameraFrame 
  */
 M3_API int M3_CALL m3_camera_copy_frame(const M3CameraFrame *frame, void *dst, m3_usize dst_capacity, m3_usize *out_size);
 
+#ifdef M3_TESTING
+/**
+ * @brief Test hook to bypass camera vtable completeness checks.
+ * @param enable M3_TRUE to bypass, M3_FALSE to enforce normal checks.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_camera_test_set_skip_vtable_check(M3Bool enable);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

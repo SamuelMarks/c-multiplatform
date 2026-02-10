@@ -2,6 +2,10 @@
 
 #include <string.h>
 
+#ifdef M3_TESTING
+static m3_usize g_m3_text_cstr_limit = 0;
+#endif
+
 static int m3_text_validate_color(const M3Color *color)
 {
     if (color == NULL) {
@@ -386,6 +390,11 @@ static int m3_text_cstrlen(const char *cstr, m3_usize *out_len)
     }
 
     max_len = (m3_usize)~(m3_usize)0;
+#ifdef M3_TESTING
+    if (g_m3_text_cstr_limit != 0) {
+        max_len = g_m3_text_cstr_limit;
+    }
+#endif
     len = 0;
     while (cstr[len] != '\0') {
         if (len == max_len) {
@@ -528,3 +537,46 @@ int M3_CALL m3_text_widget_get_metrics(M3TextWidget *widget, M3TextMetrics *out_
     *out_metrics = widget->metrics;
     return M3_OK;
 }
+
+#ifdef M3_TESTING
+int M3_CALL m3_text_test_validate_color(const M3Color *color)
+{
+    return m3_text_validate_color(color);
+}
+
+int M3_CALL m3_text_test_validate_style(const M3TextStyle *style)
+{
+    return m3_text_validate_style(style);
+}
+
+int M3_CALL m3_text_test_validate_backend(const M3TextBackend *backend)
+{
+    return m3_text_validate_backend(backend);
+}
+
+int M3_CALL m3_text_test_validate_measure_spec(M3MeasureSpec spec)
+{
+    return m3_text_validate_measure_spec(spec);
+}
+
+int M3_CALL m3_text_test_validate_rect(const M3Rect *rect)
+{
+    return m3_text_validate_rect(rect);
+}
+
+int M3_CALL m3_text_test_metrics_update(M3TextWidget *widget)
+{
+    return m3_text_metrics_update(widget);
+}
+
+int M3_CALL m3_text_test_cstrlen(const char *cstr, m3_usize *out_len)
+{
+    return m3_text_cstrlen(cstr, out_len);
+}
+
+int M3_CALL m3_text_test_set_cstr_limit(m3_usize max_len)
+{
+    g_m3_text_cstr_limit = max_len;
+    return M3_OK;
+}
+#endif

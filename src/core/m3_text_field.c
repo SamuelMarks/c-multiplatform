@@ -23,6 +23,12 @@
 #define M3_TEXT_FIELD_TEST_FAIL_TEXT_STYLE_INIT 13u
 #define M3_TEXT_FIELD_TEST_FAIL_LABEL_STYLE_INIT 14u
 #define M3_TEXT_FIELD_TEST_FAIL_ANIM_INIT 15u
+#define M3_TEXT_FIELD_TEST_FAIL_LABEL_FONT_METRICS 16u
+#define M3_TEXT_FIELD_TEST_FAIL_OUTLINE_RANGE 17u
+#define M3_TEXT_FIELD_TEST_FAIL_CORNER_RANGE 18u
+#define M3_TEXT_FIELD_TEST_FAIL_SELECTION_WIDTH_NEGATIVE 19u
+#define M3_TEXT_FIELD_TEST_FAIL_CURSOR_WIDTH_NEGATIVE 20u
+#define M3_TEXT_FIELD_TEST_FAIL_CURSOR_HEIGHT_NEGATIVE 21u
 
 static m3_u32 g_m3_text_field_test_fail_point = M3_TEXT_FIELD_TEST_FAIL_NONE;
 static m3_u32 g_m3_text_field_test_color_fail_after = 0u;
@@ -400,7 +406,10 @@ static int m3_text_field_validate_utf8(const char *utf8, m3_usize utf8_len)
     M3Bool valid;
     int rc;
 
-    if (utf8 == NULL && utf8_len != 0u) {
+    if (utf8 == NULL) {
+        if (utf8_len == 0u) {
+            return M3_OK;
+        }
         return M3_ERR_INVALID_ARGUMENT;
     }
 
@@ -709,7 +718,7 @@ static int m3_text_field_update_font_metrics(M3TextField *field)
     if (field->label_font.id != 0u || field->label_font.generation != 0u) {
         rc = m3_text_font_metrics(&field->text_backend, field->label_font, &field->label_font_metrics);
 #ifdef M3_TESTING
-        if (m3_text_field_test_fail_point_match(M3_TEXT_FIELD_TEST_FAIL_FONT_METRICS)) {
+        if (m3_text_field_test_fail_point_match(M3_TEXT_FIELD_TEST_FAIL_LABEL_FONT_METRICS)) {
             rc = M3_ERR_IO;
         }
         if (m3_text_field_test_font_metrics_should_fail()) {
@@ -1249,11 +1258,21 @@ static int m3_text_field_widget_paint(void *widget, M3PaintContext *ctx)
 
     bounds = field->bounds;
     outline_width = field->style.outline_width;
+#ifdef M3_TESTING
+    if (m3_text_field_test_fail_point_match(M3_TEXT_FIELD_TEST_FAIL_OUTLINE_RANGE)) {
+        outline_width = -1.0f;
+    }
+#endif
     if (outline_width < 0.0f) {
         return M3_ERR_RANGE;
     }
 
     corner_radius = field->style.corner_radius;
+#ifdef M3_TESTING
+    if (m3_text_field_test_fail_point_match(M3_TEXT_FIELD_TEST_FAIL_CORNER_RANGE)) {
+        corner_radius = -1.0f;
+    }
+#endif
     if (corner_radius < 0.0f) {
         return M3_ERR_RANGE;
     }
@@ -1331,6 +1350,11 @@ static int m3_text_field_widget_paint(void *widget, M3PaintContext *ctx)
         selection_rect.x = text_x + start_x;
         selection_rect.y = text_top;
         selection_rect.width = end_x - start_x;
+#ifdef M3_TESTING
+        if (m3_text_field_test_fail_point_match(M3_TEXT_FIELD_TEST_FAIL_SELECTION_WIDTH_NEGATIVE)) {
+            selection_rect.width = -1.0f;
+        }
+#endif
         selection_rect.height = field->text_font_metrics.height;
         if (selection_rect.width < 0.0f) {
             selection_rect.width = 0.0f;
@@ -1382,6 +1406,14 @@ static int m3_text_field_widget_paint(void *widget, M3PaintContext *ctx)
         selection_rect.y = text_top;
         selection_rect.width = field->style.cursor_width;
         selection_rect.height = field->text_font_metrics.height;
+#ifdef M3_TESTING
+        if (m3_text_field_test_fail_point_match(M3_TEXT_FIELD_TEST_FAIL_CURSOR_WIDTH_NEGATIVE)) {
+            selection_rect.width = -1.0f;
+        }
+        if (m3_text_field_test_fail_point_match(M3_TEXT_FIELD_TEST_FAIL_CURSOR_HEIGHT_NEGATIVE)) {
+            selection_rect.height = -1.0f;
+        }
+#endif
         if (selection_rect.width < 0.0f) {
             selection_rect.width = 0.0f;
         }

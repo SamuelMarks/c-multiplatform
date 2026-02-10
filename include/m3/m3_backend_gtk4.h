@@ -83,6 +83,15 @@ M3_API int M3_CALL m3_gtk4_backend_get_gfx(M3GTK4Backend *backend, M3Gfx *out_gf
  */
 M3_API int M3_CALL m3_gtk4_backend_get_env(M3GTK4Backend *backend, M3Env *out_env);
 
+#ifdef M3_TESTING
+/**
+ * @brief Test wrapper for GTK4 backend config validation.
+ * @param config Backend configuration.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_gtk4_backend_test_validate_config(const M3GTK4BackendConfig *config);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

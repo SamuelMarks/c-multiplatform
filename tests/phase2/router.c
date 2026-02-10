@@ -300,7 +300,42 @@ int main(void)
         M3_TEST_EXPECT(m3_router_test_find_route(&find_router, "/home", 5, &found_route), M3_ERR_OVERFLOW);
         M3_TEST_OK(m3_router_test_set_cstr_limit(0));
 
+        M3_TEST_OK(m3_router_test_set_cstr_fail_after(2u));
+        M3_TEST_EXPECT(m3_router_test_find_route(&find_router, "/home", 5, &found_route), M3_ERR_OVERFLOW);
+        M3_TEST_OK(m3_router_test_set_cstr_fail_after(0u));
+
         M3_TEST_EXPECT(m3_router_test_find_route(&find_router, NULL, 0, &found_route), M3_ERR_INVALID_ARGUMENT);
+    }
+
+    {
+        M3Router find_router;
+        M3Route routes_local[2];
+
+        memset(&find_router, 0, sizeof(find_router));
+        memset(routes_local, 0, sizeof(routes_local));
+        routes_local[0].pattern = "/home";
+        routes_local[0].build = route_build;
+        routes_local[0].destroy = route_destroy;
+        routes_local[0].ctx = &home_ctx;
+        routes_local[1].pattern = "/users/:id";
+        routes_local[1].build = route_build;
+        routes_local[1].destroy = route_destroy;
+        routes_local[1].ctx = &user_ctx;
+        find_router.routes = routes_local;
+        find_router.route_count = 2;
+
+        found_route = NULL;
+        M3_TEST_OK(m3_router_test_find_route(&find_router, "/home", 5, &found_route));
+        M3_TEST_ASSERT(found_route == &routes_local[0]);
+        M3_TEST_EXPECT(m3_router_test_find_route(&find_router, "/missing", 8, &found_route), M3_ERR_NOT_FOUND);
+
+        routes_local[0].build = NULL;
+        M3_TEST_EXPECT(m3_router_test_find_route(&find_router, "/home", 5, &found_route), M3_ERR_INVALID_ARGUMENT);
+        routes_local[0].build = route_build;
+        routes_local[0].pattern = "/bad/:";
+        M3_TEST_EXPECT(m3_router_test_find_route(&find_router, "/bad", 4, &found_route), M3_ERR_INVALID_ARGUMENT);
+        routes_local[0].pattern = NULL;
+        M3_TEST_EXPECT(m3_router_test_find_route(&find_router, "/home", 5, &found_route), M3_ERR_INVALID_ARGUMENT);
     }
 
     {
@@ -486,7 +521,7 @@ int main(void)
     bad_routes[0].ctx = &home_ctx;
     M3_TEST_EXPECT(m3_router_navigate(&router_manual, "/", &component), M3_ERR_INVALID_ARGUMENT);
 
-    bad_routes[0].pattern = "abcd";
+    bad_routes[0].pattern = "/abcd";
     M3_TEST_OK(m3_router_test_set_cstr_limit(3));
     M3_TEST_EXPECT(m3_router_navigate(&router_manual, "/", &component), M3_ERR_OVERFLOW);
     M3_TEST_OK(m3_router_test_set_cstr_limit(0));
