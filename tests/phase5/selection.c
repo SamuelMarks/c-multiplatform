@@ -438,6 +438,7 @@ int main(void)
     M3_TEST_ASSERT(m3_color_near(backend.last_rect_color, checkbox_style.disabled_unchecked.fill, 0.001f));
     checkbox.widget.flags &= ~M3_WIDGET_FLAG_DISABLED;
 
+    M3_TEST_OK(m3_checkbox_set_checked(&checkbox, M3_TRUE));
     backend.fail_draw_line = M3_ERR_IO;
     M3_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx), M3_ERR_IO);
     backend.fail_draw_line = M3_OK;

@@ -1,3 +1,9 @@
+#if !defined(_WIN32) && !defined(_WIN64)
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif
+#endif
+
 #include "m3/m3_tasks.h"
 
 #include "m3/m3_object.h"
@@ -600,7 +606,7 @@ static int m3_native_sleep_ms(m3_u32 ms)
     Sleep(ms);
     return M3_OK;
 #else
-    if (m3_tasks_usleep((useconds_t)ms * 1000u) != 0) {
+    if (m3_tasks_usleep(ms * 1000u) != 0) {
         return M3_ERR_UNKNOWN;
     }
     return M3_OK;

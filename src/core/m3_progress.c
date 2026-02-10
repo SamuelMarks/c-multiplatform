@@ -1218,6 +1218,9 @@ static int m3_slider_value_from_x(const M3Slider *slider, M3Scalar x, M3Scalar *
 
 static int m3_slider_resolve_colors(const M3Slider *slider, M3Color *out_track, M3Color *out_active, M3Color *out_thumb)
 {
+    M3Color track;
+    M3Color active;
+    M3Color thumb;
     int rc;
 
     if (slider == NULL || out_track == NULL || out_active == NULL || out_thumb == NULL) {
@@ -1230,28 +1233,31 @@ static int m3_slider_resolve_colors(const M3Slider *slider, M3Color *out_track, 
 #endif
 
     if (slider->widget.flags & M3_WIDGET_FLAG_DISABLED) {
-        *out_track = slider->style.disabled_track_color;
-        *out_active = slider->style.disabled_active_track_color;
-        *out_thumb = slider->style.disabled_thumb_color;
+        track = slider->style.disabled_track_color;
+        active = slider->style.disabled_active_track_color;
+        thumb = slider->style.disabled_thumb_color;
     } else {
-        *out_track = slider->style.track_color;
-        *out_active = slider->style.active_track_color;
-        *out_thumb = slider->style.thumb_color;
+        track = slider->style.track_color;
+        active = slider->style.active_track_color;
+        thumb = slider->style.thumb_color;
     }
 
-    rc = m3_progress_validate_color(out_track);
+    rc = m3_progress_validate_color(&track);
     if (rc != M3_OK) {
         return rc;
     }
-    rc = m3_progress_validate_color(out_active);
+    rc = m3_progress_validate_color(&active);
     if (rc != M3_OK) {
         return rc;
     }
-    rc = m3_progress_validate_color(out_thumb);
+    rc = m3_progress_validate_color(&thumb);
     if (rc != M3_OK) {
         return rc;
     }
 
+    *out_track = track;
+    *out_active = active;
+    *out_thumb = thumb;
     return M3_OK;
 }
 

@@ -130,6 +130,25 @@ struct M3AndroidCameraState {
 #endif
 };
 
+struct M3AndroidBackend {
+    M3Allocator allocator;
+    M3NullBackend *null_backend;
+    M3WS ws;
+    M3Gfx gfx;
+    M3Env env;
+    M3Env null_env;
+    M3Camera camera;
+    M3AndroidCameraState camera_state;
+    M3Bool initialized;
+    void *java_vm;
+    void *jni_env;
+    void *activity;
+    void *asset_manager;
+    void *native_window;
+    void *input_queue;
+    void *looper;
+};
+
 static int m3_android_camera_mul_overflow(m3_usize a, m3_usize b, m3_usize *out_value)
 {
     m3_usize max_value;
@@ -992,25 +1011,6 @@ static const M3EnvVTable g_m3_android_env_vtable = {
     m3_android_env_get_network,
     m3_android_env_get_tasks,
     m3_android_env_get_time_ms
-};
-
-struct M3AndroidBackend {
-    M3Allocator allocator;
-    M3NullBackend *null_backend;
-    M3WS ws;
-    M3Gfx gfx;
-    M3Env env;
-    M3Env null_env;
-    M3Camera camera;
-    M3AndroidCameraState camera_state;
-    M3Bool initialized;
-    void *java_vm;
-    void *jni_env;
-    void *activity;
-    void *asset_manager;
-    void *native_window;
-    void *input_queue;
-    void *looper;
 };
 
 int M3_CALL m3_android_backend_create(const M3AndroidBackendConfig *config, M3AndroidBackend **out_backend)
