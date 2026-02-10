@@ -22,16 +22,18 @@ typedef struct M3CocoaBackend M3CocoaBackend;
  * @brief Configuration for the Cocoa backend.
  */
 typedef struct M3CocoaBackendConfig {
-    const M3Allocator *allocator; /**< Allocator for backend memory (NULL uses default). */
-    m3_usize handle_capacity; /**< Maximum number of handles to manage. */
-    m3_usize clipboard_limit; /**< Maximum clipboard byte length accepted. */
-    M3Bool enable_logging; /**< Enable logging via m3_log_write. */
-    M3Bool inline_tasks; /**< Execute posted tasks inline when M3_TRUE. */
+  const M3Allocator
+      *allocator; /**< Allocator for backend memory (NULL uses default). */
+  m3_usize handle_capacity; /**< Maximum number of handles to manage. */
+  m3_usize clipboard_limit; /**< Maximum clipboard byte length accepted. */
+  M3Bool enable_logging;    /**< Enable logging via m3_log_write. */
+  M3Bool inline_tasks;      /**< Execute posted tasks inline when M3_TRUE. */
 } M3CocoaBackendConfig;
 
 /**
  * @brief Report whether Cocoa support is available in this build.
- * @param out_available Receives M3_TRUE if Cocoa is available, M3_FALSE otherwise.
+ * @param out_available Receives M3_TRUE if Cocoa is available, M3_FALSE
+ * otherwise.
  * @return M3_OK on success or a failure code.
  */
 M3_API int M3_CALL m3_cocoa_backend_is_available(M3Bool *out_available);
@@ -49,7 +51,8 @@ M3_API int M3_CALL m3_cocoa_backend_config_init(M3CocoaBackendConfig *config);
  * @param out_backend Receives the created backend instance.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_cocoa_backend_create(const M3CocoaBackendConfig *config, M3CocoaBackend **out_backend);
+M3_API int M3_CALL m3_cocoa_backend_create(const M3CocoaBackendConfig *config,
+                                           M3CocoaBackend **out_backend);
 
 /**
  * @brief Destroy a Cocoa backend instance.
@@ -64,7 +67,8 @@ M3_API int M3_CALL m3_cocoa_backend_destroy(M3CocoaBackend *backend);
  * @param out_ws Receives the window system interface.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_cocoa_backend_get_ws(M3CocoaBackend *backend, M3WS *out_ws);
+M3_API int M3_CALL m3_cocoa_backend_get_ws(M3CocoaBackend *backend,
+                                           M3WS *out_ws);
 
 /**
  * @brief Retrieve the graphics interface for the backend.
@@ -72,7 +76,8 @@ M3_API int M3_CALL m3_cocoa_backend_get_ws(M3CocoaBackend *backend, M3WS *out_ws
  * @param out_gfx Receives the graphics interface.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_cocoa_backend_get_gfx(M3CocoaBackend *backend, M3Gfx *out_gfx);
+M3_API int M3_CALL m3_cocoa_backend_get_gfx(M3CocoaBackend *backend,
+                                            M3Gfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -80,7 +85,8 @@ M3_API int M3_CALL m3_cocoa_backend_get_gfx(M3CocoaBackend *backend, M3Gfx *out_
  * @param out_env Receives the environment interface.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_cocoa_backend_get_env(M3CocoaBackend *backend, M3Env *out_env);
+M3_API int M3_CALL m3_cocoa_backend_get_env(M3CocoaBackend *backend,
+                                            M3Env *out_env);
 
 #ifdef M3_TESTING
 /**
@@ -88,7 +94,8 @@ M3_API int M3_CALL m3_cocoa_backend_get_env(M3CocoaBackend *backend, M3Env *out_
  * @param config Backend configuration.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_cocoa_backend_test_validate_config(const M3CocoaBackendConfig *config);
+M3_API int M3_CALL
+m3_cocoa_backend_test_validate_config(const M3CocoaBackendConfig *config);
 #endif
 
 #ifdef __cplusplus

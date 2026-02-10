@@ -19,7 +19,7 @@ extern "C" {
 #define M3_LIST_ORIENTATION_HORIZONTAL 1
 
 /** @brief Invalid list index sentinel. */
-#define M3_LIST_INVALID_INDEX ((m3_usize)~(m3_usize)0)
+#define M3_LIST_INVALID_INDEX ((m3_usize) ~(m3_usize)0)
 
 /** @brief Default list item extent in pixels. */
 #define M3_LIST_DEFAULT_ITEM_EXTENT 48.0f
@@ -48,9 +48,9 @@ extern "C" {
  * @brief Slot for a recycled list/grid item.
  */
 typedef struct M3ListSlot {
-    m3_usize index; /**< Bound item index or M3_LIST_INVALID_INDEX. */
-    M3RenderNode node; /**< Render node for the item widget. */
-    void *user; /**< User-defined slot state. */
+  m3_usize index;    /**< Bound item index or M3_LIST_INVALID_INDEX. */
+  M3RenderNode node; /**< Render node for the item widget. */
+  void *user;        /**< User-defined slot state. */
 } M3ListSlot;
 
 struct M3ListView;
@@ -63,75 +63,79 @@ struct M3ListView;
  * @param index Item index to bind.
  * @return M3_OK on success or a failure code.
  */
-typedef int (M3_CALL *M3ListBindFn)(void *ctx, M3ListSlot *slot, m3_usize index);
+typedef int(M3_CALL *M3ListBindFn)(void *ctx, M3ListSlot *slot, m3_usize index);
 
 /**
  * @brief List style descriptor.
  */
 typedef struct M3ListStyle {
-    m3_u32 orientation; /**< List orientation (M3_LIST_ORIENTATION_*). */
-    M3LayoutEdges padding; /**< Padding around list contents. */
-    M3Scalar spacing; /**< Spacing between items in pixels (>= 0). */
-    M3Scalar item_extent; /**< Item extent along the scroll axis (>= 0). */
-    M3Color background_color; /**< Background fill color. */
-    m3_usize overscan; /**< Extra items to include before/after viewport. */
+  m3_u32 orientation;       /**< List orientation (M3_LIST_ORIENTATION_*). */
+  M3LayoutEdges padding;    /**< Padding around list contents. */
+  M3Scalar spacing;         /**< Spacing between items in pixels (>= 0). */
+  M3Scalar item_extent;     /**< Item extent along the scroll axis (>= 0). */
+  M3Color background_color; /**< Background fill color. */
+  m3_usize overscan; /**< Extra items to include before/after viewport. */
 } M3ListStyle;
 
 /**
  * @brief List widget instance.
  */
 typedef struct M3ListView {
-    M3Widget widget; /**< Widget interface (points to this instance). */
-    M3ListStyle style; /**< Current list style. */
-    M3Rect bounds; /**< Layout bounds. */
-    M3Scalar scroll_offset; /**< Scroll offset along the main axis. */
-    M3Scalar content_extent; /**< Content extent along the main axis. */
-    m3_usize item_count; /**< Number of items in the list. */
-    m3_usize visible_count; /**< Number of visible items after update. */
-    m3_usize visible_first; /**< First visible item index (or M3_LIST_INVALID_INDEX). */
-    m3_usize visible_last; /**< Last visible item index (or M3_LIST_INVALID_INDEX). */
-    M3ListSlot *slots; /**< Slot pool for recycling items. */
-    M3RenderNode **visible_nodes; /**< Pointer list for visible nodes. */
-    m3_usize slot_capacity; /**< Number of slots allocated. */
-    M3Allocator allocator; /**< Allocator for slots. */
-    M3ListBindFn bind; /**< Bind callback for item recycling. */
-    void *bind_ctx; /**< Bind callback context pointer. */
+  M3Widget widget;         /**< Widget interface (points to this instance). */
+  M3ListStyle style;       /**< Current list style. */
+  M3Rect bounds;           /**< Layout bounds. */
+  M3Scalar scroll_offset;  /**< Scroll offset along the main axis. */
+  M3Scalar content_extent; /**< Content extent along the main axis. */
+  m3_usize item_count;     /**< Number of items in the list. */
+  m3_usize visible_count;  /**< Number of visible items after update. */
+  m3_usize visible_first;  /**< First visible item index (or
+                              M3_LIST_INVALID_INDEX). */
+  m3_usize
+      visible_last;  /**< Last visible item index (or M3_LIST_INVALID_INDEX). */
+  M3ListSlot *slots; /**< Slot pool for recycling items. */
+  M3RenderNode **visible_nodes; /**< Pointer list for visible nodes. */
+  m3_usize slot_capacity;       /**< Number of slots allocated. */
+  M3Allocator allocator;        /**< Allocator for slots. */
+  M3ListBindFn bind;            /**< Bind callback for item recycling. */
+  void *bind_ctx;               /**< Bind callback context pointer. */
 } M3ListView;
 
 /**
  * @brief Grid style descriptor.
  */
 typedef struct M3GridStyle {
-    m3_u32 scroll_axis; /**< Scroll axis (M3_GRID_SCROLL_*). */
-    m3_usize span; /**< Columns (vertical scroll) or rows (horizontal scroll). */
-    M3LayoutEdges padding; /**< Padding around grid contents. */
-    M3Scalar spacing_x; /**< Horizontal spacing between items (>= 0). */
-    M3Scalar spacing_y; /**< Vertical spacing between items (>= 0). */
-    M3Scalar item_width; /**< Item width in pixels (>= 0). */
-    M3Scalar item_height; /**< Item height in pixels (>= 0). */
-    M3Color background_color; /**< Background fill color. */
-    m3_usize overscan; /**< Extra rows/columns to include beyond the viewport. */
+  m3_u32 scroll_axis; /**< Scroll axis (M3_GRID_SCROLL_*). */
+  m3_usize span; /**< Columns (vertical scroll) or rows (horizontal scroll). */
+  M3LayoutEdges padding;    /**< Padding around grid contents. */
+  M3Scalar spacing_x;       /**< Horizontal spacing between items (>= 0). */
+  M3Scalar spacing_y;       /**< Vertical spacing between items (>= 0). */
+  M3Scalar item_width;      /**< Item width in pixels (>= 0). */
+  M3Scalar item_height;     /**< Item height in pixels (>= 0). */
+  M3Color background_color; /**< Background fill color. */
+  m3_usize overscan; /**< Extra rows/columns to include beyond the viewport. */
 } M3GridStyle;
 
 /**
  * @brief Grid widget instance.
  */
 typedef struct M3GridView {
-    M3Widget widget; /**< Widget interface (points to this instance). */
-    M3GridStyle style; /**< Current grid style. */
-    M3Rect bounds; /**< Layout bounds. */
-    M3Scalar scroll_offset; /**< Scroll offset along the main axis. */
-    M3Scalar content_extent; /**< Content extent along the main axis. */
-    m3_usize item_count; /**< Number of items in the grid. */
-    m3_usize visible_count; /**< Number of visible items after update. */
-    m3_usize visible_first; /**< First visible item index (or M3_LIST_INVALID_INDEX). */
-    m3_usize visible_last; /**< Last visible item index (or M3_LIST_INVALID_INDEX). */
-    M3ListSlot *slots; /**< Slot pool for recycling items. */
-    M3RenderNode **visible_nodes; /**< Pointer list for visible nodes. */
-    m3_usize slot_capacity; /**< Number of slots allocated. */
-    M3Allocator allocator; /**< Allocator for slots. */
-    M3ListBindFn bind; /**< Bind callback for item recycling. */
-    void *bind_ctx; /**< Bind callback context pointer. */
+  M3Widget widget;         /**< Widget interface (points to this instance). */
+  M3GridStyle style;       /**< Current grid style. */
+  M3Rect bounds;           /**< Layout bounds. */
+  M3Scalar scroll_offset;  /**< Scroll offset along the main axis. */
+  M3Scalar content_extent; /**< Content extent along the main axis. */
+  m3_usize item_count;     /**< Number of items in the grid. */
+  m3_usize visible_count;  /**< Number of visible items after update. */
+  m3_usize visible_first;  /**< First visible item index (or
+                              M3_LIST_INVALID_INDEX). */
+  m3_usize
+      visible_last;  /**< Last visible item index (or M3_LIST_INVALID_INDEX). */
+  M3ListSlot *slots; /**< Slot pool for recycling items. */
+  M3RenderNode **visible_nodes; /**< Pointer list for visible nodes. */
+  m3_usize slot_capacity;       /**< Number of slots allocated. */
+  M3Allocator allocator;        /**< Allocator for slots. */
+  M3ListBindFn bind;            /**< Bind callback for item recycling. */
+  void *bind_ctx;               /**< Bind callback context pointer. */
 } M3GridView;
 
 /**
@@ -150,8 +154,10 @@ M3_API int M3_CALL m3_list_style_init(M3ListStyle *style);
  * @param slot_capacity Slot pool capacity (0 leaves unallocated).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_view_init(M3ListView *view, const M3ListStyle *style, const M3Allocator *allocator,
-    m3_usize item_count, m3_usize slot_capacity);
+M3_API int M3_CALL m3_list_view_init(M3ListView *view, const M3ListStyle *style,
+                                     const M3Allocator *allocator,
+                                     m3_usize item_count,
+                                     m3_usize slot_capacity);
 
 /**
  * @brief Assign the bind callback for list recycling.
@@ -160,7 +166,8 @@ M3_API int M3_CALL m3_list_view_init(M3ListView *view, const M3ListStyle *style,
  * @param ctx Callback context pointer.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_view_set_bind(M3ListView *view, M3ListBindFn bind, void *ctx);
+M3_API int M3_CALL m3_list_view_set_bind(M3ListView *view, M3ListBindFn bind,
+                                         void *ctx);
 
 /**
  * @brief Update the list item count.
@@ -168,7 +175,8 @@ M3_API int M3_CALL m3_list_view_set_bind(M3ListView *view, M3ListBindFn bind, vo
  * @param item_count New item count.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_view_set_item_count(M3ListView *view, m3_usize item_count);
+M3_API int M3_CALL m3_list_view_set_item_count(M3ListView *view,
+                                               m3_usize item_count);
 
 /**
  * @brief Update the list style.
@@ -176,7 +184,8 @@ M3_API int M3_CALL m3_list_view_set_item_count(M3ListView *view, m3_usize item_c
  * @param style New style descriptor.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_view_set_style(M3ListView *view, const M3ListStyle *style);
+M3_API int M3_CALL m3_list_view_set_style(M3ListView *view,
+                                          const M3ListStyle *style);
 
 /**
  * @brief Update the scroll offset (clamped to the content bounds).
@@ -192,7 +201,8 @@ M3_API int M3_CALL m3_list_view_set_scroll(M3ListView *view, M3Scalar offset);
  * @param out_offset Receives the scroll offset.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_view_get_scroll(const M3ListView *view, M3Scalar *out_offset);
+M3_API int M3_CALL m3_list_view_get_scroll(const M3ListView *view,
+                                           M3Scalar *out_offset);
 
 /**
  * @brief Retrieve the list content extent along the main axis.
@@ -200,7 +210,8 @@ M3_API int M3_CALL m3_list_view_get_scroll(const M3ListView *view, M3Scalar *out
  * @param out_extent Receives the content extent.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_view_get_content_extent(const M3ListView *view, M3Scalar *out_extent);
+M3_API int M3_CALL m3_list_view_get_content_extent(const M3ListView *view,
+                                                   M3Scalar *out_extent);
 
 /**
  * @brief Compute the required slot count for the current viewport.
@@ -208,7 +219,8 @@ M3_API int M3_CALL m3_list_view_get_content_extent(const M3ListView *view, M3Sca
  * @param out_required Receives the required slot count.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_view_get_required_slots(const M3ListView *view, m3_usize *out_required);
+M3_API int M3_CALL m3_list_view_get_required_slots(const M3ListView *view,
+                                                   m3_usize *out_required);
 
 /**
  * @brief Ensure the list slot pool can hold the requested capacity.
@@ -228,11 +240,14 @@ M3_API int M3_CALL m3_list_view_update(M3ListView *view);
 /**
  * @brief Retrieve the visible render node list.
  * @param view List view instance.
- * @param out_nodes Receives the node pointer array (may be NULL when count is 0).
+ * @param out_nodes Receives the node pointer array (may be NULL when count is
+ * 0).
  * @param out_count Receives the number of visible nodes.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_view_get_visible(const M3ListView *view, M3RenderNode ***out_nodes, m3_usize *out_count);
+M3_API int M3_CALL m3_list_view_get_visible(const M3ListView *view,
+                                            M3RenderNode ***out_nodes,
+                                            m3_usize *out_count);
 
 /**
  * @brief Initialize a grid style with defaults.
@@ -250,8 +265,10 @@ M3_API int M3_CALL m3_grid_style_init(M3GridStyle *style);
  * @param slot_capacity Slot pool capacity (0 leaves unallocated).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_grid_view_init(M3GridView *view, const M3GridStyle *style, const M3Allocator *allocator,
-    m3_usize item_count, m3_usize slot_capacity);
+M3_API int M3_CALL m3_grid_view_init(M3GridView *view, const M3GridStyle *style,
+                                     const M3Allocator *allocator,
+                                     m3_usize item_count,
+                                     m3_usize slot_capacity);
 
 /**
  * @brief Assign the bind callback for grid recycling.
@@ -260,7 +277,8 @@ M3_API int M3_CALL m3_grid_view_init(M3GridView *view, const M3GridStyle *style,
  * @param ctx Callback context pointer.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_grid_view_set_bind(M3GridView *view, M3ListBindFn bind, void *ctx);
+M3_API int M3_CALL m3_grid_view_set_bind(M3GridView *view, M3ListBindFn bind,
+                                         void *ctx);
 
 /**
  * @brief Update the grid item count.
@@ -268,7 +286,8 @@ M3_API int M3_CALL m3_grid_view_set_bind(M3GridView *view, M3ListBindFn bind, vo
  * @param item_count New item count.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_grid_view_set_item_count(M3GridView *view, m3_usize item_count);
+M3_API int M3_CALL m3_grid_view_set_item_count(M3GridView *view,
+                                               m3_usize item_count);
 
 /**
  * @brief Update the grid style.
@@ -276,7 +295,8 @@ M3_API int M3_CALL m3_grid_view_set_item_count(M3GridView *view, m3_usize item_c
  * @param style New style descriptor.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_grid_view_set_style(M3GridView *view, const M3GridStyle *style);
+M3_API int M3_CALL m3_grid_view_set_style(M3GridView *view,
+                                          const M3GridStyle *style);
 
 /**
  * @brief Update the scroll offset (clamped to the content bounds).
@@ -292,7 +312,8 @@ M3_API int M3_CALL m3_grid_view_set_scroll(M3GridView *view, M3Scalar offset);
  * @param out_offset Receives the scroll offset.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_grid_view_get_scroll(const M3GridView *view, M3Scalar *out_offset);
+M3_API int M3_CALL m3_grid_view_get_scroll(const M3GridView *view,
+                                           M3Scalar *out_offset);
 
 /**
  * @brief Retrieve the grid content extent along the main axis.
@@ -300,7 +321,8 @@ M3_API int M3_CALL m3_grid_view_get_scroll(const M3GridView *view, M3Scalar *out
  * @param out_extent Receives the content extent.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_grid_view_get_content_extent(const M3GridView *view, M3Scalar *out_extent);
+M3_API int M3_CALL m3_grid_view_get_content_extent(const M3GridView *view,
+                                                   M3Scalar *out_extent);
 
 /**
  * @brief Compute the required slot count for the current viewport.
@@ -308,7 +330,8 @@ M3_API int M3_CALL m3_grid_view_get_content_extent(const M3GridView *view, M3Sca
  * @param out_required Receives the required slot count.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_grid_view_get_required_slots(const M3GridView *view, m3_usize *out_required);
+M3_API int M3_CALL m3_grid_view_get_required_slots(const M3GridView *view,
+                                                   m3_usize *out_required);
 
 /**
  * @brief Ensure the grid slot pool can hold the requested capacity.
@@ -328,11 +351,14 @@ M3_API int M3_CALL m3_grid_view_update(M3GridView *view);
 /**
  * @brief Retrieve the visible render node list.
  * @param view Grid view instance.
- * @param out_nodes Receives the node pointer array (may be NULL when count is 0).
+ * @param out_nodes Receives the node pointer array (may be NULL when count is
+ * 0).
  * @param out_count Receives the number of visible nodes.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_grid_view_get_visible(const M3GridView *view, M3RenderNode ***out_nodes, m3_usize *out_count);
+M3_API int M3_CALL m3_grid_view_get_visible(const M3GridView *view,
+                                            M3RenderNode ***out_nodes,
+                                            m3_usize *out_count);
 
 #ifdef M3_TESTING
 /**
@@ -355,7 +381,8 @@ M3_API int M3_CALL m3_list_test_clear_fail_points(void);
  * @param out_value Receives product.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_test_mul_overflow(m3_usize a, m3_usize b, m3_usize *out_value);
+M3_API int M3_CALL m3_list_test_mul_overflow(m3_usize a, m3_usize b,
+                                             m3_usize *out_value);
 /**
  * @brief Test hook for validating list colors.
  * @param color Color to validate.
@@ -402,7 +429,8 @@ M3_API int M3_CALL m3_list_test_validate_grid_style(const M3GridStyle *style);
  * @param out_extent Receives computed extent.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_test_compute_content_extent(m3_usize item_count, M3Scalar item_extent, M3Scalar spacing,
+M3_API int M3_CALL m3_list_test_compute_content_extent(
+    m3_usize item_count, M3Scalar item_extent, M3Scalar spacing,
     M3Scalar padding_start, M3Scalar padding_end, M3Scalar *out_extent);
 /**
  * @brief Test hook for computing list visible ranges.
@@ -418,8 +446,10 @@ M3_API int M3_CALL m3_list_test_compute_content_extent(m3_usize item_count, M3Sc
  * @param out_count Receives visible count.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_test_compute_visible_range(m3_usize item_count, M3Scalar item_extent, M3Scalar spacing,
-    M3Scalar padding_start, M3Scalar scroll, M3Scalar viewport, m3_usize overscan, m3_usize *out_first, m3_usize *out_last,
+M3_API int M3_CALL m3_list_test_compute_visible_range(
+    m3_usize item_count, M3Scalar item_extent, M3Scalar spacing,
+    M3Scalar padding_start, M3Scalar scroll, M3Scalar viewport,
+    m3_usize overscan, m3_usize *out_first, m3_usize *out_last,
     m3_usize *out_count);
 /**
  * @brief Test hook for computing grid visible ranges.
@@ -429,7 +459,8 @@ M3_API int M3_CALL m3_list_test_compute_visible_range(m3_usize item_count, M3Sca
  * @param out_count Receives visible count.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_test_grid_compute_visible_range(const M3GridView *view, m3_usize *out_first, m3_usize *out_last,
+M3_API int M3_CALL m3_list_test_grid_compute_visible_range(
+    const M3GridView *view, m3_usize *out_first, m3_usize *out_last,
     m3_usize *out_count);
 /**
  * @brief Test hook for computing list item bounds.
@@ -438,7 +469,9 @@ M3_API int M3_CALL m3_list_test_grid_compute_visible_range(const M3GridView *vie
  * @param out_bounds Receives bounds.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_test_compute_item_bounds(const M3ListView *view, m3_usize index, M3Rect *out_bounds);
+M3_API int M3_CALL m3_list_test_compute_item_bounds(const M3ListView *view,
+                                                    m3_usize index,
+                                                    M3Rect *out_bounds);
 /**
  * @brief Test hook for computing grid item bounds.
  * @param view Grid view.
@@ -446,7 +479,9 @@ M3_API int M3_CALL m3_list_test_compute_item_bounds(const M3ListView *view, m3_u
  * @param out_bounds Receives bounds.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_test_grid_compute_item_bounds(const M3GridView *view, m3_usize index, M3Rect *out_bounds);
+M3_API int M3_CALL m3_list_test_grid_compute_item_bounds(const M3GridView *view,
+                                                         m3_usize index,
+                                                         M3Rect *out_bounds);
 /**
  * @brief Test hook for updating list metrics.
  * @param view List view instance.
@@ -468,8 +503,11 @@ M3_API int M3_CALL m3_list_test_grid_update_metrics(M3GridView *view);
  * @param capacity Requested capacity.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_list_test_reserve_slots(M3ListSlot **slots, M3RenderNode ***visible_nodes, m3_usize *slot_capacity,
-    const M3Allocator *allocator, m3_usize capacity);
+M3_API int M3_CALL m3_list_test_reserve_slots(M3ListSlot **slots,
+                                              M3RenderNode ***visible_nodes,
+                                              m3_usize *slot_capacity,
+                                              const M3Allocator *allocator,
+                                              m3_usize capacity);
 #endif
 
 #ifdef __cplusplus

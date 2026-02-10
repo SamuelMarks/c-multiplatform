@@ -59,88 +59,90 @@ extern "C" {
  * @brief Layout constraint for a single axis.
  */
 typedef struct M3MeasureSpec {
-    m3_u32 mode; /**< Measurement mode (M3_MEASURE_*). */
-    M3Scalar size; /**< Size constraint in pixels. */
+  m3_u32 mode;   /**< Measurement mode (M3_MEASURE_*). */
+  M3Scalar size; /**< Size constraint in pixels. */
 } M3MeasureSpec;
 
 /**
  * @brief Painting context passed to widgets.
  */
 typedef struct M3PaintContext {
-    M3Gfx *gfx; /**< Graphics interface. */
-    M3Rect clip; /**< Current clip rectangle. */
-    M3Scalar dpi_scale; /**< DPI scale factor. */
+  M3Gfx *gfx;         /**< Graphics interface. */
+  M3Rect clip;        /**< Current clip rectangle. */
+  M3Scalar dpi_scale; /**< DPI scale factor. */
 } M3PaintContext;
 
 /**
  * @brief Accessibility semantics description.
  */
 typedef struct M3Semantics {
-    m3_u32 role; /**< Semantic role (M3_SEMANTIC_*). */
-    m3_u32 flags; /**< Semantic flags (M3_SEMANTIC_FLAG_*). */
-    const char *utf8_label; /**< Primary label text in UTF-8. */
-    const char *utf8_hint; /**< Hint text in UTF-8. */
-    const char *utf8_value; /**< Value text in UTF-8. */
+  m3_u32 role;            /**< Semantic role (M3_SEMANTIC_*). */
+  m3_u32 flags;           /**< Semantic flags (M3_SEMANTIC_FLAG_*). */
+  const char *utf8_label; /**< Primary label text in UTF-8. */
+  const char *utf8_hint;  /**< Hint text in UTF-8. */
+  const char *utf8_value; /**< Value text in UTF-8. */
 } M3Semantics;
 
 /**
  * @brief Widget virtual table.
  */
 typedef struct M3WidgetVTable {
-    /**
-     * @brief Measure the widget.
-     * @param widget Widget instance.
-     * @param width Width measurement constraint.
-     * @param height Height measurement constraint.
-     * @param out_size Receives the desired size.
-     * @return M3_OK on success or a failure code.
-     */
-    int (M3_CALL *measure)(void *widget, M3MeasureSpec width, M3MeasureSpec height, M3Size *out_size);
-    /**
-     * @brief Layout the widget within bounds.
-     * @param widget Widget instance.
-     * @param bounds Assigned bounds in pixels.
-     * @return M3_OK on success or a failure code.
-     */
-    int (M3_CALL *layout)(void *widget, M3Rect bounds);
-    /**
-     * @brief Paint the widget contents.
-     * @param widget Widget instance.
-     * @param ctx Painting context.
-     * @return M3_OK on success or a failure code.
-     */
-    int (M3_CALL *paint)(void *widget, M3PaintContext *ctx);
-    /**
-     * @brief Handle an input event.
-     * @param widget Widget instance.
-     * @param event Input event.
-     * @param out_handled Receives M3_TRUE if the event was handled.
-     * @return M3_OK on success or a failure code.
-     */
-    int (M3_CALL *event)(void *widget, const M3InputEvent *event, M3Bool *out_handled);
-    /**
-     * @brief Retrieve accessibility semantics for the widget.
-     * @param widget Widget instance.
-     * @param out_semantics Receives semantics information.
-     * @return M3_OK on success or a failure code.
-     */
-    int (M3_CALL *get_semantics)(void *widget, M3Semantics *out_semantics);
-    /**
-     * @brief Destroy the widget instance.
-     * @param widget Widget instance.
-     * @return M3_OK on success or a failure code.
-     */
-    int (M3_CALL *destroy)(void *widget);
+  /**
+   * @brief Measure the widget.
+   * @param widget Widget instance.
+   * @param width Width measurement constraint.
+   * @param height Height measurement constraint.
+   * @param out_size Receives the desired size.
+   * @return M3_OK on success or a failure code.
+   */
+  int(M3_CALL *measure)(void *widget, M3MeasureSpec width, M3MeasureSpec height,
+                        M3Size *out_size);
+  /**
+   * @brief Layout the widget within bounds.
+   * @param widget Widget instance.
+   * @param bounds Assigned bounds in pixels.
+   * @return M3_OK on success or a failure code.
+   */
+  int(M3_CALL *layout)(void *widget, M3Rect bounds);
+  /**
+   * @brief Paint the widget contents.
+   * @param widget Widget instance.
+   * @param ctx Painting context.
+   * @return M3_OK on success or a failure code.
+   */
+  int(M3_CALL *paint)(void *widget, M3PaintContext *ctx);
+  /**
+   * @brief Handle an input event.
+   * @param widget Widget instance.
+   * @param event Input event.
+   * @param out_handled Receives M3_TRUE if the event was handled.
+   * @return M3_OK on success or a failure code.
+   */
+  int(M3_CALL *event)(void *widget, const M3InputEvent *event,
+                      M3Bool *out_handled);
+  /**
+   * @brief Retrieve accessibility semantics for the widget.
+   * @param widget Widget instance.
+   * @param out_semantics Receives semantics information.
+   * @return M3_OK on success or a failure code.
+   */
+  int(M3_CALL *get_semantics)(void *widget, M3Semantics *out_semantics);
+  /**
+   * @brief Destroy the widget instance.
+   * @param widget Widget instance.
+   * @return M3_OK on success or a failure code.
+   */
+  int(M3_CALL *destroy)(void *widget);
 } M3WidgetVTable;
 
 /**
  * @brief Widget interface.
  */
 typedef struct M3Widget {
-    void *ctx; /**< Widget implementation context. */
-    const M3WidgetVTable *vtable; /**< Widget virtual table. */
-    M3Handle handle; /**< Handle for the widget object. */
-    m3_u32 flags; /**< Widget flags (M3_WIDGET_FLAG_*). */
+  void *ctx;                    /**< Widget implementation context. */
+  const M3WidgetVTable *vtable; /**< Widget virtual table. */
+  M3Handle handle;              /**< Handle for the widget object. */
+  m3_u32 flags;                 /**< Widget flags (M3_WIDGET_FLAG_*). */
 } M3Widget;
 
 #ifdef __cplusplus

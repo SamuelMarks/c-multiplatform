@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
 #include <limits.h>
+#include <stddef.h>
 
 /** @brief Major version number. */
 #define M3_VERSION_MAJOR 0
@@ -78,7 +78,8 @@ typedef size_t m3_usize;
  * @def M3_STATIC_ASSERT
  * @brief Compile-time assertion helper.
  */
-#define M3_STATIC_ASSERT(name, expr) typedef char m3_static_assert_##name[(expr) ? 1 : -1]
+#define M3_STATIC_ASSERT(name, expr)                                           \
+  typedef char m3_static_assert_##name[(expr) ? 1 : -1]
 
 #ifndef M3_DOXYGEN
 M3_STATIC_ASSERT(char_is_8_bits, CHAR_BIT == 8);
@@ -132,7 +133,7 @@ M3_STATIC_ASSERT(size_t_at_least_32_bits, sizeof(size_t) >= 4);
  * @param out_ptr Receives the allocated block on success.
  * @return M3_OK on success or a failure code.
  */
-typedef int (M3_CALL *M3AllocFn)(void *ctx, m3_usize size, void **out_ptr);
+typedef int(M3_CALL *M3AllocFn)(void *ctx, m3_usize size, void **out_ptr);
 
 /**
  * @brief Reallocation function signature.
@@ -142,7 +143,8 @@ typedef int (M3_CALL *M3AllocFn)(void *ctx, m3_usize size, void **out_ptr);
  * @param out_ptr Receives the reallocated block on success.
  * @return M3_OK on success or a failure code.
  */
-typedef int (M3_CALL *M3ReallocFn)(void *ctx, void *ptr, m3_usize size, void **out_ptr);
+typedef int(M3_CALL *M3ReallocFn)(void *ctx, void *ptr, m3_usize size,
+                                  void **out_ptr);
 
 /**
  * @brief Free function signature.
@@ -150,16 +152,16 @@ typedef int (M3_CALL *M3ReallocFn)(void *ctx, void *ptr, m3_usize size, void **o
  * @param ptr Allocation to release.
  * @return M3_OK on success or a failure code.
  */
-typedef int (M3_CALL *M3FreeFn)(void *ctx, void *ptr);
+typedef int(M3_CALL *M3FreeFn)(void *ctx, void *ptr);
 
 /**
  * @brief Allocator interface used throughout the ABI.
  */
 typedef struct M3Allocator {
-    void *ctx; /**< User-defined allocator context. */
-    M3AllocFn alloc; /**< Allocation callback. */
-    M3ReallocFn realloc; /**< Reallocation callback. */
-    M3FreeFn free; /**< Free callback. */
+  void *ctx;           /**< User-defined allocator context. */
+  M3AllocFn alloc;     /**< Allocation callback. */
+  M3ReallocFn realloc; /**< Reallocation callback. */
+  M3FreeFn free;       /**< Free callback. */
 } M3Allocator;
 
 /**

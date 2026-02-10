@@ -37,19 +37,21 @@ typedef m3_u32 M3LogLevel;
  * @param length Message length in bytes.
  * @return M3_OK on success or a failure code.
  */
-typedef int (M3_CALL *M3LogSinkFn)(void *ctx, M3LogLevel level, const char *tag, const char *message, m3_usize length);
+typedef int(M3_CALL *M3LogSinkFn)(void *ctx, M3LogLevel level, const char *tag,
+                                  const char *message, m3_usize length);
 
 /**
  * @brief Log sink descriptor.
  */
 typedef struct M3LogSink {
-    void *ctx; /**< Sink context pointer. */
-    M3LogSinkFn write; /**< Sink write callback. */
+  void *ctx;         /**< Sink context pointer. */
+  M3LogSinkFn write; /**< Sink write callback. */
 } M3LogSink;
 
 /**
  * @brief Initialize the logging system.
- * @param allocator Allocator for internal resources; NULL uses the default allocator.
+ * @param allocator Allocator for internal resources; NULL uses the default
+ * allocator.
  * @return M3_OK on success or a failure code.
  */
 M3_API int M3_CALL m3_log_init(const M3Allocator *allocator);
@@ -81,7 +83,8 @@ M3_API int M3_CALL m3_log_get_sink(M3LogSink *out_sink);
  * @param message Null-terminated message string.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_log_write(M3LogLevel level, const char *tag, const char *message);
+M3_API int M3_CALL m3_log_write(M3LogLevel level, const char *tag,
+                                const char *message);
 
 /**
  * @brief Write a log message with an explicit length.
@@ -91,7 +94,8 @@ M3_API int M3_CALL m3_log_write(M3LogLevel level, const char *tag, const char *m
  * @param length Message length in bytes.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_log_write_n(M3LogLevel level, const char *tag, const char *message, m3_usize length);
+M3_API int M3_CALL m3_log_write_n(M3LogLevel level, const char *tag,
+                                  const char *message, m3_usize length);
 
 #ifdef M3_TESTING
 /**
@@ -102,7 +106,10 @@ M3_API int M3_CALL m3_log_write_n(M3LogLevel level, const char *tag, const char 
  * @param shutdown_fail Force shutdown to fail when M3_TRUE.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_log_test_set_mutex_failures(M3Bool init_fail, M3Bool lock_fail, M3Bool unlock_fail, M3Bool shutdown_fail);
+M3_API int M3_CALL m3_log_test_set_mutex_failures(M3Bool init_fail,
+                                                  M3Bool lock_fail,
+                                                  M3Bool unlock_fail,
+                                                  M3Bool shutdown_fail);
 
 /**
  * @brief Configure failure injection for log output.

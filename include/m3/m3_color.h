@@ -16,46 +16,46 @@ extern "C" {
  * @brief Hue-Chroma-Tone color description.
  */
 typedef struct M3ColorHct {
-    M3Scalar hue; /**< Hue angle in degrees (0..360). */
-    M3Scalar chroma; /**< Chroma intensity (>= 0). */
-    M3Scalar tone; /**< Tone value (0..100). */
+  M3Scalar hue;    /**< Hue angle in degrees (0..360). */
+  M3Scalar chroma; /**< Chroma intensity (>= 0). */
+  M3Scalar tone;   /**< Tone value (0..100). */
 } M3ColorHct;
 
 /**
  * @brief Tonal palette descriptor.
  */
 typedef struct M3TonalPalette {
-    M3Scalar hue; /**< Palette hue in degrees. */
-    M3Scalar chroma; /**< Palette chroma. */
+  M3Scalar hue;    /**< Palette hue in degrees. */
+  M3Scalar chroma; /**< Palette chroma. */
 } M3TonalPalette;
 
 /**
  * @brief Dynamic color scheme output.
  */
 typedef struct M3Scheme {
-    m3_u32 primary;
-    m3_u32 on_primary;
-    m3_u32 primary_container;
-    m3_u32 on_primary_container;
-    m3_u32 secondary;
-    m3_u32 on_secondary;
-    m3_u32 secondary_container;
-    m3_u32 on_secondary_container;
-    m3_u32 tertiary;
-    m3_u32 on_tertiary;
-    m3_u32 tertiary_container;
-    m3_u32 on_tertiary_container;
-    m3_u32 background;
-    m3_u32 on_background;
-    m3_u32 surface;
-    m3_u32 on_surface;
-    m3_u32 surface_variant;
-    m3_u32 on_surface_variant;
-    m3_u32 outline;
-    m3_u32 error;
-    m3_u32 on_error;
-    m3_u32 error_container;
-    m3_u32 on_error_container;
+  m3_u32 primary;
+  m3_u32 on_primary;
+  m3_u32 primary_container;
+  m3_u32 on_primary_container;
+  m3_u32 secondary;
+  m3_u32 on_secondary;
+  m3_u32 secondary_container;
+  m3_u32 on_secondary_container;
+  m3_u32 tertiary;
+  m3_u32 on_tertiary;
+  m3_u32 tertiary_container;
+  m3_u32 on_tertiary_container;
+  m3_u32 background;
+  m3_u32 on_background;
+  m3_u32 surface;
+  m3_u32 on_surface;
+  m3_u32 surface_variant;
+  m3_u32 on_surface_variant;
+  m3_u32 outline;
+  m3_u32 error;
+  m3_u32 on_error;
+  m3_u32 error_container;
+  m3_u32 on_error_container;
 } M3Scheme;
 
 /**
@@ -67,7 +67,8 @@ typedef struct M3Scheme {
  * @param out_argb Receives the packed ARGB color.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_color_argb_from_rgba(m3_u8 r, m3_u8 g, m3_u8 b, m3_u8 a, m3_u32 *out_argb);
+M3_API int M3_CALL m3_color_argb_from_rgba(m3_u8 r, m3_u8 g, m3_u8 b, m3_u8 a,
+                                           m3_u32 *out_argb);
 
 /**
  * @brief Decompose an ARGB color into RGBA components.
@@ -78,7 +79,9 @@ M3_API int M3_CALL m3_color_argb_from_rgba(m3_u8 r, m3_u8 g, m3_u8 b, m3_u8 a, m
  * @param out_a Receives the alpha channel.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_color_rgba_from_argb(m3_u32 argb, m3_u8 *out_r, m3_u8 *out_g, m3_u8 *out_b, m3_u8 *out_a);
+M3_API int M3_CALL m3_color_rgba_from_argb(m3_u32 argb, m3_u8 *out_r,
+                                           m3_u8 *out_g, m3_u8 *out_b,
+                                           m3_u8 *out_a);
 
 /**
  * @brief Convert an ARGB color to HCT.
@@ -103,7 +106,8 @@ M3_API int M3_CALL m3_hct_to_argb(const M3ColorHct *hct, m3_u32 *out_argb);
  * @param chroma Palette chroma (>= 0).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_tonal_palette_init(M3TonalPalette *palette, M3Scalar hue, M3Scalar chroma);
+M3_API int M3_CALL m3_tonal_palette_init(M3TonalPalette *palette, M3Scalar hue,
+                                         M3Scalar chroma);
 
 /**
  * @brief Retrieve an ARGB color from a palette at a tone.
@@ -112,7 +116,8 @@ M3_API int M3_CALL m3_tonal_palette_init(M3TonalPalette *palette, M3Scalar hue, 
  * @param out_argb Receives the packed ARGB color.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_tonal_palette_tone_argb(const M3TonalPalette *palette, M3Scalar tone, m3_u32 *out_argb);
+M3_API int M3_CALL m3_tonal_palette_tone_argb(const M3TonalPalette *palette,
+                                              M3Scalar tone, m3_u32 *out_argb);
 
 /**
  * @brief Generate a dynamic color scheme from a source color.
@@ -121,7 +126,8 @@ M3_API int M3_CALL m3_tonal_palette_tone_argb(const M3TonalPalette *palette, M3S
  * @param out_scheme Receives the generated scheme.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_scheme_generate(m3_u32 source_argb, M3Bool dark, M3Scheme *out_scheme);
+M3_API int M3_CALL m3_scheme_generate(m3_u32 source_argb, M3Bool dark,
+                                      M3Scheme *out_scheme);
 
 #ifdef M3_TESTING
 /**
@@ -164,14 +170,16 @@ M3_API int M3_CALL m3_color_test_set_lch_to_argb_fail_call(int call_index);
  * @param call_index 0 to disable or the 1-based call index to fail.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_color_test_set_tonal_palette_init_fail_call(int call_index);
+M3_API int M3_CALL
+m3_color_test_set_tonal_palette_init_fail_call(int call_index);
 
 /**
  * @brief Force tonal palette tone failures on a specific call index.
  * @param call_index 0 to disable or the 1-based call index to fail.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_color_test_set_tonal_palette_tone_fail_call(int call_index);
+M3_API int M3_CALL
+m3_color_test_set_tonal_palette_tone_fail_call(int call_index);
 
 /**
  * @brief Reset all color test failure injections.
@@ -187,7 +195,8 @@ M3_API int M3_CALL m3_color_test_reset_failures(void);
  * @param out_z Receives Z.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_color_test_argb_to_xyz(m3_u32 argb, M3Scalar *out_x, M3Scalar *out_y, M3Scalar *out_z);
+M3_API int M3_CALL m3_color_test_argb_to_xyz(m3_u32 argb, M3Scalar *out_x,
+                                             M3Scalar *out_y, M3Scalar *out_z);
 
 /**
  * @brief Test wrapper for XYZ-to-ARGB conversion.
@@ -198,7 +207,9 @@ M3_API int M3_CALL m3_color_test_argb_to_xyz(m3_u32 argb, M3Scalar *out_x, M3Sca
  * @param out_in_gamut Receives M3_TRUE if in gamut.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_color_test_xyz_to_argb(M3Scalar x, M3Scalar y, M3Scalar z, m3_u32 *out_argb, M3Bool *out_in_gamut);
+M3_API int M3_CALL m3_color_test_xyz_to_argb(M3Scalar x, M3Scalar y, M3Scalar z,
+                                             m3_u32 *out_argb,
+                                             M3Bool *out_in_gamut);
 
 /**
  * @brief Test wrapper for XYZ-to-Lab conversion.
@@ -210,7 +221,9 @@ M3_API int M3_CALL m3_color_test_xyz_to_argb(M3Scalar x, M3Scalar y, M3Scalar z,
  * @param out_b Receives b.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_color_test_xyz_to_lab(M3Scalar x, M3Scalar y, M3Scalar z, M3Scalar *out_l, M3Scalar *out_a, M3Scalar *out_b);
+M3_API int M3_CALL m3_color_test_xyz_to_lab(M3Scalar x, M3Scalar y, M3Scalar z,
+                                            M3Scalar *out_l, M3Scalar *out_a,
+                                            M3Scalar *out_b);
 
 /**
  * @brief Test wrapper for Lab-to-XYZ conversion.
@@ -222,7 +235,9 @@ M3_API int M3_CALL m3_color_test_xyz_to_lab(M3Scalar x, M3Scalar y, M3Scalar z, 
  * @param out_z Receives Z.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_color_test_lab_to_xyz(M3Scalar l, M3Scalar a, M3Scalar b, M3Scalar *out_x, M3Scalar *out_y, M3Scalar *out_z);
+M3_API int M3_CALL m3_color_test_lab_to_xyz(M3Scalar l, M3Scalar a, M3Scalar b,
+                                            M3Scalar *out_x, M3Scalar *out_y,
+                                            M3Scalar *out_z);
 
 /**
  * @brief Test wrapper for LCH-to-ARGB conversion.
@@ -233,7 +248,9 @@ M3_API int M3_CALL m3_color_test_lab_to_xyz(M3Scalar l, M3Scalar a, M3Scalar b, 
  * @param out_in_gamut Receives M3_TRUE if in gamut.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_color_test_lch_to_argb(M3Scalar hue, M3Scalar chroma, M3Scalar tone, m3_u32 *out_argb, M3Bool *out_in_gamut);
+M3_API int M3_CALL m3_color_test_lch_to_argb(M3Scalar hue, M3Scalar chroma,
+                                             M3Scalar tone, m3_u32 *out_argb,
+                                             M3Bool *out_in_gamut);
 #endif
 
 #ifdef __cplusplus

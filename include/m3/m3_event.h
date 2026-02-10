@@ -16,9 +16,9 @@ extern "C" {
  * @brief Event dispatcher state.
  */
 typedef struct M3EventDispatcher {
-    M3Bool initialized; /**< M3_TRUE when initialized. */
-    M3Widget *focused; /**< Focused widget (not owned). */
-    M3Bool focus_visible; /**< M3_TRUE when focus ring should be shown. */
+  M3Bool initialized;   /**< M3_TRUE when initialized. */
+  M3Widget *focused;    /**< Focused widget (not owned). */
+  M3Bool focus_visible; /**< M3_TRUE when focus ring should be shown. */
 } M3EventDispatcher;
 
 /**
@@ -41,7 +41,8 @@ M3_API int M3_CALL m3_event_dispatcher_shutdown(M3EventDispatcher *dispatcher);
  * @param out_widget Receives the focused widget (may be NULL).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_event_dispatcher_get_focus(const M3EventDispatcher *dispatcher, M3Widget **out_widget);
+M3_API int M3_CALL m3_event_dispatcher_get_focus(
+    const M3EventDispatcher *dispatcher, M3Widget **out_widget);
 
 /**
  * @brief Set the focused widget.
@@ -49,14 +50,16 @@ M3_API int M3_CALL m3_event_dispatcher_get_focus(const M3EventDispatcher *dispat
  * @param widget Widget to focus.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_event_dispatcher_set_focus(M3EventDispatcher *dispatcher, M3Widget *widget);
+M3_API int M3_CALL m3_event_dispatcher_set_focus(M3EventDispatcher *dispatcher,
+                                                 M3Widget *widget);
 
 /**
  * @brief Clear the focused widget.
  * @param dispatcher Dispatcher instance.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_event_dispatcher_clear_focus(M3EventDispatcher *dispatcher);
+M3_API int M3_CALL
+m3_event_dispatcher_clear_focus(M3EventDispatcher *dispatcher);
 
 /**
  * @brief Retrieve focus ring visibility.
@@ -64,7 +67,8 @@ M3_API int M3_CALL m3_event_dispatcher_clear_focus(M3EventDispatcher *dispatcher
  * @param out_visible Receives M3_TRUE when focus ring is visible.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_event_dispatcher_get_focus_visible(const M3EventDispatcher *dispatcher, M3Bool *out_visible);
+M3_API int M3_CALL m3_event_dispatcher_get_focus_visible(
+    const M3EventDispatcher *dispatcher, M3Bool *out_visible);
 
 /**
  * @brief Set focus ring visibility.
@@ -72,7 +76,8 @@ M3_API int M3_CALL m3_event_dispatcher_get_focus_visible(const M3EventDispatcher
  * @param visible M3_TRUE to show the focus ring.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_event_dispatcher_set_focus_visible(M3EventDispatcher *dispatcher, M3Bool visible);
+M3_API int M3_CALL m3_event_dispatcher_set_focus_visible(
+    M3EventDispatcher *dispatcher, M3Bool visible);
 
 /**
  * @brief Dispatch an input event to a widget tree.
@@ -83,8 +88,11 @@ M3_API int M3_CALL m3_event_dispatcher_set_focus_visible(M3EventDispatcher *disp
  * @param out_handled Receives M3_TRUE if the event was handled.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_event_dispatch(M3EventDispatcher *dispatcher, const M3RenderNode *root, const M3InputEvent *event,
-    M3Widget **out_target, M3Bool *out_handled);
+M3_API int M3_CALL m3_event_dispatch(M3EventDispatcher *dispatcher,
+                                     const M3RenderNode *root,
+                                     const M3InputEvent *event,
+                                     M3Widget **out_target,
+                                     M3Bool *out_handled);
 
 #ifdef M3_TESTING
 /**
@@ -100,7 +108,8 @@ M3_API int M3_CALL m3_event_test_validate_rect(const M3Rect *rect);
  * @param out_focusable Receives M3_TRUE when focusable.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_event_test_widget_focusable(const M3Widget *widget, M3Bool *out_focusable);
+M3_API int M3_CALL m3_event_test_widget_focusable(const M3Widget *widget,
+                                                  M3Bool *out_focusable);
 
 /**
  * @brief Test wrapper for hit testing.
@@ -110,7 +119,8 @@ M3_API int M3_CALL m3_event_test_widget_focusable(const M3Widget *widget, M3Bool
  * @param out_widget Receives the hit widget (may be NULL).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_event_test_hit_test(const M3RenderNode *node, M3Scalar x, M3Scalar y, M3Widget **out_widget);
+M3_API int M3_CALL m3_event_test_hit_test(const M3RenderNode *node, M3Scalar x,
+                                          M3Scalar y, M3Widget **out_widget);
 
 /**
  * @brief Test wrapper to dispatch directly to a widget.
@@ -119,7 +129,9 @@ M3_API int M3_CALL m3_event_test_hit_test(const M3RenderNode *node, M3Scalar x, 
  * @param out_handled Receives M3_TRUE when handled.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_event_test_dispatch_to_widget(M3Widget *widget, const M3InputEvent *event, M3Bool *out_handled);
+M3_API int M3_CALL m3_event_test_dispatch_to_widget(M3Widget *widget,
+                                                    const M3InputEvent *event,
+                                                    M3Bool *out_handled);
 
 /**
  * @brief Force hit-test to surface a containment error (tests only).

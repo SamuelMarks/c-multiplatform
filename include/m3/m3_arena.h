@@ -21,29 +21,32 @@ typedef struct M3ArenaBlock M3ArenaBlock;
  * @brief Arena allocator state.
  */
 typedef struct M3Arena {
-    M3Allocator allocator; /**< Allocator used for arena blocks. */
-    m3_usize block_size; /**< Default block size for new allocations. */
-    M3ArenaBlock *head; /**< First block in the arena. */
-    M3ArenaBlock *current; /**< Current block used for allocations. */
+  M3Allocator allocator; /**< Allocator used for arena blocks. */
+  m3_usize block_size;   /**< Default block size for new allocations. */
+  M3ArenaBlock *head;    /**< First block in the arena. */
+  M3ArenaBlock *current; /**< Current block used for allocations. */
 } M3Arena;
 
 /**
  * @brief Arena memory usage statistics.
  */
 typedef struct M3ArenaStats {
-    m3_usize block_count; /**< Number of blocks currently allocated. */
-    m3_usize total_capacity; /**< Total capacity across blocks in bytes. */
-    m3_usize total_used; /**< Total used bytes across blocks. */
+  m3_usize block_count;    /**< Number of blocks currently allocated. */
+  m3_usize total_capacity; /**< Total capacity across blocks in bytes. */
+  m3_usize total_used;     /**< Total used bytes across blocks. */
 } M3ArenaStats;
 
 /**
  * @brief Initialize an arena allocator.
  * @param arena Arena instance to initialize.
- * @param allocator Allocator used for arena blocks; NULL uses the default allocator.
- * @param block_size Default block size for allocations; 0 selects an internal default.
+ * @param allocator Allocator used for arena blocks; NULL uses the default
+ * allocator.
+ * @param block_size Default block size for allocations; 0 selects an internal
+ * default.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_arena_init(M3Arena *arena, const M3Allocator *allocator, m3_usize block_size);
+M3_API int M3_CALL m3_arena_init(M3Arena *arena, const M3Allocator *allocator,
+                                 m3_usize block_size);
 
 /**
  * @brief Reset the arena to reuse allocated blocks.
@@ -67,7 +70,8 @@ M3_API int M3_CALL m3_arena_shutdown(M3Arena *arena);
  * @param out_ptr Receives the aligned allocation pointer.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_arena_alloc(M3Arena *arena, m3_usize size, m3_usize alignment, void **out_ptr);
+M3_API int M3_CALL m3_arena_alloc(M3Arena *arena, m3_usize size,
+                                  m3_usize alignment, void **out_ptr);
 
 /**
  * @brief Retrieve arena usage statistics.
@@ -75,7 +79,8 @@ M3_API int M3_CALL m3_arena_alloc(M3Arena *arena, m3_usize size, m3_usize alignm
  * @param out_stats Receives current usage statistics.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_arena_get_stats(const M3Arena *arena, M3ArenaStats *out_stats);
+M3_API int M3_CALL m3_arena_get_stats(const M3Arena *arena,
+                                      M3ArenaStats *out_stats);
 
 #ifdef M3_TESTING
 /**

@@ -24,28 +24,28 @@ extern "C" {
  * @brief Ripple effect state.
  */
 typedef struct M3Ripple {
-    M3AnimController radius_anim; /**< Radius animation controller. */
-    M3AnimController opacity_anim; /**< Opacity animation controller. */
-    M3Scalar center_x; /**< Ripple center X in pixels. */
-    M3Scalar center_y; /**< Ripple center Y in pixels. */
-    M3Scalar max_radius; /**< Maximum ripple radius in pixels. */
-    M3Scalar radius; /**< Current ripple radius in pixels. */
-    M3Scalar opacity; /**< Opacity multiplier (0..1). */
-    M3Color color; /**< Base ripple color (alpha is multiplied by opacity). */
-    m3_u32 state; /**< Ripple state (M3_RIPPLE_STATE_*). */
+  M3AnimController radius_anim;  /**< Radius animation controller. */
+  M3AnimController opacity_anim; /**< Opacity animation controller. */
+  M3Scalar center_x;             /**< Ripple center X in pixels. */
+  M3Scalar center_y;             /**< Ripple center Y in pixels. */
+  M3Scalar max_radius;           /**< Maximum ripple radius in pixels. */
+  M3Scalar radius;               /**< Current ripple radius in pixels. */
+  M3Scalar opacity;              /**< Opacity multiplier (0..1). */
+  M3Color color; /**< Base ripple color (alpha is multiplied by opacity). */
+  m3_u32 state;  /**< Ripple state (M3_RIPPLE_STATE_*). */
 } M3Ripple;
 
 /**
  * @brief Drop shadow descriptor.
  */
 typedef struct M3Shadow {
-    M3Scalar offset_x; /**< Shadow X offset in pixels. */
-    M3Scalar offset_y; /**< Shadow Y offset in pixels. */
-    M3Scalar blur_radius; /**< Blur radius in pixels. */
-    M3Scalar spread; /**< Spread radius in pixels. */
-    M3Scalar corner_radius; /**< Corner radius in pixels. */
-    m3_u32 layers; /**< Number of shadow layers to draw (>= 1). */
-    M3Color color; /**< Base shadow color. */
+  M3Scalar offset_x;      /**< Shadow X offset in pixels. */
+  M3Scalar offset_y;      /**< Shadow Y offset in pixels. */
+  M3Scalar blur_radius;   /**< Blur radius in pixels. */
+  M3Scalar spread;        /**< Spread radius in pixels. */
+  M3Scalar corner_radius; /**< Corner radius in pixels. */
+  m3_u32 layers;          /**< Number of shadow layers to draw (>= 1). */
+  M3Color color;          /**< Base shadow color. */
 } M3Shadow;
 
 /**
@@ -65,8 +65,9 @@ M3_API int M3_CALL m3_ripple_init(M3Ripple *ripple);
  * @param color Base ripple color (RGBA in 0..1 range).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_ripple_start(M3Ripple *ripple, M3Scalar center_x, M3Scalar center_y, M3Scalar max_radius,
-    M3Scalar expand_duration, M3Color color);
+M3_API int M3_CALL m3_ripple_start(M3Ripple *ripple, M3Scalar center_x,
+                                   M3Scalar center_y, M3Scalar max_radius,
+                                   M3Scalar expand_duration, M3Color color);
 
 /**
  * @brief Release a ripple (begin fade-out).
@@ -83,7 +84,8 @@ M3_API int M3_CALL m3_ripple_release(M3Ripple *ripple, M3Scalar fade_duration);
  * @param out_finished Receives M3_TRUE when the ripple is finished.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_ripple_step(M3Ripple *ripple, M3Scalar dt, M3Bool *out_finished);
+M3_API int M3_CALL m3_ripple_step(M3Ripple *ripple, M3Scalar dt,
+                                  M3Bool *out_finished);
 
 /**
  * @brief Query whether a ripple is active.
@@ -91,7 +93,8 @@ M3_API int M3_CALL m3_ripple_step(M3Ripple *ripple, M3Scalar dt, M3Bool *out_fin
  * @param out_active Receives M3_TRUE when active.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_ripple_is_active(const M3Ripple *ripple, M3Bool *out_active);
+M3_API int M3_CALL m3_ripple_is_active(const M3Ripple *ripple,
+                                       M3Bool *out_active);
 
 /**
  * @brief Compute the maximum ripple radius required to cover a rectangle.
@@ -101,8 +104,10 @@ M3_API int M3_CALL m3_ripple_is_active(const M3Ripple *ripple, M3Bool *out_activ
  * @param out_radius Receives the maximum radius.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_ripple_compute_max_radius(const M3Rect *bounds, M3Scalar center_x, M3Scalar center_y,
-    M3Scalar *out_radius);
+M3_API int M3_CALL m3_ripple_compute_max_radius(const M3Rect *bounds,
+                                                M3Scalar center_x,
+                                                M3Scalar center_y,
+                                                M3Scalar *out_radius);
 
 /**
  * @brief Paint a ripple using a graphics backend.
@@ -112,7 +117,8 @@ M3_API int M3_CALL m3_ripple_compute_max_radius(const M3Rect *bounds, M3Scalar c
  * @param corner_radius Corner radius for the ripple shape (>= 0).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_ripple_paint(const M3Ripple *ripple, M3Gfx *gfx, const M3Rect *clip, M3Scalar corner_radius);
+M3_API int M3_CALL m3_ripple_paint(const M3Ripple *ripple, M3Gfx *gfx,
+                                   const M3Rect *clip, M3Scalar corner_radius);
 
 /**
  * @brief Initialize a shadow descriptor.
@@ -133,8 +139,10 @@ M3_API int M3_CALL m3_shadow_init(M3Shadow *shadow);
  * @param color Base shadow color (RGBA in 0..1 range).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_shadow_set(M3Shadow *shadow, M3Scalar offset_x, M3Scalar offset_y, M3Scalar blur_radius,
-    M3Scalar spread, M3Scalar corner_radius, m3_u32 layers, M3Color color);
+M3_API int M3_CALL m3_shadow_set(M3Shadow *shadow, M3Scalar offset_x,
+                                 M3Scalar offset_y, M3Scalar blur_radius,
+                                 M3Scalar spread, M3Scalar corner_radius,
+                                 m3_u32 layers, M3Color color);
 
 /**
  * @brief Paint a shadow for a rectangle.
@@ -144,7 +152,8 @@ M3_API int M3_CALL m3_shadow_set(M3Shadow *shadow, M3Scalar offset_x, M3Scalar o
  * @param clip Optional clip rectangle (NULL to skip clipping).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_shadow_paint(const M3Shadow *shadow, M3Gfx *gfx, const M3Rect *rect, const M3Rect *clip);
+M3_API int M3_CALL m3_shadow_paint(const M3Shadow *shadow, M3Gfx *gfx,
+                                   const M3Rect *rect, const M3Rect *clip);
 
 #ifdef M3_TESTING
 /**

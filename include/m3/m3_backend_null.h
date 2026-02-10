@@ -22,11 +22,12 @@ typedef struct M3NullBackend M3NullBackend;
  * @brief Configuration for the null backend.
  */
 typedef struct M3NullBackendConfig {
-    const M3Allocator *allocator; /**< Allocator for backend memory (NULL uses default). */
-    m3_usize handle_capacity; /**< Maximum number of handles to manage. */
-    m3_usize clipboard_limit; /**< Maximum clipboard byte length accepted. */
-    M3Bool enable_logging; /**< Enable logging via m3_log_write. */
-    M3Bool inline_tasks; /**< Execute posted tasks inline when M3_TRUE. */
+  const M3Allocator
+      *allocator; /**< Allocator for backend memory (NULL uses default). */
+  m3_usize handle_capacity; /**< Maximum number of handles to manage. */
+  m3_usize clipboard_limit; /**< Maximum clipboard byte length accepted. */
+  M3Bool enable_logging;    /**< Enable logging via m3_log_write. */
+  M3Bool inline_tasks;      /**< Execute posted tasks inline when M3_TRUE. */
 } M3NullBackendConfig;
 
 /**
@@ -42,7 +43,8 @@ M3_API int M3_CALL m3_null_backend_config_init(M3NullBackendConfig *config);
  * @param out_backend Receives the created backend instance.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_null_backend_create(const M3NullBackendConfig *config, M3NullBackend **out_backend);
+M3_API int M3_CALL m3_null_backend_create(const M3NullBackendConfig *config,
+                                          M3NullBackend **out_backend);
 
 /**
  * @brief Destroy a null backend instance.
@@ -65,7 +67,8 @@ M3_API int M3_CALL m3_null_backend_get_ws(M3NullBackend *backend, M3WS *out_ws);
  * @param out_gfx Receives the graphics interface.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_null_backend_get_gfx(M3NullBackend *backend, M3Gfx *out_gfx);
+M3_API int M3_CALL m3_null_backend_get_gfx(M3NullBackend *backend,
+                                           M3Gfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -73,7 +76,8 @@ M3_API int M3_CALL m3_null_backend_get_gfx(M3NullBackend *backend, M3Gfx *out_gf
  * @param out_env Receives the environment interface.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_null_backend_get_env(M3NullBackend *backend, M3Env *out_env);
+M3_API int M3_CALL m3_null_backend_get_env(M3NullBackend *backend,
+                                           M3Env *out_env);
 
 #ifdef M3_TESTING
 /**
@@ -82,7 +86,8 @@ M3_API int M3_CALL m3_null_backend_get_env(M3NullBackend *backend, M3Env *out_en
  * @param initialized M3_TRUE to mark initialized, M3_FALSE otherwise.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_null_backend_test_set_initialized(M3NullBackend *backend, M3Bool initialized);
+M3_API int M3_CALL m3_null_backend_test_set_initialized(M3NullBackend *backend,
+                                                        M3Bool initialized);
 
 /**
  * @brief Test wrapper for null backend object retain.
@@ -104,7 +109,8 @@ M3_API int M3_CALL m3_null_backend_test_object_release(M3ObjectHeader *obj);
  * @param out_type_id Receives the type identifier.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_null_backend_test_object_get_type_id(M3ObjectHeader *obj, m3_u32 *out_type_id);
+M3_API int M3_CALL m3_null_backend_test_object_get_type_id(M3ObjectHeader *obj,
+                                                           m3_u32 *out_type_id);
 #endif
 
 #ifdef __cplusplus

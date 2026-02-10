@@ -32,36 +32,36 @@ extern "C" {
  * @brief Timing animation descriptor.
  */
 typedef struct M3AnimTiming {
-    M3Scalar from; /**< Start value. */
-    M3Scalar to; /**< End value. */
-    M3Scalar duration; /**< Duration in seconds. */
-    M3Scalar elapsed; /**< Elapsed time in seconds. */
-    m3_u32 easing; /**< Easing mode (M3_ANIM_EASE_*). */
+  M3Scalar from;     /**< Start value. */
+  M3Scalar to;       /**< End value. */
+  M3Scalar duration; /**< Duration in seconds. */
+  M3Scalar elapsed;  /**< Elapsed time in seconds. */
+  m3_u32 easing;     /**< Easing mode (M3_ANIM_EASE_*). */
 } M3AnimTiming;
 
 /**
  * @brief Spring simulation descriptor.
  */
 typedef struct M3Spring {
-    M3Scalar position; /**< Current position. */
-    M3Scalar velocity; /**< Current velocity. */
-    M3Scalar target; /**< Target position. */
-    M3Scalar stiffness; /**< Spring stiffness. */
-    M3Scalar damping; /**< Damping coefficient. */
-    M3Scalar mass; /**< Mass. */
-    M3Scalar tolerance; /**< Position tolerance for rest. */
-    M3Scalar rest_velocity; /**< Velocity tolerance for rest. */
+  M3Scalar position;      /**< Current position. */
+  M3Scalar velocity;      /**< Current velocity. */
+  M3Scalar target;        /**< Target position. */
+  M3Scalar stiffness;     /**< Spring stiffness. */
+  M3Scalar damping;       /**< Damping coefficient. */
+  M3Scalar mass;          /**< Mass. */
+  M3Scalar tolerance;     /**< Position tolerance for rest. */
+  M3Scalar rest_velocity; /**< Velocity tolerance for rest. */
 } M3Spring;
 
 /**
  * @brief Animation controller for timing or spring modes.
  */
 typedef struct M3AnimController {
-    m3_u32 mode; /**< Active mode (M3_ANIM_MODE_*). */
-    M3Bool running; /**< M3_TRUE when the animation is running. */
-    M3Scalar value; /**< Current value. */
-    M3AnimTiming timing; /**< Timing state. */
-    M3Spring spring; /**< Spring state. */
+  m3_u32 mode;         /**< Active mode (M3_ANIM_MODE_*). */
+  M3Bool running;      /**< M3_TRUE when the animation is running. */
+  M3Scalar value;      /**< Current value. */
+  M3AnimTiming timing; /**< Timing state. */
+  M3Spring spring;     /**< Spring state. */
 } M3AnimController;
 
 /**
@@ -73,7 +73,9 @@ typedef struct M3AnimController {
  * @param easing Easing mode (M3_ANIM_EASE_*).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_anim_timing_init(M3AnimTiming *timing, M3Scalar from, M3Scalar to, M3Scalar duration, m3_u32 easing);
+M3_API int M3_CALL m3_anim_timing_init(M3AnimTiming *timing, M3Scalar from,
+                                       M3Scalar to, M3Scalar duration,
+                                       m3_u32 easing);
 
 /**
  * @brief Step a timing animation.
@@ -83,7 +85,9 @@ M3_API int M3_CALL m3_anim_timing_init(M3AnimTiming *timing, M3Scalar from, M3Sc
  * @param out_finished Receives M3_TRUE when finished.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_anim_timing_step(M3AnimTiming *timing, M3Scalar dt, M3Scalar *out_value, M3Bool *out_finished);
+M3_API int M3_CALL m3_anim_timing_step(M3AnimTiming *timing, M3Scalar dt,
+                                       M3Scalar *out_value,
+                                       M3Bool *out_finished);
 
 /**
  * @brief Initialize a spring simulation.
@@ -95,7 +99,9 @@ M3_API int M3_CALL m3_anim_timing_step(M3AnimTiming *timing, M3Scalar dt, M3Scal
  * @param mass Mass (> 0).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_spring_init(M3Spring *spring, M3Scalar position, M3Scalar target, M3Scalar stiffness, M3Scalar damping, M3Scalar mass);
+M3_API int M3_CALL m3_spring_init(M3Spring *spring, M3Scalar position,
+                                  M3Scalar target, M3Scalar stiffness,
+                                  M3Scalar damping, M3Scalar mass);
 
 /**
  * @brief Set a spring target.
@@ -112,7 +118,8 @@ M3_API int M3_CALL m3_spring_set_target(M3Spring *spring, M3Scalar target);
  * @param rest_velocity Velocity tolerance (>= 0).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_spring_set_tolerance(M3Spring *spring, M3Scalar tolerance, M3Scalar rest_velocity);
+M3_API int M3_CALL m3_spring_set_tolerance(M3Spring *spring, M3Scalar tolerance,
+                                           M3Scalar rest_velocity);
 
 /**
  * @brief Step a spring simulation.
@@ -121,7 +128,8 @@ M3_API int M3_CALL m3_spring_set_tolerance(M3Spring *spring, M3Scalar tolerance,
  * @param out_finished Receives M3_TRUE when the spring is at rest.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_spring_step(M3Spring *spring, M3Scalar dt, M3Bool *out_finished);
+M3_API int M3_CALL m3_spring_step(M3Spring *spring, M3Scalar dt,
+                                  M3Bool *out_finished);
 
 /**
  * @brief Initialize an animation controller.
@@ -139,7 +147,10 @@ M3_API int M3_CALL m3_anim_controller_init(M3AnimController *controller);
  * @param easing Easing mode (M3_ANIM_EASE_*).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_anim_controller_start_timing(M3AnimController *controller, M3Scalar from, M3Scalar to, M3Scalar duration, m3_u32 easing);
+M3_API int M3_CALL m3_anim_controller_start_timing(M3AnimController *controller,
+                                                   M3Scalar from, M3Scalar to,
+                                                   M3Scalar duration,
+                                                   m3_u32 easing);
 
 /**
  * @brief Start a spring animation on the controller.
@@ -151,7 +162,9 @@ M3_API int M3_CALL m3_anim_controller_start_timing(M3AnimController *controller,
  * @param mass Mass (> 0).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_anim_controller_start_spring(M3AnimController *controller, M3Scalar position, M3Scalar target, M3Scalar stiffness, M3Scalar damping, M3Scalar mass);
+M3_API int M3_CALL m3_anim_controller_start_spring(
+    M3AnimController *controller, M3Scalar position, M3Scalar target,
+    M3Scalar stiffness, M3Scalar damping, M3Scalar mass);
 
 /**
  * @brief Update the spring target for the controller.
@@ -159,7 +172,8 @@ M3_API int M3_CALL m3_anim_controller_start_spring(M3AnimController *controller,
  * @param target New target value.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_anim_controller_set_spring_target(M3AnimController *controller, M3Scalar target);
+M3_API int M3_CALL m3_anim_controller_set_spring_target(
+    M3AnimController *controller, M3Scalar target);
 
 /**
  * @brief Step the controller.
@@ -169,7 +183,9 @@ M3_API int M3_CALL m3_anim_controller_set_spring_target(M3AnimController *contro
  * @param out_finished Receives M3_TRUE when finished.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_anim_controller_step(M3AnimController *controller, M3Scalar dt, M3Scalar *out_value, M3Bool *out_finished);
+M3_API int M3_CALL m3_anim_controller_step(M3AnimController *controller,
+                                           M3Scalar dt, M3Scalar *out_value,
+                                           M3Bool *out_finished);
 
 /**
  * @brief Retrieve the current controller value.
@@ -177,7 +193,8 @@ M3_API int M3_CALL m3_anim_controller_step(M3AnimController *controller, M3Scala
  * @param out_value Receives the current value.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_anim_controller_get_value(const M3AnimController *controller, M3Scalar *out_value);
+M3_API int M3_CALL m3_anim_controller_get_value(
+    const M3AnimController *controller, M3Scalar *out_value);
 
 /**
  * @brief Query whether the controller is running.
@@ -185,7 +202,8 @@ M3_API int M3_CALL m3_anim_controller_get_value(const M3AnimController *controll
  * @param out_running Receives M3_TRUE when running.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_anim_controller_is_running(const M3AnimController *controller, M3Bool *out_running);
+M3_API int M3_CALL m3_anim_controller_is_running(
+    const M3AnimController *controller, M3Bool *out_running);
 
 /**
  * @brief Stop the controller.
@@ -202,7 +220,8 @@ M3_API int M3_CALL m3_anim_controller_stop(M3AnimController *controller);
  * @param out_value Receives the eased value.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_anim_test_apply_ease(m3_u32 easing, M3Scalar t, M3Scalar *out_value);
+M3_API int M3_CALL m3_anim_test_apply_ease(m3_u32 easing, M3Scalar t,
+                                           M3Scalar *out_value);
 #endif
 
 #ifdef __cplusplus

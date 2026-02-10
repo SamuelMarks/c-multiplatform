@@ -22,7 +22,12 @@ extern "C" {
 /** @brief Measurement constraint: maximum size. */
 #define M3_LAYOUT_MEASURE_AT_MOST 2
 
-/** @brief Layout direction: left-to-right row. */
+/** @brief Flow direction: left-to-right. */
+#define M3_DIRECTION_LTR 0
+/** @brief Flow direction: right-to-left. */
+#define M3_DIRECTION_RTL 1
+
+/** @brief Layout direction: horizontal row. */
 #define M3_LAYOUT_DIRECTION_ROW 0
 /** @brief Layout direction: top-to-bottom column. */
 #define M3_LAYOUT_DIRECTION_COLUMN 1
@@ -51,31 +56,39 @@ extern "C" {
  * @brief Measurement constraint descriptor.
  */
 typedef struct M3LayoutMeasureSpec {
-    m3_u32 mode; /**< Measurement mode (M3_LAYOUT_MEASURE_*). */
-    M3Scalar size; /**< Size constraint in pixels. */
+  m3_u32 mode;   /**< Measurement mode (M3_LAYOUT_MEASURE_*). */
+  M3Scalar size; /**< Size constraint in pixels. */
 } M3LayoutMeasureSpec;
 
 /**
  * @brief Edge sizes used for padding.
  */
 typedef struct M3LayoutEdges {
-    M3Scalar left; /**< Left edge. */
-    M3Scalar top; /**< Top edge. */
-    M3Scalar right; /**< Right edge. */
-    M3Scalar bottom; /**< Bottom edge. */
+  M3Scalar left;   /**< Left edge. */
+  M3Scalar top;    /**< Top edge. */
+  M3Scalar right;  /**< Right edge. */
+  M3Scalar bottom; /**< Bottom edge. */
 } M3LayoutEdges;
+
+/**
+ * @brief Direction context for resolving logical start/end edges.
+ */
+typedef struct M3LayoutDirection {
+  m3_u32 flow; /**< Flow direction (M3_DIRECTION_*). */
+} M3LayoutDirection;
 
 /**
  * @brief Layout style attributes.
  */
 typedef struct M3LayoutStyle {
-    m3_u32 direction; /**< Layout direction (M3_LAYOUT_DIRECTION_*). */
-    m3_u32 wrap; /**< Wrap mode (M3_LAYOUT_WRAP_*). */
-    m3_u32 align_main; /**< Main-axis alignment (M3_LAYOUT_ALIGN_*). */
-    m3_u32 align_cross; /**< Cross-axis alignment (M3_LAYOUT_ALIGN_*). */
-    M3LayoutEdges padding; /**< Padding around children. */
-    M3Scalar width; /**< Explicit width or M3_LAYOUT_AUTO. */
-    M3Scalar height; /**< Explicit height or M3_LAYOUT_AUTO. */
+  m3_u32 direction;      /**< Layout direction (M3_LAYOUT_DIRECTION_*). */
+  m3_u32 wrap;           /**< Wrap mode (M3_LAYOUT_WRAP_*). */
+  m3_u32 align_main;     /**< Main-axis alignment (M3_LAYOUT_ALIGN_*). */
+  m3_u32 align_cross;    /**< Cross-axis alignment (M3_LAYOUT_ALIGN_*). */
+  M3LayoutEdges padding; /**< Padding around children (left/right map to
+                               start/end based on layout direction). */
+  M3Scalar width;        /**< Explicit width or M3_LAYOUT_AUTO. */
+  M3Scalar height;       /**< Explicit height or M3_LAYOUT_AUTO. */
 } M3LayoutStyle;
 
 /**
@@ -86,19 +99,21 @@ typedef struct M3LayoutStyle {
  * @param out_size Receives the measured size.
  * @return M3_OK on success or a failure code.
  */
-typedef int (M3_CALL *M3LayoutMeasureFn)(void *ctx, M3LayoutMeasureSpec width, M3LayoutMeasureSpec height, M3Size *out_size);
+typedef int(M3_CALL *M3LayoutMeasureFn)(void *ctx, M3LayoutMeasureSpec width,
+                                        M3LayoutMeasureSpec height,
+                                        M3Size *out_size);
 
 /**
  * @brief Layout node definition.
  */
 typedef struct M3LayoutNode {
-    M3LayoutStyle style; /**< Style attributes. */
-    struct M3LayoutNode **children; /**< Child node list. */
-    m3_usize child_count; /**< Number of child nodes. */
-    M3LayoutMeasureFn measure; /**< Measure callback for leaf nodes. */
-    void *measure_ctx; /**< Measure callback context. */
-    M3Size measured; /**< Measured size before layout. */
-    M3Rect layout; /**< Final layout rectangle. */
+  M3LayoutStyle style;            /**< Style attributes. */
+  struct M3LayoutNode **children; /**< Child node list. */
+  m3_usize child_count;           /**< Number of child nodes. */
+  M3LayoutMeasureFn measure;      /**< Measure callback for leaf nodes. */
+  void *measure_ctx;              /**< Measure callback context. */
+  M3Size measured;                /**< Measured size before layout. */
+  M3Rect layout;                  /**< Final layout rectangle. */
 } M3LayoutNode;
 
 /**
@@ -108,7 +123,8 @@ typedef struct M3LayoutNode {
  * @param size Size constraint.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_measure_spec_init(M3LayoutMeasureSpec *spec, m3_u32 mode, M3Scalar size);
+M3_API int M3_CALL m3_layout_measure_spec_init(M3LayoutMeasureSpec *spec,
+                                               m3_u32 mode, M3Scalar size);
 
 /**
  * @brief Initialize padding edges.
@@ -119,7 +135,18 @@ M3_API int M3_CALL m3_layout_measure_spec_init(M3LayoutMeasureSpec *spec, m3_u32
  * @param bottom Bottom padding.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_edges_set(M3LayoutEdges *edges, M3Scalar left, M3Scalar top, M3Scalar right, M3Scalar bottom);
+M3_API int M3_CALL m3_layout_edges_set(M3LayoutEdges *edges, M3Scalar left,
+                                       M3Scalar top, M3Scalar right,
+                                       M3Scalar bottom);
+
+/**
+ * @brief Initialize a layout direction context.
+ * @param direction Direction context to initialize.
+ * @param flow Flow direction (M3_DIRECTION_*).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_direction_init(M3LayoutDirection *direction,
+                                            m3_u32 flow);
 
 /**
  * @brief Initialize a layout style with defaults.
@@ -134,7 +161,8 @@ M3_API int M3_CALL m3_layout_style_init(M3LayoutStyle *style);
  * @param style Style to copy; NULL uses default style.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_node_init(M3LayoutNode *node, const M3LayoutStyle *style);
+M3_API int M3_CALL m3_layout_node_init(M3LayoutNode *node,
+                                       const M3LayoutStyle *style);
 
 /**
  * @brief Assign children to a node.
@@ -143,7 +171,9 @@ M3_API int M3_CALL m3_layout_node_init(M3LayoutNode *node, const M3LayoutStyle *
  * @param count Number of children.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_node_set_children(M3LayoutNode *node, M3LayoutNode **children, m3_usize count);
+M3_API int M3_CALL m3_layout_node_set_children(M3LayoutNode *node,
+                                               M3LayoutNode **children,
+                                               m3_usize count);
 
 /**
  * @brief Assign a measure callback to a node.
@@ -152,7 +182,9 @@ M3_API int M3_CALL m3_layout_node_set_children(M3LayoutNode *node, M3LayoutNode 
  * @param ctx Measure callback context.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_node_set_measure(M3LayoutNode *node, M3LayoutMeasureFn measure, void *ctx);
+M3_API int M3_CALL m3_layout_node_set_measure(M3LayoutNode *node,
+                                              M3LayoutMeasureFn measure,
+                                              void *ctx);
 
 /**
  * @brief Retrieve a node's measured size.
@@ -160,7 +192,8 @@ M3_API int M3_CALL m3_layout_node_set_measure(M3LayoutNode *node, M3LayoutMeasur
  * @param out_size Receives the measured size.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_node_get_measured(const M3LayoutNode *node, M3Size *out_size);
+M3_API int M3_CALL m3_layout_node_get_measured(const M3LayoutNode *node,
+                                               M3Size *out_size);
 
 /**
  * @brief Retrieve a node's final layout rectangle.
@@ -168,16 +201,21 @@ M3_API int M3_CALL m3_layout_node_get_measured(const M3LayoutNode *node, M3Size 
  * @param out_rect Receives the layout rectangle.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_node_get_layout(const M3LayoutNode *node, M3Rect *out_rect);
+M3_API int M3_CALL m3_layout_node_get_layout(const M3LayoutNode *node,
+                                             M3Rect *out_rect);
 
 /**
  * @brief Compute layout for a node tree.
  * @param root Root node.
+ * @param direction Layout direction context (M3_DIRECTION_*).
  * @param width Width constraint.
  * @param height Height constraint.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_compute(M3LayoutNode *root, M3LayoutMeasureSpec width, M3LayoutMeasureSpec height);
+M3_API int M3_CALL m3_layout_compute(M3LayoutNode *root,
+                                     const M3LayoutDirection *direction,
+                                     M3LayoutMeasureSpec width,
+                                     M3LayoutMeasureSpec height);
 
 #ifdef M3_TESTING
 /**
@@ -185,7 +223,48 @@ M3_API int M3_CALL m3_layout_compute(M3LayoutNode *root, M3LayoutMeasureSpec wid
  * @param spec Measure spec to validate.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_test_validate_measure_spec(const M3LayoutMeasureSpec *spec);
+M3_API int M3_CALL
+m3_layout_test_validate_measure_spec(const M3LayoutMeasureSpec *spec);
+
+/**
+ * @brief Test wrapper for validating direction context.
+ * @param direction Direction context to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL
+m3_layout_test_validate_direction(const M3LayoutDirection *direction);
+
+/**
+ * @brief Test wrapper for clamping values to non-negative range.
+ * @param value Input value.
+ * @param out_value Receives the clamped value.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_test_clamp_non_negative(M3Scalar value,
+                                                     M3Scalar *out_value);
+
+/**
+ * @brief Test wrapper for resolving available size.
+ * @param style_size Style-provided size (or M3_LAYOUT_AUTO).
+ * @param spec Measure spec.
+ * @param out_available Receives the resolved available size.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_test_resolve_available(M3Scalar style_size,
+                                                    M3LayoutMeasureSpec spec,
+                                                    M3Scalar *out_available);
+
+/**
+ * @brief Test wrapper for resolving horizontal padding.
+ * @param direction Direction context.
+ * @param padding Padding edges.
+ * @param out_left Receives resolved left padding.
+ * @param out_right Receives resolved right padding.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_test_resolve_horizontal_padding(
+    const M3LayoutDirection *direction, const M3LayoutEdges *padding,
+    M3Scalar *out_left, M3Scalar *out_right);
 
 /**
  * @brief Test wrapper for validating styles.
@@ -201,7 +280,9 @@ M3_API int M3_CALL m3_layout_test_validate_style(const M3LayoutStyle *style);
  * @param out_size Receives the clamped size.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_test_apply_spec(M3Scalar size, M3LayoutMeasureSpec spec, M3Scalar *out_size);
+M3_API int M3_CALL m3_layout_test_apply_spec(M3Scalar size,
+                                             M3LayoutMeasureSpec spec,
+                                             M3Scalar *out_size);
 
 /**
  * @brief Test wrapper for measuring leaf nodes.
@@ -211,7 +292,10 @@ M3_API int M3_CALL m3_layout_test_apply_spec(M3Scalar size, M3LayoutMeasureSpec 
  * @param out_size Receives the measured size.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_test_measure_leaf(M3LayoutNode *node, M3LayoutMeasureSpec width, M3LayoutMeasureSpec height, M3Size *out_size);
+M3_API int M3_CALL m3_layout_test_measure_leaf(M3LayoutNode *node,
+                                               M3LayoutMeasureSpec width,
+                                               M3LayoutMeasureSpec height,
+                                               M3Size *out_size);
 
 /**
  * @brief Test wrapper for measuring row containers.
@@ -221,7 +305,10 @@ M3_API int M3_CALL m3_layout_test_measure_leaf(M3LayoutNode *node, M3LayoutMeasu
  * @param out_size Receives the measured size.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_test_measure_row(M3LayoutNode *node, M3LayoutMeasureSpec width, M3LayoutMeasureSpec height, M3Size *out_size);
+M3_API int M3_CALL m3_layout_test_measure_row(M3LayoutNode *node,
+                                              M3LayoutMeasureSpec width,
+                                              M3LayoutMeasureSpec height,
+                                              M3Size *out_size);
 
 /**
  * @brief Test wrapper for measuring column containers.
@@ -231,7 +318,36 @@ M3_API int M3_CALL m3_layout_test_measure_row(M3LayoutNode *node, M3LayoutMeasur
  * @param out_size Receives the measured size.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_test_measure_column(M3LayoutNode *node, M3LayoutMeasureSpec width, M3LayoutMeasureSpec height, M3Size *out_size);
+M3_API int M3_CALL m3_layout_test_measure_column(M3LayoutNode *node,
+                                                 M3LayoutMeasureSpec width,
+                                                 M3LayoutMeasureSpec height,
+                                                 M3Size *out_size);
+
+/**
+ * @brief Test wrapper for measuring row containers with a custom direction.
+ * @param node Node to measure.
+ * @param direction Direction context.
+ * @param width Width constraint.
+ * @param height Height constraint.
+ * @param out_size Receives the measured size.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_test_measure_row_with_direction(
+    M3LayoutNode *node, const M3LayoutDirection *direction,
+    M3LayoutMeasureSpec width, M3LayoutMeasureSpec height, M3Size *out_size);
+
+/**
+ * @brief Test wrapper for measuring column containers with a custom direction.
+ * @param node Node to measure.
+ * @param direction Direction context.
+ * @param width Width constraint.
+ * @param height Height constraint.
+ * @param out_size Receives the measured size.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_test_measure_column_with_direction(
+    M3LayoutNode *node, const M3LayoutDirection *direction,
+    M3LayoutMeasureSpec width, M3LayoutMeasureSpec height, M3Size *out_size);
 
 /**
  * @brief Test wrapper for measuring nodes.
@@ -240,7 +356,9 @@ M3_API int M3_CALL m3_layout_test_measure_column(M3LayoutNode *node, M3LayoutMea
  * @param height Height constraint.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_test_measure_node(M3LayoutNode *node, M3LayoutMeasureSpec width, M3LayoutMeasureSpec height);
+M3_API int M3_CALL m3_layout_test_measure_node(M3LayoutNode *node,
+                                               M3LayoutMeasureSpec width,
+                                               M3LayoutMeasureSpec height);
 
 /**
  * @brief Test wrapper for laying out nodes.
@@ -251,7 +369,9 @@ M3_API int M3_CALL m3_layout_test_measure_node(M3LayoutNode *node, M3LayoutMeasu
  * @param height Assigned height.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_test_layout_node(M3LayoutNode *node, M3Scalar x, M3Scalar y, M3Scalar width, M3Scalar height);
+M3_API int M3_CALL m3_layout_test_layout_node(M3LayoutNode *node, M3Scalar x,
+                                              M3Scalar y, M3Scalar width,
+                                              M3Scalar height);
 
 /**
  * @brief Test wrapper for laying out row children.
@@ -262,7 +382,10 @@ M3_API int M3_CALL m3_layout_test_layout_node(M3LayoutNode *node, M3Scalar x, M3
  * @param height Assigned height.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_test_layout_children_row(M3LayoutNode *node, M3Scalar x, M3Scalar y, M3Scalar width, M3Scalar height);
+M3_API int M3_CALL m3_layout_test_layout_children_row(M3LayoutNode *node,
+                                                      M3Scalar x, M3Scalar y,
+                                                      M3Scalar width,
+                                                      M3Scalar height);
 
 /**
  * @brief Test wrapper for laying out column children.
@@ -273,7 +396,64 @@ M3_API int M3_CALL m3_layout_test_layout_children_row(M3LayoutNode *node, M3Scal
  * @param height Assigned height.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_layout_test_layout_children_column(M3LayoutNode *node, M3Scalar x, M3Scalar y, M3Scalar width, M3Scalar height);
+M3_API int M3_CALL m3_layout_test_layout_children_column(M3LayoutNode *node,
+                                                         M3Scalar x, M3Scalar y,
+                                                         M3Scalar width,
+                                                         M3Scalar height);
+
+/**
+ * @brief Test wrapper for measuring nodes with a custom direction context.
+ * @param node Node to measure.
+ * @param direction Direction context.
+ * @param width Width constraint.
+ * @param height Height constraint.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_test_measure_node_with_direction(
+    M3LayoutNode *node, const M3LayoutDirection *direction,
+    M3LayoutMeasureSpec width, M3LayoutMeasureSpec height);
+
+/**
+ * @brief Test wrapper for laying out nodes with a custom direction context.
+ * @param node Node to layout.
+ * @param direction Direction context.
+ * @param x Origin X.
+ * @param y Origin Y.
+ * @param width Assigned width.
+ * @param height Assigned height.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_test_layout_node_with_direction(
+    M3LayoutNode *node, const M3LayoutDirection *direction, M3Scalar x,
+    M3Scalar y, M3Scalar width, M3Scalar height);
+
+/**
+ * @brief Test wrapper for laying out row children with a custom direction.
+ * @param node Node to layout.
+ * @param direction Direction context.
+ * @param x Origin X.
+ * @param y Origin Y.
+ * @param width Assigned width.
+ * @param height Assigned height.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_test_layout_children_row_with_direction(
+    M3LayoutNode *node, const M3LayoutDirection *direction, M3Scalar x,
+    M3Scalar y, M3Scalar width, M3Scalar height);
+
+/**
+ * @brief Test wrapper for laying out column children with a custom direction.
+ * @param node Node to layout.
+ * @param direction Direction context.
+ * @param x Origin X.
+ * @param y Origin Y.
+ * @param width Assigned width.
+ * @param height Assigned height.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_test_layout_children_column_with_direction(
+    M3LayoutNode *node, const M3LayoutDirection *direction, M3Scalar x,
+    M3Scalar y, M3Scalar width, M3Scalar height);
 
 /**
  * @brief Test hook to force style init failure.
@@ -281,6 +461,13 @@ M3_API int M3_CALL m3_layout_test_layout_children_column(M3LayoutNode *node, M3S
  * @return M3_OK on success or a failure code.
  */
 M3_API int M3_CALL m3_layout_test_set_style_init_fail(M3Bool enable);
+
+/**
+ * @brief Test hook to force direction validation failure.
+ * @param enable Whether to force failure.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_test_set_direction_fail(M3Bool enable);
 #endif
 
 #ifdef __cplusplus

@@ -22,17 +22,20 @@ typedef struct M3GTK4Backend M3GTK4Backend;
  * @brief Configuration for the GTK4 backend.
  */
 typedef struct M3GTK4BackendConfig {
-    const M3Allocator *allocator; /**< Allocator for backend memory (NULL uses default). */
-    m3_usize handle_capacity; /**< Maximum number of handles to manage. */
-    m3_usize clipboard_limit; /**< Maximum clipboard byte length accepted. */
-    M3Bool enable_logging; /**< Enable logging via m3_log_write. */
-    M3Bool inline_tasks; /**< Execute posted tasks inline when M3_TRUE. */
-    M3Bool enable_gdk_texture; /**< Enable GdkTexture path for GSK texture draws. */
+  const M3Allocator
+      *allocator; /**< Allocator for backend memory (NULL uses default). */
+  m3_usize handle_capacity; /**< Maximum number of handles to manage. */
+  m3_usize clipboard_limit; /**< Maximum clipboard byte length accepted. */
+  M3Bool enable_logging;    /**< Enable logging via m3_log_write. */
+  M3Bool inline_tasks;      /**< Execute posted tasks inline when M3_TRUE. */
+  M3Bool
+      enable_gdk_texture; /**< Enable GdkTexture path for GSK texture draws. */
 } M3GTK4BackendConfig;
 
 /**
  * @brief Report whether GTK4 support is available in this build.
- * @param out_available Receives M3_TRUE if GTK4 is available, M3_FALSE otherwise.
+ * @param out_available Receives M3_TRUE if GTK4 is available, M3_FALSE
+ * otherwise.
  * @return M3_OK on success or a failure code.
  */
 M3_API int M3_CALL m3_gtk4_backend_is_available(M3Bool *out_available);
@@ -50,7 +53,8 @@ M3_API int M3_CALL m3_gtk4_backend_config_init(M3GTK4BackendConfig *config);
  * @param out_backend Receives the created backend instance.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_gtk4_backend_create(const M3GTK4BackendConfig *config, M3GTK4Backend **out_backend);
+M3_API int M3_CALL m3_gtk4_backend_create(const M3GTK4BackendConfig *config,
+                                          M3GTK4Backend **out_backend);
 
 /**
  * @brief Destroy a GTK4 backend instance.
@@ -73,7 +77,8 @@ M3_API int M3_CALL m3_gtk4_backend_get_ws(M3GTK4Backend *backend, M3WS *out_ws);
  * @param out_gfx Receives the graphics interface.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_gtk4_backend_get_gfx(M3GTK4Backend *backend, M3Gfx *out_gfx);
+M3_API int M3_CALL m3_gtk4_backend_get_gfx(M3GTK4Backend *backend,
+                                           M3Gfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -81,7 +86,8 @@ M3_API int M3_CALL m3_gtk4_backend_get_gfx(M3GTK4Backend *backend, M3Gfx *out_gf
  * @param out_env Receives the environment interface.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_gtk4_backend_get_env(M3GTK4Backend *backend, M3Env *out_env);
+M3_API int M3_CALL m3_gtk4_backend_get_env(M3GTK4Backend *backend,
+                                           M3Env *out_env);
 
 #ifdef M3_TESTING
 /**
@@ -89,7 +95,8 @@ M3_API int M3_CALL m3_gtk4_backend_get_env(M3GTK4Backend *backend, M3Env *out_en
  * @param config Backend configuration.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_gtk4_backend_test_validate_config(const M3GTK4BackendConfig *config);
+M3_API int M3_CALL
+m3_gtk4_backend_test_validate_config(const M3GTK4BackendConfig *config);
 #endif
 
 #ifdef __cplusplus

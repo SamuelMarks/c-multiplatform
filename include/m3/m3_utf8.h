@@ -16,9 +16,9 @@ extern "C" {
  * @brief UTF-8 iterator state.
  */
 typedef struct M3Utf8Iter {
-    const m3_u8 *data; /**< UTF-8 byte buffer. */
-    m3_usize length; /**< Length of the buffer in bytes. */
-    m3_usize offset; /**< Current byte offset. */
+  const m3_u8 *data; /**< UTF-8 byte buffer. */
+  m3_usize length;   /**< Length of the buffer in bytes. */
+  m3_usize offset;   /**< Current byte offset. */
 } M3Utf8Iter;
 
 /**
@@ -28,7 +28,8 @@ typedef struct M3Utf8Iter {
  * @param out_valid Receives M3_TRUE if valid; M3_FALSE otherwise.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_utf8_validate(const char *data, m3_usize length, M3Bool *out_valid);
+M3_API int M3_CALL m3_utf8_validate(const char *data, m3_usize length,
+                                    M3Bool *out_valid);
 
 /**
  * @brief Validate a null-terminated UTF-8 string.
@@ -45,7 +46,8 @@ M3_API int M3_CALL m3_utf8_validate_cstr(const char *cstr, M3Bool *out_valid);
  * @param length Length of the buffer in bytes.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_utf8_iter_init(M3Utf8Iter *iter, const char *data, m3_usize length);
+M3_API int M3_CALL m3_utf8_iter_init(M3Utf8Iter *iter, const char *data,
+                                     m3_usize length);
 
 /**
  * @brief Initialize a UTF-8 iterator for a null-terminated string.
@@ -79,7 +81,9 @@ M3_API int M3_CALL m3_utf8_test_set_cstr_limit(m3_usize max_len);
  * @param out_advance Receives byte advance.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_utf8_test_decode(const m3_u8 *data, m3_usize length, m3_u32 *out_codepoint, m3_usize *out_advance);
+M3_API int M3_CALL m3_utf8_test_decode(const m3_u8 *data, m3_usize length,
+                                       m3_u32 *out_codepoint,
+                                       m3_usize *out_advance);
 
 /**
  * @brief Toggle relaxed UTF-8 boundary checks (tests only).

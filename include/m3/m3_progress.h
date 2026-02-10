@@ -43,25 +43,25 @@ extern "C" {
  * @brief Linear progress style descriptor.
  */
 typedef struct M3LinearProgressStyle {
-    M3Scalar height; /**< Track height in pixels (> 0). */
-    M3Scalar min_width; /**< Minimum width in pixels (>= 0). */
-    M3Scalar corner_radius; /**< Track corner radius in pixels (>= 0). */
-    M3Color track_color; /**< Track background color. */
-    M3Color indicator_color; /**< Filled indicator color. */
-    M3Color disabled_track_color; /**< Track color when disabled. */
-    M3Color disabled_indicator_color; /**< Indicator color when disabled. */
+  M3Scalar height;              /**< Track height in pixels (> 0). */
+  M3Scalar min_width;           /**< Minimum width in pixels (>= 0). */
+  M3Scalar corner_radius;       /**< Track corner radius in pixels (>= 0). */
+  M3Color track_color;          /**< Track background color. */
+  M3Color indicator_color;      /**< Filled indicator color. */
+  M3Color disabled_track_color; /**< Track color when disabled. */
+  M3Color disabled_indicator_color; /**< Indicator color when disabled. */
 } M3LinearProgressStyle;
 
 /**
  * @brief Linear progress indicator instance.
  */
 typedef struct M3LinearProgress {
-    M3Widget widget; /**< Widget interface (points to this instance). */
-    M3LinearProgressStyle style; /**< Current style descriptor. */
-    M3Rect bounds; /**< Layout bounds. */
-    M3Scalar value; /**< Progress value (0..1). */
-    const char *utf8_label; /**< UTF-8 label for semantics (optional). */
-    m3_usize utf8_len; /**< UTF-8 label length in bytes. */
+  M3Widget widget; /**< Widget interface (points to this instance). */
+  M3LinearProgressStyle style; /**< Current style descriptor. */
+  M3Rect bounds;               /**< Layout bounds. */
+  M3Scalar value;              /**< Progress value (0..1). */
+  const char *utf8_label;      /**< UTF-8 label for semantics (optional). */
+  m3_usize utf8_len;           /**< UTF-8 label length in bytes. */
 } M3LinearProgress;
 
 /**
@@ -78,7 +78,9 @@ M3_API int M3_CALL m3_linear_progress_style_init(M3LinearProgressStyle *style);
  * @param value Initial progress value (0..1).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_linear_progress_init(M3LinearProgress *progress, const M3LinearProgressStyle *style, M3Scalar value);
+M3_API int M3_CALL m3_linear_progress_init(M3LinearProgress *progress,
+                                           const M3LinearProgressStyle *style,
+                                           M3Scalar value);
 
 /**
  * @brief Update the linear progress value.
@@ -86,7 +88,8 @@ M3_API int M3_CALL m3_linear_progress_init(M3LinearProgress *progress, const M3L
  * @param value New progress value (0..1).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_linear_progress_set_value(M3LinearProgress *progress, M3Scalar value);
+M3_API int M3_CALL m3_linear_progress_set_value(M3LinearProgress *progress,
+                                                M3Scalar value);
 
 /**
  * @brief Retrieve the linear progress value.
@@ -94,7 +97,8 @@ M3_API int M3_CALL m3_linear_progress_set_value(M3LinearProgress *progress, M3Sc
  * @param out_value Receives the progress value.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_linear_progress_get_value(const M3LinearProgress *progress, M3Scalar *out_value);
+M3_API int M3_CALL m3_linear_progress_get_value(
+    const M3LinearProgress *progress, M3Scalar *out_value);
 
 /**
  * @brief Update the linear progress style.
@@ -102,7 +106,8 @@ M3_API int M3_CALL m3_linear_progress_get_value(const M3LinearProgress *progress
  * @param style New style descriptor.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_linear_progress_set_style(M3LinearProgress *progress, const M3LinearProgressStyle *style);
+M3_API int M3_CALL m3_linear_progress_set_style(
+    M3LinearProgress *progress, const M3LinearProgressStyle *style);
 
 /**
  * @brief Update the linear progress semantics label.
@@ -111,32 +116,34 @@ M3_API int M3_CALL m3_linear_progress_set_style(M3LinearProgress *progress, cons
  * @param utf8_len Label length in bytes.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_linear_progress_set_label(M3LinearProgress *progress, const char *utf8_label, m3_usize utf8_len);
+M3_API int M3_CALL m3_linear_progress_set_label(M3LinearProgress *progress,
+                                                const char *utf8_label,
+                                                m3_usize utf8_len);
 
 /**
  * @brief Circular progress style descriptor.
  */
 typedef struct M3CircularProgressStyle {
-    M3Scalar diameter; /**< Indicator diameter in pixels (> 0). */
-    M3Scalar thickness; /**< Stroke thickness in pixels (> 0). */
-    M3Scalar start_angle; /**< Start angle in radians. */
-    m3_u32 segments; /**< Segment count for approximation (>= 3). */
-    M3Color track_color; /**< Track background color. */
-    M3Color indicator_color; /**< Indicator arc color. */
-    M3Color disabled_track_color; /**< Track color when disabled. */
-    M3Color disabled_indicator_color; /**< Indicator color when disabled. */
+  M3Scalar diameter;            /**< Indicator diameter in pixels (> 0). */
+  M3Scalar thickness;           /**< Stroke thickness in pixels (> 0). */
+  M3Scalar start_angle;         /**< Start angle in radians. */
+  m3_u32 segments;              /**< Segment count for approximation (>= 3). */
+  M3Color track_color;          /**< Track background color. */
+  M3Color indicator_color;      /**< Indicator arc color. */
+  M3Color disabled_track_color; /**< Track color when disabled. */
+  M3Color disabled_indicator_color; /**< Indicator color when disabled. */
 } M3CircularProgressStyle;
 
 /**
  * @brief Circular progress indicator instance.
  */
 typedef struct M3CircularProgress {
-    M3Widget widget; /**< Widget interface (points to this instance). */
-    M3CircularProgressStyle style; /**< Current style descriptor. */
-    M3Rect bounds; /**< Layout bounds. */
-    M3Scalar value; /**< Progress value (0..1). */
-    const char *utf8_label; /**< UTF-8 label for semantics (optional). */
-    m3_usize utf8_len; /**< UTF-8 label length in bytes. */
+  M3Widget widget; /**< Widget interface (points to this instance). */
+  M3CircularProgressStyle style; /**< Current style descriptor. */
+  M3Rect bounds;                 /**< Layout bounds. */
+  M3Scalar value;                /**< Progress value (0..1). */
+  const char *utf8_label;        /**< UTF-8 label for semantics (optional). */
+  m3_usize utf8_len;             /**< UTF-8 label length in bytes. */
 } M3CircularProgress;
 
 /**
@@ -144,7 +151,8 @@ typedef struct M3CircularProgress {
  * @param style Style descriptor to initialize.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_circular_progress_style_init(M3CircularProgressStyle *style);
+M3_API int M3_CALL
+m3_circular_progress_style_init(M3CircularProgressStyle *style);
 
 /**
  * @brief Initialize a circular progress indicator.
@@ -153,7 +161,9 @@ M3_API int M3_CALL m3_circular_progress_style_init(M3CircularProgressStyle *styl
  * @param value Initial progress value (0..1).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_circular_progress_init(M3CircularProgress *progress, const M3CircularProgressStyle *style, M3Scalar value);
+M3_API int M3_CALL
+m3_circular_progress_init(M3CircularProgress *progress,
+                          const M3CircularProgressStyle *style, M3Scalar value);
 
 /**
  * @brief Update the circular progress value.
@@ -161,7 +171,8 @@ M3_API int M3_CALL m3_circular_progress_init(M3CircularProgress *progress, const
  * @param value New progress value (0..1).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_circular_progress_set_value(M3CircularProgress *progress, M3Scalar value);
+M3_API int M3_CALL m3_circular_progress_set_value(M3CircularProgress *progress,
+                                                  M3Scalar value);
 
 /**
  * @brief Retrieve the circular progress value.
@@ -169,7 +180,8 @@ M3_API int M3_CALL m3_circular_progress_set_value(M3CircularProgress *progress, 
  * @param out_value Receives the progress value.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_circular_progress_get_value(const M3CircularProgress *progress, M3Scalar *out_value);
+M3_API int M3_CALL m3_circular_progress_get_value(
+    const M3CircularProgress *progress, M3Scalar *out_value);
 
 /**
  * @brief Update the circular progress style.
@@ -177,7 +189,8 @@ M3_API int M3_CALL m3_circular_progress_get_value(const M3CircularProgress *prog
  * @param style New style descriptor.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_circular_progress_set_style(M3CircularProgress *progress, const M3CircularProgressStyle *style);
+M3_API int M3_CALL m3_circular_progress_set_style(
+    M3CircularProgress *progress, const M3CircularProgressStyle *style);
 
 /**
  * @brief Update the circular progress semantics label.
@@ -186,7 +199,9 @@ M3_API int M3_CALL m3_circular_progress_set_style(M3CircularProgress *progress, 
  * @param utf8_len Label length in bytes.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_circular_progress_set_label(M3CircularProgress *progress, const char *utf8_label, m3_usize utf8_len);
+M3_API int M3_CALL m3_circular_progress_set_label(M3CircularProgress *progress,
+                                                  const char *utf8_label,
+                                                  m3_usize utf8_len);
 
 struct M3Slider;
 
@@ -197,40 +212,41 @@ struct M3Slider;
  * @param value New slider value.
  * @return M3_OK on success or a failure code.
  */
-typedef int (M3_CALL *M3SliderOnChange)(void *ctx, struct M3Slider *slider, M3Scalar value);
+typedef int(M3_CALL *M3SliderOnChange)(void *ctx, struct M3Slider *slider,
+                                       M3Scalar value);
 
 /**
  * @brief Slider style descriptor.
  */
 typedef struct M3SliderStyle {
-    M3Scalar track_length; /**< Track length in pixels (> 0). */
-    M3Scalar track_height; /**< Track height in pixels (> 0). */
-    M3Scalar track_corner_radius; /**< Track corner radius in pixels (>= 0). */
-    M3Scalar thumb_radius; /**< Thumb radius in pixels (> 0). */
-    M3Color track_color; /**< Inactive track color. */
-    M3Color active_track_color; /**< Active track color. */
-    M3Color thumb_color; /**< Thumb fill color. */
-    M3Color disabled_track_color; /**< Inactive track color when disabled. */
-    M3Color disabled_active_track_color; /**< Active track color when disabled. */
-    M3Color disabled_thumb_color; /**< Thumb color when disabled. */
+  M3Scalar track_length;        /**< Track length in pixels (> 0). */
+  M3Scalar track_height;        /**< Track height in pixels (> 0). */
+  M3Scalar track_corner_radius; /**< Track corner radius in pixels (>= 0). */
+  M3Scalar thumb_radius;        /**< Thumb radius in pixels (> 0). */
+  M3Color track_color;          /**< Inactive track color. */
+  M3Color active_track_color;   /**< Active track color. */
+  M3Color thumb_color;          /**< Thumb fill color. */
+  M3Color disabled_track_color; /**< Inactive track color when disabled. */
+  M3Color disabled_active_track_color; /**< Active track color when disabled. */
+  M3Color disabled_thumb_color;        /**< Thumb color when disabled. */
 } M3SliderStyle;
 
 /**
  * @brief Slider widget instance.
  */
 typedef struct M3Slider {
-    M3Widget widget; /**< Widget interface (points to this instance). */
-    M3SliderStyle style; /**< Current slider style. */
-    M3Rect bounds; /**< Layout bounds. */
-    M3Scalar min_value; /**< Minimum value (must be < max_value). */
-    M3Scalar max_value; /**< Maximum value (must be > min_value). */
-    M3Scalar value; /**< Current value. */
-    M3Scalar step; /**< Step size (0 for continuous). */
-    const char *utf8_label; /**< UTF-8 label for semantics (optional). */
-    m3_usize utf8_len; /**< UTF-8 label length in bytes. */
-    M3Bool pressed; /**< M3_TRUE when pointer is pressed. */
-    M3SliderOnChange on_change; /**< Change callback (may be NULL). */
-    void *on_change_ctx; /**< Change callback context pointer. */
+  M3Widget widget;        /**< Widget interface (points to this instance). */
+  M3SliderStyle style;    /**< Current slider style. */
+  M3Rect bounds;          /**< Layout bounds. */
+  M3Scalar min_value;     /**< Minimum value (must be < max_value). */
+  M3Scalar max_value;     /**< Maximum value (must be > min_value). */
+  M3Scalar value;         /**< Current value. */
+  M3Scalar step;          /**< Step size (0 for continuous). */
+  const char *utf8_label; /**< UTF-8 label for semantics (optional). */
+  m3_usize utf8_len;      /**< UTF-8 label length in bytes. */
+  M3Bool pressed;         /**< M3_TRUE when pointer is pressed. */
+  M3SliderOnChange on_change; /**< Change callback (may be NULL). */
+  void *on_change_ctx;        /**< Change callback context pointer. */
 } M3Slider;
 
 /**
@@ -249,8 +265,9 @@ M3_API int M3_CALL m3_slider_style_init(M3SliderStyle *style);
  * @param value Initial slider value.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_slider_init(M3Slider *slider, const M3SliderStyle *style, M3Scalar min_value, M3Scalar max_value,
-    M3Scalar value);
+M3_API int M3_CALL m3_slider_init(M3Slider *slider, const M3SliderStyle *style,
+                                  M3Scalar min_value, M3Scalar max_value,
+                                  M3Scalar value);
 
 /**
  * @brief Update the slider value.
@@ -266,7 +283,8 @@ M3_API int M3_CALL m3_slider_set_value(M3Slider *slider, M3Scalar value);
  * @param out_value Receives the current value.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_slider_get_value(const M3Slider *slider, M3Scalar *out_value);
+M3_API int M3_CALL m3_slider_get_value(const M3Slider *slider,
+                                       M3Scalar *out_value);
 
 /**
  * @brief Update the slider value range.
@@ -275,7 +293,8 @@ M3_API int M3_CALL m3_slider_get_value(const M3Slider *slider, M3Scalar *out_val
  * @param max_value New maximum value.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_slider_set_range(M3Slider *slider, M3Scalar min_value, M3Scalar max_value);
+M3_API int M3_CALL m3_slider_set_range(M3Slider *slider, M3Scalar min_value,
+                                       M3Scalar max_value);
 
 /**
  * @brief Update the slider step size.
@@ -291,7 +310,8 @@ M3_API int M3_CALL m3_slider_set_step(M3Slider *slider, M3Scalar step);
  * @param style New slider style descriptor.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_slider_set_style(M3Slider *slider, const M3SliderStyle *style);
+M3_API int M3_CALL m3_slider_set_style(M3Slider *slider,
+                                       const M3SliderStyle *style);
 
 /**
  * @brief Update the slider semantics label.
@@ -300,7 +320,8 @@ M3_API int M3_CALL m3_slider_set_style(M3Slider *slider, const M3SliderStyle *st
  * @param utf8_len Label length in bytes.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_slider_set_label(M3Slider *slider, const char *utf8_label, m3_usize utf8_len);
+M3_API int M3_CALL m3_slider_set_label(M3Slider *slider, const char *utf8_label,
+                                       m3_usize utf8_len);
 
 /**
  * @brief Assign a slider change callback.
@@ -309,7 +330,9 @@ M3_API int M3_CALL m3_slider_set_label(M3Slider *slider, const char *utf8_label,
  * @param ctx Callback context pointer.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_slider_set_on_change(M3Slider *slider, M3SliderOnChange on_change, void *ctx);
+M3_API int M3_CALL m3_slider_set_on_change(M3Slider *slider,
+                                           M3SliderOnChange on_change,
+                                           void *ctx);
 
 #ifdef M3_TESTING
 /**
@@ -334,10 +357,12 @@ M3_API int M3_CALL m3_progress_test_set_color_set_fail_after(m3_u32 call_count);
 
 /**
  * @brief Set the call index that forces color_with_alpha to fail.
- * @param call_count Call index at or after which color_with_alpha fails (0 disables).
+ * @param call_count Call index at or after which color_with_alpha fails (0
+ * disables).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_set_color_alpha_fail_after(m3_u32 call_count);
+M3_API int M3_CALL
+m3_progress_test_set_color_alpha_fail_after(m3_u32 call_count);
 
 /**
  * @brief Test wrapper for progress color validation.
@@ -355,7 +380,9 @@ M3_API int M3_CALL m3_progress_test_validate_color(const M3Color *color);
  * @param a Alpha channel (0..1).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_color_set(M3Color *color, M3Scalar r, M3Scalar g, M3Scalar b, M3Scalar a);
+M3_API int M3_CALL m3_progress_test_color_set(M3Color *color, M3Scalar r,
+                                              M3Scalar g, M3Scalar b,
+                                              M3Scalar a);
 
 /**
  * @brief Test wrapper for alpha modulation helper.
@@ -364,7 +391,9 @@ M3_API int M3_CALL m3_progress_test_color_set(M3Color *color, M3Scalar r, M3Scal
  * @param out_color Receives the modulated color.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_color_with_alpha(const M3Color *base, M3Scalar alpha, M3Color *out_color);
+M3_API int M3_CALL m3_progress_test_color_with_alpha(const M3Color *base,
+                                                     M3Scalar alpha,
+                                                     M3Color *out_color);
 
 /**
  * @brief Test wrapper for measure spec validation.
@@ -380,7 +409,9 @@ M3_API int M3_CALL m3_progress_test_validate_measure_spec(M3MeasureSpec spec);
  * @param out_size Receives the resolved size.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_apply_measure(M3Scalar desired, M3MeasureSpec spec, M3Scalar *out_size);
+M3_API int M3_CALL m3_progress_test_apply_measure(M3Scalar desired,
+                                                  M3MeasureSpec spec,
+                                                  M3Scalar *out_size);
 
 /**
  * @brief Test wrapper for rectangle validation.
@@ -401,7 +432,8 @@ M3_API int M3_CALL m3_progress_test_validate_value01(M3Scalar value);
  * @param style Style descriptor.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_linear_validate_style(const M3LinearProgressStyle *style);
+M3_API int M3_CALL
+m3_progress_test_linear_validate_style(const M3LinearProgressStyle *style);
 
 /**
  * @brief Test wrapper for linear progress color resolution.
@@ -410,7 +442,8 @@ M3_API int M3_CALL m3_progress_test_linear_validate_style(const M3LinearProgress
  * @param out_indicator Receives resolved indicator color.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_linear_resolve_colors(const M3LinearProgress *progress, M3Color *out_track,
+M3_API int M3_CALL m3_progress_test_linear_resolve_colors(
+    const M3LinearProgress *progress, M3Color *out_track,
     M3Color *out_indicator);
 
 /**
@@ -418,7 +451,8 @@ M3_API int M3_CALL m3_progress_test_linear_resolve_colors(const M3LinearProgress
  * @param style Style descriptor.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_circular_validate_style(const M3CircularProgressStyle *style);
+M3_API int M3_CALL
+m3_progress_test_circular_validate_style(const M3CircularProgressStyle *style);
 
 /**
  * @brief Test wrapper for circular progress color resolution.
@@ -427,7 +461,8 @@ M3_API int M3_CALL m3_progress_test_circular_validate_style(const M3CircularProg
  * @param out_indicator Receives resolved indicator color.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_circular_resolve_colors(const M3CircularProgress *progress, M3Color *out_track,
+M3_API int M3_CALL m3_progress_test_circular_resolve_colors(
+    const M3CircularProgress *progress, M3Color *out_track,
     M3Color *out_indicator);
 
 /**
@@ -443,15 +478,17 @@ M3_API int M3_CALL m3_progress_test_circular_resolve_colors(const M3CircularProg
  * @param segments Segment count.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_circular_draw_arc(M3Gfx *gfx, M3Scalar cx, M3Scalar cy, M3Scalar radius,
-    M3Scalar start_angle, M3Scalar end_angle, M3Color color, M3Scalar thickness, m3_u32 segments);
+M3_API int M3_CALL m3_progress_test_circular_draw_arc(
+    M3Gfx *gfx, M3Scalar cx, M3Scalar cy, M3Scalar radius, M3Scalar start_angle,
+    M3Scalar end_angle, M3Color color, M3Scalar thickness, m3_u32 segments);
 
 /**
  * @brief Test wrapper for slider style validation.
  * @param style Style descriptor.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_slider_validate_style(const M3SliderStyle *style);
+M3_API int M3_CALL
+m3_progress_test_slider_validate_style(const M3SliderStyle *style);
 
 /**
  * @brief Test wrapper for slider value-to-fraction conversion.
@@ -459,7 +496,8 @@ M3_API int M3_CALL m3_progress_test_slider_validate_style(const M3SliderStyle *s
  * @param out_fraction Receives the fraction (0..1).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_slider_value_to_fraction(const M3Slider *slider, M3Scalar *out_fraction);
+M3_API int M3_CALL m3_progress_test_slider_value_to_fraction(
+    const M3Slider *slider, M3Scalar *out_fraction);
 
 /**
  * @brief Test wrapper for slider X-coordinate to value conversion.
@@ -468,7 +506,9 @@ M3_API int M3_CALL m3_progress_test_slider_value_to_fraction(const M3Slider *sli
  * @param out_value Receives the slider value.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_slider_value_from_x(const M3Slider *slider, M3Scalar x, M3Scalar *out_value);
+M3_API int M3_CALL m3_progress_test_slider_value_from_x(const M3Slider *slider,
+                                                        M3Scalar x,
+                                                        M3Scalar *out_value);
 
 /**
  * @brief Test wrapper for slider snapping helper.
@@ -479,8 +519,11 @@ M3_API int M3_CALL m3_progress_test_slider_value_from_x(const M3Slider *slider, 
  * @param out_value Receives the snapped value.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_slider_snap_value(M3Scalar value, M3Scalar min_value, M3Scalar max_value, M3Scalar step,
-    M3Scalar *out_value);
+M3_API int M3_CALL m3_progress_test_slider_snap_value(M3Scalar value,
+                                                      M3Scalar min_value,
+                                                      M3Scalar max_value,
+                                                      M3Scalar step,
+                                                      M3Scalar *out_value);
 
 /**
  * @brief Test wrapper for slider color resolution.
@@ -490,7 +533,8 @@ M3_API int M3_CALL m3_progress_test_slider_snap_value(M3Scalar value, M3Scalar m
  * @param out_thumb Receives thumb color.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_slider_resolve_colors(const M3Slider *slider, M3Color *out_track, M3Color *out_active,
+M3_API int M3_CALL m3_progress_test_slider_resolve_colors(
+    const M3Slider *slider, M3Color *out_track, M3Color *out_active,
     M3Color *out_thumb);
 
 /**
@@ -500,7 +544,9 @@ M3_API int M3_CALL m3_progress_test_slider_resolve_colors(const M3Slider *slider
  * @param notify M3_TRUE to invoke the change callback.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_progress_test_slider_update_value(M3Slider *slider, M3Scalar next_value, M3Bool notify);
+M3_API int M3_CALL m3_progress_test_slider_update_value(M3Slider *slider,
+                                                        M3Scalar next_value,
+                                                        M3Bool notify);
 #endif
 
 #ifdef __cplusplus

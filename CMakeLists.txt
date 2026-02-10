@@ -297,6 +297,7 @@ if(GCOVR_EXECUTABLE)
             --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-coverage-run$
             --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-android$
             --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-web$
+            --exclude-noncode-lines
             --print-summary
             --merge-mode-functions=merge-use-line-0
             --fail-under-line 100
@@ -370,6 +371,12 @@ if(BUILD_TESTING)
     target_compile_definitions(m3_phase2_layout PRIVATE M3_TESTING)
     m3_apply_c_settings(m3_phase2_layout)
     add_test(NAME m3_phase2_layout COMMAND m3_phase2_layout)
+
+    add_executable(m3_phase2_layout_rtl tests/phase2/layout_rtl.c)
+    target_link_libraries(m3_phase2_layout_rtl PRIVATE m3)
+    target_compile_definitions(m3_phase2_layout_rtl PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase2_layout_rtl)
+    add_test(NAME m3_phase2_layout_rtl COMMAND m3_phase2_layout_rtl)
 
     add_executable(m3_phase2_anim tests/phase2/anim.c)
     target_link_libraries(m3_phase2_anim PRIVATE m3)

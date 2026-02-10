@@ -16,19 +16,19 @@ extern "C" {
  * @brief String slice descriptor.
  */
 typedef struct M3UriSlice {
-    const char *data; /**< Slice data pointer (may be NULL when length is 0). */
-    m3_usize length; /**< Slice length in bytes. */
+  const char *data; /**< Slice data pointer (may be NULL when length is 0). */
+  m3_usize length;  /**< Slice length in bytes. */
 } M3UriSlice;
 
 /**
  * @brief Parsed URI components.
  */
 typedef struct M3Uri {
-    M3UriSlice scheme; /**< Scheme without "://". */
-    M3UriSlice authority; /**< Authority (host[:port]). */
-    M3UriSlice path; /**< Path component. */
-    M3UriSlice query; /**< Query string without '?'. */
-    M3UriSlice fragment; /**< Fragment without '#'. */
+  M3UriSlice scheme;    /**< Scheme without "://". */
+  M3UriSlice authority; /**< Authority (host[:port]). */
+  M3UriSlice path;      /**< Path component. */
+  M3UriSlice query;     /**< Query string without '?'. */
+  M3UriSlice fragment;  /**< Fragment without '#'. */
 } M3Uri;
 
 /**
@@ -47,14 +47,15 @@ M3_API int M3_CALL m3_uri_parse(const char *uri, M3Uri *out_uri);
  * @param out_found Receives M3_TRUE if the key is found.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_uri_query_find(const M3Uri *uri, const char *key, M3UriSlice *out_value, M3Bool *out_found);
+M3_API int M3_CALL m3_uri_query_find(const M3Uri *uri, const char *key,
+                                     M3UriSlice *out_value, M3Bool *out_found);
 
 /**
  * @brief Route parameter pair.
  */
 typedef struct M3RouteParam {
-    M3UriSlice key; /**< Parameter name. */
-    M3UriSlice value; /**< Parameter value. */
+  M3UriSlice key;   /**< Parameter name. */
+  M3UriSlice value; /**< Parameter value. */
 } M3RouteParam;
 
 /**
@@ -64,7 +65,8 @@ typedef struct M3RouteParam {
  * @param out_component Receives the created component pointer.
  * @return M3_OK on success or a failure code.
  */
-typedef int (M3_CALL *M3RouteBuildFn)(void *ctx, const char *path, void **out_component);
+typedef int(M3_CALL *M3RouteBuildFn)(void *ctx, const char *path,
+                                     void **out_component);
 
 /**
  * @brief Route destroy callback.
@@ -72,47 +74,48 @@ typedef int (M3_CALL *M3RouteBuildFn)(void *ctx, const char *path, void **out_co
  * @param component Component pointer to destroy.
  * @return M3_OK on success or a failure code.
  */
-typedef int (M3_CALL *M3RouteDestroyFn)(void *ctx, void *component);
+typedef int(M3_CALL *M3RouteDestroyFn)(void *ctx, void *component);
 
 /**
  * @brief Route descriptor.
  */
 typedef struct M3Route {
-    const char *pattern; /**< Route pattern string. */
-    M3RouteBuildFn build; /**< Component build callback. */
-    M3RouteDestroyFn destroy; /**< Component destroy callback (optional). */
-    void *ctx; /**< Route context pointer. */
+  const char *pattern;      /**< Route pattern string. */
+  M3RouteBuildFn build;     /**< Component build callback. */
+  M3RouteDestroyFn destroy; /**< Component destroy callback (optional). */
+  void *ctx;                /**< Route context pointer. */
 } M3Route;
 
 /**
  * @brief Route stack entry.
  */
 typedef struct M3RouteEntry {
-    const M3Route *route; /**< Matched route. */
-    char *path; /**< Owned path string. */
-    void *component; /**< Built component pointer. */
+  const M3Route *route; /**< Matched route. */
+  char *path;           /**< Owned path string. */
+  void *component;      /**< Built component pointer. */
 } M3RouteEntry;
 
 /**
  * @brief Router configuration.
  */
 typedef struct M3RouterConfig {
-    const M3Allocator *allocator; /**< Allocator to use; NULL uses default allocator. */
-    const M3Route *routes; /**< Route table. */
-    m3_usize route_count; /**< Number of routes. */
-    m3_usize stack_capacity; /**< Maximum navigation stack size. */
+  const M3Allocator
+      *allocator;        /**< Allocator to use; NULL uses default allocator. */
+  const M3Route *routes; /**< Route table. */
+  m3_usize route_count;  /**< Number of routes. */
+  m3_usize stack_capacity; /**< Maximum navigation stack size. */
 } M3RouterConfig;
 
 /**
  * @brief Router instance.
  */
 typedef struct M3Router {
-    M3Allocator allocator; /**< Allocator used by the router. */
-    const M3Route *routes; /**< Route table. */
-    m3_usize route_count; /**< Number of routes. */
-    M3RouteEntry *stack; /**< Navigation stack. */
-    m3_usize stack_capacity; /**< Stack capacity. */
-    m3_usize stack_size; /**< Current stack size. */
+  M3Allocator allocator;   /**< Allocator used by the router. */
+  const M3Route *routes;   /**< Route table. */
+  m3_usize route_count;    /**< Number of routes. */
+  M3RouteEntry *stack;     /**< Navigation stack. */
+  m3_usize stack_capacity; /**< Stack capacity. */
+  m3_usize stack_size;     /**< Current stack size. */
 } M3Router;
 
 /**
@@ -121,7 +124,8 @@ typedef struct M3Router {
  * @param config Router configuration.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_init(M3Router *router, const M3RouterConfig *config);
+M3_API int M3_CALL m3_router_init(M3Router *router,
+                                  const M3RouterConfig *config);
 
 /**
  * @brief Shut down a router and release its resources.
@@ -137,7 +141,8 @@ M3_API int M3_CALL m3_router_shutdown(M3Router *router);
  * @param out_component Receives the created component pointer (optional).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_navigate(M3Router *router, const char *path, void **out_component);
+M3_API int M3_CALL m3_router_navigate(M3Router *router, const char *path,
+                                      void **out_component);
 
 /**
  * @brief Navigate to a URI.
@@ -146,7 +151,8 @@ M3_API int M3_CALL m3_router_navigate(M3Router *router, const char *path, void *
  * @param out_component Receives the created component pointer (optional).
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_navigate_uri(M3Router *router, const char *uri, void **out_component);
+M3_API int M3_CALL m3_router_navigate_uri(M3Router *router, const char *uri,
+                                          void **out_component);
 
 /**
  * @brief Check whether back navigation is possible.
@@ -154,13 +160,15 @@ M3_API int M3_CALL m3_router_navigate_uri(M3Router *router, const char *uri, voi
  * @param out_can_back Receives M3_TRUE if back is possible.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_can_back(const M3Router *router, M3Bool *out_can_back);
+M3_API int M3_CALL m3_router_can_back(const M3Router *router,
+                                      M3Bool *out_can_back);
 
 /**
  * @brief Navigate back in the stack.
  * @param router Router instance.
  * @param out_component Receives the new current component (optional).
- * @return M3_OK on success, M3_ERR_NOT_FOUND if no back entry, or a failure code.
+ * @return M3_OK on success, M3_ERR_NOT_FOUND if no back entry, or a failure
+ * code.
  */
 M3_API int M3_CALL m3_router_back(M3Router *router, void **out_component);
 
@@ -169,9 +177,12 @@ M3_API int M3_CALL m3_router_back(M3Router *router, void **out_component);
  * @param router Router instance.
  * @param out_path Receives the current path (optional).
  * @param out_component Receives the current component (optional).
- * @return M3_OK on success, M3_ERR_NOT_FOUND if stack is empty, or a failure code.
+ * @return M3_OK on success, M3_ERR_NOT_FOUND if stack is empty, or a failure
+ * code.
  */
-M3_API int M3_CALL m3_router_get_current(const M3Router *router, const char **out_path, void **out_component);
+M3_API int M3_CALL m3_router_get_current(const M3Router *router,
+                                         const char **out_path,
+                                         void **out_component);
 
 /**
  * @brief Clear the navigation stack.
@@ -212,7 +223,11 @@ M3_API int M3_CALL m3_router_test_set_slice_equals_fail(M3Bool enable);
  * @param out_match Receives M3_TRUE if match succeeded.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_route_test_match(const char *pattern, const char *path, M3RouteParam *params, m3_usize max_params, m3_usize *out_param_count, M3Bool *out_match);
+M3_API int M3_CALL m3_route_test_match(const char *pattern, const char *path,
+                                       M3RouteParam *params,
+                                       m3_usize max_params,
+                                       m3_usize *out_param_count,
+                                       M3Bool *out_match);
 
 /**
  * @brief Test wrapper for router C-string length helper.
@@ -229,7 +244,8 @@ M3_API int M3_CALL m3_router_test_cstrlen(const char *cstr, m3_usize *out_len);
  * @param length Slice length.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_test_slice_set(M3UriSlice *slice, const char *data, m3_usize length);
+M3_API int M3_CALL m3_router_test_slice_set(M3UriSlice *slice, const char *data,
+                                            m3_usize length);
 
 /**
  * @brief Test wrapper for slice equality helper.
@@ -239,7 +255,10 @@ M3_API int M3_CALL m3_router_test_slice_set(M3UriSlice *slice, const char *data,
  * @param out_equal Receives comparison result.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_test_slice_equals(const M3UriSlice *slice, const char *key, m3_usize key_len, M3Bool *out_equal);
+M3_API int M3_CALL m3_router_test_slice_equals(const M3UriSlice *slice,
+                                               const char *key,
+                                               m3_usize key_len,
+                                               M3Bool *out_equal);
 
 /**
  * @brief Test wrapper for trimming trailing slashes.
@@ -247,7 +266,8 @@ M3_API int M3_CALL m3_router_test_slice_equals(const M3UriSlice *slice, const ch
  * @param len Length pointer.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_test_trim_trailing(const char **str, m3_usize *len);
+M3_API int M3_CALL m3_router_test_trim_trailing(const char **str,
+                                                m3_usize *len);
 
 /**
  * @brief Test wrapper for segment scanning.
@@ -258,7 +278,10 @@ M3_API int M3_CALL m3_router_test_trim_trailing(const char **str, m3_usize *len)
  * @param out_len Receives segment length.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_test_next_segment(const char *str, m3_usize len, m3_usize *index, const char **out_seg, m3_usize *out_len);
+M3_API int M3_CALL m3_router_test_next_segment(const char *str, m3_usize len,
+                                               m3_usize *index,
+                                               const char **out_seg,
+                                               m3_usize *out_len);
 
 /**
  * @brief Test wrapper for segment lookahead.
@@ -268,7 +291,10 @@ M3_API int M3_CALL m3_router_test_next_segment(const char *str, m3_usize len, m3
  * @param out_has_more Receives M3_TRUE if more segments exist.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_test_has_more_segments(const char *str, m3_usize len, m3_usize index, M3Bool *out_has_more);
+M3_API int M3_CALL m3_router_test_has_more_segments(const char *str,
+                                                    m3_usize len,
+                                                    m3_usize index,
+                                                    M3Bool *out_has_more);
 
 /**
  * @brief Test wrapper for low-level route matching with explicit lengths.
@@ -282,7 +308,10 @@ M3_API int M3_CALL m3_router_test_has_more_segments(const char *str, m3_usize le
  * @param out_match Receives match result.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_test_match_len(const char *pattern, m3_usize pattern_len, const char *path, m3_usize path_len, M3RouteParam *params, m3_usize max_params, m3_usize *out_param_count, M3Bool *out_match);
+M3_API int M3_CALL m3_router_test_match_len(
+    const char *pattern, m3_usize pattern_len, const char *path,
+    m3_usize path_len, M3RouteParam *params, m3_usize max_params,
+    m3_usize *out_param_count, M3Bool *out_match);
 
 /**
  * @brief Test wrapper for validating route patterns.
@@ -297,7 +326,8 @@ M3_API int M3_CALL m3_router_test_validate_pattern(const char *pattern);
  * @param entry Entry to release.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_test_release_entry(M3Router *router, M3RouteEntry *entry);
+M3_API int M3_CALL m3_router_test_release_entry(M3Router *router,
+                                                M3RouteEntry *entry);
 
 /**
  * @brief Test wrapper for finding a route entry.
@@ -307,7 +337,10 @@ M3_API int M3_CALL m3_router_test_release_entry(M3Router *router, M3RouteEntry *
  * @param out_route Receives the matched route.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_test_find_route(const M3Router *router, const char *path, m3_usize path_len, const M3Route **out_route);
+M3_API int M3_CALL m3_router_test_find_route(const M3Router *router,
+                                             const char *path,
+                                             m3_usize path_len,
+                                             const M3Route **out_route);
 
 /**
  * @brief Test wrapper for copying a path.
@@ -317,7 +350,8 @@ M3_API int M3_CALL m3_router_test_find_route(const M3Router *router, const char 
  * @param out_copy Receives allocated copy.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_test_copy_path(M3Router *router, const char *path, m3_usize path_len, char **out_copy);
+M3_API int M3_CALL m3_router_test_copy_path(M3Router *router, const char *path,
+                                            m3_usize path_len, char **out_copy);
 
 /**
  * @brief Test wrapper for navigating with explicit path length.
@@ -327,7 +361,10 @@ M3_API int M3_CALL m3_router_test_copy_path(M3Router *router, const char *path, 
  * @param out_component Receives component pointer.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_router_test_navigate_path_len(M3Router *router, const char *path, m3_usize path_len, void **out_component);
+M3_API int M3_CALL m3_router_test_navigate_path_len(M3Router *router,
+                                                    const char *path,
+                                                    m3_usize path_len,
+                                                    void **out_component);
 #endif
 
 #ifdef __cplusplus

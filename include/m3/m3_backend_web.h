@@ -22,17 +22,20 @@ typedef struct M3WebBackend M3WebBackend;
  * @brief Configuration for the web backend.
  */
 typedef struct M3WebBackendConfig {
-    const M3Allocator *allocator; /**< Allocator for backend memory (NULL uses default). */
-    m3_usize handle_capacity; /**< Maximum number of handles to manage. */
-    m3_usize clipboard_limit; /**< Maximum clipboard byte length accepted. */
-    const char *utf8_canvas_id; /**< Canvas element selector (UTF-8, e.g. "#canvas"). */
-    M3Bool enable_logging; /**< Enable logging via m3_log_write. */
-    M3Bool inline_tasks; /**< Execute posted tasks inline when M3_TRUE. */
+  const M3Allocator
+      *allocator; /**< Allocator for backend memory (NULL uses default). */
+  m3_usize handle_capacity; /**< Maximum number of handles to manage. */
+  m3_usize clipboard_limit; /**< Maximum clipboard byte length accepted. */
+  const char
+      *utf8_canvas_id; /**< Canvas element selector (UTF-8, e.g. "#canvas"). */
+  M3Bool enable_logging; /**< Enable logging via m3_log_write. */
+  M3Bool inline_tasks;   /**< Execute posted tasks inline when M3_TRUE. */
 } M3WebBackendConfig;
 
 /**
  * @brief Report whether web (Emscripten) support is available in this build.
- * @param out_available Receives M3_TRUE if web support is available, M3_FALSE otherwise.
+ * @param out_available Receives M3_TRUE if web support is available, M3_FALSE
+ * otherwise.
  * @return M3_OK on success or a failure code.
  */
 M3_API int M3_CALL m3_web_backend_is_available(M3Bool *out_available);
@@ -50,7 +53,8 @@ M3_API int M3_CALL m3_web_backend_config_init(M3WebBackendConfig *config);
  * @param out_backend Receives the created backend instance.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_web_backend_create(const M3WebBackendConfig *config, M3WebBackend **out_backend);
+M3_API int M3_CALL m3_web_backend_create(const M3WebBackendConfig *config,
+                                         M3WebBackend **out_backend);
 
 /**
  * @brief Destroy a web backend instance.
@@ -73,7 +77,8 @@ M3_API int M3_CALL m3_web_backend_get_ws(M3WebBackend *backend, M3WS *out_ws);
  * @param out_gfx Receives the graphics interface.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_web_backend_get_gfx(M3WebBackend *backend, M3Gfx *out_gfx);
+M3_API int M3_CALL m3_web_backend_get_gfx(M3WebBackend *backend,
+                                          M3Gfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -81,7 +86,8 @@ M3_API int M3_CALL m3_web_backend_get_gfx(M3WebBackend *backend, M3Gfx *out_gfx)
  * @param out_env Receives the environment interface.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_web_backend_get_env(M3WebBackend *backend, M3Env *out_env);
+M3_API int M3_CALL m3_web_backend_get_env(M3WebBackend *backend,
+                                          M3Env *out_env);
 
 #ifdef M3_TESTING
 /**
@@ -89,7 +95,8 @@ M3_API int M3_CALL m3_web_backend_get_env(M3WebBackend *backend, M3Env *out_env)
  * @param config Backend configuration.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_web_backend_test_validate_config(const M3WebBackendConfig *config);
+M3_API int M3_CALL
+m3_web_backend_test_validate_config(const M3WebBackendConfig *config);
 #endif
 
 #ifdef __cplusplus

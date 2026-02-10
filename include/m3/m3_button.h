@@ -53,51 +53,51 @@ struct M3Button;
  * @param button Button instance that was activated.
  * @return M3_OK on success or a failure code.
  */
-typedef int (M3_CALL *M3ButtonOnClick)(void *ctx, struct M3Button *button);
+typedef int(M3_CALL *M3ButtonOnClick)(void *ctx, struct M3Button *button);
 
 /**
  * @brief Button style descriptor.
  */
 typedef struct M3ButtonStyle {
-    m3_u32 variant; /**< Button variant (M3_BUTTON_VARIANT_*). */
-    M3TextStyle text_style; /**< Label text style. */
-    M3Color background_color; /**< Fill color. */
-    M3Color outline_color; /**< Outline color. */
-    M3Color ripple_color; /**< Ripple overlay color. */
-    M3Color disabled_background_color; /**< Fill color when disabled. */
-    M3Color disabled_text_color; /**< Text color when disabled. */
-    M3Color disabled_outline_color; /**< Outline color when disabled. */
-    M3Scalar outline_width; /**< Outline width in pixels. */
-    M3Scalar corner_radius; /**< Corner radius in pixels. */
-    M3Scalar padding_x; /**< Horizontal padding in pixels. */
-    M3Scalar padding_y; /**< Vertical padding in pixels. */
-    M3Scalar min_width; /**< Minimum width in pixels. */
-    M3Scalar min_height; /**< Minimum height in pixels. */
-    M3Scalar fab_diameter; /**< FAB diameter in pixels (variant FAB). */
-    M3Scalar ripple_expand_duration; /**< Ripple expansion duration in seconds. */
-    M3Scalar ripple_fade_duration; /**< Ripple fade-out duration in seconds. */
-    M3Shadow shadow; /**< Shadow descriptor for elevated buttons. */
-    M3Bool shadow_enabled; /**< M3_TRUE when shadow is enabled. */
+  m3_u32 variant;           /**< Button variant (M3_BUTTON_VARIANT_*). */
+  M3TextStyle text_style;   /**< Label text style. */
+  M3Color background_color; /**< Fill color. */
+  M3Color outline_color;    /**< Outline color. */
+  M3Color ripple_color;     /**< Ripple overlay color. */
+  M3Color disabled_background_color; /**< Fill color when disabled. */
+  M3Color disabled_text_color;       /**< Text color when disabled. */
+  M3Color disabled_outline_color;    /**< Outline color when disabled. */
+  M3Scalar outline_width;            /**< Outline width in pixels. */
+  M3Scalar corner_radius;            /**< Corner radius in pixels. */
+  M3Scalar padding_x;                /**< Horizontal padding in pixels. */
+  M3Scalar padding_y;                /**< Vertical padding in pixels. */
+  M3Scalar min_width;                /**< Minimum width in pixels. */
+  M3Scalar min_height;               /**< Minimum height in pixels. */
+  M3Scalar fab_diameter;           /**< FAB diameter in pixels (variant FAB). */
+  M3Scalar ripple_expand_duration; /**< Ripple expansion duration in seconds. */
+  M3Scalar ripple_fade_duration;   /**< Ripple fade-out duration in seconds. */
+  M3Shadow shadow;       /**< Shadow descriptor for elevated buttons. */
+  M3Bool shadow_enabled; /**< M3_TRUE when shadow is enabled. */
 } M3ButtonStyle;
 
 /**
  * @brief Button widget instance.
  */
 typedef struct M3Button {
-    M3Widget widget; /**< Widget interface (points to this instance). */
-    M3TextBackend text_backend; /**< Text backend for measurements. */
-    M3ButtonStyle style; /**< Current button style. */
-    M3Handle font; /**< Font handle for label text. */
-    M3TextMetrics metrics; /**< Cached text metrics. */
-    const char *utf8_label; /**< UTF-8 label text (may be NULL when empty). */
-    m3_usize utf8_len; /**< UTF-8 label length in bytes. */
-    M3Rect bounds; /**< Layout bounds. */
-    M3Ripple ripple; /**< Ripple state. */
-    M3Bool pressed; /**< M3_TRUE when pressed. */
-    M3Bool metrics_valid; /**< M3_TRUE when text metrics are valid. */
-    M3Bool owns_font; /**< M3_TRUE when widget owns the font. */
-    M3ButtonOnClick on_click; /**< Click callback (may be NULL). */
-    void *on_click_ctx; /**< Click callback context pointer. */
+  M3Widget widget; /**< Widget interface (points to this instance). */
+  M3TextBackend text_backend; /**< Text backend for measurements. */
+  M3ButtonStyle style;        /**< Current button style. */
+  M3Handle font;              /**< Font handle for label text. */
+  M3TextMetrics metrics;      /**< Cached text metrics. */
+  const char *utf8_label;     /**< UTF-8 label text (may be NULL when empty). */
+  m3_usize utf8_len;          /**< UTF-8 label length in bytes. */
+  M3Rect bounds;              /**< Layout bounds. */
+  M3Ripple ripple;            /**< Ripple state. */
+  M3Bool pressed;             /**< M3_TRUE when pressed. */
+  M3Bool metrics_valid;       /**< M3_TRUE when text metrics are valid. */
+  M3Bool owns_font;           /**< M3_TRUE when widget owns the font. */
+  M3ButtonOnClick on_click;   /**< Click callback (may be NULL). */
+  void *on_click_ctx;         /**< Click callback context pointer. */
 } M3Button;
 
 /**
@@ -151,8 +151,10 @@ M3_API int M3_CALL m3_button_style_init_fab(M3ButtonStyle *style);
  * @param utf8_len Length of the label in bytes.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_button_init(M3Button *button, const M3TextBackend *backend, const M3ButtonStyle *style,
-    const char *utf8_label, m3_usize utf8_len);
+M3_API int M3_CALL m3_button_init(M3Button *button,
+                                  const M3TextBackend *backend,
+                                  const M3ButtonStyle *style,
+                                  const char *utf8_label, m3_usize utf8_len);
 
 /**
  * @brief Update the button label.
@@ -161,7 +163,8 @@ M3_API int M3_CALL m3_button_init(M3Button *button, const M3TextBackend *backend
  * @param utf8_len Length of the label in bytes.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_button_set_label(M3Button *button, const char *utf8_label, m3_usize utf8_len);
+M3_API int M3_CALL m3_button_set_label(M3Button *button, const char *utf8_label,
+                                       m3_usize utf8_len);
 
 /**
  * @brief Update the button style.
@@ -169,7 +172,8 @@ M3_API int M3_CALL m3_button_set_label(M3Button *button, const char *utf8_label,
  * @param style New button style descriptor.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_button_set_style(M3Button *button, const M3ButtonStyle *style);
+M3_API int M3_CALL m3_button_set_style(M3Button *button,
+                                       const M3ButtonStyle *style);
 
 /**
  * @brief Assign a click callback to the button.
@@ -178,7 +182,8 @@ M3_API int M3_CALL m3_button_set_style(M3Button *button, const M3ButtonStyle *st
  * @param ctx Callback context pointer.
  * @return M3_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_button_set_on_click(M3Button *button, M3ButtonOnClick on_click, void *ctx);
+M3_API int M3_CALL m3_button_set_on_click(M3Button *button,
+                                          M3ButtonOnClick on_click, void *ctx);
 
 #ifdef __cplusplus
 } /* extern "C" */
