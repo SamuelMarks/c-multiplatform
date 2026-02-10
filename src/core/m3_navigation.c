@@ -667,8 +667,7 @@ static int m3_navigation_widget_paint(void *widget, M3PaintContext *ctx) {
 
   indicator_thickness = nav->style.indicator_thickness;
 #ifdef M3_TESTING
-  if (m3_nav_test_consume_fail(
-          M3_NAV_TEST_FAIL_INDICATOR_THICKNESS_NEGATIVE)) {
+  if (m3_nav_test_consume_fail(M3_NAV_TEST_FAIL_INDICATOR_THICKNESS_NEGATIVE)) {
     indicator_thickness = -1.0f;
   }
 #endif

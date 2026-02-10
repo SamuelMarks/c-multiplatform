@@ -31,7 +31,7 @@ static M3Bool m3_event_widget_focusable(const M3Widget *widget) {
 
 static int m3_event_hit_test(const M3RenderNode *node, M3Scalar x, M3Scalar y,
                              M3Widget **out_widget) {
-  M3Bool contains;
+  M3Bool contains = M3_FALSE;
   m3_usize i;
   int rc;
 

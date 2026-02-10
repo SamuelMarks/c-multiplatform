@@ -622,6 +622,8 @@ static int m3_android_camera_open_with_config(void *camera,
   return M3_OK;
 #else
   M3_UNUSED(config);
+  M3_UNUSED(state);
+  M3_UNUSED(backend);
   return M3_ERR_UNSUPPORTED;
 #endif
 }
@@ -665,7 +667,7 @@ static int m3_android_camera_stop_internal(M3AndroidCameraState *state) {
 static int m3_android_camera_close(void *camera) {
   struct M3AndroidBackend *backend;
   M3AndroidCameraState *state;
-  int rc;
+  int rc = 0;
 
   if (camera == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -723,6 +725,9 @@ static int m3_android_camera_close(void *camera) {
   state->last_error = M3_OK;
   return M3_OK;
 #else
+  M3_UNUSED(state);
+  M3_UNUSED(backend);
+  M3_UNUSED(rc);
   return M3_ERR_UNSUPPORTED;
 #endif
 }
@@ -841,6 +846,8 @@ static int m3_android_camera_start(void *camera) {
   state->streaming = M3_TRUE;
   return M3_OK;
 #else
+  M3_UNUSED(state);
+  M3_UNUSED(backend);
   return M3_ERR_UNSUPPORTED;
 #endif
 }
@@ -866,6 +873,8 @@ static int m3_android_camera_stop(void *camera) {
 
   return m3_android_camera_stop_internal(state);
 #else
+  M3_UNUSED(state);
+  M3_UNUSED(backend);
   return M3_ERR_UNSUPPORTED;
 #endif
 }
@@ -874,7 +883,7 @@ static int m3_android_camera_read_frame(void *camera, M3CameraFrame *out_frame,
                                         M3Bool *out_has_frame) {
   struct M3AndroidBackend *backend;
   M3AndroidCameraState *state;
-  int rc;
+  int rc = 0;
 
   if (camera == NULL || out_frame == NULL || out_has_frame == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -921,6 +930,9 @@ static int m3_android_camera_read_frame(void *camera, M3CameraFrame *out_frame,
 #else
   memset(out_frame, 0, sizeof(*out_frame));
   *out_has_frame = M3_FALSE;
+  M3_UNUSED(state);
+  M3_UNUSED(backend);
+  M3_UNUSED(rc);
   return M3_ERR_UNSUPPORTED;
 #endif
 }

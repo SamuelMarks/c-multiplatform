@@ -1250,8 +1250,7 @@ int main(void) {
     list.style = saved_style;
     list.bounds = saved_bounds;
 
-    M3_TEST_OK(
-        m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_VISIBLE_STRIDE));
+    M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_VISIBLE_STRIDE));
     M3_TEST_EXPECT(m3_list_view_get_required_slots(&list, &visible_count),
                    M3_ERR_RANGE);
     M3_TEST_OK(m3_list_test_clear_fail_points());
@@ -1265,8 +1264,7 @@ int main(void) {
     M3_TEST_EXPECT(m3_list_view_update(&list), M3_ERR_RANGE);
     list.bounds = saved_bounds;
 
-    M3_TEST_OK(
-        m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_VISIBLE_STRIDE));
+    M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_VISIBLE_STRIDE));
     M3_TEST_EXPECT(m3_list_view_update(&list), M3_ERR_RANGE);
     M3_TEST_OK(m3_list_test_clear_fail_points());
 
@@ -1275,8 +1273,7 @@ int main(void) {
 
     list.item_count = saved_item_count;
     M3_TEST_OK(m3_list_view_set_bind(&list, test_bind, &bind_ctx));
-    M3_TEST_OK(
-        m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_LIST_ITEM_BOUNDS));
+    M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_LIST_ITEM_BOUNDS));
     M3_TEST_EXPECT(m3_list_view_update(&list), M3_ERR_IO);
     M3_TEST_OK(m3_list_test_clear_fail_points());
     M3_TEST_OK(
@@ -1311,13 +1308,15 @@ int main(void) {
     state_bounds.width = 50.0f;
     state_bounds.height = 25.0f;
 
-    M3_TEST_OK(m3_list_view_init(&list_state, &state_style, &state_iface, 1, 0));
+    M3_TEST_OK(
+        m3_list_view_init(&list_state, &state_style, &state_iface, 1, 0));
     list_state.bounds = state_bounds;
     list_state.item_count = 1u;
     M3_TEST_EXPECT(m3_list_view_update(&list_state), M3_ERR_STATE);
     M3_TEST_OK(list_state.widget.vtable->destroy(list_state.widget.ctx));
 
-    M3_TEST_OK(m3_list_view_init(&list_range, &state_style, &state_iface, 5, 1));
+    M3_TEST_OK(
+        m3_list_view_init(&list_range, &state_style, &state_iface, 5, 1));
     list_range.bounds = state_bounds;
     bind_ctx.pool = pool;
     bind_ctx.pool_count = M3_COUNTOF(pool);
@@ -1396,8 +1395,7 @@ int main(void) {
                  M3_ERR_UNKNOWN);
   M3_TEST_OK(m3_core_test_set_default_allocator_fail(M3_FALSE));
 
-  M3_TEST_OK(
-      m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_RESERVE_NODE_BYTES));
+  M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_RESERVE_NODE_BYTES));
   M3_TEST_EXPECT(m3_grid_view_init(&grid, &grid_style, NULL, 0, 2),
                  M3_ERR_OVERFLOW);
   M3_TEST_OK(m3_list_test_clear_fail_points());
@@ -1753,7 +1751,8 @@ int main(void) {
     update_bind.last_index = 0u;
     update_bind.fail = 0;
 
-    M3_TEST_OK(m3_grid_view_init(&grid_state, &update_style, &update_iface, 2, 0));
+    M3_TEST_OK(
+        m3_grid_view_init(&grid_state, &update_style, &update_iface, 2, 0));
     grid_state.bounds = update_bounds;
     M3_TEST_OK(m3_grid_view_set_bind(&grid_state, test_bind, &update_bind));
     M3_TEST_EXPECT(m3_grid_view_update(&grid_state), M3_ERR_STATE);
@@ -1763,7 +1762,8 @@ int main(void) {
     update_bind.calls = 0u;
     update_bind.last_index = 0u;
     update_bind.fail = 0;
-    M3_TEST_OK(m3_grid_view_init(&grid_range, &update_style, &update_iface, 6, 1));
+    M3_TEST_OK(
+        m3_grid_view_init(&grid_range, &update_style, &update_iface, 6, 1));
     grid_range.bounds = update_bounds;
     M3_TEST_OK(m3_grid_view_set_bind(&grid_range, test_bind, &update_bind));
     M3_TEST_EXPECT(m3_grid_view_update(&grid_range), M3_ERR_RANGE);
@@ -1773,7 +1773,8 @@ int main(void) {
     update_bind.calls = 0u;
     update_bind.last_index = 0u;
     update_bind.fail = 0;
-    M3_TEST_OK(m3_grid_view_init(&grid_count, &update_style, &update_iface, 0, 2));
+    M3_TEST_OK(
+        m3_grid_view_init(&grid_count, &update_style, &update_iface, 0, 2));
     grid_count.bounds = update_bounds;
     M3_TEST_OK(m3_grid_view_set_bind(&grid_count, test_bind, &update_bind));
     M3_TEST_OK(m3_grid_view_update(&grid_count));
@@ -1783,7 +1784,8 @@ int main(void) {
     update_bind.calls = 0u;
     update_bind.last_index = 0u;
     update_bind.fail = 0;
-    M3_TEST_OK(m3_grid_view_init(&grid_update, &update_style, &update_iface, 4, 4));
+    M3_TEST_OK(
+        m3_grid_view_init(&grid_update, &update_style, &update_iface, 4, 4));
     grid_update.bounds = update_bounds;
     M3_TEST_OK(m3_grid_view_set_bind(&grid_update, test_bind, &update_bind));
 
@@ -1813,8 +1815,7 @@ int main(void) {
     M3_TEST_EXPECT(m3_grid_view_update(&grid_update), M3_ERR_STATE);
     M3_TEST_OK(m3_grid_view_set_bind(&grid_update, test_bind, &update_bind));
 
-    M3_TEST_OK(
-        m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_GRID_ITEM_BOUNDS));
+    M3_TEST_OK(m3_list_test_set_fail_point(M3_LIST_TEST_FAIL_GRID_ITEM_BOUNDS));
     M3_TEST_EXPECT(m3_grid_view_update(&grid_update), M3_ERR_IO);
     M3_TEST_OK(m3_list_test_clear_fail_points());
 

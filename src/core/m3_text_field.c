@@ -1632,17 +1632,17 @@ static int m3_text_field_widget_event(void *widget, const M3InputEvent *event,
     if (rc != M3_OK) {
       return rc;
     }
-  field->focused = M3_TRUE;
-  rc = m3_text_field_sync_label(field);
+    field->focused = M3_TRUE;
+    rc = m3_text_field_sync_label(field);
 #ifdef M3_TESTING
-  if (m3_text_field_test_fail_point_match(
-          M3_TEXT_FIELD_TEST_FAIL_EVENT_SYNC_LABEL)) {
-    rc = M3_ERR_IO;
-  }
+    if (m3_text_field_test_fail_point_match(
+            M3_TEXT_FIELD_TEST_FAIL_EVENT_SYNC_LABEL)) {
+      rc = M3_ERR_IO;
+    }
 #endif
-  if (rc != M3_OK) {
-    return rc;
-  }
+    if (rc != M3_OK) {
+      return rc;
+    }
     *out_handled = M3_TRUE;
     return M3_OK;
   case M3_INPUT_TEXT_EDIT:

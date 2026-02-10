@@ -155,11 +155,11 @@ int main(void) {
   M3_TEST_OK(m3_layout_test_resolve_available(M3_LAYOUT_AUTO, spec_exact_50,
                                               &resolved));
   M3_TEST_ASSERT(resolved == 50.0f);
-  M3_TEST_OK(m3_layout_test_resolve_available(10.0f, spec_at_most_15,
-                                              &resolved));
+  M3_TEST_OK(
+      m3_layout_test_resolve_available(10.0f, spec_at_most_15, &resolved));
   M3_TEST_ASSERT(resolved == 10.0f);
-  M3_TEST_OK(m3_layout_test_resolve_available(20.0f, spec_at_most_15,
-                                              &resolved));
+  M3_TEST_OK(
+      m3_layout_test_resolve_available(20.0f, spec_at_most_15, &resolved));
   M3_TEST_ASSERT(resolved == 15.0f);
 
   M3_TEST_EXPECT(m3_layout_edges_set(NULL, 0.0f, 0.0f, 0.0f, 0.0f),
@@ -167,18 +167,17 @@ int main(void) {
   M3_TEST_EXPECT(m3_layout_edges_set(&edges, -1.0f, 0.0f, 0.0f, 0.0f),
                  M3_ERR_RANGE);
   M3_TEST_OK(m3_layout_edges_set(&edges, 1.0f, 2.0f, 3.0f, 4.0f));
-  M3_TEST_EXPECT(
-      m3_layout_test_resolve_horizontal_padding(NULL, &edges, &padding_left,
-                                                &padding_right),
-      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_layout_test_resolve_horizontal_padding(
+                     NULL, &edges, &padding_left, &padding_right),
+                 M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_layout_test_resolve_horizontal_padding(
                      &direction, NULL, &padding_left, &padding_right),
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_layout_test_resolve_horizontal_padding(
                      &direction, &edges, NULL, &padding_right),
                  M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_layout_test_resolve_horizontal_padding(
-                     &direction, &edges, &padding_left, NULL),
+  M3_TEST_EXPECT(m3_layout_test_resolve_horizontal_padding(&direction, &edges,
+                                                           &padding_left, NULL),
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_OK(m3_layout_test_resolve_horizontal_padding(
       &direction, &edges, &padding_left, &padding_right));
@@ -245,9 +244,8 @@ int main(void) {
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_layout_compute(NULL, &direction, spec_unspec, spec_unspec),
                  M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(
-      m3_layout_compute(&node, NULL, spec_unspec, spec_unspec),
-      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_layout_compute(&node, NULL, spec_unspec, spec_unspec),
+                 M3_ERR_INVALID_ARGUMENT);
 
   M3_TEST_EXPECT(m3_layout_test_validate_measure_spec(NULL),
                  M3_ERR_INVALID_ARGUMENT);
@@ -371,7 +369,8 @@ int main(void) {
   M3_TEST_OK(m3_layout_node_get_layout(&node, &rect));
   M3_TEST_ASSERT(rect.width == 50.0f);
 
-  M3_TEST_OK(m3_layout_compute(&node, &direction, spec_at_most_15, spec_unspec));
+  M3_TEST_OK(
+      m3_layout_compute(&node, &direction, spec_at_most_15, spec_unspec));
   M3_TEST_OK(m3_layout_node_get_layout(&node, &rect));
   M3_TEST_ASSERT(rect.width == 15.0f);
 
@@ -417,7 +416,8 @@ int main(void) {
   style.align_main = M3_LAYOUT_ALIGN_START;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(rect.x == 0.0f);
   M3_TEST_OK(m3_layout_node_get_layout(&child2, &rect));
@@ -428,7 +428,8 @@ int main(void) {
   style.align_main = M3_LAYOUT_ALIGN_CENTER;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(rect.x == 10.0f);
   M3_TEST_OK(m3_layout_node_get_layout(&child2, &rect));
@@ -439,7 +440,8 @@ int main(void) {
   style.align_main = M3_LAYOUT_ALIGN_END;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(rect.x == 20.0f);
   M3_TEST_OK(m3_layout_node_get_layout(&child2, &rect));
@@ -450,7 +452,8 @@ int main(void) {
   style.align_main = M3_LAYOUT_ALIGN_SPACE_BETWEEN;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(rect.x == 0.0f);
   M3_TEST_OK(m3_layout_node_get_layout(&child2, &rect));
@@ -461,7 +464,8 @@ int main(void) {
   style.align_main = M3_LAYOUT_ALIGN_SPACE_AROUND;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(m3_layout_near(rect.x, 3.3333333f, 0.01f));
   M3_TEST_OK(m3_layout_node_get_layout(&child2, &rect));
@@ -472,7 +476,8 @@ int main(void) {
   style.align_main = M3_LAYOUT_ALIGN_SPACE_EVENLY;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(m3_layout_near(rect.x, 5.0f, 0.01f));
   M3_TEST_OK(m3_layout_node_get_layout(&child2, &rect));
@@ -484,21 +489,24 @@ int main(void) {
   style.align_cross = M3_LAYOUT_ALIGN_CENTER;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(rect.y == 15.0f);
 
   style.align_cross = M3_LAYOUT_ALIGN_END;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(rect.y == 30.0f);
 
   style.align_cross = M3_LAYOUT_ALIGN_STRETCH;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(rect.height == 40.0f);
 
@@ -507,7 +515,8 @@ int main(void) {
   style.padding.top = 2.0f;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_60, spec_exact_40));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(rect.x == 5.0f);
   M3_TEST_ASSERT(rect.y == 2.0f);
@@ -517,7 +526,8 @@ int main(void) {
   style.wrap = M3_LAYOUT_WRAP_YES;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_30, spec_unspec));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_30, spec_unspec));
   M3_TEST_OK(m3_layout_node_get_layout(&container, &rect));
   M3_TEST_ASSERT(rect.height == 20.0f);
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
@@ -532,7 +542,8 @@ int main(void) {
   style.align_cross = M3_LAYOUT_ALIGN_END;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_40, spec_exact_60));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_40, spec_exact_60));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(rect.y == 15.0f);
   M3_TEST_ASSERT(rect.x == 30.0f);
@@ -540,7 +551,8 @@ int main(void) {
   style.align_cross = M3_LAYOUT_ALIGN_STRETCH;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_40, spec_exact_60));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_40, spec_exact_60));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(rect.width == 40.0f);
 
@@ -548,7 +560,8 @@ int main(void) {
   style.align_cross = M3_LAYOUT_ALIGN_START;
   M3_TEST_OK(m3_layout_node_init(&container, &style));
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 3));
-  M3_TEST_OK(m3_layout_compute(&container, &direction, spec_exact_40, spec_exact_25));
+  M3_TEST_OK(
+      m3_layout_compute(&container, &direction, spec_exact_40, spec_exact_25));
   M3_TEST_OK(m3_layout_node_get_layout(&child1, &rect));
   M3_TEST_ASSERT(rect.x == 0.0f);
   M3_TEST_OK(m3_layout_node_get_layout(&child3, &rect));
@@ -859,8 +872,9 @@ int main(void) {
                                         &mutate_ctx));
   children[0] = &child1;
   M3_TEST_OK(m3_layout_node_set_children(&container, children, 1));
-  M3_TEST_EXPECT(m3_layout_compute(&container, &direction, spec_unspec, spec_unspec),
-                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      m3_layout_compute(&container, &direction, spec_unspec, spec_unspec),
+      M3_ERR_INVALID_ARGUMENT);
 
   container.child_count = 1;
   container.children = NULL;
@@ -972,15 +986,14 @@ int main(void) {
   M3_TEST_EXPECT(
       m3_layout_test_measure_row(&container, spec_unspec, spec_unspec, &size),
       M3_ERR_UNKNOWN);
-  M3_TEST_EXPECT(
-      m3_layout_test_measure_column(&container, spec_unspec, spec_unspec, &size),
-      M3_ERR_UNKNOWN);
-  M3_TEST_EXPECT(m3_layout_test_measure_node(&container, spec_unspec,
-                                             spec_unspec),
+  M3_TEST_EXPECT(m3_layout_test_measure_column(&container, spec_unspec,
+                                               spec_unspec, &size),
                  M3_ERR_UNKNOWN);
   M3_TEST_EXPECT(
-      m3_layout_test_layout_node(&container, 0.0f, 0.0f, 1.0f, 1.0f),
+      m3_layout_test_measure_node(&container, spec_unspec, spec_unspec),
       M3_ERR_UNKNOWN);
+  M3_TEST_EXPECT(m3_layout_test_layout_node(&container, 0.0f, 0.0f, 1.0f, 1.0f),
+                 M3_ERR_UNKNOWN);
   M3_TEST_EXPECT(
       m3_layout_test_layout_children_row(&container, 0.0f, 0.0f, 1.0f, 1.0f),
       M3_ERR_UNKNOWN);

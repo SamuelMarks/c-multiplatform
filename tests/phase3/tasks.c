@@ -1,5 +1,5 @@
-#include "m3/m3_tasks.h"
 #include "m3/m3_core.h"
+#include "m3/m3_tasks.h"
 #include "test_utils.h"
 
 #include <stdlib.h>
@@ -192,7 +192,10 @@ int main(void) {
     M3_TEST_ASSERT(config.handle_capacity > 0);
   }
 
-  { M3_TEST_EXPECT(m3_tasks_default_create(NULL, NULL), M3_ERR_INVALID_ARGUMENT); }
+  {
+    M3_TEST_EXPECT(m3_tasks_default_create(NULL, NULL),
+                   M3_ERR_INVALID_ARGUMENT);
+  }
 
 #ifdef M3_TESTING
   {
@@ -308,9 +311,9 @@ int main(void) {
     M3_TEST_EXPECT(m3_tasks_test_thread_entry_case(999u),
                    M3_ERR_INVALID_ARGUMENT);
 
-    M3_TEST_EXPECT(m3_tasks_test_thread_create_case(
-                       M3_TASKS_TEST_THREAD_CREATE_STATE),
-                   M3_ERR_STATE);
+    M3_TEST_EXPECT(
+        m3_tasks_test_thread_create_case(M3_TASKS_TEST_THREAD_CREATE_STATE),
+        M3_ERR_STATE);
     M3_TEST_EXPECT(m3_tasks_test_thread_create_case(
                        M3_TASKS_TEST_THREAD_CREATE_ALLOC_FAIL),
                    M3_ERR_OUT_OF_MEMORY);
@@ -354,9 +357,9 @@ int main(void) {
     M3_TEST_OK(m3_tasks_test_clear_fail_point());
 
     M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_TEST_MALLOC));
-    M3_TEST_EXPECT(m3_tasks_test_thread_join_case(
-                       M3_TASKS_TEST_THREAD_JOIN_NATIVE_FAIL),
-                   M3_ERR_OUT_OF_MEMORY);
+    M3_TEST_EXPECT(
+        m3_tasks_test_thread_join_case(M3_TASKS_TEST_THREAD_JOIN_NATIVE_FAIL),
+        M3_ERR_OUT_OF_MEMORY);
     M3_TEST_OK(m3_tasks_test_clear_fail_point());
 
     M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_TEST_MALLOC));
@@ -366,9 +369,9 @@ int main(void) {
     M3_TEST_OK(m3_tasks_test_clear_fail_point());
 
     M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_TEST_MALLOC));
-    M3_TEST_EXPECT(m3_tasks_test_thread_join_case(
-                       M3_TASKS_TEST_THREAD_JOIN_FREE_FAIL),
-                   M3_ERR_OUT_OF_MEMORY);
+    M3_TEST_EXPECT(
+        m3_tasks_test_thread_join_case(M3_TASKS_TEST_THREAD_JOIN_FREE_FAIL),
+        M3_ERR_OUT_OF_MEMORY);
     M3_TEST_OK(m3_tasks_test_clear_fail_point());
 
     M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_THREAD_CREATE));
@@ -464,9 +467,9 @@ int main(void) {
     M3_TEST_EXPECT(
         m3_tasks_test_mutex_unlock_case(M3_TASKS_TEST_MUTEX_UNLOCK_STATE),
         M3_ERR_STATE);
-    M3_TEST_EXPECT(
-        m3_tasks_test_mutex_unlock_case(M3_TASKS_TEST_MUTEX_UNLOCK_RESOLVE_FAIL),
-        M3_ERR_UNKNOWN);
+    M3_TEST_EXPECT(m3_tasks_test_mutex_unlock_case(
+                       M3_TASKS_TEST_MUTEX_UNLOCK_RESOLVE_FAIL),
+                   M3_ERR_UNKNOWN);
     M3_TEST_EXPECT(m3_tasks_test_mutex_unlock_case(
                        M3_TASKS_TEST_MUTEX_UNLOCK_NOT_INITIALIZED),
                    M3_ERR_STATE);
@@ -557,15 +560,15 @@ int main(void) {
     M3_TEST_OK(m3_tasks_test_signal_stop_null());
 
     M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_THREAD_JOIN));
-    M3_TEST_EXPECT(m3_tasks_test_worker_case(
-                       M3_TASKS_TEST_WORKER_CASE_TIMEDWAIT_SIGNAL),
-                   M3_ERR_UNKNOWN);
+    M3_TEST_EXPECT(
+        m3_tasks_test_worker_case(M3_TASKS_TEST_WORKER_CASE_TIMEDWAIT_SIGNAL),
+        M3_ERR_UNKNOWN);
     M3_TEST_OK(m3_tasks_test_clear_fail_point());
 
     M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_THREAD_CREATE));
-    M3_TEST_EXPECT(m3_tasks_test_worker_case(
-                       M3_TASKS_TEST_WORKER_CASE_TIMEDWAIT_SIGNAL),
-                   M3_ERR_UNKNOWN);
+    M3_TEST_EXPECT(
+        m3_tasks_test_worker_case(M3_TASKS_TEST_WORKER_CASE_TIMEDWAIT_SIGNAL),
+        M3_ERR_UNKNOWN);
     M3_TEST_OK(m3_tasks_test_clear_fail_point());
     M3_TEST_OK(m3_tasks_test_worker_case(999u));
   }
@@ -584,8 +587,7 @@ int main(void) {
         m3_tasks_test_timedwait_case(M3_TASKS_TEST_TIMEDWAIT_NSEC_ADJUST));
     M3_TEST_OK(
         m3_tasks_test_timedwait_case(M3_TASKS_TEST_TIMEDWAIT_SIGNAL_NULL));
-    M3_TEST_EXPECT(m3_tasks_test_timedwait_case(999u),
-                   M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_tasks_test_timedwait_case(999u), M3_ERR_INVALID_ARGUMENT);
   }
 
   {
@@ -631,8 +633,8 @@ int main(void) {
                    M3_ERR_UNKNOWN);
     M3_TEST_OK(m3_tasks_test_clear_fail_point());
 
-    M3_TEST_OK(
-        m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_INVALID));
+    M3_TEST_OK(m3_tasks_test_set_fail_point(
+        M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_INVALID));
     M3_TEST_EXPECT(
         m3_tasks_test_timedwait_case(M3_TASKS_TEST_TIMEDWAIT_NSEC_ADJUST),
         M3_ERR_UNKNOWN);
@@ -948,14 +950,14 @@ int main(void) {
                    M3_ERR_INVALID_ARGUMENT);
 
     M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_MUTEX_INIT));
-    M3_TEST_EXPECT(m3_tasks_test_post_delayed_case(
-                       M3_TASKS_TEST_POST_DELAYED_CASE_BUSY),
-                   M3_ERR_UNKNOWN);
+    M3_TEST_EXPECT(
+        m3_tasks_test_post_delayed_case(M3_TASKS_TEST_POST_DELAYED_CASE_BUSY),
+        M3_ERR_UNKNOWN);
     M3_TEST_OK(m3_tasks_test_clear_fail_point());
     M3_TEST_OK(m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_COND_INIT));
-    M3_TEST_EXPECT(m3_tasks_test_post_delayed_case(
-                       M3_TASKS_TEST_POST_DELAYED_CASE_BUSY),
-                   M3_ERR_UNKNOWN);
+    M3_TEST_EXPECT(
+        m3_tasks_test_post_delayed_case(M3_TASKS_TEST_POST_DELAYED_CASE_BUSY),
+        M3_ERR_UNKNOWN);
     M3_TEST_OK(m3_tasks_test_clear_fail_point());
 
     {

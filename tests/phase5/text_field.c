@@ -1923,8 +1923,8 @@ int main(void) {
                  M3_ERR_IO);
   M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
-  M3_TEST_OK(m3_text_field_init(&event_field, &text_backend, &style, NULL, "A",
-                                1));
+  M3_TEST_OK(
+      m3_text_field_init(&event_field, &text_backend, &style, NULL, "A", 1));
   event_field.utf8_label = NULL;
   event_field.label_len = 0u;
   event_field.label_value = 1.0f;
@@ -1935,9 +1935,9 @@ int main(void) {
   event.data.text.length = 1u;
   M3_TEST_OK(m3_text_field_test_set_fail_point(
       M3_TEXT_FIELD_TEST_FAIL_EVENT_SYNC_LABEL));
-  M3_TEST_EXPECT(
-      event_field.widget.vtable->event(event_field.widget.ctx, &event, &handled),
-      M3_ERR_IO);
+  M3_TEST_EXPECT(event_field.widget.vtable->event(event_field.widget.ctx,
+                                                  &event, &handled),
+                 M3_ERR_IO);
   M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
   memset(&event, 0, sizeof(event));
@@ -1946,17 +1946,17 @@ int main(void) {
   event.data.text_utf8.length = 1u;
   M3_TEST_OK(m3_text_field_test_set_fail_point(
       M3_TEXT_FIELD_TEST_FAIL_EVENT_SYNC_LABEL));
-  M3_TEST_EXPECT(
-      event_field.widget.vtable->event(event_field.widget.ctx, &event, &handled),
-      M3_ERR_IO);
+  M3_TEST_EXPECT(event_field.widget.vtable->event(event_field.widget.ctx,
+                                                  &event, &handled),
+                 M3_ERR_IO);
   M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
   M3_TEST_OK(init_key_event(&event, 46u));
   M3_TEST_OK(
       m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_ANIM_START));
-  M3_TEST_EXPECT(
-      event_field.widget.vtable->event(event_field.widget.ctx, &event, &handled),
-      M3_ERR_IO);
+  M3_TEST_EXPECT(event_field.widget.vtable->event(event_field.widget.ctx,
+                                                  &event, &handled),
+                 M3_ERR_IO);
   M3_TEST_OK(m3_text_field_test_clear_fail_points());
   M3_TEST_OK(event_field.widget.vtable->destroy(event_field.widget.ctx));
 

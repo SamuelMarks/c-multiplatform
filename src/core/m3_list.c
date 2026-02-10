@@ -669,7 +669,8 @@ static int m3_grid_view_update_metrics(M3GridView *view) {
                            spacing_main * (M3Scalar)(line_count - 1);
   }
 #ifdef M3_TESTING
-  if (m3_list_test_fail_point_match(M3_LIST_TEST_FAIL_CONTENT_EXTENT_NEGATIVE)) {
+  if (m3_list_test_fail_point_match(
+          M3_LIST_TEST_FAIL_CONTENT_EXTENT_NEGATIVE)) {
     view->content_extent = -1.0f;
   }
 #endif

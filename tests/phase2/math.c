@@ -17,8 +17,8 @@ static int m3_float_near(M3Scalar a, M3Scalar b) {
 }
 
 int main(void) {
-  M3Rect a;
-  M3Rect b;
+  M3Rect a = {0};
+  M3Rect b = {0};
   M3Rect out;
   M3Bool hit;
   M3Mat3 mat;

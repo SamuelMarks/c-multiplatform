@@ -1151,7 +1151,9 @@ static int m3_slider_snap_value(M3Scalar value, M3Scalar min_value,
   if (force_negative) {
     count = -1.0f;
   }
-  if (count < 0.0f) { return M3_ERR_RANGE; }
+  if (count < 0.0f) {
+    return M3_ERR_RANGE;
+  }
   steps = (m3_i32)(count + 0.5f);
   clamped = min_value + ((M3Scalar)steps) * step;
 #ifdef M3_TESTING

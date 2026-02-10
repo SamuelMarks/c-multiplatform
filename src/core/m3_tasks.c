@@ -945,7 +945,7 @@ m3_tasks_worker_entry(void *user) {
   }
 
   for (;;) {
-    M3TaskItem task;
+    M3TaskItem task = {0};
     m3_u32 wait_ms;
 
     rc = m3_native_mutex_lock(&runner->queue_mutex);
@@ -1967,12 +1967,12 @@ int M3_CALL m3_tasks_test_thread_create_case(m3_u32 mode) {
   switch (mode) {
   case M3_TASKS_TEST_THREAD_CREATE_STATE:
     runner.initialized = M3_FALSE;
-    return m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop, NULL,
-                                          &out_thread);
+    return m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop,
+                                          NULL, &out_thread);
   case M3_TASKS_TEST_THREAD_CREATE_ALLOC_FAIL:
     stub.rc_alloc = M3_ERR_OUT_OF_MEMORY;
-    return m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop, NULL,
-                                          &out_thread);
+    return m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop,
+                                          NULL, &out_thread);
   case M3_TASKS_TEST_THREAD_CREATE_OBJECT_FAIL:
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_OBJECT_INIT);
     rc = m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop, NULL,
@@ -1987,8 +1987,8 @@ int M3_CALL m3_tasks_test_thread_create_case(m3_u32 mode) {
     return rc;
   case M3_TASKS_TEST_THREAD_CREATE_REGISTER_FAIL:
     stub.rc_register = M3_ERR_UNKNOWN;
-    return m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop, NULL,
-                                          &out_thread);
+    return m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop,
+                                          NULL, &out_thread);
   default:
     return M3_ERR_INVALID_ARGUMENT;
   }
@@ -2368,10 +2368,10 @@ int M3_CALL m3_tasks_test_stub_exercise(void) {
   stub.rc_register = M3_OK;
   rc = m3_tasks_test_register_ex(&stub, &obj);
   result = (rc == M3_OK) ? result : rc;
-  result = (obj.handle.id == 1u && obj.handle.generation == 1u &&
-            stub.ptr == &obj)
-               ? result
-               : M3_ERR_UNKNOWN;
+  result =
+      (obj.handle.id == 1u && obj.handle.generation == 1u && stub.ptr == &obj)
+          ? result
+          : M3_ERR_UNKNOWN;
 
   rc = m3_tasks_test_resolve_ex(NULL, handle, &out_ptr);
   result = (rc == M3_ERR_INVALID_ARGUMENT) ? result : rc;

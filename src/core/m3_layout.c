@@ -30,9 +30,10 @@ static int m3_layout_validate_direction(const M3LayoutDirection *direction) {
   return M3_OK;
 }
 
-static int m3_layout_resolve_horizontal_padding(
-    const M3LayoutDirection *direction, const M3LayoutEdges *padding,
-    M3Scalar *out_left, M3Scalar *out_right) {
+static int
+m3_layout_resolve_horizontal_padding(const M3LayoutDirection *direction,
+                                     const M3LayoutEdges *padding,
+                                     M3Scalar *out_left, M3Scalar *out_right) {
   M3Scalar start;
   M3Scalar end;
   M3Bool is_rtl;
@@ -253,8 +254,7 @@ static int m3_layout_measure_leaf(M3LayoutNode *node, M3LayoutMeasureSpec width,
 static int m3_layout_measure_row(M3LayoutNode *node,
                                  const M3LayoutDirection *direction,
                                  M3LayoutMeasureSpec width,
-                                 M3LayoutMeasureSpec height,
-                                 M3Size *out_size) {
+                                 M3LayoutMeasureSpec height, M3Size *out_size) {
   M3LayoutMeasureSpec child_width_spec;
   M3LayoutMeasureSpec child_height_spec;
   M3Scalar padding_lr;
@@ -825,8 +825,8 @@ static int m3_layout_layout_children_row(M3LayoutNode *node,
       }
       child_y = origin_y + padding_top + cursor_cross + cross_offset;
 
-      rc = m3_layout_layout_node(child, direction, child_x, child_y,
-                                 child_main, child_cross);
+      rc = m3_layout_layout_node(child, direction, child_x, child_y, child_main,
+                                 child_cross);
       if (rc != M3_OK) {
         return rc;
       }
@@ -1200,8 +1200,8 @@ int M3_CALL m3_layout_compute(M3LayoutNode *root,
     return rc;
   }
 
-  rc = m3_layout_layout_node(root, direction, 0.0f, 0.0f,
-                             root->measured.width, root->measured.height);
+  rc = m3_layout_layout_node(root, direction, 0.0f, 0.0f, root->measured.width,
+                             root->measured.height);
   if (rc != M3_OK) {
     return rc;
   }

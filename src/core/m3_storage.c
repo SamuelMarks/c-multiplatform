@@ -212,7 +212,9 @@ int M3_CALL m3_storage_init(M3Storage *storage, const M3StorageConfig *config) {
     if (rc != M3_OK) {
       return rc;
     }
-  } else { allocator = *config->allocator; }
+  } else {
+    allocator = *config->allocator;
+  }
 
   if (allocator.alloc == NULL || allocator.realloc == NULL ||
       allocator.free == NULL) {
