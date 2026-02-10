@@ -10,17 +10,26 @@ typedef struct TestWidget {
     M3Bool handled;
     M3Scalar last_x;
     M3Scalar last_y;
+    char last_text[64];
+    m3_usize last_text_len;
+    m3_i32 last_cursor;
+    m3_i32 last_selection;
 } TestWidget;
 
 static void test_widget_init(TestWidget *widget)
 {
     memset(widget, 0, sizeof(*widget));
     widget->handled = M3_TRUE;
+    widget->last_text[0] = '\0';
 }
 
 static int test_widget_event(void *ctx, const M3InputEvent *event, M3Bool *out_handled)
 {
     TestWidget *widget;
+    const char *text;
+    m3_usize text_len;
+    m3_usize i;
+    m3_usize max_len;
 
     if (ctx == NULL || event == NULL || out_handled == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
@@ -29,10 +38,49 @@ static int test_widget_event(void *ctx, const M3InputEvent *event, M3Bool *out_h
     widget = (TestWidget *)ctx;
     widget->event_calls += 1;
     widget->last_type = (int)event->type;
+    widget->last_text_len = 0;
+    widget->last_text[0] = '\0';
+    widget->last_cursor = 0;
+    widget->last_selection = 0;
     if (event->type == M3_INPUT_POINTER_DOWN || event->type == M3_INPUT_POINTER_UP
         || event->type == M3_INPUT_POINTER_MOVE || event->type == M3_INPUT_POINTER_SCROLL) {
         widget->last_x = (M3Scalar)event->data.pointer.x;
         widget->last_y = (M3Scalar)event->data.pointer.y;
+    } else if (event->type == M3_INPUT_TEXT) {
+        text = event->data.text.utf8;
+        text_len = (m3_usize)event->data.text.length;
+        max_len = (m3_usize)(sizeof(widget->last_text) - 1);
+        if (text != NULL) {
+            for (i = 0; i < text_len && i < max_len && text[i] != '\0'; ++i) {
+                widget->last_text[i] = text[i];
+            }
+            widget->last_text[i] = '\0';
+            widget->last_text_len = i;
+        }
+    } else if (event->type == M3_INPUT_TEXT_UTF8) {
+        text = event->data.text_utf8.utf8;
+        text_len = event->data.text_utf8.length;
+        max_len = (m3_usize)(sizeof(widget->last_text) - 1);
+        if (text != NULL) {
+            for (i = 0; i < text_len && i < max_len && text[i] != '\0'; ++i) {
+                widget->last_text[i] = text[i];
+            }
+            widget->last_text[i] = '\0';
+            widget->last_text_len = i;
+        }
+    } else if (event->type == M3_INPUT_TEXT_EDIT) {
+        text = event->data.text_edit.utf8;
+        text_len = event->data.text_edit.length;
+        max_len = (m3_usize)(sizeof(widget->last_text) - 1);
+        if (text != NULL) {
+            for (i = 0; i < text_len && i < max_len && text[i] != '\0'; ++i) {
+                widget->last_text[i] = text[i];
+            }
+            widget->last_text[i] = '\0';
+            widget->last_text_len = i;
+        }
+        widget->last_cursor = event->data.text_edit.cursor;
+        widget->last_selection = event->data.text_edit.selection_length;
     }
 
     if (widget->fail_event) {
@@ -69,6 +117,40 @@ static void init_text_event(M3InputEvent *event, const char *text)
     }
     event->data.text.utf8[i] = '\0';
     event->data.text.length = (m3_u32)i;
+}
+
+static void init_text_utf8_event(M3InputEvent *event, const char *text)
+{
+    m3_usize len;
+
+    memset(event, 0, sizeof(*event));
+    event->type = M3_INPUT_TEXT_UTF8;
+    event->data.text_utf8.utf8 = text;
+    len = 0;
+    if (text != NULL) {
+        while (text[len] != '\0') {
+            len += 1;
+        }
+    }
+    event->data.text_utf8.length = len;
+}
+
+static void init_text_edit_event(M3InputEvent *event, const char *text, m3_i32 cursor, m3_i32 selection_length)
+{
+    m3_usize len;
+
+    memset(event, 0, sizeof(*event));
+    event->type = M3_INPUT_TEXT_EDIT;
+    event->data.text_edit.utf8 = text;
+    len = 0;
+    if (text != NULL) {
+        while (text[len] != '\0') {
+            len += 1;
+        }
+    }
+    event->data.text_edit.length = len;
+    event->data.text_edit.cursor = cursor;
+    event->data.text_edit.selection_length = selection_length;
 }
 
 static void init_window_event(M3InputEvent *event, m3_u32 type, m3_i32 width, m3_i32 height)
@@ -114,6 +196,10 @@ int main(void)
         M3_TEST_EXPECT(m3_event_dispatcher_get_focus_visible(NULL, &visible), M3_ERR_INVALID_ARGUMENT);
         M3_TEST_EXPECT(m3_event_dispatcher_get_focus_visible(&dispatcher, NULL), M3_ERR_INVALID_ARGUMENT);
         M3_TEST_EXPECT(m3_event_dispatcher_set_focus_visible(NULL, M3_TRUE), M3_ERR_INVALID_ARGUMENT);
+
+        M3_TEST_EXPECT(m3_event_dispatcher_set_focus(&dispatcher, &widget), M3_ERR_STATE);
+        M3_TEST_EXPECT(m3_event_dispatcher_get_focus_visible(&dispatcher, &visible), M3_ERR_STATE);
+        M3_TEST_EXPECT(m3_event_dispatcher_set_focus_visible(&dispatcher, M3_TRUE), M3_ERR_STATE);
 
         M3_TEST_EXPECT(m3_event_dispatcher_shutdown(&dispatcher), M3_ERR_STATE);
         M3_TEST_EXPECT(m3_event_dispatcher_get_focus(&dispatcher, &focused), M3_ERR_STATE);
@@ -211,6 +297,11 @@ int main(void)
         M3_TEST_OK(m3_event_dispatcher_get_focus_visible(&dispatcher, &handled));
         M3_TEST_ASSERT(handled == M3_FALSE);
 
+        state2.fail_event = 1;
+        init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 10, 10);
+        M3_TEST_EXPECT(m3_event_dispatch(&dispatcher, &root, &event, &target, &handled), M3_ERR_UNKNOWN);
+        state2.fail_event = 0;
+
         widget2.flags = M3_WIDGET_FLAG_FOCUSABLE | M3_WIDGET_FLAG_DISABLED;
         init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 10, 10);
         M3_TEST_OK(m3_event_dispatch(&dispatcher, &root, &event, &target, &handled));
@@ -230,6 +321,16 @@ int main(void)
         M3_TEST_ASSERT(target == NULL);
         root_widget.flags = 0;
 
+        widget1.flags = M3_WIDGET_FLAG_DISABLED;
+        widget2.flags = 0;
+        init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 10, 10);
+        M3_TEST_OK(m3_event_dispatch(&dispatcher, &root, &event, &target, &handled));
+        M3_TEST_ASSERT(target == &widget2);
+        M3_TEST_OK(m3_event_dispatcher_get_focus(&dispatcher, &target));
+        M3_TEST_ASSERT(target == NULL);
+        widget1.flags = M3_WIDGET_FLAG_FOCUSABLE;
+        widget2.flags = M3_WIDGET_FLAG_FOCUSABLE;
+
         init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 200, 200);
         M3_TEST_OK(m3_event_dispatch(&dispatcher, &root, &event, &target, &handled));
         M3_TEST_ASSERT(target == NULL);
@@ -248,6 +349,33 @@ int main(void)
         M3_TEST_ASSERT(handled == M3_FALSE);
         M3_TEST_OK(m3_event_dispatcher_get_focus_visible(&dispatcher, &handled));
         M3_TEST_ASSERT(handled == M3_TRUE);
+
+        init_text_event(&event, "Hi");
+        state1.handled = M3_TRUE;
+        M3_TEST_OK(m3_event_dispatch(&dispatcher, &root, &event, &target, &handled));
+        M3_TEST_ASSERT(target == &widget1);
+        M3_TEST_ASSERT(handled == M3_TRUE);
+        M3_TEST_ASSERT(state1.last_type == M3_INPUT_TEXT);
+        M3_TEST_ASSERT(state1.last_text_len == 2);
+        M3_TEST_ASSERT(strcmp(state1.last_text, "Hi") == 0);
+
+        init_text_utf8_event(&event, "Hello");
+        M3_TEST_OK(m3_event_dispatch(&dispatcher, &root, &event, &target, &handled));
+        M3_TEST_ASSERT(target == &widget1);
+        M3_TEST_ASSERT(handled == M3_TRUE);
+        M3_TEST_ASSERT(state1.last_type == M3_INPUT_TEXT_UTF8);
+        M3_TEST_ASSERT(state1.last_text_len == 5);
+        M3_TEST_ASSERT(strcmp(state1.last_text, "Hello") == 0);
+
+        init_text_edit_event(&event, "Compose", 2, 3);
+        M3_TEST_OK(m3_event_dispatch(&dispatcher, &root, &event, &target, &handled));
+        M3_TEST_ASSERT(target == &widget1);
+        M3_TEST_ASSERT(handled == M3_TRUE);
+        M3_TEST_ASSERT(state1.last_type == M3_INPUT_TEXT_EDIT);
+        M3_TEST_ASSERT(state1.last_text_len == 7);
+        M3_TEST_ASSERT(strcmp(state1.last_text, "Compose") == 0);
+        M3_TEST_ASSERT(state1.last_cursor == 2);
+        M3_TEST_ASSERT(state1.last_selection == 3);
 
         init_text_event(&event, "Hi");
         state1.fail_event = 1;
@@ -293,11 +421,15 @@ int main(void)
             M3_TEST_EXPECT(m3_event_dispatch(&uninit, &root, &event, &target, &handled), M3_ERR_STATE);
         }
 
+        root.child_count = 1;
+        widget2.flags = M3_WIDGET_FLAG_HIDDEN;
         child1.bounds.width = -1.0f;
         init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 1, 1);
         M3_TEST_EXPECT(m3_event_dispatch(&dispatcher, &root, &event, &target, &handled), M3_ERR_RANGE);
         child_bounds.width = 50.0f;
         M3_TEST_OK(m3_render_node_set_bounds(&child1, &child_bounds));
+        widget2.flags = M3_WIDGET_FLAG_FOCUSABLE;
+        root.child_count = 2;
 
         root.child_count = 1;
         root.children = NULL;
@@ -305,6 +437,11 @@ int main(void)
         M3_TEST_EXPECT(m3_event_dispatch(&dispatcher, &root, &event, &target, &handled), M3_ERR_INVALID_ARGUMENT);
         root.children = children;
         root.child_count = 2;
+
+        root.widget = NULL;
+        init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 1, 1);
+        M3_TEST_EXPECT(m3_event_dispatch(&dispatcher, &root, &event, &target, &handled), M3_ERR_INVALID_ARGUMENT);
+        root.widget = &root_widget;
 
         children[1] = NULL;
         init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 1, 1);

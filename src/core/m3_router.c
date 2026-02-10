@@ -4,6 +4,7 @@
 
 #ifdef M3_TESTING
 static m3_usize g_router_cstr_limit_override = 0;
+static M3Bool g_router_force_slice_equals_fail = M3_FALSE;
 #endif
 
 static const char g_router_root_path[] = "/";
@@ -177,6 +178,11 @@ static int m3_router_slice_equals(const M3UriSlice *slice, const char *key, m3_u
     if (slice == NULL || key == NULL || out_equal == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
+#ifdef M3_TESTING
+    if (g_router_force_slice_equals_fail) {
+        return M3_ERR_UNKNOWN;
+    }
+#endif
 
     if (slice->length != key_len) {
         *out_equal = M3_FALSE;
@@ -445,7 +451,12 @@ static int m3_route_match_len(const char *pattern, m3_usize pattern_len, const c
 static int m3_route_validate_pattern(const char *pattern)
 {
     m3_usize len;
-    M3Bool match;
+    const char *pat_str;
+    m3_usize pat_len;
+    m3_usize index;
+    const char *seg;
+    m3_usize seg_len;
+    M3Bool has_more;
     int rc;
 
     if (pattern == NULL) {
@@ -457,12 +468,33 @@ static int m3_route_validate_pattern(const char *pattern)
         return rc;
     }
 
-    match = M3_FALSE;
-    rc = m3_route_match_len(pattern, len, g_router_root_path, 1, NULL, 0, NULL, &match);
-    if (rc != M3_OK) {
-        return rc;
+    if (len == 0) {
+        return M3_OK;
     }
-    return M3_OK;
+
+    pat_str = pattern;
+    pat_len = len;
+    m3_route_trim_trailing(&pat_str, &pat_len);
+
+    index = 0;
+    for (;;) {
+        m3_route_next_segment(pat_str, pat_len, &index, &seg, &seg_len);
+        if (seg == NULL) {
+            return M3_OK;
+        }
+        if (seg_len == 1 && seg[0] == '*') {
+            has_more = m3_route_has_more_segments(pat_str, pat_len, index);
+            if (has_more == M3_TRUE) {
+                return M3_ERR_INVALID_ARGUMENT;
+            }
+            return M3_OK;
+        }
+        if (seg_len > 0 && seg[0] == ':') {
+            if (seg_len == 1) {
+                return M3_ERR_INVALID_ARGUMENT;
+            }
+        }
+    }
 }
 
 static int m3_router_release_entry(M3Router *router, M3RouteEntry *entry)
@@ -517,6 +549,10 @@ static int m3_router_find_route(const M3Router *router, const char *path, m3_usi
         route = &router->routes[i];
         if (route->pattern == NULL || route->build == NULL) {
             return M3_ERR_INVALID_ARGUMENT;
+        }
+        rc = m3_route_validate_pattern(route->pattern);
+        if (rc != M3_OK) {
+            return rc;
         }
 
         rc = m3_router_cstrlen(route->pattern, &pattern_len);
@@ -579,6 +615,25 @@ static int m3_router_navigate_path_len(M3Router *router, const char *path, m3_us
 
     if (router == NULL || path == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    if (router->stack_size > 0 && router->stack != NULL) {
+        const char *current_path;
+        m3_usize current_len;
+
+        current_path = router->stack[router->stack_size - 1].path;
+        if (current_path != NULL) {
+            rc = m3_router_cstrlen(current_path, &current_len);
+            if (rc != M3_OK) {
+                return rc;
+            }
+            if (current_len == path_len && memcmp(current_path, path, (size_t)path_len) == 0) {
+                if (out_component != NULL) {
+                    *out_component = router->stack[router->stack_size - 1].component;
+                }
+                return M3_OK;
+            }
+        }
     }
 
     if (router->stack_capacity == 0 || router->stack == NULL) {
@@ -845,6 +900,12 @@ int M3_CALL m3_router_test_set_cstr_limit(m3_usize max_len)
     return M3_OK;
 }
 
+int M3_CALL m3_router_test_set_slice_equals_fail(M3Bool enable)
+{
+    g_router_force_slice_equals_fail = enable ? M3_TRUE : M3_FALSE;
+    return M3_OK;
+}
+
 int M3_CALL m3_route_test_match(const char *pattern, const char *path, M3RouteParam *params, m3_usize max_params, m3_usize *out_param_count, M3Bool *out_match)
 {
     m3_usize pattern_len;
@@ -914,6 +975,11 @@ int M3_CALL m3_router_test_match_len(const char *pattern, m3_usize pattern_len, 
 int M3_CALL m3_router_test_validate_pattern(const char *pattern)
 {
     return m3_route_validate_pattern(pattern);
+}
+
+int M3_CALL m3_router_test_find_route(const M3Router *router, const char *path, m3_usize path_len, const M3Route **out_route)
+{
+    return m3_router_find_route(router, path, path_len, out_route);
 }
 
 int M3_CALL m3_router_test_release_entry(M3Router *router, M3RouteEntry *entry)

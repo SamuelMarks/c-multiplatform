@@ -257,6 +257,27 @@ M3_API int M3_CALL m3_render_test_mul_overflow(m3_usize a, m3_usize b, m3_usize 
  * @return M3_OK on success or a failure code.
  */
 M3_API int M3_CALL m3_render_test_list_reserve(M3RenderList *list, m3_usize additional);
+
+/**
+ * @brief Test wrapper for render node validation.
+ * @param node Render node to validate.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_render_test_validate_node(const M3RenderNode *node);
+
+/**
+ * @brief Test hook to force render list reserve path.
+ * @param enable Whether to force the reserve path.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_render_test_set_force_reserve(M3Bool enable);
+
+/**
+ * @brief Test hook to force clip intersection failure.
+ * @param enable Whether to force failure.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_render_test_set_force_intersect_fail(M3Bool enable);
 #endif
 
 #ifdef __cplusplus

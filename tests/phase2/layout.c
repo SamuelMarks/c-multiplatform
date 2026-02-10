@@ -147,6 +147,11 @@ int main(void)
     M3_TEST_OK(m3_layout_style_init(&style));
     M3_TEST_OK(m3_layout_node_init(&node, &style));
     M3_TEST_OK(m3_layout_node_init(&node, NULL));
+#ifdef M3_TESTING
+    M3_TEST_OK(m3_layout_test_set_style_init_fail(M3_TRUE));
+    M3_TEST_EXPECT(m3_layout_node_init(&node, NULL), M3_ERR_UNKNOWN);
+    M3_TEST_OK(m3_layout_test_set_style_init_fail(M3_FALSE));
+#endif
     M3_TEST_EXPECT(m3_layout_node_set_children(NULL, NULL, 0), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_layout_node_set_children(&node, NULL, 1), M3_ERR_INVALID_ARGUMENT);
     children[0] = NULL;
@@ -204,6 +209,16 @@ int main(void)
     M3_TEST_EXPECT(m3_layout_test_measure_column(&node, spec_unspec, spec_unspec, NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_layout_test_measure_node(NULL, spec_unspec, spec_unspec), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_layout_test_layout_node(NULL, 0.0f, 0.0f, 1.0f, 1.0f), M3_ERR_INVALID_ARGUMENT);
+
+    spec.mode = 99;
+    spec.size = 0.0f;
+    M3_TEST_EXPECT(m3_layout_test_measure_node(&node, spec_unspec, spec), M3_ERR_INVALID_ARGUMENT);
+    spec.mode = M3_LAYOUT_MEASURE_UNSPECIFIED;
+    spec.size = 0.0f;
+    node.child_count = 1;
+    node.children = NULL;
+    M3_TEST_EXPECT(m3_layout_test_measure_node(&node, spec_unspec, spec_unspec), M3_ERR_INVALID_ARGUMENT);
+    node.child_count = 0;
 
     spec.mode = M3_LAYOUT_MEASURE_EXACTLY;
     spec.size = -1.0f;
@@ -701,6 +716,60 @@ int main(void)
     spec.mode = M3_LAYOUT_MEASURE_EXACTLY;
     spec.size = -1.0f;
     M3_TEST_EXPECT(m3_layout_test_measure_node(&node, spec, spec_unspec), M3_ERR_RANGE);
+
+    M3_TEST_OK(m3_layout_style_init(&style));
+    style.direction = M3_LAYOUT_DIRECTION_ROW;
+    style.wrap = M3_LAYOUT_WRAP_NO;
+    style.width = M3_LAYOUT_AUTO;
+    style.height = M3_LAYOUT_AUTO;
+    M3_TEST_OK(m3_layout_node_init(&container, &style));
+    container.child_count = 0;
+    container.children = NULL;
+    M3_TEST_OK(m3_layout_test_measure_row(&container, spec_unspec, spec_unspec, &size));
+
+    M3_TEST_OK(m3_layout_style_init(&style));
+    style.direction = M3_LAYOUT_DIRECTION_ROW;
+    style.wrap = M3_LAYOUT_WRAP_YES;
+    style.width = 5.0f;
+    style.height = M3_LAYOUT_AUTO;
+    M3_TEST_OK(m3_layout_node_init(&container, &style));
+    M3_TEST_OK(m3_layout_node_init(&child1, &style));
+    M3_TEST_OK(m3_layout_node_init(&child2, &style));
+    child1.style.width = 2.0f;
+    child1.style.height = 1.0f;
+    child2.style.width = 6.0f;
+    child2.style.height = 1.0f;
+    children[0] = &child1;
+    children[1] = &child2;
+    M3_TEST_OK(m3_layout_node_set_children(&container, children, 2));
+    M3_TEST_OK(m3_layout_test_measure_row(&container, spec_unspec, spec_unspec, &size));
+
+    M3_TEST_OK(m3_layout_style_init(&style));
+    style.direction = M3_LAYOUT_DIRECTION_COLUMN;
+    style.wrap = M3_LAYOUT_WRAP_NO;
+    style.width = 100.0f;
+    style.height = 80.0f;
+    M3_TEST_OK(m3_layout_node_init(&container, &style));
+    spec.mode = M3_LAYOUT_MEASURE_EXACTLY;
+    spec.size = 50.0f;
+    M3_TEST_OK(m3_layout_test_measure_column(&container, spec, spec, &size));
+
+    M3_TEST_OK(m3_layout_style_init(&style));
+    style.direction = M3_LAYOUT_DIRECTION_COLUMN;
+    style.wrap = M3_LAYOUT_WRAP_YES;
+    style.width = M3_LAYOUT_AUTO;
+    style.height = 5.0f;
+    M3_TEST_OK(m3_layout_node_init(&container, &style));
+    M3_TEST_OK(m3_layout_node_init(&child1, &style));
+    M3_TEST_OK(m3_layout_node_init(&child2, &style));
+    child1.style.width = 1.0f;
+    child1.style.height = 2.0f;
+    child2.style.width = 1.0f;
+    child2.style.height = 6.0f;
+    children[0] = &child1;
+    children[1] = &child2;
+    M3_TEST_OK(m3_layout_node_set_children(&container, children, 2));
+    M3_TEST_OK(m3_layout_test_measure_column(&container, spec_unspec, spec_unspec, &size));
 
     return 0;
 }

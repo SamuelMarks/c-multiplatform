@@ -59,6 +59,10 @@ extern "C" {
 #define M3_INPUT_WINDOW_FOCUS 10
 /** @brief Window focus lost event. */
 #define M3_INPUT_WINDOW_BLUR 11
+/** @brief UTF-8 text input event with full-length string. */
+#define M3_INPUT_TEXT_UTF8 12
+/** @brief UTF-8 IME composition update event. */
+#define M3_INPUT_TEXT_EDIT 13
 
 /**
  * @brief Pointer input data.
@@ -82,12 +86,37 @@ typedef struct M3KeyEvent {
 } M3KeyEvent;
 
 /**
- * @brief UTF-8 text input data (null-terminated).
+ * @brief UTF-8 text input data (null-terminated, short form).
  */
 typedef struct M3TextEvent {
     char utf8[8]; /**< UTF-8 bytes including the null terminator. */
     m3_u32 length; /**< Number of bytes excluding the null terminator. */
 } M3TextEvent;
+
+/**
+ * @brief UTF-8 text input data (full-length).
+ *
+ * @note The utf8 pointer is owned by the backend and is only guaranteed to be
+ *       valid until the next call to poll_event on the same window system.
+ */
+typedef struct M3TextUtf8Event {
+    const char *utf8; /**< UTF-8 bytes (may be NULL for empty). */
+    m3_usize length; /**< Number of bytes in utf8 (may be 0). */
+} M3TextUtf8Event;
+
+/**
+ * @brief IME composition (text editing) data.
+ *
+ * @note Offsets are byte offsets in the UTF-8 buffer.
+ * @note The utf8 pointer is owned by the backend and is only guaranteed to be
+ *       valid until the next call to poll_event on the same window system.
+ */
+typedef struct M3TextEditEvent {
+    const char *utf8; /**< Current composition string in UTF-8 (may be NULL). */
+    m3_usize length; /**< Number of bytes in utf8 (may be 0). */
+    m3_i32 cursor; /**< Cursor byte offset in utf8. */
+    m3_i32 selection_length; /**< Selection length in bytes. */
+} M3TextEditEvent;
 
 /**
  * @brief Window event data.
@@ -104,6 +133,8 @@ typedef union M3InputEventData {
     M3PointerEvent pointer; /**< Pointer event payload. */
     M3KeyEvent key; /**< Key event payload. */
     M3TextEvent text; /**< Text input payload. */
+    M3TextUtf8Event text_utf8; /**< Full UTF-8 text input payload. */
+    M3TextEditEvent text_edit; /**< IME composition payload. */
     M3WindowEvent window; /**< Window event payload. */
 } M3InputEventData;
 

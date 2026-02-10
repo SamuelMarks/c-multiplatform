@@ -12,10 +12,12 @@ This project is architected specifically for **Context-Window Scalability**, dec
 *   **Flex-style Layout:** A constraint-based layout engine similar to Flexbox.
 *   **Physics-based Animation:** Spring simulation and timing controllers built-in.
 *   **Redux-style State Store:** Deterministic state management with time-travel debugging capabilities (Undo/Redo).
+*   **Component Suite:** Buttons, selection controls, and text fields (with cursor, selection, and label animation).
 *   **Modular Backends:**
     *   **Null Backend:** For headless testing and logic verification.
     *   **SDL3 Backend:** For desktop development and debugging.
-    *   *(Planned)*: Native Connectors for GTK3, Win32 GDI, Cocoa, Android, and Web/WASM.
+    *   **GTK4 Backend:** Linux desktop backend using GTK4/Cairo.
+    *   *(Planned)*: Native Connectors for Win32 GDI, Cocoa, Android, and Web/WASM.
 *   **Interface-Driven:** Pure virtual table architecture separates API definitions from execution logic.
 
 ## 📂 Architecture Strategy
@@ -26,12 +28,21 @@ The project structure is designed to separate the **Contract** (Phase 0) from th
 *   **`src/core/`**: Pure logic implementations (Math, Color, Layout, Router, Redux). These have no platform dependencies.
 *   **`src/backend/`**: Platform-specific glue code implementation of the V-Tables defined in `m3_api_*.h`.
 
+## 📚 Documentation
+
+*   **`USAGE.md`**: Build and widget usage walkthroughs.
+*   **`ARCHITECTURE.md`**: Contract/implementation split and system flow.
+*   **`DESIGN_PRINCIPLES.md`**: C89 and API design conventions.
+
 ## 🛠️ Build Instructions
 
 LibM3C uses **CMake**. Ensure you have CMake 3.16+ installed.
 
 ### Prerequisites for SDL3 Backend (Optional)
 If you wish to run the visual backend, ensure SDL3 is installed on your system. If not found, the build will proceed with only the Null backend and Core library.
+
+### Prerequisites for GTK4 Backend (Optional)
+To enable the GTK4 backend, install GTK4 development packages and ensure `pkg-config` can locate `gtk4`. If not found, the GTK4 backend will be stubbed.
 
 ### Compile
 
@@ -48,6 +59,9 @@ cmake --build .
 | :--- | :--- | :--- |
 | `M3_WARNINGS_AS_ERRORS` | `ON` | Treat compiler warnings as errors. |
 | `M3_ENABLE_SDL3` | `OFF` | Enable the SDL3 debug backend. |
+| `M3_ENABLE_GTK4` | `OFF` | Enable the GTK4 backend (Linux). |
+| `M3_ENABLE_LIBCURL` | `ON` | Enable libcurl-backed network support. |
+| `M3_APPLE_USE_CFNETWORK_C` | `ON` | Use CFNetwork C APIs for Apple network backends (OFF uses Foundation). |
 | `M3_REQUIRE_DOXYGEN` | `ON` | Fail configuration if Doxygen is missing. |
 | `M3_ENABLE_COVERAGE` | `OFF` | Enable code coverage (GCC/Clang only). |
 
@@ -63,6 +77,7 @@ ctest --output-on-failure
 To run a specific backend test manually:
 ```bash
 ./m3_phase4_sdl3_backend
+./m3_phase4_gtk4_backend
 ```
 
 ## 📦 Usage Example
@@ -146,7 +161,7 @@ int main(void) {
 | **1. Infra** | Build system, Allocators, Logging, Redux Store | ✅ Complete |
 | **2. Core Logic** | Math, HCT Color, Flex Layout, Springs, Router | ✅ Complete |
 | **3. Engine** | Render Tree Builders, Event Dispatching, Task Runner | ✅ Complete |
-| **4. Backends** | Null Backend, SDL3 Debug Backend | ✅ Complete |
-| **5. Components** | Buttons, Text Fields, Lists (Native Widgets) | 🚧 Planned |
-| **6. Plugins** | Camera, Network, Storage implementations | 🚧 Planned |
+| **4. Backends** | Null Backend, SDL3 Debug Backend, GTK4 (Linux) | 🚧 In Progress |
+| **5. Components** | Buttons, Text Fields, Lists (Native Widgets) | 🚧 In Progress (5.1–5.5 complete) |
+| **6. Plugins** | Camera, Network, Storage implementations | 🚧 In Progress (Storage core complete) |
 | **7. Release** | Packaging logic for Mobile/Web/Desktop | 🚧 Planned |

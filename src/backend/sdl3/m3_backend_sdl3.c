@@ -4,7 +4,11 @@
 #include "m3/m3_object.h"
 #include "m3/m3_tasks.h"
 
+#include <limits.h>
 #include <string.h>
+#if defined(M3_LIBCURL_AVAILABLE)
+#include <curl/curl.h>
+#endif
 
 #if defined(M3_SDL3_AVAILABLE)
 #include <SDL3/SDL.h>
@@ -103,9 +107,12 @@ typedef struct M3SDL3Window {
 typedef struct M3SDL3Texture {
     M3ObjectHeader header;
     struct M3SDL3Backend *backend;
+    void *texture;
+    void *renderer;
     m3_i32 width;
     m3_i32 height;
     m3_u32 format;
+    m3_u32 bytes_per_pixel;
 } M3SDL3Texture;
 
 typedef struct M3SDL3Font {
@@ -330,6 +337,66 @@ static int m3_sdl3_renderer_flags_to_sdl(m3_u32 flags, Uint32 *out_flags)
     return M3_OK;
 }
 
+static int m3_sdl3_texture_format_to_sdl(m3_u32 format, Uint32 *out_format, m3_u32 *out_bpp)
+{
+    if (out_format == NULL || out_bpp == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    if (format == M3_TEX_FORMAT_RGBA8) {
+#if defined(SDL_PIXELFORMAT_RGBA32)
+        *out_format = SDL_PIXELFORMAT_RGBA32;
+#elif defined(SDL_PIXELFORMAT_RGBA8888)
+        *out_format = SDL_PIXELFORMAT_RGBA8888;
+#else
+        return M3_ERR_UNSUPPORTED;
+#endif
+        *out_bpp = 4u;
+        return M3_OK;
+    }
+
+    if (format == M3_TEX_FORMAT_BGRA8) {
+#if defined(SDL_PIXELFORMAT_BGRA32)
+        *out_format = SDL_PIXELFORMAT_BGRA32;
+#elif defined(SDL_PIXELFORMAT_BGRA8888)
+        *out_format = SDL_PIXELFORMAT_BGRA8888;
+#else
+        return M3_ERR_UNSUPPORTED;
+#endif
+        *out_bpp = 4u;
+        return M3_OK;
+    }
+
+    if (format == M3_TEX_FORMAT_A8) {
+#if defined(SDL_PIXELFORMAT_A8)
+        *out_format = SDL_PIXELFORMAT_A8;
+        *out_bpp = 1u;
+        return M3_OK;
+#else
+        return M3_ERR_UNSUPPORTED;
+#endif
+    }
+
+    return M3_ERR_INVALID_ARGUMENT;
+}
+
+static int m3_sdl3_mul_usize(m3_usize a, m3_usize b, m3_usize *out_value)
+{
+    m3_usize max_value;
+
+    if (out_value == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    max_value = (m3_usize)~(m3_usize)0;
+    if (a != 0 && b > max_value / a) {
+        return M3_ERR_OVERFLOW;
+    }
+
+    *out_value = a * b;
+    return M3_OK;
+}
+
 static int m3_sdl3_window_flags_to_sdl(m3_u32 flags, Uint32 *out_flags)
 {
     Uint32 sdl_flags;
@@ -500,6 +567,13 @@ static int m3_sdl3_texture_destroy(void *obj)
 
     rc = backend->handles.vtable->unregister_object(backend->handles.ctx, texture->header.handle);
     M3_SDL3_RETURN_IF_ERROR(rc);
+
+#if defined(M3_SDL3_AVAILABLE)
+    if (texture->texture != NULL) {
+        SDL_DestroyTexture((SDL_Texture *)texture->texture);
+        texture->texture = NULL;
+    }
+#endif
 
     rc = backend->allocator.free(backend->allocator.ctx, texture);
     M3_SDL3_RETURN_IF_ERROR(rc);
@@ -1030,6 +1104,94 @@ static int m3_sdl3_fill_pointer_state(M3PointerEvent *pointer)
     return M3_OK;
 }
 
+static int m3_sdl3_fill_key_event(const SDL_Event *event, M3KeyEvent *key)
+{
+    if (event == NULL || key == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+#if defined(SDL_MAJOR_VERSION) && (SDL_MAJOR_VERSION >= 3)
+    key->key_code = (m3_u32)event->key.key;
+    key->native_code = (m3_u32)event->key.scancode;
+    key->is_repeat = event->key.repeat ? M3_TRUE : M3_FALSE;
+#else
+    key->key_code = (m3_u32)event->key.keysym.sym;
+    key->native_code = (m3_u32)event->key.keysym.scancode;
+    key->is_repeat = event->key.repeat ? M3_TRUE : M3_FALSE;
+#endif
+    return M3_OK;
+}
+
+static int m3_sdl3_copy_text(const char *text, M3TextEvent *out_text)
+{
+    m3_usize i;
+    m3_usize max_len;
+
+    if (out_text == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    out_text->utf8[0] = '\0';
+    out_text->length = 0u;
+    if (text == NULL) {
+        return M3_OK;
+    }
+
+    max_len = (m3_usize)sizeof(out_text->utf8) - 1u;
+    i = 0;
+    while (text[i] != '\0' && i < max_len) {
+        out_text->utf8[i] = text[i];
+        i += 1u;
+    }
+    out_text->utf8[i] = '\0';
+    out_text->length = (m3_u32)i;
+    return M3_OK;
+}
+
+static int m3_sdl3_text_length(const char *text, m3_usize *out_length)
+{
+    m3_usize i;
+
+    if (out_length == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    if (text == NULL) {
+        *out_length = 0;
+        return M3_OK;
+    }
+
+    i = 0;
+    while (text[i] != '\0') {
+        i += 1u;
+    }
+    *out_length = i;
+    return M3_OK;
+}
+
+static int m3_sdl3_fill_scroll_event(const SDL_Event *event, M3PointerEvent *pointer)
+{
+    m3_i32 scroll_x;
+    m3_i32 scroll_y;
+
+    if (event == NULL || pointer == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    scroll_x = (m3_i32)event->wheel.x;
+    scroll_y = (m3_i32)event->wheel.y;
+#if defined(SDL_MOUSEWHEEL_FLIPPED)
+    if (event->wheel.direction == SDL_MOUSEWHEEL_FLIPPED) {
+        scroll_x = -scroll_x;
+        scroll_y = -scroll_y;
+    }
+#endif
+
+    pointer->scroll_x = scroll_x;
+    pointer->scroll_y = scroll_y;
+    return M3_OK;
+}
+
 static int m3_sdl3_translate_event(struct M3SDL3Backend *backend, const SDL_Event *sdl_event, M3InputEvent *out_event, M3Bool *out_has_event)
 {
     m3_u32 modifiers;
@@ -1077,9 +1239,8 @@ static int m3_sdl3_translate_event(struct M3SDL3Backend *backend, const SDL_Even
         out_event->type = M3_INPUT_KEY_DOWN;
         out_event->modifiers = modifiers;
         out_event->window = window_handle;
-        out_event->data.key.key_code = 0u;
-        out_event->data.key.native_code = 0u;
-        out_event->data.key.is_repeat = M3_FALSE;
+        rc = m3_sdl3_fill_key_event(sdl_event, &out_event->data.key);
+        M3_SDL3_RETURN_IF_ERROR(rc);
         *out_has_event = M3_TRUE;
         return M3_OK;
     }
@@ -1089,9 +1250,8 @@ static int m3_sdl3_translate_event(struct M3SDL3Backend *backend, const SDL_Even
         out_event->type = M3_INPUT_KEY_UP;
         out_event->modifiers = modifiers;
         out_event->window = window_handle;
-        out_event->data.key.key_code = 0u;
-        out_event->data.key.native_code = 0u;
-        out_event->data.key.is_repeat = M3_FALSE;
+        rc = m3_sdl3_fill_key_event(sdl_event, &out_event->data.key);
+        M3_SDL3_RETURN_IF_ERROR(rc);
         *out_has_event = M3_TRUE;
         return M3_OK;
     }
@@ -1101,9 +1261,8 @@ static int m3_sdl3_translate_event(struct M3SDL3Backend *backend, const SDL_Even
         out_event->type = M3_INPUT_KEY_DOWN;
         out_event->modifiers = modifiers;
         out_event->window = window_handle;
-        out_event->data.key.key_code = 0u;
-        out_event->data.key.native_code = 0u;
-        out_event->data.key.is_repeat = M3_FALSE;
+        rc = m3_sdl3_fill_key_event(sdl_event, &out_event->data.key);
+        M3_SDL3_RETURN_IF_ERROR(rc);
         *out_has_event = M3_TRUE;
         return M3_OK;
     }
@@ -1113,9 +1272,8 @@ static int m3_sdl3_translate_event(struct M3SDL3Backend *backend, const SDL_Even
         out_event->type = M3_INPUT_KEY_UP;
         out_event->modifiers = modifiers;
         out_event->window = window_handle;
-        out_event->data.key.key_code = 0u;
-        out_event->data.key.native_code = 0u;
-        out_event->data.key.is_repeat = M3_FALSE;
+        rc = m3_sdl3_fill_key_event(sdl_event, &out_event->data.key);
+        M3_SDL3_RETURN_IF_ERROR(rc);
         *out_has_event = M3_TRUE;
         return M3_OK;
     }
@@ -1123,22 +1281,97 @@ static int m3_sdl3_translate_event(struct M3SDL3Backend *backend, const SDL_Even
 
 #if defined(SDL_EVENT_TEXT_INPUT)
     if (sdl_event->type == SDL_EVENT_TEXT_INPUT) {
-        out_event->type = M3_INPUT_TEXT;
+        m3_usize text_len;
+        const char *text;
+
         out_event->modifiers = modifiers;
         out_event->window = window_handle;
-        out_event->data.text.utf8[0] = '\0';
-        out_event->data.text.length = 0u;
+
+        text = sdl_event->text.text;
+        rc = m3_sdl3_text_length(text, &text_len);
+        M3_SDL3_RETURN_IF_ERROR(rc);
+
+        if (text_len <= (m3_usize)(sizeof(out_event->data.text.utf8) - 1u)) {
+            out_event->type = M3_INPUT_TEXT;
+            rc = m3_sdl3_copy_text(text, &out_event->data.text);
+            M3_SDL3_RETURN_IF_ERROR(rc);
+        } else {
+            out_event->type = M3_INPUT_TEXT_UTF8;
+            out_event->data.text_utf8.utf8 = text;
+            out_event->data.text_utf8.length = text_len;
+        }
+
         *out_has_event = M3_TRUE;
         return M3_OK;
     }
 #endif
 #if defined(SDL_TEXTINPUT)
     if (sdl_event->type == SDL_TEXTINPUT) {
-        out_event->type = M3_INPUT_TEXT;
+        m3_usize text_len;
+        const char *text;
+
         out_event->modifiers = modifiers;
         out_event->window = window_handle;
-        out_event->data.text.utf8[0] = '\0';
-        out_event->data.text.length = 0u;
+
+        text = sdl_event->text.text;
+        rc = m3_sdl3_text_length(text, &text_len);
+        M3_SDL3_RETURN_IF_ERROR(rc);
+
+        if (text_len <= (m3_usize)(sizeof(out_event->data.text.utf8) - 1u)) {
+            out_event->type = M3_INPUT_TEXT;
+            rc = m3_sdl3_copy_text(text, &out_event->data.text);
+            M3_SDL3_RETURN_IF_ERROR(rc);
+        } else {
+            out_event->type = M3_INPUT_TEXT_UTF8;
+            out_event->data.text_utf8.utf8 = text;
+            out_event->data.text_utf8.length = text_len;
+        }
+
+        *out_has_event = M3_TRUE;
+        return M3_OK;
+    }
+#endif
+
+#if defined(SDL_EVENT_TEXT_EDITING)
+    if (sdl_event->type == SDL_EVENT_TEXT_EDITING) {
+        m3_usize text_len;
+        const char *text;
+
+        out_event->type = M3_INPUT_TEXT_EDIT;
+        out_event->modifiers = modifiers;
+        out_event->window = window_handle;
+
+        text = sdl_event->edit.text;
+        rc = m3_sdl3_text_length(text, &text_len);
+        M3_SDL3_RETURN_IF_ERROR(rc);
+
+        out_event->data.text_edit.utf8 = text;
+        out_event->data.text_edit.length = text_len;
+        out_event->data.text_edit.cursor = (m3_i32)sdl_event->edit.start;
+        out_event->data.text_edit.selection_length = (m3_i32)sdl_event->edit.length;
+
+        *out_has_event = M3_TRUE;
+        return M3_OK;
+    }
+#endif
+#if defined(SDL_TEXTEDITING)
+    if (sdl_event->type == SDL_TEXTEDITING) {
+        m3_usize text_len;
+        const char *text;
+
+        out_event->type = M3_INPUT_TEXT_EDIT;
+        out_event->modifiers = modifiers;
+        out_event->window = window_handle;
+
+        text = sdl_event->edit.text;
+        rc = m3_sdl3_text_length(text, &text_len);
+        M3_SDL3_RETURN_IF_ERROR(rc);
+
+        out_event->data.text_edit.utf8 = text;
+        out_event->data.text_edit.length = text_len;
+        out_event->data.text_edit.cursor = (m3_i32)sdl_event->edit.start;
+        out_event->data.text_edit.selection_length = (m3_i32)sdl_event->edit.length;
+
         *out_has_event = M3_TRUE;
         return M3_OK;
     }
@@ -1184,6 +1417,8 @@ static int m3_sdl3_translate_event(struct M3SDL3Backend *backend, const SDL_Even
         out_event->window = window_handle;
         rc = m3_sdl3_fill_pointer_state(&out_event->data.pointer);
         M3_SDL3_RETURN_IF_ERROR(rc);
+        rc = m3_sdl3_fill_scroll_event(sdl_event, &out_event->data.pointer);
+        M3_SDL3_RETURN_IF_ERROR(rc);
         *out_has_event = M3_TRUE;
         return M3_OK;
     }
@@ -1227,6 +1462,8 @@ static int m3_sdl3_translate_event(struct M3SDL3Backend *backend, const SDL_Even
         out_event->modifiers = modifiers;
         out_event->window = window_handle;
         rc = m3_sdl3_fill_pointer_state(&out_event->data.pointer);
+        M3_SDL3_RETURN_IF_ERROR(rc);
+        rc = m3_sdl3_fill_scroll_event(sdl_event, &out_event->data.pointer);
         M3_SDL3_RETURN_IF_ERROR(rc);
         *out_has_event = M3_TRUE;
         return M3_OK;
@@ -1697,19 +1934,19 @@ static int m3_sdl3_gfx_create_texture(void *gfx, m3_i32 width, m3_i32 height, m3
 {
     struct M3SDL3Backend *backend;
     M3SDL3Texture *texture;
+    SDL_Renderer *renderer;
+    SDL_Texture *sdl_texture;
+    Uint32 sdl_format;
+    m3_usize required;
+    m3_usize row_bytes;
+    m3_u32 bpp;
     int rc;
-
-    M3_UNUSED(pixels);
-    M3_UNUSED(size);
 
     if (gfx == NULL || out_texture == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
     if (width <= 0 || height <= 0) {
         return M3_ERR_RANGE;
-    }
-    if (format != M3_TEX_FORMAT_RGBA8 && format != M3_TEX_FORMAT_BGRA8 && format != M3_TEX_FORMAT_A8) {
-        return M3_ERR_INVALID_ARGUMENT;
     }
     if (pixels == NULL && size != 0) {
         return M3_ERR_INVALID_ARGUMENT;
@@ -1722,6 +1959,21 @@ static int m3_sdl3_gfx_create_texture(void *gfx, m3_i32 width, m3_i32 height, m3
     rc = m3_sdl3_backend_log(backend, M3_LOG_LEVEL_DEBUG, "gfx.create_texture");
     M3_SDL3_RETURN_IF_ERROR(rc);
 
+    rc = m3_sdl3_get_active_renderer(backend, &renderer);
+    M3_SDL3_RETURN_IF_ERROR(rc);
+
+    rc = m3_sdl3_texture_format_to_sdl(format, &sdl_format, &bpp);
+    M3_SDL3_RETURN_IF_ERROR(rc);
+
+    rc = m3_sdl3_mul_usize((m3_usize)width, (m3_usize)height, &required);
+    M3_SDL3_RETURN_IF_ERROR(rc);
+    rc = m3_sdl3_mul_usize(required, (m3_usize)bpp, &required);
+    M3_SDL3_RETURN_IF_ERROR(rc);
+
+    if (pixels != NULL && size < required) {
+        return M3_ERR_RANGE;
+    }
+
     rc = backend->allocator.alloc(backend->allocator.ctx, sizeof(M3SDL3Texture), (void **)&texture);
     M3_SDL3_RETURN_IF_ERROR(rc);
 
@@ -1730,12 +1982,45 @@ static int m3_sdl3_gfx_create_texture(void *gfx, m3_i32 width, m3_i32 height, m3
     texture->width = width;
     texture->height = height;
     texture->format = format;
+    texture->bytes_per_pixel = bpp;
+    texture->renderer = renderer;
+
+    sdl_texture = SDL_CreateTexture(renderer, sdl_format, SDL_TEXTUREACCESS_STREAMING, width, height);
+    if (sdl_texture == NULL) {
+        m3_sdl3_backend_log_sdl_error(backend, "gfx.create_texture");
+        backend->allocator.free(backend->allocator.ctx, texture);
+        return M3_ERR_UNKNOWN;
+    }
+    texture->texture = sdl_texture;
+
+    if (pixels != NULL && size > 0) {
+        rc = m3_sdl3_mul_usize((m3_usize)width, (m3_usize)bpp, &row_bytes);
+        if (rc != M3_OK) {
+            SDL_DestroyTexture(sdl_texture);
+            backend->allocator.free(backend->allocator.ctx, texture);
+            return rc;
+        }
+        if (SDL_UpdateTexture(sdl_texture, NULL, pixels, (int)row_bytes) != 0) {
+            m3_sdl3_backend_log_sdl_error(backend, "gfx.create_texture");
+            SDL_DestroyTexture(sdl_texture);
+            backend->allocator.free(backend->allocator.ctx, texture);
+            return M3_ERR_UNKNOWN;
+        }
+    }
 
     rc = m3_object_header_init(&texture->header, M3_SDL3_TYPE_TEXTURE, 0, &g_m3_sdl3_texture_vtable);
-    M3_SDL3_RETURN_IF_ERROR_CLEANUP(rc, backend->allocator.free(backend->allocator.ctx, texture));
+    if (rc != M3_OK) {
+        SDL_DestroyTexture(sdl_texture);
+        backend->allocator.free(backend->allocator.ctx, texture);
+        return rc;
+    }
 
     rc = backend->handles.vtable->register_object(backend->handles.ctx, &texture->header);
-    M3_SDL3_RETURN_IF_ERROR_CLEANUP(rc, backend->allocator.free(backend->allocator.ctx, texture));
+    if (rc != M3_OK) {
+        SDL_DestroyTexture(sdl_texture);
+        backend->allocator.free(backend->allocator.ctx, texture);
+        return rc;
+    }
 
     *out_texture = texture->header.handle;
     return M3_OK;
@@ -1745,10 +2030,11 @@ static int m3_sdl3_gfx_update_texture(void *gfx, M3Handle texture, m3_i32 x, m3_
                                       m3_usize size)
 {
     struct M3SDL3Backend *backend;
+    M3SDL3Texture *resolved;
+    SDL_Rect rect;
+    m3_usize required;
+    m3_usize row_bytes;
     int rc;
-
-    M3_UNUSED(pixels);
-    M3_UNUSED(size);
 
     if (gfx == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
@@ -1761,11 +2047,43 @@ static int m3_sdl3_gfx_update_texture(void *gfx, M3Handle texture, m3_i32 x, m3_
     }
 
     backend = (struct M3SDL3Backend *)gfx;
-    rc = m3_sdl3_backend_resolve(backend, texture, M3_SDL3_TYPE_TEXTURE, NULL);
+    rc = m3_sdl3_backend_resolve(backend, texture, M3_SDL3_TYPE_TEXTURE, (void **)&resolved);
     M3_SDL3_RETURN_IF_ERROR(rc);
 
     rc = m3_sdl3_backend_log(backend, M3_LOG_LEVEL_DEBUG, "gfx.update_texture");
     M3_SDL3_RETURN_IF_ERROR(rc);
+
+    if (resolved->texture == NULL) {
+        return M3_ERR_STATE;
+    }
+    if (x + width > resolved->width || y + height > resolved->height) {
+        return M3_ERR_RANGE;
+    }
+
+    rc = m3_sdl3_mul_usize((m3_usize)width, (m3_usize)height, &required);
+    M3_SDL3_RETURN_IF_ERROR(rc);
+    rc = m3_sdl3_mul_usize(required, (m3_usize)resolved->bytes_per_pixel, &required);
+    M3_SDL3_RETURN_IF_ERROR(rc);
+
+    if (pixels != NULL && size < required) {
+        return M3_ERR_RANGE;
+    }
+    if (pixels == NULL || size == 0) {
+        return M3_OK;
+    }
+
+    rc = m3_sdl3_mul_usize((m3_usize)width, (m3_usize)resolved->bytes_per_pixel, &row_bytes);
+    M3_SDL3_RETURN_IF_ERROR(rc);
+
+    rect.x = (int)x;
+    rect.y = (int)y;
+    rect.w = (int)width;
+    rect.h = (int)height;
+
+    if (SDL_UpdateTexture((SDL_Texture *)resolved->texture, &rect, pixels, (int)row_bytes) != 0) {
+        m3_sdl3_backend_log_sdl_error(backend, "gfx.update_texture");
+        return M3_ERR_UNKNOWN;
+    }
     return M3_OK;
 }
 
@@ -1792,11 +2110,17 @@ static int m3_sdl3_gfx_destroy_texture(void *gfx, M3Handle texture)
 static int m3_sdl3_gfx_draw_texture(void *gfx, M3Handle texture, const M3Rect *src, const M3Rect *dst, M3Scalar opacity)
 {
     struct M3SDL3Backend *backend;
+    M3SDL3Texture *resolved;
+    SDL_Renderer *renderer;
+#if defined(SDL_MAJOR_VERSION) && (SDL_MAJOR_VERSION >= 3)
+    SDL_FRect sdl_src;
+    SDL_FRect sdl_dst;
+#else
+    SDL_Rect sdl_src;
+    SDL_Rect sdl_dst;
+#endif
+    m3_u8 alpha;
     int rc;
-
-    M3_UNUSED(src);
-    M3_UNUSED(dst);
-    M3_UNUSED(opacity);
 
     if (gfx == NULL || src == NULL || dst == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
@@ -1806,11 +2130,64 @@ static int m3_sdl3_gfx_draw_texture(void *gfx, M3Handle texture, const M3Rect *s
     }
 
     backend = (struct M3SDL3Backend *)gfx;
-    rc = m3_sdl3_backend_resolve(backend, texture, M3_SDL3_TYPE_TEXTURE, NULL);
+    rc = m3_sdl3_backend_resolve(backend, texture, M3_SDL3_TYPE_TEXTURE, (void **)&resolved);
     M3_SDL3_RETURN_IF_ERROR(rc);
 
     rc = m3_sdl3_backend_log(backend, M3_LOG_LEVEL_DEBUG, "gfx.draw_texture");
     M3_SDL3_RETURN_IF_ERROR(rc);
+
+    if (resolved->texture == NULL) {
+        return M3_ERR_STATE;
+    }
+    if (src->width < 0.0f || src->height < 0.0f || dst->width < 0.0f || dst->height < 0.0f) {
+        return M3_ERR_RANGE;
+    }
+
+    rc = m3_sdl3_get_active_renderer(backend, &renderer);
+    M3_SDL3_RETURN_IF_ERROR(rc);
+    if ((SDL_Renderer *)resolved->renderer != renderer) {
+        return M3_ERR_STATE;
+    }
+
+    rc = m3_sdl3_color_to_u8(opacity, &alpha);
+    M3_SDL3_RETURN_IF_ERROR(rc);
+
+    if (SDL_SetTextureBlendMode((SDL_Texture *)resolved->texture, SDL_BLENDMODE_BLEND) != 0) {
+        m3_sdl3_backend_log_sdl_error(backend, "gfx.draw_texture");
+        return M3_ERR_UNKNOWN;
+    }
+    if (SDL_SetTextureAlphaMod((SDL_Texture *)resolved->texture, alpha) != 0) {
+        m3_sdl3_backend_log_sdl_error(backend, "gfx.draw_texture");
+        return M3_ERR_UNKNOWN;
+    }
+
+#if defined(SDL_MAJOR_VERSION) && (SDL_MAJOR_VERSION >= 3)
+    sdl_src.x = src->x;
+    sdl_src.y = src->y;
+    sdl_src.w = src->width;
+    sdl_src.h = src->height;
+    sdl_dst.x = dst->x;
+    sdl_dst.y = dst->y;
+    sdl_dst.w = dst->width;
+    sdl_dst.h = dst->height;
+    if (SDL_RenderTexture(renderer, (SDL_Texture *)resolved->texture, &sdl_src, &sdl_dst) != 0) {
+        m3_sdl3_backend_log_sdl_error(backend, "gfx.draw_texture");
+        return M3_ERR_UNKNOWN;
+    }
+#else
+    sdl_src.x = (int)src->x;
+    sdl_src.y = (int)src->y;
+    sdl_src.w = (int)src->width;
+    sdl_src.h = (int)src->height;
+    sdl_dst.x = (int)dst->x;
+    sdl_dst.y = (int)dst->y;
+    sdl_dst.w = (int)dst->width;
+    sdl_dst.h = (int)dst->height;
+    if (SDL_RenderCopy(renderer, (SDL_Texture *)resolved->texture, &sdl_src, &sdl_dst) != 0) {
+        m3_sdl3_backend_log_sdl_error(backend, "gfx.draw_texture");
+        return M3_ERR_UNKNOWN;
+    }
+#endif
     return M3_OK;
 }
 
@@ -2431,6 +2808,14 @@ static int m3_sdl3_camera_open(void *camera, m3_u32 camera_id)
     return M3_ERR_UNSUPPORTED;
 }
 
+static int m3_sdl3_camera_open_with_config(void *camera, const M3CameraConfig *config)
+{
+    if (config == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+    return m3_sdl3_camera_open(camera, config->camera_id);
+}
+
 static int m3_sdl3_camera_close(void *camera)
 {
     struct M3SDL3Backend *backend;
@@ -2496,15 +2881,316 @@ static int m3_sdl3_camera_read_frame(void *camera, M3CameraFrame *out_frame, M3B
 
 static const M3CameraVTable g_m3_sdl3_camera_vtable = {
     m3_sdl3_camera_open,
+    m3_sdl3_camera_open_with_config,
     m3_sdl3_camera_close,
     m3_sdl3_camera_start,
     m3_sdl3_camera_stop,
     m3_sdl3_camera_read_frame
 };
 
+#if defined(M3_LIBCURL_AVAILABLE)
+typedef struct M3SDL3CurlBuffer {
+    const M3Allocator *allocator;
+    void *data;
+    m3_usize size;
+    m3_usize capacity;
+    int error;
+} M3SDL3CurlBuffer;
+
+static m3_u32 g_m3_sdl3_curl_refcount = 0u;
+
+static int m3_sdl3_network_add_usize(m3_usize a, m3_usize b, m3_usize *out_value)
+{
+    if (out_value == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+    if (b > ((m3_usize)~(m3_usize)0) - a) {
+        return M3_ERR_OVERFLOW;
+    }
+    *out_value = a + b;
+    return M3_OK;
+}
+
+static int m3_sdl3_network_mul_usize(m3_usize a, m3_usize b, m3_usize *out_value)
+{
+    if (out_value == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+    if (a != 0 && b > ((m3_usize)~(m3_usize)0) / a) {
+        return M3_ERR_OVERFLOW;
+    }
+    *out_value = a * b;
+    return M3_OK;
+}
+
+static int m3_sdl3_network_error_from_curl(CURLcode code)
+{
+    switch (code) {
+        case CURLE_OK:
+            return M3_OK;
+        case CURLE_UNSUPPORTED_PROTOCOL:
+            return M3_ERR_UNSUPPORTED;
+        case CURLE_URL_MALFORMAT:
+        case CURLE_BAD_FUNCTION_ARGUMENT:
+            return M3_ERR_INVALID_ARGUMENT;
+        case CURLE_OUT_OF_MEMORY:
+            return M3_ERR_OUT_OF_MEMORY;
+        case CURLE_OPERATION_TIMEDOUT:
+            return M3_ERR_TIMEOUT;
+        case CURLE_COULDNT_RESOLVE_HOST:
+        case CURLE_COULDNT_RESOLVE_PROXY:
+        case CURLE_REMOTE_FILE_NOT_FOUND:
+            return M3_ERR_NOT_FOUND;
+        case CURLE_LOGIN_DENIED:
+        case CURLE_REMOTE_ACCESS_DENIED:
+            return M3_ERR_PERMISSION;
+        case CURLE_TOO_MANY_REDIRECTS:
+        case CURLE_FILESIZE_EXCEEDED:
+            return M3_ERR_RANGE;
+        default:
+            return M3_ERR_IO;
+    }
+}
+
+static int m3_sdl3_libcurl_init(void)
+{
+    CURLcode curl_rc;
+
+    if (g_m3_sdl3_curl_refcount == 0u) {
+        curl_rc = curl_global_init(CURL_GLOBAL_DEFAULT);
+        if (curl_rc != CURLE_OK) {
+            return m3_sdl3_network_error_from_curl(curl_rc);
+        }
+    }
+
+    g_m3_sdl3_curl_refcount += 1u;
+    return M3_OK;
+}
+
+static int m3_sdl3_libcurl_shutdown(void)
+{
+    if (g_m3_sdl3_curl_refcount == 0u) {
+        return M3_ERR_STATE;
+    }
+
+    g_m3_sdl3_curl_refcount -= 1u;
+    if (g_m3_sdl3_curl_refcount == 0u) {
+        curl_global_cleanup();
+    }
+    return M3_OK;
+}
+
+static size_t m3_sdl3_network_write_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
+{
+    M3SDL3CurlBuffer *buffer;
+    m3_usize chunk;
+    m3_usize new_size;
+    m3_usize alloc_size;
+    void *new_data;
+    int rc;
+
+    if (userdata == NULL || ptr == NULL) {
+        return 0;
+    }
+
+    buffer = (M3SDL3CurlBuffer *)userdata;
+    if (buffer->allocator == NULL) {
+        buffer->error = M3_ERR_INVALID_ARGUMENT;
+        return 0;
+    }
+
+    if (size == 0 || nmemb == 0) {
+        return 0;
+    }
+
+    rc = m3_sdl3_network_mul_usize((m3_usize)size, (m3_usize)nmemb, &chunk);
+    if (rc != M3_OK) {
+        buffer->error = rc;
+        return 0;
+    }
+
+    rc = m3_sdl3_network_add_usize(buffer->size, chunk, &new_size);
+    if (rc != M3_OK) {
+        buffer->error = rc;
+        return 0;
+    }
+
+    if (new_size > buffer->capacity) {
+        alloc_size = new_size;
+        new_data = NULL;
+        if (buffer->data == NULL) {
+            rc = buffer->allocator->alloc(buffer->allocator->ctx, alloc_size, &new_data);
+        } else {
+            rc = buffer->allocator->realloc(buffer->allocator->ctx, buffer->data, alloc_size, &new_data);
+        }
+        if (rc != M3_OK) {
+            buffer->error = rc;
+            return 0;
+        }
+        buffer->data = new_data;
+        buffer->capacity = alloc_size;
+    }
+
+    memcpy((m3_u8 *)buffer->data + buffer->size, ptr, (size_t)chunk);
+    buffer->size = new_size;
+    return (size_t)chunk;
+}
+
+static int m3_sdl3_network_append_headers(struct M3SDL3Backend *backend, const char *headers,
+    struct curl_slist **out_list)
+{
+    const char *cursor;
+    struct curl_slist *list;
+
+    if (backend == NULL || out_list == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+
+    list = *out_list;
+    if (headers == NULL || headers[0] == '\0') {
+        *out_list = list;
+        return M3_OK;
+    }
+
+    cursor = headers;
+    while (*cursor != '\0') {
+        const char *line_start;
+        const char *line_end;
+        const char *colon;
+        const char *key_start;
+        const char *key_end;
+        const char *value_start;
+        const char *value_end;
+        m3_usize key_len;
+        m3_usize value_len;
+        m3_usize line_len;
+        m3_usize alloc_len;
+        m3_usize offset;
+        char *line;
+        struct curl_slist *new_list;
+        int rc;
+
+        line_start = cursor;
+        line_end = line_start;
+        while (*line_end != '\0' && *line_end != '\r' && *line_end != '\n') {
+            line_end++;
+        }
+
+        if (line_end != line_start) {
+            colon = line_start;
+            while (colon < line_end && *colon != ':') {
+                colon++;
+            }
+            if (colon == line_end) {
+                *out_list = list;
+                return M3_ERR_INVALID_ARGUMENT;
+            }
+
+            key_start = line_start;
+            key_end = colon;
+            while (key_start < key_end && (*key_start == ' ' || *key_start == '\t')) {
+                key_start++;
+            }
+            while (key_end > key_start && (key_end[-1] == ' ' || key_end[-1] == '\t')) {
+                key_end--;
+            }
+
+            value_start = colon + 1;
+            value_end = line_end;
+            while (value_start < value_end && (*value_start == ' ' || *value_start == '\t')) {
+                value_start++;
+            }
+            while (value_end > value_start && (value_end[-1] == ' ' || value_end[-1] == '\t')) {
+                value_end--;
+            }
+
+            if (key_start == key_end) {
+                *out_list = list;
+                return M3_ERR_INVALID_ARGUMENT;
+            }
+
+            key_len = (m3_usize)(key_end - key_start);
+            value_len = (m3_usize)(value_end - value_start);
+            rc = m3_sdl3_network_add_usize(key_len, 1u, &line_len);
+            if (rc != M3_OK) {
+                *out_list = list;
+                return rc;
+            }
+            if (value_len > 0u) {
+                rc = m3_sdl3_network_add_usize(line_len, 1u, &line_len);
+                if (rc != M3_OK) {
+                    *out_list = list;
+                    return rc;
+                }
+            }
+            rc = m3_sdl3_network_add_usize(line_len, value_len, &line_len);
+            if (rc != M3_OK) {
+                *out_list = list;
+                return rc;
+            }
+            rc = m3_sdl3_network_add_usize(line_len, 1u, &alloc_len);
+            if (rc != M3_OK) {
+                *out_list = list;
+                return rc;
+            }
+
+            rc = backend->allocator.alloc(backend->allocator.ctx, alloc_len, (void **)&line);
+            if (rc != M3_OK) {
+                *out_list = list;
+                return rc;
+            }
+
+            memcpy(line, key_start, (size_t)key_len);
+            offset = key_len;
+            line[offset] = ':';
+            offset += 1u;
+            if (value_len > 0u) {
+                line[offset] = ' ';
+                offset += 1u;
+                memcpy(line + offset, value_start, (size_t)value_len);
+                offset += value_len;
+            }
+            line[offset] = '\0';
+
+            new_list = curl_slist_append(list, line);
+            rc = backend->allocator.free(backend->allocator.ctx, line);
+            if (rc != M3_OK) {
+                *out_list = list;
+                return rc;
+            }
+            if (new_list == NULL) {
+                *out_list = list;
+                return M3_ERR_OUT_OF_MEMORY;
+            }
+            list = new_list;
+        }
+
+        if (*line_end == '\r' && line_end[1] == '\n') {
+            cursor = line_end + 2;
+        } else if (*line_end == '\r' || *line_end == '\n') {
+            cursor = line_end + 1;
+        } else {
+            cursor = line_end;
+        }
+    }
+
+    *out_list = list;
+    return M3_OK;
+}
+#endif
+
 static int m3_sdl3_network_request(void *net, const M3NetworkRequest *request, const M3Allocator *allocator, M3NetworkResponse *out_response)
 {
     struct M3SDL3Backend *backend;
+#if defined(M3_LIBCURL_AVAILABLE)
+    CURL *curl;
+    CURLcode curl_rc;
+    struct curl_slist *header_list;
+    M3SDL3CurlBuffer buffer;
+    long response_code;
+    long timeout_ms;
+    long body_len;
+#endif
     int rc;
 
     if (net == NULL || request == NULL || allocator == NULL || out_response == NULL) {
@@ -2519,7 +3205,164 @@ static int m3_sdl3_network_request(void *net, const M3NetworkRequest *request, c
     M3_SDL3_RETURN_IF_ERROR(rc);
 
     memset(out_response, 0, sizeof(*out_response));
+#if defined(M3_LIBCURL_AVAILABLE)
+    if (request->method == NULL || request->url == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+    if (request->method[0] == '\0' || request->url[0] == '\0') {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+    if (request->body_size > 0 && request->body == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+    if (request->timeout_ms > 0u && request->timeout_ms > (m3_u32)LONG_MAX) {
+        return M3_ERR_RANGE;
+    }
+    if (request->body_size > (m3_usize)LONG_MAX) {
+        return M3_ERR_RANGE;
+    }
+
+    curl = NULL;
+    header_list = NULL;
+    buffer.allocator = allocator;
+    buffer.data = NULL;
+    buffer.size = 0u;
+    buffer.capacity = 0u;
+    buffer.error = M3_OK;
+
+    curl = curl_easy_init();
+    if (curl == NULL) {
+        rc = M3_ERR_OUT_OF_MEMORY;
+        goto cleanup;
+    }
+
+    curl_rc = curl_easy_setopt(curl, CURLOPT_URL, request->url);
+    if (curl_rc != CURLE_OK) {
+        rc = m3_sdl3_network_error_from_curl(curl_rc);
+        goto cleanup;
+    }
+
+    curl_rc = curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request->method);
+    if (curl_rc != CURLE_OK) {
+        rc = m3_sdl3_network_error_from_curl(curl_rc);
+        goto cleanup;
+    }
+
+    curl_rc = curl_easy_setopt(curl, CURLOPT_USERAGENT, "LibM3C/1.0");
+    if (curl_rc != CURLE_OK) {
+        rc = m3_sdl3_network_error_from_curl(curl_rc);
+        goto cleanup;
+    }
+
+    curl_rc = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, m3_sdl3_network_write_cb);
+    if (curl_rc != CURLE_OK) {
+        rc = m3_sdl3_network_error_from_curl(curl_rc);
+        goto cleanup;
+    }
+
+    curl_rc = curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+    if (curl_rc != CURLE_OK) {
+        rc = m3_sdl3_network_error_from_curl(curl_rc);
+        goto cleanup;
+    }
+
+    curl_rc = curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+    if (curl_rc != CURLE_OK) {
+        rc = m3_sdl3_network_error_from_curl(curl_rc);
+        goto cleanup;
+    }
+
+    if (request->timeout_ms > 0u) {
+        timeout_ms = (long)request->timeout_ms;
+        curl_rc = curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeout_ms);
+        if (curl_rc != CURLE_OK) {
+            rc = m3_sdl3_network_error_from_curl(curl_rc);
+            goto cleanup;
+        }
+        curl_rc = curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, timeout_ms);
+        if (curl_rc != CURLE_OK) {
+            rc = m3_sdl3_network_error_from_curl(curl_rc);
+            goto cleanup;
+        }
+    }
+
+    if (request->headers != NULL && request->headers[0] != '\0') {
+        rc = m3_sdl3_network_append_headers(backend, request->headers, &header_list);
+        if (rc != M3_OK) {
+            goto cleanup;
+        }
+        if (header_list != NULL) {
+            curl_rc = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header_list);
+            if (curl_rc != CURLE_OK) {
+                rc = m3_sdl3_network_error_from_curl(curl_rc);
+                goto cleanup;
+            }
+        }
+    }
+
+    if (request->body_size > 0u) {
+        body_len = (long)request->body_size;
+        curl_rc = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request->body);
+        if (curl_rc != CURLE_OK) {
+            rc = m3_sdl3_network_error_from_curl(curl_rc);
+            goto cleanup;
+        }
+        curl_rc = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, body_len);
+        if (curl_rc != CURLE_OK) {
+            rc = m3_sdl3_network_error_from_curl(curl_rc);
+            goto cleanup;
+        }
+    }
+
+    curl_rc = curl_easy_perform(curl);
+    if (curl_rc != CURLE_OK) {
+        if (buffer.error != M3_OK) {
+            rc = buffer.error;
+        } else {
+            rc = m3_sdl3_network_error_from_curl(curl_rc);
+        }
+        goto cleanup;
+    }
+
+    if (buffer.error != M3_OK) {
+        rc = buffer.error;
+        goto cleanup;
+    }
+
+    response_code = 0;
+    curl_rc = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+    if (curl_rc != CURLE_OK) {
+        rc = m3_sdl3_network_error_from_curl(curl_rc);
+        goto cleanup;
+    }
+    if (response_code < 0 || (m3_usize)response_code > (m3_usize)((m3_u32)~(m3_u32)0)) {
+        rc = M3_ERR_RANGE;
+        goto cleanup;
+    }
+
+    out_response->status_code = (m3_u32)response_code;
+    out_response->body = buffer.data;
+    out_response->body_size = buffer.size;
+    buffer.data = NULL;
+    rc = M3_OK;
+
+cleanup:
+    if (header_list != NULL) {
+        curl_slist_free_all(header_list);
+    }
+    if (curl != NULL) {
+        curl_easy_cleanup(curl);
+    }
+    if (buffer.data != NULL) {
+        allocator->free(allocator->ctx, buffer.data);
+    }
+    if (rc != M3_OK) {
+        memset(out_response, 0, sizeof(*out_response));
+    }
+    return rc;
+#else
     return M3_ERR_UNSUPPORTED;
+#endif
 }
 
 static int m3_sdl3_network_free_response(void *net, const M3Allocator *allocator, M3NetworkResponse *response)
@@ -2533,11 +3376,28 @@ static int m3_sdl3_network_free_response(void *net, const M3Allocator *allocator
     if (allocator->alloc == NULL || allocator->realloc == NULL || allocator->free == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
+    if (response->body_size > 0 && response->body == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
 
     backend = (struct M3SDL3Backend *)net;
     rc = m3_sdl3_backend_log(backend, M3_LOG_LEVEL_DEBUG, "network.free_response");
     M3_SDL3_RETURN_IF_ERROR(rc);
+#if defined(M3_LIBCURL_AVAILABLE)
+    if (response->body != NULL) {
+        rc = allocator->free(allocator->ctx, (void *)response->body);
+        if (rc != M3_OK) {
+            return rc;
+        }
+    }
+
+    response->body = NULL;
+    response->body_size = 0u;
+    response->status_code = 0u;
+    return M3_OK;
+#else
     return M3_ERR_UNSUPPORTED;
+#endif
 }
 
 static const M3NetworkVTable g_m3_sdl3_network_vtable = {
@@ -2893,9 +3753,25 @@ int M3_CALL m3_sdl3_backend_create(const M3SDL3BackendConfig *config, M3SDL3Back
     }
     backend->sdl_initialized = M3_TRUE;
 
+#if defined(M3_LIBCURL_AVAILABLE)
+    rc = m3_sdl3_libcurl_init();
+    if (rc != M3_OK) {
+        m3_sdl3_global_shutdown(backend);
+        m3_handle_system_default_destroy(&backend->handles);
+        if (backend->log_owner) {
+            m3_log_shutdown();
+        }
+        allocator.free(allocator.ctx, backend);
+        return rc;
+    }
+#endif
+
 #if defined(M3_SDL3_TTF_AVAILABLE)
     rc = m3_sdl3_ttf_init(backend);
     if (rc != M3_OK) {
+#if defined(M3_LIBCURL_AVAILABLE)
+        m3_sdl3_libcurl_shutdown();
+#endif
         m3_sdl3_global_shutdown(backend);
         m3_handle_system_default_destroy(&backend->handles);
         if (backend->log_owner) {
@@ -2916,6 +3792,9 @@ int M3_CALL m3_sdl3_backend_create(const M3SDL3BackendConfig *config, M3SDL3Back
                 backend->ttf_initialized = M3_FALSE;
             }
 #endif
+#if defined(M3_LIBCURL_AVAILABLE)
+            m3_sdl3_libcurl_shutdown();
+#endif
             m3_sdl3_global_shutdown(backend);
             m3_handle_system_default_destroy(&backend->handles);
             if (backend->log_owner) {
@@ -2932,6 +3811,9 @@ int M3_CALL m3_sdl3_backend_create(const M3SDL3BackendConfig *config, M3SDL3Back
                 m3_sdl3_ttf_shutdown(backend);
                 backend->ttf_initialized = M3_FALSE;
             }
+#endif
+#if defined(M3_LIBCURL_AVAILABLE)
+            m3_sdl3_libcurl_shutdown();
 #endif
             m3_sdl3_global_shutdown(backend);
             m3_handle_system_default_destroy(&backend->handles);
@@ -3010,6 +3892,13 @@ int M3_CALL m3_sdl3_backend_destroy(M3SDL3Backend *backend)
         }
         backend->sdl_initialized = M3_FALSE;
     }
+
+#if defined(M3_LIBCURL_AVAILABLE)
+    rc = m3_sdl3_libcurl_shutdown();
+    if (rc != M3_OK && first_error == M3_OK) {
+        first_error = rc;
+    }
+#endif
 
     if (backend->log_owner) {
         rc = m3_log_shutdown();

@@ -1,5 +1,10 @@
 #include "m3/m3_render.h"
 
+#ifdef M3_TESTING
+static M3Bool g_m3_render_force_reserve = M3_FALSE;
+static M3Bool g_m3_render_force_intersect_fail = M3_FALSE;
+#endif
+
 #define M3_RENDER_LIST_DEFAULT_CAPACITY 64
 
 typedef struct M3RenderRecorder {
@@ -74,9 +79,15 @@ static int m3_render_list_reserve(M3RenderList *list, m3_usize additional)
         return rc;
     }
 
+#ifdef M3_TESTING
+    if (!g_m3_render_force_reserve && required <= list->capacity) {
+        return M3_OK;
+    }
+#else
     if (required <= list->capacity) {
         return M3_OK;
     }
+#endif
 
     if (list->capacity == 0) {
         new_capacity = M3_RENDER_LIST_DEFAULT_CAPACITY;
@@ -515,6 +526,11 @@ static int m3_render_build_node(const M3RenderNode *node, const M3Rect *parent_c
         has_intersection = (clip.width > 0.0f && clip.height > 0.0f) ? M3_TRUE : M3_FALSE;
     } else {
         rc = m3_rect_intersect(parent_clip, &node->bounds, &clip, &has_intersection);
+#ifdef M3_TESTING
+        if (g_m3_render_force_intersect_fail) {
+            rc = M3_ERR_RANGE;
+        }
+#endif
         if (rc != M3_OK) {
             return rc;
         }
@@ -860,5 +876,22 @@ int M3_CALL m3_render_test_mul_overflow(m3_usize a, m3_usize b, m3_usize *out_va
 int M3_CALL m3_render_test_list_reserve(M3RenderList *list, m3_usize additional)
 {
     return m3_render_list_reserve(list, additional);
+}
+
+int M3_CALL m3_render_test_validate_node(const M3RenderNode *node)
+{
+    return m3_render_validate_node(node);
+}
+
+int M3_CALL m3_render_test_set_force_reserve(M3Bool enable)
+{
+    g_m3_render_force_reserve = enable ? M3_TRUE : M3_FALSE;
+    return M3_OK;
+}
+
+int M3_CALL m3_render_test_set_force_intersect_fail(M3Bool enable)
+{
+    g_m3_render_force_intersect_fail = enable ? M3_TRUE : M3_FALSE;
+    return M3_OK;
 }
 #endif

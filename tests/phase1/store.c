@@ -204,6 +204,42 @@ int main(void)
 
     config.state_size = sizeof(CounterState);
 
+#ifdef M3_TESTING
+    M3_TEST_OK(m3_core_test_set_default_allocator_fail(M3_TRUE));
+    M3_TEST_EXPECT(m3_store_init(&store, &config, &initial), M3_ERR_UNKNOWN);
+    M3_TEST_OK(m3_core_test_set_default_allocator_fail(M3_FALSE));
+
+    M3_TEST_EXPECT(m3_store_test_mul_overflow(1, 1, NULL), M3_ERR_INVALID_ARGUMENT);
+    {
+        m3_u8 history_buffer[8];
+        m3_usize history_count;
+        CounterState history_state;
+
+        history_state.value = 0;
+        history_count = 0;
+        M3_TEST_EXPECT(m3_store_test_history_push(NULL, 1, sizeof(history_state), &history_count, &history_state),
+            M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_store_test_history_push(history_buffer, 1, sizeof(history_state), NULL, &history_state),
+            M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_store_test_history_push(history_buffer, 1, sizeof(history_state), &history_count, NULL),
+            M3_ERR_INVALID_ARGUMENT);
+
+        M3_TEST_EXPECT(m3_store_test_history_pop(NULL, 1, sizeof(history_state), &history_count, &history_state),
+            M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_store_test_history_pop(history_buffer, 1, sizeof(history_state), NULL, &history_state),
+            M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_store_test_history_pop(history_buffer, 1, sizeof(history_state), &history_count, NULL),
+            M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_store_test_history_pop(history_buffer, 0, sizeof(history_state), &history_count, &history_state),
+            M3_ERR_NOT_FOUND);
+
+        M3_TEST_EXPECT(m3_store_test_copy_history(NULL, 1, sizeof(history_state), 1, 0, &history_state),
+            M3_ERR_INVALID_ARGUMENT);
+        M3_TEST_EXPECT(m3_store_test_copy_history(history_buffer, 0, sizeof(history_state), 1, 0, &history_state),
+            M3_ERR_NOT_FOUND);
+    }
+#endif
+
     init_alloc(&alloc_ctx, 0);
     test_allocator.ctx = &alloc_ctx;
     test_allocator.alloc = test_alloc;
@@ -252,6 +288,13 @@ int main(void)
     M3_TEST_ASSERT(can_undo == M3_FALSE);
     M3_TEST_ASSERT(can_redo == M3_FALSE);
 
+    delta = 0;
+    action.type = ACTION_SET;
+    action.data = &delta;
+    action.size = sizeof(delta);
+    M3_TEST_EXPECT(m3_store_dispatch(NULL, &action), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_store_dispatch(&store, NULL), M3_ERR_INVALID_ARGUMENT);
+
     action.type = ACTION_ADD;
     action.data = NULL;
     action.size = sizeof(int);
@@ -295,6 +338,8 @@ int main(void)
     M3_TEST_OK(m3_store_copy_undo_state(&store, 1, &snapshot, sizeof(snapshot)));
     M3_TEST_ASSERT(snapshot.value == 2);
     M3_TEST_EXPECT(m3_store_copy_undo_state(&store, 2, &snapshot, sizeof(snapshot)), M3_ERR_NOT_FOUND);
+    M3_TEST_EXPECT(m3_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot) - 1), M3_ERR_RANGE);
+    M3_TEST_EXPECT(m3_store_copy_undo_state(&store, 0, NULL, sizeof(snapshot)), M3_ERR_INVALID_ARGUMENT);
 
     M3_TEST_OK(m3_store_undo(&store));
     M3_TEST_OK(m3_store_get_state(&store, &state, sizeof(state)));
@@ -310,6 +355,7 @@ int main(void)
     M3_TEST_ASSERT(snapshot.value == 3);
     M3_TEST_OK(m3_store_copy_redo_state(&store, 1, &snapshot, sizeof(snapshot)));
     M3_TEST_ASSERT(snapshot.value == 4);
+    M3_TEST_EXPECT(m3_store_copy_redo_state(&store, 0, NULL, sizeof(snapshot)), M3_ERR_INVALID_ARGUMENT);
 
     M3_TEST_OK(m3_store_redo(&store));
     M3_TEST_OK(m3_store_get_state(&store, &state, sizeof(state)));
@@ -334,8 +380,70 @@ int main(void)
     M3_TEST_EXPECT(m3_store_get_redo_count(NULL, &count), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_store_get_redo_count(&store, NULL), M3_ERR_INVALID_ARGUMENT);
 
+    {
+        M3Store temp_store_local;
+        void *saved_undo;
+        void *saved_redo;
+        m3_usize saved_undo_count;
+        m3_usize saved_redo_count;
+
+        memset(&temp_store_local, 0, sizeof(temp_store_local));
+        M3_TEST_OK(m3_store_init(&temp_store_local, &config, &initial));
+
+        delta = 1;
+        action.type = ACTION_ADD;
+        action.data = &delta;
+        action.size = sizeof(delta);
+        M3_TEST_OK(m3_store_dispatch(&temp_store_local, &action));
+
+        saved_undo = temp_store_local.undo_buffer;
+        saved_redo = temp_store_local.redo_buffer;
+        saved_undo_count = temp_store_local.undo_count;
+        saved_redo_count = temp_store_local.redo_count;
+
+        temp_store_local.undo_buffer = NULL;
+        M3_TEST_EXPECT(m3_store_dispatch(&temp_store_local, &action), M3_ERR_INVALID_ARGUMENT);
+        temp_store_local.undo_buffer = saved_undo;
+
+        temp_store_local.redo_buffer = NULL;
+        temp_store_local.undo_count = saved_undo_count;
+        M3_TEST_EXPECT(m3_store_undo(&temp_store_local), M3_ERR_INVALID_ARGUMENT);
+        temp_store_local.redo_buffer = saved_redo;
+
+        temp_store_local.undo_buffer = NULL;
+        temp_store_local.undo_count = saved_undo_count;
+        temp_store_local.redo_count = saved_redo_count;
+        M3_TEST_EXPECT(m3_store_undo(&temp_store_local), M3_ERR_INVALID_ARGUMENT);
+        temp_store_local.undo_buffer = saved_undo;
+
+        temp_store_local.undo_buffer = NULL;
+        temp_store_local.redo_count = 1;
+        M3_TEST_EXPECT(m3_store_redo(&temp_store_local), M3_ERR_INVALID_ARGUMENT);
+        temp_store_local.undo_buffer = saved_undo;
+
+        temp_store_local.redo_buffer = NULL;
+        temp_store_local.redo_count = 1;
+        M3_TEST_EXPECT(m3_store_redo(&temp_store_local), M3_ERR_INVALID_ARGUMENT);
+        temp_store_local.redo_buffer = saved_redo;
+        temp_store_local.redo_count = saved_redo_count;
+        temp_store_local.undo_count = saved_undo_count;
+
+        M3_TEST_OK(m3_store_shutdown(&temp_store_local));
+    }
+
     M3_TEST_OK(m3_store_shutdown(&store));
     M3_TEST_EXPECT(m3_store_shutdown(&store), M3_ERR_STATE);
+
+    M3_TEST_EXPECT(m3_store_dispatch(&store, &action), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_store_get_state(&store, &state, sizeof(state)), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_store_can_undo(&store, &can_undo), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_store_can_redo(&store, &can_redo), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_store_undo(&store), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_store_redo(&store), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_store_get_undo_count(&store, &count), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_store_get_redo_count(&store, &count), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot)), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_store_copy_redo_state(&store, 0, &snapshot, sizeof(snapshot)), M3_ERR_STATE);
 
     config.allocator = NULL;
     config.history_capacity = 0;
@@ -350,6 +458,12 @@ int main(void)
     M3_TEST_EXPECT(m3_store_undo(&store_zero), M3_ERR_NOT_FOUND);
     M3_TEST_EXPECT(m3_store_redo(&store_zero), M3_ERR_NOT_FOUND);
     M3_TEST_OK(m3_store_shutdown(&store_zero));
+
+    M3_TEST_EXPECT(m3_store_undo(NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_store_redo(NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_store_clear_history(NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_store_copy_undo_state(NULL, 0, &snapshot, sizeof(snapshot)), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_store_copy_redo_state(NULL, 0, &snapshot, sizeof(snapshot)), M3_ERR_INVALID_ARGUMENT);
 
     M3_TEST_EXPECT(m3_store_shutdown(NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_store_get_state_ptr(&store, &state_ptr, &size), M3_ERR_STATE);

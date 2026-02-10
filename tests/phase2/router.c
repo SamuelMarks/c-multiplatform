@@ -187,6 +187,7 @@ int main(void)
     M3Route routes[3];
     M3Route bad_routes[1];
     M3RouteEntry stack_entries[1];
+    const M3Route *found_route;
     const char *current_path;
     char *path_copy;
     void *component;
@@ -229,17 +230,21 @@ int main(void)
     M3_TEST_ASSERT(has_more == M3_FALSE);
     M3_TEST_EXPECT(m3_router_test_match_len(NULL, 0, "/", 1, NULL, 0, NULL, &match), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_router_test_validate_pattern(NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_OK(m3_router_test_validate_pattern(""));
+    M3_TEST_EXPECT(m3_router_test_validate_pattern("/users/:"), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_router_test_release_entry(NULL, NULL), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_router_test_navigate_path_len(NULL, "/", 1, &component), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_router_test_has_more_segments(NULL, 0, 0, NULL), M3_ERR_INVALID_ARGUMENT);
+
+    found_route = NULL;
+    M3_TEST_EXPECT(m3_router_test_find_route(NULL, "/", 1, &found_route), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_router_test_find_route(&router_manual, "/", 1, NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_router_test_find_route(&router_manual, "/", 1, &found_route), M3_ERR_NOT_FOUND);
     M3_TEST_OK(m3_uri_parse("app://example.com/path/one?foo=bar&flag#frag", &uri));
     M3_TEST_ASSERT(slice_equals(&uri.scheme, "app"));
     M3_TEST_ASSERT(slice_equals(&uri.authority, "example.com"));
     M3_TEST_ASSERT(slice_equals(&uri.path, "/path/one"));
     M3_TEST_ASSERT(slice_equals(&uri.query, "foo=bar&flag"));
-    M3_TEST_ASSERT(slice_equals(&uri.fragment, "frag"));
-
-    M3_TEST_OK(m3_uri_parse("app://example.com/path#frag", &uri));
-    M3_TEST_ASSERT(slice_equals(&uri.path, "/path"));
     M3_TEST_ASSERT(slice_equals(&uri.fragment, "frag"));
 
     M3_TEST_OK(m3_uri_query_find(&uri, "foo", &value, &found));
@@ -250,6 +255,15 @@ int main(void)
     M3_TEST_ASSERT(value.length == 0);
     M3_TEST_OK(m3_uri_query_find(&uri, "missing", &value, &found));
     M3_TEST_ASSERT(found == M3_FALSE);
+#ifdef M3_TESTING
+    M3_TEST_OK(m3_router_test_set_slice_equals_fail(M3_TRUE));
+    M3_TEST_EXPECT(m3_uri_query_find(&uri, "foo", &value, &found), M3_ERR_UNKNOWN);
+    M3_TEST_OK(m3_router_test_set_slice_equals_fail(M3_FALSE));
+#endif
+
+    M3_TEST_OK(m3_uri_parse("app://example.com/path#frag", &uri));
+    M3_TEST_ASSERT(slice_equals(&uri.path, "/path"));
+    M3_TEST_ASSERT(slice_equals(&uri.fragment, "frag"));
 
     M3_TEST_OK(m3_uri_parse("app://example.com/path?bar=baz", &uri));
     M3_TEST_OK(m3_uri_query_find(&uri, "foo", &value, &found));
@@ -267,7 +281,43 @@ int main(void)
 
     M3_TEST_OK(m3_router_test_set_cstr_limit(3));
     M3_TEST_EXPECT(m3_uri_query_find(&uri, "abcd", &value, &found), M3_ERR_OVERFLOW);
+    M3_TEST_EXPECT(m3_router_test_validate_pattern("abcd"), M3_ERR_OVERFLOW);
     M3_TEST_OK(m3_router_test_set_cstr_limit(0));
+
+    {
+        M3Router find_router;
+        M3Route route;
+
+        memset(&find_router, 0, sizeof(find_router));
+        route.pattern = "/home";
+        route.build = route_build;
+        route.destroy = route_destroy;
+        route.ctx = &home_ctx;
+        find_router.routes = &route;
+        find_router.route_count = 1;
+
+        M3_TEST_OK(m3_router_test_set_cstr_limit(1));
+        M3_TEST_EXPECT(m3_router_test_find_route(&find_router, "/home", 5, &found_route), M3_ERR_OVERFLOW);
+        M3_TEST_OK(m3_router_test_set_cstr_limit(0));
+
+        M3_TEST_EXPECT(m3_router_test_find_route(&find_router, NULL, 0, &found_route), M3_ERR_INVALID_ARGUMENT);
+    }
+
+    {
+        M3Router local_router;
+        M3RouteEntry local_stack[1];
+
+        memset(&local_router, 0, sizeof(local_router));
+        local_router.stack = local_stack;
+        local_router.stack_capacity = 1;
+        local_router.stack_size = 1;
+        local_stack[0].path = "/overflow";
+        local_stack[0].component = NULL;
+
+        M3_TEST_OK(m3_router_test_set_cstr_limit(1));
+        M3_TEST_EXPECT(m3_router_test_navigate_path_len(&local_router, "/next", 5, &component), M3_ERR_OVERFLOW);
+        M3_TEST_OK(m3_router_test_set_cstr_limit(0));
+    }
 
     M3_TEST_OK(m3_uri_parse("/local/path", &uri));
     M3_TEST_ASSERT(uri.scheme.length == 0);
@@ -312,13 +362,22 @@ int main(void)
 
     M3_TEST_EXPECT(m3_route_test_match("/users/:", "/users/42", params, 2, &param_count, &match), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_route_test_match("/files/*/more", "/files/x", params, 2, &param_count, &match), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_route_test_match("/files/*/more", "/files", params, 2, &param_count, &match), M3_ERR_INVALID_ARGUMENT);
 
     M3_TEST_OK(m3_route_test_match("/files/*", "/files/a/b/c", NULL, 0, NULL, &match));
     M3_TEST_ASSERT(match == M3_TRUE);
+    M3_TEST_OK(m3_route_test_match("/files/*", "/files/a/b", params, 2, &param_count, &match));
+    M3_TEST_ASSERT(match == M3_TRUE);
+    M3_TEST_ASSERT(param_count == 0);
+    M3_TEST_OK(m3_route_test_match("/files/*", "/files", params, 2, &param_count, &match));
+    M3_TEST_ASSERT(match == M3_TRUE);
+    M3_TEST_ASSERT(param_count == 0);
 
     M3_TEST_EXPECT(m3_route_test_match("/users/:id", "/users/42", params, 0, &param_count, &match), M3_ERR_OVERFLOW);
 
     M3_TEST_OK(m3_route_test_match("/a/b", "/a", NULL, 0, NULL, &match));
+    M3_TEST_ASSERT(match == M3_FALSE);
+    M3_TEST_OK(m3_route_test_match("/a", "/a/b", NULL, 0, NULL, &match));
     M3_TEST_ASSERT(match == M3_FALSE);
 
     test_allocator_init(&alloc);

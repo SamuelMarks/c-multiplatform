@@ -152,12 +152,26 @@ typedef struct M3Sensors {
     const M3SensorsVTable *vtable; /**< Sensors virtual table. */
 } M3Sensors;
 
+/** @brief Any camera frame format (backend chooses). */
+#define M3_CAMERA_FORMAT_ANY 0
 /** @brief RGBA8 camera frame format. */
 #define M3_CAMERA_FORMAT_RGBA8 1
 /** @brief BGRA8 camera frame format. */
 #define M3_CAMERA_FORMAT_BGRA8 2
 /** @brief NV12 camera frame format. */
 #define M3_CAMERA_FORMAT_NV12 3
+
+/** @brief Camera facing preference unspecified. */
+#define M3_CAMERA_FACING_UNSPECIFIED 0
+/** @brief Front-facing camera preference. */
+#define M3_CAMERA_FACING_FRONT 1
+/** @brief Back-facing camera preference. */
+#define M3_CAMERA_FACING_BACK 2
+/** @brief External-facing camera preference. */
+#define M3_CAMERA_FACING_EXTERNAL 3
+
+/** @brief Default camera identifier. */
+#define M3_CAMERA_ID_DEFAULT ((m3_u32)~(m3_u32)0)
 
 /**
  * @brief Camera frame description.
@@ -171,6 +185,17 @@ typedef struct M3CameraFrame {
 } M3CameraFrame;
 
 /**
+ * @brief Camera configuration.
+ */
+typedef struct M3CameraConfig {
+    m3_u32 camera_id; /**< Backend-specific camera identifier (M3_CAMERA_ID_DEFAULT for automatic selection). */
+    m3_u32 facing; /**< Requested camera facing (M3_CAMERA_FACING_*). */
+    m3_u32 width; /**< Requested frame width in pixels (0 for backend default). */
+    m3_u32 height; /**< Requested frame height in pixels (0 for backend default). */
+    m3_u32 format; /**< Requested pixel format (M3_CAMERA_FORMAT_*). */
+} M3CameraConfig;
+
+/**
  * @brief Camera virtual table.
  */
 typedef struct M3CameraVTable {
@@ -181,6 +206,13 @@ typedef struct M3CameraVTable {
      * @return M3_OK on success or a failure code.
      */
     int (M3_CALL *open)(void *camera, m3_u32 camera_id);
+    /**
+     * @brief Open a camera device with configuration options.
+     * @param camera Camera backend instance.
+     * @param config Camera configuration.
+     * @return M3_OK on success or a failure code.
+     */
+    int (M3_CALL *open_with_config)(void *camera, const M3CameraConfig *config);
     /**
      * @brief Close the camera device.
      * @param camera Camera backend instance.

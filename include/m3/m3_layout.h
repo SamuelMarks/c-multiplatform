@@ -274,6 +274,13 @@ M3_API int M3_CALL m3_layout_test_layout_children_row(M3LayoutNode *node, M3Scal
  * @return M3_OK on success or a failure code.
  */
 M3_API int M3_CALL m3_layout_test_layout_children_column(M3LayoutNode *node, M3Scalar x, M3Scalar y, M3Scalar width, M3Scalar height);
+
+/**
+ * @brief Test hook to force style init failure.
+ * @param enable Whether to force failure.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_layout_test_set_style_init_fail(M3Bool enable);
 #endif
 
 #ifdef __cplusplus

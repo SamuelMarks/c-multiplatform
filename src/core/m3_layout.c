@@ -1,5 +1,9 @@
 #include "m3/m3_layout.h"
 
+#ifdef M3_TESTING
+static M3Bool g_m3_layout_force_style_init_fail = M3_FALSE;
+#endif
+
 static M3Scalar m3_layout_clamp_non_negative(M3Scalar value)
 {
     if (value < 0.0f) {
@@ -884,6 +888,11 @@ int M3_CALL m3_layout_style_init(M3LayoutStyle *style)
     if (style == NULL) {
         return M3_ERR_INVALID_ARGUMENT;
     }
+#ifdef M3_TESTING
+    if (g_m3_layout_force_style_init_fail) {
+        return M3_ERR_UNKNOWN;
+    }
+#endif
 
     style->direction = M3_LAYOUT_DIRECTION_ROW;
     style->wrap = M3_LAYOUT_WRAP_NO;
@@ -1036,6 +1045,12 @@ int M3_CALL m3_layout_test_measure_row(M3LayoutNode *node, M3LayoutMeasureSpec w
 int M3_CALL m3_layout_test_measure_column(M3LayoutNode *node, M3LayoutMeasureSpec width, M3LayoutMeasureSpec height, M3Size *out_size)
 {
     return m3_layout_measure_column(node, width, height, out_size);
+}
+
+int M3_CALL m3_layout_test_set_style_init_fail(M3Bool enable)
+{
+    g_m3_layout_force_style_init_fail = enable ? M3_TRUE : M3_FALSE;
+    return M3_OK;
 }
 
 int M3_CALL m3_layout_test_measure_node(M3LayoutNode *node, M3LayoutMeasureSpec width, M3LayoutMeasureSpec height)

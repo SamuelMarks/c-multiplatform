@@ -189,6 +189,13 @@ M3_API int M3_CALL m3_router_clear(M3Router *router);
 M3_API int M3_CALL m3_router_test_set_cstr_limit(m3_usize max_len);
 
 /**
+ * @brief Test hook to force slice equality failure.
+ * @param enable Whether to force failure.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_router_test_set_slice_equals_fail(M3Bool enable);
+
+/**
  * @brief Test wrapper for route matching.
  * @param pattern Route pattern.
  * @param path Path string.
@@ -284,6 +291,16 @@ M3_API int M3_CALL m3_router_test_validate_pattern(const char *pattern);
  * @return M3_OK on success or a failure code.
  */
 M3_API int M3_CALL m3_router_test_release_entry(M3Router *router, M3RouteEntry *entry);
+
+/**
+ * @brief Test wrapper for finding a route entry.
+ * @param router Router instance.
+ * @param path Path to match.
+ * @param path_len Length of the path in bytes.
+ * @param out_route Receives the matched route.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_router_test_find_route(const M3Router *router, const char *path, m3_usize path_len, const M3Route **out_route);
 
 /**
  * @brief Test wrapper for copying a path.

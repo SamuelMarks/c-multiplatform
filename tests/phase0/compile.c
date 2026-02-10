@@ -16,8 +16,14 @@
 #include "m3/m3_render.h"
 #include "m3/m3_event.h"
 #include "m3/m3_tasks.h"
+#include "m3/m3_camera.h"
+#include "m3/m3_visuals.h"
+#include "m3/m3_text.h"
+#include "m3/m3_selection.h"
 #include "m3/m3_backend_null.h"
 #include "m3/m3_backend_sdl3.h"
+#include "m3/m3_backend_web.h"
+#include "m3/m3_backend_ios.h"
 
 int main(void)
 {
@@ -44,10 +50,19 @@ int main(void)
     M3EventDispatcher dispatcher;
     M3Tasks tasks;
     M3TasksDefaultConfig tasks_config;
+    M3CameraSessionConfig camera_config;
+    M3CameraSession camera_session;
+    M3Ripple ripple;
+    M3Shadow shadow;
+    M3TextWidget text_widget;
     M3NullBackendConfig null_config;
     M3NullBackend *null_backend;
     M3SDL3BackendConfig sdl3_config;
     M3SDL3Backend *sdl3_backend;
+    M3WebBackendConfig web_config;
+    M3WebBackend *web_backend;
+    M3IOSBackendConfig ios_config;
+    M3IOSBackend *ios_backend;
 
     M3_UNUSED(&alloc);
     M3_UNUSED(&handle);
@@ -72,10 +87,19 @@ int main(void)
     M3_UNUSED(&dispatcher);
     M3_UNUSED(&tasks);
     M3_UNUSED(&tasks_config);
+    M3_UNUSED(&camera_config);
+    M3_UNUSED(&camera_session);
+    M3_UNUSED(&ripple);
+    M3_UNUSED(&shadow);
+    M3_UNUSED(&text_widget);
     M3_UNUSED(&null_config);
     M3_UNUSED(&null_backend);
     M3_UNUSED(&sdl3_config);
     M3_UNUSED(&sdl3_backend);
+    M3_UNUSED(&web_config);
+    M3_UNUSED(&web_backend);
+    M3_UNUSED(&ios_config);
+    M3_UNUSED(&ios_backend);
 
     return 0;
 }

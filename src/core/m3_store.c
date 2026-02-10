@@ -428,3 +428,26 @@ int M3_CALL m3_store_copy_redo_state(const M3Store *store, m3_usize index_from_l
 
     return m3_store_copy_history(store->redo_buffer, store->redo_capacity, store->state_size, store->redo_count, index_from_latest, out_state);
 }
+
+#ifdef M3_TESTING
+int M3_CALL m3_store_test_mul_overflow(m3_usize a, m3_usize b, m3_usize *out_value)
+{
+    return m3_store_mul_overflow(a, b, out_value);
+}
+
+int M3_CALL m3_store_test_history_push(m3_u8 *buffer, m3_usize capacity, m3_usize state_size, m3_usize *io_count, const void *state)
+{
+    return m3_store_history_push(buffer, capacity, state_size, io_count, state);
+}
+
+int M3_CALL m3_store_test_history_pop(const m3_u8 *buffer, m3_usize capacity, m3_usize state_size, m3_usize *io_count, void *out_state)
+{
+    return m3_store_history_pop(buffer, capacity, state_size, io_count, out_state);
+}
+
+int M3_CALL m3_store_test_copy_history(const m3_u8 *buffer, m3_usize capacity, m3_usize state_size, m3_usize count,
+    m3_usize index_from_latest, void *out_state)
+{
+    return m3_store_copy_history(buffer, capacity, state_size, count, index_from_latest, out_state);
+}
+#endif

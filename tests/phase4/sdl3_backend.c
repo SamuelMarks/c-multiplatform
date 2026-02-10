@@ -83,6 +83,14 @@ int main(void)
         M3Gfx gfx;
         M3Env env;
         M3WSConfig ws_config;
+        M3WSWindowConfig window_config;
+        M3Handle window;
+        M3Rect src_rect;
+        M3Rect dst_rect;
+        M3Color color;
+        M3Handle texture;
+        m3_u8 pixels[16];
+        m3_u8 update_pixels[4];
         m3_u32 time_ms;
         int rc;
 
@@ -133,6 +141,47 @@ int main(void)
         ws_config.utf8_app_id = "com.libm3c.test";
         ws_config.reserved = 0u;
         M3_TEST_OK(ws.vtable->init(ws.ctx, &ws_config));
+
+        window_config.width = 320;
+        window_config.height = 240;
+        window_config.utf8_title = "LibM3C SDL3";
+        window_config.flags = M3_WS_WINDOW_RESIZABLE;
+
+        rc = ws.vtable->create_window(ws.ctx, &window_config, &window);
+        if (rc == M3_OK) {
+            M3_TEST_OK(gfx.vtable->begin_frame(gfx.ctx, window, window_config.width, window_config.height, 1.0f));
+
+            memset(pixels, 255, sizeof(pixels));
+            texture.id = 0u;
+            texture.generation = 0u;
+            M3_TEST_OK(gfx.vtable->create_texture(gfx.ctx, 2, 2, M3_TEX_FORMAT_RGBA8, pixels, sizeof(pixels), &texture));
+
+            update_pixels[0] = 0u;
+            update_pixels[1] = 128u;
+            update_pixels[2] = 255u;
+            update_pixels[3] = 255u;
+            M3_TEST_OK(gfx.vtable->update_texture(gfx.ctx, texture, 0, 0, 1, 1, update_pixels, sizeof(update_pixels)));
+
+            src_rect.x = 0.0f;
+            src_rect.y = 0.0f;
+            src_rect.width = 2.0f;
+            src_rect.height = 2.0f;
+            dst_rect.x = 10.0f;
+            dst_rect.y = 10.0f;
+            dst_rect.width = 20.0f;
+            dst_rect.height = 20.0f;
+
+            color.r = 0.0f;
+            color.g = 0.0f;
+            color.b = 0.0f;
+            color.a = 1.0f;
+            M3_TEST_OK(gfx.vtable->clear(gfx.ctx, color));
+            M3_TEST_OK(gfx.vtable->draw_texture(gfx.ctx, texture, &src_rect, &dst_rect, 1.0f));
+            M3_TEST_OK(gfx.vtable->destroy_texture(gfx.ctx, texture));
+            M3_TEST_OK(gfx.vtable->end_frame(gfx.ctx, window));
+            M3_TEST_OK(ws.vtable->destroy_window(ws.ctx, window));
+        }
+
         M3_TEST_OK(ws.vtable->get_time_ms(ws.ctx, &time_ms));
         M3_TEST_OK(env.vtable->get_time_ms(env.ctx, &time_ms));
         M3_TEST_OK(ws.vtable->shutdown(ws.ctx));

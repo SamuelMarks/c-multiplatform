@@ -277,6 +277,8 @@ int M3_CALL m3_event_dispatch(M3EventDispatcher *dispatcher, const M3RenderNode 
         case M3_INPUT_KEY_DOWN:
         case M3_INPUT_KEY_UP:
         case M3_INPUT_TEXT:
+        case M3_INPUT_TEXT_UTF8:
+        case M3_INPUT_TEXT_EDIT:
             if (dispatcher->focused == NULL) {
                 return M3_OK;
             }

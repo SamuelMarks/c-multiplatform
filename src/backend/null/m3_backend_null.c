@@ -1208,6 +1208,14 @@ static int m3_null_camera_open(void *camera, m3_u32 camera_id)
     return M3_ERR_UNSUPPORTED;
 }
 
+static int m3_null_camera_open_with_config(void *camera, const M3CameraConfig *config)
+{
+    if (config == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+    return m3_null_camera_open(camera, config->camera_id);
+}
+
 static int m3_null_camera_close(void *camera)
 {
     struct M3NullBackend *backend;
@@ -1273,6 +1281,7 @@ static int m3_null_camera_read_frame(void *camera, M3CameraFrame *out_frame, M3B
 
 static const M3CameraVTable g_m3_null_camera_vtable = {
     m3_null_camera_open,
+    m3_null_camera_open_with_config,
     m3_null_camera_close,
     m3_null_camera_start,
     m3_null_camera_stop,
