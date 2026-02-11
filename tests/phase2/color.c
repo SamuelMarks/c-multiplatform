@@ -13,8 +13,8 @@ static int m3_color_near_u8(m3_u8 a, m3_u8 b, m3_u8 tol) {
 }
 
 int main(void) {
-  M3ColorHct hct;
-  M3ColorHct hct2;
+  M3ColorHct hct = {0};
+  M3ColorHct hct2 = {0};
   M3TonalPalette palette;
   M3Scheme scheme_light;
   M3Scheme scheme_dark;

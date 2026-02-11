@@ -29,8 +29,12 @@ static int M3_CALL test_sink_write(void *ctx, M3LogLevel level, const char *tag,
   if (tag == NULL) {
     state->last_tag[0] = '\0';
   } else {
-    strncpy(state->last_tag, tag, sizeof(state->last_tag) - 1);
-    state->last_tag[sizeof(state->last_tag) - 1] = '\0';
+    size_t tag_len = strlen(tag);
+    if (tag_len >= sizeof(state->last_tag)) {
+      tag_len = sizeof(state->last_tag) - 1;
+    }
+    memcpy(state->last_tag, tag, tag_len);
+    state->last_tag[tag_len] = '\0';
   }
 
   if (length == 0 || message == NULL) {

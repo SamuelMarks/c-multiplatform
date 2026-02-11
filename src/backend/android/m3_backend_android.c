@@ -148,6 +148,7 @@ struct M3AndroidBackend {
   void *looper;
 };
 
+#if M3_ANDROID_CAMERA2_AVAILABLE
 static int m3_android_camera_mul_overflow(m3_usize a, m3_usize b,
                                           m3_usize *out_value) {
   m3_usize max_value;
@@ -164,6 +165,7 @@ static int m3_android_camera_mul_overflow(m3_usize a, m3_usize b,
   *out_value = a * b;
   return M3_OK;
 }
+#endif
 
 #if M3_ANDROID_CAMERA2_AVAILABLE
 static int m3_android_camera_status_to_error(camera_status_t status) {
@@ -628,8 +630,8 @@ static int m3_android_camera_open_with_config(void *camera,
 #endif
 }
 
-static int m3_android_camera_stop_internal(M3AndroidCameraState *state) {
 #if M3_ANDROID_CAMERA2_AVAILABLE
+static int m3_android_camera_stop_internal(M3AndroidCameraState *state) {
   if (state == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
@@ -658,11 +660,8 @@ static int m3_android_camera_stop_internal(M3AndroidCameraState *state) {
 
   state->streaming = M3_FALSE;
   return M3_OK;
-#else
-  (void)state;
-  return M3_ERR_UNSUPPORTED;
-#endif
 }
+#endif
 
 static int m3_android_camera_close(void *camera) {
   struct M3AndroidBackend *backend;

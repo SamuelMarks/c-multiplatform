@@ -114,6 +114,23 @@ typedef struct TestFieldBackend {
 
 static int g_m3_text_field_trace = 0;
 
+static int m3_text_field_env_enabled(const char *name) {
+#if defined(_MSC_VER)
+  char *value = NULL;
+  size_t length = 0;
+  int enabled = 0;
+
+  if (_dupenv_s(&value, &length, name) == 0 && value != NULL) {
+    enabled = (value[0] != '\0') ? 1 : 0;
+    free(value);
+  }
+  return enabled;
+#else
+  const char *value = getenv(name);
+  return (value != NULL && value[0] != '\0') ? 1 : 0;
+#endif
+}
+
 static void m3_text_field_trace_step(int step) {
   if (g_m3_text_field_trace) {
     fprintf(stderr, "m3_phase5_text_field step %d\n", step);
@@ -513,13 +530,13 @@ int main(void) {
   int draw_rect_target;
   M3Bool handled;
   M3Bool changed;
-  char invalid_utf8[2];
-  char multi_utf8[3];
+  unsigned char invalid_utf8[2];
+  unsigned char multi_utf8[3];
   char ascii_utf8[4];
-  const char *trace_env;
+  const char *invalid_utf8_str;
+  const char *multi_utf8_str;
 
-  trace_env = getenv("M3_TEXT_FIELD_TRACE");
-  g_m3_text_field_trace = (trace_env != NULL && trace_env[0] != '\0') ? 1 : 0;
+  g_m3_text_field_trace = m3_text_field_env_enabled("M3_TEXT_FIELD_TRACE");
   m3_text_field_trace_step(1);
 
   test_backend_init(&backend);
@@ -964,15 +981,16 @@ int main(void) {
     reserve_field.utf8_capacity = 0u;
   }
 
-  invalid_utf8[0] = (char)0xC0;
+  invalid_utf8[0] = 0xC0u;
   invalid_utf8[1] = '\0';
+  invalid_utf8_str = (const char *)invalid_utf8;
   ascii_utf8[0] = 'A';
   ascii_utf8[1] = 'B';
   ascii_utf8[2] = 'C';
   ascii_utf8[3] = '\0';
   M3_TEST_EXPECT(m3_text_field_test_validate_utf8(NULL, 1u),
                  M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_text_field_test_validate_utf8(invalid_utf8, 1u),
+  M3_TEST_EXPECT(m3_text_field_test_validate_utf8(invalid_utf8_str, 1u),
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_OK(m3_text_field_test_validate_utf8(ascii_utf8, 3u));
   M3_TEST_OK(
@@ -980,15 +998,16 @@ int main(void) {
   M3_TEST_EXPECT(m3_text_field_test_validate_utf8(ascii_utf8, 3u), M3_ERR_IO);
   M3_TEST_OK(m3_text_field_test_clear_fail_points());
 
-  multi_utf8[0] = (char)0xC3;
-  multi_utf8[1] = (char)0xA9;
+  multi_utf8[0] = 0xC3u;
+  multi_utf8[1] = 0xA9u;
   multi_utf8[2] = '\0';
+  multi_utf8_str = (const char *)multi_utf8;
   M3_TEST_EXPECT(m3_text_field_test_validate_offset(ascii_utf8, 3u, 4u),
                  M3_ERR_RANGE);
   M3_TEST_OK(m3_text_field_test_validate_offset(ascii_utf8, 3u, 0u));
   M3_TEST_OK(m3_text_field_test_validate_offset(ascii_utf8, 3u, 3u));
   M3_TEST_OK(m3_text_field_test_validate_offset(ascii_utf8, 3u, 1u));
-  M3_TEST_EXPECT(m3_text_field_test_validate_offset(multi_utf8, 2u, 1u),
+  M3_TEST_EXPECT(m3_text_field_test_validate_offset(multi_utf8_str, 2u, 1u),
                  M3_ERR_RANGE);
   M3_TEST_OK(m3_text_field_test_set_fail_point(
       M3_TEXT_FIELD_TEST_FAIL_UTF8_ITER_INIT));
@@ -1013,7 +1032,7 @@ int main(void) {
   M3_TEST_OK(m3_text_field_test_prev_offset(ascii_utf8, 3u, 2u, &offset_value));
   M3_TEST_ASSERT(offset_value == 1u);
   M3_TEST_EXPECT(
-      m3_text_field_test_prev_offset(multi_utf8, 2u, 1u, &offset_value),
+      m3_text_field_test_prev_offset(multi_utf8_str, 2u, 1u, &offset_value),
       M3_ERR_RANGE);
   M3_TEST_OK(m3_text_field_test_set_fail_point(
       M3_TEXT_FIELD_TEST_FAIL_UTF8_ITER_INIT));
@@ -1039,7 +1058,7 @@ int main(void) {
   M3_TEST_OK(m3_text_field_test_next_offset(ascii_utf8, 3u, 1u, &offset_value));
   M3_TEST_ASSERT(offset_value == 2u);
   M3_TEST_EXPECT(
-      m3_text_field_test_next_offset(multi_utf8, 2u, 1u, &offset_value),
+      m3_text_field_test_next_offset(multi_utf8_str, 2u, 1u, &offset_value),
       M3_ERR_RANGE);
   M3_TEST_OK(m3_text_field_test_set_fail_point(
       M3_TEXT_FIELD_TEST_FAIL_UTF8_ITER_INIT));
@@ -1329,7 +1348,7 @@ int main(void) {
   temp_utf8_ptr = temp_field.utf8;
   temp_utf8_len = temp_field.utf8_len;
   temp_utf8_capacity = temp_field.utf8_capacity;
-  temp_field.utf8 = multi_utf8;
+  temp_field.utf8 = (char *)multi_utf8;
   temp_field.utf8_len = 2u;
   M3_TEST_EXPECT(
       m3_text_field_test_measure_prefix(&temp_field, 1u, &width_value),
@@ -1633,11 +1652,12 @@ int main(void) {
   M3_TEST_EXPECT(m3_text_field_set_text(NULL, "", 0), M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_text_field_set_text(&field, NULL, 1),
                  M3_ERR_INVALID_ARGUMENT);
-  invalid_utf8[0] = (char)0xC0;
+  invalid_utf8[0] = 0xC0u;
   invalid_utf8[1] = '\0';
-  M3_TEST_EXPECT(m3_text_field_set_text(&field, invalid_utf8, 1),
+  invalid_utf8_str = (const char *)invalid_utf8;
+  M3_TEST_EXPECT(m3_text_field_set_text(&field, invalid_utf8_str, 1),
                  M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_text_field_insert_utf8(&field, invalid_utf8, 1),
+  M3_TEST_EXPECT(m3_text_field_insert_utf8(&field, invalid_utf8_str, 1),
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_text_field_insert_utf8(NULL, "X", 1),
                  M3_ERR_INVALID_ARGUMENT);
@@ -1645,10 +1665,11 @@ int main(void) {
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_OK(m3_text_field_insert_utf8(&field, NULL, 0));
 
-  multi_utf8[0] = (char)0xC3;
-  multi_utf8[1] = (char)0xA9;
+  multi_utf8[0] = 0xC3u;
+  multi_utf8[1] = 0xA9u;
   multi_utf8[2] = '\0';
-  M3_TEST_OK(m3_text_field_set_text(&field, multi_utf8, 2));
+  multi_utf8_str = (const char *)multi_utf8;
+  M3_TEST_OK(m3_text_field_set_text(&field, multi_utf8_str, 2));
   M3_TEST_EXPECT(m3_text_field_set_cursor(NULL, 0u), M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_text_field_set_cursor(&field, 1), M3_ERR_RANGE);
   M3_TEST_OK(m3_text_field_set_cursor(&field, 2));

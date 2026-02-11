@@ -51,8 +51,14 @@ static int test_text_create_font(void *text, const char *utf8_family,
   backend->last_size = size_px;
   backend->last_weight = weight;
   backend->last_italic = italic;
-  strncpy(backend->last_family, utf8_family, sizeof(backend->last_family) - 1);
-  backend->last_family[sizeof(backend->last_family) - 1] = '\0';
+  {
+    size_t family_len = strlen(utf8_family);
+    if (family_len >= sizeof(backend->last_family)) {
+      family_len = sizeof(backend->last_family) - 1;
+    }
+    memcpy(backend->last_family, utf8_family, family_len);
+    backend->last_family[family_len] = '\0';
+  }
 
   out_font->id = 1u;
   out_font->generation = 1u;
