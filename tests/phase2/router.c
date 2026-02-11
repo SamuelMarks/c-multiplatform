@@ -466,6 +466,7 @@ int main(void) {
   m3_alloc.realloc = test_realloc;
   m3_alloc.free = test_free;
 
+  memset(&config, 0, sizeof(config));
   M3_TEST_EXPECT(m3_router_init(NULL, &config), M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_router_init(&router, NULL), M3_ERR_INVALID_ARGUMENT);
 

@@ -504,6 +504,11 @@ static int m3_tasks_mul_overflow(m3_usize a, m3_usize b, m3_usize *out_value) {
 }
 static int m3_tasks_time_now_ms(m3_u32 *out_ms) {
 #if defined(M3_TASKS_USE_WIN32)
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_TIME_NOW)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   if (out_ms == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
@@ -532,6 +537,11 @@ static int m3_native_mutex_init(M3NativeMutex *mutex) {
     return M3_ERR_INVALID_ARGUMENT;
   }
 #if defined(M3_TASKS_USE_WIN32)
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_MUTEX_INIT)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   InitializeCriticalSection(&mutex->cs);
   return M3_OK;
 #else
@@ -548,6 +558,11 @@ static int m3_native_mutex_destroy(M3NativeMutex *mutex) {
   }
 #if defined(M3_TASKS_USE_WIN32)
   DeleteCriticalSection(&mutex->cs);
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_MUTEX_DESTROY)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   return M3_OK;
 #else
   if (m3_tasks_pthread_mutex_destroy(&mutex->mutex) != 0) {
@@ -562,6 +577,11 @@ static int m3_native_mutex_lock(M3NativeMutex *mutex) {
     return M3_ERR_INVALID_ARGUMENT;
   }
 #if defined(M3_TASKS_USE_WIN32)
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_MUTEX_LOCK)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   EnterCriticalSection(&mutex->cs);
   return M3_OK;
 #else
@@ -578,6 +598,11 @@ static int m3_native_mutex_unlock(M3NativeMutex *mutex) {
   }
 #if defined(M3_TASKS_USE_WIN32)
   LeaveCriticalSection(&mutex->cs);
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_MUTEX_UNLOCK)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   return M3_OK;
 #else
   if (m3_tasks_pthread_mutex_unlock(&mutex->mutex) != 0) {
@@ -592,6 +617,11 @@ static int m3_native_cond_init(M3NativeCond *cond) {
     return M3_ERR_INVALID_ARGUMENT;
   }
 #if defined(M3_TASKS_USE_WIN32)
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_INIT)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   InitializeConditionVariable(&cond->cond);
   return M3_OK;
 #else
@@ -607,6 +637,11 @@ static int m3_native_cond_destroy(M3NativeCond *cond) {
     return M3_ERR_INVALID_ARGUMENT;
   }
 #if defined(M3_TASKS_USE_WIN32)
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_DESTROY)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   return M3_OK;
 #else
   if (m3_tasks_pthread_cond_destroy(&cond->cond) != 0) {
@@ -622,6 +657,11 @@ static int m3_native_cond_signal(M3NativeCond *cond) {
   }
 #if defined(M3_TASKS_USE_WIN32)
   WakeConditionVariable(&cond->cond);
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_SIGNAL)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   return M3_OK;
 #else
   if (m3_tasks_pthread_cond_signal(&cond->cond) != 0) {
@@ -637,6 +677,11 @@ static int m3_native_cond_broadcast(M3NativeCond *cond) {
   }
 #if defined(M3_TASKS_USE_WIN32)
   WakeAllConditionVariable(&cond->cond);
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_BROADCAST)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   return M3_OK;
 #else
   if (m3_tasks_pthread_cond_broadcast(&cond->cond) != 0) {
@@ -651,6 +696,11 @@ static int m3_native_cond_wait(M3NativeCond *cond, M3NativeMutex *mutex) {
     return M3_ERR_INVALID_ARGUMENT;
   }
 #if defined(M3_TASKS_USE_WIN32)
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_WAIT)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   if (!SleepConditionVariableCS(&cond->cond, &mutex->cs, INFINITE)) {
     return M3_ERR_UNKNOWN;
   }
@@ -674,6 +724,15 @@ static int m3_native_cond_timedwait(M3NativeCond *cond, M3NativeMutex *mutex,
     return M3_ERR_INVALID_ARGUMENT;
   }
 #if defined(M3_TASKS_USE_WIN32)
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_TIMEOUT)) {
+    g_m3_tasks_test_fail_point = M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_ERROR;
+    return M3_ERR_TIMEOUT;
+  }
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_ERROR)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   if (!SleepConditionVariableCS(&cond->cond, &mutex->cs, (DWORD)wait_ms)) {
     if (GetLastError() == ERROR_TIMEOUT) {
       return M3_ERR_TIMEOUT;
@@ -721,6 +780,11 @@ static int m3_native_cond_timedwait(M3NativeCond *cond, M3NativeMutex *mutex,
 
 static int m3_native_sleep_ms(m3_u32 ms) {
 #if defined(M3_TASKS_USE_WIN32)
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_SLEEP)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   Sleep(ms);
   return M3_OK;
 #else
@@ -746,6 +810,19 @@ static int m3_native_thread_create(
     return M3_ERR_INVALID_ARGUMENT;
   }
 #if defined(M3_TASKS_USE_WIN32)
+#ifdef M3_TESTING
+  if (g_m3_tasks_test_thread_create_fail_after > 0) {
+    g_m3_tasks_test_thread_create_count += 1;
+    if (g_m3_tasks_test_thread_create_count ==
+        g_m3_tasks_test_thread_create_fail_after) {
+      g_m3_tasks_test_thread_create_fail_after = 0;
+      return M3_ERR_UNKNOWN;
+    }
+  }
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_THREAD_CREATE)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   thread->handle = CreateThread(NULL, 0, entry, user, 0, &thread->id);
   if (thread->handle == NULL) {
     return M3_ERR_UNKNOWN;
@@ -769,6 +846,11 @@ static int m3_native_thread_join(M3NativeThread *thread) {
   }
   CloseHandle(thread->handle);
   thread->handle = NULL;
+#ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_THREAD_JOIN)) {
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   return M3_OK;
 #else
   if (m3_tasks_pthread_join(thread->thread) != 0) {

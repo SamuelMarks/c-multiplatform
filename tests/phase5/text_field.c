@@ -3,6 +3,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#if defined(__APPLE__)
+#include <crt_externs.h>
+#endif
 
 #define M3_TEXT_FIELD_TEST_FAIL_NONE 0u
 #define M3_TEXT_FIELD_TEST_FAIL_UTF8_VALIDATE 1u
@@ -126,8 +129,32 @@ static int m3_text_field_env_enabled(const char *name) {
   }
   return enabled;
 #else
-  const char *value = getenv(name);
-  return (value != NULL && value[0] != '\0') ? 1 : 0;
+  size_t name_len;
+  char **env;
+
+  if (name == NULL || name[0] == '\0') {
+    return 0;
+  }
+
+  name_len = strlen(name);
+#if defined(__APPLE__)
+  env = *_NSGetEnviron();
+#else
+  extern char **environ;
+  env = environ;
+#endif
+
+  if (env == NULL) {
+    return 0;
+  }
+
+  for (; *env != NULL; ++env) {
+    const char *entry = *env;
+    if (strncmp(entry, name, name_len) == 0 && entry[name_len] == '=') {
+      return entry[name_len + 1] != '\0' ? 1 : 0;
+    }
+  }
+  return 0;
 #endif
 }
 
