@@ -725,6 +725,9 @@ static int m3_native_cond_timedwait(M3NativeCond *cond, M3NativeMutex *mutex,
   }
 #if defined(M3_TASKS_USE_WIN32)
 #ifdef M3_TESTING
+  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_TIME_NOW)) {
+    return M3_ERR_UNKNOWN;
+  }
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_TIMEOUT)) {
     g_m3_tasks_test_fail_point = M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_ERROR;
     return M3_ERR_TIMEOUT;

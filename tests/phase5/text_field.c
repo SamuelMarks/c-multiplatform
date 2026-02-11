@@ -6,6 +6,9 @@
 #if defined(__APPLE__)
 #include <crt_externs.h>
 #endif
+#if !defined(_MSC_VER) && !defined(__APPLE__)
+extern char **environ;
+#endif
 
 #define M3_TEXT_FIELD_TEST_FAIL_NONE 0u
 #define M3_TEXT_FIELD_TEST_FAIL_UTF8_VALIDATE 1u
@@ -140,7 +143,6 @@ static int m3_text_field_env_enabled(const char *name) {
 #if defined(__APPLE__)
   env = *_NSGetEnviron();
 #else
-  extern char **environ;
   env = environ;
 #endif
 

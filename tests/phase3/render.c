@@ -456,6 +456,7 @@ static int test_widget_paint(void *ctx, M3PaintContext *paint_ctx) {
   out_width = 0.0f;
   out_height = 0.0f;
   out_baseline = 0.0f;
+  memset(&transform, 0, sizeof(transform));
 
   switch (scenario->mode) {
   case SCENARIO_OK:
