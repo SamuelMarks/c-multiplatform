@@ -2151,6 +2151,153 @@ static int m3_cocoa_gfx_draw_line(void *gfx, M3Scalar x0, M3Scalar y0, M3Scalar 
     return M3_OK;
 }
 
+static int m3_cocoa_path_build(const M3Path *path, CGMutablePathRef cg_path)
+{
+    M3Scalar current_x;
+    M3Scalar current_y;
+    M3Scalar start_x;
+    M3Scalar start_y;
+    M3Bool has_current;
+    m3_usize i;
+
+    if (path == NULL || cg_path == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+    if (path->commands == NULL) {
+        return M3_ERR_STATE;
+    }
+    if (path->count == 0) {
+        return M3_OK;
+    }
+
+    has_current = M3_FALSE;
+    current_x = 0.0f;
+    current_y = 0.0f;
+    start_x = 0.0f;
+    start_y = 0.0f;
+
+    for (i = 0; i < path->count; ++i) {
+        const M3PathCmd *cmd = &path->commands[i];
+        switch (cmd->type) {
+        case M3_PATH_CMD_MOVE_TO:
+            current_x = cmd->data.move_to.x;
+            current_y = cmd->data.move_to.y;
+            start_x = current_x;
+            start_y = current_y;
+            has_current = M3_TRUE;
+            CGPathMoveToPoint(cg_path, NULL, (CGFloat)current_x, (CGFloat)current_y);
+            break;
+        case M3_PATH_CMD_LINE_TO:
+            if (!has_current) {
+                return M3_ERR_STATE;
+            }
+            current_x = cmd->data.line_to.x;
+            current_y = cmd->data.line_to.y;
+            CGPathAddLineToPoint(cg_path, NULL, (CGFloat)current_x, (CGFloat)current_y);
+            break;
+        case M3_PATH_CMD_QUAD_TO:
+            if (!has_current) {
+                return M3_ERR_STATE;
+            }
+            current_x = cmd->data.quad_to.x;
+            current_y = cmd->data.quad_to.y;
+            CGPathAddQuadCurveToPoint(cg_path, NULL,
+                                      (CGFloat)cmd->data.quad_to.cx,
+                                      (CGFloat)cmd->data.quad_to.cy,
+                                      (CGFloat)current_x, (CGFloat)current_y);
+            break;
+        case M3_PATH_CMD_CUBIC_TO:
+            if (!has_current) {
+                return M3_ERR_STATE;
+            }
+            current_x = cmd->data.cubic_to.x;
+            current_y = cmd->data.cubic_to.y;
+            CGPathAddCurveToPoint(cg_path, NULL,
+                                  (CGFloat)cmd->data.cubic_to.cx1,
+                                  (CGFloat)cmd->data.cubic_to.cy1,
+                                  (CGFloat)cmd->data.cubic_to.cx2,
+                                  (CGFloat)cmd->data.cubic_to.cy2,
+                                  (CGFloat)current_x, (CGFloat)current_y);
+            break;
+        case M3_PATH_CMD_CLOSE:
+            if (!has_current) {
+                return M3_ERR_STATE;
+            }
+            CGPathCloseSubpath(cg_path);
+            current_x = start_x;
+            current_y = start_y;
+            has_current = M3_FALSE;
+            break;
+        default:
+            return M3_ERR_INVALID_ARGUMENT;
+        }
+    }
+    return M3_OK;
+}
+
+static int m3_cocoa_gfx_draw_path(void *gfx, const M3Path *path, M3Color color)
+{
+    struct M3CocoaBackend *backend;
+    CGContextRef ctx;
+    CGMutablePathRef cg_path;
+    CGAffineTransform transform;
+    M3Bool apply_transform;
+    int rc;
+
+    if (gfx == NULL || path == NULL) {
+        return M3_ERR_INVALID_ARGUMENT;
+    }
+    if (path->commands == NULL) {
+        return M3_ERR_STATE;
+    }
+    if (path->count > path->capacity) {
+        return M3_ERR_STATE;
+    }
+    if (path->count == 0) {
+        return M3_OK;
+    }
+
+    backend = (struct M3CocoaBackend *)gfx;
+    rc = m3_cocoa_backend_log(backend, M3_LOG_LEVEL_DEBUG, "gfx.draw_path");
+    M3_COCOA_RETURN_IF_ERROR(rc);
+
+    rc = m3_cocoa_color_validate(color);
+    M3_COCOA_RETURN_IF_ERROR(rc);
+
+    rc = m3_cocoa_get_active_context(backend, &ctx);
+    M3_COCOA_RETURN_IF_ERROR(rc);
+
+    cg_path = CGPathCreateMutable();
+    if (cg_path == NULL) {
+        return M3_ERR_OUT_OF_MEMORY;
+    }
+
+    rc = m3_cocoa_path_build(path, cg_path);
+    if (rc != M3_OK) {
+        CGPathRelease(cg_path);
+        return rc;
+    }
+
+    apply_transform = backend->has_transform ? M3_TRUE : M3_FALSE;
+    if (apply_transform) {
+        rc = m3_cocoa_mat3_to_cgaffine(&backend->transform, &transform);
+        M3_COCOA_RETURN_IF_ERROR_CLEANUP(rc, CGPathRelease(cg_path));
+        CGContextSaveGState(ctx);
+        CGContextConcatCTM(ctx, transform);
+    }
+
+    CGContextSetRGBFillColor(ctx, (CGFloat)color.r, (CGFloat)color.g, (CGFloat)color.b, (CGFloat)color.a);
+    CGContextAddPath(ctx, cg_path);
+    CGContextFillPath(ctx);
+
+    if (apply_transform) {
+        CGContextRestoreGState(ctx);
+    }
+
+    CGPathRelease(cg_path);
+    return M3_OK;
+}
+
 static int m3_cocoa_gfx_push_clip(void *gfx, const M3Rect *rect)
 {
     struct M3CocoaBackend *backend;
@@ -2533,6 +2680,7 @@ static const M3GfxVTable g_m3_cocoa_gfx_vtable = {
     m3_cocoa_gfx_clear,
     m3_cocoa_gfx_draw_rect,
     m3_cocoa_gfx_draw_line,
+    m3_cocoa_gfx_draw_path,
     m3_cocoa_gfx_push_clip,
     m3_cocoa_gfx_pop_clip,
     m3_cocoa_gfx_set_transform,

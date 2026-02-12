@@ -688,6 +688,28 @@ static int m3_null_gfx_draw_line(void *gfx, M3Scalar x0, M3Scalar y0,
   return M3_OK;
 }
 
+static int m3_null_gfx_draw_path(void *gfx, const M3Path *path, M3Color color) {
+  struct M3NullBackend *backend;
+  int rc;
+
+  M3_UNUSED(color);
+
+  if (gfx == NULL || path == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (path->commands == NULL) {
+    return M3_ERR_STATE;
+  }
+  if (path->count > path->capacity) {
+    return M3_ERR_STATE;
+  }
+
+  backend = (struct M3NullBackend *)gfx;
+  rc = m3_null_backend_log(backend, M3_LOG_LEVEL_DEBUG, "gfx.draw_path");
+  M3_NULL_RETURN_IF_ERROR(rc);
+  return M3_OK;
+}
+
 static int m3_null_gfx_push_clip(void *gfx, const M3Rect *rect) {
   struct M3NullBackend *backend;
   int rc;
@@ -853,12 +875,13 @@ static int m3_null_gfx_draw_texture(void *gfx, M3Handle texture,
 }
 
 static const M3GfxVTable g_m3_null_gfx_vtable = {
-    m3_null_gfx_begin_frame,     m3_null_gfx_end_frame,
-    m3_null_gfx_clear,           m3_null_gfx_draw_rect,
-    m3_null_gfx_draw_line,       m3_null_gfx_push_clip,
-    m3_null_gfx_pop_clip,        m3_null_gfx_set_transform,
-    m3_null_gfx_create_texture,  m3_null_gfx_update_texture,
-    m3_null_gfx_destroy_texture, m3_null_gfx_draw_texture};
+    m3_null_gfx_begin_frame,    m3_null_gfx_end_frame,
+    m3_null_gfx_clear,          m3_null_gfx_draw_rect,
+    m3_null_gfx_draw_line,      m3_null_gfx_draw_path,
+    m3_null_gfx_push_clip,      m3_null_gfx_pop_clip,
+    m3_null_gfx_set_transform,  m3_null_gfx_create_texture,
+    m3_null_gfx_update_texture, m3_null_gfx_destroy_texture,
+    m3_null_gfx_draw_texture};
 
 static int m3_null_text_create_font(void *text, const char *utf8_family,
                                     m3_i32 size_px, m3_i32 weight,

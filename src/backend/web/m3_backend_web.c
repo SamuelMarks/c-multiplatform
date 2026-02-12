@@ -3437,6 +3437,36 @@ static int m3_web_gfx_draw_line(void *gfx, M3Scalar x0, M3Scalar y0,
                               0.0f);
 }
 
+static int m3_web_gfx_draw_path(void *gfx, const M3Path *path, M3Color color) {
+  struct M3WebBackend *backend;
+  int rc;
+
+  M3_UNUSED(color);
+
+  if (gfx == NULL || path == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (path->commands == NULL) {
+    return M3_ERR_STATE;
+  }
+  if (path->count > path->capacity) {
+    return M3_ERR_STATE;
+  }
+  if (path->count == 0) {
+    return M3_OK;
+  }
+
+  backend = (struct M3WebBackend *)gfx;
+  rc = m3_web_backend_log(backend, M3_LOG_LEVEL_DEBUG, "gfx.draw_path");
+  M3_WEB_RETURN_IF_ERROR(rc);
+
+  if (!backend->in_frame) {
+    return M3_ERR_STATE;
+  }
+
+  return M3_ERR_UNSUPPORTED;
+}
+
 static int m3_web_gfx_push_clip(void *gfx, const M3Rect *rect) {
   struct M3WebBackend *backend;
   M3Rect clipped;
@@ -4184,12 +4214,13 @@ static int m3_web_gfx_draw_texture(void *gfx, M3Handle texture,
 }
 
 static const M3GfxVTable g_m3_web_gfx_vtable = {
-    m3_web_gfx_begin_frame,     m3_web_gfx_end_frame,
-    m3_web_gfx_clear,           m3_web_gfx_draw_rect,
-    m3_web_gfx_draw_line,       m3_web_gfx_push_clip,
-    m3_web_gfx_pop_clip,        m3_web_gfx_set_transform,
-    m3_web_gfx_create_texture,  m3_web_gfx_update_texture,
-    m3_web_gfx_destroy_texture, m3_web_gfx_draw_texture};
+    m3_web_gfx_begin_frame,    m3_web_gfx_end_frame,
+    m3_web_gfx_clear,          m3_web_gfx_draw_rect,
+    m3_web_gfx_draw_line,      m3_web_gfx_draw_path,
+    m3_web_gfx_push_clip,      m3_web_gfx_pop_clip,
+    m3_web_gfx_set_transform,  m3_web_gfx_create_texture,
+    m3_web_gfx_update_texture, m3_web_gfx_destroy_texture,
+    m3_web_gfx_draw_texture};
 
 static int m3_web_text_create_font(void *text, const char *utf8_family,
                                    m3_i32 size_px, m3_i32 weight, M3Bool italic,

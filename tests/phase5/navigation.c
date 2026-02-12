@@ -191,11 +191,12 @@ static const M3TextVTable g_test_text_vtable_no_destroy = {
     test_text_create_font, NULL, test_text_measure_text, test_text_draw_text};
 
 static const M3GfxVTable g_test_gfx_vtable = {
-    NULL, NULL, NULL, test_gfx_draw_rect, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, test_gfx_draw_rect, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL};
 
 static const M3GfxVTable g_test_gfx_vtable_no_rect = {
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL};
 
 static int m3_near(M3Scalar a, M3Scalar b, M3Scalar tol) {
   M3Scalar diff;

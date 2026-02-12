@@ -335,7 +335,7 @@ int main(void) {
     M3Camera camera;
     M3Network network;
     M3Tasks tasks;
-    M3Allocator default_alloc;
+    M3Allocator default_alloc = {0};
     M3WSConfig ws_config;
     M3WSWindowConfig win_config;
     M3Handle window;

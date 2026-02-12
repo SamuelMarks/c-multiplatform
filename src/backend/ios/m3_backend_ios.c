@@ -26,6 +26,10 @@ static int m3_ios_backend_validate_config(const M3IOSBackendConfig *config) {
       return M3_ERR_INVALID_ARGUMENT;
     }
   }
+  if (config->predictive_back != NULL &&
+      config->predictive_back->initialized != M3_TRUE) {
+    return M3_ERR_STATE;
+  }
   return M3_OK;
 }
 
@@ -58,6 +62,7 @@ int M3_CALL m3_ios_backend_config_init(M3IOSBackendConfig *config) {
   config->clipboard_limit = (m3_usize) ~(m3_usize)0;
   config->enable_logging = M3_TRUE;
   config->inline_tasks = M3_TRUE;
+  config->predictive_back = NULL;
   return M3_OK;
 }
 
@@ -69,6 +74,7 @@ struct M3IOSBackend {
   M3WS ws;
   M3Gfx gfx;
   M3Env env;
+  M3PredictiveBack *predictive_back;
   M3Bool initialized;
 };
 
@@ -170,6 +176,7 @@ int M3_CALL m3_ios_backend_create(const M3IOSBackendConfig *config,
     return m3_ios_backend_cleanup(&allocator, backend, rc);
   }
 
+  backend->predictive_back = config->predictive_back;
   backend->initialized = M3_TRUE;
   *out_backend = backend;
   return M3_OK;
@@ -189,6 +196,7 @@ int M3_CALL m3_ios_backend_destroy(M3IOSBackend *backend) {
   M3_IOS_RETURN_IF_ERROR(rc);
 
   backend->null_backend = NULL;
+  backend->predictive_back = NULL;
   backend->initialized = M3_FALSE;
   return backend->allocator.free(backend->allocator.ctx, backend);
 }
@@ -224,6 +232,77 @@ int M3_CALL m3_ios_backend_get_env(M3IOSBackend *backend, M3Env *out_env) {
   }
   *out_env = backend->env;
   return M3_OK;
+}
+
+int M3_CALL m3_ios_backend_set_predictive_back(M3IOSBackend *backend,
+                                               M3PredictiveBack *predictive) {
+  if (backend == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized) {
+    return M3_ERR_STATE;
+  }
+  if (predictive != NULL && predictive->initialized != M3_TRUE) {
+    return M3_ERR_STATE;
+  }
+  backend->predictive_back = predictive;
+  return M3_OK;
+}
+
+int M3_CALL m3_ios_backend_get_predictive_back(
+    M3IOSBackend *backend, M3PredictiveBack **out_predictive) {
+  if (backend == NULL || out_predictive == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized) {
+    return M3_ERR_STATE;
+  }
+  *out_predictive = backend->predictive_back;
+  return M3_OK;
+}
+
+int M3_CALL m3_ios_backend_predictive_back_start(
+    M3IOSBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized || backend->predictive_back == NULL) {
+    return M3_ERR_STATE;
+  }
+  return m3_predictive_back_start(backend->predictive_back, event);
+}
+
+int M3_CALL m3_ios_backend_predictive_back_progress(
+    M3IOSBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized || backend->predictive_back == NULL) {
+    return M3_ERR_STATE;
+  }
+  return m3_predictive_back_progress(backend->predictive_back, event);
+}
+
+int M3_CALL m3_ios_backend_predictive_back_commit(
+    M3IOSBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized || backend->predictive_back == NULL) {
+    return M3_ERR_STATE;
+  }
+  return m3_predictive_back_commit(backend->predictive_back, event);
+}
+
+int M3_CALL m3_ios_backend_predictive_back_cancel(
+    M3IOSBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized || backend->predictive_back == NULL) {
+    return M3_ERR_STATE;
+  }
+  return m3_predictive_back_cancel(backend->predictive_back, event);
 }
 
 #else
@@ -278,6 +357,56 @@ int M3_CALL m3_ios_backend_get_env(M3IOSBackend *backend, M3Env *out_env) {
     return M3_ERR_INVALID_ARGUMENT;
   }
   memset(out_env, 0, sizeof(*out_env));
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_ios_backend_set_predictive_back(M3IOSBackend *backend,
+                                               M3PredictiveBack *predictive) {
+  if (backend == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  M3_UNUSED(predictive);
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_ios_backend_get_predictive_back(
+    M3IOSBackend *backend, M3PredictiveBack **out_predictive) {
+  if (backend == NULL || out_predictive == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  *out_predictive = NULL;
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_ios_backend_predictive_back_start(
+    M3IOSBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_ios_backend_predictive_back_progress(
+    M3IOSBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_ios_backend_predictive_back_commit(
+    M3IOSBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_ios_backend_predictive_back_cancel(
+    M3IOSBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
   return M3_ERR_UNSUPPORTED;
 }
 

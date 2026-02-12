@@ -30,6 +30,83 @@ typedef struct M3Color {
   M3Scalar a; /**< Alpha channel. */
 } M3Color;
 
+/** @brief Path command: move to. */
+#define M3_PATH_CMD_MOVE_TO 1
+/** @brief Path command: line to. */
+#define M3_PATH_CMD_LINE_TO 2
+/** @brief Path command: quadratic curve to. */
+#define M3_PATH_CMD_QUAD_TO 3
+/** @brief Path command: cubic curve to. */
+#define M3_PATH_CMD_CUBIC_TO 4
+/** @brief Path command: close path. */
+#define M3_PATH_CMD_CLOSE 5
+
+/**
+ * @brief Move-to path command payload.
+ */
+typedef struct M3PathCmdMoveTo {
+  M3Scalar x; /**< Target X coordinate. */
+  M3Scalar y; /**< Target Y coordinate. */
+} M3PathCmdMoveTo;
+
+/**
+ * @brief Line-to path command payload.
+ */
+typedef struct M3PathCmdLineTo {
+  M3Scalar x; /**< Target X coordinate. */
+  M3Scalar y; /**< Target Y coordinate. */
+} M3PathCmdLineTo;
+
+/**
+ * @brief Quadratic curve path command payload.
+ */
+typedef struct M3PathCmdQuadTo {
+  M3Scalar cx; /**< Control point X coordinate. */
+  M3Scalar cy; /**< Control point Y coordinate. */
+  M3Scalar x;  /**< Target X coordinate. */
+  M3Scalar y;  /**< Target Y coordinate. */
+} M3PathCmdQuadTo;
+
+/**
+ * @brief Cubic curve path command payload.
+ */
+typedef struct M3PathCmdCubicTo {
+  M3Scalar cx1; /**< First control point X coordinate. */
+  M3Scalar cy1; /**< First control point Y coordinate. */
+  M3Scalar cx2; /**< Second control point X coordinate. */
+  M3Scalar cy2; /**< Second control point Y coordinate. */
+  M3Scalar x;   /**< Target X coordinate. */
+  M3Scalar y;   /**< Target Y coordinate. */
+} M3PathCmdCubicTo;
+
+/**
+ * @brief Path command payload union.
+ */
+typedef union M3PathCmdData {
+  M3PathCmdMoveTo move_to;   /**< Move-to payload. */
+  M3PathCmdLineTo line_to;   /**< Line-to payload. */
+  M3PathCmdQuadTo quad_to;   /**< Quadratic curve payload. */
+  M3PathCmdCubicTo cubic_to; /**< Cubic curve payload. */
+} M3PathCmdData;
+
+/**
+ * @brief Path command entry.
+ */
+typedef struct M3PathCmd {
+  m3_u32 type;        /**< Command type (M3_PATH_CMD_*). */
+  M3PathCmdData data; /**< Command payload. */
+} M3PathCmd;
+
+/**
+ * @brief Vector path command list.
+ */
+typedef struct M3Path {
+  M3PathCmd *commands;   /**< Command array (owned by the path). */
+  m3_usize count;        /**< Number of commands in the path. */
+  m3_usize capacity;     /**< Command array capacity. */
+  M3Allocator allocator; /**< Allocator used for command storage. */
+} M3Path;
+
 /**
  * @brief Graphics virtual table.
  */
@@ -82,6 +159,14 @@ typedef struct M3GfxVTable {
    */
   int(M3_CALL *draw_line)(void *gfx, M3Scalar x0, M3Scalar y0, M3Scalar x1,
                           M3Scalar y1, M3Color color, M3Scalar thickness);
+  /**
+   * @brief Draw a filled path.
+   * @param gfx Graphics backend instance.
+   * @param path Path to draw.
+   * @param color Fill color.
+   * @return M3_OK on success or a failure code.
+   */
+  int(M3_CALL *draw_path)(void *gfx, const M3Path *path, M3Color color);
   /**
    * @brief Push a clipping rectangle.
    * @param gfx Graphics backend instance.

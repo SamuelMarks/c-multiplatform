@@ -61,23 +61,40 @@ add_library(m3 STATIC
     src/core/m3_log.c
     src/core/m3_store.c
     src/core/m3_storage.c
+    src/core/m3_i18n.c
     src/core/m3_math.c
     src/core/m3_color.c
     src/core/m3_layout.c
+    src/core/m3_a11y.c
     src/core/m3_anim.c
     src/core/m3_router.c
+    src/core/m3_predictive.c
+    src/core/m3_path.c
     src/core/m3_render.c
     src/core/m3_event.c
+    src/core/m3_gesture.c
+    src/core/m3_scroll.c
     src/core/m3_tasks.c
     src/core/m3_visuals.c
     src/core/m3_text.c
+    src/core/m3_icon.c
+    src/core/m3_extras.c
     src/core/m3_text_field.c
     src/core/m3_list.c
     src/core/m3_navigation.c
+    src/core/m3_app_bar.c
+    src/core/m3_tabs.c
     src/core/m3_dialogs.c
+    src/core/m3_sheet.c
+    src/core/m3_scaffold.c
+    src/core/m3_menu.c
     src/core/m3_button.c
+    src/core/m3_card.c
+    src/core/m3_chip.c
     src/core/m3_selection.c
     src/core/m3_progress.c
+    src/core/m3_date_picker.c
+    src/core/m3_time_picker.c
     src/core/m3_camera.c
     src/core/m3_network.c
     src/backend/null/m3_backend_null.c
@@ -373,6 +390,12 @@ if(BUILD_TESTING)
     m3_apply_c_settings(m3_phase1_store)
     add_test(NAME m3_phase1_store COMMAND m3_phase1_store)
 
+    add_executable(m3_phase1_i18n tests/phase1/i18n.c)
+    target_link_libraries(m3_phase1_i18n PRIVATE m3)
+    target_compile_definitions(m3_phase1_i18n PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase1_i18n)
+    add_test(NAME m3_phase1_i18n COMMAND m3_phase1_i18n)
+
     add_executable(m3_phase2_math tests/phase2/math.c)
     target_link_libraries(m3_phase2_math PRIVATE m3)
     m3_apply_c_settings(m3_phase2_math)
@@ -414,11 +437,29 @@ if(BUILD_TESTING)
     m3_apply_c_settings(m3_phase3_render)
     add_test(NAME m3_phase3_render COMMAND m3_phase3_render)
 
+    add_executable(m3_phase3_path tests/phase3/path.c)
+    target_link_libraries(m3_phase3_path PRIVATE m3)
+    target_compile_definitions(m3_phase3_path PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase3_path)
+    add_test(NAME m3_phase3_path COMMAND m3_phase3_path)
+
     add_executable(m3_phase3_event tests/phase3/event.c)
     target_link_libraries(m3_phase3_event PRIVATE m3)
     target_compile_definitions(m3_phase3_event PRIVATE M3_TESTING)
     m3_apply_c_settings(m3_phase3_event)
     add_test(NAME m3_phase3_event COMMAND m3_phase3_event)
+
+    add_executable(m3_phase3_gesture tests/phase3/gesture.c)
+    target_link_libraries(m3_phase3_gesture PRIVATE m3)
+    target_compile_definitions(m3_phase3_gesture PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase3_gesture)
+    add_test(NAME m3_phase3_gesture COMMAND m3_phase3_gesture)
+
+    add_executable(m3_phase3_scroll tests/phase3/scroll.c)
+    target_link_libraries(m3_phase3_scroll PRIVATE m3)
+    target_compile_definitions(m3_phase3_scroll PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase3_scroll)
+    add_test(NAME m3_phase3_scroll COMMAND m3_phase3_scroll)
 
     add_executable(m3_phase3_tasks tests/phase3/tasks.c)
     target_link_libraries(m3_phase3_tasks PRIVATE m3)
@@ -486,11 +527,35 @@ if(BUILD_TESTING)
     m3_apply_c_settings(m3_phase5_text)
     add_test(NAME m3_phase5_text COMMAND m3_phase5_text)
 
+    add_executable(m3_phase5_icons tests/phase5/icons.c)
+    target_link_libraries(m3_phase5_icons PRIVATE m3)
+    target_compile_definitions(m3_phase5_icons PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase5_icons)
+    add_test(NAME m3_phase5_icons COMMAND m3_phase5_icons)
+
+    add_executable(m3_phase5_extras tests/phase5/extras.c)
+    target_link_libraries(m3_phase5_extras PRIVATE m3)
+    target_compile_definitions(m3_phase5_extras PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase5_extras)
+    add_test(NAME m3_phase5_extras COMMAND m3_phase5_extras)
+
     add_executable(m3_phase5_buttons tests/phase5/buttons.c)
     target_link_libraries(m3_phase5_buttons PRIVATE m3)
     target_compile_definitions(m3_phase5_buttons PRIVATE M3_TESTING)
     m3_apply_c_settings(m3_phase5_buttons)
     add_test(NAME m3_phase5_buttons COMMAND m3_phase5_buttons)
+
+    add_executable(m3_phase5_cards tests/phase5/cards.c)
+    target_link_libraries(m3_phase5_cards PRIVATE m3)
+    target_compile_definitions(m3_phase5_cards PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase5_cards)
+    add_test(NAME m3_phase5_cards COMMAND m3_phase5_cards)
+
+    add_executable(m3_phase5_chips tests/phase5/chips.c)
+    target_link_libraries(m3_phase5_chips PRIVATE m3)
+    target_compile_definitions(m3_phase5_chips PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase5_chips)
+    add_test(NAME m3_phase5_chips COMMAND m3_phase5_chips)
 
     add_executable(m3_phase5_selection tests/phase5/selection.c)
     target_link_libraries(m3_phase5_selection PRIVATE m3)
@@ -516,17 +581,59 @@ if(BUILD_TESTING)
     m3_apply_c_settings(m3_phase5_navigation)
     add_test(NAME m3_phase5_navigation COMMAND m3_phase5_navigation)
 
+    add_executable(m3_phase5_app_bar tests/phase5/app_bar.c)
+    target_link_libraries(m3_phase5_app_bar PRIVATE m3)
+    target_compile_definitions(m3_phase5_app_bar PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase5_app_bar)
+    add_test(NAME m3_phase5_app_bar COMMAND m3_phase5_app_bar)
+
+    add_executable(m3_phase5_tabs tests/phase5/tabs.c)
+    target_link_libraries(m3_phase5_tabs PRIVATE m3)
+    target_compile_definitions(m3_phase5_tabs PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase5_tabs)
+    add_test(NAME m3_phase5_tabs COMMAND m3_phase5_tabs)
+
+    add_executable(m3_phase5_menus tests/phase5/menus.c)
+    target_link_libraries(m3_phase5_menus PRIVATE m3)
+    target_compile_definitions(m3_phase5_menus PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase5_menus)
+    add_test(NAME m3_phase5_menus COMMAND m3_phase5_menus)
+
     add_executable(m3_phase5_dialogs tests/phase5/dialogs.c)
     target_link_libraries(m3_phase5_dialogs PRIVATE m3)
     target_compile_definitions(m3_phase5_dialogs PRIVATE M3_TESTING)
     m3_apply_c_settings(m3_phase5_dialogs)
     add_test(NAME m3_phase5_dialogs COMMAND m3_phase5_dialogs)
 
+    add_executable(m3_phase5_sheet tests/phase5/sheet.c)
+    target_link_libraries(m3_phase5_sheet PRIVATE m3)
+    target_compile_definitions(m3_phase5_sheet PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase5_sheet)
+    add_test(NAME m3_phase5_sheet COMMAND m3_phase5_sheet)
+
+    add_executable(m3_phase5_scaffold tests/phase5/scaffold.c)
+    target_link_libraries(m3_phase5_scaffold PRIVATE m3)
+    target_compile_definitions(m3_phase5_scaffold PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase5_scaffold)
+    add_test(NAME m3_phase5_scaffold COMMAND m3_phase5_scaffold)
+
 add_executable(m3_phase5_progress tests/phase5/progress.c)
 target_link_libraries(m3_phase5_progress PRIVATE m3)
 target_compile_definitions(m3_phase5_progress PRIVATE M3_TESTING)
 m3_apply_c_settings(m3_phase5_progress)
 add_test(NAME m3_phase5_progress COMMAND m3_phase5_progress)
+
+add_executable(m3_phase5_date_picker tests/phase5/date_picker.c)
+target_link_libraries(m3_phase5_date_picker PRIVATE m3)
+target_compile_definitions(m3_phase5_date_picker PRIVATE M3_TESTING)
+m3_apply_c_settings(m3_phase5_date_picker)
+add_test(NAME m3_phase5_date_picker COMMAND m3_phase5_date_picker)
+
+add_executable(m3_phase5_time_picker tests/phase5/time_picker.c)
+target_link_libraries(m3_phase5_time_picker PRIVATE m3)
+target_compile_definitions(m3_phase5_time_picker PRIVATE M3_TESTING)
+m3_apply_c_settings(m3_phase5_time_picker)
+add_test(NAME m3_phase5_time_picker COMMAND m3_phase5_time_picker)
 
 add_executable(m3_phase6_storage tests/phase6/storage.c)
 target_link_libraries(m3_phase6_storage PRIVATE m3)
@@ -543,4 +650,15 @@ target_link_libraries(m3_phase6_network PRIVATE m3)
 target_compile_definitions(m3_phase6_network PRIVATE M3_TESTING)
 m3_apply_c_settings(m3_phase6_network)
 add_test(NAME m3_phase6_network COMMAND m3_phase6_network)
+    add_executable(m3_phase6_a11y tests/phase6/a11y.c)
+    target_link_libraries(m3_phase6_a11y PRIVATE m3)
+    target_compile_definitions(m3_phase6_a11y PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase6_a11y)
+    add_test(NAME m3_phase6_a11y COMMAND m3_phase6_a11y)
+
+    add_executable(m3_phase6_predictive tests/phase6/predictive.c)
+    target_link_libraries(m3_phase6_predictive PRIVATE m3)
+    target_compile_definitions(m3_phase6_predictive PRIVATE M3_TESTING)
+    m3_apply_c_settings(m3_phase6_predictive)
+    add_test(NAME m3_phase6_predictive COMMAND m3_phase6_predictive)
 endif()

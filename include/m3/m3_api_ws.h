@@ -63,6 +63,20 @@ extern "C" {
 #define M3_INPUT_TEXT_UTF8 12
 /** @brief UTF-8 IME composition update event. */
 #define M3_INPUT_TEXT_EDIT 13
+/** @brief Tap gesture event. */
+#define M3_INPUT_GESTURE_TAP 14
+/** @brief Double tap gesture event. */
+#define M3_INPUT_GESTURE_DOUBLE_TAP 15
+/** @brief Long press gesture event. */
+#define M3_INPUT_GESTURE_LONG_PRESS 16
+/** @brief Drag gesture started. */
+#define M3_INPUT_GESTURE_DRAG_START 17
+/** @brief Drag gesture update. */
+#define M3_INPUT_GESTURE_DRAG_UPDATE 18
+/** @brief Drag gesture ended. */
+#define M3_INPUT_GESTURE_DRAG_END 19
+/** @brief Fling gesture event. */
+#define M3_INPUT_GESTURE_FLING 20
 
 /**
  * @brief Pointer input data.
@@ -119,6 +133,24 @@ typedef struct M3TextEditEvent {
 } M3TextEditEvent;
 
 /**
+ * @brief Gesture input data.
+ */
+typedef struct M3GestureEvent {
+  m3_i32 pointer_id;   /**< Pointer or touch identifier. */
+  M3Scalar x;          /**< Current X position in window coordinates. */
+  M3Scalar y;          /**< Current Y position in window coordinates. */
+  M3Scalar start_x;    /**< Gesture start X position in window coordinates. */
+  M3Scalar start_y;    /**< Gesture start Y position in window coordinates. */
+  M3Scalar delta_x;    /**< Delta X since the previous gesture event. */
+  M3Scalar delta_y;    /**< Delta Y since the previous gesture event. */
+  M3Scalar total_x;    /**< Total X offset since the gesture start. */
+  M3Scalar total_y;    /**< Total Y offset since the gesture start. */
+  M3Scalar velocity_x; /**< Velocity along X in pixels per second. */
+  M3Scalar velocity_y; /**< Velocity along Y in pixels per second. */
+  m3_u32 tap_count;    /**< Tap count (1 for tap, 2 for double tap). */
+} M3GestureEvent;
+
+/**
  * @brief Window event data.
  */
 typedef struct M3WindowEvent {
@@ -135,6 +167,7 @@ typedef union M3InputEventData {
   M3TextEvent text;          /**< Text input payload. */
   M3TextUtf8Event text_utf8; /**< Full UTF-8 text input payload. */
   M3TextEditEvent text_edit; /**< IME composition payload. */
+  M3GestureEvent gesture;    /**< Gesture payload. */
   M3WindowEvent window;      /**< Window event payload. */
 } M3InputEventData;
 

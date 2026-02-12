@@ -1851,6 +1851,212 @@ static int m3_win32_gfx_draw_line(void *gfx, M3Scalar x0, M3Scalar y0,
   return M3_OK;
 }
 
+static int m3_win32_path_build(HDC dc, const M3Path *path) {
+  M3Scalar current_x;
+  M3Scalar current_y;
+  M3Scalar start_x;
+  M3Scalar start_y;
+  M3Bool has_current;
+  m3_usize i;
+
+  if (dc == NULL || path == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (path->commands == NULL) {
+    return M3_ERR_STATE;
+  }
+  if (path->count == 0) {
+    return M3_OK;
+  }
+
+  has_current = M3_FALSE;
+  current_x = 0.0f;
+  current_y = 0.0f;
+  start_x = 0.0f;
+  start_y = 0.0f;
+
+  for (i = 0; i < path->count; ++i) {
+    const M3PathCmd *cmd = &path->commands[i];
+    switch (cmd->type) {
+    case M3_PATH_CMD_MOVE_TO:
+      current_x = cmd->data.move_to.x;
+      current_y = cmd->data.move_to.y;
+      start_x = current_x;
+      start_y = current_y;
+      has_current = M3_TRUE;
+      if (!MoveToEx(dc, (int)current_x, (int)current_y, NULL)) {
+        return M3_ERR_UNKNOWN;
+      }
+      break;
+    case M3_PATH_CMD_LINE_TO:
+      if (!has_current) {
+        return M3_ERR_STATE;
+      }
+      current_x = cmd->data.line_to.x;
+      current_y = cmd->data.line_to.y;
+      if (!LineTo(dc, (int)current_x, (int)current_y)) {
+        return M3_ERR_UNKNOWN;
+      }
+      break;
+    case M3_PATH_CMD_QUAD_TO: {
+      M3Scalar cx1;
+      M3Scalar cy1;
+      M3Scalar cx2;
+      M3Scalar cy2;
+      M3Scalar x;
+      M3Scalar y;
+      POINT pts[3];
+
+      if (!has_current) {
+        return M3_ERR_STATE;
+      }
+
+      x = cmd->data.quad_to.x;
+      y = cmd->data.quad_to.y;
+      cx1 = current_x + (cmd->data.quad_to.cx - current_x) * (2.0f / 3.0f);
+      cy1 = current_y + (cmd->data.quad_to.cy - current_y) * (2.0f / 3.0f);
+      cx2 = x + (cmd->data.quad_to.cx - x) * (2.0f / 3.0f);
+      cy2 = y + (cmd->data.quad_to.cy - y) * (2.0f / 3.0f);
+
+      pts[0].x = (LONG)cx1;
+      pts[0].y = (LONG)cy1;
+      pts[1].x = (LONG)cx2;
+      pts[1].y = (LONG)cy2;
+      pts[2].x = (LONG)x;
+      pts[2].y = (LONG)y;
+
+      if (!PolyBezierTo(dc, pts, 3)) {
+        return M3_ERR_UNKNOWN;
+      }
+      current_x = x;
+      current_y = y;
+      break;
+    }
+    case M3_PATH_CMD_CUBIC_TO: {
+      M3Scalar x;
+      M3Scalar y;
+      POINT pts[3];
+
+      if (!has_current) {
+        return M3_ERR_STATE;
+      }
+
+      x = cmd->data.cubic_to.x;
+      y = cmd->data.cubic_to.y;
+
+      pts[0].x = (LONG)cmd->data.cubic_to.cx1;
+      pts[0].y = (LONG)cmd->data.cubic_to.cy1;
+      pts[1].x = (LONG)cmd->data.cubic_to.cx2;
+      pts[1].y = (LONG)cmd->data.cubic_to.cy2;
+      pts[2].x = (LONG)x;
+      pts[2].y = (LONG)y;
+
+      if (!PolyBezierTo(dc, pts, 3)) {
+        return M3_ERR_UNKNOWN;
+      }
+      current_x = x;
+      current_y = y;
+      break;
+    }
+    case M3_PATH_CMD_CLOSE:
+      if (!has_current) {
+        return M3_ERR_STATE;
+      }
+      if (!CloseFigure(dc)) {
+        return M3_ERR_UNKNOWN;
+      }
+      current_x = start_x;
+      current_y = start_y;
+      has_current = M3_FALSE;
+      break;
+    default:
+      return M3_ERR_INVALID_ARGUMENT;
+    }
+  }
+  return M3_OK;
+}
+
+static int m3_win32_gfx_draw_path(void *gfx, const M3Path *path,
+                                  M3Color color) {
+  struct M3Win32Backend *backend;
+  M3Win32Window *window;
+  COLORREF ref;
+  HBRUSH brush;
+  HPEN pen;
+  HPEN old_pen;
+  HBRUSH old_brush;
+  int old_fill_mode;
+  int rc;
+  int result;
+
+  if (gfx == NULL || path == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (path->commands == NULL) {
+    return M3_ERR_STATE;
+  }
+  if (path->count > path->capacity) {
+    return M3_ERR_STATE;
+  }
+  if (path->count == 0) {
+    return M3_OK;
+  }
+
+  backend = (struct M3Win32Backend *)gfx;
+  window = backend->active_window;
+  if (window == NULL || window->mem_dc == NULL) {
+    return M3_ERR_STATE;
+  }
+
+  rc = m3_win32_backend_log(backend, M3_LOG_LEVEL_DEBUG, "gfx.draw_path");
+  M3_WIN32_RETURN_IF_ERROR(rc);
+
+  ref = m3_win32_color_to_colorref(color);
+  brush = CreateSolidBrush(ref);
+  if (brush == NULL) {
+    return M3_ERR_UNKNOWN;
+  }
+
+  pen = CreatePen(PS_NULL, 0, ref);
+  if (pen == NULL) {
+    DeleteObject(brush);
+    return M3_ERR_UNKNOWN;
+  }
+
+  old_pen = (HPEN)SelectObject(window->mem_dc, pen);
+  old_brush = (HBRUSH)SelectObject(window->mem_dc, brush);
+  old_fill_mode = SetPolyFillMode(window->mem_dc, WINDING);
+  if (old_fill_mode == 0) {
+    SelectObject(window->mem_dc, old_pen);
+    SelectObject(window->mem_dc, old_brush);
+    DeleteObject(pen);
+    DeleteObject(brush);
+    return M3_ERR_UNKNOWN;
+  }
+
+  result = M3_OK;
+  if (!BeginPath(window->mem_dc)) {
+    result = M3_ERR_UNKNOWN;
+  } else {
+    result = m3_win32_path_build(window->mem_dc, path);
+    if (result != M3_OK) {
+      AbortPath(window->mem_dc);
+    } else if (!EndPath(window->mem_dc)) {
+      AbortPath(window->mem_dc);
+      result = M3_ERR_UNKNOWN;
+    } else if (!FillPath(window->mem_dc)) {
+      result = M3_ERR_UNKNOWN;
+    }
+  }
+
+  SetPolyFillMode(window->mem_dc, old_fill_mode);
+  SelectObject(window->mem_dc, old_pen);
+  SelectObject(window->mem_dc, old_brush);
+  DeleteObject(pen);
+  DeleteObject(brush);
+  return result;
+}
+
 static int m3_win32_gfx_push_clip(void *gfx, const M3Rect *rect) {
   struct M3Win32Backend *backend;
   M3Win32Window *window;
@@ -2222,12 +2428,13 @@ static int m3_win32_gfx_draw_texture(void *gfx, M3Handle texture,
 }
 
 static const M3GfxVTable g_m3_win32_gfx_vtable = {
-    m3_win32_gfx_begin_frame,     m3_win32_gfx_end_frame,
-    m3_win32_gfx_clear,           m3_win32_gfx_draw_rect,
-    m3_win32_gfx_draw_line,       m3_win32_gfx_push_clip,
-    m3_win32_gfx_pop_clip,        m3_win32_gfx_set_transform,
-    m3_win32_gfx_create_texture,  m3_win32_gfx_update_texture,
-    m3_win32_gfx_destroy_texture, m3_win32_gfx_draw_texture};
+    m3_win32_gfx_begin_frame,    m3_win32_gfx_end_frame,
+    m3_win32_gfx_clear,          m3_win32_gfx_draw_rect,
+    m3_win32_gfx_draw_line,      m3_win32_gfx_draw_path,
+    m3_win32_gfx_push_clip,      m3_win32_gfx_pop_clip,
+    m3_win32_gfx_set_transform,  m3_win32_gfx_create_texture,
+    m3_win32_gfx_update_texture, m3_win32_gfx_destroy_texture,
+    m3_win32_gfx_draw_texture};
 
 static int m3_win32_text_create_font(void *text, const char *utf8_family,
                                      m3_i32 size_px, m3_i32 weight,

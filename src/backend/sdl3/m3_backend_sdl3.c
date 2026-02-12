@@ -1862,6 +1862,37 @@ static int m3_sdl3_gfx_draw_line(void *gfx, M3Scalar x0, M3Scalar y0,
   return M3_OK;
 }
 
+static int m3_sdl3_gfx_draw_path(void *gfx, const M3Path *path, M3Color color) {
+  struct M3SDL3Backend *backend;
+  SDL_Renderer *renderer;
+  int rc;
+
+  M3_UNUSED(color);
+
+  if (gfx == NULL || path == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (path->commands == NULL) {
+    return M3_ERR_STATE;
+  }
+  if (path->count > path->capacity) {
+    return M3_ERR_STATE;
+  }
+  if (path->count == 0) {
+    return M3_OK;
+  }
+
+  backend = (struct M3SDL3Backend *)gfx;
+  rc = m3_sdl3_backend_log(backend, M3_LOG_LEVEL_DEBUG, "gfx.draw_path");
+  M3_SDL3_RETURN_IF_ERROR(rc);
+
+  rc = m3_sdl3_get_active_renderer(backend, &renderer);
+  M3_SDL3_RETURN_IF_ERROR(rc);
+  M3_UNUSED(renderer);
+
+  return M3_ERR_UNSUPPORTED;
+}
+
 static int m3_sdl3_gfx_push_clip(void *gfx, const M3Rect *rect) {
   struct M3SDL3Backend *backend;
   int rc;
@@ -2200,12 +2231,13 @@ static int m3_sdl3_gfx_draw_texture(void *gfx, M3Handle texture,
 }
 
 static const M3GfxVTable g_m3_sdl3_gfx_vtable = {
-    m3_sdl3_gfx_begin_frame,     m3_sdl3_gfx_end_frame,
-    m3_sdl3_gfx_clear,           m3_sdl3_gfx_draw_rect,
-    m3_sdl3_gfx_draw_line,       m3_sdl3_gfx_push_clip,
-    m3_sdl3_gfx_pop_clip,        m3_sdl3_gfx_set_transform,
-    m3_sdl3_gfx_create_texture,  m3_sdl3_gfx_update_texture,
-    m3_sdl3_gfx_destroy_texture, m3_sdl3_gfx_draw_texture};
+    m3_sdl3_gfx_begin_frame,    m3_sdl3_gfx_end_frame,
+    m3_sdl3_gfx_clear,          m3_sdl3_gfx_draw_rect,
+    m3_sdl3_gfx_draw_line,      m3_sdl3_gfx_draw_path,
+    m3_sdl3_gfx_push_clip,      m3_sdl3_gfx_pop_clip,
+    m3_sdl3_gfx_set_transform,  m3_sdl3_gfx_create_texture,
+    m3_sdl3_gfx_update_texture, m3_sdl3_gfx_destroy_texture,
+    m3_sdl3_gfx_draw_texture};
 
 static int m3_sdl3_text_make_cstr(struct M3SDL3Backend *backend,
                                   const char *utf8, m3_usize utf8_len,

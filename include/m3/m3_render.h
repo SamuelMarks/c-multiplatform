@@ -32,6 +32,8 @@ extern "C" {
 #define M3_RENDER_CMD_DRAW_TEXTURE 9
 /** @brief Render command: draw text. */
 #define M3_RENDER_CMD_DRAW_TEXT 10
+/** @brief Render command: draw path. */
+#define M3_RENDER_CMD_DRAW_PATH 11
 
 /**
  * @brief Begin frame render command payload.
@@ -116,6 +118,15 @@ typedef struct M3RenderCmdDrawText {
 } M3RenderCmdDrawText;
 
 /**
+ * @brief Draw path render command payload.
+ */
+typedef struct M3RenderCmdDrawPath {
+  const M3Path *path; /**< Path pointer (must remain valid for the list
+                         lifetime). */
+  M3Color color;      /**< Fill color. */
+} M3RenderCmdDrawPath;
+
+/**
  * @brief Render command payload union.
  */
 typedef union M3RenderCmdData {
@@ -128,6 +139,7 @@ typedef union M3RenderCmdData {
   M3RenderCmdSetTransform set_transform; /**< Set transform payload. */
   M3RenderCmdDrawTexture draw_texture;   /**< Draw texture payload. */
   M3RenderCmdDrawText draw_text;         /**< Draw text payload. */
+  M3RenderCmdDrawPath draw_path;         /**< Draw path payload. */
 } M3RenderCmdData;
 
 /**

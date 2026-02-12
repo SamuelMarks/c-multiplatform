@@ -1,3 +1,4 @@
+#include "m3/m3_path.h"
 #include "m3/m3_render.h"
 #include "test_utils.h"
 
@@ -94,6 +95,7 @@ typedef struct TestBackend {
   int clear_calls;
   int draw_rect_calls;
   int draw_line_calls;
+  int draw_path_calls;
   int push_clip_calls;
   int pop_clip_calls;
   int set_transform_calls;
@@ -102,6 +104,7 @@ typedef struct TestBackend {
   int fail_clear;
   int fail_draw_line;
   int fail_draw_rect;
+  int fail_draw_path;
   int fail_draw_text;
   M3Handle last_window;
   m3_i32 last_width;
@@ -113,6 +116,7 @@ typedef struct TestBackend {
   M3Rect last_src;
   M3Rect last_dst;
   M3Scalar last_opacity;
+  const M3Path *last_path;
   const char *last_text;
   m3_usize last_text_len;
 } TestBackend;
@@ -127,6 +131,7 @@ static void test_backend_init(TestBackend *backend) {
   backend->fail_clear = M3_OK;
   backend->fail_draw_line = M3_OK;
   backend->fail_draw_rect = M3_OK;
+  backend->fail_draw_path = M3_OK;
   backend->fail_draw_text = M3_OK;
 }
 
@@ -216,6 +221,24 @@ static int test_gfx_draw_line(void *gfx, M3Scalar x0, M3Scalar y0, M3Scalar x1,
   backend->last_line_thickness = thickness;
   if (backend->fail_draw_line != M3_OK) {
     return backend->fail_draw_line;
+  }
+  return M3_OK;
+}
+
+static int test_gfx_draw_path(void *gfx, const M3Path *path, M3Color color) {
+  TestBackend *backend;
+
+  M3_UNUSED(color);
+
+  if (gfx == NULL || path == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+
+  backend = (TestBackend *)gfx;
+  backend->draw_path_calls += 1;
+  backend->last_path = path;
+  if (backend->fail_draw_path != M3_OK) {
+    return backend->fail_draw_path;
   }
   return M3_OK;
 }
@@ -368,10 +391,11 @@ static int test_text_draw_text(void *text, M3Handle font, const char *utf8,
 }
 
 static const M3GfxVTable g_test_gfx_vtable = {
-    test_gfx_begin_frame,    test_gfx_end_frame,       test_gfx_clear,
-    test_gfx_draw_rect,      test_gfx_draw_line,       test_gfx_push_clip,
-    test_gfx_pop_clip,       test_gfx_set_transform,   test_gfx_create_texture,
-    test_gfx_update_texture, test_gfx_destroy_texture, test_gfx_draw_texture};
+    test_gfx_begin_frame,    test_gfx_end_frame,      test_gfx_clear,
+    test_gfx_draw_rect,      test_gfx_draw_line,      test_gfx_draw_path,
+    test_gfx_push_clip,      test_gfx_pop_clip,       test_gfx_set_transform,
+    test_gfx_create_texture, test_gfx_update_texture, test_gfx_destroy_texture,
+    test_gfx_draw_texture};
 
 static const M3TextVTable g_test_text_vtable = {
     test_text_create_font, test_text_destroy_font, test_text_measure_text,
@@ -408,6 +432,7 @@ typedef struct PaintScenario {
   int mode;
   int calls;
   M3Rect last_clip;
+  M3Path *path;
 } PaintScenario;
 
 static int test_widget_paint(void *ctx, M3PaintContext *paint_ctx) {
@@ -488,6 +513,13 @@ static int test_widget_paint(void *ctx, M3PaintContext *paint_ctx) {
                                            2.0f, 3.0f, color, 1.0f);
     if (rc != M3_OK) {
       return rc;
+    }
+    if (scenario->path != NULL) {
+      rc = paint_ctx->gfx->vtable->draw_path(paint_ctx->gfx->ctx,
+                                             scenario->path, color);
+      if (rc != M3_OK) {
+        return rc;
+      }
     }
     rc = paint_ctx->gfx->vtable->set_transform(paint_ctx->gfx->ctx, &transform);
     if (rc != M3_OK) {
@@ -603,10 +635,16 @@ static int test_widget_paint(void *ctx, M3PaintContext *paint_ctx) {
   case SCENARIO_RECORD_ERRORS: {
     FakeRecorder fake;
     M3Rect bad_dst;
+    M3PathCmd path_cmds[1];
+    M3Path fake_path;
     int ok;
 
     fake.list = NULL;
     ok = 1;
+    memset(&fake_path, 0, sizeof(fake_path));
+    fake_path.commands = path_cmds;
+    fake_path.count = 0;
+    fake_path.capacity = 1;
 
     if (paint_ctx->gfx->vtable->begin_frame(NULL, handle, 1, 1, 1.0f) !=
         M3_ERR_INVALID_ARGUMENT) {
@@ -651,6 +689,15 @@ static int test_widget_paint(void *ctx, M3PaintContext *paint_ctx) {
     }
     if (paint_ctx->gfx->vtable->draw_line(&fake, 0.0f, 0.0f, 1.0f, 1.0f, color,
                                           1.0f) != M3_ERR_STATE) {
+      ok = 0;
+    }
+
+    if (paint_ctx->gfx->vtable->draw_path(NULL, &fake_path, color) !=
+        M3_ERR_INVALID_ARGUMENT) {
+      ok = 0;
+    }
+    if (paint_ctx->gfx->vtable->draw_path(&fake, &fake_path, color) !=
+        M3_ERR_STATE) {
       ok = 0;
     }
 
@@ -727,10 +774,12 @@ static int run_paint_scenario(int mode, int expected_rc) {
   M3Widget widget;
   M3WidgetVTable vtable;
   PaintScenario scenario;
+  M3Path path;
   M3Rect bounds;
   int rc;
 
   memset(&list, 0, sizeof(list));
+  memset(&path, 0, sizeof(path));
   bounds.x = 0.0f;
   bounds.y = 0.0f;
   bounds.width = 10.0f;
@@ -739,6 +788,13 @@ static int run_paint_scenario(int mode, int expected_rc) {
   scenario.mode = mode;
   scenario.calls = 0;
   scenario.last_clip = bounds;
+  scenario.path = NULL;
+  if (mode == SCENARIO_OK) {
+    M3_TEST_OK(m3_path_init(&path, NULL, 2));
+    M3_TEST_OK(m3_path_move_to(&path, 0.0f, 0.0f));
+    M3_TEST_OK(m3_path_line_to(&path, 1.0f, 1.0f));
+    scenario.path = &path;
+  }
 
   memset(&vtable, 0, sizeof(vtable));
   vtable.paint = test_widget_paint;
@@ -756,14 +812,23 @@ static int run_paint_scenario(int mode, int expected_rc) {
     fprintf(stderr, "TEST FAIL scenario %d: expected %d got %d\n", mode,
             expected_rc, rc);
     m3_render_list_shutdown(&list);
+    if (scenario.path != NULL) {
+      m3_path_shutdown(&path);
+    }
     return 1;
   }
   if (scenario.calls != 1) {
     fprintf(stderr, "TEST FAIL scenario %d: expected paint call\n", mode);
     m3_render_list_shutdown(&list);
+    if (scenario.path != NULL) {
+      m3_path_shutdown(&path);
+    }
     return 1;
   }
   M3_TEST_OK(m3_render_list_shutdown(&list));
+  if (scenario.path != NULL) {
+    M3_TEST_OK(m3_path_shutdown(&path));
+  }
   return 0;
 }
 
@@ -951,6 +1016,7 @@ int main(void) {
     M3Rect dst;
     M3Mat3 transform;
     const char *text;
+    M3Path path;
 
     memset(&list, 0, sizeof(list));
     test_backend_init(&backend);
@@ -991,6 +1057,10 @@ int main(void) {
     transform.m[7] = 0.0f;
     transform.m[8] = 1.0f;
     text = "Hello";
+    memset(&path, 0, sizeof(path));
+    M3_TEST_OK(m3_path_init(&path, NULL, 2));
+    M3_TEST_OK(m3_path_move_to(&path, 0.0f, 0.0f));
+    M3_TEST_OK(m3_path_line_to(&path, 1.0f, 1.0f));
 
     cmd.type = M3_RENDER_CMD_BEGIN_FRAME;
     cmd.data.begin_frame.window = handle;
@@ -1016,6 +1086,11 @@ int main(void) {
     cmd.data.draw_line.y1 = 3.0f;
     cmd.data.draw_line.color = color;
     cmd.data.draw_line.thickness = 2.5f;
+    M3_TEST_OK(m3_render_list_append(&list, &cmd));
+
+    cmd.type = M3_RENDER_CMD_DRAW_PATH;
+    cmd.data.draw_path.path = &path;
+    cmd.data.draw_path.color = color;
     M3_TEST_OK(m3_render_list_append(&list, &cmd));
 
     cmd.type = M3_RENDER_CMD_PUSH_CLIP;
@@ -1062,6 +1137,7 @@ int main(void) {
     M3_TEST_ASSERT(backend.clear_calls == 1);
     M3_TEST_ASSERT(backend.draw_rect_calls == 1);
     M3_TEST_ASSERT(backend.draw_line_calls == 1);
+    M3_TEST_ASSERT(backend.draw_path_calls == 1);
     M3_TEST_ASSERT(backend.push_clip_calls == 1);
     M3_TEST_ASSERT(backend.pop_clip_calls == 1);
     M3_TEST_ASSERT(backend.set_transform_calls == 1);
@@ -1073,6 +1149,7 @@ int main(void) {
     M3_TEST_ASSERT(backend.last_corner == 1.5f);
     M3_TEST_ASSERT(backend.last_text == text);
     M3_TEST_ASSERT(backend.last_text_len == 5);
+    M3_TEST_ASSERT(backend.last_path == &path);
     M3_TEST_OK(m3_render_list_shutdown(&list));
 
     memset(&list, 0, sizeof(list));
@@ -1157,6 +1234,20 @@ int main(void) {
     M3_TEST_OK(m3_render_list_append(&list, &cmd));
     gfx_vtable = g_test_gfx_vtable;
     gfx_vtable.draw_line = NULL;
+    gfx.ctx = &backend;
+    gfx.vtable = &gfx_vtable;
+    gfx.text_vtable = &text_vtable;
+    M3_TEST_EXPECT(m3_render_list_execute(&list, &gfx), M3_ERR_UNSUPPORTED);
+    M3_TEST_OK(m3_render_list_shutdown(&list));
+
+    memset(&list, 0, sizeof(list));
+    M3_TEST_OK(m3_render_list_init(&list, NULL, 1));
+    cmd.type = M3_RENDER_CMD_DRAW_PATH;
+    cmd.data.draw_path.path = &path;
+    cmd.data.draw_path.color = color;
+    M3_TEST_OK(m3_render_list_append(&list, &cmd));
+    gfx_vtable = g_test_gfx_vtable;
+    gfx_vtable.draw_path = NULL;
     gfx.ctx = &backend;
     gfx.vtable = &gfx_vtable;
     gfx.text_vtable = &text_vtable;
@@ -1251,6 +1342,8 @@ int main(void) {
     M3_TEST_EXPECT(m3_render_list_execute(NULL, &gfx), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_render_list_execute(&list, NULL),
                    M3_ERR_INVALID_ARGUMENT);
+
+    M3_TEST_OK(m3_path_shutdown(&path));
   }
 
   {
@@ -1305,6 +1398,7 @@ int main(void) {
     scenario.mode = SCENARIO_DRAW_RECT_ONLY;
     scenario.calls = 0;
     scenario.last_clip = bounds;
+    scenario.path = NULL;
     widget.ctx = &scenario;
     widget.vtable = &vtable;
     widget.flags = 0;
@@ -1340,9 +1434,11 @@ int main(void) {
     M3_TEST_OK(m3_render_list_init(&list, NULL, 8));
     scenario.mode = SCENARIO_OK;
     scenario.calls = 0;
+    scenario.path = NULL;
     child_scenario.mode = SCENARIO_DRAW_RECT_ONLY;
     child_scenario.calls = 0;
     child_scenario.last_clip = bounds;
+    child_scenario.path = NULL;
     child_widget.ctx = &child_scenario;
     child_widget.vtable = &vtable;
     child_widget.flags = 0;

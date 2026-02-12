@@ -249,12 +249,13 @@ static int test_draw_rect(void *gfx, const M3Rect *rect, M3Color color,
   return M3_OK;
 }
 
-static const M3GfxVTable g_test_gfx_vtable = {NULL, NULL, NULL, test_draw_rect,
-                                              NULL, NULL, NULL, NULL,
-                                              NULL, NULL, NULL, NULL};
+static const M3GfxVTable g_test_gfx_vtable = {
+    NULL, NULL, NULL, test_draw_rect, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,           NULL, NULL};
 
 static const M3GfxVTable g_test_gfx_vtable_no_draw = {
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL};
 
 int main(void) {
   M3ListStyle list_style;

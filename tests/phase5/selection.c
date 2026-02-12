@@ -108,14 +108,15 @@ static const M3GfxVTable g_test_vtable = {NULL,
                                           NULL,
                                           NULL,
                                           NULL,
+                                          NULL,
                                           NULL};
 
 static const M3GfxVTable g_test_vtable_no_rect = {
-    NULL, NULL, NULL, NULL, test_gfx_draw_line, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, test_gfx_draw_line, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL};
 
 static const M3GfxVTable g_test_vtable_no_line = {
-    NULL, NULL, NULL, test_gfx_draw_rect, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, test_gfx_draw_rect, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL};
 
 static int m3_near(M3Scalar a, M3Scalar b, M3Scalar tol) {

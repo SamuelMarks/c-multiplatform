@@ -193,11 +193,12 @@ static const M3TextVTable g_test_text_vtable_no_create = {
     NULL, test_text_destroy_font, test_text_measure_text, test_text_draw_text};
 
 static const M3GfxVTable g_test_gfx_vtable = {
-    NULL, NULL, NULL, test_gfx_draw_rect, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, test_gfx_draw_rect, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL};
 
 static const M3GfxVTable g_test_gfx_vtable_no_draw = {
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL};
 
 static void test_setup_text_backend(TestDialogBackend *backend,
                                     M3TextBackend *out_backend,

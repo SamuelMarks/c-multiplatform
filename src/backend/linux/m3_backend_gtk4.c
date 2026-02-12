@@ -53,6 +53,7 @@
 #define M3_GTK4_CMD_POP_CLIP 5u
 #define M3_GTK4_CMD_TEXTURE 6u
 #define M3_GTK4_CMD_TEXT 7u
+#define M3_GTK4_CMD_PATH 8u
 
 #define M3_GTK4_CAMERA_DEFAULT_WIDTH 640u
 #define M3_GTK4_CAMERA_DEFAULT_HEIGHT 480u
@@ -209,6 +210,13 @@ typedef struct M3GTK4CmdText {
   M3Color color;
 } M3GTK4CmdText;
 
+typedef struct M3GTK4CmdPath {
+  M3PathCmd *commands;
+  m3_usize count;
+  M3Rect bounds;
+  M3Color color;
+} M3GTK4CmdPath;
+
 typedef struct M3GTK4CmdClear {
   M3Rect rect;
   M3Color color;
@@ -222,6 +230,7 @@ typedef struct M3GTK4Cmd {
     M3GTK4CmdClip clip;
     M3GTK4CmdTexture texture;
     M3GTK4CmdText text;
+    M3GTK4CmdPath path;
     M3GTK4CmdClear clear;
   } data;
 };
@@ -480,6 +489,16 @@ static int m3_gtk4_cmd_list_reset(M3GTK4Window *window) {
         }
         window->cmds[i].data.text.utf8 = NULL;
         window->cmds[i].data.text.len = 0;
+      }
+    } else if (window->cmds[i].type == M3_GTK4_CMD_PATH) {
+      if (window->cmds[i].data.path.commands != NULL) {
+        rc = backend->allocator.free(backend->allocator.ctx,
+                                     window->cmds[i].data.path.commands);
+        if (rc != M3_OK && first_error == M3_OK) {
+          first_error = rc;
+        }
+        window->cmds[i].data.path.commands = NULL;
+        window->cmds[i].data.path.count = 0;
       }
     }
   }
@@ -1861,6 +1880,130 @@ static void m3_gtk4_path_rounded_rect(cairo_t *cr, const M3Rect *rect,
   cairo_close_path(cr);
 }
 
+static int m3_gtk4_cairo_build_path(cairo_t *cr, const M3PathCmd *commands,
+                                    m3_usize count) {
+  M3Scalar current_x;
+  M3Scalar current_y;
+  M3Scalar start_x;
+  M3Scalar start_y;
+  M3Bool has_current;
+  m3_usize i;
+
+  if (cr == NULL || commands == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (count == 0) {
+    return M3_OK;
+  }
+
+  has_current = M3_FALSE;
+  current_x = 0.0f;
+  current_y = 0.0f;
+  start_x = 0.0f;
+  start_y = 0.0f;
+
+  cairo_new_path(cr);
+  for (i = 0; i < count; ++i) {
+    const M3PathCmd *cmd = &commands[i];
+    switch (cmd->type) {
+    case M3_PATH_CMD_MOVE_TO:
+      current_x = cmd->data.move_to.x;
+      current_y = cmd->data.move_to.y;
+      start_x = current_x;
+      start_y = current_y;
+      has_current = M3_TRUE;
+      cairo_move_to(cr, (double)current_x, (double)current_y);
+      break;
+    case M3_PATH_CMD_LINE_TO:
+      if (!has_current) {
+        return M3_ERR_STATE;
+      }
+      current_x = cmd->data.line_to.x;
+      current_y = cmd->data.line_to.y;
+      cairo_line_to(cr, (double)current_x, (double)current_y);
+      break;
+    case M3_PATH_CMD_QUAD_TO: {
+      M3Scalar cx1;
+      M3Scalar cy1;
+      M3Scalar cx2;
+      M3Scalar cy2;
+      M3Scalar x;
+      M3Scalar y;
+
+      if (!has_current) {
+        return M3_ERR_STATE;
+      }
+      x = cmd->data.quad_to.x;
+      y = cmd->data.quad_to.y;
+      cx1 = current_x + (cmd->data.quad_to.cx - current_x) * (2.0f / 3.0f);
+      cy1 = current_y + (cmd->data.quad_to.cy - current_y) * (2.0f / 3.0f);
+      cx2 = x + (cmd->data.quad_to.cx - x) * (2.0f / 3.0f);
+      cy2 = y + (cmd->data.quad_to.cy - y) * (2.0f / 3.0f);
+      cairo_curve_to(cr, (double)cx1, (double)cy1, (double)cx2, (double)cy2,
+                     (double)x, (double)y);
+      current_x = x;
+      current_y = y;
+      break;
+    }
+    case M3_PATH_CMD_CUBIC_TO:
+      if (!has_current) {
+        return M3_ERR_STATE;
+      }
+      cairo_curve_to(
+          cr, (double)cmd->data.cubic_to.cx1, (double)cmd->data.cubic_to.cy1,
+          (double)cmd->data.cubic_to.cx2, (double)cmd->data.cubic_to.cy2,
+          (double)cmd->data.cubic_to.x, (double)cmd->data.cubic_to.y);
+      current_x = cmd->data.cubic_to.x;
+      current_y = cmd->data.cubic_to.y;
+      break;
+    case M3_PATH_CMD_CLOSE:
+      if (!has_current) {
+        return M3_ERR_STATE;
+      }
+      cairo_close_path(cr);
+      current_x = start_x;
+      current_y = start_y;
+      has_current = M3_FALSE;
+      break;
+    default:
+      return M3_ERR_INVALID_ARGUMENT;
+    }
+  }
+  return M3_OK;
+}
+
+static int m3_gtk4_path_bounds_update(M3Scalar x, M3Scalar y, M3Scalar *min_x,
+                                      M3Scalar *min_y, M3Scalar *max_x,
+                                      M3Scalar *max_y, M3Bool *has_bounds) {
+  if (min_x == NULL || min_y == NULL || max_x == NULL || max_y == NULL ||
+      has_bounds == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+
+  if (!*has_bounds) {
+    *min_x = x;
+    *max_x = x;
+    *min_y = y;
+    *max_y = y;
+    *has_bounds = M3_TRUE;
+    return M3_OK;
+  }
+
+  if (x < *min_x) {
+    *min_x = x;
+  }
+  if (x > *max_x) {
+    *max_x = x;
+  }
+  if (y < *min_y) {
+    *min_y = y;
+  }
+  if (y > *max_y) {
+    *max_y = y;
+  }
+  return M3_OK;
+}
+
 static void m3_gtk4_color_to_rgba(M3Color color, GdkRGBA *out_rgba) {
   if (out_rgba == NULL) {
     return;
@@ -2151,6 +2294,40 @@ static void m3_gtk4_snapshot_draw_text(GtkSnapshot *snapshot,
   cairo_destroy(cr);
 }
 
+static void m3_gtk4_snapshot_draw_path(GtkSnapshot *snapshot,
+                                       const M3GTK4CmdPath *cmd) {
+  graphene_rect_t bounds;
+  cairo_t *cr;
+  int rc;
+
+  if (snapshot == NULL || cmd == NULL) {
+    return;
+  }
+  if (cmd->commands == NULL || cmd->count == 0) {
+    return;
+  }
+
+  bounds.origin.x = cmd->bounds.x;
+  bounds.origin.y = cmd->bounds.y;
+  bounds.size.width = cmd->bounds.width;
+  bounds.size.height = cmd->bounds.height;
+
+  cr = gtk_snapshot_append_cairo(snapshot, &bounds);
+  if (cr == NULL) {
+    return;
+  }
+
+  cairo_save(cr);
+  cairo_translate(cr, (double)-cmd->bounds.x, (double)-cmd->bounds.y);
+  m3_gtk4_set_source_color(cr, cmd->color);
+  rc = m3_gtk4_cairo_build_path(cr, cmd->commands, cmd->count);
+  if (rc == M3_OK) {
+    cairo_fill(cr);
+  }
+  cairo_restore(cr);
+  cairo_destroy(cr);
+}
+
 static void m3_gtk4_snapshot_cmds(M3GTK4Window *window, GtkSnapshot *snapshot) {
   m3_usize i;
   const M3GTK4Cmd *cmd;
@@ -2190,6 +2367,9 @@ static void m3_gtk4_snapshot_cmds(M3GTK4Window *window, GtkSnapshot *snapshot) {
       break;
     case M3_GTK4_CMD_TEXT:
       m3_gtk4_snapshot_draw_text(snapshot, window, &cmd->data.text);
+      break;
+    case M3_GTK4_CMD_PATH:
+      m3_gtk4_snapshot_draw_path(snapshot, &cmd->data.path);
       break;
     default:
       break;
@@ -2632,6 +2812,205 @@ static int m3_gtk4_gfx_draw_line(void *gfx, M3Scalar x0, M3Scalar y0,
   return M3_OK;
 }
 
+static int m3_gtk4_gfx_draw_path(void *gfx, const M3Path *path, M3Color color) {
+  struct M3GTK4Backend *backend;
+  M3GTK4Window *window;
+  M3GTK4Cmd cmd;
+  M3PathCmd *commands;
+  M3Scalar min_x;
+  M3Scalar min_y;
+  M3Scalar max_x;
+  M3Scalar max_y;
+  M3Bool has_bounds;
+  m3_usize max_value;
+  m3_usize bytes;
+  m3_usize i;
+  void *mem;
+  int rc;
+
+  if (gfx == NULL || path == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (path->commands == NULL) {
+    return M3_ERR_STATE;
+  }
+  if (path->count > path->capacity) {
+    return M3_ERR_STATE;
+  }
+  if (path->count == 0) {
+    return M3_OK;
+  }
+
+  backend = (struct M3GTK4Backend *)gfx;
+  if (backend->frame_use_gsk) {
+    if (!backend->in_frame || backend->active_window == NULL) {
+      return M3_ERR_STATE;
+    }
+    if (!backend->gsk_transform_simple) {
+      return M3_ERR_UNSUPPORTED;
+    }
+
+    window = backend->active_window;
+    max_value = (m3_usize) ~(m3_usize)0;
+    if (path->count > max_value / (m3_usize)sizeof(M3PathCmd)) {
+      return M3_ERR_OVERFLOW;
+    }
+    bytes = path->count * (m3_usize)sizeof(M3PathCmd);
+    rc = backend->allocator.alloc(backend->allocator.ctx, bytes, &mem);
+    M3_GTK4_RETURN_IF_ERROR(rc);
+
+    commands = (M3PathCmd *)mem;
+    has_bounds = M3_FALSE;
+    min_x = 0.0f;
+    min_y = 0.0f;
+    max_x = 0.0f;
+    max_y = 0.0f;
+
+    for (i = 0; i < path->count; ++i) {
+      const M3PathCmd *src = &path->commands[i];
+      M3PathCmd *dst = &commands[i];
+
+      dst->type = src->type;
+      switch (src->type) {
+      case M3_PATH_CMD_MOVE_TO:
+        rc = m3_gtk4_transform_point_simple(
+            &backend->gsk_transform, src->data.move_to.x, src->data.move_to.y,
+            &dst->data.move_to.x, &dst->data.move_to.y);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        rc = m3_gtk4_path_bounds_update(dst->data.move_to.x,
+                                        dst->data.move_to.y, &min_x, &min_y,
+                                        &max_x, &max_y, &has_bounds);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        break;
+      case M3_PATH_CMD_LINE_TO:
+        rc = m3_gtk4_transform_point_simple(
+            &backend->gsk_transform, src->data.line_to.x, src->data.line_to.y,
+            &dst->data.line_to.x, &dst->data.line_to.y);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        rc = m3_gtk4_path_bounds_update(dst->data.line_to.x,
+                                        dst->data.line_to.y, &min_x, &min_y,
+                                        &max_x, &max_y, &has_bounds);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        break;
+      case M3_PATH_CMD_QUAD_TO: {
+        M3Scalar tx;
+        M3Scalar ty;
+
+        rc = m3_gtk4_transform_point_simple(
+            &backend->gsk_transform, src->data.quad_to.cx, src->data.quad_to.cy,
+            &dst->data.quad_to.cx, &dst->data.quad_to.cy);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        rc = m3_gtk4_transform_point_simple(&backend->gsk_transform,
+                                            src->data.quad_to.x,
+                                            src->data.quad_to.y, &tx, &ty);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        dst->data.quad_to.x = tx;
+        dst->data.quad_to.y = ty;
+
+        rc = m3_gtk4_path_bounds_update(dst->data.quad_to.cx,
+                                        dst->data.quad_to.cy, &min_x, &min_y,
+                                        &max_x, &max_y, &has_bounds);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        rc = m3_gtk4_path_bounds_update(dst->data.quad_to.x,
+                                        dst->data.quad_to.y, &min_x, &min_y,
+                                        &max_x, &max_y, &has_bounds);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        break;
+      }
+      case M3_PATH_CMD_CUBIC_TO: {
+        M3Scalar tx;
+        M3Scalar ty;
+
+        rc = m3_gtk4_transform_point_simple(
+            &backend->gsk_transform, src->data.cubic_to.cx1,
+            src->data.cubic_to.cy1, &dst->data.cubic_to.cx1,
+            &dst->data.cubic_to.cy1);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        rc = m3_gtk4_transform_point_simple(
+            &backend->gsk_transform, src->data.cubic_to.cx2,
+            src->data.cubic_to.cy2, &dst->data.cubic_to.cx2,
+            &dst->data.cubic_to.cy2);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        rc = m3_gtk4_transform_point_simple(&backend->gsk_transform,
+                                            src->data.cubic_to.x,
+                                            src->data.cubic_to.y, &tx, &ty);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        dst->data.cubic_to.x = tx;
+        dst->data.cubic_to.y = ty;
+
+        rc = m3_gtk4_path_bounds_update(dst->data.cubic_to.cx1,
+                                        dst->data.cubic_to.cy1, &min_x, &min_y,
+                                        &max_x, &max_y, &has_bounds);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        rc = m3_gtk4_path_bounds_update(dst->data.cubic_to.cx2,
+                                        dst->data.cubic_to.cy2, &min_x, &min_y,
+                                        &max_x, &max_y, &has_bounds);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        rc = m3_gtk4_path_bounds_update(dst->data.cubic_to.x,
+                                        dst->data.cubic_to.y, &min_x, &min_y,
+                                        &max_x, &max_y, &has_bounds);
+        M3_GTK4_RETURN_IF_ERROR_CLEANUP(
+            rc, backend->allocator.free(backend->allocator.ctx, mem));
+        break;
+      }
+      case M3_PATH_CMD_CLOSE:
+        break;
+      default:
+        backend->allocator.free(backend->allocator.ctx, mem);
+        return M3_ERR_INVALID_ARGUMENT;
+      }
+    }
+
+    if (!has_bounds) {
+      backend->allocator.free(backend->allocator.ctx, mem);
+      return M3_OK;
+    }
+
+    cmd.type = M3_GTK4_CMD_PATH;
+    cmd.data.path.commands = commands;
+    cmd.data.path.count = path->count;
+    cmd.data.path.color = color;
+    cmd.data.path.bounds.x = min_x;
+    cmd.data.path.bounds.y = min_y;
+    cmd.data.path.bounds.width = max_x - min_x;
+    cmd.data.path.bounds.height = max_y - min_y;
+    rc = m3_gtk4_cmd_list_push(window, &cmd);
+    if (rc != M3_OK) {
+      backend->allocator.free(backend->allocator.ctx, commands);
+      return rc;
+    }
+    return M3_OK;
+  }
+
+  if (backend->frame_cr == NULL) {
+    return M3_ERR_STATE;
+  }
+  rc = m3_gtk4_backend_log(backend, M3_LOG_LEVEL_DEBUG, "gfx.draw_path");
+  M3_GTK4_RETURN_IF_ERROR(rc);
+
+  cairo_save(backend->frame_cr);
+  m3_gtk4_set_source_color(backend->frame_cr, color);
+  rc = m3_gtk4_cairo_build_path(backend->frame_cr, path->commands, path->count);
+  if (rc == M3_OK) {
+    cairo_fill(backend->frame_cr);
+  }
+  cairo_restore(backend->frame_cr);
+  return rc;
+}
+
 static int m3_gtk4_gfx_push_clip(void *gfx, const M3Rect *rect) {
   struct M3GTK4Backend *backend;
   M3GTK4Cmd cmd;
@@ -2980,12 +3359,13 @@ static int m3_gtk4_gfx_draw_texture(void *gfx, M3Handle texture,
 }
 
 static const M3GfxVTable g_m3_gtk4_gfx_vtable = {
-    m3_gtk4_gfx_begin_frame,     m3_gtk4_gfx_end_frame,
-    m3_gtk4_gfx_clear,           m3_gtk4_gfx_draw_rect,
-    m3_gtk4_gfx_draw_line,       m3_gtk4_gfx_push_clip,
-    m3_gtk4_gfx_pop_clip,        m3_gtk4_gfx_set_transform,
-    m3_gtk4_gfx_create_texture,  m3_gtk4_gfx_update_texture,
-    m3_gtk4_gfx_destroy_texture, m3_gtk4_gfx_draw_texture};
+    m3_gtk4_gfx_begin_frame,    m3_gtk4_gfx_end_frame,
+    m3_gtk4_gfx_clear,          m3_gtk4_gfx_draw_rect,
+    m3_gtk4_gfx_draw_line,      m3_gtk4_gfx_draw_path,
+    m3_gtk4_gfx_push_clip,      m3_gtk4_gfx_pop_clip,
+    m3_gtk4_gfx_set_transform,  m3_gtk4_gfx_create_texture,
+    m3_gtk4_gfx_update_texture, m3_gtk4_gfx_destroy_texture,
+    m3_gtk4_gfx_draw_texture};
 
 static PangoWeight m3_gtk4_pango_weight(m3_i32 weight) {
   if (weight <= 200) {

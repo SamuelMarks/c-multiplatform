@@ -17,6 +17,7 @@ extern "C" {
 #include "m3_api_gfx.h"
 #include "m3_api_ws.h"
 #include "m3_core.h"
+#include "m3_predictive.h"
 
 /** @brief Opaque Android backend instance. */
 typedef struct M3AndroidBackend M3AndroidBackend;
@@ -31,8 +32,10 @@ typedef struct M3AndroidBackendConfig {
   m3_usize clipboard_limit; /**< Maximum clipboard byte length accepted. */
   M3Bool enable_logging;    /**< Enable logging via m3_log_write. */
   M3Bool inline_tasks;      /**< Execute posted tasks inline when M3_TRUE. */
-  void *java_vm;            /**< JavaVM* pointer (Android only). */
-  void *jni_env;            /**< JNIEnv* pointer (Android only). */
+  M3PredictiveBack
+      *predictive_back; /**< Predictive back controller (optional). */
+  void *java_vm;        /**< JavaVM* pointer (Android only). */
+  void *jni_env;        /**< JNIEnv* pointer (Android only). */
   void *activity;      /**< jobject Activity global reference (Android only). */
   void *asset_manager; /**< AAssetManager* pointer (Android only). */
   void *native_window; /**< ANativeWindow* pointer (Android only). */
@@ -98,6 +101,60 @@ M3_API int M3_CALL m3_android_backend_get_gfx(M3AndroidBackend *backend,
  */
 M3_API int M3_CALL m3_android_backend_get_env(M3AndroidBackend *backend,
                                               M3Env *out_env);
+
+/**
+ * @brief Assign the predictive back controller for the backend.
+ * @param backend Backend instance.
+ * @param predictive Predictive back controller (may be NULL to clear).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_android_backend_set_predictive_back(
+    M3AndroidBackend *backend, M3PredictiveBack *predictive);
+
+/**
+ * @brief Retrieve the predictive back controller for the backend.
+ * @param backend Backend instance.
+ * @param out_predictive Receives the predictive back controller pointer.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_android_backend_get_predictive_back(
+    M3AndroidBackend *backend, M3PredictiveBack **out_predictive);
+
+/**
+ * @brief Notify the backend of a predictive back start event.
+ * @param backend Backend instance.
+ * @param event Predictive back event payload.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_android_backend_predictive_back_start(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event);
+
+/**
+ * @brief Notify the backend of a predictive back progress event.
+ * @param backend Backend instance.
+ * @param event Predictive back event payload.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_android_backend_predictive_back_progress(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event);
+
+/**
+ * @brief Notify the backend of a predictive back commit event.
+ * @param backend Backend instance.
+ * @param event Predictive back event payload.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_android_backend_predictive_back_commit(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event);
+
+/**
+ * @brief Notify the backend of a predictive back cancel event.
+ * @param backend Backend instance.
+ * @param event Predictive back event payload.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_android_backend_predictive_back_cancel(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event);
 
 #ifdef M3_TESTING
 /**

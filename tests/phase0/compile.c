@@ -16,6 +16,7 @@
 #include "m3/m3_log.h"
 #include "m3/m3_math.h"
 #include "m3/m3_object.h"
+#include "m3/m3_predictive.h"
 #include "m3/m3_render.h"
 #include "m3/m3_router.h"
 #include "m3/m3_selection.h"
@@ -29,6 +30,8 @@ int main(void) {
   M3Allocator alloc;
   M3Handle handle;
   M3ObjectHeader obj;
+  M3PredictiveBack predictive;
+  M3PredictiveBackEvent predictive_event;
   M3Mat3 mat;
   M3Rect rect;
   M3WS ws;
@@ -66,6 +69,8 @@ int main(void) {
   M3_UNUSED(&alloc);
   M3_UNUSED(&handle);
   M3_UNUSED(&obj);
+  M3_UNUSED(&predictive);
+  M3_UNUSED(&predictive_event);
   M3_UNUSED(&mat);
   M3_UNUSED(&rect);
   M3_UNUSED(&ws);

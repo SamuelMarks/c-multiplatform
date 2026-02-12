@@ -237,6 +237,32 @@ static int m3_render_record_draw_line(void *gfx, M3Scalar x0, M3Scalar y0,
   return m3_render_list_append(recorder->list, &cmd);
 }
 
+static int m3_render_record_draw_path(void *gfx, const M3Path *path,
+                                      M3Color color) {
+  M3RenderRecorder *recorder;
+  M3RenderCmd cmd;
+
+  if (gfx == NULL || path == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (path->commands == NULL) {
+    return M3_ERR_STATE;
+  }
+  if (path->count > path->capacity) {
+    return M3_ERR_STATE;
+  }
+
+  recorder = (M3RenderRecorder *)gfx;
+  if (recorder->list == NULL) {
+    return M3_ERR_STATE;
+  }
+
+  cmd.type = M3_RENDER_CMD_DRAW_PATH;
+  cmd.data.draw_path.path = path;
+  cmd.data.draw_path.color = color;
+  return m3_render_list_append(recorder->list, &cmd);
+}
+
 static int m3_render_record_push_clip(void *gfx, const M3Rect *rect) {
   M3RenderRecorder *recorder;
   M3RenderCmd cmd;
@@ -449,12 +475,13 @@ static int m3_render_record_measure_text(void *text, M3Handle font,
 }
 
 static const M3GfxVTable g_m3_render_record_vtable = {
-    m3_render_record_begin_frame,     m3_render_record_end_frame,
-    m3_render_record_clear,           m3_render_record_draw_rect,
-    m3_render_record_draw_line,       m3_render_record_push_clip,
-    m3_render_record_pop_clip,        m3_render_record_set_transform,
-    m3_render_record_create_texture,  m3_render_record_update_texture,
-    m3_render_record_destroy_texture, m3_render_record_draw_texture};
+    m3_render_record_begin_frame,    m3_render_record_end_frame,
+    m3_render_record_clear,          m3_render_record_draw_rect,
+    m3_render_record_draw_line,      m3_render_record_draw_path,
+    m3_render_record_push_clip,      m3_render_record_pop_clip,
+    m3_render_record_set_transform,  m3_render_record_create_texture,
+    m3_render_record_update_texture, m3_render_record_destroy_texture,
+    m3_render_record_draw_texture};
 
 static const M3TextVTable g_m3_render_record_text_vtable = {
     m3_render_record_create_font, m3_render_record_destroy_font,
@@ -721,6 +748,13 @@ int M3_CALL m3_render_list_execute(const M3RenderList *list, M3Gfx *gfx) {
           gfx->ctx, cmd->data.draw_line.x0, cmd->data.draw_line.y0,
           cmd->data.draw_line.x1, cmd->data.draw_line.y1,
           cmd->data.draw_line.color, cmd->data.draw_line.thickness);
+      break;
+    case M3_RENDER_CMD_DRAW_PATH:
+      if (gfx->vtable->draw_path == NULL) {
+        return M3_ERR_UNSUPPORTED;
+      }
+      rc = gfx->vtable->draw_path(gfx->ctx, cmd->data.draw_path.path,
+                                  cmd->data.draw_path.color);
       break;
     case M3_RENDER_CMD_PUSH_CLIP:
       if (gfx->vtable->push_clip == NULL) {

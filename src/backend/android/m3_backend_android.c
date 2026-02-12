@@ -45,6 +45,10 @@ m3_android_backend_validate_config(const M3AndroidBackendConfig *config) {
       return M3_ERR_INVALID_ARGUMENT;
     }
   }
+  if (config->predictive_back != NULL &&
+      config->predictive_back->initialized != M3_TRUE) {
+    return M3_ERR_STATE;
+  }
 #if defined(M3_ANDROID_AVAILABLE)
   if (config->java_vm == NULL || config->activity == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -82,6 +86,7 @@ int M3_CALL m3_android_backend_config_init(M3AndroidBackendConfig *config) {
   config->clipboard_limit = (m3_usize) ~(m3_usize)0;
   config->enable_logging = M3_TRUE;
   config->inline_tasks = M3_TRUE;
+  config->predictive_back = NULL;
   config->java_vm = NULL;
   config->jni_env = NULL;
   config->activity = NULL;
@@ -138,6 +143,7 @@ struct M3AndroidBackend {
   M3Env null_env;
   M3Camera camera;
   M3AndroidCameraState camera_state;
+  M3PredictiveBack *predictive_back;
   M3Bool initialized;
   void *java_vm;
   void *jni_env;
@@ -1082,6 +1088,7 @@ int M3_CALL m3_android_backend_create(const M3AndroidBackendConfig *config,
   backend->native_window = config->native_window;
   backend->input_queue = config->input_queue;
   backend->looper = config->looper;
+  backend->predictive_back = config->predictive_back;
 
   null_config.allocator = &backend->allocator;
   null_config.handle_capacity = config->handle_capacity;
@@ -1160,6 +1167,7 @@ int M3_CALL m3_android_backend_destroy(M3AndroidBackend *backend) {
     }
     backend->null_backend = NULL;
   }
+  backend->predictive_back = NULL;
 
   if (allocator.free == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -1205,6 +1213,77 @@ int M3_CALL m3_android_backend_get_env(M3AndroidBackend *backend,
   }
   *out_env = backend->env;
   return M3_OK;
+}
+
+int M3_CALL m3_android_backend_set_predictive_back(
+    M3AndroidBackend *backend, M3PredictiveBack *predictive) {
+  if (backend == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized) {
+    return M3_ERR_STATE;
+  }
+  if (predictive != NULL && predictive->initialized != M3_TRUE) {
+    return M3_ERR_STATE;
+  }
+  backend->predictive_back = predictive;
+  return M3_OK;
+}
+
+int M3_CALL m3_android_backend_get_predictive_back(
+    M3AndroidBackend *backend, M3PredictiveBack **out_predictive) {
+  if (backend == NULL || out_predictive == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized) {
+    return M3_ERR_STATE;
+  }
+  *out_predictive = backend->predictive_back;
+  return M3_OK;
+}
+
+int M3_CALL m3_android_backend_predictive_back_start(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized || backend->predictive_back == NULL) {
+    return M3_ERR_STATE;
+  }
+  return m3_predictive_back_start(backend->predictive_back, event);
+}
+
+int M3_CALL m3_android_backend_predictive_back_progress(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized || backend->predictive_back == NULL) {
+    return M3_ERR_STATE;
+  }
+  return m3_predictive_back_progress(backend->predictive_back, event);
+}
+
+int M3_CALL m3_android_backend_predictive_back_commit(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized || backend->predictive_back == NULL) {
+    return M3_ERR_STATE;
+  }
+  return m3_predictive_back_commit(backend->predictive_back, event);
+}
+
+int M3_CALL m3_android_backend_predictive_back_cancel(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (!backend->initialized || backend->predictive_back == NULL) {
+    return M3_ERR_STATE;
+  }
+  return m3_predictive_back_cancel(backend->predictive_back, event);
 }
 
 #else
@@ -1261,6 +1340,56 @@ int M3_CALL m3_android_backend_get_env(M3AndroidBackend *backend,
     return M3_ERR_INVALID_ARGUMENT;
   }
   memset(out_env, 0, sizeof(*out_env));
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_android_backend_set_predictive_back(
+    M3AndroidBackend *backend, M3PredictiveBack *predictive) {
+  if (backend == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  M3_UNUSED(predictive);
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_android_backend_get_predictive_back(
+    M3AndroidBackend *backend, M3PredictiveBack **out_predictive) {
+  if (backend == NULL || out_predictive == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  *out_predictive = NULL;
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_android_backend_predictive_back_start(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_android_backend_predictive_back_progress(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_android_backend_predictive_back_commit(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  return M3_ERR_UNSUPPORTED;
+}
+
+int M3_CALL m3_android_backend_predictive_back_cancel(
+    M3AndroidBackend *backend, const M3PredictiveBackEvent *event) {
+  if (backend == NULL || event == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
   return M3_ERR_UNSUPPORTED;
 }
 

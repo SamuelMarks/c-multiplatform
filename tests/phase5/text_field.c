@@ -362,6 +362,7 @@ static const M3GfxVTable g_test_gfx_vtable = {NULL,
                                               NULL,
                                               test_gfx_draw_rect,
                                               NULL,
+                                              NULL,
                                               test_gfx_push_clip,
                                               test_gfx_pop_clip,
                                               NULL,
@@ -371,11 +372,11 @@ static const M3GfxVTable g_test_gfx_vtable = {NULL,
                                               NULL};
 
 static const M3GfxVTable g_test_gfx_vtable_no_draw = {
-    NULL, NULL, NULL, NULL, NULL, test_gfx_push_clip, test_gfx_pop_clip,
+    NULL, NULL, NULL, NULL, NULL, NULL, test_gfx_push_clip, test_gfx_pop_clip,
     NULL, NULL, NULL, NULL, NULL};
 
 static const M3GfxVTable g_test_gfx_vtable_no_clip = {
-    NULL, NULL, NULL, test_gfx_draw_rect, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, test_gfx_draw_rect, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL};
 
 typedef struct TestAllocState {
