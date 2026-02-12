@@ -370,6 +370,17 @@ int main(void) {
   M3_TEST_ASSERT(text_backend.last_color.b == style.color.b);
   M3_TEST_ASSERT(text_backend.last_color.a == style.color.a);
 
+  M3_TEST_EXPECT(
+      m3_icon_draw_cstr(&gfx, &bounds, &style, NULL, &svg, M3_ICON_RENDER_FONT),
+      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(m3_icon_test_set_cstr_limit(3));
+  M3_TEST_EXPECT(m3_icon_draw_cstr(&gfx, &bounds, &style, "four", &svg,
+                                   M3_ICON_RENDER_FONT),
+                 M3_ERR_OVERFLOW);
+  M3_TEST_OK(m3_icon_test_set_cstr_limit(0));
+  M3_TEST_OK(m3_icon_draw_cstr(&gfx, &bounds, &style, name, &svg,
+                               M3_ICON_RENDER_FONT));
+
   gfx.text_vtable = NULL;
   M3_TEST_EXPECT(m3_icon_measure_utf8(&gfx, &style, name, name_len, &svg,
                                       M3_ICON_RENDER_FONT, &metrics),
@@ -423,6 +434,10 @@ int main(void) {
                                    M3_ICON_RENDER_FONT),
                  M3_ERR_RANGE);
   text_backend.metric_height = 16.0f;
+
+  M3_TEST_EXPECT(m3_icon_draw_utf8(&gfx, &bounds, &style, name, name_len, &svg,
+                                   M3_ICON_RENDER_SVG + 1u),
+                 M3_ERR_INVALID_ARGUMENT);
 
   test_gfx_backend_init(&gfx_backend);
   gfx.ctx = &gfx_backend;
@@ -488,6 +503,13 @@ int main(void) {
                                    M3_ICON_RENDER_SVG),
                  M3_ERR_UNSUPPORTED);
 
+  svg.utf8_path = "0 0 L10 10";
+  svg.viewbox_width = 20.0f;
+  svg.viewbox_height = 20.0f;
+  M3_TEST_EXPECT(m3_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
+                                   M3_ICON_RENDER_SVG),
+                 M3_ERR_CORRUPT);
+
   svg.utf8_path = "M0 0 L10";
   svg.viewbox_width = 20.0f;
   svg.viewbox_height = 20.0f;
@@ -514,6 +536,18 @@ int main(void) {
                                    M3_ICON_RENDER_SVG),
                  M3_ERR_IO);
   M3_TEST_OK(m3_icon_test_clear_fail_points());
+
+  svg.utf8_path = "M1e309 0";
+  svg.viewbox_width = 20.0f;
+  svg.viewbox_height = 20.0f;
+  M3_TEST_EXPECT(m3_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
+                                   M3_ICON_RENDER_SVG),
+                 M3_ERR_RANGE);
+
+  svg.utf8_path = "Mnan 0";
+  M3_TEST_EXPECT(m3_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
+                                   M3_ICON_RENDER_SVG),
+                 M3_ERR_RANGE);
 
   gfx.vtable = &g_test_gfx_vtable_no_path;
   M3_TEST_EXPECT(m3_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,

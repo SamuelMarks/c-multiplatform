@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(LibM3C C)
+project(LibM3C VERSION 0.1.0 LANGUAGES C)
+
+include(GNUInstallDirs)
 
 set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -25,10 +27,14 @@ else()
     set(M3_ENABLE_ANDROID_DEFAULT OFF)
 endif()
 option(M3_ENABLE_ANDROID "Enable Android backend" ${M3_ENABLE_ANDROID_DEFAULT})
+option(M3_ENABLE_PACKAGING "Enable packaging targets" OFF)
+option(M3_BUILD_WEB_APP "Build minimal web app target" OFF)
+option(M3_BUILD_PACKAGING_STUB "Build packaging stub executable" OFF)
 
 add_library(m3_headers INTERFACE)
 target_include_directories(m3_headers INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 set(M3_WARNINGS_C
@@ -53,7 +59,7 @@ function(m3_apply_c_settings target_name)
     endif()
 endfunction()
 
-add_library(m3 STATIC
+add_library(m3
     src/core/m3_core.c
     src/core/m3_object.c
     src/core/m3_arena.c
@@ -105,14 +111,27 @@ add_library(m3 STATIC
     src/backend/web/m3_backend_web.c
     src/backend/android/m3_backend_android.c
 )
-target_link_libraries(m3 PUBLIC m3_headers)
-target_include_directories(m3 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_library(m3::m3 ALIAS m3)
+target_include_directories(m3 PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
 if (NOT WIN32)
     target_link_libraries(m3 PUBLIC m)
 endif()
+if(BUILD_SHARED_LIBS AND WIN32)
+    target_compile_definitions(m3 PRIVATE M3_BUILD_DLL)
+    target_compile_definitions(m3 INTERFACE M3_USE_DLL)
+endif()
+
+set(M3_HAS_SDL3 OFF)
+set(M3_HAS_SDL3_TTF OFF)
+set(M3_HAS_GTK4 OFF)
+set(M3_HAS_LIBCURL OFF)
 if(M3_ENABLE_SDL3)
     find_package(SDL3 CONFIG QUIET)
     if(SDL3_FOUND)
+        set(M3_HAS_SDL3 ON)
         target_link_libraries(m3 PUBLIC SDL3::SDL3)
         target_compile_definitions(m3 PUBLIC M3_SDL3_AVAILABLE)
     else()
@@ -125,9 +144,11 @@ if(M3_ENABLE_SDL3_TTF)
     else()
         find_package(SDL3_ttf CONFIG QUIET)
         if(TARGET SDL3_ttf::SDL3_ttf)
+            set(M3_HAS_SDL3_TTF ON)
             target_link_libraries(m3 PUBLIC SDL3_ttf::SDL3_ttf)
             target_compile_definitions(m3 PUBLIC M3_SDL3_TTF_AVAILABLE)
         elseif(TARGET SDL3_ttf::SDL3_ttf-static)
+            set(M3_HAS_SDL3_TTF ON)
             target_link_libraries(m3 PUBLIC SDL3_ttf::SDL3_ttf-static)
             target_compile_definitions(m3 PUBLIC M3_SDL3_TTF_AVAILABLE)
         else()
@@ -140,6 +161,7 @@ if(M3_ENABLE_GTK4)
     if(PKG_CONFIG_FOUND)
         pkg_check_modules(GTK4 QUIET IMPORTED_TARGET gtk4)
         if(GTK4_FOUND)
+            set(M3_HAS_GTK4 ON)
             target_link_libraries(m3 PUBLIC PkgConfig::GTK4)
             target_compile_definitions(m3 PUBLIC M3_GTK4_AVAILABLE)
         else()
@@ -152,6 +174,7 @@ endif()
 if(M3_ENABLE_LIBCURL)
     find_package(CURL QUIET)
     if(CURL_FOUND)
+        set(M3_HAS_LIBCURL ON)
         if(TARGET CURL::libcurl)
             target_link_libraries(m3 PUBLIC CURL::libcurl)
         else()
@@ -283,6 +306,75 @@ if(APPLE AND M3_APPLE_USE_CFNETWORK_C)
 endif()
 m3_apply_c_settings(m3)
 
+set_target_properties(m3 PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
+
+if(M3_BUILD_WEB_APP)
+    add_executable(m3_web_app packaging/web/app.c)
+    target_link_libraries(m3_web_app PRIVATE m3)
+    m3_apply_c_settings(m3_web_app)
+endif()
+
+if(M3_BUILD_PACKAGING_STUB)
+    add_executable(m3_packaging_stub packaging/desktop/stub.c)
+    target_link_libraries(m3_packaging_stub PRIVATE m3)
+    set_target_properties(m3_packaging_stub PROPERTIES OUTPUT_NAME "libm3c-stub")
+    m3_apply_c_settings(m3_packaging_stub)
+    install(TARGETS m3_packaging_stub
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+endif()
+
+include(CMakePackageConfigHelpers)
+
+set(LIBM3C_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/LibM3C")
+
+install(TARGETS m3
+    EXPORT LibM3CTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/LibM3CConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/LibM3CConfig.cmake
+    INSTALL_DESTINATION ${LIBM3C_INSTALL_CMAKEDIR}
+)
+
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/LibM3CConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/LibM3CConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/LibM3CConfigVersion.cmake
+    DESTINATION ${LIBM3C_INSTALL_CMAKEDIR}
+)
+
+install(EXPORT LibM3CTargets
+    NAMESPACE m3::
+    DESTINATION ${LIBM3C_INSTALL_CMAKEDIR}
+)
+
+export(EXPORT LibM3CTargets
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/LibM3CTargets.cmake
+    NAMESPACE m3::
+)
+
+if(M3_ENABLE_PACKAGING)
+    include(cmake/M3Packaging.cmake)
+endif()
+
 include(CTest)
 
 find_package(Doxygen QUIET)
@@ -333,6 +425,7 @@ if(GCOVR_EXECUTABLE)
             --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-android$
             --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-web$
             --exclude-noncode-lines
+            --merge-lines
             --print-summary
             --merge-mode-functions=merge-use-line-0
             --fail-under-line 100

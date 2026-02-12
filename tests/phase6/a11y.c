@@ -1,6 +1,8 @@
 #include "m3/m3_a11y.h"
 #include "test_utils.h"
 
+int M3_CALL m3_a11y_test_set_fail_clear(M3Bool enable);
+
 static int test_semantics_init_defaults(void) {
   M3Semantics semantics;
 
@@ -20,6 +22,8 @@ static int test_node_init_and_setters(void) {
   M3Widget widget;
 
   M3_TEST_EXPECT(m3_a11y_node_init(NULL, NULL, NULL), M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(m3_a11y_test_set_fail_clear(M3_TRUE));
+  M3_TEST_EXPECT(m3_a11y_node_init(&node, &widget, NULL), M3_ERR_UNKNOWN);
 
   M3_TEST_OK(m3_a11y_semantics_init(&semantics));
   semantics.role = M3_SEMANTIC_BUTTON;
@@ -56,6 +60,8 @@ static int test_node_init_and_setters(void) {
   M3_TEST_ASSERT(node.semantics.utf8_hint == NULL);
   M3_TEST_ASSERT(node.semantics.utf8_value == NULL);
 
+  M3_TEST_OK(m3_a11y_test_set_fail_clear(M3_TRUE));
+  M3_TEST_EXPECT(m3_a11y_node_set_semantics(&node, NULL), M3_ERR_UNKNOWN);
   M3_TEST_OK(m3_a11y_node_set_semantics(&node, NULL));
   M3_TEST_ASSERT(node.semantics.role == M3_SEMANTIC_NONE);
   M3_TEST_ASSERT(node.semantics.flags == 0);
@@ -224,6 +230,8 @@ static int test_sibling_queries(void) {
   M3_TEST_ASSERT(out_node == NULL);
 
   M3_TEST_OK(m3_a11y_node_get_next_sibling(&orphan, &out_node));
+  M3_TEST_ASSERT(out_node == NULL);
+  M3_TEST_OK(m3_a11y_node_get_prev_sibling(&orphan, &out_node));
   M3_TEST_ASSERT(out_node == NULL);
 
   orphan.parent = &parent;

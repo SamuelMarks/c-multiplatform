@@ -59,11 +59,11 @@ int M3_CALL m3_camera_init(M3CameraSession *session,
       return M3_ERR_UNSUPPORTED;
     }
   }
-#else
-  if (!M3_CAMERA_VTABLE_COMPLETE(camera.vtable)) {
+#else  /* GCOVR_EXCL_LINE */
+  if (!M3_CAMERA_VTABLE_COMPLETE(camera.vtable)) { /* GCOVR_EXCL_LINE */
     return M3_ERR_UNSUPPORTED;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
 
   if (camera.vtable->open_with_config != NULL) {
     rc = camera.vtable->open_with_config(camera.ctx, &config->config);

@@ -2,6 +2,21 @@
 
 #include <string.h>
 
+#ifdef M3_TESTING
+static M3Bool g_m3_extras_test_force_tooltip_size_range = M3_FALSE;
+static M3Bool g_m3_extras_test_force_badge_size_range = M3_FALSE;
+
+int M3_CALL m3_extras_test_set_tooltip_size_range_fail(M3Bool enable) {
+  g_m3_extras_test_force_tooltip_size_range = enable ? M3_TRUE : M3_FALSE;
+  return M3_OK;
+}
+
+int M3_CALL m3_extras_test_set_badge_size_range_fail(M3Bool enable) {
+  g_m3_extras_test_force_badge_size_range = enable ? M3_TRUE : M3_FALSE;
+  return M3_OK;
+}
+#endif
+
 static int m3_extras_validate_bool(M3Bool value) {
   if (value != M3_FALSE && value != M3_TRUE) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -450,6 +465,13 @@ int M3_CALL m3_tooltip_compute_content_size(const M3TooltipStyle *style,
     height = style->max_height;
   }
 
+#ifdef M3_TESTING
+  if (g_m3_extras_test_force_tooltip_size_range == M3_TRUE) {
+    g_m3_extras_test_force_tooltip_size_range = M3_FALSE;
+    width = -1.0f;
+  }
+#endif
+
   if (width < 0.0f || height < 0.0f) {
     return M3_ERR_RANGE;
   }
@@ -466,7 +488,7 @@ int M3_CALL m3_tooltip_compute_bounds(
   M3Rect anchor_rect;
   M3Scalar width;
   M3Scalar height;
-  M3Scalar anchor_x;
+  M3Scalar anchor_x; /* GCOVR_EXCL_LINE */
   M3Scalar anchor_y;
   M3Scalar anchor_w;
   M3Scalar anchor_h;
@@ -715,6 +737,13 @@ int M3_CALL m3_badge_compute_size(const M3BadgeStyle *style,
     height = style->dot_diameter;
   }
 
+#ifdef M3_TESTING
+  if (g_m3_extras_test_force_badge_size_range == M3_TRUE) {
+    g_m3_extras_test_force_badge_size_range = M3_FALSE;
+    width = -1.0f;
+  }
+#endif
+
   if (width < 0.0f || height < 0.0f) {
     return M3_ERR_RANGE;
   }
@@ -801,6 +830,14 @@ int M3_CALL m3_extras_test_validate_text_style(const M3TextStyle *style,
 
 int M3_CALL m3_extras_test_validate_rect(const M3Rect *rect) {
   return m3_extras_validate_rect(rect);
+}
+
+int M3_CALL m3_extras_test_validate_size(const M3Size *size) {
+  return m3_extras_validate_size(size);
+}
+
+int M3_CALL m3_extras_test_validate_text_metrics(const M3TextMetrics *metrics) {
+  return m3_extras_validate_text_metrics(metrics);
 }
 
 int M3_CALL

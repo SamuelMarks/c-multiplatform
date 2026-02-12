@@ -237,6 +237,59 @@ M3_API int M3_CALL m3_time_picker_update(M3TimePicker *picker);
 
 #ifdef M3_TESTING
 /**
+ * @brief Test hook to force dial-size zeroing in metrics computation.
+ * @param enable M3_TRUE to force the next dial computation to zero out.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_time_picker_test_set_force_dial_size_zero(M3Bool enable);
+/**
+ * @brief Test hook to force angle-from-point failure.
+ * @param enable M3_TRUE to force the next angle computation to fail.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_time_picker_test_set_force_angle_error(M3Bool enable);
+/**
+ * @brief Test hook to force angle-to-index failure.
+ * @param enable M3_TRUE to force the next index computation to fail.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL
+m3_time_picker_test_set_force_angle_index_error(M3Bool enable);
+/**
+ * @brief Test hook to force invalid hour mapping in index conversion.
+ * @param enable M3_TRUE to force the next hour mapping to fail validation.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_time_picker_test_set_force_hour_invalid(M3Bool enable);
+/**
+ * @brief Test hook to force hour-to-index conversion failure.
+ * @param enable M3_TRUE to force the next hour-to-index conversion to fail.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL
+m3_time_picker_test_set_force_hour_to_index_error(M3Bool enable);
+/**
+ * @brief Test hook to force draw-circle rectangle validation failure.
+ * @param enable M3_TRUE to force the next circle draw to fail validation.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_time_picker_test_set_force_rect_error(M3Bool enable);
+/**
+ * @brief Test hook to force resolve-colors failure.
+ * @param enable M3_TRUE to force the next resolve-colors call to fail.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL
+m3_time_picker_test_set_force_resolve_colors_error(M3Bool enable);
+/**
+ * @brief Test hook to force compute-hand minute validation failure.
+ * @param enable M3_TRUE to force the next compute-hand minute check to fail.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL
+m3_time_picker_test_set_force_compute_hand_minute_error(M3Bool enable);
+
+/**
  * @brief Test hook for validating colors.
  * @param color Color to validate.
  * @return M3_OK on success or a failure code.

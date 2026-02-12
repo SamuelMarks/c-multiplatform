@@ -2,6 +2,15 @@
 
 #include <string.h>
 
+#ifdef M3_TESTING
+static M3Bool g_m3_predictive_test_fail_event_init = M3_FALSE;
+
+int M3_CALL m3_predictive_test_set_event_init_fail(M3Bool enable) {
+  g_m3_predictive_test_fail_event_init = enable ? M3_TRUE : M3_FALSE;
+  return M3_OK;
+}
+#endif
+
 static int m3_predictive_back_validate_edge(m3_u32 edge) {
   if (edge == M3_PREDICTIVE_BACK_EDGE_UNKNOWN ||
       edge == M3_PREDICTIVE_BACK_EDGE_LEFT ||
@@ -70,6 +79,12 @@ int M3_CALL m3_predictive_back_event_init(M3PredictiveBackEvent *event) {
   if (event == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
+#ifdef M3_TESTING
+  if (g_m3_predictive_test_fail_event_init == M3_TRUE) {
+    g_m3_predictive_test_fail_event_init = M3_FALSE;
+    return M3_ERR_UNKNOWN;
+  }
+#endif
 
   memset(event, 0, sizeof(*event));
   event->edge = M3_PREDICTIVE_BACK_EDGE_UNKNOWN;
@@ -230,7 +245,7 @@ int M3_CALL m3_predictive_back_start(M3PredictiveBack *predictive,
 
 int M3_CALL m3_predictive_back_progress(M3PredictiveBack *predictive,
                                         const M3PredictiveBackEvent *event) {
-  M3PredictiveBackEvent prev_event;
+  M3PredictiveBackEvent prev_event; /* GCOVR_EXCL_LINE */
   int rc;
 
   if (predictive == NULL || event == NULL) {
@@ -263,7 +278,7 @@ int M3_CALL m3_predictive_back_progress(M3PredictiveBack *predictive,
 int M3_CALL m3_predictive_back_commit(M3PredictiveBack *predictive,
                                       const M3PredictiveBackEvent *event) {
   M3PredictiveBackEvent prev_event;
-  M3Bool prev_active;
+  M3Bool prev_active; /* GCOVR_EXCL_LINE */
   int rc;
 
   if (predictive == NULL || event == NULL) {
@@ -299,7 +314,7 @@ int M3_CALL m3_predictive_back_commit(M3PredictiveBack *predictive,
 int M3_CALL m3_predictive_back_cancel(M3PredictiveBack *predictive,
                                       const M3PredictiveBackEvent *event) {
   M3PredictiveBackEvent prev_event;
-  M3Bool prev_active;
+  M3Bool prev_active; /* GCOVR_EXCL_LINE */
   int rc;
 
   if (predictive == NULL || event == NULL) {

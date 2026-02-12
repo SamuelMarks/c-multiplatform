@@ -1,0 +1,68 @@
+{
+  "name": "m3",
+  "version": "0.1.0",
+  "description": "C89 cross-platform UI framework with Material 3 design, modular backends, and zero-dependency core.",
+  "homepage": "https://github.com/SamuelMarks/c-multiplatform",
+  "default-features": [
+    { "name": "win32", "platform": "windows" },
+    { "name": "cocoa", "platform": "osx" },
+    { "name": "gtk4", "platform": "linux" },
+    { "name": "ios", "platform": "ios" },
+    { "name": "android", "platform": "android" },
+    { "name": "web", "platform": "emscripten" },
+    { "name": "libcurl", "platform": "!emscripten" },
+    { "name": "apple-cfnetwork-c", "platform": "osx | ios" }
+  ],
+  "features": {
+    "sdl3": {
+      "description": "Enable the SDL3 debug backend.",
+      "dependencies": [ "sdl3" ]
+    },
+    "sdl3-ttf": {
+      "description": "Enable SDL3_ttf text rendering for the SDL3 backend.",
+      "dependencies": [ "sdl3", "sdl3-ttf" ]
+    },
+    "gtk4": {
+      "description": "Enable the GTK4 backend (Linux).",
+      "supports": "linux",
+      "dependencies": [
+        "gtk4",
+        { "name": "pkgconf", "host": true }
+      ]
+    },
+    "cocoa": {
+      "description": "Enable the Cocoa backend (macOS).",
+      "supports": "osx"
+    },
+    "win32": {
+      "description": "Enable the Win32 backend (Windows).",
+      "supports": "windows"
+    },
+    "web": {
+      "description": "Enable the Web (Emscripten) backend.",
+      "supports": "emscripten"
+    },
+    "webgpu": {
+      "description": "Enable WebGPU for the Web backend.",
+      "supports": "emscripten",
+      "dependencies": [ "web" ]
+    },
+    "ios": {
+      "description": "Enable the iOS backend.",
+      "supports": "ios"
+    },
+    "android": {
+      "description": "Enable the Android backend.",
+      "supports": "android"
+    },
+    "libcurl": {
+      "description": "Enable libcurl-backed network support.",
+      "supports": "!emscripten",
+      "dependencies": [ "curl" ]
+    },
+    "apple-cfnetwork-c": {
+      "description": "Use CFNetwork C APIs for Apple network backends.",
+      "supports": "osx | ios"
+    }
+  }
+}

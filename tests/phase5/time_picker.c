@@ -222,6 +222,10 @@ static int test_helpers(void) {
   style.ring_thickness = style.diameter;
   M3_TEST_EXPECT(m3_time_picker_test_validate_style(&style), M3_ERR_RANGE);
   M3_TEST_OK(m3_time_picker_style_init(&style));
+  style.inner_ring_ratio = 0.5f;
+  style.ring_thickness = (style.diameter * 0.5f) * style.inner_ring_ratio;
+  M3_TEST_EXPECT(m3_time_picker_test_validate_style(&style), M3_ERR_RANGE);
+  M3_TEST_OK(m3_time_picker_style_init(&style));
   style.inner_ring_ratio = 0.0f;
   M3_TEST_EXPECT(m3_time_picker_test_validate_style(&style), M3_ERR_RANGE);
   M3_TEST_OK(m3_time_picker_style_init(&style));
@@ -388,6 +392,11 @@ static int test_helpers(void) {
   M3_TEST_OK(m3_time_picker_style_init(&style));
   M3_TEST_OK(
       m3_time_picker_init(&picker, &style, 0u, 0u, M3_TIME_PICKER_FORMAT_24H));
+  picker.bounds.width = 100.0f;
+  picker.bounds.height = 80.0f;
+  M3_TEST_OK(m3_time_picker_test_set_force_dial_size_zero(M3_TRUE));
+  M3_TEST_OK(m3_time_picker_test_compute_metrics(&picker, &metrics));
+  M3_TEST_ASSERT(metrics.outer_radius == 0.0f);
   M3_TEST_EXPECT(m3_time_picker_test_resolve_colors(NULL, &out_background,
                                                     &out_ring, &out_hand,
                                                     &out_selection),
@@ -406,6 +415,24 @@ static int test_helpers(void) {
                                                     &out_ring, &out_hand,
                                                     &out_selection),
                  M3_ERR_RANGE);
+  picker.style.background_color.r = 0.0f;
+  picker.style.ring_color.r = -1.0f;
+  M3_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background,
+                                                    &out_ring, &out_hand,
+                                                    &out_selection),
+                 M3_ERR_RANGE);
+  picker.style.ring_color.r = 0.0f;
+  picker.style.hand_color.r = -1.0f;
+  M3_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background,
+                                                    &out_ring, &out_hand,
+                                                    &out_selection),
+                 M3_ERR_RANGE);
+  picker.style.hand_color.r = 0.0f;
+  picker.style.selection_color.r = -1.0f;
+  M3_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background,
+                                                    &out_ring, &out_hand,
+                                                    &out_selection),
+                 M3_ERR_RANGE);
 
   return 0;
 }
@@ -415,6 +442,8 @@ static int test_metrics_and_picking(void) {
   M3TimePicker picker;
   M3TimePickerMetrics metrics;
   M3Time picked;
+  M3Time saved_time;
+  M3Rect saved_bounds;
   M3Bool valid;
   M3Scalar hand_angle;
   M3Scalar hand_radius;
@@ -474,9 +503,25 @@ static int test_metrics_and_picking(void) {
   picker.time.minute = 30u;
   M3_TEST_OK(m3_time_picker_test_compute_hand(&picker, &metrics, &hand_angle,
                                               &hand_radius));
+  M3_TEST_OK(m3_time_picker_test_set_force_compute_hand_minute_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_time_picker_test_compute_hand(&picker, &metrics,
+                                                  &hand_angle, &hand_radius),
+                 M3_ERR_RANGE);
   picker.active_field = M3_TIME_PICKER_FIELD_HOUR;
+  picker.format = M3_TIME_PICKER_FORMAT_24H;
+  picker.time.hour = 15u;
+  M3_TEST_OK(m3_time_picker_test_set_force_hour_to_index_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_time_picker_test_compute_hand(&picker, &metrics,
+                                                  &hand_angle, &hand_radius),
+                 M3_ERR_RANGE);
   M3_TEST_OK(m3_time_picker_test_compute_hand(&picker, &metrics, &hand_angle,
                                               &hand_radius));
+  picker.style.ring_thickness = metrics.outer_radius * 4.0f;
+  metrics.outer_radius = 1.0f;
+  M3_TEST_OK(m3_time_picker_test_compute_hand(&picker, &metrics, &hand_angle,
+                                              &hand_radius));
+  M3_TEST_ASSERT(hand_radius == 0.0f);
+  picker.style.ring_thickness = M3_TIME_PICKER_DEFAULT_RING_THICKNESS;
   metrics.outer_radius = 0.0f;
   metrics.inner_radius = 0.0f;
   M3_TEST_OK(m3_time_picker_test_compute_hand(&picker, &metrics, &hand_angle,
@@ -507,6 +552,28 @@ static int test_metrics_and_picking(void) {
       &picker, metrics.center_x + metrics.outer_radius + 10.0f,
       metrics.center_y, M3_TIME_PICKER_FIELD_HOUR, &picked, &valid));
   M3_TEST_ASSERT(valid == M3_FALSE);
+
+  M3_TEST_OK(m3_time_picker_test_set_force_angle_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_time_picker_test_pick_time(
+                     &picker, metrics.center_x, metrics.center_y - 10.0f,
+                     M3_TIME_PICKER_FIELD_HOUR, &picked, &valid),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_time_picker_test_set_force_angle_index_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_time_picker_test_pick_time(
+                     &picker, metrics.center_x, metrics.center_y - 10.0f,
+                     M3_TIME_PICKER_FIELD_HOUR, &picked, &valid),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_time_picker_test_set_force_hour_invalid(M3_TRUE));
+  M3_TEST_EXPECT(m3_time_picker_test_pick_time(
+                     &picker, metrics.center_x, metrics.center_y - 10.0f,
+                     M3_TIME_PICKER_FIELD_HOUR, &picked, &valid),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_time_picker_test_set_force_angle_index_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_time_picker_test_pick_time(
+                     &picker, metrics.center_x + metrics.outer_radius,
+                     metrics.center_y, M3_TIME_PICKER_FIELD_MINUTE, &picked,
+                     &valid),
+                 M3_ERR_RANGE);
 
   M3_TEST_OK(m3_time_picker_set_format(&picker, M3_TIME_PICKER_FORMAT_12H));
   picker.time.hour = 15u;
@@ -539,6 +606,22 @@ static int test_metrics_and_picking(void) {
                                                &picked, NULL),
                  M3_ERR_INVALID_ARGUMENT);
 
+  saved_bounds = picker.bounds;
+  picker.bounds.width = -1.0f;
+  M3_TEST_EXPECT(m3_time_picker_test_pick_time(&picker, 0.0f, 0.0f,
+                                               M3_TIME_PICKER_FIELD_HOUR,
+                                               &picked, &valid),
+                 M3_ERR_RANGE);
+  picker.bounds = saved_bounds;
+
+  saved_time = picker.time;
+  picker.time.hour = 24u;
+  M3_TEST_EXPECT(
+      m3_time_picker_test_pick_time(&picker, metrics.center_x, metrics.center_y,
+                                    M3_TIME_PICKER_FIELD_HOUR, &picked, &valid),
+      M3_ERR_RANGE);
+  picker.time = saved_time;
+
   picker.bounds.width = 0.0f;
   picker.bounds.height = 0.0f;
   M3_TEST_OK(m3_time_picker_test_compute_metrics(&picker, &metrics));
@@ -561,6 +644,7 @@ static int test_init_and_setters(void) {
   M3Scalar prev_diameter;
   m3_u32 prev_format;
 
+  M3_TEST_EXPECT(m3_time_picker_style_init(NULL), M3_ERR_INVALID_ARGUMENT);
   M3_TEST_OK(m3_time_picker_style_init(&style));
   M3_TEST_EXPECT(
       m3_time_picker_init(NULL, &style, 0u, 0u, M3_TIME_PICKER_FORMAT_12H),
@@ -568,6 +652,11 @@ static int test_init_and_setters(void) {
   M3_TEST_EXPECT(
       m3_time_picker_init(&picker, NULL, 0u, 0u, M3_TIME_PICKER_FORMAT_12H),
       M3_ERR_INVALID_ARGUMENT);
+  style.diameter = 0.0f;
+  M3_TEST_EXPECT(
+      m3_time_picker_init(&picker, &style, 0u, 0u, M3_TIME_PICKER_FORMAT_12H),
+      M3_ERR_RANGE);
+  M3_TEST_OK(m3_time_picker_style_init(&style));
   M3_TEST_EXPECT(
       m3_time_picker_init(&picker, &style, 24u, 0u, M3_TIME_PICKER_FORMAT_12H),
       M3_ERR_RANGE);
@@ -614,6 +703,7 @@ static int test_init_and_setters(void) {
   M3_TEST_EXPECT(m3_time_picker_set_style(&picker, &style), M3_ERR_RANGE);
   M3_TEST_ASSERT(picker.style.diameter == prev_diameter);
   picker.bounds.width = 200.0f;
+  M3_TEST_OK(m3_time_picker_set_style(&picker, &style));
 
   M3_TEST_EXPECT(m3_time_picker_set_format(NULL, M3_TIME_PICKER_FORMAT_12H),
                  M3_ERR_INVALID_ARGUMENT);
@@ -630,6 +720,10 @@ static int test_init_and_setters(void) {
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_time_picker_set_period(&picker, M3_TIME_PICKER_PERIOD_AM),
                  M3_ERR_STATE);
+  picker.format = 99u;
+  M3_TEST_EXPECT(m3_time_picker_set_period(&picker, M3_TIME_PICKER_PERIOD_AM),
+                 M3_ERR_RANGE);
+  picker.format = M3_TIME_PICKER_FORMAT_24H;
 
   M3_TEST_OK(m3_time_picker_set_format(&picker, M3_TIME_PICKER_FORMAT_12H));
 
@@ -672,7 +766,11 @@ static int test_init_and_setters(void) {
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_OK(m3_time_picker_get_period(&picker, &period));
   M3_TEST_ASSERT(period == M3_TIME_PICKER_PERIOD_PM);
+  picker.time.hour = 1u;
+  M3_TEST_OK(m3_time_picker_get_period(&picker, &period));
+  M3_TEST_ASSERT(period == M3_TIME_PICKER_PERIOD_AM);
 
+  picker.time.hour = 13u;
   memset(&counter, 0, sizeof(counter));
   counter.fail = 1;
   M3_TEST_OK(m3_time_picker_set_on_change(&picker, test_on_change, &counter));
@@ -695,6 +793,8 @@ static int test_widget_api(void) {
   M3TimePickerStyle style;
   M3TimePicker picker;
   M3MeasureSpec spec;
+  M3MeasureSpec width_spec;
+  M3MeasureSpec height_spec;
   M3Size size;
   M3Rect bounds;
   M3Semantics semantics;
@@ -706,6 +806,11 @@ static int test_widget_api(void) {
 
   spec.mode = 99u;
   spec.size = 0.0f;
+  M3_TEST_EXPECT(picker.widget.vtable->measure(NULL, spec, spec, &size),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      picker.widget.vtable->measure(picker.widget.ctx, spec, spec, NULL),
+      M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(
       picker.widget.vtable->measure(picker.widget.ctx, spec, spec, &size),
       M3_ERR_INVALID_ARGUMENT);
@@ -715,9 +820,51 @@ static int test_widget_api(void) {
       picker.widget.vtable->measure(picker.widget.ctx, spec, spec, &size));
   M3_TEST_ASSERT(size.width == 123.0f);
   M3_TEST_ASSERT(size.height == 123.0f);
+  picker.style.diameter = 0.0f;
+  M3_TEST_EXPECT(
+      picker.widget.vtable->measure(picker.widget.ctx, spec, spec, &size),
+      M3_ERR_RANGE);
+  M3_TEST_OK(m3_time_picker_style_init(&style));
+  picker.style = style;
+
+  width_spec.mode = M3_MEASURE_AT_MOST;
+  width_spec.size = 10.0f;
+  height_spec.mode = M3_MEASURE_EXACTLY;
+  height_spec.size = 50.0f;
+  M3_TEST_OK(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
+                                           height_spec, &size));
+  M3_TEST_ASSERT(size.width == width_spec.size);
+  M3_TEST_ASSERT(size.height == height_spec.size);
+
+  width_spec.mode = M3_MEASURE_UNSPECIFIED;
+  width_spec.size = 0.0f;
+  height_spec.mode = 99u;
+  height_spec.size = 0.0f;
+  M3_TEST_EXPECT(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
+                                               height_spec, &size),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  width_spec.mode = M3_MEASURE_EXACTLY;
+  width_spec.size = 40.0f;
+  height_spec.mode = M3_MEASURE_AT_MOST;
+  height_spec.size = 10.0f;
+  M3_TEST_OK(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
+                                           height_spec, &size));
+  M3_TEST_ASSERT(size.width == width_spec.size);
+  M3_TEST_ASSERT(size.height == height_spec.size);
+
+  width_spec.mode = M3_MEASURE_EXACTLY;
+  width_spec.size = 40.0f;
+  height_spec.mode = M3_MEASURE_UNSPECIFIED;
+  height_spec.size = 0.0f;
+  M3_TEST_OK(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
+                                           height_spec, &size));
+  M3_TEST_ASSERT(size.width == width_spec.size);
 
   bounds.x = 0.0f;
   bounds.y = 0.0f;
+  M3_TEST_EXPECT(picker.widget.vtable->layout(NULL, bounds),
+                 M3_ERR_INVALID_ARGUMENT);
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   M3_TEST_EXPECT(picker.widget.vtable->layout(picker.widget.ctx, bounds),
@@ -798,9 +945,42 @@ static int test_event_and_paint(void) {
                  M3_ERR_UNSUPPORTED);
 
   gfx.vtable = &g_test_vtable;
+  picker.style.diameter = 0.0f;
+  M3_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_time_picker_style_init(&style));
+  picker.style = style;
+  picker.bounds.width = -1.0f;
+  M3_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
+                 M3_ERR_RANGE);
+  picker.bounds.width = 200.0f;
+  picker.time.minute = 99u;
+  M3_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
+                 M3_ERR_RANGE);
+  picker.time.minute = 0u;
+  M3_TEST_OK(m3_time_picker_test_set_force_resolve_colors_error(M3_TRUE));
+  M3_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
+                 M3_ERR_RANGE);
   M3_TEST_OK(picker.widget.vtable->paint(picker.widget.ctx, &ctx));
   M3_TEST_ASSERT(backend.draw_rect_calls > 0);
   M3_TEST_ASSERT(backend.draw_line_calls > 0);
+
+  backend.draw_rect_calls = 0;
+  backend.fail_draw_rect_after = 3;
+  M3_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
+                 M3_ERR_IO);
+  backend.fail_draw_rect_after = 0;
+
+  picker.active_field = 99u;
+  M3_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
+                 M3_ERR_RANGE);
+  picker.active_field = M3_TIME_PICKER_FIELD_HOUR;
+
+  backend.draw_rect_calls = 0;
+  backend.fail_draw_rect_after = 5;
+  M3_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
+                 M3_ERR_IO);
+  backend.fail_draw_rect_after = 0;
 
   picker.time.hour = 0u;
   picker.active_field = M3_TIME_PICKER_FIELD_HOUR;
@@ -929,6 +1109,43 @@ static int test_event_and_paint(void) {
   M3_TEST_ASSERT(picker.time.hour == time.hour);
   counter.fail = 0;
 
+  picker.format = 99u;
+  M3_TEST_OK(init_pointer_event(
+      &event, M3_INPUT_POINTER_DOWN, (m3_i32)metrics.center_x,
+      (m3_i32)(metrics.center_y - metrics.outer_radius)));
+  M3_TEST_EXPECT(
+      picker.widget.vtable->event(picker.widget.ctx, &event, &handled),
+      M3_ERR_RANGE);
+  picker.format = M3_TIME_PICKER_FORMAT_24H;
+
+  picker.format = 99u;
+  picker.pressed = M3_TRUE;
+  M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_MOVE,
+                                (m3_i32)metrics.center_x,
+                                (m3_i32)metrics.center_y));
+  M3_TEST_EXPECT(
+      picker.widget.vtable->event(picker.widget.ctx, &event, &handled),
+      M3_ERR_RANGE);
+  picker.pressed = M3_FALSE;
+  picker.format = M3_TIME_PICKER_FORMAT_24H;
+
+  picker.pressed = M3_TRUE;
+  counter.fail = 1;
+  M3_TEST_OK(init_pointer_event(
+      &event, M3_INPUT_POINTER_MOVE, (m3_i32)metrics.center_x,
+      (m3_i32)(metrics.center_y - metrics.outer_radius)));
+  M3_TEST_EXPECT(
+      picker.widget.vtable->event(picker.widget.ctx, &event, &handled),
+      M3_ERR_IO);
+  counter.fail = 0;
+  picker.pressed = M3_FALSE;
+
+  memset(&event, 0, sizeof(event));
+  event.type = M3_INPUT_KEY_DOWN;
+  handled = M3_TRUE;
+  M3_TEST_OK(picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
+  M3_TEST_ASSERT(handled == M3_FALSE);
+
   M3_TEST_OK(m3_time_picker_set_format(&picker, M3_TIME_PICKER_FORMAT_12H));
   picker.time.hour = 0u;
   picker.active_field = M3_TIME_PICKER_FIELD_MINUTE;
@@ -949,6 +1166,10 @@ static int test_event_and_paint(void) {
   M3_TEST_OK(m3_time_picker_test_draw_circle(&gfx, 0.0f, 0.0f, 0.0f,
                                              picker.style.background_color));
   M3_TEST_ASSERT(backend.draw_rect_calls == 0);
+  M3_TEST_OK(m3_time_picker_test_set_force_rect_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_time_picker_test_draw_circle(&gfx, 0.0f, 0.0f, 1.0f,
+                                                 picker.style.background_color),
+                 M3_ERR_RANGE);
 
   M3_TEST_EXPECT(m3_time_picker_test_draw_ring(&gfx, 0.0f, 0.0f, 1.0f, 0.0f,
                                                picker.style.ring_color,

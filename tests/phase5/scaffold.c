@@ -666,6 +666,22 @@ static int test_scaffold_measure(void) {
                      scaffold.widget.ctx, width_spec, height_spec, &size),
                  M3_ERR_INVALID_ARGUMENT);
 
+  scaffold.style.padding.left = -1.0f;
+  width_spec.mode = M3_MEASURE_EXACTLY;
+  width_spec.size = 100.0f;
+  height_spec.mode = M3_MEASURE_EXACTLY;
+  height_spec.size = 100.0f;
+  M3_TEST_EXPECT(scaffold.widget.vtable->measure(
+                     scaffold.widget.ctx, width_spec, height_spec, &size),
+                 M3_ERR_RANGE);
+  scaffold.style.padding.left = style.padding.left;
+
+  scaffold.safe_area.left = -1.0f;
+  M3_TEST_EXPECT(scaffold.widget.vtable->measure(
+                     scaffold.widget.ctx, width_spec, height_spec, &size),
+                 M3_ERR_RANGE);
+  scaffold.safe_area.left = 0.0f;
+
   width_spec.mode = M3_MEASURE_EXACTLY;
   width_spec.size = 10.0f;
   height_spec.mode = M3_MEASURE_EXACTLY;
@@ -674,6 +690,16 @@ static int test_scaffold_measure(void) {
   safe_area.right = 8.0f;
   safe_area.top = 0.0f;
   safe_area.bottom = 0.0f;
+  M3_TEST_OK(m3_scaffold_set_safe_area(&scaffold, &safe_area));
+  M3_TEST_EXPECT(scaffold.widget.vtable->measure(
+                     scaffold.widget.ctx, width_spec, height_spec, &size),
+                 M3_ERR_RANGE);
+
+  safe_area.left = 0.0f;
+  safe_area.right = 0.0f;
+  safe_area.top = 6.0f;
+  safe_area.bottom = 6.0f;
+  height_spec.size = 10.0f;
   M3_TEST_OK(m3_scaffold_set_safe_area(&scaffold, &safe_area));
   M3_TEST_EXPECT(scaffold.widget.vtable->measure(
                      scaffold.widget.ctx, width_spec, height_spec, &size),
@@ -700,6 +726,31 @@ static int test_scaffold_measure(void) {
   M3_TEST_EXPECT(scaffold.widget.vtable->measure(
                      scaffold.widget.ctx, width_spec, height_spec, &size),
                  M3_ERR_UNSUPPORTED);
+
+  M3_TEST_OK(m3_scaffold_set_body(&scaffold, &body.widget));
+  top_bar.fail_measure = 1;
+  M3_TEST_EXPECT(scaffold.widget.vtable->measure(
+                     scaffold.widget.ctx, width_spec, height_spec, &size),
+                 M3_ERR_IO);
+  top_bar.fail_measure = 0;
+
+  bottom_bar.fail_measure = 1;
+  M3_TEST_EXPECT(scaffold.widget.vtable->measure(
+                     scaffold.widget.ctx, width_spec, height_spec, &size),
+                 M3_ERR_IO);
+  bottom_bar.fail_measure = 0;
+
+  fab.fail_measure = 1;
+  M3_TEST_EXPECT(scaffold.widget.vtable->measure(
+                     scaffold.widget.ctx, width_spec, height_spec, &size),
+                 M3_ERR_IO);
+  fab.fail_measure = 0;
+
+  snackbar.fail_measure = 1;
+  M3_TEST_EXPECT(scaffold.widget.vtable->measure(
+                     scaffold.widget.ctx, width_spec, height_spec, &size),
+                 M3_ERR_IO);
+  snackbar.fail_measure = 0;
 
   return 0;
 }
@@ -808,6 +859,26 @@ static int test_scaffold_layout(void) {
                  M3_ERR_UNSUPPORTED);
   top_bar.widget.vtable = &g_test_widget_vtable;
 
+  bottom_bar.fail_layout = 1;
+  M3_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
+                 M3_ERR_IO);
+  bottom_bar.fail_layout = 0;
+
+  fab.fail_layout = 1;
+  M3_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
+                 M3_ERR_IO);
+  fab.fail_layout = 0;
+
+  snackbar.fail_layout = 1;
+  M3_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
+                 M3_ERR_IO);
+  snackbar.fail_layout = 0;
+
+  body.widget.vtable = &g_test_widget_vtable_no_layout;
+  M3_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
+                 M3_ERR_UNSUPPORTED);
+  body.widget.vtable = &g_test_widget_vtable;
+
   return 0;
 }
 
@@ -852,10 +923,35 @@ static int test_scaffold_paint(void) {
                  M3_ERR_IO);
   body.fail_paint = 0;
 
+  top_bar.fail_paint = 1;
+  M3_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
+                 M3_ERR_IO);
+  top_bar.fail_paint = 0;
+
+  bottom_bar.fail_paint = 1;
+  M3_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
+                 M3_ERR_IO);
+  bottom_bar.fail_paint = 0;
+
+  snackbar.fail_paint = 1;
+  M3_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
+                 M3_ERR_IO);
+  snackbar.fail_paint = 0;
+
+  fab.fail_paint = 1;
+  M3_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
+                 M3_ERR_IO);
+  fab.fail_paint = 0;
+
   body.widget.vtable = &g_test_widget_vtable_no_paint;
   M3_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
                  M3_ERR_UNSUPPORTED);
   body.widget.vtable = &g_test_widget_vtable;
+
+  top_bar.widget.vtable = &g_test_widget_vtable_no_paint;
+  M3_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
+                 M3_ERR_UNSUPPORTED);
+  top_bar.widget.vtable = &g_test_widget_vtable;
 
   {
     int prev_calls = body.paint_calls;
@@ -904,6 +1000,16 @@ static int test_scaffold_event(void) {
   bounds.height = 200.0f;
   M3_TEST_OK(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds));
 
+  memset(&event, 0, sizeof(event));
+  M3_TEST_EXPECT(scaffold.widget.vtable->event(NULL, &event, &handled),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      scaffold.widget.vtable->event(scaffold.widget.ctx, NULL, &handled),
+      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      scaffold.widget.vtable->event(scaffold.widget.ctx, &event, NULL),
+      M3_ERR_INVALID_ARGUMENT);
+
   M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_DOWN,
                                 (m3_i32)(fab.last_bounds.x + 1.0f),
                                 (m3_i32)(fab.last_bounds.y + 1.0f)));
@@ -950,6 +1056,18 @@ static int test_scaffold_event(void) {
       scaffold.widget.vtable->event(scaffold.widget.ctx, &event, &handled));
   M3_TEST_ASSERT(handled == M3_TRUE);
 
+  M3_TEST_OK(m3_scaffold_set_body(&scaffold, NULL));
+  M3_TEST_OK(
+      scaffold.widget.vtable->event(scaffold.widget.ctx, &event, &handled));
+  M3_TEST_ASSERT(handled == M3_FALSE);
+  M3_TEST_OK(m3_scaffold_set_body(&scaffold, &body.widget));
+
+  scaffold.widget.flags = M3_WIDGET_FLAG_HIDDEN;
+  M3_TEST_OK(
+      scaffold.widget.vtable->event(scaffold.widget.ctx, &event, &handled));
+  M3_TEST_ASSERT(handled == M3_FALSE);
+  scaffold.widget.flags = 0u;
+
   body.widget.flags = M3_WIDGET_FLAG_HIDDEN;
   M3_TEST_OK(
       scaffold.widget.vtable->event(scaffold.widget.ctx, &event, &handled));
@@ -980,6 +1098,46 @@ static int test_scaffold_event(void) {
   M3_TEST_ASSERT(handled == M3_FALSE);
   fab.widget.vtable = &g_test_widget_vtable;
 
+  return 0;
+}
+
+static int test_scaffold_semantics_destroy(void) {
+  M3Scaffold scaffold;
+  M3ScaffoldStyle style;
+  TestScaffoldWidget body;
+  M3Semantics semantics;
+
+  M3_TEST_OK(m3_scaffold_style_init(&style));
+  M3_TEST_OK(test_widget_init(&body, 10.0f, 10.0f));
+  M3_TEST_OK(m3_scaffold_init(&scaffold, &style, &body.widget, NULL, NULL, NULL,
+                              NULL));
+
+  M3_TEST_EXPECT(scaffold.widget.vtable->get_semantics(NULL, &semantics),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      scaffold.widget.vtable->get_semantics(scaffold.widget.ctx, NULL),
+      M3_ERR_INVALID_ARGUMENT);
+
+  scaffold.widget.flags = M3_WIDGET_FLAG_DISABLED | M3_WIDGET_FLAG_FOCUSABLE;
+  M3_TEST_OK(
+      scaffold.widget.vtable->get_semantics(scaffold.widget.ctx, &semantics));
+  M3_TEST_ASSERT(semantics.role == M3_SEMANTIC_NONE);
+  M3_TEST_ASSERT((semantics.flags & M3_SEMANTIC_FLAG_DISABLED) != 0u);
+  M3_TEST_ASSERT((semantics.flags & M3_SEMANTIC_FLAG_FOCUSABLE) != 0u);
+  M3_TEST_ASSERT(semantics.utf8_label == NULL);
+  M3_TEST_ASSERT(semantics.utf8_hint == NULL);
+  M3_TEST_ASSERT(semantics.utf8_value == NULL);
+
+  M3_TEST_EXPECT(scaffold.widget.vtable->destroy(NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(scaffold.widget.vtable->destroy(scaffold.widget.ctx));
+  M3_TEST_ASSERT(scaffold.widget.vtable == NULL);
+  M3_TEST_ASSERT(scaffold.widget.ctx == NULL);
+  M3_TEST_ASSERT(scaffold.body == NULL);
+  M3_TEST_ASSERT(scaffold.top_bar == NULL);
+  M3_TEST_ASSERT(scaffold.bottom_bar == NULL);
+  M3_TEST_ASSERT(scaffold.fab == NULL);
+  M3_TEST_ASSERT(scaffold.snackbar == NULL);
   return 0;
 }
 
@@ -1029,6 +1187,7 @@ int main(void) {
   M3_TEST_ASSERT(test_scaffold_layout() == 0);
   M3_TEST_ASSERT(test_scaffold_paint() == 0);
   M3_TEST_ASSERT(test_scaffold_event() == 0);
+  M3_TEST_ASSERT(test_scaffold_semantics_destroy() == 0);
   M3_TEST_ASSERT(test_scaffold_step() == 0);
   return 0;
 }

@@ -375,6 +375,16 @@ static int test_storage_init_errors(void) {
   M3_TEST_EXPECT(m3_storage_init(&storage, &config), M3_ERR_STATE);
   storage.entries = NULL;
 
+  M3_TEST_OK(test_alloc_reset(&test_alloc));
+  allocator.ctx = &test_alloc;
+  allocator.alloc = test_alloc_fn;
+  allocator.realloc = test_realloc_fn;
+  allocator.free = test_free_fn;
+  config.allocator = &allocator;
+  config.entry_capacity = 1u;
+  M3_TEST_OK(m3_storage_init(&storage, &config));
+  M3_TEST_OK(m3_storage_shutdown(&storage));
+
   return 0;
 }
 

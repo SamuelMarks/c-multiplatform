@@ -2,6 +2,15 @@
 
 #define M3_PATH_DEFAULT_CAPACITY 16u
 
+#ifdef M3_TESTING
+static M3Bool g_m3_path_test_force_reserve = M3_FALSE;
+
+int M3_CALL m3_path_test_set_force_reserve(M3Bool enable) {
+  g_m3_path_test_force_reserve = enable ? M3_TRUE : M3_FALSE;
+  return M3_OK;
+}
+#endif
+
 static m3_usize m3_path_max_value(void) { return (m3_usize) ~(m3_usize)0; }
 
 static int m3_path_add_overflow(m3_usize a, m3_usize b, m3_usize *out_value) {
@@ -90,9 +99,15 @@ static int m3_path_reserve(M3Path *path, m3_usize additional) {
     return rc;
   }
 
-  if (required <= path->capacity) {
-    return M3_OK;
+#ifdef M3_TESTING
+  if (g_m3_path_test_force_reserve != M3_TRUE) {
+#endif
+    if (required <= path->capacity) {
+      return M3_OK;
+    }
+#ifdef M3_TESTING
   }
+#endif
 
   if (path->capacity == 0) {
     return M3_ERR_STATE;
@@ -342,5 +357,13 @@ int M3_CALL m3_path_test_mul_overflow(m3_usize a, m3_usize b,
 int M3_CALL m3_path_test_has_current(const M3Path *path,
                                      M3Bool *out_has_current) {
   return m3_path_has_current(path, out_has_current);
+}
+
+int M3_CALL m3_path_test_reserve(M3Path *path, m3_usize additional) {
+  return m3_path_reserve(path, additional);
+}
+
+int M3_CALL m3_path_test_append(M3Path *path, const M3PathCmd *cmd) {
+  return m3_path_append(path, cmd);
 }
 #endif

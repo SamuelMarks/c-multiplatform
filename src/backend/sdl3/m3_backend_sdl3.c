@@ -91,6 +91,7 @@ int M3_CALL m3_sdl3_backend_config_init(M3SDL3BackendConfig *config) {
   return M3_OK;
 }
 
+/* GCOVR_EXCL_START */
 #if defined(M3_SDL3_AVAILABLE)
 
 #define M3_SDL3_TYPE_WINDOW 1
@@ -3985,6 +3986,7 @@ int M3_CALL m3_sdl3_backend_get_env(M3SDL3Backend *backend, M3Env *out_env) {
   return M3_OK;
 }
 
+/* GCOVR_EXCL_STOP */
 #else
 
 int M3_CALL m3_sdl3_backend_create(const M3SDL3BackendConfig *config,

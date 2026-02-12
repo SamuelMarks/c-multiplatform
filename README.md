@@ -1,6 +1,9 @@
 LibM3C
 ======
 
+[![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![ci](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml)
+
 **LibM3C** is a strict C89 (ANSI C) cross-platform application framework designed to implement Material 3 design principles, robust state management, and modern UI physics in a highly portable, zero-dependency core.
 
 This project is architected specifically for **Context-Window Scalability**, decoupling Interfaces (Contracts) from Implementations. This allows for modular development and makes the codebase distinctively friendly for LLM-assisted coding and maintenance.
@@ -80,6 +83,9 @@ cmake --build .
 | `M3_APPLE_USE_CFNETWORK_C` | `ON` | Use CFNetwork C APIs for Apple network backends (OFF uses Foundation). |
 | `M3_REQUIRE_DOXYGEN` | `OFF` | Fail configuration if Doxygen is missing. |
 | `M3_ENABLE_COVERAGE` | `OFF` | Enable code coverage (GCC/Clang only). |
+| `M3_ENABLE_PACKAGING` | `OFF` | Enable packaging targets (Android, iOS, Web, Desktop, SDL3). |
+| `M3_BUILD_WEB_APP` | `OFF` | Build a minimal web app target for Emscripten packaging. |
+| `M3_BUILD_PACKAGING_STUB` | `OFF` | Build a minimal desktop stub executable for installer packaging. |
 
 ### Running Tests
 
@@ -100,6 +106,22 @@ To run a specific backend test manually (platform-dependent):
 ./m3_phase4_ios_backend
 ./m3_phase4_android_backend
 ```
+
+### Packaging
+
+Packaging helpers live under `packaging/`. Enable the packaging targets and invoke
+the desired platform target:
+
+```bash
+cmake -S . -B build-packaging -DM3_ENABLE_PACKAGING=ON
+cmake --build build-packaging --target m3_package_android
+cmake --build build-packaging --target m3_package_ios_xcframework
+cmake --build build-packaging --target m3_package_web
+cmake --build build-packaging --target m3_package_desktop
+cmake --build build-packaging --target m3_package_sdl3
+```
+
+Each platform folder contains a README with prerequisites and output locations.
 
 ## 📦 Usage Example
 

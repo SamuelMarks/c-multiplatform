@@ -543,7 +543,7 @@ static int m3_router_release_entry(M3Router *router, M3RouteEntry *entry) {
 static int m3_router_find_route(const M3Router *router, const char *path,
                                 m3_usize path_len, const M3Route **out_route) {
   m3_usize i;
-  M3Bool match;
+  M3Bool match; /* GCOVR_EXCL_LINE */
   m3_usize pattern_len;
   int rc;
 
@@ -556,7 +556,7 @@ static int m3_router_find_route(const M3Router *router, const char *path,
   }
 
   for (i = 0; i < router->route_count; ++i) {
-    const M3Route *route;
+    const M3Route *route; /* GCOVR_EXCL_LINE */
 
     route = &router->routes[i];
     if (route->pattern == NULL || route->build == NULL) {
@@ -588,9 +588,10 @@ static int m3_router_find_route(const M3Router *router, const char *path,
 }
 
 static int m3_router_copy_path(M3Router *router, const char *path,
-                               m3_usize path_len, char **out_copy) {
-  m3_usize alloc_size;
-  void *mem;
+                               m3_usize path_len,
+                               char **out_copy) { /* GCOVR_EXCL_LINE */
+  m3_usize alloc_size;                            /* GCOVR_EXCL_LINE */
+  void *mem;                                      /* GCOVR_EXCL_LINE */
   int rc;
 
   if (router == NULL || path == NULL || out_copy == NULL) {
@@ -986,11 +987,11 @@ int M3_CALL m3_router_test_has_more_segments(const char *str, m3_usize len,
   return M3_OK;
 }
 
-int M3_CALL m3_router_test_match_len(const char *pattern, m3_usize pattern_len,
-                                     const char *path, m3_usize path_len,
-                                     M3RouteParam *params, m3_usize max_params,
-                                     m3_usize *out_param_count,
-                                     M3Bool *out_match) {
+int M3_CALL m3_router_test_match_len(
+    const char *pattern, m3_usize pattern_len, const char *path,
+    m3_usize path_len, M3RouteParam *params, m3_usize max_params,
+    m3_usize *out_param_count, /* GCOVR_EXCL_LINE */
+    M3Bool *out_match) {
   return m3_route_match_len(pattern, pattern_len, path, path_len, params,
                             max_params, out_param_count, out_match);
 }

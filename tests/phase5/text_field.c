@@ -2618,6 +2618,179 @@ int main(void) {
   M3_TEST_OK(m3_text_field_set_focus(&field, M3_FALSE));
   M3_TEST_OK(m3_text_field_step(&field, 0.2f, &changed));
 
+  {
+    M3TextField coverage_field;
+    M3TextField reserve_local;
+    M3InputEvent event_local;
+    M3Semantics sem_local;
+    m3_usize out_offset_local;
+    m3_usize max_local;
+    int rc_local;
+
+    M3_TEST_EXPECT(m3_text_field_test_usize_max(NULL), M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_OK(m3_text_field_test_usize_max(&max_local));
+    M3_TEST_ASSERT(max_local > 0u);
+
+    M3_TEST_OK(m3_text_field_test_set_offset_skip_early(M3_TRUE));
+    M3_TEST_OK(m3_text_field_test_validate_offset("A", 1u, 1u));
+    M3_TEST_OK(m3_text_field_test_set_offset_skip_early(M3_FALSE));
+    M3_TEST_OK(m3_text_field_test_validate_offset("A", 1u, 0u));
+    M3_TEST_EXPECT(m3_text_field_test_validate_offset("A", 1u, 2u),
+                   M3_ERR_RANGE);
+
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_UTF8_VALIDATE));
+    M3_TEST_EXPECT(m3_text_field_test_validate_utf8("A", 1u), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_UTF8_ITER_INIT));
+    M3_TEST_EXPECT(
+        m3_text_field_test_prev_offset("A", 1u, 1u, &out_offset_local),
+        M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_UTF8_ITER_NEXT));
+    M3_TEST_EXPECT(
+        m3_text_field_test_prev_offset("A", 1u, 1u, &out_offset_local),
+        M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_UTF8_ITER_NOT_FOUND));
+    M3_TEST_OK(m3_text_field_test_next_offset("A", 1u, 0u, &out_offset_local));
+    M3_TEST_ASSERT(out_offset_local == 1u);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+    memset(&reserve_local, 0, sizeof(reserve_local));
+    reserve_local.allocator = custom_alloc;
+    M3_TEST_EXPECT(m3_text_field_test_reserve(NULL, 1u),
+                   M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(m3_text_field_test_reserve(&reserve_local, 0u),
+                   M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_OK(m3_text_field_test_reserve(&reserve_local, 4u));
+    reserve_local.utf8_capacity = 8u;
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_RESERVE_BYPASS));
+    M3_TEST_OK(m3_text_field_test_reserve(&reserve_local, 4u));
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_RESERVE_REALLOC));
+    M3_TEST_EXPECT(m3_text_field_test_reserve(&reserve_local, 32u), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+    if (reserve_local.utf8 != NULL && reserve_local.allocator.free != NULL) {
+      reserve_local.allocator.free(reserve_local.allocator.ctx,
+                                   reserve_local.utf8);
+      reserve_local.utf8 = NULL;
+    }
+
+    M3_TEST_OK(m3_text_field_init(&coverage_field, &text_backend,
+                                  &style_with_label, NULL, "Hi", 2u));
+    coverage_field.bounds.x = 0.0f;
+    coverage_field.bounds.y = 0.0f;
+    coverage_field.bounds.width = 200.0f;
+    coverage_field.bounds.height = 60.0f;
+    coverage_field.text_metrics_valid = M3_FALSE;
+    M3_TEST_OK(m3_text_field_test_update_text_metrics(&coverage_field));
+    coverage_field.text_metrics_valid = M3_FALSE;
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_TEXT_MEASURE));
+    M3_TEST_EXPECT(m3_text_field_test_update_text_metrics(&coverage_field),
+                   M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+    coverage_field.utf8_label = "Lbl";
+    coverage_field.label_len = 3u;
+    coverage_field.label_font = coverage_field.text_font;
+    coverage_field.label_metrics_valid = M3_FALSE;
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_TEXT_MEASURE));
+    M3_TEST_EXPECT(m3_text_field_test_update_label_metrics(&coverage_field),
+                   M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+    coverage_field.utf8_placeholder = "PH";
+    coverage_field.placeholder_len = 2u;
+    coverage_field.placeholder_metrics_valid = M3_FALSE;
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_TEXT_MEASURE));
+    M3_TEST_EXPECT(
+        m3_text_field_test_update_placeholder_metrics(&coverage_field),
+        M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+    coverage_field.font_metrics_valid = M3_FALSE;
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_FONT_METRICS));
+    M3_TEST_EXPECT(m3_text_field_test_update_font_metrics(&coverage_field),
+                   M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+    coverage_field.focused = M3_FALSE;
+    coverage_field.label_value = 0.0f;
+    M3_TEST_OK(m3_text_field_test_sync_label(&coverage_field));
+    M3_TEST_OK(
+        m3_text_field_test_set_fail_point(M3_TEXT_FIELD_TEST_FAIL_ANIM_START));
+    M3_TEST_EXPECT(m3_text_field_test_sync_label(&coverage_field), M3_ERR_IO);
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+    M3_TEST_EXPECT(m3_text_field_set_focus(&coverage_field, 2), M3_ERR_RANGE);
+    M3_TEST_OK(m3_text_field_set_focus(&coverage_field, M3_TRUE));
+
+    coverage_field.selection_start = 0u;
+    coverage_field.selection_end = 1u;
+    M3_TEST_OK(m3_text_field_backspace(&coverage_field));
+    coverage_field.selection_start = 0u;
+    coverage_field.selection_end = 1u;
+    M3_TEST_OK(m3_text_field_delete_forward(&coverage_field));
+    coverage_field.cursor = 0u;
+    M3_TEST_OK(m3_text_field_backspace(&coverage_field));
+    coverage_field.cursor = coverage_field.utf8_len;
+    M3_TEST_OK(m3_text_field_delete_forward(&coverage_field));
+    M3_TEST_OK(m3_text_field_set_text(&coverage_field, "Hi", 2u));
+
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_OUTLINE_RANGE));
+    rc_local = coverage_field.widget.vtable->paint(coverage_field.widget.ctx,
+                                                   &paint_ctx);
+    if (rc_local != M3_OK) {
+      M3_TEST_ASSERT(rc_local == M3_ERR_RANGE);
+    }
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+    M3_TEST_OK(m3_text_field_test_set_fail_point(
+        M3_TEXT_FIELD_TEST_FAIL_SELECTION_WIDTH_NEGATIVE));
+    coverage_field.selection_start = 0u;
+    coverage_field.selection_end = 1u;
+    M3_TEST_OK(coverage_field.widget.vtable->paint(coverage_field.widget.ctx,
+                                                   &paint_ctx));
+    M3_TEST_OK(m3_text_field_test_clear_fail_points());
+
+    event_local.type = M3_INPUT_POINTER_MOVE;
+    event_local.data.pointer.x = 1;
+    event_local.data.pointer.y = 1;
+    coverage_field.selecting = M3_FALSE;
+    handled = M3_FALSE;
+    M3_TEST_OK(coverage_field.widget.vtable->event(coverage_field.widget.ctx,
+                                                   &event_local, &handled));
+
+    event_local.type = M3_INPUT_POINTER_UP;
+    M3_TEST_OK(coverage_field.widget.vtable->event(coverage_field.widget.ctx,
+                                                   &event_local, &handled));
+
+    event_local.type = M3_INPUT_TEXT_EDIT;
+    M3_TEST_OK(coverage_field.widget.vtable->event(coverage_field.widget.ctx,
+                                                   &event_local, &handled));
+
+    coverage_field.widget.flags |= M3_WIDGET_FLAG_DISABLED;
+    M3_TEST_OK(coverage_field.widget.vtable->get_semantics(
+        coverage_field.widget.ctx, &sem_local));
+
+    M3_TEST_OK(
+        coverage_field.widget.vtable->destroy(coverage_field.widget.ctx));
+  }
+
   M3_TEST_EXPECT(field.widget.vtable->destroy(NULL), M3_ERR_INVALID_ARGUMENT);
   M3_TEST_OK(m3_text_field_init(&destroy_field, &text_backend,
                                 &style_with_label, NULL, "", 0));

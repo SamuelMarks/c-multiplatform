@@ -117,6 +117,29 @@ M3_API int M3_CALL m3_path_test_mul_overflow(m3_usize a, m3_usize b,
  */
 M3_API int M3_CALL m3_path_test_has_current(const M3Path *path,
                                             M3Bool *out_has_current);
+
+/**
+ * @brief Test control for forcing reserve growth paths.
+ * @param enable M3_TRUE to force growth logic even when capacity is sufficient.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_path_test_set_force_reserve(M3Bool enable);
+
+/**
+ * @brief Test wrapper for reserving path command storage.
+ * @param path Path instance.
+ * @param additional Additional command slots required.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_path_test_reserve(M3Path *path, m3_usize additional);
+
+/**
+ * @brief Test wrapper for appending a raw path command.
+ * @param path Path instance.
+ * @param cmd Command to append.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_path_test_append(M3Path *path, const M3PathCmd *cmd);
 #endif
 
 #ifdef __cplusplus

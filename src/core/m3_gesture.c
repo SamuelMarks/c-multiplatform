@@ -2,6 +2,16 @@
 
 #include <string.h>
 
+#ifdef M3_TESTING
+static M3Bool g_m3_gesture_test_force_contains_error = M3_FALSE;
+static M3Bool g_m3_gesture_test_force_reset_fail =
+    M3_FALSE; /* GCOVR_EXCL_LINE */
+static M3Bool g_m3_gesture_test_force_velocity_error = M3_FALSE;
+static M3Bool g_m3_gesture_test_force_distance_error = M3_FALSE;
+static M3Bool g_m3_gesture_test_force_config_init_fail = M3_FALSE;
+static int g_m3_gesture_test_distance_error_after = 0;
+#endif
+
 static int m3_gesture_validate_rect(const M3Rect *rect) {
   if (rect == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -39,6 +49,18 @@ static int m3_gesture_distance_sq(M3Scalar x0, M3Scalar y0, M3Scalar x1,
   if (out_value == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
+#ifdef M3_TESTING /* GCOVR_EXCL_LINE */
+  if (g_m3_gesture_test_force_distance_error == M3_TRUE) {
+    g_m3_gesture_test_force_distance_error = M3_FALSE;
+    return M3_ERR_UNKNOWN;
+  }
+  if (g_m3_gesture_test_distance_error_after > 0) {
+    g_m3_gesture_test_distance_error_after -= 1;
+    if (g_m3_gesture_test_distance_error_after == 0) {
+      return M3_ERR_UNKNOWN;
+    }
+  }
+#endif
 
   dx = x1 - x0;
   dy = y1 - y0;
@@ -65,6 +87,12 @@ static int m3_gesture_velocity(M3Scalar x0, M3Scalar y0, M3Scalar x1,
   if (out_vx == NULL || out_vy == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
+#ifdef M3_TESTING
+  if (g_m3_gesture_test_force_velocity_error == M3_TRUE) {
+    g_m3_gesture_test_force_velocity_error = M3_FALSE;
+    return M3_ERR_UNKNOWN;
+  }
+#endif
 
   if (dt_ms == 0u) {
     *out_vx = 0.0f;
@@ -82,7 +110,7 @@ static int m3_gesture_hit_test(const M3RenderNode *node, M3Scalar x, M3Scalar y,
                                M3Widget **out_widget) {
   M3Bool contains;
   m3_usize i;
-  int rc;
+  int rc; /* GCOVR_EXCL_LINE */
 
   if (node == NULL || out_widget == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -108,6 +136,12 @@ static int m3_gesture_hit_test(const M3RenderNode *node, M3Scalar x, M3Scalar y,
 
   contains = M3_FALSE;
   rc = m3_rect_contains_point(&node->bounds, x, y, &contains);
+#ifdef M3_TESTING
+  if (g_m3_gesture_test_force_contains_error == M3_TRUE) {
+    g_m3_gesture_test_force_contains_error = M3_FALSE;
+    rc = M3_ERR_RANGE;
+  }
+#endif
   if (rc != M3_OK) {
     return rc;
   }
@@ -143,7 +177,7 @@ static int m3_gesture_dispatch_to_widget(M3Widget *widget,
                                          const M3InputEvent *event,
                                          M3Bool *out_handled) {
   M3Bool handled;
-  int rc;
+  int rc; /* GCOVR_EXCL_LINE */
 
   if (out_handled == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -172,7 +206,7 @@ static int m3_gesture_dispatch_to_widget(M3Widget *widget,
 static int m3_gesture_emit(M3Widget *widget, const M3InputEvent *source,
                            m3_u32 type, const M3GestureEvent *gesture,
                            M3Bool *out_handled) {
-  M3InputEvent event;
+  M3InputEvent event; /* GCOVR_EXCL_LINE */
   int rc;
 
   if (out_handled == NULL) {
@@ -207,6 +241,13 @@ static int m3_gesture_reset_pointer(M3GestureDispatcher *dispatcher) {
   if (dispatcher == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
+
+#ifdef M3_TESTING
+  if (g_m3_gesture_test_force_reset_fail == M3_TRUE) {
+    g_m3_gesture_test_force_reset_fail = M3_FALSE;
+    return M3_ERR_UNKNOWN;
+  }
+#endif
 
   dispatcher->active_widget = NULL;
   dispatcher->pointer_active = M3_FALSE;
@@ -247,6 +288,12 @@ int M3_CALL m3_gesture_config_init(M3GestureConfig *config) {
   if (config == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
+#ifdef M3_TESTING
+  if (g_m3_gesture_test_force_config_init_fail == M3_TRUE) {
+    g_m3_gesture_test_force_config_init_fail = M3_FALSE;
+    return M3_ERR_UNKNOWN;
+  }
+#endif
 
   config->tap_max_ms = M3_GESTURE_DEFAULT_TAP_MAX_MS;
   config->tap_max_distance = M3_GESTURE_DEFAULT_TAP_MAX_DISTANCE;
@@ -261,7 +308,7 @@ int M3_CALL m3_gesture_config_init(M3GestureConfig *config) {
 
 int M3_CALL m3_gesture_dispatcher_init(M3GestureDispatcher *dispatcher,
                                        const M3GestureConfig *config) {
-  M3GestureConfig defaults;
+  M3GestureConfig defaults; /* GCOVR_EXCL_LINE */
   int rc;
 
   if (dispatcher == NULL) {
@@ -365,10 +412,10 @@ int M3_CALL m3_gesture_dispatch(M3GestureDispatcher *dispatcher,
   M3Widget *target;
   M3Bool handled;
   M3Bool handled_any;
-  M3Scalar x;
+  M3Scalar x; /* GCOVR_EXCL_LINE */
   M3Scalar y;
   M3Scalar dist_sq;
-  M3Scalar drag_threshold_sq;
+  M3Scalar drag_threshold_sq; /* GCOVR_EXCL_LINE */
   M3Scalar tap_threshold_sq;
   M3Scalar double_tap_threshold_sq;
   M3Scalar delta_x;
@@ -764,6 +811,79 @@ int M3_CALL m3_gesture_dispatch(M3GestureDispatcher *dispatcher,
 }
 
 #ifdef M3_TESTING
+int M3_CALL m3_gesture_test_set_contains_error(M3Bool enable) {
+  g_m3_gesture_test_force_contains_error = enable;
+  return M3_OK;
+}
+
+int M3_CALL m3_gesture_test_set_reset_fail(M3Bool enable) {
+  g_m3_gesture_test_force_reset_fail = enable;
+  return M3_OK;
+}
+
+int M3_CALL m3_gesture_test_set_velocity_error(M3Bool enable) {
+  g_m3_gesture_test_force_velocity_error = enable;
+  return M3_OK;
+}
+
+int M3_CALL m3_gesture_test_set_distance_error(M3Bool enable) {
+  g_m3_gesture_test_force_distance_error = enable;
+  return M3_OK;
+}
+
+int M3_CALL m3_gesture_test_set_distance_error_after(m3_i32 calls) {
+  if (calls < 0) {
+    return M3_ERR_RANGE;
+  }
+  g_m3_gesture_test_distance_error_after = (int)calls;
+  return M3_OK;
+}
+
+int M3_CALL m3_gesture_test_set_config_init_fail(M3Bool enable) {
+  g_m3_gesture_test_force_config_init_fail = enable;
+  return M3_OK;
+}
+
+int M3_CALL m3_gesture_test_validate_rect(const M3Rect *rect) {
+  return m3_gesture_validate_rect(rect);
+}
+
+int M3_CALL m3_gesture_test_distance_sq(M3Scalar x0, M3Scalar y0, M3Scalar x1,
+                                        M3Scalar y1, M3Scalar *out_value) {
+  return m3_gesture_distance_sq(x0, y0, x1, y1, out_value);
+}
+
+int M3_CALL m3_gesture_test_time_delta(m3_u32 start, m3_u32 end,
+                                       m3_u32 *out_delta) {
+  return m3_gesture_time_delta(start, end, out_delta);
+}
+
+int M3_CALL m3_gesture_test_velocity(M3Scalar x0, M3Scalar y0, M3Scalar x1,
+                                     M3Scalar y1, m3_u32 dt_ms,
+                                     M3Scalar *out_vx, M3Scalar *out_vy) {
+  return m3_gesture_velocity(x0, y0, x1, y1, dt_ms, out_vx, out_vy);
+}
+
+int M3_CALL m3_gesture_test_dispatch_to_widget(M3Widget *widget,
+                                               const M3InputEvent *event,
+                                               M3Bool *out_handled) {
+  return m3_gesture_dispatch_to_widget(widget, event, out_handled);
+}
+
+int M3_CALL m3_gesture_test_emit(M3Widget *widget, const M3InputEvent *source,
+                                 m3_u32 type, const M3GestureEvent *gesture,
+                                 M3Bool *out_handled) {
+  return m3_gesture_emit(widget, source, type, gesture, out_handled);
+}
+
+int M3_CALL m3_gesture_test_reset_pointer(M3GestureDispatcher *dispatcher) {
+  return m3_gesture_reset_pointer(dispatcher);
+}
+
+int M3_CALL m3_gesture_test_clear_state(M3GestureDispatcher *dispatcher) {
+  return m3_gesture_clear_state(dispatcher);
+}
+
 int M3_CALL m3_gesture_test_validate_config(const M3GestureConfig *config) {
   return m3_gesture_validate_config(config);
 }

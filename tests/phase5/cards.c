@@ -13,6 +13,8 @@
 #define M3_CARD_TEST_FAIL_RIPPLE_START 7u
 #define M3_CARD_TEST_FAIL_RIPPLE_RELEASE 8u
 #define M3_CARD_TEST_FAIL_CONTENT_BOUNDS 9u
+#define M3_CARD_TEST_FAIL_MEASURE_CONTENT 10u
+#define M3_CARD_TEST_FAIL_CORNER_RADIUS 11u
 
 int M3_CALL m3_card_test_set_fail_point(m3_u32 fail_point);
 int M3_CALL m3_card_test_set_color_fail_after(m3_u32 call_count);
@@ -26,6 +28,11 @@ int M3_CALL m3_card_test_validate_edges(const M3LayoutEdges *edges);
 int M3_CALL m3_card_test_validate_style(const M3CardStyle *style);
 int M3_CALL m3_card_test_validate_measure_spec(M3MeasureSpec spec);
 int M3_CALL m3_card_test_validate_rect(const M3Rect *rect);
+int M3_CALL m3_card_test_measure_content(const M3CardStyle *style,
+                                         M3Scalar *out_width,
+                                         M3Scalar *out_height);
+int M3_CALL m3_card_test_compute_inner(const M3Card *card, M3Rect *out_inner,
+                                       M3Scalar *out_corner);
 int M3_CALL m3_card_test_compute_content_bounds(const M3Card *card,
                                                 M3Rect *out_bounds);
 int M3_CALL m3_card_test_resolve_colors(const M3Card *card,
@@ -187,9 +194,13 @@ static int test_card_helpers(void) {
   M3Card card;
   M3CardStyle card_style;
   M3Rect content;
+  M3Rect inner;
   M3Color background;
   M3Color outline;
   M3Color ripple;
+  M3Scalar content_width;
+  M3Scalar content_height;
+  M3Scalar inner_corner;
   volatile const M3Color *null_color;
   volatile const M3LayoutEdges *null_edges;
   volatile const M3Rect *null_rect;
@@ -273,6 +284,7 @@ static int test_card_helpers(void) {
   edges.bottom = 0.0f;
   M3_TEST_OK(m3_card_test_validate_edges(&edges));
 
+  M3_TEST_EXPECT(m3_card_test_validate_style(NULL), M3_ERR_INVALID_ARGUMENT);
   M3_TEST_OK(m3_card_style_init_filled(&style));
   M3_TEST_OK(m3_card_test_validate_style(&style));
   bad_style = style;
@@ -312,6 +324,21 @@ static int test_card_helpers(void) {
   bad_style.disabled_outline_color.r = -1.0f;
   M3_TEST_EXPECT(m3_card_test_validate_style(&bad_style), M3_ERR_RANGE);
 
+  M3_TEST_EXPECT(
+      m3_card_test_measure_content(NULL, &content_width, &content_height),
+      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_card_test_measure_content(&style, NULL, &content_height),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_card_test_measure_content(&style, &content_width, NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+  bad_style = style;
+  bad_style.padding.left = -1.0f;
+  bad_style.padding.right = 0.0f;
+  bad_style.outline_width = 0.0f;
+  M3_TEST_EXPECT(
+      m3_card_test_measure_content(&bad_style, &content_width, &content_height),
+      M3_ERR_RANGE);
+
   spec.mode = 99u;
   spec.size = 0.0f;
   M3_TEST_EXPECT(m3_card_test_validate_measure_spec(spec),
@@ -338,13 +365,51 @@ static int test_card_helpers(void) {
 
   M3_TEST_OK(m3_card_style_init_filled(&card_style));
   M3_TEST_OK(m3_card_init(&card, &card_style));
+  M3_TEST_EXPECT(m3_card_test_compute_inner(NULL, &inner, &inner_corner),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_card_test_compute_inner(&card, NULL, &inner_corner),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_card_test_compute_inner(&card, &inner, NULL),
+                 M3_ERR_INVALID_ARGUMENT);
   card.bounds.x = 0.0f;
   card.bounds.y = 0.0f;
+  card.bounds.width = 100.0f;
+  card.bounds.height = 80.0f;
+  card.bounds.width = -1.0f;
+  M3_TEST_EXPECT(m3_card_test_compute_inner(&card, &inner, &inner_corner),
+                 M3_ERR_RANGE);
+  card.bounds.width = 100.0f;
+  card.style.outline_width = -1.0f;
+  M3_TEST_EXPECT(m3_card_test_compute_inner(&card, &inner, &inner_corner),
+                 M3_ERR_RANGE);
+  card.style.outline_width = card_style.outline_width;
+  card.style.corner_radius = -1.0f;
+  M3_TEST_EXPECT(m3_card_test_compute_inner(&card, &inner, &inner_corner),
+                 M3_ERR_RANGE);
+  card.style.corner_radius = card_style.corner_radius;
+  card.style.outline_width = 6.0f;
+  card.bounds.width = 10.0f;
+  card.bounds.height = 10.0f;
+  M3_TEST_EXPECT(m3_card_test_compute_inner(&card, &inner, &inner_corner),
+                 M3_ERR_RANGE);
+  card.style.outline_width = card_style.outline_width;
   card.bounds.width = 100.0f;
   card.bounds.height = 80.0f;
   M3_TEST_OK(m3_card_test_compute_content_bounds(&card, &content));
   M3_TEST_ASSERT(m3_near(content.width, 68.0f, 0.001f));
   M3_TEST_ASSERT(m3_near(content.height, 48.0f, 0.001f));
+
+  bad_style = card.style;
+  bad_style.variant = 0u;
+  card.style = bad_style;
+  M3_TEST_EXPECT(m3_card_test_compute_content_bounds(&card, &content),
+                 M3_ERR_RANGE);
+  card.style = card_style;
+
+  card.bounds.width = -1.0f;
+  M3_TEST_EXPECT(m3_card_test_compute_content_bounds(&card, &content),
+                 M3_ERR_RANGE);
+  card.bounds.width = 100.0f;
 
   card.style.corner_radius = 0.5f;
   card.style.outline_width = 1.0f;
@@ -373,11 +438,68 @@ static int test_card_helpers(void) {
       m3_card_test_resolve_colors(&card, &background, &outline, &ripple));
   card.widget.flags = 0u;
 
+  M3_TEST_EXPECT(
+      m3_card_test_resolve_colors(NULL, &background, &outline, &ripple),
+      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_card_test_resolve_colors(&card, NULL, &outline, &ripple),
+                 M3_ERR_INVALID_ARGUMENT);
+
   card.style.background_color.r = -1.0f;
   M3_TEST_EXPECT(
       m3_card_test_resolve_colors(&card, &background, &outline, &ripple),
       M3_ERR_RANGE);
   card.style.background_color.r = 1.0f;
+
+  card.style.outline_color.g = 2.0f;
+  M3_TEST_EXPECT(
+      m3_card_test_resolve_colors(&card, &background, &outline, &ripple),
+      M3_ERR_RANGE);
+  card.style.outline_color.g = card_style.outline_color.g;
+
+  card.style.ripple_color.b = 2.0f;
+  M3_TEST_EXPECT(
+      m3_card_test_resolve_colors(&card, &background, &outline, &ripple),
+      M3_ERR_RANGE);
+  card.style.ripple_color.b = card_style.ripple_color.b;
+
+  return 0;
+}
+
+static int test_card_style_init_failures(void) {
+  M3CardStyle style;
+  m3_u32 fail_after;
+
+  for (fail_after = 1u; fail_after <= 11u; ++fail_after) {
+    M3_TEST_OK(m3_card_test_set_color_fail_after(fail_after));
+    M3_TEST_EXPECT(m3_card_style_init_elevated(&style), M3_ERR_IO);
+    M3_TEST_OK(m3_card_test_clear_fail_points());
+  }
+
+  return 0;
+}
+
+static int test_card_style_init_filled_failures(void) {
+  M3CardStyle style;
+  m3_u32 fail_after;
+
+  for (fail_after = 6u; fail_after <= 10u; ++fail_after) {
+    M3_TEST_OK(m3_card_test_set_color_fail_after(fail_after));
+    M3_TEST_EXPECT(m3_card_style_init_filled(&style), M3_ERR_IO);
+    M3_TEST_OK(m3_card_test_clear_fail_points());
+  }
+
+  return 0;
+}
+
+static int test_card_style_init_outlined_failures(void) {
+  M3CardStyle style;
+  m3_u32 fail_after;
+
+  for (fail_after = 6u; fail_after <= 10u; ++fail_after) {
+    M3_TEST_OK(m3_card_test_set_color_fail_after(fail_after));
+    M3_TEST_EXPECT(m3_card_style_init_outlined(&style), M3_ERR_IO);
+    M3_TEST_OK(m3_card_test_clear_fail_points());
+  }
 
   return 0;
 }
@@ -404,6 +526,9 @@ int main(void) {
   M3InputEvent event;
 
   M3_TEST_OK(test_card_helpers());
+  M3_TEST_OK(test_card_style_init_failures());
+  M3_TEST_OK(test_card_style_init_filled_failures());
+  M3_TEST_OK(test_card_style_init_outlined_failures());
 
   M3_TEST_OK(test_backend_init(&backend));
   gfx.ctx = &backend;
@@ -545,6 +670,28 @@ int main(void) {
                                              height_spec, &size),
                  M3_ERR_INVALID_ARGUMENT);
 
+  width_spec.mode = M3_MEASURE_EXACTLY;
+  width_spec.size = 10.0f;
+  height_spec.mode = 99u;
+  height_spec.size = 0.0f;
+  M3_TEST_EXPECT(card.widget.vtable->measure(card.widget.ctx, width_spec,
+                                             height_spec, &size),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  height_spec.mode = M3_MEASURE_UNSPECIFIED;
+  height_spec.size = 0.0f;
+  card.style.outline_width = -1.0f;
+  M3_TEST_EXPECT(card.widget.vtable->measure(card.widget.ctx, width_spec,
+                                             height_spec, &size),
+                 M3_ERR_RANGE);
+  card.style = filled_style;
+
+  M3_TEST_OK(m3_card_test_set_fail_point(M3_CARD_TEST_FAIL_MEASURE_CONTENT));
+  M3_TEST_EXPECT(card.widget.vtable->measure(card.widget.ctx, width_spec,
+                                             height_spec, &size),
+                 M3_ERR_IO);
+  M3_TEST_OK(m3_card_test_clear_fail_points());
+
   M3_TEST_EXPECT(
       card.widget.vtable->measure(NULL, width_spec, height_spec, &size),
       M3_ERR_INVALID_ARGUMENT);
@@ -591,6 +738,39 @@ int main(void) {
                  M3_ERR_RANGE);
   M3_TEST_OK(m3_card_test_clear_fail_points());
 
+  card.style.corner_radius = -1.0f;
+  M3_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
+                 M3_ERR_RANGE);
+  card.style = filled_style;
+
+  card.bounds.width = -1.0f;
+  M3_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
+                 M3_ERR_RANGE);
+  card.bounds = bounds;
+
+  M3_TEST_OK(m3_card_test_set_fail_point(M3_CARD_TEST_FAIL_CORNER_RADIUS));
+  M3_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_card_test_clear_fail_points());
+
+  card.style = outlined_style;
+  backend.fail_draw_rect = M3_ERR_IO;
+  M3_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
+                 M3_ERR_IO);
+  backend.fail_draw_rect = M3_OK;
+  card.style = filled_style;
+
+  card.style.corner_radius = 5.0f;
+  card.style.outline_width = 20.0f;
+  M3_TEST_OK(card.widget.vtable->paint(card.widget.ctx, &paint_ctx));
+  M3_TEST_ASSERT(m3_near(backend.last_corner, 0.0f, 0.001f));
+  card.style = filled_style;
+
+  card.ripple.state = 99;
+  M3_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
+                 M3_ERR_INVALID_ARGUMENT);
+  card.ripple.state = M3_RIPPLE_STATE_IDLE;
+
   backend.fail_draw_rect = M3_ERR_IO;
   M3_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
                  M3_ERR_IO);
@@ -603,11 +783,24 @@ int main(void) {
       shadow_card.widget.vtable->paint(shadow_card.widget.ctx, &paint_ctx),
       M3_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_gfx_vtable;
+  M3_TEST_OK(
+      shadow_card.widget.vtable->paint(shadow_card.widget.ctx, &paint_ctx));
 
   M3_TEST_OK(m3_card_init(&paint_card, &filled_style));
   paint_card.bounds = bounds;
   M3_TEST_OK(
       paint_card.widget.vtable->paint(paint_card.widget.ctx, &paint_ctx));
+  paint_card.ripple.state = M3_RIPPLE_STATE_EXPANDING;
+  paint_card.ripple.opacity = 0.5f;
+  paint_card.ripple.radius = 8.0f;
+  paint_card.ripple.center_x = bounds.x + 10.0f;
+  paint_card.ripple.center_y = bounds.y + 10.0f;
+  paint_card.ripple.color = paint_card.style.ripple_color;
+  M3_TEST_OK(
+      paint_card.widget.vtable->paint(paint_card.widget.ctx, &paint_ctx));
+  paint_card.ripple.state = M3_RIPPLE_STATE_IDLE;
+  paint_card.ripple.opacity = 0.0f;
+  paint_card.ripple.radius = 0.0f;
 
   M3_TEST_OK(m3_card_init(&paint_card, &outlined_style));
   paint_card.bounds = bounds;

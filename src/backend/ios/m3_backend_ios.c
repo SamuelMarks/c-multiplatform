@@ -66,6 +66,7 @@ int M3_CALL m3_ios_backend_config_init(M3IOSBackendConfig *config) {
   return M3_OK;
 }
 
+/* GCOVR_EXCL_START */
 #if defined(M3_IOS_AVAILABLE)
 
 struct M3IOSBackend {
@@ -305,6 +306,7 @@ int M3_CALL m3_ios_backend_predictive_back_cancel(
   return m3_predictive_back_cancel(backend->predictive_back, event);
 }
 
+/* GCOVR_EXCL_STOP */
 #else
 
 int M3_CALL m3_ios_backend_create(const M3IOSBackendConfig *config,

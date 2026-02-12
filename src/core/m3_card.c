@@ -13,6 +13,8 @@
 #define M3_CARD_TEST_FAIL_RIPPLE_START 7u
 #define M3_CARD_TEST_FAIL_RIPPLE_RELEASE 8u
 #define M3_CARD_TEST_FAIL_CONTENT_BOUNDS 9u
+#define M3_CARD_TEST_FAIL_MEASURE_CONTENT 10u
+#define M3_CARD_TEST_FAIL_CORNER_RADIUS 11u
 
 static m3_u32 g_m3_card_test_fail_point = M3_CARD_TEST_FAIL_NONE;
 static m3_u32 g_m3_card_test_color_fail_after = 0u;
@@ -48,7 +50,7 @@ static int m3_card_test_fail_point_match(m3_u32 point) {
   g_m3_card_test_fail_point = M3_CARD_TEST_FAIL_NONE;
   return 1;
 }
-#endif
+#endif /* GCOVR_EXCL_LINE */
 
 static int m3_card_validate_color(const M3Color *color) {
   if (color == NULL) {
@@ -90,7 +92,7 @@ static int m3_card_color_set(M3Color *color, M3Scalar r, M3Scalar g, M3Scalar b,
   if (m3_card_test_color_should_fail()) {
     return M3_ERR_IO;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   color->r = r;
   color->g = g;
   color->b = b;
@@ -223,6 +225,11 @@ static int m3_card_measure_content(const M3CardStyle *style,
   if (style == NULL || out_width == NULL || out_height == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
+#ifdef M3_TESTING
+  if (m3_card_test_fail_point_match(M3_CARD_TEST_FAIL_MEASURE_CONTENT)) {
+    return M3_ERR_IO;
+  }
+#endif
 
   required_width =
       style->padding.left + style->padding.right + style->outline_width * 2.0f;
@@ -667,6 +674,11 @@ static int m3_card_widget_paint(void *widget, M3PaintContext *ctx) {
   M3_UNUSED(ripple_color);
 
   corner_radius = card->style.corner_radius;
+#ifdef M3_TESTING
+  if (m3_card_test_fail_point_match(M3_CARD_TEST_FAIL_CORNER_RADIUS)) {
+    corner_radius = -1.0f;
+  }
+#endif
   if (corner_radius < 0.0f) {
     return M3_ERR_RANGE;
   }
@@ -677,7 +689,7 @@ static int m3_card_widget_paint(void *widget, M3PaintContext *ctx) {
   if (m3_card_test_fail_point_match(M3_CARD_TEST_FAIL_OUTLINE_WIDTH)) {
     outline_width = -1.0f;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   if (outline_width < 0.0f) {
     return M3_ERR_RANGE;
   }
@@ -978,6 +990,17 @@ int M3_CALL m3_card_test_validate_measure_spec(M3MeasureSpec spec) {
 
 int M3_CALL m3_card_test_validate_rect(const M3Rect *rect) {
   return m3_card_validate_rect(rect);
+}
+
+int M3_CALL m3_card_test_measure_content(const M3CardStyle *style,
+                                         M3Scalar *out_width,
+                                         M3Scalar *out_height) {
+  return m3_card_measure_content(style, out_width, out_height);
+}
+
+int M3_CALL m3_card_test_compute_inner(const M3Card *card, M3Rect *out_inner,
+                                       M3Scalar *out_corner) {
+  return m3_card_compute_inner(card, out_inner, out_corner);
 }
 
 int M3_CALL m3_card_test_compute_content_bounds(const M3Card *card,

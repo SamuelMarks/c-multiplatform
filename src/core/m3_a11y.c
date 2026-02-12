@@ -1,9 +1,24 @@
 #include "m3/m3_a11y.h"
 
+#ifdef M3_TESTING
+static M3Bool g_m3_a11y_test_fail_clear = M3_FALSE;
+
+int M3_CALL m3_a11y_test_set_fail_clear(M3Bool enable) {
+  g_m3_a11y_test_fail_clear = enable ? M3_TRUE : M3_FALSE;
+  return M3_OK;
+}
+#endif
+
 static int m3_a11y_clear_semantics(M3Semantics *semantics) {
   if (semantics == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
+#ifdef M3_TESTING
+  if (g_m3_a11y_test_fail_clear == M3_TRUE) {
+    g_m3_a11y_test_fail_clear = M3_FALSE;
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   semantics->role = M3_SEMANTIC_NONE;
   semantics->flags = 0;
   semantics->utf8_label = NULL;

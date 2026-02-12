@@ -3,6 +3,11 @@
 
 #include <string.h>
 
+int M3_CALL m3_menu_test_set_style_fail_text_style(M3Bool enable);
+int M3_CALL m3_menu_test_set_style_fail_shadow_init(M3Bool enable);
+int M3_CALL m3_menu_test_set_style_fail_background_color(M3Bool enable);
+int M3_CALL m3_menu_test_set_style_fail_disabled_color(M3Bool enable);
+
 typedef struct TestMenuBackend {
   int create_calls;
   int destroy_calls;
@@ -18,6 +23,7 @@ typedef struct TestMenuBackend {
   int fail_draw_rect;
   int fail_push_clip;
   int fail_pop_clip;
+  int fail_measure_after;
   int negative_width;
   M3Handle last_font;
   M3Rect last_rect;
@@ -50,6 +56,16 @@ static int test_backend_init(TestMenuBackend *backend) {
   }
   memset(backend, 0, sizeof(*backend));
   return M3_OK;
+}
+
+static int m3_near(M3Scalar a, M3Scalar b, M3Scalar tol) {
+  M3Scalar diff;
+
+  diff = a - b;
+  if (diff < 0.0f) {
+    diff = -diff;
+  }
+  return (diff <= tol) ? 1 : 0;
 }
 
 static int test_text_create_font(void *text, const char *utf8_family,
@@ -120,6 +136,10 @@ static int test_text_measure_text(void *text, M3Handle font, const char *utf8,
   backend = (TestMenuBackend *)text;
   backend->measure_calls += 1;
   if (backend->fail_measure) {
+    return M3_ERR_IO;
+  }
+  if (backend->fail_measure_after > 0 &&
+      backend->measure_calls >= backend->fail_measure_after) {
     return M3_ERR_IO;
   }
 
@@ -250,6 +270,26 @@ static int test_menu_style_init_helper(M3MenuStyle *style) {
   return M3_OK;
 }
 
+static int test_menu_style_init_failures(void) {
+  M3MenuStyle style;
+
+  M3_TEST_EXPECT(m3_menu_style_init(NULL), M3_ERR_INVALID_ARGUMENT);
+
+  M3_TEST_OK(m3_menu_test_set_style_fail_text_style(M3_TRUE));
+  M3_TEST_EXPECT(m3_menu_style_init(&style), M3_ERR_IO);
+
+  M3_TEST_OK(m3_menu_test_set_style_fail_shadow_init(M3_TRUE));
+  M3_TEST_EXPECT(m3_menu_style_init(&style), M3_ERR_IO);
+
+  M3_TEST_OK(m3_menu_test_set_style_fail_background_color(M3_TRUE));
+  M3_TEST_EXPECT(m3_menu_style_init(&style), M3_ERR_IO);
+
+  M3_TEST_OK(m3_menu_test_set_style_fail_disabled_color(M3_TRUE));
+  M3_TEST_EXPECT(m3_menu_style_init(&style), M3_ERR_IO);
+
+  return M3_OK;
+}
+
 static int test_menu_validation_helpers(void) {
   M3Color color;
   M3LayoutEdges edges;
@@ -258,7 +298,21 @@ static int test_menu_validation_helpers(void) {
   M3Rect rect;
   M3MenuAnchor anchor;
   M3MenuPlacement placement;
+  M3MenuStyle menu_style;
+  M3MenuStyle bad_menu_style;
+  M3Menu menu;
   M3MenuItem items[1];
+  M3MenuItem menu_items[2];
+  M3Rect overlay;
+  M3Rect panel_bounds;
+  M3Scalar text_width;
+  M3Scalar panel_width;
+  M3Scalar panel_height;
+  M3Bool has_label;
+  M3Bool inside;
+  m3_usize index;
+  m3_u32 direction;
+  TestMenuBackend backend;
   int rc;
 
   M3_TEST_EXPECT(m3_menu_test_validate_color(NULL), M3_ERR_INVALID_ARGUMENT);
@@ -393,6 +447,232 @@ static int test_menu_validation_helpers(void) {
   items[0].enabled = M3_FALSE;
   M3_TEST_OK(m3_menu_test_validate_items(items, 1u));
 
+  rc = test_backend_init(&backend);
+  M3_TEST_OK(rc);
+  rc = test_menu_style_init_helper(&menu_style);
+  M3_TEST_OK(rc);
+
+  M3_TEST_EXPECT(m3_menu_test_validate_style(NULL, M3_FALSE),
+                 M3_ERR_INVALID_ARGUMENT);
+  bad_menu_style = menu_style;
+  bad_menu_style.item_height = 0.0f;
+  M3_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, M3_TRUE),
+                 M3_ERR_RANGE);
+  bad_menu_style = menu_style;
+  bad_menu_style.item_spacing = -1.0f;
+  M3_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, M3_TRUE),
+                 M3_ERR_RANGE);
+  bad_menu_style = menu_style;
+  bad_menu_style.min_width = -1.0f;
+  M3_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, M3_TRUE),
+                 M3_ERR_RANGE);
+  bad_menu_style = menu_style;
+  bad_menu_style.min_width = 10.0f;
+  bad_menu_style.max_width = 5.0f;
+  M3_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, M3_TRUE),
+                 M3_ERR_RANGE);
+  bad_menu_style = menu_style;
+  bad_menu_style.corner_radius = -1.0f;
+  M3_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, M3_TRUE),
+                 M3_ERR_RANGE);
+  bad_menu_style = menu_style;
+  bad_menu_style.anchor_gap = -1.0f;
+  M3_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, M3_TRUE),
+                 M3_ERR_RANGE);
+  bad_menu_style = menu_style;
+  bad_menu_style.padding.left = -1.0f;
+  M3_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, M3_TRUE),
+                 M3_ERR_RANGE);
+  bad_menu_style = menu_style;
+  bad_menu_style.text_style.utf8_family = NULL;
+  M3_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, M3_TRUE),
+                 M3_ERR_INVALID_ARGUMENT);
+  bad_menu_style = menu_style;
+  bad_menu_style.background_color.r = -1.0f;
+  M3_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, M3_TRUE),
+                 M3_ERR_RANGE);
+  bad_menu_style = menu_style;
+  bad_menu_style.disabled_text_color.a = 2.0f;
+  M3_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, M3_TRUE),
+                 M3_ERR_RANGE);
+
+  memset(&menu, 0, sizeof(menu));
+  menu.text_backend.ctx = &backend;
+  menu.text_backend.vtable = &g_test_text_vtable;
+  menu.style = menu_style;
+  menu.items = menu_items;
+  menu.item_count = 2u;
+  menu.font.id = 1u;
+  menu.font.generation = 1u;
+
+  menu_items[0].utf8_label = "Alpha";
+  menu_items[0].utf8_len = 5u;
+  menu_items[0].enabled = M3_TRUE;
+  menu_items[1].utf8_label = NULL;
+  menu_items[1].utf8_len = 0u;
+  menu_items[1].enabled = M3_TRUE;
+
+  M3_TEST_EXPECT(m3_menu_test_update_metrics(NULL, &text_width, &has_label),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_menu_test_update_metrics(&menu, NULL, &has_label),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_menu_test_update_metrics(&menu, &text_width, NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  menu.items = NULL;
+  menu.item_count = 1u;
+  M3_TEST_EXPECT(m3_menu_test_update_metrics(&menu, &text_width, &has_label),
+                 M3_ERR_INVALID_ARGUMENT);
+  menu.items = menu_items;
+  menu.item_count = 2u;
+
+  M3_TEST_OK(m3_menu_test_update_metrics(&menu, &text_width, &has_label));
+  M3_TEST_ASSERT(has_label == M3_TRUE);
+
+  backend.fail_measure = 1;
+  M3_TEST_EXPECT(m3_menu_test_update_metrics(&menu, &text_width, &has_label),
+                 M3_ERR_IO);
+  backend.fail_measure = 0;
+
+  backend.measure_calls = 0;
+  backend.fail_measure_after = 2;
+  M3_TEST_EXPECT(m3_menu_test_update_metrics(&menu, &text_width, &has_label),
+                 M3_ERR_IO);
+  backend.fail_measure_after = 0;
+
+  backend.measure_calls = 0;
+  backend.negative_width = 1;
+  menu_items[0].utf8_label = "A";
+  menu_items[0].utf8_len = 1u;
+  M3_TEST_EXPECT(m3_menu_test_update_metrics(&menu, &text_width, &has_label),
+                 M3_ERR_RANGE);
+  backend.negative_width = 0;
+
+  M3_TEST_EXPECT(m3_menu_test_compute_panel_size(NULL, &panel_width,
+                                                 &panel_height, &has_label),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      m3_menu_test_compute_panel_size(&menu, NULL, &panel_height, &has_label),
+      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      m3_menu_test_compute_panel_size(&menu, &panel_width, NULL, &has_label),
+      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      m3_menu_test_compute_panel_size(&menu, &panel_width, &panel_height, NULL),
+      M3_ERR_INVALID_ARGUMENT);
+
+  menu.style.item_height = 0.0f;
+  M3_TEST_EXPECT(m3_menu_test_compute_panel_size(&menu, &panel_width,
+                                                 &panel_height, &has_label),
+                 M3_ERR_RANGE);
+  menu.style = menu_style;
+
+  menu.items = NULL;
+  menu.item_count = 1u;
+  M3_TEST_EXPECT(m3_menu_test_compute_panel_size(&menu, &panel_width,
+                                                 &panel_height, &has_label),
+                 M3_ERR_INVALID_ARGUMENT);
+  menu.items = menu_items;
+  menu.item_count = 2u;
+
+  menu.style.min_width = 0.0f;
+  menu.style.max_width = 20.0f;
+  M3_TEST_OK(m3_menu_test_compute_panel_size(&menu, &panel_width, &panel_height,
+                                             &has_label));
+  M3_TEST_ASSERT(m3_near(panel_width, menu.style.max_width, 0.001f));
+  menu.style.min_width = menu_style.min_width;
+  menu.style.max_width = menu_style.max_width;
+
+  M3_TEST_OK(m3_menu_test_set_force_negative_panel(M3_TRUE));
+  M3_TEST_EXPECT(m3_menu_test_compute_panel_size(&menu, &panel_width,
+                                                 &panel_height, &has_label),
+                 M3_ERR_RANGE);
+
+  overlay.x = 0.0f;
+  overlay.y = 0.0f;
+  overlay.width = 50.0f;
+  overlay.height = 40.0f;
+  menu.anchor.type = M3_MENU_ANCHOR_RECT;
+  menu.anchor.rect.x = 5.0f;
+  menu.anchor.rect.y = 5.0f;
+  menu.anchor.rect.width = 10.0f;
+  menu.anchor.rect.height = 10.0f;
+  menu.placement.direction = M3_MENU_DIRECTION_DOWN;
+  menu.placement.align = M3_MENU_ALIGN_START;
+
+  M3_TEST_EXPECT(m3_menu_test_compute_panel_bounds(NULL, &overlay, 10.0f, 10.0f,
+                                                   &panel_bounds, &direction),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_menu_test_compute_panel_bounds(&menu, NULL, 10.0f, 10.0f,
+                                                   &panel_bounds, &direction),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_menu_test_compute_panel_bounds(&menu, &overlay, 10.0f,
+                                                   10.0f, NULL, &direction),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_menu_test_compute_panel_bounds(&menu, &overlay, 10.0f,
+                                                   10.0f, &panel_bounds, NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  overlay.width = -1.0f;
+  M3_TEST_EXPECT(m3_menu_test_compute_panel_bounds(
+                     &menu, &overlay, 10.0f, 10.0f, &panel_bounds, &direction),
+                 M3_ERR_RANGE);
+  overlay.width = 50.0f;
+
+  M3_TEST_EXPECT(m3_menu_test_compute_panel_bounds(
+                     &menu, &overlay, -1.0f, 10.0f, &panel_bounds, &direction),
+                 M3_ERR_RANGE);
+  M3_TEST_EXPECT(m3_menu_test_compute_panel_bounds(
+                     &menu, &overlay, 10.0f, -1.0f, &panel_bounds, &direction),
+                 M3_ERR_RANGE);
+
+  M3_TEST_OK(m3_menu_test_compute_panel_bounds(&menu, &overlay, 60.0f, 60.0f,
+                                               &panel_bounds, &direction));
+  overlay.width = 10.0f;
+  overlay.height = 10.0f;
+  M3_TEST_OK(m3_menu_test_set_force_bounds_overflow(M3_TRUE));
+  M3_TEST_OK(m3_menu_test_compute_panel_bounds(&menu, &overlay, 60.0f, 60.0f,
+                                               &panel_bounds, &direction));
+  M3_TEST_OK(m3_menu_test_compute_panel_bounds(&menu, &overlay, 60.0f, 60.0f,
+                                               &panel_bounds, &direction));
+  M3_TEST_ASSERT(panel_bounds.x == overlay.x);
+  M3_TEST_ASSERT(panel_bounds.y == overlay.y);
+  overlay.width = 1.0f;
+  overlay.height = 1.0f;
+  M3_TEST_OK(m3_menu_test_compute_panel_bounds(&menu, &overlay, 20.0f, 20.0f,
+                                               &panel_bounds, &direction));
+  M3_TEST_ASSERT(panel_bounds.x == overlay.x);
+  M3_TEST_ASSERT(panel_bounds.y == overlay.y);
+  overlay.width = 50.0f;
+  overlay.height = 40.0f;
+
+  menu.menu_bounds.x = 0.0f;
+  menu.menu_bounds.y = 0.0f;
+  menu.menu_bounds.width = 20.0f;
+  menu.menu_bounds.height = 20.0f;
+  M3_TEST_EXPECT(m3_menu_test_hit_test(NULL, 0.0f, 0.0f, &inside, &index),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_menu_test_hit_test(&menu, 0.0f, 0.0f, NULL, &index),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_menu_test_hit_test(&menu, 0.0f, 0.0f, &inside, NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  M3_TEST_OK(m3_menu_test_set_force_hit_test_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_menu_test_hit_test(&menu, 1.0f, 1.0f, &inside, &index),
+                 M3_ERR_RANGE);
+
+  menu.style.padding.top = 10.0f;
+  M3_TEST_OK(m3_menu_test_hit_test(&menu, 1.0f, 0.0f, &inside, &index));
+  M3_TEST_ASSERT(inside == M3_TRUE);
+  menu.style.item_height = 10.0f;
+  menu.style.item_spacing = 0.0f;
+  menu.menu_bounds.height = 50.0f;
+  M3_TEST_OK(m3_menu_test_hit_test(&menu, 1.0f, 45.0f, &inside, &index));
+  M3_TEST_ASSERT(inside == M3_TRUE);
+  M3_TEST_ASSERT(index == M3_MENU_INVALID_INDEX);
+  menu.menu_bounds.height = 20.0f;
+  menu.style.padding.top = menu_style.padding.top;
+
   return 0;
 }
 
@@ -508,6 +788,9 @@ static int test_menu_init_and_setters(void) {
 
   M3_TEST_OK(m3_menu_set_style(&menu, &style));
 
+  M3_TEST_EXPECT(m3_menu_set_on_action(NULL, test_action, NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+
   M3_TEST_EXPECT(m3_menu_set_anchor_rect(NULL, &rect), M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_menu_set_anchor_rect(&menu, NULL), M3_ERR_INVALID_ARGUMENT);
   rect.x = 0.0f;
@@ -608,9 +891,27 @@ static int test_menu_measure_layout(void) {
 
   M3_TEST_OK(m3_menu_init(&menu, &backend, &style, items, 2u));
 
+  width.mode = M3_MEASURE_UNSPECIFIED;
+  width.size = 0.0f;
+  height.mode = M3_MEASURE_UNSPECIFIED;
+  height.size = 0.0f;
+  M3_TEST_EXPECT(menu.widget.vtable->measure(NULL, width, height, &size),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      menu.widget.vtable->measure(menu.widget.ctx, width, height, NULL),
+      M3_ERR_INVALID_ARGUMENT);
+
   width.mode = 99u;
   width.size = 0.0f;
   height.mode = M3_MEASURE_UNSPECIFIED;
+  height.size = 0.0f;
+  M3_TEST_EXPECT(
+      menu.widget.vtable->measure(menu.widget.ctx, width, height, &size),
+      M3_ERR_INVALID_ARGUMENT);
+
+  width.mode = M3_MEASURE_EXACTLY;
+  width.size = 10.0f;
+  height.mode = 99u;
   height.size = 0.0f;
   M3_TEST_EXPECT(
       menu.widget.vtable->measure(menu.widget.ctx, width, height, &size),
@@ -635,6 +936,11 @@ static int test_menu_measure_layout(void) {
   M3_TEST_ASSERT(size.width == expected_width);
   M3_TEST_ASSERT(size.height == expected_height);
 
+  M3_TEST_OK(m3_menu_test_set_force_negative_panel(M3_TRUE));
+  M3_TEST_EXPECT(
+      menu.widget.vtable->measure(menu.widget.ctx, width, height, &size),
+      M3_ERR_RANGE);
+
   width.mode = M3_MEASURE_AT_MOST;
   width.size = 10.0f;
   height.mode = M3_MEASURE_AT_MOST;
@@ -655,6 +961,15 @@ static int test_menu_measure_layout(void) {
 
   bounds.x = 0.0f;
   bounds.y = 0.0f;
+  bounds.width = 100.0f;
+  bounds.height = 100.0f;
+  M3_TEST_EXPECT(menu.widget.vtable->layout(NULL, bounds),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(m3_menu_test_set_force_negative_panel(M3_TRUE));
+  M3_TEST_EXPECT(menu.widget.vtable->layout(menu.widget.ctx, bounds),
+                 M3_ERR_RANGE);
+  bounds.width = 100.0f;
+  bounds.height = 100.0f;
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   M3_TEST_EXPECT(menu.widget.vtable->layout(menu.widget.ctx, bounds),
@@ -975,6 +1290,15 @@ static int test_menu_events(void) {
 
   M3_TEST_OK(m3_menu_init(&menu, &backend, &style, items, 2u));
 
+  memset(&event, 0, sizeof(event));
+  handled = M3_FALSE;
+  M3_TEST_EXPECT(menu.widget.vtable->event(NULL, &event, &handled),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(menu.widget.vtable->event(menu.widget.ctx, NULL, &handled),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(menu.widget.vtable->event(menu.widget.ctx, &event, NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+
   bounds.x = 10.0f;
   bounds.y = 10.0f;
   bounds.width = 80.0f;
@@ -1020,6 +1344,19 @@ static int test_menu_events(void) {
   M3_TEST_ASSERT(handled == M3_TRUE);
   M3_TEST_ASSERT(action.last_action == M3_MENU_ACTION_SELECT);
   M3_TEST_ASSERT(action.last_index == 0u);
+
+  action.fail_next = 1;
+  test_make_pointer_event(&event, M3_INPUT_POINTER_DOWN,
+                          (m3_i32)(menu.menu_bounds.x + 1.0f),
+                          (m3_i32)(menu.menu_bounds.y + 1.0f));
+  handled = M3_FALSE;
+  M3_TEST_OK(menu.widget.vtable->event(menu.widget.ctx, &event, &handled));
+  test_make_pointer_event(&event, M3_INPUT_POINTER_UP,
+                          (m3_i32)(menu.menu_bounds.x + 1.0f),
+                          (m3_i32)(menu.menu_bounds.y + 1.0f));
+  handled = M3_FALSE;
+  M3_TEST_EXPECT(menu.widget.vtable->event(menu.widget.ctx, &event, &handled),
+                 M3_ERR_IO);
 
   test_make_pointer_event(&event, M3_INPUT_POINTER_DOWN,
                           (m3_i32)(menu.menu_bounds.x + 1.0f),
@@ -1222,6 +1559,16 @@ static int test_menu_paint(void) {
   M3_TEST_ASSERT(backend_state.last_text_color.r ==
                  menu.style.disabled_text_color.r);
 
+  backend_state.fail_draw = 1;
+  M3_TEST_EXPECT(menu.widget.vtable->paint(menu.widget.ctx, &ctx), M3_ERR_IO);
+  backend_state.fail_draw = 0;
+
+  items[1].utf8_label = NULL;
+  items[1].utf8_len = 0u;
+  M3_TEST_OK(menu.widget.vtable->paint(menu.widget.ctx, &ctx));
+  items[1].utf8_label = "Two";
+  items[1].utf8_len = 3u;
+
   menu.style.shadow.color.a = 0.5f;
   menu.style.shadow.layers = 1u;
   backend_state.push_clip_calls = 0;
@@ -1313,6 +1660,7 @@ static const M3GfxVTable g_test_gfx_vtable_no_draw = {
 
 int main(void) {
   M3_TEST_OK(test_menu_validation_helpers());
+  M3_TEST_OK(test_menu_style_init_failures());
   M3_TEST_OK(test_menu_init_and_setters());
   M3_TEST_OK(test_menu_measure_layout());
   M3_TEST_OK(test_menu_item_bounds());

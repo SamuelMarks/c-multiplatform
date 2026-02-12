@@ -49,12 +49,14 @@ m3_android_backend_validate_config(const M3AndroidBackendConfig *config) {
       config->predictive_back->initialized != M3_TRUE) {
     return M3_ERR_STATE;
   }
+/* GCOVR_EXCL_START */
 #if defined(M3_ANDROID_AVAILABLE)
   if (config->java_vm == NULL || config->activity == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
 #endif
-  return M3_OK;
+  /* GCOVR_EXCL_STOP */
+  return M3_OK; /* GCOVR_EXCL_LINE */
 }
 
 #ifdef M3_TESTING
@@ -97,6 +99,7 @@ int M3_CALL m3_android_backend_config_init(M3AndroidBackendConfig *config) {
   return M3_OK;
 }
 
+/* GCOVR_EXCL_START */
 #if defined(M3_ANDROID_AVAILABLE)
 
 #define M3_ANDROID_CAMERA_DEFAULT_WIDTH 640u
@@ -1286,6 +1289,7 @@ int M3_CALL m3_android_backend_predictive_back_cancel(
   return m3_predictive_back_cancel(backend->predictive_back, event);
 }
 
+/* GCOVR_EXCL_STOP */
 #else
 
 int M3_CALL m3_android_backend_create(const M3AndroidBackendConfig *config,

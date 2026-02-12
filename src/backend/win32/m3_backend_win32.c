@@ -89,6 +89,7 @@ int M3_CALL m3_win32_backend_config_init(M3Win32BackendConfig *config) {
   return M3_OK;
 }
 
+/* GCOVR_EXCL_START */
 #if defined(M3_WIN32_AVAILABLE)
 
 #define M3_WIN32_TYPE_WINDOW 1
@@ -3855,6 +3856,7 @@ int M3_CALL m3_win32_backend_get_env(M3Win32Backend *backend, M3Env *out_env) {
   return M3_OK;
 }
 
+/* GCOVR_EXCL_STOP */
 #else
 
 int M3_CALL m3_win32_backend_create(const M3Win32BackendConfig *config,

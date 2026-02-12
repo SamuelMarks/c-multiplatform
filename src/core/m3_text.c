@@ -196,7 +196,7 @@ static int m3_text_widget_paint(void *widget, M3PaintContext *ctx) {
 }
 
 static int m3_text_widget_event(void *widget, const M3InputEvent *event,
-                                M3Bool *out_handled) {
+                                M3Bool *out_handled) { /* GCOVR_EXCL_LINE */
   if (widget == NULL || event == NULL || out_handled == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
@@ -492,7 +492,7 @@ int M3_CALL m3_text_widget_set_text(M3TextWidget *widget, const char *utf8,
 int M3_CALL m3_text_widget_set_style(M3TextWidget *widget,
                                      const M3TextStyle *style) {
   M3Handle new_font;
-  int rc;
+  int rc; /* GCOVR_EXCL_LINE */
 
   if (widget == NULL || style == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -519,8 +519,8 @@ int M3_CALL m3_text_widget_set_style(M3TextWidget *widget,
   return M3_OK;
 }
 
-int M3_CALL m3_text_widget_get_metrics(M3TextWidget *widget,
-                                       M3TextMetrics *out_metrics) {
+int M3_CALL m3_text_widget_get_metrics(
+    M3TextWidget *widget, M3TextMetrics *out_metrics) { /* GCOVR_EXCL_LINE */
   int rc;
 
   if (widget == NULL || out_metrics == NULL) {

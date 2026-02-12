@@ -435,6 +435,10 @@ typedef struct PaintScenario {
   M3Path *path;
 } PaintScenario;
 
+typedef struct PathScenario {
+  M3Path *path;
+} PathScenario;
+
 static int test_widget_paint(void *ctx, M3PaintContext *paint_ctx) {
   PaintScenario *scenario;
   M3Rect rect;
@@ -766,6 +770,78 @@ static int test_widget_paint(void *ctx, M3PaintContext *paint_ctx) {
   default:
     return M3_ERR_UNKNOWN;
   }
+}
+
+static int test_widget_paint_path(void *ctx, M3PaintContext *paint_ctx) {
+  PathScenario *scenario;
+  M3Color color;
+
+  if (ctx == NULL || paint_ctx == NULL || paint_ctx->gfx == NULL ||
+      paint_ctx->gfx->vtable == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+
+  scenario = (PathScenario *)ctx;
+  color.r = 0.2f;
+  color.g = 0.3f;
+  color.b = 0.4f;
+  color.a = 1.0f;
+  return paint_ctx->gfx->vtable->draw_path(paint_ctx->gfx->ctx, scenario->path,
+                                           color);
+}
+
+static int test_record_draw_path_errors(void) {
+  M3RenderList list;
+  M3RenderNode node;
+  M3Widget widget;
+  M3WidgetVTable vtable;
+  M3Rect bounds;
+  PathScenario scenario;
+  M3Path path;
+  M3PathCmd cmds[1];
+
+  memset(&list, 0, sizeof(list));
+  memset(&path, 0, sizeof(path));
+  memset(&vtable, 0, sizeof(vtable));
+  vtable.paint = test_widget_paint_path;
+
+  bounds.x = 0.0f;
+  bounds.y = 0.0f;
+  bounds.width = 10.0f;
+  bounds.height = 10.0f;
+
+  scenario.path = &path;
+  widget.ctx = &scenario;
+  widget.vtable = &vtable;
+  widget.flags = 0;
+  widget.handle.id = 1u;
+  widget.handle.generation = 1u;
+
+  M3_TEST_OK(m3_render_list_init(&list, NULL, 1));
+  M3_TEST_OK(m3_render_node_init(&node, &widget, &bounds));
+  M3_TEST_EXPECT(m3_render_build(&node, &list, 1.0f), M3_ERR_STATE);
+  M3_TEST_OK(m3_render_list_shutdown(&list));
+
+  path.commands = cmds;
+  path.count = 2u;
+  path.capacity = 1u;
+  M3_TEST_OK(m3_render_list_init(&list, NULL, 1));
+  M3_TEST_OK(m3_render_node_init(&node, &widget, &bounds));
+  M3_TEST_EXPECT(m3_render_build(&node, &list, 1.0f), M3_ERR_STATE);
+  M3_TEST_OK(m3_render_list_shutdown(&list));
+
+  path.commands = NULL;
+  path.count = 0u;
+  path.capacity = 0u;
+  M3_TEST_OK(m3_path_init(&path, NULL, 1));
+  M3_TEST_OK(m3_path_move_to(&path, 0.0f, 0.0f));
+  M3_TEST_OK(m3_render_list_init(&list, NULL, 1));
+  M3_TEST_OK(m3_render_node_init(&node, &widget, &bounds));
+  M3_TEST_OK(m3_render_build(&node, &list, 1.0f));
+  M3_TEST_OK(m3_render_list_shutdown(&list));
+  M3_TEST_OK(m3_path_shutdown(&path));
+
+  return 0;
 }
 
 static int run_paint_scenario(int mode, int expected_rc) {
@@ -1652,6 +1728,9 @@ int main(void) {
     return 1;
   }
   if (run_paint_scenario(SCENARIO_RECORD_ERRORS, M3_OK)) {
+    return 1;
+  }
+  if (test_record_draw_path_errors() != 0) {
     return 1;
   }
 

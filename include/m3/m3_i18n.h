@@ -436,6 +436,15 @@ M3_API int M3_CALL m3_i18n_test_validate_date(const struct M3Date *date);
 M3_API int M3_CALL m3_i18n_test_validate_time(const struct M3Time *time);
 
 /**
+ * @brief Test wrapper for UTF-8 validation.
+ * @param data UTF-8 data pointer (may be NULL when length is 0).
+ * @param length Data length in bytes.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_validate_utf8(const char *data,
+                                              m3_usize length);
+
+/**
  * @brief Test wrapper for C-string length helper.
  * @param cstr Null-terminated string.
  * @param out_len Receives string length in bytes.
@@ -527,6 +536,104 @@ M3_API int M3_CALL m3_i18n_test_grow(M3I18n *i18n, m3_usize min_capacity);
  * @return M3_OK on success or a failure code.
  */
 M3_API int M3_CALL m3_i18n_test_set_cstr_limit(m3_usize max_len);
+
+/**
+ * @brief Force the pow10 helper to return an error once (testing only).
+ * @param enable M3_TRUE to force an error on the next call.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_force_pow10_error(M3Bool enable);
+
+/**
+ * @brief Force leap-year detection to return an error once (testing only).
+ * @param enable M3_TRUE to force an error on the next call.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_force_leap_error(M3Bool enable);
+
+/**
+ * @brief Force the days-in-month helper to hit the default branch once.
+ * @param enable M3_TRUE to force the default path on the next call.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_force_days_default(M3Bool enable);
+
+/**
+ * @brief Fail the ASCII lowercase helper after a number of calls.
+ * @param call_count Number of calls before failing (0 to disable).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_set_ascii_lower_fail_after(m3_u32 call_count);
+
+/**
+ * @brief Force UTF-8 validation to return an error once (testing only).
+ * @param enable M3_TRUE to force an error on the next call.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_force_utf8_error(M3Bool enable);
+
+/**
+ * @brief Force UTF-8 validation to return success once (testing only).
+ * @param enable M3_TRUE to force success on the next call.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_force_utf8_ok(M3Bool enable);
+
+/**
+ * @brief Force UTF-8 validation to return success for a number of calls.
+ * @param count Number of calls to force success for (0 to disable).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_force_utf8_ok_count(m3_u32 count);
+
+/**
+ * @brief Force config initialization to return an error once (testing only).
+ * @param enable M3_TRUE to force an error on the next call.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_force_config_init_error(M3Bool enable);
+
+/**
+ * @brief Test wrapper for en-US locale preset.
+ * @param out_locale Locale descriptor to initialize.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_locale_preset_en_us(M3I18nLocale *out_locale);
+
+/**
+ * @brief Test wrapper for en-GB locale preset.
+ * @param out_locale Locale descriptor to initialize.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_locale_preset_en_gb(M3I18nLocale *out_locale);
+
+/**
+ * @brief Test wrapper for fr-FR locale preset.
+ * @param out_locale Locale descriptor to initialize.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_locale_preset_fr_fr(M3I18nLocale *out_locale);
+
+/**
+ * @brief Test wrapper for de-DE locale preset.
+ * @param out_locale Locale descriptor to initialize.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_locale_preset_de_de(M3I18nLocale *out_locale);
+
+/**
+ * @brief Test wrapper for parsing translation tables.
+ * @param i18n I18N instance.
+ * @param data Table text data.
+ * @param size Size of the text buffer.
+ * @param clear_existing M3_TRUE to clear existing entries.
+ * @param overwrite M3_TRUE to overwrite existing keys.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_i18n_test_parse_table(M3I18n *i18n, const char *data,
+                                            m3_usize size,
+                                            M3Bool clear_existing,
+                                            M3Bool overwrite);
 #endif
 
 #ifdef __cplusplus

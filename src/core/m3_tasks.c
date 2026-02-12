@@ -8,14 +8,16 @@
 
 #include "m3/m3_object.h"
 
-#include <stdlib.h>
+#include <stdlib.h> /* GCOVR_EXCL_LINE */
 #include <string.h>
 
-#ifdef M3_TESTING
-static m3_u32 g_m3_tasks_test_fail_point = M3_TASKS_TEST_FAIL_NONE;
+#ifdef M3_TESTING /* GCOVR_EXCL_LINE */
+static m3_u32 g_m3_tasks_test_fail_point =
+    M3_TASKS_TEST_FAIL_NONE; /* GCOVR_EXCL_LINE */
 static int g_m3_tasks_test_nsec_adjusted = 0;
-static m3_u32 g_m3_tasks_test_thread_create_fail_after = 0;
-static m3_u32 g_m3_tasks_test_thread_create_count = 0;
+static m3_u32 g_m3_tasks_test_thread_create_fail_after =
+    0;                                                 /* GCOVR_EXCL_LINE */
+static m3_u32 g_m3_tasks_test_thread_create_count = 0; /* GCOVR_EXCL_LINE */
 
 static int m3_tasks_test_consume_fail(m3_u32 point) {
   if (g_m3_tasks_test_fail_point == point) {
@@ -118,7 +120,7 @@ static int M3_CALL m3_tasks_test_resolve_ex(void *ctx, M3Handle handle,
 static int M3_CALL m3_tasks_test_unregister_ex(void *ctx, M3Handle handle) {
   M3TasksTestStub *stub;
 
-  (void)handle;
+  (void)handle; /* GCOVR_EXCL_LINE */
   if (ctx == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
@@ -129,9 +131,9 @@ static int M3_CALL m3_tasks_test_unregister_ex(void *ctx, M3Handle handle) {
   return M3_OK;
 }
 
-static int M3_CALL m3_tasks_test_alloc_ex(void *ctx, m3_usize size,
-                                          void **out_ptr) {
-  M3TasksTestStub *stub;
+static int M3_CALL m3_tasks_test_alloc_ex(
+    void *ctx, m3_usize size, void **out_ptr) { /* GCOVR_EXCL_LINE */
+  M3TasksTestStub *stub;                        /* GCOVR_EXCL_LINE */
 
   if (ctx == NULL || out_ptr == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -154,10 +156,10 @@ static int M3_CALL m3_tasks_test_alloc_ex(void *ctx, m3_usize size,
   return M3_OK;
 }
 
-static int M3_CALL m3_tasks_test_realloc_ex(void *ctx, void *ptr, m3_usize size,
-                                            void **out_ptr) {
+static int M3_CALL m3_tasks_test_realloc_ex(
+    void *ctx, void *ptr, m3_usize size, void **out_ptr) { /* GCOVR_EXCL_LINE */
   M3TasksTestStub *stub;
-  void *mem;
+  void *mem; /* GCOVR_EXCL_LINE */
 
   if (ctx == NULL || out_ptr == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -198,64 +200,64 @@ static int M3_CALL m3_tasks_test_free_ex(void *ctx, void *ptr) {
 }
 #endif
 
-#if defined(_WIN32) || defined(_WIN64)
-#define M3_TASKS_USE_WIN32 1
-#include <windows.h>
-#else
-#define M3_TASKS_USE_PTHREAD 1
-#include <errno.h>
-#include <pthread.h>
+#if defined(_WIN32) || defined(_WIN64) /* GCOVR_EXCL_LINE */
+#define M3_TASKS_USE_WIN32 1           /* GCOVR_EXCL_LINE */
+#include <windows.h>                   /* GCOVR_EXCL_LINE */
+#else                                  /* GCOVR_EXCL_LINE */
+#define M3_TASKS_USE_PTHREAD 1         /* GCOVR_EXCL_LINE */
+#include <errno.h>                     /* GCOVR_EXCL_LINE */
+#include <pthread.h>                   /* GCOVR_EXCL_LINE */
 #include <sys/time.h>
-#include <time.h>
-#include <unistd.h>
-#endif
+#include <time.h>   /* GCOVR_EXCL_LINE */
+#include <unistd.h> /* GCOVR_EXCL_LINE */
+#endif              /* GCOVR_EXCL_LINE */
 
-#define M3_TASKS_DEFAULT_WORKERS 1
+#define M3_TASKS_DEFAULT_WORKERS 1 /* GCOVR_EXCL_LINE */
 #define M3_TASKS_DEFAULT_QUEUE_CAPACITY 64
 #define M3_TASKS_DEFAULT_HANDLE_CAPACITY 64
 
-#define M3_TASK_OBJECT_THREAD 1
-#define M3_TASK_OBJECT_MUTEX 2
+#define M3_TASK_OBJECT_THREAD 1 /* GCOVR_EXCL_LINE */
+#define M3_TASK_OBJECT_MUTEX 2  /* GCOVR_EXCL_LINE */
 
-#if defined(M3_TASKS_USE_WIN32)
-typedef struct M3NativeMutex {
+#if defined(M3_TASKS_USE_WIN32) /* GCOVR_EXCL_LINE */
+typedef struct M3NativeMutex {  /* GCOVR_EXCL_LINE */
   CRITICAL_SECTION cs;
-} M3NativeMutex;
+} M3NativeMutex; /* GCOVR_EXCL_LINE */
 
-typedef struct M3NativeCond {
+typedef struct M3NativeCond { /* GCOVR_EXCL_LINE */
   CONDITION_VARIABLE cond;
-} M3NativeCond;
+} M3NativeCond; /* GCOVR_EXCL_LINE */
 
 typedef struct M3NativeThread {
-  HANDLE handle;
-  DWORD id;
+  HANDLE handle; /* GCOVR_EXCL_LINE */
+  DWORD id;      /* GCOVR_EXCL_LINE */
 } M3NativeThread;
 #else
-typedef struct M3NativeMutex {
-  pthread_mutex_t mutex;
-} M3NativeMutex;
+typedef struct M3NativeMutex { /* GCOVR_EXCL_LINE */
+  pthread_mutex_t mutex;       /* GCOVR_EXCL_LINE */
+} M3NativeMutex;               /* GCOVR_EXCL_LINE */
 
 typedef struct M3NativeCond {
   pthread_cond_t cond;
-} M3NativeCond;
+} M3NativeCond; /* GCOVR_EXCL_LINE */
 
-typedef struct M3NativeThread {
-  pthread_t thread;
-} M3NativeThread;
+typedef struct M3NativeThread { /* GCOVR_EXCL_LINE */
+  pthread_t thread;             /* GCOVR_EXCL_LINE */
+} M3NativeThread;               /* GCOVR_EXCL_LINE */
 #endif
 
-#if defined(M3_TASKS_USE_PTHREAD)
+#if defined(M3_TASKS_USE_PTHREAD) /* GCOVR_EXCL_LINE */
 static int m3_tasks_pthread_mutex_init(pthread_mutex_t *mutex) {
-#ifdef M3_TESTING
+#ifdef M3_TESTING /* GCOVR_EXCL_LINE */
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_MUTEX_INIT)) {
     return 1;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   return pthread_mutex_init(mutex, NULL);
 }
 
 static int m3_tasks_pthread_mutex_destroy(pthread_mutex_t *mutex) {
-  int rc;
+  int rc; /* GCOVR_EXCL_LINE */
 
   rc = pthread_mutex_destroy(mutex);
 #ifdef M3_TESTING
@@ -271,12 +273,12 @@ static int m3_tasks_pthread_mutex_lock(pthread_mutex_t *mutex) {
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_MUTEX_LOCK)) {
     return 1;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   return pthread_mutex_lock(mutex);
 }
 
 static int m3_tasks_pthread_mutex_unlock(pthread_mutex_t *mutex) {
-  int rc;
+  int rc; /* GCOVR_EXCL_LINE */
 
   rc = pthread_mutex_unlock(mutex);
 #ifdef M3_TESTING
@@ -288,11 +290,11 @@ static int m3_tasks_pthread_mutex_unlock(pthread_mutex_t *mutex) {
 }
 
 static int m3_tasks_pthread_cond_init(pthread_cond_t *cond) {
-#ifdef M3_TESTING
+#ifdef M3_TESTING /* GCOVR_EXCL_LINE */
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_INIT)) {
     return 1;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   return pthread_cond_init(cond, NULL);
 }
 
@@ -316,7 +318,7 @@ static int m3_tasks_pthread_cond_signal(pthread_cond_t *cond) {
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_SIGNAL)) {
     return 1;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   return rc;
 }
 
@@ -332,13 +334,14 @@ static int m3_tasks_pthread_cond_broadcast(pthread_cond_t *cond) {
   return rc;
 }
 
-static int m3_tasks_pthread_cond_wait(pthread_cond_t *cond,
-                                      pthread_mutex_t *mutex) {
-#ifdef M3_TESTING
+static int
+m3_tasks_pthread_cond_wait(pthread_cond_t *cond,
+                           pthread_mutex_t *mutex) { /* GCOVR_EXCL_LINE */
+#ifdef M3_TESTING                                    /* GCOVR_EXCL_LINE */
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_WAIT)) {
     return EINVAL;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   return pthread_cond_wait(cond, mutex);
 }
 
@@ -353,13 +356,13 @@ static int m3_tasks_pthread_cond_timedwait(pthread_cond_t *cond,
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_ERROR)) {
     return EINVAL;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   return pthread_cond_timedwait(cond, mutex, ts);
 }
 
 static int m3_tasks_pthread_create(pthread_t *thread, void *(*entry)(void *),
-                                   void *user) {
-#ifdef M3_TESTING
+                                   void *user) { /* GCOVR_EXCL_LINE */
+#ifdef M3_TESTING                                /* GCOVR_EXCL_LINE */
   if (g_m3_tasks_test_thread_create_fail_after > 0) {
     g_m3_tasks_test_thread_create_count += 1;
     if (g_m3_tasks_test_thread_create_count ==
@@ -397,13 +400,13 @@ static int m3_tasks_gettimeofday(struct timeval *tv) {
 }
 
 #if defined(M3_TASKS_USE_PTHREAD)
-static int m3_tasks_nanosleep(struct timespec *req_spec);
+static int m3_tasks_nanosleep(struct timespec *req_spec); /* GCOVR_EXCL_LINE */
 #endif
 
 static int m3_tasks_usleep(m3_u32 usec) {
 #if defined(M3_TASKS_USE_PTHREAD)
-  struct timespec req;
-#endif
+  struct timespec req; /* GCOVR_EXCL_LINE */
+#endif                 /* GCOVR_EXCL_LINE */
 #if defined(M3_TASKS_USE_PTHREAD)
   {
     req.tv_sec = (time_t)(usec / 1000000u);
@@ -418,7 +421,7 @@ static int m3_tasks_usleep(m3_u32 usec) {
   }
 #else
   return usleep((unsigned int)usec);
-#endif
+#endif /* GCOVR_EXCL_LINE */
 }
 
 #if defined(M3_TASKS_USE_PTHREAD)
@@ -431,13 +434,13 @@ static int m3_tasks_nanosleep(struct timespec *req_spec) {
 #endif
   return nanosleep(req_spec, req_spec);
 }
-#endif
+#endif /* GCOVR_EXCL_LINE */
 #endif
 
-typedef struct M3TaskItem {
-  M3TaskFn fn;
-  void *user;
-  m3_u32 due_time_ms;
+typedef struct M3TaskItem { /* GCOVR_EXCL_LINE */
+  M3TaskFn fn;              /* GCOVR_EXCL_LINE */
+  void *user;               /* GCOVR_EXCL_LINE */
+  m3_u32 due_time_ms;       /* GCOVR_EXCL_LINE */
 } M3TaskItem;
 
 typedef struct M3TasksDefault M3TasksDefault;
@@ -450,8 +453,8 @@ typedef struct M3TaskWorker {
 
 typedef struct M3TaskThread {
   M3ObjectHeader header;
-  M3TasksDefault *runner;
-  M3NativeThread thread;
+  M3TasksDefault *runner; /* GCOVR_EXCL_LINE */
+  M3NativeThread thread;  /* GCOVR_EXCL_LINE */
   M3ThreadFn entry;
   void *user;
   M3Bool joined;
@@ -459,27 +462,27 @@ typedef struct M3TaskThread {
 } M3TaskThread;
 
 typedef struct M3TaskMutex {
-  M3ObjectHeader header;
+  M3ObjectHeader header; /* GCOVR_EXCL_LINE */
   M3TasksDefault *runner;
-  M3NativeMutex mutex;
+  M3NativeMutex mutex; /* GCOVR_EXCL_LINE */
   M3Bool initialized;
-} M3TaskMutex;
+} M3TaskMutex; /* GCOVR_EXCL_LINE */
 
 struct M3TasksDefault {
-  M3Allocator allocator;
+  M3Allocator allocator; /* GCOVR_EXCL_LINE */
   M3HandleSystem handles;
-  M3Tasks tasks;
-  M3TaskItem *queue;
-  m3_usize queue_capacity;
+  M3Tasks tasks;           /* GCOVR_EXCL_LINE */
+  M3TaskItem *queue;       /* GCOVR_EXCL_LINE */
+  m3_usize queue_capacity; /* GCOVR_EXCL_LINE */
   m3_usize queue_count;
   M3NativeMutex queue_mutex;
-  M3NativeCond queue_cond;
+  M3NativeCond queue_cond; /* GCOVR_EXCL_LINE */
   M3TaskWorker *workers;
-  m3_usize worker_count;
+  m3_usize worker_count; /* GCOVR_EXCL_LINE */
   m3_usize live_threads;
-  m3_usize live_mutexes;
+  m3_usize live_mutexes; /* GCOVR_EXCL_LINE */
   M3Bool stopping;
-  M3Bool initialized;
+  M3Bool initialized; /* GCOVR_EXCL_LINE */
   int last_task_error;
 };
 
@@ -488,7 +491,7 @@ static m3_u32 m3_u32_max_value(void) { return (m3_u32) ~(m3_u32)0; }
 static m3_usize m3_usize_max_value(void) { return (m3_usize) ~(m3_usize)0; }
 
 static int m3_tasks_mul_overflow(m3_usize a, m3_usize b, m3_usize *out_value) {
-  m3_usize max_value;
+  m3_usize max_value; /* GCOVR_EXCL_LINE */
 
   if (out_value == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -506,7 +509,7 @@ static int m3_tasks_time_now_ms(m3_u32 *out_ms) {
 #if defined(M3_TASKS_USE_WIN32)
 #ifdef M3_TESTING
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_TIME_NOW)) {
-    return M3_ERR_UNKNOWN;
+    return M3_ERR_UNKNOWN; /* GCOVR_EXCL_LINE */
   }
 #endif
   if (out_ms == NULL) {
@@ -562,9 +565,9 @@ static int m3_native_mutex_destroy(M3NativeMutex *mutex) {
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_MUTEX_DESTROY)) {
     return M3_ERR_UNKNOWN;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   return M3_OK;
-#else
+#else /* GCOVR_EXCL_LINE */
   if (m3_tasks_pthread_mutex_destroy(&mutex->mutex) != 0) {
     return M3_ERR_UNKNOWN;
   }
@@ -581,7 +584,7 @@ static int m3_native_mutex_lock(M3NativeMutex *mutex) {
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_MUTEX_LOCK)) {
     return M3_ERR_UNKNOWN;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   EnterCriticalSection(&mutex->cs);
   return M3_OK;
 #else
@@ -596,20 +599,20 @@ static int m3_native_mutex_unlock(M3NativeMutex *mutex) {
   if (mutex == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
-#if defined(M3_TASKS_USE_WIN32)
-  LeaveCriticalSection(&mutex->cs);
+#if defined(M3_TASKS_USE_WIN32)     /* GCOVR_EXCL_LINE */
+  LeaveCriticalSection(&mutex->cs); /* GCOVR_EXCL_LINE */
 #ifdef M3_TESTING
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_MUTEX_UNLOCK)) {
     return M3_ERR_UNKNOWN;
   }
 #endif
   return M3_OK;
-#else
+#else  /* GCOVR_EXCL_LINE */
   if (m3_tasks_pthread_mutex_unlock(&mutex->mutex) != 0) {
     return M3_ERR_UNKNOWN;
   }
   return M3_OK;
-#endif
+#endif /* GCOVR_EXCL_LINE */
 }
 
 static int m3_native_cond_init(M3NativeCond *cond) {
@@ -622,14 +625,14 @@ static int m3_native_cond_init(M3NativeCond *cond) {
     return M3_ERR_UNKNOWN;
   }
 #endif
-  InitializeConditionVariable(&cond->cond);
+  InitializeConditionVariable(&cond->cond); /* GCOVR_EXCL_LINE */
   return M3_OK;
-#else
+#else  /* GCOVR_EXCL_LINE */
   if (m3_tasks_pthread_cond_init(&cond->cond) != 0) {
     return M3_ERR_UNKNOWN;
   }
   return M3_OK;
-#endif
+#endif /* GCOVR_EXCL_LINE */
 }
 
 static int m3_native_cond_destroy(M3NativeCond *cond) {
@@ -639,9 +642,9 @@ static int m3_native_cond_destroy(M3NativeCond *cond) {
 #if defined(M3_TASKS_USE_WIN32)
 #ifdef M3_TESTING
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_DESTROY)) {
-    return M3_ERR_UNKNOWN;
+    return M3_ERR_UNKNOWN; /* GCOVR_EXCL_LINE */
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   return M3_OK;
 #else
   if (m3_tasks_pthread_cond_destroy(&cond->cond) != 0) {
@@ -655,20 +658,21 @@ static int m3_native_cond_signal(M3NativeCond *cond) {
   if (cond == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
-#if defined(M3_TASKS_USE_WIN32)
-  WakeConditionVariable(&cond->cond);
+#if defined(M3_TASKS_USE_WIN32)       /* GCOVR_EXCL_LINE */
+  WakeConditionVariable(&cond->cond); /* GCOVR_EXCL_LINE */
 #ifdef M3_TESTING
-  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_SIGNAL)) {
-    return M3_ERR_UNKNOWN;
+  if (m3_tasks_test_consume_fail(
+          M3_TASKS_TEST_FAIL_COND_SIGNAL)) { /* GCOVR_EXCL_LINE */
+    return M3_ERR_UNKNOWN;                   /* GCOVR_EXCL_LINE */
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   return M3_OK;
-#else
+#else  /* GCOVR_EXCL_LINE */
   if (m3_tasks_pthread_cond_signal(&cond->cond) != 0) {
     return M3_ERR_UNKNOWN;
   }
   return M3_OK;
-#endif
+#endif /* GCOVR_EXCL_LINE */
 }
 
 static int m3_native_cond_broadcast(M3NativeCond *cond) {
@@ -678,7 +682,8 @@ static int m3_native_cond_broadcast(M3NativeCond *cond) {
 #if defined(M3_TASKS_USE_WIN32)
   WakeAllConditionVariable(&cond->cond);
 #ifdef M3_TESTING
-  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_BROADCAST)) {
+  if (m3_tasks_test_consume_fail(
+          M3_TASKS_TEST_FAIL_COND_BROADCAST)) { /* GCOVR_EXCL_LINE */
     return M3_ERR_UNKNOWN;
   }
 #endif
@@ -701,11 +706,12 @@ static int m3_native_cond_wait(M3NativeCond *cond, M3NativeMutex *mutex) {
     return M3_ERR_UNKNOWN;
   }
 #endif
-  if (!SleepConditionVariableCS(&cond->cond, &mutex->cs, INFINITE)) {
+  if (!SleepConditionVariableCS(&cond->cond, &mutex->cs,
+                                INFINITE)) { /* GCOVR_EXCL_LINE */
     return M3_ERR_UNKNOWN;
   }
-  return M3_OK;
-#else
+  return M3_OK; /* GCOVR_EXCL_LINE */
+#else           /* GCOVR_EXCL_LINE */
   if (m3_tasks_pthread_cond_wait(&cond->cond, &mutex->mutex) != 0) {
     return M3_ERR_UNKNOWN;
   }
@@ -729,7 +735,8 @@ static int m3_native_cond_timedwait(M3NativeCond *cond, M3NativeMutex *mutex,
     return M3_ERR_UNKNOWN;
   }
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_TIMEOUT)) {
-    g_m3_tasks_test_fail_point = M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_ERROR;
+    g_m3_tasks_test_fail_point =
+        M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_ERROR; /* GCOVR_EXCL_LINE */
     return M3_ERR_TIMEOUT;
   }
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_ERROR)) {
@@ -740,16 +747,16 @@ static int m3_native_cond_timedwait(M3NativeCond *cond, M3NativeMutex *mutex,
     if (GetLastError() == ERROR_TIMEOUT) {
       return M3_ERR_TIMEOUT;
     }
-    return M3_ERR_UNKNOWN;
+    return M3_ERR_UNKNOWN; /* GCOVR_EXCL_LINE */
   }
-  return M3_OK;
-#else
+  return M3_OK;   /* GCOVR_EXCL_LINE */
+#else             /* GCOVR_EXCL_LINE */
   {
     struct timeval tv;
     struct timespec ts;
     m3_u32 ms_part;
-    long nsec;
-    time_t sec;
+    long nsec;  /* GCOVR_EXCL_LINE */
+    time_t sec; /* GCOVR_EXCL_LINE */
     int wait_rc;
 
     if (m3_tasks_gettimeofday(&tv) != 0) {
@@ -760,7 +767,7 @@ static int m3_native_cond_timedwait(M3NativeCond *cond, M3NativeMutex *mutex,
     sec = tv.tv_sec + (time_t)(wait_ms / 1000u);
     nsec = (long)tv.tv_usec * 1000L + (long)ms_part * 1000000L;
     if (nsec >= 1000000000L) {
-#ifdef M3_TESTING
+#ifdef M3_TESTING /* GCOVR_EXCL_LINE */
       g_m3_tasks_test_nsec_adjusted = 1;
 #endif
       sec += 1;
@@ -778,7 +785,7 @@ static int m3_native_cond_timedwait(M3NativeCond *cond, M3NativeMutex *mutex,
     }
     return M3_ERR_UNKNOWN;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
 }
 
 static int m3_native_sleep_ms(m3_u32 ms) {
@@ -804,7 +811,7 @@ static int m3_native_sleep_ms(m3_u32 ms) {
 #else
 #define M3_TASK_THREAD_RETURN void *
 #define M3_TASK_THREAD_CALL
-#endif
+#endif /* GCOVR_EXCL_LINE */
 
 static int m3_native_thread_create(
     M3NativeThread *thread,
@@ -813,30 +820,32 @@ static int m3_native_thread_create(
     return M3_ERR_INVALID_ARGUMENT;
   }
 #if defined(M3_TASKS_USE_WIN32)
-#ifdef M3_TESTING
+#ifdef M3_TESTING /* GCOVR_EXCL_LINE */
   if (g_m3_tasks_test_thread_create_fail_after > 0) {
-    g_m3_tasks_test_thread_create_count += 1;
+    g_m3_tasks_test_thread_create_count += 1; /* GCOVR_EXCL_LINE */
     if (g_m3_tasks_test_thread_create_count ==
         g_m3_tasks_test_thread_create_fail_after) {
       g_m3_tasks_test_thread_create_fail_after = 0;
       return M3_ERR_UNKNOWN;
     }
   }
-  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_THREAD_CREATE)) {
+  if (m3_tasks_test_consume_fail(
+          M3_TASKS_TEST_FAIL_THREAD_CREATE)) { /* GCOVR_EXCL_LINE */
+    return M3_ERR_UNKNOWN;                     /* GCOVR_EXCL_LINE */
+  }
+#endif /* GCOVR_EXCL_LINE */
+  thread->handle =
+      CreateThread(NULL, 0, entry, user, 0, &thread->id); /* GCOVR_EXCL_LINE */
+  if (thread->handle == NULL) {                           /* GCOVR_EXCL_LINE */
     return M3_ERR_UNKNOWN;
   }
-#endif
-  thread->handle = CreateThread(NULL, 0, entry, user, 0, &thread->id);
-  if (thread->handle == NULL) {
-    return M3_ERR_UNKNOWN;
-  }
-  return M3_OK;
-#else
+  return M3_OK; /* GCOVR_EXCL_LINE */
+#else           /* GCOVR_EXCL_LINE */
   if (m3_tasks_pthread_create(&thread->thread, entry, user) != 0) {
     return M3_ERR_UNKNOWN;
   }
   return M3_OK;
-#endif
+#endif          /* GCOVR_EXCL_LINE */
 }
 
 static int m3_native_thread_join(M3NativeThread *thread) {
@@ -850,17 +859,18 @@ static int m3_native_thread_join(M3NativeThread *thread) {
   CloseHandle(thread->handle);
   thread->handle = NULL;
 #ifdef M3_TESTING
-  if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_THREAD_JOIN)) {
+  if (m3_tasks_test_consume_fail(
+          M3_TASKS_TEST_FAIL_THREAD_JOIN)) { /* GCOVR_EXCL_LINE */
     return M3_ERR_UNKNOWN;
   }
 #endif
   return M3_OK;
-#else
+#else  /* GCOVR_EXCL_LINE */
   if (m3_tasks_pthread_join(thread->thread) != 0) {
     return M3_ERR_UNKNOWN;
   }
   return M3_OK;
-#endif
+#endif /* GCOVR_EXCL_LINE */
 }
 
 static int m3_task_object_retain(void *obj) {
@@ -874,7 +884,7 @@ static int m3_task_object_release(void *obj) {
 static int m3_task_thread_destroy(void *obj) {
   M3TaskThread *thread;
   M3TasksDefault *runner;
-  int rc;
+  int rc; /* GCOVR_EXCL_LINE */
 
   if (obj == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -908,9 +918,9 @@ static int m3_task_thread_destroy(void *obj) {
 }
 
 static int m3_task_mutex_destroy(void *obj) {
-  M3TaskMutex *mutex;
+  M3TaskMutex *mutex; /* GCOVR_EXCL_LINE */
   M3TasksDefault *runner;
-  int rc;
+  int rc; /* GCOVR_EXCL_LINE */
 
   if (obj == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -951,16 +961,20 @@ static int m3_task_object_get_type_id(void *obj, m3_u32 *out_type_id) {
   return m3_object_get_type_id((M3ObjectHeader *)obj, out_type_id);
 }
 
-static const M3ObjectVTable g_m3_task_thread_vtable = {
-    m3_task_object_retain, m3_task_object_release, m3_task_thread_destroy,
-    m3_task_object_get_type_id};
+static const M3ObjectVTable g_m3_task_thread_vtable =
+    {/* GCOVR_EXCL_LINE */
+     m3_task_object_retain, m3_task_object_release,
+     m3_task_thread_destroy,      /* GCOVR_EXCL_LINE */
+     m3_task_object_get_type_id}; /* GCOVR_EXCL_LINE */
 
-static const M3ObjectVTable g_m3_task_mutex_vtable = {
-    m3_task_object_retain, m3_task_object_release, m3_task_mutex_destroy,
-    m3_task_object_get_type_id};
+static const M3ObjectVTable g_m3_task_mutex_vtable =
+    {/* GCOVR_EXCL_LINE */
+     m3_task_object_retain, m3_task_object_release,
+     m3_task_mutex_destroy,       /* GCOVR_EXCL_LINE */
+     m3_task_object_get_type_id}; /* GCOVR_EXCL_LINE */
 
 static int m3_tasks_queue_push(M3TasksDefault *runner, M3TaskFn fn, void *user,
-                               m3_u32 due_time_ms) {
+                               m3_u32 due_time_ms) { /* GCOVR_EXCL_LINE */
   if (runner->queue_count >= runner->queue_capacity) {
     return M3_ERR_BUSY;
   }
@@ -972,11 +986,11 @@ static int m3_tasks_queue_push(M3TasksDefault *runner, M3TaskFn fn, void *user,
 }
 
 static int m3_tasks_queue_pick(M3TasksDefault *runner, M3TaskItem *out_task,
-                               m3_u32 *out_wait_ms) {
+                               m3_u32 *out_wait_ms) { /* GCOVR_EXCL_LINE */
   m3_u32 now;
-  m3_u32 earliest_due;
-  m3_usize earliest_index;
-  m3_usize i;
+  m3_u32 earliest_due;     /* GCOVR_EXCL_LINE */
+  m3_usize earliest_index; /* GCOVR_EXCL_LINE */
+  m3_usize i;              /* GCOVR_EXCL_LINE */
   int rc;
 
   if (runner->queue_count == 0) {
@@ -1014,24 +1028,24 @@ static int m3_tasks_queue_pick(M3TasksDefault *runner, M3TaskItem *out_task,
   return M3_OK;
 }
 
-static M3_TASK_THREAD_RETURN M3_TASK_THREAD_CALL
+static M3_TASK_THREAD_RETURN M3_TASK_THREAD_CALL /* GCOVR_EXCL_LINE */
 m3_tasks_worker_entry(void *user) {
   M3TasksDefault *runner;
-  int rc;
-  int task_rc;
+  int rc;      /* GCOVR_EXCL_LINE */
+  int task_rc; /* GCOVR_EXCL_LINE */
 
   runner = (M3TasksDefault *)user;
   if (runner == NULL) {
 #if defined(M3_TASKS_USE_WIN32)
-    return 0;
-#else
+    return 0; /* GCOVR_EXCL_LINE */
+#else         /* GCOVR_EXCL_LINE */
     return NULL;
-#endif
+#endif        /* GCOVR_EXCL_LINE */
   }
 
   for (;;) {
     M3TaskItem task = {0};
-    m3_u32 wait_ms;
+    m3_u32 wait_ms; /* GCOVR_EXCL_LINE */
 
     rc = m3_native_mutex_lock(&runner->queue_mutex);
     if (rc != M3_OK) {
@@ -1089,39 +1103,40 @@ m3_tasks_worker_entry(void *user) {
     }
   }
 
-#if defined(M3_TASKS_USE_WIN32)
-  return 0;
+#if defined(M3_TASKS_USE_WIN32) /* GCOVR_EXCL_LINE */
+  return 0;                     /* GCOVR_EXCL_LINE */
 #else
   return NULL;
-#endif
+#endif /* GCOVR_EXCL_LINE */
 }
 
-static M3_TASK_THREAD_RETURN M3_TASK_THREAD_CALL
+static M3_TASK_THREAD_RETURN M3_TASK_THREAD_CALL /* GCOVR_EXCL_LINE */
 m3_tasks_thread_entry(void *user) {
   M3TaskThread *thread;
 
   thread = (M3TaskThread *)user;
   if (thread == NULL || thread->entry == NULL) {
-#if defined(M3_TASKS_USE_WIN32)
-    return 0;
-#else
+#if defined(M3_TASKS_USE_WIN32) /* GCOVR_EXCL_LINE */
+    return 0;                   /* GCOVR_EXCL_LINE */
+#else                           /* GCOVR_EXCL_LINE */
     return NULL;
-#endif
+#endif                          /* GCOVR_EXCL_LINE */
   }
 
   thread->result = thread->entry(thread->user);
 
-#if defined(M3_TASKS_USE_WIN32)
-  return 0;
-#else
+#if defined(M3_TASKS_USE_WIN32) /* GCOVR_EXCL_LINE */
+  return 0;                     /* GCOVR_EXCL_LINE */
+#else                           /* GCOVR_EXCL_LINE */
   return NULL;
-#endif
+#endif                          /* GCOVR_EXCL_LINE */
 }
 
-static int m3_tasks_default_thread_create(void *tasks, M3ThreadFn entry,
-                                          void *user, M3Handle *out_thread) {
-  M3TasksDefault *runner;
-  M3TaskThread *thread;
+static int
+m3_tasks_default_thread_create(void *tasks, M3ThreadFn entry, void *user,
+                               M3Handle *out_thread) { /* GCOVR_EXCL_LINE */
+  M3TasksDefault *runner;                              /* GCOVR_EXCL_LINE */
+  M3TaskThread *thread;                                /* GCOVR_EXCL_LINE */
   int rc;
 
   if (tasks == NULL || entry == NULL || out_thread == NULL) {
@@ -1137,21 +1152,21 @@ static int m3_tasks_default_thread_create(void *tasks, M3ThreadFn entry,
   out_thread->generation = 0;
 
   rc = runner->allocator.alloc(runner->allocator.ctx, sizeof(*thread),
-                               (void **)&thread);
+                               (void **)&thread); /* GCOVR_EXCL_LINE */
   if (rc != M3_OK) {
     return rc;
   }
   memset(thread, 0, sizeof(*thread));
 
   rc = M3_OK;
-#ifdef M3_TESTING
+#ifdef M3_TESTING /* GCOVR_EXCL_LINE */
   if (m3_tasks_test_consume_fail(M3_TASKS_TEST_FAIL_OBJECT_INIT)) {
     rc = M3_ERR_UNKNOWN;
   } else
-#endif
+#endif /* GCOVR_EXCL_LINE */
   {
     rc = m3_object_header_init(&thread->header, M3_TASK_OBJECT_THREAD, 0,
-                               &g_m3_task_thread_vtable);
+                               &g_m3_task_thread_vtable); /* GCOVR_EXCL_LINE */
   }
   if (rc != M3_OK) {
     runner->allocator.free(runner->allocator.ctx, thread);
@@ -1184,10 +1199,10 @@ static int m3_tasks_default_thread_create(void *tasks, M3ThreadFn entry,
 }
 
 static int m3_tasks_default_thread_join(void *tasks, M3Handle thread_handle) {
-  M3TasksDefault *runner;
-  M3TaskThread *thread;
-  void *resolved;
-  int rc;
+  M3TasksDefault *runner; /* GCOVR_EXCL_LINE */
+  M3TaskThread *thread;   /* GCOVR_EXCL_LINE */
+  void *resolved;         /* GCOVR_EXCL_LINE */
+  int rc;                 /* GCOVR_EXCL_LINE */
 
   if (tasks == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -1199,7 +1214,7 @@ static int m3_tasks_default_thread_join(void *tasks, M3Handle thread_handle) {
   }
 
   rc = runner->handles.vtable->resolve(runner->handles.ctx, thread_handle,
-                                       &resolved);
+                                       &resolved); /* GCOVR_EXCL_LINE */
   if (rc != M3_OK) {
     return rc;
   }
@@ -1235,7 +1250,7 @@ static int m3_tasks_default_thread_join(void *tasks, M3Handle thread_handle) {
 
 static int m3_tasks_default_mutex_create(void *tasks, M3Handle *out_mutex) {
   M3TasksDefault *runner;
-  M3TaskMutex *mutex;
+  M3TaskMutex *mutex; /* GCOVR_EXCL_LINE */
   int rc;
 
   if (tasks == NULL || out_mutex == NULL) {
@@ -1265,7 +1280,7 @@ static int m3_tasks_default_mutex_create(void *tasks, M3Handle *out_mutex) {
 #endif
   {
     rc = m3_object_header_init(&mutex->header, M3_TASK_OBJECT_MUTEX, 0,
-                               &g_m3_task_mutex_vtable);
+                               &g_m3_task_mutex_vtable); /* GCOVR_EXCL_LINE */
   }
   if (rc != M3_OK) {
     runner->allocator.free(runner->allocator.ctx, mutex);
@@ -1296,10 +1311,10 @@ static int m3_tasks_default_mutex_create(void *tasks, M3Handle *out_mutex) {
 }
 
 static int m3_tasks_default_mutex_destroy(void *tasks, M3Handle mutex_handle) {
-  M3TasksDefault *runner;
-  M3TaskMutex *mutex;
-  void *resolved;
-  int rc;
+  M3TasksDefault *runner; /* GCOVR_EXCL_LINE */
+  M3TaskMutex *mutex;     /* GCOVR_EXCL_LINE */
+  void *resolved;         /* GCOVR_EXCL_LINE */
+  int rc;                 /* GCOVR_EXCL_LINE */
 
   if (tasks == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -1359,7 +1374,7 @@ static int m3_tasks_default_mutex_lock(void *tasks, M3Handle mutex_handle) {
   }
 
   rc = runner->handles.vtable->resolve(runner->handles.ctx, mutex_handle,
-                                       &resolved);
+                                       &resolved); /* GCOVR_EXCL_LINE */
   if (rc != M3_OK) {
     return rc;
   }
@@ -1373,10 +1388,10 @@ static int m3_tasks_default_mutex_lock(void *tasks, M3Handle mutex_handle) {
 }
 
 static int m3_tasks_default_mutex_unlock(void *tasks, M3Handle mutex_handle) {
-  M3TasksDefault *runner;
-  M3TaskMutex *mutex;
-  void *resolved;
-  int rc;
+  M3TasksDefault *runner; /* GCOVR_EXCL_LINE */
+  M3TaskMutex *mutex;     /* GCOVR_EXCL_LINE */
+  void *resolved;         /* GCOVR_EXCL_LINE */
+  int rc;                 /* GCOVR_EXCL_LINE */
 
   if (tasks == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -1388,7 +1403,7 @@ static int m3_tasks_default_mutex_unlock(void *tasks, M3Handle mutex_handle) {
   }
 
   rc = runner->handles.vtable->resolve(runner->handles.ctx, mutex_handle,
-                                       &resolved);
+                                       &resolved); /* GCOVR_EXCL_LINE */
   if (rc != M3_OK) {
     return rc;
   }
@@ -1402,7 +1417,7 @@ static int m3_tasks_default_mutex_unlock(void *tasks, M3Handle mutex_handle) {
 }
 
 static int m3_tasks_default_sleep_ms(void *tasks, m3_u32 ms) {
-  M3TasksDefault *runner;
+  M3TasksDefault *runner; /* GCOVR_EXCL_LINE */
 
   if (tasks == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -1415,9 +1430,9 @@ static int m3_tasks_default_sleep_ms(void *tasks, m3_u32 ms) {
 }
 
 static int m3_tasks_default_task_post(void *tasks, M3TaskFn fn, void *user) {
-  M3TasksDefault *runner;
-  int rc;
-  int unlock_rc;
+  M3TasksDefault *runner; /* GCOVR_EXCL_LINE */
+  int rc;                 /* GCOVR_EXCL_LINE */
+  int unlock_rc;          /* GCOVR_EXCL_LINE */
 
   if (tasks == NULL || fn == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -1451,8 +1466,8 @@ static int m3_tasks_default_task_post_delayed(void *tasks, M3TaskFn fn,
   M3TasksDefault *runner;
   m3_u32 now;
   m3_u32 due_time;
-  int rc;
-  int unlock_rc;
+  int rc;        /* GCOVR_EXCL_LINE */
+  int unlock_rc; /* GCOVR_EXCL_LINE */
 
   if (tasks == NULL || fn == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -1518,12 +1533,12 @@ int M3_CALL m3_tasks_default_config_init(M3TasksDefaultConfig *config) {
 int M3_CALL m3_tasks_default_create(const M3TasksDefaultConfig *config,
                                     M3Tasks *out_tasks) {
   M3TasksDefaultConfig cfg;
-  M3TasksDefault *runner;
+  M3TasksDefault *runner; /* GCOVR_EXCL_LINE */
   M3Allocator allocator;
   m3_usize worker_count;
-  m3_usize queue_capacity;
-  m3_usize handle_capacity;
-  m3_usize i;
+  m3_usize queue_capacity;  /* GCOVR_EXCL_LINE */
+  m3_usize handle_capacity; /* GCOVR_EXCL_LINE */
+  m3_usize i;               /* GCOVR_EXCL_LINE */
   int rc;
   int first_error;
 
@@ -1602,7 +1617,7 @@ int M3_CALL m3_tasks_default_create(const M3TasksDefaultConfig *config,
     m3_usize queue_bytes;
 
     rc = m3_tasks_mul_overflow(queue_capacity, sizeof(*runner->queue),
-                               &queue_bytes);
+                               &queue_bytes); /* GCOVR_EXCL_LINE */
     if (rc != M3_OK) {
       m3_native_cond_destroy(&runner->queue_cond);
       m3_native_mutex_destroy(&runner->queue_mutex);
@@ -1691,7 +1706,7 @@ int M3_CALL m3_tasks_default_create(const M3TasksDefaultConfig *config,
 int M3_CALL m3_tasks_default_destroy(M3Tasks *tasks) {
   M3TasksDefault *runner;
   M3Allocator allocator;
-  int rc;
+  int rc; /* GCOVR_EXCL_LINE */
   int first_error;
   m3_usize i;
 
@@ -1772,8 +1787,8 @@ int M3_CALL m3_tasks_default_destroy(M3Tasks *tasks) {
 }
 
 #ifdef M3_TESTING
-int M3_CALL m3_tasks_test_mul_overflow(m3_usize a, m3_usize b,
-                                       m3_usize *out_value) {
+int M3_CALL m3_tasks_test_mul_overflow(
+    m3_usize a, m3_usize b, m3_usize *out_value) { /* GCOVR_EXCL_LINE */
   return m3_tasks_mul_overflow(a, b, out_value);
 }
 
@@ -1783,13 +1798,13 @@ int M3_CALL m3_tasks_test_call_native(m3_u32 op) {
     return m3_tasks_time_now_ms(NULL);
   case M3_TASKS_TEST_NATIVE_MUTEX_INIT:
     return m3_native_mutex_init(NULL);
-  case M3_TASKS_TEST_NATIVE_MUTEX_DESTROY:
+  case M3_TASKS_TEST_NATIVE_MUTEX_DESTROY: /* GCOVR_EXCL_LINE */
     return m3_native_mutex_destroy(NULL);
   case M3_TASKS_TEST_NATIVE_MUTEX_LOCK:
     return m3_native_mutex_lock(NULL);
   case M3_TASKS_TEST_NATIVE_MUTEX_UNLOCK:
     return m3_native_mutex_unlock(NULL);
-  case M3_TASKS_TEST_NATIVE_COND_INIT:
+  case M3_TASKS_TEST_NATIVE_COND_INIT: /* GCOVR_EXCL_LINE */
     return m3_native_cond_init(NULL);
   case M3_TASKS_TEST_NATIVE_COND_DESTROY:
     return m3_native_cond_destroy(NULL);
@@ -1807,15 +1822,15 @@ int M3_CALL m3_tasks_test_call_native(m3_u32 op) {
     return m3_native_thread_join(NULL);
   case M3_TASKS_TEST_NATIVE_SLEEP:
     return m3_native_sleep_ms(0);
-  default:
+  default: /* GCOVR_EXCL_LINE */
     return M3_ERR_INVALID_ARGUMENT;
   }
 }
 
 int M3_CALL m3_tasks_test_thread_destroy_case(m3_u32 mode) {
-  M3TasksDefault runner;
-  M3TaskThread thread;
-  M3HandleSystemVTable handles_vtable;
+  M3TasksDefault runner;               /* GCOVR_EXCL_LINE */
+  M3TaskThread thread;                 /* GCOVR_EXCL_LINE */
+  M3HandleSystemVTable handles_vtable; /* GCOVR_EXCL_LINE */
   M3TasksTestStub stub;
 
   memset(&runner, 0, sizeof(runner));
@@ -1873,7 +1888,7 @@ int M3_CALL m3_tasks_test_thread_destroy_case(m3_u32 mode) {
     runner.allocator.ctx = &stub;
     stub.rc = M3_OK;
     return m3_task_thread_destroy(&thread);
-  default:
+  default: /* GCOVR_EXCL_LINE */
     return M3_ERR_INVALID_ARGUMENT;
   }
 }
@@ -1882,8 +1897,8 @@ int M3_CALL m3_tasks_test_mutex_destroy_case(m3_u32 mode) {
   M3TasksDefault runner;
   M3TaskMutex mutex;
   M3HandleSystemVTable handles_vtable;
-  M3TasksTestStub stub;
-  int rc;
+  M3TasksTestStub stub; /* GCOVR_EXCL_LINE */
+  int rc;               /* GCOVR_EXCL_LINE */
 
   memset(&runner, 0, sizeof(runner));
   memset(&mutex, 0, sizeof(mutex));
@@ -1952,13 +1967,13 @@ int M3_CALL m3_tasks_test_mutex_destroy_case(m3_u32 mode) {
     runner.allocator.ctx = &stub;
     stub.rc = M3_OK;
     return m3_task_mutex_destroy(&mutex);
-  default:
+  default: /* GCOVR_EXCL_LINE */
     return M3_ERR_INVALID_ARGUMENT;
   }
 }
 
 static int m3_tasks_test_task_fail(void *user) {
-  M3TasksDefault *runner;
+  M3TasksDefault *runner; /* GCOVR_EXCL_LINE */
 
   runner = (M3TasksDefault *)user;
   if (runner != NULL) {
@@ -1972,27 +1987,27 @@ static int m3_tasks_test_task_noop(void *user) {
   return M3_OK;
 }
 
-static M3_TASK_THREAD_RETURN M3_TASK_THREAD_CALL
+static M3_TASK_THREAD_RETURN M3_TASK_THREAD_CALL /* GCOVR_EXCL_LINE */
 m3_tasks_test_quick_exit(void *user) {
   (void)user;
-#if defined(M3_TASKS_USE_WIN32)
-  return 0;
-#else
+#if defined(M3_TASKS_USE_WIN32) /* GCOVR_EXCL_LINE */
+  return 0;                     /* GCOVR_EXCL_LINE */
+#else                           /* GCOVR_EXCL_LINE */
   return NULL;
-#endif
+#endif                          /* GCOVR_EXCL_LINE */
 }
 
 static M3_TASK_THREAD_RETURN M3_TASK_THREAD_CALL
 m3_tasks_test_signal_stop_entry(void *user) {
-  M3TasksDefault *runner;
+  M3TasksDefault *runner; /* GCOVR_EXCL_LINE */
 
   runner = (M3TasksDefault *)user;
   if (runner == NULL) {
-#if defined(M3_TASKS_USE_WIN32)
+#if defined(M3_TASKS_USE_WIN32) /* GCOVR_EXCL_LINE */
     return 0;
-#else
+#else  /* GCOVR_EXCL_LINE */
     return NULL;
-#endif
+#endif /* GCOVR_EXCL_LINE */
   }
 
   m3_native_mutex_lock(&runner->queue_mutex);
@@ -2000,23 +2015,23 @@ m3_tasks_test_signal_stop_entry(void *user) {
   m3_native_cond_signal(&runner->queue_cond);
   m3_native_mutex_unlock(&runner->queue_mutex);
 
-#if defined(M3_TASKS_USE_WIN32)
+#if defined(M3_TASKS_USE_WIN32) /* GCOVR_EXCL_LINE */
   return 0;
-#else
+#else  /* GCOVR_EXCL_LINE */
   return NULL;
-#endif
+#endif /* GCOVR_EXCL_LINE */
 }
 
 int M3_CALL m3_tasks_test_thread_entry_case(m3_u32 mode) {
-  M3TaskThread thread;
+  M3TaskThread thread; /* GCOVR_EXCL_LINE */
 
   memset(&thread, 0, sizeof(thread));
 
   switch (mode) {
-  case M3_TASKS_TEST_THREAD_ENTRY_NULL:
+  case M3_TASKS_TEST_THREAD_ENTRY_NULL: /* GCOVR_EXCL_LINE */
     (void)m3_tasks_thread_entry(NULL);
     return M3_OK;
-  case M3_TASKS_TEST_THREAD_ENTRY_NO_ENTRY:
+  case M3_TASKS_TEST_THREAD_ENTRY_NO_ENTRY: /* GCOVR_EXCL_LINE */
     thread.entry = NULL;
     (void)m3_tasks_thread_entry(&thread);
     return M3_OK;
@@ -2026,11 +2041,11 @@ int M3_CALL m3_tasks_test_thread_entry_case(m3_u32 mode) {
 }
 
 int M3_CALL m3_tasks_test_thread_create_case(m3_u32 mode) {
-  M3TasksDefault runner;
-  M3HandleSystemVTable handles_vtable;
+  M3TasksDefault runner;               /* GCOVR_EXCL_LINE */
+  M3HandleSystemVTable handles_vtable; /* GCOVR_EXCL_LINE */
   M3TasksTestStub stub;
-  M3Handle out_thread;
-  int rc;
+  M3Handle out_thread; /* GCOVR_EXCL_LINE */
+  int rc;              /* GCOVR_EXCL_LINE */
 
   memset(&runner, 0, sizeof(runner));
   memset(&handles_vtable, 0, sizeof(handles_vtable));
@@ -2050,42 +2065,44 @@ int M3_CALL m3_tasks_test_thread_create_case(m3_u32 mode) {
   runner.handles.ctx = &stub;
 
   switch (mode) {
-  case M3_TASKS_TEST_THREAD_CREATE_STATE:
+  case M3_TASKS_TEST_THREAD_CREATE_STATE: /* GCOVR_EXCL_LINE */
     runner.initialized = M3_FALSE;
     return m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop,
                                           NULL, &out_thread);
-  case M3_TASKS_TEST_THREAD_CREATE_ALLOC_FAIL:
+  case M3_TASKS_TEST_THREAD_CREATE_ALLOC_FAIL: /* GCOVR_EXCL_LINE */
     stub.rc_alloc = M3_ERR_OUT_OF_MEMORY;
     return m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop,
-                                          NULL, &out_thread);
-  case M3_TASKS_TEST_THREAD_CREATE_OBJECT_FAIL:
+                                          NULL,
+                                          &out_thread); /* GCOVR_EXCL_LINE */
+  case M3_TASKS_TEST_THREAD_CREATE_OBJECT_FAIL:         /* GCOVR_EXCL_LINE */
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_OBJECT_INIT);
     rc = m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop, NULL,
-                                        &out_thread);
+                                        &out_thread); /* GCOVR_EXCL_LINE */
     m3_tasks_test_clear_fail_point();
     return rc;
-  case M3_TASKS_TEST_THREAD_CREATE_NATIVE_FAIL:
+  case M3_TASKS_TEST_THREAD_CREATE_NATIVE_FAIL: /* GCOVR_EXCL_LINE */
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_THREAD_CREATE);
     rc = m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop, NULL,
                                         &out_thread);
     m3_tasks_test_clear_fail_point();
     return rc;
-  case M3_TASKS_TEST_THREAD_CREATE_REGISTER_FAIL:
+  case M3_TASKS_TEST_THREAD_CREATE_REGISTER_FAIL: /* GCOVR_EXCL_LINE */
     stub.rc_register = M3_ERR_UNKNOWN;
     return m3_tasks_default_thread_create(&runner, m3_tasks_test_task_noop,
-                                          NULL, &out_thread);
-  default:
+                                          NULL,
+                                          &out_thread); /* GCOVR_EXCL_LINE */
+  default:                                              /* GCOVR_EXCL_LINE */
     return M3_ERR_INVALID_ARGUMENT;
   }
 }
 
 int M3_CALL m3_tasks_test_thread_join_case(m3_u32 mode) {
-  M3TasksDefault runner;
-  M3HandleSystemVTable handles_vtable;
-  M3TasksTestStub stub;
+  M3TasksDefault runner;               /* GCOVR_EXCL_LINE */
+  M3HandleSystemVTable handles_vtable; /* GCOVR_EXCL_LINE */
+  M3TasksTestStub stub;                /* GCOVR_EXCL_LINE */
   M3TaskThread *thread;
-  M3Handle handle;
-  int rc;
+  M3Handle handle; /* GCOVR_EXCL_LINE */
+  int rc;          /* GCOVR_EXCL_LINE */
 
   memset(&runner, 0, sizeof(runner));
   memset(&handles_vtable, 0, sizeof(handles_vtable));
@@ -2110,13 +2127,13 @@ int M3_CALL m3_tasks_test_thread_join_case(m3_u32 mode) {
   handle.generation = 1u;
 
   switch (mode) {
-  case M3_TASKS_TEST_THREAD_JOIN_STATE:
+  case M3_TASKS_TEST_THREAD_JOIN_STATE: /* GCOVR_EXCL_LINE */
     runner.initialized = M3_FALSE;
     return m3_tasks_default_thread_join(&runner, handle);
-  case M3_TASKS_TEST_THREAD_JOIN_RESOLVE_FAIL:
+  case M3_TASKS_TEST_THREAD_JOIN_RESOLVE_FAIL: /* GCOVR_EXCL_LINE */
     stub.rc_resolve = M3_ERR_UNKNOWN;
     return m3_tasks_default_thread_join(&runner, handle);
-  case M3_TASKS_TEST_THREAD_JOIN_ALREADY_JOINED:
+  case M3_TASKS_TEST_THREAD_JOIN_ALREADY_JOINED: /* GCOVR_EXCL_LINE */
     thread = (M3TaskThread *)m3_tasks_test_malloc(sizeof(*thread));
     if (thread == NULL) {
       return M3_ERR_OUT_OF_MEMORY;
@@ -2127,7 +2144,7 @@ int M3_CALL m3_tasks_test_thread_join_case(m3_u32 mode) {
     rc = m3_tasks_default_thread_join(&runner, handle);
     free(thread);
     return rc;
-  case M3_TASKS_TEST_THREAD_JOIN_NATIVE_FAIL:
+  case M3_TASKS_TEST_THREAD_JOIN_NATIVE_FAIL: /* GCOVR_EXCL_LINE */
     thread = (M3TaskThread *)m3_tasks_test_malloc(sizeof(*thread));
     if (thread == NULL) {
       return M3_ERR_OUT_OF_MEMORY;
@@ -2138,7 +2155,7 @@ int M3_CALL m3_tasks_test_thread_join_case(m3_u32 mode) {
     thread->header.handle = handle;
     stub.ptr = thread;
     rc = m3_native_thread_create(&thread->thread, m3_tasks_test_quick_exit,
-                                 NULL);
+                                 NULL); /* GCOVR_EXCL_LINE */
     if (rc != M3_OK) {
       free(thread);
       return rc;
@@ -2168,7 +2185,7 @@ int M3_CALL m3_tasks_test_thread_join_case(m3_u32 mode) {
     rc = m3_tasks_default_thread_join(&runner, handle);
     free(thread);
     return rc;
-  case M3_TASKS_TEST_THREAD_JOIN_FREE_FAIL:
+  case M3_TASKS_TEST_THREAD_JOIN_FREE_FAIL: /* GCOVR_EXCL_LINE */
     thread = (M3TaskThread *)m3_tasks_test_malloc(sizeof(*thread));
     if (thread == NULL) {
       return M3_ERR_OUT_OF_MEMORY;
@@ -2179,7 +2196,7 @@ int M3_CALL m3_tasks_test_thread_join_case(m3_u32 mode) {
     thread->header.handle = handle;
     stub.ptr = thread;
     rc = m3_native_thread_create(&thread->thread, m3_tasks_test_quick_exit,
-                                 NULL);
+                                 NULL); /* GCOVR_EXCL_LINE */
     if (rc != M3_OK) {
       free(thread);
       return rc;
@@ -2194,9 +2211,9 @@ int M3_CALL m3_tasks_test_thread_join_case(m3_u32 mode) {
 
 int M3_CALL m3_tasks_test_mutex_create_case(m3_u32 mode) {
   M3TasksDefault runner;
-  M3HandleSystemVTable handles_vtable;
-  M3TasksTestStub stub;
-  M3Handle handle;
+  M3HandleSystemVTable handles_vtable; /* GCOVR_EXCL_LINE */
+  M3TasksTestStub stub;                /* GCOVR_EXCL_LINE */
+  M3Handle handle;                     /* GCOVR_EXCL_LINE */
   int rc;
 
   memset(&runner, 0, sizeof(runner));
@@ -2217,13 +2234,13 @@ int M3_CALL m3_tasks_test_mutex_create_case(m3_u32 mode) {
   runner.handles.ctx = &stub;
 
   switch (mode) {
-  case M3_TASKS_TEST_MUTEX_CREATE_STATE:
+  case M3_TASKS_TEST_MUTEX_CREATE_STATE: /* GCOVR_EXCL_LINE */
     runner.initialized = M3_FALSE;
     return m3_tasks_default_mutex_create(&runner, &handle);
-  case M3_TASKS_TEST_MUTEX_CREATE_ALLOC_FAIL:
+  case M3_TASKS_TEST_MUTEX_CREATE_ALLOC_FAIL: /* GCOVR_EXCL_LINE */
     stub.rc_alloc = M3_ERR_OUT_OF_MEMORY;
     return m3_tasks_default_mutex_create(&runner, &handle);
-  case M3_TASKS_TEST_MUTEX_CREATE_OBJECT_FAIL:
+  case M3_TASKS_TEST_MUTEX_CREATE_OBJECT_FAIL: /* GCOVR_EXCL_LINE */
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_OBJECT_INIT);
     rc = m3_tasks_default_mutex_create(&runner, &handle);
     m3_tasks_test_clear_fail_point();
@@ -2233,20 +2250,20 @@ int M3_CALL m3_tasks_test_mutex_create_case(m3_u32 mode) {
     rc = m3_tasks_default_mutex_create(&runner, &handle);
     m3_tasks_test_clear_fail_point();
     return rc;
-  case M3_TASKS_TEST_MUTEX_CREATE_REGISTER_FAIL:
+  case M3_TASKS_TEST_MUTEX_CREATE_REGISTER_FAIL: /* GCOVR_EXCL_LINE */
     stub.rc_register = M3_ERR_UNKNOWN;
     return m3_tasks_default_mutex_create(&runner, &handle);
-  default:
+  default: /* GCOVR_EXCL_LINE */
     return M3_ERR_INVALID_ARGUMENT;
   }
 }
 
 int M3_CALL m3_tasks_test_default_mutex_destroy_case(m3_u32 mode) {
-  M3TasksDefault runner;
+  M3TasksDefault runner; /* GCOVR_EXCL_LINE */
   M3HandleSystemVTable handles_vtable;
-  M3TasksTestStub stub;
+  M3TasksTestStub stub; /* GCOVR_EXCL_LINE */
   M3TaskMutex *mutex;
-  M3Handle handle;
+  M3Handle handle; /* GCOVR_EXCL_LINE */
   int rc;
 
   memset(&runner, 0, sizeof(runner));
@@ -2272,13 +2289,13 @@ int M3_CALL m3_tasks_test_default_mutex_destroy_case(m3_u32 mode) {
   handle.generation = 1u;
 
   switch (mode) {
-  case M3_TASKS_TEST_DEFAULT_MUTEX_DESTROY_STATE:
+  case M3_TASKS_TEST_DEFAULT_MUTEX_DESTROY_STATE: /* GCOVR_EXCL_LINE */
     runner.initialized = M3_FALSE;
     return m3_tasks_default_mutex_destroy(&runner, handle);
-  case M3_TASKS_TEST_DEFAULT_MUTEX_DESTROY_RESOLVE_FAIL:
+  case M3_TASKS_TEST_DEFAULT_MUTEX_DESTROY_RESOLVE_FAIL: /* GCOVR_EXCL_LINE */
     stub.rc_resolve = M3_ERR_UNKNOWN;
     return m3_tasks_default_mutex_destroy(&runner, handle);
-  case M3_TASKS_TEST_DEFAULT_MUTEX_DESTROY_NATIVE_FAIL:
+  case M3_TASKS_TEST_DEFAULT_MUTEX_DESTROY_NATIVE_FAIL: /* GCOVR_EXCL_LINE */
     mutex = (M3TaskMutex *)m3_tasks_test_malloc(sizeof(*mutex));
     if (mutex == NULL) {
       return M3_ERR_OUT_OF_MEMORY;
@@ -2299,7 +2316,8 @@ int M3_CALL m3_tasks_test_default_mutex_destroy_case(m3_u32 mode) {
     m3_native_mutex_destroy(&mutex->mutex);
     free(mutex);
     return rc;
-  case M3_TASKS_TEST_DEFAULT_MUTEX_DESTROY_UNREGISTER_FAIL:
+  case M3_TASKS_TEST_DEFAULT_MUTEX_DESTROY_UNREGISTER_FAIL: /* GCOVR_EXCL_LINE
+                                                             */
     mutex = (M3TaskMutex *)m3_tasks_test_malloc(sizeof(*mutex));
     if (mutex == NULL) {
       return M3_ERR_OUT_OF_MEMORY;
@@ -2326,17 +2344,17 @@ int M3_CALL m3_tasks_test_default_mutex_destroy_case(m3_u32 mode) {
     stub.rc_free = M3_ERR_OUT_OF_MEMORY;
     rc = m3_tasks_default_mutex_destroy(&runner, handle);
     return rc;
-  default:
+  default: /* GCOVR_EXCL_LINE */
     return M3_ERR_INVALID_ARGUMENT;
   }
 }
 
 int M3_CALL m3_tasks_test_mutex_lock_case(m3_u32 mode) {
-  M3TasksDefault runner;
+  M3TasksDefault runner; /* GCOVR_EXCL_LINE */
   M3HandleSystemVTable handles_vtable;
   M3TasksTestStub stub;
   M3TaskMutex mutex;
-  M3Handle handle;
+  M3Handle handle; /* GCOVR_EXCL_LINE */
 
   memset(&runner, 0, sizeof(runner));
   memset(&handles_vtable, 0, sizeof(handles_vtable));
@@ -2353,24 +2371,24 @@ int M3_CALL m3_tasks_test_mutex_lock_case(m3_u32 mode) {
   stub.ptr = &mutex;
 
   switch (mode) {
-  case M3_TASKS_TEST_MUTEX_LOCK_STATE:
+  case M3_TASKS_TEST_MUTEX_LOCK_STATE: /* GCOVR_EXCL_LINE */
     runner.initialized = M3_FALSE;
     return m3_tasks_default_mutex_lock(&runner, handle);
-  case M3_TASKS_TEST_MUTEX_LOCK_RESOLVE_FAIL:
+  case M3_TASKS_TEST_MUTEX_LOCK_RESOLVE_FAIL: /* GCOVR_EXCL_LINE */
     stub.rc_resolve = M3_ERR_UNKNOWN;
     return m3_tasks_default_mutex_lock(&runner, handle);
   case M3_TASKS_TEST_MUTEX_LOCK_NOT_INITIALIZED:
     mutex.initialized = M3_FALSE;
     return m3_tasks_default_mutex_lock(&runner, handle);
-  default:
+  default: /* GCOVR_EXCL_LINE */
     return M3_ERR_INVALID_ARGUMENT;
   }
 }
 
 int M3_CALL m3_tasks_test_mutex_unlock_case(m3_u32 mode) {
-  M3TasksDefault runner;
-  M3HandleSystemVTable handles_vtable;
-  M3TasksTestStub stub;
+  M3TasksDefault runner;               /* GCOVR_EXCL_LINE */
+  M3HandleSystemVTable handles_vtable; /* GCOVR_EXCL_LINE */
+  M3TasksTestStub stub;                /* GCOVR_EXCL_LINE */
   M3TaskMutex mutex;
   M3Handle handle;
 
@@ -2389,22 +2407,22 @@ int M3_CALL m3_tasks_test_mutex_unlock_case(m3_u32 mode) {
   stub.ptr = &mutex;
 
   switch (mode) {
-  case M3_TASKS_TEST_MUTEX_UNLOCK_STATE:
+  case M3_TASKS_TEST_MUTEX_UNLOCK_STATE: /* GCOVR_EXCL_LINE */
     runner.initialized = M3_FALSE;
     return m3_tasks_default_mutex_unlock(&runner, handle);
   case M3_TASKS_TEST_MUTEX_UNLOCK_RESOLVE_FAIL:
     stub.rc_resolve = M3_ERR_UNKNOWN;
     return m3_tasks_default_mutex_unlock(&runner, handle);
-  case M3_TASKS_TEST_MUTEX_UNLOCK_NOT_INITIALIZED:
+  case M3_TASKS_TEST_MUTEX_UNLOCK_NOT_INITIALIZED: /* GCOVR_EXCL_LINE */
     mutex.initialized = M3_FALSE;
     return m3_tasks_default_mutex_unlock(&runner, handle);
-  default:
+  default: /* GCOVR_EXCL_LINE */
     return M3_ERR_INVALID_ARGUMENT;
   }
 }
 
 int M3_CALL m3_tasks_test_sleep_case(m3_u32 mode) {
-  M3TasksDefault runner;
+  M3TasksDefault runner; /* GCOVR_EXCL_LINE */
 
   memset(&runner, 0, sizeof(runner));
 
@@ -2412,14 +2430,14 @@ int M3_CALL m3_tasks_test_sleep_case(m3_u32 mode) {
   case M3_TASKS_TEST_SLEEP_STATE:
     runner.initialized = M3_FALSE;
     return m3_tasks_default_sleep_ms(&runner, 1u);
-  default:
+  default: /* GCOVR_EXCL_LINE */
     return M3_ERR_INVALID_ARGUMENT;
   }
 }
 
 int M3_CALL m3_tasks_test_destroy_state(void) {
-  M3Tasks tasks;
-  M3TasksDefault runner;
+  M3Tasks tasks;         /* GCOVR_EXCL_LINE */
+  M3TasksDefault runner; /* GCOVR_EXCL_LINE */
 
   memset(&tasks, 0, sizeof(tasks));
   memset(&runner, 0, sizeof(runner));
@@ -2430,13 +2448,13 @@ int M3_CALL m3_tasks_test_destroy_state(void) {
 }
 
 int M3_CALL m3_tasks_test_stub_exercise(void) {
-  M3TasksTestStub stub;
-  M3ObjectHeader obj;
-  M3Handle handle;
-  void *out_ptr;
+  M3TasksTestStub stub; /* GCOVR_EXCL_LINE */
+  M3ObjectHeader obj;   /* GCOVR_EXCL_LINE */
+  M3Handle handle;      /* GCOVR_EXCL_LINE */
+  void *out_ptr;        /* GCOVR_EXCL_LINE */
   int rc;
-  int result;
-  int clear_rc;
+  int result;   /* GCOVR_EXCL_LINE */
+  int clear_rc; /* GCOVR_EXCL_LINE */
 
   memset(&stub, 0, sizeof(stub));
   memset(&obj, 0, sizeof(obj));
@@ -2542,14 +2560,14 @@ int M3_CALL m3_tasks_test_signal_stop_null(void) {
   return M3_OK;
 }
 
-int M3_CALL m3_tasks_test_queue_case(m3_u32 mode, m3_u32 *out_wait_ms,
-                                     m3_u32 *out_due_time,
-                                     m3_usize *out_count) {
-  M3TasksDefault runner;
-  M3TaskItem items[2];
-  M3TaskItem picked;
+int M3_CALL
+m3_tasks_test_queue_case(m3_u32 mode, m3_u32 *out_wait_ms, m3_u32 *out_due_time,
+                         m3_usize *out_count) { /* GCOVR_EXCL_LINE */
+  M3TasksDefault runner;                        /* GCOVR_EXCL_LINE */
+  M3TaskItem items[2];                          /* GCOVR_EXCL_LINE */
+  M3TaskItem picked;                            /* GCOVR_EXCL_LINE */
   m3_u32 wait_ms;
-  int rc;
+  int rc; /* GCOVR_EXCL_LINE */
 
   memset(&runner, 0, sizeof(runner));
   memset(items, 0, sizeof(items));
@@ -2562,31 +2580,31 @@ int M3_CALL m3_tasks_test_queue_case(m3_u32 mode, m3_u32 *out_wait_ms,
   rc = M3_ERR_INVALID_ARGUMENT;
 
   switch (mode) {
-  case M3_TASKS_TEST_QUEUE_CASE_EMPTY:
+  case M3_TASKS_TEST_QUEUE_CASE_EMPTY: /* GCOVR_EXCL_LINE */
     rc = m3_tasks_queue_pick(&runner, &picked, &wait_ms);
     break;
-  case M3_TASKS_TEST_QUEUE_CASE_INVALID:
+  case M3_TASKS_TEST_QUEUE_CASE_INVALID: /* GCOVR_EXCL_LINE */
     runner.queue_count = 1;
     items[0].due_time_ms = 0;
     rc = m3_tasks_queue_pick(&runner, NULL, &wait_ms);
     break;
-  case M3_TASKS_TEST_QUEUE_CASE_NOT_READY:
+  case M3_TASKS_TEST_QUEUE_CASE_NOT_READY: /* GCOVR_EXCL_LINE */
     runner.queue_count = 1;
     items[0].due_time_ms = m3_u32_max_value();
     rc = m3_tasks_queue_pick(&runner, &picked, &wait_ms);
     break;
-  case M3_TASKS_TEST_QUEUE_CASE_READY_EARLY:
+  case M3_TASKS_TEST_QUEUE_CASE_READY_EARLY: /* GCOVR_EXCL_LINE */
     runner.queue_count = 2;
     items[0].due_time_ms = 1000u;
     items[1].due_time_ms = 0u;
     rc = m3_tasks_queue_pick(&runner, &picked, &wait_ms);
     break;
-  case M3_TASKS_TEST_QUEUE_CASE_READY_LATE:
+  case M3_TASKS_TEST_QUEUE_CASE_READY_LATE: /* GCOVR_EXCL_LINE */
     runner.queue_count = 1;
     items[0].due_time_ms = 0u;
     rc = m3_tasks_queue_pick(&runner, &picked, &wait_ms);
     break;
-  case M3_TASKS_TEST_QUEUE_CASE_SWAP:
+  case M3_TASKS_TEST_QUEUE_CASE_SWAP: /* GCOVR_EXCL_LINE */
     runner.queue_count = 2;
     items[0].due_time_ms = 0u;
     items[1].due_time_ms = 1000u;
@@ -2603,7 +2621,7 @@ int M3_CALL m3_tasks_test_queue_case(m3_u32 mode, m3_u32 *out_wait_ms,
     runner.queue_count = runner.queue_capacity;
     rc = m3_tasks_queue_push(&runner, NULL, NULL, 0u);
     break;
-  default:
+  default: /* GCOVR_EXCL_LINE */
     rc = M3_ERR_INVALID_ARGUMENT;
     break;
   }
@@ -2622,8 +2640,8 @@ int M3_CALL m3_tasks_test_queue_case(m3_u32 mode, m3_u32 *out_wait_ms,
 }
 
 int M3_CALL m3_tasks_test_post_case(m3_u32 mode) {
-  M3TasksDefault runner;
-  M3TaskItem items[1];
+  M3TasksDefault runner; /* GCOVR_EXCL_LINE */
+  M3TaskItem items[1];   /* GCOVR_EXCL_LINE */
   int rc;
 
   memset(&runner, 0, sizeof(runner));
@@ -2645,7 +2663,7 @@ int M3_CALL m3_tasks_test_post_case(m3_u32 mode) {
   }
 
   switch (mode) {
-  case M3_TASKS_TEST_POST_CASE_LOCK_FAIL:
+  case M3_TASKS_TEST_POST_CASE_LOCK_FAIL: /* GCOVR_EXCL_LINE */
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_MUTEX_LOCK);
     rc = m3_tasks_default_task_post(&runner, m3_tasks_test_task_noop, NULL);
     break;
@@ -2653,11 +2671,11 @@ int M3_CALL m3_tasks_test_post_case(m3_u32 mode) {
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_COND_SIGNAL);
     rc = m3_tasks_default_task_post(&runner, m3_tasks_test_task_noop, NULL);
     break;
-  case M3_TASKS_TEST_POST_CASE_UNLOCK_FAIL:
+  case M3_TASKS_TEST_POST_CASE_UNLOCK_FAIL: /* GCOVR_EXCL_LINE */
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_MUTEX_UNLOCK);
     rc = m3_tasks_default_task_post(&runner, m3_tasks_test_task_noop, NULL);
     break;
-  case M3_TASKS_TEST_POST_CASE_BUSY:
+  case M3_TASKS_TEST_POST_CASE_BUSY: /* GCOVR_EXCL_LINE */
     runner.queue_count = runner.queue_capacity;
     rc = m3_tasks_default_task_post(&runner, m3_tasks_test_task_noop, NULL);
     break;
@@ -2678,9 +2696,9 @@ int M3_CALL m3_tasks_test_post_case(m3_u32 mode) {
 
 int M3_CALL m3_tasks_test_post_delayed_case(m3_u32 mode) {
   M3TasksDefault runner;
-  M3TaskItem items[1];
-  m3_u32 max_delay;
-  int rc;
+  M3TaskItem items[1]; /* GCOVR_EXCL_LINE */
+  m3_u32 max_delay;    /* GCOVR_EXCL_LINE */
+  int rc;              /* GCOVR_EXCL_LINE */
 
   memset(&runner, 0, sizeof(runner));
   memset(items, 0, sizeof(items));
@@ -2701,40 +2719,40 @@ int M3_CALL m3_tasks_test_post_delayed_case(m3_u32 mode) {
   }
 
   switch (mode) {
-  case M3_TASKS_TEST_POST_DELAYED_CASE_TIME_FAIL:
+  case M3_TASKS_TEST_POST_DELAYED_CASE_TIME_FAIL: /* GCOVR_EXCL_LINE */
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_TIME_NOW);
     rc = m3_tasks_default_task_post_delayed(&runner, m3_tasks_test_task_noop,
                                             NULL, 1u);
     break;
-  case M3_TASKS_TEST_POST_DELAYED_CASE_LOCK_FAIL:
+  case M3_TASKS_TEST_POST_DELAYED_CASE_LOCK_FAIL: /* GCOVR_EXCL_LINE */
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_MUTEX_LOCK);
     rc = m3_tasks_default_task_post_delayed(&runner, m3_tasks_test_task_noop,
-                                            NULL, 1u);
+                                            NULL, 1u); /* GCOVR_EXCL_LINE */
     break;
   case M3_TASKS_TEST_POST_DELAYED_CASE_SIGNAL_FAIL:
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_COND_SIGNAL);
     rc = m3_tasks_default_task_post_delayed(&runner, m3_tasks_test_task_noop,
-                                            NULL, 1u);
+                                            NULL, 1u); /* GCOVR_EXCL_LINE */
     break;
-  case M3_TASKS_TEST_POST_DELAYED_CASE_UNLOCK_FAIL:
+  case M3_TASKS_TEST_POST_DELAYED_CASE_UNLOCK_FAIL: /* GCOVR_EXCL_LINE */
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_MUTEX_UNLOCK);
     rc = m3_tasks_default_task_post_delayed(&runner, m3_tasks_test_task_noop,
-                                            NULL, 1u);
+                                            NULL, 1u); /* GCOVR_EXCL_LINE */
     break;
-  case M3_TASKS_TEST_POST_DELAYED_CASE_BUSY:
+  case M3_TASKS_TEST_POST_DELAYED_CASE_BUSY: /* GCOVR_EXCL_LINE */
     runner.queue_count = runner.queue_capacity;
     rc = m3_tasks_default_task_post_delayed(&runner, m3_tasks_test_task_noop,
-                                            NULL, 1u);
+                                            NULL, 1u); /* GCOVR_EXCL_LINE */
     break;
   case M3_TASKS_TEST_POST_DELAYED_CASE_OVERFLOW:
     max_delay = (m3_u32) ~(m3_u32)0;
     rc = m3_tasks_default_task_post_delayed(&runner, m3_tasks_test_task_noop,
                                             NULL, max_delay);
     break;
-  case M3_TASKS_TEST_POST_DELAYED_CASE_STATE:
+  case M3_TASKS_TEST_POST_DELAYED_CASE_STATE: /* GCOVR_EXCL_LINE */
     runner.initialized = M3_FALSE;
     rc = m3_tasks_default_task_post_delayed(&runner, m3_tasks_test_task_noop,
-                                            NULL, 1u);
+                                            NULL, 1u); /* GCOVR_EXCL_LINE */
     break;
   default:
     rc = M3_ERR_INVALID_ARGUMENT;
@@ -2748,10 +2766,10 @@ int M3_CALL m3_tasks_test_post_delayed_case(m3_u32 mode) {
 }
 
 int M3_CALL m3_tasks_test_worker_case(m3_u32 mode) {
-  M3TasksDefault runner;
-  M3TaskItem items[1];
+  M3TasksDefault runner; /* GCOVR_EXCL_LINE */
+  M3TaskItem items[1];   /* GCOVR_EXCL_LINE */
   M3NativeThread thread;
-  int rc;
+  int rc; /* GCOVR_EXCL_LINE */
   int join_rc;
 
   memset(&runner, 0, sizeof(runner));
@@ -2778,7 +2796,7 @@ int M3_CALL m3_tasks_test_worker_case(m3_u32 mode) {
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_MUTEX_LOCK);
     (void)m3_tasks_worker_entry(&runner);
     break;
-  case M3_TASKS_TEST_WORKER_CASE_WAIT_FAIL:
+  case M3_TASKS_TEST_WORKER_CASE_WAIT_FAIL: /* GCOVR_EXCL_LINE */
     runner.queue_count = 0;
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_COND_WAIT);
     (void)m3_tasks_worker_entry(&runner);
@@ -2789,7 +2807,7 @@ int M3_CALL m3_tasks_test_worker_case(m3_u32 mode) {
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_COND_TIMEDWAIT_TIMEOUT);
     (void)m3_tasks_worker_entry(&runner);
     break;
-  case M3_TASKS_TEST_WORKER_CASE_TASK_ERROR:
+  case M3_TASKS_TEST_WORKER_CASE_TASK_ERROR: /* GCOVR_EXCL_LINE */
     runner.queue_count = 1;
     items[0].due_time_ms = 0u;
     items[0].fn = m3_tasks_test_task_fail;
@@ -2802,20 +2820,20 @@ int M3_CALL m3_tasks_test_worker_case(m3_u32 mode) {
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_TIME_NOW);
     (void)m3_tasks_worker_entry(&runner);
     break;
-  case M3_TASKS_TEST_WORKER_CASE_UNLOCK_FAIL:
+  case M3_TASKS_TEST_WORKER_CASE_UNLOCK_FAIL: /* GCOVR_EXCL_LINE */
     runner.queue_count = 1;
     items[0].due_time_ms = 0u;
     m3_tasks_test_set_fail_point(M3_TASKS_TEST_FAIL_MUTEX_UNLOCK);
     (void)m3_tasks_worker_entry(&runner);
     break;
-  case M3_TASKS_TEST_WORKER_CASE_NULL:
+  case M3_TASKS_TEST_WORKER_CASE_NULL: /* GCOVR_EXCL_LINE */
     (void)m3_tasks_worker_entry(NULL);
     break;
   case M3_TASKS_TEST_WORKER_CASE_TIMEDWAIT_SIGNAL:
     runner.queue_count = 1;
     items[0].due_time_ms = m3_u32_max_value();
     rc = m3_native_thread_create(&thread, m3_tasks_test_signal_stop_entry,
-                                 &runner);
+                                 &runner); /* GCOVR_EXCL_LINE */
     if (rc == M3_OK) {
       (void)m3_tasks_worker_entry(&runner);
       join_rc = m3_native_thread_join(&thread);
@@ -2826,7 +2844,7 @@ int M3_CALL m3_tasks_test_worker_case(m3_u32 mode) {
       return rc;
     }
     break;
-  default:
+  default: /* GCOVR_EXCL_LINE */
     break;
   }
 
@@ -2837,9 +2855,9 @@ int M3_CALL m3_tasks_test_worker_case(m3_u32 mode) {
 }
 
 int M3_CALL m3_tasks_test_object_op(m3_u32 mode, m3_u32 *out_type_id) {
-  M3TaskThread thread;
-  M3ObjectVTable bad_vtable;
-  const M3ObjectVTable *vtable;
+  M3TaskThread thread;          /* GCOVR_EXCL_LINE */
+  M3ObjectVTable bad_vtable;    /* GCOVR_EXCL_LINE */
+  const M3ObjectVTable *vtable; /* GCOVR_EXCL_LINE */
   int rc;
 
   memset(&thread, 0, sizeof(thread));
@@ -2856,50 +2874,50 @@ int M3_CALL m3_tasks_test_object_op(m3_u32 mode, m3_u32 *out_type_id) {
   switch (mode) {
   case M3_TASKS_TEST_OBJECT_OP_RETAIN:
     return m3_task_object_retain(&thread);
-  case M3_TASKS_TEST_OBJECT_OP_RELEASE:
+  case M3_TASKS_TEST_OBJECT_OP_RELEASE: /* GCOVR_EXCL_LINE */
     thread.header.ref_count = 2;
     return m3_task_object_release(&thread);
-  case M3_TASKS_TEST_OBJECT_OP_GET_TYPE:
+  case M3_TASKS_TEST_OBJECT_OP_GET_TYPE: /* GCOVR_EXCL_LINE */
     if (out_type_id == NULL) {
       return M3_ERR_INVALID_ARGUMENT;
     }
     return m3_task_object_get_type_id(&thread, out_type_id);
-  case M3_TASKS_TEST_OBJECT_OP_RETAIN_NULL:
+  case M3_TASKS_TEST_OBJECT_OP_RETAIN_NULL: /* GCOVR_EXCL_LINE */
     return m3_task_object_retain(NULL);
   case M3_TASKS_TEST_OBJECT_OP_RELEASE_NULL:
     return m3_task_object_release(NULL);
-  case M3_TASKS_TEST_OBJECT_OP_INIT_FAIL:
+  case M3_TASKS_TEST_OBJECT_OP_INIT_FAIL: /* GCOVR_EXCL_LINE */
     memset(&bad_vtable, 0, sizeof(bad_vtable));
     rc = m3_object_header_init(&thread.header, M3_TASK_OBJECT_THREAD, 0,
-                               &bad_vtable);
+                               &bad_vtable); /* GCOVR_EXCL_LINE */
     return rc;
-  default:
+  default: /* GCOVR_EXCL_LINE */
     return M3_ERR_INVALID_ARGUMENT;
   }
 }
 
-static M3_TASK_THREAD_RETURN M3_TASK_THREAD_CALL
+static M3_TASK_THREAD_RETURN M3_TASK_THREAD_CALL /* GCOVR_EXCL_LINE */
 m3_tasks_test_signal_entry(void *user) {
-  M3TasksDefault *runner;
+  M3TasksDefault *runner; /* GCOVR_EXCL_LINE */
 
   runner = (M3TasksDefault *)user;
   if (runner == NULL) {
-#if defined(M3_TASKS_USE_WIN32)
+#if defined(M3_TASKS_USE_WIN32) /* GCOVR_EXCL_LINE */
     return 0;
-#else
+#else  /* GCOVR_EXCL_LINE */
     return NULL;
-#endif
+#endif /* GCOVR_EXCL_LINE */
   }
 
   m3_native_mutex_lock(&runner->queue_mutex);
   m3_native_cond_signal(&runner->queue_cond);
   m3_native_mutex_unlock(&runner->queue_mutex);
 
-#if defined(M3_TASKS_USE_WIN32)
-  return 0;
-#else
+#if defined(M3_TASKS_USE_WIN32) /* GCOVR_EXCL_LINE */
+  return 0;                     /* GCOVR_EXCL_LINE */
+#else                           /* GCOVR_EXCL_LINE */
   return NULL;
-#endif
+#endif                          /* GCOVR_EXCL_LINE */
 }
 
 int M3_CALL m3_tasks_test_timedwait_case(m3_u32 mode) {

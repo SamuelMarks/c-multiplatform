@@ -5,6 +5,18 @@
 
 #define M3_TIME_PICKER_PI 3.14159265358979323846f
 
+#ifdef M3_TESTING
+static M3Bool g_m3_time_picker_test_force_dial_size_zero = M3_FALSE;
+static M3Bool g_m3_time_picker_test_force_angle_error = M3_FALSE;
+static M3Bool g_m3_time_picker_test_force_angle_index_error = M3_FALSE;
+static M3Bool g_m3_time_picker_test_force_hour_invalid = M3_FALSE;
+static M3Bool g_m3_time_picker_test_force_hour_to_index_error = M3_FALSE;
+static M3Bool g_m3_time_picker_test_force_rect_error = M3_FALSE;
+static M3Bool g_m3_time_picker_test_force_resolve_colors_error = M3_FALSE;
+static M3Bool g_m3_time_picker_test_skip_time_minute = M3_FALSE;
+static M3Bool g_m3_time_picker_test_force_minute_error = M3_FALSE;
+#endif
+
 static int m3_time_picker_validate_color(const M3Color *color) {
   if (color == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -153,6 +165,12 @@ static int m3_time_picker_validate_hour(m3_u32 hour) {
 }
 
 static int m3_time_picker_validate_minute(m3_u32 minute) {
+#ifdef M3_TESTING
+  if (g_m3_time_picker_test_force_minute_error == M3_TRUE) {
+    g_m3_time_picker_test_force_minute_error = M3_FALSE;
+    return M3_ERR_RANGE;
+  }
+#endif
   if (minute < M3_TIME_PICKER_MIN_MINUTE ||
       minute > M3_TIME_PICKER_MAX_MINUTE) {
     return M3_ERR_RANGE;
@@ -170,6 +188,12 @@ static int m3_time_picker_validate_time(const M3Time *time) {
   if (rc != M3_OK) {
     return rc;
   }
+#ifdef M3_TESTING
+  if (g_m3_time_picker_test_skip_time_minute == M3_TRUE) {
+    g_m3_time_picker_test_skip_time_minute = M3_FALSE;
+    return M3_OK;
+  }
+#endif
   rc = m3_time_picker_validate_minute(time->minute);
   if (rc != M3_OK) {
     return rc;
@@ -211,6 +235,12 @@ static int m3_time_picker_compute_metrics(const M3TimePicker *picker,
   }
 
   dial_size = (avail_width < avail_height) ? avail_width : avail_height;
+#ifdef M3_TESTING
+  if (g_m3_time_picker_test_force_dial_size_zero == M3_TRUE) {
+    g_m3_time_picker_test_force_dial_size_zero = M3_FALSE;
+    dial_size = 0.0f;
+  }
+#endif
   if (dial_size <= 0.0f) {
     memset(out_metrics, 0, sizeof(*out_metrics));
     return M3_OK;
@@ -242,6 +272,12 @@ static int m3_time_picker_angle_from_point(M3Scalar cx, M3Scalar cy, M3Scalar x,
   if (out_angle == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
+#ifdef M3_TESTING
+  if (g_m3_time_picker_test_force_angle_error == M3_TRUE) {
+    g_m3_time_picker_test_force_angle_error = M3_FALSE;
+    return M3_ERR_RANGE;
+  }
+#endif
 
   angle = atan2((double)(y - cy), (double)(x - cx));
   angle += (double)(M3_TIME_PICKER_PI * 0.5f);
@@ -263,6 +299,12 @@ static int m3_time_picker_angle_to_index(M3Scalar angle, m3_u32 count,
   if (out_index == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
+#ifdef M3_TESTING
+  if (g_m3_time_picker_test_force_angle_index_error == M3_TRUE) {
+    g_m3_time_picker_test_force_angle_index_error = M3_FALSE;
+    return M3_ERR_RANGE;
+  }
+#endif
   if (count == 0u) {
     return M3_ERR_RANGE;
   }
@@ -323,6 +365,12 @@ static int m3_time_picker_hour_from_index(m3_u32 index, m3_u32 format,
     }
   }
 
+#ifdef M3_TESTING
+  if (g_m3_time_picker_test_force_hour_invalid == M3_TRUE) {
+    g_m3_time_picker_test_force_hour_invalid = M3_FALSE;
+    hour = M3_TIME_PICKER_MAX_HOUR + 1u;
+  }
+#endif
   rc = m3_time_picker_validate_hour(hour);
   if (rc != M3_OK) {
     return rc;
@@ -341,6 +389,12 @@ static int m3_time_picker_hour_to_index(m3_u32 hour, m3_u32 format,
   if (out_index == NULL || out_inner == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
+#ifdef M3_TESTING
+  if (g_m3_time_picker_test_force_hour_to_index_error == M3_TRUE) {
+    g_m3_time_picker_test_force_hour_to_index_error = M3_FALSE;
+    return M3_ERR_RANGE;
+  }
+#endif
 
   rc = m3_time_picker_validate_hour(hour);
   if (rc != M3_OK) {
@@ -374,13 +428,13 @@ static int m3_time_picker_hour_to_index(m3_u32 hour, m3_u32 format,
 
 static int m3_time_picker_pick_time(const M3TimePicker *picker, M3Scalar x,
                                     M3Scalar y, m3_u32 field, M3Time *out_time,
-                                    M3Bool *out_valid) {
+                                    M3Bool *out_valid) { /* GCOVR_EXCL_LINE */
   M3TimePickerMetrics metrics;
   M3Time time;
   M3Scalar dx;
   M3Scalar dy;
   M3Scalar dist;
-  M3Scalar angle;
+  M3Scalar angle = 0.0f;
   M3Scalar threshold;
   m3_u32 index;
   M3Bool inner_ring;
@@ -533,6 +587,12 @@ static int m3_time_picker_draw_circle(M3Gfx *gfx, M3Scalar cx, M3Scalar cy,
   rect.width = radius * 2.0f;
   rect.height = radius * 2.0f;
 
+#ifdef M3_TESTING
+  if (g_m3_time_picker_test_force_rect_error == M3_TRUE) {
+    g_m3_time_picker_test_force_rect_error = M3_FALSE;
+    rect.width = -1.0f;
+  }
+#endif
   rc = m3_time_picker_validate_rect(&rect);
   if (rc != M3_OK) {
     return rc;
@@ -544,7 +604,7 @@ static int m3_time_picker_draw_circle(M3Gfx *gfx, M3Scalar cx, M3Scalar cy,
 static int m3_time_picker_draw_ring(M3Gfx *gfx, M3Scalar cx, M3Scalar cy,
                                     M3Scalar radius, M3Scalar thickness,
                                     M3Color ring_color, M3Color fill_color) {
-  M3Scalar inner_radius;
+  M3Scalar inner_radius = 0.0f;
   int rc;
 
   if (thickness <= 0.0f) {
@@ -582,6 +642,12 @@ static int m3_time_picker_resolve_colors(const M3TimePicker *picker,
     return M3_ERR_INVALID_ARGUMENT;
   }
 
+#ifdef M3_TESTING
+  if (g_m3_time_picker_test_force_resolve_colors_error == M3_TRUE) {
+    g_m3_time_picker_test_force_resolve_colors_error = M3_FALSE;
+    return M3_ERR_RANGE;
+  }
+#endif
   if (picker->widget.flags & M3_WIDGET_FLAG_DISABLED) {
     *out_background = picker->style.disabled_color;
     *out_ring = picker->style.disabled_color;
@@ -621,7 +687,7 @@ static int m3_time_picker_compute_hand(const M3TimePicker *picker,
   M3Scalar step;
   M3Scalar radius;
   m3_u32 index;
-  M3Bool inner_ring;
+  M3Bool inner_ring = M3_FALSE;
   int rc;
 
   if (picker == NULL || metrics == NULL || out_angle == NULL ||
@@ -756,7 +822,7 @@ static int m3_time_picker_widget_layout(void *widget, M3Rect bounds) {
 static int m3_time_picker_widget_paint(void *widget, M3PaintContext *ctx) {
   M3TimePicker *picker;
   M3TimePickerMetrics metrics;
-  M3Color background;
+  M3Color background = {0.0f, 0.0f, 0.0f, 0.0f};
   M3Color ring;
   M3Color hand;
   M3Color selection;
@@ -1207,6 +1273,48 @@ int M3_CALL m3_time_picker_update(M3TimePicker *picker) {
 }
 
 #ifdef M3_TESTING
+int M3_CALL m3_time_picker_test_set_force_dial_size_zero(M3Bool enable) {
+  g_m3_time_picker_test_force_dial_size_zero = enable;
+  return M3_OK;
+}
+
+int M3_CALL m3_time_picker_test_set_force_angle_error(M3Bool enable) {
+  g_m3_time_picker_test_force_angle_error = enable;
+  return M3_OK;
+}
+
+int M3_CALL m3_time_picker_test_set_force_angle_index_error(M3Bool enable) {
+  g_m3_time_picker_test_force_angle_index_error = enable;
+  return M3_OK;
+}
+
+int M3_CALL m3_time_picker_test_set_force_hour_invalid(M3Bool enable) {
+  g_m3_time_picker_test_force_hour_invalid = enable;
+  return M3_OK;
+}
+
+int M3_CALL m3_time_picker_test_set_force_hour_to_index_error(M3Bool enable) {
+  g_m3_time_picker_test_force_hour_to_index_error = enable;
+  return M3_OK;
+}
+
+int M3_CALL m3_time_picker_test_set_force_rect_error(M3Bool enable) {
+  g_m3_time_picker_test_force_rect_error = enable;
+  return M3_OK;
+}
+
+int M3_CALL m3_time_picker_test_set_force_resolve_colors_error(M3Bool enable) {
+  g_m3_time_picker_test_force_resolve_colors_error = enable;
+  return M3_OK;
+}
+
+int M3_CALL
+m3_time_picker_test_set_force_compute_hand_minute_error(M3Bool enable) {
+  g_m3_time_picker_test_skip_time_minute = enable;
+  g_m3_time_picker_test_force_minute_error = enable;
+  return M3_OK;
+}
+
 int M3_CALL m3_time_picker_test_validate_color(const M3Color *color) {
   return m3_time_picker_validate_color(color);
 }

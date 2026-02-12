@@ -3,6 +3,7 @@
 #include "m3/m3_backend_null.h"
 #include "m3/m3_log.h"
 #include "m3/m3_object.h"
+#include "m3/m3_path.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -347,6 +348,7 @@ int main(void) {
     M3Rect rect_small;
     M3Mat3 transform;
     M3Color color;
+    M3Path path;
     char clip_buffer[16];
     m3_usize clip_len;
     m3_i32 width;
@@ -591,6 +593,21 @@ int main(void) {
         M3_ERR_RANGE);
     M3_TEST_OK(
         gfx.vtable->draw_line(gfx.ctx, 0.0f, 0.0f, 1.0f, 1.0f, color, 1.0f));
+
+    memset(&path, 0, sizeof(path));
+    M3_TEST_EXPECT(gfx.vtable->draw_path(NULL, &path, color),
+                   M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(gfx.vtable->draw_path(gfx.ctx, NULL, color),
+                   M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(gfx.vtable->draw_path(gfx.ctx, &path, color), M3_ERR_STATE);
+    M3_TEST_OK(m3_path_init(&path, NULL, 0));
+    M3_TEST_OK(m3_path_move_to(&path, 0.0f, 0.0f));
+    M3_TEST_OK(gfx.vtable->draw_path(gfx.ctx, &path, color));
+    path.count = path.capacity + 1u;
+    M3_TEST_EXPECT(gfx.vtable->draw_path(gfx.ctx, &path, color), M3_ERR_STATE);
+    path.count = 1u;
+    M3_TEST_OK(gfx.vtable->draw_path(gfx.ctx, &path, color));
+    M3_TEST_OK(m3_path_shutdown(&path));
 
     M3_TEST_EXPECT(gfx.vtable->push_clip(NULL, &rect), M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(gfx.vtable->push_clip(gfx.ctx, NULL),

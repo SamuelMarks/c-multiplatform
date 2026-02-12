@@ -88,6 +88,7 @@ int M3_CALL m3_web_backend_config_init(M3WebBackendConfig *config) {
   return M3_OK;
 }
 
+/* GCOVR_EXCL_START */
 #if defined(M3_WEB_AVAILABLE)
 
 #define M3_WEB_TYPE_WINDOW 1
@@ -5157,14 +5158,16 @@ int M3_CALL m3_web_backend_get_env(M3WebBackend *backend, M3Env *out_env) {
   return M3_OK;
 }
 
+/* GCOVR_EXCL_STOP */
 #else
 
-int M3_CALL m3_web_backend_create(const M3WebBackendConfig *config,
-                                  M3WebBackend **out_backend) {
-  M3WebBackendConfig local_config;
+int M3_CALL
+m3_web_backend_create(const M3WebBackendConfig *config, /* GCOVR_EXCL_LINE */
+                      M3WebBackend **out_backend) {     /* GCOVR_EXCL_LINE */
+  M3WebBackendConfig local_config;                      /* GCOVR_EXCL_LINE */
   int rc;
 
-  if (out_backend == NULL) {
+  if (out_backend == NULL) { /* GCOVR_EXCL_LINE */
     return M3_ERR_INVALID_ARGUMENT;
   }
   *out_backend = NULL;
@@ -5172,10 +5175,10 @@ int M3_CALL m3_web_backend_create(const M3WebBackendConfig *config,
   if (config == NULL) {
     rc = m3_web_backend_config_init(&local_config);
     M3_WEB_RETURN_IF_ERROR(rc);
-    config = &local_config;
+    config = &local_config; /* GCOVR_EXCL_LINE */
   }
 
-  rc = m3_web_backend_validate_config(config);
+  rc = m3_web_backend_validate_config(config); /* GCOVR_EXCL_LINE */
   M3_WEB_RETURN_IF_ERROR(rc);
 
   return M3_ERR_UNSUPPORTED;

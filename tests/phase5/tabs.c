@@ -43,6 +43,48 @@ int M3_CALL m3_tab_row_test_validate_backend(const M3TextBackend *backend);
 int M3_CALL m3_tab_row_test_measure_content(const M3TabRow *row, m3_u32 mode,
                                             M3Scalar *out_width,
                                             M3Scalar *out_height);
+int M3_CALL m3_tab_row_test_color_should_fail_null(void);
+int M3_CALL m3_tab_row_test_fail_point_match_null(void);
+int M3_CALL m3_tab_row_test_force_color_error(M3Bool enable);
+int M3_CALL m3_tab_row_test_set_fail_point_error_after(m3_u32 call_count);
+int M3_CALL m3_tab_row_test_set_value_fail_after(m3_u32 call_count);
+int M3_CALL m3_tab_row_test_set_start_fail_after(m3_u32 call_count);
+int M3_CALL m3_tab_row_test_measure_max_text(const M3TabRow *row,
+                                             M3Scalar *out_width,
+                                             M3Scalar *out_height,
+                                             M3Scalar *out_baseline);
+int M3_CALL m3_tab_row_test_item_width(const M3TabRow *row,
+                                       const M3TabItem *item,
+                                       M3Scalar *out_width);
+int M3_CALL m3_tab_row_test_compute_layout(const M3TabRow *row,
+                                           M3Scalar *out_content_width,
+                                           M3Scalar *out_tab_width,
+                                           M3Scalar *out_tab_height,
+                                           m3_u32 *out_mode);
+int M3_CALL m3_tab_row_test_clamp_scroll(M3TabRow *row, m3_u32 mode,
+                                         M3Scalar content_width,
+                                         M3Scalar available_width);
+int M3_CALL m3_tab_row_test_indicator_target(
+    const M3TabRow *row, m3_u32 mode, M3Scalar tab_width, M3Scalar spacing,
+    M3Scalar content_width, M3Scalar start_x, M3Scalar start_y,
+    M3Scalar tab_height, M3Scalar *out_pos, M3Scalar *out_width);
+int M3_CALL m3_tab_row_test_sync_indicator(M3TabRow *row, m3_u32 mode,
+                                           M3Scalar tab_width, M3Scalar spacing,
+                                           M3Scalar content_width,
+                                           M3Scalar start_x, M3Scalar start_y,
+                                           M3Scalar tab_height, M3Bool animate);
+int M3_CALL m3_tab_row_test_item_rect(const M3TabRow *row, m3_u32 mode,
+                                      M3Scalar start_x, M3Scalar start_y,
+                                      M3Scalar tab_width, M3Scalar tab_height,
+                                      M3Scalar spacing, M3Scalar content_width,
+                                      M3Scalar available_width, m3_usize index,
+                                      M3Rect *out_rect);
+int M3_CALL m3_tab_row_test_hit_test(const M3TabRow *row, m3_u32 mode,
+                                     M3Scalar start_x, M3Scalar start_y,
+                                     M3Scalar tab_width, M3Scalar tab_height,
+                                     M3Scalar spacing, M3Scalar content_width,
+                                     M3Scalar available_width, m3_i32 x,
+                                     m3_i32 y, m3_usize *out_index);
 
 int M3_CALL m3_segmented_test_set_fail_point(m3_u32 point);
 int M3_CALL m3_segmented_test_set_color_fail_after(m3_u32 call_count);
@@ -69,6 +111,26 @@ int M3_CALL m3_segmented_test_validate_selected_states(const M3Bool *states,
 int M3_CALL m3_segmented_test_measure_content(const M3SegmentedButtons *buttons,
                                               M3Scalar *out_width,
                                               M3Scalar *out_height);
+int M3_CALL m3_segmented_test_color_should_fail_null(void);
+int M3_CALL m3_segmented_test_fail_point_match_null(void);
+int M3_CALL m3_segmented_test_force_color_error(M3Bool enable);
+int M3_CALL m3_segmented_test_set_fail_point_error_after(m3_u32 call_count);
+int M3_CALL m3_segmented_test_measure_max_text(
+    const M3SegmentedButtons *buttons, M3Scalar *out_width,
+    M3Scalar *out_height, M3Scalar *out_baseline);
+int M3_CALL m3_segmented_test_compute_layout(const M3SegmentedButtons *buttons,
+                                             M3Scalar *out_content_width,
+                                             M3Scalar *out_segment_width,
+                                             M3Scalar *out_segment_height,
+                                             M3Scalar *out_spacing);
+int M3_CALL m3_segmented_test_hit_test(const M3SegmentedButtons *buttons,
+                                       M3Scalar start_x, M3Scalar start_y,
+                                       M3Scalar segment_width,
+                                       M3Scalar segment_height,
+                                       M3Scalar spacing, M3Scalar content_width,
+                                       m3_i32 x, m3_i32 y, m3_usize *out_index);
+int M3_CALL m3_segmented_test_is_selected(const M3SegmentedButtons *buttons,
+                                          m3_usize index, M3Bool *out_selected);
 
 typedef struct TestTabsBackend {
   int create_calls;
@@ -593,6 +655,464 @@ static int test_tab_row_validation_helpers(void) {
                                              &width, &height));
   M3_TEST_OK(row.widget.vtable->destroy(row.widget.ctx));
 
+  return M3_OK;
+}
+
+static int test_tab_row_internal_helpers(void) {
+  TestTabsBackend backend_state;
+  M3TextBackend backend;
+  M3TabRowStyle style;
+  M3TabRow row;
+  M3TabItem items[2];
+  M3Color color;
+  M3Scalar width;
+  M3Scalar height;
+  M3Scalar baseline;
+  M3Scalar content_width;
+  M3Scalar tab_width;
+  M3Scalar tab_height;
+  m3_u32 layout_mode;
+  M3Rect rect;
+  m3_usize index;
+
+  M3_TEST_EXPECT(m3_tab_row_test_color_should_fail_null(),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_tab_row_test_fail_point_match_null(),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  M3_TEST_EXPECT(m3_tab_row_test_color_set(&color, 0.0f, -0.1f, 0.0f, 0.0f),
+                 M3_ERR_RANGE);
+  M3_TEST_EXPECT(m3_tab_row_test_color_set(&color, 0.0f, 0.0f, -0.1f, 0.0f),
+                 M3_ERR_RANGE);
+  M3_TEST_EXPECT(m3_tab_row_test_color_set(&color, 0.0f, 0.0f, 0.0f, -0.1f),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_tab_row_test_force_color_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_tab_row_test_color_set(&color, 0.0f, 0.0f, 0.0f, 1.0f),
+                 M3_ERR_IO);
+
+  color.r = 0.0f;
+  color.g = 2.0f;
+  color.b = 0.0f;
+  color.a = 1.0f;
+  M3_TEST_EXPECT(m3_tab_row_test_color_with_alpha(&color, 0.5f, &color),
+                 M3_ERR_RANGE);
+  color.g = 0.0f;
+  M3_TEST_OK(m3_tab_row_test_force_color_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_tab_row_test_color_with_alpha(&color, 0.5f, &color),
+                 M3_ERR_IO);
+
+  M3_TEST_OK(m3_tab_row_style_init(&style));
+  style.text_style.utf8_family = "Sans";
+  style.indicator_color.r = -1.0f;
+  M3_TEST_EXPECT(m3_tab_row_test_validate_style(&style, M3_TRUE), M3_ERR_RANGE);
+  M3_TEST_OK(m3_tab_row_style_init(&style));
+  style.text_style.utf8_family = "Sans";
+  style.background_color.r = -1.0f;
+  M3_TEST_EXPECT(m3_tab_row_test_validate_style(&style, M3_TRUE), M3_ERR_RANGE);
+  M3_TEST_OK(m3_tab_row_style_init(&style));
+  style.text_style.utf8_family = "Sans";
+  style.disabled_text_color.r = -1.0f;
+  M3_TEST_EXPECT(m3_tab_row_test_validate_style(&style, M3_TRUE), M3_ERR_RANGE);
+  M3_TEST_OK(m3_tab_row_style_init(&style));
+  style.text_style.utf8_family = "Sans";
+  style.disabled_indicator_color.r = -1.0f;
+  M3_TEST_EXPECT(m3_tab_row_test_validate_style(&style, M3_TRUE), M3_ERR_RANGE);
+
+  M3_TEST_OK(test_backend_init(&backend_state));
+  M3_TEST_OK(setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
+  M3_TEST_OK(m3_tab_row_style_init(&style));
+  style.text_style.utf8_family = "Sans";
+  items[0].utf8_label = "A";
+  items[0].utf8_len = 1;
+  items[1].utf8_label = NULL;
+  items[1].utf8_len = 0;
+  M3_TEST_OK(m3_tab_row_init(&row, &backend, &style, items, 2, 0));
+
+  M3_TEST_EXPECT(
+      m3_tab_row_test_measure_max_text(NULL, &width, &height, &baseline),
+      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      m3_tab_row_test_measure_max_text(&row, NULL, &height, &baseline),
+      M3_ERR_INVALID_ARGUMENT);
+  row.items = NULL;
+  row.item_count = 1;
+  M3_TEST_EXPECT(
+      m3_tab_row_test_measure_max_text(&row, &width, &height, &baseline),
+      M3_ERR_INVALID_ARGUMENT);
+  row.items = items;
+  row.item_count = 2;
+  M3_TEST_OK(
+      m3_tab_row_test_measure_max_text(&row, &width, &height, &baseline));
+
+  M3_TEST_EXPECT(m3_tab_row_test_item_width(NULL, &items[0], &width),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_tab_row_test_item_width(&row, NULL, &width),
+                 M3_ERR_INVALID_ARGUMENT);
+  backend_state.fail_measure = 1;
+  M3_TEST_EXPECT(m3_tab_row_test_item_width(&row, &items[0], &width),
+                 M3_ERR_IO);
+  backend_state.fail_measure = 0;
+  row.style.padding_x = -10.0f;
+  row.style.min_width = -100.0f;
+  M3_TEST_EXPECT(m3_tab_row_test_item_width(&row, &items[0], &width),
+                 M3_ERR_RANGE);
+  row.style.padding_x = style.padding_x;
+  row.style.min_width = style.min_width;
+
+  M3_TEST_EXPECT(m3_tab_row_test_measure_content(&row, 99u, &width, &height),
+                 M3_ERR_RANGE);
+  row.item_count = 0;
+  M3_TEST_OK(m3_tab_row_test_measure_content(&row, M3_TAB_MODE_FIXED, &width,
+                                             &height));
+  row.item_count = 2;
+  backend_state.fail_measure = 1;
+  M3_TEST_EXPECT(m3_tab_row_test_measure_content(&row, M3_TAB_MODE_SCROLLABLE,
+                                                 &width, &height),
+                 M3_ERR_IO);
+  backend_state.fail_measure = 0;
+  row.style.padding.left = -100.0f;
+  row.item_count = 0;
+  M3_TEST_EXPECT(
+      m3_tab_row_test_measure_content(&row, M3_TAB_MODE_FIXED, &width, &height),
+      M3_ERR_RANGE);
+  row.style.padding.left = style.padding.left;
+  row.item_count = 2;
+
+  M3_TEST_EXPECT(m3_tab_row_test_compute_layout(NULL, &content_width,
+                                                &tab_width, &tab_height,
+                                                &layout_mode),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, NULL, &tab_width,
+                                                &tab_height, &layout_mode),
+                 M3_ERR_INVALID_ARGUMENT);
+  row.style.mode = 99u;
+  M3_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
+                                                &tab_width, &tab_height,
+                                                &layout_mode),
+                 M3_ERR_RANGE);
+  row.style.mode = M3_TAB_MODE_FIXED;
+  row.bounds.width = -1.0f;
+  M3_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
+                                                &tab_width, &tab_height,
+                                                &layout_mode),
+                 M3_ERR_RANGE);
+  row.bounds.width = 100.0f;
+  row.bounds.height = 50.0f;
+
+  row.style.padding.left = 60.0f;
+  row.style.padding.right = 60.0f;
+  M3_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
+                                                &tab_width, &tab_height,
+                                                &layout_mode),
+                 M3_ERR_RANGE);
+  row.style.padding.left = style.padding.left;
+  row.style.padding.right = style.padding.right;
+
+  M3_TEST_OK(m3_tab_row_test_set_fail_point_error_after(1u));
+  M3_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
+                                                &tab_width, &tab_height,
+                                                &layout_mode),
+                 M3_ERR_IO);
+  M3_TEST_OK(m3_tab_row_test_set_fail_point_error_after(2u));
+  M3_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
+                                                &tab_width, &tab_height,
+                                                &layout_mode),
+                 M3_ERR_IO);
+  M3_TEST_OK(m3_tab_row_test_set_fail_point_error_after(3u));
+  M3_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
+                                                &tab_width, &tab_height,
+                                                &layout_mode),
+                 M3_ERR_IO);
+  M3_TEST_OK(m3_tab_row_test_set_fail_point_error_after(0u));
+
+  M3_TEST_EXPECT(
+      m3_tab_row_test_clamp_scroll(NULL, M3_TAB_MODE_SCROLLABLE, 10.0f, 5.0f),
+      M3_ERR_INVALID_ARGUMENT);
+  row.scroll_offset = -1.0f;
+  M3_TEST_EXPECT(
+      m3_tab_row_test_clamp_scroll(&row, M3_TAB_MODE_SCROLLABLE, 10.0f, 5.0f),
+      M3_ERR_RANGE);
+  row.scroll_offset = 0.0f;
+  M3_TEST_OK(
+      m3_tab_row_test_clamp_scroll(&row, M3_TAB_MODE_FIXED, 10.0f, 5.0f));
+
+  M3_TEST_EXPECT(m3_tab_row_test_indicator_target(NULL, M3_TAB_MODE_FIXED,
+                                                  10.0f, 0.0f, 10.0f, 0.0f,
+                                                  0.0f, 10.0f, &width, &height),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_tab_row_test_indicator_target(&row, 99u, 10.0f, 0.0f, 10.0f,
+                                                  0.0f, 0.0f, 10.0f, &width,
+                                                  &height),
+                 M3_ERR_RANGE);
+  row.selected_index = 1;
+  row.item_count = 2;
+  backend_state.fail_measure = 1;
+  M3_TEST_EXPECT(m3_tab_row_test_indicator_target(&row, M3_TAB_MODE_SCROLLABLE,
+                                                  10.0f, 0.0f, 20.0f, 0.0f,
+                                                  0.0f, 10.0f, &width, &height),
+                 M3_ERR_IO);
+  backend_state.fail_measure = 0;
+  M3_TEST_EXPECT(m3_tab_row_test_indicator_target(&row, M3_TAB_MODE_FIXED,
+                                                  -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                                                  10.0f, &width, &height),
+                 M3_ERR_RANGE);
+
+  M3_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
+                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                (M3Bool)2),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, 99u, 10.0f, 0.0f, 10.0f,
+                                                0.0f, 0.0f, 10.0f, M3_FALSE),
+                 M3_ERR_RANGE);
+
+  row.style.indicator_anim_duration = -1.0f;
+  M3_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
+                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                M3_TRUE),
+                 M3_ERR_RANGE);
+  row.style.indicator_anim_duration = 0.2f;
+  row.style.indicator_anim_easing = 99u;
+  M3_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
+                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                M3_TRUE),
+                 M3_ERR_INVALID_ARGUMENT);
+  row.style.indicator_anim_easing = M3_TAB_DEFAULT_INDICATOR_EASING;
+
+  M3_TEST_OK(m3_tab_row_test_set_start_fail_after(1u));
+  M3_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
+                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                M3_TRUE),
+                 M3_ERR_IO);
+  M3_TEST_OK(m3_tab_row_test_set_start_fail_after(2u));
+  M3_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
+                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                M3_FALSE),
+                 M3_ERR_IO);
+
+  M3_TEST_OK(m3_tab_row_test_set_value_fail_after(1u));
+  M3_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
+                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                M3_FALSE),
+                 M3_ERR_IO);
+  M3_TEST_OK(m3_tab_row_test_set_value_fail_after(2u));
+  M3_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
+                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                M3_FALSE),
+                 M3_ERR_IO);
+
+  M3_TEST_OK(
+      m3_tab_row_test_set_fail_point(M3_TAB_ROW_TEST_FAIL_ITEM_RECT_NEGATIVE));
+  M3_TEST_EXPECT(m3_tab_row_test_item_rect(&row, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
+                                           10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 0u,
+                                           &rect),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_tab_row_test_clear_fail_points());
+
+  M3_TEST_EXPECT(m3_tab_row_test_item_rect(NULL, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
+                                           10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 0u,
+                                           &rect),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_tab_row_test_item_rect(&row, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
+                                           10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 5u,
+                                           &rect),
+                 M3_ERR_RANGE);
+  M3_TEST_EXPECT(m3_tab_row_test_item_rect(&row, 99u, 0.0f, 0.0f, 10.0f, 10.0f,
+                                           0.0f, 10.0f, 10.0f, 0u, &rect),
+                 M3_ERR_RANGE);
+
+  index = M3_TAB_INVALID_INDEX;
+  M3_TEST_EXPECT(m3_tab_row_test_hit_test(NULL, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
+                                          10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 0,
+                                          0, &index),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_tab_row_test_hit_test(&row, 99u, 0.0f, 0.0f, 10.0f, 10.0f,
+                                          0.0f, 10.0f, 10.0f, 0, 0, &index),
+                 M3_ERR_RANGE);
+
+  M3_TEST_OK(m3_tab_row_test_set_fail_point_error_after(1u));
+  M3_TEST_EXPECT(m3_tab_row_test_hit_test(&row, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
+                                          10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 0,
+                                          0, &index),
+                 M3_ERR_IO);
+  M3_TEST_OK(m3_tab_row_test_set_fail_point_error_after(0u));
+
+  {
+    M3Bool changed;
+
+    M3_TEST_OK(m3_anim_controller_start_timing(
+        &row.indicator_pos_anim, 0.0f, 1.0f, 1.0f, M3_ANIM_EASE_LINEAR));
+    M3_TEST_OK(m3_anim_controller_start_timing(
+        &row.indicator_width_anim, 0.0f, 2.0f, 1.0f, M3_ANIM_EASE_LINEAR));
+    row.indicator_pos = 10.0f;
+    row.indicator_width = 10.0f;
+    M3_TEST_OK(m3_tab_row_step(&row, 0.1f, &changed));
+    M3_TEST_ASSERT(changed == M3_TRUE);
+  }
+
+  M3_TEST_OK(row.widget.vtable->destroy(row.widget.ctx));
+  return M3_OK;
+}
+
+static int test_segmented_internal_helpers(void) {
+  TestTabsBackend backend_state;
+  M3TextBackend backend;
+  M3SegmentedStyle style;
+  M3SegmentedButtons buttons;
+  M3SegmentedItem items[2];
+  M3Color color;
+  M3Scalar width;
+  M3Scalar height;
+  M3Scalar baseline;
+  M3Scalar content_width;
+  M3Scalar segment_width;
+  M3Scalar segment_height;
+  M3Scalar spacing;
+  m3_usize index;
+  M3Bool selected;
+
+  M3_TEST_EXPECT(m3_segmented_test_color_should_fail_null(),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_segmented_test_fail_point_match_null(),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  M3_TEST_EXPECT(m3_segmented_test_color_set(&color, 0.0f, -0.1f, 0.0f, 0.0f),
+                 M3_ERR_RANGE);
+  M3_TEST_EXPECT(m3_segmented_test_color_set(&color, 0.0f, 0.0f, -0.1f, 0.0f),
+                 M3_ERR_RANGE);
+  M3_TEST_EXPECT(m3_segmented_test_color_set(&color, 0.0f, 0.0f, 0.0f, -0.1f),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_segmented_test_force_color_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_segmented_test_color_set(&color, 0.0f, 0.0f, 0.0f, 1.0f),
+                 M3_ERR_IO);
+
+  color.r = 0.0f;
+  color.g = 2.0f;
+  color.b = 0.0f;
+  color.a = 1.0f;
+  M3_TEST_EXPECT(m3_segmented_test_color_with_alpha(&color, 0.5f, &color),
+                 M3_ERR_RANGE);
+  color.g = 0.0f;
+  M3_TEST_OK(m3_segmented_test_force_color_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_segmented_test_color_with_alpha(&color, 0.5f, &color),
+                 M3_ERR_IO);
+
+  M3_TEST_OK(m3_segmented_style_init(&style));
+  style.text_style.utf8_family = "Sans";
+  style.background_color.r = -1.0f;
+  M3_TEST_EXPECT(m3_segmented_test_validate_style(&style, M3_TRUE),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_segmented_style_init(&style));
+  style.text_style.utf8_family = "Sans";
+  style.outline_color.r = -1.0f;
+  M3_TEST_EXPECT(m3_segmented_test_validate_style(&style, M3_TRUE),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_segmented_style_init(&style));
+  style.text_style.utf8_family = "Sans";
+  style.disabled_text_color.r = -1.0f;
+  M3_TEST_EXPECT(m3_segmented_test_validate_style(&style, M3_TRUE),
+                 M3_ERR_RANGE);
+
+  M3_TEST_OK(test_backend_init(&backend_state));
+  M3_TEST_OK(setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
+  M3_TEST_OK(m3_segmented_style_init(&style));
+  style.text_style.utf8_family = "Sans";
+  items[0].utf8_label = "One";
+  items[0].utf8_len = 3;
+  items[1].utf8_label = NULL;
+  items[1].utf8_len = 0;
+  M3_TEST_OK(m3_segmented_buttons_init(&buttons, &backend, &style, items, 2,
+                                       M3_SEGMENTED_MODE_SINGLE, 0, NULL));
+
+  M3_TEST_EXPECT(
+      m3_segmented_test_measure_max_text(NULL, &width, &height, &baseline),
+      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      m3_segmented_test_measure_max_text(&buttons, NULL, &height, &baseline),
+      M3_ERR_INVALID_ARGUMENT);
+  buttons.items = NULL;
+  buttons.item_count = 1;
+  M3_TEST_EXPECT(
+      m3_segmented_test_measure_max_text(&buttons, &width, &height, &baseline),
+      M3_ERR_INVALID_ARGUMENT);
+  buttons.items = items;
+  buttons.item_count = 2;
+  M3_TEST_OK(
+      m3_segmented_test_measure_max_text(&buttons, &width, &height, &baseline));
+
+  M3_TEST_EXPECT(m3_segmented_test_measure_content(NULL, &width, &height),
+                 M3_ERR_INVALID_ARGUMENT);
+  buttons.item_count = 0;
+  M3_TEST_OK(m3_segmented_test_measure_content(&buttons, &width, &height));
+  buttons.item_count = 2;
+  buttons.style.padding.left = -100.0f;
+  buttons.item_count = 0;
+  M3_TEST_EXPECT(m3_segmented_test_measure_content(&buttons, &width, &height),
+                 M3_ERR_RANGE);
+  buttons.style.padding.left = style.padding.left;
+  buttons.item_count = 2;
+
+  M3_TEST_EXPECT(m3_segmented_test_compute_layout(NULL, &content_width,
+                                                  &segment_width,
+                                                  &segment_height, &spacing),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_segmented_test_compute_layout(
+                     &buttons, NULL, &segment_width, &segment_height, &spacing),
+                 M3_ERR_INVALID_ARGUMENT);
+  buttons.bounds.width = -1.0f;
+  M3_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, &content_width,
+                                                  &segment_width,
+                                                  &segment_height, &spacing),
+                 M3_ERR_RANGE);
+  buttons.bounds.width = 100.0f;
+  buttons.bounds.height = 40.0f;
+  buttons.style.padding.left = 60.0f;
+  buttons.style.padding.right = 60.0f;
+  M3_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, &content_width,
+                                                  &segment_width,
+                                                  &segment_height, &spacing),
+                 M3_ERR_RANGE);
+  buttons.style.padding.left = style.padding.left;
+  buttons.style.padding.right = style.padding.right;
+
+  M3_TEST_OK(m3_segmented_test_set_fail_point_error_after(1u));
+  M3_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, &content_width,
+                                                  &segment_width,
+                                                  &segment_height, &spacing),
+                 M3_ERR_IO);
+  M3_TEST_OK(m3_segmented_test_set_fail_point_error_after(2u));
+  M3_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, &content_width,
+                                                  &segment_width,
+                                                  &segment_height, &spacing),
+                 M3_ERR_IO);
+  M3_TEST_OK(m3_segmented_test_set_fail_point_error_after(3u));
+  M3_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, &content_width,
+                                                  &segment_width,
+                                                  &segment_height, &spacing),
+                 M3_ERR_IO);
+  M3_TEST_OK(m3_segmented_test_set_fail_point_error_after(0u));
+
+  index = 0;
+  M3_TEST_EXPECT(m3_segmented_test_hit_test(NULL, 0.0f, 0.0f, 10.0f, 10.0f,
+                                            0.0f, 10.0f, 0, 0, &index),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  M3_TEST_OK(m3_segmented_test_set_fail_point_error_after(1u));
+  M3_TEST_EXPECT(m3_segmented_test_hit_test(&buttons, 0.0f, 0.0f, 10.0f, 10.0f,
+                                            0.0f, 10.0f, 0, 0, &index),
+                 M3_ERR_IO);
+  M3_TEST_OK(m3_segmented_test_set_fail_point_error_after(0u));
+
+  M3_TEST_EXPECT(m3_segmented_test_is_selected(NULL, 0u, &selected),
+                 M3_ERR_INVALID_ARGUMENT);
+  buttons.mode = M3_SEGMENTED_MODE_MULTI;
+  M3_TEST_EXPECT(m3_segmented_test_is_selected(&buttons, 0u, &selected),
+                 M3_ERR_INVALID_ARGUMENT);
+  buttons.mode = M3_SEGMENTED_MODE_SINGLE;
+  buttons.selected_index = M3_SEGMENTED_INVALID_INDEX;
+  M3_TEST_OK(m3_segmented_test_is_selected(&buttons, 0u, &selected));
+  M3_TEST_ASSERT(selected == M3_FALSE);
+
+  M3_TEST_OK(buttons.widget.vtable->destroy(buttons.widget.ctx));
   return M3_OK;
 }
 
@@ -2112,6 +2632,11 @@ int main(void) {
     return 1;
   }
   step += 1;
+  if (test_tab_row_internal_helpers() != M3_OK) {
+    fprintf(stderr, "m3_phase5_tabs step %d\n", step);
+    return 1;
+  }
+  step += 1;
   if (test_tab_row_init_and_setters() != M3_OK) {
     fprintf(stderr, "m3_phase5_tabs step %d\n", step);
     return 1;
@@ -2133,6 +2658,11 @@ int main(void) {
   }
   step += 1;
   if (test_segmented_validation_helpers() != M3_OK) {
+    fprintf(stderr, "m3_phase5_tabs step %d\n", step);
+    return 1;
+  }
+  step += 1;
+  if (test_segmented_internal_helpers() != M3_OK) {
     fprintf(stderr, "m3_phase5_tabs step %d\n", step);
     return 1;
   }

@@ -3,6 +3,11 @@
 
 #include <string.h>
 
+int M3_CALL m3_extras_test_set_tooltip_size_range_fail(M3Bool enable);
+int M3_CALL m3_extras_test_set_badge_size_range_fail(M3Bool enable);
+int M3_CALL m3_extras_test_validate_size(const M3Size *size);
+int M3_CALL m3_extras_test_validate_text_metrics(const M3TextMetrics *metrics);
+
 static int test_text_style_fill(M3TextStyle *style) {
   if (style == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
@@ -101,6 +106,31 @@ int main(void) {
   edges.bottom = 0.0f;
   M3_TEST_OK(m3_extras_test_validate_edges(&edges));
 
+  M3_TEST_EXPECT(m3_extras_test_validate_rect(NULL), M3_ERR_INVALID_ARGUMENT);
+  bounds.x = 0.0f;
+  bounds.y = 0.0f;
+  bounds.width = -1.0f;
+  bounds.height = 1.0f;
+  M3_TEST_EXPECT(m3_extras_test_validate_rect(&bounds), M3_ERR_RANGE);
+  bounds.width = 1.0f;
+  bounds.height = -1.0f;
+  M3_TEST_EXPECT(m3_extras_test_validate_rect(&bounds), M3_ERR_RANGE);
+  bounds.height = 1.0f;
+  M3_TEST_OK(m3_extras_test_validate_rect(&bounds));
+
+  M3_TEST_EXPECT(m3_extras_test_validate_size(NULL), M3_ERR_INVALID_ARGUMENT);
+  tooltip_size.width = -1.0f;
+  tooltip_size.height = 1.0f;
+  M3_TEST_EXPECT(m3_extras_test_validate_size(&tooltip_size), M3_ERR_RANGE);
+  tooltip_size.width = 1.0f;
+  tooltip_size.height = -1.0f;
+  M3_TEST_EXPECT(m3_extras_test_validate_size(&tooltip_size), M3_ERR_RANGE);
+  tooltip_size.height = 1.0f;
+  M3_TEST_OK(m3_extras_test_validate_size(&tooltip_size));
+
+  M3_TEST_EXPECT(m3_extras_test_validate_text_metrics(NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+
   M3_TEST_EXPECT(m3_extras_test_validate_text_style(NULL, M3_FALSE),
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_OK(test_text_style_fill(&text_style));
@@ -149,6 +179,9 @@ int main(void) {
   M3_TEST_ASSERT(m3_near(tooltip_style_rich.min_height,
                          M3_TOOLTIP_RICH_DEFAULT_MIN_HEIGHT, 0.001f));
 
+  M3_TEST_EXPECT(m3_extras_test_validate_tooltip_style(NULL, M3_FALSE),
+                 M3_ERR_INVALID_ARGUMENT);
+
   tooltip_style.variant = 99;
   M3_TEST_EXPECT(
       m3_extras_test_validate_tooltip_style(&tooltip_style, M3_FALSE),
@@ -171,6 +204,12 @@ int main(void) {
   M3_TEST_OK(m3_tooltip_style_init_plain(&tooltip_style));
   tooltip_style.min_width = 10.0f;
   tooltip_style.max_width = 5.0f;
+  M3_TEST_EXPECT(
+      m3_extras_test_validate_tooltip_style(&tooltip_style, M3_FALSE),
+      M3_ERR_RANGE);
+  M3_TEST_OK(m3_tooltip_style_init_plain(&tooltip_style));
+  tooltip_style.min_height = 10.0f;
+  tooltip_style.max_height = 5.0f;
   M3_TEST_EXPECT(
       m3_extras_test_validate_tooltip_style(&tooltip_style, M3_FALSE),
       M3_ERR_RANGE);
@@ -283,6 +322,11 @@ int main(void) {
       m3_extras_test_validate_tooltip_content(&tooltip_style, &tooltip_content),
       M3_ERR_RANGE);
   M3_TEST_OK(test_metrics_fill(&tooltip_content.body_metrics, 10.0f, 8.0f));
+  tooltip_content.body_metrics.baseline = -1.0f;
+  M3_TEST_EXPECT(
+      m3_extras_test_validate_tooltip_content(&tooltip_style, &tooltip_content),
+      M3_ERR_RANGE);
+  M3_TEST_OK(test_metrics_fill(&tooltip_content.body_metrics, 10.0f, 8.0f));
   tooltip_content.has_title = M3_TRUE;
   tooltip_content.title_metrics.height = -1.0f;
   M3_TEST_EXPECT(
@@ -321,6 +365,24 @@ int main(void) {
   tooltip_content.title_metrics = title_metrics;
   tooltip_content.has_title = M3_FALSE;
   tooltip_content.has_body = M3_TRUE;
+  M3_TEST_EXPECT(
+      m3_tooltip_compute_content_size(NULL, &tooltip_content, &tooltip_size),
+      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      m3_tooltip_compute_content_size(&tooltip_style, NULL, &tooltip_size),
+      M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      m3_tooltip_compute_content_size(&tooltip_style, &tooltip_content, NULL),
+      M3_ERR_INVALID_ARGUMENT);
+  tooltip_style.variant = 99;
+  M3_TEST_EXPECT(m3_tooltip_compute_content_size(
+                     &tooltip_style, &tooltip_content, &tooltip_size),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_tooltip_style_init_plain(&tooltip_style));
+  M3_TEST_OK(m3_extras_test_set_tooltip_size_range_fail(M3_TRUE));
+  M3_TEST_EXPECT(m3_tooltip_compute_content_size(
+                     &tooltip_style, &tooltip_content, &tooltip_size),
+                 M3_ERR_RANGE);
   M3_TEST_OK(m3_tooltip_compute_content_size(&tooltip_style, &tooltip_content,
                                              &tooltip_size));
   M3_TEST_ASSERT(m3_near(tooltip_size.width, 36.0f, 0.001f));
@@ -372,6 +434,37 @@ int main(void) {
                                            &tooltip_placement, &overlay,
                                            &tooltip_size, &bounds, &direction),
                  M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(m3_tooltip_style_init_plain(&tooltip_style));
+  tooltip_anchor.type = M3_TOOLTIP_ANCHOR_RECT;
+  tooltip_anchor.rect.x = 0.0f;
+  tooltip_anchor.rect.y = 0.0f;
+  tooltip_anchor.rect.width = 10.0f;
+  tooltip_anchor.rect.height = 10.0f;
+  tooltip_placement.direction = M3_TOOLTIP_DIRECTION_DOWN;
+  tooltip_placement.align = M3_TOOLTIP_ALIGN_START;
+  overlay.x = 0.0f;
+  overlay.y = 0.0f;
+  overlay.width = 100.0f;
+  overlay.height = 100.0f;
+  tooltip_size.width = -1.0f;
+  tooltip_size.height = 10.0f;
+  M3_TEST_EXPECT(m3_tooltip_compute_bounds(&tooltip_style, &tooltip_anchor,
+                                           &tooltip_placement, &overlay,
+                                           &tooltip_size, &bounds, &direction),
+                 M3_ERR_RANGE);
+  tooltip_style.variant = 99;
+  tooltip_size.width = 10.0f;
+  M3_TEST_EXPECT(m3_tooltip_compute_bounds(&tooltip_style, &tooltip_anchor,
+                                           &tooltip_placement, &overlay,
+                                           &tooltip_size, &bounds, &direction),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_tooltip_style_init_plain(&tooltip_style));
+  tooltip_anchor.type = M3_TOOLTIP_ANCHOR_POINT;
+  tooltip_anchor.point.x = 50.0f;
+  tooltip_anchor.point.y = 50.0f;
+  M3_TEST_OK(m3_tooltip_compute_bounds(&tooltip_style, &tooltip_anchor,
+                                       &tooltip_placement, &overlay,
+                                       &tooltip_size, &bounds, &direction));
   M3_TEST_OK(m3_tooltip_style_init_plain(&tooltip_style));
   tooltip_anchor.type = 99;
   M3_TEST_EXPECT(m3_tooltip_compute_bounds(&tooltip_style, &tooltip_anchor,
@@ -639,6 +732,10 @@ int main(void) {
   M3_TEST_EXPECT(m3_extras_test_validate_badge_style(&badge_style, M3_FALSE),
                  M3_ERR_RANGE);
   M3_TEST_OK(m3_badge_style_init(&badge_style));
+  badge_style.corner_radius = -1.0f;
+  M3_TEST_EXPECT(m3_extras_test_validate_badge_style(&badge_style, M3_FALSE),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_badge_style_init(&badge_style));
   badge_style.text_style.size_px = 0;
   M3_TEST_EXPECT(m3_extras_test_validate_badge_style(&badge_style, M3_FALSE),
                  M3_ERR_RANGE);
@@ -676,6 +773,20 @@ int main(void) {
 
   M3_TEST_EXPECT(m3_badge_compute_size(NULL, &badge_content, &badge_size),
                  M3_ERR_INVALID_ARGUMENT);
+  badge_style.min_size = -1.0f;
+  M3_TEST_EXPECT(
+      m3_badge_compute_size(&badge_style, &badge_content, &badge_size),
+      M3_ERR_RANGE);
+  M3_TEST_OK(m3_badge_style_init(&badge_style));
+  badge_content.has_text = 2;
+  M3_TEST_EXPECT(
+      m3_badge_compute_size(&badge_style, &badge_content, &badge_size),
+      M3_ERR_INVALID_ARGUMENT);
+  badge_content.has_text = M3_FALSE;
+  M3_TEST_OK(m3_extras_test_set_badge_size_range_fail(M3_TRUE));
+  M3_TEST_EXPECT(
+      m3_badge_compute_size(&badge_style, &badge_content, &badge_size),
+      M3_ERR_RANGE);
   M3_TEST_OK(m3_badge_style_init(&badge_style));
   badge_content.has_text = M3_FALSE;
   M3_TEST_OK(m3_badge_compute_size(&badge_style, &badge_content, &badge_size));
@@ -715,6 +826,18 @@ int main(void) {
   bounds.y = 10.0f;
   bounds.width = 20.0f;
   bounds.height = 20.0f;
+  badge_style.min_size = -1.0f;
+  M3_TEST_EXPECT(m3_badge_compute_bounds(&badge_style, &badge_content, &bounds,
+                                         &badge_placement, &badge_bounds),
+                 M3_ERR_RANGE);
+  badge_placement.corner = M3_BADGE_CORNER_TOP_LEFT;
+  M3_TEST_EXPECT(m3_badge_compute_bounds(&badge_style, &badge_content, &bounds,
+                                         &badge_placement, &badge_bounds),
+                 M3_ERR_RANGE);
+  M3_TEST_OK(m3_badge_style_init(&badge_style));
+  badge_style.dot_diameter = 10.0f;
+  badge_content.has_text = M3_FALSE;
+  badge_placement.corner = 99;
   M3_TEST_EXPECT(m3_badge_compute_bounds(&badge_style, &badge_content, &bounds,
                                          &badge_placement, &badge_bounds),
                  M3_ERR_RANGE);

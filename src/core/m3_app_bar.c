@@ -11,6 +11,10 @@
 
 static m3_u32 g_m3_app_bar_test_fail_point = M3_APP_BAR_TEST_FAIL_NONE;
 static m3_u32 g_m3_app_bar_test_color_fail_after = 0u;
+static m3_u32 g_m3_app_bar_test_match_calls = 0u;
+static m3_u32 g_m3_app_bar_test_match_fail_after = 0u;
+static m3_u32 g_m3_app_bar_test_color_error_after = 0u;
+static M3Bool g_m3_app_bar_test_force_collapse_error = M3_FALSE;
 
 int M3_CALL m3_app_bar_test_set_fail_point(m3_u32 fail_point) {
   g_m3_app_bar_test_fail_point = fail_point;
@@ -25,12 +29,38 @@ int M3_CALL m3_app_bar_test_set_color_fail_after(m3_u32 call_count) {
 int M3_CALL m3_app_bar_test_clear_fail_points(void) {
   g_m3_app_bar_test_fail_point = M3_APP_BAR_TEST_FAIL_NONE;
   g_m3_app_bar_test_color_fail_after = 0u;
+  g_m3_app_bar_test_match_calls = 0u;
+  g_m3_app_bar_test_match_fail_after = 0u;
+  g_m3_app_bar_test_color_error_after = 0u;
+  g_m3_app_bar_test_force_collapse_error = M3_FALSE;
+  return M3_OK;
+}
+
+int M3_CALL m3_app_bar_test_set_match_fail_after(m3_u32 call_count) {
+  g_m3_app_bar_test_match_calls = 0u;
+  g_m3_app_bar_test_match_fail_after = call_count;
+  return M3_OK;
+}
+
+int M3_CALL m3_app_bar_test_set_color_error_after(m3_u32 call_count) {
+  g_m3_app_bar_test_color_error_after = call_count;
+  return M3_OK;
+}
+
+int M3_CALL m3_app_bar_test_set_collapse_fail(M3Bool enable) {
+  g_m3_app_bar_test_force_collapse_error = enable ? M3_TRUE : M3_FALSE;
   return M3_OK;
 }
 
 static int m3_app_bar_test_color_should_fail(M3Bool *out_fail) {
   if (out_fail == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
+  }
+  if (g_m3_app_bar_test_color_error_after > 0u) {
+    g_m3_app_bar_test_color_error_after -= 1u;
+    if (g_m3_app_bar_test_color_error_after == 0u) {
+      return M3_ERR_UNKNOWN;
+    }
   }
   if (g_m3_app_bar_test_color_fail_after == 0u) {
     *out_fail = M3_FALSE;
@@ -43,6 +73,12 @@ static int m3_app_bar_test_color_should_fail(M3Bool *out_fail) {
 
 static int m3_app_bar_test_fail_point_match(m3_u32 point, M3Bool *out_match) {
   if (out_match == NULL) {
+    return M3_ERR_INVALID_ARGUMENT;
+  }
+  g_m3_app_bar_test_match_calls += 1u;
+  if (g_m3_app_bar_test_match_fail_after > 0u &&
+      g_m3_app_bar_test_match_calls >= g_m3_app_bar_test_match_fail_after) {
+    g_m3_app_bar_test_match_fail_after = 0u;
     return M3_ERR_INVALID_ARGUMENT;
   }
   if (g_m3_app_bar_test_fail_point != point) {
@@ -248,6 +284,12 @@ static int m3_app_bar_compute_collapse_range(const M3AppBarStyle *style,
   if (style == NULL || out_range == NULL) {
     return M3_ERR_INVALID_ARGUMENT;
   }
+#ifdef M3_TESTING
+  if (g_m3_app_bar_test_force_collapse_error == M3_TRUE) {
+    g_m3_app_bar_test_force_collapse_error = M3_FALSE;
+    return M3_ERR_UNKNOWN;
+  }
+#endif
   if (style->expanded_height < style->collapsed_height) {
     return M3_ERR_RANGE;
   }
@@ -1045,6 +1087,15 @@ int M3_CALL m3_app_bar_test_validate_text_style(const M3TextStyle *style,
 int M3_CALL m3_app_bar_test_validate_style(const M3AppBarStyle *style,
                                            M3Bool require_family) {
   return m3_app_bar_validate_style(style, require_family);
+}
+
+int M3_CALL m3_app_bar_test_call_color_should_fail(M3Bool *out_fail) {
+  return m3_app_bar_test_color_should_fail(out_fail);
+}
+
+int M3_CALL m3_app_bar_test_call_fail_point_match(m3_u32 point,
+                                                  M3Bool *out_match) {
+  return m3_app_bar_test_fail_point_match(point, out_match);
 }
 
 int M3_CALL m3_app_bar_test_validate_measure_spec(M3MeasureSpec spec) {

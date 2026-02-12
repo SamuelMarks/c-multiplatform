@@ -270,6 +270,87 @@ M3_API int M3_CALL m3_menu_set_on_action(M3Menu *menu, M3MenuOnAction on_action,
 
 #ifdef M3_TESTING
 /**
+ * @brief Test hook to force negative panel size computation.
+ * @param enable M3_TRUE to force a negative size on the next computation.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_menu_test_set_force_negative_panel(M3Bool enable);
+
+/**
+ * @brief Test hook to force overflow clamping in panel bounds.
+ * @param enable M3_TRUE to force bounds overflow on the next computation.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_menu_test_set_force_bounds_overflow(M3Bool enable);
+
+/**
+ * @brief Test hook to force hit-test rectangle errors.
+ * @param enable M3_TRUE to inject a hit-test error on the next check.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_menu_test_set_force_hit_test_error(M3Bool enable);
+
+/**
+ * @brief Test wrapper for menu style validation.
+ * @param style Menu style to validate.
+ * @param require_family Whether a family name is required.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_menu_test_validate_style(const M3MenuStyle *style,
+                                               M3Bool require_family);
+
+/**
+ * @brief Test wrapper for menu text metric updates.
+ * @param menu Menu instance.
+ * @param out_text_width Text width output.
+ * @param out_has_label M3_TRUE when any label exists.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_menu_test_update_metrics(M3Menu *menu,
+                                               M3Scalar *out_text_width,
+                                               M3Bool *out_has_label);
+
+/**
+ * @brief Test wrapper for computing panel size.
+ * @param menu Menu instance.
+ * @param out_width Panel width output.
+ * @param out_height Panel height output.
+ * @param out_has_label M3_TRUE when any label exists.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_menu_test_compute_panel_size(M3Menu *menu,
+                                                   M3Scalar *out_width,
+                                                   M3Scalar *out_height,
+                                                   M3Bool *out_has_label);
+
+/**
+ * @brief Test wrapper for computing panel bounds.
+ * @param menu Menu instance.
+ * @param overlay Overlay bounds.
+ * @param panel_width Panel width.
+ * @param panel_height Panel height.
+ * @param out_bounds Computed panel bounds.
+ * @param out_direction Resolved direction.
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_menu_test_compute_panel_bounds(
+    const M3Menu *menu, const M3Rect *overlay, M3Scalar panel_width,
+    M3Scalar panel_height, M3Rect *out_bounds, m3_u32 *out_direction);
+
+/**
+ * @brief Test wrapper for hit testing.
+ * @param menu Menu instance.
+ * @param x X coordinate in pixels.
+ * @param y Y coordinate in pixels.
+ * @param out_inside M3_TRUE when the point is inside.
+ * @param out_index Hit item index (or M3_MENU_INVALID_INDEX).
+ * @return M3_OK on success or a failure code.
+ */
+M3_API int M3_CALL m3_menu_test_hit_test(const M3Menu *menu, M3Scalar x,
+                                         M3Scalar y, M3Bool *out_inside,
+                                         m3_usize *out_index);
+
+/**
  * @brief Test wrapper for color validation.
  * @param color Color to validate.
  * @return M3_OK on success or a failure code.

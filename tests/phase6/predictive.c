@@ -3,6 +3,8 @@
 
 #include <string.h>
 
+int M3_CALL m3_predictive_test_set_event_init_fail(M3Bool enable);
+
 typedef struct PredictiveHandlerState {
   int start_count;
   int progress_count;
@@ -122,6 +124,11 @@ static int test_controller_init_and_handler(void) {
                  M3_ERR_INVALID_ARGUMENT);
 
   memset(&predictive, 0, sizeof(predictive));
+  M3_TEST_OK(m3_predictive_test_set_event_init_fail(M3_TRUE));
+  M3_TEST_EXPECT(m3_predictive_back_init(&predictive, NULL), M3_ERR_UNKNOWN);
+  M3_TEST_OK(m3_predictive_test_set_event_init_fail(M3_FALSE));
+
+  memset(&predictive, 0, sizeof(predictive));
   memset(&vtable, 0, sizeof(vtable));
   handler.ctx = NULL;
   handler.vtable = NULL;
@@ -146,6 +153,10 @@ static int test_controller_init_and_handler(void) {
 
   M3_TEST_EXPECT(m3_predictive_back_set_handler(NULL, NULL),
                  M3_ERR_INVALID_ARGUMENT);
+  handler.ctx = &event;
+  handler.vtable = NULL;
+  M3_TEST_EXPECT(m3_predictive_back_set_handler(&predictive, &handler),
+                 M3_ERR_INVALID_ARGUMENT);
   M3_TEST_OK(m3_predictive_back_set_handler(&predictive, NULL));
   M3_TEST_ASSERT(predictive.handler.vtable == NULL);
 
@@ -169,6 +180,10 @@ static int test_controller_init_and_handler(void) {
   M3_TEST_ASSERT(state.active == M3_FALSE);
   M3_TEST_ASSERT(state.event.edge == M3_PREDICTIVE_BACK_EDGE_LEFT);
 
+  M3_TEST_OK(m3_predictive_test_set_event_init_fail(M3_TRUE));
+  M3_TEST_EXPECT(m3_predictive_back_shutdown(&predictive), M3_ERR_UNKNOWN);
+  M3_TEST_OK(m3_predictive_test_set_event_init_fail(M3_FALSE));
+
   M3_TEST_OK(m3_predictive_back_shutdown(&predictive));
   M3_TEST_EXPECT(m3_predictive_back_shutdown(&predictive), M3_ERR_STATE);
   M3_TEST_EXPECT(m3_predictive_back_get_handler(&predictive, &handler),
@@ -177,6 +192,11 @@ static int test_controller_init_and_handler(void) {
                  M3_ERR_STATE);
   M3_TEST_EXPECT(m3_predictive_back_set_handler(&predictive, NULL),
                  M3_ERR_STATE);
+  M3_TEST_EXPECT(m3_predictive_back_start(&predictive, &event), M3_ERR_STATE);
+  M3_TEST_EXPECT(m3_predictive_back_progress(&predictive, &event),
+                 M3_ERR_STATE);
+  M3_TEST_EXPECT(m3_predictive_back_commit(&predictive, &event), M3_ERR_STATE);
+  M3_TEST_EXPECT(m3_predictive_back_cancel(&predictive, &event), M3_ERR_STATE);
 
   return M3_OK;
 }
@@ -227,9 +247,20 @@ static int test_event_flow_and_errors(void) {
   M3_TEST_EXPECT(m3_predictive_back_progress(&predictive, &event),
                  M3_ERR_STATE);
   M3_TEST_EXPECT(m3_predictive_back_commit(&predictive, &event), M3_ERR_STATE);
+  M3_TEST_EXPECT(m3_predictive_back_cancel(&predictive, &event), M3_ERR_STATE);
 
   M3_TEST_OK(m3_predictive_back_start(&predictive, &event));
   M3_TEST_ASSERT(handler_state.start_count == 1);
+
+  event.progress = -0.1f;
+  M3_TEST_EXPECT(m3_predictive_back_progress(&predictive, &event),
+                 M3_ERR_RANGE);
+  event.progress = 0.2f;
+  event.edge = 77u;
+  M3_TEST_EXPECT(m3_predictive_back_commit(&predictive, &event), M3_ERR_RANGE);
+  M3_TEST_EXPECT(m3_predictive_back_cancel(&predictive, &event), M3_ERR_RANGE);
+  event.edge = M3_PREDICTIVE_BACK_EDGE_LEFT;
+  event.progress = 0.5f;
 
   rc = m3_predictive_back_start(&predictive, &event);
   M3_TEST_EXPECT(rc, M3_ERR_STATE);
@@ -260,6 +291,9 @@ static int test_event_flow_and_errors(void) {
 
   event.edge = M3_PREDICTIVE_BACK_EDGE_RIGHT;
   event.progress = 0.2f;
+  handler_state.fail_start = M3_TRUE;
+  M3_TEST_EXPECT(m3_predictive_back_start(&predictive, &event), M3_ERR_UNKNOWN);
+  handler_state.fail_start = M3_FALSE;
   M3_TEST_OK(m3_predictive_back_start(&predictive, &event));
   handler_state.fail_progress = M3_TRUE;
   event.progress = 0.4f;
@@ -272,6 +306,11 @@ static int test_event_flow_and_errors(void) {
   M3_TEST_EXPECT(m3_predictive_back_commit(&predictive, &event),
                  M3_ERR_UNKNOWN);
   handler_state.fail_commit = M3_FALSE;
+  handler_state.fail_cancel = M3_TRUE;
+  M3_TEST_EXPECT(m3_predictive_back_cancel(&predictive, &event),
+                 M3_ERR_UNKNOWN);
+  M3_TEST_ASSERT(predictive.active == M3_TRUE);
+  handler_state.fail_cancel = M3_FALSE;
   M3_TEST_OK(m3_predictive_back_cancel(&predictive, &event));
 
   M3_TEST_OK(m3_predictive_back_shutdown(&predictive));

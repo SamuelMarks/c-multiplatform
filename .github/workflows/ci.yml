@@ -99,3 +99,13 @@ jobs:
             --fail-under-line 100 \
             --fail-under-function 100 \
             --xml-pretty -o build-coverage/coverage.xml
+
+  packaging-smoke:
+    name: packaging-smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build-packaging -DCMAKE_BUILD_TYPE=Release -DM3_ENABLE_PACKAGING=ON -DM3_BUILD_PACKAGING_STUB=ON
+      - name: Build Packaging Stub
+        run: cmake --build build-packaging --config Release --target m3_packaging_stub

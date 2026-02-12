@@ -14,6 +14,12 @@
 int M3_CALL m3_app_bar_test_set_fail_point(m3_u32 fail_point);
 int M3_CALL m3_app_bar_test_set_color_fail_after(m3_u32 call_count);
 int M3_CALL m3_app_bar_test_clear_fail_points(void);
+int M3_CALL m3_app_bar_test_set_match_fail_after(m3_u32 call_count);
+int M3_CALL m3_app_bar_test_set_color_error_after(m3_u32 call_count);
+int M3_CALL m3_app_bar_test_set_collapse_fail(M3Bool enable);
+int M3_CALL m3_app_bar_test_call_color_should_fail(M3Bool *out_fail);
+int M3_CALL m3_app_bar_test_call_fail_point_match(m3_u32 point,
+                                                  M3Bool *out_match);
 int M3_CALL m3_app_bar_test_validate_color(const M3Color *color);
 int M3_CALL m3_app_bar_test_color_set(M3Color *color, M3Scalar r, M3Scalar g,
                                       M3Scalar b, M3Scalar a);
@@ -314,6 +320,21 @@ static int test_app_bar_helpers(void) {
   M3_TEST_OK(m3_app_bar_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f));
 
 #ifdef M3_TESTING
+  M3_TEST_EXPECT(m3_app_bar_test_call_color_should_fail(NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(
+      m3_app_bar_test_call_fail_point_match(M3_APP_BAR_TEST_FAIL_NONE, NULL),
+      M3_ERR_INVALID_ARGUMENT);
+
+  M3_TEST_OK(m3_app_bar_test_set_color_error_after(2));
+  M3_TEST_OK(m3_app_bar_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f));
+  M3_TEST_OK(m3_app_bar_test_clear_fail_points());
+
+  M3_TEST_OK(m3_app_bar_test_set_color_error_after(1));
+  M3_TEST_EXPECT(m3_app_bar_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f),
+                 M3_ERR_UNKNOWN);
+  M3_TEST_OK(m3_app_bar_test_clear_fail_points());
+
   M3_TEST_OK(m3_app_bar_test_set_color_fail_after(1));
   M3_TEST_EXPECT(m3_app_bar_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f),
                  M3_ERR_IO);
@@ -437,6 +458,12 @@ static int test_app_bar_helpers(void) {
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_app_bar_test_compute_current_height(&bar, &height),
                  M3_ERR_RANGE);
+  bar.style.expanded_height = 10.0f;
+  bar.style.collapsed_height = 20.0f;
+  bar.collapse_offset = 0.0f;
+  M3_TEST_EXPECT(m3_app_bar_test_compute_current_height(&bar, &height),
+                 M3_ERR_RANGE);
+  bar.style = style;
   bar.collapse_offset = 0.0f;
   M3_TEST_OK(m3_app_bar_test_compute_current_height(&bar, &height));
   bar.style.collapsed_height = -1.0f;
@@ -462,6 +489,12 @@ static int test_app_bar_helpers(void) {
   M3_TEST_ASSERT(m3_near(content.width, 180.0f, 0.001f));
   M3_TEST_ASSERT(
       m3_near(content.height, bar.style.expanded_height - 20.0f, 0.001f));
+  bar.style.expanded_height = 10.0f;
+  bar.style.collapsed_height = 20.0f;
+  bar.collapse_offset = 0.0f;
+  M3_TEST_EXPECT(m3_app_bar_test_compute_content_bounds(&bar, &content),
+                 M3_ERR_RANGE);
+  bar.style = style;
   bar.bounds.width = 5.0f;
   M3_TEST_EXPECT(m3_app_bar_test_compute_content_bounds(&bar, &content),
                  M3_ERR_RANGE);
@@ -493,8 +526,25 @@ static int test_app_bar_helpers(void) {
   bar.style.expanded_height = 112.0f;
   bar.style.collapsed_height = 64.0f;
   bar.collapse_offset = 24.0f;
+  M3_TEST_OK(m3_app_bar_test_set_collapse_fail(M3_TRUE));
+  M3_TEST_EXPECT(
+      m3_app_bar_test_compute_title_position(&bar, &metrics, &pos_x, &pos_y),
+      M3_ERR_UNKNOWN);
+  M3_TEST_OK(m3_app_bar_test_clear_fail_points());
   M3_TEST_OK(
       m3_app_bar_test_compute_title_position(&bar, &metrics, &pos_x, &pos_y));
+
+  bar.collapse_offset = -10.0f;
+  M3_TEST_OK(
+      m3_app_bar_test_compute_title_position(&bar, &metrics, &pos_x, &pos_y));
+  bar.collapse_offset = 200.0f;
+  M3_TEST_OK(
+      m3_app_bar_test_compute_title_position(&bar, &metrics, &pos_x, &pos_y));
+  bar.style.expanded_height = 10.0f;
+  bar.style.collapsed_height = 20.0f;
+  M3_TEST_EXPECT(
+      m3_app_bar_test_compute_title_position(&bar, &metrics, &pos_x, &pos_y),
+      M3_ERR_RANGE);
 
   bar.style.expanded_height = 64.0f;
   bar.style.collapsed_height = 64.0f;
@@ -535,11 +585,19 @@ static int test_app_bar_helpers(void) {
   M3_TEST_ASSERT(m3_near(height, 10.0f, 0.001f));
   M3_TEST_OK(m3_app_bar_test_apply_scroll(&bar, -5.0f, &height));
   M3_TEST_ASSERT(m3_near(height, -5.0f, 0.001f));
+  bar.collapse_offset = 5.0f;
+  M3_TEST_OK(m3_app_bar_test_apply_scroll(&bar, -10.0f, &height));
+  M3_TEST_ASSERT(m3_near(height, -5.0f, 0.001f));
   M3_TEST_EXPECT(m3_app_bar_test_apply_scroll(NULL, 1.0f, &height),
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_app_bar_test_apply_scroll(&bar, 1.0f, NULL),
                  M3_ERR_INVALID_ARGUMENT);
   bar.collapse_offset = 1000.0f;
+  M3_TEST_EXPECT(m3_app_bar_test_apply_scroll(&bar, 1.0f, &height),
+                 M3_ERR_RANGE);
+  bar.style.expanded_height = 10.0f;
+  bar.style.collapsed_height = 20.0f;
+  bar.collapse_offset = 0.0f;
   M3_TEST_EXPECT(m3_app_bar_test_apply_scroll(&bar, 1.0f, &height),
                  M3_ERR_RANGE);
 
@@ -548,6 +606,18 @@ static int test_app_bar_helpers(void) {
 
 static int test_app_bar_style_init(void) {
   M3AppBarStyle style;
+
+  M3_TEST_EXPECT(m3_app_bar_style_init_small(NULL), M3_ERR_INVALID_ARGUMENT);
+
+#ifdef M3_TESTING
+  M3_TEST_OK(m3_app_bar_test_set_match_fail_after(1));
+  M3_TEST_EXPECT(m3_app_bar_style_init_small(&style), M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(m3_app_bar_test_set_match_fail_after(2));
+  M3_TEST_EXPECT(m3_app_bar_style_init_small(&style), M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(m3_app_bar_test_set_match_fail_after(3));
+  M3_TEST_EXPECT(m3_app_bar_style_init_small(&style), M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(m3_app_bar_test_clear_fail_points());
+#endif
 
   M3_TEST_OK(m3_app_bar_style_init_small(&style));
   M3_TEST_ASSERT(style.variant == M3_APP_BAR_VARIANT_SMALL);
@@ -642,6 +712,11 @@ static int test_app_bar_init_and_setters(void) {
   M3_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, "Test", 4), M3_ERR_IO);
   M3_TEST_OK(m3_app_bar_test_clear_fail_points());
   backend_state.fail_destroy = 0;
+
+  M3_TEST_OK(m3_app_bar_test_set_match_fail_after(1));
+  M3_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, "Test", 4),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(m3_app_bar_test_clear_fail_points());
 #endif
 
   M3_TEST_OK(m3_app_bar_init(&bar, &backend, &style, "Test", 4));
@@ -668,8 +743,17 @@ static int test_app_bar_init_and_setters(void) {
   backend_state.fail_destroy = 1;
   M3_TEST_EXPECT(m3_app_bar_set_style(&bar, &new_style), M3_ERR_IO);
   backend_state.fail_destroy = 0;
+
+#ifdef M3_TESTING
+  M3_TEST_OK(m3_app_bar_test_set_collapse_fail(M3_TRUE));
+  M3_TEST_EXPECT(m3_app_bar_set_style(&bar, &new_style), M3_ERR_UNKNOWN);
+  M3_TEST_OK(m3_app_bar_test_clear_fail_points());
+#endif
+
   M3_TEST_OK(m3_app_bar_set_style(&bar, &new_style));
 
+  M3_TEST_EXPECT(m3_app_bar_set_collapse_offset(NULL, 0.0f),
+                 M3_ERR_INVALID_ARGUMENT);
   M3_TEST_EXPECT(m3_app_bar_set_collapse_offset(&bar, -1.0f), M3_ERR_RANGE);
   M3_TEST_EXPECT(m3_app_bar_set_collapse_offset(&bar, 1.0f), M3_ERR_RANGE);
   M3_TEST_OK(m3_app_bar_set_collapse_offset(&bar, 0.0f));
@@ -759,6 +843,15 @@ static int test_app_bar_scroll(void) {
                      bar.scroll_parent.ctx, NULL, &child_consumed, &consumed),
                  M3_ERR_INVALID_ARGUMENT);
 
+  bar.style.expanded_height = 10.0f;
+  bar.style.collapsed_height = 20.0f;
+  delta.y = -5.0f;
+  M3_TEST_EXPECT(bar.scroll_parent.vtable->post_scroll(
+                     bar.scroll_parent.ctx, &delta, &child_consumed, &consumed),
+                 M3_ERR_RANGE);
+  bar.style.expanded_height = style.expanded_height;
+  bar.style.collapsed_height = style.collapsed_height;
+
   bar.collapse_offset = -1.0f;
   delta.y = 5.0f;
   M3_TEST_EXPECT(bar.scroll_parent.vtable->pre_scroll(bar.scroll_parent.ctx,
@@ -830,11 +923,27 @@ static int test_app_bar_widget(void) {
   spec.size = 0.0f;
   M3_TEST_EXPECT(bar.widget.vtable->measure(&bar, spec, spec, &size),
                  M3_ERR_INVALID_ARGUMENT);
+  spec.mode = M3_MEASURE_EXACTLY;
+  spec.size = 10.0f;
+  {
+    M3MeasureSpec bad_spec = spec;
+    bad_spec.mode = 99u;
+    M3_TEST_EXPECT(bar.widget.vtable->measure(&bar, spec, bad_spec, &size),
+                   M3_ERR_INVALID_ARGUMENT);
+  }
 
   spec.mode = M3_MEASURE_EXACTLY;
   spec.size = -1.0f;
   M3_TEST_EXPECT(bar.widget.vtable->measure(&bar, spec, spec, &size),
                  M3_ERR_RANGE);
+
+  bar.collapse_offset =
+      (bar.style.expanded_height - bar.style.collapsed_height) + 1.0f;
+  spec.mode = M3_MEASURE_UNSPECIFIED;
+  spec.size = 0.0f;
+  M3_TEST_EXPECT(bar.widget.vtable->measure(&bar, spec, spec, &size),
+                 M3_ERR_RANGE);
+  bar.collapse_offset = 0.0f;
 
   bar.style.collapsed_height = -1.0f;
   spec.mode = M3_MEASURE_UNSPECIFIED;
@@ -884,6 +993,19 @@ static int test_app_bar_widget(void) {
   M3_TEST_EXPECT(bar.widget.vtable->paint(&bar, &ctx), M3_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_gfx_vtable;
 
+  bar.style.collapsed_height = 0.0f;
+  M3_TEST_EXPECT(bar.widget.vtable->paint(&bar, &ctx), M3_ERR_RANGE);
+  bar.style.collapsed_height = style.collapsed_height;
+
+  bar.collapse_offset =
+      (bar.style.expanded_height - bar.style.collapsed_height) + 1.0f;
+  M3_TEST_EXPECT(bar.widget.vtable->paint(&bar, &ctx), M3_ERR_RANGE);
+  bar.collapse_offset = 0.0f;
+
+  backend_state.fail_measure = 1;
+  M3_TEST_EXPECT(bar.widget.vtable->paint(&bar, &ctx), M3_ERR_IO);
+  backend_state.fail_measure = 0;
+
   gfx.vtable = &g_test_gfx_vtable_no_rect;
   M3_TEST_EXPECT(bar.widget.vtable->paint(&bar, &ctx), M3_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_gfx_vtable;
@@ -900,6 +1022,7 @@ static int test_app_bar_widget(void) {
   bar.style.shadow.layers = 0u;
   M3_TEST_EXPECT(bar.widget.vtable->paint(&bar, &ctx), M3_ERR_RANGE);
   bar.style.shadow.layers = 1u;
+  M3_TEST_OK(bar.widget.vtable->paint(&bar, &ctx));
   bar.style.shadow_enabled = M3_FALSE;
 
   backend_state.fail_draw_rect = 1;

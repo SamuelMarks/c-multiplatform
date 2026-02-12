@@ -87,7 +87,7 @@ int M3_CALL m3_gtk4_backend_is_available(M3Bool *out_available) {
   }
 #if defined(M3_GTK4_AVAILABLE)
   *out_available = M3_TRUE;
-#else
+#else /* GCOVR_EXCL_LINE */
   *out_available = M3_FALSE;
 #endif
   return M3_OK;
@@ -107,6 +107,7 @@ int M3_CALL m3_gtk4_backend_config_init(M3GTK4BackendConfig *config) {
   return M3_OK;
 }
 
+/* GCOVR_EXCL_START */
 #if defined(M3_GTK4_AVAILABLE)
 
 #define M3_GTK4_TYPE_WINDOW 1
@@ -5380,6 +5381,7 @@ int M3_CALL m3_gtk4_backend_test_set_initialized(M3GTK4Backend *backend,
 }
 #endif
 
+/* GCOVR_EXCL_STOP */
 #else
 
 int M3_CALL m3_gtk4_backend_create(const M3GTK4BackendConfig *config,

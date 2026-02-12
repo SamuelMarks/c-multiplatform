@@ -17,6 +17,28 @@ Backend Selection
 -----------------
 
 Backends are enabled with CMake flags and may compile as stubs if their platform/dependencies are missing.
+
+FetchContent (CMake)
+--------------------
+
+```cmake
+include(FetchContent)
+
+FetchContent_Declare(
+    m3
+    GIT_REPOSITORY https://github.com/SamuelMarks/c-multiplatform.git
+    GIT_TAG e7be20e2583a21df1b0189c810cb7a969705e023
+)
+
+set(M3_ENABLE_SDL3 ON CACHE BOOL "" FORCE)
+set(M3_ENABLE_SDL3_TTF ON CACHE BOOL "" FORCE)
+set(M3_ENABLE_LIBCURL ON CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(m3)
+
+add_executable(app main.c)
+target_link_libraries(app PRIVATE m3::m3)
+```
 Use `m3_*_backend_is_available` at runtime to confirm support.
 
 ```

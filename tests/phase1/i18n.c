@@ -234,6 +234,251 @@ static int M3_CALL test_formatter_time(void *ctx, const char *locale_tag,
   return test_formatter_write("FMT-T", out_text, text_capacity, out_len);
 }
 
+static int test_i18n_coverage_hooks(TestAlloc *alloc_state,
+                                    const M3Allocator *allocator) {
+  M3I18n i18n_local;
+  M3I18nConfig config;
+  M3I18nLocale locale;
+  M3I18nNumber number;
+  M3Date date;
+  M3Bool equal;
+  m3_u32 days;
+  char buffer[128];
+  m3_usize out_len;
+
+  if (alloc_state == NULL || allocator == NULL) {
+    return 1;
+  }
+
+  number.integer = 1;
+  number.fraction = 0;
+  number.fraction_digits = 1;
+  M3_TEST_OK(m3_i18n_test_force_pow10_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_i18n_test_validate_number(&number), M3_ERR_IO);
+
+  M3_TEST_OK(m3_i18n_test_force_leap_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_i18n_test_days_in_month(2024, 2u, &days), M3_ERR_IO);
+
+  date.year = 2024;
+  date.month = 2u;
+  date.day = 1u;
+  M3_TEST_OK(m3_i18n_test_force_leap_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_i18n_test_validate_date(&date), M3_ERR_IO);
+
+  M3_TEST_OK(m3_i18n_test_force_days_default(M3_TRUE));
+  M3_TEST_EXPECT(m3_i18n_test_days_in_month(2024, 2u, &days), M3_ERR_RANGE);
+  M3_TEST_OK(m3_i18n_test_days_in_month(2024, 1u, &days));
+  M3_TEST_ASSERT(days == 31u);
+
+  M3_TEST_OK(m3_i18n_test_tag_equals("en-US", "en_US", &equal));
+  M3_TEST_ASSERT(equal == M3_TRUE);
+
+  M3_TEST_EXPECT(m3_i18n_test_locale_preset_en_us(NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_i18n_test_locale_preset_en_gb(NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_i18n_test_locale_preset_fr_fr(NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_EXPECT(m3_i18n_test_locale_preset_de_de(NULL),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  M3_TEST_OK(m3_i18n_test_set_ascii_lower_fail_after(1u));
+  M3_TEST_EXPECT(m3_i18n_locale_from_tag("zz-ZZ", &locale), M3_ERR_IO);
+  M3_TEST_OK(m3_i18n_test_set_ascii_lower_fail_after(2u));
+  M3_TEST_EXPECT(m3_i18n_test_tag_equals("aa", "aa", &equal), M3_ERR_IO);
+  M3_TEST_OK(m3_i18n_test_set_ascii_lower_fail_after(3u));
+  M3_TEST_EXPECT(m3_i18n_locale_from_tag("zz-ZZ", &locale), M3_ERR_IO);
+  M3_TEST_OK(m3_i18n_test_set_ascii_lower_fail_after(5u));
+  M3_TEST_EXPECT(m3_i18n_locale_from_tag("zz-ZZ", &locale), M3_ERR_IO);
+  M3_TEST_OK(m3_i18n_test_set_ascii_lower_fail_after(7u));
+  M3_TEST_EXPECT(m3_i18n_locale_from_tag("zz-ZZ", &locale), M3_ERR_IO);
+  M3_TEST_OK(m3_i18n_test_set_ascii_lower_fail_after(0u));
+
+  M3_TEST_OK(m3_i18n_test_force_utf8_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_i18n_test_validate_utf8("a", 1u), M3_ERR_IO);
+
+  M3_TEST_EXPECT(m3_i18n_test_parse_table(NULL, "", 0u, M3_FALSE, M3_FALSE),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.entry_capacity = 4u;
+  M3_TEST_OK(m3_i18n_init(&i18n_local, &config));
+  {
+    const char *data = "\n\r\n   \t\r\n#comment\n;comment\nkey=value\r\n";
+    M3_TEST_OK(m3_i18n_test_parse_table(
+        &i18n_local, data, (m3_usize)strlen(data), M3_TRUE, M3_TRUE));
+  }
+  {
+    const char *data = "badline\n";
+    M3_TEST_EXPECT(m3_i18n_test_parse_table(&i18n_local, data,
+                                            (m3_usize)strlen(data), M3_TRUE,
+                                            M3_TRUE),
+                   M3_ERR_CORRUPT);
+  }
+  {
+    const char *data = "=value\n";
+    M3_TEST_EXPECT(m3_i18n_test_parse_table(&i18n_local, data,
+                                            (m3_usize)strlen(data), M3_TRUE,
+                                            M3_TRUE),
+                   M3_ERR_CORRUPT);
+  }
+  {
+    const char *data = "k=v\nk=w\n";
+    M3_TEST_EXPECT(m3_i18n_test_parse_table(&i18n_local, data,
+                                            (m3_usize)strlen(data), M3_TRUE,
+                                            M3_FALSE),
+                   M3_ERR_BUSY);
+  }
+  M3_TEST_OK(m3_i18n_shutdown(&i18n_local));
+
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_test_force_config_init_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_i18n_init(&i18n_local, NULL), M3_ERR_IO);
+
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.entry_capacity = (m3_usize) ~(m3_usize)0;
+  M3_TEST_EXPECT(m3_i18n_init(&i18n_local, &config), M3_ERR_OVERFLOW);
+
+  M3_TEST_OK(test_alloc_reset(alloc_state));
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.entry_capacity = 1u;
+  alloc_state->fail_alloc_on_call = 1;
+  M3_TEST_EXPECT(m3_i18n_init(&i18n_local, &config), M3_ERR_OUT_OF_MEMORY);
+  alloc_state->fail_alloc_on_call = 0;
+
+  M3_TEST_OK(test_alloc_reset(alloc_state));
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.entry_capacity = 1u;
+  config.locale_tag = NULL;
+  config.locale = NULL;
+  alloc_state->fail_alloc_on_call = 2;
+  M3_TEST_EXPECT(m3_i18n_init(&i18n_local, &config), M3_ERR_OUT_OF_MEMORY);
+  alloc_state->fail_alloc_on_call = 0;
+
+  M3_TEST_OK(m3_i18n_locale_init(&locale));
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.locale = &locale;
+  config.locale_tag = NULL;
+  config.entry_capacity = 1u;
+  M3_TEST_OK(m3_i18n_init(&i18n_local, &config));
+  M3_TEST_OK(m3_i18n_shutdown(&i18n_local));
+
+  M3_TEST_OK(test_alloc_reset(alloc_state));
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.entry_capacity = 1u;
+  alloc_state->fail_alloc_on_call = alloc_state->alloc_calls + 1;
+  M3_TEST_EXPECT(m3_i18n_init(&i18n_local, &config), M3_ERR_OUT_OF_MEMORY);
+  alloc_state->fail_alloc_on_call = 0;
+
+  M3_TEST_OK(test_alloc_reset(alloc_state));
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.entry_capacity = 2u;
+  M3_TEST_OK(m3_i18n_init(&i18n_local, &config));
+
+  M3_TEST_OK(m3_i18n_test_set_cstr_limit(1u));
+  M3_TEST_EXPECT(m3_i18n_set_locale(&i18n_local, "en-US", NULL),
+                 M3_ERR_OVERFLOW);
+  M3_TEST_OK(m3_i18n_test_set_cstr_limit(0u));
+
+  M3_TEST_OK(m3_i18n_test_force_utf8_error(M3_TRUE));
+  M3_TEST_EXPECT(m3_i18n_set_locale(&i18n_local, "en-US", NULL), M3_ERR_IO);
+
+  M3_TEST_OK(test_alloc_reset(alloc_state));
+  alloc_state->fail_alloc_on_call = 1;
+  M3_TEST_EXPECT(m3_i18n_set_locale(&i18n_local, "en-US", NULL),
+                 M3_ERR_OUT_OF_MEMORY);
+  alloc_state->fail_alloc_on_call = 0;
+
+  M3_TEST_OK(m3_i18n_locale_init(&locale));
+  locale.decimal_separator = '\0';
+  M3_TEST_EXPECT(m3_i18n_set_locale(&i18n_local, "en-US", &locale),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  M3_TEST_OK(m3_i18n_test_force_utf8_ok(M3_TRUE));
+  M3_TEST_EXPECT(m3_i18n_put(&i18n_local, "a", 1u, NULL, 1u, M3_TRUE),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  date.year = 10000;
+  date.month = 1u;
+  date.day = 1u;
+  M3_TEST_OK(m3_i18n_format_date(&i18n_local, &date, buffer, sizeof(buffer),
+                                 &out_len));
+
+  M3_TEST_OK(m3_i18n_shutdown(&i18n_local));
+
+  M3_TEST_OK(test_alloc_reset(alloc_state));
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.entry_capacity = 2u;
+  M3_TEST_OK(m3_i18n_init(&i18n_local, &config));
+  M3_TEST_OK(m3_i18n_put(&i18n_local, "a", 1u, "b", 1u, M3_TRUE));
+  M3_TEST_OK(m3_i18n_put(&i18n_local, "c", 1u, "d", 1u, M3_TRUE));
+  M3_TEST_OK(m3_i18n_remove(&i18n_local, "a", 1u));
+  M3_TEST_OK(m3_i18n_shutdown(&i18n_local));
+
+  M3_TEST_OK(test_alloc_reset(alloc_state));
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.entry_capacity = 1u;
+  M3_TEST_OK(m3_i18n_init(&i18n_local, &config));
+  M3_TEST_OK(m3_i18n_put(&i18n_local, "k", 1u, "v", 1u, M3_TRUE));
+  alloc_state->fail_free_on_call = alloc_state->free_calls + 2;
+  M3_TEST_EXPECT(m3_i18n_shutdown(&i18n_local), M3_ERR_IO);
+  alloc_state->fail_free_on_call = 0;
+
+  M3_TEST_OK(test_alloc_reset(alloc_state));
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.entry_capacity = 1u;
+  M3_TEST_OK(m3_i18n_init(&i18n_local, &config));
+  M3_TEST_OK(m3_i18n_put(&i18n_local, "k", 1u, "v", 1u, M3_TRUE));
+  alloc_state->fail_free_on_call = alloc_state->free_calls + 3;
+  M3_TEST_EXPECT(m3_i18n_shutdown(&i18n_local), M3_ERR_IO);
+  alloc_state->fail_free_on_call = 0;
+
+  M3_TEST_OK(test_alloc_reset(alloc_state));
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.entry_capacity = 2u;
+  M3_TEST_OK(m3_i18n_init(&i18n_local, &config));
+  alloc_state->fail_alloc_on_call = alloc_state->alloc_calls + 1;
+  M3_TEST_EXPECT(m3_i18n_put(&i18n_local, "x", 1u, "y", 1u, M3_TRUE),
+                 M3_ERR_OUT_OF_MEMORY);
+  alloc_state->fail_alloc_on_call = 0;
+  M3_TEST_OK(m3_i18n_shutdown(&i18n_local));
+
+  M3_TEST_OK(test_alloc_reset(alloc_state));
+  memset(&i18n_local, 0, sizeof(i18n_local));
+  M3_TEST_OK(m3_i18n_config_init(&config));
+  config.allocator = allocator;
+  config.entry_capacity = 1u;
+  M3_TEST_OK(m3_i18n_init(&i18n_local, &config));
+  M3_TEST_OK(m3_i18n_put(&i18n_local, "k", 1u, "v", 1u, M3_TRUE));
+  alloc_state->fail_free_on_call = alloc_state->free_calls + 4;
+  M3_TEST_EXPECT(m3_i18n_shutdown(&i18n_local), M3_ERR_IO);
+  alloc_state->fail_free_on_call = 0;
+
+  return 0;
+}
+
 int main(void) {
   M3I18n i18n;
   M3I18n i18n_fail;
@@ -404,6 +649,14 @@ int main(void) {
 
   M3_TEST_OK(m3_i18n_locale_init(&locale));
   locale.decimal_separator = '\0';
+  M3_TEST_EXPECT(m3_i18n_test_validate_locale(&locale),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(m3_i18n_locale_init(&locale));
+  locale.date_separator = '\0';
+  M3_TEST_EXPECT(m3_i18n_test_validate_locale(&locale),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(m3_i18n_locale_init(&locale));
+  locale.time_separator = '\0';
   M3_TEST_EXPECT(m3_i18n_test_validate_locale(&locale),
                  M3_ERR_INVALID_ARGUMENT);
   M3_TEST_OK(m3_i18n_locale_init(&locale));
@@ -971,7 +1224,48 @@ int main(void) {
       m3_i18n_format_number(&i18n, &number, buffer, sizeof(buffer), &out_len));
   M3_TEST_ASSERT(strcmp(buffer, "1234") == 0);
 
+  M3_TEST_OK(m3_i18n_set_locale(&i18n, "en-GB", NULL));
+  M3_TEST_OK(m3_i18n_set_locale(&i18n, "fr-FR", NULL));
+  M3_TEST_OK(m3_i18n_set_locale(&i18n, "de-DE", NULL));
+  M3_TEST_EXPECT(m3_i18n_set_locale(&i18n, "zz-ZZ", NULL), M3_ERR_NOT_FOUND);
+
   M3_TEST_OK(m3_i18n_shutdown(&i18n));
+
+  {
+    M3I18n i18n_fmt;
+    M3I18nConfig fmt_config;
+    M3I18nFormatter formatter;
+    M3I18nFormatterVTable formatter_vtable;
+    TestFormatter fmt_state;
+
+    memset(&i18n_fmt, 0, sizeof(i18n_fmt));
+    fmt_state.mode = 2;
+    formatter_vtable.format_number = test_formatter_number;
+    formatter_vtable.format_date = test_formatter_date;
+    formatter_vtable.format_time = test_formatter_time;
+    formatter.ctx = &fmt_state;
+    formatter.vtable = &formatter_vtable;
+
+    M3_TEST_OK(m3_i18n_config_init(&fmt_config));
+    fmt_config.formatter = &formatter;
+    M3_TEST_OK(m3_i18n_init(&i18n_fmt, &fmt_config));
+    M3_TEST_EXPECT(m3_i18n_format_number(&i18n_fmt, &number, buffer,
+                                         sizeof(buffer), &out_len),
+                   M3_ERR_IO);
+    M3_TEST_EXPECT(
+        m3_i18n_format_date(&i18n_fmt, &date, buffer, sizeof(buffer), &out_len),
+        M3_ERR_IO);
+    M3_TEST_EXPECT(
+        m3_i18n_format_time(&i18n_fmt, &time, buffer, sizeof(buffer), &out_len),
+        M3_ERR_IO);
+    M3_TEST_OK(m3_i18n_shutdown(&i18n_fmt));
+
+    formatter.vtable = NULL;
+    M3_TEST_OK(m3_i18n_config_init(&fmt_config));
+    fmt_config.formatter = &formatter;
+    M3_TEST_EXPECT(m3_i18n_init(&i18n_fmt, &fmt_config),
+                   M3_ERR_INVALID_ARGUMENT);
+  }
 
   test_alloc_reset(&alloc_state);
   test_allocator.ctx = &alloc_state;
@@ -985,6 +1279,72 @@ int main(void) {
   M3_TEST_OK(m3_i18n_init(&i18n_fail, &config));
   M3_TEST_OK(test_alloc_reset(&alloc_state));
 
+  {
+    M3I18n i18n_bad;
+    memset(&i18n_bad, 0, sizeof(i18n_bad));
+    i18n_bad.entries = (M3I18nEntry *)&i18n_bad;
+    i18n_bad.allocator.free = NULL;
+    M3_TEST_EXPECT(m3_i18n_shutdown(&i18n_bad), M3_ERR_INVALID_ARGUMENT);
+  }
+
+  M3_TEST_EXPECT(m3_i18n_test_validate_utf8(NULL, 1u), M3_ERR_INVALID_ARGUMENT);
+
+  {
+    M3I18n i18n_overflow;
+    M3I18nEntry entries[1];
+    m3_usize max_size;
+    m3_usize min_capacity;
+
+    max_size = (m3_usize) ~(m3_usize)0;
+    memset(&i18n_overflow, 0, sizeof(i18n_overflow));
+    i18n_overflow.entries = entries;
+    i18n_overflow.allocator = test_allocator;
+
+    i18n_overflow.entry_capacity = (max_size / 2u) + 1u;
+    min_capacity = i18n_overflow.entry_capacity + 1u;
+    M3_TEST_EXPECT(m3_i18n_test_grow(&i18n_overflow, min_capacity),
+                   M3_ERR_OVERFLOW);
+
+    i18n_overflow.entry_capacity =
+        (max_size / (m3_usize)sizeof(M3I18nEntry)) + 1u;
+    M3_TEST_EXPECT(
+        m3_i18n_test_grow(&i18n_overflow, i18n_overflow.entry_capacity),
+        M3_ERR_OVERFLOW);
+  }
+
+  {
+    char *out_string = NULL;
+    m3_usize max_size;
+
+    max_size = (m3_usize) ~(m3_usize)0;
+    M3_TEST_EXPECT(
+        m3_i18n_test_alloc_string(&test_allocator, "x", max_size, &out_string),
+        M3_ERR_OVERFLOW);
+  }
+
+  alloc_state.fail_free_on_call = alloc_state.free_calls + 1;
+  M3_TEST_EXPECT(m3_i18n_set_locale(&i18n_fail, "en-US", NULL), M3_ERR_IO);
+  alloc_state.fail_free_on_call = 0;
+
+  M3_TEST_OK(m3_i18n_test_force_utf8_ok_count(2u));
+  M3_TEST_EXPECT(m3_i18n_put(&i18n_fail, "a", 1, NULL, 1, M3_TRUE),
+                 M3_ERR_INVALID_ARGUMENT);
+
+  M3_TEST_OK(m3_i18n_put(&i18n_fail, "key", 3, "val", 3, M3_TRUE));
+  M3_TEST_EXPECT(m3_i18n_put(&i18n_fail, "key", 3, "new", 3, M3_FALSE),
+                 M3_ERR_BUSY);
+  alloc_state.fail_free_on_call = alloc_state.free_calls + 1;
+  M3_TEST_EXPECT(m3_i18n_put(&i18n_fail, "key", 3, NULL, 0, M3_TRUE),
+                 M3_ERR_IO);
+  alloc_state.fail_free_on_call = 0;
+  M3_TEST_OK(m3_i18n_put(&i18n_fail, "key", 3, NULL, 0, M3_TRUE));
+  M3_TEST_OK(m3_i18n_put(&i18n_fail, "key", 3, "val", 3, M3_TRUE));
+  alloc_state.fail_free_on_call = alloc_state.free_calls + 1;
+  M3_TEST_EXPECT(m3_i18n_put(&i18n_fail, "key", 3, "new", 3, M3_TRUE),
+                 M3_ERR_IO);
+  alloc_state.fail_free_on_call = 0;
+
+  M3_TEST_OK(test_alloc_reset(&alloc_state));
   alloc_state.fail_alloc_on_call = 1;
   M3_TEST_EXPECT(m3_i18n_put(&i18n_fail, "a", 1, "b", 1, M3_TRUE),
                  M3_ERR_OUT_OF_MEMORY);
@@ -993,7 +1353,34 @@ int main(void) {
                  M3_ERR_OUT_OF_MEMORY);
   alloc_state.fail_alloc_on_call = 0;
 
+  {
+    M3I18n i18n_update;
+    M3I18nConfig update_config;
+
+    memset(&i18n_update, 0, sizeof(i18n_update));
+    M3_TEST_OK(m3_i18n_config_init(&update_config));
+    update_config.allocator = &test_allocator;
+    update_config.entry_capacity = 2u;
+    M3_TEST_OK(m3_i18n_init(&i18n_update, &update_config));
+    M3_TEST_OK(m3_i18n_put(&i18n_update, "k", 1, "v", 1, M3_TRUE));
+
+    M3_TEST_OK(test_alloc_reset(&alloc_state));
+    alloc_state.fail_alloc_on_call = 1;
+    M3_TEST_EXPECT(m3_i18n_put(&i18n_update, "k", 1, "n", 1, M3_TRUE),
+                   M3_ERR_OUT_OF_MEMORY);
+    alloc_state.fail_alloc_on_call = 0;
+
+    M3_TEST_OK(test_alloc_reset(&alloc_state));
+    alloc_state.fail_alloc_on_call = 2;
+    M3_TEST_EXPECT(m3_i18n_put(&i18n_update, "x", 1, "y", 1, M3_TRUE),
+                   M3_ERR_OUT_OF_MEMORY);
+    alloc_state.fail_alloc_on_call = 0;
+
+    M3_TEST_OK(m3_i18n_shutdown(&i18n_update));
+  }
+
   M3_TEST_OK(m3_i18n_put(&i18n_fail, "a", 1, "b", 1, M3_TRUE));
+  M3_TEST_OK(test_alloc_reset(&alloc_state));
   alloc_state.fail_realloc_on_call = 1;
   M3_TEST_EXPECT(m3_i18n_put(&i18n_fail, "c", 1, "d", 1, M3_TRUE),
                  M3_ERR_OUT_OF_MEMORY);
@@ -1005,6 +1392,9 @@ int main(void) {
 
   M3_TEST_OK(m3_i18n_clear(&i18n_fail));
   M3_TEST_OK(m3_i18n_put(&i18n_fail, "x", 1, "y", 1, M3_TRUE));
+  alloc_state.fail_free_on_call = alloc_state.free_calls + 1;
+  M3_TEST_EXPECT(m3_i18n_remove(&i18n_fail, "x", 1), M3_ERR_IO);
+  alloc_state.fail_free_on_call = 0;
 
   alloc_state.fail_free_on_call = alloc_state.free_calls + 1;
   M3_TEST_EXPECT(m3_i18n_shutdown(&i18n_fail), M3_ERR_IO);
@@ -1034,6 +1424,10 @@ int main(void) {
   M3_TEST_OK(m3_i18n_shutdown(&i18n_fail));
 
   M3_TEST_EXPECT(m3_i18n_shutdown(&i18n_fail), M3_ERR_STATE);
+
+  if (test_i18n_coverage_hooks(&alloc_state, &test_allocator) != 0) {
+    return 1;
+  }
 
   return 0;
 }

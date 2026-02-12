@@ -99,16 +99,29 @@ int main(void) {
 
   memset(&path, 0, sizeof(path));
 
+  M3_TEST_EXPECT(m3_path_move_to(&path, 0.0f, 0.0f), M3_ERR_STATE);
+  M3_TEST_EXPECT(m3_path_line_to(&path, 0.0f, 0.0f), M3_ERR_STATE);
+  M3_TEST_EXPECT(m3_path_quad_to(&path, 0.0f, 0.0f, 0.0f, 0.0f), M3_ERR_STATE);
+  M3_TEST_EXPECT(m3_path_cubic_to(&path, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
+                 M3_ERR_STATE);
+  M3_TEST_EXPECT(m3_path_close(&path), M3_ERR_STATE);
+
   M3_TEST_EXPECT(m3_path_init(NULL, NULL, 0), M3_ERR_INVALID_ARGUMENT);
 #ifdef M3_TESTING
   {
     m3_usize out_value;
     M3Bool has_current;
+    M3Path bad_path;
+    M3PathCmd dummy_cmd;
+    m3_usize max_value;
 
     M3_TEST_EXPECT(m3_path_test_add_overflow(1, 2, NULL),
                    M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(m3_path_test_add_overflow(1, 2, &out_value));
     M3_TEST_ASSERT(out_value == 3);
+    max_value = (m3_usize) ~(m3_usize)0;
+    M3_TEST_EXPECT(m3_path_test_add_overflow(max_value, 1, &out_value),
+                   M3_ERR_OVERFLOW);
     M3_TEST_EXPECT(m3_path_test_mul_overflow(2, 3, NULL),
                    M3_ERR_INVALID_ARGUMENT);
     M3_TEST_OK(m3_path_test_mul_overflow(2, 3, &out_value));
@@ -116,6 +129,15 @@ int main(void) {
     M3_TEST_EXPECT(m3_path_test_has_current(&path, NULL),
                    M3_ERR_INVALID_ARGUMENT);
     M3_TEST_EXPECT(m3_path_test_has_current(&path, &has_current), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_path_test_reserve(&path, 1), M3_ERR_STATE);
+    M3_TEST_EXPECT(m3_path_test_append(&path, NULL), M3_ERR_INVALID_ARGUMENT);
+
+    memset(&bad_path, 0, sizeof(bad_path));
+    bad_path.commands = &dummy_cmd;
+    bad_path.capacity = 1;
+    bad_path.count = 2;
+    M3_TEST_EXPECT(m3_path_test_has_current(&bad_path, &has_current),
+                   M3_ERR_STATE);
   }
   M3_TEST_OK(m3_core_test_set_default_allocator_fail(M3_TRUE));
   M3_TEST_EXPECT(m3_path_init(&path, NULL, 1), M3_ERR_UNKNOWN);
@@ -144,6 +166,47 @@ int main(void) {
   M3_TEST_EXPECT(m3_path_init(&path, &alloc_iface, overflow_capacity),
                  M3_ERR_OVERFLOW);
 
+#ifdef M3_TESTING
+  {
+    M3Path reserve_path;
+    M3Path overflow_path;
+    M3Path zero_path;
+    M3PathCmd dummy_cmd;
+    m3_usize max_value;
+
+    max_value = (m3_usize) ~(m3_usize)0;
+
+    memset(&overflow_path, 0, sizeof(overflow_path));
+    overflow_path.commands = &dummy_cmd;
+    overflow_path.capacity = max_value;
+    overflow_path.count = max_value;
+    overflow_path.allocator = alloc_iface;
+    M3_TEST_EXPECT(m3_path_test_reserve(&overflow_path, 1), M3_ERR_OVERFLOW);
+
+    memset(&zero_path, 0, sizeof(zero_path));
+    zero_path.commands = &dummy_cmd;
+    zero_path.capacity = 0;
+    zero_path.count = 0;
+    zero_path.allocator = alloc_iface;
+    M3_TEST_EXPECT(m3_path_test_reserve(&zero_path, 1), M3_ERR_STATE);
+
+    memset(&reserve_path, 0, sizeof(reserve_path));
+    M3_TEST_OK(m3_path_init(&reserve_path, &alloc_iface, 1));
+    M3_TEST_OK(m3_path_move_to(&reserve_path, 0.0f, 0.0f));
+    M3_TEST_OK(m3_path_test_reserve(&reserve_path, 4));
+    M3_TEST_OK(m3_path_shutdown(&reserve_path));
+
+    memset(&overflow_path, 0, sizeof(overflow_path));
+    overflow_path.commands = &dummy_cmd;
+    overflow_path.capacity = max_value;
+    overflow_path.count = max_value;
+    overflow_path.allocator = alloc_iface;
+    M3_TEST_OK(m3_path_test_set_force_reserve(M3_TRUE));
+    M3_TEST_EXPECT(m3_path_test_reserve(&overflow_path, 0), M3_ERR_OVERFLOW);
+    M3_TEST_OK(m3_path_test_set_force_reserve(M3_FALSE));
+  }
+#endif
+
   memset(&path, 0, sizeof(path));
   M3_TEST_OK(m3_path_init(&path, &alloc_iface, 0));
   M3_TEST_ASSERT(path.capacity >= 1);
@@ -161,6 +224,9 @@ int main(void) {
 
   memset(&path, 0, sizeof(path));
   M3_TEST_OK(m3_path_init(&path, &alloc_iface, 1));
+  M3_TEST_EXPECT(m3_path_quad_to(&path, 0.0f, 0.0f, 0.0f, 0.0f), M3_ERR_STATE);
+  M3_TEST_EXPECT(m3_path_cubic_to(&path, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
+                 M3_ERR_STATE);
   M3_TEST_EXPECT(m3_path_line_to(&path, 1.0f, 2.0f), M3_ERR_STATE);
   M3_TEST_EXPECT(m3_path_close(&path), M3_ERR_STATE);
 
@@ -194,6 +260,9 @@ int main(void) {
 
   M3_TEST_OK(m3_path_reset(&path));
   M3_TEST_ASSERT(path.count == 0);
+
+  M3_TEST_OK(m3_path_move_to(&path, 0.0f, 0.0f));
+  M3_TEST_OK(m3_path_test_reserve(&path, 4));
 
   path.count = max_size / 2 + 1;
   path.capacity = path.count;

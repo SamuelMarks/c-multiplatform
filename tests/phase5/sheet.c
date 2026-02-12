@@ -9,6 +9,8 @@
 #define M3_SHEET_TEST_FAIL_ANIM_INIT 3u
 #define M3_SHEET_TEST_FAIL_ANIM_START 4u
 #define M3_SHEET_TEST_FAIL_ANIM_TARGET 5u
+#define M3_SHEET_TEST_FAIL_APPLY_OFFSET 6u
+#define M3_SHEET_TEST_FAIL_SCRIM_ALPHA 7u
 
 int M3_CALL m3_sheet_test_set_fail_point(m3_u32 fail_point);
 int M3_CALL m3_sheet_test_set_color_fail_after(m3_u32 call_count);
@@ -186,6 +188,9 @@ static int test_sheet_helpers(void) {
   M3Rect rect;
   M3SheetStyle base_style;
   M3SheetStyle style;
+  M3Sheet sheet;
+  M3Bool changed;
+  M3Scalar alpha;
 
   M3_TEST_EXPECT(m3_sheet_test_validate_color(NULL), M3_ERR_INVALID_ARGUMENT);
 
@@ -352,6 +357,50 @@ static int test_sheet_helpers(void) {
   M3_TEST_EXPECT(m3_sheet_style_init_standard(&style), M3_ERR_IO);
   M3_TEST_OK(m3_sheet_test_clear_fail_points());
 
+  M3_TEST_OK(m3_sheet_style_init_standard(&style));
+  M3_TEST_OK(m3_sheet_init(&sheet, &style));
+  sheet.sheet_bounds.height = 100.0f;
+  sheet.offset = 0.0f;
+  sheet.anim.spring.velocity = 5.0f;
+  M3_TEST_EXPECT(m3_sheet_test_apply_offset(NULL, 0.0f, M3_FALSE, &changed),
+                 M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(m3_sheet_test_apply_offset(&sheet, -10.0f, M3_FALSE, &changed));
+  M3_TEST_ASSERT(sheet.offset == 0.0f);
+  M3_TEST_ASSERT(sheet.anim.spring.velocity == 0.0f);
+  M3_TEST_ASSERT(changed == M3_FALSE);
+  M3_TEST_OK(m3_sheet_test_apply_offset(&sheet, 200.0f, M3_FALSE, &changed));
+  M3_TEST_ASSERT(sheet.offset == 100.0f);
+  M3_TEST_ASSERT(changed == M3_TRUE);
+  sheet.sheet_bounds.height = -1.0f;
+  M3_TEST_EXPECT(m3_sheet_test_apply_offset(&sheet, 0.0f, M3_TRUE, &changed),
+                 M3_ERR_RANGE);
+  sheet.sheet_bounds.height = 100.0f;
+  M3_TEST_OK(m3_sheet_test_set_fail_point(M3_SHEET_TEST_FAIL_APPLY_OFFSET));
+  M3_TEST_EXPECT(m3_sheet_test_apply_offset(&sheet, 0.0f, M3_TRUE, &changed),
+                 M3_ERR_UNKNOWN);
+  M3_TEST_OK(m3_sheet_test_clear_fail_points());
+
+  M3_TEST_EXPECT(m3_sheet_test_compute_scrim_alpha(NULL, &alpha),
+                 M3_ERR_INVALID_ARGUMENT);
+  sheet.sheet_bounds.height = -1.0f;
+  M3_TEST_EXPECT(m3_sheet_test_compute_scrim_alpha(&sheet, &alpha),
+                 M3_ERR_RANGE);
+  sheet.sheet_bounds.height = 0.0f;
+  sheet.offset = 0.0f;
+  M3_TEST_OK(m3_sheet_test_compute_scrim_alpha(&sheet, &alpha));
+  M3_TEST_ASSERT(alpha == 0.0f);
+  sheet.sheet_bounds.height = 100.0f;
+  sheet.offset = -10.0f;
+  M3_TEST_OK(m3_sheet_test_compute_scrim_alpha(&sheet, &alpha));
+  M3_TEST_ASSERT(alpha == 1.0f);
+  sheet.offset = 120.0f;
+  M3_TEST_OK(m3_sheet_test_compute_scrim_alpha(&sheet, &alpha));
+  M3_TEST_ASSERT(alpha == 0.0f);
+  M3_TEST_OK(m3_sheet_test_set_fail_point(M3_SHEET_TEST_FAIL_SCRIM_ALPHA));
+  M3_TEST_EXPECT(m3_sheet_test_compute_scrim_alpha(&sheet, &alpha),
+                 M3_ERR_UNKNOWN);
+  M3_TEST_OK(m3_sheet_test_clear_fail_points());
+
   return 0;
 }
 
@@ -404,6 +453,30 @@ static int test_sheet_init_and_setters(void) {
 
   sheet.anim.mode = M3_ANIM_MODE_TIMING;
   M3_TEST_EXPECT(m3_sheet_set_open(&sheet, M3_FALSE), M3_ERR_STATE);
+
+  {
+    M3Semantics semantics;
+
+    M3_TEST_EXPECT(sheet.widget.vtable->get_semantics(NULL, &semantics),
+                   M3_ERR_INVALID_ARGUMENT);
+    M3_TEST_EXPECT(sheet.widget.vtable->get_semantics(sheet.widget.ctx, NULL),
+                   M3_ERR_INVALID_ARGUMENT);
+
+    sheet.widget.flags = M3_WIDGET_FLAG_DISABLED | M3_WIDGET_FLAG_FOCUSABLE;
+    M3_TEST_OK(
+        sheet.widget.vtable->get_semantics(sheet.widget.ctx, &semantics));
+    M3_TEST_ASSERT(semantics.role == M3_SEMANTIC_NONE);
+    M3_TEST_ASSERT((semantics.flags & M3_SEMANTIC_FLAG_DISABLED) != 0u);
+    M3_TEST_ASSERT((semantics.flags & M3_SEMANTIC_FLAG_FOCUSABLE) != 0u);
+    M3_TEST_ASSERT(semantics.utf8_label == NULL);
+    M3_TEST_ASSERT(semantics.utf8_hint == NULL);
+    M3_TEST_ASSERT(semantics.utf8_value == NULL);
+    sheet.widget.flags = 0u;
+  }
+
+  M3_TEST_EXPECT(sheet.widget.vtable->destroy(NULL), M3_ERR_INVALID_ARGUMENT);
+  M3_TEST_OK(sheet.widget.vtable->destroy(sheet.widget.ctx));
+  M3_TEST_ASSERT(sheet.widget.vtable == NULL);
 
   return 0;
 }
@@ -476,6 +549,11 @@ static int test_sheet_measure_layout(void) {
   bounds.width = 800.0f;
   bounds.height = 600.0f;
   M3_TEST_OK(sheet.widget.vtable->layout(sheet.widget.ctx, bounds));
+
+  M3_TEST_OK(m3_sheet_test_set_fail_point(M3_SHEET_TEST_FAIL_APPLY_OFFSET));
+  M3_TEST_EXPECT(sheet.widget.vtable->layout(sheet.widget.ctx, bounds),
+                 M3_ERR_UNKNOWN);
+  M3_TEST_OK(m3_sheet_test_clear_fail_points());
 
   M3_TEST_OK(m3_sheet_get_bounds(&sheet, &bounds));
   M3_TEST_ASSERT(m3_near(bounds.width, 300.0f, 0.001f));
@@ -554,6 +632,49 @@ static int test_sheet_paint(void) {
   rc = sheet.widget.vtable->paint(sheet.widget.ctx, &ctx);
   M3_TEST_OK(rc);
   M3_TEST_ASSERT(backend.draw_rect_calls == 1);
+
+  M3_TEST_OK(m3_sheet_test_set_fail_point(M3_SHEET_TEST_FAIL_SCRIM_ALPHA));
+  style.scrim_enabled = M3_TRUE;
+  M3_TEST_OK(m3_sheet_set_style(&sheet, &style));
+  M3_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
+                 M3_ERR_UNKNOWN);
+  M3_TEST_OK(m3_sheet_test_clear_fail_points());
+
+  M3_TEST_OK(test_backend_init(&backend));
+  gfx.vtable = &g_test_gfx_vtable;
+  backend.fail_draw_rect = 1;
+  style.scrim_enabled = M3_TRUE;
+  M3_TEST_OK(m3_sheet_set_style(&sheet, &style));
+  M3_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx), M3_ERR_IO);
+  backend.fail_draw_rect = 0;
+
+  M3_TEST_OK(test_backend_init(&backend));
+  gfx.vtable = &g_test_gfx_vtable;
+  backend.fail_draw_rect = 1;
+  style.scrim_enabled = M3_FALSE;
+  M3_TEST_OK(m3_sheet_set_style(&sheet, &style));
+  M3_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx), M3_ERR_IO);
+  backend.fail_draw_rect = 0;
+
+  sheet.style.corner_radius = -1.0f;
+  M3_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
+                 M3_ERR_RANGE);
+  sheet.style.corner_radius = style.corner_radius;
+
+  sheet.overlay_bounds.width = -1.0f;
+  M3_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
+                 M3_ERR_RANGE);
+  sheet.overlay_bounds.width = overlay.width;
+
+  sheet.sheet_bounds.height = -1.0f;
+  M3_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
+                 M3_ERR_RANGE);
+  sheet.sheet_bounds.height = overlay.height - style.height;
+
+  sheet.style.variant = 99u;
+  M3_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
+                 M3_ERR_RANGE);
+  sheet.style.variant = style.variant;
 
   gfx.vtable = &g_test_gfx_vtable_no_draw;
   M3_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
@@ -641,6 +762,13 @@ static int test_sheet_event(void) {
   M3_TEST_ASSERT(handled == M3_TRUE);
   M3_TEST_ASSERT(sheet.offset > 0.0f);
 
+  M3_TEST_OK(m3_sheet_test_set_fail_point(M3_SHEET_TEST_FAIL_APPLY_OFFSET));
+  M3_TEST_OK(init_gesture_event(&event, M3_INPUT_GESTURE_DRAG_UPDATE, 200.0f,
+                                360.0f, 200.0f, 350.0f, 30.0f, 0.0f));
+  M3_TEST_EXPECT(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
+                 M3_ERR_UNKNOWN);
+  M3_TEST_OK(m3_sheet_test_clear_fail_points());
+
   M3_TEST_OK(init_gesture_event(&event, M3_INPUT_GESTURE_DRAG_END, 200.0f,
                                 360.0f, 200.0f, 350.0f, 50.0f, 0.0f));
   M3_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
@@ -676,6 +804,56 @@ static int test_sheet_event(void) {
                                 10.0f, 10.0f, 0.0f, 0.0f));
   M3_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   M3_TEST_ASSERT(handled == M3_FALSE);
+
+  M3_TEST_OK(init_gesture_event(&event, M3_INPUT_GESTURE_DRAG_UPDATE, 10.0f,
+                                10.0f, 10.0f, 10.0f, 5.0f, 0.0f));
+  M3_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
+  M3_TEST_ASSERT(handled == M3_FALSE);
+
+  sheet.dragging = M3_TRUE;
+  sheet.sheet_bounds.height = 0.0f;
+  M3_TEST_OK(init_gesture_event(&event, M3_INPUT_GESTURE_DRAG_END, 200.0f,
+                                360.0f, 200.0f, 350.0f, 50.0f, 0.0f));
+  M3_TEST_EXPECT(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
+                 M3_ERR_RANGE);
+  sheet.sheet_bounds.height = 200.0f;
+
+  sheet.dragging = M3_TRUE;
+  M3_TEST_OK(init_gesture_event(&event, M3_INPUT_GESTURE_FLING, 200.0f, 360.0f,
+                                200.0f, 350.0f, 50.0f, 2000.0f));
+  M3_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
+  M3_TEST_ASSERT(handled == M3_TRUE);
+  M3_TEST_ASSERT(sheet.open == M3_FALSE);
+
+  M3_TEST_OK(m3_sheet_set_open(&sheet, M3_TRUE));
+  sheet.dragging = M3_TRUE;
+  M3_TEST_OK(init_gesture_event(&event, M3_INPUT_GESTURE_FLING, 200.0f, 360.0f,
+                                200.0f, 350.0f, 10.0f, 0.0f));
+  M3_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
+  M3_TEST_ASSERT(handled == M3_TRUE);
+  M3_TEST_ASSERT(sheet.open == M3_TRUE);
+
+  sheet.style.scrim_enabled = M3_TRUE;
+  M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_MOVE, 10, 10));
+  M3_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
+  M3_TEST_ASSERT(handled == M3_TRUE);
+  M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_SCROLL, 10, 10));
+  M3_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
+  M3_TEST_ASSERT(handled == M3_TRUE);
+
+  sheet.style.scrim_enabled = M3_FALSE;
+  M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_MOVE, 200, 350));
+  M3_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
+  M3_TEST_ASSERT(handled == M3_TRUE);
+  M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_SCROLL, 200, 350));
+  M3_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
+  M3_TEST_ASSERT(handled == M3_TRUE);
+
+  sheet.widget.flags |= M3_WIDGET_FLAG_HIDDEN;
+  M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 200, 350));
+  M3_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
+  M3_TEST_ASSERT(handled == M3_FALSE);
+  sheet.widget.flags &= (m3_u32)~M3_WIDGET_FLAG_HIDDEN;
 
   sheet.widget.flags |= M3_WIDGET_FLAG_DISABLED;
   M3_TEST_OK(init_pointer_event(&event, M3_INPUT_POINTER_DOWN, 200, 350));
