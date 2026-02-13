@@ -191,17 +191,17 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_uri_parse("x", NULL), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_router_test_cstrlen(NULL, &max_value),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_test_cstrlen("x", NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_router_test_slice_set(NULL, "x", 1));
   temp_slice.data = "bar";
   temp_slice.length = 3;
   CMP_TEST_EXPECT(cmp_router_test_slice_equals(NULL, "bar", 3, &match),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_test_slice_equals(&temp_slice, NULL, 3, &match),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_test_slice_equals(&temp_slice, "bar", 3, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   temp_slice.data = NULL;
   temp_slice.length = 0;
   CMP_TEST_OK(cmp_router_test_slice_equals(&temp_slice, "", 0, &match));
@@ -227,22 +227,22 @@ int main(void) {
       cmp_router_test_match_len(NULL, 0, "/", 1, NULL, 0, NULL, &match),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_test_validate_pattern(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_router_test_validate_pattern(""));
   CMP_TEST_EXPECT(cmp_router_test_validate_pattern("/users/:"),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_test_release_entry(NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_test_navigate_path_len(NULL, "/", 1, &component),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_test_has_more_segments(NULL, 0, 0, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   found_route = NULL;
   CMP_TEST_EXPECT(cmp_router_test_find_route(NULL, "/", 1, &found_route),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_test_find_route(&router_manual, "/", 1, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       cmp_router_test_find_route(&router_manual, "/", 1, &found_route),
       CMP_ERR_NOT_FOUND);
@@ -265,7 +265,7 @@ int main(void) {
 #ifdef CMP_TESTING
   CMP_TEST_OK(cmp_router_test_set_slice_equals_fail(CMP_TRUE));
   CMP_TEST_EXPECT(cmp_uri_query_find(&uri, "foo", &value, &found),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(cmp_router_test_set_slice_equals_fail(CMP_FALSE));
 #endif
 
@@ -278,13 +278,13 @@ int main(void) {
   CMP_TEST_ASSERT(found == CMP_FALSE);
 
   CMP_TEST_EXPECT(cmp_uri_query_find(NULL, "foo", &value, &found),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_uri_query_find(&uri, NULL, &value, &found),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_uri_query_find(&uri, "foo", NULL, &found),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_uri_query_find(&uri, "foo", &value, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_uri_query_find(&uri, "", &value, &found), CMP_ERR_RANGE);
 
   CMP_TEST_OK(cmp_uri_parse("app://example.com/path", &uri));
@@ -293,7 +293,7 @@ int main(void) {
 
   CMP_TEST_OK(cmp_router_test_set_cstr_limit(3));
   CMP_TEST_EXPECT(cmp_uri_query_find(&uri, "abcd", &value, &found),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_EXPECT(cmp_router_test_validate_pattern("abcd"), CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_router_test_set_cstr_limit(0));
 
@@ -378,9 +378,9 @@ int main(void) {
     local_stack[0].component = NULL;
 
     CMP_TEST_OK(cmp_router_test_set_cstr_limit(1));
-    CMP_TEST_EXPECT(
-        cmp_router_test_navigate_path_len(&local_router, "/next", 5, &component),
-        CMP_ERR_OVERFLOW);
+    CMP_TEST_EXPECT(cmp_router_test_navigate_path_len(&local_router, "/next", 5,
+                                                      &component),
+                    CMP_ERR_OVERFLOW);
     CMP_TEST_OK(cmp_router_test_set_cstr_limit(0));
   }
 
@@ -402,11 +402,12 @@ int main(void) {
   CMP_TEST_ASSERT(uri.path.length == 0);
 
   CMP_TEST_EXPECT(cmp_route_test_match(NULL, "/a", NULL, 0, NULL, &match),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_route_test_match("/a", NULL, NULL, 0, NULL, &match),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_route_test_match("/a", "/a", NULL, 0, &param_count, &match),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_route_test_match("/a", "/a", NULL, 0, &param_count, &match),
+      CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_route_test_match("", "", NULL, 0, NULL, &match));
   CMP_TEST_ASSERT(match == CMP_TRUE);
@@ -423,37 +424,37 @@ int main(void) {
   CMP_TEST_ASSERT(match == CMP_TRUE);
 
   CMP_TEST_OK(cmp_route_test_match("/users/:id", "/users/42", params, 2,
-                                 &param_count, &match));
+                                   &param_count, &match));
   CMP_TEST_ASSERT(match == CMP_TRUE);
   CMP_TEST_ASSERT(param_count == 1);
   CMP_TEST_ASSERT(slice_equals(&params[0].key, "id"));
   CMP_TEST_ASSERT(slice_equals(&params[0].value, "42"));
 
   CMP_TEST_EXPECT(cmp_route_test_match("/users/:", "/users/42", params, 2,
-                                     &param_count, &match),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                       &param_count, &match),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_route_test_match("/files/*/more", "/files/x", params, 2,
-                                     &param_count, &match),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                       &param_count, &match),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_route_test_match("/files/*/more", "/files", params, 2,
-                                     &param_count, &match),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                       &param_count, &match),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(
       cmp_route_test_match("/files/*", "/files/a/b/c", NULL, 0, NULL, &match));
   CMP_TEST_ASSERT(match == CMP_TRUE);
   CMP_TEST_OK(cmp_route_test_match("/files/*", "/files/a/b", params, 2,
-                                 &param_count, &match));
+                                   &param_count, &match));
   CMP_TEST_ASSERT(match == CMP_TRUE);
   CMP_TEST_ASSERT(param_count == 0);
-  CMP_TEST_OK(cmp_route_test_match("/files/*", "/files", params, 2, &param_count,
-                                 &match));
+  CMP_TEST_OK(cmp_route_test_match("/files/*", "/files", params, 2,
+                                   &param_count, &match));
   CMP_TEST_ASSERT(match == CMP_TRUE);
   CMP_TEST_ASSERT(param_count == 0);
 
   CMP_TEST_EXPECT(cmp_route_test_match("/users/:id", "/users/42", params, 0,
-                                     &param_count, &match),
-                 CMP_ERR_OVERFLOW);
+                                       &param_count, &match),
+                  CMP_ERR_OVERFLOW);
 
   CMP_TEST_OK(cmp_route_test_match("/a/b", "/a", NULL, 0, NULL, &match));
   CMP_TEST_ASSERT(match == CMP_FALSE);
@@ -549,14 +550,14 @@ int main(void) {
   CMP_TEST_OK(cmp_router_init(&router, &config));
 
   CMP_TEST_EXPECT(cmp_router_test_copy_path(NULL, "/", 1, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   router_copy.allocator = cmp_alloc;
   CMP_TEST_EXPECT(
       cmp_router_test_copy_path(&router_copy, "/", max_value, &path_copy),
       CMP_ERR_OVERFLOW);
   router_copy.allocator = null_alloc;
   CMP_TEST_EXPECT(cmp_router_test_copy_path(&router_copy, "/", 1, &path_copy),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
 
   CMP_TEST_OK(cmp_get_default_allocator(&router_manual.allocator));
   router_manual.routes = bad_routes;
@@ -570,37 +571,39 @@ int main(void) {
   bad_routes[0].destroy = route_destroy;
   bad_routes[0].ctx = &home_ctx;
   CMP_TEST_EXPECT(cmp_router_navigate(&router_manual, "/", &component),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_routes[0].pattern = "/abcd";
   CMP_TEST_OK(cmp_router_test_set_cstr_limit(3));
   CMP_TEST_EXPECT(cmp_router_navigate(&router_manual, "/", &component),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_router_test_set_cstr_limit(0));
 
   bad_routes[0].pattern = "/files/*/more";
   CMP_TEST_EXPECT(cmp_router_navigate(&router_manual, "/", &component),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_router_navigate(NULL, "/", &component),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_navigate(&router, NULL, &component),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_get_current(&router, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_router_navigate_uri(NULL, "app://example.com", &component),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_router_navigate_uri(NULL, "app://example.com", &component),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_navigate_uri(&router, NULL, &component),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_router_can_back(NULL, &can_back), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_router_can_back(NULL, &can_back),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_can_back(&router, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_back(NULL, &component), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_get_current(NULL, &current_path, &component),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_router_clear(NULL), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_router_navigate(&router, "/missing", &component),
-                 CMP_ERR_NOT_FOUND);
+                  CMP_ERR_NOT_FOUND);
 
   CMP_TEST_OK(cmp_router_navigate(&router, "", &component));
   CMP_TEST_ASSERT(component == &home_ctx);
@@ -609,11 +612,12 @@ int main(void) {
   current_slice.length = 1;
   CMP_TEST_ASSERT(slice_equals(&current_slice, "/"));
 
-  CMP_TEST_OK(cmp_router_navigate_uri(&router, "app://example.com", &component));
+  CMP_TEST_OK(
+      cmp_router_navigate_uri(&router, "app://example.com", &component));
   CMP_TEST_ASSERT(component == &home_ctx);
 
   CMP_TEST_OK(cmp_router_navigate_uri(&router, "app://example.com/users/42?x=1",
-                                    &component));
+                                      &component));
   CMP_TEST_ASSERT(component == &user_ctx);
   CMP_TEST_OK(cmp_router_can_back(&router, &can_back));
   CMP_TEST_ASSERT(can_back == CMP_TRUE);
@@ -627,18 +631,18 @@ int main(void) {
 
   user_ctx.build_fail = 1;
   CMP_TEST_EXPECT(cmp_router_navigate(&router, "/users/99", &component),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   user_ctx.build_fail = 0;
 
   alloc.fail_alloc_on = alloc.alloc_calls + 1;
   CMP_TEST_EXPECT(cmp_router_navigate(&router, "/users/77", &component),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   alloc.fail_alloc_on = 0;
 
   CMP_TEST_OK(cmp_router_navigate(&router, "/users/77", &component));
   CMP_TEST_OK(cmp_router_navigate(&router, "/files/a/b", &component));
   CMP_TEST_EXPECT(cmp_router_navigate(&router, "/users/88", &component),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
 
   file_ctx.destroy_fail = 1;
   CMP_TEST_EXPECT(cmp_router_back(&router, &component), CMP_ERR_UNKNOWN);
@@ -655,7 +659,7 @@ int main(void) {
 
   CMP_TEST_OK(cmp_router_clear(&router));
   CMP_TEST_EXPECT(cmp_router_get_current(&router, &current_path, NULL),
-                 CMP_ERR_NOT_FOUND);
+                  CMP_ERR_NOT_FOUND);
 
   CMP_TEST_OK(cmp_router_navigate(&router, "/users/11", &component));
   user_ctx.destroy_fail = 1;
@@ -671,18 +675,19 @@ int main(void) {
 
   config.stack_capacity = 0;
   CMP_TEST_OK(cmp_router_init(&router, &config));
-  CMP_TEST_EXPECT(cmp_router_navigate(&router, "/", &component), CMP_ERR_OVERFLOW);
+  CMP_TEST_EXPECT(cmp_router_navigate(&router, "/", &component),
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_router_shutdown(&router));
 
   CMP_TEST_OK(cmp_router_test_set_cstr_limit(3));
   CMP_TEST_EXPECT(cmp_router_navigate(&router, "abcd", &component),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_EXPECT(cmp_router_navigate_uri(&router, "abcd", &component),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_EXPECT(cmp_route_test_match("abcd", "/a", NULL, 0, NULL, &match),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_EXPECT(cmp_route_test_match("a", "/abcd", NULL, 0, NULL, &match),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_EXPECT(cmp_uri_parse("abcd", &uri), CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_router_test_set_cstr_limit(0));
 

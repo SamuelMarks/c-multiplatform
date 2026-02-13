@@ -55,7 +55,7 @@ static int cmp_extras_validate_edges(const CMPLayoutEdges *edges) {
 }
 
 static int cmp_extras_validate_text_style(const CMPTextStyle *style,
-                                         CMPBool require_family) {
+                                          CMPBool require_family) {
   int rc;
 
   if (style == NULL) {
@@ -155,7 +155,7 @@ cmp_extras_validate_tooltip_placement(const CMPTooltipPlacement *placement) {
 }
 
 static int cmp_extras_validate_tooltip_style(const CMPTooltipStyle *style,
-                                            CMPBool require_family) {
+                                             CMPBool require_family) {
   int rc;
 
   if (style == NULL) {
@@ -214,8 +214,9 @@ static int cmp_extras_validate_tooltip_style(const CMPTooltipStyle *style,
   return CMP_OK;
 }
 
-static int cmp_extras_validate_tooltip_content(const CMPTooltipStyle *style,
-                                              const CMPTooltipContent *content) {
+static int
+cmp_extras_validate_tooltip_content(const CMPTooltipStyle *style,
+                                    const CMPTooltipContent *content) {
   int rc;
 
   if (style == NULL || content == NULL) {
@@ -258,7 +259,7 @@ static int cmp_extras_validate_tooltip_content(const CMPTooltipStyle *style,
 }
 
 static int cmp_extras_validate_badge_style(const CMPBadgeStyle *style,
-                                          CMPBool require_family) {
+                                           CMPBool require_family) {
   int rc;
 
   if (style == NULL) {
@@ -407,8 +408,8 @@ int CMP_CALL cmp_tooltip_style_init_rich(CMPTooltipStyle *style) {
 }
 
 int CMP_CALL cmp_tooltip_compute_content_size(const CMPTooltipStyle *style,
-                                            const CMPTooltipContent *content,
-                                            CMPSize *out_size) {
+                                              const CMPTooltipContent *content,
+                                              CMPSize *out_size) {
   CMPScalar content_width;
   CMPScalar content_height;
   CMPScalar width;
@@ -704,8 +705,8 @@ int CMP_CALL cmp_badge_placement_init_navigation(CMPBadgePlacement *placement) {
 }
 
 int CMP_CALL cmp_badge_compute_size(const CMPBadgeStyle *style,
-                                  const CMPBadgeContent *content,
-                                  CMPSize *out_size) {
+                                    const CMPBadgeContent *content,
+                                    CMPSize *out_size) {
   CMPScalar width;
   CMPScalar height;
   int rc;
@@ -754,10 +755,10 @@ int CMP_CALL cmp_badge_compute_size(const CMPBadgeStyle *style,
 }
 
 int CMP_CALL cmp_badge_compute_bounds(const CMPBadgeStyle *style,
-                                    const CMPBadgeContent *content,
-                                    const CMPRect *anchor,
-                                    const CMPBadgePlacement *placement,
-                                    CMPRect *out_bounds) {
+                                      const CMPBadgeContent *content,
+                                      const CMPRect *anchor,
+                                      const CMPBadgePlacement *placement,
+                                      CMPRect *out_bounds) {
   CMPSize size;
   CMPScalar anchor_x;
   CMPScalar anchor_y;
@@ -824,7 +825,7 @@ int CMP_CALL cmp_extras_test_validate_edges(const CMPLayoutEdges *edges) {
 }
 
 int CMP_CALL cmp_extras_test_validate_text_style(const CMPTextStyle *style,
-                                               CMPBool require_family) {
+                                                 CMPBool require_family) {
   return cmp_extras_validate_text_style(style, require_family);
 }
 
@@ -836,7 +837,8 @@ int CMP_CALL cmp_extras_test_validate_size(const CMPSize *size) {
   return cmp_extras_validate_size(size);
 }
 
-int CMP_CALL cmp_extras_test_validate_text_metrics(const CMPTextMetrics *metrics) {
+int CMP_CALL
+cmp_extras_test_validate_text_metrics(const CMPTextMetrics *metrics) {
   return cmp_extras_validate_text_metrics(metrics);
 }
 
@@ -845,13 +847,13 @@ cmp_extras_test_validate_tooltip_anchor(const CMPTooltipAnchor *anchor) {
   return cmp_extras_validate_tooltip_anchor(anchor);
 }
 
-int CMP_CALL
-cmp_extras_test_validate_tooltip_placement(const CMPTooltipPlacement *placement) {
+int CMP_CALL cmp_extras_test_validate_tooltip_placement(
+    const CMPTooltipPlacement *placement) {
   return cmp_extras_validate_tooltip_placement(placement);
 }
 
-int CMP_CALL cmp_extras_test_validate_tooltip_style(const CMPTooltipStyle *style,
-                                                  CMPBool require_family) {
+int CMP_CALL cmp_extras_test_validate_tooltip_style(
+    const CMPTooltipStyle *style, CMPBool require_family) {
   return cmp_extras_validate_tooltip_style(style, require_family);
 }
 
@@ -861,7 +863,7 @@ int CMP_CALL cmp_extras_test_validate_tooltip_content(
 }
 
 int CMP_CALL cmp_extras_test_validate_badge_style(const CMPBadgeStyle *style,
-                                                CMPBool require_family) {
+                                                  CMPBool require_family) {
   return cmp_extras_validate_badge_style(style, require_family);
 }
 

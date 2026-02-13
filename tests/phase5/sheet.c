@@ -17,16 +17,16 @@ int CMP_CALL m3_sheet_test_set_color_fail_after(cmp_u32 call_count);
 int CMP_CALL m3_sheet_test_clear_fail_points(void);
 int CMP_CALL m3_sheet_test_validate_color(const CMPColor *color);
 int CMP_CALL m3_sheet_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                    CMPScalar b, CMPScalar a);
+                                     CMPScalar b, CMPScalar a);
 int CMP_CALL m3_sheet_test_validate_edges(const CMPLayoutEdges *edges);
 int CMP_CALL m3_sheet_test_validate_measure_spec(CMPMeasureSpec spec);
 int CMP_CALL m3_sheet_test_validate_rect(const CMPRect *rect);
 int CMP_CALL m3_sheet_test_validate_style(const M3SheetStyle *style);
 int CMP_CALL m3_sheet_test_apply_offset(M3Sheet *sheet, CMPScalar offset,
-                                       CMPBool reset_velocity,
-                                       CMPBool *out_changed);
+                                        CMPBool reset_velocity,
+                                        CMPBool *out_changed);
 int CMP_CALL m3_sheet_test_compute_scrim_alpha(const M3Sheet *sheet,
-                                              CMPScalar *out_alpha);
+                                               CMPScalar *out_alpha);
 
 typedef struct TestSheetBackend {
   int draw_rect_calls;
@@ -106,18 +106,18 @@ static int test_gfx_pop_clip(void *gfx) {
 }
 
 static const CMPGfxVTable g_test_gfx_vtable = {NULL,
-                                              NULL,
-                                              NULL,
-                                              test_gfx_draw_rect,
-                                              NULL,
-                                              NULL,
-                                              test_gfx_push_clip,
-                                              test_gfx_pop_clip,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL};
+                                               NULL,
+                                               NULL,
+                                               test_gfx_draw_rect,
+                                               NULL,
+                                               NULL,
+                                               test_gfx_push_clip,
+                                               test_gfx_pop_clip,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL};
 
 static const CMPGfxVTable g_test_gfx_vtable_no_draw = {
     NULL, NULL, NULL, NULL, NULL, NULL, test_gfx_push_clip, test_gfx_pop_clip,
@@ -213,15 +213,15 @@ static int test_sheet_helpers(void) {
   CMP_TEST_EXPECT(m3_sheet_test_validate_color(&color), CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_sheet_test_color_set(NULL, 0.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_sheet_test_color_set(&color, -0.1f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_sheet_test_color_set(&color, 0.0f, -0.1f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_sheet_test_color_set(&color, 0.0f, 0.0f, -0.1f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_sheet_test_color_set(&color, 0.0f, 0.0f, 0.0f, -0.1f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_sheet_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f));
 
   CMP_TEST_EXPECT(m3_sheet_test_validate_edges(NULL), CMP_ERR_INVALID_ARGUMENT);
@@ -245,7 +245,7 @@ static int test_sheet_helpers(void) {
   spec.mode = 99u;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(m3_sheet_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_AT_MOST;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_sheet_test_validate_measure_spec(spec), CMP_ERR_RANGE);
@@ -363,7 +363,7 @@ static int test_sheet_helpers(void) {
   sheet.offset = 0.0f;
   sheet.anim.spring.velocity = 5.0f;
   CMP_TEST_EXPECT(m3_sheet_test_apply_offset(NULL, 0.0f, CMP_FALSE, &changed),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_sheet_test_apply_offset(&sheet, -10.0f, CMP_FALSE, &changed));
   CMP_TEST_ASSERT(sheet.offset == 0.0f);
   CMP_TEST_ASSERT(sheet.anim.spring.velocity == 0.0f);
@@ -373,18 +373,18 @@ static int test_sheet_helpers(void) {
   CMP_TEST_ASSERT(changed == CMP_TRUE);
   sheet.sheet_bounds.height = -1.0f;
   CMP_TEST_EXPECT(m3_sheet_test_apply_offset(&sheet, 0.0f, CMP_TRUE, &changed),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   sheet.sheet_bounds.height = 100.0f;
   CMP_TEST_OK(m3_sheet_test_set_fail_point(M3_SHEET_TEST_FAIL_APPLY_OFFSET));
   CMP_TEST_EXPECT(m3_sheet_test_apply_offset(&sheet, 0.0f, CMP_TRUE, &changed),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_sheet_test_clear_fail_points());
 
   CMP_TEST_EXPECT(m3_sheet_test_compute_scrim_alpha(NULL, &alpha),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   sheet.sheet_bounds.height = -1.0f;
   CMP_TEST_EXPECT(m3_sheet_test_compute_scrim_alpha(&sheet, &alpha),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   sheet.sheet_bounds.height = 0.0f;
   sheet.offset = 0.0f;
   CMP_TEST_OK(m3_sheet_test_compute_scrim_alpha(&sheet, &alpha));
@@ -398,7 +398,7 @@ static int test_sheet_helpers(void) {
   CMP_TEST_ASSERT(alpha == 0.0f);
   CMP_TEST_OK(m3_sheet_test_set_fail_point(M3_SHEET_TEST_FAIL_SCRIM_ALPHA));
   CMP_TEST_EXPECT(m3_sheet_test_compute_scrim_alpha(&sheet, &alpha),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_sheet_test_clear_fail_points());
 
   return 0;
@@ -437,7 +437,7 @@ static int test_sheet_init_and_setters(void) {
   CMP_TEST_OK(m3_sheet_style_init_standard(&style));
 
   CMP_TEST_EXPECT(m3_sheet_set_on_action(NULL, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_sheet_set_on_action(&sheet, NULL, NULL));
 
   CMP_TEST_EXPECT(m3_sheet_set_open(NULL, CMP_TRUE), CMP_ERR_INVALID_ARGUMENT);
@@ -458,9 +458,9 @@ static int test_sheet_init_and_setters(void) {
     CMPSemantics semantics;
 
     CMP_TEST_EXPECT(sheet.widget.vtable->get_semantics(NULL, &semantics),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(sheet.widget.vtable->get_semantics(sheet.widget.ctx, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     sheet.widget.flags = CMP_WIDGET_FLAG_DISABLED | CMP_WIDGET_FLAG_FOCUSABLE;
     CMP_TEST_OK(
@@ -507,7 +507,7 @@ static int test_sheet_measure_layout(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 600.0f;
   CMP_TEST_OK(sheet.widget.vtable->measure(sheet.widget.ctx, width_spec,
-                                          height_spec, &size));
+                                           height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 500.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 600.0f, 0.001f));
 
@@ -516,7 +516,7 @@ static int test_sheet_measure_layout(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 150.0f;
   CMP_TEST_OK(sheet.widget.vtable->measure(sheet.widget.ctx, width_spec,
-                                          height_spec, &size));
+                                           height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 250.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 150.0f, 0.001f));
 
@@ -525,7 +525,7 @@ static int test_sheet_measure_layout(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(sheet.widget.vtable->measure(sheet.widget.ctx, width_spec,
-                                          height_spec, &size));
+                                           height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 300.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 200.0f, 0.001f));
 
@@ -534,15 +534,15 @@ static int test_sheet_measure_layout(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(sheet.widget.vtable->measure(sheet.widget.ctx, width_spec,
-                                              height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                               height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bounds.x = 0.0f;
   bounds.y = 0.0f;
   bounds.width = -1.0f;
   bounds.height = 100.0f;
   CMP_TEST_EXPECT(sheet.widget.vtable->layout(sheet.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bounds.x = 0.0f;
   bounds.y = 0.0f;
@@ -552,7 +552,7 @@ static int test_sheet_measure_layout(void) {
 
   CMP_TEST_OK(m3_sheet_test_set_fail_point(M3_SHEET_TEST_FAIL_APPLY_OFFSET));
   CMP_TEST_EXPECT(sheet.widget.vtable->layout(sheet.widget.ctx, bounds),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_sheet_test_clear_fail_points());
 
   CMP_TEST_OK(m3_sheet_get_bounds(&sheet, &bounds));
@@ -570,9 +570,9 @@ static int test_sheet_measure_layout(void) {
   CMP_TEST_EXPECT(m3_sheet_get_bounds(NULL, &bounds), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_sheet_get_bounds(&sheet, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_sheet_get_content_bounds(NULL, &content),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_sheet_get_content_bounds(&sheet, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   return 0;
 }
@@ -623,8 +623,8 @@ static int test_sheet_paint(void) {
   expected_alpha = 0.4f * 0.5f;
   CMP_TEST_ASSERT(cmp_near(backend.colors[0].a, expected_alpha, 0.01f));
   CMP_TEST_ASSERT(cmp_near(backend.rects[0].width, overlay.width, 0.001f));
-  CMP_TEST_ASSERT(
-      cmp_near(backend.rects[1].y, sheet.sheet_bounds.y + sheet.offset, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(backend.rects[1].y,
+                           sheet.sheet_bounds.y + sheet.offset, 0.001f));
 
   CMP_TEST_OK(test_backend_init(&backend));
   style.scrim_enabled = CMP_FALSE;
@@ -637,7 +637,7 @@ static int test_sheet_paint(void) {
   style.scrim_enabled = CMP_TRUE;
   CMP_TEST_OK(m3_sheet_set_style(&sheet, &style));
   CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_sheet_test_clear_fail_points());
 
   CMP_TEST_OK(test_backend_init(&backend));
@@ -645,7 +645,8 @@ static int test_sheet_paint(void) {
   backend.fail_draw_rect = 1;
   style.scrim_enabled = CMP_TRUE;
   CMP_TEST_OK(m3_sheet_set_style(&sheet, &style));
-  CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx), CMP_ERR_IO);
+  CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
+                  CMP_ERR_IO);
   backend.fail_draw_rect = 0;
 
   CMP_TEST_OK(test_backend_init(&backend));
@@ -653,44 +654,45 @@ static int test_sheet_paint(void) {
   backend.fail_draw_rect = 1;
   style.scrim_enabled = CMP_FALSE;
   CMP_TEST_OK(m3_sheet_set_style(&sheet, &style));
-  CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx), CMP_ERR_IO);
+  CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
+                  CMP_ERR_IO);
   backend.fail_draw_rect = 0;
 
   sheet.style.corner_radius = -1.0f;
   CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   sheet.style.corner_radius = style.corner_radius;
 
   sheet.overlay_bounds.width = -1.0f;
   CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   sheet.overlay_bounds.width = overlay.width;
 
   sheet.sheet_bounds.height = -1.0f;
   CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   sheet.sheet_bounds.height = overlay.height - style.height;
 
   sheet.style.variant = 99u;
   CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   sheet.style.variant = style.variant;
 
   gfx.vtable = &g_test_gfx_vtable_no_draw;
   CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   gfx.vtable = &g_test_gfx_vtable;
   style.shadow_enabled = CMP_TRUE;
   style.shadow.blur_radius = -1.0f;
   CMP_TEST_OK(m3_sheet_set_style(&sheet, &style));
   CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(sheet.widget.vtable->paint(NULL, &ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sheet.widget.vtable->paint(sheet.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   return 0;
 }
@@ -732,8 +734,9 @@ static int test_sheet_event(void) {
 
   action.fail = 1;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 10, 10));
-  CMP_TEST_EXPECT(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(
+      sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
+      CMP_ERR_IO);
   action.fail = 0;
 
   CMP_TEST_OK(m3_sheet_style_init_standard(&style));
@@ -748,41 +751,43 @@ static int test_sheet_event(void) {
   CMP_TEST_ASSERT(handled == CMP_FALSE);
 
   CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_START, 200.0f,
-                                350.0f, 200.0f, 350.0f, 0.0f, 0.0f));
+                                 350.0f, 200.0f, 350.0f, 0.0f, 0.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
   CMP_TEST_ASSERT(sheet.dragging == CMP_TRUE);
 
-  CMP_TEST_EXPECT(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
-                 CMP_ERR_STATE);
+  CMP_TEST_EXPECT(
+      sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
+      CMP_ERR_STATE);
 
   CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_UPDATE, 200.0f,
-                                360.0f, 200.0f, 350.0f, 50.0f, 0.0f));
+                                 360.0f, 200.0f, 350.0f, 50.0f, 0.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
   CMP_TEST_ASSERT(sheet.offset > 0.0f);
 
   CMP_TEST_OK(m3_sheet_test_set_fail_point(M3_SHEET_TEST_FAIL_APPLY_OFFSET));
   CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_UPDATE, 200.0f,
-                                360.0f, 200.0f, 350.0f, 30.0f, 0.0f));
-  CMP_TEST_EXPECT(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
-                 CMP_ERR_UNKNOWN);
+                                 360.0f, 200.0f, 350.0f, 30.0f, 0.0f));
+  CMP_TEST_EXPECT(
+      sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
+      CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_sheet_test_clear_fail_points());
 
   CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_END, 200.0f,
-                                360.0f, 200.0f, 350.0f, 50.0f, 0.0f));
+                                 360.0f, 200.0f, 350.0f, 50.0f, 0.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
   CMP_TEST_ASSERT(sheet.open == CMP_TRUE);
 
   CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_START, 200.0f,
-                                350.0f, 200.0f, 350.0f, 0.0f, 0.0f));
+                                 350.0f, 200.0f, 350.0f, 0.0f, 0.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_UPDATE, 200.0f,
-                                380.0f, 200.0f, 350.0f, 120.0f, 0.0f));
+                                 380.0f, 200.0f, 350.0f, 120.0f, 0.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_END, 200.0f,
-                                380.0f, 200.0f, 350.0f, 120.0f, 0.0f));
+                                 380.0f, 200.0f, 350.0f, 120.0f, 0.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(sheet.open == CMP_FALSE);
 
@@ -790,45 +795,46 @@ static int test_sheet_event(void) {
   sheet.dragging = CMP_TRUE;
   sheet.offset = 10.0f;
   CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_END, 200.0f,
-                                350.0f, 200.0f, 350.0f, 10.0f, 2000.0f));
+                                 350.0f, 200.0f, 350.0f, 10.0f, 2000.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(sheet.open == CMP_FALSE);
 
   CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_START, 10.0f,
-                                10.0f, 10.0f, 10.0f, 0.0f, 0.0f));
+                                 10.0f, 10.0f, 10.0f, 0.0f, 0.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
   CMP_TEST_ASSERT(sheet.dragging == CMP_FALSE);
 
-  CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_END, 10.0f, 10.0f,
-                                10.0f, 10.0f, 0.0f, 0.0f));
+  CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_END, 10.0f,
+                                 10.0f, 10.0f, 10.0f, 0.0f, 0.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
 
   CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_UPDATE, 10.0f,
-                                10.0f, 10.0f, 10.0f, 5.0f, 0.0f));
+                                 10.0f, 10.0f, 10.0f, 5.0f, 0.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
 
   sheet.dragging = CMP_TRUE;
   sheet.sheet_bounds.height = 0.0f;
   CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_DRAG_END, 200.0f,
-                                360.0f, 200.0f, 350.0f, 50.0f, 0.0f));
-  CMP_TEST_EXPECT(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                                 360.0f, 200.0f, 350.0f, 50.0f, 0.0f));
+  CMP_TEST_EXPECT(
+      sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
+      CMP_ERR_RANGE);
   sheet.sheet_bounds.height = 200.0f;
 
   sheet.dragging = CMP_TRUE;
-  CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_FLING, 200.0f, 360.0f,
-                                200.0f, 350.0f, 50.0f, 2000.0f));
+  CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_FLING, 200.0f,
+                                 360.0f, 200.0f, 350.0f, 50.0f, 2000.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
   CMP_TEST_ASSERT(sheet.open == CMP_FALSE);
 
   CMP_TEST_OK(m3_sheet_set_open(&sheet, CMP_TRUE));
   sheet.dragging = CMP_TRUE;
-  CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_FLING, 200.0f, 360.0f,
-                                200.0f, 350.0f, 10.0f, 0.0f));
+  CMP_TEST_OK(init_gesture_event(&event, CMP_INPUT_GESTURE_FLING, 200.0f,
+                                 360.0f, 200.0f, 350.0f, 10.0f, 0.0f));
   CMP_TEST_OK(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
   CMP_TEST_ASSERT(sheet.open == CMP_TRUE);
@@ -863,15 +869,16 @@ static int test_sheet_event(void) {
 
   sheet.style.corner_radius = -1.0f;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 200, 350));
-  CMP_TEST_EXPECT(sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      sheet.widget.vtable->event(sheet.widget.ctx, &event, &handled),
+      CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(sheet.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sheet.widget.vtable->event(sheet.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sheet.widget.vtable->event(sheet.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   return 0;
 }
@@ -894,7 +901,8 @@ static int test_sheet_step(void) {
   overlay.height = 400.0f;
   CMP_TEST_OK(sheet.widget.vtable->layout(sheet.widget.ctx, overlay));
 
-  CMP_TEST_EXPECT(m3_sheet_step(NULL, 0.1f, &changed), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_sheet_step(NULL, 0.1f, &changed),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_sheet_step(&sheet, 0.1f, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_sheet_step(&sheet, -0.1f, &changed), CMP_ERR_RANGE);
 

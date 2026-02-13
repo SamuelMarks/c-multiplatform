@@ -109,8 +109,8 @@ typedef struct CMPRenderCmdDrawTexture {
  */
 typedef struct CMPRenderCmdDrawText {
   CMPHandle font;     /**< Font handle. */
-  const char *utf8;  /**< UTF-8 text pointer (must remain valid for the list
-                        lifetime). */
+  const char *utf8;   /**< UTF-8 text pointer (must remain valid for the list
+                         lifetime). */
   cmp_usize utf8_len; /**< UTF-8 length in bytes. */
   CMPScalar x;        /**< X origin in pixels. */
   CMPScalar y;        /**< Y origin in pixels. */
@@ -178,8 +178,8 @@ typedef struct CMPRenderNode {
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_render_list_init(CMPRenderList *list,
-                                       const CMPAllocator *allocator,
-                                       cmp_usize initial_capacity);
+                                          const CMPAllocator *allocator,
+                                          cmp_usize initial_capacity);
 
 /**
  * @brief Reset a render list without freeing its storage.
@@ -202,7 +202,7 @@ CMP_API int CMP_CALL cmp_render_list_shutdown(CMPRenderList *list);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_render_list_append(CMPRenderList *list,
-                                         const CMPRenderCmd *cmd);
+                                            const CMPRenderCmd *cmd);
 
 /**
  * @brief Execute a render list on a graphics backend.
@@ -210,7 +210,8 @@ CMP_API int CMP_CALL cmp_render_list_append(CMPRenderList *list,
  * @param gfx Graphics backend interface.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_render_list_execute(const CMPRenderList *list, CMPGfx *gfx);
+CMP_API int CMP_CALL cmp_render_list_execute(const CMPRenderList *list,
+                                             CMPGfx *gfx);
 
 /**
  * @brief Initialize a render tree node.
@@ -219,8 +220,9 @@ CMP_API int CMP_CALL cmp_render_list_execute(const CMPRenderList *list, CMPGfx *
  * @param bounds Layout bounds for the widget.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_render_node_init(CMPRenderNode *node, CMPWidget *widget,
-                                       const CMPRect *bounds);
+CMP_API int CMP_CALL cmp_render_node_init(CMPRenderNode *node,
+                                          CMPWidget *widget,
+                                          const CMPRect *bounds);
 
 /**
  * @brief Update the bounds for a render node.
@@ -229,7 +231,7 @@ CMP_API int CMP_CALL cmp_render_node_init(CMPRenderNode *node, CMPWidget *widget
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_render_node_set_bounds(CMPRenderNode *node,
-                                             const CMPRect *bounds);
+                                                const CMPRect *bounds);
 
 /**
  * @brief Assign children to a render node.
@@ -239,8 +241,8 @@ CMP_API int CMP_CALL cmp_render_node_set_bounds(CMPRenderNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_render_node_set_children(CMPRenderNode *node,
-                                               CMPRenderNode **children,
-                                               cmp_usize count);
+                                                  CMPRenderNode **children,
+                                                  cmp_usize count);
 
 /**
  * @brief Build a render command list from a widget tree.
@@ -249,8 +251,8 @@ CMP_API int CMP_CALL cmp_render_node_set_children(CMPRenderNode *node,
  * @param dpi_scale DPI scale factor for paint contexts.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_render_build(const CMPRenderNode *root, CMPRenderList *list,
-                                   CMPScalar dpi_scale);
+CMP_API int CMP_CALL cmp_render_build(const CMPRenderNode *root,
+                                      CMPRenderList *list, CMPScalar dpi_scale);
 
 #ifdef CMP_TESTING
 /**
@@ -261,7 +263,7 @@ CMP_API int CMP_CALL cmp_render_build(const CMPRenderNode *root, CMPRenderList *
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_render_test_add_overflow(cmp_usize a, cmp_usize b,
-                                               cmp_usize *out_value);
+                                                  cmp_usize *out_value);
 
 /**
  * @brief Test wrapper for render multiply-overflow helper.
@@ -271,7 +273,7 @@ CMP_API int CMP_CALL cmp_render_test_add_overflow(cmp_usize a, cmp_usize b,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_render_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                               cmp_usize *out_value);
+                                                  cmp_usize *out_value);
 
 /**
  * @brief Test wrapper for render list reserve helper.
@@ -280,7 +282,7 @@ CMP_API int CMP_CALL cmp_render_test_mul_overflow(cmp_usize a, cmp_usize b,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_render_test_list_reserve(CMPRenderList *list,
-                                               cmp_usize additional);
+                                                  cmp_usize additional);
 
 /**
  * @brief Test wrapper for render node validation.

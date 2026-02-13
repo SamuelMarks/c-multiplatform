@@ -59,8 +59,8 @@ static int m3_dialog_validate_edges(const CMPLayoutEdges *edges) {
 }
 
 static int m3_dialog_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -108,7 +108,7 @@ static int m3_dialog_measure_optional_text(const CMPTextBackend *backend,
 }
 
 static CMPBool m3_dialog_point_in_rect(const CMPRect *rect, CMPScalar x,
-                                      CMPScalar y) {
+                                       CMPScalar y) {
   if (rect == NULL) {
     return CMP_FALSE;
   }
@@ -126,7 +126,7 @@ static CMPBool m3_dialog_point_in_rect(const CMPRect *rect, CMPScalar x,
 
 #ifdef CMP_TESTING
 int CMP_CALL m3_dialog_test_point_in_rect(const CMPRect *rect, CMPScalar x,
-                                         CMPScalar y, CMPBool *out_inside) {
+                                          CMPScalar y, CMPBool *out_inside) {
   if (out_inside == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -140,7 +140,7 @@ int CMP_CALL m3_dialog_test_validate_color(const CMPColor *color) {
 }
 
 int CMP_CALL m3_dialog_test_validate_text_style(const CMPTextStyle *style,
-                                               CMPBool require_family) {
+                                                CMPBool require_family) {
   return m3_dialog_validate_text_style(style, require_family);
 }
 
@@ -637,7 +637,7 @@ static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
 
   if (dialog->style.shadow_enabled == CMP_TRUE) {
     rc = cmp_shadow_paint(&dialog->style.shadow, ctx->gfx, &dialog->bounds,
-                         shadow_clip);
+                          shadow_clip);
     if (rc != CMP_OK) {
       return rc; /* GCOVR_EXCL_LINE */
     }
@@ -716,7 +716,8 @@ static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
       dialog->utf8_confirm, dialog->confirm_len, ctx);
 }
 
-static int m3_alert_dialog_widget_event(void *widget, const CMPInputEvent *event,
+static int m3_alert_dialog_widget_event(void *widget,
+                                        const CMPInputEvent *event,
                                         CMPBool *out_handled) {
   M3AlertDialog *dialog;
   CMPScalar x;
@@ -1236,8 +1237,8 @@ static int m3_fullscreen_dialog_widget_paint(void *widget,
 
   if (dialog->style.shadow_enabled == CMP_TRUE) {
     rc = cmp_shadow_paint(&dialog->style.shadow, ctx->gfx,
-                         &dialog->bounds, /* GCOVR_EXCL_LINE */
-                         shadow_clip);    /* GCOVR_EXCL_LINE */
+                          &dialog->bounds, /* GCOVR_EXCL_LINE */
+                          shadow_clip);    /* GCOVR_EXCL_LINE */
     if (rc != CMP_OK) {                    /* GCOVR_EXCL_LINE */
       return rc;
     }
@@ -1558,7 +1559,8 @@ static int m3_snackbar_layout_action(M3Snackbar *snackbar) {
 }
 
 static int m3_snackbar_widget_measure(void *widget, CMPMeasureSpec width,
-                                      CMPMeasureSpec height, CMPSize *out_size) {
+                                      CMPMeasureSpec height,
+                                      CMPSize *out_size) {
   M3Snackbar *snackbar;
   CMPScalar desired_width;
   CMPScalar desired_height;
@@ -1676,10 +1678,11 @@ static int m3_snackbar_widget_layout(void *widget, CMPRect bounds) {
 }
 
 static int m3_snackbar_draw_action_text(
-    const M3Snackbar *snackbar, const CMPRect *bounds,      /* GCOVR_EXCL_LINE */
-    const CMPTextMetrics *metrics,                          /* GCOVR_EXCL_LINE */
-    const char *utf8, cmp_usize len, CMPPaintContext *ctx) { /* GCOVR_EXCL_LINE */
-  CMPScalar text_x;                                         /* GCOVR_EXCL_LINE */
+    const M3Snackbar *snackbar, const CMPRect *bounds, /* GCOVR_EXCL_LINE */
+    const CMPTextMetrics *metrics,                     /* GCOVR_EXCL_LINE */
+    const char *utf8, cmp_usize len,
+    CMPPaintContext *ctx) { /* GCOVR_EXCL_LINE */
+  CMPScalar text_x;         /* GCOVR_EXCL_LINE */
   CMPScalar text_y;
   CMPScalar available_width;
   CMPScalar available_height;
@@ -2014,7 +2017,7 @@ int CMP_CALL m3_alert_dialog_style_init(M3AlertDialogStyle *style) {
   shadow_color.b = 0.0f;
   shadow_color.a = 0.24f;
   rc = cmp_shadow_set(&style->shadow, 0.0f, 8.0f, 16.0f, 0.0f,
-                     style->corner_radius, 4u, shadow_color);
+                      style->corner_radius, 4u, shadow_color);
   if (rc != CMP_OK) {
     return rc; /* GCOVR_EXCL_LINE */
   }
@@ -2025,10 +2028,11 @@ int CMP_CALL m3_alert_dialog_style_init(M3AlertDialogStyle *style) {
 }
 
 int CMP_CALL m3_alert_dialog_init(M3AlertDialog *dialog,
-                                 const CMPTextBackend *backend,
-                                 const M3AlertDialogStyle *style,
-                                 const char *utf8_title, cmp_usize title_len, /* GCOVR_EXCL_LINE */
-                                 const char *utf8_body, cmp_usize body_len) {
+                                  const CMPTextBackend *backend,
+                                  const M3AlertDialogStyle *style,
+                                  const char *utf8_title,
+                                  cmp_usize title_len, /* GCOVR_EXCL_LINE */
+                                  const char *utf8_body, cmp_usize body_len) {
   CMPHandle fonts[2];
   int rc; /* GCOVR_EXCL_LINE */
   int cleanup_rc;
@@ -2095,7 +2099,8 @@ int CMP_CALL m3_alert_dialog_init(M3AlertDialog *dialog,
     }
     return rc; /* GCOVR_EXCL_LINE */
   }
-  rc = cmp_text_font_create(backend, &style->action_style, &dialog->action_font);
+  rc =
+      cmp_text_font_create(backend, &style->action_style, &dialog->action_font);
   if (rc != CMP_OK) {
     fonts[0] = dialog->title_font;
     fonts[1] = dialog->body_font;
@@ -2116,8 +2121,8 @@ int CMP_CALL m3_alert_dialog_init(M3AlertDialog *dialog,
 }
 
 int CMP_CALL m3_alert_dialog_set_title(M3AlertDialog *dialog,
-                                      const char *utf8_title,
-                                      cmp_usize title_len) {
+                                       const char *utf8_title,
+                                       cmp_usize title_len) {
   if (dialog == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2132,7 +2137,8 @@ int CMP_CALL m3_alert_dialog_set_title(M3AlertDialog *dialog,
 }
 
 int CMP_CALL m3_alert_dialog_set_body(M3AlertDialog *dialog,
-                                     const char *utf8_body, cmp_usize body_len) {
+                                      const char *utf8_body,
+                                      cmp_usize body_len) {
   if (dialog == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2146,11 +2152,9 @@ int CMP_CALL m3_alert_dialog_set_body(M3AlertDialog *dialog,
   return CMP_OK; /* GCOVR_EXCL_LINE */
 }
 
-int CMP_CALL m3_alert_dialog_set_actions(M3AlertDialog *dialog,
-                                        const char *utf8_confirm, /* GCOVR_EXCL_LINE */
-                                        cmp_usize confirm_len,
-                                        const char *utf8_dismiss,
-                                        cmp_usize dismiss_len) {
+int CMP_CALL m3_alert_dialog_set_actions(
+    M3AlertDialog *dialog, const char *utf8_confirm, /* GCOVR_EXCL_LINE */
+    cmp_usize confirm_len, const char *utf8_dismiss, cmp_usize dismiss_len) {
   if (dialog == NULL) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
   }
@@ -2197,12 +2201,12 @@ int CMP_CALL m3_alert_dialog_set_style(
   new_action.generation = 0u;
 
   rc = cmp_text_font_create(&dialog->text_backend, &style->title_style,
-                           &new_title);
+                            &new_title);
   if (rc != CMP_OK) {
     return rc;
   }
-  rc =
-      cmp_text_font_create(&dialog->text_backend, &style->body_style, &new_body);
+  rc = cmp_text_font_create(&dialog->text_backend, &style->body_style,
+                            &new_body);
   if (rc != CMP_OK) {
     cleanup_rc = m3_dialog_destroy_fonts(&dialog->text_backend, &new_title, 1u);
     if (cleanup_rc != CMP_OK) {
@@ -2211,7 +2215,7 @@ int CMP_CALL m3_alert_dialog_set_style(
     return rc;
   }
   rc = cmp_text_font_create(&dialog->text_backend, &style->action_style,
-                           &new_action);
+                            &new_action);
   if (rc != CMP_OK) {
     new_fonts[0] = new_title;
     new_fonts[1] = new_body;
@@ -2250,8 +2254,8 @@ int CMP_CALL m3_alert_dialog_set_style(
 }
 
 int CMP_CALL m3_alert_dialog_set_on_action(M3AlertDialog *dialog,
-                                          CMPAlertDialogOnAction on_action,
-                                          void *ctx) {
+                                           CMPAlertDialogOnAction on_action,
+                                           void *ctx) {
   if (dialog == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2334,7 +2338,7 @@ int CMP_CALL m3_fullscreen_dialog_style_init(M3FullScreenDialogStyle *style) {
   shadow_color.b = 0.0f;
   shadow_color.a = 0.24f;
   rc = cmp_shadow_set(&style->shadow, 0.0f, 6.0f, 12.0f, 0.0f,
-                     style->corner_radius, 3u, shadow_color);
+                      style->corner_radius, 3u, shadow_color);
   if (rc != CMP_OK) {
     return rc; /* GCOVR_EXCL_LINE */
   }
@@ -2345,7 +2349,7 @@ int CMP_CALL m3_fullscreen_dialog_style_init(M3FullScreenDialogStyle *style) {
 }
 
 int CMP_CALL m3_fullscreen_dialog_init(
-    M3FullScreenDialog *dialog, /* GCOVR_EXCL_LINE */
+    M3FullScreenDialog *dialog,    /* GCOVR_EXCL_LINE */
     const CMPTextBackend *backend, /* GCOVR_EXCL_LINE */
     const M3FullScreenDialogStyle *style, const char *utf8_title,
     cmp_usize title_len, const char *utf8_body, cmp_usize body_len) {
@@ -2410,7 +2414,8 @@ int CMP_CALL m3_fullscreen_dialog_init(
     }
     return rc;
   }
-  rc = cmp_text_font_create(backend, &style->action_style, &dialog->action_font);
+  rc =
+      cmp_text_font_create(backend, &style->action_style, &dialog->action_font);
   if (rc != CMP_OK) {
     fonts[0] = dialog->title_font;
     fonts[1] = dialog->body_font;
@@ -2430,8 +2435,8 @@ int CMP_CALL m3_fullscreen_dialog_init(
 }
 
 int CMP_CALL m3_fullscreen_dialog_set_title(M3FullScreenDialog *dialog,
-                                           const char *utf8_title,
-                                           cmp_usize title_len) {
+                                            const char *utf8_title,
+                                            cmp_usize title_len) {
   if (dialog == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2446,8 +2451,8 @@ int CMP_CALL m3_fullscreen_dialog_set_title(M3FullScreenDialog *dialog,
 }
 
 int CMP_CALL m3_fullscreen_dialog_set_body(M3FullScreenDialog *dialog,
-                                          const char *utf8_body,
-                                          cmp_usize body_len) {
+                                           const char *utf8_body,
+                                           cmp_usize body_len) {
   if (dialog == NULL) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
   }
@@ -2504,12 +2509,12 @@ int CMP_CALL m3_fullscreen_dialog_set_style(
   new_action.generation = 0u;
 
   rc = cmp_text_font_create(&dialog->text_backend, &style->title_style,
-                           &new_title);
+                            &new_title);
   if (rc != CMP_OK) {
     return rc;
   }
-  rc =
-      cmp_text_font_create(&dialog->text_backend, &style->body_style, &new_body);
+  rc = cmp_text_font_create(&dialog->text_backend, &style->body_style,
+                            &new_body);
   if (rc != CMP_OK) {
     cleanup_rc = m3_dialog_destroy_fonts(&dialog->text_backend, &new_title, 1u);
     if (cleanup_rc != CMP_OK) {
@@ -2518,7 +2523,7 @@ int CMP_CALL m3_fullscreen_dialog_set_style(
     return rc;
   }
   rc = cmp_text_font_create(&dialog->text_backend, &style->action_style,
-                           &new_action);
+                            &new_action);
   if (rc != CMP_OK) {
     new_fonts[0] = new_title;
     new_fonts[1] = new_body;
@@ -2619,9 +2624,10 @@ int CMP_CALL m3_snackbar_style_init(M3SnackbarStyle *style) {
   return CMP_OK;
 }
 
-int CMP_CALL m3_snackbar_init(M3Snackbar *snackbar, const CMPTextBackend *backend,
-                             const M3SnackbarStyle *style,
-                             const char *utf8_message, cmp_usize message_len) {
+int CMP_CALL m3_snackbar_init(M3Snackbar *snackbar,
+                              const CMPTextBackend *backend,
+                              const M3SnackbarStyle *style,
+                              const char *utf8_message, cmp_usize message_len) {
   int rc;
   int cleanup_rc;
 
@@ -2664,16 +2670,16 @@ int CMP_CALL m3_snackbar_init(M3Snackbar *snackbar, const CMPTextBackend *backen
   snackbar->action_font.generation = 0u;
 
   rc = cmp_text_font_create(backend, &style->message_style,
-                           &snackbar->message_font);
+                            &snackbar->message_font);
   if (rc != CMP_OK) {
     return rc; /* GCOVR_EXCL_LINE */
   }
   rc = cmp_text_font_create(backend, &style->action_style,
-                           &snackbar->action_font);
+                            &snackbar->action_font);
   if (rc != CMP_OK) {
     cleanup_rc = m3_dialog_destroy_fonts(backend, &snackbar->message_font,
                                          1u); /* GCOVR_EXCL_LINE */
-    if (cleanup_rc != CMP_OK) {                /* GCOVR_EXCL_LINE */
+    if (cleanup_rc != CMP_OK) {               /* GCOVR_EXCL_LINE */
       return cleanup_rc;                      /* GCOVR_EXCL_LINE */
     }
     return rc; /* GCOVR_EXCL_LINE */
@@ -2688,8 +2694,8 @@ int CMP_CALL m3_snackbar_init(M3Snackbar *snackbar, const CMPTextBackend *backen
 }
 
 int CMP_CALL m3_snackbar_set_message(M3Snackbar *snackbar,
-                                    const char *utf8_message,
-                                    cmp_usize message_len) {
+                                     const char *utf8_message,
+                                     cmp_usize message_len) {
   if (snackbar == NULL) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
   }
@@ -2704,8 +2710,8 @@ int CMP_CALL m3_snackbar_set_message(M3Snackbar *snackbar,
 }
 
 int CMP_CALL m3_snackbar_set_action(M3Snackbar *snackbar,
-                                   const char *utf8_action,
-                                   cmp_usize action_len) {
+                                    const char *utf8_action,
+                                    cmp_usize action_len) {
   if (snackbar == NULL) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
   }
@@ -2720,7 +2726,7 @@ int CMP_CALL m3_snackbar_set_action(M3Snackbar *snackbar,
 }
 
 int CMP_CALL m3_snackbar_set_style(M3Snackbar *snackbar,
-                                  const M3SnackbarStyle *style) {
+                                   const M3SnackbarStyle *style) {
   CMPHandle new_message;
   CMPHandle new_action;
   CMPHandle old_fonts[2];
@@ -2743,12 +2749,12 @@ int CMP_CALL m3_snackbar_set_style(M3Snackbar *snackbar,
   new_action.generation = 0u;
 
   rc = cmp_text_font_create(&snackbar->text_backend, &style->message_style,
-                           &new_message);
+                            &new_message);
   if (rc != CMP_OK) {
     return rc;
   }
   rc = cmp_text_font_create(&snackbar->text_backend, &style->action_style,
-                           &new_action);
+                            &new_action);
   if (rc != CMP_OK) {
     cleanup_rc =
         m3_dialog_destroy_fonts(&snackbar->text_backend, &new_message, 1u);
@@ -2783,7 +2789,8 @@ int CMP_CALL m3_snackbar_set_style(M3Snackbar *snackbar,
 }
 
 int CMP_CALL m3_snackbar_set_on_action(M3Snackbar *snackbar,
-                                      CMPSnackbarOnAction on_action, void *ctx) {
+                                       CMPSnackbarOnAction on_action,
+                                       void *ctx) {
   if (snackbar == NULL) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
   }

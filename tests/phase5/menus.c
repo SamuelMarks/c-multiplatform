@@ -69,8 +69,8 @@ static int cmp_near(CMPScalar a, CMPScalar b, CMPScalar tol) {
 }
 
 static int test_text_create_font(void *text, const char *utf8_family,
-                                 cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
-                                 CMPHandle *out_font) {
+                                 cmp_i32 size_px, cmp_i32 weight,
+                                 CMPBool italic, CMPHandle *out_font) {
   TestMenuBackend *backend;
 
   if (text == NULL || utf8_family == NULL || out_font == NULL) {
@@ -230,7 +230,8 @@ static int test_gfx_pop_clip(void *gfx) {
   return CMP_OK;
 }
 
-static int test_action(void *ctx, M3Menu *menu, cmp_u32 action, cmp_usize index) {
+static int test_action(void *ctx, M3Menu *menu, cmp_u32 action,
+                       cmp_usize index) {
   TestActionState *state;
 
   CMP_UNUSED(menu);
@@ -250,8 +251,8 @@ static int test_action(void *ctx, M3Menu *menu, cmp_u32 action, cmp_usize index)
   return CMP_OK;
 }
 
-static void test_make_pointer_event(CMPInputEvent *event, cmp_u32 type, cmp_i32 x,
-                                    cmp_i32 y) {
+static void test_make_pointer_event(CMPInputEvent *event, cmp_u32 type,
+                                    cmp_i32 x, cmp_i32 y) {
   memset(event, 0, sizeof(*event));
   event->type = type;
   event->data.pointer.x = x;
@@ -334,15 +335,15 @@ static int test_menu_validation_helpers(void) {
   CMP_TEST_OK(m3_menu_test_validate_color(&color));
 
   CMP_TEST_EXPECT(m3_menu_test_color_set(NULL, 0.0f, 0.0f, 0.0f, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_test_color_set(&color, -0.1f, 0.0f, 0.0f, 1.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_menu_test_color_set(&color, 0.0f, -0.1f, 0.0f, 1.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_menu_test_color_set(&color, 0.0f, 0.0f, -0.1f, 1.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_menu_test_color_set(&color, 0.0f, 0.0f, 0.0f, -0.1f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_menu_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f));
 
   CMP_TEST_EXPECT(m3_menu_test_validate_edges(NULL), CMP_ERR_INVALID_ARGUMENT);
@@ -358,37 +359,37 @@ static int test_menu_validation_helpers(void) {
   CMP_TEST_OK(m3_menu_test_validate_edges(&edges));
 
   CMP_TEST_EXPECT(m3_menu_test_validate_text_style(NULL, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   rc = cmp_text_style_init(&style);
   CMP_TEST_OK(rc);
   CMP_TEST_EXPECT(m3_menu_test_validate_text_style(&style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   style.utf8_family = "Test";
   style.size_px = 0;
   CMP_TEST_EXPECT(m3_menu_test_validate_text_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.size_px = 12;
   style.weight = 99;
   CMP_TEST_EXPECT(m3_menu_test_validate_text_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.weight = 901;
   CMP_TEST_EXPECT(m3_menu_test_validate_text_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.weight = 400;
   style.italic = 2;
   CMP_TEST_EXPECT(m3_menu_test_validate_text_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.italic = CMP_FALSE;
   style.color.r = 1.2f;
   CMP_TEST_EXPECT(m3_menu_test_validate_text_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.color.r = 0.0f;
   CMP_TEST_OK(m3_menu_test_validate_text_style(&style, CMP_TRUE));
 
   spec.mode = 99u;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(m3_menu_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_EXACTLY;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_menu_test_validate_measure_spec(spec), CMP_ERR_RANGE);
@@ -429,7 +430,7 @@ static int test_menu_validation_helpers(void) {
   CMP_TEST_OK(m3_menu_test_validate_anchor(&anchor));
 
   CMP_TEST_EXPECT(m3_menu_test_validate_placement(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   placement.direction = 99u;
   placement.align = M3_MENU_ALIGN_START;
   CMP_TEST_EXPECT(m3_menu_test_validate_placement(&placement), CMP_ERR_RANGE);
@@ -445,7 +446,7 @@ static int test_menu_validation_helpers(void) {
   items[0].utf8_len = 1u;
   items[0].enabled = CMP_TRUE;
   CMP_TEST_EXPECT(m3_menu_test_validate_items(items, 1u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   items[0].utf8_label = "A";
   items[0].utf8_len = 1u;
   items[0].enabled = 2;
@@ -459,48 +460,48 @@ static int test_menu_validation_helpers(void) {
   CMP_TEST_OK(rc);
 
   CMP_TEST_EXPECT(m3_menu_test_validate_style(NULL, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bad_menu_style = menu_style;
   bad_menu_style.item_height = 0.0f;
   CMP_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_menu_style = menu_style;
   bad_menu_style.item_spacing = -1.0f;
   CMP_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_menu_style = menu_style;
   bad_menu_style.min_width = -1.0f;
   CMP_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_menu_style = menu_style;
   bad_menu_style.min_width = 10.0f;
   bad_menu_style.max_width = 5.0f;
   CMP_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_menu_style = menu_style;
   bad_menu_style.corner_radius = -1.0f;
   CMP_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_menu_style = menu_style;
   bad_menu_style.anchor_gap = -1.0f;
   CMP_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_menu_style = menu_style;
   bad_menu_style.padding.left = -1.0f;
   CMP_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_menu_style = menu_style;
   bad_menu_style.text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bad_menu_style = menu_style;
   bad_menu_style.background_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_menu_style = menu_style;
   bad_menu_style.disabled_text_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_menu_test_validate_style(&bad_menu_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   memset(&menu, 0, sizeof(menu));
   menu.text_backend.ctx = &backend;
@@ -519,16 +520,16 @@ static int test_menu_validation_helpers(void) {
   menu_items[1].enabled = CMP_TRUE;
 
   CMP_TEST_EXPECT(m3_menu_test_update_metrics(NULL, &text_width, &has_label),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_test_update_metrics(&menu, NULL, &has_label),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_test_update_metrics(&menu, &text_width, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   menu.items = NULL;
   menu.item_count = 1u;
   CMP_TEST_EXPECT(m3_menu_test_update_metrics(&menu, &text_width, &has_label),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   menu.items = menu_items;
   menu.item_count = 2u;
 
@@ -548,13 +549,13 @@ static int test_menu_validation_helpers(void) {
 
   backend.fail_measure = 1;
   CMP_TEST_EXPECT(m3_menu_test_update_metrics(&menu, &text_width, &has_label),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_measure = 0;
 
   backend.measure_calls = 0;
   backend.fail_measure_after = 2;
   CMP_TEST_EXPECT(m3_menu_test_update_metrics(&menu, &text_width, &has_label),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_measure_after = 0;
 
   backend.measure_calls = 0;
@@ -562,12 +563,12 @@ static int test_menu_validation_helpers(void) {
   menu_items[0].utf8_label = "A";
   menu_items[0].utf8_len = 1u;
   CMP_TEST_EXPECT(m3_menu_test_update_metrics(&menu, &text_width, &has_label),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   backend.negative_width = 0;
 
   CMP_TEST_EXPECT(m3_menu_test_compute_panel_size(NULL, &panel_width,
-                                                 &panel_height, &has_label),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                  &panel_height, &has_label),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       m3_menu_test_compute_panel_size(&menu, NULL, &panel_height, &has_label),
       CMP_ERR_INVALID_ARGUMENT);
@@ -580,30 +581,30 @@ static int test_menu_validation_helpers(void) {
 
   menu.style.item_height = 0.0f;
   CMP_TEST_EXPECT(m3_menu_test_compute_panel_size(&menu, &panel_width,
-                                                 &panel_height, &has_label),
-                 CMP_ERR_RANGE);
+                                                  &panel_height, &has_label),
+                  CMP_ERR_RANGE);
   menu.style = menu_style;
 
   menu.items = NULL;
   menu.item_count = 1u;
   CMP_TEST_EXPECT(m3_menu_test_compute_panel_size(&menu, &panel_width,
-                                                 &panel_height, &has_label),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                  &panel_height, &has_label),
+                  CMP_ERR_INVALID_ARGUMENT);
   menu.items = menu_items;
   menu.item_count = 2u;
 
   menu.style.min_width = 0.0f;
   menu.style.max_width = 20.0f;
-  CMP_TEST_OK(m3_menu_test_compute_panel_size(&menu, &panel_width, &panel_height,
-                                             &has_label));
+  CMP_TEST_OK(m3_menu_test_compute_panel_size(&menu, &panel_width,
+                                              &panel_height, &has_label));
   CMP_TEST_ASSERT(cmp_near(panel_width, menu.style.max_width, 0.001f));
   menu.style.min_width = menu_style.min_width;
   menu.style.max_width = menu_style.max_width;
 
   CMP_TEST_OK(m3_menu_test_set_force_negative_panel(CMP_TRUE));
   CMP_TEST_EXPECT(m3_menu_test_compute_panel_size(&menu, &panel_width,
-                                                 &panel_height, &has_label),
-                 CMP_ERR_RANGE);
+                                                  &panel_height, &has_label),
+                  CMP_ERR_RANGE);
 
   overlay.x = 0.0f;
   overlay.y = 0.0f;
@@ -617,47 +618,47 @@ static int test_menu_validation_helpers(void) {
   menu.placement.direction = M3_MENU_DIRECTION_DOWN;
   menu.placement.align = M3_MENU_ALIGN_START;
 
-  CMP_TEST_EXPECT(m3_menu_test_compute_panel_bounds(NULL, &overlay, 10.0f, 10.0f,
-                                                   &panel_bounds, &direction),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_menu_test_compute_panel_bounds(
+                      NULL, &overlay, 10.0f, 10.0f, &panel_bounds, &direction),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_test_compute_panel_bounds(&menu, NULL, 10.0f, 10.0f,
-                                                   &panel_bounds, &direction),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                    &panel_bounds, &direction),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_test_compute_panel_bounds(&menu, &overlay, 10.0f,
-                                                   10.0f, NULL, &direction),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                    10.0f, NULL, &direction),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_test_compute_panel_bounds(&menu, &overlay, 10.0f,
-                                                   10.0f, &panel_bounds, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                    10.0f, &panel_bounds, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   overlay.width = -1.0f;
   CMP_TEST_EXPECT(m3_menu_test_compute_panel_bounds(
-                     &menu, &overlay, 10.0f, 10.0f, &panel_bounds, &direction),
-                 CMP_ERR_RANGE);
+                      &menu, &overlay, 10.0f, 10.0f, &panel_bounds, &direction),
+                  CMP_ERR_RANGE);
   overlay.width = 50.0f;
 
   CMP_TEST_EXPECT(m3_menu_test_compute_panel_bounds(
-                     &menu, &overlay, -1.0f, 10.0f, &panel_bounds, &direction),
-                 CMP_ERR_RANGE);
+                      &menu, &overlay, -1.0f, 10.0f, &panel_bounds, &direction),
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_menu_test_compute_panel_bounds(
-                     &menu, &overlay, 10.0f, -1.0f, &panel_bounds, &direction),
-                 CMP_ERR_RANGE);
+                      &menu, &overlay, 10.0f, -1.0f, &panel_bounds, &direction),
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(m3_menu_test_compute_panel_bounds(&menu, &overlay, 60.0f, 60.0f,
-                                               &panel_bounds, &direction));
+                                                &panel_bounds, &direction));
   overlay.width = 10.0f;
   overlay.height = 10.0f;
   CMP_TEST_OK(m3_menu_test_set_force_bounds_overflow(CMP_TRUE));
   CMP_TEST_OK(m3_menu_test_compute_panel_bounds(&menu, &overlay, 60.0f, 60.0f,
-                                               &panel_bounds, &direction));
+                                                &panel_bounds, &direction));
   CMP_TEST_OK(m3_menu_test_compute_panel_bounds(&menu, &overlay, 60.0f, 60.0f,
-                                               &panel_bounds, &direction));
+                                                &panel_bounds, &direction));
   CMP_TEST_ASSERT(panel_bounds.x == overlay.x);
   CMP_TEST_ASSERT(panel_bounds.y == overlay.y);
   overlay.width = 1.0f;
   overlay.height = 1.0f;
   CMP_TEST_OK(m3_menu_test_compute_panel_bounds(&menu, &overlay, 20.0f, 20.0f,
-                                               &panel_bounds, &direction));
+                                                &panel_bounds, &direction));
   CMP_TEST_ASSERT(panel_bounds.x == overlay.x);
   CMP_TEST_ASSERT(panel_bounds.y == overlay.y);
   overlay.width = 50.0f;
@@ -675,7 +676,7 @@ static int test_menu_validation_helpers(void) {
   menu.placement.direction = M3_MENU_DIRECTION_DOWN;
   menu.placement.align = M3_MENU_ALIGN_CENTER;
   CMP_TEST_OK(m3_menu_test_compute_panel_bounds(&menu, &overlay, 40.0f, 40.0f,
-                                               &panel_bounds, &direction));
+                                                &panel_bounds, &direction));
   CMP_TEST_ASSERT(panel_bounds.x > overlay.x);
   CMP_TEST_ASSERT(panel_bounds.y > overlay.y);
 
@@ -684,15 +685,15 @@ static int test_menu_validation_helpers(void) {
   menu.menu_bounds.width = 20.0f;
   menu.menu_bounds.height = 20.0f;
   CMP_TEST_EXPECT(m3_menu_test_hit_test(NULL, 0.0f, 0.0f, &inside, &index),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_test_hit_test(&menu, 0.0f, 0.0f, NULL, &index),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_test_hit_test(&menu, 0.0f, 0.0f, &inside, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_menu_test_set_force_hit_test_error(CMP_TRUE));
   CMP_TEST_EXPECT(m3_menu_test_hit_test(&menu, 1.0f, 1.0f, &inside, &index),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(m3_menu_test_hit_test(&menu, 100.0f, 100.0f, &inside, &index));
   CMP_TEST_ASSERT(inside == CMP_FALSE);
@@ -754,36 +755,36 @@ static int test_menu_init_and_setters(void) {
   items[1].enabled = CMP_TRUE;
 
   CMP_TEST_EXPECT(m3_menu_init(NULL, &backend, &style, items, 2u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_init(&menu, NULL, &style, items, 2u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_init(&menu, &backend, NULL, items, 2u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   backend.vtable = NULL;
   CMP_TEST_EXPECT(m3_menu_init(&menu, &backend, &style, items, 2u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   backend.vtable = &g_test_text_vtable_no_create;
   CMP_TEST_EXPECT(m3_menu_init(&menu, &backend, &style, items, 2u),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   backend.vtable = &g_test_text_vtable_no_destroy;
   CMP_TEST_EXPECT(m3_menu_init(&menu, &backend, &style, items, 2u),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   backend.vtable = &g_test_text_vtable_no_measure;
   CMP_TEST_EXPECT(m3_menu_init(&menu, &backend, &style, items, 2u),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   backend.vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(m3_menu_init(&menu, &backend, &style, items, 2u),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   backend.vtable = &g_test_text_vtable;
   bad_style = style;
   bad_style.item_height = 0.0f;
   CMP_TEST_EXPECT(m3_menu_init(&menu, &backend, &bad_style, items, 2u),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_menu_init(&menu, &backend, &style, NULL, 2u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   backend_state.fail_create = 1;
   CMP_TEST_EXPECT(m3_menu_init(&menu, &backend, &style, items, 2u), CMP_ERR_IO);
@@ -795,9 +796,9 @@ static int test_menu_init_and_setters(void) {
   CMP_TEST_ASSERT(menu.open == CMP_TRUE);
 
   CMP_TEST_EXPECT(menu.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(menu.widget.vtable->get_semantics(menu.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(menu.widget.vtable->get_semantics(menu.widget.ctx, &semantics));
   CMP_TEST_ASSERT(semantics.flags & CMP_SEMANTIC_FLAG_FOCUSABLE);
   menu.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
@@ -809,7 +810,7 @@ static int test_menu_init_and_setters(void) {
   bad_items[0].utf8_len = 1u;
   bad_items[0].enabled = CMP_TRUE;
   CMP_TEST_EXPECT(m3_menu_set_items(&menu, bad_items, 1u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bad_items[0].utf8_label = "A";
   bad_items[0].utf8_len = 1u;
   bad_items[0].enabled = 2;
@@ -837,10 +838,12 @@ static int test_menu_init_and_setters(void) {
   CMP_TEST_OK(m3_menu_set_style(&menu, &style));
 
   CMP_TEST_EXPECT(m3_menu_set_on_action(NULL, test_action, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
-  CMP_TEST_EXPECT(m3_menu_set_anchor_rect(NULL, &rect), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_menu_set_anchor_rect(&menu, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_menu_set_anchor_rect(NULL, &rect),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_menu_set_anchor_rect(&menu, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   rect.x = 0.0f;
   rect.y = 0.0f;
   rect.width = -1.0f;
@@ -851,11 +854,11 @@ static int test_menu_init_and_setters(void) {
   CMP_TEST_OK(m3_menu_set_anchor_rect(&menu, &rect));
 
   CMP_TEST_EXPECT(m3_menu_set_anchor_point(NULL, 0.0f, 0.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_menu_set_anchor_point(&menu, 4.0f, 5.0f));
 
   CMP_TEST_EXPECT(m3_menu_set_placement(NULL, &placement),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_set_placement(&menu, NULL), CMP_ERR_INVALID_ARGUMENT);
   placement.direction = 99u;
   placement.align = M3_MENU_ALIGN_START;
@@ -882,13 +885,13 @@ static int test_menu_init_and_setters(void) {
   CMP_TEST_EXPECT(m3_menu_get_bounds(NULL, &rect), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_get_bounds(&menu, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_get_overlay_bounds(NULL, &rect),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_get_overlay_bounds(&menu, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_get_resolved_direction(NULL, &placement.direction),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_get_resolved_direction(&menu, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(menu.widget.vtable->destroy(menu.widget.ctx));
   return 0;
@@ -944,7 +947,7 @@ static int test_menu_measure_layout(void) {
   height.mode = CMP_MEASURE_UNSPECIFIED;
   height.size = 0.0f;
   CMP_TEST_EXPECT(menu.widget.vtable->measure(NULL, width, height, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       menu.widget.vtable->measure(menu.widget.ctx, width, height, NULL),
       CMP_ERR_INVALID_ARGUMENT);
@@ -1012,22 +1015,22 @@ static int test_menu_measure_layout(void) {
   bounds.width = 100.0f;
   bounds.height = 100.0f;
   CMP_TEST_EXPECT(menu.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_menu_test_set_force_negative_panel(CMP_TRUE));
   CMP_TEST_EXPECT(menu.widget.vtable->layout(menu.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bounds.width = 100.0f;
   bounds.height = 100.0f;
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(menu.widget.vtable->layout(menu.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bounds.width = 100.0f;
   bounds.height = 100.0f;
   menu.anchor.type = 99u;
   CMP_TEST_EXPECT(menu.widget.vtable->layout(menu.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   anchor_rect.x = 10.0f;
   anchor_rect.y = 10.0f;
@@ -1038,12 +1041,12 @@ static int test_menu_measure_layout(void) {
   menu.placement.direction = 99u;
   menu.placement.align = M3_MENU_ALIGN_START;
   CMP_TEST_EXPECT(menu.widget.vtable->layout(menu.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   menu.placement.direction = M3_MENU_DIRECTION_DOWN;
   menu.placement.align = 99u;
   CMP_TEST_EXPECT(menu.widget.vtable->layout(menu.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   placement.direction = M3_MENU_DIRECTION_DOWN;
   placement.align = M3_MENU_ALIGN_START;
@@ -1280,21 +1283,21 @@ static int test_menu_item_bounds(void) {
   CMP_TEST_OK(menu.widget.vtable->layout(menu.widget.ctx, bounds));
 
   CMP_TEST_EXPECT(m3_menu_get_item_bounds(NULL, 0u, &item_bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_get_item_bounds(&menu, 0u, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_menu_get_item_bounds(&menu, 5u, &item_bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   menu.style.item_height = 0.0f;
   menu.style.item_spacing = 0.0f;
   CMP_TEST_EXPECT(m3_menu_get_item_bounds(&menu, 0u, &item_bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   menu.style.item_height = 10.0f;
 
   CMP_TEST_OK(m3_menu_get_item_bounds(&menu, 1u, &item_bounds));
   CMP_TEST_ASSERT(item_bounds.y ==
-                 menu.menu_bounds.y + menu.style.padding.top + 10.0f);
+                  menu.menu_bounds.y + menu.style.padding.top + 10.0f);
 
   CMP_TEST_OK(menu.widget.vtable->destroy(menu.widget.ctx));
   return 0;
@@ -1341,11 +1344,11 @@ static int test_menu_events(void) {
   memset(&event, 0, sizeof(event));
   handled = CMP_FALSE;
   CMP_TEST_EXPECT(menu.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(menu.widget.vtable->event(menu.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(menu.widget.vtable->event(menu.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bounds.x = 10.0f;
   bounds.y = 10.0f;
@@ -1375,7 +1378,7 @@ static int test_menu_events(void) {
                           (cmp_i32)(menu.menu_bounds.y - 2.0f));
   handled = CMP_FALSE;
   CMP_TEST_EXPECT(menu.widget.vtable->event(menu.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
 
   test_make_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
                           (cmp_i32)(menu.menu_bounds.x + 1.0f),
@@ -1404,7 +1407,7 @@ static int test_menu_events(void) {
                           (cmp_i32)(menu.menu_bounds.y + 1.0f));
   handled = CMP_FALSE;
   CMP_TEST_EXPECT(menu.widget.vtable->event(menu.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
 
   test_make_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
                           (cmp_i32)(menu.menu_bounds.x + 1.0f),
@@ -1442,7 +1445,7 @@ static int test_menu_events(void) {
                           (cmp_i32)(menu.menu_bounds.y + 1.0f));
   handled = CMP_FALSE;
   CMP_TEST_EXPECT(menu.widget.vtable->event(menu.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   menu.style.item_height = 10.0f;
 
   test_make_pointer_event(&event, CMP_INPUT_POINTER_MOVE,
@@ -1477,7 +1480,7 @@ static int test_menu_events(void) {
   test_make_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 0, 0);
   handled = CMP_FALSE;
   CMP_TEST_EXPECT(menu.widget.vtable->event(menu.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   menu.menu_bounds.width = 10.0f;
 
   memset(&event, 0, sizeof(event));
@@ -1544,43 +1547,43 @@ static int test_menu_paint(void) {
   ctx.dpi_scale = 1.0f;
 
   CMP_TEST_EXPECT(menu.widget.vtable->paint(NULL, &ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(menu.widget.vtable->paint(menu.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_gfx.ctx = &backend_state;
   bad_gfx.vtable = &g_test_gfx_vtable_no_draw;
   bad_gfx.text_vtable = &g_test_text_vtable;
   ctx.gfx = &bad_gfx;
   CMP_TEST_EXPECT(menu.widget.vtable->paint(menu.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   ctx.gfx = &gfx;
   menu.style.item_height = 0.0f;
   CMP_TEST_EXPECT(menu.widget.vtable->paint(menu.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   menu.style.item_height = 20.0f;
 
   menu.menu_bounds.width = -1.0f;
   CMP_TEST_EXPECT(menu.widget.vtable->paint(menu.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   menu.menu_bounds.width = 50.0f;
 
   menu.text_backend.vtable = &g_test_text_vtable_no_measure;
   CMP_TEST_EXPECT(menu.widget.vtable->paint(menu.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   menu.text_backend.vtable = &g_test_text_vtable;
 
   menu.font.id = 0u;
   menu.font.generation = 0u;
   CMP_TEST_EXPECT(menu.widget.vtable->paint(menu.widget.ctx, &ctx),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   menu.font.id = 1u;
   menu.font.generation = 1u;
 
   backend_state.negative_width = 1;
   CMP_TEST_EXPECT(menu.widget.vtable->paint(menu.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   backend_state.negative_width = 0;
 
   backend_state.fail_draw_rect = 1;
@@ -1590,12 +1593,12 @@ static int test_menu_paint(void) {
   menu.style.shadow_enabled = CMP_TRUE;
   menu.style.shadow.layers = 0u;
   CMP_TEST_EXPECT(menu.widget.vtable->paint(menu.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   menu.style.shadow.layers = 1u;
 
   ctx.gfx->text_vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(menu.widget.vtable->paint(menu.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   ctx.gfx->text_vtable = &g_test_text_vtable;
 
   menu.style.disabled_text_color.r = 0.25f;
@@ -1605,7 +1608,7 @@ static int test_menu_paint(void) {
 
   CMP_TEST_OK(menu.widget.vtable->paint(menu.widget.ctx, &ctx));
   CMP_TEST_ASSERT(backend_state.last_text_color.r ==
-                 menu.style.disabled_text_color.r);
+                  menu.style.disabled_text_color.r);
 
   backend_state.fail_draw = 1;
   CMP_TEST_EXPECT(menu.widget.vtable->paint(menu.widget.ctx, &ctx), CMP_ERR_IO);
@@ -1666,7 +1669,7 @@ static int test_menu_destroy(void) {
   menu.font.id = 1u;
   menu.font.generation = 1u;
   CMP_TEST_EXPECT(menu.widget.vtable->destroy(menu.widget.ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   return 0;
 }
@@ -1689,18 +1692,18 @@ static const CMPTextVTable g_test_text_vtable_no_create = {
     NULL, test_text_destroy_font, test_text_measure_text, test_text_draw_text};
 
 static const CMPGfxVTable g_test_gfx_vtable = {NULL,
-                                              NULL,
-                                              NULL,
-                                              test_gfx_draw_rect,
-                                              NULL,
-                                              NULL,
-                                              test_gfx_push_clip,
-                                              test_gfx_pop_clip,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL};
+                                               NULL,
+                                               NULL,
+                                               test_gfx_draw_rect,
+                                               NULL,
+                                               NULL,
+                                               test_gfx_push_clip,
+                                               test_gfx_pop_clip,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL};
 
 static const CMPGfxVTable g_test_gfx_vtable_no_draw = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL,

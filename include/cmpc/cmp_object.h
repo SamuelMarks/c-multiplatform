@@ -35,137 +35,137 @@ typedef struct CMPObjectHeader {
  * @brief Object virtual table for retain/release and destruction.
  */
 typedef struct CMPObjectVTable {
-  /**
-   * @brief Retain a reference to the object.
-   * @param obj Object instance.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+/**
+ * @brief Retain a reference to the object.
+ * @param obj Object instance.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int retain(void *obj);
-  #else
+#else
   int(CMP_CALL *retain)(void *obj);
-  #endif
-  /**
-   * @brief Release a reference to the object.
-   * @param obj Object instance.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Release a reference to the object.
+ * @param obj Object instance.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int release(void *obj);
-  #else
+#else
   int(CMP_CALL *release)(void *obj);
-  #endif
-  /**
-   * @brief Destroy the object and free its resources.
-   * @param obj Object instance.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Destroy the object and free its resources.
+ * @param obj Object instance.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int destroy(void *obj);
-  #else
+#else
   int(CMP_CALL *destroy)(void *obj);
-  #endif
-  /**
-   * @brief Retrieve the type identifier for the object.
-   * @param obj Object instance.
-   * @param out_type_id Receives the type identifier.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Retrieve the type identifier for the object.
+ * @param obj Object instance.
+ * @param out_type_id Receives the type identifier.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int get_type_id(void *obj, cmp_u32 *out_type_id);
-  #else
+#else
   int(CMP_CALL *get_type_id)(void *obj, cmp_u32 *out_type_id);
-  #endif
+#endif
 } CMPObjectVTable;
 
 /**
  * @brief Handle system virtual table.
  */
 typedef struct CMPHandleSystemVTable {
-  /**
-   * @brief Initialize the handle system.
-   * @param handle_system Handle system instance.
-   * @param capacity Maximum number of handles.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+/**
+ * @brief Initialize the handle system.
+ * @param handle_system Handle system instance.
+ * @param capacity Maximum number of handles.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int init(void *handle_system, cmp_usize capacity);
-  #else
+#else
   int(CMP_CALL *init)(void *handle_system, cmp_usize capacity);
-  #endif
-  /**
-   * @brief Shut down the handle system.
-   * @param handle_system Handle system instance.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Shut down the handle system.
+ * @param handle_system Handle system instance.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int shutdown(void *handle_system);
-  #else
+#else
   int(CMP_CALL *shutdown)(void *handle_system);
-  #endif
-  /**
-   * @brief Register an object with the handle system.
-   * @param handle_system Handle system instance.
-   * @param obj Object header to register.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Register an object with the handle system.
+ * @param handle_system Handle system instance.
+ * @param obj Object header to register.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int register_object(void *handle_system, CMPObjectHeader *obj);
-  #else
+#else
   int(CMP_CALL *register_object)(void *handle_system, CMPObjectHeader *obj);
-  #endif
-  /**
-   * @brief Unregister a handle from the system.
-   * @param handle_system Handle system instance.
-   * @param handle Handle to remove.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Unregister a handle from the system.
+ * @param handle_system Handle system instance.
+ * @param handle Handle to remove.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int unregister_object(void *handle_system, CMPHandle handle);
-  #else
+#else
   int(CMP_CALL *unregister_object)(void *handle_system, CMPHandle handle);
-  #endif
-  /**
-   * @brief Resolve a handle to its object pointer.
-   * @param handle_system Handle system instance.
-   * @param handle Handle to resolve.
-   * @param out_obj Receives the resolved object pointer.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Resolve a handle to its object pointer.
+ * @param handle_system Handle system instance.
+ * @param handle Handle to resolve.
+ * @param out_obj Receives the resolved object pointer.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int resolve(void *handle_system, CMPHandle handle, void **out_obj);
-  #else
+#else
   int(CMP_CALL *resolve)(void *handle_system, CMPHandle handle, void **out_obj);
-  #endif
-  /**
-   * @brief Retain a handle-managed object.
-   * @param handle_system Handle system instance.
-   * @param handle Handle to retain.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Retain a handle-managed object.
+ * @param handle_system Handle system instance.
+ * @param handle Handle to retain.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int retain(void *handle_system, CMPHandle handle);
-  #else
+#else
   int(CMP_CALL *retain)(void *handle_system, CMPHandle handle);
-  #endif
-  /**
-   * @brief Release a handle-managed object.
-   * @param handle_system Handle system instance.
-   * @param handle Handle to release.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Release a handle-managed object.
+ * @param handle_system Handle system instance.
+ * @param handle Handle to release.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int release(void *handle_system, CMPHandle handle);
-  #else
+#else
   int(CMP_CALL *release)(void *handle_system, CMPHandle handle);
-  #endif
+#endif
 } CMPHandleSystemVTable;
 
 /**
  * @brief Handle system interface.
  */
 typedef struct CMPHandleSystem {
-  void *ctx;                          /**< Handle system context pointer. */
+  void *ctx;                           /**< Handle system context pointer. */
   const CMPHandleSystemVTable *vtable; /**< Handle system virtual table. */
 } CMPHandleSystem;
 
@@ -185,9 +185,9 @@ CMP_API int CMP_CALL cmp_handle_is_valid(CMPHandle handle, CMPBool *out_valid);
  * @param vtable Object virtual table.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_object_header_init(CMPObjectHeader *obj, cmp_u32 type_id,
-                                         cmp_u32 flags,
-                                         const CMPObjectVTable *vtable);
+CMP_API int CMP_CALL cmp_object_header_init(CMPObjectHeader *obj,
+                                            cmp_u32 type_id, cmp_u32 flags,
+                                            const CMPObjectVTable *vtable);
 
 /**
  * @brief Retain a reference to an object header.
@@ -210,7 +210,7 @@ CMP_API int CMP_CALL cmp_object_release(CMPObjectHeader *obj);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_object_get_type_id(const CMPObjectHeader *obj,
-                                         cmp_u32 *out_type_id);
+                                            cmp_u32 *out_type_id);
 
 /**
  * @brief Create the default handle system implementation.
@@ -220,9 +220,9 @@ CMP_API int CMP_CALL cmp_object_get_type_id(const CMPObjectHeader *obj,
  * @param out_sys Receives the initialized handle system interface.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_handle_system_default_create(cmp_usize capacity,
-                                                   const CMPAllocator *allocator,
-                                                   CMPHandleSystem *out_sys);
+CMP_API int CMP_CALL cmp_handle_system_default_create(
+    cmp_usize capacity, const CMPAllocator *allocator,
+    CMPHandleSystem *out_sys);
 
 /**
  * @brief Destroy a handle system created by the default implementation.

@@ -14,7 +14,8 @@ typedef struct CMPRenderRecorder {
 
 static cmp_usize cmp_usize_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
 
-static int cmp_render_add_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
+static int cmp_render_add_overflow(cmp_usize a, cmp_usize b,
+                                   cmp_usize *out_value) {
   cmp_usize max_value;
 
   if (out_value == NULL) {
@@ -30,7 +31,8 @@ static int cmp_render_add_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_valu
   return CMP_OK;
 }
 
-static int cmp_render_mul_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
+static int cmp_render_mul_overflow(cmp_usize a, cmp_usize b,
+                                   cmp_usize *out_value) {
   cmp_usize max_value;
 
   if (out_value == NULL) {
@@ -98,7 +100,7 @@ static int cmp_render_list_reserve(CMPRenderList *list, cmp_usize additional) {
   }
 
   rc = cmp_render_mul_overflow(new_capacity, (cmp_usize)sizeof(CMPRenderCmd),
-                              &bytes);
+                               &bytes);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -115,8 +117,8 @@ static int cmp_render_list_reserve(CMPRenderList *list, cmp_usize additional) {
 }
 
 static int cmp_render_record_begin_frame(void *gfx, CMPHandle window,
-                                        cmp_i32 width, cmp_i32 height,
-                                        CMPScalar dpi_scale) {
+                                         cmp_i32 width, cmp_i32 height,
+                                         CMPScalar dpi_scale) {
   CMPRenderRecorder *recorder;
   CMPRenderCmd cmd;
 
@@ -180,7 +182,8 @@ static int cmp_render_record_clear(void *gfx, CMPColor color) {
 }
 
 static int cmp_render_record_draw_rect(void *gfx, const CMPRect *rect,
-                                      CMPColor color, CMPScalar corner_radius) {
+                                       CMPColor color,
+                                       CMPScalar corner_radius) {
   CMPRenderRecorder *recorder;
   CMPRenderCmd cmd;
   int rc;
@@ -210,8 +213,8 @@ static int cmp_render_record_draw_rect(void *gfx, const CMPRect *rect,
 }
 
 static int cmp_render_record_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
-                                      CMPScalar x1, CMPScalar y1, CMPColor color,
-                                      CMPScalar thickness) {
+                                       CMPScalar x1, CMPScalar y1,
+                                       CMPColor color, CMPScalar thickness) {
   CMPRenderRecorder *recorder;
   CMPRenderCmd cmd;
 
@@ -238,7 +241,7 @@ static int cmp_render_record_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
 }
 
 static int cmp_render_record_draw_path(void *gfx, const CMPPath *path,
-                                      CMPColor color) {
+                                       CMPColor color) {
   CMPRenderRecorder *recorder;
   CMPRenderCmd cmd;
 
@@ -304,7 +307,8 @@ static int cmp_render_record_pop_clip(void *gfx) {
   return cmp_render_list_append(recorder->list, &cmd);
 }
 
-static int cmp_render_record_set_transform(void *gfx, const CMPMat3 *transform) {
+static int cmp_render_record_set_transform(void *gfx,
+                                           const CMPMat3 *transform) {
   CMPRenderRecorder *recorder;
   CMPRenderCmd cmd; /* GCOVR_EXCL_LINE */
 
@@ -322,11 +326,11 @@ static int cmp_render_record_set_transform(void *gfx, const CMPMat3 *transform) 
   return cmp_render_list_append(recorder->list, &cmd);
 }
 
-static int cmp_render_record_create_texture(void *gfx, cmp_i32 width,
-                                           cmp_i32 height,
-                                           cmp_u32 format, /* GCOVR_EXCL_LINE */
-                                           const void *pixels, cmp_usize size,
-                                           CMPHandle *out_texture) {
+static int
+cmp_render_record_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
+                                 cmp_u32 format, /* GCOVR_EXCL_LINE */
+                                 const void *pixels, cmp_usize size,
+                                 CMPHandle *out_texture) {
   CMP_UNUSED(width);
   CMP_UNUSED(height);
   CMP_UNUSED(format);
@@ -341,10 +345,10 @@ static int cmp_render_record_create_texture(void *gfx, cmp_i32 width,
 }
 
 static int cmp_render_record_update_texture(void *gfx, CMPHandle texture,
-                                           cmp_i32 x, cmp_i32 y,
-                                           cmp_i32 width, /* GCOVR_EXCL_LINE */
-                                           cmp_i32 height, const void *pixels,
-                                           cmp_usize size) {
+                                            cmp_i32 x, cmp_i32 y,
+                                            cmp_i32 width, /* GCOVR_EXCL_LINE */
+                                            cmp_i32 height, const void *pixels,
+                                            cmp_usize size) {
   CMP_UNUSED(texture);
   CMP_UNUSED(x);
   CMP_UNUSED(y);
@@ -372,8 +376,8 @@ static int cmp_render_record_destroy_texture(void *gfx, CMPHandle texture) {
 
 static int
 cmp_render_record_draw_texture(void *gfx, CMPHandle texture, const CMPRect *src,
-                              const CMPRect *dst,
-                              CMPScalar opacity) { /* GCOVR_EXCL_LINE */
+                               const CMPRect *dst,
+                               CMPScalar opacity) { /* GCOVR_EXCL_LINE */
   CMPRenderRecorder *recorder;
   CMPRenderCmd cmd;
   int rc;
@@ -408,8 +412,9 @@ cmp_render_record_draw_texture(void *gfx, CMPHandle texture, const CMPRect *src,
 }
 
 static int cmp_render_record_draw_text(void *text, CMPHandle font,
-                                      const char *utf8, cmp_usize utf8_len,
-                                      CMPScalar x, CMPScalar y, CMPColor color) {
+                                       const char *utf8, cmp_usize utf8_len,
+                                       CMPScalar x, CMPScalar y,
+                                       CMPColor color) {
   CMPRenderRecorder *recorder;
   CMPRenderCmd cmd;
 
@@ -436,8 +441,8 @@ static int cmp_render_record_draw_text(void *text, CMPHandle font,
 }
 
 static int cmp_render_record_create_font(void *text, const char *utf8_family,
-                                        cmp_i32 size_px, cmp_i32 weight,
-                                        CMPBool italic, CMPHandle *out_font) {
+                                         cmp_i32 size_px, cmp_i32 weight,
+                                         CMPBool italic, CMPHandle *out_font) {
   CMP_UNUSED(utf8_family);
   CMP_UNUSED(size_px);
   CMP_UNUSED(weight);
@@ -462,9 +467,9 @@ static int cmp_render_record_destroy_font(void *text, CMPHandle font) {
 
 static int
 cmp_render_record_measure_text(void *text, CMPHandle font, const char *utf8,
-                              cmp_usize utf8_len, CMPScalar *out_width,
-                              CMPScalar *out_height, /* GCOVR_EXCL_LINE */
-                              CMPScalar *out_baseline) {
+                               cmp_usize utf8_len, CMPScalar *out_width,
+                               CMPScalar *out_height, /* GCOVR_EXCL_LINE */
+                               CMPScalar *out_baseline) {
   CMP_UNUSED(font);
   CMP_UNUSED(utf8);
   CMP_UNUSED(utf8_len);
@@ -530,8 +535,8 @@ static int cmp_render_validate_node(const CMPRenderNode *node) {
 
 static int
 cmp_render_build_node(const CMPRenderNode *node, const CMPRect *parent_clip,
-                     CMPScalar dpi_scale,
-                     CMPRenderRecorder *recorder) { /* GCOVR_EXCL_LINE */
+                      CMPScalar dpi_scale,
+                      CMPRenderRecorder *recorder) { /* GCOVR_EXCL_LINE */
   CMPRect clip;
   CMPBool has_intersection;
   CMPPaintContext ctx;
@@ -553,8 +558,8 @@ cmp_render_build_node(const CMPRenderNode *node, const CMPRect *parent_clip,
     has_intersection =
         (clip.width > 0.0f && clip.height > 0.0f) ? CMP_TRUE : CMP_FALSE;
   } else {
-    rc =
-        cmp_rect_intersect(parent_clip, &node->bounds, &clip, &has_intersection);
+    rc = cmp_rect_intersect(parent_clip, &node->bounds, &clip,
+                            &has_intersection);
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
     if (g_cmp_render_force_intersect_fail) {
       rc = CMP_ERR_RANGE;
@@ -598,7 +603,7 @@ cmp_render_build_node(const CMPRenderNode *node, const CMPRect *parent_clip,
 
 int CMP_CALL
 cmp_render_list_init(CMPRenderList *list, const CMPAllocator *allocator,
-                    cmp_usize initial_capacity) { /* GCOVR_EXCL_LINE */
+                     cmp_usize initial_capacity) { /* GCOVR_EXCL_LINE */
   CMPAllocator chosen;
   cmp_usize bytes;
   void *mem;
@@ -629,8 +634,8 @@ cmp_render_list_init(CMPRenderList *list, const CMPAllocator *allocator,
     initial_capacity = CMP_RENDER_LIST_DEFAULT_CAPACITY;
   }
 
-  rc = cmp_render_mul_overflow(initial_capacity, (cmp_usize)sizeof(CMPRenderCmd),
-                              &bytes);
+  rc = cmp_render_mul_overflow(initial_capacity,
+                               (cmp_usize)sizeof(CMPRenderCmd), &bytes);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -686,7 +691,8 @@ int CMP_CALL cmp_render_list_shutdown(CMPRenderList *list) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_render_list_append(CMPRenderList *list, const CMPRenderCmd *cmd) {
+int CMP_CALL cmp_render_list_append(CMPRenderList *list,
+                                    const CMPRenderCmd *cmd) {
   int rc; /* GCOVR_EXCL_LINE */
 
   if (list == NULL || cmd == NULL) {
@@ -817,7 +823,7 @@ int CMP_CALL cmp_render_list_execute(const CMPRenderList *list, CMPGfx *gfx) {
 }
 
 int CMP_CALL cmp_render_node_init(CMPRenderNode *node, CMPWidget *widget,
-                                const CMPRect *bounds) {
+                                  const CMPRect *bounds) {
   int rc;
 
   if (node == NULL || widget == NULL || bounds == NULL) {
@@ -854,8 +860,8 @@ int CMP_CALL cmp_render_node_set_bounds(
 }
 
 int CMP_CALL cmp_render_node_set_children(CMPRenderNode *node,
-                                        CMPRenderNode **children,
-                                        cmp_usize count) {
+                                          CMPRenderNode **children,
+                                          cmp_usize count) {
   cmp_usize i;
 
   if (node == NULL) {
@@ -877,7 +883,7 @@ int CMP_CALL cmp_render_node_set_children(CMPRenderNode *node,
 }
 
 int CMP_CALL cmp_render_build(const CMPRenderNode *root, CMPRenderList *list,
-                            CMPScalar dpi_scale) {
+                              CMPScalar dpi_scale) {
   CMPRenderRecorder recorder;
   cmp_usize start_count; /* GCOVR_EXCL_LINE */
   int rc;
@@ -907,17 +913,17 @@ int CMP_CALL cmp_render_build(const CMPRenderNode *root, CMPRenderList *list,
 
 #ifdef CMP_TESTING
 int CMP_CALL cmp_render_test_add_overflow(cmp_usize a, cmp_usize b,
-                                        cmp_usize *out_value) {
+                                          cmp_usize *out_value) {
   return cmp_render_add_overflow(a, b, out_value);
 }
 
 int CMP_CALL cmp_render_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                        cmp_usize *out_value) {
+                                          cmp_usize *out_value) {
   return cmp_render_mul_overflow(a, b, out_value);
 }
 
 int CMP_CALL cmp_render_test_list_reserve(CMPRenderList *list,
-                                        cmp_usize additional) {
+                                          cmp_usize additional) {
   return cmp_render_list_reserve(list, additional);
 }
 

@@ -66,8 +66,9 @@ CMP_API int CMP_CALL cmp_ripple_init(CMPRipple *ripple);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_ripple_start(CMPRipple *ripple, CMPScalar center_x,
-                                   CMPScalar center_y, CMPScalar max_radius,
-                                   CMPScalar expand_duration, CMPColor color);
+                                      CMPScalar center_y, CMPScalar max_radius,
+                                      CMPScalar expand_duration,
+                                      CMPColor color);
 
 /**
  * @brief Release a ripple (begin fade-out).
@@ -75,7 +76,8 @@ CMP_API int CMP_CALL cmp_ripple_start(CMPRipple *ripple, CMPScalar center_x,
  * @param fade_duration Fade duration in seconds (>= 0).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_ripple_release(CMPRipple *ripple, CMPScalar fade_duration);
+CMP_API int CMP_CALL cmp_ripple_release(CMPRipple *ripple,
+                                        CMPScalar fade_duration);
 
 /**
  * @brief Advance the ripple simulation.
@@ -85,7 +87,7 @@ CMP_API int CMP_CALL cmp_ripple_release(CMPRipple *ripple, CMPScalar fade_durati
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_ripple_step(CMPRipple *ripple, CMPScalar dt,
-                                  CMPBool *out_finished);
+                                     CMPBool *out_finished);
 
 /**
  * @brief Query whether a ripple is active.
@@ -94,7 +96,7 @@ CMP_API int CMP_CALL cmp_ripple_step(CMPRipple *ripple, CMPScalar dt,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_ripple_is_active(const CMPRipple *ripple,
-                                       CMPBool *out_active);
+                                          CMPBool *out_active);
 
 /**
  * @brief Compute the maximum ripple radius required to cover a rectangle.
@@ -105,9 +107,9 @@ CMP_API int CMP_CALL cmp_ripple_is_active(const CMPRipple *ripple,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_ripple_compute_max_radius(const CMPRect *bounds,
-                                                CMPScalar center_x,
-                                                CMPScalar center_y,
-                                                CMPScalar *out_radius);
+                                                   CMPScalar center_x,
+                                                   CMPScalar center_y,
+                                                   CMPScalar *out_radius);
 
 /**
  * @brief Paint a ripple using a graphics backend.
@@ -118,7 +120,8 @@ CMP_API int CMP_CALL cmp_ripple_compute_max_radius(const CMPRect *bounds,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_ripple_paint(const CMPRipple *ripple, CMPGfx *gfx,
-                                   const CMPRect *clip, CMPScalar corner_radius);
+                                      const CMPRect *clip,
+                                      CMPScalar corner_radius);
 
 /**
  * @brief Initialize a shadow descriptor.
@@ -140,9 +143,9 @@ CMP_API int CMP_CALL cmp_shadow_init(CMPShadow *shadow);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_shadow_set(CMPShadow *shadow, CMPScalar offset_x,
-                                 CMPScalar offset_y, CMPScalar blur_radius,
-                                 CMPScalar spread, CMPScalar corner_radius,
-                                 cmp_u32 layers, CMPColor color);
+                                    CMPScalar offset_y, CMPScalar blur_radius,
+                                    CMPScalar spread, CMPScalar corner_radius,
+                                    cmp_u32 layers, CMPColor color);
 
 /**
  * @brief Paint a shadow for a rectangle.
@@ -153,7 +156,7 @@ CMP_API int CMP_CALL cmp_shadow_set(CMPShadow *shadow, CMPScalar offset_x,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_shadow_paint(const CMPShadow *shadow, CMPGfx *gfx,
-                                   const CMPRect *rect, const CMPRect *clip);
+                                      const CMPRect *rect, const CMPRect *clip);
 
 #ifdef CMP_TESTING
 /**

@@ -54,8 +54,8 @@ static CMPScalar m3_linear_to_srgb(CMPScalar c) {
   return (CMPScalar)(1.055 * pow(c, 1.0 / 2.4) - 0.055);
 }
 
-static int m3_color_argb_to_xyz(cmp_u32 argb, CMPScalar *out_x, CMPScalar *out_y,
-                                CMPScalar *out_z) {
+static int m3_color_argb_to_xyz(cmp_u32 argb, CMPScalar *out_x,
+                                CMPScalar *out_y, CMPScalar *out_z) {
   cmp_u8 r8;
   cmp_u8 g8;
   cmp_u8 b8;
@@ -123,7 +123,8 @@ static int m3_color_xyz_to_argb(CMPScalar x, CMPScalar y, CMPScalar z,
   b = m3_scalar_clamp01(b);
 
   *out_argb = 0xFF000000u | ((cmp_u32)(r * 255.0f + 0.5f) << 16) |
-              ((cmp_u32)(g * 255.0f + 0.5f) << 8) | (cmp_u32)(b * 255.0f + 0.5f);
+              ((cmp_u32)(g * 255.0f + 0.5f) << 8) |
+              (cmp_u32)(b * 255.0f + 0.5f);
   *out_in_gamut = in_gamut;
   return CMP_OK;
 }
@@ -235,7 +236,7 @@ static int m3_color_lch_to_argb(CMPScalar hue, CMPScalar chroma, CMPScalar tone,
 }
 
 int CMP_CALL m3_color_argb_from_rgba(cmp_u8 r, cmp_u8 g, cmp_u8 b, cmp_u8 a,
-                                    cmp_u32 *out_argb) {
+                                     cmp_u32 *out_argb) {
   if (out_argb == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -246,7 +247,7 @@ int CMP_CALL m3_color_argb_from_rgba(cmp_u8 r, cmp_u8 g, cmp_u8 b, cmp_u8 a,
 }
 
 int CMP_CALL m3_color_rgba_from_argb(cmp_u32 argb, cmp_u8 *out_r, cmp_u8 *out_g,
-                                    cmp_u8 *out_b, cmp_u8 *out_a) {
+                                     cmp_u8 *out_b, cmp_u8 *out_a) {
   if (out_r == NULL || out_g == NULL || out_b == NULL || out_a == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -364,7 +365,7 @@ int CMP_CALL m3_hct_to_argb(const M3ColorHct *hct, cmp_u32 *out_argb) {
 }
 
 int CMP_CALL m3_tonal_palette_init(M3TonalPalette *palette, CMPScalar hue,
-                                  CMPScalar chroma) {
+                                   CMPScalar chroma) {
   if (palette == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -385,7 +386,7 @@ int CMP_CALL m3_tonal_palette_init(M3TonalPalette *palette, CMPScalar hue,
 }
 
 int CMP_CALL m3_tonal_palette_tone_argb(const M3TonalPalette *palette,
-                                       CMPScalar tone, cmp_u32 *out_argb) {
+                                        CMPScalar tone, cmp_u32 *out_argb) {
   M3ColorHct hct;
 
   if (palette == NULL || out_argb == NULL) {
@@ -416,7 +417,7 @@ static CMPScalar m3_scheme_max_chroma(CMPScalar value, CMPScalar minimum) {
 }
 
 int CMP_CALL m3_scheme_generate(cmp_u32 source_argb, CMPBool dark,
-                               M3Scheme *out_scheme) {
+                                M3Scheme *out_scheme) {
   M3ColorHct source_hct;
   M3TonalPalette primary;
   M3TonalPalette secondary;
@@ -757,30 +758,31 @@ int CMP_CALL m3_color_test_reset_failures(void) {
 }
 
 int CMP_CALL m3_color_test_argb_to_xyz(cmp_u32 argb, CMPScalar *out_x,
-                                      CMPScalar *out_y, CMPScalar *out_z) {
+                                       CMPScalar *out_y, CMPScalar *out_z) {
   return m3_color_argb_to_xyz(argb, out_x, out_y, out_z);
 }
 
 int CMP_CALL m3_color_test_xyz_to_argb(CMPScalar x, CMPScalar y, CMPScalar z,
-                                      cmp_u32 *out_argb, CMPBool *out_in_gamut) {
+                                       cmp_u32 *out_argb,
+                                       CMPBool *out_in_gamut) {
   return m3_color_xyz_to_argb(x, y, z, out_argb, out_in_gamut);
 }
 
 int CMP_CALL m3_color_test_xyz_to_lab(CMPScalar x, CMPScalar y, CMPScalar z,
-                                     CMPScalar *out_l, CMPScalar *out_a,
-                                     CMPScalar *out_b) {
+                                      CMPScalar *out_l, CMPScalar *out_a,
+                                      CMPScalar *out_b) {
   return m3_color_xyz_to_lab(x, y, z, out_l, out_a, out_b);
 }
 
 int CMP_CALL m3_color_test_lab_to_xyz(CMPScalar l, CMPScalar a, CMPScalar b,
-                                     CMPScalar *out_x, CMPScalar *out_y,
-                                     CMPScalar *out_z) {
+                                      CMPScalar *out_x, CMPScalar *out_y,
+                                      CMPScalar *out_z) {
   return m3_color_lab_to_xyz(l, a, b, out_x, out_y, out_z);
 }
 
 int CMP_CALL m3_color_test_lch_to_argb(CMPScalar hue, CMPScalar chroma,
-                                      CMPScalar tone, cmp_u32 *out_argb,
-                                      CMPBool *out_in_gamut) {
+                                       CMPScalar tone, cmp_u32 *out_argb,
+                                       CMPBool *out_in_gamut) {
   return m3_color_lch_to_argb(hue, chroma, tone, out_argb, out_in_gamut);
 }
 #endif

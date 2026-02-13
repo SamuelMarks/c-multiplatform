@@ -27,7 +27,7 @@ typedef struct CMPVideoConfig {
 typedef struct CMPVideoDecoder {
   CMPVideo video;         /**< Video decoder interface handle. */
   CMPAllocator allocator; /**< Allocator used for decoder state. */
-  void *fallback_state;  /**< Internal fallback decoder state. */
+  void *fallback_state;   /**< Internal fallback decoder state. */
   CMPBool ready;          /**< CMP_TRUE when initialized. */
   CMPBool has_backend;    /**< CMP_TRUE when a backend decoder is available. */
   CMPBool opened;         /**< CMP_TRUE when a stream is opened. */
@@ -55,7 +55,7 @@ CMP_API int CMP_CALL cmp_video_request_init(CMPVideoOpenRequest *request);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_video_init(CMPVideoDecoder *decoder,
-                                 const CMPVideoConfig *config);
+                                    const CMPVideoConfig *config);
 
 /**
  * @brief Shut down a video decoder and release its state.
@@ -71,7 +71,7 @@ CMP_API int CMP_CALL cmp_video_shutdown(CMPVideoDecoder *decoder);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_video_open(CMPVideoDecoder *decoder,
-                                 const CMPVideoOpenRequest *request);
+                                    const CMPVideoOpenRequest *request);
 
 /**
  * @brief Close a video stream and release its resources.
@@ -88,8 +88,8 @@ CMP_API int CMP_CALL cmp_video_close(CMPVideoDecoder *decoder);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_video_read_frame(CMPVideoDecoder *decoder,
-                                       CMPVideoFrame *out_frame,
-                                       CMPBool *out_has_frame);
+                                          CMPVideoFrame *out_frame,
+                                          CMPBool *out_has_frame);
 
 #ifdef __cplusplus
 } /* extern "C" */

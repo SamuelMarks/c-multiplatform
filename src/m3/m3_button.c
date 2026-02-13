@@ -230,8 +230,8 @@ static int m3_button_validate_style(const M3ButtonStyle *style,
 }
 
 static int m3_button_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -269,8 +269,8 @@ static int m3_button_metrics_update(M3Button *button) {
   }
 
   rc = cmp_text_measure_utf8(&button->text_backend, button->font,
-                            button->utf8_label, button->utf8_len,
-                            &button->metrics);
+                             button->utf8_label, button->utf8_len,
+                             &button->metrics);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -282,7 +282,8 @@ static int m3_button_metrics_update(M3Button *button) {
 static int m3_button_resolve_colors(const M3Button *button,
                                     CMPColor *out_background,
                                     CMPColor *out_text, /* GCOVR_EXCL_LINE */
-                                    CMPColor *out_outline, CMPColor *out_ripple) {
+                                    CMPColor *out_outline,
+                                    CMPColor *out_ripple) {
   int rc;
 
   if (button == NULL || out_background == NULL || out_text == NULL ||
@@ -657,7 +658,7 @@ int CMP_CALL m3_button_style_init_elevated(M3ButtonStyle *style) {
     return rc;
   }
   rc = cmp_shadow_set(&style->shadow, 0.0f, 2.0f, 6.0f, 0.0f,
-                     style->corner_radius, 3, shadow_color);
+                      style->corner_radius, 3, shadow_color);
 #ifdef CMP_TESTING
   if (m3_button_test_fail_point_match(M3_BUTTON_TEST_FAIL_SHADOW_SET)) {
     rc = CMP_ERR_IO;
@@ -725,7 +726,7 @@ int CMP_CALL m3_button_style_init_fab(M3ButtonStyle *style) {
     return rc;
   }
   rc = cmp_shadow_set(&style->shadow, 0.0f, 4.0f, 10.0f, 0.0f,
-                     style->corner_radius, 4, shadow_color);
+                      style->corner_radius, 4, shadow_color);
 #ifdef CMP_TESTING
   if (m3_button_test_fail_point_match(M3_BUTTON_TEST_FAIL_SHADOW_SET)) {
     rc = CMP_ERR_IO;
@@ -959,7 +960,8 @@ static int m3_button_widget_paint(void *widget, CMPPaintContext *ctx) {
       return rc;
     }
     if (ripple_active == CMP_TRUE) {
-      rc = cmp_ripple_paint(&button->ripple, ctx->gfx, &ctx->clip, inner_corner);
+      rc =
+          cmp_ripple_paint(&button->ripple, ctx->gfx, &ctx->clip, inner_corner);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -1038,7 +1040,7 @@ static int m3_button_widget_event(void *widget, const CMPInputEvent *event,
     center_x = (CMPScalar)event->data.pointer.x;
     center_y = (CMPScalar)event->data.pointer.y;
     rc = cmp_ripple_compute_max_radius(&button->bounds, center_x, center_y,
-                                      &max_radius);
+                                       &max_radius);
 #ifdef CMP_TESTING
     if (m3_button_test_fail_point_match(M3_BUTTON_TEST_FAIL_RIPPLE_RADIUS)) {
       rc = CMP_ERR_IO;
@@ -1048,8 +1050,8 @@ static int m3_button_widget_event(void *widget, const CMPInputEvent *event,
       return rc;
     }
     rc = cmp_ripple_start(&button->ripple, center_x, center_y, max_radius,
-                         button->style.ripple_expand_duration,
-                         button->style.ripple_color);
+                          button->style.ripple_expand_duration,
+                          button->style.ripple_color);
 #ifdef CMP_TESTING
     if (m3_button_test_fail_point_match(M3_BUTTON_TEST_FAIL_RIPPLE_START)) {
       rc = CMP_ERR_IO;
@@ -1069,7 +1071,8 @@ static int m3_button_widget_event(void *widget, const CMPInputEvent *event,
       return CMP_ERR_RANGE;
     }
     button->pressed = CMP_FALSE;
-    rc = cmp_ripple_release(&button->ripple, button->style.ripple_fade_duration);
+    rc =
+        cmp_ripple_release(&button->ripple, button->style.ripple_fade_duration);
 #ifdef CMP_TESTING
     if (m3_button_test_fail_point_match(M3_BUTTON_TEST_FAIL_RIPPLE_RELEASE)) {
       rc = CMP_ERR_IO;
@@ -1157,8 +1160,8 @@ static const CMPWidgetVTable g_m3_button_widget_vtable = {
     m3_button_widget_get_semantics, m3_button_widget_destroy};
 
 int CMP_CALL m3_button_init(M3Button *button, const CMPTextBackend *backend,
-                           const M3ButtonStyle *style, const char *utf8_label,
-                           cmp_usize utf8_len) {
+                            const M3ButtonStyle *style, const char *utf8_label,
+                            cmp_usize utf8_len) {
   int rc;
 
   if (button == NULL || backend == NULL || style == NULL) {
@@ -1217,7 +1220,7 @@ int CMP_CALL m3_button_init(M3Button *button, const CMPTextBackend *backend,
 }
 
 int CMP_CALL m3_button_set_label(M3Button *button, const char *utf8_label,
-                                cmp_usize utf8_len) {
+                                 cmp_usize utf8_len) {
   if (button == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1244,8 +1247,8 @@ int CMP_CALL m3_button_set_style(M3Button *button, const M3ButtonStyle *style) {
     return rc;
   }
 
-  rc =
-      cmp_text_font_create(&button->text_backend, &style->text_style, &new_font);
+  rc = cmp_text_font_create(&button->text_backend, &style->text_style,
+                            &new_font);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1266,7 +1269,7 @@ int CMP_CALL m3_button_set_style(M3Button *button, const M3ButtonStyle *style) {
 }
 
 int CMP_CALL m3_button_set_on_click(M3Button *button, CMPButtonOnClick on_click,
-                                   void *ctx) {
+                                    void *ctx) {
   if (button == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1282,22 +1285,23 @@ int CMP_CALL m3_button_test_validate_color(const CMPColor *color) {
 }
 
 int CMP_CALL m3_button_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                     CMPScalar b, CMPScalar a) {
+                                      CMPScalar b, CMPScalar a) {
   return m3_button_color_set(color, r, g, b, a);
 }
 
-int CMP_CALL m3_button_test_color_with_alpha(const CMPColor *base, CMPScalar alpha,
-                                            CMPColor *out_color) {
+int CMP_CALL m3_button_test_color_with_alpha(const CMPColor *base,
+                                             CMPScalar alpha,
+                                             CMPColor *out_color) {
   return m3_button_color_with_alpha(base, alpha, out_color);
 }
 
 int CMP_CALL m3_button_test_validate_text_style(const CMPTextStyle *style,
-                                               CMPBool require_family) {
+                                                CMPBool require_family) {
   return m3_button_validate_text_style(style, require_family);
 }
 
 int CMP_CALL m3_button_test_validate_style(const M3ButtonStyle *style,
-                                          CMPBool require_family) {
+                                           CMPBool require_family) {
   return m3_button_validate_style(style, require_family);
 }
 
@@ -1318,16 +1322,16 @@ int CMP_CALL m3_button_test_metrics_update(M3Button *button) {
 }
 
 int CMP_CALL m3_button_test_resolve_colors(const M3Button *button,
-                                          CMPColor *out_background,
-                                          CMPColor *out_text,
-                                          CMPColor *out_outline,
-                                          CMPColor *out_ripple) {
+                                           CMPColor *out_background,
+                                           CMPColor *out_text,
+                                           CMPColor *out_outline,
+                                           CMPColor *out_ripple) {
   return m3_button_resolve_colors(button, out_background, out_text, out_outline,
                                   out_ripple);
 }
 
 int CMP_CALL m3_button_test_resolve_corner(const M3Button *button,
-                                          CMPScalar *out_corner) {
+                                           CMPScalar *out_corner) {
   return m3_button_resolve_corner(button, out_corner);
 }
 #endif

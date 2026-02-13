@@ -58,10 +58,10 @@ typedef struct M3LinearProgressStyle {
 typedef struct M3LinearProgress {
   CMPWidget widget; /**< Widget interface (points to this instance). */
   M3LinearProgressStyle style; /**< Current style descriptor. */
-  CMPRect bounds;               /**< Layout bounds. */
-  CMPScalar value;              /**< Progress value (0..1). */
+  CMPRect bounds;              /**< Layout bounds. */
+  CMPScalar value;             /**< Progress value (0..1). */
   const char *utf8_label;      /**< UTF-8 label for semantics (optional). */
-  cmp_usize utf8_len;           /**< UTF-8 label length in bytes. */
+  cmp_usize utf8_len;          /**< UTF-8 label length in bytes. */
 } M3LinearProgress;
 
 /**
@@ -69,7 +69,8 @@ typedef struct M3LinearProgress {
  * @param style Style descriptor to initialize.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_linear_progress_style_init(M3LinearProgressStyle *style);
+CMP_API int CMP_CALL
+m3_linear_progress_style_init(M3LinearProgressStyle *style);
 
 /**
  * @brief Initialize a linear progress indicator.
@@ -79,8 +80,8 @@ CMP_API int CMP_CALL m3_linear_progress_style_init(M3LinearProgressStyle *style)
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_linear_progress_init(M3LinearProgress *progress,
-                                           const M3LinearProgressStyle *style,
-                                           CMPScalar value);
+                                             const M3LinearProgressStyle *style,
+                                             CMPScalar value);
 
 /**
  * @brief Update the linear progress value.
@@ -89,7 +90,7 @@ CMP_API int CMP_CALL m3_linear_progress_init(M3LinearProgress *progress,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_linear_progress_set_value(M3LinearProgress *progress,
-                                                CMPScalar value);
+                                                  CMPScalar value);
 
 /**
  * @brief Retrieve the linear progress value.
@@ -117,8 +118,8 @@ CMP_API int CMP_CALL m3_linear_progress_set_style(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_linear_progress_set_label(M3LinearProgress *progress,
-                                                const char *utf8_label,
-                                                cmp_usize utf8_len);
+                                                  const char *utf8_label,
+                                                  cmp_usize utf8_len);
 
 /**
  * @brief Circular progress style descriptor.
@@ -140,10 +141,10 @@ typedef struct M3CircularProgressStyle {
 typedef struct M3CircularProgress {
   CMPWidget widget; /**< Widget interface (points to this instance). */
   M3CircularProgressStyle style; /**< Current style descriptor. */
-  CMPRect bounds;                 /**< Layout bounds. */
-  CMPScalar value;                /**< Progress value (0..1). */
+  CMPRect bounds;                /**< Layout bounds. */
+  CMPScalar value;               /**< Progress value (0..1). */
   const char *utf8_label;        /**< UTF-8 label for semantics (optional). */
-  cmp_usize utf8_len;             /**< UTF-8 label length in bytes. */
+  cmp_usize utf8_len;            /**< UTF-8 label length in bytes. */
 } M3CircularProgress;
 
 /**
@@ -161,9 +162,9 @@ m3_circular_progress_style_init(M3CircularProgressStyle *style);
  * @param value Initial progress value (0..1).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL
-m3_circular_progress_init(M3CircularProgress *progress,
-                          const M3CircularProgressStyle *style, CMPScalar value);
+CMP_API int CMP_CALL m3_circular_progress_init(
+    M3CircularProgress *progress, const M3CircularProgressStyle *style,
+    CMPScalar value);
 
 /**
  * @brief Update the circular progress value.
@@ -171,8 +172,8 @@ m3_circular_progress_init(M3CircularProgress *progress,
  * @param value New progress value (0..1).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_circular_progress_set_value(M3CircularProgress *progress,
-                                                  CMPScalar value);
+CMP_API int CMP_CALL
+m3_circular_progress_set_value(M3CircularProgress *progress, CMPScalar value);
 
 /**
  * @brief Retrieve the circular progress value.
@@ -199,9 +200,8 @@ CMP_API int CMP_CALL m3_circular_progress_set_style(
  * @param utf8_len Label length in bytes.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_circular_progress_set_label(M3CircularProgress *progress,
-                                                  const char *utf8_label,
-                                                  cmp_usize utf8_len);
+CMP_API int CMP_CALL m3_circular_progress_set_label(
+    M3CircularProgress *progress, const char *utf8_label, cmp_usize utf8_len);
 
 struct M3Slider;
 
@@ -213,7 +213,7 @@ struct M3Slider;
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPSliderOnChange)(void *ctx, struct M3Slider *slider,
-                                       CMPScalar value);
+                                         CMPScalar value);
 
 /**
  * @brief Slider style descriptor.
@@ -227,26 +227,27 @@ typedef struct M3SliderStyle {
   CMPColor active_track_color;   /**< Active track color. */
   CMPColor thumb_color;          /**< Thumb fill color. */
   CMPColor disabled_track_color; /**< Inactive track color when disabled. */
-  CMPColor disabled_active_track_color; /**< Active track color when disabled. */
-  CMPColor disabled_thumb_color;        /**< Thumb color when disabled. */
+  CMPColor
+      disabled_active_track_color; /**< Active track color when disabled. */
+  CMPColor disabled_thumb_color;   /**< Thumb color when disabled. */
 } M3SliderStyle;
 
 /**
  * @brief Slider widget instance.
  */
 typedef struct M3Slider {
-  CMPWidget widget;        /**< Widget interface (points to this instance). */
+  CMPWidget widget;       /**< Widget interface (points to this instance). */
   M3SliderStyle style;    /**< Current slider style. */
-  CMPRect bounds;          /**< Layout bounds. */
-  CMPScalar min_value;     /**< Minimum value (must be < max_value). */
-  CMPScalar max_value;     /**< Maximum value (must be > min_value). */
-  CMPScalar value;         /**< Current value. */
-  CMPScalar step;          /**< Step size (0 for continuous). */
+  CMPRect bounds;         /**< Layout bounds. */
+  CMPScalar min_value;    /**< Minimum value (must be < max_value). */
+  CMPScalar max_value;    /**< Maximum value (must be > min_value). */
+  CMPScalar value;        /**< Current value. */
+  CMPScalar step;         /**< Step size (0 for continuous). */
   const char *utf8_label; /**< UTF-8 label for semantics (optional). */
-  cmp_usize utf8_len;      /**< UTF-8 label length in bytes. */
-  CMPBool pressed;         /**< CMP_TRUE when pointer is pressed. */
+  cmp_usize utf8_len;     /**< UTF-8 label length in bytes. */
+  CMPBool pressed;        /**< CMP_TRUE when pointer is pressed. */
   CMPSliderOnChange on_change; /**< Change callback (may be NULL). */
-  void *on_change_ctx;        /**< Change callback context pointer. */
+  void *on_change_ctx;         /**< Change callback context pointer. */
 } M3Slider;
 
 /**
@@ -265,9 +266,10 @@ CMP_API int CMP_CALL m3_slider_style_init(M3SliderStyle *style);
  * @param value Initial slider value.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_slider_init(M3Slider *slider, const M3SliderStyle *style,
-                                  CMPScalar min_value, CMPScalar max_value,
-                                  CMPScalar value);
+CMP_API int CMP_CALL m3_slider_init(M3Slider *slider,
+                                    const M3SliderStyle *style,
+                                    CMPScalar min_value, CMPScalar max_value,
+                                    CMPScalar value);
 
 /**
  * @brief Update the slider value.
@@ -284,7 +286,7 @@ CMP_API int CMP_CALL m3_slider_set_value(M3Slider *slider, CMPScalar value);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_slider_get_value(const M3Slider *slider,
-                                       CMPScalar *out_value);
+                                         CMPScalar *out_value);
 
 /**
  * @brief Update the slider value range.
@@ -294,7 +296,7 @@ CMP_API int CMP_CALL m3_slider_get_value(const M3Slider *slider,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_slider_set_range(M3Slider *slider, CMPScalar min_value,
-                                       CMPScalar max_value);
+                                         CMPScalar max_value);
 
 /**
  * @brief Update the slider step size.
@@ -311,7 +313,7 @@ CMP_API int CMP_CALL m3_slider_set_step(M3Slider *slider, CMPScalar step);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_slider_set_style(M3Slider *slider,
-                                       const M3SliderStyle *style);
+                                         const M3SliderStyle *style);
 
 /**
  * @brief Update the slider semantics label.
@@ -320,8 +322,9 @@ CMP_API int CMP_CALL m3_slider_set_style(M3Slider *slider,
  * @param utf8_len Label length in bytes.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_slider_set_label(M3Slider *slider, const char *utf8_label,
-                                       cmp_usize utf8_len);
+CMP_API int CMP_CALL m3_slider_set_label(M3Slider *slider,
+                                         const char *utf8_label,
+                                         cmp_usize utf8_len);
 
 /**
  * @brief Assign a slider change callback.
@@ -331,8 +334,8 @@ CMP_API int CMP_CALL m3_slider_set_label(M3Slider *slider, const char *utf8_labe
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_slider_set_on_change(M3Slider *slider,
-                                           CMPSliderOnChange on_change,
-                                           void *ctx);
+                                             CMPSliderOnChange on_change,
+                                             void *ctx);
 
 #ifdef CMP_TESTING
 /**
@@ -353,7 +356,8 @@ CMP_API int CMP_CALL m3_progress_test_clear_fail_points(void);
  * @param call_count Call index at or after which color_set fails (0 disables).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_progress_test_set_color_set_fail_after(cmp_u32 call_count);
+CMP_API int CMP_CALL
+m3_progress_test_set_color_set_fail_after(cmp_u32 call_count);
 
 /**
  * @brief Set the call index that forces color_with_alpha to fail.
@@ -381,8 +385,8 @@ CMP_API int CMP_CALL m3_progress_test_validate_color(const CMPColor *color);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_progress_test_color_set(CMPColor *color, CMPScalar r,
-                                              CMPScalar g, CMPScalar b,
-                                              CMPScalar a);
+                                                CMPScalar g, CMPScalar b,
+                                                CMPScalar a);
 
 /**
  * @brief Test wrapper for alpha modulation helper.
@@ -392,15 +396,16 @@ CMP_API int CMP_CALL m3_progress_test_color_set(CMPColor *color, CMPScalar r,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_progress_test_color_with_alpha(const CMPColor *base,
-                                                     CMPScalar alpha,
-                                                     CMPColor *out_color);
+                                                       CMPScalar alpha,
+                                                       CMPColor *out_color);
 
 /**
  * @brief Test wrapper for measure spec validation.
  * @param spec Measure spec to validate.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_progress_test_validate_measure_spec(CMPMeasureSpec spec);
+CMP_API int CMP_CALL
+m3_progress_test_validate_measure_spec(CMPMeasureSpec spec);
 
 /**
  * @brief Test wrapper for measure application helper.
@@ -410,8 +415,8 @@ CMP_API int CMP_CALL m3_progress_test_validate_measure_spec(CMPMeasureSpec spec)
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_progress_test_apply_measure(CMPScalar desired,
-                                                  CMPMeasureSpec spec,
-                                                  CMPScalar *out_size);
+                                                    CMPMeasureSpec spec,
+                                                    CMPScalar *out_size);
 
 /**
  * @brief Test wrapper for rectangle validation.
@@ -479,8 +484,9 @@ CMP_API int CMP_CALL m3_progress_test_circular_resolve_colors(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_progress_test_circular_draw_arc(
-    CMPGfx *gfx, CMPScalar cx, CMPScalar cy, CMPScalar radius, CMPScalar start_angle,
-    CMPScalar end_angle, CMPColor color, CMPScalar thickness, cmp_u32 segments);
+    CMPGfx *gfx, CMPScalar cx, CMPScalar cy, CMPScalar radius,
+    CMPScalar start_angle, CMPScalar end_angle, CMPColor color,
+    CMPScalar thickness, cmp_u32 segments);
 
 /**
  * @brief Test wrapper for slider style validation.
@@ -506,9 +512,8 @@ CMP_API int CMP_CALL m3_progress_test_slider_value_to_fraction(
  * @param out_value Receives the slider value.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_progress_test_slider_value_from_x(const M3Slider *slider,
-                                                        CMPScalar x,
-                                                        CMPScalar *out_value);
+CMP_API int CMP_CALL m3_progress_test_slider_value_from_x(
+    const M3Slider *slider, CMPScalar x, CMPScalar *out_value);
 
 /**
  * @brief Test wrapper for slider snapping helper.
@@ -520,10 +525,10 @@ CMP_API int CMP_CALL m3_progress_test_slider_value_from_x(const M3Slider *slider
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_progress_test_slider_snap_value(CMPScalar value,
-                                                      CMPScalar min_value,
-                                                      CMPScalar max_value,
-                                                      CMPScalar step,
-                                                      CMPScalar *out_value);
+                                                        CMPScalar min_value,
+                                                        CMPScalar max_value,
+                                                        CMPScalar step,
+                                                        CMPScalar *out_value);
 
 /**
  * @brief Test wrapper for slider color resolution.
@@ -545,8 +550,8 @@ CMP_API int CMP_CALL m3_progress_test_slider_resolve_colors(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_progress_test_slider_update_value(M3Slider *slider,
-                                                        CMPScalar next_value,
-                                                        CMPBool notify);
+                                                          CMPScalar next_value,
+                                                          CMPBool notify);
 #endif
 
 #ifdef __cplusplus

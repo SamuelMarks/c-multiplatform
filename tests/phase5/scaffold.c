@@ -7,32 +7,35 @@ int CMP_CALL m3_scaffold_test_validate_edges(const CMPLayoutEdges *edges);
 int CMP_CALL m3_scaffold_test_validate_style(const M3ScaffoldStyle *style);
 int CMP_CALL m3_scaffold_test_validate_measure_spec(CMPMeasureSpec spec);
 int CMP_CALL m3_scaffold_test_validate_rect(const CMPRect *rect);
-int CMP_CALL m3_scaffold_test_compute_safe_bounds(const CMPRect *bounds,
-                                                 const CMPLayoutEdges *safe_area,
-                                                 CMPRect *out_bounds);
+int CMP_CALL m3_scaffold_test_compute_safe_bounds(
+    const CMPRect *bounds, const CMPLayoutEdges *safe_area,
+    CMPRect *out_bounds);
 int CMP_CALL m3_scaffold_test_compute_fab_target(const M3ScaffoldStyle *style,
-                                                CMPScalar snackbar_height,
-                                                CMPScalar *out_offset);
+                                                 CMPScalar snackbar_height,
+                                                 CMPScalar *out_offset);
 int CMP_CALL m3_scaffold_test_widget_is_visible(const CMPWidget *widget,
-                                               CMPBool *out_visible);
-int CMP_CALL m3_scaffold_test_measure_child(CMPWidget *child, CMPMeasureSpec width,
-                                           CMPMeasureSpec height,
-                                           CMPSize *out_size);
+                                                CMPBool *out_visible);
+int CMP_CALL m3_scaffold_test_measure_child(CMPWidget *child,
+                                            CMPMeasureSpec width,
+                                            CMPMeasureSpec height,
+                                            CMPSize *out_size);
 int CMP_CALL m3_scaffold_test_layout_child(CMPWidget *child,
-                                          const CMPRect *bounds);
-int CMP_CALL m3_scaffold_test_paint_child(CMPWidget *child, CMPPaintContext *ctx);
+                                           const CMPRect *bounds);
+int CMP_CALL m3_scaffold_test_paint_child(CMPWidget *child,
+                                          CMPPaintContext *ctx);
 int CMP_CALL m3_scaffold_test_event_child(CMPWidget *child,
-                                         const CMPInputEvent *event,
-                                         CMPBool *out_handled);
+                                          const CMPInputEvent *event,
+                                          CMPBool *out_handled);
 int CMP_CALL m3_scaffold_test_event_get_position(const CMPInputEvent *event,
-                                                CMPBool *out_has_pos,
-                                                CMPScalar *out_x,
-                                                CMPScalar *out_y);
+                                                 CMPBool *out_has_pos,
+                                                 CMPScalar *out_x,
+                                                 CMPScalar *out_y);
 int CMP_CALL m3_scaffold_test_child_hit(CMPWidget *child, const CMPRect *bounds,
-                                       CMPScalar x, CMPScalar y, CMPBool *out_hit);
+                                        CMPScalar x, CMPScalar y,
+                                        CMPBool *out_hit);
 int CMP_CALL m3_scaffold_test_apply_measure_spec(CMPScalar desired,
-                                                CMPMeasureSpec spec,
-                                                CMPScalar *out_value);
+                                                 CMPMeasureSpec spec,
+                                                 CMPScalar *out_value);
 
 typedef struct TestScaffoldWidget {
   CMPWidget widget;
@@ -66,7 +69,8 @@ static int test_widget_measure(void *widget, CMPMeasureSpec width,
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (height.mode != CMP_MEASURE_UNSPECIFIED &&
-      height.mode != CMP_MEASURE_EXACTLY && height.mode != CMP_MEASURE_AT_MOST) {
+      height.mode != CMP_MEASURE_EXACTLY &&
+      height.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (width.mode != CMP_MEASURE_UNSPECIFIED && width.size < 0.0f) {
@@ -155,7 +159,8 @@ static int test_widget_event(void *widget, const CMPInputEvent *event,
   return CMP_OK;
 }
 
-static int test_widget_get_semantics(void *widget, CMPSemantics *out_semantics) {
+static int test_widget_get_semantics(void *widget,
+                                     CMPSemantics *out_semantics) {
   TestScaffoldWidget *state;
 
   if (widget == NULL || out_semantics == NULL) {
@@ -260,7 +265,7 @@ static int test_scaffold_helpers(void) {
   CMPScalar y;
 
   CMP_TEST_EXPECT(m3_scaffold_test_validate_edges(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   edges.left = -1.0f;
   edges.top = 0.0f;
   edges.right = 0.0f;
@@ -273,7 +278,7 @@ static int test_scaffold_helpers(void) {
   CMP_TEST_OK(m3_scaffold_test_validate_edges(&edges));
 
   CMP_TEST_EXPECT(m3_scaffold_test_validate_style(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_scaffold_style_init(&style));
   style.fab_slide_duration = 0.0f;
   CMP_TEST_OK(m3_scaffold_test_validate_style(&style));
@@ -295,7 +300,7 @@ static int test_scaffold_helpers(void) {
   spec.mode = 99u;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_AT_MOST;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_validate_measure_spec(spec), CMP_ERR_RANGE);
@@ -303,7 +308,8 @@ static int test_scaffold_helpers(void) {
   spec.size = -1.0f;
   CMP_TEST_OK(m3_scaffold_test_validate_measure_spec(spec));
 
-  CMP_TEST_EXPECT(m3_scaffold_test_validate_rect(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_scaffold_test_validate_rect(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   rect.x = 0.0f;
   rect.y = 0.0f;
   rect.width = -1.0f;
@@ -328,7 +334,7 @@ static int test_scaffold_helpers(void) {
       m3_scaffold_test_compute_safe_bounds(&rect, NULL, &safe_bounds),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_scaffold_test_compute_safe_bounds(&rect, &edges, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       m3_scaffold_test_compute_safe_bounds(&rect, &edges, &safe_bounds),
       CMP_ERR_RANGE);
@@ -336,17 +342,18 @@ static int test_scaffold_helpers(void) {
   edges.right = 1.0f;
   edges.top = 2.0f;
   edges.bottom = 3.0f;
-  CMP_TEST_OK(m3_scaffold_test_compute_safe_bounds(&rect, &edges, &safe_bounds));
+  CMP_TEST_OK(
+      m3_scaffold_test_compute_safe_bounds(&rect, &edges, &safe_bounds));
   CMP_TEST_ASSERT(safe_bounds.x == 1.0f);
   CMP_TEST_ASSERT(safe_bounds.y == 2.0f);
   CMP_TEST_ASSERT(safe_bounds.width == 8.0f);
   CMP_TEST_ASSERT(safe_bounds.height == 5.0f);
 
   CMP_TEST_EXPECT(m3_scaffold_test_compute_fab_target(NULL, 1.0f, &offset),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_scaffold_style_init(&style));
   CMP_TEST_EXPECT(m3_scaffold_test_compute_fab_target(&style, -1.0f, &offset),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_scaffold_test_compute_fab_target(&style, 0.0f, &offset));
   CMP_TEST_ASSERT(offset == 0.0f);
   style.fab_margin_y = 16.0f;
@@ -356,7 +363,7 @@ static int test_scaffold_helpers(void) {
   CMP_TEST_ASSERT(offset == 44.0f);
 
   CMP_TEST_EXPECT(m3_scaffold_test_widget_is_visible(NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_scaffold_test_widget_is_visible(NULL, &visible));
   CMP_TEST_ASSERT(visible == CMP_FALSE);
   CMP_TEST_OK(test_widget_init(&widget, 10.0f, 10.0f));
@@ -370,7 +377,7 @@ static int test_scaffold_helpers(void) {
   spec.mode = CMP_MEASURE_EXACTLY;
   spec.size = 10.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_measure_child(NULL, spec, spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       m3_scaffold_test_measure_child(&widget.widget, spec, spec, NULL),
       CMP_ERR_INVALID_ARGUMENT);
@@ -390,45 +397,46 @@ static int test_scaffold_helpers(void) {
       m3_scaffold_test_measure_child(&widget.widget, spec, spec, &size),
       CMP_ERR_UNSUPPORTED);
   widget.widget.vtable = &g_test_widget_vtable;
-  CMP_TEST_OK(m3_scaffold_test_measure_child(&widget.widget, spec, spec, &size));
+  CMP_TEST_OK(
+      m3_scaffold_test_measure_child(&widget.widget, spec, spec, &size));
 
   rect.x = 0.0f;
   rect.y = 0.0f;
   rect.width = 10.0f;
   rect.height = 10.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_layout_child(NULL, &rect),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_scaffold_test_layout_child(&widget.widget, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   rect.width = -1.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_layout_child(&widget.widget, &rect),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   rect.width = 10.0f;
   widget.widget.vtable = &g_test_widget_vtable_no_layout;
   CMP_TEST_EXPECT(m3_scaffold_test_layout_child(&widget.widget, &rect),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   widget.widget.vtable = &g_test_widget_vtable;
   CMP_TEST_OK(m3_scaffold_test_layout_child(&widget.widget, &rect));
 
   memset(&ctx, 0, sizeof(ctx));
   CMP_TEST_EXPECT(m3_scaffold_test_paint_child(NULL, &ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_scaffold_test_paint_child(&widget.widget, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   widget.widget.vtable = &g_test_widget_vtable_no_paint;
   CMP_TEST_EXPECT(m3_scaffold_test_paint_child(&widget.widget, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   widget.widget.vtable = &g_test_widget_vtable;
   CMP_TEST_OK(m3_scaffold_test_paint_child(&widget.widget, &ctx));
 
   memset(&event, 0, sizeof(event));
   event.type = CMP_INPUT_KEY_DOWN;
   CMP_TEST_EXPECT(m3_scaffold_test_event_child(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_scaffold_test_event_child(&widget.widget, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_scaffold_test_event_child(&widget.widget, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   widget.widget.vtable = &g_test_widget_vtable_no_event;
   CMP_TEST_OK(m3_scaffold_test_event_child(&widget.widget, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
@@ -436,9 +444,9 @@ static int test_scaffold_helpers(void) {
   CMP_TEST_OK(m3_scaffold_test_event_child(&widget.widget, &event, &handled));
 
   CMP_TEST_EXPECT(m3_scaffold_test_event_get_position(NULL, &visible, &x, &y),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_scaffold_test_event_get_position(&event, NULL, &x, &y),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       m3_scaffold_test_event_get_position(&event, &visible, NULL, &y),
       CMP_ERR_INVALID_ARGUMENT);
@@ -489,7 +497,7 @@ static int test_scaffold_helpers(void) {
   spec.mode = CMP_MEASURE_EXACTLY;
   spec.size = 5.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_apply_measure_spec(10.0f, spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_scaffold_test_apply_measure_spec(10.0f, spec, &value));
   CMP_TEST_ASSERT(value == 5.0f);
   spec.mode = CMP_MEASURE_AT_MOST;
@@ -516,15 +524,15 @@ static int test_scaffold_style_init(void) {
   CMP_TEST_ASSERT(style.fab_margin_x == M3_SCAFFOLD_DEFAULT_FAB_MARGIN);
   CMP_TEST_ASSERT(style.fab_margin_y == M3_SCAFFOLD_DEFAULT_FAB_MARGIN);
   CMP_TEST_ASSERT(style.snackbar_margin_x ==
-                 M3_SCAFFOLD_DEFAULT_SNACKBAR_MARGIN_X);
+                  M3_SCAFFOLD_DEFAULT_SNACKBAR_MARGIN_X);
   CMP_TEST_ASSERT(style.snackbar_margin_y ==
-                 M3_SCAFFOLD_DEFAULT_SNACKBAR_MARGIN_Y);
+                  M3_SCAFFOLD_DEFAULT_SNACKBAR_MARGIN_Y);
   CMP_TEST_ASSERT(style.fab_snackbar_spacing ==
-                 M3_SCAFFOLD_DEFAULT_FAB_SNACKBAR_SPACING);
+                  M3_SCAFFOLD_DEFAULT_FAB_SNACKBAR_SPACING);
   CMP_TEST_ASSERT(style.fab_slide_duration ==
-                 M3_SCAFFOLD_DEFAULT_FAB_SLIDE_DURATION);
+                  M3_SCAFFOLD_DEFAULT_FAB_SLIDE_DURATION);
   CMP_TEST_ASSERT(style.fab_slide_easing ==
-                 M3_SCAFFOLD_DEFAULT_FAB_SLIDE_EASING);
+                  M3_SCAFFOLD_DEFAULT_FAB_SLIDE_EASING);
   return 0;
 }
 
@@ -550,17 +558,18 @@ static int test_scaffold_init_and_setters(void) {
       CMP_ERR_RANGE);
   CMP_TEST_OK(m3_scaffold_style_init(&style));
 
-  CMP_TEST_OK(m3_scaffold_init(&scaffold, &style, &body.widget, NULL, NULL, NULL,
-                              NULL));
+  CMP_TEST_OK(m3_scaffold_init(&scaffold, &style, &body.widget, NULL, NULL,
+                               NULL, NULL));
   CMP_TEST_OK(m3_scaffold_set_body(&scaffold, NULL));
   CMP_TEST_OK(m3_scaffold_set_top_bar(&scaffold, NULL));
   CMP_TEST_OK(m3_scaffold_set_bottom_bar(&scaffold, NULL));
   CMP_TEST_OK(m3_scaffold_set_fab(&scaffold, NULL));
   CMP_TEST_OK(m3_scaffold_set_snackbar(&scaffold, NULL));
 
-  CMP_TEST_EXPECT(m3_scaffold_set_style(NULL, &style), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_scaffold_set_style(NULL, &style),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_scaffold_set_style(&scaffold, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   style.fab_slide_duration = -1.0f;
   CMP_TEST_EXPECT(m3_scaffold_set_style(&scaffold, &style), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_scaffold_style_init(&style));
@@ -571,7 +580,7 @@ static int test_scaffold_init_and_setters(void) {
   safe_area.right = 0.0f;
   safe_area.bottom = 0.0f;
   CMP_TEST_EXPECT(m3_scaffold_set_safe_area(&scaffold, &safe_area),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   safe_area.left = 1.0f;
   safe_area.top = 2.0f;
   safe_area.right = 3.0f;
@@ -588,9 +597,9 @@ static int test_scaffold_init_and_setters(void) {
   CMP_TEST_ASSERT(safe_area.bottom == 4.0f);
 
   CMP_TEST_EXPECT(m3_scaffold_get_safe_area(NULL, &safe_area),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_scaffold_get_safe_area(&scaffold, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   return 0;
 }
@@ -622,8 +631,8 @@ static int test_scaffold_measure(void) {
   CMP_TEST_OK(test_widget_init(&snackbar, 180.0f, 30.0f));
 
   CMP_TEST_OK(m3_scaffold_init(&scaffold, &style, &body.widget, &top_bar.widget,
-                              &bottom_bar.widget, &fab.widget,
-                              &snackbar.widget));
+                               &bottom_bar.widget, &fab.widget,
+                               &snackbar.widget));
 
   safe_area.left = 0.0f;
   safe_area.top = 0.0f;
@@ -636,7 +645,7 @@ static int test_scaffold_measure(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 480.0f;
   CMP_TEST_OK(scaffold.widget.vtable->measure(scaffold.widget.ctx, width_spec,
-                                             height_spec, &size));
+                                              height_spec, &size));
   CMP_TEST_ASSERT(size.width == 320.0f);
   CMP_TEST_ASSERT(size.height == 480.0f);
 
@@ -645,13 +654,13 @@ static int test_scaffold_measure(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(scaffold.widget.vtable->measure(scaffold.widget.ctx, width_spec,
-                                             height_spec, &size));
+                                              height_spec, &size));
   CMP_TEST_ASSERT(size.width == 300.0f);
   CMP_TEST_ASSERT(size.height == 206.0f);
 
   fab.desired_size.height = 200.0f;
   CMP_TEST_OK(scaffold.widget.vtable->measure(scaffold.widget.ctx, width_spec,
-                                             height_spec, &size));
+                                              height_spec, &size));
   CMP_TEST_ASSERT(size.width == 300.0f);
   CMP_TEST_ASSERT(size.height == 322.0f);
   fab.desired_size.height = 50.0f;
@@ -661,7 +670,7 @@ static int test_scaffold_measure(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 200.0f;
   CMP_TEST_OK(scaffold.widget.vtable->measure(scaffold.widget.ctx, width_spec,
-                                             height_spec, &size));
+                                              height_spec, &size));
   CMP_TEST_ASSERT(size.width == 250.0f);
   CMP_TEST_ASSERT(size.height == 200.0f);
 
@@ -670,8 +679,8 @@ static int test_scaffold_measure(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 10.0f;
   CMP_TEST_EXPECT(scaffold.widget.vtable->measure(
-                     scaffold.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      scaffold.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   scaffold.style.padding.left = -1.0f;
   width_spec.mode = CMP_MEASURE_EXACTLY;
@@ -679,14 +688,14 @@ static int test_scaffold_measure(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 100.0f;
   CMP_TEST_EXPECT(scaffold.widget.vtable->measure(
-                     scaffold.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_RANGE);
+                      scaffold.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_RANGE);
   scaffold.style.padding.left = style.padding.left;
 
   scaffold.safe_area.left = -1.0f;
   CMP_TEST_EXPECT(scaffold.widget.vtable->measure(
-                     scaffold.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_RANGE);
+                      scaffold.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_RANGE);
   scaffold.safe_area.left = 0.0f;
 
   width_spec.mode = CMP_MEASURE_EXACTLY;
@@ -699,8 +708,8 @@ static int test_scaffold_measure(void) {
   safe_area.bottom = 0.0f;
   CMP_TEST_OK(m3_scaffold_set_safe_area(&scaffold, &safe_area));
   CMP_TEST_EXPECT(scaffold.widget.vtable->measure(
-                     scaffold.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_RANGE);
+                      scaffold.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_RANGE);
 
   safe_area.left = 0.0f;
   safe_area.right = 0.0f;
@@ -709,8 +718,8 @@ static int test_scaffold_measure(void) {
   height_spec.size = 10.0f;
   CMP_TEST_OK(m3_scaffold_set_safe_area(&scaffold, &safe_area));
   CMP_TEST_EXPECT(scaffold.widget.vtable->measure(
-                     scaffold.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_RANGE);
+                      scaffold.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_RANGE);
 
   safe_area.left = 0.0f;
   safe_area.right = 0.0f;
@@ -723,40 +732,40 @@ static int test_scaffold_measure(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 100.0f;
   CMP_TEST_EXPECT(scaffold.widget.vtable->measure(
-                     scaffold.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_IO);
+                      scaffold.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_IO);
   body.fail_measure = 0;
 
   CMP_TEST_OK(test_widget_init(&bad_body, 10.0f, 10.0f));
   bad_body.widget.vtable = &g_test_widget_vtable_no_measure;
   CMP_TEST_OK(m3_scaffold_set_body(&scaffold, &bad_body.widget));
   CMP_TEST_EXPECT(scaffold.widget.vtable->measure(
-                     scaffold.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_UNSUPPORTED);
+                      scaffold.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_UNSUPPORTED);
 
   CMP_TEST_OK(m3_scaffold_set_body(&scaffold, &body.widget));
   top_bar.fail_measure = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->measure(
-                     scaffold.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_IO);
+                      scaffold.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_IO);
   top_bar.fail_measure = 0;
 
   bottom_bar.fail_measure = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->measure(
-                     scaffold.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_IO);
+                      scaffold.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_IO);
   bottom_bar.fail_measure = 0;
 
   fab.fail_measure = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->measure(
-                     scaffold.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_IO);
+                      scaffold.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_IO);
   fab.fail_measure = 0;
 
   snackbar.fail_measure = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->measure(
-                     scaffold.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_IO);
+                      scaffold.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_IO);
   snackbar.fail_measure = 0;
 
   return 0;
@@ -793,8 +802,8 @@ static int test_scaffold_layout(void) {
   CMP_TEST_OK(test_widget_init(&snackbar, 200.0f, 40.0f));
 
   CMP_TEST_OK(m3_scaffold_init(&scaffold, &style, &body.widget, &top_bar.widget,
-                              &bottom_bar.widget, &fab.widget,
-                              &snackbar.widget));
+                               &bottom_bar.widget, &fab.widget,
+                               &snackbar.widget));
 
   safe_area.left = 10.0f;
   safe_area.top = 20.0f;
@@ -840,7 +849,7 @@ static int test_scaffold_layout(void) {
 
   bounds.width = -1.0f;
   CMP_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bounds.width = 360.0f;
   safe_area.left = 200.0f;
@@ -849,7 +858,7 @@ static int test_scaffold_layout(void) {
   safe_area.bottom = 0.0f;
   CMP_TEST_OK(m3_scaffold_set_safe_area(&scaffold, &safe_area));
   CMP_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   safe_area.left = 0.0f;
   safe_area.right = 0.0f;
   safe_area.top = 0.0f;
@@ -858,32 +867,32 @@ static int test_scaffold_layout(void) {
 
   top_bar.fail_layout = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   top_bar.fail_layout = 0;
 
   top_bar.widget.vtable = &g_test_widget_vtable_no_layout;
   CMP_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   top_bar.widget.vtable = &g_test_widget_vtable;
 
   bottom_bar.fail_layout = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   bottom_bar.fail_layout = 0;
 
   fab.fail_layout = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   fab.fail_layout = 0;
 
   snackbar.fail_layout = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   snackbar.fail_layout = 0;
 
   body.widget.vtable = &g_test_widget_vtable_no_layout;
   CMP_TEST_EXPECT(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   body.widget.vtable = &g_test_widget_vtable;
 
   return 0;
@@ -908,8 +917,8 @@ static int test_scaffold_paint(void) {
   CMP_TEST_OK(test_widget_init(&snackbar, 50.0f, 10.0f));
 
   CMP_TEST_OK(m3_scaffold_init(&scaffold, &style, &body.widget, &top_bar.widget,
-                              &bottom_bar.widget, &fab.widget,
-                              &snackbar.widget));
+                               &bottom_bar.widget, &fab.widget,
+                               &snackbar.widget));
 
   bounds.x = 0.0f;
   bounds.y = 0.0f;
@@ -927,37 +936,37 @@ static int test_scaffold_paint(void) {
 
   body.fail_paint = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   body.fail_paint = 0;
 
   top_bar.fail_paint = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   top_bar.fail_paint = 0;
 
   bottom_bar.fail_paint = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   bottom_bar.fail_paint = 0;
 
   snackbar.fail_paint = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   snackbar.fail_paint = 0;
 
   fab.fail_paint = 1;
   CMP_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   fab.fail_paint = 0;
 
   body.widget.vtable = &g_test_widget_vtable_no_paint;
   CMP_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   body.widget.vtable = &g_test_widget_vtable;
 
   top_bar.widget.vtable = &g_test_widget_vtable_no_paint;
   CMP_TEST_EXPECT(scaffold.widget.vtable->paint(scaffold.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   top_bar.widget.vtable = &g_test_widget_vtable;
 
   {
@@ -998,8 +1007,8 @@ static int test_scaffold_event(void) {
   body.handle_events = 1;
 
   CMP_TEST_OK(m3_scaffold_init(&scaffold, &style, &body.widget, &top_bar.widget,
-                              &bottom_bar.widget, &fab.widget,
-                              &snackbar.widget));
+                               &bottom_bar.widget, &fab.widget,
+                               &snackbar.widget));
 
   bounds.x = 0.0f;
   bounds.y = 0.0f;
@@ -1009,7 +1018,7 @@ static int test_scaffold_event(void) {
 
   memset(&event, 0, sizeof(event));
   CMP_TEST_EXPECT(scaffold.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       scaffold.widget.vtable->event(scaffold.widget.ctx, NULL, &handled),
       CMP_ERR_INVALID_ARGUMENT);
@@ -1018,40 +1027,40 @@ static int test_scaffold_event(void) {
       CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
-                                (cmp_i32)(fab.last_bounds.x + 1.0f),
-                                (cmp_i32)(fab.last_bounds.y + 1.0f)));
+                                 (cmp_i32)(fab.last_bounds.x + 1.0f),
+                                 (cmp_i32)(fab.last_bounds.y + 1.0f)));
   CMP_TEST_OK(
       scaffold.widget.vtable->event(scaffold.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
   CMP_TEST_ASSERT(fab.event_calls == 1);
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
-                                (cmp_i32)(snackbar.last_bounds.x + 1.0f),
-                                (cmp_i32)(snackbar.last_bounds.y + 1.0f)));
+                                 (cmp_i32)(snackbar.last_bounds.x + 1.0f),
+                                 (cmp_i32)(snackbar.last_bounds.y + 1.0f)));
   CMP_TEST_OK(
       scaffold.widget.vtable->event(scaffold.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
   CMP_TEST_ASSERT(snackbar.event_calls == 1);
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
-                                (cmp_i32)(top_bar.last_bounds.x + 1.0f),
-                                (cmp_i32)(top_bar.last_bounds.y + 1.0f)));
+                                 (cmp_i32)(top_bar.last_bounds.x + 1.0f),
+                                 (cmp_i32)(top_bar.last_bounds.y + 1.0f)));
   CMP_TEST_OK(
       scaffold.widget.vtable->event(scaffold.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
   CMP_TEST_ASSERT(top_bar.event_calls == 1);
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
-                                (cmp_i32)(bottom_bar.last_bounds.x + 1.0f),
-                                (cmp_i32)(bottom_bar.last_bounds.y + 1.0f)));
+                                 (cmp_i32)(bottom_bar.last_bounds.x + 1.0f),
+                                 (cmp_i32)(bottom_bar.last_bounds.y + 1.0f)));
   CMP_TEST_OK(
       scaffold.widget.vtable->event(scaffold.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
   CMP_TEST_ASSERT(bottom_bar.event_calls == 1);
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
-                                (cmp_i32)(body.last_bounds.x + 1.0f),
-                                (cmp_i32)(body.last_bounds.y + 1.0f)));
+                                 (cmp_i32)(body.last_bounds.x + 1.0f),
+                                 (cmp_i32)(body.last_bounds.y + 1.0f)));
   CMP_TEST_OK(
       scaffold.widget.vtable->event(scaffold.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
@@ -1089,8 +1098,8 @@ static int test_scaffold_event(void) {
 
   fab.fail_event = 1;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
-                                (cmp_i32)(fab.last_bounds.x + 1.0f),
-                                (cmp_i32)(fab.last_bounds.y + 1.0f)));
+                                 (cmp_i32)(fab.last_bounds.x + 1.0f),
+                                 (cmp_i32)(fab.last_bounds.y + 1.0f)));
   CMP_TEST_EXPECT(
       scaffold.widget.vtable->event(scaffold.widget.ctx, &event, &handled),
       CMP_ERR_IO);
@@ -1098,8 +1107,8 @@ static int test_scaffold_event(void) {
 
   fab.widget.vtable = &g_test_widget_vtable_no_event;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
-                                (cmp_i32)(fab.last_bounds.x + 1.0f),
-                                (cmp_i32)(fab.last_bounds.y + 1.0f)));
+                                 (cmp_i32)(fab.last_bounds.x + 1.0f),
+                                 (cmp_i32)(fab.last_bounds.y + 1.0f)));
   CMP_TEST_OK(
       scaffold.widget.vtable->event(scaffold.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
@@ -1116,11 +1125,11 @@ static int test_scaffold_semantics_destroy(void) {
 
   CMP_TEST_OK(m3_scaffold_style_init(&style));
   CMP_TEST_OK(test_widget_init(&body, 10.0f, 10.0f));
-  CMP_TEST_OK(m3_scaffold_init(&scaffold, &style, &body.widget, NULL, NULL, NULL,
-                              NULL));
+  CMP_TEST_OK(m3_scaffold_init(&scaffold, &style, &body.widget, NULL, NULL,
+                               NULL, NULL));
 
   CMP_TEST_EXPECT(scaffold.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       scaffold.widget.vtable->get_semantics(scaffold.widget.ctx, NULL),
       CMP_ERR_INVALID_ARGUMENT);
@@ -1136,7 +1145,7 @@ static int test_scaffold_semantics_destroy(void) {
   CMP_TEST_ASSERT(semantics.utf8_value == NULL);
 
   CMP_TEST_EXPECT(scaffold.widget.vtable->destroy(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(scaffold.widget.vtable->destroy(scaffold.widget.ctx));
   CMP_TEST_ASSERT(scaffold.widget.vtable == NULL);
   CMP_TEST_ASSERT(scaffold.widget.ctx == NULL);
@@ -1164,7 +1173,7 @@ static int test_scaffold_step(void) {
   CMP_TEST_OK(test_widget_init(&snackbar, 50.0f, 10.0f));
 
   CMP_TEST_OK(m3_scaffold_init(&scaffold, &style, &body.widget, NULL, NULL,
-                              &fab.widget, &snackbar.widget));
+                               &fab.widget, &snackbar.widget));
 
   bounds.x = 0.0f;
   bounds.y = 0.0f;
@@ -1178,10 +1187,10 @@ static int test_scaffold_step(void) {
   CMP_TEST_ASSERT(fab.layout_calls > 1);
 
   CMP_TEST_EXPECT(m3_scaffold_step(NULL, 0.1f, &changed),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_scaffold_step(&scaffold, -1.0f, &changed), CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_scaffold_step(&scaffold, 0.1f, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   return 0;
 }

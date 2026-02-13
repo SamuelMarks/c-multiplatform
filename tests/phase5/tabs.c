@@ -25,24 +25,24 @@ int CMP_CALL m3_tab_row_test_set_fail_point(cmp_u32 point);
 int CMP_CALL m3_tab_row_test_set_color_fail_after(cmp_u32 call_count);
 int CMP_CALL m3_tab_row_test_clear_fail_points(void);
 int CMP_CALL m3_tab_row_test_validate_color(const CMPColor *color);
-int CMP_CALL m3_tab_row_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                      CMPScalar b, CMPScalar a);
+int CMP_CALL m3_tab_row_test_color_set(CMPColor *color, CMPScalar r,
+                                       CMPScalar g, CMPScalar b, CMPScalar a);
 int CMP_CALL m3_tab_row_test_color_with_alpha(const CMPColor *base,
-                                             CMPScalar alpha,
-                                             CMPColor *out_color);
+                                              CMPScalar alpha,
+                                              CMPColor *out_color);
 int CMP_CALL m3_tab_row_test_validate_edges(const CMPLayoutEdges *edges);
 int CMP_CALL m3_tab_row_test_validate_text_style(const CMPTextStyle *style,
-                                                CMPBool require_family);
+                                                 CMPBool require_family);
 int CMP_CALL m3_tab_row_test_validate_style(const M3TabRowStyle *style,
-                                           CMPBool require_family);
+                                            CMPBool require_family);
 int CMP_CALL m3_tab_row_test_validate_items(const M3TabItem *items,
-                                           cmp_usize count);
+                                            cmp_usize count);
 int CMP_CALL m3_tab_row_test_validate_measure_spec(CMPMeasureSpec spec);
 int CMP_CALL m3_tab_row_test_validate_rect(const CMPRect *rect);
 int CMP_CALL m3_tab_row_test_validate_backend(const CMPTextBackend *backend);
 int CMP_CALL m3_tab_row_test_measure_content(const M3TabRow *row, cmp_u32 mode,
-                                            CMPScalar *out_width,
-                                            CMPScalar *out_height);
+                                             CMPScalar *out_width,
+                                             CMPScalar *out_height);
 int CMP_CALL m3_tab_row_test_color_should_fail_null(void);
 int CMP_CALL m3_tab_row_test_fail_point_match_null(void);
 int CMP_CALL m3_tab_row_test_force_color_error(CMPBool enable);
@@ -50,67 +50,68 @@ int CMP_CALL m3_tab_row_test_set_fail_point_error_after(cmp_u32 call_count);
 int CMP_CALL m3_tab_row_test_set_value_fail_after(cmp_u32 call_count);
 int CMP_CALL m3_tab_row_test_set_start_fail_after(cmp_u32 call_count);
 int CMP_CALL m3_tab_row_test_measure_max_text(const M3TabRow *row,
-                                             CMPScalar *out_width,
-                                             CMPScalar *out_height,
-                                             CMPScalar *out_baseline);
+                                              CMPScalar *out_width,
+                                              CMPScalar *out_height,
+                                              CMPScalar *out_baseline);
 int CMP_CALL m3_tab_row_test_item_width(const M3TabRow *row,
-                                       const M3TabItem *item,
-                                       CMPScalar *out_width);
+                                        const M3TabItem *item,
+                                        CMPScalar *out_width);
 int CMP_CALL m3_tab_row_test_compute_layout(const M3TabRow *row,
-                                           CMPScalar *out_content_width,
-                                           CMPScalar *out_tab_width,
-                                           CMPScalar *out_tab_height,
-                                           cmp_u32 *out_mode);
+                                            CMPScalar *out_content_width,
+                                            CMPScalar *out_tab_width,
+                                            CMPScalar *out_tab_height,
+                                            cmp_u32 *out_mode);
 int CMP_CALL m3_tab_row_test_clamp_scroll(M3TabRow *row, cmp_u32 mode,
-                                         CMPScalar content_width,
-                                         CMPScalar available_width);
+                                          CMPScalar content_width,
+                                          CMPScalar available_width);
 int CMP_CALL m3_tab_row_test_indicator_target(
     const M3TabRow *row, cmp_u32 mode, CMPScalar tab_width, CMPScalar spacing,
     CMPScalar content_width, CMPScalar start_x, CMPScalar start_y,
     CMPScalar tab_height, CMPScalar *out_pos, CMPScalar *out_width);
-int CMP_CALL m3_tab_row_test_sync_indicator(M3TabRow *row, cmp_u32 mode,
-                                           CMPScalar tab_width, CMPScalar spacing,
-                                           CMPScalar content_width,
-                                           CMPScalar start_x, CMPScalar start_y,
-                                           CMPScalar tab_height, CMPBool animate);
+int CMP_CALL m3_tab_row_test_sync_indicator(
+    M3TabRow *row, cmp_u32 mode, CMPScalar tab_width, CMPScalar spacing,
+    CMPScalar content_width, CMPScalar start_x, CMPScalar start_y,
+    CMPScalar tab_height, CMPBool animate);
 int CMP_CALL m3_tab_row_test_item_rect(const M3TabRow *row, cmp_u32 mode,
+                                       CMPScalar start_x, CMPScalar start_y,
+                                       CMPScalar tab_width,
+                                       CMPScalar tab_height, CMPScalar spacing,
+                                       CMPScalar content_width,
+                                       CMPScalar available_width,
+                                       cmp_usize index, CMPRect *out_rect);
+int CMP_CALL m3_tab_row_test_hit_test(const M3TabRow *row, cmp_u32 mode,
                                       CMPScalar start_x, CMPScalar start_y,
                                       CMPScalar tab_width, CMPScalar tab_height,
-                                      CMPScalar spacing, CMPScalar content_width,
-                                      CMPScalar available_width, cmp_usize index,
-                                      CMPRect *out_rect);
-int CMP_CALL m3_tab_row_test_hit_test(const M3TabRow *row, cmp_u32 mode,
-                                     CMPScalar start_x, CMPScalar start_y,
-                                     CMPScalar tab_width, CMPScalar tab_height,
-                                     CMPScalar spacing, CMPScalar content_width,
-                                     CMPScalar available_width, cmp_i32 x,
-                                     cmp_i32 y, cmp_usize *out_index);
+                                      CMPScalar spacing,
+                                      CMPScalar content_width,
+                                      CMPScalar available_width, cmp_i32 x,
+                                      cmp_i32 y, cmp_usize *out_index);
 
 int CMP_CALL m3_segmented_test_set_fail_point(cmp_u32 point);
 int CMP_CALL m3_segmented_test_set_color_fail_after(cmp_u32 call_count);
 int CMP_CALL m3_segmented_test_clear_fail_points(void);
 int CMP_CALL m3_segmented_test_validate_color(const CMPColor *color);
-int CMP_CALL m3_segmented_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                        CMPScalar b, CMPScalar a);
+int CMP_CALL m3_segmented_test_color_set(CMPColor *color, CMPScalar r,
+                                         CMPScalar g, CMPScalar b, CMPScalar a);
 int CMP_CALL m3_segmented_test_color_with_alpha(const CMPColor *base,
-                                               CMPScalar alpha,
-                                               CMPColor *out_color);
+                                                CMPScalar alpha,
+                                                CMPColor *out_color);
 int CMP_CALL m3_segmented_test_validate_edges(const CMPLayoutEdges *edges);
 int CMP_CALL m3_segmented_test_validate_text_style(const CMPTextStyle *style,
-                                                  CMPBool require_family);
+                                                   CMPBool require_family);
 int CMP_CALL m3_segmented_test_validate_style(const M3SegmentedStyle *style,
-                                             CMPBool require_family);
+                                              CMPBool require_family);
 int CMP_CALL m3_segmented_test_validate_items(const M3SegmentedItem *items,
-                                             cmp_usize count);
+                                              cmp_usize count);
 int CMP_CALL m3_segmented_test_validate_measure_spec(CMPMeasureSpec spec);
 int CMP_CALL m3_segmented_test_validate_rect(const CMPRect *rect);
 int CMP_CALL m3_segmented_test_validate_backend(const CMPTextBackend *backend);
 int CMP_CALL m3_segmented_test_validate_mode(cmp_u32 mode);
 int CMP_CALL m3_segmented_test_validate_selected_states(const CMPBool *states,
-                                                       cmp_usize count);
-int CMP_CALL m3_segmented_test_measure_content(const M3SegmentedButtons *buttons,
-                                              CMPScalar *out_width,
-                                              CMPScalar *out_height);
+                                                        cmp_usize count);
+int CMP_CALL
+m3_segmented_test_measure_content(const M3SegmentedButtons *buttons,
+                                  CMPScalar *out_width, CMPScalar *out_height);
 int CMP_CALL m3_segmented_test_color_should_fail_null(void);
 int CMP_CALL m3_segmented_test_fail_point_match_null(void);
 int CMP_CALL m3_segmented_test_force_color_error(CMPBool enable);
@@ -119,18 +120,17 @@ int CMP_CALL m3_segmented_test_measure_max_text(
     const M3SegmentedButtons *buttons, CMPScalar *out_width,
     CMPScalar *out_height, CMPScalar *out_baseline);
 int CMP_CALL m3_segmented_test_compute_layout(const M3SegmentedButtons *buttons,
-                                             CMPScalar *out_content_width,
-                                             CMPScalar *out_segment_width,
-                                             CMPScalar *out_segment_height,
-                                             CMPScalar *out_spacing);
-int CMP_CALL m3_segmented_test_hit_test(const M3SegmentedButtons *buttons,
-                                       CMPScalar start_x, CMPScalar start_y,
-                                       CMPScalar segment_width,
-                                       CMPScalar segment_height,
-                                       CMPScalar spacing, CMPScalar content_width,
-                                       cmp_i32 x, cmp_i32 y, cmp_usize *out_index);
+                                              CMPScalar *out_content_width,
+                                              CMPScalar *out_segment_width,
+                                              CMPScalar *out_segment_height,
+                                              CMPScalar *out_spacing);
+int CMP_CALL m3_segmented_test_hit_test(
+    const M3SegmentedButtons *buttons, CMPScalar start_x, CMPScalar start_y,
+    CMPScalar segment_width, CMPScalar segment_height, CMPScalar spacing,
+    CMPScalar content_width, cmp_i32 x, cmp_i32 y, cmp_usize *out_index);
 int CMP_CALL m3_segmented_test_is_selected(const M3SegmentedButtons *buttons,
-                                          cmp_usize index, CMPBool *out_selected);
+                                           cmp_usize index,
+                                           CMPBool *out_selected);
 
 typedef struct TestTabsBackend {
   int create_calls;
@@ -203,7 +203,8 @@ static int setup_gfx(TestTabsBackend *state, CMPGfx *gfx, CMPPaintContext *ctx,
   return CMP_OK;
 }
 
-static int tabs_near(CMPScalar a, CMPScalar b, CMPScalar tol, CMPBool *out_near) {
+static int tabs_near(CMPScalar a, CMPScalar b, CMPScalar tol,
+                     CMPBool *out_near) {
   CMPScalar diff;
 
   if (out_near == NULL) {
@@ -230,8 +231,8 @@ static int init_pointer_event(CMPInputEvent *event, cmp_u32 type, cmp_i32 x,
 }
 
 static int test_text_create_font(void *text, const char *utf8_family,
-                                 cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
-                                 CMPHandle *out_font) {
+                                 cmp_i32 size_px, cmp_i32 weight,
+                                 CMPBool italic, CMPHandle *out_font) {
   TestTabsBackend *backend;
 
   if (text == NULL || utf8_family == NULL || out_font == NULL) {
@@ -433,13 +434,13 @@ static int test_tab_row_style_init(void) {
       tabs_near(style.padding_y, M3_TAB_DEFAULT_PADDING_Y, 0.001f, &near));
   CMP_TEST_ASSERT(near == CMP_TRUE);
   CMP_TEST_OK(tabs_near(style.indicator_thickness,
-                       M3_TAB_DEFAULT_INDICATOR_THICKNESS, 0.001f, &near));
+                        M3_TAB_DEFAULT_INDICATOR_THICKNESS, 0.001f, &near));
   CMP_TEST_ASSERT(near == CMP_TRUE);
   CMP_TEST_OK(tabs_near(style.indicator_anim_duration,
-                       M3_TAB_DEFAULT_INDICATOR_DURATION, 0.001f, &near));
+                        M3_TAB_DEFAULT_INDICATOR_DURATION, 0.001f, &near));
   CMP_TEST_ASSERT(near == CMP_TRUE);
   CMP_TEST_ASSERT(style.indicator_anim_easing ==
-                 M3_TAB_DEFAULT_INDICATOR_EASING);
+                  M3_TAB_DEFAULT_INDICATOR_EASING);
   CMP_TEST_ASSERT(style.text_style.size_px == 14);
   CMP_TEST_ASSERT(style.text_style.weight == 400);
   CMP_TEST_ASSERT(style.text_style.italic == CMP_FALSE);
@@ -476,7 +477,8 @@ static int test_tab_row_validation_helpers(void) {
   CMPScalar width;
   CMPScalar height;
 
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_color(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_color(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   color.r = -0.1f;
   color.g = 0.0f;
   color.b = 0.0f;
@@ -495,18 +497,19 @@ static int test_tab_row_validation_helpers(void) {
   CMP_TEST_OK(m3_tab_row_test_validate_color(&color));
 
   CMP_TEST_EXPECT(m3_tab_row_test_color_set(NULL, 0.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_test_color_set(&color, -1.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_color_set(&color, 0.0f, 0.0f, 0.0f, 1.0f));
 
   CMP_TEST_EXPECT(m3_tab_row_test_color_with_alpha(NULL, 0.5f, &color),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_test_color_with_alpha(&color, -1.0f, &color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_color_with_alpha(&color, 0.5f, &color));
 
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_edges(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_edges(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   edges.left = -1.0f;
   edges.top = 0.0f;
   edges.right = 0.0f;
@@ -519,95 +522,108 @@ static int test_tab_row_validation_helpers(void) {
   CMP_TEST_OK(m3_tab_row_test_validate_edges(&edges));
 
   CMP_TEST_EXPECT(m3_tab_row_test_validate_text_style(NULL, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_text_style_init(&text_style));
   text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_tab_row_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_tab_row_test_validate_text_style(&text_style, CMP_FALSE));
   text_style.utf8_family = "Sans";
   text_style.size_px = 0;
   CMP_TEST_EXPECT(m3_tab_row_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.size_px = 12;
   text_style.weight = 50;
   CMP_TEST_EXPECT(m3_tab_row_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.weight = 400;
   text_style.italic = 3;
   CMP_TEST_EXPECT(m3_tab_row_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   text_style.italic = CMP_FALSE;
   text_style.color.a = 2.0f;
   CMP_TEST_EXPECT(m3_tab_row_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.color.a = 1.0f;
   CMP_TEST_OK(m3_tab_row_test_validate_text_style(&text_style, CMP_TRUE));
 
   CMP_TEST_EXPECT(m3_tab_row_test_validate_style(NULL, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_tab_row_style_init(&style));
   style.text_style.utf8_family = "Sans";
   base_style = style;
   style.mode = 99u;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.spacing = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.min_width = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.min_height = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.padding_x = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.padding_y = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.indicator_thickness = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.indicator_corner = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.indicator_anim_duration = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.indicator_anim_easing = 99u;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.padding.left = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   style = base_style;
   style.selected_text_color.a = 2.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   style.disabled_indicator_color.a = 2.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   style = base_style;
   CMP_TEST_OK(m3_tab_row_test_validate_style(&style, CMP_TRUE));
 
   CMP_TEST_EXPECT(m3_tab_row_test_validate_items(NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_tab_row_test_validate_items(NULL, 0));
   item.utf8_label = NULL;
   item.utf8_len = 1;
   CMP_TEST_EXPECT(m3_tab_row_test_validate_items(&item, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   item.utf8_len = 0;
   CMP_TEST_OK(m3_tab_row_test_validate_items(&item, 1));
 
   spec.mode = 99u;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(m3_tab_row_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_AT_MOST;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_tab_row_test_validate_measure_spec(spec), CMP_ERR_RANGE);
@@ -615,7 +631,8 @@ static int test_tab_row_validation_helpers(void) {
   spec.size = -1.0f;
   CMP_TEST_OK(m3_tab_row_test_validate_measure_spec(spec));
 
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_rect(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_rect(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   rect.x = 0.0f;
   rect.y = 0.0f;
   rect.width = -1.0f;
@@ -628,14 +645,15 @@ static int test_tab_row_validation_helpers(void) {
   CMP_TEST_OK(m3_tab_row_test_validate_rect(&rect));
 
   CMP_TEST_EXPECT(m3_tab_row_test_validate_backend(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   backend.ctx = NULL;
   backend.vtable = NULL;
   CMP_TEST_EXPECT(m3_tab_row_test_validate_backend(&backend),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(test_backend_init(&backend_state));
-  CMP_TEST_OK(setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
+  CMP_TEST_OK(
+      setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
   CMP_TEST_OK(m3_tab_row_test_validate_backend(&backend));
   CMP_TEST_OK(m3_tab_row_style_init(&style));
   style.text_style.utf8_family = "Sans";
@@ -648,11 +666,11 @@ static int test_tab_row_validation_helpers(void) {
       m3_tab_row_test_measure_content(NULL, M3_TAB_MODE_FIXED, &width, &height),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_test_measure_content(&row, 99u, &width, &height),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_measure_content(&row, M3_TAB_MODE_FIXED, &width,
-                                             &height));
+                                              &height));
   CMP_TEST_OK(m3_tab_row_test_measure_content(&row, M3_TAB_MODE_SCROLLABLE,
-                                             &width, &height));
+                                              &width, &height));
   CMP_TEST_OK(row.widget.vtable->destroy(row.widget.ctx));
 
   return CMP_OK;
@@ -676,50 +694,55 @@ static int test_tab_row_internal_helpers(void) {
   cmp_usize index;
 
   CMP_TEST_EXPECT(m3_tab_row_test_color_should_fail_null(),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_test_fail_point_match_null(),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_tab_row_test_color_set(&color, 0.0f, -0.1f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_tab_row_test_color_set(&color, 0.0f, 0.0f, -0.1f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_tab_row_test_color_set(&color, 0.0f, 0.0f, 0.0f, -0.1f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_force_color_error(CMP_TRUE));
   CMP_TEST_EXPECT(m3_tab_row_test_color_set(&color, 0.0f, 0.0f, 0.0f, 1.0f),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
 
   color.r = 0.0f;
   color.g = 2.0f;
   color.b = 0.0f;
   color.a = 1.0f;
   CMP_TEST_EXPECT(m3_tab_row_test_color_with_alpha(&color, 0.5f, &color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   color.g = 0.0f;
   CMP_TEST_OK(m3_tab_row_test_force_color_error(CMP_TRUE));
   CMP_TEST_EXPECT(m3_tab_row_test_color_with_alpha(&color, 0.5f, &color),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
 
   CMP_TEST_OK(m3_tab_row_style_init(&style));
   style.text_style.utf8_family = "Sans";
   style.indicator_color.r = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_style_init(&style));
   style.text_style.utf8_family = "Sans";
   style.background_color.r = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_style_init(&style));
   style.text_style.utf8_family = "Sans";
   style.disabled_text_color.r = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_style_init(&style));
   style.text_style.utf8_family = "Sans";
   style.disabled_indicator_color.r = -1.0f;
-  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(test_backend_init(&backend_state));
-  CMP_TEST_OK(setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
+  CMP_TEST_OK(
+      setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
   CMP_TEST_OK(m3_tab_row_style_init(&style));
   style.text_style.utf8_family = "Sans";
   items[0].utf8_label = "A";
@@ -745,30 +768,30 @@ static int test_tab_row_internal_helpers(void) {
       m3_tab_row_test_measure_max_text(&row, &width, &height, &baseline));
 
   CMP_TEST_EXPECT(m3_tab_row_test_item_width(NULL, &items[0], &width),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_test_item_width(&row, NULL, &width),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   backend_state.fail_measure = 1;
   CMP_TEST_EXPECT(m3_tab_row_test_item_width(&row, &items[0], &width),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend_state.fail_measure = 0;
   row.style.padding_x = -10.0f;
   row.style.min_width = -100.0f;
   CMP_TEST_EXPECT(m3_tab_row_test_item_width(&row, &items[0], &width),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   row.style.padding_x = style.padding_x;
   row.style.min_width = style.min_width;
 
   CMP_TEST_EXPECT(m3_tab_row_test_measure_content(&row, 99u, &width, &height),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   row.item_count = 0;
   CMP_TEST_OK(m3_tab_row_test_measure_content(&row, M3_TAB_MODE_FIXED, &width,
-                                             &height));
+                                              &height));
   row.item_count = 2;
   backend_state.fail_measure = 1;
   CMP_TEST_EXPECT(m3_tab_row_test_measure_content(&row, M3_TAB_MODE_SCROLLABLE,
-                                                 &width, &height),
-                 CMP_ERR_IO);
+                                                  &width, &height),
+                  CMP_ERR_IO);
   backend_state.fail_measure = 0;
   row.style.padding.left = -100.0f;
   row.item_count = 0;
@@ -779,50 +802,50 @@ static int test_tab_row_internal_helpers(void) {
   row.item_count = 2;
 
   CMP_TEST_EXPECT(m3_tab_row_test_compute_layout(NULL, &content_width,
-                                                &tab_width, &tab_height,
-                                                &layout_mode),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                 &tab_width, &tab_height,
+                                                 &layout_mode),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, NULL, &tab_width,
-                                                &tab_height, &layout_mode),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                 &tab_height, &layout_mode),
+                  CMP_ERR_INVALID_ARGUMENT);
   row.style.mode = 99u;
   CMP_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
-                                                &tab_width, &tab_height,
-                                                &layout_mode),
-                 CMP_ERR_RANGE);
+                                                 &tab_width, &tab_height,
+                                                 &layout_mode),
+                  CMP_ERR_RANGE);
   row.style.mode = M3_TAB_MODE_FIXED;
   row.bounds.width = -1.0f;
   CMP_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
-                                                &tab_width, &tab_height,
-                                                &layout_mode),
-                 CMP_ERR_RANGE);
+                                                 &tab_width, &tab_height,
+                                                 &layout_mode),
+                  CMP_ERR_RANGE);
   row.bounds.width = 100.0f;
   row.bounds.height = 50.0f;
 
   row.style.padding.left = 60.0f;
   row.style.padding.right = 60.0f;
   CMP_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
-                                                &tab_width, &tab_height,
-                                                &layout_mode),
-                 CMP_ERR_RANGE);
+                                                 &tab_width, &tab_height,
+                                                 &layout_mode),
+                  CMP_ERR_RANGE);
   row.style.padding.left = style.padding.left;
   row.style.padding.right = style.padding.right;
 
   CMP_TEST_OK(m3_tab_row_test_set_fail_point_error_after(1u));
   CMP_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
-                                                &tab_width, &tab_height,
-                                                &layout_mode),
-                 CMP_ERR_IO);
+                                                 &tab_width, &tab_height,
+                                                 &layout_mode),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_tab_row_test_set_fail_point_error_after(2u));
   CMP_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
-                                                &tab_width, &tab_height,
-                                                &layout_mode),
-                 CMP_ERR_IO);
+                                                 &tab_width, &tab_height,
+                                                 &layout_mode),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_tab_row_test_set_fail_point_error_after(3u));
   CMP_TEST_EXPECT(m3_tab_row_test_compute_layout(&row, &content_width,
-                                                &tab_width, &tab_height,
-                                                &layout_mode),
-                 CMP_ERR_IO);
+                                                 &tab_width, &tab_height,
+                                                 &layout_mode),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_tab_row_test_set_fail_point_error_after(0u));
 
   CMP_TEST_EXPECT(
@@ -836,181 +859,180 @@ static int test_tab_row_internal_helpers(void) {
   CMP_TEST_OK(
       m3_tab_row_test_clamp_scroll(&row, M3_TAB_MODE_FIXED, 10.0f, 5.0f));
 
-  CMP_TEST_EXPECT(m3_tab_row_test_indicator_target(NULL, M3_TAB_MODE_FIXED,
-                                                  10.0f, 0.0f, 10.0f, 0.0f,
-                                                  0.0f, 10.0f, &width, &height),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_tab_row_test_indicator_target(&row, 99u, 10.0f, 0.0f, 10.0f,
-                                                  0.0f, 0.0f, 10.0f, &width,
-                                                  &height),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_indicator_target(
+                      NULL, M3_TAB_MODE_FIXED, 10.0f, 0.0f, 10.0f, 0.0f, 0.0f,
+                      10.0f, &width, &height),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_tab_row_test_indicator_target(&row, 99u, 10.0f, 0.0f,
+                                                   10.0f, 0.0f, 0.0f, 10.0f,
+                                                   &width, &height),
+                  CMP_ERR_RANGE);
   row.selected_index = 1;
   row.item_count = 2;
   backend_state.fail_measure = 1;
-  CMP_TEST_EXPECT(m3_tab_row_test_indicator_target(&row, M3_TAB_MODE_SCROLLABLE,
-                                                  10.0f, 0.0f, 20.0f, 0.0f,
-                                                  0.0f, 10.0f, &width, &height),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(m3_tab_row_test_indicator_target(
+                      &row, M3_TAB_MODE_SCROLLABLE, 10.0f, 0.0f, 20.0f, 0.0f,
+                      0.0f, 10.0f, &width, &height),
+                  CMP_ERR_IO);
   backend_state.fail_measure = 0;
-  CMP_TEST_EXPECT(m3_tab_row_test_indicator_target(&row, M3_TAB_MODE_FIXED,
-                                                  -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-                                                  10.0f, &width, &height),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_tab_row_test_indicator_target(
+                      &row, M3_TAB_MODE_FIXED, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                      10.0f, &width, &height),
+                  CMP_ERR_RANGE);
   row.selected_index = 0;
   row.item_count = 1;
   backend_state.fail_measure = 1;
-  CMP_TEST_EXPECT(m3_tab_row_test_indicator_target(&row, M3_TAB_MODE_SCROLLABLE,
-                                                  10.0f, 0.0f, 20.0f, 0.0f,
-                                                  0.0f, 10.0f, &width, &height),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(m3_tab_row_test_indicator_target(
+                      &row, M3_TAB_MODE_SCROLLABLE, 10.0f, 0.0f, 20.0f, 0.0f,
+                      0.0f, 10.0f, &width, &height),
+                  CMP_ERR_IO);
   backend_state.fail_measure = 0;
   row.selected_index = 1;
   row.item_count = 2;
 
   CMP_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
-                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
-                                                (CMPBool)2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                 0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                 (CMPBool)2),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, 99u, 10.0f, 0.0f, 10.0f,
-                                                0.0f, 0.0f, 10.0f, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                                                 0.0f, 0.0f, 10.0f, CMP_FALSE),
+                  CMP_ERR_RANGE);
 
   row.style.indicator_anim_duration = -1.0f;
   CMP_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
-                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
-                                                CMP_TRUE),
-                 CMP_ERR_RANGE);
+                                                 0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                 CMP_TRUE),
+                  CMP_ERR_RANGE);
   row.style.indicator_anim_duration = 0.2f;
   row.style.indicator_anim_easing = 99u;
   CMP_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
-                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
-                                                CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                 0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                 CMP_TRUE),
+                  CMP_ERR_INVALID_ARGUMENT);
   row.style.indicator_anim_easing = M3_TAB_DEFAULT_INDICATOR_EASING;
 
   CMP_TEST_OK(
       m3_tab_row_test_set_fail_point(M3_TAB_ROW_TEST_FAIL_INDICATOR_START));
   CMP_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
-                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
-                                                CMP_TRUE),
-                 CMP_ERR_IO);
+                                                 0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                 CMP_TRUE),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_OK(m3_tab_row_test_set_start_fail_after(1u));
   CMP_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
-                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
-                                                CMP_FALSE),
-                 CMP_ERR_IO);
+                                                 0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                 CMP_FALSE),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_tab_row_test_set_start_fail_after(0u));
 
   CMP_TEST_OK(m3_tab_row_test_set_start_fail_after(1u));
   CMP_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
-                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
-                                                CMP_TRUE),
-                 CMP_ERR_IO);
+                                                 0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                 CMP_TRUE),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_tab_row_test_set_start_fail_after(2u));
   CMP_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
-                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
-                                                CMP_FALSE),
-                 CMP_ERR_IO);
+                                                 0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                 CMP_FALSE),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_tab_row_test_set_start_fail_after(2u));
   CMP_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
-                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
-                                                CMP_TRUE),
-                 CMP_ERR_IO);
+                                                 0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                 CMP_TRUE),
+                  CMP_ERR_IO);
 
   CMP_TEST_OK(m3_tab_row_test_set_value_fail_after(1u));
   CMP_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
-                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
-                                                CMP_FALSE),
-                 CMP_ERR_IO);
+                                                 0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                 CMP_FALSE),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_tab_row_test_set_value_fail_after(2u));
   CMP_TEST_EXPECT(m3_tab_row_test_sync_indicator(&row, M3_TAB_MODE_FIXED, 10.0f,
-                                                0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
-                                                CMP_FALSE),
-                 CMP_ERR_IO);
+                                                 0.0f, 10.0f, 0.0f, 0.0f, 10.0f,
+                                                 CMP_FALSE),
+                  CMP_ERR_IO);
 
   CMP_TEST_OK(m3_tab_row_test_set_fail_point_error_after(1u));
   CMP_TEST_EXPECT(m3_tab_row_test_item_rect(&row, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
-                                           10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 0u,
-                                           &rect),
-                 CMP_ERR_IO);
+                                            10.0f, 10.0f, 0.0f, 10.0f, 10.0f,
+                                            0u, &rect),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_tab_row_test_set_fail_point_error_after(0u));
 
   CMP_TEST_OK(
       m3_tab_row_test_set_fail_point(M3_TAB_ROW_TEST_FAIL_ITEM_RECT_NEGATIVE));
   CMP_TEST_EXPECT(m3_tab_row_test_item_rect(&row, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
-                                           10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 0u,
-                                           &rect),
-                 CMP_ERR_RANGE);
+                                            10.0f, 10.0f, 0.0f, 10.0f, 10.0f,
+                                            0u, &rect),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_EXPECT(m3_tab_row_test_item_rect(NULL, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
-                                           10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 0u,
-                                           &rect),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                            10.0f, 10.0f, 0.0f, 10.0f, 10.0f,
+                                            0u, &rect),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_test_item_rect(&row, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
-                                           10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 5u,
-                                           &rect),
-                 CMP_ERR_RANGE);
+                                            10.0f, 10.0f, 0.0f, 10.0f, 10.0f,
+                                            5u, &rect),
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_tab_row_test_item_rect(&row, 99u, 0.0f, 0.0f, 10.0f, 10.0f,
-                                           0.0f, 10.0f, 10.0f, 0u, &rect),
-                 CMP_ERR_RANGE);
-  CMP_TEST_OK(m3_tab_row_test_item_rect(&row, M3_TAB_MODE_SCROLLABLE, 0.0f, 0.0f,
-                                       0.0f, 10.0f, 5.0f, 200.0f, 200.0f, 1u,
-                                       &rect));
+                                            0.0f, 10.0f, 10.0f, 0u, &rect),
+                  CMP_ERR_RANGE);
+  CMP_TEST_OK(m3_tab_row_test_item_rect(&row, M3_TAB_MODE_SCROLLABLE, 0.0f,
+                                        0.0f, 0.0f, 10.0f, 5.0f, 200.0f, 200.0f,
+                                        1u, &rect));
 
   index = M3_TAB_INVALID_INDEX;
   CMP_TEST_EXPECT(m3_tab_row_test_hit_test(NULL, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
-                                          10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 0,
-                                          0, &index),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                           10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 0,
+                                           0, &index),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_test_hit_test(&row, 99u, 0.0f, 0.0f, 10.0f, 10.0f,
-                                          0.0f, 10.0f, 10.0f, 0, 0, &index),
-                 CMP_ERR_RANGE);
+                                           0.0f, 10.0f, 10.0f, 0, 0, &index),
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_tab_row_test_hit_test(&row, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
-                                          0.0f, 10.0f, 0.0f, 0.0f, 10.0f, 0, 0,
-                                          &index),
-                 CMP_ERR_RANGE);
+                                           0.0f, 10.0f, 0.0f, 0.0f, 10.0f, 0, 0,
+                                           &index),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_set_fail_point(
       M3_TAB_ROW_TEST_FAIL_HIT_TEST_POS_NEGATIVE));
-  CMP_TEST_OK(m3_tab_row_test_hit_test(&row, M3_TAB_MODE_FIXED, 0.0f, 0.0f, 10.0f,
-                                      10.0f, 0.0f, 20.0f, 10.0f, 1, 1, &index));
+  CMP_TEST_OK(m3_tab_row_test_hit_test(&row, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
+                                       10.0f, 10.0f, 0.0f, 20.0f, 10.0f, 1, 1,
+                                       &index));
   CMP_TEST_ASSERT(index == M3_TAB_INVALID_INDEX);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
   CMP_TEST_OK(m3_tab_row_test_item_width(&row, &items[0], &width));
   index = M3_TAB_INVALID_INDEX;
   CMP_TEST_OK(m3_tab_row_test_hit_test(&row, M3_TAB_MODE_SCROLLABLE, 0.0f, 0.0f,
-                                      0.0f, 10.0f, 5.0f, 200.0f, 200.0f,
-                                      (cmp_i32)(width - 1.0f), 5, &index));
+                                       0.0f, 10.0f, 5.0f, 200.0f, 200.0f,
+                                       (cmp_i32)(width - 1.0f), 5, &index));
   CMP_TEST_ASSERT(index == 0u);
   index = M3_TAB_INVALID_INDEX;
   CMP_TEST_OK(m3_tab_row_test_hit_test(&row, M3_TAB_MODE_SCROLLABLE, 0.0f, 0.0f,
-                                      0.0f, 10.0f, 5.0f, 200.0f, 200.0f,
-                                      (cmp_i32)(width + 2.0f), 5, &index));
+                                       0.0f, 10.0f, 5.0f, 200.0f, 200.0f,
+                                       (cmp_i32)(width + 2.0f), 5, &index));
   CMP_TEST_ASSERT(index == M3_TAB_INVALID_INDEX);
-  content_width =
-      width * (CMPScalar)row.item_count + row.style.spacing *
-                                             (CMPScalar)(row.item_count - 1u);
+  content_width = width * (CMPScalar)row.item_count +
+                  row.style.spacing * (CMPScalar)(row.item_count - 1u);
   index = M3_TAB_INVALID_INDEX;
-  CMP_TEST_OK(m3_tab_row_test_hit_test(&row, M3_TAB_MODE_SCROLLABLE, 0.0f, 0.0f,
-                                      0.0f, 10.0f, row.style.spacing,
-                                      content_width, 200.0f,
-                                      (cmp_i32)(width + row.style.spacing + 1.0f),
-                                      5, &index));
+  CMP_TEST_OK(m3_tab_row_test_hit_test(
+      &row, M3_TAB_MODE_SCROLLABLE, 0.0f, 0.0f, 0.0f, 10.0f, row.style.spacing,
+      content_width, 200.0f, (cmp_i32)(width + row.style.spacing + 1.0f), 5,
+      &index));
   CMP_TEST_ASSERT(index == 1u);
   backend_state.fail_measure = 1;
   CMP_TEST_EXPECT(m3_tab_row_test_hit_test(&row, M3_TAB_MODE_SCROLLABLE, 0.0f,
-                                          0.0f, 0.0f, 10.0f, 5.0f, 200.0f,
-                                          200.0f, 1, 5, &index),
-                 CMP_ERR_IO);
+                                           0.0f, 0.0f, 10.0f, 5.0f, 200.0f,
+                                           200.0f, 1, 5, &index),
+                  CMP_ERR_IO);
   backend_state.fail_measure = 0;
 
   CMP_TEST_OK(m3_tab_row_test_set_fail_point_error_after(1u));
   CMP_TEST_EXPECT(m3_tab_row_test_hit_test(&row, M3_TAB_MODE_FIXED, 0.0f, 0.0f,
-                                          10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 0,
-                                          0, &index),
-                 CMP_ERR_IO);
+                                           10.0f, 10.0f, 0.0f, 10.0f, 10.0f, 0,
+                                           0, &index),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_tab_row_test_set_fail_point_error_after(0u));
 
   {
@@ -1049,49 +1071,50 @@ static int test_segmented_internal_helpers(void) {
   CMPBool selected;
 
   CMP_TEST_EXPECT(m3_segmented_test_color_should_fail_null(),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_test_fail_point_match_null(),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_segmented_test_color_set(&color, 0.0f, -0.1f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_segmented_test_color_set(&color, 0.0f, 0.0f, -0.1f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_segmented_test_color_set(&color, 0.0f, 0.0f, 0.0f, -0.1f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_segmented_test_force_color_error(CMP_TRUE));
   CMP_TEST_EXPECT(m3_segmented_test_color_set(&color, 0.0f, 0.0f, 0.0f, 1.0f),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
 
   color.r = 0.0f;
   color.g = 2.0f;
   color.b = 0.0f;
   color.a = 1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_color_with_alpha(&color, 0.5f, &color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   color.g = 0.0f;
   CMP_TEST_OK(m3_segmented_test_force_color_error(CMP_TRUE));
   CMP_TEST_EXPECT(m3_segmented_test_color_with_alpha(&color, 0.5f, &color),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
 
   CMP_TEST_OK(m3_segmented_style_init(&style));
   style.text_style.utf8_family = "Sans";
   style.background_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_segmented_style_init(&style));
   style.text_style.utf8_family = "Sans";
   style.outline_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_segmented_style_init(&style));
   style.text_style.utf8_family = "Sans";
   style.disabled_text_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(test_backend_init(&backend_state));
-  CMP_TEST_OK(setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
+  CMP_TEST_OK(
+      setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
   CMP_TEST_OK(m3_segmented_style_init(&style));
   style.text_style.utf8_family = "Sans";
   items[0].utf8_label = "One";
@@ -1099,7 +1122,7 @@ static int test_segmented_internal_helpers(void) {
   items[1].utf8_label = NULL;
   items[1].utf8_len = 0;
   CMP_TEST_OK(m3_segmented_buttons_init(&buttons, &backend, &style, items, 2,
-                                       M3_SEGMENTED_MODE_SINGLE, 0, NULL));
+                                        M3_SEGMENTED_MODE_SINGLE, 0, NULL));
 
   CMP_TEST_EXPECT(
       m3_segmented_test_measure_max_text(NULL, &width, &height, &baseline),
@@ -1118,115 +1141,116 @@ static int test_segmented_internal_helpers(void) {
       m3_segmented_test_measure_max_text(&buttons, &width, &height, &baseline));
 
   CMP_TEST_EXPECT(m3_segmented_test_measure_content(NULL, &width, &height),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   buttons.item_count = 0;
   CMP_TEST_OK(m3_segmented_test_measure_content(&buttons, &width, &height));
   buttons.item_count = 2;
   buttons.style.padding.left = -100.0f;
   buttons.item_count = 0;
   CMP_TEST_EXPECT(m3_segmented_test_measure_content(&buttons, &width, &height),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   buttons.style.padding.left = style.padding.left;
   buttons.item_count = 2;
 
   CMP_TEST_EXPECT(m3_segmented_test_compute_layout(NULL, &content_width,
-                                                  &segment_width,
-                                                  &segment_height, &spacing),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_segmented_test_compute_layout(
-                     &buttons, NULL, &segment_width, &segment_height, &spacing),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                   &segment_width,
+                                                   &segment_height, &spacing),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, NULL,
+                                                   &segment_width,
+                                                   &segment_height, &spacing),
+                  CMP_ERR_INVALID_ARGUMENT);
   buttons.bounds.width = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, &content_width,
-                                                  &segment_width,
-                                                  &segment_height, &spacing),
-                 CMP_ERR_RANGE);
+                                                   &segment_width,
+                                                   &segment_height, &spacing),
+                  CMP_ERR_RANGE);
   buttons.bounds.width = 100.0f;
   buttons.bounds.height = 40.0f;
   buttons.style.padding.left = 60.0f;
   buttons.style.padding.right = 60.0f;
   CMP_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, &content_width,
-                                                  &segment_width,
-                                                  &segment_height, &spacing),
-                 CMP_ERR_RANGE);
+                                                   &segment_width,
+                                                   &segment_height, &spacing),
+                  CMP_ERR_RANGE);
   buttons.style.padding.left = style.padding.left;
   buttons.style.padding.right = style.padding.right;
   {
     CMPScalar height_backup;
 
     height_backup = buttons.bounds.height;
-    buttons.bounds.height = buttons.style.padding.top + buttons.style.padding.bottom;
+    buttons.bounds.height =
+        buttons.style.padding.top + buttons.style.padding.bottom;
     CMP_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, &content_width,
-                                                    &segment_width,
-                                                    &segment_height, &spacing),
-                   CMP_ERR_RANGE);
+                                                     &segment_width,
+                                                     &segment_height, &spacing),
+                    CMP_ERR_RANGE);
     buttons.bounds.height = height_backup;
   }
   {
     CMPScalar height_backup;
 
     height_backup = buttons.bounds.height;
-    buttons.bounds.height = buttons.style.padding.top +
-                            buttons.style.padding.bottom + 1.0f;
-    CMP_TEST_OK(m3_segmented_test_compute_layout(&buttons, &content_width,
-                                                &segment_width, &segment_height,
-                                                &spacing));
+    buttons.bounds.height =
+        buttons.style.padding.top + buttons.style.padding.bottom + 1.0f;
+    CMP_TEST_OK(m3_segmented_test_compute_layout(
+        &buttons, &content_width, &segment_width, &segment_height, &spacing));
     buttons.bounds.height = height_backup;
   }
 
   CMP_TEST_OK(m3_segmented_test_set_fail_point_error_after(1u));
   CMP_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, &content_width,
-                                                  &segment_width,
-                                                  &segment_height, &spacing),
-                 CMP_ERR_IO);
+                                                   &segment_width,
+                                                   &segment_height, &spacing),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_segmented_test_set_fail_point_error_after(2u));
   CMP_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, &content_width,
-                                                  &segment_width,
-                                                  &segment_height, &spacing),
-                 CMP_ERR_IO);
+                                                   &segment_width,
+                                                   &segment_height, &spacing),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_segmented_test_set_fail_point_error_after(3u));
   CMP_TEST_EXPECT(m3_segmented_test_compute_layout(&buttons, &content_width,
-                                                  &segment_width,
-                                                  &segment_height, &spacing),
-                 CMP_ERR_IO);
+                                                   &segment_width,
+                                                   &segment_height, &spacing),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_segmented_test_set_fail_point_error_after(0u));
 
   index = 0;
   CMP_TEST_EXPECT(m3_segmented_test_hit_test(NULL, 0.0f, 0.0f, 10.0f, 10.0f,
-                                            0.0f, 10.0f, 0, 0, &index),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                             0.0f, 10.0f, 0, 0, &index),
+                  CMP_ERR_INVALID_ARGUMENT);
   saved_count = buttons.item_count;
   buttons.item_count = 0;
   index = 1u;
-  CMP_TEST_OK(m3_segmented_test_hit_test(&buttons, 0.0f, 0.0f, 10.0f, 10.0f, 0.0f,
-                                        10.0f, 0, 0, &index));
+  CMP_TEST_OK(m3_segmented_test_hit_test(&buttons, 0.0f, 0.0f, 10.0f, 10.0f,
+                                         0.0f, 10.0f, 0, 0, &index));
   CMP_TEST_ASSERT(index == M3_SEGMENTED_INVALID_INDEX);
   buttons.item_count = saved_count;
   CMP_TEST_EXPECT(m3_segmented_test_hit_test(&buttons, 0.0f, 0.0f, 0.0f, 10.0f,
-                                            0.0f, 10.0f, 0, 0, &index),
-                 CMP_ERR_RANGE);
+                                             0.0f, 10.0f, 0, 0, &index),
+                  CMP_ERR_RANGE);
   index = M3_SEGMENTED_INVALID_INDEX;
-  CMP_TEST_OK(m3_segmented_test_hit_test(&buttons, 0.0f, 0.0f, 10.0f, 10.0f, 4.0f,
-                                        24.0f, 11, 5, &index));
+  CMP_TEST_OK(m3_segmented_test_hit_test(&buttons, 0.0f, 0.0f, 10.0f, 10.0f,
+                                         4.0f, 24.0f, 11, 5, &index));
   CMP_TEST_ASSERT(index == M3_SEGMENTED_INVALID_INDEX);
 
   CMP_TEST_OK(m3_segmented_test_set_fail_point_error_after(1u));
   CMP_TEST_EXPECT(m3_segmented_test_hit_test(&buttons, 0.0f, 0.0f, 10.0f, 10.0f,
-                                            0.0f, 10.0f, 0, 0, &index),
-                 CMP_ERR_IO);
+                                             0.0f, 10.0f, 0, 0, &index),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_segmented_test_set_fail_point_error_after(0u));
 
   CMP_TEST_EXPECT(m3_segmented_test_is_selected(NULL, 0u, &selected),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   buttons.mode = M3_SEGMENTED_MODE_MULTI;
   CMP_TEST_EXPECT(m3_segmented_test_is_selected(&buttons, 0u, &selected),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   buttons.mode = M3_SEGMENTED_MODE_SINGLE;
   buttons.selected_index = M3_SEGMENTED_INVALID_INDEX;
   CMP_TEST_OK(m3_segmented_test_is_selected(&buttons, 0u, &selected));
   CMP_TEST_ASSERT(selected == CMP_FALSE);
   CMP_TEST_EXPECT(m3_segmented_test_is_selected(&buttons, 5u, &selected),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(buttons.widget.vtable->destroy(buttons.widget.ctx));
   return CMP_OK;
@@ -1248,7 +1272,8 @@ static int test_tab_row_init_and_setters(void) {
   CMPScalar scroll;
 
   CMP_TEST_OK(test_backend_init(&backend_state));
-  CMP_TEST_OK(setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
+  CMP_TEST_OK(
+      setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
 
   CMP_TEST_OK(m3_tab_row_style_init(&style));
   style.text_style.utf8_family = "Sans";
@@ -1262,71 +1287,74 @@ static int test_tab_row_init_and_setters(void) {
   bad_items[0].utf8_len = 3;
 
   CMP_TEST_EXPECT(m3_tab_row_init(NULL, &backend, &style, items, 2, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_init(&row, NULL, &style, items, 2, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_init(&row, &backend, NULL, items, 2, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_backend.ctx = NULL;
   bad_backend.vtable = NULL;
   CMP_TEST_EXPECT(m3_tab_row_init(&row, &bad_backend, &style, items, 2, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_backend.ctx = &backend_state;
   bad_backend.vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(m3_tab_row_init(&row, &bad_backend, &style, items, 2, 0),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   bad_backend.vtable = &g_test_text_vtable_no_destroy;
   CMP_TEST_EXPECT(m3_tab_row_init(&row, &bad_backend, &style, items, 2, 0),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   bad_backend.vtable = &g_test_text_vtable_no_create;
   CMP_TEST_EXPECT(m3_tab_row_init(&row, &bad_backend, &style, items, 2, 0),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   bad_style = style;
   bad_style.mode = 99u;
   CMP_TEST_EXPECT(m3_tab_row_init(&row, &backend, &bad_style, items, 2, 0),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_tab_row_init(&row, &backend, &style, bad_items, 1, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_init(&row, &backend, &style, items, 2, 5),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   backend_state.fail_create = 1;
   CMP_TEST_EXPECT(m3_tab_row_init(&row3, &backend, &style, items, 2, 0),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend_state.fail_create = 0;
 
   CMP_TEST_OK(m3_tab_row_test_set_fail_point(M3_TAB_ROW_TEST_FAIL_ANIM_INIT));
   CMP_TEST_EXPECT(m3_tab_row_init(&row2, &backend, &style, items, 2, 0),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_OK(m3_tab_row_test_set_start_fail_after(1u));
   CMP_TEST_EXPECT(m3_tab_row_init(&row2, &backend, &style, items, 2, 0),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_tab_row_test_set_start_fail_after(0u));
 
   CMP_TEST_OK(m3_tab_row_init(&row, &backend, &style, items, 2, 0));
 
-  CMP_TEST_EXPECT(m3_tab_row_set_items(NULL, items, 2), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_tab_row_set_items(NULL, items, 2),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_set_style(NULL, &style), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_set_style(&row, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_set_selected(NULL, 0), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_get_selected(NULL, &selected),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_tab_row_get_selected(&row, NULL), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_tab_row_get_selected(&row, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_set_scroll(NULL, 0.0f), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_tab_row_get_scroll(NULL, &scroll), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_tab_row_get_scroll(NULL, &scroll),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_get_scroll(&row, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_set_on_select(NULL, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_step(NULL, 0.0f, &changed),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tab_row_step(&row, -1.0f, &changed), CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_tab_row_step(&row, 0.0f, NULL), CMP_ERR_INVALID_ARGUMENT);
 
@@ -1345,7 +1373,7 @@ static int test_tab_row_init_and_setters(void) {
   CMP_TEST_ASSERT(selected == 1);
 
   CMP_TEST_EXPECT(m3_tab_row_set_items(&row, bad_items, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_tab_row_set_items(&row, items, 2));
   row.selected_index = 1;
   row.pressed_index = 1;
@@ -1357,7 +1385,7 @@ static int test_tab_row_init_and_setters(void) {
   bad_style = style;
   bad_style.text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_tab_row_set_style(&row, &bad_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_tab_row_set_scroll(&row, -1.0f), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_set_scroll(&row, 20.0f));
@@ -1379,7 +1407,7 @@ static int test_tab_row_init_and_setters(void) {
   CMP_TEST_OK(m3_tab_row_init(&row2, &backend, &style, items, 2, 0));
   row2.text_backend.vtable = &g_test_text_vtable_no_destroy;
   CMP_TEST_EXPECT(row2.widget.vtable->destroy(row2.widget.ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   return CMP_OK;
 }
@@ -1410,9 +1438,10 @@ static int test_tab_row_widget_fixed(void) {
   cmp_usize saved_len;
 
   CMP_TEST_OK(test_backend_init(&backend_state));
-  CMP_TEST_OK(setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
+  CMP_TEST_OK(
+      setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
   CMP_TEST_OK(setup_gfx(&backend_state, &gfx, &paint_ctx, &g_test_gfx_vtable,
-                       &g_test_text_vtable));
+                        &g_test_text_vtable));
 
   CMP_TEST_OK(m3_tab_row_style_init(&style));
   style.text_style.utf8_family = "Sans";
@@ -1443,24 +1472,24 @@ static int test_tab_row_widget_fixed(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(row.widget.vtable->measure(row.widget.ctx, width_spec,
-                                            height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                             height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = 99u;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(row.widget.vtable->measure(row.widget.ctx, width_spec,
-                                            height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                             height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = -1.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(row.widget.vtable->measure(row.widget.ctx, width_spec,
-                                            height_spec, &size),
-                 CMP_ERR_RANGE);
+                                             height_spec, &size),
+                  CMP_ERR_RANGE);
 
   saved_spacing = row.style.spacing;
   row.style.spacing = -1.0f;
@@ -1469,8 +1498,8 @@ static int test_tab_row_widget_fixed(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(row.widget.vtable->measure(row.widget.ctx, width_spec,
-                                            height_spec, &size),
-                 CMP_ERR_RANGE);
+                                             height_spec, &size),
+                  CMP_ERR_RANGE);
   row.style.spacing = saved_spacing;
 
   saved_items = row.items;
@@ -1482,8 +1511,8 @@ static int test_tab_row_widget_fixed(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(row.widget.vtable->measure(row.widget.ctx, width_spec,
-                                            height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                             height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
   row.items = saved_items;
   row.item_count = saved_count;
 
@@ -1493,16 +1522,16 @@ static int test_tab_row_widget_fixed(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(row.widget.vtable->measure(row.widget.ctx, width_spec,
-                                            height_spec, &size),
-                 CMP_ERR_UNSUPPORTED);
+                                             height_spec, &size),
+                  CMP_ERR_UNSUPPORTED);
   row.text_backend.vtable = &g_test_text_vtable;
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
-  CMP_TEST_OK(row.widget.vtable->measure(row.widget.ctx, width_spec, height_spec,
-                                        &size));
+  CMP_TEST_OK(row.widget.vtable->measure(row.widget.ctx, width_spec,
+                                         height_spec, &size));
   CMP_TEST_ASSERT(size.width > 0.0f);
   CMP_TEST_ASSERT(size.height > 0.0f);
 
@@ -1510,16 +1539,16 @@ static int test_tab_row_widget_fixed(void) {
   width_spec.size = 320.0f;
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 100.0f;
-  CMP_TEST_OK(row.widget.vtable->measure(row.widget.ctx, width_spec, height_spec,
-                                        &size));
+  CMP_TEST_OK(row.widget.vtable->measure(row.widget.ctx, width_spec,
+                                         height_spec, &size));
   CMP_TEST_ASSERT(size.width == 320.0f);
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = 200.0f;
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 40.0f;
-  CMP_TEST_OK(row.widget.vtable->measure(row.widget.ctx, width_spec, height_spec,
-                                        &size));
+  CMP_TEST_OK(row.widget.vtable->measure(row.widget.ctx, width_spec,
+                                         height_spec, &size));
   CMP_TEST_ASSERT(size.width <= 200.0f);
   CMP_TEST_ASSERT(size.height == 40.0f);
 
@@ -1528,22 +1557,22 @@ static int test_tab_row_widget_fixed(void) {
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(row.widget.vtable->layout(row.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bounds.width = 10.0f;
   bounds.height = -1.0f;
   CMP_TEST_EXPECT(row.widget.vtable->layout(row.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bounds.width = 10.0f;
   bounds.height = 0.0f;
   CMP_TEST_EXPECT(row.widget.vtable->layout(row.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   saved_spacing = row.style.spacing;
   row.style.spacing = 1000.0f;
   bounds.width = 10.0f;
   bounds.height = 40.0f;
   CMP_TEST_EXPECT(row.widget.vtable->layout(row.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   row.style.spacing = saved_spacing;
 
   saved_scroll = row.scroll_offset;
@@ -1551,19 +1580,19 @@ static int test_tab_row_widget_fixed(void) {
   bounds.width = 100.0f;
   bounds.height = 40.0f;
   CMP_TEST_EXPECT(row.widget.vtable->layout(row.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   row.scroll_offset = saved_scroll;
 
   bounds.width = 320.0f;
   bounds.height = 60.0f;
   CMP_TEST_EXPECT(row.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(row.widget.vtable->layout(row.widget.ctx, bounds));
 
   CMP_TEST_EXPECT(row.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(row.widget.vtable->get_semantics(row.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(row.widget.vtable->get_semantics(row.widget.ctx, &semantics));
   CMP_TEST_ASSERT(semantics.role == CMP_SEMANTIC_NONE);
   row.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
@@ -1572,20 +1601,20 @@ static int test_tab_row_widget_fixed(void) {
   row.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
 
   CMP_TEST_EXPECT(row.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   saved_bounds = row.bounds;
   row.bounds.width = -1.0f;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   row.bounds = saved_bounds;
 
   saved_spacing = row.style.spacing;
   row.style.spacing = -1.0f;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   row.style.spacing = saved_spacing;
 
   saved_items = row.items;
@@ -1593,14 +1622,14 @@ static int test_tab_row_widget_fixed(void) {
   row.items = NULL;
   row.item_count = 1;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   row.items = saved_items;
   row.item_count = saved_count;
 
   saved_scroll = row.scroll_offset;
   row.scroll_offset = -1.0f;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   row.scroll_offset = saved_scroll;
 
   CMP_TEST_OK(row.widget.vtable->paint(row.widget.ctx, &paint_ctx));
@@ -1609,32 +1638,32 @@ static int test_tab_row_widget_fixed(void) {
 
   backend_state.fail_draw_rect = 1;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend_state.fail_draw_rect = 0;
 
   backend_state.fail_measure = 1;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend_state.fail_measure = 0;
 
   backend_state.fail_draw_text = 1;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend_state.fail_draw_text = 0;
 
   paint_ctx.gfx = NULL;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = &gfx;
 
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_gfx_vtable;
 
   gfx.text_vtable = NULL;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable;
 
   {
@@ -1659,7 +1688,7 @@ static int test_tab_row_widget_fixed(void) {
     items[2].utf8_len = 0;
     row.text_backend.vtable = NULL;
     CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
     row.text_backend.vtable = &g_test_text_vtable;
     items[0].utf8_label = saved_label0;
     items[0].utf8_len = saved_len0;
@@ -1684,17 +1713,17 @@ static int test_tab_row_widget_fixed(void) {
 
   gfx.vtable = &g_test_gfx_vtable_no_rect;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_gfx_vtable;
 
   gfx.text_vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable;
 
   row.text_backend.vtable = &g_test_text_vtable_no_measure;
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   row.text_backend.vtable = &g_test_text_vtable;
 
   saved_label = items[1].utf8_label;
@@ -1708,28 +1737,28 @@ static int test_tab_row_widget_fixed(void) {
   CMP_TEST_OK(m3_tab_row_test_set_fail_point(
       M3_TAB_ROW_TEST_FAIL_INDICATOR_THICKNESS_NEGATIVE));
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_OK(m3_tab_row_test_set_fail_point(
       M3_TAB_ROW_TEST_FAIL_INDICATOR_RECT_NEGATIVE));
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_OK(
       m3_tab_row_test_set_fail_point(M3_TAB_ROW_TEST_FAIL_ITEM_RECT_NEGATIVE));
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 0, 0));
   CMP_TEST_EXPECT(row.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(row.widget.vtable->event(row.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(row.widget.vtable->event(row.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   row.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(row.widget.vtable->event(row.widget.ctx, &event, &handled));
@@ -1740,7 +1769,7 @@ static int test_tab_row_widget_fixed(void) {
   row.scroll_offset = -1.0f;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 10, 10));
   CMP_TEST_EXPECT(row.widget.vtable->event(row.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   row.scroll_offset = saved_scroll;
 
   select_state.calls = 0;
@@ -1761,7 +1790,7 @@ static int test_tab_row_widget_fixed(void) {
   CMP_TEST_ASSERT(handled == CMP_TRUE);
 
   CMP_TEST_EXPECT(row.widget.vtable->event(row.widget.ctx, &event, &handled),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10));
   CMP_TEST_OK(row.widget.vtable->event(row.widget.ctx, &event, &handled));
@@ -1772,7 +1801,7 @@ static int test_tab_row_widget_fixed(void) {
       M3_TAB_ROW_TEST_FAIL_LAYOUT_SPACING_NEGATIVE));
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 10, 10));
   CMP_TEST_EXPECT(row.widget.vtable->event(row.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 10, 10));
@@ -1827,9 +1856,10 @@ static int test_tab_row_widget_scrollable(void) {
   CMPBool near;
 
   CMP_TEST_OK(test_backend_init(&backend_state));
-  CMP_TEST_OK(setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
+  CMP_TEST_OK(
+      setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
   CMP_TEST_OK(setup_gfx(&backend_state, &gfx, &paint_ctx, &g_test_gfx_vtable,
-                       &g_test_text_vtable));
+                        &g_test_text_vtable));
 
   CMP_TEST_OK(m3_tab_row_style_init(&style));
   style.text_style.utf8_family = "Sans";
@@ -1861,7 +1891,7 @@ static int test_tab_row_widget_scrollable(void) {
   CMP_TEST_OK(row.widget.vtable->layout(row.widget.ctx, bounds));
 
   CMP_TEST_OK(m3_tab_row_test_measure_content(&row, M3_TAB_MODE_SCROLLABLE,
-                                             &content_width, &content_height));
+                                              &content_width, &content_height));
   max_scroll =
       content_width - (bounds.width - style.padding.left - style.padding.right);
   if (max_scroll < 0.0f) {
@@ -1889,7 +1919,7 @@ static int test_tab_row_widget_scrollable(void) {
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_SCROLL, 0, 0));
   event.data.pointer.scroll_x = 10;
   CMP_TEST_EXPECT(row.widget.vtable->event(row.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_KEY_DOWN, 0, 0));
@@ -1899,7 +1929,7 @@ static int test_tab_row_widget_scrollable(void) {
   CMP_TEST_OK(m3_tab_row_test_set_fail_point(
       M3_TAB_ROW_TEST_FAIL_LAYOUT_SPACING_NEGATIVE));
   CMP_TEST_EXPECT(row.widget.vtable->layout(row.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   style.mode = M3_TAB_MODE_FIXED;
@@ -1907,7 +1937,7 @@ static int test_tab_row_widget_scrollable(void) {
   CMP_TEST_OK(m3_tab_row_test_set_fail_point(
       M3_TAB_ROW_TEST_FAIL_LAYOUT_TAB_WIDTH_NEGATIVE));
   CMP_TEST_EXPECT(row.widget.vtable->layout(row.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
   style.mode = M3_TAB_MODE_SCROLLABLE;
   CMP_TEST_OK(m3_tab_row_set_style(&row, &style));
@@ -1915,7 +1945,7 @@ static int test_tab_row_widget_scrollable(void) {
   CMP_TEST_OK(m3_tab_row_test_set_fail_point(
       M3_TAB_ROW_TEST_FAIL_LAYOUT_TAB_HEIGHT_NEGATIVE));
   CMP_TEST_EXPECT(row.widget.vtable->layout(row.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_OK(
@@ -1926,19 +1956,19 @@ static int test_tab_row_widget_scrollable(void) {
   CMP_TEST_OK(m3_tab_row_test_set_fail_point(
       M3_TAB_ROW_TEST_FAIL_INDICATOR_THICKNESS_NEGATIVE));
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_OK(m3_tab_row_test_set_fail_point(
       M3_TAB_ROW_TEST_FAIL_INDICATOR_RECT_NEGATIVE));
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_OK(
       m3_tab_row_test_set_fail_point(M3_TAB_ROW_TEST_FAIL_ITEM_RECT_NEGATIVE));
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tab_row_test_clear_fail_points());
 
   CMP_TEST_OK(m3_tab_row_test_set_fail_point(
@@ -1960,22 +1990,22 @@ static int test_segmented_style_init(void) {
   CMP_TEST_EXPECT(m3_segmented_style_init(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_segmented_style_init(&style));
   CMP_TEST_OK(tabs_near(style.min_width, M3_SEGMENTED_DEFAULT_MIN_WIDTH, 0.001f,
-                       &near));
+                        &near));
   CMP_TEST_ASSERT(near == CMP_TRUE);
   CMP_TEST_OK(tabs_near(style.min_height, M3_SEGMENTED_DEFAULT_MIN_HEIGHT,
-                       0.001f, &near));
+                        0.001f, &near));
   CMP_TEST_ASSERT(near == CMP_TRUE);
   CMP_TEST_OK(tabs_near(style.padding_x, M3_SEGMENTED_DEFAULT_PADDING_X, 0.001f,
-                       &near));
+                        &near));
   CMP_TEST_ASSERT(near == CMP_TRUE);
   CMP_TEST_OK(tabs_near(style.padding_y, M3_SEGMENTED_DEFAULT_PADDING_Y, 0.001f,
-                       &near));
+                        &near));
   CMP_TEST_ASSERT(near == CMP_TRUE);
   CMP_TEST_OK(tabs_near(style.outline_width, M3_SEGMENTED_DEFAULT_OUTLINE_WIDTH,
-                       0.001f, &near));
+                        0.001f, &near));
   CMP_TEST_ASSERT(near == CMP_TRUE);
   CMP_TEST_OK(tabs_near(style.corner_radius, M3_SEGMENTED_DEFAULT_CORNER_RADIUS,
-                       0.001f, &near));
+                        0.001f, &near));
   CMP_TEST_ASSERT(near == CMP_TRUE);
 
   CMP_TEST_OK(
@@ -2010,7 +2040,7 @@ static int test_segmented_validation_helpers(void) {
   CMPScalar height;
 
   CMP_TEST_EXPECT(m3_segmented_test_validate_color(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   color.r = -0.1f;
   color.g = 0.0f;
   color.b = 0.0f;
@@ -2029,19 +2059,19 @@ static int test_segmented_validation_helpers(void) {
   CMP_TEST_OK(m3_segmented_test_validate_color(&color));
 
   CMP_TEST_EXPECT(m3_segmented_test_color_set(NULL, 0.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_test_color_set(&color, -1.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_segmented_test_color_set(&color, 0.0f, 0.0f, 0.0f, 1.0f));
 
   CMP_TEST_EXPECT(m3_segmented_test_color_with_alpha(NULL, 0.5f, &color),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_test_color_with_alpha(&color, -1.0f, &color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_segmented_test_color_with_alpha(&color, 0.5f, &color));
 
   CMP_TEST_EXPECT(m3_segmented_test_validate_edges(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   edges.left = -1.0f;
   edges.top = 0.0f;
   edges.right = 0.0f;
@@ -2054,91 +2084,91 @@ static int test_segmented_validation_helpers(void) {
   CMP_TEST_OK(m3_segmented_test_validate_edges(&edges));
 
   CMP_TEST_EXPECT(m3_segmented_test_validate_text_style(NULL, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_text_style_init(&text_style));
   text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_segmented_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   text_style.utf8_family = "Sans";
   text_style.size_px = 0;
   CMP_TEST_EXPECT(m3_segmented_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.size_px = 12;
   text_style.weight = 50;
   CMP_TEST_EXPECT(m3_segmented_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.weight = 400;
   text_style.italic = 2;
   CMP_TEST_EXPECT(m3_segmented_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   text_style.italic = CMP_FALSE;
   text_style.color.a = 2.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.color.a = 1.0f;
   CMP_TEST_OK(m3_segmented_test_validate_text_style(&text_style, CMP_TRUE));
 
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(NULL, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_segmented_style_init(&style));
   style.text_style.utf8_family = "Sans";
   base_style = style;
   style.spacing = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.min_width = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.min_height = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.padding_x = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.padding_y = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.outline_width = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.corner_radius = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.padding.left = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   style = base_style;
   style.selected_text_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   CMP_TEST_OK(m3_segmented_test_validate_style(&style, CMP_TRUE));
 
   CMP_TEST_EXPECT(m3_segmented_test_validate_items(NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_segmented_test_validate_items(NULL, 0));
   item.utf8_label = NULL;
   item.utf8_len = 1;
   CMP_TEST_EXPECT(m3_segmented_test_validate_items(&item, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   item.utf8_len = 0;
   CMP_TEST_OK(m3_segmented_test_validate_items(&item, 1));
 
   spec.mode = 99u;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_AT_MOST;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_test_validate_measure_spec(spec), CMP_ERR_RANGE);
@@ -2147,7 +2177,7 @@ static int test_segmented_validation_helpers(void) {
   CMP_TEST_OK(m3_segmented_test_validate_measure_spec(spec));
 
   CMP_TEST_EXPECT(m3_segmented_test_validate_rect(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   rect.x = 0.0f;
   rect.y = 0.0f;
   rect.width = -1.0f;
@@ -2160,25 +2190,26 @@ static int test_segmented_validation_helpers(void) {
   CMP_TEST_OK(m3_segmented_test_validate_rect(&rect));
 
   CMP_TEST_EXPECT(m3_segmented_test_validate_backend(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   backend.ctx = NULL;
   backend.vtable = NULL;
   CMP_TEST_EXPECT(m3_segmented_test_validate_backend(&backend),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_segmented_test_validate_mode(99u), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_segmented_test_validate_mode(M3_SEGMENTED_MODE_SINGLE));
 
   CMP_TEST_EXPECT(m3_segmented_test_validate_selected_states(NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   states[0] = (CMPBool)2;
   CMP_TEST_EXPECT(m3_segmented_test_validate_selected_states(states, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   states[0] = CMP_FALSE;
   CMP_TEST_OK(m3_segmented_test_validate_selected_states(states, 1));
 
   CMP_TEST_OK(test_backend_init(&backend_state));
-  CMP_TEST_OK(setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
+  CMP_TEST_OK(
+      setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
   CMP_TEST_OK(m3_segmented_test_validate_backend(&backend));
   CMP_TEST_OK(m3_segmented_style_init(&style));
   style.text_style.utf8_family = "Sans";
@@ -2189,10 +2220,10 @@ static int test_segmented_validation_helpers(void) {
   states[0] = CMP_TRUE;
   states[1] = CMP_FALSE;
   CMP_TEST_OK(m3_segmented_buttons_init(&buttons, &backend, &style, items, 2,
-                                       M3_SEGMENTED_MODE_MULTI,
-                                       M3_SEGMENTED_INVALID_INDEX, states));
+                                        M3_SEGMENTED_MODE_MULTI,
+                                        M3_SEGMENTED_INVALID_INDEX, states));
   CMP_TEST_EXPECT(m3_segmented_test_measure_content(NULL, &width, &height),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_segmented_test_measure_content(&buttons, &width, &height));
   CMP_TEST_OK(buttons.widget.vtable->destroy(buttons.widget.ctx));
 
@@ -2214,7 +2245,8 @@ static int test_segmented_init_and_setters(void) {
   cmp_usize selected;
 
   CMP_TEST_OK(test_backend_init(&backend_state));
-  CMP_TEST_OK(setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
+  CMP_TEST_OK(
+      setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
 
   CMP_TEST_OK(m3_segmented_style_init(&style));
   style.text_style.utf8_family = "Sans";
@@ -2231,89 +2263,91 @@ static int test_segmented_init_and_setters(void) {
   states[1] = CMP_TRUE;
 
   CMP_TEST_EXPECT(m3_segmented_buttons_init(NULL, &backend, &style, items, 2,
-                                           M3_SEGMENTED_MODE_SINGLE, 0, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                            M3_SEGMENTED_MODE_SINGLE, 0, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, NULL, &style, items, 2,
-                                           M3_SEGMENTED_MODE_SINGLE, 0, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                            M3_SEGMENTED_MODE_SINGLE, 0, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, &backend, NULL, items, 2,
-                                           M3_SEGMENTED_MODE_SINGLE, 0, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                            M3_SEGMENTED_MODE_SINGLE, 0, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_backend.ctx = NULL;
   bad_backend.vtable = NULL;
   CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, &bad_backend, &style,
-                                           items, 2, M3_SEGMENTED_MODE_SINGLE,
-                                           0, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                            items, 2, M3_SEGMENTED_MODE_SINGLE,
+                                            0, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_backend.ctx = &backend_state;
   bad_backend.vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, &bad_backend, &style,
-                                           items, 2, M3_SEGMENTED_MODE_SINGLE,
-                                           0, NULL),
-                 CMP_ERR_UNSUPPORTED);
+                                            items, 2, M3_SEGMENTED_MODE_SINGLE,
+                                            0, NULL),
+                  CMP_ERR_UNSUPPORTED);
 
   bad_style = style;
   bad_style.spacing = -1.0f;
   CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, &backend, &bad_style,
-                                           items, 2, M3_SEGMENTED_MODE_SINGLE,
-                                           0, NULL),
-                 CMP_ERR_RANGE);
+                                            items, 2, M3_SEGMENTED_MODE_SINGLE,
+                                            0, NULL),
+                  CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, &backend, &style,
-                                           bad_items, 1,
-                                           M3_SEGMENTED_MODE_SINGLE, 0, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, &backend, &style, items, 2,
-                                           99u, 0, NULL),
-                 CMP_ERR_RANGE);
-  CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, &backend, &style, items, 2,
-                                           M3_SEGMENTED_MODE_SINGLE, 5, NULL),
-                 CMP_ERR_RANGE);
-  CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, &backend, &style, items, 2,
-                                           M3_SEGMENTED_MODE_MULTI,
-                                           M3_SEGMENTED_INVALID_INDEX, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                            bad_items, 1,
+                                            M3_SEGMENTED_MODE_SINGLE, 0, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, &backend, &style, items,
+                                            2, 99u, 0, NULL),
+                  CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, &backend, &style, items,
+                                            2, M3_SEGMENTED_MODE_SINGLE, 5,
+                                            NULL),
+                  CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons, &backend, &style, items,
+                                            2, M3_SEGMENTED_MODE_MULTI,
+                                            M3_SEGMENTED_INVALID_INDEX, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   backend_state.fail_create = 1;
   CMP_TEST_EXPECT(m3_segmented_buttons_init(&buttons3, &backend, &style, items,
-                                           2, M3_SEGMENTED_MODE_SINGLE, 0,
-                                           NULL),
-                 CMP_ERR_IO);
+                                            2, M3_SEGMENTED_MODE_SINGLE, 0,
+                                            NULL),
+                  CMP_ERR_IO);
   backend_state.fail_create = 0;
 
   CMP_TEST_OK(m3_segmented_buttons_init(&buttons, &backend, &style, items, 2,
-                                       M3_SEGMENTED_MODE_SINGLE, 0, NULL));
+                                        M3_SEGMENTED_MODE_SINGLE, 0, NULL));
 
   CMP_TEST_EXPECT(m3_segmented_buttons_set_items(NULL, items, 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_buttons_set_style(NULL, &style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_buttons_set_style(&buttons, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_buttons_set_selected_index(NULL, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_buttons_get_selected_index(NULL, &selected),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_buttons_get_selected_index(&buttons, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_buttons_set_selected_state(NULL, 0, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_buttons_get_selected_state(NULL, 0, &states[0]),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_buttons_get_selected_state(&buttons, 0, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_segmented_buttons_set_on_select(NULL, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_segmented_buttons_get_selected_index(&buttons, &selected));
   CMP_TEST_ASSERT(selected == 0);
   CMP_TEST_OK(m3_segmented_buttons_set_selected_index(&buttons, 1));
   CMP_TEST_EXPECT(m3_segmented_buttons_set_selected_index(&buttons, 5),
-                 CMP_ERR_RANGE);
-  CMP_TEST_EXPECT(m3_segmented_buttons_set_selected_state(&buttons, 0, CMP_TRUE),
-                 CMP_ERR_STATE);
+                  CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      m3_segmented_buttons_set_selected_state(&buttons, 0, CMP_TRUE),
+      CMP_ERR_STATE);
   CMP_TEST_EXPECT(
       m3_segmented_buttons_get_selected_state(&buttons, 0, &states[0]),
       CMP_ERR_STATE);
@@ -2321,7 +2355,7 @@ static int test_segmented_init_and_setters(void) {
   bad_style = style;
   bad_style.text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_segmented_buttons_set_style(&buttons, &bad_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   backend_state.fail_create = 1;
   CMP_TEST_EXPECT(m3_segmented_buttons_set_style(&buttons, &style), CMP_ERR_IO);
@@ -2332,7 +2366,7 @@ static int test_segmented_init_and_setters(void) {
   CMP_TEST_OK(m3_segmented_buttons_set_style(&buttons, &style));
 
   CMP_TEST_EXPECT(m3_segmented_buttons_set_items(&buttons, bad_items, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_segmented_buttons_set_items(&buttons, items, 2));
   buttons.selected_index = 1;
   buttons.pressed_index = 1;
@@ -2344,41 +2378,44 @@ static int test_segmented_init_and_setters(void) {
   CMP_TEST_OK(buttons.widget.vtable->destroy(buttons.widget.ctx));
 
   CMP_TEST_OK(m3_segmented_buttons_init(&buttons2, &backend, &style, items, 2,
-                                       M3_SEGMENTED_MODE_MULTI,
-                                       M3_SEGMENTED_INVALID_INDEX, states));
+                                        M3_SEGMENTED_MODE_MULTI,
+                                        M3_SEGMENTED_INVALID_INDEX, states));
   CMP_TEST_EXPECT(m3_segmented_buttons_set_selected_index(&buttons2, 0),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(m3_segmented_buttons_get_selected_index(&buttons2, &selected),
-                 CMP_ERR_STATE);
-  CMP_TEST_EXPECT(m3_segmented_buttons_set_selected_state(&buttons2, 5, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_STATE);
+  CMP_TEST_EXPECT(
+      m3_segmented_buttons_set_selected_state(&buttons2, 5, CMP_TRUE),
+      CMP_ERR_RANGE);
   CMP_TEST_EXPECT(
       m3_segmented_buttons_set_selected_state(&buttons2, 0, (CMPBool)3),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_segmented_buttons_set_selected_state(&buttons2, 1, CMP_TRUE));
   CMP_TEST_ASSERT(states[1] == CMP_TRUE);
   buttons2.selected_states = NULL;
-  CMP_TEST_EXPECT(m3_segmented_buttons_set_selected_state(&buttons2, 0, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      m3_segmented_buttons_set_selected_state(&buttons2, 0, CMP_TRUE),
+      CMP_ERR_INVALID_ARGUMENT);
   buttons2.selected_states = states;
   states[0] = (CMPBool)2;
   CMP_TEST_EXPECT(
       m3_segmented_buttons_get_selected_state(&buttons2, 0, &states[0]),
       CMP_ERR_INVALID_ARGUMENT);
   states[0] = CMP_TRUE;
-  CMP_TEST_OK(m3_segmented_buttons_get_selected_state(&buttons2, 0, &states[0]));
+  CMP_TEST_OK(
+      m3_segmented_buttons_get_selected_state(&buttons2, 0, &states[0]));
 
   buttons2.selected_states = NULL;
   CMP_TEST_EXPECT(m3_segmented_buttons_set_items(&buttons2, items, 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(buttons2.widget.vtable->destroy(buttons2.widget.ctx));
 
   CMP_TEST_OK(m3_segmented_buttons_init(&buttons3, &backend, &style, items, 2,
-                                       M3_SEGMENTED_MODE_SINGLE, 0, NULL));
+                                        M3_SEGMENTED_MODE_SINGLE, 0, NULL));
   buttons3.text_backend.vtable = &g_test_text_vtable_no_destroy;
   CMP_TEST_EXPECT(buttons3.widget.vtable->destroy(buttons3.widget.ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   return CMP_OK;
 }
@@ -2408,9 +2445,10 @@ static int test_segmented_widget_flow(void) {
   cmp_usize saved_count;
 
   CMP_TEST_OK(test_backend_init(&backend_state));
-  CMP_TEST_OK(setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
+  CMP_TEST_OK(
+      setup_text_backend(&backend_state, &backend, &g_test_text_vtable));
   CMP_TEST_OK(setup_gfx(&backend_state, &gfx, &paint_ctx, &g_test_gfx_vtable,
-                       &g_test_text_vtable));
+                        &g_test_text_vtable));
 
   CMP_TEST_OK(m3_segmented_style_init(&style));
   style.text_style.utf8_family = "Sans";
@@ -2423,7 +2461,7 @@ static int test_segmented_widget_flow(void) {
   items[2].utf8_len = 5;
 
   CMP_TEST_OK(m3_segmented_buttons_init(&buttons, &backend, &style, items, 3,
-                                       M3_SEGMENTED_MODE_SINGLE, 0, NULL));
+                                        M3_SEGMENTED_MODE_SINGLE, 0, NULL));
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
@@ -2433,32 +2471,32 @@ static int test_segmented_widget_flow(void) {
       buttons.widget.vtable->measure(NULL, width_spec, height_spec, &size),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(buttons.widget.vtable->measure(buttons.widget.ctx, width_spec,
-                                                height_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                 height_spec, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = 99u;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->measure(buttons.widget.ctx, width_spec,
-                                                height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                 height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = 99u;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->measure(buttons.widget.ctx, width_spec,
-                                                height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                 height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = -1.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->measure(buttons.widget.ctx, width_spec,
-                                                height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                 height_spec, &size),
+                  CMP_ERR_RANGE);
 
   saved_spacing = buttons.style.spacing;
   buttons.style.spacing = -1.0f;
@@ -2467,8 +2505,8 @@ static int test_segmented_widget_flow(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->measure(buttons.widget.ctx, width_spec,
-                                                height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                 height_spec, &size),
+                  CMP_ERR_RANGE);
   buttons.style.spacing = saved_spacing;
 
   saved_items = buttons.items;
@@ -2480,8 +2518,8 @@ static int test_segmented_widget_flow(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->measure(buttons.widget.ctx, width_spec,
-                                                height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                 height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
   buttons.items = saved_items;
   buttons.item_count = saved_count;
 
@@ -2491,8 +2529,8 @@ static int test_segmented_widget_flow(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->measure(buttons.widget.ctx, width_spec,
-                                                height_spec, &size),
-                 CMP_ERR_UNSUPPORTED);
+                                                 height_spec, &size),
+                  CMP_ERR_UNSUPPORTED);
   buttons.text_backend.vtable = &g_test_text_vtable;
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
@@ -2500,7 +2538,7 @@ static int test_segmented_widget_flow(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(buttons.widget.vtable->measure(buttons.widget.ctx, width_spec,
-                                            height_spec, &size));
+                                             height_spec, &size));
   CMP_TEST_ASSERT(size.width > 0.0f);
   CMP_TEST_ASSERT(size.height > 0.0f);
 
@@ -2509,7 +2547,7 @@ static int test_segmented_widget_flow(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 40.0f;
   CMP_TEST_OK(buttons.widget.vtable->measure(buttons.widget.ctx, width_spec,
-                                            height_spec, &size));
+                                             height_spec, &size));
   CMP_TEST_ASSERT(size.width <= 200.0f);
   CMP_TEST_ASSERT(size.height == 40.0f);
 
@@ -2518,7 +2556,7 @@ static int test_segmented_widget_flow(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 30.0f;
   CMP_TEST_OK(buttons.widget.vtable->measure(buttons.widget.ctx, width_spec,
-                                            height_spec, &size));
+                                             height_spec, &size));
   CMP_TEST_ASSERT(size.height <= 30.0f);
 
   bounds.x = 0.0f;
@@ -2526,21 +2564,22 @@ static int test_segmented_widget_flow(void) {
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->layout(buttons.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bounds.width = 10.0f;
   bounds.height = -1.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->layout(buttons.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bounds.width = 300.0f;
   bounds.height = 50.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(buttons.widget.vtable->layout(buttons.widget.ctx, bounds));
 
   CMP_TEST_EXPECT(buttons.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(buttons.widget.vtable->get_semantics(buttons.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      buttons.widget.vtable->get_semantics(buttons.widget.ctx, NULL),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(
       buttons.widget.vtable->get_semantics(buttons.widget.ctx, &semantics));
   CMP_TEST_ASSERT(semantics.role == CMP_SEMANTIC_NONE);
@@ -2551,20 +2590,20 @@ static int test_segmented_widget_flow(void) {
   buttons.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
 
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   saved_bounds = buttons.bounds;
   buttons.bounds.width = -1.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   buttons.bounds = saved_bounds;
 
   saved_spacing = buttons.style.spacing;
   buttons.style.spacing = -1.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   buttons.style.spacing = saved_spacing;
 
   saved_items = buttons.items;
@@ -2572,7 +2611,7 @@ static int test_segmented_widget_flow(void) {
   buttons.items = NULL;
   buttons.item_count = 1;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   buttons.items = saved_items;
   buttons.item_count = saved_count;
 
@@ -2583,37 +2622,37 @@ static int test_segmented_widget_flow(void) {
   saved_outline = buttons.style.outline_width;
   buttons.style.outline_width = 1000.0f;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   buttons.style.outline_width = saved_outline;
 
   backend_state.fail_draw_rect = 1;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend_state.fail_draw_rect = 0;
 
   backend_state.fail_measure = 1;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend_state.fail_measure = 0;
 
   backend_state.fail_draw_text = 1;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend_state.fail_draw_text = 0;
 
   paint_ctx.gfx = NULL;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = &gfx;
 
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_gfx_vtable;
 
   gfx.text_vtable = NULL;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable;
 
   saved_items = buttons.items;
@@ -2627,17 +2666,17 @@ static int test_segmented_widget_flow(void) {
 
   gfx.vtable = &g_test_gfx_vtable_no_rect;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_gfx_vtable;
 
   gfx.text_vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable;
 
   buttons.text_backend.vtable = &g_test_text_vtable_no_measure;
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   buttons.text_backend.vtable = &g_test_text_vtable;
 
   buttons.style.outline_width = 0.0f;
@@ -2650,12 +2689,13 @@ static int test_segmented_widget_flow(void) {
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 0, 0));
   CMP_TEST_EXPECT(buttons.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       buttons.widget.vtable->event(buttons.widget.ctx, NULL, &handled),
       CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(buttons.widget.vtable->event(buttons.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      buttons.widget.vtable->event(buttons.widget.ctx, &event, NULL),
+      CMP_ERR_INVALID_ARGUMENT);
 
   buttons.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(
@@ -2668,7 +2708,7 @@ static int test_segmented_widget_flow(void) {
   select_state.last_selected = CMP_FALSE;
   select_state.fail_index = (cmp_usize) ~(cmp_usize)0;
   CMP_TEST_OK(m3_segmented_buttons_set_on_select(&buttons, segmented_on_select,
-                                                &select_state));
+                                                 &select_state));
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_KEY_DOWN, 0, 0));
   CMP_TEST_OK(
@@ -2727,25 +2767,25 @@ static int test_segmented_widget_flow(void) {
   CMP_TEST_OK(m3_segmented_test_set_fail_point(
       M3_SEGMENTED_TEST_FAIL_LAYOUT_SPACING_NEGATIVE));
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_segmented_test_clear_fail_points());
 
   CMP_TEST_OK(m3_segmented_test_set_fail_point(
       M3_SEGMENTED_TEST_FAIL_LAYOUT_SEGMENT_WIDTH_NEGATIVE));
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_segmented_test_clear_fail_points());
 
   CMP_TEST_OK(m3_segmented_test_set_fail_point(
       M3_SEGMENTED_TEST_FAIL_LAYOUT_SEGMENT_HEIGHT_NEGATIVE));
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_segmented_test_clear_fail_points());
 
   CMP_TEST_OK(m3_segmented_test_set_fail_point(
       M3_SEGMENTED_TEST_FAIL_ITEM_RECT_NEGATIVE));
   CMP_TEST_EXPECT(buttons.widget.vtable->paint(buttons.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_segmented_test_clear_fail_points());
 
   CMP_TEST_OK(m3_segmented_test_set_fail_point(
@@ -2756,15 +2796,16 @@ static int test_segmented_widget_flow(void) {
   CMP_TEST_ASSERT(handled == CMP_FALSE);
   CMP_TEST_OK(m3_segmented_test_clear_fail_points());
 
-  CMP_TEST_EXPECT(buttons.widget.vtable->destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(buttons.widget.vtable->destroy(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(buttons.widget.vtable->destroy(buttons.widget.ctx));
 
   states[0] = CMP_FALSE;
   states[1] = CMP_TRUE;
   states[2] = CMP_FALSE;
   CMP_TEST_OK(m3_segmented_buttons_init(&multi_buttons, &backend, &style, items,
-                                       3, M3_SEGMENTED_MODE_MULTI,
-                                       M3_SEGMENTED_INVALID_INDEX, states));
+                                        3, M3_SEGMENTED_MODE_MULTI,
+                                        M3_SEGMENTED_INVALID_INDEX, states));
   bounds.x = 0.0f;
   bounds.y = 0.0f;
   bounds.width = 300.0f;
@@ -2783,40 +2824,40 @@ static int test_segmented_widget_flow(void) {
   states[0] = (CMPBool)2;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 10, 10));
   CMP_TEST_OK(multi_buttons.widget.vtable->event(multi_buttons.widget.ctx,
-                                                &event, &handled));
+                                                 &event, &handled));
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10));
   CMP_TEST_EXPECT(multi_buttons.widget.vtable->event(multi_buttons.widget.ctx,
-                                                    &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                     &event, &handled),
+                  CMP_ERR_INVALID_ARGUMENT);
   multi_buttons.pressed_index = M3_SEGMENTED_INVALID_INDEX;
   states[0] = CMP_FALSE;
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 220, 10));
   CMP_TEST_OK(multi_buttons.widget.vtable->event(multi_buttons.widget.ctx,
-                                                &event, &handled));
+                                                 &event, &handled));
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 220, 10));
   CMP_TEST_EXPECT(multi_buttons.widget.vtable->event(multi_buttons.widget.ctx,
-                                                    &event, &handled),
-                 CMP_ERR_IO);
+                                                     &event, &handled),
+                  CMP_ERR_IO);
 
   multi_buttons.selected_states = NULL;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 10, 10));
   CMP_TEST_EXPECT(multi_buttons.widget.vtable->event(multi_buttons.widget.ctx,
-                                                    &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                     &event, &handled),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   multi_buttons.selected_states = states;
   multi_buttons.mode = 99u;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 10, 10));
   CMP_TEST_EXPECT(multi_buttons.widget.vtable->event(multi_buttons.widget.ctx,
-                                                    &event, &handled),
-                 CMP_ERR_RANGE);
+                                                     &event, &handled),
+                  CMP_ERR_RANGE);
 
   multi_buttons.mode = M3_SEGMENTED_MODE_MULTI;
   multi_buttons.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 10, 10));
   CMP_TEST_OK(multi_buttons.widget.vtable->event(multi_buttons.widget.ctx,
-                                                &event, &handled));
+                                                 &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
 
   CMP_TEST_OK(multi_buttons.widget.vtable->destroy(multi_buttons.widget.ctx));

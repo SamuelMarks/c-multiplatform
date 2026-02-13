@@ -116,8 +116,8 @@ typedef struct M3ChipStyle {
                                         (>= 0). */
   CMPScalar ripple_fade_duration;     /**< Ripple fade duration in seconds
                                         (>= 0). */
-  M3ChipLayout layout;               /**< Default layout metrics. */
-  M3ChipLayout dense_layout;         /**< Dense layout metrics. */
+  M3ChipLayout layout;                /**< Default layout metrics. */
+  M3ChipLayout dense_layout;          /**< Dense layout metrics. */
 } M3ChipStyle;
 
 /**
@@ -126,10 +126,10 @@ typedef struct M3ChipStyle {
 typedef struct M3Chip {
   CMPWidget widget; /**< Widget interface (points to this instance). */
   CMPTextBackend text_backend; /**< Text backend for measurements. */
-  M3ChipStyle style;          /**< Current chip style. */
+  M3ChipStyle style;           /**< Current chip style. */
   CMPHandle font;              /**< Font handle for label text. */
   CMPTextMetrics metrics;      /**< Cached text metrics. */
-  const char *utf8_label;     /**< UTF-8 label text (may be NULL). */
+  const char *utf8_label;      /**< UTF-8 label text (may be NULL). */
   cmp_usize utf8_len;          /**< UTF-8 label length in bytes. */
   CMPRect bounds;              /**< Layout bounds. */
   CMPRipple ripple;            /**< Ripple state. */
@@ -141,9 +141,9 @@ typedef struct M3Chip {
   CMPBool dense;               /**< CMP_TRUE when using dense layout. */
   CMPBool show_delete;         /**< CMP_TRUE when delete icon is visible. */
   CMPChipOnClick on_click;     /**< Click callback (may be NULL). */
-  void *on_click_ctx;         /**< Click callback context pointer. */
+  void *on_click_ctx;          /**< Click callback context pointer. */
   CMPChipOnDelete on_delete;   /**< Delete callback (may be NULL). */
-  void *on_delete_ctx;        /**< Delete callback context pointer. */
+  void *on_delete_ctx;         /**< Delete callback context pointer. */
 } M3Chip;
 
 /**
@@ -184,8 +184,8 @@ CMP_API int CMP_CALL m3_chip_style_init_suggestion(M3ChipStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_chip_init(M3Chip *chip, const CMPTextBackend *backend,
-                                const M3ChipStyle *style,
-                                const char *utf8_label, cmp_usize utf8_len);
+                                  const M3ChipStyle *style,
+                                  const char *utf8_label, cmp_usize utf8_len);
 
 /**
  * @brief Update the chip label.
@@ -195,7 +195,7 @@ CMP_API int CMP_CALL m3_chip_init(M3Chip *chip, const CMPTextBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_chip_set_label(M3Chip *chip, const char *utf8_label,
-                                     cmp_usize utf8_len);
+                                       cmp_usize utf8_len);
 
 /**
  * @brief Update the chip style.
@@ -220,7 +220,7 @@ CMP_API int CMP_CALL m3_chip_set_selected(M3Chip *chip, CMPBool selected);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_chip_get_selected(const M3Chip *chip,
-                                        CMPBool *out_selected);
+                                          CMPBool *out_selected);
 
 /**
  * @brief Enable or disable the dense layout.
@@ -253,7 +253,7 @@ CMP_API int CMP_CALL m3_chip_set_show_delete(M3Chip *chip, CMPBool show_delete);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_chip_get_show_delete(const M3Chip *chip,
-                                           CMPBool *out_show_delete);
+                                             CMPBool *out_show_delete);
 
 /**
  * @brief Assign a click callback to the chip.
@@ -263,7 +263,7 @@ CMP_API int CMP_CALL m3_chip_get_show_delete(const M3Chip *chip,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_chip_set_on_click(M3Chip *chip, CMPChipOnClick on_click,
-                                        void *ctx);
+                                          void *ctx);
 
 /**
  * @brief Assign a delete callback to the chip.
@@ -272,8 +272,9 @@ CMP_API int CMP_CALL m3_chip_set_on_click(M3Chip *chip, CMPChipOnClick on_click,
  * @param ctx Callback context pointer.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_chip_set_on_delete(M3Chip *chip, CMPChipOnDelete on_delete,
-                                         void *ctx);
+CMP_API int CMP_CALL m3_chip_set_on_delete(M3Chip *chip,
+                                           CMPChipOnDelete on_delete,
+                                           void *ctx);
 
 #ifdef __cplusplus
 } /* extern "C" */

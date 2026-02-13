@@ -42,7 +42,7 @@ static int cmp_gesture_validate_config(const CMPGestureConfig *config) {
 }
 
 static int cmp_gesture_distance_sq(CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                                  CMPScalar y1, CMPScalar *out_value) {
+                                   CMPScalar y1, CMPScalar *out_value) {
   CMPScalar dx;
   CMPScalar dy;
 
@@ -68,7 +68,8 @@ static int cmp_gesture_distance_sq(CMPScalar x0, CMPScalar y0, CMPScalar x1,
   return CMP_OK;
 }
 
-static int cmp_gesture_time_delta(cmp_u32 start, cmp_u32 end, cmp_u32 *out_delta) {
+static int cmp_gesture_time_delta(cmp_u32 start, cmp_u32 end,
+                                  cmp_u32 *out_delta) {
   if (out_delta == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -80,8 +81,8 @@ static int cmp_gesture_time_delta(cmp_u32 start, cmp_u32 end, cmp_u32 *out_delta
 }
 
 static int cmp_gesture_velocity(CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                               CMPScalar y1, cmp_u32 dt_ms, CMPScalar *out_vx,
-                               CMPScalar *out_vy) {
+                                CMPScalar y1, cmp_u32 dt_ms, CMPScalar *out_vx,
+                                CMPScalar *out_vy) {
   CMPScalar scale;
 
   if (out_vx == NULL || out_vy == NULL) {
@@ -106,8 +107,8 @@ static int cmp_gesture_velocity(CMPScalar x0, CMPScalar y0, CMPScalar x1,
   return CMP_OK;
 }
 
-static int cmp_gesture_hit_test(const CMPRenderNode *node, CMPScalar x, CMPScalar y,
-                               CMPWidget **out_widget) {
+static int cmp_gesture_hit_test(const CMPRenderNode *node, CMPScalar x,
+                                CMPScalar y, CMPWidget **out_widget) {
   CMPBool contains;
   cmp_usize i;
   int rc; /* GCOVR_EXCL_LINE */
@@ -174,8 +175,8 @@ static int cmp_gesture_hit_test(const CMPRenderNode *node, CMPScalar x, CMPScala
 }
 
 static int cmp_gesture_dispatch_to_widget(CMPWidget *widget,
-                                         const CMPInputEvent *event,
-                                         CMPBool *out_handled) {
+                                          const CMPInputEvent *event,
+                                          CMPBool *out_handled) {
   CMPBool handled;
   int rc; /* GCOVR_EXCL_LINE */
 
@@ -204,8 +205,8 @@ static int cmp_gesture_dispatch_to_widget(CMPWidget *widget,
 }
 
 static int cmp_gesture_emit(CMPWidget *widget, const CMPInputEvent *source,
-                           cmp_u32 type, const CMPGestureEvent *gesture,
-                           CMPBool *out_handled) {
+                            cmp_u32 type, const CMPGestureEvent *gesture,
+                            CMPBool *out_handled) {
   CMPInputEvent event; /* GCOVR_EXCL_LINE */
   int rc;
 
@@ -307,7 +308,7 @@ int CMP_CALL cmp_gesture_config_init(CMPGestureConfig *config) {
 }
 
 int CMP_CALL cmp_gesture_dispatcher_init(CMPGestureDispatcher *dispatcher,
-                                       const CMPGestureConfig *config) {
+                                         const CMPGestureConfig *config) {
   CMPGestureConfig defaults; /* GCOVR_EXCL_LINE */
   int rc;
 
@@ -373,7 +374,7 @@ int CMP_CALL cmp_gesture_dispatcher_reset(CMPGestureDispatcher *dispatcher) {
 }
 
 int CMP_CALL cmp_gesture_dispatcher_set_config(CMPGestureDispatcher *dispatcher,
-                                             const CMPGestureConfig *config) {
+                                               const CMPGestureConfig *config) {
   int rc;
 
   if (dispatcher == NULL || config == NULL) {
@@ -406,9 +407,10 @@ int CMP_CALL cmp_gesture_dispatcher_get_config(
 }
 
 int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
-                                const CMPRenderNode *root,
-                                const CMPInputEvent *event,
-                                CMPWidget **out_target, CMPBool *out_handled) {
+                                  const CMPRenderNode *root,
+                                  const CMPInputEvent *event,
+                                  CMPWidget **out_target,
+                                  CMPBool *out_handled) {
   CMPWidget *target;
   CMPBool handled;
   CMPBool handled_any;
@@ -497,7 +499,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
     x = (CMPScalar)event->data.pointer.x;
     y = (CMPScalar)event->data.pointer.y;
     rc = cmp_gesture_velocity(dispatcher->last_x, dispatcher->last_y, x, y, dt,
-                             &velocity_x, &velocity_y);
+                              &velocity_x, &velocity_y);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -505,7 +507,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
     dispatcher->velocity_y = velocity_y;
 
     rc = cmp_gesture_distance_sq(dispatcher->down_x, dispatcher->down_y, x, y,
-                                &dist_sq);
+                                 &dist_sq);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -540,7 +542,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
 
       handled = CMP_FALSE;
       rc = cmp_gesture_emit(dispatcher->active_widget, event,
-                           CMP_INPUT_GESTURE_DRAG_START, &gesture, &handled);
+                            CMP_INPUT_GESTURE_DRAG_START, &gesture, &handled);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -579,7 +581,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
 
       handled = CMP_FALSE;
       rc = cmp_gesture_emit(dispatcher->active_widget, event,
-                           CMP_INPUT_GESTURE_DRAG_UPDATE, &gesture, &handled);
+                            CMP_INPUT_GESTURE_DRAG_UPDATE, &gesture, &handled);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -610,8 +612,8 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
     if (rc != CMP_OK) {
       return rc;
     }
-    rc =
-        cmp_gesture_time_delta(dispatcher->down_time, event->time_ms, &duration);
+    rc = cmp_gesture_time_delta(dispatcher->down_time, event->time_ms,
+                                &duration);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -620,7 +622,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
     y = (CMPScalar)event->data.pointer.y;
 
     rc = cmp_gesture_velocity(dispatcher->last_x, dispatcher->last_y, x, y, dt,
-                             &velocity_x, &velocity_y);
+                              &velocity_x, &velocity_y);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -629,7 +631,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
     dispatcher->velocity_y = velocity_y;
 
     rc = cmp_gesture_distance_sq(dispatcher->down_x, dispatcher->down_y, x, y,
-                                &dist_sq);
+                                 &dist_sq);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -662,7 +664,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
 
       handled = CMP_FALSE;
       rc = cmp_gesture_emit(dispatcher->active_widget, event,
-                           CMP_INPUT_GESTURE_DRAG_END, &gesture, &handled);
+                            CMP_INPUT_GESTURE_DRAG_END, &gesture, &handled);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -680,7 +682,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
         gesture.tap_count = 0u;
         handled = CMP_FALSE;
         rc = cmp_gesture_emit(dispatcher->active_widget, event,
-                             CMP_INPUT_GESTURE_FLING, &gesture, &handled);
+                              CMP_INPUT_GESTURE_FLING, &gesture, &handled);
         if (rc != CMP_OK) {
           return rc;
         }
@@ -707,7 +709,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
 
       handled = CMP_FALSE;
       rc = cmp_gesture_emit(dispatcher->active_widget, event,
-                           CMP_INPUT_GESTURE_LONG_PRESS, &gesture, &handled);
+                            CMP_INPUT_GESTURE_LONG_PRESS, &gesture, &handled);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -725,8 +727,8 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
         if (event->time_ms >= dispatcher->last_tap_time) {
           tap_dt = event->time_ms - dispatcher->last_tap_time;
           rc = cmp_gesture_distance_sq(dispatcher->last_tap_x,
-                                      dispatcher->last_tap_y, x, y,
-                                      &tap_dist_sq);
+                                       dispatcher->last_tap_y, x, y,
+                                       &tap_dist_sq);
           if (rc != CMP_OK) {
             return rc;
           }
@@ -757,7 +759,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
 
         handled = CMP_FALSE;
         rc = cmp_gesture_emit(dispatcher->active_widget, event,
-                             CMP_INPUT_GESTURE_DOUBLE_TAP, &gesture, &handled);
+                              CMP_INPUT_GESTURE_DOUBLE_TAP, &gesture, &handled);
         if (rc != CMP_OK) {
           return rc;
         }
@@ -781,7 +783,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
 
         handled = CMP_FALSE;
         rc = cmp_gesture_emit(dispatcher->active_widget, event,
-                             CMP_INPUT_GESTURE_TAP, &gesture, &handled);
+                              CMP_INPUT_GESTURE_TAP, &gesture, &handled);
         if (rc != CMP_OK) {
           return rc;
         }
@@ -848,31 +850,33 @@ int CMP_CALL cmp_gesture_test_validate_rect(const CMPRect *rect) {
   return cmp_gesture_validate_rect(rect);
 }
 
-int CMP_CALL cmp_gesture_test_distance_sq(CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                                        CMPScalar y1, CMPScalar *out_value) {
+int CMP_CALL cmp_gesture_test_distance_sq(CMPScalar x0, CMPScalar y0,
+                                          CMPScalar x1, CMPScalar y1,
+                                          CMPScalar *out_value) {
   return cmp_gesture_distance_sq(x0, y0, x1, y1, out_value);
 }
 
 int CMP_CALL cmp_gesture_test_time_delta(cmp_u32 start, cmp_u32 end,
-                                       cmp_u32 *out_delta) {
+                                         cmp_u32 *out_delta) {
   return cmp_gesture_time_delta(start, end, out_delta);
 }
 
 int CMP_CALL cmp_gesture_test_velocity(CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                                     CMPScalar y1, cmp_u32 dt_ms,
-                                     CMPScalar *out_vx, CMPScalar *out_vy) {
+                                       CMPScalar y1, cmp_u32 dt_ms,
+                                       CMPScalar *out_vx, CMPScalar *out_vy) {
   return cmp_gesture_velocity(x0, y0, x1, y1, dt_ms, out_vx, out_vy);
 }
 
 int CMP_CALL cmp_gesture_test_dispatch_to_widget(CMPWidget *widget,
-                                               const CMPInputEvent *event,
-                                               CMPBool *out_handled) {
+                                                 const CMPInputEvent *event,
+                                                 CMPBool *out_handled) {
   return cmp_gesture_dispatch_to_widget(widget, event, out_handled);
 }
 
-int CMP_CALL cmp_gesture_test_emit(CMPWidget *widget, const CMPInputEvent *source,
-                                 cmp_u32 type, const CMPGestureEvent *gesture,
-                                 CMPBool *out_handled) {
+int CMP_CALL cmp_gesture_test_emit(CMPWidget *widget,
+                                   const CMPInputEvent *source, cmp_u32 type,
+                                   const CMPGestureEvent *gesture,
+                                   CMPBool *out_handled) {
   return cmp_gesture_emit(widget, source, type, gesture, out_handled);
 }
 
@@ -889,7 +893,7 @@ int CMP_CALL cmp_gesture_test_validate_config(const CMPGestureConfig *config) {
 }
 
 int CMP_CALL cmp_gesture_test_hit_test(const CMPRenderNode *node, CMPScalar x,
-                                     CMPScalar y, CMPWidget **out_widget) {
+                                       CMPScalar y, CMPWidget **out_widget) {
   return cmp_gesture_hit_test(node, x, y, out_widget);
 }
 #endif

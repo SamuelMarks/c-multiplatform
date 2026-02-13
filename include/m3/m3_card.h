@@ -59,13 +59,14 @@ typedef struct M3CardStyle {
   CMPColor ripple_color;              /**< Ripple overlay color. */
   CMPColor disabled_background_color; /**< Background color when disabled. */
   CMPColor disabled_outline_color;    /**< Outline color when disabled. */
-  CMPScalar min_width;              /**< Minimum card width in pixels (>= 0). */
-  CMPScalar min_height;             /**< Minimum card height in pixels (>= 0). */
-  CMPScalar corner_radius;          /**< Corner radius in pixels (>= 0). */
-  CMPScalar outline_width;          /**< Outline width in pixels (>= 0). */
-  CMPScalar ripple_expand_duration; /**< Ripple expansion duration in seconds. */
-  CMPScalar ripple_fade_duration;   /**< Ripple fade-out duration in seconds. */
-  CMPShadow shadow;                 /**< Shadow descriptor for elevated cards. */
+  CMPScalar min_width;     /**< Minimum card width in pixels (>= 0). */
+  CMPScalar min_height;    /**< Minimum card height in pixels (>= 0). */
+  CMPScalar corner_radius; /**< Corner radius in pixels (>= 0). */
+  CMPScalar outline_width; /**< Outline width in pixels (>= 0). */
+  CMPScalar
+      ripple_expand_duration;     /**< Ripple expansion duration in seconds. */
+  CMPScalar ripple_fade_duration; /**< Ripple fade-out duration in seconds. */
+  CMPShadow shadow;               /**< Shadow descriptor for elevated cards. */
   CMPBool shadow_enabled; /**< CMP_TRUE when shadow rendering is enabled. */
 } M3CardStyle;
 
@@ -74,12 +75,12 @@ typedef struct M3CardStyle {
  */
 typedef struct M3Card {
   CMPWidget widget;        /**< Widget interface (points to this instance). */
-  M3CardStyle style;      /**< Current card style. */
+  M3CardStyle style;       /**< Current card style. */
   CMPRect bounds;          /**< Layout bounds. */
   CMPRipple ripple;        /**< Ripple state. */
   CMPBool pressed;         /**< CMP_TRUE when pressed. */
   CMPCardOnClick on_click; /**< Click callback (may be NULL). */
-  void *on_click_ctx;     /**< Click callback context pointer. */
+  void *on_click_ctx;      /**< Click callback context pointer. */
 } M3Card;
 
 /**
@@ -127,7 +128,7 @@ CMP_API int CMP_CALL m3_card_set_style(M3Card *card, const M3CardStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_card_set_on_click(M3Card *card, CMPCardOnClick on_click,
-                                        void *ctx);
+                                          void *ctx);
 
 /**
  * @brief Compute the content bounds inside the card.
@@ -136,7 +137,7 @@ CMP_API int CMP_CALL m3_card_set_on_click(M3Card *card, CMPCardOnClick on_click,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_card_get_content_bounds(const M3Card *card,
-                                              CMPRect *out_bounds);
+                                                CMPRect *out_bounds);
 
 #ifdef __cplusplus
 } /* extern "C" */

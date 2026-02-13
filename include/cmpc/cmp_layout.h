@@ -100,8 +100,8 @@ typedef struct CMPLayoutStyle {
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPLayoutMeasureFn)(void *ctx, CMPLayoutMeasureSpec width,
-                                        CMPLayoutMeasureSpec height,
-                                        CMPSize *out_size);
+                                          CMPLayoutMeasureSpec height,
+                                          CMPSize *out_size);
 
 /**
  * @brief Layout node definition.
@@ -111,7 +111,7 @@ typedef struct CMPLayoutNode {
   struct CMPLayoutNode **children; /**< Child node list. */
   cmp_usize child_count;           /**< Number of child nodes. */
   CMPLayoutMeasureFn measure;      /**< Measure callback for leaf nodes. */
-  void *measure_ctx;              /**< Measure callback context. */
+  void *measure_ctx;               /**< Measure callback context. */
   CMPSize measured;                /**< Measured size before layout. */
   CMPRect layout;                  /**< Final layout rectangle. */
 } CMPLayoutNode;
@@ -124,7 +124,7 @@ typedef struct CMPLayoutNode {
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_measure_spec_init(CMPLayoutMeasureSpec *spec,
-                                               cmp_u32 mode, CMPScalar size);
+                                                  cmp_u32 mode, CMPScalar size);
 
 /**
  * @brief Initialize padding edges.
@@ -136,8 +136,8 @@ CMP_API int CMP_CALL cmp_layout_measure_spec_init(CMPLayoutMeasureSpec *spec,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_edges_set(CMPLayoutEdges *edges, CMPScalar left,
-                                       CMPScalar top, CMPScalar right,
-                                       CMPScalar bottom);
+                                          CMPScalar top, CMPScalar right,
+                                          CMPScalar bottom);
 
 /**
  * @brief Initialize a layout direction context.
@@ -146,7 +146,7 @@ CMP_API int CMP_CALL cmp_layout_edges_set(CMPLayoutEdges *edges, CMPScalar left,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_direction_init(CMPLayoutDirection *direction,
-                                            cmp_u32 flow);
+                                               cmp_u32 flow);
 
 /**
  * @brief Initialize a layout style with defaults.
@@ -162,7 +162,7 @@ CMP_API int CMP_CALL cmp_layout_style_init(CMPLayoutStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_node_init(CMPLayoutNode *node,
-                                       const CMPLayoutStyle *style);
+                                          const CMPLayoutStyle *style);
 
 /**
  * @brief Assign children to a node.
@@ -172,8 +172,8 @@ CMP_API int CMP_CALL cmp_layout_node_init(CMPLayoutNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_node_set_children(CMPLayoutNode *node,
-                                               CMPLayoutNode **children,
-                                               cmp_usize count);
+                                                  CMPLayoutNode **children,
+                                                  cmp_usize count);
 
 /**
  * @brief Assign a measure callback to a node.
@@ -183,8 +183,8 @@ CMP_API int CMP_CALL cmp_layout_node_set_children(CMPLayoutNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_node_set_measure(CMPLayoutNode *node,
-                                              CMPLayoutMeasureFn measure,
-                                              void *ctx);
+                                                 CMPLayoutMeasureFn measure,
+                                                 void *ctx);
 
 /**
  * @brief Retrieve a node's measured size.
@@ -193,7 +193,7 @@ CMP_API int CMP_CALL cmp_layout_node_set_measure(CMPLayoutNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_node_get_measured(const CMPLayoutNode *node,
-                                               CMPSize *out_size);
+                                                  CMPSize *out_size);
 
 /**
  * @brief Retrieve a node's final layout rectangle.
@@ -202,7 +202,7 @@ CMP_API int CMP_CALL cmp_layout_node_get_measured(const CMPLayoutNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_node_get_layout(const CMPLayoutNode *node,
-                                             CMPRect *out_rect);
+                                                CMPRect *out_rect);
 
 /**
  * @brief Compute layout for a node tree.
@@ -213,9 +213,9 @@ CMP_API int CMP_CALL cmp_layout_node_get_layout(const CMPLayoutNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_compute(CMPLayoutNode *root,
-                                     const CMPLayoutDirection *direction,
-                                     CMPLayoutMeasureSpec width,
-                                     CMPLayoutMeasureSpec height);
+                                        const CMPLayoutDirection *direction,
+                                        CMPLayoutMeasureSpec width,
+                                        CMPLayoutMeasureSpec height);
 
 #ifdef CMP_TESTING
 /**
@@ -241,7 +241,7 @@ cmp_layout_test_validate_direction(const CMPLayoutDirection *direction);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_test_clamp_non_negative(CMPScalar value,
-                                                     CMPScalar *out_value);
+                                                        CMPScalar *out_value);
 
 /**
  * @brief Test wrapper for resolving available size.
@@ -250,9 +250,8 @@ CMP_API int CMP_CALL cmp_layout_test_clamp_non_negative(CMPScalar value,
  * @param out_available Receives the resolved available size.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_layout_test_resolve_available(CMPScalar style_size,
-                                                    CMPLayoutMeasureSpec spec,
-                                                    CMPScalar *out_available);
+CMP_API int CMP_CALL cmp_layout_test_resolve_available(
+    CMPScalar style_size, CMPLayoutMeasureSpec spec, CMPScalar *out_available);
 
 /**
  * @brief Test wrapper for resolving horizontal padding.
@@ -271,7 +270,8 @@ CMP_API int CMP_CALL cmp_layout_test_resolve_horizontal_padding(
  * @param style Style to validate.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_layout_test_validate_style(const CMPLayoutStyle *style);
+CMP_API int CMP_CALL
+cmp_layout_test_validate_style(const CMPLayoutStyle *style);
 
 /**
  * @brief Test wrapper for applying measure specs.
@@ -281,8 +281,8 @@ CMP_API int CMP_CALL cmp_layout_test_validate_style(const CMPLayoutStyle *style)
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_test_apply_spec(CMPScalar size,
-                                             CMPLayoutMeasureSpec spec,
-                                             CMPScalar *out_size);
+                                                CMPLayoutMeasureSpec spec,
+                                                CMPScalar *out_size);
 
 /**
  * @brief Test wrapper for measuring leaf nodes.
@@ -293,9 +293,9 @@ CMP_API int CMP_CALL cmp_layout_test_apply_spec(CMPScalar size,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_test_measure_leaf(CMPLayoutNode *node,
-                                               CMPLayoutMeasureSpec width,
-                                               CMPLayoutMeasureSpec height,
-                                               CMPSize *out_size);
+                                                  CMPLayoutMeasureSpec width,
+                                                  CMPLayoutMeasureSpec height,
+                                                  CMPSize *out_size);
 
 /**
  * @brief Test wrapper for measuring row containers.
@@ -306,9 +306,9 @@ CMP_API int CMP_CALL cmp_layout_test_measure_leaf(CMPLayoutNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_test_measure_row(CMPLayoutNode *node,
-                                              CMPLayoutMeasureSpec width,
-                                              CMPLayoutMeasureSpec height,
-                                              CMPSize *out_size);
+                                                 CMPLayoutMeasureSpec width,
+                                                 CMPLayoutMeasureSpec height,
+                                                 CMPSize *out_size);
 
 /**
  * @brief Test wrapper for measuring column containers.
@@ -319,9 +319,9 @@ CMP_API int CMP_CALL cmp_layout_test_measure_row(CMPLayoutNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_test_measure_column(CMPLayoutNode *node,
-                                                 CMPLayoutMeasureSpec width,
-                                                 CMPLayoutMeasureSpec height,
-                                                 CMPSize *out_size);
+                                                    CMPLayoutMeasureSpec width,
+                                                    CMPLayoutMeasureSpec height,
+                                                    CMPSize *out_size);
 
 /**
  * @brief Test wrapper for measuring row containers with a custom direction.
@@ -357,8 +357,8 @@ CMP_API int CMP_CALL cmp_layout_test_measure_column_with_direction(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_test_measure_node(CMPLayoutNode *node,
-                                               CMPLayoutMeasureSpec width,
-                                               CMPLayoutMeasureSpec height);
+                                                  CMPLayoutMeasureSpec width,
+                                                  CMPLayoutMeasureSpec height);
 
 /**
  * @brief Test wrapper for laying out nodes.
@@ -369,9 +369,10 @@ CMP_API int CMP_CALL cmp_layout_test_measure_node(CMPLayoutNode *node,
  * @param height Assigned height.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_layout_test_layout_node(CMPLayoutNode *node, CMPScalar x,
-                                              CMPScalar y, CMPScalar width,
-                                              CMPScalar height);
+CMP_API int CMP_CALL cmp_layout_test_layout_node(CMPLayoutNode *node,
+                                                 CMPScalar x, CMPScalar y,
+                                                 CMPScalar width,
+                                                 CMPScalar height);
 
 /**
  * @brief Test wrapper for laying out row children.
@@ -383,9 +384,10 @@ CMP_API int CMP_CALL cmp_layout_test_layout_node(CMPLayoutNode *node, CMPScalar 
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_test_layout_children_row(CMPLayoutNode *node,
-                                                      CMPScalar x, CMPScalar y,
-                                                      CMPScalar width,
-                                                      CMPScalar height);
+                                                         CMPScalar x,
+                                                         CMPScalar y,
+                                                         CMPScalar width,
+                                                         CMPScalar height);
 
 /**
  * @brief Test wrapper for laying out column children.
@@ -397,9 +399,10 @@ CMP_API int CMP_CALL cmp_layout_test_layout_children_row(CMPLayoutNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_layout_test_layout_children_column(CMPLayoutNode *node,
-                                                         CMPScalar x, CMPScalar y,
-                                                         CMPScalar width,
-                                                         CMPScalar height);
+                                                            CMPScalar x,
+                                                            CMPScalar y,
+                                                            CMPScalar width,
+                                                            CMPScalar height);
 
 /**
  * @brief Test wrapper for measuring nodes with a custom direction context.

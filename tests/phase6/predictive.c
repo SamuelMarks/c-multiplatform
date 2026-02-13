@@ -45,7 +45,8 @@ static int predictive_on_progress(void *ctx,
   return CMP_OK;
 }
 
-static int predictive_on_commit(void *ctx, const CMPPredictiveBackEvent *event) {
+static int predictive_on_commit(void *ctx,
+                                const CMPPredictiveBackEvent *event) {
   PredictiveHandlerState *state;
 
   if (ctx == NULL || event == NULL) {
@@ -59,7 +60,8 @@ static int predictive_on_commit(void *ctx, const CMPPredictiveBackEvent *event) 
   return CMP_OK;
 }
 
-static int predictive_on_cancel(void *ctx, const CMPPredictiveBackEvent *event) {
+static int predictive_on_cancel(void *ctx,
+                                const CMPPredictiveBackEvent *event) {
   PredictiveHandlerState *state;
 
   if (ctx == NULL || event == NULL) {
@@ -79,7 +81,8 @@ static int test_event_and_handler_init(void) {
   CMPPredictiveBackHandlerVTable vtable;
   int rc;
 
-  CMP_TEST_EXPECT(cmp_predictive_back_event_init(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_predictive_back_event_init(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_predictive_back_event_init(&event));
   CMP_TEST_ASSERT(event.progress == 0.0f);
   CMP_TEST_ASSERT(event.x == 0.0f);
@@ -90,9 +93,9 @@ static int test_event_and_handler_init(void) {
   CMP_TEST_ASSERT(event.time_ms == 0u);
 
   CMP_TEST_EXPECT(cmp_predictive_back_handler_init(NULL, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_handler_init(&handler, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   memset(&vtable, 0, sizeof(vtable));
   vtable.on_start = predictive_on_start;
@@ -116,12 +119,13 @@ static int test_controller_init_and_handler(void) {
   CMPPredictiveBackEvent event;
   CMPPredictiveBackState state;
 
-  CMP_TEST_EXPECT(cmp_predictive_back_init(NULL, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_predictive_back_init(NULL, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_shutdown(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_get_state(NULL, &state),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_get_state(&predictive, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   memset(&predictive, 0, sizeof(predictive));
   CMP_TEST_OK(cmp_predictive_test_set_event_init_fail(CMP_TRUE));
@@ -133,30 +137,31 @@ static int test_controller_init_and_handler(void) {
   handler.ctx = NULL;
   handler.vtable = NULL;
   CMP_TEST_EXPECT(cmp_predictive_back_init(&predictive, &handler),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   vtable.on_start = predictive_on_start;
   handler.vtable = &vtable;
   CMP_TEST_OK(cmp_predictive_back_init(&predictive, &handler));
-  CMP_TEST_EXPECT(cmp_predictive_back_init(&predictive, &handler), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_predictive_back_init(&predictive, &handler),
+                  CMP_ERR_STATE);
 
   CMP_TEST_ASSERT(predictive.initialized == CMP_TRUE);
   CMP_TEST_ASSERT(predictive.active == CMP_FALSE);
   CMP_TEST_ASSERT(predictive.handler.vtable == &vtable);
 
   CMP_TEST_EXPECT(cmp_predictive_back_get_handler(NULL, &handler),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_get_handler(&predictive, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_predictive_back_get_handler(&predictive, &handler));
   CMP_TEST_ASSERT(handler.vtable == &vtable);
 
   CMP_TEST_EXPECT(cmp_predictive_back_set_handler(NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   handler.ctx = &event;
   handler.vtable = NULL;
   CMP_TEST_EXPECT(cmp_predictive_back_set_handler(&predictive, &handler),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_predictive_back_set_handler(&predictive, NULL));
   CMP_TEST_ASSERT(predictive.handler.vtable == NULL);
 
@@ -187,16 +192,19 @@ static int test_controller_init_and_handler(void) {
   CMP_TEST_OK(cmp_predictive_back_shutdown(&predictive));
   CMP_TEST_EXPECT(cmp_predictive_back_shutdown(&predictive), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_predictive_back_get_handler(&predictive, &handler),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_predictive_back_get_state(&predictive, &state),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_predictive_back_set_handler(&predictive, NULL),
-                 CMP_ERR_STATE);
-  CMP_TEST_EXPECT(cmp_predictive_back_start(&predictive, &event), CMP_ERR_STATE);
+                  CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_predictive_back_start(&predictive, &event),
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_predictive_back_progress(&predictive, &event),
-                 CMP_ERR_STATE);
-  CMP_TEST_EXPECT(cmp_predictive_back_commit(&predictive, &event), CMP_ERR_STATE);
-  CMP_TEST_EXPECT(cmp_predictive_back_cancel(&predictive, &event), CMP_ERR_STATE);
+                  CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_predictive_back_commit(&predictive, &event),
+                  CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_predictive_back_cancel(&predictive, &event),
+                  CMP_ERR_STATE);
 
   return CMP_OK;
 }
@@ -228,37 +236,41 @@ static int test_event_flow_and_errors(void) {
   event.progress = 0.0f;
 
   CMP_TEST_EXPECT(cmp_predictive_back_start(NULL, &event),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_start(&predictive, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_progress(NULL, &event),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_progress(&predictive, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_commit(NULL, &event),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_commit(&predictive, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_cancel(NULL, &event),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_predictive_back_cancel(&predictive, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_predictive_back_progress(&predictive, &event),
-                 CMP_ERR_STATE);
-  CMP_TEST_EXPECT(cmp_predictive_back_commit(&predictive, &event), CMP_ERR_STATE);
-  CMP_TEST_EXPECT(cmp_predictive_back_cancel(&predictive, &event), CMP_ERR_STATE);
+                  CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_predictive_back_commit(&predictive, &event),
+                  CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_predictive_back_cancel(&predictive, &event),
+                  CMP_ERR_STATE);
 
   CMP_TEST_OK(cmp_predictive_back_start(&predictive, &event));
   CMP_TEST_ASSERT(handler_state.start_count == 1);
 
   event.progress = -0.1f;
   CMP_TEST_EXPECT(cmp_predictive_back_progress(&predictive, &event),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   event.progress = 0.2f;
   event.edge = 77u;
-  CMP_TEST_EXPECT(cmp_predictive_back_commit(&predictive, &event), CMP_ERR_RANGE);
-  CMP_TEST_EXPECT(cmp_predictive_back_cancel(&predictive, &event), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_predictive_back_commit(&predictive, &event),
+                  CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_predictive_back_cancel(&predictive, &event),
+                  CMP_ERR_RANGE);
   event.edge = CMP_PREDICTIVE_BACK_EDGE_LEFT;
   event.progress = 0.5f;
 
@@ -282,33 +294,37 @@ static int test_event_flow_and_errors(void) {
   CMP_TEST_ASSERT(state.active == CMP_FALSE);
 
   event.progress = -0.1f;
-  CMP_TEST_EXPECT(cmp_predictive_back_start(&predictive, &event), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_predictive_back_start(&predictive, &event),
+                  CMP_ERR_RANGE);
   event.progress = 1.1f;
-  CMP_TEST_EXPECT(cmp_predictive_back_start(&predictive, &event), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_predictive_back_start(&predictive, &event),
+                  CMP_ERR_RANGE);
   event.progress = 0.2f;
   event.edge = 77u;
-  CMP_TEST_EXPECT(cmp_predictive_back_start(&predictive, &event), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_predictive_back_start(&predictive, &event),
+                  CMP_ERR_RANGE);
 
   event.edge = CMP_PREDICTIVE_BACK_EDGE_RIGHT;
   event.progress = 0.2f;
   handler_state.fail_start = CMP_TRUE;
-  CMP_TEST_EXPECT(cmp_predictive_back_start(&predictive, &event), CMP_ERR_UNKNOWN);
+  CMP_TEST_EXPECT(cmp_predictive_back_start(&predictive, &event),
+                  CMP_ERR_UNKNOWN);
   handler_state.fail_start = CMP_FALSE;
   CMP_TEST_OK(cmp_predictive_back_start(&predictive, &event));
   handler_state.fail_progress = CMP_TRUE;
   event.progress = 0.4f;
   CMP_TEST_EXPECT(cmp_predictive_back_progress(&predictive, &event),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   handler_state.fail_progress = CMP_FALSE;
   CMP_TEST_OK(cmp_predictive_back_progress(&predictive, &event));
 
   handler_state.fail_commit = CMP_TRUE;
   CMP_TEST_EXPECT(cmp_predictive_back_commit(&predictive, &event),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   handler_state.fail_commit = CMP_FALSE;
   handler_state.fail_cancel = CMP_TRUE;
   CMP_TEST_EXPECT(cmp_predictive_back_cancel(&predictive, &event),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_ASSERT(predictive.active == CMP_TRUE);
   handler_state.fail_cancel = CMP_FALSE;
   CMP_TEST_OK(cmp_predictive_back_cancel(&predictive, &event));
@@ -323,20 +339,21 @@ static int test_validation_wrappers(void) {
   CMPPredictiveBackHandlerVTable vtable;
 
   CMP_TEST_EXPECT(cmp_predictive_back_test_validate_event(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_predictive_back_event_init(&event));
   event.edge = 44u;
-  CMP_TEST_EXPECT(cmp_predictive_back_test_validate_event(&event), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_predictive_back_test_validate_event(&event),
+                  CMP_ERR_RANGE);
   event.edge = CMP_PREDICTIVE_BACK_EDGE_LEFT;
   event.progress = 0.5f;
   CMP_TEST_OK(cmp_predictive_back_test_validate_event(&event));
 
   CMP_TEST_EXPECT(cmp_predictive_back_test_validate_handler(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   handler.ctx = NULL;
   handler.vtable = NULL;
   CMP_TEST_EXPECT(cmp_predictive_back_test_validate_handler(&handler),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   memset(&vtable, 0, sizeof(vtable));
   handler.vtable = &vtable;
   CMP_TEST_OK(cmp_predictive_back_test_validate_handler(&handler));

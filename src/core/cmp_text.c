@@ -60,8 +60,8 @@ static int cmp_text_validate_backend(const CMPTextBackend *backend) {
 }
 
 static int cmp_text_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -92,7 +92,7 @@ static int cmp_text_metrics_update(CMPTextWidget *widget) {
   }
 
   rc = cmp_text_measure_utf8(&widget->backend, widget->font, widget->utf8,
-                            widget->utf8_len, &widget->metrics);
+                             widget->utf8_len, &widget->metrics);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -102,7 +102,7 @@ static int cmp_text_metrics_update(CMPTextWidget *widget) {
 }
 
 static int cmp_text_widget_measure(void *widget, CMPMeasureSpec width,
-                                  CMPMeasureSpec height, CMPSize *out_size) {
+                                   CMPMeasureSpec height, CMPSize *out_size) {
   CMPTextWidget *text;
   CMPTextMetrics metrics;
   int rc;
@@ -196,7 +196,7 @@ static int cmp_text_widget_paint(void *widget, CMPPaintContext *ctx) {
 }
 
 static int cmp_text_widget_event(void *widget, const CMPInputEvent *event,
-                                CMPBool *out_handled) { /* GCOVR_EXCL_LINE */
+                                 CMPBool *out_handled) { /* GCOVR_EXCL_LINE */
   if (widget == NULL || event == NULL || out_handled == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -206,7 +206,7 @@ static int cmp_text_widget_event(void *widget, const CMPInputEvent *event,
 }
 
 static int cmp_text_widget_get_semantics(void *widget,
-                                        CMPSemantics *out_semantics) {
+                                         CMPSemantics *out_semantics) {
   CMPTextWidget *text;
 
   if (widget == NULL || out_semantics == NULL) {
@@ -277,7 +277,7 @@ int CMP_CALL cmp_text_style_init(CMPTextStyle *style) {
 }
 
 int CMP_CALL cmp_text_backend_from_gfx(const CMPGfx *gfx,
-                                     CMPTextBackend *out_backend) {
+                                       CMPTextBackend *out_backend) {
   if (gfx == NULL || out_backend == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -291,7 +291,8 @@ int CMP_CALL cmp_text_backend_from_gfx(const CMPGfx *gfx,
 }
 
 int CMP_CALL cmp_text_font_create(const CMPTextBackend *backend,
-                                const CMPTextStyle *style, CMPHandle *out_font) {
+                                  const CMPTextStyle *style,
+                                  CMPHandle *out_font) {
   int rc;
 
   if (backend == NULL || style == NULL || out_font == NULL) {
@@ -318,7 +319,8 @@ int CMP_CALL cmp_text_font_create(const CMPTextBackend *backend,
                                       style->italic, out_font);
 }
 
-int CMP_CALL cmp_text_font_destroy(const CMPTextBackend *backend, CMPHandle font) {
+int CMP_CALL cmp_text_font_destroy(const CMPTextBackend *backend,
+                                   CMPHandle font) {
   int rc;
 
   if (backend == NULL) {
@@ -338,9 +340,10 @@ int CMP_CALL cmp_text_font_destroy(const CMPTextBackend *backend, CMPHandle font
   return backend->vtable->destroy_font(backend->ctx, font);
 }
 
-int CMP_CALL cmp_text_measure_utf8(const CMPTextBackend *backend, CMPHandle font,
-                                 const char *utf8, cmp_usize utf8_len,
-                                 CMPTextMetrics *out_metrics) {
+int CMP_CALL cmp_text_measure_utf8(const CMPTextBackend *backend,
+                                   CMPHandle font, const char *utf8,
+                                   cmp_usize utf8_len,
+                                   CMPTextMetrics *out_metrics) {
   CMPScalar width;
   CMPScalar height;
   CMPScalar baseline;
@@ -402,8 +405,9 @@ static int cmp_text_cstrlen(const char *cstr, cmp_usize *out_len) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_text_measure_cstr(const CMPTextBackend *backend, CMPHandle font,
-                                 const char *utf8, CMPTextMetrics *out_metrics) {
+int CMP_CALL cmp_text_measure_cstr(const CMPTextBackend *backend,
+                                   CMPHandle font, const char *utf8,
+                                   CMPTextMetrics *out_metrics) {
   cmp_usize len;
   int rc;
 
@@ -419,15 +423,16 @@ int CMP_CALL cmp_text_measure_cstr(const CMPTextBackend *backend, CMPHandle font
   return cmp_text_measure_utf8(backend, font, utf8, len, out_metrics);
 }
 
-int CMP_CALL cmp_text_font_metrics(const CMPTextBackend *backend, CMPHandle font,
-                                 CMPTextMetrics *out_metrics) {
+int CMP_CALL cmp_text_font_metrics(const CMPTextBackend *backend,
+                                   CMPHandle font,
+                                   CMPTextMetrics *out_metrics) {
   return cmp_text_measure_utf8(backend, font, NULL, 0, out_metrics);
 }
 
 int CMP_CALL cmp_text_widget_init(CMPTextWidget *widget,
-                                const CMPTextBackend *backend,
-                                const CMPTextStyle *style, const char *utf8,
-                                cmp_usize utf8_len) {
+                                  const CMPTextBackend *backend,
+                                  const CMPTextStyle *style, const char *utf8,
+                                  cmp_usize utf8_len) {
   int rc;
 
   if (widget == NULL || backend == NULL || style == NULL) {
@@ -475,7 +480,7 @@ int CMP_CALL cmp_text_widget_init(CMPTextWidget *widget,
 }
 
 int CMP_CALL cmp_text_widget_set_text(CMPTextWidget *widget, const char *utf8,
-                                    cmp_usize utf8_len) {
+                                      cmp_usize utf8_len) {
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -490,7 +495,7 @@ int CMP_CALL cmp_text_widget_set_text(CMPTextWidget *widget, const char *utf8,
 }
 
 int CMP_CALL cmp_text_widget_set_style(CMPTextWidget *widget,
-                                     const CMPTextStyle *style) {
+                                       const CMPTextStyle *style) {
   CMPHandle new_font;
   int rc; /* GCOVR_EXCL_LINE */
 

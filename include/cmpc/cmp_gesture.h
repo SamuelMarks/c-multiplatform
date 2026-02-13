@@ -34,12 +34,12 @@ typedef struct CMPGestureConfig {
   cmp_u32 tap_max_ms;         /**< Max tap duration in milliseconds. */
   CMPScalar tap_max_distance; /**< Max tap distance in pixels (>= 0). */
   cmp_u32 double_tap_max_ms;  /**< Max delay between taps in milliseconds. */
-  CMPScalar double_tap_max_distance; /**< Max distance between taps in pixels (>=
-                                       0). */
-  cmp_u32 long_press_ms;             /**< Long press duration in milliseconds. */
+  CMPScalar double_tap_max_distance; /**< Max distance between taps in pixels
+                                       (>= 0). */
+  cmp_u32 long_press_ms;         /**< Long press duration in milliseconds. */
   CMPScalar drag_start_distance; /**< Drag start threshold in pixels (>= 0). */
-  CMPScalar fling_min_velocity;  /**< Minimum fling velocity in pixels per second
-                                   (>= 0). */
+  CMPScalar fling_min_velocity; /**< Minimum fling velocity in pixels per second
+                                  (>= 0). */
 } CMPGestureConfig;
 
 /**
@@ -80,8 +80,8 @@ CMP_API int CMP_CALL cmp_gesture_config_init(CMPGestureConfig *config);
  * @param config Configuration (NULL uses defaults).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_gesture_dispatcher_init(CMPGestureDispatcher *dispatcher,
-                                              const CMPGestureConfig *config);
+CMP_API int CMP_CALL cmp_gesture_dispatcher_init(
+    CMPGestureDispatcher *dispatcher, const CMPGestureConfig *config);
 
 /**
  * @brief Shut down a gesture dispatcher.
@@ -96,7 +96,8 @@ cmp_gesture_dispatcher_shutdown(CMPGestureDispatcher *dispatcher);
  * @param dispatcher Dispatcher instance.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_gesture_dispatcher_reset(CMPGestureDispatcher *dispatcher);
+CMP_API int CMP_CALL
+cmp_gesture_dispatcher_reset(CMPGestureDispatcher *dispatcher);
 
 /**
  * @brief Update the gesture dispatcher configuration.
@@ -126,10 +127,10 @@ CMP_API int CMP_CALL cmp_gesture_dispatcher_get_config(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
-                                       const CMPRenderNode *root,
-                                       const CMPInputEvent *event,
-                                       CMPWidget **out_target,
-                                       CMPBool *out_handled);
+                                          const CMPRenderNode *root,
+                                          const CMPInputEvent *event,
+                                          CMPWidget **out_target,
+                                          CMPBool *out_handled);
 
 #ifdef CMP_TESTING
 /**
@@ -149,8 +150,8 @@ cmp_gesture_test_validate_config(const CMPGestureConfig *config);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_gesture_test_hit_test(const CMPRenderNode *node,
-                                            CMPScalar x, CMPScalar y,
-                                            CMPWidget **out_widget);
+                                               CMPScalar x, CMPScalar y,
+                                               CMPWidget **out_widget);
 #endif
 
 #ifdef __cplusplus

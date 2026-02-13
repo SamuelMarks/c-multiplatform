@@ -14,10 +14,12 @@
 #define M3_NAV_TEST_FAIL_LAYOUT_SPACING_NEGATIVE 8u
 #define M3_NAV_TEST_FAIL_LAYOUT_ITEM_HEIGHT_NEGATIVE 9u
 #define M3_NAV_TEST_FAIL_MEASURE_CONTENT 10u
-#define M3_NAV_TEST_FAIL_INDICATOR_THICKNESS_NEGATIVE 11u /* GCOVR_EXCL_LINE   \
-                                                           */
+#define M3_NAV_TEST_FAIL_INDICATOR_THICKNESS_NEGATIVE                          \
+  11u /* GCOVR_EXCL_LINE                                                       \
+       */
 
-static cmp_u32 g_m3_nav_test_fail_point = M3_NAV_TEST_FAIL_NONE; /* GCOVR_EXCL_LINE */
+static cmp_u32 g_m3_nav_test_fail_point =
+    M3_NAV_TEST_FAIL_NONE; /* GCOVR_EXCL_LINE */
 
 static CMPBool m3_nav_test_consume_fail(cmp_u32 point) {
   if (g_m3_nav_test_fail_point != point) {
@@ -47,7 +49,7 @@ typedef struct M3NavigationLayout {
   CMPScalar spacing;
   CMPScalar content_width;
   CMPScalar content_height; /* GCOVR_EXCL_LINE */
-} M3NavigationLayout; /* GCOVR_EXCL_LINE */
+} M3NavigationLayout;       /* GCOVR_EXCL_LINE */
 
 static int m3_navigation_validate_color(const CMPColor *color) {
   if (color == NULL) {
@@ -79,9 +81,8 @@ static int m3_navigation_validate_edges(const CMPLayoutEdges *edges) {
   return CMP_OK;
 }
 
-static int
-m3_navigation_validate_text_style(const CMPTextStyle *style,
-                                  CMPBool require_family) { /* GCOVR_EXCL_LINE */
+static int m3_navigation_validate_text_style(
+    const CMPTextStyle *style, CMPBool require_family) { /* GCOVR_EXCL_LINE */
   int rc;
 
   if (style == NULL) {
@@ -210,8 +211,8 @@ static int m3_navigation_validate_items(const M3NavigationItem *items,
 }
 
 static int m3_navigation_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -310,15 +311,16 @@ static int m3_navigation_measure_content(const M3NavigationStyle *style,
   return CMP_OK;
 }
 
-static int m3_navigation_compute_layout(const M3Navigation *nav,
-                                        M3NavigationLayout *out_layout) { /* GCOVR_EXCL_LINE */
-  M3NavigationStyle style; /* GCOVR_EXCL_LINE */
-  CMPRect bounds;             /* GCOVR_EXCL_LINE */
-  CMPScalar available_width;  /* GCOVR_EXCL_LINE */
-  CMPScalar available_height; /* GCOVR_EXCL_LINE */
-  CMPScalar spacing; /* GCOVR_EXCL_LINE */
-  CMPScalar total_spacing; /* GCOVR_EXCL_LINE */
-  cmp_u32 mode;            /* GCOVR_EXCL_LINE */
+static int m3_navigation_compute_layout(
+    const M3Navigation *nav,
+    M3NavigationLayout *out_layout) { /* GCOVR_EXCL_LINE */
+  M3NavigationStyle style;            /* GCOVR_EXCL_LINE */
+  CMPRect bounds;                     /* GCOVR_EXCL_LINE */
+  CMPScalar available_width;          /* GCOVR_EXCL_LINE */
+  CMPScalar available_height;         /* GCOVR_EXCL_LINE */
+  CMPScalar spacing;                  /* GCOVR_EXCL_LINE */
+  CMPScalar total_spacing;            /* GCOVR_EXCL_LINE */
+  cmp_u32 mode;                       /* GCOVR_EXCL_LINE */
   int rc;
 
   if (nav == NULL || out_layout == NULL) {
@@ -394,10 +396,11 @@ static int m3_navigation_compute_layout(const M3Navigation *nav,
       out_layout->item_width =
           (available_width - total_spacing) / (CMPScalar)nav->item_count;
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
-    if (m3_nav_test_consume_fail(
-            M3_NAV_TEST_FAIL_LAYOUT_ITEM_WIDTH_NEGATIVE)) { /* GCOVR_EXCL_LINE */
-      out_layout->item_width = -1.0f;
-    }
+      if (m3_nav_test_consume_fail(
+              M3_NAV_TEST_FAIL_LAYOUT_ITEM_WIDTH_NEGATIVE)) { /* GCOVR_EXCL_LINE
+                                                               */
+        out_layout->item_width = -1.0f;
+      }
 #endif /* GCOVR_EXCL_LINE */
       if (out_layout->item_width < 0.0f) {
         return CMP_ERR_RANGE;
@@ -439,15 +442,16 @@ static int m3_navigation_compute_layout(const M3Navigation *nav,
   return CMP_OK;
 }
 
-static int m3_navigation_hit_test(const M3Navigation *nav,
-                                  const M3NavigationLayout *layout, /* GCOVR_EXCL_LINE */
-                                  cmp_i32 x, /* GCOVR_EXCL_LINE */
-                                  cmp_i32 y, cmp_usize *out_index) { /* GCOVR_EXCL_LINE */
-  CMPScalar fx; /* GCOVR_EXCL_LINE */
-  CMPScalar fy; /* GCOVR_EXCL_LINE */
-  CMPScalar stride; /* GCOVR_EXCL_LINE */
-  CMPScalar pos;    /* GCOVR_EXCL_LINE */
-  cmp_usize index;  /* GCOVR_EXCL_LINE */
+static int
+m3_navigation_hit_test(const M3Navigation *nav,
+                       const M3NavigationLayout *layout,  /* GCOVR_EXCL_LINE */
+                       cmp_i32 x,                         /* GCOVR_EXCL_LINE */
+                       cmp_i32 y, cmp_usize *out_index) { /* GCOVR_EXCL_LINE */
+  CMPScalar fx;                                           /* GCOVR_EXCL_LINE */
+  CMPScalar fy;                                           /* GCOVR_EXCL_LINE */
+  CMPScalar stride;                                       /* GCOVR_EXCL_LINE */
+  CMPScalar pos;                                          /* GCOVR_EXCL_LINE */
+  cmp_usize index;                                        /* GCOVR_EXCL_LINE */
 
   if (nav == NULL || layout == NULL || out_index == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -524,10 +528,10 @@ static int m3_navigation_hit_test(const M3Navigation *nav,
 
 static int /* GCOVR_EXCL_LINE */
 cmp_navigation_widget_measure(void *widget, CMPMeasureSpec width,
-                             CMPMeasureSpec height, /* GCOVR_EXCL_LINE */
-                             CMPSize *out_size) {   /* GCOVR_EXCL_LINE */
-  M3Navigation *nav;                               /* GCOVR_EXCL_LINE */
-  CMPScalar content_width = 0.0f;                   /* GCOVR_EXCL_LINE */
+                              CMPMeasureSpec height, /* GCOVR_EXCL_LINE */
+                              CMPSize *out_size) {   /* GCOVR_EXCL_LINE */
+  M3Navigation *nav;                                 /* GCOVR_EXCL_LINE */
+  CMPScalar content_width = 0.0f;                    /* GCOVR_EXCL_LINE */
   CMPScalar content_height = 0.0f;
   cmp_u32 mode = 0u;
   int rc; /* GCOVR_EXCL_LINE */
@@ -565,7 +569,7 @@ cmp_navigation_widget_measure(void *widget, CMPMeasureSpec width,
   }
 
   rc = m3_navigation_measure_content(&nav->style, mode, nav->item_count,
-                                     &content_width, /* GCOVR_EXCL_LINE */
+                                     &content_width,   /* GCOVR_EXCL_LINE */
                                      &content_height); /* GCOVR_EXCL_LINE */
   if (rc != CMP_OK) {
     return rc;
@@ -592,9 +596,9 @@ cmp_navigation_widget_measure(void *widget, CMPMeasureSpec width,
 }
 
 static int m3_navigation_widget_layout(void *widget, CMPRect bounds) {
-  M3Navigation *nav; /* GCOVR_EXCL_LINE */
+  M3Navigation *nav;         /* GCOVR_EXCL_LINE */
   M3NavigationLayout layout; /* GCOVR_EXCL_LINE */
-  int rc; /* GCOVR_EXCL_LINE */
+  int rc;                    /* GCOVR_EXCL_LINE */
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -619,15 +623,15 @@ static int m3_navigation_widget_layout(void *widget, CMPRect bounds) {
 static int m3_navigation_widget_paint(void *widget, CMPPaintContext *ctx) {
   M3Navigation *nav;         /* GCOVR_EXCL_LINE */
   M3NavigationLayout layout; /* GCOVR_EXCL_LINE */
-  CMPRect item_rect;          /* GCOVR_EXCL_LINE */
+  CMPRect item_rect;         /* GCOVR_EXCL_LINE */
   CMPRect indicator_rect = {0};
   CMPTextMetrics metrics; /* GCOVR_EXCL_LINE */
   CMPScalar text_x;       /* GCOVR_EXCL_LINE */
   CMPScalar text_y;       /* GCOVR_EXCL_LINE */
   CMPScalar indicator_thickness = 0.0f;
   CMPColor text_color; /* GCOVR_EXCL_LINE */
-  cmp_usize i; /* GCOVR_EXCL_LINE */
-  int rc;     /* GCOVR_EXCL_LINE */
+  cmp_usize i;         /* GCOVR_EXCL_LINE */
+  int rc;              /* GCOVR_EXCL_LINE */
 
   if (widget == NULL || ctx == NULL || ctx->gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -690,8 +694,8 @@ static int m3_navigation_widget_paint(void *widget, CMPPaintContext *ctx) {
       item_rect.x +=
           (layout.item_width + layout.spacing) * (CMPScalar)nav->selected_index;
     } else {
-      item_rect.y +=
-          (layout.item_height + layout.spacing) * (CMPScalar)nav->selected_index;
+      item_rect.y += (layout.item_height + layout.spacing) *
+                     (CMPScalar)nav->selected_index;
     }
 
     indicator_rect = item_rect;
@@ -753,8 +757,8 @@ static int m3_navigation_widget_paint(void *widget, CMPPaintContext *ctx) {
     }
 
     rc = cmp_text_measure_utf8(&nav->text_backend, nav->font,
-                              nav->items[i].utf8_label, nav->items[i].utf8_len,
-                              &metrics);
+                               nav->items[i].utf8_label, nav->items[i].utf8_len,
+                               &metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -779,12 +783,14 @@ static int m3_navigation_widget_paint(void *widget, CMPPaintContext *ctx) {
   return CMP_OK;
 }
 
-static int m3_navigation_widget_event(void *widget, const CMPInputEvent *event, /* GCOVR_EXCL_LINE */
-                                      CMPBool *out_handled) { /* GCOVR_EXCL_LINE */
+static int
+m3_navigation_widget_event(void *widget,
+                           const CMPInputEvent *event, /* GCOVR_EXCL_LINE */
+                           CMPBool *out_handled) {     /* GCOVR_EXCL_LINE */
   M3Navigation *nav;
   M3NavigationLayout layout; /* GCOVR_EXCL_LINE */
-  cmp_usize index;            /* GCOVR_EXCL_LINE */
-  cmp_usize previous;         /* GCOVR_EXCL_LINE */
+  cmp_usize index;           /* GCOVR_EXCL_LINE */
+  cmp_usize previous;        /* GCOVR_EXCL_LINE */
   int rc;                    /* GCOVR_EXCL_LINE */
 
   if (widget == NULL || event == NULL || out_handled == NULL) {
@@ -850,7 +856,7 @@ static int m3_navigation_widget_event(void *widget, const CMPInputEvent *event, 
 
 static int m3_navigation_widget_get_semantics(
     void *widget, CMPSemantics *out_semantics) { /* GCOVR_EXCL_LINE */
-  M3Navigation *nav;                            /* GCOVR_EXCL_LINE */
+  M3Navigation *nav;                             /* GCOVR_EXCL_LINE */
 
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -913,14 +919,14 @@ static int m3_navigation_widget_destroy(void *widget) {
   return rc;
 }
 
-static const CMPWidgetVTable g_m3_navigation_widget_vtable = /* GCOVR_EXCL_LINE */
-    {
-     cmp_navigation_widget_measure,
+static const CMPWidgetVTable
+    g_m3_navigation_widget_vtable = /* GCOVR_EXCL_LINE */
+    {cmp_navigation_widget_measure,
      m3_navigation_widget_layout, /* GCOVR_EXCL_LINE */
      m3_navigation_widget_paint,
-     m3_navigation_widget_event, /* GCOVR_EXCL_LINE */
+     m3_navigation_widget_event,         /* GCOVR_EXCL_LINE */
      m3_navigation_widget_get_semantics, /* GCOVR_EXCL_LINE */
-     m3_navigation_widget_destroy}; /* GCOVR_EXCL_LINE */
+     m3_navigation_widget_destroy};      /* GCOVR_EXCL_LINE */
 
 int CMP_CALL m3_navigation_style_init(M3NavigationStyle *style) {
   int rc; /* GCOVR_EXCL_LINE */
@@ -969,10 +975,10 @@ int CMP_CALL m3_navigation_style_init(M3NavigationStyle *style) {
 
 int CMP_CALL m3_navigation_init(
     M3Navigation *nav, const CMPTextBackend *backend,
-    const M3NavigationStyle *style,                 /* GCOVR_EXCL_LINE */
-    const M3NavigationItem *items,                  /* GCOVR_EXCL_LINE */
+    const M3NavigationStyle *style,                   /* GCOVR_EXCL_LINE */
+    const M3NavigationItem *items,                    /* GCOVR_EXCL_LINE */
     cmp_usize item_count, cmp_usize selected_index) { /* GCOVR_EXCL_LINE */
-  cmp_u32 mode;                                      /* GCOVR_EXCL_LINE */
+  cmp_u32 mode;                                       /* GCOVR_EXCL_LINE */
   int rc;
 
   if (nav == NULL || backend == NULL || style == NULL) {
@@ -1065,8 +1071,8 @@ int CMP_CALL m3_navigation_set_items(
 
 int CMP_CALL m3_navigation_set_style(
     M3Navigation *nav, const M3NavigationStyle *style) { /* GCOVR_EXCL_LINE */
-  CMPHandle new_font; /* GCOVR_EXCL_LINE */
-  int rc; /* GCOVR_EXCL_LINE */
+  CMPHandle new_font;                                    /* GCOVR_EXCL_LINE */
+  int rc;                                                /* GCOVR_EXCL_LINE */
 
   if (nav == NULL || style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1097,7 +1103,7 @@ int CMP_CALL m3_navigation_set_style(
 }
 
 int CMP_CALL m3_navigation_set_selected(M3Navigation *nav,
-                                       cmp_usize selected_index) {
+                                        cmp_usize selected_index) {
   if (nav == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1119,8 +1125,8 @@ int CMP_CALL m3_navigation_get_selected(
 }
 
 int CMP_CALL m3_navigation_set_on_select(M3Navigation *nav,
-                                        CMPNavigationOnSelect on_select,
-                                        void *ctx) { /* GCOVR_EXCL_LINE */
+                                         CMPNavigationOnSelect on_select,
+                                         void *ctx) { /* GCOVR_EXCL_LINE */
   if (nav == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1129,7 +1135,8 @@ int CMP_CALL m3_navigation_set_on_select(M3Navigation *nav,
   return CMP_OK;
 }
 
-int CMP_CALL m3_navigation_get_mode(const M3Navigation *nav, cmp_u32 *out_mode) {
+int CMP_CALL m3_navigation_get_mode(const M3Navigation *nav,
+                                    cmp_u32 *out_mode) {
   int rc; /* GCOVR_EXCL_LINE */
 
   if (nav == NULL || out_mode == NULL) {
@@ -1158,14 +1165,14 @@ int CMP_CALL m3_navigation_test_validate_text_style(
   return m3_navigation_validate_text_style(style, require_family);
 }
 
-int CMP_CALL
-m3_navigation_test_validate_style(const M3NavigationStyle *style,
-                                  CMPBool require_family) { /* GCOVR_EXCL_LINE */
+int CMP_CALL m3_navigation_test_validate_style(
+    const M3NavigationStyle *style,
+    CMPBool require_family) { /* GCOVR_EXCL_LINE */
   return m3_navigation_validate_style(style, require_family);
 }
 
-int CMP_CALL m3_navigation_test_validate_items(const M3NavigationItem *items,
-                                              cmp_usize count) { /* GCOVR_EXCL_LINE */
+int CMP_CALL m3_navigation_test_validate_items(
+    const M3NavigationItem *items, cmp_usize count) { /* GCOVR_EXCL_LINE */
   return m3_navigation_validate_items(items, count);
 }
 
@@ -1185,7 +1192,7 @@ m3_navigation_test_resolve_mode(const M3NavigationStyle *style, CMPScalar width,
 
 int CMP_CALL m3_navigation_test_measure_content(
     const M3NavigationStyle *style, cmp_u32 mode,
-    cmp_usize item_count,                         /* GCOVR_EXCL_LINE */
+    cmp_usize item_count,                          /* GCOVR_EXCL_LINE */
     CMPScalar *out_width, CMPScalar *out_height) { /* GCOVR_EXCL_LINE */
   return m3_navigation_measure_content(style, mode, item_count, out_width,
                                        out_height);
@@ -1216,9 +1223,9 @@ int CMP_CALL m3_navigation_test_compute_layout(
 }
 
 int CMP_CALL m3_navigation_test_hit_test(const M3Navigation *nav,
-                                        const M3NavigationLayoutTest *layout,
-                                        cmp_i32 x, cmp_i32 y,
-                                        cmp_usize *out_index) {
+                                         const M3NavigationLayoutTest *layout,
+                                         cmp_i32 x, cmp_i32 y,
+                                         cmp_usize *out_index) {
   M3NavigationLayout internal;
   const M3NavigationLayout *layout_ptr;
 

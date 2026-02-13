@@ -284,11 +284,11 @@ static int test_storage_helpers(void) {
   int rc;
 
   CMP_TEST_EXPECT(cmp_storage_test_mul_overflow(1u, 2u, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_test_add_overflow(1u, 2u, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_test_u32_from_usize(1u, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   rc = cmp_storage_test_mul_overflow(4u, 5u, &value);
   CMP_TEST_OK(rc);
@@ -300,9 +300,9 @@ static int test_storage_helpers(void) {
 
   max_value = (cmp_usize) ~(cmp_usize)0;
   CMP_TEST_EXPECT(cmp_storage_test_mul_overflow(max_value, 2u, &value),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_EXPECT(cmp_storage_test_add_overflow(max_value, 1u, &value),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
 
   rc = cmp_storage_test_u32_from_usize(42u, &value32);
   CMP_TEST_OK(rc);
@@ -311,7 +311,7 @@ static int test_storage_helpers(void) {
   max_u32 = (cmp_usize)((cmp_u32) ~(cmp_u32)0);
   if (max_u32 < (cmp_usize) ~(cmp_usize)0) {
     CMP_TEST_EXPECT(cmp_storage_test_u32_from_usize(max_u32 + 1u, &value32),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
   }
   return 0;
 }
@@ -323,7 +323,7 @@ static int test_storage_config_init(void) {
   CMP_TEST_OK(cmp_storage_config_init(&config));
   CMP_TEST_ASSERT(config.allocator == NULL);
   CMP_TEST_ASSERT(config.entry_capacity ==
-                 (cmp_usize)CMP_STORAGE_DEFAULT_CAPACITY);
+                  (cmp_usize)CMP_STORAGE_DEFAULT_CAPACITY);
   return 0;
 }
 
@@ -341,7 +341,8 @@ static int test_storage_init_errors(void) {
   CMP_TEST_EXPECT(cmp_storage_init(&storage, NULL), CMP_ERR_INVALID_ARGUMENT);
 
   config.entry_capacity = 0;
-  CMP_TEST_EXPECT(cmp_storage_init(&storage, &config), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_storage_init(&storage, &config),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(test_alloc_reset(&test_alloc));
   allocator.ctx = NULL;
@@ -350,7 +351,8 @@ static int test_storage_init_errors(void) {
   allocator.free = NULL;
   config.entry_capacity = 1u;
   config.allocator = &allocator;
-  CMP_TEST_EXPECT(cmp_storage_init(&storage, &config), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_storage_init(&storage, &config),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
   config.allocator = NULL;
@@ -455,11 +457,11 @@ static int test_storage_put_errors(void) {
   cmp_usize max_value;
 
   CMP_TEST_EXPECT(cmp_storage_put(NULL, "a", 1u, "b", 1u, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   memset(&storage, 0, sizeof(storage));
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "a", 1u, "b", 1u, CMP_FALSE),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
 
   CMP_TEST_OK(test_alloc_reset(&test_alloc));
   allocator.ctx = &test_alloc;
@@ -473,41 +475,41 @@ static int test_storage_put_errors(void) {
   CMP_TEST_OK(cmp_storage_init(&storage, &config));
 
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "a", 1u, "b", 1u, 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "a", 0u, "b", 1u, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "a", 1u, NULL, 1u, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   max_value = (cmp_usize) ~(cmp_usize)0;
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "a", max_value, "b", 1u, CMP_TRUE),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
 
   CMP_TEST_OK(cmp_storage_put(&storage, "alpha", 5u, "one", 3u, CMP_FALSE));
 
   test_alloc.alloc_calls = 0;
   test_alloc.fail_alloc_on_call = 1;
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "alpha", 5u, "two", 3u, CMP_TRUE),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   test_alloc.fail_alloc_on_call = 0;
 
   test_alloc.free_calls = 0;
   test_alloc.fail_free_on_call = 1;
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "alpha", 5u, "two", 3u, CMP_TRUE),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   test_alloc.fail_free_on_call = 0;
 
   storage.entry_capacity = 1u;
   storage.allocator.realloc = NULL;
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "beta", 4u, "two", 3u, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   storage.allocator.realloc = test_realloc_fn;
   storage.entry_capacity = 2u;
 
   test_alloc.free_calls = 0;
   test_alloc.fail_free_on_call = 1;
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "alpha", 5u, NULL, 0u, CMP_TRUE),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   test_alloc.fail_free_on_call = 0;
 
   CMP_TEST_OK(cmp_storage_shutdown(&storage));
@@ -536,8 +538,9 @@ static int test_storage_access_errors(void) {
       CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_storage_contains(NULL, "a", 1u, &exists),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_storage_contains(&storage, "a", 1u, &exists), CMP_ERR_STATE);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_storage_contains(&storage, "a", 1u, &exists),
+                  CMP_ERR_STATE);
 
   CMP_TEST_EXPECT(cmp_storage_remove(NULL, "a", 1u), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_remove(&storage, "a", 1u), CMP_ERR_STATE);
@@ -545,7 +548,8 @@ static int test_storage_access_errors(void) {
   CMP_TEST_EXPECT(cmp_storage_clear(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_clear(&storage), CMP_ERR_STATE);
 
-  CMP_TEST_EXPECT(cmp_storage_count(NULL, &value_size), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_storage_count(NULL, &value_size),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_count(&storage, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_count(&storage, &value_size), CMP_ERR_STATE);
 
@@ -564,13 +568,13 @@ static int test_storage_access_errors(void) {
       cmp_storage_get(&storage, NULL, 1u, buffer, sizeof(buffer), &value_size),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_get(&storage, "a", 1u, NULL, 1u, &value_size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_contains(&storage, NULL, 1u, &exists),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_contains(&storage, "a", 1u, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_remove(&storage, NULL, 1u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_storage_shutdown(&storage));
   return 0;
@@ -666,7 +670,7 @@ static int test_storage_put_get_remove(void) {
   CMP_TEST_OK(cmp_storage_put(&storage, "beta", 4u, "two", 3u, CMP_FALSE));
 
   CMP_TEST_OK(cmp_storage_get(&storage, "alpha", 5u, buffer, sizeof(buffer),
-                            &value_size));
+                              &value_size));
   CMP_TEST_ASSERT(value_size == 3u);
   CMP_TEST_ASSERT(memcmp(buffer, "one", 3u) == 0);
 
@@ -675,13 +679,14 @@ static int test_storage_put_get_remove(void) {
   CMP_TEST_OK(cmp_storage_contains(&storage, "missing", 7u, &exists));
   CMP_TEST_ASSERT(exists == CMP_FALSE);
 
-  CMP_TEST_EXPECT(cmp_storage_get(&storage, "missing", 7u, buffer, sizeof(buffer),
-                                &value_size),
-                 CMP_ERR_NOT_FOUND);
+  CMP_TEST_EXPECT(cmp_storage_get(&storage, "missing", 7u, buffer,
+                                  sizeof(buffer), &value_size),
+                  CMP_ERR_NOT_FOUND);
   CMP_TEST_ASSERT(value_size == 0u);
 
-  CMP_TEST_EXPECT(cmp_storage_get(&storage, "alpha", 5u, buffer, 2u, &value_size),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      cmp_storage_get(&storage, "alpha", 5u, buffer, 2u, &value_size),
+      CMP_ERR_RANGE);
   CMP_TEST_ASSERT(value_size == 3u);
 
   CMP_TEST_OK(cmp_storage_count(&storage, &count));
@@ -725,17 +730,17 @@ static int test_storage_overwrite_and_grow(void) {
 
   CMP_TEST_OK(cmp_storage_put(&storage, "dup", 3u, "one", 3u, CMP_FALSE));
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "dup", 3u, "two", 3u, CMP_FALSE),
-                 CMP_ERR_BUSY);
+                  CMP_ERR_BUSY);
 
   CMP_TEST_OK(cmp_storage_put(&storage, "dup", 3u, "two", 3u, CMP_TRUE));
-  CMP_TEST_OK(
-      cmp_storage_get(&storage, "dup", 3u, buffer, sizeof(buffer), &value_size));
+  CMP_TEST_OK(cmp_storage_get(&storage, "dup", 3u, buffer, sizeof(buffer),
+                              &value_size));
   CMP_TEST_ASSERT(value_size == 3u);
   CMP_TEST_ASSERT(memcmp(buffer, "two", 3u) == 0);
 
   CMP_TEST_OK(cmp_storage_put(&storage, "dup", 3u, NULL, 0u, CMP_TRUE));
-  CMP_TEST_OK(
-      cmp_storage_get(&storage, "dup", 3u, buffer, sizeof(buffer), &value_size));
+  CMP_TEST_OK(cmp_storage_get(&storage, "dup", 3u, buffer, sizeof(buffer),
+                              &value_size));
   CMP_TEST_ASSERT(value_size == 0u);
 
   CMP_TEST_OK(cmp_storage_put(&storage, "grow", 4u, "x", 1u, CMP_FALSE));
@@ -746,13 +751,13 @@ static int test_storage_overwrite_and_grow(void) {
   test_alloc.realloc_calls = 0;
   test_alloc.fail_realloc_on_call = 1;
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "fail", 4u, "y", 1u, CMP_FALSE),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   test_alloc.fail_realloc_on_call = 0;
 
   max_value = (cmp_usize) ~(cmp_usize)0;
   storage.entry_capacity = max_value / 2u + 1u;
   CMP_TEST_EXPECT(cmp_storage_test_grow(&storage, storage.entry_capacity + 1u),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   storage.entry_capacity = 2u;
 
   CMP_TEST_OK(cmp_storage_shutdown(&storage));
@@ -781,7 +786,7 @@ static int test_storage_alloc_failures(void) {
   test_alloc.alloc_calls = 0;
   test_alloc.fail_alloc_on_call = 1;
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "key", 3u, NULL, 0u, CMP_FALSE),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   test_alloc.fail_alloc_on_call = 0;
 
   test_alloc.alloc_calls = 0;
@@ -791,7 +796,7 @@ static int test_storage_alloc_failures(void) {
   test_alloc.alloc_calls = 0;
   test_alloc.fail_alloc_on_call = 2;
   CMP_TEST_EXPECT(cmp_storage_put(&storage, "key", 3u, "val", 3u, CMP_FALSE),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   test_alloc.fail_alloc_on_call = 0;
 
   CMP_TEST_OK(cmp_storage_shutdown(&storage));
@@ -919,8 +924,9 @@ static int test_storage_save_errors(void) {
 
   CMP_TEST_EXPECT(cmp_storage_save(NULL, &io, "mem"), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_save(&storage, NULL, "mem"),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_storage_save(&storage, &io, NULL), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_storage_save(&storage, &io, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_save(&storage, &io, "mem"), CMP_ERR_STATE);
 
   CMP_TEST_OK(cmp_storage_config_init(&config));
@@ -930,12 +936,12 @@ static int test_storage_save_errors(void) {
 
   io.vtable = NULL;
   CMP_TEST_EXPECT(cmp_storage_save(&storage, &io, "mem"),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   io.vtable = &g_test_io_vtable;
 
   storage.allocator.alloc = NULL;
   CMP_TEST_EXPECT(cmp_storage_save(&storage, &io, "mem"),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   storage.allocator.alloc = test_alloc_fn;
 
   CMP_TEST_OK(cmp_storage_put(&storage, "k", 1u, "v", 1u, CMP_FALSE));
@@ -979,7 +985,8 @@ static int test_storage_save_errors(void) {
 
   test_alloc.alloc_calls = 0;
   test_alloc.fail_alloc_on_call = 1;
-  CMP_TEST_EXPECT(cmp_storage_save(&storage, &io, "mem"), CMP_ERR_OUT_OF_MEMORY);
+  CMP_TEST_EXPECT(cmp_storage_save(&storage, &io, "mem"),
+                  CMP_ERR_OUT_OF_MEMORY);
   test_alloc.fail_alloc_on_call = 0;
 
   test_io.fail_write = 1;
@@ -1020,8 +1027,9 @@ static int test_storage_load_errors(void) {
 
   CMP_TEST_EXPECT(cmp_storage_load(NULL, &io, "mem"), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_load(&storage, NULL, "mem"),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_storage_load(&storage, &io, NULL), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_storage_load(&storage, &io, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_storage_load(&storage, &io, "mem"), CMP_ERR_STATE);
 
   CMP_TEST_OK(cmp_storage_config_init(&config));
@@ -1031,12 +1039,12 @@ static int test_storage_load_errors(void) {
 
   io.vtable = NULL;
   CMP_TEST_EXPECT(cmp_storage_load(&storage, &io, "mem"),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   io.vtable = &g_test_io_vtable;
 
   storage.allocator.alloc = NULL;
   CMP_TEST_EXPECT(cmp_storage_load(&storage, &io, "mem"),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   storage.allocator.alloc = test_alloc_fn;
 
   test_io.fail_read_alloc = 1;
@@ -1123,7 +1131,8 @@ static int test_storage_load_errors(void) {
   test_io.buffer[3] = 'T';
   CMP_TEST_OK(test_write_u32_le(test_io.buffer + 4, 1u));
   CMP_TEST_OK(test_write_u32_le(test_io.buffer + 8, 0u));
-  CMP_TEST_EXPECT(cmp_storage_load(&storage, &io, "mem"), CMP_ERR_OUT_OF_MEMORY);
+  CMP_TEST_EXPECT(cmp_storage_load(&storage, &io, "mem"),
+                  CMP_ERR_OUT_OF_MEMORY);
   test_alloc.fail_alloc_on_call = 0;
 
   test_io.size = 16u;

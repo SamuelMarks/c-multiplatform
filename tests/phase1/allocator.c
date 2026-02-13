@@ -24,9 +24,9 @@ int main(void) {
   CMP_TEST_ASSERT(ptr != NULL);
 
   CMP_TEST_EXPECT(alloc.realloc(alloc.ctx, ptr, 0, &ptr2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(alloc.realloc(alloc.ctx, ptr, 32, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(alloc.realloc(alloc.ctx, ptr, 32, &ptr2));
   CMP_TEST_ASSERT(ptr2 != NULL);
@@ -35,9 +35,9 @@ int main(void) {
   CMP_TEST_OK(alloc.free(alloc.ctx, NULL));
 
   CMP_TEST_EXPECT(alloc.realloc(alloc.ctx, NULL, 0, &ptr),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(alloc.realloc(alloc.ctx, NULL, 8, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   ptr = NULL;
   CMP_TEST_OK(alloc.realloc(alloc.ctx, NULL, 8, &ptr));
@@ -46,12 +46,13 @@ int main(void) {
 
   max_size = (cmp_usize) ~(cmp_usize)0;
   ptr = NULL;
-  CMP_TEST_EXPECT(alloc.alloc(alloc.ctx, max_size, &ptr), CMP_ERR_OUT_OF_MEMORY);
+  CMP_TEST_EXPECT(alloc.alloc(alloc.ctx, max_size, &ptr),
+                  CMP_ERR_OUT_OF_MEMORY);
   CMP_TEST_ASSERT(ptr == NULL);
 
   ptr = NULL;
   CMP_TEST_EXPECT(alloc.realloc(alloc.ctx, NULL, max_size, &ptr),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   CMP_TEST_ASSERT(ptr == NULL);
 
   return 0;

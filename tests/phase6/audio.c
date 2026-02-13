@@ -91,7 +91,7 @@ static int test_audio_free(void *audio, const CMPAllocator *allocator,
 }
 
 static const CMPAudioVTable g_test_audio_vtable = {test_audio_decode,
-                                                  test_audio_free};
+                                                   test_audio_free};
 
 typedef struct TestEnvState {
   CMPEnv env;
@@ -115,9 +115,8 @@ static int test_env_get_audio(void *env, CMPAudio *out_audio) {
   return CMP_OK;
 }
 
-static const CMPEnvVTable g_test_env_vtable = {NULL, NULL, NULL, NULL, NULL,
-                                              test_env_get_audio, NULL, NULL,
-                                              NULL};
+static const CMPEnvVTable g_test_env_vtable = {
+    NULL, NULL, NULL, NULL, NULL, test_env_get_audio, NULL, NULL, NULL};
 
 static int test_env_reset(TestEnvState *env_state, TestAudioState *audio_state,
                           const CMPAudioVTable *vtable) {
@@ -231,10 +230,10 @@ static int test_audio_decode_fallback_wav(void) {
   CMPAudioDecodeRequest request;
   CMPAudioData audio;
   static const cmp_u8 wav_data[] = {
-      'R', 'I', 'F', 'F', 38u, 0u, 0u, 0u, 'W', 'A', 'V', 'E',
-      'f', 'm', 't', ' ', 16u, 0u, 0u, 0u, 1u, 0u, 1u, 0u,
-      64u, 31u, 0u, 0u, 128u, 62u, 0u, 0u, 2u, 0u, 16u, 0u,
-      'd', 'a', 't', 'a', 2u, 0u, 0u, 0u, 1u, 0u};
+      'R', 'I', 'F', 'F', 38u,  0u,  0u, 0u, 'W', 'A', 'V', 'E',
+      'f', 'm', 't', ' ', 16u,  0u,  0u, 0u, 1u,  0u,  1u,  0u,
+      64u, 31u, 0u,  0u,  128u, 62u, 0u, 0u, 2u,  0u,  16u, 0u,
+      'd', 'a', 't', 'a', 2u,   0u,  0u, 0u, 1u,  0u};
 
   CMP_TEST_OK(cmp_audio_config_init(&config));
   memset(&decoder, 0, sizeof(decoder));

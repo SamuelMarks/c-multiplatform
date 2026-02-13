@@ -16,9 +16,9 @@ extern "C" {
  * @brief Action payload descriptor.
  */
 typedef struct CMPAction {
-  cmp_u32 type;      /**< Action type identifier. */
+  cmp_u32 type;     /**< Action type identifier. */
   const void *data; /**< Optional action payload bytes. */
-  cmp_usize size;    /**< Payload size in bytes. */
+  cmp_usize size;   /**< Payload size in bytes. */
 } CMPAction;
 
 /**
@@ -30,7 +30,7 @@ typedef struct CMPAction {
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPReducerFn)(void *ctx, const CMPAction *action,
-                                  const void *prev_state, void *next_state);
+                                    const void *prev_state, void *next_state);
 
 /**
  * @brief Store configuration.
@@ -41,7 +41,7 @@ typedef struct CMPStoreConfig {
   cmp_usize state_size;          /**< Size of the state in bytes. */
   cmp_usize
       history_capacity; /**< Maximum number of undo/redo snapshots to keep. */
-  CMPReducerFn reducer;  /**< Reducer callback for state transitions. */
+  CMPReducerFn reducer; /**< Reducer callback for state transitions. */
   void *reducer_ctx;    /**< Reducer context pointer. */
 } CMPStoreConfig;
 
@@ -51,7 +51,7 @@ typedef struct CMPStoreConfig {
 typedef struct CMPStore {
   CMPAllocator allocator;  /**< Allocator used for store memory. */
   CMPReducerFn reducer;    /**< Reducer callback. */
-  void *reducer_ctx;      /**< Reducer context pointer. */
+  void *reducer_ctx;       /**< Reducer context pointer. */
   cmp_usize state_size;    /**< State size in bytes. */
   cmp_u8 *state;           /**< Current state buffer. */
   cmp_u8 *scratch;         /**< Scratch buffer for reducer output. */
@@ -70,8 +70,9 @@ typedef struct CMPStore {
  * @param initial_state Optional initial state bytes (NULL zeros the state).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_store_init(CMPStore *store, const CMPStoreConfig *config,
-                                 const void *initial_state);
+CMP_API int CMP_CALL cmp_store_init(CMPStore *store,
+                                    const CMPStoreConfig *config,
+                                    const void *initial_state);
 
 /**
  * @brief Shut down a store and release its resources.
@@ -86,7 +87,8 @@ CMP_API int CMP_CALL cmp_store_shutdown(CMPStore *store);
  * @param action Action descriptor.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_store_dispatch(CMPStore *store, const CMPAction *action);
+CMP_API int CMP_CALL cmp_store_dispatch(CMPStore *store,
+                                        const CMPAction *action);
 
 /**
  * @brief Retrieve a pointer to the current state.
@@ -96,8 +98,8 @@ CMP_API int CMP_CALL cmp_store_dispatch(CMPStore *store, const CMPAction *action
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_store_get_state_ptr(const CMPStore *store,
-                                          const void **out_state,
-                                          cmp_usize *out_size);
+                                             const void **out_state,
+                                             cmp_usize *out_size);
 
 /**
  * @brief Copy the current state into a caller-provided buffer.
@@ -107,7 +109,7 @@ CMP_API int CMP_CALL cmp_store_get_state_ptr(const CMPStore *store,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_store_get_state(const CMPStore *store, void *out_state,
-                                      cmp_usize state_size);
+                                         cmp_usize state_size);
 
 /**
  * @brief Test whether an undo snapshot is available.
@@ -116,7 +118,7 @@ CMP_API int CMP_CALL cmp_store_get_state(const CMPStore *store, void *out_state,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_store_can_undo(const CMPStore *store,
-                                     CMPBool *out_can_undo);
+                                        CMPBool *out_can_undo);
 
 /**
  * @brief Test whether a redo snapshot is available.
@@ -125,7 +127,7 @@ CMP_API int CMP_CALL cmp_store_can_undo(const CMPStore *store,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_store_can_redo(const CMPStore *store,
-                                     CMPBool *out_can_redo);
+                                        CMPBool *out_can_redo);
 
 /**
  * @brief Undo the most recent state transition.
@@ -157,7 +159,7 @@ CMP_API int CMP_CALL cmp_store_clear_history(CMPStore *store);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_store_get_undo_count(const CMPStore *store,
-                                           cmp_usize *out_count);
+                                              cmp_usize *out_count);
 
 /**
  * @brief Get the number of redo snapshots.
@@ -166,7 +168,7 @@ CMP_API int CMP_CALL cmp_store_get_undo_count(const CMPStore *store,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_store_get_redo_count(const CMPStore *store,
-                                           cmp_usize *out_count);
+                                              cmp_usize *out_count);
 
 /**
  * @brief Copy an undo snapshot for debugging.
@@ -174,13 +176,13 @@ CMP_API int CMP_CALL cmp_store_get_redo_count(const CMPStore *store,
  * @param index_from_latest 0-based index from the most recent undo snapshot.
  * @param out_state Destination buffer.
  * @param state_size Size of the destination buffer in bytes.
- * @return CMP_OK on success, CMP_ERR_NOT_FOUND if the index is out of range, or a
- * failure code.
+ * @return CMP_OK on success, CMP_ERR_NOT_FOUND if the index is out of range, or
+ * a failure code.
  */
 CMP_API int CMP_CALL cmp_store_copy_undo_state(const CMPStore *store,
-                                            cmp_usize index_from_latest,
-                                            void *out_state,
-                                            cmp_usize state_size);
+                                               cmp_usize index_from_latest,
+                                               void *out_state,
+                                               cmp_usize state_size);
 
 /**
  * @brief Copy a redo snapshot for debugging.
@@ -188,13 +190,13 @@ CMP_API int CMP_CALL cmp_store_copy_undo_state(const CMPStore *store,
  * @param index_from_latest 0-based index from the most recent redo snapshot.
  * @param out_state Destination buffer.
  * @param state_size Size of the destination buffer in bytes.
- * @return CMP_OK on success, CMP_ERR_NOT_FOUND if the index is out of range, or a
- * failure code.
+ * @return CMP_OK on success, CMP_ERR_NOT_FOUND if the index is out of range, or
+ * a failure code.
  */
 CMP_API int CMP_CALL cmp_store_copy_redo_state(const CMPStore *store,
-                                            cmp_usize index_from_latest,
-                                            void *out_state,
-                                            cmp_usize state_size);
+                                               cmp_usize index_from_latest,
+                                               void *out_state,
+                                               cmp_usize state_size);
 
 #ifdef CMP_TESTING
 /**
@@ -205,7 +207,7 @@ CMP_API int CMP_CALL cmp_store_copy_redo_state(const CMPStore *store,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_store_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                              cmp_usize *out_value);
+                                                 cmp_usize *out_value);
 
 /**
  * @brief Test wrapper for pushing history snapshots.
@@ -216,10 +218,11 @@ CMP_API int CMP_CALL cmp_store_test_mul_overflow(cmp_usize a, cmp_usize b,
  * @param state State bytes.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_store_test_history_push(cmp_u8 *buffer, cmp_usize capacity,
-                                              cmp_usize state_size,
-                                              cmp_usize *io_count,
-                                              const void *state);
+CMP_API int CMP_CALL cmp_store_test_history_push(cmp_u8 *buffer,
+                                                 cmp_usize capacity,
+                                                 cmp_usize state_size,
+                                                 cmp_usize *io_count,
+                                                 const void *state);
 
 /**
  * @brief Test wrapper for popping history snapshots.
@@ -231,10 +234,10 @@ CMP_API int CMP_CALL cmp_store_test_history_push(cmp_u8 *buffer, cmp_usize capac
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_store_test_history_pop(const cmp_u8 *buffer,
-                                             cmp_usize capacity,
-                                             cmp_usize state_size,
-                                             cmp_usize *io_count,
-                                             void *out_state);
+                                                cmp_usize capacity,
+                                                cmp_usize state_size,
+                                                cmp_usize *io_count,
+                                                void *out_state);
 
 /**
  * @brief Test wrapper for copying history snapshots.
@@ -247,8 +250,8 @@ CMP_API int CMP_CALL cmp_store_test_history_pop(const cmp_u8 *buffer,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_store_test_copy_history(
-    const cmp_u8 *buffer, cmp_usize capacity, cmp_usize state_size, cmp_usize count,
-    cmp_usize index_from_latest, void *out_state);
+    const cmp_u8 *buffer, cmp_usize capacity, cmp_usize state_size,
+    cmp_usize count, cmp_usize index_from_latest, void *out_state);
 #endif
 
 #ifdef __cplusplus

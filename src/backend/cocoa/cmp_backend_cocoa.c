@@ -2,9 +2,9 @@
 
 #include <string.h>
 
-#define CMP_COCOA_RETURN_IF_ERROR(rc)                                           \
+#define CMP_COCOA_RETURN_IF_ERROR(rc)                                          \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       return (rc);                                                             \
     }                                                                          \
   } while (0)
@@ -63,7 +63,7 @@ cmp_cocoa_backend_test_validate_config(const CMPCocoaBackendConfig *config) {
 #endif
 
 int CMP_CALL cmp_cocoa_backend_create(const CMPCocoaBackendConfig *config,
-                                    CMPCocoaBackend **out_backend) {
+                                      CMPCocoaBackend **out_backend) {
   CMPCocoaBackendConfig local_config;
   int rc;
 
@@ -99,7 +99,8 @@ int CMP_CALL cmp_cocoa_backend_get_ws(CMPCocoaBackend *backend, CMPWS *out_ws) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-int CMP_CALL cmp_cocoa_backend_get_gfx(CMPCocoaBackend *backend, CMPGfx *out_gfx) {
+int CMP_CALL cmp_cocoa_backend_get_gfx(CMPCocoaBackend *backend,
+                                       CMPGfx *out_gfx) {
   if (backend == NULL || out_gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -107,7 +108,8 @@ int CMP_CALL cmp_cocoa_backend_get_gfx(CMPCocoaBackend *backend, CMPGfx *out_gfx
   return CMP_ERR_UNSUPPORTED;
 }
 
-int CMP_CALL cmp_cocoa_backend_get_env(CMPCocoaBackend *backend, CMPEnv *out_env) {
+int CMP_CALL cmp_cocoa_backend_get_env(CMPCocoaBackend *backend,
+                                       CMPEnv *out_env) {
   if (backend == NULL || out_env == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

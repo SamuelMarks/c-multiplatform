@@ -53,8 +53,8 @@ static int test_backend_init(TestNavBackend *backend) {
 }
 
 static int test_text_create_font(void *text, const char *utf8_family,
-                                 cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
-                                 CMPHandle *out_font) {
+                                 cmp_i32 size_px, cmp_i32 weight,
+                                 CMPBool italic, CMPHandle *out_font) {
   TestNavBackend *backend;
 
   if (text == NULL || utf8_family == NULL || out_font == NULL) {
@@ -214,8 +214,10 @@ static int test_style_init(void) {
   CMP_TEST_EXPECT(m3_navigation_style_init(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_navigation_style_init(&style));
   CMP_TEST_ASSERT(style.mode == M3_NAV_MODE_AUTO);
-  CMP_TEST_ASSERT(cmp_near(style.bar_height, M3_NAV_DEFAULT_BAR_HEIGHT, 0.001f));
-  CMP_TEST_ASSERT(cmp_near(style.rail_width, M3_NAV_DEFAULT_RAIL_WIDTH, 0.001f));
+  CMP_TEST_ASSERT(
+      cmp_near(style.bar_height, M3_NAV_DEFAULT_BAR_HEIGHT, 0.001f));
+  CMP_TEST_ASSERT(
+      cmp_near(style.rail_width, M3_NAV_DEFAULT_RAIL_WIDTH, 0.001f));
   CMP_TEST_ASSERT(
       cmp_near(style.drawer_width, M3_NAV_DEFAULT_DRAWER_WIDTH, 0.001f));
   CMP_TEST_ASSERT(
@@ -225,13 +227,13 @@ static int test_style_init(void) {
   CMP_TEST_ASSERT(
       cmp_near(style.item_spacing, M3_NAV_DEFAULT_ITEM_SPACING, 0.001f));
   CMP_TEST_ASSERT(cmp_near(style.indicator_thickness,
-                         M3_NAV_DEFAULT_INDICATOR_THICKNESS, 0.001f));
-  CMP_TEST_ASSERT(
-      cmp_near(style.indicator_corner, M3_NAV_DEFAULT_INDICATOR_CORNER, 0.001f));
+                           M3_NAV_DEFAULT_INDICATOR_THICKNESS, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(style.indicator_corner,
+                           M3_NAV_DEFAULT_INDICATOR_CORNER, 0.001f));
   CMP_TEST_ASSERT(
       cmp_near(style.breakpoint_rail, M3_NAV_DEFAULT_BREAKPOINT_RAIL, 0.001f));
   CMP_TEST_ASSERT(cmp_near(style.breakpoint_drawer,
-                         M3_NAV_DEFAULT_BREAKPOINT_DRAWER, 0.001f));
+                           M3_NAV_DEFAULT_BREAKPOINT_DRAWER, 0.001f));
   CMP_TEST_ASSERT(style.text_style.size_px == 14);
   CMP_TEST_ASSERT(style.text_style.weight == 400);
   CMP_TEST_ASSERT(style.text_style.italic == CMP_FALSE);
@@ -261,7 +263,7 @@ static int test_validation_helpers(void) {
   CMPScalar height;
 
   CMP_TEST_EXPECT(m3_navigation_test_validate_color(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   color.r = -0.1f;
   color.g = 0.0f;
   color.b = 0.0f;
@@ -280,7 +282,7 @@ static int test_validation_helpers(void) {
   CMP_TEST_OK(m3_navigation_test_validate_color(&color));
 
   CMP_TEST_EXPECT(m3_navigation_test_validate_edges(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   edges.left = -1.0f;
   edges.right = 0.0f;
   edges.top = 0.0f;
@@ -293,156 +295,157 @@ static int test_validation_helpers(void) {
   CMP_TEST_OK(m3_navigation_test_validate_edges(&edges));
 
   CMP_TEST_EXPECT(m3_navigation_test_validate_text_style(NULL, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_text_style_init(&text_style));
   text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_navigation_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_navigation_test_validate_text_style(&text_style, CMP_FALSE));
   text_style.utf8_family = "Test";
   text_style.size_px = 0;
   CMP_TEST_EXPECT(m3_navigation_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.size_px = 12;
   text_style.weight = 50;
   CMP_TEST_EXPECT(m3_navigation_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.weight = 400;
   text_style.italic = 2;
   CMP_TEST_EXPECT(m3_navigation_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.italic = CMP_FALSE;
   text_style.color.r = -0.5f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.color.r = 0.0f;
   CMP_TEST_OK(m3_navigation_test_validate_text_style(&text_style, CMP_TRUE));
 
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(NULL, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_navigation_style_init(&style));
   style.text_style.utf8_family = "Sans";
   base_style = style;
   style.mode = 99u;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.bar_height = 0.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.rail_width = 0.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.drawer_width = 0.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.item_height = 0.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.item_min_width = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.item_spacing = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.indicator_thickness = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.indicator_corner = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.breakpoint_rail = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.breakpoint_drawer = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.breakpoint_rail = 200.0f;
   style.breakpoint_drawer = 100.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.padding.left = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.padding.top = 100.0f;
   style.padding.bottom = 100.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.padding.left = 50.0f;
   style.padding.right = 50.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   style = base_style;
   style.text_style.size_px = 0;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.text_style.weight = 50;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.text_style.italic = 3;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.text_style.color.a = 2.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.selected_text_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.indicator_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   style.background_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style = base_style;
   CMP_TEST_OK(m3_navigation_test_validate_style(&style, CMP_TRUE));
 
   CMP_TEST_EXPECT(m3_navigation_test_validate_items(NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_navigation_test_validate_items(NULL, 0));
   item.utf8_label = NULL;
   item.utf8_len = 1;
   CMP_TEST_EXPECT(m3_navigation_test_validate_items(&item, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   item.utf8_len = 0;
   CMP_TEST_OK(m3_navigation_test_validate_items(&item, 1));
 
   spec.mode = 99u;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(m3_navigation_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_AT_MOST;
   spec.size = -1.0f;
-  CMP_TEST_EXPECT(m3_navigation_test_validate_measure_spec(spec), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_navigation_test_validate_measure_spec(spec),
+                  CMP_ERR_RANGE);
   spec.mode = CMP_MEASURE_UNSPECIFIED;
   spec.size = -1.0f;
   CMP_TEST_OK(m3_navigation_test_validate_measure_spec(spec));
 
   CMP_TEST_EXPECT(m3_navigation_test_validate_rect(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   rect.x = 0.0f;
   rect.y = 0.0f;
   rect.width = -1.0f;
@@ -455,9 +458,9 @@ static int test_validation_helpers(void) {
   CMP_TEST_OK(m3_navigation_test_validate_rect(&rect));
 
   CMP_TEST_EXPECT(m3_navigation_test_resolve_mode(NULL, 0.0f, &mode),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_navigation_test_resolve_mode(&base_style, -1.0f, &mode),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   base_style.mode = M3_NAV_MODE_BAR;
   CMP_TEST_OK(m3_navigation_test_resolve_mode(&base_style, 10.0f, &mode));
   CMP_TEST_ASSERT(mode == M3_NAV_MODE_BAR);
@@ -472,30 +475,30 @@ static int test_validation_helpers(void) {
   CMP_TEST_ASSERT(mode == M3_NAV_MODE_DRAWER);
 
   CMP_TEST_EXPECT(m3_navigation_test_measure_content(NULL, M3_NAV_MODE_BAR, 0,
-                                                    &width, &height),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                     &width, &height),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_navigation_test_measure_content(
-                     &base_style, M3_NAV_MODE_BAR, 0, NULL, &height),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      &base_style, M3_NAV_MODE_BAR, 0, NULL, &height),
+                  CMP_ERR_INVALID_ARGUMENT);
   base_style.item_spacing = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_measure_content(
-                     &base_style, M3_NAV_MODE_BAR, 0, &width, &height),
-                 CMP_ERR_RANGE);
+                      &base_style, M3_NAV_MODE_BAR, 0, &width, &height),
+                  CMP_ERR_RANGE);
   base_style = style;
   CMP_TEST_EXPECT(
       m3_navigation_test_measure_content(&base_style, 99u, 0, &width, &height),
       CMP_ERR_RANGE);
   base_style.bar_height = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_measure_content(
-                     &base_style, M3_NAV_MODE_BAR, 0, &width, &height),
-                 CMP_ERR_RANGE);
+                      &base_style, M3_NAV_MODE_BAR, 0, &width, &height),
+                  CMP_ERR_RANGE);
   base_style = style;
-  CMP_TEST_OK(m3_navigation_test_measure_content(&base_style, M3_NAV_MODE_BAR, 0,
-                                                &width, &height));
-  CMP_TEST_OK(m3_navigation_test_measure_content(&base_style, M3_NAV_MODE_BAR, 2,
-                                                &width, &height));
+  CMP_TEST_OK(m3_navigation_test_measure_content(&base_style, M3_NAV_MODE_BAR,
+                                                 0, &width, &height));
+  CMP_TEST_OK(m3_navigation_test_measure_content(&base_style, M3_NAV_MODE_BAR,
+                                                 2, &width, &height));
   CMP_TEST_OK(m3_navigation_test_measure_content(&base_style, M3_NAV_MODE_RAIL,
-                                                2, &width, &height));
+                                                 2, &width, &height));
 
   return CMP_OK;
 }
@@ -523,51 +526,51 @@ static int test_init_validation(void) {
   items[1].utf8_len = 8;
 
   CMP_TEST_EXPECT(m3_navigation_init(NULL, &backend, &style, items, 2, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_navigation_init(&nav, NULL, &style, items, 2, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_navigation_init(&nav, &backend, NULL, items, 2, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_backend = backend;
   bad_backend.vtable = NULL;
   CMP_TEST_EXPECT(m3_navigation_init(&nav, &bad_backend, &style, items, 2, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_backend = backend;
   bad_backend.vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(m3_navigation_init(&nav, &bad_backend, &style, items, 2, 0),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   bad_backend.vtable = &g_test_text_vtable_no_destroy;
   CMP_TEST_EXPECT(m3_navigation_init(&nav, &bad_backend, &style, items, 2, 0),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
 #ifdef CMP_TESTING
   CMP_TEST_OK(m3_navigation_test_set_fail_point(M3_NAV_TEST_FAIL_RESOLVE_MODE));
   CMP_TEST_EXPECT(m3_navigation_init(&nav, &backend, &style, items, 2, 0),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_navigation_test_clear_fail_points());
 #endif
 
   bad_style = style;
   bad_style.item_height = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_init(&nav, &backend, &bad_style, items, 2, 0),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_navigation_init(&nav, &backend, &style, NULL, 1, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_items[0].utf8_label = NULL;
   bad_items[0].utf8_len = 1;
   CMP_TEST_EXPECT(m3_navigation_init(&nav, &backend, &style, bad_items, 1, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_navigation_init(&nav, &backend, &style, items, 2, 5),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   backend_state.fail_create = 1;
   CMP_TEST_EXPECT(m3_navigation_init(&nav, &backend, &style, items, 2, 0),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend_state.fail_create = 0;
 
   CMP_TEST_OK(m3_navigation_init(&nav, &backend, &style, items, 2, 0));
@@ -605,23 +608,24 @@ static int test_setters_and_getters(void) {
   CMP_TEST_OK(m3_navigation_init(&nav, &backend, &style, items, 2, 0));
 
   CMP_TEST_EXPECT(m3_navigation_get_selected(NULL, &selected),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_navigation_get_selected(&nav, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_navigation_get_selected(&nav, &selected));
   CMP_TEST_ASSERT(selected == 0u);
 
   CMP_TEST_EXPECT(nav.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(nav.widget.vtable->get_semantics(nav.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   nav.widget.flags = CMP_WIDGET_FLAG_DISABLED | CMP_WIDGET_FLAG_FOCUSABLE;
   CMP_TEST_OK(nav.widget.vtable->get_semantics(nav.widget.ctx, &semantics));
   CMP_TEST_ASSERT((semantics.flags & CMP_SEMANTIC_FLAG_DISABLED) != 0u);
   CMP_TEST_ASSERT((semantics.flags & CMP_SEMANTIC_FLAG_FOCUSABLE) != 0u);
   nav.widget.flags = CMP_WIDGET_FLAG_FOCUSABLE;
 
-  CMP_TEST_EXPECT(m3_navigation_set_selected(NULL, 0), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_navigation_set_selected(NULL, 0),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_navigation_set_selected(&nav, 5), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_navigation_set_selected(&nav, M3_NAV_INVALID_INDEX));
   CMP_TEST_OK(m3_navigation_get_selected(&nav, &selected));
@@ -629,12 +633,13 @@ static int test_setters_and_getters(void) {
   CMP_TEST_OK(m3_navigation_set_selected(&nav, 1));
 
   CMP_TEST_EXPECT(m3_navigation_set_on_select(NULL, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_navigation_set_on_select(&nav, NULL, NULL));
 
   CMP_TEST_EXPECT(m3_navigation_set_style(NULL, &style),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_navigation_set_style(&nav, NULL), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_navigation_set_style(&nav, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   {
     M3NavigationStyle bad_style = style;
     bad_style.item_height = -1.0f;
@@ -642,7 +647,7 @@ static int test_setters_and_getters(void) {
   }
 
   CMP_TEST_EXPECT(m3_navigation_set_items(NULL, NULL, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_navigation_set_items(&nav, NULL, 0));
   CMP_TEST_ASSERT(nav.item_count == 0u);
   CMP_TEST_ASSERT(nav.selected_index == M3_NAV_INVALID_INDEX);
@@ -652,7 +657,7 @@ static int test_setters_and_getters(void) {
     bad_items[0].utf8_label = NULL;
     bad_items[0].utf8_len = 1;
     CMP_TEST_EXPECT(m3_navigation_set_items(&nav, bad_items, 1),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   new_items[0].utf8_label = "Only";
@@ -666,7 +671,8 @@ static int test_setters_and_getters(void) {
   nav.bounds.width = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_get_mode(&nav, &mode), CMP_ERR_RANGE);
 
-  CMP_TEST_EXPECT(m3_navigation_get_mode(NULL, &mode), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_navigation_get_mode(NULL, &mode),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_navigation_get_mode(&nav, NULL), CMP_ERR_INVALID_ARGUMENT);
 
   backend_state.fail_create = 1;
@@ -716,42 +722,42 @@ static int test_measure_layout_mode(void) {
   size_spec.mode = CMP_MEASURE_UNSPECIFIED;
   size_spec.size = 0.0f;
   CMP_TEST_EXPECT(nav.widget.vtable->measure(NULL, size_spec, size_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(nav.widget.vtable->measure(&nav, size_spec, size_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_spec.mode = 99u;
   bad_spec.size = 0.0f;
   size_spec.mode = CMP_MEASURE_EXACTLY;
   size_spec.size = 10.0f;
   CMP_TEST_EXPECT(nav.widget.vtable->measure(&nav, bad_spec, size_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_spec.mode = CMP_MEASURE_EXACTLY;
   bad_spec.size = -5.0f;
   CMP_TEST_EXPECT(nav.widget.vtable->measure(&nav, bad_spec, size_spec, &size),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bad_spec.mode = 99u;
   bad_spec.size = 0.0f;
   CMP_TEST_EXPECT(nav.widget.vtable->measure(&nav, size_spec, bad_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   nav.style.item_height = -1.0f;
   CMP_TEST_EXPECT(nav.widget.vtable->measure(&nav, size_spec, size_spec, &size),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.style.item_height = style.item_height;
 
 #ifdef CMP_TESTING
   CMP_TEST_OK(m3_navigation_test_set_fail_point(M3_NAV_TEST_FAIL_RESOLVE_MODE));
   CMP_TEST_EXPECT(nav.widget.vtable->measure(&nav, size_spec, size_spec, &size),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_navigation_test_clear_fail_points());
 
   CMP_TEST_OK(
       m3_navigation_test_set_fail_point(M3_NAV_TEST_FAIL_MEASURE_CONTENT));
   CMP_TEST_EXPECT(nav.widget.vtable->measure(&nav, size_spec, size_spec, &size),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_navigation_test_clear_fail_points());
 #endif
 
@@ -783,7 +789,7 @@ static int test_measure_layout_mode(void) {
 
   nav.style.item_spacing = -1.0f;
   CMP_TEST_EXPECT(nav.widget.vtable->measure(&nav, size_spec, size_spec, &size),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.style.item_spacing = style.item_spacing;
 
   style.mode = M3_NAV_MODE_RAIL;
@@ -809,7 +815,7 @@ static int test_measure_layout_mode(void) {
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(nav.widget.vtable->layout(&nav, bounds), CMP_ERR_RANGE);
   CMP_TEST_EXPECT(nav.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   nav.style.item_height = -1.0f;
   bounds.width = 80.0f;
@@ -885,18 +891,18 @@ static int test_compute_layout_and_hit_test(void) {
   nav.bounds.height = 60.0f;
 
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(NULL, &layout),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   nav.style.item_height = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.style.item_height = style.item_height;
 
   nav.bounds.width = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.bounds.width = 100.0f;
 
   nav.style.padding.left = 10.0f;
@@ -906,7 +912,7 @@ static int test_compute_layout_and_hit_test(void) {
   nav.bounds.width = 5.0f;
   nav.bounds.height = 5.0f;
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.style.padding.left = style.padding.left;
   nav.style.padding.right = style.padding.right;
   nav.style.padding.top = style.padding.top;
@@ -917,25 +923,25 @@ static int test_compute_layout_and_hit_test(void) {
 #ifdef CMP_TESTING
   CMP_TEST_OK(m3_navigation_test_set_fail_point(M3_NAV_TEST_FAIL_RESOLVE_MODE));
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_navigation_test_clear_fail_points());
 
   CMP_TEST_OK(m3_navigation_test_set_fail_point(
       M3_NAV_TEST_FAIL_LAYOUT_SPACING_NEGATIVE));
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_navigation_test_clear_fail_points());
 #endif
 
   nav.style.item_spacing = -1.0f;
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.style.item_spacing = style.item_spacing;
 
   nav.style.mode = M3_NAV_MODE_BAR;
   nav.style.item_height = 0.0f;
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.style.item_height = style.item_height;
 
 #ifdef CMP_TESTING
@@ -943,13 +949,13 @@ static int test_compute_layout_and_hit_test(void) {
   CMP_TEST_OK(m3_navigation_test_set_fail_point(
       M3_NAV_TEST_FAIL_LAYOUT_ITEM_HEIGHT_NEGATIVE));
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_navigation_test_clear_fail_points());
 #endif
 
   nav.bounds.height = nav.style.padding.top + nav.style.padding.bottom;
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   nav.bounds.height = 20.0f;
   nav.style.item_height = 50.0f;
@@ -962,7 +968,7 @@ static int test_compute_layout_and_hit_test(void) {
   nav.style.item_spacing = 10.0f;
   nav.bounds.width = 15.0f;
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.style.item_spacing = style.item_spacing;
   nav.bounds.width = 100.0f;
   nav.item_count = 2;
@@ -971,14 +977,14 @@ static int test_compute_layout_and_hit_test(void) {
   CMP_TEST_OK(m3_navigation_test_set_fail_point(
       M3_NAV_TEST_FAIL_LAYOUT_ITEM_WIDTH_NEGATIVE));
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_navigation_test_clear_fail_points());
 #endif
 
   nav.style.mode = M3_NAV_MODE_RAIL;
   nav.style.item_height = 0.0f;
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.style.item_height = style.item_height;
 
 #ifdef CMP_TESTING
@@ -986,13 +992,13 @@ static int test_compute_layout_and_hit_test(void) {
   CMP_TEST_OK(m3_navigation_test_set_fail_point(
       M3_NAV_TEST_FAIL_LAYOUT_ITEM_HEIGHT_NEGATIVE));
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_navigation_test_clear_fail_points());
 #endif
 
   nav.bounds.width = nav.style.padding.left + nav.style.padding.right;
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.bounds.width = 100.0f;
 
   nav.item_count = 0;
@@ -1004,12 +1010,12 @@ static int test_compute_layout_and_hit_test(void) {
   CMP_TEST_OK(
       m3_navigation_test_set_fail_point(M3_NAV_TEST_FAIL_LAYOUT_MODE_INVALID));
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, &layout),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_navigation_test_clear_fail_points());
 #endif
 
   CMP_TEST_EXPECT(m3_navigation_test_compute_layout(&nav, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   layout.mode = M3_NAV_MODE_BAR;
   layout.start_x = 0.0f;
@@ -1021,11 +1027,11 @@ static int test_compute_layout_and_hit_test(void) {
   layout.content_height = 10.0f;
 
   CMP_TEST_EXPECT(m3_navigation_test_hit_test(NULL, &layout, 0, 0, &index),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_navigation_test_hit_test(&nav, NULL, 0, 0, &index),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_navigation_test_hit_test(&nav, &layout, 0, 0, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   nav.item_count = 0;
   CMP_TEST_OK(m3_navigation_test_hit_test(&nav, &layout, 0, 0, &index));
@@ -1037,7 +1043,7 @@ static int test_compute_layout_and_hit_test(void) {
   layout.item_width = 0.0f;
   layout.spacing = 0.0f;
   CMP_TEST_EXPECT(m3_navigation_test_hit_test(&nav, &layout, 5, 5, &index),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   layout.item_width = 10.0f;
 
 #ifdef CMP_TESTING
@@ -1078,7 +1084,7 @@ static int test_compute_layout_and_hit_test(void) {
   layout.item_height = 0.0f;
   layout.spacing = 0.0f;
   CMP_TEST_EXPECT(m3_navigation_test_hit_test(&nav, &layout, 5, 5, &index),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   layout.item_height = 10.0f;
 
 #ifdef CMP_TESTING
@@ -1164,11 +1170,11 @@ static int test_event_selection(void) {
   CMP_TEST_OK(nav.widget.vtable->layout(&nav, bounds));
 
   CMP_TEST_EXPECT(nav.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(nav.widget.vtable->event(nav.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(nav.widget.vtable->event(nav.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   memset(&event, 0, sizeof(event));
   event.type = CMP_INPUT_POINTER_DOWN;
@@ -1176,7 +1182,7 @@ static int test_event_selection(void) {
   event.data.pointer.y = 10;
   nav.style.item_height = -1.0f;
   CMP_TEST_EXPECT(nav.widget.vtable->event(&nav, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.style.item_height = style.item_height;
 
   nav.bounds.width = 0.0f;
@@ -1184,7 +1190,7 @@ static int test_event_selection(void) {
   event.data.pointer.x = 0;
   event.data.pointer.y = 10;
   CMP_TEST_EXPECT(nav.widget.vtable->event(&nav, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   nav.bounds.width = bounds.width;
   nav.bounds.height = bounds.height;
 
@@ -1209,7 +1215,7 @@ static int test_event_selection(void) {
   CMP_TEST_ASSERT(nav.pressed_index == 0u);
 
   CMP_TEST_EXPECT(nav.widget.vtable->event(&nav, &event, &handled),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
 
   event.type = CMP_INPUT_POINTER_UP;
   CMP_TEST_OK(nav.widget.vtable->event(&nav, &event, &handled));
@@ -1307,13 +1313,13 @@ static int test_paint(void) {
   CMP_TEST_OK(nav.widget.vtable->layout(&nav, bounds));
 
   CMP_TEST_EXPECT(nav.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(nav.widget.vtable->paint(nav.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   gfx.vtable = &g_test_gfx_vtable_no_rect;
   CMP_TEST_EXPECT(nav.widget.vtable->paint(&nav, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_gfx_vtable;
 
   rc = nav.widget.vtable->paint(&nav, &paint_ctx);
@@ -1360,7 +1366,7 @@ static int test_paint(void) {
   nav.items = bad_items;
   nav.item_count = 1;
   CMP_TEST_EXPECT(nav.widget.vtable->paint(&nav, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   nav.items = items;
   nav.item_count = 2;
 
@@ -1375,21 +1381,21 @@ static int test_paint(void) {
 
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(nav.widget.vtable->paint(&nav, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_gfx_vtable;
 
   gfx.vtable = &g_test_gfx_vtable;
   gfx.text_vtable = NULL;
   CMP_TEST_EXPECT(nav.widget.vtable->paint(&nav, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(nav.widget.vtable->paint(&nav, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable;
 
   nav.text_backend.vtable = &g_test_text_vtable_no_measure;
   CMP_TEST_EXPECT(nav.widget.vtable->paint(&nav, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   nav.text_backend.vtable = &g_test_text_vtable;
 
   nav.items = NULL;

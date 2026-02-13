@@ -25,7 +25,8 @@ static int cmp_layout_near(CMPScalar a, CMPScalar b, CMPScalar tol) {
 }
 
 static int cmp_layout_measure_cb(void *ctx, CMPLayoutMeasureSpec width,
-                                CMPLayoutMeasureSpec height, CMPSize *out_size) {
+                                 CMPLayoutMeasureSpec height,
+                                 CMPSize *out_size) {
   MeasureCtx *measure;
 
   if (ctx == NULL || out_size == NULL) {
@@ -55,8 +56,8 @@ static int cmp_layout_measure_cb(void *ctx, CMPLayoutMeasureSpec width,
 }
 
 static int cmp_layout_measure_mutate(void *ctx, CMPLayoutMeasureSpec width,
-                                    CMPLayoutMeasureSpec height,
-                                    CMPSize *out_size) {
+                                     CMPLayoutMeasureSpec height,
+                                     CMPSize *out_size) {
   MutateCtx *state;
 
   CMP_UNUSED(width);
@@ -111,35 +112,35 @@ int main(void) {
       cmp_layout_measure_spec_init(NULL, CMP_LAYOUT_MEASURE_UNSPECIFIED, 0.0f),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_measure_spec_init(&spec, 99, 0.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       cmp_layout_measure_spec_init(&spec, CMP_LAYOUT_MEASURE_EXACTLY, -1.0f),
       CMP_ERR_RANGE);
-  CMP_TEST_OK(cmp_layout_measure_spec_init(&spec_unspec,
-                                         CMP_LAYOUT_MEASURE_UNSPECIFIED, 0.0f));
+  CMP_TEST_OK(cmp_layout_measure_spec_init(
+      &spec_unspec, CMP_LAYOUT_MEASURE_UNSPECIFIED, 0.0f));
   CMP_TEST_OK(cmp_layout_measure_spec_init(&spec_exact_60,
-                                         CMP_LAYOUT_MEASURE_EXACTLY, 60.0f));
+                                           CMP_LAYOUT_MEASURE_EXACTLY, 60.0f));
   CMP_TEST_OK(cmp_layout_measure_spec_init(&spec_exact_40,
-                                         CMP_LAYOUT_MEASURE_EXACTLY, 40.0f));
+                                           CMP_LAYOUT_MEASURE_EXACTLY, 40.0f));
   CMP_TEST_OK(cmp_layout_measure_spec_init(&spec_exact_25,
-                                         CMP_LAYOUT_MEASURE_EXACTLY, 25.0f));
+                                           CMP_LAYOUT_MEASURE_EXACTLY, 25.0f));
   CMP_TEST_OK(cmp_layout_measure_spec_init(&spec_exact_30,
-                                         CMP_LAYOUT_MEASURE_EXACTLY, 30.0f));
+                                           CMP_LAYOUT_MEASURE_EXACTLY, 30.0f));
   CMP_TEST_OK(cmp_layout_measure_spec_init(&spec_exact_50,
-                                         CMP_LAYOUT_MEASURE_EXACTLY, 50.0f));
+                                           CMP_LAYOUT_MEASURE_EXACTLY, 50.0f));
   CMP_TEST_OK(cmp_layout_measure_spec_init(&spec_at_most_15,
-                                         CMP_LAYOUT_MEASURE_AT_MOST, 15.0f));
+                                           CMP_LAYOUT_MEASURE_AT_MOST, 15.0f));
   CMP_TEST_OK(cmp_layout_direction_init(&direction, CMP_DIRECTION_LTR));
   CMP_TEST_OK(cmp_layout_direction_init(&direction_rtl, CMP_DIRECTION_RTL));
   CMP_TEST_EXPECT(cmp_layout_test_validate_direction(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   direction.flow = 99u;
   CMP_TEST_EXPECT(cmp_layout_test_validate_direction(&direction),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   direction.flow = CMP_DIRECTION_LTR;
   CMP_TEST_OK(cmp_layout_test_validate_direction(&direction));
   CMP_TEST_EXPECT(cmp_layout_test_clamp_non_negative(-1.0f, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_layout_test_clamp_non_negative(-1.0f, &clamped));
   CMP_TEST_ASSERT(clamped == 0.0f);
   CMP_TEST_OK(cmp_layout_test_clamp_non_negative(2.0f, &clamped));
@@ -147,13 +148,13 @@ int main(void) {
   CMP_TEST_EXPECT(
       cmp_layout_test_resolve_available(CMP_LAYOUT_AUTO, spec_unspec, NULL),
       CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_OK(
-      cmp_layout_test_resolve_available(CMP_LAYOUT_AUTO, spec_unspec, &resolved));
+  CMP_TEST_OK(cmp_layout_test_resolve_available(CMP_LAYOUT_AUTO, spec_unspec,
+                                                &resolved));
   CMP_TEST_ASSERT(resolved == -1.0f);
   CMP_TEST_OK(cmp_layout_test_resolve_available(10.0f, spec_unspec, &resolved));
   CMP_TEST_ASSERT(resolved == 10.0f);
   CMP_TEST_OK(cmp_layout_test_resolve_available(CMP_LAYOUT_AUTO, spec_exact_50,
-                                              &resolved));
+                                                &resolved));
   CMP_TEST_ASSERT(resolved == 50.0f);
   CMP_TEST_OK(
       cmp_layout_test_resolve_available(10.0f, spec_at_most_15, &resolved));
@@ -163,22 +164,22 @@ int main(void) {
   CMP_TEST_ASSERT(resolved == 15.0f);
 
   CMP_TEST_EXPECT(cmp_layout_edges_set(NULL, 0.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_edges_set(&edges, -1.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(cmp_layout_edges_set(&edges, 1.0f, 2.0f, 3.0f, 4.0f));
   CMP_TEST_EXPECT(cmp_layout_test_resolve_horizontal_padding(
-                     NULL, &edges, &padding_left, &padding_right),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      NULL, &edges, &padding_left, &padding_right),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_test_resolve_horizontal_padding(
-                     &direction, NULL, &padding_left, &padding_right),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      &direction, NULL, &padding_left, &padding_right),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_test_resolve_horizontal_padding(
-                     &direction, &edges, NULL, &padding_right),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_layout_test_resolve_horizontal_padding(&direction, &edges,
-                                                           &padding_left, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      &direction, &edges, NULL, &padding_right),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_layout_test_resolve_horizontal_padding(
+                      &direction, &edges, &padding_left, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_layout_test_resolve_horizontal_padding(
       &direction, &edges, &padding_left, &padding_right));
   CMP_TEST_ASSERT(padding_left == 1.0f);
@@ -195,16 +196,20 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_layout_node_init(NULL, &style), CMP_ERR_INVALID_ARGUMENT);
 
   style.direction = 99;
-  CMP_TEST_EXPECT(cmp_layout_node_init(&node, &style), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_layout_node_init(&node, &style),
+                  CMP_ERR_INVALID_ARGUMENT);
   style.direction = CMP_LAYOUT_DIRECTION_ROW;
   style.wrap = 99;
-  CMP_TEST_EXPECT(cmp_layout_node_init(&node, &style), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_layout_node_init(&node, &style),
+                  CMP_ERR_INVALID_ARGUMENT);
   style.wrap = CMP_LAYOUT_WRAP_NO;
   style.align_main = CMP_LAYOUT_ALIGN_STRETCH;
-  CMP_TEST_EXPECT(cmp_layout_node_init(&node, &style), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_layout_node_init(&node, &style),
+                  CMP_ERR_INVALID_ARGUMENT);
   style.align_main = CMP_LAYOUT_ALIGN_START;
   style.align_cross = CMP_LAYOUT_ALIGN_SPACE_BETWEEN;
-  CMP_TEST_EXPECT(cmp_layout_node_init(&node, &style), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_layout_node_init(&node, &style),
+                  CMP_ERR_INVALID_ARGUMENT);
   style.align_cross = CMP_LAYOUT_ALIGN_START;
   style.padding.left = -1.0f;
   CMP_TEST_EXPECT(cmp_layout_node_init(&node, &style), CMP_ERR_RANGE);
@@ -224,35 +229,36 @@ int main(void) {
   CMP_TEST_OK(cmp_layout_test_set_style_init_fail(CMP_FALSE));
 #endif
   CMP_TEST_EXPECT(cmp_layout_node_set_children(NULL, NULL, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_node_set_children(&node, NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   children[0] = NULL;
   CMP_TEST_EXPECT(cmp_layout_node_set_children(&node, children, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_layout_node_set_children(&node, NULL, 0));
   CMP_TEST_OK(cmp_layout_node_set_measure(&node, NULL, NULL));
   CMP_TEST_EXPECT(cmp_layout_node_set_measure(NULL, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_node_get_measured(NULL, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_node_get_measured(&node, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_node_get_layout(NULL, &rect),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_node_get_layout(&node, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_layout_compute(NULL, &direction, spec_unspec, spec_unspec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_layout_compute(NULL, &direction, spec_unspec, spec_unspec),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_compute(&node, NULL, spec_unspec, spec_unspec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_layout_test_validate_measure_spec(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = 99;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(cmp_layout_test_validate_measure_spec(&spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_LAYOUT_MEASURE_AT_MOST;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(cmp_layout_test_validate_measure_spec(&spec), CMP_ERR_RANGE);
@@ -260,24 +266,25 @@ int main(void) {
   spec.size = 0.0f;
   CMP_TEST_OK(cmp_layout_test_validate_measure_spec(&spec));
 
-  CMP_TEST_EXPECT(cmp_layout_test_validate_style(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_layout_test_validate_style(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_layout_style_init(&style));
   CMP_TEST_OK(cmp_layout_test_validate_style(&style));
 
   CMP_TEST_EXPECT(cmp_layout_test_apply_spec(1.0f, spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_LAYOUT_MEASURE_EXACTLY;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(cmp_layout_test_apply_spec(1.0f, spec, &out_size),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   spec.mode = CMP_LAYOUT_MEASURE_AT_MOST;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(cmp_layout_test_apply_spec(1.0f, spec, &out_size),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   spec.mode = 99;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(cmp_layout_test_apply_spec(1.0f, spec, &out_size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_LAYOUT_MEASURE_EXACTLY;
   spec.size = 5.0f;
   CMP_TEST_OK(cmp_layout_test_apply_spec(1.0f, spec, &out_size));
@@ -308,28 +315,28 @@ int main(void) {
       cmp_layout_test_measure_column(&node, spec_unspec, spec_unspec, NULL),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_test_measure_node(NULL, spec_unspec, spec_unspec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_test_layout_node(NULL, 0.0f, 0.0f, 1.0f, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   spec.mode = 99;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(cmp_layout_test_measure_node(&node, spec_unspec, spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_LAYOUT_MEASURE_UNSPECIFIED;
   spec.size = 0.0f;
   node.child_count = 1;
   node.children = NULL;
   CMP_TEST_EXPECT(cmp_layout_test_measure_node(&node, spec_unspec, spec_unspec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   node.child_count = 0;
 
   spec.mode = CMP_LAYOUT_MEASURE_EXACTLY;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(cmp_layout_test_measure_leaf(&node, spec, spec_unspec, &size),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(cmp_layout_test_measure_leaf(&node, spec_unspec, spec, &size),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(cmp_layout_style_init(&style));
   style.width = CMP_LAYOUT_AUTO;
@@ -365,7 +372,8 @@ int main(void) {
   CMP_TEST_ASSERT(rect.width == 30.0f);
   CMP_TEST_ASSERT(rect.height == 20.0f);
 
-  CMP_TEST_OK(cmp_layout_compute(&node, &direction, spec_exact_50, spec_unspec));
+  CMP_TEST_OK(
+      cmp_layout_compute(&node, &direction, spec_exact_50, spec_unspec));
   CMP_TEST_OK(cmp_layout_node_get_layout(&node, &rect));
   CMP_TEST_ASSERT(rect.width == 50.0f);
 
@@ -594,14 +602,14 @@ int main(void) {
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 1));
   container.style.align_main = 99;
   CMP_TEST_EXPECT(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f,
-                                                       10.0f, 10.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                         10.0f, 10.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   container.style.align_main = CMP_LAYOUT_ALIGN_START;
   container.style.align_cross = 99;
   CMP_TEST_EXPECT(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f,
-                                                       10.0f, 10.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                         10.0f, 10.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_layout_style_init(&style));
   style.direction = CMP_LAYOUT_DIRECTION_ROW;
@@ -644,8 +652,8 @@ int main(void) {
   style.direction = CMP_LAYOUT_DIRECTION_ROW;
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   CMP_TEST_OK(cmp_layout_node_init(&child1, &style));
-  CMP_TEST_OK(
-      cmp_layout_node_set_measure(&child1, cmp_layout_measure_cb, &measure_ctx));
+  CMP_TEST_OK(cmp_layout_node_set_measure(&child1, cmp_layout_measure_cb,
+                                          &measure_ctx));
   children[0] = &child1;
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 1));
   CMP_TEST_EXPECT(
@@ -663,8 +671,8 @@ int main(void) {
   measure_ctx.width = 6.0f;
   measure_ctx.height = 4.0f;
   measure_ctx.fail = CMP_FALSE;
-  CMP_TEST_OK(
-      cmp_layout_node_set_measure(&child1, cmp_layout_measure_cb, &measure_ctx));
+  CMP_TEST_OK(cmp_layout_node_set_measure(&child1, cmp_layout_measure_cb,
+                                          &measure_ctx));
   children[0] = &child1;
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 1));
   CMP_TEST_OK(
@@ -697,8 +705,8 @@ int main(void) {
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   container.child_count = 0;
   container.children = NULL;
-  CMP_TEST_OK(cmp_layout_test_measure_column(&container, spec_unspec, spec_unspec,
-                                           &size));
+  CMP_TEST_OK(cmp_layout_test_measure_column(&container, spec_unspec,
+                                             spec_unspec, &size));
 
   CMP_TEST_OK(cmp_layout_style_init(&style));
   style.direction = CMP_LAYOUT_DIRECTION_COLUMN;
@@ -719,13 +727,13 @@ int main(void) {
   style.direction = CMP_LAYOUT_DIRECTION_COLUMN;
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   CMP_TEST_OK(cmp_layout_node_init(&child1, &style));
-  CMP_TEST_OK(
-      cmp_layout_node_set_measure(&child1, cmp_layout_measure_cb, &measure_ctx));
+  CMP_TEST_OK(cmp_layout_node_set_measure(&child1, cmp_layout_measure_cb,
+                                          &measure_ctx));
   children[0] = &child1;
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 1));
   CMP_TEST_EXPECT(cmp_layout_test_measure_column(&container, spec_unspec,
-                                               spec_unspec, &size),
-                 CMP_ERR_UNKNOWN);
+                                                 spec_unspec, &size),
+                  CMP_ERR_UNKNOWN);
   measure_ctx.fail = CMP_FALSE;
 
   CMP_TEST_OK(cmp_layout_style_init(&style));
@@ -738,12 +746,12 @@ int main(void) {
   measure_ctx.width = 4.0f;
   measure_ctx.height = 6.0f;
   measure_ctx.fail = CMP_FALSE;
-  CMP_TEST_OK(
-      cmp_layout_node_set_measure(&child1, cmp_layout_measure_cb, &measure_ctx));
+  CMP_TEST_OK(cmp_layout_node_set_measure(&child1, cmp_layout_measure_cb,
+                                          &measure_ctx));
   children[0] = &child1;
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 1));
-  CMP_TEST_OK(cmp_layout_test_measure_column(&container, spec_unspec, spec_unspec,
-                                           &size));
+  CMP_TEST_OK(cmp_layout_test_measure_column(&container, spec_unspec,
+                                             spec_unspec, &size));
 
   CMP_TEST_OK(cmp_layout_style_init(&style));
   style.direction = CMP_LAYOUT_DIRECTION_COLUMN;
@@ -752,8 +760,8 @@ int main(void) {
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   container.child_count = 0;
   container.children = NULL;
-  CMP_TEST_OK(cmp_layout_test_measure_column(&container, spec_unspec, spec_unspec,
-                                           &size));
+  CMP_TEST_OK(cmp_layout_test_measure_column(&container, spec_unspec,
+                                             spec_unspec, &size));
 
   spec.mode = CMP_LAYOUT_MEASURE_EXACTLY;
   spec.size = -1.0f;
@@ -768,7 +776,7 @@ int main(void) {
   CMP_TEST_OK(cmp_layout_node_init(&node, &style));
   node.style.direction = 99;
   CMP_TEST_EXPECT(cmp_layout_test_measure_node(&node, spec_unspec, spec_unspec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_layout_style_init(&style));
   style.direction = CMP_LAYOUT_DIRECTION_ROW;
@@ -814,39 +822,39 @@ int main(void) {
   children[0] = &child1;
   children[1] = &child2;
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 2));
-  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f, 5.0f,
-                                                   10.0f));
+  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f,
+                                                     5.0f, 10.0f));
 
   style.align_main = CMP_LAYOUT_ALIGN_END;
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 2));
-  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f, 5.0f,
-                                                   10.0f));
+  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f,
+                                                     5.0f, 10.0f));
 
   style.align_main = CMP_LAYOUT_ALIGN_SPACE_BETWEEN;
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 2));
-  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f, 5.0f,
-                                                   10.0f));
+  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f,
+                                                     5.0f, 10.0f));
 
   style.align_main = CMP_LAYOUT_ALIGN_SPACE_AROUND;
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 2));
-  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f, 5.0f,
-                                                   10.0f));
+  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f,
+                                                     5.0f, 10.0f));
 
   style.align_main = CMP_LAYOUT_ALIGN_SPACE_EVENLY;
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 2));
-  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f, 5.0f,
-                                                   10.0f));
+  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f,
+                                                     5.0f, 10.0f));
 
   style.align_main = CMP_LAYOUT_ALIGN_START;
   style.align_cross = CMP_LAYOUT_ALIGN_CENTER;
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 2));
-  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f, 5.0f,
-                                                   10.0f));
+  CMP_TEST_OK(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f,
+                                                     5.0f, 10.0f));
 
   CMP_TEST_OK(cmp_layout_node_init(&child3, &style));
   child3.measured.width = 2.0f;
@@ -856,8 +864,8 @@ int main(void) {
   children[0] = &child3;
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 1));
   CMP_TEST_EXPECT(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f,
-                                                       5.0f, 10.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                         5.0f, 10.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   mutate_ctx.target = &container;
   mutate_ctx.called = 0;
@@ -869,7 +877,7 @@ int main(void) {
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   CMP_TEST_OK(cmp_layout_node_init(&child1, &style));
   CMP_TEST_OK(cmp_layout_node_set_measure(&child1, cmp_layout_measure_mutate,
-                                        &mutate_ctx));
+                                          &mutate_ctx));
   children[0] = &child1;
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 1));
   CMP_TEST_EXPECT(
@@ -885,12 +893,12 @@ int main(void) {
   node.child_count = 1;
   node.children = NULL;
   CMP_TEST_EXPECT(cmp_layout_test_measure_node(&node, spec_unspec, spec_unspec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   spec.mode = CMP_LAYOUT_MEASURE_EXACTLY;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(cmp_layout_test_measure_node(&node, spec, spec_unspec),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(cmp_layout_style_init(&style));
   style.direction = CMP_LAYOUT_DIRECTION_ROW;
@@ -946,8 +954,8 @@ int main(void) {
   children[0] = &child1;
   children[1] = &child2;
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 2));
-  CMP_TEST_OK(cmp_layout_test_measure_column(&container, spec_unspec, spec_unspec,
-                                           &size));
+  CMP_TEST_OK(cmp_layout_test_measure_column(&container, spec_unspec,
+                                             spec_unspec, &size));
 
   direction.flow = 99u;
   CMP_TEST_OK(cmp_layout_style_init(&style));
@@ -955,31 +963,31 @@ int main(void) {
   style.wrap = CMP_LAYOUT_WRAP_NO;
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   CMP_TEST_EXPECT(cmp_layout_test_measure_row_with_direction(
-                     &container, &direction, spec_unspec, spec_unspec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      &container, &direction, spec_unspec, spec_unspec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_test_measure_node_with_direction(
-                     &container, &direction, spec_unspec, spec_unspec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      &container, &direction, spec_unspec, spec_unspec),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_test_layout_node_with_direction(
-                     &container, &direction, 0.0f, 0.0f, 1.0f, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      &container, &direction, 0.0f, 0.0f, 1.0f, 1.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_test_layout_children_row_with_direction(
-                     NULL, &direction, 0.0f, 0.0f, 1.0f, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      NULL, &direction, 0.0f, 0.0f, 1.0f, 1.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_test_layout_children_row_with_direction(
-                     &container, &direction, 0.0f, 0.0f, 1.0f, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      &container, &direction, 0.0f, 0.0f, 1.0f, 1.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
   style.direction = CMP_LAYOUT_DIRECTION_COLUMN;
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   CMP_TEST_EXPECT(cmp_layout_test_measure_column_with_direction(
-                     &container, &direction, spec_unspec, spec_unspec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      &container, &direction, spec_unspec, spec_unspec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_test_layout_children_column_with_direction(
-                     NULL, &direction, 0.0f, 0.0f, 1.0f, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      NULL, &direction, 0.0f, 0.0f, 1.0f, 1.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_test_layout_children_column_with_direction(
-                     &container, &direction, 0.0f, 0.0f, 1.0f, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      &container, &direction, 0.0f, 0.0f, 1.0f, 1.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
   direction.flow = CMP_DIRECTION_LTR;
 
   CMP_TEST_OK(cmp_layout_test_set_direction_fail(CMP_TRUE));
@@ -987,19 +995,20 @@ int main(void) {
       cmp_layout_test_measure_row(&container, spec_unspec, spec_unspec, &size),
       CMP_ERR_UNKNOWN);
   CMP_TEST_EXPECT(cmp_layout_test_measure_column(&container, spec_unspec,
-                                               spec_unspec, &size),
-                 CMP_ERR_UNKNOWN);
+                                                 spec_unspec, &size),
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_EXPECT(
       cmp_layout_test_measure_node(&container, spec_unspec, spec_unspec),
       CMP_ERR_UNKNOWN);
-  CMP_TEST_EXPECT(cmp_layout_test_layout_node(&container, 0.0f, 0.0f, 1.0f, 1.0f),
-                 CMP_ERR_UNKNOWN);
+  CMP_TEST_EXPECT(
+      cmp_layout_test_layout_node(&container, 0.0f, 0.0f, 1.0f, 1.0f),
+      CMP_ERR_UNKNOWN);
   CMP_TEST_EXPECT(
       cmp_layout_test_layout_children_row(&container, 0.0f, 0.0f, 1.0f, 1.0f),
       CMP_ERR_UNKNOWN);
-  CMP_TEST_EXPECT(
-      cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f, 1.0f, 1.0f),
-      CMP_ERR_UNKNOWN);
+  CMP_TEST_EXPECT(cmp_layout_test_layout_children_column(&container, 0.0f, 0.0f,
+                                                         1.0f, 1.0f),
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(cmp_layout_test_set_direction_fail(CMP_FALSE));
 
   return 0;

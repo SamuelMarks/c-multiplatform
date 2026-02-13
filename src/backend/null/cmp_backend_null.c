@@ -5,16 +5,16 @@
 
 #include <string.h>
 
-#define CMP_NULL_RETURN_IF_ERROR(rc)                                            \
+#define CMP_NULL_RETURN_IF_ERROR(rc)                                           \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       return (rc);                                                             \
     }                                                                          \
   } while (0)
 
-#define CMP_NULL_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                           \
+#define CMP_NULL_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                          \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       cleanup;                                                                 \
       return (rc);                                                             \
     }                                                                          \
@@ -77,8 +77,8 @@ struct CMPNullBackend {
   cmp_usize clipboard_limit;
 };
 
-static int cmp_null_backend_log(struct CMPNullBackend *backend, CMPLogLevel level,
-                               const char *message) {
+static int cmp_null_backend_log(struct CMPNullBackend *backend,
+                                CMPLogLevel level, const char *message) {
   if (!backend->log_enabled) {
     return CMP_OK;
   }
@@ -86,8 +86,8 @@ static int cmp_null_backend_log(struct CMPNullBackend *backend, CMPLogLevel leve
 }
 
 static int cmp_null_backend_resolve(struct CMPNullBackend *backend,
-                                   CMPHandle handle, cmp_u32 type_id,
-                                   void **out_obj) {
+                                    CMPHandle handle, cmp_u32 type_id,
+                                    void **out_obj) {
   void *resolved;
   cmp_u32 actual_type;
   int rc;
@@ -222,7 +222,7 @@ static int cmp_null_ws_shutdown(void *ws) {
 }
 
 static int cmp_null_ws_create_window(void *ws, const CMPWSWindowConfig *config,
-                                    CMPHandle *out_window) {
+                                     CMPHandle *out_window) {
   struct CMPNullBackend *backend;
   CMPNullWindow *window;
   int rc;
@@ -257,7 +257,7 @@ static int cmp_null_ws_create_window(void *ws, const CMPWSWindowConfig *config,
   window->visible = CMP_FALSE;
 
   rc = cmp_object_header_init(&window->header, CMP_NULL_TYPE_WINDOW, 0,
-                             &g_cmp_null_window_vtable);
+                              &g_cmp_null_window_vtable);
   CMP_NULL_RETURN_IF_ERROR_CLEANUP(
       rc, backend->allocator.free(backend->allocator.ctx, window));
 
@@ -281,7 +281,7 @@ static int cmp_null_ws_destroy_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPNullBackend *)ws;
   rc = cmp_null_backend_resolve(backend, window, CMP_NULL_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.destroy_window");
@@ -301,7 +301,7 @@ static int cmp_null_ws_show_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPNullBackend *)ws;
   rc = cmp_null_backend_resolve(backend, window, CMP_NULL_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.show_window");
@@ -322,7 +322,7 @@ static int cmp_null_ws_hide_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPNullBackend *)ws;
   rc = cmp_null_backend_resolve(backend, window, CMP_NULL_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.hide_window");
@@ -333,7 +333,7 @@ static int cmp_null_ws_hide_window(void *ws, CMPHandle window) {
 }
 
 static int cmp_null_ws_set_window_title(void *ws, CMPHandle window,
-                                       const char *utf8_title) {
+                                        const char *utf8_title) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -351,8 +351,8 @@ static int cmp_null_ws_set_window_title(void *ws, CMPHandle window,
   return CMP_OK;
 }
 
-static int cmp_null_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width,
-                                      cmp_i32 height) {
+static int cmp_null_ws_set_window_size(void *ws, CMPHandle window,
+                                       cmp_i32 width, cmp_i32 height) {
   struct CMPNullBackend *backend;
   CMPNullWindow *resolved;
   int rc;
@@ -366,7 +366,7 @@ static int cmp_null_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width
 
   backend = (struct CMPNullBackend *)ws;
   rc = cmp_null_backend_resolve(backend, window, CMP_NULL_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_window_size");
@@ -378,7 +378,8 @@ static int cmp_null_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width
 }
 
 static int cmp_null_ws_get_window_size(void *ws, CMPHandle window,
-                                      cmp_i32 *out_width, cmp_i32 *out_height) {
+                                       cmp_i32 *out_width,
+                                       cmp_i32 *out_height) {
   struct CMPNullBackend *backend;
   CMPNullWindow *resolved;
   int rc;
@@ -389,7 +390,7 @@ static int cmp_null_ws_get_window_size(void *ws, CMPHandle window,
 
   backend = (struct CMPNullBackend *)ws;
   rc = cmp_null_backend_resolve(backend, window, CMP_NULL_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_window_size");
@@ -401,7 +402,7 @@ static int cmp_null_ws_get_window_size(void *ws, CMPHandle window,
 }
 
 static int cmp_null_ws_set_window_dpi_scale(void *ws, CMPHandle window,
-                                           CMPScalar scale) {
+                                            CMPScalar scale) {
   struct CMPNullBackend *backend;
   CMPNullWindow *resolved;
   int rc;
@@ -415,11 +416,11 @@ static int cmp_null_ws_set_window_dpi_scale(void *ws, CMPHandle window,
 
   backend = (struct CMPNullBackend *)ws;
   rc = cmp_null_backend_resolve(backend, window, CMP_NULL_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO,
-                           "ws.set_window_dpi_scale");
+                            "ws.set_window_dpi_scale");
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   resolved->dpi_scale = scale;
@@ -427,7 +428,7 @@ static int cmp_null_ws_set_window_dpi_scale(void *ws, CMPHandle window,
 }
 
 static int cmp_null_ws_get_window_dpi_scale(void *ws, CMPHandle window,
-                                           CMPScalar *out_scale) {
+                                            CMPScalar *out_scale) {
   struct CMPNullBackend *backend;
   CMPNullWindow *resolved;
   int rc;
@@ -438,11 +439,11 @@ static int cmp_null_ws_get_window_dpi_scale(void *ws, CMPHandle window,
 
   backend = (struct CMPNullBackend *)ws;
   rc = cmp_null_backend_resolve(backend, window, CMP_NULL_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO,
-                           "ws.get_window_dpi_scale");
+                            "ws.get_window_dpi_scale");
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   *out_scale = resolved->dpi_scale;
@@ -460,7 +461,8 @@ static int cmp_null_ws_set_clipboard_text(void *ws, const char *utf8_text) {
   }
 
   backend = (struct CMPNullBackend *)ws;
-  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_clipboard_text");
+  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO,
+                            "ws.set_clipboard_text");
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   length = 0;
@@ -491,8 +493,8 @@ static int cmp_null_ws_set_clipboard_text(void *ws, const char *utf8_text) {
 }
 
 static int cmp_null_ws_get_clipboard_text(void *ws, char *buffer,
-                                         cmp_usize buffer_size,
-                                         cmp_usize *out_length) {
+                                          cmp_usize buffer_size,
+                                          cmp_usize *out_length) {
   struct CMPNullBackend *backend;
   cmp_usize required;
   int rc;
@@ -502,7 +504,8 @@ static int cmp_null_ws_get_clipboard_text(void *ws, char *buffer,
   }
 
   backend = (struct CMPNullBackend *)ws;
-  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_clipboard_text");
+  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO,
+                            "ws.get_clipboard_text");
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   required = backend->clipboard_length + 1;
@@ -521,7 +524,7 @@ static int cmp_null_ws_get_clipboard_text(void *ws, char *buffer,
 }
 
 static int cmp_null_ws_poll_event(void *ws, CMPInputEvent *out_event,
-                                 CMPBool *out_has_event) {
+                                  CMPBool *out_has_event) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -569,25 +572,26 @@ static int cmp_null_ws_get_time_ms(void *ws, cmp_u32 *out_time_ms) {
   return CMP_OK;
 }
 
-static const CMPWSVTable g_cmp_null_ws_vtable = {cmp_null_ws_init,
-                                               cmp_null_ws_shutdown,
-                                               cmp_null_ws_create_window,
-                                               cmp_null_ws_destroy_window,
-                                               cmp_null_ws_show_window,
-                                               cmp_null_ws_hide_window,
-                                               cmp_null_ws_set_window_title,
-                                               cmp_null_ws_set_window_size,
-                                               cmp_null_ws_get_window_size,
-                                               cmp_null_ws_set_window_dpi_scale,
-                                               cmp_null_ws_get_window_dpi_scale,
-                                               cmp_null_ws_set_clipboard_text,
-                                               cmp_null_ws_get_clipboard_text,
-                                               cmp_null_ws_poll_event,
-                                               cmp_null_ws_pump_events,
-                                               cmp_null_ws_get_time_ms};
+static const CMPWSVTable g_cmp_null_ws_vtable = {
+    cmp_null_ws_init,
+    cmp_null_ws_shutdown,
+    cmp_null_ws_create_window,
+    cmp_null_ws_destroy_window,
+    cmp_null_ws_show_window,
+    cmp_null_ws_hide_window,
+    cmp_null_ws_set_window_title,
+    cmp_null_ws_set_window_size,
+    cmp_null_ws_get_window_size,
+    cmp_null_ws_set_window_dpi_scale,
+    cmp_null_ws_get_window_dpi_scale,
+    cmp_null_ws_set_clipboard_text,
+    cmp_null_ws_get_clipboard_text,
+    cmp_null_ws_poll_event,
+    cmp_null_ws_pump_events,
+    cmp_null_ws_get_time_ms};
 
 static int cmp_null_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
-                                   cmp_i32 height, CMPScalar dpi_scale) {
+                                    cmp_i32 height, CMPScalar dpi_scale) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -643,8 +647,8 @@ static int cmp_null_gfx_clear(void *gfx, CMPColor color) {
   return CMP_OK;
 }
 
-static int cmp_null_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
-                                 CMPScalar corner_radius) {
+static int cmp_null_gfx_draw_rect(void *gfx, const CMPRect *rect,
+                                  CMPColor color, CMPScalar corner_radius) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -667,8 +671,8 @@ static int cmp_null_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color
 }
 
 static int cmp_null_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
-                                 CMPScalar x1, CMPScalar y1, CMPColor color,
-                                 CMPScalar thickness) {
+                                  CMPScalar x1, CMPScalar y1, CMPColor color,
+                                  CMPScalar thickness) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -691,7 +695,8 @@ static int cmp_null_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
   return CMP_OK;
 }
 
-static int cmp_null_gfx_draw_path(void *gfx, const CMPPath *path, CMPColor color) {
+static int cmp_null_gfx_draw_path(void *gfx, const CMPPath *path,
+                                  CMPColor color) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -732,7 +737,7 @@ static int cmp_null_gfx_push_clip(void *gfx, const CMPRect *rect) {
 
 static int cmp_null_gfx_pop_clip(void *gfx) {
   struct CMPNullBackend *backend; /* GCOVR_EXCL_LINE */
-  int rc;                        /* GCOVR_EXCL_LINE */
+  int rc;                         /* GCOVR_EXCL_LINE */
 
   if (gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -759,9 +764,9 @@ static int cmp_null_gfx_set_transform(void *gfx, const CMPMat3 *transform) {
 }
 
 static int cmp_null_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
-                                      cmp_u32 format,
-                                      const void *pixels, /* GCOVR_EXCL_LINE */
-                                      cmp_usize size, CMPHandle *out_texture) {
+                                       cmp_u32 format,
+                                       const void *pixels, /* GCOVR_EXCL_LINE */
+                                       cmp_usize size, CMPHandle *out_texture) {
   struct CMPNullBackend *backend;
   CMPNullTexture *texture; /* GCOVR_EXCL_LINE */
   int rc;
@@ -798,7 +803,7 @@ static int cmp_null_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
   texture->format = format;
 
   rc = cmp_object_header_init(&texture->header, CMP_NULL_TYPE_TEXTURE, 0,
-                             &g_cmp_null_texture_vtable);
+                              &g_cmp_null_texture_vtable);
   CMP_NULL_RETURN_IF_ERROR_CLEANUP(
       rc, backend->allocator.free(backend->allocator.ctx, texture));
 
@@ -813,8 +818,8 @@ static int cmp_null_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
 }
 
 static int cmp_null_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
-                                      cmp_i32 y, cmp_i32 width, cmp_i32 height,
-                                      const void *pixels, cmp_usize size) {
+                                       cmp_i32 y, cmp_i32 width, cmp_i32 height,
+                                       const void *pixels, cmp_usize size) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -848,18 +853,19 @@ static int cmp_null_gfx_destroy_texture(void *gfx, CMPHandle texture) {
 
   backend = (struct CMPNullBackend *)gfx;
   rc = cmp_null_backend_resolve(backend, texture, CMP_NULL_TYPE_TEXTURE,
-                               (void **)&resolved); /* GCOVR_EXCL_LINE */
+                                (void **)&resolved); /* GCOVR_EXCL_LINE */
   CMP_NULL_RETURN_IF_ERROR(rc);
 
-  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.destroy_texture");
+  rc =
+      cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.destroy_texture");
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   return cmp_object_release(&resolved->header);
 }
 
 static int cmp_null_gfx_draw_texture(void *gfx, CMPHandle texture,
-                                    const CMPRect *src, const CMPRect *dst,
-                                    CMPScalar opacity) {
+                                     const CMPRect *src, const CMPRect *dst,
+                                     CMPScalar opacity) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -895,8 +901,8 @@ static const CMPGfxVTable g_cmp_null_gfx_vtable = {
     cmp_null_gfx_draw_texture};
 
 static int cmp_null_text_create_font(void *text, const char *utf8_family,
-                                    cmp_i32 size_px, cmp_i32 weight,
-                                    CMPBool italic, CMPHandle *out_font) {
+                                     cmp_i32 size_px, cmp_i32 weight,
+                                     CMPBool italic, CMPHandle *out_font) {
   struct CMPNullBackend *backend;
   CMPNullFont *font;
   int rc;
@@ -929,7 +935,7 @@ static int cmp_null_text_create_font(void *text, const char *utf8_family,
   font->italic = italic ? CMP_TRUE : CMP_FALSE;
 
   rc = cmp_object_header_init(&font->header, CMP_NULL_TYPE_FONT, 0,
-                             &g_cmp_null_font_vtable); /* GCOVR_EXCL_LINE */
+                              &g_cmp_null_font_vtable); /* GCOVR_EXCL_LINE */
   CMP_NULL_RETURN_IF_ERROR_CLEANUP(
       rc, backend->allocator.free(backend->allocator.ctx, font));
 
@@ -953,7 +959,7 @@ static int cmp_null_text_destroy_font(void *text, CMPHandle font) {
 
   backend = (struct CMPNullBackend *)text;
   rc = cmp_null_backend_resolve(backend, font, CMP_NULL_TYPE_FONT,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.destroy_font");
@@ -963,9 +969,10 @@ static int cmp_null_text_destroy_font(void *text, CMPHandle font) {
 }
 
 static int cmp_null_text_measure_text(void *text, CMPHandle font,
-                                     const char *utf8, cmp_usize utf8_len,
-                                     CMPScalar *out_width, CMPScalar *out_height,
-                                     CMPScalar *out_baseline) {
+                                      const char *utf8, cmp_usize utf8_len,
+                                      CMPScalar *out_width,
+                                      CMPScalar *out_height,
+                                      CMPScalar *out_baseline) {
   struct CMPNullBackend *backend;
   CMPNullFont *resolved;
   CMPScalar size;
@@ -981,7 +988,7 @@ static int cmp_null_text_measure_text(void *text, CMPHandle font,
 
   backend = (struct CMPNullBackend *)text;
   rc = cmp_null_backend_resolve(backend, font, CMP_NULL_TYPE_FONT,
-                               (void **)&resolved); /* GCOVR_EXCL_LINE */
+                                (void **)&resolved); /* GCOVR_EXCL_LINE */
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.measure_text");
@@ -995,9 +1002,9 @@ static int cmp_null_text_measure_text(void *text, CMPHandle font,
 }
 
 static int cmp_null_text_draw_text(void *text, CMPHandle font, const char *utf8,
-                                  cmp_usize utf8_len, CMPScalar x,
-                                  CMPScalar y,      /* GCOVR_EXCL_LINE */
-                                  CMPColor color) { /* GCOVR_EXCL_LINE */
+                                   cmp_usize utf8_len, CMPScalar x,
+                                   CMPScalar y,      /* GCOVR_EXCL_LINE */
+                                   CMPColor color) { /* GCOVR_EXCL_LINE */
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1027,7 +1034,7 @@ static const CMPTextVTable g_cmp_null_text_vtable = {
     cmp_null_text_measure_text, cmp_null_text_draw_text};
 
 static int cmp_null_io_read_file(void *io, const char *utf8_path, void *buffer,
-                                cmp_usize buffer_size, cmp_usize *out_read) {
+                                 cmp_usize buffer_size, cmp_usize *out_read) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1048,8 +1055,8 @@ static int cmp_null_io_read_file(void *io, const char *utf8_path, void *buffer,
 
 static int
 cmp_null_io_read_file_alloc(void *io, const char *utf8_path,
-                           const CMPAllocator *allocator, /* GCOVR_EXCL_LINE */
-                           void **out_data, cmp_usize *out_size) {
+                            const CMPAllocator *allocator, /* GCOVR_EXCL_LINE */
+                            void **out_data, cmp_usize *out_size) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1072,8 +1079,8 @@ cmp_null_io_read_file_alloc(void *io, const char *utf8_path,
 }
 
 static int cmp_null_io_write_file(void *io, const char *utf8_path,
-                                 const void *data, cmp_usize size,
-                                 CMPBool overwrite) {
+                                  const void *data, cmp_usize size,
+                                  CMPBool overwrite) {
   struct CMPNullBackend *backend; /* GCOVR_EXCL_LINE */
   int rc;
 
@@ -1093,7 +1100,7 @@ static int cmp_null_io_write_file(void *io, const char *utf8_path,
 }
 
 static int cmp_null_io_file_exists(void *io, const char *utf8_path,
-                                  CMPBool *out_exists) {
+                                   CMPBool *out_exists) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1124,7 +1131,7 @@ static int cmp_null_io_delete_file(void *io, const char *utf8_path) {
 }
 
 static int cmp_null_io_stat_file(void *io, const char *utf8_path,
-                                CMPFileInfo *out_info) {
+                                 CMPFileInfo *out_info) {
   struct CMPNullBackend *backend;
   int rc; /* GCOVR_EXCL_LINE */
 
@@ -1141,13 +1148,14 @@ static int cmp_null_io_stat_file(void *io, const char *utf8_path,
 }
 
 static const CMPIOVTable g_cmp_null_io_vtable = {
-    cmp_null_io_read_file,   cmp_null_io_read_file_alloc, cmp_null_io_write_file,
-    cmp_null_io_file_exists, cmp_null_io_delete_file,     cmp_null_io_stat_file};
+    cmp_null_io_read_file,   cmp_null_io_read_file_alloc,
+    cmp_null_io_write_file,  cmp_null_io_file_exists,
+    cmp_null_io_delete_file, cmp_null_io_stat_file};
 
 static int cmp_null_sensors_is_available(void *sensors, cmp_u32 type,
-                                        CMPBool *out_available) {
+                                         CMPBool *out_available) {
   struct CMPNullBackend *backend; /* GCOVR_EXCL_LINE */
-  int rc;                        /* GCOVR_EXCL_LINE */
+  int rc;                         /* GCOVR_EXCL_LINE */
 
   CMP_UNUSED(type);
 
@@ -1156,7 +1164,8 @@ static int cmp_null_sensors_is_available(void *sensors, cmp_u32 type,
   }
 
   backend = (struct CMPNullBackend *)sensors;
-  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "sensors.is_available");
+  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
+                            "sensors.is_available");
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   *out_available = CMP_FALSE;
@@ -1181,7 +1190,7 @@ static int cmp_null_sensors_start(void *sensors, cmp_u32 type) {
 
 static int cmp_null_sensors_stop(void *sensors, cmp_u32 type) {
   struct CMPNullBackend *backend; /* GCOVR_EXCL_LINE */
-  int rc;                        /* GCOVR_EXCL_LINE */
+  int rc;                         /* GCOVR_EXCL_LINE */
 
   CMP_UNUSED(type);
 
@@ -1195,9 +1204,10 @@ static int cmp_null_sensors_stop(void *sensors, cmp_u32 type) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-static int cmp_null_sensors_read(void *sensors, cmp_u32 type,
-                                CMPSensorReading *out_reading,
-                                CMPBool *out_has_reading) { /* GCOVR_EXCL_LINE */
+static int
+cmp_null_sensors_read(void *sensors, cmp_u32 type,
+                      CMPSensorReading *out_reading,
+                      CMPBool *out_has_reading) { /* GCOVR_EXCL_LINE */
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1217,8 +1227,8 @@ static int cmp_null_sensors_read(void *sensors, cmp_u32 type,
 }
 
 static const CMPSensorsVTable g_cmp_null_sensors_vtable = {
-    cmp_null_sensors_is_available, cmp_null_sensors_start, cmp_null_sensors_stop,
-    cmp_null_sensors_read};
+    cmp_null_sensors_is_available, cmp_null_sensors_start,
+    cmp_null_sensors_stop, cmp_null_sensors_read};
 
 static int cmp_null_camera_open(void *camera, cmp_u32 camera_id) {
   struct CMPNullBackend *backend;
@@ -1237,7 +1247,7 @@ static int cmp_null_camera_open(void *camera, cmp_u32 camera_id) {
 }
 
 static int cmp_null_camera_open_with_config(void *camera,
-                                           const CMPCameraConfig *config) {
+                                            const CMPCameraConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1246,7 +1256,7 @@ static int cmp_null_camera_open_with_config(void *camera,
 
 static int cmp_null_camera_close(void *camera) {
   struct CMPNullBackend *backend; /* GCOVR_EXCL_LINE */
-  int rc;                        /* GCOVR_EXCL_LINE */
+  int rc;                         /* GCOVR_EXCL_LINE */
 
   if (camera == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1287,7 +1297,7 @@ static int cmp_null_camera_stop(void *camera) {
 }
 
 static int cmp_null_camera_read_frame(void *camera, CMPCameraFrame *out_frame,
-                                     CMPBool *out_has_frame) {
+                                      CMPBool *out_has_frame) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1305,14 +1315,17 @@ static int cmp_null_camera_read_frame(void *camera, CMPCameraFrame *out_frame,
 }
 
 static const CMPCameraVTable g_cmp_null_camera_vtable = {
-    cmp_null_camera_open,  cmp_null_camera_open_with_config, /* GCOVR_EXCL_LINE */
-    cmp_null_camera_close, cmp_null_camera_start,
-    cmp_null_camera_stop,  cmp_null_camera_read_frame};
+    cmp_null_camera_open,
+    cmp_null_camera_open_with_config, /* GCOVR_EXCL_LINE */
+    cmp_null_camera_close,
+    cmp_null_camera_start,
+    cmp_null_camera_stop,
+    cmp_null_camera_read_frame};
 
 static int cmp_null_image_decode(void *image,
-                                const CMPImageDecodeRequest *request,
-                                const CMPAllocator *allocator,
-                                CMPImageData *out_image) {
+                                 const CMPImageDecodeRequest *request,
+                                 const CMPAllocator *allocator,
+                                 CMPImageData *out_image) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1334,7 +1347,7 @@ static int cmp_null_image_decode(void *image,
 }
 
 static int cmp_null_image_free(void *image, const CMPAllocator *allocator,
-                              CMPImageData *image_data) {
+                               CMPImageData *image_data) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1353,10 +1366,10 @@ static int cmp_null_image_free(void *image, const CMPAllocator *allocator,
 }
 
 static const CMPImageVTable g_cmp_null_image_vtable = {cmp_null_image_decode,
-                                                     cmp_null_image_free};
+                                                       cmp_null_image_free};
 
 static int cmp_null_video_open(void *video,
-                              const CMPVideoOpenRequest *request) {
+                               const CMPVideoOpenRequest *request) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1385,7 +1398,7 @@ static int cmp_null_video_close(void *video) {
 }
 
 static int cmp_null_video_read_frame(void *video, CMPVideoFrame *out_frame,
-                                    CMPBool *out_has_frame) {
+                                     CMPBool *out_has_frame) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1406,9 +1419,9 @@ static const CMPVideoVTable g_cmp_null_video_vtable = {
     cmp_null_video_open, cmp_null_video_close, cmp_null_video_read_frame};
 
 static int cmp_null_audio_decode(void *audio,
-                                const CMPAudioDecodeRequest *request,
-                                const CMPAllocator *allocator,
-                                CMPAudioData *out_audio) {
+                                 const CMPAudioDecodeRequest *request,
+                                 const CMPAllocator *allocator,
+                                 CMPAudioData *out_audio) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1430,7 +1443,7 @@ static int cmp_null_audio_decode(void *audio,
 }
 
 static int cmp_null_audio_free(void *audio, const CMPAllocator *allocator,
-                              CMPAudioData *audio_data) {
+                               CMPAudioData *audio_data) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1449,11 +1462,11 @@ static int cmp_null_audio_free(void *audio, const CMPAllocator *allocator,
 }
 
 static const CMPAudioVTable g_cmp_null_audio_vtable = {cmp_null_audio_decode,
-                                                     cmp_null_audio_free};
+                                                       cmp_null_audio_free};
 
 static int cmp_null_network_request(void *net, const CMPNetworkRequest *request,
-                                   const CMPAllocator *allocator,
-                                   CMPNetworkResponse *out_response) {
+                                    const CMPAllocator *allocator,
+                                    CMPNetworkResponse *out_response) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1475,8 +1488,8 @@ static int cmp_null_network_request(void *net, const CMPNetworkRequest *request,
 }
 
 static int cmp_null_network_free_response(void *net,
-                                         const CMPAllocator *allocator,
-                                         CMPNetworkResponse *response) {
+                                          const CMPAllocator *allocator,
+                                          CMPNetworkResponse *response) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1489,8 +1502,8 @@ static int cmp_null_network_free_response(void *net,
   }
 
   backend = (struct CMPNullBackend *)net;
-  rc =
-      cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "network.free_response");
+  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
+                            "network.free_response");
   CMP_NULL_RETURN_IF_ERROR(rc);
   return CMP_ERR_UNSUPPORTED;
 }
@@ -1499,7 +1512,7 @@ static const CMPNetworkVTable g_cmp_null_network_vtable = {
     cmp_null_network_request, cmp_null_network_free_response};
 
 static int cmp_null_tasks_thread_create(void *tasks, CMPThreadFn entry,
-                                       void *user, CMPHandle *out_thread) {
+                                        void *user, CMPHandle *out_thread) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1511,7 +1524,8 @@ static int cmp_null_tasks_thread_create(void *tasks, CMPThreadFn entry,
   }
 
   backend = (struct CMPNullBackend *)tasks;
-  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.thread_create");
+  rc =
+      cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.thread_create");
   CMP_NULL_RETURN_IF_ERROR(rc);
   return CMP_ERR_UNSUPPORTED;
 }
@@ -1557,7 +1571,8 @@ static int cmp_null_tasks_mutex_destroy(void *tasks, CMPHandle mutex) {
   }
 
   backend = (struct CMPNullBackend *)tasks;
-  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.mutex_destroy");
+  rc =
+      cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.mutex_destroy");
   CMP_NULL_RETURN_IF_ERROR(rc);
   return CMP_ERR_UNSUPPORTED;
 }
@@ -1615,7 +1630,7 @@ static int cmp_null_tasks_sleep_ms(void *tasks, cmp_u32 ms) {
 
 static int cmp_null_tasks_post(void *tasks, CMPTaskFn fn, void *user) {
   struct CMPNullBackend *backend; /* GCOVR_EXCL_LINE */
-  int rc;                        /* GCOVR_EXCL_LINE */
+  int rc;                         /* GCOVR_EXCL_LINE */
 
   if (tasks == NULL || fn == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1631,7 +1646,7 @@ static int cmp_null_tasks_post(void *tasks, CMPTaskFn fn, void *user) {
 }
 
 static int cmp_null_tasks_post_delayed(void *tasks, CMPTaskFn fn, void *user,
-                                      cmp_u32 delay_ms) {
+                                       cmp_u32 delay_ms) {
   struct CMPNullBackend *backend;
   int rc;
 
@@ -1656,11 +1671,11 @@ static const CMPTasksVTable g_cmp_null_tasks_vtable =
      cmp_null_tasks_mutex_create,  cmp_null_tasks_mutex_destroy,
      cmp_null_tasks_mutex_lock,    cmp_null_tasks_mutex_unlock,
      cmp_null_tasks_sleep_ms,      cmp_null_tasks_post, /* GCOVR_EXCL_LINE */
-     cmp_null_tasks_post_delayed};                     /* GCOVR_EXCL_LINE */
+     cmp_null_tasks_post_delayed};                      /* GCOVR_EXCL_LINE */
 
 static int cmp_null_env_get_io(void *env, CMPIO *out_io) {
   struct CMPNullBackend *backend; /* GCOVR_EXCL_LINE */
-  int rc;                        /* GCOVR_EXCL_LINE */
+  int rc;                         /* GCOVR_EXCL_LINE */
 
   if (env == NULL || out_io == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1804,9 +1819,11 @@ static int cmp_null_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
 }
 
 static const CMPEnvVTable g_cmp_null_env_vtable = {
-    cmp_null_env_get_io,     cmp_null_env_get_sensors, cmp_null_env_get_camera,
-    cmp_null_env_get_image,  cmp_null_env_get_video,   cmp_null_env_get_audio,
-    cmp_null_env_get_network, cmp_null_env_get_tasks,  cmp_null_env_get_time_ms};
+    cmp_null_env_get_io,      cmp_null_env_get_sensors,
+    cmp_null_env_get_camera,  cmp_null_env_get_image,
+    cmp_null_env_get_video,   cmp_null_env_get_audio,
+    cmp_null_env_get_network, cmp_null_env_get_tasks,
+    cmp_null_env_get_time_ms};
 
 int CMP_CALL cmp_null_backend_config_init(CMPNullBackendConfig *config) {
   if (config == NULL) {
@@ -1822,7 +1839,7 @@ int CMP_CALL cmp_null_backend_config_init(CMPNullBackendConfig *config) {
 }
 
 int CMP_CALL cmp_null_backend_create(const CMPNullBackendConfig *config,
-                                   CMPNullBackend **out_backend) {
+                                     CMPNullBackend **out_backend) {
   CMPNullBackendConfig local_config; /* GCOVR_EXCL_LINE */
   CMPAllocator allocator;            /* GCOVR_EXCL_LINE */
   struct CMPNullBackend *backend;
@@ -1855,7 +1872,8 @@ int CMP_CALL cmp_null_backend_create(const CMPNullBackendConfig *config,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  rc = allocator.alloc(allocator.ctx, sizeof(CMPNullBackend), (void **)&backend);
+  rc =
+      allocator.alloc(allocator.ctx, sizeof(CMPNullBackend), (void **)&backend);
   CMP_NULL_RETURN_IF_ERROR(rc);
 
   memset(backend, 0, sizeof(*backend));
@@ -1874,7 +1892,7 @@ int CMP_CALL cmp_null_backend_create(const CMPNullBackendConfig *config,
   }
 
   rc = cmp_handle_system_default_create(config->handle_capacity, &allocator,
-                                       &backend->handles);
+                                        &backend->handles);
   if (rc != CMP_OK) {
     if (backend->log_owner) {
       cmp_log_shutdown();
@@ -1989,7 +2007,8 @@ int CMP_CALL cmp_null_backend_get_ws(CMPNullBackend *backend, CMPWS *out_ws) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_null_backend_get_gfx(CMPNullBackend *backend, CMPGfx *out_gfx) {
+int CMP_CALL cmp_null_backend_get_gfx(CMPNullBackend *backend,
+                                      CMPGfx *out_gfx) {
   if (backend == NULL || out_gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2000,7 +2019,8 @@ int CMP_CALL cmp_null_backend_get_gfx(CMPNullBackend *backend, CMPGfx *out_gfx) 
   return CMP_OK;
 }
 
-int CMP_CALL cmp_null_backend_get_env(CMPNullBackend *backend, CMPEnv *out_env) {
+int CMP_CALL cmp_null_backend_get_env(CMPNullBackend *backend,
+                                      CMPEnv *out_env) {
   if (backend == NULL || out_env == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2013,7 +2033,7 @@ int CMP_CALL cmp_null_backend_get_env(CMPNullBackend *backend, CMPEnv *out_env) 
 
 #ifdef CMP_TESTING
 int CMP_CALL cmp_null_backend_test_set_initialized(CMPNullBackend *backend,
-                                                 CMPBool initialized) {
+                                                   CMPBool initialized) {
   if (backend == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2039,7 +2059,7 @@ int CMP_CALL cmp_null_backend_test_object_release(CMPObjectHeader *obj) {
 }
 
 int CMP_CALL cmp_null_backend_test_object_get_type_id(CMPObjectHeader *obj,
-                                                    cmp_u32 *out_type_id) {
+                                                      cmp_u32 *out_type_id) {
   if (obj == NULL || out_type_id == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

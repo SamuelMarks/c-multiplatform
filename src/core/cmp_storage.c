@@ -10,15 +10,15 @@
 #define CMP_STORAGE_HEADER_SIZE 12u
 #define CMP_STORAGE_U32_MAX ((cmp_u32) ~(cmp_u32)0)
 
-#define CMP_STORAGE_RETURN_IF_ERROR(rc)                                         \
+#define CMP_STORAGE_RETURN_IF_ERROR(rc)                                        \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       return (rc);                                                             \
     }                                                                          \
   } while (0)
 
 static int cmp_storage_mul_overflow(cmp_usize a, cmp_usize b,
-                                   cmp_usize *out_value) {
+                                    cmp_usize *out_value) {
   cmp_usize max_value;
 
   if (out_value == NULL) {
@@ -35,7 +35,7 @@ static int cmp_storage_mul_overflow(cmp_usize a, cmp_usize b,
 }
 
 static int cmp_storage_add_overflow(cmp_usize a, cmp_usize b,
-                                   cmp_usize *out_value) {
+                                    cmp_usize *out_value) {
   cmp_usize max_value;
 
   if (out_value == NULL) {
@@ -85,14 +85,14 @@ static int cmp_storage_write_u32_le(cmp_u8 *dst, cmp_u32 value) {
 }
 
 static int cmp_storage_read_u32_le(const cmp_u8 *src, cmp_u32 *out_value) {
-  *out_value = (cmp_u32)src[0] | ((cmp_u32)src[1] << 8) | ((cmp_u32)src[2] << 16) |
-               ((cmp_u32)src[3] << 24);
+  *out_value = (cmp_u32)src[0] | ((cmp_u32)src[1] << 8) |
+               ((cmp_u32)src[2] << 16) | ((cmp_u32)src[3] << 24);
   return CMP_OK;
 }
 
 static int cmp_storage_find_entry(const CMPStorage *storage, const char *key,
-                                 cmp_usize key_len, cmp_usize *out_index,
-                                 CMPBool *out_found) {
+                                  cmp_usize key_len, cmp_usize *out_index,
+                                  CMPBool *out_found) {
   cmp_usize i;
 
   *out_index = 0;
@@ -112,7 +112,8 @@ static int cmp_storage_find_entry(const CMPStorage *storage, const char *key,
   return CMP_OK;
 }
 
-static int cmp_storage_entry_release(CMPStorage *storage, CMPStorageEntry *entry) {
+static int cmp_storage_entry_release(CMPStorage *storage,
+                                     CMPStorageEntry *entry) {
   int rc;
   int free_rc;
 
@@ -158,8 +159,8 @@ static int cmp_storage_grow(CMPStorage *storage, cmp_usize min_capacity) {
     }
   }
 
-  rc = cmp_storage_mul_overflow(new_capacity, (cmp_usize)sizeof(CMPStorageEntry),
-                               &alloc_size);
+  rc = cmp_storage_mul_overflow(
+      new_capacity, (cmp_usize)sizeof(CMPStorageEntry), &alloc_size);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -191,7 +192,8 @@ int CMP_CALL cmp_storage_config_init(CMPStorageConfig *config) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_storage_init(CMPStorage *storage, const CMPStorageConfig *config) {
+int CMP_CALL cmp_storage_init(CMPStorage *storage,
+                              const CMPStorageConfig *config) {
   CMPAllocator allocator;
   CMPStorageEntry *entries;
   cmp_usize alloc_size;
@@ -221,8 +223,8 @@ int CMP_CALL cmp_storage_init(CMPStorage *storage, const CMPStorageConfig *confi
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  rc = cmp_storage_mul_overflow(config->entry_capacity,
-                               (cmp_usize)sizeof(CMPStorageEntry), &alloc_size);
+  rc = cmp_storage_mul_overflow(
+      config->entry_capacity, (cmp_usize)sizeof(CMPStorageEntry), &alloc_size);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -281,8 +283,8 @@ int CMP_CALL cmp_storage_shutdown(CMPStorage *storage) {
 }
 
 int CMP_CALL cmp_storage_put(CMPStorage *storage, const char *utf8_key,
-                           cmp_usize key_len, const void *value,
-                           cmp_usize value_len, CMPBool overwrite) {
+                             cmp_usize key_len, const void *value,
+                             cmp_usize value_len, CMPBool overwrite) {
   CMPStorageEntry *entry;
   cmp_usize index;
   CMPBool found;
@@ -388,8 +390,9 @@ int CMP_CALL cmp_storage_put(CMPStorage *storage, const char *utf8_key,
 }
 
 int CMP_CALL cmp_storage_get(const CMPStorage *storage, const char *utf8_key,
-                           cmp_usize key_len, void *out_value,
-                           cmp_usize value_capacity, cmp_usize *out_value_size) {
+                             cmp_usize key_len, void *out_value,
+                             cmp_usize value_capacity,
+                             cmp_usize *out_value_size) {
   cmp_usize index;
   CMPBool found;
   int rc;
@@ -428,8 +431,9 @@ int CMP_CALL cmp_storage_get(const CMPStorage *storage, const char *utf8_key,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_storage_contains(const CMPStorage *storage, const char *utf8_key,
-                                cmp_usize key_len, CMPBool *out_exists) {
+int CMP_CALL cmp_storage_contains(const CMPStorage *storage,
+                                  const char *utf8_key, cmp_usize key_len,
+                                  CMPBool *out_exists) {
   cmp_usize index;
   CMPBool found;
   int rc;
@@ -452,7 +456,7 @@ int CMP_CALL cmp_storage_contains(const CMPStorage *storage, const char *utf8_ke
 }
 
 int CMP_CALL cmp_storage_remove(CMPStorage *storage, const char *utf8_key,
-                              cmp_usize key_len) {
+                                cmp_usize key_len) {
   cmp_usize index;
   cmp_usize tail_count;
   CMPBool found;
@@ -514,7 +518,8 @@ int CMP_CALL cmp_storage_clear(CMPStorage *storage) {
   return rc;
 }
 
-int CMP_CALL cmp_storage_count(const CMPStorage *storage, cmp_usize *out_count) {
+int CMP_CALL cmp_storage_count(const CMPStorage *storage,
+                               cmp_usize *out_count) {
   if (storage == NULL || out_count == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -527,7 +532,7 @@ int CMP_CALL cmp_storage_count(const CMPStorage *storage, cmp_usize *out_count) 
 }
 
 int CMP_CALL cmp_storage_save(const CMPStorage *storage, CMPIO *io,
-                            const char *utf8_path) {
+                              const char *utf8_path) {
   cmp_u8 *buffer;
   cmp_u32 entry_count_u32;
   cmp_u32 key_len_u32;
@@ -631,7 +636,7 @@ int CMP_CALL cmp_storage_save(const CMPStorage *storage, CMPIO *io,
 }
 
 int CMP_CALL cmp_storage_load(CMPStorage *storage, CMPIO *io,
-                            const char *utf8_path) {
+                              const char *utf8_path) {
   CMPStorageConfig config;
   CMPStorage temp_storage;
   CMPStorage swap_storage;
@@ -729,8 +734,8 @@ int CMP_CALL cmp_storage_load(CMPStorage *storage, CMPIO *io,
     }
 
     rc = cmp_storage_put(&temp_storage, (const char *)(buffer + offset),
-                        (cmp_usize)key_len_u32, buffer + offset + key_len_u32,
-                        (cmp_usize)value_len_u32, CMP_FALSE);
+                         (cmp_usize)key_len_u32, buffer + offset + key_len_u32,
+                         (cmp_usize)value_len_u32, CMP_FALSE);
     if (rc != CMP_OK) {
       break;
     }
@@ -759,20 +764,22 @@ int CMP_CALL cmp_storage_load(CMPStorage *storage, CMPIO *io,
 
 #ifdef CMP_TESTING
 int CMP_CALL cmp_storage_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                         cmp_usize *out_value) {
+                                           cmp_usize *out_value) {
   return cmp_storage_mul_overflow(a, b, out_value);
 }
 
 int CMP_CALL cmp_storage_test_add_overflow(cmp_usize a, cmp_usize b,
-                                         cmp_usize *out_value) {
+                                           cmp_usize *out_value) {
   return cmp_storage_add_overflow(a, b, out_value);
 }
 
-int CMP_CALL cmp_storage_test_grow(CMPStorage *storage, cmp_usize min_capacity) {
+int CMP_CALL cmp_storage_test_grow(CMPStorage *storage,
+                                   cmp_usize min_capacity) {
   return cmp_storage_grow(storage, min_capacity);
 }
 
-int CMP_CALL cmp_storage_test_u32_from_usize(cmp_usize value, cmp_u32 *out_value) {
+int CMP_CALL cmp_storage_test_u32_from_usize(cmp_usize value,
+                                             cmp_u32 *out_value) {
   return cmp_storage_u32_from_usize(value, out_value);
 }
 

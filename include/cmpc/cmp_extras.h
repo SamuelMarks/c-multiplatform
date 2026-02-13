@@ -89,7 +89,7 @@ typedef struct CMPTooltipAnchor {
  */
 typedef struct CMPTooltipPlacement {
   cmp_u32 direction; /**< Preferred direction (CMP_TOOLTIP_DIRECTION_*). */
-  cmp_u32 align;     /**< Alignment along the cross axis (CMP_TOOLTIP_ALIGN_*). */
+  cmp_u32 align; /**< Alignment along the cross axis (CMP_TOOLTIP_ALIGN_*). */
 } CMPTooltipPlacement;
 
 /**
@@ -118,9 +118,9 @@ typedef struct CMPTooltipStyle {
   CMPScalar
       title_body_spacing;  /**< Spacing between title and body in pixels (>= 0).
                             */
-  CMPTextStyle text_style;  /**< Plain tooltip text style. */
-  CMPTextStyle title_style; /**< Rich tooltip title style. */
-  CMPTextStyle body_style;  /**< Rich tooltip body style. */
+  CMPTextStyle text_style; /**< Plain tooltip text style. */
+  CMPTextStyle title_style;  /**< Rich tooltip title style. */
+  CMPTextStyle body_style;   /**< Rich tooltip body style. */
   CMPColor background_color; /**< Tooltip background color. */
 } CMPTooltipStyle;
 
@@ -235,7 +235,8 @@ CMP_API int CMP_CALL cmp_badge_style_init(CMPBadgeStyle *style);
  * @param placement Placement descriptor to initialize.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_badge_placement_init_icon(CMPBadgePlacement *placement);
+CMP_API int CMP_CALL
+cmp_badge_placement_init_icon(CMPBadgePlacement *placement);
 
 /**
  * @brief Initialize a navigation badge placement descriptor.
@@ -253,8 +254,8 @@ cmp_badge_placement_init_navigation(CMPBadgePlacement *placement);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_badge_compute_size(const CMPBadgeStyle *style,
-                                         const CMPBadgeContent *content,
-                                         CMPSize *out_size);
+                                            const CMPBadgeContent *content,
+                                            CMPSize *out_size);
 
 /**
  * @brief Compute the badge bounds relative to an anchor rectangle.
@@ -265,11 +266,10 @@ CMP_API int CMP_CALL cmp_badge_compute_size(const CMPBadgeStyle *style,
  * @param out_bounds Receives the badge bounds.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_badge_compute_bounds(const CMPBadgeStyle *style,
-                                           const CMPBadgeContent *content,
-                                           const CMPRect *anchor,
-                                           const CMPBadgePlacement *placement,
-                                           CMPRect *out_bounds);
+CMP_API int CMP_CALL cmp_badge_compute_bounds(
+    const CMPBadgeStyle *style, const CMPBadgeContent *content,
+    const CMPRect *anchor, const CMPBadgePlacement *placement,
+    CMPRect *out_bounds);
 
 #ifdef CMP_TESTING
 /**
@@ -284,7 +284,8 @@ CMP_API int CMP_CALL cmp_extras_test_validate_color(const CMPColor *color);
  * @param edges Edge descriptor to validate.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_extras_test_validate_edges(const CMPLayoutEdges *edges);
+CMP_API int CMP_CALL
+cmp_extras_test_validate_edges(const CMPLayoutEdges *edges);
 
 /**
  * @brief Test wrapper for text style validation.
@@ -292,8 +293,8 @@ CMP_API int CMP_CALL cmp_extras_test_validate_edges(const CMPLayoutEdges *edges)
  * @param require_family CMP_TRUE to require a family name.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_extras_test_validate_text_style(const CMPTextStyle *style,
-                                                      CMPBool require_family);
+CMP_API int CMP_CALL cmp_extras_test_validate_text_style(
+    const CMPTextStyle *style, CMPBool require_family);
 
 /**
  * @brief Test wrapper for rectangle validation.
@@ -315,8 +316,8 @@ cmp_extras_test_validate_tooltip_anchor(const CMPTooltipAnchor *anchor);
  * @param placement Placement descriptor to validate.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL
-cmp_extras_test_validate_tooltip_placement(const CMPTooltipPlacement *placement);
+CMP_API int CMP_CALL cmp_extras_test_validate_tooltip_placement(
+    const CMPTooltipPlacement *placement);
 
 /**
  * @brief Test wrapper for tooltip style validation.

@@ -95,7 +95,7 @@ static int test_image_free(void *image, const CMPAllocator *allocator,
 }
 
 static const CMPImageVTable g_test_image_vtable = {test_image_decode,
-                                                  test_image_free};
+                                                   test_image_free};
 
 typedef struct TestEnvState {
   CMPEnv env;
@@ -119,9 +119,8 @@ static int test_env_get_image(void *env, CMPImage *out_image) {
   return CMP_OK;
 }
 
-static const CMPEnvVTable g_test_env_vtable = {NULL, NULL, NULL,
-                                              test_env_get_image, NULL, NULL,
-                                              NULL, NULL, NULL};
+static const CMPEnvVTable g_test_env_vtable = {
+    NULL, NULL, NULL, test_env_get_image, NULL, NULL, NULL, NULL, NULL};
 
 static int test_env_reset(TestEnvState *env_state, TestImageState *image_state,
                           const CMPImageVTable *vtable) {
@@ -237,9 +236,9 @@ static int test_image_decode_fallback_ppm(void) {
   CMPImageConfig config;
   CMPImageDecodeRequest request;
   CMPImageData image;
-  static const cmp_u8 ppm_data[] = {
-      'P', '6', '\n', '2', ' ', '1', '\n', '2', '5', '5', '\n',
-      255u, 0u, 0u, 0u, 255u, 0u};
+  static const cmp_u8 ppm_data[] = {'P',  '6', '\n', '2',  ' ',  '1',
+                                    '\n', '2', '5',  '5',  '\n', 255u,
+                                    0u,   0u,  0u,   255u, 0u};
 
   CMP_TEST_OK(cmp_image_config_init(&config));
   memset(&decoder, 0, sizeof(decoder));

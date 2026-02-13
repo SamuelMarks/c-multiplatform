@@ -56,8 +56,8 @@ static const CMPGfxVTable g_test_vtable = {
     NULL, NULL, NULL};
 
 static const CMPGfxVTable g_test_vtable_no_rect = {NULL, NULL, NULL, NULL, NULL,
-                                                  NULL, NULL, NULL, NULL, NULL,
-                                                  NULL, NULL, NULL};
+                                                   NULL, NULL, NULL, NULL, NULL,
+                                                   NULL, NULL, NULL};
 
 static int init_pointer_event(CMPInputEvent *event, cmp_u32 type, cmp_i32 x,
                               cmp_i32 y) {
@@ -106,7 +106,7 @@ static int test_helpers(void) {
   cmp_u32 month;
 
   CMP_TEST_EXPECT(m3_date_picker_test_validate_color(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   color.r = 1.1f;
   color.g = 0.0f;
   color.b = 0.0f;
@@ -125,11 +125,11 @@ static int test_helpers(void) {
   CMP_TEST_EXPECT(m3_date_picker_test_validate_color(&color), CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_date_picker_test_validate_edges(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_validate_style(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_validate_rect(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   edges.left = -1.0f;
   edges.right = 0.0f;
@@ -178,10 +178,11 @@ static int test_helpers(void) {
   spec.mode = 99u;
   spec.size = 10.0f;
   CMP_TEST_EXPECT(m3_date_picker_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_EXACTLY;
   spec.size = -1.0f;
-  CMP_TEST_EXPECT(m3_date_picker_test_validate_measure_spec(spec), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_date_picker_test_validate_measure_spec(spec),
+                  CMP_ERR_RANGE);
 
   rect.x = 0.0f;
   rect.y = 0.0f;
@@ -204,7 +205,7 @@ static int test_helpers(void) {
   CMP_TEST_OK(m3_date_picker_test_validate_date(&date));
 
   CMP_TEST_EXPECT(m3_date_picker_test_is_leap_year(2024, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_is_leap_year(-1, &leap), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_date_picker_test_is_leap_year(2000, &leap));
   CMP_TEST_ASSERT(leap == CMP_TRUE);
@@ -212,11 +213,11 @@ static int test_helpers(void) {
   CMP_TEST_ASSERT(leap == CMP_FALSE);
 
   CMP_TEST_EXPECT(m3_date_picker_test_days_in_month(2024, 1u, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_days_in_month(-1, 1u, &days),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_date_picker_test_days_in_month(2024, 13u, &days),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_date_picker_test_days_in_month(2024, 2u, &days));
   CMP_TEST_ASSERT(days == 29u);
   CMP_TEST_OK(m3_date_picker_test_days_in_month(2023, 2u, &days));
@@ -232,9 +233,9 @@ static int test_helpers(void) {
   CMP_TEST_OK(m3_date_picker_test_day_of_week(&date, &weekday));
   CMP_TEST_ASSERT(weekday == M3_DATE_PICKER_WEEKDAY_SATURDAY);
   CMP_TEST_EXPECT(m3_date_picker_test_day_of_week(NULL, &weekday),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_day_of_week(&date, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   {
     CMPDate a;
@@ -269,11 +270,11 @@ static int test_helpers(void) {
     CMP_TEST_ASSERT(cmp > 0);
   }
   CMP_TEST_EXPECT(m3_date_picker_test_compare_dates(NULL, &date, &cmp),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_compare_dates(&date, NULL, &cmp),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_compare_dates(&date, &date, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   {
     M3DateRange range;
@@ -298,11 +299,11 @@ static int test_helpers(void) {
     CMP_TEST_ASSERT(in_range == CMP_FALSE);
 
     CMP_TEST_EXPECT(m3_date_picker_test_date_in_range(NULL, &range, &in_range),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(m3_date_picker_test_date_in_range(&date, NULL, &in_range),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(m3_date_picker_test_date_in_range(&date, &range, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     range.start.year = 2024;
     range.start.month = 12u;
@@ -311,31 +312,31 @@ static int test_helpers(void) {
     range.end.month = 1u;
     range.end.day = 1u;
     CMP_TEST_EXPECT(m3_date_picker_test_date_in_range(&date, &range, &in_range),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
   }
 
   CMP_TEST_EXPECT(m3_date_picker_test_compute_offset(7u, 0u, &offset),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_date_picker_test_compute_offset(0u, 7u, &offset),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_date_picker_test_compute_offset(0u, 0u, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_date_picker_test_compute_offset(0u, 0u, &offset));
   CMP_TEST_ASSERT(offset == 0u);
 
   CMP_TEST_EXPECT(m3_date_picker_test_shift_month(2024, 1u, 1, NULL, &month),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_shift_month(2024, 1u, 1, &year, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_shift_month(-1, 1u, 1, &year, &month),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_date_picker_test_shift_month(2024, 13u, 1, &year, &month),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_date_picker_test_shift_month(2024, 0u, 1, &year, &month),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_date_picker_test_shift_month(CMP_DATE_MAX_YEAR + 1, 1u, 0,
-                                                 &year, &month),
-                 CMP_ERR_RANGE);
+                                                  &year, &month),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_date_picker_test_shift_month(2024, 1u, 1, &year, &month));
   CMP_TEST_ASSERT(year == 2024 && month == 2u);
   CMP_TEST_OK(m3_date_picker_test_shift_month(2024, 1u, -1, &year, &month));
@@ -358,37 +359,39 @@ static int test_init_and_display(void) {
 
   CMP_TEST_OK(m3_date_picker_style_init(&style));
   CMP_TEST_EXPECT(m3_date_picker_init(NULL, &style, 2024, 1u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_init(&picker, NULL, 2024, 1u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_init(&picker, &style, 0, 1u), CMP_ERR_RANGE);
-  CMP_TEST_EXPECT(m3_date_picker_init(&picker, &style, 2024, 13u), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_date_picker_init(&picker, &style, 2024, 13u),
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(m3_date_picker_init(&picker, &style, 2024, 12u));
   CMP_TEST_ASSERT(picker.widget.ctx == &picker);
   CMP_TEST_ASSERT(picker.widget.vtable != NULL);
 
   CMP_TEST_EXPECT(m3_date_picker_set_style(NULL, &style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_set_style(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   {
     M3DatePickerStyle bad_style;
 
     bad_style = style;
     bad_style.cell_width = 0.0f;
-    CMP_TEST_EXPECT(m3_date_picker_set_style(&picker, &bad_style), CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(m3_date_picker_set_style(&picker, &bad_style),
+                    CMP_ERR_RANGE);
   }
 
   CMP_TEST_EXPECT(m3_date_picker_get_display_month(NULL, &year, &month),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_get_display_month(&picker, NULL, &month),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_get_display_month(&picker, &year, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_date_picker_set_week_start(NULL, 0u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_set_week_start(&picker, 7u), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_date_picker_set_week_start(&picker, 0u));
 
@@ -401,13 +404,13 @@ static int test_init_and_display(void) {
   CMP_TEST_ASSERT(year == 2024 && month == 12u);
 
   CMP_TEST_EXPECT(m3_date_picker_set_display_month(&picker, 2024, 0u),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_date_picker_set_display_month(&picker, 0, 1u),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_date_picker_set_display_month(&picker, -1, 1u),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_date_picker_set_display_month(NULL, 2024, 1u),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(
       m3_date_picker_set_display_month(&picker, CMP_DATE_MAX_YEAR - 1, 12u));
@@ -442,9 +445,9 @@ static int test_constraints_and_selection(void) {
   CMP_TEST_OK(m3_date_picker_init(&picker, &style, 2024, 6u));
 
   CMP_TEST_EXPECT(m3_date_picker_set_constraints(NULL, &constraints),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_set_constraints(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   constraints.start.year = 2024;
   constraints.start.month = 1u;
@@ -457,13 +460,13 @@ static int test_constraints_and_selection(void) {
   CMP_TEST_OK(m3_date_picker_set_constraints(&picker, &constraints));
 
   CMP_TEST_EXPECT(m3_date_picker_get_constraints(NULL, &out_range),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_get_constraints(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   constraints.has_start = 2;
   CMP_TEST_EXPECT(m3_date_picker_set_constraints(&picker, &constraints),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   constraints.has_start = CMP_TRUE;
   constraints.has_end = CMP_TRUE;
 
@@ -477,27 +480,28 @@ static int test_constraints_and_selection(void) {
   counter.calls = 0;
   counter.fail = 0;
   CMP_TEST_EXPECT(m3_date_picker_set_on_change(NULL, test_on_change, &counter),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_date_picker_set_on_change(&picker, test_on_change, &counter));
   CMP_TEST_EXPECT(m3_date_picker_set_selection(NULL, &selection),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_set_selection(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_date_picker_set_selection(&picker, &selection));
   CMP_TEST_ASSERT(counter.calls == 1);
 
   picker.style.cell_width = 0.0f;
   CMP_TEST_EXPECT(m3_date_picker_set_selection(&picker, &selection),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   picker.style.cell_width = style.cell_width;
 
   CMP_TEST_EXPECT(m3_date_picker_get_selection(NULL, &out_range),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_get_selection(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   counter.fail = 1;
-  CMP_TEST_EXPECT(m3_date_picker_set_selection(&picker, &selection), CMP_ERR_IO);
+  CMP_TEST_EXPECT(m3_date_picker_set_selection(&picker, &selection),
+                  CMP_ERR_IO);
   counter.fail = 0;
 
   selection.end.year = 2024;
@@ -505,17 +509,17 @@ static int test_constraints_and_selection(void) {
   selection.end.day = 11u;
   selection.has_end = CMP_TRUE;
   CMP_TEST_EXPECT(m3_date_picker_set_selection(&picker, &selection),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   selection.has_end = CMP_FALSE;
 
   selection.start.year = 2025;
   CMP_TEST_EXPECT(m3_date_picker_set_selection(&picker, &selection),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   selection.has_start = CMP_FALSE;
   selection.has_end = CMP_TRUE;
   CMP_TEST_EXPECT(m3_date_picker_set_selection(&picker, &selection),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   selection.has_start = CMP_TRUE;
   selection.has_end = CMP_FALSE;
 
@@ -526,7 +530,7 @@ static int test_constraints_and_selection(void) {
   selection.has_end = CMP_TRUE;
   CMP_TEST_OK(m3_date_picker_set_mode(&picker, M3_DATE_PICKER_MODE_RANGE));
   CMP_TEST_EXPECT(m3_date_picker_set_selection(&picker, &selection),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   selection.end.year = 2024;
   selection.end.month = 6u;
@@ -541,19 +545,20 @@ static int test_constraints_and_selection(void) {
   constraints.end.month = 5u;
   constraints.end.day = 1u;
   CMP_TEST_EXPECT(m3_date_picker_set_constraints(&picker, &constraints),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_date_picker_set_mode(&picker, M3_DATE_PICKER_MODE_SINGLE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_date_picker_set_mode(NULL, M3_DATE_PICKER_MODE_SINGLE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_set_mode(&picker, 99u), CMP_ERR_RANGE);
 
   return 0;
 }
 
-static int find_cell(const M3DatePickerCell *cells, cmp_usize count, cmp_i32 year,
-                     cmp_u32 month, cmp_u32 day, cmp_usize *out_index) {
+static int find_cell(const M3DatePickerCell *cells, cmp_usize count,
+                     cmp_i32 year, cmp_u32 month, cmp_u32 day,
+                     cmp_usize *out_index) {
   cmp_usize i;
 
   if (cells == NULL || out_index == NULL) {
@@ -602,11 +607,11 @@ static int test_grid_and_cells(void) {
   CMP_TEST_OK(m3_date_picker_set_selection(&picker, &selection));
 
   CMP_TEST_EXPECT(m3_date_picker_get_cells(NULL, &cells, &count),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_get_cells(&picker, NULL, &count),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_get_cells(&picker, &cells, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_date_picker_get_cells(&picker, &cells, &count));
   CMP_TEST_ASSERT(count == M3_DATE_PICKER_GRID_COUNT);
@@ -618,13 +623,13 @@ static int test_grid_and_cells(void) {
   CMP_TEST_ASSERT(cells[index].flags & M3_DATE_CELL_FLAG_OUT_OF_RANGE);
 
   CMP_TEST_EXPECT(m3_date_picker_get_cell(NULL, 0, &picker.cells[0]),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       m3_date_picker_get_cell(&picker, M3_DATE_PICKER_GRID_COUNT, NULL),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_get_cell(&picker, M3_DATE_PICKER_GRID_COUNT,
-                                         &picker.cells[0]),
-                 CMP_ERR_RANGE);
+                                          &picker.cells[0]),
+                  CMP_ERR_RANGE);
 
   return 0;
 }
@@ -635,7 +640,7 @@ static int test_update_grid_errors(void) {
 
   CMP_TEST_EXPECT(m3_date_picker_update(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_update_grid(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_date_picker_style_init(&style));
   CMP_TEST_OK(m3_date_picker_init(&picker, &style, 2024, 3u));
 
@@ -708,21 +713,21 @@ static int test_widget_paths(void) {
       picker.widget.vtable->measure(NULL, width_spec, height_spec, &size),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
-                                               height_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   width_spec.mode = 99u;
   CMP_TEST_EXPECT(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
   width_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = -1.0f;
   CMP_TEST_EXPECT(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                height_spec, &size),
+                  CMP_ERR_RANGE);
   height_spec.size = 300.0f;
 
   CMP_TEST_OK(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(size.width == 300.0f && size.height == 300.0f);
 
   bounds.x = 0.0f;
@@ -730,40 +735,40 @@ static int test_widget_paths(void) {
   bounds.width = 300.0f;
   bounds.height = 300.0f;
   CMP_TEST_EXPECT(picker.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bounds.width = -1.0f;
   CMP_TEST_EXPECT(picker.widget.vtable->layout(picker.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bounds.width = 300.0f;
   CMP_TEST_OK(picker.widget.vtable->layout(picker.widget.ctx, bounds));
 
   CMP_TEST_EXPECT(picker.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(picker.widget.vtable->get_semantics(picker.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(
       picker.widget.vtable->get_semantics(picker.widget.ctx, &semantics));
   CMP_TEST_ASSERT(semantics.role == CMP_SEMANTIC_NONE);
 
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(picker.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = NULL;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = &gfx;
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_vtable_no_rect;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_vtable;
 
   backend.fail_draw_rect_after = 1;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect_after = 0;
   backend.fail_draw_rect = CMP_OK;
   CMP_TEST_OK(picker.widget.vtable->paint(picker.widget.ctx, &paint_ctx));
@@ -789,25 +794,27 @@ static int test_widget_paths(void) {
   CMP_TEST_OK(m3_date_picker_set_selection(&picker, &selection));
   CMP_TEST_OK(picker.widget.vtable->paint(picker.widget.ctx, &paint_ctx));
 
-  CMP_TEST_EXPECT(picker.widget.vtable->event(picker.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      picker.widget.vtable->event(picker.widget.ctx, NULL, &handled),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(picker.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(picker.widget.vtable->event(picker.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
-  CMP_TEST_OK(m3_date_picker_test_compute_cell_bounds(&picker, 0u, 0u, &bounds));
+  CMP_TEST_OK(
+      m3_date_picker_test_compute_cell_bounds(&picker, 0u, 0u, &bounds));
   hit_x = bounds.x + 1.0f;
   hit_y = bounds.y + 1.0f;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, (cmp_i32)hit_x,
-                                (cmp_i32)hit_y));
+                                 (cmp_i32)hit_y));
   CMP_TEST_OK(picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
   CMP_TEST_EXPECT(
       picker.widget.vtable->event(picker.widget.ctx, &event, &handled),
       CMP_ERR_STATE);
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, (cmp_i32)hit_x,
-                                (cmp_i32)hit_y));
+                                 (cmp_i32)hit_y));
   CMP_TEST_OK(picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
 
@@ -820,16 +827,16 @@ static int test_widget_paths(void) {
 
     start_index = 0u;
     while (start_index < M3_DATE_PICKER_GRID_COUNT) {
-      if ((picker.cells[start_index].flags &
-           M3_DATE_CELL_FLAG_OUT_OF_RANGE) == 0u) {
+      if ((picker.cells[start_index].flags & M3_DATE_CELL_FLAG_OUT_OF_RANGE) ==
+          0u) {
         break;
       }
       start_index += 1u;
     }
     other_index = start_index + 1u;
     while (other_index < M3_DATE_PICKER_GRID_COUNT) {
-      if ((picker.cells[other_index].flags &
-           M3_DATE_CELL_FLAG_OUT_OF_RANGE) == 0u) {
+      if ((picker.cells[other_index].flags & M3_DATE_CELL_FLAG_OUT_OF_RANGE) ==
+          0u) {
         break;
       }
       other_index += 1u;
@@ -844,16 +851,18 @@ static int test_widget_paths(void) {
 
     row = other_index / M3_DATE_PICKER_GRID_COLS;
     col = other_index % M3_DATE_PICKER_GRID_COLS;
-    CMP_TEST_OK(
-        m3_date_picker_test_compute_cell_bounds(&picker, row, col, &cell_bounds));
+    CMP_TEST_OK(m3_date_picker_test_compute_cell_bounds(&picker, row, col,
+                                                        &cell_bounds));
     hit_x = cell_bounds.x + 1.0f;
     hit_y = cell_bounds.y + 1.0f;
     CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
-                                  (cmp_i32)hit_x, (cmp_i32)hit_y));
-    CMP_TEST_OK(picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
+                                   (cmp_i32)hit_x, (cmp_i32)hit_y));
+    CMP_TEST_OK(
+        picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
     CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, (cmp_i32)hit_x,
-                                  (cmp_i32)hit_y));
-    CMP_TEST_OK(picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
+                                   (cmp_i32)hit_y));
+    CMP_TEST_OK(
+        picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
   }
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, -10, -10));
@@ -872,10 +881,10 @@ static int test_widget_paths(void) {
   hit_x = picker.cells[index].bounds.x + 1.0f;
   hit_y = picker.cells[index].bounds.y + 1.0f;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, (cmp_i32)hit_x,
-                                (cmp_i32)hit_y));
+                                 (cmp_i32)hit_y));
   CMP_TEST_OK(picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, (cmp_i32)hit_x,
-                                (cmp_i32)hit_y));
+                                 (cmp_i32)hit_y));
   CMP_TEST_EXPECT(
       picker.widget.vtable->event(picker.widget.ctx, &event, &handled),
       CMP_ERR_RANGE);
@@ -903,11 +912,11 @@ static int test_widget_paths(void) {
       hit_x = picker.cells[index].bounds.x + 1.0f;
       hit_y = picker.cells[index].bounds.y + 1.0f;
       CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
-                                    (cmp_i32)hit_x, (cmp_i32)hit_y));
+                                     (cmp_i32)hit_x, (cmp_i32)hit_y));
       CMP_TEST_OK(
           picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
-      CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, (cmp_i32)hit_x,
-                                    (cmp_i32)hit_y));
+      CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP,
+                                     (cmp_i32)hit_x, (cmp_i32)hit_y));
       CMP_TEST_OK(
           picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
       break;
@@ -922,23 +931,26 @@ static int test_widget_paths(void) {
   picker.widget.flags = 0u;
 
   CMP_TEST_EXPECT(m3_date_picker_test_hit_test(NULL, 0.0f, 0.0f, &index),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_hit_test(&picker, 0.0f, 0.0f, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_date_picker_test_hit_test(&picker, -1.0f, -1.0f, &index));
   CMP_TEST_ASSERT(index == M3_DATE_PICKER_INVALID_INDEX);
 
-  CMP_TEST_EXPECT(m3_date_picker_test_compute_cell_bounds(NULL, 0u, 0u, &bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_date_picker_test_compute_cell_bounds(&picker, 0u, 0u, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      m3_date_picker_test_compute_cell_bounds(NULL, 0u, 0u, &bounds),
+      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      m3_date_picker_test_compute_cell_bounds(&picker, 0u, 0u, NULL),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_date_picker_test_compute_cell_bounds(
-                     &picker, M3_DATE_PICKER_GRID_ROWS, 0u, &bounds),
-                 CMP_ERR_RANGE);
+                      &picker, M3_DATE_PICKER_GRID_ROWS, 0u, &bounds),
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_date_picker_test_compute_cell_bounds(
-                     &picker, 0u, M3_DATE_PICKER_GRID_COLS, &bounds),
-                 CMP_ERR_RANGE);
-  CMP_TEST_OK(m3_date_picker_test_compute_cell_bounds(&picker, 0u, 0u, &bounds));
+                      &picker, 0u, M3_DATE_PICKER_GRID_COLS, &bounds),
+                  CMP_ERR_RANGE);
+  CMP_TEST_OK(
+      m3_date_picker_test_compute_cell_bounds(&picker, 0u, 0u, &bounds));
 
   CMP_TEST_OK(picker.widget.vtable->destroy(picker.widget.ctx));
 

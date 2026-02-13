@@ -20,24 +20,25 @@ int CMP_CALL m3_button_test_set_color_fail_after(cmp_u32 call_count);
 int CMP_CALL m3_button_test_clear_fail_points(void);
 int CMP_CALL m3_button_test_validate_color(const CMPColor *color);
 int CMP_CALL m3_button_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                     CMPScalar b, CMPScalar a);
-int CMP_CALL m3_button_test_color_with_alpha(const CMPColor *base, CMPScalar alpha,
-                                            CMPColor *out_color);
+                                      CMPScalar b, CMPScalar a);
+int CMP_CALL m3_button_test_color_with_alpha(const CMPColor *base,
+                                             CMPScalar alpha,
+                                             CMPColor *out_color);
 int CMP_CALL m3_button_test_validate_text_style(const CMPTextStyle *style,
-                                               CMPBool require_family);
+                                                CMPBool require_family);
 int CMP_CALL m3_button_test_validate_style(const M3ButtonStyle *style,
-                                          CMPBool require_family);
+                                           CMPBool require_family);
 int CMP_CALL m3_button_test_validate_measure_spec(CMPMeasureSpec spec);
 int CMP_CALL m3_button_test_validate_rect(const CMPRect *rect);
 int CMP_CALL m3_button_test_validate_backend(const CMPTextBackend *backend);
 int CMP_CALL m3_button_test_metrics_update(M3Button *button);
 int CMP_CALL m3_button_test_resolve_colors(const M3Button *button,
-                                          CMPColor *out_background,
-                                          CMPColor *out_text,
-                                          CMPColor *out_outline,
-                                          CMPColor *out_ripple);
+                                           CMPColor *out_background,
+                                           CMPColor *out_text,
+                                           CMPColor *out_outline,
+                                           CMPColor *out_ripple);
 int CMP_CALL m3_button_test_resolve_corner(const M3Button *button,
-                                          CMPScalar *out_corner);
+                                           CMPScalar *out_corner);
 
 typedef struct TestButtonBackend {
   int create_calls;
@@ -69,8 +70,8 @@ static void test_backend_init(TestButtonBackend *backend) {
 }
 
 static int test_text_create_font(void *text, const char *utf8_family,
-                                 cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
-                                 CMPHandle *out_font) {
+                                 cmp_i32 size_px, cmp_i32 weight,
+                                 CMPBool italic, CMPHandle *out_font) {
   TestButtonBackend *backend;
 
   if (text == NULL || utf8_family == NULL || out_font == NULL) {
@@ -234,18 +235,18 @@ static const CMPTextVTable g_test_text_vtable_no_create = {
     NULL, test_text_destroy_font, test_text_measure_text, test_text_draw_text};
 
 static const CMPGfxVTable g_test_gfx_vtable = {NULL,
-                                              NULL,
-                                              NULL,
-                                              test_gfx_draw_rect,
-                                              NULL,
-                                              NULL,
-                                              test_gfx_push_clip,
-                                              test_gfx_pop_clip,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL};
+                                               NULL,
+                                               NULL,
+                                               test_gfx_draw_rect,
+                                               NULL,
+                                               NULL,
+                                               test_gfx_push_clip,
+                                               test_gfx_pop_clip,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL};
 
 static const CMPGfxVTable g_test_gfx_vtable_no_draw = {
     NULL, NULL, NULL, NULL, NULL, NULL, test_gfx_push_clip, test_gfx_pop_clip,
@@ -348,19 +349,23 @@ int main(void) {
   CMPColor resolved_ripple;
   CMP_TEST_EXPECT(m3_button_style_init_filled(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_button_style_init_tonal(NULL), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_button_style_init_outlined(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_button_style_init_outlined(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_button_style_init_text(NULL), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_button_style_init_elevated(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_button_style_init_elevated(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_button_style_init_fab(NULL), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_button_style_init_filled(&style));
   CMP_TEST_ASSERT(style.variant == M3_BUTTON_VARIANT_FILLED);
-  CMP_TEST_ASSERT(cmp_near(style.padding_x, M3_BUTTON_DEFAULT_PADDING_X, 0.001f));
-  CMP_TEST_ASSERT(cmp_near(style.padding_y, M3_BUTTON_DEFAULT_PADDING_Y, 0.001f));
+  CMP_TEST_ASSERT(
+      cmp_near(style.padding_x, M3_BUTTON_DEFAULT_PADDING_X, 0.001f));
+  CMP_TEST_ASSERT(
+      cmp_near(style.padding_y, M3_BUTTON_DEFAULT_PADDING_Y, 0.001f));
   CMP_TEST_ASSERT(
       cmp_near(style.corner_radius, M3_BUTTON_DEFAULT_CORNER_RADIUS, 0.001f));
   CMP_TEST_ASSERT(cmp_near(style.ripple_expand_duration,
-                         M3_BUTTON_DEFAULT_RIPPLE_EXPAND, 0.001f));
+                           M3_BUTTON_DEFAULT_RIPPLE_EXPAND, 0.001f));
 
   CMP_TEST_OK(m3_button_style_init_tonal(&other_style));
   CMP_TEST_ASSERT(other_style.variant == M3_BUTTON_VARIANT_TONAL);
@@ -406,7 +411,8 @@ int main(void) {
     return 1;
   }
 
-  CMP_TEST_EXPECT(m3_button_test_validate_color(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_button_test_validate_color(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   color.r = -0.5f;
   color.g = 0.5f;
   color.b = 0.5f;
@@ -425,129 +431,129 @@ int main(void) {
   CMP_TEST_OK(m3_button_test_validate_color(&color));
 
   CMP_TEST_EXPECT(m3_button_test_color_set(NULL, 0.0f, 0.0f, 0.0f, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_button_test_color_set(&color, -0.1f, 0.0f, 0.0f, 1.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_button_test_color_set(&color, 0.0f, -0.1f, 0.0f, 1.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_button_test_color_set(&color, 0.0f, 0.0f, -0.1f, 1.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_button_test_color_set(&color, 0.0f, 0.0f, 0.0f, -0.1f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_button_test_color_with_alpha(NULL, 0.5f, &color),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_button_test_color_with_alpha(&color, -0.1f, &color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   color.r = -1.0f;
   CMP_TEST_EXPECT(m3_button_test_color_with_alpha(&color, 0.5f, &color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   color.r = 0.5f;
 
   CMP_TEST_EXPECT(m3_button_test_validate_text_style(NULL, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_text_style_init(&tmp_text_style));
   tmp_text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_button_test_validate_text_style(&tmp_text_style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   tmp_text_style.utf8_family = "Test";
   tmp_text_style.size_px = 0;
   CMP_TEST_EXPECT(m3_button_test_validate_text_style(&tmp_text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   tmp_text_style.size_px = 14;
   tmp_text_style.weight = 99;
   CMP_TEST_EXPECT(m3_button_test_validate_text_style(&tmp_text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   tmp_text_style.weight = 901;
   CMP_TEST_EXPECT(m3_button_test_validate_text_style(&tmp_text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   tmp_text_style.weight = 400;
   tmp_text_style.italic = 2;
   CMP_TEST_EXPECT(m3_button_test_validate_text_style(&tmp_text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   tmp_text_style.italic = CMP_FALSE;
   tmp_text_style.color.r = -0.2f;
   CMP_TEST_EXPECT(m3_button_test_validate_text_style(&tmp_text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   tmp_text_style.color.r = 0.0f;
   CMP_TEST_OK(m3_button_test_validate_text_style(&tmp_text_style, CMP_TRUE));
 
   CMP_TEST_EXPECT(m3_button_test_validate_style(NULL, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   CMP_TEST_OK(m3_button_test_validate_style(&tmp_style, CMP_FALSE));
   tmp_style.variant = 42u;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.padding_x = -1.0f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.min_width = -1.0f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.outline_width = -1.0f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.corner_radius = -1.0f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.fab_diameter = -1.0f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_fab(&tmp_style));
   tmp_style.fab_diameter = 0.0f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.ripple_expand_duration = -1.0f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.shadow_enabled = 2;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.text_style.size_px = 0;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.background_color.r = -0.2f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.outline_color.g = -0.2f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.ripple_color.b = -0.2f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.disabled_background_color.a = -0.2f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.disabled_text_color.r = -0.2f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_style_init_filled(&tmp_style));
   tmp_style.disabled_outline_color.g = -0.2f;
   CMP_TEST_EXPECT(m3_button_test_validate_style(&tmp_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   width_spec.mode = 99u;
   width_spec.size = 0.0f;
   CMP_TEST_EXPECT(m3_button_test_validate_measure_spec(width_spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_button_test_validate_measure_spec(width_spec),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   width_spec.mode = CMP_MEASURE_EXACTLY;
   width_spec.size = 1.0f;
   CMP_TEST_OK(m3_button_test_validate_measure_spec(width_spec));
@@ -563,7 +569,7 @@ int main(void) {
   CMP_TEST_EXPECT(m3_button_test_validate_rect(&bounds), CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_button_test_validate_backend(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   test_backend_init(&backend);
   text_backend.ctx = &backend;
@@ -575,41 +581,41 @@ int main(void) {
   CMP_TEST_OK(m3_button_test_validate_backend(&text_backend));
   text_backend.vtable = NULL;
   CMP_TEST_EXPECT(m3_button_test_validate_backend(&text_backend),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   text_backend.vtable = &g_test_text_vtable;
 
   CMP_TEST_EXPECT(m3_button_init(NULL, &text_backend, &style, "OK", 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_button_init(&button, NULL, &style, "OK", 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_button_init(&button, &text_backend, NULL, "OK", 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_button_init(&button, &text_backend, &style, NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   text_backend.vtable = NULL;
   CMP_TEST_EXPECT(m3_button_init(&button, &text_backend, &style, "OK", 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   text_backend.vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(m3_button_init(&button, &text_backend, &style, "OK", 2),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable_no_create;
   CMP_TEST_EXPECT(m3_button_init(&button, &text_backend, &style, "OK", 2),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable;
 
   CMP_TEST_EXPECT(m3_button_init(&button, &text_backend, &style, "OK", 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   style.text_style.utf8_family = "Test";
 
   backend.fail_create = 1;
   CMP_TEST_EXPECT(m3_button_init(&button, &text_backend, &style, "OK", 2),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_create = 0;
 
   CMP_TEST_OK(m3_button_test_set_fail_point(M3_BUTTON_TEST_FAIL_RIPPLE_INIT));
   CMP_TEST_EXPECT(m3_button_init(&button, &text_backend, &style, "OK", 2),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_button_test_clear_fail_points());
 
   CMP_TEST_OK(m3_button_init(&button, &text_backend, &style, "OK", 2));
@@ -617,23 +623,24 @@ int main(void) {
   CMP_TEST_ASSERT(button.widget.vtable != NULL);
   CMP_TEST_ASSERT((button.widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) != 0);
 
-  CMP_TEST_EXPECT(m3_button_test_metrics_update(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_button_test_metrics_update(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(
       m3_button_test_resolve_colors(NULL, &resolved_bg, &resolved_text,
                                     &resolved_outline, &resolved_ripple),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_button_test_resolve_colors(&button, &resolved_bg,
-                                           &resolved_text, &resolved_outline,
-                                           &resolved_ripple));
+                                            &resolved_text, &resolved_outline,
+                                            &resolved_ripple));
   CMP_TEST_ASSERT(
       cmp_color_near(resolved_bg, button.style.background_color, 0.001f));
   button.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(m3_button_test_resolve_colors(&button, &resolved_bg,
-                                           &resolved_text, &resolved_outline,
-                                           &resolved_ripple));
-  CMP_TEST_ASSERT(cmp_color_near(resolved_bg,
-                               button.style.disabled_background_color, 0.001f));
+                                            &resolved_text, &resolved_outline,
+                                            &resolved_ripple));
+  CMP_TEST_ASSERT(cmp_color_near(
+      resolved_bg, button.style.disabled_background_color, 0.001f));
   button.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
   button.style.background_color.r = -0.1f;
   CMP_TEST_EXPECT(
@@ -661,13 +668,14 @@ int main(void) {
   button.style.ripple_color = style.ripple_color;
 
   CMP_TEST_EXPECT(m3_button_test_resolve_corner(NULL, &corner),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bounds.x = 0.0f;
   bounds.y = 0.0f;
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   button.bounds = bounds;
-  CMP_TEST_EXPECT(m3_button_test_resolve_corner(&button, &corner), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_button_test_resolve_corner(&button, &corner),
+                  CMP_ERR_RANGE);
   bounds.width = 40.0f;
   bounds.height = 20.0f;
   button.bounds = bounds;
@@ -676,16 +684,17 @@ int main(void) {
   CMP_TEST_ASSERT(cmp_near(corner, 10.0f, 0.001f));
   button.style.variant = M3_BUTTON_VARIANT_FILLED;
   button.style.corner_radius = -1.0f;
-  CMP_TEST_EXPECT(m3_button_test_resolve_corner(&button, &corner), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_button_test_resolve_corner(&button, &corner),
+                  CMP_ERR_RANGE);
   button.style.corner_radius = style.corner_radius;
 
   CMP_TEST_EXPECT(m3_button_set_label(NULL, "Hi", 2), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_button_set_label(&button, NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_button_set_label(&button, "OK", 2));
 
   CMP_TEST_EXPECT(m3_button_set_on_click(NULL, test_button_on_click, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   clicks = 0;
   CMP_TEST_OK(m3_button_set_on_click(&button, test_button_on_click, &clicks));
 
@@ -693,7 +702,7 @@ int main(void) {
   tmp_style = style;
   tmp_style.text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_button_set_style(&button, &tmp_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   backend.fail_create = 1;
   CMP_TEST_EXPECT(m3_button_set_style(&button, &style), CMP_ERR_IO);
   backend.fail_create = 0;
@@ -709,45 +718,45 @@ int main(void) {
       button.widget.vtable->measure(NULL, width_spec, height_spec, &size),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(button.widget.vtable->measure(button.widget.ctx, width_spec,
-                                               height_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = 99u;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(button.widget.vtable->measure(button.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = 99u;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(button.widget.vtable->measure(button.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   button.style.variant = 42u;
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   CMP_TEST_EXPECT(button.widget.vtable->measure(button.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                height_spec, &size),
+                  CMP_ERR_RANGE);
   button.style.variant = M3_BUTTON_VARIANT_FILLED;
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = -1.0f;
   CMP_TEST_EXPECT(button.widget.vtable->measure(button.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                height_spec, &size),
+                  CMP_ERR_RANGE);
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(button.widget.vtable->measure(button.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 64.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 36.0f, 0.001f));
 
@@ -756,7 +765,7 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 30.0f;
   CMP_TEST_OK(button.widget.vtable->measure(button.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 80.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 30.0f, 0.001f));
 
@@ -765,7 +774,7 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 40.0f;
   CMP_TEST_OK(button.widget.vtable->measure(button.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 50.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 40.0f, 0.001f));
 
@@ -774,8 +783,8 @@ int main(void) {
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   CMP_TEST_EXPECT(button.widget.vtable->measure(button.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_IO);
+                                                height_spec, &size),
+                  CMP_ERR_IO);
   backend.fail_measure = 0;
 
   bounds.x = 0.0f;
@@ -783,34 +792,34 @@ int main(void) {
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(button.widget.vtable->layout(button.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bounds.width = 100.0f;
   bounds.height = 40.0f;
   CMP_TEST_OK(button.widget.vtable->layout(button.widget.ctx, bounds));
   CMP_TEST_EXPECT(button.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   paint_ctx.gfx = &gfx;
   paint_ctx.clip = bounds;
   paint_ctx.dpi_scale = 1.0f;
 
   CMP_TEST_EXPECT(button.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_gfx_vtable_no_draw;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_gfx_vtable;
 
   gfx.text_vtable = NULL;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable;
 
   test_backend_init(&backend);
@@ -824,38 +833,40 @@ int main(void) {
   backend.fail_draw_rect = 1;
   gfx.ctx = &backend;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect = 0;
 
-  CMP_TEST_OK(m3_button_test_set_fail_point(M3_BUTTON_TEST_FAIL_RESOLVE_COLORS));
+  CMP_TEST_OK(
+      m3_button_test_set_fail_point(M3_BUTTON_TEST_FAIL_RESOLVE_COLORS));
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_button_test_clear_fail_points());
 
-  CMP_TEST_OK(m3_button_test_set_fail_point(M3_BUTTON_TEST_FAIL_RESOLVE_CORNER));
+  CMP_TEST_OK(
+      m3_button_test_set_fail_point(M3_BUTTON_TEST_FAIL_RESOLVE_CORNER));
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_button_test_clear_fail_points());
 
   CMP_TEST_OK(m3_button_test_set_fail_point(M3_BUTTON_TEST_FAIL_OUTLINE_WIDTH));
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_button_test_clear_fail_points());
 
   button.style.variant = 42u;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   button.style.variant = M3_BUTTON_VARIANT_FILLED;
 
   button.bounds.width = -1.0f;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   button.bounds = bounds;
 
   backend.fail_measure = 1;
   button.metrics_valid = CMP_FALSE;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_measure = 0;
 
   button.style.shadow.color.a = 0.5f;
@@ -865,7 +876,7 @@ int main(void) {
   CMP_TEST_OK(button.widget.vtable->paint(button.widget.ctx, &paint_ctx));
   backend.fail_draw_rect = 1;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect = 0;
   button.style.shadow_enabled = CMP_FALSE;
   button.style.shadow.color.a = 0.0f;
@@ -875,19 +886,19 @@ int main(void) {
   gfx.ctx = &backend;
   text_backend.ctx = &backend;
   CMP_TEST_OK(button.widget.vtable->paint(button.widget.ctx, &paint_ctx));
-  CMP_TEST_ASSERT(cmp_color_near(backend.last_rect_color,
-                               button.style.disabled_background_color, 0.001f));
+  CMP_TEST_ASSERT(cmp_color_near(
+      backend.last_rect_color, button.style.disabled_background_color, 0.001f));
   CMP_TEST_ASSERT(cmp_color_near(backend.last_text_color,
-                               button.style.disabled_text_color, 0.001f));
+                                 button.style.disabled_text_color, 0.001f));
   button.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
 
   button.ripple.state = 99u;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   button.ripple.state = CMP_RIPPLE_STATE_EXPANDING;
   button.ripple.radius = -1.0f;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   button.ripple.radius = 0.0f;
   button.ripple.opacity = 0.0f;
   button.ripple.state = CMP_RIPPLE_STATE_IDLE;
@@ -941,14 +952,14 @@ int main(void) {
   backend.fail_draw_rect = 1;
   gfx.ctx = &backend;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect = 0;
 
   button.style.outline_width = 30.0f;
   test_backend_init(&backend);
   gfx.ctx = &backend;
   CMP_TEST_EXPECT(button.widget.vtable->paint(button.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   button.style.outline_width = other_style.outline_width;
 
   CMP_TEST_OK(m3_button_style_init_fab(&other_style));
@@ -957,13 +968,13 @@ int main(void) {
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   CMP_TEST_OK(button.widget.vtable->measure(button.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(size.width >= other_style.fab_diameter);
   CMP_TEST_ASSERT(size.height >= other_style.fab_diameter);
   button.style.min_width = 0.0f;
   button.style.min_height = 0.0f;
   CMP_TEST_OK(button.widget.vtable->measure(button.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(size.width >= other_style.fab_diameter);
   CMP_TEST_ASSERT(size.height >= other_style.fab_diameter);
   button.style.min_width = other_style.min_width;
@@ -974,11 +985,12 @@ int main(void) {
   button.metrics_valid = CMP_FALSE;
 
   CMP_TEST_EXPECT(button.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(button.widget.vtable->event(button.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      button.widget.vtable->event(button.widget.ctx, NULL, &handled),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(button.widget.vtable->event(button.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_button_style_init_filled(&other_style));
   other_style.text_style.utf8_family = "Test";
@@ -1048,7 +1060,8 @@ int main(void) {
   button.style.ripple_fade_duration = other_style.ripple_fade_duration;
   button.pressed = CMP_TRUE;
 
-  CMP_TEST_OK(m3_button_test_set_fail_point(M3_BUTTON_TEST_FAIL_RIPPLE_RELEASE));
+  CMP_TEST_OK(
+      m3_button_test_set_fail_point(M3_BUTTON_TEST_FAIL_RIPPLE_RELEASE));
   init_pointer_event(&event, CMP_INPUT_POINTER_UP, 5, 6);
   CMP_TEST_EXPECT(
       button.widget.vtable->event(button.widget.ctx, &event, &handled),
@@ -1085,14 +1098,16 @@ int main(void) {
       button.widget.vtable->get_semantics(button.widget.ctx, &semantics));
   CMP_TEST_ASSERT((semantics.flags & CMP_SEMANTIC_FLAG_DISABLED) != 0);
   CMP_TEST_ASSERT((semantics.flags & CMP_SEMANTIC_FLAG_FOCUSABLE) != 0);
-  button.widget.flags &= ~(CMP_WIDGET_FLAG_DISABLED | CMP_WIDGET_FLAG_FOCUSABLE);
+  button.widget.flags &=
+      ~(CMP_WIDGET_FLAG_DISABLED | CMP_WIDGET_FLAG_FOCUSABLE);
 
   CMP_TEST_EXPECT(button.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(button.widget.vtable->get_semantics(button.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
-  CMP_TEST_EXPECT(button.widget.vtable->destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(button.widget.vtable->destroy(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_button_init(&destroy_button, &text_backend, &style, "OK", 2));
   backend.fail_destroy = 1;
   CMP_TEST_EXPECT(

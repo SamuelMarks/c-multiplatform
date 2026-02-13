@@ -21,16 +21,16 @@
 #include <winhttp.h>
 #endif
 
-#define CMP_WIN32_RETURN_IF_ERROR(rc)                                           \
+#define CMP_WIN32_RETURN_IF_ERROR(rc)                                          \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       return (rc);                                                             \
     }                                                                          \
   } while (0)
 
-#define CMP_WIN32_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                          \
+#define CMP_WIN32_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                         \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       cleanup;                                                                 \
       return (rc);                                                             \
     }                                                                          \
@@ -97,7 +97,7 @@ int CMP_CALL cmp_win32_backend_config_init(CMPWin32BackendConfig *config) {
 #define CMP_WIN32_TYPE_FONT 3
 
 typedef BOOL(WINAPI *CMPWin32AlphaBlendFn)(HDC, int, int, int, int, HDC, int,
-                                          int, int, int, BLENDFUNCTION);
+                                           int, int, int, BLENDFUNCTION);
 
 typedef struct CMPWin32EventQueue {
   CMPInputEvent events[CMP_WIN32_EVENT_CAPACITY];
@@ -224,8 +224,8 @@ static int cmp_win32_network_error_from_winhttp(DWORD error_code) {
 }
 
 static int cmp_win32_network_copy_wide_range(struct CMPWin32Backend *backend,
-                                            const wchar_t *src, DWORD src_len,
-                                            wchar_t **out_wide) {
+                                             const wchar_t *src, DWORD src_len,
+                                             wchar_t **out_wide) {
   cmp_usize len_usize;
   cmp_usize alloc_size;
   wchar_t *dst;
@@ -260,7 +260,7 @@ static int cmp_win32_network_copy_wide_range(struct CMPWin32Backend *backend,
 }
 
 static int cmp_win32_backend_log(struct CMPWin32Backend *backend,
-                                CMPLogLevel level, const char *message) {
+                                 CMPLogLevel level, const char *message) {
   if (backend == NULL || message == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -271,7 +271,7 @@ static int cmp_win32_backend_log(struct CMPWin32Backend *backend,
 }
 
 static int cmp_win32_backend_log_last_error(struct CMPWin32Backend *backend,
-                                           const char *message) {
+                                            const char *message) {
   DWORD error_code;
   char buffer[256];
   int rc;
@@ -299,7 +299,8 @@ static int cmp_win32_backend_log_last_error(struct CMPWin32Backend *backend,
   return CMP_OK;
 }
 
-static void cmp_win32_backend_init_alpha_blend(struct CMPWin32Backend *backend) {
+static void
+cmp_win32_backend_init_alpha_blend(struct CMPWin32Backend *backend) {
   HMODULE module;
   CMPWin32AlphaBlendFn fn;
 
@@ -333,7 +334,7 @@ static void cmp_win32_event_queue_init(CMPWin32EventQueue *queue) {
 }
 
 static int cmp_win32_event_queue_push(CMPWin32EventQueue *queue,
-                                     const CMPInputEvent *event) {
+                                      const CMPInputEvent *event) {
   if (queue == NULL || event == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -347,8 +348,8 @@ static int cmp_win32_event_queue_push(CMPWin32EventQueue *queue,
 }
 
 static int cmp_win32_event_queue_pop(CMPWin32EventQueue *queue,
-                                    CMPInputEvent *out_event,
-                                    CMPBool *out_has_event) {
+                                     CMPInputEvent *out_event,
+                                     CMPBool *out_has_event) {
   if (queue == NULL || out_event == NULL || out_has_event == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -365,7 +366,7 @@ static int cmp_win32_event_queue_pop(CMPWin32EventQueue *queue,
 }
 
 static int cmp_win32_backend_push_event(struct CMPWin32Backend *backend,
-                                       const CMPInputEvent *event) {
+                                        const CMPInputEvent *event) {
   int rc;
 
   if (backend == NULL || event == NULL) {
@@ -407,8 +408,8 @@ static cmp_u32 cmp_win32_get_modifiers(void) {
 static cmp_u32 cmp_win32_get_time_ms(void) { return (cmp_u32)GetTickCount(); }
 
 static int cmp_win32_utf8_to_wide_alloc(struct CMPWin32Backend *backend,
-                                       const char *utf8, int utf8_len,
-                                       wchar_t **out_wide, int *out_wide_len) {
+                                        const char *utf8, int utf8_len,
+                                        wchar_t **out_wide, int *out_wide_len) {
   wchar_t *wide;
   int wide_len;
   int rc;
@@ -464,8 +465,8 @@ static int cmp_win32_utf8_to_wide_alloc(struct CMPWin32Backend *backend,
 }
 
 static int cmp_win32_wide_to_utf8(const wchar_t *wide, int wide_len,
-                                 char *buffer, cmp_usize buffer_size,
-                                 cmp_usize *out_length) {
+                                  char *buffer, cmp_usize buffer_size,
+                                  cmp_usize *out_length) {
   int required;
 
   if (wide == NULL || buffer == NULL || out_length == NULL) {
@@ -501,8 +502,8 @@ static int cmp_win32_wide_to_utf8(const wchar_t *wide, int wide_len,
 }
 
 static int cmp_win32_backend_resolve(struct CMPWin32Backend *backend,
-                                    CMPHandle handle, cmp_u32 type_id,
-                                    void **out_obj) {
+                                     CMPHandle handle, cmp_u32 type_id,
+                                     void **out_obj) {
   void *resolved;
   cmp_u32 actual_type;
   int rc;
@@ -572,8 +573,9 @@ static int cmp_win32_window_destroy(void *obj) {
   return CMP_OK;
 }
 
-static void cmp_win32_window_cleanup_unregistered(struct CMPWin32Backend *backend,
-                                                 CMPWin32Window *window) {
+static void
+cmp_win32_window_cleanup_unregistered(struct CMPWin32Backend *backend,
+                                      CMPWin32Window *window) {
   if (window == NULL || backend == NULL) {
     return;
   }
@@ -622,7 +624,7 @@ static int cmp_win32_texture_destroy(void *obj) {
 
 static void
 cmp_win32_texture_cleanup_unregistered(struct CMPWin32Backend *backend,
-                                      CMPWin32Texture *texture) {
+                                       CMPWin32Texture *texture) {
   if (texture == NULL || backend == NULL) {
     return;
   }
@@ -661,7 +663,7 @@ static int cmp_win32_font_destroy(void *obj) {
 }
 
 static void cmp_win32_font_cleanup_unregistered(struct CMPWin32Backend *backend,
-                                               CMPWin32Font *font) {
+                                                CMPWin32Font *font) {
   if (font == NULL || backend == NULL) {
     return;
   }
@@ -677,15 +679,15 @@ static const CMPObjectVTable g_cmp_win32_window_vtable = {
     cmp_win32_object_get_type_id};
 
 static const CMPObjectVTable g_cmp_win32_texture_vtable = {
-    cmp_win32_object_retain, cmp_win32_object_release, cmp_win32_texture_destroy,
-    cmp_win32_object_get_type_id};
+    cmp_win32_object_retain, cmp_win32_object_release,
+    cmp_win32_texture_destroy, cmp_win32_object_get_type_id};
 
 static const CMPObjectVTable g_cmp_win32_font_vtable = {
     cmp_win32_object_retain, cmp_win32_object_release, cmp_win32_font_destroy,
     cmp_win32_object_get_type_id};
 
 static int cmp_win32_window_flags_to_style(cmp_u32 flags, DWORD *out_style,
-                                          DWORD *out_ex_style) {
+                                           DWORD *out_ex_style) {
   DWORD style;
   DWORD ex_style;
 
@@ -735,7 +737,7 @@ static CMPScalar cmp_win32_query_dpi_scale(HWND hwnd) {
 }
 
 static int cmp_win32_window_ensure_backbuffer(CMPWin32Window *window,
-                                             cmp_i32 width, cmp_i32 height) {
+                                              cmp_i32 width, cmp_i32 height) {
   BITMAPINFO bmi;
   void *pixels;
   HBITMAP dib;
@@ -787,8 +789,8 @@ static int cmp_win32_window_ensure_backbuffer(CMPWin32Window *window,
 }
 
 static int cmp_win32_apply_transform(CMPWin32Window *window,
-                                    const CMPMat3 *transform,
-                                    CMPBool has_transform) {
+                                     const CMPMat3 *transform,
+                                     CMPBool has_transform) {
   XFORM xform;
 
   if (window == NULL || window->mem_dc == NULL) {
@@ -843,9 +845,9 @@ static cmp_u8 cmp_win32_premultiply_channel(cmp_u8 c, cmp_u8 a) {
 }
 
 static void cmp_win32_texture_copy_pixels(cmp_u8 *dst, cmp_i32 dst_stride,
-                                         const cmp_u8 *src, cmp_i32 src_stride,
-                                         cmp_i32 width, cmp_i32 height,
-                                         cmp_u32 format) {
+                                          const cmp_u8 *src, cmp_i32 src_stride,
+                                          cmp_i32 width, cmp_i32 height,
+                                          cmp_u32 format) {
   cmp_i32 y;
   cmp_i32 x;
   cmp_u8 r;
@@ -893,7 +895,7 @@ static void cmp_win32_texture_copy_pixels(cmp_u8 *dst, cmp_i32 dst_stride,
 }
 
 static LRESULT CALLBACK cmp_win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam,
-                                         LPARAM lparam) {
+                                          LPARAM lparam) {
   CMPWin32Window *window;
   struct CMPWin32Backend *backend;
   CMPInputEvent event;
@@ -1092,7 +1094,7 @@ static int cmp_win32_ws_shutdown(void *ws) {
 }
 
 static int cmp_win32_ws_create_window(void *ws, const CMPWSWindowConfig *config,
-                                     CMPHandle *out_window) {
+                                      CMPHandle *out_window) {
   struct CMPWin32Backend *backend;
   CMPWin32Window *window;
   DWORD style;
@@ -1162,7 +1164,7 @@ static int cmp_win32_ws_create_window(void *ws, const CMPWSWindowConfig *config,
   has_title = (config->utf8_title != NULL && config->utf8_title[0] != '\0');
   if (has_title) {
     rc = cmp_win32_utf8_to_wide_alloc(backend, config->utf8_title, -1,
-                                     &title_wide, NULL);
+                                      &title_wide, NULL);
     if (rc != CMP_OK) {
       backend->allocator.free(backend->allocator.ctx, window);
       return rc;
@@ -1188,7 +1190,7 @@ static int cmp_win32_ws_create_window(void *ws, const CMPWSWindowConfig *config,
   window->dpi_scale = cmp_win32_query_dpi_scale(window->hwnd);
 
   rc = cmp_object_header_init(&window->header, CMP_WIN32_TYPE_WINDOW, 0,
-                             &g_cmp_win32_window_vtable);
+                              &g_cmp_win32_window_vtable);
   if (rc != CMP_OK) {
     cmp_win32_window_cleanup_unregistered(backend, window);
     return rc;
@@ -1216,7 +1218,7 @@ static int cmp_win32_ws_destroy_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPWin32Backend *)ws;
   rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.destroy_window");
@@ -1236,7 +1238,7 @@ static int cmp_win32_ws_show_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPWin32Backend *)ws;
   rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.show_window");
@@ -1258,7 +1260,7 @@ static int cmp_win32_ws_hide_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPWin32Backend *)ws;
   rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.hide_window");
@@ -1270,7 +1272,7 @@ static int cmp_win32_ws_hide_window(void *ws, CMPHandle window) {
 }
 
 static int cmp_win32_ws_set_window_title(void *ws, CMPHandle window,
-                                        const char *utf8_title) {
+                                         const char *utf8_title) {
   struct CMPWin32Backend *backend;
   CMPWin32Window *resolved;
   wchar_t *wide;
@@ -1282,10 +1284,11 @@ static int cmp_win32_ws_set_window_title(void *ws, CMPHandle window,
 
   backend = (struct CMPWin32Backend *)ws;
   rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
-  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_window_title");
+  rc =
+      cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_window_title");
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_utf8_to_wide_alloc(backend, utf8_title, -1, &wide, NULL);
@@ -1300,8 +1303,8 @@ static int cmp_win32_ws_set_window_title(void *ws, CMPHandle window,
   return CMP_OK;
 }
 
-static int cmp_win32_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width,
-                                       cmp_i32 height) {
+static int cmp_win32_ws_set_window_size(void *ws, CMPHandle window,
+                                        cmp_i32 width, cmp_i32 height) {
   struct CMPWin32Backend *backend;
   CMPWin32Window *resolved;
   RECT rect;
@@ -1318,7 +1321,7 @@ static int cmp_win32_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 widt
 
   backend = (struct CMPWin32Backend *)ws;
   rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_window_size");
@@ -1347,7 +1350,8 @@ static int cmp_win32_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 widt
 }
 
 static int cmp_win32_ws_get_window_size(void *ws, CMPHandle window,
-                                       cmp_i32 *out_width, cmp_i32 *out_height) {
+                                        cmp_i32 *out_width,
+                                        cmp_i32 *out_height) {
   struct CMPWin32Backend *backend;
   CMPWin32Window *resolved;
   RECT rect;
@@ -1359,7 +1363,7 @@ static int cmp_win32_ws_get_window_size(void *ws, CMPHandle window,
 
   backend = (struct CMPWin32Backend *)ws;
   rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_window_size");
@@ -1377,7 +1381,7 @@ static int cmp_win32_ws_get_window_size(void *ws, CMPHandle window,
 }
 
 static int cmp_win32_ws_set_window_dpi_scale(void *ws, CMPHandle window,
-                                            CMPScalar scale) {
+                                             CMPScalar scale) {
   struct CMPWin32Backend *backend;
   CMPWin32Window *resolved;
   int rc;
@@ -1391,11 +1395,11 @@ static int cmp_win32_ws_set_window_dpi_scale(void *ws, CMPHandle window,
 
   backend = (struct CMPWin32Backend *)ws;
   rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO,
-                            "ws.set_window_dpi_scale");
+                             "ws.set_window_dpi_scale");
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   resolved->dpi_scale_override = scale;
@@ -1404,7 +1408,7 @@ static int cmp_win32_ws_set_window_dpi_scale(void *ws, CMPHandle window,
 }
 
 static int cmp_win32_ws_get_window_dpi_scale(void *ws, CMPHandle window,
-                                            CMPScalar *out_scale) {
+                                             CMPScalar *out_scale) {
   struct CMPWin32Backend *backend;
   CMPWin32Window *resolved;
   int rc;
@@ -1415,11 +1419,11 @@ static int cmp_win32_ws_get_window_dpi_scale(void *ws, CMPHandle window,
 
   backend = (struct CMPWin32Backend *)ws;
   rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO,
-                            "ws.get_window_dpi_scale");
+                             "ws.get_window_dpi_scale");
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   if (resolved->has_scale_override) {
@@ -1445,8 +1449,8 @@ static int cmp_win32_ws_set_clipboard_text(void *ws, const char *utf8_text) {
   }
 
   backend = (struct CMPWin32Backend *)ws;
-  rc =
-      cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_clipboard_text");
+  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO,
+                             "ws.set_clipboard_text");
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   length = 0;
@@ -1498,8 +1502,8 @@ static int cmp_win32_ws_set_clipboard_text(void *ws, const char *utf8_text) {
 }
 
 static int cmp_win32_ws_get_clipboard_text(void *ws, char *buffer,
-                                          cmp_usize buffer_size,
-                                          cmp_usize *out_length) {
+                                           cmp_usize buffer_size,
+                                           cmp_usize *out_length) {
   struct CMPWin32Backend *backend;
   HANDLE mem;
   wchar_t *wide;
@@ -1510,8 +1514,8 @@ static int cmp_win32_ws_get_clipboard_text(void *ws, char *buffer,
   }
 
   backend = (struct CMPWin32Backend *)ws;
-  rc =
-      cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_clipboard_text");
+  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO,
+                             "ws.get_clipboard_text");
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   if (!OpenClipboard(NULL)) {
@@ -1539,7 +1543,7 @@ static int cmp_win32_ws_get_clipboard_text(void *ws, char *buffer,
 }
 
 static int cmp_win32_ws_poll_event(void *ws, CMPInputEvent *out_event,
-                                  CMPBool *out_has_event) {
+                                   CMPBool *out_has_event) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -1557,7 +1561,7 @@ static int cmp_win32_ws_poll_event(void *ws, CMPInputEvent *out_event,
   }
 
   return cmp_win32_event_queue_pop(&backend->event_queue, out_event,
-                                  out_has_event);
+                                   out_has_event);
 }
 
 static int cmp_win32_ws_pump_events(void *ws) {
@@ -1611,7 +1615,7 @@ static const CMPWSVTable g_cmp_win32_ws_vtable = {
     cmp_win32_ws_get_time_ms};
 
 static int cmp_win32_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
-                                    cmp_i32 height, CMPScalar dpi_scale) {
+                                     cmp_i32 height, CMPScalar dpi_scale) {
   struct CMPWin32Backend *backend;
   CMPWin32Window *resolved;
   int rc;
@@ -1632,7 +1636,7 @@ static int cmp_win32_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
   }
 
   rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.begin_frame");
@@ -1655,7 +1659,7 @@ static int cmp_win32_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
   backend->clip_depth = 0u;
 
   rc = cmp_win32_apply_transform(resolved, &backend->transform,
-                                backend->has_transform);
+                                 backend->has_transform);
   CMP_WIN32_RETURN_IF_ERROR(rc);
   return CMP_OK;
 }
@@ -1672,7 +1676,7 @@ static int cmp_win32_gfx_end_frame(void *gfx, CMPHandle window) {
 
   backend = (struct CMPWin32Backend *)gfx;
   rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   if (backend->active_window != resolved) {
@@ -1736,8 +1740,8 @@ static int cmp_win32_gfx_clear(void *gfx, CMPColor color) {
   return CMP_OK;
 }
 
-static int cmp_win32_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
-                                  CMPScalar corner_radius) {
+static int cmp_win32_gfx_draw_rect(void *gfx, const CMPRect *rect,
+                                   CMPColor color, CMPScalar corner_radius) {
   struct CMPWin32Backend *backend;
   CMPWin32Window *window;
   RECT r;
@@ -1808,8 +1812,8 @@ static int cmp_win32_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor colo
 }
 
 static int cmp_win32_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
-                                  CMPScalar x1, CMPScalar y1, CMPColor color,
-                                  CMPScalar thickness) {
+                                   CMPScalar x1, CMPScalar y1, CMPColor color,
+                                   CMPScalar thickness) {
   struct CMPWin32Backend *backend;
   CMPWin32Window *window;
   COLORREF ref;
@@ -1978,7 +1982,7 @@ static int cmp_win32_path_build(HDC dc, const CMPPath *path) {
 }
 
 static int cmp_win32_gfx_draw_path(void *gfx, const CMPPath *path,
-                                  CMPColor color) {
+                                   CMPColor color) {
   struct CMPWin32Backend *backend;
   CMPWin32Window *window;
   COLORREF ref;
@@ -2122,7 +2126,7 @@ static int cmp_win32_gfx_pop_clip(void *gfx) {
   }
   backend->clip_depth -= 1u;
   rc = cmp_win32_apply_transform(window, &backend->transform,
-                                backend->has_transform);
+                                 backend->has_transform);
   CMP_WIN32_RETURN_IF_ERROR(rc);
   return CMP_OK;
 }
@@ -2150,9 +2154,10 @@ static int cmp_win32_gfx_set_transform(void *gfx, const CMPMat3 *transform) {
   return cmp_win32_apply_transform(window, transform, CMP_TRUE);
 }
 
-static int cmp_win32_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
-                                       cmp_u32 format, const void *pixels,
-                                       cmp_usize size, CMPHandle *out_texture) {
+static int cmp_win32_gfx_create_texture(void *gfx, cmp_i32 width,
+                                        cmp_i32 height, cmp_u32 format,
+                                        const void *pixels, cmp_usize size,
+                                        CMPHandle *out_texture) {
   struct CMPWin32Backend *backend;
   CMPWin32Texture *texture;
   BITMAPINFO bmi;
@@ -2183,7 +2188,8 @@ static int cmp_win32_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height
   out_texture->id = 0u;
   out_texture->generation = 0u;
 
-  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.create_texture");
+  rc =
+      cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.create_texture");
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   bpp = (format == CMP_TEX_FORMAT_A8) ? 1u : 4u;
@@ -2239,12 +2245,12 @@ static int cmp_win32_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height
       return rc;
     }
     cmp_win32_texture_copy_pixels((cmp_u8 *)texture->pixels, texture->stride,
-                                 (const cmp_u8 *)pixels, (cmp_i32)row_bytes,
-                                 width, height, format);
+                                  (const cmp_u8 *)pixels, (cmp_i32)row_bytes,
+                                  width, height, format);
   }
 
   rc = cmp_object_header_init(&texture->header, CMP_WIN32_TYPE_TEXTURE, 0,
-                             &g_cmp_win32_texture_vtable);
+                              &g_cmp_win32_texture_vtable);
   if (rc != CMP_OK) {
     cmp_win32_texture_cleanup_unregistered(backend, texture);
     return rc;
@@ -2262,8 +2268,9 @@ static int cmp_win32_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height
 }
 
 static int cmp_win32_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
-                                       cmp_i32 y, cmp_i32 width, cmp_i32 height,
-                                       const void *pixels, cmp_usize size) {
+                                        cmp_i32 y, cmp_i32 width,
+                                        cmp_i32 height, const void *pixels,
+                                        cmp_usize size) {
   struct CMPWin32Backend *backend;
   CMPWin32Texture *resolved;
   cmp_usize required;
@@ -2283,10 +2290,11 @@ static int cmp_win32_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
 
   backend = (struct CMPWin32Backend *)gfx;
   rc = cmp_win32_backend_resolve(backend, texture, CMP_WIN32_TYPE_TEXTURE,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
-  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.update_texture");
+  rc =
+      cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.update_texture");
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   if (x + width > resolved->width || y + height > resolved->height) {
@@ -2296,7 +2304,7 @@ static int cmp_win32_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
   rc = cmp_win32_mul_usize((cmp_usize)width, (cmp_usize)height, &required);
   CMP_WIN32_RETURN_IF_ERROR(rc);
   rc = cmp_win32_mul_usize(required, (cmp_usize)resolved->bytes_per_pixel,
-                          &required);
+                           &required);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   if (pixels != NULL && size < required) {
@@ -2306,15 +2314,15 @@ static int cmp_win32_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
     return CMP_OK;
   }
 
-  rc = cmp_win32_mul_usize((cmp_usize)width, (cmp_usize)resolved->bytes_per_pixel,
-                          &row_bytes);
+  rc = cmp_win32_mul_usize((cmp_usize)width,
+                           (cmp_usize)resolved->bytes_per_pixel, &row_bytes);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
-  dst = (cmp_u8 *)resolved->pixels + (cmp_isize)y * (cmp_isize)resolved->stride +
-        (cmp_isize)x * 4;
+  dst = (cmp_u8 *)resolved->pixels +
+        (cmp_isize)y * (cmp_isize)resolved->stride + (cmp_isize)x * 4;
   cmp_win32_texture_copy_pixels(dst, resolved->stride, (const cmp_u8 *)pixels,
-                               (cmp_i32)row_bytes, width, height,
-                               resolved->format);
+                                (cmp_i32)row_bytes, width, height,
+                                resolved->format);
   return CMP_OK;
 }
 
@@ -2329,18 +2337,19 @@ static int cmp_win32_gfx_destroy_texture(void *gfx, CMPHandle texture) {
 
   backend = (struct CMPWin32Backend *)gfx;
   rc = cmp_win32_backend_resolve(backend, texture, CMP_WIN32_TYPE_TEXTURE,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
-  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.destroy_texture");
+  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
+                             "gfx.destroy_texture");
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   return cmp_object_release(&resolved->header);
 }
 
 static int cmp_win32_gfx_draw_texture(void *gfx, CMPHandle texture,
-                                     const CMPRect *src, const CMPRect *dst,
-                                     CMPScalar opacity) {
+                                      const CMPRect *src, const CMPRect *dst,
+                                      CMPScalar opacity) {
   struct CMPWin32Backend *backend;
   CMPWin32Texture *resolved;
   CMPWin32Window *window;
@@ -2370,7 +2379,7 @@ static int cmp_win32_gfx_draw_texture(void *gfx, CMPHandle texture,
   }
 
   rc = cmp_win32_backend_resolve(backend, texture, CMP_WIN32_TYPE_TEXTURE,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.draw_texture");
@@ -2438,8 +2447,8 @@ static const CMPGfxVTable g_cmp_win32_gfx_vtable = {
     cmp_win32_gfx_draw_texture};
 
 static int cmp_win32_text_create_font(void *text, const char *utf8_family,
-                                     cmp_i32 size_px, cmp_i32 weight,
-                                     CMPBool italic, CMPHandle *out_font) {
+                                      cmp_i32 size_px, cmp_i32 weight,
+                                      CMPBool italic, CMPHandle *out_font) {
   struct CMPWin32Backend *backend;
   CMPWin32Font *font;
   wchar_t *family;
@@ -2493,7 +2502,7 @@ static int cmp_win32_text_create_font(void *text, const char *utf8_family,
   font->italic = italic ? CMP_TRUE : CMP_FALSE;
 
   rc = cmp_object_header_init(&font->header, CMP_WIN32_TYPE_FONT, 0,
-                             &g_cmp_win32_font_vtable);
+                              &g_cmp_win32_font_vtable);
   if (rc != CMP_OK) {
     cmp_win32_font_cleanup_unregistered(backend, font);
     return rc;
@@ -2521,7 +2530,7 @@ static int cmp_win32_text_destroy_font(void *text, CMPHandle font) {
 
   backend = (struct CMPWin32Backend *)text;
   rc = cmp_win32_backend_resolve(backend, font, CMP_WIN32_TYPE_FONT,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.destroy_font");
@@ -2531,9 +2540,10 @@ static int cmp_win32_text_destroy_font(void *text, CMPHandle font) {
 }
 
 static int cmp_win32_text_measure_text(void *text, CMPHandle font,
-                                      const char *utf8, cmp_usize utf8_len,
-                                      CMPScalar *out_width, CMPScalar *out_height,
-                                      CMPScalar *out_baseline) {
+                                       const char *utf8, cmp_usize utf8_len,
+                                       CMPScalar *out_width,
+                                       CMPScalar *out_height,
+                                       CMPScalar *out_baseline) {
   struct CMPWin32Backend *backend;
   CMPWin32Font *resolved;
   wchar_t *wide;
@@ -2557,7 +2567,7 @@ static int cmp_win32_text_measure_text(void *text, CMPHandle font,
 
   backend = (struct CMPWin32Backend *)text;
   rc = cmp_win32_backend_resolve(backend, font, CMP_WIN32_TYPE_FONT,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.measure_text");
@@ -2582,7 +2592,7 @@ static int cmp_win32_text_measure_text(void *text, CMPHandle font,
     wide = NULL;
     wide_len = 0;
     rc = cmp_win32_utf8_to_wide_alloc(backend, utf8, (int)utf8_len, &wide,
-                                     &wide_len);
+                                      &wide_len);
     if (rc != CMP_OK) {
       SelectObject(hdc, old_font);
       ReleaseDC(NULL, hdc);
@@ -2606,9 +2616,9 @@ static int cmp_win32_text_measure_text(void *text, CMPHandle font,
   return CMP_OK;
 }
 
-static int cmp_win32_text_draw_text(void *text, CMPHandle font, const char *utf8,
-                                   cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                                   CMPColor color) {
+static int cmp_win32_text_draw_text(void *text, CMPHandle font,
+                                    const char *utf8, cmp_usize utf8_len,
+                                    CMPScalar x, CMPScalar y, CMPColor color) {
   struct CMPWin32Backend *backend;
   CMPWin32Font *resolved;
   CMPWin32Window *window;
@@ -2635,7 +2645,7 @@ static int cmp_win32_text_draw_text(void *text, CMPHandle font, const char *utf8
   }
 
   rc = cmp_win32_backend_resolve(backend, font, CMP_WIN32_TYPE_FONT,
-                                (void **)&resolved);
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.draw_text");
@@ -2648,7 +2658,7 @@ static int cmp_win32_text_draw_text(void *text, CMPHandle font, const char *utf8
   wide = NULL;
   wide_len = 0;
   rc = cmp_win32_utf8_to_wide_alloc(backend, utf8, (int)utf8_len, &wide,
-                                   &wide_len);
+                                    &wide_len);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   old_font = (HFONT)SelectObject(window->mem_dc, resolved->font);
@@ -2668,7 +2678,7 @@ static const CMPTextVTable g_cmp_win32_text_vtable = {
     cmp_win32_text_measure_text, cmp_win32_text_draw_text};
 
 static int cmp_win32_io_read_file(void *io, const char *utf8_path, void *buffer,
-                                 cmp_usize buffer_size, cmp_usize *out_read) {
+                                  cmp_usize buffer_size, cmp_usize *out_read) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -2688,8 +2698,8 @@ static int cmp_win32_io_read_file(void *io, const char *utf8_path, void *buffer,
 }
 
 static int cmp_win32_io_read_file_alloc(void *io, const char *utf8_path,
-                                       const CMPAllocator *allocator,
-                                       void **out_data, cmp_usize *out_size) {
+                                        const CMPAllocator *allocator,
+                                        void **out_data, cmp_usize *out_size) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -2703,7 +2713,8 @@ static int cmp_win32_io_read_file_alloc(void *io, const char *utf8_path,
   }
 
   backend = (struct CMPWin32Backend *)io;
-  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "io.read_file_alloc");
+  rc =
+      cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "io.read_file_alloc");
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   *out_data = NULL;
@@ -2712,8 +2723,8 @@ static int cmp_win32_io_read_file_alloc(void *io, const char *utf8_path,
 }
 
 static int cmp_win32_io_write_file(void *io, const char *utf8_path,
-                                  const void *data, cmp_usize size,
-                                  CMPBool overwrite) {
+                                   const void *data, cmp_usize size,
+                                   CMPBool overwrite) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -2733,7 +2744,7 @@ static int cmp_win32_io_write_file(void *io, const char *utf8_path,
 }
 
 static int cmp_win32_io_file_exists(void *io, const char *utf8_path,
-                                   CMPBool *out_exists) {
+                                    CMPBool *out_exists) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -2764,7 +2775,7 @@ static int cmp_win32_io_delete_file(void *io, const char *utf8_path) {
 }
 
 static int cmp_win32_io_stat_file(void *io, const char *utf8_path,
-                                 CMPFileInfo *out_info) {
+                                  CMPFileInfo *out_info) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -2786,7 +2797,7 @@ static const CMPIOVTable g_cmp_win32_io_vtable = {
     cmp_win32_io_delete_file, cmp_win32_io_stat_file};
 
 static int cmp_win32_sensors_is_available(void *sensors, cmp_u32 type,
-                                         CMPBool *out_available) {
+                                          CMPBool *out_available) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -2797,8 +2808,8 @@ static int cmp_win32_sensors_is_available(void *sensors, cmp_u32 type,
   }
 
   backend = (struct CMPWin32Backend *)sensors;
-  rc =
-      cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "sensors.is_available");
+  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
+                             "sensors.is_available");
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   *out_available = CMP_FALSE;
@@ -2838,8 +2849,8 @@ static int cmp_win32_sensors_stop(void *sensors, cmp_u32 type) {
 }
 
 static int cmp_win32_sensors_read(void *sensors, cmp_u32 type,
-                                 CMPSensorReading *out_reading,
-                                 CMPBool *out_has_reading) {
+                                  CMPSensorReading *out_reading,
+                                  CMPBool *out_has_reading) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -2879,7 +2890,7 @@ static int cmp_win32_camera_open(void *camera, cmp_u32 camera_id) {
 }
 
 static int cmp_win32_camera_open_with_config(void *camera,
-                                            const CMPCameraConfig *config) {
+                                             const CMPCameraConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2929,7 +2940,7 @@ static int cmp_win32_camera_stop(void *camera) {
 }
 
 static int cmp_win32_camera_read_frame(void *camera, CMPCameraFrame *out_frame,
-                                      CMPBool *out_has_frame) {
+                                       CMPBool *out_has_frame) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -2951,9 +2962,10 @@ static const CMPCameraVTable g_cmp_win32_camera_vtable = {
     cmp_win32_camera_close, cmp_win32_camera_start,
     cmp_win32_camera_stop,  cmp_win32_camera_read_frame};
 
-static int cmp_win32_network_request(void *net, const CMPNetworkRequest *request,
-                                    const CMPAllocator *allocator,
-                                    CMPNetworkResponse *out_response) {
+static int cmp_win32_network_request(void *net,
+                                     const CMPNetworkRequest *request,
+                                     const CMPAllocator *allocator,
+                                     CMPNetworkResponse *out_response) {
   struct CMPWin32Backend *backend;
   URL_COMPONENTS components;
   HINTERNET session;
@@ -3057,9 +3069,9 @@ static int cmp_win32_network_request(void *net, const CMPNetworkRequest *request
     goto cleanup;
   }
 
-  rc =
-      cmp_win32_network_copy_wide_range(backend, components.lpszHostName,
-                                       components.dwHostNameLength, &host_wide);
+  rc = cmp_win32_network_copy_wide_range(backend, components.lpszHostName,
+                                         components.dwHostNameLength,
+                                         &host_wide);
   if (rc != CMP_OK) {
     goto cleanup;
   }
@@ -3127,14 +3139,14 @@ static int cmp_win32_network_request(void *net, const CMPNetworkRequest *request
   }
 
   rc = cmp_win32_utf8_to_wide_alloc(backend, request->method, -1, &method_wide,
-                                   NULL);
+                                    NULL);
   if (rc != CMP_OK) {
     goto cleanup;
   }
 
   if (request->headers != NULL && request->headers[0] != '\0') {
     rc = cmp_win32_utf8_to_wide_alloc(backend, request->headers, -1,
-                                     &headers_wide, NULL);
+                                      &headers_wide, NULL);
     if (rc != CMP_OK) {
       goto cleanup;
     }
@@ -3158,7 +3170,8 @@ static int cmp_win32_network_request(void *net, const CMPNetworkRequest *request
                             (int)request->timeout_ms)) {
       last_error = GetLastError();
       rc = cmp_win32_network_error_from_winhttp(last_error);
-      log_rc = cmp_win32_backend_log_last_error(backend, "network.set_timeouts");
+      log_rc =
+          cmp_win32_backend_log_last_error(backend, "network.set_timeouts");
       if (log_rc != CMP_OK && rc == CMP_OK) {
         rc = log_rc;
       }
@@ -3252,7 +3265,7 @@ static int cmp_win32_network_request(void *net, const CMPNetworkRequest *request
       last_error = GetLastError();
       rc = cmp_win32_network_error_from_winhttp(last_error);
       log_rc = cmp_win32_backend_log_last_error(backend,
-                                               "network.query_data_available");
+                                                "network.query_data_available");
       if (log_rc != CMP_OK && rc == CMP_OK) {
         rc = log_rc;
       }
@@ -3262,7 +3275,8 @@ static int cmp_win32_network_request(void *net, const CMPNetworkRequest *request
       break;
     }
 
-    rc = cmp_win32_add_usize(total_size, (cmp_usize)bytes_available, &alloc_size);
+    rc = cmp_win32_add_usize(total_size, (cmp_usize)bytes_available,
+                             &alloc_size);
     if (rc != CMP_OK) {
       goto cleanup;
     }
@@ -3347,8 +3361,8 @@ cleanup:
 }
 
 static int cmp_win32_network_free_response(void *net,
-                                          const CMPAllocator *allocator,
-                                          CMPNetworkResponse *response) {
+                                           const CMPAllocator *allocator,
+                                           CMPNetworkResponse *response) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -3365,7 +3379,7 @@ static int cmp_win32_network_free_response(void *net,
 
   backend = (struct CMPWin32Backend *)net;
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
-                            "network.free_response");
+                             "network.free_response");
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   if (response->body != NULL) {
@@ -3385,7 +3399,7 @@ static const CMPNetworkVTable g_cmp_win32_network_vtable = {
     cmp_win32_network_request, cmp_win32_network_free_response};
 
 static int cmp_win32_tasks_thread_create(void *tasks, CMPThreadFn entry,
-                                        void *user, CMPHandle *out_thread) {
+                                         void *user, CMPHandle *out_thread) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -3397,7 +3411,8 @@ static int cmp_win32_tasks_thread_create(void *tasks, CMPThreadFn entry,
   }
 
   backend = (struct CMPWin32Backend *)tasks;
-  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.thread_create");
+  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
+                             "tasks.thread_create");
   CMP_WIN32_RETURN_IF_ERROR(rc);
   return CMP_ERR_UNSUPPORTED;
 }
@@ -3427,7 +3442,8 @@ static int cmp_win32_tasks_mutex_create(void *tasks, CMPHandle *out_mutex) {
   }
 
   backend = (struct CMPWin32Backend *)tasks;
-  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.mutex_create");
+  rc =
+      cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.mutex_create");
   CMP_WIN32_RETURN_IF_ERROR(rc);
   return CMP_ERR_UNSUPPORTED;
 }
@@ -3443,7 +3459,8 @@ static int cmp_win32_tasks_mutex_destroy(void *tasks, CMPHandle mutex) {
   }
 
   backend = (struct CMPWin32Backend *)tasks;
-  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.mutex_destroy");
+  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
+                             "tasks.mutex_destroy");
   CMP_WIN32_RETURN_IF_ERROR(rc);
   return CMP_ERR_UNSUPPORTED;
 }
@@ -3475,7 +3492,8 @@ static int cmp_win32_tasks_mutex_unlock(void *tasks, CMPHandle mutex) {
   }
 
   backend = (struct CMPWin32Backend *)tasks;
-  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.mutex_unlock");
+  rc =
+      cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.mutex_unlock");
   CMP_WIN32_RETURN_IF_ERROR(rc);
   return CMP_ERR_UNSUPPORTED;
 }
@@ -3517,7 +3535,7 @@ static int cmp_win32_tasks_post(void *tasks, CMPTaskFn fn, void *user) {
 }
 
 static int cmp_win32_tasks_post_delayed(void *tasks, CMPTaskFn fn, void *user,
-                                       cmp_u32 delay_ms) {
+                                        cmp_u32 delay_ms) {
   struct CMPWin32Backend *backend;
   int rc;
 
@@ -3528,7 +3546,8 @@ static int cmp_win32_tasks_post_delayed(void *tasks, CMPTaskFn fn, void *user,
   }
 
   backend = (struct CMPWin32Backend *)tasks;
-  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.post_delayed");
+  rc =
+      cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.post_delayed");
   CMP_WIN32_RETURN_IF_ERROR(rc);
   if (!backend->inline_tasks) {
     return CMP_ERR_UNSUPPORTED;
@@ -3692,14 +3711,14 @@ static int cmp_win32_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
 }
 
 static const CMPEnvVTable g_cmp_win32_env_vtable = {
-    cmp_win32_env_get_io,     cmp_win32_env_get_sensors,
-    cmp_win32_env_get_camera, cmp_win32_env_get_image,
-    cmp_win32_env_get_video,  cmp_win32_env_get_audio,
+    cmp_win32_env_get_io,      cmp_win32_env_get_sensors,
+    cmp_win32_env_get_camera,  cmp_win32_env_get_image,
+    cmp_win32_env_get_video,   cmp_win32_env_get_audio,
     cmp_win32_env_get_network, cmp_win32_env_get_tasks,
     cmp_win32_env_get_time_ms};
 
 int CMP_CALL cmp_win32_backend_create(const CMPWin32BackendConfig *config,
-                                    CMPWin32Backend **out_backend) {
+                                      CMPWin32Backend **out_backend) {
   CMPWin32BackendConfig local_config;
   CMPAllocator allocator;
   struct CMPWin32Backend *backend;
@@ -3753,7 +3772,7 @@ int CMP_CALL cmp_win32_backend_create(const CMPWin32BackendConfig *config,
   }
 
   rc = cmp_handle_system_default_create(config->handle_capacity, &allocator,
-                                       &backend->handles);
+                                        &backend->handles);
   if (rc != CMP_OK) {
     if (backend->log_owner) {
       cmp_log_shutdown();
@@ -3887,7 +3906,8 @@ int CMP_CALL cmp_win32_backend_get_ws(CMPWin32Backend *backend, CMPWS *out_ws) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_win32_backend_get_gfx(CMPWin32Backend *backend, CMPGfx *out_gfx) {
+int CMP_CALL cmp_win32_backend_get_gfx(CMPWin32Backend *backend,
+                                       CMPGfx *out_gfx) {
   if (backend == NULL || out_gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -3898,7 +3918,8 @@ int CMP_CALL cmp_win32_backend_get_gfx(CMPWin32Backend *backend, CMPGfx *out_gfx
   return CMP_OK;
 }
 
-int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend, CMPEnv *out_env) {
+int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend,
+                                       CMPEnv *out_env) {
   if (backend == NULL || out_env == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -3913,7 +3934,7 @@ int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend, CMPEnv *out_env
 #else
 
 int CMP_CALL cmp_win32_backend_create(const CMPWin32BackendConfig *config,
-                                    CMPWin32Backend **out_backend) {
+                                      CMPWin32Backend **out_backend) {
   CMPWin32BackendConfig local_config;
   int rc;
 
@@ -3949,7 +3970,8 @@ int CMP_CALL cmp_win32_backend_get_ws(CMPWin32Backend *backend, CMPWS *out_ws) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-int CMP_CALL cmp_win32_backend_get_gfx(CMPWin32Backend *backend, CMPGfx *out_gfx) {
+int CMP_CALL cmp_win32_backend_get_gfx(CMPWin32Backend *backend,
+                                       CMPGfx *out_gfx) {
   if (backend == NULL || out_gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -3957,7 +3979,8 @@ int CMP_CALL cmp_win32_backend_get_gfx(CMPWin32Backend *backend, CMPGfx *out_gfx
   return CMP_ERR_UNSUPPORTED;
 }
 
-int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend, CMPEnv *out_env) {
+int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend,
+                                       CMPEnv *out_env) {
   if (backend == NULL || out_env == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

@@ -50,7 +50,7 @@ static int CMP_CALL test_alloc(void *ctx, cmp_usize size, void **out_ptr) {
 }
 
 static int CMP_CALL test_realloc(void *ctx, void *ptr, cmp_usize size,
-                                void **out_ptr) {
+                                 void **out_ptr) {
   TestAllocCtx *state;
   void *mem;
 
@@ -139,7 +139,7 @@ int main(void) {
 
   memset(&bad_alloc, 0, sizeof(bad_alloc));
   CMP_TEST_EXPECT(cmp_arena_init(&arena, &bad_alloc, 64),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
 #ifdef CMP_TESTING
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
@@ -161,10 +161,14 @@ int main(void) {
   CMP_TEST_ASSERT(stats.total_used == 0);
 
   CMP_TEST_EXPECT(cmp_arena_alloc(NULL, 8, 4, &ptr), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 0, 4, &ptr), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 8, 0, &ptr), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 8, 3, &ptr), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 8, 4, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 0, 4, &ptr),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 8, 0, &ptr),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 8, 3, &ptr),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 8, 4, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_arena_alloc(&arena_uninit, 8, 4, &ptr), CMP_ERR_STATE);
 
   CMP_TEST_OK(cmp_arena_alloc(&arena, 16, 8, &ptr));
@@ -184,7 +188,7 @@ int main(void) {
   block = (CMPArenaBlockInternal *)align_overflow_arena.current;
   block->offset = max_size;
   CMP_TEST_EXPECT(cmp_arena_alloc(&align_overflow_arena, 8, 8, &ptr),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_arena_shutdown(&align_overflow_arena));
 
 #ifdef CMP_TESTING
@@ -220,7 +224,8 @@ int main(void) {
   CMP_TEST_OK(cmp_arena_alloc(&stats_cap_arena, 16, 1, &ptr));
   block = (CMPArenaBlockInternal *)stats_cap_arena.head;
   block->capacity = max_size;
-  CMP_TEST_EXPECT(cmp_arena_get_stats(&stats_cap_arena, &stats), CMP_ERR_OVERFLOW);
+  CMP_TEST_EXPECT(cmp_arena_get_stats(&stats_cap_arena, &stats),
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_arena_shutdown(&stats_cap_arena));
 
   CMP_TEST_OK(cmp_arena_init(&stats_used_arena, NULL, 16));
@@ -229,7 +234,7 @@ int main(void) {
   block = (CMPArenaBlockInternal *)stats_used_arena.head;
   block->offset = max_size;
   CMP_TEST_EXPECT(cmp_arena_get_stats(&stats_used_arena, &stats),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_arena_shutdown(&stats_used_arena));
 
   CMP_TEST_EXPECT(cmp_arena_reset(&arena_uninit), CMP_ERR_STATE);
@@ -242,7 +247,7 @@ int main(void) {
 
   test_ctx.fail_alloc = 1;
   CMP_TEST_EXPECT(cmp_arena_init(&fail_arena, &test_allocator, 16),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   test_ctx.fail_alloc = 0;
 
   CMP_TEST_OK(cmp_arena_init(&fail_arena, &test_allocator, 16));
@@ -263,7 +268,8 @@ int main(void) {
   CMP_TEST_OK(cmp_arena_init(&oom_arena, &test_allocator, 16));
   CMP_TEST_OK(cmp_arena_alloc(&oom_arena, 16, 1, &ptr));
   test_ctx.fail_alloc = 1;
-  CMP_TEST_EXPECT(cmp_arena_alloc(&oom_arena, 64, 1, &ptr), CMP_ERR_OUT_OF_MEMORY);
+  CMP_TEST_EXPECT(cmp_arena_alloc(&oom_arena, 64, 1, &ptr),
+                  CMP_ERR_OUT_OF_MEMORY);
   test_ctx.fail_alloc = 0;
   CMP_TEST_OK(cmp_arena_shutdown(&oom_arena));
 

@@ -29,7 +29,7 @@ typedef struct CMPUtf8Iter {
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_utf8_validate(const char *data, cmp_usize length,
-                                    CMPBool *out_valid);
+                                       CMPBool *out_valid);
 
 /**
  * @brief Validate a null-terminated UTF-8 string.
@@ -37,7 +37,8 @@ CMP_API int CMP_CALL cmp_utf8_validate(const char *data, cmp_usize length,
  * @param out_valid Receives CMP_TRUE if valid; CMP_FALSE otherwise.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_utf8_validate_cstr(const char *cstr, CMPBool *out_valid);
+CMP_API int CMP_CALL cmp_utf8_validate_cstr(const char *cstr,
+                                            CMPBool *out_valid);
 
 /**
  * @brief Initialize a UTF-8 iterator for a byte buffer.
@@ -47,7 +48,7 @@ CMP_API int CMP_CALL cmp_utf8_validate_cstr(const char *cstr, CMPBool *out_valid
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_utf8_iter_init(CMPUtf8Iter *iter, const char *data,
-                                     cmp_usize length);
+                                        cmp_usize length);
 
 /**
  * @brief Initialize a UTF-8 iterator for a null-terminated string.
@@ -55,7 +56,8 @@ CMP_API int CMP_CALL cmp_utf8_iter_init(CMPUtf8Iter *iter, const char *data,
  * @param cstr Null-terminated UTF-8 string.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_utf8_iter_init_cstr(CMPUtf8Iter *iter, const char *cstr);
+CMP_API int CMP_CALL cmp_utf8_iter_init_cstr(CMPUtf8Iter *iter,
+                                             const char *cstr);
 
 /**
  * @brief Read the next UTF-8 codepoint from the iterator.
@@ -63,7 +65,8 @@ CMP_API int CMP_CALL cmp_utf8_iter_init_cstr(CMPUtf8Iter *iter, const char *cstr
  * @param out_codepoint Receives the decoded codepoint.
  * @return CMP_OK on success, CMP_ERR_NOT_FOUND at end, or a failure code.
  */
-CMP_API int CMP_CALL cmp_utf8_iter_next(CMPUtf8Iter *iter, cmp_u32 *out_codepoint);
+CMP_API int CMP_CALL cmp_utf8_iter_next(CMPUtf8Iter *iter,
+                                        cmp_u32 *out_codepoint);
 
 #ifdef CMP_TESTING
 /**
@@ -82,8 +85,8 @@ CMP_API int CMP_CALL cmp_utf8_test_set_cstr_limit(cmp_usize max_len);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_utf8_test_decode(const cmp_u8 *data, cmp_usize length,
-                                       cmp_u32 *out_codepoint,
-                                       cmp_usize *out_advance);
+                                          cmp_u32 *out_codepoint,
+                                          cmp_usize *out_advance);
 
 /**
  * @brief Toggle relaxed UTF-8 boundary checks (tests only).

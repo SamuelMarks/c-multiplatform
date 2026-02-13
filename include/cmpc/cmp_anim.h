@@ -74,8 +74,8 @@ typedef struct CMPAnimController {
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_anim_timing_init(CMPAnimTiming *timing, CMPScalar from,
-                                       CMPScalar to, CMPScalar duration,
-                                       cmp_u32 easing);
+                                          CMPScalar to, CMPScalar duration,
+                                          cmp_u32 easing);
 
 /**
  * @brief Step a timing animation.
@@ -86,8 +86,8 @@ CMP_API int CMP_CALL cmp_anim_timing_init(CMPAnimTiming *timing, CMPScalar from,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_anim_timing_step(CMPAnimTiming *timing, CMPScalar dt,
-                                       CMPScalar *out_value,
-                                       CMPBool *out_finished);
+                                          CMPScalar *out_value,
+                                          CMPBool *out_finished);
 
 /**
  * @brief Initialize a spring simulation.
@@ -100,8 +100,8 @@ CMP_API int CMP_CALL cmp_anim_timing_step(CMPAnimTiming *timing, CMPScalar dt,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_spring_init(CMPSpring *spring, CMPScalar position,
-                                  CMPScalar target, CMPScalar stiffness,
-                                  CMPScalar damping, CMPScalar mass);
+                                     CMPScalar target, CMPScalar stiffness,
+                                     CMPScalar damping, CMPScalar mass);
 
 /**
  * @brief Set a spring target.
@@ -118,8 +118,9 @@ CMP_API int CMP_CALL cmp_spring_set_target(CMPSpring *spring, CMPScalar target);
  * @param rest_velocity Velocity tolerance (>= 0).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_spring_set_tolerance(CMPSpring *spring, CMPScalar tolerance,
-                                           CMPScalar rest_velocity);
+CMP_API int CMP_CALL cmp_spring_set_tolerance(CMPSpring *spring,
+                                              CMPScalar tolerance,
+                                              CMPScalar rest_velocity);
 
 /**
  * @brief Step a spring simulation.
@@ -129,7 +130,7 @@ CMP_API int CMP_CALL cmp_spring_set_tolerance(CMPSpring *spring, CMPScalar toler
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_spring_step(CMPSpring *spring, CMPScalar dt,
-                                  CMPBool *out_finished);
+                                     CMPBool *out_finished);
 
 /**
  * @brief Initialize an animation controller.
@@ -147,10 +148,9 @@ CMP_API int CMP_CALL cmp_anim_controller_init(CMPAnimController *controller);
  * @param easing Easing mode (CMP_ANIM_EASE_*).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_anim_controller_start_timing(CMPAnimController *controller,
-                                                   CMPScalar from, CMPScalar to,
-                                                   CMPScalar duration,
-                                                   cmp_u32 easing);
+CMP_API int CMP_CALL cmp_anim_controller_start_timing(
+    CMPAnimController *controller, CMPScalar from, CMPScalar to,
+    CMPScalar duration, cmp_u32 easing);
 
 /**
  * @brief Start a spring animation on the controller.
@@ -184,8 +184,9 @@ CMP_API int CMP_CALL cmp_anim_controller_set_spring_target(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_anim_controller_step(CMPAnimController *controller,
-                                           CMPScalar dt, CMPScalar *out_value,
-                                           CMPBool *out_finished);
+                                              CMPScalar dt,
+                                              CMPScalar *out_value,
+                                              CMPBool *out_finished);
 
 /**
  * @brief Retrieve the current controller value.
@@ -221,7 +222,7 @@ CMP_API int CMP_CALL cmp_anim_controller_stop(CMPAnimController *controller);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_anim_test_apply_ease(cmp_u32 easing, CMPScalar t,
-                                           CMPScalar *out_value);
+                                              CMPScalar *out_value);
 #endif
 
 #ifdef __cplusplus

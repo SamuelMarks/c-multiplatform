@@ -56,7 +56,7 @@ static int cmp_router_cstrlen(const char *cstr, cmp_usize *out_len) {
 }
 
 static void cmp_router_slice_set(CMPUriSlice *slice, const char *data,
-                                cmp_usize length) {
+                                 cmp_usize length) {
   if (slice == NULL) {
     return;
   }
@@ -132,7 +132,7 @@ int CMP_CALL cmp_uri_parse(const char *uri, CMPUri *out_uri) {
       authority_end = len;
     }
     cmp_router_slice_set(&out_uri->authority, uri + authority_start,
-                        authority_end - authority_start);
+                         authority_end - authority_start);
     path_start = authority_end;
   } else {
     path_start = 0;
@@ -170,22 +170,22 @@ int CMP_CALL cmp_uri_parse(const char *uri, CMPUri *out_uri) {
 
   if (path_end > path_start) {
     cmp_router_slice_set(&out_uri->path, uri + path_start,
-                        path_end - path_start);
+                         path_end - path_start);
   }
   if (query_start < len) {
     cmp_router_slice_set(&out_uri->query, uri + query_start,
-                        query_end - query_start);
+                         query_end - query_start);
   }
   if (fragment_start < len) {
     cmp_router_slice_set(&out_uri->fragment, uri + fragment_start,
-                        len - fragment_start);
+                         len - fragment_start);
   }
 
   return CMP_OK;
 }
 
 static int cmp_router_slice_equals(const CMPUriSlice *slice, const char *key,
-                                  cmp_usize key_len, CMPBool *out_equal) {
+                                   cmp_usize key_len, CMPBool *out_equal) {
   if (slice == NULL || key == NULL || out_equal == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -214,7 +214,7 @@ static int cmp_router_slice_equals(const CMPUriSlice *slice, const char *key,
 }
 
 int CMP_CALL cmp_uri_query_find(const CMPUri *uri, const char *key,
-                              CMPUriSlice *out_value, CMPBool *out_found) {
+                                CMPUriSlice *out_value, CMPBool *out_found) {
   cmp_usize key_len;
   cmp_usize start;
   cmp_usize end;
@@ -263,7 +263,7 @@ int CMP_CALL cmp_uri_query_find(const CMPUri *uri, const char *key,
     if (equal == CMP_TRUE) {
       if (eq_pos < end && uri->query.data[eq_pos] == '=') {
         cmp_router_slice_set(out_value, uri->query.data + eq_pos + 1,
-                            end - eq_pos - 1);
+                             end - eq_pos - 1);
       } else {
         cmp_router_slice_set(out_value, NULL, 0);
       }
@@ -295,8 +295,8 @@ static void cmp_route_trim_trailing(const char **str, cmp_usize *len) {
 }
 
 static void cmp_route_next_segment(const char *str, cmp_usize len,
-                                  cmp_usize *index, const char **out_seg,
-                                  cmp_usize *out_len) {
+                                   cmp_usize *index, const char **out_seg,
+                                   cmp_usize *out_len) {
   cmp_usize i;
   cmp_usize start;
 
@@ -331,7 +331,7 @@ static void cmp_route_next_segment(const char *str, cmp_usize len,
 }
 
 static CMPBool cmp_route_has_more_segments(const char *str, cmp_usize len,
-                                         cmp_usize index) {
+                                           cmp_usize index) {
   cmp_usize i;
 
   if (str == NULL) {
@@ -347,9 +347,9 @@ static CMPBool cmp_route_has_more_segments(const char *str, cmp_usize len,
 }
 
 static int cmp_route_match_len(const char *pattern, cmp_usize pattern_len,
-                              const char *path, cmp_usize path_len,
-                              CMPRouteParam *params, cmp_usize max_params,
-                              cmp_usize *out_param_count, CMPBool *out_match) {
+                               const char *path, cmp_usize path_len,
+                               CMPRouteParam *params, cmp_usize max_params,
+                               cmp_usize *out_param_count, CMPBool *out_match) {
   const char *pat_str;
   const char *path_str;
   cmp_usize pat_len;
@@ -398,7 +398,8 @@ static int cmp_route_match_len(const char *pattern, cmp_usize pattern_len,
     CMPBool has_more;
 
     cmp_route_next_segment(pat_str, pat_len, &p_idx, &pat_seg, &pat_seg_len);
-    cmp_route_next_segment(path_str, path_len, &s_idx, &path_seg, &path_seg_len);
+    cmp_route_next_segment(path_str, path_len, &s_idx, &path_seg,
+                           &path_seg_len);
 
     if (pat_seg == NULL && path_seg == NULL) {
       *out_match = CMP_TRUE;
@@ -541,7 +542,8 @@ static int cmp_router_release_entry(CMPRouter *router, CMPRouteEntry *entry) {
 }
 
 static int cmp_router_find_route(const CMPRouter *router, const char *path,
-                                cmp_usize path_len, const CMPRoute **out_route) {
+                                 cmp_usize path_len,
+                                 const CMPRoute **out_route) {
   cmp_usize i;
   CMPBool match; /* GCOVR_EXCL_LINE */
   cmp_usize pattern_len;
@@ -574,7 +576,7 @@ static int cmp_router_find_route(const CMPRouter *router, const char *path,
 
     match = CMP_FALSE;
     rc = cmp_route_match_len(route->pattern, pattern_len, path, path_len, NULL,
-                            0, NULL, &match);
+                             0, NULL, &match);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -588,10 +590,10 @@ static int cmp_router_find_route(const CMPRouter *router, const char *path,
 }
 
 static int cmp_router_copy_path(CMPRouter *router, const char *path,
-                               cmp_usize path_len,
-                               char **out_copy) { /* GCOVR_EXCL_LINE */
+                                cmp_usize path_len,
+                                char **out_copy) { /* GCOVR_EXCL_LINE */
   cmp_usize alloc_size;                            /* GCOVR_EXCL_LINE */
-  void *mem;                                      /* GCOVR_EXCL_LINE */
+  void *mem;                                       /* GCOVR_EXCL_LINE */
   int rc;
 
   if (router == NULL || path == NULL || out_copy == NULL) {
@@ -621,8 +623,8 @@ static int cmp_router_copy_path(CMPRouter *router, const char *path,
 }
 
 static int cmp_router_navigate_path_len(CMPRouter *router, const char *path,
-                                       cmp_usize path_len,
-                                       void **out_component) {
+                                        cmp_usize path_len,
+                                        void **out_component) {
   const CMPRoute *route;
   char *path_copy;
   void *component;
@@ -785,7 +787,7 @@ int CMP_CALL cmp_router_shutdown(CMPRouter *router) {
 }
 
 int CMP_CALL cmp_router_navigate(CMPRouter *router, const char *path,
-                               void **out_component) {
+                                 void **out_component) {
   cmp_usize path_len;
   int rc;
 
@@ -807,7 +809,7 @@ int CMP_CALL cmp_router_navigate(CMPRouter *router, const char *path,
 }
 
 int CMP_CALL cmp_router_navigate_uri(CMPRouter *router, const char *uri,
-                                   void **out_component) {
+                                     void **out_component) {
   CMPUri parsed;
   const char *path;
   cmp_usize path_len;
@@ -833,7 +835,8 @@ int CMP_CALL cmp_router_navigate_uri(CMPRouter *router, const char *uri,
   return cmp_router_navigate_path_len(router, path, path_len, out_component);
 }
 
-int CMP_CALL cmp_router_can_back(const CMPRouter *router, CMPBool *out_can_back) {
+int CMP_CALL cmp_router_can_back(const CMPRouter *router,
+                                 CMPBool *out_can_back) {
   if (router == NULL || out_can_back == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -862,8 +865,9 @@ int CMP_CALL cmp_router_back(CMPRouter *router, void **out_component) {
   return rc;
 }
 
-int CMP_CALL cmp_router_get_current(const CMPRouter *router, const char **out_path,
-                                  void **out_component) {
+int CMP_CALL cmp_router_get_current(const CMPRouter *router,
+                                    const char **out_path,
+                                    void **out_component) {
   const CMPRouteEntry *entry;
 
   if (router == NULL) {
@@ -896,8 +900,8 @@ int CMP_CALL cmp_router_clear(CMPRouter *router) {
 
   rc = CMP_OK;
   while (router->stack_size > 0) {
-    entry_rc =
-        cmp_router_release_entry(router, &router->stack[router->stack_size - 1]);
+    entry_rc = cmp_router_release_entry(router,
+                                        &router->stack[router->stack_size - 1]);
     router->stack_size -= 1;
     if (rc == CMP_OK && entry_rc != CMP_OK) {
       rc = entry_rc;
@@ -925,8 +929,9 @@ int CMP_CALL cmp_router_test_set_slice_equals_fail(CMPBool enable) {
 }
 
 int CMP_CALL cmp_route_test_match(const char *pattern, const char *path,
-                                CMPRouteParam *params, cmp_usize max_params,
-                                cmp_usize *out_param_count, CMPBool *out_match) {
+                                  CMPRouteParam *params, cmp_usize max_params,
+                                  cmp_usize *out_param_count,
+                                  CMPBool *out_match) {
   cmp_usize pattern_len;
   cmp_usize path_len;
   int rc;
@@ -945,7 +950,7 @@ int CMP_CALL cmp_route_test_match(const char *pattern, const char *path,
   }
 
   return cmp_route_match_len(pattern, pattern_len, path, path_len, params,
-                            max_params, out_param_count, out_match);
+                             max_params, out_param_count, out_match);
 }
 
 int CMP_CALL cmp_router_test_cstrlen(const char *cstr, cmp_usize *out_len) {
@@ -953,14 +958,14 @@ int CMP_CALL cmp_router_test_cstrlen(const char *cstr, cmp_usize *out_len) {
 }
 
 int CMP_CALL cmp_router_test_slice_set(CMPUriSlice *slice, const char *data,
-                                     cmp_usize length) {
+                                       cmp_usize length) {
   cmp_router_slice_set(slice, data, length);
   return CMP_OK;
 }
 
 int CMP_CALL cmp_router_test_slice_equals(const CMPUriSlice *slice,
-                                        const char *key, cmp_usize key_len,
-                                        CMPBool *out_equal) {
+                                          const char *key, cmp_usize key_len,
+                                          CMPBool *out_equal) {
   return cmp_router_slice_equals(slice, key, key_len, out_equal);
 }
 
@@ -970,15 +975,16 @@ int CMP_CALL cmp_router_test_trim_trailing(const char **str, cmp_usize *len) {
 }
 
 int CMP_CALL cmp_router_test_next_segment(const char *str, cmp_usize len,
-                                        cmp_usize *index, const char **out_seg,
-                                        cmp_usize *out_len) {
+                                          cmp_usize *index,
+                                          const char **out_seg,
+                                          cmp_usize *out_len) {
   cmp_route_next_segment(str, len, index, out_seg, out_len);
   return CMP_OK;
 }
 
 int CMP_CALL cmp_router_test_has_more_segments(const char *str, cmp_usize len,
-                                             cmp_usize index,
-                                             CMPBool *out_has_more) {
+                                               cmp_usize index,
+                                               CMPBool *out_has_more) {
   if (out_has_more == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -993,32 +999,33 @@ int CMP_CALL cmp_router_test_match_len(
     cmp_usize *out_param_count, /* GCOVR_EXCL_LINE */
     CMPBool *out_match) {
   return cmp_route_match_len(pattern, pattern_len, path, path_len, params,
-                            max_params, out_param_count, out_match);
+                             max_params, out_param_count, out_match);
 }
 
 int CMP_CALL cmp_router_test_validate_pattern(const char *pattern) {
   return cmp_route_validate_pattern(pattern);
 }
 
-int CMP_CALL cmp_router_test_find_route(const CMPRouter *router, const char *path,
-                                      cmp_usize path_len,
-                                      const CMPRoute **out_route) {
+int CMP_CALL cmp_router_test_find_route(const CMPRouter *router,
+                                        const char *path, cmp_usize path_len,
+                                        const CMPRoute **out_route) {
   return cmp_router_find_route(router, path, path_len, out_route);
 }
 
 int CMP_CALL cmp_router_test_release_entry(CMPRouter *router,
-                                         CMPRouteEntry *entry) {
+                                           CMPRouteEntry *entry) {
   return cmp_router_release_entry(router, entry);
 }
 
 int CMP_CALL cmp_router_test_copy_path(CMPRouter *router, const char *path,
-                                     cmp_usize path_len, char **out_copy) {
+                                       cmp_usize path_len, char **out_copy) {
   return cmp_router_copy_path(router, path, path_len, out_copy);
 }
 
-int CMP_CALL cmp_router_test_navigate_path_len(CMPRouter *router, const char *path,
-                                             cmp_usize path_len,
-                                             void **out_component) {
+int CMP_CALL cmp_router_test_navigate_path_len(CMPRouter *router,
+                                               const char *path,
+                                               cmp_usize path_len,
+                                               void **out_component) {
   return cmp_router_navigate_path_len(router, path, path_len, out_component);
 }
 #endif

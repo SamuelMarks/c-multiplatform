@@ -12,8 +12,9 @@ typedef struct TestSinkState {
   char last_message[64];
 } TestSinkState;
 
-static int CMP_CALL test_sink_write(void *ctx, CMPLogLevel level, const char *tag,
-                                   const char *message, cmp_usize length) {
+static int CMP_CALL test_sink_write(void *ctx, CMPLogLevel level,
+                                    const char *tag, const char *message,
+                                    cmp_usize length) {
   TestSinkState *state;
   cmp_usize copy_len;
 
@@ -69,7 +70,8 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_log_test_mutex_lock(), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_log_test_mutex_unlock(), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_log_test_mutex_shutdown(), CMP_ERR_STATE);
-  CMP_TEST_EXPECT(cmp_log_test_cstrlen(NULL, &max_size), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_log_test_cstrlen(NULL, &max_size),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_log_test_cstrlen("x", NULL), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_log_shutdown(), CMP_ERR_STATE);
@@ -77,17 +79,18 @@ int main(void) {
   sink.write = test_sink_write;
   CMP_TEST_EXPECT(cmp_log_set_sink(&sink), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_log_get_sink(&current), CMP_ERR_STATE);
-  CMP_TEST_EXPECT(cmp_log_write(CMP_LOG_LEVEL_INFO, "core", "msg"), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_log_write(CMP_LOG_LEVEL_INFO, "core", "msg"),
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_log_write(CMP_LOG_LEVEL_INFO, "core", NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_log_init(&bad_alloc), CMP_ERR_INVALID_ARGUMENT);
 
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_TRUE, CMP_FALSE, CMP_FALSE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_TRUE, CMP_FALSE, CMP_FALSE,
+                                              CMP_FALSE));
   CMP_TEST_EXPECT(cmp_log_init(NULL), CMP_ERR_UNKNOWN);
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE,
+                                              CMP_FALSE));
 
 #ifdef CMP_TESTING
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
@@ -104,20 +107,20 @@ int main(void) {
   sink.write = NULL;
   CMP_TEST_EXPECT(cmp_log_set_sink(&sink), CMP_ERR_INVALID_ARGUMENT);
 
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_TRUE, CMP_FALSE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_TRUE, CMP_FALSE,
+                                              CMP_FALSE));
   sink.ctx = &state;
   sink.write = test_sink_write;
   CMP_TEST_EXPECT(cmp_log_set_sink(&sink), CMP_ERR_UNKNOWN);
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE,
+                                              CMP_FALSE));
 
   CMP_TEST_EXPECT(cmp_log_get_sink(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_log_get_sink(&current));
   CMP_TEST_ASSERT(current.write != NULL);
 
   CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "core", NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_log_write(CMP_LOG_LEVEL_TRACE, "core", "trace"));
   CMP_TEST_OK(cmp_log_write(CMP_LOG_LEVEL_INFO, "core", "hello"));
@@ -129,58 +132,66 @@ int main(void) {
   CMP_TEST_OK(cmp_log_write_n(99, "core", "x", 1));
 
   CMP_TEST_OK(cmp_log_test_set_io_fail(CMP_TRUE));
-  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "core", "x", 1), CMP_ERR_IO);
+  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "core", "x", 1),
+                  CMP_ERR_IO);
   CMP_TEST_OK(cmp_log_test_set_io_fail(CMP_FALSE));
 
   CMP_TEST_EXPECT(cmp_log_test_set_cstr_limit(0), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_log_test_set_cstr_limit(4));
   CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "toolong", "x", 1),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_log_test_set_cstr_limit(1));
   CMP_TEST_EXPECT(cmp_log_write(CMP_LOG_LEVEL_INFO, "core", "ab"),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_TRACE, NULL, "x", 1),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   max_size = (cmp_usize) ~(cmp_usize)0;
   CMP_TEST_OK(cmp_log_test_set_cstr_limit(max_size));
 
   CMP_TEST_OK(cmp_log_test_set_io_fail_on_call(1));
-  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3), CMP_ERR_IO);
+  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3),
+                  CMP_ERR_IO);
   CMP_TEST_OK(cmp_log_test_set_io_fail_on_call(2));
-  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3), CMP_ERR_IO);
+  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3),
+                  CMP_ERR_IO);
   CMP_TEST_OK(cmp_log_test_set_io_fail_on_call(3));
-  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3), CMP_ERR_IO);
+  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3),
+                  CMP_ERR_IO);
   CMP_TEST_OK(cmp_log_test_set_io_fail_on_call(4));
-  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3), CMP_ERR_IO);
+  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3),
+                  CMP_ERR_IO);
   CMP_TEST_OK(cmp_log_test_set_io_fail_on_call(5));
-  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3), CMP_ERR_IO);
+  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3),
+                  CMP_ERR_IO);
   CMP_TEST_OK(cmp_log_test_set_io_fail_on_call(6));
-  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3), CMP_ERR_IO);
+  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3),
+                  CMP_ERR_IO);
   CMP_TEST_OK(cmp_log_test_set_io_fail_on_call(7));
-  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3), CMP_ERR_IO);
+  CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "tag", "msg", 3),
+                  CMP_ERR_IO);
   CMP_TEST_OK(cmp_log_test_set_io_fail_on_call(0));
 
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_TRUE, CMP_FALSE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_TRUE, CMP_FALSE,
+                                              CMP_FALSE));
   CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "core", "x", 1),
-                 CMP_ERR_UNKNOWN);
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE, CMP_FALSE));
+                  CMP_ERR_UNKNOWN);
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE,
+                                              CMP_FALSE));
 
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_TRUE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_TRUE,
+                                              CMP_FALSE));
   CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_INFO, "core", "x", 1),
-                 CMP_ERR_UNKNOWN);
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE, CMP_FALSE));
+                  CMP_ERR_UNKNOWN);
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE,
+                                              CMP_FALSE));
 
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_TRUE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_TRUE,
+                                              CMP_FALSE));
   sink.ctx = &state;
   sink.write = test_sink_write;
   CMP_TEST_EXPECT(cmp_log_set_sink(&sink), CMP_ERR_UNKNOWN);
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE,
+                                              CMP_FALSE));
 
   sink.ctx = &state;
   sink.write = test_sink_write;
@@ -195,27 +206,27 @@ int main(void) {
 
   state.fail = 1;
   CMP_TEST_EXPECT(cmp_log_write_n(CMP_LOG_LEVEL_ERROR, "tag", "msg", 3),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   state.fail = 0;
 
   CMP_TEST_OK(cmp_log_get_sink(&current));
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_TRUE, CMP_FALSE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_TRUE, CMP_FALSE,
+                                              CMP_FALSE));
   CMP_TEST_EXPECT(cmp_log_get_sink(&current), CMP_ERR_UNKNOWN);
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE,
+                                              CMP_FALSE));
 
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_TRUE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_TRUE,
+                                              CMP_FALSE));
   CMP_TEST_EXPECT(cmp_log_get_sink(&current), CMP_ERR_UNKNOWN);
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE,
+                                              CMP_FALSE));
 
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE, CMP_TRUE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE,
+                                              CMP_TRUE));
   CMP_TEST_EXPECT(cmp_log_shutdown(), CMP_ERR_UNKNOWN);
-  CMP_TEST_OK(
-      cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE, CMP_FALSE));
+  CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_FALSE, CMP_FALSE, CMP_FALSE,
+                                              CMP_FALSE));
 
   CMP_TEST_OK(cmp_log_shutdown());
   CMP_TEST_EXPECT(cmp_log_shutdown(), CMP_ERR_STATE);

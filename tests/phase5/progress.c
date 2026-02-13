@@ -78,8 +78,9 @@ static int test_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
   return CMP_OK;
 }
 
-static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                              CMPScalar y1, CMPColor color, CMPScalar thickness) {
+static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
+                              CMPScalar x1, CMPScalar y1, CMPColor color,
+                              CMPScalar thickness) {
   TestProgressBackend *backend;
 
   if (gfx == NULL) {
@@ -101,18 +102,18 @@ static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0, CMPScalar x
 }
 
 static const CMPGfxVTable g_test_vtable = {NULL,
-                                          NULL,
-                                          NULL,
-                                          test_gfx_draw_rect,
-                                          test_gfx_draw_line,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL};
+                                           NULL,
+                                           NULL,
+                                           test_gfx_draw_rect,
+                                           test_gfx_draw_line,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL};
 
 static const CMPGfxVTable g_test_vtable_no_rect = {
     NULL, NULL, NULL, NULL, test_gfx_draw_line, NULL, NULL, NULL, NULL,
@@ -185,7 +186,7 @@ static int test_progress_helpers(void) {
   null_color = NULL;
   null_rect = NULL;
   CMP_TEST_EXPECT(m3_progress_test_validate_color((const CMPColor *)null_color),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   color.r = -0.1f;
   color.g = 0.0f;
   color.b = 0.0f;
@@ -206,35 +207,35 @@ static int test_progress_helpers(void) {
   color.a = 1.0f;
   CMP_TEST_OK(m3_progress_test_validate_color(&color));
 
-  CMP_TEST_EXPECT(
-      m3_progress_test_color_set((CMPColor *)null_color, 0.0f, 0.0f, 0.0f, 0.0f),
-      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_progress_test_color_set((CMPColor *)null_color, 0.0f, 0.0f,
+                                             0.0f, 0.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_progress_test_color_set(&color, -0.1f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   invalid_scalar = 1.2f;
   CMP_TEST_EXPECT(m3_progress_test_color_set(
-                     &color, 0.0f, (CMPScalar)invalid_scalar, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                      &color, 0.0f, (CMPScalar)invalid_scalar, 0.0f, 0.0f),
+                  CMP_ERR_RANGE);
   invalid_scalar = 1.2f;
   CMP_TEST_EXPECT(m3_progress_test_color_set(&color, 0.0f, 0.0f,
-                                            (CMPScalar)invalid_scalar, 0.0f),
-                 CMP_ERR_RANGE);
+                                             (CMPScalar)invalid_scalar, 0.0f),
+                  CMP_ERR_RANGE);
   invalid_scalar = 1.2f;
   CMP_TEST_EXPECT(m3_progress_test_color_set(&color, 0.0f, 0.0f, 0.0f,
-                                            (CMPScalar)invalid_scalar),
-                 CMP_ERR_RANGE);
+                                             (CMPScalar)invalid_scalar),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f));
 
-  CMP_TEST_EXPECT(m3_progress_test_color_with_alpha((const CMPColor *)null_color,
-                                                   0.5f, &out_color),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_progress_test_color_with_alpha(
+                      (const CMPColor *)null_color, 0.5f, &out_color),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_progress_test_color_with_alpha(&color, 0.5f, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_progress_test_color_with_alpha(&color, -0.1f, &out_color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   color.r = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_color_with_alpha(&color, 0.5f, &out_color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   color.r = 0.1f;
   CMP_TEST_OK(m3_progress_test_color_with_alpha(&color, 0.5f, &out_color));
   CMP_TEST_ASSERT(cmp_near(out_color.a, 0.2f, 0.001f));
@@ -242,7 +243,7 @@ static int test_progress_helpers(void) {
   spec.mode = 99u;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(m3_progress_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_AT_MOST;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_progress_test_validate_measure_spec(spec), CMP_ERR_RANGE);
@@ -250,7 +251,7 @@ static int test_progress_helpers(void) {
   spec.size = -1.0f;
   CMP_TEST_OK(m3_progress_test_validate_measure_spec(spec));
   CMP_TEST_EXPECT(m3_progress_test_apply_measure(1.0f, spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_EXACTLY;
   spec.size = 5.0f;
   CMP_TEST_OK(m3_progress_test_apply_measure(1.0f, spec, &size));
@@ -261,7 +262,7 @@ static int test_progress_helpers(void) {
   CMP_TEST_ASSERT(cmp_near(size, 3.0f, 0.001f));
 
   CMP_TEST_EXPECT(m3_progress_test_validate_rect((const CMPRect *)null_rect),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   rect.x = 0.0f;
   rect.y = 0.0f;
   rect.width = -1.0f;
@@ -293,30 +294,30 @@ static int test_progress_helpers(void) {
 
   CMP_TEST_OK(m3_linear_progress_style_init(&linear_style));
   CMP_TEST_EXPECT(m3_progress_test_linear_validate_style(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   linear_style.height = 0.0f;
   CMP_TEST_EXPECT(m3_progress_test_linear_validate_style(&linear_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_linear_progress_style_init(&linear_style));
   linear_style.min_width = -1.0f;
   CMP_TEST_EXPECT(m3_progress_test_linear_validate_style(&linear_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_linear_progress_style_init(&linear_style));
   linear_style.corner_radius = linear_style.height;
   CMP_TEST_EXPECT(m3_progress_test_linear_validate_style(&linear_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_linear_progress_style_init(&linear_style));
   linear_style.track_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_progress_test_linear_validate_style(&linear_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_linear_progress_style_init(&linear_style));
   linear_style.disabled_track_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_progress_test_linear_validate_style(&linear_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_linear_progress_style_init(&linear_style));
   linear_style.disabled_indicator_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_progress_test_linear_validate_style(&linear_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_linear_progress_style_init(&linear_style));
   CMP_TEST_OK(m3_progress_test_linear_validate_style(&linear_style));
 
@@ -344,56 +345,56 @@ static int test_progress_helpers(void) {
 
   CMP_TEST_OK(m3_progress_test_set_fail_point(M3_PROGRESS_TEST_FAIL_COLOR_SET));
   CMP_TEST_EXPECT(m3_circular_progress_style_init(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
   CMP_TEST_OK(
       m3_progress_test_set_fail_point(M3_PROGRESS_TEST_FAIL_COLOR_WITH_ALPHA));
   CMP_TEST_EXPECT(m3_circular_progress_style_init(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
   CMP_TEST_OK(m3_progress_test_set_color_set_fail_after(2u));
   CMP_TEST_EXPECT(m3_circular_progress_style_init(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
   CMP_TEST_OK(m3_progress_test_set_color_alpha_fail_after(2u));
   CMP_TEST_EXPECT(m3_circular_progress_style_init(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
 
   CMP_TEST_OK(m3_circular_progress_style_init(&circular_style));
   CMP_TEST_EXPECT(m3_progress_test_circular_validate_style(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   circular_style.diameter = 0.0f;
   CMP_TEST_EXPECT(m3_progress_test_circular_validate_style(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_circular_progress_style_init(&circular_style));
   circular_style.thickness = 0.0f;
   CMP_TEST_EXPECT(m3_progress_test_circular_validate_style(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_circular_progress_style_init(&circular_style));
   circular_style.thickness = circular_style.diameter;
   CMP_TEST_EXPECT(m3_progress_test_circular_validate_style(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_circular_progress_style_init(&circular_style));
   circular_style.segments = 2u;
   CMP_TEST_EXPECT(m3_progress_test_circular_validate_style(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_circular_progress_style_init(&circular_style));
   circular_style.track_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_circular_validate_style(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_circular_progress_style_init(&circular_style));
   circular_style.indicator_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_circular_validate_style(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_circular_progress_style_init(&circular_style));
   circular_style.disabled_track_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_circular_validate_style(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_circular_progress_style_init(&circular_style));
   circular_style.disabled_indicator_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_circular_validate_style(&circular_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_circular_progress_style_init(&circular_style));
   CMP_TEST_OK(m3_progress_test_circular_validate_style(&circular_style));
 
@@ -424,32 +425,32 @@ static int test_progress_helpers(void) {
   gfx.vtable = NULL;
   gfx.text_vtable = NULL;
   CMP_TEST_EXPECT(m3_progress_test_circular_draw_arc(
-                     NULL, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 1.0f, 8u),
-                 CMP_ERR_UNSUPPORTED);
+                      NULL, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 1.0f, 8u),
+                  CMP_ERR_UNSUPPORTED);
   CMP_TEST_EXPECT(m3_progress_test_circular_draw_arc(
-                     &gfx, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 1.0f, 8u),
-                 CMP_ERR_UNSUPPORTED);
+                      &gfx, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 1.0f, 8u),
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_vtable_no_line;
   CMP_TEST_EXPECT(m3_progress_test_circular_draw_arc(
-                     &gfx, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 1.0f, 8u),
-                 CMP_ERR_UNSUPPORTED);
+                      &gfx, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 1.0f, 8u),
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_vtable;
   CMP_TEST_EXPECT(m3_progress_test_circular_draw_arc(
-                     &gfx, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 0.0f, 8u),
-                 CMP_ERR_RANGE);
+                      &gfx, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 0.0f, 8u),
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_progress_test_circular_draw_arc(
-                     &gfx, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 1.0f, 0u),
-                 CMP_ERR_RANGE);
+                      &gfx, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 1.0f, 0u),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_circular_draw_arc(&gfx, 0.0f, 0.0f, 1.0f, 1.0f,
-                                                0.0f, color, 1.0f, 8u));
+                                                 0.0f, color, 1.0f, 8u));
   backend.fail_draw_line = CMP_ERR_IO;
   CMP_TEST_EXPECT(m3_progress_test_circular_draw_arc(
-                     &gfx, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 1.0f, 8u),
-                 CMP_ERR_IO);
+                      &gfx, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, color, 1.0f, 8u),
+                  CMP_ERR_IO);
 
   CMP_TEST_OK(m3_slider_style_init(&slider_style));
   CMP_TEST_EXPECT(m3_progress_test_slider_validate_style(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_progress_test_set_fail_point(M3_PROGRESS_TEST_FAIL_COLOR_SET));
   CMP_TEST_EXPECT(m3_slider_style_init(&slider_style), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
@@ -471,43 +472,43 @@ static int test_progress_helpers(void) {
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
   slider_style.track_length = 0.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_validate_style(&slider_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_slider_style_init(&slider_style));
   slider_style.track_height = 0.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_validate_style(&slider_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_slider_style_init(&slider_style));
   slider_style.track_corner_radius = slider_style.track_height;
   CMP_TEST_EXPECT(m3_progress_test_slider_validate_style(&slider_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_slider_style_init(&slider_style));
   slider_style.thumb_radius = 0.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_validate_style(&slider_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_slider_style_init(&slider_style));
   slider_style.track_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_validate_style(&slider_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_slider_style_init(&slider_style));
   slider_style.active_track_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_validate_style(&slider_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_slider_style_init(&slider_style));
   slider_style.thumb_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_validate_style(&slider_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_slider_style_init(&slider_style));
   slider_style.disabled_track_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_validate_style(&slider_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_slider_style_init(&slider_style));
   slider_style.disabled_active_track_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_validate_style(&slider_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_slider_style_init(&slider_style));
   slider_style.disabled_thumb_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_validate_style(&slider_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_slider_style_init(&slider_style));
   CMP_TEST_OK(m3_progress_test_slider_validate_style(&slider_style));
 
@@ -516,16 +517,16 @@ static int test_progress_helpers(void) {
   slider.max_value = 1.0f;
   slider.value = 1.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_value_to_fraction(NULL, &fraction),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_progress_test_slider_value_to_fraction(&slider, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_progress_test_slider_value_to_fraction(&slider, &fraction),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.min_value = 0.0f;
   slider.max_value = 1.0f;
   slider.value = 2.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_value_to_fraction(&slider, &fraction),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.value = 0.5f;
   CMP_TEST_OK(m3_progress_test_slider_value_to_fraction(&slider, &fraction));
   CMP_TEST_ASSERT(cmp_near(fraction, 0.5f, 0.001f));
@@ -545,19 +546,19 @@ static int test_progress_helpers(void) {
   slider.bounds.width = 0.0f;
   slider.bounds.height = 10.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_value_from_x(NULL, 1.0f, &value),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_progress_test_slider_value_from_x(&slider, 1.0f, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_progress_test_slider_value_from_x(&slider, 1.0f, &value),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.bounds.width = 10.0f;
   slider.max_value = 0.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_value_from_x(&slider, 1.0f, &value),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.max_value = 1.0f;
   slider.step = -1.0f;
   CMP_TEST_EXPECT(m3_progress_test_slider_value_from_x(&slider, 1.0f, &value),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.step = 0.0f;
   CMP_TEST_OK(m3_progress_test_slider_value_from_x(&slider, -5.0f, &value));
   CMP_TEST_ASSERT(cmp_near(value, 0.0f, 0.001f));
@@ -605,34 +606,34 @@ static int test_progress_helpers(void) {
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
 
   CMP_TEST_OK(m3_slider_init(&slider, &slider_style, 0.0f, 1.0f, 0.5f));
-  CMP_TEST_EXPECT(m3_progress_test_slider_resolve_colors(NULL, &color,
-                                                        &out_color, &out_color),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_progress_test_slider_resolve_colors(&slider, NULL,
-                                                        &out_color, &out_color),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_progress_test_slider_resolve_colors(
+                      NULL, &color, &out_color, &out_color),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_progress_test_slider_resolve_colors(
+                      &slider, NULL, &out_color, &out_color),
+                  CMP_ERR_INVALID_ARGUMENT);
   slider.widget.flags = CMP_WIDGET_FLAG_DISABLED;
-  CMP_TEST_OK(m3_progress_test_slider_resolve_colors(&slider, &color, &out_color,
-                                                    &out_color));
+  CMP_TEST_OK(m3_progress_test_slider_resolve_colors(&slider, &color,
+                                                     &out_color, &out_color));
   slider.widget.flags = 0u;
   slider.style.track_color.r = -1.0f;
-  CMP_TEST_EXPECT(m3_progress_test_slider_resolve_colors(&slider, &color,
-                                                        &out_color, &out_color),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_progress_test_slider_resolve_colors(
+                      &slider, &color, &out_color, &out_color),
+                  CMP_ERR_RANGE);
   slider.style = slider_style;
   slider.style.active_track_color.r = -1.0f;
-  CMP_TEST_EXPECT(m3_progress_test_slider_resolve_colors(&slider, &color,
-                                                        &out_color, &out_color),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_progress_test_slider_resolve_colors(
+                      &slider, &color, &out_color, &out_color),
+                  CMP_ERR_RANGE);
   slider.style = slider_style;
   slider.style.thumb_color.r = -1.0f;
-  CMP_TEST_EXPECT(m3_progress_test_slider_resolve_colors(&slider, &color,
-                                                        &out_color, &out_color),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_progress_test_slider_resolve_colors(
+                      &slider, &color, &out_color, &out_color),
+                  CMP_ERR_RANGE);
   slider.style = slider_style;
 
   CMP_TEST_EXPECT(m3_progress_test_slider_update_value(NULL, 0.5f, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   return CMP_OK;
 }
@@ -674,52 +675,53 @@ int main(void) {
   paint_ctx.clip.width = 200.0f;
   paint_ctx.clip.height = 200.0f;
 
-  CMP_TEST_EXPECT(m3_linear_progress_style_init(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_linear_progress_style_init(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_linear_progress_style_init(&linear_style));
   CMP_TEST_ASSERT(
       cmp_near(linear_style.height, M3_LINEAR_PROGRESS_DEFAULT_HEIGHT, 0.001f));
 
   CMP_TEST_EXPECT(m3_linear_progress_init(NULL, &linear_style, 0.5f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_linear_progress_init(&linear, NULL, 0.5f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_linear_progress_init(&linear, &linear_style, -0.1f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bad_linear_style = linear_style;
   bad_linear_style.height = 0.0f;
   CMP_TEST_EXPECT(m3_linear_progress_init(&linear, &bad_linear_style, 0.5f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(m3_linear_progress_init(&linear, &linear_style, 0.25f));
   CMP_TEST_ASSERT(linear.widget.ctx == &linear);
   CMP_TEST_ASSERT(linear.widget.vtable != NULL);
 
   CMP_TEST_EXPECT(m3_linear_progress_set_value(NULL, 0.5f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_linear_progress_set_value(&linear, 1.5f), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_linear_progress_set_value(&linear, 0.75f));
   CMP_TEST_OK(m3_linear_progress_get_value(&linear, &value));
   CMP_TEST_ASSERT(cmp_near(value, 0.75f, 0.001f));
   CMP_TEST_EXPECT(m3_linear_progress_get_value(NULL, &value),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_linear_progress_get_value(&linear, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_linear_progress_set_label(NULL, "A", 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_linear_progress_set_label(&linear, NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_linear_progress_set_label(&linear, "Loading", 7));
 
   CMP_TEST_EXPECT(m3_linear_progress_set_style(NULL, &linear_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_linear_progress_set_style(&linear, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bad_linear_style = linear_style;
   bad_linear_style.track_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_linear_progress_set_style(&linear, &bad_linear_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_linear_progress_set_style(&linear, &linear_style));
 
   width_spec.mode = 99u;
@@ -727,20 +729,20 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(linear.widget.vtable->measure(linear.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       linear.widget.vtable->measure(NULL, width_spec, height_spec, &size),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(linear.widget.vtable->measure(linear.widget.ctx, width_spec,
-                                               height_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = -1.0f;
   CMP_TEST_EXPECT(linear.widget.vtable->measure(linear.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                height_spec, &size),
+                  CMP_ERR_RANGE);
 
   bad_linear_style = linear_style;
   bad_linear_style.min_width = -1.0f;
@@ -750,8 +752,8 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(linear.widget.vtable->measure(linear.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                height_spec, &size),
+                  CMP_ERR_RANGE);
   linear.style = linear_style;
 
   width_spec.mode = CMP_MEASURE_EXACTLY;
@@ -759,15 +761,15 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = -1.0f;
   CMP_TEST_EXPECT(linear.widget.vtable->measure(linear.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                height_spec, &size),
+                  CMP_ERR_RANGE);
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(linear.widget.vtable->measure(linear.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, linear_style.min_width, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, linear_style.height, 0.001f));
 
@@ -776,7 +778,7 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 12.0f;
   CMP_TEST_OK(linear.widget.vtable->measure(linear.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 10.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 12.0f, 0.001f));
 
@@ -785,7 +787,7 @@ int main(void) {
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(linear.widget.vtable->layout(linear.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bounds.width = 120.0f;
   bounds.height = 8.0f;
@@ -793,48 +795,48 @@ int main(void) {
 
   CMP_TEST_OK(test_backend_init(&backend));
   CMP_TEST_EXPECT(linear.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_vtable_no_rect;
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_vtable;
 
   linear.value = 2.0f;
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   linear.value = 0.5f;
 
   linear.bounds.width = -1.0f;
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   linear.bounds = bounds;
 
   bad_linear_style = linear_style;
   bad_linear_style.height = 0.0f;
   linear.style = bad_linear_style;
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   linear.style = linear_style;
 
   linear.style.indicator_color.r = -1.0f;
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   linear.style = linear_style;
   CMP_TEST_OK(m3_progress_test_set_fail_point(
       M3_PROGRESS_TEST_FAIL_LINEAR_RESOLVE_COLORS));
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
   CMP_TEST_OK(m3_progress_test_set_fail_point(
       M3_PROGRESS_TEST_FAIL_LINEAR_CORNER_RANGE));
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
   CMP_TEST_OK(m3_progress_test_set_fail_point(
       M3_PROGRESS_TEST_FAIL_LINEAR_FILL_CORNER_CLAMP));
@@ -843,13 +845,13 @@ int main(void) {
   CMP_TEST_OK(m3_progress_test_set_fail_point(
       M3_PROGRESS_TEST_FAIL_LINEAR_FILL_CORNER_RANGE));
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_rect = CMP_ERR_IO;
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
 
   CMP_TEST_OK(test_backend_init(&backend));
   linear.style = linear_style;
@@ -858,7 +860,7 @@ int main(void) {
   linear.value = 0.5f;
   backend.fail_draw_rect = CMP_ERR_IO;
   CMP_TEST_EXPECT(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect = CMP_OK;
   linear.style = linear_style;
   CMP_TEST_OK(m3_linear_progress_set_style(&linear, &linear.style));
@@ -899,18 +901,20 @@ int main(void) {
   CMP_TEST_OK(linear.widget.vtable->paint(linear.widget.ctx, &paint_ctx));
 
   CMP_TEST_EXPECT(linear.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(linear.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(linear.widget.vtable->event(linear.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      linear.widget.vtable->event(linear.widget.ctx, NULL, &handled),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(linear.widget.vtable->event(linear.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(linear.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(linear.widget.vtable->get_semantics(linear.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(linear.widget.vtable->destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(linear.widget.vtable->destroy(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   linear.widget.flags = CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(
@@ -927,17 +931,17 @@ int main(void) {
   CMP_TEST_ASSERT(linear.widget.vtable == NULL);
 
   CMP_TEST_EXPECT(m3_circular_progress_style_init(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_circular_progress_style_init(&circular_style));
   CMP_TEST_ASSERT(circular_style.segments ==
-                 M3_CIRCULAR_PROGRESS_DEFAULT_SEGMENTS);
+                  M3_CIRCULAR_PROGRESS_DEFAULT_SEGMENTS);
 
   CMP_TEST_EXPECT(m3_circular_progress_init(NULL, &circular_style, 0.5f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_circular_progress_init(&circular, NULL, 0.5f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_circular_progress_init(&circular, &circular_style, 1.5f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bad_circular_style = circular_style;
   bad_circular_style.segments = 2u;
@@ -950,30 +954,31 @@ int main(void) {
   CMP_TEST_ASSERT(circular.widget.vtable != NULL);
 
   CMP_TEST_EXPECT(m3_circular_progress_set_value(NULL, 0.5f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_circular_progress_set_value(&circular, -0.5f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_circular_progress_set_value(&circular, 0.75f));
   CMP_TEST_OK(m3_circular_progress_get_value(&circular, &value));
   CMP_TEST_ASSERT(cmp_near(value, 0.75f, 0.001f));
 
   CMP_TEST_EXPECT(m3_circular_progress_get_value(NULL, &value),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_circular_progress_get_value(&circular, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_circular_progress_set_label(NULL, "B", 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_circular_progress_set_label(&circular, NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_circular_progress_set_label(&circular, "Sync", 4));
 
   bad_circular_style = circular_style;
   bad_circular_style.track_color.a = 2.0f;
-  CMP_TEST_EXPECT(m3_circular_progress_set_style(&circular, &bad_circular_style),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      m3_circular_progress_set_style(&circular, &bad_circular_style),
+      CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_circular_progress_set_style(NULL, &circular_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_circular_progress_set_style(&circular, &circular_style));
 
   width_spec.mode = 99u;
@@ -981,20 +986,20 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(circular.widget.vtable->measure(
-                     circular.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      circular.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       circular.widget.vtable->measure(NULL, width_spec, height_spec, &size),
       CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(circular.widget.vtable->measure(circular.widget.ctx,
-                                                 width_spec, height_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(circular.widget.vtable->measure(
+                      circular.widget.ctx, width_spec, height_spec, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = -1.0f;
   CMP_TEST_EXPECT(circular.widget.vtable->measure(
-                     circular.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_RANGE);
+                      circular.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_RANGE);
 
   bad_circular_style = circular_style;
   bad_circular_style.diameter = -1.0f;
@@ -1004,8 +1009,8 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(circular.widget.vtable->measure(
-                     circular.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_RANGE);
+                      circular.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_RANGE);
   circular.style = circular_style;
 
   width_spec.mode = CMP_MEASURE_EXACTLY;
@@ -1013,15 +1018,15 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = -1.0f;
   CMP_TEST_EXPECT(circular.widget.vtable->measure(
-                     circular.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_RANGE);
+                      circular.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_RANGE);
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(circular.widget.vtable->measure(circular.widget.ctx, width_spec,
-                                             height_spec, &size));
+                                              height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, circular_style.diameter, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, circular_style.diameter, 0.001f));
 
@@ -1030,7 +1035,7 @@ int main(void) {
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(circular.widget.vtable->layout(circular.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bounds.width = 60.0f;
   bounds.height = 60.0f;
@@ -1038,54 +1043,62 @@ int main(void) {
 
   CMP_TEST_OK(test_backend_init(&backend));
   CMP_TEST_EXPECT(circular.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(circular.widget.vtable->paint(circular.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   gfx.vtable = &g_test_vtable_no_line;
-  CMP_TEST_EXPECT(circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+  CMP_TEST_EXPECT(
+      circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
+      CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_vtable;
 
   circular.value = 2.0f;
-  CMP_TEST_EXPECT(circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
+      CMP_ERR_RANGE);
   circular.value = 0.25f;
 
   circular.bounds.width = -1.0f;
-  CMP_TEST_EXPECT(circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
+      CMP_ERR_RANGE);
   circular.bounds = bounds;
 
   bad_circular_style = circular_style;
   bad_circular_style.thickness = bad_circular_style.diameter;
   circular.style = bad_circular_style;
-  CMP_TEST_EXPECT(circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
+      CMP_ERR_RANGE);
   circular.style = circular_style;
   CMP_TEST_OK(m3_progress_test_set_fail_point(
       M3_PROGRESS_TEST_FAIL_CIRCULAR_RESOLVE_COLORS));
-  CMP_TEST_EXPECT(circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(
+      circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
+      CMP_ERR_IO);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_line = CMP_ERR_IO;
-  CMP_TEST_EXPECT(circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(
+      circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
+      CMP_ERR_IO);
 
   CMP_TEST_OK(test_backend_init(&backend));
   circular.style = circular_style;
   circular.style.track_color.a = 0.0f;
   CMP_TEST_OK(m3_circular_progress_set_style(&circular, &circular.style));
   backend.fail_draw_line = CMP_ERR_IO;
-  CMP_TEST_EXPECT(circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(
+      circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
+      CMP_ERR_IO);
   backend.fail_draw_line = CMP_OK;
 
   gfx.vtable = NULL;
-  CMP_TEST_EXPECT(circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
+      CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_vtable;
 
   bounds.width = 60.0f;
@@ -1101,20 +1114,22 @@ int main(void) {
   bounds.width = 0.0f;
   bounds.height = 10.0f;
   CMP_TEST_OK(circular.widget.vtable->layout(circular.widget.ctx, bounds));
-  CMP_TEST_EXPECT(circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
+      CMP_ERR_RANGE);
   bounds.width = 4.0f;
   bounds.height = 4.0f;
   CMP_TEST_OK(circular.widget.vtable->layout(circular.widget.ctx, bounds));
-  CMP_TEST_EXPECT(circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      circular.widget.vtable->paint(circular.widget.ctx, &paint_ctx),
+      CMP_ERR_RANGE);
 
   bounds.width = 60.0f;
   bounds.height = 40.0f;
   CMP_TEST_OK(circular.widget.vtable->layout(circular.widget.ctx, bounds));
 
   CMP_TEST_EXPECT(circular.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       circular.widget.vtable->event(circular.widget.ctx, NULL, &handled),
       CMP_ERR_INVALID_ARGUMENT);
@@ -1122,14 +1137,14 @@ int main(void) {
       circular.widget.vtable->event(circular.widget.ctx, &event, NULL),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(circular.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       circular.widget.vtable->get_semantics(circular.widget.ctx, NULL),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(circular.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(circular.widget.vtable->destroy(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   circular.style = circular_style;
   CMP_TEST_OK(m3_circular_progress_set_style(&circular, &circular.style));
@@ -1163,22 +1178,22 @@ int main(void) {
       cmp_near(slider_style.track_length, M3_SLIDER_DEFAULT_LENGTH, 0.001f));
 
   CMP_TEST_EXPECT(m3_slider_init(NULL, &slider_style, 0.0f, 1.0f, 0.5f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_slider_init(&slider, NULL, 0.0f, 1.0f, 0.5f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_slider_style = slider_style;
   bad_slider_style.thumb_radius = 0.0f;
   CMP_TEST_EXPECT(m3_slider_init(&slider, &bad_slider_style, 0.0f, 1.0f, 0.5f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_slider_init(&slider, &slider_style, 1.0f, 0.0f, 0.5f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_slider_init(&slider, &slider_style, 0.0f, 1.0f, 2.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_set_fail_point(
       M3_PROGRESS_TEST_FAIL_SLIDER_SNAP_COUNT_NEGATIVE));
   CMP_TEST_EXPECT(m3_slider_init(&slider, &slider_style, 0.0f, 1.0f, 0.5f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
 
   CMP_TEST_OK(m3_slider_init(&slider, &slider_style, 0.0f, 1.0f, 0.25f));
@@ -1214,7 +1229,7 @@ int main(void) {
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
 
   CMP_TEST_EXPECT(m3_slider_set_range(NULL, 0.0f, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_slider_set_range(&slider, 1.0f, 0.0f), CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_slider_set_range(&slider, 0.0f, 0.1f), CMP_ERR_RANGE);
   slider.step = -1.0f;
@@ -1228,50 +1243,53 @@ int main(void) {
   CMP_TEST_OK(m3_slider_set_range(&slider, 0.0f, 1.0f));
 
   CMP_TEST_EXPECT(m3_slider_set_style(NULL, &slider_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bad_slider_style = slider_style;
   bad_slider_style.track_color.a = 2.0f;
-  CMP_TEST_EXPECT(m3_slider_set_style(&slider, &bad_slider_style), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_slider_set_style(&slider, &bad_slider_style),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_slider_set_style(&slider, &slider_style));
 
   CMP_TEST_EXPECT(m3_slider_set_label(NULL, "S", 1), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_slider_set_label(&slider, NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_slider_set_label(&slider, "Volume", 6));
 
   CMP_TEST_EXPECT(m3_slider_set_on_change(NULL, test_slider_on_change, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   counter.calls = 0;
   counter.last_value = 0.0f;
   counter.fail = 0;
-  CMP_TEST_OK(m3_slider_set_on_change(&slider, test_slider_on_change, &counter));
+  CMP_TEST_OK(
+      m3_slider_set_on_change(&slider, test_slider_on_change, &counter));
 
   CMP_TEST_EXPECT(slider.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(slider.widget.vtable->event(slider.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      slider.widget.vtable->event(slider.widget.ctx, NULL, &handled),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(slider.widget.vtable->event(slider.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = 99u;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(slider.widget.vtable->measure(slider.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       slider.widget.vtable->measure(NULL, width_spec, height_spec, &size),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(slider.widget.vtable->measure(slider.widget.ctx, width_spec,
-                                               height_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = -1.0f;
   CMP_TEST_EXPECT(slider.widget.vtable->measure(slider.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                height_spec, &size),
+                  CMP_ERR_RANGE);
 
   bad_slider_style = slider_style;
   bad_slider_style.track_height = 0.0f;
@@ -1281,8 +1299,8 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(slider.widget.vtable->measure(slider.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                height_spec, &size),
+                  CMP_ERR_RANGE);
   slider.style = slider_style;
 
   width_spec.mode = CMP_MEASURE_EXACTLY;
@@ -1290,15 +1308,15 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = -1.0f;
   CMP_TEST_EXPECT(slider.widget.vtable->measure(slider.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                height_spec, &size),
+                  CMP_ERR_RANGE);
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(slider.widget.vtable->measure(slider.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, slider_style.track_length, 0.001f));
   CMP_TEST_ASSERT(
       cmp_near(size.height, slider_style.thumb_radius * 2.0f, 0.001f));
@@ -1308,7 +1326,7 @@ int main(void) {
   bounds.width = -1.0f;
   bounds.height = 20.0f;
   CMP_TEST_EXPECT(slider.widget.vtable->layout(slider.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bounds.width = 100.0f;
   bounds.height = 20.0f;
@@ -1316,54 +1334,54 @@ int main(void) {
 
   CMP_TEST_OK(test_backend_init(&backend));
   CMP_TEST_EXPECT(slider.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_vtable_no_rect;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_vtable;
 
   slider.bounds.width = 0.0f;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.bounds = bounds;
 
   bad_slider_style = slider_style;
   bad_slider_style.track_length = 0.0f;
   slider.style = bad_slider_style;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.style = slider_style;
 
   slider.bounds.width = -1.0f;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.bounds = bounds;
 
   slider.step = -1.0f;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.step = 0.0f;
 
   slider.max_value = slider.min_value;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.max_value = 1.0f;
 
   slider.value = 2.0f;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.value = 0.5f;
 
   CMP_TEST_OK(m3_progress_test_set_fail_point(
       M3_PROGRESS_TEST_FAIL_SLIDER_RESOLVE_COLORS));
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
 
   CMP_TEST_OK(m3_progress_test_set_fail_point(
@@ -1373,27 +1391,27 @@ int main(void) {
   CMP_TEST_OK(m3_progress_test_set_fail_point(
       M3_PROGRESS_TEST_FAIL_SLIDER_CORNER_RANGE));
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_progress_test_clear_fail_points());
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_rect_after = 2;
   slider.value = 0.5f;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect_after = 0;
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_rect_after = 3;
   slider.value = 0.5f;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect_after = 0;
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_rect = CMP_ERR_IO;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
 
   CMP_TEST_OK(test_backend_init(&backend));
   slider.value = 0.5f;
@@ -1402,7 +1420,7 @@ int main(void) {
 
   slider.step = 2.0f;
   CMP_TEST_EXPECT(slider.widget.vtable->paint(slider.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   slider.step = 0.0f;
 
   slider.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
@@ -1413,16 +1431,18 @@ int main(void) {
   slider.widget.flags = CMP_WIDGET_FLAG_FOCUSABLE;
 
   CMP_TEST_EXPECT(slider.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(slider.widget.vtable->get_semantics(slider.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(slider.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(slider.widget.vtable->destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(slider.widget.vtable->destroy(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   counter.calls = 0;
   counter.fail = 0;
-  CMP_TEST_OK(m3_slider_set_on_change(&slider, test_slider_on_change, &counter));
+  CMP_TEST_OK(
+      m3_slider_set_on_change(&slider, test_slider_on_change, &counter));
 
   slider.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 50, 10));

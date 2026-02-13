@@ -115,11 +115,13 @@ static int m3_segmented_test_color_should_fail(CMPBool *out_fail) {
     return CMP_OK;
   }
   g_m3_segmented_test_color_fail_after -= 1u;
-  *out_fail = (g_m3_segmented_test_color_fail_after == 0u) ? CMP_TRUE : CMP_FALSE;
+  *out_fail =
+      (g_m3_segmented_test_color_fail_after == 0u) ? CMP_TRUE : CMP_FALSE;
   return CMP_OK;
 }
 
-static int m3_segmented_test_fail_point_match(cmp_u32 point, CMPBool *out_match) {
+static int m3_segmented_test_fail_point_match(cmp_u32 point,
+                                              CMPBool *out_match) {
   if (out_match == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -378,8 +380,8 @@ static int m3_tab_row_validate_items(const M3TabItem *items, cmp_usize count) {
 }
 
 static int m3_tab_row_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -405,7 +407,8 @@ static int m3_tab_row_validate_backend(const CMPTextBackend *backend) {
   return CMP_OK;
 }
 
-static int m3_tab_row_measure_max_text(const M3TabRow *row, CMPScalar *out_width,
+static int m3_tab_row_measure_max_text(const M3TabRow *row,
+                                       CMPScalar *out_width,
                                        CMPScalar *out_height,
                                        CMPScalar *out_baseline) {
   CMPTextMetrics metrics;
@@ -439,8 +442,8 @@ static int m3_tab_row_measure_max_text(const M3TabRow *row, CMPScalar *out_width
       continue;
     }
     rc = cmp_text_measure_utf8(&row->text_backend, row->font,
-                              row->items[i].utf8_label, row->items[i].utf8_len,
-                              &metrics);
+                               row->items[i].utf8_label, row->items[i].utf8_len,
+                               &metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -477,7 +480,7 @@ static int m3_tab_row_item_width(const M3TabRow *row, const M3TabItem *item,
 
   if (item->utf8_len > 0) {
     rc = cmp_text_measure_utf8(&row->text_backend, row->font, item->utf8_label,
-                              item->utf8_len, &metrics);
+                               item->utf8_len, &metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -589,7 +592,7 @@ static int m3_tab_row_compute_layout(const M3TabRow *row,
   int rc;
 #ifdef CMP_TESTING
   CMPBool match; /* GCOVR_EXCL_LINE */
-#endif /* GCOVR_EXCL_LINE */
+#endif           /* GCOVR_EXCL_LINE */
 
   if (row == NULL || out_layout == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -677,7 +680,8 @@ static int m3_tab_row_compute_layout(const M3TabRow *row,
       if (available_width < total_spacing) {
         return CMP_ERR_RANGE;
       }
-      tab_width = (available_width - total_spacing) / (CMPScalar)row->item_count;
+      tab_width =
+          (available_width - total_spacing) / (CMPScalar)row->item_count;
 #ifdef CMP_TESTING
       rc = m3_tab_row_test_fail_point_match(
           M3_TAB_ROW_TEST_FAIL_LAYOUT_TAB_WIDTH_NEGATIVE, &match);
@@ -755,10 +759,10 @@ static int m3_tab_row_clamp_scroll(M3TabRow *row,
   return CMP_OK;
 }
 
-static int
-m3_tab_row_indicator_target(const M3TabRow *row, const M3TabRowLayout *layout,
-                            CMPScalar *out_pos, /* GCOVR_EXCL_LINE */
-                            CMPScalar *out_width) {
+static int m3_tab_row_indicator_target(const M3TabRow *row,
+                                       const M3TabRowLayout *layout,
+                                       CMPScalar *out_pos, /* GCOVR_EXCL_LINE */
+                                       CMPScalar *out_width) {
   CMPScalar pos = 0.0f;
   CMPScalar width = 0.0f;
   cmp_usize i = 0u;
@@ -776,7 +780,8 @@ m3_tab_row_indicator_target(const M3TabRow *row, const M3TabRowLayout *layout,
   }
 
   if (layout->mode == M3_TAB_MODE_FIXED) {
-    pos = (layout->tab_width + layout->spacing) * (CMPScalar)row->selected_index;
+    pos =
+        (layout->tab_width + layout->spacing) * (CMPScalar)row->selected_index;
     width = layout->tab_width;
   } else if (layout->mode == M3_TAB_MODE_SCROLLABLE) {
     pos = 0.0f;
@@ -844,8 +849,9 @@ static int m3_tab_row_sync_indicator(M3TabRow *row,
 #endif
 #ifdef CMP_TESTING
     if (rc == CMP_OK) {
-      rc = m3_tab_row_test_fail_point_match(
-          M3_TAB_ROW_TEST_FAIL_INDICATOR_START, &fail_match); /* GCOVR_EXCL_LINE */
+      rc =
+          m3_tab_row_test_fail_point_match(M3_TAB_ROW_TEST_FAIL_INDICATOR_START,
+                                           &fail_match); /* GCOVR_EXCL_LINE */
       if (rc == CMP_OK && fail_match == CMP_TRUE) {
         rc = CMP_ERR_IO;
       }
@@ -880,7 +886,8 @@ static int m3_tab_row_sync_indicator(M3TabRow *row,
     }
   } else {
     rc = cmp_anim_controller_start_timing(&row->indicator_pos_anim, target_pos,
-                                         target_pos, 0.0f, CMP_ANIM_EASE_LINEAR);
+                                          target_pos, 0.0f,
+                                          CMP_ANIM_EASE_LINEAR);
 #ifdef CMP_TESTING
     if (g_m3_tab_row_test_start_fail_after > 0u) {
       g_m3_tab_row_test_start_fail_after -= 1u;
@@ -943,10 +950,10 @@ static int m3_tab_row_item_rect(const M3TabRow *row,
                                 CMPRect *out_rect) {
   CMPScalar offset;
   CMPScalar width; /* GCOVR_EXCL_LINE */
-  int rc; /* GCOVR_EXCL_LINE */
+  int rc;          /* GCOVR_EXCL_LINE */
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
-  CMPBool match; /* GCOVR_EXCL_LINE */
-#endif /* GCOVR_EXCL_LINE */
+  CMPBool match;   /* GCOVR_EXCL_LINE */
+#endif             /* GCOVR_EXCL_LINE */
 
   if (row == NULL || layout == NULL || out_rect == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1004,18 +1011,18 @@ static int m3_tab_row_item_rect(const M3TabRow *row,
 }
 
 static int m3_tab_row_hit_test(const M3TabRow *row,
-                               const M3TabRowLayout *layout, cmp_i32 x, cmp_i32 y,
-                               cmp_usize *out_index) {
+                               const M3TabRowLayout *layout, cmp_i32 x,
+                               cmp_i32 y, cmp_usize *out_index) {
   CMPScalar fx;
   CMPScalar fy;
   CMPScalar stride = 0.0f;
   CMPScalar pos = 0.0f;
   CMPScalar width = 0.0f;
   cmp_usize index; /* GCOVR_EXCL_LINE */
-  int rc;         /* GCOVR_EXCL_LINE */
+  int rc;          /* GCOVR_EXCL_LINE */
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   CMPBool match;   /* GCOVR_EXCL_LINE */
-#endif /* GCOVR_EXCL_LINE */
+#endif             /* GCOVR_EXCL_LINE */
 
   if (row == NULL || layout == NULL || out_index == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1092,7 +1099,7 @@ static int m3_tab_row_hit_test(const M3TabRow *row,
     }
     if (pos <= width) {   /* GCOVR_EXCL_LINE */
       *out_index = index; /* GCOVR_EXCL_LINE */
-      return CMP_OK;       /* GCOVR_EXCL_LINE */
+      return CMP_OK;      /* GCOVR_EXCL_LINE */
     }
     pos -= width;
     if (index + 1 < row->item_count) { /* GCOVR_EXCL_LINE */
@@ -1214,7 +1221,7 @@ static int m3_tab_row_widget_paint(void *widget, CMPPaintContext *ctx) {
   int rc;
 #ifdef CMP_TESTING
   CMPBool match; /* GCOVR_EXCL_LINE */
-#endif /* GCOVR_EXCL_LINE */
+#endif           /* GCOVR_EXCL_LINE */
 
   if (widget == NULL || ctx == NULL || ctx->gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1333,8 +1340,8 @@ static int m3_tab_row_widget_paint(void *widget, CMPPaintContext *ctx) {
     }
 
     rc = cmp_text_measure_utf8(&row->text_backend, row->font,
-                              row->items[i].utf8_label, row->items[i].utf8_len,
-                              &metrics); /* GCOVR_EXCL_LINE */
+                               row->items[i].utf8_label, row->items[i].utf8_len,
+                               &metrics); /* GCOVR_EXCL_LINE */
     if (rc != CMP_OK) {
       return rc; /* GCOVR_EXCL_LINE */
     }
@@ -1365,8 +1372,8 @@ static int m3_tab_row_widget_event(void *widget, const CMPInputEvent *event,
                                    CMPBool *out_handled) { /* GCOVR_EXCL_LINE */
   M3TabRow *row = NULL;
   M3TabRowLayout layout; /* GCOVR_EXCL_LINE */
-  cmp_usize index;        /* GCOVR_EXCL_LINE */
-  cmp_usize previous;     /* GCOVR_EXCL_LINE */
+  cmp_usize index;       /* GCOVR_EXCL_LINE */
+  cmp_usize previous;    /* GCOVR_EXCL_LINE */
   CMPScalar delta = 0.0f;
   int rc = CMP_OK;
 
@@ -1601,8 +1608,9 @@ int CMP_CALL m3_tab_row_style_init(M3TabRowStyle *style) {
 }
 
 int CMP_CALL m3_tab_row_init(M3TabRow *row, const CMPTextBackend *backend,
-                            const M3TabRowStyle *style, const M3TabItem *items,
-                            cmp_usize item_count, cmp_usize selected_index) { /* GCOVR_EXCL_LINE */
+                             const M3TabRowStyle *style, const M3TabItem *items,
+                             cmp_usize item_count,
+                             cmp_usize selected_index) { /* GCOVR_EXCL_LINE */
   M3TabRowLayout layout = {0};
   int rc = CMP_OK; /* GCOVR_EXCL_LINE */
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
@@ -1713,7 +1721,7 @@ int CMP_CALL m3_tab_row_init(M3TabRow *row, const CMPTextBackend *backend,
 }
 
 int CMP_CALL m3_tab_row_set_items(M3TabRow *row, const M3TabItem *items,
-                                 cmp_usize item_count) {
+                                  cmp_usize item_count) {
   int rc = CMP_OK;
 
   if (row == NULL) {
@@ -1800,7 +1808,7 @@ int CMP_CALL m3_tab_row_set_selected(M3TabRow *row, cmp_usize selected_index) {
 }
 
 int CMP_CALL m3_tab_row_get_selected(const M3TabRow *row,
-                                    cmp_usize *out_selected) {
+                                     cmp_usize *out_selected) {
   if (row == NULL || out_selected == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1844,8 +1852,8 @@ int CMP_CALL m3_tab_row_get_scroll(const M3TabRow *row, CMPScalar *out_offset) {
   return CMP_OK;
 }
 
-int CMP_CALL m3_tab_row_set_on_select(M3TabRow *row, CMPTabRowOnSelect on_select,
-                                     void *ctx) {
+int CMP_CALL m3_tab_row_set_on_select(M3TabRow *row,
+                                      CMPTabRowOnSelect on_select, void *ctx) {
   if (row == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1854,7 +1862,8 @@ int CMP_CALL m3_tab_row_set_on_select(M3TabRow *row, CMPTabRowOnSelect on_select
   return CMP_OK;
 }
 
-int CMP_CALL m3_tab_row_step(M3TabRow *row, CMPScalar dt, CMPBool *out_changed) {
+int CMP_CALL m3_tab_row_step(M3TabRow *row, CMPScalar dt,
+                             CMPBool *out_changed) {
   CMPScalar value; /* GCOVR_EXCL_LINE */
   CMPBool finished = CMP_FALSE;
   CMPBool changed = CMP_FALSE;
@@ -1869,7 +1878,7 @@ int CMP_CALL m3_tab_row_step(M3TabRow *row, CMPScalar dt, CMPBool *out_changed) 
 
   if (row->indicator_pos_anim.mode != CMP_ANIM_MODE_NONE) {
     rc = cmp_anim_controller_step(&row->indicator_pos_anim, dt, &value,
-                                 &finished);
+                                  &finished);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1881,7 +1890,7 @@ int CMP_CALL m3_tab_row_step(M3TabRow *row, CMPScalar dt, CMPBool *out_changed) 
 
   if (row->indicator_width_anim.mode != CMP_ANIM_MODE_NONE) {
     rc = cmp_anim_controller_step(&row->indicator_width_anim, dt, &value,
-                                 &finished);
+                                  &finished);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -2106,8 +2115,8 @@ static int m3_segmented_validate_items(const M3SegmentedItem *items,
 }
 
 static int m3_segmented_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -2199,8 +2208,8 @@ static int m3_segmented_measure_max_text(const M3SegmentedButtons *buttons,
       continue;
     }
     rc = cmp_text_measure_utf8(&buttons->text_backend, buttons->font,
-                              buttons->items[i].utf8_label,
-                              buttons->items[i].utf8_len, &metrics);
+                               buttons->items[i].utf8_label,
+                               buttons->items[i].utf8_len, &metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -2412,7 +2421,8 @@ static int m3_segmented_compute_layout(const M3SegmentedButtons *buttons,
 
 static int m3_segmented_hit_test(const M3SegmentedButtons *buttons,
                                  const M3SegmentedLayout *layout, cmp_i32 x,
-                                 cmp_i32 y, cmp_usize *out_index) { /* GCOVR_EXCL_LINE */
+                                 cmp_i32 y,
+                                 cmp_usize *out_index) { /* GCOVR_EXCL_LINE */
   CMPScalar fx = 0.0f;
   CMPScalar fy = 0.0f;
   CMPScalar stride = 0.0f;
@@ -2477,7 +2487,7 @@ static int m3_segmented_hit_test(const M3SegmentedButtons *buttons,
 static int
 m3_segmented_is_selected(const M3SegmentedButtons *buttons, cmp_usize index,
                          CMPBool *out_selected) { /* GCOVR_EXCL_LINE */
-  int rc;                                        /* GCOVR_EXCL_LINE */
+  int rc;                                         /* GCOVR_EXCL_LINE */
 
   if (buttons == NULL || out_selected == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2505,7 +2515,8 @@ m3_segmented_is_selected(const M3SegmentedButtons *buttons, cmp_usize index,
 }
 
 static int m3_segmented_widget_measure(void *widget, CMPMeasureSpec width,
-                                       CMPMeasureSpec height, CMPSize *out_size) {
+                                       CMPMeasureSpec height,
+                                       CMPSize *out_size) {
   M3SegmentedButtons *buttons;
   CMPScalar content_width;
   CMPScalar content_height;
@@ -2728,8 +2739,8 @@ static int m3_segmented_widget_paint(void *widget, CMPPaintContext *ctx) {
     }
 
     rc = cmp_text_measure_utf8(&buttons->text_backend, buttons->font,
-                              buttons->items[i].utf8_label,
-                              buttons->items[i].utf8_len, &metrics);
+                               buttons->items[i].utf8_label,
+                               buttons->items[i].utf8_len, &metrics);
     if (rc != CMP_OK) {
       return rc; /* GCOVR_EXCL_LINE */
     }
@@ -2816,8 +2827,8 @@ static int m3_segmented_widget_event(void *widget, const CMPInputEvent *event,
       previous = buttons->selected_index;
       buttons->selected_index = index;
       if (buttons->on_select != NULL) {
-        rc =
-            buttons->on_select(buttons->on_select_ctx, buttons, index, CMP_TRUE);
+        rc = buttons->on_select(buttons->on_select_ctx, buttons, index,
+                                CMP_TRUE);
         if (rc != CMP_OK) {
           buttons->selected_index = previous;
           buttons->pressed_index = M3_SEGMENTED_INVALID_INDEX;
@@ -2843,7 +2854,7 @@ static int m3_segmented_widget_event(void *widget, const CMPInputEvent *event,
           return rc;
         }
       }
-    } else {               /* GCOVR_EXCL_LINE */
+    } else {                /* GCOVR_EXCL_LINE */
       return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
     }
   }
@@ -3007,12 +3018,12 @@ int CMP_CALL m3_segmented_style_init(M3SegmentedStyle *style) {
 }
 
 int CMP_CALL m3_segmented_buttons_init(M3SegmentedButtons *buttons,
-                                      const CMPTextBackend *backend,
-                                      const M3SegmentedStyle *style,
-                                      const M3SegmentedItem *items,
-                                      cmp_usize item_count, cmp_u32 mode,
-                                      cmp_usize selected_index,
-                                      CMPBool *selected_states) {
+                                       const CMPTextBackend *backend,
+                                       const M3SegmentedStyle *style,
+                                       const M3SegmentedItem *items,
+                                       cmp_usize item_count, cmp_u32 mode,
+                                       cmp_usize selected_index,
+                                       CMPBool *selected_states) {
   int rc;
 
   if (buttons == NULL || backend == NULL || style == NULL) {
@@ -3086,8 +3097,8 @@ int CMP_CALL m3_segmented_buttons_init(M3SegmentedButtons *buttons,
 }
 
 int CMP_CALL m3_segmented_buttons_set_items(M3SegmentedButtons *buttons,
-                                           const M3SegmentedItem *items,
-                                           cmp_usize item_count) {
+                                            const M3SegmentedItem *items,
+                                            cmp_usize item_count) {
   int rc;
 
   if (buttons == NULL) {
@@ -3118,7 +3129,7 @@ int CMP_CALL m3_segmented_buttons_set_items(M3SegmentedButtons *buttons,
 }
 
 int CMP_CALL m3_segmented_buttons_set_style(M3SegmentedButtons *buttons,
-                                           const M3SegmentedStyle *style) {
+                                            const M3SegmentedStyle *style) {
   CMPHandle new_font;
   int rc; /* GCOVR_EXCL_LINE */
 
@@ -3132,7 +3143,7 @@ int CMP_CALL m3_segmented_buttons_set_style(M3SegmentedButtons *buttons,
   }
 
   rc = cmp_text_font_create(&buttons->text_backend, &style->text_style,
-                           &new_font);
+                            &new_font);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -3151,8 +3162,8 @@ int CMP_CALL m3_segmented_buttons_set_style(M3SegmentedButtons *buttons,
   return CMP_OK;
 }
 
-int CMP_CALL m3_segmented_buttons_set_selected_index(M3SegmentedButtons *buttons,
-                                                    cmp_usize selected_index) {
+int CMP_CALL m3_segmented_buttons_set_selected_index(
+    M3SegmentedButtons *buttons, cmp_usize selected_index) {
   if (buttons == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -3179,9 +3190,8 @@ int CMP_CALL m3_segmented_buttons_get_selected_index(
   return CMP_OK;
 }
 
-int CMP_CALL m3_segmented_buttons_set_selected_state(M3SegmentedButtons *buttons,
-                                                    cmp_usize index,
-                                                    CMPBool selected) {
+int CMP_CALL m3_segmented_buttons_set_selected_state(
+    M3SegmentedButtons *buttons, cmp_usize index, CMPBool selected) {
   int rc;
 
   if (buttons == NULL) {
@@ -3231,8 +3241,8 @@ int CMP_CALL m3_segmented_buttons_get_selected_state(
 }
 
 int CMP_CALL m3_segmented_buttons_set_on_select(M3SegmentedButtons *buttons,
-                                               CMPSegmentedOnSelect on_select,
-                                               void *ctx) {
+                                                CMPSegmentedOnSelect on_select,
+                                                void *ctx) {
   if (buttons == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -3246,14 +3256,14 @@ int CMP_CALL m3_tab_row_test_validate_color(const CMPColor *color) {
   return m3_tab_row_validate_color(color);
 }
 
-int CMP_CALL m3_tab_row_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                      CMPScalar b, CMPScalar a) {
+int CMP_CALL m3_tab_row_test_color_set(CMPColor *color, CMPScalar r,
+                                       CMPScalar g, CMPScalar b, CMPScalar a) {
   return m3_tab_row_color_set(color, r, g, b, a);
 }
 
 int CMP_CALL m3_tab_row_test_color_with_alpha(const CMPColor *base,
-                                             CMPScalar alpha,
-                                             CMPColor *out_color) {
+                                              CMPScalar alpha,
+                                              CMPColor *out_color) {
   return m3_tab_row_color_with_alpha(base, alpha, out_color);
 }
 
@@ -3262,17 +3272,17 @@ int CMP_CALL m3_tab_row_test_validate_edges(const CMPLayoutEdges *edges) {
 }
 
 int CMP_CALL m3_tab_row_test_validate_text_style(const CMPTextStyle *style,
-                                                CMPBool require_family) {
+                                                 CMPBool require_family) {
   return m3_tab_row_validate_text_style(style, require_family);
 }
 
 int CMP_CALL m3_tab_row_test_validate_style(const M3TabRowStyle *style,
-                                           CMPBool require_family) {
+                                            CMPBool require_family) {
   return m3_tab_row_validate_style(style, require_family);
 }
 
 int CMP_CALL m3_tab_row_test_validate_items(const M3TabItem *items,
-                                           cmp_usize count) {
+                                            cmp_usize count) {
   return m3_tab_row_validate_items(items, count);
 }
 
@@ -3289,8 +3299,8 @@ int CMP_CALL m3_tab_row_test_validate_backend(const CMPTextBackend *backend) {
 }
 
 int CMP_CALL m3_tab_row_test_measure_content(const M3TabRow *row, cmp_u32 mode,
-                                            CMPScalar *out_width,
-                                            CMPScalar *out_height) {
+                                             CMPScalar *out_width,
+                                             CMPScalar *out_height) {
   return m3_tab_row_measure_content(row, mode, out_width, out_height);
 }
 
@@ -3323,23 +3333,23 @@ int CMP_CALL m3_tab_row_test_set_start_fail_after(cmp_u32 call_count) {
 }
 
 int CMP_CALL m3_tab_row_test_measure_max_text(const M3TabRow *row,
-                                             CMPScalar *out_width,
-                                             CMPScalar *out_height,
-                                             CMPScalar *out_baseline) {
+                                              CMPScalar *out_width,
+                                              CMPScalar *out_height,
+                                              CMPScalar *out_baseline) {
   return m3_tab_row_measure_max_text(row, out_width, out_height, out_baseline);
 }
 
 int CMP_CALL m3_tab_row_test_item_width(const M3TabRow *row,
-                                       const M3TabItem *item,
-                                       CMPScalar *out_width) {
+                                        const M3TabItem *item,
+                                        CMPScalar *out_width) {
   return m3_tab_row_item_width(row, item, out_width);
 }
 
 int CMP_CALL m3_tab_row_test_compute_layout(const M3TabRow *row,
-                                           CMPScalar *out_content_width,
-                                           CMPScalar *out_tab_width,
-                                           CMPScalar *out_tab_height,
-                                           cmp_u32 *out_mode) {
+                                            CMPScalar *out_content_width,
+                                            CMPScalar *out_tab_width,
+                                            CMPScalar *out_tab_height,
+                                            cmp_u32 *out_mode) {
   M3TabRowLayout layout;
   int rc;
 
@@ -3357,12 +3367,12 @@ int CMP_CALL m3_tab_row_test_compute_layout(const M3TabRow *row,
   *out_tab_width = layout.tab_width;         /* GCOVR_EXCL_LINE */
   *out_tab_height = layout.tab_height;       /* GCOVR_EXCL_LINE */
   *out_mode = layout.mode;                   /* GCOVR_EXCL_LINE */
-  return CMP_OK;                              /* GCOVR_EXCL_LINE */
+  return CMP_OK;                             /* GCOVR_EXCL_LINE */
 }
 
 int CMP_CALL m3_tab_row_test_clamp_scroll(M3TabRow *row, cmp_u32 mode,
-                                         CMPScalar content_width,
-                                         CMPScalar available_width) {
+                                          CMPScalar content_width,
+                                          CMPScalar available_width) {
   M3TabRowLayout layout;
 
   memset(&layout, 0, sizeof(layout));
@@ -3389,12 +3399,10 @@ int CMP_CALL m3_tab_row_test_indicator_target(
   return m3_tab_row_indicator_target(row, &layout, out_pos, out_width);
 }
 
-int CMP_CALL m3_tab_row_test_sync_indicator(M3TabRow *row, cmp_u32 mode,
-                                           CMPScalar tab_width, CMPScalar spacing,
-                                           CMPScalar content_width,
-                                           CMPScalar start_x, CMPScalar start_y,
-                                           CMPScalar tab_height,
-                                           CMPBool animate) {
+int CMP_CALL m3_tab_row_test_sync_indicator(
+    M3TabRow *row, cmp_u32 mode, CMPScalar tab_width, CMPScalar spacing,
+    CMPScalar content_width, CMPScalar start_x, CMPScalar start_y,
+    CMPScalar tab_height, CMPBool animate) {
   M3TabRowLayout layout;
 
   memset(&layout, 0, sizeof(layout));
@@ -3409,11 +3417,12 @@ int CMP_CALL m3_tab_row_test_sync_indicator(M3TabRow *row, cmp_u32 mode,
 }
 
 int CMP_CALL m3_tab_row_test_item_rect(const M3TabRow *row, cmp_u32 mode,
-                                      CMPScalar start_x, CMPScalar start_y,
-                                      CMPScalar tab_width, CMPScalar tab_height,
-                                      CMPScalar spacing, CMPScalar content_width,
-                                      CMPScalar available_width, cmp_usize index,
-                                      CMPRect *out_rect) {
+                                       CMPScalar start_x, CMPScalar start_y,
+                                       CMPScalar tab_width,
+                                       CMPScalar tab_height, CMPScalar spacing,
+                                       CMPScalar content_width,
+                                       CMPScalar available_width,
+                                       cmp_usize index, CMPRect *out_rect) {
   M3TabRowLayout layout;
 
   memset(&layout, 0, sizeof(layout));
@@ -3429,11 +3438,12 @@ int CMP_CALL m3_tab_row_test_item_rect(const M3TabRow *row, cmp_u32 mode,
 }
 
 int CMP_CALL m3_tab_row_test_hit_test(const M3TabRow *row, cmp_u32 mode,
-                                     CMPScalar start_x, CMPScalar start_y,
-                                     CMPScalar tab_width, CMPScalar tab_height,
-                                     CMPScalar spacing, CMPScalar content_width,
-                                     CMPScalar available_width, cmp_i32 x,
-                                     cmp_i32 y, cmp_usize *out_index) {
+                                      CMPScalar start_x, CMPScalar start_y,
+                                      CMPScalar tab_width, CMPScalar tab_height,
+                                      CMPScalar spacing,
+                                      CMPScalar content_width,
+                                      CMPScalar available_width, cmp_i32 x,
+                                      cmp_i32 y, cmp_usize *out_index) {
   M3TabRowLayout layout;
 
   memset(&layout, 0, sizeof(layout));
@@ -3452,14 +3462,15 @@ int CMP_CALL m3_segmented_test_validate_color(const CMPColor *color) {
   return m3_segmented_validate_color(color);
 }
 
-int CMP_CALL m3_segmented_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                        CMPScalar b, CMPScalar a) {
+int CMP_CALL m3_segmented_test_color_set(CMPColor *color, CMPScalar r,
+                                         CMPScalar g, CMPScalar b,
+                                         CMPScalar a) {
   return m3_segmented_color_set(color, r, g, b, a);
 }
 
 int CMP_CALL m3_segmented_test_color_with_alpha(const CMPColor *base,
-                                               CMPScalar alpha,
-                                               CMPColor *out_color) {
+                                                CMPScalar alpha,
+                                                CMPColor *out_color) {
   return m3_segmented_color_with_alpha(base, alpha, out_color);
 }
 
@@ -3468,17 +3479,17 @@ int CMP_CALL m3_segmented_test_validate_edges(const CMPLayoutEdges *edges) {
 }
 
 int CMP_CALL m3_segmented_test_validate_text_style(const CMPTextStyle *style,
-                                                  CMPBool require_family) {
+                                                   CMPBool require_family) {
   return m3_segmented_validate_text_style(style, require_family);
 }
 
 int CMP_CALL m3_segmented_test_validate_style(const M3SegmentedStyle *style,
-                                             CMPBool require_family) {
+                                              CMPBool require_family) {
   return m3_segmented_validate_style(style, require_family);
 }
 
 int CMP_CALL m3_segmented_test_validate_items(const M3SegmentedItem *items,
-                                             cmp_usize count) {
+                                              cmp_usize count) {
   return m3_segmented_validate_items(items, count);
 }
 
@@ -3499,13 +3510,13 @@ int CMP_CALL m3_segmented_test_validate_mode(cmp_u32 mode) {
 }
 
 int CMP_CALL m3_segmented_test_validate_selected_states(const CMPBool *states,
-                                                       cmp_usize count) {
+                                                        cmp_usize count) {
   return m3_segmented_validate_selected_states(states, count);
 }
 
-int CMP_CALL m3_segmented_test_measure_content(const M3SegmentedButtons *buttons,
-                                              CMPScalar *out_width,
-                                              CMPScalar *out_height) {
+int CMP_CALL
+m3_segmented_test_measure_content(const M3SegmentedButtons *buttons,
+                                  CMPScalar *out_width, CMPScalar *out_height) {
   return m3_segmented_measure_content(buttons, out_width, out_height);
 }
 
@@ -3535,10 +3546,10 @@ int CMP_CALL m3_segmented_test_measure_max_text(
 }
 
 int CMP_CALL m3_segmented_test_compute_layout(const M3SegmentedButtons *buttons,
-                                             CMPScalar *out_content_width,
-                                             CMPScalar *out_segment_width,
-                                             CMPScalar *out_segment_height,
-                                             CMPScalar *out_spacing) {
+                                              CMPScalar *out_content_width,
+                                              CMPScalar *out_segment_width,
+                                              CMPScalar *out_segment_height,
+                                              CMPScalar *out_spacing) {
   M3SegmentedLayout layout;
   int rc;
 
@@ -3556,7 +3567,7 @@ int CMP_CALL m3_segmented_test_compute_layout(const M3SegmentedButtons *buttons,
   *out_segment_width = layout.segment_width;   /* GCOVR_EXCL_LINE */
   *out_segment_height = layout.segment_height; /* GCOVR_EXCL_LINE */
   *out_spacing = layout.spacing;               /* GCOVR_EXCL_LINE */
-  return CMP_OK;                                /* GCOVR_EXCL_LINE */
+  return CMP_OK;                               /* GCOVR_EXCL_LINE */
 }
 
 int CMP_CALL m3_segmented_test_hit_test(
@@ -3576,8 +3587,8 @@ int CMP_CALL m3_segmented_test_hit_test(
 }
 
 int CMP_CALL m3_segmented_test_is_selected(const M3SegmentedButtons *buttons,
-                                          cmp_usize index,
-                                          CMPBool *out_selected) {
+                                           cmp_usize index,
+                                           CMPBool *out_selected) {
   return m3_segmented_is_selected(buttons, index, out_selected);
 }
 #endif

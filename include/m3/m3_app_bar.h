@@ -61,9 +61,9 @@ typedef struct M3AppBar {
   CMPWidget widget; /**< Widget interface (points to this instance). */
   CMPTextBackend text_backend; /**< Text backend instance. */
   CMPHandle title_font;        /**< Font handle for the title. */
-  M3AppBarStyle style;        /**< Current app bar style. */
+  M3AppBarStyle style;         /**< Current app bar style. */
   const char
-      *utf8_title;    /**< UTF-8 title pointer (may be NULL when len is 0). */
+      *utf8_title;     /**< UTF-8 title pointer (may be NULL when len is 0). */
   cmp_usize title_len; /**< Title length in bytes. */
   CMPRect bounds;      /**< Layout bounds. */
   CMPScalar collapse_offset;     /**< Collapse offset in pixels (0..range). */
@@ -108,9 +108,11 @@ CMP_API int CMP_CALL m3_app_bar_style_init_large(M3AppBarStyle *style);
  * @param title_len Title length in bytes.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_app_bar_init(M3AppBar *bar, const CMPTextBackend *backend,
-                                   const M3AppBarStyle *style,
-                                   const char *utf8_title, cmp_usize title_len);
+CMP_API int CMP_CALL m3_app_bar_init(M3AppBar *bar,
+                                     const CMPTextBackend *backend,
+                                     const M3AppBarStyle *style,
+                                     const char *utf8_title,
+                                     cmp_usize title_len);
 
 /**
  * @brief Update the app bar title text.
@@ -120,7 +122,7 @@ CMP_API int CMP_CALL m3_app_bar_init(M3AppBar *bar, const CMPTextBackend *backen
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_app_bar_set_title(M3AppBar *bar, const char *utf8_title,
-                                        cmp_usize title_len);
+                                          cmp_usize title_len);
 
 /**
  * @brief Update the app bar style.
@@ -129,7 +131,7 @@ CMP_API int CMP_CALL m3_app_bar_set_title(M3AppBar *bar, const char *utf8_title,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_app_bar_set_style(M3AppBar *bar,
-                                        const M3AppBarStyle *style);
+                                          const M3AppBarStyle *style);
 
 /**
  * @brief Set the collapse offset of the app bar.
@@ -138,7 +140,7 @@ CMP_API int CMP_CALL m3_app_bar_set_style(M3AppBar *bar,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_app_bar_set_collapse_offset(M3AppBar *bar,
-                                                  CMPScalar offset);
+                                                    CMPScalar offset);
 
 /**
  * @brief Retrieve the collapse offset of the app bar.
@@ -147,7 +149,7 @@ CMP_API int CMP_CALL m3_app_bar_set_collapse_offset(M3AppBar *bar,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_app_bar_get_collapse_offset(const M3AppBar *bar,
-                                                  CMPScalar *out_offset);
+                                                    CMPScalar *out_offset);
 
 /**
  * @brief Retrieve the current app bar height.
@@ -156,7 +158,7 @@ CMP_API int CMP_CALL m3_app_bar_get_collapse_offset(const M3AppBar *bar,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_app_bar_get_height(const M3AppBar *bar,
-                                         CMPScalar *out_height);
+                                           CMPScalar *out_height);
 
 /**
  * @brief Compute content bounds inside the app bar.
@@ -165,7 +167,7 @@ CMP_API int CMP_CALL m3_app_bar_get_height(const M3AppBar *bar,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_app_bar_get_content_bounds(const M3AppBar *bar,
-                                                 CMPRect *out_bounds);
+                                                   CMPRect *out_bounds);
 
 #ifdef __cplusplus
 } /* extern "C" */

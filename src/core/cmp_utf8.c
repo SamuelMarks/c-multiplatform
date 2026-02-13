@@ -39,7 +39,7 @@ static int cmp_utf8_cstrlen(const char *cstr, cmp_usize *out_len) {
 }
 
 static int cmp_utf8_decode(const cmp_u8 *data, cmp_usize length,
-                          cmp_u32 *out_codepoint, cmp_usize *out_advance) {
+                           cmp_u32 *out_codepoint, cmp_usize *out_advance) {
   cmp_u8 b0;
   cmp_u8 b1;
   cmp_u8 b2;
@@ -161,7 +161,7 @@ static int cmp_utf8_decode(const cmp_u8 *data, cmp_usize length,
 }
 
 int CMP_CALL cmp_utf8_validate(const char *data, cmp_usize length,
-                             CMPBool *out_valid) {
+                               CMPBool *out_valid) {
   const cmp_u8 *bytes;
   cmp_usize offset;
   cmp_usize advance;
@@ -206,7 +206,7 @@ int CMP_CALL cmp_utf8_validate_cstr(const char *cstr, CMPBool *out_valid) {
 }
 
 int CMP_CALL cmp_utf8_iter_init(CMPUtf8Iter *iter, const char *data,
-                              cmp_usize length) {
+                                cmp_usize length) {
   if (iter == NULL || data == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -246,7 +246,7 @@ int CMP_CALL cmp_utf8_iter_next(CMPUtf8Iter *iter, cmp_u32 *out_codepoint) {
   }
 
   rc = cmp_utf8_decode(iter->data + iter->offset, iter->length - iter->offset,
-                      out_codepoint, &advance);
+                       out_codepoint, &advance);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -266,7 +266,8 @@ int CMP_CALL cmp_utf8_test_set_cstr_limit(cmp_usize max_len) {
 }
 
 int CMP_CALL cmp_utf8_test_decode(const cmp_u8 *data, cmp_usize length,
-                                cmp_u32 *out_codepoint, cmp_usize *out_advance) {
+                                  cmp_u32 *out_codepoint,
+                                  cmp_usize *out_advance) {
   return cmp_utf8_decode(data, length, out_codepoint, out_advance);
 }
 

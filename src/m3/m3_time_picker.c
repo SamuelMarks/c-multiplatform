@@ -113,8 +113,8 @@ static int m3_time_picker_validate_style(const M3TimePickerStyle *style) {
 }
 
 static int m3_time_picker_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -158,7 +158,12 @@ static int m3_time_picker_validate_period(cmp_u32 period) {
 }
 
 static int m3_time_picker_validate_hour(cmp_u32 hour) {
-  if (hour < M3_TIME_PICKER_MIN_HOUR || hour > M3_TIME_PICKER_MAX_HOUR) {
+#if M3_TIME_PICKER_MIN_HOUR > 0u
+  if (hour < M3_TIME_PICKER_MIN_HOUR) {
+    return CMP_ERR_RANGE;
+  }
+#endif
+  if (hour > M3_TIME_PICKER_MAX_HOUR) {
     return CMP_ERR_RANGE;
   }
   return CMP_OK;
@@ -171,8 +176,12 @@ static int m3_time_picker_validate_minute(cmp_u32 minute) {
     return CMP_ERR_RANGE;
   }
 #endif
-  if (minute < M3_TIME_PICKER_MIN_MINUTE ||
-      minute > M3_TIME_PICKER_MAX_MINUTE) {
+#if M3_TIME_PICKER_MIN_MINUTE > 0u
+  if (minute < M3_TIME_PICKER_MIN_MINUTE) {
+    return CMP_ERR_RANGE;
+  }
+#endif
+  if (minute > M3_TIME_PICKER_MAX_MINUTE) {
     return CMP_ERR_RANGE;
   }
   return CMP_OK;
@@ -264,8 +273,9 @@ static int m3_time_picker_compute_metrics(const M3TimePicker *picker,
   return CMP_OK;
 }
 
-static int m3_time_picker_angle_from_point(CMPScalar cx, CMPScalar cy, CMPScalar x,
-                                           CMPScalar y, CMPScalar *out_angle) {
+static int m3_time_picker_angle_from_point(CMPScalar cx, CMPScalar cy,
+                                           CMPScalar x, CMPScalar y,
+                                           CMPScalar *out_angle) {
   double angle;
   double full;
 
@@ -381,7 +391,8 @@ static int m3_time_picker_hour_from_index(cmp_u32 index, cmp_u32 format,
 }
 
 static int m3_time_picker_hour_to_index(cmp_u32 hour, cmp_u32 format,
-                                        cmp_u32 *out_index, CMPBool *out_inner) {
+                                        cmp_u32 *out_index,
+                                        CMPBool *out_inner) {
   cmp_u32 index;
   CMPBool inner;
   int rc;
@@ -427,7 +438,8 @@ static int m3_time_picker_hour_to_index(cmp_u32 hour, cmp_u32 format,
 }
 
 static int m3_time_picker_pick_time(const M3TimePicker *picker, CMPScalar x,
-                                    CMPScalar y, cmp_u32 field, CMPTime *out_time,
+                                    CMPScalar y, cmp_u32 field,
+                                    CMPTime *out_time,
                                     CMPBool *out_valid) { /* GCOVR_EXCL_LINE */
   M3TimePickerMetrics metrics;
   CMPTime time;
@@ -518,7 +530,8 @@ static int m3_time_picker_pick_time(const M3TimePicker *picker, CMPScalar x,
   return CMP_OK;
 }
 
-static int m3_time_picker_apply_time(M3TimePicker *picker, const CMPTime *time) {
+static int m3_time_picker_apply_time(M3TimePicker *picker,
+                                     const CMPTime *time) {
   CMPTime prev;
   int rc;
 
@@ -1062,8 +1075,8 @@ int CMP_CALL m3_time_picker_style_init(M3TimePickerStyle *style) {
 }
 
 int CMP_CALL m3_time_picker_init(M3TimePicker *picker,
-                                const M3TimePickerStyle *style, cmp_u32 hour,
-                                cmp_u32 minute, cmp_u32 format) {
+                                 const M3TimePickerStyle *style, cmp_u32 hour,
+                                 cmp_u32 minute, cmp_u32 format) {
   int rc;
 
   if (picker == NULL || style == NULL) {
@@ -1104,7 +1117,7 @@ int CMP_CALL m3_time_picker_init(M3TimePicker *picker,
 }
 
 int CMP_CALL m3_time_picker_set_style(M3TimePicker *picker,
-                                     const M3TimePickerStyle *style) {
+                                      const M3TimePickerStyle *style) {
   M3TimePickerStyle prev;
   int rc;
 
@@ -1157,7 +1170,7 @@ int CMP_CALL m3_time_picker_set_format(M3TimePicker *picker, cmp_u32 format) {
 }
 
 int CMP_CALL m3_time_picker_get_format(const M3TimePicker *picker,
-                                      cmp_u32 *out_format) {
+                                       cmp_u32 *out_format) {
   if (picker == NULL || out_format == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1167,7 +1180,7 @@ int CMP_CALL m3_time_picker_get_format(const M3TimePicker *picker,
 }
 
 int CMP_CALL m3_time_picker_set_active_field(M3TimePicker *picker,
-                                            cmp_u32 field) {
+                                             cmp_u32 field) {
   int rc;
 
   if (picker == NULL) {
@@ -1184,7 +1197,7 @@ int CMP_CALL m3_time_picker_set_active_field(M3TimePicker *picker,
 }
 
 int CMP_CALL m3_time_picker_get_active_field(const M3TimePicker *picker,
-                                            cmp_u32 *out_field) {
+                                             cmp_u32 *out_field) {
   if (picker == NULL || out_field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1193,12 +1206,13 @@ int CMP_CALL m3_time_picker_get_active_field(const M3TimePicker *picker,
   return CMP_OK;
 }
 
-int CMP_CALL m3_time_picker_set_time(M3TimePicker *picker, const CMPTime *time) {
+int CMP_CALL m3_time_picker_set_time(M3TimePicker *picker,
+                                     const CMPTime *time) {
   return m3_time_picker_apply_time(picker, time);
 }
 
 int CMP_CALL m3_time_picker_get_time(const M3TimePicker *picker,
-                                    CMPTime *out_time) {
+                                     CMPTime *out_time) {
   if (picker == NULL || out_time == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1243,7 +1257,7 @@ int CMP_CALL m3_time_picker_set_period(M3TimePicker *picker, cmp_u32 period) {
 }
 
 int CMP_CALL m3_time_picker_get_period(const M3TimePicker *picker,
-                                      cmp_u32 *out_period) {
+                                       cmp_u32 *out_period) {
   if (picker == NULL || out_period == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1257,8 +1271,8 @@ int CMP_CALL m3_time_picker_get_period(const M3TimePicker *picker,
 }
 
 int CMP_CALL m3_time_picker_set_on_change(M3TimePicker *picker,
-                                         CMPTimePickerOnChange on_change,
-                                         void *ctx) {
+                                          CMPTimePickerOnChange on_change,
+                                          void *ctx) {
   if (picker == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1303,7 +1317,8 @@ int CMP_CALL m3_time_picker_test_set_force_rect_error(CMPBool enable) {
   return CMP_OK;
 }
 
-int CMP_CALL m3_time_picker_test_set_force_resolve_colors_error(CMPBool enable) {
+int CMP_CALL
+m3_time_picker_test_set_force_resolve_colors_error(CMPBool enable) {
   g_m3_time_picker_test_force_resolve_colors_error = enable;
   return CMP_OK;
 }
@@ -1323,7 +1338,8 @@ int CMP_CALL m3_time_picker_test_validate_edges(const CMPLayoutEdges *edges) {
   return m3_time_picker_validate_edges(edges);
 }
 
-int CMP_CALL m3_time_picker_test_validate_style(const M3TimePickerStyle *style) {
+int CMP_CALL
+m3_time_picker_test_validate_style(const M3TimePickerStyle *style) {
   return m3_time_picker_validate_style(style);
 }
 
@@ -1340,27 +1356,27 @@ int CMP_CALL m3_time_picker_test_validate_time(const CMPTime *time) {
 }
 
 int CMP_CALL m3_time_picker_test_angle_from_point(CMPScalar cx, CMPScalar cy,
-                                                 CMPScalar x, CMPScalar y,
-                                                 CMPScalar *out_angle) {
+                                                  CMPScalar x, CMPScalar y,
+                                                  CMPScalar *out_angle) {
   return m3_time_picker_angle_from_point(cx, cy, x, y, out_angle);
 }
 
 int CMP_CALL m3_time_picker_test_angle_to_index(CMPScalar angle, cmp_u32 count,
-                                               cmp_u32 *out_index) {
+                                                cmp_u32 *out_index) {
   return m3_time_picker_angle_to_index(angle, count, out_index);
 }
 
 int CMP_CALL m3_time_picker_test_hour_from_index(cmp_u32 index, cmp_u32 format,
-                                                CMPBool inner_ring,
-                                                cmp_u32 current_hour,
-                                                cmp_u32 *out_hour) {
+                                                 CMPBool inner_ring,
+                                                 cmp_u32 current_hour,
+                                                 cmp_u32 *out_hour) {
   return m3_time_picker_hour_from_index(index, format, inner_ring, current_hour,
                                         out_hour);
 }
 
 int CMP_CALL m3_time_picker_test_hour_to_index(cmp_u32 hour, cmp_u32 format,
-                                              cmp_u32 *out_index,
-                                              CMPBool *out_inner) {
+                                               cmp_u32 *out_index,
+                                               CMPBool *out_inner) {
   return m3_time_picker_hour_to_index(hour, format, out_index, out_inner);
 }
 
@@ -1370,37 +1386,38 @@ int CMP_CALL m3_time_picker_test_compute_metrics(
 }
 
 int CMP_CALL m3_time_picker_test_pick_time(const M3TimePicker *picker,
-                                          CMPScalar x, CMPScalar y, cmp_u32 field,
-                                          CMPTime *out_time, CMPBool *out_valid) {
+                                           CMPScalar x, CMPScalar y,
+                                           cmp_u32 field, CMPTime *out_time,
+                                           CMPBool *out_valid) {
   return m3_time_picker_pick_time(picker, x, y, field, out_time, out_valid);
 }
 
 int CMP_CALL m3_time_picker_test_resolve_colors(const M3TimePicker *picker,
-                                               CMPColor *out_background,
-                                               CMPColor *out_ring,
-                                               CMPColor *out_hand,
-                                               CMPColor *out_selection) {
+                                                CMPColor *out_background,
+                                                CMPColor *out_ring,
+                                                CMPColor *out_hand,
+                                                CMPColor *out_selection) {
   return m3_time_picker_resolve_colors(picker, out_background, out_ring,
                                        out_hand, out_selection);
 }
 
-int CMP_CALL m3_time_picker_test_compute_hand(const M3TimePicker *picker,
-                                             const M3TimePickerMetrics *metrics,
-                                             CMPScalar *out_angle,
-                                             CMPScalar *out_radius) {
+int CMP_CALL m3_time_picker_test_compute_hand(
+    const M3TimePicker *picker, const M3TimePickerMetrics *metrics,
+    CMPScalar *out_angle, CMPScalar *out_radius) {
   return m3_time_picker_compute_hand(picker, metrics, out_angle, out_radius);
 }
 
 int CMP_CALL m3_time_picker_test_draw_circle(CMPGfx *gfx, CMPScalar cx,
-                                            CMPScalar cy, CMPScalar radius,
-                                            CMPColor color) {
+                                             CMPScalar cy, CMPScalar radius,
+                                             CMPColor color) {
   return m3_time_picker_draw_circle(gfx, cx, cy, radius, color);
 }
 
-int CMP_CALL m3_time_picker_test_draw_ring(CMPGfx *gfx, CMPScalar cx, CMPScalar cy,
-                                          CMPScalar radius, CMPScalar thickness,
-                                          CMPColor ring_color,
-                                          CMPColor fill_color) {
+int CMP_CALL m3_time_picker_test_draw_ring(CMPGfx *gfx, CMPScalar cx,
+                                           CMPScalar cy, CMPScalar radius,
+                                           CMPScalar thickness,
+                                           CMPColor ring_color,
+                                           CMPColor fill_color) {
   return m3_time_picker_draw_ring(gfx, cx, cy, radius, thickness, ring_color,
                                   fill_color);
 }

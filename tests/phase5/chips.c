@@ -19,29 +19,31 @@ int CMP_CALL m3_chip_test_set_color_fail_after(cmp_u32 call_count);
 int CMP_CALL m3_chip_test_clear_fail_points(void);
 int CMP_CALL m3_chip_test_validate_color(const CMPColor *color);
 int CMP_CALL m3_chip_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                   CMPScalar b, CMPScalar a);
-int CMP_CALL m3_chip_test_color_with_alpha(const CMPColor *base, CMPScalar alpha,
-                                          CMPColor *out_color);
+                                    CMPScalar b, CMPScalar a);
+int CMP_CALL m3_chip_test_color_with_alpha(const CMPColor *base,
+                                           CMPScalar alpha,
+                                           CMPColor *out_color);
 int CMP_CALL m3_chip_test_validate_text_style(const CMPTextStyle *style,
-                                             CMPBool require_family);
+                                              CMPBool require_family);
 int CMP_CALL m3_chip_test_validate_layout(const M3ChipLayout *layout);
 int CMP_CALL m3_chip_test_validate_style(const M3ChipStyle *style,
-                                        CMPBool require_family);
+                                         CMPBool require_family);
 int CMP_CALL m3_chip_test_validate_measure_spec(CMPMeasureSpec spec);
 int CMP_CALL m3_chip_test_validate_rect(const CMPRect *rect);
 int CMP_CALL m3_chip_test_validate_backend(const CMPTextBackend *backend);
 int CMP_CALL m3_chip_test_metrics_update(M3Chip *chip);
 int CMP_CALL m3_chip_test_resolve_colors(const M3Chip *chip,
-                                        CMPColor *out_background,
-                                        CMPColor *out_text, CMPColor *out_outline,
-                                        CMPColor *out_ripple);
+                                         CMPColor *out_background,
+                                         CMPColor *out_text,
+                                         CMPColor *out_outline,
+                                         CMPColor *out_ripple);
 int CMP_CALL m3_chip_test_resolve_corner(const M3Chip *chip,
-                                        CMPScalar *out_corner);
+                                         CMPScalar *out_corner);
 int CMP_CALL m3_chip_test_compute_delete_bounds(M3Chip *chip,
-                                               CMPRect *out_bounds);
+                                                CMPRect *out_bounds);
 int CMP_CALL m3_chip_test_draw_delete_icon(const CMPGfx *gfx,
-                                          const CMPRect *bounds, CMPColor color,
-                                          CMPScalar thickness);
+                                           const CMPRect *bounds,
+                                           CMPColor color, CMPScalar thickness);
 
 typedef struct TestChipBackend {
   int create_calls;
@@ -95,8 +97,8 @@ static int test_backend_init(TestChipBackend *backend) {
 }
 
 static int test_text_create_font(void *text, const char *utf8_family,
-                                 cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
-                                 CMPHandle *out_font) {
+                                 cmp_i32 size_px, cmp_i32 weight,
+                                 CMPBool italic, CMPHandle *out_font) {
   TestChipBackend *backend;
 
   if (text == NULL || utf8_family == NULL || out_font == NULL) {
@@ -218,8 +220,9 @@ static int test_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
   return CMP_OK;
 }
 
-static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                              CMPScalar y1, CMPColor color, CMPScalar thickness) {
+static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
+                              CMPScalar x1, CMPScalar y1, CMPColor color,
+                              CMPScalar thickness) {
   TestChipBackend *backend;
 
   if (gfx == NULL) {
@@ -282,60 +285,60 @@ static const CMPTextVTable g_test_text_vtable_no_create = {
     NULL, test_text_destroy_font, test_text_measure_text, test_text_draw_text};
 
 static const CMPGfxVTable g_test_gfx_vtable = {NULL,
-                                              NULL,
-                                              NULL,
-                                              test_gfx_draw_rect,
-                                              test_gfx_draw_line,
-                                              NULL,
-                                              test_gfx_push_clip,
-                                              test_gfx_pop_clip,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL};
+                                               NULL,
+                                               NULL,
+                                               test_gfx_draw_rect,
+                                               test_gfx_draw_line,
+                                               NULL,
+                                               test_gfx_push_clip,
+                                               test_gfx_pop_clip,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL};
 
 static const CMPGfxVTable g_test_gfx_vtable_no_rect = {NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      test_gfx_draw_line,
-                                                      NULL,
-                                                      test_gfx_push_clip,
-                                                      test_gfx_pop_clip,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL};
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       test_gfx_draw_line,
+                                                       NULL,
+                                                       test_gfx_push_clip,
+                                                       test_gfx_pop_clip,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL};
 
 static const CMPGfxVTable g_test_gfx_vtable_no_line = {NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      test_gfx_draw_rect,
-                                                      NULL,
-                                                      NULL,
-                                                      test_gfx_push_clip,
-                                                      test_gfx_pop_clip,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL};
+                                                       NULL,
+                                                       NULL,
+                                                       test_gfx_draw_rect,
+                                                       NULL,
+                                                       NULL,
+                                                       test_gfx_push_clip,
+                                                       test_gfx_pop_clip,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL};
 
 static const CMPGfxVTable g_test_gfx_vtable_no_clip = {NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      test_gfx_draw_rect,
-                                                      test_gfx_draw_line,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL,
-                                                      NULL};
+                                                       NULL,
+                                                       NULL,
+                                                       test_gfx_draw_rect,
+                                                       test_gfx_draw_line,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL};
 
 static int cmp_near(CMPScalar a, CMPScalar b, CMPScalar tol) {
   CMPScalar diff;
@@ -423,7 +426,7 @@ static int test_chip_helpers(void) {
   null_backend = NULL;
 
   CMP_TEST_EXPECT(m3_chip_test_validate_color((const CMPColor *)null_color),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   color.r = -0.1f;
   color.g = 0.0f;
   color.b = 0.0f;
@@ -440,43 +443,43 @@ static int test_chip_helpers(void) {
   CMP_TEST_EXPECT(m3_chip_test_validate_color(&color), CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_chip_test_color_set(NULL, 0.0f, 0.0f, 0.0f, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_test_color_set(&color, -1.0f, 0.0f, 0.0f, 1.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 0.0f, -1.0f, 0.0f, 1.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 0.0f, 0.0f, -1.0f, 1.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 0.0f, 0.0f, 0.0f, 2.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_chip_test_set_color_fail_after(1));
   CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 0.0f, 0.0f, 0.0f, 1.0f),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
 
   CMP_TEST_EXPECT(m3_chip_test_color_with_alpha(NULL, 0.5f, &out_color),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_test_color_with_alpha(&color, 0.5f, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_test_color_with_alpha(&color, -0.1f, &out_color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_chip_test_color_with_alpha(&color, 1.5f, &out_color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   color.r = 2.0f;
   CMP_TEST_EXPECT(m3_chip_test_color_with_alpha(&color, 0.5f, &out_color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   color.r = 0.0f;
   color.g = 0.0f;
   color.b = 0.0f;
   color.a = 1.0f;
   CMP_TEST_OK(m3_chip_test_set_color_fail_after(1));
   CMP_TEST_EXPECT(m3_chip_test_color_with_alpha(&color, 0.5f, &out_color),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
 
   CMP_TEST_EXPECT(m3_chip_test_validate_text_style(
-                     (const CMPTextStyle *)null_style, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      (const CMPTextStyle *)null_style, CMP_FALSE),
+                  CMP_ERR_INVALID_ARGUMENT);
   memset(&text_style, 0, sizeof(text_style));
   text_style.size_px = 12;
   text_style.weight = 400;
@@ -486,23 +489,23 @@ static int test_chip_helpers(void) {
   text_style.color.b = 0.0f;
   text_style.color.a = 1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   text_style.utf8_family = "Test";
   text_style.size_px = 0;
   CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.size_px = 12;
   text_style.weight = 50;
   CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.weight = 400;
   text_style.italic = 2;
   CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.italic = CMP_FALSE;
   text_style.color.r = 2.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.color.r = 0.0f;
   CMP_TEST_OK(m3_chip_test_validate_text_style(&text_style, CMP_TRUE));
 
@@ -528,46 +531,46 @@ static int test_chip_helpers(void) {
   CMP_TEST_OK(m3_chip_test_validate_layout(&layout));
 
   CMP_TEST_EXPECT(m3_chip_test_validate_style(
-                     (const M3ChipStyle *)null_chip_style, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      (const M3ChipStyle *)null_chip_style, CMP_FALSE),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_chip_style_init_assist(&style));
   style.text_style.utf8_family = "Test";
   CMP_TEST_OK(m3_chip_test_validate_style(&style, CMP_TRUE));
   bad_style = style;
   bad_style.variant = 0;
   CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_style = style;
   bad_style.corner_radius = -1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_style = style;
   bad_style.ripple_expand_duration = -1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_style = style;
   bad_style.layout.padding_x = -1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_style = style;
   bad_style.text_style.size_px = 0;
   CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bad_style = style;
   bad_style.background_color.r = 2.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   spec.mode = 999u;
   spec.size = 10.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_AT_MOST;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_measure_spec(spec), CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_chip_test_validate_rect((const CMPRect *)null_rect),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   rect.x = 0.0f;
   rect.y = 0.0f;
   rect.width = -1.0f;
@@ -579,28 +582,28 @@ static int test_chip_helpers(void) {
       CMP_ERR_INVALID_ARGUMENT);
   memset(&text_backend, 0, sizeof(text_backend));
   CMP_TEST_EXPECT(m3_chip_test_validate_backend(&text_backend),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   memset(&chip, 0, sizeof(chip));
   chip.style = style;
   chip.widget.flags = 0;
   chip.selected = CMP_TRUE;
   CMP_TEST_OK(m3_chip_test_resolve_colors(&chip, &background, &text_color,
-                                         &outline, &ripple));
+                                          &outline, &ripple));
   CMP_TEST_ASSERT(
       cmp_near(background.r, style.selected_background_color.r, 0.001f));
   CMP_TEST_ASSERT(cmp_near(text_color.r, style.selected_text_color.r, 0.001f));
   chip.widget.flags = CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(m3_chip_test_resolve_colors(&chip, &background, &text_color,
-                                         &outline, &ripple));
+                                          &outline, &ripple));
   CMP_TEST_ASSERT(
       cmp_near(background.a, style.disabled_background_color.a, 0.001f));
   chip.widget.flags = 0;
   chip.selected = CMP_FALSE;
   chip.style.background_color.r = 2.0f;
   CMP_TEST_EXPECT(m3_chip_test_resolve_colors(&chip, &background, &text_color,
-                                             &outline, &ripple),
-                 CMP_ERR_RANGE);
+                                              &outline, &ripple),
+                  CMP_ERR_RANGE);
   chip.style.background_color = style.background_color;
 
   chip.bounds.x = 0.0f;
@@ -624,9 +627,9 @@ static int test_chip_helpers(void) {
   chip.bounds.height = 32.0f;
   chip.show_delete = CMP_FALSE;
   CMP_TEST_EXPECT(m3_chip_test_compute_delete_bounds(NULL, &delete_bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_test_compute_delete_bounds(&chip, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_chip_test_compute_delete_bounds(&chip, &delete_bounds));
   CMP_TEST_ASSERT(delete_bounds.width == 0.0f);
   chip.show_delete = CMP_TRUE;
@@ -639,16 +642,16 @@ static int test_chip_helpers(void) {
   chip.bounds.height = 32.0f;
   chip.style.layout.icon_size = 0.0f;
   CMP_TEST_EXPECT(m3_chip_test_compute_delete_bounds(&chip, &delete_bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   chip.style.layout.icon_size = style.layout.icon_size;
   CMP_TEST_OK(m3_chip_test_set_fail_point(M3_CHIP_TEST_FAIL_DELETE_BOUNDS));
   CMP_TEST_EXPECT(m3_chip_test_compute_delete_bounds(&chip, &delete_bounds),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
 
   chip.dense = 2;
   CMP_TEST_EXPECT(m3_chip_test_compute_delete_bounds(&chip, &delete_bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   chip.dense = CMP_FALSE;
 
   CMP_TEST_EXPECT(m3_chip_test_metrics_update(NULL), CMP_ERR_INVALID_ARGUMENT);
@@ -694,15 +697,15 @@ static int test_chip_draw_delete(void) {
   color.a = 1.0f;
 
   CMP_TEST_EXPECT(m3_chip_test_draw_delete_icon(NULL, &bounds, color, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_test_draw_delete_icon(&gfx, NULL, color, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, -1.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, 1.0f),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_gfx_vtable;
 
   bounds.width = 0.0f;
@@ -711,7 +714,7 @@ static int test_chip_draw_delete(void) {
 
   backend.fail_draw_line = 1;
   CMP_TEST_EXPECT(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, 1.0f),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_line = 0;
 
   CMP_TEST_OK(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, 1.0f));
@@ -784,32 +787,33 @@ static int test_chip_widget(void) {
   other_style.text_style.size_px = 16;
 
   CMP_TEST_EXPECT(m3_chip_init(NULL, &text_backend, &style, "A", 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_init(&chip, NULL, &style, "A", 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_init(&chip, &text_backend, NULL, "A", 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_init(&chip, &text_backend, &style, NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   text_backend.vtable = NULL;
   CMP_TEST_EXPECT(m3_chip_init(&chip, &text_backend, &style, "A", 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   text_backend.vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(m3_chip_init(&chip, &text_backend, &style, "A", 1),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable_no_create;
   CMP_TEST_EXPECT(m3_chip_init(&chip, &text_backend, &style, "A", 1),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable;
 
   style.text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_chip_init(&chip, &text_backend, &style, "A", 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   style.text_style.utf8_family = "Test";
 
   CMP_TEST_OK(m3_chip_test_set_fail_point(M3_CHIP_TEST_FAIL_RIPPLE_INIT));
-  CMP_TEST_EXPECT(m3_chip_init(&chip, &text_backend, &style, "A", 1), CMP_ERR_IO);
+  CMP_TEST_EXPECT(m3_chip_init(&chip, &text_backend, &style, "A", 1),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
 
   CMP_TEST_OK(m3_chip_init(&chip, &text_backend, &style, "Chip", 4));
@@ -834,10 +838,12 @@ static int test_chip_widget(void) {
 
   CMP_TEST_OK(m3_chip_set_style(&chip, &other_style));
 
-  CMP_TEST_EXPECT(m3_chip_set_selected(NULL, CMP_TRUE), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_chip_set_selected(NULL, CMP_TRUE),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_set_selected(&chip, 2), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_chip_set_selected(&chip, CMP_TRUE));
-  CMP_TEST_EXPECT(m3_chip_get_selected(NULL, &handled), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_chip_get_selected(NULL, &handled),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_get_selected(&chip, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_chip_get_selected(&chip, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
@@ -851,20 +857,21 @@ static int test_chip_widget(void) {
   CMP_TEST_ASSERT(handled == CMP_TRUE);
 
   CMP_TEST_EXPECT(m3_chip_set_show_delete(NULL, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_set_show_delete(&chip, 2), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_chip_set_show_delete(&chip, CMP_TRUE));
   CMP_TEST_EXPECT(m3_chip_get_show_delete(NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_chip_get_show_delete(&chip, NULL), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_chip_get_show_delete(&chip, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_chip_get_show_delete(&chip, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
 
   CMP_TEST_EXPECT(m3_chip_set_on_click(NULL, test_chip_on_click, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_chip_set_on_click(&chip, test_chip_on_click, NULL));
   CMP_TEST_EXPECT(m3_chip_set_on_delete(NULL, test_chip_on_delete, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_chip_set_on_delete(&chip, test_chip_on_delete, NULL));
 
   width_spec.mode = 999u;
@@ -872,21 +879,21 @@ static int test_chip_widget(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(chip.widget.vtable->measure(chip.widget.ctx, width_spec,
-                                             height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                              height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = -1.0f;
   CMP_TEST_EXPECT(chip.widget.vtable->measure(chip.widget.ctx, width_spec,
-                                             height_spec, &size),
-                 CMP_ERR_RANGE);
+                                              height_spec, &size),
+                  CMP_ERR_RANGE);
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(chip.widget.vtable->measure(chip.widget.ctx, width_spec,
-                                         height_spec, &size));
+                                          height_spec, &size));
   expected_width = (CMPScalar)(chip.utf8_len * 10u) +
                    chip.style.dense_layout.padding_x * 2.0f +
                    chip.style.dense_layout.icon_gap +
@@ -914,7 +921,7 @@ static int test_chip_widget(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(chip.widget.vtable->measure(chip.widget.ctx, width_spec,
-                                         height_spec, &size));
+                                          height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 20.0f, 0.01f));
   CMP_TEST_ASSERT(size.height >= chip.style.dense_layout.icon_size);
   chip.style.dense_layout = dense_backup;
@@ -924,7 +931,7 @@ static int test_chip_widget(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 20.0f;
   CMP_TEST_OK(chip.widget.vtable->measure(chip.widget.ctx, width_spec,
-                                         height_spec, &size));
+                                          height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 50.0f, 0.01f));
   CMP_TEST_ASSERT(size.height <= 20.0f + 0.01f);
 
@@ -933,31 +940,31 @@ static int test_chip_widget(void) {
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(chip.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(chip.widget.vtable->layout(chip.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bounds.width = 120.0f;
   bounds.height = 32.0f;
   CMP_TEST_OK(chip.widget.vtable->layout(chip.widget.ctx, bounds));
 
   CMP_TEST_EXPECT(chip.widget.vtable->paint(NULL, &ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(chip.widget.vtable->paint(chip.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(chip.widget.vtable->paint(chip.widget.ctx, &ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_gfx_vtable;
 
   gfx.vtable = &g_test_gfx_vtable_no_rect;
   CMP_TEST_EXPECT(chip.widget.vtable->paint(chip.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_gfx_vtable;
 
   gfx.text_vtable = NULL;
   CMP_TEST_EXPECT(chip.widget.vtable->paint(chip.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable;
 
   chip.metrics_valid = CMP_FALSE;
@@ -975,12 +982,12 @@ static int test_chip_widget(void) {
 
   CMP_TEST_OK(m3_chip_test_set_fail_point(M3_CHIP_TEST_FAIL_OUTLINE_WIDTH));
   CMP_TEST_EXPECT(chip.widget.vtable->paint(chip.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
 
   chip.style.outline_width = 100.0f;
   CMP_TEST_EXPECT(chip.widget.vtable->paint(chip.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   chip.style.outline_width = other_style.outline_width;
 
   chip.style.outline_width = 0.0f;
@@ -997,7 +1004,7 @@ static int test_chip_widget(void) {
 
   gfx.vtable = &g_test_gfx_vtable_no_line;
   CMP_TEST_EXPECT(chip.widget.vtable->paint(chip.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_gfx_vtable;
 
   backend.fail_draw_line = 1;
@@ -1007,10 +1014,10 @@ static int test_chip_widget(void) {
   chip.ripple.state = CMP_RIPPLE_STATE_EXPANDING;
   gfx.vtable = &g_test_gfx_vtable_no_clip;
   CMP_TEST_EXPECT(chip.widget.vtable->paint(chip.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_gfx_vtable;
   CMP_TEST_OK(cmp_ripple_start(&chip.ripple, 5.0f, 5.0f, 12.0f, 0.1f,
-                             chip.style.ripple_color));
+                               chip.style.ripple_color));
   CMP_TEST_OK(chip.widget.vtable->paint(chip.widget.ctx, &ctx));
   chip.ripple.state = CMP_RIPPLE_STATE_IDLE;
 
@@ -1022,57 +1029,57 @@ static int test_chip_widget(void) {
   chip.utf8_label = NULL;
   chip.utf8_len = 1;
   CMP_TEST_EXPECT(chip.widget.vtable->paint(chip.widget.ctx, &ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_chip_set_label(&chip, "Chip", 4));
 
   CMP_TEST_EXPECT(chip.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 5, 6));
   CMP_TEST_OK(chip.widget.vtable->event(chip.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
 
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
 
   chip.pressed = CMP_FALSE;
   chip.style.ripple_expand_duration = -1.0f;
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   chip.style.ripple_expand_duration = other_style.ripple_expand_duration;
 
   chip.style.ripple_color.r = -1.0f;
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   chip.style.ripple_color = other_style.ripple_color;
 
   chip.bounds.width = -1.0f;
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   chip.bounds.width = 120.0f;
 
   chip.style.dense_layout.icon_size = 0.0f;
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   chip.style.dense_layout.icon_size = other_style.dense_layout.icon_size;
 
   CMP_TEST_OK(m3_chip_test_set_fail_point(M3_CHIP_TEST_FAIL_DELETE_BOUNDS));
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
 
   CMP_TEST_OK(m3_chip_test_set_fail_point(M3_CHIP_TEST_FAIL_RIPPLE_RADIUS));
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
 
   CMP_TEST_OK(m3_chip_test_set_fail_point(M3_CHIP_TEST_FAIL_RIPPLE_START));
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 5, 6));
@@ -1083,13 +1090,13 @@ static int test_chip_widget(void) {
   chip.pressed = CMP_TRUE;
   chip.style.ripple_fade_duration = -1.0f;
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   chip.style.ripple_fade_duration = other_style.ripple_fade_duration;
   chip.pressed = CMP_TRUE;
 
   CMP_TEST_OK(m3_chip_test_set_fail_point(M3_CHIP_TEST_FAIL_RIPPLE_RELEASE));
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
   chip.pressed = CMP_TRUE;
 
@@ -1103,7 +1110,7 @@ static int test_chip_widget(void) {
   chip.pressed = CMP_TRUE;
   clicks.fail = 1;
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   clicks.fail = 0;
 
   chip.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
@@ -1118,12 +1125,12 @@ static int test_chip_widget(void) {
   deletes.fail = 0;
   CMP_TEST_OK(m3_chip_set_on_delete(&chip, test_chip_on_delete, &deletes));
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN,
-                                (cmp_i32)(delete_bounds.x + 1.0f),
-                                (cmp_i32)(delete_bounds.y + 1.0f)));
+                                 (cmp_i32)(delete_bounds.x + 1.0f),
+                                 (cmp_i32)(delete_bounds.y + 1.0f)));
   CMP_TEST_OK(chip.widget.vtable->event(chip.widget.ctx, &event, &handled));
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP,
-                                (cmp_i32)(delete_bounds.x + 1.0f),
-                                (cmp_i32)(delete_bounds.y + 1.0f)));
+                                 (cmp_i32)(delete_bounds.x + 1.0f),
+                                 (cmp_i32)(delete_bounds.y + 1.0f)));
   CMP_TEST_OK(chip.widget.vtable->event(chip.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(deletes.calls == 1);
   deletes.fail = 1;
@@ -1131,7 +1138,7 @@ static int test_chip_widget(void) {
   chip.pressed_delete = CMP_TRUE;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 5, 6));
   CMP_TEST_EXPECT(chip.widget.vtable->event(chip.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   deletes.fail = 0;
 
   chip.style.variant = M3_CHIP_VARIANT_FILTER;
@@ -1152,21 +1159,21 @@ static int test_chip_widget(void) {
   chip.widget.flags &= ~(CMP_WIDGET_FLAG_DISABLED | CMP_WIDGET_FLAG_FOCUSABLE);
 
   CMP_TEST_EXPECT(chip.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(chip.widget.vtable->get_semantics(chip.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(chip.widget.vtable->destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_chip_init(&destroy_chip, &text_backend, &style, "OK", 2));
   backend.fail_destroy = 1;
   CMP_TEST_EXPECT(destroy_chip.widget.vtable->destroy(destroy_chip.widget.ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_destroy = 0;
 
   CMP_TEST_OK(m3_chip_init(&destroy_chip, &text_backend, &style, "OK", 2));
   destroy_chip.text_backend.vtable = NULL;
   CMP_TEST_EXPECT(destroy_chip.widget.vtable->destroy(destroy_chip.widget.ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   return 0;
 }

@@ -19,31 +19,30 @@ int CMP_CALL m3_app_bar_test_set_color_error_after(cmp_u32 call_count);
 int CMP_CALL m3_app_bar_test_set_collapse_fail(CMPBool enable);
 int CMP_CALL m3_app_bar_test_call_color_should_fail(CMPBool *out_fail);
 int CMP_CALL m3_app_bar_test_call_fail_point_match(cmp_u32 point,
-                                                  CMPBool *out_match);
+                                                   CMPBool *out_match);
 int CMP_CALL m3_app_bar_test_validate_color(const CMPColor *color);
-int CMP_CALL m3_app_bar_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                      CMPScalar b, CMPScalar a);
+int CMP_CALL m3_app_bar_test_color_set(CMPColor *color, CMPScalar r,
+                                       CMPScalar g, CMPScalar b, CMPScalar a);
 int CMP_CALL m3_app_bar_test_validate_edges(const CMPLayoutEdges *edges);
 int CMP_CALL m3_app_bar_test_validate_text_style(const CMPTextStyle *style,
-                                                CMPBool require_family);
+                                                 CMPBool require_family);
 int CMP_CALL m3_app_bar_test_validate_style(const M3AppBarStyle *style,
-                                           CMPBool require_family);
+                                            CMPBool require_family);
 int CMP_CALL m3_app_bar_test_validate_measure_spec(CMPMeasureSpec spec);
 int CMP_CALL m3_app_bar_test_validate_rect(const CMPRect *rect);
 int CMP_CALL m3_app_bar_test_compute_collapse_range(const M3AppBarStyle *style,
-                                                   CMPScalar *out_range);
+                                                    CMPScalar *out_range);
 int CMP_CALL m3_app_bar_test_compute_current_height(const M3AppBar *bar,
-                                                   CMPScalar *out_height);
+                                                    CMPScalar *out_height);
 int CMP_CALL m3_app_bar_test_compute_content_bounds(const M3AppBar *bar,
-                                                   CMPRect *out_bounds);
-int CMP_CALL m3_app_bar_test_compute_title_position(const M3AppBar *bar,
-                                                   const CMPTextMetrics *metrics,
-                                                   CMPScalar *out_x,
-                                                   CMPScalar *out_y);
+                                                    CMPRect *out_bounds);
+int CMP_CALL m3_app_bar_test_compute_title_position(
+    const M3AppBar *bar, const CMPTextMetrics *metrics, CMPScalar *out_x,
+    CMPScalar *out_y);
 int CMP_CALL m3_app_bar_test_measure_title(const M3AppBar *bar,
-                                          CMPTextMetrics *out_metrics);
+                                           CMPTextMetrics *out_metrics);
 int CMP_CALL m3_app_bar_test_apply_scroll(M3AppBar *bar, CMPScalar delta,
-                                         CMPScalar *out_consumed);
+                                          CMPScalar *out_consumed);
 
 typedef struct TestAppBarBackend {
   int create_calls;
@@ -75,8 +74,8 @@ static int test_backend_init(TestAppBarBackend *backend) {
 }
 
 static int test_text_create_font(void *text, const char *utf8_family,
-                                 cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
-                                 CMPHandle *out_font) {
+                                 cmp_i32 size_px, cmp_i32 weight,
+                                 CMPBool italic, CMPHandle *out_font) {
   TestAppBarBackend *backend;
 
   if (text == NULL || utf8_family == NULL || out_font == NULL) {
@@ -221,18 +220,18 @@ static const CMPTextVTable g_test_text_vtable_no_draw = {
     NULL};
 
 static const CMPGfxVTable g_test_gfx_vtable = {NULL,
-                                              NULL,
-                                              NULL,
-                                              test_gfx_draw_rect,
-                                              NULL,
-                                              NULL,
-                                              test_gfx_push_clip,
-                                              test_gfx_pop_clip,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL};
+                                               NULL,
+                                               NULL,
+                                               test_gfx_draw_rect,
+                                               NULL,
+                                               NULL,
+                                               test_gfx_push_clip,
+                                               test_gfx_pop_clip,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL};
 
 static const CMPGfxVTable g_test_gfx_vtable_no_rect = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -281,10 +280,12 @@ static int test_app_bar_helpers(void) {
   CMPScalar pos_y;
 
   CMP_TEST_EXPECT(m3_app_bar_test_validate_style(NULL, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_app_bar_test_validate_rect(NULL), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_app_bar_test_validate_rect(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
-  CMP_TEST_EXPECT(m3_app_bar_test_validate_color(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_app_bar_test_validate_color(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   color.r = -0.1f;
   color.g = 0.0f;
@@ -308,20 +309,20 @@ static int test_app_bar_helpers(void) {
   CMP_TEST_OK(m3_app_bar_test_validate_color(&color));
 
   CMP_TEST_EXPECT(m3_app_bar_test_color_set(NULL, 0.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_test_color_set(&color, -0.1f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_app_bar_test_color_set(&color, 0.0f, -0.1f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_app_bar_test_color_set(&color, 0.0f, 0.0f, -0.1f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_app_bar_test_color_set(&color, 0.0f, 0.0f, 0.0f, -0.1f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_app_bar_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f));
 
 #ifdef CMP_TESTING
   CMP_TEST_EXPECT(m3_app_bar_test_call_color_should_fail(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       m3_app_bar_test_call_fail_point_match(M3_APP_BAR_TEST_FAIL_NONE, NULL),
       CMP_ERR_INVALID_ARGUMENT);
@@ -332,16 +333,17 @@ static int test_app_bar_helpers(void) {
 
   CMP_TEST_OK(m3_app_bar_test_set_color_error_after(1));
   CMP_TEST_EXPECT(m3_app_bar_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_app_bar_test_clear_fail_points());
 
   CMP_TEST_OK(m3_app_bar_test_set_color_fail_after(1));
   CMP_TEST_EXPECT(m3_app_bar_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_app_bar_test_clear_fail_points());
 #endif
 
-  CMP_TEST_EXPECT(m3_app_bar_test_validate_edges(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_app_bar_test_validate_edges(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   edges.left = -1.0f;
   edges.right = 0.0f;
   edges.top = 0.0f;
@@ -360,7 +362,7 @@ static int test_app_bar_helpers(void) {
   CMP_TEST_OK(m3_app_bar_test_validate_edges(&edges));
 
   CMP_TEST_EXPECT(m3_app_bar_test_validate_text_style(NULL, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   memset(&text_style, 0, sizeof(text_style));
   text_style.utf8_family = NULL;
   text_style.size_px = 12;
@@ -368,24 +370,24 @@ static int test_app_bar_helpers(void) {
   text_style.italic = CMP_FALSE;
   text_style.color = color;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   text_style.utf8_family = "Test";
   text_style.size_px = 0;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.size_px = 12;
   text_style.weight = 99;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.weight = 400;
   text_style.italic = 2;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.italic = CMP_FALSE;
   text_style.color.r = -0.1f;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_text_style(&text_style, CMP_TRUE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   text_style.color.r = 0.1f;
   CMP_TEST_OK(m3_app_bar_test_validate_text_style(&text_style, CMP_TRUE));
 
@@ -393,44 +395,44 @@ static int test_app_bar_helpers(void) {
   CMP_TEST_OK(m3_app_bar_test_validate_style(&style, CMP_FALSE));
   style.variant = 99u;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_style(&style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.variant = M3_APP_BAR_VARIANT_SMALL;
   style.collapsed_height = -1.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_style(&style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.collapsed_height = M3_APP_BAR_DEFAULT_SMALL_HEIGHT;
   style.expanded_height = 0.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_style(&style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.expanded_height = style.collapsed_height - 1.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_style(&style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.expanded_height = M3_APP_BAR_DEFAULT_SMALL_HEIGHT;
   style.padding.top = -1.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_style(&style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.padding.top = M3_APP_BAR_DEFAULT_PADDING_Y;
   style.padding.bottom = style.collapsed_height;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_style(&style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.padding.bottom = M3_APP_BAR_DEFAULT_PADDING_Y;
   style.shadow_enabled = 2;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_style(&style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.shadow_enabled = CMP_FALSE;
   style.background_color.r = -0.1f;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_style(&style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.background_color.r = 0.1f;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_style(&style, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   style.title_style.utf8_family = "Test";
   CMP_TEST_OK(m3_app_bar_test_validate_style(&style, CMP_TRUE));
 
   spec.mode = 99u;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_EXACTLY;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_validate_measure_spec(spec), CMP_ERR_RANGE);
@@ -447,22 +449,22 @@ static int test_app_bar_helpers(void) {
   CMP_TEST_OK(m3_app_bar_test_validate_rect(&rect));
 
   CMP_TEST_EXPECT(m3_app_bar_test_compute_collapse_range(NULL, &height),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   memset(&bar, 0, sizeof(bar));
   bar.style = style;
   bar.collapse_offset = -1.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_compute_current_height(NULL, &height),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_test_compute_current_height(&bar, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_test_compute_current_height(&bar, &height),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bar.style.expanded_height = 10.0f;
   bar.style.collapsed_height = 20.0f;
   bar.collapse_offset = 0.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_compute_current_height(&bar, &height),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bar.style = style;
   bar.collapse_offset = 0.0f;
   CMP_TEST_OK(m3_app_bar_test_compute_current_height(&bar, &height));
@@ -470,7 +472,7 @@ static int test_app_bar_helpers(void) {
   bar.style.expanded_height = -1.0f;
   bar.collapse_offset = 0.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_compute_current_height(&bar, &height),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bar.style = style;
 
   bar.bounds.x = 0.0f;
@@ -482,9 +484,9 @@ static int test_app_bar_helpers(void) {
   bar.style.padding.top = 10.0f;
   bar.style.padding.bottom = 10.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_compute_content_bounds(NULL, &content),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_test_compute_content_bounds(&bar, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_app_bar_test_compute_content_bounds(&bar, &content));
   CMP_TEST_ASSERT(cmp_near(content.width, 180.0f, 0.001f));
   CMP_TEST_ASSERT(
@@ -493,11 +495,11 @@ static int test_app_bar_helpers(void) {
   bar.style.collapsed_height = 20.0f;
   bar.collapse_offset = 0.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_compute_content_bounds(&bar, &content),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bar.style = style;
   bar.bounds.width = 5.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_compute_content_bounds(&bar, &content),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   metrics.width = 20.0f;
   metrics.height = 10.0f;
@@ -520,7 +522,8 @@ static int test_app_bar_helpers(void) {
   bar.style.variant = M3_APP_BAR_VARIANT_SMALL;
   CMP_TEST_OK(
       m3_app_bar_test_compute_title_position(&bar, &metrics, &pos_x, &pos_y));
-  CMP_TEST_ASSERT(cmp_near(pos_x, bar.bounds.x + bar.style.padding.left, 0.001f));
+  CMP_TEST_ASSERT(
+      cmp_near(pos_x, bar.bounds.x + bar.style.padding.left, 0.001f));
 
   bar.style.variant = M3_APP_BAR_VARIANT_MEDIUM;
   bar.style.expanded_height = 112.0f;
@@ -575,9 +578,9 @@ static int test_app_bar_helpers(void) {
   bar.style.collapsed_height = 64.0f;
   bar.collapse_offset = 20.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_measure_title(NULL, &metrics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_test_measure_title(&bar, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_app_bar_test_measure_title(&bar, &metrics));
   CMP_TEST_OK(m3_app_bar_test_apply_scroll(&bar, 0.0f, &height));
   CMP_TEST_ASSERT(cmp_near(height, 0.0f, 0.001f));
@@ -589,17 +592,17 @@ static int test_app_bar_helpers(void) {
   CMP_TEST_OK(m3_app_bar_test_apply_scroll(&bar, -10.0f, &height));
   CMP_TEST_ASSERT(cmp_near(height, -5.0f, 0.001f));
   CMP_TEST_EXPECT(m3_app_bar_test_apply_scroll(NULL, 1.0f, &height),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_test_apply_scroll(&bar, 1.0f, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bar.collapse_offset = 1000.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_apply_scroll(&bar, 1.0f, &height),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bar.style.expanded_height = 10.0f;
   bar.style.collapsed_height = 20.0f;
   bar.collapse_offset = 0.0f;
   CMP_TEST_EXPECT(m3_app_bar_test_apply_scroll(&bar, 1.0f, &height),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   return 0;
 }
@@ -611,18 +614,21 @@ static int test_app_bar_style_init(void) {
 
 #ifdef CMP_TESTING
   CMP_TEST_OK(m3_app_bar_test_set_match_fail_after(1));
-  CMP_TEST_EXPECT(m3_app_bar_style_init_small(&style), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_app_bar_style_init_small(&style),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_app_bar_test_set_match_fail_after(2));
-  CMP_TEST_EXPECT(m3_app_bar_style_init_small(&style), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_app_bar_style_init_small(&style),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_app_bar_test_set_match_fail_after(3));
-  CMP_TEST_EXPECT(m3_app_bar_style_init_small(&style), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_app_bar_style_init_small(&style),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_app_bar_test_clear_fail_points());
 #endif
 
   CMP_TEST_OK(m3_app_bar_style_init_small(&style));
   CMP_TEST_ASSERT(style.variant == M3_APP_BAR_VARIANT_SMALL);
-  CMP_TEST_ASSERT(
-      cmp_near(style.collapsed_height, M3_APP_BAR_DEFAULT_SMALL_HEIGHT, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(style.collapsed_height,
+                           M3_APP_BAR_DEFAULT_SMALL_HEIGHT, 0.001f));
   CMP_TEST_ASSERT(
       cmp_near(style.expanded_height, M3_APP_BAR_DEFAULT_SMALL_HEIGHT, 0.001f));
 
@@ -631,8 +637,8 @@ static int test_app_bar_style_init(void) {
 
   CMP_TEST_OK(m3_app_bar_style_init_medium(&style));
   CMP_TEST_ASSERT(style.variant == M3_APP_BAR_VARIANT_MEDIUM);
-  CMP_TEST_ASSERT(
-      cmp_near(style.expanded_height, M3_APP_BAR_DEFAULT_MEDIUM_HEIGHT, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(style.expanded_height,
+                           M3_APP_BAR_DEFAULT_MEDIUM_HEIGHT, 0.001f));
 
   CMP_TEST_OK(m3_app_bar_style_init_large(&style));
   CMP_TEST_ASSERT(style.variant == M3_APP_BAR_VARIANT_LARGE);
@@ -676,46 +682,49 @@ static int test_app_bar_init_and_setters(void) {
   CMP_TEST_OK(init_style(&style));
   style.title_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, NULL, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   style.title_style.utf8_family = "Test";
 
   backend.vtable = NULL;
   CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, "Test", 4),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   backend.vtable = &g_test_text_vtable;
 
   backend.vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, "Test", 4),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   backend.vtable = &g_test_text_vtable;
 
   CMP_TEST_EXPECT(m3_app_bar_init(NULL, &backend, &style, NULL, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_init(&bar, NULL, &style, NULL, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, NULL, NULL, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, NULL, 4),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   backend_state.fail_create = 1;
-  CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, "Test", 4), CMP_ERR_IO);
+  CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, "Test", 4),
+                  CMP_ERR_IO);
   backend_state.fail_create = 0;
 
 #ifdef CMP_TESTING
   CMP_TEST_OK(m3_app_bar_test_set_fail_point(M3_APP_BAR_TEST_FAIL_SCROLL_INIT));
-  CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, "Test", 4), CMP_ERR_IO);
+  CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, "Test", 4),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_app_bar_test_clear_fail_points());
 
   backend_state.fail_destroy = 1;
   CMP_TEST_OK(m3_app_bar_test_set_fail_point(M3_APP_BAR_TEST_FAIL_SCROLL_INIT));
-  CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, "Test", 4), CMP_ERR_IO);
+  CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, "Test", 4),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_app_bar_test_clear_fail_points());
   backend_state.fail_destroy = 0;
 
   CMP_TEST_OK(m3_app_bar_test_set_match_fail_after(1));
   CMP_TEST_EXPECT(m3_app_bar_init(&bar, &backend, &style, "Test", 4),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_app_bar_test_clear_fail_points());
 #endif
 
@@ -723,8 +732,10 @@ static int test_app_bar_init_and_setters(void) {
   CMP_TEST_ASSERT(bar.widget.vtable != NULL);
   CMP_TEST_ASSERT(bar.scroll_parent.vtable != NULL);
 
-  CMP_TEST_EXPECT(m3_app_bar_set_title(NULL, NULL, 0), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_app_bar_set_title(&bar, NULL, 1), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_app_bar_set_title(NULL, NULL, 0),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_app_bar_set_title(&bar, NULL, 1),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_app_bar_set_title(&bar, NULL, 0));
   CMP_TEST_OK(m3_app_bar_set_title(&bar, "New", 3));
 
@@ -734,7 +745,7 @@ static int test_app_bar_init_and_setters(void) {
   new_style = style;
   new_style.title_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_app_bar_set_style(&bar, &new_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   new_style.title_style.utf8_family = "Test";
   new_style.title_style.size_px = 24;
   backend_state.fail_create = 1;
@@ -753,12 +764,12 @@ static int test_app_bar_init_and_setters(void) {
   CMP_TEST_OK(m3_app_bar_set_style(&bar, &new_style));
 
   CMP_TEST_EXPECT(m3_app_bar_set_collapse_offset(NULL, 0.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_set_collapse_offset(&bar, -1.0f), CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_app_bar_set_collapse_offset(&bar, 1.0f), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_app_bar_set_collapse_offset(&bar, 0.0f));
   CMP_TEST_EXPECT(m3_app_bar_get_collapse_offset(&bar, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_app_bar_get_collapse_offset(&bar, &offset));
   CMP_TEST_ASSERT(cmp_near(offset, 0.0f, 0.001f));
 
@@ -808,20 +819,20 @@ static int test_app_bar_scroll(void) {
 
   delta.x = 0.0f;
   delta.y = 20.0f;
-  CMP_TEST_OK(bar.scroll_parent.vtable->pre_scroll(bar.scroll_parent.ctx, &delta,
-                                                  &consumed));
+  CMP_TEST_OK(bar.scroll_parent.vtable->pre_scroll(bar.scroll_parent.ctx,
+                                                   &delta, &consumed));
   CMP_TEST_ASSERT(cmp_near(consumed.y, 20.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(bar.collapse_offset, 20.0f, 0.001f));
 
   delta.y = 40.0f;
-  CMP_TEST_OK(bar.scroll_parent.vtable->pre_scroll(bar.scroll_parent.ctx, &delta,
-                                                  &consumed));
+  CMP_TEST_OK(bar.scroll_parent.vtable->pre_scroll(bar.scroll_parent.ctx,
+                                                   &delta, &consumed));
   CMP_TEST_ASSERT(cmp_near(consumed.y, 28.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(bar.collapse_offset, 48.0f, 0.001f));
 
   delta.y = -5.0f;
-  CMP_TEST_OK(bar.scroll_parent.vtable->pre_scroll(bar.scroll_parent.ctx, &delta,
-                                                  &consumed));
+  CMP_TEST_OK(bar.scroll_parent.vtable->pre_scroll(bar.scroll_parent.ctx,
+                                                   &delta, &consumed));
   CMP_TEST_ASSERT(cmp_near(consumed.y, 0.0f, 0.001f));
 
   delta.y = -10.0f;
@@ -838,25 +849,26 @@ static int test_app_bar_scroll(void) {
   CMP_TEST_ASSERT(cmp_near(consumed.y, 0.0f, 0.001f));
 
   CMP_TEST_EXPECT(bar.scroll_parent.vtable->pre_scroll(NULL, &delta, &consumed),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(bar.scroll_parent.vtable->post_scroll(
-                     bar.scroll_parent.ctx, NULL, &child_consumed, &consumed),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      bar.scroll_parent.ctx, NULL, &child_consumed, &consumed),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bar.style.expanded_height = 10.0f;
   bar.style.collapsed_height = 20.0f;
   delta.y = -5.0f;
-  CMP_TEST_EXPECT(bar.scroll_parent.vtable->post_scroll(
-                     bar.scroll_parent.ctx, &delta, &child_consumed, &consumed),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(bar.scroll_parent.vtable->post_scroll(bar.scroll_parent.ctx,
+                                                        &delta, &child_consumed,
+                                                        &consumed),
+                  CMP_ERR_RANGE);
   bar.style.expanded_height = style.expanded_height;
   bar.style.collapsed_height = style.collapsed_height;
 
   bar.collapse_offset = -1.0f;
   delta.y = 5.0f;
   CMP_TEST_EXPECT(bar.scroll_parent.vtable->pre_scroll(bar.scroll_parent.ctx,
-                                                      &delta, &consumed),
-                 CMP_ERR_RANGE);
+                                                       &delta, &consumed),
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(bar.widget.vtable->destroy(&bar));
   return 0;
@@ -898,9 +910,9 @@ static int test_app_bar_widget(void) {
   spec.mode = CMP_MEASURE_UNSPECIFIED;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(bar.widget.vtable->measure(NULL, spec, spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(bar.widget.vtable->measure(&bar, spec, spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(bar.widget.vtable->measure(&bar, spec, spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.height, bar.style.expanded_height, 0.001f));
   CMP_TEST_ASSERT(cmp_near(
@@ -922,41 +934,41 @@ static int test_app_bar_widget(void) {
   spec.mode = 99u;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(bar.widget.vtable->measure(&bar, spec, spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_EXACTLY;
   spec.size = 10.0f;
   {
     CMPMeasureSpec bad_spec = spec;
     bad_spec.mode = 99u;
     CMP_TEST_EXPECT(bar.widget.vtable->measure(&bar, spec, bad_spec, &size),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   spec.mode = CMP_MEASURE_EXACTLY;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(bar.widget.vtable->measure(&bar, spec, spec, &size),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bar.collapse_offset =
       (bar.style.expanded_height - bar.style.collapsed_height) + 1.0f;
   spec.mode = CMP_MEASURE_UNSPECIFIED;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(bar.widget.vtable->measure(&bar, spec, spec, &size),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bar.collapse_offset = 0.0f;
 
   bar.style.collapsed_height = -1.0f;
   spec.mode = CMP_MEASURE_UNSPECIFIED;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(bar.widget.vtable->measure(&bar, spec, spec, &size),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bar.style.collapsed_height = style.collapsed_height;
 
   backend_state.fail_measure = 1;
   spec.mode = CMP_MEASURE_UNSPECIFIED;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(bar.widget.vtable->measure(&bar, spec, spec, &size),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend_state.fail_measure = 0;
 
   bounds.x = 0.0f;
@@ -965,32 +977,36 @@ static int test_app_bar_widget(void) {
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(bar.widget.vtable->layout(&bar, bounds), CMP_ERR_RANGE);
   CMP_TEST_EXPECT(bar.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bounds.width = 200.0f;
   bounds.height = 100.0f;
   CMP_TEST_OK(bar.widget.vtable->layout(&bar, bounds));
 
   CMP_TEST_EXPECT(m3_app_bar_get_height(NULL, &size.height),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_get_height(&bar, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_app_bar_get_height(&bar, &size.height));
 
   CMP_TEST_EXPECT(m3_app_bar_get_content_bounds(NULL, &bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_app_bar_get_content_bounds(&bar, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_app_bar_get_content_bounds(&bar, &bounds));
 
-  CMP_TEST_EXPECT(bar.widget.vtable->paint(NULL, &ctx), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(bar.widget.vtable->paint(&bar, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(bar.widget.vtable->paint(NULL, &ctx),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(bar.widget.vtable->paint(&bar, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   ctx.gfx = NULL;
-  CMP_TEST_EXPECT(bar.widget.vtable->paint(&bar, &ctx), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(bar.widget.vtable->paint(&bar, &ctx),
+                  CMP_ERR_INVALID_ARGUMENT);
   ctx.gfx = &gfx;
 
   gfx.vtable = NULL;
-  CMP_TEST_EXPECT(bar.widget.vtable->paint(&bar, &ctx), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(bar.widget.vtable->paint(&bar, &ctx),
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_gfx_vtable;
 
   bar.style.collapsed_height = 0.0f;
@@ -1051,15 +1067,15 @@ static int test_app_bar_widget(void) {
   CMP_TEST_ASSERT(backend_state.draw_calls > 0);
 
   CMP_TEST_EXPECT(bar.widget.vtable->event(NULL, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   memset(&event, 0, sizeof(event));
   CMP_TEST_OK(bar.widget.vtable->event(&bar, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
 
   CMP_TEST_EXPECT(bar.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(bar.widget.vtable->get_semantics(&bar, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bar.widget.flags = CMP_WIDGET_FLAG_DISABLED | CMP_WIDGET_FLAG_FOCUSABLE;
   CMP_TEST_OK(bar.widget.vtable->get_semantics(&bar, &semantics));
   CMP_TEST_ASSERT(semantics.flags & CMP_SEMANTIC_FLAG_DISABLED);

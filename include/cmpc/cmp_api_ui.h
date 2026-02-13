@@ -76,8 +76,8 @@ typedef struct CMPPaintContext {
  * @brief Accessibility semantics description.
  */
 typedef struct CMPSemantics {
-  cmp_u32 role;            /**< Semantic role (CMP_SEMANTIC_*). */
-  cmp_u32 flags;           /**< Semantic flags (CMP_SEMANTIC_FLAG_*). */
+  cmp_u32 role;           /**< Semantic role (CMP_SEMANTIC_*). */
+  cmp_u32 flags;          /**< Semantic flags (CMP_SEMANTIC_FLAG_*). */
   const char *utf8_label; /**< Primary label text in UTF-8. */
   const char *utf8_hint;  /**< Hint text in UTF-8. */
   const char *utf8_value; /**< Value text in UTF-8. */
@@ -87,84 +87,84 @@ typedef struct CMPSemantics {
  * @brief Widget virtual table.
  */
 typedef struct CMPWidgetVTable {
-  /**
-   * @brief Measure the widget.
-   * @param widget Widget instance.
-   * @param width Width measurement constraint.
-   * @param height Height measurement constraint.
-   * @param out_size Receives the desired size.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+/**
+ * @brief Measure the widget.
+ * @param widget Widget instance.
+ * @param width Width measurement constraint.
+ * @param height Height measurement constraint.
+ * @param out_size Receives the desired size.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int measure(void *widget, CMPMeasureSpec width, CMPMeasureSpec height,
               CMPSize *out_size);
-  #else
+#else
   int(CMP_CALL *measure)(void *widget, CMPMeasureSpec width,
                          CMPMeasureSpec height, CMPSize *out_size);
-  #endif
-  /**
-   * @brief Layout the widget within bounds.
-   * @param widget Widget instance.
-   * @param bounds Assigned bounds in pixels.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Layout the widget within bounds.
+ * @param widget Widget instance.
+ * @param bounds Assigned bounds in pixels.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int layout(void *widget, CMPRect bounds);
-  #else
+#else
   int(CMP_CALL *layout)(void *widget, CMPRect bounds);
-  #endif
-  /**
-   * @brief Paint the widget contents.
-   * @param widget Widget instance.
-   * @param ctx Painting context.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Paint the widget contents.
+ * @param widget Widget instance.
+ * @param ctx Painting context.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int paint(void *widget, CMPPaintContext *ctx);
-  #else
+#else
   int(CMP_CALL *paint)(void *widget, CMPPaintContext *ctx);
-  #endif
-  /**
-   * @brief Handle an input event.
-   * @param widget Widget instance.
-   * @param event Input event.
-   * @param out_handled Receives CMP_TRUE if the event was handled.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Handle an input event.
+ * @param widget Widget instance.
+ * @param event Input event.
+ * @param out_handled Receives CMP_TRUE if the event was handled.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int event(void *widget, const CMPInputEvent *event, CMPBool *out_handled);
-  #else
+#else
   int(CMP_CALL *event)(void *widget, const CMPInputEvent *event,
                        CMPBool *out_handled);
-  #endif
-  /**
-   * @brief Retrieve accessibility semantics for the widget.
-   * @param widget Widget instance.
-   * @param out_semantics Receives semantics information.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Retrieve accessibility semantics for the widget.
+ * @param widget Widget instance.
+ * @param out_semantics Receives semantics information.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int get_semantics(void *widget, CMPSemantics *out_semantics);
-  #else
+#else
   int(CMP_CALL *get_semantics)(void *widget, CMPSemantics *out_semantics);
-  #endif
-  /**
-   * @brief Destroy the widget instance.
-   * @param widget Widget instance.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Destroy the widget instance.
+ * @param widget Widget instance.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int destroy(void *widget);
-  #else
+#else
   int(CMP_CALL *destroy)(void *widget);
-  #endif
+#endif
 } CMPWidgetVTable;
 
 /**
  * @brief Widget interface.
  */
 typedef struct CMPWidget {
-  void *ctx;                    /**< Widget implementation context. */
+  void *ctx;                     /**< Widget implementation context. */
   const CMPWidgetVTable *vtable; /**< Widget virtual table. */
   CMPHandle handle;              /**< Handle for the widget object. */
   cmp_u32 flags;                 /**< Widget flags (CMP_WIDGET_FLAG_*). */

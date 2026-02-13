@@ -55,7 +55,7 @@ CMP_API int CMP_CALL cmp_ios_backend_config_init(CMPIOSBackendConfig *config);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_ios_backend_create(const CMPIOSBackendConfig *config,
-                                         CMPIOSBackend **out_backend);
+                                            CMPIOSBackend **out_backend);
 
 /**
  * @brief Destroy an iOS backend instance.
@@ -70,7 +70,8 @@ CMP_API int CMP_CALL cmp_ios_backend_destroy(CMPIOSBackend *backend);
  * @param out_ws Receives the window system interface.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_ios_backend_get_ws(CMPIOSBackend *backend, CMPWS *out_ws);
+CMP_API int CMP_CALL cmp_ios_backend_get_ws(CMPIOSBackend *backend,
+                                            CMPWS *out_ws);
 
 /**
  * @brief Retrieve the graphics interface for the backend.
@@ -79,7 +80,7 @@ CMP_API int CMP_CALL cmp_ios_backend_get_ws(CMPIOSBackend *backend, CMPWS *out_w
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_ios_backend_get_gfx(CMPIOSBackend *backend,
-                                          CMPGfx *out_gfx);
+                                             CMPGfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -88,7 +89,7 @@ CMP_API int CMP_CALL cmp_ios_backend_get_gfx(CMPIOSBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_ios_backend_get_env(CMPIOSBackend *backend,
-                                          CMPEnv *out_env);
+                                             CMPEnv *out_env);
 
 /**
  * @brief Assign the predictive back controller for the backend.

@@ -65,8 +65,9 @@ typedef struct M3NavigationItem {
  * @param index Newly selected index.
  * @return CMP_OK on success or a failure code.
  */
-typedef int(CMP_CALL *CMPNavigationOnSelect)(void *ctx, struct M3Navigation *nav,
-                                           cmp_usize index);
+typedef int(CMP_CALL *CMPNavigationOnSelect)(void *ctx,
+                                             struct M3Navigation *nav,
+                                             cmp_usize index);
 
 /**
  * @brief Navigation style descriptor.
@@ -80,10 +81,10 @@ typedef struct M3NavigationStyle {
   CMPScalar item_min_width;      /**< Minimum item width in pixels (>= 0). */
   CMPScalar item_spacing;        /**< Spacing between items in pixels (>= 0). */
   CMPLayoutEdges padding;        /**< Padding around contents. */
-  CMPScalar indicator_thickness; /**< Selection indicator thickness in pixels (>=
-                                   0). */
-  CMPScalar indicator_corner;    /**< Selection indicator corner radius in pixels
+  CMPScalar indicator_thickness; /**< Selection indicator thickness in pixels
                                    (>= 0). */
+  CMPScalar indicator_corner; /**< Selection indicator corner radius in pixels
+                                (>= 0). */
   CMPScalar breakpoint_rail; /**< Width breakpoint for rail selection (>= 0). */
   CMPScalar
       breakpoint_drawer; /**< Width breakpoint for drawer selection (>= 0). */
@@ -99,17 +100,17 @@ typedef struct M3NavigationStyle {
  */
 typedef struct M3Navigation {
   CMPWidget widget; /**< Widget interface (points to this instance). */
-  CMPTextBackend text_backend;    /**< Text backend instance. */
-  CMPHandle font;                 /**< Font handle for labels. */
+  CMPTextBackend text_backend;   /**< Text backend instance. */
+  CMPHandle font;                /**< Font handle for labels. */
   M3NavigationStyle style;       /**< Current navigation style. */
   const M3NavigationItem *items; /**< Item list (not owned). */
-  cmp_usize item_count;           /**< Number of items. */
+  cmp_usize item_count;          /**< Number of items. */
   cmp_usize selected_index; /**< Selected item index or M3_NAV_INVALID_INDEX. */
   cmp_usize pressed_index;  /**< Pressed item index or M3_NAV_INVALID_INDEX. */
   cmp_u32 active_mode;      /**< Last resolved mode (CMP_NAV_MODE_*). */
   CMPRect bounds;           /**< Layout bounds. */
   CMPNavigationOnSelect on_select; /**< Selection callback (may be NULL). */
-  void *on_select_ctx;            /**< Selection callback context pointer. */
+  void *on_select_ctx;             /**< Selection callback context pointer. */
   CMPBool owns_font;               /**< CMP_TRUE when widget owns the font. */
 } M3Navigation;
 
@@ -131,11 +132,11 @@ CMP_API int CMP_CALL m3_navigation_style_init(M3NavigationStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_navigation_init(M3Navigation *nav,
-                                      const CMPTextBackend *backend,
-                                      const M3NavigationStyle *style,
-                                      const M3NavigationItem *items,
-                                      cmp_usize item_count,
-                                      cmp_usize selected_index);
+                                        const CMPTextBackend *backend,
+                                        const M3NavigationStyle *style,
+                                        const M3NavigationItem *items,
+                                        cmp_usize item_count,
+                                        cmp_usize selected_index);
 
 /**
  * @brief Replace the navigation items.
@@ -145,8 +146,8 @@ CMP_API int CMP_CALL m3_navigation_init(M3Navigation *nav,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_navigation_set_items(M3Navigation *nav,
-                                           const M3NavigationItem *items,
-                                           cmp_usize item_count);
+                                             const M3NavigationItem *items,
+                                             cmp_usize item_count);
 
 /**
  * @brief Update the navigation style.
@@ -155,7 +156,7 @@ CMP_API int CMP_CALL m3_navigation_set_items(M3Navigation *nav,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_navigation_set_style(M3Navigation *nav,
-                                           const M3NavigationStyle *style);
+                                             const M3NavigationStyle *style);
 
 /**
  * @brief Update the selected item.
@@ -164,7 +165,7 @@ CMP_API int CMP_CALL m3_navigation_set_style(M3Navigation *nav,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_navigation_set_selected(M3Navigation *nav,
-                                              cmp_usize selected_index);
+                                                cmp_usize selected_index);
 
 /**
  * @brief Retrieve the selected item index.
@@ -173,7 +174,7 @@ CMP_API int CMP_CALL m3_navigation_set_selected(M3Navigation *nav,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_navigation_get_selected(const M3Navigation *nav,
-                                              cmp_usize *out_selected);
+                                                cmp_usize *out_selected);
 
 /**
  * @brief Assign the selection callback.
@@ -182,9 +183,8 @@ CMP_API int CMP_CALL m3_navigation_get_selected(const M3Navigation *nav,
  * @param ctx Callback context pointer.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_navigation_set_on_select(M3Navigation *nav,
-                                               CMPNavigationOnSelect on_select,
-                                               void *ctx);
+CMP_API int CMP_CALL m3_navigation_set_on_select(
+    M3Navigation *nav, CMPNavigationOnSelect on_select, void *ctx);
 
 /**
  * @brief Resolve the currently active navigation mode.
@@ -193,7 +193,7 @@ CMP_API int CMP_CALL m3_navigation_set_on_select(M3Navigation *nav,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_navigation_get_mode(const M3Navigation *nav,
-                                          cmp_u32 *out_mode);
+                                            cmp_u32 *out_mode);
 
 #ifdef CMP_TESTING
 /**
@@ -243,7 +243,8 @@ CMP_API int CMP_CALL m3_navigation_test_validate_items(
  * @param spec Measure spec to validate.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_navigation_test_validate_measure_spec(CMPMeasureSpec spec);
+CMP_API int CMP_CALL
+m3_navigation_test_validate_measure_spec(CMPMeasureSpec spec);
 
 /**
  * @brief Test wrapper for rectangle validation.

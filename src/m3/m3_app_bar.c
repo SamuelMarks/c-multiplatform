@@ -259,8 +259,8 @@ static int m3_app_bar_validate_backend(const CMPTextBackend *backend) {
 }
 
 static int m3_app_bar_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -338,7 +338,7 @@ static int m3_app_bar_measure_title(const M3AppBar *bar,
   }
 
   return cmp_text_measure_utf8(&bar->text_backend, bar->title_font,
-                              bar->utf8_title, bar->title_len, out_metrics);
+                               bar->utf8_title, bar->title_len, out_metrics);
 }
 
 static int m3_app_bar_compute_content_bounds(const M3AppBar *bar,
@@ -416,7 +416,8 @@ static int m3_app_bar_apply_scroll(M3AppBar *bar, CMPScalar delta,
 
 static int m3_app_bar_compute_title_position(const M3AppBar *bar,
                                              const CMPTextMetrics *metrics,
-                                             CMPScalar *out_x, CMPScalar *out_y) {
+                                             CMPScalar *out_x,
+                                             CMPScalar *out_y) {
   CMPScalar content_width;
   CMPScalar collapsed_height;
   CMPScalar expanded_height;
@@ -879,8 +880,8 @@ int CMP_CALL m3_app_bar_style_init_large(M3AppBarStyle *style) {
 }
 
 int CMP_CALL m3_app_bar_init(M3AppBar *bar, const CMPTextBackend *backend,
-                            const M3AppBarStyle *style, const char *utf8_title,
-                            cmp_usize title_len) {
+                             const M3AppBarStyle *style, const char *utf8_title,
+                             cmp_usize title_len) {
   int rc;
 #ifdef CMP_TESTING
   CMPBool matched;
@@ -935,7 +936,7 @@ int CMP_CALL m3_app_bar_init(M3AppBar *bar, const CMPTextBackend *backend,
   bar->widget.flags = 0u;
 
   rc = cmp_scroll_parent_init(&bar->scroll_parent, bar,
-                             &g_m3_app_bar_scroll_vtable);
+                              &g_m3_app_bar_scroll_vtable);
 #ifdef CMP_TESTING
   if (rc == CMP_OK) {
     rc = m3_app_bar_test_fail_point_match(M3_APP_BAR_TEST_FAIL_SCROLL_INIT,
@@ -965,7 +966,7 @@ int CMP_CALL m3_app_bar_init(M3AppBar *bar, const CMPTextBackend *backend,
 }
 
 int CMP_CALL m3_app_bar_set_title(M3AppBar *bar, const char *utf8_title,
-                                 cmp_usize title_len) {
+                                  cmp_usize title_len) {
   int rc;
 
   if (bar == NULL) {
@@ -1048,7 +1049,7 @@ int CMP_CALL m3_app_bar_set_collapse_offset(M3AppBar *bar, CMPScalar offset) {
 }
 
 int CMP_CALL m3_app_bar_get_collapse_offset(const M3AppBar *bar,
-                                           CMPScalar *out_offset) {
+                                            CMPScalar *out_offset) {
   if (bar == NULL || out_offset == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1061,7 +1062,7 @@ int CMP_CALL m3_app_bar_get_height(const M3AppBar *bar, CMPScalar *out_height) {
 }
 
 int CMP_CALL m3_app_bar_get_content_bounds(const M3AppBar *bar,
-                                          CMPRect *out_bounds) {
+                                           CMPRect *out_bounds) {
   return m3_app_bar_compute_content_bounds(bar, out_bounds);
 }
 
@@ -1070,8 +1071,8 @@ int CMP_CALL m3_app_bar_test_validate_color(const CMPColor *color) {
   return m3_app_bar_validate_color(color);
 }
 
-int CMP_CALL m3_app_bar_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                      CMPScalar b, CMPScalar a) {
+int CMP_CALL m3_app_bar_test_color_set(CMPColor *color, CMPScalar r,
+                                       CMPScalar g, CMPScalar b, CMPScalar a) {
   return m3_app_bar_color_set(color, r, g, b, a);
 }
 
@@ -1080,12 +1081,12 @@ int CMP_CALL m3_app_bar_test_validate_edges(const CMPLayoutEdges *edges) {
 }
 
 int CMP_CALL m3_app_bar_test_validate_text_style(const CMPTextStyle *style,
-                                                CMPBool require_family) {
+                                                 CMPBool require_family) {
   return m3_app_bar_validate_text_style(style, require_family);
 }
 
 int CMP_CALL m3_app_bar_test_validate_style(const M3AppBarStyle *style,
-                                           CMPBool require_family) {
+                                            CMPBool require_family) {
   return m3_app_bar_validate_style(style, require_family);
 }
 
@@ -1094,7 +1095,7 @@ int CMP_CALL m3_app_bar_test_call_color_should_fail(CMPBool *out_fail) {
 }
 
 int CMP_CALL m3_app_bar_test_call_fail_point_match(cmp_u32 point,
-                                                  CMPBool *out_match) {
+                                                   CMPBool *out_match) {
   return m3_app_bar_test_fail_point_match(point, out_match);
 }
 
@@ -1107,34 +1108,33 @@ int CMP_CALL m3_app_bar_test_validate_rect(const CMPRect *rect) {
 }
 
 int CMP_CALL m3_app_bar_test_compute_collapse_range(const M3AppBarStyle *style,
-                                                   CMPScalar *out_range) {
+                                                    CMPScalar *out_range) {
   return m3_app_bar_compute_collapse_range(style, out_range);
 }
 
 int CMP_CALL m3_app_bar_test_compute_current_height(const M3AppBar *bar,
-                                                   CMPScalar *out_height) {
+                                                    CMPScalar *out_height) {
   return m3_app_bar_compute_current_height(bar, out_height);
 }
 
 int CMP_CALL m3_app_bar_test_compute_content_bounds(const M3AppBar *bar,
-                                                   CMPRect *out_bounds) {
+                                                    CMPRect *out_bounds) {
   return m3_app_bar_compute_content_bounds(bar, out_bounds);
 }
 
-int CMP_CALL m3_app_bar_test_compute_title_position(const M3AppBar *bar,
-                                                   const CMPTextMetrics *metrics,
-                                                   CMPScalar *out_x,
-                                                   CMPScalar *out_y) {
+int CMP_CALL m3_app_bar_test_compute_title_position(
+    const M3AppBar *bar, const CMPTextMetrics *metrics, CMPScalar *out_x,
+    CMPScalar *out_y) {
   return m3_app_bar_compute_title_position(bar, metrics, out_x, out_y);
 }
 
 int CMP_CALL m3_app_bar_test_measure_title(const M3AppBar *bar,
-                                          CMPTextMetrics *out_metrics) {
+                                           CMPTextMetrics *out_metrics) {
   return m3_app_bar_measure_title(bar, out_metrics);
 }
 
 int CMP_CALL m3_app_bar_test_apply_scroll(M3AppBar *bar, CMPScalar delta,
-                                         CMPScalar *out_consumed) {
+                                          CMPScalar *out_consumed) {
   return m3_app_bar_apply_scroll(bar, delta, out_consumed);
 }
 #endif

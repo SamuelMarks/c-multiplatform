@@ -4,7 +4,8 @@
 
 static cmp_usize cmp_usize_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
 
-static int cmp_store_mul_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
+static int cmp_store_mul_overflow(cmp_usize a, cmp_usize b,
+                                  cmp_usize *out_value) {
   cmp_usize max_value;
 
   if (out_value == NULL) {
@@ -21,8 +22,8 @@ static int cmp_store_mul_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value
 }
 
 static int cmp_store_history_push(cmp_u8 *buffer, cmp_usize capacity,
-                                 cmp_usize state_size, cmp_usize *io_count,
-                                 const void *state) {
+                                  cmp_usize state_size, cmp_usize *io_count,
+                                  const void *state) {
   cmp_usize offset;
   cmp_usize copy_size;
 
@@ -52,8 +53,8 @@ static int cmp_store_history_push(cmp_u8 *buffer, cmp_usize capacity,
 }
 
 static int cmp_store_history_pop(const cmp_u8 *buffer, cmp_usize capacity,
-                                cmp_usize state_size, cmp_usize *io_count,
-                                void *out_state) {
+                                 cmp_usize state_size, cmp_usize *io_count,
+                                 void *out_state) {
   cmp_usize offset;
 
   if (buffer == NULL || io_count == NULL || out_state == NULL) {
@@ -70,8 +71,9 @@ static int cmp_store_history_pop(const cmp_u8 *buffer, cmp_usize capacity,
 }
 
 static int cmp_store_copy_history(const cmp_u8 *buffer, cmp_usize capacity,
-                                 cmp_usize state_size, cmp_usize count,
-                                 cmp_usize index_from_latest, void *out_state) {
+                                  cmp_usize state_size, cmp_usize count,
+                                  cmp_usize index_from_latest,
+                                  void *out_state) {
   cmp_usize slot_index;
   cmp_usize offset;
 
@@ -92,7 +94,7 @@ static int cmp_store_copy_history(const cmp_u8 *buffer, cmp_usize capacity,
 }
 
 int CMP_CALL cmp_store_init(CMPStore *store, const CMPStoreConfig *config,
-                          const void *initial_state) {
+                            const void *initial_state) {
   CMPAllocator allocator;
   cmp_usize history_bytes;
   int rc;
@@ -130,7 +132,7 @@ int CMP_CALL cmp_store_init(CMPStore *store, const CMPStoreConfig *config,
   history_bytes = 0;
   if (store->undo_capacity > 0) {
     rc = cmp_store_mul_overflow(store->state_size, store->undo_capacity,
-                               &history_bytes);
+                                &history_bytes);
     if (rc != CMP_OK) {
       memset(store, 0, sizeof(*store));
       return rc;
@@ -244,8 +246,8 @@ int CMP_CALL cmp_store_dispatch(CMPStore *store, const CMPAction *action) {
   }
 
   rc = cmp_store_history_push(store->undo_buffer, store->undo_capacity,
-                             store->state_size, &store->undo_count,
-                             store->state);
+                              store->state_size, &store->undo_count,
+                              store->state);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -255,8 +257,9 @@ int CMP_CALL cmp_store_dispatch(CMPStore *store, const CMPAction *action) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_store_get_state_ptr(const CMPStore *store, const void **out_state,
-                                   cmp_usize *out_size) {
+int CMP_CALL cmp_store_get_state_ptr(const CMPStore *store,
+                                     const void **out_state,
+                                     cmp_usize *out_size) {
   if (store == NULL || out_state == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -270,7 +273,7 @@ int CMP_CALL cmp_store_get_state_ptr(const CMPStore *store, const void **out_sta
 }
 
 int CMP_CALL cmp_store_get_state(const CMPStore *store, void *out_state,
-                               cmp_usize state_size) {
+                                 cmp_usize state_size) {
   if (store == NULL || out_state == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -323,15 +326,15 @@ int CMP_CALL cmp_store_undo(CMPStore *store) {
   }
 
   rc = cmp_store_history_push(store->redo_buffer, store->redo_capacity,
-                             store->state_size, &store->redo_count,
-                             store->state);
+                              store->state_size, &store->redo_count,
+                              store->state);
   if (rc != CMP_OK) {
     return rc;
   }
 
-  rc =
-      cmp_store_history_pop(store->undo_buffer, store->undo_capacity,
-                           store->state_size, &store->undo_count, store->state);
+  rc = cmp_store_history_pop(store->undo_buffer, store->undo_capacity,
+                             store->state_size, &store->undo_count,
+                             store->state);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -353,15 +356,15 @@ int CMP_CALL cmp_store_redo(CMPStore *store) {
   }
 
   rc = cmp_store_history_push(store->undo_buffer, store->undo_capacity,
-                             store->state_size, &store->undo_count,
-                             store->state);
+                              store->state_size, &store->undo_count,
+                              store->state);
   if (rc != CMP_OK) {
     return rc;
   }
 
-  rc =
-      cmp_store_history_pop(store->redo_buffer, store->redo_capacity,
-                           store->state_size, &store->redo_count, store->state);
+  rc = cmp_store_history_pop(store->redo_buffer, store->redo_capacity,
+                             store->state_size, &store->redo_count,
+                             store->state);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -382,7 +385,8 @@ int CMP_CALL cmp_store_clear_history(CMPStore *store) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_store_get_undo_count(const CMPStore *store, cmp_usize *out_count) {
+int CMP_CALL cmp_store_get_undo_count(const CMPStore *store,
+                                      cmp_usize *out_count) {
   if (store == NULL || out_count == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -394,7 +398,8 @@ int CMP_CALL cmp_store_get_undo_count(const CMPStore *store, cmp_usize *out_coun
   return CMP_OK;
 }
 
-int CMP_CALL cmp_store_get_redo_count(const CMPStore *store, cmp_usize *out_count) {
+int CMP_CALL cmp_store_get_redo_count(const CMPStore *store,
+                                      cmp_usize *out_count) {
   if (store == NULL || out_count == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -407,8 +412,8 @@ int CMP_CALL cmp_store_get_redo_count(const CMPStore *store, cmp_usize *out_coun
 }
 
 int CMP_CALL cmp_store_copy_undo_state(const CMPStore *store,
-                                     cmp_usize index_from_latest,
-                                     void *out_state, cmp_usize state_size) {
+                                       cmp_usize index_from_latest,
+                                       void *out_state, cmp_usize state_size) {
   if (store == NULL || out_state == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -420,13 +425,13 @@ int CMP_CALL cmp_store_copy_undo_state(const CMPStore *store,
   }
 
   return cmp_store_copy_history(store->undo_buffer, store->undo_capacity,
-                               store->state_size, store->undo_count,
-                               index_from_latest, out_state);
+                                store->state_size, store->undo_count,
+                                index_from_latest, out_state);
 }
 
 int CMP_CALL cmp_store_copy_redo_state(const CMPStore *store,
-                                     cmp_usize index_from_latest,
-                                     void *out_state, cmp_usize state_size) {
+                                       cmp_usize index_from_latest,
+                                       void *out_state, cmp_usize state_size) {
   if (store == NULL || out_state == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -438,34 +443,37 @@ int CMP_CALL cmp_store_copy_redo_state(const CMPStore *store,
   }
 
   return cmp_store_copy_history(store->redo_buffer, store->redo_capacity,
-                               store->state_size, store->redo_count,
-                               index_from_latest, out_state);
+                                store->state_size, store->redo_count,
+                                index_from_latest, out_state);
 }
 
 #ifdef CMP_TESTING
 int CMP_CALL cmp_store_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                       cmp_usize *out_value) {
+                                         cmp_usize *out_value) {
   return cmp_store_mul_overflow(a, b, out_value);
 }
 
 int CMP_CALL cmp_store_test_history_push(cmp_u8 *buffer, cmp_usize capacity,
-                                       cmp_usize state_size, cmp_usize *io_count,
-                                       const void *state) {
+                                         cmp_usize state_size,
+                                         cmp_usize *io_count,
+                                         const void *state) {
   return cmp_store_history_push(buffer, capacity, state_size, io_count, state);
 }
 
-int CMP_CALL cmp_store_test_history_pop(const cmp_u8 *buffer, cmp_usize capacity,
-                                      cmp_usize state_size, cmp_usize *io_count,
-                                      void *out_state) {
+int CMP_CALL cmp_store_test_history_pop(const cmp_u8 *buffer,
+                                        cmp_usize capacity,
+                                        cmp_usize state_size,
+                                        cmp_usize *io_count, void *out_state) {
   return cmp_store_history_pop(buffer, capacity, state_size, io_count,
-                              out_state);
+                               out_state);
 }
 
-int CMP_CALL cmp_store_test_copy_history(const cmp_u8 *buffer, cmp_usize capacity,
-                                       cmp_usize state_size, cmp_usize count,
-                                       cmp_usize index_from_latest,
-                                       void *out_state) {
+int CMP_CALL cmp_store_test_copy_history(const cmp_u8 *buffer,
+                                         cmp_usize capacity,
+                                         cmp_usize state_size, cmp_usize count,
+                                         cmp_usize index_from_latest,
+                                         void *out_state) {
   return cmp_store_copy_history(buffer, capacity, state_size, count,
-                               index_from_latest, out_state);
+                                index_from_latest, out_state);
 }
 #endif

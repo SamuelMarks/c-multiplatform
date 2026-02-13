@@ -84,7 +84,7 @@ static int CMP_CALL test_get_type_id(void *obj, cmp_u32 *out_type_id) {
 }
 
 static const CMPObjectVTable test_vtable = {test_retain, test_release,
-                                           test_destroy, test_get_type_id};
+                                            test_destroy, test_get_type_id};
 
 static const CMPObjectVTable test_vtable_no_release = {
     test_retain, NULL, test_destroy, test_get_type_id};
@@ -92,8 +92,8 @@ static const CMPObjectVTable test_vtable_no_release = {
 static const CMPObjectVTable test_vtable_no_retain = {
     NULL, test_release, test_destroy, test_get_type_id};
 
-static const CMPObjectVTable test_vtable_no_destroy = {test_retain, test_release,
-                                                      NULL, test_get_type_id};
+static const CMPObjectVTable test_vtable_no_destroy = {
+    test_retain, test_release, NULL, test_get_type_id};
 
 static int init_test_object(TestObject *obj, CMPHandleSystem *sys,
                             cmp_u32 type_id) {
@@ -118,7 +118,7 @@ static int CMP_CALL fail_alloc(void *ctx, cmp_usize size, void **out_ptr) {
 }
 
 static int CMP_CALL fail_realloc(void *ctx, void *ptr, cmp_usize size,
-                                void **out_ptr) {
+                                 void **out_ptr) {
   CMP_UNUSED(ctx);
   CMP_UNUSED(ptr);
   CMP_UNUSED(size);
@@ -159,7 +159,7 @@ static int CMP_CALL ok_alloc(void *ctx, cmp_usize size, void **out_ptr) {
 }
 
 static int CMP_CALL ok_realloc(void *ctx, void *ptr, cmp_usize size,
-                              void **out_ptr) {
+                               void **out_ptr) {
   void *mem;
 
   CMP_UNUSED(ctx);
@@ -240,11 +240,12 @@ int main(void) {
   CMP_TEST_ASSERT(valid == CMP_FALSE);
 
   CMP_TEST_EXPECT(cmp_object_header_init(NULL, 1, 0, &test_vtable),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_object_header_init(&header, 1, 0, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_object_header_init(&header, 1, 0, &test_vtable_no_release),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_object_header_init(&header, 1, 0, &test_vtable_no_release),
+      CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(init_test_object(&obj, NULL, 42));
   CMP_TEST_ASSERT(obj.header.ref_count == 1);
@@ -284,25 +285,25 @@ int main(void) {
   CMP_TEST_ASSERT(obj2.destroy_calls == 1);
 
   CMP_TEST_EXPECT(cmp_object_get_type_id(NULL, &type_id),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_object_get_type_id(&obj.header, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_object_get_type_id(&obj.header, &type_id));
   CMP_TEST_ASSERT(type_id == obj.header.type_id);
 
   CMP_TEST_EXPECT(cmp_handle_system_default_create(0, NULL, &sys),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_handle_system_default_create(1, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_handle_system_default_create(1, &bad_alloc, &sys),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_handle_system_default_destroy(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
 #ifdef CMP_TESTING
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
   CMP_TEST_EXPECT(cmp_handle_system_default_create(1, NULL, &sys),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
 #endif
 
@@ -310,8 +311,9 @@ int main(void) {
   fail_allocator.alloc = fail_alloc;
   fail_allocator.realloc = fail_realloc;
   fail_allocator.free = fail_free;
-  CMP_TEST_EXPECT(cmp_handle_system_default_create(1, &fail_allocator, &fail_sys),
-                 CMP_ERR_OUT_OF_MEMORY);
+  CMP_TEST_EXPECT(
+      cmp_handle_system_default_create(1, &fail_allocator, &fail_sys),
+      CMP_ERR_OUT_OF_MEMORY);
 
   max_usize = (cmp_usize) ~(cmp_usize)0;
   CMP_TEST_EXPECT(
@@ -324,7 +326,7 @@ int main(void) {
   CMP_TEST_EXPECT(sys.vtable->init(NULL, 1), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sys.vtable->shutdown(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sys.vtable->unregister_object(NULL, handle),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sys.vtable->retain(NULL, handle), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sys.vtable->release(NULL, handle), CMP_ERR_INVALID_ARGUMENT);
 
@@ -354,7 +356,7 @@ int main(void) {
   max_usize = (cmp_usize) ~(cmp_usize)0;
   if ((cmp_usize)max_u32 < max_usize) {
     CMP_TEST_EXPECT(sys.vtable->init(&impl, (cmp_usize)max_u32 + 1),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
   }
 
   CMP_TEST_EXPECT(sys.vtable->init(&impl, max_usize), CMP_ERR_OVERFLOW);
@@ -374,9 +376,9 @@ int main(void) {
   handle.id = 999;
   handle.generation = 1;
   CMP_TEST_EXPECT(sys.vtable->resolve(sys.ctx, handle, &resolved),
-                 CMP_ERR_NOT_FOUND);
+                  CMP_ERR_NOT_FOUND);
   CMP_TEST_EXPECT(sys.vtable->unregister_object(sys.ctx, handle),
-                 CMP_ERR_NOT_FOUND);
+                  CMP_ERR_NOT_FOUND);
 
   CMP_TEST_OK(init_test_object(&obj, &sys, 100));
 #ifdef CMP_TESTING
@@ -384,19 +386,20 @@ int main(void) {
   handle.id = 1;
   handle.generation = 1;
   CMP_TEST_EXPECT(sys.vtable->resolve(sys.ctx, handle, &resolved),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_EXPECT(sys.vtable->unregister_object(sys.ctx, handle),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_EXPECT(sys.vtable->register_object(sys.ctx, &obj.header),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(cmp_object_test_set_handle_is_valid_fail(CMP_FALSE));
 #endif
   obj.header.vtable = &test_vtable_no_release;
   CMP_TEST_EXPECT(sys.vtable->register_object(NULL, &obj.header),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(sys.vtable->register_object(&impl, &obj.header), CMP_ERR_STATE);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(sys.vtable->register_object(&impl, &obj.header),
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(sys.vtable->register_object(sys.ctx, &obj.header),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   obj.header.vtable = &test_vtable;
   CMP_TEST_OK(sys.vtable->register_object(sys.ctx, &obj.header));
@@ -406,16 +409,17 @@ int main(void) {
 
   sys_impl = (CMPHandleSystemImplInternal *)sys.ctx;
   sys_impl->live_count = 0;
-  CMP_TEST_EXPECT(sys.vtable->unregister_object(sys.ctx, handle), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(sys.vtable->unregister_object(sys.ctx, handle),
+                  CMP_ERR_STATE);
   sys_impl->live_count = 1;
 
   CMP_TEST_EXPECT(sys.vtable->register_object(sys.ctx, &obj.header),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
 
   CMP_TEST_EXPECT(sys.vtable->resolve(NULL, handle, &resolved),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sys.vtable->resolve(sys.ctx, handle, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(sys.vtable->resolve(sys.ctx, handle, &resolved));
   CMP_TEST_ASSERT(resolved == &obj);
 
@@ -440,18 +444,18 @@ int main(void) {
   CMP_TEST_ASSERT(valid == CMP_FALSE);
 
   CMP_TEST_EXPECT(sys.vtable->resolve(sys.ctx, handle, &resolved),
-                 CMP_ERR_NOT_FOUND);
+                  CMP_ERR_NOT_FOUND);
   CMP_TEST_EXPECT(sys.vtable->release(sys.ctx, handle), CMP_ERR_NOT_FOUND);
 
   CMP_TEST_OK(init_test_object(&obj2, &sys, 101));
   CMP_TEST_OK(sys.vtable->register_object(sys.ctx, &obj2.header));
   CMP_TEST_EXPECT(sys.vtable->resolve(sys.ctx, handle, &resolved),
-                 CMP_ERR_NOT_FOUND);
+                  CMP_ERR_NOT_FOUND);
 
   obj2_handle = obj2.header.handle;
   CMP_TEST_OK(sys.vtable->unregister_object(sys.ctx, obj2_handle));
   CMP_TEST_EXPECT(sys.vtable->unregister_object(sys.ctx, obj2_handle),
-                 CMP_ERR_NOT_FOUND);
+                  CMP_ERR_NOT_FOUND);
 
   CMP_TEST_OK(init_test_object(&obj3, &sys, 102));
   CMP_TEST_OK(sys.vtable->register_object(sys.ctx, &obj3.header));
@@ -464,10 +468,12 @@ int main(void) {
 
   handle.id = 0;
   handle.generation = 0;
-  CMP_TEST_EXPECT(sys.vtable->retain(sys.ctx, handle), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(sys.vtable->release(sys.ctx, handle), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(sys.vtable->retain(sys.ctx, handle),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(sys.vtable->release(sys.ctx, handle),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sys.vtable->unregister_object(sys.ctx, handle),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_handle_system_default_destroy(&sys));
   CMP_TEST_EXPECT(cmp_handle_system_default_destroy(&sys), CMP_ERR_STATE);
@@ -477,8 +483,9 @@ int main(void) {
   CMP_TEST_OK(sys_small.vtable->register_object(sys_small.ctx, &obj.header));
 
   CMP_TEST_OK(init_test_object(&obj2, &sys_small, 201));
-  CMP_TEST_EXPECT(sys_small.vtable->register_object(sys_small.ctx, &obj2.header),
-                 CMP_ERR_BUSY);
+  CMP_TEST_EXPECT(
+      sys_small.vtable->register_object(sys_small.ctx, &obj2.header),
+      CMP_ERR_BUSY);
 
   CMP_TEST_EXPECT(cmp_handle_system_default_destroy(&sys_small), CMP_ERR_BUSY);
 
@@ -493,9 +500,10 @@ int main(void) {
   free_fail_allocator.alloc = ok_alloc;
   free_fail_allocator.realloc = ok_realloc;
   free_fail_allocator.free = free_fail_on_call;
-  CMP_TEST_OK(
-      cmp_handle_system_default_create(1, &free_fail_allocator, &free_fail_sys));
-  CMP_TEST_EXPECT(cmp_handle_system_default_destroy(&free_fail_sys), CMP_ERR_IO);
+  CMP_TEST_OK(cmp_handle_system_default_create(1, &free_fail_allocator,
+                                               &free_fail_sys));
+  CMP_TEST_EXPECT(cmp_handle_system_default_destroy(&free_fail_sys),
+                  CMP_ERR_IO);
   free_fail_sys.ctx = NULL;
   free_fail_sys.vtable = NULL;
 

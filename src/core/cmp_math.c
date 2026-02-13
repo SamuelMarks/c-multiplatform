@@ -11,7 +11,8 @@ static CMPScalar cmp_scalar_min(CMPScalar a, CMPScalar b) {
 }
 
 int CMP_CALL cmp_rect_intersect(const CMPRect *a, const CMPRect *b,
-                              CMPRect *out_rect, CMPBool *out_has_intersection) {
+                                CMPRect *out_rect,
+                                CMPBool *out_has_intersection) {
   CMPScalar ax2;
   CMPScalar ay2;
   CMPScalar bx2;
@@ -58,7 +59,8 @@ int CMP_CALL cmp_rect_intersect(const CMPRect *a, const CMPRect *b,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_rect_union(const CMPRect *a, const CMPRect *b, CMPRect *out_rect) {
+int CMP_CALL cmp_rect_union(const CMPRect *a, const CMPRect *b,
+                            CMPRect *out_rect) {
   CMPScalar ax2;
   CMPScalar ay2;
   CMPScalar bx2;
@@ -94,8 +96,8 @@ int CMP_CALL cmp_rect_union(const CMPRect *a, const CMPRect *b, CMPRect *out_rec
   return CMP_OK;
 }
 
-int CMP_CALL cmp_rect_contains_point(const CMPRect *rect, CMPScalar x, CMPScalar y,
-                                   CMPBool *out_contains) {
+int CMP_CALL cmp_rect_contains_point(const CMPRect *rect, CMPScalar x,
+                                     CMPScalar y, CMPBool *out_contains) {
   if (rect == NULL || out_contains == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -140,7 +142,8 @@ int CMP_CALL cmp_mat3_identity(CMPMat3 *out_mat) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_mat3_mul(const CMPMat3 *a, const CMPMat3 *b, CMPMat3 *out_mat) {
+int CMP_CALL cmp_mat3_mul(const CMPMat3 *a, const CMPMat3 *b,
+                          CMPMat3 *out_mat) {
   CMPMat3 tmp;
   int row;
   int col;
@@ -220,8 +223,9 @@ int CMP_CALL cmp_mat3_rotate(CMPScalar radians, CMPMat3 *out_mat) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_mat3_transform_point(const CMPMat3 *m, CMPScalar x, CMPScalar y,
-                                    CMPScalar *out_x, CMPScalar *out_y) {
+int CMP_CALL cmp_mat3_transform_point(const CMPMat3 *m, CMPScalar x,
+                                      CMPScalar y, CMPScalar *out_x,
+                                      CMPScalar *out_y) {
   CMPScalar tx;
   CMPScalar ty;
   CMPScalar tw;

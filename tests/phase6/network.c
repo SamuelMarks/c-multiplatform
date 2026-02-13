@@ -51,7 +51,7 @@ static int CMP_CALL test_alloc(void *ctx, cmp_usize size, void **out_ptr) {
 }
 
 static int CMP_CALL test_realloc(void *ctx, void *ptr, cmp_usize size,
-                                void **out_ptr) {
+                                 void **out_ptr) {
   TestAllocatorState *state;
   void *mem;
 
@@ -208,13 +208,11 @@ static int test_env_get_network(void *env, CMPNetwork *out_network) {
   return CMP_OK;
 }
 
-static const CMPEnvVTable g_test_env_vtable = {NULL, NULL, NULL, NULL, NULL,
-                                              NULL, test_env_get_network, NULL,
-                                              NULL};
+static const CMPEnvVTable g_test_env_vtable = {
+    NULL, NULL, NULL, NULL, NULL, NULL, test_env_get_network, NULL, NULL};
 
-static const CMPEnvVTable g_test_env_vtable_no_network = {NULL, NULL, NULL,
-                                                         NULL, NULL, NULL, NULL,
-                                                         NULL, NULL};
+static const CMPEnvVTable g_test_env_vtable_no_network = {
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 static int test_env_reset(TestEnvState *env_state, TestNetworkState *net_state,
                           const CMPNetworkVTable *vtable) {
@@ -399,7 +397,7 @@ static int test_network_shutdown_errors(void) {
   allocator.realloc = test_realloc;
   allocator.free = test_free;
   CMP_TEST_OK(test_client_reset(&client, &net_state, &g_test_network_vtable,
-                               &allocator, CMP_TRUE));
+                                &allocator, CMP_TRUE));
   client.network.ctx = NULL;
   CMP_TEST_EXPECT(cmp_network_shutdown(&client), CMP_ERR_INVALID_ARGUMENT);
 
@@ -441,14 +439,14 @@ static int test_network_request_errors(void) {
   memset(&response, 0, sizeof(response));
 
   CMP_TEST_EXPECT(cmp_network_request(NULL, &request, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_network_request(&client, NULL, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_network_request(&client, &request, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
 
   CMP_TEST_OK(test_network_state_reset(&net_state));
   CMP_TEST_OK(test_allocator_state_reset(&alloc_state));
@@ -457,58 +455,59 @@ static int test_network_request_errors(void) {
   allocator.realloc = test_realloc;
   allocator.free = test_free;
   CMP_TEST_OK(test_client_reset(&client, &net_state, &g_test_network_vtable,
-                               &allocator, CMP_TRUE));
+                                &allocator, CMP_TRUE));
 
   client.network.ctx = NULL;
   CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   client.network.ctx = &net_state;
 
   client.network.vtable = NULL;
   CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   client.network.vtable = &g_test_network_vtable;
 
   vtable_missing = g_test_network_vtable;
   vtable_missing.request = NULL;
   client.network.vtable = &vtable_missing;
   CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   client.network.vtable = &g_test_network_vtable;
 
   client.allocator.alloc = NULL;
   CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   client.allocator.alloc = test_alloc;
 
   CMP_TEST_OK(cmp_network_request_init(&request));
   request.method = NULL;
   CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   request.method = "";
   CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   request.method = "GET";
   request.url = NULL;
   CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   request.url = "";
   CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   request.url = "https://example.com";
   request.body = NULL;
   request.body_size = 2u;
   CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   request.body = body;
   request.body_size = (cmp_usize)sizeof(body);
   net_state.fail_request = 1;
-  CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response), CMP_ERR_IO);
+  CMP_TEST_EXPECT(cmp_network_request(&client, &request, &response),
+                  CMP_ERR_IO);
   net_state.fail_request = 0;
 
   return 0;
@@ -571,7 +570,7 @@ static int test_network_request_success(void) {
   CMP_TEST_ASSERT(net_state.last_allocator == &client.allocator);
   CMP_TEST_ASSERT(net_state.last_request.timeout_ms == 1234u);
   CMP_TEST_ASSERT(net_state.last_request.body_size ==
-                 (cmp_usize)sizeof(request_body));
+                  (cmp_usize)sizeof(request_body));
   CMP_TEST_ASSERT(response.status_code == 201u);
   CMP_TEST_ASSERT(response.body_size == (cmp_usize)sizeof(response_body));
   CMP_TEST_ASSERT(response.body != NULL);
@@ -605,9 +604,9 @@ static int test_network_response_free_errors(void) {
   memset(&response, 0, sizeof(response));
 
   CMP_TEST_EXPECT(cmp_network_response_free(NULL, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_network_response_free(&client, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_network_response_free(&client, &response), CMP_ERR_STATE);
 
@@ -618,23 +617,23 @@ static int test_network_response_free_errors(void) {
   allocator.realloc = test_realloc;
   allocator.free = test_free;
   CMP_TEST_OK(test_client_reset(&client, &net_state, &g_test_network_vtable,
-                               &allocator, CMP_TRUE));
+                                &allocator, CMP_TRUE));
 
   client.network.ctx = NULL;
   CMP_TEST_EXPECT(cmp_network_response_free(&client, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   client.network.ctx = &net_state;
 
   vtable_missing = g_test_network_vtable;
   vtable_missing.free_response = NULL;
   client.network.vtable = &vtable_missing;
   CMP_TEST_EXPECT(cmp_network_response_free(&client, &response),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   client.network.vtable = &g_test_network_vtable;
 
   client.allocator.alloc = NULL;
   CMP_TEST_EXPECT(cmp_network_response_free(&client, &response),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   client.allocator.alloc = test_alloc;
 
   net_state.fail_free = 1;
@@ -660,13 +659,13 @@ static int test_network_copy_response_body(void) {
   response.body_size = 4u;
   response.body = NULL;
   CMP_TEST_EXPECT(cmp_network_copy_response_body(&response, buffer,
-                                               sizeof(buffer), &out_size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                 sizeof(buffer), &out_size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   response.body = buffer;
-  CMP_TEST_EXPECT(
-      cmp_network_copy_response_body(&response, NULL, sizeof(buffer), &out_size),
-      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_network_copy_response_body(&response, NULL,
+                                                 sizeof(buffer), &out_size),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       cmp_network_copy_response_body(&response, buffer, 2u, &out_size),
       CMP_ERR_RANGE);
@@ -676,7 +675,7 @@ static int test_network_copy_response_body(void) {
   buffer[2] = 13u;
   buffer[3] = 14u;
   CMP_TEST_OK(cmp_network_copy_response_body(&response, buffer + 4,
-                                           sizeof(buffer) - 4u, &out_size));
+                                             sizeof(buffer) - 4u, &out_size));
   CMP_TEST_ASSERT(out_size == 4u);
   CMP_TEST_ASSERT(buffer[4] == 11u);
   CMP_TEST_ASSERT(buffer[7] == 14u);

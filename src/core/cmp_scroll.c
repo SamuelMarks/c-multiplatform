@@ -1,7 +1,7 @@
 #include "cmpc/cmp_scroll.h"
 
 static int cmp_scroll_validate_consumed_component(CMPScalar consumed,
-                                                 CMPScalar available) {
+                                                  CMPScalar available) {
   if (available > 0.0f) {
     if (consumed < 0.0f || consumed > available) {
       return CMP_ERR_RANGE;
@@ -20,7 +20,7 @@ static int cmp_scroll_validate_consumed_component(CMPScalar consumed,
 }
 
 static int cmp_scroll_validate_consumed(const CMPScrollDelta *consumed,
-                                       const CMPScrollDelta *available) {
+                                        const CMPScrollDelta *available) {
   int rc;
 
   if (consumed == NULL || available == NULL) {
@@ -64,7 +64,8 @@ static int cmp_scroll_validate_chain(const CMPScrollChain *chain) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_scroll_delta_init(CMPScrollDelta *delta, CMPScalar x, CMPScalar y) {
+int CMP_CALL cmp_scroll_delta_init(CMPScrollDelta *delta, CMPScalar x,
+                                   CMPScalar y) {
   if (delta == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -75,7 +76,7 @@ int CMP_CALL cmp_scroll_delta_init(CMPScrollDelta *delta, CMPScalar x, CMPScalar
 }
 
 int CMP_CALL cmp_scroll_parent_init(CMPScrollParent *parent, void *ctx,
-                                  const CMPScrollParentVTable *vtable) {
+                                    const CMPScrollParentVTable *vtable) {
   if (parent == NULL || vtable == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -85,8 +86,8 @@ int CMP_CALL cmp_scroll_parent_init(CMPScrollParent *parent, void *ctx,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_scroll_chain_init(CMPScrollChain *chain, CMPScrollParent **parents,
-                                 cmp_usize count) {
+int CMP_CALL cmp_scroll_chain_init(CMPScrollChain *chain,
+                                   CMPScrollParent **parents, cmp_usize count) {
   CMPScrollChain temp;
   int rc;
 
@@ -107,9 +108,9 @@ int CMP_CALL cmp_scroll_chain_init(CMPScrollChain *chain, CMPScrollParent **pare
 }
 
 int CMP_CALL cmp_scroll_chain_pre_scroll(const CMPScrollChain *chain,
-                                       const CMPScrollDelta *delta,
-                                       CMPScrollDelta *out_consumed,
-                                       CMPScrollDelta *out_remaining) {
+                                         const CMPScrollDelta *delta,
+                                         CMPScrollDelta *out_consumed,
+                                         CMPScrollDelta *out_remaining) {
   CMPScrollDelta remaining;
   CMPScrollDelta total;
   cmp_usize i;
@@ -166,10 +167,10 @@ int CMP_CALL cmp_scroll_chain_pre_scroll(const CMPScrollChain *chain,
 }
 
 int CMP_CALL cmp_scroll_chain_post_scroll(const CMPScrollChain *chain,
-                                        const CMPScrollDelta *delta_remaining,
-                                        const CMPScrollDelta *child_consumed,
-                                        CMPScrollDelta *out_consumed,
-                                        CMPScrollDelta *out_remaining) {
+                                          const CMPScrollDelta *delta_remaining,
+                                          const CMPScrollDelta *child_consumed,
+                                          CMPScrollDelta *out_consumed,
+                                          CMPScrollDelta *out_remaining) {
   CMPScrollDelta remaining;
   CMPScrollDelta total;
   cmp_usize i;
@@ -227,8 +228,8 @@ int CMP_CALL cmp_scroll_chain_post_scroll(const CMPScrollChain *chain,
 }
 
 #ifdef CMP_TESTING
-int CMP_CALL cmp_scroll_test_validate_consumed(const CMPScrollDelta *consumed,
-                                             const CMPScrollDelta *available) {
+int CMP_CALL cmp_scroll_test_validate_consumed(
+    const CMPScrollDelta *consumed, const CMPScrollDelta *available) {
   return cmp_scroll_validate_consumed(consumed, available);
 }
 

@@ -100,7 +100,8 @@ static void init_pointer_event(CMPInputEvent *event, cmp_u32 type, cmp_i32 x,
   event->data.pointer.y = y;
 }
 
-static void init_key_event(CMPInputEvent *event, cmp_u32 type, cmp_u32 key_code) {
+static void init_key_event(CMPInputEvent *event, cmp_u32 type,
+                           cmp_u32 key_code) {
   memset(event, 0, sizeof(*event));
   event->type = type;
   event->data.key.key_code = key_code;
@@ -186,35 +187,39 @@ int main(void) {
     setup_widget(&widget, &vtable, &state, 0, 1);
 
     CMP_TEST_EXPECT(cmp_event_dispatcher_init(NULL), CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_event_dispatcher_shutdown(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_event_dispatcher_shutdown(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_dispatcher_get_focus(NULL, &focused),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_dispatcher_get_focus(&dispatcher, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_dispatcher_set_focus(NULL, &widget),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_dispatcher_set_focus(&dispatcher, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_dispatcher_clear_focus(NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_dispatcher_get_focus_visible(NULL, &visible),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_dispatcher_get_focus_visible(&dispatcher, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_dispatcher_set_focus_visible(NULL, CMP_TRUE),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_EXPECT(cmp_event_dispatcher_set_focus(&dispatcher, &widget),
-                   CMP_ERR_STATE);
-    CMP_TEST_EXPECT(cmp_event_dispatcher_get_focus_visible(&dispatcher, &visible),
-                   CMP_ERR_STATE);
-    CMP_TEST_EXPECT(cmp_event_dispatcher_set_focus_visible(&dispatcher, CMP_TRUE),
-                   CMP_ERR_STATE);
+                    CMP_ERR_STATE);
+    CMP_TEST_EXPECT(
+        cmp_event_dispatcher_get_focus_visible(&dispatcher, &visible),
+        CMP_ERR_STATE);
+    CMP_TEST_EXPECT(
+        cmp_event_dispatcher_set_focus_visible(&dispatcher, CMP_TRUE),
+        CMP_ERR_STATE);
 
     CMP_TEST_EXPECT(cmp_event_dispatcher_shutdown(&dispatcher), CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_event_dispatcher_get_focus(&dispatcher, &focused),
-                   CMP_ERR_STATE);
-    CMP_TEST_EXPECT(cmp_event_dispatcher_clear_focus(&dispatcher), CMP_ERR_STATE);
+                    CMP_ERR_STATE);
+    CMP_TEST_EXPECT(cmp_event_dispatcher_clear_focus(&dispatcher),
+                    CMP_ERR_STATE);
 
     CMP_TEST_OK(cmp_event_dispatcher_init(&dispatcher));
     CMP_TEST_EXPECT(cmp_event_dispatcher_init(&dispatcher), CMP_ERR_STATE);
@@ -223,7 +228,7 @@ int main(void) {
     CMP_TEST_ASSERT(focused == NULL);
 
     CMP_TEST_EXPECT(cmp_event_dispatcher_set_focus(&dispatcher, &widget),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     widget.flags = CMP_WIDGET_FLAG_FOCUSABLE;
     CMP_TEST_OK(cmp_event_dispatcher_set_focus(&dispatcher, &widget));
     CMP_TEST_OK(cmp_event_dispatcher_get_focus(&dispatcher, &focused));
@@ -243,10 +248,10 @@ int main(void) {
 
     widget.flags = CMP_WIDGET_FLAG_FOCUSABLE | CMP_WIDGET_FLAG_DISABLED;
     CMP_TEST_EXPECT(cmp_event_dispatcher_set_focus(&dispatcher, &widget),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     widget.flags = CMP_WIDGET_FLAG_FOCUSABLE | CMP_WIDGET_FLAG_HIDDEN;
     CMP_TEST_EXPECT(cmp_event_dispatcher_set_focus(&dispatcher, &widget),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_event_dispatcher_shutdown(&dispatcher));
     CMP_TEST_EXPECT(cmp_event_dispatcher_shutdown(&dispatcher), CMP_ERR_STATE);
@@ -446,15 +451,16 @@ int main(void) {
         CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_EXPECT(cmp_event_dispatch(NULL, &root, &event, &target, &handled),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_event_dispatch(&dispatcher, NULL, &event, &target, &handled),
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_event_dispatch(&dispatcher, &root, NULL, &target, &handled),
         CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_event_dispatch(&dispatcher, &root, &event, &target, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_event_dispatch(&dispatcher, &root, &event, &target, NULL),
+        CMP_ERR_INVALID_ARGUMENT);
 
     {
       CMPEventDispatcher uninit;
@@ -524,13 +530,14 @@ int main(void) {
     rect.y = 0.0f;
     rect.width = -1.0f;
     rect.height = 1.0f;
-    CMP_TEST_EXPECT(cmp_event_test_validate_rect(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_event_test_validate_rect(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_test_validate_rect(&rect), CMP_ERR_RANGE);
     rect.width = 0.0f;
     CMP_TEST_OK(cmp_event_test_validate_rect(&rect));
 
     CMP_TEST_EXPECT(cmp_event_test_widget_focusable(NULL, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_event_test_widget_focusable(NULL, &focusable));
     CMP_TEST_ASSERT(focusable == CMP_FALSE);
 
@@ -543,25 +550,25 @@ int main(void) {
     node.bounds.height = 10.0f;
 
     CMP_TEST_EXPECT(cmp_event_test_hit_test(NULL, 0.0f, 0.0f, &hit),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_test_hit_test(&node, 0.0f, 0.0f, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_EXPECT(cmp_event_test_set_force_contains_error(2),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_event_test_set_force_contains_error(CMP_TRUE));
     CMP_TEST_EXPECT(cmp_event_test_hit_test(&node, 1.0f, 1.0f, &hit),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_event_test_set_force_contains_error(CMP_FALSE));
 
     memset(&event, 0, sizeof(event));
     event.type = CMP_INPUT_POINTER_DOWN;
     CMP_TEST_EXPECT(cmp_event_test_dispatch_to_widget(&widget, &event, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_test_dispatch_to_widget(NULL, &event, &handled),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_event_test_dispatch_to_widget(&widget, NULL, &handled),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   return 0;

@@ -130,27 +130,27 @@ struct M3DatePicker;
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPDatePickerOnChange)(void *ctx,
-                                           struct M3DatePicker *picker,
-                                           const M3DateRange *range);
+                                             struct M3DatePicker *picker,
+                                             const M3DateRange *range);
 
 /**
  * @brief Date picker widget instance.
  */
 typedef struct M3DatePicker {
-  CMPWidget widget;         /**< Widget interface (points to this instance). */
+  CMPWidget widget;        /**< Widget interface (points to this instance). */
   M3DatePickerStyle style; /**< Current style. */
-  CMPRect bounds;           /**< Layout bounds. */
-  cmp_i32 display_year;     /**< Displayed year. */
-  cmp_u32 display_month;    /**< Displayed month (1..12). */
-  cmp_u32 week_start;       /**< Week start weekday (0..6). */
-  cmp_u32 mode;             /**< Selection mode (CMP_DATE_PICKER_MODE_*). */
+  CMPRect bounds;          /**< Layout bounds. */
+  cmp_i32 display_year;    /**< Displayed year. */
+  cmp_u32 display_month;   /**< Displayed month (1..12). */
+  cmp_u32 week_start;      /**< Week start weekday (0..6). */
+  cmp_u32 mode;            /**< Selection mode (CMP_DATE_PICKER_MODE_*). */
   M3DateRange selection;   /**< Current selection range. */
   M3DateRange constraints; /**< Allowed date range constraints. */
   M3DatePickerCell cells[M3_DATE_PICKER_GRID_COUNT]; /**< Cached cells. */
   cmp_usize
       pressed_index; /**< Pressed cell index or M3_DATE_PICKER_INVALID_INDEX. */
   CMPDatePickerOnChange on_change; /**< Change callback (may be NULL). */
-  void *on_change_ctx;            /**< Change callback context pointer. */
+  void *on_change_ctx;             /**< Change callback context pointer. */
 } M3DatePicker;
 
 /**
@@ -169,8 +169,8 @@ CMP_API int CMP_CALL m3_date_picker_style_init(M3DatePickerStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_init(M3DatePicker *picker,
-                                       const M3DatePickerStyle *style,
-                                       cmp_i32 year, cmp_u32 month);
+                                         const M3DatePickerStyle *style,
+                                         cmp_i32 year, cmp_u32 month);
 
 /**
  * @brief Update the date picker style.
@@ -179,7 +179,7 @@ CMP_API int CMP_CALL m3_date_picker_init(M3DatePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_set_style(M3DatePicker *picker,
-                                            const M3DatePickerStyle *style);
+                                              const M3DatePickerStyle *style);
 
 /**
  * @brief Update the selection mode.
@@ -187,7 +187,8 @@ CMP_API int CMP_CALL m3_date_picker_set_style(M3DatePicker *picker,
  * @param mode Selection mode (CMP_DATE_PICKER_MODE_*).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_date_picker_set_mode(M3DatePicker *picker, cmp_u32 mode);
+CMP_API int CMP_CALL m3_date_picker_set_mode(M3DatePicker *picker,
+                                             cmp_u32 mode);
 
 /**
  * @brief Update the week start.
@@ -196,7 +197,7 @@ CMP_API int CMP_CALL m3_date_picker_set_mode(M3DatePicker *picker, cmp_u32 mode)
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_set_week_start(M3DatePicker *picker,
-                                                 cmp_u32 week_start);
+                                                   cmp_u32 week_start);
 
 /**
  * @brief Update the displayed month.
@@ -206,7 +207,8 @@ CMP_API int CMP_CALL m3_date_picker_set_week_start(M3DatePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_set_display_month(M3DatePicker *picker,
-                                                    cmp_i32 year, cmp_u32 month);
+                                                      cmp_i32 year,
+                                                      cmp_u32 month);
 
 /**
  * @brief Retrieve the displayed month.
@@ -215,9 +217,8 @@ CMP_API int CMP_CALL m3_date_picker_set_display_month(M3DatePicker *picker,
  * @param out_month Receives the display month.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_date_picker_get_display_month(const M3DatePicker *picker,
-                                                    cmp_i32 *out_year,
-                                                    cmp_u32 *out_month);
+CMP_API int CMP_CALL m3_date_picker_get_display_month(
+    const M3DatePicker *picker, cmp_i32 *out_year, cmp_u32 *out_month);
 
 /**
  * @brief Advance the displayed month by one.
@@ -248,8 +249,8 @@ CMP_API int CMP_CALL m3_date_picker_set_constraints(
  * @param out_constraints Receives constraints.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_date_picker_get_constraints(const M3DatePicker *picker,
-                                                  M3DateRange *out_constraints);
+CMP_API int CMP_CALL m3_date_picker_get_constraints(
+    const M3DatePicker *picker, M3DateRange *out_constraints);
 
 /**
  * @brief Update the selected date range.
@@ -258,7 +259,7 @@ CMP_API int CMP_CALL m3_date_picker_get_constraints(const M3DatePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_set_selection(M3DatePicker *picker,
-                                                const M3DateRange *selection);
+                                                  const M3DateRange *selection);
 
 /**
  * @brief Retrieve the selected date range.
@@ -267,7 +268,7 @@ CMP_API int CMP_CALL m3_date_picker_set_selection(M3DatePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_get_selection(const M3DatePicker *picker,
-                                                M3DateRange *out_selection);
+                                                  M3DateRange *out_selection);
 
 /**
  * @brief Assign a change callback.
@@ -276,9 +277,8 @@ CMP_API int CMP_CALL m3_date_picker_get_selection(const M3DatePicker *picker,
  * @param ctx Callback context pointer.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_date_picker_set_on_change(M3DatePicker *picker,
-                                                CMPDatePickerOnChange on_change,
-                                                void *ctx);
+CMP_API int CMP_CALL m3_date_picker_set_on_change(
+    M3DatePicker *picker, CMPDatePickerOnChange on_change, void *ctx);
 
 /**
  * @brief Recompute cached grid cells.
@@ -294,9 +294,9 @@ CMP_API int CMP_CALL m3_date_picker_update(M3DatePicker *picker);
  * @param out_count Receives the number of cells.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_date_picker_get_cells(const M3DatePicker *picker,
-                                            const M3DatePickerCell **out_cells,
-                                            cmp_usize *out_count);
+CMP_API int CMP_CALL m3_date_picker_get_cells(
+    const M3DatePicker *picker, const M3DatePickerCell **out_cells,
+    cmp_usize *out_count);
 
 /**
  * @brief Retrieve a cell by index.
@@ -306,8 +306,8 @@ CMP_API int CMP_CALL m3_date_picker_get_cells(const M3DatePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_get_cell(const M3DatePicker *picker,
-                                           cmp_usize index,
-                                           M3DatePickerCell *out_cell);
+                                             cmp_usize index,
+                                             M3DatePickerCell *out_cell);
 
 #ifdef CMP_TESTING
 /**
@@ -356,7 +356,7 @@ CMP_API int CMP_CALL m3_date_picker_test_validate_date(const CMPDate *date);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_test_is_leap_year(cmp_i32 year,
-                                                    CMPBool *out_leap);
+                                                      CMPBool *out_leap);
 /**
  * @brief Test hook for days-in-month calculations.
  * @param year Year to test.
@@ -364,8 +364,9 @@ CMP_API int CMP_CALL m3_date_picker_test_is_leap_year(cmp_i32 year,
  * @param out_days Receives the number of days.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_date_picker_test_days_in_month(cmp_i32 year, cmp_u32 month,
-                                                     cmp_u32 *out_days);
+CMP_API int CMP_CALL m3_date_picker_test_days_in_month(cmp_i32 year,
+                                                       cmp_u32 month,
+                                                       cmp_u32 *out_days);
 /**
  * @brief Test hook for day-of-week calculations.
  * @param date Date to test.
@@ -373,7 +374,7 @@ CMP_API int CMP_CALL m3_date_picker_test_days_in_month(cmp_i32 year, cmp_u32 mon
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_test_day_of_week(const CMPDate *date,
-                                                   cmp_u32 *out_weekday);
+                                                     cmp_u32 *out_weekday);
 /**
  * @brief Test hook for comparing two dates.
  * @param a First date.
@@ -382,8 +383,8 @@ CMP_API int CMP_CALL m3_date_picker_test_day_of_week(const CMPDate *date,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_test_compare_dates(const CMPDate *a,
-                                                     const CMPDate *b,
-                                                     cmp_i32 *out_cmp);
+                                                       const CMPDate *b,
+                                                       cmp_i32 *out_cmp);
 /**
  * @brief Test hook for checking whether a date is in range.
  * @param date Date to test.
@@ -392,8 +393,8 @@ CMP_API int CMP_CALL m3_date_picker_test_compare_dates(const CMPDate *a,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_test_date_in_range(const CMPDate *date,
-                                                     const M3DateRange *range,
-                                                     CMPBool *out_in_range);
+                                                       const M3DateRange *range,
+                                                       CMPBool *out_in_range);
 /**
  * @brief Test hook for computing weekday offsets.
  * @param weekday Weekday index (0..6).
@@ -402,8 +403,8 @@ CMP_API int CMP_CALL m3_date_picker_test_date_in_range(const CMPDate *date,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_test_compute_offset(cmp_u32 weekday,
-                                                      cmp_u32 week_start,
-                                                      cmp_u32 *out_offset);
+                                                        cmp_u32 week_start,
+                                                        cmp_u32 *out_offset);
 /**
  * @brief Test hook for shifting months.
  * @param year Input year.
@@ -413,10 +414,11 @@ CMP_API int CMP_CALL m3_date_picker_test_compute_offset(cmp_u32 weekday,
  * @param out_month Receives the shifted month.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_date_picker_test_shift_month(cmp_i32 year, cmp_u32 month,
-                                                   cmp_i32 delta,
-                                                   cmp_i32 *out_year,
-                                                   cmp_u32 *out_month);
+CMP_API int CMP_CALL m3_date_picker_test_shift_month(cmp_i32 year,
+                                                     cmp_u32 month,
+                                                     cmp_i32 delta,
+                                                     cmp_i32 *out_year,
+                                                     cmp_u32 *out_month);
 /**
  * @brief Test hook for computing cell bounds.
  * @param picker Date picker instance.
@@ -436,8 +438,8 @@ CMP_API int CMP_CALL m3_date_picker_test_compute_cell_bounds(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_date_picker_test_hit_test(const M3DatePicker *picker,
-                                                CMPScalar x, CMPScalar y,
-                                                cmp_usize *out_index);
+                                                  CMPScalar x, CMPScalar y,
+                                                  cmp_usize *out_index);
 /**
  * @brief Test hook for updating cached grid cells.
  * @param picker Date picker instance.

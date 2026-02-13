@@ -202,8 +202,9 @@ static int test_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
   return CMP_OK;
 }
 
-static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                              CMPScalar y1, CMPColor color, CMPScalar thickness) {
+static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
+                              CMPScalar x1, CMPScalar y1, CMPColor color,
+                              CMPScalar thickness) {
   TestBackend *backend;
 
   CMP_UNUSED(x0);
@@ -316,8 +317,9 @@ static int test_gfx_destroy_texture(void *gfx, CMPHandle texture) {
   return CMP_OK;
 }
 
-static int test_gfx_draw_texture(void *gfx, CMPHandle texture, const CMPRect *src,
-                                 const CMPRect *dst, CMPScalar opacity) {
+static int test_gfx_draw_texture(void *gfx, CMPHandle texture,
+                                 const CMPRect *src, const CMPRect *dst,
+                                 CMPScalar opacity) {
   TestBackend *backend;
 
   CMP_UNUSED(texture);
@@ -335,8 +337,8 @@ static int test_gfx_draw_texture(void *gfx, CMPHandle texture, const CMPRect *sr
 }
 
 static int test_text_create_font(void *text, const char *utf8_family,
-                                 cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
-                                 CMPHandle *out_font) {
+                                 cmp_i32 size_px, cmp_i32 weight,
+                                 CMPBool italic, CMPHandle *out_font) {
   CMP_UNUSED(text);
   CMP_UNUSED(utf8_family);
   CMP_UNUSED(size_px);
@@ -671,7 +673,8 @@ static int test_widget_paint(void *ctx, CMPPaintContext *paint_ctx) {
       ok = 0;
     }
 
-    if (paint_ctx->gfx->vtable->clear(NULL, color) != CMP_ERR_INVALID_ARGUMENT) {
+    if (paint_ctx->gfx->vtable->clear(NULL, color) !=
+        CMP_ERR_INVALID_ARGUMENT) {
       ok = 0;
     }
     if (paint_ctx->gfx->vtable->clear(&fake, color) != CMP_ERR_STATE) {
@@ -754,8 +757,8 @@ static int test_widget_paint(void *ctx, CMPPaintContext *paint_ctx) {
           CMP_ERR_INVALID_ARGUMENT) {
         ok = 0;
       }
-      if (paint_ctx->gfx->text_vtable->draw_text(&fake, handle, "Hi", 2, 0.0f,
-                                                 0.0f, color) != CMP_ERR_STATE) {
+      if (paint_ctx->gfx->text_vtable->draw_text(
+              &fake, handle, "Hi", 2, 0.0f, 0.0f, color) != CMP_ERR_STATE) {
         ok = 0;
       }
     }
@@ -921,18 +924,19 @@ int main(void) {
 
     memset(&list, 0, sizeof(list));
 
-    CMP_TEST_EXPECT(cmp_render_list_init(NULL, NULL, 0), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_render_list_init(NULL, NULL, 0),
+                    CMP_ERR_INVALID_ARGUMENT);
 #ifdef CMP_TESTING
     CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
     CMP_TEST_EXPECT(cmp_render_list_init(&list, NULL, 1), CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
 #endif
     CMP_TEST_EXPECT(cmp_render_test_add_overflow(1, 1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_render_test_mul_overflow(1, 1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_render_test_list_reserve(NULL, 1),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     list.commands = (CMPRenderCmd *)1;
     list.capacity = 1;
@@ -945,7 +949,7 @@ int main(void) {
     bad_alloc.realloc = NULL;
     bad_alloc.free = NULL;
     CMP_TEST_EXPECT(cmp_render_list_init(&list, &bad_alloc, 0),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     test_allocator_init(&alloc);
     alloc_iface.ctx = &alloc;
@@ -955,13 +959,13 @@ int main(void) {
 
     alloc.fail_alloc_on = 1;
     CMP_TEST_EXPECT(cmp_render_list_init(&list, &alloc_iface, 4),
-                   CMP_ERR_OUT_OF_MEMORY);
+                    CMP_ERR_OUT_OF_MEMORY);
     alloc.fail_alloc_on = 0;
 
     memset(&list, 0, sizeof(list));
     max_size = (cmp_usize) ~(cmp_usize)0;
     CMP_TEST_EXPECT(cmp_render_list_init(&list, &alloc_iface, max_size),
-                   CMP_ERR_OVERFLOW);
+                    CMP_ERR_OVERFLOW);
 
     memset(&list, 0, sizeof(list));
     CMP_TEST_OK(cmp_render_list_init(&list, &alloc_iface, 0));
@@ -1040,8 +1044,10 @@ int main(void) {
     CMP_TEST_EXPECT(cmp_render_list_reset(NULL), CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_render_list_reset(&list), CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_render_list_shutdown(NULL), CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_render_list_append(NULL, &cmd), CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_render_list_append(&list, NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_render_list_append(NULL, &cmd),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_render_list_append(&list, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_render_list_append(&list, &cmd), CMP_ERR_STATE);
 
     memset(&list, 0, sizeof(list));
@@ -1410,14 +1416,15 @@ int main(void) {
     gfx.vtable = &gfx_vtable;
     gfx.text_vtable = &text_vtable;
     CMP_TEST_EXPECT(cmp_render_list_execute(&list, &gfx),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_render_list_shutdown(&list));
 
     memset(&list, 0, sizeof(list));
     CMP_TEST_EXPECT(cmp_render_list_execute(&list, &gfx), CMP_ERR_STATE);
-    CMP_TEST_EXPECT(cmp_render_list_execute(NULL, &gfx), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_render_list_execute(NULL, &gfx),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_render_list_execute(&list, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_path_shutdown(&path));
   }
@@ -1445,28 +1452,29 @@ int main(void) {
     bounds.height = 10.0f;
 
     CMP_TEST_EXPECT(cmp_render_node_init(NULL, &widget, &bounds),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_render_node_init(&node, NULL, &bounds),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_render_node_init(&node, &widget, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     bounds.width = -1.0f;
-    CMP_TEST_EXPECT(cmp_render_node_init(&node, &widget, &bounds), CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(cmp_render_node_init(&node, &widget, &bounds),
+                    CMP_ERR_RANGE);
     bounds.width = 10.0f;
 
     CMP_TEST_EXPECT(cmp_render_node_set_bounds(NULL, &bounds),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     bounds.height = -1.0f;
     CMP_TEST_EXPECT(cmp_render_node_set_bounds(&node, &bounds), CMP_ERR_RANGE);
     bounds.height = 10.0f;
 
     CMP_TEST_EXPECT(cmp_render_node_set_children(NULL, children, 1),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_render_node_set_children(&node, NULL, 1),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     children[0] = NULL;
     CMP_TEST_EXPECT(cmp_render_node_set_children(&node, children, 1),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     memset(&vtable, 0, sizeof(vtable));
     vtable.paint = test_widget_paint;
@@ -1483,7 +1491,8 @@ int main(void) {
 
     CMP_TEST_OK(cmp_render_node_init(&node, &widget, &bounds));
 
-    CMP_TEST_EXPECT(cmp_render_test_validate_node(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_render_test_validate_node(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     bounds.width = -1.0f;
     node.bounds = bounds;
     CMP_TEST_EXPECT(cmp_render_test_validate_node(&node), CMP_ERR_RANGE);
@@ -1492,17 +1501,19 @@ int main(void) {
     node.child_count = 1;
     node.children = NULL;
     CMP_TEST_EXPECT(cmp_render_test_validate_node(&node),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     children[0] = NULL;
     node.children = children;
     CMP_TEST_EXPECT(cmp_render_test_validate_node(&node),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     node.child_count = 0;
     node.children = NULL;
 
     memset(&list, 0, sizeof(list));
-    CMP_TEST_EXPECT(cmp_render_build(NULL, &list, 1.0f), CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_render_build(&node, NULL, 1.0f), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_render_build(NULL, &list, 1.0f),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_render_build(&node, NULL, 1.0f),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_render_build(&node, &list, 0.0f), CMP_ERR_RANGE);
     CMP_TEST_EXPECT(cmp_render_build(&node, &list, -1.0f), CMP_ERR_RANGE);
     CMP_TEST_EXPECT(cmp_render_build(&node, &list, 1.0f), CMP_ERR_STATE);
@@ -1524,7 +1535,8 @@ int main(void) {
     child_bounds.y = 1.0f;
     child_bounds.width = 2.0f;
     child_bounds.height = 2.0f;
-    CMP_TEST_OK(cmp_render_node_init(&child_node, &child_widget, &child_bounds));
+    CMP_TEST_OK(
+        cmp_render_node_init(&child_node, &child_widget, &child_bounds));
     children[0] = &child_node;
     CMP_TEST_OK(cmp_render_node_set_children(&node, children, 1));
     CMP_TEST_OK(cmp_render_build(&node, &list, 1.0f));
@@ -1534,7 +1546,7 @@ int main(void) {
     CMP_TEST_ASSERT(list.commands[0].type == CMP_RENDER_CMD_PUSH_CLIP);
     CMP_TEST_ASSERT(list.commands[1].type == CMP_RENDER_CMD_BEGIN_FRAME);
     CMP_TEST_ASSERT(list.commands[list.count - 1].type ==
-                   CMP_RENDER_CMD_POP_CLIP);
+                    CMP_RENDER_CMD_POP_CLIP);
     CMP_TEST_OK(cmp_render_list_shutdown(&list));
 
     test_allocator_init(&alloc);
@@ -1547,7 +1559,8 @@ int main(void) {
     list.count = list.capacity;
     scenario.mode = SCENARIO_NOOP;
     scenario.calls = 0;
-    CMP_TEST_EXPECT(cmp_render_build(&node, &list, 1.0f), CMP_ERR_OUT_OF_MEMORY);
+    CMP_TEST_EXPECT(cmp_render_build(&node, &list, 1.0f),
+                    CMP_ERR_OUT_OF_MEMORY);
     alloc.fail_realloc_on = 0;
     CMP_TEST_OK(cmp_render_list_shutdown(&list));
 
@@ -1562,7 +1575,8 @@ int main(void) {
     node.children = NULL;
     scenario.mode = SCENARIO_NOOP;
     scenario.calls = 0;
-    CMP_TEST_EXPECT(cmp_render_build(&node, &list, 1.0f), CMP_ERR_OUT_OF_MEMORY);
+    CMP_TEST_EXPECT(cmp_render_build(&node, &list, 1.0f),
+                    CMP_ERR_OUT_OF_MEMORY);
     alloc.fail_realloc_on = 0;
     CMP_TEST_OK(cmp_render_list_shutdown(&list));
 
@@ -1630,7 +1644,7 @@ int main(void) {
     CMP_TEST_OK(cmp_render_list_init(&list, NULL, 2));
     widget.vtable = NULL;
     CMP_TEST_EXPECT(cmp_render_build(&node, &list, 1.0f),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_render_list_shutdown(&list));
     widget.vtable = &vtable;
 

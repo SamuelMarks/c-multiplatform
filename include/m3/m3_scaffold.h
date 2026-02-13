@@ -41,7 +41,7 @@ typedef struct M3ScaffoldStyle {
   CMPScalar snackbar_margin_x; /**< Snackbar horizontal margin (>= 0). */
   CMPScalar snackbar_margin_y; /**< Snackbar vertical margin (>= 0). */
   CMPScalar
-      fab_snackbar_spacing;    /**< Spacing between FAB and snackbar (>= 0). */
+      fab_snackbar_spacing;     /**< Spacing between FAB and snackbar (>= 0). */
   CMPScalar fab_slide_duration; /**< FAB slide animation duration (>= 0). */
   cmp_u32 fab_slide_easing;     /**< FAB slide easing (CMP_ANIM_EASE_*). */
 } M3ScaffoldStyle;
@@ -50,20 +50,20 @@ typedef struct M3ScaffoldStyle {
  * @brief Scaffold widget instance.
  */
 typedef struct M3Scaffold {
-  CMPWidget widget;          /**< Widget interface (points to this instance). */
+  CMPWidget widget;         /**< Widget interface (points to this instance). */
   M3ScaffoldStyle style;    /**< Current scaffold style. */
-  CMPLayoutEdges safe_area;  /**< Safe-area insets applied to layout (>= 0). */
-  CMPWidget *body;           /**< Body widget (may be NULL). */
-  CMPWidget *top_bar;        /**< Top bar widget (may be NULL). */
-  CMPWidget *bottom_bar;     /**< Bottom bar widget (may be NULL). */
-  CMPWidget *fab;            /**< Floating action button widget (may be NULL). */
-  CMPWidget *snackbar;       /**< Snackbar widget (may be NULL). */
-  CMPRect bounds;            /**< Assigned scaffold bounds. */
-  CMPRect body_bounds;       /**< Computed body bounds. */
-  CMPRect top_bar_bounds;    /**< Computed top bar bounds. */
-  CMPRect bottom_bar_bounds; /**< Computed bottom bar bounds. */
-  CMPRect fab_bounds;        /**< Computed FAB bounds. */
-  CMPRect snackbar_bounds;   /**< Computed snackbar bounds. */
+  CMPLayoutEdges safe_area; /**< Safe-area insets applied to layout (>= 0). */
+  CMPWidget *body;          /**< Body widget (may be NULL). */
+  CMPWidget *top_bar;       /**< Top bar widget (may be NULL). */
+  CMPWidget *bottom_bar;    /**< Bottom bar widget (may be NULL). */
+  CMPWidget *fab;           /**< Floating action button widget (may be NULL). */
+  CMPWidget *snackbar;      /**< Snackbar widget (may be NULL). */
+  CMPRect bounds;           /**< Assigned scaffold bounds. */
+  CMPRect body_bounds;      /**< Computed body bounds. */
+  CMPRect top_bar_bounds;   /**< Computed top bar bounds. */
+  CMPRect bottom_bar_bounds;   /**< Computed bottom bar bounds. */
+  CMPRect fab_bounds;          /**< Computed FAB bounds. */
+  CMPRect snackbar_bounds;     /**< Computed snackbar bounds. */
   CMPAnimController fab_anim;  /**< FAB slide animation controller. */
   CMPScalar fab_offset;        /**< Current FAB offset in pixels. */
   CMPScalar fab_target_offset; /**< Target FAB offset in pixels. */
@@ -88,10 +88,10 @@ CMP_API int CMP_CALL m3_scaffold_style_init(M3ScaffoldStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_scaffold_init(M3Scaffold *scaffold,
-                                    const M3ScaffoldStyle *style,
-                                    CMPWidget *body, CMPWidget *top_bar,
-                                    CMPWidget *bottom_bar, CMPWidget *fab,
-                                    CMPWidget *snackbar);
+                                      const M3ScaffoldStyle *style,
+                                      CMPWidget *body, CMPWidget *top_bar,
+                                      CMPWidget *bottom_bar, CMPWidget *fab,
+                                      CMPWidget *snackbar);
 
 /**
  * @brief Update the scaffold style.
@@ -100,7 +100,7 @@ CMP_API int CMP_CALL m3_scaffold_init(M3Scaffold *scaffold,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_scaffold_set_style(M3Scaffold *scaffold,
-                                         const M3ScaffoldStyle *style);
+                                           const M3ScaffoldStyle *style);
 
 /**
  * @brief Assign the body widget.
@@ -108,7 +108,8 @@ CMP_API int CMP_CALL m3_scaffold_set_style(M3Scaffold *scaffold,
  * @param body Body widget (may be NULL).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_scaffold_set_body(M3Scaffold *scaffold, CMPWidget *body);
+CMP_API int CMP_CALL m3_scaffold_set_body(M3Scaffold *scaffold,
+                                          CMPWidget *body);
 
 /**
  * @brief Assign the top bar widget.
@@ -117,7 +118,7 @@ CMP_API int CMP_CALL m3_scaffold_set_body(M3Scaffold *scaffold, CMPWidget *body)
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_scaffold_set_top_bar(M3Scaffold *scaffold,
-                                           CMPWidget *top_bar);
+                                             CMPWidget *top_bar);
 
 /**
  * @brief Assign the bottom bar widget.
@@ -126,7 +127,7 @@ CMP_API int CMP_CALL m3_scaffold_set_top_bar(M3Scaffold *scaffold,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_scaffold_set_bottom_bar(M3Scaffold *scaffold,
-                                              CMPWidget *bottom_bar);
+                                                CMPWidget *bottom_bar);
 
 /**
  * @brief Assign the floating action button widget.
@@ -143,7 +144,7 @@ CMP_API int CMP_CALL m3_scaffold_set_fab(M3Scaffold *scaffold, CMPWidget *fab);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_scaffold_set_snackbar(M3Scaffold *scaffold,
-                                            CMPWidget *snackbar);
+                                              CMPWidget *snackbar);
 
 /**
  * @brief Update the safe-area insets.
@@ -152,7 +153,7 @@ CMP_API int CMP_CALL m3_scaffold_set_snackbar(M3Scaffold *scaffold,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_scaffold_set_safe_area(M3Scaffold *scaffold,
-                                             const CMPLayoutEdges *safe_area);
+                                               const CMPLayoutEdges *safe_area);
 
 /**
  * @brief Retrieve the current safe-area insets.
@@ -161,7 +162,7 @@ CMP_API int CMP_CALL m3_scaffold_set_safe_area(M3Scaffold *scaffold,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_scaffold_get_safe_area(const M3Scaffold *scaffold,
-                                             CMPLayoutEdges *out_safe_area);
+                                               CMPLayoutEdges *out_safe_area);
 
 /**
  * @brief Step scaffold animations.
@@ -171,7 +172,7 @@ CMP_API int CMP_CALL m3_scaffold_get_safe_area(const M3Scaffold *scaffold,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_scaffold_step(M3Scaffold *scaffold, CMPScalar dt,
-                                    CMPBool *out_changed);
+                                      CMPBool *out_changed);
 
 #ifdef __cplusplus
 } /* extern "C" */

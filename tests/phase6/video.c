@@ -91,9 +91,8 @@ static int test_video_read(void *video, CMPVideoFrame *out_frame,
   return CMP_OK;
 }
 
-static const CMPVideoVTable g_test_video_vtable = {test_video_open,
-                                                  test_video_close,
-                                                  test_video_read};
+static const CMPVideoVTable g_test_video_vtable = {
+    test_video_open, test_video_close, test_video_read};
 
 typedef struct TestEnvState {
   CMPEnv env;
@@ -117,9 +116,8 @@ static int test_env_get_video(void *env, CMPVideo *out_video) {
   return CMP_OK;
 }
 
-static const CMPEnvVTable g_test_env_vtable = {NULL, NULL, NULL, NULL,
-                                              test_env_get_video, NULL, NULL,
-                                              NULL, NULL};
+static const CMPEnvVTable g_test_env_vtable = {
+    NULL, NULL, NULL, NULL, test_env_get_video, NULL, NULL, NULL, NULL};
 
 static int test_env_reset(TestEnvState *env_state, TestVideoState *video_state,
                           const CMPVideoVTable *vtable) {
@@ -241,16 +239,10 @@ static int test_video_fallback_m3v0(void) {
   CMPVideoOpenRequest request;
   CMPVideoFrame frame;
   CMPBool has_frame;
-  static const cmp_u8 video_data[] = {
-      'M', '3', 'V', '0',
-      1u, 0u, 0u, 0u,
-      1u, 0u, 0u, 0u,
-      1u, 0u, 0u, 0u,
-      30u, 0u, 0u, 0u,
-      1u, 0u, 0u, 0u,
-      2u, 0u, 0u, 0u,
-      1u, 2u, 3u, 4u,
-      5u, 6u, 7u, 8u};
+  static const cmp_u8 video_data[] = {'M', '3', 'V', '0', 1u, 0u, 0u, 0u,  1u,
+                                      0u,  0u,  0u,  1u,  0u, 0u, 0u, 30u, 0u,
+                                      0u,  0u,  1u,  0u,  0u, 0u, 2u, 0u,  0u,
+                                      0u,  1u,  2u,  3u,  4u, 5u, 6u, 7u,  8u};
 
   CMP_TEST_OK(cmp_video_config_init(&config));
   memset(&decoder, 0, sizeof(decoder));

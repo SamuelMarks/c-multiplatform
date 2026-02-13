@@ -71,8 +71,8 @@ static int m3_card_validate_color(const CMPColor *color) {
   return CMP_OK;
 }
 
-static int m3_card_color_set(CMPColor *color, CMPScalar r, CMPScalar g, CMPScalar b,
-                             CMPScalar a) {
+static int m3_card_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
+                             CMPScalar b, CMPScalar a) {
   if (color == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -197,8 +197,8 @@ static int m3_card_validate_style(const M3CardStyle *style) {
 }
 
 static int m3_card_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -218,7 +218,8 @@ static int m3_card_validate_rect(const CMPRect *rect) {
 }
 
 static int m3_card_measure_content(const M3CardStyle *style,
-                                   CMPScalar *out_width, CMPScalar *out_height) {
+                                   CMPScalar *out_width,
+                                   CMPScalar *out_height) {
   CMPScalar required_width;
   CMPScalar required_height;
 
@@ -469,7 +470,7 @@ int CMP_CALL m3_card_style_init_elevated(M3CardStyle *style) {
     return rc;
   }
   rc = cmp_shadow_set(&style->shadow, 0.0f, 2.0f, 6.0f, 0.0f,
-                     style->corner_radius, 3, shadow_color);
+                      style->corner_radius, 3, shadow_color);
 #ifdef CMP_TESTING
   if (m3_card_test_fail_point_match(M3_CARD_TEST_FAIL_SHADOW_SET)) {
     rc = CMP_ERR_IO;
@@ -790,7 +791,7 @@ static int m3_card_widget_event(void *widget, const CMPInputEvent *event,
     center_x = (CMPScalar)event->data.pointer.x;
     center_y = (CMPScalar)event->data.pointer.y;
     rc = cmp_ripple_compute_max_radius(&card->bounds, center_x, center_y,
-                                      &max_radius);
+                                       &max_radius);
 #ifdef CMP_TESTING
     if (m3_card_test_fail_point_match(M3_CARD_TEST_FAIL_RIPPLE_RADIUS)) {
       rc = CMP_ERR_IO;
@@ -800,8 +801,8 @@ static int m3_card_widget_event(void *widget, const CMPInputEvent *event,
       return rc;
     }
     rc = cmp_ripple_start(&card->ripple, center_x, center_y, max_radius,
-                         card->style.ripple_expand_duration,
-                         card->style.ripple_color);
+                          card->style.ripple_expand_duration,
+                          card->style.ripple_color);
 #ifdef CMP_TESTING
     if (m3_card_test_fail_point_match(M3_CARD_TEST_FAIL_RIPPLE_START)) {
       rc = CMP_ERR_IO;
@@ -947,7 +948,7 @@ int CMP_CALL m3_card_set_style(M3Card *card, const M3CardStyle *style) {
 }
 
 int CMP_CALL m3_card_set_on_click(M3Card *card, CMPCardOnClick on_click,
-                                 void *ctx) {
+                                  void *ctx) {
   if (card == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -957,7 +958,8 @@ int CMP_CALL m3_card_set_on_click(M3Card *card, CMPCardOnClick on_click,
   return CMP_OK;
 }
 
-int CMP_CALL m3_card_get_content_bounds(const M3Card *card, CMPRect *out_bounds) {
+int CMP_CALL m3_card_get_content_bounds(const M3Card *card,
+                                        CMPRect *out_bounds) {
   return m3_card_compute_content_bounds(card, out_bounds);
 }
 
@@ -967,12 +969,13 @@ int CMP_CALL m3_card_test_validate_color(const CMPColor *color) {
 }
 
 int CMP_CALL m3_card_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                   CMPScalar b, CMPScalar a) {
+                                    CMPScalar b, CMPScalar a) {
   return m3_card_color_set(color, r, g, b, a);
 }
 
-int CMP_CALL m3_card_test_color_with_alpha(const CMPColor *base, CMPScalar alpha,
-                                          CMPColor *out_color) {
+int CMP_CALL m3_card_test_color_with_alpha(const CMPColor *base,
+                                           CMPScalar alpha,
+                                           CMPColor *out_color) {
   return m3_card_color_with_alpha(base, alpha, out_color);
 }
 
@@ -993,25 +996,25 @@ int CMP_CALL m3_card_test_validate_rect(const CMPRect *rect) {
 }
 
 int CMP_CALL m3_card_test_measure_content(const M3CardStyle *style,
-                                         CMPScalar *out_width,
-                                         CMPScalar *out_height) {
+                                          CMPScalar *out_width,
+                                          CMPScalar *out_height) {
   return m3_card_measure_content(style, out_width, out_height);
 }
 
 int CMP_CALL m3_card_test_compute_inner(const M3Card *card, CMPRect *out_inner,
-                                       CMPScalar *out_corner) {
+                                        CMPScalar *out_corner) {
   return m3_card_compute_inner(card, out_inner, out_corner);
 }
 
 int CMP_CALL m3_card_test_compute_content_bounds(const M3Card *card,
-                                                CMPRect *out_bounds) {
+                                                 CMPRect *out_bounds) {
   return m3_card_compute_content_bounds(card, out_bounds);
 }
 
 int CMP_CALL m3_card_test_resolve_colors(const M3Card *card,
-                                        CMPColor *out_background,
-                                        CMPColor *out_outline,
-                                        CMPColor *out_ripple) {
+                                         CMPColor *out_background,
+                                         CMPColor *out_outline,
+                                         CMPColor *out_ripple) {
   return m3_card_resolve_colors(card, out_background, out_outline, out_ripple);
 }
 #endif

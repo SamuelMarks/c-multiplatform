@@ -3,7 +3,7 @@
 #include <string.h>
 
 #define CMP_VIDEO_VTABLE_COMPLETE(vtable)                                      \
-  ((vtable)->open != NULL && (vtable)->close != NULL &&                       \
+  ((vtable)->open != NULL && (vtable)->close != NULL &&                        \
    (vtable)->read_frame != NULL)
 
 #define CMP_VIDEO_FALLBACK_MAGIC 0x3056334du
@@ -21,11 +21,12 @@ typedef struct CMPVideoFallbackState {
   cmp_u8 *frames;
 } CMPVideoFallbackState;
 
-static int cmp_video_mul_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
+static int cmp_video_mul_overflow(cmp_usize a, cmp_usize b,
+                                  cmp_usize *out_value) {
   if (out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (a != 0 && b > ((cmp_usize)~(cmp_usize)0) / a) {
+  if (a != 0 && b > ((cmp_usize) ~(cmp_usize)0) / a) {
     return CMP_ERR_OVERFLOW;
   }
   *out_value = a * b;
@@ -33,7 +34,7 @@ static int cmp_video_mul_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value
 }
 
 static int cmp_video_read_u32_le(const cmp_u8 *data, cmp_usize size,
-                                cmp_usize offset, cmp_u32 *out_value) {
+                                 cmp_usize offset, cmp_u32 *out_value) {
   if (data == NULL || out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -48,7 +49,7 @@ static int cmp_video_read_u32_le(const cmp_u8 *data, cmp_usize size,
 }
 
 static int cmp_video_fallback_parse(const CMPVideoOpenRequest *request,
-                                   CMPVideoFallbackState *state) {
+                                    CMPVideoFallbackState *state) {
   const cmp_u8 *data;
   cmp_u32 magic;
   int rc;
@@ -108,7 +109,7 @@ static int cmp_video_fallback_parse(const CMPVideoOpenRequest *request,
 }
 
 static int cmp_video_fallback_open(CMPVideoDecoder *decoder,
-                                  const CMPVideoOpenRequest *request) {
+                                   const CMPVideoOpenRequest *request) {
   CMPVideoFallbackState *state;
   cmp_usize pixel_count;
   cmp_usize frame_size;
@@ -142,8 +143,8 @@ static int cmp_video_fallback_open(CMPVideoDecoder *decoder,
     return rc;
   }
 
-  rc = cmp_video_mul_overflow((cmp_usize)state->width,
-                             (cmp_usize)state->height, &pixel_count);
+  rc = cmp_video_mul_overflow((cmp_usize)state->width, (cmp_usize)state->height,
+                              &pixel_count);
   if (rc != CMP_OK) {
     free_rc = decoder->allocator.free(decoder->allocator.ctx, state);
     if (free_rc != CMP_OK) {
@@ -160,7 +161,7 @@ static int cmp_video_fallback_open(CMPVideoDecoder *decoder,
     return rc;
   }
   rc = cmp_video_mul_overflow(frame_size, (cmp_usize)state->frame_count,
-                             &total_size);
+                              &total_size);
   if (rc != CMP_OK) {
     free_rc = decoder->allocator.free(decoder->allocator.ctx, state);
     if (free_rc != CMP_OK) {
@@ -229,8 +230,8 @@ static int cmp_video_fallback_close(CMPVideoDecoder *decoder) {
 }
 
 static int cmp_video_fallback_read_frame(CMPVideoDecoder *decoder,
-                                        CMPVideoFrame *out_frame,
-                                        CMPBool *out_has_frame) {
+                                         CMPVideoFrame *out_frame,
+                                         CMPBool *out_has_frame) {
   CMPVideoFallbackState *state;
   cmp_u32 timestamp_ms;
   cmp_usize offset;
@@ -299,7 +300,7 @@ int CMP_CALL cmp_video_request_init(CMPVideoOpenRequest *request) {
 }
 
 int CMP_CALL cmp_video_init(CMPVideoDecoder *decoder,
-                          const CMPVideoConfig *config) {
+                            const CMPVideoConfig *config) {
   CMPVideo video;
   CMPAllocator allocator;
   int rc;
@@ -377,7 +378,7 @@ int CMP_CALL cmp_video_shutdown(CMPVideoDecoder *decoder) {
 }
 
 int CMP_CALL cmp_video_open(CMPVideoDecoder *decoder,
-                          const CMPVideoOpenRequest *request) {
+                            const CMPVideoOpenRequest *request) {
   int rc;
 
   if (decoder == NULL || request == NULL) {
@@ -464,8 +465,8 @@ int CMP_CALL cmp_video_close(CMPVideoDecoder *decoder) {
 }
 
 int CMP_CALL cmp_video_read_frame(CMPVideoDecoder *decoder,
-                                CMPVideoFrame *out_frame,
-                                CMPBool *out_has_frame) {
+                                  CMPVideoFrame *out_frame,
+                                  CMPBool *out_has_frame) {
   int rc;
 
   if (decoder == NULL || out_frame == NULL || out_has_frame == NULL) {

@@ -95,8 +95,8 @@ static int m3_date_picker_validate_style(const M3DatePickerStyle *style) {
 }
 
 static int m3_date_picker_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -354,7 +354,8 @@ static int m3_date_picker_date_in_range(const CMPDate *date,
   return CMP_OK;
 }
 
-static int m3_date_picker_day_of_week(const CMPDate *date, cmp_u32 *out_weekday) {
+static int m3_date_picker_day_of_week(const CMPDate *date,
+                                      cmp_u32 *out_weekday) {
   cmp_i32 year;
   cmp_i32 month;
   cmp_i32 day;
@@ -421,8 +422,9 @@ static int m3_date_picker_compute_offset(cmp_u32 weekday, cmp_u32 week_start,
   return CMP_OK;
 }
 
-static int m3_date_picker_shift_month(cmp_i32 year, cmp_u32 month, cmp_i32 delta,
-                                      cmp_i32 *out_year, cmp_u32 *out_month) {
+static int m3_date_picker_shift_month(cmp_i32 year, cmp_u32 month,
+                                      cmp_i32 delta, cmp_i32 *out_year,
+                                      cmp_u32 *out_month) {
   cmp_i32 remaining;
   int rc;
 
@@ -872,20 +874,20 @@ static int m3_date_picker_select_cell(M3DatePicker *picker, cmp_usize index) {
   next = picker->selection;
   if (picker->mode == M3_DATE_PICKER_MODE_SINGLE) {
     next.start = picker->cells[index].date; /* GCOVR_EXCL_LINE */
-    next.has_start = CMP_TRUE;               /* GCOVR_EXCL_LINE */
-    next.has_end = CMP_FALSE;                /* GCOVR_EXCL_LINE */
+    next.has_start = CMP_TRUE;              /* GCOVR_EXCL_LINE */
+    next.has_end = CMP_FALSE;               /* GCOVR_EXCL_LINE */
   } else if (picker->mode == M3_DATE_PICKER_MODE_RANGE) {
     if (next.has_start == CMP_FALSE ||
-        next.has_end == CMP_TRUE) {            /* GCOVR_EXCL_LINE */
+        next.has_end == CMP_TRUE) {           /* GCOVR_EXCL_LINE */
       next.start = picker->cells[index].date; /* GCOVR_EXCL_LINE */
-      next.has_start = CMP_TRUE;               /* GCOVR_EXCL_LINE */
-      next.has_end = CMP_FALSE;                /* GCOVR_EXCL_LINE */
+      next.has_start = CMP_TRUE;              /* GCOVR_EXCL_LINE */
+      next.has_end = CMP_FALSE;               /* GCOVR_EXCL_LINE */
     } else {                                  /* GCOVR_EXCL_LINE */
       rc = m3_date_picker_compare_dates(&picker->cells[index].date,
                                         &next.start, /* GCOVR_EXCL_LINE */
-	                                        &cmp); /* GCOVR_EXCL_LINE */
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc;       /* GCOVR_EXCL_LINE */
+                                        &cmp);       /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {                            /* GCOVR_EXCL_LINE */
+        return rc;                                   /* GCOVR_EXCL_LINE */
       }
       if (cmp < 0) {                            /* GCOVR_EXCL_LINE */
         next.end = next.start;                  /* GCOVR_EXCL_LINE */
@@ -1154,8 +1156,8 @@ int CMP_CALL m3_date_picker_style_init(M3DatePickerStyle *style) {
 }
 
 int CMP_CALL m3_date_picker_init(M3DatePicker *picker,
-                                const M3DatePickerStyle *style, cmp_i32 year,
-                                cmp_u32 month) {
+                                 const M3DatePickerStyle *style, cmp_i32 year,
+                                 cmp_u32 month) {
   int rc;
 
   if (picker == NULL || style == NULL) {
@@ -1192,7 +1194,7 @@ int CMP_CALL m3_date_picker_init(M3DatePicker *picker,
 }
 
 int CMP_CALL m3_date_picker_set_style(M3DatePicker *picker,
-                                     const M3DatePickerStyle *style) {
+                                      const M3DatePickerStyle *style) {
   M3DatePickerStyle prev;
   int rc;
 
@@ -1209,7 +1211,7 @@ int CMP_CALL m3_date_picker_set_style(M3DatePicker *picker,
   picker->style = *style; /* GCOVR_EXCL_LINE */
 
   rc = m3_date_picker_update_grid(picker); /* GCOVR_EXCL_LINE */
-  if (rc != CMP_OK) {                       /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {                      /* GCOVR_EXCL_LINE */
     picker->style = prev;                  /* GCOVR_EXCL_LINE */
     m3_date_picker_update_grid(picker);    /* GCOVR_EXCL_LINE */
     return rc;                             /* GCOVR_EXCL_LINE */
@@ -1249,7 +1251,7 @@ int CMP_CALL m3_date_picker_set_mode(M3DatePicker *picker, cmp_u32 mode) {
 }
 
 int CMP_CALL m3_date_picker_set_week_start(M3DatePicker *picker,
-                                          cmp_u32 week_start) {
+                                           cmp_u32 week_start) {
   cmp_u32 prev;
   int rc;
 
@@ -1274,8 +1276,8 @@ int CMP_CALL m3_date_picker_set_week_start(M3DatePicker *picker,
   return CMP_OK;
 }
 
-int CMP_CALL m3_date_picker_set_display_month(M3DatePicker *picker, cmp_i32 year,
-                                             cmp_u32 month) {
+int CMP_CALL m3_date_picker_set_display_month(M3DatePicker *picker,
+                                              cmp_i32 year, cmp_u32 month) {
   cmp_i32 prev_year;
   cmp_u32 prev_month;
   int rc;
@@ -1310,8 +1312,8 @@ int CMP_CALL m3_date_picker_set_display_month(M3DatePicker *picker, cmp_i32 year
 }
 
 int CMP_CALL m3_date_picker_get_display_month(const M3DatePicker *picker,
-                                             cmp_i32 *out_year,
-                                             cmp_u32 *out_month) {
+                                              cmp_i32 *out_year,
+                                              cmp_u32 *out_month) {
   if (picker == NULL || out_year == NULL || out_month == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1358,7 +1360,7 @@ int CMP_CALL m3_date_picker_prev_month(M3DatePicker *picker) {
 }
 
 int CMP_CALL m3_date_picker_set_constraints(M3DatePicker *picker,
-                                           const M3DateRange *constraints) {
+                                            const M3DateRange *constraints) {
   M3DateRange prev;
   int rc;
 
@@ -1391,22 +1393,22 @@ int CMP_CALL m3_date_picker_set_constraints(M3DatePicker *picker,
 }
 
 int CMP_CALL m3_date_picker_get_constraints(const M3DatePicker *picker,
-                                           M3DateRange *out_constraints) {
+                                            M3DateRange *out_constraints) {
   if (picker == NULL || out_constraints == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
   *out_constraints = picker->constraints; /* GCOVR_EXCL_LINE */
-  return CMP_OK;                           /* GCOVR_EXCL_LINE */
+  return CMP_OK;                          /* GCOVR_EXCL_LINE */
 }
 
 int CMP_CALL m3_date_picker_set_selection(M3DatePicker *picker,
-                                         const M3DateRange *selection) {
+                                          const M3DateRange *selection) {
   return m3_date_picker_apply_selection(picker, selection, CMP_TRUE);
 }
 
 int CMP_CALL m3_date_picker_get_selection(const M3DatePicker *picker,
-                                         M3DateRange *out_selection) {
+                                          M3DateRange *out_selection) {
   if (picker == NULL || out_selection == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1416,8 +1418,8 @@ int CMP_CALL m3_date_picker_get_selection(const M3DatePicker *picker,
 }
 
 int CMP_CALL m3_date_picker_set_on_change(M3DatePicker *picker,
-                                         CMPDatePickerOnChange on_change,
-                                         void *ctx) {
+                                          CMPDatePickerOnChange on_change,
+                                          void *ctx) {
   if (picker == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1435,8 +1437,8 @@ int CMP_CALL m3_date_picker_update(M3DatePicker *picker) {
 }
 
 int CMP_CALL m3_date_picker_get_cells(const M3DatePicker *picker,
-                                     const M3DatePickerCell **out_cells,
-                                     cmp_usize *out_count) {
+                                      const M3DatePickerCell **out_cells,
+                                      cmp_usize *out_count) {
   if (picker == NULL || out_cells == NULL || out_count == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1446,8 +1448,9 @@ int CMP_CALL m3_date_picker_get_cells(const M3DatePicker *picker,
   return CMP_OK;
 }
 
-int CMP_CALL m3_date_picker_get_cell(const M3DatePicker *picker, cmp_usize index,
-                                    M3DatePickerCell *out_cell) {
+int CMP_CALL m3_date_picker_get_cell(const M3DatePicker *picker,
+                                     cmp_usize index,
+                                     M3DatePickerCell *out_cell) {
   if (picker == NULL || out_cell == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1456,7 +1459,7 @@ int CMP_CALL m3_date_picker_get_cell(const M3DatePicker *picker, cmp_usize index
   }
 
   *out_cell = picker->cells[index]; /* GCOVR_EXCL_LINE */
-  return CMP_OK;                     /* GCOVR_EXCL_LINE */
+  return CMP_OK;                    /* GCOVR_EXCL_LINE */
 }
 
 #ifdef CMP_TESTING
@@ -1468,7 +1471,8 @@ int CMP_CALL m3_date_picker_test_validate_edges(const CMPLayoutEdges *edges) {
   return m3_date_picker_validate_edges(edges);
 }
 
-int CMP_CALL m3_date_picker_test_validate_style(const M3DatePickerStyle *style) {
+int CMP_CALL
+m3_date_picker_test_validate_style(const M3DatePickerStyle *style) {
   return m3_date_picker_validate_style(style);
 }
 
@@ -1489,46 +1493,48 @@ int CMP_CALL m3_date_picker_test_is_leap_year(cmp_i32 year, CMPBool *out_leap) {
 }
 
 int CMP_CALL m3_date_picker_test_days_in_month(cmp_i32 year, cmp_u32 month,
-                                              cmp_u32 *out_days) {
+                                               cmp_u32 *out_days) {
   return m3_date_picker_days_in_month(year, month, out_days);
 }
 
 int CMP_CALL m3_date_picker_test_day_of_week(const CMPDate *date,
-                                            cmp_u32 *out_weekday) {
+                                             cmp_u32 *out_weekday) {
   return m3_date_picker_day_of_week(date, out_weekday);
 }
 
-int CMP_CALL m3_date_picker_test_compare_dates(const CMPDate *a, const CMPDate *b,
-                                              cmp_i32 *out_cmp) {
+int CMP_CALL m3_date_picker_test_compare_dates(const CMPDate *a,
+                                               const CMPDate *b,
+                                               cmp_i32 *out_cmp) {
   return m3_date_picker_compare_dates(a, b, out_cmp);
 }
 
 int CMP_CALL m3_date_picker_test_date_in_range(const CMPDate *date,
-                                              const M3DateRange *range,
-                                              CMPBool *out_in_range) {
+                                               const M3DateRange *range,
+                                               CMPBool *out_in_range) {
   return m3_date_picker_date_in_range(date, range, out_in_range);
 }
 
 int CMP_CALL m3_date_picker_test_compute_offset(cmp_u32 weekday,
-                                               cmp_u32 week_start,
-                                               cmp_u32 *out_offset) {
+                                                cmp_u32 week_start,
+                                                cmp_u32 *out_offset) {
   return m3_date_picker_compute_offset(weekday, week_start, out_offset);
 }
 
 int CMP_CALL m3_date_picker_test_shift_month(cmp_i32 year, cmp_u32 month,
-                                            cmp_i32 delta, cmp_i32 *out_year,
-                                            cmp_u32 *out_month) {
+                                             cmp_i32 delta, cmp_i32 *out_year,
+                                             cmp_u32 *out_month) {
   return m3_date_picker_shift_month(year, month, delta, out_year, out_month);
 }
 
 int CMP_CALL m3_date_picker_test_compute_cell_bounds(const M3DatePicker *picker,
-                                                    cmp_u32 row, cmp_u32 col,
-                                                    CMPRect *out_bounds) {
+                                                     cmp_u32 row, cmp_u32 col,
+                                                     CMPRect *out_bounds) {
   return m3_date_picker_compute_cell_bounds(picker, row, col, out_bounds);
 }
 
-int CMP_CALL m3_date_picker_test_hit_test(const M3DatePicker *picker, CMPScalar x,
-                                         CMPScalar y, cmp_usize *out_index) {
+int CMP_CALL m3_date_picker_test_hit_test(const M3DatePicker *picker,
+                                          CMPScalar x, CMPScalar y,
+                                          cmp_usize *out_index) {
   return m3_date_picker_hit_test(picker, x, y, out_index);
 }
 

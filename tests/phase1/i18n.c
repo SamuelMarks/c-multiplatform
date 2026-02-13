@@ -168,10 +168,11 @@ static int test_formatter_write(const char *text, char *out_text,
 }
 
 static int CMP_CALL test_formatter_number(void *ctx, const char *locale_tag,
-                                         const CMPI18nLocale *locale,
-                                         const CMPI18nNumber *number,
-                                         char *out_text, cmp_usize text_capacity,
-                                         cmp_usize *out_len) {
+                                          const CMPI18nLocale *locale,
+                                          const CMPI18nNumber *number,
+                                          char *out_text,
+                                          cmp_usize text_capacity,
+                                          cmp_usize *out_len) {
   TestFormatter *state;
 
   if (ctx == NULL || locale_tag == NULL || locale == NULL || number == NULL) {
@@ -190,10 +191,10 @@ static int CMP_CALL test_formatter_number(void *ctx, const char *locale_tag,
 }
 
 static int CMP_CALL test_formatter_date(void *ctx, const char *locale_tag,
-                                       const CMPI18nLocale *locale,
-                                       const CMPDate *date, char *out_text,
-                                       cmp_usize text_capacity,
-                                       cmp_usize *out_len) {
+                                        const CMPI18nLocale *locale,
+                                        const CMPDate *date, char *out_text,
+                                        cmp_usize text_capacity,
+                                        cmp_usize *out_len) {
   TestFormatter *state;
 
   if (ctx == NULL || locale_tag == NULL || locale == NULL || date == NULL) {
@@ -212,10 +213,10 @@ static int CMP_CALL test_formatter_date(void *ctx, const char *locale_tag,
 }
 
 static int CMP_CALL test_formatter_time(void *ctx, const char *locale_tag,
-                                       const CMPI18nLocale *locale,
-                                       const CMPTime *time, char *out_text,
-                                       cmp_usize text_capacity,
-                                       cmp_usize *out_len) {
+                                        const CMPI18nLocale *locale,
+                                        const CMPTime *time, char *out_text,
+                                        cmp_usize text_capacity,
+                                        cmp_usize *out_len) {
   TestFormatter *state;
 
   if (ctx == NULL || locale_tag == NULL || locale == NULL || time == NULL) {
@@ -273,13 +274,13 @@ static int test_i18n_coverage_hooks(TestAlloc *alloc_state,
   CMP_TEST_ASSERT(equal == CMP_TRUE);
 
   CMP_TEST_EXPECT(cmp_i18n_test_locale_preset_en_us(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_locale_preset_en_gb(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_locale_preset_fr_fr(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_locale_preset_de_de(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_i18n_test_set_ascii_lower_fail_after(1u));
   CMP_TEST_EXPECT(cmp_i18n_locale_from_tag("zz-ZZ", &locale), CMP_ERR_IO);
@@ -297,7 +298,7 @@ static int test_i18n_coverage_hooks(TestAlloc *alloc_state,
   CMP_TEST_EXPECT(cmp_i18n_test_validate_utf8("a", 1u), CMP_ERR_IO);
 
   CMP_TEST_EXPECT(cmp_i18n_test_parse_table(NULL, "", 0u, CMP_FALSE, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   memset(&i18n_local, 0, sizeof(i18n_local));
   CMP_TEST_OK(cmp_i18n_config_init(&config));
@@ -312,23 +313,23 @@ static int test_i18n_coverage_hooks(TestAlloc *alloc_state,
   {
     const char *data = "badline\n";
     CMP_TEST_EXPECT(cmp_i18n_test_parse_table(&i18n_local, data,
-                                            (cmp_usize)strlen(data), CMP_TRUE,
-                                            CMP_TRUE),
-                   CMP_ERR_CORRUPT);
+                                              (cmp_usize)strlen(data), CMP_TRUE,
+                                              CMP_TRUE),
+                    CMP_ERR_CORRUPT);
   }
   {
     const char *data = "=value\n";
     CMP_TEST_EXPECT(cmp_i18n_test_parse_table(&i18n_local, data,
-                                            (cmp_usize)strlen(data), CMP_TRUE,
-                                            CMP_TRUE),
-                   CMP_ERR_CORRUPT);
+                                              (cmp_usize)strlen(data), CMP_TRUE,
+                                              CMP_TRUE),
+                    CMP_ERR_CORRUPT);
   }
   {
     const char *data = "k=v\nk=w\n";
     CMP_TEST_EXPECT(cmp_i18n_test_parse_table(&i18n_local, data,
-                                            (cmp_usize)strlen(data), CMP_TRUE,
-                                            CMP_FALSE),
-                   CMP_ERR_BUSY);
+                                              (cmp_usize)strlen(data), CMP_TRUE,
+                                              CMP_FALSE),
+                    CMP_ERR_BUSY);
   }
   CMP_TEST_OK(cmp_i18n_shutdown(&i18n_local));
 
@@ -390,7 +391,7 @@ static int test_i18n_coverage_hooks(TestAlloc *alloc_state,
 
   CMP_TEST_OK(cmp_i18n_test_set_cstr_limit(1u));
   CMP_TEST_EXPECT(cmp_i18n_set_locale(&i18n_local, "en-US", NULL),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_i18n_test_set_cstr_limit(0u));
 
   CMP_TEST_OK(cmp_i18n_test_force_utf8_error(CMP_TRUE));
@@ -399,23 +400,23 @@ static int test_i18n_coverage_hooks(TestAlloc *alloc_state,
   CMP_TEST_OK(test_alloc_reset(alloc_state));
   alloc_state->fail_alloc_on_call = 1;
   CMP_TEST_EXPECT(cmp_i18n_set_locale(&i18n_local, "en-US", NULL),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   alloc_state->fail_alloc_on_call = 0;
 
   CMP_TEST_OK(cmp_i18n_locale_init(&locale));
   locale.decimal_separator = '\0';
   CMP_TEST_EXPECT(cmp_i18n_set_locale(&i18n_local, "en-US", &locale),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_i18n_test_force_utf8_ok(CMP_TRUE));
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n_local, "a", 1u, NULL, 1u, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   date.year = 10000;
   date.month = 1u;
   date.day = 1u;
   CMP_TEST_OK(cmp_i18n_format_date(&i18n_local, &date, buffer, sizeof(buffer),
-                                 &out_len));
+                                   &out_len));
 
   CMP_TEST_OK(cmp_i18n_shutdown(&i18n_local));
 
@@ -460,7 +461,7 @@ static int test_i18n_coverage_hooks(TestAlloc *alloc_state,
   CMP_TEST_OK(cmp_i18n_init(&i18n_local, &config));
   alloc_state->fail_alloc_on_call = alloc_state->alloc_calls + 1;
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n_local, "x", 1u, "y", 1u, CMP_TRUE),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   alloc_state->fail_alloc_on_call = 0;
   CMP_TEST_OK(cmp_i18n_shutdown(&i18n_local));
 
@@ -538,47 +539,53 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_i18n_config_init(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_locale_init(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_locale_from_tag(NULL, &locale),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_locale_from_tag("en-US", NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_i18n_locale_from_tag("EN_us", &locale));
   CMP_TEST_ASSERT(locale.date_order == CMP_I18N_DATE_ORDER_MDY);
-  CMP_TEST_EXPECT(cmp_i18n_locale_from_tag("zz-ZZ", &locale), CMP_ERR_NOT_FOUND);
+  CMP_TEST_EXPECT(cmp_i18n_locale_from_tag("zz-ZZ", &locale),
+                  CMP_ERR_NOT_FOUND);
 
   CMP_TEST_EXPECT(cmp_i18n_test_mul_overflow(1, 1, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_add_overflow(1, 1, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_pow10(1, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_is_leap_year(2000, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_days_in_month(2020, 1, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_i18n_test_validate_locale(NULL), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_i18n_test_validate_number(NULL), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_i18n_test_validate_locale(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_i18n_test_validate_number(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_validate_date(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_validate_time(NULL), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_i18n_test_cstrlen(NULL, &out_len), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_i18n_test_cstrlen(NULL, &out_len),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_cstrlen("x", NULL), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_i18n_test_ascii_lower('A', NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_i18n_test_ascii_lower('A', NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_tag_equals(NULL, "en", &flag),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_tag_equals("en", NULL, &flag),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_tag_equals("en", "en", NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_trim_span(NULL, 0, &start, &span_len),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_alloc_string(NULL, "x", 1, &allocated),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_alloc_string(&default_alloc, "x", 1, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_i18n_test_alloc_string(&default_alloc, NULL, 1, &allocated),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_i18n_test_alloc_string(&default_alloc, NULL, 1, &allocated),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_write_uint(NULL, 4, &out_len, 1, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_write_uint(buffer, 4, NULL, 1, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   number.integer = 0;
   number.fraction = 0;
@@ -588,24 +595,26 @@ int main(void) {
   date.day = 1;
   time.hour = 0u;
   time.minute = 0u;
-  CMP_TEST_EXPECT(cmp_i18n_set_locale(&i18n_fail, "en-US", NULL), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_i18n_set_locale(&i18n_fail, "en-US", NULL),
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_i18n_set_formatter(&i18n_fail, NULL), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n_fail, "k", 1, "v", 1, CMP_TRUE),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_i18n_get(&i18n_fail, "k", 1, &value, &value_len),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_i18n_contains(&i18n_fail, "k", 1, &flag), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_i18n_remove(&i18n_fail, "k", 1), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_i18n_clear(&i18n_fail), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_i18n_count(&i18n_fail, &count), CMP_ERR_STATE);
-  CMP_TEST_EXPECT(cmp_i18n_load_table(&i18n_fail, &io, "path", CMP_FALSE, CMP_TRUE),
-                 CMP_ERR_STATE);
+  CMP_TEST_EXPECT(
+      cmp_i18n_load_table(&i18n_fail, &io, "path", CMP_FALSE, CMP_TRUE),
+      CMP_ERR_STATE);
   CMP_TEST_EXPECT(
       cmp_i18n_load_table_buffer(&i18n_fail, "x", 1, CMP_FALSE, CMP_TRUE),
       CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_i18n_format_number(&i18n_fail, &number, buffer,
-                                       sizeof(buffer), &out_len),
-                 CMP_ERR_STATE);
+                                         sizeof(buffer), &out_len),
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(
       cmp_i18n_format_date(&i18n_fail, &date, buffer, sizeof(buffer), &out_len),
       CMP_ERR_STATE);
@@ -614,11 +623,11 @@ int main(void) {
       CMP_ERR_STATE);
 
   CMP_TEST_EXPECT(cmp_i18n_test_mul_overflow(max_size, 2, &out_len),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_i18n_test_mul_overflow(2, 3, &out_len));
   CMP_TEST_ASSERT(out_len == 6u);
   CMP_TEST_EXPECT(cmp_i18n_test_add_overflow(max_size, 1, &out_len),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_i18n_test_add_overflow(2, 3, &out_len));
   CMP_TEST_ASSERT(out_len == 5u);
 
@@ -649,35 +658,35 @@ int main(void) {
   CMP_TEST_OK(cmp_i18n_locale_init(&locale));
   locale.decimal_separator = '\0';
   CMP_TEST_EXPECT(cmp_i18n_test_validate_locale(&locale),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_i18n_locale_init(&locale));
   locale.date_separator = '\0';
   CMP_TEST_EXPECT(cmp_i18n_test_validate_locale(&locale),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_i18n_locale_init(&locale));
   locale.time_separator = '\0';
   CMP_TEST_EXPECT(cmp_i18n_test_validate_locale(&locale),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_i18n_locale_init(&locale));
   locale.thousands_separator = '\0';
   locale.grouping = 3u;
   CMP_TEST_EXPECT(cmp_i18n_test_validate_locale(&locale),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_i18n_locale_init(&locale));
   locale.grouping = 10u;
   CMP_TEST_EXPECT(cmp_i18n_test_validate_locale(&locale), CMP_ERR_RANGE);
   CMP_TEST_OK(cmp_i18n_locale_init(&locale));
   locale.date_order = 99u;
   CMP_TEST_EXPECT(cmp_i18n_test_validate_locale(&locale),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_i18n_locale_init(&locale));
   locale.time_format = 99u;
   CMP_TEST_EXPECT(cmp_i18n_test_validate_locale(&locale),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_i18n_locale_init(&locale));
   locale.pad_day = 2;
   CMP_TEST_EXPECT(cmp_i18n_test_validate_locale(&locale),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_i18n_locale_init(&locale));
   CMP_TEST_OK(cmp_i18n_test_validate_locale(&locale));
 
@@ -754,25 +763,28 @@ int main(void) {
   test_allocator.realloc = test_realloc_fn;
   test_allocator.free = test_free_fn;
   alloc_state.fail_alloc_on_call = 1;
-  CMP_TEST_EXPECT(cmp_i18n_test_alloc_string(&test_allocator, "x", 1, &allocated),
-                 CMP_ERR_OUT_OF_MEMORY);
+  CMP_TEST_EXPECT(
+      cmp_i18n_test_alloc_string(&test_allocator, "x", 1, &allocated),
+      CMP_ERR_OUT_OF_MEMORY);
   alloc_state.fail_alloc_on_call = 0;
 
   out_len = 0;
   CMP_TEST_EXPECT(cmp_i18n_test_write_uint(small_buffer, 2, &out_len, 999u, 3u),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   out_len = 0;
   CMP_TEST_OK(
       cmp_i18n_test_write_uint(buffer, sizeof(buffer), &out_len, 42u, 4u));
   CMP_TEST_ASSERT(strcmp(buffer, "0042") == 0);
 
-  CMP_TEST_EXPECT(cmp_i18n_test_cstrlen(NULL, &out_len), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_i18n_test_cstrlen(NULL, &out_len),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_i18n_test_set_cstr_limit(1));
   CMP_TEST_EXPECT(cmp_i18n_test_cstrlen("ab", &out_len), CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_i18n_test_set_cstr_limit(0));
 
   CMP_TEST_OK(cmp_i18n_config_init(&config));
-  CMP_TEST_ASSERT(config.entry_capacity == (cmp_usize)CMP_I18N_DEFAULT_CAPACITY);
+  CMP_TEST_ASSERT(config.entry_capacity ==
+                  (cmp_usize)CMP_I18N_DEFAULT_CAPACITY);
   CMP_TEST_ASSERT(config.locale_tag != NULL);
 
 #ifdef CMP_TESTING
@@ -818,21 +830,21 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_i18n_init(&i18n, &config), CMP_ERR_STATE);
 
   CMP_TEST_EXPECT(cmp_i18n_set_locale(NULL, "en-US", NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_set_formatter(NULL, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_put(NULL, "k", 1, "v", 1, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_get(NULL, "k", 1, &value, &value_len),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_contains(NULL, "k", 1, &flag),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_remove(NULL, "k", 1), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_clear(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_count(NULL, &count), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_load_table(NULL, &io, "path", CMP_FALSE, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_load_table_buffer(NULL, "x", 1, CMP_FALSE, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       cmp_i18n_format_number(NULL, &number, buffer, sizeof(buffer), &out_len),
       CMP_ERR_INVALID_ARGUMENT);
@@ -844,11 +856,12 @@ int main(void) {
       CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_i18n_set_locale(&i18n, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_i18n_set_locale(&i18n, "", NULL), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_i18n_set_locale(&i18n, "", NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_i18n_set_formatter(&i18n, &formatter),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_i18n_locale_init(&custom_locale));
   custom_locale.decimal_separator = '.';
@@ -878,23 +891,23 @@ int main(void) {
   CMP_TEST_OK(cmp_i18n_set_formatter(&i18n, NULL));
 
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n, NULL, 1, "v", 1, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n, "k", 0, "v", 1, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n, "k", 1, NULL, 1, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   {
     char invalid_utf8[2];
     invalid_utf8[0] = (char)0xC0;
     invalid_utf8[1] = '\0';
     CMP_TEST_EXPECT(cmp_i18n_put(&i18n, invalid_utf8, 1, "v", 1, CMP_TRUE),
-                   CMP_ERR_CORRUPT);
+                    CMP_ERR_CORRUPT);
   }
 
   CMP_TEST_OK(cmp_i18n_put(&i18n, "greeting", 8, "hello", 5, CMP_FALSE));
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n, "greeting", 8, "hi", 2, CMP_FALSE),
-                 CMP_ERR_BUSY);
+                  CMP_ERR_BUSY);
   CMP_TEST_OK(cmp_i18n_put(&i18n, "greeting", 8, "hi", 2, CMP_TRUE));
 
   CMP_TEST_OK(cmp_i18n_get(&i18n, "greeting", 8, &value, &value_len));
@@ -907,7 +920,7 @@ int main(void) {
   CMP_TEST_ASSERT(flag == CMP_FALSE);
 
   CMP_TEST_EXPECT(cmp_i18n_get(&i18n, "missing", 7, &value, &value_len),
-                 CMP_ERR_NOT_FOUND);
+                  CMP_ERR_NOT_FOUND);
   CMP_TEST_ASSERT(value == NULL);
   CMP_TEST_ASSERT(value_len == 0u);
 
@@ -932,9 +945,9 @@ int main(void) {
   CMP_TEST_OK(cmp_i18n_test_find_entry(&i18n, "missing", 7, &index, &flag));
   CMP_TEST_ASSERT(flag == CMP_FALSE);
   CMP_TEST_EXPECT(cmp_i18n_test_find_entry(&i18n, "one", 3, NULL, &flag),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_find_entry(&i18n, "one", 3, &index, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_i18n_clear(&i18n));
 
@@ -952,8 +965,9 @@ int main(void) {
     test_allocator.realloc = test_realloc_fn;
     test_allocator.free = test_free_fn;
 
-    CMP_TEST_OK(test_allocator.alloc(
-        test_allocator.ctx, (cmp_usize)sizeof(CMPI18nEntry), (void **)&entries));
+    CMP_TEST_OK(test_allocator.alloc(test_allocator.ctx,
+                                     (cmp_usize)sizeof(CMPI18nEntry),
+                                     (void **)&entries));
     memset(entries, 0, sizeof(CMPI18nEntry));
     grow_i18n.entries = entries;
     grow_i18n.entry_capacity = 1u;
@@ -975,7 +989,8 @@ int main(void) {
     grow_i18n.entries = (CMPI18nEntry *)buffer;
     grow_i18n.entry_capacity = 1u;
     grow_i18n.allocator.realloc = NULL;
-    CMP_TEST_EXPECT(cmp_i18n_test_grow(&grow_i18n, 2u), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_i18n_test_grow(&grow_i18n, 2u),
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   {
@@ -995,17 +1010,17 @@ int main(void) {
   {
     const char *bad_table = "badline\n";
     CMP_TEST_EXPECT(cmp_i18n_load_table_buffer(&i18n, bad_table,
-                                             (cmp_usize)strlen(bad_table),
-                                             CMP_FALSE, CMP_TRUE),
-                   CMP_ERR_CORRUPT);
+                                               (cmp_usize)strlen(bad_table),
+                                               CMP_FALSE, CMP_TRUE),
+                    CMP_ERR_CORRUPT);
   }
 
   {
     const char *bad_table = "=value\n";
     CMP_TEST_EXPECT(cmp_i18n_load_table_buffer(&i18n, bad_table,
-                                             (cmp_usize)strlen(bad_table),
-                                             CMP_FALSE, CMP_TRUE),
-                   CMP_ERR_CORRUPT);
+                                               (cmp_usize)strlen(bad_table),
+                                               CMP_FALSE, CMP_TRUE),
+                    CMP_ERR_CORRUPT);
   }
 
   {
@@ -1017,17 +1032,20 @@ int main(void) {
     CMP_TEST_ASSERT(strncmp(value, "value", value_len) == 0);
   }
 
-  CMP_TEST_EXPECT(cmp_i18n_load_table_buffer(&i18n, "x", 1, (CMPBool)2, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_i18n_load_table_buffer(&i18n, "x", 1, CMP_FALSE, (CMPBool)2),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_i18n_load_table_buffer(&i18n, NULL, 1, CMP_FALSE, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_i18n_load_table_buffer(&i18n, "x", 1, (CMPBool)2, CMP_TRUE),
+      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_i18n_load_table_buffer(&i18n, "x", 1, CMP_FALSE, (CMPBool)2),
+      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_i18n_load_table_buffer(&i18n, NULL, 1, CMP_FALSE, CMP_TRUE),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_i18n_load_table_buffer(&i18n, NULL, 0, CMP_FALSE, CMP_FALSE));
 
   io.vtable = NULL;
   CMP_TEST_EXPECT(cmp_i18n_load_table(&i18n, &io, "path", CMP_FALSE, CMP_TRUE),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   {
     static const CMPIOVTable io_vtable = {
@@ -1042,8 +1060,9 @@ int main(void) {
     CMP_TEST_ASSERT(strncmp(value, "value", value_len) == 0);
 
     io_state.fail = 1;
-    CMP_TEST_EXPECT(cmp_i18n_load_table(&i18n, &io, "path", CMP_FALSE, CMP_TRUE),
-                   CMP_ERR_IO);
+    CMP_TEST_EXPECT(
+        cmp_i18n_load_table(&i18n, &io, "path", CMP_FALSE, CMP_TRUE),
+        CMP_ERR_IO);
     io_state.fail = 0;
   }
 
@@ -1095,9 +1114,9 @@ int main(void) {
   number.fraction = 0u;
   number.fraction_digits = 0u;
   CMP_TEST_EXPECT(cmp_i18n_format_number(&i18n, &number, NULL, 1, &out_len),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_format_number(&i18n, &number, buffer, 1, &out_len),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(
       cmp_i18n_format_number(&i18n, NULL, buffer, sizeof(buffer), &out_len),
       CMP_ERR_INVALID_ARGUMENT);
@@ -1139,12 +1158,12 @@ int main(void) {
   date.day = 4;
 
   CMP_TEST_EXPECT(cmp_i18n_format_date(&i18n, &date, buffer, 4, &out_len),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(
       cmp_i18n_format_date(&i18n, NULL, buffer, sizeof(buffer), &out_len),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_format_date(&i18n, &date, NULL, 1, &out_len),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       cmp_i18n_format_date(&i18n, &date, buffer, sizeof(buffer), NULL),
       CMP_ERR_INVALID_ARGUMENT);
@@ -1187,12 +1206,12 @@ int main(void) {
   time.minute = 5u;
 
   CMP_TEST_EXPECT(cmp_i18n_format_time(&i18n, &time, buffer, 4, &out_len),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(
       cmp_i18n_format_time(&i18n, NULL, buffer, sizeof(buffer), &out_len),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_format_time(&i18n, &time, NULL, 1, &out_len),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       cmp_i18n_format_time(&i18n, &time, buffer, sizeof(buffer), NULL),
       CMP_ERR_INVALID_ARGUMENT);
@@ -1249,21 +1268,21 @@ int main(void) {
     fmt_config.formatter = &formatter;
     CMP_TEST_OK(cmp_i18n_init(&i18n_fmt, &fmt_config));
     CMP_TEST_EXPECT(cmp_i18n_format_number(&i18n_fmt, &number, buffer,
+                                           sizeof(buffer), &out_len),
+                    CMP_ERR_IO);
+    CMP_TEST_EXPECT(cmp_i18n_format_date(&i18n_fmt, &date, buffer,
                                          sizeof(buffer), &out_len),
-                   CMP_ERR_IO);
-    CMP_TEST_EXPECT(
-        cmp_i18n_format_date(&i18n_fmt, &date, buffer, sizeof(buffer), &out_len),
-        CMP_ERR_IO);
-    CMP_TEST_EXPECT(
-        cmp_i18n_format_time(&i18n_fmt, &time, buffer, sizeof(buffer), &out_len),
-        CMP_ERR_IO);
+                    CMP_ERR_IO);
+    CMP_TEST_EXPECT(cmp_i18n_format_time(&i18n_fmt, &time, buffer,
+                                         sizeof(buffer), &out_len),
+                    CMP_ERR_IO);
     CMP_TEST_OK(cmp_i18n_shutdown(&i18n_fmt));
 
     formatter.vtable = NULL;
     CMP_TEST_OK(cmp_i18n_config_init(&fmt_config));
     fmt_config.formatter = &formatter;
     CMP_TEST_EXPECT(cmp_i18n_init(&i18n_fmt, &fmt_config),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   test_alloc_reset(&alloc_state);
@@ -1286,7 +1305,8 @@ int main(void) {
     CMP_TEST_EXPECT(cmp_i18n_shutdown(&i18n_bad), CMP_ERR_INVALID_ARGUMENT);
   }
 
-  CMP_TEST_EXPECT(cmp_i18n_test_validate_utf8(NULL, 1u), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_i18n_test_validate_utf8(NULL, 1u),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   {
     CMPI18n i18n_overflow;
@@ -1302,7 +1322,7 @@ int main(void) {
     i18n_overflow.entry_capacity = (max_size / 2u) + 1u;
     min_capacity = i18n_overflow.entry_capacity + 1u;
     CMP_TEST_EXPECT(cmp_i18n_test_grow(&i18n_overflow, min_capacity),
-                   CMP_ERR_OVERFLOW);
+                    CMP_ERR_OVERFLOW);
 
     i18n_overflow.entry_capacity =
         (max_size / (cmp_usize)sizeof(CMPI18nEntry)) + 1u;
@@ -1327,29 +1347,29 @@ int main(void) {
 
   CMP_TEST_OK(cmp_i18n_test_force_utf8_ok_count(2u));
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n_fail, "a", 1, NULL, 1, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_i18n_put(&i18n_fail, "key", 3, "val", 3, CMP_TRUE));
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n_fail, "key", 3, "new", 3, CMP_FALSE),
-                 CMP_ERR_BUSY);
+                  CMP_ERR_BUSY);
   alloc_state.fail_free_on_call = alloc_state.free_calls + 1;
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n_fail, "key", 3, NULL, 0, CMP_TRUE),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   alloc_state.fail_free_on_call = 0;
   CMP_TEST_OK(cmp_i18n_put(&i18n_fail, "key", 3, NULL, 0, CMP_TRUE));
   CMP_TEST_OK(cmp_i18n_put(&i18n_fail, "key", 3, "val", 3, CMP_TRUE));
   alloc_state.fail_free_on_call = alloc_state.free_calls + 1;
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n_fail, "key", 3, "new", 3, CMP_TRUE),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   alloc_state.fail_free_on_call = 0;
 
   CMP_TEST_OK(test_alloc_reset(&alloc_state));
   alloc_state.fail_alloc_on_call = 1;
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n_fail, "a", 1, "b", 1, CMP_TRUE),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   alloc_state.fail_alloc_on_call = 2;
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n_fail, "a", 1, "b", 1, CMP_TRUE),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   alloc_state.fail_alloc_on_call = 0;
 
   {
@@ -1366,13 +1386,13 @@ int main(void) {
     CMP_TEST_OK(test_alloc_reset(&alloc_state));
     alloc_state.fail_alloc_on_call = 1;
     CMP_TEST_EXPECT(cmp_i18n_put(&i18n_update, "k", 1, "n", 1, CMP_TRUE),
-                   CMP_ERR_OUT_OF_MEMORY);
+                    CMP_ERR_OUT_OF_MEMORY);
     alloc_state.fail_alloc_on_call = 0;
 
     CMP_TEST_OK(test_alloc_reset(&alloc_state));
     alloc_state.fail_alloc_on_call = 2;
     CMP_TEST_EXPECT(cmp_i18n_put(&i18n_update, "x", 1, "y", 1, CMP_TRUE),
-                   CMP_ERR_OUT_OF_MEMORY);
+                    CMP_ERR_OUT_OF_MEMORY);
     alloc_state.fail_alloc_on_call = 0;
 
     CMP_TEST_OK(cmp_i18n_shutdown(&i18n_update));
@@ -1382,7 +1402,7 @@ int main(void) {
   CMP_TEST_OK(test_alloc_reset(&alloc_state));
   alloc_state.fail_realloc_on_call = 1;
   CMP_TEST_EXPECT(cmp_i18n_put(&i18n_fail, "c", 1, "d", 1, CMP_TRUE),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   alloc_state.fail_realloc_on_call = 0;
 
   alloc_state.fail_free_on_call = alloc_state.free_calls + 1;

@@ -24,44 +24,44 @@ typedef struct CMPScrollDelta {
  * @brief Scroll parent virtual table.
  */
 typedef struct CMPScrollParentVTable {
-  /**
-   * @brief Pre-scroll callback invoked before the child consumes the delta.
-   * @param ctx Parent context pointer.
-   * @param delta Remaining scroll delta.
-   * @param out_consumed Receives the delta consumed by the parent.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+/**
+ * @brief Pre-scroll callback invoked before the child consumes the delta.
+ * @param ctx Parent context pointer.
+ * @param delta Remaining scroll delta.
+ * @param out_consumed Receives the delta consumed by the parent.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int pre_scroll(void *ctx, const CMPScrollDelta *delta,
                  CMPScrollDelta *out_consumed);
-  #else
+#else
   int(CMP_CALL *pre_scroll)(void *ctx, const CMPScrollDelta *delta,
                             CMPScrollDelta *out_consumed);
-  #endif
-  /**
-   * @brief Post-scroll callback invoked after the child consumes the delta.
-   * @param ctx Parent context pointer.
-   * @param delta Remaining scroll delta after the child scrolls.
-   * @param child_consumed Delta consumed by the child.
-   * @param out_consumed Receives the delta consumed by the parent.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Post-scroll callback invoked after the child consumes the delta.
+ * @param ctx Parent context pointer.
+ * @param delta Remaining scroll delta after the child scrolls.
+ * @param child_consumed Delta consumed by the child.
+ * @param out_consumed Receives the delta consumed by the parent.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int post_scroll(void *ctx, const CMPScrollDelta *delta,
                   const CMPScrollDelta *child_consumed,
                   CMPScrollDelta *out_consumed);
-  #else
+#else
   int(CMP_CALL *post_scroll)(void *ctx, const CMPScrollDelta *delta,
                              const CMPScrollDelta *child_consumed,
                              CMPScrollDelta *out_consumed);
-  #endif
+#endif
 } CMPScrollParentVTable;
 
 /**
  * @brief Scroll parent interface.
  */
 typedef struct CMPScrollParent {
-  void *ctx;                          /**< Parent context pointer. */
+  void *ctx;                           /**< Parent context pointer. */
   const CMPScrollParentVTable *vtable; /**< Parent virtual table. */
 } CMPScrollParent;
 
@@ -81,7 +81,7 @@ typedef struct CMPScrollChain {
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_scroll_delta_init(CMPScrollDelta *delta, CMPScalar x,
-                                        CMPScalar y);
+                                           CMPScalar y);
 
 /**
  * @brief Initialize a scroll parent interface.
@@ -90,8 +90,8 @@ CMP_API int CMP_CALL cmp_scroll_delta_init(CMPScrollDelta *delta, CMPScalar x,
  * @param vtable Parent virtual table.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_scroll_parent_init(CMPScrollParent *parent, void *ctx,
-                                         const CMPScrollParentVTable *vtable);
+CMP_API int CMP_CALL cmp_scroll_parent_init(
+    CMPScrollParent *parent, void *ctx, const CMPScrollParentVTable *vtable);
 
 /**
  * @brief Initialize a scroll chain.
@@ -101,8 +101,8 @@ CMP_API int CMP_CALL cmp_scroll_parent_init(CMPScrollParent *parent, void *ctx,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_scroll_chain_init(CMPScrollChain *chain,
-                                        CMPScrollParent **parents,
-                                        cmp_usize count);
+                                           CMPScrollParent **parents,
+                                           cmp_usize count);
 
 /**
  * @brief Dispatch a pre-scroll through the parent chain.
@@ -113,9 +113,9 @@ CMP_API int CMP_CALL cmp_scroll_chain_init(CMPScrollChain *chain,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_scroll_chain_pre_scroll(const CMPScrollChain *chain,
-                                              const CMPScrollDelta *delta,
-                                              CMPScrollDelta *out_consumed,
-                                              CMPScrollDelta *out_remaining);
+                                                 const CMPScrollDelta *delta,
+                                                 CMPScrollDelta *out_consumed,
+                                                 CMPScrollDelta *out_remaining);
 
 /**
  * @brief Dispatch a post-scroll through the parent chain.
@@ -146,7 +146,8 @@ CMP_API int CMP_CALL cmp_scroll_test_validate_consumed(
  * @param chain Scroll chain to validate.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_scroll_test_validate_chain(const CMPScrollChain *chain);
+CMP_API int CMP_CALL
+cmp_scroll_test_validate_chain(const CMPScrollChain *chain);
 #endif
 
 #ifdef __cplusplus

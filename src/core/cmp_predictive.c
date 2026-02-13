@@ -48,8 +48,8 @@ cmp_predictive_back_validate_handler(const CMPPredictiveBackHandler *handler) {
 }
 
 static int cmp_predictive_back_call(const CMPPredictiveBackHandler *handler,
-                                   cmp_u32 kind,
-                                   const CMPPredictiveBackEvent *event) {
+                                    cmp_u32 kind,
+                                    const CMPPredictiveBackEvent *event) {
   if (handler == NULL || handler->vtable == NULL) {
     return CMP_OK;
   }
@@ -93,7 +93,7 @@ int CMP_CALL cmp_predictive_back_event_init(CMPPredictiveBackEvent *event) {
 
 int CMP_CALL
 cmp_predictive_back_handler_init(CMPPredictiveBackHandler *handler, void *ctx,
-                                const CMPPredictiveBackHandlerVTable *vtable) {
+                                 const CMPPredictiveBackHandlerVTable *vtable) {
   if (handler == NULL || vtable == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -104,7 +104,7 @@ cmp_predictive_back_handler_init(CMPPredictiveBackHandler *handler, void *ctx,
 }
 
 int CMP_CALL cmp_predictive_back_init(CMPPredictiveBack *predictive,
-                                    const CMPPredictiveBackHandler *handler) {
+                                      const CMPPredictiveBackHandler *handler) {
   int rc;
 
   if (predictive == NULL) {
@@ -182,8 +182,9 @@ int CMP_CALL cmp_predictive_back_set_handler(
   return CMP_OK;
 }
 
-int CMP_CALL cmp_predictive_back_get_handler(
-    const CMPPredictiveBack *predictive, CMPPredictiveBackHandler *out_handler) {
+int CMP_CALL
+cmp_predictive_back_get_handler(const CMPPredictiveBack *predictive,
+                                CMPPredictiveBackHandler *out_handler) {
   if (predictive == NULL || out_handler == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -196,7 +197,7 @@ int CMP_CALL cmp_predictive_back_get_handler(
 }
 
 int CMP_CALL cmp_predictive_back_get_state(const CMPPredictiveBack *predictive,
-                                         CMPPredictiveBackState *out_state) {
+                                           CMPPredictiveBackState *out_state) {
   if (predictive == NULL || out_state == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -210,7 +211,7 @@ int CMP_CALL cmp_predictive_back_get_state(const CMPPredictiveBack *predictive,
 }
 
 int CMP_CALL cmp_predictive_back_start(CMPPredictiveBack *predictive,
-                                     const CMPPredictiveBackEvent *event) {
+                                       const CMPPredictiveBackEvent *event) {
   CMPPredictiveBackEvent prev_event;
   int rc;
 
@@ -244,7 +245,7 @@ int CMP_CALL cmp_predictive_back_start(CMPPredictiveBack *predictive,
 }
 
 int CMP_CALL cmp_predictive_back_progress(CMPPredictiveBack *predictive,
-                                        const CMPPredictiveBackEvent *event) {
+                                          const CMPPredictiveBackEvent *event) {
   CMPPredictiveBackEvent prev_event; /* GCOVR_EXCL_LINE */
   int rc;
 
@@ -276,7 +277,7 @@ int CMP_CALL cmp_predictive_back_progress(CMPPredictiveBack *predictive,
 }
 
 int CMP_CALL cmp_predictive_back_commit(CMPPredictiveBack *predictive,
-                                      const CMPPredictiveBackEvent *event) {
+                                        const CMPPredictiveBackEvent *event) {
   CMPPredictiveBackEvent prev_event;
   CMPBool prev_active; /* GCOVR_EXCL_LINE */
   int rc;
@@ -312,7 +313,7 @@ int CMP_CALL cmp_predictive_back_commit(CMPPredictiveBack *predictive,
 }
 
 int CMP_CALL cmp_predictive_back_cancel(CMPPredictiveBack *predictive,
-                                      const CMPPredictiveBackEvent *event) {
+                                        const CMPPredictiveBackEvent *event) {
   CMPPredictiveBackEvent prev_event;
   CMPBool prev_active; /* GCOVR_EXCL_LINE */
   int rc;

@@ -41,8 +41,8 @@ static int m3_menu_validate_color(const CMPColor *color) {
   return CMP_OK;
 }
 
-static int m3_menu_color_set(CMPColor *color, CMPScalar r, CMPScalar g, CMPScalar b,
-                             CMPScalar a) {
+static int m3_menu_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
+                             CMPScalar b, CMPScalar a) {
   if (color == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -181,8 +181,8 @@ static int m3_menu_validate_items(const M3MenuItem *items, cmp_usize count) {
 }
 
 static int m3_menu_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -239,7 +239,7 @@ static int m3_menu_validate_placement(const M3MenuPlacement *placement) {
 }
 
 static CMPScalar m3_menu_clamp(CMPScalar value, CMPScalar min_value,
-                              CMPScalar max_value) {
+                               CMPScalar max_value) {
   if (value < min_value) {
     return min_value;
   }
@@ -287,7 +287,7 @@ m3_menu_update_metrics(M3Menu *menu,
     }
 
     rc = cmp_text_font_metrics(&menu->text_backend, menu->font,
-                              &menu->font_metrics);
+                               &menu->font_metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -297,8 +297,8 @@ m3_menu_update_metrics(M3Menu *menu,
         continue;
       }
       rc = cmp_text_measure_utf8(&menu->text_backend, menu->font,
-                                menu->items[i].utf8_label,
-                                menu->items[i].utf8_len, &metrics);
+                                 menu->items[i].utf8_label,
+                                 menu->items[i].utf8_len, &metrics);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -706,7 +706,7 @@ static int m3_menu_widget_layout(void *widget, CMPRect bounds) {
   menu->overlay_bounds = bounds;                 /* GCOVR_EXCL_LINE */
   menu->menu_bounds = panel_bounds;              /* GCOVR_EXCL_LINE */
   menu->resolved_direction = resolved_direction; /* GCOVR_EXCL_LINE */
-  return CMP_OK;                                  /* GCOVR_EXCL_LINE */
+  return CMP_OK;                                 /* GCOVR_EXCL_LINE */
 }
 
 static int m3_menu_widget_paint(void *widget,
@@ -753,7 +753,7 @@ static int m3_menu_widget_paint(void *widget,
 
   if (menu->style.shadow_enabled == CMP_TRUE) {
     rc = cmp_shadow_paint(&menu->style.shadow, ctx->gfx, &menu->menu_bounds,
-                         shadow_clip);
+                          shadow_clip);
     if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
       return rc;
     }
@@ -803,7 +803,7 @@ static int m3_menu_widget_paint(void *widget,
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, menu->font, /* GCOVR_EXCL_LINE */
         item->utf8_label, item->utf8_len, text_x, text_y,
-        color);        /* GCOVR_EXCL_LINE */
+        color);         /* GCOVR_EXCL_LINE */
     if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
       return rc;
     }
@@ -1026,8 +1026,8 @@ int CMP_CALL m3_menu_style_init(M3MenuStyle *style) {
 }
 
 int CMP_CALL m3_menu_init(M3Menu *menu, const CMPTextBackend *backend,
-                         const M3MenuStyle *style, const M3MenuItem *items,
-                         cmp_usize item_count) {
+                          const M3MenuStyle *style, const M3MenuItem *items,
+                          cmp_usize item_count) {
   int rc;
 
   if (menu == NULL || backend == NULL || style == NULL) {
@@ -1089,7 +1089,7 @@ int CMP_CALL m3_menu_init(M3Menu *menu, const CMPTextBackend *backend,
 }
 
 int CMP_CALL m3_menu_set_items(M3Menu *menu, const M3MenuItem *items,
-                              cmp_usize item_count) {
+                               cmp_usize item_count) {
   int rc;
 
   if (menu == NULL) {
@@ -1168,7 +1168,7 @@ int CMP_CALL m3_menu_set_anchor_point(M3Menu *menu, CMPScalar x, CMPScalar y) {
 }
 
 int CMP_CALL m3_menu_set_placement(M3Menu *menu,
-                                  const M3MenuPlacement *placement) {
+                                   const M3MenuPlacement *placement) {
   int rc;
 
   if (menu == NULL || placement == NULL) {
@@ -1219,7 +1219,8 @@ int CMP_CALL m3_menu_get_bounds(const M3Menu *menu, CMPRect *out_bounds) {
   return CMP_OK;
 }
 
-int CMP_CALL m3_menu_get_overlay_bounds(const M3Menu *menu, CMPRect *out_bounds) {
+int CMP_CALL m3_menu_get_overlay_bounds(const M3Menu *menu,
+                                        CMPRect *out_bounds) {
   if (menu == NULL || out_bounds == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1229,7 +1230,7 @@ int CMP_CALL m3_menu_get_overlay_bounds(const M3Menu *menu, CMPRect *out_bounds)
 }
 
 int CMP_CALL m3_menu_get_resolved_direction(const M3Menu *menu,
-                                           cmp_u32 *out_direction) {
+                                            cmp_u32 *out_direction) {
   if (menu == NULL || out_direction == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1239,7 +1240,7 @@ int CMP_CALL m3_menu_get_resolved_direction(const M3Menu *menu,
 }
 
 int CMP_CALL m3_menu_get_item_bounds(const M3Menu *menu, cmp_usize index,
-                                    CMPRect *out_bounds) {
+                                     CMPRect *out_bounds) {
   CMPScalar content_x;
   CMPScalar content_y = 0.0f;
   CMPScalar stride;
@@ -1267,7 +1268,7 @@ int CMP_CALL m3_menu_get_item_bounds(const M3Menu *menu, cmp_usize index,
 }
 
 int CMP_CALL m3_menu_set_on_action(M3Menu *menu, CMPMenuOnAction on_action,
-                                  void *ctx) {
+                                   void *ctx) {
   if (menu == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1314,36 +1315,37 @@ int CMP_CALL m3_menu_test_set_style_fail_disabled_color(CMPBool enable) {
 }
 
 int CMP_CALL m3_menu_test_validate_style(const M3MenuStyle *style,
-                                        CMPBool require_family) {
+                                         CMPBool require_family) {
   return m3_menu_validate_style(style, require_family);
 }
 
-int CMP_CALL m3_menu_test_update_metrics(M3Menu *menu, CMPScalar *out_text_width,
-                                        CMPBool *out_has_label) {
+int CMP_CALL m3_menu_test_update_metrics(M3Menu *menu,
+                                         CMPScalar *out_text_width,
+                                         CMPBool *out_has_label) {
   return m3_menu_update_metrics(menu, out_text_width,
                                 out_has_label); /* GCOVR_EXCL_LINE */
 }
 
 int CMP_CALL m3_menu_test_compute_panel_size(M3Menu *menu, CMPScalar *out_width,
-                                            CMPScalar *out_height,
-                                            CMPBool *out_has_label) {
+                                             CMPScalar *out_height,
+                                             CMPBool *out_has_label) {
   return m3_menu_compute_panel_size(menu, out_width, out_height, out_has_label);
 }
 
 int CMP_CALL m3_menu_test_compute_panel_bounds(/* GCOVR_EXCL_LINE */
-                                              const M3Menu *menu,
-                                              const CMPRect *overlay,
-                                              CMPScalar panel_width,
-                                              CMPScalar panel_height,
-                                              CMPRect *out_bounds,
-                                              cmp_u32 *out_direction) {
+                                               const M3Menu *menu,
+                                               const CMPRect *overlay,
+                                               CMPScalar panel_width,
+                                               CMPScalar panel_height,
+                                               CMPRect *out_bounds,
+                                               cmp_u32 *out_direction) {
   return m3_menu_compute_panel_bounds(menu, overlay, panel_width, panel_height,
                                       out_bounds,
                                       out_direction); /* GCOVR_EXCL_LINE */
 }
 
 int CMP_CALL m3_menu_test_hit_test(const M3Menu *menu, CMPScalar x, CMPScalar y,
-                                  CMPBool *out_inside, cmp_usize *out_index) {
+                                   CMPBool *out_inside, cmp_usize *out_index) {
   return m3_menu_hit_test(menu, x, y, out_inside,
                           out_index); /* GCOVR_EXCL_LINE */
 }
@@ -1353,18 +1355,18 @@ int CMP_CALL m3_menu_test_validate_color(const CMPColor *color) {
 }
 
 int CMP_CALL m3_menu_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                   CMPScalar b, CMPScalar a) {
+                                    CMPScalar b, CMPScalar a) {
   return m3_menu_color_set(color, r, g, b, a); /* GCOVR_EXCL_LINE */
 }
 
 int CMP_CALL
 m3_menu_test_validate_edges(const CMPLayoutEdges *edges) { /* GCOVR_EXCL_LINE */
-  return m3_menu_validate_edges(edges);                   /* GCOVR_EXCL_LINE */
+  return m3_menu_validate_edges(edges);                    /* GCOVR_EXCL_LINE */
 }
 
-int CMP_CALL
-m3_menu_test_validate_text_style(const CMPTextStyle *style, /* GCOVR_EXCL_LINE */
-                                 CMPBool require_family) {
+int CMP_CALL m3_menu_test_validate_text_style(
+    const CMPTextStyle *style, /* GCOVR_EXCL_LINE */
+    CMPBool require_family) {
   return m3_menu_validate_text_style(style, require_family);
 }
 
@@ -1375,7 +1377,7 @@ m3_menu_test_validate_measure_spec(CMPMeasureSpec spec) { /* GCOVR_EXCL_LINE */
 
 int CMP_CALL
 m3_menu_test_validate_rect(const CMPRect *rect) { /* GCOVR_EXCL_LINE */
-  return m3_menu_validate_rect(rect);            /* GCOVR_EXCL_LINE */
+  return m3_menu_validate_rect(rect);             /* GCOVR_EXCL_LINE */
 }
 
 int CMP_CALL

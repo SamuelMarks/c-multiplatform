@@ -9,7 +9,6 @@
 #include "cmpc/cmp_backend_sdl3.h"
 #include "cmpc/cmp_backend_web.h"
 #include "cmpc/cmp_camera.h"
-#include "m3/m3_color.h"
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_datetime.h"
 #include "cmpc/cmp_event.h"
@@ -20,12 +19,13 @@
 #include "cmpc/cmp_predictive.h"
 #include "cmpc/cmp_render.h"
 #include "cmpc/cmp_router.h"
-#include "m3/m3_selection.h"
 #include "cmpc/cmp_store.h"
 #include "cmpc/cmp_tasks.h"
 #include "cmpc/cmp_text.h"
 #include "cmpc/cmp_utf8.h"
 #include "cmpc/cmp_visuals.h"
+#include "m3/m3_color.h"
+#include "m3/m3_selection.h"
 
 int main(void) {
   CMPAllocator alloc;

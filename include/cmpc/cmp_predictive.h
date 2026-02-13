@@ -55,7 +55,7 @@ typedef struct CMPPredictiveBackHandlerVTable {
  * @brief Predictive back handler interface.
  */
 typedef struct CMPPredictiveBackHandler {
-  void *ctx;                                   /**< Handler context pointer. */
+  void *ctx;                                    /**< Handler context pointer. */
   const CMPPredictiveBackHandlerVTable *vtable; /**< Handler virtual table. */
 } CMPPredictiveBackHandler;
 
@@ -82,7 +82,8 @@ typedef struct CMPPredictiveBack {
  * @param event Event to initialize.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_predictive_back_event_init(CMPPredictiveBackEvent *event);
+CMP_API int CMP_CALL
+cmp_predictive_back_event_init(CMPPredictiveBackEvent *event);
 
 /**
  * @brief Initialize a predictive back handler interface.
@@ -93,7 +94,7 @@ CMP_API int CMP_CALL cmp_predictive_back_event_init(CMPPredictiveBackEvent *even
  */
 CMP_API int CMP_CALL
 cmp_predictive_back_handler_init(CMPPredictiveBackHandler *handler, void *ctx,
-                                const CMPPredictiveBackHandlerVTable *vtable);
+                                 const CMPPredictiveBackHandlerVTable *vtable);
 
 /**
  * @brief Initialize a predictive back controller.
@@ -109,7 +110,8 @@ CMP_API int CMP_CALL cmp_predictive_back_init(
  * @param predictive Controller instance.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_predictive_back_shutdown(CMPPredictiveBack *predictive);
+CMP_API int CMP_CALL
+cmp_predictive_back_shutdown(CMPPredictiveBack *predictive);
 
 /**
  * @brief Update the predictive back handler.
@@ -144,8 +146,8 @@ CMP_API int CMP_CALL cmp_predictive_back_get_state(
  * @param event Gesture payload.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_predictive_back_start(CMPPredictiveBack *predictive,
-                                            const CMPPredictiveBackEvent *event);
+CMP_API int CMP_CALL cmp_predictive_back_start(
+    CMPPredictiveBack *predictive, const CMPPredictiveBackEvent *event);
 
 /**
  * @brief Notify the controller of predictive back gesture progress.

@@ -6,10 +6,10 @@
 static CMPBool g_cmp_camera_skip_vtable_check = CMP_FALSE;
 #endif
 
-#define CMP_CAMERA_VTABLE_HAS_OPEN(vtable)                                      \
+#define CMP_CAMERA_VTABLE_HAS_OPEN(vtable)                                     \
   ((vtable)->open != NULL || (vtable)->open_with_config != NULL)
-#define CMP_CAMERA_VTABLE_COMPLETE(vtable)                                      \
-  (CMP_CAMERA_VTABLE_HAS_OPEN(vtable) && (vtable)->close != NULL &&             \
+#define CMP_CAMERA_VTABLE_COMPLETE(vtable)                                     \
+  (CMP_CAMERA_VTABLE_HAS_OPEN(vtable) && (vtable)->close != NULL &&            \
    (vtable)->start != NULL && (vtable)->stop != NULL &&                        \
    (vtable)->read_frame != NULL)
 
@@ -28,7 +28,7 @@ int CMP_CALL cmp_camera_config_init(CMPCameraSessionConfig *config) {
 }
 
 int CMP_CALL cmp_camera_init(CMPCameraSession *session,
-                           const CMPCameraSessionConfig *config) {
+                             const CMPCameraSessionConfig *config) {
   CMPCamera camera;
   int rc;
 
@@ -181,8 +181,8 @@ int CMP_CALL cmp_camera_stop(CMPCameraSession *session) {
 }
 
 int CMP_CALL cmp_camera_read_frame(CMPCameraSession *session,
-                                 CMPCameraFrame *out_frame,
-                                 CMPBool *out_has_frame) {
+                                   CMPCameraFrame *out_frame,
+                                   CMPBool *out_has_frame) {
   int rc;
 
   if (session == NULL || out_frame == NULL || out_has_frame == NULL) {
@@ -211,7 +211,8 @@ int CMP_CALL cmp_camera_read_frame(CMPCameraSession *session,
 }
 
 int CMP_CALL cmp_camera_copy_frame(const CMPCameraFrame *frame, void *dst,
-                                 cmp_usize dst_capacity, cmp_usize *out_size) {
+                                   cmp_usize dst_capacity,
+                                   cmp_usize *out_size) {
   if (frame == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

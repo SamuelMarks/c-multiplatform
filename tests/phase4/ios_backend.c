@@ -20,7 +20,7 @@ int main(void) {
   CMP_TEST_ASSERT(config.predictive_back == NULL);
 
   CMP_TEST_EXPECT(cmp_ios_backend_test_validate_config(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
   CMP_TEST_OK(cmp_ios_backend_config_init(&config));
   config.allocator = &default_alloc;
@@ -29,7 +29,8 @@ int main(void) {
     CMPPredictiveBack predictive;
     memset(&predictive, 0, sizeof(predictive));
     config.predictive_back = &predictive;
-    CMP_TEST_EXPECT(cmp_ios_backend_test_validate_config(&config), CMP_ERR_STATE);
+    CMP_TEST_EXPECT(cmp_ios_backend_test_validate_config(&config),
+                    CMP_ERR_STATE);
     CMP_TEST_OK(cmp_predictive_back_init(&predictive, NULL));
     CMP_TEST_OK(cmp_ios_backend_test_validate_config(&config));
     config.predictive_back = NULL;
@@ -54,7 +55,7 @@ int main(void) {
   CMP_TEST_OK(cmp_ios_backend_config_init(&config));
   config.handle_capacity = 0;
   CMP_TEST_EXPECT(cmp_ios_backend_create(&config, &backend),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   {
     CMPAllocator bad_alloc;
@@ -62,7 +63,7 @@ int main(void) {
     memset(&bad_alloc, 0, sizeof(bad_alloc));
     config.allocator = &bad_alloc;
     CMP_TEST_EXPECT(cmp_ios_backend_create(&config, &backend),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   if (!available) {
@@ -75,45 +76,50 @@ int main(void) {
     CMP_TEST_OK(cmp_ios_backend_config_init(&config));
     backend = NULL;
     CMP_TEST_EXPECT(cmp_ios_backend_create(&config, &backend),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
     CMP_TEST_ASSERT(backend == NULL);
 
     CMP_TEST_EXPECT(cmp_ios_backend_destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_ios_backend_destroy((CMPIOSBackend *)1),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
-    CMP_TEST_EXPECT(cmp_ios_backend_get_ws(NULL, &ws), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_ios_backend_get_ws(NULL, &ws),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_ios_backend_get_ws((CMPIOSBackend *)1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_ios_backend_get_ws((CMPIOSBackend *)1, &ws),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
-    CMP_TEST_EXPECT(cmp_ios_backend_get_gfx(NULL, &gfx), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_ios_backend_get_gfx(NULL, &gfx),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_ios_backend_get_gfx((CMPIOSBackend *)1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_ios_backend_get_gfx((CMPIOSBackend *)1, &gfx),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
-    CMP_TEST_EXPECT(cmp_ios_backend_get_env(NULL, &env), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_ios_backend_get_env(NULL, &env),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_ios_backend_get_env((CMPIOSBackend *)1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_ios_backend_get_env((CMPIOSBackend *)1, &env),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
     predictive = (CMPPredictiveBack *)1;
     CMP_TEST_EXPECT(cmp_ios_backend_set_predictive_back(NULL, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_ios_backend_get_predictive_back((CMPIOSBackend *)1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_ios_backend_get_predictive_back((CMPIOSBackend *)1, NULL),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_ios_backend_get_predictive_back((CMPIOSBackend *)1, &predictive),
         CMP_ERR_UNSUPPORTED);
     CMP_TEST_ASSERT(predictive == NULL);
-    CMP_TEST_EXPECT(cmp_ios_backend_set_predictive_back((CMPIOSBackend *)1, NULL),
-                   CMP_ERR_UNSUPPORTED);
+    CMP_TEST_EXPECT(
+        cmp_ios_backend_set_predictive_back((CMPIOSBackend *)1, NULL),
+        CMP_ERR_UNSUPPORTED);
     CMP_TEST_OK(cmp_predictive_back_event_init(&event));
     CMP_TEST_EXPECT(cmp_ios_backend_predictive_back_start(NULL, &event),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_ios_backend_predictive_back_start((CMPIOSBackend *)1, NULL),
         CMP_ERR_INVALID_ARGUMENT);
@@ -121,7 +127,7 @@ int main(void) {
         cmp_ios_backend_predictive_back_start((CMPIOSBackend *)1, &event),
         CMP_ERR_UNSUPPORTED);
     CMP_TEST_EXPECT(cmp_ios_backend_predictive_back_progress(NULL, &event),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_ios_backend_predictive_back_progress((CMPIOSBackend *)1, NULL),
         CMP_ERR_INVALID_ARGUMENT);
@@ -129,7 +135,7 @@ int main(void) {
         cmp_ios_backend_predictive_back_progress((CMPIOSBackend *)1, &event),
         CMP_ERR_UNSUPPORTED);
     CMP_TEST_EXPECT(cmp_ios_backend_predictive_back_commit(NULL, &event),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_ios_backend_predictive_back_commit((CMPIOSBackend *)1, NULL),
         CMP_ERR_INVALID_ARGUMENT);
@@ -137,7 +143,7 @@ int main(void) {
         cmp_ios_backend_predictive_back_commit((CMPIOSBackend *)1, &event),
         CMP_ERR_UNSUPPORTED);
     CMP_TEST_EXPECT(cmp_ios_backend_predictive_back_cancel(NULL, &event),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_ios_backend_predictive_back_cancel((CMPIOSBackend *)1, NULL),
         CMP_ERR_INVALID_ARGUMENT);
@@ -179,15 +185,15 @@ int main(void) {
     event.edge = CMP_PREDICTIVE_BACK_EDGE_LEFT;
     event.progress = 0.0f;
     CMP_TEST_EXPECT(cmp_ios_backend_set_predictive_back(NULL, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_ios_backend_predictive_back_start(NULL, &event),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_ios_backend_predictive_back_progress(NULL, &event),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_ios_backend_predictive_back_commit(NULL, &event),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_ios_backend_predictive_back_cancel(NULL, &event),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_ios_backend_predictive_back_start(backend, &event));
     event.progress = 0.5f;
     CMP_TEST_OK(cmp_ios_backend_predictive_back_progress(backend, &event));

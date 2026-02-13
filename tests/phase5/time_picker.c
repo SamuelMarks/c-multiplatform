@@ -62,8 +62,9 @@ static int test_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
   return CMP_OK;
 }
 
-static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                              CMPScalar y1, CMPColor color, CMPScalar thickness) {
+static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
+                              CMPScalar x1, CMPScalar y1, CMPColor color,
+                              CMPScalar thickness) {
   TestTimePickerBackend *backend;
 
   if (gfx == NULL) {
@@ -85,18 +86,18 @@ static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0, CMPScalar x
 }
 
 static const CMPGfxVTable g_test_vtable = {NULL,
-                                          NULL,
-                                          NULL,
-                                          test_gfx_draw_rect,
-                                          test_gfx_draw_line,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL};
+                                           NULL,
+                                           NULL,
+                                           test_gfx_draw_rect,
+                                           test_gfx_draw_line,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL};
 
 static const CMPGfxVTable g_test_vtable_no_rect = {
     NULL, NULL, NULL, NULL, test_gfx_draw_line, NULL, NULL, NULL, NULL,
@@ -119,7 +120,8 @@ static int init_pointer_event(CMPInputEvent *event, cmp_u32 type, cmp_i32 x,
   return CMP_OK;
 }
 
-static int test_on_change(void *ctx, M3TimePicker *picker, const CMPTime *time) {
+static int test_on_change(void *ctx, M3TimePicker *picker,
+                          const CMPTime *time) {
   ChangeCounter *counter;
 
   if (ctx == NULL || picker == NULL || time == NULL) {
@@ -201,9 +203,9 @@ static int test_helpers(void) {
       m3_time_picker_test_validate_style((const M3TimePickerStyle *)null_style),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_test_validate_rect((const CMPRect *)null_rect),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_test_validate_time((const CMPTime *)null_time),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   edges.left = -1.0f;
   edges.right = 0.0f;
@@ -262,10 +264,11 @@ static int test_helpers(void) {
   spec.mode = 99u;
   spec.size = 10.0f;
   CMP_TEST_EXPECT(m3_time_picker_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_AT_MOST;
   spec.size = -1.0f;
-  CMP_TEST_EXPECT(m3_time_picker_test_validate_measure_spec(spec), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_time_picker_test_validate_measure_spec(spec),
+                  CMP_ERR_RANGE);
   spec.mode = CMP_MEASURE_EXACTLY;
   spec.size = 10.0f;
   CMP_TEST_OK(m3_time_picker_test_validate_measure_spec(spec));
@@ -303,9 +306,9 @@ static int test_helpers(void) {
   CMP_TEST_ASSERT(cmp_near(angle, (CMPScalar)(CMP_TEST_PI * 1.75f), 1e-3f));
 
   CMP_TEST_EXPECT(m3_time_picker_test_angle_to_index(0.0f, 0u, &index),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_time_picker_test_angle_to_index(0.0f, 12u, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_time_picker_test_angle_to_index(0.0f, 12u, &index));
   CMP_TEST_ASSERT(index == 0u);
   angle = (CMPScalar)(CMP_TEST_PI * 2.0f / 12.0f) * 0.6f;
@@ -317,58 +320,58 @@ static int test_helpers(void) {
   CMP_TEST_ASSERT(index == 1u);
 
   CMP_TEST_EXPECT(m3_time_picker_test_hour_from_index(
-                     12u, M3_TIME_PICKER_FORMAT_24H, CMP_FALSE, 0u, &hour),
-                 CMP_ERR_RANGE);
+                      12u, M3_TIME_PICKER_FORMAT_24H, CMP_FALSE, 0u, &hour),
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_time_picker_test_hour_from_index(
-                     0u, M3_TIME_PICKER_FORMAT_24H, CMP_FALSE, 0u, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      0u, M3_TIME_PICKER_FORMAT_24H, CMP_FALSE, 0u, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       m3_time_picker_test_hour_from_index(0u, 99u, CMP_FALSE, 0u, &hour),
       CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_time_picker_test_hour_from_index(
-                     0u, M3_TIME_PICKER_FORMAT_12H, CMP_FALSE, 99u, &hour),
-                 CMP_ERR_RANGE);
+                      0u, M3_TIME_PICKER_FORMAT_12H, CMP_FALSE, 99u, &hour),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_time_picker_test_hour_from_index(0u, M3_TIME_PICKER_FORMAT_24H,
-                                                 CMP_TRUE, 0u, &hour));
+                                                  CMP_TRUE, 0u, &hour));
   CMP_TEST_ASSERT(hour == 0u);
   CMP_TEST_OK(m3_time_picker_test_hour_from_index(0u, M3_TIME_PICKER_FORMAT_24H,
-                                                 CMP_FALSE, 0u, &hour));
+                                                  CMP_FALSE, 0u, &hour));
   CMP_TEST_ASSERT(hour == 12u);
   CMP_TEST_OK(m3_time_picker_test_hour_from_index(1u, M3_TIME_PICKER_FORMAT_24H,
-                                                 CMP_TRUE, 0u, &hour));
+                                                  CMP_TRUE, 0u, &hour));
   CMP_TEST_ASSERT(hour == 13u);
   CMP_TEST_OK(m3_time_picker_test_hour_from_index(1u, M3_TIME_PICKER_FORMAT_12H,
-                                                 CMP_FALSE, 15u, &hour));
+                                                  CMP_FALSE, 15u, &hour));
   CMP_TEST_ASSERT(hour == 13u);
   CMP_TEST_OK(m3_time_picker_test_hour_from_index(0u, M3_TIME_PICKER_FORMAT_12H,
-                                                 CMP_FALSE, 3u, &hour));
+                                                  CMP_FALSE, 3u, &hour));
   CMP_TEST_ASSERT(hour == 0u);
 
   CMP_TEST_EXPECT(m3_time_picker_test_hour_to_index(
-                     24u, M3_TIME_PICKER_FORMAT_24H, &index, &inner),
-                 CMP_ERR_RANGE);
+                      24u, M3_TIME_PICKER_FORMAT_24H, &index, &inner),
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_time_picker_test_hour_to_index(0u, 99u, &index, &inner),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_time_picker_test_hour_to_index(
-                     0u, M3_TIME_PICKER_FORMAT_24H, NULL, &inner),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      0u, M3_TIME_PICKER_FORMAT_24H, NULL, &inner),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_test_hour_to_index(
-                     0u, M3_TIME_PICKER_FORMAT_24H, &index, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      0u, M3_TIME_PICKER_FORMAT_24H, &index, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_time_picker_test_hour_to_index(0u, M3_TIME_PICKER_FORMAT_24H,
-                                               &index, &inner));
+                                                &index, &inner));
   CMP_TEST_ASSERT(index == 0u);
   CMP_TEST_ASSERT(inner == CMP_TRUE);
   CMP_TEST_OK(m3_time_picker_test_hour_to_index(12u, M3_TIME_PICKER_FORMAT_24H,
-                                               &index, &inner));
+                                                &index, &inner));
   CMP_TEST_ASSERT(index == 0u);
   CMP_TEST_ASSERT(inner == CMP_FALSE);
   CMP_TEST_OK(m3_time_picker_test_hour_to_index(23u, M3_TIME_PICKER_FORMAT_24H,
-                                               &index, &inner));
+                                                &index, &inner));
   CMP_TEST_ASSERT(index == 11u);
   CMP_TEST_ASSERT(inner == CMP_TRUE);
   CMP_TEST_OK(m3_time_picker_test_hour_to_index(5u, M3_TIME_PICKER_FORMAT_12H,
-                                               &index, &inner));
+                                                &index, &inner));
   CMP_TEST_ASSERT(index == 5u);
   CMP_TEST_ASSERT(inner == CMP_FALSE);
 
@@ -376,19 +379,19 @@ static int test_helpers(void) {
   CMP_TEST_OK(
       m3_time_picker_init(&picker, &style, 0u, 0u, M3_TIME_PICKER_FORMAT_24H));
   CMP_TEST_EXPECT(m3_time_picker_test_update_metrics(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_test_compute_metrics(NULL, &metrics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_test_compute_metrics(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   picker.bounds.width = -1.0f;
   CMP_TEST_EXPECT(m3_time_picker_test_compute_metrics(&picker, &metrics),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   picker.bounds.width = 0.0f;
   picker.bounds.height = 0.0f;
   picker.style.diameter = 0.0f;
   CMP_TEST_EXPECT(m3_time_picker_test_compute_metrics(&picker, &metrics),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_time_picker_style_init(&style));
   CMP_TEST_OK(
       m3_time_picker_init(&picker, &style, 0u, 0u, M3_TIME_PICKER_FORMAT_24H));
@@ -398,12 +401,12 @@ static int test_helpers(void) {
   CMP_TEST_OK(m3_time_picker_test_compute_metrics(&picker, &metrics));
   CMP_TEST_ASSERT(metrics.outer_radius == 0.0f);
   CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(NULL, &out_background,
-                                                    &out_ring, &out_hand,
-                                                    &out_selection),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                     &out_ring, &out_hand,
+                                                     &out_selection),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, NULL, &out_ring,
-                                                    &out_hand, &out_selection),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                     &out_hand, &out_selection),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_time_picker_test_resolve_colors(
       &picker, &out_background, &out_ring, &out_hand, &out_selection));
   picker.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
@@ -412,27 +415,27 @@ static int test_helpers(void) {
   picker.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
   picker.style.background_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background,
-                                                    &out_ring, &out_hand,
-                                                    &out_selection),
-                 CMP_ERR_RANGE);
+                                                     &out_ring, &out_hand,
+                                                     &out_selection),
+                  CMP_ERR_RANGE);
   picker.style.background_color.r = 0.0f;
   picker.style.ring_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background,
-                                                    &out_ring, &out_hand,
-                                                    &out_selection),
-                 CMP_ERR_RANGE);
+                                                     &out_ring, &out_hand,
+                                                     &out_selection),
+                  CMP_ERR_RANGE);
   picker.style.ring_color.r = 0.0f;
   picker.style.hand_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background,
-                                                    &out_ring, &out_hand,
-                                                    &out_selection),
-                 CMP_ERR_RANGE);
+                                                     &out_ring, &out_hand,
+                                                     &out_selection),
+                  CMP_ERR_RANGE);
   picker.style.hand_color.r = 0.0f;
   picker.style.selection_color.r = -1.0f;
   CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background,
-                                                    &out_ring, &out_hand,
-                                                    &out_selection),
-                 CMP_ERR_RANGE);
+                                                     &out_ring, &out_hand,
+                                                     &out_selection),
+                  CMP_ERR_RANGE);
 
   return 0;
 }
@@ -452,7 +455,7 @@ static int test_metrics_and_picking(void) {
 
   CMP_TEST_OK(m3_time_picker_style_init(&style));
   CMP_TEST_OK(m3_time_picker_init(&picker, &style, 15u, 30u,
-                                 M3_TIME_PICKER_FORMAT_24H));
+                                  M3_TIME_PICKER_FORMAT_24H));
 
   picker.bounds.x = 0.0f;
   picker.bounds.y = 0.0f;
@@ -468,11 +471,11 @@ static int test_metrics_and_picking(void) {
   saved_inner = metrics.inner_radius;
 
   CMP_TEST_EXPECT(m3_time_picker_test_compute_hand(NULL, &metrics, &hand_angle,
-                                                  &hand_radius),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                   &hand_radius),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_test_compute_hand(&picker, NULL, &hand_angle,
-                                                  &hand_radius),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                   &hand_radius),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       m3_time_picker_test_compute_hand(&picker, &metrics, NULL, &hand_radius),
       CMP_ERR_INVALID_ARGUMENT);
@@ -482,50 +485,51 @@ static int test_metrics_and_picking(void) {
 
   picker.active_field = 99u;
   CMP_TEST_EXPECT(m3_time_picker_test_compute_hand(&picker, &metrics,
-                                                  &hand_angle, &hand_radius),
-                 CMP_ERR_RANGE);
+                                                   &hand_angle, &hand_radius),
+                  CMP_ERR_RANGE);
   picker.active_field = M3_TIME_PICKER_FIELD_HOUR;
   picker.format = 99u;
   CMP_TEST_EXPECT(m3_time_picker_test_compute_hand(&picker, &metrics,
-                                                  &hand_angle, &hand_radius),
-                 CMP_ERR_RANGE);
+                                                   &hand_angle, &hand_radius),
+                  CMP_ERR_RANGE);
   picker.format = M3_TIME_PICKER_FORMAT_24H;
   picker.time.hour = 99u;
   CMP_TEST_EXPECT(m3_time_picker_test_compute_hand(&picker, &metrics,
-                                                  &hand_angle, &hand_radius),
-                 CMP_ERR_RANGE);
+                                                   &hand_angle, &hand_radius),
+                  CMP_ERR_RANGE);
   picker.time.hour = 15u;
   picker.active_field = M3_TIME_PICKER_FIELD_MINUTE;
   picker.time.minute = 99u;
   CMP_TEST_EXPECT(m3_time_picker_test_compute_hand(&picker, &metrics,
-                                                  &hand_angle, &hand_radius),
-                 CMP_ERR_RANGE);
+                                                   &hand_angle, &hand_radius),
+                  CMP_ERR_RANGE);
   picker.time.minute = 30u;
   CMP_TEST_OK(m3_time_picker_test_compute_hand(&picker, &metrics, &hand_angle,
-                                              &hand_radius));
-  CMP_TEST_OK(m3_time_picker_test_set_force_compute_hand_minute_error(CMP_TRUE));
+                                               &hand_radius));
+  CMP_TEST_OK(
+      m3_time_picker_test_set_force_compute_hand_minute_error(CMP_TRUE));
   CMP_TEST_EXPECT(m3_time_picker_test_compute_hand(&picker, &metrics,
-                                                  &hand_angle, &hand_radius),
-                 CMP_ERR_RANGE);
+                                                   &hand_angle, &hand_radius),
+                  CMP_ERR_RANGE);
   picker.active_field = M3_TIME_PICKER_FIELD_HOUR;
   picker.format = M3_TIME_PICKER_FORMAT_24H;
   picker.time.hour = 15u;
   CMP_TEST_OK(m3_time_picker_test_set_force_hour_to_index_error(CMP_TRUE));
   CMP_TEST_EXPECT(m3_time_picker_test_compute_hand(&picker, &metrics,
-                                                  &hand_angle, &hand_radius),
-                 CMP_ERR_RANGE);
+                                                   &hand_angle, &hand_radius),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_time_picker_test_compute_hand(&picker, &metrics, &hand_angle,
-                                              &hand_radius));
+                                               &hand_radius));
   picker.style.ring_thickness = metrics.outer_radius * 4.0f;
   metrics.outer_radius = 1.0f;
   CMP_TEST_OK(m3_time_picker_test_compute_hand(&picker, &metrics, &hand_angle,
-                                              &hand_radius));
+                                               &hand_radius));
   CMP_TEST_ASSERT(hand_radius == 0.0f);
   picker.style.ring_thickness = M3_TIME_PICKER_DEFAULT_RING_THICKNESS;
   metrics.outer_radius = 0.0f;
   metrics.inner_radius = 0.0f;
   CMP_TEST_OK(m3_time_picker_test_compute_hand(&picker, &metrics, &hand_angle,
-                                              &hand_radius));
+                                               &hand_radius));
   CMP_TEST_ASSERT(hand_radius == 0.0f);
   metrics.outer_radius = saved_outer;
   metrics.inner_radius = saved_inner;
@@ -555,25 +559,25 @@ static int test_metrics_and_picking(void) {
 
   CMP_TEST_OK(m3_time_picker_test_set_force_angle_error(CMP_TRUE));
   CMP_TEST_EXPECT(m3_time_picker_test_pick_time(
-                     &picker, metrics.center_x, metrics.center_y - 10.0f,
-                     M3_TIME_PICKER_FIELD_HOUR, &picked, &valid),
-                 CMP_ERR_RANGE);
+                      &picker, metrics.center_x, metrics.center_y - 10.0f,
+                      M3_TIME_PICKER_FIELD_HOUR, &picked, &valid),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_time_picker_test_set_force_angle_index_error(CMP_TRUE));
   CMP_TEST_EXPECT(m3_time_picker_test_pick_time(
-                     &picker, metrics.center_x, metrics.center_y - 10.0f,
-                     M3_TIME_PICKER_FIELD_HOUR, &picked, &valid),
-                 CMP_ERR_RANGE);
+                      &picker, metrics.center_x, metrics.center_y - 10.0f,
+                      M3_TIME_PICKER_FIELD_HOUR, &picked, &valid),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_time_picker_test_set_force_hour_invalid(CMP_TRUE));
   CMP_TEST_EXPECT(m3_time_picker_test_pick_time(
-                     &picker, metrics.center_x, metrics.center_y - 10.0f,
-                     M3_TIME_PICKER_FIELD_HOUR, &picked, &valid),
-                 CMP_ERR_RANGE);
+                      &picker, metrics.center_x, metrics.center_y - 10.0f,
+                      M3_TIME_PICKER_FIELD_HOUR, &picked, &valid),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_time_picker_test_set_force_angle_index_error(CMP_TRUE));
   CMP_TEST_EXPECT(m3_time_picker_test_pick_time(
-                     &picker, metrics.center_x + metrics.outer_radius,
-                     metrics.center_y, M3_TIME_PICKER_FIELD_MINUTE, &picked,
-                     &valid),
-                 CMP_ERR_RANGE);
+                      &picker, metrics.center_x + metrics.outer_radius,
+                      metrics.center_y, M3_TIME_PICKER_FIELD_MINUTE, &picked,
+                      &valid),
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(m3_time_picker_set_format(&picker, M3_TIME_PICKER_FORMAT_12H));
   picker.time.hour = 15u;
@@ -591,27 +595,27 @@ static int test_metrics_and_picking(void) {
   CMP_TEST_ASSERT(picked.hour == 0u);
 
   CMP_TEST_EXPECT(m3_time_picker_test_pick_time(NULL, 0.0f, 0.0f,
-                                               M3_TIME_PICKER_FIELD_HOUR,
-                                               &picked, &valid),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                M3_TIME_PICKER_FIELD_HOUR,
+                                                &picked, &valid),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       m3_time_picker_test_pick_time(&picker, 0.0f, 0.0f, 99u, &picked, &valid),
       CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_time_picker_test_pick_time(&picker, 0.0f, 0.0f,
-                                               M3_TIME_PICKER_FIELD_HOUR, NULL,
-                                               &valid),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                M3_TIME_PICKER_FIELD_HOUR, NULL,
+                                                &valid),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_test_pick_time(&picker, 0.0f, 0.0f,
-                                               M3_TIME_PICKER_FIELD_HOUR,
-                                               &picked, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                M3_TIME_PICKER_FIELD_HOUR,
+                                                &picked, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   saved_bounds = picker.bounds;
   picker.bounds.width = -1.0f;
   CMP_TEST_EXPECT(m3_time_picker_test_pick_time(&picker, 0.0f, 0.0f,
-                                               M3_TIME_PICKER_FIELD_HOUR,
-                                               &picked, &valid),
-                 CMP_ERR_RANGE);
+                                                M3_TIME_PICKER_FIELD_HOUR,
+                                                &picked, &valid),
+                  CMP_ERR_RANGE);
   picker.bounds = saved_bounds;
 
   saved_time = picker.time;
@@ -664,9 +668,9 @@ static int test_init_and_setters(void) {
       m3_time_picker_init(&picker, &style, 0u, 60u, M3_TIME_PICKER_FORMAT_12H),
       CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_time_picker_init(&picker, &style, 0u, 0u, 99u),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_time_picker_init(&picker, &style, 13u, 15u,
-                                 M3_TIME_PICKER_FORMAT_24H));
+                                  M3_TIME_PICKER_FORMAT_24H));
 
   CMP_TEST_OK(m3_time_picker_get_format(&picker, &format));
   CMP_TEST_ASSERT(format == M3_TIME_PICKER_FORMAT_24H);
@@ -677,21 +681,22 @@ static int test_init_and_setters(void) {
   CMP_TEST_ASSERT(time.minute == 15u);
 
   CMP_TEST_EXPECT(m3_time_picker_get_format(NULL, &format),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_get_format(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_get_active_field(NULL, &field),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_get_active_field(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_time_picker_get_time(NULL, &time), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_time_picker_get_time(NULL, &time),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_get_time(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_time_picker_set_style(NULL, &style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_set_style(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   style.diameter = 0.0f;
   CMP_TEST_EXPECT(m3_time_picker_set_style(&picker, &style), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_time_picker_style_init(&style));
@@ -706,23 +711,23 @@ static int test_init_and_setters(void) {
   CMP_TEST_OK(m3_time_picker_set_style(&picker, &style));
 
   CMP_TEST_EXPECT(m3_time_picker_set_format(NULL, M3_TIME_PICKER_FORMAT_12H),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_set_format(&picker, 99u), CMP_ERR_RANGE);
 
   prev_format = picker.format;
   picker.bounds.width = -1.0f;
   CMP_TEST_EXPECT(m3_time_picker_set_format(&picker, M3_TIME_PICKER_FORMAT_12H),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_ASSERT(picker.format == prev_format);
   picker.bounds.width = 200.0f;
 
   CMP_TEST_EXPECT(m3_time_picker_set_period(NULL, M3_TIME_PICKER_PERIOD_AM),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_set_period(&picker, M3_TIME_PICKER_PERIOD_AM),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   picker.format = 99u;
   CMP_TEST_EXPECT(m3_time_picker_set_period(&picker, M3_TIME_PICKER_PERIOD_AM),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   picker.format = M3_TIME_PICKER_FORMAT_24H;
 
   CMP_TEST_OK(m3_time_picker_set_format(&picker, M3_TIME_PICKER_FORMAT_12H));
@@ -736,9 +741,10 @@ static int test_init_and_setters(void) {
 
   time.hour = 10u;
   time.minute = 5u;
-  CMP_TEST_EXPECT(m3_time_picker_set_time(NULL, &time), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_time_picker_set_time(NULL, &time),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_set_time(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   time.hour = 30u;
   time.minute = 5u;
   CMP_TEST_EXPECT(m3_time_picker_set_time(&picker, &time), CMP_ERR_RANGE);
@@ -750,7 +756,7 @@ static int test_init_and_setters(void) {
   CMP_TEST_OK(m3_time_picker_set_time(&picker, &time));
 
   CMP_TEST_EXPECT(m3_time_picker_set_on_change(NULL, test_on_change, &counter),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_time_picker_set_format(&picker, M3_TIME_PICKER_FORMAT_12H));
   CMP_TEST_EXPECT(m3_time_picker_set_period(&picker, 99u), CMP_ERR_RANGE);
@@ -761,9 +767,9 @@ static int test_init_and_setters(void) {
   CMP_TEST_ASSERT(picker.time.hour == 13u);
 
   CMP_TEST_EXPECT(m3_time_picker_get_period(NULL, &period),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_time_picker_get_period(&picker, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_time_picker_get_period(&picker, &period));
   CMP_TEST_ASSERT(period == M3_TIME_PICKER_PERIOD_PM);
   picker.time.hour = 1u;
@@ -807,7 +813,7 @@ static int test_widget_api(void) {
   spec.mode = 99u;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(picker.widget.vtable->measure(NULL, spec, spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       picker.widget.vtable->measure(picker.widget.ctx, spec, spec, NULL),
       CMP_ERR_INVALID_ARGUMENT);
@@ -832,7 +838,7 @@ static int test_widget_api(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 50.0f;
   CMP_TEST_OK(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(size.width == width_spec.size);
   CMP_TEST_ASSERT(size.height == height_spec.size);
 
@@ -841,15 +847,15 @@ static int test_widget_api(void) {
   height_spec.mode = 99u;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_EXACTLY;
   width_spec.size = 40.0f;
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 10.0f;
   CMP_TEST_OK(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(size.width == width_spec.size);
   CMP_TEST_ASSERT(size.height == height_spec.size);
 
@@ -858,25 +864,25 @@ static int test_widget_api(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(size.width == width_spec.size);
 
   bounds.x = 0.0f;
   bounds.y = 0.0f;
   CMP_TEST_EXPECT(picker.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(picker.widget.vtable->layout(picker.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bounds.width = 100.0f;
   bounds.height = 100.0f;
   CMP_TEST_OK(picker.widget.vtable->layout(picker.widget.ctx, bounds));
 
   CMP_TEST_EXPECT(picker.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(picker.widget.vtable->get_semantics(picker.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   rc = picker.widget.vtable->get_semantics(picker.widget.ctx, &semantics);
   CMP_TEST_OK(rc);
   CMP_TEST_ASSERT(semantics.role == CMP_SEMANTIC_NONE);
@@ -886,7 +892,8 @@ static int test_widget_api(void) {
   CMP_TEST_OK(rc);
   CMP_TEST_ASSERT(semantics.flags & CMP_SEMANTIC_FLAG_DISABLED);
 
-  CMP_TEST_EXPECT(picker.widget.vtable->destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(picker.widget.vtable->destroy(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(picker.widget.vtable->destroy(picker.widget.ctx));
 
   return 0;
@@ -927,40 +934,40 @@ static int test_event_and_paint(void) {
   ctx.dpi_scale = 1.0f;
 
   CMP_TEST_EXPECT(picker.widget.vtable->paint(NULL, &ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   ctx.gfx = NULL;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   ctx.gfx = &gfx;
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_vtable_no_rect;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_vtable_no_line;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   gfx.vtable = &g_test_vtable;
   picker.style.diameter = 0.0f;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_time_picker_style_init(&style));
   picker.style = style;
   picker.bounds.width = -1.0f;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   picker.bounds.width = 200.0f;
   picker.time.minute = 99u;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   picker.time.minute = 0u;
   CMP_TEST_OK(m3_time_picker_test_set_force_resolve_colors_error(CMP_TRUE));
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(picker.widget.vtable->paint(picker.widget.ctx, &ctx));
   CMP_TEST_ASSERT(backend.draw_rect_calls > 0);
   CMP_TEST_ASSERT(backend.draw_line_calls > 0);
@@ -968,18 +975,18 @@ static int test_event_and_paint(void) {
   backend.draw_rect_calls = 0;
   backend.fail_draw_rect_after = 3;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect_after = 0;
 
   picker.active_field = 99u;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   picker.active_field = M3_TIME_PICKER_FIELD_HOUR;
 
   backend.draw_rect_calls = 0;
   backend.fail_draw_rect_after = 5;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect_after = 0;
 
   picker.time.hour = 0u;
@@ -999,12 +1006,12 @@ static int test_event_and_paint(void) {
 
   backend.fail_draw_rect = CMP_ERR_IO;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect = CMP_OK;
 
   backend.fail_draw_line = CMP_ERR_IO;
   CMP_TEST_EXPECT(picker.widget.vtable->paint(picker.widget.ctx, &ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_line = CMP_OK;
 
   picker.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
@@ -1021,15 +1028,16 @@ static int test_event_and_paint(void) {
   ctx.gfx = &gfx;
 
   CMP_TEST_EXPECT(picker.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(picker.widget.vtable->event(picker.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      picker.widget.vtable->event(picker.widget.ctx, NULL, &handled),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(picker.widget.vtable->event(picker.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_MOVE,
-                                (cmp_i32)metrics.center_x,
-                                (cmp_i32)metrics.center_y));
+                                 (cmp_i32)metrics.center_x,
+                                 (cmp_i32)metrics.center_y));
   CMP_TEST_OK(picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
 
@@ -1072,21 +1080,21 @@ static int test_event_and_paint(void) {
   CMP_TEST_ASSERT(handled == CMP_TRUE);
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP,
-                                (cmp_i32)metrics.center_x,
-                                (cmp_i32)metrics.center_y));
+                                 (cmp_i32)metrics.center_x,
+                                 (cmp_i32)metrics.center_y));
   CMP_TEST_OK(picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_TRUE);
   CMP_TEST_ASSERT(picker.pressed == CMP_FALSE);
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP,
-                                (cmp_i32)metrics.center_x,
-                                (cmp_i32)metrics.center_y));
+                                 (cmp_i32)metrics.center_x,
+                                 (cmp_i32)metrics.center_y));
   CMP_TEST_OK(picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_MOVE,
-                                (cmp_i32)metrics.center_x,
-                                (cmp_i32)metrics.center_y));
+                                 (cmp_i32)metrics.center_x,
+                                 (cmp_i32)metrics.center_y));
   CMP_TEST_OK(picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
 
@@ -1121,8 +1129,8 @@ static int test_event_and_paint(void) {
   picker.format = 99u;
   picker.pressed = CMP_TRUE;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_MOVE,
-                                (cmp_i32)metrics.center_x,
-                                (cmp_i32)metrics.center_y));
+                                 (cmp_i32)metrics.center_x,
+                                 (cmp_i32)metrics.center_y));
   CMP_TEST_EXPECT(
       picker.widget.vtable->event(picker.widget.ctx, &event, &handled),
       CMP_ERR_RANGE);
@@ -1156,34 +1164,34 @@ static int test_event_and_paint(void) {
   CMP_TEST_OK(picker.widget.vtable->event(picker.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(picker.time.minute == 15u);
 
-  CMP_TEST_EXPECT(m3_time_picker_test_draw_circle(NULL, 0.0f, 0.0f, 1.0f,
-                                                 picker.style.background_color),
-                 CMP_ERR_UNSUPPORTED);
-  CMP_TEST_EXPECT(m3_time_picker_test_draw_circle(&gfx, 0.0f, 0.0f, -1.0f,
-                                                 picker.style.background_color),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_time_picker_test_draw_circle(
+                      NULL, 0.0f, 0.0f, 1.0f, picker.style.background_color),
+                  CMP_ERR_UNSUPPORTED);
+  CMP_TEST_EXPECT(m3_time_picker_test_draw_circle(
+                      &gfx, 0.0f, 0.0f, -1.0f, picker.style.background_color),
+                  CMP_ERR_RANGE);
   backend.draw_rect_calls = 0;
   CMP_TEST_OK(m3_time_picker_test_draw_circle(&gfx, 0.0f, 0.0f, 0.0f,
-                                             picker.style.background_color));
+                                              picker.style.background_color));
   CMP_TEST_ASSERT(backend.draw_rect_calls == 0);
   CMP_TEST_OK(m3_time_picker_test_set_force_rect_error(CMP_TRUE));
-  CMP_TEST_EXPECT(m3_time_picker_test_draw_circle(&gfx, 0.0f, 0.0f, 1.0f,
-                                                 picker.style.background_color),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_time_picker_test_draw_circle(
+                      &gfx, 0.0f, 0.0f, 1.0f, picker.style.background_color),
+                  CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_time_picker_test_draw_ring(&gfx, 0.0f, 0.0f, 1.0f, 0.0f,
-                                               picker.style.ring_color,
-                                               picker.style.background_color),
-                 CMP_ERR_RANGE);
+                                                picker.style.ring_color,
+                                                picker.style.background_color),
+                  CMP_ERR_RANGE);
   backend.draw_rect_calls = 0;
   CMP_TEST_OK(m3_time_picker_test_draw_ring(&gfx, 0.0f, 0.0f, 0.0f, 1.0f,
-                                           picker.style.ring_color,
-                                           picker.style.background_color));
+                                            picker.style.ring_color,
+                                            picker.style.background_color));
   CMP_TEST_ASSERT(backend.draw_rect_calls == 0);
   backend.draw_rect_calls = 0;
   CMP_TEST_OK(m3_time_picker_test_draw_ring(&gfx, 0.0f, 0.0f, 1.0f, 5.0f,
-                                           picker.style.ring_color,
-                                           picker.style.background_color));
+                                            picker.style.ring_color,
+                                            picker.style.background_color));
   CMP_TEST_ASSERT(backend.draw_rect_calls == 1);
 
   picker.bounds.width = 6.0f;

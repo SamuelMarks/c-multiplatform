@@ -14,7 +14,8 @@ static CMPScalar cmp_anim_clamp01(CMPScalar value) {
   return value;
 }
 
-static int cmp_anim_ease_apply(cmp_u32 easing, CMPScalar t, CMPScalar *out_value) {
+static int cmp_anim_ease_apply(cmp_u32 easing, CMPScalar t,
+                               CMPScalar *out_value) {
   CMPScalar clamped;
   CMPScalar inv;
 
@@ -49,7 +50,8 @@ static int cmp_anim_ease_apply(cmp_u32 easing, CMPScalar t, CMPScalar *out_value
 }
 
 int CMP_CALL cmp_anim_timing_init(CMPAnimTiming *timing, CMPScalar from,
-                                CMPScalar to, CMPScalar duration, cmp_u32 easing) {
+                                  CMPScalar to, CMPScalar duration,
+                                  cmp_u32 easing) {
   CMPScalar eased;
   int rc;
 
@@ -74,7 +76,7 @@ int CMP_CALL cmp_anim_timing_init(CMPAnimTiming *timing, CMPScalar from,
 }
 
 int CMP_CALL cmp_anim_timing_step(CMPAnimTiming *timing, CMPScalar dt,
-                                CMPScalar *out_value, CMPBool *out_finished) {
+                                  CMPScalar *out_value, CMPBool *out_finished) {
   CMPScalar new_elapsed;
   CMPScalar progress;
   CMPScalar eased;
@@ -119,9 +121,9 @@ int CMP_CALL cmp_anim_timing_step(CMPAnimTiming *timing, CMPScalar dt,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_spring_init(CMPSpring *spring, CMPScalar position, CMPScalar target,
-                           CMPScalar stiffness, CMPScalar damping,
-                           CMPScalar mass) {
+int CMP_CALL cmp_spring_init(CMPSpring *spring, CMPScalar position,
+                             CMPScalar target, CMPScalar stiffness,
+                             CMPScalar damping, CMPScalar mass) {
   if (spring == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -150,7 +152,7 @@ int CMP_CALL cmp_spring_set_target(CMPSpring *spring, CMPScalar target) {
 }
 
 int CMP_CALL cmp_spring_set_tolerance(CMPSpring *spring, CMPScalar tolerance,
-                                    CMPScalar rest_velocity) {
+                                      CMPScalar rest_velocity) {
   if (spring == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -164,7 +166,7 @@ int CMP_CALL cmp_spring_set_tolerance(CMPSpring *spring, CMPScalar tolerance,
 }
 
 int CMP_CALL cmp_spring_step(CMPSpring *spring, CMPScalar dt,
-                           CMPBool *out_finished) {
+                             CMPBool *out_finished) {
   CMPScalar displacement;
   CMPScalar acceleration;
 
@@ -230,8 +232,9 @@ int CMP_CALL cmp_anim_controller_init(CMPAnimController *controller) {
 }
 
 int CMP_CALL cmp_anim_controller_start_timing(CMPAnimController *controller,
-                                            CMPScalar from, CMPScalar to,
-                                            CMPScalar duration, cmp_u32 easing) {
+                                              CMPScalar from, CMPScalar to,
+                                              CMPScalar duration,
+                                              cmp_u32 easing) {
   int rc;
 
   if (controller == NULL) {
@@ -254,18 +257,17 @@ int CMP_CALL cmp_anim_controller_start_timing(CMPAnimController *controller,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_anim_controller_start_spring(CMPAnimController *controller,
-                                            CMPScalar position, CMPScalar target,
-                                            CMPScalar stiffness,
-                                            CMPScalar damping, CMPScalar mass) {
+int CMP_CALL cmp_anim_controller_start_spring(
+    CMPAnimController *controller, CMPScalar position, CMPScalar target,
+    CMPScalar stiffness, CMPScalar damping, CMPScalar mass) {
   int rc;
 
   if (controller == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  rc = cmp_spring_init(&controller->spring, position, target, stiffness, damping,
-                      mass);
+  rc = cmp_spring_init(&controller->spring, position, target, stiffness,
+                       damping, mass);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -276,8 +278,8 @@ int CMP_CALL cmp_anim_controller_start_spring(CMPAnimController *controller,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_anim_controller_set_spring_target(CMPAnimController *controller,
-                                                 CMPScalar target) {
+int CMP_CALL cmp_anim_controller_set_spring_target(
+    CMPAnimController *controller, CMPScalar target) {
   if (controller == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -290,8 +292,9 @@ int CMP_CALL cmp_anim_controller_set_spring_target(CMPAnimController *controller
   return CMP_OK;
 }
 
-int CMP_CALL cmp_anim_controller_step(CMPAnimController *controller, CMPScalar dt,
-                                    CMPScalar *out_value, CMPBool *out_finished) {
+int CMP_CALL cmp_anim_controller_step(CMPAnimController *controller,
+                                      CMPScalar dt, CMPScalar *out_value,
+                                      CMPBool *out_finished) {
   CMPScalar value;
   CMPBool finished;
   int rc;
@@ -343,7 +346,7 @@ int CMP_CALL cmp_anim_controller_step(CMPAnimController *controller, CMPScalar d
 }
 
 int CMP_CALL cmp_anim_controller_get_value(const CMPAnimController *controller,
-                                         CMPScalar *out_value) {
+                                           CMPScalar *out_value) {
   if (controller == NULL || out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -353,7 +356,7 @@ int CMP_CALL cmp_anim_controller_get_value(const CMPAnimController *controller,
 }
 
 int CMP_CALL cmp_anim_controller_is_running(const CMPAnimController *controller,
-                                          CMPBool *out_running) {
+                                            CMPBool *out_running) {
   if (controller == NULL || out_running == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -373,7 +376,7 @@ int CMP_CALL cmp_anim_controller_stop(CMPAnimController *controller) {
 
 #ifdef CMP_TESTING
 int CMP_CALL cmp_anim_test_apply_ease(cmp_u32 easing, CMPScalar t,
-                                    CMPScalar *out_value) {
+                                      CMPScalar *out_value) {
   return cmp_anim_ease_apply(easing, t, out_value);
 }
 #endif

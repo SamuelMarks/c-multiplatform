@@ -17,7 +17,7 @@ extern "C" {
  */
 typedef struct CMPUriSlice {
   const char *data; /**< Slice data pointer (may be NULL when length is 0). */
-  cmp_usize length;  /**< Slice length in bytes. */
+  cmp_usize length; /**< Slice length in bytes. */
 } CMPUriSlice;
 
 /**
@@ -48,7 +48,8 @@ CMP_API int CMP_CALL cmp_uri_parse(const char *uri, CMPUri *out_uri);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_uri_query_find(const CMPUri *uri, const char *key,
-                                     CMPUriSlice *out_value, CMPBool *out_found);
+                                        CMPUriSlice *out_value,
+                                        CMPBool *out_found);
 
 /**
  * @brief Route parameter pair.
@@ -66,7 +67,7 @@ typedef struct CMPRouteParam {
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPRouteBuildFn)(void *ctx, const char *path,
-                                     void **out_component);
+                                       void **out_component);
 
 /**
  * @brief Route destroy callback.
@@ -80,10 +81,10 @@ typedef int(CMP_CALL *CMPRouteDestroyFn)(void *ctx, void *component);
  * @brief Route descriptor.
  */
 typedef struct CMPRoute {
-  const char *pattern;      /**< Route pattern string. */
+  const char *pattern;       /**< Route pattern string. */
   CMPRouteBuildFn build;     /**< Component build callback. */
   CMPRouteDestroyFn destroy; /**< Component destroy callback (optional). */
-  void *ctx;                /**< Route context pointer. */
+  void *ctx;                 /**< Route context pointer. */
 } CMPRoute;
 
 /**
@@ -91,8 +92,8 @@ typedef struct CMPRoute {
  */
 typedef struct CMPRouteEntry {
   const CMPRoute *route; /**< Matched route. */
-  char *path;           /**< Owned path string. */
-  void *component;      /**< Built component pointer. */
+  char *path;            /**< Owned path string. */
+  void *component;       /**< Built component pointer. */
 } CMPRouteEntry;
 
 /**
@@ -100,7 +101,7 @@ typedef struct CMPRouteEntry {
  */
 typedef struct CMPRouterConfig {
   const CMPAllocator
-      *allocator;        /**< Allocator to use; NULL uses default allocator. */
+      *allocator;         /**< Allocator to use; NULL uses default allocator. */
   const CMPRoute *routes; /**< Route table. */
   cmp_usize route_count;  /**< Number of routes. */
   cmp_usize stack_capacity; /**< Maximum navigation stack size. */
@@ -125,7 +126,7 @@ typedef struct CMPRouter {
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_router_init(CMPRouter *router,
-                                  const CMPRouterConfig *config);
+                                     const CMPRouterConfig *config);
 
 /**
  * @brief Shut down a router and release its resources.
@@ -142,7 +143,7 @@ CMP_API int CMP_CALL cmp_router_shutdown(CMPRouter *router);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_router_navigate(CMPRouter *router, const char *path,
-                                      void **out_component);
+                                         void **out_component);
 
 /**
  * @brief Navigate to a URI.
@@ -152,7 +153,7 @@ CMP_API int CMP_CALL cmp_router_navigate(CMPRouter *router, const char *path,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_router_navigate_uri(CMPRouter *router, const char *uri,
-                                          void **out_component);
+                                             void **out_component);
 
 /**
  * @brief Check whether back navigation is possible.
@@ -161,7 +162,7 @@ CMP_API int CMP_CALL cmp_router_navigate_uri(CMPRouter *router, const char *uri,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_router_can_back(const CMPRouter *router,
-                                      CMPBool *out_can_back);
+                                         CMPBool *out_can_back);
 
 /**
  * @brief Navigate back in the stack.
@@ -181,8 +182,8 @@ CMP_API int CMP_CALL cmp_router_back(CMPRouter *router, void **out_component);
  * code.
  */
 CMP_API int CMP_CALL cmp_router_get_current(const CMPRouter *router,
-                                         const char **out_path,
-                                         void **out_component);
+                                            const char **out_path,
+                                            void **out_component);
 
 /**
  * @brief Clear the navigation stack.
@@ -224,10 +225,10 @@ CMP_API int CMP_CALL cmp_router_test_set_slice_equals_fail(CMPBool enable);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_route_test_match(const char *pattern, const char *path,
-                                       CMPRouteParam *params,
-                                       cmp_usize max_params,
-                                       cmp_usize *out_param_count,
-                                       CMPBool *out_match);
+                                          CMPRouteParam *params,
+                                          cmp_usize max_params,
+                                          cmp_usize *out_param_count,
+                                          CMPBool *out_match);
 
 /**
  * @brief Test wrapper for router C-string length helper.
@@ -235,7 +236,8 @@ CMP_API int CMP_CALL cmp_route_test_match(const char *pattern, const char *path,
  * @param out_len Receives length.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_router_test_cstrlen(const char *cstr, cmp_usize *out_len);
+CMP_API int CMP_CALL cmp_router_test_cstrlen(const char *cstr,
+                                             cmp_usize *out_len);
 
 /**
  * @brief Test wrapper for router slice setter.
@@ -244,8 +246,9 @@ CMP_API int CMP_CALL cmp_router_test_cstrlen(const char *cstr, cmp_usize *out_le
  * @param length Slice length.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_router_test_slice_set(CMPUriSlice *slice, const char *data,
-                                            cmp_usize length);
+CMP_API int CMP_CALL cmp_router_test_slice_set(CMPUriSlice *slice,
+                                               const char *data,
+                                               cmp_usize length);
 
 /**
  * @brief Test wrapper for slice equality helper.
@@ -256,9 +259,9 @@ CMP_API int CMP_CALL cmp_router_test_slice_set(CMPUriSlice *slice, const char *d
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_router_test_slice_equals(const CMPUriSlice *slice,
-                                               const char *key,
-                                               cmp_usize key_len,
-                                               CMPBool *out_equal);
+                                                  const char *key,
+                                                  cmp_usize key_len,
+                                                  CMPBool *out_equal);
 
 /**
  * @brief Test wrapper for trimming trailing slashes.
@@ -267,7 +270,7 @@ CMP_API int CMP_CALL cmp_router_test_slice_equals(const CMPUriSlice *slice,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_router_test_trim_trailing(const char **str,
-                                                cmp_usize *len);
+                                                   cmp_usize *len);
 
 /**
  * @brief Test wrapper for segment scanning.
@@ -278,10 +281,11 @@ CMP_API int CMP_CALL cmp_router_test_trim_trailing(const char **str,
  * @param out_len Receives segment length.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_router_test_next_segment(const char *str, cmp_usize len,
-                                               cmp_usize *index,
-                                               const char **out_seg,
-                                               cmp_usize *out_len);
+CMP_API int CMP_CALL cmp_router_test_next_segment(const char *str,
+                                                  cmp_usize len,
+                                                  cmp_usize *index,
+                                                  const char **out_seg,
+                                                  cmp_usize *out_len);
 
 /**
  * @brief Test wrapper for segment lookahead.
@@ -292,9 +296,9 @@ CMP_API int CMP_CALL cmp_router_test_next_segment(const char *str, cmp_usize len
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_router_test_has_more_segments(const char *str,
-                                                    cmp_usize len,
-                                                    cmp_usize index,
-                                                    CMPBool *out_has_more);
+                                                       cmp_usize len,
+                                                       cmp_usize index,
+                                                       CMPBool *out_has_more);
 
 /**
  * @brief Test wrapper for low-level route matching with explicit lengths.
@@ -327,7 +331,7 @@ CMP_API int CMP_CALL cmp_router_test_validate_pattern(const char *pattern);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_router_test_release_entry(CMPRouter *router,
-                                                CMPRouteEntry *entry);
+                                                   CMPRouteEntry *entry);
 
 /**
  * @brief Test wrapper for finding a route entry.
@@ -338,9 +342,9 @@ CMP_API int CMP_CALL cmp_router_test_release_entry(CMPRouter *router,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_router_test_find_route(const CMPRouter *router,
-                                             const char *path,
-                                             cmp_usize path_len,
-                                             const CMPRoute **out_route);
+                                                const char *path,
+                                                cmp_usize path_len,
+                                                const CMPRoute **out_route);
 
 /**
  * @brief Test wrapper for copying a path.
@@ -350,8 +354,10 @@ CMP_API int CMP_CALL cmp_router_test_find_route(const CMPRouter *router,
  * @param out_copy Receives allocated copy.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_router_test_copy_path(CMPRouter *router, const char *path,
-                                            cmp_usize path_len, char **out_copy);
+CMP_API int CMP_CALL cmp_router_test_copy_path(CMPRouter *router,
+                                               const char *path,
+                                               cmp_usize path_len,
+                                               char **out_copy);
 
 /**
  * @brief Test wrapper for navigating with explicit path length.
@@ -362,9 +368,9 @@ CMP_API int CMP_CALL cmp_router_test_copy_path(CMPRouter *router, const char *pa
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_router_test_navigate_path_len(CMPRouter *router,
-                                                    const char *path,
-                                                    cmp_usize path_len,
-                                                    void **out_component);
+                                                       const char *path,
+                                                       cmp_usize path_len,
+                                                       void **out_component);
 #endif
 
 #ifdef __cplusplus

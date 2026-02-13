@@ -4,9 +4,9 @@
 
 #include <string.h>
 
-#define CMP_IOS_RETURN_IF_ERROR(rc)                                             \
+#define CMP_IOS_RETURN_IF_ERROR(rc)                                            \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       return (rc);                                                             \
     }                                                                          \
   } while (0)
@@ -80,8 +80,8 @@ struct CMPIOSBackend {
 };
 
 static int cmp_ios_backend_cleanup(CMPAllocator *allocator,
-                                  struct CMPIOSBackend *backend,
-                                  int primary_error) {
+                                   struct CMPIOSBackend *backend,
+                                   int primary_error) {
   int rc;
   int result;
 
@@ -107,7 +107,7 @@ static int cmp_ios_backend_cleanup(CMPAllocator *allocator,
 }
 
 int CMP_CALL cmp_ios_backend_create(const CMPIOSBackendConfig *config,
-                                  CMPIOSBackend **out_backend) {
+                                    CMPIOSBackend **out_backend) {
   CMPIOSBackendConfig local_config;
   CMPAllocator allocator;
   CMPNullBackendConfig null_config;
@@ -235,8 +235,8 @@ int CMP_CALL cmp_ios_backend_get_env(CMPIOSBackend *backend, CMPEnv *out_env) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_ios_backend_set_predictive_back(CMPIOSBackend *backend,
-                                               CMPPredictiveBack *predictive) {
+int CMP_CALL cmp_ios_backend_set_predictive_back(
+    CMPIOSBackend *backend, CMPPredictiveBack *predictive) {
   if (backend == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -310,7 +310,7 @@ int CMP_CALL cmp_ios_backend_predictive_back_cancel(
 #else
 
 int CMP_CALL cmp_ios_backend_create(const CMPIOSBackendConfig *config,
-                                  CMPIOSBackend **out_backend) {
+                                    CMPIOSBackend **out_backend) {
   CMPIOSBackendConfig local_config;
   int rc;
 
@@ -362,8 +362,8 @@ int CMP_CALL cmp_ios_backend_get_env(CMPIOSBackend *backend, CMPEnv *out_env) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-int CMP_CALL cmp_ios_backend_set_predictive_back(CMPIOSBackend *backend,
-                                               CMPPredictiveBack *predictive) {
+int CMP_CALL cmp_ios_backend_set_predictive_back(
+    CMPIOSBackend *backend, CMPPredictiveBack *predictive) {
   if (backend == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

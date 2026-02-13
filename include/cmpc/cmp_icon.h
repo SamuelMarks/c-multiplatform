@@ -31,17 +31,17 @@ extern "C" {
  */
 typedef struct CMPIconStyle {
   const char *utf8_family; /**< Font family name (UTF-8). */
-  cmp_i32 size_px;          /**< Icon size in pixels. */
-  cmp_i32 weight;           /**< Font weight (100..900). */
-  CMPBool italic;           /**< CMP_TRUE for italic. */
-  CMPColor color;           /**< Icon color (RGBA in 0..1 range). */
+  cmp_i32 size_px;         /**< Icon size in pixels. */
+  cmp_i32 weight;          /**< Font weight (100..900). */
+  CMPBool italic;          /**< CMP_TRUE for italic. */
+  CMPColor color;          /**< Icon color (RGBA in 0..1 range). */
 } CMPIconStyle;
 
 /**
  * @brief SVG path descriptor for icon fallback.
  */
 typedef struct CMPIconSvg {
-  const char *utf8_path;   /**< SVG path data string (UTF-8). */
+  const char *utf8_path;    /**< SVG path data string (UTF-8). */
   CMPScalar viewbox_x;      /**< Viewbox X origin. */
   CMPScalar viewbox_y;      /**< Viewbox Y origin. */
   CMPScalar viewbox_width;  /**< Viewbox width (> 0). */
@@ -83,12 +83,10 @@ CMP_API int CMP_CALL cmp_icon_svg_init(CMPIconSvg *svg);
  * @param out_metrics Receives the measured icon metrics.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_icon_measure_utf8(const CMPGfx *gfx,
-                                        const CMPIconStyle *style,
-                                        const char *utf8_name,
-                                        cmp_usize utf8_len, const CMPIconSvg *svg,
-                                        cmp_u32 render_mode,
-                                        CMPIconMetrics *out_metrics);
+CMP_API int CMP_CALL cmp_icon_measure_utf8(
+    const CMPGfx *gfx, const CMPIconStyle *style, const char *utf8_name,
+    cmp_usize utf8_len, const CMPIconSvg *svg, cmp_u32 render_mode,
+    CMPIconMetrics *out_metrics);
 
 /**
  * @brief Measure an icon specified by a null-terminated UTF-8 string.
@@ -116,10 +114,10 @@ CMP_API int CMP_CALL cmp_icon_measure_cstr(
  * @param render_mode Rendering mode (CMP_ICON_RENDER_*).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_icon_draw_utf8(const CMPGfx *gfx, const CMPRect *bounds,
-                                     const CMPIconStyle *style,
-                                     const char *utf8_name, cmp_usize utf8_len,
-                                     const CMPIconSvg *svg, cmp_u32 render_mode);
+CMP_API int CMP_CALL cmp_icon_draw_utf8(
+    const CMPGfx *gfx, const CMPRect *bounds, const CMPIconStyle *style,
+    const char *utf8_name, cmp_usize utf8_len, const CMPIconSvg *svg,
+    cmp_u32 render_mode);
 
 /**
  * @brief Draw an icon specified by a null-terminated UTF-8 string.
@@ -131,10 +129,9 @@ CMP_API int CMP_CALL cmp_icon_draw_utf8(const CMPGfx *gfx, const CMPRect *bounds
  * @param render_mode Rendering mode (CMP_ICON_RENDER_*).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_icon_draw_cstr(const CMPGfx *gfx, const CMPRect *bounds,
-                                     const CMPIconStyle *style,
-                                     const char *utf8_name,
-                                     const CMPIconSvg *svg, cmp_u32 render_mode);
+CMP_API int CMP_CALL cmp_icon_draw_cstr(
+    const CMPGfx *gfx, const CMPRect *bounds, const CMPIconStyle *style,
+    const char *utf8_name, const CMPIconSvg *svg, cmp_u32 render_mode);
 
 #ifdef CMP_TESTING
 /**

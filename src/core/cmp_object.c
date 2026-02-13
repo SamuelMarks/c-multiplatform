@@ -25,7 +25,7 @@ typedef struct CMPHandleSystemImpl {
 static cmp_u32 cmp_u32_max_value(void) { return (cmp_u32) ~(cmp_u32)0; }
 
 static int cmp_handle_system_resolve_impl(CMPHandleSystemImpl *impl,
-                                         CMPHandle handle, void **out_obj) {
+                                          CMPHandle handle, void **out_obj) {
   CMPHandleSlot *slot;
   CMPBool valid;
   cmp_u32 index;
@@ -62,7 +62,8 @@ static int cmp_handle_system_resolve_impl(CMPHandleSystemImpl *impl,
   return CMP_OK;
 }
 
-static int CMP_CALL cmp_handle_system_default_init(void *sys, cmp_usize capacity) {
+static int CMP_CALL cmp_handle_system_default_init(void *sys,
+                                                   cmp_usize capacity) {
   CMPHandleSystemImpl *impl;
   CMPHandleSlot *slots;
   cmp_usize max_value;
@@ -189,8 +190,8 @@ cmp_handle_system_default_register_object(void *sys, CMPObjectHeader *obj) {
   return CMP_OK;
 }
 
-static int CMP_CALL cmp_handle_system_default_unregister_object(void *sys,
-                                                              CMPHandle handle) {
+static int CMP_CALL
+cmp_handle_system_default_unregister_object(void *sys, CMPHandle handle) {
   CMPHandleSystemImpl *impl;
   CMPHandleSlot *slot;
   CMPObjectHeader *obj;
@@ -247,13 +248,15 @@ static int CMP_CALL cmp_handle_system_default_unregister_object(void *sys,
   return CMP_OK;
 }
 
-static int CMP_CALL cmp_handle_system_default_resolve(void *sys, CMPHandle handle,
-                                                    void **out_obj) {
+static int CMP_CALL cmp_handle_system_default_resolve(void *sys,
+                                                      CMPHandle handle,
+                                                      void **out_obj) {
   return cmp_handle_system_resolve_impl((CMPHandleSystemImpl *)sys, handle,
-                                       out_obj);
+                                        out_obj);
 }
 
-static int CMP_CALL cmp_handle_system_default_retain(void *sys, CMPHandle handle) {
+static int CMP_CALL cmp_handle_system_default_retain(void *sys,
+                                                     CMPHandle handle) {
   CMPObjectHeader *obj;
   void *resolved;
   int rc;
@@ -263,7 +266,7 @@ static int CMP_CALL cmp_handle_system_default_retain(void *sys, CMPHandle handle
   }
 
   rc = cmp_handle_system_resolve_impl((CMPHandleSystemImpl *)sys, handle,
-                                     &resolved);
+                                      &resolved);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -277,7 +280,7 @@ static int CMP_CALL cmp_handle_system_default_retain(void *sys, CMPHandle handle
 }
 
 static int CMP_CALL cmp_handle_system_default_release(void *sys,
-                                                    CMPHandle handle) {
+                                                      CMPHandle handle) {
   CMPObjectHeader *obj;
   void *resolved;
   int rc;
@@ -287,7 +290,7 @@ static int CMP_CALL cmp_handle_system_default_release(void *sys,
   }
 
   rc = cmp_handle_system_resolve_impl((CMPHandleSystemImpl *)sys, handle,
-                                     &resolved);
+                                      &resolved);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -329,7 +332,8 @@ int CMP_CALL cmp_handle_is_valid(CMPHandle handle, CMPBool *out_valid) {
 }
 
 int CMP_CALL cmp_object_header_init(CMPObjectHeader *obj, cmp_u32 type_id,
-                                  cmp_u32 flags, const CMPObjectVTable *vtable) {
+                                    cmp_u32 flags,
+                                    const CMPObjectVTable *vtable) {
   if (obj == NULL || vtable == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -396,7 +400,7 @@ int CMP_CALL cmp_object_release(CMPObjectHeader *obj) {
 }
 
 int CMP_CALL cmp_object_get_type_id(const CMPObjectHeader *obj,
-                                  cmp_u32 *out_type_id) {
+                                    cmp_u32 *out_type_id) {
   if (obj == NULL || out_type_id == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -406,8 +410,8 @@ int CMP_CALL cmp_object_get_type_id(const CMPObjectHeader *obj,
 }
 
 int CMP_CALL cmp_handle_system_default_create(cmp_usize capacity,
-                                            const CMPAllocator *allocator,
-                                            CMPHandleSystem *out_sys) {
+                                              const CMPAllocator *allocator,
+                                              CMPHandleSystem *out_sys) {
   CMPAllocator default_alloc;
   CMPHandleSystemImpl *impl;
   int rc;

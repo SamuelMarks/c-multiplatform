@@ -37,36 +37,36 @@ int main(void) {
   CMP_TEST_OK(m3_color_test_reset_failures());
 
   CMP_TEST_EXPECT(m3_color_test_argb_to_xyz(0, NULL, &y, &z),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_test_argb_to_xyz(0, &x, NULL, &z),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_test_argb_to_xyz(0, &x, &y, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_color_test_xyz_to_argb(0.0f, 0.0f, 0.0f, NULL, &in_gamut),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_test_xyz_to_argb(0.0f, 0.0f, 0.0f, &argb2, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(
       m3_color_test_xyz_to_lab(0.0f, 0.0f, 0.0f, NULL, &a_lab, &b_lab),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_test_xyz_to_lab(0.0f, 0.0f, 0.0f, &l, NULL, &b_lab),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_test_xyz_to_lab(0.0f, 0.0f, 0.0f, &l, &a_lab, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_color_test_lab_to_xyz(0.0f, 0.0f, 0.0f, NULL, &y, &z),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_test_lab_to_xyz(0.0f, 0.0f, 0.0f, &x, NULL, &z),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_test_lab_to_xyz(0.0f, 0.0f, 0.0f, &x, &y, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_color_test_lch_to_argb(0.0f, 0.0f, 0.0f, NULL, &in_gamut),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_test_lch_to_argb(0.0f, 0.0f, 0.0f, &argb2, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_color_test_argb_to_xyz(0xFF000000u, &x, &y, &z));
   CMP_TEST_OK(m3_color_test_argb_to_xyz(0xFFFFFFFFu, &x, &y, &z));
@@ -85,20 +85,20 @@ int main(void) {
 
   CMP_TEST_EXPECT(m3_color_test_set_lch_to_argb_fail_call(-1), CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_color_test_set_tonal_palette_init_fail_call(-1),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_color_test_set_tonal_palette_tone_fail_call(-1),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_color_argb_from_rgba(0, 0, 0, 0, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_rgba_from_argb(0, NULL, &g, &b, &a),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_rgba_from_argb(0, &r, NULL, &b, &a),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_rgba_from_argb(0, &r, &g, NULL, &a),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_color_rgba_from_argb(0, &r, &g, &b, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_color_argb_from_rgba(255, 0, 0, 255, &argb));
   CMP_TEST_ASSERT(argb == 0xFFFF0000u);
@@ -110,8 +110,9 @@ int main(void) {
   CMP_TEST_EXPECT(m3_hct_to_argb(&hct, NULL), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_color_test_set_xyz_to_argb_fail(CMP_TRUE));
-  CMP_TEST_EXPECT(m3_color_test_xyz_to_argb(0.0f, 0.0f, 0.0f, &argb2, &in_gamut),
-                 CMP_ERR_UNKNOWN);
+  CMP_TEST_EXPECT(
+      m3_color_test_xyz_to_argb(0.0f, 0.0f, 0.0f, &argb2, &in_gamut),
+      CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_color_test_set_xyz_to_argb_fail(CMP_FALSE));
 
   CMP_TEST_OK(m3_color_test_set_argb_to_xyz_fail(CMP_TRUE));
@@ -165,8 +166,8 @@ int main(void) {
   CMP_TEST_OK(m3_hct_to_argb(&hct, &argb2));
   CMP_TEST_OK(m3_hct_from_argb(argb2, &hct2));
   CMP_TEST_ASSERT(hct2.chroma <= hct.chroma + 0.01f);
-  CMP_TEST_ASSERT(
-      cmp_color_near_u8((cmp_u8)(hct2.tone + 0.5f), (cmp_u8)(hct.tone + 0.5f), 2));
+  CMP_TEST_ASSERT(cmp_color_near_u8((cmp_u8)(hct2.tone + 0.5f),
+                                    (cmp_u8)(hct.tone + 0.5f), 2));
 
   CMP_TEST_OK(m3_color_test_set_lch_to_argb_fail_call(1));
   CMP_TEST_EXPECT(m3_hct_to_argb(&hct, &argb2), CMP_ERR_UNKNOWN);
@@ -177,43 +178,43 @@ int main(void) {
   CMP_TEST_OK(m3_color_test_set_lch_to_argb_fail_call(0));
 
   CMP_TEST_EXPECT(m3_tonal_palette_init(NULL, 0.0f, 1.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tonal_palette_init(&palette, 0.0f, -1.0f), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tonal_palette_init(&palette, -10.0f, 20.0f));
   CMP_TEST_EXPECT(m3_tonal_palette_tone_argb(NULL, 50.0f, &argb2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tonal_palette_tone_argb(&palette, 50.0f, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_tonal_palette_tone_argb(&palette, -1.0f, &argb2),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_tonal_palette_tone_argb(&palette, 101.0f, &argb2),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_tonal_palette_tone_argb(&palette, 50.0f, &argb2));
 
   CMP_TEST_EXPECT(m3_scheme_generate(0xFF000000u, CMP_FALSE, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_color_test_set_argb_to_xyz_fail(CMP_TRUE));
   CMP_TEST_EXPECT(m3_scheme_generate(0xFF3366FFu, CMP_FALSE, &scheme_light),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_color_test_set_argb_to_xyz_fail(CMP_FALSE));
 
   for (i = 1; i <= 6; ++i) {
     CMP_TEST_OK(m3_color_test_set_tonal_palette_init_fail_call(i));
     CMP_TEST_EXPECT(m3_scheme_generate(0xFF3366FFu, CMP_FALSE, &scheme_light),
-                   CMP_ERR_UNKNOWN);
+                    CMP_ERR_UNKNOWN);
   }
   CMP_TEST_OK(m3_color_test_set_tonal_palette_init_fail_call(0));
 
   for (i = 1; i <= 23; ++i) {
     CMP_TEST_OK(m3_color_test_set_tonal_palette_tone_fail_call(i));
     CMP_TEST_EXPECT(m3_scheme_generate(0xFF3366FFu, CMP_TRUE, &scheme_dark),
-                   CMP_ERR_UNKNOWN);
+                    CMP_ERR_UNKNOWN);
   }
   for (i = 1; i <= 23; ++i) {
     CMP_TEST_OK(m3_color_test_set_tonal_palette_tone_fail_call(i));
     CMP_TEST_EXPECT(m3_scheme_generate(0xFF3366FFu, CMP_FALSE, &scheme_light),
-                   CMP_ERR_UNKNOWN);
+                    CMP_ERR_UNKNOWN);
   }
   CMP_TEST_OK(m3_color_test_set_tonal_palette_tone_fail_call(0));
 

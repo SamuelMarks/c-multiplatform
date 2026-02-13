@@ -64,7 +64,7 @@ CMP_API int CMP_CALL cmp_sdl3_backend_config_init(CMPSDL3BackendConfig *config);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_sdl3_backend_create(const CMPSDL3BackendConfig *config,
-                                          CMPSDL3Backend **out_backend);
+                                             CMPSDL3Backend **out_backend);
 
 /**
  * @brief Destroy an SDL3 backend instance.
@@ -79,7 +79,8 @@ CMP_API int CMP_CALL cmp_sdl3_backend_destroy(CMPSDL3Backend *backend);
  * @param out_ws Receives the window system interface.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_sdl3_backend_get_ws(CMPSDL3Backend *backend, CMPWS *out_ws);
+CMP_API int CMP_CALL cmp_sdl3_backend_get_ws(CMPSDL3Backend *backend,
+                                             CMPWS *out_ws);
 
 /**
  * @brief Retrieve the graphics interface for the backend.
@@ -88,7 +89,7 @@ CMP_API int CMP_CALL cmp_sdl3_backend_get_ws(CMPSDL3Backend *backend, CMPWS *out
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_sdl3_backend_get_gfx(CMPSDL3Backend *backend,
-                                           CMPGfx *out_gfx);
+                                              CMPGfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -97,7 +98,7 @@ CMP_API int CMP_CALL cmp_sdl3_backend_get_gfx(CMPSDL3Backend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_sdl3_backend_get_env(CMPSDL3Backend *backend,
-                                           CMPEnv *out_env);
+                                              CMPEnv *out_env);
 
 #ifdef CMP_TESTING
 /**

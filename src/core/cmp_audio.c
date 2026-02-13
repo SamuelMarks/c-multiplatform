@@ -6,7 +6,7 @@
   ((vtable)->decode != NULL && (vtable)->free_audio != NULL)
 
 static int cmp_audio_read_u16_le(const cmp_u8 *data, cmp_usize size,
-                                cmp_usize offset, cmp_u16 *out_value) {
+                                 cmp_usize offset, cmp_u16 *out_value) {
   if (data == NULL || out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -19,7 +19,7 @@ static int cmp_audio_read_u16_le(const cmp_u8 *data, cmp_usize size,
 }
 
 static int cmp_audio_read_u32_le(const cmp_u8 *data, cmp_usize size,
-                                cmp_usize offset, cmp_u32 *out_value) {
+                                 cmp_usize offset, cmp_u32 *out_value) {
   if (data == NULL || out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -34,8 +34,8 @@ static int cmp_audio_read_u32_le(const cmp_u8 *data, cmp_usize size,
 }
 
 static int cmp_audio_decode_wav(const CMPAudioDecodeRequest *request,
-                               const CMPAllocator *allocator,
-                               CMPAudioData *out_audio) {
+                                const CMPAllocator *allocator,
+                                CMPAudioData *out_audio) {
   const cmp_u8 *data;
   cmp_usize offset;
   cmp_usize chunk_size;
@@ -115,18 +115,18 @@ static int cmp_audio_decode_wav(const CMPAudioDecodeRequest *request,
       if (rc != CMP_OK) {
         return rc;
       }
-      rc = cmp_audio_read_u32_le(data, request->size, offset + 4u,
-                                &sample_rate);
+      rc =
+          cmp_audio_read_u32_le(data, request->size, offset + 4u, &sample_rate);
       if (rc != CMP_OK) {
         return rc;
       }
       rc = cmp_audio_read_u16_le(data, request->size, offset + 12u,
-                                &block_align);
+                                 &block_align);
       if (rc != CMP_OK) {
         return rc;
       }
       rc = cmp_audio_read_u16_le(data, request->size, offset + 14u,
-                                &bits_per_sample);
+                                 &bits_per_sample);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -200,7 +200,7 @@ int CMP_CALL cmp_audio_request_init(CMPAudioDecodeRequest *request) {
 }
 
 int CMP_CALL cmp_audio_init(CMPAudioDecoder *decoder,
-                          const CMPAudioConfig *config) {
+                            const CMPAudioConfig *config) {
   CMPAudio audio;
   CMPAllocator allocator;
   int rc;
@@ -266,8 +266,8 @@ int CMP_CALL cmp_audio_shutdown(CMPAudioDecoder *decoder) {
 }
 
 int CMP_CALL cmp_audio_decode(CMPAudioDecoder *decoder,
-                            const CMPAudioDecodeRequest *request,
-                            CMPAudioData *out_audio) {
+                              const CMPAudioDecodeRequest *request,
+                              CMPAudioData *out_audio) {
   int rc;
 
   if (decoder == NULL || request == NULL || out_audio == NULL) {

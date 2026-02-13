@@ -37,14 +37,15 @@ typedef cmp_u32 CMPLogLevel;
  * @param length Message length in bytes.
  * @return CMP_OK on success or a failure code.
  */
-typedef int(CMP_CALL *CMPLogSinkFn)(void *ctx, CMPLogLevel level, const char *tag,
-                                  const char *message, cmp_usize length);
+typedef int(CMP_CALL *CMPLogSinkFn)(void *ctx, CMPLogLevel level,
+                                    const char *tag, const char *message,
+                                    cmp_usize length);
 
 /**
  * @brief Log sink descriptor.
  */
 typedef struct CMPLogSink {
-  void *ctx;         /**< Sink context pointer. */
+  void *ctx;          /**< Sink context pointer. */
   CMPLogSinkFn write; /**< Sink write callback. */
 } CMPLogSink;
 
@@ -84,7 +85,7 @@ CMP_API int CMP_CALL cmp_log_get_sink(CMPLogSink *out_sink);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_log_write(CMPLogLevel level, const char *tag,
-                                const char *message);
+                                   const char *message);
 
 /**
  * @brief Write a log message with an explicit length.
@@ -95,7 +96,7 @@ CMP_API int CMP_CALL cmp_log_write(CMPLogLevel level, const char *tag,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_log_write_n(CMPLogLevel level, const char *tag,
-                                  const char *message, cmp_usize length);
+                                     const char *message, cmp_usize length);
 
 #ifdef CMP_TESTING
 /**
@@ -107,9 +108,9 @@ CMP_API int CMP_CALL cmp_log_write_n(CMPLogLevel level, const char *tag,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_log_test_set_mutex_failures(CMPBool init_fail,
-                                                  CMPBool lock_fail,
-                                                  CMPBool unlock_fail,
-                                                  CMPBool shutdown_fail);
+                                                     CMPBool lock_fail,
+                                                     CMPBool unlock_fail,
+                                                     CMPBool shutdown_fail);
 
 /**
  * @brief Configure failure injection for log output.

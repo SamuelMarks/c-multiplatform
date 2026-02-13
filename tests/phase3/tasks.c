@@ -134,7 +134,8 @@ static int task_increment(void *user) {
   return CMP_OK;
 }
 
-static int wait_for_counter(TaskState *state, int expected, cmp_u32 timeout_ms) {
+static int wait_for_counter(TaskState *state, int expected,
+                            cmp_u32 timeout_ms) {
   cmp_u32 elapsed;
   int value;
   int rc;
@@ -185,7 +186,8 @@ int main(void) {
   {
     CMPTasksDefaultConfig config;
 
-    CMP_TEST_EXPECT(cmp_tasks_default_config_init(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_tasks_default_config_init(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_tasks_default_config_init(&config));
     CMP_TEST_ASSERT(config.worker_count > 0);
     CMP_TEST_ASSERT(config.queue_capacity > 0);
@@ -194,7 +196,7 @@ int main(void) {
 
   {
     CMP_TEST_EXPECT(cmp_tasks_default_create(NULL, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
 #ifdef CMP_TESTING
@@ -202,7 +204,7 @@ int main(void) {
     cmp_usize out_value;
 
     CMP_TEST_EXPECT(cmp_tasks_test_mul_overflow(1, 1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_tasks_test_mul_overflow(0, 16, &out_value));
     CMP_TEST_ASSERT(out_value == 0);
     CMP_TEST_EXPECT(
@@ -210,35 +212,41 @@ int main(void) {
         CMP_ERR_OVERFLOW);
 
     CMP_TEST_EXPECT(cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_TIME_NOW),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_MUTEX_INIT),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_MUTEX_INIT),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_MUTEX_DESTROY),
         CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_MUTEX_LOCK),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_MUTEX_UNLOCK),
-                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_MUTEX_LOCK),
+        CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_MUTEX_UNLOCK),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_COND_INIT),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_COND_DESTROY),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_COND_SIGNAL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_COND_DESTROY),
+        CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_COND_SIGNAL),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_COND_BROADCAST),
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_COND_WAIT),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_COND_TIMEDWAIT),
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_THREAD_CREATE),
         CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_THREAD_JOIN),
-                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_THREAD_JOIN),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_tasks_test_call_native(CMP_TASKS_TEST_NATIVE_SLEEP));
     CMP_TEST_EXPECT(cmp_tasks_test_call_native(999u), CMP_ERR_INVALID_ARGUMENT);
   }
@@ -248,52 +256,52 @@ int main(void) {
         cmp_tasks_test_thread_destroy_case(CMP_TASKS_TEST_THREAD_DESTROY_NULL),
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_destroy_case(
-                       CMP_TASKS_TEST_THREAD_DESTROY_NOT_JOINED),
-                   CMP_ERR_STATE);
+                        CMP_TASKS_TEST_THREAD_DESTROY_NOT_JOINED),
+                    CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_destroy_case(
-                       CMP_TASKS_TEST_THREAD_DESTROY_UNREGISTER_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_THREAD_DESTROY_UNREGISTER_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_destroy_case(
-                       CMP_TASKS_TEST_THREAD_DESTROY_UNREGISTER_NULL_CTX),
-                   CMP_ERR_INVALID_ARGUMENT);
+                        CMP_TASKS_TEST_THREAD_DESTROY_UNREGISTER_NULL_CTX),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_destroy_case(
-                       CMP_TASKS_TEST_THREAD_DESTROY_FREE_FAIL),
-                   CMP_ERR_OUT_OF_MEMORY);
+                        CMP_TASKS_TEST_THREAD_DESTROY_FREE_FAIL),
+                    CMP_ERR_OUT_OF_MEMORY);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_destroy_case(
-                       CMP_TASKS_TEST_THREAD_DESTROY_FREE_NULL_CTX),
-                   CMP_ERR_INVALID_ARGUMENT);
+                        CMP_TASKS_TEST_THREAD_DESTROY_FREE_NULL_CTX),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(
         cmp_tasks_test_thread_destroy_case(CMP_TASKS_TEST_THREAD_DESTROY_OK));
     CMP_TEST_EXPECT(cmp_tasks_test_thread_destroy_case(999u),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_EXPECT(
         cmp_tasks_test_mutex_destroy_case(CMP_TASKS_TEST_MUTEX_DESTROY_NULL),
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_destroy_case(
-                       CMP_TASKS_TEST_MUTEX_DESTROY_NATIVE_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_MUTEX_DESTROY_NATIVE_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_destroy_case(
-                       CMP_TASKS_TEST_MUTEX_DESTROY_UNREGISTER_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_MUTEX_DESTROY_UNREGISTER_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_destroy_case(
-                       CMP_TASKS_TEST_MUTEX_DESTROY_UNREGISTER_NULL_CTX),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(
-        cmp_tasks_test_mutex_destroy_case(CMP_TASKS_TEST_MUTEX_DESTROY_FREE_FAIL),
-        CMP_ERR_OUT_OF_MEMORY);
+                        CMP_TASKS_TEST_MUTEX_DESTROY_UNREGISTER_NULL_CTX),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_destroy_case(
-                       CMP_TASKS_TEST_MUTEX_DESTROY_FREE_NULL_CTX),
-                   CMP_ERR_INVALID_ARGUMENT);
+                        CMP_TASKS_TEST_MUTEX_DESTROY_FREE_FAIL),
+                    CMP_ERR_OUT_OF_MEMORY);
+    CMP_TEST_EXPECT(cmp_tasks_test_mutex_destroy_case(
+                        CMP_TASKS_TEST_MUTEX_DESTROY_FREE_NULL_CTX),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(
         cmp_tasks_test_mutex_destroy_case(CMP_TASKS_TEST_MUTEX_DESTROY_OK));
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_destroy_case(999u),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_MUTEX_INIT));
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_destroy_case(
-                       CMP_TASKS_TEST_MUTEX_DESTROY_NATIVE_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_MUTEX_DESTROY_NATIVE_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_MUTEX_INIT));
@@ -309,51 +317,51 @@ int main(void) {
     CMP_TEST_OK(
         cmp_tasks_test_thread_entry_case(CMP_TASKS_TEST_THREAD_ENTRY_NO_ENTRY));
     CMP_TEST_EXPECT(cmp_tasks_test_thread_entry_case(999u),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_EXPECT(
         cmp_tasks_test_thread_create_case(CMP_TASKS_TEST_THREAD_CREATE_STATE),
         CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_create_case(
-                       CMP_TASKS_TEST_THREAD_CREATE_ALLOC_FAIL),
-                   CMP_ERR_OUT_OF_MEMORY);
+                        CMP_TASKS_TEST_THREAD_CREATE_ALLOC_FAIL),
+                    CMP_ERR_OUT_OF_MEMORY);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_create_case(
-                       CMP_TASKS_TEST_THREAD_CREATE_OBJECT_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_THREAD_CREATE_OBJECT_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_create_case(
-                       CMP_TASKS_TEST_THREAD_CREATE_NATIVE_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_THREAD_CREATE_NATIVE_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_create_case(
-                       CMP_TASKS_TEST_THREAD_CREATE_REGISTER_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_THREAD_CREATE_REGISTER_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_create_case(999u),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_EXPECT(
         cmp_tasks_test_thread_join_case(CMP_TASKS_TEST_THREAD_JOIN_STATE),
         CMP_ERR_STATE);
-    CMP_TEST_EXPECT(
-        cmp_tasks_test_thread_join_case(CMP_TASKS_TEST_THREAD_JOIN_RESOLVE_FAIL),
-        CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_join_case(
-                       CMP_TASKS_TEST_THREAD_JOIN_ALREADY_JOINED),
-                   CMP_ERR_STATE);
+                        CMP_TASKS_TEST_THREAD_JOIN_RESOLVE_FAIL),
+                    CMP_ERR_UNKNOWN);
+    CMP_TEST_EXPECT(cmp_tasks_test_thread_join_case(
+                        CMP_TASKS_TEST_THREAD_JOIN_ALREADY_JOINED),
+                    CMP_ERR_STATE);
     CMP_TEST_EXPECT(
         cmp_tasks_test_thread_join_case(CMP_TASKS_TEST_THREAD_JOIN_NATIVE_FAIL),
         CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_join_case(
-                       CMP_TASKS_TEST_THREAD_JOIN_UNREGISTER_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_THREAD_JOIN_UNREGISTER_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(
         cmp_tasks_test_thread_join_case(CMP_TASKS_TEST_THREAD_JOIN_FREE_FAIL),
         CMP_ERR_OUT_OF_MEMORY);
     CMP_TEST_EXPECT(cmp_tasks_test_thread_join_case(999u),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_TEST_MALLOC));
     CMP_TEST_EXPECT(cmp_tasks_test_thread_join_case(
-                       CMP_TASKS_TEST_THREAD_JOIN_ALREADY_JOINED),
-                   CMP_ERR_OUT_OF_MEMORY);
+                        CMP_TASKS_TEST_THREAD_JOIN_ALREADY_JOINED),
+                    CMP_ERR_OUT_OF_MEMORY);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_TEST_MALLOC));
@@ -364,8 +372,8 @@ int main(void) {
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_TEST_MALLOC));
     CMP_TEST_EXPECT(cmp_tasks_test_thread_join_case(
-                       CMP_TASKS_TEST_THREAD_JOIN_UNREGISTER_FAIL),
-                   CMP_ERR_OUT_OF_MEMORY);
+                        CMP_TASKS_TEST_THREAD_JOIN_UNREGISTER_FAIL),
+                    CMP_ERR_OUT_OF_MEMORY);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_TEST_MALLOC));
@@ -374,19 +382,22 @@ int main(void) {
         CMP_ERR_OUT_OF_MEMORY);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
-    CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
+    CMP_TEST_OK(
+        cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
     CMP_TEST_EXPECT(
         cmp_tasks_test_thread_join_case(CMP_TASKS_TEST_THREAD_JOIN_NATIVE_FAIL),
         CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
-    CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
+    CMP_TEST_OK(
+        cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
     CMP_TEST_EXPECT(cmp_tasks_test_thread_join_case(
-                       CMP_TASKS_TEST_THREAD_JOIN_UNREGISTER_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_THREAD_JOIN_UNREGISTER_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
-    CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
+    CMP_TEST_OK(
+        cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
     CMP_TEST_EXPECT(
         cmp_tasks_test_thread_join_case(CMP_TASKS_TEST_THREAD_JOIN_FREE_FAIL),
         CMP_ERR_UNKNOWN);
@@ -395,61 +406,61 @@ int main(void) {
     CMP_TEST_EXPECT(
         cmp_tasks_test_mutex_create_case(CMP_TASKS_TEST_MUTEX_CREATE_STATE),
         CMP_ERR_STATE);
-    CMP_TEST_EXPECT(
-        cmp_tasks_test_mutex_create_case(CMP_TASKS_TEST_MUTEX_CREATE_ALLOC_FAIL),
-        CMP_ERR_OUT_OF_MEMORY);
-    CMP_TEST_EXPECT(
-        cmp_tasks_test_mutex_create_case(CMP_TASKS_TEST_MUTEX_CREATE_OBJECT_FAIL),
-        CMP_ERR_UNKNOWN);
-    CMP_TEST_EXPECT(
-        cmp_tasks_test_mutex_create_case(CMP_TASKS_TEST_MUTEX_CREATE_NATIVE_FAIL),
-        CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_create_case(
-                       CMP_TASKS_TEST_MUTEX_CREATE_REGISTER_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_MUTEX_CREATE_ALLOC_FAIL),
+                    CMP_ERR_OUT_OF_MEMORY);
+    CMP_TEST_EXPECT(cmp_tasks_test_mutex_create_case(
+                        CMP_TASKS_TEST_MUTEX_CREATE_OBJECT_FAIL),
+                    CMP_ERR_UNKNOWN);
+    CMP_TEST_EXPECT(cmp_tasks_test_mutex_create_case(
+                        CMP_TASKS_TEST_MUTEX_CREATE_NATIVE_FAIL),
+                    CMP_ERR_UNKNOWN);
+    CMP_TEST_EXPECT(cmp_tasks_test_mutex_create_case(
+                        CMP_TASKS_TEST_MUTEX_CREATE_REGISTER_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_create_case(999u),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_EXPECT(cmp_tasks_test_default_mutex_destroy_case(
-                       CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_STATE),
-                   CMP_ERR_STATE);
+                        CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_STATE),
+                    CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_tasks_test_default_mutex_destroy_case(
-                       CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_RESOLVE_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_RESOLVE_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_default_mutex_destroy_case(
-                       CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_NATIVE_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_NATIVE_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_default_mutex_destroy_case(
-                       CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_UNREGISTER_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_UNREGISTER_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_default_mutex_destroy_case(
-                       CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_FREE_FAIL),
-                   CMP_ERR_OUT_OF_MEMORY);
+                        CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_FREE_FAIL),
+                    CMP_ERR_OUT_OF_MEMORY);
     CMP_TEST_EXPECT(cmp_tasks_test_default_mutex_destroy_case(999u),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_TEST_MALLOC));
     CMP_TEST_EXPECT(cmp_tasks_test_default_mutex_destroy_case(
-                       CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_NATIVE_FAIL),
-                   CMP_ERR_OUT_OF_MEMORY);
+                        CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_NATIVE_FAIL),
+                    CMP_ERR_OUT_OF_MEMORY);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_MUTEX_INIT));
     CMP_TEST_EXPECT(cmp_tasks_test_default_mutex_destroy_case(
-                       CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_NATIVE_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_NATIVE_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_TEST_MALLOC));
     CMP_TEST_EXPECT(cmp_tasks_test_default_mutex_destroy_case(
-                       CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_UNREGISTER_FAIL),
-                   CMP_ERR_OUT_OF_MEMORY);
+                        CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_UNREGISTER_FAIL),
+                    CMP_ERR_OUT_OF_MEMORY);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_TEST_MALLOC));
     CMP_TEST_EXPECT(cmp_tasks_test_default_mutex_destroy_case(
-                       CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_FREE_FAIL),
-                   CMP_ERR_OUT_OF_MEMORY);
+                        CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_FREE_FAIL),
+                    CMP_ERR_OUT_OF_MEMORY);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_EXPECT(
@@ -458,26 +469,26 @@ int main(void) {
     CMP_TEST_EXPECT(
         cmp_tasks_test_mutex_lock_case(CMP_TASKS_TEST_MUTEX_LOCK_RESOLVE_FAIL),
         CMP_ERR_UNKNOWN);
-    CMP_TEST_EXPECT(
-        cmp_tasks_test_mutex_lock_case(CMP_TASKS_TEST_MUTEX_LOCK_NOT_INITIALIZED),
-        CMP_ERR_STATE);
+    CMP_TEST_EXPECT(cmp_tasks_test_mutex_lock_case(
+                        CMP_TASKS_TEST_MUTEX_LOCK_NOT_INITIALIZED),
+                    CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_lock_case(999u),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_EXPECT(
         cmp_tasks_test_mutex_unlock_case(CMP_TASKS_TEST_MUTEX_UNLOCK_STATE),
         CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_unlock_case(
-                       CMP_TASKS_TEST_MUTEX_UNLOCK_RESOLVE_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_MUTEX_UNLOCK_RESOLVE_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_unlock_case(
-                       CMP_TASKS_TEST_MUTEX_UNLOCK_NOT_INITIALIZED),
-                   CMP_ERR_STATE);
+                        CMP_TASKS_TEST_MUTEX_UNLOCK_NOT_INITIALIZED),
+                    CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_tasks_test_mutex_unlock_case(999u),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_EXPECT(cmp_tasks_test_sleep_case(CMP_TASKS_TEST_SLEEP_STATE),
-                   CMP_ERR_STATE);
+                    CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_tasks_test_sleep_case(999u), CMP_ERR_INVALID_ARGUMENT);
   }
 
@@ -487,30 +498,33 @@ int main(void) {
     cmp_usize count;
 
     CMP_TEST_EXPECT(cmp_tasks_test_queue_case(CMP_TASKS_TEST_QUEUE_CASE_EMPTY,
-                                            &wait_ms, &due_time, &count),
-                   CMP_ERR_NOT_FOUND);
+                                              &wait_ms, &due_time, &count),
+                    CMP_ERR_NOT_FOUND);
     CMP_TEST_EXPECT(cmp_tasks_test_queue_case(CMP_TASKS_TEST_QUEUE_CASE_INVALID,
-                                            &wait_ms, &due_time, &count),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_tasks_test_queue_case(CMP_TASKS_TEST_QUEUE_CASE_NOT_READY,
-                                            &wait_ms, &due_time, &count),
-                   CMP_ERR_NOT_READY);
+                                              &wait_ms, &due_time, &count),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_queue_case(CMP_TASKS_TEST_QUEUE_CASE_NOT_READY, &wait_ms,
+                                  &due_time, &count),
+        CMP_ERR_NOT_READY);
     CMP_TEST_OK(cmp_tasks_test_queue_case(CMP_TASKS_TEST_QUEUE_CASE_READY_EARLY,
-                                        &wait_ms, &due_time, &count));
+                                          &wait_ms, &due_time, &count));
     CMP_TEST_ASSERT(due_time == 0u);
     CMP_TEST_OK(cmp_tasks_test_queue_case(CMP_TASKS_TEST_QUEUE_CASE_READY_LATE,
-                                        &wait_ms, &due_time, &count));
-    CMP_TEST_OK(cmp_tasks_test_queue_case(CMP_TASKS_TEST_QUEUE_CASE_SWAP, &wait_ms,
-                                        &due_time, &count));
+                                          &wait_ms, &due_time, &count));
+    CMP_TEST_OK(cmp_tasks_test_queue_case(CMP_TASKS_TEST_QUEUE_CASE_SWAP,
+                                          &wait_ms, &due_time, &count));
     CMP_TEST_ASSERT(count == 1u);
-    CMP_TEST_EXPECT(cmp_tasks_test_queue_case(CMP_TASKS_TEST_QUEUE_CASE_TIME_FAIL,
-                                            &wait_ms, &due_time, &count),
-                   CMP_ERR_UNKNOWN);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_queue_case(CMP_TASKS_TEST_QUEUE_CASE_TIME_FAIL, &wait_ms,
+                                  &due_time, &count),
+        CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_queue_case(CMP_TASKS_TEST_QUEUE_CASE_BUSY,
-                                            &wait_ms, &due_time, &count),
-                   CMP_ERR_BUSY);
-    CMP_TEST_EXPECT(cmp_tasks_test_queue_case(999u, &wait_ms, &due_time, &count),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                              &wait_ms, &due_time, &count),
+                    CMP_ERR_BUSY);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_queue_case(999u, &wait_ms, &due_time, &count),
+        CMP_ERR_INVALID_ARGUMENT);
   }
 
   {
@@ -526,37 +540,41 @@ int main(void) {
     CMP_TEST_EXPECT(
         cmp_tasks_test_object_op(CMP_TASKS_TEST_OBJECT_OP_GET_TYPE, NULL),
         CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(
-        cmp_tasks_test_object_op(CMP_TASKS_TEST_OBJECT_OP_RETAIN_NULL, &type_id),
-        CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(
-        cmp_tasks_test_object_op(CMP_TASKS_TEST_OBJECT_OP_RELEASE_NULL, &type_id),
-        CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_tasks_test_object_op(
+                        CMP_TASKS_TEST_OBJECT_OP_RETAIN_NULL, &type_id),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_tasks_test_object_op(
+                        CMP_TASKS_TEST_OBJECT_OP_RELEASE_NULL, &type_id),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_tasks_test_object_op(CMP_TASKS_TEST_OBJECT_OP_INIT_FAIL, &type_id),
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_tasks_test_object_op(
-                       CMP_TASKS_TEST_OBJECT_OP_INIT_EARLY_FAIL, &type_id),
-                   CMP_ERR_INVALID_ARGUMENT);
+                        CMP_TASKS_TEST_OBJECT_OP_INIT_EARLY_FAIL, &type_id),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_tasks_test_object_op(999u, &type_id),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_tasks_test_stub_exercise());
     CMP_TEST_OK(cmp_tasks_test_call_noop());
   }
 
   {
-    CMP_TEST_OK(cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_LOCK_FAIL));
-    CMP_TEST_OK(cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_WAIT_FAIL));
     CMP_TEST_OK(
-        cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_TIMEDWAIT_TIMEOUT));
-    CMP_TEST_OK(cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_TASK_ERROR));
-    CMP_TEST_OK(cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_PICK_ERROR));
+        cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_LOCK_FAIL));
+    CMP_TEST_OK(
+        cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_WAIT_FAIL));
+    CMP_TEST_OK(cmp_tasks_test_worker_case(
+        CMP_TASKS_TEST_WORKER_CASE_TIMEDWAIT_TIMEOUT));
+    CMP_TEST_OK(
+        cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_TASK_ERROR));
+    CMP_TEST_OK(
+        cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_PICK_ERROR));
     CMP_TEST_OK(
         cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_UNLOCK_FAIL));
     CMP_TEST_OK(cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_NULL));
-    CMP_TEST_OK(
-        cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_TIMEDWAIT_SIGNAL));
+    CMP_TEST_OK(cmp_tasks_test_worker_case(
+        CMP_TASKS_TEST_WORKER_CASE_TIMEDWAIT_SIGNAL));
     CMP_TEST_OK(cmp_tasks_test_signal_stop_null());
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_JOIN));
@@ -565,7 +583,8 @@ int main(void) {
         CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
-    CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
+    CMP_TEST_OK(
+        cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
     CMP_TEST_EXPECT(
         cmp_tasks_test_worker_case(CMP_TASKS_TEST_WORKER_CASE_TIMEDWAIT_SIGNAL),
         CMP_ERR_UNKNOWN);
@@ -577,8 +596,9 @@ int main(void) {
     CMP_TEST_EXPECT(
         cmp_tasks_test_timedwait_case(CMP_TASKS_TEST_TIMEDWAIT_TIMEOUT),
         CMP_ERR_TIMEOUT);
-    CMP_TEST_EXPECT(cmp_tasks_test_timedwait_case(CMP_TASKS_TEST_TIMEDWAIT_ERROR),
-                   CMP_ERR_UNKNOWN);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_timedwait_case(CMP_TASKS_TEST_TIMEDWAIT_ERROR),
+        CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(
         cmp_tasks_test_timedwait_case(CMP_TASKS_TEST_TIMEDWAIT_TIME_FAIL),
         CMP_ERR_UNKNOWN);
@@ -587,7 +607,8 @@ int main(void) {
         cmp_tasks_test_timedwait_case(CMP_TASKS_TEST_TIMEDWAIT_NSEC_ADJUST));
     CMP_TEST_OK(
         cmp_tasks_test_timedwait_case(CMP_TASKS_TEST_TIMEDWAIT_SIGNAL_NULL));
-    CMP_TEST_EXPECT(cmp_tasks_test_timedwait_case(999u), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_tasks_test_timedwait_case(999u),
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   {
@@ -623,14 +644,15 @@ int main(void) {
         CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
-    CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
+    CMP_TEST_OK(
+        cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
     CMP_TEST_EXPECT(cmp_tasks_test_timedwait_case(CMP_TASKS_TEST_TIMEDWAIT_OK),
-                   CMP_ERR_UNKNOWN);
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_JOIN));
     CMP_TEST_EXPECT(cmp_tasks_test_timedwait_case(CMP_TASKS_TEST_TIMEDWAIT_OK),
-                   CMP_ERR_UNKNOWN);
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(
@@ -655,15 +677,15 @@ int main(void) {
     CMP_TEST_OK(cmp_tasks_default_config_init(&config));
     config.worker_count = 0;
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     config.worker_count = 1;
     config.queue_capacity = 0;
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     config.queue_capacity = 4;
     config.handle_capacity = 0;
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   {
@@ -684,17 +706,17 @@ int main(void) {
     config.queue_capacity = 2;
     config.handle_capacity = 2;
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     alloc_iface.alloc = test_alloc;
     alloc_iface.realloc = NULL;
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     alloc_iface.realloc = test_realloc;
     alloc_iface.free = NULL;
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   {
@@ -717,7 +739,7 @@ int main(void) {
 
     alloc.fail_on = 1;
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
-                   CMP_ERR_OUT_OF_MEMORY);
+                    CMP_ERR_OUT_OF_MEMORY);
   }
 
 #ifdef CMP_TESTING
@@ -738,7 +760,8 @@ int main(void) {
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks), CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
-    CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
+    CMP_TEST_OK(
+        cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_THREAD_CREATE));
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks), CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
   }
@@ -774,17 +797,17 @@ int main(void) {
     test_allocator_init(&alloc);
     alloc.fail_on = 2;
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
-                   CMP_ERR_OUT_OF_MEMORY);
+                    CMP_ERR_OUT_OF_MEMORY);
 
     test_allocator_init(&alloc);
     alloc.fail_on = 4;
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
-                   CMP_ERR_OUT_OF_MEMORY);
+                    CMP_ERR_OUT_OF_MEMORY);
 
     test_allocator_init(&alloc);
     alloc.fail_on = 5;
     CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
-                   CMP_ERR_OUT_OF_MEMORY);
+                    CMP_ERR_OUT_OF_MEMORY);
 
     alloc.fail_on = 0;
     max_value = (cmp_usize) ~(cmp_usize)0;
@@ -792,12 +815,14 @@ int main(void) {
     config.worker_count = 1;
     config.queue_capacity = max_value;
     config.handle_capacity = 1;
-    CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks), CMP_ERR_OVERFLOW);
+    CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
+                    CMP_ERR_OVERFLOW);
 
     config.worker_count = max_value;
     config.queue_capacity = 1;
     config.handle_capacity = 1;
-    CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks), CMP_ERR_OVERFLOW);
+    CMP_TEST_EXPECT(cmp_tasks_default_create(&config, &tasks),
+                    CMP_ERR_OVERFLOW);
 
     CMP_TEST_OK(cmp_tasks_default_config_init(&config));
     config.worker_count = 2;
@@ -837,29 +862,29 @@ int main(void) {
         tasks.vtable->thread_create(tasks.ctx, NULL, NULL, &thread_handle),
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(tasks.vtable->thread_join(NULL, bad_handle),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(tasks.vtable->mutex_create(NULL, &mutex),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(tasks.vtable->mutex_lock(NULL, bad_handle),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(tasks.vtable->mutex_unlock(NULL, bad_handle),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(tasks.vtable->mutex_destroy(NULL, bad_handle),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(tasks.vtable->sleep_ms(NULL, 1), CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(tasks.vtable->task_post(NULL, task_increment, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(tasks.vtable->task_post(tasks.ctx, NULL, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         tasks.vtable->task_post_delayed(NULL, task_increment, NULL, 1),
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(tasks.vtable->task_post_delayed(tasks.ctx, NULL, NULL, 1),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(tasks.vtable->thread_join(tasks.ctx, bad_handle),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(tasks.vtable->mutex_lock(tasks.ctx, bad_handle),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(tasks.vtable->mutex_create(tasks.ctx, &mutex));
     CMP_TEST_OK(tasks.vtable->mutex_lock(tasks.ctx, mutex));
@@ -870,12 +895,12 @@ int main(void) {
 
     counter = 0;
     thread_ctx.counter = &counter;
-    CMP_TEST_OK(tasks.vtable->thread_create(tasks.ctx, thread_entry, &thread_ctx,
-                                           &thread_handle));
+    CMP_TEST_OK(tasks.vtable->thread_create(tasks.ctx, thread_entry,
+                                            &thread_ctx, &thread_handle));
     CMP_TEST_OK(tasks.vtable->thread_join(tasks.ctx, thread_handle));
     CMP_TEST_ASSERT(counter == 1);
     CMP_TEST_EXPECT(tasks.vtable->thread_join(tasks.ctx, thread_handle),
-                   CMP_ERR_NOT_FOUND);
+                    CMP_ERR_NOT_FOUND);
 
     state.tasks = tasks;
     state.counter = 0;
@@ -889,7 +914,7 @@ int main(void) {
 
     state.counter = 0;
     CMP_TEST_OK(tasks.vtable->task_post_delayed(tasks.ctx, task_increment,
-                                               &state, 100));
+                                                &state, 100));
     CMP_TEST_OK(tasks.vtable->sleep_ms(tasks.ctx, 20));
     CMP_TEST_OK(task_state_get(&state, &value));
     CMP_TEST_ASSERT(value == 0);
@@ -904,50 +929,53 @@ int main(void) {
 
 #ifdef CMP_TESTING
   {
-    CMP_TEST_EXPECT(cmp_tasks_test_post_case(CMP_TASKS_TEST_POST_CASE_LOCK_FAIL),
-                   CMP_ERR_UNKNOWN);
-    CMP_TEST_EXPECT(cmp_tasks_test_post_case(CMP_TASKS_TEST_POST_CASE_SIGNAL_FAIL),
-                   CMP_ERR_UNKNOWN);
-    CMP_TEST_EXPECT(cmp_tasks_test_post_case(CMP_TASKS_TEST_POST_CASE_UNLOCK_FAIL),
-                   CMP_ERR_UNKNOWN);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_post_case(CMP_TASKS_TEST_POST_CASE_LOCK_FAIL),
+        CMP_ERR_UNKNOWN);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_post_case(CMP_TASKS_TEST_POST_CASE_SIGNAL_FAIL),
+        CMP_ERR_UNKNOWN);
+    CMP_TEST_EXPECT(
+        cmp_tasks_test_post_case(CMP_TASKS_TEST_POST_CASE_UNLOCK_FAIL),
+        CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_post_case(CMP_TASKS_TEST_POST_CASE_BUSY),
-                   CMP_ERR_BUSY);
+                    CMP_ERR_BUSY);
     CMP_TEST_EXPECT(cmp_tasks_test_post_case(CMP_TASKS_TEST_POST_CASE_STATE),
-                   CMP_ERR_STATE);
+                    CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_tasks_test_post_case(999u), CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_MUTEX_INIT));
     CMP_TEST_EXPECT(cmp_tasks_test_post_case(CMP_TASKS_TEST_POST_CASE_BUSY),
-                   CMP_ERR_UNKNOWN);
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_COND_INIT));
     CMP_TEST_EXPECT(cmp_tasks_test_post_case(CMP_TASKS_TEST_POST_CASE_BUSY),
-                   CMP_ERR_UNKNOWN);
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_EXPECT(cmp_tasks_test_post_delayed_case(
-                       CMP_TASKS_TEST_POST_DELAYED_CASE_TIME_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_POST_DELAYED_CASE_TIME_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_post_delayed_case(
-                       CMP_TASKS_TEST_POST_DELAYED_CASE_LOCK_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_POST_DELAYED_CASE_LOCK_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_post_delayed_case(
-                       CMP_TASKS_TEST_POST_DELAYED_CASE_SIGNAL_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_POST_DELAYED_CASE_SIGNAL_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(cmp_tasks_test_post_delayed_case(
-                       CMP_TASKS_TEST_POST_DELAYED_CASE_UNLOCK_FAIL),
-                   CMP_ERR_UNKNOWN);
+                        CMP_TASKS_TEST_POST_DELAYED_CASE_UNLOCK_FAIL),
+                    CMP_ERR_UNKNOWN);
     CMP_TEST_EXPECT(
         cmp_tasks_test_post_delayed_case(CMP_TASKS_TEST_POST_DELAYED_CASE_BUSY),
         CMP_ERR_BUSY);
     CMP_TEST_EXPECT(cmp_tasks_test_post_delayed_case(
-                       CMP_TASKS_TEST_POST_DELAYED_CASE_OVERFLOW),
-                   CMP_ERR_OVERFLOW);
-    CMP_TEST_EXPECT(
-        cmp_tasks_test_post_delayed_case(CMP_TASKS_TEST_POST_DELAYED_CASE_STATE),
-        CMP_ERR_STATE);
+                        CMP_TASKS_TEST_POST_DELAYED_CASE_OVERFLOW),
+                    CMP_ERR_OVERFLOW);
+    CMP_TEST_EXPECT(cmp_tasks_test_post_delayed_case(
+                        CMP_TASKS_TEST_POST_DELAYED_CASE_STATE),
+                    CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_tasks_test_post_delayed_case(999u),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_MUTEX_INIT));
     CMP_TEST_EXPECT(
@@ -990,12 +1018,14 @@ int main(void) {
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_OK(cmp_tasks_default_create(&config, &tasks));
-    CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_MUTEX_UNLOCK));
+    CMP_TEST_OK(
+        cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_MUTEX_UNLOCK));
     CMP_TEST_EXPECT(cmp_tasks_default_destroy(&tasks), CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_tasks_test_clear_fail_point());
 
     CMP_TEST_OK(cmp_tasks_default_create(&config, &tasks));
-    CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_COND_BROADCAST));
+    CMP_TEST_OK(
+        cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_COND_BROADCAST));
     CMP_TEST_EXPECT(cmp_tasks_default_destroy(&tasks), CMP_ERR_UNKNOWN);
 
     CMP_TEST_OK(cmp_tasks_default_create(&config, &tasks));
@@ -1003,11 +1033,13 @@ int main(void) {
     CMP_TEST_EXPECT(cmp_tasks_default_destroy(&tasks), CMP_ERR_UNKNOWN);
 
     CMP_TEST_OK(cmp_tasks_default_create(&config, &tasks));
-    CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_COND_DESTROY));
+    CMP_TEST_OK(
+        cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_COND_DESTROY));
     CMP_TEST_EXPECT(cmp_tasks_default_destroy(&tasks), CMP_ERR_UNKNOWN);
 
     CMP_TEST_OK(cmp_tasks_default_create(&config, &tasks));
-    CMP_TEST_OK(cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_MUTEX_DESTROY));
+    CMP_TEST_OK(
+        cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_MUTEX_DESTROY));
     CMP_TEST_EXPECT(cmp_tasks_default_destroy(&tasks), CMP_ERR_UNKNOWN);
   }
 #endif
@@ -1079,7 +1111,7 @@ int main(void) {
         tasks.vtable->task_post_delayed(tasks.ctx, task_increment, &state, 200);
     CMP_TEST_OK(rc);
     CMP_TEST_EXPECT(tasks.vtable->task_post(tasks.ctx, task_increment, &state),
-                   CMP_ERR_BUSY);
+                    CMP_ERR_BUSY);
 
     CMP_TEST_OK(tasks.vtable->mutex_destroy(tasks.ctx, state.mutex));
     CMP_TEST_OK(cmp_tasks_default_destroy(&tasks));

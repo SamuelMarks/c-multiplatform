@@ -44,7 +44,7 @@ CMP_API int CMP_CALL cmp_null_backend_config_init(CMPNullBackendConfig *config);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_null_backend_create(const CMPNullBackendConfig *config,
-                                          CMPNullBackend **out_backend);
+                                             CMPNullBackend **out_backend);
 
 /**
  * @brief Destroy a null backend instance.
@@ -59,7 +59,8 @@ CMP_API int CMP_CALL cmp_null_backend_destroy(CMPNullBackend *backend);
  * @param out_ws Receives the window system interface.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_null_backend_get_ws(CMPNullBackend *backend, CMPWS *out_ws);
+CMP_API int CMP_CALL cmp_null_backend_get_ws(CMPNullBackend *backend,
+                                             CMPWS *out_ws);
 
 /**
  * @brief Retrieve the graphics interface for the backend.
@@ -68,7 +69,7 @@ CMP_API int CMP_CALL cmp_null_backend_get_ws(CMPNullBackend *backend, CMPWS *out
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_null_backend_get_gfx(CMPNullBackend *backend,
-                                           CMPGfx *out_gfx);
+                                              CMPGfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -77,7 +78,7 @@ CMP_API int CMP_CALL cmp_null_backend_get_gfx(CMPNullBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_null_backend_get_env(CMPNullBackend *backend,
-                                           CMPEnv *out_env);
+                                              CMPEnv *out_env);
 
 #ifdef CMP_TESTING
 /**
@@ -86,8 +87,8 @@ CMP_API int CMP_CALL cmp_null_backend_get_env(CMPNullBackend *backend,
  * @param initialized CMP_TRUE to mark initialized, CMP_FALSE otherwise.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_null_backend_test_set_initialized(CMPNullBackend *backend,
-                                                        CMPBool initialized);
+CMP_API int CMP_CALL cmp_null_backend_test_set_initialized(
+    CMPNullBackend *backend, CMPBool initialized);
 
 /**
  * @brief Test wrapper for null backend object retain.
@@ -109,8 +110,8 @@ CMP_API int CMP_CALL cmp_null_backend_test_object_release(CMPObjectHeader *obj);
  * @param out_type_id Receives the type identifier.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_null_backend_test_object_get_type_id(CMPObjectHeader *obj,
-                                                           cmp_u32 *out_type_id);
+CMP_API int CMP_CALL cmp_null_backend_test_object_get_type_id(
+    CMPObjectHeader *obj, cmp_u32 *out_type_id);
 #endif
 
 #ifdef __cplusplus

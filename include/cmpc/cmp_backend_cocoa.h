@@ -43,7 +43,8 @@ CMP_API int CMP_CALL cmp_cocoa_backend_is_available(CMPBool *out_available);
  * @param config Config to initialize.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_cocoa_backend_config_init(CMPCocoaBackendConfig *config);
+CMP_API int CMP_CALL
+cmp_cocoa_backend_config_init(CMPCocoaBackendConfig *config);
 
 /**
  * @brief Create a Cocoa backend instance.
@@ -51,8 +52,8 @@ CMP_API int CMP_CALL cmp_cocoa_backend_config_init(CMPCocoaBackendConfig *config
  * @param out_backend Receives the created backend instance.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_cocoa_backend_create(const CMPCocoaBackendConfig *config,
-                                           CMPCocoaBackend **out_backend);
+CMP_API int CMP_CALL cmp_cocoa_backend_create(
+    const CMPCocoaBackendConfig *config, CMPCocoaBackend **out_backend);
 
 /**
  * @brief Destroy a Cocoa backend instance.
@@ -68,7 +69,7 @@ CMP_API int CMP_CALL cmp_cocoa_backend_destroy(CMPCocoaBackend *backend);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_cocoa_backend_get_ws(CMPCocoaBackend *backend,
-                                           CMPWS *out_ws);
+                                              CMPWS *out_ws);
 
 /**
  * @brief Retrieve the graphics interface for the backend.
@@ -77,7 +78,7 @@ CMP_API int CMP_CALL cmp_cocoa_backend_get_ws(CMPCocoaBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_cocoa_backend_get_gfx(CMPCocoaBackend *backend,
-                                            CMPGfx *out_gfx);
+                                               CMPGfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -86,7 +87,7 @@ CMP_API int CMP_CALL cmp_cocoa_backend_get_gfx(CMPCocoaBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_cocoa_backend_get_env(CMPCocoaBackend *backend,
-                                            CMPEnv *out_env);
+                                               CMPEnv *out_env);
 
 #ifdef CMP_TESTING
 /**

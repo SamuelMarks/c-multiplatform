@@ -16,7 +16,8 @@ struct CMPArenaBlock {
 
 static cmp_usize cmp_usize_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
 
-static int cmp_arena_add_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
+static int cmp_arena_add_overflow(cmp_usize a, cmp_usize b,
+                                  cmp_usize *out_value) {
   cmp_usize max_value;
 
   max_value = cmp_usize_max_value();
@@ -29,7 +30,7 @@ static int cmp_arena_add_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value
 }
 
 static int cmp_arena_align_offset(cmp_usize offset, cmp_usize alignment,
-                                 cmp_usize *out_aligned) {
+                                  cmp_usize *out_aligned) {
   cmp_usize mask;
   cmp_usize max_value;
 
@@ -44,7 +45,7 @@ static int cmp_arena_align_offset(cmp_usize offset, cmp_usize alignment,
 }
 
 static int cmp_arena_allocate_block(CMPArena *arena, cmp_usize capacity,
-                                   CMPArenaBlock **out_block) {
+                                    CMPArenaBlock **out_block) {
   cmp_usize header_size;
   cmp_usize total_size;
   void *mem;
@@ -71,7 +72,7 @@ static int cmp_arena_allocate_block(CMPArena *arena, cmp_usize capacity,
 }
 
 int CMP_CALL cmp_arena_init(CMPArena *arena, const CMPAllocator *allocator,
-                          cmp_usize block_size) {
+                            cmp_usize block_size) {
   CMPAllocator default_alloc;
   CMPArenaBlock *block;
   int rc;
@@ -190,8 +191,8 @@ int CMP_CALL cmp_arena_shutdown(CMPArena *arena) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_arena_alloc(CMPArena *arena, cmp_usize size, cmp_usize alignment,
-                           void **out_ptr) {
+int CMP_CALL cmp_arena_alloc(CMPArena *arena, cmp_usize size,
+                             cmp_usize alignment, void **out_ptr) {
   CMPArenaBlock *block;
   CMPArenaBlock *new_block;
   cmp_usize aligned_offset;
@@ -269,7 +270,8 @@ int CMP_CALL cmp_arena_alloc(CMPArena *arena, cmp_usize size, cmp_usize alignmen
   return CMP_OK;
 }
 
-int CMP_CALL cmp_arena_get_stats(const CMPArena *arena, CMPArenaStats *out_stats) {
+int CMP_CALL cmp_arena_get_stats(const CMPArena *arena,
+                                 CMPArenaStats *out_stats) {
   const CMPArenaBlock *block;
   cmp_usize total_capacity;
   cmp_usize total_used;

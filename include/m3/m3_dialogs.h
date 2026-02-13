@@ -50,34 +50,35 @@ struct M3AlertDialog;
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPAlertDialogOnAction)(void *ctx,
-                                            struct M3AlertDialog *dialog,
-                                            cmp_u32 action_id);
+                                              struct M3AlertDialog *dialog,
+                                              cmp_u32 action_id);
 
 /**
  * @brief Alert dialog style descriptor.
  */
 typedef struct M3AlertDialogStyle {
-  CMPLayoutEdges padding;       /**< Padding around dialog contents. */
-  CMPScalar corner_radius;      /**< Corner radius in pixels (>= 0). */
-  CMPScalar min_width;          /**< Minimum dialog width in pixels (>= 0). */
-  CMPScalar max_width;          /**< Maximum dialog width in pixels (>= 0). */
-  CMPScalar title_body_spacing; /**< Spacing between title and body in pixels (>=
-                                  0). */
+  CMPLayoutEdges padding;        /**< Padding around dialog contents. */
+  CMPScalar corner_radius;       /**< Corner radius in pixels (>= 0). */
+  CMPScalar min_width;           /**< Minimum dialog width in pixels (>= 0). */
+  CMPScalar max_width;           /**< Maximum dialog width in pixels (>= 0). */
+  CMPScalar title_body_spacing;  /**< Spacing between title and body in pixels
+                                   (>=  0). */
   CMPScalar body_action_spacing; /**< Spacing between body and actions in pixels
                                    (>= 0). */
   CMPScalar
       action_spacing; /**< Spacing between action buttons in pixels (>= 0). */
   CMPScalar
       action_padding_x; /**< Horizontal padding for action buttons (>= 0). */
-  CMPScalar action_padding_y; /**< Vertical padding for action buttons (>= 0). */
-  CMPTextStyle title_style;   /**< Text style for the title. */
-  CMPTextStyle body_style;    /**< Text style for the body. */
-  CMPTextStyle action_style;  /**< Text style for action labels. */
-  CMPColor background_color;  /**< Dialog background color. */
-  CMPColor scrim_color;       /**< Scrim color used behind the dialog. */
-  CMPShadow shadow;           /**< Shadow descriptor. */
-  CMPBool shadow_enabled;     /**< CMP_TRUE when shadow rendering is enabled. */
-  CMPBool scrim_enabled;      /**< CMP_TRUE when scrim rendering is enabled. */
+  CMPScalar
+      action_padding_y;      /**< Vertical padding for action buttons (>= 0). */
+  CMPTextStyle title_style;  /**< Text style for the title. */
+  CMPTextStyle body_style;   /**< Text style for the body. */
+  CMPTextStyle action_style; /**< Text style for action labels. */
+  CMPColor background_color; /**< Dialog background color. */
+  CMPColor scrim_color;      /**< Scrim color used behind the dialog. */
+  CMPShadow shadow;          /**< Shadow descriptor. */
+  CMPBool shadow_enabled;    /**< CMP_TRUE when shadow rendering is enabled. */
+  CMPBool scrim_enabled;     /**< CMP_TRUE when scrim rendering is enabled. */
 } M3AlertDialogStyle;
 
 /**
@@ -86,7 +87,7 @@ typedef struct M3AlertDialogStyle {
 typedef struct M3AlertDialog {
   CMPWidget widget; /**< Widget interface (points to this instance). */
   CMPTextBackend text_backend;    /**< Text backend instance. */
-  M3AlertDialogStyle style;      /**< Current dialog style. */
+  M3AlertDialogStyle style;       /**< Current dialog style. */
   CMPHandle title_font;           /**< Font handle for the title text. */
   CMPHandle body_font;            /**< Font handle for the body text. */
   CMPHandle action_font;          /**< Font handle for action labels. */
@@ -94,23 +95,23 @@ typedef struct M3AlertDialog {
   CMPTextMetrics body_metrics;    /**< Cached body metrics. */
   CMPTextMetrics confirm_metrics; /**< Cached confirm action metrics. */
   CMPTextMetrics dismiss_metrics; /**< Cached dismiss action metrics. */
-  const char *utf8_title;        /**< UTF-8 title text (may be NULL). */
+  const char *utf8_title;         /**< UTF-8 title text (may be NULL). */
   cmp_usize title_len;            /**< Title length in bytes. */
-  const char *utf8_body;         /**< UTF-8 body text (may be NULL). */
+  const char *utf8_body;          /**< UTF-8 body text (may be NULL). */
   cmp_usize body_len;             /**< Body length in bytes. */
-  const char *utf8_confirm;      /**< UTF-8 confirm label (may be NULL). */
+  const char *utf8_confirm;       /**< UTF-8 confirm label (may be NULL). */
   cmp_usize confirm_len;          /**< Confirm label length in bytes. */
-  const char *utf8_dismiss;      /**< UTF-8 dismiss label (may be NULL). */
+  const char *utf8_dismiss;       /**< UTF-8 dismiss label (may be NULL). */
   cmp_usize dismiss_len;          /**< Dismiss label length in bytes. */
   CMPRect bounds;                 /**< Layout bounds. */
   CMPRect confirm_bounds;         /**< Bounds for confirm action hit testing. */
   CMPRect dismiss_bounds;         /**< Bounds for dismiss action hit testing. */
-  CMPBool metrics_valid;          /**< CMP_TRUE when cached metrics are valid. */
-  CMPBool owns_fonts;             /**< CMP_TRUE when widget owns font handles. */
-  CMPBool pressed_confirm;        /**< CMP_TRUE when confirm action is pressed. */
-  CMPBool pressed_dismiss;        /**< CMP_TRUE when dismiss action is pressed. */
+  CMPBool metrics_valid;   /**< CMP_TRUE when cached metrics are valid. */
+  CMPBool owns_fonts;      /**< CMP_TRUE when widget owns font handles. */
+  CMPBool pressed_confirm; /**< CMP_TRUE when confirm action is pressed. */
+  CMPBool pressed_dismiss; /**< CMP_TRUE when dismiss action is pressed. */
   CMPAlertDialogOnAction on_action; /**< Action callback (may be NULL). */
-  void *on_action_ctx;             /**< Action callback context pointer. */
+  void *on_action_ctx;              /**< Action callback context pointer. */
 } M3AlertDialog;
 
 /** @brief Default full screen dialog corner radius in pixels. */
@@ -143,10 +144,10 @@ typedef int(CMP_CALL *CMPFullScreenDialogOnAction)(
  * @brief Full screen dialog style descriptor.
  */
 typedef struct M3FullScreenDialogStyle {
-  CMPLayoutEdges padding;       /**< Padding around dialog contents. */
-  CMPScalar corner_radius;      /**< Corner radius in pixels (>= 0). */
-  CMPScalar title_body_spacing; /**< Spacing between title and body in pixels (>=
-                                  0). */
+  CMPLayoutEdges padding;        /**< Padding around dialog contents. */
+  CMPScalar corner_radius;       /**< Corner radius in pixels (>= 0). */
+  CMPScalar title_body_spacing;  /**< Spacing between title and body in pixels
+                                   (>=  0). */
   CMPScalar body_action_spacing; /**< Spacing between body and action in pixels
                                    (>= 0). */
   CMPScalar
@@ -168,27 +169,27 @@ typedef struct M3FullScreenDialogStyle {
  */
 typedef struct M3FullScreenDialog {
   CMPWidget widget; /**< Widget interface (points to this instance). */
-  CMPTextBackend text_backend;    /**< Text backend instance. */
+  CMPTextBackend text_backend;   /**< Text backend instance. */
   M3FullScreenDialogStyle style; /**< Current dialog style. */
-  CMPHandle title_font;           /**< Font handle for the title text. */
-  CMPHandle body_font;            /**< Font handle for the body text. */
-  CMPHandle action_font;          /**< Font handle for action label. */
-  CMPTextMetrics title_metrics;   /**< Cached title metrics. */
-  CMPTextMetrics body_metrics;    /**< Cached body metrics. */
-  CMPTextMetrics action_metrics;  /**< Cached action metrics. */
+  CMPHandle title_font;          /**< Font handle for the title text. */
+  CMPHandle body_font;           /**< Font handle for the body text. */
+  CMPHandle action_font;         /**< Font handle for action label. */
+  CMPTextMetrics title_metrics;  /**< Cached title metrics. */
+  CMPTextMetrics body_metrics;   /**< Cached body metrics. */
+  CMPTextMetrics action_metrics; /**< Cached action metrics. */
   const char *utf8_title;        /**< UTF-8 title text (may be NULL). */
-  cmp_usize title_len;            /**< Title length in bytes. */
+  cmp_usize title_len;           /**< Title length in bytes. */
   const char *utf8_body;         /**< UTF-8 body text (may be NULL). */
-  cmp_usize body_len;             /**< Body length in bytes. */
+  cmp_usize body_len;            /**< Body length in bytes. */
   const char *utf8_action;       /**< UTF-8 action label (may be NULL). */
-  cmp_usize action_len;           /**< Action label length in bytes. */
-  CMPRect bounds;                 /**< Layout bounds. */
-  CMPRect action_bounds;          /**< Bounds for action hit testing. */
-  CMPBool metrics_valid;          /**< CMP_TRUE when cached metrics are valid. */
-  CMPBool owns_fonts;             /**< CMP_TRUE when widget owns font handles. */
-  CMPBool pressed_action;         /**< CMP_TRUE when action is pressed. */
+  cmp_usize action_len;          /**< Action label length in bytes. */
+  CMPRect bounds;                /**< Layout bounds. */
+  CMPRect action_bounds;         /**< Bounds for action hit testing. */
+  CMPBool metrics_valid;         /**< CMP_TRUE when cached metrics are valid. */
+  CMPBool owns_fonts;            /**< CMP_TRUE when widget owns font handles. */
+  CMPBool pressed_action;        /**< CMP_TRUE when action is pressed. */
   CMPFullScreenDialogOnAction on_action; /**< Action callback (may be NULL). */
-  void *on_action_ctx;                  /**< Action callback context pointer. */
+  void *on_action_ctx; /**< Action callback context pointer. */
 } M3FullScreenDialog;
 
 /** @brief Default snackbar corner radius in pixels. */
@@ -219,7 +220,7 @@ struct M3Snackbar;
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPSnackbarOnAction)(void *ctx,
-                                         struct M3Snackbar *snackbar);
+                                           struct M3Snackbar *snackbar);
 
 /**
  * @brief Snackbar style descriptor.
@@ -230,8 +231,8 @@ typedef struct M3SnackbarStyle {
   CMPScalar min_width;      /**< Minimum snackbar width in pixels (>= 0). */
   CMPScalar max_width;      /**< Maximum snackbar width in pixels (>= 0). */
   CMPScalar min_height;     /**< Minimum snackbar height in pixels (>= 0). */
-  CMPScalar action_spacing; /**< Spacing between message and action in pixels (>=
-                              0). */
+  CMPScalar action_spacing; /**< Spacing between message and action in pixels
+                              (>= 0). */
   CMPScalar
       action_padding_x; /**< Horizontal padding for the action button (>= 0). */
   CMPScalar
@@ -247,21 +248,21 @@ typedef struct M3SnackbarStyle {
 typedef struct M3Snackbar {
   CMPWidget widget; /**< Widget interface (points to this instance). */
   CMPTextBackend text_backend;    /**< Text backend instance. */
-  M3SnackbarStyle style;         /**< Current snackbar style. */
+  M3SnackbarStyle style;          /**< Current snackbar style. */
   CMPHandle message_font;         /**< Font handle for the message. */
   CMPHandle action_font;          /**< Font handle for the action label. */
   CMPTextMetrics message_metrics; /**< Cached message metrics. */
   CMPTextMetrics action_metrics;  /**< Cached action metrics. */
-  const char *utf8_message;      /**< UTF-8 message text (may be NULL). */
+  const char *utf8_message;       /**< UTF-8 message text (may be NULL). */
   cmp_usize message_len;          /**< Message length in bytes. */
-  const char *utf8_action;       /**< UTF-8 action label (may be NULL). */
+  const char *utf8_action;        /**< UTF-8 action label (may be NULL). */
   cmp_usize action_len;           /**< Action label length in bytes. */
   CMPRect bounds;                 /**< Layout bounds. */
   CMPRect action_bounds;          /**< Bounds for action hit testing. */
-  CMPBool metrics_valid;          /**< CMP_TRUE when cached metrics are valid. */
-  CMPBool owns_fonts;             /**< CMP_TRUE when widget owns font handles. */
-  CMPBool pressed_action;         /**< CMP_TRUE when action is pressed. */
-  CMPSnackbarOnAction on_action;  /**< Action callback (may be NULL). */
+  CMPBool metrics_valid;         /**< CMP_TRUE when cached metrics are valid. */
+  CMPBool owns_fonts;            /**< CMP_TRUE when widget owns font handles. */
+  CMPBool pressed_action;        /**< CMP_TRUE when action is pressed. */
+  CMPSnackbarOnAction on_action; /**< Action callback (may be NULL). */
   void *on_action_ctx;           /**< Action callback context pointer. */
 } M3Snackbar;
 
@@ -285,8 +286,8 @@ CMP_API int CMP_CALL m3_alert_dialog_style_init(M3AlertDialogStyle *style);
  */
 CMP_API int CMP_CALL m3_alert_dialog_init(
     M3AlertDialog *dialog, const CMPTextBackend *backend,
-    const M3AlertDialogStyle *style, const char *utf8_title, cmp_usize title_len,
-    const char *utf8_body, cmp_usize body_len);
+    const M3AlertDialogStyle *style, const char *utf8_title,
+    cmp_usize title_len, const char *utf8_body, cmp_usize body_len);
 
 /**
  * @brief Update the alert dialog title.
@@ -296,8 +297,8 @@ CMP_API int CMP_CALL m3_alert_dialog_init(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_alert_dialog_set_title(M3AlertDialog *dialog,
-                                             const char *utf8_title,
-                                             cmp_usize title_len);
+                                               const char *utf8_title,
+                                               cmp_usize title_len);
 
 /**
  * @brief Update the alert dialog body text.
@@ -307,8 +308,8 @@ CMP_API int CMP_CALL m3_alert_dialog_set_title(M3AlertDialog *dialog,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_alert_dialog_set_body(M3AlertDialog *dialog,
-                                            const char *utf8_body,
-                                            cmp_usize body_len);
+                                              const char *utf8_body,
+                                              cmp_usize body_len);
 
 /**
  * @brief Update the alert dialog action labels.
@@ -320,10 +321,10 @@ CMP_API int CMP_CALL m3_alert_dialog_set_body(M3AlertDialog *dialog,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_alert_dialog_set_actions(M3AlertDialog *dialog,
-                                               const char *utf8_confirm,
-                                               cmp_usize confirm_len,
-                                               const char *utf8_dismiss,
-                                               cmp_usize dismiss_len);
+                                                 const char *utf8_confirm,
+                                                 cmp_usize confirm_len,
+                                                 const char *utf8_dismiss,
+                                                 cmp_usize dismiss_len);
 
 /**
  * @brief Update the alert dialog style.
@@ -332,7 +333,7 @@ CMP_API int CMP_CALL m3_alert_dialog_set_actions(M3AlertDialog *dialog,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_alert_dialog_set_style(M3AlertDialog *dialog,
-                                             const M3AlertDialogStyle *style);
+                                               const M3AlertDialogStyle *style);
 
 /**
  * @brief Assign the alert dialog action callback.
@@ -376,8 +377,8 @@ CMP_API int CMP_CALL m3_fullscreen_dialog_init(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_fullscreen_dialog_set_title(M3FullScreenDialog *dialog,
-                                                  const char *utf8_title,
-                                                  cmp_usize title_len);
+                                                    const char *utf8_title,
+                                                    cmp_usize title_len);
 
 /**
  * @brief Update the full screen dialog body text.
@@ -387,8 +388,8 @@ CMP_API int CMP_CALL m3_fullscreen_dialog_set_title(M3FullScreenDialog *dialog,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_fullscreen_dialog_set_body(M3FullScreenDialog *dialog,
-                                                 const char *utf8_body,
-                                                 cmp_usize body_len);
+                                                   const char *utf8_body,
+                                                   cmp_usize body_len);
 
 /**
  * @brief Update the full screen dialog action label.
@@ -398,8 +399,8 @@ CMP_API int CMP_CALL m3_fullscreen_dialog_set_body(M3FullScreenDialog *dialog,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_fullscreen_dialog_set_action(M3FullScreenDialog *dialog,
-                                                   const char *utf8_action,
-                                                   cmp_usize action_len);
+                                                     const char *utf8_action,
+                                                     cmp_usize action_len);
 
 /**
  * @brief Update the full screen dialog style.
@@ -438,10 +439,10 @@ CMP_API int CMP_CALL m3_snackbar_style_init(M3SnackbarStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_snackbar_init(M3Snackbar *snackbar,
-                                    const CMPTextBackend *backend,
-                                    const M3SnackbarStyle *style,
-                                    const char *utf8_message,
-                                    cmp_usize message_len);
+                                      const CMPTextBackend *backend,
+                                      const M3SnackbarStyle *style,
+                                      const char *utf8_message,
+                                      cmp_usize message_len);
 
 /**
  * @brief Update the snackbar message text.
@@ -451,8 +452,8 @@ CMP_API int CMP_CALL m3_snackbar_init(M3Snackbar *snackbar,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_snackbar_set_message(M3Snackbar *snackbar,
-                                           const char *utf8_message,
-                                           cmp_usize message_len);
+                                             const char *utf8_message,
+                                             cmp_usize message_len);
 
 /**
  * @brief Update the snackbar action label.
@@ -462,8 +463,8 @@ CMP_API int CMP_CALL m3_snackbar_set_message(M3Snackbar *snackbar,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_snackbar_set_action(M3Snackbar *snackbar,
-                                          const char *utf8_action,
-                                          cmp_usize action_len);
+                                            const char *utf8_action,
+                                            cmp_usize action_len);
 
 /**
  * @brief Update the snackbar style.
@@ -472,7 +473,7 @@ CMP_API int CMP_CALL m3_snackbar_set_action(M3Snackbar *snackbar,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_snackbar_set_style(M3Snackbar *snackbar,
-                                         const M3SnackbarStyle *style);
+                                           const M3SnackbarStyle *style);
 
 /**
  * @brief Assign the snackbar action callback.
@@ -482,8 +483,8 @@ CMP_API int CMP_CALL m3_snackbar_set_style(M3Snackbar *snackbar,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_snackbar_set_on_action(M3Snackbar *snackbar,
-                                             CMPSnackbarOnAction on_action,
-                                             void *ctx);
+                                               CMPSnackbarOnAction on_action,
+                                               void *ctx);
 
 #ifdef CMP_TESTING
 /**
@@ -494,8 +495,9 @@ CMP_API int CMP_CALL m3_snackbar_set_on_action(M3Snackbar *snackbar,
  * @param out_inside Receives CMP_TRUE if the point is inside.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_dialog_test_point_in_rect(const CMPRect *rect, CMPScalar x,
-                                                CMPScalar y, CMPBool *out_inside);
+CMP_API int CMP_CALL m3_dialog_test_point_in_rect(const CMPRect *rect,
+                                                  CMPScalar x, CMPScalar y,
+                                                  CMPBool *out_inside);
 /**
  * @brief Test helper to validate a color struct.
  * @param color Color pointer (may be NULL).
@@ -508,8 +510,8 @@ CMP_API int CMP_CALL m3_dialog_test_validate_color(const CMPColor *color);
  * @param require_family CMP_TRUE to require a font family name.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_dialog_test_validate_text_style(const CMPTextStyle *style,
-                                                      CMPBool require_family);
+CMP_API int CMP_CALL m3_dialog_test_validate_text_style(
+    const CMPTextStyle *style, CMPBool require_family);
 /**
  * @brief Test helper to validate layout edges.
  * @param edges Edge sizes pointer (may be NULL).

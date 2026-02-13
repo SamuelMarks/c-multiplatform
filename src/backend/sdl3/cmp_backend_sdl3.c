@@ -17,30 +17,31 @@
 #endif
 #endif
 
-#define CMP_SDL3_RETURN_IF_ERROR(rc)                                            \
+#define CMP_SDL3_RETURN_IF_ERROR(rc)                                           \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       return (rc);                                                             \
     }                                                                          \
   } while (0)
 
-#define CMP_SDL3_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                           \
+#define CMP_SDL3_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                          \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       cleanup;                                                                 \
       return (rc);                                                             \
     }                                                                          \
   } while (0)
 
 #define CMP_SDL3_DEFAULT_HANDLE_CAPACITY 64u
-#define CMP_SDL3_DEFAULT_RENDERER_FLAGS                                         \
+#define CMP_SDL3_DEFAULT_RENDERER_FLAGS                                        \
   (CMP_SDL3_RENDERER_ACCELERATED | CMP_SDL3_RENDERER_PRESENTVSYNC)
 
-#define CMP_SDL3_RENDERER_FLAG_MASK                                             \
-  (CMP_SDL3_RENDERER_ACCELERATED | CMP_SDL3_RENDERER_PRESENTVSYNC |              \
+#define CMP_SDL3_RENDERER_FLAG_MASK                                            \
+  (CMP_SDL3_RENDERER_ACCELERATED | CMP_SDL3_RENDERER_PRESENTVSYNC |            \
    CMP_SDL3_RENDERER_TARGETTEXTURE)
 
-static int cmp_sdl3_backend_validate_config(const CMPSDL3BackendConfig *config) {
+static int
+cmp_sdl3_backend_validate_config(const CMPSDL3BackendConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -166,8 +167,8 @@ static cmp_u32 g_cmp_sdl3_refcount = 0u;
 static cmp_u32 g_cmp_sdl3_ttf_refcount = 0u;
 #endif
 
-static int cmp_sdl3_backend_log(struct CMPSDL3Backend *backend, CMPLogLevel level,
-                               const char *message) {
+static int cmp_sdl3_backend_log(struct CMPSDL3Backend *backend,
+                                CMPLogLevel level, const char *message) {
   if (backend == NULL || message == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -178,7 +179,7 @@ static int cmp_sdl3_backend_log(struct CMPSDL3Backend *backend, CMPLogLevel leve
 }
 
 static int cmp_sdl3_backend_log_sdl_error(struct CMPSDL3Backend *backend,
-                                         const char *message) {
+                                          const char *message) {
   const char *sdl_error;
   int rc;
 
@@ -199,7 +200,7 @@ static int cmp_sdl3_backend_log_sdl_error(struct CMPSDL3Backend *backend,
 
 #if defined(CMP_SDL3_TTF_AVAILABLE)
 static int cmp_sdl3_backend_log_ttf_error(struct CMPSDL3Backend *backend,
-                                         const char *message) {
+                                          const char *message) {
   const char *ttf_error;
   int rc;
 
@@ -344,7 +345,7 @@ static int cmp_sdl3_renderer_flags_to_sdl(cmp_u32 flags, Uint32 *out_flags) {
 }
 
 static int cmp_sdl3_texture_format_to_sdl(cmp_u32 format, Uint32 *out_format,
-                                         cmp_u32 *out_bpp) {
+                                          cmp_u32 *out_bpp) {
   if (out_format == NULL || out_bpp == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -482,8 +483,8 @@ static int cmp_sdl3_color_to_u8(CMPScalar value, cmp_u8 *out_value) {
 }
 
 static int cmp_sdl3_backend_resolve(struct CMPSDL3Backend *backend,
-                                   CMPHandle handle, cmp_u32 type_id,
-                                   void **out_obj) {
+                                    CMPHandle handle, cmp_u32 type_id,
+                                    void **out_obj) {
   void *resolved;
   cmp_u32 actual_type;
   int rc;
@@ -657,7 +658,7 @@ static int cmp_sdl3_ws_shutdown(void *ws) {
 }
 
 static int cmp_sdl3_ws_create_window(void *ws, const CMPWSWindowConfig *config,
-                                    CMPHandle *out_window) {
+                                     CMPHandle *out_window) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Window *window;
   Uint32 sdl_flags;
@@ -726,7 +727,7 @@ static int cmp_sdl3_ws_create_window(void *ws, const CMPWSWindowConfig *config,
   }
 
   rc = cmp_object_header_init(&window->header, CMP_SDL3_TYPE_WINDOW, 0,
-                             &g_cmp_sdl3_window_vtable);
+                              &g_cmp_sdl3_window_vtable);
   if (rc != CMP_OK) {
     SDL_DestroyRenderer(window->renderer);
     SDL_DestroyWindow(window->window);
@@ -758,7 +759,7 @@ static int cmp_sdl3_ws_destroy_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPSDL3Backend *)ws;
   rc = cmp_sdl3_backend_resolve(backend, window, CMP_SDL3_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.destroy_window");
@@ -778,7 +779,7 @@ static int cmp_sdl3_ws_show_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPSDL3Backend *)ws;
   rc = cmp_sdl3_backend_resolve(backend, window, CMP_SDL3_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.show_window");
@@ -802,7 +803,7 @@ static int cmp_sdl3_ws_hide_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPSDL3Backend *)ws;
   rc = cmp_sdl3_backend_resolve(backend, window, CMP_SDL3_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.hide_window");
@@ -816,7 +817,7 @@ static int cmp_sdl3_ws_hide_window(void *ws, CMPHandle window) {
 }
 
 static int cmp_sdl3_ws_set_window_title(void *ws, CMPHandle window,
-                                       const char *utf8_title) {
+                                        const char *utf8_title) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Window *resolved;
   int rc;
@@ -827,7 +828,7 @@ static int cmp_sdl3_ws_set_window_title(void *ws, CMPHandle window,
 
   backend = (struct CMPSDL3Backend *)ws;
   rc = cmp_sdl3_backend_resolve(backend, window, CMP_SDL3_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_window_title");
@@ -839,8 +840,8 @@ static int cmp_sdl3_ws_set_window_title(void *ws, CMPHandle window,
   return CMP_OK;
 }
 
-static int cmp_sdl3_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width,
-                                      cmp_i32 height) {
+static int cmp_sdl3_ws_set_window_size(void *ws, CMPHandle window,
+                                       cmp_i32 width, cmp_i32 height) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Window *resolved;
   int rc;
@@ -854,7 +855,7 @@ static int cmp_sdl3_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width
 
   backend = (struct CMPSDL3Backend *)ws;
   rc = cmp_sdl3_backend_resolve(backend, window, CMP_SDL3_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_window_size");
@@ -869,7 +870,8 @@ static int cmp_sdl3_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width
 }
 
 static int cmp_sdl3_ws_get_window_size(void *ws, CMPHandle window,
-                                      cmp_i32 *out_width, cmp_i32 *out_height) {
+                                       cmp_i32 *out_width,
+                                       cmp_i32 *out_height) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Window *resolved;
   int rc;
@@ -880,7 +882,7 @@ static int cmp_sdl3_ws_get_window_size(void *ws, CMPHandle window,
 
   backend = (struct CMPSDL3Backend *)ws;
   rc = cmp_sdl3_backend_resolve(backend, window, CMP_SDL3_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_window_size");
@@ -900,7 +902,7 @@ static int cmp_sdl3_ws_get_window_size(void *ws, CMPHandle window,
 }
 
 static int cmp_sdl3_ws_set_window_dpi_scale(void *ws, CMPHandle window,
-                                           CMPScalar scale) {
+                                            CMPScalar scale) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Window *resolved;
   int rc;
@@ -914,11 +916,11 @@ static int cmp_sdl3_ws_set_window_dpi_scale(void *ws, CMPHandle window,
 
   backend = (struct CMPSDL3Backend *)ws;
   rc = cmp_sdl3_backend_resolve(backend, window, CMP_SDL3_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO,
-                           "ws.set_window_dpi_scale");
+                            "ws.set_window_dpi_scale");
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   resolved->dpi_scale = scale;
@@ -926,7 +928,7 @@ static int cmp_sdl3_ws_set_window_dpi_scale(void *ws, CMPHandle window,
 }
 
 static int cmp_sdl3_ws_get_window_dpi_scale(void *ws, CMPHandle window,
-                                           CMPScalar *out_scale) {
+                                            CMPScalar *out_scale) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Window *resolved;
   int rc;
@@ -937,11 +939,11 @@ static int cmp_sdl3_ws_get_window_dpi_scale(void *ws, CMPHandle window,
 
   backend = (struct CMPSDL3Backend *)ws;
   rc = cmp_sdl3_backend_resolve(backend, window, CMP_SDL3_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO,
-                           "ws.get_window_dpi_scale");
+                            "ws.get_window_dpi_scale");
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   *out_scale = resolved->dpi_scale;
@@ -958,7 +960,8 @@ static int cmp_sdl3_ws_set_clipboard_text(void *ws, const char *utf8_text) {
   }
 
   backend = (struct CMPSDL3Backend *)ws;
-  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_clipboard_text");
+  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO,
+                            "ws.set_clipboard_text");
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   sdl_rc = SDL_SetClipboardText(utf8_text);
@@ -970,8 +973,8 @@ static int cmp_sdl3_ws_set_clipboard_text(void *ws, const char *utf8_text) {
 }
 
 static int cmp_sdl3_ws_get_clipboard_text(void *ws, char *buffer,
-                                         cmp_usize buffer_size,
-                                         cmp_usize *out_length) {
+                                          cmp_usize buffer_size,
+                                          cmp_usize *out_length) {
   struct CMPSDL3Backend *backend;
   char *text;
   cmp_usize length;
@@ -983,7 +986,8 @@ static int cmp_sdl3_ws_get_clipboard_text(void *ws, char *buffer,
   }
 
   backend = (struct CMPSDL3Backend *)ws;
-  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_clipboard_text");
+  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO,
+                            "ws.get_clipboard_text");
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   text = SDL_GetClipboardText();
@@ -1169,7 +1173,7 @@ static int cmp_sdl3_text_length(const char *text, cmp_usize *out_length) {
 }
 
 static int cmp_sdl3_fill_scroll_event(const SDL_Event *event,
-                                     CMPPointerEvent *pointer) {
+                                      CMPPointerEvent *pointer) {
   cmp_i32 scroll_x;
   cmp_i32 scroll_y;
 
@@ -1192,9 +1196,9 @@ static int cmp_sdl3_fill_scroll_event(const SDL_Event *event,
 }
 
 static int cmp_sdl3_translate_event(struct CMPSDL3Backend *backend,
-                                   const SDL_Event *sdl_event,
-                                   CMPInputEvent *out_event,
-                                   CMPBool *out_has_event) {
+                                    const SDL_Event *sdl_event,
+                                    CMPInputEvent *out_event,
+                                    CMPBool *out_has_event) {
   cmp_u32 modifiers;
   CMPHandle window_handle;
   int rc;
@@ -1350,7 +1354,8 @@ static int cmp_sdl3_translate_event(struct CMPSDL3Backend *backend,
     out_event->data.text_edit.utf8 = text;
     out_event->data.text_edit.length = text_len;
     out_event->data.text_edit.cursor = (cmp_i32)sdl_event->edit.start;
-    out_event->data.text_edit.selection_length = (cmp_i32)sdl_event->edit.length;
+    out_event->data.text_edit.selection_length =
+        (cmp_i32)sdl_event->edit.length;
 
     *out_has_event = CMP_TRUE;
     return CMP_OK;
@@ -1372,7 +1377,8 @@ static int cmp_sdl3_translate_event(struct CMPSDL3Backend *backend,
     out_event->data.text_edit.utf8 = text;
     out_event->data.text_edit.length = text_len;
     out_event->data.text_edit.cursor = (cmp_i32)sdl_event->edit.start;
-    out_event->data.text_edit.selection_length = (cmp_i32)sdl_event->edit.length;
+    out_event->data.text_edit.selection_length =
+        (cmp_i32)sdl_event->edit.length;
 
     *out_has_event = CMP_TRUE;
     return CMP_OK;
@@ -1511,7 +1517,7 @@ static int cmp_sdl3_translate_event(struct CMPSDL3Backend *backend,
 }
 
 static int cmp_sdl3_ws_poll_event(void *ws, CMPInputEvent *out_event,
-                                 CMPBool *out_has_event) {
+                                  CMPBool *out_has_event) {
   struct CMPSDL3Backend *backend;
   SDL_Event event;
   CMPBool has_event;
@@ -1586,25 +1592,26 @@ static int cmp_sdl3_ws_get_time_ms(void *ws, cmp_u32 *out_time_ms) {
   return cmp_sdl3_time_ms(out_time_ms);
 }
 
-static const CMPWSVTable g_cmp_sdl3_ws_vtable = {cmp_sdl3_ws_init,
-                                               cmp_sdl3_ws_shutdown,
-                                               cmp_sdl3_ws_create_window,
-                                               cmp_sdl3_ws_destroy_window,
-                                               cmp_sdl3_ws_show_window,
-                                               cmp_sdl3_ws_hide_window,
-                                               cmp_sdl3_ws_set_window_title,
-                                               cmp_sdl3_ws_set_window_size,
-                                               cmp_sdl3_ws_get_window_size,
-                                               cmp_sdl3_ws_set_window_dpi_scale,
-                                               cmp_sdl3_ws_get_window_dpi_scale,
-                                               cmp_sdl3_ws_set_clipboard_text,
-                                               cmp_sdl3_ws_get_clipboard_text,
-                                               cmp_sdl3_ws_poll_event,
-                                               cmp_sdl3_ws_pump_events,
-                                               cmp_sdl3_ws_get_time_ms};
+static const CMPWSVTable g_cmp_sdl3_ws_vtable = {
+    cmp_sdl3_ws_init,
+    cmp_sdl3_ws_shutdown,
+    cmp_sdl3_ws_create_window,
+    cmp_sdl3_ws_destroy_window,
+    cmp_sdl3_ws_show_window,
+    cmp_sdl3_ws_hide_window,
+    cmp_sdl3_ws_set_window_title,
+    cmp_sdl3_ws_set_window_size,
+    cmp_sdl3_ws_get_window_size,
+    cmp_sdl3_ws_set_window_dpi_scale,
+    cmp_sdl3_ws_get_window_dpi_scale,
+    cmp_sdl3_ws_set_clipboard_text,
+    cmp_sdl3_ws_get_clipboard_text,
+    cmp_sdl3_ws_poll_event,
+    cmp_sdl3_ws_pump_events,
+    cmp_sdl3_ws_get_time_ms};
 
 static int cmp_sdl3_get_active_renderer(struct CMPSDL3Backend *backend,
-                                       SDL_Renderer **out_renderer) {
+                                        SDL_Renderer **out_renderer) {
   if (backend == NULL || out_renderer == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1618,7 +1625,7 @@ static int cmp_sdl3_get_active_renderer(struct CMPSDL3Backend *backend,
 }
 
 static int cmp_sdl3_render_fill_rect(SDL_Renderer *renderer,
-                                    const CMPRect *rect) {
+                                     const CMPRect *rect) {
 #if defined(SDL_MAJOR_VERSION) && (SDL_MAJOR_VERSION >= 3)
   SDL_FRect sdl_rect;
 #else
@@ -1650,8 +1657,8 @@ static int cmp_sdl3_render_fill_rect(SDL_Renderer *renderer,
   return CMP_OK;
 }
 
-static int cmp_sdl3_render_line(SDL_Renderer *renderer, CMPScalar x0, CMPScalar y0,
-                               CMPScalar x1, CMPScalar y1) {
+static int cmp_sdl3_render_line(SDL_Renderer *renderer, CMPScalar x0,
+                                CMPScalar y0, CMPScalar x1, CMPScalar y1) {
   int rc;
 
   if (renderer == NULL) {
@@ -1671,7 +1678,7 @@ static int cmp_sdl3_render_line(SDL_Renderer *renderer, CMPScalar x0, CMPScalar 
 }
 
 static int cmp_sdl3_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
-                                   cmp_i32 height, CMPScalar dpi_scale) {
+                                    cmp_i32 height, CMPScalar dpi_scale) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Window *resolved;
   int rc;
@@ -1692,7 +1699,7 @@ static int cmp_sdl3_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
   }
 
   rc = cmp_sdl3_backend_resolve(backend, window, CMP_SDL3_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.begin_frame");
@@ -1718,7 +1725,7 @@ static int cmp_sdl3_gfx_end_frame(void *gfx, CMPHandle window) {
 
   backend = (struct CMPSDL3Backend *)gfx;
   rc = cmp_sdl3_backend_resolve(backend, window, CMP_SDL3_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   if (backend->active_window != resolved) {
@@ -1776,8 +1783,8 @@ static int cmp_sdl3_gfx_clear(void *gfx, CMPColor color) {
   return CMP_OK;
 }
 
-static int cmp_sdl3_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
-                                 CMPScalar corner_radius) {
+static int cmp_sdl3_gfx_draw_rect(void *gfx, const CMPRect *rect,
+                                  CMPColor color, CMPScalar corner_radius) {
   struct CMPSDL3Backend *backend;
   SDL_Renderer *renderer;
   cmp_u8 r;
@@ -1823,8 +1830,8 @@ static int cmp_sdl3_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color
 }
 
 static int cmp_sdl3_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
-                                 CMPScalar x1, CMPScalar y1, CMPColor color,
-                                 CMPScalar thickness) {
+                                  CMPScalar x1, CMPScalar y1, CMPColor color,
+                                  CMPScalar thickness) {
   struct CMPSDL3Backend *backend;
   SDL_Renderer *renderer;
   cmp_u8 r;
@@ -1866,7 +1873,8 @@ static int cmp_sdl3_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
   return CMP_OK;
 }
 
-static int cmp_sdl3_gfx_draw_path(void *gfx, const CMPPath *path, CMPColor color) {
+static int cmp_sdl3_gfx_draw_path(void *gfx, const CMPPath *path,
+                                  CMPColor color) {
   struct CMPSDL3Backend *backend;
   SDL_Renderer *renderer;
   int rc;
@@ -1959,8 +1967,8 @@ static int cmp_sdl3_gfx_set_transform(void *gfx, const CMPMat3 *transform) {
 }
 
 static int cmp_sdl3_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
-                                      cmp_u32 format, const void *pixels,
-                                      cmp_usize size, CMPHandle *out_texture) {
+                                       cmp_u32 format, const void *pixels,
+                                       cmp_usize size, CMPHandle *out_texture) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Texture *texture;
   SDL_Renderer *renderer;
@@ -2040,7 +2048,7 @@ static int cmp_sdl3_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
   }
 
   rc = cmp_object_header_init(&texture->header, CMP_SDL3_TYPE_TEXTURE, 0,
-                             &g_cmp_sdl3_texture_vtable);
+                              &g_cmp_sdl3_texture_vtable);
   if (rc != CMP_OK) {
     SDL_DestroyTexture(sdl_texture);
     backend->allocator.free(backend->allocator.ctx, texture);
@@ -2060,8 +2068,8 @@ static int cmp_sdl3_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
 }
 
 static int cmp_sdl3_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
-                                      cmp_i32 y, cmp_i32 width, cmp_i32 height,
-                                      const void *pixels, cmp_usize size) {
+                                       cmp_i32 y, cmp_i32 width, cmp_i32 height,
+                                       const void *pixels, cmp_usize size) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Texture *resolved;
   SDL_Rect rect;
@@ -2081,7 +2089,7 @@ static int cmp_sdl3_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
 
   backend = (struct CMPSDL3Backend *)gfx;
   rc = cmp_sdl3_backend_resolve(backend, texture, CMP_SDL3_TYPE_TEXTURE,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.update_texture");
@@ -2097,7 +2105,7 @@ static int cmp_sdl3_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
   rc = cmp_sdl3_mul_usize((cmp_usize)width, (cmp_usize)height, &required);
   CMP_SDL3_RETURN_IF_ERROR(rc);
   rc = cmp_sdl3_mul_usize(required, (cmp_usize)resolved->bytes_per_pixel,
-                         &required);
+                          &required);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   if (pixels != NULL && size < required) {
@@ -2107,8 +2115,8 @@ static int cmp_sdl3_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
     return CMP_OK;
   }
 
-  rc = cmp_sdl3_mul_usize((cmp_usize)width, (cmp_usize)resolved->bytes_per_pixel,
-                         &row_bytes);
+  rc = cmp_sdl3_mul_usize((cmp_usize)width,
+                          (cmp_usize)resolved->bytes_per_pixel, &row_bytes);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rect.x = (int)x;
@@ -2135,18 +2143,19 @@ static int cmp_sdl3_gfx_destroy_texture(void *gfx, CMPHandle texture) {
 
   backend = (struct CMPSDL3Backend *)gfx;
   rc = cmp_sdl3_backend_resolve(backend, texture, CMP_SDL3_TYPE_TEXTURE,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
-  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.destroy_texture");
+  rc =
+      cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.destroy_texture");
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   return cmp_object_release(&resolved->header);
 }
 
 static int cmp_sdl3_gfx_draw_texture(void *gfx, CMPHandle texture,
-                                    const CMPRect *src, const CMPRect *dst,
-                                    CMPScalar opacity) {
+                                     const CMPRect *src, const CMPRect *dst,
+                                     CMPScalar opacity) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Texture *resolved;
   SDL_Renderer *renderer;
@@ -2169,7 +2178,7 @@ static int cmp_sdl3_gfx_draw_texture(void *gfx, CMPHandle texture,
 
   backend = (struct CMPSDL3Backend *)gfx;
   rc = cmp_sdl3_backend_resolve(backend, texture, CMP_SDL3_TYPE_TEXTURE,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.draw_texture");
@@ -2244,8 +2253,8 @@ static const CMPGfxVTable g_cmp_sdl3_gfx_vtable = {
     cmp_sdl3_gfx_draw_texture};
 
 static int cmp_sdl3_text_make_cstr(struct CMPSDL3Backend *backend,
-                                  const char *utf8, cmp_usize utf8_len,
-                                  char **out_text) {
+                                   const char *utf8, cmp_usize utf8_len,
+                                   char **out_text) {
   cmp_usize max_value;
   cmp_usize required;
   char *buffer;
@@ -2293,8 +2302,8 @@ static int cmp_sdl3_text_free_cstr(struct CMPSDL3Backend *backend, char *text) {
 }
 
 static int cmp_sdl3_text_create_font(void *text, const char *utf8_family,
-                                    cmp_i32 size_px, cmp_i32 weight,
-                                    CMPBool italic, CMPHandle *out_font) {
+                                     cmp_i32 size_px, cmp_i32 weight,
+                                     CMPBool italic, CMPHandle *out_font) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Font *font;
 #if defined(CMP_SDL3_TTF_AVAILABLE)
@@ -2358,7 +2367,7 @@ static int cmp_sdl3_text_create_font(void *text, const char *utf8_family,
   font->font = ttf_font;
 
   rc = cmp_object_header_init(&font->header, CMP_SDL3_TYPE_FONT, 0,
-                             &g_cmp_sdl3_font_vtable);
+                              &g_cmp_sdl3_font_vtable);
   if (rc != CMP_OK) {
     TTF_CloseFont(ttf_font);
     backend->allocator.free(backend->allocator.ctx, font);
@@ -2389,7 +2398,7 @@ static int cmp_sdl3_text_destroy_font(void *text, CMPHandle font) {
 
   backend = (struct CMPSDL3Backend *)text;
   rc = cmp_sdl3_backend_resolve(backend, font, CMP_SDL3_TYPE_FONT,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.destroy_font");
@@ -2403,9 +2412,10 @@ static int cmp_sdl3_text_destroy_font(void *text, CMPHandle font) {
 }
 
 static int cmp_sdl3_text_measure_text(void *text, CMPHandle font,
-                                     const char *utf8, cmp_usize utf8_len,
-                                     CMPScalar *out_width, CMPScalar *out_height,
-                                     CMPScalar *out_baseline) {
+                                      const char *utf8, cmp_usize utf8_len,
+                                      CMPScalar *out_width,
+                                      CMPScalar *out_height,
+                                      CMPScalar *out_baseline) {
   struct CMPSDL3Backend *backend;
   CMPSDL3Font *resolved;
 #if defined(CMP_SDL3_TTF_AVAILABLE)
@@ -2427,7 +2437,7 @@ static int cmp_sdl3_text_measure_text(void *text, CMPHandle font,
 
   backend = (struct CMPSDL3Backend *)text;
   rc = cmp_sdl3_backend_resolve(backend, font, CMP_SDL3_TYPE_FONT,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.measure_text");
@@ -2475,8 +2485,8 @@ static int cmp_sdl3_text_measure_text(void *text, CMPHandle font,
 }
 
 static int cmp_sdl3_text_draw_text(void *text, CMPHandle font, const char *utf8,
-                                  cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                                  CMPColor color) {
+                                   cmp_usize utf8_len, CMPScalar x, CMPScalar y,
+                                   CMPColor color) {
   struct CMPSDL3Backend *backend;
 #if defined(CMP_SDL3_TTF_AVAILABLE)
   CMPSDL3Font *resolved;
@@ -2517,7 +2527,7 @@ static int cmp_sdl3_text_draw_text(void *text, CMPHandle font, const char *utf8,
   return CMP_ERR_UNSUPPORTED;
 #else
   rc = cmp_sdl3_backend_resolve(backend, font, CMP_SDL3_TYPE_FONT,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_SDL3_RETURN_IF_ERROR(rc);
   if (resolved->font == NULL) {
     return CMP_ERR_STATE;
@@ -2638,7 +2648,7 @@ static const CMPTextVTable g_cmp_sdl3_text_vtable = {
     cmp_sdl3_text_measure_text, cmp_sdl3_text_draw_text};
 
 static int cmp_sdl3_io_read_file(void *io, const char *utf8_path, void *buffer,
-                                cmp_usize buffer_size, cmp_usize *out_read) {
+                                 cmp_usize buffer_size, cmp_usize *out_read) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -2658,8 +2668,8 @@ static int cmp_sdl3_io_read_file(void *io, const char *utf8_path, void *buffer,
 }
 
 static int cmp_sdl3_io_read_file_alloc(void *io, const char *utf8_path,
-                                      const CMPAllocator *allocator,
-                                      void **out_data, cmp_usize *out_size) {
+                                       const CMPAllocator *allocator,
+                                       void **out_data, cmp_usize *out_size) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -2682,8 +2692,8 @@ static int cmp_sdl3_io_read_file_alloc(void *io, const char *utf8_path,
 }
 
 static int cmp_sdl3_io_write_file(void *io, const char *utf8_path,
-                                 const void *data, cmp_usize size,
-                                 CMPBool overwrite) {
+                                  const void *data, cmp_usize size,
+                                  CMPBool overwrite) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -2703,7 +2713,7 @@ static int cmp_sdl3_io_write_file(void *io, const char *utf8_path,
 }
 
 static int cmp_sdl3_io_file_exists(void *io, const char *utf8_path,
-                                  CMPBool *out_exists) {
+                                   CMPBool *out_exists) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -2734,7 +2744,7 @@ static int cmp_sdl3_io_delete_file(void *io, const char *utf8_path) {
 }
 
 static int cmp_sdl3_io_stat_file(void *io, const char *utf8_path,
-                                CMPFileInfo *out_info) {
+                                 CMPFileInfo *out_info) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -2751,11 +2761,12 @@ static int cmp_sdl3_io_stat_file(void *io, const char *utf8_path,
 }
 
 static const CMPIOVTable g_cmp_sdl3_io_vtable = {
-    cmp_sdl3_io_read_file,   cmp_sdl3_io_read_file_alloc, cmp_sdl3_io_write_file,
-    cmp_sdl3_io_file_exists, cmp_sdl3_io_delete_file,     cmp_sdl3_io_stat_file};
+    cmp_sdl3_io_read_file,   cmp_sdl3_io_read_file_alloc,
+    cmp_sdl3_io_write_file,  cmp_sdl3_io_file_exists,
+    cmp_sdl3_io_delete_file, cmp_sdl3_io_stat_file};
 
 static int cmp_sdl3_sensors_is_available(void *sensors, cmp_u32 type,
-                                        CMPBool *out_available) {
+                                         CMPBool *out_available) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -2766,7 +2777,8 @@ static int cmp_sdl3_sensors_is_available(void *sensors, cmp_u32 type,
   }
 
   backend = (struct CMPSDL3Backend *)sensors;
-  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "sensors.is_available");
+  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
+                            "sensors.is_available");
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   *out_available = CMP_FALSE;
@@ -2806,8 +2818,8 @@ static int cmp_sdl3_sensors_stop(void *sensors, cmp_u32 type) {
 }
 
 static int cmp_sdl3_sensors_read(void *sensors, cmp_u32 type,
-                                CMPSensorReading *out_reading,
-                                CMPBool *out_has_reading) {
+                                 CMPSensorReading *out_reading,
+                                 CMPBool *out_has_reading) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -2827,8 +2839,8 @@ static int cmp_sdl3_sensors_read(void *sensors, cmp_u32 type,
 }
 
 static const CMPSensorsVTable g_cmp_sdl3_sensors_vtable = {
-    cmp_sdl3_sensors_is_available, cmp_sdl3_sensors_start, cmp_sdl3_sensors_stop,
-    cmp_sdl3_sensors_read};
+    cmp_sdl3_sensors_is_available, cmp_sdl3_sensors_start,
+    cmp_sdl3_sensors_stop, cmp_sdl3_sensors_read};
 
 static int cmp_sdl3_camera_open(void *camera, cmp_u32 camera_id) {
   struct CMPSDL3Backend *backend;
@@ -2847,7 +2859,7 @@ static int cmp_sdl3_camera_open(void *camera, cmp_u32 camera_id) {
 }
 
 static int cmp_sdl3_camera_open_with_config(void *camera,
-                                           const CMPCameraConfig *config) {
+                                            const CMPCameraConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2897,7 +2909,7 @@ static int cmp_sdl3_camera_stop(void *camera) {
 }
 
 static int cmp_sdl3_camera_read_frame(void *camera, CMPCameraFrame *out_frame,
-                                     CMPBool *out_has_frame) {
+                                      CMPBool *out_has_frame) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -2920,9 +2932,9 @@ static const CMPCameraVTable g_cmp_sdl3_camera_vtable = {
     cmp_sdl3_camera_stop,  cmp_sdl3_camera_read_frame};
 
 static int cmp_sdl3_image_decode(void *image,
-                                const CMPImageDecodeRequest *request,
-                                const CMPAllocator *allocator,
-                                CMPImageData *out_image) {
+                                 const CMPImageDecodeRequest *request,
+                                 const CMPAllocator *allocator,
+                                 CMPImageData *out_image) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -2944,7 +2956,7 @@ static int cmp_sdl3_image_decode(void *image,
 }
 
 static int cmp_sdl3_image_free(void *image, const CMPAllocator *allocator,
-                              CMPImageData *image_data) {
+                               CMPImageData *image_data) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -2963,10 +2975,10 @@ static int cmp_sdl3_image_free(void *image, const CMPAllocator *allocator,
 }
 
 static const CMPImageVTable g_cmp_sdl3_image_vtable = {cmp_sdl3_image_decode,
-                                                     cmp_sdl3_image_free};
+                                                       cmp_sdl3_image_free};
 
 static int cmp_sdl3_video_open(void *video,
-                              const CMPVideoOpenRequest *request) {
+                               const CMPVideoOpenRequest *request) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -2995,7 +3007,7 @@ static int cmp_sdl3_video_close(void *video) {
 }
 
 static int cmp_sdl3_video_read_frame(void *video, CMPVideoFrame *out_frame,
-                                    CMPBool *out_has_frame) {
+                                     CMPBool *out_has_frame) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -3016,9 +3028,9 @@ static const CMPVideoVTable g_cmp_sdl3_video_vtable = {
     cmp_sdl3_video_open, cmp_sdl3_video_close, cmp_sdl3_video_read_frame};
 
 static int cmp_sdl3_audio_decode(void *audio,
-                                const CMPAudioDecodeRequest *request,
-                                const CMPAllocator *allocator,
-                                CMPAudioData *out_audio) {
+                                 const CMPAudioDecodeRequest *request,
+                                 const CMPAllocator *allocator,
+                                 CMPAudioData *out_audio) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -3040,7 +3052,7 @@ static int cmp_sdl3_audio_decode(void *audio,
 }
 
 static int cmp_sdl3_audio_free(void *audio, const CMPAllocator *allocator,
-                              CMPAudioData *audio_data) {
+                               CMPAudioData *audio_data) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -3059,7 +3071,7 @@ static int cmp_sdl3_audio_free(void *audio, const CMPAllocator *allocator,
 }
 
 static const CMPAudioVTable g_cmp_sdl3_audio_vtable = {cmp_sdl3_audio_decode,
-                                                     cmp_sdl3_audio_free};
+                                                       cmp_sdl3_audio_free};
 
 #if defined(CMP_LIBCURL_AVAILABLE)
 typedef struct CMPSDL3CurlBuffer {
@@ -3073,7 +3085,7 @@ typedef struct CMPSDL3CurlBuffer {
 static cmp_u32 g_cmp_sdl3_curl_refcount = 0u;
 
 static int cmp_sdl3_network_add_usize(cmp_usize a, cmp_usize b,
-                                     cmp_usize *out_value) {
+                                      cmp_usize *out_value) {
   if (out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -3085,7 +3097,7 @@ static int cmp_sdl3_network_add_usize(cmp_usize a, cmp_usize b,
 }
 
 static int cmp_sdl3_network_mul_usize(cmp_usize a, cmp_usize b,
-                                     cmp_usize *out_value) {
+                                      cmp_usize *out_value) {
   if (out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -3151,7 +3163,7 @@ static int cmp_sdl3_libcurl_shutdown(void) {
 }
 
 static size_t cmp_sdl3_network_write_cb(char *ptr, size_t size, size_t nmemb,
-                                       void *userdata) {
+                                        void *userdata) {
   CMPSDL3CurlBuffer *buffer;
   cmp_usize chunk;
   cmp_usize new_size;
@@ -3209,8 +3221,8 @@ static size_t cmp_sdl3_network_write_cb(char *ptr, size_t size, size_t nmemb,
 }
 
 static int cmp_sdl3_network_append_headers(struct CMPSDL3Backend *backend,
-                                          const char *headers,
-                                          struct curl_slist **out_list) {
+                                           const char *headers,
+                                           struct curl_slist **out_list) {
   const char *cursor;
   struct curl_slist *list;
 
@@ -3356,8 +3368,8 @@ static int cmp_sdl3_network_append_headers(struct CMPSDL3Backend *backend,
 #endif
 
 static int cmp_sdl3_network_request(void *net, const CMPNetworkRequest *request,
-                                   const CMPAllocator *allocator,
-                                   CMPNetworkResponse *out_response) {
+                                    const CMPAllocator *allocator,
+                                    CMPNetworkResponse *out_response) {
   struct CMPSDL3Backend *backend;
 #if defined(CMP_LIBCURL_AVAILABLE)
   CURL *curl;
@@ -3467,8 +3479,8 @@ static int cmp_sdl3_network_request(void *net, const CMPNetworkRequest *request,
   }
 
   if (request->headers != NULL && request->headers[0] != '\0') {
-    rc =
-        cmp_sdl3_network_append_headers(backend, request->headers, &header_list);
+    rc = cmp_sdl3_network_append_headers(backend, request->headers,
+                                         &header_list);
     if (rc != CMP_OK) {
       goto cleanup;
     }
@@ -3548,8 +3560,8 @@ cleanup:
 }
 
 static int cmp_sdl3_network_free_response(void *net,
-                                         const CMPAllocator *allocator,
-                                         CMPNetworkResponse *response) {
+                                          const CMPAllocator *allocator,
+                                          CMPNetworkResponse *response) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -3565,8 +3577,8 @@ static int cmp_sdl3_network_free_response(void *net,
   }
 
   backend = (struct CMPSDL3Backend *)net;
-  rc =
-      cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "network.free_response");
+  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
+                            "network.free_response");
   CMP_SDL3_RETURN_IF_ERROR(rc);
 #if defined(CMP_LIBCURL_AVAILABLE)
   if (response->body != NULL) {
@@ -3589,7 +3601,7 @@ static const CMPNetworkVTable g_cmp_sdl3_network_vtable = {
     cmp_sdl3_network_request, cmp_sdl3_network_free_response};
 
 static int cmp_sdl3_tasks_thread_create(void *tasks, CMPThreadFn entry,
-                                       void *user, CMPHandle *out_thread) {
+                                        void *user, CMPHandle *out_thread) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -3601,7 +3613,8 @@ static int cmp_sdl3_tasks_thread_create(void *tasks, CMPThreadFn entry,
   }
 
   backend = (struct CMPSDL3Backend *)tasks;
-  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.thread_create");
+  rc =
+      cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.thread_create");
   CMP_SDL3_RETURN_IF_ERROR(rc);
   return CMP_ERR_UNSUPPORTED;
 }
@@ -3647,7 +3660,8 @@ static int cmp_sdl3_tasks_mutex_destroy(void *tasks, CMPHandle mutex) {
   }
 
   backend = (struct CMPSDL3Backend *)tasks;
-  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.mutex_destroy");
+  rc =
+      cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.mutex_destroy");
   CMP_SDL3_RETURN_IF_ERROR(rc);
   return CMP_ERR_UNSUPPORTED;
 }
@@ -3718,7 +3732,7 @@ static int cmp_sdl3_tasks_post(void *tasks, CMPTaskFn fn, void *user) {
 }
 
 static int cmp_sdl3_tasks_post_delayed(void *tasks, CMPTaskFn fn, void *user,
-                                      cmp_u32 delay_ms) {
+                                       cmp_u32 delay_ms) {
   struct CMPSDL3Backend *backend;
   int rc;
 
@@ -3875,12 +3889,14 @@ static int cmp_sdl3_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
 }
 
 static const CMPEnvVTable g_cmp_sdl3_env_vtable = {
-    cmp_sdl3_env_get_io,     cmp_sdl3_env_get_sensors, cmp_sdl3_env_get_camera,
-    cmp_sdl3_env_get_image,  cmp_sdl3_env_get_video,   cmp_sdl3_env_get_audio,
-    cmp_sdl3_env_get_network, cmp_sdl3_env_get_tasks,  cmp_sdl3_env_get_time_ms};
+    cmp_sdl3_env_get_io,      cmp_sdl3_env_get_sensors,
+    cmp_sdl3_env_get_camera,  cmp_sdl3_env_get_image,
+    cmp_sdl3_env_get_video,   cmp_sdl3_env_get_audio,
+    cmp_sdl3_env_get_network, cmp_sdl3_env_get_tasks,
+    cmp_sdl3_env_get_time_ms};
 
 int CMP_CALL cmp_sdl3_backend_create(const CMPSDL3BackendConfig *config,
-                                   CMPSDL3Backend **out_backend) {
+                                     CMPSDL3Backend **out_backend) {
   CMPSDL3BackendConfig local_config;
   CMPAllocator allocator;
   struct CMPSDL3Backend *backend;
@@ -3913,7 +3929,8 @@ int CMP_CALL cmp_sdl3_backend_create(const CMPSDL3BackendConfig *config,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  rc = allocator.alloc(allocator.ctx, sizeof(CMPSDL3Backend), (void **)&backend);
+  rc =
+      allocator.alloc(allocator.ctx, sizeof(CMPSDL3Backend), (void **)&backend);
   CMP_SDL3_RETURN_IF_ERROR(rc);
 
   memset(backend, 0, sizeof(*backend));
@@ -3932,7 +3949,7 @@ int CMP_CALL cmp_sdl3_backend_create(const CMPSDL3BackendConfig *config,
   }
 
   rc = cmp_handle_system_default_create(config->handle_capacity, &allocator,
-                                       &backend->handles);
+                                        &backend->handles);
   if (rc != CMP_OK) {
     if (backend->log_owner) {
       cmp_log_shutdown();
@@ -4156,7 +4173,8 @@ int CMP_CALL cmp_sdl3_backend_get_ws(CMPSDL3Backend *backend, CMPWS *out_ws) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_sdl3_backend_get_gfx(CMPSDL3Backend *backend, CMPGfx *out_gfx) {
+int CMP_CALL cmp_sdl3_backend_get_gfx(CMPSDL3Backend *backend,
+                                      CMPGfx *out_gfx) {
   if (backend == NULL || out_gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -4168,7 +4186,8 @@ int CMP_CALL cmp_sdl3_backend_get_gfx(CMPSDL3Backend *backend, CMPGfx *out_gfx) 
   return CMP_OK;
 }
 
-int CMP_CALL cmp_sdl3_backend_get_env(CMPSDL3Backend *backend, CMPEnv *out_env) {
+int CMP_CALL cmp_sdl3_backend_get_env(CMPSDL3Backend *backend,
+                                      CMPEnv *out_env) {
   if (backend == NULL || out_env == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -4184,7 +4203,7 @@ int CMP_CALL cmp_sdl3_backend_get_env(CMPSDL3Backend *backend, CMPEnv *out_env) 
 #else
 
 int CMP_CALL cmp_sdl3_backend_create(const CMPSDL3BackendConfig *config,
-                                   CMPSDL3Backend **out_backend) {
+                                     CMPSDL3Backend **out_backend) {
   CMPSDL3BackendConfig local_config;
   int rc;
 
@@ -4220,7 +4239,8 @@ int CMP_CALL cmp_sdl3_backend_get_ws(CMPSDL3Backend *backend, CMPWS *out_ws) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-int CMP_CALL cmp_sdl3_backend_get_gfx(CMPSDL3Backend *backend, CMPGfx *out_gfx) {
+int CMP_CALL cmp_sdl3_backend_get_gfx(CMPSDL3Backend *backend,
+                                      CMPGfx *out_gfx) {
   if (backend == NULL || out_gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -4228,7 +4248,8 @@ int CMP_CALL cmp_sdl3_backend_get_gfx(CMPSDL3Backend *backend, CMPGfx *out_gfx) 
   return CMP_ERR_UNSUPPORTED;
 }
 
-int CMP_CALL cmp_sdl3_backend_get_env(CMPSDL3Backend *backend, CMPEnv *out_env) {
+int CMP_CALL cmp_sdl3_backend_get_env(CMPSDL3Backend *backend,
+                                      CMPEnv *out_env) {
   if (backend == NULL || out_env == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

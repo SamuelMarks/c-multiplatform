@@ -16,8 +16,8 @@ extern "C" {
  * @brief Configuration for the default task runner.
  */
 typedef struct CMPTasksDefaultConfig {
-  const CMPAllocator *allocator; /**< Allocator used for task runner memory (NULL
-                                   uses default). */
+  const CMPAllocator *allocator; /**< Allocator used for task runner memory
+                                   (NULL uses default). */
   cmp_usize worker_count;        /**< Number of worker threads. */
   cmp_usize queue_capacity;      /**< Maximum number of queued tasks. */
   cmp_usize handle_capacity;     /**< Capacity for thread/mutex handles. */
@@ -28,7 +28,8 @@ typedef struct CMPTasksDefaultConfig {
  * @param config Config to initialize.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_tasks_default_config_init(CMPTasksDefaultConfig *config);
+CMP_API int CMP_CALL
+cmp_tasks_default_config_init(CMPTasksDefaultConfig *config);
 
 /**
  * @brief Create the default task runner.
@@ -36,8 +37,8 @@ CMP_API int CMP_CALL cmp_tasks_default_config_init(CMPTasksDefaultConfig *config
  * @param out_tasks Receives the task interface.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_tasks_default_create(const CMPTasksDefaultConfig *config,
-                                           CMPTasks *out_tasks);
+CMP_API int CMP_CALL cmp_tasks_default_create(
+    const CMPTasksDefaultConfig *config, CMPTasks *out_tasks);
 
 /**
  * @brief Destroy a task runner created by the default implementation.
@@ -196,7 +197,7 @@ CMP_API int CMP_CALL cmp_tasks_test_set_fail_point(cmp_u32 point);
 CMP_API int CMP_CALL cmp_tasks_test_clear_fail_point(void);
 CMP_API int CMP_CALL cmp_tasks_test_set_thread_create_fail_after(cmp_u32 count);
 CMP_API int CMP_CALL cmp_tasks_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                              cmp_usize *out_value);
+                                                 cmp_usize *out_value);
 CMP_API int CMP_CALL cmp_tasks_test_call_native(cmp_u32 op);
 /**
  * @brief Test wrapper for thread entry handling.
@@ -263,13 +264,15 @@ CMP_API int CMP_CALL cmp_tasks_test_stub_exercise(void);
 CMP_API int CMP_CALL cmp_tasks_test_signal_stop_null(void);
 CMP_API int CMP_CALL cmp_tasks_test_thread_destroy_case(cmp_u32 mode);
 CMP_API int CMP_CALL cmp_tasks_test_mutex_destroy_case(cmp_u32 mode);
-CMP_API int CMP_CALL cmp_tasks_test_queue_case(cmp_u32 mode, cmp_u32 *out_wait_ms,
-                                            cmp_u32 *out_due_time,
-                                            cmp_usize *out_count);
+CMP_API int CMP_CALL cmp_tasks_test_queue_case(cmp_u32 mode,
+                                               cmp_u32 *out_wait_ms,
+                                               cmp_u32 *out_due_time,
+                                               cmp_usize *out_count);
 CMP_API int CMP_CALL cmp_tasks_test_post_case(cmp_u32 mode);
 CMP_API int CMP_CALL cmp_tasks_test_post_delayed_case(cmp_u32 mode);
 CMP_API int CMP_CALL cmp_tasks_test_worker_case(cmp_u32 mode);
-CMP_API int CMP_CALL cmp_tasks_test_object_op(cmp_u32 mode, cmp_u32 *out_type_id);
+CMP_API int CMP_CALL cmp_tasks_test_object_op(cmp_u32 mode,
+                                              cmp_u32 *out_type_id);
 CMP_API int CMP_CALL cmp_tasks_test_timedwait_case(cmp_u32 mode);
 /**
  * @brief Invoke the internal noop task used by task posting helpers.

@@ -24,16 +24,16 @@
 #define CMP_GTK4_V4L2_AVAILABLE 0
 #endif
 
-#define CMP_GTK4_RETURN_IF_ERROR(rc)                                            \
+#define CMP_GTK4_RETURN_IF_ERROR(rc)                                           \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       return (rc);                                                             \
     }                                                                          \
   } while (0)
 
-#define CMP_GTK4_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                           \
+#define CMP_GTK4_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                          \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       cleanup;                                                                 \
       return (rc);                                                             \
     }                                                                          \
@@ -58,7 +58,8 @@
 #define CMP_GTK4_CAMERA_DEFAULT_WIDTH 640u
 #define CMP_GTK4_CAMERA_DEFAULT_HEIGHT 480u
 
-static int cmp_gtk4_backend_validate_config(const CMPGTK4BackendConfig *config) {
+static int
+cmp_gtk4_backend_validate_config(const CMPGTK4BackendConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -279,8 +280,8 @@ struct CMPGTK4Backend {
 
 static cmp_u32 g_cmp_gtk4_refcount = 0u;
 
-static int cmp_gtk4_backend_log(struct CMPGTK4Backend *backend, CMPLogLevel level,
-                               const char *message) {
+static int cmp_gtk4_backend_log(struct CMPGTK4Backend *backend,
+                                CMPLogLevel level, const char *message) {
   if (!backend->log_enabled) {
     return CMP_OK;
   }
@@ -383,7 +384,7 @@ static cmp_i32 cmp_gtk4_buttons_from_state(GdkModifierType state) {
 }
 
 static int cmp_gtk4_queue_event(struct CMPGTK4Backend *backend,
-                               const CMPInputEvent *event) {
+                                const CMPInputEvent *event) {
   cmp_usize tail;
   int rc;
 
@@ -422,9 +423,9 @@ static CMPBool cmp_gtk4_transform_is_simple(const CMPMat3 *transform) {
   return CMP_TRUE;
 }
 
-static int cmp_gtk4_transform_point_simple(const CMPMat3 *transform, CMPScalar x,
-                                          CMPScalar y, CMPScalar *out_x,
-                                          CMPScalar *out_y) {
+static int cmp_gtk4_transform_point_simple(const CMPMat3 *transform,
+                                           CMPScalar x, CMPScalar y,
+                                           CMPScalar *out_x, CMPScalar *out_y) {
   if (transform == NULL || out_x == NULL || out_y == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -434,7 +435,8 @@ static int cmp_gtk4_transform_point_simple(const CMPMat3 *transform, CMPScalar x
 }
 
 static int cmp_gtk4_transform_rect_simple(const CMPMat3 *transform,
-                                         const CMPRect *rect, CMPRect *out_rect) {
+                                          const CMPRect *rect,
+                                          CMPRect *out_rect) {
   CMPScalar x0;
   CMPScalar y0;
   CMPScalar x1;
@@ -452,7 +454,7 @@ static int cmp_gtk4_transform_rect_simple(const CMPMat3 *transform,
   rc = cmp_gtk4_transform_point_simple(transform, rect->x, rect->y, &x0, &y0);
   CMP_GTK4_RETURN_IF_ERROR(rc);
   rc = cmp_gtk4_transform_point_simple(transform, rect->x + rect->width,
-                                      rect->y + rect->height, &x1, &y1);
+                                       rect->y + rect->height, &x1, &y1);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   min_x = (x0 < x1) ? x0 : x1;
@@ -511,7 +513,8 @@ static int cmp_gtk4_cmd_list_reset(CMPGTK4Window *window) {
   return first_error;
 }
 
-static int cmp_gtk4_cmd_list_push(CMPGTK4Window *window, const CMPGTK4Cmd *cmd) {
+static int cmp_gtk4_cmd_list_push(CMPGTK4Window *window,
+                                  const CMPGTK4Cmd *cmd) {
   struct CMPGTK4Backend *backend;
   cmp_usize capacity;
   cmp_usize new_capacity;
@@ -555,7 +558,7 @@ static int cmp_gtk4_cmd_list_push(CMPGTK4Window *window, const CMPGTK4Cmd *cmd) 
 }
 
 static int cmp_gtk4_ensure_surface(CMPGTK4Window *window, cmp_i32 width,
-                                  cmp_i32 height) {
+                                   cmp_i32 height) {
   cairo_surface_t *surface;
   cairo_status_t status;
 
@@ -613,7 +616,7 @@ static int cmp_gtk4_apply_transform(struct CMPGTK4Backend *backend) {
 }
 
 static void cmp_gtk4_queue_window_resize(CMPGTK4Window *window, cmp_i32 width,
-                                        cmp_i32 height) {
+                                         cmp_i32 height) {
   struct CMPGTK4Backend *backend;
   CMPInputEvent event;
   int rc;
@@ -645,7 +648,7 @@ typedef struct CMPGTK4ClipboardRead {
 } CMPGTK4ClipboardRead;
 
 static void cmp_gtk4_clipboard_read_cb(GObject *source, GAsyncResult *result,
-                                      gpointer user_data) {
+                                       gpointer user_data) {
   CMPGTK4ClipboardRead *state;
 
   state = (CMPGTK4ClipboardRead *)user_data;
@@ -659,7 +662,7 @@ static void cmp_gtk4_clipboard_read_cb(GObject *source, GAsyncResult *result,
 }
 
 static void cmp_gtk4_on_snapshot(GtkWidget *widget, GtkSnapshot *snapshot,
-                                gpointer user_data) {
+                                 gpointer user_data) {
   CMPGTK4Window *window;
   cairo_t *cr;
   graphene_rect_t rect;
@@ -696,7 +699,7 @@ static void cmp_gtk4_on_snapshot(GtkWidget *widget, GtkSnapshot *snapshot,
 }
 
 static void cmp_gtk4_on_size_allocate(GtkWidget *widget, int width, int height,
-                                     int baseline, gpointer user_data) {
+                                      int baseline, gpointer user_data) {
   CMPGTK4Window *window;
 
   CMP_UNUSED(widget);
@@ -715,7 +718,7 @@ static void cmp_gtk4_on_size_allocate(GtkWidget *widget, int width, int height,
 }
 
 static gboolean cmp_gtk4_on_close_request(GtkWindow *gtk_window,
-                                         gpointer user_data) {
+                                          gpointer user_data) {
   CMPGTK4Window *window;
   struct CMPGTK4Backend *backend;
   CMPInputEvent event;
@@ -747,7 +750,7 @@ static gboolean cmp_gtk4_on_close_request(GtkWindow *gtk_window,
 }
 
 static void cmp_gtk4_on_focus_enter(GtkEventControllerFocus *controller,
-                                   gpointer user_data) {
+                                    gpointer user_data) {
   CMPGTK4Window *window;
   struct CMPGTK4Backend *backend;
   CMPInputEvent event;
@@ -777,7 +780,7 @@ static void cmp_gtk4_on_focus_enter(GtkEventControllerFocus *controller,
 }
 
 static void cmp_gtk4_on_focus_leave(GtkEventControllerFocus *controller,
-                                   gpointer user_data) {
+                                    gpointer user_data) {
   CMPGTK4Window *window;
   struct CMPGTK4Backend *backend;
   CMPInputEvent event;
@@ -807,7 +810,7 @@ static void cmp_gtk4_on_focus_leave(GtkEventControllerFocus *controller,
 }
 
 static void cmp_gtk4_on_motion(GtkEventControllerMotion *controller, double x,
-                              double y, gpointer user_data) {
+                               double y, gpointer user_data) {
   CMPGTK4Window *window;
   struct CMPGTK4Backend *backend;
   CMPInputEvent event;
@@ -846,7 +849,7 @@ static void cmp_gtk4_on_motion(GtkEventControllerMotion *controller, double x,
 }
 
 static void cmp_gtk4_on_click_pressed(GtkGestureClick *gesture, int n_press,
-                                     double x, double y, gpointer user_data) {
+                                      double x, double y, gpointer user_data) {
   CMPGTK4Window *window;
   struct CMPGTK4Backend *backend;
   CMPInputEvent event;
@@ -892,7 +895,7 @@ static void cmp_gtk4_on_click_pressed(GtkGestureClick *gesture, int n_press,
 }
 
 static void cmp_gtk4_on_click_released(GtkGestureClick *gesture, int n_press,
-                                      double x, double y, gpointer user_data) {
+                                       double x, double y, gpointer user_data) {
   CMPGTK4Window *window;
   struct CMPGTK4Backend *backend;
   CMPInputEvent event;
@@ -929,7 +932,8 @@ static void cmp_gtk4_on_click_released(GtkGestureClick *gesture, int n_press,
   event.data.pointer.pointer_id = 0;
   event.data.pointer.x = (cmp_i32)x;
   event.data.pointer.y = (cmp_i32)y;
-  event.data.pointer.buttons = cmp_gtk4_buttons_from_state(state) & ~button_mask;
+  event.data.pointer.buttons =
+      cmp_gtk4_buttons_from_state(state) & ~button_mask;
   event.data.pointer.scroll_x = 0;
   event.data.pointer.scroll_y = 0;
 
@@ -938,7 +942,7 @@ static void cmp_gtk4_on_click_released(GtkGestureClick *gesture, int n_press,
 }
 
 static gboolean cmp_gtk4_on_scroll(GtkEventControllerScroll *controller,
-                                  double dx, double dy, gpointer user_data) {
+                                   double dx, double dy, gpointer user_data) {
   CMPGTK4Window *window;
   struct CMPGTK4Backend *backend;
   CMPInputEvent event;
@@ -976,9 +980,9 @@ static gboolean cmp_gtk4_on_scroll(GtkEventControllerScroll *controller,
 }
 
 static gboolean cmp_gtk4_on_key_pressed(GtkEventControllerKey *controller,
-                                       guint keyval, guint keycode,
-                                       GdkModifierType state,
-                                       gpointer user_data) {
+                                        guint keyval, guint keycode,
+                                        GdkModifierType state,
+                                        gpointer user_data) {
   CMPGTK4Window *window;
   struct CMPGTK4Backend *backend;
   CMPInputEvent event;
@@ -1033,9 +1037,9 @@ static gboolean cmp_gtk4_on_key_pressed(GtkEventControllerKey *controller,
 }
 
 static gboolean cmp_gtk4_on_key_released(GtkEventControllerKey *controller,
-                                        guint keyval, guint keycode,
-                                        GdkModifierType state,
-                                        gpointer user_data) {
+                                         guint keyval, guint keycode,
+                                         GdkModifierType state,
+                                         gpointer user_data) {
   CMPGTK4Window *window;
   struct CMPGTK4Backend *backend;
   CMPInputEvent event;
@@ -1068,8 +1072,8 @@ static gboolean cmp_gtk4_on_key_released(GtkEventControllerKey *controller,
 }
 
 static int cmp_gtk4_backend_resolve(struct CMPGTK4Backend *backend,
-                                   CMPHandle handle, cmp_u32 type_id,
-                                   void **out_obj) {
+                                    CMPHandle handle, cmp_u32 type_id,
+                                    void **out_obj) {
   void *resolved;
   cmp_u32 actual_type;
   int rc;
@@ -1254,7 +1258,7 @@ static int cmp_gtk4_ws_shutdown(void *ws) {
 }
 
 static int cmp_gtk4_ws_create_window(void *ws, const CMPWSWindowConfig *config,
-                                    CMPHandle *out_window) {
+                                     CMPHandle *out_window) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Window *window;
   GtkWindow *gtk_window;
@@ -1325,7 +1329,8 @@ static int cmp_gtk4_ws_create_window(void *ws, const CMPWSWindowConfig *config,
   gtk_window_set_title(gtk_window, config->utf8_title);
   gtk_window_set_default_size(gtk_window, config->width, config->height);
   gtk_window_set_resizable(
-      gtk_window, (config->flags & CMP_WS_WINDOW_RESIZABLE) != 0 ? TRUE : FALSE);
+      gtk_window,
+      (config->flags & CMP_WS_WINDOW_RESIZABLE) != 0 ? TRUE : FALSE);
   if ((config->flags & CMP_WS_WINDOW_BORDERLESS) != 0) {
     gtk_window_set_decorated(gtk_window, FALSE);
   }
@@ -1350,7 +1355,7 @@ static int cmp_gtk4_ws_create_window(void *ws, const CMPWSWindowConfig *config,
   }
 
   rc = cmp_object_header_init(&window->header, CMP_GTK4_TYPE_WINDOW, 0,
-                             &g_cmp_gtk4_window_vtable);
+                              &g_cmp_gtk4_window_vtable);
   if (rc != CMP_OK) {
     if (window->surface != NULL) {
       cairo_surface_destroy(window->surface);
@@ -1442,7 +1447,7 @@ static int cmp_gtk4_ws_destroy_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPGTK4Backend *)ws;
   rc = cmp_gtk4_backend_resolve(backend, window, CMP_GTK4_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.destroy_window");
@@ -1462,7 +1467,7 @@ static int cmp_gtk4_ws_show_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPGTK4Backend *)ws;
   rc = cmp_gtk4_backend_resolve(backend, window, CMP_GTK4_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.show_window");
@@ -1489,7 +1494,7 @@ static int cmp_gtk4_ws_hide_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPGTK4Backend *)ws;
   rc = cmp_gtk4_backend_resolve(backend, window, CMP_GTK4_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.hide_window");
@@ -1503,7 +1508,7 @@ static int cmp_gtk4_ws_hide_window(void *ws, CMPHandle window) {
 }
 
 static int cmp_gtk4_ws_set_window_title(void *ws, CMPHandle window,
-                                       const char *utf8_title) {
+                                        const char *utf8_title) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Window *resolved;
   int rc;
@@ -1514,7 +1519,7 @@ static int cmp_gtk4_ws_set_window_title(void *ws, CMPHandle window,
 
   backend = (struct CMPGTK4Backend *)ws;
   rc = cmp_gtk4_backend_resolve(backend, window, CMP_GTK4_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_window_title");
@@ -1526,8 +1531,8 @@ static int cmp_gtk4_ws_set_window_title(void *ws, CMPHandle window,
   return CMP_OK;
 }
 
-static int cmp_gtk4_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width,
-                                      cmp_i32 height) {
+static int cmp_gtk4_ws_set_window_size(void *ws, CMPHandle window,
+                                       cmp_i32 width, cmp_i32 height) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Window *resolved;
   int rc;
@@ -1541,7 +1546,7 @@ static int cmp_gtk4_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width
 
   backend = (struct CMPGTK4Backend *)ws;
   rc = cmp_gtk4_backend_resolve(backend, window, CMP_GTK4_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_window_size");
@@ -1557,7 +1562,8 @@ static int cmp_gtk4_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width
 }
 
 static int cmp_gtk4_ws_get_window_size(void *ws, CMPHandle window,
-                                      cmp_i32 *out_width, cmp_i32 *out_height) {
+                                       cmp_i32 *out_width,
+                                       cmp_i32 *out_height) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Window *resolved;
   int width;
@@ -1570,7 +1576,7 @@ static int cmp_gtk4_ws_get_window_size(void *ws, CMPHandle window,
 
   backend = (struct CMPGTK4Backend *)ws;
   rc = cmp_gtk4_backend_resolve(backend, window, CMP_GTK4_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_window_size");
@@ -1593,7 +1599,7 @@ static int cmp_gtk4_ws_get_window_size(void *ws, CMPHandle window,
 }
 
 static int cmp_gtk4_ws_set_window_dpi_scale(void *ws, CMPHandle window,
-                                           CMPScalar scale) {
+                                            CMPScalar scale) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Window *resolved;
   int rc;
@@ -1607,11 +1613,11 @@ static int cmp_gtk4_ws_set_window_dpi_scale(void *ws, CMPHandle window,
 
   backend = (struct CMPGTK4Backend *)ws;
   rc = cmp_gtk4_backend_resolve(backend, window, CMP_GTK4_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO,
-                           "ws.set_window_dpi_scale");
+                            "ws.set_window_dpi_scale");
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   resolved->dpi_scale = scale;
@@ -1621,7 +1627,7 @@ static int cmp_gtk4_ws_set_window_dpi_scale(void *ws, CMPHandle window,
 }
 
 static int cmp_gtk4_ws_get_window_dpi_scale(void *ws, CMPHandle window,
-                                           CMPScalar *out_scale) {
+                                            CMPScalar *out_scale) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Window *resolved;
   int scale;
@@ -1633,11 +1639,11 @@ static int cmp_gtk4_ws_get_window_dpi_scale(void *ws, CMPHandle window,
 
   backend = (struct CMPGTK4Backend *)ws;
   rc = cmp_gtk4_backend_resolve(backend, window, CMP_GTK4_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO,
-                           "ws.get_window_dpi_scale");
+                            "ws.get_window_dpi_scale");
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   if (resolved->has_scale_override) {
@@ -1668,7 +1674,8 @@ static int cmp_gtk4_ws_set_clipboard_text(void *ws, const char *utf8_text) {
   }
 
   backend = (struct CMPGTK4Backend *)ws;
-  rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_clipboard_text");
+  rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO,
+                            "ws.set_clipboard_text");
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   length = 0;
@@ -1695,8 +1702,8 @@ static int cmp_gtk4_ws_set_clipboard_text(void *ws, const char *utf8_text) {
 }
 
 static int cmp_gtk4_ws_get_clipboard_text(void *ws, char *buffer,
-                                         cmp_usize buffer_size,
-                                         cmp_usize *out_length) {
+                                          cmp_usize buffer_size,
+                                          cmp_usize *out_length) {
   struct CMPGTK4Backend *backend;
   GdkDisplay *display;
   GdkClipboard *clipboard;
@@ -1709,7 +1716,8 @@ static int cmp_gtk4_ws_get_clipboard_text(void *ws, char *buffer,
   }
 
   backend = (struct CMPGTK4Backend *)ws;
-  rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_clipboard_text");
+  rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_INFO,
+                            "ws.get_clipboard_text");
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   display = gdk_display_get_default();
@@ -1758,7 +1766,7 @@ static int cmp_gtk4_ws_get_clipboard_text(void *ws, char *buffer,
 }
 
 static int cmp_gtk4_ws_poll_event(void *ws, CMPInputEvent *out_event,
-                                 CMPBool *out_has_event) {
+                                  CMPBool *out_has_event) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -1824,22 +1832,23 @@ static int cmp_gtk4_ws_get_time_ms(void *ws, cmp_u32 *out_time_ms) {
   return CMP_OK;
 }
 
-static const CMPWSVTable g_cmp_gtk4_ws_vtable = {cmp_gtk4_ws_init,
-                                               cmp_gtk4_ws_shutdown,
-                                               cmp_gtk4_ws_create_window,
-                                               cmp_gtk4_ws_destroy_window,
-                                               cmp_gtk4_ws_show_window,
-                                               cmp_gtk4_ws_hide_window,
-                                               cmp_gtk4_ws_set_window_title,
-                                               cmp_gtk4_ws_set_window_size,
-                                               cmp_gtk4_ws_get_window_size,
-                                               cmp_gtk4_ws_set_window_dpi_scale,
-                                               cmp_gtk4_ws_get_window_dpi_scale,
-                                               cmp_gtk4_ws_set_clipboard_text,
-                                               cmp_gtk4_ws_get_clipboard_text,
-                                               cmp_gtk4_ws_poll_event,
-                                               cmp_gtk4_ws_pump_events,
-                                               cmp_gtk4_ws_get_time_ms};
+static const CMPWSVTable g_cmp_gtk4_ws_vtable = {
+    cmp_gtk4_ws_init,
+    cmp_gtk4_ws_shutdown,
+    cmp_gtk4_ws_create_window,
+    cmp_gtk4_ws_destroy_window,
+    cmp_gtk4_ws_show_window,
+    cmp_gtk4_ws_hide_window,
+    cmp_gtk4_ws_set_window_title,
+    cmp_gtk4_ws_set_window_size,
+    cmp_gtk4_ws_get_window_size,
+    cmp_gtk4_ws_set_window_dpi_scale,
+    cmp_gtk4_ws_get_window_dpi_scale,
+    cmp_gtk4_ws_set_clipboard_text,
+    cmp_gtk4_ws_get_clipboard_text,
+    cmp_gtk4_ws_poll_event,
+    cmp_gtk4_ws_pump_events,
+    cmp_gtk4_ws_get_time_ms};
 
 static void cmp_gtk4_set_source_color(cairo_t *cr, CMPColor color) {
   cairo_set_source_rgba(cr, (double)color.r, (double)color.g, (double)color.b,
@@ -1847,7 +1856,7 @@ static void cmp_gtk4_set_source_color(cairo_t *cr, CMPColor color) {
 }
 
 static void cmp_gtk4_path_rounded_rect(cairo_t *cr, const CMPRect *rect,
-                                      CMPScalar radius) {
+                                       CMPScalar radius) {
   double x;
   double y;
   double w;
@@ -1885,7 +1894,7 @@ static void cmp_gtk4_path_rounded_rect(cairo_t *cr, const CMPRect *rect,
 }
 
 static int cmp_gtk4_cairo_build_path(cairo_t *cr, const CMPPathCmd *commands,
-                                    cmp_usize count) {
+                                     cmp_usize count) {
   CMPScalar current_x;
   CMPScalar current_y;
   CMPScalar start_x;
@@ -1976,9 +1985,10 @@ static int cmp_gtk4_cairo_build_path(cairo_t *cr, const CMPPathCmd *commands,
   return CMP_OK;
 }
 
-static int cmp_gtk4_path_bounds_update(CMPScalar x, CMPScalar y, CMPScalar *min_x,
-                                      CMPScalar *min_y, CMPScalar *max_x,
-                                      CMPScalar *max_y, CMPBool *has_bounds) {
+static int cmp_gtk4_path_bounds_update(CMPScalar x, CMPScalar y,
+                                       CMPScalar *min_x, CMPScalar *min_y,
+                                       CMPScalar *max_x, CMPScalar *max_y,
+                                       CMPBool *has_bounds) {
   if (min_x == NULL || min_y == NULL || max_x == NULL || max_y == NULL ||
       has_bounds == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2019,8 +2029,8 @@ static void cmp_gtk4_color_to_rgba(CMPColor color, GdkRGBA *out_rgba) {
 }
 
 static void cmp_gtk4_snapshot_draw_rect(GtkSnapshot *snapshot,
-                                       const CMPRect *rect, CMPColor color,
-                                       CMPScalar radius) {
+                                        const CMPRect *rect, CMPColor color,
+                                        CMPScalar radius) {
   graphene_rect_t bounds;
   cairo_t *cr;
   CMPRect local;
@@ -2056,7 +2066,7 @@ static void cmp_gtk4_snapshot_draw_rect(GtkSnapshot *snapshot,
 }
 
 static void cmp_gtk4_snapshot_draw_line(GtkSnapshot *snapshot,
-                                       const CMPGTK4CmdLine *line) {
+                                        const CMPGTK4CmdLine *line) {
   graphene_rect_t bounds;
   cairo_t *cr;
   CMPScalar min_x;
@@ -2119,8 +2129,8 @@ static void cmp_gtk4_snapshot_draw_line(GtkSnapshot *snapshot,
 }
 
 static void cmp_gtk4_snapshot_draw_texture(GtkSnapshot *snapshot,
-                                          CMPGTK4Window *window,
-                                          const CMPGTK4CmdTexture *cmd) {
+                                           CMPGTK4Window *window,
+                                           const CMPGTK4CmdTexture *cmd) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Texture *resolved;
   cairo_t *cr;
@@ -2147,7 +2157,7 @@ static void cmp_gtk4_snapshot_draw_texture(GtkSnapshot *snapshot,
   }
 
   rc = cmp_gtk4_backend_resolve(backend, cmd->texture, CMP_GTK4_TYPE_TEXTURE,
-                               (void **)&resolved);
+                                (void **)&resolved);
   if (rc != CMP_OK || resolved == NULL || resolved->surface == NULL) {
     return;
   }
@@ -2230,8 +2240,8 @@ static void cmp_gtk4_snapshot_draw_texture(GtkSnapshot *snapshot,
 }
 
 static void cmp_gtk4_snapshot_draw_text(GtkSnapshot *snapshot,
-                                       CMPGTK4Window *window,
-                                       const CMPGTK4CmdText *cmd) {
+                                        CMPGTK4Window *window,
+                                        const CMPGTK4CmdText *cmd) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Font *resolved;
   graphene_rect_t bounds;
@@ -2252,7 +2262,7 @@ static void cmp_gtk4_snapshot_draw_text(GtkSnapshot *snapshot,
   }
 
   rc = cmp_gtk4_backend_resolve(backend, cmd->font, CMP_GTK4_TYPE_FONT,
-                               (void **)&resolved);
+                                (void **)&resolved);
   if (rc != CMP_OK || resolved == NULL || resolved->desc == NULL) {
     return;
   }
@@ -2299,7 +2309,7 @@ static void cmp_gtk4_snapshot_draw_text(GtkSnapshot *snapshot,
 }
 
 static void cmp_gtk4_snapshot_draw_path(GtkSnapshot *snapshot,
-                                       const CMPGTK4CmdPath *cmd) {
+                                        const CMPGTK4CmdPath *cmd) {
   graphene_rect_t bounds;
   cairo_t *cr;
   int rc;
@@ -2332,7 +2342,8 @@ static void cmp_gtk4_snapshot_draw_path(GtkSnapshot *snapshot,
   cairo_destroy(cr);
 }
 
-static void cmp_gtk4_snapshot_cmds(CMPGTK4Window *window, GtkSnapshot *snapshot) {
+static void cmp_gtk4_snapshot_cmds(CMPGTK4Window *window,
+                                   GtkSnapshot *snapshot) {
   cmp_usize i;
   const CMPGTK4Cmd *cmd;
 
@@ -2345,11 +2356,11 @@ static void cmp_gtk4_snapshot_cmds(CMPGTK4Window *window, GtkSnapshot *snapshot)
     switch (cmd->type) {
     case CMP_GTK4_CMD_CLEAR:
       cmp_gtk4_snapshot_draw_rect(snapshot, &cmd->data.clear.rect,
-                                 cmd->data.clear.color, 0.0f);
+                                  cmd->data.clear.color, 0.0f);
       break;
     case CMP_GTK4_CMD_RECT:
       cmp_gtk4_snapshot_draw_rect(snapshot, &cmd->data.rect.rect,
-                                 cmd->data.rect.color, cmd->data.rect.radius);
+                                  cmd->data.rect.color, cmd->data.rect.radius);
       break;
     case CMP_GTK4_CMD_LINE:
       cmp_gtk4_snapshot_draw_line(snapshot, &cmd->data.line);
@@ -2382,8 +2393,8 @@ static void cmp_gtk4_snapshot_cmds(CMPGTK4Window *window, GtkSnapshot *snapshot)
 }
 
 static void cmp_gtk4_write_argb32_pixel(unsigned char *dst, unsigned char r,
-                                       unsigned char g, unsigned char b,
-                                       unsigned char a) {
+                                        unsigned char g, unsigned char b,
+                                        unsigned char a) {
   unsigned int alpha;
   unsigned char pr;
   unsigned char pg;
@@ -2414,9 +2425,9 @@ static void cmp_gtk4_write_argb32_pixel(unsigned char *dst, unsigned char r,
 }
 
 static int cmp_gtk4_copy_texture_region(CMPGTK4Texture *texture,
-                                       const void *pixels, cmp_usize size,
-                                       cmp_i32 x, cmp_i32 y, cmp_i32 width,
-                                       cmp_i32 height) {
+                                        const void *pixels, cmp_usize size,
+                                        cmp_i32 x, cmp_i32 y, cmp_i32 width,
+                                        cmp_i32 height) {
   const unsigned char *src;
   unsigned char *dst;
   cmp_usize expected;
@@ -2458,8 +2469,8 @@ static int cmp_gtk4_copy_texture_region(CMPGTK4Texture *texture,
     }
     src_stride = (cmp_usize)width;
     for (row = 0; row < height; ++row) {
-      dst = texture->pixels + (cmp_usize)(y + row) * (cmp_usize)texture->stride +
-            (cmp_usize)x;
+      dst = texture->pixels +
+            (cmp_usize)(y + row) * (cmp_usize)texture->stride + (cmp_usize)x;
       memcpy(dst, src + (cmp_usize)row * src_stride, (cmp_usize)width);
     }
     cairo_surface_mark_dirty(texture->surface);
@@ -2497,7 +2508,7 @@ static int cmp_gtk4_copy_texture_region(CMPGTK4Texture *texture,
 }
 
 static int cmp_gtk4_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
-                                   cmp_i32 height, CMPScalar dpi_scale) {
+                                    cmp_i32 height, CMPScalar dpi_scale) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Window *resolved;
   cairo_t *cr;
@@ -2520,7 +2531,7 @@ static int cmp_gtk4_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
   }
 
   rc = cmp_gtk4_backend_resolve(backend, window, CMP_GTK4_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.begin_frame");
@@ -2604,7 +2615,7 @@ static int cmp_gtk4_gfx_end_frame(void *gfx, CMPHandle window) {
 
   backend = (struct CMPGTK4Backend *)gfx;
   rc = cmp_gtk4_backend_resolve(backend, window, CMP_GTK4_TYPE_WINDOW,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
   if (!backend->in_frame || backend->active_window != resolved) {
     return CMP_ERR_STATE;
@@ -2684,8 +2695,8 @@ static int cmp_gtk4_gfx_clear(void *gfx, CMPColor color) {
   return CMP_OK;
 }
 
-static int cmp_gtk4_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
-                                 CMPScalar corner_radius) {
+static int cmp_gtk4_gfx_draw_rect(void *gfx, const CMPRect *rect,
+                                  CMPColor color, CMPScalar corner_radius) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Cmd cmd;
   CMPRect transformed;
@@ -2714,7 +2725,7 @@ static int cmp_gtk4_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color
     }
 
     rc = cmp_gtk4_transform_rect_simple(&backend->gsk_transform, rect,
-                                       &transformed);
+                                        &transformed);
     CMP_GTK4_RETURN_IF_ERROR(rc);
 
     sx = cmp_gtk4_abs_scalar(backend->gsk_transform.m[0]);
@@ -2749,8 +2760,8 @@ static int cmp_gtk4_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color
 }
 
 static int cmp_gtk4_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
-                                 CMPScalar x1, CMPScalar y1, CMPColor color,
-                                 CMPScalar thickness) {
+                                  CMPScalar x1, CMPScalar y1, CMPColor color,
+                                  CMPScalar thickness) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Cmd cmd;
   CMPScalar tx0;
@@ -2779,10 +2790,10 @@ static int cmp_gtk4_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
     }
 
     rc = cmp_gtk4_transform_point_simple(&backend->gsk_transform, x0, y0, &tx0,
-                                        &ty0);
+                                         &ty0);
     CMP_GTK4_RETURN_IF_ERROR(rc);
     rc = cmp_gtk4_transform_point_simple(&backend->gsk_transform, x1, y1, &tx1,
-                                        &ty1);
+                                         &ty1);
     CMP_GTK4_RETURN_IF_ERROR(rc);
 
     sx = cmp_gtk4_abs_scalar(backend->gsk_transform.m[0]);
@@ -2816,7 +2827,8 @@ static int cmp_gtk4_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
   return CMP_OK;
 }
 
-static int cmp_gtk4_gfx_draw_path(void *gfx, const CMPPath *path, CMPColor color) {
+static int cmp_gtk4_gfx_draw_path(void *gfx, const CMPPath *path,
+                                  CMPColor color) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Window *window;
   CMPGTK4Cmd cmd;
@@ -2883,8 +2895,8 @@ static int cmp_gtk4_gfx_draw_path(void *gfx, const CMPPath *path, CMPColor color
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         rc = cmp_gtk4_path_bounds_update(dst->data.move_to.x,
-                                        dst->data.move_to.y, &min_x, &min_y,
-                                        &max_x, &max_y, &has_bounds);
+                                         dst->data.move_to.y, &min_x, &min_y,
+                                         &max_x, &max_y, &has_bounds);
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         break;
@@ -2895,8 +2907,8 @@ static int cmp_gtk4_gfx_draw_path(void *gfx, const CMPPath *path, CMPColor color
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         rc = cmp_gtk4_path_bounds_update(dst->data.line_to.x,
-                                        dst->data.line_to.y, &min_x, &min_y,
-                                        &max_x, &max_y, &has_bounds);
+                                         dst->data.line_to.y, &min_x, &min_y,
+                                         &max_x, &max_y, &has_bounds);
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         break;
@@ -2910,21 +2922,21 @@ static int cmp_gtk4_gfx_draw_path(void *gfx, const CMPPath *path, CMPColor color
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         rc = cmp_gtk4_transform_point_simple(&backend->gsk_transform,
-                                            src->data.quad_to.x,
-                                            src->data.quad_to.y, &tx, &ty);
+                                             src->data.quad_to.x,
+                                             src->data.quad_to.y, &tx, &ty);
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         dst->data.quad_to.x = tx;
         dst->data.quad_to.y = ty;
 
         rc = cmp_gtk4_path_bounds_update(dst->data.quad_to.cx,
-                                        dst->data.quad_to.cy, &min_x, &min_y,
-                                        &max_x, &max_y, &has_bounds);
+                                         dst->data.quad_to.cy, &min_x, &min_y,
+                                         &max_x, &max_y, &has_bounds);
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         rc = cmp_gtk4_path_bounds_update(dst->data.quad_to.x,
-                                        dst->data.quad_to.y, &min_x, &min_y,
-                                        &max_x, &max_y, &has_bounds);
+                                         dst->data.quad_to.y, &min_x, &min_y,
+                                         &max_x, &max_y, &has_bounds);
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         break;
@@ -2946,26 +2958,26 @@ static int cmp_gtk4_gfx_draw_path(void *gfx, const CMPPath *path, CMPColor color
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         rc = cmp_gtk4_transform_point_simple(&backend->gsk_transform,
-                                            src->data.cubic_to.x,
-                                            src->data.cubic_to.y, &tx, &ty);
+                                             src->data.cubic_to.x,
+                                             src->data.cubic_to.y, &tx, &ty);
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         dst->data.cubic_to.x = tx;
         dst->data.cubic_to.y = ty;
 
         rc = cmp_gtk4_path_bounds_update(dst->data.cubic_to.cx1,
-                                        dst->data.cubic_to.cy1, &min_x, &min_y,
-                                        &max_x, &max_y, &has_bounds);
+                                         dst->data.cubic_to.cy1, &min_x, &min_y,
+                                         &max_x, &max_y, &has_bounds);
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         rc = cmp_gtk4_path_bounds_update(dst->data.cubic_to.cx2,
-                                        dst->data.cubic_to.cy2, &min_x, &min_y,
-                                        &max_x, &max_y, &has_bounds);
+                                         dst->data.cubic_to.cy2, &min_x, &min_y,
+                                         &max_x, &max_y, &has_bounds);
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         rc = cmp_gtk4_path_bounds_update(dst->data.cubic_to.x,
-                                        dst->data.cubic_to.y, &min_x, &min_y,
-                                        &max_x, &max_y, &has_bounds);
+                                         dst->data.cubic_to.y, &min_x, &min_y,
+                                         &max_x, &max_y, &has_bounds);
         CMP_GTK4_RETURN_IF_ERROR_CLEANUP(
             rc, backend->allocator.free(backend->allocator.ctx, mem));
         break;
@@ -3007,7 +3019,8 @@ static int cmp_gtk4_gfx_draw_path(void *gfx, const CMPPath *path, CMPColor color
 
   cairo_save(backend->frame_cr);
   cmp_gtk4_set_source_color(backend->frame_cr, color);
-  rc = cmp_gtk4_cairo_build_path(backend->frame_cr, path->commands, path->count);
+  rc =
+      cmp_gtk4_cairo_build_path(backend->frame_cr, path->commands, path->count);
   if (rc == CMP_OK) {
     cairo_fill(backend->frame_cr);
   }
@@ -3040,7 +3053,7 @@ static int cmp_gtk4_gfx_push_clip(void *gfx, const CMPRect *rect) {
       return CMP_ERR_UNSUPPORTED;
     }
     rc = cmp_gtk4_transform_rect_simple(&backend->gsk_transform, rect,
-                                       &transformed);
+                                        &transformed);
     CMP_GTK4_RETURN_IF_ERROR(rc);
     cmd.type = CMP_GTK4_CMD_PUSH_CLIP;
     cmd.data.clip.rect = transformed;
@@ -3134,8 +3147,8 @@ static int cmp_gtk4_gfx_set_transform(void *gfx, const CMPMat3 *transform) {
 }
 
 static int cmp_gtk4_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
-                                      cmp_u32 format, const void *pixels,
-                                      cmp_usize size, CMPHandle *out_texture) {
+                                       cmp_u32 format, const void *pixels,
+                                       cmp_usize size, CMPHandle *out_texture) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Texture *texture;
   cairo_format_t cairo_format;
@@ -3201,8 +3214,8 @@ static int cmp_gtk4_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
   texture->surface = surface;
 
   if (pixels != NULL && size != 0) {
-    rc =
-        cmp_gtk4_copy_texture_region(texture, pixels, size, 0, 0, width, height);
+    rc = cmp_gtk4_copy_texture_region(texture, pixels, size, 0, 0, width,
+                                      height);
     if (rc != CMP_OK) {
       cairo_surface_destroy(texture->surface);
       backend->allocator.free(backend->allocator.ctx, texture->pixels);
@@ -3212,7 +3225,7 @@ static int cmp_gtk4_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
   }
 
   rc = cmp_object_header_init(&texture->header, CMP_GTK4_TYPE_TEXTURE, 0,
-                             &g_cmp_gtk4_texture_vtable);
+                              &g_cmp_gtk4_texture_vtable);
   if (rc != CMP_OK) {
     cairo_surface_destroy(texture->surface);
     backend->allocator.free(backend->allocator.ctx, texture->pixels);
@@ -3234,8 +3247,8 @@ static int cmp_gtk4_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
 }
 
 static int cmp_gtk4_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
-                                      cmp_i32 y, cmp_i32 width, cmp_i32 height,
-                                      const void *pixels, cmp_usize size) {
+                                       cmp_i32 y, cmp_i32 width, cmp_i32 height,
+                                       const void *pixels, cmp_usize size) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Texture *resolved;
   int rc;
@@ -3252,12 +3265,13 @@ static int cmp_gtk4_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
 
   backend = (struct CMPGTK4Backend *)gfx;
   rc = cmp_gtk4_backend_resolve(backend, texture, CMP_GTK4_TYPE_TEXTURE,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.update_texture");
   CMP_GTK4_RETURN_IF_ERROR(rc);
-  rc = cmp_gtk4_copy_texture_region(resolved, pixels, size, x, y, width, height);
+  rc =
+      cmp_gtk4_copy_texture_region(resolved, pixels, size, x, y, width, height);
   CMP_GTK4_RETURN_IF_ERROR(rc);
   if (resolved->gdk_texture != NULL) {
     g_object_unref(resolved->gdk_texture);
@@ -3277,18 +3291,19 @@ static int cmp_gtk4_gfx_destroy_texture(void *gfx, CMPHandle texture) {
 
   backend = (struct CMPGTK4Backend *)gfx;
   rc = cmp_gtk4_backend_resolve(backend, texture, CMP_GTK4_TYPE_TEXTURE,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
-  rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.destroy_texture");
+  rc =
+      cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.destroy_texture");
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   return cmp_object_release(&resolved->header);
 }
 
 static int cmp_gtk4_gfx_draw_texture(void *gfx, CMPHandle texture,
-                                    const CMPRect *src, const CMPRect *dst,
-                                    CMPScalar opacity) {
+                                     const CMPRect *src, const CMPRect *dst,
+                                     CMPScalar opacity) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Texture *resolved;
   double scale_x;
@@ -3306,7 +3321,7 @@ static int cmp_gtk4_gfx_draw_texture(void *gfx, CMPHandle texture,
 
   backend = (struct CMPGTK4Backend *)gfx;
   rc = cmp_gtk4_backend_resolve(backend, texture, CMP_GTK4_TYPE_TEXTURE,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
   if (resolved->surface == NULL) {
     return CMP_ERR_STATE;
@@ -3329,7 +3344,7 @@ static int cmp_gtk4_gfx_draw_texture(void *gfx, CMPHandle texture,
       return CMP_ERR_UNSUPPORTED;
     }
     rc = cmp_gtk4_transform_rect_simple(&backend->gsk_transform, dst,
-                                       &transformed);
+                                        &transformed);
     CMP_GTK4_RETURN_IF_ERROR(rc);
     cmd.type = CMP_GTK4_CMD_TEXTURE;
     cmd.data.texture.texture = texture;
@@ -3397,8 +3412,8 @@ static PangoWeight cmp_gtk4_pango_weight(cmp_i32 weight) {
 }
 
 static int cmp_gtk4_text_create_font(void *text, const char *utf8_family,
-                                    cmp_i32 size_px, cmp_i32 weight,
-                                    CMPBool italic, CMPHandle *out_font) {
+                                     cmp_i32 size_px, cmp_i32 weight,
+                                     CMPBool italic, CMPHandle *out_font) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Font *font;
   PangoFontDescription *desc;
@@ -3444,7 +3459,7 @@ static int cmp_gtk4_text_create_font(void *text, const char *utf8_family,
   font->desc = desc;
 
   rc = cmp_object_header_init(&font->header, CMP_GTK4_TYPE_FONT, 0,
-                             &g_cmp_gtk4_font_vtable);
+                              &g_cmp_gtk4_font_vtable);
   if (rc != CMP_OK) {
     pango_font_description_free(desc);
     backend->allocator.free(backend->allocator.ctx, font);
@@ -3474,7 +3489,7 @@ static int cmp_gtk4_text_destroy_font(void *text, CMPHandle font) {
 
   backend = (struct CMPGTK4Backend *)text;
   rc = cmp_gtk4_backend_resolve(backend, font, CMP_GTK4_TYPE_FONT,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.destroy_font");
@@ -3484,9 +3499,10 @@ static int cmp_gtk4_text_destroy_font(void *text, CMPHandle font) {
 }
 
 static int cmp_gtk4_text_measure_text(void *text, CMPHandle font,
-                                     const char *utf8, cmp_usize utf8_len,
-                                     CMPScalar *out_width, CMPScalar *out_height,
-                                     CMPScalar *out_baseline) {
+                                      const char *utf8, cmp_usize utf8_len,
+                                      CMPScalar *out_width,
+                                      CMPScalar *out_height,
+                                      CMPScalar *out_baseline) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Font *resolved;
   cairo_surface_t *surface;
@@ -3507,7 +3523,7 @@ static int cmp_gtk4_text_measure_text(void *text, CMPHandle font,
 
   backend = (struct CMPGTK4Backend *)text;
   rc = cmp_gtk4_backend_resolve(backend, font, CMP_GTK4_TYPE_FONT,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.measure_text");
@@ -3555,8 +3571,8 @@ static int cmp_gtk4_text_measure_text(void *text, CMPHandle font,
 }
 
 static int cmp_gtk4_text_draw_text(void *text, CMPHandle font, const char *utf8,
-                                  cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                                  CMPColor color) {
+                                   cmp_usize utf8_len, CMPScalar x, CMPScalar y,
+                                   CMPColor color) {
   struct CMPGTK4Backend *backend;
   CMPGTK4Font *resolved;
   PangoLayout *layout;
@@ -3575,7 +3591,7 @@ static int cmp_gtk4_text_draw_text(void *text, CMPHandle font, const char *utf8,
 
   backend = (struct CMPGTK4Backend *)text;
   rc = cmp_gtk4_backend_resolve(backend, font, CMP_GTK4_TYPE_FONT,
-                               (void **)&resolved);
+                                (void **)&resolved);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.draw_text");
@@ -3588,8 +3604,8 @@ static int cmp_gtk4_text_draw_text(void *text, CMPHandle font, const char *utf8,
     if (!backend->gsk_transform_simple) {
       return CMP_ERR_UNSUPPORTED;
     }
-    rc =
-        cmp_gtk4_transform_point_simple(&backend->gsk_transform, x, y, &tx, &ty);
+    rc = cmp_gtk4_transform_point_simple(&backend->gsk_transform, x, y, &tx,
+                                         &ty);
     CMP_GTK4_RETURN_IF_ERROR(rc);
 
     cmd.type = CMP_GTK4_CMD_TEXT;
@@ -3652,7 +3668,7 @@ static const CMPTextVTable g_cmp_gtk4_text_vtable = {
     cmp_gtk4_text_measure_text, cmp_gtk4_text_draw_text};
 
 static int cmp_gtk4_io_read_file(void *io, const char *utf8_path, void *buffer,
-                                cmp_usize buffer_size, cmp_usize *out_read) {
+                                 cmp_usize buffer_size, cmp_usize *out_read) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -3672,8 +3688,8 @@ static int cmp_gtk4_io_read_file(void *io, const char *utf8_path, void *buffer,
 }
 
 static int cmp_gtk4_io_read_file_alloc(void *io, const char *utf8_path,
-                                      const CMPAllocator *allocator,
-                                      void **out_data, cmp_usize *out_size) {
+                                       const CMPAllocator *allocator,
+                                       void **out_data, cmp_usize *out_size) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -3696,8 +3712,8 @@ static int cmp_gtk4_io_read_file_alloc(void *io, const char *utf8_path,
 }
 
 static int cmp_gtk4_io_write_file(void *io, const char *utf8_path,
-                                 const void *data, cmp_usize size,
-                                 CMPBool overwrite) {
+                                  const void *data, cmp_usize size,
+                                  CMPBool overwrite) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -3717,7 +3733,7 @@ static int cmp_gtk4_io_write_file(void *io, const char *utf8_path,
 }
 
 static int cmp_gtk4_io_file_exists(void *io, const char *utf8_path,
-                                  CMPBool *out_exists) {
+                                   CMPBool *out_exists) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -3748,7 +3764,7 @@ static int cmp_gtk4_io_delete_file(void *io, const char *utf8_path) {
 }
 
 static int cmp_gtk4_io_stat_file(void *io, const char *utf8_path,
-                                CMPFileInfo *out_info) {
+                                 CMPFileInfo *out_info) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -3765,11 +3781,12 @@ static int cmp_gtk4_io_stat_file(void *io, const char *utf8_path,
 }
 
 static const CMPIOVTable g_cmp_gtk4_io_vtable = {
-    cmp_gtk4_io_read_file,   cmp_gtk4_io_read_file_alloc, cmp_gtk4_io_write_file,
-    cmp_gtk4_io_file_exists, cmp_gtk4_io_delete_file,     cmp_gtk4_io_stat_file};
+    cmp_gtk4_io_read_file,   cmp_gtk4_io_read_file_alloc,
+    cmp_gtk4_io_write_file,  cmp_gtk4_io_file_exists,
+    cmp_gtk4_io_delete_file, cmp_gtk4_io_stat_file};
 
 static int cmp_gtk4_sensors_is_available(void *sensors, cmp_u32 type,
-                                        CMPBool *out_available) {
+                                         CMPBool *out_available) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -3780,7 +3797,8 @@ static int cmp_gtk4_sensors_is_available(void *sensors, cmp_u32 type,
   }
 
   backend = (struct CMPGTK4Backend *)sensors;
-  rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "sensors.is_available");
+  rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
+                            "sensors.is_available");
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   *out_available = CMP_FALSE;
@@ -3820,8 +3838,8 @@ static int cmp_gtk4_sensors_stop(void *sensors, cmp_u32 type) {
 }
 
 static int cmp_gtk4_sensors_read(void *sensors, cmp_u32 type,
-                                CMPSensorReading *out_reading,
-                                CMPBool *out_has_reading) {
+                                 CMPSensorReading *out_reading,
+                                 CMPBool *out_has_reading) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -3841,11 +3859,11 @@ static int cmp_gtk4_sensors_read(void *sensors, cmp_u32 type,
 }
 
 static const CMPSensorsVTable g_cmp_gtk4_sensors_vtable = {
-    cmp_gtk4_sensors_is_available, cmp_gtk4_sensors_start, cmp_gtk4_sensors_stop,
-    cmp_gtk4_sensors_read};
+    cmp_gtk4_sensors_is_available, cmp_gtk4_sensors_start,
+    cmp_gtk4_sensors_stop, cmp_gtk4_sensors_read};
 
 static int cmp_gtk4_camera_path_from_id(cmp_u32 camera_id, char *out_path,
-                                       cmp_usize path_capacity) {
+                                        cmp_usize path_capacity) {
   const char prefix[] = "/dev/video";
   char digits[10];
   cmp_u32 value;
@@ -3883,7 +3901,7 @@ static int cmp_gtk4_camera_path_from_id(cmp_u32 camera_id, char *out_path,
 
 #if CMP_GTK4_V4L2_AVAILABLE
 static int cmp_gtk4_camera_select_id(const CMPCameraConfig *config,
-                                    cmp_u32 *out_id) {
+                                     cmp_u32 *out_id) {
   if (config == NULL || out_id == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -3923,7 +3941,8 @@ static int cmp_gtk4_camera_map_errno(int err) {
   return CMP_ERR_IO;
 }
 
-static int cmp_gtk4_camera_v4l2_from_format(cmp_u32 format, cmp_u32 *out_format) {
+static int cmp_gtk4_camera_v4l2_from_format(cmp_u32 format,
+                                            cmp_u32 *out_format) {
   if (out_format == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -3944,7 +3963,7 @@ static int cmp_gtk4_camera_v4l2_from_format(cmp_u32 format, cmp_u32 *out_format)
 }
 
 static int cmp_gtk4_camera_format_from_v4l2(cmp_u32 v4l2_format,
-                                           cmp_u32 *out_format) {
+                                            cmp_u32 *out_format) {
   if (out_format == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -3965,8 +3984,8 @@ static int cmp_gtk4_camera_format_from_v4l2(cmp_u32 v4l2_format,
 }
 
 static int cmp_gtk4_camera_try_format(int fd, cmp_u32 width, cmp_u32 height,
-                                     cmp_u32 pixfmt,
-                                     struct v4l2_format *out_fmt) {
+                                      cmp_u32 pixfmt,
+                                      struct v4l2_format *out_fmt) {
   struct v4l2_format fmt;
 
   if (out_fmt == NULL) {
@@ -3989,26 +4008,26 @@ static int cmp_gtk4_camera_try_format(int fd, cmp_u32 width, cmp_u32 height,
 }
 
 static int cmp_gtk4_camera_set_format(int fd, cmp_u32 width, cmp_u32 height,
-                                     cmp_u32 format,
-                                     struct v4l2_format *out_fmt) {
+                                      cmp_u32 format,
+                                      struct v4l2_format *out_fmt) {
   int rc;
   cmp_u32 v4l2_format;
 
   if (format == CMP_CAMERA_FORMAT_ANY) {
     rc = cmp_gtk4_camera_try_format(fd, width, height, V4L2_PIX_FMT_NV12,
-                                   out_fmt);
+                                    out_fmt);
     if (rc == CMP_OK) {
       return CMP_OK;
     }
 
     rc = cmp_gtk4_camera_try_format(fd, width, height, V4L2_PIX_FMT_BGR32,
-                                   out_fmt);
+                                    out_fmt);
     if (rc == CMP_OK) {
       return CMP_OK;
     }
 
     rc = cmp_gtk4_camera_try_format(fd, width, height, V4L2_PIX_FMT_RGB32,
-                                   out_fmt);
+                                    out_fmt);
     if (rc == CMP_OK) {
       return CMP_OK;
     }
@@ -4066,7 +4085,7 @@ static int cmp_gtk4_camera_release(struct CMPGTK4Backend *backend) {
 #endif
 
 static int cmp_gtk4_camera_open_with_config(void *camera,
-                                           const CMPCameraConfig *config);
+                                            const CMPCameraConfig *config);
 
 static int cmp_gtk4_camera_open(void *camera, cmp_u32 camera_id) {
   CMPCameraConfig config;
@@ -4081,7 +4100,7 @@ static int cmp_gtk4_camera_open(void *camera, cmp_u32 camera_id) {
 }
 
 static int cmp_gtk4_camera_open_with_config(void *camera,
-                                           const CMPCameraConfig *config) {
+                                            const CMPCameraConfig *config) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -4117,11 +4136,11 @@ static int cmp_gtk4_camera_open_with_config(void *camera,
 
     width =
         (config->width == 0u) ? CMP_GTK4_CAMERA_DEFAULT_WIDTH : config->width;
-    height =
-        (config->height == 0u) ? CMP_GTK4_CAMERA_DEFAULT_HEIGHT : config->height;
+    height = (config->height == 0u) ? CMP_GTK4_CAMERA_DEFAULT_HEIGHT
+                                    : config->height;
 
     rc = cmp_gtk4_camera_path_from_id(camera_id, device_path,
-                                     (cmp_usize)sizeof(device_path));
+                                      (cmp_usize)sizeof(device_path));
     if (rc != CMP_OK) {
       return rc;
     }
@@ -4157,7 +4176,8 @@ static int cmp_gtk4_camera_open_with_config(void *camera,
       close(fd);
       return rc;
     }
-    if (config->format != CMP_CAMERA_FORMAT_ANY && cmp_format != config->format) {
+    if (config->format != CMP_CAMERA_FORMAT_ANY &&
+        cmp_format != config->format) {
       close(fd);
       return CMP_ERR_UNSUPPORTED;
     }
@@ -4280,7 +4300,7 @@ static int cmp_gtk4_camera_stop(void *camera) {
 }
 
 static int cmp_gtk4_camera_read_frame(void *camera, CMPCameraFrame *out_frame,
-                                     CMPBool *out_has_frame) {
+                                      CMPBool *out_has_frame) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -4346,9 +4366,9 @@ static const CMPCameraVTable g_cmp_gtk4_camera_vtable = {
 
 /* GCOVR_EXCL_START */
 static int cmp_gtk4_image_decode(void *image,
-                                const CMPImageDecodeRequest *request,
-                                const CMPAllocator *allocator,
-                                CMPImageData *out_image) {
+                                 const CMPImageDecodeRequest *request,
+                                 const CMPAllocator *allocator,
+                                 CMPImageData *out_image) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -4370,7 +4390,7 @@ static int cmp_gtk4_image_decode(void *image,
 }
 
 static int cmp_gtk4_image_free(void *image, const CMPAllocator *allocator,
-                              CMPImageData *image_data) {
+                               CMPImageData *image_data) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -4389,10 +4409,10 @@ static int cmp_gtk4_image_free(void *image, const CMPAllocator *allocator,
 }
 
 static const CMPImageVTable g_cmp_gtk4_image_vtable = {cmp_gtk4_image_decode,
-                                                     cmp_gtk4_image_free};
+                                                       cmp_gtk4_image_free};
 
 static int cmp_gtk4_video_open(void *video,
-                              const CMPVideoOpenRequest *request) {
+                               const CMPVideoOpenRequest *request) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -4421,7 +4441,7 @@ static int cmp_gtk4_video_close(void *video) {
 }
 
 static int cmp_gtk4_video_read_frame(void *video, CMPVideoFrame *out_frame,
-                                    CMPBool *out_has_frame) {
+                                     CMPBool *out_has_frame) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -4442,9 +4462,9 @@ static const CMPVideoVTable g_cmp_gtk4_video_vtable = {
     cmp_gtk4_video_open, cmp_gtk4_video_close, cmp_gtk4_video_read_frame};
 
 static int cmp_gtk4_audio_decode(void *audio,
-                                const CMPAudioDecodeRequest *request,
-                                const CMPAllocator *allocator,
-                                CMPAudioData *out_audio) {
+                                 const CMPAudioDecodeRequest *request,
+                                 const CMPAllocator *allocator,
+                                 CMPAudioData *out_audio) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -4466,7 +4486,7 @@ static int cmp_gtk4_audio_decode(void *audio,
 }
 
 static int cmp_gtk4_audio_free(void *audio, const CMPAllocator *allocator,
-                              CMPAudioData *audio_data) {
+                               CMPAudioData *audio_data) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -4485,7 +4505,7 @@ static int cmp_gtk4_audio_free(void *audio, const CMPAllocator *allocator,
 }
 
 static const CMPAudioVTable g_cmp_gtk4_audio_vtable = {cmp_gtk4_audio_decode,
-                                                     cmp_gtk4_audio_free};
+                                                       cmp_gtk4_audio_free};
 /* GCOVR_EXCL_STOP */
 
 #if defined(CMP_LIBCURL_AVAILABLE)
@@ -4500,7 +4520,7 @@ typedef struct CMPGTK4CurlBuffer {
 static cmp_u32 g_cmp_gtk4_curl_refcount = 0u;
 
 static int cmp_gtk4_network_add_usize(cmp_usize a, cmp_usize b,
-                                     cmp_usize *out_value) {
+                                      cmp_usize *out_value) {
   if (out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -4512,7 +4532,7 @@ static int cmp_gtk4_network_add_usize(cmp_usize a, cmp_usize b,
 }
 
 static int cmp_gtk4_network_mul_usize(cmp_usize a, cmp_usize b,
-                                     cmp_usize *out_value) {
+                                      cmp_usize *out_value) {
   if (out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -4578,7 +4598,7 @@ static int cmp_gtk4_libcurl_shutdown(void) {
 }
 
 static size_t cmp_gtk4_network_write_cb(char *ptr, size_t size, size_t nmemb,
-                                       void *userdata) {
+                                        void *userdata) {
   CMPGTK4CurlBuffer *buffer;
   cmp_usize chunk;
   cmp_usize new_size;
@@ -4636,8 +4656,8 @@ static size_t cmp_gtk4_network_write_cb(char *ptr, size_t size, size_t nmemb,
 }
 
 static int cmp_gtk4_network_append_headers(struct CMPGTK4Backend *backend,
-                                          const char *headers,
-                                          struct curl_slist **out_list) {
+                                           const char *headers,
+                                           struct curl_slist **out_list) {
   const char *cursor;
   struct curl_slist *list;
 
@@ -4783,8 +4803,8 @@ static int cmp_gtk4_network_append_headers(struct CMPGTK4Backend *backend,
 #endif
 
 static int cmp_gtk4_network_request(void *net, const CMPNetworkRequest *request,
-                                   const CMPAllocator *allocator,
-                                   CMPNetworkResponse *out_response) {
+                                    const CMPAllocator *allocator,
+                                    CMPNetworkResponse *out_response) {
   struct CMPGTK4Backend *backend;
 #if defined(CMP_LIBCURL_AVAILABLE)
   CURL *curl;
@@ -4894,8 +4914,8 @@ static int cmp_gtk4_network_request(void *net, const CMPNetworkRequest *request,
   }
 
   if (request->headers != NULL && request->headers[0] != '\0') {
-    rc =
-        cmp_gtk4_network_append_headers(backend, request->headers, &header_list);
+    rc = cmp_gtk4_network_append_headers(backend, request->headers,
+                                         &header_list);
     if (rc != CMP_OK) {
       goto cleanup;
     }
@@ -4975,8 +4995,8 @@ cleanup:
 }
 
 static int cmp_gtk4_network_free_response(void *net,
-                                         const CMPAllocator *allocator,
-                                         CMPNetworkResponse *response) {
+                                          const CMPAllocator *allocator,
+                                          CMPNetworkResponse *response) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -4992,8 +5012,8 @@ static int cmp_gtk4_network_free_response(void *net,
   }
 
   backend = (struct CMPGTK4Backend *)net;
-  rc =
-      cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "network.free_response");
+  rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
+                            "network.free_response");
   CMP_GTK4_RETURN_IF_ERROR(rc);
 #if defined(CMP_LIBCURL_AVAILABLE)
   if (response->body != NULL) {
@@ -5016,7 +5036,7 @@ static const CMPNetworkVTable g_cmp_gtk4_network_vtable = {
     cmp_gtk4_network_request, cmp_gtk4_network_free_response};
 
 static int cmp_gtk4_tasks_thread_create(void *tasks, CMPThreadFn entry,
-                                       void *user, CMPHandle *out_thread) {
+                                        void *user, CMPHandle *out_thread) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -5028,7 +5048,8 @@ static int cmp_gtk4_tasks_thread_create(void *tasks, CMPThreadFn entry,
   }
 
   backend = (struct CMPGTK4Backend *)tasks;
-  rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.thread_create");
+  rc =
+      cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.thread_create");
   CMP_GTK4_RETURN_IF_ERROR(rc);
   return CMP_ERR_UNSUPPORTED;
 }
@@ -5074,7 +5095,8 @@ static int cmp_gtk4_tasks_mutex_destroy(void *tasks, CMPHandle mutex) {
   }
 
   backend = (struct CMPGTK4Backend *)tasks;
-  rc = cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.mutex_destroy");
+  rc =
+      cmp_gtk4_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "tasks.mutex_destroy");
   CMP_GTK4_RETURN_IF_ERROR(rc);
   return CMP_ERR_UNSUPPORTED;
 }
@@ -5148,7 +5170,7 @@ static int cmp_gtk4_tasks_post(void *tasks, CMPTaskFn fn, void *user) {
 }
 
 static int cmp_gtk4_tasks_post_delayed(void *tasks, CMPTaskFn fn, void *user,
-                                      cmp_u32 delay_ms) {
+                                       cmp_u32 delay_ms) {
   struct CMPGTK4Backend *backend;
   int rc;
 
@@ -5310,12 +5332,14 @@ static int cmp_gtk4_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
 }
 
 static const CMPEnvVTable g_cmp_gtk4_env_vtable = {
-    cmp_gtk4_env_get_io,     cmp_gtk4_env_get_sensors, cmp_gtk4_env_get_camera,
-    cmp_gtk4_env_get_image,  cmp_gtk4_env_get_video,   cmp_gtk4_env_get_audio,
-    cmp_gtk4_env_get_network, cmp_gtk4_env_get_tasks,  cmp_gtk4_env_get_time_ms};
+    cmp_gtk4_env_get_io,      cmp_gtk4_env_get_sensors,
+    cmp_gtk4_env_get_camera,  cmp_gtk4_env_get_image,
+    cmp_gtk4_env_get_video,   cmp_gtk4_env_get_audio,
+    cmp_gtk4_env_get_network, cmp_gtk4_env_get_tasks,
+    cmp_gtk4_env_get_time_ms};
 
 int CMP_CALL cmp_gtk4_backend_create(const CMPGTK4BackendConfig *config,
-                                   CMPGTK4Backend **out_backend) {
+                                     CMPGTK4Backend **out_backend) {
   CMPGTK4BackendConfig local_config;
   CMPAllocator allocator;
   struct CMPGTK4Backend *backend;
@@ -5347,7 +5371,8 @@ int CMP_CALL cmp_gtk4_backend_create(const CMPGTK4BackendConfig *config,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  rc = allocator.alloc(allocator.ctx, sizeof(CMPGTK4Backend), (void **)&backend);
+  rc =
+      allocator.alloc(allocator.ctx, sizeof(CMPGTK4Backend), (void **)&backend);
   CMP_GTK4_RETURN_IF_ERROR(rc);
 
   memset(backend, 0, sizeof(*backend));
@@ -5390,7 +5415,7 @@ int CMP_CALL cmp_gtk4_backend_create(const CMPGTK4BackendConfig *config,
 #endif
 
   rc = cmp_handle_system_default_create(config->handle_capacity, &allocator,
-                                       &backend->handles);
+                                        &backend->handles);
   if (rc != CMP_OK) {
 #if defined(CMP_LIBCURL_AVAILABLE)
     cmp_gtk4_libcurl_shutdown();
@@ -5543,7 +5568,8 @@ int CMP_CALL cmp_gtk4_backend_get_ws(CMPGTK4Backend *backend, CMPWS *out_ws) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_gtk4_backend_get_gfx(CMPGTK4Backend *backend, CMPGfx *out_gfx) {
+int CMP_CALL cmp_gtk4_backend_get_gfx(CMPGTK4Backend *backend,
+                                      CMPGfx *out_gfx) {
   if (backend == NULL || out_gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -5554,7 +5580,8 @@ int CMP_CALL cmp_gtk4_backend_get_gfx(CMPGTK4Backend *backend, CMPGfx *out_gfx) 
   return CMP_OK;
 }
 
-int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *backend, CMPEnv *out_env) {
+int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *backend,
+                                      CMPEnv *out_env) {
   if (backend == NULL || out_env == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -5567,7 +5594,7 @@ int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *backend, CMPEnv *out_env) 
 
 #ifdef CMP_TESTING
 int CMP_CALL cmp_gtk4_backend_test_set_initialized(CMPGTK4Backend *backend,
-                                                 CMPBool initialized) {
+                                                   CMPBool initialized) {
   if (backend == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -5581,7 +5608,7 @@ int CMP_CALL cmp_gtk4_backend_test_set_initialized(CMPGTK4Backend *backend,
 #else
 
 int CMP_CALL cmp_gtk4_backend_create(const CMPGTK4BackendConfig *config,
-                                   CMPGTK4Backend **out_backend) {
+                                     CMPGTK4Backend **out_backend) {
   CMPGTK4BackendConfig local_config;
   int rc;
 
@@ -5617,7 +5644,8 @@ int CMP_CALL cmp_gtk4_backend_get_ws(CMPGTK4Backend *backend, CMPWS *out_ws) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-int CMP_CALL cmp_gtk4_backend_get_gfx(CMPGTK4Backend *backend, CMPGfx *out_gfx) {
+int CMP_CALL cmp_gtk4_backend_get_gfx(CMPGTK4Backend *backend,
+                                      CMPGfx *out_gfx) {
   if (backend == NULL || out_gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -5625,7 +5653,8 @@ int CMP_CALL cmp_gtk4_backend_get_gfx(CMPGTK4Backend *backend, CMPGfx *out_gfx) 
   return CMP_ERR_UNSUPPORTED;
 }
 
-int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *backend, CMPEnv *out_env) {
+int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *backend,
+                                      CMPEnv *out_env) {
   if (backend == NULL || out_env == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

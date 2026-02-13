@@ -46,23 +46,25 @@ struct CMPTextField;
  * @param utf8_len Length of the text buffer in bytes.
  * @return CMP_OK on success or a failure code.
  */
-typedef int(CMP_CALL *CMPTextFieldOnChange)(void *ctx, struct CMPTextField *field,
-                                          const char *utf8, cmp_usize utf8_len);
+typedef int(CMP_CALL *CMPTextFieldOnChange)(void *ctx,
+                                            struct CMPTextField *field,
+                                            const char *utf8,
+                                            cmp_usize utf8_len);
 
 /**
  * @brief Text field style descriptor.
  */
 typedef struct CMPTextFieldStyle {
-  CMPTextStyle text_style;             /**< Text style for input content. */
-  CMPTextStyle label_style;            /**< Text style for the floating label. */
-  CMPColor container_color;            /**< Container fill color. */
-  CMPColor outline_color;              /**< Outline color (idle). */
-  CMPColor focused_outline_color;      /**< Outline color when focused. */
-  CMPColor disabled_container_color;   /**< Container color when disabled. */
-  CMPColor disabled_outline_color;     /**< Outline color when disabled. */
-  CMPColor disabled_text_color;        /**< Text color when disabled. */
-  CMPColor disabled_label_color;       /**< Label color when disabled. */
-  CMPColor placeholder_color;          /**< Placeholder text color. */
+  CMPTextStyle text_style;           /**< Text style for input content. */
+  CMPTextStyle label_style;          /**< Text style for the floating label. */
+  CMPColor container_color;          /**< Container fill color. */
+  CMPColor outline_color;            /**< Outline color (idle). */
+  CMPColor focused_outline_color;    /**< Outline color when focused. */
+  CMPColor disabled_container_color; /**< Container color when disabled. */
+  CMPColor disabled_outline_color;   /**< Outline color when disabled. */
+  CMPColor disabled_text_color;      /**< Text color when disabled. */
+  CMPColor disabled_label_color;     /**< Label color when disabled. */
+  CMPColor placeholder_color;        /**< Placeholder text color. */
   CMPColor disabled_placeholder_color; /**< Placeholder color when disabled. */
   CMPColor cursor_color;               /**< Cursor color. */
   CMPColor selection_color;            /**< Selection highlight color. */
@@ -75,7 +77,7 @@ typedef struct CMPTextFieldStyle {
   CMPScalar label_float_offset; /**< Label floating offset from top (>= 0). */
   CMPScalar
       label_anim_duration; /**< Label animation duration in seconds (>= 0). */
-  CMPScalar cursor_width;   /**< Cursor width in pixels (>= 0). */
+  CMPScalar cursor_width;  /**< Cursor width in pixels (>= 0). */
   CMPScalar cursor_blink_period; /**< Cursor blink period in seconds (>= 0). */
   CMPScalar handle_radius; /**< Selection handle radius in pixels (>= 0). */
   CMPScalar handle_height; /**< Selection handle height in pixels (>= 0). */
@@ -87,7 +89,7 @@ typedef struct CMPTextFieldStyle {
 typedef struct CMPTextField {
   CMPWidget widget; /**< Widget interface (points to this instance). */
   CMPTextBackend
-      text_backend;       /**< Text backend for measurements and rendering. */
+      text_backend;        /**< Text backend for measurements and rendering. */
   CMPTextFieldStyle style; /**< Current text field style. */
   CMPAllocator allocator;  /**< Allocator for internal text buffers. */
   CMPHandle text_font;     /**< Font handle for input text. */
@@ -98,31 +100,33 @@ typedef struct CMPTextField {
   CMPTextMetrics text_font_metrics;   /**< Cached font metrics for text. */
   CMPTextMetrics label_font_metrics;  /**< Cached font metrics for label. */
   CMPRect bounds;                     /**< Layout bounds. */
-  char *utf8;               /**< Owned UTF-8 text buffer (null-terminated). */
+  char *utf8;                /**< Owned UTF-8 text buffer (null-terminated). */
   cmp_usize utf8_len;        /**< UTF-8 length in bytes. */
   cmp_usize utf8_capacity;   /**< UTF-8 buffer capacity in bytes. */
   cmp_usize cursor;          /**< Cursor byte offset in UTF-8 buffer. */
   cmp_usize selection_start; /**< Selection start byte offset. */
   cmp_usize selection_end;   /**< Selection end byte offset. */
   CMPBool selecting; /**< CMP_TRUE when pointer selection drag is active. */
-  CMPBool text_metrics_valid; /**< CMP_TRUE when cached text metrics are valid. */
+  CMPBool
+      text_metrics_valid; /**< CMP_TRUE when cached text metrics are valid. */
   CMPBool
       label_metrics_valid; /**< CMP_TRUE when cached label metrics are valid. */
-  CMPBool placeholder_metrics_valid; /**< CMP_TRUE when cached placeholder metrics
-                                       are valid. */
-  CMPBool font_metrics_valid; /**< CMP_TRUE when cached font metrics are valid. */
-  CMPBool owns_fonts;         /**< CMP_TRUE when widget owns font handles. */
-  CMPBool focused;            /**< CMP_TRUE when field is focused. */
-  CMPBool cursor_visible;     /**< CMP_TRUE when cursor is visible. */
-  CMPScalar cursor_timer;     /**< Cursor blink timer in seconds. */
+  CMPBool placeholder_metrics_valid; /**< CMP_TRUE when cached placeholder
+                                       metrics are valid. */
+  CMPBool
+      font_metrics_valid; /**< CMP_TRUE when cached font metrics are valid. */
+  CMPBool owns_fonts;     /**< CMP_TRUE when widget owns font handles. */
+  CMPBool focused;        /**< CMP_TRUE when field is focused. */
+  CMPBool cursor_visible; /**< CMP_TRUE when cursor is visible. */
+  CMPScalar cursor_timer; /**< Cursor blink timer in seconds. */
   CMPAnimController label_anim;   /**< Label animation controller. */
   CMPScalar label_value;          /**< Current label animation value (0..1). */
-  const char *utf8_label;        /**< UTF-8 label text (may be NULL). */
+  const char *utf8_label;         /**< UTF-8 label text (may be NULL). */
   cmp_usize label_len;            /**< Label text length in bytes. */
-  const char *utf8_placeholder;  /**< UTF-8 placeholder text (may be NULL). */
+  const char *utf8_placeholder;   /**< UTF-8 placeholder text (may be NULL). */
   cmp_usize placeholder_len;      /**< Placeholder text length in bytes. */
   CMPTextFieldOnChange on_change; /**< Change callback (may be NULL). */
-  void *on_change_ctx;           /**< Change callback context pointer. */
+  void *on_change_ctx;            /**< Change callback context pointer. */
 } CMPTextField;
 
 /**
@@ -144,10 +148,11 @@ CMP_API int CMP_CALL cmp_text_field_style_init(CMPTextFieldStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_field_init(CMPTextField *field,
-                                      const CMPTextBackend *backend,
-                                      const CMPTextFieldStyle *style,
-                                      const CMPAllocator *allocator,
-                                      const char *utf8_text, cmp_usize utf8_len);
+                                         const CMPTextBackend *backend,
+                                         const CMPTextFieldStyle *style,
+                                         const CMPAllocator *allocator,
+                                         const char *utf8_text,
+                                         cmp_usize utf8_len);
 
 /**
  * @brief Update the text field content.
@@ -157,8 +162,8 @@ CMP_API int CMP_CALL cmp_text_field_init(CMPTextField *field,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_field_set_text(CMPTextField *field,
-                                          const char *utf8_text,
-                                          cmp_usize utf8_len);
+                                             const char *utf8_text,
+                                             cmp_usize utf8_len);
 
 /**
  * @brief Retrieve the current text buffer.
@@ -168,8 +173,8 @@ CMP_API int CMP_CALL cmp_text_field_set_text(CMPTextField *field,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_field_get_text(const CMPTextField *field,
-                                          const char **out_utf8,
-                                          cmp_usize *out_len);
+                                             const char **out_utf8,
+                                             cmp_usize *out_len);
 
 /**
  * @brief Insert UTF-8 text at the cursor (replacing any selection).
@@ -179,8 +184,8 @@ CMP_API int CMP_CALL cmp_text_field_get_text(const CMPTextField *field,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_field_insert_utf8(CMPTextField *field,
-                                             const char *utf8_text,
-                                             cmp_usize utf8_len);
+                                                const char *utf8_text,
+                                                cmp_usize utf8_len);
 
 /**
  * @brief Delete the current selection, if any.
@@ -211,8 +216,8 @@ CMP_API int CMP_CALL cmp_text_field_delete_forward(CMPTextField *field);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_field_set_label(CMPTextField *field,
-                                           const char *utf8_label,
-                                           cmp_usize label_len);
+                                              const char *utf8_label,
+                                              cmp_usize label_len);
 
 /**
  * @brief Update the text field placeholder.
@@ -222,9 +227,9 @@ CMP_API int CMP_CALL cmp_text_field_set_label(CMPTextField *field,
  * @param placeholder_len Placeholder length in bytes.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_text_field_set_placeholder(CMPTextField *field,
-                                                 const char *utf8_placeholder,
-                                                 cmp_usize placeholder_len);
+CMP_API int CMP_CALL cmp_text_field_set_placeholder(
+    CMPTextField *field, const char *utf8_placeholder,
+    cmp_usize placeholder_len);
 
 /**
  * @brief Update the text field style.
@@ -233,7 +238,7 @@ CMP_API int CMP_CALL cmp_text_field_set_placeholder(CMPTextField *field,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_field_set_style(CMPTextField *field,
-                                           const CMPTextFieldStyle *style);
+                                              const CMPTextFieldStyle *style);
 
 /**
  * @brief Update the text selection range.
@@ -243,7 +248,8 @@ CMP_API int CMP_CALL cmp_text_field_set_style(CMPTextField *field,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_field_set_selection(CMPTextField *field,
-                                               cmp_usize start, cmp_usize end);
+                                                  cmp_usize start,
+                                                  cmp_usize end);
 
 /**
  * @brief Retrieve the current text selection range.
@@ -253,8 +259,8 @@ CMP_API int CMP_CALL cmp_text_field_set_selection(CMPTextField *field,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_field_get_selection(const CMPTextField *field,
-                                               cmp_usize *out_start,
-                                               cmp_usize *out_end);
+                                                  cmp_usize *out_start,
+                                                  cmp_usize *out_end);
 
 /**
  * @brief Update the cursor position.
@@ -263,7 +269,7 @@ CMP_API int CMP_CALL cmp_text_field_get_selection(const CMPTextField *field,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_field_set_cursor(CMPTextField *field,
-                                            cmp_usize cursor);
+                                               cmp_usize cursor);
 
 /**
  * @brief Retrieve the cursor position.
@@ -272,7 +278,7 @@ CMP_API int CMP_CALL cmp_text_field_set_cursor(CMPTextField *field,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_field_get_cursor(const CMPTextField *field,
-                                            cmp_usize *out_cursor);
+                                               cmp_usize *out_cursor);
 
 /**
  * @brief Set the text field focus state.
@@ -280,7 +286,8 @@ CMP_API int CMP_CALL cmp_text_field_get_cursor(const CMPTextField *field,
  * @param focused CMP_TRUE to focus, CMP_FALSE to unfocus.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_text_field_set_focus(CMPTextField *field, CMPBool focused);
+CMP_API int CMP_CALL cmp_text_field_set_focus(CMPTextField *field,
+                                              CMPBool focused);
 
 /**
  * @brief Step text field animations (label and cursor).
@@ -290,7 +297,7 @@ CMP_API int CMP_CALL cmp_text_field_set_focus(CMPTextField *field, CMPBool focus
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_field_step(CMPTextField *field, CMPScalar dt,
-                                      CMPBool *out_changed);
+                                         CMPBool *out_changed);
 
 /**
  * @brief Assign a change callback to the text field.
@@ -299,9 +306,8 @@ CMP_API int CMP_CALL cmp_text_field_step(CMPTextField *field, CMPScalar dt,
  * @param ctx Callback context pointer.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_text_field_set_on_change(CMPTextField *field,
-                                               CMPTextFieldOnChange on_change,
-                                               void *ctx);
+CMP_API int CMP_CALL cmp_text_field_set_on_change(
+    CMPTextField *field, CMPTextFieldOnChange on_change, void *ctx);
 
 #ifdef __cplusplus
 } /* extern "C" */

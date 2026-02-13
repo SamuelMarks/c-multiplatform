@@ -8,15 +8,17 @@
 #define M3_PROGRESS_TEST_FAIL_COLOR_SET 1u
 #define M3_PROGRESS_TEST_FAIL_COLOR_WITH_ALPHA 2u
 #define M3_PROGRESS_TEST_FAIL_LINEAR_CORNER_RANGE 3u
-#define M3_PROGRESS_TEST_FAIL_LINEAR_FILL_CORNER_RANGE 4u /* GCOVR_EXCL_LINE   \
-                                                           */
+#define M3_PROGRESS_TEST_FAIL_LINEAR_FILL_CORNER_RANGE                         \
+  4u /* GCOVR_EXCL_LINE                                                        \
+      */
 #define M3_PROGRESS_TEST_FAIL_LINEAR_FILL_CORNER_CLAMP 5u
 #define M3_PROGRESS_TEST_FAIL_SLIDER_SNAP_COUNT_NEGATIVE 6u
 #define M3_PROGRESS_TEST_FAIL_SLIDER_SNAP_CLAMP_MIN 7u
 #define M3_PROGRESS_TEST_FAIL_SLIDER_SNAP_CLAMP_MAX 8u
 #define M3_PROGRESS_TEST_FAIL_SLIDER_FRACTION_NEGATIVE 9u
-#define M3_PROGRESS_TEST_FAIL_SLIDER_FRACTION_POSITIVE 10u /* GCOVR_EXCL_LINE  \
-                                                            */
+#define M3_PROGRESS_TEST_FAIL_SLIDER_FRACTION_POSITIVE                         \
+  10u /* GCOVR_EXCL_LINE                                                       \
+       */
 #define M3_PROGRESS_TEST_FAIL_SLIDER_FROM_X_FRACTION_HIGH 11u
 #define M3_PROGRESS_TEST_FAIL_SLIDER_CORNER_RANGE 12u
 #define M3_PROGRESS_TEST_FAIL_LINEAR_RESOLVE_COLORS 13u /* GCOVR_EXCL_LINE */
@@ -130,8 +132,8 @@ m3_progress_color_with_alpha(const CMPColor *base, CMPScalar alpha,
 }
 
 static int m3_progress_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -221,9 +223,10 @@ m3_linear_progress_validate_style(const M3LinearProgressStyle *style) {
   return CMP_OK;
 }
 
-static int m3_linear_progress_resolve_colors(const M3LinearProgress *progress,
-                                             CMPColor *out_track, /* GCOVR_EXCL_LINE */
-                                             CMPColor *out_indicator) {
+static int
+m3_linear_progress_resolve_colors(const M3LinearProgress *progress,
+                                  CMPColor *out_track, /* GCOVR_EXCL_LINE */
+                                  CMPColor *out_indicator) {
   int rc;
 
   if (progress == NULL || out_track == NULL || out_indicator == NULL) {
@@ -255,9 +258,10 @@ static int m3_linear_progress_resolve_colors(const M3LinearProgress *progress,
   return CMP_OK;
 }
 
-static int m3_linear_progress_widget_measure(void *widget, CMPMeasureSpec width,
-                                             CMPMeasureSpec height, /* GCOVR_EXCL_LINE */
-                                             CMPSize *out_size) {
+static int
+m3_linear_progress_widget_measure(void *widget, CMPMeasureSpec width,
+                                  CMPMeasureSpec height, /* GCOVR_EXCL_LINE */
+                                  CMPSize *out_size) {
   M3LinearProgress *progress; /* GCOVR_EXCL_LINE */
   int rc;                     /* GCOVR_EXCL_LINE */
 
@@ -311,7 +315,7 @@ static int m3_linear_progress_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPScalar corner;         /* GCOVR_EXCL_LINE */
   CMPScalar fill_corner;
   CMPScalar fill_width; /* GCOVR_EXCL_LINE */
-  int rc;              /* GCOVR_EXCL_LINE */
+  int rc;               /* GCOVR_EXCL_LINE */
 
   if (widget == NULL || ctx == NULL || ctx->gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -407,10 +411,9 @@ static int m3_linear_progress_widget_paint(void *widget, CMPPaintContext *ctx) {
   return CMP_OK;
 }
 
-static int
-m3_linear_progress_widget_event(void *widget,
-                                const CMPInputEvent *event, /* GCOVR_EXCL_LINE */
-                                CMPBool *out_handled) {
+static int m3_linear_progress_widget_event(
+    void *widget, const CMPInputEvent *event, /* GCOVR_EXCL_LINE */
+    CMPBool *out_handled) {
   if (widget == NULL || event == NULL || out_handled == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -423,7 +426,7 @@ m3_linear_progress_widget_event(void *widget,
 
 static int m3_linear_progress_widget_get_semantics(
     void *widget, CMPSemantics *out_semantics) { /* GCOVR_EXCL_LINE */
-  M3LinearProgress *progress;                   /* GCOVR_EXCL_LINE */
+  M3LinearProgress *progress;                    /* GCOVR_EXCL_LINE */
 
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -512,7 +515,7 @@ int CMP_CALL m3_linear_progress_style_init(M3LinearProgressStyle *style) {
 int CMP_CALL m3_linear_progress_init(
     M3LinearProgress *progress,
     const M3LinearProgressStyle *style, /* GCOVR_EXCL_LINE */
-    CMPScalar value) {                   /* GCOVR_EXCL_LINE */
+    CMPScalar value) {                  /* GCOVR_EXCL_LINE */
   int rc;                               /* GCOVR_EXCL_LINE */
 
   if (progress == NULL || style == NULL) {
@@ -539,9 +542,9 @@ int CMP_CALL m3_linear_progress_init(
   return CMP_OK;
 }
 
-int CMP_CALL m3_linear_progress_set_value(M3LinearProgress *progress,
-                                         CMPScalar value) { /* GCOVR_EXCL_LINE */
-  int rc;                                                  /* GCOVR_EXCL_LINE */
+int CMP_CALL m3_linear_progress_set_value(
+    M3LinearProgress *progress, CMPScalar value) { /* GCOVR_EXCL_LINE */
+  int rc;                                          /* GCOVR_EXCL_LINE */
 
   if (progress == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -556,8 +559,9 @@ int CMP_CALL m3_linear_progress_set_value(M3LinearProgress *progress,
   return CMP_OK;
 }
 
-int CMP_CALL m3_linear_progress_get_value(const M3LinearProgress *progress,
-                                         CMPScalar *out_value) { /* GCOVR_EXCL_LINE */
+int CMP_CALL
+m3_linear_progress_get_value(const M3LinearProgress *progress,
+                             CMPScalar *out_value) { /* GCOVR_EXCL_LINE */
   if (progress == NULL || out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -567,7 +571,7 @@ int CMP_CALL m3_linear_progress_get_value(const M3LinearProgress *progress,
 }
 
 int CMP_CALL m3_linear_progress_set_style(
-    M3LinearProgress *progress, /* GCOVR_EXCL_LINE */
+    M3LinearProgress *progress,           /* GCOVR_EXCL_LINE */
     const M3LinearProgressStyle *style) { /* GCOVR_EXCL_LINE */
   int rc;                                 /* GCOVR_EXCL_LINE */
 
@@ -586,7 +590,7 @@ int CMP_CALL m3_linear_progress_set_style(
 
 int CMP_CALL m3_linear_progress_set_label(
     M3LinearProgress *progress, const char *utf8_label, /* GCOVR_EXCL_LINE */
-    cmp_usize utf8_len) {                                /* GCOVR_EXCL_LINE */
+    cmp_usize utf8_len) {                               /* GCOVR_EXCL_LINE */
   if (progress == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -641,16 +645,18 @@ m3_circular_progress_validate_style(const M3CircularProgressStyle *style) {
 
 static int /* GCOVR_EXCL_LINE */
 m3_circular_progress_resolve_colors(
-    const M3CircularProgress *progress, CMPColor *out_track, /* GCOVR_EXCL_LINE */
+    const M3CircularProgress *progress,
+    CMPColor *out_track,       /* GCOVR_EXCL_LINE */
     CMPColor *out_indicator) { /* GCOVR_EXCL_LINE */
-  int rc;                     /* GCOVR_EXCL_LINE */
+  int rc;                      /* GCOVR_EXCL_LINE */
 
   if (progress == NULL || out_track == NULL || out_indicator == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (m3_progress_test_fail_point_match(
-          M3_PROGRESS_TEST_FAIL_CIRCULAR_RESOLVE_COLORS)) { /* GCOVR_EXCL_LINE */
+          M3_PROGRESS_TEST_FAIL_CIRCULAR_RESOLVE_COLORS)) { /* GCOVR_EXCL_LINE
+                                                             */
     return CMP_ERR_IO;
   }
 #endif /* GCOVR_EXCL_LINE */
@@ -675,8 +681,9 @@ m3_circular_progress_resolve_colors(
 }
 
 static int m3_circular_progress_draw_arc(
-    CMPGfx *gfx, CMPScalar cx, CMPScalar cy, CMPScalar radius, CMPScalar start_angle,
-    CMPScalar end_angle, CMPColor color,     /* GCOVR_EXCL_LINE */
+    CMPGfx *gfx, CMPScalar cx, CMPScalar cy, CMPScalar radius,
+    CMPScalar start_angle, CMPScalar end_angle,
+    CMPColor color,                          /* GCOVR_EXCL_LINE */
     CMPScalar thickness, cmp_u32 segments) { /* GCOVR_EXCL_LINE */
   CMPScalar full;
   CMPScalar step;  /* GCOVR_EXCL_LINE */
@@ -728,7 +735,7 @@ m3_circular_progress_widget_measure(void *widget,
                                     CMPMeasureSpec width,  /* GCOVR_EXCL_LINE */
                                     CMPMeasureSpec height, /* GCOVR_EXCL_LINE */
                                     CMPSize *out_size) {   /* GCOVR_EXCL_LINE */
-  M3CircularProgress *progress;                           /* GCOVR_EXCL_LINE */
+  M3CircularProgress *progress;                            /* GCOVR_EXCL_LINE */
   int rc;
 
   if (widget == NULL || out_size == NULL) {
@@ -784,7 +791,7 @@ m3_circular_progress_widget_paint(void *widget,
   CMPScalar cx;
   CMPScalar cy;        /* GCOVR_EXCL_LINE */
   CMPScalar end_angle; /* GCOVR_EXCL_LINE */
-  int rc;             /* GCOVR_EXCL_LINE */
+  int rc;              /* GCOVR_EXCL_LINE */
 
   if (widget == NULL || ctx == NULL || ctx->gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -919,14 +926,14 @@ static int m3_circular_progress_widget_destroy(void *widget) {
   return CMP_OK;
 }
 
-static const CMPWidgetVTable g_m3_circular_progress_widget_vtable = /* GCOVR_EXCL_LINE */
-    {
-     m3_circular_progress_widget_measure,
-     m3_circular_progress_widget_layout, /* GCOVR_EXCL_LINE */
-     m3_circular_progress_widget_paint,  /* GCOVR_EXCL_LINE */
-     m3_circular_progress_widget_event,  /* GCOVR_EXCL_LINE */
+static const CMPWidgetVTable
+    g_m3_circular_progress_widget_vtable = /* GCOVR_EXCL_LINE */
+    {m3_circular_progress_widget_measure,
+     m3_circular_progress_widget_layout,        /* GCOVR_EXCL_LINE */
+     m3_circular_progress_widget_paint,         /* GCOVR_EXCL_LINE */
+     m3_circular_progress_widget_event,         /* GCOVR_EXCL_LINE */
      m3_circular_progress_widget_get_semantics, /* GCOVR_EXCL_LINE */
-     m3_circular_progress_widget_destroy}; /* GCOVR_EXCL_LINE */
+     m3_circular_progress_widget_destroy};      /* GCOVR_EXCL_LINE */
 
 int CMP_CALL m3_circular_progress_style_init(M3CircularProgressStyle *style) {
   int rc;
@@ -964,11 +971,13 @@ int CMP_CALL m3_circular_progress_style_init(M3CircularProgressStyle *style) {
   return CMP_OK;
 }
 
-int CMP_CALL m3_circular_progress_init( /* GCOVR_EXCL_LINE */
-    M3CircularProgress *progress, /* GCOVR_EXCL_LINE */
-    const M3CircularProgressStyle *style, /* GCOVR_EXCL_LINE */
-    CMPScalar value) {                     /* GCOVR_EXCL_LINE */
-  int rc;                                 /* GCOVR_EXCL_LINE */
+int CMP_CALL
+m3_circular_progress_init(                              /* GCOVR_EXCL_LINE */
+                          M3CircularProgress *progress, /* GCOVR_EXCL_LINE */
+                          const M3CircularProgressStyle
+                              *style,        /* GCOVR_EXCL_LINE */
+                          CMPScalar value) { /* GCOVR_EXCL_LINE */
+  int rc;                                    /* GCOVR_EXCL_LINE */
 
   if (progress == NULL || style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -996,7 +1005,7 @@ int CMP_CALL m3_circular_progress_init( /* GCOVR_EXCL_LINE */
 
 int CMP_CALL m3_circular_progress_set_value(
     M3CircularProgress *progress, CMPScalar value) { /* GCOVR_EXCL_LINE */
-  int rc;                                           /* GCOVR_EXCL_LINE */
+  int rc;                                            /* GCOVR_EXCL_LINE */
 
   if (progress == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1022,9 +1031,11 @@ m3_circular_progress_get_value(const M3CircularProgress *progress,
   return CMP_OK;
 }
 
-int CMP_CALL m3_circular_progress_set_style( /* GCOVR_EXCL_LINE */
-    M3CircularProgress *progress, const M3CircularProgressStyle *style) { /* GCOVR_EXCL_LINE */
-  int rc; /* GCOVR_EXCL_LINE */
+int CMP_CALL m3_circular_progress_set_style(/* GCOVR_EXCL_LINE */
+                                            M3CircularProgress *progress,
+                                            const M3CircularProgressStyle
+                                                *style) { /* GCOVR_EXCL_LINE */
+  int rc;                                                 /* GCOVR_EXCL_LINE */
 
   if (progress == NULL || style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1041,7 +1052,7 @@ int CMP_CALL m3_circular_progress_set_style( /* GCOVR_EXCL_LINE */
 
 int CMP_CALL m3_circular_progress_set_label(
     M3CircularProgress *progress, const char *utf8_label, /* GCOVR_EXCL_LINE */
-    cmp_usize utf8_len) {                                  /* GCOVR_EXCL_LINE */
+    cmp_usize utf8_len) {                                 /* GCOVR_EXCL_LINE */
   if (progress == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1214,7 +1225,8 @@ static int m3_slider_value_to_fraction(const M3Slider *slider,
   *out_fraction = (slider->value - slider->min_value) / range;
 #ifdef CMP_TESTING
   if (m3_progress_test_fail_point_match(
-          M3_PROGRESS_TEST_FAIL_SLIDER_FRACTION_NEGATIVE)) { /* GCOVR_EXCL_LINE */
+          M3_PROGRESS_TEST_FAIL_SLIDER_FRACTION_NEGATIVE)) { /* GCOVR_EXCL_LINE
+                                                              */
     *out_fraction = -1.0f;
   }
   if (m3_progress_test_fail_point_match(
@@ -1252,7 +1264,8 @@ static int m3_slider_value_from_x(const M3Slider *slider, CMPScalar x,
   fraction = (x - slider->bounds.x) / slider->bounds.width;
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (m3_progress_test_fail_point_match(
-          M3_PROGRESS_TEST_FAIL_SLIDER_FROM_X_FRACTION_HIGH)) { /* GCOVR_EXCL_LINE */
+          M3_PROGRESS_TEST_FAIL_SLIDER_FROM_X_FRACTION_HIGH)) { /* GCOVR_EXCL_LINE
+                                                                 */
     fraction = 2.0f;
   }
 #endif /* GCOVR_EXCL_LINE */
@@ -1345,7 +1358,7 @@ static int m3_slider_update_value(M3Slider *slider, CMPScalar next_value,
 static int m3_slider_widget_measure(void *widget, CMPMeasureSpec width,
                                     CMPMeasureSpec height,
                                     CMPSize *out_size) { /* GCOVR_EXCL_LINE */
-  M3Slider *slider;                                     /* GCOVR_EXCL_LINE */
+  M3Slider *slider;                                      /* GCOVR_EXCL_LINE */
   CMPScalar desired_height;                              /* GCOVR_EXCL_LINE */
   int rc;
 
@@ -1395,8 +1408,8 @@ static int m3_slider_widget_layout(void *widget, CMPRect bounds) {
 }
 
 static int m3_slider_widget_paint(void *widget, CMPPaintContext *ctx) {
-  M3Slider *slider; /* GCOVR_EXCL_LINE */
-  CMPRect bounds; /* GCOVR_EXCL_LINE */
+  M3Slider *slider;     /* GCOVR_EXCL_LINE */
+  CMPRect bounds;       /* GCOVR_EXCL_LINE */
   CMPRect track;        /* GCOVR_EXCL_LINE */
   CMPRect active;       /* GCOVR_EXCL_LINE */
   CMPRect thumb;        /* GCOVR_EXCL_LINE */
@@ -1515,7 +1528,7 @@ static int m3_slider_widget_paint(void *widget, CMPPaintContext *ctx) {
 
 static int m3_slider_widget_event(void *widget, const CMPInputEvent *event,
                                   CMPBool *out_handled) { /* GCOVR_EXCL_LINE */
-  M3Slider *slider;                                      /* GCOVR_EXCL_LINE */
+  M3Slider *slider;                                       /* GCOVR_EXCL_LINE */
   CMPScalar next_value;                                   /* GCOVR_EXCL_LINE */
   int rc = CMP_OK;
 
@@ -1628,10 +1641,14 @@ static int m3_slider_widget_destroy(void *widget) {
   return CMP_OK;
 }
 
-static const CMPWidgetVTable g_m3_slider_widget_vtable = { /* GCOVR_EXCL_LINE */
-    m3_slider_widget_measure,       m3_slider_widget_layout,
-    m3_slider_widget_paint,         m3_slider_widget_event, /* GCOVR_EXCL_LINE */
-    m3_slider_widget_get_semantics, m3_slider_widget_destroy};
+static const CMPWidgetVTable g_m3_slider_widget_vtable =
+    {/* GCOVR_EXCL_LINE */
+     m3_slider_widget_measure,
+     m3_slider_widget_layout,
+     m3_slider_widget_paint,
+     m3_slider_widget_event, /* GCOVR_EXCL_LINE */
+     m3_slider_widget_get_semantics,
+     m3_slider_widget_destroy};
 
 int CMP_CALL m3_slider_style_init(M3SliderStyle *style) {
   int rc; /* GCOVR_EXCL_LINE */
@@ -1679,9 +1696,9 @@ int CMP_CALL m3_slider_style_init(M3SliderStyle *style) {
 }
 
 int CMP_CALL m3_slider_init(M3Slider *slider, const M3SliderStyle *style,
-                           CMPScalar min_value, /* GCOVR_EXCL_LINE */
-                           CMPScalar max_value, /* GCOVR_EXCL_LINE */
-                           CMPScalar value) {   /* GCOVR_EXCL_LINE */
+                            CMPScalar min_value, /* GCOVR_EXCL_LINE */
+                            CMPScalar max_value, /* GCOVR_EXCL_LINE */
+                            CMPScalar value) {   /* GCOVR_EXCL_LINE */
   CMPScalar snapped;
   int rc; /* GCOVR_EXCL_LINE */
 
@@ -1724,7 +1741,7 @@ int CMP_CALL m3_slider_init(M3Slider *slider, const M3SliderStyle *style,
 
 int CMP_CALL m3_slider_set_value(M3Slider *slider, CMPScalar value) {
   CMPScalar snapped; /* GCOVR_EXCL_LINE */
-  int rc;           /* GCOVR_EXCL_LINE */
+  int rc;            /* GCOVR_EXCL_LINE */
 
   if (slider == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1758,9 +1775,9 @@ int CMP_CALL m3_slider_get_value(const M3Slider *slider, CMPScalar *out_value) {
 }
 
 int CMP_CALL m3_slider_set_range(M3Slider *slider, CMPScalar min_value,
-                                CMPScalar max_value) {
+                                 CMPScalar max_value) {
   CMPScalar snapped; /* GCOVR_EXCL_LINE */
-  int rc;           /* GCOVR_EXCL_LINE */
+  int rc;            /* GCOVR_EXCL_LINE */
 
   if (slider == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1791,7 +1808,7 @@ int CMP_CALL m3_slider_set_range(M3Slider *slider, CMPScalar min_value,
 
 int CMP_CALL m3_slider_set_step(M3Slider *slider, CMPScalar step) {
   CMPScalar snapped; /* GCOVR_EXCL_LINE */
-  int rc;           /* GCOVR_EXCL_LINE */
+  int rc;            /* GCOVR_EXCL_LINE */
 
   if (slider == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1832,7 +1849,7 @@ int CMP_CALL m3_slider_set_style(M3Slider *slider, const M3SliderStyle *style) {
 }
 
 int CMP_CALL m3_slider_set_label(M3Slider *slider, const char *utf8_label,
-                                cmp_usize utf8_len) { /* GCOVR_EXCL_LINE */
+                                 cmp_usize utf8_len) { /* GCOVR_EXCL_LINE */
   if (slider == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1846,8 +1863,8 @@ int CMP_CALL m3_slider_set_label(M3Slider *slider, const char *utf8_label,
 }
 
 int CMP_CALL m3_slider_set_on_change(M3Slider *slider,
-                                    CMPSliderOnChange on_change,
-                                    void *ctx) { /* GCOVR_EXCL_LINE */
+                                     CMPSliderOnChange on_change,
+                                     void *ctx) { /* GCOVR_EXCL_LINE */
   if (slider == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1888,8 +1905,8 @@ int CMP_CALL m3_progress_test_validate_color(const CMPColor *color) {
   return m3_progress_validate_color(color);
 }
 
-int CMP_CALL m3_progress_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                       CMPScalar b, CMPScalar a) {
+int CMP_CALL m3_progress_test_color_set(CMPColor *color, CMPScalar r,
+                                        CMPScalar g, CMPScalar b, CMPScalar a) {
   return m3_progress_color_set(color, r, g, b, a);
 }
 
@@ -1903,8 +1920,9 @@ int CMP_CALL m3_progress_test_validate_measure_spec(CMPMeasureSpec spec) {
   return m3_progress_validate_measure_spec(spec);
 }
 
-int CMP_CALL m3_progress_test_apply_measure(CMPScalar desired, CMPMeasureSpec spec,
-                                           CMPScalar *out_size) {
+int CMP_CALL m3_progress_test_apply_measure(CMPScalar desired,
+                                            CMPMeasureSpec spec,
+                                            CMPScalar *out_size) {
   return m3_progress_apply_measure(desired, spec, out_size);
 }
 
@@ -1940,45 +1958,47 @@ int CMP_CALL m3_progress_test_circular_resolve_colors(
 }
 
 int CMP_CALL m3_progress_test_circular_draw_arc(
-    CMPGfx *gfx, CMPScalar cx, CMPScalar cy, CMPScalar radius, CMPScalar start_angle,
-    CMPScalar end_angle, CMPColor color, CMPScalar thickness, cmp_u32 segments) {
+    CMPGfx *gfx, CMPScalar cx, CMPScalar cy, CMPScalar radius,
+    CMPScalar start_angle, CMPScalar end_angle, CMPColor color,
+    CMPScalar thickness, cmp_u32 segments) {
   return m3_circular_progress_draw_arc(gfx, cx, cy, radius, start_angle,
                                        end_angle, color, thickness, segments);
 }
 
-int CMP_CALL m3_progress_test_slider_validate_style(const M3SliderStyle *style) {
+int CMP_CALL
+m3_progress_test_slider_validate_style(const M3SliderStyle *style) {
   return m3_slider_validate_style(style);
 }
 
-int CMP_CALL m3_progress_test_slider_value_to_fraction(const M3Slider *slider,
-                                                      CMPScalar *out_fraction) {
+int CMP_CALL m3_progress_test_slider_value_to_fraction(
+    const M3Slider *slider, CMPScalar *out_fraction) {
   return m3_slider_value_to_fraction(slider, out_fraction);
 }
 
 int CMP_CALL m3_progress_test_slider_value_from_x(const M3Slider *slider,
-                                                 CMPScalar x,
-                                                 CMPScalar *out_value) {
+                                                  CMPScalar x,
+                                                  CMPScalar *out_value) {
   return m3_slider_value_from_x(slider, x, out_value);
 }
 
 int CMP_CALL m3_progress_test_slider_snap_value(CMPScalar value,
-                                               CMPScalar min_value,
-                                               CMPScalar max_value,
-                                               CMPScalar step,
-                                               CMPScalar *out_value) {
+                                                CMPScalar min_value,
+                                                CMPScalar max_value,
+                                                CMPScalar step,
+                                                CMPScalar *out_value) {
   return m3_slider_snap_value(value, min_value, max_value, step, out_value);
 }
 
 int CMP_CALL m3_progress_test_slider_resolve_colors(const M3Slider *slider,
-                                                   CMPColor *out_track,
-                                                   CMPColor *out_active,
-                                                   CMPColor *out_thumb) {
+                                                    CMPColor *out_track,
+                                                    CMPColor *out_active,
+                                                    CMPColor *out_thumb) {
   return m3_slider_resolve_colors(slider, out_track, out_active, out_thumb);
 }
 
 int CMP_CALL m3_progress_test_slider_update_value(M3Slider *slider,
-                                                 CMPScalar next_value,
-                                                 CMPBool notify) {
+                                                  CMPScalar next_value,
+                                                  CMPBool notify) {
   return m3_slider_update_value(slider, next_value, notify);
 }
 #endif

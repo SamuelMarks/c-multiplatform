@@ -101,9 +101,10 @@ int main(void) {
 
   CMP_TEST_EXPECT(cmp_path_move_to(&path, 0.0f, 0.0f), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_path_line_to(&path, 0.0f, 0.0f), CMP_ERR_STATE);
-  CMP_TEST_EXPECT(cmp_path_quad_to(&path, 0.0f, 0.0f, 0.0f, 0.0f), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_path_quad_to(&path, 0.0f, 0.0f, 0.0f, 0.0f),
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_path_cubic_to(&path, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_path_close(&path), CMP_ERR_STATE);
 
   CMP_TEST_EXPECT(cmp_path_init(NULL, NULL, 0), CMP_ERR_INVALID_ARGUMENT);
@@ -116,28 +117,30 @@ int main(void) {
     cmp_usize max_value;
 
     CMP_TEST_EXPECT(cmp_path_test_add_overflow(1, 2, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_path_test_add_overflow(1, 2, &out_value));
     CMP_TEST_ASSERT(out_value == 3);
     max_value = (cmp_usize) ~(cmp_usize)0;
     CMP_TEST_EXPECT(cmp_path_test_add_overflow(max_value, 1, &out_value),
-                   CMP_ERR_OVERFLOW);
+                    CMP_ERR_OVERFLOW);
     CMP_TEST_EXPECT(cmp_path_test_mul_overflow(2, 3, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_path_test_mul_overflow(2, 3, &out_value));
     CMP_TEST_ASSERT(out_value == 6);
     CMP_TEST_EXPECT(cmp_path_test_has_current(&path, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_path_test_has_current(&path, &has_current), CMP_ERR_STATE);
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_path_test_has_current(&path, &has_current),
+                    CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_path_test_reserve(&path, 1), CMP_ERR_STATE);
-    CMP_TEST_EXPECT(cmp_path_test_append(&path, NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_path_test_append(&path, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
 
     memset(&bad_path, 0, sizeof(bad_path));
     bad_path.commands = &dummy_cmd;
     bad_path.capacity = 1;
     bad_path.count = 2;
     CMP_TEST_EXPECT(cmp_path_test_has_current(&bad_path, &has_current),
-                   CMP_ERR_STATE);
+                    CMP_ERR_STATE);
   }
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
   CMP_TEST_EXPECT(cmp_path_init(&path, NULL, 1), CMP_ERR_UNKNOWN);
@@ -148,7 +151,8 @@ int main(void) {
   bad_alloc.alloc = NULL;
   bad_alloc.realloc = NULL;
   bad_alloc.free = NULL;
-  CMP_TEST_EXPECT(cmp_path_init(&path, &bad_alloc, 1), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_path_init(&path, &bad_alloc, 1),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   test_allocator_init(&alloc);
   alloc_iface.ctx = &alloc;
@@ -164,7 +168,7 @@ int main(void) {
   cmd_size = (cmp_usize)sizeof(CMPPathCmd);
   overflow_capacity = max_size / cmd_size + 1;
   CMP_TEST_EXPECT(cmp_path_init(&path, &alloc_iface, overflow_capacity),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
 
 #ifdef CMP_TESTING
   {
@@ -224,16 +228,18 @@ int main(void) {
 
   memset(&path, 0, sizeof(path));
   CMP_TEST_OK(cmp_path_init(&path, &alloc_iface, 1));
-  CMP_TEST_EXPECT(cmp_path_quad_to(&path, 0.0f, 0.0f, 0.0f, 0.0f), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_path_quad_to(&path, 0.0f, 0.0f, 0.0f, 0.0f),
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_path_cubic_to(&path, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_path_line_to(&path, 1.0f, 2.0f), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_path_close(&path), CMP_ERR_STATE);
 
   CMP_TEST_OK(cmp_path_move_to(&path, 1.0f, 2.0f));
   CMP_TEST_OK(cmp_path_line_to(&path, 3.0f, 4.0f));
   CMP_TEST_OK(cmp_path_quad_to(&path, 5.0f, 6.0f, 7.0f, 8.0f));
-  CMP_TEST_OK(cmp_path_cubic_to(&path, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f));
+  CMP_TEST_OK(
+      cmp_path_cubic_to(&path, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f));
   CMP_TEST_OK(cmp_path_close(&path));
   CMP_TEST_EXPECT(cmp_path_line_to(&path, 15.0f, 16.0f), CMP_ERR_STATE);
 

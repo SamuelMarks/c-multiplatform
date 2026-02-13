@@ -61,29 +61,30 @@ struct M3TabRow;
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPTabRowOnSelect)(void *ctx, struct M3TabRow *row,
-                                       cmp_usize index);
+                                         cmp_usize index);
 
 /**
  * @brief Tab row style descriptor.
  */
 typedef struct M3TabRowStyle {
-  cmp_u32 mode;                  /**< Tab layout mode (CMP_TAB_MODE_*). */
-  CMPLayoutEdges padding;        /**< Padding around the tab row. */
-  CMPScalar spacing;             /**< Spacing between tabs in pixels (>= 0). */
-  CMPScalar min_width;           /**< Minimum tab width in pixels (>= 0). */
-  CMPScalar min_height;          /**< Minimum tab height in pixels (>= 0). */
-  CMPScalar padding_x;           /**< Horizontal tab padding in pixels (>= 0). */
-  CMPScalar padding_y;           /**< Vertical tab padding in pixels (>= 0). */
+  cmp_u32 mode;           /**< Tab layout mode (CMP_TAB_MODE_*). */
+  CMPLayoutEdges padding; /**< Padding around the tab row. */
+  CMPScalar spacing;      /**< Spacing between tabs in pixels (>= 0). */
+  CMPScalar min_width;    /**< Minimum tab width in pixels (>= 0). */
+  CMPScalar min_height;   /**< Minimum tab height in pixels (>= 0). */
+  CMPScalar padding_x;    /**< Horizontal tab padding in pixels (>= 0). */
+  CMPScalar padding_y;    /**< Vertical tab padding in pixels (>= 0). */
   CMPScalar indicator_thickness; /**< Indicator thickness in pixels (>= 0). */
   CMPScalar indicator_corner; /**< Indicator corner radius in pixels (>= 0). */
   CMPScalar indicator_anim_duration; /**< Indicator animation duration in
                                        seconds (>= 0). */
-  cmp_u32 indicator_anim_easing; /**< Indicator easing mode (CMP_ANIM_EASE_*). */
-  CMPTextStyle text_style;       /**< Base text style. */
-  CMPColor selected_text_color;  /**< Selected label color. */
-  CMPColor indicator_color;      /**< Indicator color. */
-  CMPColor background_color;     /**< Background fill color. */
-  CMPColor disabled_text_color;  /**< Disabled label color. */
+  cmp_u32
+      indicator_anim_easing;    /**< Indicator easing mode (CMP_ANIM_EASE_*). */
+  CMPTextStyle text_style;      /**< Base text style. */
+  CMPColor selected_text_color; /**< Selected label color. */
+  CMPColor indicator_color;     /**< Indicator color. */
+  CMPColor background_color;    /**< Background fill color. */
+  CMPColor disabled_text_color; /**< Disabled label color. */
   CMPColor disabled_indicator_color; /**< Disabled indicator color. */
 } M3TabRowStyle;
 
@@ -93,8 +94,8 @@ typedef struct M3TabRowStyle {
 typedef struct M3TabRow {
   CMPWidget widget; /**< Widget interface (points to this instance). */
   CMPTextBackend text_backend; /**< Text backend instance. */
-  M3TabRowStyle style;        /**< Current tab row style. */
-  const M3TabItem *items;     /**< Tab items (not owned). */
+  M3TabRowStyle style;         /**< Current tab row style. */
+  const M3TabItem *items;      /**< Tab items (not owned). */
   cmp_usize item_count;        /**< Number of tab items. */
   cmp_usize selected_index; /**< Selected tab index or M3_TAB_INVALID_INDEX. */
   cmp_usize pressed_index;  /**< Pressed tab index or M3_TAB_INVALID_INDEX. */
@@ -107,7 +108,7 @@ typedef struct M3TabRow {
   CMPScalar scroll_offset;     /**< Scroll offset for scrollable tabs. */
   CMPScalar content_width;     /**< Content width for scrollable tabs. */
   CMPTabRowOnSelect on_select; /**< Selection callback (may be NULL). */
-  void *on_select_ctx;        /**< Selection callback context pointer. */
+  void *on_select_ctx;         /**< Selection callback context pointer. */
   CMPBool owns_font;           /**< CMP_TRUE when widget owns the font. */
 } M3TabRow;
 
@@ -128,10 +129,9 @@ CMP_API int CMP_CALL m3_tab_row_style_init(M3TabRowStyle *style);
  * @param selected_index Initial selection or M3_TAB_INVALID_INDEX.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_tab_row_init(M3TabRow *row, const CMPTextBackend *backend,
-                                   const M3TabRowStyle *style,
-                                   const M3TabItem *items, cmp_usize item_count,
-                                   cmp_usize selected_index);
+CMP_API int CMP_CALL m3_tab_row_init(
+    M3TabRow *row, const CMPTextBackend *backend, const M3TabRowStyle *style,
+    const M3TabItem *items, cmp_usize item_count, cmp_usize selected_index);
 
 /**
  * @brief Replace the tab items.
@@ -141,7 +141,7 @@ CMP_API int CMP_CALL m3_tab_row_init(M3TabRow *row, const CMPTextBackend *backen
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_tab_row_set_items(M3TabRow *row, const M3TabItem *items,
-                                        cmp_usize item_count);
+                                          cmp_usize item_count);
 
 /**
  * @brief Update the tab row style.
@@ -150,7 +150,7 @@ CMP_API int CMP_CALL m3_tab_row_set_items(M3TabRow *row, const M3TabItem *items,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_tab_row_set_style(M3TabRow *row,
-                                        const M3TabRowStyle *style);
+                                          const M3TabRowStyle *style);
 
 /**
  * @brief Update the selected tab.
@@ -159,7 +159,7 @@ CMP_API int CMP_CALL m3_tab_row_set_style(M3TabRow *row,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_tab_row_set_selected(M3TabRow *row,
-                                           cmp_usize selected_index);
+                                             cmp_usize selected_index);
 
 /**
  * @brief Retrieve the selected tab index.
@@ -168,7 +168,7 @@ CMP_API int CMP_CALL m3_tab_row_set_selected(M3TabRow *row,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_tab_row_get_selected(const M3TabRow *row,
-                                           cmp_usize *out_selected);
+                                             cmp_usize *out_selected);
 
 /**
  * @brief Update the scroll offset for scrollable tabs.
@@ -185,7 +185,7 @@ CMP_API int CMP_CALL m3_tab_row_set_scroll(M3TabRow *row, CMPScalar offset);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_tab_row_get_scroll(const M3TabRow *row,
-                                         CMPScalar *out_offset);
+                                           CMPScalar *out_offset);
 
 /**
  * @brief Assign a selection callback for the tab row.
@@ -195,8 +195,8 @@ CMP_API int CMP_CALL m3_tab_row_get_scroll(const M3TabRow *row,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_tab_row_set_on_select(M3TabRow *row,
-                                            CMPTabRowOnSelect on_select,
-                                            void *ctx);
+                                              CMPTabRowOnSelect on_select,
+                                              void *ctx);
 
 /**
  * @brief Step the tab row indicator animations.
@@ -206,7 +206,7 @@ CMP_API int CMP_CALL m3_tab_row_set_on_select(M3TabRow *row,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_tab_row_step(M3TabRow *row, CMPScalar dt,
-                                   CMPBool *out_changed);
+                                     CMPBool *out_changed);
 
 /** @brief Single-select segmented buttons. */
 #define M3_SEGMENTED_MODE_SINGLE 1
@@ -252,24 +252,24 @@ struct M3SegmentedButtons;
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPSegmentedOnSelect)(void *ctx,
-                                          struct M3SegmentedButtons *buttons,
-                                          cmp_usize index, CMPBool selected);
+                                            struct M3SegmentedButtons *buttons,
+                                            cmp_usize index, CMPBool selected);
 
 /**
  * @brief Segmented button style descriptor.
  */
 typedef struct M3SegmentedStyle {
-  CMPLayoutEdges padding;    /**< Padding around the segmented group. */
-  CMPScalar spacing;         /**< Spacing between segments in pixels (>= 0). */
-  CMPScalar min_width;       /**< Minimum segment width in pixels (>= 0). */
-  CMPScalar min_height;      /**< Minimum segment height in pixels (>= 0). */
-  CMPScalar padding_x;       /**< Horizontal segment padding in pixels (>= 0). */
-  CMPScalar padding_y;       /**< Vertical segment padding in pixels (>= 0). */
-  CMPScalar outline_width;   /**< Outline width in pixels (>= 0). */
-  CMPScalar corner_radius;   /**< Corner radius in pixels (>= 0). */
-  CMPTextStyle text_style;   /**< Base text style. */
-  CMPColor background_color; /**< Background color. */
-  CMPColor outline_color;    /**< Outline color. */
+  CMPLayoutEdges padding;  /**< Padding around the segmented group. */
+  CMPScalar spacing;       /**< Spacing between segments in pixels (>= 0). */
+  CMPScalar min_width;     /**< Minimum segment width in pixels (>= 0). */
+  CMPScalar min_height;    /**< Minimum segment height in pixels (>= 0). */
+  CMPScalar padding_x;     /**< Horizontal segment padding in pixels (>= 0). */
+  CMPScalar padding_y;     /**< Vertical segment padding in pixels (>= 0). */
+  CMPScalar outline_width; /**< Outline width in pixels (>= 0). */
+  CMPScalar corner_radius; /**< Corner radius in pixels (>= 0). */
+  CMPTextStyle text_style; /**< Base text style. */
+  CMPColor background_color;          /**< Background color. */
+  CMPColor outline_color;             /**< Outline color. */
   CMPColor selected_background_color; /**< Background color when selected. */
   CMPColor selected_text_color;       /**< Text color when selected. */
   CMPColor disabled_background_color; /**< Background color when disabled. */
@@ -286,18 +286,19 @@ typedef struct M3SegmentedStyle {
  */
 typedef struct M3SegmentedButtons {
   CMPWidget widget; /**< Widget interface (points to this instance). */
-  CMPTextBackend text_backend;   /**< Text backend instance. */
+  CMPTextBackend text_backend;  /**< Text backend instance. */
   M3SegmentedStyle style;       /**< Current segmented style. */
   const M3SegmentedItem *items; /**< Segmented items (not owned). */
-  cmp_usize item_count;          /**< Number of segmented items. */
-  cmp_u32 mode;                  /**< Selection mode (CMP_SEGMENTED_MODE_*). */
-  cmp_usize selected_index; /**< Selected index or M3_SEGMENTED_INVALID_INDEX. */
+  cmp_usize item_count;         /**< Number of segmented items. */
+  cmp_u32 mode;                 /**< Selection mode (CMP_SEGMENTED_MODE_*). */
+  cmp_usize
+      selected_index; /**< Selected index or M3_SEGMENTED_INVALID_INDEX. */
   CMPBool *selected_states; /**< Selected state array for multi-select. */
   cmp_usize pressed_index;  /**< Pressed index or M3_SEGMENTED_INVALID_INDEX. */
   CMPRect bounds;           /**< Layout bounds. */
   CMPHandle font;           /**< Font handle for labels. */
   CMPSegmentedOnSelect on_select; /**< Selection callback (may be NULL). */
-  void *on_select_ctx;           /**< Selection callback context pointer. */
+  void *on_select_ctx;            /**< Selection callback context pointer. */
   CMPBool owns_font;              /**< CMP_TRUE when widget owns the font. */
 } M3SegmentedButtons;
 
@@ -322,13 +323,11 @@ CMP_API int CMP_CALL m3_segmented_style_init(M3SegmentedStyle *style);
  *        NULL when item_count is 0).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_segmented_buttons_init(M3SegmentedButtons *buttons,
-                                             const CMPTextBackend *backend,
-                                             const M3SegmentedStyle *style,
-                                             const M3SegmentedItem *items,
-                                             cmp_usize item_count, cmp_u32 mode,
-                                             cmp_usize selected_index,
-                                             CMPBool *selected_states);
+CMP_API int CMP_CALL m3_segmented_buttons_init(
+    M3SegmentedButtons *buttons, const CMPTextBackend *backend,
+    const M3SegmentedStyle *style, const M3SegmentedItem *items,
+    cmp_usize item_count, cmp_u32 mode, cmp_usize selected_index,
+    CMPBool *selected_states);
 
 /**
  * @brief Replace the segmented items.
@@ -337,9 +336,9 @@ CMP_API int CMP_CALL m3_segmented_buttons_init(M3SegmentedButtons *buttons,
  * @param item_count Number of items.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_segmented_buttons_set_items(M3SegmentedButtons *buttons,
-                                                  const M3SegmentedItem *items,
-                                                  cmp_usize item_count);
+CMP_API int CMP_CALL m3_segmented_buttons_set_items(
+    M3SegmentedButtons *buttons, const M3SegmentedItem *items,
+    cmp_usize item_count);
 
 /**
  * @brief Update the segmented style.

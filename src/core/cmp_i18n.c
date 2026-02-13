@@ -7,9 +7,9 @@
 
 #define CMP_I18N_USIZE_MAX ((cmp_usize) ~(cmp_usize)0)
 
-#define CMP_I18N_RETURN_IF_ERROR(rc)                                            \
+#define CMP_I18N_RETURN_IF_ERROR(rc)                                           \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       return (rc);                                                             \
     }                                                                          \
   } while (0)
@@ -25,7 +25,8 @@ static cmp_u32 g_cmp_i18n_force_utf8_ok = 0u;
 static int g_cmp_i18n_force_config_init_error = 0;
 #endif
 
-static int cmp_i18n_mul_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
+static int cmp_i18n_mul_overflow(cmp_usize a, cmp_usize b,
+                                 cmp_usize *out_value) {
   cmp_usize max_value;
 
   if (out_value == NULL) {
@@ -41,7 +42,8 @@ static int cmp_i18n_mul_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value)
   return CMP_OK;
 }
 
-static int cmp_i18n_add_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
+static int cmp_i18n_add_overflow(cmp_usize a, cmp_usize b,
+                                 cmp_usize *out_value) {
   cmp_usize max_value;
 
   if (out_value == NULL) {
@@ -189,7 +191,8 @@ static int cmp_i18n_is_leap_year(cmp_i32 year, CMPBool *out_leap) {
   return CMP_OK;
 }
 
-static int cmp_i18n_days_in_month(cmp_i32 year, cmp_u32 month, cmp_u32 *out_days) {
+static int cmp_i18n_days_in_month(cmp_i32 year, cmp_u32 month,
+                                  cmp_u32 *out_days) {
   CMPBool leap;
   int rc;
 
@@ -322,7 +325,8 @@ static int cmp_i18n_ascii_lower(char ch, char *out_lower) {
   return CMP_OK;
 }
 
-static int cmp_i18n_tag_equals(const char *a, const char *b, CMPBool *out_equal) {
+static int cmp_i18n_tag_equals(const char *a, const char *b,
+                               CMPBool *out_equal) {
   cmp_usize index;
   char ca;
   char cb;
@@ -491,8 +495,8 @@ static int cmp_i18n_validate_utf8(const char *data, cmp_usize length) {
 }
 
 static int cmp_i18n_find_entry(const CMPI18n *i18n, const char *key,
-                              cmp_usize key_len, cmp_usize *out_index,
-                              CMPBool *out_found) {
+                               cmp_usize key_len, cmp_usize *out_index,
+                               CMPBool *out_found) {
   cmp_usize i;
 
   if (out_index == NULL || out_found == NULL) {
@@ -563,7 +567,7 @@ static int cmp_i18n_grow(CMPI18n *i18n, cmp_usize min_capacity) {
   }
 
   rc = cmp_i18n_mul_overflow(new_capacity, (cmp_usize)sizeof(CMPI18nEntry),
-                            &alloc_size);
+                             &alloc_size);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -586,7 +590,7 @@ static int cmp_i18n_grow(CMPI18n *i18n, cmp_usize min_capacity) {
 }
 
 static int cmp_i18n_alloc_string(const CMPAllocator *allocator, const char *src,
-                                cmp_usize len, char **out_str) {
+                                 cmp_usize len, char **out_str) {
   cmp_usize bytes;
   void *mem;
   int rc;
@@ -618,8 +622,8 @@ static int cmp_i18n_alloc_string(const CMPAllocator *allocator, const char *src,
 }
 
 static int cmp_i18n_write_uint(char *out_text, cmp_usize text_capacity,
-                              cmp_usize *io_offset, cmp_u32 value,
-                              cmp_u32 min_digits) {
+                               cmp_usize *io_offset, cmp_u32 value,
+                               cmp_u32 min_digits) {
   char digits[16];
   cmp_usize digit_count;
   cmp_usize i;
@@ -655,10 +659,10 @@ static int cmp_i18n_write_uint(char *out_text, cmp_usize text_capacity,
 }
 
 static int cmp_i18n_format_number_internal(const CMPI18nLocale *locale,
-                                          const CMPI18nNumber *number,
-                                          char *out_text,
-                                          cmp_usize text_capacity,
-                                          cmp_usize *out_len) {
+                                           const CMPI18nNumber *number,
+                                           char *out_text,
+                                           cmp_usize text_capacity,
+                                           cmp_usize *out_len) {
   char digits[16];
   cmp_u32 magnitude;
   cmp_usize digit_count;
@@ -761,9 +765,9 @@ static int cmp_i18n_format_number_internal(const CMPI18nLocale *locale,
 }
 
 static int cmp_i18n_format_date_internal(const CMPI18nLocale *locale,
-                                        const CMPDate *date, char *out_text,
-                                        cmp_usize text_capacity,
-                                        cmp_usize *out_len) {
+                                         const CMPDate *date, char *out_text,
+                                         cmp_usize text_capacity,
+                                         cmp_usize *out_len) {
   cmp_u32 year_value;
   cmp_u32 year_digits;
   cmp_u32 year_min_digits;
@@ -810,45 +814,45 @@ static int cmp_i18n_format_date_internal(const CMPI18nLocale *locale,
 
   if (locale->date_order == CMP_I18N_DATE_ORDER_MDY) {
     rc = cmp_i18n_write_uint(out_text, text_capacity, &offset, date->month,
-                            month_digits);
+                             month_digits);
     CMP_I18N_RETURN_IF_ERROR(rc);
     out_text[offset] = locale->date_separator;
     offset += 1u;
     rc = cmp_i18n_write_uint(out_text, text_capacity, &offset, date->day,
-                            day_digits);
+                             day_digits);
     CMP_I18N_RETURN_IF_ERROR(rc);
     out_text[offset] = locale->date_separator;
     offset += 1u;
     rc = cmp_i18n_write_uint(out_text, text_capacity, &offset,
-                            (cmp_u32)date->year, year_min_digits);
+                             (cmp_u32)date->year, year_min_digits);
     CMP_I18N_RETURN_IF_ERROR(rc);
   } else if (locale->date_order == CMP_I18N_DATE_ORDER_DMY) {
     rc = cmp_i18n_write_uint(out_text, text_capacity, &offset, date->day,
-                            day_digits);
+                             day_digits);
     CMP_I18N_RETURN_IF_ERROR(rc);
     out_text[offset] = locale->date_separator;
     offset += 1u;
     rc = cmp_i18n_write_uint(out_text, text_capacity, &offset, date->month,
-                            month_digits);
+                             month_digits);
     CMP_I18N_RETURN_IF_ERROR(rc);
     out_text[offset] = locale->date_separator;
     offset += 1u;
     rc = cmp_i18n_write_uint(out_text, text_capacity, &offset,
-                            (cmp_u32)date->year, year_min_digits);
+                             (cmp_u32)date->year, year_min_digits);
     CMP_I18N_RETURN_IF_ERROR(rc);
   } else {
     rc = cmp_i18n_write_uint(out_text, text_capacity, &offset,
-                            (cmp_u32)date->year, year_min_digits);
+                             (cmp_u32)date->year, year_min_digits);
     CMP_I18N_RETURN_IF_ERROR(rc);
     out_text[offset] = locale->date_separator;
     offset += 1u;
     rc = cmp_i18n_write_uint(out_text, text_capacity, &offset, date->month,
-                            month_digits);
+                             month_digits);
     CMP_I18N_RETURN_IF_ERROR(rc);
     out_text[offset] = locale->date_separator;
     offset += 1u;
     rc = cmp_i18n_write_uint(out_text, text_capacity, &offset, date->day,
-                            day_digits);
+                             day_digits);
     CMP_I18N_RETURN_IF_ERROR(rc);
   }
 
@@ -857,9 +861,9 @@ static int cmp_i18n_format_date_internal(const CMPI18nLocale *locale,
 }
 
 static int cmp_i18n_format_time_internal(const CMPI18nLocale *locale,
-                                        const CMPTime *time, char *out_text,
-                                        cmp_usize text_capacity,
-                                        cmp_usize *out_len) {
+                                         const CMPTime *time, char *out_text,
+                                         cmp_usize text_capacity,
+                                         cmp_usize *out_len) {
   cmp_u32 hour_value;
   cmp_u32 hour_digits;
   cmp_u32 minute_digits;
@@ -922,12 +926,12 @@ static int cmp_i18n_format_time_internal(const CMPI18nLocale *locale,
 
   offset = 0;
   rc = cmp_i18n_write_uint(out_text, text_capacity, &offset, hour_value,
-                          hour_digits);
+                           hour_digits);
   CMP_I18N_RETURN_IF_ERROR(rc);
   out_text[offset] = locale->time_separator;
   offset += 1u;
   rc = cmp_i18n_write_uint(out_text, text_capacity, &offset, time->minute,
-                          minute_digits);
+                           minute_digits);
   CMP_I18N_RETURN_IF_ERROR(rc);
 
   if (designator != NULL && designator_len > 0) {
@@ -942,7 +946,7 @@ static int cmp_i18n_format_time_internal(const CMPI18nLocale *locale,
 }
 
 static int cmp_i18n_set_locale_internal(CMPI18n *i18n, const char *locale_tag,
-                                       const CMPI18nLocale *locale) {
+                                        const CMPI18nLocale *locale) {
   CMPI18nLocale next_locale;
   char *next_tag;
   cmp_usize tag_len = 0u;
@@ -1005,7 +1009,7 @@ static int cmp_i18n_set_locale_internal(CMPI18n *i18n, const char *locale_tag,
 }
 
 static int cmp_i18n_trim_span(const char *data, cmp_usize length,
-                             cmp_usize *out_start, cmp_usize *out_length) {
+                              cmp_usize *out_start, cmp_usize *out_length) {
   cmp_usize start;
   cmp_usize end;
 
@@ -1037,7 +1041,7 @@ static int cmp_i18n_trim_span(const char *data, cmp_usize length,
 }
 
 static int cmp_i18n_parse_table(CMPI18n *i18n, const char *data, cmp_usize size,
-                               CMPBool clear_existing, CMPBool overwrite) {
+                                CMPBool clear_existing, CMPBool overwrite) {
   cmp_usize offset;
   int rc;
 
@@ -1117,8 +1121,8 @@ static int cmp_i18n_parse_table(CMPI18n *i18n, const char *data, cmp_usize size,
       return CMP_ERR_CORRUPT;
     }
 
-    rc = cmp_i18n_trim_span(line + trim_start, eq_index - trim_start, &key_start,
-                           &key_len);
+    rc = cmp_i18n_trim_span(line + trim_start, eq_index - trim_start,
+                            &key_start, &key_len);
     CMP_I18N_RETURN_IF_ERROR(rc);
     if (key_len == 0) {
       return CMP_ERR_CORRUPT;
@@ -1126,13 +1130,13 @@ static int cmp_i18n_parse_table(CMPI18n *i18n, const char *data, cmp_usize size,
     key_start += trim_start;
 
     rc = cmp_i18n_trim_span(line + eq_index + 1u,
-                           trim_start + trim_len - (eq_index + 1u),
-                           &value_start, &value_len);
+                            trim_start + trim_len - (eq_index + 1u),
+                            &value_start, &value_len);
     CMP_I18N_RETURN_IF_ERROR(rc);
     value_start += eq_index + 1u;
 
     rc = cmp_i18n_put(i18n, line + key_start, key_len, line + value_start,
-                     value_len, overwrite);
+                      value_len, overwrite);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1149,7 +1153,7 @@ int CMP_CALL cmp_i18n_locale_init(CMPI18nLocale *locale) {
 }
 
 int CMP_CALL cmp_i18n_locale_from_tag(const char *locale_tag,
-                                    CMPI18nLocale *out_locale) {
+                                      CMPI18nLocale *out_locale) {
   CMPBool match;
   int rc;
 
@@ -1254,7 +1258,7 @@ int CMP_CALL cmp_i18n_init(CMPI18n *i18n, const CMPI18nConfig *config) {
   }
 
   rc = cmp_i18n_mul_overflow(config->entry_capacity,
-                            (cmp_usize)sizeof(CMPI18nEntry), &alloc_size);
+                             (cmp_usize)sizeof(CMPI18nEntry), &alloc_size);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1360,7 +1364,7 @@ int CMP_CALL cmp_i18n_shutdown(CMPI18n *i18n) {
 }
 
 int CMP_CALL cmp_i18n_set_locale(CMPI18n *i18n, const char *locale_tag,
-                               const CMPI18nLocale *locale) {
+                                 const CMPI18nLocale *locale) {
   if (i18n == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1371,7 +1375,7 @@ int CMP_CALL cmp_i18n_set_locale(CMPI18n *i18n, const char *locale_tag,
 }
 
 int CMP_CALL cmp_i18n_set_formatter(CMPI18n *i18n,
-                                  const CMPI18nFormatter *formatter) {
+                                    const CMPI18nFormatter *formatter) {
   if (i18n == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1391,9 +1395,9 @@ int CMP_CALL cmp_i18n_set_formatter(CMPI18n *i18n,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_i18n_put(CMPI18n *i18n, const char *utf8_key, cmp_usize key_len,
-                        const char *utf8_value, cmp_usize value_len,
-                        CMPBool overwrite) {
+int CMP_CALL cmp_i18n_put(CMPI18n *i18n, const char *utf8_key,
+                          cmp_usize key_len, const char *utf8_value,
+                          cmp_usize value_len, CMPBool overwrite) {
   CMPI18nEntry *entry;
   cmp_usize index = 0u;
   CMPBool found; /* GCOVR_EXCL_LINE */
@@ -1447,7 +1451,7 @@ int CMP_CALL cmp_i18n_put(CMPI18n *i18n, const char *utf8_key, cmp_usize key_len
     }
 
     rc = cmp_i18n_alloc_string(&i18n->allocator, utf8_value, value_len,
-                              &value_copy);
+                               &value_copy);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1479,7 +1483,7 @@ int CMP_CALL cmp_i18n_put(CMPI18n *i18n, const char *utf8_key, cmp_usize key_len
   value_copy = NULL;
   if (value_len > 0) {
     rc = cmp_i18n_alloc_string(&i18n->allocator, utf8_value, value_len,
-                              &value_copy);
+                               &value_copy);
     if (rc != CMP_OK) {
       free_rc = i18n->allocator.free(i18n->allocator.ctx, key_copy);
       CMP_UNUSED(free_rc);
@@ -1497,8 +1501,8 @@ int CMP_CALL cmp_i18n_put(CMPI18n *i18n, const char *utf8_key, cmp_usize key_len
 }
 
 int CMP_CALL cmp_i18n_get(const CMPI18n *i18n, const char *utf8_key,
-                        cmp_usize key_len, const char **out_value,
-                        cmp_usize *out_value_len) {
+                          cmp_usize key_len, const char **out_value,
+                          cmp_usize *out_value_len) {
   cmp_usize index;
   CMPBool found;
   int rc;
@@ -1528,10 +1532,10 @@ int CMP_CALL cmp_i18n_get(const CMPI18n *i18n, const char *utf8_key,
 }
 
 int CMP_CALL cmp_i18n_contains(const CMPI18n *i18n, const char *utf8_key,
-                             cmp_usize key_len,
-                             CMPBool *out_exists) { /* GCOVR_EXCL_LINE */
-  cmp_usize index;                                  /* GCOVR_EXCL_LINE */
-  CMPBool found;                                    /* GCOVR_EXCL_LINE */
+                               cmp_usize key_len,
+                               CMPBool *out_exists) { /* GCOVR_EXCL_LINE */
+  cmp_usize index;                                    /* GCOVR_EXCL_LINE */
+  CMPBool found;                                      /* GCOVR_EXCL_LINE */
   int rc;
 
   if (i18n == NULL || out_exists == NULL) {
@@ -1552,7 +1556,7 @@ int CMP_CALL cmp_i18n_contains(const CMPI18n *i18n, const char *utf8_key,
 }
 
 int CMP_CALL cmp_i18n_remove(CMPI18n *i18n, const char *utf8_key,
-                           cmp_usize key_len) {
+                             cmp_usize key_len) {
   cmp_usize index;
   cmp_usize tail_count;
   CMPBool found;
@@ -1626,8 +1630,9 @@ int CMP_CALL cmp_i18n_count(const CMPI18n *i18n, cmp_usize *out_count) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_i18n_load_table(CMPI18n *i18n, CMPIO *io, const char *utf8_path,
-                               CMPBool clear_existing, CMPBool overwrite) {
+int CMP_CALL cmp_i18n_load_table(CMPI18n *i18n, CMPIO *io,
+                                 const char *utf8_path, CMPBool clear_existing,
+                                 CMPBool overwrite) {
   void *buffer;
   cmp_usize size;
   int rc;
@@ -1652,7 +1657,7 @@ int CMP_CALL cmp_i18n_load_table(CMPI18n *i18n, CMPIO *io, const char *utf8_path
   }
 
   rc = cmp_i18n_load_table_buffer(i18n, (const char *)buffer, size,
-                                 clear_existing, overwrite);
+                                  clear_existing, overwrite);
   free_rc = i18n->allocator.free(i18n->allocator.ctx, buffer);
   if (free_rc != CMP_OK && rc == CMP_OK) {
     rc = free_rc;
@@ -1660,9 +1665,9 @@ int CMP_CALL cmp_i18n_load_table(CMPI18n *i18n, CMPIO *io, const char *utf8_path
   return rc;
 }
 
-int CMP_CALL cmp_i18n_load_table_buffer(CMPI18n *i18n, const char *data,
-                                      cmp_usize size, CMPBool clear_existing,
-                                      CMPBool overwrite) { /* GCOVR_EXCL_LINE */
+int CMP_CALL cmp_i18n_load_table_buffer(
+    CMPI18n *i18n, const char *data, cmp_usize size, CMPBool clear_existing,
+    CMPBool overwrite) { /* GCOVR_EXCL_LINE */
   if (i18n == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1674,8 +1679,9 @@ int CMP_CALL cmp_i18n_load_table_buffer(CMPI18n *i18n, const char *data,
 }
 
 int CMP_CALL cmp_i18n_format_number(const CMPI18n *i18n,
-                                  const CMPI18nNumber *number, char *out_text,
-                                  cmp_usize text_capacity, cmp_usize *out_len) {
+                                    const CMPI18nNumber *number, char *out_text,
+                                    cmp_usize text_capacity,
+                                    cmp_usize *out_len) {
   int rc;
 
   if (i18n == NULL) {
@@ -1696,12 +1702,12 @@ int CMP_CALL cmp_i18n_format_number(const CMPI18n *i18n,
   }
 
   return cmp_i18n_format_number_internal(&i18n->locale, number, out_text,
-                                        text_capacity, out_len);
+                                         text_capacity, out_len);
 }
 
 int CMP_CALL cmp_i18n_format_date(const CMPI18n *i18n, const CMPDate *date,
-                                char *out_text, cmp_usize text_capacity,
-                                cmp_usize *out_len) {
+                                  char *out_text, cmp_usize text_capacity,
+                                  cmp_usize *out_len) {
   int rc;
 
   if (i18n == NULL) {
@@ -1722,12 +1728,12 @@ int CMP_CALL cmp_i18n_format_date(const CMPI18n *i18n, const CMPDate *date,
   }
 
   return cmp_i18n_format_date_internal(&i18n->locale, date, out_text,
-                                      text_capacity, out_len);
+                                       text_capacity, out_len);
 }
 
 int CMP_CALL cmp_i18n_format_time(const CMPI18n *i18n, const CMPTime *time,
-                                char *out_text, cmp_usize text_capacity,
-                                cmp_usize *out_len) {
+                                  char *out_text, cmp_usize text_capacity,
+                                  cmp_usize *out_len) {
   int rc;
 
   if (i18n == NULL) {
@@ -1748,17 +1754,17 @@ int CMP_CALL cmp_i18n_format_time(const CMPI18n *i18n, const CMPTime *time,
   }
 
   return cmp_i18n_format_time_internal(&i18n->locale, time, out_text,
-                                      text_capacity, out_len);
+                                       text_capacity, out_len);
 }
 
 #ifdef CMP_TESTING
 int CMP_CALL cmp_i18n_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                      cmp_usize *out_value) {
+                                        cmp_usize *out_value) {
   return cmp_i18n_mul_overflow(a, b, out_value);
 }
 
 int CMP_CALL cmp_i18n_test_add_overflow(cmp_usize a, cmp_usize b,
-                                      cmp_usize *out_value) {
+                                        cmp_usize *out_value) {
   return cmp_i18n_add_overflow(a, b, out_value);
 }
 
@@ -1771,7 +1777,7 @@ int CMP_CALL cmp_i18n_test_is_leap_year(cmp_i32 year, CMPBool *out_leap) {
 }
 
 int CMP_CALL cmp_i18n_test_days_in_month(cmp_i32 year, cmp_u32 month,
-                                       cmp_u32 *out_days) {
+                                         cmp_u32 *out_days) {
   return cmp_i18n_days_in_month(year, month, out_days);
 }
 
@@ -1804,31 +1810,32 @@ int CMP_CALL cmp_i18n_test_ascii_lower(char ch, char *out_lower) {
 }
 
 int CMP_CALL cmp_i18n_test_tag_equals(const char *a, const char *b,
-                                    CMPBool *out_equal) {
+                                      CMPBool *out_equal) {
   return cmp_i18n_tag_equals(a, b, out_equal);
 }
 
 int CMP_CALL cmp_i18n_test_trim_span(const char *data, cmp_usize length,
-                                   cmp_usize *out_start, cmp_usize *out_length) {
+                                     cmp_usize *out_start,
+                                     cmp_usize *out_length) {
   return cmp_i18n_trim_span(data, length, out_start, out_length);
 }
 
 int CMP_CALL cmp_i18n_test_alloc_string(const CMPAllocator *allocator,
-                                      const char *src, cmp_usize len,
-                                      char **out_str) {
+                                        const char *src, cmp_usize len,
+                                        char **out_str) {
   return cmp_i18n_alloc_string(allocator, src, len, out_str);
 }
 
 int CMP_CALL cmp_i18n_test_write_uint(char *out_text, cmp_usize text_capacity,
-                                    cmp_usize *io_offset, cmp_u32 value,
-                                    cmp_u32 min_digits) {
+                                      cmp_usize *io_offset, cmp_u32 value,
+                                      cmp_u32 min_digits) {
   return cmp_i18n_write_uint(out_text, text_capacity, io_offset, value,
-                            min_digits);
+                             min_digits);
 }
 
 int CMP_CALL cmp_i18n_test_find_entry(const CMPI18n *i18n, const char *key,
-                                    cmp_usize key_len, cmp_usize *out_index,
-                                    CMPBool *out_found) {
+                                      cmp_usize key_len, cmp_usize *out_index,
+                                      CMPBool *out_found) {
   return cmp_i18n_find_entry(i18n, key, key_len, out_index, out_found);
 }
 
@@ -1898,10 +1905,10 @@ int CMP_CALL cmp_i18n_test_locale_preset_de_de(CMPI18nLocale *out_locale) {
 }
 
 int CMP_CALL cmp_i18n_test_parse_table(CMPI18n *i18n,
-                                     const char *data, /* GCOVR_EXCL_LINE */
-                                     cmp_usize size, CMPBool clear_existing,
-                                     CMPBool overwrite) {
+                                       const char *data, /* GCOVR_EXCL_LINE */
+                                       cmp_usize size, CMPBool clear_existing,
+                                       CMPBool overwrite) {
   return cmp_i18n_parse_table(i18n, data, size, clear_existing,
-                             overwrite); /* GCOVR_EXCL_LINE */
+                              overwrite); /* GCOVR_EXCL_LINE */
 }
 #endif

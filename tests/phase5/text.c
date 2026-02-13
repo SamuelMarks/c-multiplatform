@@ -28,8 +28,8 @@ static void test_text_backend_init(TestTextBackend *backend) {
 }
 
 static int test_text_create_font(void *text, const char *utf8_family,
-                                 cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
-                                 CMPHandle *out_font) {
+                                 cmp_i32 size_px, cmp_i32 weight,
+                                 CMPBool italic, CMPHandle *out_font) {
   TestTextBackend *backend;
 
   if (text == NULL || utf8_family == NULL || out_font == NULL) {
@@ -229,7 +229,7 @@ int main(void) {
   alt_style = style;
   alt_style.utf8_family = NULL;
   CMP_TEST_EXPECT(cmp_text_test_validate_style(&alt_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   alt_style.utf8_family = "Test";
   alt_style.size_px = 0;
   CMP_TEST_EXPECT(cmp_text_test_validate_style(&alt_style), CMP_ERR_RANGE);
@@ -245,21 +245,23 @@ int main(void) {
   alt_style.color.a = 1.0f;
   CMP_TEST_OK(cmp_text_test_validate_style(&alt_style));
 
-  CMP_TEST_EXPECT(cmp_text_test_validate_backend(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_text_test_validate_backend(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   alt_backend.ctx = &backend;
   alt_backend.vtable = NULL;
   CMP_TEST_EXPECT(cmp_text_test_validate_backend(&alt_backend),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   alt_backend.vtable = &g_test_text_vtable;
   CMP_TEST_OK(cmp_text_test_validate_backend(&alt_backend));
 
   width_spec.mode = 99u;
   width_spec.size = 0.0f;
   CMP_TEST_EXPECT(cmp_text_test_validate_measure_spec(width_spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   width_spec.mode = CMP_MEASURE_EXACTLY;
   width_spec.size = -1.0f;
-  CMP_TEST_EXPECT(cmp_text_test_validate_measure_spec(width_spec), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_text_test_validate_measure_spec(width_spec),
+                  CMP_ERR_RANGE);
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = -1.0f;
   CMP_TEST_OK(cmp_text_test_validate_measure_spec(width_spec));
@@ -277,43 +279,43 @@ int main(void) {
   CMP_TEST_OK(cmp_text_test_validate_rect(&bounds));
 
   CMP_TEST_EXPECT(cmp_text_backend_from_gfx(NULL, &text_backend),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.text_vtable = NULL;
   CMP_TEST_EXPECT(cmp_text_backend_from_gfx(&gfx, &text_backend),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable;
   CMP_TEST_OK(cmp_text_backend_from_gfx(&gfx, &text_backend));
 
   CMP_TEST_EXPECT(cmp_text_font_create(NULL, &style, &font),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_font_create(&text_backend, NULL, &font),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_font_create(&text_backend, &style, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   memset(&invalid_backend, 0, sizeof(invalid_backend));
   CMP_TEST_EXPECT(cmp_text_font_create(&invalid_backend, &style, &font),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   text_backend.vtable = &g_test_text_vtable_no_create;
   CMP_TEST_EXPECT(cmp_text_font_create(&text_backend, &style, &font),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable;
 
   style.utf8_family = NULL;
   CMP_TEST_EXPECT(cmp_text_font_create(&text_backend, &style, &font),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   style.utf8_family = "Test";
   style.size_px = 0;
   CMP_TEST_EXPECT(cmp_text_font_create(&text_backend, &style, &font),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.size_px = 16;
   style.weight = 50;
   CMP_TEST_EXPECT(cmp_text_font_create(&text_backend, &style, &font),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.weight = 400;
   style.color.a = 1.2f;
   CMP_TEST_EXPECT(cmp_text_font_create(&text_backend, &style, &font),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   style.color.a = 1.0f;
   CMP_TEST_OK(cmp_text_font_create(&text_backend, &style, &font));
   CMP_TEST_ASSERT(backend.create_calls == 1);
@@ -322,7 +324,7 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_text_font_destroy(NULL, font), CMP_ERR_INVALID_ARGUMENT);
   text_backend.vtable = &g_test_text_vtable_no_destroy;
   CMP_TEST_EXPECT(cmp_text_font_destroy(&text_backend, saved_font),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable;
   font.id = 0u;
   font.generation = 0u;
@@ -330,28 +332,31 @@ int main(void) {
   font = saved_font;
 
   CMP_TEST_EXPECT(cmp_text_measure_utf8(NULL, font, "abc", 3, &metrics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       cmp_text_measure_utf8(&invalid_backend, font, "abc", 3, &metrics),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_measure_utf8(&text_backend, font, NULL, 3, &metrics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_measure_utf8(&text_backend, font, "abc", 3, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   text_backend.vtable = &g_test_text_vtable_no_measure;
-  CMP_TEST_EXPECT(cmp_text_measure_utf8(&text_backend, font, "abc", 3, &metrics),
-                 CMP_ERR_UNSUPPORTED);
+  CMP_TEST_EXPECT(
+      cmp_text_measure_utf8(&text_backend, font, "abc", 3, &metrics),
+      CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable;
 
   backend.fail_measure = 1;
-  CMP_TEST_EXPECT(cmp_text_measure_utf8(&text_backend, font, "abc", 3, &metrics),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(
+      cmp_text_measure_utf8(&text_backend, font, "abc", 3, &metrics),
+      CMP_ERR_IO);
   backend.fail_measure = 0;
 
   backend.negative_metrics = 1;
-  CMP_TEST_EXPECT(cmp_text_measure_utf8(&text_backend, font, "abc", 3, &metrics),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      cmp_text_measure_utf8(&text_backend, font, "abc", 3, &metrics),
+      CMP_ERR_RANGE);
   backend.negative_metrics = 0;
 
   CMP_TEST_OK(cmp_text_measure_utf8(&text_backend, font, "abc", 3, &metrics));
@@ -360,12 +365,12 @@ int main(void) {
   CMP_TEST_ASSERT(cmp_near(metrics.baseline, 15.0f, 0.001f));
 
   CMP_TEST_EXPECT(cmp_text_measure_cstr(NULL, font, "abc", &metrics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_measure_cstr(&text_backend, font, NULL, &metrics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_text_test_set_cstr_limit(2));
   CMP_TEST_EXPECT(cmp_text_measure_cstr(&text_backend, font, "abcd", &metrics),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_text_test_set_cstr_limit(0));
 
   CMP_TEST_OK(cmp_text_font_metrics(&text_backend, font, &metrics));
@@ -376,7 +381,7 @@ int main(void) {
   CMP_TEST_ASSERT(cmp_near(metrics.width, 0.0f, 0.001f));
 
   CMP_TEST_EXPECT(cmp_text_test_cstrlen(NULL, &cstr_len),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_test_cstrlen("", NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_text_test_set_cstr_limit(2));
   CMP_TEST_EXPECT(cmp_text_test_cstrlen("abc", &cstr_len), CMP_ERR_OVERFLOW);
@@ -388,29 +393,29 @@ int main(void) {
   CMP_TEST_ASSERT(backend.destroy_calls == 1);
 
   CMP_TEST_EXPECT(cmp_text_widget_init(NULL, &text_backend, &style, "Hi", 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_widget_init(&widget, NULL, &style, "Hi", 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_widget_init(&widget, &text_backend, NULL, "Hi", 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_widget_init(&widget, &text_backend, &style, NULL, 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       cmp_text_widget_init(&widget, &invalid_backend, &style, "Hi", 2),
       CMP_ERR_INVALID_ARGUMENT);
 
   text_backend.vtable = &g_test_text_vtable_no_create;
   CMP_TEST_EXPECT(cmp_text_widget_init(&widget, &text_backend, &style, "Hi", 2),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(cmp_text_widget_init(&widget, &text_backend, &style, "Hi", 2),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable_no_measure;
   CMP_TEST_EXPECT(cmp_text_widget_init(&widget, &text_backend, &style, "Hi", 2),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable_no_destroy;
   CMP_TEST_EXPECT(cmp_text_widget_init(&widget, &text_backend, &style, "Hi", 2),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable;
 
   alt_style = style;
@@ -420,7 +425,7 @@ int main(void) {
       CMP_ERR_RANGE);
   backend.fail_create = 1;
   CMP_TEST_EXPECT(cmp_text_widget_init(&widget, &text_backend, &style, "Hi", 2),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_create = 0;
 
   CMP_TEST_OK(cmp_text_widget_init(&widget, &text_backend, &style, "Hi", 2));
@@ -443,21 +448,21 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(widget.widget.vtable->measure(widget.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 10.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 20.0f, 0.001f));
 
   CMP_TEST_OK(cmp_text_widget_set_text(&widget, "Hello", 5));
   CMP_TEST_EXPECT(cmp_text_widget_set_text(NULL, "Hi", 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_widget_set_text(&widget, NULL, 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 12.0f;
   CMP_TEST_OK(widget.widget.vtable->measure(widget.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 50.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 12.0f, 0.001f));
   CMP_TEST_OK(cmp_text_widget_set_text(&widget, NULL, 0));
@@ -466,7 +471,7 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 10.0f;
   CMP_TEST_OK(widget.widget.vtable->measure(widget.widget.ctx, width_spec,
-                                           height_spec, &size));
+                                            height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 42.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 10.0f, 0.001f));
 
@@ -495,68 +500,70 @@ int main(void) {
   width_spec.mode = 42u;
   width_spec.size = 10.0f;
   CMP_TEST_EXPECT(widget.widget.vtable->measure(widget.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
   width_spec.mode = CMP_MEASURE_EXACTLY;
   width_spec.size = 10.0f;
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = -5.0f;
   CMP_TEST_EXPECT(widget.widget.vtable->measure(widget.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_RANGE);
+                                                height_spec, &size),
+                  CMP_ERR_RANGE);
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 10.0f;
   widget.metrics_valid = CMP_FALSE;
   backend.fail_measure = 1;
   CMP_TEST_EXPECT(widget.widget.vtable->measure(widget.widget.ctx, width_spec,
-                                               height_spec, &size),
-                 CMP_ERR_IO);
+                                                height_spec, &size),
+                  CMP_ERR_IO);
   backend.fail_measure = 0;
 
   bounds.width = -1.0f;
   CMP_TEST_EXPECT(widget.widget.vtable->layout(widget.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bounds.width = 100.0f;
   CMP_TEST_EXPECT(widget.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(widget.widget.vtable->layout(widget.widget.ctx, bounds));
 
   CMP_TEST_EXPECT(widget.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(widget.widget.vtable->paint(widget.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = NULL;
   CMP_TEST_EXPECT(widget.widget.vtable->paint(widget.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = &gfx;
   gfx.text_vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(widget.widget.vtable->paint(widget.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable;
   backend.fail_measure = 1;
   CMP_TEST_EXPECT(widget.widget.vtable->paint(widget.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_measure = 0;
   backend.fail_draw = 1;
   CMP_TEST_EXPECT(widget.widget.vtable->paint(widget.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw = 0;
 
   CMP_TEST_EXPECT(widget.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(widget.widget.vtable->event(widget.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      widget.widget.vtable->event(widget.widget.ctx, NULL, &handled),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(widget.widget.vtable->event(widget.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(widget.widget.vtable->event(widget.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
 
   CMP_TEST_EXPECT(widget.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(widget.widget.vtable->get_semantics(widget.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
-  CMP_TEST_EXPECT(widget.widget.vtable->destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(widget.widget.vtable->destroy(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   temp_widget = widget;
   temp_widget.backend.vtable = &g_test_text_vtable_no_destroy;
   temp_widget.owns_font = CMP_TRUE;
@@ -574,20 +581,21 @@ int main(void) {
 
   alt_style = style;
   alt_style.weight = 50;
-  CMP_TEST_EXPECT(cmp_text_widget_set_style(&widget, &alt_style), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_text_widget_set_style(&widget, &alt_style),
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(cmp_text_widget_set_style(NULL, &style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_widget_set_style(&widget, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   backend.fail_create = 1;
   CMP_TEST_EXPECT(cmp_text_widget_set_style(&widget, &style), CMP_ERR_IO);
   backend.fail_create = 0;
   CMP_TEST_OK(cmp_text_widget_set_style(&widget, &style));
 
   CMP_TEST_EXPECT(cmp_text_widget_get_metrics(NULL, &metrics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_widget_get_metrics(&widget, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   backend.fail_measure = 1;
   CMP_TEST_EXPECT(cmp_text_widget_get_metrics(&widget, &metrics), CMP_ERR_IO);
   backend.fail_measure = 0;

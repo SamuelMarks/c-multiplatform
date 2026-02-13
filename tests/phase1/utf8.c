@@ -113,16 +113,18 @@ int main(void) {
 
   advance = 0;
   CMP_TEST_EXPECT(cmp_utf8_test_decode(NULL, 1, &codepoint, &advance),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_utf8_test_decode((const cmp_u8 *)ascii, 1, NULL, &advance),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_utf8_test_decode((const cmp_u8 *)ascii, 1, &codepoint, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_utf8_test_decode((const cmp_u8 *)ascii, 1, NULL, &advance),
+      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_utf8_test_decode((const cmp_u8 *)ascii, 1, &codepoint, NULL),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       cmp_utf8_test_decode((const cmp_u8 *)ascii, 0, &codepoint, &advance),
       CMP_ERR_NOT_FOUND);
   CMP_TEST_EXPECT(cmp_utf8_test_decode(invalid_trunc2, 1, &codepoint, &advance),
-                 CMP_ERR_CORRUPT);
+                  CMP_ERR_CORRUPT);
   CMP_TEST_EXPECT(
       cmp_utf8_test_decode(invalid_e0_boundary, 3, &codepoint, &advance),
       CMP_ERR_CORRUPT);
@@ -138,8 +140,10 @@ int main(void) {
   CMP_TEST_OK(cmp_utf8_test_set_relaxed_checks(CMP_FALSE));
 #endif
 
-  CMP_TEST_EXPECT(cmp_utf8_validate_cstr(NULL, &valid), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_utf8_validate_cstr(ascii, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_utf8_validate_cstr(NULL, &valid),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_utf8_validate_cstr(ascii, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_utf8_validate_cstr(ascii, &valid));
   CMP_TEST_ASSERT(valid == CMP_TRUE);
@@ -148,14 +152,16 @@ int main(void) {
   CMP_TEST_ASSERT(valid == CMP_FALSE);
 
   CMP_TEST_EXPECT(cmp_utf8_iter_init(NULL, ascii, strlen(ascii)),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_utf8_iter_init(&iter, NULL, 0), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_utf8_iter_init(&iter, ascii, 0));
   CMP_TEST_EXPECT(cmp_utf8_iter_next(&iter, &codepoint), CMP_ERR_NOT_FOUND);
 
-  CMP_TEST_EXPECT(cmp_utf8_iter_init_cstr(NULL, ascii), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_utf8_iter_init_cstr(&iter, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_utf8_iter_init_cstr(NULL, ascii),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_utf8_iter_init_cstr(&iter, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_utf8_iter_init_cstr(&iter, mixed));
   CMP_TEST_OK(cmp_utf8_iter_next(&iter, &codepoint));
@@ -168,7 +174,8 @@ int main(void) {
 
   CMP_TEST_OK(cmp_utf8_iter_init(&iter, invalid_continuation, 3));
   CMP_TEST_EXPECT(cmp_utf8_iter_next(&iter, &codepoint), CMP_ERR_CORRUPT);
-  CMP_TEST_EXPECT(cmp_utf8_iter_next(NULL, &codepoint), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_utf8_iter_next(NULL, &codepoint),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_utf8_iter_next(&iter, NULL), CMP_ERR_INVALID_ARGUMENT);
 
   max_size = (cmp_usize) ~(cmp_usize)0;

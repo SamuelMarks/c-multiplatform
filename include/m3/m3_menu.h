@@ -71,7 +71,7 @@ struct M3Menu;
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPMenuOnAction)(void *ctx, struct M3Menu *menu,
-                                     cmp_u32 action, cmp_usize index);
+                                       cmp_u32 action, cmp_usize index);
 
 /**
  * @brief Menu item descriptor.
@@ -79,8 +79,8 @@ typedef int(CMP_CALL *CMPMenuOnAction)(void *ctx, struct M3Menu *menu,
 typedef struct M3MenuItem {
   const char *utf8_label; /**< UTF-8 label pointer (may be NULL when
                              utf8_len is 0). */
-  cmp_usize utf8_len;      /**< UTF-8 label length in bytes. */
-  CMPBool enabled;         /**< CMP_TRUE when item is enabled. */
+  cmp_usize utf8_len;     /**< UTF-8 label length in bytes. */
+  CMPBool enabled;        /**< CMP_TRUE when item is enabled. */
 } M3MenuItem;
 
 /**
@@ -104,18 +104,19 @@ typedef struct M3MenuPlacement {
  * @brief Menu style descriptor.
  */
 typedef struct M3MenuStyle {
-  CMPLayoutEdges padding;  /**< Padding around menu contents. */
-  CMPScalar item_height;   /**< Menu item height in pixels (> 0). */
-  CMPScalar item_spacing;  /**< Spacing between items in pixels (>= 0). */
-  CMPScalar min_width;     /**< Minimum menu width in pixels (>= 0). */
-  CMPScalar max_width;     /**< Maximum menu width in pixels (>= 0, 0 = none). */
+  CMPLayoutEdges padding; /**< Padding around menu contents. */
+  CMPScalar item_height;  /**< Menu item height in pixels (> 0). */
+  CMPScalar item_spacing; /**< Spacing between items in pixels (>= 0). */
+  CMPScalar min_width;    /**< Minimum menu width in pixels (>= 0). */
+  CMPScalar max_width;    /**< Maximum menu width in pixels (>= 0, 0 = none). */
   CMPScalar corner_radius; /**< Menu corner radius in pixels (>= 0). */
   CMPScalar anchor_gap;    /**< Gap between anchor and menu in pixels (>= 0). */
-  CMPTextStyle text_style; /**< Label text style (requires valid family name). */
+  CMPTextStyle
+      text_style; /**< Label text style (requires valid family name). */
   CMPColor background_color;    /**< Menu background color. */
   CMPColor disabled_text_color; /**< Text color for disabled items. */
   CMPShadow shadow;             /**< Shadow descriptor. */
-  CMPBool shadow_enabled;       /**< CMP_TRUE when shadow rendering is enabled. */
+  CMPBool shadow_enabled; /**< CMP_TRUE when shadow rendering is enabled. */
 } M3MenuStyle;
 
 /**
@@ -126,19 +127,19 @@ typedef struct M3Menu {
   CMPTextBackend text_backend; /**< Text backend instance. */
   CMPHandle font;              /**< Font handle for menu labels. */
   CMPTextMetrics font_metrics; /**< Cached font metrics. */
-  M3MenuStyle style;          /**< Current menu style. */
-  const M3MenuItem *items;    /**< Menu items (not owned). */
+  M3MenuStyle style;           /**< Current menu style. */
+  const M3MenuItem *items;     /**< Menu items (not owned). */
   cmp_usize item_count;        /**< Number of menu items. */
-  M3MenuAnchor anchor;        /**< Current anchor descriptor. */
-  M3MenuPlacement placement;  /**< Preferred placement settings. */
+  M3MenuAnchor anchor;         /**< Current anchor descriptor. */
+  M3MenuPlacement placement;   /**< Preferred placement settings. */
   cmp_u32 resolved_direction;  /**< Resolved placement direction. */
   CMPRect overlay_bounds;      /**< Bounds of the overlay region. */
   CMPRect menu_bounds;         /**< Bounds of the menu panel. */
-  cmp_usize pressed_index;   /**< Pressed item index or M3_MENU_INVALID_INDEX. */
-  CMPBool owns_font;         /**< CMP_TRUE when widget owns the font. */
-  CMPBool open;              /**< CMP_TRUE when menu is open/visible. */
+  cmp_usize pressed_index; /**< Pressed item index or M3_MENU_INVALID_INDEX. */
+  CMPBool owns_font;       /**< CMP_TRUE when widget owns the font. */
+  CMPBool open;            /**< CMP_TRUE when menu is open/visible. */
   CMPMenuOnAction on_action; /**< Action callback (may be NULL). */
-  void *on_action_ctx;      /**< Action callback context pointer. */
+  void *on_action_ctx;       /**< Action callback context pointer. */
 } M3Menu;
 
 /**
@@ -158,8 +159,9 @@ CMP_API int CMP_CALL m3_menu_style_init(M3MenuStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_init(M3Menu *menu, const CMPTextBackend *backend,
-                                const M3MenuStyle *style,
-                                const M3MenuItem *items, cmp_usize item_count);
+                                  const M3MenuStyle *style,
+                                  const M3MenuItem *items,
+                                  cmp_usize item_count);
 
 /**
  * @brief Update the menu items.
@@ -169,7 +171,7 @@ CMP_API int CMP_CALL m3_menu_init(M3Menu *menu, const CMPTextBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_set_items(M3Menu *menu, const M3MenuItem *items,
-                                     cmp_usize item_count);
+                                       cmp_usize item_count);
 
 /**
  * @brief Update the menu style.
@@ -195,7 +197,7 @@ CMP_API int CMP_CALL m3_menu_set_anchor_rect(M3Menu *menu, const CMPRect *rect);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_set_anchor_point(M3Menu *menu, CMPScalar x,
-                                            CMPScalar y);
+                                              CMPScalar y);
 
 /**
  * @brief Update the menu placement settings.
@@ -204,7 +206,7 @@ CMP_API int CMP_CALL m3_menu_set_anchor_point(M3Menu *menu, CMPScalar x,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_set_placement(M3Menu *menu,
-                                         const M3MenuPlacement *placement);
+                                           const M3MenuPlacement *placement);
 
 /**
  * @brief Open or close the menu (updates widget hidden flag).
@@ -228,7 +230,8 @@ CMP_API int CMP_CALL m3_menu_get_open(const M3Menu *menu, CMPBool *out_open);
  * @param out_bounds Receives the menu bounds.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_menu_get_bounds(const M3Menu *menu, CMPRect *out_bounds);
+CMP_API int CMP_CALL m3_menu_get_bounds(const M3Menu *menu,
+                                        CMPRect *out_bounds);
 
 /**
  * @brief Retrieve the current overlay bounds.
@@ -237,7 +240,7 @@ CMP_API int CMP_CALL m3_menu_get_bounds(const M3Menu *menu, CMPRect *out_bounds)
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_get_overlay_bounds(const M3Menu *menu,
-                                              CMPRect *out_bounds);
+                                                CMPRect *out_bounds);
 
 /**
  * @brief Retrieve the resolved menu direction after collision handling.
@@ -246,7 +249,7 @@ CMP_API int CMP_CALL m3_menu_get_overlay_bounds(const M3Menu *menu,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_get_resolved_direction(const M3Menu *menu,
-                                                  cmp_u32 *out_direction);
+                                                    cmp_u32 *out_direction);
 
 /**
  * @brief Retrieve the bounds for a menu item.
@@ -255,8 +258,9 @@ CMP_API int CMP_CALL m3_menu_get_resolved_direction(const M3Menu *menu,
  * @param out_bounds Receives the item bounds.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_menu_get_item_bounds(const M3Menu *menu, cmp_usize index,
-                                           CMPRect *out_bounds);
+CMP_API int CMP_CALL m3_menu_get_item_bounds(const M3Menu *menu,
+                                             cmp_usize index,
+                                             CMPRect *out_bounds);
 
 /**
  * @brief Assign a menu action callback.
@@ -265,8 +269,9 @@ CMP_API int CMP_CALL m3_menu_get_item_bounds(const M3Menu *menu, cmp_usize index
  * @param ctx Callback context pointer.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_menu_set_on_action(M3Menu *menu, CMPMenuOnAction on_action,
-                                         void *ctx);
+CMP_API int CMP_CALL m3_menu_set_on_action(M3Menu *menu,
+                                           CMPMenuOnAction on_action,
+                                           void *ctx);
 
 #ifdef CMP_TESTING
 /**
@@ -297,7 +302,7 @@ CMP_API int CMP_CALL m3_menu_test_set_force_hit_test_error(CMPBool enable);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_test_validate_style(const M3MenuStyle *style,
-                                               CMPBool require_family);
+                                                 CMPBool require_family);
 
 /**
  * @brief Test wrapper for menu text metric updates.
@@ -307,8 +312,8 @@ CMP_API int CMP_CALL m3_menu_test_validate_style(const M3MenuStyle *style,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_test_update_metrics(M3Menu *menu,
-                                               CMPScalar *out_text_width,
-                                               CMPBool *out_has_label);
+                                                 CMPScalar *out_text_width,
+                                                 CMPBool *out_has_label);
 
 /**
  * @brief Test wrapper for computing panel size.
@@ -319,9 +324,9 @@ CMP_API int CMP_CALL m3_menu_test_update_metrics(M3Menu *menu,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_test_compute_panel_size(M3Menu *menu,
-                                                   CMPScalar *out_width,
-                                                   CMPScalar *out_height,
-                                                   CMPBool *out_has_label);
+                                                     CMPScalar *out_width,
+                                                     CMPScalar *out_height,
+                                                     CMPBool *out_has_label);
 
 /**
  * @brief Test wrapper for computing panel bounds.
@@ -347,8 +352,8 @@ CMP_API int CMP_CALL m3_menu_test_compute_panel_bounds(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_test_hit_test(const M3Menu *menu, CMPScalar x,
-                                         CMPScalar y, CMPBool *out_inside,
-                                         cmp_usize *out_index);
+                                           CMPScalar y, CMPBool *out_inside,
+                                           cmp_usize *out_index);
 
 /**
  * @brief Test wrapper for color validation.
@@ -367,7 +372,8 @@ CMP_API int CMP_CALL m3_menu_test_validate_color(const CMPColor *color);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_test_color_set(CMPColor *color, CMPScalar r,
-                                          CMPScalar g, CMPScalar b, CMPScalar a);
+                                            CMPScalar g, CMPScalar b,
+                                            CMPScalar a);
 
 /**
  * @brief Test wrapper for edge validation.
@@ -383,7 +389,7 @@ CMP_API int CMP_CALL m3_menu_test_validate_edges(const CMPLayoutEdges *edges);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_test_validate_text_style(const CMPTextStyle *style,
-                                                    CMPBool require_family);
+                                                      CMPBool require_family);
 
 /**
  * @brief Test wrapper for measure spec validation.
@@ -421,7 +427,7 @@ m3_menu_test_validate_placement(const M3MenuPlacement *placement);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_menu_test_validate_items(const M3MenuItem *items,
-                                               cmp_usize count);
+                                                 cmp_usize count);
 #endif
 
 #ifdef __cplusplus

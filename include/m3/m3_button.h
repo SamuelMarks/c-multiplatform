@@ -73,9 +73,10 @@ typedef struct M3ButtonStyle {
   CMPScalar padding_y;                /**< Vertical padding in pixels. */
   CMPScalar min_width;                /**< Minimum width in pixels. */
   CMPScalar min_height;               /**< Minimum height in pixels. */
-  CMPScalar fab_diameter;           /**< FAB diameter in pixels (variant FAB). */
-  CMPScalar ripple_expand_duration; /**< Ripple expansion duration in seconds. */
-  CMPScalar ripple_fade_duration;   /**< Ripple fade-out duration in seconds. */
+  CMPScalar fab_diameter; /**< FAB diameter in pixels (variant FAB). */
+  CMPScalar
+      ripple_expand_duration;     /**< Ripple expansion duration in seconds. */
+  CMPScalar ripple_fade_duration; /**< Ripple fade-out duration in seconds. */
   CMPShadow shadow;       /**< Shadow descriptor for elevated buttons. */
   CMPBool shadow_enabled; /**< CMP_TRUE when shadow is enabled. */
 } M3ButtonStyle;
@@ -86,18 +87,18 @@ typedef struct M3ButtonStyle {
 typedef struct M3Button {
   CMPWidget widget; /**< Widget interface (points to this instance). */
   CMPTextBackend text_backend; /**< Text backend for measurements. */
-  M3ButtonStyle style;        /**< Current button style. */
+  M3ButtonStyle style;         /**< Current button style. */
   CMPHandle font;              /**< Font handle for label text. */
   CMPTextMetrics metrics;      /**< Cached text metrics. */
-  const char *utf8_label;     /**< UTF-8 label text (may be NULL when empty). */
-  cmp_usize utf8_len;          /**< UTF-8 label length in bytes. */
-  CMPRect bounds;              /**< Layout bounds. */
-  CMPRipple ripple;            /**< Ripple state. */
-  CMPBool pressed;             /**< CMP_TRUE when pressed. */
-  CMPBool metrics_valid;       /**< CMP_TRUE when text metrics are valid. */
-  CMPBool owns_font;           /**< CMP_TRUE when widget owns the font. */
-  CMPButtonOnClick on_click;   /**< Click callback (may be NULL). */
-  void *on_click_ctx;         /**< Click callback context pointer. */
+  const char *utf8_label;    /**< UTF-8 label text (may be NULL when empty). */
+  cmp_usize utf8_len;        /**< UTF-8 label length in bytes. */
+  CMPRect bounds;            /**< Layout bounds. */
+  CMPRipple ripple;          /**< Ripple state. */
+  CMPBool pressed;           /**< CMP_TRUE when pressed. */
+  CMPBool metrics_valid;     /**< CMP_TRUE when text metrics are valid. */
+  CMPBool owns_font;         /**< CMP_TRUE when widget owns the font. */
+  CMPButtonOnClick on_click; /**< Click callback (may be NULL). */
+  void *on_click_ctx;        /**< Click callback context pointer. */
 } M3Button;
 
 /**
@@ -152,9 +153,9 @@ CMP_API int CMP_CALL m3_button_style_init_fab(M3ButtonStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_button_init(M3Button *button,
-                                  const CMPTextBackend *backend,
-                                  const M3ButtonStyle *style,
-                                  const char *utf8_label, cmp_usize utf8_len);
+                                    const CMPTextBackend *backend,
+                                    const M3ButtonStyle *style,
+                                    const char *utf8_label, cmp_usize utf8_len);
 
 /**
  * @brief Update the button label.
@@ -163,8 +164,9 @@ CMP_API int CMP_CALL m3_button_init(M3Button *button,
  * @param utf8_len Length of the label in bytes.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_button_set_label(M3Button *button, const char *utf8_label,
-                                       cmp_usize utf8_len);
+CMP_API int CMP_CALL m3_button_set_label(M3Button *button,
+                                         const char *utf8_label,
+                                         cmp_usize utf8_len);
 
 /**
  * @brief Update the button style.
@@ -173,7 +175,7 @@ CMP_API int CMP_CALL m3_button_set_label(M3Button *button, const char *utf8_labe
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_button_set_style(M3Button *button,
-                                       const M3ButtonStyle *style);
+                                         const M3ButtonStyle *style);
 
 /**
  * @brief Assign a click callback to the button.
@@ -183,7 +185,8 @@ CMP_API int CMP_CALL m3_button_set_style(M3Button *button,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_button_set_on_click(M3Button *button,
-                                          CMPButtonOnClick on_click, void *ctx);
+                                            CMPButtonOnClick on_click,
+                                            void *ctx);
 
 #ifdef __cplusplus
 } /* extern "C" */

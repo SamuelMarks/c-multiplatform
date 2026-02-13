@@ -47,7 +47,7 @@ static int CMP_CALL test_alloc(void *ctx, cmp_usize size, void **out_ptr) {
 }
 
 static int CMP_CALL test_realloc(void *ctx, void *ptr, cmp_usize size,
-                                void **out_ptr) {
+                                 void **out_ptr) {
   TestAllocCtx *state;
   void *mem;
 
@@ -98,7 +98,7 @@ static int CMP_CALL test_free(void *ctx, void *ptr) {
 #define ACTION_UNSUPPORTED 4
 
 static int CMP_CALL counter_reducer(void *ctx, const CMPAction *action,
-                                   const void *prev_state, void *next_state) {
+                                    const void *prev_state, void *next_state) {
   const CounterState *prev;
   CounterState *next;
 
@@ -174,20 +174,20 @@ int main(void) {
   config.reducer_ctx = NULL;
 
   CMP_TEST_EXPECT(cmp_store_init(NULL, &config, &initial),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_init(&store, NULL, &initial),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_config = config;
   bad_config.state_size = 0;
   bad_config.reducer = counter_reducer;
   CMP_TEST_EXPECT(cmp_store_init(&store, &bad_config, &initial),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bad_config.state_size = sizeof(CounterState);
   bad_config.reducer = NULL;
   CMP_TEST_EXPECT(cmp_store_init(&store, &bad_config, &initial),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   config.allocator = &bad_alloc;
   config.state_size = sizeof(CounterState);
@@ -195,7 +195,7 @@ int main(void) {
   config.reducer = counter_reducer;
   config.reducer_ctx = NULL;
   CMP_TEST_EXPECT(cmp_store_init(&store, &config, &initial),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   max_size = (cmp_usize) ~(cmp_usize)0;
   config.allocator = NULL;
@@ -213,7 +213,7 @@ int main(void) {
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
 
   CMP_TEST_EXPECT(cmp_store_test_mul_overflow(1, 1, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   {
     cmp_u8 history_buffer[8];
     cmp_usize history_count;
@@ -222,40 +222,40 @@ int main(void) {
     history_state.value = 0;
     history_count = 0;
     CMP_TEST_EXPECT(cmp_store_test_history_push(NULL, 1, sizeof(history_state),
-                                              &history_count, &history_state),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                                &history_count, &history_state),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_store_test_history_push(history_buffer, 1,
-                                              sizeof(history_state), NULL,
-                                              &history_state),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                                sizeof(history_state), NULL,
+                                                &history_state),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_store_test_history_push(history_buffer, 1,
-                                              sizeof(history_state),
-                                              &history_count, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                                sizeof(history_state),
+                                                &history_count, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_EXPECT(cmp_store_test_history_pop(NULL, 1, sizeof(history_state),
-                                             &history_count, &history_state),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                               &history_count, &history_state),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_store_test_history_pop(history_buffer, 1,
-                                             sizeof(history_state), NULL,
-                                             &history_state),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                               sizeof(history_state), NULL,
+                                               &history_state),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_store_test_history_pop(history_buffer, 1,
-                                             sizeof(history_state),
-                                             &history_count, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                               sizeof(history_state),
+                                               &history_count, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_store_test_history_pop(history_buffer, 0,
-                                             sizeof(history_state),
-                                             &history_count, &history_state),
-                   CMP_ERR_NOT_FOUND);
+                                               sizeof(history_state),
+                                               &history_count, &history_state),
+                    CMP_ERR_NOT_FOUND);
 
-    CMP_TEST_EXPECT(cmp_store_test_copy_history(NULL, 1, sizeof(history_state), 1,
-                                              0, &history_state),
-                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_test_copy_history(NULL, 1, sizeof(history_state),
+                                                1, 0, &history_state),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_store_test_copy_history(history_buffer, 0,
-                                              sizeof(history_state), 1, 0,
-                                              &history_state),
-                   CMP_ERR_NOT_FOUND);
+                                                sizeof(history_state), 1, 0,
+                                                &history_state),
+                    CMP_ERR_NOT_FOUND);
   }
 #endif
 
@@ -267,21 +267,21 @@ int main(void) {
   config.allocator = &test_allocator;
   config.history_capacity = 1;
   CMP_TEST_EXPECT(cmp_store_init(&temp_store, &config, &initial),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
 
   init_alloc(&alloc_ctx, 1);
   CMP_TEST_EXPECT(cmp_store_init(&temp_store, &config, &initial),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   CMP_TEST_ASSERT(alloc_ctx.free_calls == 1);
 
   init_alloc(&alloc_ctx, 2);
   CMP_TEST_EXPECT(cmp_store_init(&temp_store, &config, &initial),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   CMP_TEST_ASSERT(alloc_ctx.free_calls == 2);
 
   init_alloc(&alloc_ctx, 3);
   CMP_TEST_EXPECT(cmp_store_init(&temp_store, &config, &initial),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
   CMP_TEST_ASSERT(alloc_ctx.free_calls == 3);
 
   config.allocator = NULL;
@@ -289,27 +289,29 @@ int main(void) {
   CMP_TEST_OK(cmp_store_init(&store, &config, &initial));
 
   CMP_TEST_EXPECT(cmp_store_get_state_ptr(NULL, &state_ptr, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_get_state_ptr(&store, NULL, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_get_state_ptr(&store, &state_ptr, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_store_get_state_ptr(&store, &state_ptr, &size));
   CMP_TEST_ASSERT(size == sizeof(CounterState));
   CMP_TEST_ASSERT(((const CounterState *)state_ptr)->value == 1);
 
   CMP_TEST_EXPECT(cmp_store_get_state(NULL, &state, sizeof(state)),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_get_state(&store, NULL, sizeof(state)),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_get_state(&store, &state, sizeof(state) - 1),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(cmp_store_get_state(&store, &state, sizeof(state)));
   CMP_TEST_ASSERT(state.value == 1);
 
-  CMP_TEST_EXPECT(cmp_store_can_undo(NULL, &can_undo), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_can_undo(NULL, &can_undo),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_can_undo(&store, NULL), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_store_can_redo(NULL, &can_redo), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_can_redo(NULL, &can_redo),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_can_redo(&store, NULL), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_store_can_undo(&store, &can_undo));
@@ -327,7 +329,8 @@ int main(void) {
   action.type = ACTION_ADD;
   action.data = NULL;
   action.size = sizeof(int);
-  CMP_TEST_EXPECT(cmp_store_dispatch(&store, &action), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_dispatch(&store, &action),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   action.type = ACTION_UNSUPPORTED;
   action.data = NULL;
@@ -362,9 +365,11 @@ int main(void) {
   CMP_TEST_OK(cmp_store_get_undo_count(&store, &count));
   CMP_TEST_ASSERT(count == 2);
 
-  CMP_TEST_OK(cmp_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot)));
+  CMP_TEST_OK(
+      cmp_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot)));
   CMP_TEST_ASSERT(snapshot.value == 3);
-  CMP_TEST_OK(cmp_store_copy_undo_state(&store, 1, &snapshot, sizeof(snapshot)));
+  CMP_TEST_OK(
+      cmp_store_copy_undo_state(&store, 1, &snapshot, sizeof(snapshot)));
   CMP_TEST_ASSERT(snapshot.value == 2);
   CMP_TEST_EXPECT(
       cmp_store_copy_undo_state(&store, 2, &snapshot, sizeof(snapshot)),
@@ -373,7 +378,7 @@ int main(void) {
       cmp_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot) - 1),
       CMP_ERR_RANGE);
   CMP_TEST_EXPECT(cmp_store_copy_undo_state(&store, 0, NULL, sizeof(snapshot)),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_store_undo(&store));
   CMP_TEST_OK(cmp_store_get_state(&store, &state, sizeof(state)));
@@ -385,12 +390,14 @@ int main(void) {
 
   CMP_TEST_OK(cmp_store_get_redo_count(&store, &count));
   CMP_TEST_ASSERT(count == 2);
-  CMP_TEST_OK(cmp_store_copy_redo_state(&store, 0, &snapshot, sizeof(snapshot)));
+  CMP_TEST_OK(
+      cmp_store_copy_redo_state(&store, 0, &snapshot, sizeof(snapshot)));
   CMP_TEST_ASSERT(snapshot.value == 3);
-  CMP_TEST_OK(cmp_store_copy_redo_state(&store, 1, &snapshot, sizeof(snapshot)));
+  CMP_TEST_OK(
+      cmp_store_copy_redo_state(&store, 1, &snapshot, sizeof(snapshot)));
   CMP_TEST_ASSERT(snapshot.value == 4);
   CMP_TEST_EXPECT(cmp_store_copy_redo_state(&store, 0, NULL, sizeof(snapshot)),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_store_redo(&store));
   CMP_TEST_OK(cmp_store_get_state(&store, &state, sizeof(state)));
@@ -417,13 +424,13 @@ int main(void) {
       CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(cmp_store_get_undo_count(NULL, &count),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_get_undo_count(&store, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_get_redo_count(NULL, &count),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_get_redo_count(&store, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   {
     CMPStore temp_store_local;
@@ -448,28 +455,32 @@ int main(void) {
 
     temp_store_local.undo_buffer = NULL;
     CMP_TEST_EXPECT(cmp_store_dispatch(&temp_store_local, &action),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     temp_store_local.undo_buffer = saved_undo;
 
     temp_store_local.redo_buffer = NULL;
     temp_store_local.undo_count = saved_undo_count;
-    CMP_TEST_EXPECT(cmp_store_undo(&temp_store_local), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_undo(&temp_store_local),
+                    CMP_ERR_INVALID_ARGUMENT);
     temp_store_local.redo_buffer = saved_redo;
 
     temp_store_local.undo_buffer = NULL;
     temp_store_local.undo_count = saved_undo_count;
     temp_store_local.redo_count = saved_redo_count;
-    CMP_TEST_EXPECT(cmp_store_undo(&temp_store_local), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_undo(&temp_store_local),
+                    CMP_ERR_INVALID_ARGUMENT);
     temp_store_local.undo_buffer = saved_undo;
 
     temp_store_local.undo_buffer = NULL;
     temp_store_local.redo_count = 1;
-    CMP_TEST_EXPECT(cmp_store_redo(&temp_store_local), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_redo(&temp_store_local),
+                    CMP_ERR_INVALID_ARGUMENT);
     temp_store_local.undo_buffer = saved_undo;
 
     temp_store_local.redo_buffer = NULL;
     temp_store_local.redo_count = 1;
-    CMP_TEST_EXPECT(cmp_store_redo(&temp_store_local), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_redo(&temp_store_local),
+                    CMP_ERR_INVALID_ARGUMENT);
     temp_store_local.redo_buffer = saved_redo;
     temp_store_local.redo_count = saved_redo_count;
     temp_store_local.undo_count = saved_undo_count;
@@ -482,7 +493,7 @@ int main(void) {
 
   CMP_TEST_EXPECT(cmp_store_dispatch(&store, &action), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_store_get_state(&store, &state, sizeof(state)),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_store_can_undo(&store, &can_undo), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_store_can_redo(&store, &can_redo), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_store_undo(&store), CMP_ERR_STATE);
@@ -513,14 +524,16 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_store_undo(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_redo(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_clear_history(NULL), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_store_copy_undo_state(NULL, 0, &snapshot, sizeof(snapshot)),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_store_copy_redo_state(NULL, 0, &snapshot, sizeof(snapshot)),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_store_copy_undo_state(NULL, 0, &snapshot, sizeof(snapshot)),
+      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_store_copy_redo_state(NULL, 0, &snapshot, sizeof(snapshot)),
+      CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_store_shutdown(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_store_get_state_ptr(&store, &state_ptr, &size),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_store_clear_history(&store), CMP_ERR_STATE);
 
   return 0;

@@ -33,7 +33,8 @@ CMP_API int CMP_CALL cmp_event_dispatcher_init(CMPEventDispatcher *dispatcher);
  * @param dispatcher Dispatcher instance.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_event_dispatcher_shutdown(CMPEventDispatcher *dispatcher);
+CMP_API int CMP_CALL
+cmp_event_dispatcher_shutdown(CMPEventDispatcher *dispatcher);
 
 /**
  * @brief Retrieve the focused widget.
@@ -50,8 +51,8 @@ CMP_API int CMP_CALL cmp_event_dispatcher_get_focus(
  * @param widget Widget to focus.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_event_dispatcher_set_focus(CMPEventDispatcher *dispatcher,
-                                                 CMPWidget *widget);
+CMP_API int CMP_CALL cmp_event_dispatcher_set_focus(
+    CMPEventDispatcher *dispatcher, CMPWidget *widget);
 
 /**
  * @brief Clear the focused widget.
@@ -89,10 +90,10 @@ CMP_API int CMP_CALL cmp_event_dispatcher_set_focus_visible(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
-                                     const CMPRenderNode *root,
-                                     const CMPInputEvent *event,
-                                     CMPWidget **out_target,
-                                     CMPBool *out_handled);
+                                        const CMPRenderNode *root,
+                                        const CMPInputEvent *event,
+                                        CMPWidget **out_target,
+                                        CMPBool *out_handled);
 
 #ifdef CMP_TESTING
 /**
@@ -109,7 +110,7 @@ CMP_API int CMP_CALL cmp_event_test_validate_rect(const CMPRect *rect);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_event_test_widget_focusable(const CMPWidget *widget,
-                                                  CMPBool *out_focusable);
+                                                     CMPBool *out_focusable);
 
 /**
  * @brief Test wrapper for hit testing.
@@ -119,8 +120,9 @@ CMP_API int CMP_CALL cmp_event_test_widget_focusable(const CMPWidget *widget,
  * @param out_widget Receives the hit widget (may be NULL).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_event_test_hit_test(const CMPRenderNode *node, CMPScalar x,
-                                          CMPScalar y, CMPWidget **out_widget);
+CMP_API int CMP_CALL cmp_event_test_hit_test(const CMPRenderNode *node,
+                                             CMPScalar x, CMPScalar y,
+                                             CMPWidget **out_widget);
 
 /**
  * @brief Test wrapper to dispatch directly to a widget.
@@ -129,9 +131,8 @@ CMP_API int CMP_CALL cmp_event_test_hit_test(const CMPRenderNode *node, CMPScala
  * @param out_handled Receives CMP_TRUE when handled.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_event_test_dispatch_to_widget(CMPWidget *widget,
-                                                    const CMPInputEvent *event,
-                                                    CMPBool *out_handled);
+CMP_API int CMP_CALL cmp_event_test_dispatch_to_widget(
+    CMPWidget *widget, const CMPInputEvent *event, CMPBool *out_handled);
 
 /**
  * @brief Force hit-test to surface a containment error (tests only).

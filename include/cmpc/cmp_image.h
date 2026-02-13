@@ -25,10 +25,10 @@ typedef struct CMPImageConfig {
  * @brief Image decoder state.
  */
 typedef struct CMPImageDecoder {
-  CMPImage image;        /**< Image decoder interface handle. */
+  CMPImage image;         /**< Image decoder interface handle. */
   CMPAllocator allocator; /**< Allocator used for decoded pixels. */
-  CMPBool ready;         /**< CMP_TRUE when initialized. */
-  CMPBool has_backend;   /**< CMP_TRUE when a backend decoder is available. */
+  CMPBool ready;          /**< CMP_TRUE when initialized. */
+  CMPBool has_backend;    /**< CMP_TRUE when a backend decoder is available. */
 } CMPImageDecoder;
 
 /**
@@ -52,7 +52,7 @@ CMP_API int CMP_CALL cmp_image_request_init(CMPImageDecodeRequest *request);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_image_init(CMPImageDecoder *decoder,
-                                 const CMPImageConfig *config);
+                                    const CMPImageConfig *config);
 
 /**
  * @brief Shut down an image decoder and release its state.
@@ -69,8 +69,8 @@ CMP_API int CMP_CALL cmp_image_shutdown(CMPImageDecoder *decoder);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_image_decode(CMPImageDecoder *decoder,
-                                   const CMPImageDecodeRequest *request,
-                                   CMPImageData *out_image);
+                                      const CMPImageDecodeRequest *request,
+                                      CMPImageData *out_image);
 
 /**
  * @brief Release decoded image data.
@@ -79,7 +79,7 @@ CMP_API int CMP_CALL cmp_image_decode(CMPImageDecoder *decoder,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_image_free(CMPImageDecoder *decoder,
-                                 CMPImageData *image);
+                                    CMPImageData *image);
 
 #ifdef __cplusplus
 } /* extern "C" */

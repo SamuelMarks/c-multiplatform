@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#define CMP_NETWORK_VTABLE_COMPLETE(vtable)                                     \
+#define CMP_NETWORK_VTABLE_COMPLETE(vtable)                                    \
   ((vtable)->request != NULL && (vtable)->free_response != NULL)
 
 int CMP_CALL cmp_network_config_init(CMPNetworkConfig *config) {
@@ -30,7 +30,7 @@ int CMP_CALL cmp_network_request_init(CMPNetworkRequest *request) {
 }
 
 int CMP_CALL cmp_network_init(CMPNetworkClient *client,
-                            const CMPNetworkConfig *config) {
+                              const CMPNetworkConfig *config) {
   CMPNetwork network;
   CMPAllocator allocator;
   int rc;
@@ -96,8 +96,8 @@ int CMP_CALL cmp_network_shutdown(CMPNetworkClient *client) {
 }
 
 int CMP_CALL cmp_network_request(CMPNetworkClient *client,
-                               const CMPNetworkRequest *request,
-                               CMPNetworkResponse *out_response) {
+                                 const CMPNetworkRequest *request,
+                                 CMPNetworkResponse *out_response) {
   int rc;
 
   if (client == NULL || request == NULL || out_response == NULL) {
@@ -136,7 +136,7 @@ int CMP_CALL cmp_network_request(CMPNetworkClient *client,
 }
 
 int CMP_CALL cmp_network_response_free(CMPNetworkClient *client,
-                                     CMPNetworkResponse *response) {
+                                       CMPNetworkResponse *response) {
   int rc;
 
   if (client == NULL || response == NULL) {
@@ -167,8 +167,8 @@ int CMP_CALL cmp_network_response_free(CMPNetworkClient *client,
 }
 
 int CMP_CALL cmp_network_copy_response_body(const CMPNetworkResponse *response,
-                                          void *dst, cmp_usize dst_capacity,
-                                          cmp_usize *out_size) {
+                                            void *dst, cmp_usize dst_capacity,
+                                            cmp_usize *out_size) {
   if (response == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

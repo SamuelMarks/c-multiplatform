@@ -21,24 +21,25 @@ int CMP_CALL m3_card_test_set_color_fail_after(cmp_u32 call_count);
 int CMP_CALL m3_card_test_clear_fail_points(void);
 int CMP_CALL m3_card_test_validate_color(const CMPColor *color);
 int CMP_CALL m3_card_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                   CMPScalar b, CMPScalar a);
-int CMP_CALL m3_card_test_color_with_alpha(const CMPColor *base, CMPScalar alpha,
-                                          CMPColor *out_color);
+                                    CMPScalar b, CMPScalar a);
+int CMP_CALL m3_card_test_color_with_alpha(const CMPColor *base,
+                                           CMPScalar alpha,
+                                           CMPColor *out_color);
 int CMP_CALL m3_card_test_validate_edges(const CMPLayoutEdges *edges);
 int CMP_CALL m3_card_test_validate_style(const M3CardStyle *style);
 int CMP_CALL m3_card_test_validate_measure_spec(CMPMeasureSpec spec);
 int CMP_CALL m3_card_test_validate_rect(const CMPRect *rect);
 int CMP_CALL m3_card_test_measure_content(const M3CardStyle *style,
-                                         CMPScalar *out_width,
-                                         CMPScalar *out_height);
+                                          CMPScalar *out_width,
+                                          CMPScalar *out_height);
 int CMP_CALL m3_card_test_compute_inner(const M3Card *card, CMPRect *out_inner,
-                                       CMPScalar *out_corner);
+                                        CMPScalar *out_corner);
 int CMP_CALL m3_card_test_compute_content_bounds(const M3Card *card,
-                                                CMPRect *out_bounds);
+                                                 CMPRect *out_bounds);
 int CMP_CALL m3_card_test_resolve_colors(const M3Card *card,
-                                        CMPColor *out_background,
-                                        CMPColor *out_outline,
-                                        CMPColor *out_ripple);
+                                         CMPColor *out_background,
+                                         CMPColor *out_outline,
+                                         CMPColor *out_ripple);
 
 typedef struct TestCardBackend {
   int draw_rect_calls;
@@ -124,18 +125,18 @@ static int test_gfx_pop_clip(void *gfx) {
 }
 
 static const CMPGfxVTable g_test_gfx_vtable = {NULL,
-                                              NULL,
-                                              NULL,
-                                              test_gfx_draw_rect,
-                                              NULL,
-                                              NULL,
-                                              test_gfx_push_clip,
-                                              test_gfx_pop_clip,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL,
-                                              NULL};
+                                               NULL,
+                                               NULL,
+                                               test_gfx_draw_rect,
+                                               NULL,
+                                               NULL,
+                                               test_gfx_push_clip,
+                                               test_gfx_pop_clip,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL,
+                                               NULL};
 
 static const CMPGfxVTable g_test_gfx_vtable_no_rect = {
     NULL, NULL, NULL, NULL, NULL, NULL, test_gfx_push_clip, test_gfx_pop_clip,
@@ -210,7 +211,7 @@ static int test_card_helpers(void) {
   null_rect = NULL;
 
   CMP_TEST_EXPECT(m3_card_test_validate_color((const CMPColor *)null_color),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   color.r = -0.1f;
   color.g = 0.0f;
   color.b = 0.0f;
@@ -229,44 +230,45 @@ static int test_card_helpers(void) {
   CMP_TEST_OK(m3_card_test_validate_color(&color));
 
   CMP_TEST_EXPECT(m3_card_test_color_set(NULL, 0.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_test_color_set(&color, -0.1f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_card_test_color_set(&color, 0.0f, -0.1f, 0.0f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_card_test_color_set(&color, 0.0f, 0.0f, -0.1f, 0.0f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_card_test_color_set(&color, 0.0f, 0.0f, 0.0f, -0.1f),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_card_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f));
   CMP_TEST_ASSERT(cmp_near(color.r, 0.1f, 0.0001f));
   CMP_TEST_ASSERT(cmp_near(color.a, 0.4f, 0.0001f));
 
   CMP_TEST_OK(m3_card_test_set_color_fail_after(1));
   CMP_TEST_EXPECT(m3_card_test_color_set(&color, 0.0f, 0.0f, 0.0f, 0.0f),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_card_test_clear_fail_points());
 
   CMP_TEST_EXPECT(m3_card_test_color_with_alpha(NULL, 0.5f, &out_color),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_test_color_with_alpha(&color, 0.5f, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_test_color_with_alpha(&color, -0.1f, &out_color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   color.r = -0.1f;
   CMP_TEST_EXPECT(m3_card_test_color_with_alpha(&color, 0.5f, &out_color),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_card_test_color_set(&color, 0.2f, 0.3f, 0.4f, 0.5f));
   CMP_TEST_OK(m3_card_test_color_with_alpha(&color, 0.5f, &out_color));
   CMP_TEST_ASSERT(cmp_near(out_color.a, 0.25f, 0.0001f));
 
   CMP_TEST_OK(m3_card_test_set_color_fail_after(1));
   CMP_TEST_EXPECT(m3_card_test_color_with_alpha(&color, 0.5f, &out_color),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_card_test_clear_fail_points());
 
-  CMP_TEST_EXPECT(m3_card_test_validate_edges((const CMPLayoutEdges *)null_edges),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      m3_card_test_validate_edges((const CMPLayoutEdges *)null_edges),
+      CMP_ERR_INVALID_ARGUMENT);
   edges.left = -1.0f;
   edges.top = 0.0f;
   edges.right = 0.0f;
@@ -328,9 +330,9 @@ static int test_card_helpers(void) {
       m3_card_test_measure_content(NULL, &content_width, &content_height),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_test_measure_content(&style, NULL, &content_height),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_test_measure_content(&style, &content_width, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bad_style = style;
   bad_style.padding.left = -1.0f;
   bad_style.padding.right = 0.0f;
@@ -342,7 +344,7 @@ static int test_card_helpers(void) {
   spec.mode = 99u;
   spec.size = 0.0f;
   CMP_TEST_EXPECT(m3_card_test_validate_measure_spec(spec),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   spec.mode = CMP_MEASURE_EXACTLY;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_card_test_validate_measure_spec(spec), CMP_ERR_RANGE);
@@ -351,7 +353,7 @@ static int test_card_helpers(void) {
   CMP_TEST_OK(m3_card_test_validate_measure_spec(spec));
 
   CMP_TEST_EXPECT(m3_card_test_validate_rect((const CMPRect *)null_rect),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   rect.x = 0.0f;
   rect.y = 0.0f;
   rect.width = -1.0f;
@@ -366,32 +368,32 @@ static int test_card_helpers(void) {
   CMP_TEST_OK(m3_card_style_init_filled(&card_style));
   CMP_TEST_OK(m3_card_init(&card, &card_style));
   CMP_TEST_EXPECT(m3_card_test_compute_inner(NULL, &inner, &inner_corner),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_test_compute_inner(&card, NULL, &inner_corner),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_test_compute_inner(&card, &inner, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   card.bounds.x = 0.0f;
   card.bounds.y = 0.0f;
   card.bounds.width = 100.0f;
   card.bounds.height = 80.0f;
   card.bounds.width = -1.0f;
   CMP_TEST_EXPECT(m3_card_test_compute_inner(&card, &inner, &inner_corner),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.bounds.width = 100.0f;
   card.style.outline_width = -1.0f;
   CMP_TEST_EXPECT(m3_card_test_compute_inner(&card, &inner, &inner_corner),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.style.outline_width = card_style.outline_width;
   card.style.corner_radius = -1.0f;
   CMP_TEST_EXPECT(m3_card_test_compute_inner(&card, &inner, &inner_corner),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.style.corner_radius = card_style.corner_radius;
   card.style.outline_width = 6.0f;
   card.bounds.width = 10.0f;
   card.bounds.height = 10.0f;
   CMP_TEST_EXPECT(m3_card_test_compute_inner(&card, &inner, &inner_corner),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.style.outline_width = card_style.outline_width;
   card.bounds.width = 100.0f;
   card.bounds.height = 80.0f;
@@ -403,12 +405,12 @@ static int test_card_helpers(void) {
   bad_style.variant = 0u;
   card.style = bad_style;
   CMP_TEST_EXPECT(m3_card_test_compute_content_bounds(&card, &content),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.style = card_style;
 
   card.bounds.width = -1.0f;
   CMP_TEST_EXPECT(m3_card_test_compute_content_bounds(&card, &content),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.bounds.width = 100.0f;
 
   card.style.corner_radius = 0.5f;
@@ -422,13 +424,13 @@ static int test_card_helpers(void) {
   card.bounds.width = 10.0f;
   card.bounds.height = 10.0f;
   CMP_TEST_EXPECT(m3_card_test_compute_content_bounds(&card, &content),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.bounds.width = 100.0f;
   card.bounds.height = 80.0f;
 
   CMP_TEST_OK(m3_card_test_set_fail_point(M3_CARD_TEST_FAIL_CONTENT_BOUNDS));
   CMP_TEST_EXPECT(m3_card_test_compute_content_bounds(&card, &content),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_card_test_clear_fail_points());
 
   CMP_TEST_OK(
@@ -442,7 +444,7 @@ static int test_card_helpers(void) {
       m3_card_test_resolve_colors(NULL, &background, &outline, &ripple),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_test_resolve_colors(&card, NULL, &outline, &ripple),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   card.style.background_color.r = -1.0f;
   CMP_TEST_EXPECT(
@@ -563,10 +565,11 @@ int main(void) {
   CMP_TEST_OK(m3_card_style_init_outlined(&outlined_style));
   CMP_TEST_ASSERT(elevated_style.variant == M3_CARD_VARIANT_ELEVATED);
   CMP_TEST_ASSERT(cmp_near(elevated_style.corner_radius,
-                         M3_CARD_DEFAULT_CORNER_RADIUS, 0.001f));
+                           M3_CARD_DEFAULT_CORNER_RADIUS, 0.001f));
   CMP_TEST_ASSERT(elevated_style.shadow_enabled == CMP_TRUE);
   CMP_TEST_ASSERT(filled_style.outline_width == 0.0f);
-  CMP_TEST_ASSERT(outlined_style.outline_width == M3_CARD_DEFAULT_OUTLINE_WIDTH);
+  CMP_TEST_ASSERT(outlined_style.outline_width ==
+                  M3_CARD_DEFAULT_OUTLINE_WIDTH);
 
   CMP_TEST_EXPECT(m3_card_init(NULL, &filled_style), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_init(&card, NULL), CMP_ERR_INVALID_ARGUMENT);
@@ -583,7 +586,7 @@ int main(void) {
   CMP_TEST_ASSERT(card.widget.vtable != NULL);
 
   CMP_TEST_EXPECT(m3_card_set_style(NULL, &filled_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_set_style(&card, NULL), CMP_ERR_INVALID_ARGUMENT);
   bad_style = filled_style;
   bad_style.outline_width = -1.0f;
@@ -593,7 +596,7 @@ int main(void) {
   counter.calls = 0;
   counter.fail = 0;
   CMP_TEST_EXPECT(m3_card_set_on_click(NULL, test_card_on_click, &counter),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_card_set_on_click(&card, test_card_on_click, &counter));
 
   bounds.x = 0.0f;
@@ -603,9 +606,9 @@ int main(void) {
   card.bounds = bounds;
 
   CMP_TEST_EXPECT(m3_card_get_content_bounds(NULL, &content_bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_get_content_bounds(&card, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_card_set_style(&card, &filled_style));
   CMP_TEST_OK(m3_card_get_content_bounds(&card, &content_bounds));
@@ -616,12 +619,12 @@ int main(void) {
   bad_style.padding.right = 80.0f;
   CMP_TEST_OK(m3_card_set_style(&card, &bad_style));
   CMP_TEST_EXPECT(m3_card_get_content_bounds(&card, &content_bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_card_set_style(&card, &filled_style));
 
   CMP_TEST_OK(m3_card_test_set_fail_point(M3_CARD_TEST_FAIL_CONTENT_BOUNDS));
   CMP_TEST_EXPECT(m3_card_get_content_bounds(&card, &content_bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_card_test_clear_fail_points());
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
@@ -629,7 +632,7 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(card.widget.vtable->measure(card.widget.ctx, width_spec,
-                                         height_spec, &size));
+                                          height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, M3_CARD_DEFAULT_MIN_WIDTH, 0.001f));
 
   bad_style = filled_style;
@@ -641,7 +644,7 @@ int main(void) {
   bad_style.padding.bottom = 10.0f;
   CMP_TEST_OK(m3_card_set_style(&card, &bad_style));
   CMP_TEST_OK(card.widget.vtable->measure(card.widget.ctx, width_spec,
-                                         height_spec, &size));
+                                          height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 80.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 20.0f, 0.001f));
   CMP_TEST_OK(m3_card_set_style(&card, &filled_style));
@@ -651,7 +654,7 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 50.0f;
   CMP_TEST_OK(card.widget.vtable->measure(card.widget.ctx, width_spec,
-                                         height_spec, &size));
+                                          height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 120.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 50.0f, 0.001f));
 
@@ -660,103 +663,103 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 44.0f;
   CMP_TEST_OK(card.widget.vtable->measure(card.widget.ctx, width_spec,
-                                         height_spec, &size));
+                                          height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 30.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 44.0f, 0.001f));
 
   width_spec.mode = 99u;
   width_spec.size = 0.0f;
   CMP_TEST_EXPECT(card.widget.vtable->measure(card.widget.ctx, width_spec,
-                                             height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                              height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_EXACTLY;
   width_spec.size = 10.0f;
   height_spec.mode = 99u;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(card.widget.vtable->measure(card.widget.ctx, width_spec,
-                                             height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                              height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   card.style.outline_width = -1.0f;
   CMP_TEST_EXPECT(card.widget.vtable->measure(card.widget.ctx, width_spec,
-                                             height_spec, &size),
-                 CMP_ERR_RANGE);
+                                              height_spec, &size),
+                  CMP_ERR_RANGE);
   card.style = filled_style;
 
   CMP_TEST_OK(m3_card_test_set_fail_point(M3_CARD_TEST_FAIL_MEASURE_CONTENT));
   CMP_TEST_EXPECT(card.widget.vtable->measure(card.widget.ctx, width_spec,
-                                             height_spec, &size),
-                 CMP_ERR_IO);
+                                              height_spec, &size),
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_card_test_clear_fail_points());
 
   CMP_TEST_EXPECT(
       card.widget.vtable->measure(NULL, width_spec, height_spec, &size),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(card.widget.vtable->measure(card.widget.ctx, width_spec,
-                                             height_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                              height_spec, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bounds.width = -1.0f;
   CMP_TEST_EXPECT(card.widget.vtable->layout(card.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bounds.width = 100.0f;
   bounds.height = 80.0f;
   CMP_TEST_OK(card.widget.vtable->layout(card.widget.ctx, bounds));
 
   CMP_TEST_EXPECT(card.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(card.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = NULL;
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = &gfx;
 
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_gfx_vtable;
 
   gfx.vtable = &g_test_gfx_vtable_no_rect;
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_gfx_vtable;
 
   CMP_TEST_OK(m3_card_test_set_fail_point(M3_CARD_TEST_FAIL_RESOLVE_COLORS));
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_card_test_clear_fail_points());
 
   CMP_TEST_OK(m3_card_test_set_fail_point(M3_CARD_TEST_FAIL_OUTLINE_WIDTH));
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_card_test_clear_fail_points());
 
   card.style.corner_radius = -1.0f;
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.style = filled_style;
 
   card.bounds.width = -1.0f;
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.bounds = bounds;
 
   CMP_TEST_OK(m3_card_test_set_fail_point(M3_CARD_TEST_FAIL_CORNER_RADIUS));
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_card_test_clear_fail_points());
 
   card.style = outlined_style;
   backend.fail_draw_rect = CMP_ERR_IO;
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect = CMP_OK;
   card.style = filled_style;
 
@@ -768,12 +771,12 @@ int main(void) {
 
   card.ripple.state = 99;
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   card.ripple.state = CMP_RIPPLE_STATE_IDLE;
 
   backend.fail_draw_rect = CMP_ERR_IO;
   CMP_TEST_EXPECT(card.widget.vtable->paint(card.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect = CMP_OK;
 
   CMP_TEST_OK(m3_card_init(&shadow_card, &elevated_style));
@@ -832,11 +835,11 @@ int main(void) {
   CMP_TEST_OK(m3_card_init(&card, &filled_style));
   card.bounds = bounds;
   CMP_TEST_EXPECT(card.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(card.widget.vtable->event(card.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(card.widget.vtable->event(card.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   card.widget.flags = CMP_WIDGET_FLAG_DISABLED;
   handled = CMP_TRUE;
@@ -846,32 +849,32 @@ int main(void) {
 
   card.pressed = CMP_TRUE;
   CMP_TEST_EXPECT(card.widget.vtable->event(card.widget.ctx, &event, &handled),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   card.pressed = CMP_FALSE;
 
   card.style.ripple_expand_duration = -1.0f;
   CMP_TEST_EXPECT(card.widget.vtable->event(card.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.style.ripple_expand_duration = filled_style.ripple_expand_duration;
 
   card.style.ripple_color.r = -1.0f;
   CMP_TEST_EXPECT(card.widget.vtable->event(card.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.style.ripple_color.r = filled_style.ripple_color.r;
 
   card.bounds.width = -1.0f;
   CMP_TEST_EXPECT(card.widget.vtable->event(card.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.bounds.width = bounds.width;
 
   CMP_TEST_OK(m3_card_test_set_fail_point(M3_CARD_TEST_FAIL_RIPPLE_RADIUS));
   CMP_TEST_EXPECT(card.widget.vtable->event(card.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_card_test_clear_fail_points());
 
   CMP_TEST_OK(m3_card_test_set_fail_point(M3_CARD_TEST_FAIL_RIPPLE_START));
   CMP_TEST_EXPECT(card.widget.vtable->event(card.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_card_test_clear_fail_points());
 
   CMP_TEST_OK(card.widget.vtable->event(card.widget.ctx, &event, &handled));
@@ -889,13 +892,13 @@ int main(void) {
   card.pressed = CMP_TRUE;
   card.style.ripple_fade_duration = -1.0f;
   CMP_TEST_EXPECT(card.widget.vtable->event(card.widget.ctx, &event, &handled),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   card.style.ripple_fade_duration = filled_style.ripple_fade_duration;
 
   card.pressed = CMP_TRUE;
   CMP_TEST_OK(m3_card_test_set_fail_point(M3_CARD_TEST_FAIL_RIPPLE_RELEASE));
   CMP_TEST_EXPECT(card.widget.vtable->event(card.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(m3_card_test_clear_fail_points());
 
   counter.calls = 0;
@@ -910,12 +913,12 @@ int main(void) {
   card.pressed = CMP_TRUE;
   card.ripple.state = CMP_RIPPLE_STATE_IDLE;
   CMP_TEST_EXPECT(card.widget.vtable->event(card.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
 
   CMP_TEST_EXPECT(card.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(card.widget.vtable->get_semantics(card.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(card.widget.vtable->get_semantics(card.widget.ctx, &semantics));
   CMP_TEST_ASSERT(semantics.role == CMP_SEMANTIC_BUTTON);
   CMP_TEST_ASSERT((semantics.flags & CMP_SEMANTIC_FLAG_FOCUSABLE) != 0u);

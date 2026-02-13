@@ -19,9 +19,9 @@ extern "C" {
  * @brief Storage entry description.
  */
 typedef struct CMPStorageEntry {
-  char *key;          /**< UTF-8 key bytes (null-terminated copy). */
+  char *key;           /**< UTF-8 key bytes (null-terminated copy). */
   cmp_usize key_len;   /**< Key length in bytes (excluding null terminator). */
-  void *value;        /**< Value bytes (may be NULL when value_len is 0). */
+  void *value;         /**< Value bytes (may be NULL when value_len is 0). */
   cmp_usize value_len; /**< Value length in bytes. */
 } CMPStorageEntry;
 
@@ -58,7 +58,7 @@ CMP_API int CMP_CALL cmp_storage_config_init(CMPStorageConfig *config);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_storage_init(CMPStorage *storage,
-                                   const CMPStorageConfig *config);
+                                      const CMPStorageConfig *config);
 
 /**
  * @brief Shut down a storage instance and release resources.
@@ -79,8 +79,8 @@ CMP_API int CMP_CALL cmp_storage_shutdown(CMPStorage *storage);
  * false, or a failure code.
  */
 CMP_API int CMP_CALL cmp_storage_put(CMPStorage *storage, const char *utf8_key,
-                                  cmp_usize key_len, const void *value,
-                                  cmp_usize value_len, CMPBool overwrite);
+                                     cmp_usize key_len, const void *value,
+                                     cmp_usize value_len, CMPBool overwrite);
 
 /**
  * @brief Retrieve a value into a caller-provided buffer.
@@ -94,9 +94,9 @@ CMP_API int CMP_CALL cmp_storage_put(CMPStorage *storage, const char *utf8_key,
  * buffer is too small, or a failure code.
  */
 CMP_API int CMP_CALL cmp_storage_get(const CMPStorage *storage,
-                                  const char *utf8_key, cmp_usize key_len,
-                                  void *out_value, cmp_usize value_capacity,
-                                  cmp_usize *out_value_size);
+                                     const char *utf8_key, cmp_usize key_len,
+                                     void *out_value, cmp_usize value_capacity,
+                                     cmp_usize *out_value_size);
 
 /**
  * @brief Check whether a key exists in storage.
@@ -107,8 +107,9 @@ CMP_API int CMP_CALL cmp_storage_get(const CMPStorage *storage,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_storage_contains(const CMPStorage *storage,
-                                       const char *utf8_key, cmp_usize key_len,
-                                       CMPBool *out_exists);
+                                          const char *utf8_key,
+                                          cmp_usize key_len,
+                                          CMPBool *out_exists);
 
 /**
  * @brief Remove a key/value pair.
@@ -117,8 +118,9 @@ CMP_API int CMP_CALL cmp_storage_contains(const CMPStorage *storage,
  * @param key_len Key length in bytes.
  * @return CMP_OK on success, CMP_ERR_NOT_FOUND if missing, or a failure code.
  */
-CMP_API int CMP_CALL cmp_storage_remove(CMPStorage *storage, const char *utf8_key,
-                                     cmp_usize key_len);
+CMP_API int CMP_CALL cmp_storage_remove(CMPStorage *storage,
+                                        const char *utf8_key,
+                                        cmp_usize key_len);
 
 /**
  * @brief Remove all key/value pairs.
@@ -134,7 +136,7 @@ CMP_API int CMP_CALL cmp_storage_clear(CMPStorage *storage);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_storage_count(const CMPStorage *storage,
-                                    cmp_usize *out_count);
+                                       cmp_usize *out_count);
 
 /**
  * @brief Save storage contents to a file using the provided IO backend.
@@ -144,18 +146,18 @@ CMP_API int CMP_CALL cmp_storage_count(const CMPStorage *storage,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_storage_save(const CMPStorage *storage, CMPIO *io,
-                                   const char *utf8_path);
+                                      const char *utf8_path);
 
 /**
  * @brief Load storage contents from a file produced by cmp_storage_save.
  * @param storage Storage instance.
  * @param io IO backend.
  * @param utf8_path Input file path in UTF-8.
- * @return CMP_OK on success, CMP_ERR_CORRUPT for invalid data, CMP_ERR_UNSUPPORTED
- * for version mismatch, or a failure code.
+ * @return CMP_OK on success, CMP_ERR_CORRUPT for invalid data,
+ * CMP_ERR_UNSUPPORTED for version mismatch, or a failure code.
  */
 CMP_API int CMP_CALL cmp_storage_load(CMPStorage *storage, CMPIO *io,
-                                   const char *utf8_path);
+                                      const char *utf8_path);
 
 #ifdef CMP_TESTING
 /**
@@ -166,7 +168,7 @@ CMP_API int CMP_CALL cmp_storage_load(CMPStorage *storage, CMPIO *io,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_storage_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                                cmp_usize *out_value);
+                                                   cmp_usize *out_value);
 
 /**
  * @brief Test wrapper for overflow-safe addition.
@@ -176,7 +178,7 @@ CMP_API int CMP_CALL cmp_storage_test_mul_overflow(cmp_usize a, cmp_usize b,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_storage_test_add_overflow(cmp_usize a, cmp_usize b,
-                                                cmp_usize *out_value);
+                                                   cmp_usize *out_value);
 
 /**
  * @brief Test wrapper for converting sizes to u32.
@@ -185,7 +187,7 @@ CMP_API int CMP_CALL cmp_storage_test_add_overflow(cmp_usize a, cmp_usize b,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_storage_test_u32_from_usize(cmp_usize value,
-                                                  cmp_u32 *out_value);
+                                                     cmp_u32 *out_value);
 
 /**
  * @brief Test wrapper for growing storage capacity.
@@ -194,7 +196,7 @@ CMP_API int CMP_CALL cmp_storage_test_u32_from_usize(cmp_usize value,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_storage_test_grow(CMPStorage *storage,
-                                        cmp_usize min_capacity);
+                                           cmp_usize min_capacity);
 
 #endif
 

@@ -215,7 +215,8 @@ static const char *cmp_log_level_name(CMPLogLevel level) {
   }
 }
 
-static int cmp_log_write_bytes(FILE *stream, const char *data, cmp_usize length) {
+static int cmp_log_write_bytes(FILE *stream, const char *data,
+                               cmp_usize length) {
   size_t written;
 
   if (length == 0) {
@@ -244,8 +245,8 @@ static int cmp_log_write_bytes(FILE *stream, const char *data, cmp_usize length)
 }
 
 static int CMP_CALL cmp_log_default_sink(void *ctx, CMPLogLevel level,
-                                       const char *tag, const char *message,
-                                       cmp_usize length) {
+                                         const char *tag, const char *message,
+                                         cmp_usize length) {
   FILE *stream;
   const char *level_name;
   cmp_usize level_len;
@@ -412,7 +413,7 @@ int CMP_CALL cmp_log_get_sink(CMPLogSink *out_sink) {
 }
 
 int CMP_CALL cmp_log_write(CMPLogLevel level, const char *tag,
-                         const char *message) {
+                           const char *message) {
   cmp_usize length;
   int rc;
 
@@ -429,7 +430,7 @@ int CMP_CALL cmp_log_write(CMPLogLevel level, const char *tag,
 }
 
 int CMP_CALL cmp_log_write_n(CMPLogLevel level, const char *tag,
-                           const char *message, cmp_usize length) {
+                             const char *message, cmp_usize length) {
   int rc;
   int write_rc;
 
@@ -457,9 +458,10 @@ int CMP_CALL cmp_log_write_n(CMPLogLevel level, const char *tag,
 }
 
 #ifdef CMP_TESTING
-int CMP_CALL cmp_log_test_set_mutex_failures(CMPBool init_fail, CMPBool lock_fail,
-                                           CMPBool unlock_fail,
-                                           CMPBool shutdown_fail) {
+int CMP_CALL cmp_log_test_set_mutex_failures(CMPBool init_fail,
+                                             CMPBool lock_fail,
+                                             CMPBool unlock_fail,
+                                             CMPBool shutdown_fail) {
   g_log_force_mutex_init_fail = init_fail;
   g_log_force_mutex_lock_fail = lock_fail;
   g_log_force_mutex_unlock_fail = unlock_fail;
@@ -495,5 +497,7 @@ int CMP_CALL cmp_log_test_mutex_lock(void) { return cmp_log_mutex_lock(); }
 
 int CMP_CALL cmp_log_test_mutex_unlock(void) { return cmp_log_mutex_unlock(); }
 
-int CMP_CALL cmp_log_test_mutex_shutdown(void) { return cmp_log_mutex_shutdown(); }
+int CMP_CALL cmp_log_test_mutex_shutdown(void) {
+  return cmp_log_mutex_shutdown();
+}
 #endif

@@ -25,10 +25,10 @@ typedef struct CMPAudioConfig {
  * @brief Audio decoder state.
  */
 typedef struct CMPAudioDecoder {
-  CMPAudio audio;        /**< Audio decoder interface handle. */
+  CMPAudio audio;         /**< Audio decoder interface handle. */
   CMPAllocator allocator; /**< Allocator used for decoded PCM. */
-  CMPBool ready;         /**< CMP_TRUE when initialized. */
-  CMPBool has_backend;   /**< CMP_TRUE when a backend decoder is available. */
+  CMPBool ready;          /**< CMP_TRUE when initialized. */
+  CMPBool has_backend;    /**< CMP_TRUE when a backend decoder is available. */
 } CMPAudioDecoder;
 
 /**
@@ -52,7 +52,7 @@ CMP_API int CMP_CALL cmp_audio_request_init(CMPAudioDecodeRequest *request);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_audio_init(CMPAudioDecoder *decoder,
-                                 const CMPAudioConfig *config);
+                                    const CMPAudioConfig *config);
 
 /**
  * @brief Shut down an audio decoder and release its state.
@@ -69,8 +69,8 @@ CMP_API int CMP_CALL cmp_audio_shutdown(CMPAudioDecoder *decoder);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_audio_decode(CMPAudioDecoder *decoder,
-                                   const CMPAudioDecodeRequest *request,
-                                   CMPAudioData *out_audio);
+                                      const CMPAudioDecodeRequest *request,
+                                      CMPAudioData *out_audio);
 
 /**
  * @brief Release decoded audio data.
@@ -78,7 +78,8 @@ CMP_API int CMP_CALL cmp_audio_decode(CMPAudioDecoder *decoder,
  * @param audio Audio data to free.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_audio_free(CMPAudioDecoder *decoder, CMPAudioData *audio);
+CMP_API int CMP_CALL cmp_audio_free(CMPAudioDecoder *decoder,
+                                    CMPAudioData *audio);
 
 #ifdef __cplusplus
 } /* extern "C" */

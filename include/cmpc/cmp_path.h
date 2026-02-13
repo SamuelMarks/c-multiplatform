@@ -20,7 +20,7 @@ extern "C" {
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_path_init(CMPPath *path, const CMPAllocator *allocator,
-                                cmp_usize initial_capacity);
+                                   cmp_usize initial_capacity);
 
 /**
  * @brief Reset a path without freeing its storage.
@@ -64,7 +64,7 @@ CMP_API int CMP_CALL cmp_path_line_to(CMPPath *path, CMPScalar x, CMPScalar y);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_path_quad_to(CMPPath *path, CMPScalar cx, CMPScalar cy,
-                                   CMPScalar x, CMPScalar y);
+                                      CMPScalar x, CMPScalar y);
 
 /**
  * @brief Append a cubic curve-to command to the path.
@@ -77,9 +77,9 @@ CMP_API int CMP_CALL cmp_path_quad_to(CMPPath *path, CMPScalar cx, CMPScalar cy,
  * @param y Target Y coordinate.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_path_cubic_to(CMPPath *path, CMPScalar cx1, CMPScalar cy1,
-                                    CMPScalar cx2, CMPScalar cy2, CMPScalar x,
-                                    CMPScalar y);
+CMP_API int CMP_CALL cmp_path_cubic_to(CMPPath *path, CMPScalar cx1,
+                                       CMPScalar cy1, CMPScalar cx2,
+                                       CMPScalar cy2, CMPScalar x, CMPScalar y);
 
 /**
  * @brief Append a close-path command to the path.
@@ -97,7 +97,7 @@ CMP_API int CMP_CALL cmp_path_close(CMPPath *path);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_path_test_add_overflow(cmp_usize a, cmp_usize b,
-                                             cmp_usize *out_value);
+                                                cmp_usize *out_value);
 
 /**
  * @brief Test wrapper for overflow-safe multiplication.
@@ -107,7 +107,7 @@ CMP_API int CMP_CALL cmp_path_test_add_overflow(cmp_usize a, cmp_usize b,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_path_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                             cmp_usize *out_value);
+                                                cmp_usize *out_value);
 
 /**
  * @brief Test wrapper for current-point detection.
@@ -116,11 +116,12 @@ CMP_API int CMP_CALL cmp_path_test_mul_overflow(cmp_usize a, cmp_usize b,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_path_test_has_current(const CMPPath *path,
-                                            CMPBool *out_has_current);
+                                               CMPBool *out_has_current);
 
 /**
  * @brief Test control for forcing reserve growth paths.
- * @param enable CMP_TRUE to force growth logic even when capacity is sufficient.
+ * @param enable CMP_TRUE to force growth logic even when capacity is
+ * sufficient.
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_path_test_set_force_reserve(CMPBool enable);

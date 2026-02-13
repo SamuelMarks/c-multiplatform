@@ -24,17 +24,17 @@ typedef struct CMPTextMetrics {
  */
 typedef struct CMPTextStyle {
   const char *utf8_family; /**< Font family name (UTF-8). */
-  cmp_i32 size_px;          /**< Font size in pixels. */
-  cmp_i32 weight;           /**< Font weight (100..900). */
-  CMPBool italic;           /**< CMP_TRUE for italic. */
-  CMPColor color;           /**< Text color. */
+  cmp_i32 size_px;         /**< Font size in pixels. */
+  cmp_i32 weight;          /**< Font weight (100..900). */
+  CMPBool italic;          /**< CMP_TRUE for italic. */
+  CMPColor color;          /**< Text color. */
 } CMPTextStyle;
 
 /**
  * @brief Text backend descriptor.
  */
 typedef struct CMPTextBackend {
-  void *ctx;                  /**< Backend context pointer. */
+  void *ctx;                   /**< Backend context pointer. */
   const CMPTextVTable *vtable; /**< Backend text virtual table. */
 } CMPTextBackend;
 
@@ -47,7 +47,7 @@ typedef struct CMPTextWidget {
   CMPTextStyle style;     /**< Text style. */
   CMPHandle font;         /**< Font handle. */
   CMPTextMetrics metrics; /**< Cached metrics. */
-  const char *utf8;      /**< UTF-8 text pointer. */
+  const char *utf8;       /**< UTF-8 text pointer. */
   cmp_usize utf8_len;     /**< UTF-8 length in bytes. */
   CMPRect bounds;         /**< Layout bounds. */
   CMPBool owns_font;      /**< CMP_TRUE when widget owns the font. */
@@ -68,7 +68,7 @@ CMP_API int CMP_CALL cmp_text_style_init(CMPTextStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_backend_from_gfx(const CMPGfx *gfx,
-                                            CMPTextBackend *out_backend);
+                                               CMPTextBackend *out_backend);
 
 /**
  * @brief Create a font using a text backend.
@@ -78,8 +78,8 @@ CMP_API int CMP_CALL cmp_text_backend_from_gfx(const CMPGfx *gfx,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_font_create(const CMPTextBackend *backend,
-                                       const CMPTextStyle *style,
-                                       CMPHandle *out_font);
+                                          const CMPTextStyle *style,
+                                          CMPHandle *out_font);
 
 /**
  * @brief Destroy a font using a text backend.
@@ -88,7 +88,7 @@ CMP_API int CMP_CALL cmp_text_font_create(const CMPTextBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_font_destroy(const CMPTextBackend *backend,
-                                        CMPHandle font);
+                                           CMPHandle font);
 
 /**
  * @brief Measure a UTF-8 buffer.
@@ -100,9 +100,9 @@ CMP_API int CMP_CALL cmp_text_font_destroy(const CMPTextBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_measure_utf8(const CMPTextBackend *backend,
-                                        CMPHandle font, const char *utf8,
-                                        cmp_usize utf8_len,
-                                        CMPTextMetrics *out_metrics);
+                                           CMPHandle font, const char *utf8,
+                                           cmp_usize utf8_len,
+                                           CMPTextMetrics *out_metrics);
 
 /**
  * @brief Measure a null-terminated UTF-8 string.
@@ -113,8 +113,8 @@ CMP_API int CMP_CALL cmp_text_measure_utf8(const CMPTextBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_measure_cstr(const CMPTextBackend *backend,
-                                        CMPHandle font, const char *utf8,
-                                        CMPTextMetrics *out_metrics);
+                                           CMPHandle font, const char *utf8,
+                                           CMPTextMetrics *out_metrics);
 
 /**
  * @brief Retrieve font metrics by measuring an empty string.
@@ -124,8 +124,8 @@ CMP_API int CMP_CALL cmp_text_measure_cstr(const CMPTextBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_font_metrics(const CMPTextBackend *backend,
-                                        CMPHandle font,
-                                        CMPTextMetrics *out_metrics);
+                                           CMPHandle font,
+                                           CMPTextMetrics *out_metrics);
 
 /**
  * @brief Initialize a text widget.
@@ -137,9 +137,9 @@ CMP_API int CMP_CALL cmp_text_font_metrics(const CMPTextBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_widget_init(CMPTextWidget *widget,
-                                       const CMPTextBackend *backend,
-                                       const CMPTextStyle *style,
-                                       const char *utf8, cmp_usize utf8_len);
+                                          const CMPTextBackend *backend,
+                                          const CMPTextStyle *style,
+                                          const char *utf8, cmp_usize utf8_len);
 
 /**
  * @brief Update the text widget content.
@@ -149,7 +149,8 @@ CMP_API int CMP_CALL cmp_text_widget_init(CMPTextWidget *widget,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_widget_set_text(CMPTextWidget *widget,
-                                           const char *utf8, cmp_usize utf8_len);
+                                              const char *utf8,
+                                              cmp_usize utf8_len);
 
 /**
  * @brief Update the text widget style.
@@ -158,7 +159,7 @@ CMP_API int CMP_CALL cmp_text_widget_set_text(CMPTextWidget *widget,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_widget_set_style(CMPTextWidget *widget,
-                                            const CMPTextStyle *style);
+                                               const CMPTextStyle *style);
 
 /**
  * @brief Retrieve cached text metrics.
@@ -167,7 +168,7 @@ CMP_API int CMP_CALL cmp_text_widget_set_style(CMPTextWidget *widget,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_widget_get_metrics(CMPTextWidget *widget,
-                                              CMPTextMetrics *out_metrics);
+                                                 CMPTextMetrics *out_metrics);
 
 #ifdef CMP_TESTING
 /**
@@ -189,7 +190,8 @@ CMP_API int CMP_CALL cmp_text_test_validate_style(const CMPTextStyle *style);
  * @param backend Backend to validate.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_text_test_validate_backend(const CMPTextBackend *backend);
+CMP_API int CMP_CALL
+cmp_text_test_validate_backend(const CMPTextBackend *backend);
 
 /**
  * @brief Test wrapper for measure spec validation.
@@ -218,7 +220,8 @@ CMP_API int CMP_CALL cmp_text_test_metrics_update(CMPTextWidget *widget);
  * @param out_len Receives string length.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_text_test_cstrlen(const char *cstr, cmp_usize *out_len);
+CMP_API int CMP_CALL cmp_text_test_cstrlen(const char *cstr,
+                                           cmp_usize *out_len);
 
 /**
  * @brief Override the maximum C-string length used by text helpers.

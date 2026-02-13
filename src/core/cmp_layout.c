@@ -30,10 +30,9 @@ static int cmp_layout_validate_direction(const CMPLayoutDirection *direction) {
   return CMP_OK;
 }
 
-static int
-cmp_layout_resolve_horizontal_padding(const CMPLayoutDirection *direction,
-                                     const CMPLayoutEdges *padding,
-                                     CMPScalar *out_left, CMPScalar *out_right) {
+static int cmp_layout_resolve_horizontal_padding(
+    const CMPLayoutDirection *direction, const CMPLayoutEdges *padding,
+    CMPScalar *out_left, CMPScalar *out_right) {
   CMPScalar start;
   CMPScalar end;
   CMPBool is_rtl;
@@ -136,7 +135,7 @@ static int cmp_layout_validate_style(const CMPLayoutStyle *style) {
 }
 
 static int cmp_layout_apply_spec(CMPScalar size, CMPLayoutMeasureSpec spec,
-                                CMPScalar *out_size) {
+                                 CMPScalar *out_size) {
   if (out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -163,7 +162,7 @@ static int cmp_layout_apply_spec(CMPScalar size, CMPLayoutMeasureSpec spec,
 }
 
 static CMPScalar cmp_layout_resolve_available(CMPScalar style_size,
-                                            CMPLayoutMeasureSpec spec) {
+                                              CMPLayoutMeasureSpec spec) {
   CMPScalar available;
 
   available = -1.0f;
@@ -183,13 +182,14 @@ static CMPScalar cmp_layout_resolve_available(CMPScalar style_size,
 }
 
 static int cmp_layout_measure_node(CMPLayoutNode *node,
-                                  const CMPLayoutDirection *direction,
-                                  CMPLayoutMeasureSpec width,
-                                  CMPLayoutMeasureSpec height);
+                                   const CMPLayoutDirection *direction,
+                                   CMPLayoutMeasureSpec width,
+                                   CMPLayoutMeasureSpec height);
 
-static int cmp_layout_measure_leaf(CMPLayoutNode *node, CMPLayoutMeasureSpec width,
-                                  CMPLayoutMeasureSpec height,
-                                  CMPSize *out_size) {
+static int cmp_layout_measure_leaf(CMPLayoutNode *node,
+                                   CMPLayoutMeasureSpec width,
+                                   CMPLayoutMeasureSpec height,
+                                   CMPSize *out_size) {
   CMPLayoutMeasureSpec measure_width;
   CMPLayoutMeasureSpec measure_height;
   CMPSize measured;
@@ -252,9 +252,10 @@ static int cmp_layout_measure_leaf(CMPLayoutNode *node, CMPLayoutMeasureSpec wid
 }
 
 static int cmp_layout_measure_row(CMPLayoutNode *node,
-                                 const CMPLayoutDirection *direction,
-                                 CMPLayoutMeasureSpec width,
-                                 CMPLayoutMeasureSpec height, CMPSize *out_size) {
+                                  const CMPLayoutDirection *direction,
+                                  CMPLayoutMeasureSpec width,
+                                  CMPLayoutMeasureSpec height,
+                                  CMPSize *out_size) {
   CMPLayoutMeasureSpec child_width_spec;
   CMPLayoutMeasureSpec child_height_spec;
   CMPScalar padding_lr;
@@ -282,7 +283,7 @@ static int cmp_layout_measure_row(CMPLayoutNode *node,
   }
 
   rc = cmp_layout_resolve_horizontal_padding(direction, &node->style.padding,
-                                            &padding_left, &padding_right);
+                                             &padding_left, &padding_right);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -340,7 +341,7 @@ static int cmp_layout_measure_row(CMPLayoutNode *node,
 
     child = node->children[i];
     rc = cmp_layout_measure_node(child, direction, child_width_spec,
-                                child_height_spec);
+                                 child_height_spec);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -402,10 +403,10 @@ static int cmp_layout_measure_row(CMPLayoutNode *node,
 }
 
 static int cmp_layout_measure_column(CMPLayoutNode *node,
-                                    const CMPLayoutDirection *direction,
-                                    CMPLayoutMeasureSpec width,
-                                    CMPLayoutMeasureSpec height,
-                                    CMPSize *out_size) {
+                                     const CMPLayoutDirection *direction,
+                                     CMPLayoutMeasureSpec width,
+                                     CMPLayoutMeasureSpec height,
+                                     CMPSize *out_size) {
   CMPLayoutMeasureSpec child_width_spec;
   CMPLayoutMeasureSpec child_height_spec;
   CMPScalar padding_lr;
@@ -433,7 +434,7 @@ static int cmp_layout_measure_column(CMPLayoutNode *node,
   }
 
   rc = cmp_layout_resolve_horizontal_padding(direction, &node->style.padding,
-                                            &padding_left, &padding_right);
+                                             &padding_left, &padding_right);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -491,7 +492,7 @@ static int cmp_layout_measure_column(CMPLayoutNode *node,
 
     child = node->children[i];
     rc = cmp_layout_measure_node(child, direction, child_width_spec,
-                                child_height_spec);
+                                 child_height_spec);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -553,9 +554,9 @@ static int cmp_layout_measure_column(CMPLayoutNode *node,
 }
 
 static int cmp_layout_measure_node(CMPLayoutNode *node,
-                                  const CMPLayoutDirection *direction,
-                                  CMPLayoutMeasureSpec width,
-                                  CMPLayoutMeasureSpec height) {
+                                   const CMPLayoutDirection *direction,
+                                   CMPLayoutMeasureSpec width,
+                                   CMPLayoutMeasureSpec height) {
   CMPSize measured;
   int rc;
 
@@ -604,19 +605,18 @@ static int cmp_layout_measure_node(CMPLayoutNode *node,
 }
 
 static int cmp_layout_layout_children_row(CMPLayoutNode *node,
-                                         const CMPLayoutDirection *direction,
-                                         CMPScalar origin_x, CMPScalar origin_y,
-                                         CMPScalar width, CMPScalar height);
-static int cmp_layout_layout_children_column(CMPLayoutNode *node,
-                                            const CMPLayoutDirection *direction,
-                                            CMPScalar origin_x,
-                                            CMPScalar origin_y, CMPScalar width,
-                                            CMPScalar height);
+                                          const CMPLayoutDirection *direction,
+                                          CMPScalar origin_x,
+                                          CMPScalar origin_y, CMPScalar width,
+                                          CMPScalar height);
+static int cmp_layout_layout_children_column(
+    CMPLayoutNode *node, const CMPLayoutDirection *direction,
+    CMPScalar origin_x, CMPScalar origin_y, CMPScalar width, CMPScalar height);
 
 static int cmp_layout_layout_node(CMPLayoutNode *node,
-                                 const CMPLayoutDirection *direction,
-                                 CMPScalar origin_x, CMPScalar origin_y,
-                                 CMPScalar width, CMPScalar height) {
+                                  const CMPLayoutDirection *direction,
+                                  CMPScalar origin_x, CMPScalar origin_y,
+                                  CMPScalar width, CMPScalar height) {
   int rc;
 
   if (node == NULL) {
@@ -643,10 +643,10 @@ static int cmp_layout_layout_node(CMPLayoutNode *node,
 
   if (node->style.direction == CMP_LAYOUT_DIRECTION_ROW) {
     rc = cmp_layout_layout_children_row(node, direction, origin_x, origin_y,
-                                       width, height);
+                                        width, height);
   } else if (node->style.direction == CMP_LAYOUT_DIRECTION_COLUMN) {
     rc = cmp_layout_layout_children_column(node, direction, origin_x, origin_y,
-                                          width, height);
+                                           width, height);
   } else {
     rc = CMP_ERR_INVALID_ARGUMENT;
   }
@@ -655,9 +655,10 @@ static int cmp_layout_layout_node(CMPLayoutNode *node,
 }
 
 static int cmp_layout_layout_children_row(CMPLayoutNode *node,
-                                         const CMPLayoutDirection *direction,
-                                         CMPScalar origin_x, CMPScalar origin_y,
-                                         CMPScalar width, CMPScalar height) {
+                                          const CMPLayoutDirection *direction,
+                                          CMPScalar origin_x,
+                                          CMPScalar origin_y, CMPScalar width,
+                                          CMPScalar height) {
   CMPScalar padding_left;
   CMPScalar padding_top;
   CMPScalar padding_right;
@@ -677,7 +678,7 @@ static int cmp_layout_layout_children_row(CMPLayoutNode *node,
   }
 
   rc = cmp_layout_resolve_horizontal_padding(direction, &node->style.padding,
-                                            &padding_left, &padding_right);
+                                             &padding_left, &padding_right);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -692,9 +693,10 @@ static int cmp_layout_layout_children_row(CMPLayoutNode *node,
   inner_width = cmp_layout_clamp_non_negative(inner_width);
   inner_height = cmp_layout_clamp_non_negative(inner_height);
 
-  wrap_enabled = (node->style.wrap == CMP_LAYOUT_WRAP_YES && inner_width >= 0.0f)
-                     ? CMP_TRUE
-                     : CMP_FALSE;
+  wrap_enabled =
+      (node->style.wrap == CMP_LAYOUT_WRAP_YES && inner_width >= 0.0f)
+          ? CMP_TRUE
+          : CMP_FALSE;
 
   if (is_rtl) {
     main_start = origin_x + width - padding_right;
@@ -825,8 +827,8 @@ static int cmp_layout_layout_children_row(CMPLayoutNode *node,
       }
       child_y = origin_y + padding_top + cursor_cross + cross_offset;
 
-      rc = cmp_layout_layout_node(child, direction, child_x, child_y, child_main,
-                                 child_cross);
+      rc = cmp_layout_layout_node(child, direction, child_x, child_y,
+                                  child_main, child_cross);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -841,11 +843,9 @@ static int cmp_layout_layout_children_row(CMPLayoutNode *node,
   return CMP_OK;
 }
 
-static int cmp_layout_layout_children_column(CMPLayoutNode *node,
-                                            const CMPLayoutDirection *direction,
-                                            CMPScalar origin_x,
-                                            CMPScalar origin_y, CMPScalar width,
-                                            CMPScalar height) {
+static int cmp_layout_layout_children_column(
+    CMPLayoutNode *node, const CMPLayoutDirection *direction,
+    CMPScalar origin_x, CMPScalar origin_y, CMPScalar width, CMPScalar height) {
   CMPScalar padding_left;
   CMPScalar padding_top;
   CMPScalar padding_right;
@@ -865,7 +865,7 @@ static int cmp_layout_layout_children_column(CMPLayoutNode *node,
   }
 
   rc = cmp_layout_resolve_horizontal_padding(direction, &node->style.padding,
-                                            &padding_left, &padding_right);
+                                             &padding_left, &padding_right);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1015,7 +1015,7 @@ static int cmp_layout_layout_children_column(CMPLayoutNode *node,
       child_y = origin_y + padding_top + cursor_main;
 
       rc = cmp_layout_layout_node(child, direction, child_x, child_y,
-                                 child_cross, child_main);
+                                  child_cross, child_main);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -1030,8 +1030,8 @@ static int cmp_layout_layout_children_column(CMPLayoutNode *node,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_layout_measure_spec_init(CMPLayoutMeasureSpec *spec, cmp_u32 mode,
-                                        CMPScalar size) {
+int CMP_CALL cmp_layout_measure_spec_init(CMPLayoutMeasureSpec *spec,
+                                          cmp_u32 mode, CMPScalar size) {
   if (spec == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1042,7 +1042,8 @@ int CMP_CALL cmp_layout_measure_spec_init(CMPLayoutMeasureSpec *spec, cmp_u32 mo
 }
 
 int CMP_CALL cmp_layout_edges_set(CMPLayoutEdges *edges, CMPScalar left,
-                                CMPScalar top, CMPScalar right, CMPScalar bottom) {
+                                  CMPScalar top, CMPScalar right,
+                                  CMPScalar bottom) {
   if (edges == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1059,7 +1060,7 @@ int CMP_CALL cmp_layout_edges_set(CMPLayoutEdges *edges, CMPScalar left,
 }
 
 int CMP_CALL cmp_layout_direction_init(CMPLayoutDirection *direction,
-                                     cmp_u32 flow) {
+                                       cmp_u32 flow) {
   if (direction == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1092,7 +1093,7 @@ int CMP_CALL cmp_layout_style_init(CMPLayoutStyle *style) {
 }
 
 int CMP_CALL cmp_layout_node_init(CMPLayoutNode *node,
-                                const CMPLayoutStyle *style) {
+                                  const CMPLayoutStyle *style) {
   int rc;
 
   if (node == NULL) {
@@ -1126,8 +1127,8 @@ int CMP_CALL cmp_layout_node_init(CMPLayoutNode *node,
 }
 
 int CMP_CALL cmp_layout_node_set_children(CMPLayoutNode *node,
-                                        CMPLayoutNode **children,
-                                        cmp_usize count) {
+                                          CMPLayoutNode **children,
+                                          cmp_usize count) {
   cmp_usize i;
 
   if (node == NULL) {
@@ -1150,7 +1151,8 @@ int CMP_CALL cmp_layout_node_set_children(CMPLayoutNode *node,
 }
 
 int CMP_CALL cmp_layout_node_set_measure(CMPLayoutNode *node,
-                                       CMPLayoutMeasureFn measure, void *ctx) {
+                                         CMPLayoutMeasureFn measure,
+                                         void *ctx) {
   if (node == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1161,7 +1163,7 @@ int CMP_CALL cmp_layout_node_set_measure(CMPLayoutNode *node,
 }
 
 int CMP_CALL cmp_layout_node_get_measured(const CMPLayoutNode *node,
-                                        CMPSize *out_size) {
+                                          CMPSize *out_size) {
   if (node == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1171,7 +1173,7 @@ int CMP_CALL cmp_layout_node_get_measured(const CMPLayoutNode *node,
 }
 
 int CMP_CALL cmp_layout_node_get_layout(const CMPLayoutNode *node,
-                                      CMPRect *out_rect) {
+                                        CMPRect *out_rect) {
   if (node == NULL || out_rect == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1181,9 +1183,9 @@ int CMP_CALL cmp_layout_node_get_layout(const CMPLayoutNode *node,
 }
 
 int CMP_CALL cmp_layout_compute(CMPLayoutNode *root,
-                              const CMPLayoutDirection *direction,
-                              CMPLayoutMeasureSpec width,
-                              CMPLayoutMeasureSpec height) {
+                                const CMPLayoutDirection *direction,
+                                CMPLayoutMeasureSpec width,
+                                CMPLayoutMeasureSpec height) {
   int rc;
 
   if (root == NULL) {
@@ -1201,7 +1203,7 @@ int CMP_CALL cmp_layout_compute(CMPLayoutNode *root,
   }
 
   rc = cmp_layout_layout_node(root, direction, 0.0f, 0.0f, root->measured.width,
-                             root->measured.height);
+                              root->measured.height);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1221,7 +1223,7 @@ cmp_layout_test_validate_direction(const CMPLayoutDirection *direction) {
 }
 
 int CMP_CALL cmp_layout_test_clamp_non_negative(CMPScalar value,
-                                              CMPScalar *out_value) {
+                                                CMPScalar *out_value) {
   if (out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1231,8 +1233,8 @@ int CMP_CALL cmp_layout_test_clamp_non_negative(CMPScalar value,
 }
 
 int CMP_CALL cmp_layout_test_resolve_available(CMPScalar style_size,
-                                             CMPLayoutMeasureSpec spec,
-                                             CMPScalar *out_available) {
+                                               CMPLayoutMeasureSpec spec,
+                                               CMPScalar *out_available) {
   if (out_available == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1245,29 +1247,30 @@ int CMP_CALL cmp_layout_test_resolve_horizontal_padding(
     const CMPLayoutDirection *direction, const CMPLayoutEdges *padding,
     CMPScalar *out_left, CMPScalar *out_right) {
   return cmp_layout_resolve_horizontal_padding(direction, padding, out_left,
-                                              out_right);
+                                               out_right);
 }
 
 int CMP_CALL cmp_layout_test_validate_style(const CMPLayoutStyle *style) {
   return cmp_layout_validate_style(style);
 }
 
-int CMP_CALL cmp_layout_test_apply_spec(CMPScalar size, CMPLayoutMeasureSpec spec,
-                                      CMPScalar *out_size) {
+int CMP_CALL cmp_layout_test_apply_spec(CMPScalar size,
+                                        CMPLayoutMeasureSpec spec,
+                                        CMPScalar *out_size) {
   return cmp_layout_apply_spec(size, spec, out_size);
 }
 
 int CMP_CALL cmp_layout_test_measure_leaf(CMPLayoutNode *node,
-                                        CMPLayoutMeasureSpec width,
-                                        CMPLayoutMeasureSpec height,
-                                        CMPSize *out_size) {
+                                          CMPLayoutMeasureSpec width,
+                                          CMPLayoutMeasureSpec height,
+                                          CMPSize *out_size) {
   return cmp_layout_measure_leaf(node, width, height, out_size);
 }
 
 int CMP_CALL cmp_layout_test_measure_row(CMPLayoutNode *node,
-                                       CMPLayoutMeasureSpec width,
-                                       CMPLayoutMeasureSpec height,
-                                       CMPSize *out_size) {
+                                         CMPLayoutMeasureSpec width,
+                                         CMPLayoutMeasureSpec height,
+                                         CMPSize *out_size) {
   CMPLayoutDirection direction;
   int rc;
 
@@ -1281,14 +1284,15 @@ int CMP_CALL cmp_layout_test_measure_row(CMPLayoutNode *node,
 
 int CMP_CALL cmp_layout_test_measure_row_with_direction(
     CMPLayoutNode *node, const CMPLayoutDirection *direction,
-    CMPLayoutMeasureSpec width, CMPLayoutMeasureSpec height, CMPSize *out_size) {
+    CMPLayoutMeasureSpec width, CMPLayoutMeasureSpec height,
+    CMPSize *out_size) {
   return cmp_layout_measure_row(node, direction, width, height, out_size);
 }
 
 int CMP_CALL cmp_layout_test_measure_column(CMPLayoutNode *node,
-                                          CMPLayoutMeasureSpec width,
-                                          CMPLayoutMeasureSpec height,
-                                          CMPSize *out_size) {
+                                            CMPLayoutMeasureSpec width,
+                                            CMPLayoutMeasureSpec height,
+                                            CMPSize *out_size) {
   CMPLayoutDirection direction;
   int rc;
 
@@ -1302,7 +1306,8 @@ int CMP_CALL cmp_layout_test_measure_column(CMPLayoutNode *node,
 
 int CMP_CALL cmp_layout_test_measure_column_with_direction(
     CMPLayoutNode *node, const CMPLayoutDirection *direction,
-    CMPLayoutMeasureSpec width, CMPLayoutMeasureSpec height, CMPSize *out_size) {
+    CMPLayoutMeasureSpec width, CMPLayoutMeasureSpec height,
+    CMPSize *out_size) {
   return cmp_layout_measure_column(node, direction, width, height, out_size);
 }
 
@@ -1332,7 +1337,8 @@ int CMP_CALL cmp_layout_test_layout_children_row_with_direction(
 int CMP_CALL cmp_layout_test_layout_children_column_with_direction(
     CMPLayoutNode *node, const CMPLayoutDirection *direction, CMPScalar x,
     CMPScalar y, CMPScalar width, CMPScalar height) {
-  return cmp_layout_layout_children_column(node, direction, x, y, width, height);
+  return cmp_layout_layout_children_column(node, direction, x, y, width,
+                                           height);
 }
 
 int CMP_CALL cmp_layout_test_set_direction_fail(CMPBool enable) {
@@ -1341,8 +1347,8 @@ int CMP_CALL cmp_layout_test_set_direction_fail(CMPBool enable) {
 }
 
 int CMP_CALL cmp_layout_test_measure_node(CMPLayoutNode *node,
-                                        CMPLayoutMeasureSpec width,
-                                        CMPLayoutMeasureSpec height) {
+                                          CMPLayoutMeasureSpec width,
+                                          CMPLayoutMeasureSpec height) {
   CMPLayoutDirection direction;
   int rc;
 
@@ -1355,8 +1361,8 @@ int CMP_CALL cmp_layout_test_measure_node(CMPLayoutNode *node,
 }
 
 int CMP_CALL cmp_layout_test_layout_node(CMPLayoutNode *node, CMPScalar x,
-                                       CMPScalar y, CMPScalar width,
-                                       CMPScalar height) {
+                                         CMPScalar y, CMPScalar width,
+                                         CMPScalar height) {
   CMPLayoutDirection direction;
   int rc;
 
@@ -1368,9 +1374,10 @@ int CMP_CALL cmp_layout_test_layout_node(CMPLayoutNode *node, CMPScalar x,
   return cmp_layout_layout_node(node, &direction, x, y, width, height);
 }
 
-int CMP_CALL cmp_layout_test_layout_children_row(CMPLayoutNode *node, CMPScalar x,
-                                               CMPScalar y, CMPScalar width,
-                                               CMPScalar height) {
+int CMP_CALL cmp_layout_test_layout_children_row(CMPLayoutNode *node,
+                                                 CMPScalar x, CMPScalar y,
+                                                 CMPScalar width,
+                                                 CMPScalar height) {
   CMPLayoutDirection direction;
   int rc;
 
@@ -1383,9 +1390,9 @@ int CMP_CALL cmp_layout_test_layout_children_row(CMPLayoutNode *node, CMPScalar 
 }
 
 int CMP_CALL cmp_layout_test_layout_children_column(CMPLayoutNode *node,
-                                                  CMPScalar x, CMPScalar y,
-                                                  CMPScalar width,
-                                                  CMPScalar height) {
+                                                    CMPScalar x, CMPScalar y,
+                                                    CMPScalar width,
+                                                    CMPScalar height) {
   CMPLayoutDirection direction;
   int rc;
 
@@ -1395,6 +1402,6 @@ int CMP_CALL cmp_layout_test_layout_children_column(CMPLayoutNode *node,
   }
 
   return cmp_layout_layout_children_column(node, &direction, x, y, width,
-                                          height);
+                                           height);
 }
 #endif

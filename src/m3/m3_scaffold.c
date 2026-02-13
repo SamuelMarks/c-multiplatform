@@ -14,8 +14,8 @@ static int m3_scaffold_validate_edges(const CMPLayoutEdges *edges) {
 }
 
 static int m3_scaffold_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -225,8 +225,8 @@ static int m3_scaffold_event_child(CMPWidget *child, const CMPInputEvent *event,
 }
 
 static int m3_scaffold_event_get_position(const CMPInputEvent *event,
-                                          CMPBool *out_has_pos, CMPScalar *out_x,
-                                          CMPScalar *out_y) {
+                                          CMPBool *out_has_pos,
+                                          CMPScalar *out_x, CMPScalar *out_y) {
   if (event == NULL || out_has_pos == NULL || out_x == NULL || out_y == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -260,7 +260,8 @@ static int m3_scaffold_event_get_position(const CMPInputEvent *event,
   }
 }
 
-static int m3_scaffold_apply_measure_spec(CMPScalar desired, CMPMeasureSpec spec,
+static int m3_scaffold_apply_measure_spec(CMPScalar desired,
+                                          CMPMeasureSpec spec,
                                           CMPScalar *out_value) {
   if (out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -280,7 +281,8 @@ static int m3_scaffold_apply_measure_spec(CMPScalar desired, CMPMeasureSpec spec
 }
 
 static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
-                                      CMPMeasureSpec height, CMPSize *out_size) {
+                                      CMPMeasureSpec height,
+                                      CMPSize *out_size) {
   M3Scaffold *scaffold;
   CMPMeasureSpec child_width;
   CMPMeasureSpec child_height;
@@ -1052,9 +1054,9 @@ int CMP_CALL m3_scaffold_style_init(M3ScaffoldStyle *style) {
   }
 
   rc = cmp_layout_edges_set(&style->padding, M3_SCAFFOLD_DEFAULT_PADDING_X,
-                           M3_SCAFFOLD_DEFAULT_PADDING_Y,
-                           M3_SCAFFOLD_DEFAULT_PADDING_X,
-                           M3_SCAFFOLD_DEFAULT_PADDING_Y);
+                            M3_SCAFFOLD_DEFAULT_PADDING_Y,
+                            M3_SCAFFOLD_DEFAULT_PADDING_X,
+                            M3_SCAFFOLD_DEFAULT_PADDING_Y);
   if (rc != CMP_OK) {
     return rc; /* GCOVR_EXCL_LINE */
   }
@@ -1069,10 +1071,10 @@ int CMP_CALL m3_scaffold_style_init(M3ScaffoldStyle *style) {
   return CMP_OK;
 }
 
-int CMP_CALL m3_scaffold_init(M3Scaffold *scaffold, const M3ScaffoldStyle *style,
-                             CMPWidget *body, CMPWidget *top_bar,
-                             CMPWidget *bottom_bar, CMPWidget *fab,
-                             CMPWidget *snackbar) {
+int CMP_CALL m3_scaffold_init(M3Scaffold *scaffold,
+                              const M3ScaffoldStyle *style, CMPWidget *body,
+                              CMPWidget *top_bar, CMPWidget *bottom_bar,
+                              CMPWidget *fab, CMPWidget *snackbar) {
   int rc;
 
   if (scaffold == NULL || style == NULL) {
@@ -1112,7 +1114,7 @@ int CMP_CALL m3_scaffold_init(M3Scaffold *scaffold, const M3ScaffoldStyle *style
 }
 
 int CMP_CALL m3_scaffold_set_style(M3Scaffold *scaffold,
-                                  const M3ScaffoldStyle *style) {
+                                   const M3ScaffoldStyle *style) {
   int rc;
 
   if (scaffold == NULL || style == NULL) {
@@ -1145,7 +1147,7 @@ int CMP_CALL m3_scaffold_set_top_bar(M3Scaffold *scaffold, CMPWidget *top_bar) {
 }
 
 int CMP_CALL m3_scaffold_set_bottom_bar(M3Scaffold *scaffold,
-                                       CMPWidget *bottom_bar) {
+                                        CMPWidget *bottom_bar) {
   if (scaffold == NULL) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
   }
@@ -1161,7 +1163,8 @@ int CMP_CALL m3_scaffold_set_fab(M3Scaffold *scaffold, CMPWidget *fab) {
   return CMP_OK;
 }
 
-int CMP_CALL m3_scaffold_set_snackbar(M3Scaffold *scaffold, CMPWidget *snackbar) {
+int CMP_CALL m3_scaffold_set_snackbar(M3Scaffold *scaffold,
+                                      CMPWidget *snackbar) {
   if (scaffold == NULL) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
   }
@@ -1170,7 +1173,7 @@ int CMP_CALL m3_scaffold_set_snackbar(M3Scaffold *scaffold, CMPWidget *snackbar)
 }
 
 int CMP_CALL m3_scaffold_set_safe_area(M3Scaffold *scaffold,
-                                      const CMPLayoutEdges *safe_area) {
+                                       const CMPLayoutEdges *safe_area) {
   int rc;
 
   if (scaffold == NULL || safe_area == NULL) {
@@ -1187,7 +1190,7 @@ int CMP_CALL m3_scaffold_set_safe_area(M3Scaffold *scaffold,
 }
 
 int CMP_CALL m3_scaffold_get_safe_area(const M3Scaffold *scaffold,
-                                      CMPLayoutEdges *out_safe_area) {
+                                       CMPLayoutEdges *out_safe_area) {
   if (scaffold == NULL || out_safe_area == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1197,7 +1200,7 @@ int CMP_CALL m3_scaffold_get_safe_area(const M3Scaffold *scaffold,
 }
 
 int CMP_CALL m3_scaffold_step(M3Scaffold *scaffold, CMPScalar dt,
-                             CMPBool *out_changed) {
+                              CMPBool *out_changed) {
   CMPBool finished;
   CMPScalar value;
   CMPScalar prev_offset;
@@ -1257,60 +1260,62 @@ int CMP_CALL m3_scaffold_test_validate_rect(const CMPRect *rect) {
   return m3_scaffold_validate_rect(rect);
 }
 
-int CMP_CALL m3_scaffold_test_compute_safe_bounds(const CMPRect *bounds,
-                                                 const CMPLayoutEdges *safe_area,
-                                                 CMPRect *out_bounds) {
+int CMP_CALL m3_scaffold_test_compute_safe_bounds(
+    const CMPRect *bounds, const CMPLayoutEdges *safe_area,
+    CMPRect *out_bounds) {
   return m3_scaffold_compute_safe_bounds(bounds, safe_area, out_bounds);
 }
 
 int CMP_CALL m3_scaffold_test_compute_fab_target(const M3ScaffoldStyle *style,
-                                                CMPScalar snackbar_height,
-                                                CMPScalar *out_offset) {
+                                                 CMPScalar snackbar_height,
+                                                 CMPScalar *out_offset) {
   return m3_scaffold_compute_fab_target(style, snackbar_height, out_offset);
 }
 
 int CMP_CALL m3_scaffold_test_widget_is_visible(const CMPWidget *widget,
-                                               CMPBool *out_visible) {
+                                                CMPBool *out_visible) {
   return m3_scaffold_widget_is_visible(widget, out_visible);
 }
 
-int CMP_CALL m3_scaffold_test_measure_child(CMPWidget *child, CMPMeasureSpec width,
-                                           CMPMeasureSpec height,
-                                           CMPSize *out_size) {
+int CMP_CALL m3_scaffold_test_measure_child(CMPWidget *child,
+                                            CMPMeasureSpec width,
+                                            CMPMeasureSpec height,
+                                            CMPSize *out_size) {
   return m3_scaffold_measure_child(child, width, height, out_size);
 }
 
 int CMP_CALL m3_scaffold_test_layout_child(CMPWidget *child,
-                                          const CMPRect *bounds) {
+                                           const CMPRect *bounds) {
   return m3_scaffold_layout_child(child, bounds);
 }
 
-int CMP_CALL m3_scaffold_test_paint_child(CMPWidget *child, CMPPaintContext *ctx) {
+int CMP_CALL m3_scaffold_test_paint_child(CMPWidget *child,
+                                          CMPPaintContext *ctx) {
   return m3_scaffold_paint_child(child, ctx);
 }
 
 int CMP_CALL m3_scaffold_test_event_child(CMPWidget *child,
-                                         const CMPInputEvent *event,
-                                         CMPBool *out_handled) {
+                                          const CMPInputEvent *event,
+                                          CMPBool *out_handled) {
   return m3_scaffold_event_child(child, event, out_handled);
 }
 
 int CMP_CALL m3_scaffold_test_event_get_position(const CMPInputEvent *event,
-                                                CMPBool *out_has_pos,
-                                                CMPScalar *out_x,
-                                                CMPScalar *out_y) {
+                                                 CMPBool *out_has_pos,
+                                                 CMPScalar *out_x,
+                                                 CMPScalar *out_y) {
   return m3_scaffold_event_get_position(event, out_has_pos, out_x, out_y);
 }
 
 int CMP_CALL m3_scaffold_test_child_hit(CMPWidget *child, const CMPRect *bounds,
-                                       CMPScalar x, CMPScalar y,
-                                       CMPBool *out_hit) {
+                                        CMPScalar x, CMPScalar y,
+                                        CMPBool *out_hit) {
   return m3_scaffold_child_hit(child, bounds, x, y, out_hit);
 }
 
 int CMP_CALL m3_scaffold_test_apply_measure_spec(CMPScalar desired,
-                                                CMPMeasureSpec spec,
-                                                CMPScalar *out_value) {
+                                                 CMPMeasureSpec spec,
+                                                 CMPScalar *out_value) {
   return m3_scaffold_apply_measure_spec(desired, spec, out_value);
 }
 #endif

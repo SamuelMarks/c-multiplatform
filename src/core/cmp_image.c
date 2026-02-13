@@ -5,11 +5,12 @@
 #define CMP_IMAGE_VTABLE_COMPLETE(vtable)                                      \
   ((vtable)->decode != NULL && (vtable)->free_image != NULL)
 
-static int cmp_image_mul_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
+static int cmp_image_mul_overflow(cmp_usize a, cmp_usize b,
+                                  cmp_usize *out_value) {
   if (out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (a != 0 && b > ((cmp_usize)~(cmp_usize)0) / a) {
+  if (a != 0 && b > ((cmp_usize) ~(cmp_usize)0) / a) {
     return CMP_ERR_OVERFLOW;
   }
   *out_value = a * b;
@@ -17,7 +18,7 @@ static int cmp_image_mul_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value
 }
 
 static int cmp_image_ppm_skip_ws(const cmp_u8 *data, cmp_usize size,
-                                cmp_usize *offset) {
+                                 cmp_usize *offset) {
   cmp_u8 ch;
 
   if (data == NULL || offset == NULL) {
@@ -27,8 +28,7 @@ static int cmp_image_ppm_skip_ws(const cmp_u8 *data, cmp_usize size,
   while (*offset < size) {
     ch = data[*offset];
     if (ch == '#') {
-      while (*offset < size && data[*offset] != '\n' &&
-             data[*offset] != '\r') {
+      while (*offset < size && data[*offset] != '\n' && data[*offset] != '\r') {
         *offset += 1u;
       }
       continue;
@@ -45,7 +45,7 @@ static int cmp_image_ppm_skip_ws(const cmp_u8 *data, cmp_usize size,
 }
 
 static int cmp_image_ppm_read_uint(const cmp_u8 *data, cmp_usize size,
-                                  cmp_usize *offset, cmp_u32 *out_value) {
+                                   cmp_usize *offset, cmp_u32 *out_value) {
   cmp_u32 value;
   cmp_u32 max_div10;
   cmp_u32 max_mod10;
@@ -91,8 +91,8 @@ static int cmp_image_ppm_read_uint(const cmp_u8 *data, cmp_usize size,
 }
 
 static int cmp_image_decode_ppm(const CMPImageDecodeRequest *request,
-                               const CMPAllocator *allocator,
-                               CMPImageData *out_image) {
+                                const CMPAllocator *allocator,
+                                CMPImageData *out_image) {
   const cmp_u8 *data;
   cmp_u8 *pixels;
   cmp_usize offset;
@@ -149,7 +149,8 @@ static int cmp_image_decode_ppm(const CMPImageDecodeRequest *request,
     return rc;
   }
 
-  rc = cmp_image_mul_overflow((cmp_usize)width, (cmp_usize)height, &pixel_count);
+  rc =
+      cmp_image_mul_overflow((cmp_usize)width, (cmp_usize)height, &pixel_count);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -202,8 +203,8 @@ static int cmp_image_decode_ppm(const CMPImageDecodeRequest *request,
 }
 
 static int cmp_image_decode_raw_rgba8(const CMPImageDecodeRequest *request,
-                                     const CMPAllocator *allocator,
-                                     CMPImageData *out_image) {
+                                      const CMPAllocator *allocator,
+                                      CMPImageData *out_image) {
   cmp_u8 *pixels;
   cmp_usize pixel_count;
   cmp_usize row_stride;
@@ -233,7 +234,7 @@ static int cmp_image_decode_raw_rgba8(const CMPImageDecodeRequest *request,
   }
 
   rc = cmp_image_mul_overflow((cmp_usize)request->width,
-                             (cmp_usize)request->height, &pixel_count);
+                              (cmp_usize)request->height, &pixel_count);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -246,7 +247,7 @@ static int cmp_image_decode_raw_rgba8(const CMPImageDecodeRequest *request,
   }
 
   rc = cmp_image_mul_overflow(row_stride, (cmp_usize)request->height,
-                             &expected_size);
+                              &expected_size);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -316,7 +317,7 @@ int CMP_CALL cmp_image_request_init(CMPImageDecodeRequest *request) {
 }
 
 int CMP_CALL cmp_image_init(CMPImageDecoder *decoder,
-                          const CMPImageConfig *config) {
+                            const CMPImageConfig *config) {
   CMPImage image;
   CMPAllocator allocator;
   int rc;
@@ -382,8 +383,8 @@ int CMP_CALL cmp_image_shutdown(CMPImageDecoder *decoder) {
 }
 
 int CMP_CALL cmp_image_decode(CMPImageDecoder *decoder,
-                            const CMPImageDecodeRequest *request,
-                            CMPImageData *out_image) {
+                              const CMPImageDecodeRequest *request,
+                              CMPImageData *out_image) {
   int rc;
 
   if (decoder == NULL || request == NULL || out_image == NULL) {
@@ -408,8 +409,8 @@ int CMP_CALL cmp_image_decode(CMPImageDecoder *decoder,
 
   memset(out_image, 0, sizeof(*out_image));
 
-  if (decoder->has_backend == CMP_TRUE &&
-      decoder->image.vtable != NULL && decoder->image.vtable->decode != NULL) {
+  if (decoder->has_backend == CMP_TRUE && decoder->image.vtable != NULL &&
+      decoder->image.vtable->decode != NULL) {
     rc = decoder->image.vtable->decode(decoder->image.ctx, request,
                                        &decoder->allocator, out_image);
     if (rc == CMP_OK) {

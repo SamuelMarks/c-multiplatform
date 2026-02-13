@@ -19,7 +19,7 @@ int main(void) {
   CMP_TEST_ASSERT(config.inline_tasks == CMP_TRUE);
 
   CMP_TEST_EXPECT(cmp_web_backend_test_validate_config(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
   CMP_TEST_OK(cmp_web_backend_config_init(&config));
   config.allocator = &default_alloc;
@@ -44,7 +44,7 @@ int main(void) {
   CMP_TEST_OK(cmp_web_backend_config_init(&config));
   config.handle_capacity = 0;
   CMP_TEST_EXPECT(cmp_web_backend_create(&config, &backend),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   {
     CMPAllocator bad_alloc;
@@ -52,14 +52,14 @@ int main(void) {
     memset(&bad_alloc, 0, sizeof(bad_alloc));
     config.allocator = &bad_alloc;
     CMP_TEST_EXPECT(cmp_web_backend_create(&config, &backend),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   {
     CMP_TEST_OK(cmp_web_backend_config_init(&config));
     config.utf8_canvas_id = NULL;
     CMP_TEST_EXPECT(cmp_web_backend_create(&config, &backend),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   if (!available) {
@@ -70,30 +70,33 @@ int main(void) {
     CMP_TEST_OK(cmp_web_backend_config_init(&config));
     backend = NULL;
     CMP_TEST_EXPECT(cmp_web_backend_create(&config, &backend),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
     CMP_TEST_ASSERT(backend == NULL);
 
     CMP_TEST_EXPECT(cmp_web_backend_destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_web_backend_destroy((CMPWebBackend *)1),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
-    CMP_TEST_EXPECT(cmp_web_backend_get_ws(NULL, &ws), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_web_backend_get_ws(NULL, &ws),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_web_backend_get_ws((CMPWebBackend *)1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_web_backend_get_ws((CMPWebBackend *)1, &ws),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
-    CMP_TEST_EXPECT(cmp_web_backend_get_gfx(NULL, &gfx), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_web_backend_get_gfx(NULL, &gfx),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_web_backend_get_gfx((CMPWebBackend *)1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_web_backend_get_gfx((CMPWebBackend *)1, &gfx),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
-    CMP_TEST_EXPECT(cmp_web_backend_get_env(NULL, &env), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_web_backend_get_env(NULL, &env),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_web_backend_get_env((CMPWebBackend *)1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_web_backend_get_env((CMPWebBackend *)1, &env),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
     return 0;
   }

@@ -50,7 +50,7 @@ extern "C" {
 typedef struct CMPListSlot {
   cmp_usize index;    /**< Bound item index or CMP_LIST_INVALID_INDEX. */
   CMPRenderNode node; /**< Render node for the item widget. */
-  void *user;        /**< User-defined slot state. */
+  void *user;         /**< User-defined slot state. */
 } CMPListSlot;
 
 struct CMPListView;
@@ -63,7 +63,8 @@ struct CMPListView;
  * @param index Item index to bind.
  * @return CMP_OK on success or a failure code.
  */
-typedef int(CMP_CALL *CMPListBindFn)(void *ctx, CMPListSlot *slot, cmp_usize index);
+typedef int(CMP_CALL *CMPListBindFn)(void *ctx, CMPListSlot *slot,
+                                     cmp_usize index);
 
 /**
  * @brief List style descriptor.
@@ -91,13 +92,13 @@ typedef struct CMPListView {
   cmp_usize visible_first;  /**< First visible item index (or
                               CMP_LIST_INVALID_INDEX). */
   cmp_usize
-      visible_last;  /**< Last visible item index (or CMP_LIST_INVALID_INDEX). */
-  CMPListSlot *slots; /**< Slot pool for recycling items. */
+      visible_last; /**< Last visible item index (or CMP_LIST_INVALID_INDEX). */
+  CMPListSlot *slots;            /**< Slot pool for recycling items. */
   CMPRenderNode **visible_nodes; /**< Pointer list for visible nodes. */
   cmp_usize slot_capacity;       /**< Number of slots allocated. */
   CMPAllocator allocator;        /**< Allocator for slots. */
   CMPListBindFn bind;            /**< Bind callback for item recycling. */
-  void *bind_ctx;               /**< Bind callback context pointer. */
+  void *bind_ctx;                /**< Bind callback context pointer. */
 } CMPListView;
 
 /**
@@ -129,13 +130,13 @@ typedef struct CMPGridView {
   cmp_usize visible_first;  /**< First visible item index (or
                               CMP_LIST_INVALID_INDEX). */
   cmp_usize
-      visible_last;  /**< Last visible item index (or CMP_LIST_INVALID_INDEX). */
-  CMPListSlot *slots; /**< Slot pool for recycling items. */
+      visible_last; /**< Last visible item index (or CMP_LIST_INVALID_INDEX). */
+  CMPListSlot *slots;            /**< Slot pool for recycling items. */
   CMPRenderNode **visible_nodes; /**< Pointer list for visible nodes. */
   cmp_usize slot_capacity;       /**< Number of slots allocated. */
   CMPAllocator allocator;        /**< Allocator for slots. */
   CMPListBindFn bind;            /**< Bind callback for item recycling. */
-  void *bind_ctx;               /**< Bind callback context pointer. */
+  void *bind_ctx;                /**< Bind callback context pointer. */
 } CMPGridView;
 
 /**
@@ -154,10 +155,11 @@ CMP_API int CMP_CALL cmp_list_style_init(CMPListStyle *style);
  * @param slot_capacity Slot pool capacity (0 leaves unallocated).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_list_view_init(CMPListView *view, const CMPListStyle *style,
-                                     const CMPAllocator *allocator,
-                                     cmp_usize item_count,
-                                     cmp_usize slot_capacity);
+CMP_API int CMP_CALL cmp_list_view_init(CMPListView *view,
+                                        const CMPListStyle *style,
+                                        const CMPAllocator *allocator,
+                                        cmp_usize item_count,
+                                        cmp_usize slot_capacity);
 
 /**
  * @brief Assign the bind callback for list recycling.
@@ -166,8 +168,8 @@ CMP_API int CMP_CALL cmp_list_view_init(CMPListView *view, const CMPListStyle *s
  * @param ctx Callback context pointer.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_list_view_set_bind(CMPListView *view, CMPListBindFn bind,
-                                         void *ctx);
+CMP_API int CMP_CALL cmp_list_view_set_bind(CMPListView *view,
+                                            CMPListBindFn bind, void *ctx);
 
 /**
  * @brief Update the list item count.
@@ -176,7 +178,7 @@ CMP_API int CMP_CALL cmp_list_view_set_bind(CMPListView *view, CMPListBindFn bin
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_list_view_set_item_count(CMPListView *view,
-                                               cmp_usize item_count);
+                                                  cmp_usize item_count);
 
 /**
  * @brief Update the list style.
@@ -185,7 +187,7 @@ CMP_API int CMP_CALL cmp_list_view_set_item_count(CMPListView *view,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_list_view_set_style(CMPListView *view,
-                                          const CMPListStyle *style);
+                                             const CMPListStyle *style);
 
 /**
  * @brief Update the scroll offset (clamped to the content bounds).
@@ -193,7 +195,8 @@ CMP_API int CMP_CALL cmp_list_view_set_style(CMPListView *view,
  * @param offset Scroll offset in pixels (>= 0).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_list_view_set_scroll(CMPListView *view, CMPScalar offset);
+CMP_API int CMP_CALL cmp_list_view_set_scroll(CMPListView *view,
+                                              CMPScalar offset);
 
 /**
  * @brief Retrieve the current scroll offset.
@@ -202,7 +205,7 @@ CMP_API int CMP_CALL cmp_list_view_set_scroll(CMPListView *view, CMPScalar offse
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_list_view_get_scroll(const CMPListView *view,
-                                           CMPScalar *out_offset);
+                                              CMPScalar *out_offset);
 
 /**
  * @brief Retrieve the list content extent along the main axis.
@@ -211,7 +214,7 @@ CMP_API int CMP_CALL cmp_list_view_get_scroll(const CMPListView *view,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_list_view_get_content_extent(const CMPListView *view,
-                                                   CMPScalar *out_extent);
+                                                      CMPScalar *out_extent);
 
 /**
  * @brief Compute the required slot count for the current viewport.
@@ -220,7 +223,7 @@ CMP_API int CMP_CALL cmp_list_view_get_content_extent(const CMPListView *view,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_list_view_get_required_slots(const CMPListView *view,
-                                                   cmp_usize *out_required);
+                                                      cmp_usize *out_required);
 
 /**
  * @brief Ensure the list slot pool can hold the requested capacity.
@@ -228,7 +231,8 @@ CMP_API int CMP_CALL cmp_list_view_get_required_slots(const CMPListView *view,
  * @param capacity Slot capacity to reserve.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_list_view_reserve(CMPListView *view, cmp_usize capacity);
+CMP_API int CMP_CALL cmp_list_view_reserve(CMPListView *view,
+                                           cmp_usize capacity);
 
 /**
  * @brief Update the visible slot bindings and node bounds.
@@ -246,8 +250,8 @@ CMP_API int CMP_CALL cmp_list_view_update(CMPListView *view);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_list_view_get_visible(const CMPListView *view,
-                                            CMPRenderNode ***out_nodes,
-                                            cmp_usize *out_count);
+                                               CMPRenderNode ***out_nodes,
+                                               cmp_usize *out_count);
 
 /**
  * @brief Initialize a grid style with defaults.
@@ -265,10 +269,11 @@ CMP_API int CMP_CALL cmp_grid_style_init(CMPGridStyle *style);
  * @param slot_capacity Slot pool capacity (0 leaves unallocated).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_grid_view_init(CMPGridView *view, const CMPGridStyle *style,
-                                     const CMPAllocator *allocator,
-                                     cmp_usize item_count,
-                                     cmp_usize slot_capacity);
+CMP_API int CMP_CALL cmp_grid_view_init(CMPGridView *view,
+                                        const CMPGridStyle *style,
+                                        const CMPAllocator *allocator,
+                                        cmp_usize item_count,
+                                        cmp_usize slot_capacity);
 
 /**
  * @brief Assign the bind callback for grid recycling.
@@ -277,8 +282,8 @@ CMP_API int CMP_CALL cmp_grid_view_init(CMPGridView *view, const CMPGridStyle *s
  * @param ctx Callback context pointer.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_grid_view_set_bind(CMPGridView *view, CMPListBindFn bind,
-                                         void *ctx);
+CMP_API int CMP_CALL cmp_grid_view_set_bind(CMPGridView *view,
+                                            CMPListBindFn bind, void *ctx);
 
 /**
  * @brief Update the grid item count.
@@ -287,7 +292,7 @@ CMP_API int CMP_CALL cmp_grid_view_set_bind(CMPGridView *view, CMPListBindFn bin
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_grid_view_set_item_count(CMPGridView *view,
-                                               cmp_usize item_count);
+                                                  cmp_usize item_count);
 
 /**
  * @brief Update the grid style.
@@ -296,7 +301,7 @@ CMP_API int CMP_CALL cmp_grid_view_set_item_count(CMPGridView *view,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_grid_view_set_style(CMPGridView *view,
-                                          const CMPGridStyle *style);
+                                             const CMPGridStyle *style);
 
 /**
  * @brief Update the scroll offset (clamped to the content bounds).
@@ -304,7 +309,8 @@ CMP_API int CMP_CALL cmp_grid_view_set_style(CMPGridView *view,
  * @param offset Scroll offset in pixels (>= 0).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_grid_view_set_scroll(CMPGridView *view, CMPScalar offset);
+CMP_API int CMP_CALL cmp_grid_view_set_scroll(CMPGridView *view,
+                                              CMPScalar offset);
 
 /**
  * @brief Retrieve the current scroll offset.
@@ -313,7 +319,7 @@ CMP_API int CMP_CALL cmp_grid_view_set_scroll(CMPGridView *view, CMPScalar offse
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_grid_view_get_scroll(const CMPGridView *view,
-                                           CMPScalar *out_offset);
+                                              CMPScalar *out_offset);
 
 /**
  * @brief Retrieve the grid content extent along the main axis.
@@ -322,7 +328,7 @@ CMP_API int CMP_CALL cmp_grid_view_get_scroll(const CMPGridView *view,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_grid_view_get_content_extent(const CMPGridView *view,
-                                                   CMPScalar *out_extent);
+                                                      CMPScalar *out_extent);
 
 /**
  * @brief Compute the required slot count for the current viewport.
@@ -331,7 +337,7 @@ CMP_API int CMP_CALL cmp_grid_view_get_content_extent(const CMPGridView *view,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_grid_view_get_required_slots(const CMPGridView *view,
-                                                   cmp_usize *out_required);
+                                                      cmp_usize *out_required);
 
 /**
  * @brief Ensure the grid slot pool can hold the requested capacity.
@@ -339,7 +345,8 @@ CMP_API int CMP_CALL cmp_grid_view_get_required_slots(const CMPGridView *view,
  * @param capacity Slot capacity to reserve.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_grid_view_reserve(CMPGridView *view, cmp_usize capacity);
+CMP_API int CMP_CALL cmp_grid_view_reserve(CMPGridView *view,
+                                           cmp_usize capacity);
 
 /**
  * @brief Update the visible slot bindings and node bounds.
@@ -357,8 +364,8 @@ CMP_API int CMP_CALL cmp_grid_view_update(CMPGridView *view);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_grid_view_get_visible(const CMPGridView *view,
-                                            CMPRenderNode ***out_nodes,
-                                            cmp_usize *out_count);
+                                               CMPRenderNode ***out_nodes,
+                                               cmp_usize *out_count);
 
 #ifdef CMP_TESTING
 /**
@@ -382,7 +389,7 @@ CMP_API int CMP_CALL cmp_list_test_clear_fail_points(void);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_list_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                             cmp_usize *out_value);
+                                                cmp_usize *out_value);
 /**
  * @brief Test hook for validating list colors.
  * @param color Color to validate.
@@ -418,7 +425,8 @@ CMP_API int CMP_CALL cmp_list_test_validate_style(const CMPListStyle *style);
  * @param style Style to validate.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_list_test_validate_grid_style(const CMPGridStyle *style);
+CMP_API int CMP_CALL
+cmp_list_test_validate_grid_style(const CMPGridStyle *style);
 /**
  * @brief Test hook for computing list content extents.
  * @param item_count Number of items.
@@ -470,8 +478,8 @@ CMP_API int CMP_CALL cmp_list_test_grid_compute_visible_range(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_list_test_compute_item_bounds(const CMPListView *view,
-                                                    cmp_usize index,
-                                                    CMPRect *out_bounds);
+                                                       cmp_usize index,
+                                                       CMPRect *out_bounds);
 /**
  * @brief Test hook for computing grid item bounds.
  * @param view Grid view.
@@ -479,9 +487,8 @@ CMP_API int CMP_CALL cmp_list_test_compute_item_bounds(const CMPListView *view,
  * @param out_bounds Receives bounds.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_list_test_grid_compute_item_bounds(const CMPGridView *view,
-                                                         cmp_usize index,
-                                                         CMPRect *out_bounds);
+CMP_API int CMP_CALL cmp_list_test_grid_compute_item_bounds(
+    const CMPGridView *view, cmp_usize index, CMPRect *out_bounds);
 /**
  * @brief Test hook for updating list metrics.
  * @param view List view instance.
@@ -504,10 +511,10 @@ CMP_API int CMP_CALL cmp_list_test_grid_update_metrics(CMPGridView *view);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_list_test_reserve_slots(CMPListSlot **slots,
-                                              CMPRenderNode ***visible_nodes,
-                                              cmp_usize *slot_capacity,
-                                              const CMPAllocator *allocator,
-                                              cmp_usize capacity);
+                                                 CMPRenderNode ***visible_nodes,
+                                                 cmp_usize *slot_capacity,
+                                                 const CMPAllocator *allocator,
+                                                 cmp_usize capacity);
 #endif
 
 #ifdef __cplusplus

@@ -16,7 +16,8 @@ extern "C" {
  * @brief Network client configuration.
  */
 typedef struct CMPNetworkConfig {
-  CMPEnv *env; /**< Environment backend used to acquire the network interface. */
+  CMPEnv
+      *env; /**< Environment backend used to acquire the network interface. */
   const CMPAllocator *allocator; /**< Allocator used for response storage (NULL
                                    uses default). */
 } CMPNetworkConfig;
@@ -51,7 +52,7 @@ CMP_API int CMP_CALL cmp_network_request_init(CMPNetworkRequest *request);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_network_init(CMPNetworkClient *client,
-                                   const CMPNetworkConfig *config);
+                                      const CMPNetworkConfig *config);
 
 /**
  * @brief Shut down a network client and release its state.
@@ -69,8 +70,8 @@ CMP_API int CMP_CALL cmp_network_shutdown(CMPNetworkClient *client);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_network_request(CMPNetworkClient *client,
-                                      const CMPNetworkRequest *request,
-                                      CMPNetworkResponse *out_response);
+                                         const CMPNetworkRequest *request,
+                                         CMPNetworkResponse *out_response);
 
 /**
  * @brief Release resources in a network response.
@@ -79,7 +80,7 @@ CMP_API int CMP_CALL cmp_network_request(CMPNetworkClient *client,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_network_response_free(CMPNetworkClient *client,
-                                            CMPNetworkResponse *response);
+                                               CMPNetworkResponse *response);
 
 /**
  * @brief Copy a response body into a caller-provided buffer.
@@ -92,7 +93,7 @@ CMP_API int CMP_CALL cmp_network_response_free(CMPNetworkClient *client,
  */
 CMP_API int CMP_CALL
 cmp_network_copy_response_body(const CMPNetworkResponse *response, void *dst,
-                              cmp_usize dst_capacity, cmp_usize *out_size);
+                               cmp_usize dst_capacity, cmp_usize *out_size);
 
 #ifdef __cplusplus
 } /* extern "C" */

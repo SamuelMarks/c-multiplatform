@@ -22,9 +22,9 @@
 #endif
 #endif
 
-#define CMP_ANDROID_RETURN_IF_ERROR(rc)                                         \
+#define CMP_ANDROID_RETURN_IF_ERROR(rc)                                        \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       return (rc);                                                             \
     }                                                                          \
   } while (0)
@@ -60,8 +60,8 @@ cmp_android_backend_validate_config(const CMPAndroidBackendConfig *config) {
 }
 
 #ifdef CMP_TESTING
-int CMP_CALL
-cmp_android_backend_test_validate_config(const CMPAndroidBackendConfig *config) {
+int CMP_CALL cmp_android_backend_test_validate_config(
+    const CMPAndroidBackendConfig *config) {
   return cmp_android_backend_validate_config(config);
 }
 #endif
@@ -159,7 +159,7 @@ struct CMPAndroidBackend {
 
 #if CMP_ANDROID_CAMERA2_AVAILABLE
 static int cmp_android_camera_mul_overflow(cmp_usize a, cmp_usize b,
-                                          cmp_usize *out_value) {
+                                           cmp_usize *out_value) {
   cmp_usize max_value;
 
   if (out_value == NULL) {
@@ -216,7 +216,7 @@ static int cmp_android_camera_unlock(CMPAndroidCameraState *state) {
 }
 
 static int cmp_android_camera_copy_image(CMPAndroidCameraState *state,
-                                        AImage *image) {
+                                         AImage *image) {
   unsigned char *y_plane;
   unsigned char *u_plane;
   unsigned char *v_plane;
@@ -248,7 +248,7 @@ static int cmp_android_camera_copy_image(CMPAndroidCameraState *state,
   }
 
   rc = cmp_android_camera_mul_overflow((cmp_usize)width, (cmp_usize)height,
-                                      &y_size);
+                                       &y_size);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -372,7 +372,7 @@ static void cmp_android_camera_on_opened(void *context, ACameraDevice *device) {
 }
 
 static void cmp_android_camera_on_disconnected(void *context,
-                                              ACameraDevice *device) {
+                                               ACameraDevice *device) {
   CMPAndroidCameraState *state;
 
   (void)device;
@@ -391,7 +391,7 @@ static void cmp_android_camera_on_disconnected(void *context,
 }
 
 static void cmp_android_camera_on_error(void *context, ACameraDevice *device,
-                                       int error) {
+                                        int error) {
   CMPAndroidCameraState *state;
 
   (void)device;
@@ -413,9 +413,9 @@ static void cmp_android_camera_on_error(void *context, ACameraDevice *device,
 
 #if CMP_ANDROID_CAMERA2_AVAILABLE
 static int cmp_android_camera_select_index(ACameraManager *manager,
-                                          const CMPCameraConfig *config,
-                                          const ACameraIdList *id_list,
-                                          cmp_u32 *out_index) {
+                                           const CMPCameraConfig *config,
+                                           const ACameraIdList *id_list,
+                                           cmp_u32 *out_index) {
   cmp_u32 desired;
   cmp_u32 i;
 
@@ -491,7 +491,7 @@ static int cmp_android_camera_select_index(ACameraManager *manager,
 #endif
 
 static int cmp_android_camera_open_with_config(void *camera,
-                                              const CMPCameraConfig *config);
+                                               const CMPCameraConfig *config);
 
 static int cmp_android_camera_open(void *camera, cmp_u32 camera_id) {
   CMPCameraConfig config;
@@ -506,7 +506,7 @@ static int cmp_android_camera_open(void *camera, cmp_u32 camera_id) {
 }
 
 static int cmp_android_camera_open_with_config(void *camera,
-                                              const CMPCameraConfig *config) {
+                                               const CMPCameraConfig *config) {
   struct CMPAndroidBackend *backend;
   CMPAndroidCameraState *state;
 
@@ -563,7 +563,7 @@ static int cmp_android_camera_open_with_config(void *camera,
     }
 
     rc = cmp_android_camera_select_index(state->manager, config, id_list,
-                                        &selected_index);
+                                         &selected_index);
     if (rc != CMP_OK) {
       ACameraManager_deleteCameraIdList(id_list);
       ACameraManager_delete(state->manager);
@@ -887,8 +887,9 @@ static int cmp_android_camera_stop(void *camera) {
 #endif
 }
 
-static int cmp_android_camera_read_frame(void *camera, CMPCameraFrame *out_frame,
-                                        CMPBool *out_has_frame) {
+static int cmp_android_camera_read_frame(void *camera,
+                                         CMPCameraFrame *out_frame,
+                                         CMPBool *out_has_frame) {
   struct CMPAndroidBackend *backend;
   CMPAndroidCameraState *state;
   int rc = 0;
@@ -1071,14 +1072,14 @@ static int cmp_android_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
 }
 
 static const CMPEnvVTable g_cmp_android_env_vtable = {
-    cmp_android_env_get_io,     cmp_android_env_get_sensors,
-    cmp_android_env_get_camera, cmp_android_env_get_image,
-    cmp_android_env_get_video,  cmp_android_env_get_audio,
+    cmp_android_env_get_io,      cmp_android_env_get_sensors,
+    cmp_android_env_get_camera,  cmp_android_env_get_image,
+    cmp_android_env_get_video,   cmp_android_env_get_audio,
     cmp_android_env_get_network, cmp_android_env_get_tasks,
     cmp_android_env_get_time_ms};
 
 int CMP_CALL cmp_android_backend_create(const CMPAndroidBackendConfig *config,
-                                      CMPAndroidBackend **out_backend) {
+                                        CMPAndroidBackend **out_backend) {
   CMPAndroidBackendConfig local_config;
   CMPNullBackendConfig null_config;
   CMPAllocator allocator;
@@ -1215,7 +1216,8 @@ int CMP_CALL cmp_android_backend_destroy(CMPAndroidBackend *backend) {
   return first_error;
 }
 
-int CMP_CALL cmp_android_backend_get_ws(CMPAndroidBackend *backend, CMPWS *out_ws) {
+int CMP_CALL cmp_android_backend_get_ws(CMPAndroidBackend *backend,
+                                        CMPWS *out_ws) {
   if (backend == NULL || out_ws == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1227,7 +1229,7 @@ int CMP_CALL cmp_android_backend_get_ws(CMPAndroidBackend *backend, CMPWS *out_w
 }
 
 int CMP_CALL cmp_android_backend_get_gfx(CMPAndroidBackend *backend,
-                                       CMPGfx *out_gfx) {
+                                         CMPGfx *out_gfx) {
   if (backend == NULL || out_gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1239,7 +1241,7 @@ int CMP_CALL cmp_android_backend_get_gfx(CMPAndroidBackend *backend,
 }
 
 int CMP_CALL cmp_android_backend_get_env(CMPAndroidBackend *backend,
-                                       CMPEnv *out_env) {
+                                         CMPEnv *out_env) {
   if (backend == NULL || out_env == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1325,7 +1327,7 @@ int CMP_CALL cmp_android_backend_predictive_back_cancel(
 #else
 
 int CMP_CALL cmp_android_backend_create(const CMPAndroidBackendConfig *config,
-                                      CMPAndroidBackend **out_backend) {
+                                        CMPAndroidBackend **out_backend) {
   CMPAndroidBackendConfig local_config;
   int rc;
 
@@ -1353,7 +1355,8 @@ int CMP_CALL cmp_android_backend_destroy(CMPAndroidBackend *backend) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-int CMP_CALL cmp_android_backend_get_ws(CMPAndroidBackend *backend, CMPWS *out_ws) {
+int CMP_CALL cmp_android_backend_get_ws(CMPAndroidBackend *backend,
+                                        CMPWS *out_ws) {
   if (backend == NULL || out_ws == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1362,7 +1365,7 @@ int CMP_CALL cmp_android_backend_get_ws(CMPAndroidBackend *backend, CMPWS *out_w
 }
 
 int CMP_CALL cmp_android_backend_get_gfx(CMPAndroidBackend *backend,
-                                       CMPGfx *out_gfx) {
+                                         CMPGfx *out_gfx) {
   if (backend == NULL || out_gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1371,7 +1374,7 @@ int CMP_CALL cmp_android_backend_get_gfx(CMPAndroidBackend *backend,
 }
 
 int CMP_CALL cmp_android_backend_get_env(CMPAndroidBackend *backend,
-                                       CMPEnv *out_env) {
+                                         CMPEnv *out_env) {
   if (backend == NULL || out_env == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

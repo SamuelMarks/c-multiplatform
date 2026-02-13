@@ -18,17 +18,19 @@ int main(void) {
   CMP_TEST_ASSERT(config.enable_tasks == CMP_TRUE);
 
   CMP_TEST_EXPECT(cmp_sdl3_backend_test_validate_config(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
   CMP_TEST_OK(cmp_sdl3_backend_config_init(&config));
   config.allocator = &default_alloc;
   CMP_TEST_OK(cmp_sdl3_backend_test_validate_config(&config));
 
-  CMP_TEST_EXPECT(cmp_sdl3_backend_is_available(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_sdl3_backend_is_available(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_sdl3_backend_is_available(&available));
 
   backend = NULL;
-  CMP_TEST_EXPECT(cmp_sdl3_backend_create(NULL, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_sdl3_backend_create(NULL, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   {
     int rc;
     rc = cmp_sdl3_backend_create(NULL, &backend);
@@ -43,12 +45,12 @@ int main(void) {
   CMP_TEST_OK(cmp_sdl3_backend_config_init(&config));
   config.handle_capacity = 0;
   CMP_TEST_EXPECT(cmp_sdl3_backend_create(&config, &backend),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_sdl3_backend_config_init(&config));
   config.renderer_flags = 0x80000000u;
   CMP_TEST_EXPECT(cmp_sdl3_backend_create(&config, &backend),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   {
     CMPAllocator bad_alloc;
@@ -56,7 +58,7 @@ int main(void) {
     memset(&bad_alloc, 0, sizeof(bad_alloc));
     config.allocator = &bad_alloc;
     CMP_TEST_EXPECT(cmp_sdl3_backend_create(&config, &backend),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   if (!available) {
@@ -67,32 +69,33 @@ int main(void) {
     CMP_TEST_OK(cmp_sdl3_backend_config_init(&config));
     backend = NULL;
     CMP_TEST_EXPECT(cmp_sdl3_backend_create(&config, &backend),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
     CMP_TEST_ASSERT(backend == NULL);
 
     CMP_TEST_EXPECT(cmp_sdl3_backend_destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_sdl3_backend_destroy((CMPSDL3Backend *)1),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
-    CMP_TEST_EXPECT(cmp_sdl3_backend_get_ws(NULL, &ws), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_sdl3_backend_get_ws(NULL, &ws),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_sdl3_backend_get_ws((CMPSDL3Backend *)1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_sdl3_backend_get_ws((CMPSDL3Backend *)1, &ws),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
     CMP_TEST_EXPECT(cmp_sdl3_backend_get_gfx(NULL, &gfx),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_sdl3_backend_get_gfx((CMPSDL3Backend *)1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_sdl3_backend_get_gfx((CMPSDL3Backend *)1, &gfx),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
     CMP_TEST_EXPECT(cmp_sdl3_backend_get_env(NULL, &env),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_sdl3_backend_get_env((CMPSDL3Backend *)1, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_sdl3_backend_get_env((CMPSDL3Backend *)1, &env),
-                   CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_UNSUPPORTED);
 
     return 0;
   }
@@ -114,11 +117,12 @@ int main(void) {
     cmp_u32 time_ms;
     int rc;
 
-    CMP_TEST_EXPECT(cmp_sdl3_backend_get_ws(NULL, &ws), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_sdl3_backend_get_ws(NULL, &ws),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_sdl3_backend_get_gfx(NULL, &gfx),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_sdl3_backend_get_env(NULL, &env),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_sdl3_backend_config_init(&config));
     backend = NULL;
@@ -138,15 +142,15 @@ int main(void) {
       font.id = 0u;
       font.generation = 0u;
 
-      CMP_TEST_EXPECT(
-          gfx.text_vtable->create_font(gfx.ctx, NULL, 12, 400, CMP_FALSE, &font),
-          CMP_ERR_INVALID_ARGUMENT);
+      CMP_TEST_EXPECT(gfx.text_vtable->create_font(gfx.ctx, NULL, 12, 400,
+                                                   CMP_FALSE, &font),
+                      CMP_ERR_INVALID_ARGUMENT);
       CMP_TEST_EXPECT(gfx.text_vtable->create_font(gfx.ctx, "missing.ttf", 0,
-                                                  400, CMP_FALSE, &font),
-                     CMP_ERR_RANGE);
+                                                   400, CMP_FALSE, &font),
+                      CMP_ERR_RANGE);
       CMP_TEST_EXPECT(gfx.text_vtable->create_font(gfx.ctx, "missing.ttf", 12,
-                                                  50, CMP_FALSE, &font),
-                     CMP_ERR_RANGE);
+                                                   50, CMP_FALSE, &font),
+                      CMP_ERR_RANGE);
 
       text_rc = gfx.text_vtable->create_font(gfx.ctx, "missing.ttf", 12, 400,
                                              CMP_FALSE, &font);
@@ -157,11 +161,11 @@ int main(void) {
         CMPScalar baseline;
 
         CMP_TEST_OK(gfx.text_vtable->measure_text(gfx.ctx, font, "", 0, &width,
-                                                 &height, &baseline));
+                                                  &height, &baseline));
         CMP_TEST_OK(gfx.text_vtable->destroy_font(gfx.ctx, font));
       } else {
         CMP_TEST_ASSERT(text_rc == CMP_ERR_NOT_FOUND ||
-                       text_rc == CMP_ERR_UNKNOWN);
+                        text_rc == CMP_ERR_UNKNOWN);
       }
 #else
       CMP_TEST_EXPECT(text_rc, CMP_ERR_UNSUPPORTED);
@@ -181,13 +185,14 @@ int main(void) {
     rc = ws.vtable->create_window(ws.ctx, &window_config, &window);
     if (rc == CMP_OK) {
       CMP_TEST_OK(gfx.vtable->begin_frame(gfx.ctx, window, window_config.width,
-                                         window_config.height, 1.0f));
+                                          window_config.height, 1.0f));
 
       memset(pixels, 255, sizeof(pixels));
       texture.id = 0u;
       texture.generation = 0u;
-      CMP_TEST_OK(gfx.vtable->create_texture(gfx.ctx, 2, 2, CMP_TEX_FORMAT_RGBA8,
-                                            pixels, sizeof(pixels), &texture));
+      CMP_TEST_OK(gfx.vtable->create_texture(gfx.ctx, 2, 2,
+                                             CMP_TEX_FORMAT_RGBA8, pixels,
+                                             sizeof(pixels), &texture));
 
       update_pixels[0] = 0u;
       update_pixels[1] = 128u;
@@ -211,7 +216,7 @@ int main(void) {
       color.a = 1.0f;
       CMP_TEST_OK(gfx.vtable->clear(gfx.ctx, color));
       CMP_TEST_OK(gfx.vtable->draw_texture(gfx.ctx, texture, &src_rect,
-                                          &dst_rect, 1.0f));
+                                           &dst_rect, 1.0f));
       CMP_TEST_OK(gfx.vtable->destroy_texture(gfx.ctx, texture));
       CMP_TEST_OK(gfx.vtable->end_frame(gfx.ctx, window));
       CMP_TEST_OK(ws.vtable->destroy_window(ws.ctx, window));

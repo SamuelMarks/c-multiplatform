@@ -29,8 +29,8 @@ static CMPBool cmp_event_widget_focusable(const CMPWidget *widget) {
   return CMP_FALSE;
 }
 
-static int cmp_event_hit_test(const CMPRenderNode *node, CMPScalar x, CMPScalar y,
-                             CMPWidget **out_widget) {
+static int cmp_event_hit_test(const CMPRenderNode *node, CMPScalar x,
+                              CMPScalar y, CMPWidget **out_widget) {
   CMPBool contains = CMP_FALSE;
   cmp_usize i;
   int rc;
@@ -98,8 +98,8 @@ static int cmp_event_hit_test(const CMPRenderNode *node, CMPScalar x, CMPScalar 
 }
 
 static int cmp_event_dispatch_to_widget(CMPWidget *widget,
-                                       const CMPInputEvent *event,
-                                       CMPBool *out_handled) {
+                                        const CMPInputEvent *event,
+                                        CMPBool *out_handled) {
   CMPBool handled;
 
   if (out_handled == NULL) {
@@ -156,8 +156,8 @@ int CMP_CALL cmp_event_dispatcher_shutdown(CMPEventDispatcher *dispatcher) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_event_dispatcher_get_focus(const CMPEventDispatcher *dispatcher,
-                                          CMPWidget **out_widget) {
+int CMP_CALL cmp_event_dispatcher_get_focus(
+    const CMPEventDispatcher *dispatcher, CMPWidget **out_widget) {
   if (dispatcher == NULL || out_widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -170,7 +170,7 @@ int CMP_CALL cmp_event_dispatcher_get_focus(const CMPEventDispatcher *dispatcher
 }
 
 int CMP_CALL cmp_event_dispatcher_set_focus(CMPEventDispatcher *dispatcher,
-                                          CMPWidget *widget) {
+                                            CMPWidget *widget) {
   if (dispatcher == NULL || widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -211,8 +211,8 @@ int CMP_CALL cmp_event_dispatcher_get_focus_visible(
   return CMP_OK;
 }
 
-int CMP_CALL cmp_event_dispatcher_set_focus_visible(CMPEventDispatcher *dispatcher,
-                                                  CMPBool visible) {
+int CMP_CALL cmp_event_dispatcher_set_focus_visible(
+    CMPEventDispatcher *dispatcher, CMPBool visible) {
   if (dispatcher == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -225,9 +225,9 @@ int CMP_CALL cmp_event_dispatcher_set_focus_visible(CMPEventDispatcher *dispatch
 }
 
 int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
-                              const CMPRenderNode *root,
-                              const CMPInputEvent *event, CMPWidget **out_target,
-                              CMPBool *out_handled) {
+                                const CMPRenderNode *root,
+                                const CMPInputEvent *event,
+                                CMPWidget **out_target, CMPBool *out_handled) {
   CMPWidget *target;
   CMPBool handled;
   int rc;
@@ -252,7 +252,7 @@ int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
   case CMP_INPUT_POINTER_MOVE:
   case CMP_INPUT_POINTER_SCROLL:
     rc = cmp_event_hit_test(root, (CMPScalar)event->data.pointer.x,
-                           (CMPScalar)event->data.pointer.y, &target);
+                            (CMPScalar)event->data.pointer.y, &target);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -332,7 +332,7 @@ int CMP_CALL cmp_event_test_validate_rect(const CMPRect *rect) {
 }
 
 int CMP_CALL cmp_event_test_widget_focusable(const CMPWidget *widget,
-                                           CMPBool *out_focusable) {
+                                             CMPBool *out_focusable) {
   if (out_focusable == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -342,13 +342,13 @@ int CMP_CALL cmp_event_test_widget_focusable(const CMPWidget *widget,
 }
 
 int CMP_CALL cmp_event_test_hit_test(const CMPRenderNode *node, CMPScalar x,
-                                   CMPScalar y, CMPWidget **out_widget) {
+                                     CMPScalar y, CMPWidget **out_widget) {
   return cmp_event_hit_test(node, x, y, out_widget);
 }
 
 int CMP_CALL cmp_event_test_dispatch_to_widget(CMPWidget *widget,
-                                             const CMPInputEvent *event,
-                                             CMPBool *out_handled) {
+                                               const CMPInputEvent *event,
+                                               CMPBool *out_handled) {
   return cmp_event_dispatch_to_widget(widget, event, out_handled);
 }
 

@@ -82,7 +82,7 @@ CMP_API int CMP_CALL cmp_android_backend_destroy(CMPAndroidBackend *backend);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_android_backend_get_ws(CMPAndroidBackend *backend,
-                                             CMPWS *out_ws);
+                                                CMPWS *out_ws);
 
 /**
  * @brief Retrieve the graphics interface for the backend.
@@ -91,7 +91,7 @@ CMP_API int CMP_CALL cmp_android_backend_get_ws(CMPAndroidBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_android_backend_get_gfx(CMPAndroidBackend *backend,
-                                              CMPGfx *out_gfx);
+                                                 CMPGfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -100,7 +100,7 @@ CMP_API int CMP_CALL cmp_android_backend_get_gfx(CMPAndroidBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_android_backend_get_env(CMPAndroidBackend *backend,
-                                              CMPEnv *out_env);
+                                                 CMPEnv *out_env);
 
 /**
  * @brief Assign the predictive back controller for the backend.

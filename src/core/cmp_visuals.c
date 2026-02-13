@@ -16,8 +16,9 @@
 #define CMP_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_RUNNING 10u
 #define CMP_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_STEP 11u
 #define CMP_VISUALS_TEST_FAIL_RIPPLE_STEP_OPACITY_VALUE 12u
-#define CMP_VISUALS_TEST_FAIL_RIPPLE_STEP_FADE_RUNNING 13u /* GCOVR_EXCL_LINE   \
-                                                           */
+#define CMP_VISUALS_TEST_FAIL_RIPPLE_STEP_FADE_RUNNING                         \
+  13u /* GCOVR_EXCL_LINE                                                       \
+       */
 #define CMP_VISUALS_TEST_FAIL_RIPPLE_STEP_STOP_RADIUS 14u
 #define CMP_VISUALS_TEST_FAIL_RIPPLE_STEP_STOP_OPACITY 15u
 #define CMP_VISUALS_TEST_FAIL_RIPPLE_PAINT_RECT 16u
@@ -116,8 +117,8 @@ int CMP_CALL cmp_ripple_init(CMPRipple *ripple) {
 }
 
 int CMP_CALL cmp_ripple_start(CMPRipple *ripple, CMPScalar center_x,
-                            CMPScalar center_y, CMPScalar max_radius,
-                            CMPScalar expand_duration, CMPColor color) {
+                              CMPScalar center_y, CMPScalar max_radius,
+                              CMPScalar expand_duration, CMPColor color) {
   int rc;
 
   if (ripple == NULL) {
@@ -157,7 +158,7 @@ int CMP_CALL cmp_ripple_start(CMPRipple *ripple, CMPScalar center_x,
   }
 
   rc = cmp_anim_controller_start_timing(&ripple->radius_anim, 0.0f, max_radius,
-                                       expand_duration, CMP_ANIM_EASE_OUT);
+                                        expand_duration, CMP_ANIM_EASE_OUT);
 #ifdef CMP_TESTING
   if (cmp_visuals_test_fail_point_match(
           CMP_VISUALS_TEST_FAIL_RIPPLE_START_TIMING)) {
@@ -198,7 +199,7 @@ int CMP_CALL cmp_ripple_release(CMPRipple *ripple, CMPScalar fade_duration) {
   }
 
   rc = cmp_anim_controller_start_timing(&ripple->opacity_anim, ripple->opacity,
-                                       0.0f, fade_duration, CMP_ANIM_EASE_OUT);
+                                        0.0f, fade_duration, CMP_ANIM_EASE_OUT);
 #ifdef CMP_TESTING
   if (cmp_visuals_test_fail_point_match(
           CMP_VISUALS_TEST_FAIL_RIPPLE_RELEASE_TIMING)) {
@@ -214,7 +215,7 @@ int CMP_CALL cmp_ripple_release(CMPRipple *ripple, CMPScalar fade_duration) {
 }
 
 int CMP_CALL cmp_ripple_step(CMPRipple *ripple, CMPScalar dt,
-                           CMPBool *out_finished) {
+                             CMPBool *out_finished) {
   CMPBool running;
   CMPBool finished;
   CMPScalar value;
@@ -348,11 +349,13 @@ int CMP_CALL cmp_ripple_step(CMPRipple *ripple, CMPScalar dt,
     }
   }
 
-  *out_finished = (ripple->state == CMP_RIPPLE_STATE_IDLE) ? CMP_TRUE : CMP_FALSE;
+  *out_finished =
+      (ripple->state == CMP_RIPPLE_STATE_IDLE) ? CMP_TRUE : CMP_FALSE;
   return CMP_OK;
 }
 
-int CMP_CALL cmp_ripple_is_active(const CMPRipple *ripple, CMPBool *out_active) {
+int CMP_CALL cmp_ripple_is_active(const CMPRipple *ripple,
+                                  CMPBool *out_active) {
   if (ripple == NULL || out_active == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -367,8 +370,9 @@ int CMP_CALL cmp_ripple_is_active(const CMPRipple *ripple, CMPBool *out_active) 
 }
 
 int CMP_CALL cmp_ripple_compute_max_radius(const CMPRect *bounds,
-                                         CMPScalar center_x, CMPScalar center_y,
-                                         CMPScalar *out_radius) {
+                                           CMPScalar center_x,
+                                           CMPScalar center_y,
+                                           CMPScalar *out_radius) {
   CMPScalar max_radius;
   CMPScalar dx;
   CMPScalar dy;
@@ -424,7 +428,7 @@ int CMP_CALL cmp_ripple_compute_max_radius(const CMPRect *bounds,
 }
 
 int CMP_CALL cmp_ripple_paint(const CMPRipple *ripple, CMPGfx *gfx,
-                            const CMPRect *clip, CMPScalar corner_radius) {
+                              const CMPRect *clip, CMPScalar corner_radius) {
   CMPRect rect;
   CMPColor color;
   int rc;
@@ -547,9 +551,9 @@ int CMP_CALL cmp_shadow_init(CMPShadow *shadow) {
 }
 
 int CMP_CALL cmp_shadow_set(CMPShadow *shadow, CMPScalar offset_x,
-                          CMPScalar offset_y, CMPScalar blur_radius,
-                          CMPScalar spread, CMPScalar corner_radius,
-                          cmp_u32 layers, CMPColor color) {
+                            CMPScalar offset_y, CMPScalar blur_radius,
+                            CMPScalar spread, CMPScalar corner_radius,
+                            cmp_u32 layers, CMPColor color) {
   int rc;
 
   if (shadow == NULL) {
@@ -578,7 +582,7 @@ int CMP_CALL cmp_shadow_set(CMPShadow *shadow, CMPScalar offset_x,
 }
 
 int CMP_CALL cmp_shadow_paint(const CMPShadow *shadow, CMPGfx *gfx,
-                            const CMPRect *rect, const CMPRect *clip) {
+                              const CMPRect *rect, const CMPRect *clip) {
   CMPRect layer_rect;
   CMPColor layer_color;
   CMPScalar layer_corner;

@@ -305,7 +305,8 @@ int main(void) {
     CMPListView temp_list;
     CMPGridView temp_grid;
 
-    CMP_TEST_EXPECT(cmp_list_test_validate_color(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_list_test_validate_color(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     color.r = -0.1f;
     color.g = 0.5f;
     color.b = 0.5f;
@@ -323,7 +324,8 @@ int main(void) {
     color.a = 1.0f;
     CMP_TEST_OK(cmp_list_test_validate_color(&color));
 
-    CMP_TEST_EXPECT(cmp_list_test_validate_edges(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_list_test_validate_edges(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     edges.left = -1.0f;
     edges.right = 0.0f;
     edges.top = 0.0f;
@@ -341,7 +343,8 @@ int main(void) {
     edges.bottom = 0.0f;
     CMP_TEST_OK(cmp_list_test_validate_edges(&edges));
 
-    CMP_TEST_EXPECT(cmp_list_test_validate_rect(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_list_test_validate_rect(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     rect.x = 0.0f;
     rect.y = 0.0f;
     rect.width = -1.0f;
@@ -356,7 +359,7 @@ int main(void) {
     spec.mode = 99u;
     spec.size = 1.0f;
     CMP_TEST_EXPECT(cmp_list_test_validate_measure_spec(spec),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     spec.mode = CMP_MEASURE_EXACTLY;
     spec.size = -1.0f;
     CMP_TEST_EXPECT(cmp_list_test_validate_measure_spec(spec), CMP_ERR_RANGE);
@@ -365,7 +368,8 @@ int main(void) {
     CMP_TEST_OK(cmp_list_test_validate_measure_spec(spec));
 
     CMP_TEST_OK(cmp_list_style_init(&style));
-    CMP_TEST_EXPECT(cmp_list_test_validate_style(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_list_test_validate_style(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     style.orientation = 99u;
     CMP_TEST_EXPECT(cmp_list_test_validate_style(&style), CMP_ERR_RANGE);
     style.orientation = CMP_LIST_ORIENTATION_VERTICAL;
@@ -385,38 +389,38 @@ int main(void) {
 
     CMP_TEST_OK(cmp_grid_style_init(&grid_style_local));
     CMP_TEST_EXPECT(cmp_list_test_validate_grid_style(NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     grid_style_local.scroll_axis = 99u;
     CMP_TEST_EXPECT(cmp_list_test_validate_grid_style(&grid_style_local),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid_style_local.scroll_axis = CMP_GRID_SCROLL_VERTICAL;
     grid_style_local.span = 0u;
     CMP_TEST_EXPECT(cmp_list_test_validate_grid_style(&grid_style_local),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid_style_local.span = 2u;
     grid_style_local.spacing_x = -1.0f;
     CMP_TEST_EXPECT(cmp_list_test_validate_grid_style(&grid_style_local),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid_style_local.spacing_x = 0.0f;
     grid_style_local.spacing_y = -1.0f;
     CMP_TEST_EXPECT(cmp_list_test_validate_grid_style(&grid_style_local),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid_style_local.spacing_y = 0.0f;
     grid_style_local.item_width = -1.0f;
     CMP_TEST_EXPECT(cmp_list_test_validate_grid_style(&grid_style_local),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid_style_local.item_width = CMP_GRID_DEFAULT_ITEM_WIDTH;
     grid_style_local.item_height = -1.0f;
     CMP_TEST_EXPECT(cmp_list_test_validate_grid_style(&grid_style_local),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid_style_local.item_height = CMP_GRID_DEFAULT_ITEM_HEIGHT;
     grid_style_local.padding.left = -1.0f;
     CMP_TEST_EXPECT(cmp_list_test_validate_grid_style(&grid_style_local),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid_style_local.padding.left = 0.0f;
     grid_style_local.background_color.a = 2.0f;
     CMP_TEST_EXPECT(cmp_list_test_validate_grid_style(&grid_style_local),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid_style_local.background_color.a = 0.0f;
     CMP_TEST_OK(cmp_list_test_validate_grid_style(&grid_style_local));
 
@@ -424,44 +428,44 @@ int main(void) {
         cmp_list_test_compute_content_extent(1u, 1.0f, 1.0f, 0.0f, 0.0f, NULL),
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_list_test_compute_content_extent(1u, -1.0f, 1.0f, 0.0f,
-                                                       0.0f, &extent),
-                   CMP_ERR_RANGE);
+                                                         0.0f, &extent),
+                    CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_list_test_compute_content_extent(0u, 1.0f, 1.0f, 1.0f, 2.0f,
-                                                   &extent));
+                                                     &extent));
     CMP_TEST_ASSERT(extent > 2.999f && extent < 3.001f);
     CMP_TEST_EXPECT(cmp_list_test_compute_content_extent(1u, 0.0f, 1.0f, 0.0f,
-                                                       0.0f, &extent),
-                   CMP_ERR_RANGE);
+                                                         0.0f, &extent),
+                    CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_list_test_compute_content_extent(2u, 1.0f, 1.0f, 0.0f, 0.0f,
-                                                   &extent));
-    CMP_TEST_OK(
-        cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_CONTENT_EXTENT_NEGATIVE));
+                                                     &extent));
+    CMP_TEST_OK(cmp_list_test_set_fail_point(
+        CMP_LIST_TEST_FAIL_CONTENT_EXTENT_NEGATIVE));
     CMP_TEST_EXPECT(cmp_list_test_compute_content_extent(2u, 1.0f, 1.0f, 0.0f,
-                                                       0.0f, &extent),
-                   CMP_ERR_RANGE);
+                                                         0.0f, &extent),
+                    CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
     CMP_TEST_EXPECT(cmp_list_test_compute_visible_range(1u, 1.0f, 0.0f, 0.0f,
-                                                      0.0f, 1.0f, 0u, NULL,
-                                                      &last, &count),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                                        0.0f, 1.0f, 0u, NULL,
+                                                        &last, &count),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_list_test_compute_visible_range(
         0u, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0u, &first, &last, &count));
     CMP_TEST_ASSERT(count == 0u);
     CMP_TEST_OK(cmp_list_test_compute_visible_range(
         1u, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0u, &first, &last, &count));
     CMP_TEST_EXPECT(cmp_list_test_compute_visible_range(1u, 0.0f, 0.0f, 0.0f,
-                                                      0.0f, 1.0f, 0u, &first,
-                                                      &last, &count),
-                   CMP_ERR_RANGE);
+                                                        0.0f, 1.0f, 0u, &first,
+                                                        &last, &count),
+                    CMP_ERR_RANGE);
     CMP_TEST_EXPECT(cmp_list_test_compute_visible_range(1u, 1.0f, -1.0f, 0.0f,
-                                                      0.0f, 1.0f, 0u, &first,
-                                                      &last, &count),
-                   CMP_ERR_RANGE);
+                                                        0.0f, 1.0f, 0u, &first,
+                                                        &last, &count),
+                    CMP_ERR_RANGE);
     CMP_TEST_EXPECT(cmp_list_test_compute_visible_range(1u, 1.0f, 0.0f, -1.0f,
-                                                      0.0f, 1.0f, 0u, &first,
-                                                      &last, &count),
-                   CMP_ERR_RANGE);
+                                                        0.0f, 1.0f, 0u, &first,
+                                                        &last, &count),
+                    CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_list_test_compute_visible_range(
         1u, 1.0f, 0.0f, 5.0f, 0.0f, 1.0f, 0u, &first, &last, &count));
     CMP_TEST_OK(cmp_list_test_compute_visible_range(
@@ -476,11 +480,12 @@ int main(void) {
         3u, 1.0f, 0.0f, 0.0f, 0.0f, 1.1f, 1u, &first, &last, &count));
     CMP_TEST_OK(cmp_list_test_compute_visible_range(
         3u, 1.0f, 0.0f, 0.0f, 0.0f, 1.1f, 10u, &first, &last, &count));
-    CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_VISIBLE_STRIDE));
+    CMP_TEST_OK(
+        cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_VISIBLE_STRIDE));
     CMP_TEST_EXPECT(cmp_list_test_compute_visible_range(1u, 1.0f, 0.0f, 0.0f,
-                                                      0.0f, 1.0f, 0u, &first,
-                                                      &last, &count),
-                   CMP_ERR_RANGE);
+                                                        0.0f, 1.0f, 0u, &first,
+                                                        &last, &count),
+                    CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
     CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_VISIBLE_END));
     CMP_TEST_OK(cmp_list_test_compute_visible_range(
@@ -516,20 +521,20 @@ int main(void) {
     memset(&temp_list, 0, sizeof(temp_list));
     temp_list.item_count = 2u;
     CMP_TEST_EXPECT(cmp_list_test_compute_item_bounds(NULL, 0u, &rect),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_list_test_compute_item_bounds(&temp_list, 2u, &rect),
-                   CMP_ERR_NOT_FOUND);
+                    CMP_ERR_NOT_FOUND);
     temp_list.style.item_extent = 0.0f;
     temp_list.style.spacing = 0.0f;
     CMP_TEST_EXPECT(cmp_list_test_compute_item_bounds(&temp_list, 0u, &rect),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     temp_list.style.item_extent = 10.0f;
     temp_list.style.spacing = 1.0f;
     temp_list.bounds.width = 0.0f;
     temp_list.style.padding.left = 2.0f;
     temp_list.style.padding.right = 2.0f;
     CMP_TEST_EXPECT(cmp_list_test_compute_item_bounds(&temp_list, 0u, &rect),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     temp_list.bounds.width = 20.0f;
     temp_list.bounds.height = 20.0f;
     temp_list.style.padding.left = 0.0f;
@@ -546,60 +551,60 @@ int main(void) {
     temp_grid.style = grid_style_local;
     temp_grid.item_count = 0u;
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     temp_grid.item_count = 1u;
     temp_grid.style.item_height = -1.0f;
     CMP_TEST_EXPECT(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                           &last, &count),
-                   CMP_ERR_RANGE);
+                                                             &last, &count),
+                    CMP_ERR_RANGE);
     temp_grid.style.item_height = 10.0f;
     temp_grid.bounds.height = 0.0f;
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     temp_grid.bounds.height = 10.0f;
     temp_grid.style.padding.top = 20.0f;
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     temp_grid.style.padding.top = 0.0f;
     temp_grid.style.span = 2u;
     temp_grid.item_count = 3u;
     temp_grid.style.spacing_y = 0.0f;
     temp_grid.scroll_offset = 0.0f;
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     temp_grid.scroll_offset = 100.0f;
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     CMP_TEST_OK(
         cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_LINE_COUNT_ZERO));
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     CMP_TEST_ASSERT(count == 0u);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
     CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_STRIDE));
     CMP_TEST_EXPECT(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                           &last, &count),
-                   CMP_ERR_RANGE);
+                                                             &last, &count),
+                    CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
     CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_END));
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     CMP_TEST_ASSERT(count == 0u);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
     CMP_TEST_OK(
         cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_END_NEGATIVE));
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
     CMP_TEST_OK(
         cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_LAST_TOO_LARGE));
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
-    CMP_TEST_OK(
-        cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST));
+    CMP_TEST_OK(cmp_list_test_set_fail_point(
+        CMP_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST));
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     CMP_TEST_ASSERT(count == 0u);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
@@ -615,7 +620,7 @@ int main(void) {
     CMP_TEST_OK(
         cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_LAST_TOO_LARGE));
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     CMP_TEST_ASSERT(count > 0u);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
@@ -628,18 +633,18 @@ int main(void) {
     temp_grid.style.padding.bottom = 0.0f;
     temp_grid.bounds.height = 5.0f;
     temp_grid.scroll_offset = 15.0f;
-    CMP_TEST_OK(
-        cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST));
+    CMP_TEST_OK(cmp_list_test_set_fail_point(
+        CMP_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST));
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     CMP_TEST_ASSERT(count == 0u);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
     temp_grid.scroll_offset = 0.0f;
-    CMP_TEST_OK(
-        cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST));
+    CMP_TEST_OK(cmp_list_test_set_fail_point(
+        CMP_LIST_TEST_FAIL_GRID_LAST_BEFORE_FIRST));
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     CMP_TEST_ASSERT(count > 0u);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
@@ -649,7 +654,7 @@ int main(void) {
     temp_grid.bounds.height = 15.0f;
     temp_grid.scroll_offset = 0.0f;
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     CMP_TEST_ASSERT(count > 0u);
 
     huge_span = ((cmp_usize) ~(cmp_usize)0 / 2u) + 2u;
@@ -664,7 +669,7 @@ int main(void) {
     temp_grid.bounds.height = 1.0f;
     temp_grid.scroll_offset = 1.2f;
     CMP_TEST_OK(cmp_list_test_grid_compute_visible_range(&temp_grid, &first,
-                                                       &last, &count));
+                                                         &last, &count));
     CMP_TEST_ASSERT(count == 0u);
 
     memset(&temp_grid, 0, sizeof(temp_grid));
@@ -672,52 +677,56 @@ int main(void) {
     temp_grid.item_count = 1u;
 
     CMP_TEST_EXPECT(cmp_list_test_grid_compute_item_bounds(NULL, 0u, &rect),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_list_test_grid_compute_item_bounds(&temp_grid, 10u, &rect),
         CMP_ERR_NOT_FOUND);
     temp_grid.style.item_width = 0.0f;
-    CMP_TEST_EXPECT(cmp_list_test_grid_compute_item_bounds(&temp_grid, 0u, &rect),
-                   CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(
+        cmp_list_test_grid_compute_item_bounds(&temp_grid, 0u, &rect),
+        CMP_ERR_RANGE);
     temp_grid.style.item_width = 10.0f;
     temp_grid.style.item_height = 10.0f;
     CMP_TEST_OK(cmp_list_test_grid_compute_item_bounds(&temp_grid, 0u, &rect));
   }
 
   CMP_TEST_EXPECT(cmp_list_view_init(NULL, &list_style, NULL, 0, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_list_view_init(&list, NULL, NULL, 0, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   list_style.orientation = 99u;
   CMP_TEST_EXPECT(cmp_list_view_init(&list, &list_style, NULL, 0, 0),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(cmp_list_style_init(&list_style));
 
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
   CMP_TEST_EXPECT(cmp_list_view_init(&list, &list_style, NULL, 0, 0),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
 
   CMP_TEST_EXPECT(cmp_list_view_set_bind(NULL, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_list_view_set_item_count(NULL, 1), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_list_view_set_item_count(NULL, 1),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_list_view_set_style(NULL, &list_style),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_list_view_set_scroll(NULL, 0.0f), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_list_view_set_scroll(NULL, 0.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_list_view_get_scroll(NULL, &scroll),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_list_view_get_content_extent(NULL, &content_extent),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_list_view_get_required_slots(NULL, &visible_count),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_list_view_update(NULL), CMP_ERR_INVALID_ARGUMENT);
 
   {
     CMPListView metrics_view;
     CMPListStyle metrics_style;
 
-    CMP_TEST_EXPECT(cmp_list_test_update_metrics(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_list_test_update_metrics(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_list_style_init(&metrics_style));
     CMP_TEST_OK(cmp_list_view_init(&metrics_view, &metrics_style, NULL, 0, 0));
     metrics_view.bounds.height = -1.0f;
@@ -736,17 +745,17 @@ int main(void) {
     CMPGridStyle metrics_grid_style;
 
     CMP_TEST_EXPECT(cmp_list_test_grid_update_metrics(NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_grid_style_init(&metrics_grid_style));
     CMP_TEST_OK(
         cmp_grid_view_init(&metrics_grid, &metrics_grid_style, NULL, 0, 0));
     metrics_grid.style.spacing_y = -1.0f;
     CMP_TEST_EXPECT(cmp_list_test_grid_update_metrics(&metrics_grid),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     metrics_grid.style.spacing_y = 0.0f;
     metrics_grid.style.span = 0u;
     CMP_TEST_EXPECT(cmp_list_test_grid_update_metrics(&metrics_grid),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     metrics_grid.style.span = 1u;
     metrics_grid.item_count = 0u;
     metrics_grid.bounds.height = 10.0f;
@@ -754,11 +763,11 @@ int main(void) {
     metrics_grid.item_count = 2u;
     metrics_grid.style.item_height = 0.0f;
     CMP_TEST_EXPECT(cmp_list_test_grid_update_metrics(&metrics_grid),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     metrics_grid.style.item_height = metrics_grid_style.item_height;
     metrics_grid.bounds.height = -1.0f;
     CMP_TEST_EXPECT(cmp_list_test_grid_update_metrics(&metrics_grid),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     metrics_grid.bounds.height = 10.0f;
     metrics_grid.scroll_offset = -5.0f;
     CMP_TEST_OK(cmp_list_test_grid_update_metrics(&metrics_grid));
@@ -777,28 +786,29 @@ int main(void) {
     nodes = NULL;
     capacity = 0;
     CMP_TEST_EXPECT(cmp_list_test_reserve_slots(NULL, NULL, NULL, NULL, 1),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_list_test_reserve_slots(&slots, &nodes, &capacity, NULL, 1),
         CMP_ERR_INVALID_ARGUMENT);
   }
 
   CMP_TEST_EXPECT(cmp_list_test_mul_overflow(1, 1, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_list_test_mul_overflow(2, 3, &overflow_value));
   CMP_TEST_ASSERT(overflow_value == 6);
-  overflow_value = ((cmp_usize) ~(cmp_usize)0) / (cmp_usize)sizeof(CMPListSlot) + 1;
+  overflow_value =
+      ((cmp_usize) ~(cmp_usize)0) / (cmp_usize)sizeof(CMPListSlot) + 1;
   CMP_TEST_EXPECT(cmp_list_test_mul_overflow(overflow_value,
-                                           (cmp_usize)sizeof(CMPListSlot),
-                                           &overflow_value),
-                 CMP_ERR_OVERFLOW);
+                                             (cmp_usize)sizeof(CMPListSlot),
+                                             &overflow_value),
+                  CMP_ERR_OVERFLOW);
 
   bad_alloc.ctx = NULL;
   bad_alloc.alloc = NULL;
   bad_alloc.realloc = NULL;
   bad_alloc.free = NULL;
   CMP_TEST_EXPECT(cmp_list_view_init(&list, &list_style, &bad_alloc, 0, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   test_allocator_init(&alloc);
   alloc.fail_alloc_on = 1;
@@ -807,7 +817,7 @@ int main(void) {
   alloc_iface.realloc = test_realloc;
   alloc_iface.free = test_free;
   CMP_TEST_EXPECT(cmp_list_view_init(&list, &list_style, &alloc_iface, 0, 2),
-                 CMP_ERR_OUT_OF_MEMORY);
+                  CMP_ERR_OUT_OF_MEMORY);
 
   alloc.fail_alloc_on = 0;
   CMP_TEST_OK(cmp_list_view_init(&list, &list_style, &alloc_iface, 5, 0));
@@ -817,11 +827,14 @@ int main(void) {
   CMP_TEST_ASSERT(list.slots != NULL);
   CMP_TEST_ASSERT(list.visible_nodes != NULL);
   CMP_TEST_OK(cmp_list_view_reserve(&list, 2));
-  CMP_TEST_EXPECT(cmp_list_view_reserve(&list, overflow_value), CMP_ERR_OVERFLOW);
-  CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_RESERVE_NODE_BYTES));
+  CMP_TEST_EXPECT(cmp_list_view_reserve(&list, overflow_value),
+                  CMP_ERR_OVERFLOW);
+  CMP_TEST_OK(
+      cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_RESERVE_NODE_BYTES));
   CMP_TEST_EXPECT(cmp_list_view_reserve(&list, 8), CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_list_test_clear_fail_points());
-  CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_RESERVE_COPY_BYTES));
+  CMP_TEST_OK(
+      cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_RESERVE_COPY_BYTES));
   CMP_TEST_EXPECT(cmp_list_view_reserve(&list, 8), CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_list_test_clear_fail_points());
   {
@@ -830,7 +843,8 @@ int main(void) {
     list_bad = list;
     list_bad.allocator.alloc = NULL;
     list_bad.allocator.free = NULL;
-    CMP_TEST_EXPECT(cmp_list_view_reserve(&list_bad, 1), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_list_view_reserve(&list_bad, 1),
+                    CMP_ERR_INVALID_ARGUMENT);
   }
   {
     CMPListView list_fail;
@@ -845,13 +859,15 @@ int main(void) {
     alloc_iface_fail.free = test_free;
     CMP_TEST_OK(
         cmp_list_view_init(&list_fail, &list_style, &alloc_iface_fail, 0, 0));
-    CMP_TEST_EXPECT(cmp_list_view_reserve(&list_fail, 1), CMP_ERR_OUT_OF_MEMORY);
+    CMP_TEST_EXPECT(cmp_list_view_reserve(&list_fail, 1),
+                    CMP_ERR_OUT_OF_MEMORY);
     CMP_TEST_OK(list_fail.widget.vtable->destroy(list_fail.widget.ctx));
   }
   {
     CMPListView list_bad;
     memset(&list_bad, 0, sizeof(list_bad));
-    CMP_TEST_EXPECT(cmp_list_view_reserve(&list_bad, 1), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_list_view_reserve(&list_bad, 1),
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   list_style = list.style;
@@ -886,20 +902,20 @@ int main(void) {
       list.widget.vtable->measure(NULL, width_spec, height_spec, &measured),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                             height_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                              height_spec, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   list_style = list.style;
   list.style.orientation = 99u;
   CMP_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                             height_spec, &measured),
-                 CMP_ERR_RANGE);
+                                              height_spec, &measured),
+                  CMP_ERR_RANGE);
   list.style = list_style;
 
   list.bounds.height = -1.0f;
   CMP_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                             height_spec, &measured),
-                 CMP_ERR_RANGE);
+                                              height_spec, &measured),
+                  CMP_ERR_RANGE);
   list.bounds.height = 0.0f;
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
@@ -907,15 +923,15 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 10.0f;
   CMP_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                             height_spec, &measured),
-                 CMP_ERR_RANGE);
+                                              height_spec, &measured),
+                  CMP_ERR_RANGE);
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = 5.0f;
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 30.0f;
   CMP_TEST_OK(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                         height_spec, &measured));
+                                          height_spec, &measured));
   CMP_TEST_ASSERT(measured.width == 2.0f);
   CMP_TEST_ASSERT(measured.height == 30.0f);
 
@@ -924,7 +940,7 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                         height_spec, &measured));
+                                          height_spec, &measured));
   CMP_TEST_ASSERT(measured.width == 2.0f);
   CMP_TEST_ASSERT(measured.height == 60.0f);
 
@@ -933,23 +949,23 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 50.0f;
   CMP_TEST_OK(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                         height_spec, &measured));
+                                          height_spec, &measured));
   CMP_TEST_ASSERT(measured.width == 100.0f);
   CMP_TEST_ASSERT(measured.height == 50.0f);
 
   width_spec.mode = 99u;
   width_spec.size = 0.0f;
   CMP_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                             height_spec, &measured),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                              height_spec, &measured),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = 5.0f;
   height_spec.mode = 99u;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                             height_spec, &measured),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                              height_spec, &measured),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = 10.0f;
@@ -958,8 +974,8 @@ int main(void) {
   CMP_TEST_OK(cmp_list_test_set_fail_point(
       CMP_LIST_TEST_FAIL_LIST_MEASURE_CONTENT_NEGATIVE));
   CMP_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                             height_spec, &measured),
-                 CMP_ERR_RANGE);
+                                              height_spec, &measured),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
   bounds.x = 0.0f;
@@ -967,9 +983,9 @@ int main(void) {
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(list.widget.vtable->layout(list.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(list.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   bounds.width = 50.0f;
   bounds.height = 0.0f;
@@ -1046,9 +1062,9 @@ int main(void) {
   CMP_TEST_OK(cmp_list_view_set_bind(&list, test_bind, &bind_ctx));
 
   CMP_TEST_EXPECT(cmp_list_view_get_visible(&list, NULL, &visible_count),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_list_view_get_visible(&list, &visible, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   gfx_backend.draw_rect_calls = 0;
   gfx.ctx = &gfx_backend;
@@ -1058,16 +1074,16 @@ int main(void) {
   paint_ctx.clip = bounds;
   paint_ctx.dpi_scale = 1.0f;
   CMP_TEST_EXPECT(list.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(list.widget.vtable->paint(list.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   {
     CMPPaintContext bad_ctx;
 
     bad_ctx = paint_ctx;
     bad_ctx.gfx = NULL;
     CMP_TEST_EXPECT(list.widget.vtable->paint(list.widget.ctx, &bad_ctx),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
   list.style.background_color.a = 1.0f;
   CMP_TEST_OK(list.widget.vtable->paint(list.widget.ctx, &paint_ctx));
@@ -1079,14 +1095,14 @@ int main(void) {
 
   list.style.background_color.a = 1.0f;
   CMP_TEST_EXPECT(list.widget.vtable->paint(list.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   {
     CMPSemantics semantics;
     CMP_TEST_EXPECT(list.widget.vtable->get_semantics(NULL, &semantics),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(list.widget.vtable->get_semantics(list.widget.ctx, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(list.widget.vtable->get_semantics(list.widget.ctx, &semantics));
     CMP_TEST_ASSERT(semantics.role == CMP_SEMANTIC_NONE);
   }
@@ -1095,11 +1111,11 @@ int main(void) {
   event.type = CMP_INPUT_POINTER_DOWN;
   handled = CMP_TRUE;
   CMP_TEST_EXPECT(list.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(list.widget.vtable->event(list.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(list.widget.vtable->event(list.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(list.widget.vtable->event(list.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
 
@@ -1149,7 +1165,7 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 5.0f;
   CMP_TEST_OK(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                         height_spec, &measured));
+                                          height_spec, &measured));
   CMP_TEST_ASSERT(measured.width == 10.0f);
   CMP_TEST_ASSERT(measured.height == 2.0f);
 
@@ -1174,25 +1190,25 @@ int main(void) {
     height_spec.mode = 99u;
     height_spec.size = 0.0f;
     CMP_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                               height_spec, &measured),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                                height_spec, &measured),
+                    CMP_ERR_INVALID_ARGUMENT);
 
     height_spec.mode = CMP_MEASURE_AT_MOST;
     height_spec.size = 10.0f;
     CMP_TEST_OK(cmp_list_test_set_fail_point(
         CMP_LIST_TEST_FAIL_LIST_MEASURE_CONTENT_NEGATIVE));
     CMP_TEST_EXPECT(list.widget.vtable->measure(list.widget.ctx, width_spec,
-                                               height_spec, &measured),
-                   CMP_ERR_RANGE);
+                                                height_spec, &measured),
+                    CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
     list.style.spacing = -1.0f;
     CMP_TEST_EXPECT(list.widget.vtable->paint(list.widget.ctx, &paint_ctx),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     list.style = saved_style;
     list.bounds.width = -1.0f;
     CMP_TEST_EXPECT(list.widget.vtable->paint(list.widget.ctx, &paint_ctx),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     list.bounds = saved_bounds;
 
     list.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
@@ -1204,8 +1220,9 @@ int main(void) {
     list.style.orientation = CMP_LIST_ORIENTATION_VERTICAL;
     event.data.pointer.scroll_y = 3;
     list.style.item_extent = 0.0f;
-    CMP_TEST_EXPECT(list.widget.vtable->event(list.widget.ctx, &event, &handled),
-                   CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(
+        list.widget.vtable->event(list.widget.ctx, &event, &handled),
+        CMP_ERR_RANGE);
     list.style = saved_style;
 
     list.bounds.width = -1.0f;
@@ -1215,14 +1232,15 @@ int main(void) {
 
     list.bounds.width = -1.0f;
     list.bounds.height = -1.0f;
-    CMP_TEST_EXPECT(cmp_list_view_set_style(&list, &saved_style), CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(cmp_list_view_set_style(&list, &saved_style),
+                    CMP_ERR_RANGE);
     list.bounds = saved_bounds;
     list.style = saved_style;
 
     list.bounds.width = -1.0f;
     list.bounds.height = -1.0f;
     CMP_TEST_EXPECT(cmp_list_view_get_content_extent(&list, &content_extent),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     list.bounds = saved_bounds;
 
     CMP_TEST_OK(cmp_list_view_set_scroll(&list, -5.0f));
@@ -1236,13 +1254,13 @@ int main(void) {
 
     list.style.spacing = -1.0f;
     CMP_TEST_EXPECT(cmp_list_view_get_required_slots(&list, &visible_count),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     list.style = saved_style;
 
     list.bounds.width = -1.0f;
     list.bounds.height = -1.0f;
     CMP_TEST_EXPECT(cmp_list_view_get_required_slots(&list, &visible_count),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     list.bounds = saved_bounds;
 
     list.style.orientation = CMP_LIST_ORIENTATION_HORIZONTAL;
@@ -1251,9 +1269,10 @@ int main(void) {
     list.style = saved_style;
     list.bounds = saved_bounds;
 
-    CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_VISIBLE_STRIDE));
+    CMP_TEST_OK(
+        cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_VISIBLE_STRIDE));
     CMP_TEST_EXPECT(cmp_list_view_get_required_slots(&list, &visible_count),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
     list.style.spacing = -1.0f;
@@ -1265,7 +1284,8 @@ int main(void) {
     CMP_TEST_EXPECT(cmp_list_view_update(&list), CMP_ERR_RANGE);
     list.bounds = saved_bounds;
 
-    CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_VISIBLE_STRIDE));
+    CMP_TEST_OK(
+        cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_VISIBLE_STRIDE));
     CMP_TEST_EXPECT(cmp_list_view_update(&list), CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
@@ -1274,7 +1294,8 @@ int main(void) {
 
     list.item_count = saved_item_count;
     CMP_TEST_OK(cmp_list_view_set_bind(&list, test_bind, &bind_ctx));
-    CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_LIST_ITEM_BOUNDS));
+    CMP_TEST_OK(
+        cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_LIST_ITEM_BOUNDS));
     CMP_TEST_EXPECT(cmp_list_view_update(&list), CMP_ERR_IO);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
     CMP_TEST_OK(
@@ -1345,7 +1366,7 @@ int main(void) {
     CMP_TEST_OK(cmp_list_view_init(&list_free, &free_style, &free_iface, 1, 2));
     free_alloc.fail_free_on = 1u;
     CMP_TEST_EXPECT(list_free.widget.vtable->destroy(list_free.widget.ctx),
-                   CMP_ERR_IO);
+                    CMP_ERR_IO);
   }
 
   {
@@ -1363,7 +1384,7 @@ int main(void) {
     CMP_TEST_OK(cmp_list_view_init(&list_free, &free_style, &free_iface, 1, 2));
     free_alloc.fail_free_on = 2u;
     CMP_TEST_EXPECT(list_free.widget.vtable->destroy(list_free.widget.ctx),
-                   CMP_ERR_IO);
+                    CMP_ERR_IO);
   }
 
   CMP_TEST_EXPECT(list.widget.vtable->destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
@@ -1374,44 +1395,48 @@ int main(void) {
   CMP_TEST_ASSERT(grid_style.span == CMP_GRID_DEFAULT_SPAN);
 
   CMP_TEST_EXPECT(cmp_grid_view_set_bind(NULL, NULL, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_grid_view_set_item_count(NULL, 1), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_grid_view_set_item_count(NULL, 1),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_grid_view_set_style(NULL, &grid_style),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_grid_view_set_scroll(NULL, 0.0f), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_grid_view_set_scroll(NULL, 0.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_grid_view_get_scroll(NULL, &scroll),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_grid_view_get_content_extent(NULL, &content_extent),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_grid_view_get_required_slots(NULL, &visible_count),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_grid_view_update(NULL), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_grid_view_init(NULL, &grid_style, NULL, 0, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_grid_view_init(&grid, NULL, NULL, 0, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
   CMP_TEST_EXPECT(cmp_grid_view_init(&grid, &grid_style, NULL, 0, 0),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
 
-  CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_RESERVE_NODE_BYTES));
+  CMP_TEST_OK(
+      cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_RESERVE_NODE_BYTES));
   CMP_TEST_EXPECT(cmp_grid_view_init(&grid, &grid_style, NULL, 0, 2),
-                 CMP_ERR_OVERFLOW);
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
   grid_style.span = 0u;
   CMP_TEST_EXPECT(cmp_grid_view_init(&grid, &grid_style, NULL, 0, 0),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(cmp_grid_style_init(&grid_style));
   CMP_TEST_EXPECT(cmp_grid_view_init(&grid, &grid_style, &bad_alloc, 0, 0),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_grid_view_init(&grid, &grid_style, NULL, 5, 0));
   CMP_TEST_OK(cmp_grid_view_reserve(&grid, 6));
   CMP_TEST_EXPECT(cmp_grid_view_reserve(NULL, 1), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_grid_view_reserve(&grid, overflow_value), CMP_ERR_OVERFLOW);
+  CMP_TEST_EXPECT(cmp_grid_view_reserve(&grid, overflow_value),
+                  CMP_ERR_OVERFLOW);
 
   grid_style = grid.style;
   grid_style.spacing_x = -1.0f;
@@ -1443,20 +1468,20 @@ int main(void) {
       grid.widget.vtable->measure(NULL, width_spec, height_spec, &measured),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(grid.widget.vtable->measure(grid.widget.ctx, width_spec,
-                                             height_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                              height_spec, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   grid_style = grid.style;
   grid.style.span = 0u;
   CMP_TEST_EXPECT(grid.widget.vtable->measure(grid.widget.ctx, width_spec,
-                                             height_spec, &measured),
-                 CMP_ERR_RANGE);
+                                              height_spec, &measured),
+                  CMP_ERR_RANGE);
   grid.style = grid_style;
 
   grid.bounds.height = -1.0f;
   CMP_TEST_EXPECT(grid.widget.vtable->measure(grid.widget.ctx, width_spec,
-                                             height_spec, &measured),
-                 CMP_ERR_RANGE);
+                                              height_spec, &measured),
+                  CMP_ERR_RANGE);
   grid.bounds.height = 0.0f;
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
@@ -1464,23 +1489,23 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 10.0f;
   CMP_TEST_EXPECT(grid.widget.vtable->measure(grid.widget.ctx, width_spec,
-                                             height_spec, &measured),
-                 CMP_ERR_RANGE);
+                                              height_spec, &measured),
+                  CMP_ERR_RANGE);
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = 5.0f;
   height_spec.mode = 99u;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(grid.widget.vtable->measure(grid.widget.ctx, width_spec,
-                                             height_spec, &measured),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                              height_spec, &measured),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   width_spec.mode = CMP_MEASURE_EXACTLY;
   width_spec.size = 30.0f;
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 15.0f;
   CMP_TEST_OK(grid.widget.vtable->measure(grid.widget.ctx, width_spec,
-                                         height_spec, &measured));
+                                          height_spec, &measured));
   CMP_TEST_ASSERT(measured.width == 30.0f);
   CMP_TEST_ASSERT(measured.height == 15.0f);
 
@@ -1491,14 +1516,14 @@ int main(void) {
   CMP_TEST_OK(cmp_list_test_set_fail_point(
       CMP_LIST_TEST_FAIL_GRID_MEASURE_CONTENT_NEGATIVE));
   CMP_TEST_EXPECT(grid.widget.vtable->measure(grid.widget.ctx, width_spec,
-                                             height_spec, &measured),
-                 CMP_ERR_RANGE);
+                                              height_spec, &measured),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
   width_spec.size = 20.0f;
   height_spec.size = 25.0f;
   CMP_TEST_OK(grid.widget.vtable->measure(grid.widget.ctx, width_spec,
-                                         height_spec, &measured));
+                                          height_spec, &measured));
   CMP_TEST_ASSERT(measured.width == 20.0f);
   CMP_TEST_ASSERT(measured.height == 25.0f);
 
@@ -1507,18 +1532,18 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(grid.widget.vtable->measure(grid.widget.ctx, width_spec,
-                                         height_spec, &measured));
+                                          height_spec, &measured));
   CMP_TEST_ASSERT(measured.width == 24.0f);
   CMP_TEST_ASSERT(measured.height == 30.0f);
 
   bounds.width = -1.0f;
   bounds.height = 20.0f;
   CMP_TEST_EXPECT(grid.widget.vtable->layout(grid.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   bounds.width = 30.0f;
   bounds.height = 20.0f;
   CMP_TEST_EXPECT(grid.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(grid.widget.vtable->layout(grid.widget.ctx, bounds));
   CMP_TEST_OK(cmp_grid_view_set_bind(&grid, NULL, NULL));
   CMP_TEST_EXPECT(cmp_grid_view_update(&grid), CMP_ERR_STATE);
@@ -1533,19 +1558,19 @@ int main(void) {
   CMP_TEST_ASSERT(visible_count == 4);
   CMP_TEST_ASSERT(visible[0] == &grid.slots[0].node);
   CMP_TEST_EXPECT(cmp_grid_view_get_visible(&grid, NULL, &visible_count),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_grid_view_get_visible(&grid, &visible, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   memset(&event, 0, sizeof(event));
   event.type = CMP_INPUT_POINTER_DOWN;
   handled = CMP_TRUE;
   CMP_TEST_EXPECT(grid.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(grid.widget.vtable->event(grid.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(grid.widget.vtable->event(grid.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(grid.widget.vtable->event(grid.widget.ctx, &event, &handled));
   CMP_TEST_ASSERT(handled == CMP_FALSE);
 
@@ -1579,7 +1604,7 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_AT_MOST;
   height_spec.size = 15.0f;
   CMP_TEST_OK(grid.widget.vtable->measure(grid.widget.ctx, width_spec,
-                                         height_spec, &measured));
+                                          height_spec, &measured));
   CMP_TEST_ASSERT(measured.width == 30.0f);
   CMP_TEST_ASSERT(measured.height == 15.0f);
 
@@ -1595,16 +1620,16 @@ int main(void) {
   gfx.vtable = &g_test_gfx_vtable;
   grid.style.background_color.a = 1.0f;
   CMP_TEST_EXPECT(grid.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(grid.widget.vtable->paint(grid.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   {
     CMPPaintContext bad_ctx;
 
     bad_ctx = paint_ctx;
     bad_ctx.gfx = NULL;
     CMP_TEST_EXPECT(grid.widget.vtable->paint(grid.widget.ctx, &bad_ctx),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
   }
   CMP_TEST_OK(grid.widget.vtable->paint(grid.widget.ctx, &paint_ctx));
   CMP_TEST_ASSERT(gfx_backend.draw_rect_calls == 1);
@@ -1614,14 +1639,14 @@ int main(void) {
   CMP_TEST_OK(grid.widget.vtable->paint(grid.widget.ctx, &paint_ctx));
   grid.style.background_color.a = 1.0f;
   CMP_TEST_EXPECT(grid.widget.vtable->paint(grid.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   {
     CMPSemantics semantics;
     CMP_TEST_EXPECT(grid.widget.vtable->get_semantics(NULL, &semantics),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(grid.widget.vtable->get_semantics(grid.widget.ctx, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(grid.widget.vtable->get_semantics(grid.widget.ctx, &semantics));
     CMP_TEST_ASSERT(semantics.role == CMP_SEMANTIC_NONE);
   }
@@ -1638,8 +1663,8 @@ int main(void) {
 
     CMP_TEST_OK(cmp_grid_view_set_item_count(&grid, grid.item_count));
     CMP_TEST_OK(cmp_grid_view_get_content_extent(&grid, &content_extent));
-    CMP_TEST_OK(
-        cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_CONTENT_EXTENT_NEGATIVE));
+    CMP_TEST_OK(cmp_list_test_set_fail_point(
+        CMP_LIST_TEST_FAIL_CONTENT_EXTENT_NEGATIVE));
     CMP_TEST_OK(cmp_grid_view_set_scroll(&grid, 0.0f));
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
@@ -1647,17 +1672,18 @@ int main(void) {
     grid.style.scroll_axis = CMP_GRID_SCROLL_VERTICAL;
     event.data.pointer.scroll_y = 2;
     grid.style.item_height = 0.0f;
-    CMP_TEST_EXPECT(grid.widget.vtable->event(grid.widget.ctx, &event, &handled),
-                   CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(
+        grid.widget.vtable->event(grid.widget.ctx, &event, &handled),
+        CMP_ERR_RANGE);
     grid.style = saved_style;
 
     grid.style.spacing_x = -1.0f;
     CMP_TEST_EXPECT(grid.widget.vtable->paint(grid.widget.ctx, &paint_ctx),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid.style = saved_style;
     grid.bounds.width = -1.0f;
     CMP_TEST_EXPECT(grid.widget.vtable->paint(grid.widget.ctx, &paint_ctx),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid.bounds = saved_bounds;
 
     grid.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
@@ -1672,7 +1698,8 @@ int main(void) {
 
     grid.bounds.width = -1.0f;
     grid.bounds.height = -1.0f;
-    CMP_TEST_EXPECT(cmp_grid_view_set_style(&grid, &saved_style), CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(cmp_grid_view_set_style(&grid, &saved_style),
+                    CMP_ERR_RANGE);
     grid.bounds = saved_bounds;
     grid.style = saved_style;
 
@@ -1688,23 +1715,23 @@ int main(void) {
     grid.bounds.width = -1.0f;
     grid.bounds.height = -1.0f;
     CMP_TEST_EXPECT(cmp_grid_view_get_content_extent(&grid, &content_extent),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid.bounds = saved_bounds;
 
     grid.style.spacing_x = -1.0f;
     CMP_TEST_EXPECT(cmp_grid_view_get_required_slots(&grid, &visible_count),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid.style = saved_style;
 
     grid.bounds.width = -1.0f;
     grid.bounds.height = -1.0f;
     CMP_TEST_EXPECT(cmp_grid_view_get_required_slots(&grid, &visible_count),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     grid.bounds = saved_bounds;
 
     CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_STRIDE));
     CMP_TEST_EXPECT(cmp_grid_view_get_required_slots(&grid, &visible_count),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
     grid.style = saved_style;
@@ -1816,7 +1843,8 @@ int main(void) {
     CMP_TEST_EXPECT(cmp_grid_view_update(&grid_update), CMP_ERR_STATE);
     CMP_TEST_OK(cmp_grid_view_set_bind(&grid_update, test_bind, &update_bind));
 
-    CMP_TEST_OK(cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_ITEM_BOUNDS));
+    CMP_TEST_OK(
+        cmp_list_test_set_fail_point(CMP_LIST_TEST_FAIL_GRID_ITEM_BOUNDS));
     CMP_TEST_EXPECT(cmp_grid_view_update(&grid_update), CMP_ERR_IO);
     CMP_TEST_OK(cmp_list_test_clear_fail_points());
 
@@ -1843,7 +1871,7 @@ int main(void) {
     CMP_TEST_OK(cmp_grid_view_init(&grid_free, &free_style, &free_iface, 1, 2));
     free_alloc.fail_free_on = 1u;
     CMP_TEST_EXPECT(grid_free.widget.vtable->destroy(grid_free.widget.ctx),
-                   CMP_ERR_IO);
+                    CMP_ERR_IO);
   }
 
   {
@@ -1861,7 +1889,7 @@ int main(void) {
     CMP_TEST_OK(cmp_grid_view_init(&grid_free, &free_style, &free_iface, 1, 2));
     free_alloc.fail_free_on = 2u;
     CMP_TEST_EXPECT(grid_free.widget.vtable->destroy(grid_free.widget.ctx),
-                   CMP_ERR_IO);
+                    CMP_ERR_IO);
   }
 
   CMP_TEST_EXPECT(grid.widget.vtable->destroy(NULL), CMP_ERR_INVALID_ARGUMENT);

@@ -76,8 +76,8 @@ static int m3_chip_validate_color(const CMPColor *color) {
   return CMP_OK;
 }
 
-static int m3_chip_color_set(CMPColor *color, CMPScalar r, CMPScalar g, CMPScalar b,
-                             CMPScalar a) {
+static int m3_chip_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
+                             CMPScalar b, CMPScalar a) {
   if (color == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -259,8 +259,8 @@ static int m3_chip_validate_style(const M3ChipStyle *style,
 }
 
 static int m3_chip_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -298,7 +298,7 @@ static int m3_chip_metrics_update(M3Chip *chip) {
   }
 
   rc = cmp_text_measure_utf8(&chip->text_backend, chip->font, chip->utf8_label,
-                            chip->utf8_len, &chip->metrics);
+                             chip->utf8_len, &chip->metrics);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1000,7 +1000,7 @@ static int m3_chip_widget_event(void *widget, const CMPInputEvent *event,
     center_x = (CMPScalar)event->data.pointer.x;
     center_y = (CMPScalar)event->data.pointer.y;
     rc = cmp_ripple_compute_max_radius(&chip->bounds, center_x, center_y,
-                                      &max_radius);
+                                       &max_radius);
 #ifdef CMP_TESTING
     if (m3_chip_test_fail_point_match(M3_CHIP_TEST_FAIL_RIPPLE_RADIUS)) {
       rc = CMP_ERR_IO;
@@ -1010,8 +1010,8 @@ static int m3_chip_widget_event(void *widget, const CMPInputEvent *event,
       return rc;
     }
     rc = cmp_ripple_start(&chip->ripple, center_x, center_y, max_radius,
-                         chip->style.ripple_expand_duration,
-                         chip->style.ripple_color);
+                          chip->style.ripple_expand_duration,
+                          chip->style.ripple_color);
 #ifdef CMP_TESTING
     if (m3_chip_test_fail_point_match(M3_CHIP_TEST_FAIL_RIPPLE_START)) {
       rc = CMP_ERR_IO;
@@ -1232,8 +1232,8 @@ int CMP_CALL m3_chip_style_init_suggestion(M3ChipStyle *style) {
 }
 
 int CMP_CALL m3_chip_init(M3Chip *chip, const CMPTextBackend *backend,
-                         const M3ChipStyle *style, const char *utf8_label,
-                         cmp_usize utf8_len) {
+                          const M3ChipStyle *style, const char *utf8_label,
+                          cmp_usize utf8_len) {
   int rc;
 
   if (chip == NULL || backend == NULL || style == NULL) {
@@ -1296,7 +1296,7 @@ int CMP_CALL m3_chip_init(M3Chip *chip, const CMPTextBackend *backend,
 }
 
 int CMP_CALL m3_chip_set_label(M3Chip *chip, const char *utf8_label,
-                              cmp_usize utf8_len) {
+                               cmp_usize utf8_len) {
   if (chip == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1411,7 +1411,7 @@ int CMP_CALL m3_chip_set_show_delete(M3Chip *chip, CMPBool show_delete) {
 }
 
 int CMP_CALL m3_chip_get_show_delete(const M3Chip *chip,
-                                    CMPBool *out_show_delete) {
+                                     CMPBool *out_show_delete) {
   if (chip == NULL || out_show_delete == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1421,7 +1421,7 @@ int CMP_CALL m3_chip_get_show_delete(const M3Chip *chip,
 }
 
 int CMP_CALL m3_chip_set_on_click(M3Chip *chip, CMPChipOnClick on_click,
-                                 void *ctx) {
+                                  void *ctx) {
   if (chip == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1432,7 +1432,7 @@ int CMP_CALL m3_chip_set_on_click(M3Chip *chip, CMPChipOnClick on_click,
 }
 
 int CMP_CALL m3_chip_set_on_delete(M3Chip *chip, CMPChipOnDelete on_delete,
-                                  void *ctx) {
+                                   void *ctx) {
   if (chip == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1448,17 +1448,18 @@ int CMP_CALL m3_chip_test_validate_color(const CMPColor *color) {
 }
 
 int CMP_CALL m3_chip_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                   CMPScalar b, CMPScalar a) {
+                                    CMPScalar b, CMPScalar a) {
   return m3_chip_color_set(color, r, g, b, a);
 }
 
-int CMP_CALL m3_chip_test_color_with_alpha(const CMPColor *base, CMPScalar alpha,
-                                          CMPColor *out_color) {
+int CMP_CALL m3_chip_test_color_with_alpha(const CMPColor *base,
+                                           CMPScalar alpha,
+                                           CMPColor *out_color) {
   return m3_chip_color_with_alpha(base, alpha, out_color);
 }
 
 int CMP_CALL m3_chip_test_validate_text_style(const CMPTextStyle *style,
-                                             CMPBool require_family) {
+                                              CMPBool require_family) {
   return m3_chip_validate_text_style(style, require_family);
 }
 
@@ -1467,7 +1468,7 @@ int CMP_CALL m3_chip_test_validate_layout(const M3ChipLayout *layout) {
 }
 
 int CMP_CALL m3_chip_test_validate_style(const M3ChipStyle *style,
-                                        CMPBool require_family) {
+                                         CMPBool require_family) {
   return m3_chip_validate_style(style, require_family);
 }
 
@@ -1488,20 +1489,21 @@ int CMP_CALL m3_chip_test_metrics_update(M3Chip *chip) {
 }
 
 int CMP_CALL m3_chip_test_resolve_colors(const M3Chip *chip,
-                                        CMPColor *out_background,
-                                        CMPColor *out_text, CMPColor *out_outline,
-                                        CMPColor *out_ripple) {
+                                         CMPColor *out_background,
+                                         CMPColor *out_text,
+                                         CMPColor *out_outline,
+                                         CMPColor *out_ripple) {
   return m3_chip_resolve_colors(chip, out_background, out_text, out_outline,
                                 out_ripple);
 }
 
 int CMP_CALL m3_chip_test_resolve_corner(const M3Chip *chip,
-                                        CMPScalar *out_corner) {
+                                         CMPScalar *out_corner) {
   return m3_chip_resolve_corner(chip, out_corner);
 }
 
 int CMP_CALL m3_chip_test_compute_delete_bounds(M3Chip *chip,
-                                               CMPRect *out_bounds) {
+                                                CMPRect *out_bounds) {
   M3ChipLayout layout;
   int rc;
   CMPScalar text_x;
@@ -1521,8 +1523,9 @@ int CMP_CALL m3_chip_test_compute_delete_bounds(M3Chip *chip,
 }
 
 int CMP_CALL m3_chip_test_draw_delete_icon(const CMPGfx *gfx,
-                                          const CMPRect *bounds, CMPColor color,
-                                          CMPScalar thickness) {
+                                           const CMPRect *bounds,
+                                           CMPColor color,
+                                           CMPScalar thickness) {
   return m3_chip_draw_delete_icon(gfx, bounds, color, thickness);
 }
 #endif

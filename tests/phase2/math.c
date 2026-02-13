@@ -29,13 +29,13 @@ int main(void) {
   CMPScalar angle;
 
   CMP_TEST_EXPECT(cmp_rect_intersect(NULL, &b, &out, &hit),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_rect_intersect(&a, NULL, &out, &hit),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_rect_intersect(&a, &b, NULL, &hit),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_rect_intersect(&a, &b, &out, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   a.x = 0.0f;
   a.y = 0.0f;
@@ -98,9 +98,9 @@ int main(void) {
   CMP_TEST_ASSERT(cmp_float_near(out.height, 4.0f));
 
   CMP_TEST_EXPECT(cmp_rect_contains_point(NULL, 0.0f, 0.0f, &hit),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_rect_contains_point(&a, 0.0f, 0.0f, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   a.width = -1.0f;
   a.height = 1.0f;
@@ -150,7 +150,8 @@ int main(void) {
   CMP_TEST_ASSERT(cmp_float_near(out_x, 7.0f));
   CMP_TEST_ASSERT(cmp_float_near(out_y, 10.0f));
 
-  CMP_TEST_EXPECT(cmp_mat3_translate(0.0f, 0.0f, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_mat3_translate(0.0f, 0.0f, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_mat3_scale(0.0f, 0.0f, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_mat3_rotate(0.0f, NULL), CMP_ERR_INVALID_ARGUMENT);
 
@@ -161,15 +162,15 @@ int main(void) {
   CMP_TEST_ASSERT(cmp_float_near(out_y, 1.0f));
 
   CMP_TEST_EXPECT(cmp_mat3_transform_point(NULL, 0.0f, 0.0f, &out_x, &out_y),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_mat3_transform_point(&mat, 0.0f, 0.0f, NULL, &out_y),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_mat3_transform_point(&mat, 0.0f, 0.0f, &out_x, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   memset(&mat, 0, sizeof(mat));
   CMP_TEST_EXPECT(cmp_mat3_transform_point(&mat, 1.0f, 1.0f, &out_x, &out_y),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   return 0;
 }

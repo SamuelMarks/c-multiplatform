@@ -22,7 +22,8 @@ static void *cmp_default_realloc_impl(void *ptr, cmp_usize size) {
   return realloc(ptr, (size_t)size);
 }
 
-static int CMP_CALL cmp_default_alloc(void *ctx, cmp_usize size, void **out_ptr) {
+static int CMP_CALL cmp_default_alloc(void *ctx, cmp_usize size,
+                                      void **out_ptr) {
   void *mem;
 
   CMP_UNUSED(ctx);
@@ -46,7 +47,7 @@ static int CMP_CALL cmp_default_alloc(void *ctx, cmp_usize size, void **out_ptr)
 }
 
 static int CMP_CALL cmp_default_realloc(void *ctx, void *ptr, cmp_usize size,
-                                      void **out_ptr) {
+                                        void **out_ptr) {
   void *mem;
 
   CMP_UNUSED(ctx);

@@ -46,8 +46,8 @@ static void test_text_backend_init(TestTextBackend *backend) {
 }
 
 static int test_text_create_font(void *text, const char *utf8_family,
-                                 cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
-                                 CMPHandle *out_font) {
+                                 cmp_i32 size_px, cmp_i32 weight,
+                                 CMPBool italic, CMPHandle *out_font) {
   TestTextBackend *backend;
 
   if (text == NULL || utf8_family == NULL || out_font == NULL) {
@@ -283,7 +283,7 @@ int main(void) {
   bad_style = style;
   bad_style.utf8_family = NULL;
   CMP_TEST_EXPECT(cmp_icon_test_validate_style(&bad_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   bad_style = style;
   bad_style.size_px = 0;
   CMP_TEST_EXPECT(cmp_icon_test_validate_style(&bad_style), CMP_ERR_RANGE);
@@ -312,7 +312,8 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_icon_test_validate_svg(NULL), CMP_ERR_INVALID_ARGUMENT);
   svg_bad = svg;
   svg_bad.utf8_path = NULL;
-  CMP_TEST_EXPECT(cmp_icon_test_validate_svg(&svg_bad), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_icon_test_validate_svg(&svg_bad),
+                  CMP_ERR_INVALID_ARGUMENT);
   svg_bad = svg;
   svg_bad.utf8_path = "M0 0";
   svg_bad.viewbox_width = 0.0f;
@@ -326,8 +327,8 @@ int main(void) {
   gfx.text_vtable = NULL;
   CMP_TEST_OK(cmp_icon_test_set_cstr_limit(3));
   CMP_TEST_EXPECT(cmp_icon_measure_cstr(&gfx, &style, "four", &svg,
-                                      CMP_ICON_RENDER_FONT, &metrics),
-                 CMP_ERR_OVERFLOW);
+                                        CMP_ICON_RENDER_FONT, &metrics),
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_icon_test_set_cstr_limit(0));
 
   test_text_backend_init(&text_backend);
@@ -337,7 +338,7 @@ int main(void) {
   name = "home";
   name_len = 4u;
   CMP_TEST_OK(cmp_icon_measure_utf8(&gfx, &style, name, name_len, &svg,
-                                  CMP_ICON_RENDER_AUTO, &metrics));
+                                    CMP_ICON_RENDER_AUTO, &metrics));
   CMP_TEST_ASSERT(metrics.width == text_backend.metric_width);
   CMP_TEST_ASSERT(metrics.height == text_backend.metric_height);
   CMP_TEST_ASSERT(metrics.baseline == text_backend.metric_baseline);
@@ -345,8 +346,8 @@ int main(void) {
   CMP_TEST_ASSERT(text_backend.measure_calls == 1);
   CMP_TEST_ASSERT(text_backend.destroy_calls == 1);
 
-  CMP_TEST_OK(cmp_icon_measure_cstr(&gfx, &style, name, &svg, CMP_ICON_RENDER_AUTO,
-                                  &metrics));
+  CMP_TEST_OK(cmp_icon_measure_cstr(&gfx, &style, name, &svg,
+                                    CMP_ICON_RENDER_AUTO, &metrics));
   CMP_TEST_ASSERT(text_backend.create_calls == 2);
 
   bounds.x = 5.0f;
@@ -358,7 +359,7 @@ int main(void) {
   style.color.b = 0.3f;
   style.color.a = 0.4f;
   CMP_TEST_OK(cmp_icon_draw_utf8(&gfx, &bounds, &style, name, name_len, &svg,
-                               CMP_ICON_RENDER_AUTO));
+                                 CMP_ICON_RENDER_AUTO));
   expected_x = bounds.x + (bounds.width - metrics.width) * 0.5f;
   expected_y =
       bounds.y + (bounds.height - metrics.height) * 0.5f + metrics.baseline;
@@ -370,78 +371,78 @@ int main(void) {
   CMP_TEST_ASSERT(text_backend.last_color.b == style.color.b);
   CMP_TEST_ASSERT(text_backend.last_color.a == style.color.a);
 
-  CMP_TEST_EXPECT(
-      cmp_icon_draw_cstr(&gfx, &bounds, &style, NULL, &svg, CMP_ICON_RENDER_FONT),
-      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_icon_draw_cstr(&gfx, &bounds, &style, NULL, &svg,
+                                     CMP_ICON_RENDER_FONT),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_icon_test_set_cstr_limit(3));
   CMP_TEST_EXPECT(cmp_icon_draw_cstr(&gfx, &bounds, &style, "four", &svg,
-                                   CMP_ICON_RENDER_FONT),
-                 CMP_ERR_OVERFLOW);
+                                     CMP_ICON_RENDER_FONT),
+                  CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_icon_test_set_cstr_limit(0));
   CMP_TEST_OK(cmp_icon_draw_cstr(&gfx, &bounds, &style, name, &svg,
-                               CMP_ICON_RENDER_FONT));
+                                 CMP_ICON_RENDER_FONT));
 
   gfx.text_vtable = NULL;
   CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, name, name_len, &svg,
-                                      CMP_ICON_RENDER_FONT, &metrics),
-                 CMP_ERR_UNSUPPORTED);
+                                        CMP_ICON_RENDER_FONT, &metrics),
+                  CMP_ERR_UNSUPPORTED);
 
   gfx.text_vtable = &g_test_text_vtable_no_draw;
-  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, name, name_len, &svg,
-                                   CMP_ICON_RENDER_FONT),
-                 CMP_ERR_UNSUPPORTED);
+  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, name, name_len,
+                                     &svg, CMP_ICON_RENDER_FONT),
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable_no_measure;
   CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, name, name_len, &svg,
-                                      CMP_ICON_RENDER_FONT, &metrics),
-                 CMP_ERR_UNSUPPORTED);
+                                        CMP_ICON_RENDER_FONT, &metrics),
+                  CMP_ERR_UNSUPPORTED);
   gfx.text_vtable = &g_test_text_vtable_no_destroy;
   CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, name, name_len, &svg,
-                                      CMP_ICON_RENDER_FONT, &metrics),
-                 CMP_ERR_UNSUPPORTED);
+                                        CMP_ICON_RENDER_FONT, &metrics),
+                  CMP_ERR_UNSUPPORTED);
 
   test_text_backend_init(&text_backend);
   gfx.text_vtable = &g_test_text_vtable;
   gfx.ctx = &text_backend;
   text_backend.fail_create = 1;
   CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, name, name_len, &svg,
-                                      CMP_ICON_RENDER_FONT, &metrics),
-                 CMP_ERR_IO);
+                                        CMP_ICON_RENDER_FONT, &metrics),
+                  CMP_ERR_IO);
   text_backend.fail_create = 0;
   text_backend.fail_measure = 1;
   CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, name, name_len, &svg,
-                                      CMP_ICON_RENDER_FONT, &metrics),
-                 CMP_ERR_IO);
+                                        CMP_ICON_RENDER_FONT, &metrics),
+                  CMP_ERR_IO);
   CMP_TEST_ASSERT(text_backend.destroy_calls == 1);
-  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, name, name_len, &svg,
-                                   CMP_ICON_RENDER_FONT),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, name, name_len,
+                                     &svg, CMP_ICON_RENDER_FONT),
+                  CMP_ERR_IO);
   CMP_TEST_ASSERT(text_backend.destroy_calls == 2);
   text_backend.fail_measure = 0;
   text_backend.fail_draw = 1;
-  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, name, name_len, &svg,
-                                   CMP_ICON_RENDER_FONT),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, name, name_len,
+                                     &svg, CMP_ICON_RENDER_FONT),
+                  CMP_ERR_IO);
   CMP_TEST_ASSERT(text_backend.destroy_calls == 3);
   text_backend.fail_draw = 0;
   text_backend.fail_destroy = 1;
   CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, name, name_len, &svg,
-                                      CMP_ICON_RENDER_FONT, &metrics),
-                 CMP_ERR_IO);
+                                        CMP_ICON_RENDER_FONT, &metrics),
+                  CMP_ERR_IO);
   text_backend.fail_destroy = 0;
   text_backend.metric_width = -1.0f;
   CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, name, name_len, &svg,
-                                      CMP_ICON_RENDER_FONT, &metrics),
-                 CMP_ERR_RANGE);
+                                        CMP_ICON_RENDER_FONT, &metrics),
+                  CMP_ERR_RANGE);
   text_backend.metric_width = 12.0f;
   text_backend.metric_height = -1.0f;
-  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, name, name_len, &svg,
-                                   CMP_ICON_RENDER_FONT),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, name, name_len,
+                                     &svg, CMP_ICON_RENDER_FONT),
+                  CMP_ERR_RANGE);
   text_backend.metric_height = 16.0f;
 
-  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, name, name_len, &svg,
-                                   CMP_ICON_RENDER_SVG + 1u),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, name, name_len,
+                                     &svg, CMP_ICON_RENDER_SVG + 1u),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   test_gfx_backend_init(&gfx_backend);
   gfx.ctx = &gfx_backend;
@@ -457,7 +458,7 @@ int main(void) {
   bounds.width = 20.0f;
   bounds.height = 10.0f;
   CMP_TEST_OK(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                               CMP_ICON_RENDER_AUTO));
+                                 CMP_ICON_RENDER_AUTO));
   CMP_TEST_ASSERT(gfx_backend.draw_path_calls == 1);
   CMP_TEST_ASSERT(gfx_backend.cmd_count == 4u);
   CMP_TEST_ASSERT(gfx_backend.cmds[0].type == CMP_PATH_CMD_MOVE_TO);
@@ -475,16 +476,22 @@ int main(void) {
   bounds.width = 60.0f;
   bounds.height = 20.0f;
   CMP_TEST_OK(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                               CMP_ICON_RENDER_SVG));
+                                 CMP_ICON_RENDER_SVG));
   CMP_TEST_ASSERT(gfx_backend.cmd_count == 6u);
   CMP_TEST_ASSERT(gfx_backend.cmds[1].type == CMP_PATH_CMD_CUBIC_TO);
-  CMP_TEST_ASSERT(cmp_near(gfx_backend.cmds[1].data.cubic_to.cx2, 10.0f, 0.001f));
-  CMP_TEST_ASSERT(cmp_near(gfx_backend.cmds[1].data.cubic_to.cy2, 0.0f, 0.001f));
+  CMP_TEST_ASSERT(
+      cmp_near(gfx_backend.cmds[1].data.cubic_to.cx2, 10.0f, 0.001f));
+  CMP_TEST_ASSERT(
+      cmp_near(gfx_backend.cmds[1].data.cubic_to.cy2, 0.0f, 0.001f));
   CMP_TEST_ASSERT(gfx_backend.cmds[2].type == CMP_PATH_CMD_CUBIC_TO);
-  CMP_TEST_ASSERT(cmp_near(gfx_backend.cmds[2].data.cubic_to.cx1, 10.0f, 0.001f));
-  CMP_TEST_ASSERT(cmp_near(gfx_backend.cmds[2].data.cubic_to.cy1, 20.0f, 0.001f));
-  CMP_TEST_ASSERT(cmp_near(gfx_backend.cmds[2].data.cubic_to.cx2, 20.0f, 0.001f));
-  CMP_TEST_ASSERT(cmp_near(gfx_backend.cmds[2].data.cubic_to.cy2, 20.0f, 0.001f));
+  CMP_TEST_ASSERT(
+      cmp_near(gfx_backend.cmds[2].data.cubic_to.cx1, 10.0f, 0.001f));
+  CMP_TEST_ASSERT(
+      cmp_near(gfx_backend.cmds[2].data.cubic_to.cy1, 20.0f, 0.001f));
+  CMP_TEST_ASSERT(
+      cmp_near(gfx_backend.cmds[2].data.cubic_to.cx2, 20.0f, 0.001f));
+  CMP_TEST_ASSERT(
+      cmp_near(gfx_backend.cmds[2].data.cubic_to.cy2, 20.0f, 0.001f));
   CMP_TEST_ASSERT(gfx_backend.cmds[3].type == CMP_PATH_CMD_QUAD_TO);
   CMP_TEST_ASSERT(cmp_near(gfx_backend.cmds[3].data.quad_to.cx, 40.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(gfx_backend.cmds[3].data.quad_to.cy, 0.0f, 0.001f));
@@ -498,65 +505,65 @@ int main(void) {
   bounds.width = 40.0f;
   bounds.height = 20.0f;
   CMP_TEST_OK(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                               CMP_ICON_RENDER_SVG));
+                                 CMP_ICON_RENDER_SVG));
 
   svg.utf8_path = "M0 0 A10 10 0 0 0 10 10";
   svg.viewbox_width = 20.0f;
   svg.viewbox_height = 20.0f;
   CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                                   CMP_ICON_RENDER_SVG),
-                 CMP_ERR_UNSUPPORTED);
+                                     CMP_ICON_RENDER_SVG),
+                  CMP_ERR_UNSUPPORTED);
 
   svg.utf8_path = "0 0 L10 10";
   svg.viewbox_width = 20.0f;
   svg.viewbox_height = 20.0f;
   CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                                   CMP_ICON_RENDER_SVG),
-                 CMP_ERR_CORRUPT);
+                                     CMP_ICON_RENDER_SVG),
+                  CMP_ERR_CORRUPT);
 
   svg.utf8_path = "M0 0 L10";
   svg.viewbox_width = 20.0f;
   svg.viewbox_height = 20.0f;
   CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                                   CMP_ICON_RENDER_SVG),
-                 CMP_ERR_CORRUPT);
+                                     CMP_ICON_RENDER_SVG),
+                  CMP_ERR_CORRUPT);
 
   svg.utf8_path = "M0 0";
   svg.viewbox_width = 0.0f;
   svg.viewbox_height = 20.0f;
   CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                                   CMP_ICON_RENDER_SVG),
-                 CMP_ERR_RANGE);
+                                     CMP_ICON_RENDER_SVG),
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_INIT));
   svg.viewbox_width = 20.0f;
   CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                                   CMP_ICON_RENDER_SVG),
-                 CMP_ERR_IO);
+                                     CMP_ICON_RENDER_SVG),
+                  CMP_ERR_IO);
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
   CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                                   CMP_ICON_RENDER_SVG),
-                 CMP_ERR_IO);
+                                     CMP_ICON_RENDER_SVG),
+                  CMP_ERR_IO);
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
   svg.utf8_path = "M1e309 0";
   svg.viewbox_width = 20.0f;
   svg.viewbox_height = 20.0f;
   CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                                   CMP_ICON_RENDER_SVG),
-                 CMP_ERR_RANGE);
+                                     CMP_ICON_RENDER_SVG),
+                  CMP_ERR_RANGE);
 
   svg.utf8_path = "Mnan 0";
   CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                                   CMP_ICON_RENDER_SVG),
-                 CMP_ERR_RANGE);
+                                     CMP_ICON_RENDER_SVG),
+                  CMP_ERR_RANGE);
 
   gfx.vtable = &g_test_gfx_vtable_no_path;
   CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
-                                   CMP_ICON_RENDER_SVG),
-                 CMP_ERR_UNSUPPORTED);
+                                     CMP_ICON_RENDER_SVG),
+                  CMP_ERR_UNSUPPORTED);
 
   gfx.vtable = &g_test_gfx_vtable;
   svg.utf8_path = "M0 0 L10 10";
@@ -564,7 +571,7 @@ int main(void) {
   svg.viewbox_height = 20.0f;
   style.size_px = 20;
   CMP_TEST_OK(cmp_icon_measure_utf8(&gfx, &style, NULL, 0u, &svg,
-                                  CMP_ICON_RENDER_SVG, &metrics));
+                                    CMP_ICON_RENDER_SVG, &metrics));
   CMP_TEST_ASSERT(cmp_near(metrics.width, 10.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(metrics.height, 20.0f, 0.001f));
 

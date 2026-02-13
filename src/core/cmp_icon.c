@@ -149,7 +149,8 @@ static int cmp_icon_cstrlen(const char *cstr, cmp_usize *out_len) {
 
 static int cmp_icon_validate_render_mode(cmp_u32 render_mode) {
   if (render_mode != CMP_ICON_RENDER_AUTO &&
-      render_mode != CMP_ICON_RENDER_FONT && render_mode != CMP_ICON_RENDER_SVG) {
+      render_mode != CMP_ICON_RENDER_FONT &&
+      render_mode != CMP_ICON_RENDER_SVG) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   return CMP_OK;
@@ -178,9 +179,11 @@ static int cmp_icon_gfx_supports_svg(const CMPGfx *gfx) {
 }
 
 static int cmp_icon_select_render_mode(const CMPGfx *gfx, const char *utf8_name,
-                                      cmp_usize utf8_len, const CMPIconSvg *svg,
-                                      cmp_u32 render_mode, CMPBool require_draw,
-                                      cmp_u32 *out_mode) {
+                                       cmp_usize utf8_len,
+                                       const CMPIconSvg *svg,
+                                       cmp_u32 render_mode,
+                                       CMPBool require_draw,
+                                       cmp_u32 *out_mode) {
   int has_font;
   int has_svg;
   int rc;
@@ -234,8 +237,8 @@ static int cmp_icon_select_render_mode(const CMPGfx *gfx, const char *utf8_name,
 }
 
 static void cmp_icon_svg_transform_point(const CMPIconSvgTransform *xf,
-                                        CMPScalar x, CMPScalar y, CMPScalar *out_x,
-                                        CMPScalar *out_y) {
+                                         CMPScalar x, CMPScalar y,
+                                         CMPScalar *out_x, CMPScalar *out_y) {
   *out_x = (x - xf->viewbox_x) * xf->scale + xf->offset_x;
   *out_y = (y - xf->viewbox_y) * xf->scale + xf->offset_y;
 }
@@ -258,7 +261,8 @@ static void cmp_icon_svg_skip_separators(const char **cursor) {
   *cursor = p;
 }
 
-static int cmp_icon_svg_parse_number(const char **cursor, CMPScalar *out_value) {
+static int cmp_icon_svg_parse_number(const char **cursor,
+                                     CMPScalar *out_value) {
   const char *p;
   char *endptr;
   double value;
@@ -289,7 +293,7 @@ static int cmp_icon_svg_parse_number(const char **cursor, CMPScalar *out_value) 
     return CMP_ERR_RANGE;
   }
   if (value > (double)FLT_MAX || value < (double)-FLT_MAX) {
-    *cursor = endptr;    /* GCOVR_EXCL_LINE */
+    *cursor = endptr;     /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
   }
 
@@ -299,7 +303,7 @@ static int cmp_icon_svg_parse_number(const char **cursor, CMPScalar *out_value) 
 }
 
 static int cmp_icon_svg_parse_pair(const char **cursor, CMPScalar *out_x,
-                                  CMPScalar *out_y) {
+                                   CMPScalar *out_y) {
   int rc;
 
   rc = cmp_icon_svg_parse_number(cursor, out_x);
@@ -321,7 +325,7 @@ static int cmp_icon_map_path_result(int rc) {
 }
 
 static int cmp_icon_path_move_to(CMPPath *path, const CMPIconSvgTransform *xf,
-                                CMPScalar x, CMPScalar y) {
+                                 CMPScalar x, CMPScalar y) {
   CMPScalar tx;
   CMPScalar ty;
   int rc;
@@ -338,7 +342,7 @@ static int cmp_icon_path_move_to(CMPPath *path, const CMPIconSvgTransform *xf,
 }
 
 static int cmp_icon_path_line_to(CMPPath *path, const CMPIconSvgTransform *xf,
-                                CMPScalar x, CMPScalar y) {
+                                 CMPScalar x, CMPScalar y) {
   CMPScalar tx;
   CMPScalar ty;
   int rc;
@@ -355,8 +359,8 @@ static int cmp_icon_path_line_to(CMPPath *path, const CMPIconSvgTransform *xf,
 }
 
 static int cmp_icon_path_quad_to(CMPPath *path, const CMPIconSvgTransform *xf,
-                                CMPScalar cx, CMPScalar cy, CMPScalar x,
-                                CMPScalar y) {
+                                 CMPScalar cx, CMPScalar cy, CMPScalar x,
+                                 CMPScalar y) {
   CMPScalar tcx;
   CMPScalar tcy;
   CMPScalar tx;
@@ -376,8 +380,8 @@ static int cmp_icon_path_quad_to(CMPPath *path, const CMPIconSvgTransform *xf,
 }
 
 static int cmp_icon_path_cubic_to(CMPPath *path, const CMPIconSvgTransform *xf,
-                                 CMPScalar cx1, CMPScalar cy1, CMPScalar cx2,
-                                 CMPScalar cy2, CMPScalar x, CMPScalar y) {
+                                  CMPScalar cx1, CMPScalar cy1, CMPScalar cx2,
+                                  CMPScalar cy2, CMPScalar x, CMPScalar y) {
   CMPScalar tcx1;
   CMPScalar tcy1;
   CMPScalar tcx2;
@@ -413,8 +417,8 @@ static int cmp_icon_path_close(CMPPath *path) {
 }
 
 static int cmp_icon_svg_compute_transform(const CMPIconSvg *svg,
-                                         const CMPRect *bounds,
-                                         CMPIconSvgTransform *out_xf) {
+                                          const CMPRect *bounds,
+                                          CMPIconSvgTransform *out_xf) {
   CMPScalar scale_x;
   CMPScalar scale_y;
   CMPScalar scale;
@@ -444,7 +448,7 @@ static int cmp_icon_svg_compute_transform(const CMPIconSvg *svg,
 }
 
 static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
-                             CMPPath *path) {
+                              CMPPath *path) {
   const char *p;
   CMPScalar cur_x;
   CMPScalar cur_y;
@@ -527,7 +531,7 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
         } else {
           rc = cmp_icon_path_line_to(path, xf, x, y); /* GCOVR_EXCL_LINE */
           if (rc != CMP_OK) {                         /* GCOVR_EXCL_LINE */
-            return rc;                               /* GCOVR_EXCL_LINE */
+            return rc;                                /* GCOVR_EXCL_LINE */
           }
         }
         cur_x = x;
@@ -812,7 +816,7 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
 }
 
 static int cmp_icon_svg_build_path(const CMPIconSvg *svg, const CMPRect *bounds,
-                                  CMPPath *path) {
+                                   CMPPath *path) {
   CMPIconSvgTransform xf;
   int rc;
   int cleanup_rc;
@@ -867,8 +871,9 @@ static int cmp_icon_svg_build_path(const CMPIconSvg *svg, const CMPRect *bounds,
   return CMP_OK;
 }
 
-static int cmp_icon_measure_svg(const CMPIconStyle *style, const CMPIconSvg *svg,
-                               CMPIconMetrics *out_metrics) {
+static int cmp_icon_measure_svg(const CMPIconStyle *style,
+                                const CMPIconSvg *svg,
+                                CMPIconMetrics *out_metrics) {
   CMPScalar size;
   CMPScalar w;
   CMPScalar h;
@@ -897,8 +902,8 @@ static int cmp_icon_measure_svg(const CMPIconStyle *style, const CMPIconSvg *svg
 }
 
 static int cmp_icon_measure_font(const CMPGfx *gfx, const CMPIconStyle *style,
-                                const char *utf8_name, cmp_usize utf8_len,
-                                CMPIconMetrics *out_metrics) {
+                                 const char *utf8_name, cmp_usize utf8_len,
+                                 CMPIconMetrics *out_metrics) {
   CMPHandle font;
   CMPScalar width;
   CMPScalar height;
@@ -955,8 +960,8 @@ static int cmp_icon_measure_font(const CMPGfx *gfx, const CMPIconStyle *style,
 }
 
 static int cmp_icon_draw_font(const CMPGfx *gfx, const CMPRect *bounds,
-                             const CMPIconStyle *style, const char *utf8_name,
-                             cmp_usize utf8_len) {
+                              const CMPIconStyle *style, const char *utf8_name,
+                              cmp_usize utf8_len) {
   CMPHandle font;
   CMPScalar width;
   CMPScalar height;
@@ -990,7 +995,7 @@ static int cmp_icon_draw_font(const CMPGfx *gfx, const CMPRect *bounds,
   if (rc != CMP_OK) {
     cleanup_rc =
         gfx->text_vtable->destroy_font(gfx->ctx, font); /* GCOVR_EXCL_LINE */
-    if (cleanup_rc != CMP_OK) {                          /* GCOVR_EXCL_LINE */
+    if (cleanup_rc != CMP_OK) {                         /* GCOVR_EXCL_LINE */
       return cleanup_rc;                                /* GCOVR_EXCL_LINE */
     }
     return rc; /* GCOVR_EXCL_LINE */
@@ -1020,7 +1025,7 @@ static int cmp_icon_draw_font(const CMPGfx *gfx, const CMPRect *bounds,
 }
 
 static int cmp_icon_draw_svg(const CMPGfx *gfx, const CMPRect *bounds,
-                            const CMPIconStyle *style, const CMPIconSvg *svg) {
+                             const CMPIconStyle *style, const CMPIconSvg *svg) {
   CMPPath path;
   int rc;
   int cleanup_rc;
@@ -1075,9 +1080,9 @@ int CMP_CALL cmp_icon_svg_init(CMPIconSvg *svg) {
 }
 
 int CMP_CALL cmp_icon_measure_utf8(const CMPGfx *gfx, const CMPIconStyle *style,
-                                 const char *utf8_name, cmp_usize utf8_len,
-                                 const CMPIconSvg *svg, cmp_u32 render_mode,
-                                 CMPIconMetrics *out_metrics) {
+                                   const char *utf8_name, cmp_usize utf8_len,
+                                   const CMPIconSvg *svg, cmp_u32 render_mode,
+                                   CMPIconMetrics *out_metrics) {
   int rc;
   cmp_u32 resolved_mode;
 
@@ -1098,7 +1103,7 @@ int CMP_CALL cmp_icon_measure_utf8(const CMPGfx *gfx, const CMPIconStyle *style,
   }
 
   rc = cmp_icon_select_render_mode(gfx, utf8_name, utf8_len, svg, render_mode,
-                                  CMP_FALSE, &resolved_mode);
+                                   CMP_FALSE, &resolved_mode);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1110,9 +1115,9 @@ int CMP_CALL cmp_icon_measure_utf8(const CMPGfx *gfx, const CMPIconStyle *style,
 }
 
 int CMP_CALL cmp_icon_measure_cstr(const CMPGfx *gfx, const CMPIconStyle *style,
-                                 const char *utf8_name, const CMPIconSvg *svg,
-                                 cmp_u32 render_mode,
-                                 CMPIconMetrics *out_metrics) {
+                                   const char *utf8_name, const CMPIconSvg *svg,
+                                   cmp_u32 render_mode,
+                                   CMPIconMetrics *out_metrics) {
   cmp_usize len;
   int rc;
 
@@ -1126,13 +1131,13 @@ int CMP_CALL cmp_icon_measure_cstr(const CMPGfx *gfx, const CMPIconStyle *style,
   }
 
   return cmp_icon_measure_utf8(gfx, style, utf8_name, len, svg, render_mode,
-                              out_metrics);
+                               out_metrics);
 }
 
 int CMP_CALL cmp_icon_draw_utf8(const CMPGfx *gfx, const CMPRect *bounds,
-                              const CMPIconStyle *style, const char *utf8_name,
-                              cmp_usize utf8_len, const CMPIconSvg *svg,
-                              cmp_u32 render_mode) {
+                                const CMPIconStyle *style,
+                                const char *utf8_name, cmp_usize utf8_len,
+                                const CMPIconSvg *svg, cmp_u32 render_mode) {
   int rc;
   cmp_u32 resolved_mode;
 
@@ -1157,7 +1162,7 @@ int CMP_CALL cmp_icon_draw_utf8(const CMPGfx *gfx, const CMPRect *bounds,
   }
 
   rc = cmp_icon_select_render_mode(gfx, utf8_name, utf8_len, svg, render_mode,
-                                  CMP_TRUE, &resolved_mode);
+                                   CMP_TRUE, &resolved_mode);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1169,8 +1174,9 @@ int CMP_CALL cmp_icon_draw_utf8(const CMPGfx *gfx, const CMPRect *bounds,
 }
 
 int CMP_CALL cmp_icon_draw_cstr(const CMPGfx *gfx, const CMPRect *bounds,
-                              const CMPIconStyle *style, const char *utf8_name,
-                              const CMPIconSvg *svg, cmp_u32 render_mode) {
+                                const CMPIconStyle *style,
+                                const char *utf8_name, const CMPIconSvg *svg,
+                                cmp_u32 render_mode) {
   cmp_usize len;
   int rc;
 
@@ -1184,7 +1190,7 @@ int CMP_CALL cmp_icon_draw_cstr(const CMPGfx *gfx, const CMPRect *bounds,
   }
 
   return cmp_icon_draw_utf8(gfx, bounds, style, utf8_name, len, svg,
-                           render_mode);
+                            render_mode);
 }
 
 #ifdef CMP_TESTING

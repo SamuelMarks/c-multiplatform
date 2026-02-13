@@ -76,15 +76,15 @@ int main(void) {
     memset(&vtable, 0, sizeof(vtable));
 
     CMP_TEST_EXPECT(cmp_scroll_delta_init(NULL, 1.0f, 2.0f),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_scroll_delta_init(&delta, 1.0f, -2.0f));
     CMP_TEST_ASSERT(delta.x == 1.0f);
     CMP_TEST_ASSERT(delta.y == -2.0f);
 
     CMP_TEST_EXPECT(cmp_scroll_parent_init(NULL, NULL, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_scroll_parent_init(&parent, NULL, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_scroll_parent_init(&parent, &delta, &vtable));
     CMP_TEST_ASSERT(parent.ctx == &delta);
     CMP_TEST_ASSERT(parent.vtable == &vtable);
@@ -100,17 +100,17 @@ int main(void) {
     memset(&vtable, 0, sizeof(vtable));
 
     CMP_TEST_EXPECT(cmp_scroll_chain_init(NULL, NULL, 0),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     parents[0] = NULL;
     CMP_TEST_EXPECT(cmp_scroll_chain_init(&chain, parents, 1),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     parent.ctx = NULL;
     parent.vtable = NULL;
     parents[0] = &parent;
     CMP_TEST_EXPECT(cmp_scroll_chain_init(&chain, parents, 1),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_scroll_parent_init(&parent, NULL, &vtable));
     parents[0] = &parent;
@@ -128,9 +128,9 @@ int main(void) {
     CMPScrollDelta consumed;
 
     CMP_TEST_EXPECT(cmp_scroll_test_validate_consumed(NULL, &available),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_scroll_test_validate_consumed(&consumed, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_scroll_delta_init(&available, 5.0f, -3.0f));
     CMP_TEST_OK(cmp_scroll_delta_init(&consumed, 2.0f, -1.0f));
@@ -138,12 +138,12 @@ int main(void) {
 
     CMP_TEST_OK(cmp_scroll_delta_init(&consumed, -1.0f, -1.0f));
     CMP_TEST_EXPECT(cmp_scroll_test_validate_consumed(&consumed, &available),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
 
     CMP_TEST_OK(cmp_scroll_delta_init(&available, -2.0f, -2.0f));
     CMP_TEST_OK(cmp_scroll_delta_init(&consumed, 1.0f, 0.0f));
     CMP_TEST_EXPECT(cmp_scroll_test_validate_consumed(&consumed, &available),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
 
     CMP_TEST_OK(cmp_scroll_delta_init(&available, 0.0f, 0.0f));
     CMP_TEST_OK(cmp_scroll_delta_init(&consumed, 0.0f, 0.0f));
@@ -152,7 +152,7 @@ int main(void) {
     CMP_TEST_OK(cmp_scroll_delta_init(&available, 0.0f, 0.0f));
     CMP_TEST_OK(cmp_scroll_delta_init(&consumed, 0.0f, 1.0f));
     CMP_TEST_EXPECT(cmp_scroll_test_validate_consumed(&consumed, &available),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
   }
 
   {
@@ -165,24 +165,24 @@ int main(void) {
     memset(&vtable, 0, sizeof(vtable));
 
     CMP_TEST_EXPECT(cmp_scroll_test_validate_chain(NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     chain.parents = NULL;
     chain.count = 1;
     CMP_TEST_EXPECT(cmp_scroll_test_validate_chain(&chain),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     parents[0] = NULL;
     chain.parents = parents;
     CMP_TEST_EXPECT(cmp_scroll_test_validate_chain(&chain),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     parent.ctx = NULL;
     parent.vtable = NULL;
     parents[0] = &parent;
     chain.parents = parents;
     CMP_TEST_EXPECT(cmp_scroll_test_validate_chain(&chain),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_scroll_parent_init(&parent, NULL, &vtable));
     parents[0] = &parent;
@@ -205,10 +205,12 @@ int main(void) {
     CMP_TEST_EXPECT(
         cmp_scroll_chain_pre_scroll(&chain, NULL, &consumed, &remaining),
         CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_scroll_chain_pre_scroll(&chain, &delta, NULL, &remaining),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_scroll_chain_pre_scroll(&chain, &delta, &consumed, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_scroll_chain_pre_scroll(&chain, &delta, NULL, &remaining),
+        CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_scroll_chain_pre_scroll(&chain, &delta, &consumed, NULL),
+        CMP_ERR_INVALID_ARGUMENT);
   }
 
   {
@@ -427,20 +429,20 @@ int main(void) {
     CMP_TEST_OK(cmp_scroll_delta_init(&child_consumed, 0.0f, 0.0f));
 
     CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(NULL, &delta, &child_consumed,
-                                               &consumed, &remaining),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                                 &consumed, &remaining),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(&chain, NULL, &child_consumed,
-                                               &consumed, &remaining),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(&chain, &delta, NULL, &consumed,
-                                               &remaining),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(&chain, &delta, &child_consumed,
-                                               NULL, &remaining),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(&chain, &delta, &child_consumed,
-                                               &consumed, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                                 &consumed, &remaining),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(&chain, &delta, NULL,
+                                                 &consumed, &remaining),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(
+                        &chain, &delta, &child_consumed, NULL, &remaining),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(
+                        &chain, &delta, &child_consumed, &consumed, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   {
@@ -455,9 +457,9 @@ int main(void) {
     CMP_TEST_OK(cmp_scroll_delta_init(&delta, 1.0f, 0.0f));
     CMP_TEST_OK(cmp_scroll_delta_init(&child_consumed, 0.0f, 0.0f));
 
-    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(&chain, &delta, &child_consumed,
-                                               &consumed, &remaining),
-                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(
+                        &chain, &delta, &child_consumed, &consumed, &remaining),
+                    CMP_ERR_INVALID_ARGUMENT);
   }
 
   {
@@ -472,7 +474,7 @@ int main(void) {
     CMP_TEST_OK(cmp_scroll_delta_init(&child_consumed, 1.0f, -1.0f));
 
     CMP_TEST_OK(cmp_scroll_chain_post_scroll(&chain, &delta, &child_consumed,
-                                           &consumed, &remaining));
+                                             &consumed, &remaining));
     CMP_TEST_ASSERT(consumed.x == 0.0f);
     CMP_TEST_ASSERT(consumed.y == 0.0f);
     CMP_TEST_ASSERT(remaining.x == delta.x);
@@ -504,7 +506,7 @@ int main(void) {
     CMP_TEST_OK(cmp_scroll_delta_init(&delta, 0.0f, 0.0f));
     CMP_TEST_OK(cmp_scroll_delta_init(&child_consumed, 0.0f, 0.0f));
     CMP_TEST_OK(cmp_scroll_chain_post_scroll(&chain, &delta, &child_consumed,
-                                           &consumed, &remaining));
+                                             &consumed, &remaining));
 
     CMP_TEST_ASSERT(state.post_calls == 0);
     CMP_TEST_ASSERT(consumed.x == 0.0f);
@@ -545,7 +547,7 @@ int main(void) {
     CMP_TEST_OK(cmp_scroll_delta_init(&delta, 4.0f, -2.0f));
     CMP_TEST_OK(cmp_scroll_delta_init(&child_consumed, 1.0f, -1.0f));
     CMP_TEST_OK(cmp_scroll_chain_post_scroll(&chain, &delta, &child_consumed,
-                                           &consumed, &remaining));
+                                             &consumed, &remaining));
 
     CMP_TEST_ASSERT(parent_a.post_calls == 1);
     CMP_TEST_ASSERT(parent_b.post_calls == 1);
@@ -585,7 +587,7 @@ int main(void) {
     CMP_TEST_OK(cmp_scroll_delta_init(&delta, 4.0f, -2.0f));
     CMP_TEST_OK(cmp_scroll_delta_init(&child_consumed, 1.0f, -1.0f));
     CMP_TEST_OK(cmp_scroll_chain_post_scroll(&chain, &delta, &child_consumed,
-                                           &consumed, &remaining));
+                                             &consumed, &remaining));
 
     CMP_TEST_ASSERT(state.post_calls == 0);
     CMP_TEST_ASSERT(consumed.x == 0.0f);
@@ -622,9 +624,9 @@ int main(void) {
 
     CMP_TEST_OK(cmp_scroll_delta_init(&delta, 4.0f, -2.0f));
     CMP_TEST_OK(cmp_scroll_delta_init(&child_consumed, 1.0f, -1.0f));
-    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(&chain, &delta, &child_consumed,
-                                               &consumed, &remaining),
-                   CMP_ERR_UNKNOWN);
+    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(
+                        &chain, &delta, &child_consumed, &consumed, &remaining),
+                    CMP_ERR_UNKNOWN);
 
     CMP_TEST_ASSERT(parent_a.post_calls == 1);
     CMP_TEST_ASSERT(parent_b.post_calls == 0);
@@ -659,9 +661,9 @@ int main(void) {
 
     CMP_TEST_OK(cmp_scroll_delta_init(&delta, 4.0f, -2.0f));
     CMP_TEST_OK(cmp_scroll_delta_init(&child_consumed, 1.0f, -1.0f));
-    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(&chain, &delta, &child_consumed,
-                                               &consumed, &remaining),
-                   CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(cmp_scroll_chain_post_scroll(
+                        &chain, &delta, &child_consumed, &consumed, &remaining),
+                    CMP_ERR_RANGE);
 
     CMP_TEST_ASSERT(parent_a.post_calls == 1);
     CMP_TEST_ASSERT(parent_b.post_calls == 0);

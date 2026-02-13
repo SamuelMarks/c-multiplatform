@@ -13,7 +13,8 @@ int CMP_CALL cmp_path_test_set_force_reserve(CMPBool enable) {
 
 static cmp_usize cmp_path_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
 
-static int cmp_path_add_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
+static int cmp_path_add_overflow(cmp_usize a, cmp_usize b,
+                                 cmp_usize *out_value) {
   cmp_usize max_value;
 
   if (out_value == NULL) {
@@ -29,7 +30,8 @@ static int cmp_path_add_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value)
   return CMP_OK;
 }
 
-static int cmp_path_mul_overflow(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
+static int cmp_path_mul_overflow(cmp_usize a, cmp_usize b,
+                                 cmp_usize *out_value) {
   cmp_usize max_value;
 
   if (out_value == NULL) {
@@ -75,9 +77,9 @@ static int cmp_path_has_current(const CMPPath *path, CMPBool *out_has_current) {
     return CMP_OK;
   }
 
-  *out_has_current = (path->commands[path->count - 1].type != CMP_PATH_CMD_CLOSE)
-                         ? CMP_TRUE
-                         : CMP_FALSE;
+  *out_has_current =
+      (path->commands[path->count - 1].type != CMP_PATH_CMD_CLOSE) ? CMP_TRUE
+                                                                   : CMP_FALSE;
   return CMP_OK;
 }
 
@@ -127,7 +129,8 @@ static int cmp_path_reserve(CMPPath *path, cmp_usize additional) {
     new_capacity = required;
   }
 
-  rc = cmp_path_mul_overflow(new_capacity, (cmp_usize)sizeof(CMPPathCmd), &bytes);
+  rc = cmp_path_mul_overflow(new_capacity, (cmp_usize)sizeof(CMPPathCmd),
+                             &bytes);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -161,7 +164,7 @@ static int cmp_path_append(CMPPath *path, const CMPPathCmd *cmd) {
 }
 
 int CMP_CALL cmp_path_init(CMPPath *path, const CMPAllocator *allocator,
-                         cmp_usize initial_capacity) {
+                           cmp_usize initial_capacity) {
   CMPAllocator chosen;
   cmp_usize bytes;
   void *mem;
@@ -192,7 +195,7 @@ int CMP_CALL cmp_path_init(CMPPath *path, const CMPAllocator *allocator,
   }
 
   rc = cmp_path_mul_overflow(initial_capacity, (cmp_usize)sizeof(CMPPathCmd),
-                            &bytes);
+                             &bytes);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -279,8 +282,8 @@ int CMP_CALL cmp_path_line_to(CMPPath *path, CMPScalar x, CMPScalar y) {
   return cmp_path_append(path, &cmd);
 }
 
-int CMP_CALL cmp_path_quad_to(CMPPath *path, CMPScalar cx, CMPScalar cy, CMPScalar x,
-                            CMPScalar y) {
+int CMP_CALL cmp_path_quad_to(CMPPath *path, CMPScalar cx, CMPScalar cy,
+                              CMPScalar x, CMPScalar y) {
   CMPPathCmd cmd;
   CMPBool has_current;
   int rc;
@@ -302,8 +305,8 @@ int CMP_CALL cmp_path_quad_to(CMPPath *path, CMPScalar cx, CMPScalar cy, CMPScal
 }
 
 int CMP_CALL cmp_path_cubic_to(CMPPath *path, CMPScalar cx1, CMPScalar cy1,
-                             CMPScalar cx2, CMPScalar cy2, CMPScalar x,
-                             CMPScalar y) {
+                               CMPScalar cx2, CMPScalar cy2, CMPScalar x,
+                               CMPScalar y) {
   CMPPathCmd cmd;
   CMPBool has_current;
   int rc;
@@ -345,17 +348,17 @@ int CMP_CALL cmp_path_close(CMPPath *path) {
 
 #ifdef CMP_TESTING
 int CMP_CALL cmp_path_test_add_overflow(cmp_usize a, cmp_usize b,
-                                      cmp_usize *out_value) {
+                                        cmp_usize *out_value) {
   return cmp_path_add_overflow(a, b, out_value);
 }
 
 int CMP_CALL cmp_path_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                      cmp_usize *out_value) {
+                                        cmp_usize *out_value) {
   return cmp_path_mul_overflow(a, b, out_value);
 }
 
 int CMP_CALL cmp_path_test_has_current(const CMPPath *path,
-                                     CMPBool *out_has_current) {
+                                       CMPBool *out_has_current) {
   return cmp_path_has_current(path, out_has_current);
 }
 

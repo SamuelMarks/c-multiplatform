@@ -61,7 +61,7 @@ struct M3Sheet;
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPSheetOnAction)(void *ctx, struct M3Sheet *sheet,
-                                      cmp_u32 action);
+                                        cmp_u32 action);
 
 /**
  * @brief Bottom sheet style descriptor.
@@ -95,7 +95,7 @@ typedef struct M3SheetStyle {
  */
 typedef struct M3Sheet {
   CMPWidget widget;       /**< Widget interface (points to this instance). */
-  M3SheetStyle style;    /**< Current sheet style. */
+  M3SheetStyle style;     /**< Current sheet style. */
   CMPRect overlay_bounds; /**< Bounds of the overlay region. */
   CMPRect sheet_bounds;   /**< Bounds of the sheet at rest (open state). */
   CMPScalar offset;       /**< Current vertical offset from the open state. */
@@ -104,7 +104,7 @@ typedef struct M3Sheet {
   CMPBool open;                /**< CMP_TRUE when the sheet is open. */
   CMPAnimController anim;      /**< Spring animation controller. */
   CMPSheetOnAction on_action;  /**< Action callback (may be NULL). */
-  void *on_action_ctx;        /**< Action callback context pointer. */
+  void *on_action_ctx;         /**< Action callback context pointer. */
 } M3Sheet;
 
 /**
@@ -136,7 +136,7 @@ CMP_API int CMP_CALL m3_sheet_init(M3Sheet *sheet, const M3SheetStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_sheet_set_style(M3Sheet *sheet,
-                                      const M3SheetStyle *style);
+                                        const M3SheetStyle *style);
 
 /**
  * @brief Assign an action callback to the sheet.
@@ -146,7 +146,8 @@ CMP_API int CMP_CALL m3_sheet_set_style(M3Sheet *sheet,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_sheet_set_on_action(M3Sheet *sheet,
-                                          CMPSheetOnAction on_action, void *ctx);
+                                            CMPSheetOnAction on_action,
+                                            void *ctx);
 
 /**
  * @brief Set the open state of the sheet.
@@ -172,7 +173,7 @@ CMP_API int CMP_CALL m3_sheet_get_open(const M3Sheet *sheet, CMPBool *out_open);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_sheet_step(M3Sheet *sheet, CMPScalar dt,
-                                 CMPBool *out_changed);
+                                   CMPBool *out_changed);
 
 /**
  * @brief Retrieve the current sheet bounds.
@@ -181,7 +182,7 @@ CMP_API int CMP_CALL m3_sheet_step(M3Sheet *sheet, CMPScalar dt,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_sheet_get_bounds(const M3Sheet *sheet,
-                                       CMPRect *out_bounds);
+                                         CMPRect *out_bounds);
 
 /**
  * @brief Compute content bounds inside the sheet.
@@ -190,7 +191,7 @@ CMP_API int CMP_CALL m3_sheet_get_bounds(const M3Sheet *sheet,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_sheet_get_content_bounds(const M3Sheet *sheet,
-                                               CMPRect *out_bounds);
+                                                 CMPRect *out_bounds);
 
 #ifdef __cplusplus
 } /* extern "C" */

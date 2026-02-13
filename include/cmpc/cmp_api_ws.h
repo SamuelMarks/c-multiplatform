@@ -103,7 +103,7 @@ typedef struct CMPKeyEvent {
  * @brief UTF-8 text input data (null-terminated, short form).
  */
 typedef struct CMPTextEvent {
-  char utf8[8];  /**< UTF-8 bytes including the null terminator. */
+  char utf8[8];   /**< UTF-8 bytes including the null terminator. */
   cmp_u32 length; /**< Number of bytes excluding the null terminator. */
 } CMPTextEvent;
 
@@ -115,7 +115,7 @@ typedef struct CMPTextEvent {
  */
 typedef struct CMPTextUtf8Event {
   const char *utf8; /**< UTF-8 bytes (may be NULL for empty). */
-  cmp_usize length;  /**< Number of bytes in utf8 (may be 0). */
+  cmp_usize length; /**< Number of bytes in utf8 (may be 0). */
 } CMPTextUtf8Event;
 
 /**
@@ -127,8 +127,8 @@ typedef struct CMPTextUtf8Event {
  */
 typedef struct CMPTextEditEvent {
   const char *utf8; /**< Current composition string in UTF-8 (may be NULL). */
-  cmp_usize length;  /**< Number of bytes in utf8 (may be 0). */
-  cmp_i32 cursor;    /**< Cursor byte offset in utf8. */
+  cmp_usize length; /**< Number of bytes in utf8 (may be 0). */
+  cmp_i32 cursor;   /**< Cursor byte offset in utf8. */
   cmp_i32 selection_length; /**< Selection length in bytes. */
 } CMPTextEditEvent;
 
@@ -187,10 +187,10 @@ typedef struct CMPInputEvent {
  * @brief Window creation configuration.
  */
 typedef struct CMPWSWindowConfig {
-  cmp_i32 width;           /**< Initial width in pixels. */
-  cmp_i32 height;          /**< Initial height in pixels. */
+  cmp_i32 width;          /**< Initial width in pixels. */
+  cmp_i32 height;         /**< Initial height in pixels. */
   const char *utf8_title; /**< Window title in UTF-8. */
-  cmp_u32 flags;           /**< Window flags (CMP_WS_WINDOW_*). */
+  cmp_u32 flags;          /**< Window flags (CMP_WS_WINDOW_*). */
 } CMPWSWindowConfig;
 
 /**
@@ -199,217 +199,218 @@ typedef struct CMPWSWindowConfig {
 typedef struct CMPWSConfig {
   const char *utf8_app_name; /**< Application name in UTF-8. */
   const char *utf8_app_id;   /**< Application identifier in UTF-8. */
-  cmp_u32 reserved;           /**< Reserved for future use. */
+  cmp_u32 reserved;          /**< Reserved for future use. */
 } CMPWSConfig;
 
 /**
  * @brief Window system virtual table.
  */
 typedef struct CMPWSVTable {
-  /**
-   * @brief Initialize the window system.
-   * @param ws Window system instance.
-   * @param config Configuration to apply.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+/**
+ * @brief Initialize the window system.
+ * @param ws Window system instance.
+ * @param config Configuration to apply.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int init(void *ws, const CMPWSConfig *config);
-  #else
+#else
   int(CMP_CALL *init)(void *ws, const CMPWSConfig *config);
-  #endif
-  /**
-   * @brief Shut down the window system.
-   * @param ws Window system instance.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Shut down the window system.
+ * @param ws Window system instance.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int shutdown(void *ws);
-  #else
+#else
   int(CMP_CALL *shutdown)(void *ws);
-  #endif
-  /**
-   * @brief Create a window.
-   * @param ws Window system instance.
-   * @param config Window configuration.
-   * @param out_window Receives the created window handle.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Create a window.
+ * @param ws Window system instance.
+ * @param config Window configuration.
+ * @param out_window Receives the created window handle.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int create_window(void *ws, const CMPWSWindowConfig *config,
                     CMPHandle *out_window);
-  #else
+#else
   int(CMP_CALL *create_window)(void *ws, const CMPWSWindowConfig *config,
                                CMPHandle *out_window);
-  #endif
-  /**
-   * @brief Destroy a window.
-   * @param ws Window system instance.
-   * @param window Window handle to destroy.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Destroy a window.
+ * @param ws Window system instance.
+ * @param window Window handle to destroy.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int destroy_window(void *ws, CMPHandle window);
-  #else
+#else
   int(CMP_CALL *destroy_window)(void *ws, CMPHandle window);
-  #endif
-  /**
-   * @brief Show a window.
-   * @param ws Window system instance.
-   * @param window Window handle to show.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Show a window.
+ * @param ws Window system instance.
+ * @param window Window handle to show.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int show_window(void *ws, CMPHandle window);
-  #else
+#else
   int(CMP_CALL *show_window)(void *ws, CMPHandle window);
-  #endif
-  /**
-   * @brief Hide a window.
-   * @param ws Window system instance.
-   * @param window Window handle to hide.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Hide a window.
+ * @param ws Window system instance.
+ * @param window Window handle to hide.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int hide_window(void *ws, CMPHandle window);
-  #else
+#else
   int(CMP_CALL *hide_window)(void *ws, CMPHandle window);
-  #endif
-  /**
-   * @brief Set the window title.
-   * @param ws Window system instance.
-   * @param window Window handle to update.
-   * @param utf8_title New window title in UTF-8.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Set the window title.
+ * @param ws Window system instance.
+ * @param window Window handle to update.
+ * @param utf8_title New window title in UTF-8.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int set_window_title(void *ws, CMPHandle window, const char *utf8_title);
-  #else
+#else
   int(CMP_CALL *set_window_title)(void *ws, CMPHandle window,
                                   const char *utf8_title);
-  #endif
-  /**
-   * @brief Set the window size.
-   * @param ws Window system instance.
-   * @param window Window handle to update.
-   * @param width New width in pixels.
-   * @param height New height in pixels.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
-  int set_window_size(void *ws, CMPHandle window, cmp_i32 width, cmp_i32 height);
-  #else
+#endif
+/**
+ * @brief Set the window size.
+ * @param ws Window system instance.
+ * @param window Window handle to update.
+ * @param width New width in pixels.
+ * @param height New height in pixels.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
+  int set_window_size(void *ws, CMPHandle window, cmp_i32 width,
+                      cmp_i32 height);
+#else
   int(CMP_CALL *set_window_size)(void *ws, CMPHandle window, cmp_i32 width,
                                  cmp_i32 height);
-  #endif
-  /**
-   * @brief Get the window size.
-   * @param ws Window system instance.
-   * @param window Window handle to query.
-   * @param out_width Receives the width in pixels.
-   * @param out_height Receives the height in pixels.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Get the window size.
+ * @param ws Window system instance.
+ * @param window Window handle to query.
+ * @param out_width Receives the width in pixels.
+ * @param out_height Receives the height in pixels.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int get_window_size(void *ws, CMPHandle window, cmp_i32 *out_width,
                       cmp_i32 *out_height);
-  #else
-  int(CMP_CALL *get_window_size)(void *ws, CMPHandle window,
-                                 cmp_i32 *out_width, cmp_i32 *out_height);
-  #endif
-  /**
-   * @brief Set the window DPI scale.
-   * @param ws Window system instance.
-   * @param window Window handle to update.
-   * @param scale DPI scale factor.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#else
+  int(CMP_CALL *get_window_size)(void *ws, CMPHandle window, cmp_i32 *out_width,
+                                 cmp_i32 *out_height);
+#endif
+/**
+ * @brief Set the window DPI scale.
+ * @param ws Window system instance.
+ * @param window Window handle to update.
+ * @param scale DPI scale factor.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int set_window_dpi_scale(void *ws, CMPHandle window, CMPScalar scale);
-  #else
+#else
   int(CMP_CALL *set_window_dpi_scale)(void *ws, CMPHandle window,
                                       CMPScalar scale);
-  #endif
-  /**
-   * @brief Get the window DPI scale.
-   * @param ws Window system instance.
-   * @param window Window handle to query.
-   * @param out_scale Receives the DPI scale factor.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Get the window DPI scale.
+ * @param ws Window system instance.
+ * @param window Window handle to query.
+ * @param out_scale Receives the DPI scale factor.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int get_window_dpi_scale(void *ws, CMPHandle window, CMPScalar *out_scale);
-  #else
+#else
   int(CMP_CALL *get_window_dpi_scale)(void *ws, CMPHandle window,
                                       CMPScalar *out_scale);
-  #endif
-  /**
-   * @brief Set the clipboard text.
-   * @param ws Window system instance.
-   * @param utf8_text Text to place on the clipboard.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Set the clipboard text.
+ * @param ws Window system instance.
+ * @param utf8_text Text to place on the clipboard.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int set_clipboard_text(void *ws, const char *utf8_text);
-  #else
+#else
   int(CMP_CALL *set_clipboard_text)(void *ws, const char *utf8_text);
-  #endif
-  /**
-   * @brief Get the clipboard text.
-   * @param ws Window system instance.
-   * @param buffer Output buffer for UTF-8 text.
-   * @param buffer_size Size of the output buffer in bytes.
-   * @param out_length Receives the number of bytes written.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Get the clipboard text.
+ * @param ws Window system instance.
+ * @param buffer Output buffer for UTF-8 text.
+ * @param buffer_size Size of the output buffer in bytes.
+ * @param out_length Receives the number of bytes written.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int get_clipboard_text(void *ws, char *buffer, cmp_usize buffer_size,
                          cmp_usize *out_length);
-  #else
+#else
   int(CMP_CALL *get_clipboard_text)(void *ws, char *buffer,
                                     cmp_usize buffer_size,
                                     cmp_usize *out_length);
-  #endif
-  /**
-   * @brief Poll for a single input event.
-   * @param ws Window system instance.
-   * @param out_event Receives the next event.
-   * @param out_has_event Receives CMP_TRUE if an event was returned.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Poll for a single input event.
+ * @param ws Window system instance.
+ * @param out_event Receives the next event.
+ * @param out_has_event Receives CMP_TRUE if an event was returned.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int poll_event(void *ws, CMPInputEvent *out_event, CMPBool *out_has_event);
-  #else
+#else
   int(CMP_CALL *poll_event)(void *ws, CMPInputEvent *out_event,
                             CMPBool *out_has_event);
-  #endif
-  /**
-   * @brief Pump pending events without returning them.
-   * @param ws Window system instance.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Pump pending events without returning them.
+ * @param ws Window system instance.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int pump_events(void *ws);
-  #else
+#else
   int(CMP_CALL *pump_events)(void *ws);
-  #endif
-  /**
-   * @brief Get the current time in milliseconds.
-   * @param ws Window system instance.
-   * @param out_time_ms Receives the time in milliseconds.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Get the current time in milliseconds.
+ * @param ws Window system instance.
+ * @param out_time_ms Receives the time in milliseconds.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int get_time_ms(void *ws, cmp_u32 *out_time_ms);
-  #else
+#else
   int(CMP_CALL *get_time_ms)(void *ws, cmp_u32 *out_time_ms);
-  #endif
+#endif
 } CMPWSVTable;
 
 /**
  * @brief Window system interface.
  */
 typedef struct CMPWS {
-  void *ctx;                /**< Backend context pointer. */
+  void *ctx;                 /**< Backend context pointer. */
   const CMPWSVTable *vtable; /**< Window system virtual table. */
 } CMPWS;
 

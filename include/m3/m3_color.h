@@ -67,8 +67,8 @@ typedef struct M3Scheme {
  * @param out_argb Receives the packed ARGB color.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_color_argb_from_rgba(cmp_u8 r, cmp_u8 g, cmp_u8 b, cmp_u8 a,
-                                           cmp_u32 *out_argb);
+CMP_API int CMP_CALL m3_color_argb_from_rgba(cmp_u8 r, cmp_u8 g, cmp_u8 b,
+                                             cmp_u8 a, cmp_u32 *out_argb);
 
 /**
  * @brief Decompose an ARGB color into RGBA components.
@@ -80,8 +80,8 @@ CMP_API int CMP_CALL m3_color_argb_from_rgba(cmp_u8 r, cmp_u8 g, cmp_u8 b, cmp_u
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_color_rgba_from_argb(cmp_u32 argb, cmp_u8 *out_r,
-                                           cmp_u8 *out_g, cmp_u8 *out_b,
-                                           cmp_u8 *out_a);
+                                             cmp_u8 *out_g, cmp_u8 *out_b,
+                                             cmp_u8 *out_a);
 
 /**
  * @brief Convert an ARGB color to HCT.
@@ -106,8 +106,8 @@ CMP_API int CMP_CALL m3_hct_to_argb(const M3ColorHct *hct, cmp_u32 *out_argb);
  * @param chroma Palette chroma (>= 0).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_tonal_palette_init(M3TonalPalette *palette, CMPScalar hue,
-                                         CMPScalar chroma);
+CMP_API int CMP_CALL m3_tonal_palette_init(M3TonalPalette *palette,
+                                           CMPScalar hue, CMPScalar chroma);
 
 /**
  * @brief Retrieve an ARGB color from a palette at a tone.
@@ -117,7 +117,8 @@ CMP_API int CMP_CALL m3_tonal_palette_init(M3TonalPalette *palette, CMPScalar hu
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_tonal_palette_tone_argb(const M3TonalPalette *palette,
-                                              CMPScalar tone, cmp_u32 *out_argb);
+                                                CMPScalar tone,
+                                                cmp_u32 *out_argb);
 
 /**
  * @brief Generate a dynamic color scheme from a source color.
@@ -127,7 +128,7 @@ CMP_API int CMP_CALL m3_tonal_palette_tone_argb(const M3TonalPalette *palette,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_scheme_generate(cmp_u32 source_argb, CMPBool dark,
-                                      M3Scheme *out_scheme);
+                                        M3Scheme *out_scheme);
 
 #ifdef CMP_TESTING
 /**
@@ -196,7 +197,8 @@ CMP_API int CMP_CALL m3_color_test_reset_failures(void);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_color_test_argb_to_xyz(cmp_u32 argb, CMPScalar *out_x,
-                                             CMPScalar *out_y, CMPScalar *out_z);
+                                               CMPScalar *out_y,
+                                               CMPScalar *out_z);
 
 /**
  * @brief Test wrapper for XYZ-to-ARGB conversion.
@@ -207,9 +209,9 @@ CMP_API int CMP_CALL m3_color_test_argb_to_xyz(cmp_u32 argb, CMPScalar *out_x,
  * @param out_in_gamut Receives CMP_TRUE if in gamut.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_color_test_xyz_to_argb(CMPScalar x, CMPScalar y, CMPScalar z,
-                                             cmp_u32 *out_argb,
-                                             CMPBool *out_in_gamut);
+CMP_API int CMP_CALL m3_color_test_xyz_to_argb(CMPScalar x, CMPScalar y,
+                                               CMPScalar z, cmp_u32 *out_argb,
+                                               CMPBool *out_in_gamut);
 
 /**
  * @brief Test wrapper for XYZ-to-Lab conversion.
@@ -221,9 +223,10 @@ CMP_API int CMP_CALL m3_color_test_xyz_to_argb(CMPScalar x, CMPScalar y, CMPScal
  * @param out_b Receives b.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_color_test_xyz_to_lab(CMPScalar x, CMPScalar y, CMPScalar z,
-                                            CMPScalar *out_l, CMPScalar *out_a,
-                                            CMPScalar *out_b);
+CMP_API int CMP_CALL m3_color_test_xyz_to_lab(CMPScalar x, CMPScalar y,
+                                              CMPScalar z, CMPScalar *out_l,
+                                              CMPScalar *out_a,
+                                              CMPScalar *out_b);
 
 /**
  * @brief Test wrapper for Lab-to-XYZ conversion.
@@ -235,9 +238,10 @@ CMP_API int CMP_CALL m3_color_test_xyz_to_lab(CMPScalar x, CMPScalar y, CMPScala
  * @param out_z Receives Z.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_color_test_lab_to_xyz(CMPScalar l, CMPScalar a, CMPScalar b,
-                                            CMPScalar *out_x, CMPScalar *out_y,
-                                            CMPScalar *out_z);
+CMP_API int CMP_CALL m3_color_test_lab_to_xyz(CMPScalar l, CMPScalar a,
+                                              CMPScalar b, CMPScalar *out_x,
+                                              CMPScalar *out_y,
+                                              CMPScalar *out_z);
 
 /**
  * @brief Test wrapper for LCH-to-ARGB conversion.
@@ -249,8 +253,9 @@ CMP_API int CMP_CALL m3_color_test_lab_to_xyz(CMPScalar l, CMPScalar a, CMPScala
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_color_test_lch_to_argb(CMPScalar hue, CMPScalar chroma,
-                                             CMPScalar tone, cmp_u32 *out_argb,
-                                             CMPBool *out_in_gamut);
+                                               CMPScalar tone,
+                                               cmp_u32 *out_argb,
+                                               CMPBool *out_in_gamut);
 #endif
 
 #ifdef __cplusplus

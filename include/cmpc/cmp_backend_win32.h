@@ -32,8 +32,8 @@ typedef struct CMPWin32BackendConfig {
 
 /**
  * @brief Report whether the Win32 backend is available in this build.
- * @param out_available Receives CMP_TRUE if Win32 support is available, CMP_FALSE
- * otherwise.
+ * @param out_available Receives CMP_TRUE if Win32 support is available,
+ * CMP_FALSE otherwise.
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_win32_backend_is_available(CMPBool *out_available);
@@ -43,7 +43,8 @@ CMP_API int CMP_CALL cmp_win32_backend_is_available(CMPBool *out_available);
  * @param config Config to initialize.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_win32_backend_config_init(CMPWin32BackendConfig *config);
+CMP_API int CMP_CALL
+cmp_win32_backend_config_init(CMPWin32BackendConfig *config);
 
 /**
  * @brief Create a Win32 backend instance.
@@ -51,8 +52,8 @@ CMP_API int CMP_CALL cmp_win32_backend_config_init(CMPWin32BackendConfig *config
  * @param out_backend Receives the created backend instance.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_win32_backend_create(const CMPWin32BackendConfig *config,
-                                           CMPWin32Backend **out_backend);
+CMP_API int CMP_CALL cmp_win32_backend_create(
+    const CMPWin32BackendConfig *config, CMPWin32Backend **out_backend);
 
 /**
  * @brief Destroy a Win32 backend instance.
@@ -68,7 +69,7 @@ CMP_API int CMP_CALL cmp_win32_backend_destroy(CMPWin32Backend *backend);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_win32_backend_get_ws(CMPWin32Backend *backend,
-                                           CMPWS *out_ws);
+                                              CMPWS *out_ws);
 
 /**
  * @brief Retrieve the graphics interface for the backend.
@@ -77,7 +78,7 @@ CMP_API int CMP_CALL cmp_win32_backend_get_ws(CMPWin32Backend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_win32_backend_get_gfx(CMPWin32Backend *backend,
-                                            CMPGfx *out_gfx);
+                                               CMPGfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -86,7 +87,7 @@ CMP_API int CMP_CALL cmp_win32_backend_get_gfx(CMPWin32Backend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend,
-                                            CMPEnv *out_env);
+                                               CMPEnv *out_env);
 
 #ifdef CMP_TESTING
 /**

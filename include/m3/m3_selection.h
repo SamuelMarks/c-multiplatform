@@ -48,10 +48,10 @@ typedef struct M3SelectionColors {
  * @brief Checkbox style descriptor.
  */
 typedef struct M3CheckboxStyle {
-  CMPScalar size;               /**< Checkbox size in pixels (> 0). */
-  CMPScalar corner_radius;      /**< Corner radius in pixels (>= 0). */
-  CMPScalar border_width;       /**< Border width in pixels (>= 0). */
-  CMPScalar check_thickness;    /**< Check mark thickness in pixels (> 0). */
+  CMPScalar size;              /**< Checkbox size in pixels (> 0). */
+  CMPScalar corner_radius;     /**< Corner radius in pixels (>= 0). */
+  CMPScalar border_width;      /**< Border width in pixels (>= 0). */
+  CMPScalar check_thickness;   /**< Check mark thickness in pixels (> 0). */
   M3SelectionColors unchecked; /**< Colors when unchecked. */
   M3SelectionColors checked;   /**< Colors when checked. */
   M3SelectionColors
@@ -68,22 +68,23 @@ struct M3Checkbox;
  * @param checked CMP_TRUE when checked.
  * @return CMP_OK on success or a failure code.
  */
-typedef int(CMP_CALL *CMPCheckboxOnChange)(void *ctx, struct M3Checkbox *checkbox,
-                                         CMPBool checked);
+typedef int(CMP_CALL *CMPCheckboxOnChange)(void *ctx,
+                                           struct M3Checkbox *checkbox,
+                                           CMPBool checked);
 
 /**
  * @brief Checkbox widget instance.
  */
 typedef struct M3Checkbox {
-  CMPWidget widget;        /**< Widget interface (points to this instance). */
+  CMPWidget widget;       /**< Widget interface (points to this instance). */
   M3CheckboxStyle style;  /**< Current checkbox style. */
-  CMPRect bounds;          /**< Layout bounds. */
+  CMPRect bounds;         /**< Layout bounds. */
   const char *utf8_label; /**< UTF-8 label for semantics (optional). */
-  cmp_usize utf8_len;      /**< UTF-8 label length in bytes. */
-  CMPBool checked;         /**< CMP_TRUE when checked. */
-  CMPBool pressed;         /**< CMP_TRUE when pressed. */
+  cmp_usize utf8_len;     /**< UTF-8 label length in bytes. */
+  CMPBool checked;        /**< CMP_TRUE when checked. */
+  CMPBool pressed;        /**< CMP_TRUE when pressed. */
   CMPCheckboxOnChange on_change; /**< Change callback (may be NULL). */
-  void *on_change_ctx;          /**< Change callback context pointer. */
+  void *on_change_ctx;           /**< Change callback context pointer. */
 } M3Checkbox;
 
 /**
@@ -101,8 +102,8 @@ CMP_API int CMP_CALL m3_checkbox_style_init(M3CheckboxStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_checkbox_init(M3Checkbox *checkbox,
-                                    const M3CheckboxStyle *style,
-                                    CMPBool checked);
+                                      const M3CheckboxStyle *style,
+                                      CMPBool checked);
 
 /**
  * @brief Update the checkbox checked state.
@@ -111,7 +112,7 @@ CMP_API int CMP_CALL m3_checkbox_init(M3Checkbox *checkbox,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_checkbox_set_checked(M3Checkbox *checkbox,
-                                           CMPBool checked);
+                                             CMPBool checked);
 
 /**
  * @brief Retrieve the checkbox checked state.
@@ -120,7 +121,7 @@ CMP_API int CMP_CALL m3_checkbox_set_checked(M3Checkbox *checkbox,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_checkbox_get_checked(const M3Checkbox *checkbox,
-                                           CMPBool *out_checked);
+                                             CMPBool *out_checked);
 
 /**
  * @brief Update the checkbox style.
@@ -129,7 +130,7 @@ CMP_API int CMP_CALL m3_checkbox_get_checked(const M3Checkbox *checkbox,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_checkbox_set_style(M3Checkbox *checkbox,
-                                         const M3CheckboxStyle *style);
+                                           const M3CheckboxStyle *style);
 
 /**
  * @brief Update the checkbox semantics label.
@@ -139,8 +140,8 @@ CMP_API int CMP_CALL m3_checkbox_set_style(M3Checkbox *checkbox,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_checkbox_set_label(M3Checkbox *checkbox,
-                                         const char *utf8_label,
-                                         cmp_usize utf8_len);
+                                           const char *utf8_label,
+                                           cmp_usize utf8_len);
 
 /**
  * @brief Assign a checkbox change callback.
@@ -150,8 +151,8 @@ CMP_API int CMP_CALL m3_checkbox_set_label(M3Checkbox *checkbox,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_checkbox_set_on_change(M3Checkbox *checkbox,
-                                             CMPCheckboxOnChange on_change,
-                                             void *ctx);
+                                               CMPCheckboxOnChange on_change,
+                                               void *ctx);
 
 /**
  * @brief Switch track/thumb colors.
@@ -165,9 +166,9 @@ typedef struct M3SwitchColors {
  * @brief Switch style descriptor.
  */
 typedef struct M3SwitchStyle {
-  CMPScalar track_width;        /**< Track width in pixels (> 0). */
-  CMPScalar track_height;       /**< Track height in pixels (> 0). */
-  CMPScalar thumb_inset;        /**< Thumb inset in pixels (>= 0). */
+  CMPScalar track_width;       /**< Track width in pixels (> 0). */
+  CMPScalar track_height;      /**< Track height in pixels (> 0). */
+  CMPScalar thumb_inset;       /**< Thumb inset in pixels (>= 0). */
   M3SwitchColors off;          /**< Colors when off. */
   M3SwitchColors on;           /**< Colors when on. */
   M3SwitchColors disabled_off; /**< Colors when off and disabled. */
@@ -184,21 +185,21 @@ struct M3Switch;
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPSwitchOnChange)(void *ctx, struct M3Switch *widget,
-                                       CMPBool on);
+                                         CMPBool on);
 
 /**
  * @brief Switch widget instance.
  */
 typedef struct M3Switch {
-  CMPWidget widget;        /**< Widget interface (points to this instance). */
+  CMPWidget widget;       /**< Widget interface (points to this instance). */
   M3SwitchStyle style;    /**< Current switch style. */
-  CMPRect bounds;          /**< Layout bounds. */
+  CMPRect bounds;         /**< Layout bounds. */
   const char *utf8_label; /**< UTF-8 label for semantics (optional). */
-  cmp_usize utf8_len;      /**< UTF-8 label length in bytes. */
-  CMPBool on;              /**< CMP_TRUE when on. */
-  CMPBool pressed;         /**< CMP_TRUE when pressed. */
+  cmp_usize utf8_len;     /**< UTF-8 label length in bytes. */
+  CMPBool on;             /**< CMP_TRUE when on. */
+  CMPBool pressed;        /**< CMP_TRUE when pressed. */
   CMPSwitchOnChange on_change; /**< Change callback (may be NULL). */
-  void *on_change_ctx;        /**< Change callback context pointer. */
+  void *on_change_ctx;         /**< Change callback context pointer. */
 } M3Switch;
 
 /**
@@ -215,8 +216,8 @@ CMP_API int CMP_CALL m3_switch_style_init(M3SwitchStyle *style);
  * @param on Initial on state.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_switch_init(M3Switch *widget, const M3SwitchStyle *style,
-                                  CMPBool on);
+CMP_API int CMP_CALL m3_switch_init(M3Switch *widget,
+                                    const M3SwitchStyle *style, CMPBool on);
 
 /**
  * @brief Update the switch on state.
@@ -241,7 +242,7 @@ CMP_API int CMP_CALL m3_switch_get_on(const M3Switch *widget, CMPBool *out_on);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_switch_set_style(M3Switch *widget,
-                                       const M3SwitchStyle *style);
+                                         const M3SwitchStyle *style);
 
 /**
  * @brief Update the switch semantics label.
@@ -250,8 +251,9 @@ CMP_API int CMP_CALL m3_switch_set_style(M3Switch *widget,
  * @param utf8_len Label length in bytes.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_switch_set_label(M3Switch *widget, const char *utf8_label,
-                                       cmp_usize utf8_len);
+CMP_API int CMP_CALL m3_switch_set_label(M3Switch *widget,
+                                         const char *utf8_label,
+                                         cmp_usize utf8_len);
 
 /**
  * @brief Assign a switch change callback.
@@ -261,16 +263,16 @@ CMP_API int CMP_CALL m3_switch_set_label(M3Switch *widget, const char *utf8_labe
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_switch_set_on_change(M3Switch *widget,
-                                           CMPSwitchOnChange on_change,
-                                           void *ctx);
+                                             CMPSwitchOnChange on_change,
+                                             void *ctx);
 
 /**
  * @brief Radio button style descriptor.
  */
 typedef struct M3RadioStyle {
-  CMPScalar size;               /**< Radio size in pixels (> 0). */
-  CMPScalar border_width;       /**< Border width in pixels (>= 0). */
-  CMPScalar dot_radius;         /**< Inner dot radius in pixels (>= 0). */
+  CMPScalar size;              /**< Radio size in pixels (> 0). */
+  CMPScalar border_width;      /**< Border width in pixels (>= 0). */
+  CMPScalar dot_radius;        /**< Inner dot radius in pixels (>= 0). */
   M3SelectionColors unchecked; /**< Colors when unchecked. */
   M3SelectionColors checked;   /**< Colors when checked. */
   M3SelectionColors
@@ -288,21 +290,21 @@ struct M3Radio;
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPRadioOnChange)(void *ctx, struct M3Radio *radio,
-                                      CMPBool selected);
+                                        CMPBool selected);
 
 /**
  * @brief Radio widget instance.
  */
 typedef struct M3Radio {
-  CMPWidget widget;           /**< Widget interface (points to this instance). */
-  M3RadioStyle style;        /**< Current radio style. */
-  CMPRect bounds;             /**< Layout bounds. */
-  const char *utf8_label;    /**< UTF-8 label for semantics (optional). */
-  cmp_usize utf8_len;         /**< UTF-8 label length in bytes. */
-  CMPBool selected;           /**< CMP_TRUE when selected. */
-  CMPBool pressed;            /**< CMP_TRUE when pressed. */
+  CMPWidget widget;       /**< Widget interface (points to this instance). */
+  M3RadioStyle style;     /**< Current radio style. */
+  CMPRect bounds;         /**< Layout bounds. */
+  const char *utf8_label; /**< UTF-8 label for semantics (optional). */
+  cmp_usize utf8_len;     /**< UTF-8 label length in bytes. */
+  CMPBool selected;       /**< CMP_TRUE when selected. */
+  CMPBool pressed;        /**< CMP_TRUE when pressed. */
   CMPRadioOnChange on_change; /**< Change callback (may be NULL). */
-  void *on_change_ctx;       /**< Change callback context pointer. */
+  void *on_change_ctx;        /**< Change callback context pointer. */
 } M3Radio;
 
 /**
@@ -320,7 +322,7 @@ CMP_API int CMP_CALL m3_radio_style_init(M3RadioStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_radio_init(M3Radio *radio, const M3RadioStyle *style,
-                                 CMPBool selected);
+                                   CMPBool selected);
 
 /**
  * @brief Update the radio selected state.
@@ -337,7 +339,7 @@ CMP_API int CMP_CALL m3_radio_set_selected(M3Radio *radio, CMPBool selected);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_radio_get_selected(const M3Radio *radio,
-                                         CMPBool *out_selected);
+                                           CMPBool *out_selected);
 
 /**
  * @brief Update the radio style.
@@ -346,7 +348,7 @@ CMP_API int CMP_CALL m3_radio_get_selected(const M3Radio *radio,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_radio_set_style(M3Radio *radio,
-                                      const M3RadioStyle *style);
+                                        const M3RadioStyle *style);
 
 /**
  * @brief Update the radio semantics label.
@@ -356,7 +358,7 @@ CMP_API int CMP_CALL m3_radio_set_style(M3Radio *radio,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_radio_set_label(M3Radio *radio, const char *utf8_label,
-                                      cmp_usize utf8_len);
+                                        cmp_usize utf8_len);
 
 /**
  * @brief Assign a radio change callback.
@@ -366,7 +368,8 @@ CMP_API int CMP_CALL m3_radio_set_label(M3Radio *radio, const char *utf8_label,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_radio_set_on_change(M3Radio *radio,
-                                          CMPRadioOnChange on_change, void *ctx);
+                                            CMPRadioOnChange on_change,
+                                            void *ctx);
 
 #ifdef CMP_TESTING
 /**

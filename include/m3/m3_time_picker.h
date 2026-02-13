@@ -89,23 +89,23 @@ struct M3TimePicker;
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPTimePickerOnChange)(void *ctx,
-                                           struct M3TimePicker *picker,
-                                           const CMPTime *time);
+                                             struct M3TimePicker *picker,
+                                             const CMPTime *time);
 
 /**
  * @brief Time picker widget instance.
  */
 typedef struct M3TimePicker {
-  CMPWidget widget;         /**< Widget interface (points to this instance). */
+  CMPWidget widget;        /**< Widget interface (points to this instance). */
   M3TimePickerStyle style; /**< Current style. */
-  CMPRect bounds;           /**< Layout bounds. */
-  M3TimePickerMetrics metrics;    /**< Cached dial metrics. */
-  cmp_u32 format;                  /**< Time format (CMP_TIME_PICKER_FORMAT_*). */
-  cmp_u32 active_field;            /**< Active field (CMP_TIME_PICKER_FIELD_*). */
-  CMPTime time;                    /**< Current time selection. */
-  CMPBool pressed;                 /**< CMP_TRUE when pointer is pressed. */
+  CMPRect bounds;          /**< Layout bounds. */
+  M3TimePickerMetrics metrics; /**< Cached dial metrics. */
+  cmp_u32 format;              /**< Time format (CMP_TIME_PICKER_FORMAT_*). */
+  cmp_u32 active_field;        /**< Active field (CMP_TIME_PICKER_FIELD_*). */
+  CMPTime time;                /**< Current time selection. */
+  CMPBool pressed;             /**< CMP_TRUE when pointer is pressed. */
   CMPTimePickerOnChange on_change; /**< Change callback (may be NULL). */
-  void *on_change_ctx;            /**< Change callback context pointer. */
+  void *on_change_ctx;             /**< Change callback context pointer. */
 } M3TimePicker;
 
 /**
@@ -125,9 +125,9 @@ CMP_API int CMP_CALL m3_time_picker_style_init(M3TimePickerStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_init(M3TimePicker *picker,
-                                       const M3TimePickerStyle *style,
-                                       cmp_u32 hour, cmp_u32 minute,
-                                       cmp_u32 format);
+                                         const M3TimePickerStyle *style,
+                                         cmp_u32 hour, cmp_u32 minute,
+                                         cmp_u32 format);
 
 /**
  * @brief Update the time picker style.
@@ -136,7 +136,7 @@ CMP_API int CMP_CALL m3_time_picker_init(M3TimePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_set_style(M3TimePicker *picker,
-                                            const M3TimePickerStyle *style);
+                                              const M3TimePickerStyle *style);
 
 /**
  * @brief Update the time format.
@@ -145,7 +145,7 @@ CMP_API int CMP_CALL m3_time_picker_set_style(M3TimePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_set_format(M3TimePicker *picker,
-                                             cmp_u32 format);
+                                               cmp_u32 format);
 
 /**
  * @brief Retrieve the time format.
@@ -154,7 +154,7 @@ CMP_API int CMP_CALL m3_time_picker_set_format(M3TimePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_get_format(const M3TimePicker *picker,
-                                             cmp_u32 *out_format);
+                                               cmp_u32 *out_format);
 
 /**
  * @brief Update the active field.
@@ -163,7 +163,7 @@ CMP_API int CMP_CALL m3_time_picker_get_format(const M3TimePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_set_active_field(M3TimePicker *picker,
-                                                   cmp_u32 field);
+                                                     cmp_u32 field);
 
 /**
  * @brief Retrieve the active field.
@@ -172,7 +172,7 @@ CMP_API int CMP_CALL m3_time_picker_set_active_field(M3TimePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_get_active_field(const M3TimePicker *picker,
-                                                   cmp_u32 *out_field);
+                                                     cmp_u32 *out_field);
 
 /**
  * @brief Update the selected time.
@@ -181,7 +181,7 @@ CMP_API int CMP_CALL m3_time_picker_get_active_field(const M3TimePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_set_time(M3TimePicker *picker,
-                                           const CMPTime *time);
+                                             const CMPTime *time);
 
 /**
  * @brief Retrieve the selected time.
@@ -190,7 +190,7 @@ CMP_API int CMP_CALL m3_time_picker_set_time(M3TimePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_get_time(const M3TimePicker *picker,
-                                           CMPTime *out_time);
+                                             CMPTime *out_time);
 
 /**
  * @brief Update the AM/PM period (12-hour format only).
@@ -199,7 +199,7 @@ CMP_API int CMP_CALL m3_time_picker_get_time(const M3TimePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_set_period(M3TimePicker *picker,
-                                             cmp_u32 period);
+                                               cmp_u32 period);
 
 /**
  * @brief Retrieve the AM/PM period.
@@ -208,7 +208,7 @@ CMP_API int CMP_CALL m3_time_picker_set_period(M3TimePicker *picker,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_get_period(const M3TimePicker *picker,
-                                             cmp_u32 *out_period);
+                                               cmp_u32 *out_period);
 
 /**
  * @brief Assign a change callback.
@@ -217,9 +217,8 @@ CMP_API int CMP_CALL m3_time_picker_get_period(const M3TimePicker *picker,
  * @param ctx Callback context pointer.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_time_picker_set_on_change(M3TimePicker *picker,
-                                                CMPTimePickerOnChange on_change,
-                                                void *ctx);
+CMP_API int CMP_CALL m3_time_picker_set_on_change(
+    M3TimePicker *picker, CMPTimePickerOnChange on_change, void *ctx);
 
 /**
  * @brief Recompute cached dial metrics.
@@ -234,7 +233,8 @@ CMP_API int CMP_CALL m3_time_picker_update(M3TimePicker *picker);
  * @param enable CMP_TRUE to force the next dial computation to zero out.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_time_picker_test_set_force_dial_size_zero(CMPBool enable);
+CMP_API int CMP_CALL
+m3_time_picker_test_set_force_dial_size_zero(CMPBool enable);
 /**
  * @brief Test hook to force angle-from-point failure.
  * @param enable CMP_TRUE to force the next angle computation to fail.
@@ -330,10 +330,8 @@ CMP_API int CMP_CALL m3_time_picker_test_validate_time(const CMPTime *time);
  * @param out_angle Receives the angle in radians.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_time_picker_test_angle_from_point(CMPScalar cx,
-                                                        CMPScalar cy, CMPScalar x,
-                                                        CMPScalar y,
-                                                        CMPScalar *out_angle);
+CMP_API int CMP_CALL m3_time_picker_test_angle_from_point(
+    CMPScalar cx, CMPScalar cy, CMPScalar x, CMPScalar y, CMPScalar *out_angle);
 /**
  * @brief Test hook for mapping an angle to a dial index.
  * @param angle Angle in radians.
@@ -342,8 +340,8 @@ CMP_API int CMP_CALL m3_time_picker_test_angle_from_point(CMPScalar cx,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_test_angle_to_index(CMPScalar angle,
-                                                      cmp_u32 count,
-                                                      cmp_u32 *out_index);
+                                                        cmp_u32 count,
+                                                        cmp_u32 *out_index);
 /**
  * @brief Test hook for mapping a dial index to an hour.
  * @param index Dial index (0..11).
@@ -354,10 +352,10 @@ CMP_API int CMP_CALL m3_time_picker_test_angle_to_index(CMPScalar angle,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_test_hour_from_index(cmp_u32 index,
-                                                       cmp_u32 format,
-                                                       CMPBool inner_ring,
-                                                       cmp_u32 current_hour,
-                                                       cmp_u32 *out_hour);
+                                                         cmp_u32 format,
+                                                         CMPBool inner_ring,
+                                                         cmp_u32 current_hour,
+                                                         cmp_u32 *out_hour);
 /**
  * @brief Test hook for mapping an hour to a dial index.
  * @param hour Hour to map (0..23).
@@ -366,9 +364,10 @@ CMP_API int CMP_CALL m3_time_picker_test_hour_from_index(cmp_u32 index,
  * @param out_inner Receives CMP_TRUE when the inner ring is used.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_time_picker_test_hour_to_index(cmp_u32 hour, cmp_u32 format,
-                                                     cmp_u32 *out_index,
-                                                     CMPBool *out_inner);
+CMP_API int CMP_CALL m3_time_picker_test_hour_to_index(cmp_u32 hour,
+                                                       cmp_u32 format,
+                                                       cmp_u32 *out_index,
+                                                       CMPBool *out_inner);
 /**
  * @brief Test hook for computing dial metrics.
  * @param picker Time picker instance.
@@ -388,9 +387,10 @@ CMP_API int CMP_CALL m3_time_picker_test_compute_metrics(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_test_pick_time(const M3TimePicker *picker,
-                                                 CMPScalar x, CMPScalar y,
-                                                 cmp_u32 field, CMPTime *out_time,
-                                                 CMPBool *out_valid);
+                                                   CMPScalar x, CMPScalar y,
+                                                   cmp_u32 field,
+                                                   CMPTime *out_time,
+                                                   CMPBool *out_valid);
 /**
  * @brief Test hook for resolving dial colors.
  * @param picker Time picker instance.
@@ -424,8 +424,9 @@ CMP_API int CMP_CALL m3_time_picker_test_compute_hand(
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_time_picker_test_draw_circle(CMPGfx *gfx, CMPScalar cx,
-                                                   CMPScalar cy, CMPScalar radius,
-                                                   CMPColor color);
+                                                     CMPScalar cy,
+                                                     CMPScalar radius,
+                                                     CMPColor color);
 /**
  * @brief Test hook for drawing a dial ring.
  * @param gfx Graphics backend instance.
@@ -437,11 +438,9 @@ CMP_API int CMP_CALL m3_time_picker_test_draw_circle(CMPGfx *gfx, CMPScalar cx,
  * @param fill_color Inner fill color.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_time_picker_test_draw_ring(CMPGfx *gfx, CMPScalar cx,
-                                                 CMPScalar cy, CMPScalar radius,
-                                                 CMPScalar thickness,
-                                                 CMPColor ring_color,
-                                                 CMPColor fill_color);
+CMP_API int CMP_CALL m3_time_picker_test_draw_ring(
+    CMPGfx *gfx, CMPScalar cx, CMPScalar cy, CMPScalar radius,
+    CMPScalar thickness, CMPColor ring_color, CMPColor fill_color);
 /**
  * @brief Test hook for updating cached metrics.
  * @param picker Time picker instance.

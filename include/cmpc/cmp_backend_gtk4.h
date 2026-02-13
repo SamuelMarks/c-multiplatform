@@ -54,7 +54,7 @@ CMP_API int CMP_CALL cmp_gtk4_backend_config_init(CMPGTK4BackendConfig *config);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_gtk4_backend_create(const CMPGTK4BackendConfig *config,
-                                          CMPGTK4Backend **out_backend);
+                                             CMPGTK4Backend **out_backend);
 
 /**
  * @brief Destroy a GTK4 backend instance.
@@ -69,7 +69,8 @@ CMP_API int CMP_CALL cmp_gtk4_backend_destroy(CMPGTK4Backend *backend);
  * @param out_ws Receives the window system interface.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_gtk4_backend_get_ws(CMPGTK4Backend *backend, CMPWS *out_ws);
+CMP_API int CMP_CALL cmp_gtk4_backend_get_ws(CMPGTK4Backend *backend,
+                                             CMPWS *out_ws);
 
 /**
  * @brief Retrieve the graphics interface for the backend.
@@ -78,7 +79,7 @@ CMP_API int CMP_CALL cmp_gtk4_backend_get_ws(CMPGTK4Backend *backend, CMPWS *out
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_gtk4_backend_get_gfx(CMPGTK4Backend *backend,
-                                           CMPGfx *out_gfx);
+                                              CMPGfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -87,7 +88,7 @@ CMP_API int CMP_CALL cmp_gtk4_backend_get_gfx(CMPGTK4Backend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *backend,
-                                           CMPEnv *out_env);
+                                              CMPEnv *out_env);
 
 #ifdef CMP_TESTING
 /**

@@ -54,7 +54,7 @@ CMP_API int CMP_CALL cmp_web_backend_config_init(CMPWebBackendConfig *config);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_web_backend_create(const CMPWebBackendConfig *config,
-                                         CMPWebBackend **out_backend);
+                                            CMPWebBackend **out_backend);
 
 /**
  * @brief Destroy a web backend instance.
@@ -69,7 +69,8 @@ CMP_API int CMP_CALL cmp_web_backend_destroy(CMPWebBackend *backend);
  * @param out_ws Receives the window system interface.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_web_backend_get_ws(CMPWebBackend *backend, CMPWS *out_ws);
+CMP_API int CMP_CALL cmp_web_backend_get_ws(CMPWebBackend *backend,
+                                            CMPWS *out_ws);
 
 /**
  * @brief Retrieve the graphics interface for the backend.
@@ -78,7 +79,7 @@ CMP_API int CMP_CALL cmp_web_backend_get_ws(CMPWebBackend *backend, CMPWS *out_w
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_web_backend_get_gfx(CMPWebBackend *backend,
-                                          CMPGfx *out_gfx);
+                                             CMPGfx *out_gfx);
 
 /**
  * @brief Retrieve the environment interface for the backend.
@@ -87,7 +88,7 @@ CMP_API int CMP_CALL cmp_web_backend_get_gfx(CMPWebBackend *backend,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_web_backend_get_env(CMPWebBackend *backend,
-                                          CMPEnv *out_env);
+                                             CMPEnv *out_env);
 
 #ifdef CMP_TESTING
 /**

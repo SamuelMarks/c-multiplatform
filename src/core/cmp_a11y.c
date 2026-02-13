@@ -28,8 +28,8 @@ static int cmp_a11y_clear_semantics(CMPSemantics *semantics) {
 }
 
 static int cmp_a11y_find_child_index(const CMPA11yNode *parent,
-                                    const CMPA11yNode *child,
-                                    cmp_usize *out_index) {
+                                     const CMPA11yNode *child,
+                                     cmp_usize *out_index) {
   cmp_usize i;
 
   if (parent->child_count > 0 && parent->children == NULL) {
@@ -54,7 +54,7 @@ int CMP_CALL cmp_a11y_semantics_init(CMPSemantics *semantics) {
 }
 
 int CMP_CALL cmp_a11y_node_init(CMPA11yNode *node, CMPWidget *widget,
-                              const CMPSemantics *semantics) {
+                                const CMPSemantics *semantics) {
   int rc;
 
   if (node == NULL) {
@@ -78,7 +78,7 @@ int CMP_CALL cmp_a11y_node_init(CMPA11yNode *node, CMPWidget *widget,
 }
 
 int CMP_CALL cmp_a11y_node_set_semantics(CMPA11yNode *node,
-                                       const CMPSemantics *semantics) {
+                                         const CMPSemantics *semantics) {
   int rc;
 
   if (node == NULL) {
@@ -106,8 +106,9 @@ int CMP_CALL cmp_a11y_node_set_widget(CMPA11yNode *node, CMPWidget *widget) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_a11y_node_set_children(CMPA11yNode *node, CMPA11yNode **children,
-                                      cmp_usize count) {
+int CMP_CALL cmp_a11y_node_set_children(CMPA11yNode *node,
+                                        CMPA11yNode **children,
+                                        cmp_usize count) {
   cmp_usize i;
   cmp_usize j;
 
@@ -155,7 +156,7 @@ int CMP_CALL cmp_a11y_node_set_children(CMPA11yNode *node, CMPA11yNode **childre
 }
 
 int CMP_CALL cmp_a11y_node_get_parent(const CMPA11yNode *node,
-                                    CMPA11yNode **out_parent) {
+                                      CMPA11yNode **out_parent) {
   if (node == NULL || out_parent == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -165,7 +166,7 @@ int CMP_CALL cmp_a11y_node_get_parent(const CMPA11yNode *node,
 }
 
 int CMP_CALL cmp_a11y_node_get_child_count(const CMPA11yNode *node,
-                                         cmp_usize *out_count) {
+                                           cmp_usize *out_count) {
   if (node == NULL || out_count == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -178,7 +179,7 @@ int CMP_CALL cmp_a11y_node_get_child_count(const CMPA11yNode *node,
 }
 
 int CMP_CALL cmp_a11y_node_get_child(const CMPA11yNode *node, cmp_usize index,
-                                   CMPA11yNode **out_child) {
+                                     CMPA11yNode **out_child) {
   if (node == NULL || out_child == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -197,7 +198,7 @@ int CMP_CALL cmp_a11y_node_get_child(const CMPA11yNode *node, cmp_usize index,
 }
 
 int CMP_CALL cmp_a11y_node_get_next_sibling(const CMPA11yNode *node,
-                                          CMPA11yNode **out_sibling) {
+                                            CMPA11yNode **out_sibling) {
   int rc;
   cmp_usize index;
   const CMPA11yNode *parent;
@@ -233,7 +234,7 @@ int CMP_CALL cmp_a11y_node_get_next_sibling(const CMPA11yNode *node,
 }
 
 int CMP_CALL cmp_a11y_node_get_prev_sibling(const CMPA11yNode *node,
-                                          CMPA11yNode **out_sibling) {
+                                            CMPA11yNode **out_sibling) {
   int rc;
   cmp_usize index;
   const CMPA11yNode *parent;

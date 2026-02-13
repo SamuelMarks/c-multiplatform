@@ -48,7 +48,7 @@ CMP_API int CMP_CALL cmp_camera_config_init(CMPCameraSessionConfig *config);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_camera_init(CMPCameraSession *session,
-                                  const CMPCameraSessionConfig *config);
+                                     const CMPCameraSessionConfig *config);
 
 /**
  * @brief Stop streaming (if needed) and close the camera session.
@@ -79,8 +79,8 @@ CMP_API int CMP_CALL cmp_camera_stop(CMPCameraSession *session);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_camera_read_frame(CMPCameraSession *session,
-                                        CMPCameraFrame *out_frame,
-                                        CMPBool *out_has_frame);
+                                           CMPCameraFrame *out_frame,
+                                           CMPBool *out_has_frame);
 
 /**
  * @brief Copy a camera frame into a caller-provided buffer.
@@ -91,9 +91,9 @@ CMP_API int CMP_CALL cmp_camera_read_frame(CMPCameraSession *session,
  * @return CMP_OK on success, CMP_ERR_RANGE if the buffer is too small, or a
  * failure code.
  */
-CMP_API int CMP_CALL cmp_camera_copy_frame(const CMPCameraFrame *frame, void *dst,
-                                        cmp_usize dst_capacity,
-                                        cmp_usize *out_size);
+CMP_API int CMP_CALL cmp_camera_copy_frame(const CMPCameraFrame *frame,
+                                           void *dst, cmp_usize dst_capacity,
+                                           cmp_usize *out_size);
 
 #ifdef CMP_TESTING
 /**

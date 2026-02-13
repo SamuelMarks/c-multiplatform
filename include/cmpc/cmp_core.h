@@ -78,7 +78,7 @@ typedef size_t cmp_usize;
  * @def CMP_STATIC_ASSERT
  * @brief Compile-time assertion helper.
  */
-#define CMP_STATIC_ASSERT(name, expr)                                           \
+#define CMP_STATIC_ASSERT(name, expr)                                          \
   typedef char cmp_static_assert_##name[(expr) ? 1 : -1]
 
 #ifndef CMP_DOXYGEN
@@ -144,7 +144,7 @@ typedef int(CMP_CALL *CMPAllocFn)(void *ctx, cmp_usize size, void **out_ptr);
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPReallocFn)(void *ctx, void *ptr, cmp_usize size,
-                                  void **out_ptr);
+                                    void **out_ptr);
 
 /**
  * @brief Free function signature.
@@ -158,7 +158,7 @@ typedef int(CMP_CALL *CMPFreeFn)(void *ctx, void *ptr);
  * @brief Allocator interface used throughout the ABI.
  */
 typedef struct CMPAllocator {
-  void *ctx;           /**< User-defined allocator context. */
+  void *ctx;            /**< User-defined allocator context. */
   CMPAllocFn alloc;     /**< Allocation callback. */
   CMPReallocFn realloc; /**< Reallocation callback. */
   CMPFreeFn free;       /**< Free callback. */

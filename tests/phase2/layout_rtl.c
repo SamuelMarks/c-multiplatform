@@ -17,23 +17,24 @@ int main(void) {
   int rc;
 
   CMP_TEST_EXPECT(cmp_layout_direction_init(NULL, CMP_DIRECTION_LTR),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_layout_direction_init(&direction, 99),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_layout_direction_init(&direction_ltr, CMP_DIRECTION_LTR));
   CMP_TEST_OK(cmp_layout_direction_init(&direction_rtl, CMP_DIRECTION_RTL));
 
   CMP_TEST_OK(cmp_layout_measure_spec_init(&spec_exact_100,
-                                         CMP_LAYOUT_MEASURE_EXACTLY, 100.0f));
+                                           CMP_LAYOUT_MEASURE_EXACTLY, 100.0f));
   CMP_TEST_OK(cmp_layout_measure_spec_init(&spec_exact_60,
-                                         CMP_LAYOUT_MEASURE_EXACTLY, 60.0f));
+                                           CMP_LAYOUT_MEASURE_EXACTLY, 60.0f));
   CMP_TEST_OK(cmp_layout_measure_spec_init(&spec_exact_50,
-                                         CMP_LAYOUT_MEASURE_EXACTLY, 50.0f));
+                                           CMP_LAYOUT_MEASURE_EXACTLY, 50.0f));
 
   CMP_TEST_OK(cmp_layout_style_init(&style));
   CMP_TEST_OK(cmp_layout_node_init(&container, &style));
   direction.flow = 99;
-  rc = cmp_layout_compute(&container, &direction, spec_exact_100, spec_exact_50);
+  rc =
+      cmp_layout_compute(&container, &direction, spec_exact_100, spec_exact_50);
   CMP_TEST_ASSERT(rc == CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       cmp_layout_compute(&container, NULL, spec_exact_100, spec_exact_50),
@@ -57,14 +58,14 @@ int main(void) {
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 2));
 
   CMP_TEST_OK(cmp_layout_compute(&container, &direction_rtl, spec_exact_100,
-                               spec_exact_50));
+                                 spec_exact_50));
   CMP_TEST_OK(cmp_layout_node_get_layout(&child1, &rect));
   CMP_TEST_ASSERT(rect.x == 85.0f);
   CMP_TEST_OK(cmp_layout_node_get_layout(&child2, &rect));
   CMP_TEST_ASSERT(rect.x == 65.0f);
 
   CMP_TEST_OK(cmp_layout_compute(&container, &direction_ltr, spec_exact_100,
-                               spec_exact_50));
+                                 spec_exact_50));
   CMP_TEST_OK(cmp_layout_node_get_layout(&child1, &rect));
   CMP_TEST_ASSERT(rect.x == 5.0f);
   CMP_TEST_OK(cmp_layout_node_get_layout(&child2, &rect));
@@ -86,14 +87,14 @@ int main(void) {
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 2));
 
   CMP_TEST_OK(cmp_layout_compute(&container, &direction_rtl, spec_exact_100,
-                               spec_exact_50));
+                                 spec_exact_50));
   CMP_TEST_OK(cmp_layout_node_get_layout(&child1, &rect));
   CMP_TEST_ASSERT(rect.x == 20.0f);
   CMP_TEST_OK(cmp_layout_node_get_layout(&child2, &rect));
   CMP_TEST_ASSERT(rect.x == 0.0f);
 
   CMP_TEST_OK(cmp_layout_compute(&container, &direction_ltr, spec_exact_100,
-                               spec_exact_50));
+                                 spec_exact_50));
   CMP_TEST_OK(cmp_layout_node_get_layout(&child1, &rect));
   CMP_TEST_ASSERT(rect.x == 70.0f);
   CMP_TEST_OK(cmp_layout_node_get_layout(&child2, &rect));
@@ -118,14 +119,14 @@ int main(void) {
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 2));
 
   CMP_TEST_OK(cmp_layout_compute(&container, &direction_rtl, spec_exact_100,
-                               spec_exact_60));
+                                 spec_exact_60));
   CMP_TEST_OK(cmp_layout_node_get_layout(&child1, &rect));
   CMP_TEST_ASSERT(rect.x == 81.0f);
   CMP_TEST_OK(cmp_layout_node_get_layout(&child2, &rect));
   CMP_TEST_ASSERT(rect.x == 76.0f);
 
   CMP_TEST_OK(cmp_layout_compute(&container, &direction_ltr, spec_exact_100,
-                               spec_exact_60));
+                                 spec_exact_60));
   CMP_TEST_OK(cmp_layout_node_get_layout(&child1, &rect));
   CMP_TEST_ASSERT(rect.x == 9.0f);
   CMP_TEST_OK(cmp_layout_node_get_layout(&child2, &rect));
@@ -148,14 +149,14 @@ int main(void) {
   CMP_TEST_OK(cmp_layout_node_set_children(&container, children, 2));
 
   CMP_TEST_OK(cmp_layout_compute(&container, &direction_rtl, spec_exact_100,
-                               spec_exact_60));
+                                 spec_exact_60));
   CMP_TEST_OK(cmp_layout_node_get_layout(&child1, &rect));
   CMP_TEST_ASSERT(rect.x == 0.0f);
   CMP_TEST_OK(cmp_layout_node_get_layout(&child2, &rect));
   CMP_TEST_ASSERT(rect.x == 0.0f);
 
   CMP_TEST_OK(cmp_layout_compute(&container, &direction_ltr, spec_exact_100,
-                               spec_exact_60));
+                                 spec_exact_60));
   CMP_TEST_OK(cmp_layout_node_get_layout(&child1, &rect));
   CMP_TEST_ASSERT(rect.x == 90.0f);
   CMP_TEST_OK(cmp_layout_node_get_layout(&child2, &rect));

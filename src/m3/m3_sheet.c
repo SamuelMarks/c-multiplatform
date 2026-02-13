@@ -108,8 +108,8 @@ static int m3_sheet_validate_edges(const CMPLayoutEdges *edges) {
 }
 
 static int m3_sheet_validate_measure_spec(CMPMeasureSpec spec) {
-  if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.mode != CMP_MEASURE_EXACTLY &&
-      spec.mode != CMP_MEASURE_AT_MOST) {
+  if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
+      spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (spec.mode != CMP_MEASURE_UNSPECIFIED && spec.size < 0.0f) {
@@ -214,7 +214,8 @@ static int m3_sheet_compute_preferred_height(const M3SheetStyle *style,
 }
 
 static int m3_sheet_compute_bounds(const M3SheetStyle *style,
-                                   const CMPRect *overlay, CMPRect *out_bounds) {
+                                   const CMPRect *overlay,
+                                   CMPRect *out_bounds) {
   CMPScalar width;
   CMPScalar height;
   int rc;
@@ -366,7 +367,8 @@ static int m3_sheet_update_hidden(M3Sheet *sheet) {
   if (sheet->offset >= height && height > 0.0f) {
     sheet->widget.flags |= CMP_WIDGET_FLAG_HIDDEN;
   } else if (height > 0.0f) {
-    sheet->widget.flags &= (cmp_u32)~CMP_WIDGET_FLAG_HIDDEN; /* GCOVR_EXCL_LINE */
+    sheet->widget.flags &=
+        (cmp_u32)~CMP_WIDGET_FLAG_HIDDEN; /* GCOVR_EXCL_LINE */
   }
 
   return CMP_OK;
@@ -375,7 +377,7 @@ static int m3_sheet_update_hidden(M3Sheet *sheet) {
 static int m3_sheet_start_animation(M3Sheet *sheet, CMPScalar target) {
   CMPScalar height;
   CMPScalar clamped; /* GCOVR_EXCL_LINE */
-  int rc;           /* GCOVR_EXCL_LINE */
+  int rc;            /* GCOVR_EXCL_LINE */
 
   if (sheet == NULL) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
@@ -475,7 +477,7 @@ int CMP_CALL m3_sheet_test_validate_color(const CMPColor *color) {
 }
 
 int CMP_CALL m3_sheet_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                    CMPScalar b, CMPScalar a) {
+                                     CMPScalar b, CMPScalar a) {
   return m3_sheet_color_set(color, r, g, b, a);
 }
 
@@ -502,7 +504,7 @@ int CMP_CALL m3_sheet_test_apply_offset(
 }
 
 int CMP_CALL m3_sheet_test_compute_scrim_alpha(const M3Sheet *sheet,
-                                              CMPScalar *out_alpha) {
+                                               CMPScalar *out_alpha) {
   return m3_sheet_compute_scrim_alpha(sheet, out_alpha);
 }
 #endif
@@ -758,7 +760,7 @@ static int m3_sheet_widget_paint(void *widget, CMPPaintContext *ctx) {
 
   if (sheet->style.shadow_enabled == CMP_TRUE) {
     rc = cmp_shadow_paint(&sheet->style.shadow, ctx->gfx, &sheet_bounds,
-                         shadow_clip);
+                          shadow_clip);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -928,14 +930,14 @@ static int m3_sheet_widget_event(void *widget, const CMPInputEvent *event,
     }
     *out_handled = CMP_TRUE;
     return CMP_OK;
-  default:        /* GCOVR_EXCL_LINE */
+  default:         /* GCOVR_EXCL_LINE */
     return CMP_OK; /* GCOVR_EXCL_LINE */
   }
 }
 
 static int m3_sheet_widget_get_semantics(
     void *widget, CMPSemantics *out_semantics) { /* GCOVR_EXCL_LINE */
-  M3Sheet *sheet;                               /* GCOVR_EXCL_LINE */
+  M3Sheet *sheet;                                /* GCOVR_EXCL_LINE */
 
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1036,7 +1038,7 @@ int CMP_CALL m3_sheet_init(M3Sheet *sheet, const M3SheetStyle *style) {
   }
 
   rc = cmp_spring_set_tolerance(&sheet->anim.spring, style->spring_tolerance,
-                               style->spring_rest_velocity);
+                                style->spring_rest_velocity);
   if (rc != CMP_OK) {
     return rc; /* GCOVR_EXCL_LINE */
   }
@@ -1082,7 +1084,7 @@ int CMP_CALL m3_sheet_set_style(M3Sheet *sheet, const M3SheetStyle *style) {
   }
 
   rc = cmp_spring_set_tolerance(&sheet->anim.spring, style->spring_tolerance,
-                               style->spring_rest_velocity);
+                                style->spring_rest_velocity);
   if (rc != CMP_OK) {
     return rc; /* GCOVR_EXCL_LINE */
   }
@@ -1099,7 +1101,7 @@ int CMP_CALL m3_sheet_set_style(M3Sheet *sheet, const M3SheetStyle *style) {
 }
 
 int CMP_CALL m3_sheet_set_on_action(M3Sheet *sheet, CMPSheetOnAction on_action,
-                                   void *ctx) {
+                                    void *ctx) {
   if (sheet == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1136,7 +1138,7 @@ int CMP_CALL m3_sheet_set_open(M3Sheet *sheet, CMPBool open) {
     sheet->widget.flags |= CMP_WIDGET_FLAG_HIDDEN; /* GCOVR_EXCL_LINE */
     rc = cmp_anim_controller_stop(&sheet->anim);   /* GCOVR_EXCL_LINE */
     if (rc != CMP_OK) {                            /* GCOVR_EXCL_LINE */
-      return rc;                                  /* GCOVR_EXCL_LINE */
+      return rc;                                   /* GCOVR_EXCL_LINE */
     }
     return CMP_OK; /* GCOVR_EXCL_LINE */
   }
@@ -1208,7 +1210,7 @@ int CMP_CALL m3_sheet_step(M3Sheet *sheet, CMPScalar dt, CMPBool *out_changed) {
 
   if (finished == CMP_TRUE) {
     rc = m3_sheet_update_hidden(sheet); /* GCOVR_EXCL_LINE */
-    if (rc != CMP_OK) {                  /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {                 /* GCOVR_EXCL_LINE */
       return rc;                        /* GCOVR_EXCL_LINE */
     }
   }
@@ -1225,7 +1227,7 @@ int CMP_CALL m3_sheet_get_bounds(const M3Sheet *sheet, CMPRect *out_bounds) {
 }
 
 int CMP_CALL m3_sheet_get_content_bounds(const M3Sheet *sheet,
-                                        CMPRect *out_bounds) {
+                                         CMPRect *out_bounds) {
   CMPRect bounds;
   int rc;
 

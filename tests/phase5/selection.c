@@ -71,8 +71,9 @@ static int test_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
   return CMP_OK;
 }
 
-static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                              CMPScalar y1, CMPColor color, CMPScalar thickness) {
+static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
+                              CMPScalar x1, CMPScalar y1, CMPColor color,
+                              CMPScalar thickness) {
   TestSelectionBackend *backend;
 
   if (gfx == NULL) {
@@ -98,18 +99,18 @@ static int test_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0, CMPScalar x
 }
 
 static const CMPGfxVTable g_test_vtable = {NULL,
-                                          NULL,
-                                          NULL,
-                                          test_gfx_draw_rect,
-                                          test_gfx_draw_line,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          NULL};
+                                           NULL,
+                                           NULL,
+                                           test_gfx_draw_rect,
+                                           test_gfx_draw_line,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL};
 
 static const CMPGfxVTable g_test_vtable_no_rect = {
     NULL, NULL, NULL, NULL, test_gfx_draw_line, NULL, NULL, NULL, NULL,
@@ -247,63 +248,66 @@ int main(void) {
       cmp_near(checkbox_style.size, M3_CHECKBOX_DEFAULT_SIZE, 0.001f));
 
   CMP_TEST_EXPECT(m3_checkbox_init(NULL, &checkbox_style, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_checkbox_init(&checkbox, NULL, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_checkbox_init(&checkbox, &checkbox_style, 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   other_checkbox_style = checkbox_style;
   other_checkbox_style.size = 0.0f;
   CMP_TEST_EXPECT(m3_checkbox_init(&checkbox, &other_checkbox_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(m3_checkbox_init(&checkbox, &checkbox_style, CMP_FALSE));
   CMP_TEST_ASSERT(checkbox.widget.ctx == &checkbox);
   CMP_TEST_ASSERT(checkbox.widget.vtable != NULL);
   CMP_TEST_EXPECT(m3_checkbox_set_style(NULL, &checkbox_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_checkbox_set_style(&checkbox, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_checkbox_set_checked(NULL, CMP_TRUE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_checkbox_set_checked(&checkbox, 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_checkbox_set_checked(&checkbox, CMP_TRUE));
   CMP_TEST_OK(m3_checkbox_get_checked(&checkbox, &state));
   CMP_TEST_ASSERT(state == CMP_TRUE);
   CMP_TEST_EXPECT(m3_checkbox_get_checked(NULL, &state),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_checkbox_get_checked(&checkbox, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
-  CMP_TEST_EXPECT(m3_checkbox_set_label(NULL, "A", 1), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_checkbox_set_label(NULL, "A", 1),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_checkbox_set_label(&checkbox, NULL, 1),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_checkbox_set_label(&checkbox, "Check", 5));
 
   other_checkbox_style = checkbox_style;
   other_checkbox_style.checked.fill.a = 2.0f;
   CMP_TEST_EXPECT(m3_checkbox_set_style(&checkbox, &other_checkbox_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   other_checkbox_style = checkbox_style;
   other_checkbox_style.border_width = -1.0f;
   CMP_TEST_EXPECT(m3_checkbox_set_style(&checkbox, &other_checkbox_style),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_checkbox_set_style(&checkbox, &checkbox_style));
 
 #ifdef CMP_TESTING
   CMP_TEST_OK(test_backend_init(&backend));
   CMP_TEST_OK(m3_selection_test_set_fail_point(
       M3_SELECTION_TEST_FAIL_CHECKBOX_RESOLVE_COLORS));
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNKNOWN);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_selection_test_clear_fail_points());
 #endif
 
-  CMP_TEST_EXPECT(m3_checkbox_set_on_change(NULL, test_checkbox_on_change, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      m3_checkbox_set_on_change(NULL, test_checkbox_on_change, NULL),
+      CMP_ERR_INVALID_ARGUMENT);
   counter.calls = 0;
   counter.last_state = CMP_FALSE;
   counter.fail = 0;
@@ -317,12 +321,12 @@ int main(void) {
   CMP_TEST_EXPECT(
       checkbox.widget.vtable->measure(NULL, width_spec, height_spec, &size),
       CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(checkbox.widget.vtable->measure(checkbox.widget.ctx,
-                                                 width_spec, height_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(checkbox.widget.vtable->measure(
-                     checkbox.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      checkbox.widget.ctx, width_spec, height_spec, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(checkbox.widget.vtable->measure(
+                      checkbox.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   checkbox.style.size = -1.0f;
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
@@ -330,8 +334,8 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(checkbox.widget.vtable->measure(
-                     checkbox.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_RANGE);
+                      checkbox.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_RANGE);
   checkbox.style.size = checkbox_style.size;
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
@@ -339,22 +343,22 @@ int main(void) {
   height_spec.mode = 99u;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(checkbox.widget.vtable->measure(
-                     checkbox.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                      checkbox.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = -1.0f;
   CMP_TEST_EXPECT(checkbox.widget.vtable->measure(
-                     checkbox.widget.ctx, width_spec, height_spec, &size),
-                 CMP_ERR_RANGE);
+                      checkbox.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_RANGE);
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(checkbox.widget.vtable->measure(checkbox.widget.ctx, width_spec,
-                                             height_spec, &size));
+                                              height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, checkbox_style.size, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, checkbox_style.size, 0.001f));
 
@@ -363,7 +367,7 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_EXACTLY;
   height_spec.size = 12.0f;
   CMP_TEST_OK(checkbox.widget.vtable->measure(checkbox.widget.ctx, width_spec,
-                                             height_spec, &size));
+                                              height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, 10.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, 12.0f, 0.001f));
 
@@ -372,35 +376,39 @@ int main(void) {
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(checkbox.widget.vtable->layout(checkbox.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bounds.width = 20.0f;
   bounds.height = 20.0f;
   CMP_TEST_EXPECT(checkbox.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(checkbox.widget.vtable->layout(checkbox.widget.ctx, bounds));
 
   CMP_TEST_OK(test_backend_init(&backend));
   CMP_TEST_EXPECT(checkbox.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   gfx.vtable = NULL;
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_INVALID_ARGUMENT);
   gfx.vtable = &g_test_vtable_no_rect;
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_vtable_no_line;
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_vtable;
 
   CMP_TEST_OK(m3_checkbox_set_style(&checkbox, &checkbox_style));
   checkbox.style.border_width = 15.0f;
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_RANGE);
   checkbox.style.border_width = checkbox_style.border_width;
 
   checkbox.style.corner_radius = 0.5f;
@@ -412,40 +420,46 @@ int main(void) {
 
   checkbox.bounds.width = 2.0f;
   checkbox.bounds.height = 2.0f;
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_RANGE);
   checkbox.bounds = bounds;
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_rect_after = 2;
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_IO);
   backend.fail_draw_rect_after = 0;
 
 #ifdef CMP_TESTING
   CMP_TEST_OK(m3_checkbox_set_checked(&checkbox, CMP_TRUE));
   CMP_TEST_OK(m3_selection_test_set_fail_point(
       M3_SELECTION_TEST_FAIL_CHECKBOX_CHECK_THICKNESS_NEGATIVE));
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_RANGE);
   CMP_TEST_OK(m3_selection_test_clear_fail_points());
 #endif
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_line_after = 2;
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_IO);
   backend.fail_draw_line_after = 0;
 
   checkbox.bounds.width = -1.0f;
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_RANGE);
   checkbox.bounds = bounds;
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_rect = CMP_ERR_IO;
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_IO);
   CMP_TEST_OK(test_backend_init(&backend));
 
   CMP_TEST_OK(m3_checkbox_set_checked(&checkbox, CMP_FALSE));
@@ -459,31 +473,32 @@ int main(void) {
   CMP_TEST_ASSERT(backend.draw_rect_calls == 2);
   CMP_TEST_ASSERT(backend.draw_line_calls == 2);
   CMP_TEST_ASSERT(cmp_color_near(backend.last_line_color,
-                               checkbox_style.checked.mark, 0.001f));
+                                 checkbox_style.checked.mark, 0.001f));
 
   checkbox.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(test_backend_init(&backend));
   CMP_TEST_OK(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx));
   CMP_TEST_ASSERT(cmp_color_near(backend.last_rect_color,
-                               checkbox_style.disabled_checked.fill, 0.001f));
+                                 checkbox_style.disabled_checked.fill, 0.001f));
   checkbox.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
 
   CMP_TEST_OK(m3_checkbox_set_checked(&checkbox, CMP_FALSE));
   checkbox.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(test_backend_init(&backend));
   CMP_TEST_OK(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx));
-  CMP_TEST_ASSERT(cmp_color_near(backend.last_rect_color,
-                               checkbox_style.disabled_unchecked.fill, 0.001f));
+  CMP_TEST_ASSERT(cmp_color_near(
+      backend.last_rect_color, checkbox_style.disabled_unchecked.fill, 0.001f));
   checkbox.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
 
   CMP_TEST_OK(m3_checkbox_set_checked(&checkbox, CMP_TRUE));
   backend.fail_draw_line = CMP_ERR_IO;
-  CMP_TEST_EXPECT(checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(
+      checkbox.widget.vtable->paint(checkbox.widget.ctx, &paint_ctx),
+      CMP_ERR_IO);
   backend.fail_draw_line = CMP_OK;
 
   CMP_TEST_EXPECT(checkbox.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       checkbox.widget.vtable->event(checkbox.widget.ctx, NULL, &handled),
       CMP_ERR_INVALID_ARGUMENT);
@@ -545,7 +560,7 @@ int main(void) {
   counter.fail = 0;
 
   CMP_TEST_EXPECT(checkbox.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(
       checkbox.widget.vtable->get_semantics(checkbox.widget.ctx, &semantics));
   CMP_TEST_ASSERT(semantics.role == CMP_SEMANTIC_CHECKBOX);
@@ -558,30 +573,31 @@ int main(void) {
   checkbox.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
 
   CMP_TEST_EXPECT(checkbox.widget.vtable->destroy(NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(checkbox.widget.vtable->destroy(checkbox.widget.ctx));
 
   CMP_TEST_EXPECT(m3_switch_style_init(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_switch_style_init(&switch_style));
-  CMP_TEST_ASSERT(
-      cmp_near(switch_style.track_width, M3_SWITCH_DEFAULT_TRACK_WIDTH, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(switch_style.track_width,
+                           M3_SWITCH_DEFAULT_TRACK_WIDTH, 0.001f));
 
   CMP_TEST_EXPECT(m3_switch_init(NULL, &switch_style, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_switch_init(&sw, NULL, CMP_FALSE), CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_switch_init(&sw, NULL, CMP_FALSE),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_switch_init(&sw, &switch_style, 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   other_switch_style = switch_style;
   other_switch_style.track_width = 10.0f;
   other_switch_style.track_height = 20.0f;
   CMP_TEST_EXPECT(m3_switch_init(&sw, &other_switch_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(m3_switch_init(&sw, &switch_style, CMP_FALSE));
   CMP_TEST_ASSERT(sw.widget.ctx == &sw);
   CMP_TEST_EXPECT(m3_switch_set_style(NULL, &switch_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_switch_set_style(&sw, NULL), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(m3_switch_set_on(NULL, CMP_TRUE), CMP_ERR_INVALID_ARGUMENT);
@@ -610,7 +626,7 @@ int main(void) {
   CMP_TEST_OK(m3_switch_set_label(&sw, "Switch", 6));
 
   CMP_TEST_EXPECT(m3_switch_set_on_change(NULL, test_switch_on_change, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   counter.calls = 0;
   counter.fail = 0;
   CMP_TEST_OK(m3_switch_set_on_change(&sw, test_switch_on_change, &counter));
@@ -667,26 +683,27 @@ int main(void) {
   bounds.y = 0.0f;
   bounds.width = -1.0f;
   bounds.height = 10.0f;
-  CMP_TEST_EXPECT(sw.widget.vtable->layout(sw.widget.ctx, bounds), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(sw.widget.vtable->layout(sw.widget.ctx, bounds),
+                  CMP_ERR_RANGE);
 
   bounds.width = switch_style.track_width;
   bounds.height = switch_style.track_height;
   CMP_TEST_EXPECT(sw.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(sw.widget.vtable->layout(sw.widget.ctx, bounds));
 
   CMP_TEST_EXPECT(sw.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = NULL;
   CMP_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = &gfx;
 
   gfx.vtable = &g_test_vtable_no_rect;
   CMP_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_vtable;
 
 #ifdef CMP_TESTING
@@ -694,34 +711,36 @@ int main(void) {
   CMP_TEST_OK(m3_selection_test_set_fail_point(
       M3_SELECTION_TEST_FAIL_SWITCH_RESOLVE_COLORS));
   CMP_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_selection_test_clear_fail_points());
 #endif
 
   CMP_TEST_OK(m3_switch_set_style(&sw, &switch_style));
   sw.style.thumb_inset = 30.0f;
   CMP_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   sw.style.thumb_inset = switch_style.thumb_inset;
 
   sw.bounds.height = 2.0f;
   CMP_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   sw.bounds = bounds;
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_rect = CMP_ERR_IO;
-  CMP_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx), CMP_ERR_IO);
+  CMP_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx),
+                  CMP_ERR_IO);
   CMP_TEST_OK(test_backend_init(&backend));
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_rect_after = 2;
-  CMP_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx), CMP_ERR_IO);
+  CMP_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx),
+                  CMP_ERR_IO);
   backend.fail_draw_rect_after = 0;
 
   sw.bounds.width = -1.0f;
   CMP_TEST_EXPECT(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   sw.bounds = bounds;
 
   CMP_TEST_OK(test_backend_init(&backend));
@@ -748,7 +767,7 @@ int main(void) {
   CMP_TEST_OK(test_backend_init(&backend));
   CMP_TEST_OK(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx));
   CMP_TEST_ASSERT(cmp_color_near(backend.last_rect_color,
-                               switch_style.disabled_off.thumb, 0.001f));
+                                 switch_style.disabled_off.thumb, 0.001f));
   sw.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
 
   sw.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
@@ -756,15 +775,15 @@ int main(void) {
   CMP_TEST_OK(m3_switch_set_on(&sw, CMP_TRUE));
   CMP_TEST_OK(sw.widget.vtable->paint(sw.widget.ctx, &paint_ctx));
   CMP_TEST_ASSERT(cmp_color_near(backend.last_rect_color,
-                               switch_style.disabled_on.thumb, 0.001f));
+                                 switch_style.disabled_on.thumb, 0.001f));
   sw.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
 
   CMP_TEST_EXPECT(sw.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sw.widget.vtable->event(sw.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sw.widget.vtable->event(sw.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   sw.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 5, 6));
@@ -775,13 +794,13 @@ int main(void) {
   sw.on = 2;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 5, 6));
   CMP_TEST_EXPECT(sw.widget.vtable->event(sw.widget.ctx, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   sw.on = CMP_FALSE;
 
   sw.pressed = CMP_TRUE;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 5, 6));
   CMP_TEST_EXPECT(sw.widget.vtable->event(sw.widget.ctx, &event, &handled),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
   sw.pressed = CMP_FALSE;
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_KEY_UP, 0, 0));
@@ -807,12 +826,12 @@ int main(void) {
   sw.pressed = CMP_TRUE;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 5, 6));
   CMP_TEST_EXPECT(sw.widget.vtable->event(sw.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_ASSERT(sw.on == CMP_TRUE);
   counter.fail = 0;
 
   CMP_TEST_EXPECT(sw.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(sw.widget.vtable->get_semantics(sw.widget.ctx, &semantics));
   CMP_TEST_ASSERT(semantics.role == CMP_SEMANTIC_SWITCH);
 
@@ -829,45 +848,51 @@ int main(void) {
   CMP_TEST_ASSERT(cmp_near(radio_style.size, M3_RADIO_DEFAULT_SIZE, 0.001f));
 
   CMP_TEST_EXPECT(m3_radio_init(NULL, &radio_style, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_radio_init(&radio, NULL, CMP_FALSE),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_radio_init(&radio, &radio_style, 2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   other_radio_style = radio_style;
   other_radio_style.dot_radius = 20.0f;
   CMP_TEST_EXPECT(m3_radio_init(&radio, &other_radio_style, CMP_FALSE),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   CMP_TEST_OK(m3_radio_init(&radio, &radio_style, CMP_FALSE));
   CMP_TEST_ASSERT(radio.widget.ctx == &radio);
   CMP_TEST_EXPECT(m3_radio_set_style(NULL, &radio_style),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_radio_set_style(&radio, NULL), CMP_ERR_INVALID_ARGUMENT);
 
-  CMP_TEST_EXPECT(m3_radio_set_selected(NULL, CMP_TRUE), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_radio_set_selected(NULL, CMP_TRUE),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_radio_set_selected(&radio, 3), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_radio_set_selected(&radio, CMP_TRUE));
   CMP_TEST_OK(m3_radio_get_selected(&radio, &state));
   CMP_TEST_ASSERT(state == CMP_TRUE);
-  CMP_TEST_EXPECT(m3_radio_get_selected(NULL, &state), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_radio_get_selected(&radio, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_radio_get_selected(NULL, &state),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_radio_get_selected(&radio, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   other_radio_style = radio_style;
   other_radio_style.checked.mark.a = 2.0f;
-  CMP_TEST_EXPECT(m3_radio_set_style(&radio, &other_radio_style), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_radio_set_style(&radio, &other_radio_style),
+                  CMP_ERR_RANGE);
   other_radio_style = radio_style;
   other_radio_style.border_width = -1.0f;
-  CMP_TEST_EXPECT(m3_radio_set_style(&radio, &other_radio_style), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_radio_set_style(&radio, &other_radio_style),
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_radio_set_style(&radio, &radio_style));
 
   CMP_TEST_EXPECT(m3_radio_set_label(NULL, "R", 1), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_radio_set_label(&radio, NULL, 1), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_radio_set_label(&radio, NULL, 1),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_radio_set_label(&radio, "Radio", 5));
 
   CMP_TEST_EXPECT(m3_radio_set_on_change(NULL, test_radio_on_change, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   counter.calls = 0;
   counter.fail = 0;
   CMP_TEST_OK(m3_radio_set_on_change(&radio, test_radio_on_change, &counter));
@@ -880,11 +905,11 @@ int main(void) {
       radio.widget.vtable->measure(NULL, width_spec, height_spec, &size),
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(radio.widget.vtable->measure(radio.widget.ctx, width_spec,
-                                              height_spec, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                               height_spec, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(radio.widget.vtable->measure(radio.widget.ctx, width_spec,
-                                              height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                               height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   radio.style.size = -1.0f;
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
@@ -892,8 +917,8 @@ int main(void) {
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(radio.widget.vtable->measure(radio.widget.ctx, width_spec,
-                                              height_spec, &size),
-                 CMP_ERR_RANGE);
+                                               height_spec, &size),
+                  CMP_ERR_RANGE);
   radio.style.size = radio_style.size;
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
@@ -901,22 +926,22 @@ int main(void) {
   height_spec.mode = 99u;
   height_spec.size = 0.0f;
   CMP_TEST_EXPECT(radio.widget.vtable->measure(radio.widget.ctx, width_spec,
-                                              height_spec, &size),
-                 CMP_ERR_INVALID_ARGUMENT);
+                                               height_spec, &size),
+                  CMP_ERR_INVALID_ARGUMENT);
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
 
   width_spec.mode = CMP_MEASURE_AT_MOST;
   width_spec.size = -1.0f;
   CMP_TEST_EXPECT(radio.widget.vtable->measure(radio.widget.ctx, width_spec,
-                                              height_spec, &size),
-                 CMP_ERR_RANGE);
+                                               height_spec, &size),
+                  CMP_ERR_RANGE);
 
   width_spec.mode = CMP_MEASURE_UNSPECIFIED;
   width_spec.size = 0.0f;
   height_spec.mode = CMP_MEASURE_UNSPECIFIED;
   height_spec.size = 0.0f;
   CMP_TEST_OK(radio.widget.vtable->measure(radio.widget.ctx, width_spec,
-                                          height_spec, &size));
+                                           height_spec, &size));
   CMP_TEST_ASSERT(cmp_near(size.width, radio_style.size, 0.001f));
   CMP_TEST_ASSERT(cmp_near(size.height, radio_style.size, 0.001f));
 
@@ -925,26 +950,26 @@ int main(void) {
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(radio.widget.vtable->layout(radio.widget.ctx, bounds),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   bounds.width = radio_style.size;
   bounds.height = radio_style.size;
   CMP_TEST_EXPECT(radio.widget.vtable->layout(NULL, bounds),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(radio.widget.vtable->layout(radio.widget.ctx, bounds));
 
   CMP_TEST_EXPECT(radio.widget.vtable->paint(NULL, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = NULL;
   CMP_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = &gfx;
 
   gfx.vtable = &g_test_vtable_no_rect;
   CMP_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
   gfx.vtable = &g_test_vtable;
 
 #ifdef CMP_TESTING
@@ -952,19 +977,19 @@ int main(void) {
   CMP_TEST_OK(m3_selection_test_set_fail_point(
       M3_SELECTION_TEST_FAIL_RADIO_RESOLVE_COLORS));
   CMP_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx),
-                 CMP_ERR_UNKNOWN);
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(m3_selection_test_clear_fail_points());
 #endif
 
   CMP_TEST_OK(m3_radio_set_style(&radio, &radio_style));
   radio.style.border_width = 15.0f;
   CMP_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   radio.style.border_width = radio_style.border_width;
 
   radio.bounds.width = -1.0f;
   CMP_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   radio.bounds = bounds;
 
   radio.style.border_width = 8.0f;
@@ -979,14 +1004,14 @@ int main(void) {
   radio.bounds.width = 10.0f;
   radio.bounds.height = 10.0f;
   CMP_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   radio.style.border_width = radio_style.border_width;
   radio.bounds = bounds;
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_rect_after = 2;
   CMP_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect_after = 0;
 
 #ifdef CMP_TESTING
@@ -994,7 +1019,7 @@ int main(void) {
   CMP_TEST_OK(m3_selection_test_set_fail_point(
       M3_SELECTION_TEST_FAIL_RADIO_DOT_RADIUS_NEGATIVE));
   CMP_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
   CMP_TEST_OK(m3_selection_test_clear_fail_points());
 
   CMP_TEST_OK(m3_radio_set_selected(&radio, CMP_FALSE));
@@ -1007,14 +1032,14 @@ int main(void) {
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_rect = CMP_ERR_IO;
   CMP_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   CMP_TEST_OK(test_backend_init(&backend));
 
   CMP_TEST_OK(test_backend_init(&backend));
   backend.fail_draw_rect_after = 3;
   CMP_TEST_OK(m3_radio_set_selected(&radio, CMP_TRUE));
   CMP_TEST_EXPECT(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx),
-                 CMP_ERR_IO);
+                  CMP_ERR_IO);
   backend.fail_draw_rect_after = 0;
 
   CMP_TEST_OK(test_backend_init(&backend));
@@ -1032,20 +1057,20 @@ int main(void) {
   CMP_TEST_OK(m3_radio_set_selected(&radio, CMP_TRUE));
   CMP_TEST_OK(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx));
   CMP_TEST_ASSERT(cmp_color_near(backend.last_rect_color,
-                               radio_style.disabled_checked.mark, 0.001f));
+                                 radio_style.disabled_checked.mark, 0.001f));
   CMP_TEST_OK(test_backend_init(&backend));
   CMP_TEST_OK(m3_radio_set_selected(&radio, CMP_FALSE));
   CMP_TEST_OK(radio.widget.vtable->paint(radio.widget.ctx, &paint_ctx));
   CMP_TEST_ASSERT(cmp_color_near(backend.last_rect_color,
-                               radio_style.disabled_unchecked.fill, 0.001f));
+                                 radio_style.disabled_unchecked.fill, 0.001f));
   radio.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
 
   CMP_TEST_EXPECT(radio.widget.vtable->event(NULL, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(radio.widget.vtable->event(radio.widget.ctx, NULL, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(radio.widget.vtable->event(radio.widget.ctx, &event, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   radio.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 5, 6));
@@ -1055,14 +1080,16 @@ int main(void) {
 
   radio.selected = 2;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 5, 6));
-  CMP_TEST_EXPECT(radio.widget.vtable->event(radio.widget.ctx, &event, &handled),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      radio.widget.vtable->event(radio.widget.ctx, &event, &handled),
+      CMP_ERR_INVALID_ARGUMENT);
   radio.selected = CMP_FALSE;
 
   radio.pressed = CMP_TRUE;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 5, 6));
-  CMP_TEST_EXPECT(radio.widget.vtable->event(radio.widget.ctx, &event, &handled),
-                 CMP_ERR_STATE);
+  CMP_TEST_EXPECT(
+      radio.widget.vtable->event(radio.widget.ctx, &event, &handled),
+      CMP_ERR_STATE);
   radio.pressed = CMP_FALSE;
 
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_KEY_UP, 0, 0));
@@ -1094,13 +1121,14 @@ int main(void) {
   radio.selected = CMP_FALSE;
   radio.pressed = CMP_TRUE;
   CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 5, 6));
-  CMP_TEST_EXPECT(radio.widget.vtable->event(radio.widget.ctx, &event, &handled),
-                 CMP_ERR_IO);
+  CMP_TEST_EXPECT(
+      radio.widget.vtable->event(radio.widget.ctx, &event, &handled),
+      CMP_ERR_IO);
   CMP_TEST_ASSERT(radio.selected == CMP_FALSE);
   counter.fail = 0;
 
   CMP_TEST_EXPECT(radio.widget.vtable->get_semantics(NULL, &semantics),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(radio.widget.vtable->get_semantics(radio.widget.ctx, &semantics));
   CMP_TEST_ASSERT(semantics.role == CMP_SEMANTIC_RADIO);
 

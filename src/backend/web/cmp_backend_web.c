@@ -18,16 +18,16 @@
 #endif
 #endif
 
-#define CMP_WEB_RETURN_IF_ERROR(rc)                                             \
+#define CMP_WEB_RETURN_IF_ERROR(rc)                                            \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       return (rc);                                                             \
     }                                                                          \
   } while (0)
 
-#define CMP_WEB_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                            \
+#define CMP_WEB_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                           \
   do {                                                                         \
-    if ((rc) != CMP_OK) {                                                       \
+    if ((rc) != CMP_OK) {                                                      \
       cleanup;                                                                 \
       return (rc);                                                             \
     }                                                                          \
@@ -246,7 +246,7 @@ struct CMPWebBackend {
 };
 
 static int cmp_web_backend_log(struct CMPWebBackend *backend, CMPLogLevel level,
-                              const char *message) {
+                               const char *message) {
   if (backend == NULL || message == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -256,8 +256,9 @@ static int cmp_web_backend_log(struct CMPWebBackend *backend, CMPLogLevel level,
   return cmp_log_write(level, "m3.web", message);
 }
 
-static int cmp_web_backend_resolve(struct CMPWebBackend *backend, CMPHandle handle,
-                                  cmp_u32 type_id, void **out_obj) {
+static int cmp_web_backend_resolve(struct CMPWebBackend *backend,
+                                   CMPHandle handle, cmp_u32 type_id,
+                                   void **out_obj) {
   void *resolved;
   cmp_u32 actual_type;
   int rc;
@@ -286,7 +287,7 @@ static int cmp_web_backend_resolve(struct CMPWebBackend *backend, CMPHandle hand
 }
 
 static int cmp_web_backend_copy_string(const CMPAllocator *allocator,
-                                      const char *src, char **out_dst) {
+                                       const char *src, char **out_dst) {
   cmp_usize length;
   cmp_usize max_value;
   char *mem;
@@ -372,7 +373,7 @@ static int cmp_web_double_to_i32(double value, cmp_i32 *out_value) {
 }
 
 static int cmp_web_event_queue_push(CMPWebEventQueue *queue,
-                                   const CMPInputEvent *event) {
+                                    const CMPInputEvent *event) {
   cmp_usize index;
 
   if (queue == NULL || event == NULL) {
@@ -389,8 +390,8 @@ static int cmp_web_event_queue_push(CMPWebEventQueue *queue,
 }
 
 static int cmp_web_event_queue_pop(CMPWebEventQueue *queue,
-                                  CMPInputEvent *out_event,
-                                  CMPBool *out_has_event) {
+                                   CMPInputEvent *out_event,
+                                   CMPBool *out_has_event) {
   cmp_usize index;
 
   if (queue == NULL || out_event == NULL || out_has_event == NULL) {
@@ -412,7 +413,7 @@ static int cmp_web_event_queue_pop(CMPWebEventQueue *queue,
 }
 
 static int cmp_web_build_modifiers(cmp_u32 *out_modifiers, int shift, int ctrl,
-                                  int alt, int meta) {
+                                   int alt, int meta) {
   cmp_u32 mods;
 
   if (out_modifiers == NULL) {
@@ -438,7 +439,7 @@ static int cmp_web_build_modifiers(cmp_u32 *out_modifiers, int shift, int ctrl,
 }
 
 static int cmp_web_event_stamp(struct CMPWebBackend *backend,
-                              CMPInputEvent *event) {
+                               CMPInputEvent *event) {
   int rc;
 
   if (backend == NULL || event == NULL) {
@@ -455,7 +456,7 @@ static int cmp_web_event_stamp(struct CMPWebBackend *backend,
 }
 
 static int cmp_web_gl_check_error(struct CMPWebBackend *backend,
-                                 const char *label) {
+                                  const char *label) {
   GLenum err;
   int rc;
 
@@ -476,7 +477,7 @@ static int cmp_web_gl_check_error(struct CMPWebBackend *backend,
 }
 
 static int cmp_web_gl_compile_shader(struct CMPWebBackend *backend, GLenum type,
-                                    const char *source, GLuint *out_shader) {
+                                     const char *source, GLuint *out_shader) {
   GLuint shader;
   GLint status;
   char info[256];
@@ -519,7 +520,7 @@ static int cmp_web_gl_compile_shader(struct CMPWebBackend *backend, GLenum type,
 }
 
 static int cmp_web_gl_link_program(struct CMPWebBackend *backend, GLuint vert,
-                                  GLuint frag, GLuint *out_program) {
+                                   GLuint frag, GLuint *out_program) {
   GLuint program;
   GLint status;
   char info[256];
@@ -652,14 +653,14 @@ static int cmp_web_gl_init(struct CMPWebBackend *backend) {
   program = 0;
 
   rc = cmp_web_gl_compile_shader(backend, GL_VERTEX_SHADER, vert_src,
-                                &vert_shader);
+                                 &vert_shader);
   if (rc != CMP_OK) {
     emscripten_webgl_destroy_context(ctx);
     return rc;
   }
 
   rc = cmp_web_gl_compile_shader(backend, GL_FRAGMENT_SHADER, frag_src,
-                                &frag_shader);
+                                 &frag_shader);
   if (rc != CMP_OK) {
     glDeleteShader(vert_shader);
     emscripten_webgl_destroy_context(ctx);
@@ -844,7 +845,7 @@ static const char *g_cmp_web_wgpu_shader =
     "}\n";
 
 static int cmp_web_wgpu_align_size(cmp_usize value, cmp_usize alignment,
-                                  cmp_usize *out_value) {
+                                   cmp_usize *out_value) {
   cmp_usize remainder;
   cmp_usize add;
   cmp_usize max_value;
@@ -869,7 +870,8 @@ static int cmp_web_wgpu_align_size(cmp_usize value, cmp_usize alignment,
   return CMP_OK;
 }
 
-static int cmp_web_wgpu_fill_transform(const CMPMat3 *transform, float *out_mat) {
+static int cmp_web_wgpu_fill_transform(const CMPMat3 *transform,
+                                       float *out_mat) {
   if (transform == NULL || out_mat == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1290,7 +1292,8 @@ static int cmp_web_wgpu_init(struct CMPWebBackend *backend) {
   extent.depthOrArrayLayers = 1u;
 
   wgpuQueueWriteTexture(queue, &copy_dst, white_row,
-                        (cmp_usize)CMP_WEB_WGPU_ROW_ALIGN, &data_layout, &extent);
+                        (cmp_usize)CMP_WEB_WGPU_ROW_ALIGN, &data_layout,
+                        &extent);
 
   memset(bind_entries, 0, sizeof(bind_entries));
   bind_entries[0].binding = 0u;
@@ -1325,7 +1328,7 @@ static int cmp_web_wgpu_init(struct CMPWebBackend *backend) {
 }
 
 static int cmp_web_wgpu_configure_surface(struct CMPWebBackend *backend,
-                                         cmp_i32 width, cmp_i32 height) {
+                                          cmp_i32 width, cmp_i32 height) {
   CMPWebGPUState *wgpu;
   WGPUSurfaceConfiguration config;
 
@@ -1426,7 +1429,8 @@ static int cmp_web_wgpu_acquire_frame(struct CMPWebBackend *backend) {
   return CMP_OK;
 }
 
-static int cmp_web_wgpu_begin_pass(struct CMPWebBackend *backend, CMPBool clear) {
+static int cmp_web_wgpu_begin_pass(struct CMPWebBackend *backend,
+                                   CMPBool clear) {
   CMPWebGPUState *wgpu;
   WGPURenderPassColorAttachment color_attachment;
   WGPURenderPassDescriptor pass_desc;
@@ -1576,10 +1580,11 @@ static int cmp_web_wgpu_apply_clip(struct CMPWebBackend *backend) {
 }
 
 static int cmp_web_wgpu_prepare_uniforms(struct CMPWebBackend *backend,
-                                        const CMPRect *rect, CMPColor color,
-                                        CMPScalar opacity, CMPScalar radius,
-                                        CMPBool use_texture, CMPBool alpha_only,
-                                        CMPWebGPUUniforms *out_uniforms) {
+                                         const CMPRect *rect, CMPColor color,
+                                         CMPScalar opacity, CMPScalar radius,
+                                         CMPBool use_texture,
+                                         CMPBool alpha_only,
+                                         CMPWebGPUUniforms *out_uniforms) {
   CMPMat3 transform;
   int rc;
 
@@ -1621,10 +1626,11 @@ static int cmp_web_wgpu_prepare_uniforms(struct CMPWebBackend *backend,
 }
 
 static int cmp_web_wgpu_draw_quad(struct CMPWebBackend *backend,
-                                 const CMPWebVertex *verts, CMPColor color,
-                                 CMPBool use_texture,
-                                 const CMPWebTexture *texture, CMPScalar opacity,
-                                 const CMPRect *rect, CMPScalar radius) {
+                                  const CMPWebVertex *verts, CMPColor color,
+                                  CMPBool use_texture,
+                                  const CMPWebTexture *texture,
+                                  CMPScalar opacity, const CMPRect *rect,
+                                  CMPScalar radius) {
   CMPWebGPUState *wgpu;
   CMPWebGPUUniforms uniforms;
   WGPUBindGroup bind_group;
@@ -1683,8 +1689,8 @@ static int cmp_web_wgpu_draw_quad(struct CMPWebBackend *backend,
 }
 
 static int cmp_web_wgpu_begin_frame(struct CMPWebBackend *backend,
-                                   CMPWebWindow *resolved, cmp_i32 width,
-                                   cmp_i32 height, CMPScalar dpi_scale) {
+                                    CMPWebWindow *resolved, cmp_i32 width,
+                                    cmp_i32 height, CMPScalar dpi_scale) {
   cmp_i32 device_width;
   cmp_i32 device_height;
   int rc;
@@ -1913,10 +1919,10 @@ static int cmp_web_gfx_apply_clip(struct CMPWebBackend *backend) {
 }
 
 static int cmp_web_gfx_draw_quad(struct CMPWebBackend *backend,
-                                const CMPWebVertex *verts, CMPColor color,
-                                CMPBool use_texture, GLuint texture,
-                                CMPScalar opacity, const CMPRect *rect,
-                                CMPScalar radius) {
+                                 const CMPWebVertex *verts, CMPColor color,
+                                 CMPBool use_texture, GLuint texture,
+                                 CMPScalar opacity, const CMPRect *rect,
+                                 CMPScalar radius) {
   int rc;
 
   if (backend == NULL || verts == NULL || rect == NULL) {
@@ -1952,8 +1958,8 @@ static int cmp_web_gfx_draw_quad(struct CMPWebBackend *backend,
 }
 
 static int cmp_web_backend_set_canvas_size(struct CMPWebBackend *backend,
-                                          cmp_i32 width, cmp_i32 height,
-                                          CMPScalar dpi_scale) {
+                                           cmp_i32 width, cmp_i32 height,
+                                           CMPScalar dpi_scale) {
   cmp_i32 device_width;
   cmp_i32 device_height;
   int result;
@@ -1993,8 +1999,8 @@ static int cmp_web_backend_set_canvas_size(struct CMPWebBackend *backend,
 }
 
 static EM_BOOL cmp_web_on_mouse_down(int event_type,
-                                    const EmscriptenMouseEvent *event,
-                                    void *user_data) {
+                                     const EmscriptenMouseEvent *event,
+                                     void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2008,7 +2014,7 @@ static EM_BOOL cmp_web_on_mouse_down(int event_type,
   }
 
   rc = cmp_web_build_modifiers(&mods, event->shiftKey, event->ctrlKey,
-                              event->altKey, event->metaKey);
+                               event->altKey, event->metaKey);
   if (rc != CMP_OK) {
     return EM_FALSE;
   }
@@ -2034,8 +2040,8 @@ static EM_BOOL cmp_web_on_mouse_down(int event_type,
 }
 
 static EM_BOOL cmp_web_on_mouse_up(int event_type,
-                                  const EmscriptenMouseEvent *event,
-                                  void *user_data) {
+                                   const EmscriptenMouseEvent *event,
+                                   void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2049,7 +2055,7 @@ static EM_BOOL cmp_web_on_mouse_up(int event_type,
   }
 
   rc = cmp_web_build_modifiers(&mods, event->shiftKey, event->ctrlKey,
-                              event->altKey, event->metaKey);
+                               event->altKey, event->metaKey);
   if (rc != CMP_OK) {
     return EM_FALSE;
   }
@@ -2075,8 +2081,8 @@ static EM_BOOL cmp_web_on_mouse_up(int event_type,
 }
 
 static EM_BOOL cmp_web_on_mouse_move(int event_type,
-                                    const EmscriptenMouseEvent *event,
-                                    void *user_data) {
+                                     const EmscriptenMouseEvent *event,
+                                     void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2090,7 +2096,7 @@ static EM_BOOL cmp_web_on_mouse_move(int event_type,
   }
 
   rc = cmp_web_build_modifiers(&mods, event->shiftKey, event->ctrlKey,
-                              event->altKey, event->metaKey);
+                               event->altKey, event->metaKey);
   if (rc != CMP_OK) {
     return EM_FALSE;
   }
@@ -2116,8 +2122,8 @@ static EM_BOOL cmp_web_on_mouse_move(int event_type,
 }
 
 static EM_BOOL cmp_web_on_wheel(int event_type,
-                               const EmscriptenWheelEvent *event,
-                               void *user_data) {
+                                const EmscriptenWheelEvent *event,
+                                void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2132,9 +2138,9 @@ static EM_BOOL cmp_web_on_wheel(int event_type,
     return EM_FALSE;
   }
 
-  rc =
-      cmp_web_build_modifiers(&mods, event->mouse.shiftKey, event->mouse.ctrlKey,
-                             event->mouse.altKey, event->mouse.metaKey);
+  rc = cmp_web_build_modifiers(&mods, event->mouse.shiftKey,
+                               event->mouse.ctrlKey, event->mouse.altKey,
+                               event->mouse.metaKey);
   if (rc != CMP_OK) {
     return EM_FALSE;
   }
@@ -2171,8 +2177,8 @@ static EM_BOOL cmp_web_on_wheel(int event_type,
 }
 
 static EM_BOOL cmp_web_on_touch(int event_type,
-                               const EmscriptenTouchEvent *event,
-                               void *user_data) {
+                                const EmscriptenTouchEvent *event,
+                                void *user_data) {
   struct CMPWebBackend *backend;
   cmp_u32 mods;
   int rc;
@@ -2184,7 +2190,7 @@ static EM_BOOL cmp_web_on_touch(int event_type,
   }
 
   rc = cmp_web_build_modifiers(&mods, event->shiftKey, event->ctrlKey,
-                              event->altKey, event->metaKey);
+                               event->altKey, event->metaKey);
   if (rc != CMP_OK) {
     return EM_FALSE;
   }
@@ -2234,8 +2240,8 @@ static EM_BOOL cmp_web_on_touch(int event_type,
 }
 
 static EM_BOOL cmp_web_on_key_down(int event_type,
-                                  const EmscriptenKeyboardEvent *event,
-                                  void *user_data) {
+                                   const EmscriptenKeyboardEvent *event,
+                                   void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2249,7 +2255,7 @@ static EM_BOOL cmp_web_on_key_down(int event_type,
   }
 
   rc = cmp_web_build_modifiers(&mods, event->shiftKey, event->ctrlKey,
-                              event->altKey, event->metaKey);
+                               event->altKey, event->metaKey);
   if (rc != CMP_OK) {
     return EM_FALSE;
   }
@@ -2272,8 +2278,8 @@ static EM_BOOL cmp_web_on_key_down(int event_type,
 }
 
 static EM_BOOL cmp_web_on_key_up(int event_type,
-                                const EmscriptenKeyboardEvent *event,
-                                void *user_data) {
+                                 const EmscriptenKeyboardEvent *event,
+                                 void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2287,7 +2293,7 @@ static EM_BOOL cmp_web_on_key_up(int event_type,
   }
 
   rc = cmp_web_build_modifiers(&mods, event->shiftKey, event->ctrlKey,
-                              event->altKey, event->metaKey);
+                               event->altKey, event->metaKey);
   if (rc != CMP_OK) {
     return EM_FALSE;
   }
@@ -2310,8 +2316,8 @@ static EM_BOOL cmp_web_on_key_up(int event_type,
 }
 
 static EM_BOOL cmp_web_on_key_press(int event_type,
-                                   const EmscriptenKeyboardEvent *event,
-                                   void *user_data) {
+                                    const EmscriptenKeyboardEvent *event,
+                                    void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2342,7 +2348,7 @@ static EM_BOOL cmp_web_on_key_press(int event_type,
   }
 
   rc = cmp_web_build_modifiers(&mods, event->shiftKey, event->ctrlKey,
-                              event->altKey, event->metaKey);
+                               event->altKey, event->metaKey);
   if (rc != CMP_OK) {
     return EM_FALSE;
   }
@@ -2365,8 +2371,8 @@ static EM_BOOL cmp_web_on_key_press(int event_type,
 }
 
 static EM_BOOL cmp_web_on_focus(int event_type,
-                               const EmscriptenFocusEvent *event,
-                               void *user_data) {
+                                const EmscriptenFocusEvent *event,
+                                void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   int rc;
@@ -2392,8 +2398,9 @@ static EM_BOOL cmp_web_on_focus(int event_type,
   return EM_TRUE;
 }
 
-static EM_BOOL cmp_web_on_blur(int event_type, const EmscriptenFocusEvent *event,
-                              void *user_data) {
+static EM_BOOL cmp_web_on_blur(int event_type,
+                               const EmscriptenFocusEvent *event,
+                               void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   int rc;
@@ -2420,7 +2427,7 @@ static EM_BOOL cmp_web_on_blur(int event_type, const EmscriptenFocusEvent *event
 }
 
 static EM_BOOL cmp_web_on_resize(int event_type, const EmscriptenUiEvent *event,
-                                void *user_data) {
+                                 void *user_data) {
   struct CMPWebBackend *backend;
   CMPWebWindow *window;
   CMPInputEvent input;
@@ -2446,7 +2453,7 @@ static EM_BOOL cmp_web_on_resize(int event_type, const EmscriptenUiEvent *event,
 
   window = NULL;
   rc = cmp_web_backend_resolve(backend, backend->event_window,
-                              CMP_WEB_TYPE_WINDOW, (void **)&window);
+                               CMP_WEB_TYPE_WINDOW, (void **)&window);
   if (rc != CMP_OK || window == NULL) {
     return EM_FALSE;
   }
@@ -2474,8 +2481,8 @@ static EM_BOOL cmp_web_on_resize(int event_type, const EmscriptenUiEvent *event,
 
   window->width = width;
   window->height = height;
-  rc =
-      cmp_web_backend_set_canvas_size(backend, width, height, window->dpi_scale);
+  rc = cmp_web_backend_set_canvas_size(backend, width, height,
+                                       window->dpi_scale);
   if (rc != CMP_OK) {
     return EM_FALSE;
   }
@@ -2582,8 +2589,8 @@ static int cmp_web_register_callbacks(struct CMPWebBackend *backend) {
   }
 
   backend->callbacks_registered = CMP_TRUE;
-  rc =
-      cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.callbacks_registered");
+  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO,
+                           "ws.callbacks_registered");
   CMP_WEB_RETURN_IF_ERROR(rc);
   return CMP_OK;
 }
@@ -2722,7 +2729,7 @@ static int cmp_web_ws_shutdown(void *ws) {
 }
 
 static int cmp_web_ws_create_window(void *ws, const CMPWSWindowConfig *config,
-                                   CMPHandle *out_window) {
+                                    CMPHandle *out_window) {
   struct CMPWebBackend *backend;
   CMPWebWindow *window;
   double ratio;
@@ -2763,7 +2770,7 @@ static int cmp_web_ws_create_window(void *ws, const CMPWSWindowConfig *config,
   window->dpi_scale = (CMPScalar)ratio;
 
   rc = cmp_object_header_init(&window->header, CMP_WEB_TYPE_WINDOW, 0,
-                             &g_cmp_web_window_vtable);
+                              &g_cmp_web_window_vtable);
   CMP_WEB_RETURN_IF_ERROR_CLEANUP(
       rc, backend->allocator.free(backend->allocator.ctx, window));
 
@@ -2773,7 +2780,7 @@ static int cmp_web_ws_create_window(void *ws, const CMPWSWindowConfig *config,
       rc, backend->allocator.free(backend->allocator.ctx, window));
 
   rc = cmp_web_backend_set_canvas_size(backend, window->width, window->height,
-                                      window->dpi_scale);
+                                       window->dpi_scale);
   CMP_WEB_RETURN_IF_ERROR_CLEANUP(rc, cmp_object_release(&window->header));
 
   if (backend->event_window.id == 0u &&
@@ -2812,7 +2819,7 @@ static int cmp_web_ws_destroy_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPWebBackend *)ws;
   rc = cmp_web_backend_resolve(backend, window, CMP_WEB_TYPE_WINDOW,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.destroy_window");
@@ -2838,7 +2845,7 @@ static int cmp_web_ws_show_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPWebBackend *)ws;
   rc = cmp_web_backend_resolve(backend, window, CMP_WEB_TYPE_WINDOW,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.show_window");
@@ -2859,7 +2866,7 @@ static int cmp_web_ws_hide_window(void *ws, CMPHandle window) {
 
   backend = (struct CMPWebBackend *)ws;
   rc = cmp_web_backend_resolve(backend, window, CMP_WEB_TYPE_WINDOW,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.hide_window");
@@ -2870,7 +2877,7 @@ static int cmp_web_ws_hide_window(void *ws, CMPHandle window) {
 }
 
 static int cmp_web_ws_set_window_title(void *ws, CMPHandle window,
-                                      const char *utf8_title) {
+                                       const char *utf8_title) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -2889,7 +2896,7 @@ static int cmp_web_ws_set_window_title(void *ws, CMPHandle window,
 }
 
 static int cmp_web_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width,
-                                     cmp_i32 height) {
+                                      cmp_i32 height) {
   struct CMPWebBackend *backend;
   CMPWebWindow *resolved;
   int rc;
@@ -2903,14 +2910,14 @@ static int cmp_web_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width,
 
   backend = (struct CMPWebBackend *)ws;
   rc = cmp_web_backend_resolve(backend, window, CMP_WEB_TYPE_WINDOW,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_window_size");
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   rc = cmp_web_backend_set_canvas_size(backend, width, height,
-                                      resolved->dpi_scale);
+                                       resolved->dpi_scale);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   resolved->width = width;
@@ -2919,7 +2926,7 @@ static int cmp_web_ws_set_window_size(void *ws, CMPHandle window, cmp_i32 width,
 }
 
 static int cmp_web_ws_get_window_size(void *ws, CMPHandle window,
-                                     cmp_i32 *out_width, cmp_i32 *out_height) {
+                                      cmp_i32 *out_width, cmp_i32 *out_height) {
   struct CMPWebBackend *backend;
   CMPWebWindow *resolved;
   int rc;
@@ -2930,7 +2937,7 @@ static int cmp_web_ws_get_window_size(void *ws, CMPHandle window,
 
   backend = (struct CMPWebBackend *)ws;
   rc = cmp_web_backend_resolve(backend, window, CMP_WEB_TYPE_WINDOW,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_window_size");
@@ -2942,7 +2949,7 @@ static int cmp_web_ws_get_window_size(void *ws, CMPHandle window,
 }
 
 static int cmp_web_ws_set_window_dpi_scale(void *ws, CMPHandle window,
-                                          CMPScalar scale) {
+                                           CMPScalar scale) {
   struct CMPWebBackend *backend;
   CMPWebWindow *resolved;
   int rc;
@@ -2956,23 +2963,23 @@ static int cmp_web_ws_set_window_dpi_scale(void *ws, CMPHandle window,
 
   backend = (struct CMPWebBackend *)ws;
   rc = cmp_web_backend_resolve(backend, window, CMP_WEB_TYPE_WINDOW,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
-  rc =
-      cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_window_dpi_scale");
+  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO,
+                           "ws.set_window_dpi_scale");
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   resolved->dpi_scale = scale;
   rc = cmp_web_backend_set_canvas_size(backend, resolved->width,
-                                      resolved->height, resolved->dpi_scale);
+                                       resolved->height, resolved->dpi_scale);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   return CMP_OK;
 }
 
 static int cmp_web_ws_get_window_dpi_scale(void *ws, CMPHandle window,
-                                          CMPScalar *out_scale) {
+                                           CMPScalar *out_scale) {
   struct CMPWebBackend *backend;
   CMPWebWindow *resolved;
   int rc;
@@ -2983,11 +2990,11 @@ static int cmp_web_ws_get_window_dpi_scale(void *ws, CMPHandle window,
 
   backend = (struct CMPWebBackend *)ws;
   rc = cmp_web_backend_resolve(backend, window, CMP_WEB_TYPE_WINDOW,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
-  rc =
-      cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_window_dpi_scale");
+  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO,
+                           "ws.get_window_dpi_scale");
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   *out_scale = resolved->dpi_scale;
@@ -3005,7 +3012,8 @@ static int cmp_web_ws_set_clipboard_text(void *ws, const char *utf8_text) {
   }
 
   backend = (struct CMPWebBackend *)ws;
-  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_clipboard_text");
+  rc =
+      cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_clipboard_text");
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   length = 0;
@@ -3036,8 +3044,8 @@ static int cmp_web_ws_set_clipboard_text(void *ws, const char *utf8_text) {
 }
 
 static int cmp_web_ws_get_clipboard_text(void *ws, char *buffer,
-                                        cmp_usize buffer_size,
-                                        cmp_usize *out_length) {
+                                         cmp_usize buffer_size,
+                                         cmp_usize *out_length) {
   struct CMPWebBackend *backend;
   cmp_usize required;
   int rc;
@@ -3047,7 +3055,8 @@ static int cmp_web_ws_get_clipboard_text(void *ws, char *buffer,
   }
 
   backend = (struct CMPWebBackend *)ws;
-  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_clipboard_text");
+  rc =
+      cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.get_clipboard_text");
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   required = backend->clipboard_length + 1;
@@ -3066,7 +3075,7 @@ static int cmp_web_ws_get_clipboard_text(void *ws, char *buffer,
 }
 
 static int cmp_web_ws_poll_event(void *ws, CMPInputEvent *out_event,
-                                CMPBool *out_has_event) {
+                                 CMPBool *out_has_event) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -3111,24 +3120,24 @@ static int cmp_web_ws_get_time_ms(void *ws, cmp_u32 *out_time_ms) {
 }
 
 static const CMPWSVTable g_cmp_web_ws_vtable = {cmp_web_ws_init,
-                                              cmp_web_ws_shutdown,
-                                              cmp_web_ws_create_window,
-                                              cmp_web_ws_destroy_window,
-                                              cmp_web_ws_show_window,
-                                              cmp_web_ws_hide_window,
-                                              cmp_web_ws_set_window_title,
-                                              cmp_web_ws_set_window_size,
-                                              cmp_web_ws_get_window_size,
-                                              cmp_web_ws_set_window_dpi_scale,
-                                              cmp_web_ws_get_window_dpi_scale,
-                                              cmp_web_ws_set_clipboard_text,
-                                              cmp_web_ws_get_clipboard_text,
-                                              cmp_web_ws_poll_event,
-                                              cmp_web_ws_pump_events,
-                                              cmp_web_ws_get_time_ms};
+                                                cmp_web_ws_shutdown,
+                                                cmp_web_ws_create_window,
+                                                cmp_web_ws_destroy_window,
+                                                cmp_web_ws_show_window,
+                                                cmp_web_ws_hide_window,
+                                                cmp_web_ws_set_window_title,
+                                                cmp_web_ws_set_window_size,
+                                                cmp_web_ws_get_window_size,
+                                                cmp_web_ws_set_window_dpi_scale,
+                                                cmp_web_ws_get_window_dpi_scale,
+                                                cmp_web_ws_set_clipboard_text,
+                                                cmp_web_ws_get_clipboard_text,
+                                                cmp_web_ws_poll_event,
+                                                cmp_web_ws_pump_events,
+                                                cmp_web_ws_get_time_ms};
 
 static int cmp_web_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
-                                  cmp_i32 height, CMPScalar dpi_scale) {
+                                   cmp_i32 height, CMPScalar dpi_scale) {
   struct CMPWebBackend *backend;
   CMPWebWindow *resolved;
   cmp_i32 device_width;
@@ -3147,7 +3156,7 @@ static int cmp_web_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
 
   backend = (struct CMPWebBackend *)gfx;
   rc = cmp_web_backend_resolve(backend, window, CMP_WEB_TYPE_WINDOW,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.begin_frame");
@@ -3155,7 +3164,8 @@ static int cmp_web_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
 
 #if defined(CMP_WEBGPU_AVAILABLE)
   if (backend->use_webgpu) {
-    return cmp_web_wgpu_begin_frame(backend, resolved, width, height, dpi_scale);
+    return cmp_web_wgpu_begin_frame(backend, resolved, width, height,
+                                    dpi_scale);
   }
 #endif
 
@@ -3254,7 +3264,7 @@ static int cmp_web_gfx_clear(void *gfx, CMPColor color) {
 }
 
 static int cmp_web_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
-                                CMPScalar corner_radius) {
+                                 CMPScalar corner_radius) {
   struct CMPWebBackend *backend;
   CMPWebVertex verts[4];
   CMPRect rect_copy;
@@ -3308,17 +3318,17 @@ static int cmp_web_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
 #if defined(CMP_WEBGPU_AVAILABLE)
   if (backend->use_webgpu) {
     return cmp_web_wgpu_draw_quad(backend, verts, color, CMP_FALSE, NULL, 1.0f,
-                                 &rect_copy, radius);
+                                  &rect_copy, radius);
   }
 #endif
 
   return cmp_web_gfx_draw_quad(backend, verts, color, CMP_FALSE, 0, 1.0f,
-                              &rect_copy, radius);
+                               &rect_copy, radius);
 }
 
 static int cmp_web_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
-                                CMPScalar x1, CMPScalar y1, CMPColor color,
-                                CMPScalar thickness) {
+                                 CMPScalar x1, CMPScalar y1, CMPColor color,
+                                 CMPScalar thickness) {
   struct CMPWebBackend *backend;
   CMPWebVertex verts[4];
   CMPRect rect;
@@ -3430,15 +3440,16 @@ static int cmp_web_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
 #if defined(CMP_WEBGPU_AVAILABLE)
   if (backend->use_webgpu) {
     return cmp_web_wgpu_draw_quad(backend, verts, color, CMP_FALSE, NULL, 1.0f,
-                                 &rect, 0.0f);
+                                  &rect, 0.0f);
   }
 #endif
 
   return cmp_web_gfx_draw_quad(backend, verts, color, CMP_FALSE, 0, 1.0f, &rect,
-                              0.0f);
+                               0.0f);
 }
 
-static int cmp_web_gfx_draw_path(void *gfx, const CMPPath *path, CMPColor color) {
+static int cmp_web_gfx_draw_path(void *gfx, const CMPPath *path,
+                                 CMPColor color) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -3492,8 +3503,8 @@ static int cmp_web_gfx_push_clip(void *gfx, const CMPRect *rect) {
   if (backend->clip_depth == 0) {
     clipped = *rect;
   } else {
-    rc = cmp_rect_intersect(&backend->clip_stack[backend->clip_depth - 1u], rect,
-                           &clipped, &has_intersection);
+    rc = cmp_rect_intersect(&backend->clip_stack[backend->clip_depth - 1u],
+                            rect, &clipped, &has_intersection);
     CMP_WEB_RETURN_IF_ERROR(rc);
     if (!has_intersection) {
       clipped.x = rect->x;
@@ -3573,8 +3584,9 @@ static int cmp_web_mul_size(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
   return CMP_OK;
 }
 
-static int cmp_web_convert_bgra(const CMPAllocator *allocator, const void *pixels,
-                               cmp_usize size, void **out_pixels) {
+static int cmp_web_convert_bgra(const CMPAllocator *allocator,
+                                const void *pixels, cmp_usize size,
+                                void **out_pixels) {
   unsigned char *dst;
   const unsigned char *src;
   cmp_usize i;
@@ -3607,9 +3619,9 @@ static int cmp_web_convert_bgra(const CMPAllocator *allocator, const void *pixel
 
 #if defined(CMP_WEBGPU_AVAILABLE)
 static int cmp_web_wgpu_write_texture(struct CMPWebBackend *backend,
-                                     CMPWebTexture *texture, cmp_i32 x, cmp_i32 y,
-                                     cmp_i32 width, cmp_i32 height,
-                                     const void *pixels, cmp_usize size) {
+                                      CMPWebTexture *texture, cmp_i32 x,
+                                      cmp_i32 y, cmp_i32 width, cmp_i32 height,
+                                      const void *pixels, cmp_usize size) {
   cmp_usize row_bytes;
   cmp_usize expected_size;
   cmp_usize padded_row_bytes;
@@ -3639,7 +3651,7 @@ static int cmp_web_wgpu_write_texture(struct CMPWebBackend *backend,
   }
 
   rc = cmp_web_mul_size((cmp_usize)width, (cmp_usize)texture->bytes_per_pixel,
-                       &row_bytes);
+                        &row_bytes);
   CMP_WEB_RETURN_IF_ERROR(rc);
   rc = cmp_web_mul_size(row_bytes, (cmp_usize)height, &expected_size);
   CMP_WEB_RETURN_IF_ERROR(rc);
@@ -3649,7 +3661,7 @@ static int cmp_web_wgpu_write_texture(struct CMPWebBackend *backend,
   }
 
   rc = cmp_web_wgpu_align_size(row_bytes, (cmp_usize)CMP_WEB_WGPU_ROW_ALIGN,
-                              &padded_row_bytes);
+                               &padded_row_bytes);
   CMP_WEB_RETURN_IF_ERROR(rc);
   rc = cmp_web_mul_size(padded_row_bytes, (cmp_usize)height, &padded_size);
   CMP_WEB_RETURN_IF_ERROR(rc);
@@ -3701,9 +3713,9 @@ static int cmp_web_wgpu_write_texture(struct CMPWebBackend *backend,
 }
 
 static int cmp_web_wgpu_create_texture(struct CMPWebBackend *backend,
-                                      cmp_i32 width, cmp_i32 height,
-                                      cmp_u32 format, const void *pixels,
-                                      cmp_usize size, CMPHandle *out_texture) {
+                                       cmp_i32 width, cmp_i32 height,
+                                       cmp_u32 format, const void *pixels,
+                                       cmp_usize size, CMPHandle *out_texture) {
   CMPWebTexture *texture;
   WGPUTextureDescriptor texture_desc;
   WGPUTextureViewDescriptor view_desc;
@@ -3826,7 +3838,7 @@ static int cmp_web_wgpu_create_texture(struct CMPWebBackend *backend,
 
   if (pixels != NULL && size != 0) {
     rc = cmp_web_wgpu_write_texture(backend, texture, 0, 0, width, height,
-                                   pixels, size);
+                                    pixels, size);
     if (rc != CMP_OK) {
       wgpuBindGroupRelease(texture->wgpu_bind_group);
       wgpuTextureViewRelease(texture->wgpu_view);
@@ -3837,7 +3849,7 @@ static int cmp_web_wgpu_create_texture(struct CMPWebBackend *backend,
   }
 
   rc = cmp_object_header_init(&texture->header, CMP_WEB_TYPE_TEXTURE, 0,
-                             &g_cmp_web_texture_vtable);
+                              &g_cmp_web_texture_vtable);
   if (rc != CMP_OK) {
     wgpuBindGroupRelease(texture->wgpu_bind_group);
     wgpuTextureViewRelease(texture->wgpu_view);
@@ -3861,9 +3873,9 @@ static int cmp_web_wgpu_create_texture(struct CMPWebBackend *backend,
 }
 
 static int cmp_web_wgpu_update_texture(struct CMPWebBackend *backend,
-                                      CMPWebTexture *resolved, cmp_i32 x,
-                                      cmp_i32 y, cmp_i32 width, cmp_i32 height,
-                                      const void *pixels, cmp_usize size) {
+                                       CMPWebTexture *resolved, cmp_i32 x,
+                                       cmp_i32 y, cmp_i32 width, cmp_i32 height,
+                                       const void *pixels, cmp_usize size) {
   int rc;
 
   if (backend == NULL || resolved == NULL) {
@@ -3882,8 +3894,8 @@ static int cmp_web_wgpu_update_texture(struct CMPWebBackend *backend,
     return CMP_OK;
   }
 
-  rc = cmp_web_wgpu_write_texture(backend, resolved, x, y, width, height, pixels,
-                                 size);
+  rc = cmp_web_wgpu_write_texture(backend, resolved, x, y, width, height,
+                                  pixels, size);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   return CMP_OK;
@@ -3891,8 +3903,8 @@ static int cmp_web_wgpu_update_texture(struct CMPWebBackend *backend,
 #endif
 
 static int cmp_web_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
-                                     cmp_u32 format, const void *pixels,
-                                     cmp_usize size, CMPHandle *out_texture) {
+                                      cmp_u32 format, const void *pixels,
+                                      cmp_usize size, CMPHandle *out_texture) {
   struct CMPWebBackend *backend;
   CMPWebTexture *texture;
   GLenum gl_format;
@@ -3927,7 +3939,7 @@ static int cmp_web_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
 #if defined(CMP_WEBGPU_AVAILABLE)
   if (backend->use_webgpu) {
     return cmp_web_wgpu_create_texture(backend, width, height, format, pixels,
-                                      size, out_texture);
+                                       size, out_texture);
   }
 #endif
 
@@ -3977,7 +3989,7 @@ static int cmp_web_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
   upload_pixels = (void *)pixels;
   if (format == CMP_TEX_FORMAT_BGRA8 && pixels != NULL && size != 0) {
     rc = cmp_web_convert_bgra(&backend->allocator, pixels, expected_size,
-                             &upload_pixels);
+                              &upload_pixels);
     if (rc != CMP_OK) {
       glDeleteTextures(1, &gl_texture);
       backend->allocator.free(backend->allocator.ctx, texture);
@@ -4002,7 +4014,7 @@ static int cmp_web_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
   texture->gl_texture = gl_texture;
 
   rc = cmp_object_header_init(&texture->header, CMP_WEB_TYPE_TEXTURE, 0,
-                             &g_cmp_web_texture_vtable);
+                              &g_cmp_web_texture_vtable);
   if (rc != CMP_OK) {
     glDeleteTextures(1, &gl_texture);
     backend->allocator.free(backend->allocator.ctx, texture);
@@ -4022,8 +4034,8 @@ static int cmp_web_gfx_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
 }
 
 static int cmp_web_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
-                                     cmp_i32 y, cmp_i32 width, cmp_i32 height,
-                                     const void *pixels, cmp_usize size) {
+                                      cmp_i32 y, cmp_i32 width, cmp_i32 height,
+                                      const void *pixels, cmp_usize size) {
   struct CMPWebBackend *backend;
   CMPWebTexture *resolved;
   cmp_usize expected_size;
@@ -4044,7 +4056,7 @@ static int cmp_web_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
 
   backend = (struct CMPWebBackend *)gfx;
   rc = cmp_web_backend_resolve(backend, texture, CMP_WEB_TYPE_TEXTURE,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   if (x + width > resolved->width || y + height > resolved->height) {
@@ -4061,7 +4073,7 @@ static int cmp_web_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
 #if defined(CMP_WEBGPU_AVAILABLE)
   if (backend->use_webgpu) {
     return cmp_web_wgpu_update_texture(backend, resolved, x, y, width, height,
-                                      pixels, size);
+                                       pixels, size);
   }
 #endif
 
@@ -4072,7 +4084,7 @@ static int cmp_web_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
   rc = cmp_web_mul_size((cmp_usize)width, (cmp_usize)height, &row_size);
   CMP_WEB_RETURN_IF_ERROR(rc);
   rc = cmp_web_mul_size(row_size, (cmp_usize)resolved->bytes_per_pixel,
-                       &expected_size);
+                        &expected_size);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   if (size != 0 && size < expected_size) {
@@ -4090,7 +4102,7 @@ static int cmp_web_gfx_update_texture(void *gfx, CMPHandle texture, cmp_i32 x,
   upload_pixels = (void *)pixels;
   if (resolved->format == CMP_TEX_FORMAT_BGRA8 && pixels != NULL) {
     rc = cmp_web_convert_bgra(&backend->allocator, pixels, expected_size,
-                             &upload_pixels);
+                              &upload_pixels);
     CMP_WEB_RETURN_IF_ERROR(rc);
   }
 
@@ -4117,7 +4129,7 @@ static int cmp_web_gfx_destroy_texture(void *gfx, CMPHandle texture) {
 
   backend = (struct CMPWebBackend *)gfx;
   rc = cmp_web_backend_resolve(backend, texture, CMP_WEB_TYPE_TEXTURE,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.destroy_texture");
@@ -4127,8 +4139,8 @@ static int cmp_web_gfx_destroy_texture(void *gfx, CMPHandle texture) {
 }
 
 static int cmp_web_gfx_draw_texture(void *gfx, CMPHandle texture,
-                                   const CMPRect *src, const CMPRect *dst,
-                                   CMPScalar opacity) {
+                                    const CMPRect *src, const CMPRect *dst,
+                                    CMPScalar opacity) {
   struct CMPWebBackend *backend;
   CMPWebTexture *resolved;
   CMPWebVertex verts[4];
@@ -4154,7 +4166,7 @@ static int cmp_web_gfx_draw_texture(void *gfx, CMPHandle texture,
 
   backend = (struct CMPWebBackend *)gfx;
   rc = cmp_web_backend_resolve(backend, texture, CMP_WEB_TYPE_TEXTURE,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   if (src->x < 0.0f || src->y < 0.0f || src->width < 0.0f ||
@@ -4206,12 +4218,12 @@ static int cmp_web_gfx_draw_texture(void *gfx, CMPHandle texture,
 #if defined(CMP_WEBGPU_AVAILABLE)
   if (backend->use_webgpu) {
     return cmp_web_wgpu_draw_quad(backend, verts, color, CMP_TRUE, resolved,
-                                 opacity, &rect_copy, 0.0f);
+                                  opacity, &rect_copy, 0.0f);
   }
 #endif
 
   return cmp_web_gfx_draw_quad(backend, verts, color, CMP_TRUE,
-                              resolved->gl_texture, opacity, &rect_copy, 0.0f);
+                               resolved->gl_texture, opacity, &rect_copy, 0.0f);
 }
 
 static const CMPGfxVTable g_cmp_web_gfx_vtable = {
@@ -4224,8 +4236,8 @@ static const CMPGfxVTable g_cmp_web_gfx_vtable = {
     cmp_web_gfx_draw_texture};
 
 static int cmp_web_text_create_font(void *text, const char *utf8_family,
-                                   cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
-                                   CMPHandle *out_font) {
+                                    cmp_i32 size_px, cmp_i32 weight,
+                                    CMPBool italic, CMPHandle *out_font) {
   struct CMPWebBackend *backend;
   CMPWebFont *font;
   int rc;
@@ -4258,7 +4270,7 @@ static int cmp_web_text_create_font(void *text, const char *utf8_family,
   font->italic = italic ? CMP_TRUE : CMP_FALSE;
 
   rc = cmp_object_header_init(&font->header, CMP_WEB_TYPE_FONT, 0,
-                             &g_cmp_web_font_vtable);
+                              &g_cmp_web_font_vtable);
   CMP_WEB_RETURN_IF_ERROR_CLEANUP(
       rc, backend->allocator.free(backend->allocator.ctx, font));
 
@@ -4282,7 +4294,7 @@ static int cmp_web_text_destroy_font(void *text, CMPHandle font) {
 
   backend = (struct CMPWebBackend *)text;
   rc = cmp_web_backend_resolve(backend, font, CMP_WEB_TYPE_FONT,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.destroy_font");
@@ -4291,10 +4303,11 @@ static int cmp_web_text_destroy_font(void *text, CMPHandle font) {
   return cmp_object_release(&resolved->header);
 }
 
-static int cmp_web_text_measure_text(void *text, CMPHandle font, const char *utf8,
-                                    cmp_usize utf8_len, CMPScalar *out_width,
-                                    CMPScalar *out_height,
-                                    CMPScalar *out_baseline) {
+static int cmp_web_text_measure_text(void *text, CMPHandle font,
+                                     const char *utf8, cmp_usize utf8_len,
+                                     CMPScalar *out_width,
+                                     CMPScalar *out_height,
+                                     CMPScalar *out_baseline) {
   struct CMPWebBackend *backend;
   CMPWebFont *resolved;
   CMPScalar size;
@@ -4310,7 +4323,7 @@ static int cmp_web_text_measure_text(void *text, CMPHandle font, const char *utf
 
   backend = (struct CMPWebBackend *)text;
   rc = cmp_web_backend_resolve(backend, font, CMP_WEB_TYPE_FONT,
-                              (void **)&resolved);
+                               (void **)&resolved);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "text.measure_text");
@@ -4324,8 +4337,8 @@ static int cmp_web_text_measure_text(void *text, CMPHandle font, const char *utf
 }
 
 static int cmp_web_text_draw_text(void *text, CMPHandle font, const char *utf8,
-                                 cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                                 CMPColor color) {
+                                  cmp_usize utf8_len, CMPScalar x, CMPScalar y,
+                                  CMPColor color) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4351,11 +4364,11 @@ static int cmp_web_text_draw_text(void *text, CMPHandle font, const char *utf8,
 }
 
 static const CMPTextVTable g_cmp_web_text_vtable = {
-    cmp_web_text_create_font, cmp_web_text_destroy_font, cmp_web_text_measure_text,
-    cmp_web_text_draw_text};
+    cmp_web_text_create_font, cmp_web_text_destroy_font,
+    cmp_web_text_measure_text, cmp_web_text_draw_text};
 
 static int cmp_web_io_read_file(void *io, const char *utf8_path, void *buffer,
-                               cmp_usize buffer_size, cmp_usize *out_read) {
+                                cmp_usize buffer_size, cmp_usize *out_read) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4375,8 +4388,8 @@ static int cmp_web_io_read_file(void *io, const char *utf8_path, void *buffer,
 }
 
 static int cmp_web_io_read_file_alloc(void *io, const char *utf8_path,
-                                     const CMPAllocator *allocator,
-                                     void **out_data, cmp_usize *out_size) {
+                                      const CMPAllocator *allocator,
+                                      void **out_data, cmp_usize *out_size) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4399,8 +4412,8 @@ static int cmp_web_io_read_file_alloc(void *io, const char *utf8_path,
 }
 
 static int cmp_web_io_write_file(void *io, const char *utf8_path,
-                                const void *data, cmp_usize size,
-                                CMPBool overwrite) {
+                                 const void *data, cmp_usize size,
+                                 CMPBool overwrite) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4420,7 +4433,7 @@ static int cmp_web_io_write_file(void *io, const char *utf8_path,
 }
 
 static int cmp_web_io_file_exists(void *io, const char *utf8_path,
-                                 CMPBool *out_exists) {
+                                  CMPBool *out_exists) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4451,7 +4464,7 @@ static int cmp_web_io_delete_file(void *io, const char *utf8_path) {
 }
 
 static int cmp_web_io_stat_file(void *io, const char *utf8_path,
-                               CMPFileInfo *out_info) {
+                                CMPFileInfo *out_info) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4472,7 +4485,7 @@ static const CMPIOVTable g_cmp_web_io_vtable = {
     cmp_web_io_file_exists, cmp_web_io_delete_file,     cmp_web_io_stat_file};
 
 static int cmp_web_sensors_is_available(void *sensors, cmp_u32 type,
-                                       CMPBool *out_available) {
+                                        CMPBool *out_available) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4483,7 +4496,8 @@ static int cmp_web_sensors_is_available(void *sensors, cmp_u32 type,
   }
 
   backend = (struct CMPWebBackend *)sensors;
-  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "sensors.is_available");
+  rc =
+      cmp_web_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "sensors.is_available");
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   *out_available = CMP_FALSE;
@@ -4523,8 +4537,8 @@ static int cmp_web_sensors_stop(void *sensors, cmp_u32 type) {
 }
 
 static int cmp_web_sensors_read(void *sensors, cmp_u32 type,
-                               CMPSensorReading *out_reading,
-                               CMPBool *out_has_reading) {
+                                CMPSensorReading *out_reading,
+                                CMPBool *out_has_reading) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4564,7 +4578,7 @@ static int cmp_web_camera_open(void *camera, cmp_u32 camera_id) {
 }
 
 static int cmp_web_camera_open_with_config(void *camera,
-                                          const CMPCameraConfig *config) {
+                                           const CMPCameraConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -4614,7 +4628,7 @@ static int cmp_web_camera_stop(void *camera) {
 }
 
 static int cmp_web_camera_read_frame(void *camera, CMPCameraFrame *out_frame,
-                                    CMPBool *out_has_frame) {
+                                     CMPBool *out_has_frame) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4637,8 +4651,8 @@ static const CMPCameraVTable g_cmp_web_camera_vtable = {
     cmp_web_camera_stop,  cmp_web_camera_read_frame};
 
 static int cmp_web_network_request(void *net, const CMPNetworkRequest *request,
-                                  const CMPAllocator *allocator,
-                                  CMPNetworkResponse *out_response) {
+                                   const CMPAllocator *allocator,
+                                   CMPNetworkResponse *out_response) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4657,8 +4671,9 @@ static int cmp_web_network_request(void *net, const CMPNetworkRequest *request,
   return CMP_ERR_UNSUPPORTED;
 }
 
-static int cmp_web_network_free_response(void *net, const CMPAllocator *allocator,
-                                        CMPNetworkResponse *response) {
+static int cmp_web_network_free_response(void *net,
+                                         const CMPAllocator *allocator,
+                                         CMPNetworkResponse *response) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4670,7 +4685,8 @@ static int cmp_web_network_free_response(void *net, const CMPAllocator *allocato
   }
 
   backend = (struct CMPWebBackend *)net;
-  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "network.free_response");
+  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
+                           "network.free_response");
   CMP_WEB_RETURN_IF_ERROR(rc);
   return CMP_OK;
 }
@@ -4678,8 +4694,8 @@ static int cmp_web_network_free_response(void *net, const CMPAllocator *allocato
 static const CMPNetworkVTable g_cmp_web_network_vtable = {
     cmp_web_network_request, cmp_web_network_free_response};
 
-static int cmp_web_tasks_thread_create(void *tasks, CMPThreadFn entry, void *user,
-                                      CMPHandle *out_thread) {
+static int cmp_web_tasks_thread_create(void *tasks, CMPThreadFn entry,
+                                       void *user, CMPHandle *out_thread) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4811,7 +4827,7 @@ static int cmp_web_tasks_post(void *tasks, CMPTaskFn fn, void *user) {
 }
 
 static int cmp_web_tasks_post_delayed(void *tasks, CMPTaskFn fn, void *user,
-                                     cmp_u32 delay_ms) {
+                                      cmp_u32 delay_ms) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4984,12 +5000,12 @@ static int cmp_web_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
 }
 
 static const CMPEnvVTable g_cmp_web_env_vtable = {
-    cmp_web_env_get_io,     cmp_web_env_get_sensors, cmp_web_env_get_camera,
-    cmp_web_env_get_image,  cmp_web_env_get_video,   cmp_web_env_get_audio,
-    cmp_web_env_get_network, cmp_web_env_get_tasks,  cmp_web_env_get_time_ms};
+    cmp_web_env_get_io,      cmp_web_env_get_sensors, cmp_web_env_get_camera,
+    cmp_web_env_get_image,   cmp_web_env_get_video,   cmp_web_env_get_audio,
+    cmp_web_env_get_network, cmp_web_env_get_tasks,   cmp_web_env_get_time_ms};
 
 int CMP_CALL cmp_web_backend_create(const CMPWebBackendConfig *config,
-                                  CMPWebBackend **out_backend) {
+                                    CMPWebBackend **out_backend) {
   CMPWebBackendConfig local_config;
   CMPAllocator allocator;
   struct CMPWebBackend *backend;
@@ -5031,7 +5047,7 @@ int CMP_CALL cmp_web_backend_create(const CMPWebBackendConfig *config,
   backend->clipboard_limit = config->clipboard_limit;
 
   rc = cmp_web_backend_copy_string(&allocator, config->utf8_canvas_id,
-                                  &backend->canvas_id);
+                                   &backend->canvas_id);
   if (rc != CMP_OK) {
     allocator.free(allocator.ctx, backend);
     return rc;
@@ -5048,7 +5064,7 @@ int CMP_CALL cmp_web_backend_create(const CMPWebBackendConfig *config,
   }
 
   rc = cmp_handle_system_default_create(config->handle_capacity, &allocator,
-                                       &backend->handles);
+                                        &backend->handles);
   if (rc != CMP_OK) {
     if (backend->log_owner) {
       cmp_log_shutdown();
@@ -5215,8 +5231,8 @@ int CMP_CALL cmp_web_backend_get_env(CMPWebBackend *backend, CMPEnv *out_env) {
 
 int CMP_CALL
 cmp_web_backend_create(const CMPWebBackendConfig *config, /* GCOVR_EXCL_LINE */
-                      CMPWebBackend **out_backend) {     /* GCOVR_EXCL_LINE */
-  CMPWebBackendConfig local_config;                      /* GCOVR_EXCL_LINE */
+                       CMPWebBackend **out_backend) {     /* GCOVR_EXCL_LINE */
+  CMPWebBackendConfig local_config;                       /* GCOVR_EXCL_LINE */
   int rc;
 
   if (out_backend == NULL) { /* GCOVR_EXCL_LINE */

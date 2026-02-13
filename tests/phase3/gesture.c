@@ -10,19 +10,21 @@ int CMP_CALL cmp_gesture_test_set_distance_error(CMPBool enable);
 int CMP_CALL cmp_gesture_test_set_distance_error_after(cmp_i32 calls);
 int CMP_CALL cmp_gesture_test_set_config_init_fail(CMPBool enable);
 int CMP_CALL cmp_gesture_test_validate_rect(const CMPRect *rect);
-int CMP_CALL cmp_gesture_test_distance_sq(CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                                        CMPScalar y1, CMPScalar *out_value);
+int CMP_CALL cmp_gesture_test_distance_sq(CMPScalar x0, CMPScalar y0,
+                                          CMPScalar x1, CMPScalar y1,
+                                          CMPScalar *out_value);
 int CMP_CALL cmp_gesture_test_time_delta(cmp_u32 start, cmp_u32 end,
-                                       cmp_u32 *out_delta);
+                                         cmp_u32 *out_delta);
 int CMP_CALL cmp_gesture_test_velocity(CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                                     CMPScalar y1, cmp_u32 dt_ms,
-                                     CMPScalar *out_vx, CMPScalar *out_vy);
+                                       CMPScalar y1, cmp_u32 dt_ms,
+                                       CMPScalar *out_vx, CMPScalar *out_vy);
 int CMP_CALL cmp_gesture_test_dispatch_to_widget(CMPWidget *widget,
-                                               const CMPInputEvent *event,
-                                               CMPBool *out_handled);
-int CMP_CALL cmp_gesture_test_emit(CMPWidget *widget, const CMPInputEvent *source,
-                                 cmp_u32 type, const CMPGestureEvent *gesture,
-                                 CMPBool *out_handled);
+                                                 const CMPInputEvent *event,
+                                                 CMPBool *out_handled);
+int CMP_CALL cmp_gesture_test_emit(CMPWidget *widget,
+                                   const CMPInputEvent *source, cmp_u32 type,
+                                   const CMPGestureEvent *gesture,
+                                   CMPBool *out_handled);
 int CMP_CALL cmp_gesture_test_reset_pointer(CMPGestureDispatcher *dispatcher);
 int CMP_CALL cmp_gesture_test_clear_state(CMPGestureDispatcher *dispatcher);
 
@@ -155,20 +157,20 @@ int main(void) {
     CMP_TEST_OK(cmp_gesture_config_init(&config));
     CMP_TEST_ASSERT(config.tap_max_ms == CMP_GESTURE_DEFAULT_TAP_MAX_MS);
     CMP_TEST_ASSERT(config.tap_max_distance ==
-                   CMP_GESTURE_DEFAULT_TAP_MAX_DISTANCE);
+                    CMP_GESTURE_DEFAULT_TAP_MAX_DISTANCE);
     CMP_TEST_ASSERT(config.double_tap_max_ms ==
-                   CMP_GESTURE_DEFAULT_DOUBLE_TAP_MAX_MS);
+                    CMP_GESTURE_DEFAULT_DOUBLE_TAP_MAX_MS);
     CMP_TEST_ASSERT(config.double_tap_max_distance ==
-                   CMP_GESTURE_DEFAULT_DOUBLE_TAP_MAX_DISTANCE);
+                    CMP_GESTURE_DEFAULT_DOUBLE_TAP_MAX_DISTANCE);
     CMP_TEST_ASSERT(config.long_press_ms == CMP_GESTURE_DEFAULT_LONG_PRESS_MS);
     CMP_TEST_ASSERT(config.drag_start_distance ==
-                   CMP_GESTURE_DEFAULT_DRAG_START_DISTANCE);
+                    CMP_GESTURE_DEFAULT_DRAG_START_DISTANCE);
     CMP_TEST_ASSERT(config.fling_min_velocity ==
-                   CMP_GESTURE_DEFAULT_FLING_MIN_VELOCITY);
+                    CMP_GESTURE_DEFAULT_FLING_MIN_VELOCITY);
 
 #ifdef CMP_TESTING
     CMP_TEST_EXPECT(cmp_gesture_test_validate_config(NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     invalid = config;
     invalid.tap_max_distance = -1.0f;
     CMP_TEST_EXPECT(cmp_gesture_test_validate_config(&invalid), CMP_ERR_RANGE);
@@ -201,7 +203,7 @@ int main(void) {
     CMPWidget *hit;
 
     CMP_TEST_EXPECT(cmp_gesture_test_validate_rect(NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     rect.x = 0.0f;
     rect.y = 0.0f;
     rect.width = -1.0f;
@@ -211,12 +213,13 @@ int main(void) {
     CMP_TEST_OK(cmp_gesture_test_validate_rect(&rect));
 
     CMP_TEST_EXPECT(cmp_gesture_test_distance_sq(0.0f, 0.0f, 1.0f, 1.0f, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_gesture_test_distance_sq(0.0f, 0.0f, 1.0f, 1.0f, &value));
 
     CMP_TEST_EXPECT(cmp_gesture_test_time_delta(0u, 1u, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_gesture_test_time_delta(10u, 5u, &delta), CMP_ERR_RANGE);
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_gesture_test_time_delta(10u, 5u, &delta),
+                    CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_gesture_test_time_delta(5u, 10u, &delta));
 
     CMP_TEST_EXPECT(
@@ -225,9 +228,11 @@ int main(void) {
     CMP_TEST_EXPECT(
         cmp_gesture_test_velocity(0.0f, 0.0f, 1.0f, 1.0f, 10u, &vx, NULL),
         CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_OK(cmp_gesture_test_velocity(0.0f, 0.0f, 1.0f, 1.0f, 0u, &vx, &vy));
+    CMP_TEST_OK(
+        cmp_gesture_test_velocity(0.0f, 0.0f, 1.0f, 1.0f, 0u, &vx, &vy));
 
-    CMP_TEST_EXPECT(cmp_gesture_test_set_distance_error_after(-1), CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(cmp_gesture_test_set_distance_error_after(-1),
+                    CMP_ERR_RANGE);
     CMP_TEST_OK(cmp_gesture_test_set_distance_error_after(0));
 
     memset(&widget, 0, sizeof(widget));
@@ -242,35 +247,37 @@ int main(void) {
 
     CMP_TEST_OK(cmp_gesture_test_set_contains_error(CMP_TRUE));
     CMP_TEST_EXPECT(cmp_gesture_test_hit_test(&node, 0.5f, 0.5f, &hit),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
 
     memset(&event, 0, sizeof(event));
     event.type = CMP_INPUT_GESTURE_TAP;
     CMP_TEST_EXPECT(cmp_gesture_test_dispatch_to_widget(&widget, &event, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_gesture_test_dispatch_to_widget(NULL, &event, &handled),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_gesture_test_dispatch_to_widget(&widget, NULL, &handled),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        cmp_gesture_test_dispatch_to_widget(&widget, NULL, &handled),
+        CMP_ERR_INVALID_ARGUMENT);
     widget.vtable = NULL;
     CMP_TEST_OK(cmp_gesture_test_dispatch_to_widget(&widget, &event, &handled));
 
     memset(&gesture, 0, sizeof(gesture));
-    CMP_TEST_EXPECT(cmp_gesture_test_emit(&widget, &event, CMP_INPUT_GESTURE_TAP,
-                                        &gesture, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_gesture_test_emit(
+                        &widget, &event, CMP_INPUT_GESTURE_TAP, &gesture, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_gesture_test_emit(NULL, &event, CMP_INPUT_GESTURE_TAP,
-                                    &gesture, &handled));
+                                      &gesture, &handled));
     CMP_TEST_EXPECT(cmp_gesture_test_emit(&widget, NULL, CMP_INPUT_GESTURE_TAP,
-                                        &gesture, &handled),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_gesture_test_emit(&widget, &event, CMP_INPUT_GESTURE_TAP,
-                                        NULL, &handled),
-                   CMP_ERR_INVALID_ARGUMENT);
+                                          &gesture, &handled),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_gesture_test_emit(
+                        &widget, &event, CMP_INPUT_GESTURE_TAP, NULL, &handled),
+                    CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_EXPECT(cmp_gesture_test_reset_pointer(NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_gesture_test_clear_state(NULL), CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_gesture_test_clear_state(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     memset(&dispatcher, 0, sizeof(dispatcher));
     CMP_TEST_OK(cmp_gesture_test_set_reset_fail(CMP_TRUE));
     CMP_TEST_EXPECT(cmp_gesture_test_clear_state(&dispatcher), CMP_ERR_UNKNOWN);
@@ -279,20 +286,21 @@ int main(void) {
     CMP_TEST_OK(cmp_gesture_config_init(&config));
     CMP_TEST_OK(cmp_gesture_test_set_config_init_fail(CMP_TRUE));
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_init(&dispatcher, NULL),
-                   CMP_ERR_UNKNOWN);
+                    CMP_ERR_UNKNOWN);
 
     invalid_config = config;
     invalid_config.tap_max_distance = -1.0f;
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_init(&dispatcher, &invalid_config),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
 
     CMP_TEST_OK(cmp_gesture_test_set_reset_fail(CMP_TRUE));
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_init(&dispatcher, &config),
-                   CMP_ERR_UNKNOWN);
+                    CMP_ERR_UNKNOWN);
 
     CMP_TEST_OK(cmp_gesture_dispatcher_init(&dispatcher, &config));
     CMP_TEST_OK(cmp_gesture_test_set_reset_fail(CMP_TRUE));
-    CMP_TEST_EXPECT(cmp_gesture_dispatcher_shutdown(&dispatcher), CMP_ERR_UNKNOWN);
+    CMP_TEST_EXPECT(cmp_gesture_dispatcher_shutdown(&dispatcher),
+                    CMP_ERR_UNKNOWN);
 
     memset(&dispatcher, 0, sizeof(dispatcher));
     CMP_TEST_OK(cmp_gesture_dispatcher_init(&dispatcher, NULL));
@@ -308,38 +316,41 @@ int main(void) {
     CMP_TEST_OK(cmp_gesture_config_init(&config));
 
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_init(NULL, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_shutdown(NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(cmp_gesture_dispatcher_reset(NULL), CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_gesture_dispatcher_reset(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_set_config(NULL, &config),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_get_config(NULL, &out_config),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 
-    CMP_TEST_EXPECT(cmp_gesture_dispatcher_shutdown(&dispatcher), CMP_ERR_STATE);
+    CMP_TEST_EXPECT(cmp_gesture_dispatcher_shutdown(&dispatcher),
+                    CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_reset(&dispatcher), CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_set_config(&dispatcher, &config),
-                   CMP_ERR_STATE);
+                    CMP_ERR_STATE);
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_get_config(&dispatcher, &out_config),
-                   CMP_ERR_STATE);
+                    CMP_ERR_STATE);
 
     CMP_TEST_OK(cmp_gesture_dispatcher_init(&dispatcher, &config));
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_init(&dispatcher, &config),
-                   CMP_ERR_STATE);
+                    CMP_ERR_STATE);
 
     CMP_TEST_OK(cmp_gesture_dispatcher_get_config(&dispatcher, &out_config));
     CMP_TEST_ASSERT(out_config.tap_max_ms == config.tap_max_ms);
 
     config.tap_max_distance = -1.0f;
     CMP_TEST_EXPECT(cmp_gesture_dispatcher_set_config(&dispatcher, &config),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     config.tap_max_distance = CMP_GESTURE_DEFAULT_TAP_MAX_DISTANCE;
     CMP_TEST_OK(cmp_gesture_dispatcher_set_config(&dispatcher, &config));
 
     CMP_TEST_OK(cmp_gesture_dispatcher_reset(&dispatcher));
     CMP_TEST_OK(cmp_gesture_dispatcher_shutdown(&dispatcher));
-    CMP_TEST_EXPECT(cmp_gesture_dispatcher_shutdown(&dispatcher), CMP_ERR_STATE);
+    CMP_TEST_EXPECT(cmp_gesture_dispatcher_shutdown(&dispatcher),
+                    CMP_ERR_STATE);
   }
 
   {
@@ -387,9 +398,9 @@ int main(void) {
 
 #ifdef CMP_TESTING
     CMP_TEST_EXPECT(cmp_gesture_test_hit_test(NULL, 0.0f, 0.0f, &hit),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_gesture_test_hit_test(&root, 0.0f, 0.0f, NULL),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
 #endif
 
     hit = NULL;
@@ -412,7 +423,7 @@ int main(void) {
     child1.bounds.width = -1.0f;
     hit = NULL;
     CMP_TEST_EXPECT(cmp_gesture_test_hit_test(&root, 10.0f, 10.0f, &hit),
-                   CMP_ERR_RANGE);
+                    CMP_ERR_RANGE);
     child_bounds.width = 50.0f;
     CMP_TEST_OK(cmp_render_node_set_bounds(&child1, &child_bounds));
     widget2.flags = 0;
@@ -421,20 +432,20 @@ int main(void) {
     root.children = NULL;
     hit = NULL;
     CMP_TEST_EXPECT(cmp_gesture_test_hit_test(&root, 10.0f, 10.0f, &hit),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     root.children = children;
     root.child_count = 2;
 
     root.widget = NULL;
     hit = NULL;
     CMP_TEST_EXPECT(cmp_gesture_test_hit_test(&root, 10.0f, 10.0f, &hit),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     root.widget = &root_widget;
 
     children[1] = NULL;
     hit = NULL;
     CMP_TEST_EXPECT(cmp_gesture_test_hit_test(&root, 10.0f, 10.0f, &hit),
-                   CMP_ERR_INVALID_ARGUMENT);
+                    CMP_ERR_INVALID_ARGUMENT);
     children[1] = &child2;
     CMP_TEST_OK(cmp_render_node_set_children(&root, children, 2));
   }
@@ -497,8 +508,10 @@ int main(void) {
     children[1] = &child2;
     CMP_TEST_OK(cmp_render_node_set_children(&root, children, 2));
 
-    CMP_TEST_EXPECT(cmp_gesture_dispatch(NULL, &root, &event, &target, &handled),
-                   CMP_ERR_INVALID_ARGUMENT);
+    memset(&event, 0, sizeof(event));
+    CMP_TEST_EXPECT(
+        cmp_gesture_dispatch(NULL, &root, &event, &target, &handled),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         cmp_gesture_dispatch(&dispatcher, NULL, &event, &target, &handled),
         CMP_ERR_INVALID_ARGUMENT);
@@ -516,8 +529,8 @@ int main(void) {
       memset(&event, 0, sizeof(event));
       event.type = CMP_INPUT_POINTER_DOWN;
       CMP_TEST_EXPECT(cmp_gesture_dispatch(&idle_dispatcher, &root, &event,
-                                         &target, &handled),
-                     CMP_ERR_STATE);
+                                           &target, &handled),
+                      CMP_ERR_STATE);
     }
 
     event.type = CMP_INPUT_TEXT;
@@ -526,7 +539,8 @@ int main(void) {
         CMP_ERR_INVALID_ARGUMENT);
 
     CMP_TEST_OK(cmp_gesture_test_set_contains_error(CMP_TRUE));
-    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 10, 10, 1, 5));
+    CMP_TEST_OK(
+        init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 10, 10, 1, 5));
     CMP_TEST_EXPECT(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled),
         CMP_ERR_RANGE);
@@ -542,7 +556,8 @@ int main(void) {
     dispatcher.pointer_active = CMP_TRUE;
     dispatcher.active_widget = NULL;
     dispatcher.active_pointer = 1;
-    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, 0, 0, 1, 10));
+    CMP_TEST_OK(
+        init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, 0, 0, 1, 10));
     CMP_TEST_EXPECT(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled),
         CMP_ERR_STATE);
@@ -628,7 +643,8 @@ int main(void) {
     dispatcher.active_pointer = 1;
     dispatcher.last_time = 200u;
     dispatcher.down_time = 100u;
-    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10, 1, 150));
+    CMP_TEST_OK(
+        init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10, 1, 150));
     CMP_TEST_EXPECT(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled),
         CMP_ERR_RANGE);
@@ -638,7 +654,8 @@ int main(void) {
     dispatcher.active_pointer = 1;
     dispatcher.last_time = 100u;
     dispatcher.down_time = 200u;
-    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10, 1, 150));
+    CMP_TEST_OK(
+        init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10, 1, 150));
     CMP_TEST_EXPECT(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled),
         CMP_ERR_RANGE);
@@ -677,7 +694,8 @@ int main(void) {
         init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, 10, 0, 1, 1510));
     CMP_TEST_OK(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled));
-    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 30, 0, 1, 1520));
+    CMP_TEST_OK(
+        init_pointer_event(&event, CMP_INPUT_POINTER_UP, 30, 0, 1, 1520));
     CMP_TEST_EXPECT(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled),
         CMP_ERR_UNKNOWN);
@@ -693,7 +711,8 @@ int main(void) {
         init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, 10, 0, 1, 1610));
     CMP_TEST_OK(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled));
-    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 40, 0, 1, 1620));
+    CMP_TEST_OK(
+        init_pointer_event(&event, CMP_INPUT_POINTER_UP, 40, 0, 1, 1620));
     CMP_TEST_EXPECT(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled),
         CMP_ERR_UNKNOWN);
@@ -794,7 +813,8 @@ int main(void) {
     CMP_TEST_OK(test_widget_init(&state1));
     CMP_TEST_OK(test_widget_init(&state2));
 
-    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, 0, 0, 1, 10));
+    CMP_TEST_OK(
+        init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, 0, 0, 1, 10));
     CMP_TEST_OK(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(handled == CMP_FALSE);
@@ -829,7 +849,8 @@ int main(void) {
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled),
         CMP_ERR_INVALID_ARGUMENT);
 
-    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10, 2, 140));
+    CMP_TEST_OK(
+        init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10, 2, 140));
     CMP_TEST_EXPECT(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled),
         CMP_ERR_INVALID_ARGUMENT);
@@ -840,7 +861,8 @@ int main(void) {
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled),
         CMP_ERR_RANGE);
 
-    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10, 1, 150));
+    CMP_TEST_OK(
+        init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10, 1, 150));
     CMP_TEST_OK(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(handled == CMP_TRUE);
@@ -912,7 +934,8 @@ int main(void) {
     CMP_TEST_ASSERT(state2.last_gesture.delta_x == 10.0f);
     CMP_TEST_ASSERT(state2.last_gesture.delta_y == 4.0f);
 
-    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 36, 4, 1, 3030));
+    CMP_TEST_OK(
+        init_pointer_event(&event, CMP_INPUT_POINTER_UP, 36, 4, 1, 3030));
     CMP_TEST_OK(
         cmp_gesture_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(state2.drag_end_calls == 1);

@@ -66,8 +66,8 @@ typedef struct CMPMat3 {
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_rect_intersect(const CMPRect *a, const CMPRect *b,
-                                     CMPRect *out_rect,
-                                     CMPBool *out_has_intersection);
+                                        CMPRect *out_rect,
+                                        CMPBool *out_has_intersection);
 
 /**
  * @brief Compute the union of two rectangles.
@@ -77,7 +77,7 @@ CMP_API int CMP_CALL cmp_rect_intersect(const CMPRect *a, const CMPRect *b,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_rect_union(const CMPRect *a, const CMPRect *b,
-                                 CMPRect *out_rect);
+                                    CMPRect *out_rect);
 
 /**
  * @brief Test whether a point lies inside a rectangle.
@@ -88,7 +88,8 @@ CMP_API int CMP_CALL cmp_rect_union(const CMPRect *a, const CMPRect *b,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_rect_contains_point(const CMPRect *rect, CMPScalar x,
-                                          CMPScalar y, CMPBool *out_contains);
+                                             CMPScalar y,
+                                             CMPBool *out_contains);
 
 /**
  * @brief Create an identity matrix.
@@ -105,7 +106,7 @@ CMP_API int CMP_CALL cmp_mat3_identity(CMPMat3 *out_mat);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_mat3_mul(const CMPMat3 *a, const CMPMat3 *b,
-                               CMPMat3 *out_mat);
+                                  CMPMat3 *out_mat);
 
 /**
  * @brief Create a translation matrix.
@@ -114,7 +115,8 @@ CMP_API int CMP_CALL cmp_mat3_mul(const CMPMat3 *a, const CMPMat3 *b,
  * @param out_mat Receives the translation matrix.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_mat3_translate(CMPScalar tx, CMPScalar ty, CMPMat3 *out_mat);
+CMP_API int CMP_CALL cmp_mat3_translate(CMPScalar tx, CMPScalar ty,
+                                        CMPMat3 *out_mat);
 
 /**
  * @brief Create a scale matrix.
@@ -123,7 +125,8 @@ CMP_API int CMP_CALL cmp_mat3_translate(CMPScalar tx, CMPScalar ty, CMPMat3 *out
  * @param out_mat Receives the scale matrix.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_mat3_scale(CMPScalar sx, CMPScalar sy, CMPMat3 *out_mat);
+CMP_API int CMP_CALL cmp_mat3_scale(CMPScalar sx, CMPScalar sy,
+                                    CMPMat3 *out_mat);
 
 /**
  * @brief Create a rotation matrix.
@@ -143,8 +146,8 @@ CMP_API int CMP_CALL cmp_mat3_rotate(CMPScalar radians, CMPMat3 *out_mat);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_mat3_transform_point(const CMPMat3 *m, CMPScalar x,
-                                           CMPScalar y, CMPScalar *out_x,
-                                           CMPScalar *out_y);
+                                              CMPScalar y, CMPScalar *out_x,
+                                              CMPScalar *out_y);
 
 #ifdef __cplusplus
 } /* extern "C" */

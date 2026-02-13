@@ -117,8 +117,8 @@ typedef struct CMPPath {
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPGfxBeginFrameFn)(void *gfx, CMPHandle window,
-                                        cmp_i32 width, cmp_i32 height,
-                                        CMPScalar dpi_scale);
+                                          cmp_i32 width, cmp_i32 height,
+                                          CMPScalar dpi_scale);
 
 /**
  * @brief End rendering a frame for a window.
@@ -145,7 +145,8 @@ typedef int(CMP_CALL *CMPGfxClearFn)(void *gfx, CMPColor color);
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPGfxDrawRectFn)(void *gfx, const CMPRect *rect,
-                                      CMPColor color, CMPScalar corner_radius);
+                                        CMPColor color,
+                                        CMPScalar corner_radius);
 
 /**
  * @brief Draw a line segment.
@@ -159,8 +160,8 @@ typedef int(CMP_CALL *CMPGfxDrawRectFn)(void *gfx, const CMPRect *rect,
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPGfxDrawLineFn)(void *gfx, CMPScalar x0, CMPScalar y0,
-                                      CMPScalar x1, CMPScalar y1, CMPColor color,
-                                      CMPScalar thickness);
+                                        CMPScalar x1, CMPScalar y1,
+                                        CMPColor color, CMPScalar thickness);
 
 /**
  * @brief Draw a filled path.
@@ -170,7 +171,7 @@ typedef int(CMP_CALL *CMPGfxDrawLineFn)(void *gfx, CMPScalar x0, CMPScalar y0,
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPGfxDrawPathFn)(void *gfx, const CMPPath *path,
-                                      CMPColor color);
+                                        CMPColor color);
 
 /**
  * @brief Push a clipping rectangle.
@@ -194,7 +195,7 @@ typedef int(CMP_CALL *CMPGfxPopClipFn)(void *gfx);
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPGfxSetTransformFn)(void *gfx,
-                                          const CMPMat3 *transform);
+                                            const CMPMat3 *transform);
 
 /**
  * @brief Create a texture resource.
@@ -208,9 +209,9 @@ typedef int(CMP_CALL *CMPGfxSetTransformFn)(void *gfx,
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPGfxCreateTextureFn)(void *gfx, cmp_i32 width,
-                                           cmp_i32 height, cmp_u32 format,
-                                           const void *pixels, cmp_usize size,
-                                           CMPHandle *out_texture);
+                                             cmp_i32 height, cmp_u32 format,
+                                             const void *pixels, cmp_usize size,
+                                             CMPHandle *out_texture);
 
 /**
  * @brief Update an existing texture.
@@ -225,9 +226,10 @@ typedef int(CMP_CALL *CMPGfxCreateTextureFn)(void *gfx, cmp_i32 width,
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPGfxUpdateTextureFn)(void *gfx, CMPHandle texture,
-                                           cmp_i32 x, cmp_i32 y, cmp_i32 width,
-                                           cmp_i32 height, const void *pixels,
-                                           cmp_usize size);
+                                             cmp_i32 x, cmp_i32 y,
+                                             cmp_i32 width, cmp_i32 height,
+                                             const void *pixels,
+                                             cmp_usize size);
 
 /**
  * @brief Destroy a texture resource.
@@ -247,8 +249,9 @@ typedef int(CMP_CALL *CMPGfxDestroyTextureFn)(void *gfx, CMPHandle texture);
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPGfxDrawTextureFn)(void *gfx, CMPHandle texture,
-                                         const CMPRect *src, const CMPRect *dst,
-                                         CMPScalar opacity);
+                                           const CMPRect *src,
+                                           const CMPRect *dst,
+                                           CMPScalar opacity);
 
 /**
  * @brief Graphics virtual table.
@@ -293,8 +296,8 @@ typedef struct CMPGfxVTable {
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPTextCreateFontFn)(void *text, const char *utf8_family,
-                                         cmp_i32 size_px, cmp_i32 weight,
-                                         CMPBool italic, CMPHandle *out_font);
+                                           cmp_i32 size_px, cmp_i32 weight,
+                                           CMPBool italic, CMPHandle *out_font);
 
 /**
  * @brief Destroy a font resource.
@@ -315,11 +318,9 @@ typedef int(CMP_CALL *CMPTextDestroyFontFn)(void *text, CMPHandle font);
  * @param out_baseline Receives the baseline offset in pixels.
  * @return CMP_OK on success or a failure code.
  */
-typedef int(CMP_CALL *CMPTextMeasureTextFn)(void *text, CMPHandle font,
-                                          const char *utf8, cmp_usize utf8_len,
-                                          CMPScalar *out_width,
-                                          CMPScalar *out_height,
-                                          CMPScalar *out_baseline);
+typedef int(CMP_CALL *CMPTextMeasureTextFn)(
+    void *text, CMPHandle font, const char *utf8, cmp_usize utf8_len,
+    CMPScalar *out_width, CMPScalar *out_height, CMPScalar *out_baseline);
 
 /**
  * @brief Draw UTF-8 text.
@@ -333,8 +334,9 @@ typedef int(CMP_CALL *CMPTextMeasureTextFn)(void *text, CMPHandle font,
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPTextDrawTextFn)(void *text, CMPHandle font,
-                                       const char *utf8, cmp_usize utf8_len,
-                                       CMPScalar x, CMPScalar y, CMPColor color);
+                                         const char *utf8, cmp_usize utf8_len,
+                                         CMPScalar x, CMPScalar y,
+                                         CMPColor color);
 
 /**
  * @brief Text rendering virtual table.
@@ -354,7 +356,7 @@ typedef struct CMPTextVTable {
  * @brief Graphics interface.
  */
 typedef struct CMPGfx {
-  void *ctx;                       /**< Backend context pointer. */
+  void *ctx;                        /**< Backend context pointer. */
   const CMPGfxVTable *vtable;       /**< Graphics virtual table. */
   const CMPTextVTable *text_vtable; /**< Text virtual table. */
 } CMPGfx;

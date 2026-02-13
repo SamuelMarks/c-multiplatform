@@ -25,100 +25,100 @@ typedef struct CMPFileInfo {
  * @brief IO virtual table.
  */
 typedef struct CMPIOVTable {
-  /**
-   * @brief Read a file into a caller-provided buffer.
-   * @param io IO backend instance.
-   * @param utf8_path File path in UTF-8.
-   * @param buffer Destination buffer.
-   * @param buffer_size Size of the destination buffer.
-   * @param out_read Receives number of bytes read.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+/**
+ * @brief Read a file into a caller-provided buffer.
+ * @param io IO backend instance.
+ * @param utf8_path File path in UTF-8.
+ * @param buffer Destination buffer.
+ * @param buffer_size Size of the destination buffer.
+ * @param out_read Receives number of bytes read.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int read_file(void *io, const char *utf8_path, void *buffer,
                 cmp_usize buffer_size, cmp_usize *out_read);
-  #else
+#else
   int(CMP_CALL *read_file)(void *io, const char *utf8_path, void *buffer,
                            cmp_usize buffer_size, cmp_usize *out_read);
-  #endif
-  /**
-   * @brief Read a file by allocating a new buffer.
-   * @param io IO backend instance.
-   * @param utf8_path File path in UTF-8.
-   * @param allocator Allocator used for the buffer.
-   * @param out_data Receives the allocated buffer.
-   * @param out_size Receives the buffer size in bytes.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Read a file by allocating a new buffer.
+ * @param io IO backend instance.
+ * @param utf8_path File path in UTF-8.
+ * @param allocator Allocator used for the buffer.
+ * @param out_data Receives the allocated buffer.
+ * @param out_size Receives the buffer size in bytes.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int read_file_alloc(void *io, const char *utf8_path,
                       const CMPAllocator *allocator, void **out_data,
                       cmp_usize *out_size);
-  #else
+#else
   int(CMP_CALL *read_file_alloc)(void *io, const char *utf8_path,
-                                 const CMPAllocator *allocator,
-                                 void **out_data, cmp_usize *out_size);
-  #endif
-  /**
-   * @brief Write a buffer to a file.
-   * @param io IO backend instance.
-   * @param utf8_path File path in UTF-8.
-   * @param data Source data buffer.
-   * @param size Size of the data buffer.
-   * @param overwrite CMP_TRUE to overwrite existing files.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+                                 const CMPAllocator *allocator, void **out_data,
+                                 cmp_usize *out_size);
+#endif
+/**
+ * @brief Write a buffer to a file.
+ * @param io IO backend instance.
+ * @param utf8_path File path in UTF-8.
+ * @param data Source data buffer.
+ * @param size Size of the data buffer.
+ * @param overwrite CMP_TRUE to overwrite existing files.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int write_file(void *io, const char *utf8_path, const void *data,
                  cmp_usize size, CMPBool overwrite);
-  #else
+#else
   int(CMP_CALL *write_file)(void *io, const char *utf8_path, const void *data,
                             cmp_usize size, CMPBool overwrite);
-  #endif
-  /**
-   * @brief Test whether a file exists.
-   * @param io IO backend instance.
-   * @param utf8_path File path in UTF-8.
-   * @param out_exists Receives CMP_TRUE if the file exists.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Test whether a file exists.
+ * @param io IO backend instance.
+ * @param utf8_path File path in UTF-8.
+ * @param out_exists Receives CMP_TRUE if the file exists.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int file_exists(void *io, const char *utf8_path, CMPBool *out_exists);
-  #else
+#else
   int(CMP_CALL *file_exists)(void *io, const char *utf8_path,
                              CMPBool *out_exists);
-  #endif
-  /**
-   * @brief Delete a file.
-   * @param io IO backend instance.
-   * @param utf8_path File path in UTF-8.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Delete a file.
+ * @param io IO backend instance.
+ * @param utf8_path File path in UTF-8.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int delete_file(void *io, const char *utf8_path);
-  #else
+#else
   int(CMP_CALL *delete_file)(void *io, const char *utf8_path);
-  #endif
-  /**
-   * @brief Retrieve file metadata.
-   * @param io IO backend instance.
-   * @param utf8_path File path in UTF-8.
-   * @param out_info Receives file information.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Retrieve file metadata.
+ * @param io IO backend instance.
+ * @param utf8_path File path in UTF-8.
+ * @param out_info Receives file information.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int stat_file(void *io, const char *utf8_path, CMPFileInfo *out_info);
-  #else
+#else
   int(CMP_CALL *stat_file)(void *io, const char *utf8_path,
                            CMPFileInfo *out_info);
-  #endif
+#endif
 } CMPIOVTable;
 
 /**
  * @brief IO interface.
  */
 typedef struct CMPIO {
-  void *ctx;                /**< IO backend context pointer. */
+  void *ctx;                 /**< IO backend context pointer. */
   const CMPIOVTable *vtable; /**< IO virtual table. */
 } CMPIO;
 
@@ -145,64 +145,63 @@ typedef struct CMPSensorReading {
  * @brief Sensors virtual table.
  */
 typedef struct CMPSensorsVTable {
-  /**
-   * @brief Test whether a sensor type is available.
-   * @param sensors Sensors backend instance.
-   * @param type Sensor type (CMP_SENSOR_*).
-   * @param out_available Receives CMP_TRUE if available.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+/**
+ * @brief Test whether a sensor type is available.
+ * @param sensors Sensors backend instance.
+ * @param type Sensor type (CMP_SENSOR_*).
+ * @param out_available Receives CMP_TRUE if available.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int is_available(void *sensors, cmp_u32 type, CMPBool *out_available);
-  #else
+#else
   int(CMP_CALL *is_available)(void *sensors, cmp_u32 type,
                               CMPBool *out_available);
-  #endif
-  /**
-   * @brief Start producing readings for a sensor.
-   * @param sensors Sensors backend instance.
-   * @param type Sensor type (CMP_SENSOR_*).
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Start producing readings for a sensor.
+ * @param sensors Sensors backend instance.
+ * @param type Sensor type (CMP_SENSOR_*).
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int start(void *sensors, cmp_u32 type);
-  #else
+#else
   int(CMP_CALL *start)(void *sensors, cmp_u32 type);
-  #endif
-  /**
-   * @brief Stop producing readings for a sensor.
-   * @param sensors Sensors backend instance.
-   * @param type Sensor type (CMP_SENSOR_*).
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Stop producing readings for a sensor.
+ * @param sensors Sensors backend instance.
+ * @param type Sensor type (CMP_SENSOR_*).
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int stop(void *sensors, cmp_u32 type);
-  #else
+#else
   int(CMP_CALL *stop)(void *sensors, cmp_u32 type);
-  #endif
-  /**
-   * @brief Read the latest sensor data.
-   * @param sensors Sensors backend instance.
-   * @param type Sensor type (CMP_SENSOR_*).
-   * @param out_reading Receives the sensor reading.
-   * @param out_has_reading Receives CMP_TRUE if data was read.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Read the latest sensor data.
+ * @param sensors Sensors backend instance.
+ * @param type Sensor type (CMP_SENSOR_*).
+ * @param out_reading Receives the sensor reading.
+ * @param out_has_reading Receives CMP_TRUE if data was read.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int read(void *sensors, cmp_u32 type, CMPSensorReading *out_reading,
            CMPBool *out_has_reading);
-  #else
+#else
   int(CMP_CALL *read)(void *sensors, cmp_u32 type,
-                      CMPSensorReading *out_reading,
-                      CMPBool *out_has_reading);
-  #endif
+                      CMPSensorReading *out_reading, CMPBool *out_has_reading);
+#endif
 } CMPSensorsVTable;
 
 /**
  * @brief Sensors interface.
  */
 typedef struct CMPSensors {
-  void *ctx;                     /**< Sensors backend context pointer. */
+  void *ctx;                      /**< Sensors backend context pointer. */
   const CMPSensorsVTable *vtable; /**< Sensors virtual table. */
 } CMPSensors;
 
@@ -231,11 +230,11 @@ typedef struct CMPSensors {
  * @brief Camera frame description.
  */
 typedef struct CMPCameraFrame {
-  cmp_u32 format;    /**< Pixel format (CMP_CAMERA_FORMAT_*). */
-  cmp_u32 width;     /**< Frame width in pixels. */
-  cmp_u32 height;    /**< Frame height in pixels. */
+  cmp_u32 format;   /**< Pixel format (CMP_CAMERA_FORMAT_*). */
+  cmp_u32 width;    /**< Frame width in pixels. */
+  cmp_u32 height;   /**< Frame height in pixels. */
   const void *data; /**< Pointer to frame data. */
-  cmp_usize size;    /**< Size of frame data in bytes. */
+  cmp_usize size;   /**< Size of frame data in bytes. */
 } CMPCameraFrame;
 
 /**
@@ -245,7 +244,8 @@ typedef struct CMPCameraConfig {
   cmp_u32 camera_id; /**< Backend-specific camera identifier
                        (CMP_CAMERA_ID_DEFAULT for automatic selection). */
   cmp_u32 facing;    /**< Requested camera facing (CMP_CAMERA_FACING_*). */
-  cmp_u32 width; /**< Requested frame width in pixels (0 for backend default). */
+  cmp_u32
+      width; /**< Requested frame width in pixels (0 for backend default). */
   cmp_u32
       height; /**< Requested frame height in pixels (0 for backend default). */
   cmp_u32 format; /**< Requested pixel format (CMP_CAMERA_FORMAT_*). */
@@ -266,7 +266,7 @@ typedef int(CMP_CALL *CMPCameraOpenFn)(void *camera, cmp_u32 camera_id);
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPCameraOpenWithConfigFn)(void *camera,
-                                               const CMPCameraConfig *config);
+                                                 const CMPCameraConfig *config);
 
 /**
  * @brief Close the camera device.
@@ -297,8 +297,8 @@ typedef int(CMP_CALL *CMPCameraStopFn)(void *camera);
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPCameraReadFrameFn)(void *camera,
-                                          CMPCameraFrame *out_frame,
-                                          CMPBool *out_has_frame);
+                                            CMPCameraFrame *out_frame,
+                                            CMPBool *out_has_frame);
 
 /**
  * @brief Camera virtual table.
@@ -322,7 +322,7 @@ typedef struct CMPCameraVTable {
  * @brief Camera interface.
  */
 typedef struct CMPCamera {
-  void *ctx;                    /**< Camera backend context pointer. */
+  void *ctx;                     /**< Camera backend context pointer. */
   const CMPCameraVTable *vtable; /**< Camera virtual table. */
 } CMPCamera;
 
@@ -351,68 +351,67 @@ typedef struct CMPCamera {
 typedef struct CMPImageDecodeRequest {
   const char *utf8_path; /**< Optional file path for backend decode. */
   const void *data;      /**< Encoded image bytes. */
-  cmp_usize size;         /**< Size of encoded data in bytes. */
-  cmp_u32 encoding;       /**< Encoding hint (CMP_IMAGE_ENCODING_*). */
-  cmp_u32 format;         /**< Desired output format (CMP_IMAGE_FORMAT_*). */
-  cmp_u32 width;          /**< Width for raw encodings (pixels). */
-  cmp_u32 height;         /**< Height for raw encodings (pixels). */
-  cmp_u32 stride;         /**< Row stride for raw encodings (bytes). */
+  cmp_usize size;        /**< Size of encoded data in bytes. */
+  cmp_u32 encoding;      /**< Encoding hint (CMP_IMAGE_ENCODING_*). */
+  cmp_u32 format;        /**< Desired output format (CMP_IMAGE_FORMAT_*). */
+  cmp_u32 width;         /**< Width for raw encodings (pixels). */
+  cmp_u32 height;        /**< Height for raw encodings (pixels). */
+  cmp_u32 stride;        /**< Row stride for raw encodings (bytes). */
 } CMPImageDecodeRequest;
 
 /**
  * @brief Decoded image data.
  */
 typedef struct CMPImageData {
-  cmp_u32 format;    /**< Pixel format (CMP_IMAGE_FORMAT_*). */
-  cmp_u32 width;     /**< Image width in pixels. */
-  cmp_u32 height;    /**< Image height in pixels. */
-  cmp_u32 stride;    /**< Row stride in bytes (0 means tightly packed). */
+  cmp_u32 format;   /**< Pixel format (CMP_IMAGE_FORMAT_*). */
+  cmp_u32 width;    /**< Image width in pixels. */
+  cmp_u32 height;   /**< Image height in pixels. */
+  cmp_u32 stride;   /**< Row stride in bytes (0 means tightly packed). */
   const void *data; /**< Pixel data pointer. */
-  cmp_usize size;    /**< Pixel data size in bytes. */
-  cmp_u32 flags;     /**< Data flags (CMP_IMAGE_DATA_FLAG_*). */
+  cmp_usize size;   /**< Pixel data size in bytes. */
+  cmp_u32 flags;    /**< Data flags (CMP_IMAGE_DATA_FLAG_*). */
 } CMPImageData;
 
 /**
  * @brief Image decoder virtual table.
  */
 typedef struct CMPImageVTable {
-  /**
-   * @brief Decode an image from memory or file.
-   * @param image Image backend instance.
-   * @param request Decode request parameters.
-   * @param allocator Allocator for decoded pixel storage.
-   * @param out_image Receives decoded image data.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+/**
+ * @brief Decode an image from memory or file.
+ * @param image Image backend instance.
+ * @param request Decode request parameters.
+ * @param allocator Allocator for decoded pixel storage.
+ * @param out_image Receives decoded image data.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int decode(void *image, const CMPImageDecodeRequest *request,
              const CMPAllocator *allocator, CMPImageData *out_image);
-  #else
+#else
   int(CMP_CALL *decode)(void *image, const CMPImageDecodeRequest *request,
-                        const CMPAllocator *allocator,
-                        CMPImageData *out_image);
-  #endif
-  /**
-   * @brief Release decoded image data.
-   * @param image Image backend instance.
-   * @param allocator Allocator used for decoded data.
-   * @param image_data Image data to free.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+                        const CMPAllocator *allocator, CMPImageData *out_image);
+#endif
+/**
+ * @brief Release decoded image data.
+ * @param image Image backend instance.
+ * @param allocator Allocator used for decoded data.
+ * @param image_data Image data to free.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int free_image(void *image, const CMPAllocator *allocator,
                  CMPImageData *image_data);
-  #else
+#else
   int(CMP_CALL *free_image)(void *image, const CMPAllocator *allocator,
                             CMPImageData *image_data);
-  #endif
+#endif
 } CMPImageVTable;
 
 /**
  * @brief Image decoder interface.
  */
 typedef struct CMPImage {
-  void *ctx;                   /**< Image backend context pointer. */
+  void *ctx;                    /**< Image backend context pointer. */
   const CMPImageVTable *vtable; /**< Image virtual table. */
 } CMPImage;
 
@@ -436,9 +435,9 @@ typedef struct CMPImage {
 typedef struct CMPVideoOpenRequest {
   const char *utf8_path; /**< Optional file path for backend decode. */
   const void *data;      /**< Encoded video bytes. */
-  cmp_usize size;         /**< Size of encoded data in bytes. */
-  cmp_u32 encoding;       /**< Encoding hint (CMP_VIDEO_ENCODING_*). */
-  cmp_u32 format;         /**< Desired output format (CMP_VIDEO_FORMAT_*). */
+  cmp_usize size;        /**< Size of encoded data in bytes. */
+  cmp_u32 encoding;      /**< Encoding hint (CMP_VIDEO_ENCODING_*). */
+  cmp_u32 format;        /**< Desired output format (CMP_VIDEO_FORMAT_*). */
 } CMPVideoOpenRequest;
 
 /**
@@ -448,7 +447,7 @@ typedef struct CMPVideoFrame {
   cmp_u32 format;       /**< Pixel format (CMP_VIDEO_FORMAT_*). */
   cmp_u32 width;        /**< Frame width in pixels. */
   cmp_u32 height;       /**< Frame height in pixels. */
-  const void *data;    /**< Frame data pointer. */
+  const void *data;     /**< Frame data pointer. */
   cmp_usize size;       /**< Frame data size in bytes. */
   cmp_u32 timestamp_ms; /**< Frame timestamp in milliseconds. */
 } CMPVideoFrame;
@@ -457,48 +456,47 @@ typedef struct CMPVideoFrame {
  * @brief Video decoder virtual table.
  */
 typedef struct CMPVideoVTable {
-  /**
-   * @brief Open a video stream.
-   * @param video Video backend instance.
-   * @param request Video open request.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+/**
+ * @brief Open a video stream.
+ * @param video Video backend instance.
+ * @param request Video open request.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int open(void *video, const CMPVideoOpenRequest *request);
-  #else
+#else
   int(CMP_CALL *open)(void *video, const CMPVideoOpenRequest *request);
-  #endif
-  /**
-   * @brief Close a video stream.
-   * @param video Video backend instance.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Close a video stream.
+ * @param video Video backend instance.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int close(void *video);
-  #else
+#else
   int(CMP_CALL *close)(void *video);
-  #endif
-  /**
-   * @brief Read the next video frame.
-   * @param video Video backend instance.
-   * @param out_frame Receives the frame description.
-   * @param out_has_frame Receives CMP_TRUE if a frame was read.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
-  int read_frame(void *video, CMPVideoFrame *out_frame,
-                 CMPBool *out_has_frame);
-  #else
+#endif
+/**
+ * @brief Read the next video frame.
+ * @param video Video backend instance.
+ * @param out_frame Receives the frame description.
+ * @param out_has_frame Receives CMP_TRUE if a frame was read.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
+  int read_frame(void *video, CMPVideoFrame *out_frame, CMPBool *out_has_frame);
+#else
   int(CMP_CALL *read_frame)(void *video, CMPVideoFrame *out_frame,
                             CMPBool *out_has_frame);
-  #endif
+#endif
 } CMPVideoVTable;
 
 /**
  * @brief Video decoder interface.
  */
 typedef struct CMPVideo {
-  void *ctx;                   /**< Video backend context pointer. */
+  void *ctx;                    /**< Video backend context pointer. */
   const CMPVideoVTable *vtable; /**< Video virtual table. */
 } CMPVideo;
 
@@ -521,8 +519,8 @@ typedef struct CMPVideo {
 typedef struct CMPAudioDecodeRequest {
   const char *utf8_path; /**< Optional file path for backend decode. */
   const void *data;      /**< Encoded audio bytes. */
-  cmp_usize size;         /**< Size of encoded data in bytes. */
-  cmp_u32 encoding;       /**< Encoding hint (CMP_AUDIO_ENCODING_*). */
+  cmp_usize size;        /**< Size of encoded data in bytes. */
+  cmp_u32 encoding;      /**< Encoding hint (CMP_AUDIO_ENCODING_*). */
 } CMPAudioDecodeRequest;
 
 /**
@@ -533,7 +531,7 @@ typedef struct CMPAudioData {
   cmp_u32 channels;    /**< Number of channels. */
   cmp_u32 sample_rate; /**< Sample rate in Hz. */
   cmp_usize frames;    /**< Number of audio frames. */
-  const void *data;   /**< PCM data pointer. */
+  const void *data;    /**< PCM data pointer. */
   cmp_usize size;      /**< PCM data size in bytes. */
   cmp_u32 flags;       /**< Data flags (CMP_AUDIO_DATA_FLAG_*). */
 } CMPAudioData;
@@ -547,9 +545,9 @@ typedef struct CMPAudioData {
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPAudioDecodeFn)(void *audio_ctx,
-                                      const CMPAudioDecodeRequest *request,
-                                      const CMPAllocator *allocator,
-                                      CMPAudioData *out_audio);
+                                        const CMPAudioDecodeRequest *request,
+                                        const CMPAllocator *allocator,
+                                        CMPAudioData *out_audio);
 
 /**
  * @brief Audio release function signature.
@@ -559,8 +557,8 @@ typedef int(CMP_CALL *CMPAudioDecodeFn)(void *audio_ctx,
  * @return CMP_OK on success or a failure code.
  */
 typedef int(CMP_CALL *CMPAudioFreeFn)(void *audio_ctx,
-                                    const CMPAllocator *allocator,
-                                    CMPAudioData *audio_data);
+                                      const CMPAllocator *allocator,
+                                      CMPAudioData *audio_data);
 
 /**
  * @brief Audio decoder virtual table.
@@ -580,7 +578,7 @@ typedef struct CMPAudioVTable {
  * @brief Audio decoder interface.
  */
 typedef struct CMPAudio {
-  void *ctx;                   /**< Audio backend context pointer. */
+  void *ctx;                    /**< Audio backend context pointer. */
   const CMPAudioVTable *vtable; /**< Audio virtual table. */
 } CMPAudio;
 
@@ -592,8 +590,8 @@ typedef struct CMPNetworkRequest {
   const char *url;     /**< Request URL. */
   const char *headers; /**< Raw header string, backend-defined format. */
   const void *body;    /**< Request body bytes. */
-  cmp_usize body_size;  /**< Request body size in bytes. */
-  cmp_u32 timeout_ms;   /**< Timeout in milliseconds. */
+  cmp_usize body_size; /**< Request body size in bytes. */
+  cmp_u32 timeout_ms;  /**< Timeout in milliseconds. */
 } CMPNetworkRequest;
 
 /**
@@ -601,7 +599,7 @@ typedef struct CMPNetworkRequest {
  */
 typedef struct CMPNetworkResponse {
   cmp_u32 status_code; /**< HTTP status code. */
-  const void *body;   /**< Response body bytes. */
+  const void *body;    /**< Response body bytes. */
   cmp_usize body_size; /**< Response body size in bytes. */
 } CMPNetworkResponse;
 
@@ -609,44 +607,43 @@ typedef struct CMPNetworkResponse {
  * @brief Network virtual table.
  */
 typedef struct CMPNetworkVTable {
-  /**
-   * @brief Execute a network request.
-   * @param net Network backend instance.
-   * @param request Request parameters.
-   * @param allocator Allocator for response body storage.
-   * @param out_response Receives the response data.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+/**
+ * @brief Execute a network request.
+ * @param net Network backend instance.
+ * @param request Request parameters.
+ * @param allocator Allocator for response body storage.
+ * @param out_response Receives the response data.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int request(void *net, const CMPNetworkRequest *request,
-              const CMPAllocator *allocator,
-              CMPNetworkResponse *out_response);
-  #else
+              const CMPAllocator *allocator, CMPNetworkResponse *out_response);
+#else
   int(CMP_CALL *request)(void *net, const CMPNetworkRequest *request,
                          const CMPAllocator *allocator,
                          CMPNetworkResponse *out_response);
-  #endif
-  /**
-   * @brief Release resources in a response.
-   * @param net Network backend instance.
-   * @param allocator Allocator used for the response body.
-   * @param response Response to free.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Release resources in a response.
+ * @param net Network backend instance.
+ * @param allocator Allocator used for the response body.
+ * @param response Response to free.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int free_response(void *net, const CMPAllocator *allocator,
                     CMPNetworkResponse *response);
-  #else
+#else
   int(CMP_CALL *free_response)(void *net, const CMPAllocator *allocator,
                                CMPNetworkResponse *response);
-  #endif
+#endif
 } CMPNetworkVTable;
 
 /**
  * @brief Network interface.
  */
 typedef struct CMPNetwork {
-  void *ctx;                     /**< Network backend context pointer. */
+  void *ctx;                      /**< Network backend context pointer. */
   const CMPNetworkVTable *vtable; /**< Network virtual table. */
 } CMPNetwork;
 
@@ -668,121 +665,121 @@ typedef int(CMP_CALL *CMPThreadFn)(void *user);
  * @brief Tasking virtual table.
  */
 typedef struct CMPTasksVTable {
-  /**
-   * @brief Create a new thread.
-   * @param tasks Task backend instance.
-   * @param entry Thread entry function.
-   * @param user User data pointer.
-   * @param out_thread Receives the thread handle.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+/**
+ * @brief Create a new thread.
+ * @param tasks Task backend instance.
+ * @param entry Thread entry function.
+ * @param user User data pointer.
+ * @param out_thread Receives the thread handle.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int thread_create(void *tasks, CMPThreadFn entry, void *user,
                     CMPHandle *out_thread);
-  #else
+#else
   int(CMP_CALL *thread_create)(void *tasks, CMPThreadFn entry, void *user,
                                CMPHandle *out_thread);
-  #endif
-  /**
-   * @brief Join a thread.
-   * @param tasks Task backend instance.
-   * @param thread Thread handle to join.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Join a thread.
+ * @param tasks Task backend instance.
+ * @param thread Thread handle to join.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int thread_join(void *tasks, CMPHandle thread);
-  #else
+#else
   int(CMP_CALL *thread_join)(void *tasks, CMPHandle thread);
-  #endif
-  /**
-   * @brief Create a mutex.
-   * @param tasks Task backend instance.
-   * @param out_mutex Receives the mutex handle.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Create a mutex.
+ * @param tasks Task backend instance.
+ * @param out_mutex Receives the mutex handle.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int mutex_create(void *tasks, CMPHandle *out_mutex);
-  #else
+#else
   int(CMP_CALL *mutex_create)(void *tasks, CMPHandle *out_mutex);
-  #endif
-  /**
-   * @brief Destroy a mutex.
-   * @param tasks Task backend instance.
-   * @param mutex Mutex handle to destroy.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Destroy a mutex.
+ * @param tasks Task backend instance.
+ * @param mutex Mutex handle to destroy.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int mutex_destroy(void *tasks, CMPHandle mutex);
-  #else
+#else
   int(CMP_CALL *mutex_destroy)(void *tasks, CMPHandle mutex);
-  #endif
-  /**
-   * @brief Lock a mutex.
-   * @param tasks Task backend instance.
-   * @param mutex Mutex handle to lock.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Lock a mutex.
+ * @param tasks Task backend instance.
+ * @param mutex Mutex handle to lock.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int mutex_lock(void *tasks, CMPHandle mutex);
-  #else
+#else
   int(CMP_CALL *mutex_lock)(void *tasks, CMPHandle mutex);
-  #endif
-  /**
-   * @brief Unlock a mutex.
-   * @param tasks Task backend instance.
-   * @param mutex Mutex handle to unlock.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Unlock a mutex.
+ * @param tasks Task backend instance.
+ * @param mutex Mutex handle to unlock.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int mutex_unlock(void *tasks, CMPHandle mutex);
-  #else
+#else
   int(CMP_CALL *mutex_unlock)(void *tasks, CMPHandle mutex);
-  #endif
-  /**
-   * @brief Sleep for a number of milliseconds.
-   * @param tasks Task backend instance.
-   * @param ms Milliseconds to sleep.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Sleep for a number of milliseconds.
+ * @param tasks Task backend instance.
+ * @param ms Milliseconds to sleep.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int sleep_ms(void *tasks, cmp_u32 ms);
-  #else
+#else
   int(CMP_CALL *sleep_ms)(void *tasks, cmp_u32 ms);
-  #endif
-  /**
-   * @brief Post a task to the default task queue.
-   * @param tasks Task backend instance.
-   * @param fn Task function to execute.
-   * @param user User data pointer.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Post a task to the default task queue.
+ * @param tasks Task backend instance.
+ * @param fn Task function to execute.
+ * @param user User data pointer.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int task_post(void *tasks, CMPTaskFn fn, void *user);
-  #else
+#else
   int(CMP_CALL *task_post)(void *tasks, CMPTaskFn fn, void *user);
-  #endif
-  /**
-   * @brief Post a task to run after a delay.
-   * @param tasks Task backend instance.
-   * @param fn Task function to execute.
-   * @param user User data pointer.
-   * @param delay_ms Delay in milliseconds.
-   * @return CMP_OK on success or a failure code.
-   */
-  #ifdef CMP_DOXYGEN
+#endif
+/**
+ * @brief Post a task to run after a delay.
+ * @param tasks Task backend instance.
+ * @param fn Task function to execute.
+ * @param user User data pointer.
+ * @param delay_ms Delay in milliseconds.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
   int task_post_delayed(void *tasks, CMPTaskFn fn, void *user,
                         cmp_u32 delay_ms);
-  #else
+#else
   int(CMP_CALL *task_post_delayed)(void *tasks, CMPTaskFn fn, void *user,
                                    cmp_u32 delay_ms);
-  #endif
+#endif
 } CMPTasksVTable;
 
 /**
  * @brief Tasking interface.
  */
 typedef struct CMPTasks {
-  void *ctx;                   /**< Task backend context pointer. */
+  void *ctx;                    /**< Task backend context pointer. */
   const CMPTasksVTable *vtable; /**< Task virtual table. */
 } CMPTasks;
 
@@ -886,7 +883,7 @@ typedef struct CMPEnvVTable {
  * @brief Environment interface.
  */
 typedef struct CMPEnv {
-  void *ctx;                 /**< Environment backend context pointer. */
+  void *ctx;                  /**< Environment backend context pointer. */
   const CMPEnvVTable *vtable; /**< Environment virtual table. */
 } CMPEnv;
 

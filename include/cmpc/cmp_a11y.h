@@ -40,7 +40,7 @@ CMP_API int CMP_CALL cmp_a11y_semantics_init(CMPSemantics *semantics);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_a11y_node_init(CMPA11yNode *node, CMPWidget *widget,
-                                     const CMPSemantics *semantics);
+                                        const CMPSemantics *semantics);
 
 /**
  * @brief Update semantics for an accessibility node.
@@ -49,7 +49,7 @@ CMP_API int CMP_CALL cmp_a11y_node_init(CMPA11yNode *node, CMPWidget *widget,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_a11y_node_set_semantics(CMPA11yNode *node,
-                                              const CMPSemantics *semantics);
+                                                 const CMPSemantics *semantics);
 
 /**
  * @brief Update the backing widget for an accessibility node.
@@ -57,7 +57,8 @@ CMP_API int CMP_CALL cmp_a11y_node_set_semantics(CMPA11yNode *node,
  * @param widget Widget backing the node (may be NULL for virtual nodes).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_a11y_node_set_widget(CMPA11yNode *node, CMPWidget *widget);
+CMP_API int CMP_CALL cmp_a11y_node_set_widget(CMPA11yNode *node,
+                                              CMPWidget *widget);
 
 /**
  * @brief Assign children to an accessibility node.
@@ -67,8 +68,8 @@ CMP_API int CMP_CALL cmp_a11y_node_set_widget(CMPA11yNode *node, CMPWidget *widg
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_a11y_node_set_children(CMPA11yNode *node,
-                                             CMPA11yNode **children,
-                                             cmp_usize count);
+                                                CMPA11yNode **children,
+                                                cmp_usize count);
 
 /**
  * @brief Retrieve the parent of a node.
@@ -77,7 +78,7 @@ CMP_API int CMP_CALL cmp_a11y_node_set_children(CMPA11yNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_a11y_node_get_parent(const CMPA11yNode *node,
-                                           CMPA11yNode **out_parent);
+                                              CMPA11yNode **out_parent);
 
 /**
  * @brief Retrieve the number of children for a node.
@@ -86,7 +87,7 @@ CMP_API int CMP_CALL cmp_a11y_node_get_parent(const CMPA11yNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_a11y_node_get_child_count(const CMPA11yNode *node,
-                                                cmp_usize *out_count);
+                                                   cmp_usize *out_count);
 
 /**
  * @brief Retrieve a child node by index.
@@ -96,8 +97,8 @@ CMP_API int CMP_CALL cmp_a11y_node_get_child_count(const CMPA11yNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_a11y_node_get_child(const CMPA11yNode *node,
-                                          cmp_usize index,
-                                          CMPA11yNode **out_child);
+                                             cmp_usize index,
+                                             CMPA11yNode **out_child);
 
 /**
  * @brief Retrieve the next sibling of a node.
@@ -106,7 +107,7 @@ CMP_API int CMP_CALL cmp_a11y_node_get_child(const CMPA11yNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_a11y_node_get_next_sibling(const CMPA11yNode *node,
-                                                 CMPA11yNode **out_sibling);
+                                                    CMPA11yNode **out_sibling);
 
 /**
  * @brief Retrieve the previous sibling of a node.
@@ -115,7 +116,7 @@ CMP_API int CMP_CALL cmp_a11y_node_get_next_sibling(const CMPA11yNode *node,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_a11y_node_get_prev_sibling(const CMPA11yNode *node,
-                                                 CMPA11yNode **out_sibling);
+                                                    CMPA11yNode **out_sibling);
 
 #ifdef __cplusplus
 } /* extern "C" */

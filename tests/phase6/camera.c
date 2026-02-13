@@ -186,13 +186,11 @@ static int test_env_get_camera(void *env, CMPCamera *out_camera) {
   return CMP_OK;
 }
 
-static const CMPEnvVTable g_test_env_vtable = {NULL, NULL, test_env_get_camera,
-                                              NULL, NULL, NULL, NULL, NULL,
-                                              NULL};
+static const CMPEnvVTable g_test_env_vtable = {
+    NULL, NULL, test_env_get_camera, NULL, NULL, NULL, NULL, NULL, NULL};
 
-static const CMPEnvVTable g_test_env_vtable_no_camera = {NULL, NULL, NULL,
-                                                        NULL, NULL, NULL, NULL,
-                                                        NULL, NULL};
+static const CMPEnvVTable g_test_env_vtable_no_camera = {
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 static int test_env_reset(TestEnvState *env_state,
                           TestCameraState *camera_state,
@@ -326,7 +324,7 @@ static int test_camera_init_errors(void) {
   env_state.camera.vtable = &vtable_missing;
   memset(&session, 0, sizeof(session));
   CMP_TEST_EXPECT(cmp_camera_test_set_skip_vtable_check(2),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_camera_test_set_skip_vtable_check(CMP_TRUE));
   CMP_TEST_EXPECT(cmp_camera_init(&session, &config), CMP_ERR_UNSUPPORTED);
   CMP_TEST_OK(cmp_camera_test_set_skip_vtable_check(CMP_FALSE));
@@ -346,26 +344,26 @@ static int test_camera_shutdown_errors(void) {
 
   CMP_TEST_OK(test_camera_state_reset(&cam_state));
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_FALSE));
+                                 CMP_TRUE, CMP_FALSE));
   session.camera.ctx = NULL;
   CMP_TEST_EXPECT(cmp_camera_shutdown(&session), CMP_ERR_INVALID_ARGUMENT);
 
   vtable_missing = g_test_camera_vtable;
   vtable_missing.close = NULL;
-  CMP_TEST_OK(test_session_reset(&session, &cam_state, &vtable_missing, CMP_TRUE,
-                                CMP_FALSE));
+  CMP_TEST_OK(test_session_reset(&session, &cam_state, &vtable_missing,
+                                 CMP_TRUE, CMP_FALSE));
   CMP_TEST_EXPECT(cmp_camera_shutdown(&session), CMP_ERR_UNSUPPORTED);
 
   CMP_TEST_OK(test_camera_state_reset(&cam_state));
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_TRUE));
+                                 CMP_TRUE, CMP_TRUE));
   cam_state.fail_stop = 1;
   CMP_TEST_EXPECT(cmp_camera_shutdown(&session), CMP_ERR_IO);
   cam_state.fail_stop = 0;
 
   CMP_TEST_OK(test_camera_state_reset(&cam_state));
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_FALSE));
+                                 CMP_TRUE, CMP_FALSE));
   cam_state.fail_close = 1;
   CMP_TEST_EXPECT(cmp_camera_shutdown(&session), CMP_ERR_IO);
   cam_state.fail_close = 0;
@@ -441,23 +439,23 @@ static int test_camera_start_errors(void) {
 
   CMP_TEST_OK(test_camera_state_reset(&cam_state));
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_TRUE));
+                                 CMP_TRUE, CMP_TRUE));
   CMP_TEST_EXPECT(cmp_camera_start(&session), CMP_ERR_STATE);
 
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_FALSE));
+                                 CMP_TRUE, CMP_FALSE));
   session.camera.ctx = NULL;
   CMP_TEST_EXPECT(cmp_camera_start(&session), CMP_ERR_INVALID_ARGUMENT);
 
   vtable_missing = g_test_camera_vtable;
   vtable_missing.start = NULL;
-  CMP_TEST_OK(test_session_reset(&session, &cam_state, &vtable_missing, CMP_TRUE,
-                                CMP_FALSE));
+  CMP_TEST_OK(test_session_reset(&session, &cam_state, &vtable_missing,
+                                 CMP_TRUE, CMP_FALSE));
   CMP_TEST_EXPECT(cmp_camera_start(&session), CMP_ERR_UNSUPPORTED);
 
   cam_state.fail_start = 1;
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_FALSE));
+                                 CMP_TRUE, CMP_FALSE));
   CMP_TEST_EXPECT(cmp_camera_start(&session), CMP_ERR_IO);
   cam_state.fail_start = 0;
 
@@ -476,23 +474,23 @@ static int test_camera_stop_errors(void) {
 
   CMP_TEST_OK(test_camera_state_reset(&cam_state));
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_FALSE));
+                                 CMP_TRUE, CMP_FALSE));
   CMP_TEST_EXPECT(cmp_camera_stop(&session), CMP_ERR_STATE);
 
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_TRUE));
+                                 CMP_TRUE, CMP_TRUE));
   session.camera.ctx = NULL;
   CMP_TEST_EXPECT(cmp_camera_stop(&session), CMP_ERR_INVALID_ARGUMENT);
 
   vtable_missing = g_test_camera_vtable;
   vtable_missing.stop = NULL;
-  CMP_TEST_OK(test_session_reset(&session, &cam_state, &vtable_missing, CMP_TRUE,
-                                CMP_TRUE));
+  CMP_TEST_OK(test_session_reset(&session, &cam_state, &vtable_missing,
+                                 CMP_TRUE, CMP_TRUE));
   CMP_TEST_EXPECT(cmp_camera_stop(&session), CMP_ERR_UNSUPPORTED);
 
   cam_state.fail_stop = 1;
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_TRUE));
+                                 CMP_TRUE, CMP_TRUE));
   CMP_TEST_EXPECT(cmp_camera_stop(&session), CMP_ERR_IO);
   cam_state.fail_stop = 0;
 
@@ -507,39 +505,40 @@ static int test_camera_read_errors(void) {
   CMPBool has_frame;
 
   CMP_TEST_EXPECT(cmp_camera_read_frame(NULL, &frame, &has_frame),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_camera_read_frame(&session, NULL, &has_frame),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_camera_read_frame(&session, &frame, NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   memset(&session, 0, sizeof(session));
   CMP_TEST_EXPECT(cmp_camera_read_frame(&session, &frame, &has_frame),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
 
   CMP_TEST_OK(test_camera_state_reset(&cam_state));
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_FALSE));
+                                 CMP_TRUE, CMP_FALSE));
   CMP_TEST_EXPECT(cmp_camera_read_frame(&session, &frame, &has_frame),
-                 CMP_ERR_STATE);
+                  CMP_ERR_STATE);
 
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_TRUE));
+                                 CMP_TRUE, CMP_TRUE));
   session.camera.ctx = NULL;
   CMP_TEST_EXPECT(cmp_camera_read_frame(&session, &frame, &has_frame),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   vtable_missing = g_test_camera_vtable;
   vtable_missing.read_frame = NULL;
-  CMP_TEST_OK(test_session_reset(&session, &cam_state, &vtable_missing, CMP_TRUE,
-                                CMP_TRUE));
+  CMP_TEST_OK(test_session_reset(&session, &cam_state, &vtable_missing,
+                                 CMP_TRUE, CMP_TRUE));
   CMP_TEST_EXPECT(cmp_camera_read_frame(&session, &frame, &has_frame),
-                 CMP_ERR_UNSUPPORTED);
+                  CMP_ERR_UNSUPPORTED);
 
   cam_state.fail_read = 1;
   CMP_TEST_OK(test_session_reset(&session, &cam_state, &g_test_camera_vtable,
-                                CMP_TRUE, CMP_TRUE));
-  CMP_TEST_EXPECT(cmp_camera_read_frame(&session, &frame, &has_frame), CMP_ERR_IO);
+                                 CMP_TRUE, CMP_TRUE));
+  CMP_TEST_EXPECT(cmp_camera_read_frame(&session, &frame, &has_frame),
+                  CMP_ERR_IO);
   cam_state.fail_read = 0;
 
   return 0;
@@ -588,10 +587,11 @@ static int test_camera_copy_frame(void) {
   cmp_u8 buffer[8];
   cmp_usize out_size;
 
-  CMP_TEST_EXPECT(cmp_camera_copy_frame(NULL, buffer, sizeof(buffer), &out_size),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_camera_copy_frame(NULL, buffer, sizeof(buffer), &out_size),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_camera_copy_frame(&frame, buffer, sizeof(buffer), NULL),
-                 CMP_ERR_INVALID_ARGUMENT);
+                  CMP_ERR_INVALID_ARGUMENT);
 
   memset(&frame, 0, sizeof(frame));
   frame.size = 4u;
@@ -601,18 +601,19 @@ static int test_camera_copy_frame(void) {
       CMP_ERR_INVALID_ARGUMENT);
 
   frame.data = buffer;
-  CMP_TEST_EXPECT(cmp_camera_copy_frame(&frame, NULL, sizeof(buffer), &out_size),
-                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_camera_copy_frame(&frame, NULL, sizeof(buffer), &out_size),
+      CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_camera_copy_frame(&frame, buffer, 2u, &out_size),
-                 CMP_ERR_RANGE);
+                  CMP_ERR_RANGE);
 
   buffer[0] = 9u;
   buffer[1] = 8u;
   buffer[2] = 7u;
   buffer[3] = 6u;
-  CMP_TEST_OK(
-      cmp_camera_copy_frame(&frame, buffer + 4, sizeof(buffer) - 4u, &out_size));
+  CMP_TEST_OK(cmp_camera_copy_frame(&frame, buffer + 4, sizeof(buffer) - 4u,
+                                    &out_size));
   CMP_TEST_ASSERT(out_size == 4u);
   CMP_TEST_ASSERT(buffer[4] == 9u);
   CMP_TEST_ASSERT(buffer[7] == 6u);
