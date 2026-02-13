@@ -538,6 +538,10 @@ int main(void) {
   CMP_TEST_EXPECT(widget.widget.vtable->paint(widget.widget.ctx, &paint_ctx),
                   CMP_ERR_INVALID_ARGUMENT);
   paint_ctx.gfx = &gfx;
+  gfx.text_vtable = NULL;
+  CMP_TEST_EXPECT(widget.widget.vtable->paint(widget.widget.ctx, &paint_ctx),
+                  CMP_ERR_UNSUPPORTED);
+  gfx.text_vtable = &g_test_text_vtable;
   gfx.text_vtable = &g_test_text_vtable_no_draw;
   CMP_TEST_EXPECT(widget.widget.vtable->paint(widget.widget.ctx, &paint_ctx),
                   CMP_ERR_UNSUPPORTED);
@@ -578,6 +582,14 @@ int main(void) {
   CMP_TEST_ASSERT(temp_widget.font.id == 0u);
 
   temp_widget = widget;
+  temp_widget.backend.vtable = NULL;
+  temp_widget.owns_font = CMP_TRUE;
+  temp_widget.font.id = 1u;
+  temp_widget.font.generation = 1u;
+  rc = text_vtable->destroy(&temp_widget);
+  CMP_TEST_EXPECT(rc, CMP_ERR_UNSUPPORTED);
+
+  temp_widget = widget;
   temp_widget.owns_font = CMP_FALSE;
   temp_widget.font.id = 1u;
   temp_widget.font.generation = 1u;
@@ -616,6 +628,45 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_text_widget_get_metrics(&widget, &metrics), CMP_ERR_IO);
   backend.fail_measure = 0;
   CMP_TEST_OK(cmp_text_widget_get_metrics(&widget, &metrics));
+
+  CMP_TEST_OK(cmp_text_test_set_style_init_fail_after(1u));
+  CMP_TEST_EXPECT(cmp_text_style_init(&alt_style), CMP_ERR_IO);
+  CMP_TEST_OK(cmp_text_test_set_style_init_fail_after(0u));
+  CMP_TEST_OK(cmp_text_style_init(&alt_style));
+
+  width_spec.mode = CMP_MEASURE_UNSPECIFIED;
+  width_spec.size = 0.0f;
+  height_spec = width_spec;
+  CMP_TEST_OK(widget.widget.vtable->measure(widget.widget.ctx, width_spec,
+                                            height_spec, &size));
+  CMP_TEST_ASSERT(cmp_near(size.width, widget.metrics.width, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(size.height, widget.metrics.height, 0.001f));
+
+  width_spec.mode = CMP_MEASURE_EXACTLY;
+  width_spec.size = 15.0f;
+  height_spec.mode = CMP_MEASURE_UNSPECIFIED;
+  height_spec.size = 0.0f;
+  CMP_TEST_OK(widget.widget.vtable->measure(widget.widget.ctx, width_spec,
+                                            height_spec, &size));
+  CMP_TEST_ASSERT(cmp_near(size.width, 15.0f, 0.001f));
+
+  width_spec.mode = CMP_MEASURE_AT_MOST;
+  width_spec.size = 200.0f;
+  height_spec.mode = CMP_MEASURE_AT_MOST;
+  height_spec.size = 50.0f;
+  CMP_TEST_OK(widget.widget.vtable->measure(widget.widget.ctx, width_spec,
+                                            height_spec, &size));
+  CMP_TEST_ASSERT(cmp_near(size.width, widget.metrics.width, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(size.height, widget.metrics.height, 0.001f));
+
+  width_spec.mode = CMP_MEASURE_EXACTLY;
+  width_spec.size = 33.0f;
+  height_spec.mode = CMP_MEASURE_EXACTLY;
+  height_spec.size = 44.0f;
+  CMP_TEST_OK(widget.widget.vtable->measure(widget.widget.ctx, width_spec,
+                                            height_spec, &size));
+  CMP_TEST_ASSERT(cmp_near(size.width, 33.0f, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(size.height, 44.0f, 0.001f));
 
   rc = widget.widget.vtable->destroy(widget.widget.ctx);
   CMP_TEST_OK(rc);

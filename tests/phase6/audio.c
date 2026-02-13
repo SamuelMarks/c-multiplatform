@@ -1,4 +1,5 @@
 #include "cmpc/cmp_audio.h"
+#include "cmpc/cmp_core.h"
 #include "test_utils.h"
 
 #include <stdlib.h>
@@ -13,6 +14,7 @@ int CMP_CALL cmp_audio_test_read_u32_le(const cmp_u8 *data, cmp_usize size,
 int CMP_CALL cmp_audio_test_decode_wav(const CMPAudioDecodeRequest *request,
                                        const CMPAllocator *allocator,
                                        CMPAudioData *out_audio);
+int CMP_CALL cmp_core_test_set_default_allocator_fail(CMPBool fail);
 
 typedef struct TestAudioState {
   int fail_decode;
@@ -461,6 +463,7 @@ static int test_audio_decode_wav_errors(void) {
   CMPAudioDecodeRequest request;
   CMPAudioData audio;
   CMPAllocator allocator;
+  CMPAllocator bad_alloc;
   TestAlloc alloc;
   cmp_u8 wav[128];
   cmp_u8 pcm[2] = {1u, 0u};
@@ -490,6 +493,11 @@ static int test_audio_decode_wav_errors(void) {
                              &size));
   request.data = wav;
   request.size = size;
+
+  bad_alloc = allocator;
+  bad_alloc.realloc = NULL;
+  CMP_TEST_EXPECT(cmp_audio_test_decode_wav(&request, &bad_alloc, &audio),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   wav[0] = 'X';
   CMP_TEST_EXPECT(cmp_audio_test_decode_wav(&request, &allocator, &audio),
@@ -552,6 +560,11 @@ static int test_audio_decode_wav_errors(void) {
   CMP_TEST_OK(test_build_wav(wav, sizeof(wav), 1u, 8000u, 16u, pcm, sizeof(pcm),
                              &size));
 
+  alloc.fail_alloc_on_call = alloc.alloc_calls + 1;
+  CMP_TEST_EXPECT(cmp_audio_test_decode_wav(&request, &allocator, &audio),
+                  CMP_ERR_OUT_OF_MEMORY);
+  alloc.fail_alloc_on_call = 0;
+
   for (fail_index = 1u; fail_index <= 4u; fail_index += 1u) {
     CMP_TEST_OK(cmp_audio_test_set_read_u32_fail_after(fail_index));
     CMP_TEST_EXPECT(cmp_audio_test_decode_wav(&request, &allocator, &audio),
@@ -576,6 +589,11 @@ static int test_audio_init_edge_cases(void) {
   CMPAudioVTable incomplete_vtable = {test_audio_decode, NULL};
 
   CMP_TEST_OK(cmp_audio_config_init(&config));
+  CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
+  memset(&decoder, 0, sizeof(decoder));
+  CMP_TEST_EXPECT(cmp_audio_init(&decoder, &config), CMP_ERR_UNKNOWN);
+  CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
+
   memset(&decoder, 0, sizeof(decoder));
   decoder.ready = CMP_TRUE;
   CMP_TEST_EXPECT(cmp_audio_init(&decoder, &config), CMP_ERR_STATE);
@@ -736,6 +754,10 @@ static int test_audio_api_error_paths(void) {
   CMP_TEST_EXPECT(cmp_audio_free(&decoder, &audio), CMP_ERR_IO);
   alloc.fail_free_on_call = 0;
   CMP_TEST_OK(cmp_audio_free(&decoder, &audio));
+
+  CMP_TEST_EXPECT(cmp_audio_shutdown(NULL), CMP_ERR_INVALID_ARGUMENT);
+  memset(&decoder, 0, sizeof(decoder));
+  CMP_TEST_EXPECT(cmp_audio_shutdown(&decoder), CMP_ERR_STATE);
   return 0;
 }
 

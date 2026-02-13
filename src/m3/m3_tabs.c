@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
 #define M3_TAB_ROW_TEST_FAIL_NONE 0u
 #define M3_TAB_ROW_TEST_FAIL_STYLE_INIT 1u
 #define M3_TAB_ROW_TEST_FAIL_ANIM_INIT 2u
@@ -180,7 +180,7 @@ typedef struct M3SegmentedLayout {
   CMPScalar spacing;
   CMPScalar content_width;
   CMPScalar content_height;
-} M3SegmentedLayout;
+} M3SegmentedLayout; /* GCOVR_EXCL_LINE */
 
 static int m3_tab_row_validate_color(const CMPColor *color) {
   if (color == NULL) {
@@ -221,7 +221,7 @@ static int m3_tab_row_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
   if (!(a >= 0.0f && a <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   rc = m3_tab_row_test_color_should_fail(&should_fail);
   if (rc != CMP_OK) {
     return rc;
@@ -253,7 +253,7 @@ static int m3_tab_row_color_with_alpha(const CMPColor *base, CMPScalar alpha,
   if (rc != CMP_OK) {
     return rc;
   }
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   rc = m3_tab_row_test_color_should_fail(&should_fail);
   if (rc != CMP_OK) {
     return rc;
@@ -281,7 +281,7 @@ static int m3_tab_row_validate_edges(const CMPLayoutEdges *edges) {
 
 static int m3_tab_row_validate_text_style(const CMPTextStyle *style,
                                           CMPBool require_family) {
-  int rc;
+  int rc = CMP_OK;
 
   if (style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -309,17 +309,14 @@ static int m3_tab_row_validate_text_style(const CMPTextStyle *style,
 
 static int m3_tab_row_validate_style(const M3TabRowStyle *style,
                                      CMPBool require_family) {
-  int rc;
+  int rc = CMP_OK;
 
   if (style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  switch (style->mode) {
-  case M3_TAB_MODE_FIXED:
-  case M3_TAB_MODE_SCROLLABLE:
-    break;
-  default:
+  if (style->mode != M3_TAB_MODE_FIXED &&
+      style->mode != M3_TAB_MODE_SCROLLABLE) {
     return CMP_ERR_RANGE;
   }
 
@@ -330,13 +327,10 @@ static int m3_tab_row_validate_style(const M3TabRowStyle *style,
     return CMP_ERR_RANGE;
   }
 
-  switch (style->indicator_anim_easing) {
-  case CMP_ANIM_EASE_LINEAR:
-  case CMP_ANIM_EASE_IN:
-  case CMP_ANIM_EASE_OUT:
-  case CMP_ANIM_EASE_IN_OUT: /* GCOVR_EXCL_LINE */
-    break;
-  default:
+  if (style->indicator_anim_easing != CMP_ANIM_EASE_LINEAR &&
+      style->indicator_anim_easing != CMP_ANIM_EASE_IN &&
+      style->indicator_anim_easing != CMP_ANIM_EASE_OUT &&
+      style->indicator_anim_easing != CMP_ANIM_EASE_IN_OUT) {
     return CMP_ERR_RANGE;
   }
 
@@ -375,7 +369,7 @@ static int m3_tab_row_validate_style(const M3TabRowStyle *style,
 }
 
 static int m3_tab_row_validate_items(const M3TabItem *items, cmp_usize count) {
-  cmp_usize i;
+  cmp_usize i = 0u;
 
   if (count == 0) {
     return CMP_OK;
@@ -427,8 +421,8 @@ static int m3_tab_row_measure_max_text(const M3TabRow *row,
   CMPScalar max_width;
   CMPScalar max_height; /* GCOVR_EXCL_LINE */
   CMPScalar max_baseline;
-  cmp_usize i;
-  int rc;
+  cmp_usize i = 0u;
+  int rc = CMP_OK;
 
   if (row == NULL || out_width == NULL || out_height == NULL ||
       out_baseline == NULL) {
@@ -480,7 +474,7 @@ static int m3_tab_row_item_width(const M3TabRow *row, const M3TabItem *item,
                                  CMPScalar *out_width) { /* GCOVR_EXCL_LINE */
   CMPTextMetrics metrics;
   CMPScalar width;
-  int rc;
+  int rc = CMP_OK;
 
   if (row == NULL || item == NULL || out_width == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -520,8 +514,8 @@ static int m3_tab_row_measure_content(const M3TabRow *row, cmp_u32 mode,
   CMPScalar tab_height;
   CMPScalar content_width;
   CMPScalar content_height;
-  cmp_usize i;
-  int rc;
+  cmp_usize i = 0u;
+  int rc = CMP_OK;
 
   if (row == NULL || out_width == NULL || out_height == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -588,7 +582,7 @@ static int m3_tab_row_measure_content(const M3TabRow *row, cmp_u32 mode,
 static int m3_tab_row_compute_layout(const M3TabRow *row,
                                      M3TabRowLayout *out_layout) {
   M3TabRowStyle style;
-  CMPRect bounds;
+  CMPRect bounds = {0};
   CMPScalar available_width; /* GCOVR_EXCL_LINE */
   CMPScalar available_height;
   CMPScalar spacing;
@@ -602,9 +596,9 @@ static int m3_tab_row_compute_layout(const M3TabRow *row,
   cmp_u32 mode; /* GCOVR_EXCL_LINE */
   cmp_usize i;
   int rc;
-#ifdef CMP_TESTING
-  CMPBool match; /* GCOVR_EXCL_LINE */
-#endif           /* GCOVR_EXCL_LINE */
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+  CMPBool match;   /* GCOVR_EXCL_LINE */
+#endif             /* GCOVR_EXCL_LINE */
 
   if (row == NULL || out_layout == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -635,7 +629,7 @@ static int m3_tab_row_compute_layout(const M3TabRow *row,
   CMP_UNUSED(max_baseline);
 
   spacing = style.spacing;
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   rc = m3_tab_row_test_fail_point_match(
       M3_TAB_ROW_TEST_FAIL_LAYOUT_SPACING_NEGATIVE, &match);
   if (rc != CMP_OK) {
@@ -680,7 +674,7 @@ static int m3_tab_row_compute_layout(const M3TabRow *row,
     g_m3_tab_row_test_fail_point = M3_TAB_ROW_TEST_FAIL_NONE;
     mode = 99u;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   memset(out_layout, 0, sizeof(*out_layout));
   out_layout->mode = mode;
   out_layout->spacing = spacing;
@@ -710,7 +704,7 @@ static int m3_tab_row_compute_layout(const M3TabRow *row,
       if (match == CMP_TRUE) {
         tab_width = -1.0f;
       }
-#endif
+#endif /* GCOVR_EXCL_LINE */
       if (tab_width < 0.0f) {
         return CMP_ERR_RANGE;
       }
@@ -742,13 +736,13 @@ static int m3_tab_row_compute_layout(const M3TabRow *row,
     return CMP_ERR_RANGE;
   }
 
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (g_m3_tab_row_test_fail_point ==
       M3_TAB_ROW_TEST_FAIL_LAYOUT_CONTENT_WIDTH_NEGATIVE) {
     g_m3_tab_row_test_fail_point = M3_TAB_ROW_TEST_FAIL_NONE;
     content_width = -1.0f;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   if (content_width < 0.0f) {
     return CMP_ERR_RANGE;
   }
@@ -760,13 +754,13 @@ static int m3_tab_row_compute_layout(const M3TabRow *row,
 
 static int m3_tab_row_clamp_scroll(M3TabRow *row,
                                    const M3TabRowLayout *layout) {
-  CMPScalar max_scroll;
+  CMPScalar max_scroll = 0.0f;
 
   if (row == NULL || layout == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (g_m3_tab_row_test_fail_point == M3_TAB_ROW_TEST_FAIL_CLAMP_SCROLL) {
     g_m3_tab_row_test_fail_point = M3_TAB_ROW_TEST_FAIL_NONE;
     return CMP_ERR_IO;
@@ -794,7 +788,7 @@ static int m3_tab_row_clamp_scroll(M3TabRow *row,
 
 static int m3_tab_row_indicator_target(const M3TabRow *row,
                                        const M3TabRowLayout *layout,
-                                       CMPScalar *out_pos, /* GCOVR_EXCL_LINE */
+                                       CMPScalar *out_pos,
                                        CMPScalar *out_width) {
   CMPScalar pos = 0.0f;
   CMPScalar width = 0.0f;
@@ -846,13 +840,13 @@ static int m3_tab_row_indicator_target(const M3TabRow *row,
 static int m3_tab_row_sync_indicator(M3TabRow *row,
                                      const M3TabRowLayout *layout,
                                      CMPBool animate) {
-  CMPScalar target_pos;
-  CMPScalar target_width;
-  CMPScalar value;
-  int rc;
-#ifdef CMP_TESTING
-  CMPBool fail_match;
-#endif
+  CMPScalar target_pos = 0.0f;
+  CMPScalar target_width = 0.0f;
+  CMPScalar value = 0.0f;
+  int rc = CMP_OK;
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+  CMPBool fail_match = CMP_FALSE;
+#endif /* GCOVR_EXCL_LINE */
 
   if (row == NULL || layout == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -880,7 +874,7 @@ static int m3_tab_row_sync_indicator(M3TabRow *row,
       }
     }
 #endif
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
     if (rc == CMP_OK) {
       rc =
           m3_tab_row_test_fail_point_match(M3_TAB_ROW_TEST_FAIL_INDICATOR_START,
@@ -897,7 +891,7 @@ static int m3_tab_row_sync_indicator(M3TabRow *row,
     rc = cmp_anim_controller_start_timing(
         &row->indicator_width_anim, row->indicator_width, target_width,
         row->style.indicator_anim_duration, row->style.indicator_anim_easing);
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
     if (g_m3_tab_row_test_start_fail_after > 0u) {
       g_m3_tab_row_test_start_fail_after -= 1u; /* GCOVR_EXCL_LINE */
       if (g_m3_tab_row_test_start_fail_after == 0u) {
@@ -1046,7 +1040,7 @@ static int m3_tab_row_item_rect(const M3TabRow *row,
 static int m3_tab_row_hit_test(const M3TabRow *row,
                                const M3TabRowLayout *layout, cmp_i32 x,
                                cmp_i32 y, cmp_usize *out_index) {
-  CMPScalar fx;
+  CMPScalar fx = 0.0f;
   CMPScalar fy;
   CMPScalar stride = 0.0f;
   CMPScalar pos = 0.0f;
@@ -1082,7 +1076,7 @@ static int m3_tab_row_hit_test(const M3TabRow *row,
       return CMP_ERR_RANGE;
     }
     pos = fx - layout->start_x;
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
     rc = m3_tab_row_test_fail_point_match(
         M3_TAB_ROW_TEST_FAIL_HIT_TEST_POS_NEGATIVE, &match);
     if (rc != CMP_OK) {
@@ -1148,10 +1142,10 @@ static int m3_tab_row_hit_test(const M3TabRow *row,
 
 static int m3_tab_row_widget_measure(void *widget, CMPMeasureSpec width,
                                      CMPMeasureSpec height, CMPSize *out_size) {
-  M3TabRow *row;
-  CMPScalar content_width;
-  CMPScalar content_height;
-  int rc;
+  M3TabRow *row = NULL;
+  CMPScalar content_width = 0.0f;
+  CMPScalar content_height = 0.0f;
+  int rc = CMP_OK;
 
   if (widget == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1203,9 +1197,9 @@ static int m3_tab_row_widget_measure(void *widget, CMPMeasureSpec width,
 }
 
 static int m3_tab_row_widget_layout(void *widget, CMPRect bounds) {
-  M3TabRow *row;
-  M3TabRowLayout layout;
-  int rc;
+  M3TabRow *row = NULL;
+  M3TabRowLayout layout = {0};
+  int rc = CMP_OK;
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1247,11 +1241,11 @@ static int m3_tab_row_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPScalar text_x;
   CMPScalar text_y;
   CMPScalar indicator_thickness;
-  CMPScalar indicator_width;
-  CMPColor text_color;
-  CMPColor indicator_color;
-  cmp_usize i;
-  int rc;
+  CMPScalar indicator_width = 0.0f;
+  CMPColor text_color = {0};
+  CMPColor indicator_color = {0};
+  cmp_usize i = 0u;
+  int rc = CMP_OK;
 #ifdef CMP_TESTING
   CMPBool match; /* GCOVR_EXCL_LINE */
 #endif           /* GCOVR_EXCL_LINE */
@@ -1504,7 +1498,7 @@ static int m3_tab_row_widget_event(void *widget, const CMPInputEvent *event,
 
 static int m3_tab_row_widget_get_semantics(void *widget,
                                            CMPSemantics *out_semantics) {
-  M3TabRow *row;
+  M3TabRow *row = NULL;
 
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1526,8 +1520,8 @@ static int m3_tab_row_widget_get_semantics(void *widget,
 }
 
 static int m3_tab_row_widget_destroy(void *widget) {
-  M3TabRow *row;
-  int rc;
+  M3TabRow *row = NULL;
+  int rc = CMP_OK;
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1651,7 +1645,7 @@ int CMP_CALL m3_tab_row_init(M3TabRow *row, const CMPTextBackend *backend,
   M3TabRowLayout layout = {0};
   int rc = CMP_OK; /* GCOVR_EXCL_LINE */
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
-  CMPBool match;
+  CMPBool match = CMP_FALSE;
 #endif /* GCOVR_EXCL_LINE */
 
   if (row == NULL || backend == NULL || style == NULL) {
@@ -1703,7 +1697,7 @@ int CMP_CALL m3_tab_row_init(M3TabRow *row, const CMPTextBackend *backend,
   }
 
   rc = cmp_anim_controller_init(&row->indicator_pos_anim);
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (g_m3_tab_row_test_fail_point == M3_TAB_ROW_TEST_FAIL_ANIM_INIT_ERROR) {
     g_m3_tab_row_test_fail_point = M3_TAB_ROW_TEST_FAIL_NONE;
     rc = CMP_ERR_IO;
@@ -1795,7 +1789,7 @@ int CMP_CALL m3_tab_row_set_items(M3TabRow *row, const M3TabItem *items,
 
 int CMP_CALL m3_tab_row_set_style(M3TabRow *row, const M3TabRowStyle *style) {
   CMPHandle new_font;
-  int rc;
+  int rc = CMP_OK;
 
   if (row == NULL || style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1827,7 +1821,7 @@ int CMP_CALL m3_tab_row_set_style(M3TabRow *row, const M3TabRowStyle *style) {
 
 int CMP_CALL m3_tab_row_set_selected(M3TabRow *row, cmp_usize selected_index) {
   M3TabRowLayout layout = {0};
-  int rc;
+  int rc = CMP_OK;
 
   if (row == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1864,7 +1858,7 @@ int CMP_CALL m3_tab_row_get_selected(const M3TabRow *row,
 
 int CMP_CALL m3_tab_row_set_scroll(M3TabRow *row, CMPScalar offset) {
   M3TabRowLayout layout = {0};
-  int rc;
+  int rc = CMP_OK;
 
   if (row == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1972,8 +1966,8 @@ static int m3_segmented_validate_color(const CMPColor *color) {
 
 static int m3_segmented_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
                                   CMPScalar b, CMPScalar a) {
-  CMPBool should_fail;
-  int rc;
+  CMPBool should_fail = CMP_FALSE;
+  int rc = CMP_OK;
 
   if (color == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2008,8 +2002,8 @@ static int m3_segmented_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
 
 static int m3_segmented_color_with_alpha(const CMPColor *base, CMPScalar alpha,
                                          CMPColor *out_color) {
-  CMPBool should_fail;
-  int rc;
+  CMPBool should_fail = CMP_FALSE;
+  int rc = CMP_OK;
 
   if (base == NULL || out_color == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2079,7 +2073,7 @@ m3_segmented_validate_text_style(const CMPTextStyle *style,
 
 static int m3_segmented_validate_style(const M3SegmentedStyle *style,
                                        CMPBool require_family) {
-  int rc;
+  int rc = CMP_OK;
 
   if (style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2144,7 +2138,7 @@ static int m3_segmented_validate_style(const M3SegmentedStyle *style,
 
 static int m3_segmented_validate_items(const M3SegmentedItem *items,
                                        cmp_usize count) {
-  cmp_usize i;
+  cmp_usize i = 0u;
 
   if (count == 0) {
     return CMP_OK;
@@ -2201,8 +2195,8 @@ static int m3_segmented_validate_mode(cmp_u32 mode) {
 
 static int m3_segmented_validate_selected_states(const CMPBool *states,
                                                  cmp_usize count) {
-  cmp_usize i;
-  int rc;
+  cmp_usize i = 0u;
+  int rc = CMP_OK;
 
   if (count == 0) {
     return CMP_OK; /* GCOVR_EXCL_LINE */
@@ -2227,8 +2221,8 @@ static int m3_segmented_measure_max_text(const M3SegmentedButtons *buttons,
   CMPScalar max_width;
   CMPScalar max_height;
   CMPScalar max_baseline;
-  cmp_usize i;
-  int rc;
+  cmp_usize i = 0u;
+  int rc = CMP_OK;
 
   if (buttons == NULL || out_width == NULL || out_height == NULL ||
       out_baseline == NULL) {
@@ -2476,8 +2470,8 @@ static int m3_segmented_hit_test(const M3SegmentedButtons *buttons,
   cmp_usize index = 0u;
   int rc = CMP_OK;
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
-  CMPBool match;
-#endif
+  CMPBool match = CMP_FALSE;
+#endif /* GCOVR_EXCL_LINE */
 
   if (buttons == NULL || layout == NULL || out_index == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2563,10 +2557,10 @@ m3_segmented_is_selected(const M3SegmentedButtons *buttons, cmp_usize index,
 static int m3_segmented_widget_measure(void *widget, CMPMeasureSpec width,
                                        CMPMeasureSpec height,
                                        CMPSize *out_size) {
-  M3SegmentedButtons *buttons;
-  CMPScalar content_width;
-  CMPScalar content_height;
-  int rc;
+  M3SegmentedButtons *buttons = NULL;
+  CMPScalar content_width = 0.0f;
+  CMPScalar content_height = 0.0f;
+  int rc = CMP_OK;
 
   if (widget == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2618,8 +2612,8 @@ static int m3_segmented_widget_measure(void *widget, CMPMeasureSpec width,
 }
 
 static int m3_segmented_widget_layout(void *widget, CMPRect bounds) {
-  M3SegmentedButtons *buttons;
-  int rc;
+  M3SegmentedButtons *buttons = NULL;
+  int rc = CMP_OK;
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2636,9 +2630,9 @@ static int m3_segmented_widget_layout(void *widget, CMPRect bounds) {
 }
 
 static int m3_segmented_widget_paint(void *widget, CMPPaintContext *ctx) {
-  M3SegmentedButtons *buttons;
-  M3SegmentedLayout layout;
-  CMPRect segment_rect;
+  M3SegmentedButtons *buttons = NULL;
+  M3SegmentedLayout layout = {0};
+  CMPRect segment_rect = {0};
   CMPRect inner_rect; /* GCOVR_EXCL_LINE */
   CMPTextMetrics metrics;
   CMPScalar text_x;
@@ -2648,12 +2642,12 @@ static int m3_segmented_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPScalar corner_radius;
   CMPColor bg_color;
   CMPColor text_color;
-  CMPColor outline_color;
+  CMPColor outline_color = {0};
   CMPBool selected;
   cmp_usize i = 0u;
   int rc = CMP_OK;
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
-  CMPBool match;
+  CMPBool match = CMP_FALSE;
 #endif /* GCOVR_EXCL_LINE */
 
   if (widget == NULL || ctx == NULL || ctx->gfx == NULL) {
@@ -2818,13 +2812,13 @@ static int m3_segmented_widget_paint(void *widget, CMPPaintContext *ctx) {
 
 static int m3_segmented_widget_event(void *widget, const CMPInputEvent *event,
                                      CMPBool *out_handled) {
-  M3SegmentedButtons *buttons;
-  M3SegmentedLayout layout; /* GCOVR_EXCL_LINE */
-  cmp_usize index;
-  cmp_usize previous;
-  CMPBool selected;
-  CMPBool new_selected;
-  int rc;
+  M3SegmentedButtons *buttons = NULL;
+  M3SegmentedLayout layout = {0}; /* GCOVR_EXCL_LINE */
+  cmp_usize index = 0u;
+  cmp_usize previous = 0u;
+  CMPBool selected = CMP_FALSE;
+  CMPBool new_selected = CMP_FALSE;
+  int rc = CMP_OK;
 
   if (widget == NULL || event == NULL || out_handled == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2960,7 +2954,7 @@ static int m3_segmented_widget_get_semantics(void *widget,
 
 static int m3_segmented_widget_destroy(void *widget) {
   M3SegmentedButtons *buttons;
-  int rc;
+  int rc = CMP_OK;
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -3007,7 +3001,7 @@ static const CMPWidgetVTable g_m3_segmented_widget_vtable = {
 
 int CMP_CALL m3_segmented_style_init(M3SegmentedStyle *style) {
   int rc;
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   CMPBool match;
 #endif
 
@@ -3031,7 +3025,7 @@ int CMP_CALL m3_segmented_style_init(M3SegmentedStyle *style) {
       rc = CMP_ERR_UNKNOWN;
     }
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   if (rc != CMP_OK) {
     return rc;
   }
@@ -3100,7 +3094,7 @@ int CMP_CALL m3_segmented_buttons_init(M3SegmentedButtons *buttons,
                                        cmp_usize item_count, cmp_u32 mode,
                                        cmp_usize selected_index,
                                        CMPBool *selected_states) {
-  int rc;
+  int rc = CMP_OK;
 
   if (buttons == NULL || backend == NULL || style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -3207,7 +3201,7 @@ int CMP_CALL m3_segmented_buttons_set_items(M3SegmentedButtons *buttons,
 int CMP_CALL m3_segmented_buttons_set_style(M3SegmentedButtons *buttons,
                                             const M3SegmentedStyle *style) {
   CMPHandle new_font;
-  int rc; /* GCOVR_EXCL_LINE */
+  int rc = CMP_OK; /* GCOVR_EXCL_LINE */
 
   if (buttons == NULL || style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -3268,7 +3262,7 @@ int CMP_CALL m3_segmented_buttons_get_selected_index(
 
 int CMP_CALL m3_segmented_buttons_set_selected_state(
     M3SegmentedButtons *buttons, cmp_usize index, CMPBool selected) {
-  int rc;
+  int rc = CMP_OK;
 
   if (buttons == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -3327,7 +3321,7 @@ int CMP_CALL m3_segmented_buttons_set_on_select(M3SegmentedButtons *buttons,
   return CMP_OK;
 }
 
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
 int CMP_CALL m3_tab_row_test_validate_color(const CMPColor *color) {
   return m3_tab_row_validate_color(color);
 }
@@ -3426,8 +3420,8 @@ int CMP_CALL m3_tab_row_test_compute_layout(const M3TabRow *row,
                                             CMPScalar *out_tab_width,
                                             CMPScalar *out_tab_height,
                                             cmp_u32 *out_mode) {
-  M3TabRowLayout layout;
-  int rc;
+  M3TabRowLayout layout = {0};
+  int rc = CMP_OK;
 
   if (out_content_width == NULL || out_tab_width == NULL ||
       out_tab_height == NULL || out_mode == NULL) {
@@ -3453,9 +3447,7 @@ int CMP_CALL m3_tab_row_test_compute_layout_null_out(const M3TabRow *row) {
 int CMP_CALL m3_tab_row_test_clamp_scroll(M3TabRow *row, cmp_u32 mode,
                                           CMPScalar content_width,
                                           CMPScalar available_width) {
-  M3TabRowLayout layout;
-
-  memset(&layout, 0, sizeof(layout));
+  M3TabRowLayout layout = {0};
   layout.mode = mode;
   layout.content_width = content_width;
   layout.available_width = available_width;
@@ -3475,9 +3467,7 @@ int CMP_CALL m3_tab_row_test_indicator_target(
     const M3TabRow *row, cmp_u32 mode, CMPScalar tab_width, CMPScalar spacing,
     CMPScalar content_width, CMPScalar start_x, CMPScalar start_y,
     CMPScalar tab_height, CMPScalar *out_pos, CMPScalar *out_width) {
-  M3TabRowLayout layout;
-
-  memset(&layout, 0, sizeof(layout));
+  M3TabRowLayout layout = {0};
   layout.mode = mode;
   layout.tab_width = tab_width;
   layout.spacing = spacing;
@@ -3497,9 +3487,7 @@ int CMP_CALL m3_tab_row_test_sync_indicator(
     M3TabRow *row, cmp_u32 mode, CMPScalar tab_width, CMPScalar spacing,
     CMPScalar content_width, CMPScalar start_x, CMPScalar start_y,
     CMPScalar tab_height, CMPBool animate) {
-  M3TabRowLayout layout;
-
-  memset(&layout, 0, sizeof(layout));
+  M3TabRowLayout layout = {0};
   layout.mode = mode;
   layout.tab_width = tab_width;
   layout.spacing = spacing;
@@ -3523,9 +3511,7 @@ int CMP_CALL m3_tab_row_test_item_rect(const M3TabRow *row, cmp_u32 mode,
                                        CMPScalar content_width,
                                        CMPScalar available_width,
                                        cmp_usize index, CMPRect *out_rect) {
-  M3TabRowLayout layout;
-
-  memset(&layout, 0, sizeof(layout));
+  M3TabRowLayout layout = {0};
   layout.mode = mode;
   layout.start_x = start_x;
   layout.start_y = start_y;
@@ -3550,9 +3536,7 @@ int CMP_CALL m3_tab_row_test_hit_test(const M3TabRow *row, cmp_u32 mode,
                                       CMPScalar content_width,
                                       CMPScalar available_width, cmp_i32 x,
                                       cmp_i32 y, cmp_usize *out_index) {
-  M3TabRowLayout layout;
-
-  memset(&layout, 0, sizeof(layout));
+  M3TabRowLayout layout = {0};
   layout.mode = mode;
   layout.start_x = start_x;
   layout.start_y = start_y;
@@ -3656,8 +3640,8 @@ int CMP_CALL m3_segmented_test_compute_layout(const M3SegmentedButtons *buttons,
                                               CMPScalar *out_segment_width,
                                               CMPScalar *out_segment_height,
                                               CMPScalar *out_spacing) {
-  M3SegmentedLayout layout;
-  int rc;
+  M3SegmentedLayout layout = {0};
+  int rc = CMP_OK;
 
   if (out_content_width == NULL || out_segment_width == NULL ||
       out_segment_height == NULL || out_spacing == NULL) {
@@ -3685,9 +3669,7 @@ int CMP_CALL m3_segmented_test_hit_test(
     const M3SegmentedButtons *buttons, CMPScalar start_x, CMPScalar start_y,
     CMPScalar segment_width, CMPScalar segment_height, CMPScalar spacing,
     CMPScalar content_width, cmp_i32 x, cmp_i32 y, cmp_usize *out_index) {
-  M3SegmentedLayout layout;
-
-  memset(&layout, 0, sizeof(layout));
+  M3SegmentedLayout layout = {0};
   layout.start_x = start_x;
   layout.start_y = start_y;
   layout.segment_width = segment_width;

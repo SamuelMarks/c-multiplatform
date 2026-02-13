@@ -209,13 +209,13 @@ int CMP_CALL cmp_storage_init(CMPStorage *storage,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (config->allocator == NULL) {
+  if (config->allocator != NULL) {
+    allocator = *config->allocator;
+  } else {
     rc = cmp_get_default_allocator(&allocator);
     if (rc != CMP_OK) {
       return rc;
     }
-  } else {
-    allocator = *config->allocator;
   }
 
   if (allocator.alloc == NULL || allocator.realloc == NULL ||

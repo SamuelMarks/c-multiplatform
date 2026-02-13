@@ -495,6 +495,8 @@ CMP_API int CMP_CALL m3_snackbar_set_on_action(M3Snackbar *snackbar,
 #define M3_DIALOG_TEST_FAIL_FULLSCREEN_COMPUTE_ACTION 2u
 /** @brief Fail snackbar compute action. */
 #define M3_DIALOG_TEST_FAIL_SNACKBAR_COMPUTE_ACTION 3u
+/** @brief Force snackbar available height to be negative. */
+#define M3_DIALOG_TEST_FAIL_SNACKBAR_AVAILABLE_HEIGHT_NEGATIVE 4u
 
 /**
  * @brief Set the dialog test failure point.
@@ -556,6 +558,20 @@ CMP_API int CMP_CALL m3_dialog_test_alert_compute_actions(
  */
 CMP_API int CMP_CALL m3_dialog_test_alert_layout_actions(M3AlertDialog *dialog);
 /**
+ * @brief Test helper to draw alert dialog action text.
+ * @param dialog Alert dialog pointer (may be NULL).
+ * @param bounds Action bounds (may be NULL).
+ * @param metrics Text metrics (may be NULL).
+ * @param utf8 UTF-8 action label (may be NULL when len is 0).
+ * @param len Text length in bytes.
+ * @param ctx Paint context (may be NULL).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_dialog_test_alert_draw_action_text(
+    const M3AlertDialog *dialog, const CMPRect *bounds,
+    const CMPTextMetrics *metrics, const char *utf8, cmp_usize len,
+    CMPPaintContext *ctx);
+/**
  * @brief Test helper to update full screen dialog metrics.
  * @param dialog Full screen dialog pointer (may be NULL).
  * @return CMP_OK on success or a failure code.
@@ -579,6 +595,20 @@ CMP_API int CMP_CALL m3_dialog_test_fullscreen_compute_action(
  */
 CMP_API int CMP_CALL
 m3_dialog_test_fullscreen_layout_action(M3FullScreenDialog *dialog);
+/**
+ * @brief Test helper to draw full screen dialog action text.
+ * @param dialog Full screen dialog pointer (may be NULL).
+ * @param bounds Action bounds (may be NULL).
+ * @param metrics Text metrics (may be NULL).
+ * @param utf8 UTF-8 action label (may be NULL when len is 0).
+ * @param len Text length in bytes.
+ * @param ctx Paint context (may be NULL).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_dialog_test_fullscreen_draw_action_text(
+    const M3FullScreenDialog *dialog, const CMPRect *bounds,
+    const CMPTextMetrics *metrics, const char *utf8, cmp_usize len,
+    CMPPaintContext *ctx);
 /**
  * @brief Test helper to update snackbar metrics.
  * @param snackbar Snackbar pointer (may be NULL).

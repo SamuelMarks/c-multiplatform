@@ -5,8 +5,34 @@
 
 #include <string.h>
 
+#ifdef CMP_TESTING
+static cmp_usize g_cmp_null_test_fail_after = 0u;
+static cmp_usize g_cmp_null_test_call_count = 0u;
+
+static void cmp_null_backend_test_maybe_fail(int *rc) {
+  if (rc == NULL) {
+    return;
+  }
+  if (g_cmp_null_test_fail_after == 0u) {
+    return;
+  }
+  g_cmp_null_test_call_count += 1u;
+  if (g_cmp_null_test_call_count == g_cmp_null_test_fail_after) {
+    *rc = CMP_ERR_IO;
+  }
+}
+
+#define CMP_NULL_TEST_MAYBE_FAIL(rc_ptr)                                       \
+  cmp_null_backend_test_maybe_fail(rc_ptr)
+#else
+#define CMP_NULL_TEST_MAYBE_FAIL(rc_ptr)                                       \
+  do {                                                                         \
+  } while (0)
+#endif
+
 #define CMP_NULL_RETURN_IF_ERROR(rc)                                           \
   do {                                                                         \
+    CMP_NULL_TEST_MAYBE_FAIL(&(rc));                                           \
     if ((rc) != CMP_OK) {                                                      \
       return (rc);                                                             \
     }                                                                          \
@@ -14,6 +40,7 @@
 
 #define CMP_NULL_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                          \
   do {                                                                         \
+    CMP_NULL_TEST_MAYBE_FAIL(&(rc));                                           \
     if ((rc) != CMP_OK) {                                                      \
       cleanup;                                                                 \
       return (rc);                                                             \
@@ -2065,5 +2092,22 @@ int CMP_CALL cmp_null_backend_test_object_get_type_id(CMPObjectHeader *obj,
   }
 
   return cmp_null_object_get_type_id(obj, out_type_id);
+}
+
+int CMP_CALL cmp_null_backend_test_set_fail_after(cmp_usize call_index) {
+  g_cmp_null_test_fail_after = call_index;
+  g_cmp_null_test_call_count = 0u;
+  return CMP_OK;
+}
+
+int CMP_CALL cmp_null_backend_test_clear_fail_after(void) {
+  g_cmp_null_test_fail_after = 0u;
+  g_cmp_null_test_call_count = 0u;
+  return CMP_OK;
+}
+
+int CMP_CALL cmp_null_backend_test_maybe_fail_null(void) {
+  cmp_null_backend_test_maybe_fail(NULL);
+  return CMP_OK;
 }
 #endif

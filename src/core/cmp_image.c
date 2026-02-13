@@ -77,9 +77,6 @@ static int cmp_image_ppm_read_uint(const cmp_u8 *data, cmp_usize size,
   if (rc != CMP_OK) {
     return rc;
   }
-  if (*offset >= size) {
-    return CMP_ERR_CORRUPT;
-  }
 
   ch = data[*offset];
   if (ch < '0' || ch > '9') {

@@ -253,6 +253,10 @@ int main(void) {
   CMP_TEST_OK(cmp_ripple_start(&ripple, 5.0f, 6.0f, 10.0f, 0.0f, color));
   CMP_TEST_OK(cmp_ripple_is_active(&ripple, &active));
   CMP_TEST_ASSERT(active == CMP_TRUE);
+  ripple.state = CMP_RIPPLE_STATE_FADING;
+  CMP_TEST_OK(cmp_ripple_is_active(&ripple, &active));
+  CMP_TEST_ASSERT(active == CMP_TRUE);
+  ripple.state = CMP_RIPPLE_STATE_EXPANDING;
 
   CMP_TEST_EXPECT(cmp_ripple_release(NULL, 0.1f), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_ripple_release(&ripple, -0.1f), CMP_ERR_RANGE);
@@ -340,6 +344,8 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_ripple_step(&ripple, 0.0f, &finished),
                   CMP_ERR_INVALID_ARGUMENT);
   ripple.state = CMP_RIPPLE_STATE_IDLE;
+  CMP_TEST_OK(cmp_ripple_step(&ripple, 0.0f, &finished));
+  CMP_TEST_ASSERT(finished == CMP_TRUE);
 
   CMP_TEST_EXPECT(cmp_ripple_compute_max_radius(NULL, 0.0f, 0.0f, &radius),
                   CMP_ERR_INVALID_ARGUMENT);
@@ -357,6 +363,8 @@ int main(void) {
   bounds.height = 10.0f;
   CMP_TEST_OK(cmp_ripple_compute_max_radius(&bounds, 5.0f, 5.0f, &radius));
   CMP_TEST_ASSERT(cmp_near(radius, 7.071f, 0.01f));
+  CMP_TEST_OK(cmp_ripple_compute_max_radius(&bounds, 10.0f, 0.0f, &radius));
+  CMP_TEST_ASSERT(radius > 0.0f);
   CMP_TEST_OK(cmp_ripple_compute_max_radius(&bounds, 0.0f, 0.0f, &radius));
   CMP_TEST_ASSERT(cmp_near(radius, 14.142f, 0.02f));
   bounds.height = 20.0f;
@@ -483,6 +491,11 @@ int main(void) {
   color.g = 0.1f;
   color.b = 0.1f;
   color.a = 0.8f;
+  color.r = -0.2f;
+  CMP_TEST_EXPECT(
+      cmp_shadow_set(&shadow, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1, color),
+      CMP_ERR_RANGE);
+  color.r = 0.1f;
   color.g = -0.2f;
   CMP_TEST_EXPECT(
       cmp_shadow_set(&shadow, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1, color),
@@ -504,6 +517,10 @@ int main(void) {
       CMP_ERR_RANGE);
   CMP_TEST_EXPECT(
       cmp_shadow_set(&shadow, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0, color),
+      CMP_ERR_RANGE);
+  color.a = -0.2f;
+  CMP_TEST_EXPECT(
+      cmp_shadow_set(&shadow, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1, color),
       CMP_ERR_RANGE);
   color.a = 1.2f;
   CMP_TEST_EXPECT(
@@ -614,6 +631,46 @@ int main(void) {
   gfx.vtable = &g_test_vtable;
   clip.width = -1.0f;
   CMP_TEST_EXPECT(cmp_shadow_paint(&shadow, &gfx, &rect, &clip), CMP_ERR_RANGE);
+
+  CMP_TEST_OK(
+      cmp_visuals_test_set_fail_point(CMP_VISUALS_TEST_FAIL_SHADOW_INIT));
+  CMP_TEST_EXPECT(cmp_shadow_init(&shadow), CMP_ERR_IO);
+  CMP_TEST_OK(cmp_visuals_test_clear_fail_points());
+
+  CMP_TEST_OK(cmp_ripple_init(&ripple));
+  CMP_TEST_OK(cmp_ripple_start(&ripple, 0.0f, 0.0f, 10.0f, 0.1f, color));
+  CMP_TEST_OK(cmp_ripple_step(&ripple, 1.0f, &finished));
+  CMP_TEST_ASSERT(cmp_near(ripple.radius, ripple.max_radius, 0.001f));
+
+  ripple.state = CMP_RIPPLE_STATE_EXPANDING;
+  ripple.radius_anim.running = CMP_FALSE;
+  ripple.radius_anim.value = 2.0f;
+  ripple.opacity_anim.running = CMP_FALSE;
+  ripple.opacity_anim.value = 0.25f;
+  CMP_TEST_OK(cmp_ripple_step(&ripple, 0.0f, &finished));
+  CMP_TEST_ASSERT(cmp_near(ripple.radius, 2.0f, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(ripple.opacity, 0.25f, 0.001f));
+
+  ripple.state = CMP_RIPPLE_STATE_EXPANDING;
+  CMP_TEST_OK(cmp_visuals_test_set_fail_point(
+      CMP_VISUALS_TEST_FAIL_RIPPLE_INIT_RADIUS));
+  CMP_TEST_OK(cmp_ripple_release(&ripple, 0.0f));
+  CMP_TEST_OK(cmp_visuals_test_clear_fail_points());
+
+  test_gfx_backend_init(&backend);
+  gfx.ctx = &backend;
+  gfx.vtable = &g_test_vtable;
+  backend.fail_draw_rect = CMP_ERR_IO;
+  ripple.state = CMP_RIPPLE_STATE_EXPANDING;
+  ripple.opacity = 0.5f;
+  ripple.radius = 4.0f;
+  CMP_TEST_EXPECT(cmp_ripple_paint(&ripple, &gfx, NULL, 0.0f), CMP_ERR_IO);
+
+  test_gfx_backend_init(&backend);
+  gfx.ctx = &backend;
+  gfx.vtable = &g_test_vtable;
+  backend.fail_draw_rect = CMP_ERR_IO;
+  CMP_TEST_EXPECT(cmp_shadow_paint(&shadow, &gfx, &rect, NULL), CMP_ERR_IO);
 
   return 0;
 }

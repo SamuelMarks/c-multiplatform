@@ -302,9 +302,6 @@ m3_menu_update_metrics(M3Menu *menu,
       if (rc != CMP_OK) {
         return rc;
       }
-      if (metrics.width < 0.0f) {
-        return CMP_ERR_RANGE;
-      }
       if (metrics.width > max_width) {
         max_width = metrics.width;
       }

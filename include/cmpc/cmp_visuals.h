@@ -163,6 +163,10 @@ CMP_API int CMP_CALL cmp_shadow_paint(const CMPShadow *shadow, CMPGfx *gfx,
 #ifndef CMP_VISUALS_TEST_FAIL_SHADOW_NORM
 #define CMP_VISUALS_TEST_FAIL_SHADOW_NORM 18u
 #endif
+/** @brief Fail point: force shadow init error. */
+#ifndef CMP_VISUALS_TEST_FAIL_SHADOW_INIT
+#define CMP_VISUALS_TEST_FAIL_SHADOW_INIT 19u
+#endif
 /**
  * @brief Set a visuals test fail point.
  * @param fail_point Fail point identifier.

@@ -112,6 +112,25 @@ CMP_API int CMP_CALL cmp_null_backend_test_object_release(CMPObjectHeader *obj);
  */
 CMP_API int CMP_CALL cmp_null_backend_test_object_get_type_id(
     CMPObjectHeader *obj, cmp_u32 *out_type_id);
+
+/**
+ * @brief Force CMP_NULL_RETURN_IF_ERROR to fail after N calls (tests only).
+ * @param call_index 1-based call index to fail on (0 disables).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_null_backend_test_set_fail_after(cmp_usize call_index);
+
+/**
+ * @brief Disable forced failures for CMP_NULL_RETURN_IF_ERROR (tests only).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_null_backend_test_clear_fail_after(void);
+
+/**
+ * @brief Exercise NULL handling in the fail injection hook (tests only).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_null_backend_test_maybe_fail_null(void);
 #endif
 
 #ifdef __cplusplus

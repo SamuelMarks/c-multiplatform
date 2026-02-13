@@ -549,6 +549,10 @@ static int test_sheet_measure_layout(void) {
   bounds.width = 800.0f;
   bounds.height = 600.0f;
   CMP_TEST_OK(sheet.widget.vtable->layout(sheet.widget.ctx, bounds));
+  sheet.open = CMP_FALSE;
+  sheet.offset = 0.0f;
+  CMP_TEST_OK(sheet.widget.vtable->layout(sheet.widget.ctx, bounds));
+  sheet.open = CMP_TRUE;
 
   CMP_TEST_OK(m3_sheet_test_set_fail_point(M3_SHEET_TEST_FAIL_APPLY_OFFSET));
   CMP_TEST_EXPECT(sheet.widget.vtable->layout(sheet.widget.ctx, bounds),

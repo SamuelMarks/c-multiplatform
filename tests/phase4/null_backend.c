@@ -192,6 +192,39 @@ static int test_obj_get_type_id(void *obj, cmp_u32 *out_type_id) {
 static const CMPObjectVTable g_test_object_vtable = {
     test_obj_retain, test_obj_release, test_obj_destroy, test_obj_get_type_id};
 
+#define CMP_TEST_NULL_FAIL_SWEEP(call_expr, success_cleanup)                   \
+  do {                                                                         \
+    cmp_usize cmp_test_fail_index = 1u;                                        \
+    int cmp_test_rc = CMP_OK;                                                  \
+    CMPBool cmp_test_done = CMP_FALSE;                                         \
+    for (; cmp_test_fail_index <= 64u; ++cmp_test_fail_index) {                \
+      CMP_TEST_OK(cmp_null_backend_test_set_fail_after(cmp_test_fail_index));  \
+      cmp_test_rc = (call_expr);                                               \
+      if (cmp_test_rc == CMP_OK) {                                             \
+        CMP_TEST_OK(cmp_null_backend_test_clear_fail_after());                 \
+        success_cleanup;                                                       \
+        cmp_test_done = CMP_TRUE;                                              \
+        break;                                                                 \
+      }                                                                        \
+    }                                                                          \
+    CMP_TEST_OK(cmp_null_backend_test_clear_fail_after());                     \
+    CMP_TEST_ASSERT(cmp_test_done == CMP_TRUE);                                \
+  } while (0)
+
+#define CMP_TEST_NULL_FORCE_FAIL(call_expr)                                    \
+  do {                                                                         \
+    CMP_TEST_OK(cmp_null_backend_test_set_fail_after(1u));                     \
+    CMP_TEST_EXPECT((call_expr), CMP_ERR_IO);                                  \
+    CMP_TEST_OK(cmp_null_backend_test_clear_fail_after());                     \
+  } while (0)
+
+#define CMP_TEST_NULL_FORCE_FAIL_AT(call_expr, idx)                            \
+  do {                                                                         \
+    CMP_TEST_OK(cmp_null_backend_test_set_fail_after((idx)));                  \
+    CMP_TEST_EXPECT((call_expr), CMP_ERR_IO);                                  \
+    CMP_TEST_OK(cmp_null_backend_test_clear_fail_after());                     \
+  } while (0)
+
 int main(void) {
   {
     int rc;
@@ -1105,6 +1138,117 @@ int main(void) {
 
     rc = cmp_log_shutdown();
     CMP_TEST_EXPECT(rc, CMP_OK);
+  }
+
+  {
+    CMPNullBackendConfig config;
+    CMPNullBackend *backend;
+    CMPWS ws;
+    CMPGfx gfx;
+    CMPEnv env;
+    CMPIO io;
+    CMPWSConfig ws_config;
+    CMPWSWindowConfig win_config;
+    CMPHandle window;
+    CMPHandle texture;
+    CMPHandle font;
+    CMPScalar width;
+    CMPScalar height;
+    CMPScalar baseline;
+    CMPColor color;
+    char buffer[32];
+    cmp_usize length;
+    cmp_usize read;
+    CMPAllocator default_alloc;
+    void *data;
+    cmp_usize data_size;
+
+    CMP_TEST_OK(cmp_null_backend_test_maybe_fail_null());
+    CMP_TEST_OK(cmp_null_backend_config_init(&config));
+    config.enable_logging = CMP_FALSE;
+    config.handle_capacity = 16;
+    CMP_TEST_OK(cmp_null_backend_create(&config, &backend));
+    CMP_TEST_OK(cmp_null_backend_get_ws(backend, &ws));
+    CMP_TEST_OK(cmp_null_backend_get_gfx(backend, &gfx));
+    CMP_TEST_OK(cmp_null_backend_get_env(backend, &env));
+    CMP_TEST_OK(env.vtable->get_io(env.ctx, &io));
+
+    ws_config.utf8_app_name = "App";
+    ws_config.utf8_app_id = "app.id";
+    ws_config.reserved = 0;
+    CMP_TEST_NULL_FORCE_FAIL(ws.vtable->init(ws.ctx, &ws_config));
+    CMP_TEST_OK(ws.vtable->init(ws.ctx, &ws_config));
+
+    win_config.width = 120;
+    win_config.height = 80;
+    win_config.utf8_title = "Win";
+    win_config.flags = 0;
+
+    CMP_TEST_NULL_FORCE_FAIL(
+        ws.vtable->create_window(ws.ctx, &win_config, &window));
+    CMP_TEST_OK(ws.vtable->create_window(ws.ctx, &win_config, &window));
+    CMP_TEST_NULL_FORCE_FAIL(ws.vtable->destroy_window(ws.ctx, window));
+    CMP_TEST_OK(ws.vtable->destroy_window(ws.ctx, window));
+
+    CMP_TEST_NULL_FORCE_FAIL(gfx.vtable->create_texture(
+        gfx.ctx, 4, 4, CMP_TEX_FORMAT_RGBA8, NULL, 0, &texture));
+    CMP_TEST_OK(gfx.vtable->create_texture(gfx.ctx, 4, 4, CMP_TEX_FORMAT_RGBA8,
+                                           NULL, 0, &texture));
+    CMP_TEST_OK(gfx.vtable->destroy_texture(gfx.ctx, texture));
+
+    CMP_TEST_NULL_FORCE_FAIL(gfx.text_vtable->create_font(
+        gfx.ctx, "Sans", 12, 400, CMP_FALSE, &font));
+    CMP_TEST_OK(gfx.text_vtable->create_font(gfx.ctx, "Sans", 12, 400,
+                                             CMP_FALSE, &font));
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &width, &height,
+                                      &baseline),
+        1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &width, &height,
+                                      &baseline),
+        2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &width, &height,
+                                      &baseline),
+        3u);
+    CMP_TEST_OK(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &width,
+                                              &height, &baseline));
+    color.r = 1.0f;
+    color.g = 1.0f;
+    color.b = 1.0f;
+    color.a = 1.0f;
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color),
+        1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color),
+        2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color),
+        3u);
+    CMP_TEST_OK(
+        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color));
+    CMP_TEST_OK(gfx.text_vtable->destroy_font(gfx.ctx, font));
+
+    CMP_TEST_NULL_FORCE_FAIL(ws.vtable->set_clipboard_text(ws.ctx, "clip"));
+    CMP_TEST_OK(ws.vtable->set_clipboard_text(ws.ctx, "clip"));
+    CMP_TEST_NULL_FORCE_FAIL(
+        ws.vtable->get_clipboard_text(ws.ctx, buffer, sizeof(buffer), &length));
+    CMP_TEST_OK(
+        ws.vtable->get_clipboard_text(ws.ctx, buffer, sizeof(buffer), &length));
+
+    CMP_TEST_NULL_FORCE_FAIL(
+        io.vtable->read_file(io.ctx, "path", buffer, sizeof(buffer), &read));
+    CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
+    data = NULL;
+    data_size = 0;
+    CMP_TEST_NULL_FORCE_FAIL(io.vtable->read_file_alloc(
+        io.ctx, "path", &default_alloc, &data, &data_size));
+
+    CMP_TEST_NULL_FORCE_FAIL(ws.vtable->shutdown(ws.ctx));
+    CMP_TEST_OK(ws.vtable->shutdown(ws.ctx));
+    CMP_TEST_OK(cmp_null_backend_destroy(backend));
   }
 
   {

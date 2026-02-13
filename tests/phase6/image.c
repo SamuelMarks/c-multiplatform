@@ -311,6 +311,12 @@ static int test_image_init_and_shutdown(void) {
   CMP_TEST_EXPECT(cmp_image_init(&decoder, &config), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_image_config_init(&config));
+  CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
+  memset(&decoder, 0, sizeof(decoder));
+  CMP_TEST_EXPECT(cmp_image_init(&decoder, &config), CMP_ERR_UNKNOWN);
+  CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
+
+  CMP_TEST_OK(cmp_image_config_init(&config));
   config.env = NULL;
   CMP_TEST_OK(cmp_image_init(&decoder, &config));
   CMP_TEST_OK(cmp_image_shutdown(&decoder));
@@ -326,7 +332,16 @@ static int test_image_init_and_shutdown(void) {
   CMP_TEST_ASSERT(decoder.has_backend == CMP_FALSE);
   CMP_TEST_OK(cmp_image_shutdown(&decoder));
 
+  CMP_TEST_OK(test_image_state_reset(&image_state));
+  CMP_TEST_OK(test_env_reset(&env_state, &image_state, &g_test_image_vtable));
+  env_state.image.ctx = NULL;
+  config.env = &env_state.env;
+  memset(&decoder, 0, sizeof(decoder));
+  CMP_TEST_EXPECT(cmp_image_init(&decoder, &config), CMP_ERR_INVALID_ARGUMENT);
+
   env_state.fail_get_image = 0;
+  env_state.image.ctx = &image_state;
+  env_state.image.vtable = &g_test_image_vtable;
   CMP_TEST_OK(cmp_image_init(&decoder, &config));
   CMP_TEST_OK(cmp_image_shutdown(&decoder));
   return 0;
@@ -537,6 +552,11 @@ static int test_image_decode_ppm_helpers(void) {
   const cmp_u8 tiny[] = {'P', '6'};
   const cmp_u8 bad_magic[] = {'P', '3', '\n'};
   const cmp_u8 bad_digit[] = {'P', '6', '\n', 'x'};
+  const cmp_u8 bad_height[] = {'P', '6', '\n', '1', ' ', 'x', '\n'};
+  const cmp_u8 bad_maxval_token[] = {'P', '6',  '\n', '1', ' ',
+                                     '1', '\n', 'x',  '\n'};
+  const cmp_u8 bad_trailing_ws[] = {'P',  '6', '\n', '1', ' ',  '1',
+                                    '\n', '2', '5',  '5', '\n', '#'};
   const cmp_u8 zero_width[] = {'P', '6', '\n', '0',  ' ', '1', '\n',
                                '2', '5', '5',  '\n', 0u,  0u,  0u};
   const cmp_u8 zero_height[] = {'P', '6', '\n', '1',  ' ', '0', '\n',
@@ -584,6 +604,21 @@ static int test_image_decode_ppm_helpers(void) {
 
   request.data = bad_digit;
   request.size = sizeof(bad_digit);
+  CMP_TEST_EXPECT(cmp_image_test_decode_ppm(&request, &allocator, &image),
+                  CMP_ERR_CORRUPT);
+
+  request.data = bad_height;
+  request.size = sizeof(bad_height);
+  CMP_TEST_EXPECT(cmp_image_test_decode_ppm(&request, &allocator, &image),
+                  CMP_ERR_CORRUPT);
+
+  request.data = bad_maxval_token;
+  request.size = sizeof(bad_maxval_token);
+  CMP_TEST_EXPECT(cmp_image_test_decode_ppm(&request, &allocator, &image),
+                  CMP_ERR_CORRUPT);
+
+  request.data = bad_trailing_ws;
+  request.size = sizeof(bad_trailing_ws);
   CMP_TEST_EXPECT(cmp_image_test_decode_ppm(&request, &allocator, &image),
                   CMP_ERR_CORRUPT);
 
@@ -769,6 +804,10 @@ static int test_image_decode_error_paths(void) {
   cmp_u8 encoded[4];
   const cmp_u8 bad_magic[] = {'P', '3', '\n'};
 
+  CMP_TEST_EXPECT(cmp_image_shutdown(NULL), CMP_ERR_INVALID_ARGUMENT);
+  memset(&decoder, 0, sizeof(decoder));
+  CMP_TEST_EXPECT(cmp_image_shutdown(&decoder), CMP_ERR_STATE);
+
   memset(&decoder, 0, sizeof(decoder));
   CMP_TEST_OK(cmp_image_config_init(&config));
   CMP_TEST_OK(cmp_image_request_init(&request));
@@ -841,13 +880,21 @@ static int test_image_free_error_paths(void) {
   CMPImageData image;
   TestEnvState env_state;
   TestImageState image_state;
+  TestAlloc alloc;
+  CMPAllocator alloc_cfg;
   cmp_u8 pixels_stack[4] = {1u, 2u, 3u, 4u};
   cmp_u8 *pixels_heap = NULL;
 
   memset(&decoder, 0, sizeof(decoder));
+  CMP_TEST_EXPECT(cmp_image_free(NULL, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_image_free(&decoder, &image), CMP_ERR_STATE);
   CMP_TEST_OK(cmp_image_config_init(&config));
   CMP_TEST_OK(cmp_image_init(&decoder, &config));
+
+  memset(&image, 0, sizeof(image));
+  decoder.allocator.alloc = NULL;
+  CMP_TEST_EXPECT(cmp_image_free(&decoder, &image), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(cmp_get_default_allocator(&decoder.allocator));
 
   memset(&image, 0, sizeof(image));
   image.size = 4u;
@@ -888,6 +935,25 @@ static int test_image_free_error_paths(void) {
   CMP_TEST_OK(cmp_image_free(&decoder, &image));
   pixels_heap = NULL;
   CMP_TEST_OK(cmp_image_shutdown(&decoder));
+
+  CMP_TEST_OK(test_alloc_reset(&alloc));
+  alloc_cfg.ctx = &alloc;
+  alloc_cfg.alloc = test_alloc_fn;
+  alloc_cfg.realloc = test_realloc_fn;
+  alloc_cfg.free = test_free_fn;
+  memset(&decoder, 0, sizeof(decoder));
+  decoder.ready = CMP_TRUE;
+  decoder.allocator = alloc_cfg;
+
+  CMP_TEST_OK(alloc_cfg.alloc(alloc_cfg.ctx, 4u, (void **)&pixels_heap));
+  image.flags = 0u;
+  image.data = pixels_heap;
+  image.size = 4u;
+  alloc.fail_free_on_call = 1;
+  CMP_TEST_EXPECT(cmp_image_free(&decoder, &image), CMP_ERR_IO);
+  alloc.fail_free_on_call = 0;
+  CMP_TEST_OK(cmp_image_free(&decoder, &image));
+  pixels_heap = NULL;
   return 0;
 }
 

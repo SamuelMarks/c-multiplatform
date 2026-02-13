@@ -1,5 +1,7 @@
 #include "m3/m3_dialogs.h"
 
+#include <string.h>
+
 static int m3_dialog_measure_optional_text(const CMPTextBackend *backend,
                                            CMPHandle font, const char *utf8,
                                            cmp_usize len,
@@ -13,11 +15,20 @@ static int m3_alert_dialog_compute_actions(const M3AlertDialog *dialog,
                                            CMPScalar *out_confirm_width,
                                            CMPScalar *out_dismiss_width);
 static int m3_alert_dialog_layout_actions(M3AlertDialog *dialog);
+static int m3_alert_dialog_draw_action_text(const M3AlertDialog *dialog,
+                                            const CMPRect *bounds,
+                                            const CMPTextMetrics *metrics,
+                                            const char *utf8, cmp_usize len,
+                                            CMPPaintContext *ctx);
 static int m3_fullscreen_dialog_metrics_update(M3FullScreenDialog *dialog);
 static int m3_fullscreen_dialog_compute_action(const M3FullScreenDialog *dialog,
                                                CMPScalar *out_width,
                                                CMPScalar *out_height);
 static int m3_fullscreen_dialog_layout_action(M3FullScreenDialog *dialog);
+static int m3_fullscreen_dialog_draw_action_text(
+    const M3FullScreenDialog *dialog, const CMPRect *bounds,
+    const CMPTextMetrics *metrics, const char *utf8, cmp_usize len,
+    CMPPaintContext *ctx);
 static int m3_snackbar_metrics_update(M3Snackbar *snackbar);
 static int m3_snackbar_compute_action(const M3Snackbar *snackbar,
                                       CMPScalar *out_width,
@@ -42,7 +53,6 @@ static int m3_dialog_validate_color(const CMPColor *color) {
   }
   return CMP_OK;
 }
-
 static int m3_dialog_validate_text_style(const CMPTextStyle *style,
                                          CMPBool require_family) {
   int rc;
@@ -70,7 +80,6 @@ static int m3_dialog_validate_text_style(const CMPTextStyle *style,
 
   return CMP_OK;
 }
-
 static int m3_dialog_validate_edges(const CMPLayoutEdges *edges) {
   if (edges == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -81,7 +90,6 @@ static int m3_dialog_validate_edges(const CMPLayoutEdges *edges) {
   }
   return CMP_OK;
 }
-
 static int m3_dialog_validate_measure_spec(CMPMeasureSpec spec) {
   if (spec.mode != CMP_MEASURE_UNSPECIFIED &&
       spec.mode != CMP_MEASURE_EXACTLY && spec.mode != CMP_MEASURE_AT_MOST) {
@@ -92,7 +100,6 @@ static int m3_dialog_validate_measure_spec(CMPMeasureSpec spec) {
   }
   return CMP_OK;
 }
-
 static int m3_dialog_validate_rect(const CMPRect *rect) {
   if (rect == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -154,6 +161,7 @@ static CMPBool m3_dialog_point_in_rect(const CMPRect *rect, CMPScalar x,
 #define M3_DIALOG_TEST_FAIL_ALERT_COMPUTE_ACTIONS 1u
 #define M3_DIALOG_TEST_FAIL_FULLSCREEN_COMPUTE_ACTION 2u
 #define M3_DIALOG_TEST_FAIL_SNACKBAR_COMPUTE_ACTION 3u
+#define M3_DIALOG_TEST_FAIL_SNACKBAR_AVAILABLE_HEIGHT_NEGATIVE 4u
 #endif
 
 static cmp_u32 g_m3_dialog_test_fail_point = M3_DIALOG_TEST_FAIL_NONE;
@@ -205,6 +213,14 @@ int CMP_CALL m3_dialog_test_alert_layout_actions(M3AlertDialog *dialog) {
   return m3_alert_dialog_layout_actions(dialog);
 }
 
+int CMP_CALL m3_dialog_test_alert_draw_action_text(
+    const M3AlertDialog *dialog, const CMPRect *bounds,
+    const CMPTextMetrics *metrics, const char *utf8, cmp_usize len,
+    CMPPaintContext *ctx) {
+  return m3_alert_dialog_draw_action_text(dialog, bounds, metrics, utf8, len,
+                                          ctx);
+}
+
 int CMP_CALL
 m3_dialog_test_fullscreen_metrics_update(M3FullScreenDialog *dialog) {
   return m3_fullscreen_dialog_metrics_update(dialog);
@@ -220,6 +236,14 @@ int CMP_CALL m3_dialog_test_fullscreen_compute_action(
 int CMP_CALL
 m3_dialog_test_fullscreen_layout_action(M3FullScreenDialog *dialog) {
   return m3_fullscreen_dialog_layout_action(dialog);
+}
+
+int CMP_CALL m3_dialog_test_fullscreen_draw_action_text(
+    const M3FullScreenDialog *dialog, const CMPRect *bounds,
+    const CMPTextMetrics *metrics, const char *utf8, cmp_usize len,
+    CMPPaintContext *ctx) {
+  return m3_fullscreen_dialog_draw_action_text(dialog, bounds, metrics, utf8,
+                                               len, ctx);
 }
 
 int CMP_CALL m3_dialog_test_snackbar_metrics_update(M3Snackbar *snackbar) {
@@ -542,15 +566,15 @@ static int m3_alert_dialog_layout_actions(M3AlertDialog *dialog) {
 static int m3_alert_dialog_widget_measure(void *widget, CMPMeasureSpec width,
                                           CMPMeasureSpec height,
                                           CMPSize *out_size) {
-  M3AlertDialog *dialog;
-  CMPScalar desired_width;
-  CMPScalar desired_height;
-  CMPScalar content_width;
-  CMPScalar actions_width;
-  CMPScalar actions_height;
-  CMPScalar confirm_width;
-  CMPScalar dismiss_width;
-  int rc;
+  M3AlertDialog *dialog = (M3AlertDialog *)widget;
+  CMPScalar content_width = 0.0f;
+  CMPScalar actions_width = 0.0f;
+  CMPScalar actions_height = 0.0f;
+  CMPScalar confirm_width = 0.0f;
+  CMPScalar dismiss_width = 0.0f;
+  CMPScalar desired_width = 0.0f;
+  CMPScalar desired_height = 0.0f;
+  int rc = CMP_OK;
 
   if (widget == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -565,7 +589,6 @@ static int m3_alert_dialog_widget_measure(void *widget, CMPMeasureSpec width,
     return rc;
   }
 
-  dialog = (M3AlertDialog *)widget;
   rc = m3_alert_dialog_validate_style(&dialog->style, CMP_FALSE);
   if (rc != CMP_OK) {
     return rc;
@@ -640,8 +663,8 @@ static int m3_alert_dialog_widget_measure(void *widget, CMPMeasureSpec width,
 }
 
 static int m3_alert_dialog_widget_layout(void *widget, CMPRect bounds) {
-  M3AlertDialog *dialog;
-  int rc;
+  M3AlertDialog *dialog = (M3AlertDialog *)widget;
+  int rc = CMP_OK;
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -652,7 +675,6 @@ static int m3_alert_dialog_widget_layout(void *widget, CMPRect bounds) {
     return rc;
   }
 
-  dialog = (M3AlertDialog *)widget;
   rc = m3_alert_dialog_validate_style(&dialog->style, CMP_FALSE);
   if (rc != CMP_OK) {
     return rc; /* GCOVR_EXCL_LINE */
@@ -673,7 +695,7 @@ static int m3_alert_dialog_draw_action_text(
   CMPScalar text_x;
   CMPScalar text_y;
   CMPScalar available_width;
-  CMPScalar available_height;
+  CMPScalar available_height = 0.0f;
 
   if (dialog == NULL || bounds == NULL || metrics == NULL || ctx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -684,7 +706,6 @@ static int m3_alert_dialog_draw_action_text(
   if (len == 0u) {
     return CMP_OK; /* GCOVR_EXCL_LINE */
   }
-
   available_width = bounds->width - dialog->style.action_padding_x * 2.0f;
   available_height = bounds->height - dialog->style.action_padding_y * 2.0f;
   if (available_width < 0.0f) {
@@ -715,7 +736,7 @@ static int m3_alert_dialog_draw_action_text(
 }
 
 static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
-  M3AlertDialog *dialog;
+  M3AlertDialog *dialog = (M3AlertDialog *)widget;
   CMPRect content_rect;
   const CMPRect *shadow_clip;
   CMPScalar cursor_y;
@@ -735,13 +756,11 @@ static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
     shadow_clip = &ctx->clip; /* GCOVR_EXCL_LINE */
   }
 
-  dialog = (M3AlertDialog *)widget;
-  rc = m3_alert_dialog_validate_style(&dialog->style, CMP_FALSE);
-  if (rc != CMP_OK) {
+  if ((rc = m3_alert_dialog_validate_style(&dialog->style, CMP_FALSE)) !=
+      CMP_OK) {
     return rc;
   }
-  rc = m3_alert_dialog_metrics_update(dialog);
-  if (rc != CMP_OK) {
+  if ((rc = m3_alert_dialog_metrics_update(dialog)) != CMP_OK) {
     return rc; /* GCOVR_EXCL_LINE */
   }
 
@@ -937,14 +956,13 @@ static int m3_alert_dialog_widget_get_semantics(void *widget,
 static int m3_alert_dialog_widget_destroy(void *widget) {
   M3AlertDialog *dialog;
   CMPHandle fonts[3];
-  int rc;
+  int rc = CMP_OK;
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
   dialog = (M3AlertDialog *)widget;
-  rc = CMP_OK;
   if (dialog->owns_fonts == CMP_TRUE) {
     fonts[0] = dialog->title_font;
     fonts[1] = dialog->body_font;
@@ -952,30 +970,7 @@ static int m3_alert_dialog_widget_destroy(void *widget) {
     rc = m3_dialog_destroy_fonts(&dialog->text_backend, fonts, 3u);
   }
 
-  dialog->title_font.id = 0u;
-  dialog->title_font.generation = 0u;
-  dialog->body_font.id = 0u;
-  dialog->body_font.generation = 0u;
-  dialog->action_font.id = 0u;
-  dialog->action_font.generation = 0u;
-  dialog->utf8_title = NULL;
-  dialog->title_len = 0u;
-  dialog->utf8_body = NULL;
-  dialog->body_len = 0u;
-  dialog->utf8_confirm = NULL;
-  dialog->confirm_len = 0u;
-  dialog->utf8_dismiss = NULL;
-  dialog->dismiss_len = 0u;
-  dialog->metrics_valid = CMP_FALSE;
-  dialog->owns_fonts = CMP_FALSE;
-  dialog->pressed_confirm = CMP_FALSE;
-  dialog->pressed_dismiss = CMP_FALSE;
-  dialog->on_action = NULL;
-  dialog->on_action_ctx = NULL;
-  dialog->text_backend.ctx = NULL;
-  dialog->text_backend.vtable = NULL;
-  dialog->widget.ctx = NULL;
-  dialog->widget.vtable = NULL;
+  memset(dialog, 0, sizeof(*dialog));
   return rc;
 }
 
@@ -1004,29 +999,25 @@ m3_fullscreen_dialog_validate_style(const M3FullScreenDialogStyle *style,
     return CMP_ERR_RANGE;
   }
 
-  rc = m3_dialog_validate_edges(&style->padding);
-  if (rc != CMP_OK) {
+  if ((rc = m3_dialog_validate_edges(&style->padding)) != CMP_OK) {
     return rc;
   }
-  rc = m3_dialog_validate_text_style(&style->title_style, require_family);
-  if (rc != CMP_OK) {
+  if ((rc = m3_dialog_validate_text_style(&style->title_style,
+                                          require_family)) != CMP_OK) {
     return rc;
   }
-  rc = m3_dialog_validate_text_style(&style->body_style, require_family);
-  if (rc != CMP_OK) {
+  if ((rc = m3_dialog_validate_text_style(&style->body_style,
+                                          require_family)) != CMP_OK) {
     return rc;
   }
-  rc = m3_dialog_validate_text_style(&style->action_style, require_family);
-  if (rc != CMP_OK) {
+  if ((rc = m3_dialog_validate_text_style(&style->action_style,
+                                          require_family)) != CMP_OK) {
     return rc;
   }
-
-  rc = m3_dialog_validate_color(&style->background_color);
-  if (rc != CMP_OK) {
+  if ((rc = m3_dialog_validate_color(&style->background_color)) != CMP_OK) {
     return rc;
   }
-  rc = m3_dialog_validate_color(&style->scrim_color);
-  if (rc != CMP_OK) {
+  if ((rc = m3_dialog_validate_color(&style->scrim_color)) != CMP_OK) {
     return rc;
   }
 
@@ -1157,13 +1148,13 @@ static int m3_fullscreen_dialog_widget_measure(void *widget,
                                                CMPMeasureSpec width,
                                                CMPMeasureSpec height,
                                                CMPSize *out_size) {
-  M3FullScreenDialog *dialog;
-  CMPScalar desired_width;
-  CMPScalar desired_height;
-  CMPScalar content_width;
-  CMPScalar action_width;
-  CMPScalar action_height;
-  int rc;
+  M3FullScreenDialog *dialog = (M3FullScreenDialog *)widget;
+  CMPScalar content_width = 0.0f;
+  CMPScalar action_width = 0.0f;
+  CMPScalar action_height = 0.0f;
+  CMPScalar desired_width = 0.0f;
+  CMPScalar desired_height = 0.0f;
+  int rc = CMP_OK;
 
   if (widget == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1173,12 +1164,9 @@ static int m3_fullscreen_dialog_widget_measure(void *widget,
   if (rc != CMP_OK) {
     return rc;
   }
-  rc = m3_dialog_validate_measure_spec(height);
-  if (rc != CMP_OK) {
+  if ((rc = m3_dialog_validate_measure_spec(height)) != CMP_OK) {
     return rc;
   }
-
-  dialog = (M3FullScreenDialog *)widget;
   rc = m3_fullscreen_dialog_validate_style(&dialog->style, CMP_FALSE);
   if (rc != CMP_OK) {
     return rc; /* GCOVR_EXCL_LINE */
@@ -1245,25 +1233,22 @@ static int m3_fullscreen_dialog_widget_measure(void *widget,
 }
 
 static int m3_fullscreen_dialog_widget_layout(void *widget, CMPRect bounds) {
-  M3FullScreenDialog *dialog; /* GCOVR_EXCL_LINE */
-  int rc;                     /* GCOVR_EXCL_LINE */
+  M3FullScreenDialog *dialog =
+      (M3FullScreenDialog *)widget; /* GCOVR_EXCL_LINE */
+  int rc;                           /* GCOVR_EXCL_LINE */
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  rc = m3_dialog_validate_rect(&bounds);
-  if (rc != CMP_OK) {
+  if ((rc = m3_dialog_validate_rect(&bounds)) != CMP_OK) {
     return rc;
   }
-
-  dialog = (M3FullScreenDialog *)widget;
-  rc = m3_fullscreen_dialog_validate_style(&dialog->style, CMP_FALSE);
-  if (rc != CMP_OK) {
+  if ((rc = m3_fullscreen_dialog_validate_style(&dialog->style, CMP_FALSE)) !=
+      CMP_OK) {
     return rc;
   }
-  rc = m3_fullscreen_dialog_metrics_update(dialog);
-  if (rc != CMP_OK) {
+  if ((rc = m3_fullscreen_dialog_metrics_update(dialog)) != CMP_OK) {
     return rc;
   }
 
@@ -1277,8 +1262,8 @@ static int m3_fullscreen_dialog_draw_action_text(
     CMPPaintContext *ctx) {
   CMPScalar text_x;
   CMPScalar text_y;
-  CMPScalar available_width;
-  CMPScalar available_height;
+  CMPScalar available_width = 0.0f;
+  CMPScalar available_height = 0.0f;
 
   if (dialog == NULL || bounds == NULL || metrics == NULL || ctx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
@@ -1322,7 +1307,7 @@ static int m3_fullscreen_dialog_draw_action_text(
 static int m3_fullscreen_dialog_widget_paint(void *widget,
                                              CMPPaintContext *ctx) {
   M3FullScreenDialog *dialog;
-  CMPRect content_rect;
+  CMPRect content_rect = {0};
   const CMPRect *shadow_clip;
   CMPScalar cursor_y;
   int rc;
@@ -1340,7 +1325,6 @@ static int m3_fullscreen_dialog_widget_paint(void *widget,
       ctx->gfx->vtable->pop_clip != NULL) {
     shadow_clip = &ctx->clip;
   }
-
   dialog = (M3FullScreenDialog *)widget;
   rc = m3_fullscreen_dialog_validate_style(&dialog->style, CMP_FALSE);
   if (rc != CMP_OK) {
@@ -1508,14 +1492,13 @@ m3_fullscreen_dialog_widget_get_semantics(void *widget,
 static int m3_fullscreen_dialog_widget_destroy(void *widget) {
   M3FullScreenDialog *dialog;
   CMPHandle fonts[3];
-  int rc;
+  int rc = CMP_OK;
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
   dialog = (M3FullScreenDialog *)widget;
-  rc = CMP_OK;
   if (dialog->owns_fonts == CMP_TRUE) {
     fonts[0] = dialog->title_font;
     fonts[1] = dialog->body_font;
@@ -1523,27 +1506,7 @@ static int m3_fullscreen_dialog_widget_destroy(void *widget) {
     rc = m3_dialog_destroy_fonts(&dialog->text_backend, fonts, 3u);
   }
 
-  dialog->title_font.id = 0u;
-  dialog->title_font.generation = 0u;
-  dialog->body_font.id = 0u;
-  dialog->body_font.generation = 0u;
-  dialog->action_font.id = 0u;
-  dialog->action_font.generation = 0u;
-  dialog->utf8_title = NULL;
-  dialog->title_len = 0u;
-  dialog->utf8_body = NULL;
-  dialog->body_len = 0u;
-  dialog->utf8_action = NULL;
-  dialog->action_len = 0u;
-  dialog->metrics_valid = CMP_FALSE;
-  dialog->owns_fonts = CMP_FALSE;
-  dialog->pressed_action = CMP_FALSE;
-  dialog->on_action = NULL;
-  dialog->on_action_ctx = NULL;
-  dialog->text_backend.ctx = NULL;
-  dialog->text_backend.vtable = NULL;
-  dialog->widget.ctx = NULL;
-  dialog->widget.vtable = NULL;
+  memset(dialog, 0, sizeof(*dialog));
   return rc;
 }
 
@@ -1691,13 +1654,13 @@ static int m3_snackbar_layout_action(M3Snackbar *snackbar) {
 static int m3_snackbar_widget_measure(void *widget, CMPMeasureSpec width,
                                       CMPMeasureSpec height,
                                       CMPSize *out_size) {
-  M3Snackbar *snackbar;
-  CMPScalar desired_width;
-  CMPScalar desired_height;
-  CMPScalar content_width;
-  CMPScalar action_width;
-  CMPScalar action_height;
-  int rc;
+  M3Snackbar *snackbar = NULL;
+  CMPScalar desired_width = 0.0f;
+  CMPScalar desired_height = 0.0f;
+  CMPScalar content_width = 0.0f;
+  CMPScalar action_width = 0.0f;
+  CMPScalar action_height = 0.0f;
+  int rc = CMP_OK;
 
   if (widget == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1781,8 +1744,8 @@ static int m3_snackbar_widget_measure(void *widget, CMPMeasureSpec width,
 }
 
 static int m3_snackbar_widget_layout(void *widget, CMPRect bounds) {
-  M3Snackbar *snackbar;
-  int rc;
+  M3Snackbar *snackbar = NULL;
+  int rc = CMP_OK;
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1826,7 +1789,6 @@ static int m3_snackbar_draw_action_text(
   if (len == 0u) {
     return CMP_OK; /* GCOVR_EXCL_LINE */
   }
-
   available_width = bounds->width - snackbar->style.action_padding_x * 2.0f;
   available_height = bounds->height - snackbar->style.action_padding_y * 2.0f;
   if (available_width < 0.0f) {
@@ -1846,8 +1808,7 @@ static int m3_snackbar_draw_action_text(
   if (available_height <= metrics->height) {
     text_y = bounds->y + snackbar->style.action_padding_y + metrics->baseline;
   } else {
-    text_y = bounds->y +
-             snackbar->style.action_padding_y + /* GCOVR_EXCL_LINE */
+    text_y = bounds->y + snackbar->style.action_padding_y +
              (available_height - metrics->height) * 0.5f + metrics->baseline;
   }
 
@@ -1857,12 +1818,12 @@ static int m3_snackbar_draw_action_text(
 }
 
 static int m3_snackbar_widget_paint(void *widget, CMPPaintContext *ctx) {
-  M3Snackbar *snackbar;
-  CMPRect content_rect;
+  M3Snackbar *snackbar = NULL;
+  CMPRect content_rect = {0};
   CMPScalar text_x;
   CMPScalar text_y;
-  CMPScalar available_width;
-  CMPScalar available_height;
+  CMPScalar available_width = 0.0f;
+  CMPScalar available_height = 0.0f;
   int rc;
 
   if (widget == NULL || ctx == NULL || ctx->gfx == NULL ||
@@ -1921,6 +1882,12 @@ static int m3_snackbar_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   available_height = content_rect.height;
+#ifdef CMP_TESTING
+  if (m3_dialog_test_fail_point_match(
+          M3_DIALOG_TEST_FAIL_SNACKBAR_AVAILABLE_HEIGHT_NEGATIVE)) {
+    available_height = -1.0f;
+  }
+#endif
   if (available_height < 0.0f) {
     available_height = 0.0f;
   }
@@ -2032,44 +1999,39 @@ static int m3_snackbar_widget_get_semantics(void *widget,
 static int m3_snackbar_widget_destroy(void *widget) {
   M3Snackbar *snackbar;
   CMPHandle fonts[2];
-  int rc;
+  int rc = CMP_OK;
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
   snackbar = (M3Snackbar *)widget;
-  rc = CMP_OK;
   if (snackbar->owns_fonts == CMP_TRUE) {
     fonts[0] = snackbar->message_font;
     fonts[1] = snackbar->action_font;
     rc = m3_dialog_destroy_fonts(&snackbar->text_backend, fonts, 2u);
   }
 
-  snackbar->message_font.id = 0u;
-  snackbar->message_font.generation = 0u;
-  snackbar->action_font.id = 0u;
-  snackbar->action_font.generation = 0u;
-  snackbar->utf8_message = NULL;
-  snackbar->message_len = 0u;
-  snackbar->utf8_action = NULL;
-  snackbar->action_len = 0u;
-  snackbar->metrics_valid = CMP_FALSE;
-  snackbar->owns_fonts = CMP_FALSE;
-  snackbar->pressed_action = CMP_FALSE;
-  snackbar->on_action = NULL;
-  snackbar->on_action_ctx = NULL;
-  snackbar->text_backend.ctx = NULL;
-  snackbar->text_backend.vtable = NULL;
-  snackbar->widget.ctx = NULL;
-  snackbar->widget.vtable = NULL;
+  memset(snackbar, 0, sizeof(*snackbar));
   return rc;
 }
 
-static const CMPWidgetVTable g_m3_snackbar_widget_vtable = {
-    m3_snackbar_widget_measure,       m3_snackbar_widget_layout,
-    m3_snackbar_widget_paint,         m3_snackbar_widget_event,
-    m3_snackbar_widget_get_semantics, m3_snackbar_widget_destroy};
+static CMPWidgetVTable g_m3_snackbar_widget_vtable;
+static CMPBool g_m3_snackbar_widget_vtable_ready = CMP_FALSE;
+
+static void m3_snackbar_widget_vtable_init(void) {
+  if (g_m3_snackbar_widget_vtable_ready == CMP_TRUE) {
+    return;
+  }
+
+  g_m3_snackbar_widget_vtable.measure = m3_snackbar_widget_measure;
+  g_m3_snackbar_widget_vtable.layout = m3_snackbar_widget_layout;
+  g_m3_snackbar_widget_vtable.paint = m3_snackbar_widget_paint;
+  g_m3_snackbar_widget_vtable.event = m3_snackbar_widget_event;
+  g_m3_snackbar_widget_vtable.get_semantics = m3_snackbar_widget_get_semantics;
+  g_m3_snackbar_widget_vtable.destroy = m3_snackbar_widget_destroy;
+  g_m3_snackbar_widget_vtable_ready = CMP_TRUE;
+}
 
 int CMP_CALL m3_alert_dialog_style_init(M3AlertDialogStyle *style) {
   CMPColor shadow_color;
@@ -2104,34 +2066,28 @@ int CMP_CALL m3_alert_dialog_style_init(M3AlertDialogStyle *style) {
   style->action_spacing = M3_ALERT_DIALOG_DEFAULT_ACTION_SPACING;
   style->action_padding_x = M3_ALERT_DIALOG_DEFAULT_ACTION_PADDING_X;
   style->action_padding_y = M3_ALERT_DIALOG_DEFAULT_ACTION_PADDING_Y;
-
   style->title_style.size_px = 20;
   style->title_style.weight = 500;
   style->body_style.size_px = 14;
   style->body_style.weight = 400;
   style->action_style.size_px = 14;
   style->action_style.weight = 500;
-
   style->title_style.color.r = 0.0f;
   style->title_style.color.g = 0.0f;
   style->title_style.color.b = 0.0f;
   style->title_style.color.a = 1.0f;
-
   style->body_style.color.r = 0.0f;
   style->body_style.color.g = 0.0f;
   style->body_style.color.b = 0.0f;
   style->body_style.color.a = 0.74f;
-
   style->action_style.color.r = 0.12f;
   style->action_style.color.g = 0.37f;
   style->action_style.color.b = 0.85f;
   style->action_style.color.a = 1.0f;
-
   style->background_color.r = 1.0f;
   style->background_color.g = 1.0f;
   style->background_color.b = 1.0f;
   style->background_color.a = 1.0f;
-
   style->scrim_color.r = 0.0f;
   style->scrim_color.g = 0.0f;
   style->scrim_color.b = 0.0f;
@@ -2425,34 +2381,28 @@ int CMP_CALL m3_fullscreen_dialog_style_init(M3FullScreenDialogStyle *style) {
   style->body_action_spacing = M3_FULLSCREEN_DIALOG_DEFAULT_BODY_ACTION_SPACING;
   style->action_padding_x = M3_FULLSCREEN_DIALOG_DEFAULT_ACTION_PADDING_X;
   style->action_padding_y = M3_FULLSCREEN_DIALOG_DEFAULT_ACTION_PADDING_Y;
-
   style->title_style.size_px = 20;
   style->title_style.weight = 500;
   style->body_style.size_px = 14;
   style->body_style.weight = 400;
   style->action_style.size_px = 14;
   style->action_style.weight = 500;
-
   style->title_style.color.r = 0.0f;
   style->title_style.color.g = 0.0f;
   style->title_style.color.b = 0.0f;
   style->title_style.color.a = 1.0f;
-
   style->body_style.color.r = 0.0f;
   style->body_style.color.g = 0.0f;
   style->body_style.color.b = 0.0f;
   style->body_style.color.a = 0.74f;
-
   style->action_style.color.r = 0.12f;
   style->action_style.color.g = 0.37f;
   style->action_style.color.b = 0.85f;
   style->action_style.color.a = 1.0f;
-
   style->background_color.r = 1.0f;
   style->background_color.g = 1.0f;
   style->background_color.b = 1.0f;
   style->background_color.a = 1.0f;
-
   style->scrim_color.r = 0.0f;
   style->scrim_color.g = 0.0f;
   style->scrim_color.b = 0.0f;
@@ -2596,9 +2546,9 @@ int CMP_CALL m3_fullscreen_dialog_set_body(M3FullScreenDialog *dialog,
   return CMP_OK; /* GCOVR_EXCL_LINE */
 }
 
-int CMP_CALL m3_fullscreen_dialog_set_action(
-    M3FullScreenDialog *dialog, const char *utf8_action, /* GCOVR_EXCL_LINE */
-    cmp_usize action_len) {
+int CMP_CALL m3_fullscreen_dialog_set_action(M3FullScreenDialog *dialog,
+                                             const char *utf8_action,
+                                             cmp_usize action_len) {
   if (dialog == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2730,22 +2680,18 @@ int CMP_CALL m3_snackbar_style_init(M3SnackbarStyle *style) {
   style->action_spacing = M3_SNACKBAR_DEFAULT_ACTION_SPACING;
   style->action_padding_x = M3_SNACKBAR_DEFAULT_ACTION_PADDING_X;
   style->action_padding_y = M3_SNACKBAR_DEFAULT_ACTION_PADDING_Y;
-
   style->message_style.size_px = 14;
   style->message_style.weight = 400;
   style->action_style.size_px = 14;
   style->action_style.weight = 500;
-
   style->message_style.color.r = 1.0f;
   style->message_style.color.g = 1.0f;
   style->message_style.color.b = 1.0f;
   style->message_style.color.a = 1.0f;
-
   style->action_style.color.r = 0.67f;
   style->action_style.color.g = 0.85f;
   style->action_style.color.b = 1.0f;
   style->action_style.color.a = 1.0f;
-
   style->background_color.r = 0.2f;
   style->background_color.g = 0.2f;
   style->background_color.b = 0.2f;
@@ -2815,6 +2761,7 @@ int CMP_CALL m3_snackbar_init(M3Snackbar *snackbar,
     return rc; /* GCOVR_EXCL_LINE */
   }
 
+  m3_snackbar_widget_vtable_init();
   snackbar->widget.ctx = snackbar;
   snackbar->widget.vtable = &g_m3_snackbar_widget_vtable;
   snackbar->widget.handle.id = 0u;

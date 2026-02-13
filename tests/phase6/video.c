@@ -1,3 +1,4 @@
+#include "cmpc/cmp_core.h"
 #include "cmpc/cmp_video.h"
 #include "test_utils.h"
 
@@ -340,9 +341,20 @@ static int test_video_init_and_shutdown(void) {
   CMP_TEST_OK(cmp_video_config_init(&config));
   CMP_TEST_EXPECT(cmp_video_init(NULL, &config), CMP_ERR_INVALID_ARGUMENT);
 
+  memset(&decoder, 0, sizeof(decoder));
+  decoder.ready = CMP_TRUE;
+  CMP_TEST_EXPECT(cmp_video_init(&decoder, &config), CMP_ERR_STATE);
+
+  memset(&decoder, 0, sizeof(decoder));
   memset(&bad_alloc, 0, sizeof(bad_alloc));
   config.allocator = &bad_alloc;
   CMP_TEST_EXPECT(cmp_video_init(&decoder, &config), CMP_ERR_INVALID_ARGUMENT);
+
+  CMP_TEST_OK(cmp_video_config_init(&config));
+  CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
+  memset(&decoder, 0, sizeof(decoder));
+  CMP_TEST_EXPECT(cmp_video_init(&decoder, &config), CMP_ERR_UNKNOWN);
+  CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
 
   CMP_TEST_OK(cmp_video_config_init(&config));
   config.env = NULL;
@@ -587,11 +599,28 @@ static int test_video_fallback_open_errors(void) {
   }
   CMP_TEST_OK(cmp_video_test_set_mul_overflow_fail_after(0u));
 
+  for (fail_index = 1u; fail_index <= 3u; fail_index += 1u) {
+    CMP_TEST_OK(test_alloc_reset(&alloc));
+    CMP_TEST_OK(test_video_decoder_init(&decoder, &allocator));
+    alloc.fail_free_on_call = 1;
+    CMP_TEST_OK(cmp_video_test_set_mul_overflow_fail_after(fail_index));
+    CMP_TEST_EXPECT(cmp_video_test_fallback_open(&decoder, &request),
+                    CMP_ERR_IO);
+  }
+  CMP_TEST_OK(cmp_video_test_set_mul_overflow_fail_after(0u));
+
   CMP_TEST_OK(test_alloc_reset(&alloc));
   CMP_TEST_OK(test_video_decoder_init(&decoder, &allocator));
   request.size = TEST_VIDEO_M3V0_HEADER_SIZE;
   CMP_TEST_EXPECT(cmp_video_test_fallback_open(&decoder, &request),
                   CMP_ERR_CORRUPT);
+  request.size = size;
+
+  CMP_TEST_OK(test_alloc_reset(&alloc));
+  CMP_TEST_OK(test_video_decoder_init(&decoder, &allocator));
+  alloc.fail_free_on_call = 1;
+  request.size = TEST_VIDEO_M3V0_HEADER_SIZE;
+  CMP_TEST_EXPECT(cmp_video_test_fallback_open(&decoder, &request), CMP_ERR_IO);
   request.size = size;
 
   CMP_TEST_OK(test_alloc_reset(&alloc));
@@ -648,6 +677,57 @@ static int test_video_fallback_read_frame_errors(void) {
   return 0;
 }
 
+static int test_video_fallback_close_errors(void) {
+  CMPVideoOpenRequest request;
+  CMPVideoDecoder decoder;
+  CMPAllocator allocator;
+  TestAlloc alloc;
+  void *fallback_state;
+  cmp_u8 buffer[TEST_VIDEO_M3V0_HEADER_SIZE + 4u];
+  cmp_u8 frame[4] = {0u, 1u, 2u, 3u};
+  cmp_usize size;
+
+  CMP_TEST_OK(test_build_m3v0(buffer, sizeof(buffer), 1u, 1u,
+                              CMP_VIDEO_FORMAT_RGBA8, 1u, 1u, 1u, frame,
+                              sizeof(frame), &size));
+  CMP_TEST_OK(cmp_video_request_init(&request));
+  request.data = buffer;
+  request.size = size;
+
+  CMP_TEST_EXPECT(cmp_video_test_fallback_close(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
+
+  memset(&decoder, 0, sizeof(decoder));
+  CMP_TEST_EXPECT(cmp_video_test_fallback_close(&decoder), CMP_ERR_STATE);
+
+  CMP_TEST_OK(test_alloc_reset(&alloc));
+  allocator.ctx = &alloc;
+  allocator.alloc = test_alloc_fn;
+  allocator.realloc = test_realloc_fn;
+  allocator.free = test_free_fn;
+
+  CMP_TEST_OK(test_video_decoder_init(&decoder, &allocator));
+  CMP_TEST_OK(cmp_video_test_fallback_open(&decoder, &request));
+  alloc.fail_free_on_call = alloc.free_calls + 1;
+  CMP_TEST_EXPECT(cmp_video_test_fallback_close(&decoder), CMP_ERR_IO);
+  alloc.fail_free_on_call = 0;
+  CMP_TEST_OK(cmp_video_test_fallback_close(&decoder));
+
+  CMP_TEST_OK(test_alloc_reset(&alloc));
+  CMP_TEST_OK(test_video_decoder_init(&decoder, &allocator));
+  CMP_TEST_OK(cmp_video_test_fallback_open(&decoder, &request));
+  alloc.fail_free_on_call = alloc.free_calls + 2;
+  CMP_TEST_EXPECT(cmp_video_test_fallback_close(&decoder), CMP_ERR_IO);
+  alloc.fail_free_on_call = 0;
+  fallback_state = decoder.fallback_state;
+  CMP_TEST_ASSERT(fallback_state != NULL);
+  decoder.fallback_state = NULL;
+  decoder.using_fallback = CMP_FALSE;
+  decoder.opened = CMP_FALSE;
+  CMP_TEST_OK(allocator.free(allocator.ctx, fallback_state));
+  return 0;
+}
+
 static int test_video_init_edge_cases(void) {
   CMPVideoDecoder decoder;
   CMPVideoConfig config;
@@ -690,6 +770,8 @@ static int test_video_api_error_paths(void) {
   CMPBool has_frame;
   TestVideoState video_state;
   CMPAllocator allocator;
+  CMPAllocator alloc_cfg;
+  TestAlloc alloc;
   cmp_u8 dummy[4] = {0u, 0u, 0u, 0u};
   cmp_u8 m3v0[64];
   cmp_usize m3v0_size;
@@ -789,6 +871,25 @@ static int test_video_api_error_paths(void) {
   video_state.fail_close = 1;
   CMP_TEST_EXPECT(cmp_video_close(&decoder), CMP_ERR_IO);
 
+  CMP_TEST_OK(test_alloc_reset(&alloc));
+  alloc_cfg.ctx = &alloc;
+  alloc_cfg.alloc = test_alloc_fn;
+  alloc_cfg.realloc = test_realloc_fn;
+  alloc_cfg.free = test_free_fn;
+  memset(&decoder, 0, sizeof(decoder));
+  decoder.ready = CMP_TRUE;
+  decoder.allocator = alloc_cfg;
+  request.data = m3v0;
+  request.size = m3v0_size;
+  request.utf8_path = NULL;
+  request.encoding = CMP_VIDEO_ENCODING_AUTO;
+  request.format = CMP_VIDEO_FORMAT_RGBA8;
+  CMP_TEST_OK(cmp_video_open(&decoder, &request));
+  alloc.fail_free_on_call = alloc.free_calls + 1;
+  CMP_TEST_EXPECT(cmp_video_close(&decoder), CMP_ERR_IO);
+  alloc.fail_free_on_call = 0;
+  CMP_TEST_OK(cmp_video_close(&decoder));
+
   memset(&decoder, 0, sizeof(decoder));
   decoder.ready = CMP_TRUE;
   decoder.opened = CMP_TRUE;
@@ -868,6 +969,9 @@ int main(void) {
     return 1;
   }
   if (test_video_fallback_read_frame_errors() != 0) {
+    return 1;
+  }
+  if (test_video_fallback_close_errors() != 0) {
     return 1;
   }
   if (test_video_init_edge_cases() != 0) {

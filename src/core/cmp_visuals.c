@@ -24,6 +24,7 @@
 #define CMP_VISUALS_TEST_FAIL_RIPPLE_PAINT_RECT 16u
 #define CMP_VISUALS_TEST_FAIL_RIPPLE_PAINT_COLOR 17u
 #define CMP_VISUALS_TEST_FAIL_SHADOW_NORM 18u
+#define CMP_VISUALS_TEST_FAIL_SHADOW_INIT 19u
 
 static cmp_u32 g_cmp_visuals_test_fail_point = CMP_VISUALS_TEST_FAIL_NONE;
 
@@ -536,6 +537,12 @@ int CMP_CALL cmp_shadow_init(CMPShadow *shadow) {
   if (shadow == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+
+#ifdef CMP_TESTING
+  if (cmp_visuals_test_fail_point_match(CMP_VISUALS_TEST_FAIL_SHADOW_INIT)) {
+    return CMP_ERR_IO;
+  }
+#endif
 
   shadow->offset_x = 0.0f;
   shadow->offset_y = 0.0f;

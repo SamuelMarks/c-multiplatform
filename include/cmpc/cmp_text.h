@@ -229,6 +229,14 @@ CMP_API int CMP_CALL cmp_text_test_cstrlen(const char *cstr,
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_test_set_cstr_limit(cmp_usize max_len);
+
+/**
+ * @brief Force cmp_text_style_init to fail after N calls (0 disables).
+ * @param call_count Call count to fail on.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL
+cmp_text_test_set_style_init_fail_after(cmp_u32 call_count);
 #endif
 
 #ifdef __cplusplus

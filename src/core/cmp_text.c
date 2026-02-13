@@ -4,6 +4,7 @@
 
 #ifdef CMP_TESTING
 static cmp_usize g_cmp_text_cstr_limit = 0;
+static cmp_u32 g_cmp_text_style_init_fail_after = 0u;
 #endif
 
 static int cmp_text_validate_color(const CMPColor *color) {
@@ -264,6 +265,15 @@ int CMP_CALL cmp_text_style_init(CMPTextStyle *style) {
   if (style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+
+#ifdef CMP_TESTING
+  if (g_cmp_text_style_init_fail_after > 0u) {
+    g_cmp_text_style_init_fail_after -= 1u;
+    if (g_cmp_text_style_init_fail_after == 0u) {
+      return CMP_ERR_IO;
+    }
+  }
+#endif
 
   style->utf8_family = NULL;
   style->size_px = 14;
@@ -572,6 +582,11 @@ int CMP_CALL cmp_text_test_cstrlen(const char *cstr, cmp_usize *out_len) {
 
 int CMP_CALL cmp_text_test_set_cstr_limit(cmp_usize max_len) {
   g_cmp_text_cstr_limit = max_len;
+  return CMP_OK;
+}
+
+int CMP_CALL cmp_text_test_set_style_init_fail_after(cmp_u32 call_count) {
+  g_cmp_text_style_init_fail_after = call_count;
   return CMP_OK;
 }
 #endif
