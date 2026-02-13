@@ -341,6 +341,7 @@ int main(void) {
     CMPNetwork network;
     CMPTasks tasks;
     CMPAllocator default_alloc = {0};
+    CMPAllocator bad_alloc = {0};
     CMPWSConfig ws_config;
     CMPWSWindowConfig win_config;
     CMPHandle window;
@@ -909,6 +910,11 @@ int main(void) {
         CMP_ERR_INVALID_ARGUMENT);
     memset(&default_alloc, 0, sizeof(default_alloc));
     CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
+    bad_alloc = default_alloc;
+    bad_alloc.alloc = NULL;
+    CMP_TEST_EXPECT(
+        image.vtable->decode(image.ctx, &image_req, &bad_alloc, &image_data),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(image.vtable->decode(image.ctx, &image_req, &default_alloc,
                                          &image_data),
                     CMP_ERR_UNSUPPORTED);
@@ -919,6 +925,11 @@ int main(void) {
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(image.vtable->free_image(image.ctx, &default_alloc, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.free = NULL;
+    CMP_TEST_EXPECT(
+        image.vtable->free_image(image.ctx, &bad_alloc, &image_data),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         image.vtable->free_image(image.ctx, &default_alloc, &image_data),
         CMP_ERR_UNSUPPORTED);
@@ -949,6 +960,11 @@ int main(void) {
     CMP_TEST_EXPECT(
         audio.vtable->decode(audio.ctx, &audio_req, &default_alloc, NULL),
         CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.realloc = NULL;
+    CMP_TEST_EXPECT(
+        audio.vtable->decode(audio.ctx, &audio_req, &bad_alloc, &audio_data),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(audio.vtable->decode(audio.ctx, &audio_req, &default_alloc,
                                          &audio_data),
                     CMP_ERR_UNSUPPORTED);
@@ -959,6 +975,11 @@ int main(void) {
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(audio.vtable->free_audio(audio.ctx, &default_alloc, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.free = NULL;
+    CMP_TEST_EXPECT(
+        audio.vtable->free_audio(audio.ctx, &bad_alloc, &audio_data),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         audio.vtable->free_audio(audio.ctx, &default_alloc, &audio_data),
         CMP_ERR_UNSUPPORTED);

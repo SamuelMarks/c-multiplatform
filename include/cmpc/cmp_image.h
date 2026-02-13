@@ -81,6 +81,24 @@ CMP_API int CMP_CALL cmp_image_decode(CMPImageDecoder *decoder,
 CMP_API int CMP_CALL cmp_image_free(CMPImageDecoder *decoder,
                                     CMPImageData *image);
 
+#ifdef CMP_TESTING
+CMP_API int CMP_CALL cmp_image_test_mul_overflow(cmp_usize a, cmp_usize b,
+                                                 cmp_usize *out_value);
+CMP_API int CMP_CALL cmp_image_test_ppm_skip_ws(const cmp_u8 *data,
+                                                cmp_usize size,
+                                                cmp_usize *offset);
+CMP_API int CMP_CALL cmp_image_test_ppm_read_uint(const cmp_u8 *data,
+                                                  cmp_usize size,
+                                                  cmp_usize *offset,
+                                                  cmp_u32 *out_value);
+CMP_API int CMP_CALL cmp_image_test_decode_ppm(
+    const CMPImageDecodeRequest *request, const CMPAllocator *allocator,
+    CMPImageData *out_image);
+CMP_API int CMP_CALL cmp_image_test_decode_raw_rgba8(
+    const CMPImageDecodeRequest *request, const CMPAllocator *allocator,
+    CMPImageData *out_image);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

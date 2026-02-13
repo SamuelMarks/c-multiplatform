@@ -159,6 +159,10 @@ CMP_API int CMP_CALL cmp_shadow_paint(const CMPShadow *shadow, CMPGfx *gfx,
                                       const CMPRect *rect, const CMPRect *clip);
 
 #ifdef CMP_TESTING
+/** @brief Fail point: force shadow normalization error. */
+#ifndef CMP_VISUALS_TEST_FAIL_SHADOW_NORM
+#define CMP_VISUALS_TEST_FAIL_SHADOW_NORM 18u
+#endif
 /**
  * @brief Set a visuals test fail point.
  * @param fail_point Fail point identifier.

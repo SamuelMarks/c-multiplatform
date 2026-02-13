@@ -2,6 +2,15 @@
 
 #include <string.h>
 
+#ifdef CMP_TESTING
+static cmp_u32 g_cmp_image_test_mul_overflow_fail_after = 0u;
+
+int CMP_CALL cmp_image_test_set_mul_overflow_fail_after(cmp_u32 call_count) {
+  g_cmp_image_test_mul_overflow_fail_after = call_count;
+  return CMP_OK;
+}
+#endif
+
 #define CMP_IMAGE_VTABLE_COMPLETE(vtable)                                      \
   ((vtable)->decode != NULL && (vtable)->free_image != NULL)
 
@@ -10,6 +19,14 @@ static int cmp_image_mul_overflow(cmp_usize a, cmp_usize b,
   if (out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#ifdef CMP_TESTING
+  if (g_cmp_image_test_mul_overflow_fail_after > 0u) {
+    g_cmp_image_test_mul_overflow_fail_after -= 1u;
+    if (g_cmp_image_test_mul_overflow_fail_after == 0u) {
+      return CMP_ERR_OVERFLOW;
+    }
+  }
+#endif
   if (a != 0 && b > ((cmp_usize) ~(cmp_usize)0) / a) {
     return CMP_ERR_OVERFLOW;
   }
@@ -480,3 +497,33 @@ int CMP_CALL cmp_image_free(CMPImageDecoder *decoder, CMPImageData *image) {
   memset(image, 0, sizeof(*image));
   return CMP_OK;
 }
+
+#ifdef CMP_TESTING
+int CMP_CALL cmp_image_test_mul_overflow(cmp_usize a, cmp_usize b,
+                                         cmp_usize *out_value) {
+  return cmp_image_mul_overflow(a, b, out_value);
+}
+
+int CMP_CALL cmp_image_test_ppm_skip_ws(const cmp_u8 *data, cmp_usize size,
+                                        cmp_usize *offset) {
+  return cmp_image_ppm_skip_ws(data, size, offset);
+}
+
+int CMP_CALL cmp_image_test_ppm_read_uint(const cmp_u8 *data, cmp_usize size,
+                                          cmp_usize *offset,
+                                          cmp_u32 *out_value) {
+  return cmp_image_ppm_read_uint(data, size, offset, out_value);
+}
+
+int CMP_CALL cmp_image_test_decode_ppm(const CMPImageDecodeRequest *request,
+                                       const CMPAllocator *allocator,
+                                       CMPImageData *out_image) {
+  return cmp_image_decode_ppm(request, allocator, out_image);
+}
+
+int CMP_CALL cmp_image_test_decode_raw_rgba8(
+    const CMPImageDecodeRequest *request, const CMPAllocator *allocator,
+    CMPImageData *out_image) {
+  return cmp_image_decode_raw_rgba8(request, allocator, out_image);
+}
+#endif

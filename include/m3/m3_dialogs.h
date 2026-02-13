@@ -487,6 +487,122 @@ CMP_API int CMP_CALL m3_snackbar_set_on_action(M3Snackbar *snackbar,
                                                void *ctx);
 
 #ifdef CMP_TESTING
+/** @brief No test failure injected. */
+#define M3_DIALOG_TEST_FAIL_NONE 0u
+/** @brief Fail alert dialog compute actions. */
+#define M3_DIALOG_TEST_FAIL_ALERT_COMPUTE_ACTIONS 1u
+/** @brief Fail full screen dialog compute action. */
+#define M3_DIALOG_TEST_FAIL_FULLSCREEN_COMPUTE_ACTION 2u
+/** @brief Fail snackbar compute action. */
+#define M3_DIALOG_TEST_FAIL_SNACKBAR_COMPUTE_ACTION 3u
+
+/**
+ * @brief Set the dialog test failure point.
+ * @param point Failure point constant (M3_DIALOG_TEST_FAIL_*).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_dialog_test_set_fail_point(cmp_u32 point);
+/**
+ * @brief Clear any dialog test failure point.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_dialog_test_clear_fail_points(void);
+
+/**
+ * @brief Test helper for optional text measurement.
+ * @param backend Text backend pointer (may be NULL).
+ * @param font Font handle.
+ * @param utf8 UTF-8 text (may be NULL when len is 0).
+ * @param len Text length in bytes.
+ * @param out_metrics Receives metrics (may be NULL).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_dialog_test_measure_optional_text(
+    const CMPTextBackend *backend, CMPHandle font, const char *utf8,
+    cmp_usize len, CMPTextMetrics *out_metrics);
+/**
+ * @brief Test helper to destroy dialog fonts.
+ * @param backend Text backend pointer (may be NULL).
+ * @param fonts Font handle array (may be NULL).
+ * @param count Number of font handles.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_dialog_test_destroy_fonts(const CMPTextBackend *backend,
+                                                  CMPHandle *fonts,
+                                                  cmp_usize count);
+/**
+ * @brief Test helper to update alert dialog metrics.
+ * @param dialog Alert dialog pointer (may be NULL).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_dialog_test_alert_metrics_update(M3AlertDialog *dialog);
+/**
+ * @brief Test helper to compute alert dialog action metrics.
+ * @param dialog Alert dialog pointer (may be NULL).
+ * @param out_total_width Receives total actions width.
+ * @param out_height Receives actions height.
+ * @param out_confirm_width Receives confirm action width.
+ * @param out_dismiss_width Receives dismiss action width.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_dialog_test_alert_compute_actions(
+    const M3AlertDialog *dialog, CMPScalar *out_total_width,
+    CMPScalar *out_height, CMPScalar *out_confirm_width,
+    CMPScalar *out_dismiss_width);
+/**
+ * @brief Test helper to layout alert dialog actions.
+ * @param dialog Alert dialog pointer (may be NULL).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_dialog_test_alert_layout_actions(M3AlertDialog *dialog);
+/**
+ * @brief Test helper to update full screen dialog metrics.
+ * @param dialog Full screen dialog pointer (may be NULL).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL
+m3_dialog_test_fullscreen_metrics_update(M3FullScreenDialog *dialog);
+/**
+ * @brief Test helper to compute full screen dialog action metrics.
+ * @param dialog Full screen dialog pointer (may be NULL).
+ * @param out_action_width Receives action width.
+ * @param out_action_height Receives action height.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_dialog_test_fullscreen_compute_action(
+    const M3FullScreenDialog *dialog, CMPScalar *out_action_width,
+    CMPScalar *out_action_height);
+/**
+ * @brief Test helper to layout full screen dialog action.
+ * @param dialog Full screen dialog pointer (may be NULL).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL
+m3_dialog_test_fullscreen_layout_action(M3FullScreenDialog *dialog);
+/**
+ * @brief Test helper to update snackbar metrics.
+ * @param snackbar Snackbar pointer (may be NULL).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL
+m3_dialog_test_snackbar_metrics_update(M3Snackbar *snackbar);
+/**
+ * @brief Test helper to compute snackbar action metrics.
+ * @param snackbar Snackbar pointer (may be NULL).
+ * @param out_action_width Receives action width.
+ * @param out_action_height Receives action height.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_dialog_test_snackbar_compute_action(
+    const M3Snackbar *snackbar, CMPScalar *out_action_width,
+    CMPScalar *out_action_height);
+/**
+ * @brief Test helper to layout snackbar action.
+ * @param snackbar Snackbar pointer (may be NULL).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL
+m3_dialog_test_snackbar_layout_action(M3Snackbar *snackbar);
 /**
  * @brief Test helper to evaluate point-in-rect logic.
  * @param rect Rectangle to test (may be NULL).

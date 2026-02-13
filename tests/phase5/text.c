@@ -322,6 +322,10 @@ int main(void) {
   saved_font = font;
 
   CMP_TEST_EXPECT(cmp_text_font_destroy(NULL, font), CMP_ERR_INVALID_ARGUMENT);
+  text_backend.vtable = NULL;
+  CMP_TEST_EXPECT(cmp_text_font_destroy(&text_backend, saved_font),
+                  CMP_ERR_INVALID_ARGUMENT);
+  text_backend.vtable = &g_test_text_vtable;
   text_backend.vtable = &g_test_text_vtable_no_destroy;
   CMP_TEST_EXPECT(cmp_text_font_destroy(&text_backend, saved_font),
                   CMP_ERR_UNSUPPORTED);
@@ -576,6 +580,18 @@ int main(void) {
   temp_widget = widget;
   temp_widget.owns_font = CMP_FALSE;
   temp_widget.font.id = 1u;
+  temp_widget.font.generation = 1u;
+  CMP_TEST_OK(text_vtable->destroy(&temp_widget));
+
+  temp_widget = widget;
+  temp_widget.owns_font = CMP_TRUE;
+  temp_widget.font.id = 0u;
+  temp_widget.font.generation = 0u;
+  CMP_TEST_OK(text_vtable->destroy(&temp_widget));
+
+  temp_widget = widget;
+  temp_widget.owns_font = CMP_TRUE;
+  temp_widget.font.id = 0u;
   temp_widget.font.generation = 1u;
   CMP_TEST_OK(text_vtable->destroy(&temp_widget));
 

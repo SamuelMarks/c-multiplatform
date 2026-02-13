@@ -2,6 +2,21 @@
 
 #include <string.h>
 
+#ifdef CMP_TESTING
+static cmp_u32 g_cmp_audio_test_read_u16_fail_after = 0u;
+static cmp_u32 g_cmp_audio_test_read_u32_fail_after = 0u;
+
+int CMP_CALL cmp_audio_test_set_read_u16_fail_after(cmp_u32 call_count) {
+  g_cmp_audio_test_read_u16_fail_after = call_count;
+  return CMP_OK;
+}
+
+int CMP_CALL cmp_audio_test_set_read_u32_fail_after(cmp_u32 call_count) {
+  g_cmp_audio_test_read_u32_fail_after = call_count;
+  return CMP_OK;
+}
+#endif
+
 #define CMP_AUDIO_VTABLE_COMPLETE(vtable)                                      \
   ((vtable)->decode != NULL && (vtable)->free_audio != NULL)
 
@@ -10,6 +25,14 @@ static int cmp_audio_read_u16_le(const cmp_u8 *data, cmp_usize size,
   if (data == NULL || out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#ifdef CMP_TESTING
+  if (g_cmp_audio_test_read_u16_fail_after > 0u) {
+    g_cmp_audio_test_read_u16_fail_after -= 1u;
+    if (g_cmp_audio_test_read_u16_fail_after == 0u) {
+      return CMP_ERR_IO;
+    }
+  }
+#endif
   if (offset + 2u > size) {
     return CMP_ERR_CORRUPT;
   }
@@ -23,6 +46,14 @@ static int cmp_audio_read_u32_le(const cmp_u8 *data, cmp_usize size,
   if (data == NULL || out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#ifdef CMP_TESTING
+  if (g_cmp_audio_test_read_u32_fail_after > 0u) {
+    g_cmp_audio_test_read_u32_fail_after -= 1u;
+    if (g_cmp_audio_test_read_u32_fail_after == 0u) {
+      return CMP_ERR_IO;
+    }
+  }
+#endif
   if (offset + 4u > size) {
     return CMP_ERR_CORRUPT;
   }
@@ -360,3 +391,21 @@ int CMP_CALL cmp_audio_free(CMPAudioDecoder *decoder, CMPAudioData *audio) {
   memset(audio, 0, sizeof(*audio));
   return CMP_OK;
 }
+
+#ifdef CMP_TESTING
+int CMP_CALL cmp_audio_test_read_u16_le(const cmp_u8 *data, cmp_usize size,
+                                        cmp_usize offset, cmp_u16 *out_value) {
+  return cmp_audio_read_u16_le(data, size, offset, out_value);
+}
+
+int CMP_CALL cmp_audio_test_read_u32_le(const cmp_u8 *data, cmp_usize size,
+                                        cmp_usize offset, cmp_u32 *out_value) {
+  return cmp_audio_read_u32_le(data, size, offset, out_value);
+}
+
+int CMP_CALL cmp_audio_test_decode_wav(const CMPAudioDecodeRequest *request,
+                                       const CMPAllocator *allocator,
+                                       CMPAudioData *out_audio) {
+  return cmp_audio_decode_wav(request, allocator, out_audio);
+}
+#endif

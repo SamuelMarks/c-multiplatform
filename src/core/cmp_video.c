@@ -2,6 +2,21 @@
 
 #include <string.h>
 
+#ifdef CMP_TESTING
+static cmp_u32 g_cmp_video_test_read_u32_fail_after = 0u;
+static cmp_u32 g_cmp_video_test_mul_overflow_fail_after = 0u;
+
+int CMP_CALL cmp_video_test_set_read_u32_fail_after(cmp_u32 call_count) {
+  g_cmp_video_test_read_u32_fail_after = call_count;
+  return CMP_OK;
+}
+
+int CMP_CALL cmp_video_test_set_mul_overflow_fail_after(cmp_u32 call_count) {
+  g_cmp_video_test_mul_overflow_fail_after = call_count;
+  return CMP_OK;
+}
+#endif
+
 #define CMP_VIDEO_VTABLE_COMPLETE(vtable)                                      \
   ((vtable)->open != NULL && (vtable)->close != NULL &&                        \
    (vtable)->read_frame != NULL)
@@ -26,6 +41,14 @@ static int cmp_video_mul_overflow(cmp_usize a, cmp_usize b,
   if (out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#ifdef CMP_TESTING
+  if (g_cmp_video_test_mul_overflow_fail_after > 0u) {
+    g_cmp_video_test_mul_overflow_fail_after -= 1u;
+    if (g_cmp_video_test_mul_overflow_fail_after == 0u) {
+      return CMP_ERR_OVERFLOW;
+    }
+  }
+#endif
   if (a != 0 && b > ((cmp_usize) ~(cmp_usize)0) / a) {
     return CMP_ERR_OVERFLOW;
   }
@@ -38,6 +61,14 @@ static int cmp_video_read_u32_le(const cmp_u8 *data, cmp_usize size,
   if (data == NULL || out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#ifdef CMP_TESTING
+  if (g_cmp_video_test_read_u32_fail_after > 0u) {
+    g_cmp_video_test_read_u32_fail_after -= 1u;
+    if (g_cmp_video_test_read_u32_fail_after == 0u) {
+      return CMP_ERR_IO;
+    }
+  }
+#endif
   if (offset + 4u > size) {
     return CMP_ERR_CORRUPT;
   }
@@ -496,3 +527,61 @@ int CMP_CALL cmp_video_read_frame(CMPVideoDecoder *decoder,
 
   return CMP_OK;
 }
+
+#ifdef CMP_TESTING
+int CMP_CALL cmp_video_test_mul_overflow(cmp_usize a, cmp_usize b,
+                                         cmp_usize *out_value) {
+  return cmp_video_mul_overflow(a, b, out_value);
+}
+
+int CMP_CALL cmp_video_test_read_u32_le(const cmp_u8 *data, cmp_usize size,
+                                        cmp_usize offset, cmp_u32 *out_value) {
+  return cmp_video_read_u32_le(data, size, offset, out_value);
+}
+
+int CMP_CALL cmp_video_test_fallback_parse(const CMPVideoOpenRequest *request) {
+  CMPVideoFallbackState state;
+
+  memset(&state, 0, sizeof(state));
+  return cmp_video_fallback_parse(request, &state);
+}
+
+int CMP_CALL cmp_video_test_fallback_open(CMPVideoDecoder *decoder,
+                                          const CMPVideoOpenRequest *request) {
+  return cmp_video_fallback_open(decoder, request);
+}
+
+int CMP_CALL cmp_video_test_fallback_close(CMPVideoDecoder *decoder) {
+  return cmp_video_fallback_close(decoder);
+}
+
+int CMP_CALL cmp_video_test_fallback_read_frame_raw(CMPVideoDecoder *decoder,
+                                                    CMPVideoFrame *out_frame,
+                                                    CMPBool *out_has_frame) {
+  return cmp_video_fallback_read_frame(decoder, out_frame, out_has_frame);
+}
+
+int CMP_CALL cmp_video_test_fallback_read_frame_case(
+    cmp_u32 width, cmp_u32 height, cmp_u32 fps_num, cmp_u32 fps_den,
+    cmp_u32 frame_count, cmp_u32 frame_index, cmp_usize frame_size,
+    CMPVideoFrame *out_frame, CMPBool *out_has_frame) {
+  CMPVideoFallbackState state;
+  CMPVideoDecoder decoder;
+  static cmp_u8 dummy[4];
+
+  memset(&state, 0, sizeof(state));
+  state.width = width;
+  state.height = height;
+  state.fps_num = fps_num;
+  state.fps_den = fps_den;
+  state.frame_count = frame_count;
+  state.frame_index = frame_index;
+  state.frame_size = frame_size;
+  state.frames = dummy;
+
+  memset(&decoder, 0, sizeof(decoder));
+  decoder.fallback_state = &state;
+
+  return cmp_video_fallback_read_frame(&decoder, out_frame, out_has_frame);
+}
+#endif

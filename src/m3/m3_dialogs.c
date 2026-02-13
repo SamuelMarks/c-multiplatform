@@ -1,5 +1,29 @@
 #include "m3/m3_dialogs.h"
 
+static int m3_dialog_measure_optional_text(const CMPTextBackend *backend,
+                                           CMPHandle font, const char *utf8,
+                                           cmp_usize len,
+                                           CMPTextMetrics *out_metrics);
+static int m3_dialog_destroy_fonts(const CMPTextBackend *backend,
+                                   CMPHandle *fonts, cmp_usize count);
+static int m3_alert_dialog_metrics_update(M3AlertDialog *dialog);
+static int m3_alert_dialog_compute_actions(const M3AlertDialog *dialog,
+                                           CMPScalar *out_total_width,
+                                           CMPScalar *out_height,
+                                           CMPScalar *out_confirm_width,
+                                           CMPScalar *out_dismiss_width);
+static int m3_alert_dialog_layout_actions(M3AlertDialog *dialog);
+static int m3_fullscreen_dialog_metrics_update(M3FullScreenDialog *dialog);
+static int m3_fullscreen_dialog_compute_action(const M3FullScreenDialog *dialog,
+                                               CMPScalar *out_width,
+                                               CMPScalar *out_height);
+static int m3_fullscreen_dialog_layout_action(M3FullScreenDialog *dialog);
+static int m3_snackbar_metrics_update(M3Snackbar *snackbar);
+static int m3_snackbar_compute_action(const M3Snackbar *snackbar,
+                                      CMPScalar *out_width,
+                                      CMPScalar *out_height);
+static int m3_snackbar_layout_action(M3Snackbar *snackbar);
+
 static int m3_dialog_validate_color(const CMPColor *color) {
   if (color == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -125,6 +149,94 @@ static CMPBool m3_dialog_point_in_rect(const CMPRect *rect, CMPScalar x,
 }
 
 #ifdef CMP_TESTING
+#ifndef M3_DIALOG_TEST_FAIL_NONE
+#define M3_DIALOG_TEST_FAIL_NONE 0u
+#define M3_DIALOG_TEST_FAIL_ALERT_COMPUTE_ACTIONS 1u
+#define M3_DIALOG_TEST_FAIL_FULLSCREEN_COMPUTE_ACTION 2u
+#define M3_DIALOG_TEST_FAIL_SNACKBAR_COMPUTE_ACTION 3u
+#endif
+
+static cmp_u32 g_m3_dialog_test_fail_point = M3_DIALOG_TEST_FAIL_NONE;
+
+static CMPBool m3_dialog_test_fail_point_match(cmp_u32 point) {
+  if (g_m3_dialog_test_fail_point != point) {
+    return CMP_FALSE;
+  }
+  g_m3_dialog_test_fail_point = M3_DIALOG_TEST_FAIL_NONE;
+  return CMP_TRUE;
+}
+
+int CMP_CALL m3_dialog_test_set_fail_point(cmp_u32 point) {
+  g_m3_dialog_test_fail_point = point;
+  return CMP_OK;
+}
+
+int CMP_CALL m3_dialog_test_clear_fail_points(void) {
+  g_m3_dialog_test_fail_point = M3_DIALOG_TEST_FAIL_NONE;
+  return CMP_OK;
+}
+
+int CMP_CALL m3_dialog_test_measure_optional_text(const CMPTextBackend *backend,
+                                                  CMPHandle font,
+                                                  const char *utf8,
+                                                  cmp_usize len,
+                                                  CMPTextMetrics *out_metrics) {
+  return m3_dialog_measure_optional_text(backend, font, utf8, len, out_metrics);
+}
+
+int CMP_CALL m3_dialog_test_destroy_fonts(const CMPTextBackend *backend,
+                                          CMPHandle *fonts, cmp_usize count) {
+  return m3_dialog_destroy_fonts(backend, fonts, count);
+}
+
+int CMP_CALL m3_dialog_test_alert_metrics_update(M3AlertDialog *dialog) {
+  return m3_alert_dialog_metrics_update(dialog);
+}
+
+int CMP_CALL m3_dialog_test_alert_compute_actions(
+    const M3AlertDialog *dialog, CMPScalar *out_total_width,
+    CMPScalar *out_height, CMPScalar *out_confirm_width,
+    CMPScalar *out_dismiss_width) {
+  return m3_alert_dialog_compute_actions(dialog, out_total_width, out_height,
+                                         out_confirm_width, out_dismiss_width);
+}
+
+int CMP_CALL m3_dialog_test_alert_layout_actions(M3AlertDialog *dialog) {
+  return m3_alert_dialog_layout_actions(dialog);
+}
+
+int CMP_CALL
+m3_dialog_test_fullscreen_metrics_update(M3FullScreenDialog *dialog) {
+  return m3_fullscreen_dialog_metrics_update(dialog);
+}
+
+int CMP_CALL m3_dialog_test_fullscreen_compute_action(
+    const M3FullScreenDialog *dialog, CMPScalar *out_action_width,
+    CMPScalar *out_action_height) {
+  return m3_fullscreen_dialog_compute_action(dialog, out_action_width,
+                                             out_action_height);
+}
+
+int CMP_CALL
+m3_dialog_test_fullscreen_layout_action(M3FullScreenDialog *dialog) {
+  return m3_fullscreen_dialog_layout_action(dialog);
+}
+
+int CMP_CALL m3_dialog_test_snackbar_metrics_update(M3Snackbar *snackbar) {
+  return m3_snackbar_metrics_update(snackbar);
+}
+
+int CMP_CALL m3_dialog_test_snackbar_compute_action(
+    const M3Snackbar *snackbar, CMPScalar *out_action_width,
+    CMPScalar *out_action_height) {
+  return m3_snackbar_compute_action(snackbar, out_action_width,
+                                    out_action_height);
+}
+
+int CMP_CALL m3_dialog_test_snackbar_layout_action(M3Snackbar *snackbar) {
+  return m3_snackbar_layout_action(snackbar);
+}
+
 int CMP_CALL m3_dialog_test_point_in_rect(const CMPRect *rect, CMPScalar x,
                                           CMPScalar y, CMPBool *out_inside) {
   if (out_inside == NULL) {
@@ -297,6 +409,12 @@ static int m3_alert_dialog_compute_actions(const M3AlertDialog *dialog,
       out_confirm_width == NULL || out_dismiss_width == NULL) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
   }
+#ifdef CMP_TESTING
+  if (m3_dialog_test_fail_point_match(
+          M3_DIALOG_TEST_FAIL_ALERT_COMPUTE_ACTIONS)) {
+    return CMP_ERR_IO;
+  }
+#endif
 
   has_confirm = (dialog->confirm_len > 0u) ? CMP_TRUE : CMP_FALSE;
   has_dismiss = (dialog->dismiss_len > 0u) ? CMP_TRUE : CMP_FALSE;
@@ -955,6 +1073,12 @@ static int m3_fullscreen_dialog_compute_action(const M3FullScreenDialog *dialog,
   if (dialog == NULL || out_width == NULL || out_height == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#ifdef CMP_TESTING
+  if (m3_dialog_test_fail_point_match(
+          M3_DIALOG_TEST_FAIL_FULLSCREEN_COMPUTE_ACTION)) {
+    return CMP_ERR_IO;
+  }
+#endif
 
   if (dialog->action_len == 0u) {
     *out_width = 0.0f;
@@ -1503,6 +1627,12 @@ m3_snackbar_compute_action(const M3Snackbar *snackbar, CMPScalar *out_width,
   if (snackbar == NULL || out_width == NULL || out_height == NULL) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
   }
+#ifdef CMP_TESTING
+  if (m3_dialog_test_fail_point_match(
+          M3_DIALOG_TEST_FAIL_SNACKBAR_COMPUTE_ACTION)) {
+    return CMP_ERR_IO;
+  }
+#endif
 
   if (snackbar->action_len == 0u) {
     *out_width = 0.0f;

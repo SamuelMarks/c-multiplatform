@@ -466,18 +466,10 @@ if(GCOVR_EXECUTABLE)
             COMMAND ${CMAKE_CTEST_COMMAND} -R cmp_phase3_tasks --output-on-failure
             COMMAND ${GCOVR_EXECUTABLE} -r ${CMAKE_CURRENT_SOURCE_DIR}
                 ${CMP_GCOVR_GCOV_ARGS}
-                --gcov-filter ${CMAKE_BINARY_DIR}/.*
                 --object-directory ${CMAKE_BINARY_DIR}
-                --filter ${CMAKE_CURRENT_SOURCE_DIR}/src/.*
-                --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build$
-                --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-cocoa$
-                --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-docs$
-                --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-coverage$
-                --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-coverage-clean$
-                --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-coverage-fresh$
-                --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-coverage-run$
-                --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-android$
-                --exclude-directories=${CMAKE_CURRENT_SOURCE_DIR}/build-web$
+                --filter .*src/.*
+                --gcov-ignore-errors=source_not_found
+                --gcov-ignore-errors=no_working_dir_found
                 --exclude-noncode-lines
                 --merge-lines
                 --print-summary

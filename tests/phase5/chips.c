@@ -432,14 +432,22 @@ static int test_chip_helpers(void) {
   color.b = 0.0f;
   color.a = 1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_color(&color), CMP_ERR_RANGE);
+  color.r = 1.2f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_color(&color), CMP_ERR_RANGE);
   color.r = 0.0f;
   color.g = 1.2f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_color(&color), CMP_ERR_RANGE);
+  color.g = -0.1f;
   CMP_TEST_EXPECT(m3_chip_test_validate_color(&color), CMP_ERR_RANGE);
   color.g = 0.0f;
   color.b = -0.1f;
   CMP_TEST_EXPECT(m3_chip_test_validate_color(&color), CMP_ERR_RANGE);
+  color.b = 1.2f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_color(&color), CMP_ERR_RANGE);
   color.b = 0.0f;
   color.a = 2.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_color(&color), CMP_ERR_RANGE);
+  color.a = -0.1f;
   CMP_TEST_EXPECT(m3_chip_test_validate_color(&color), CMP_ERR_RANGE);
 
   CMP_TEST_EXPECT(m3_chip_test_color_set(NULL, 0.0f, 0.0f, 0.0f, 1.0f),
@@ -498,6 +506,9 @@ static int test_chip_helpers(void) {
   text_style.weight = 50;
   CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
                   CMP_ERR_RANGE);
+  text_style.weight = 901;
+  CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
   text_style.weight = 400;
   text_style.italic = 2;
   CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
@@ -507,6 +518,18 @@ static int test_chip_helpers(void) {
   CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
                   CMP_ERR_RANGE);
   text_style.color.r = 0.0f;
+  text_style.color.g = -0.5f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  text_style.color.g = 0.0f;
+  text_style.color.b = 1.5f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  text_style.color.b = 0.0f;
+  text_style.color.a = -0.5f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_text_style(&text_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  text_style.color.a = 1.0f;
   CMP_TEST_OK(m3_chip_test_validate_text_style(&text_style, CMP_TRUE));
 
   CMP_TEST_EXPECT(
