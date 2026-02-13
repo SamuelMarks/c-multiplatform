@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 
-if(NOT DEFINED M3_ROOT)
-    set(M3_ROOT "${CMAKE_CURRENT_LIST_DIR}/../..")
+if(NOT DEFINED CMP_ROOT)
+    set(CMP_ROOT "${CMAKE_CURRENT_LIST_DIR}/../..")
 endif()
-get_filename_component(M3_ROOT "${M3_ROOT}" ABSOLUTE)
+get_filename_component(CMP_ROOT "${CMP_ROOT}" ABSOLUTE)
 
 find_program(XCODEBUILD_EXECUTABLE xcodebuild)
 if(NOT XCODEBUILD_EXECUTABLE)
@@ -33,14 +33,14 @@ if(NOT EXISTS "${IOS_EXPORT_OPTIONS_PLIST}")
     message(FATAL_ERROR "Export options plist not found: ${IOS_EXPORT_OPTIONS_PLIST}")
 endif()
 
-set(ARCHIVE_DIR "${M3_ROOT}/packaging/ios/archive")
+set(ARCHIVE_DIR "${CMP_ROOT}/packaging/ios/archive")
 set(EXPORT_DIR "${ARCHIVE_DIR}/export")
 file(MAKE_DIRECTORY "${ARCHIVE_DIR}")
 file(MAKE_DIRECTORY "${EXPORT_DIR}")
 
 set(ARCHIVE_PATH "${ARCHIVE_DIR}/${IOS_SCHEME}.xcarchive")
 
-function(m3_run)
+function(cmp_run)
     execute_process(COMMAND ${ARGV} RESULT_VARIABLE rc)
     if(NOT rc EQUAL 0)
         message(FATAL_ERROR "Command failed (exit ${rc}): ${ARGV}")
@@ -48,14 +48,14 @@ function(m3_run)
 endfunction()
 
 if(DEFINED IOS_PROJECT)
-    m3_run(${XCODEBUILD_EXECUTABLE}
+    cmp_run(${XCODEBUILD_EXECUTABLE}
         -project "${IOS_PROJECT}"
         -scheme "${IOS_SCHEME}"
         -configuration "${IOS_CONFIGURATION}"
         -archivePath "${ARCHIVE_PATH}"
         archive)
 else()
-    m3_run(${XCODEBUILD_EXECUTABLE}
+    cmp_run(${XCODEBUILD_EXECUTABLE}
         -workspace "${IOS_WORKSPACE}"
         -scheme "${IOS_SCHEME}"
         -configuration "${IOS_CONFIGURATION}"
@@ -63,7 +63,7 @@ else()
         archive)
 endif()
 
-m3_run(${XCODEBUILD_EXECUTABLE}
+cmp_run(${XCODEBUILD_EXECUTABLE}
     -exportArchive
     -archivePath "${ARCHIVE_PATH}"
     -exportOptionsPlist "${IOS_EXPORT_OPTIONS_PLIST}"

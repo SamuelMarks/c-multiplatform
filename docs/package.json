@@ -1,0 +1,7 @@
+{
+  "name": "cross-platform-c-docs",
+  "private": true,
+  "devDependencies": {
+    "@xpack-3rd-party/doxygen-awesome-css": "2.3.4-1"
+  }
+}

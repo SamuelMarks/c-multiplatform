@@ -1,11 +1,11 @@
-#ifndef M3_TEST_UTILS_H
-#define M3_TEST_UTILS_H
+#ifndef CMP_TEST_UTILS_H
+#define CMP_TEST_UTILS_H
 
 #include <stdio.h>
 
-#include "m3/m3_core.h"
+#include "cmpc/cmp_core.h"
 
-#define M3_TEST_ASSERT(condition)                                              \
+#define CMP_TEST_ASSERT(condition)                                              \
   do {                                                                         \
     if (!(condition)) {                                                        \
       fprintf(stderr, "TEST FAIL %s:%d: %s\n", __FILE__, __LINE__,             \
@@ -14,16 +14,16 @@
     }                                                                          \
   } while (0)
 
-#define M3_TEST_EXPECT(expr, expected)                                         \
+#define CMP_TEST_EXPECT(expr, expected)                                         \
   do {                                                                         \
-    int m3_test_rc = (expr);                                                   \
-    if (m3_test_rc != (expected)) {                                            \
+    int cmp_test_rc = (expr);                                                   \
+    if (cmp_test_rc != (expected)) {                                            \
       fprintf(stderr, "TEST FAIL %s:%d: expected %d got %d\n", __FILE__,       \
-              __LINE__, (expected), m3_test_rc);                               \
+              __LINE__, (expected), cmp_test_rc);                               \
       return 1;                                                                \
     }                                                                          \
   } while (0)
 
-#define M3_TEST_OK(expr) M3_TEST_EXPECT((expr), M3_OK)
+#define CMP_TEST_OK(expr) CMP_TEST_EXPECT((expr), CMP_OK)
 
-#endif /* M3_TEST_UTILS_H */
+#endif /* CMP_TEST_UTILS_H */

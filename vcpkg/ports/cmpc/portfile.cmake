@@ -1,0 +1,48 @@
+vcpkg_from_github(
+    OUT_SOURCE_PATH SOURCE_PATH
+    REPO SamuelMarks/c-multiplatform
+    REF e7be20e2583a21df1b0189c810cb7a969705e023
+    SHA512 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    HEAD_REF main
+)
+
+vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
+    FEATURES
+        sdl3 CMP_ENABLE_SDL3
+        sdl3-ttf CMP_ENABLE_SDL3_TTF
+        gtk4 CMP_ENABLE_GTK4
+        cocoa CMP_ENABLE_COCOA
+        win32 CMP_ENABLE_WIN32
+        web CMP_ENABLE_WEB
+        webgpu CMP_ENABLE_WEBGPU
+        ios CMP_ENABLE_IOS
+        android CMP_ENABLE_ANDROID
+        libcurl CMP_ENABLE_LIBCURL
+        apple-cfnetwork-c CMP_APPLE_USE_CFNETWORK_C
+)
+
+if(VCPKG_LIBRARY_LINKAGE STREQUAL "dynamic")
+    set(CMP_BUILD_SHARED ON)
+else()
+    set(CMP_BUILD_SHARED OFF)
+endif()
+
+vcpkg_cmake_configure(
+    SOURCE_PATH "${SOURCE_PATH}"
+    OPTIONS
+        -DBUILD_SHARED_LIBS=${CMP_BUILD_SHARED}
+        -DBUILD_TESTING=OFF
+        -DCMP_WARNINGS_AS_ERRORS=OFF
+        -DCMP_ENABLE_COVERAGE=OFF
+        -DCMP_REQUIRE_DOXYGEN=OFF
+        ${FEATURE_OPTIONS}
+)
+
+vcpkg_cmake_install()
+vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/LibCMPC)
+
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/share")
+
+vcpkg_install_copyright(
+    FILE_LIST "${SOURCE_PATH}/LICENSE"
+)

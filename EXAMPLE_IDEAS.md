@@ -1,70 +1,74 @@
 Example ideas
 =============
 
+This plan outlines the feature gaps between the current state of **LibCMPC** (core APIs through Phase 6 are implemented; backend coverage varies) and the requirements to port high-fidelity sample apps. LibCMPC currently ships the **Material 3** (`m3`) library; **Apple Cupertino** and **Microsoft Fluent** are planned.
 
-Actually why not be super boring, and copycat
-- https://github.com/android/compose-samples
+Sample app sources (roadmap)
+----------------------------
 
-It's all Apache-2.0 licensed afterall…
+- Android Compose Samples (Material 3)
+- Apple SwiftUI / Cupertino sample apps (HIG samples)
+- Microsoft Fluent UI sample gallery/apps
+
+The goal is to copy/port these example apps to validate design-system parity and stress-test the core APIs.
 
 ---
 
-This plan outlines the feature gaps between the current state of **LibM3C** (Phase 6 complete) and the requirements to implement the **Android Compose Samples**.
-
-The primary gaps are in **Multimedia** (Image decoding/Audio), **Advanced Graphics** (Gradients/Shaders), and **Rich Text**.
+The primary gaps for Material 3 sample parity are in **Multimedia** (image/audio), **Advanced Graphics** (gradients/shaders), and **Rich Text**.
 
 ### 1. Multimedia & Assets Subsytem
 *Essential for almost all samples (JetNews, Jetsnack, Jetchat, Jetcaster).*
 
 | Feature | Targeted Sample | Description | Affected Core File | Complexity |
 | :--- | :--- | :--- | :--- | :--- |
-| **Image Decoding** | JetNews, Jetsnack | LibM3C can render textures (`m3_api_gfx`), but cannot decode JPG/PNG/WebP from disk/network to raw bytes. Needs a `m3_image` module (wrapping `stb_image` or platform codecs). | `include/m3/m3_image.h` (New) | **Medium** |
-| **Async Image Loader** | Jetcaster, Jetchat | A helper to fetch an image via `M3Network`, decode it on a worker thread (`M3Tasks`), and upload to texture on the main thread. | `include/m3/m3_assets.h` (New) | **Medium** |
-| **Audio Playback** | Jetcaster | Jetcaster is a podcast app. LibM3C needs an audio output interface (`M3Audio`) implemented across backends. | `include/m3/m3_api_env.h` | **High** |
-| **SVG/Vector Parsing** | JetLagged | While `m3_icon` handles simple SVG paths, JetLagged requires complex dynamic graphs. A dedicated Vector Drawable loader/renderer is needed beyond simple icons. | `include/m3/m3_vector.h` (New) | **High** |
+| **Image Decoding** | JetNews, Jetsnack | LibCMPC includes fallback decoders for PPM (P6) and raw RGBA, but lacks PNG/JPEG/WebP and image metadata parsing. Add a real codec layer (stb_image or platform codecs). | `include/cmpc/cmp_image.h` | **Medium** |
+| **Async Image Loader** | Jetcaster, Jetchat | A helper to fetch an image via `CMPNetwork`, decode it on a worker thread (`CMPTasks`), and upload to texture on the main thread. | `include/cmpc/cmp_assets.h` (New) | **Medium** |
+| **Audio Playback** | Jetcaster | LibCMPC can decode WAV (PCM16) but has no audio output interface yet. Add playback/output (`CMPAudioOutput`) across backends. | `include/cmpc/cmp_api_env.h` | **High** |
+| **SVG/Vector Parsing** | JetLagged | `cmp_icon` handles simple path icons, but complex vector scenes need a richer parser/renderer. | `include/cmpc/cmp_vector.h` (New) | **High** |
 
 ### 2. Graphics & Rendering Enhancements
 *Required for the polished look of Jetsnack and JetLagged.*
 
 | Feature | Targeted Sample | Description | Affected Core File | Complexity |
 | :--- | :--- | :--- | :--- | :--- |
-| **Gradient Shaders** | Jetsnack | The current `draw_rect` only accepts a flat `M3Color`. Jetsnack relies heavily on gradients for the "snack" cards. The GFX ABI needs a `M3Brush` or `M3Paint` struct supporting Linear/Radial gradients. | `include/m3/m3_api_gfx.h` | **High** |
-| **Blend Modes** | Jetchat | Sophisticated UI often requires specific blend modes (e.g., overlay, screen) beyond simple alpha blending for images and shapes. | `include/m3/m3_api_gfx.h` | **Medium** |
-| **Blur Effects** | Jetsnack | The "frosted glass" effect or blurring background content. | `include/m3/m3_api_gfx.h` | **High** |
-| **Path Effects** | JetLagged | Dashed lines and corner rounding on arbitrary paths (for graph lines). | `include/m3/m3_path.h` | **Medium** |
+| **Gradient Shaders** | Jetsnack | The current `draw_rect` only accepts a flat `CMPColor`. Add a `CMPBrush`/`CMPPaint` API for linear/radial gradients. | `include/cmpc/cmp_api_gfx.h` | **High** |
+| **Blend Modes** | Jetchat | Sophisticated UI often requires blend modes beyond simple alpha blending. | `include/cmpc/cmp_api_gfx.h` | **Medium** |
+| **Blur Effects** | Jetsnack | The "frosted glass" effect or blurring background content. | `include/cmpc/cmp_api_gfx.h` | **High** |
+| **Path Effects** | JetLagged | Dashed lines and corner rounding on arbitrary paths (for graph lines). | `include/cmpc/cmp_path.h` | **Medium** |
 
 ### 3. Advanced Layout & Scrolling
 *Required for Jetsnack (coordinator layouts) and Reply (adaptive layouts).*
 
 | Feature | Targeted Sample | Description | Affected Core File | Complexity |
 | :--- | :--- | :--- | :--- | :--- |
-| **Staggered Grid** | Jetsnack | `m3_list.h` supports uniform Grids. Jetsnack uses a masonry/waterfall layout. | `include/m3/m3_list.h` | **Medium** |
-| **Collapsing Toolbar**| Jetsnack | Logic to coordinate a `M3ScrollParent` that consumes scroll deltas to shrink a top bar before scrolling the list content. Logic exists in `m3_scroll`, but a widget implementation is needed. | `include/m3/m3_app_bar.h` | **Medium** |
-| **Window Insets** | Jetchat, Reply | Handling IME (Keyboard) appearance sliding up the content, and status bar padding. LibM3C has `safe_area` in Scaffold, but needs dynamic listening to OS Inset changes. | `include/m3/m3_api_ws.h` | **Medium** |
-| **Shared Element** | Jetsnack | One of the hardest features: transitioning a widget from a List geometry to a Detail page geometry smoothly. | `include/m3/m3_anim.h` | **Very High** |
+| **Staggered Grid** | Jetsnack | `cmp_list` supports uniform grids. Jetsnack uses a masonry/waterfall layout. | `include/cmpc/cmp_list.h` | **Medium** |
+| **Collapsing Toolbar**| Jetsnack | Logic to coordinate a `CMPScrollParent` that consumes scroll deltas to shrink a top bar before scrolling the list content. | `include/m3/m3_app_bar.h` | **Medium** |
+| **Window Insets** | Jetchat, Reply | Handling IME (keyboard) appearance sliding up the content, and status bar padding. Scaffold has `safe_area`, but needs dynamic OS inset updates. | `include/cmpc/cmp_api_ws.h` | **Medium** |
+| **Shared Element** | Jetsnack | Transitioning a widget from list geometry to detail geometry smoothly. | `include/cmpc/cmp_anim.h` | **Very High** |
 
 ### 4. Rich Text & Input
 *Required for JetNews (article reading) and Jetchat.*
 
 | Feature | Targeted Sample | Description | Affected Core File | Complexity |
 | :--- | :--- | :--- | :--- | :--- |
-| **Rich Text (Spans)** | JetNews | Currently `M3TextStyle` applies to the whole string. JetNews articles require bold, italic, and links mixed within a single paragraph. | `include/m3/m3_text.h` | **High** |
-| **Downloadable Fonts**| Jetchat | Helper to fetch fonts via network and register them with the text backend at runtime. | `include/m3/m3_text.h` | **Medium** |
-| **IME Integration** | Jetchat | Advanced soft-keyboard control (show/hide, input type selection, emoji support). Current `M3InputEvent` handles text, but not control flow of the keyboard itself. | `include/m3/m3_api_ws.h` | **High** |
+| **Rich Text (Spans)** | JetNews | `CMPTextStyle` applies to the whole string. Mixed bold/italic/link spans need a richer text layout model. | `include/cmpc/cmp_text.h` | **High** |
+| **Downloadable Fonts**| Jetchat | Helper to fetch fonts via network and register them with the text backend at runtime. | `include/cmpc/cmp_text.h` | **Medium** |
+| **IME Integration** | Jetchat | Soft-keyboard control (show/hide, input type selection, emoji support). Current `CMPInputEvent` handles text, but not keyboard control. | `include/cmpc/cmp_api_ws.h` | **High** |
 
 ### 5. Algorithmic Features
 *Specific logic requirements.*
 
 | Feature | Targeted Sample | Description | Affected Core File | Complexity |
 | :--- | :--- | :--- | :--- | :--- |
-| **Palette Generation**| Jetcaster | Jetcaster extracts the color palette from the podcast cover art to theme the UI. Requires an implementation of the quantization algorithm (e.g., Wu or K-Means) to feed into `m3_color`. | `include/m3/m3_color.h` | **Medium** |
-| **Diff/DiffUtil** | All (Lists) | When `M3Store` updates a list of items, an algorithm (Myers Diff) is needed to animate insertions/removals in the `M3ListView` rather than reloading the whole list. | `include/m3/m3_list.h` | **Medium** |
+| **Palette Generation**| Jetcaster | Extract a color palette from cover art to theme the UI. Needs a quantization algorithm feeding `m3_color`. | `include/m3/m3_color.h` | **Medium** |
+| **Diff/DiffUtil** | All (Lists) | When `CMPStore` updates a list of items, calculate diffs to animate insertions/removals in `CMPListView`. | `include/cmpc/cmp_list.h` | **Medium** |
 
 ### Execution Order
 
-To reach parity with the Compose samples, the recommended implementation order is:
+To reach parity with the sample apps, the recommended implementation order is:
 
-1.  **GFX Upgrade (Priority):** Add Gradients and Image Decoding. Without this, the UI will look flat and empty compared to the samples.
-2.  **Rich Text:** Essential for JetNews and any realistic app content.
-3.  **Advanced Layouts:** Staggered Grids and Collapsing mechanics.
-4.  **Audio/Platform inputs:** Audio playback and Keyboard control.
+1.  **GFX Upgrade (Priority):** Add gradients and real image decoding.
+2.  **Rich Text:** Essential for JetNews and realistic app content.
+3.  **Advanced Layouts:** Staggered grids and collapsing mechanics.
+4.  **Audio + IME:** Audio output and keyboard control.
+5.  **Design Systems + Samples:** Cupertino + Fluent widgets, then port the official sample apps for each design system.

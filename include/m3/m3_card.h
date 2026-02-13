@@ -3,16 +3,16 @@
 
 /**
  * @file m3_card.h
- * @brief Card widgets for LibM3C.
+ * @brief Card widgets for LibCMPC.
  */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "m3_api_ui.h"
-#include "m3_layout.h"
-#include "m3_visuals.h"
+#include "cmpc/cmp_api_ui.h"
+#include "cmpc/cmp_layout.h"
+#include "cmpc/cmp_visuals.h"
 
 /** @brief Elevated card variant. */
 #define M3_CARD_VARIANT_ELEVATED 1
@@ -44,99 +44,99 @@ struct M3Card;
  * @brief Card click callback signature.
  * @param ctx User callback context pointer.
  * @param card Card instance that was activated.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-typedef int(M3_CALL *M3CardOnClick)(void *ctx, struct M3Card *card);
+typedef int(CMP_CALL *CMPCardOnClick)(void *ctx, struct M3Card *card);
 
 /**
  * @brief Card style descriptor.
  */
 typedef struct M3CardStyle {
-  m3_u32 variant;                    /**< Card variant (M3_CARD_VARIANT_*). */
-  M3LayoutEdges padding;             /**< Padding around card contents. */
-  M3Color background_color;          /**< Background fill color. */
-  M3Color outline_color;             /**< Outline color. */
-  M3Color ripple_color;              /**< Ripple overlay color. */
-  M3Color disabled_background_color; /**< Background color when disabled. */
-  M3Color disabled_outline_color;    /**< Outline color when disabled. */
-  M3Scalar min_width;              /**< Minimum card width in pixels (>= 0). */
-  M3Scalar min_height;             /**< Minimum card height in pixels (>= 0). */
-  M3Scalar corner_radius;          /**< Corner radius in pixels (>= 0). */
-  M3Scalar outline_width;          /**< Outline width in pixels (>= 0). */
-  M3Scalar ripple_expand_duration; /**< Ripple expansion duration in seconds. */
-  M3Scalar ripple_fade_duration;   /**< Ripple fade-out duration in seconds. */
-  M3Shadow shadow;                 /**< Shadow descriptor for elevated cards. */
-  M3Bool shadow_enabled; /**< M3_TRUE when shadow rendering is enabled. */
+  cmp_u32 variant;                    /**< Card variant (CMP_CARD_VARIANT_*). */
+  CMPLayoutEdges padding;             /**< Padding around card contents. */
+  CMPColor background_color;          /**< Background fill color. */
+  CMPColor outline_color;             /**< Outline color. */
+  CMPColor ripple_color;              /**< Ripple overlay color. */
+  CMPColor disabled_background_color; /**< Background color when disabled. */
+  CMPColor disabled_outline_color;    /**< Outline color when disabled. */
+  CMPScalar min_width;              /**< Minimum card width in pixels (>= 0). */
+  CMPScalar min_height;             /**< Minimum card height in pixels (>= 0). */
+  CMPScalar corner_radius;          /**< Corner radius in pixels (>= 0). */
+  CMPScalar outline_width;          /**< Outline width in pixels (>= 0). */
+  CMPScalar ripple_expand_duration; /**< Ripple expansion duration in seconds. */
+  CMPScalar ripple_fade_duration;   /**< Ripple fade-out duration in seconds. */
+  CMPShadow shadow;                 /**< Shadow descriptor for elevated cards. */
+  CMPBool shadow_enabled; /**< CMP_TRUE when shadow rendering is enabled. */
 } M3CardStyle;
 
 /**
  * @brief Card widget instance.
  */
 typedef struct M3Card {
-  M3Widget widget;        /**< Widget interface (points to this instance). */
+  CMPWidget widget;        /**< Widget interface (points to this instance). */
   M3CardStyle style;      /**< Current card style. */
-  M3Rect bounds;          /**< Layout bounds. */
-  M3Ripple ripple;        /**< Ripple state. */
-  M3Bool pressed;         /**< M3_TRUE when pressed. */
-  M3CardOnClick on_click; /**< Click callback (may be NULL). */
+  CMPRect bounds;          /**< Layout bounds. */
+  CMPRipple ripple;        /**< Ripple state. */
+  CMPBool pressed;         /**< CMP_TRUE when pressed. */
+  CMPCardOnClick on_click; /**< Click callback (may be NULL). */
   void *on_click_ctx;     /**< Click callback context pointer. */
 } M3Card;
 
 /**
  * @brief Initialize an elevated card style with defaults.
  * @param style Style descriptor to initialize.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_card_style_init_elevated(M3CardStyle *style);
+CMP_API int CMP_CALL m3_card_style_init_elevated(M3CardStyle *style);
 
 /**
  * @brief Initialize a filled card style with defaults.
  * @param style Style descriptor to initialize.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_card_style_init_filled(M3CardStyle *style);
+CMP_API int CMP_CALL m3_card_style_init_filled(M3CardStyle *style);
 
 /**
  * @brief Initialize an outlined card style with defaults.
  * @param style Style descriptor to initialize.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_card_style_init_outlined(M3CardStyle *style);
+CMP_API int CMP_CALL m3_card_style_init_outlined(M3CardStyle *style);
 
 /**
  * @brief Initialize a card widget.
  * @param card Card instance.
  * @param style Card style descriptor.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_card_init(M3Card *card, const M3CardStyle *style);
+CMP_API int CMP_CALL m3_card_init(M3Card *card, const M3CardStyle *style);
 
 /**
  * @brief Update the card style.
  * @param card Card instance.
  * @param style New card style descriptor.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_card_set_style(M3Card *card, const M3CardStyle *style);
+CMP_API int CMP_CALL m3_card_set_style(M3Card *card, const M3CardStyle *style);
 
 /**
  * @brief Assign a click callback to the card.
  * @param card Card instance.
  * @param on_click Click callback (may be NULL to clear).
  * @param ctx Callback context pointer.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_card_set_on_click(M3Card *card, M3CardOnClick on_click,
+CMP_API int CMP_CALL m3_card_set_on_click(M3Card *card, CMPCardOnClick on_click,
                                         void *ctx);
 
 /**
  * @brief Compute the content bounds inside the card.
  * @param card Card instance.
  * @param out_bounds Receives the content bounds.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_card_get_content_bounds(const M3Card *card,
-                                              M3Rect *out_bounds);
+CMP_API int CMP_CALL m3_card_get_content_bounds(const M3Card *card,
+                                              CMPRect *out_bounds);
 
 #ifdef __cplusplus
 } /* extern "C" */

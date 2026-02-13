@@ -3,16 +3,16 @@
 
 /**
  * @file m3_menu.h
- * @brief Menu and popup widgets for LibM3C.
+ * @brief Menu and popup widgets for LibCMPC.
  */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "m3_layout.h"
-#include "m3_text.h"
-#include "m3_visuals.h"
+#include "cmpc/cmp_layout.h"
+#include "cmpc/cmp_text.h"
+#include "cmpc/cmp_visuals.h"
 
 /** @brief Anchor uses a rectangle (dropdown menus). */
 #define M3_MENU_ANCHOR_RECT 0
@@ -41,7 +41,7 @@ extern "C" {
 #define M3_MENU_ACTION_DISMISS 2u
 
 /** @brief Invalid menu index sentinel. */
-#define M3_MENU_INVALID_INDEX ((m3_usize) ~(m3_usize)0)
+#define M3_MENU_INVALID_INDEX ((cmp_usize) ~(cmp_usize)0)
 
 /** @brief Default menu item height in pixels. */
 #define M3_MENU_DEFAULT_ITEM_HEIGHT 48.0f
@@ -66,12 +66,12 @@ struct M3Menu;
  * @brief Menu action callback signature.
  * @param ctx User callback context pointer.
  * @param menu Menu instance that triggered the action.
- * @param action Action identifier (M3_MENU_ACTION_*).
+ * @param action Action identifier (CMP_MENU_ACTION_*).
  * @param index Selected index (M3_MENU_INVALID_INDEX for dismiss).
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-typedef int(M3_CALL *M3MenuOnAction)(void *ctx, struct M3Menu *menu,
-                                     m3_u32 action, m3_usize index);
+typedef int(CMP_CALL *CMPMenuOnAction)(void *ctx, struct M3Menu *menu,
+                                     cmp_u32 action, cmp_usize index);
 
 /**
  * @brief Menu item descriptor.
@@ -79,74 +79,74 @@ typedef int(M3_CALL *M3MenuOnAction)(void *ctx, struct M3Menu *menu,
 typedef struct M3MenuItem {
   const char *utf8_label; /**< UTF-8 label pointer (may be NULL when
                              utf8_len is 0). */
-  m3_usize utf8_len;      /**< UTF-8 label length in bytes. */
-  M3Bool enabled;         /**< M3_TRUE when item is enabled. */
+  cmp_usize utf8_len;      /**< UTF-8 label length in bytes. */
+  CMPBool enabled;         /**< CMP_TRUE when item is enabled. */
 } M3MenuItem;
 
 /**
  * @brief Menu anchor descriptor.
  */
 typedef struct M3MenuAnchor {
-  m3_u32 type;  /**< Anchor type (M3_MENU_ANCHOR_*). */
-  M3Rect rect;  /**< Anchor rectangle (used for M3_MENU_ANCHOR_RECT). */
-  M3Vec2 point; /**< Anchor point (used for M3_MENU_ANCHOR_POINT). */
+  cmp_u32 type;  /**< Anchor type (CMP_MENU_ANCHOR_*). */
+  CMPRect rect;  /**< Anchor rectangle (used for M3_MENU_ANCHOR_RECT). */
+  CMPVec2 point; /**< Anchor point (used for M3_MENU_ANCHOR_POINT). */
 } M3MenuAnchor;
 
 /**
  * @brief Menu placement descriptor.
  */
 typedef struct M3MenuPlacement {
-  m3_u32 direction; /**< Preferred direction (M3_MENU_DIRECTION_*). */
-  m3_u32 align;     /**< Alignment along the cross axis (M3_MENU_ALIGN_*). */
+  cmp_u32 direction; /**< Preferred direction (CMP_MENU_DIRECTION_*). */
+  cmp_u32 align;     /**< Alignment along the cross axis (CMP_MENU_ALIGN_*). */
 } M3MenuPlacement;
 
 /**
  * @brief Menu style descriptor.
  */
 typedef struct M3MenuStyle {
-  M3LayoutEdges padding;  /**< Padding around menu contents. */
-  M3Scalar item_height;   /**< Menu item height in pixels (> 0). */
-  M3Scalar item_spacing;  /**< Spacing between items in pixels (>= 0). */
-  M3Scalar min_width;     /**< Minimum menu width in pixels (>= 0). */
-  M3Scalar max_width;     /**< Maximum menu width in pixels (>= 0, 0 = none). */
-  M3Scalar corner_radius; /**< Menu corner radius in pixels (>= 0). */
-  M3Scalar anchor_gap;    /**< Gap between anchor and menu in pixels (>= 0). */
-  M3TextStyle text_style; /**< Label text style (requires valid family name). */
-  M3Color background_color;    /**< Menu background color. */
-  M3Color disabled_text_color; /**< Text color for disabled items. */
-  M3Shadow shadow;             /**< Shadow descriptor. */
-  M3Bool shadow_enabled;       /**< M3_TRUE when shadow rendering is enabled. */
+  CMPLayoutEdges padding;  /**< Padding around menu contents. */
+  CMPScalar item_height;   /**< Menu item height in pixels (> 0). */
+  CMPScalar item_spacing;  /**< Spacing between items in pixels (>= 0). */
+  CMPScalar min_width;     /**< Minimum menu width in pixels (>= 0). */
+  CMPScalar max_width;     /**< Maximum menu width in pixels (>= 0, 0 = none). */
+  CMPScalar corner_radius; /**< Menu corner radius in pixels (>= 0). */
+  CMPScalar anchor_gap;    /**< Gap between anchor and menu in pixels (>= 0). */
+  CMPTextStyle text_style; /**< Label text style (requires valid family name). */
+  CMPColor background_color;    /**< Menu background color. */
+  CMPColor disabled_text_color; /**< Text color for disabled items. */
+  CMPShadow shadow;             /**< Shadow descriptor. */
+  CMPBool shadow_enabled;       /**< CMP_TRUE when shadow rendering is enabled. */
 } M3MenuStyle;
 
 /**
  * @brief Menu widget instance.
  */
 typedef struct M3Menu {
-  M3Widget widget; /**< Widget interface (points to this instance). */
-  M3TextBackend text_backend; /**< Text backend instance. */
-  M3Handle font;              /**< Font handle for menu labels. */
-  M3TextMetrics font_metrics; /**< Cached font metrics. */
+  CMPWidget widget; /**< Widget interface (points to this instance). */
+  CMPTextBackend text_backend; /**< Text backend instance. */
+  CMPHandle font;              /**< Font handle for menu labels. */
+  CMPTextMetrics font_metrics; /**< Cached font metrics. */
   M3MenuStyle style;          /**< Current menu style. */
   const M3MenuItem *items;    /**< Menu items (not owned). */
-  m3_usize item_count;        /**< Number of menu items. */
+  cmp_usize item_count;        /**< Number of menu items. */
   M3MenuAnchor anchor;        /**< Current anchor descriptor. */
   M3MenuPlacement placement;  /**< Preferred placement settings. */
-  m3_u32 resolved_direction;  /**< Resolved placement direction. */
-  M3Rect overlay_bounds;      /**< Bounds of the overlay region. */
-  M3Rect menu_bounds;         /**< Bounds of the menu panel. */
-  m3_usize pressed_index;   /**< Pressed item index or M3_MENU_INVALID_INDEX. */
-  M3Bool owns_font;         /**< M3_TRUE when widget owns the font. */
-  M3Bool open;              /**< M3_TRUE when menu is open/visible. */
-  M3MenuOnAction on_action; /**< Action callback (may be NULL). */
+  cmp_u32 resolved_direction;  /**< Resolved placement direction. */
+  CMPRect overlay_bounds;      /**< Bounds of the overlay region. */
+  CMPRect menu_bounds;         /**< Bounds of the menu panel. */
+  cmp_usize pressed_index;   /**< Pressed item index or M3_MENU_INVALID_INDEX. */
+  CMPBool owns_font;         /**< CMP_TRUE when widget owns the font. */
+  CMPBool open;              /**< CMP_TRUE when menu is open/visible. */
+  CMPMenuOnAction on_action; /**< Action callback (may be NULL). */
   void *on_action_ctx;      /**< Action callback context pointer. */
 } M3Menu;
 
 /**
  * @brief Initialize a menu style with defaults.
  * @param style Style descriptor to initialize.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_style_init(M3MenuStyle *style);
+CMP_API int CMP_CALL m3_menu_style_init(M3MenuStyle *style);
 
 /**
  * @brief Initialize a menu widget.
@@ -155,173 +155,173 @@ M3_API int M3_CALL m3_menu_style_init(M3MenuStyle *style);
  * @param style Menu style descriptor.
  * @param items Menu item array (may be NULL when item_count is 0).
  * @param item_count Number of menu items.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_init(M3Menu *menu, const M3TextBackend *backend,
+CMP_API int CMP_CALL m3_menu_init(M3Menu *menu, const CMPTextBackend *backend,
                                 const M3MenuStyle *style,
-                                const M3MenuItem *items, m3_usize item_count);
+                                const M3MenuItem *items, cmp_usize item_count);
 
 /**
  * @brief Update the menu items.
  * @param menu Menu instance.
  * @param items Menu item array (may be NULL when item_count is 0).
  * @param item_count Number of menu items.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_set_items(M3Menu *menu, const M3MenuItem *items,
-                                     m3_usize item_count);
+CMP_API int CMP_CALL m3_menu_set_items(M3Menu *menu, const M3MenuItem *items,
+                                     cmp_usize item_count);
 
 /**
  * @brief Update the menu style.
  * @param menu Menu instance.
  * @param style New style descriptor.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_set_style(M3Menu *menu, const M3MenuStyle *style);
+CMP_API int CMP_CALL m3_menu_set_style(M3Menu *menu, const M3MenuStyle *style);
 
 /**
  * @brief Set the menu anchor rectangle (dropdown menus).
  * @param menu Menu instance.
  * @param rect Anchor rectangle (non-negative width/height).
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_set_anchor_rect(M3Menu *menu, const M3Rect *rect);
+CMP_API int CMP_CALL m3_menu_set_anchor_rect(M3Menu *menu, const CMPRect *rect);
 
 /**
  * @brief Set the menu anchor point (context menus).
  * @param menu Menu instance.
  * @param x Anchor X position in pixels.
  * @param y Anchor Y position in pixels.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_set_anchor_point(M3Menu *menu, M3Scalar x,
-                                            M3Scalar y);
+CMP_API int CMP_CALL m3_menu_set_anchor_point(M3Menu *menu, CMPScalar x,
+                                            CMPScalar y);
 
 /**
  * @brief Update the menu placement settings.
  * @param menu Menu instance.
  * @param placement Placement descriptor.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_set_placement(M3Menu *menu,
+CMP_API int CMP_CALL m3_menu_set_placement(M3Menu *menu,
                                          const M3MenuPlacement *placement);
 
 /**
  * @brief Open or close the menu (updates widget hidden flag).
  * @param menu Menu instance.
- * @param open M3_TRUE to open, M3_FALSE to close.
- * @return M3_OK on success or a failure code.
+ * @param open CMP_TRUE to open, CMP_FALSE to close.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_set_open(M3Menu *menu, M3Bool open);
+CMP_API int CMP_CALL m3_menu_set_open(M3Menu *menu, CMPBool open);
 
 /**
  * @brief Retrieve the open state of the menu.
  * @param menu Menu instance.
- * @param out_open Receives M3_TRUE when open.
- * @return M3_OK on success or a failure code.
+ * @param out_open Receives CMP_TRUE when open.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_get_open(const M3Menu *menu, M3Bool *out_open);
+CMP_API int CMP_CALL m3_menu_get_open(const M3Menu *menu, CMPBool *out_open);
 
 /**
  * @brief Retrieve the current menu panel bounds.
  * @param menu Menu instance.
  * @param out_bounds Receives the menu bounds.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_get_bounds(const M3Menu *menu, M3Rect *out_bounds);
+CMP_API int CMP_CALL m3_menu_get_bounds(const M3Menu *menu, CMPRect *out_bounds);
 
 /**
  * @brief Retrieve the current overlay bounds.
  * @param menu Menu instance.
  * @param out_bounds Receives the overlay bounds.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_get_overlay_bounds(const M3Menu *menu,
-                                              M3Rect *out_bounds);
+CMP_API int CMP_CALL m3_menu_get_overlay_bounds(const M3Menu *menu,
+                                              CMPRect *out_bounds);
 
 /**
  * @brief Retrieve the resolved menu direction after collision handling.
  * @param menu Menu instance.
  * @param out_direction Receives the resolved direction.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_get_resolved_direction(const M3Menu *menu,
-                                                  m3_u32 *out_direction);
+CMP_API int CMP_CALL m3_menu_get_resolved_direction(const M3Menu *menu,
+                                                  cmp_u32 *out_direction);
 
 /**
  * @brief Retrieve the bounds for a menu item.
  * @param menu Menu instance.
  * @param index Item index.
  * @param out_bounds Receives the item bounds.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_get_item_bounds(const M3Menu *menu, m3_usize index,
-                                           M3Rect *out_bounds);
+CMP_API int CMP_CALL m3_menu_get_item_bounds(const M3Menu *menu, cmp_usize index,
+                                           CMPRect *out_bounds);
 
 /**
  * @brief Assign a menu action callback.
  * @param menu Menu instance.
  * @param on_action Action callback (may be NULL).
  * @param ctx Callback context pointer.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_set_on_action(M3Menu *menu, M3MenuOnAction on_action,
+CMP_API int CMP_CALL m3_menu_set_on_action(M3Menu *menu, CMPMenuOnAction on_action,
                                          void *ctx);
 
-#ifdef M3_TESTING
+#ifdef CMP_TESTING
 /**
  * @brief Test hook to force negative panel size computation.
- * @param enable M3_TRUE to force a negative size on the next computation.
- * @return M3_OK on success or a failure code.
+ * @param enable CMP_TRUE to force a negative size on the next computation.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_set_force_negative_panel(M3Bool enable);
+CMP_API int CMP_CALL m3_menu_test_set_force_negative_panel(CMPBool enable);
 
 /**
  * @brief Test hook to force overflow clamping in panel bounds.
- * @param enable M3_TRUE to force bounds overflow on the next computation.
- * @return M3_OK on success or a failure code.
+ * @param enable CMP_TRUE to force bounds overflow on the next computation.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_set_force_bounds_overflow(M3Bool enable);
+CMP_API int CMP_CALL m3_menu_test_set_force_bounds_overflow(CMPBool enable);
 
 /**
  * @brief Test hook to force hit-test rectangle errors.
- * @param enable M3_TRUE to inject a hit-test error on the next check.
- * @return M3_OK on success or a failure code.
+ * @param enable CMP_TRUE to inject a hit-test error on the next check.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_set_force_hit_test_error(M3Bool enable);
+CMP_API int CMP_CALL m3_menu_test_set_force_hit_test_error(CMPBool enable);
 
 /**
  * @brief Test wrapper for menu style validation.
  * @param style Menu style to validate.
  * @param require_family Whether a family name is required.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_validate_style(const M3MenuStyle *style,
-                                               M3Bool require_family);
+CMP_API int CMP_CALL m3_menu_test_validate_style(const M3MenuStyle *style,
+                                               CMPBool require_family);
 
 /**
  * @brief Test wrapper for menu text metric updates.
  * @param menu Menu instance.
  * @param out_text_width Text width output.
- * @param out_has_label M3_TRUE when any label exists.
- * @return M3_OK on success or a failure code.
+ * @param out_has_label CMP_TRUE when any label exists.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_update_metrics(M3Menu *menu,
-                                               M3Scalar *out_text_width,
-                                               M3Bool *out_has_label);
+CMP_API int CMP_CALL m3_menu_test_update_metrics(M3Menu *menu,
+                                               CMPScalar *out_text_width,
+                                               CMPBool *out_has_label);
 
 /**
  * @brief Test wrapper for computing panel size.
  * @param menu Menu instance.
  * @param out_width Panel width output.
  * @param out_height Panel height output.
- * @param out_has_label M3_TRUE when any label exists.
- * @return M3_OK on success or a failure code.
+ * @param out_has_label CMP_TRUE when any label exists.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_compute_panel_size(M3Menu *menu,
-                                                   M3Scalar *out_width,
-                                                   M3Scalar *out_height,
-                                                   M3Bool *out_has_label);
+CMP_API int CMP_CALL m3_menu_test_compute_panel_size(M3Menu *menu,
+                                                   CMPScalar *out_width,
+                                                   CMPScalar *out_height,
+                                                   CMPBool *out_has_label);
 
 /**
  * @brief Test wrapper for computing panel bounds.
@@ -331,31 +331,31 @@ M3_API int M3_CALL m3_menu_test_compute_panel_size(M3Menu *menu,
  * @param panel_height Panel height.
  * @param out_bounds Computed panel bounds.
  * @param out_direction Resolved direction.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_compute_panel_bounds(
-    const M3Menu *menu, const M3Rect *overlay, M3Scalar panel_width,
-    M3Scalar panel_height, M3Rect *out_bounds, m3_u32 *out_direction);
+CMP_API int CMP_CALL m3_menu_test_compute_panel_bounds(
+    const M3Menu *menu, const CMPRect *overlay, CMPScalar panel_width,
+    CMPScalar panel_height, CMPRect *out_bounds, cmp_u32 *out_direction);
 
 /**
  * @brief Test wrapper for hit testing.
  * @param menu Menu instance.
  * @param x X coordinate in pixels.
  * @param y Y coordinate in pixels.
- * @param out_inside M3_TRUE when the point is inside.
+ * @param out_inside CMP_TRUE when the point is inside.
  * @param out_index Hit item index (or M3_MENU_INVALID_INDEX).
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_hit_test(const M3Menu *menu, M3Scalar x,
-                                         M3Scalar y, M3Bool *out_inside,
-                                         m3_usize *out_index);
+CMP_API int CMP_CALL m3_menu_test_hit_test(const M3Menu *menu, CMPScalar x,
+                                         CMPScalar y, CMPBool *out_inside,
+                                         cmp_usize *out_index);
 
 /**
  * @brief Test wrapper for color validation.
  * @param color Color to validate.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_validate_color(const M3Color *color);
+CMP_API int CMP_CALL m3_menu_test_validate_color(const CMPColor *color);
 
 /**
  * @brief Test wrapper for setting a color.
@@ -364,64 +364,64 @@ M3_API int M3_CALL m3_menu_test_validate_color(const M3Color *color);
  * @param g Green component (0..1).
  * @param b Blue component (0..1).
  * @param a Alpha component (0..1).
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_color_set(M3Color *color, M3Scalar r,
-                                          M3Scalar g, M3Scalar b, M3Scalar a);
+CMP_API int CMP_CALL m3_menu_test_color_set(CMPColor *color, CMPScalar r,
+                                          CMPScalar g, CMPScalar b, CMPScalar a);
 
 /**
  * @brief Test wrapper for edge validation.
  * @param edges Edge descriptor to validate.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_validate_edges(const M3LayoutEdges *edges);
+CMP_API int CMP_CALL m3_menu_test_validate_edges(const CMPLayoutEdges *edges);
 
 /**
  * @brief Test wrapper for text style validation.
  * @param style Text style to validate.
  * @param require_family Whether a family name is required.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_validate_text_style(const M3TextStyle *style,
-                                                    M3Bool require_family);
+CMP_API int CMP_CALL m3_menu_test_validate_text_style(const CMPTextStyle *style,
+                                                    CMPBool require_family);
 
 /**
  * @brief Test wrapper for measure spec validation.
  * @param spec Measure spec to validate.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_validate_measure_spec(M3MeasureSpec spec);
+CMP_API int CMP_CALL m3_menu_test_validate_measure_spec(CMPMeasureSpec spec);
 
 /**
  * @brief Test wrapper for rectangle validation.
  * @param rect Rectangle to validate.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_validate_rect(const M3Rect *rect);
+CMP_API int CMP_CALL m3_menu_test_validate_rect(const CMPRect *rect);
 
 /**
  * @brief Test wrapper for anchor validation.
  * @param anchor Anchor descriptor to validate.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_validate_anchor(const M3MenuAnchor *anchor);
+CMP_API int CMP_CALL m3_menu_test_validate_anchor(const M3MenuAnchor *anchor);
 
 /**
  * @brief Test wrapper for placement validation.
  * @param placement Placement descriptor to validate.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL
+CMP_API int CMP_CALL
 m3_menu_test_validate_placement(const M3MenuPlacement *placement);
 
 /**
  * @brief Test wrapper for menu item validation.
  * @param items Item array to validate.
  * @param count Item count.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_menu_test_validate_items(const M3MenuItem *items,
-                                               m3_usize count);
+CMP_API int CMP_CALL m3_menu_test_validate_items(const M3MenuItem *items,
+                                               cmp_usize count);
 #endif
 
 #ifdef __cplusplus

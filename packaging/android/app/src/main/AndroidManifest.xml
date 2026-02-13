@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.libm3c.sample">
+    package="com.libcmpc.sample">
 
     <application
         android:allowBackup="true"

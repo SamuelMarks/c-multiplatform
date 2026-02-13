@@ -1,2 +1,2 @@
-rootProject.name = "libm3c-android"
+rootProject.name = "libcmpc-android"
 include(":app")

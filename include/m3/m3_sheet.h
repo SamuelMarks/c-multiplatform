@@ -3,16 +3,16 @@
 
 /**
  * @file m3_sheet.h
- * @brief Bottom sheet widgets for LibM3C.
+ * @brief Bottom sheet widgets for LibCMPC.
  */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "m3_api_ui.h"
-#include "m3_layout.h"
-#include "m3_visuals.h"
+#include "cmpc/cmp_api_ui.h"
+#include "cmpc/cmp_layout.h"
+#include "cmpc/cmp_visuals.h"
 
 /** @brief Standard bottom sheet variant. */
 #define M3_SHEET_VARIANT_STANDARD 1
@@ -57,85 +57,85 @@ struct M3Sheet;
  * @brief Bottom sheet action callback signature.
  * @param ctx User callback context pointer.
  * @param sheet Bottom sheet instance that triggered the action.
- * @param action Action identifier (M3_SHEET_ACTION_*).
- * @return M3_OK on success or a failure code.
+ * @param action Action identifier (CMP_SHEET_ACTION_*).
+ * @return CMP_OK on success or a failure code.
  */
-typedef int(M3_CALL *M3SheetOnAction)(void *ctx, struct M3Sheet *sheet,
-                                      m3_u32 action);
+typedef int(CMP_CALL *CMPSheetOnAction)(void *ctx, struct M3Sheet *sheet,
+                                      cmp_u32 action);
 
 /**
  * @brief Bottom sheet style descriptor.
  */
 typedef struct M3SheetStyle {
-  m3_u32 variant;        /**< Sheet variant (M3_SHEET_VARIANT_*). */
-  M3LayoutEdges padding; /**< Padding around sheet contents. */
-  M3Scalar height;       /**< Preferred sheet height in pixels (>= 0). */
-  M3Scalar min_height;   /**< Minimum sheet height in pixels (>= 0). */
-  M3Scalar max_height; /**< Maximum sheet height in pixels (>= 0, 0 = none). */
-  M3Scalar max_width;  /**< Maximum sheet width in pixels (>= 0, 0 = none). */
-  M3Scalar corner_radius; /**< Sheet corner radius in pixels (>= 0). */
-  M3Scalar
+  cmp_u32 variant;        /**< Sheet variant (CMP_SHEET_VARIANT_*). */
+  CMPLayoutEdges padding; /**< Padding around sheet contents. */
+  CMPScalar height;       /**< Preferred sheet height in pixels (>= 0). */
+  CMPScalar min_height;   /**< Minimum sheet height in pixels (>= 0). */
+  CMPScalar max_height; /**< Maximum sheet height in pixels (>= 0, 0 = none). */
+  CMPScalar max_width;  /**< Maximum sheet width in pixels (>= 0, 0 = none). */
+  CMPScalar corner_radius; /**< Sheet corner radius in pixels (>= 0). */
+  CMPScalar
       dismiss_threshold; /**< Fraction of height needed to dismiss (0..1). */
-  M3Scalar min_fling_velocity; /**< Minimum downward fling velocity for dismiss
+  CMPScalar min_fling_velocity; /**< Minimum downward fling velocity for dismiss
                                   (>= 0). */
-  M3Scalar spring_stiffness;   /**< Spring stiffness (> 0). */
-  M3Scalar spring_damping;     /**< Spring damping (>= 0). */
-  M3Scalar spring_mass;        /**< Spring mass (> 0). */
-  M3Scalar spring_tolerance;   /**< Spring rest position tolerance (>= 0). */
-  M3Scalar spring_rest_velocity; /**< Spring rest velocity tolerance (>= 0). */
-  M3Color background_color;      /**< Sheet background color. */
-  M3Color scrim_color;           /**< Scrim color used behind the sheet. */
-  M3Shadow shadow;               /**< Shadow descriptor. */
-  M3Bool shadow_enabled; /**< M3_TRUE when shadow rendering is enabled. */
-  M3Bool scrim_enabled;  /**< M3_TRUE when scrim rendering is enabled. */
+  CMPScalar spring_stiffness;   /**< Spring stiffness (> 0). */
+  CMPScalar spring_damping;     /**< Spring damping (>= 0). */
+  CMPScalar spring_mass;        /**< Spring mass (> 0). */
+  CMPScalar spring_tolerance;   /**< Spring rest position tolerance (>= 0). */
+  CMPScalar spring_rest_velocity; /**< Spring rest velocity tolerance (>= 0). */
+  CMPColor background_color;      /**< Sheet background color. */
+  CMPColor scrim_color;           /**< Scrim color used behind the sheet. */
+  CMPShadow shadow;               /**< Shadow descriptor. */
+  CMPBool shadow_enabled; /**< CMP_TRUE when shadow rendering is enabled. */
+  CMPBool scrim_enabled;  /**< CMP_TRUE when scrim rendering is enabled. */
 } M3SheetStyle;
 
 /**
  * @brief Bottom sheet widget instance.
  */
 typedef struct M3Sheet {
-  M3Widget widget;       /**< Widget interface (points to this instance). */
+  CMPWidget widget;       /**< Widget interface (points to this instance). */
   M3SheetStyle style;    /**< Current sheet style. */
-  M3Rect overlay_bounds; /**< Bounds of the overlay region. */
-  M3Rect sheet_bounds;   /**< Bounds of the sheet at rest (open state). */
-  M3Scalar offset;       /**< Current vertical offset from the open state. */
-  M3Scalar drag_start_offset; /**< Offset at the start of a drag gesture. */
-  M3Bool dragging;            /**< M3_TRUE when a drag gesture is active. */
-  M3Bool open;                /**< M3_TRUE when the sheet is open. */
-  M3AnimController anim;      /**< Spring animation controller. */
-  M3SheetOnAction on_action;  /**< Action callback (may be NULL). */
+  CMPRect overlay_bounds; /**< Bounds of the overlay region. */
+  CMPRect sheet_bounds;   /**< Bounds of the sheet at rest (open state). */
+  CMPScalar offset;       /**< Current vertical offset from the open state. */
+  CMPScalar drag_start_offset; /**< Offset at the start of a drag gesture. */
+  CMPBool dragging;            /**< CMP_TRUE when a drag gesture is active. */
+  CMPBool open;                /**< CMP_TRUE when the sheet is open. */
+  CMPAnimController anim;      /**< Spring animation controller. */
+  CMPSheetOnAction on_action;  /**< Action callback (may be NULL). */
   void *on_action_ctx;        /**< Action callback context pointer. */
 } M3Sheet;
 
 /**
  * @brief Initialize a standard bottom sheet style with defaults.
  * @param style Style descriptor to initialize.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_sheet_style_init_standard(M3SheetStyle *style);
+CMP_API int CMP_CALL m3_sheet_style_init_standard(M3SheetStyle *style);
 
 /**
  * @brief Initialize a modal bottom sheet style with defaults.
  * @param style Style descriptor to initialize.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_sheet_style_init_modal(M3SheetStyle *style);
+CMP_API int CMP_CALL m3_sheet_style_init_modal(M3SheetStyle *style);
 
 /**
  * @brief Initialize a bottom sheet widget.
  * @param sheet Sheet instance.
  * @param style Sheet style descriptor.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_sheet_init(M3Sheet *sheet, const M3SheetStyle *style);
+CMP_API int CMP_CALL m3_sheet_init(M3Sheet *sheet, const M3SheetStyle *style);
 
 /**
  * @brief Update the sheet style.
  * @param sheet Sheet instance.
  * @param style New sheet style descriptor.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_sheet_set_style(M3Sheet *sheet,
+CMP_API int CMP_CALL m3_sheet_set_style(M3Sheet *sheet,
                                       const M3SheetStyle *style);
 
 /**
@@ -143,54 +143,54 @@ M3_API int M3_CALL m3_sheet_set_style(M3Sheet *sheet,
  * @param sheet Sheet instance.
  * @param on_action Action callback (may be NULL to clear).
  * @param ctx Callback context pointer.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_sheet_set_on_action(M3Sheet *sheet,
-                                          M3SheetOnAction on_action, void *ctx);
+CMP_API int CMP_CALL m3_sheet_set_on_action(M3Sheet *sheet,
+                                          CMPSheetOnAction on_action, void *ctx);
 
 /**
  * @brief Set the open state of the sheet.
  * @param sheet Sheet instance.
- * @param open M3_TRUE to open, M3_FALSE to close.
- * @return M3_OK on success or a failure code.
+ * @param open CMP_TRUE to open, CMP_FALSE to close.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_sheet_set_open(M3Sheet *sheet, M3Bool open);
+CMP_API int CMP_CALL m3_sheet_set_open(M3Sheet *sheet, CMPBool open);
 
 /**
  * @brief Retrieve the open state of the sheet.
  * @param sheet Sheet instance.
- * @param out_open Receives M3_TRUE when open.
- * @return M3_OK on success or a failure code.
+ * @param out_open Receives CMP_TRUE when open.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_sheet_get_open(const M3Sheet *sheet, M3Bool *out_open);
+CMP_API int CMP_CALL m3_sheet_get_open(const M3Sheet *sheet, CMPBool *out_open);
 
 /**
  * @brief Step sheet animations.
  * @param sheet Sheet instance.
  * @param dt Delta time in seconds (>= 0).
- * @param out_changed Receives M3_TRUE when visual state changed.
- * @return M3_OK on success or a failure code.
+ * @param out_changed Receives CMP_TRUE when visual state changed.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_sheet_step(M3Sheet *sheet, M3Scalar dt,
-                                 M3Bool *out_changed);
+CMP_API int CMP_CALL m3_sheet_step(M3Sheet *sheet, CMPScalar dt,
+                                 CMPBool *out_changed);
 
 /**
  * @brief Retrieve the current sheet bounds.
  * @param sheet Sheet instance.
  * @param out_bounds Receives the current sheet bounds.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_sheet_get_bounds(const M3Sheet *sheet,
-                                       M3Rect *out_bounds);
+CMP_API int CMP_CALL m3_sheet_get_bounds(const M3Sheet *sheet,
+                                       CMPRect *out_bounds);
 
 /**
  * @brief Compute content bounds inside the sheet.
  * @param sheet Sheet instance.
  * @param out_bounds Receives the content bounds.
- * @return M3_OK on success or a failure code.
+ * @return CMP_OK on success or a failure code.
  */
-M3_API int M3_CALL m3_sheet_get_content_bounds(const M3Sheet *sheet,
-                                               M3Rect *out_bounds);
+CMP_API int CMP_CALL m3_sheet_get_content_bounds(const M3Sheet *sheet,
+                                               CMPRect *out_bounds);
 
 #ifdef __cplusplus
 } /* extern "C" */

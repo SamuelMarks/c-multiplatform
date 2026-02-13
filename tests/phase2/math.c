@@ -1,41 +1,41 @@
-#include "m3/m3_math.h"
+#include "cmpc/cmp_math.h"
 #include "test_utils.h"
 
 #include <string.h>
 
-#define M3_TEST_EPS 1.0e-4f
+#define CMP_TEST_EPS 1.0e-4f
 
-static int m3_float_near(M3Scalar a, M3Scalar b) {
-  M3Scalar diff;
+static int cmp_float_near(CMPScalar a, CMPScalar b) {
+  CMPScalar diff;
 
   diff = a - b;
   if (diff < 0.0f) {
     diff = -diff;
   }
 
-  return (diff <= M3_TEST_EPS) ? 1 : 0;
+  return (diff <= CMP_TEST_EPS) ? 1 : 0;
 }
 
 int main(void) {
-  M3Rect a = {0};
-  M3Rect b = {0};
-  M3Rect out;
-  M3Bool hit;
-  M3Mat3 mat;
-  M3Mat3 mat2;
-  M3Mat3 mat3;
-  M3Scalar out_x;
-  M3Scalar out_y;
-  M3Scalar angle;
+  CMPRect a = {0};
+  CMPRect b = {0};
+  CMPRect out;
+  CMPBool hit;
+  CMPMat3 mat;
+  CMPMat3 mat2;
+  CMPMat3 mat3;
+  CMPScalar out_x;
+  CMPScalar out_y;
+  CMPScalar angle;
 
-  M3_TEST_EXPECT(m3_rect_intersect(NULL, &b, &out, &hit),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_rect_intersect(&a, NULL, &out, &hit),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_rect_intersect(&a, &b, NULL, &hit),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_rect_intersect(&a, &b, &out, NULL),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_rect_intersect(NULL, &b, &out, &hit),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_rect_intersect(&a, NULL, &out, &hit),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_rect_intersect(&a, &b, NULL, &hit),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_rect_intersect(&a, &b, &out, NULL),
+                 CMP_ERR_INVALID_ARGUMENT);
 
   a.x = 0.0f;
   a.y = 0.0f;
@@ -43,7 +43,7 @@ int main(void) {
   a.height = 1.0f;
   b = a;
   b.width = 1.0f;
-  M3_TEST_EXPECT(m3_rect_intersect(&a, &b, &out, &hit), M3_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_rect_intersect(&a, &b, &out, &hit), CMP_ERR_RANGE);
 
   a.x = 0.0f;
   a.y = 0.0f;
@@ -53,35 +53,35 @@ int main(void) {
   b.y = 5.0f;
   b.width = 1.0f;
   b.height = 1.0f;
-  M3_TEST_OK(m3_rect_intersect(&a, &b, &out, &hit));
-  M3_TEST_ASSERT(hit == M3_FALSE);
-  M3_TEST_ASSERT(out.width == 0.0f);
+  CMP_TEST_OK(cmp_rect_intersect(&a, &b, &out, &hit));
+  CMP_TEST_ASSERT(hit == CMP_FALSE);
+  CMP_TEST_ASSERT(out.width == 0.0f);
 
   b.x = 1.0f;
   b.y = 1.0f;
   b.width = 2.0f;
   b.height = 2.0f;
-  M3_TEST_OK(m3_rect_intersect(&a, &b, &out, &hit));
-  M3_TEST_ASSERT(hit == M3_TRUE);
-  M3_TEST_ASSERT(m3_float_near(out.x, 1.0f));
-  M3_TEST_ASSERT(m3_float_near(out.y, 1.0f));
-  M3_TEST_ASSERT(m3_float_near(out.width, 1.0f));
-  M3_TEST_ASSERT(m3_float_near(out.height, 1.0f));
+  CMP_TEST_OK(cmp_rect_intersect(&a, &b, &out, &hit));
+  CMP_TEST_ASSERT(hit == CMP_TRUE);
+  CMP_TEST_ASSERT(cmp_float_near(out.x, 1.0f));
+  CMP_TEST_ASSERT(cmp_float_near(out.y, 1.0f));
+  CMP_TEST_ASSERT(cmp_float_near(out.width, 1.0f));
+  CMP_TEST_ASSERT(cmp_float_near(out.height, 1.0f));
 
   b.x = 2.0f;
   b.y = 0.0f;
   b.width = 1.0f;
   b.height = 1.0f;
-  M3_TEST_OK(m3_rect_intersect(&a, &b, &out, &hit));
-  M3_TEST_ASSERT(hit == M3_FALSE);
+  CMP_TEST_OK(cmp_rect_intersect(&a, &b, &out, &hit));
+  CMP_TEST_ASSERT(hit == CMP_FALSE);
 
-  M3_TEST_EXPECT(m3_rect_union(NULL, &b, &out), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_rect_union(&a, NULL, &out), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_rect_union(&a, &b, NULL), M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_rect_union(NULL, &b, &out), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_rect_union(&a, NULL, &out), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_rect_union(&a, &b, NULL), CMP_ERR_INVALID_ARGUMENT);
 
   a.width = -1.0f;
   b.width = 1.0f;
-  M3_TEST_EXPECT(m3_rect_union(&a, &b, &out), M3_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_rect_union(&a, &b, &out), CMP_ERR_RANGE);
 
   a.x = 0.0f;
   a.y = 0.0f;
@@ -91,85 +91,85 @@ int main(void) {
   b.y = -2.0f;
   b.width = 1.0f;
   b.height = 1.0f;
-  M3_TEST_OK(m3_rect_union(&a, &b, &out));
-  M3_TEST_ASSERT(m3_float_near(out.x, -1.0f));
-  M3_TEST_ASSERT(m3_float_near(out.y, -2.0f));
-  M3_TEST_ASSERT(m3_float_near(out.width, 3.0f));
-  M3_TEST_ASSERT(m3_float_near(out.height, 4.0f));
+  CMP_TEST_OK(cmp_rect_union(&a, &b, &out));
+  CMP_TEST_ASSERT(cmp_float_near(out.x, -1.0f));
+  CMP_TEST_ASSERT(cmp_float_near(out.y, -2.0f));
+  CMP_TEST_ASSERT(cmp_float_near(out.width, 3.0f));
+  CMP_TEST_ASSERT(cmp_float_near(out.height, 4.0f));
 
-  M3_TEST_EXPECT(m3_rect_contains_point(NULL, 0.0f, 0.0f, &hit),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_rect_contains_point(&a, 0.0f, 0.0f, NULL),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_rect_contains_point(NULL, 0.0f, 0.0f, &hit),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_rect_contains_point(&a, 0.0f, 0.0f, NULL),
+                 CMP_ERR_INVALID_ARGUMENT);
 
   a.width = -1.0f;
   a.height = 1.0f;
-  M3_TEST_EXPECT(m3_rect_contains_point(&a, 0.0f, 0.0f, &hit), M3_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_rect_contains_point(&a, 0.0f, 0.0f, &hit), CMP_ERR_RANGE);
 
   a.x = 0.0f;
   a.y = 0.0f;
   a.width = 10.0f;
   a.height = 10.0f;
-  M3_TEST_OK(m3_rect_contains_point(&a, 0.0f, 0.0f, &hit));
-  M3_TEST_ASSERT(hit == M3_TRUE);
-  M3_TEST_OK(m3_rect_contains_point(&a, -1.0f, 5.0f, &hit));
-  M3_TEST_ASSERT(hit == M3_FALSE);
-  M3_TEST_OK(m3_rect_contains_point(&a, 9.0f, 9.0f, &hit));
-  M3_TEST_ASSERT(hit == M3_TRUE);
-  M3_TEST_OK(m3_rect_contains_point(&a, 10.0f, 10.0f, &hit));
-  M3_TEST_ASSERT(hit == M3_FALSE);
+  CMP_TEST_OK(cmp_rect_contains_point(&a, 0.0f, 0.0f, &hit));
+  CMP_TEST_ASSERT(hit == CMP_TRUE);
+  CMP_TEST_OK(cmp_rect_contains_point(&a, -1.0f, 5.0f, &hit));
+  CMP_TEST_ASSERT(hit == CMP_FALSE);
+  CMP_TEST_OK(cmp_rect_contains_point(&a, 9.0f, 9.0f, &hit));
+  CMP_TEST_ASSERT(hit == CMP_TRUE);
+  CMP_TEST_OK(cmp_rect_contains_point(&a, 10.0f, 10.0f, &hit));
+  CMP_TEST_ASSERT(hit == CMP_FALSE);
 
   a.width = 0.0f;
   a.height = 0.0f;
-  M3_TEST_OK(m3_rect_contains_point(&a, 0.0f, 0.0f, &hit));
-  M3_TEST_ASSERT(hit == M3_FALSE);
+  CMP_TEST_OK(cmp_rect_contains_point(&a, 0.0f, 0.0f, &hit));
+  CMP_TEST_ASSERT(hit == CMP_FALSE);
 
-  M3_TEST_EXPECT(m3_mat3_identity(NULL), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_OK(m3_mat3_identity(&mat));
-  M3_TEST_ASSERT(m3_float_near(mat.m[0], 1.0f));
-  M3_TEST_ASSERT(m3_float_near(mat.m[4], 1.0f));
-  M3_TEST_ASSERT(m3_float_near(mat.m[8], 1.0f));
+  CMP_TEST_EXPECT(cmp_mat3_identity(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(cmp_mat3_identity(&mat));
+  CMP_TEST_ASSERT(cmp_float_near(mat.m[0], 1.0f));
+  CMP_TEST_ASSERT(cmp_float_near(mat.m[4], 1.0f));
+  CMP_TEST_ASSERT(cmp_float_near(mat.m[8], 1.0f));
 
-  M3_TEST_EXPECT(m3_mat3_mul(NULL, &mat, &mat2), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_mat3_mul(&mat, NULL, &mat2), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_mat3_mul(&mat, &mat2, NULL), M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_mat3_mul(NULL, &mat, &mat2), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_mat3_mul(&mat, NULL, &mat2), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_mat3_mul(&mat, &mat2, NULL), CMP_ERR_INVALID_ARGUMENT);
 
-  M3_TEST_OK(m3_mat3_translate(2.0f, 3.0f, &mat2));
-  M3_TEST_OK(m3_mat3_mul(&mat, &mat2, &mat3));
-  M3_TEST_ASSERT(m3_float_near(mat3.m[6], 2.0f));
-  M3_TEST_ASSERT(m3_float_near(mat3.m[7], 3.0f));
+  CMP_TEST_OK(cmp_mat3_translate(2.0f, 3.0f, &mat2));
+  CMP_TEST_OK(cmp_mat3_mul(&mat, &mat2, &mat3));
+  CMP_TEST_ASSERT(cmp_float_near(mat3.m[6], 2.0f));
+  CMP_TEST_ASSERT(cmp_float_near(mat3.m[7], 3.0f));
 
-  M3_TEST_OK(m3_mat3_mul(&mat2, &mat, &mat3));
-  M3_TEST_ASSERT(m3_float_near(mat3.m[6], 2.0f));
-  M3_TEST_ASSERT(m3_float_near(mat3.m[7], 3.0f));
+  CMP_TEST_OK(cmp_mat3_mul(&mat2, &mat, &mat3));
+  CMP_TEST_ASSERT(cmp_float_near(mat3.m[6], 2.0f));
+  CMP_TEST_ASSERT(cmp_float_near(mat3.m[7], 3.0f));
 
-  M3_TEST_OK(m3_mat3_scale(2.0f, 3.0f, &mat2));
-  M3_TEST_OK(m3_mat3_translate(5.0f, 7.0f, &mat3));
-  M3_TEST_OK(m3_mat3_mul(&mat3, &mat2, &mat));
-  M3_TEST_OK(m3_mat3_transform_point(&mat, 1.0f, 1.0f, &out_x, &out_y));
-  M3_TEST_ASSERT(m3_float_near(out_x, 7.0f));
-  M3_TEST_ASSERT(m3_float_near(out_y, 10.0f));
+  CMP_TEST_OK(cmp_mat3_scale(2.0f, 3.0f, &mat2));
+  CMP_TEST_OK(cmp_mat3_translate(5.0f, 7.0f, &mat3));
+  CMP_TEST_OK(cmp_mat3_mul(&mat3, &mat2, &mat));
+  CMP_TEST_OK(cmp_mat3_transform_point(&mat, 1.0f, 1.0f, &out_x, &out_y));
+  CMP_TEST_ASSERT(cmp_float_near(out_x, 7.0f));
+  CMP_TEST_ASSERT(cmp_float_near(out_y, 10.0f));
 
-  M3_TEST_EXPECT(m3_mat3_translate(0.0f, 0.0f, NULL), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_mat3_scale(0.0f, 0.0f, NULL), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_mat3_rotate(0.0f, NULL), M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_mat3_translate(0.0f, 0.0f, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_mat3_scale(0.0f, 0.0f, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_mat3_rotate(0.0f, NULL), CMP_ERR_INVALID_ARGUMENT);
 
-  angle = (M3Scalar)(3.14159265f / 2.0f);
-  M3_TEST_OK(m3_mat3_rotate(angle, &mat));
-  M3_TEST_OK(m3_mat3_transform_point(&mat, 1.0f, 0.0f, &out_x, &out_y));
-  M3_TEST_ASSERT(m3_float_near(out_x, 0.0f));
-  M3_TEST_ASSERT(m3_float_near(out_y, 1.0f));
+  angle = (CMPScalar)(3.14159265f / 2.0f);
+  CMP_TEST_OK(cmp_mat3_rotate(angle, &mat));
+  CMP_TEST_OK(cmp_mat3_transform_point(&mat, 1.0f, 0.0f, &out_x, &out_y));
+  CMP_TEST_ASSERT(cmp_float_near(out_x, 0.0f));
+  CMP_TEST_ASSERT(cmp_float_near(out_y, 1.0f));
 
-  M3_TEST_EXPECT(m3_mat3_transform_point(NULL, 0.0f, 0.0f, &out_x, &out_y),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_mat3_transform_point(&mat, 0.0f, 0.0f, NULL, &out_y),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_mat3_transform_point(&mat, 0.0f, 0.0f, &out_x, NULL),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_mat3_transform_point(NULL, 0.0f, 0.0f, &out_x, &out_y),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_mat3_transform_point(&mat, 0.0f, 0.0f, NULL, &out_y),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_mat3_transform_point(&mat, 0.0f, 0.0f, &out_x, NULL),
+                 CMP_ERR_INVALID_ARGUMENT);
 
   memset(&mat, 0, sizeof(mat));
-  M3_TEST_EXPECT(m3_mat3_transform_point(&mat, 1.0f, 1.0f, &out_x, &out_y),
-                 M3_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_mat3_transform_point(&mat, 1.0f, 1.0f, &out_x, &out_y),
+                 CMP_ERR_RANGE);
 
   return 0;
 }

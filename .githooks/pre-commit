@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+root_dir=$(git rev-parse --show-toplevel)
+
+"${root_dir}/tools/update_coverage_badges.sh"
+
+git add "${root_dir}/docs/badges/test-coverage.svg"
+git add "${root_dir}/docs/badges/doc-coverage.svg"

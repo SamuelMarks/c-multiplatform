@@ -1,4 +1,4 @@
-#include "m3/m3_store.h"
+#include "cmpc/cmp_store.h"
 #include "test_utils.h"
 
 #include <stdlib.h>
@@ -14,28 +14,28 @@ typedef struct TestAllocCtx {
   int free_calls;
 } TestAllocCtx;
 
-static int M3_CALL test_alloc(void *ctx, m3_usize size, void **out_ptr) {
+static int CMP_CALL test_alloc(void *ctx, cmp_usize size, void **out_ptr) {
   TestAllocCtx *state;
   void *mem;
 
   if (out_ptr == NULL) {
-    return M3_ERR_INVALID_ARGUMENT;
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   *out_ptr = NULL;
 
   if (size == 0) {
-    return M3_ERR_INVALID_ARGUMENT;
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   state = (TestAllocCtx *)ctx;
   if (state != NULL && state->fail_after >= 0 &&
       state->alloc_calls >= state->fail_after) {
-    return M3_ERR_OUT_OF_MEMORY;
+    return CMP_ERR_OUT_OF_MEMORY;
   }
 
   mem = malloc((size_t)size);
   if (mem == NULL) {
-    return M3_ERR_OUT_OF_MEMORY;
+    return CMP_ERR_OUT_OF_MEMORY;
   }
 
   if (state != NULL) {
@@ -43,32 +43,32 @@ static int M3_CALL test_alloc(void *ctx, m3_usize size, void **out_ptr) {
   }
 
   *out_ptr = mem;
-  return M3_OK;
+  return CMP_OK;
 }
 
-static int M3_CALL test_realloc(void *ctx, void *ptr, m3_usize size,
+static int CMP_CALL test_realloc(void *ctx, void *ptr, cmp_usize size,
                                 void **out_ptr) {
   TestAllocCtx *state;
   void *mem;
 
   if (out_ptr == NULL) {
-    return M3_ERR_INVALID_ARGUMENT;
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   *out_ptr = NULL;
 
   if (size == 0) {
-    return M3_ERR_INVALID_ARGUMENT;
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   state = (TestAllocCtx *)ctx;
   if (state != NULL && state->fail_after >= 0 &&
       state->alloc_calls >= state->fail_after) {
-    return M3_ERR_OUT_OF_MEMORY;
+    return CMP_ERR_OUT_OF_MEMORY;
   }
 
   mem = realloc(ptr, (size_t)size);
   if (mem == NULL) {
-    return M3_ERR_OUT_OF_MEMORY;
+    return CMP_ERR_OUT_OF_MEMORY;
   }
 
   if (state != NULL) {
@@ -76,10 +76,10 @@ static int M3_CALL test_realloc(void *ctx, void *ptr, m3_usize size,
   }
 
   *out_ptr = mem;
-  return M3_OK;
+  return CMP_OK;
 }
 
-static int M3_CALL test_free(void *ctx, void *ptr) {
+static int CMP_CALL test_free(void *ctx, void *ptr) {
   TestAllocCtx *state;
 
   state = (TestAllocCtx *)ctx;
@@ -89,7 +89,7 @@ static int M3_CALL test_free(void *ctx, void *ptr) {
   if (state != NULL) {
     state->free_calls += 1;
   }
-  return M3_OK;
+  return CMP_OK;
 }
 
 #define ACTION_ADD 1
@@ -97,15 +97,15 @@ static int M3_CALL test_free(void *ctx, void *ptr) {
 #define ACTION_FAIL 3
 #define ACTION_UNSUPPORTED 4
 
-static int M3_CALL counter_reducer(void *ctx, const M3Action *action,
+static int CMP_CALL counter_reducer(void *ctx, const CMPAction *action,
                                    const void *prev_state, void *next_state) {
   const CounterState *prev;
   CounterState *next;
 
-  M3_UNUSED(ctx);
+  CMP_UNUSED(ctx);
 
   if (action == NULL || prev_state == NULL || next_state == NULL) {
-    return M3_ERR_INVALID_ARGUMENT;
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   prev = (const CounterState *)prev_state;
@@ -115,20 +115,20 @@ static int M3_CALL counter_reducer(void *ctx, const M3Action *action,
   switch (action->type) {
   case ACTION_ADD:
     if (action->data == NULL || action->size != sizeof(int)) {
-      return M3_ERR_INVALID_ARGUMENT;
+      return CMP_ERR_INVALID_ARGUMENT;
     }
     next->value += *(const int *)action->data;
-    return M3_OK;
+    return CMP_OK;
   case ACTION_SET:
     if (action->data == NULL || action->size != sizeof(int)) {
-      return M3_ERR_INVALID_ARGUMENT;
+      return CMP_ERR_INVALID_ARGUMENT;
     }
     next->value = *(const int *)action->data;
-    return M3_OK;
+    return CMP_OK;
   case ACTION_FAIL:
-    return M3_ERR_UNKNOWN;
+    return CMP_ERR_UNKNOWN;
   default:
-    return M3_ERR_UNSUPPORTED;
+    return CMP_ERR_UNSUPPORTED;
   }
 }
 
@@ -139,25 +139,25 @@ static void init_alloc(TestAllocCtx *ctx, int fail_after) {
 }
 
 int main(void) {
-  M3Store store;
-  M3Store store_zero;
-  M3Store temp_store;
-  M3StoreConfig config;
-  M3StoreConfig bad_config;
-  M3Allocator bad_alloc;
-  M3Allocator test_allocator;
+  CMPStore store;
+  CMPStore store_zero;
+  CMPStore temp_store;
+  CMPStoreConfig config;
+  CMPStoreConfig bad_config;
+  CMPAllocator bad_alloc;
+  CMPAllocator test_allocator;
   TestAllocCtx alloc_ctx;
   CounterState initial;
   CounterState state;
   CounterState snapshot;
   const void *state_ptr;
-  m3_usize size;
-  m3_usize count;
-  M3Bool can_undo;
-  M3Bool can_redo;
-  M3Action action;
+  cmp_usize size;
+  cmp_usize count;
+  CMPBool can_undo;
+  CMPBool can_redo;
+  CMPAction action;
   int delta;
-  m3_usize max_size;
+  cmp_usize max_size;
 
   memset(&store, 0, sizeof(store));
   memset(&store_zero, 0, sizeof(store_zero));
@@ -173,89 +173,89 @@ int main(void) {
   config.reducer = counter_reducer;
   config.reducer_ctx = NULL;
 
-  M3_TEST_EXPECT(m3_store_init(NULL, &config, &initial),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_init(&store, NULL, &initial),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_init(NULL, &config, &initial),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_init(&store, NULL, &initial),
+                 CMP_ERR_INVALID_ARGUMENT);
 
   bad_config = config;
   bad_config.state_size = 0;
   bad_config.reducer = counter_reducer;
-  M3_TEST_EXPECT(m3_store_init(&store, &bad_config, &initial),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_init(&store, &bad_config, &initial),
+                 CMP_ERR_INVALID_ARGUMENT);
 
   bad_config.state_size = sizeof(CounterState);
   bad_config.reducer = NULL;
-  M3_TEST_EXPECT(m3_store_init(&store, &bad_config, &initial),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_init(&store, &bad_config, &initial),
+                 CMP_ERR_INVALID_ARGUMENT);
 
   config.allocator = &bad_alloc;
   config.state_size = sizeof(CounterState);
   config.history_capacity = 2;
   config.reducer = counter_reducer;
   config.reducer_ctx = NULL;
-  M3_TEST_EXPECT(m3_store_init(&store, &config, &initial),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_init(&store, &config, &initial),
+                 CMP_ERR_INVALID_ARGUMENT);
 
-  max_size = (m3_usize) ~(m3_usize)0;
+  max_size = (cmp_usize) ~(cmp_usize)0;
   config.allocator = NULL;
   config.state_size = max_size;
   config.history_capacity = 2;
   config.reducer = counter_reducer;
   config.reducer_ctx = NULL;
-  M3_TEST_EXPECT(m3_store_init(&store, &config, &initial), M3_ERR_OVERFLOW);
+  CMP_TEST_EXPECT(cmp_store_init(&store, &config, &initial), CMP_ERR_OVERFLOW);
 
   config.state_size = sizeof(CounterState);
 
-#ifdef M3_TESTING
-  M3_TEST_OK(m3_core_test_set_default_allocator_fail(M3_TRUE));
-  M3_TEST_EXPECT(m3_store_init(&store, &config, &initial), M3_ERR_UNKNOWN);
-  M3_TEST_OK(m3_core_test_set_default_allocator_fail(M3_FALSE));
+#ifdef CMP_TESTING
+  CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
+  CMP_TEST_EXPECT(cmp_store_init(&store, &config, &initial), CMP_ERR_UNKNOWN);
+  CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
 
-  M3_TEST_EXPECT(m3_store_test_mul_overflow(1, 1, NULL),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_test_mul_overflow(1, 1, NULL),
+                 CMP_ERR_INVALID_ARGUMENT);
   {
-    m3_u8 history_buffer[8];
-    m3_usize history_count;
+    cmp_u8 history_buffer[8];
+    cmp_usize history_count;
     CounterState history_state;
 
     history_state.value = 0;
     history_count = 0;
-    M3_TEST_EXPECT(m3_store_test_history_push(NULL, 1, sizeof(history_state),
+    CMP_TEST_EXPECT(cmp_store_test_history_push(NULL, 1, sizeof(history_state),
                                               &history_count, &history_state),
-                   M3_ERR_INVALID_ARGUMENT);
-    M3_TEST_EXPECT(m3_store_test_history_push(history_buffer, 1,
+                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_test_history_push(history_buffer, 1,
                                               sizeof(history_state), NULL,
                                               &history_state),
-                   M3_ERR_INVALID_ARGUMENT);
-    M3_TEST_EXPECT(m3_store_test_history_push(history_buffer, 1,
+                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_test_history_push(history_buffer, 1,
                                               sizeof(history_state),
                                               &history_count, NULL),
-                   M3_ERR_INVALID_ARGUMENT);
+                   CMP_ERR_INVALID_ARGUMENT);
 
-    M3_TEST_EXPECT(m3_store_test_history_pop(NULL, 1, sizeof(history_state),
+    CMP_TEST_EXPECT(cmp_store_test_history_pop(NULL, 1, sizeof(history_state),
                                              &history_count, &history_state),
-                   M3_ERR_INVALID_ARGUMENT);
-    M3_TEST_EXPECT(m3_store_test_history_pop(history_buffer, 1,
+                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_test_history_pop(history_buffer, 1,
                                              sizeof(history_state), NULL,
                                              &history_state),
-                   M3_ERR_INVALID_ARGUMENT);
-    M3_TEST_EXPECT(m3_store_test_history_pop(history_buffer, 1,
+                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_test_history_pop(history_buffer, 1,
                                              sizeof(history_state),
                                              &history_count, NULL),
-                   M3_ERR_INVALID_ARGUMENT);
-    M3_TEST_EXPECT(m3_store_test_history_pop(history_buffer, 0,
+                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_test_history_pop(history_buffer, 0,
                                              sizeof(history_state),
                                              &history_count, &history_state),
-                   M3_ERR_NOT_FOUND);
+                   CMP_ERR_NOT_FOUND);
 
-    M3_TEST_EXPECT(m3_store_test_copy_history(NULL, 1, sizeof(history_state), 1,
+    CMP_TEST_EXPECT(cmp_store_test_copy_history(NULL, 1, sizeof(history_state), 1,
                                               0, &history_state),
-                   M3_ERR_INVALID_ARGUMENT);
-    M3_TEST_EXPECT(m3_store_test_copy_history(history_buffer, 0,
+                   CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_test_copy_history(history_buffer, 0,
                                               sizeof(history_state), 1, 0,
                                               &history_state),
-                   M3_ERR_NOT_FOUND);
+                   CMP_ERR_NOT_FOUND);
   }
 #endif
 
@@ -266,180 +266,180 @@ int main(void) {
   test_allocator.free = test_free;
   config.allocator = &test_allocator;
   config.history_capacity = 1;
-  M3_TEST_EXPECT(m3_store_init(&temp_store, &config, &initial),
-                 M3_ERR_OUT_OF_MEMORY);
+  CMP_TEST_EXPECT(cmp_store_init(&temp_store, &config, &initial),
+                 CMP_ERR_OUT_OF_MEMORY);
 
   init_alloc(&alloc_ctx, 1);
-  M3_TEST_EXPECT(m3_store_init(&temp_store, &config, &initial),
-                 M3_ERR_OUT_OF_MEMORY);
-  M3_TEST_ASSERT(alloc_ctx.free_calls == 1);
+  CMP_TEST_EXPECT(cmp_store_init(&temp_store, &config, &initial),
+                 CMP_ERR_OUT_OF_MEMORY);
+  CMP_TEST_ASSERT(alloc_ctx.free_calls == 1);
 
   init_alloc(&alloc_ctx, 2);
-  M3_TEST_EXPECT(m3_store_init(&temp_store, &config, &initial),
-                 M3_ERR_OUT_OF_MEMORY);
-  M3_TEST_ASSERT(alloc_ctx.free_calls == 2);
+  CMP_TEST_EXPECT(cmp_store_init(&temp_store, &config, &initial),
+                 CMP_ERR_OUT_OF_MEMORY);
+  CMP_TEST_ASSERT(alloc_ctx.free_calls == 2);
 
   init_alloc(&alloc_ctx, 3);
-  M3_TEST_EXPECT(m3_store_init(&temp_store, &config, &initial),
-                 M3_ERR_OUT_OF_MEMORY);
-  M3_TEST_ASSERT(alloc_ctx.free_calls == 3);
+  CMP_TEST_EXPECT(cmp_store_init(&temp_store, &config, &initial),
+                 CMP_ERR_OUT_OF_MEMORY);
+  CMP_TEST_ASSERT(alloc_ctx.free_calls == 3);
 
   config.allocator = NULL;
   config.history_capacity = 2;
-  M3_TEST_OK(m3_store_init(&store, &config, &initial));
+  CMP_TEST_OK(cmp_store_init(&store, &config, &initial));
 
-  M3_TEST_EXPECT(m3_store_get_state_ptr(NULL, &state_ptr, &size),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_get_state_ptr(&store, NULL, &size),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_get_state_ptr(&store, &state_ptr, NULL),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_OK(m3_store_get_state_ptr(&store, &state_ptr, &size));
-  M3_TEST_ASSERT(size == sizeof(CounterState));
-  M3_TEST_ASSERT(((const CounterState *)state_ptr)->value == 1);
+  CMP_TEST_EXPECT(cmp_store_get_state_ptr(NULL, &state_ptr, &size),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_get_state_ptr(&store, NULL, &size),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_get_state_ptr(&store, &state_ptr, NULL),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(cmp_store_get_state_ptr(&store, &state_ptr, &size));
+  CMP_TEST_ASSERT(size == sizeof(CounterState));
+  CMP_TEST_ASSERT(((const CounterState *)state_ptr)->value == 1);
 
-  M3_TEST_EXPECT(m3_store_get_state(NULL, &state, sizeof(state)),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_get_state(&store, NULL, sizeof(state)),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_get_state(&store, &state, sizeof(state) - 1),
-                 M3_ERR_RANGE);
-  M3_TEST_OK(m3_store_get_state(&store, &state, sizeof(state)));
-  M3_TEST_ASSERT(state.value == 1);
+  CMP_TEST_EXPECT(cmp_store_get_state(NULL, &state, sizeof(state)),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_get_state(&store, NULL, sizeof(state)),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_get_state(&store, &state, sizeof(state) - 1),
+                 CMP_ERR_RANGE);
+  CMP_TEST_OK(cmp_store_get_state(&store, &state, sizeof(state)));
+  CMP_TEST_ASSERT(state.value == 1);
 
-  M3_TEST_EXPECT(m3_store_can_undo(NULL, &can_undo), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_can_undo(&store, NULL), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_can_redo(NULL, &can_redo), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_can_redo(&store, NULL), M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_can_undo(NULL, &can_undo), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_can_undo(&store, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_can_redo(NULL, &can_redo), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_can_redo(&store, NULL), CMP_ERR_INVALID_ARGUMENT);
 
-  M3_TEST_OK(m3_store_can_undo(&store, &can_undo));
-  M3_TEST_OK(m3_store_can_redo(&store, &can_redo));
-  M3_TEST_ASSERT(can_undo == M3_FALSE);
-  M3_TEST_ASSERT(can_redo == M3_FALSE);
+  CMP_TEST_OK(cmp_store_can_undo(&store, &can_undo));
+  CMP_TEST_OK(cmp_store_can_redo(&store, &can_redo));
+  CMP_TEST_ASSERT(can_undo == CMP_FALSE);
+  CMP_TEST_ASSERT(can_redo == CMP_FALSE);
 
   delta = 0;
   action.type = ACTION_SET;
   action.data = &delta;
   action.size = sizeof(delta);
-  M3_TEST_EXPECT(m3_store_dispatch(NULL, &action), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_dispatch(&store, NULL), M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_dispatch(NULL, &action), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_dispatch(&store, NULL), CMP_ERR_INVALID_ARGUMENT);
 
   action.type = ACTION_ADD;
   action.data = NULL;
   action.size = sizeof(int);
-  M3_TEST_EXPECT(m3_store_dispatch(&store, &action), M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_dispatch(&store, &action), CMP_ERR_INVALID_ARGUMENT);
 
   action.type = ACTION_UNSUPPORTED;
   action.data = NULL;
   action.size = 0;
-  M3_TEST_EXPECT(m3_store_dispatch(&store, &action), M3_ERR_UNSUPPORTED);
+  CMP_TEST_EXPECT(cmp_store_dispatch(&store, &action), CMP_ERR_UNSUPPORTED);
 
   action.type = ACTION_FAIL;
   action.data = NULL;
   action.size = 0;
-  M3_TEST_EXPECT(m3_store_dispatch(&store, &action), M3_ERR_UNKNOWN);
-  M3_TEST_OK(m3_store_get_state(&store, &state, sizeof(state)));
-  M3_TEST_ASSERT(state.value == 1);
+  CMP_TEST_EXPECT(cmp_store_dispatch(&store, &action), CMP_ERR_UNKNOWN);
+  CMP_TEST_OK(cmp_store_get_state(&store, &state, sizeof(state)));
+  CMP_TEST_ASSERT(state.value == 1);
 
   delta = 1;
   action.type = ACTION_ADD;
   action.data = &delta;
   action.size = sizeof(delta);
-  M3_TEST_OK(m3_store_dispatch(&store, &action));
-  M3_TEST_OK(m3_store_get_state(&store, &state, sizeof(state)));
-  M3_TEST_ASSERT(state.value == 2);
+  CMP_TEST_OK(cmp_store_dispatch(&store, &action));
+  CMP_TEST_OK(cmp_store_get_state(&store, &state, sizeof(state)));
+  CMP_TEST_ASSERT(state.value == 2);
 
-  M3_TEST_OK(m3_store_get_undo_count(&store, &count));
-  M3_TEST_ASSERT(count == 1);
-  M3_TEST_OK(m3_store_get_redo_count(&store, &count));
-  M3_TEST_ASSERT(count == 0);
+  CMP_TEST_OK(cmp_store_get_undo_count(&store, &count));
+  CMP_TEST_ASSERT(count == 1);
+  CMP_TEST_OK(cmp_store_get_redo_count(&store, &count));
+  CMP_TEST_ASSERT(count == 0);
 
-  M3_TEST_OK(m3_store_dispatch(&store, &action));
-  M3_TEST_OK(m3_store_dispatch(&store, &action));
-  M3_TEST_OK(m3_store_get_state(&store, &state, sizeof(state)));
-  M3_TEST_ASSERT(state.value == 4);
+  CMP_TEST_OK(cmp_store_dispatch(&store, &action));
+  CMP_TEST_OK(cmp_store_dispatch(&store, &action));
+  CMP_TEST_OK(cmp_store_get_state(&store, &state, sizeof(state)));
+  CMP_TEST_ASSERT(state.value == 4);
 
-  M3_TEST_OK(m3_store_get_undo_count(&store, &count));
-  M3_TEST_ASSERT(count == 2);
+  CMP_TEST_OK(cmp_store_get_undo_count(&store, &count));
+  CMP_TEST_ASSERT(count == 2);
 
-  M3_TEST_OK(m3_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot)));
-  M3_TEST_ASSERT(snapshot.value == 3);
-  M3_TEST_OK(m3_store_copy_undo_state(&store, 1, &snapshot, sizeof(snapshot)));
-  M3_TEST_ASSERT(snapshot.value == 2);
-  M3_TEST_EXPECT(
-      m3_store_copy_undo_state(&store, 2, &snapshot, sizeof(snapshot)),
-      M3_ERR_NOT_FOUND);
-  M3_TEST_EXPECT(
-      m3_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot) - 1),
-      M3_ERR_RANGE);
-  M3_TEST_EXPECT(m3_store_copy_undo_state(&store, 0, NULL, sizeof(snapshot)),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(cmp_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot)));
+  CMP_TEST_ASSERT(snapshot.value == 3);
+  CMP_TEST_OK(cmp_store_copy_undo_state(&store, 1, &snapshot, sizeof(snapshot)));
+  CMP_TEST_ASSERT(snapshot.value == 2);
+  CMP_TEST_EXPECT(
+      cmp_store_copy_undo_state(&store, 2, &snapshot, sizeof(snapshot)),
+      CMP_ERR_NOT_FOUND);
+  CMP_TEST_EXPECT(
+      cmp_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot) - 1),
+      CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_store_copy_undo_state(&store, 0, NULL, sizeof(snapshot)),
+                 CMP_ERR_INVALID_ARGUMENT);
 
-  M3_TEST_OK(m3_store_undo(&store));
-  M3_TEST_OK(m3_store_get_state(&store, &state, sizeof(state)));
-  M3_TEST_ASSERT(state.value == 3);
-  M3_TEST_OK(m3_store_undo(&store));
-  M3_TEST_OK(m3_store_get_state(&store, &state, sizeof(state)));
-  M3_TEST_ASSERT(state.value == 2);
-  M3_TEST_EXPECT(m3_store_undo(&store), M3_ERR_NOT_FOUND);
+  CMP_TEST_OK(cmp_store_undo(&store));
+  CMP_TEST_OK(cmp_store_get_state(&store, &state, sizeof(state)));
+  CMP_TEST_ASSERT(state.value == 3);
+  CMP_TEST_OK(cmp_store_undo(&store));
+  CMP_TEST_OK(cmp_store_get_state(&store, &state, sizeof(state)));
+  CMP_TEST_ASSERT(state.value == 2);
+  CMP_TEST_EXPECT(cmp_store_undo(&store), CMP_ERR_NOT_FOUND);
 
-  M3_TEST_OK(m3_store_get_redo_count(&store, &count));
-  M3_TEST_ASSERT(count == 2);
-  M3_TEST_OK(m3_store_copy_redo_state(&store, 0, &snapshot, sizeof(snapshot)));
-  M3_TEST_ASSERT(snapshot.value == 3);
-  M3_TEST_OK(m3_store_copy_redo_state(&store, 1, &snapshot, sizeof(snapshot)));
-  M3_TEST_ASSERT(snapshot.value == 4);
-  M3_TEST_EXPECT(m3_store_copy_redo_state(&store, 0, NULL, sizeof(snapshot)),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(cmp_store_get_redo_count(&store, &count));
+  CMP_TEST_ASSERT(count == 2);
+  CMP_TEST_OK(cmp_store_copy_redo_state(&store, 0, &snapshot, sizeof(snapshot)));
+  CMP_TEST_ASSERT(snapshot.value == 3);
+  CMP_TEST_OK(cmp_store_copy_redo_state(&store, 1, &snapshot, sizeof(snapshot)));
+  CMP_TEST_ASSERT(snapshot.value == 4);
+  CMP_TEST_EXPECT(cmp_store_copy_redo_state(&store, 0, NULL, sizeof(snapshot)),
+                 CMP_ERR_INVALID_ARGUMENT);
 
-  M3_TEST_OK(m3_store_redo(&store));
-  M3_TEST_OK(m3_store_get_state(&store, &state, sizeof(state)));
-  M3_TEST_ASSERT(state.value == 3);
-  M3_TEST_OK(m3_store_redo(&store));
-  M3_TEST_OK(m3_store_get_state(&store, &state, sizeof(state)));
-  M3_TEST_ASSERT(state.value == 4);
-  M3_TEST_EXPECT(m3_store_redo(&store), M3_ERR_NOT_FOUND);
+  CMP_TEST_OK(cmp_store_redo(&store));
+  CMP_TEST_OK(cmp_store_get_state(&store, &state, sizeof(state)));
+  CMP_TEST_ASSERT(state.value == 3);
+  CMP_TEST_OK(cmp_store_redo(&store));
+  CMP_TEST_OK(cmp_store_get_state(&store, &state, sizeof(state)));
+  CMP_TEST_ASSERT(state.value == 4);
+  CMP_TEST_EXPECT(cmp_store_redo(&store), CMP_ERR_NOT_FOUND);
 
-  M3_TEST_OK(m3_store_clear_history(&store));
-  M3_TEST_OK(m3_store_get_undo_count(&store, &count));
-  M3_TEST_ASSERT(count == 0);
-  M3_TEST_OK(m3_store_get_redo_count(&store, &count));
-  M3_TEST_ASSERT(count == 0);
+  CMP_TEST_OK(cmp_store_clear_history(&store));
+  CMP_TEST_OK(cmp_store_get_undo_count(&store, &count));
+  CMP_TEST_ASSERT(count == 0);
+  CMP_TEST_OK(cmp_store_get_redo_count(&store, &count));
+  CMP_TEST_ASSERT(count == 0);
 
-  M3_TEST_EXPECT(
-      m3_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot)),
-      M3_ERR_NOT_FOUND);
-  M3_TEST_EXPECT(
-      m3_store_copy_redo_state(&store, 0, &snapshot, sizeof(snapshot)),
-      M3_ERR_NOT_FOUND);
-  M3_TEST_EXPECT(
-      m3_store_copy_redo_state(&store, 0, &snapshot, sizeof(snapshot) - 1),
-      M3_ERR_RANGE);
+  CMP_TEST_EXPECT(
+      cmp_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot)),
+      CMP_ERR_NOT_FOUND);
+  CMP_TEST_EXPECT(
+      cmp_store_copy_redo_state(&store, 0, &snapshot, sizeof(snapshot)),
+      CMP_ERR_NOT_FOUND);
+  CMP_TEST_EXPECT(
+      cmp_store_copy_redo_state(&store, 0, &snapshot, sizeof(snapshot) - 1),
+      CMP_ERR_RANGE);
 
-  M3_TEST_EXPECT(m3_store_get_undo_count(NULL, &count),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_get_undo_count(&store, NULL),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_get_redo_count(NULL, &count),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_get_redo_count(&store, NULL),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_get_undo_count(NULL, &count),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_get_undo_count(&store, NULL),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_get_redo_count(NULL, &count),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_get_redo_count(&store, NULL),
+                 CMP_ERR_INVALID_ARGUMENT);
 
   {
-    M3Store temp_store_local;
+    CMPStore temp_store_local;
     void *saved_undo;
     void *saved_redo;
-    m3_usize saved_undo_count;
-    m3_usize saved_redo_count;
+    cmp_usize saved_undo_count;
+    cmp_usize saved_redo_count;
 
     memset(&temp_store_local, 0, sizeof(temp_store_local));
-    M3_TEST_OK(m3_store_init(&temp_store_local, &config, &initial));
+    CMP_TEST_OK(cmp_store_init(&temp_store_local, &config, &initial));
 
     delta = 1;
     action.type = ACTION_ADD;
     action.data = &delta;
     action.size = sizeof(delta);
-    M3_TEST_OK(m3_store_dispatch(&temp_store_local, &action));
+    CMP_TEST_OK(cmp_store_dispatch(&temp_store_local, &action));
 
     saved_undo = temp_store_local.undo_buffer;
     saved_redo = temp_store_local.redo_buffer;
@@ -447,81 +447,81 @@ int main(void) {
     saved_redo_count = temp_store_local.redo_count;
 
     temp_store_local.undo_buffer = NULL;
-    M3_TEST_EXPECT(m3_store_dispatch(&temp_store_local, &action),
-                   M3_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_dispatch(&temp_store_local, &action),
+                   CMP_ERR_INVALID_ARGUMENT);
     temp_store_local.undo_buffer = saved_undo;
 
     temp_store_local.redo_buffer = NULL;
     temp_store_local.undo_count = saved_undo_count;
-    M3_TEST_EXPECT(m3_store_undo(&temp_store_local), M3_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_undo(&temp_store_local), CMP_ERR_INVALID_ARGUMENT);
     temp_store_local.redo_buffer = saved_redo;
 
     temp_store_local.undo_buffer = NULL;
     temp_store_local.undo_count = saved_undo_count;
     temp_store_local.redo_count = saved_redo_count;
-    M3_TEST_EXPECT(m3_store_undo(&temp_store_local), M3_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_undo(&temp_store_local), CMP_ERR_INVALID_ARGUMENT);
     temp_store_local.undo_buffer = saved_undo;
 
     temp_store_local.undo_buffer = NULL;
     temp_store_local.redo_count = 1;
-    M3_TEST_EXPECT(m3_store_redo(&temp_store_local), M3_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_redo(&temp_store_local), CMP_ERR_INVALID_ARGUMENT);
     temp_store_local.undo_buffer = saved_undo;
 
     temp_store_local.redo_buffer = NULL;
     temp_store_local.redo_count = 1;
-    M3_TEST_EXPECT(m3_store_redo(&temp_store_local), M3_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_redo(&temp_store_local), CMP_ERR_INVALID_ARGUMENT);
     temp_store_local.redo_buffer = saved_redo;
     temp_store_local.redo_count = saved_redo_count;
     temp_store_local.undo_count = saved_undo_count;
 
-    M3_TEST_OK(m3_store_shutdown(&temp_store_local));
+    CMP_TEST_OK(cmp_store_shutdown(&temp_store_local));
   }
 
-  M3_TEST_OK(m3_store_shutdown(&store));
-  M3_TEST_EXPECT(m3_store_shutdown(&store), M3_ERR_STATE);
+  CMP_TEST_OK(cmp_store_shutdown(&store));
+  CMP_TEST_EXPECT(cmp_store_shutdown(&store), CMP_ERR_STATE);
 
-  M3_TEST_EXPECT(m3_store_dispatch(&store, &action), M3_ERR_STATE);
-  M3_TEST_EXPECT(m3_store_get_state(&store, &state, sizeof(state)),
-                 M3_ERR_STATE);
-  M3_TEST_EXPECT(m3_store_can_undo(&store, &can_undo), M3_ERR_STATE);
-  M3_TEST_EXPECT(m3_store_can_redo(&store, &can_redo), M3_ERR_STATE);
-  M3_TEST_EXPECT(m3_store_undo(&store), M3_ERR_STATE);
-  M3_TEST_EXPECT(m3_store_redo(&store), M3_ERR_STATE);
-  M3_TEST_EXPECT(m3_store_get_undo_count(&store, &count), M3_ERR_STATE);
-  M3_TEST_EXPECT(m3_store_get_redo_count(&store, &count), M3_ERR_STATE);
-  M3_TEST_EXPECT(
-      m3_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot)),
-      M3_ERR_STATE);
-  M3_TEST_EXPECT(
-      m3_store_copy_redo_state(&store, 0, &snapshot, sizeof(snapshot)),
-      M3_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_store_dispatch(&store, &action), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_store_get_state(&store, &state, sizeof(state)),
+                 CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_store_can_undo(&store, &can_undo), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_store_can_redo(&store, &can_redo), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_store_undo(&store), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_store_redo(&store), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_store_get_undo_count(&store, &count), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_store_get_redo_count(&store, &count), CMP_ERR_STATE);
+  CMP_TEST_EXPECT(
+      cmp_store_copy_undo_state(&store, 0, &snapshot, sizeof(snapshot)),
+      CMP_ERR_STATE);
+  CMP_TEST_EXPECT(
+      cmp_store_copy_redo_state(&store, 0, &snapshot, sizeof(snapshot)),
+      CMP_ERR_STATE);
 
   config.allocator = NULL;
   config.history_capacity = 0;
-  M3_TEST_OK(m3_store_init(&store_zero, &config, NULL));
+  CMP_TEST_OK(cmp_store_init(&store_zero, &config, NULL));
   action.type = ACTION_SET;
   delta = 5;
   action.data = &delta;
   action.size = sizeof(delta);
-  M3_TEST_OK(m3_store_dispatch(&store_zero, &action));
-  M3_TEST_OK(m3_store_get_state(&store_zero, &state, sizeof(state)));
-  M3_TEST_ASSERT(state.value == 5);
-  M3_TEST_EXPECT(m3_store_undo(&store_zero), M3_ERR_NOT_FOUND);
-  M3_TEST_EXPECT(m3_store_redo(&store_zero), M3_ERR_NOT_FOUND);
-  M3_TEST_OK(m3_store_shutdown(&store_zero));
+  CMP_TEST_OK(cmp_store_dispatch(&store_zero, &action));
+  CMP_TEST_OK(cmp_store_get_state(&store_zero, &state, sizeof(state)));
+  CMP_TEST_ASSERT(state.value == 5);
+  CMP_TEST_EXPECT(cmp_store_undo(&store_zero), CMP_ERR_NOT_FOUND);
+  CMP_TEST_EXPECT(cmp_store_redo(&store_zero), CMP_ERR_NOT_FOUND);
+  CMP_TEST_OK(cmp_store_shutdown(&store_zero));
 
-  M3_TEST_EXPECT(m3_store_undo(NULL), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_redo(NULL), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_clear_history(NULL), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_copy_undo_state(NULL, 0, &snapshot, sizeof(snapshot)),
-                 M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_copy_redo_state(NULL, 0, &snapshot, sizeof(snapshot)),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_undo(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_redo(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_clear_history(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_copy_undo_state(NULL, 0, &snapshot, sizeof(snapshot)),
+                 CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_copy_redo_state(NULL, 0, &snapshot, sizeof(snapshot)),
+                 CMP_ERR_INVALID_ARGUMENT);
 
-  M3_TEST_EXPECT(m3_store_shutdown(NULL), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_store_get_state_ptr(&store, &state_ptr, &size),
-                 M3_ERR_STATE);
-  M3_TEST_EXPECT(m3_store_clear_history(&store), M3_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_store_shutdown(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_get_state_ptr(&store, &state_ptr, &size),
+                 CMP_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_store_clear_history(&store), CMP_ERR_STATE);
 
   return 0;
 }

@@ -1,4 +1,4 @@
-PROJECT_NAME           = "LibM3C"
+PROJECT_NAME           = "LibCMPC"
 PROJECT_BRIEF          = "C89 cross-platform application framework"
 OUTPUT_DIRECTORY       = "@CMAKE_CURRENT_BINARY_DIR@/docs"
 CREATE_SUBDIRS         = NO
@@ -28,9 +28,17 @@ QUIET                  = YES
 GENERATE_HTML          = YES
 GENERATE_LATEX         = NO
 
+# Doxygen Awesome CSS (sidebar-only theme)
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+HTML_COLORSTYLE        = LIGHT
+HTML_EXTRA_STYLESHEET  = "@CMAKE_CURRENT_SOURCE_DIR@/docs/node_modules/@xpack-3rd-party/doxygen-awesome-css/doxygen-awesome.css" \
+                          "@CMAKE_CURRENT_SOURCE_DIR@/docs/node_modules/@xpack-3rd-party/doxygen-awesome-css/doxygen-awesome-sidebar-only.css"
+
 STRIP_FROM_PATH        = "@CMAKE_CURRENT_SOURCE_DIR@"
 
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = NO
 
-PREDEFINED             = M3_DOXYGEN
+PREDEFINED             = CMP_DOXYGEN

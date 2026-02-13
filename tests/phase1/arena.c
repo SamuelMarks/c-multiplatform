@@ -1,15 +1,15 @@
-#include "m3/m3_arena.h"
+#include "cmpc/cmp_arena.h"
 #include "test_utils.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct M3ArenaBlockInternal {
-  struct M3ArenaBlockInternal *next;
-  m3_usize capacity;
-  m3_usize offset;
+typedef struct CMPArenaBlockInternal {
+  struct CMPArenaBlockInternal *next;
+  cmp_usize capacity;
+  cmp_usize offset;
   unsigned char data[1];
-} M3ArenaBlockInternal;
+} CMPArenaBlockInternal;
 
 typedef struct TestAllocCtx {
   int fail_alloc;
@@ -18,27 +18,27 @@ typedef struct TestAllocCtx {
   int free_calls;
 } TestAllocCtx;
 
-static int M3_CALL test_alloc(void *ctx, m3_usize size, void **out_ptr) {
+static int CMP_CALL test_alloc(void *ctx, cmp_usize size, void **out_ptr) {
   TestAllocCtx *state;
   void *mem;
 
   if (out_ptr == NULL) {
-    return M3_ERR_INVALID_ARGUMENT;
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   *out_ptr = NULL;
 
   if (size == 0) {
-    return M3_ERR_INVALID_ARGUMENT;
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   state = (TestAllocCtx *)ctx;
   if (state != NULL && state->fail_alloc) {
-    return M3_ERR_OUT_OF_MEMORY;
+    return CMP_ERR_OUT_OF_MEMORY;
   }
 
   mem = malloc((size_t)size);
   if (mem == NULL) {
-    return M3_ERR_OUT_OF_MEMORY;
+    return CMP_ERR_OUT_OF_MEMORY;
   }
 
   if (state != NULL) {
@@ -46,31 +46,31 @@ static int M3_CALL test_alloc(void *ctx, m3_usize size, void **out_ptr) {
   }
 
   *out_ptr = mem;
-  return M3_OK;
+  return CMP_OK;
 }
 
-static int M3_CALL test_realloc(void *ctx, void *ptr, m3_usize size,
+static int CMP_CALL test_realloc(void *ctx, void *ptr, cmp_usize size,
                                 void **out_ptr) {
   TestAllocCtx *state;
   void *mem;
 
   if (out_ptr == NULL) {
-    return M3_ERR_INVALID_ARGUMENT;
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   *out_ptr = NULL;
 
   if (size == 0) {
-    return M3_ERR_INVALID_ARGUMENT;
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   state = (TestAllocCtx *)ctx;
   if (state != NULL && state->fail_alloc) {
-    return M3_ERR_OUT_OF_MEMORY;
+    return CMP_ERR_OUT_OF_MEMORY;
   }
 
   mem = realloc(ptr, (size_t)size);
   if (mem == NULL) {
-    return M3_ERR_OUT_OF_MEMORY;
+    return CMP_ERR_OUT_OF_MEMORY;
   }
 
   if (state != NULL) {
@@ -78,15 +78,15 @@ static int M3_CALL test_realloc(void *ctx, void *ptr, m3_usize size,
   }
 
   *out_ptr = mem;
-  return M3_OK;
+  return CMP_OK;
 }
 
-static int M3_CALL test_free(void *ctx, void *ptr) {
+static int CMP_CALL test_free(void *ctx, void *ptr) {
   TestAllocCtx *state;
 
   state = (TestAllocCtx *)ctx;
   if (state != NULL && state->fail_free) {
-    return M3_ERR_IO;
+    return CMP_ERR_IO;
   }
 
   free(ptr);
@@ -95,28 +95,28 @@ static int M3_CALL test_free(void *ctx, void *ptr) {
     state->free_calls += 1;
   }
 
-  return M3_OK;
+  return CMP_OK;
 }
 
 int main(void) {
-  M3Allocator bad_alloc;
-  M3Arena arena;
-  M3Arena arena_uninit;
-  M3Arena small_arena;
-  M3Arena fail_arena;
-  M3Arena oom_arena;
-  M3Arena corrupt_arena;
-  M3Arena stats_cap_arena;
-  M3Arena stats_used_arena;
-  M3Arena align_overflow_arena;
-  M3Arena shutdown_fail_arena;
-  M3ArenaStats stats;
-  M3Allocator test_allocator;
+  CMPAllocator bad_alloc;
+  CMPArena arena;
+  CMPArena arena_uninit;
+  CMPArena small_arena;
+  CMPArena fail_arena;
+  CMPArena oom_arena;
+  CMPArena corrupt_arena;
+  CMPArena stats_cap_arena;
+  CMPArena stats_used_arena;
+  CMPArena align_overflow_arena;
+  CMPArena shutdown_fail_arena;
+  CMPArenaStats stats;
+  CMPAllocator test_allocator;
   TestAllocCtx test_ctx;
   void *ptr;
   void *ptr2;
-  m3_usize max_size;
-  M3ArenaBlockInternal *block;
+  cmp_usize max_size;
+  CMPArenaBlockInternal *block;
 
   memset(&arena, 0, sizeof(arena));
   memset(&arena_uninit, 0, sizeof(arena_uninit));
@@ -131,108 +131,108 @@ int main(void) {
 
   ptr = NULL;
   ptr2 = NULL;
-  max_size = (m3_usize) ~(m3_usize)0;
+  max_size = (cmp_usize) ~(cmp_usize)0;
 
-  M3_TEST_EXPECT(m3_arena_init(NULL, NULL, 0), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_arena_reset(NULL), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_arena_shutdown(NULL), M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_init(NULL, NULL, 0), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_reset(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_shutdown(NULL), CMP_ERR_INVALID_ARGUMENT);
 
   memset(&bad_alloc, 0, sizeof(bad_alloc));
-  M3_TEST_EXPECT(m3_arena_init(&arena, &bad_alloc, 64),
-                 M3_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_init(&arena, &bad_alloc, 64),
+                 CMP_ERR_INVALID_ARGUMENT);
 
-#ifdef M3_TESTING
-  M3_TEST_OK(m3_core_test_set_default_allocator_fail(M3_TRUE));
-  M3_TEST_EXPECT(m3_arena_init(&arena, NULL, 0), M3_ERR_UNKNOWN);
-  M3_TEST_OK(m3_core_test_set_default_allocator_fail(M3_FALSE));
+#ifdef CMP_TESTING
+  CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
+  CMP_TEST_EXPECT(cmp_arena_init(&arena, NULL, 0), CMP_ERR_UNKNOWN);
+  CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
 #endif
 
-  M3_TEST_OK(m3_arena_init(&arena, NULL, 0));
-  M3_TEST_ASSERT(arena.block_size != 0);
-  M3_TEST_EXPECT(m3_arena_init(&arena, NULL, 0), M3_ERR_STATE);
+  CMP_TEST_OK(cmp_arena_init(&arena, NULL, 0));
+  CMP_TEST_ASSERT(arena.block_size != 0);
+  CMP_TEST_EXPECT(cmp_arena_init(&arena, NULL, 0), CMP_ERR_STATE);
 
-  M3_TEST_EXPECT(m3_arena_get_stats(NULL, &stats), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_arena_get_stats(&arena, NULL), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_arena_get_stats(&arena_uninit, &stats), M3_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_arena_get_stats(NULL, &stats), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_get_stats(&arena, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_get_stats(&arena_uninit, &stats), CMP_ERR_STATE);
 
-  M3_TEST_OK(m3_arena_get_stats(&arena, &stats));
-  M3_TEST_ASSERT(stats.block_count == 1);
-  M3_TEST_ASSERT(stats.total_capacity >= arena.block_size);
-  M3_TEST_ASSERT(stats.total_used == 0);
+  CMP_TEST_OK(cmp_arena_get_stats(&arena, &stats));
+  CMP_TEST_ASSERT(stats.block_count == 1);
+  CMP_TEST_ASSERT(stats.total_capacity >= arena.block_size);
+  CMP_TEST_ASSERT(stats.total_used == 0);
 
-  M3_TEST_EXPECT(m3_arena_alloc(NULL, 8, 4, &ptr), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_arena_alloc(&arena, 0, 4, &ptr), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_arena_alloc(&arena, 8, 0, &ptr), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_arena_alloc(&arena, 8, 3, &ptr), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_arena_alloc(&arena, 8, 4, NULL), M3_ERR_INVALID_ARGUMENT);
-  M3_TEST_EXPECT(m3_arena_alloc(&arena_uninit, 8, 4, &ptr), M3_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_arena_alloc(NULL, 8, 4, &ptr), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 0, 4, &ptr), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 8, 0, &ptr), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 8, 3, &ptr), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 8, 4, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena_uninit, 8, 4, &ptr), CMP_ERR_STATE);
 
-  M3_TEST_OK(m3_arena_alloc(&arena, 16, 8, &ptr));
-  M3_TEST_ASSERT(ptr != NULL);
-  M3_TEST_ASSERT(((m3_usize)ptr % 8) == 0);
+  CMP_TEST_OK(cmp_arena_alloc(&arena, 16, 8, &ptr));
+  CMP_TEST_ASSERT(ptr != NULL);
+  CMP_TEST_ASSERT(((cmp_usize)ptr % 8) == 0);
 
-  M3_TEST_OK(m3_arena_shutdown(&arena));
+  CMP_TEST_OK(cmp_arena_shutdown(&arena));
 
-  M3_TEST_OK(m3_arena_init(&corrupt_arena, NULL, 16));
-  block = (M3ArenaBlockInternal *)corrupt_arena.current;
+  CMP_TEST_OK(cmp_arena_init(&corrupt_arena, NULL, 16));
+  block = (CMPArenaBlockInternal *)corrupt_arena.current;
   block->capacity = 8;
   block->offset = 32;
-  M3_TEST_OK(m3_arena_alloc(&corrupt_arena, 8, 1, &ptr));
-  M3_TEST_OK(m3_arena_shutdown(&corrupt_arena));
+  CMP_TEST_OK(cmp_arena_alloc(&corrupt_arena, 8, 1, &ptr));
+  CMP_TEST_OK(cmp_arena_shutdown(&corrupt_arena));
 
-  M3_TEST_OK(m3_arena_init(&align_overflow_arena, NULL, 16));
-  block = (M3ArenaBlockInternal *)align_overflow_arena.current;
+  CMP_TEST_OK(cmp_arena_init(&align_overflow_arena, NULL, 16));
+  block = (CMPArenaBlockInternal *)align_overflow_arena.current;
   block->offset = max_size;
-  M3_TEST_EXPECT(m3_arena_alloc(&align_overflow_arena, 8, 8, &ptr),
-                 M3_ERR_OVERFLOW);
-  M3_TEST_OK(m3_arena_shutdown(&align_overflow_arena));
+  CMP_TEST_EXPECT(cmp_arena_alloc(&align_overflow_arena, 8, 8, &ptr),
+                 CMP_ERR_OVERFLOW);
+  CMP_TEST_OK(cmp_arena_shutdown(&align_overflow_arena));
 
-#ifdef M3_TESTING
-  M3_TEST_OK(m3_arena_init(&arena, NULL, 16));
-  M3_TEST_OK(m3_arena_alloc(&arena, 8, 8, &ptr));
-  M3_TEST_OK(m3_arena_test_set_force_align_fail(M3_TRUE));
-  M3_TEST_EXPECT(m3_arena_alloc(&arena, 32, 8, &ptr2), M3_ERR_OVERFLOW);
-  M3_TEST_OK(m3_arena_test_set_force_align_fail(M3_FALSE));
-  M3_TEST_OK(m3_arena_shutdown(&arena));
+#ifdef CMP_TESTING
+  CMP_TEST_OK(cmp_arena_init(&arena, NULL, 16));
+  CMP_TEST_OK(cmp_arena_alloc(&arena, 8, 8, &ptr));
+  CMP_TEST_OK(cmp_arena_test_set_force_align_fail(CMP_TRUE));
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 32, 8, &ptr2), CMP_ERR_OVERFLOW);
+  CMP_TEST_OK(cmp_arena_test_set_force_align_fail(CMP_FALSE));
+  CMP_TEST_OK(cmp_arena_shutdown(&arena));
 
-  M3_TEST_OK(m3_arena_init(&arena, NULL, 16));
-  M3_TEST_OK(m3_arena_test_set_force_add_overflow(M3_TRUE));
-  M3_TEST_EXPECT(m3_arena_alloc(&arena, 8, 1, &ptr), M3_ERR_OVERFLOW);
-  M3_TEST_OK(m3_arena_test_set_force_add_overflow(M3_FALSE));
-  M3_TEST_OK(m3_arena_shutdown(&arena));
+  CMP_TEST_OK(cmp_arena_init(&arena, NULL, 16));
+  CMP_TEST_OK(cmp_arena_test_set_force_add_overflow(CMP_TRUE));
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 8, 1, &ptr), CMP_ERR_OVERFLOW);
+  CMP_TEST_OK(cmp_arena_test_set_force_add_overflow(CMP_FALSE));
+  CMP_TEST_OK(cmp_arena_shutdown(&arena));
 #endif
 
-  M3_TEST_OK(m3_arena_init(&small_arena, NULL, 32));
-  M3_TEST_OK(m3_arena_alloc(&small_arena, 24, 8, &ptr));
-  M3_TEST_OK(m3_arena_alloc(&small_arena, 16, 8, &ptr2));
-  M3_TEST_OK(m3_arena_get_stats(&small_arena, &stats));
-  M3_TEST_ASSERT(stats.block_count == 2);
+  CMP_TEST_OK(cmp_arena_init(&small_arena, NULL, 32));
+  CMP_TEST_OK(cmp_arena_alloc(&small_arena, 24, 8, &ptr));
+  CMP_TEST_OK(cmp_arena_alloc(&small_arena, 16, 8, &ptr2));
+  CMP_TEST_OK(cmp_arena_get_stats(&small_arena, &stats));
+  CMP_TEST_ASSERT(stats.block_count == 2);
 
-  M3_TEST_OK(m3_arena_reset(&small_arena));
-  M3_TEST_OK(m3_arena_get_stats(&small_arena, &stats));
-  M3_TEST_ASSERT(stats.block_count == 1);
-  M3_TEST_ASSERT(stats.total_used == 0);
+  CMP_TEST_OK(cmp_arena_reset(&small_arena));
+  CMP_TEST_OK(cmp_arena_get_stats(&small_arena, &stats));
+  CMP_TEST_ASSERT(stats.block_count == 1);
+  CMP_TEST_ASSERT(stats.total_used == 0);
 
-  M3_TEST_OK(m3_arena_shutdown(&small_arena));
+  CMP_TEST_OK(cmp_arena_shutdown(&small_arena));
 
-  M3_TEST_OK(m3_arena_init(&stats_cap_arena, NULL, 16));
-  M3_TEST_OK(m3_arena_alloc(&stats_cap_arena, 16, 1, &ptr));
-  M3_TEST_OK(m3_arena_alloc(&stats_cap_arena, 16, 1, &ptr));
-  block = (M3ArenaBlockInternal *)stats_cap_arena.head;
+  CMP_TEST_OK(cmp_arena_init(&stats_cap_arena, NULL, 16));
+  CMP_TEST_OK(cmp_arena_alloc(&stats_cap_arena, 16, 1, &ptr));
+  CMP_TEST_OK(cmp_arena_alloc(&stats_cap_arena, 16, 1, &ptr));
+  block = (CMPArenaBlockInternal *)stats_cap_arena.head;
   block->capacity = max_size;
-  M3_TEST_EXPECT(m3_arena_get_stats(&stats_cap_arena, &stats), M3_ERR_OVERFLOW);
-  M3_TEST_OK(m3_arena_shutdown(&stats_cap_arena));
+  CMP_TEST_EXPECT(cmp_arena_get_stats(&stats_cap_arena, &stats), CMP_ERR_OVERFLOW);
+  CMP_TEST_OK(cmp_arena_shutdown(&stats_cap_arena));
 
-  M3_TEST_OK(m3_arena_init(&stats_used_arena, NULL, 16));
-  M3_TEST_OK(m3_arena_alloc(&stats_used_arena, 16, 1, &ptr));
-  M3_TEST_OK(m3_arena_alloc(&stats_used_arena, 16, 1, &ptr));
-  block = (M3ArenaBlockInternal *)stats_used_arena.head;
+  CMP_TEST_OK(cmp_arena_init(&stats_used_arena, NULL, 16));
+  CMP_TEST_OK(cmp_arena_alloc(&stats_used_arena, 16, 1, &ptr));
+  CMP_TEST_OK(cmp_arena_alloc(&stats_used_arena, 16, 1, &ptr));
+  block = (CMPArenaBlockInternal *)stats_used_arena.head;
   block->offset = max_size;
-  M3_TEST_EXPECT(m3_arena_get_stats(&stats_used_arena, &stats),
-                 M3_ERR_OVERFLOW);
-  M3_TEST_OK(m3_arena_shutdown(&stats_used_arena));
+  CMP_TEST_EXPECT(cmp_arena_get_stats(&stats_used_arena, &stats),
+                 CMP_ERR_OVERFLOW);
+  CMP_TEST_OK(cmp_arena_shutdown(&stats_used_arena));
 
-  M3_TEST_EXPECT(m3_arena_reset(&arena_uninit), M3_ERR_STATE);
+  CMP_TEST_EXPECT(cmp_arena_reset(&arena_uninit), CMP_ERR_STATE);
 
   memset(&test_ctx, 0, sizeof(test_ctx));
   test_allocator.ctx = &test_ctx;
@@ -241,37 +241,37 @@ int main(void) {
   test_allocator.free = test_free;
 
   test_ctx.fail_alloc = 1;
-  M3_TEST_EXPECT(m3_arena_init(&fail_arena, &test_allocator, 16),
-                 M3_ERR_OUT_OF_MEMORY);
+  CMP_TEST_EXPECT(cmp_arena_init(&fail_arena, &test_allocator, 16),
+                 CMP_ERR_OUT_OF_MEMORY);
   test_ctx.fail_alloc = 0;
 
-  M3_TEST_OK(m3_arena_init(&fail_arena, &test_allocator, 16));
-  M3_TEST_OK(m3_arena_alloc(&fail_arena, 16, 1, &ptr));
-  M3_TEST_OK(m3_arena_alloc(&fail_arena, 16, 1, &ptr));
+  CMP_TEST_OK(cmp_arena_init(&fail_arena, &test_allocator, 16));
+  CMP_TEST_OK(cmp_arena_alloc(&fail_arena, 16, 1, &ptr));
+  CMP_TEST_OK(cmp_arena_alloc(&fail_arena, 16, 1, &ptr));
   test_ctx.fail_free = 1;
-  M3_TEST_EXPECT(m3_arena_reset(&fail_arena), M3_ERR_IO);
+  CMP_TEST_EXPECT(cmp_arena_reset(&fail_arena), CMP_ERR_IO);
   test_ctx.fail_free = 0;
-  M3_TEST_OK(m3_arena_shutdown(&fail_arena));
+  CMP_TEST_OK(cmp_arena_shutdown(&fail_arena));
 
-  M3_TEST_OK(m3_arena_init(&shutdown_fail_arena, &test_allocator, 16));
-  M3_TEST_OK(m3_arena_alloc(&shutdown_fail_arena, 16, 1, &ptr));
+  CMP_TEST_OK(cmp_arena_init(&shutdown_fail_arena, &test_allocator, 16));
+  CMP_TEST_OK(cmp_arena_alloc(&shutdown_fail_arena, 16, 1, &ptr));
   test_ctx.fail_free = 1;
-  M3_TEST_EXPECT(m3_arena_shutdown(&shutdown_fail_arena), M3_ERR_IO);
+  CMP_TEST_EXPECT(cmp_arena_shutdown(&shutdown_fail_arena), CMP_ERR_IO);
   test_ctx.fail_free = 0;
-  M3_TEST_OK(m3_arena_shutdown(&shutdown_fail_arena));
+  CMP_TEST_OK(cmp_arena_shutdown(&shutdown_fail_arena));
 
-  M3_TEST_OK(m3_arena_init(&oom_arena, &test_allocator, 16));
-  M3_TEST_OK(m3_arena_alloc(&oom_arena, 16, 1, &ptr));
+  CMP_TEST_OK(cmp_arena_init(&oom_arena, &test_allocator, 16));
+  CMP_TEST_OK(cmp_arena_alloc(&oom_arena, 16, 1, &ptr));
   test_ctx.fail_alloc = 1;
-  M3_TEST_EXPECT(m3_arena_alloc(&oom_arena, 64, 1, &ptr), M3_ERR_OUT_OF_MEMORY);
+  CMP_TEST_EXPECT(cmp_arena_alloc(&oom_arena, 64, 1, &ptr), CMP_ERR_OUT_OF_MEMORY);
   test_ctx.fail_alloc = 0;
-  M3_TEST_OK(m3_arena_shutdown(&oom_arena));
+  CMP_TEST_OK(cmp_arena_shutdown(&oom_arena));
 
-  M3_TEST_OK(m3_arena_init(&arena, NULL, 16));
-  M3_TEST_EXPECT(m3_arena_alloc(&arena, max_size, 1, &ptr), M3_ERR_OVERFLOW);
-  M3_TEST_OK(m3_arena_shutdown(&arena));
+  CMP_TEST_OK(cmp_arena_init(&arena, NULL, 16));
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, max_size, 1, &ptr), CMP_ERR_OVERFLOW);
+  CMP_TEST_OK(cmp_arena_shutdown(&arena));
 
-  M3_TEST_OK(m3_arena_shutdown(&arena_uninit));
+  CMP_TEST_OK(cmp_arena_shutdown(&arena_uninit));
 
   return 0;
 }

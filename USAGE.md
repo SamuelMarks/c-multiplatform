@@ -1,8 +1,8 @@
 USAGE
 =====
 
-This guide shows how to build LibM3C and wire core widgets (including text fields) into a simple loop.
-Backends are opt-in and compiled behind CMake flags.
+This guide shows how to build LibCMPC and wire core widgets (including text fields) into a simple loop.
+It also notes the current media decoding fallbacks and plugin helpers. Backends are opt-in and compiled behind CMake flags.
 
 Build
 -----
@@ -25,69 +25,84 @@ FetchContent (CMake)
 include(FetchContent)
 
 FetchContent_Declare(
-    m3
+    cmpc
     GIT_REPOSITORY https://github.com/SamuelMarks/c-multiplatform.git
-    GIT_TAG e7be20e2583a21df1b0189c810cb7a969705e023
+    GIT_TAG master
 )
 
-set(M3_ENABLE_SDL3 ON CACHE BOOL "" FORCE)
-set(M3_ENABLE_SDL3_TTF ON CACHE BOOL "" FORCE)
-set(M3_ENABLE_LIBCURL ON CACHE BOOL "" FORCE)
+set(CMP_ENABLE_SDL3 ON CACHE BOOL "" FORCE)
+set(CMP_ENABLE_SDL3_TTF ON CACHE BOOL "" FORCE)
+set(CMP_ENABLE_LIBCURL ON CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(m3)
+FetchContent_MakeAvailable(cmpc)
 
 add_executable(app main.c)
-target_link_libraries(app PRIVATE m3::m3)
+# Core-only usage:
+target_link_libraries(app PRIVATE cmp::cmpc)
+# Material 3 widgets/styles:
+# target_link_libraries(app PRIVATE m3::m3)
 ```
-Use `m3_*_backend_is_available` at runtime to confirm support.
+Pin `GIT_TAG` to a commit or release tag for reproducible builds.
+Use `cmp_*_backend_is_available` at runtime to confirm support.
 
 ```
-cmake -S . -B build -D M3_ENABLE_SDL3=ON -D M3_ENABLE_SDL3_TTF=ON
-cmake -S . -B build -D M3_ENABLE_WEB=ON -D M3_ENABLE_WEBGPU=ON
+cmake -S . -B build -D CMP_ENABLE_SDL3=ON -D CMP_ENABLE_SDL3_TTF=ON
+cmake -S . -B build -D CMP_ENABLE_WEB=ON -D CMP_ENABLE_WEBGPU=ON
 ```
+
+Media Decoding (Fallback)
+-------------------------
+
+LibCMPC ships minimal fallback decoders for development and tests:
+
+- **Images**: PPM (P6) and raw RGBA8 buffers.
+- **Audio**: WAV (PCM16).
+- **Video**: `M3V0` raw RGBA frame container.
+
+Backends can override these via `CMPEnv` for platform-native codecs.
 
 Text Field Example
 ------------------
 
 ```c
-#include "m3/m3_text_field.h"
+#include "cmpc/cmp_text_field.h"
 
-int setup_text_field(M3Gfx *gfx, M3TextField *field) {
-    M3TextBackend backend;
-    M3TextFieldStyle style;
+int setup_text_field(CMPGfx *gfx, CMPTextField *field) {
+    CMPTextBackend backend;
+    CMPTextFieldStyle style;
     int rc;
 
-    rc = m3_text_backend_from_gfx(gfx, &backend);
-    if (rc != M3_OK) return rc;
+    rc = cmp_text_backend_from_gfx(gfx, &backend);
+    if (rc != CMP_OK) return rc;
 
-    rc = m3_text_field_style_init(&style);
-    if (rc != M3_OK) return rc;
+    rc = cmp_text_field_style_init(&style);
+    if (rc != CMP_OK) return rc;
 
     style.text_style.utf8_family = "Sans";
     style.label_style.utf8_family = "Sans";
 
-    rc = m3_text_field_init(field, &backend, &style, NULL, "", 0);
-    if (rc != M3_OK) return rc;
+    rc = cmp_text_field_init(field, &backend, &style, NULL, "", 0);
+    if (rc != CMP_OK) return rc;
 
-    rc = m3_text_field_set_label(field, "Email", 5);
-    if (rc != M3_OK) return rc;
+    rc = cmp_text_field_set_label(field, "Email", 5);
+    if (rc != CMP_OK) return rc;
 
-    rc = m3_text_field_set_placeholder(field, "name@example.com", 16);
-    if (rc != M3_OK) return rc;
+    rc = cmp_text_field_set_placeholder(field, "name@example.com", 16);
+    if (rc != CMP_OK) return rc;
 
-    return M3_OK;
+    return CMP_OK;
 }
 ```
 
 Driving Animations
 ------------------
 
-Text fields animate their floating labels and cursor blink. Call `m3_text_field_step` each frame:
+Text fields animate their floating labels and cursor blink. Call `cmp_text_field_step` each frame:
 
 ```c
-M3Bool changed;
-rc = m3_text_field_step(&field, dt_seconds, &changed);
-if (rc == M3_OK && changed) {
+CMPBool changed;
+rc = cmp_text_field_step(&field, dt_seconds, &changed);
+if (rc == CMP_OK && changed) {
     /* trigger a repaint */
 }
 ```
@@ -95,89 +110,89 @@ if (rc == M3_OK && changed) {
 Input Routing
 -------------
 
-Use `m3_event_dispatch` to route `M3InputEvent` instances to widgets. Pointer and text input events update the
+Use `cmp_event_dispatch` to route `CMPInputEvent` instances to widgets. Pointer and text input events update the
 text field state automatically. For focus transitions managed outside the dispatcher, call
-`m3_text_field_set_focus` explicitly.
+`cmp_text_field_set_focus` explicitly.
 
 Camera Capture Example
 ----------------------
 
 The camera plugin exposes configuration for device selection, resolution, and pixel format. Use
-`m3_camera_config_init` to start from defaults, then override fields in `config.config`.
+`cmp_camera_config_init` to start from defaults, then override fields in `config.config`.
 
 ```c
-#include "m3/m3_camera.h"
+#include "cmpc/cmp_camera.h"
 
-int open_camera(M3Env *env, M3CameraSession *session) {
-    M3CameraSessionConfig config;
+int open_camera(CMPEnv *env, CMPCameraSession *session) {
+    CMPCameraSessionConfig config;
     int rc;
 
-    rc = m3_camera_config_init(&config);
-    if (rc != M3_OK) return rc;
+    rc = cmp_camera_config_init(&config);
+    if (rc != CMP_OK) return rc;
 
     config.env = env;
-    config.config.facing = M3_CAMERA_FACING_BACK;
+    config.config.facing = CMP_CAMERA_FACING_BACK;
     config.config.width = 1280u;
     config.config.height = 720u;
-    config.config.format = M3_CAMERA_FORMAT_NV12;
+    config.config.format = CMP_CAMERA_FORMAT_NV12;
 
-    rc = m3_camera_init(session, &config);
-    if (rc != M3_OK) return rc;
+    rc = cmp_camera_init(session, &config);
+    if (rc != CMP_OK) return rc;
 
-    rc = m3_camera_start(session);
-    if (rc != M3_OK) {
-        m3_camera_shutdown(session);
+    rc = cmp_camera_start(session);
+    if (rc != CMP_OK) {
+        cmp_camera_shutdown(session);
         return rc;
     }
 
-    return M3_OK;
+    return CMP_OK;
 }
 
-int read_camera_frame(M3CameraSession *session, M3CameraFrame *frame, M3Bool *has_frame) {
-    return m3_camera_read_frame(session, frame, has_frame);
+int read_camera_frame(CMPCameraSession *session, CMPCameraFrame *frame, CMPBool *has_frame) {
+    return cmp_camera_read_frame(session, frame, has_frame);
 }
 
-int close_camera(M3CameraSession *session) {
+int close_camera(CMPCameraSession *session) {
     int rc;
 
-    rc = m3_camera_stop(session);
-    if (rc != M3_OK) return rc;
+    rc = cmp_camera_stop(session);
+    if (rc != CMP_OK) return rc;
 
-    return m3_camera_shutdown(session);
+    return cmp_camera_shutdown(session);
 }
 ```
 
 If a backend cannot satisfy the requested resolution or pixel format, it returns
-`M3_ERR_UNSUPPORTED`. To accept a backend default, set `config.config.format` to
-`M3_CAMERA_FORMAT_ANY` and leave `width`/`height` as `0`.
+`CMP_ERR_UNSUPPORTED`. To accept a backend default, set `config.config.format` to
+`CMP_CAMERA_FORMAT_ANY` and leave `width`/`height` as `0`.
 
 Network Request Example
 -----------------------
 
 Use the network plugin to issue HTTP requests through the active backend. Responses
-must be released with `m3_network_response_free` before shutting down the client.
+must be released with `cmp_network_response_free` before shutting down the client.
 
 ```c
-#include "m3/m3_network.h"
+#include "cmpc/cmp_network.h"
 
-int fetch_url(M3Env *env, const char *url) {
-    M3NetworkClient client;
-    M3NetworkConfig config;
-    M3NetworkRequest request;
-    M3NetworkResponse response;
+int fetch_url(CMPEnv *env, const char *url) {
+    CMPNetworkClient client;
+    CMPNetworkConfig config;
+    CMPNetworkRequest request;
+    CMPNetworkResponse response;
     int rc;
 
-    rc = m3_network_config_init(&config);
-    if (rc != M3_OK) return rc;
+    rc = cmp_network_config_init(&config);
+    if (rc != CMP_OK) return rc;
 
     config.env = env;
 
-    rc = m3_network_init(&client, &config);
-    if (rc != M3_OK) return rc;
+    rc = cmp_network_init(&client, &config);
+    if (rc != CMP_OK) return rc;
 
-    rc = m3_network_request_init(&request);
-    if (rc != M3_OK) {
-        m3_network_shutdown(&client);
+    rc = cmp_network_request_init(&request);
+    if (rc != CMP_OK) {
+        cmp_network_shutdown(&client);
         return rc;
     }
 
@@ -185,64 +200,64 @@ int fetch_url(M3Env *env, const char *url) {
     request.url = url;
     request.timeout_ms = 5000u;
 
-    rc = m3_network_request(&client, &request, &response);
-    if (rc != M3_OK) {
-        m3_network_shutdown(&client);
+    rc = cmp_network_request(&client, &request, &response);
+    if (rc != CMP_OK) {
+        cmp_network_shutdown(&client);
         return rc;
     }
 
     /* consume response.body/response.body_size here */
 
-    rc = m3_network_response_free(&client, &response);
-    if (rc != M3_OK) {
-        m3_network_shutdown(&client);
+    rc = cmp_network_response_free(&client, &response);
+    if (rc != CMP_OK) {
+        cmp_network_shutdown(&client);
         return rc;
     }
 
-    return m3_network_shutdown(&client);
+    return cmp_network_shutdown(&client);
 }
 ```
 
 Storage Example
 ---------------
 
-The storage helper provides a simple key/value store with optional file persistence via `M3IO`.
+The storage helper provides a simple key/value store with optional file persistence via `CMPIO`.
 
 ```c
-#include "m3/m3_storage.h"
+#include "cmpc/cmp_storage.h"
 
-int save_prefs(M3Env *env) {
-    M3Storage storage;
-    M3StorageConfig config;
-    M3IO io;
+int save_prefs(CMPEnv *env) {
+    CMPStorage storage;
+    CMPStorageConfig config;
+    CMPIO io;
     int rc;
 
-    rc = m3_storage_config_init(&config);
-    if (rc != M3_OK) return rc;
+    rc = cmp_storage_config_init(&config);
+    if (rc != CMP_OK) return rc;
 
-    rc = m3_storage_init(&storage, &config);
-    if (rc != M3_OK) return rc;
+    rc = cmp_storage_init(&storage, &config);
+    if (rc != CMP_OK) return rc;
 
-    rc = m3_storage_put(&storage, "theme", 5, "dark", 4, M3_TRUE);
-    if (rc != M3_OK) {
-        m3_storage_shutdown(&storage);
+    rc = cmp_storage_put(&storage, "theme", 5, "dark", 4, CMP_TRUE);
+    if (rc != CMP_OK) {
+        cmp_storage_shutdown(&storage);
         return rc;
     }
 
     rc = env->vtable->get_io(env->ctx, &io);
-    if (rc != M3_OK) {
-        m3_storage_shutdown(&storage);
+    if (rc != CMP_OK) {
+        cmp_storage_shutdown(&storage);
         return rc;
     }
 
-    rc = m3_storage_save(&storage, &io, "prefs.m3s");
-    if (rc != M3_OK) {
-        m3_storage_shutdown(&storage);
+    rc = cmp_storage_save(&storage, &io, "prefs.m3s");
+    if (rc != CMP_OK) {
+        cmp_storage_shutdown(&storage);
         return rc;
     }
 
-    return m3_storage_shutdown(&storage);
+    return cmp_storage_shutdown(&storage);
 }
 ```
 
-Use `m3_storage_load` to restore a previously saved store.
+Use `cmp_storage_load` to restore a previously saved store.

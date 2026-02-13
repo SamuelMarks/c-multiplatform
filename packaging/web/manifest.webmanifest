@@ -1,6 +1,6 @@
 {
-  "name": "LibM3C",
-  "short_name": "LibM3C",
+  "name": "LibCMPC",
+  "short_name": "LibCMPC",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#222222",

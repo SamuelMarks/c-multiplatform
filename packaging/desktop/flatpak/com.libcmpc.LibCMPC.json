@@ -1,0 +1,28 @@
+{
+  "app-id": "com.libcmpc.LibCMPC",
+  "runtime": "org.freedesktop.Platform",
+  "runtime-version": "23.08",
+  "sdk": "org.freedesktop.Sdk",
+  "command": "libcmpc-stub",
+  "finish-args": [
+    "--share=network"
+  ],
+  "modules": [
+    {
+      "name": "libcmpc",
+      "buildsystem": "cmake",
+      "config-opts": [
+        "-DM3_BUILD_PACKAGING_STUB=ON",
+        "-DM3_ENABLE_GTK4=OFF",
+        "-DM3_ENABLE_TESTS=OFF",
+        "-DM3_ENABLE_COVERAGE=OFF"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "../../.."
+        }
+      ]
+    }
+  ]
+}

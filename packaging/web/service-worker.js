@@ -1,9 +1,9 @@
-const CACHE_NAME = "libm3c-cache-v1";
+const CACHE_NAME = "libcmpc-cache-v1";
 const ASSETS = [
   "./",
   "index.html",
-  "m3_web_app.js",
-  "m3_web_app.wasm",
+  "cmp_web_app.js",
+  "cmp_web_app.wasm",
   "manifest.webmanifest",
   "icon.svg"
 ];

@@ -5,8 +5,8 @@
 3. Run the packaging target:
 
 ```
-cmake -S . -B build-android-package -DM3_ENABLE_PACKAGING=ON
-cmake --build build-android-package --target m3_package_android
+cmake -S . -B build-android-package -DCMP_ENABLE_PACKAGING=ON
+cmake --build build-android-package --target cmp_package_android
 ```
 
 Release APK and AAB outputs land in `packaging/android/app/build/outputs`.
