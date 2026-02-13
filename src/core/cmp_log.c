@@ -72,7 +72,7 @@ static int cmp_log_cstrlen(const char *cstr, cmp_usize *out_len) {
 }
 
 static int cmp_log_mutex_init(void) {
-  int result;
+  int result = 0;
 #if defined(CMP_LOG_USE_WIN32)
 #ifdef CMP_TESTING
   if (g_log_force_mutex_init_fail) {
@@ -102,7 +102,7 @@ static int cmp_log_mutex_init(void) {
 }
 
 static int cmp_log_mutex_lock(void) {
-  int result;
+  int result = 0;
 
   if (!g_log_mutex_initialized) {
     return CMP_ERR_STATE;
@@ -134,7 +134,7 @@ static int cmp_log_mutex_lock(void) {
 }
 
 static int cmp_log_mutex_unlock(void) {
-  int result;
+  int result = 0;
 
   if (!g_log_mutex_initialized) {
     return CMP_ERR_STATE;
@@ -163,7 +163,7 @@ static int cmp_log_mutex_unlock(void) {
 }
 
 static int cmp_log_mutex_shutdown(void) {
-  int result;
+  int result = 0;
 
   if (!g_log_mutex_initialized) {
     return CMP_ERR_STATE;

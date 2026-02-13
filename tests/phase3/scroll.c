@@ -127,6 +127,9 @@ int main(void) {
     CMPScrollDelta available;
     CMPScrollDelta consumed;
 
+    memset(&available, 0, sizeof(available));
+    memset(&consumed, 0, sizeof(consumed));
+
     CMP_TEST_EXPECT(cmp_scroll_test_validate_consumed(NULL, &available),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_scroll_test_validate_consumed(&consumed, NULL),

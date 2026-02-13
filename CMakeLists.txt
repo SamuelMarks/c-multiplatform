@@ -136,6 +136,17 @@ target_include_directories(m3 PUBLIC
 )
 target_link_libraries(m3 PUBLIC cmpc)
 
+if(CMP_ENABLE_COVERAGE)
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(cmpc PRIVATE -O0 -g --coverage)
+        target_link_options(cmpc PRIVATE --coverage)
+        target_compile_options(m3 PRIVATE -O0 -g --coverage)
+        target_link_options(m3 PRIVATE --coverage)
+    else()
+        message(FATAL_ERROR "CMP_ENABLE_COVERAGE is only supported with GCC or Clang.")
+    endif()
+endif()
+
 if(BUILD_SHARED_LIBS AND WIN32)
     target_compile_definitions(cmpc PRIVATE CMP_BUILD_DLL)
     target_compile_definitions(cmpc INTERFACE CMP_USE_DLL)
