@@ -44,7 +44,7 @@ jobs:
             -DANDROID_ABI=armeabi-v7a \
             -DANDROID_PLATFORM=android-21 \
             -DANDROID_STL=c++_static \
-            -DM3_ENABLE_LIBCURL=OFF
+            -DCMP_ENABLE_LIBCURL=OFF
       - name: Build
         run: cmake --build build-android
 
@@ -56,7 +56,7 @@ jobs:
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v12
       - name: Configure
-        run: emcmake cmake -S . -B build-web -DCMAKE_BUILD_TYPE=Release -DM3_ENABLE_LIBCURL=OFF
+        run: emcmake cmake -S . -B build-web -DCMAKE_BUILD_TYPE=Release -DCMP_ENABLE_LIBCURL=OFF
       - name: Build
         run: cmake --build build-web
 
@@ -70,7 +70,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y doxygen graphviz libcurl4-openssl-dev
       - name: Configure
-        run: cmake -S . -B build-docs -DCMAKE_BUILD_TYPE=Release -DM3_REQUIRE_DOXYGEN=ON
+        run: cmake -S . -B build-docs -DCMAKE_BUILD_TYPE=Release -DCMP_REQUIRE_DOXYGEN=ON
       - name: Generate Docs (Doxygen)
         run: ctest --test-dir build-docs -R m3_docs --output-on-failure
 
@@ -86,7 +86,7 @@ jobs:
       - name: Configure
         env:
           CC: gcc
-        run: cmake -S . -B build-coverage -DCMAKE_BUILD_TYPE=Debug -DM3_ENABLE_COVERAGE=ON -DM3_REQUIRE_DOXYGEN=OFF
+        run: cmake -S . -B build-coverage -DCMAKE_BUILD_TYPE=Debug -DCMP_ENABLE_COVERAGE=ON -DCMP_REQUIRE_DOXYGEN=OFF
       - name: Build
         run: cmake --build build-coverage
       - name: Test
@@ -106,6 +106,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure
-        run: cmake -S . -B build-packaging -DCMAKE_BUILD_TYPE=Release -DM3_ENABLE_PACKAGING=ON -DM3_BUILD_PACKAGING_STUB=ON
+        run: cmake -S . -B build-packaging -DCMAKE_BUILD_TYPE=Release -DCMP_ENABLE_PACKAGING=ON -DCMP_BUILD_PACKAGING_STUB=ON
       - name: Build Packaging Stub
-        run: cmake --build build-packaging --config Release --target m3_packaging_stub
+        run: cmake --build build-packaging --config Release --target cmp_packaging_stub

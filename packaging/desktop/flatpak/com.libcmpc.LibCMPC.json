@@ -12,10 +12,10 @@
       "name": "libcmpc",
       "buildsystem": "cmake",
       "config-opts": [
-        "-DM3_BUILD_PACKAGING_STUB=ON",
-        "-DM3_ENABLE_GTK4=OFF",
-        "-DM3_ENABLE_TESTS=OFF",
-        "-DM3_ENABLE_COVERAGE=OFF"
+        "-DCMP_BUILD_PACKAGING_STUB=ON",
+        "-DCMP_ENABLE_GTK4=OFF",
+        "-DBUILD_TESTING=OFF",
+        "-DCMP_ENABLE_COVERAGE=OFF"
       ],
       "sources": [
         {

@@ -343,10 +343,12 @@ int main(void) {
 
   CMP_TEST_EXPECT(cmp_ripple_compute_max_radius(NULL, 0.0f, 0.0f, &radius),
                   CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_ripple_compute_max_radius(&bounds, 0.0f, 0.0f, NULL),
-                  CMP_ERR_INVALID_ARGUMENT);
   bounds.x = 0.0f;
   bounds.y = 0.0f;
+  bounds.width = 0.0f;
+  bounds.height = 0.0f;
+  CMP_TEST_EXPECT(cmp_ripple_compute_max_radius(&bounds, 0.0f, 0.0f, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   bounds.width = -1.0f;
   bounds.height = 10.0f;
   CMP_TEST_EXPECT(cmp_ripple_compute_max_radius(&bounds, 0.0f, 0.0f, &radius),
