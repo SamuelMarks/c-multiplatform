@@ -265,6 +265,10 @@ int CMP_CALL cmp_utf8_test_set_cstr_limit(cmp_usize max_len) {
   return CMP_OK;
 }
 
+int CMP_CALL cmp_utf8_test_cstrlen(const char *cstr, cmp_usize *out_len) {
+  return cmp_utf8_cstrlen(cstr, out_len);
+}
+
 int CMP_CALL cmp_utf8_test_decode(const cmp_u8 *data, cmp_usize length,
                                   cmp_u32 *out_codepoint,
                                   cmp_usize *out_advance) {

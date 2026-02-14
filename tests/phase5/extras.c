@@ -55,11 +55,11 @@ int main(void) {
   CMPTextStyle text_style;
   CMPTooltipStyle tooltip_style;
   CMPTooltipStyle tooltip_style_rich;
-  CMPTooltipContent tooltip_content;
+  CMPTooltipContent tooltip_content = {0};
   CMPTooltipAnchor tooltip_anchor;
   CMPTooltipPlacement tooltip_placement;
   CMPSize tooltip_size;
-  CMPRect overlay;
+  CMPRect overlay = {0};
   CMPRect bounds;
   cmp_u32 direction;
   CMPTextMetrics title_metrics;

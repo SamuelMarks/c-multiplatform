@@ -271,6 +271,15 @@ static int test_scaffold_helpers(void) {
   edges.right = 0.0f;
   edges.bottom = 0.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_validate_edges(&edges), CMP_ERR_RANGE);
+  edges.left = 0.0f;
+  edges.right = -1.0f;
+  CMP_TEST_EXPECT(m3_scaffold_test_validate_edges(&edges), CMP_ERR_RANGE);
+  edges.right = 0.0f;
+  edges.top = -1.0f;
+  CMP_TEST_EXPECT(m3_scaffold_test_validate_edges(&edges), CMP_ERR_RANGE);
+  edges.top = 0.0f;
+  edges.bottom = -1.0f;
+  CMP_TEST_EXPECT(m3_scaffold_test_validate_edges(&edges), CMP_ERR_RANGE);
   edges.left = 1.0f;
   edges.right = 1.0f;
   edges.top = 2.0f;
@@ -285,6 +294,12 @@ static int test_scaffold_helpers(void) {
   style.fab_margin_x = -1.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_validate_style(&style), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_scaffold_style_init(&style));
+  style.fab_margin_y = -1.0f;
+  CMP_TEST_EXPECT(m3_scaffold_test_validate_style(&style), CMP_ERR_RANGE);
+  CMP_TEST_OK(m3_scaffold_style_init(&style));
+  style.snackbar_margin_x = -1.0f;
+  CMP_TEST_EXPECT(m3_scaffold_test_validate_style(&style), CMP_ERR_RANGE);
+  CMP_TEST_OK(m3_scaffold_style_init(&style));
   style.snackbar_margin_y = -1.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_validate_style(&style), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_scaffold_style_init(&style));
@@ -294,6 +309,21 @@ static int test_scaffold_helpers(void) {
   style.fab_slide_duration = -1.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_validate_style(&style), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_scaffold_style_init(&style));
+  style.padding.left = -1.0f;
+  CMP_TEST_EXPECT(m3_scaffold_test_validate_style(&style), CMP_ERR_RANGE);
+  CMP_TEST_OK(m3_scaffold_style_init(&style));
+  style.fab_slide_easing = CMP_ANIM_EASE_LINEAR;
+  CMP_TEST_OK(m3_scaffold_test_validate_style(&style));
+  CMP_TEST_OK(m3_scaffold_style_init(&style));
+  style.fab_slide_easing = CMP_ANIM_EASE_IN;
+  CMP_TEST_OK(m3_scaffold_test_validate_style(&style));
+  CMP_TEST_OK(m3_scaffold_style_init(&style));
+  style.fab_slide_easing = CMP_ANIM_EASE_OUT;
+  CMP_TEST_OK(m3_scaffold_test_validate_style(&style));
+  CMP_TEST_OK(m3_scaffold_style_init(&style));
+  style.fab_slide_easing = CMP_ANIM_EASE_IN_OUT;
+  CMP_TEST_OK(m3_scaffold_test_validate_style(&style));
+  CMP_TEST_OK(m3_scaffold_style_init(&style));
   style.fab_slide_easing = 99u;
   CMP_TEST_EXPECT(m3_scaffold_test_validate_style(&style), CMP_ERR_RANGE);
 
@@ -301,6 +331,12 @@ static int test_scaffold_helpers(void) {
   spec.size = 0.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_validate_measure_spec(spec),
                   CMP_ERR_INVALID_ARGUMENT);
+  spec.mode = CMP_MEASURE_EXACTLY;
+  spec.size = -1.0f;
+  CMP_TEST_EXPECT(m3_scaffold_test_validate_measure_spec(spec), CMP_ERR_RANGE);
+  spec.mode = CMP_MEASURE_EXACTLY;
+  spec.size = 10.0f;
+  CMP_TEST_OK(m3_scaffold_test_validate_measure_spec(spec));
   spec.mode = CMP_MEASURE_AT_MOST;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_validate_measure_spec(spec), CMP_ERR_RANGE);
@@ -316,6 +352,9 @@ static int test_scaffold_helpers(void) {
   rect.height = 0.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_validate_rect(&rect), CMP_ERR_RANGE);
   rect.width = 10.0f;
+  rect.height = -1.0f;
+  CMP_TEST_EXPECT(m3_scaffold_test_validate_rect(&rect), CMP_ERR_RANGE);
+  rect.height = 10.0f;
   rect.height = 10.0f;
   CMP_TEST_OK(m3_scaffold_test_validate_rect(&rect));
 
@@ -335,6 +374,13 @@ static int test_scaffold_helpers(void) {
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_scaffold_test_compute_safe_bounds(&rect, &edges, NULL),
                   CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      m3_scaffold_test_compute_safe_bounds(&rect, &edges, &safe_bounds),
+      CMP_ERR_RANGE);
+  edges.left = 0.0f;
+  edges.right = 0.0f;
+  edges.top = 6.0f;
+  edges.bottom = 6.0f;
   CMP_TEST_EXPECT(
       m3_scaffold_test_compute_safe_bounds(&rect, &edges, &safe_bounds),
       CMP_ERR_RANGE);

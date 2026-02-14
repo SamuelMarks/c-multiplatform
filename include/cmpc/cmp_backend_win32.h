@@ -91,6 +91,13 @@ CMP_API int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend,
 
 #ifdef CMP_TESTING
 /**
+ * @brief Force cmp_win32_backend_config_init to fail for coverage.
+ * @param fail Set to CMP_TRUE to force the next init to fail.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_win32_backend_test_set_config_init_fail(CMPBool fail);
+
+/**
  * @brief Test wrapper for Win32 backend config validation.
  * @param config Backend configuration.
  * @return CMP_OK on success or a failure code.

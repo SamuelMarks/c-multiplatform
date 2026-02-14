@@ -2476,6 +2476,9 @@ int CMP_CALL cmp_tasks_test_stub_exercise(void) {
   result = (rc == CMP_ERR_INVALID_ARGUMENT) ? result : rc;
   rc = cmp_tasks_test_register_ex(&stub, NULL);
   result = (rc == CMP_ERR_INVALID_ARGUMENT) ? result : rc;
+  stub.rc_register = CMP_ERR_UNKNOWN;
+  rc = cmp_tasks_test_register_ex(&stub, &obj);
+  result = (rc == CMP_ERR_UNKNOWN) ? result : rc;
 
   stub.rc_register = CMP_OK;
   rc = cmp_tasks_test_register_ex(&stub, &obj);
@@ -2487,6 +2490,12 @@ int CMP_CALL cmp_tasks_test_stub_exercise(void) {
 
   rc = cmp_tasks_test_resolve_ex(NULL, handle, &out_ptr);
   result = (rc == CMP_ERR_INVALID_ARGUMENT) ? result : rc;
+  rc = cmp_tasks_test_resolve_ex(&stub, handle, NULL);
+  result = (rc == CMP_ERR_INVALID_ARGUMENT) ? result : rc;
+
+  stub.rc_resolve = CMP_ERR_UNKNOWN;
+  rc = cmp_tasks_test_resolve_ex(&stub, handle, &out_ptr);
+  result = (rc == CMP_ERR_UNKNOWN) ? result : rc;
 
   stub.rc_resolve = CMP_OK;
   stub.ptr = NULL;
@@ -2501,11 +2510,17 @@ int CMP_CALL cmp_tasks_test_stub_exercise(void) {
   rc = cmp_tasks_test_unregister_ex(NULL, handle);
   result = (rc == CMP_ERR_INVALID_ARGUMENT) ? result : rc;
 
+  stub.rc_unregister = CMP_ERR_UNKNOWN;
+  rc = cmp_tasks_test_unregister_ex(&stub, handle);
+  result = (rc == CMP_ERR_UNKNOWN) ? result : rc;
+
   stub.rc_unregister = CMP_OK;
   rc = cmp_tasks_test_unregister_ex(&stub, handle);
   result = (rc == CMP_OK) ? result : rc;
 
   rc = cmp_tasks_test_alloc_ex(NULL, 8u, &out_ptr);
+  result = (rc == CMP_ERR_INVALID_ARGUMENT) ? result : rc;
+  rc = cmp_tasks_test_alloc_ex(&stub, 8u, NULL);
   result = (rc == CMP_ERR_INVALID_ARGUMENT) ? result : rc;
   rc = cmp_tasks_test_alloc_ex(&stub, 0u, &out_ptr);
   result = (rc == CMP_ERR_INVALID_ARGUMENT) ? result : rc;
@@ -2531,6 +2546,8 @@ int CMP_CALL cmp_tasks_test_stub_exercise(void) {
   }
 
   rc = cmp_tasks_test_realloc_ex(NULL, NULL, 8u, &out_ptr);
+  result = (rc == CMP_ERR_INVALID_ARGUMENT) ? result : rc;
+  rc = cmp_tasks_test_realloc_ex(&stub, NULL, 8u, NULL);
   result = (rc == CMP_ERR_INVALID_ARGUMENT) ? result : rc;
   rc = cmp_tasks_test_realloc_ex(&stub, NULL, 0u, &out_ptr);
   result = (rc == CMP_ERR_INVALID_ARGUMENT) ? result : rc;

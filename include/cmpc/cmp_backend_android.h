@@ -158,6 +158,14 @@ CMP_API int CMP_CALL cmp_android_backend_predictive_back_cancel(
 
 #ifdef CMP_TESTING
 /**
+ * @brief Force cmp_android_backend_config_init to fail for coverage.
+ * @param fail Set to CMP_TRUE to force the next init to fail.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL
+cmp_android_backend_test_set_config_init_fail(CMPBool fail);
+
+/**
  * @brief Test wrapper for Android backend config validation.
  * @param config Backend configuration.
  * @return CMP_OK on success or a failure code.

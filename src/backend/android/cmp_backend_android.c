@@ -60,6 +60,13 @@ cmp_android_backend_validate_config(const CMPAndroidBackendConfig *config) {
 }
 
 #ifdef CMP_TESTING
+static CMPBool g_cmp_android_test_fail_config_init = CMP_FALSE;
+
+int CMP_CALL cmp_android_backend_test_set_config_init_fail(CMPBool fail) {
+  g_cmp_android_test_fail_config_init = fail;
+  return CMP_OK;
+}
+
 int CMP_CALL cmp_android_backend_test_validate_config(
     const CMPAndroidBackendConfig *config) {
   return cmp_android_backend_validate_config(config);
@@ -82,6 +89,12 @@ int CMP_CALL cmp_android_backend_config_init(CMPAndroidBackendConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#ifdef CMP_TESTING
+  if (g_cmp_android_test_fail_config_init == CMP_TRUE) {
+    g_cmp_android_test_fail_config_init = CMP_FALSE;
+    return CMP_ERR_IO;
+  }
+#endif
 
   config->allocator = NULL;
   config->handle_capacity = CMP_ANDROID_DEFAULT_HANDLE_CAPACITY;

@@ -624,7 +624,11 @@ static int test_alert_dialog(void) {
     family = "Test";
 
     CMP_TEST_EXPECT(m3_alert_dialog_style_init(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(cmp_text_test_set_style_init_fail_after(1u));
+    CMP_TEST_EXPECT(m3_alert_dialog_style_init(&style), CMP_ERR_IO);
     CMP_TEST_OK(cmp_text_test_set_style_init_fail_after(2u));
+    CMP_TEST_EXPECT(m3_alert_dialog_style_init(&style), CMP_ERR_IO);
+    CMP_TEST_OK(cmp_text_test_set_style_init_fail_after(3u));
     CMP_TEST_EXPECT(m3_alert_dialog_style_init(&style), CMP_ERR_IO);
     CMP_TEST_OK(cmp_text_test_set_style_init_fail_after(0u));
     CMP_TEST_OK(
@@ -660,6 +664,12 @@ static int test_alert_dialog(void) {
                                          0u, NULL, 0u),
                     CMP_ERR_UNSUPPORTED);
     test_setup_text_backend(&backend, &text_backend, &g_test_text_vtable);
+
+    backend.fail_create_at = 3;
+    CMP_TEST_EXPECT(m3_alert_dialog_init(&dialog, &text_backend, &style, NULL,
+                                         0u, NULL, 0u),
+                    CMP_ERR_IO);
+    backend.fail_create_at = 0;
   }
 
   {
@@ -1363,9 +1373,9 @@ static int test_alert_dialog(void) {
     backend.fail_destroy_at = 1;
     CMP_TEST_EXPECT(m3_alert_dialog_set_style(&dialog, &style), CMP_ERR_IO);
 
-    backend.create_calls = 0;
+    backend.create_calls = 1;
     backend.destroy_calls = 0;
-    backend.fail_create_at = 3;
+    backend.fail_create_at = 4;
     backend.fail_destroy_at = 0;
     CMP_TEST_EXPECT(m3_alert_dialog_set_style(&dialog, &style), CMP_ERR_IO);
 
@@ -1603,6 +1613,15 @@ static int test_alert_dialog(void) {
                     CMP_ERR_IO);
     backend.fail_draw_rect = CMP_OK;
 
+    dialog.style.scrim_enabled = CMP_FALSE;
+    dialog.style.shadow_enabled = CMP_FALSE;
+    backend.fail_draw_rect = CMP_ERR_IO;
+    CMP_TEST_EXPECT(dialog.widget.vtable->paint(dialog.widget.ctx, &ctx),
+                    CMP_ERR_IO);
+    backend.fail_draw_rect = CMP_OK;
+    dialog.style.scrim_enabled = CMP_TRUE;
+    dialog.style.shadow_enabled = CMP_TRUE;
+
     backend.fail_draw = CMP_ERR_IO;
     CMP_TEST_EXPECT(dialog.widget.vtable->paint(dialog.widget.ctx, &ctx),
                     CMP_ERR_IO);
@@ -1639,6 +1658,15 @@ static int test_alert_dialog(void) {
     CMP_TEST_EXPECT(dialog.widget.vtable->paint(dialog.widget.ctx, &ctx),
                     CMP_ERR_IO);
     backend.fail_draw = CMP_OK;
+    dialog.utf8_title = NULL;
+    dialog.title_len = 0u;
+    dialog.metrics_valid = CMP_FALSE;
+    backend.fail_draw = CMP_ERR_IO;
+    CMP_TEST_EXPECT(dialog.widget.vtable->paint(dialog.widget.ctx, &ctx),
+                    CMP_ERR_IO);
+    backend.fail_draw = CMP_OK;
+    dialog.utf8_title = title;
+    dialog.title_len = title_len;
     dialog.utf8_body = body;
     dialog.body_len = body_len;
     dialog.utf8_confirm = confirm;
@@ -1705,6 +1733,11 @@ static int test_fullscreen_dialog(void) {
 
     CMP_TEST_EXPECT(m3_fullscreen_dialog_style_init(NULL),
                     CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(cmp_text_test_set_style_init_fail_after(1u));
+    CMP_TEST_EXPECT(m3_fullscreen_dialog_style_init(&style), CMP_ERR_IO);
+    CMP_TEST_OK(cmp_text_test_set_style_init_fail_after(2u));
+    CMP_TEST_EXPECT(m3_fullscreen_dialog_style_init(&style), CMP_ERR_IO);
+    CMP_TEST_OK(cmp_text_test_set_style_init_fail_after(0u));
     CMP_TEST_OK(m3_fullscreen_dialog_style_init(&style));
     test_set_fullscreen_families(&style, family);
 
@@ -1870,6 +1903,13 @@ static int test_fullscreen_dialog(void) {
     CMP_TEST_EXPECT(m3_fullscreen_dialog_init(&dialog, &text_backend, &style,
                                               title, title_len, body, body_len),
                     CMP_ERR_IO);
+    backend.create_calls = 0;
+    backend.destroy_calls = 0;
+    backend.fail_destroy_at = 1;
+    CMP_TEST_EXPECT(m3_fullscreen_dialog_init(&dialog, &text_backend, &style,
+                                              title, title_len, body, body_len),
+                    CMP_ERR_IO);
+    backend.fail_destroy_at = 0;
     backend.fail_create_at = 0;
     CMP_TEST_OK(m3_fullscreen_dialog_init(&dialog, &text_backend, &style, title,
                                           title_len, body, body_len));
@@ -1908,6 +1948,14 @@ static int test_fullscreen_dialog(void) {
     width_spec.mode = 99u;
     width_spec.size = 10.0f;
     height_spec = width_spec;
+    CMP_TEST_EXPECT(dialog.widget.vtable->measure(dialog.widget.ctx, width_spec,
+                                                  height_spec, &size),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    width_spec.mode = CMP_MEASURE_UNSPECIFIED;
+    width_spec.size = 0.0f;
+    height_spec.mode = 99u;
+    height_spec.size = 0.0f;
     CMP_TEST_EXPECT(dialog.widget.vtable->measure(dialog.widget.ctx, width_spec,
                                                   height_spec, &size),
                     CMP_ERR_INVALID_ARGUMENT);
@@ -2382,6 +2430,19 @@ static int test_fullscreen_dialog(void) {
     test_setup_gfx_backend(&backend, &gfx, &g_test_gfx_vtable,
                            &g_test_text_vtable);
     ctx.gfx = &gfx;
+    {
+      CMPScalar saved_corner;
+      saved_corner = dialog.style.corner_radius;
+      dialog.style.corner_radius = -1.0f;
+      CMP_TEST_EXPECT(dialog.widget.vtable->paint(dialog.widget.ctx, &ctx),
+                      CMP_ERR_RANGE);
+      dialog.style.corner_radius = saved_corner;
+    }
+    backend.fail_measure = CMP_ERR_IO;
+    dialog.metrics_valid = CMP_FALSE;
+    CMP_TEST_EXPECT(dialog.widget.vtable->paint(dialog.widget.ctx, &ctx),
+                    CMP_ERR_IO);
+    backend.fail_measure = CMP_OK;
     backend.fail_draw_rect = CMP_ERR_IO;
     CMP_TEST_EXPECT(dialog.widget.vtable->paint(dialog.widget.ctx, &ctx),
                     CMP_ERR_IO);
@@ -2391,6 +2452,19 @@ static int test_fullscreen_dialog(void) {
     CMP_TEST_EXPECT(dialog.widget.vtable->paint(dialog.widget.ctx, &ctx),
                     CMP_ERR_IO);
     backend.fail_draw = CMP_OK;
+    dialog.utf8_title = NULL;
+    dialog.title_len = 0u;
+    dialog.utf8_action = NULL;
+    dialog.action_len = 0u;
+    dialog.metrics_valid = CMP_FALSE;
+    backend.fail_draw = CMP_ERR_IO;
+    CMP_TEST_EXPECT(dialog.widget.vtable->paint(dialog.widget.ctx, &ctx),
+                    CMP_ERR_IO);
+    backend.fail_draw = CMP_OK;
+    dialog.utf8_title = title;
+    dialog.title_len = title_len;
+    dialog.utf8_action = action;
+    dialog.action_len = action_len;
 
     dialog.style.shadow_enabled = CMP_TRUE;
     CMP_TEST_OK(
@@ -2457,6 +2531,9 @@ static int test_snackbar(void) {
     message_len = (cmp_usize)strlen(message);
 
     CMP_TEST_EXPECT(m3_snackbar_style_init(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(cmp_text_test_set_style_init_fail_after(1u));
+    CMP_TEST_EXPECT(m3_snackbar_style_init(&style), CMP_ERR_IO);
+    CMP_TEST_OK(cmp_text_test_set_style_init_fail_after(0u));
     CMP_TEST_OK(m3_snackbar_style_init(&style));
     test_set_snackbar_families(&style, family);
 
@@ -2607,6 +2684,15 @@ static int test_snackbar(void) {
     CMP_TEST_EXPECT(snackbar.widget.vtable->measure(
                         snackbar.widget.ctx, width_spec, height_spec, &size),
                     CMP_ERR_RANGE);
+    width_spec.mode = CMP_MEASURE_EXACTLY;
+    width_spec.size = 10.0f;
+    height_spec.mode = 999u;
+    height_spec.size = 0.0f;
+    CMP_TEST_EXPECT(snackbar.widget.vtable->measure(
+                        snackbar.widget.ctx, width_spec, height_spec, &size),
+                    CMP_ERR_INVALID_ARGUMENT);
+    height_spec.mode = CMP_MEASURE_EXACTLY;
+    height_spec.size = 40.0f;
 
     width_spec.mode = CMP_MEASURE_UNSPECIFIED;
     width_spec.size = 0.0f;
@@ -3064,6 +3150,55 @@ static int test_snackbar(void) {
     CMP_TEST_OK(snackbar.widget.vtable->destroy(snackbar.widget.ctx));
   }
 
+  return 0;
+}
+
+static int test_snackbar_paint_valid(void) {
+  TestDialogBackend backend;
+  CMPTextBackend text_backend;
+  CMPGfx gfx;
+  CMPPaintContext ctx;
+  M3SnackbarStyle style;
+  M3Snackbar snackbar;
+  CMPRect bounds;
+  CMPMeasureSpec width_spec;
+  CMPMeasureSpec height_spec;
+  CMPSize size;
+  const char *family;
+  const char *message;
+
+  test_backend_init(&backend);
+  test_setup_text_backend(&backend, &text_backend, &g_test_text_vtable);
+  test_setup_gfx_backend(&backend, &gfx, &g_test_gfx_vtable,
+                         &g_test_text_vtable);
+
+  family = "Test";
+  message = "Hello";
+  CMP_TEST_OK(m3_snackbar_style_init(&style));
+  test_set_snackbar_families(&style, family);
+  CMP_TEST_OK(m3_snackbar_init(&snackbar, &text_backend, &style, message,
+                               (cmp_usize)strlen(message)));
+
+  width_spec.mode = CMP_MEASURE_EXACTLY;
+  width_spec.size = 200.0f;
+  height_spec.mode = CMP_MEASURE_EXACTLY;
+  height_spec.size = 80.0f;
+  CMP_TEST_OK(snackbar.widget.vtable->measure(snackbar.widget.ctx, width_spec,
+                                              height_spec, &size));
+
+  bounds.x = 0.0f;
+  bounds.y = 0.0f;
+  bounds.width = size.width;
+  bounds.height = size.height;
+  CMP_TEST_OK(snackbar.widget.vtable->layout(snackbar.widget.ctx, bounds));
+
+  ctx.gfx = &gfx;
+  ctx.clip = bounds;
+  ctx.dpi_scale = 1.0f;
+  snackbar.metrics_valid = CMP_FALSE;
+  CMP_TEST_OK(snackbar.widget.vtable->paint(snackbar.widget.ctx, &ctx));
+
+  CMP_TEST_OK(snackbar.widget.vtable->destroy(snackbar.widget.ctx));
   return 0;
 }
 
@@ -3823,6 +3958,9 @@ int main(void) {
     return 1;
   }
   if (test_snackbar() != 0) {
+    return 1;
+  }
+  if (test_snackbar_paint_valid() != 0) {
     return 1;
   }
   if (test_dialog_branch_sweep() != 0) {

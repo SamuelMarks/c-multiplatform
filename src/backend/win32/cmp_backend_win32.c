@@ -40,6 +40,15 @@
 #define CMP_WIN32_EVENT_CAPACITY 256u
 #define CMP_WIN32_CLIP_STACK_CAPACITY 32u
 
+#ifdef CMP_TESTING
+static CMPBool g_cmp_win32_test_fail_config_init = CMP_FALSE;
+
+int CMP_CALL cmp_win32_backend_test_set_config_init_fail(CMPBool fail) {
+  g_cmp_win32_test_fail_config_init = fail;
+  return CMP_OK;
+}
+#endif
+
 static int
 cmp_win32_backend_validate_config(const CMPWin32BackendConfig *config) {
   if (config == NULL) {
@@ -80,6 +89,12 @@ int CMP_CALL cmp_win32_backend_config_init(CMPWin32BackendConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#ifdef CMP_TESTING
+  if (g_cmp_win32_test_fail_config_init == CMP_TRUE) {
+    g_cmp_win32_test_fail_config_init = CMP_FALSE;
+    return CMP_ERR_IO;
+  }
+#endif
 
   config->allocator = NULL;
   config->handle_capacity = CMP_WIN32_DEFAULT_HANDLE_CAPACITY;

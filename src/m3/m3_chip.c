@@ -530,9 +530,6 @@ static int m3_chip_draw_delete_icon(const CMPGfx *gfx, const CMPRect *bounds,
   }
 
   inset = thickness;
-  if (inset < 0.0f) {
-    inset = 0.0f; /* GCOVR_EXCL_LINE */
-  }
   max_inset = bounds->width * 0.5f;
   if (bounds->height * 0.5f < max_inset) {
     max_inset = bounds->height * 0.5f; /* GCOVR_EXCL_LINE */
@@ -1443,6 +1440,19 @@ int CMP_CALL m3_chip_set_on_delete(M3Chip *chip, CMPChipOnDelete on_delete,
 }
 
 #ifdef CMP_TESTING
+int CMP_CALL m3_chip_test_style_init_layout(
+    M3ChipLayout *layout, CMPScalar padding_x, CMPScalar padding_y,
+    CMPScalar min_width, CMPScalar min_height, CMPScalar icon_size,
+    CMPScalar icon_gap, CMPScalar delete_thickness) {
+  return m3_chip_style_init_layout(layout, padding_x, padding_y, min_width,
+                                   min_height, icon_size, icon_gap,
+                                   delete_thickness);
+}
+
+int CMP_CALL m3_chip_test_style_init_base(M3ChipStyle *style, cmp_u32 variant) {
+  return m3_chip_style_init_base(style, variant);
+}
+
 int CMP_CALL m3_chip_test_validate_color(const CMPColor *color) {
   return m3_chip_validate_color(color);
 }

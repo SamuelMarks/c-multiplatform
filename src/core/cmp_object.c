@@ -4,6 +4,7 @@
 
 #ifdef CMP_TESTING
 static CMPBool g_cmp_handle_is_valid_fail = CMP_FALSE;
+static CMPBool g_cmp_handle_unregister_force_null_obj = CMP_FALSE;
 #endif
 
 #define CMP_HANDLE_INDEX_INVALID ((cmp_u32) ~(cmp_u32)0)
@@ -231,6 +232,12 @@ cmp_handle_system_default_unregister_object(void *sys, CMPHandle handle) {
   }
 
   obj = slot->obj;
+#ifdef CMP_TESTING
+  if (g_cmp_handle_unregister_force_null_obj) {
+    g_cmp_handle_unregister_force_null_obj = CMP_FALSE;
+    obj = NULL;
+  }
+#endif
   slot->obj = NULL;
   slot->generation += 1;
   if (slot->generation == 0) {
@@ -493,6 +500,11 @@ int CMP_CALL cmp_handle_system_default_destroy(CMPHandleSystem *sys) {
 #ifdef CMP_TESTING
 int CMP_CALL cmp_object_test_set_handle_is_valid_fail(CMPBool fail) {
   g_cmp_handle_is_valid_fail = fail ? CMP_TRUE : CMP_FALSE;
+  return CMP_OK;
+}
+
+int CMP_CALL cmp_object_test_set_unregister_force_null_obj(CMPBool enable) {
+  g_cmp_handle_unregister_force_null_obj = enable ? CMP_TRUE : CMP_FALSE;
   return CMP_OK;
 }
 #endif

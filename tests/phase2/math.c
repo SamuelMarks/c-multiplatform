@@ -44,6 +44,10 @@ int main(void) {
   b = a;
   b.width = 1.0f;
   CMP_TEST_EXPECT(cmp_rect_intersect(&a, &b, &out, &hit), CMP_ERR_RANGE);
+  a.width = 1.0f;
+  b.width = 1.0f;
+  b.height = -1.0f;
+  CMP_TEST_EXPECT(cmp_rect_intersect(&a, &b, &out, &hit), CMP_ERR_RANGE);
 
   a.x = 0.0f;
   a.y = 0.0f;
@@ -56,6 +60,13 @@ int main(void) {
   CMP_TEST_OK(cmp_rect_intersect(&a, &b, &out, &hit));
   CMP_TEST_ASSERT(hit == CMP_FALSE);
   CMP_TEST_ASSERT(out.width == 0.0f);
+
+  b.x = 0.0f;
+  b.y = -5.0f;
+  b.width = 1.0f;
+  b.height = 1.0f;
+  CMP_TEST_OK(cmp_rect_intersect(&a, &b, &out, &hit));
+  CMP_TEST_ASSERT(hit == CMP_FALSE);
 
   b.x = 1.0f;
   b.y = 1.0f;
@@ -82,6 +93,9 @@ int main(void) {
   a.width = -1.0f;
   b.width = 1.0f;
   CMP_TEST_EXPECT(cmp_rect_union(&a, &b, &out), CMP_ERR_RANGE);
+  a.width = 1.0f;
+  b.height = -1.0f;
+  CMP_TEST_EXPECT(cmp_rect_union(&a, &b, &out), CMP_ERR_RANGE);
 
   a.x = 0.0f;
   a.y = 0.0f;
@@ -105,6 +119,9 @@ int main(void) {
   a.width = -1.0f;
   a.height = 1.0f;
   CMP_TEST_EXPECT(cmp_rect_contains_point(&a, 0.0f, 0.0f, &hit), CMP_ERR_RANGE);
+  a.width = 1.0f;
+  a.height = -1.0f;
+  CMP_TEST_EXPECT(cmp_rect_contains_point(&a, 0.0f, 0.0f, &hit), CMP_ERR_RANGE);
 
   a.x = 0.0f;
   a.y = 0.0f;
@@ -120,6 +137,14 @@ int main(void) {
   CMP_TEST_ASSERT(hit == CMP_FALSE);
 
   a.width = 0.0f;
+  a.height = 0.0f;
+  CMP_TEST_OK(cmp_rect_contains_point(&a, 0.0f, 0.0f, &hit));
+  CMP_TEST_ASSERT(hit == CMP_FALSE);
+  a.width = 0.0f;
+  a.height = 2.0f;
+  CMP_TEST_OK(cmp_rect_contains_point(&a, 0.0f, 0.0f, &hit));
+  CMP_TEST_ASSERT(hit == CMP_FALSE);
+  a.width = 2.0f;
   a.height = 0.0f;
   CMP_TEST_OK(cmp_rect_contains_point(&a, 0.0f, 0.0f, &hit));
   CMP_TEST_ASSERT(hit == CMP_FALSE);

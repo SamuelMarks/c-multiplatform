@@ -507,6 +507,7 @@ static int test_i18n_branch_sweep(TestAlloc *alloc_state,
       cmp_i18n_test_mul_overflow((cmp_usize) ~(cmp_usize)0, 2u, &out_usize),
       CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_i18n_test_mul_overflow(3u, 4u, &out_usize));
+  CMP_TEST_OK(cmp_i18n_test_mul_overflow(0u, 5u, &out_usize));
 
   CMP_TEST_EXPECT(cmp_i18n_test_add_overflow(1u, 1u, NULL),
                   CMP_ERR_INVALID_ARGUMENT);
@@ -565,6 +566,24 @@ static int test_i18n_branch_sweep(TestAlloc *alloc_state,
                   CMP_ERR_INVALID_ARGUMENT);
   locale.pad_minute = CMP_TRUE;
   CMP_TEST_OK(cmp_i18n_test_validate_locale(&locale));
+  locale.grouping = 0u;
+  locale.thousands_separator = '\0';
+  CMP_TEST_OK(cmp_i18n_test_validate_locale(&locale));
+  locale.grouping = 3u;
+  locale.thousands_separator = ',';
+  locale.date_order = CMP_I18N_DATE_ORDER_DMY;
+  CMP_TEST_OK(cmp_i18n_test_validate_locale(&locale));
+  locale.date_order = CMP_I18N_DATE_ORDER_YMD;
+  CMP_TEST_OK(cmp_i18n_test_validate_locale(&locale));
+  locale.date_order = CMP_I18N_DATE_ORDER_MDY;
+  locale.time_format = CMP_I18N_TIME_FORMAT_12H;
+  CMP_TEST_OK(cmp_i18n_test_validate_locale(&locale));
+  locale.time_format = CMP_I18N_TIME_FORMAT_24H;
+  locale.pad_day = CMP_FALSE;
+  locale.pad_month = CMP_FALSE;
+  locale.pad_hour = CMP_FALSE;
+  locale.pad_minute = CMP_FALSE;
+  CMP_TEST_OK(cmp_i18n_test_validate_locale(&locale));
 
   memset(&number, 0, sizeof(number));
   number.fraction_digits = CMP_I18N_MAX_FRACTION_DIGITS + 1u;
@@ -579,6 +598,10 @@ static int test_i18n_branch_sweep(TestAlloc *alloc_state,
   number.fraction = 5u;
   number.fraction_digits = 1u;
   CMP_TEST_OK(cmp_i18n_test_validate_number(&number));
+  number.integer = 0;
+  number.fraction = 0u;
+  number.fraction_digits = 0u;
+  CMP_TEST_OK(cmp_i18n_test_validate_number(&number));
 
   memset(&date, 0, sizeof(date));
   CMP_TEST_EXPECT(cmp_i18n_test_validate_date(NULL), CMP_ERR_INVALID_ARGUMENT);
@@ -586,8 +609,21 @@ static int test_i18n_branch_sweep(TestAlloc *alloc_state,
   date.month = 0u;
   date.day = 1u;
   CMP_TEST_EXPECT(cmp_i18n_test_validate_date(&date), CMP_ERR_RANGE);
+  date.year = CMP_DATE_MIN_YEAR - 1;
+  date.month = 1u;
+  date.day = 1u;
+  CMP_TEST_EXPECT(cmp_i18n_test_validate_date(&date), CMP_ERR_RANGE);
+  date.year = CMP_DATE_MAX_YEAR + 1;
+  CMP_TEST_EXPECT(cmp_i18n_test_validate_date(&date), CMP_ERR_RANGE);
+  date.year = 2024;
+  date.month = 13u;
+  date.day = 1u;
+  CMP_TEST_EXPECT(cmp_i18n_test_validate_date(&date), CMP_ERR_RANGE);
   date.month = 2u;
   date.day = 31u;
+  CMP_TEST_EXPECT(cmp_i18n_test_validate_date(&date), CMP_ERR_RANGE);
+  date.month = 1u;
+  date.day = 0u;
   CMP_TEST_EXPECT(cmp_i18n_test_validate_date(&date), CMP_ERR_RANGE);
   date.day = 29u;
   CMP_TEST_OK(cmp_i18n_test_validate_date(&date));

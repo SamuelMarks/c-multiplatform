@@ -493,6 +493,12 @@ int CMP_CALL cmp_log_test_cstrlen(const char *cstr, cmp_usize *out_len) {
   return cmp_log_cstrlen(cstr, out_len);
 }
 
+int CMP_CALL cmp_log_test_default_sink(void *ctx, CMPLogLevel level,
+                                       const char *tag, const char *message,
+                                       cmp_usize length) {
+  return cmp_log_default_sink(ctx, level, tag, message, length);
+}
+
 int CMP_CALL cmp_log_test_mutex_lock(void) { return cmp_log_mutex_lock(); }
 
 int CMP_CALL cmp_log_test_mutex_unlock(void) { return cmp_log_mutex_unlock(); }

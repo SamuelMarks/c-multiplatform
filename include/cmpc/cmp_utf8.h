@@ -77,6 +77,15 @@ CMP_API int CMP_CALL cmp_utf8_iter_next(CMPUtf8Iter *iter,
 CMP_API int CMP_CALL cmp_utf8_test_set_cstr_limit(cmp_usize max_len);
 
 /**
+ * @brief Test wrapper for UTF-8 C-string length helper.
+ * @param cstr Null-terminated string.
+ * @param out_len Receives string length.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_utf8_test_cstrlen(const char *cstr,
+                                           cmp_usize *out_len);
+
+/**
  * @brief Test wrapper for UTF-8 decode helper.
  * @param data UTF-8 byte buffer.
  * @param length Buffer length in bytes.

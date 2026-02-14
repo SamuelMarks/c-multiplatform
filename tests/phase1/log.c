@@ -1,6 +1,7 @@
 #include "cmpc/cmp_log.h"
 #include "test_utils.h"
 
+#include <stdio.h>
 #include <string.h>
 
 typedef struct TestSinkState {
@@ -85,6 +86,16 @@ int main(void) {
                   CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_EXPECT(cmp_log_init(&bad_alloc), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
+  bad_alloc = default_alloc;
+  bad_alloc.alloc = NULL;
+  CMP_TEST_EXPECT(cmp_log_init(&bad_alloc), CMP_ERR_INVALID_ARGUMENT);
+  bad_alloc = default_alloc;
+  bad_alloc.realloc = NULL;
+  CMP_TEST_EXPECT(cmp_log_init(&bad_alloc), CMP_ERR_INVALID_ARGUMENT);
+  bad_alloc = default_alloc;
+  bad_alloc.free = NULL;
+  CMP_TEST_EXPECT(cmp_log_init(&bad_alloc), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_log_test_set_mutex_failures(CMP_TRUE, CMP_FALSE, CMP_FALSE,
                                               CMP_FALSE));
@@ -98,9 +109,13 @@ int main(void) {
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
 #endif
 
-  CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
   CMP_TEST_OK(cmp_log_init(&default_alloc));
   CMP_TEST_EXPECT(cmp_log_init(&default_alloc), CMP_ERR_STATE);
+
+  CMP_TEST_OK(
+      cmp_log_test_default_sink(NULL, CMP_LOG_LEVEL_INFO, "", "msg", 3));
+  CMP_TEST_OK(
+      cmp_log_test_default_sink(stderr, CMP_LOG_LEVEL_INFO, "tag", "msg", 3));
 
   CMP_TEST_EXPECT(cmp_log_set_sink(NULL), CMP_ERR_INVALID_ARGUMENT);
   sink.ctx = NULL;

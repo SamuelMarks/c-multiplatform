@@ -189,6 +189,36 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_store_init(&store, &bad_config, &initial),
                   CMP_ERR_INVALID_ARGUMENT);
 
+  {
+    CMPAllocator valid_alloc;
+    CMPAllocator invalid_alloc;
+
+    valid_alloc.ctx = NULL;
+    valid_alloc.alloc = test_alloc;
+    valid_alloc.realloc = test_realloc;
+    valid_alloc.free = test_free;
+
+    invalid_alloc = valid_alloc;
+    invalid_alloc.alloc = NULL;
+    config.allocator = &invalid_alloc;
+    CMP_TEST_EXPECT(cmp_store_init(&store, &config, &initial),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    invalid_alloc = valid_alloc;
+    invalid_alloc.realloc = NULL;
+    config.allocator = &invalid_alloc;
+    CMP_TEST_EXPECT(cmp_store_init(&store, &config, &initial),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    invalid_alloc = valid_alloc;
+    invalid_alloc.free = NULL;
+    config.allocator = &invalid_alloc;
+    CMP_TEST_EXPECT(cmp_store_init(&store, &config, &initial),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    config.allocator = NULL;
+  }
+
   config.allocator = &bad_alloc;
   config.state_size = sizeof(CounterState);
   config.history_capacity = 2;
@@ -214,6 +244,8 @@ int main(void) {
 
   CMP_TEST_EXPECT(cmp_store_test_mul_overflow(1, 1, NULL),
                   CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_store_test_mul_overflow(2, max_size, &size),
+                  CMP_ERR_OVERFLOW);
   {
     cmp_u8 history_buffer[8];
     cmp_usize history_count;
@@ -248,14 +280,32 @@ int main(void) {
                                                sizeof(history_state),
                                                &history_count, &history_state),
                     CMP_ERR_NOT_FOUND);
+    history_count = 0;
+    CMP_TEST_EXPECT(cmp_store_test_history_pop(history_buffer, 2,
+                                               sizeof(history_state),
+                                               &history_count, &history_state),
+                    CMP_ERR_NOT_FOUND);
 
     CMP_TEST_EXPECT(cmp_store_test_copy_history(NULL, 1, sizeof(history_state),
                                                 1, 0, &history_state),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_store_test_copy_history(
+                        history_buffer, 1, sizeof(history_state), 1, 0, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(cmp_store_test_copy_history(history_buffer, 0,
                                                 sizeof(history_state), 1, 0,
                                                 &history_state),
                     CMP_ERR_NOT_FOUND);
+    CMP_TEST_EXPECT(cmp_store_test_copy_history(history_buffer, 1,
+                                                sizeof(history_state), 0, 0,
+                                                &history_state),
+                    CMP_ERR_NOT_FOUND);
+
+    history_state.value = 5;
+    history_count = 2;
+    CMP_TEST_OK(cmp_store_test_history_push(history_buffer, 2,
+                                            sizeof(history_state),
+                                            &history_count, &history_state));
   }
 #endif
 
@@ -490,6 +540,40 @@ int main(void) {
 
   CMP_TEST_OK(cmp_store_shutdown(&store));
   CMP_TEST_EXPECT(cmp_store_shutdown(&store), CMP_ERR_STATE);
+
+  {
+    CMPStore temp_store_dispatch;
+    void *saved_state;
+    void *saved_scratch;
+    CMPReducerFn saved_reducer;
+
+    memset(&temp_store_dispatch, 0, sizeof(temp_store_dispatch));
+    CMP_TEST_OK(cmp_store_init(&temp_store_dispatch, &config, &initial));
+
+    saved_state = temp_store_dispatch.state;
+    saved_scratch = temp_store_dispatch.scratch;
+    saved_reducer = temp_store_dispatch.reducer;
+
+    temp_store_dispatch.scratch = NULL;
+    CMP_TEST_EXPECT(cmp_store_dispatch(&temp_store_dispatch, &action),
+                    CMP_ERR_STATE);
+    temp_store_dispatch.scratch = saved_scratch;
+
+    temp_store_dispatch.reducer = NULL;
+    CMP_TEST_EXPECT(cmp_store_dispatch(&temp_store_dispatch, &action),
+                    CMP_ERR_STATE);
+    temp_store_dispatch.reducer = saved_reducer;
+
+    temp_store_dispatch.state = NULL;
+    CMP_TEST_EXPECT(cmp_store_dispatch(&temp_store_dispatch, &action),
+                    CMP_ERR_STATE);
+    temp_store_dispatch.state = saved_state;
+
+    temp_store_dispatch.scratch = NULL;
+    temp_store_dispatch.allocator.free(temp_store_dispatch.allocator.ctx,
+                                       saved_scratch);
+    CMP_TEST_OK(cmp_store_shutdown(&temp_store_dispatch));
+  }
 
   CMP_TEST_EXPECT(cmp_store_dispatch(&store, &action), CMP_ERR_STATE);
   CMP_TEST_EXPECT(cmp_store_get_state(&store, &state, sizeof(state)),

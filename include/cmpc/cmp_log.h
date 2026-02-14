@@ -142,6 +142,20 @@ CMP_API int CMP_CALL cmp_log_test_set_io_fail_on_call(cmp_usize call_index);
 CMP_API int CMP_CALL cmp_log_test_cstrlen(const char *cstr, cmp_usize *out_len);
 
 /**
+ * @brief Test wrapper for the default log sink.
+ * @param ctx Sink context (FILE*).
+ * @param level Log level.
+ * @param tag Optional tag string.
+ * @param message Message bytes.
+ * @param length Message length in bytes.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_log_test_default_sink(void *ctx, CMPLogLevel level,
+                                               const char *tag,
+                                               const char *message,
+                                               cmp_usize length);
+
+/**
  * @brief Test wrapper to lock the log mutex directly.
  * @return CMP_OK on success or a failure code.
  */

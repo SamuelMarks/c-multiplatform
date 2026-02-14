@@ -130,6 +130,17 @@ static int test_node_set_children(void) {
   CMP_TEST_ASSERT(child_b.parent == NULL);
   CMP_TEST_ASSERT(child_c.parent == &parent);
 
+  {
+    CMPA11yNode *old_children[2];
+
+    old_children[0] = &child_a;
+    old_children[1] = NULL;
+    child_a.parent = &other_parent;
+    parent.children = old_children;
+    parent.child_count = 2;
+    CMP_TEST_OK(cmp_a11y_node_set_children(&parent, single_child, 1));
+  }
+
   parent.child_count = 1;
   parent.children = NULL;
   CMP_TEST_EXPECT(cmp_a11y_node_set_children(&parent, single_child, 1),
@@ -167,6 +178,13 @@ static int test_node_queries(void) {
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_a11y_node_get_child_count(&parent, &count));
   CMP_TEST_ASSERT(count == 2);
+
+  parent.child_count = 0;
+  parent.children = NULL;
+  CMP_TEST_OK(cmp_a11y_node_get_child_count(&parent, &count));
+  CMP_TEST_ASSERT(count == 0);
+  parent.child_count = 2;
+  parent.children = children;
 
   CMP_TEST_EXPECT(cmp_a11y_node_get_child(NULL, 0, &out_node),
                   CMP_ERR_INVALID_ARGUMENT);
@@ -230,6 +248,13 @@ static int test_sibling_queries(void) {
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_a11y_node_get_prev_sibling(&child_b, &out_node));
   CMP_TEST_ASSERT(out_node == &child_a);
+
+  parent.child_count = 1;
+  parent.children = NULL;
+  CMP_TEST_EXPECT(cmp_a11y_node_get_next_sibling(&child_a, &out_node),
+                  CMP_ERR_STATE);
+  parent.child_count = 3;
+  parent.children = children;
   CMP_TEST_OK(cmp_a11y_node_get_prev_sibling(&child_a, &out_node));
   CMP_TEST_ASSERT(out_node == NULL);
 

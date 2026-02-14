@@ -17,6 +17,11 @@
 int CMP_CALL m3_chip_test_set_fail_point(cmp_u32 fail_point);
 int CMP_CALL m3_chip_test_set_color_fail_after(cmp_u32 call_count);
 int CMP_CALL m3_chip_test_clear_fail_points(void);
+int CMP_CALL m3_chip_test_style_init_layout(
+    M3ChipLayout *layout, CMPScalar padding_x, CMPScalar padding_y,
+    CMPScalar min_width, CMPScalar min_height, CMPScalar icon_size,
+    CMPScalar icon_gap, CMPScalar delete_thickness);
+int CMP_CALL m3_chip_test_style_init_base(M3ChipStyle *style, cmp_u32 variant);
 int CMP_CALL m3_chip_test_validate_color(const CMPColor *color);
 int CMP_CALL m3_chip_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
                                     CMPScalar b, CMPScalar a);
@@ -449,14 +454,27 @@ static int test_chip_helpers(void) {
   CMP_TEST_EXPECT(m3_chip_test_validate_color(&color), CMP_ERR_RANGE);
   color.a = -0.1f;
   CMP_TEST_EXPECT(m3_chip_test_validate_color(&color), CMP_ERR_RANGE);
+  color.r = 0.1f;
+  color.g = 0.2f;
+  color.b = 0.3f;
+  color.a = 0.4f;
+  CMP_TEST_OK(m3_chip_test_validate_color(&color));
 
   CMP_TEST_EXPECT(m3_chip_test_color_set(NULL, 0.0f, 0.0f, 0.0f, 1.0f),
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_test_color_set(&color, -1.0f, 0.0f, 0.0f, 1.0f),
                   CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 2.0f, 0.0f, 0.0f, 1.0f),
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 0.0f, -1.0f, 0.0f, 1.0f),
                   CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 0.0f, 2.0f, 0.0f, 1.0f),
+                  CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 0.0f, 0.0f, -1.0f, 1.0f),
+                  CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 0.0f, 0.0f, 2.0f, 1.0f),
+                  CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 0.0f, 0.0f, 0.0f, -1.0f),
                   CMP_ERR_RANGE);
   CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 0.0f, 0.0f, 0.0f, 2.0f),
                   CMP_ERR_RANGE);
@@ -464,6 +482,7 @@ static int test_chip_helpers(void) {
   CMP_TEST_EXPECT(m3_chip_test_color_set(&color, 0.0f, 0.0f, 0.0f, 1.0f),
                   CMP_ERR_IO);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
+  CMP_TEST_OK(m3_chip_test_color_set(&color, 0.1f, 0.2f, 0.3f, 0.4f));
 
   CMP_TEST_EXPECT(m3_chip_test_color_with_alpha(NULL, 0.5f, &out_color),
                   CMP_ERR_INVALID_ARGUMENT);
@@ -484,6 +503,7 @@ static int test_chip_helpers(void) {
   CMP_TEST_EXPECT(m3_chip_test_color_with_alpha(&color, 0.5f, &out_color),
                   CMP_ERR_IO);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
+  CMP_TEST_OK(m3_chip_test_color_with_alpha(&color, 0.5f, &out_color));
 
   CMP_TEST_EXPECT(m3_chip_test_validate_text_style(
                       (const CMPTextStyle *)null_style, CMP_FALSE),
@@ -531,6 +551,9 @@ static int test_chip_helpers(void) {
                   CMP_ERR_RANGE);
   text_style.color.a = 1.0f;
   CMP_TEST_OK(m3_chip_test_validate_text_style(&text_style, CMP_TRUE));
+  text_style.italic = CMP_TRUE;
+  CMP_TEST_OK(m3_chip_test_validate_text_style(&text_style, CMP_TRUE));
+  text_style.italic = CMP_FALSE;
 
   CMP_TEST_EXPECT(
       m3_chip_test_validate_layout((const M3ChipLayout *)null_layout),
@@ -539,9 +562,15 @@ static int test_chip_helpers(void) {
   layout.padding_x = -1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_layout(&layout), CMP_ERR_RANGE);
   layout.padding_x = 0.0f;
+  layout.padding_y = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_layout(&layout), CMP_ERR_RANGE);
+  layout.padding_y = 0.0f;
   layout.min_width = -1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_layout(&layout), CMP_ERR_RANGE);
   layout.min_width = 0.0f;
+  layout.min_height = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_layout(&layout), CMP_ERR_RANGE);
+  layout.min_height = 0.0f;
   layout.icon_size = -1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_layout(&layout), CMP_ERR_RANGE);
   layout.icon_size = 10.0f;
@@ -564,6 +593,19 @@ static int test_chip_helpers(void) {
   CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
                   CMP_ERR_RANGE);
   bad_style = style;
+  bad_style.variant = M3_CHIP_VARIANT_ASSIST;
+  CMP_TEST_OK(m3_chip_test_validate_style(&bad_style, CMP_TRUE));
+  bad_style.variant = M3_CHIP_VARIANT_FILTER;
+  CMP_TEST_OK(m3_chip_test_validate_style(&bad_style, CMP_TRUE));
+  bad_style.variant = M3_CHIP_VARIANT_INPUT;
+  CMP_TEST_OK(m3_chip_test_validate_style(&bad_style, CMP_TRUE));
+  bad_style.variant = M3_CHIP_VARIANT_SUGGESTION;
+  CMP_TEST_OK(m3_chip_test_validate_style(&bad_style, CMP_TRUE));
+  bad_style = style;
+  bad_style.outline_width = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  bad_style = style;
   bad_style.corner_radius = -1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
                   CMP_ERR_RANGE);
@@ -572,7 +614,15 @@ static int test_chip_helpers(void) {
   CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
                   CMP_ERR_RANGE);
   bad_style = style;
+  bad_style.ripple_fade_duration = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  bad_style = style;
   bad_style.layout.padding_x = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  bad_style = style;
+  bad_style.dense_layout.padding_y = -1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
                   CMP_ERR_RANGE);
   bad_style = style;
@@ -583,6 +633,38 @@ static int test_chip_helpers(void) {
   bad_style.background_color.r = 2.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
                   CMP_ERR_RANGE);
+  bad_style = style;
+  bad_style.outline_color.r = -0.1f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  bad_style = style;
+  bad_style.selected_background_color.r = 2.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  bad_style = style;
+  bad_style.selected_outline_color.r = 2.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  bad_style = style;
+  bad_style.selected_text_color.r = -0.1f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  bad_style = style;
+  bad_style.disabled_background_color.r = 2.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  bad_style = style;
+  bad_style.disabled_outline_color.r = 2.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  bad_style = style;
+  bad_style.disabled_text_color.r = -0.1f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
+  bad_style = style;
+  bad_style.ripple_color.r = 2.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_style(&bad_style, CMP_TRUE),
+                  CMP_ERR_RANGE);
 
   spec.mode = 999u;
   spec.size = 10.0f;
@@ -591,6 +673,15 @@ static int test_chip_helpers(void) {
   spec.mode = CMP_MEASURE_AT_MOST;
   spec.size = -1.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_measure_spec(spec), CMP_ERR_RANGE);
+  spec.mode = CMP_MEASURE_EXACTLY;
+  spec.size = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_measure_spec(spec), CMP_ERR_RANGE);
+  spec.mode = CMP_MEASURE_EXACTLY;
+  spec.size = 10.0f;
+  CMP_TEST_OK(m3_chip_test_validate_measure_spec(spec));
+  spec.mode = CMP_MEASURE_AT_MOST;
+  spec.size = 10.0f;
+  CMP_TEST_OK(m3_chip_test_validate_measure_spec(spec));
 
   CMP_TEST_EXPECT(m3_chip_test_validate_rect((const CMPRect *)null_rect),
                   CMP_ERR_INVALID_ARGUMENT);
@@ -599,6 +690,11 @@ static int test_chip_helpers(void) {
   rect.width = -1.0f;
   rect.height = 10.0f;
   CMP_TEST_EXPECT(m3_chip_test_validate_rect(&rect), CMP_ERR_RANGE);
+  rect.width = 10.0f;
+  rect.height = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_validate_rect(&rect), CMP_ERR_RANGE);
+  rect.height = 10.0f;
+  CMP_TEST_OK(m3_chip_test_validate_rect(&rect));
 
   CMP_TEST_EXPECT(
       m3_chip_test_validate_backend((const CMPTextBackend *)null_backend),
@@ -606,11 +702,29 @@ static int test_chip_helpers(void) {
   memset(&text_backend, 0, sizeof(text_backend));
   CMP_TEST_EXPECT(m3_chip_test_validate_backend(&text_backend),
                   CMP_ERR_INVALID_ARGUMENT);
+  text_backend.ctx = &backend;
+  text_backend.vtable = &g_test_text_vtable;
+  CMP_TEST_OK(m3_chip_test_validate_backend(&text_backend));
 
   memset(&chip, 0, sizeof(chip));
   chip.style = style;
   chip.widget.flags = 0;
   chip.selected = CMP_TRUE;
+  CMP_TEST_EXPECT(m3_chip_test_resolve_colors(NULL, &background, &text_color,
+                                              &outline, &ripple),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      m3_chip_test_resolve_colors(&chip, NULL, &text_color, &outline, &ripple),
+      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      m3_chip_test_resolve_colors(&chip, &background, NULL, &outline, &ripple),
+      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_chip_test_resolve_colors(&chip, &background, &text_color,
+                                              NULL, &ripple),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_chip_test_resolve_colors(&chip, &background, &text_color,
+                                              &outline, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_chip_test_resolve_colors(&chip, &background, &text_color,
                                           &outline, &ripple));
   CMP_TEST_ASSERT(
@@ -628,14 +742,40 @@ static int test_chip_helpers(void) {
                                               &outline, &ripple),
                   CMP_ERR_RANGE);
   chip.style.background_color = style.background_color;
+  chip.style.text_style.color.r = 2.0f;
+  CMP_TEST_EXPECT(m3_chip_test_resolve_colors(&chip, &background, &text_color,
+                                              &outline, &ripple),
+                  CMP_ERR_RANGE);
+  chip.style.text_style.color = style.text_style.color;
+  chip.style.outline_color.r = -0.1f;
+  CMP_TEST_EXPECT(m3_chip_test_resolve_colors(&chip, &background, &text_color,
+                                              &outline, &ripple),
+                  CMP_ERR_RANGE);
+  chip.style.outline_color = style.outline_color;
+  chip.style.ripple_color.r = 2.0f;
+  CMP_TEST_EXPECT(m3_chip_test_resolve_colors(&chip, &background, &text_color,
+                                              &outline, &ripple),
+                  CMP_ERR_RANGE);
+  chip.style.ripple_color = style.ripple_color;
 
   chip.bounds.x = 0.0f;
   chip.bounds.y = 0.0f;
   chip.bounds.width = 20.0f;
   chip.bounds.height = 10.0f;
   chip.style.corner_radius = 20.0f;
+  CMP_TEST_EXPECT(m3_chip_test_resolve_corner(NULL, &corner),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_chip_test_resolve_corner(&chip, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
+  chip.style.corner_radius = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_resolve_corner(&chip, &corner), CMP_ERR_RANGE);
+  chip.style.corner_radius = 20.0f;
   CMP_TEST_OK(m3_chip_test_resolve_corner(&chip, &corner));
   CMP_TEST_ASSERT(cmp_near(corner, 5.0f, 0.001f));
+  chip.bounds.width = 5.0f;
+  chip.bounds.height = 12.0f;
+  CMP_TEST_OK(m3_chip_test_resolve_corner(&chip, &corner));
+  CMP_TEST_ASSERT(corner > 0.0f);
   chip.bounds.width = -1.0f;
   CMP_TEST_EXPECT(m3_chip_test_resolve_corner(&chip, &corner), CMP_ERR_RANGE);
   chip.bounds.width = 20.0f;
@@ -676,6 +816,19 @@ static int test_chip_helpers(void) {
   CMP_TEST_EXPECT(m3_chip_test_compute_delete_bounds(&chip, &delete_bounds),
                   CMP_ERR_INVALID_ARGUMENT);
   chip.dense = CMP_FALSE;
+  chip.style.layout.padding_x = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_compute_delete_bounds(&chip, &delete_bounds),
+                  CMP_ERR_RANGE);
+  chip.style.layout.padding_x = style.layout.padding_x;
+  chip.bounds.width = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_compute_delete_bounds(&chip, &delete_bounds),
+                  CMP_ERR_RANGE);
+  chip.bounds.width = 120.0f;
+  chip.metrics_valid = CMP_FALSE;
+  chip.text_backend.vtable = NULL;
+  CMP_TEST_EXPECT(m3_chip_test_compute_delete_bounds(&chip, &delete_bounds),
+                  CMP_ERR_INVALID_ARGUMENT);
+  chip.text_backend.vtable = &g_test_text_vtable;
 
   CMP_TEST_EXPECT(m3_chip_test_metrics_update(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(test_backend_init(&backend));
@@ -725,6 +878,14 @@ static int test_chip_draw_delete(void) {
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, -1.0f),
                   CMP_ERR_RANGE);
+  bounds.width = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, 1.0f),
+                  CMP_ERR_RANGE);
+  bounds.width = 10.0f;
+  bounds.height = -1.0f;
+  CMP_TEST_EXPECT(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, 1.0f),
+                  CMP_ERR_RANGE);
+  bounds.height = 10.0f;
 
   gfx.vtable = NULL;
   CMP_TEST_EXPECT(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, 1.0f),
@@ -734,6 +895,15 @@ static int test_chip_draw_delete(void) {
   bounds.width = 0.0f;
   CMP_TEST_OK(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, 1.0f));
   bounds.width = 10.0f;
+  bounds.height = 0.0f;
+  CMP_TEST_OK(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, 1.0f));
+  bounds.height = 10.0f;
+
+  bounds.width = 10.0f;
+  bounds.height = 2.0f;
+  CMP_TEST_OK(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, 2.5f));
+  bounds.width = 10.0f;
+  bounds.height = 10.0f;
 
   backend.fail_draw_line = 1;
   CMP_TEST_EXPECT(m3_chip_test_draw_delete_icon(&gfx, &bounds, color, 1.0f),
@@ -746,6 +916,29 @@ static int test_chip_draw_delete(void) {
 
 static int test_chip_style_init(void) {
   M3ChipStyle style;
+  M3ChipLayout layout;
+  cmp_u32 fail_index;
+
+  CMP_TEST_OK(m3_chip_test_clear_fail_points());
+  CMP_TEST_EXPECT(m3_chip_test_style_init_layout(NULL, 1.0f, 1.0f, 1.0f, 1.0f,
+                                                 1.0f, 1.0f, 1.0f),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_chip_test_style_init_layout(&layout, -1.0f, 1.0f, 1.0f,
+                                                 1.0f, 1.0f, 1.0f, 1.0f),
+                  CMP_ERR_RANGE);
+  CMP_TEST_OK(m3_chip_test_style_init_layout(&layout, 1.0f, 1.0f, 1.0f, 1.0f,
+                                             1.0f, 1.0f, 1.0f));
+
+  CMP_TEST_EXPECT(m3_chip_test_style_init_base(NULL, M3_CHIP_VARIANT_ASSIST),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(m3_chip_test_style_init_base(&style, M3_CHIP_VARIANT_ASSIST));
+  for (fail_index = 1u; fail_index <= 10u; ++fail_index) {
+    CMP_TEST_OK(m3_chip_test_set_color_fail_after(fail_index));
+    CMP_TEST_EXPECT(
+        m3_chip_test_style_init_base(&style, M3_CHIP_VARIANT_ASSIST),
+        CMP_ERR_IO);
+    CMP_TEST_OK(m3_chip_test_clear_fail_points());
+  }
 
   CMP_TEST_OK(m3_chip_style_init_assist(&style));
   CMP_TEST_ASSERT(style.variant == M3_CHIP_VARIANT_ASSIST);
@@ -762,6 +955,36 @@ static int test_chip_style_init(void) {
 
   CMP_TEST_OK(m3_chip_test_set_color_fail_after(1));
   CMP_TEST_EXPECT(m3_chip_style_init_assist(&style), CMP_ERR_IO);
+  CMP_TEST_OK(m3_chip_test_clear_fail_points());
+
+  CMP_TEST_OK(m3_chip_test_set_color_fail_after(11));
+  CMP_TEST_EXPECT(m3_chip_style_init_filter(&style), CMP_ERR_IO);
+  CMP_TEST_OK(m3_chip_test_clear_fail_points());
+  CMP_TEST_OK(m3_chip_test_set_color_fail_after(12));
+  CMP_TEST_EXPECT(m3_chip_style_init_filter(&style), CMP_ERR_IO);
+  CMP_TEST_OK(m3_chip_test_clear_fail_points());
+  CMP_TEST_OK(m3_chip_test_set_color_fail_after(13));
+  CMP_TEST_EXPECT(m3_chip_style_init_filter(&style), CMP_ERR_IO);
+  CMP_TEST_OK(m3_chip_test_clear_fail_points());
+
+  CMP_TEST_OK(m3_chip_test_set_color_fail_after(11));
+  CMP_TEST_EXPECT(m3_chip_style_init_input(&style), CMP_ERR_IO);
+  CMP_TEST_OK(m3_chip_test_clear_fail_points());
+  CMP_TEST_OK(m3_chip_test_set_color_fail_after(12));
+  CMP_TEST_EXPECT(m3_chip_style_init_input(&style), CMP_ERR_IO);
+  CMP_TEST_OK(m3_chip_test_clear_fail_points());
+
+  CMP_TEST_OK(m3_chip_test_set_color_fail_after(11));
+  CMP_TEST_EXPECT(m3_chip_style_init_suggestion(&style), CMP_ERR_IO);
+  CMP_TEST_OK(m3_chip_test_clear_fail_points());
+  CMP_TEST_OK(m3_chip_test_set_color_fail_after(12));
+  CMP_TEST_EXPECT(m3_chip_style_init_suggestion(&style), CMP_ERR_IO);
+  CMP_TEST_OK(m3_chip_test_clear_fail_points());
+  CMP_TEST_OK(m3_chip_test_set_color_fail_after(13));
+  CMP_TEST_EXPECT(m3_chip_style_init_suggestion(&style), CMP_ERR_IO);
+  CMP_TEST_OK(m3_chip_test_clear_fail_points());
+  CMP_TEST_OK(m3_chip_test_set_color_fail_after(14));
+  CMP_TEST_EXPECT(m3_chip_style_init_suggestion(&style), CMP_ERR_IO);
   CMP_TEST_OK(m3_chip_test_clear_fail_points());
 
   return 0;

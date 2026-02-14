@@ -375,6 +375,7 @@ int main(void) {
     CMPTasks tasks;
     CMPAllocator default_alloc = {0};
     CMPAllocator bad_alloc = {0};
+    CMPAllocator partial_alloc = {0};
     CMPWSConfig ws_config;
     CMPWSWindowConfig win_config;
     CMPHandle window;
@@ -572,6 +573,7 @@ int main(void) {
                                               sizeof(clip_buffer), &clip_len));
     CMP_TEST_ASSERT(clip_len == 6);
     CMP_TEST_ASSERT(strcmp(clip_buffer, "abcdef") == 0);
+    CMP_TEST_OK(ws.vtable->set_clipboard_text(ws.ctx, "a"));
 
     CMP_TEST_EXPECT(ws.vtable->poll_event(ws.ctx, NULL, &has_event),
                     CMP_ERR_INVALID_ARGUMENT);
@@ -628,6 +630,12 @@ int main(void) {
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(gfx.vtable->draw_rect(gfx.ctx, &rect_small, color, 0.0f),
                     CMP_ERR_RANGE);
+    rect_small.width = 1.0f;
+    rect_small.height = -1.0f;
+    CMP_TEST_EXPECT(gfx.vtable->draw_rect(gfx.ctx, &rect_small, color, 0.0f),
+                    CMP_ERR_RANGE);
+    rect_small.width = -1.0f;
+    rect_small.height = 1.0f;
     CMP_TEST_EXPECT(gfx.vtable->draw_rect(gfx.ctx, &rect, color, -1.0f),
                     CMP_ERR_RANGE);
     CMP_TEST_OK(gfx.vtable->draw_rect(gfx.ctx, &rect, color, 0.0f));
@@ -663,6 +671,11 @@ int main(void) {
     CMP_TEST_EXPECT(gfx.vtable->push_clip(gfx.ctx, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(gfx.vtable->push_clip(gfx.ctx, &rect_small), CMP_ERR_RANGE);
+    rect_small.width = 1.0f;
+    rect_small.height = -1.0f;
+    CMP_TEST_EXPECT(gfx.vtable->push_clip(gfx.ctx, &rect_small), CMP_ERR_RANGE);
+    rect_small.width = -1.0f;
+    rect_small.height = 1.0f;
     CMP_TEST_OK(gfx.vtable->push_clip(gfx.ctx, &rect));
 
     CMP_TEST_EXPECT(gfx.vtable->pop_clip(NULL), CMP_ERR_INVALID_ARGUMENT);
@@ -693,6 +706,12 @@ int main(void) {
     CMP_TEST_EXPECT(gfx.vtable->create_texture(
                         gfx.ctx, 1, 1, CMP_TEX_FORMAT_RGBA8, NULL, 0, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(gfx.vtable->create_texture(gfx.ctx, 1, 1, CMP_TEX_FORMAT_BGRA8,
+                                           NULL, 0, &texture));
+    CMP_TEST_OK(gfx.vtable->destroy_texture(gfx.ctx, texture));
+    CMP_TEST_OK(gfx.vtable->create_texture(gfx.ctx, 1, 1, CMP_TEX_FORMAT_A8,
+                                           NULL, 0, &texture));
+    CMP_TEST_OK(gfx.vtable->destroy_texture(gfx.ctx, texture));
     CMP_TEST_OK(gfx.vtable->create_texture(gfx.ctx, 1, 1, CMP_TEX_FORMAT_RGBA8,
                                            NULL, 0, &texture));
 
@@ -785,6 +804,12 @@ int main(void) {
     CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, NULL,
                                                   &scale, &scale),
                     CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2,
+                                                  &scale, NULL, &scale),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2,
+                                                  &scale, &scale, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &scale,
                                               &scale, &scale));
 
@@ -815,33 +840,49 @@ int main(void) {
 
     CMP_TEST_EXPECT(env.vtable->get_sensors(NULL, &sensors),
                     CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(env.vtable->get_sensors(env.ctx, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(env.vtable->get_sensors(env.ctx, &sensors));
 
     CMP_TEST_EXPECT(env.vtable->get_camera(NULL, &camera),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(env.vtable->get_camera(env.ctx, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(env.vtable->get_camera(env.ctx, &camera));
 
     CMP_TEST_EXPECT(env.vtable->get_image(NULL, &image),
                     CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(env.vtable->get_image(env.ctx, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(env.vtable->get_image(env.ctx, &image));
 
     CMP_TEST_EXPECT(env.vtable->get_video(NULL, &video),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(env.vtable->get_video(env.ctx, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(env.vtable->get_video(env.ctx, &video));
 
     CMP_TEST_EXPECT(env.vtable->get_audio(NULL, &audio),
                     CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(env.vtable->get_audio(env.ctx, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(env.vtable->get_audio(env.ctx, &audio));
 
     CMP_TEST_EXPECT(env.vtable->get_network(NULL, &network),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(env.vtable->get_network(env.ctx, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(env.vtable->get_network(env.ctx, &network));
 
     CMP_TEST_EXPECT(env.vtable->get_tasks(NULL, &tasks),
                     CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(env.vtable->get_tasks(env.ctx, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(env.vtable->get_tasks(env.ctx, &tasks));
 
     CMP_TEST_EXPECT(env.vtable->get_time_ms(NULL, &time_ms),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(env.vtable->get_time_ms(env.ctx, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(env.vtable->get_time_ms(env.ctx, &time_ms));
 
@@ -868,6 +909,27 @@ int main(void) {
                                                &data, &clip_len),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
+    CMP_TEST_EXPECT(io.vtable->read_file_alloc(io.ctx, "path", &default_alloc,
+                                               NULL, &clip_len),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        io.vtable->read_file_alloc(io.ctx, "path", &default_alloc, &data, NULL),
+        CMP_ERR_INVALID_ARGUMENT);
+    partial_alloc = default_alloc;
+    partial_alloc.alloc = NULL;
+    CMP_TEST_EXPECT(io.vtable->read_file_alloc(io.ctx, "path", &partial_alloc,
+                                               &data, &clip_len),
+                    CMP_ERR_INVALID_ARGUMENT);
+    partial_alloc = default_alloc;
+    partial_alloc.realloc = NULL;
+    CMP_TEST_EXPECT(io.vtable->read_file_alloc(io.ctx, "path", &partial_alloc,
+                                               &data, &clip_len),
+                    CMP_ERR_INVALID_ARGUMENT);
+    partial_alloc = default_alloc;
+    partial_alloc.free = NULL;
+    CMP_TEST_EXPECT(io.vtable->read_file_alloc(io.ctx, "path", &partial_alloc,
+                                               &data, &clip_len),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(io.vtable->read_file_alloc(io.ctx, "path", &default_alloc,
                                                &data, &clip_len),
                     CMP_ERR_UNSUPPORTED);
@@ -914,6 +976,10 @@ int main(void) {
     CMP_TEST_EXPECT(sensors.vtable->stop(sensors.ctx, 0), CMP_ERR_UNSUPPORTED);
     CMP_TEST_EXPECT(sensors.vtable->read(NULL, 0, &reading, &has_event),
                     CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(sensors.vtable->read(sensors.ctx, 0, NULL, &has_event),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(sensors.vtable->read(sensors.ctx, 0, &reading, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(sensors.vtable->read(sensors.ctx, 0, &reading, &has_event));
 
     CMP_TEST_EXPECT(camera.vtable->open(NULL, 0), CMP_ERR_INVALID_ARGUMENT);
@@ -925,6 +991,10 @@ int main(void) {
     CMP_TEST_EXPECT(camera.vtable->stop(NULL), CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(camera.vtable->stop(camera.ctx), CMP_ERR_UNSUPPORTED);
     CMP_TEST_EXPECT(camera.vtable->read_frame(NULL, &frame, &has_event),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(camera.vtable->read_frame(camera.ctx, NULL, &has_event),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(camera.vtable->read_frame(camera.ctx, &frame, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(camera.vtable->read_frame(camera.ctx, &frame, &has_event));
 
@@ -948,6 +1018,16 @@ int main(void) {
     CMP_TEST_EXPECT(
         image.vtable->decode(image.ctx, &image_req, &bad_alloc, &image_data),
         CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.realloc = NULL;
+    CMP_TEST_EXPECT(
+        image.vtable->decode(image.ctx, &image_req, &bad_alloc, &image_data),
+        CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.free = NULL;
+    CMP_TEST_EXPECT(
+        image.vtable->decode(image.ctx, &image_req, &bad_alloc, &image_data),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(image.vtable->decode(image.ctx, &image_req, &default_alloc,
                                          &image_data),
                     CMP_ERR_UNSUPPORTED);
@@ -958,6 +1038,16 @@ int main(void) {
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(image.vtable->free_image(image.ctx, &default_alloc, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.alloc = NULL;
+    CMP_TEST_EXPECT(
+        image.vtable->free_image(image.ctx, &bad_alloc, &image_data),
+        CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.realloc = NULL;
+    CMP_TEST_EXPECT(
+        image.vtable->free_image(image.ctx, &bad_alloc, &image_data),
+        CMP_ERR_INVALID_ARGUMENT);
     bad_alloc = default_alloc;
     bad_alloc.free = NULL;
     CMP_TEST_EXPECT(
@@ -978,6 +1068,10 @@ int main(void) {
     CMP_TEST_EXPECT(video.vtable->close(video.ctx), CMP_ERR_UNSUPPORTED);
     CMP_TEST_EXPECT(video.vtable->read_frame(NULL, &video_frame, &has_event),
                     CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(video.vtable->read_frame(video.ctx, NULL, &has_event),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(video.vtable->read_frame(video.ctx, &video_frame, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(video.vtable->read_frame(video.ctx, &video_frame, &has_event));
 
     memset(&audio_req, 0, sizeof(audio_req));
@@ -994,7 +1088,17 @@ int main(void) {
         audio.vtable->decode(audio.ctx, &audio_req, &default_alloc, NULL),
         CMP_ERR_INVALID_ARGUMENT);
     bad_alloc = default_alloc;
+    bad_alloc.alloc = NULL;
+    CMP_TEST_EXPECT(
+        audio.vtable->decode(audio.ctx, &audio_req, &bad_alloc, &audio_data),
+        CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
     bad_alloc.realloc = NULL;
+    CMP_TEST_EXPECT(
+        audio.vtable->decode(audio.ctx, &audio_req, &bad_alloc, &audio_data),
+        CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.free = NULL;
     CMP_TEST_EXPECT(
         audio.vtable->decode(audio.ctx, &audio_req, &bad_alloc, &audio_data),
         CMP_ERR_INVALID_ARGUMENT);
@@ -1008,6 +1112,16 @@ int main(void) {
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(audio.vtable->free_audio(audio.ctx, &default_alloc, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.alloc = NULL;
+    CMP_TEST_EXPECT(
+        audio.vtable->free_audio(audio.ctx, &bad_alloc, &audio_data),
+        CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.realloc = NULL;
+    CMP_TEST_EXPECT(
+        audio.vtable->free_audio(audio.ctx, &bad_alloc, &audio_data),
+        CMP_ERR_INVALID_ARGUMENT);
     bad_alloc = default_alloc;
     bad_alloc.free = NULL;
     CMP_TEST_EXPECT(
@@ -1024,11 +1138,29 @@ int main(void) {
     CMP_TEST_EXPECT(
         network.vtable->request(network.ctx, NULL, &default_alloc, &net_resp),
         CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        network.vtable->request(network.ctx, &net_req, &default_alloc, NULL),
+        CMP_ERR_INVALID_ARGUMENT);
     memset(&default_alloc, 0, sizeof(default_alloc));
     CMP_TEST_EXPECT(network.vtable->request(network.ctx, &net_req,
                                             &default_alloc, &net_resp),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
+    bad_alloc = default_alloc;
+    bad_alloc.alloc = NULL;
+    CMP_TEST_EXPECT(
+        network.vtable->request(network.ctx, &net_req, &bad_alloc, &net_resp),
+        CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.realloc = NULL;
+    CMP_TEST_EXPECT(
+        network.vtable->request(network.ctx, &net_req, &bad_alloc, &net_resp),
+        CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.free = NULL;
+    CMP_TEST_EXPECT(
+        network.vtable->request(network.ctx, &net_req, &bad_alloc, &net_resp),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(network.vtable->request(network.ctx, &net_req,
                                             &default_alloc, &net_resp),
                     CMP_ERR_UNSUPPORTED);
@@ -1038,11 +1170,29 @@ int main(void) {
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(network.vtable->free_response(network.ctx, NULL, &net_resp),
                     CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        network.vtable->free_response(network.ctx, &default_alloc, NULL),
+        CMP_ERR_INVALID_ARGUMENT);
     memset(&default_alloc, 0, sizeof(default_alloc));
     CMP_TEST_EXPECT(
         network.vtable->free_response(network.ctx, &default_alloc, &net_resp),
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
+    bad_alloc = default_alloc;
+    bad_alloc.alloc = NULL;
+    CMP_TEST_EXPECT(
+        network.vtable->free_response(network.ctx, &bad_alloc, &net_resp),
+        CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.realloc = NULL;
+    CMP_TEST_EXPECT(
+        network.vtable->free_response(network.ctx, &bad_alloc, &net_resp),
+        CMP_ERR_INVALID_ARGUMENT);
+    bad_alloc = default_alloc;
+    bad_alloc.free = NULL;
+    CMP_TEST_EXPECT(
+        network.vtable->free_response(network.ctx, &bad_alloc, &net_resp),
+        CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         network.vtable->free_response(network.ctx, &default_alloc, &net_resp),
         CMP_ERR_UNSUPPORTED);
@@ -1255,6 +1405,295 @@ int main(void) {
     CMPNullBackendConfig config;
     CMPNullBackend *backend;
     CMPWS ws;
+    CMPGfx gfx;
+    CMPEnv env;
+    CMPIO io;
+    CMPSensors sensors;
+    CMPCamera camera;
+    CMPImage image;
+    CMPVideo video;
+    CMPAudio audio;
+    CMPNetwork network;
+    CMPTasks tasks;
+    CMPWSConfig ws_config;
+    CMPWSWindowConfig win_config;
+    CMPHandle window;
+    CMPHandle texture;
+    CMPHandle font;
+    CMPHandle task_handle;
+    CMPRect rect;
+    CMPMat3 transform;
+    CMPInputEvent event;
+    CMPBool has_event;
+    CMPScalar scale;
+    cmp_i32 width;
+    cmp_i32 height;
+    CMPScalar text_width;
+    CMPScalar text_height;
+    CMPScalar baseline;
+    cmp_u32 time_ms;
+    cmp_usize length;
+    char buffer[32];
+    CMPAllocator default_alloc;
+    CMPPath path;
+    CMPCameraFrame camera_frame;
+    CMPBool has_frame;
+    CMPVideoFrame video_frame;
+    CMPVideoOpenRequest video_request;
+    CMPSensorReading sensor_read;
+    CMPBool has_reading;
+    CMPImageDecodeRequest image_request;
+    CMPImageData image_data;
+    CMPAudioDecodeRequest audio_request;
+    CMPAudioData audio_data;
+    CMPNetworkRequest network_request;
+    CMPNetworkResponse network_response;
+    CMPFileInfo file_info;
+    CMPBool exists;
+    CMPColor color;
+
+    CMP_TEST_OK(cmp_null_backend_config_init(&config));
+    config.enable_logging = CMP_FALSE;
+    config.handle_capacity = 16;
+    CMP_TEST_OK(cmp_null_backend_create(&config, &backend));
+    CMP_TEST_OK(cmp_null_backend_get_ws(backend, &ws));
+    CMP_TEST_OK(cmp_null_backend_get_gfx(backend, &gfx));
+    CMP_TEST_OK(cmp_null_backend_get_env(backend, &env));
+    CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_io(env.ctx, &io));
+    CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_sensors(env.ctx, &sensors));
+    CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_camera(env.ctx, &camera));
+    CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_image(env.ctx, &image));
+    CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_video(env.ctx, &video));
+    CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_audio(env.ctx, &audio));
+    CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_network(env.ctx, &network));
+    CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_tasks(env.ctx, &tasks));
+    CMP_TEST_OK(env.vtable->get_io(env.ctx, &io));
+    CMP_TEST_OK(env.vtable->get_sensors(env.ctx, &sensors));
+    CMP_TEST_OK(env.vtable->get_camera(env.ctx, &camera));
+    CMP_TEST_OK(env.vtable->get_image(env.ctx, &image));
+    CMP_TEST_OK(env.vtable->get_video(env.ctx, &video));
+    CMP_TEST_OK(env.vtable->get_audio(env.ctx, &audio));
+    CMP_TEST_OK(env.vtable->get_network(env.ctx, &network));
+    CMP_TEST_OK(env.vtable->get_tasks(env.ctx, &tasks));
+
+    ws_config.utf8_app_name = "SweepApp";
+    ws_config.utf8_app_id = "com.example.sweep";
+    ws_config.reserved = 0;
+    CMP_TEST_OK(ws.vtable->init(ws.ctx, &ws_config));
+
+    win_config.width = 120;
+    win_config.height = 80;
+    win_config.utf8_title = "SweepWin";
+    win_config.flags = 0;
+
+    CMP_TEST_NULL_FAIL_SWEEP(
+        ws.vtable->create_window(ws.ctx, &win_config, &window),
+        CMP_TEST_OK(ws.vtable->destroy_window(ws.ctx, window)));
+
+    CMP_TEST_OK(ws.vtable->create_window(ws.ctx, &win_config, &window));
+    CMP_TEST_NULL_FORCE_FAIL_AT(ws.vtable->show_window(ws.ctx, window), 1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(ws.vtable->show_window(ws.ctx, window), 2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(ws.vtable->hide_window(ws.ctx, window), 1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(ws.vtable->hide_window(ws.ctx, window), 2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->set_window_title(ws.ctx, window, "Title"), 1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->set_window_title(ws.ctx, window, "Title"), 2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->set_window_size(ws.ctx, window, 10, 10), 1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->set_window_size(ws.ctx, window, 10, 10), 2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->get_window_size(ws.ctx, window, &width, &height), 1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->get_window_size(ws.ctx, window, &width, &height), 2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->set_window_dpi_scale(ws.ctx, window, 1.0f), 1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->set_window_dpi_scale(ws.ctx, window, 1.0f), 2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->get_window_dpi_scale(ws.ctx, window, &scale), 1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->get_window_dpi_scale(ws.ctx, window, &scale), 2u);
+    CMP_TEST_OK(ws.vtable->show_window(ws.ctx, window));
+    CMP_TEST_OK(ws.vtable->hide_window(ws.ctx, window));
+    CMP_TEST_OK(ws.vtable->set_window_title(ws.ctx, window, "Title"));
+    CMP_TEST_OK(ws.vtable->set_window_size(ws.ctx, window, 10, 10));
+    CMP_TEST_OK(ws.vtable->get_window_size(ws.ctx, window, &width, &height));
+    CMP_TEST_OK(ws.vtable->set_window_dpi_scale(ws.ctx, window, 1.0f));
+    CMP_TEST_OK(ws.vtable->get_window_dpi_scale(ws.ctx, window, &scale));
+    CMP_TEST_NULL_FORCE_FAIL(ws.vtable->poll_event(ws.ctx, &event, &has_event));
+    CMP_TEST_NULL_FORCE_FAIL(ws.vtable->get_time_ms(ws.ctx, &time_ms));
+
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->set_clipboard_text(ws.ctx, "longtext"), 2u);
+    CMP_TEST_OK(ws.vtable->set_clipboard_text(ws.ctx, "longtext"));
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        ws.vtable->set_clipboard_text(ws.ctx, "evenlongertext"), 2u);
+    CMP_TEST_OK(ws.vtable->set_clipboard_text(ws.ctx, "evenlongertext"));
+    CMP_TEST_NULL_FORCE_FAIL(
+        ws.vtable->get_clipboard_text(ws.ctx, buffer, sizeof(buffer), &length));
+
+    CMP_TEST_NULL_FAIL_SWEEP(
+        gfx.vtable->create_texture(gfx.ctx, 4, 4, CMP_TEX_FORMAT_RGBA8, NULL, 0,
+                                   &texture),
+        CMP_TEST_OK(gfx.vtable->destroy_texture(gfx.ctx, texture)));
+
+    CMP_TEST_OK(gfx.vtable->create_texture(gfx.ctx, 4, 4, CMP_TEX_FORMAT_RGBA8,
+                                           NULL, 0, &texture));
+    rect.x = 0.0f;
+    rect.y = 0.0f;
+    rect.width = 1.0f;
+    rect.height = 1.0f;
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.vtable->update_texture(gfx.ctx, texture, 0, 0, 1, 1, NULL, 0), 1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.vtable->update_texture(gfx.ctx, texture, 0, 0, 1, 1, NULL, 0), 2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.vtable->draw_texture(gfx.ctx, texture, &rect, &rect, 1.0f), 1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.vtable->draw_texture(gfx.ctx, texture, &rect, &rect, 1.0f), 2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.vtable->destroy_texture(gfx.ctx, texture),
+                                1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.vtable->destroy_texture(gfx.ctx, texture),
+                                2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.vtable->destroy_texture(gfx.ctx, texture),
+                                3u);
+    CMP_TEST_OK(gfx.vtable->destroy_texture(gfx.ctx, texture));
+
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.vtable->begin_frame(gfx.ctx, window, 10, 10, 1.0f), 1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.vtable->begin_frame(gfx.ctx, window, 10, 10, 1.0f), 2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.vtable->end_frame(gfx.ctx, window), 1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.vtable->end_frame(gfx.ctx, window), 2u);
+
+    color.r = 0.0f;
+    color.g = 0.0f;
+    color.b = 0.0f;
+    color.a = 1.0f;
+    CMP_TEST_NULL_FORCE_FAIL(
+        gfx.vtable->draw_rect(gfx.ctx, &rect, color, 0.0f));
+    CMP_TEST_NULL_FORCE_FAIL(
+        gfx.vtable->draw_line(gfx.ctx, 0.0f, 0.0f, 1.0f, 1.0f, color, 1.0f));
+    CMP_TEST_NULL_FORCE_FAIL(gfx.vtable->push_clip(gfx.ctx, &rect));
+    CMP_TEST_NULL_FORCE_FAIL(gfx.vtable->pop_clip(gfx.ctx));
+    memset(&transform, 0, sizeof(transform));
+    CMP_TEST_NULL_FORCE_FAIL(gfx.vtable->set_transform(gfx.ctx, &transform));
+
+    memset(&path, 0, sizeof(path));
+    CMP_TEST_OK(cmp_path_init(&path, NULL, 1));
+    CMP_TEST_OK(cmp_path_move_to(&path, 0.0f, 0.0f));
+    CMP_TEST_NULL_FORCE_FAIL(gfx.vtable->draw_path(gfx.ctx, &path, color));
+    CMP_TEST_OK(cmp_path_shutdown(&path));
+
+    CMP_TEST_NULL_FAIL_SWEEP(
+        gfx.text_vtable->create_font(gfx.ctx, "Sans", 12, 400, CMP_FALSE,
+                                     &font),
+        CMP_TEST_OK(gfx.text_vtable->destroy_font(gfx.ctx, font)));
+
+    CMP_TEST_OK(gfx.text_vtable->create_font(gfx.ctx, "Sans", 12, 400,
+                                             CMP_FALSE, &font));
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &text_width,
+                                      &text_height, &baseline),
+        1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &text_width,
+                                      &text_height, &baseline),
+        2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color),
+        1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(
+        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color),
+        2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.text_vtable->destroy_font(gfx.ctx, font),
+                                1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.text_vtable->destroy_font(gfx.ctx, font),
+                                2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.text_vtable->destroy_font(gfx.ctx, font),
+                                3u);
+    CMP_TEST_OK(gfx.text_vtable->destroy_font(gfx.ctx, font));
+
+    CMP_TEST_NULL_FORCE_FAIL(
+        io.vtable->read_file(io.ctx, "path", buffer, sizeof(buffer), &length));
+    CMP_TEST_NULL_FORCE_FAIL(
+        io.vtable->write_file(io.ctx, "path", buffer, 1, CMP_TRUE));
+    CMP_TEST_NULL_FORCE_FAIL(io.vtable->file_exists(io.ctx, "path", &exists));
+    CMP_TEST_NULL_FORCE_FAIL(io.vtable->delete_file(io.ctx, "path"));
+    CMP_TEST_NULL_FORCE_FAIL(io.vtable->stat_file(io.ctx, "path", &file_info));
+
+    CMP_TEST_NULL_FORCE_FAIL(
+        sensors.vtable->is_available(sensors.ctx, 0u, &exists));
+    CMP_TEST_NULL_FORCE_FAIL(sensors.vtable->start(sensors.ctx, 0u));
+    CMP_TEST_NULL_FORCE_FAIL(sensors.vtable->stop(sensors.ctx, 0u));
+    CMP_TEST_NULL_FORCE_FAIL(
+        sensors.vtable->read(sensors.ctx, 0u, &sensor_read, &has_reading));
+
+    CMP_TEST_NULL_FORCE_FAIL(camera.vtable->open(camera.ctx, 0u));
+    CMP_TEST_NULL_FORCE_FAIL(camera.vtable->close(camera.ctx));
+    CMP_TEST_NULL_FORCE_FAIL(camera.vtable->start(camera.ctx));
+    CMP_TEST_NULL_FORCE_FAIL(camera.vtable->stop(camera.ctx));
+    CMP_TEST_NULL_FORCE_FAIL(
+        camera.vtable->read_frame(camera.ctx, &camera_frame, &has_frame));
+
+    memset(&video_frame, 0, sizeof(video_frame));
+    memset(&camera_frame, 0, sizeof(camera_frame));
+    memset(&video_request, 0, sizeof(video_request));
+    CMP_TEST_NULL_FORCE_FAIL(video.vtable->open(video.ctx, &video_request));
+    CMP_TEST_NULL_FORCE_FAIL(video.vtable->close(video.ctx));
+    CMP_TEST_NULL_FORCE_FAIL(
+        video.vtable->read_frame(video.ctx, &video_frame, &has_frame));
+
+    CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
+    memset(&image_request, 0, sizeof(image_request));
+    memset(&image_data, 0, sizeof(image_data));
+    CMP_TEST_NULL_FORCE_FAIL(image.vtable->decode(image.ctx, &image_request,
+                                                  &default_alloc, &image_data));
+    CMP_TEST_NULL_FORCE_FAIL(
+        image.vtable->free_image(image.ctx, &default_alloc, &image_data));
+
+    memset(&audio_request, 0, sizeof(audio_request));
+    memset(&audio_data, 0, sizeof(audio_data));
+    CMP_TEST_NULL_FORCE_FAIL(audio.vtable->decode(audio.ctx, &audio_request,
+                                                  &default_alloc, &audio_data));
+    CMP_TEST_NULL_FORCE_FAIL(
+        audio.vtable->free_audio(audio.ctx, &default_alloc, &audio_data));
+
+    memset(&network_request, 0, sizeof(network_request));
+    memset(&network_response, 0, sizeof(network_response));
+    CMP_TEST_NULL_FORCE_FAIL(network.vtable->request(
+        network.ctx, &network_request, &default_alloc, &network_response));
+    CMP_TEST_NULL_FORCE_FAIL(network.vtable->free_response(
+        network.ctx, &default_alloc, &network_response));
+
+    CMP_TEST_NULL_FORCE_FAIL(tasks.vtable->thread_create(
+        tasks.ctx, test_task_ok, NULL, &task_handle));
+    CMP_TEST_NULL_FORCE_FAIL(tasks.vtable->thread_join(tasks.ctx, task_handle));
+    CMP_TEST_NULL_FORCE_FAIL(
+        tasks.vtable->mutex_create(tasks.ctx, &task_handle));
+    CMP_TEST_NULL_FORCE_FAIL(
+        tasks.vtable->mutex_destroy(tasks.ctx, task_handle));
+    CMP_TEST_NULL_FORCE_FAIL(tasks.vtable->mutex_lock(tasks.ctx, task_handle));
+    CMP_TEST_NULL_FORCE_FAIL(
+        tasks.vtable->mutex_unlock(tasks.ctx, task_handle));
+    CMP_TEST_NULL_FORCE_FAIL(tasks.vtable->sleep_ms(tasks.ctx, 1u));
+    CMP_TEST_NULL_FORCE_FAIL(
+        tasks.vtable->task_post(tasks.ctx, test_task_ok, NULL));
+    CMP_TEST_NULL_FORCE_FAIL(
+        tasks.vtable->task_post_delayed(tasks.ctx, test_task_ok, NULL, 1u));
+
+    CMP_TEST_NULL_FORCE_FAIL_AT(ws.vtable->destroy_window(ws.ctx, window), 3u);
+    CMP_TEST_OK(ws.vtable->destroy_window(ws.ctx, window));
+    CMP_TEST_OK(ws.vtable->shutdown(ws.ctx));
+    CMP_TEST_EXPECT(cmp_null_backend_destroy(backend), CMP_ERR_BUSY);
+  }
+
+  {
+    CMPNullBackendConfig config;
+    CMPNullBackend *backend;
+    CMPWS ws;
     CMPWSWindowConfig win_config;
     CMPHandle window;
 
@@ -1271,6 +1710,31 @@ int main(void) {
     CMP_TEST_OK(ws.vtable->create_window(ws.ctx, &win_config, &window));
     CMP_TEST_EXPECT(cmp_null_backend_destroy(backend), CMP_ERR_BUSY);
     CMP_TEST_OK(ws.vtable->destroy_window(ws.ctx, window));
+    CMP_TEST_OK(cmp_null_backend_destroy(backend));
+  }
+
+  {
+    CMPNullBackendConfig config;
+    CMPNullBackend *backend;
+    CMPEnv env;
+    CMPTasks tasks;
+    TestTaskState task_state;
+
+    memset(&task_state, 0, sizeof(task_state));
+    CMP_TEST_OK(cmp_null_backend_config_init(&config));
+    config.enable_logging = CMP_FALSE;
+    config.inline_tasks = CMP_FALSE;
+    config.handle_capacity = 4;
+    CMP_TEST_OK(cmp_null_backend_create(&config, &backend));
+    CMP_TEST_OK(cmp_null_backend_get_env(backend, &env));
+    CMP_TEST_OK(env.vtable->get_tasks(env.ctx, &tasks));
+    CMP_TEST_EXPECT(tasks.vtable->sleep_ms(tasks.ctx, 1u), CMP_ERR_UNSUPPORTED);
+    CMP_TEST_EXPECT(
+        tasks.vtable->task_post(tasks.ctx, test_task_ok, &task_state),
+        CMP_ERR_UNSUPPORTED);
+    CMP_TEST_EXPECT(tasks.vtable->task_post_delayed(tasks.ctx, test_task_ok,
+                                                    &task_state, 1u),
+                    CMP_ERR_UNSUPPORTED);
     CMP_TEST_OK(cmp_null_backend_destroy(backend));
   }
 

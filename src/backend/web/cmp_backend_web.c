@@ -56,6 +56,13 @@ static int cmp_web_backend_validate_config(const CMPWebBackendConfig *config) {
 }
 
 #ifdef CMP_TESTING
+static CMPBool g_cmp_web_test_fail_config_init = CMP_FALSE;
+
+int CMP_CALL cmp_web_backend_test_set_config_init_fail(CMPBool fail) {
+  g_cmp_web_test_fail_config_init = fail;
+  return CMP_OK;
+}
+
 int CMP_CALL
 cmp_web_backend_test_validate_config(const CMPWebBackendConfig *config) {
   return cmp_web_backend_validate_config(config);
@@ -78,6 +85,12 @@ int CMP_CALL cmp_web_backend_config_init(CMPWebBackendConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#ifdef CMP_TESTING
+  if (g_cmp_web_test_fail_config_init == CMP_TRUE) {
+    g_cmp_web_test_fail_config_init = CMP_FALSE;
+    return CMP_ERR_IO;
+  }
+#endif
 
   config->allocator = NULL;
   config->handle_capacity = CMP_WEB_DEFAULT_HANDLE_CAPACITY;

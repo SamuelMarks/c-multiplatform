@@ -13,6 +13,15 @@
 
 #define CMP_IOS_DEFAULT_HANDLE_CAPACITY 64u
 
+#ifdef CMP_TESTING
+static CMPBool g_cmp_ios_test_fail_config_init = CMP_FALSE;
+
+int CMP_CALL cmp_ios_backend_test_set_config_init_fail(CMPBool fail) {
+  g_cmp_ios_test_fail_config_init = fail;
+  return CMP_OK;
+}
+#endif
+
 static int cmp_ios_backend_validate_config(const CMPIOSBackendConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -56,6 +65,12 @@ int CMP_CALL cmp_ios_backend_config_init(CMPIOSBackendConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#ifdef CMP_TESTING
+  if (g_cmp_ios_test_fail_config_init == CMP_TRUE) {
+    g_cmp_ios_test_fail_config_init = CMP_FALSE;
+    return CMP_ERR_IO;
+  }
+#endif
 
   config->allocator = NULL;
   config->handle_capacity = CMP_IOS_DEFAULT_HANDLE_CAPACITY;

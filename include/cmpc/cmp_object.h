@@ -238,6 +238,14 @@ CMP_API int CMP_CALL cmp_handle_system_default_destroy(CMPHandleSystem *sys);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_object_test_set_handle_is_valid_fail(CMPBool fail);
+
+/**
+ * @brief Force unregister to clear a NULL object pointer (tests only).
+ * @param enable CMP_TRUE to clear the object pointer on unregister.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL
+cmp_object_test_set_unregister_force_null_obj(CMPBool enable);
 #endif
 
 #ifdef __cplusplus

@@ -11,6 +11,15 @@
 
 #define CMP_COCOA_DEFAULT_HANDLE_CAPACITY 64
 
+#ifdef CMP_TESTING
+static CMPBool g_cmp_cocoa_test_fail_config_init = CMP_FALSE;
+
+int CMP_CALL cmp_cocoa_backend_test_set_config_init_fail(CMPBool fail) {
+  g_cmp_cocoa_test_fail_config_init = fail;
+  return CMP_OK;
+}
+#endif
+
 int CMP_CALL cmp_cocoa_backend_is_available(CMPBool *out_available) {
   if (out_available == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -27,6 +36,12 @@ int CMP_CALL cmp_cocoa_backend_config_init(CMPCocoaBackendConfig *config) {
   if (config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#ifdef CMP_TESTING
+  if (g_cmp_cocoa_test_fail_config_init == CMP_TRUE) {
+    g_cmp_cocoa_test_fail_config_init = CMP_FALSE;
+    return CMP_ERR_IO;
+  }
+#endif
 
   config->allocator = NULL;
   config->handle_capacity = CMP_COCOA_DEFAULT_HANDLE_CAPACITY;

@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <float.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef CMP_TESTING
 #define CMP_ICON_TEST_FAIL_NONE 0u
@@ -36,7 +37,7 @@ static int cmp_icon_test_fail_point_match(cmp_u32 point) {
   g_cmp_icon_test_fail_point = CMP_ICON_TEST_FAIL_NONE;
   return 1;
 }
-#endif
+#endif /* GCOVR_EXCL_LINE */
 
 typedef struct CMPIconSvgTransform {
   CMPScalar scale;
@@ -119,11 +120,11 @@ static cmp_usize cmp_icon_cstr_limit(void) {
   cmp_usize max_len;
 
   max_len = (cmp_usize) ~(cmp_usize)0;
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (g_cmp_icon_test_cstr_limit != 0) {
     max_len = g_cmp_icon_test_cstr_limit;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
   return max_len;
 }
 
@@ -330,11 +331,11 @@ static int cmp_icon_path_move_to(CMPPath *path, const CMPIconSvgTransform *xf,
   CMPScalar ty;
   int rc;
 
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_APPEND)) {
     return CMP_ERR_IO;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
 
   cmp_icon_svg_transform_point(xf, x, y, &tx, &ty);
   rc = cmp_path_move_to(path, tx, ty);
@@ -347,11 +348,11 @@ static int cmp_icon_path_line_to(CMPPath *path, const CMPIconSvgTransform *xf,
   CMPScalar ty;
   int rc;
 
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_APPEND)) {
     return CMP_ERR_IO; /* GCOVR_EXCL_LINE */
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
 
   cmp_icon_svg_transform_point(xf, x, y, &tx, &ty);
   rc = cmp_path_line_to(path, tx, ty);
@@ -367,11 +368,11 @@ static int cmp_icon_path_quad_to(CMPPath *path, const CMPIconSvgTransform *xf,
   CMPScalar ty;
   int rc;
 
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_APPEND)) {
     return CMP_ERR_IO; /* GCOVR_EXCL_LINE */
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
 
   cmp_icon_svg_transform_point(xf, cx, cy, &tcx, &tcy);
   cmp_icon_svg_transform_point(xf, x, y, &tx, &ty);
@@ -390,11 +391,11 @@ static int cmp_icon_path_cubic_to(CMPPath *path, const CMPIconSvgTransform *xf,
   CMPScalar ty;
   int rc;
 
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_APPEND)) {
     return CMP_ERR_IO; /* GCOVR_EXCL_LINE */
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
 
   cmp_icon_svg_transform_point(xf, cx1, cy1, &tcx1, &tcy1);
   cmp_icon_svg_transform_point(xf, cx2, cy2, &tcx2, &tcy2);
@@ -406,11 +407,11 @@ static int cmp_icon_path_cubic_to(CMPPath *path, const CMPIconSvgTransform *xf,
 static int cmp_icon_path_close(CMPPath *path) {
   int rc;
 
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_APPEND)) {
     return CMP_ERR_IO; /* GCOVR_EXCL_LINE */
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
 
   rc = cmp_path_close(path);
   return cmp_icon_map_path_result(rc);
@@ -840,11 +841,11 @@ static int cmp_icon_svg_build_path(const CMPIconSvg *svg, const CMPRect *bounds,
     return rc; /* GCOVR_EXCL_LINE */
   }
 
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_INIT)) {
     return CMP_ERR_IO;
   }
-#endif
+#endif /* GCOVR_EXCL_LINE */
 
   path->commands = NULL;
   path->count = 0;
@@ -1193,7 +1194,118 @@ int CMP_CALL cmp_icon_draw_cstr(const CMPGfx *gfx, const CMPRect *bounds,
                             render_mode);
 }
 
-#ifdef CMP_TESTING
+#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+int CMP_CALL cmp_icon_test_cstrlen(const char *cstr, cmp_usize *out_len) {
+  int (*fn)(const char *, cmp_usize *) = cmp_icon_cstrlen;
+  return fn(cstr, out_len);
+}
+
+void CMP_CALL cmp_icon_test_svg_skip_separators(const char **cursor) {
+  void (*fn)(const char **) = cmp_icon_svg_skip_separators;
+  fn(cursor);
+}
+
+int CMP_CALL cmp_icon_test_svg_parse_number(const char **cursor,
+                                            CMPScalar *out_value) {
+  int (*fn)(const char **, CMPScalar *) = cmp_icon_svg_parse_number;
+  return fn(cursor, out_value);
+}
+
+int CMP_CALL cmp_icon_test_map_path_result(int rc) {
+  int (*fn)(int) = cmp_icon_map_path_result;
+  return fn(rc);
+}
+
+int CMP_CALL cmp_icon_test_gfx_supports_font(const CMPGfx *gfx,
+                                             CMPBool require_draw) {
+  int (*fn)(const CMPGfx *, CMPBool) = cmp_icon_gfx_supports_font;
+  return fn(gfx, require_draw);
+}
+
+int CMP_CALL cmp_icon_test_gfx_supports_svg(const CMPGfx *gfx) {
+  int (*fn)(const CMPGfx *) = cmp_icon_gfx_supports_svg;
+  return fn(gfx);
+}
+
+int CMP_CALL cmp_icon_test_select_render_mode(
+    const CMPGfx *gfx, const char *utf8_name, cmp_usize utf8_len,
+    const CMPIconSvg *svg, cmp_u32 render_mode, CMPBool require_draw,
+    cmp_u32 *out_mode) {
+  int (*fn)(const CMPGfx *, const char *, cmp_usize, const CMPIconSvg *,
+            cmp_u32, CMPBool, cmp_u32 *) = cmp_icon_select_render_mode;
+  return fn(gfx, utf8_name, utf8_len, svg, render_mode, require_draw, out_mode);
+}
+
+int CMP_CALL cmp_icon_test_svg_compute_transform(const CMPIconSvg *svg,
+                                                 const CMPRect *bounds,
+                                                 CMPScalar *out_scale,
+                                                 CMPScalar *out_offset_x,
+                                                 CMPScalar *out_offset_y) {
+  CMPIconSvgTransform xf;
+  CMPIconSvgTransform *out_xf = &xf;
+  int rc;
+
+  if (out_scale == NULL || out_offset_x == NULL || out_offset_y == NULL) {
+    out_xf = NULL;
+  }
+
+  {
+    int (*fn)(const CMPIconSvg *, const CMPRect *, CMPIconSvgTransform *) =
+        cmp_icon_svg_compute_transform;
+    rc = fn(svg, bounds, out_xf);
+  }
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  *out_scale = xf.scale;
+  *out_offset_x = xf.offset_x;
+  *out_offset_y = xf.offset_y;
+  return CMP_OK;
+}
+
+int CMP_CALL cmp_icon_test_svg_parse(const char *data, CMPBool provide_xf,
+                                     CMPBool provide_path) {
+  CMPIconSvgTransform xf;
+  CMPIconSvgTransform *xf_ptr;
+  CMPPath path;
+  CMPPath *path_ptr;
+  int rc;
+
+  xf_ptr = provide_xf ? &xf : NULL;
+  path_ptr = provide_path ? &path : NULL;
+  if (xf_ptr != NULL) {
+    xf.scale = 1.0f;
+    xf.offset_x = 0.0f;
+    xf.offset_y = 0.0f;
+    xf.viewbox_x = 0.0f;
+    xf.viewbox_y = 0.0f;
+  }
+
+  if (path_ptr != NULL) {
+    memset(&path, 0, sizeof(path));
+    rc = cmp_path_init(&path, NULL, 0);
+    if (rc != CMP_OK) {
+      return rc;
+    }
+  }
+
+  {
+    int (*fn)(const char *, const CMPIconSvgTransform *, CMPPath *) =
+        cmp_icon_svg_parse;
+    rc = fn(data, xf_ptr, path_ptr);
+  }
+
+  if (path_ptr != NULL) {
+    int cleanup_rc = cmp_path_shutdown(&path);
+    if (cleanup_rc != CMP_OK && rc == CMP_OK) {
+      rc = cleanup_rc;
+    }
+  }
+
+  return rc;
+}
+
 int CMP_CALL cmp_icon_test_validate_style(const CMPIconStyle *style) {
   return cmp_icon_validate_style(style);
 }
@@ -1209,4 +1321,4 @@ int CMP_CALL cmp_icon_test_validate_rect(const CMPRect *rect) {
 int CMP_CALL cmp_icon_test_validate_svg(const CMPIconSvg *svg) {
   return cmp_icon_validate_svg(svg);
 }
-#endif
+#endif /* GCOVR_EXCL_LINE */

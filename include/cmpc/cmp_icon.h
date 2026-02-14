@@ -155,6 +155,93 @@ CMP_API int CMP_CALL cmp_icon_test_clear_fail_points(void);
 CMP_API int CMP_CALL cmp_icon_test_set_cstr_limit(cmp_usize max_len);
 
 /**
+ * @brief Test wrapper for C-string length checks.
+ * @param cstr C-string to measure.
+ * @param out_len Output length.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_icon_test_cstrlen(const char *cstr,
+                                           cmp_usize *out_len);
+
+/**
+ * @brief Test wrapper for SVG separator skipping.
+ * @param cursor Cursor pointer to update.
+ */
+CMP_API void CMP_CALL cmp_icon_test_svg_skip_separators(const char **cursor);
+
+/**
+ * @brief Test wrapper for SVG number parsing.
+ * @param cursor Cursor pointer to update.
+ * @param out_value Output numeric value.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_icon_test_svg_parse_number(const char **cursor,
+                                                    CMPScalar *out_value);
+
+/**
+ * @brief Test wrapper for path error mapping.
+ * @param rc Path status code.
+ * @return Mapped status code.
+ */
+CMP_API int CMP_CALL cmp_icon_test_map_path_result(int rc);
+
+/**
+ * @brief Test wrapper for font capability checks.
+ * @param gfx Graphics backend interface.
+ * @param require_draw Whether draw support is required.
+ * @return 1 if supported, 0 otherwise.
+ */
+CMP_API int CMP_CALL cmp_icon_test_gfx_supports_font(const CMPGfx *gfx,
+                                                     CMPBool require_draw);
+
+/**
+ * @brief Test wrapper for SVG capability checks.
+ * @param gfx Graphics backend interface.
+ * @return 1 if supported, 0 otherwise.
+ */
+CMP_API int CMP_CALL cmp_icon_test_gfx_supports_svg(const CMPGfx *gfx);
+
+/**
+ * @brief Test wrapper for render mode selection.
+ * @param gfx Graphics backend interface.
+ * @param utf8_name UTF-8 icon name.
+ * @param utf8_len UTF-8 length.
+ * @param svg Optional SVG descriptor.
+ * @param render_mode Requested render mode.
+ * @param require_draw Whether draw support is required.
+ * @param out_mode Resolved render mode.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_icon_test_select_render_mode(
+    const CMPGfx *gfx, const char *utf8_name, cmp_usize utf8_len,
+    const CMPIconSvg *svg, cmp_u32 render_mode, CMPBool require_draw,
+    cmp_u32 *out_mode);
+
+/**
+ * @brief Test wrapper for SVG transform computation.
+ * @param svg SVG descriptor.
+ * @param bounds Destination bounds.
+ * @param out_scale Output scale factor.
+ * @param out_offset_x Output offset X.
+ * @param out_offset_y Output offset Y.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_icon_test_svg_compute_transform(
+    const CMPIconSvg *svg, const CMPRect *bounds, CMPScalar *out_scale,
+    CMPScalar *out_offset_x, CMPScalar *out_offset_y);
+
+/**
+ * @brief Test wrapper for SVG path parsing.
+ * @param data SVG path data.
+ * @param provide_xf Whether to provide a transform.
+ * @param provide_path Whether to provide an initialized path.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_icon_test_svg_parse(const char *data,
+                                             CMPBool provide_xf,
+                                             CMPBool provide_path);
+
+/**
  * @brief Test wrapper for icon style validation.
  * @param style Style to validate.
  * @return CMP_OK on success or a failure code.

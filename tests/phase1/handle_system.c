@@ -205,6 +205,7 @@ int main(void) {
   CMPHandleSystem overflow_sys;
   CMPHandleSystemImplInternal impl;
   CMPAllocator bad_alloc;
+  CMPAllocator default_alloc;
   CMPAllocator fail_allocator;
   CMPAllocator free_fail_allocator;
   FreeFailCtx free_fail_ctx;
@@ -238,6 +239,14 @@ int main(void) {
   CMP_TEST_EXPECT(cmp_handle_is_valid(handle, NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_handle_is_valid(handle, &valid));
   CMP_TEST_ASSERT(valid == CMP_FALSE);
+  handle.id = 1;
+  handle.generation = 0;
+  CMP_TEST_OK(cmp_handle_is_valid(handle, &valid));
+  CMP_TEST_ASSERT(valid == CMP_FALSE);
+  handle.id = 0;
+  handle.generation = 1;
+  CMP_TEST_OK(cmp_handle_is_valid(handle, &valid));
+  CMP_TEST_ASSERT(valid == CMP_FALSE);
 
   CMP_TEST_EXPECT(cmp_object_header_init(NULL, 1, 0, &test_vtable),
                   CMP_ERR_INVALID_ARGUMENT);
@@ -245,6 +254,11 @@ int main(void) {
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
       cmp_object_header_init(&header, 1, 0, &test_vtable_no_release),
+      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_object_header_init(&header, 1, 0, &test_vtable_no_retain),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_object_header_init(&header, 1, 0, &test_vtable_no_destroy),
       CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(init_test_object(&obj, NULL, 42));
@@ -299,6 +313,25 @@ int main(void) {
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_handle_system_default_destroy(NULL),
                   CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
+  {
+    CMPAllocator invalid_alloc;
+
+    invalid_alloc = default_alloc;
+    invalid_alloc.alloc = NULL;
+    CMP_TEST_EXPECT(cmp_handle_system_default_create(1, &invalid_alloc, &sys),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    invalid_alloc = default_alloc;
+    invalid_alloc.realloc = NULL;
+    CMP_TEST_EXPECT(cmp_handle_system_default_create(1, &invalid_alloc, &sys),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    invalid_alloc = default_alloc;
+    invalid_alloc.free = NULL;
+    CMP_TEST_EXPECT(cmp_handle_system_default_create(1, &invalid_alloc, &sys),
+                    CMP_ERR_INVALID_ARGUMENT);
+  }
 
 #ifdef CMP_TESTING
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
@@ -398,6 +431,15 @@ int main(void) {
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(sys.vtable->register_object(&impl, &obj.header),
                   CMP_ERR_STATE);
+  CMP_TEST_EXPECT(sys.vtable->register_object(sys.ctx, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(sys.vtable->register_object(sys.ctx, &obj.header),
+                  CMP_ERR_INVALID_ARGUMENT);
+
+  obj.header.vtable = &test_vtable_no_retain;
+  CMP_TEST_EXPECT(sys.vtable->register_object(sys.ctx, &obj.header),
+                  CMP_ERR_INVALID_ARGUMENT);
+  obj.header.vtable = &test_vtable_no_destroy;
   CMP_TEST_EXPECT(sys.vtable->register_object(sys.ctx, &obj.header),
                   CMP_ERR_INVALID_ARGUMENT);
 
@@ -408,6 +450,21 @@ int main(void) {
   CMP_TEST_ASSERT(valid == CMP_TRUE);
 
   sys_impl = (CMPHandleSystemImplInternal *)sys.ctx;
+  index = handle.id - 1;
+  {
+    CMPObjectHeader *saved_obj = sys_impl->slots[index].obj;
+    sys_impl->slots[index].obj = NULL;
+    CMP_TEST_EXPECT(sys.vtable->unregister_object(sys.ctx, handle),
+                    CMP_ERR_NOT_FOUND);
+    sys_impl->slots[index].obj = saved_obj;
+  }
+  {
+    CMPHandle bad_gen = handle;
+    bad_gen.generation += 1;
+    CMP_TEST_EXPECT(sys.vtable->unregister_object(sys.ctx, bad_gen),
+                    CMP_ERR_NOT_FOUND);
+  }
+
   sys_impl->live_count = 0;
   CMP_TEST_EXPECT(sys.vtable->unregister_object(sys.ctx, handle),
                   CMP_ERR_STATE);
@@ -425,6 +482,11 @@ int main(void) {
 
   CMP_TEST_OK(sys.vtable->retain(sys.ctx, handle));
   CMP_TEST_ASSERT(obj.header.ref_count == 2);
+
+  obj.header.vtable = NULL;
+  CMP_TEST_EXPECT(sys.vtable->retain(sys.ctx, handle), CMP_ERR_UNSUPPORTED);
+  CMP_TEST_EXPECT(sys.vtable->release(sys.ctx, handle), CMP_ERR_UNSUPPORTED);
+  obj.header.vtable = &test_vtable;
 
   obj.header.vtable = &test_vtable_no_release;
   CMP_TEST_EXPECT(sys.vtable->release(sys.ctx, handle), CMP_ERR_UNSUPPORTED);
@@ -453,6 +515,7 @@ int main(void) {
                   CMP_ERR_NOT_FOUND);
 
   obj2_handle = obj2.header.handle;
+  CMP_TEST_OK(cmp_object_test_set_unregister_force_null_obj(CMP_TRUE));
   CMP_TEST_OK(sys.vtable->unregister_object(sys.ctx, obj2_handle));
   CMP_TEST_EXPECT(sys.vtable->unregister_object(sys.ctx, obj2_handle),
                   CMP_ERR_NOT_FOUND);
@@ -477,6 +540,18 @@ int main(void) {
 
   CMP_TEST_OK(cmp_handle_system_default_destroy(&sys));
   CMP_TEST_EXPECT(cmp_handle_system_default_destroy(&sys), CMP_ERR_STATE);
+  {
+    CMPHandleSystem sys_invalid;
+
+    memset(&sys_invalid, 0, sizeof(sys_invalid));
+    sys_invalid.ctx = (void *)1;
+    CMP_TEST_EXPECT(cmp_handle_system_default_destroy(&sys_invalid),
+                    CMP_ERR_STATE);
+    sys_invalid.ctx = NULL;
+    sys_invalid.vtable = (CMPHandleSystemVTable *)1;
+    CMP_TEST_EXPECT(cmp_handle_system_default_destroy(&sys_invalid),
+                    CMP_ERR_STATE);
+  }
 
   CMP_TEST_OK(cmp_handle_system_default_create(1, NULL, &sys_small));
   CMP_TEST_OK(init_test_object(&obj, &sys_small, 200));
