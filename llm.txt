@@ -1,0 +1,39 @@
+# LibCMPC: Cross-Platform C89 GUI Framework
+
+## Project Overview
+LibCMPC is a strict C89 (ANSI C) cross-platform application framework. It separates **Contract** (Interfaces/ABI) from **Implementation**. It includes a core library (`cmpc`) and a Material 3 design system implementation (`m3`).
+
+## Critical Coding Standards
+1.  **Strict C89 Compliance**:
+    -   Variables must be declared at the top of the scope (function or block).
+    -   No C99/C11 features (no `//` comments, no designated initializers `{.x=1}`, no variable declarations in `for` loops).
+    -   Use `/* */` for comments.
+2.  **Error Handling**:
+    -   All public APIs return `int`. Use `CMP_OK` (0) for success or `CMP_ERR_*` constants.
+    -   Output data is returned via pointer parameters.
+    -   Check return codes using `CMP_*_RETURN_IF_ERROR` macros where available.
+3.  **Memory Management**:
+    -   No global static state. Everything hangs off context pointers.
+    -   Use `CMPAllocator` passed during initialization for dynamic memory.
+    -   Explicit ownership: `retain`/`release` referenced objects; explicit `destroy` for widgets.
+4.  **Architecture**:
+    -   **Contract-First**: Interfaces (`cmp_api_*.h`) define V-Tables. Implementations reside in `src/`.
+    -   **Widgets**: Plain structs embedding `CMPWidget`. Logic is handled via `CMPWidgetVTable` (measure, layout, paint, event).
+    -   **Backends**: Platform-specific implementations of `CMPWS`, `CMPGfx`, `CMPEnv`. Returns `CMP_ERR_UNSUPPORTED` for unimplemented features.
+
+## Core Concepts
+-   **CMPHandle**: Opaque resource handles (windows, fonts, textures, objects).
+-   **CMPMeasureSpec**: Box Constraints for layout (Unspecified, Exactly, AtMost).
+-   **V-Tables**: The core mechanism for polymorphism (e.g., `CMPGfxVTable`, `CMPTextVTable`). Do not break binary compatibility of these structs.
+
+## Directory Map
+-   `include/cmpc/`: Core public headers and ABI.
+-   `include/m3/`: Material 3 component headers.
+-   `src/core/`: Platform-agnostic logic (layout, render list, generic widgets).
+-   `src/m3/`: Platform-agnostic Material 3 widget implementations.
+-   `src/backend/`: Platform interfaces (SDL3, Win32, Cocoa, GTK4, Web, Android, iOS).
+
+## Common Tasks
+-   **Creating Widgets**: Define struct, implement V-Table functions, create `_init` and `_destroy`.
+-   **Style Init**: All styles must have an `_init` function setting defaults.
+-   **Testing**: Use `#ifdef CMP_TESTING` to expose private state or inject failures for coverage.

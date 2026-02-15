@@ -1,6 +1,6 @@
 {
   "name": "cmpc",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "C89 cross-platform UI framework with Material 3 design, modular backends, and zero-dependency core.",
   "homepage": "https://github.com/SamuelMarks/c-multiplatform",
   "default-features": [
