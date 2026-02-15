@@ -989,12 +989,10 @@ static int m3_button_widget_paint(void *widget, CMPPaintContext *ctx) {
              (available_width - metrics.width) * 0.5f;
   }
 
-  if (available_height <= metrics.height) {
-    text_y = bounds.y + button->style.padding_y + metrics.baseline;
-  } else {
-    text_y = bounds.y + button->style.padding_y +
-             (available_height - metrics.height) * 0.5f + metrics.baseline;
-  }
+  /* FIX: Center based on bounding box. Using available_height calculation
+     combined with baseline can drift if fonts have large leading. */
+  text_y = bounds.y + bounds.height * 0.5f - metrics.height * 0.5f +
+           metrics.baseline;
 
   return ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, button->font,
                                           button->utf8_label, button->utf8_len,

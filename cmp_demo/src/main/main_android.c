@@ -6,9 +6,10 @@
 typedef struct {
   struct android_app *app;
   CMPAndroidBackend *backend;
-  CMPWS *ws;
-  CMPGfx *gfx;
-  CMPEnv *env;
+  /* FIX: Use structs, not pointers */
+  CMPWS ws;
+  CMPGfx gfx;
+  CMPEnv env;
   CMPHandle window;
   DemoApp *demo;
   int initialized;
@@ -30,22 +31,23 @@ static void on_cmd(struct android_app *app, int32_t cmd) {
     cfg.native_window = app->window;
 
     cmp_android_backend_create(&cfg, &state->backend);
+    /* Pass pointers to member structs */
     cmp_android_backend_get_ws(state->backend, &state->ws);
     cmp_android_backend_get_gfx(state->backend, &state->gfx);
     cmp_android_backend_get_env(state->backend, &state->env);
 
     CMPWSWindowConfig wcfg = {0};
-    state->ws->vtable->create_window(state->ws->ctx, &wcfg, &state->window);
+    state->ws.vtable->create_window(state->ws.ctx, &wcfg, &state->window);
 
     CMPAllocator alloc;
     cmp_get_default_allocator(&alloc);
     demo_app_create(&alloc, &state->demo);
-    demo_app_init_resources(state->demo, state->gfx, state->env);
+    demo_app_init_resources(state->demo, &state->gfx, &state->env);
     state->initialized = 1;
   }
   if (cmd == APP_CMD_TERM_WINDOW && state->initialized) {
     demo_app_destroy(state->demo);
-    state->ws->vtable->destroy_window(state->ws->ctx, state->window);
+    state->ws.vtable->destroy_window(state->ws.ctx, state->window);
     cmp_android_backend_destroy(state->backend);
     state->initialized = 0;
   }
@@ -74,7 +76,7 @@ void android_main(struct android_app *app) {
       CMPInputEvent evt;
       CMPBool has;
       while (1) {
-        state.ws->vtable->poll_event(state.ws->ctx, &evt, &has);
+        state.ws.vtable->poll_event(state.ws.ctx, &evt, &has);
         if (!has)
           break;
         CMPBool h;
@@ -87,9 +89,9 @@ void android_main(struct android_app *app) {
 
       int w, h;
       CMPScalar s;
-      state.ws->vtable->get_window_size(state.ws->ctx, state.window, &w, &h);
-      state.ws->vtable->get_window_dpi_scale(state.ws->ctx, state.window, &s);
-      demo_app_render(state.demo, state.gfx, state.window, w, h, (float)s);
+      state.ws.vtable->get_window_size(state.ws.ctx, state.window, &w, &h);
+      state.ws.vtable->get_window_dpi_scale(state.ws.ctx, state.window, &s);
+      demo_app_render(state.demo, &state.gfx, state.window, w, h, (float)s);
     }
   }
 }

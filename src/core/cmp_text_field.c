@@ -1443,19 +1443,28 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   if (field->utf8_len > 0u) {
+    /* FIX: Center text based on bounding box, ignoring padding which can
+     * misalign relative to cursor. */
+    CMPScalar centerY = bounds.y + bounds.height * 0.5f;
+    CMPScalar textDrawY = centerY - field->text_font_metrics.height * 0.5f +
+                          field->text_font_metrics.baseline;
+
     rc = ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, field->text_font,
                                           field->utf8, field->utf8_len, text_x,
-                                          text_top + text_baseline, text_color);
+                                          textDrawY, text_color);
     if (rc != CMP_OK) {
       return rc;
     }
   } else if ((field->utf8_placeholder != NULL && field->placeholder_len > 0u) &&
              (field->utf8_label == NULL || field->label_len == 0u ||
               field->label_value > 0.0f)) {
+    CMPScalar centerY = bounds.y + bounds.height * 0.5f;
+    CMPScalar textDrawY = centerY - field->text_font_metrics.height * 0.5f +
+                          field->text_font_metrics.baseline;
+
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, field->text_font, field->utf8_placeholder,
-        field->placeholder_len, text_x, text_top + text_baseline,
-        placeholder_color);
+        field->placeholder_len, text_x, textDrawY, placeholder_color);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1465,8 +1474,19 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
       field->label_font.id != 0u) {
     label_baseline = field->label_font_metrics.baseline;
     label_x = content.x;
-    label_rest_y = text_top + text_baseline;
-    label_float_y = bounds.y + field->style.label_float_offset + label_baseline;
+
+    /* Calculate rest position (same as text input text) */
+    CMPScalar centerY = bounds.y + bounds.height * 0.5f;
+    label_rest_y = centerY - field->text_font_metrics.height * 0.5f +
+                   field->text_font_metrics.baseline;
+
+    /* FIX: Calculate float position so the label center sits on the top border.
+       Top border is bounds.y. Center of label text is y - height/2 + baseline?
+       No, we draw at baseline. To center vertically at Y, draw at Y - height/2
+       + baseline. */
+    label_float_y = bounds.y - (field->label_font_metrics.height * 0.5f) +
+                    label_baseline + field->style.label_float_offset;
+
     label_y =
         label_rest_y + (label_float_y - label_rest_y) * field->label_value;
     rc = ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, field->label_font,
@@ -1485,10 +1505,15 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
     if (rc != CMP_OK) {
       return rc;
     }
+
+    /* FIX: Center cursor vertically in the box */
+    CMPScalar centerY = bounds.y + bounds.height * 0.5f;
+
     selection_rect.x = text_x + caret_x;
-    selection_rect.y = text_top;
-    selection_rect.width = field->style.cursor_width;
     selection_rect.height = field->text_font_metrics.height;
+    selection_rect.y = centerY - (selection_rect.height * 0.5f);
+    selection_rect.width = field->style.cursor_width;
+
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
     if (cmp_text_field_test_fail_point_match(
             CMP_TEXT_FIELD_TEST_FAIL_CURSOR_WIDTH_NEGATIVE)) { /* GCOVR_EXCL_LINE

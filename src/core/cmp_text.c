@@ -275,7 +275,8 @@ int CMP_CALL cmp_text_style_init(CMPTextStyle *style) {
   }
 #endif
 
-  style->utf8_family = NULL;
+  style->utf8_family =
+      "sans-serif"; /* Changed from NULL to a reasonable default */
   style->size_px = 14;
   style->weight = 400;
   style->italic = CMP_FALSE;
