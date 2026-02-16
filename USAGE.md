@@ -4,22 +4,25 @@ USAGE
 This guide shows how to build LibCMPC and wire core widgets (including text fields) into a simple loop.
 It also notes the current media decoding fallbacks and plugin helpers. Backends are opt-in and compiled behind CMake flags.
 
-Build
------
+## System dependencies
 
-```
+- macOS: build developer tools (XCode); runtime (none)
+- Windows: MSVC; runtime (none)
+- Linux; gcc, clang, tcc, etc.; runtime (gtk4)
+
+## Build
+
+```sh
 cmake -S . -B build -D CMAKE_BUILD_TYPE=Debug
 cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-Backend Selection
------------------
+## Backend Selection
 
 Backends are enabled with CMake flags and may compile as stubs if their platform/dependencies are missing.
 
-FetchContent (CMake)
---------------------
+### FetchContent (CMake)
 
 ```cmake
 include(FetchContent)
@@ -45,13 +48,12 @@ target_link_libraries(app PRIVATE cmp::cmpc)
 Pin `GIT_TAG` to a commit or release tag for reproducible builds.
 Use `cmp_*_backend_is_available` at runtime to confirm support.
 
-```
+```sh
 cmake -S . -B build -D CMP_ENABLE_SDL3=ON -D CMP_ENABLE_SDL3_TTF=ON
 cmake -S . -B build -D CMP_ENABLE_WEB=ON -D CMP_ENABLE_WEBGPU=ON
 ```
 
-Media Decoding (Fallback)
--------------------------
+### Media Decoding (Fallback)
 
 LibCMPC ships minimal fallback decoders for development and tests:
 
@@ -61,8 +63,7 @@ LibCMPC ships minimal fallback decoders for development and tests:
 
 Backends can override these via `CMPEnv` for platform-native codecs.
 
-Text Field Example
-------------------
+## Text Field Example
 
 ```c
 #include "cmpc/cmp_text_field.h"
@@ -94,8 +95,7 @@ int setup_text_field(CMPGfx *gfx, CMPTextField *field) {
 }
 ```
 
-Driving Animations
-------------------
+## Driving Animations
 
 Text fields animate their floating labels and cursor blink. Call `cmp_text_field_step` each frame:
 
@@ -107,15 +107,13 @@ if (rc == CMP_OK && changed) {
 }
 ```
 
-Input Routing
--------------
+## Input Routing
 
 Use `cmp_event_dispatch` to route `CMPInputEvent` instances to widgets. Pointer and text input events update the
 text field state automatically. For focus transitions managed outside the dispatcher, call
 `cmp_text_field_set_focus` explicitly.
 
-Camera Capture Example
-----------------------
+## Camera Capture Example
 
 The camera plugin exposes configuration for device selection, resolution, and pixel format. Use
 `cmp_camera_config_init` to start from defaults, then override fields in `config.config`.
@@ -166,8 +164,7 @@ If a backend cannot satisfy the requested resolution or pixel format, it returns
 `CMP_ERR_UNSUPPORTED`. To accept a backend default, set `config.config.format` to
 `CMP_CAMERA_FORMAT_ANY` and leave `width`/`height` as `0`.
 
-Network Request Example
------------------------
+## Network Request Example
 
 Use the network plugin to issue HTTP requests through the active backend. Responses
 must be released with `cmp_network_response_free` before shutting down the client.
@@ -218,8 +215,7 @@ int fetch_url(CMPEnv *env, const char *url) {
 }
 ```
 
-Storage Example
----------------
+## Storage Example
 
 The storage helper provides a simple key/value store with optional file persistence via `CMPIO`.
 

@@ -1240,15 +1240,15 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPRect inner;
   CMPRect content; /* GCOVR_EXCL_LINE */
   CMPRect selection_rect = {0};
-  CMPRect handle_rect;        /* GCOVR_EXCL_LINE */
-  CMPScalar outline_width;    /* GCOVR_EXCL_LINE */
-  CMPScalar corner_radius;    /* GCOVR_EXCL_LINE */
-  CMPScalar inner_corner;     /* GCOVR_EXCL_LINE */
-  CMPScalar available_height; /* GCOVR_EXCL_LINE */
-  CMPScalar text_top;         /* GCOVR_EXCL_LINE */
-  CMPScalar text_baseline;    /* GCOVR_EXCL_LINE */
-  CMPScalar label_baseline;   /* GCOVR_EXCL_LINE */
-  CMPScalar label_rest_y;     /* GCOVR_EXCL_LINE */
+  CMPRect handle_rect;         /* GCOVR_EXCL_LINE */
+  CMPScalar outline_width;     /* GCOVR_EXCL_LINE */
+  CMPScalar corner_radius;     /* GCOVR_EXCL_LINE */
+  CMPScalar inner_corner;      /* GCOVR_EXCL_LINE */
+  CMPScalar available_height;  /* GCOVR_EXCL_LINE */
+  CMPScalar text_top;          /* GCOVR_EXCL_LINE */
+  /*CMPScalar text_baseline;*/ /* GCOVR_EXCL_LINE */
+  CMPScalar label_baseline;    /* GCOVR_EXCL_LINE */
+  CMPScalar label_rest_y;      /* GCOVR_EXCL_LINE */
   CMPScalar label_float_y;
   CMPScalar label_y; /* GCOVR_EXCL_LINE */
   CMPScalar label_x; /* GCOVR_EXCL_LINE */
@@ -1392,7 +1392,7 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
     available_height = 0.0f;
   }
   text_top = content.y + available_height * 0.5f;
-  text_baseline = field->text_font_metrics.baseline;
+  /* text_baseline = field->text_font_metrics.baseline; */
   text_x = content.x;
 
   if (ctx->gfx->vtable->push_clip != NULL) {
@@ -1476,9 +1476,11 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
     label_x = content.x;
 
     /* Calculate rest position (same as text input text) */
-    CMPScalar centerY = bounds.y + bounds.height * 0.5f;
-    label_rest_y = centerY - field->text_font_metrics.height * 0.5f +
-                   field->text_font_metrics.baseline;
+    {
+      CMPScalar centerY = bounds.y + bounds.height * 0.5f;
+      label_rest_y = centerY - field->text_font_metrics.height * 0.5f +
+                     field->text_font_metrics.baseline;
+    }
 
     /* FIX: Calculate float position so the label center sits on the top border.
        Top border is bounds.y. Center of label text is y - height/2 + baseline?
@@ -1507,12 +1509,14 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
     }
 
     /* FIX: Center cursor vertically in the box */
-    CMPScalar centerY = bounds.y + bounds.height * 0.5f;
+    {
+      CMPScalar centerY = bounds.y + bounds.height * 0.5f;
 
-    selection_rect.x = text_x + caret_x;
-    selection_rect.height = field->text_font_metrics.height;
-    selection_rect.y = centerY - (selection_rect.height * 0.5f);
-    selection_rect.width = field->style.cursor_width;
+      selection_rect.x = text_x + caret_x;
+      selection_rect.height = field->text_font_metrics.height;
+      selection_rect.y = centerY - (selection_rect.height * 0.5f);
+      selection_rect.width = field->style.cursor_width;
+    }
 
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
     if (cmp_text_field_test_fail_point_match(

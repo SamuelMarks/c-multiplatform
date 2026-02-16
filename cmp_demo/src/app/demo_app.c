@@ -7,6 +7,7 @@
 #include <cmpc/cmp_event.h>
 #include <cmpc/cmp_layout.h>
 #include <cmpc/cmp_list.h>
+#include <cmpc/cmp_math.h>
 #include <cmpc/cmp_render.h>
 #include <cmpc/cmp_text_field.h>
 
@@ -24,8 +25,7 @@
 #if defined(_WIN32)
 #define DEMO_FONT "Segoe UI"
 #elif defined(__APPLE__)
-#define DEMO_FONT                                                              \
-  "Helvetica Neue" // Simplified for demo, ideally system font lookup
+#define DEMO_FONT "Helvetica Neue"
 #elif defined(__EMSCRIPTEN__)
 #define DEMO_FONT "sans-serif"
 #else
@@ -114,13 +114,43 @@ static int measure_adapter(void *ctx, CMPLayoutMeasureSpec w,
   return widget->vtable->measure(widget, ws, hs, out);
 }
 
+static void update_widget_focus(DemoApp *app, CMPWidget *widget,
+                                CMPBool focused) {
+  if (widget == NULL)
+    return;
+
+  /* Check if widget is one of the known text fields before casting */
+  if (widget == (CMPWidget *)&app->tf_user ||
+      widget == (CMPWidget *)&app->tf_pass) {
+    cmp_text_field_set_focus((CMPTextField *)widget, focused);
+  }
+  /* Buttons don't have explicit set_focus in this API version,
+     they rely on 'pressed' state from events. */
+}
+
+static CMPBool is_pointer_event(const CMPInputEvent *e) {
+  return (e->type == CMP_INPUT_POINTER_DOWN ||
+          e->type == CMP_INPUT_POINTER_UP ||
+          e->type == CMP_INPUT_POINTER_MOVE ||
+          e->type == CMP_INPUT_POINTER_SCROLL)
+             ? CMP_TRUE
+             : CMP_FALSE;
+}
+
+static CMPBool widget_contains_point(const CMPRect *bounds,
+                                     const CMPInputEvent *evt) {
+  CMPBool contains = CMP_FALSE;
+  cmp_rect_contains_point(bounds, (CMPScalar)evt->data.pointer.x,
+                          (CMPScalar)evt->data.pointer.y, &contains);
+  return contains;
+}
+
 /* --- Callbacks --- */
 
 static int on_login_click(void *ctx, M3Button *btn) {
   DemoApp *app = (DemoApp *)ctx;
   (void)btn;
 
-  // Simple validation simulation
   const char *text;
   cmp_usize len;
   cmp_text_field_get_text(&app->tf_user, &text, &len);
@@ -131,7 +161,6 @@ static int on_login_click(void *ctx, M3Button *btn) {
   } else {
     m3_snackbar_set_message(&app->login_snackbar, "Please enter a username",
                             23);
-    // In a real app, we'd trigger visibility here
   }
   return CMP_OK;
 }
@@ -182,12 +211,11 @@ static int on_slider_chg(void *ctx, M3Slider *sl, CMPScalar val) {
 static int showcase_bind(void *ctx, CMPListSlot *slot, cmp_usize index) {
   DemoApp *app = (DemoApp *)ctx;
 
-  // Pattern: [Card] [Switch] [Slider] [Progress] [Checkbox] [Chip] ...
   int type = index % 6;
 
   switch (type) {
   case 0:
-    m3_card_set_style(&app->r_card, &app->s_card); // Ensure style
+    m3_card_set_style(&app->r_card, &app->s_card);
     slot->node.widget = (CMPWidget *)&app->r_card;
     break;
   case 1:
@@ -243,7 +271,6 @@ int demo_app_destroy(DemoApp *app) {
   if (!app)
     return CMP_OK;
   cmp_render_list_shutdown(&app->render_list);
-  // In a real app, destroy all widgets here to free fonts/internal allocs
   app->allocator.free(app->allocator.ctx, app);
   return CMP_OK;
 }
@@ -294,7 +321,6 @@ int demo_app_init_resources(DemoApp *app, CMPGfx *gfx, CMPEnv *env) {
   cmp_text_field_init(&app->tf_pass, &app->text_backend, &app->s_tf,
                       &app->allocator, "", 0);
   cmp_text_field_set_label(&app->tf_pass, "Password", 8);
-  /* In real M3, we'd enable password masking here */
 
   m3_button_init(&app->btn_login, &app->text_backend, &app->s_btn_filled,
                  "Sign In", 7);
@@ -307,7 +333,7 @@ int demo_app_init_resources(DemoApp *app, CMPGfx *gfx, CMPEnv *env) {
   CMPLayoutStyle s_col;
   cmp_layout_style_init(&s_col);
   s_col.direction = CMP_LAYOUT_DIRECTION_COLUMN;
-  s_col.align_cross = CMP_LAYOUT_ALIGN_STRETCH; // Stretch items to card width
+  s_col.align_cross = CMP_LAYOUT_ALIGN_STRETCH;
 
   // Root centers the card
   CMPLayoutStyle s_root = s_col;
@@ -320,7 +346,7 @@ int demo_app_init_resources(DemoApp *app, CMPGfx *gfx, CMPEnv *env) {
   // Card contains inputs
   CMPLayoutStyle s_card = s_col;
   s_card.padding = (CMPLayoutEdges){24, 24, 24, 24};
-  s_card.width = 320;
+  s_card.width = 340; // Increased width for better hit targets
   s_card.height = CMP_LAYOUT_AUTO;
   cmp_layout_node_init(&app->l_card, &s_card);
 
@@ -328,7 +354,7 @@ int demo_app_init_resources(DemoApp *app, CMPGfx *gfx, CMPEnv *env) {
   cmp_layout_style_init(&s_item);
   s_item.width = CMP_LAYOUT_AUTO;
   s_item.height = CMP_LAYOUT_AUTO;
-  s_item.padding.bottom = 16; // Gap
+  s_item.padding.bottom = 24;
 
   cmp_layout_node_init(&app->l_tf_user, &s_item);
   cmp_layout_node_set_measure(&app->l_tf_user, measure_adapter, &app->tf_user);
@@ -360,12 +386,10 @@ int demo_app_init_resources(DemoApp *app, CMPGfx *gfx, CMPEnv *env) {
 
   CMPListStyle list_style;
   cmp_list_style_init(&list_style);
-  list_style.padding =
-      (CMPLayoutEdges){16, 88, 16, 88}; // Space for App Bar + FAB
+  list_style.padding = (CMPLayoutEdges){16, 88, 16, 88};
   list_style.item_extent = 80;
-  list_style.spacing = 12;
-  cmp_list_view_init(&app->show_list, &list_style, &app->allocator, 100,
-                     20); // 100 items
+  list_style.spacing = 16; /* Increased spacing */
+  cmp_list_view_init(&app->show_list, &list_style, &app->allocator, 100, 20);
   cmp_list_view_set_bind(&app->show_list, showcase_bind, app);
 
   M3ScaffoldStyle scaf_style;
@@ -404,7 +428,7 @@ int demo_app_init_resources(DemoApp *app, CMPGfx *gfx, CMPEnv *env) {
                    (CMPWidget *)&app->det_bar, NULL, NULL, NULL);
 
   // Detail Layout inside body rect
-  CMPLayoutStyle s_det_center = s_root; // reusing center layout style
+  CMPLayoutStyle s_det_center = s_root;
   cmp_layout_node_init(&app->l_det_root, &s_det_center);
 
   CMPLayoutStyle s_det_card = s_card;
@@ -456,35 +480,116 @@ int demo_app_handle_event(DemoApp *app, const CMPInputEvent *evt,
   CMPBool h = CMP_FALSE;
   CMPWidget *w = NULL;
 
+  /* Dispatch order: children first/z-order or dispatch tree */
   if (app->current_screen == SCR_LOGIN) {
-    // Primitive manual hit-test/dispatch
-    w = (CMPWidget *)&app->btn_login;
-    w->vtable->event(w, evt, &h);
-    if (!h) {
-      w = (CMPWidget *)&app->tf_user;
-      w->vtable->event(w, evt, &h);
-    }
-    if (!h) {
-      w = (CMPWidget *)&app->tf_pass;
-      w->vtable->event(w, evt, &h);
+    /* Manual Tab Navigation */
+    if (evt->type == CMP_INPUT_KEY_DOWN && evt->data.key.key_code == 9) {
+      CMPWidget *curr = NULL;
+      CMPWidget *next = NULL;
+      cmp_event_dispatcher_get_focus(&app->dispatcher, &curr);
+
+      if (curr == (CMPWidget *)&app->tf_user) {
+        next = (CMPWidget *)&app->tf_pass;
+      } else if (curr == (CMPWidget *)&app->tf_pass) {
+        next = (CMPWidget *)&app->btn_login;
+      } else {
+        next = (CMPWidget *)&app->tf_user;
+      }
+
+      /* Explicitly propagate focus state to widgets so they redraw with cursors
+       */
+      if (curr) {
+        update_widget_focus(app, curr, CMP_FALSE);
+      }
+
+      cmp_event_dispatcher_set_focus(&app->dispatcher, next);
+
+      if (next) {
+        update_widget_focus(app, next, CMP_TRUE);
+      }
+
+      h = CMP_TRUE;
     }
 
-    // Handle focus
-    if (h && evt->type == CMP_INPUT_POINTER_DOWN) {
-      cmp_event_dispatcher_set_focus(&app->dispatcher, w);
+    /* FIX: Dispatch Keyboard/Text events to Focused widget first */
+    if (!h && (evt->type == CMP_INPUT_KEY_DOWN || evt->type == CMP_INPUT_TEXT ||
+               evt->type == CMP_INPUT_TEXT_UTF8)) {
+      CMPWidget *curr = NULL;
+      cmp_event_dispatcher_get_focus(&app->dispatcher, &curr);
+      if (curr) {
+        curr->vtable->event(curr, evt, &h);
+      }
+    }
+
+    /* General Dispatch (Clicks / Unhandled Keys) */
+    if (!h) {
+      /* Manual check order for hit testing: Top-most first */
+      /* Z-Order: Button (top), Pass, User, Card (bottom) */
+
+      /* FIX: Explicit hit-testing before dispatching pointer events to prevent
+       * "stealing" */
+      w = (CMPWidget *)&app->btn_login;
+      if (!is_pointer_event(evt) ||
+          widget_contains_point(&app->btn_login.bounds, evt)) {
+        w->vtable->event(w, evt, &h);
+      }
+
+      if (!h) {
+        w = (CMPWidget *)&app->tf_pass;
+        if (!is_pointer_event(evt) ||
+            widget_contains_point(&app->tf_pass.bounds, evt)) {
+          w->vtable->event(w, evt, &h);
+        }
+      }
+      if (!h) {
+        w = (CMPWidget *)&app->tf_user;
+        if (!is_pointer_event(evt) ||
+            widget_contains_point(&app->tf_user.bounds, evt)) {
+          w->vtable->event(w, evt, &h);
+        }
+      }
+
+      // Handle focus on Click
+      if (h && evt->type == CMP_INPUT_POINTER_DOWN) {
+        CMPWidget *prev = NULL;
+        cmp_event_dispatcher_get_focus(&app->dispatcher, &prev);
+
+        if (prev != w) {
+          if (prev) {
+            update_widget_focus(app, prev, CMP_FALSE);
+          }
+          cmp_event_dispatcher_set_focus(&app->dispatcher, w);
+          if (w) {
+            update_widget_focus(app, w, CMP_TRUE);
+          }
+        }
+      }
     }
   } else if (app->current_screen == SCR_SHOWCASE) {
-    w = (CMPWidget *)&app->show_scaffold;
-    w->vtable->event(w, evt, &h);
-  } else if (app->current_screen == SCR_DETAIL) {
-    w = (CMPWidget *)&app->det_scaffold;
-    w->vtable->event(w, evt, &h);
+    w = (CMPWidget *)&app->fab;
+    if (!is_pointer_event(evt) ||
+        widget_contains_point(&app->fab.bounds, evt)) {
+      w->vtable->event(w, evt, &h);
+    }
     if (!h) {
-      w = (CMPWidget *)&app->btn_back;
+      w = (CMPWidget *)&app->show_scaffold;
+      w->vtable->event(w, evt, &h);
+    }
+  } else if (app->current_screen == SCR_DETAIL) {
+    w = (CMPWidget *)&app->btn_back;
+    if (!is_pointer_event(evt) ||
+        widget_contains_point(&app->btn_back.bounds, evt)) {
       w->vtable->event(w, evt, &h);
     }
     if (!h) {
       w = (CMPWidget *)&app->btn_action;
+      if (!is_pointer_event(evt) ||
+          widget_contains_point(&app->btn_action.bounds, evt)) {
+        w->vtable->event(w, evt, &h);
+      }
+    }
+    if (!h) {
+      w = (CMPWidget *)&app->det_scaffold;
       w->vtable->event(w, evt, &h);
     }
   }
@@ -514,22 +619,28 @@ int demo_app_render(DemoApp *app, CMPGfx *gfx, CMPHandle window, int width,
     cmp_layout_compute(&app->l_root, &app->layout_dir, ws, hs);
 
     // Manually traverse and paint based on layout result
-    CMPRect r;
+    // Note: Assuming cmp_layout returns absolute coordinates logic implies
+    // we do NOT add the parent offset manually if the engine recursively
+    // propagated it. Based on user feedback ("inputs separate from card...
+    // bottom left away"), previous manual addition was incorrect.
 
-    cmp_layout_node_get_layout(&app->l_card, &r);
-    app->login_card.widget.vtable->layout(&app->login_card, r);
+    CMPRect r_card;
+    cmp_layout_node_get_layout(&app->l_card, &r_card);
+    app->login_card.widget.vtable->layout(&app->login_card, r_card);
     app->login_card.widget.vtable->paint(&app->login_card, &pctx);
 
-    cmp_layout_node_get_layout(&app->l_tf_user, &r);
-    app->tf_user.widget.vtable->layout(&app->tf_user, r);
+    CMPRect r_child;
+
+    cmp_layout_node_get_layout(&app->l_tf_user, &r_child);
+    app->tf_user.widget.vtable->layout(&app->tf_user, r_child);
     app->tf_user.widget.vtable->paint(&app->tf_user, &pctx);
 
-    cmp_layout_node_get_layout(&app->l_tf_pass, &r);
-    app->tf_pass.widget.vtable->layout(&app->tf_pass, r);
+    cmp_layout_node_get_layout(&app->l_tf_pass, &r_child);
+    app->tf_pass.widget.vtable->layout(&app->tf_pass, r_child);
     app->tf_pass.widget.vtable->paint(&app->tf_pass, &pctx);
 
-    cmp_layout_node_get_layout(&app->l_btn, &r);
-    app->btn_login.widget.vtable->layout(&app->btn_login, r);
+    cmp_layout_node_get_layout(&app->l_btn, &r_child);
+    app->btn_login.widget.vtable->layout(&app->btn_login, r_child);
     app->btn_login.widget.vtable->paint(&app->btn_login, &pctx);
   } else if (app->current_screen == SCR_SHOWCASE) {
     app->show_scaffold.widget.vtable->measure(
@@ -560,18 +671,22 @@ int demo_app_render(DemoApp *app, CMPGfx *gfx, CMPHandle window, int width,
     app->det_card.widget.vtable->layout(&app->det_card, r);
     app->det_card.widget.vtable->paint(&app->det_card, &pctx);
 
-    // Map button positions relative to card
+    // Map button positions relative to card layout logic if needed
+    // (Assuming detail uses standard absolute flow here too now)
     CMPRect r_btn;
 
     cmp_layout_node_get_layout(&app->l_det_back, &r_btn);
-    r_btn.x += r.x;
-    r_btn.y += r.y; // Add card layout offset
+    // Detail screen manual layout was relative to card body logic previously?
+    // If we assume same engine, we trust absolute coords, but we must add
+    // SCAFFOLD body offset
+    r_btn.x += body.x;
+    r_btn.y += body.y;
     app->btn_back.widget.vtable->layout(&app->btn_back, r_btn);
     app->btn_back.widget.vtable->paint(&app->btn_back, &pctx);
 
     cmp_layout_node_get_layout(&app->l_det_act, &r_btn);
-    r_btn.x += r.x;
-    r_btn.y += r.y;
+    r_btn.x += body.x;
+    r_btn.y += body.y;
     app->btn_action.widget.vtable->layout(&app->btn_action, r_btn);
     app->btn_action.widget.vtable->paint(&app->btn_action, &pctx);
   }
