@@ -476,12 +476,39 @@ static int test_i18n_coverage_hooks(TestAlloc *alloc_state,
   CMP_TEST_EXPECT(cmp_i18n_shutdown(&i18n_local), CMP_ERR_IO);
   alloc_state->fail_free_on_call = 0;
 
+  {
+    CMPI18n i18n = {0};
+    CMPI18nConfig config;
+    cmp_u32 direction;
+
+    CMP_TEST_OK(cmp_i18n_config_init(&config));
+    CMP_TEST_OK(cmp_i18n_init(&i18n, &config));
+
+    CMP_TEST_EXPECT(cmp_i18n_get_direction(NULL, &direction),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_i18n_get_direction(&i18n, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    CMP_TEST_OK(cmp_i18n_get_direction(&i18n, &direction));
+    CMP_TEST_EXPECT(direction, CMP_I18N_DIRECTION_LTR);
+
+    CMP_TEST_OK(cmp_i18n_set_locale(&i18n, "ar-SA", NULL));
+    CMP_TEST_OK(cmp_i18n_get_direction(&i18n, &direction));
+    CMP_TEST_EXPECT(direction, CMP_I18N_DIRECTION_RTL);
+
+    CMP_TEST_OK(cmp_i18n_set_locale(&i18n, "he-IL", NULL));
+    CMP_TEST_OK(cmp_i18n_get_direction(&i18n, &direction));
+    CMP_TEST_EXPECT(direction, CMP_I18N_DIRECTION_RTL);
+
+    CMP_TEST_OK(cmp_i18n_shutdown(&i18n));
+  }
+
   return 0;
 }
 
 static int test_i18n_branch_sweep(TestAlloc *alloc_state,
                                   const CMPAllocator *allocator) {
-  CMPI18n i18n;
+  CMPI18n i18n = {0};
   CMPI18nConfig config;
   CMPI18nLocale locale;
   CMPI18nNumber number;
@@ -773,11 +800,38 @@ static int test_i18n_branch_sweep(TestAlloc *alloc_state,
 
   CMP_TEST_OK(cmp_i18n_shutdown(&i18n));
 
+  {
+    CMPI18n i18n = {0};
+    CMPI18nConfig config;
+    cmp_u32 direction;
+
+    CMP_TEST_OK(cmp_i18n_config_init(&config));
+    CMP_TEST_OK(cmp_i18n_init(&i18n, &config));
+
+    CMP_TEST_EXPECT(cmp_i18n_get_direction(NULL, &direction),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_i18n_get_direction(&i18n, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    CMP_TEST_OK(cmp_i18n_get_direction(&i18n, &direction));
+    CMP_TEST_EXPECT(direction, CMP_I18N_DIRECTION_LTR);
+
+    CMP_TEST_OK(cmp_i18n_set_locale(&i18n, "ar-SA", NULL));
+    CMP_TEST_OK(cmp_i18n_get_direction(&i18n, &direction));
+    CMP_TEST_EXPECT(direction, CMP_I18N_DIRECTION_RTL);
+
+    CMP_TEST_OK(cmp_i18n_set_locale(&i18n, "he-IL", NULL));
+    CMP_TEST_OK(cmp_i18n_get_direction(&i18n, &direction));
+    CMP_TEST_EXPECT(direction, CMP_I18N_DIRECTION_RTL);
+
+    CMP_TEST_OK(cmp_i18n_shutdown(&i18n));
+  }
+
   return 0;
 }
 
 int main(void) {
-  CMPI18n i18n;
+  CMPI18n i18n = {0};
   CMPI18n i18n_fail;
   CMPI18nConfig config;
   CMPI18nLocale locale;
@@ -1746,6 +1800,33 @@ int main(void) {
   }
   if (test_i18n_branch_sweep(&alloc_state, &test_allocator) != 0) {
     return 1;
+  }
+
+  {
+    CMPI18n i18n = {0};
+    CMPI18nConfig config;
+    cmp_u32 direction;
+
+    CMP_TEST_OK(cmp_i18n_config_init(&config));
+    CMP_TEST_OK(cmp_i18n_init(&i18n, &config));
+
+    CMP_TEST_EXPECT(cmp_i18n_get_direction(NULL, &direction),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_i18n_get_direction(&i18n, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    CMP_TEST_OK(cmp_i18n_get_direction(&i18n, &direction));
+    CMP_TEST_EXPECT(direction, CMP_I18N_DIRECTION_LTR);
+
+    CMP_TEST_OK(cmp_i18n_set_locale(&i18n, "ar-SA", NULL));
+    CMP_TEST_OK(cmp_i18n_get_direction(&i18n, &direction));
+    CMP_TEST_EXPECT(direction, CMP_I18N_DIRECTION_RTL);
+
+    CMP_TEST_OK(cmp_i18n_set_locale(&i18n, "he-IL", NULL));
+    CMP_TEST_OK(cmp_i18n_get_direction(&i18n, &direction));
+    CMP_TEST_EXPECT(direction, CMP_I18N_DIRECTION_RTL);
+
+    CMP_TEST_OK(cmp_i18n_shutdown(&i18n));
   }
 
   return 0;

@@ -32,36 +32,28 @@
 #endif
 
 #define CMP_GTK4_RETURN_IF_ERROR(rc)                                           \
-  \ 
+                                                                               \
   do {                                                                         \
-    \ 
+                                                                               \
     if ((rc) != CMP_OK) {                                                      \
-      \ 
+                                                                               \
       return (rc);                                                             \
-      \ 
-                                                                           \
     }                                                                          \
-    \ 
-                                                                           \
-  }                                                                            \
-  while (0)
+                                                                               \
+  } while (0)
 
 #define CMP_GTK4_RETURN_IF_ERROR_CLEANUP(rc, cleanup)                          \
-  \ 
+                                                                               \
   do {                                                                         \
-    \ 
+                                                                               \
     if ((rc) != CMP_OK) {                                                      \
-      \ 
+                                                                               \
       cleanup;                                                                 \
-      \ 
+                                                                               \
       return (rc);                                                             \
-      \ 
-                                                                           \
     }                                                                          \
-    \ 
-                                                                           \
-  }                                                                            \
-  while (0)
+                                                                               \
+  } while (0)
 
 #define CMP_GTK4_DEFAULT_HANDLE_CAPACITY 64
 #define CMP_GTK4_EVENT_CAPACITY 1024u

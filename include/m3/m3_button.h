@@ -3,6 +3,8 @@
 
 /**
  * @file m3_button.h
+ * \image html button_filled_linux_material.svg "Filled Button"
+ * \image html button_outlined_linux_material.svg "Outlined Button"
  * @brief Button widgets for LibCMPC.
  */
 
@@ -10,6 +12,7 @@
 extern "C" {
 #endif
 
+#include "cmpc/cmp_icon.h"
 #include "cmpc/cmp_text.h"
 #include "cmpc/cmp_visuals.h"
 
@@ -25,6 +28,16 @@ extern "C" {
 #define M3_BUTTON_VARIANT_ELEVATED 5
 /** @brief Floating action button (FAB) variant. */
 #define M3_BUTTON_VARIANT_FAB 6
+/** @brief Icon button variant (standard). */
+#define M3_BUTTON_VARIANT_ICON_STANDARD 7
+/** @brief Icon button variant (filled). */
+#define M3_BUTTON_VARIANT_ICON_FILLED 8
+/** @brief Icon button variant (tonal). */
+#define M3_BUTTON_VARIANT_ICON_TONAL 9
+/** @brief Icon button variant (outlined). */
+#define M3_BUTTON_VARIANT_ICON_OUTLINED 10
+/** @brief Extended FAB variant. */
+#define M3_BUTTON_VARIANT_EXTENDED_FAB 11
 
 /** @brief Default horizontal padding for buttons. */
 #define M3_BUTTON_DEFAULT_PADDING_X 12.0f
@@ -38,6 +51,12 @@ extern "C" {
 #define M3_BUTTON_DEFAULT_CORNER_RADIUS 4.0f
 /** @brief Default outline width for outlined buttons. */
 #define M3_BUTTON_DEFAULT_OUTLINE_WIDTH 1.0f
+/** @brief Default icon-to-text spacing. */
+#define M3_BUTTON_DEFAULT_ICON_SPACING 8.0f
+/** @brief Default icon button diameter. */
+#define M3_BUTTON_DEFAULT_ICON_DIAMETER 40.0f
+/** @brief Default Extended FAB corner radius. */
+#define M3_BUTTON_DEFAULT_EXTENDED_FAB_RADIUS 16.0f
 /** @brief Default FAB diameter. */
 #define M3_BUTTON_DEFAULT_FAB_DIAMETER 56.0f
 /** @brief Default ripple expansion duration in seconds. */
@@ -77,8 +96,11 @@ typedef struct M3ButtonStyle {
   CMPScalar
       ripple_expand_duration;     /**< Ripple expansion duration in seconds. */
   CMPScalar ripple_fade_duration; /**< Ripple fade-out duration in seconds. */
-  CMPShadow shadow;       /**< Shadow descriptor for elevated buttons. */
-  CMPBool shadow_enabled; /**< CMP_TRUE when shadow is enabled. */
+  CMPShadow shadow;        /**< Shadow descriptor for elevated buttons. */
+  CMPBool shadow_enabled;  /**< CMP_TRUE when shadow is enabled. */
+  CMPIconStyle icon_style; /**< Optional icon style. */
+  CMPScalar icon_spacing;  /**< Spacing between icon and text. */
+  CMPScalar icon_diameter; /**< Icon button diameter in pixels. */
 } M3ButtonStyle;
 
 /**
@@ -90,6 +112,9 @@ typedef struct M3Button {
   M3ButtonStyle style;         /**< Current button style. */
   CMPHandle font;              /**< Font handle for label text. */
   CMPTextMetrics metrics;      /**< Cached text metrics. */
+  const char *utf8_icon;       /**< UTF-8 icon name (may be NULL). */
+  cmp_usize icon_len;          /**< UTF-8 icon name length in bytes. */
+  CMPIconMetrics icon_metrics; /**< Cached icon metrics. */
   const char *utf8_label;    /**< UTF-8 label text (may be NULL when empty). */
   cmp_usize utf8_len;        /**< UTF-8 label length in bytes. */
   CMPRect bounds;            /**< Layout bounds. */
@@ -142,6 +167,13 @@ CMP_API int CMP_CALL m3_button_style_init_elevated(M3ButtonStyle *style);
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_button_style_init_fab(M3ButtonStyle *style);
+
+CMP_API int CMP_CALL m3_button_style_init_icon(M3ButtonStyle *style,
+                                               cmp_u32 variant);
+CMP_API int CMP_CALL m3_button_style_init_extended_fab(M3ButtonStyle *style);
+
+CMP_API int CMP_CALL m3_button_set_icon(M3Button *button, const char *utf8_icon,
+                                        cmp_usize icon_len);
 
 /**
  * @brief Initialize a button widget.

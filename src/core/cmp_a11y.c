@@ -1,4 +1,5 @@
 #include "cmpc/cmp_a11y.h"
+#include <stdlib.h>
 
 #ifdef CMP_TESTING
 static CMPBool g_cmp_a11y_test_fail_clear = CMP_FALSE;
@@ -263,5 +264,114 @@ int CMP_CALL cmp_a11y_node_get_prev_sibling(const CMPA11yNode *node,
   }
 
   *out_sibling = parent->children[index - 1];
+  return CMP_OK;
+}
+
+static void cmp_a11y_find_all_focusable(CMPA11yNode *node, CMPA11yNode ***list,
+                                        cmp_usize *count, cmp_usize *capacity) {
+  cmp_usize i;
+  if (node == NULL || list == NULL || count == NULL || capacity == NULL) {
+    return;
+  }
+
+  if ((node->semantics.flags & CMP_SEMANTIC_FLAG_FOCUSABLE) != 0 &&
+      (node->semantics.flags & CMP_SEMANTIC_FLAG_DISABLED) == 0) {
+    if (*count >= *capacity) {
+      cmp_usize new_cap = (*capacity == 0) ? 16 : *capacity * 2;
+      CMPA11yNode **new_list =
+          (CMPA11yNode **)realloc(*list, new_cap * sizeof(CMPA11yNode *));
+      if (new_list != NULL) {
+        *list = new_list;
+        *capacity = new_cap;
+      }
+    }
+    if (*count < *capacity) {
+      (*list)[*count] = node;
+      *count += 1;
+    }
+  }
+
+  for (i = 0; i < node->child_count; i++) {
+    cmp_a11y_find_all_focusable(node->children[i], list, count, capacity);
+  }
+}
+
+CMP_API int CMP_CALL cmp_a11y_focus_next(CMPA11yNode *current,
+                                         CMPA11yNode *root,
+                                         CMPA11yNode **out_next) {
+  CMPA11yNode **list = NULL;
+  cmp_usize count = 0;
+  cmp_usize capacity = 0;
+  cmp_usize i;
+
+  if (root == NULL || out_next == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  *out_next = NULL;
+
+  cmp_a11y_find_all_focusable(root, &list, &count, &capacity);
+
+  if (count > 0) {
+    if (current == NULL) {
+      *out_next = list[0];
+    } else {
+      for (i = 0; i < count; i++) {
+        if (list[i] == current) {
+          if (i + 1 < count) {
+            *out_next = list[i + 1];
+          } else {
+            *out_next = list[0]; /* Wrap around */
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  if (list != NULL) {
+    free(list);
+  }
+
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL cmp_a11y_focus_prev(CMPA11yNode *current,
+                                         CMPA11yNode *root,
+                                         CMPA11yNode **out_prev) {
+  CMPA11yNode **list = NULL;
+  cmp_usize count = 0;
+  cmp_usize capacity = 0;
+  cmp_usize i;
+
+  if (root == NULL || out_prev == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  *out_prev = NULL;
+
+  cmp_a11y_find_all_focusable(root, &list, &count, &capacity);
+
+  if (count > 0) {
+    if (current == NULL) {
+      *out_prev = list[count - 1];
+    } else {
+      for (i = 0; i < count; i++) {
+        if (list[i] == current) {
+          if (i > 0) {
+            *out_prev = list[i - 1];
+          } else {
+            *out_prev = list[count - 1]; /* Wrap around */
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  if (list != NULL) {
+    free(list);
+  }
+
   return CMP_OK;
 }

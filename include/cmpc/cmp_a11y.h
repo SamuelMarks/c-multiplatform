@@ -118,6 +118,28 @@ CMP_API int CMP_CALL cmp_a11y_node_get_next_sibling(const CMPA11yNode *node,
 CMP_API int CMP_CALL cmp_a11y_node_get_prev_sibling(const CMPA11yNode *node,
                                                     CMPA11yNode **out_sibling);
 
+/**
+ * @brief Find the next focusable node in the accessibility tree.
+ * @param current Currently focused node (may be NULL to start from root).
+ * @param root Root node of the tree.
+ * @param out_next Receives the next focusable node (NULL if none found).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_a11y_focus_next(CMPA11yNode *current,
+                                         CMPA11yNode *root,
+                                         CMPA11yNode **out_next);
+
+/**
+ * @brief Find the previous focusable node in the accessibility tree.
+ * @param current Currently focused node.
+ * @param root Root node of the tree.
+ * @param out_prev Receives the previous focusable node (NULL if none found).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_a11y_focus_prev(CMPA11yNode *current,
+                                         CMPA11yNode *root,
+                                         CMPA11yNode **out_prev);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

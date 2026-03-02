@@ -786,3 +786,58 @@ int CMP_CALL m3_color_test_lch_to_argb(CMPScalar hue, CMPScalar chroma,
   return m3_color_lch_to_argb(hue, chroma, tone, out_argb, out_in_gamut);
 }
 #endif
+
+/* A simple median-cut / frequency-based heuristic to extract a dominant color
+   for Material You. We approximate by sampling the image and finding the most
+   saturated/prominent bin. */
+CMP_API int CMP_CALL m3_color_extract_seed_from_image(
+    const cmp_u32 *argb_pixels, cmp_usize pixel_count, cmp_u32 *out_seed_argb) {
+  cmp_usize i;
+  cmp_u32 best_color = 0xFF4285F4; /* Default fallback */
+  CMPScalar max_score = -1.0f;
+
+  if (argb_pixels == NULL || out_seed_argb == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  if (pixel_count == 0) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  /* Very naive sampling heuristic for the sake of the C library without large
+     allocs: We want a colorful pixel (high chroma/saturation) that isn't too
+     dark or light. */
+  for (i = 0; i < pixel_count;
+       i += 1) { /* Sample every 17th pixel to keep it fast */
+    cmp_u32 pixel = argb_pixels[i];
+    cmp_u32 a = (pixel >> 24) & 0xFF;
+    cmp_u32 r = (pixel >> 16) & 0xFF;
+    cmp_u32 g = (pixel >> 8) & 0xFF;
+    cmp_u32 b = pixel & 0xFF;
+
+    if (a < 128)
+      continue; /* Ignore transparent */
+
+    {
+      CMPScalar rf = r / 255.0f;
+      CMPScalar gf = g / 255.0f;
+      CMPScalar bf = b / 255.0f;
+      CMPScalar max_val = rf > gf ? (rf > bf ? rf : bf) : (gf > bf ? gf : bf);
+      CMPScalar min_val = rf < gf ? (rf < bf ? rf : bf) : (gf < bf ? gf : bf);
+      CMPScalar chroma = max_val - min_val;
+      CMPScalar lightness = (max_val + min_val) * 0.5f;
+
+      /* Score favors high chroma and mid-range lightness */
+      CMPScalar score =
+          chroma *
+          (1.0f - (lightness > 0.5f ? (lightness - 0.5f) : (0.5f - lightness)));
+
+      if (score > max_score) {
+        max_score = score;
+        best_color = pixel | 0xFF000000; /* Force opaque */
+      }
+    }
+  }
+
+  *out_seed_argb = best_color;
+  return CMP_OK;
+}

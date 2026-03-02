@@ -22,7 +22,12 @@ extern "C" {
 /** @brief Date order: day/month/year. */
 #define CMP_I18N_DATE_ORDER_DMY 1u
 /** @brief Date order: year/month/day. */
-#define CMP_I18N_DATE_ORDER_YMD 2u
+#define CMP_I18N_DATE_ORDER_YMD 2
+
+/** @brief Left-to-right text direction. */
+#define CMP_I18N_DIRECTION_LTR 0
+/** @brief Right-to-left text direction. */
+#define CMP_I18N_DIRECTION_RTL 1
 
 /** @brief 24-hour time format. */
 #define CMP_I18N_TIME_FORMAT_24H 0u
@@ -46,6 +51,7 @@ typedef struct CMPI18nLocale {
   cmp_u32 date_order;       /**< Date order (CMP_I18N_DATE_ORDER_*). */
   char time_separator;      /**< Time separator character. */
   cmp_u32 time_format;      /**< Time format (CMP_I18N_TIME_FORMAT_*). */
+  cmp_u32 direction;        /**< Layout direction (CMP_I18N_DIRECTION_*). */
   CMPBool pad_day;          /**< CMP_TRUE to pad day to 2 digits. */
   CMPBool pad_month;        /**< CMP_TRUE to pad month to 2 digits. */
   CMPBool pad_hour;         /**< CMP_TRUE to pad hour to 2 digits. */

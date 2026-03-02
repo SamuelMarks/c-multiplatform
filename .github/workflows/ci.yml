@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install libcurl (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -30,7 +30,7 @@ jobs:
     name: android
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
       - name: Install NDK
@@ -52,7 +52,7 @@ jobs:
     name: web
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v12
       - name: Configure
@@ -64,7 +64,7 @@ jobs:
     name: docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install Doxygen
         run: |
           sudo apt-get update
@@ -78,7 +78,7 @@ jobs:
     name: coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install gcovr
         run: |
           sudo apt-get update
@@ -104,7 +104,7 @@ jobs:
     name: packaging-smoke
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Configure
         run: cmake -S . -B build-packaging -DCMAKE_BUILD_TYPE=Release -DCMP_ENABLE_PACKAGING=ON -DCMP_BUILD_PACKAGING_STUB=ON
       - name: Build Packaging Stub

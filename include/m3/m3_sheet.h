@@ -51,7 +51,23 @@ extern "C" {
 /** @brief Default spring rest velocity for sheet animations. */
 #define M3_SHEET_DEFAULT_SPRING_REST_VELOCITY 1.0f
 
+/** @brief Standard side sheet variant. */
+#define M3_SIDE_SHEET_VARIANT_STANDARD 1
+/** @brief Modal side sheet variant. */
+#define M3_SIDE_SHEET_VARIANT_MODAL 2
+
+/** @brief Side sheet placement: Start edge (Left in LTR, Right in RTL). */
+#define M3_SIDE_SHEET_PLACEMENT_START 0u
+/** @brief Side sheet placement: End edge (Right in LTR, Left in RTL). */
+#define M3_SIDE_SHEET_PLACEMENT_END 1u
+
+/** @brief Default side sheet width in pixels. */
+#define M3_SIDE_SHEET_DEFAULT_WIDTH 400.0f
+/** @brief Default minimum side sheet width in pixels. */
+#define M3_SIDE_SHEET_DEFAULT_MIN_WIDTH 256.0f
+
 struct M3Sheet;
+struct M3SideSheet;
 
 /**
  * @brief Bottom sheet action callback signature.
@@ -62,6 +78,17 @@ struct M3Sheet;
  */
 typedef int(CMP_CALL *CMPSheetOnAction)(void *ctx, struct M3Sheet *sheet,
                                         cmp_u32 action);
+
+/**
+ * @brief Side sheet action callback signature.
+ * @param ctx User callback context pointer.
+ * @param sheet Side sheet instance that triggered the action.
+ * @param action Action identifier (CMP_SHEET_ACTION_*).
+ * @return CMP_OK on success or a failure code.
+ */
+typedef int(CMP_CALL *CMPSideSheetOnAction)(void *ctx,
+                                            struct M3SideSheet *sheet,
+                                            cmp_u32 action);
 
 /**
  * @brief Bottom sheet style descriptor.
@@ -106,6 +133,51 @@ typedef struct M3Sheet {
   CMPSheetOnAction on_action;  /**< Action callback (may be NULL). */
   void *on_action_ctx;         /**< Action callback context pointer. */
 } M3Sheet;
+
+/**
+ * @brief Side sheet style descriptor.
+ */
+typedef struct M3SideSheetStyle {
+  cmp_u32 variant;        /**< Sheet variant (M3_SIDE_SHEET_VARIANT_*). */
+  cmp_u32 placement;      /**< Placement (M3_SIDE_SHEET_PLACEMENT_*). */
+  CMPLayoutEdges padding; /**< Padding around sheet contents. */
+  CMPScalar width;        /**< Preferred sheet width in pixels (>= 0). */
+  CMPScalar min_width;    /**< Minimum sheet width in pixels (>= 0). */
+  CMPScalar max_width;  /**< Maximum sheet width in pixels (>= 0, 0 = none). */
+  CMPScalar max_height; /**< Maximum sheet height in pixels (>= 0, 0 = none). */
+  CMPScalar corner_radius; /**< Sheet corner radius in pixels (>= 0). */
+  CMPScalar
+      dismiss_threshold; /**< Fraction of width needed to dismiss (0..1). */
+  CMPScalar min_fling_velocity; /**< Minimum lateral fling velocity for dismiss
+                                   (>= 0). */
+  CMPScalar spring_stiffness;   /**< Spring stiffness (> 0). */
+  CMPScalar spring_damping;     /**< Spring damping (>= 0). */
+  CMPScalar spring_mass;        /**< Spring mass (> 0). */
+  CMPScalar spring_tolerance;   /**< Spring rest position tolerance (>= 0). */
+  CMPScalar spring_rest_velocity; /**< Spring rest velocity tolerance (>= 0). */
+  CMPColor background_color;      /**< Sheet background color. */
+  CMPColor scrim_color;           /**< Scrim color used behind the sheet. */
+  CMPShadow shadow;               /**< Shadow descriptor. */
+  CMPBool shadow_enabled; /**< CMP_TRUE when shadow rendering is enabled. */
+  CMPBool scrim_enabled;  /**< CMP_TRUE when scrim rendering is enabled. */
+} M3SideSheetStyle;
+
+/**
+ * @brief Side sheet widget instance.
+ */
+typedef struct M3SideSheet {
+  CMPWidget widget;       /**< Widget interface (points to this instance). */
+  M3SideSheetStyle style; /**< Current sheet style. */
+  CMPRect overlay_bounds; /**< Bounds of the overlay region. */
+  CMPRect sheet_bounds;   /**< Bounds of the sheet at rest (open state). */
+  CMPScalar offset;       /**< Current horizontal offset from the open state. */
+  CMPScalar drag_start_offset; /**< Offset at the start of a drag gesture. */
+  CMPBool dragging;            /**< CMP_TRUE when a drag gesture is active. */
+  CMPBool open;                /**< CMP_TRUE when the sheet is open. */
+  CMPAnimController anim;      /**< Spring animation controller. */
+  CMPSideSheetOnAction on_action; /**< Action callback (may be NULL). */
+  void *on_action_ctx;            /**< Action callback context pointer. */
+} M3SideSheet;
 
 /**
  * @brief Initialize a standard bottom sheet style with defaults.
@@ -192,6 +264,94 @@ CMP_API int CMP_CALL m3_sheet_get_bounds(const M3Sheet *sheet,
  */
 CMP_API int CMP_CALL m3_sheet_get_content_bounds(const M3Sheet *sheet,
                                                  CMPRect *out_bounds);
+
+/**
+ * @brief Initialize a standard side sheet style with defaults.
+ * @param style Style descriptor to initialize.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_side_sheet_style_init_standard(M3SideSheetStyle *style);
+
+/**
+ * @brief Initialize a modal side sheet style with defaults.
+ * @param style Style descriptor to initialize.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_side_sheet_style_init_modal(M3SideSheetStyle *style);
+
+/**
+ * @brief Initialize a side sheet widget.
+ * @param sheet Sheet instance.
+ * @param style Sheet style descriptor.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_side_sheet_init(M3SideSheet *sheet,
+                                        const M3SideSheetStyle *style);
+
+/**
+ * @brief Update the side sheet style.
+ * @param sheet Sheet instance.
+ * @param style New sheet style descriptor.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_side_sheet_set_style(M3SideSheet *sheet,
+                                             const M3SideSheetStyle *style);
+
+/**
+ * @brief Assign an action callback to the side sheet.
+ * @param sheet Sheet instance.
+ * @param on_action Action callback (may be NULL to clear).
+ * @param ctx Callback context pointer.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_side_sheet_set_on_action(M3SideSheet *sheet,
+                                                 CMPSideSheetOnAction on_action,
+                                                 void *ctx);
+
+/**
+ * @brief Set the open state of the side sheet.
+ * @param sheet Sheet instance.
+ * @param open CMP_TRUE to open, CMP_FALSE to close.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_side_sheet_set_open(M3SideSheet *sheet, CMPBool open);
+
+/**
+ * @brief Retrieve the open state of the side sheet.
+ * @param sheet Sheet instance.
+ * @param out_open Receives CMP_TRUE when open.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_side_sheet_get_open(const M3SideSheet *sheet,
+                                            CMPBool *out_open);
+
+/**
+ * @brief Step side sheet animations.
+ * @param sheet Sheet instance.
+ * @param dt Delta time in seconds (>= 0).
+ * @param out_changed Receives CMP_TRUE when visual state changed.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_side_sheet_step(M3SideSheet *sheet, CMPScalar dt,
+                                        CMPBool *out_changed);
+
+/**
+ * @brief Retrieve the current side sheet bounds.
+ * @param sheet Sheet instance.
+ * @param out_bounds Receives the current sheet bounds.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_side_sheet_get_bounds(const M3SideSheet *sheet,
+                                              CMPRect *out_bounds);
+
+/**
+ * @brief Compute content bounds inside the side sheet.
+ * @param sheet Sheet instance.
+ * @param out_bounds Receives the content bounds.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_side_sheet_get_content_bounds(const M3SideSheet *sheet,
+                                                      CMPRect *out_bounds);
 
 #ifdef __cplusplus
 } /* extern "C" */

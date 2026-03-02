@@ -203,6 +203,7 @@ static int m3_app_bar_validate_style(const M3AppBarStyle *style,
   case M3_APP_BAR_VARIANT_CENTER:
   case M3_APP_BAR_VARIANT_MEDIUM:
   case M3_APP_BAR_VARIANT_LARGE:
+  case M3_APP_BAR_VARIANT_BOTTOM:
     break;
   default:
     return CMP_ERR_RANGE;
@@ -877,6 +878,12 @@ int CMP_CALL m3_app_bar_style_init_large(M3AppBarStyle *style) {
   return m3_app_bar_style_init_base(style, M3_APP_BAR_VARIANT_LARGE,
                                     M3_APP_BAR_DEFAULT_SMALL_HEIGHT,
                                     M3_APP_BAR_DEFAULT_LARGE_HEIGHT);
+}
+
+int CMP_CALL m3_app_bar_style_init_bottom(M3AppBarStyle *style) {
+  return m3_app_bar_style_init_base(style, M3_APP_BAR_VARIANT_BOTTOM,
+                                    M3_APP_BAR_DEFAULT_BOTTOM_HEIGHT,
+                                    M3_APP_BAR_DEFAULT_BOTTOM_HEIGHT);
 }
 
 int CMP_CALL m3_app_bar_init(M3AppBar *bar, const CMPTextBackend *backend,

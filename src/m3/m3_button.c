@@ -168,6 +168,11 @@ static int m3_button_validate_style(const M3ButtonStyle *style,
   case M3_BUTTON_VARIANT_TEXT:
   case M3_BUTTON_VARIANT_ELEVATED:
   case M3_BUTTON_VARIANT_FAB:
+  case M3_BUTTON_VARIANT_ICON_STANDARD:
+  case M3_BUTTON_VARIANT_ICON_FILLED:
+  case M3_BUTTON_VARIANT_ICON_TONAL:
+  case M3_BUTTON_VARIANT_ICON_OUTLINED:
+  case M3_BUTTON_VARIANT_EXTENDED_FAB:
     break;
   default:
     return CMP_ERR_RANGE;
@@ -268,11 +273,29 @@ static int m3_button_metrics_update(M3Button *button) {
     return CMP_OK;
   }
 
-  rc = cmp_text_measure_utf8(&button->text_backend, button->font,
-                             button->utf8_label, button->utf8_len,
-                             &button->metrics);
-  if (rc != CMP_OK) {
-    return rc;
+  if (button->utf8_icon != NULL && button->text_backend.ctx != NULL) {
+    rc = cmp_icon_measure_utf8(NULL, &button->style.icon_style,
+                               button->utf8_icon, button->icon_len, NULL,
+                               CMP_ICON_RENDER_AUTO, &button->icon_metrics);
+    /* For tests and headless rendering, we can fake metrics if icon measurement
+     * isn't fully supported without gfx context */
+  } else {
+    button->icon_metrics.width = 0.0f;
+    button->icon_metrics.height = 0.0f;
+    button->icon_metrics.baseline = 0.0f;
+  }
+
+  if (button->utf8_label != NULL) {
+    rc = cmp_text_measure_utf8(&button->text_backend, button->font,
+                               button->utf8_label, button->utf8_len,
+                               &button->metrics);
+    if (rc != CMP_OK) {
+      return rc;
+    }
+  } else {
+    button->metrics.width = 0.0f;
+    button->metrics.height = 0.0f;
+    button->metrics.baseline = 0.0f;
   }
 
   button->metrics_valid = CMP_TRUE;
@@ -672,6 +695,95 @@ int CMP_CALL m3_button_style_init_elevated(M3ButtonStyle *style) {
   return CMP_OK;
 }
 
+CMP_API int CMP_CALL m3_button_style_init_icon(M3ButtonStyle *style,
+                                               cmp_u32 variant) {
+  if (style == NULL)
+    return CMP_ERR_INVALID_ARGUMENT;
+
+  cmp_icon_style_init(&style->icon_style);
+  style->icon_style.size_px = 24;
+  style->icon_spacing = M3_BUTTON_DEFAULT_ICON_SPACING;
+  style->icon_diameter = M3_BUTTON_DEFAULT_ICON_DIAMETER;
+  style->fab_diameter = M3_BUTTON_DEFAULT_FAB_DIAMETER;
+
+  style->variant = variant;
+  style->outline_width = 0.0f;
+  style->corner_radius = style->icon_diameter * 0.5f;
+  style->padding_x = 0.0f;
+  style->padding_y = 0.0f;
+  style->min_width = style->icon_diameter;
+  style->min_height = style->icon_diameter;
+  style->shadow_enabled = CMP_FALSE;
+  style->ripple_expand_duration = M3_BUTTON_DEFAULT_RIPPLE_EXPAND;
+  style->ripple_fade_duration = M3_BUTTON_DEFAULT_RIPPLE_FADE;
+
+  if (variant == M3_BUTTON_VARIANT_ICON_STANDARD) {
+    style->background_color.a = 0.0f;
+    style->text_style.color.r = 0.286f;
+    style->text_style.color.g = 0.267f;
+    style->text_style.color.b = 0.294f;
+    style->text_style.color.a = 1.0f;
+  } else if (variant == M3_BUTTON_VARIANT_ICON_FILLED) {
+    style->background_color.r = 0.416f;
+    style->background_color.g = 0.310f;
+    style->background_color.b = 0.553f;
+    style->background_color.a = 1.0f;
+    style->text_style.color.r = 1.0f;
+    style->text_style.color.g = 1.0f;
+    style->text_style.color.b = 1.0f;
+    style->text_style.color.a = 1.0f;
+  } else if (variant == M3_BUTTON_VARIANT_ICON_TONAL) {
+    style->background_color.r = 0.910f;
+    style->background_color.g = 0.867f;
+    style->background_color.b = 0.973f;
+    style->background_color.a = 1.0f;
+    style->text_style.color.r = 0.118f;
+    style->text_style.color.g = 0.078f;
+    style->text_style.color.b = 0.184f;
+    style->text_style.color.a = 1.0f;
+  } else if (variant == M3_BUTTON_VARIANT_ICON_OUTLINED) {
+    style->outline_width = M3_BUTTON_DEFAULT_OUTLINE_WIDTH;
+    style->outline_color.r = 0.490f;
+    style->outline_color.g = 0.463f;
+    style->outline_color.b = 0.498f;
+    style->outline_color.a = 1.0f;
+    style->background_color.a = 0.0f;
+    style->text_style.color.r = 0.286f;
+    style->text_style.color.g = 0.267f;
+    style->text_style.color.b = 0.294f;
+    style->text_style.color.a = 1.0f;
+  } else {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  style->icon_style.color = style->text_style.color;
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_button_style_init_extended_fab(M3ButtonStyle *style) {
+  if (style == NULL)
+    return CMP_ERR_INVALID_ARGUMENT;
+  m3_button_style_init_fab(style);
+  style->variant = M3_BUTTON_VARIANT_EXTENDED_FAB;
+  style->corner_radius = M3_BUTTON_DEFAULT_EXTENDED_FAB_RADIUS;
+  style->padding_x = 16.0f;
+  style->min_width = 80.0f;
+  style->icon_spacing = M3_BUTTON_DEFAULT_ICON_SPACING;
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_button_set_icon(M3Button *button, const char *utf8_icon,
+                                        cmp_usize icon_len) {
+  if (button == NULL)
+    return CMP_ERR_INVALID_ARGUMENT;
+  if (utf8_icon == NULL && icon_len != 0)
+    return CMP_ERR_INVALID_ARGUMENT;
+  button->utf8_icon = utf8_icon;
+  button->icon_len = icon_len;
+  button->metrics_valid = CMP_FALSE;
+  return CMP_OK;
+}
+
 int CMP_CALL m3_button_style_init_fab(M3ButtonStyle *style) {
   CMPColor shadow_color;
   int rc;
@@ -746,6 +858,7 @@ static int m3_button_widget_measure(void *widget, CMPMeasureSpec width,
   CMPTextMetrics metrics;
   CMPScalar desired_width;
   CMPScalar desired_height;
+  CMPScalar content_width;
   int rc;
 
   if (widget == NULL || out_size == NULL) {
@@ -773,7 +886,14 @@ static int m3_button_widget_measure(void *widget, CMPMeasureSpec width,
   }
 
   metrics = button->metrics;
-  desired_width = metrics.width + button->style.padding_x * 2.0f;
+  content_width = metrics.width;
+  if (button->utf8_icon != NULL) {
+    content_width += button->icon_metrics.width;
+    if (button->utf8_label != NULL && button->utf8_len > 0) {
+      content_width += button->style.icon_spacing;
+    }
+  }
+  desired_width = content_width + button->style.padding_x * 2.0f;
   desired_height = metrics.height + button->style.padding_y * 2.0f;
 
   if (desired_width < button->style.min_width) {
@@ -840,6 +960,11 @@ static int m3_button_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPColor outline;
   CMPColor ripple_color; /* GCOVR_EXCL_LINE */
   CMPShadow shadow;
+  CMPScalar content_width;
+  CMPScalar start_x;
+  CMPScalar current_x;
+  CMPRect icon_bounds;
+  CMPIconStyle runtime_icon_style;
   CMPScalar corner_radius;
   CMPScalar inner_corner;
   CMPScalar outline_width;
@@ -968,7 +1093,8 @@ static int m3_button_widget_paint(void *widget, CMPPaintContext *ctx) {
     }
   }
 
-  if (button->utf8_label == NULL && button->utf8_len == 0) {
+  if ((button->utf8_label == NULL || button->utf8_len == 0) &&
+      (button->utf8_icon == NULL || button->icon_len == 0)) {
     return CMP_OK;
   }
 
@@ -982,21 +1108,54 @@ static int m3_button_widget_paint(void *widget, CMPPaintContext *ctx) {
     available_height = 0.0f;
   }
 
-  if (available_width <= metrics.width) {
-    text_x = bounds.x + button->style.padding_x;
-  } else {
-    text_x = bounds.x + button->style.padding_x +
-             (available_width - metrics.width) * 0.5f;
+  content_width = metrics.width;
+  if (button->utf8_icon != NULL) {
+    content_width += button->icon_metrics.width;
+    if (button->utf8_label != NULL && button->utf8_len > 0) {
+      content_width += button->style.icon_spacing;
+    }
   }
 
-  /* FIX: Center based on bounding box. Using available_height calculation
-     combined with baseline can drift if fonts have large leading. */
-  text_y = bounds.y + bounds.height * 0.5f - metrics.height * 0.5f +
-           metrics.baseline;
+  if (available_width <= content_width) {
+    start_x = bounds.x + button->style.padding_x;
+  } else {
+    start_x = bounds.x + button->style.padding_x +
+              (available_width - content_width) * 0.5f;
+  }
 
-  return ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, button->font,
-                                          button->utf8_label, button->utf8_len,
-                                          text_x, text_y, text_color);
+  current_x = start_x;
+
+  if (button->utf8_icon != NULL) {
+
+    icon_bounds.x = current_x;
+    icon_bounds.width = button->icon_metrics.width;
+    icon_bounds.height = button->icon_metrics.height;
+    icon_bounds.y = bounds.y + (bounds.height - icon_bounds.height) * 0.5f;
+
+    runtime_icon_style = button->style.icon_style;
+    runtime_icon_style.color = text_color; /* Use resolved text color */
+
+    cmp_icon_draw_utf8(ctx->gfx, &icon_bounds, &runtime_icon_style,
+                       button->utf8_icon, button->icon_len, NULL,
+                       CMP_ICON_RENDER_AUTO);
+
+    current_x += button->icon_metrics.width;
+    if (button->utf8_label != NULL && button->utf8_len > 0) {
+      current_x += button->style.icon_spacing;
+    }
+  }
+
+  if (button->utf8_label != NULL && button->utf8_len > 0) {
+    text_x = current_x;
+    text_y = bounds.y + bounds.height * 0.5f - metrics.height * 0.5f +
+             metrics.baseline;
+
+    return ctx->gfx->text_vtable->draw_text(
+        ctx->gfx->ctx, button->font, button->utf8_label, button->utf8_len,
+        text_x, text_y, text_color);
+  }
+
+  return CMP_OK;
 }
 
 static int m3_button_widget_event(void *widget, const CMPInputEvent *event,

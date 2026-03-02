@@ -3,6 +3,7 @@
 
 /**
  * @file m3_chip.h
+ * \image html chip_assist_linux_material.svg "Assist Chip"
  * @brief Chip widgets for LibCMPC.
  */
 

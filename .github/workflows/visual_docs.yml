@@ -1,0 +1,91 @@
+name: Visual Docs Generation
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  generate-assets:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: ubuntu-latest
+            platform: web
+          - os: macos-latest
+            platform: macos
+          - os: windows-latest
+            platform: windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Install libcurl (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev
+          
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMP_BUILD_DOCGEN=ON
+        
+      - name: Build docgen
+        run: cmake --build build --config Release --target cmp_docgen
+        
+      - name: Run docgen (Unix)
+        if: matrix.os != 'windows-latest'
+        run: ./build/cmp_docgen --platform ${{ matrix.platform }} --theme material
+        
+      - name: Run docgen (Windows)
+        if: matrix.os == 'windows-latest'
+        run: .\build\Release\cmp_docgen.exe --platform ${{ matrix.platform }} --theme material
+        
+      - name: Upload assets
+        uses: actions/upload-artifact@v6
+        with:
+          name: docs-${{ matrix.platform }}
+          path: docs/
+
+  publish-docs:
+    needs: generate-assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+          cd docs && npm install
+          
+      - name: Download all docs artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: docs-*
+          merge-multiple: true
+          path: docs/
+          
+      - name: Generate Markdown
+        run: python3 tools/docgen/build_docs.py
+        
+      - name: Zip Visual Docs
+        run: zip -r visual_docs.zip docs/
+        
+      - name: Build Doxygen HTML
+        run: |
+          cmake -S . -B build-docs -DCMAKE_BUILD_TYPE=Release -DCMP_REQUIRE_DOXYGEN=ON
+          cmake --build build-docs --target cmp_docs
+          cd build-docs/docs/html && zip -r ../../../website.zip .
+        
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            visual_docs.zip
+            website.zip

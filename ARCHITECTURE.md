@@ -17,6 +17,7 @@ Directory Layout
   tabs, dialogs, sheets, scaffold, menus, cards, chips, selection controls, progress, date/time pickers).
 - `src/backend/<platform>/` — Platform implementations of the `cmp_api_*` V-Tables (null, sdl3, linux/gtk4, cocoa,
   win32, web, ios, android).
+- `tools/docgen/` — The autonomous headless vector documentation generator. Renders widgets into SVGs via the mock GFX V-Table.
 - `tests/` — Phase-scoped tests validating behavior and error handling.
 - `packaging/` — CMake-driven packaging scripts for desktop, mobile, web, and SDL3 builds.
 
@@ -44,21 +45,14 @@ at runtime via `cmp_*_backend_is_available`.
 Widget Composition
 ------------------
 
-Widgets are plain C structs that embed an `CMPWidget` header with a function V-Table. Widgets can be combined
-into render trees and traversed by the render builder. Semantics are carried via `CMPSemantics` for accessibility.
+Widgets are plain C structs that embed a `CMPWidget` header with a function V-Table (`measure`, `layout`, `paint`, `semantics`). Widgets can be combined into render trees and traversed by the render builder. Semantics are carried via `CMPSemantics` for accessibility.
+
+Headless Documentation Pipeline
+-------------------------------
+The `cmp_docgen` tool injects a custom `CMPGfxVTable` to intercept all rendering commands (`draw_rect`, `draw_path`, etc.) and outputs pure vector SVG graphics. This is combined with automated Markdown and Doxygen generation inside GitHub actions to provide visual test feedback without needing a headless browser.
 
 Accessibility + Predictive Back
 -------------------------------
 
 - `cmp_a11y` provides a small semantics surface that backends can map to native accessibility APIs.
 - `cmp_predictive` reports predictive back gestures (start/progress/commit/cancel) for edge-swipe navigation.
-
-Text Fields
------------
-
-Text fields are implemented in `src/core/cmp_text_field.c` and build on the text/visuals modules, exposing:
-
-- Decoration container (fill + outline).
-- Cursor rendering and blink timing.
-- Selection highlight and handles.
-- Floating label animation with explicit stepping.

@@ -114,15 +114,24 @@ endif()
 
 add_library(m3
     src/m3/m3_color.c
-    src/m3/m3_navigation.c
+    src/m3/m3_typography.c
+    src/m3/m3_text_field.c
+    src/m3/m3_search.c
+    src/m3/m3_carousel.c
+    src/m3/m3_segmented.c
+    src/m3/m3_list.c
+        src/m3/m3_navigation.c
     src/m3/m3_app_bar.c
     src/m3/m3_tabs.c
     src/m3/m3_dialogs.c
+    src/m3/m3_tooltip.c
     src/m3/m3_sheet.c
     src/m3/m3_scaffold.c
     src/m3/m3_menu.c
     src/m3/m3_button.c
     src/m3/m3_card.c
+    src/m3/m3_divider.c
+    src/m3/m3_badge.c
     src/m3/m3_chip.c
     src/m3/m3_selection.c
     src/m3/m3_progress.c
@@ -547,3 +556,76 @@ if(BUILD_TESTING)
     target_compile_definitions(m3 PRIVATE CMP_TESTING)
     # (Tests follow...)
 endif()
+option(CMP_BUILD_DOCGEN "Build the documentation generator tool" ON)
+if(CMP_BUILD_DOCGEN)
+    add_executable(cmp_docgen tools/docgen/docgen.c)
+    target_compile_options(cmp_docgen PRIVATE -g)
+    target_link_libraries(cmp_docgen PRIVATE m3 cmpc)
+    cmp_apply_c_settings(cmp_docgen)
+endif()
+
+if(BUILD_TESTING)
+    add_executable(cmp_phase5_typography tests/phase5/typography.c)
+    target_link_libraries(cmp_phase5_typography PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_typography COMMAND cmp_phase5_typography)
+
+    add_executable(cmp_phase5_text_field tests/phase5/text_field.c)
+    target_link_libraries(cmp_phase5_text_field PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_text_field COMMAND cmp_phase5_text_field)
+
+    add_executable(cmp_phase5_list tests/phase5/list.c)
+    target_link_libraries(cmp_phase5_list PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_list COMMAND cmp_phase5_list)
+
+    add_executable(cmp_phase5_search tests/phase5/search.c)
+    target_link_libraries(cmp_phase5_search PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_search COMMAND cmp_phase5_search)
+
+    add_executable(cmp_phase5_carousel tests/phase5/carousel.c)
+    target_link_libraries(cmp_phase5_carousel PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_carousel COMMAND cmp_phase5_carousel)
+
+    add_executable(cmp_phase5_segmented tests/phase5/segmented.c)
+    target_link_libraries(cmp_phase5_segmented PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_segmented COMMAND cmp_phase5_segmented)
+
+    add_executable(cmp_phase5_divider tests/phase5/divider.c)
+    target_link_libraries(cmp_phase5_divider PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_divider COMMAND cmp_phase5_divider)
+
+    add_executable(cmp_phase5_badge tests/phase5/badge.c)
+
+    add_executable(cmp_phase5_tooltip tests/phase5/tooltip.c)
+    target_link_libraries(cmp_phase5_tooltip PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_tooltip COMMAND cmp_phase5_tooltip)
+    target_link_libraries(cmp_phase5_badge PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_badge COMMAND cmp_phase5_badge)
+
+endif()
+
+if(BUILD_TESTING)
+    add_executable(cmp_phase1_i18n tests/phase1/i18n.c)
+    target_link_libraries(cmp_phase1_i18n PRIVATE cmpc)
+    add_test(NAME cmp_phase1_i18n COMMAND cmp_phase1_i18n)
+
+    add_executable(cmp_phase6_a11y tests/phase6/a11y.c)
+    target_link_libraries(cmp_phase6_a11y PRIVATE cmpc)
+    add_test(NAME cmp_phase6_a11y COMMAND cmp_phase6_a11y)
+endif()
+
+if(BUILD_TESTING)
+    add_executable(cmp_phase2_color tests/phase2/color.c)
+    target_link_libraries(cmp_phase2_color PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase2_color COMMAND cmp_phase2_color)
+endif()
+
+if(BUILD_TESTING)
+    add_executable(cmp_phase5_side_sheet tests/phase5/side_sheet.c)
+    target_link_libraries(cmp_phase5_side_sheet PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_side_sheet COMMAND cmp_phase5_side_sheet)
+
+    add_executable(cmp_phase5_buttons tests/phase5/buttons.c)
+    target_link_libraries(cmp_phase5_buttons PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_buttons COMMAND cmp_phase5_buttons)
+endif()
+

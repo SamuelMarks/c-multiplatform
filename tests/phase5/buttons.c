@@ -604,6 +604,7 @@ int main(void) {
                   CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable;
 
+  style.text_style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_button_init(&button, &text_backend, &style, "OK", 2),
                   CMP_ERR_INVALID_ARGUMENT);
   style.text_style.utf8_family = "Test";

@@ -384,6 +384,7 @@ static int cmp_i18n_locale_preset_en_us(CMPI18nLocale *out_locale) {
   out_locale->date_order = CMP_I18N_DATE_ORDER_MDY;
   out_locale->time_separator = ':';
   out_locale->time_format = CMP_I18N_TIME_FORMAT_12H;
+  out_locale->direction = CMP_I18N_DIRECTION_LTR;
   out_locale->pad_day = CMP_TRUE;
   out_locale->pad_month = CMP_TRUE;
   out_locale->pad_hour = CMP_FALSE;
@@ -404,6 +405,7 @@ static int cmp_i18n_locale_preset_en_gb(CMPI18nLocale *out_locale) {
   out_locale->date_order = CMP_I18N_DATE_ORDER_DMY;
   out_locale->time_separator = ':';
   out_locale->time_format = CMP_I18N_TIME_FORMAT_24H;
+  out_locale->direction = CMP_I18N_DIRECTION_LTR;
   out_locale->pad_day = CMP_TRUE;
   out_locale->pad_month = CMP_TRUE;
   out_locale->pad_hour = CMP_TRUE;
@@ -424,6 +426,49 @@ static int cmp_i18n_locale_preset_fr_fr(CMPI18nLocale *out_locale) {
   out_locale->date_order = CMP_I18N_DATE_ORDER_DMY;
   out_locale->time_separator = ':';
   out_locale->time_format = CMP_I18N_TIME_FORMAT_24H;
+  out_locale->direction = CMP_I18N_DIRECTION_LTR;
+  out_locale->pad_day = CMP_TRUE;
+  out_locale->pad_month = CMP_TRUE;
+  out_locale->pad_hour = CMP_TRUE;
+  out_locale->pad_minute = CMP_TRUE;
+  out_locale->am = "AM";
+  out_locale->pm = "PM";
+  return CMP_OK;
+}
+
+static int cmp_i18n_locale_preset_ar_sa(CMPI18nLocale *out_locale) {
+  if (out_locale == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  out_locale->decimal_separator = ',';
+  out_locale->thousands_separator = '.';
+  out_locale->grouping = 3u;
+  out_locale->date_separator = '/';
+  out_locale->date_order = CMP_I18N_DATE_ORDER_DMY;
+  out_locale->time_separator = ':';
+  out_locale->time_format = CMP_I18N_TIME_FORMAT_12H;
+  out_locale->direction = CMP_I18N_DIRECTION_RTL;
+  out_locale->pad_day = CMP_TRUE;
+  out_locale->pad_month = CMP_TRUE;
+  out_locale->pad_hour = CMP_FALSE;
+  out_locale->pad_minute = CMP_TRUE;
+  out_locale->am = "ص";
+  out_locale->pm = "م";
+  return CMP_OK;
+}
+
+static int cmp_i18n_locale_preset_he_il(CMPI18nLocale *out_locale) {
+  if (out_locale == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  out_locale->decimal_separator = '.';
+  out_locale->thousands_separator = ',';
+  out_locale->grouping = 3u;
+  out_locale->date_separator = '.';
+  out_locale->date_order = CMP_I18N_DATE_ORDER_DMY;
+  out_locale->time_separator = ':';
+  out_locale->time_format = CMP_I18N_TIME_FORMAT_24H;
+  out_locale->direction = CMP_I18N_DIRECTION_RTL;
   out_locale->pad_day = CMP_TRUE;
   out_locale->pad_month = CMP_TRUE;
   out_locale->pad_hour = CMP_TRUE;
@@ -444,6 +489,7 @@ static int cmp_i18n_locale_preset_de_de(CMPI18nLocale *out_locale) {
   out_locale->date_order = CMP_I18N_DATE_ORDER_DMY;
   out_locale->time_separator = ':';
   out_locale->time_format = CMP_I18N_TIME_FORMAT_24H;
+  out_locale->direction = CMP_I18N_DIRECTION_LTR;
   out_locale->pad_day = CMP_TRUE;
   out_locale->pad_month = CMP_TRUE;
   out_locale->pad_hour = CMP_TRUE;
@@ -1185,6 +1231,22 @@ int CMP_CALL cmp_i18n_locale_from_tag(const char *locale_tag,
     return cmp_i18n_locale_preset_fr_fr(out_locale);
   }
 
+  rc = cmp_i18n_tag_equals(locale_tag, "ar-SA", &match);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+  if (match == CMP_TRUE) {
+    return cmp_i18n_locale_preset_ar_sa(out_locale);
+  }
+
+  rc = cmp_i18n_tag_equals(locale_tag, "he-IL", &match);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+  if (match == CMP_TRUE) {
+    return cmp_i18n_locale_preset_he_il(out_locale);
+  }
+
   rc = cmp_i18n_tag_equals(locale_tag, "de-DE", &match);
   if (rc != CMP_OK) {
     return rc;
@@ -1392,6 +1454,15 @@ int CMP_CALL cmp_i18n_set_formatter(CMPI18n *i18n,
   }
 
   i18n->formatter = *formatter;
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL cmp_i18n_get_direction(const CMPI18n *i18n,
+                                            cmp_u32 *out_direction) {
+  if (i18n == NULL || out_direction == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  *out_direction = i18n->locale.direction;
   return CMP_OK;
 }
 
@@ -1898,6 +1969,14 @@ int CMP_CALL cmp_i18n_test_locale_preset_en_gb(CMPI18nLocale *out_locale) {
 
 int CMP_CALL cmp_i18n_test_locale_preset_fr_fr(CMPI18nLocale *out_locale) {
   return cmp_i18n_locale_preset_fr_fr(out_locale);
+}
+
+int CMP_CALL cmp_i18n_test_locale_preset_ar_sa(CMPI18nLocale *out_locale) {
+  return cmp_i18n_locale_preset_ar_sa(out_locale);
+}
+
+int CMP_CALL cmp_i18n_test_locale_preset_he_il(CMPI18nLocale *out_locale) {
+  return cmp_i18n_locale_preset_he_il(out_locale);
 }
 
 int CMP_CALL cmp_i18n_test_locale_preset_de_de(CMPI18nLocale *out_locale) {

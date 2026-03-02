@@ -3,9 +3,11 @@ PROJECT_BRIEF          = "C89 cross-platform application framework"
 OUTPUT_DIRECTORY       = "@CMAKE_CURRENT_BINARY_DIR@/docs"
 CREATE_SUBDIRS         = NO
 
-INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/include"
+USE_MDFILE_AS_MAINPAGE = "@CMAKE_CURRENT_SOURCE_DIR@/docs/pages/index.md"
+INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/include" "@CMAKE_CURRENT_SOURCE_DIR@/docs/pages" "@CMAKE_CURRENT_SOURCE_DIR@/docs/generated"
+IMAGE_PATH             = "@CMAKE_CURRENT_SOURCE_DIR@/docs/assets"
 RECURSIVE              = YES
-FILE_PATTERNS          = *.h
+FILE_PATTERNS          = *.h *.md
 
 EXTRACT_ALL            = YES
 EXTRACT_STATIC         = YES

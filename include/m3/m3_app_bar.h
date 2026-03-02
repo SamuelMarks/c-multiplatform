@@ -24,6 +24,8 @@ extern "C" {
 #define M3_APP_BAR_VARIANT_MEDIUM 3
 /** @brief Large top app bar variant. */
 #define M3_APP_BAR_VARIANT_LARGE 4
+/** @brief Bottom app bar variant. */
+#define M3_APP_BAR_VARIANT_BOTTOM 5
 
 /** @brief Default small app bar height in pixels. */
 #define M3_APP_BAR_DEFAULT_SMALL_HEIGHT 64.0f
@@ -31,6 +33,8 @@ extern "C" {
 #define M3_APP_BAR_DEFAULT_MEDIUM_HEIGHT 112.0f
 /** @brief Default large app bar height in pixels. */
 #define M3_APP_BAR_DEFAULT_LARGE_HEIGHT 152.0f
+/** @brief Default bottom app bar height in pixels. */
+#define M3_APP_BAR_DEFAULT_BOTTOM_HEIGHT 80.0f
 /** @brief Default horizontal padding in pixels. */
 #define M3_APP_BAR_DEFAULT_PADDING_X 16.0f
 /** @brief Default vertical padding in pixels. */
@@ -100,7 +104,14 @@ CMP_API int CMP_CALL m3_app_bar_style_init_medium(M3AppBarStyle *style);
 CMP_API int CMP_CALL m3_app_bar_style_init_large(M3AppBarStyle *style);
 
 /**
- * @brief Initialize a top app bar widget.
+ * @brief Initialize a bottom app bar style with defaults.
+ * @param style Style descriptor to initialize.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_app_bar_style_init_bottom(M3AppBarStyle *style);
+
+/**
+ * @brief Initialize an app bar widget.
  * @param bar App bar instance.
  * @param backend Text backend instance.
  * @param style App bar style descriptor.

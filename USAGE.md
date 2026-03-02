@@ -9,6 +9,7 @@ It also notes the current media decoding fallbacks and plugin helpers. Backends 
 - macOS: build developer tools (XCode); runtime (none)
 - Windows: MSVC; runtime (none)
 - Linux; gcc, clang, tcc, etc.; runtime (gtk4)
+- Web: Emscripten
 
 ## Build
 
@@ -45,15 +46,30 @@ target_link_libraries(app PRIVATE cmp::cmpc)
 # Material 3 widgets/styles:
 # target_link_libraries(app PRIVATE m3::m3)
 ```
-Pin `GIT_TAG` to a commit or release tag for reproducible builds.
-Use `cmp_*_backend_is_available` at runtime to confirm support.
 
-```sh
-cmake -S . -B build -D CMP_ENABLE_SDL3=ON -D CMP_ENABLE_SDL3_TTF=ON
-cmake -S . -B build -D CMP_ENABLE_WEB=ON -D CMP_ENABLE_WEBGPU=ON
+### Visual Documentation Pipeline
+
+The project features an autonomous headless vector documentation generator (`cmp_docgen`) that emits SVG files for UI verification.
+
+```bash
+# Build the docgen tool
+cmake -S . -B build -DCMP_BUILD_DOCGEN=ON
+cmake --build build --target cmp_docgen
+
+# Generate SVGs and JSON maps
+./build/cmp_docgen --platform linux --theme material
+
+# Render Markdown tables
+python3 tools/docgen/build_docs.py
+
+# Optional: Generate static HTML site with Doxygen
+cd docs && npm install
+cd ..
+cmake -S . -B build-docs -DCMP_REQUIRE_DOXYGEN=ON
+cmake --build build-docs --target cmp_docs
 ```
 
-### Media Decoding (Fallback)
+## Media Decoding (Fallback)
 
 LibCMPC ships minimal fallback decoders for development and tests:
 
@@ -95,24 +111,6 @@ int setup_text_field(CMPGfx *gfx, CMPTextField *field) {
 }
 ```
 
-## Driving Animations
-
-Text fields animate their floating labels and cursor blink. Call `cmp_text_field_step` each frame:
-
-```c
-CMPBool changed;
-rc = cmp_text_field_step(&field, dt_seconds, &changed);
-if (rc == CMP_OK && changed) {
-    /* trigger a repaint */
-}
-```
-
-## Input Routing
-
-Use `cmp_event_dispatch` to route `CMPInputEvent` instances to widgets. Pointer and text input events update the
-text field state automatically. For focus transitions managed outside the dispatcher, call
-`cmp_text_field_set_focus` explicitly.
-
 ## Camera Capture Example
 
 The camera plugin exposes configuration for device selection, resolution, and pixel format. Use
@@ -145,24 +143,7 @@ int open_camera(CMPEnv *env, CMPCameraSession *session) {
 
     return CMP_OK;
 }
-
-int read_camera_frame(CMPCameraSession *session, CMPCameraFrame *frame, CMPBool *has_frame) {
-    return cmp_camera_read_frame(session, frame, has_frame);
-}
-
-int close_camera(CMPCameraSession *session) {
-    int rc;
-
-    rc = cmp_camera_stop(session);
-    if (rc != CMP_OK) return rc;
-
-    return cmp_camera_shutdown(session);
-}
 ```
-
-If a backend cannot satisfy the requested resolution or pixel format, it returns
-`CMP_ERR_UNSUPPORTED`. To accept a backend default, set `config.config.format` to
-`CMP_CAMERA_FORMAT_ANY` and leave `width`/`height` as `0`.
 
 ## Network Request Example
 
@@ -255,5 +236,3 @@ int save_prefs(CMPEnv *env) {
     return cmp_storage_shutdown(&storage);
 }
 ```
-
-Use `cmp_storage_load` to restore a previously saved store.

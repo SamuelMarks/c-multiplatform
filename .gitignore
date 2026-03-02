@@ -4,3 +4,10 @@ build*
 .vscode
 Testing/
 node_modules/
+
+# Generated Docs
+docs/assets/
+docs/generated/
+docs/doc_*.json
+docs/*.md
+!docs/pages/

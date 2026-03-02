@@ -3,6 +3,8 @@
 
 /**
  * @file m3_card.h
+ * \image html card_elevated_linux_material.svg "Elevated Card"
+ * \image html card_outlined_linux_material.svg "Outlined Card"
  * @brief Card widgets for LibCMPC.
  */
 

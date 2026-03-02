@@ -258,6 +258,17 @@ CMP_API int CMP_CALL m3_color_test_lch_to_argb(CMPScalar hue, CMPScalar chroma,
                                                CMPBool *out_in_gamut);
 #endif
 
+/**
+ * @brief Extract a prominent seed color from an image buffer using
+ * quantization.
+ * @param argb_pixels Array of ARGB pixel data.
+ * @param pixel_count Number of pixels in the array.
+ * @param out_seed_argb Receives the extracted ARGB seed color.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_color_extract_seed_from_image(
+    const cmp_u32 *argb_pixels, cmp_usize pixel_count, cmp_u32 *out_seed_argb);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

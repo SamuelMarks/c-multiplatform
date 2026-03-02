@@ -297,5 +297,47 @@ int main(void) {
   CMP_TEST_OK(test_node_set_children());
   CMP_TEST_OK(test_node_queries());
   CMP_TEST_OK(test_sibling_queries());
+
+  {
+    CMPA11yNode root;
+    CMPA11yNode child1;
+    CMPA11yNode child2;
+    CMPA11yNode *children[2] = {&child1, &child2};
+    CMPA11yNode *next = NULL;
+    CMPA11yNode *prev = NULL;
+
+    CMP_TEST_OK(cmp_a11y_node_init(&root, NULL, NULL));
+    CMP_TEST_OK(cmp_a11y_node_init(&child1, NULL, NULL));
+    CMP_TEST_OK(cmp_a11y_node_init(&child2, NULL, NULL));
+
+    child1.semantics.flags |= CMP_SEMANTIC_FLAG_FOCUSABLE;
+    child2.semantics.flags |= CMP_SEMANTIC_FLAG_FOCUSABLE;
+
+    CMP_TEST_OK(cmp_a11y_node_set_children(&root, children, 2));
+
+    CMP_TEST_EXPECT(cmp_a11y_focus_next(NULL, NULL, &next),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_a11y_focus_prev(NULL, NULL, &prev),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    CMP_TEST_OK(cmp_a11y_focus_next(NULL, &root, &next));
+    CMP_TEST_EXPECT(next == &child1 ? CMP_OK : CMP_ERR_UNKNOWN, CMP_OK);
+
+    CMP_TEST_OK(cmp_a11y_focus_next(&child1, &root, &next));
+    CMP_TEST_EXPECT(next == &child2 ? CMP_OK : CMP_ERR_UNKNOWN, CMP_OK);
+
+    CMP_TEST_OK(cmp_a11y_focus_next(&child2, &root, &next));
+    CMP_TEST_EXPECT(next == &child1 ? CMP_OK : CMP_ERR_UNKNOWN, CMP_OK);
+
+    CMP_TEST_OK(cmp_a11y_focus_prev(NULL, &root, &prev));
+    CMP_TEST_EXPECT(prev == &child2 ? CMP_OK : CMP_ERR_UNKNOWN, CMP_OK);
+
+    CMP_TEST_OK(cmp_a11y_focus_prev(&child2, &root, &prev));
+    CMP_TEST_EXPECT(prev == &child1 ? CMP_OK : CMP_ERR_UNKNOWN, CMP_OK);
+
+    CMP_TEST_OK(cmp_a11y_focus_prev(&child1, &root, &prev));
+    CMP_TEST_EXPECT(prev == &child2 ? CMP_OK : CMP_ERR_UNKNOWN, CMP_OK);
+  }
+
   return 0;
 }

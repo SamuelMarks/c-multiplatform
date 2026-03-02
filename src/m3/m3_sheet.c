@@ -1254,3 +1254,771 @@ int CMP_CALL m3_sheet_get_content_bounds(const M3Sheet *sheet,
   *out_bounds = bounds;
   return CMP_OK;
 }
+static int m3_side_sheet_validate_style(const M3SideSheetStyle *style) {
+  if (style == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  if (style->variant != M3_SIDE_SHEET_VARIANT_STANDARD &&
+      style->variant != M3_SIDE_SHEET_VARIANT_MODAL) {
+    return CMP_ERR_RANGE;
+  }
+  if (style->placement != M3_SIDE_SHEET_PLACEMENT_START &&
+      style->placement != M3_SIDE_SHEET_PLACEMENT_END) {
+    return CMP_ERR_RANGE;
+  }
+  if (style->width < 0.0f || style->min_width < 0.0f ||
+      style->max_width < 0.0f || style->max_height < 0.0f) {
+    return CMP_ERR_RANGE;
+  }
+  if (style->min_width > style->width && style->width > 0.0f) {
+    return CMP_ERR_RANGE;
+  }
+  if (style->max_width > 0.0f && style->max_width < style->width) {
+    return CMP_ERR_RANGE;
+  }
+  if (style->corner_radius < 0.0f || style->dismiss_threshold < 0.0f ||
+      style->dismiss_threshold > 1.0f || style->min_fling_velocity < 0.0f ||
+      style->spring_stiffness <= 0.0f || style->spring_damping < 0.0f ||
+      style->spring_mass <= 0.0f || style->spring_tolerance < 0.0f ||
+      style->spring_rest_velocity < 0.0f) {
+    return CMP_ERR_RANGE;
+  }
+  if (style->padding.left < 0.0f || style->padding.right < 0.0f ||
+      style->padding.top < 0.0f || style->padding.bottom < 0.0f) {
+    return CMP_ERR_RANGE;
+  }
+  return CMP_OK;
+}
+
+static int m3_side_sheet_style_init_base(M3SideSheetStyle *style,
+                                         cmp_u32 variant) {
+  int rc;
+
+  if (style == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  memset(style, 0, sizeof(*style));
+
+  rc = cmp_shadow_init(&style->shadow);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  style->variant = variant;
+  style->placement = M3_SIDE_SHEET_PLACEMENT_END; /* Default to end */
+  style->padding.left = M3_SHEET_DEFAULT_PADDING_X;
+  style->padding.right = M3_SHEET_DEFAULT_PADDING_X;
+  style->padding.top = M3_SHEET_DEFAULT_PADDING_Y;
+  style->padding.bottom = M3_SHEET_DEFAULT_PADDING_Y;
+  style->width = M3_SIDE_SHEET_DEFAULT_WIDTH;
+  style->min_width = M3_SIDE_SHEET_DEFAULT_MIN_WIDTH;
+  style->max_width = 0.0f;
+  style->max_height = 0.0f;
+  style->corner_radius = M3_SHEET_DEFAULT_CORNER_RADIUS;
+  style->dismiss_threshold = M3_SHEET_DEFAULT_DISMISS_THRESHOLD;
+  style->min_fling_velocity = M3_SHEET_DEFAULT_MIN_FLING_VELOCITY;
+  style->spring_stiffness = M3_SHEET_DEFAULT_SPRING_STIFFNESS;
+  style->spring_damping = M3_SHEET_DEFAULT_SPRING_DAMPING;
+  style->spring_mass = M3_SHEET_DEFAULT_SPRING_MASS;
+  style->spring_tolerance = M3_SHEET_DEFAULT_SPRING_TOLERANCE;
+  style->spring_rest_velocity = M3_SHEET_DEFAULT_SPRING_REST_VELOCITY;
+  style->shadow_enabled = CMP_FALSE;
+  style->scrim_enabled = CMP_FALSE;
+
+  rc = m3_sheet_color_set(&style->background_color, 0.0f, 0.0f, 0.0f, 0.0f);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+  rc = m3_sheet_color_set(&style->scrim_color, 0.0f, 0.0f, 0.0f, 0.0f);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  return CMP_OK;
+}
+
+int CMP_CALL m3_side_sheet_style_init_standard(M3SideSheetStyle *style) {
+  int rc;
+
+  rc = m3_side_sheet_style_init_base(style, M3_SIDE_SHEET_VARIANT_STANDARD);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  rc = m3_sheet_color_set(&style->background_color, 1.0f, 1.0f, 1.0f, 1.0f);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+  rc = m3_sheet_color_set(&style->scrim_color, 0.0f, 0.0f, 0.0f, 0.0f);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  style->shadow_enabled = CMP_FALSE;
+  style->scrim_enabled = CMP_FALSE;
+  return CMP_OK;
+}
+
+int CMP_CALL m3_side_sheet_style_init_modal(M3SideSheetStyle *style) {
+  int rc;
+
+  rc = m3_side_sheet_style_init_base(style, M3_SIDE_SHEET_VARIANT_MODAL);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  rc = m3_sheet_color_set(&style->background_color, 1.0f, 1.0f, 1.0f, 1.0f);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+  rc = m3_sheet_color_set(&style->scrim_color, 0.0f, 0.0f, 0.0f, 0.32f);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  style->shadow_enabled = CMP_TRUE;
+  style->scrim_enabled = CMP_TRUE;
+  return CMP_OK;
+}
+
+static int m3_side_sheet_compute_preferred_width(const M3SideSheetStyle *style,
+                                                 CMPScalar *out_width) {
+  CMPScalar desired;
+
+  if (style == NULL || out_width == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  desired = style->width;
+  if (desired < style->min_width) {
+    desired = style->min_width;
+  }
+  if (style->max_width > 0.0f && desired > style->max_width) {
+    desired = style->max_width;
+  }
+
+  *out_width = desired;
+  return CMP_OK;
+}
+
+static int m3_side_sheet_widget_measure(void *widget, CMPMeasureSpec width,
+                                        CMPMeasureSpec height,
+                                        CMPSize *out_size) {
+  M3SideSheet *sheet;
+  CMPScalar desired_width;
+  CMPScalar desired_height;
+  int rc;
+
+  if (widget == NULL || out_size == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  rc = m3_sheet_validate_measure_spec(width);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+  rc = m3_sheet_validate_measure_spec(height);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  sheet = (M3SideSheet *)widget;
+  rc = m3_side_sheet_validate_style(&sheet->style);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  rc = m3_side_sheet_compute_preferred_width(&sheet->style, &desired_width);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  desired_height = 0.0f;
+
+  if (width.mode == CMP_MEASURE_EXACTLY) {
+    out_size->width = width.size;
+  } else if (width.mode == CMP_MEASURE_AT_MOST) {
+    out_size->width = desired_width < width.size ? desired_width : width.size;
+  } else {
+    out_size->width = desired_width;
+  }
+
+  if (height.mode == CMP_MEASURE_EXACTLY) {
+    out_size->height = height.size;
+  } else if (height.mode == CMP_MEASURE_AT_MOST) {
+    out_size->height =
+        desired_height < height.size ? desired_height : height.size;
+  } else {
+    out_size->height = desired_height;
+  }
+
+  return CMP_OK;
+}
+
+static int m3_side_sheet_widget_layout(void *widget, CMPRect bounds) {
+  M3SideSheet *sheet;
+  CMPScalar desired_width;
+  CMPScalar actual_width;
+  CMPScalar actual_height;
+  int rc;
+
+  if (widget == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+  rc = m3_sheet_validate_rect(&bounds);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  sheet = (M3SideSheet *)widget;
+
+  rc = m3_side_sheet_validate_style(&sheet->style);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  sheet->overlay_bounds = bounds;
+
+  rc = m3_side_sheet_compute_preferred_width(&sheet->style, &desired_width);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  actual_width = desired_width;
+  if (actual_width > bounds.width) {
+    actual_width = bounds.width;
+  }
+  if (sheet->style.max_width > 0.0f && actual_width > sheet->style.max_width) {
+    actual_width = sheet->style.max_width;
+  }
+
+  actual_height = bounds.height;
+  if (sheet->style.max_height > 0.0f &&
+      actual_height > sheet->style.max_height) {
+    actual_height = sheet->style.max_height;
+  }
+
+  sheet->sheet_bounds.width = actual_width;
+  sheet->sheet_bounds.height = actual_height;
+  sheet->sheet_bounds.y = bounds.y + (bounds.height - actual_height) * 0.5f;
+
+  if (sheet->style.placement == M3_SIDE_SHEET_PLACEMENT_START) {
+    sheet->sheet_bounds.x = bounds.x;
+  } else {
+    sheet->sheet_bounds.x = bounds.x + bounds.width - actual_width;
+  }
+
+  if (sheet->dragging == CMP_FALSE && sheet->anim.mode == CMP_ANIM_MODE_NONE) {
+    if (sheet->open == CMP_TRUE) {
+      sheet->offset = 0.0f;
+    } else {
+      if (sheet->style.placement == M3_SIDE_SHEET_PLACEMENT_START) {
+        sheet->offset = -actual_width;
+      } else {
+        sheet->offset = actual_width;
+      }
+    }
+  }
+
+  return CMP_OK;
+}
+
+static int m3_side_sheet_widget_paint(void *widget, CMPPaintContext *ctx) {
+  M3SideSheet *sheet;
+  CMPRect visual_bounds;
+  CMPColor scrim;
+  CMPScalar opacity;
+  CMPScalar max_offset;
+  CMPScalar corner;
+  CMPRect *shadow_clip;
+  int rc;
+
+  if (widget == NULL || ctx == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+  if (ctx->gfx == NULL || ctx->gfx->vtable == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+  if (ctx->gfx->vtable->draw_rect == NULL) {
+    return CMP_ERR_UNSUPPORTED;
+  }
+
+  sheet = (M3SideSheet *)widget;
+
+  rc = m3_side_sheet_validate_style(&sheet->style);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  visual_bounds = sheet->sheet_bounds;
+  max_offset = visual_bounds.width;
+  if (max_offset <= 0.0f) {
+    return CMP_OK; /* GCOVR_EXCL_LINE */
+  }
+
+  if (sheet->style.placement == M3_SIDE_SHEET_PLACEMENT_START) {
+    visual_bounds.x += sheet->offset;
+  } else {
+    visual_bounds.x += sheet->offset;
+  }
+
+  /* Clip if offset pushes it fully out of view */
+  if (sheet->style.placement == M3_SIDE_SHEET_PLACEMENT_START) {
+    if (sheet->offset <= -max_offset) {
+      return CMP_OK;
+    }
+  } else {
+    if (sheet->offset >= max_offset) {
+      return CMP_OK;
+    }
+  }
+
+  if (sheet->style.scrim_enabled == CMP_TRUE &&
+      sheet->style.scrim_color.a > 0.0f) {
+    CMPScalar abs_offset =
+        sheet->offset < 0.0f ? -sheet->offset : sheet->offset;
+    opacity = 1.0f - (abs_offset / max_offset);
+    if (opacity < 0.0f) {
+      opacity = 0.0f; /* GCOVR_EXCL_LINE */
+    }
+    if (opacity > 1.0f) {
+      opacity = 1.0f; /* GCOVR_EXCL_LINE */
+    }
+
+    scrim = sheet->style.scrim_color;
+    scrim.a *= opacity;
+
+    if (scrim.a > 0.0f) {
+      rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &sheet->overlay_bounds,
+                                       scrim, 0.0f);
+      if (rc != CMP_OK) {
+        return rc; /* GCOVR_EXCL_LINE */
+      }
+    }
+  }
+
+  corner = sheet->style.corner_radius;
+
+  shadow_clip = NULL;
+  if (ctx->gfx->vtable->push_clip != NULL &&
+      ctx->gfx->vtable->pop_clip != NULL) {
+    shadow_clip = &ctx->clip;
+  }
+
+  if (sheet->style.shadow_enabled == CMP_TRUE &&
+      sheet->style.shadow.layers > 0 && sheet->style.shadow.color.a > 0.0f) {
+    rc = cmp_shadow_paint(&sheet->style.shadow, ctx->gfx, &visual_bounds,
+                          shadow_clip);
+    if (rc != CMP_OK) {
+      return rc; /* GCOVR_EXCL_LINE */
+    }
+  }
+
+  rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &visual_bounds,
+                                   sheet->style.background_color, corner);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  return CMP_OK;
+}
+
+static int m3_side_sheet_widget_event(void *widget, const CMPInputEvent *event,
+                                      CMPBool *out_handled) {
+  M3SideSheet *sheet;
+  CMPRect visual_bounds;
+  CMPBool inside;
+  CMPBool old_open;
+  CMPScalar start_offset;
+  int rc;
+
+  if (widget == NULL || event == NULL || out_handled == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  sheet = (M3SideSheet *)widget;
+  *out_handled = CMP_FALSE;
+
+  rc = m3_side_sheet_validate_style(&sheet->style);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  if (sheet->open == CMP_FALSE && sheet->anim.mode == CMP_ANIM_MODE_NONE &&
+      sheet->dragging == CMP_FALSE) {
+    return CMP_OK;
+  }
+
+  visual_bounds = sheet->sheet_bounds;
+  visual_bounds.x += sheet->offset;
+
+  if (event->type == CMP_INPUT_POINTER_DOWN) {
+    rc = cmp_rect_contains_point(&visual_bounds,
+                                 (CMPScalar)event->data.pointer.x,
+                                 (CMPScalar)event->data.pointer.y, &inside);
+    if (rc != CMP_OK) {
+      return rc; /* GCOVR_EXCL_LINE */
+    }
+
+    if (sheet->style.scrim_enabled == CMP_TRUE && sheet->open == CMP_TRUE) {
+      if (inside == CMP_FALSE) {
+        if (sheet->style.variant == M3_SIDE_SHEET_VARIANT_MODAL) {
+          if (sheet->on_action != NULL) {
+            rc = sheet->on_action(sheet->on_action_ctx, sheet,
+                                  M3_SHEET_ACTION_DISMISS);
+            if (rc != CMP_OK) {
+              return rc; /* GCOVR_EXCL_LINE */
+            }
+          }
+          rc = m3_side_sheet_set_open(sheet, CMP_FALSE);
+          if (rc != CMP_OK) {
+            return rc; /* GCOVR_EXCL_LINE */
+          }
+        }
+      }
+      *out_handled = CMP_TRUE;
+      return CMP_OK;
+    }
+  }
+
+  if (event->type == CMP_INPUT_GESTURE_DRAG_START) {
+    rc = cmp_rect_contains_point(&visual_bounds, event->data.gesture.start_x,
+                                 event->data.gesture.start_y, &inside);
+    if (rc != CMP_OK) {
+      return rc; /* GCOVR_EXCL_LINE */
+    }
+
+    if (inside == CMP_TRUE) {
+      sheet->dragging = CMP_TRUE;
+      sheet->drag_start_offset = sheet->offset;
+      if (sheet->anim.mode != CMP_ANIM_MODE_NONE) {
+        rc = cmp_anim_controller_stop(&sheet->anim);
+        if (rc != CMP_OK) {
+          return rc; /* GCOVR_EXCL_LINE */
+        }
+      }
+      *out_handled = CMP_TRUE;
+    }
+    return CMP_OK;
+  }
+
+  if (event->type == CMP_INPUT_GESTURE_DRAG_UPDATE) {
+    if (sheet->dragging == CMP_TRUE) {
+      sheet->offset = sheet->drag_start_offset + event->data.gesture.total_x;
+
+      /* Clamp offset to prevent overscroll inwards */
+      if (sheet->style.placement == M3_SIDE_SHEET_PLACEMENT_START) {
+        if (sheet->offset > 0.0f) {
+          sheet->offset = 0.0f;
+        }
+      } else {
+        if (sheet->offset < 0.0f) {
+          sheet->offset = 0.0f;
+        }
+      }
+
+      *out_handled = CMP_TRUE;
+    }
+    return CMP_OK;
+  }
+
+  if (event->type == CMP_INPUT_GESTURE_DRAG_END ||
+      event->type == CMP_INPUT_GESTURE_FLING) {
+    if (sheet->dragging == CMP_TRUE) {
+      sheet->dragging = CMP_FALSE;
+
+      old_open = sheet->open;
+      start_offset = 0.0f;
+
+      if (sheet->style.placement == M3_SIDE_SHEET_PLACEMENT_START) {
+        if (event->data.gesture.velocity_x < -sheet->style.min_fling_velocity) {
+          sheet->open = CMP_FALSE;
+        } else if (event->data.gesture.velocity_x >
+                   sheet->style.min_fling_velocity) {
+          sheet->open = CMP_TRUE;
+        } else {
+          if (sheet->offset <
+              -visual_bounds.width * sheet->style.dismiss_threshold) {
+            sheet->open = CMP_FALSE;
+          } else {
+            sheet->open = CMP_TRUE;
+          }
+        }
+        start_offset = -visual_bounds.width;
+      } else {
+        if (event->data.gesture.velocity_x > sheet->style.min_fling_velocity) {
+          sheet->open = CMP_FALSE;
+        } else if (event->data.gesture.velocity_x <
+                   -sheet->style.min_fling_velocity) {
+          sheet->open = CMP_TRUE;
+        } else {
+          if (sheet->offset >
+              visual_bounds.width * sheet->style.dismiss_threshold) {
+            sheet->open = CMP_FALSE;
+          } else {
+            sheet->open = CMP_TRUE;
+          }
+        }
+        start_offset = visual_bounds.width;
+      }
+
+      if (old_open == CMP_TRUE && sheet->open == CMP_FALSE) {
+        if (sheet->on_action != NULL) {
+          rc = sheet->on_action(sheet->on_action_ctx, sheet,
+                                M3_SHEET_ACTION_DISMISS);
+          if (rc != CMP_OK) {
+            return rc; /* GCOVR_EXCL_LINE */
+          }
+        }
+      }
+
+      sheet->anim.spring.stiffness = sheet->style.spring_stiffness;
+      sheet->anim.spring.damping = sheet->style.spring_damping;
+      sheet->anim.spring.mass = sheet->style.spring_mass;
+      sheet->anim.spring.tolerance = sheet->style.spring_tolerance;
+      sheet->anim.spring.rest_velocity = sheet->style.spring_rest_velocity;
+
+      rc = cmp_anim_controller_start_spring(
+          &sheet->anim, sheet->offset,
+          sheet->open == CMP_TRUE ? 0.0f : start_offset,
+          sheet->style.spring_stiffness, sheet->style.spring_damping,
+          sheet->style.spring_mass);
+      sheet->anim.spring.velocity = event->data.gesture.velocity_x;
+      if (rc != CMP_OK) {
+        return rc; /* GCOVR_EXCL_LINE */
+      }
+
+      *out_handled = CMP_TRUE;
+    }
+    return CMP_OK;
+  }
+
+  rc = cmp_rect_contains_point(&visual_bounds, (CMPScalar)event->data.pointer.x,
+                               (CMPScalar)event->data.pointer.y, &inside);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  if (inside == CMP_TRUE) {
+    *out_handled = CMP_TRUE;
+  }
+
+  return CMP_OK;
+}
+
+static int m3_side_sheet_widget_get_semantics(void *widget,
+                                              CMPSemantics *out_semantics) {
+  if (widget == NULL || out_semantics == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  out_semantics->role = CMP_SEMANTIC_NONE;
+  out_semantics->flags = 0;
+  out_semantics->utf8_label = NULL;
+  out_semantics->utf8_hint = NULL;
+  out_semantics->utf8_value = NULL;
+
+  return CMP_OK;
+}
+
+static int m3_side_sheet_widget_destroy(void *widget) {
+  if (widget == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  return CMP_OK;
+}
+
+static CMPWidgetVTable g_m3_side_sheet_widget_vtable;
+
+static void m3_side_sheet_vtable_init(void) {
+  if (g_m3_side_sheet_widget_vtable.measure == NULL) {
+    g_m3_side_sheet_widget_vtable.measure = m3_side_sheet_widget_measure;
+    g_m3_side_sheet_widget_vtable.layout = m3_side_sheet_widget_layout;
+    g_m3_side_sheet_widget_vtable.paint = m3_side_sheet_widget_paint;
+    g_m3_side_sheet_widget_vtable.event = m3_side_sheet_widget_event;
+    g_m3_side_sheet_widget_vtable.get_semantics =
+        m3_side_sheet_widget_get_semantics;
+    g_m3_side_sheet_widget_vtable.destroy = m3_side_sheet_widget_destroy;
+  }
+}
+
+int CMP_CALL m3_side_sheet_init(M3SideSheet *sheet,
+                                const M3SideSheetStyle *style) {
+  int rc;
+
+  if (sheet == NULL || style == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  rc = m3_side_sheet_validate_style(style);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  memset(sheet, 0, sizeof(*sheet));
+  m3_side_sheet_vtable_init();
+
+  sheet->widget.ctx = sheet;
+  sheet->widget.vtable = &g_m3_side_sheet_widget_vtable;
+  sheet->style = *style;
+  sheet->open = CMP_FALSE;
+
+  rc = cmp_anim_controller_init(&sheet->anim);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  return CMP_OK;
+}
+
+int CMP_CALL m3_side_sheet_set_style(M3SideSheet *sheet,
+                                     const M3SideSheetStyle *style) {
+  int rc;
+
+  if (sheet == NULL || style == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  rc = m3_side_sheet_validate_style(style);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  sheet->style = *style;
+  return CMP_OK;
+}
+
+int CMP_CALL m3_side_sheet_set_on_action(M3SideSheet *sheet,
+                                         CMPSideSheetOnAction on_action,
+                                         void *ctx) {
+  if (sheet == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  sheet->on_action = on_action;
+  sheet->on_action_ctx = ctx;
+  return CMP_OK;
+}
+
+int CMP_CALL m3_side_sheet_set_open(M3SideSheet *sheet, CMPBool open) {
+  CMPScalar target;
+  int rc;
+
+  if (sheet == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+  if (open != CMP_TRUE && open != CMP_FALSE) {
+    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+  }
+
+  if (sheet->open == open) {
+    return CMP_OK;
+  }
+
+  sheet->open = open;
+
+  if (open == CMP_TRUE) {
+    target = 0.0f;
+  } else {
+    if (sheet->style.placement == M3_SIDE_SHEET_PLACEMENT_START) {
+      target = -sheet->sheet_bounds.width;
+    } else {
+      target = sheet->sheet_bounds.width;
+    }
+  }
+
+  sheet->anim.spring.stiffness = sheet->style.spring_stiffness;
+  sheet->anim.spring.damping = sheet->style.spring_damping;
+  sheet->anim.spring.mass = sheet->style.spring_mass;
+  sheet->anim.spring.tolerance = sheet->style.spring_tolerance;
+  sheet->anim.spring.rest_velocity = sheet->style.spring_rest_velocity;
+
+  rc = cmp_anim_controller_start_spring(
+      &sheet->anim, sheet->offset, target, sheet->style.spring_stiffness,
+      sheet->style.spring_damping, sheet->style.spring_mass);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  return CMP_OK;
+}
+
+int CMP_CALL m3_side_sheet_get_open(const M3SideSheet *sheet,
+                                    CMPBool *out_open) {
+  if (sheet == NULL || out_open == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  *out_open = sheet->open;
+  return CMP_OK;
+}
+
+int CMP_CALL m3_side_sheet_step(M3SideSheet *sheet, CMPScalar dt,
+                                CMPBool *out_changed) {
+  int rc;
+  CMPScalar value;
+  CMPBool finished;
+
+  if (sheet == NULL || out_changed == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  *out_changed = CMP_FALSE;
+
+  if (sheet->anim.mode != CMP_ANIM_MODE_NONE) {
+    rc = cmp_anim_controller_step(&sheet->anim, dt, &value, &finished);
+    if (rc != CMP_OK) {
+      return rc; /* GCOVR_EXCL_LINE */
+    }
+
+    if (sheet->offset != value) {
+      sheet->offset = value;
+      *out_changed = CMP_TRUE;
+    }
+    if (finished == CMP_TRUE) {
+      cmp_anim_controller_stop(&sheet->anim);
+    }
+  }
+
+  return CMP_OK;
+}
+
+int CMP_CALL m3_side_sheet_get_bounds(const M3SideSheet *sheet,
+                                      CMPRect *out_bounds) {
+  if (sheet == NULL || out_bounds == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  }
+
+  *out_bounds = sheet->sheet_bounds;
+  out_bounds->x += sheet->offset;
+  return CMP_OK;
+}
+
+int CMP_CALL m3_side_sheet_get_content_bounds(const M3SideSheet *sheet,
+                                              CMPRect *out_bounds) {
+  CMPRect bounds;
+  int rc;
+
+  rc = m3_side_sheet_get_bounds(sheet, &bounds);
+  if (rc != CMP_OK) {
+    return rc; /* GCOVR_EXCL_LINE */
+  }
+
+  out_bounds->x = bounds.x + sheet->style.padding.left;
+  out_bounds->y = bounds.y + sheet->style.padding.top;
+  out_bounds->width =
+      bounds.width - sheet->style.padding.left - sheet->style.padding.right;
+  out_bounds->height =
+      bounds.height - sheet->style.padding.top - sheet->style.padding.bottom;
+
+  if (out_bounds->width < 0.0f) {
+    out_bounds->width = 0.0f; /* GCOVR_EXCL_LINE */
+  }
+  if (out_bounds->height < 0.0f) {
+    out_bounds->height = 0.0f; /* GCOVR_EXCL_LINE */
+  }
+
+  return CMP_OK;
+}
