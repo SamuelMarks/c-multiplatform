@@ -242,7 +242,40 @@ int main(void) {
     /* It should pick one of the saturated ones, probably Red because it's first
      * high-chroma hit */
     CMP_TEST_EXPECT(seed == 0xFFFF0000 ? CMP_OK : CMP_ERR_UNKNOWN, CMP_OK);
-  }
+    }
 
-  return 0;
+    {
+    CMPScalar opacity;
+    cmp_u32 blended;
+
+    CMP_TEST_EXPECT(m3_color_surface_tint_opacity(0, NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_color_surface_tint_opacity(6, &opacity), CMP_ERR_RANGE);
+
+    CMP_TEST_OK(m3_color_surface_tint_opacity(0, &opacity));
+    CMP_TEST_ASSERT(opacity == 0.0f);
+    CMP_TEST_OK(m3_color_surface_tint_opacity(1, &opacity));
+    CMP_TEST_ASSERT(opacity == 0.05f);
+    CMP_TEST_OK(m3_color_surface_tint_opacity(2, &opacity));
+    CMP_TEST_ASSERT(opacity == 0.08f);
+    CMP_TEST_OK(m3_color_surface_tint_opacity(3, &opacity));
+    CMP_TEST_ASSERT(opacity == 0.11f);
+    CMP_TEST_OK(m3_color_surface_tint_opacity(4, &opacity));
+    CMP_TEST_ASSERT(opacity == 0.12f);
+    CMP_TEST_OK(m3_color_surface_tint_opacity(5, &opacity));
+    CMP_TEST_ASSERT(opacity == 0.14f);
+
+    CMP_TEST_EXPECT(m3_color_blend_surface_tint(0, 0, 0.0f, NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_color_blend_surface_tint(0, 0, -0.1f, &blended), CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(m3_color_blend_surface_tint(0, 0, 1.1f, &blended), CMP_ERR_RANGE);
+
+    CMP_TEST_OK(m3_color_blend_surface_tint(0xFF000000u, 0xFFFFFFFFu, 0.0f, &blended));
+    CMP_TEST_ASSERT(blended == 0xFF000000u);
+    CMP_TEST_OK(m3_color_blend_surface_tint(0xFF000000u, 0xFFFFFFFFu, 1.0f, &blended));
+    CMP_TEST_ASSERT(blended == 0xFFFFFFFFu);
+    CMP_TEST_OK(m3_color_blend_surface_tint(0xFF000000u, 0xFFFFFFFFu, 0.5f, &blended));
+    /* Halfway between 0 and 255 is 127 */
+    CMP_TEST_ASSERT(blended == 0xFF7F7F7Fu);
+    }
+
+    return 0;
 }

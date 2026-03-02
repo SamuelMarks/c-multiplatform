@@ -695,6 +695,76 @@ int CMP_CALL m3_scheme_generate(cmp_u32 source_argb, CMPBool dark,
   return CMP_OK;
 }
 
+int CMP_CALL m3_color_surface_tint_opacity(cmp_u32 elevation_level,
+                                           CMPScalar *out_opacity) {
+  if (out_opacity == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  switch (elevation_level) {
+  case 0:
+    *out_opacity = 0.0f;
+    return CMP_OK;
+  case 1:
+    *out_opacity = 0.05f;
+    return CMP_OK;
+  case 2:
+    *out_opacity = 0.08f;
+    return CMP_OK;
+  case 3:
+    *out_opacity = 0.11f;
+    return CMP_OK;
+  case 4:
+    *out_opacity = 0.12f;
+    return CMP_OK;
+  case 5:
+    *out_opacity = 0.14f;
+    return CMP_OK;
+  default:
+    return CMP_ERR_RANGE;
+  }
+}
+
+int CMP_CALL m3_color_blend_surface_tint(cmp_u32 bg_argb, cmp_u32 fg_argb,
+                                         CMPScalar fg_alpha,
+                                         cmp_u32 *out_argb) {
+  cmp_u8 bg_r, bg_g, bg_b, bg_a;
+  cmp_u8 fg_r, fg_g, fg_b, fg_a;
+  cmp_u8 out_r, out_g, out_b;
+  int rc;
+
+  if (out_argb == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  if (fg_alpha < 0.0f || fg_alpha > 1.0f) {
+    return CMP_ERR_RANGE;
+  }
+
+  if (fg_alpha == 0.0f) {
+    *out_argb = bg_argb;
+    return CMP_OK;
+  }
+  if (fg_alpha == 1.0f) {
+    *out_argb = fg_argb;
+    return CMP_OK;
+  }
+
+  rc = m3_color_rgba_from_argb(bg_argb, &bg_r, &bg_g, &bg_b, &bg_a);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+  rc = m3_color_rgba_from_argb(fg_argb, &fg_r, &fg_g, &fg_b, &fg_a);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  out_r = (cmp_u8)(bg_r * (1.0f - fg_alpha) + fg_r * fg_alpha);
+  out_g = (cmp_u8)(bg_g * (1.0f - fg_alpha) + fg_g * fg_alpha);
+  out_b = (cmp_u8)(bg_b * (1.0f - fg_alpha) + fg_b * fg_alpha);
+
+  return m3_color_argb_from_rgba(out_r, out_g, out_b, bg_a, out_argb);
+}
+
 #ifdef CMP_TESTING
 int CMP_CALL m3_color_test_set_argb_to_xyz_fail(CMPBool fail) {
   g_color_fail_argb_to_xyz = fail;

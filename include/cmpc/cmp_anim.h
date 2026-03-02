@@ -21,6 +21,19 @@ extern "C" {
 /** @brief Ease-in-out (quadratic). */
 #define CMP_ANIM_EASE_IN_OUT 3
 
+/** @brief Material 3 Emphasized curve. */
+#define CMP_ANIM_EASE_EMPHASIZED 4
+/** @brief Material 3 Emphasized Decelerate curve. */
+#define CMP_ANIM_EASE_EMPHASIZED_DECELERATE 5
+/** @brief Material 3 Emphasized Accelerate curve. */
+#define CMP_ANIM_EASE_EMPHASIZED_ACCELERATE 6
+/** @brief Material 3 Standard curve. */
+#define CMP_ANIM_EASE_STANDARD 7
+/** @brief Material 3 Standard Decelerate curve. */
+#define CMP_ANIM_EASE_STANDARD_DECELERATE 8
+/** @brief Material 3 Standard Accelerate curve. */
+#define CMP_ANIM_EASE_STANDARD_ACCELERATE 9
+
 /** @brief Controller idle mode. */
 #define CMP_ANIM_MODE_NONE 0
 /** @brief Controller timing mode. */

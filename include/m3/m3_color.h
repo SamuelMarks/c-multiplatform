@@ -130,6 +130,28 @@ CMP_API int CMP_CALL m3_tonal_palette_tone_argb(const M3TonalPalette *palette,
 CMP_API int CMP_CALL m3_scheme_generate(cmp_u32 source_argb, CMPBool dark,
                                         M3Scheme *out_scheme);
 
+/**
+ * @brief Get the surface tint opacity for a specific elevation level (0..5).
+ * @param elevation_level Elevation level (0 to 5).
+ * @param out_opacity Receives the alpha multiplier (0.0 to 1.0).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_color_surface_tint_opacity(cmp_u32 elevation_level,
+                                                   CMPScalar *out_opacity);
+
+/**
+ * @brief Blend a foreground tint color over a background surface color.
+ * @param bg_argb Background color in ARGB format.
+ * @param fg_argb Foreground (tint) color in ARGB format.
+ * @param fg_alpha Alpha multiplier for the foreground color (0.0 to 1.0).
+ * @param out_argb Receives the blended ARGB color.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_color_blend_surface_tint(cmp_u32 bg_argb,
+                                                 cmp_u32 fg_argb,
+                                                 CMPScalar fg_alpha,
+                                                 cmp_u32 *out_argb);
+
 #ifdef CMP_TESTING
 /**
  * @brief Force argb-to-XYZ conversion failures for testing.

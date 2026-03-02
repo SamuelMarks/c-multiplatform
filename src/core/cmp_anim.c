@@ -14,6 +14,48 @@ static CMPScalar cmp_anim_clamp01(CMPScalar value) {
   return value;
 }
 
+static CMPScalar cmp_anim_bezier_eval(CMPScalar p1, CMPScalar p2, CMPScalar t) {
+  CMPScalar mt = 1.0f - t;
+  return 3.0f * mt * mt * t * p1 + 3.0f * mt * t * t * p2 + t * t * t;
+}
+
+static CMPScalar cmp_anim_solve_bezier_t(CMPScalar p1x, CMPScalar p2x,
+                                         CMPScalar x) {
+  CMPScalar t;
+  CMPScalar current_x;
+  int i;
+  CMPScalar t0 = 0.0f;
+  CMPScalar t1 = 1.0f;
+
+  if (x <= 0.0f) {
+    return 0.0f;
+  }
+  if (x >= 1.0f) {
+    return 1.0f;
+  }
+
+  t = x;
+  for (i = 0; i < 16; i++) {
+    current_x = cmp_anim_bezier_eval(p1x, p2x, t);
+    if (cmp_anim_abs(current_x - x) < 0.0001f) {
+      break;
+    }
+    if (current_x < x) {
+      t0 = t;
+    } else {
+      t1 = t;
+    }
+    t = (t0 + t1) * 0.5f;
+  }
+  return t;
+}
+
+static CMPScalar cmp_anim_cubic_bezier(CMPScalar x, CMPScalar x1, CMPScalar y1,
+                                       CMPScalar x2, CMPScalar y2) {
+  CMPScalar t = cmp_anim_solve_bezier_t(x1, x2, x);
+  return cmp_anim_bezier_eval(y1, y2, t);
+}
+
 static int cmp_anim_ease_apply(cmp_u32 easing, CMPScalar t,
                                CMPScalar *out_value) {
   CMPScalar clamped;
@@ -43,6 +85,24 @@ static int cmp_anim_ease_apply(cmp_u32 easing, CMPScalar t,
       inv = -2.0f * clamped + 2.0f;
       *out_value = 1.0f - (inv * inv) * 0.5f;
     }
+    return CMP_OK;
+  case CMP_ANIM_EASE_EMPHASIZED:
+    *out_value = cmp_anim_cubic_bezier(clamped, 0.2f, 0.0f, 0.0f, 1.0f);
+    return CMP_OK;
+  case CMP_ANIM_EASE_EMPHASIZED_DECELERATE:
+    *out_value = cmp_anim_cubic_bezier(clamped, 0.05f, 0.7f, 0.1f, 1.0f);
+    return CMP_OK;
+  case CMP_ANIM_EASE_EMPHASIZED_ACCELERATE:
+    *out_value = cmp_anim_cubic_bezier(clamped, 0.3f, 0.0f, 0.8f, 0.15f);
+    return CMP_OK;
+  case CMP_ANIM_EASE_STANDARD:
+    *out_value = cmp_anim_cubic_bezier(clamped, 0.2f, 0.0f, 0.0f, 1.0f);
+    return CMP_OK;
+  case CMP_ANIM_EASE_STANDARD_DECELERATE:
+    *out_value = cmp_anim_cubic_bezier(clamped, 0.0f, 0.0f, 0.0f, 1.0f);
+    return CMP_OK;
+  case CMP_ANIM_EASE_STANDARD_ACCELERATE:
+    *out_value = cmp_anim_cubic_bezier(clamped, 0.3f, 0.0f, 1.0f, 1.0f);
     return CMP_OK;
   default:
     return CMP_ERR_INVALID_ARGUMENT;

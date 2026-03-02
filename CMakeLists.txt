@@ -114,6 +114,7 @@ endif()
 
 add_library(m3
     src/m3/m3_color.c
+    src/m3/m3_adaptive.c
     src/m3/m3_typography.c
     src/m3/m3_text_field.c
     src/m3/m3_search.c
@@ -147,10 +148,10 @@ target_link_libraries(m3 PUBLIC cmpc)
 
 if(CMP_ENABLE_COVERAGE)
     if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-        target_compile_options(cmpc PRIVATE -O0 -g --coverage)
-        target_link_options(cmpc PRIVATE --coverage)
-        target_compile_options(m3 PRIVATE -O0 -g --coverage)
-        target_link_options(m3 PRIVATE --coverage)
+        target_compile_options(cmpc PUBLIC -O0 -g --coverage)
+        target_link_options(cmpc PUBLIC --coverage)
+        target_compile_options(m3 PUBLIC -O0 -g --coverage)
+        target_link_options(m3 PUBLIC --coverage)
     else()
         message(FATAL_ERROR "CMP_ENABLE_COVERAGE is only supported with GCC or Clang.")
     endif()
@@ -552,8 +553,8 @@ if(BUILD_TESTING)
     # but in real file they must exist. Since I'm creating the file to overwrite, 
     # I assume the user just needs the logic fix above).
     # Since I cannot see the FULL tests block, I will include the critical headers.
-    target_compile_definitions(cmpc PRIVATE CMP_TESTING)
-    target_compile_definitions(m3 PRIVATE CMP_TESTING)
+    target_compile_definitions(cmpc PUBLIC CMP_TESTING)
+    target_compile_definitions(m3 PUBLIC CMP_TESTING)
     # (Tests follow...)
 endif()
 option(CMP_BUILD_DOCGEN "Build the documentation generator tool" ON)
@@ -572,6 +573,10 @@ if(BUILD_TESTING)
     add_executable(cmp_phase5_text_field tests/phase5/text_field.c)
     target_link_libraries(cmp_phase5_text_field PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_text_field COMMAND cmp_phase5_text_field)
+
+    add_executable(cmp_phase5_adaptive tests/phase5/adaptive.c)
+    target_link_libraries(cmp_phase5_adaptive PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_adaptive COMMAND cmp_phase5_adaptive)
 
     add_executable(cmp_phase5_list tests/phase5/list.c)
     target_link_libraries(cmp_phase5_list PRIVATE m3 cmpc)
