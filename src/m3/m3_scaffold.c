@@ -516,6 +516,7 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
   CMPScalar available_height;
   CMPScalar body_width;
   CMPScalar body_height;
+  CMPScalar padding_left;
   CMPScalar snackbar_available_width;
   CMPScalar fab_available_width;
   CMPScalar fab_available_height;
@@ -641,7 +642,13 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
     return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
   }
 
-  scaffold->body_bounds.x = safe_bounds.x + scaffold->style.padding.left;
+  if (scaffold->style.is_rtl == CMP_TRUE) {
+    padding_left = scaffold->style.padding.right;
+  } else {
+    padding_left = scaffold->style.padding.left;
+  }
+
+  scaffold->body_bounds.x = safe_bounds.x + padding_left;
   scaffold->body_bounds.y = safe_bounds.y + scaffold->top_bar_bounds.height +
                             scaffold->style.padding.top;
   scaffold->body_bounds.width = body_width;
@@ -735,8 +742,12 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
       return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
     }
 
-    fab_base_x = safe_bounds.x + safe_width - scaffold->style.fab_margin_x -
-                 fab_size.width;
+    if (scaffold->style.is_rtl == CMP_TRUE) {
+      fab_base_x = safe_bounds.x + scaffold->style.fab_margin_x;
+    } else {
+      fab_base_x = safe_bounds.x + safe_width - scaffold->style.fab_margin_x -
+                   fab_size.width;
+    }
     fab_base_y = safe_bounds.y + safe_height -
                  scaffold->bottom_bar_bounds.height -
                  scaffold->style.fab_margin_y - fab_size.height;
@@ -1069,6 +1080,8 @@ int CMP_CALL m3_scaffold_style_init(M3ScaffoldStyle *style) {
   style->fab_snackbar_spacing = M3_SCAFFOLD_DEFAULT_FAB_SNACKBAR_SPACING;
   style->fab_slide_duration = M3_SCAFFOLD_DEFAULT_FAB_SLIDE_DURATION;
   style->fab_slide_easing = M3_SCAFFOLD_DEFAULT_FAB_SLIDE_EASING;
+  style->is_rtl = CMP_FALSE;
+
   return CMP_OK;
 }
 

@@ -86,6 +86,7 @@ typedef struct M3TabRowStyle {
   CMPColor background_color;    /**< Background fill color. */
   CMPColor disabled_text_color; /**< Disabled label color. */
   CMPColor disabled_indicator_color; /**< Disabled indicator color. */
+  CMPBool is_rtl; /**< CMP_TRUE if layout should be right-to-left. */
 } M3TabRowStyle;
 
 /**
@@ -279,6 +280,7 @@ typedef struct M3SegmentedStyle {
                                                  disabled. */
   CMPColor disabled_selected_text_color;       /**< Selected text color when
                                                  disabled. */
+  CMPBool is_rtl; /**< CMP_TRUE if layout should be right-to-left. */
 } M3SegmentedStyle;
 
 /**

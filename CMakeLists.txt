@@ -561,7 +561,7 @@ if(GCOVR_EXECUTABLE)
                 --gcov-ignore-errors=source_not_found
                 --gcov-ignore-errors=no_working_dir_found
                 --exclude-noncode-lines
-                --merge-lines
+                
                 --print-summary
                 --merge-mode-functions=merge-use-line-0
                 --fail-under-line ${CMP_COVERAGE_LINE_THRESHOLD}

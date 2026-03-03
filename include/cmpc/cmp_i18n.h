@@ -37,6 +37,19 @@ extern "C" {
 /** @brief Maximum supported fractional digits for number formatting. */
 #define CMP_I18N_MAX_FRACTION_DIGITS 9u
 
+/** @brief Plural category: Zero. */
+#define CMP_I18N_PLURAL_ZERO 0u
+/** @brief Plural category: One. */
+#define CMP_I18N_PLURAL_ONE 1u
+/** @brief Plural category: Two. */
+#define CMP_I18N_PLURAL_TWO 2u
+/** @brief Plural category: Few. */
+#define CMP_I18N_PLURAL_FEW 3u
+/** @brief Plural category: Many. */
+#define CMP_I18N_PLURAL_MANY 4u
+/** @brief Plural category: Other. */
+#define CMP_I18N_PLURAL_OTHER 5u
+
 /** @brief Default locale tag used by the I18N system. */
 #define CMP_I18N_DEFAULT_LOCALE_TAG "en-US"
 
@@ -388,6 +401,17 @@ CMP_API int CMP_CALL cmp_i18n_format_time(const CMPI18n *i18n,
                                           char *out_text,
                                           cmp_usize text_capacity,
                                           cmp_usize *out_len);
+
+/**
+ * @brief Determine the plural category for a number in a given locale.
+ * @param locale_tag The locale tag (e.g., "en", "ar").
+ * @param number The number to evaluate.
+ * @param out_category Receives the plural category (CMP_I18N_PLURAL_*).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_i18n_plural_category(const char *locale_tag,
+                                              cmp_i32 number,
+                                              cmp_u32 *out_category);
 
 #ifdef CMP_TESTING
 /**

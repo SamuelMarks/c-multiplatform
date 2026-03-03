@@ -148,29 +148,30 @@ static int test_adaptive_list_detail_layout(void) {
   bounds.width = 400.0f;
   bounds.height = 800.0f;
 
-  if (m3_adaptive_list_detail_layout(NULL, bounds, &prim, &sec) !=
+  if (m3_adaptive_list_detail_layout(NULL, bounds, &prim, &sec, CMP_FALSE) !=
       CMP_ERR_INVALID_ARGUMENT)
     return 1;
-  if (m3_adaptive_list_detail_layout(&layout, bounds, NULL, &sec) !=
+  if (m3_adaptive_list_detail_layout(&layout, bounds, NULL, &sec, CMP_FALSE) !=
       CMP_ERR_INVALID_ARGUMENT)
     return 1;
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, NULL) !=
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, NULL, CMP_FALSE) !=
       CMP_ERR_INVALID_ARGUMENT)
     return 1;
 
   bounds.width = -1.0f;
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec) !=
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
       CMP_ERR_RANGE)
     return 1;
   bounds.width = 400.0f;
   bounds.height = -1.0f;
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec) !=
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
       CMP_ERR_RANGE)
     return 1;
   bounds.height = 800.0f;
 
   /* Compact */
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec) != CMP_OK)
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
     return 1;
   if (prim.width != 400.0f || prim.height != 800.0f)
     return 1;
@@ -180,7 +181,8 @@ static int test_adaptive_list_detail_layout(void) {
   /* Medium */
   layout.window_class = M3_WINDOW_CLASS_MEDIUM;
   bounds.width = 600.0f;
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec) != CMP_OK)
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
     return 1;
   /* (600 - 24) / 3 = 192 */
   if (prim.width != 192.0f)
@@ -190,7 +192,8 @@ static int test_adaptive_list_detail_layout(void) {
 
   /* Medium too small width */
   bounds.width = 10.0f;
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec) != CMP_OK)
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
     return 1;
   if (prim.width != 0.0f || sec.width != 0.0f)
     return 1;
@@ -198,7 +201,8 @@ static int test_adaptive_list_detail_layout(void) {
   /* Expanded / Extra Large */
   layout.window_class = M3_WINDOW_CLASS_EXPANDED;
   bounds.width = 1000.0f;
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec) != CMP_OK)
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
     return 1;
   if (prim.width != 360.0f)
     return 1;
@@ -207,7 +211,8 @@ static int test_adaptive_list_detail_layout(void) {
 
   /* Expanded too small width */
   bounds.width = 300.0f;
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec) != CMP_OK)
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
     return 1;
   if (prim.width != 300.0f || sec.width != 0.0f)
     return 1;
@@ -226,22 +231,24 @@ static int test_adaptive_feed_layout(void) {
   bounds.width = 400.0f;
   bounds.height = 800.0f;
 
-  if (m3_adaptive_feed_layout(NULL, bounds, &prim, &sec) !=
+  if (m3_adaptive_feed_layout(NULL, bounds, &prim, &sec, CMP_FALSE) !=
       CMP_ERR_INVALID_ARGUMENT)
     return 1;
-  if (m3_adaptive_feed_layout(&layout, bounds, NULL, &sec) !=
+  if (m3_adaptive_feed_layout(&layout, bounds, NULL, &sec, CMP_FALSE) !=
       CMP_ERR_INVALID_ARGUMENT)
     return 1;
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, NULL) !=
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, NULL, CMP_FALSE) !=
       CMP_ERR_INVALID_ARGUMENT)
     return 1;
   bounds.width = -1.0f;
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec) != CMP_ERR_RANGE)
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_ERR_RANGE)
     return 1;
   bounds.width = 400.0f;
 
   /* Compact */
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec) != CMP_OK)
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
     return 1;
   if (prim.width != 400.0f)
     return 1;
@@ -250,7 +257,8 @@ static int test_adaptive_feed_layout(void) {
 
   /* Medium */
   layout.window_class = M3_WINDOW_CLASS_MEDIUM;
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec) != CMP_OK)
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
     return 1;
   if (prim.width != 400.0f - 48.0f)
     return 1;
@@ -259,7 +267,8 @@ static int test_adaptive_feed_layout(void) {
 
   /* Medium too small */
   bounds.width = 20.0f;
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec) != CMP_OK)
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
     return 1;
   if (prim.width != 0.0f)
     return 1;
@@ -267,7 +276,8 @@ static int test_adaptive_feed_layout(void) {
   /* Expanded */
   layout.window_class = M3_WINDOW_CLASS_EXPANDED;
   bounds.width = 1200.0f;
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec) != CMP_OK)
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
     return 1;
   if (sec.width != 300.0f)
     return 1;
@@ -276,7 +286,8 @@ static int test_adaptive_feed_layout(void) {
 
   /* Expanded too small */
   bounds.width = 200.0f;
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec) != CMP_OK)
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
     return 1;
   if (sec.width != 200.0f)
     return 1;
@@ -285,7 +296,8 @@ static int test_adaptive_feed_layout(void) {
 
   /* Expanded max width feed */
   bounds.width = 2000.0f;
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec) != CMP_OK)
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
     return 1;
   if (prim.width != 840.0f)
     return 1; /* Capped */
@@ -304,24 +316,24 @@ static int test_adaptive_supporting_pane_layout(void) {
   bounds.width = 400.0f;
   bounds.height = 800.0f;
 
-  if (m3_adaptive_supporting_pane_layout(NULL, bounds, &prim, &sec) !=
-      CMP_ERR_INVALID_ARGUMENT)
+  if (m3_adaptive_supporting_pane_layout(NULL, bounds, &prim, &sec,
+                                         CMP_FALSE) != CMP_ERR_INVALID_ARGUMENT)
     return 1;
-  if (m3_adaptive_supporting_pane_layout(&layout, bounds, NULL, &sec) !=
-      CMP_ERR_INVALID_ARGUMENT)
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, NULL, &sec,
+                                         CMP_FALSE) != CMP_ERR_INVALID_ARGUMENT)
     return 1;
-  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, NULL) !=
-      CMP_ERR_INVALID_ARGUMENT)
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, NULL,
+                                         CMP_FALSE) != CMP_ERR_INVALID_ARGUMENT)
     return 1;
   bounds.width = -1.0f;
-  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec) !=
-      CMP_ERR_RANGE)
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_FALSE) != CMP_ERR_RANGE)
     return 1;
   bounds.width = 400.0f;
 
   /* Compact */
-  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec) !=
-      CMP_OK)
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_FALSE) != CMP_OK)
     return 1;
   if (prim.width != 400.0f)
     return 1;
@@ -330,8 +342,8 @@ static int test_adaptive_supporting_pane_layout(void) {
 
   /* Medium */
   layout.window_class = M3_WINDOW_CLASS_MEDIUM;
-  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec) !=
-      CMP_OK)
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_FALSE) != CMP_OK)
     return 1;
   if (prim.width != 400.0f)
     return 1;
@@ -341,8 +353,8 @@ static int test_adaptive_supporting_pane_layout(void) {
   /* Expanded */
   layout.window_class = M3_WINDOW_CLASS_EXPANDED;
   bounds.width = 1200.0f;
-  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec) !=
-      CMP_OK)
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_FALSE) != CMP_OK)
     return 1;
   if (sec.width != 360.0f)
     return 1;
@@ -351,12 +363,45 @@ static int test_adaptive_supporting_pane_layout(void) {
 
   /* Expanded too small */
   bounds.width = 200.0f;
-  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec) !=
-      CMP_OK)
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_FALSE) != CMP_OK)
     return 1;
   if (sec.width != 200.0f)
     return 1;
   if (prim.width != 0.0f)
+    return 1;
+
+  return 0;
+}
+
+static int test_adaptive_rtl_layouts(void) {
+  M3AdaptiveLayout layout;
+  CMPRect bounds;
+  CMPRect prim, sec;
+
+  layout.window_class = M3_WINDOW_CLASS_EXPANDED;
+  bounds.x = 0.0f;
+  bounds.y = 0.0f;
+  bounds.width = 1200.0f;
+  bounds.height = 800.0f;
+
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_TRUE) !=
+      CMP_OK)
+    return 1;
+  if (sec.x != 0.0f)
+    return 1;
+  if (prim.x <= sec.x)
+    return 1;
+
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK)
+    return 1;
+  if (prim.x <= sec.x)
+    return 1;
+
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_TRUE) != CMP_OK)
+    return 1;
+  if (prim.x <= sec.x)
     return 1;
 
   return 0;
@@ -387,6 +432,10 @@ int main(void) {
   }
   if (test_adaptive_supporting_pane_layout() != 0) {
     printf("supporting pane layout failed\n");
+    return 1;
+  }
+  if (test_adaptive_rtl_layouts() != 0) {
+    printf("rtl layout failed\n");
     return 1;
   }
   return 0;

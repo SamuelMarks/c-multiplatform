@@ -44,6 +44,7 @@ typedef struct M3ScaffoldStyle {
       fab_snackbar_spacing;     /**< Spacing between FAB and snackbar (>= 0). */
   CMPScalar fab_slide_duration; /**< FAB slide animation duration (>= 0). */
   cmp_u32 fab_slide_easing;     /**< FAB slide easing (CMP_ANIM_EASE_*). */
+  CMPBool is_rtl; /**< CMP_TRUE if layout should be right-to-left. */
 } M3ScaffoldStyle;
 
 /**

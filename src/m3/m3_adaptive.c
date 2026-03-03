@@ -38,7 +38,8 @@ int CMP_CALL m3_adaptive_list_detail_measure(const M3AdaptiveLayout *layout,
 int CMP_CALL m3_adaptive_list_detail_layout(const M3AdaptiveLayout *layout,
                                             CMPRect bounds,
                                             CMPRect *out_primary,
-                                            CMPRect *out_secondary) {
+                                            CMPRect *out_secondary,
+                                            CMPBool is_rtl) {
   CMPScalar spacing;
   CMPScalar avail_w;
   CMPScalar primary_w;
@@ -63,15 +64,20 @@ int CMP_CALL m3_adaptive_list_detail_layout(const M3AdaptiveLayout *layout,
       avail_w = 0.0f;
     }
 
-    out_primary->x = bounds.x;
-    out_primary->y = bounds.y;
     out_primary->height = bounds.height;
     out_primary->width = avail_w / 3.0f;
-
-    out_secondary->x = bounds.x + out_primary->width + spacing;
-    out_secondary->y = bounds.y;
     out_secondary->height = bounds.height;
     out_secondary->width = avail_w - out_primary->width;
+
+    if (is_rtl) {
+      out_secondary->x = bounds.x;
+      out_primary->x = bounds.x + out_secondary->width + spacing;
+    } else {
+      out_primary->x = bounds.x;
+      out_secondary->x = bounds.x + out_primary->width + spacing;
+    }
+    out_primary->y = bounds.y;
+    out_secondary->y = bounds.y;
   } else { /* EXPANDED or EXTRA_LARGE */
     spacing = 24.0f;
     primary_w = 360.0f;
@@ -79,18 +85,23 @@ int CMP_CALL m3_adaptive_list_detail_layout(const M3AdaptiveLayout *layout,
       primary_w = bounds.width;
     }
 
-    out_primary->x = bounds.x;
-    out_primary->y = bounds.y;
     out_primary->height = bounds.height;
     out_primary->width = primary_w;
-
-    out_secondary->x = bounds.x + primary_w + spacing;
-    out_secondary->y = bounds.y;
     out_secondary->height = bounds.height;
     out_secondary->width = bounds.width - primary_w - spacing;
     if (out_secondary->width < 0.0f) {
       out_secondary->width = 0.0f;
     }
+
+    if (is_rtl) {
+      out_secondary->x = bounds.x;
+      out_primary->x = bounds.x + out_secondary->width + spacing;
+    } else {
+      out_primary->x = bounds.x;
+      out_secondary->x = bounds.x + primary_w + spacing;
+    }
+    out_primary->y = bounds.y;
+    out_secondary->y = bounds.y;
   }
 
   return CMP_OK;
@@ -98,7 +109,7 @@ int CMP_CALL m3_adaptive_list_detail_layout(const M3AdaptiveLayout *layout,
 
 int CMP_CALL m3_adaptive_feed_layout(const M3AdaptiveLayout *layout,
                                      CMPRect bounds, CMPRect *out_primary,
-                                     CMPRect *out_secondary) {
+                                     CMPRect *out_secondary, CMPBool is_rtl) {
   CMPScalar margins, spacing;
 
   if (layout == NULL || out_primary == NULL || out_secondary == NULL) {
@@ -144,14 +155,18 @@ int CMP_CALL m3_adaptive_feed_layout(const M3AdaptiveLayout *layout,
       out_primary->width = 840.0f;
     }
 
-    out_primary->x = bounds.x + margins +
-                     (bounds.width - margins * 2.0f - out_primary->width -
-                      out_secondary->width - spacing) *
-                         0.5f;
+    if (is_rtl) {
+      out_secondary->x = bounds.x + margins;
+      out_primary->x = out_secondary->x + out_secondary->width + spacing;
+    } else {
+      out_primary->x = bounds.x + margins +
+                       (bounds.width - margins * 2.0f - out_primary->width -
+                        out_secondary->width - spacing) *
+                           0.5f;
+      out_secondary->x = out_primary->x + out_primary->width + spacing;
+    }
     out_primary->y = bounds.y;
     out_primary->height = bounds.height;
-
-    out_secondary->x = out_primary->x + out_primary->width + spacing;
     out_secondary->y = bounds.y;
     out_secondary->height = bounds.height;
   }
@@ -162,7 +177,8 @@ int CMP_CALL m3_adaptive_feed_layout(const M3AdaptiveLayout *layout,
 int CMP_CALL m3_adaptive_supporting_pane_layout(const M3AdaptiveLayout *layout,
                                                 CMPRect bounds,
                                                 CMPRect *out_primary,
-                                                CMPRect *out_secondary) {
+                                                CMPRect *out_secondary,
+                                                CMPBool is_rtl) {
   CMPScalar margins, spacing;
 
   if (layout == NULL || out_primary == NULL || out_secondary == NULL) {
@@ -188,15 +204,20 @@ int CMP_CALL m3_adaptive_supporting_pane_layout(const M3AdaptiveLayout *layout,
       out_secondary->width = bounds.width;
     }
 
-    out_primary->x = bounds.x + margins;
-    out_primary->y = bounds.y;
     out_primary->height = bounds.height;
     out_primary->width =
         bounds.width - out_secondary->width - spacing - margins * 2.0f;
     if (out_primary->width < 0.0f)
       out_primary->width = 0.0f;
 
-    out_secondary->x = out_primary->x + out_primary->width + spacing;
+    if (is_rtl) {
+      out_secondary->x = bounds.x + margins;
+      out_primary->x = out_secondary->x + out_secondary->width + spacing;
+    } else {
+      out_primary->x = bounds.x + margins;
+      out_secondary->x = out_primary->x + out_primary->width + spacing;
+    }
+    out_primary->y = bounds.y;
     out_secondary->y = bounds.y;
     out_secondary->height = bounds.height;
   }

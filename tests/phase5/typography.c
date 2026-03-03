@@ -4,11 +4,15 @@
 
 int main(void) {
   M3TypographyScale scale;
+  M3TypographyScale expressive_scale;
   CMPTextStyle style;
 
   CMP_TEST_EXPECT(m3_typography_scale_init(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_typography_scale_init_expressive(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_typography_scale_init(&scale));
+  CMP_TEST_OK(m3_typography_scale_init_expressive(&expressive_scale));
 
   CMP_TEST_EXPECT(
       m3_typography_get_style(NULL, M3_TYPOGRAPHY_BODY_LARGE, &style),
@@ -30,6 +34,16 @@ int main(void) {
   CMP_TEST_OK(
       m3_typography_get_style(&scale, M3_TYPOGRAPHY_DISPLAY_LARGE, &style));
   CMP_TEST_EXPECT(style.size_px, 57);
+
+  CMP_TEST_OK(m3_typography_get_style(&expressive_scale,
+                                      M3_TYPOGRAPHY_DISPLAY_LARGE, &style));
+  CMP_TEST_EXPECT(style.size_px, 64);
+  CMP_TEST_EXPECT(style.weight, 400);
+
+  CMP_TEST_OK(m3_typography_get_style(&expressive_scale,
+                                      M3_TYPOGRAPHY_HEADLINE_LARGE, &style));
+  CMP_TEST_EXPECT(style.size_px, 40);
+  CMP_TEST_EXPECT(style.weight, 400);
 
   {
     CMPColor c;

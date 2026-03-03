@@ -449,7 +449,7 @@ static int m3_tab_row_measure_max_text(const M3TabRow *row,
     }
     rc = cmp_text_measure_utf8(&row->text_backend, row->font,
                                row->items[i].utf8_label, row->items[i].utf8_len,
-                               0, &metrics);
+                               row->style.is_rtl ? 1 : 0, &metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -486,7 +486,8 @@ static int m3_tab_row_item_width(const M3TabRow *row, const M3TabItem *item,
 
   if (item->utf8_len > 0) {
     rc = cmp_text_measure_utf8(&row->text_backend, row->font, item->utf8_label,
-                               item->utf8_len, 0, &metrics);
+                               item->utf8_len, row->style.is_rtl ? 1 : 0,
+                               &metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -832,6 +833,10 @@ static int m3_tab_row_indicator_target(const M3TabRow *row,
     return CMP_ERR_RANGE;
   }
 
+  if (row->style.is_rtl == CMP_TRUE) {
+    pos = layout->content_width - pos - width;
+  }
+
   *out_pos = pos;
   *out_width = width;
   return CMP_OK;
@@ -989,15 +994,14 @@ static int m3_tab_row_item_rect(const M3TabRow *row,
     return CMP_ERR_RANGE;
   }
 
-  out_rect->x = layout->start_x;
   out_rect->y = layout->start_y;
-  out_rect->width = layout->tab_width;
   out_rect->height = layout->tab_height;
 
+  offset = 0.0f;
   if (layout->mode == M3_TAB_MODE_FIXED) {
-    out_rect->x += (layout->tab_width + layout->spacing) * (CMPScalar)index;
+    offset = (layout->tab_width + layout->spacing) * (CMPScalar)index;
+    out_rect->width = layout->tab_width;
   } else if (layout->mode == M3_TAB_MODE_SCROLLABLE) {
-    offset = 0.0f;
     if (index > 0) {
       cmp_usize i;
       for (i = 0; i < index; ++i) {
@@ -1013,10 +1017,23 @@ static int m3_tab_row_item_rect(const M3TabRow *row,
     if (rc != CMP_OK) {
       return rc; /* GCOVR_EXCL_LINE */
     }
-    out_rect->x += offset - row->scroll_offset;
     out_rect->width = width;
   } else {
     return CMP_ERR_RANGE;
+  }
+
+  if (row->style.is_rtl == CMP_TRUE) {
+    offset = layout->content_width - offset - out_rect->width;
+  }
+
+  out_rect->x = layout->start_x + offset;
+
+  if (layout->mode == M3_TAB_MODE_SCROLLABLE) {
+    if (row->style.is_rtl == CMP_TRUE) {
+      out_rect->x += row->scroll_offset;
+    } else {
+      out_rect->x -= row->scroll_offset;
+    }
   }
 
 #ifdef CMP_TESTING
@@ -1076,6 +1093,9 @@ static int m3_tab_row_hit_test(const M3TabRow *row,
       return CMP_ERR_RANGE;
     }
     pos = fx - layout->start_x;
+    if (row->style.is_rtl == CMP_TRUE) {
+      pos = layout->content_width - pos;
+    }
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
     rc = m3_tab_row_test_fail_point_match(
         M3_TAB_ROW_TEST_FAIL_HIT_TEST_POS_NEGATIVE, &match);
@@ -1104,7 +1124,11 @@ static int m3_tab_row_hit_test(const M3TabRow *row,
     return CMP_ERR_RANGE;
   }
 
-  pos = fx - layout->start_x + row->scroll_offset;
+  if (row->style.is_rtl == CMP_TRUE) {
+    pos = layout->content_width - (fx - layout->start_x) + row->scroll_offset;
+  } else {
+    pos = fx - layout->start_x + row->scroll_offset;
+  }
 #ifdef CMP_TESTING
   rc = m3_tab_row_test_fail_point_match(
       M3_TAB_ROW_TEST_FAIL_HIT_TEST_POS_NEGATIVE, &match);
@@ -1315,7 +1339,16 @@ static int m3_tab_row_widget_paint(void *widget, CMPPaintContext *ctx) {
   if (row->selected_index != M3_TAB_INVALID_INDEX &&
       row->selected_index < row->item_count && indicator_thickness > 0.0f) {
     indicator_width = row->indicator_width;
-    indicator_rect.x = layout.start_x + row->indicator_pos - row->scroll_offset;
+    indicator_rect.x = layout.start_x + row->indicator_pos;
+    if (row->style.is_rtl == CMP_TRUE) {
+      if (layout.mode == M3_TAB_MODE_SCROLLABLE) {
+        indicator_rect.x += row->scroll_offset;
+      }
+    } else {
+      if (layout.mode == M3_TAB_MODE_SCROLLABLE) {
+        indicator_rect.x -= row->scroll_offset;
+      }
+    }
     indicator_rect.y = layout.start_y + layout.tab_height - indicator_thickness;
     indicator_rect.width = indicator_width;
     indicator_rect.height = indicator_thickness;
@@ -1368,7 +1401,8 @@ static int m3_tab_row_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     rc = cmp_text_measure_utf8(&row->text_backend, row->font,
                                row->items[i].utf8_label, row->items[i].utf8_len,
-                               0, &metrics); /* GCOVR_EXCL_LINE */
+                               row->style.is_rtl ? 1 : 0,
+                               &metrics); /* GCOVR_EXCL_LINE */
     if (rc != CMP_OK) {
       return rc; /* GCOVR_EXCL_LINE */
     }
@@ -1386,7 +1420,8 @@ static int m3_tab_row_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, row->font, row->items[i].utf8_label,
-        row->items[i].utf8_len, 0, text_x, text_y, text_color);
+        row->items[i].utf8_len, row->style.is_rtl ? 1 : 0, text_x, text_y,
+        text_color);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -2248,9 +2283,9 @@ static int m3_segmented_measure_max_text(const M3SegmentedButtons *buttons,
     if (buttons->items[i].utf8_len == 0) {
       continue;
     }
-    rc = cmp_text_measure_utf8(&buttons->text_backend, buttons->font,
-                               buttons->items[i].utf8_label,
-                               buttons->items[i].utf8_len, 0, &metrics);
+    rc = cmp_text_measure_utf8(
+        &buttons->text_backend, buttons->font, buttons->items[i].utf8_label,
+        buttons->items[i].utf8_len, buttons->style.is_rtl ? 1 : 0, &metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -2499,6 +2534,9 @@ static int m3_segmented_hit_test(const M3SegmentedButtons *buttons,
   }
 
   pos = fx - layout->start_x;
+  if (buttons->style.is_rtl == CMP_TRUE) {
+    pos = layout->content_width - pos;
+  }
 #ifdef CMP_TESTING
   rc = m3_segmented_test_fail_point_match(
       M3_SEGMENTED_TEST_FAIL_HIT_TEST_POS_NEGATIVE, &match);
@@ -2709,8 +2747,14 @@ static int m3_segmented_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   for (i = 0; i < buttons->item_count; ++i) {
-    segment_rect.x =
-        layout.start_x + (layout.segment_width + layout.spacing) * (CMPScalar)i;
+    if (buttons->style.is_rtl == CMP_TRUE) {
+      segment_rect.x = layout.start_x + layout.content_width -
+                       (layout.segment_width + layout.spacing) * (CMPScalar)i -
+                       layout.segment_width;
+    } else {
+      segment_rect.x = layout.start_x +
+                       (layout.segment_width + layout.spacing) * (CMPScalar)i;
+    }
     segment_rect.y = layout.start_y;
     segment_rect.width = layout.segment_width;
     segment_rect.height = layout.segment_height;
@@ -2789,9 +2833,9 @@ static int m3_segmented_widget_paint(void *widget, CMPPaintContext *ctx) {
       continue; /* GCOVR_EXCL_LINE */
     }
 
-    rc = cmp_text_measure_utf8(&buttons->text_backend, buttons->font,
-                               buttons->items[i].utf8_label,
-                               buttons->items[i].utf8_len, 0, &metrics);
+    rc = cmp_text_measure_utf8(
+        &buttons->text_backend, buttons->font, buttons->items[i].utf8_label,
+        buttons->items[i].utf8_len, buttons->style.is_rtl ? 1 : 0, &metrics);
     if (rc != CMP_OK) {
       return rc; /* GCOVR_EXCL_LINE */
     }
@@ -2802,7 +2846,8 @@ static int m3_segmented_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, buttons->font, buttons->items[i].utf8_label,
-        buttons->items[i].utf8_len, 0, text_x, text_y, text_color);
+        buttons->items[i].utf8_len, buttons->style.is_rtl ? 1 : 0, text_x,
+        text_y, text_color);
     if (rc != CMP_OK) {
       return rc;
     }

@@ -56,6 +56,7 @@ typedef struct M3AppBarStyle {
   CMPColor background_color;  /**< Background fill color. */
   CMPShadow shadow;           /**< Shadow descriptor. */
   CMPBool shadow_enabled;     /**< CMP_TRUE when shadow rendering is enabled. */
+  CMPBool is_rtl; /**< CMP_TRUE if layout should be right-to-left. */
 } M3AppBarStyle;
 
 /**

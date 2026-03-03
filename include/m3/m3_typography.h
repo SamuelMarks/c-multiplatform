@@ -47,6 +47,14 @@ typedef struct M3TypographyScale {
 CMP_API int CMP_CALL m3_typography_scale_init(M3TypographyScale *scale);
 
 /**
+ * @brief Initialize a Material 3 Expressive typography scale (Roboto/system).
+ * @param scale Typography scale to initialize.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL
+m3_typography_scale_init_expressive(M3TypographyScale *scale);
+
+/**
  * @brief Retrieve a specific text style from a typography scale.
  * @param scale The initialized typography scale.
  * @param role The role to retrieve.

@@ -339,7 +339,8 @@ static int m3_app_bar_measure_title(const M3AppBar *bar,
   }
 
   return cmp_text_measure_utf8(&bar->text_backend, bar->title_font,
-                               bar->utf8_title, bar->title_len, 0, out_metrics);
+                               bar->utf8_title, bar->title_len,
+                               bar->style.is_rtl ? 1 : 0, out_metrics);
 }
 
 static int m3_app_bar_compute_content_bounds(const M3AppBar *bar,
@@ -447,10 +448,18 @@ static int m3_app_bar_compute_title_position(const M3AppBar *bar,
   }
 
   if (bar->style.variant == M3_APP_BAR_VARIANT_CENTER) {
-    *out_x = bar->bounds.x + bar->style.padding.left +
-             (content_width - metrics->width) * 0.5f;
+    CMPScalar padding_left = bar->style.is_rtl == CMP_TRUE
+                                 ? bar->style.padding.right
+                                 : bar->style.padding.left;
+    *out_x =
+        bar->bounds.x + padding_left + (content_width - metrics->width) * 0.5f;
   } else {
-    *out_x = bar->bounds.x + bar->style.padding.left;
+    if (bar->style.is_rtl == CMP_TRUE) {
+      *out_x = bar->bounds.x + bar->bounds.width - bar->style.padding.right -
+               metrics->width;
+    } else {
+      *out_x = bar->bounds.x + bar->style.padding.left;
+    }
   }
 
   collapsed_y = bar->bounds.y + bar->style.padding.top +
@@ -691,8 +700,8 @@ static int m3_app_bar_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   rc = ctx->gfx->text_vtable->draw_text(
-      ctx->gfx->ctx, bar->title_font, bar->utf8_title, bar->title_len, 0,
-      text_x, text_y, bar->style.title_style.color);
+      ctx->gfx->ctx, bar->title_font, bar->utf8_title, bar->title_len,
+      bar->style.is_rtl ? 1 : 0, text_x, text_y, bar->style.title_style.color);
   if (rc != CMP_OK) {
     return rc;
   }

@@ -74,11 +74,12 @@ m3_adaptive_list_detail_measure(const M3AdaptiveLayout *layout,
  * @param bounds Bounds for the layout.
  * @param out_primary Receives bounds for primary pane.
  * @param out_secondary Receives bounds for secondary pane.
+ * @param is_rtl CMP_TRUE if layout should be right-to-left.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL
-m3_adaptive_list_detail_layout(const M3AdaptiveLayout *layout, CMPRect bounds,
-                               CMPRect *out_primary, CMPRect *out_secondary);
+CMP_API int CMP_CALL m3_adaptive_list_detail_layout(
+    const M3AdaptiveLayout *layout, CMPRect bounds, CMPRect *out_primary,
+    CMPRect *out_secondary, CMPBool is_rtl);
 
 /**
  * @brief Evaluates an adaptive feed layout bounds resolution logic.
@@ -86,12 +87,14 @@ m3_adaptive_list_detail_layout(const M3AdaptiveLayout *layout, CMPRect bounds,
  * @param bounds Bounds for the layout.
  * @param out_primary Receives bounds for primary feed pane.
  * @param out_secondary Receives bounds for secondary support pane.
+ * @param is_rtl CMP_TRUE if layout should be right-to-left.
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_adaptive_feed_layout(const M3AdaptiveLayout *layout,
                                              CMPRect bounds,
                                              CMPRect *out_primary,
-                                             CMPRect *out_secondary);
+                                             CMPRect *out_secondary,
+                                             CMPBool is_rtl);
 
 /**
  * @brief Evaluates an adaptive supporting pane layout bounds resolution logic.
@@ -99,11 +102,12 @@ CMP_API int CMP_CALL m3_adaptive_feed_layout(const M3AdaptiveLayout *layout,
  * @param bounds Bounds for the layout.
  * @param out_primary Receives bounds for primary pane.
  * @param out_secondary Receives bounds for secondary supporting pane.
+ * @param is_rtl CMP_TRUE if layout should be right-to-left.
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_adaptive_supporting_pane_layout(
     const M3AdaptiveLayout *layout, CMPRect bounds, CMPRect *out_primary,
-    CMPRect *out_secondary);
+    CMPRect *out_secondary, CMPBool is_rtl);
 
 #ifdef __cplusplus
 } /* extern "C" */
