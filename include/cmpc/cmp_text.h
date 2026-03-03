@@ -3,7 +3,7 @@
 
 /**
  * @file cmp_text.h
- * @brief Text primitives and widget stub for LibCMPC.
+ * @brief Text primitives and widget for LibCMPC.
  */
 
 #ifdef __cplusplus
@@ -20,14 +20,42 @@ typedef struct CMPTextMetrics {
 } CMPTextMetrics;
 
 /**
+ * @brief Shaped text glyph descriptor.
+ */
+typedef struct CMPTextGlyph {
+  cmp_u32 codepoint;   /**< Unicode codepoint or font glyph index. */
+  CMPScalar x_advance; /**< X advance in pixels. */
+  CMPScalar y_advance; /**< Y advance in pixels. */
+  CMPScalar x_offset;  /**< X offset in pixels. */
+  CMPScalar y_offset;  /**< Y offset in pixels. */
+} CMPTextGlyph;
+
+/**
+ * @brief Complete shaped text layout representation.
+ */
+typedef struct CMPTextLayout {
+  CMPTextGlyph *glyphs;   /**< Array of shaped glyphs. */
+  cmp_usize glyph_count;  /**< Number of glyphs in the array. */
+  CMPTextMetrics metrics; /**< Complete dimensions and baseline. */
+} CMPTextLayout;
+
+/**
  * @brief Font style descriptor.
  */
 typedef struct CMPTextStyle {
-  const char *utf8_family; /**< Font family name (UTF-8). */
-  cmp_i32 size_px;         /**< Font size in pixels. */
-  cmp_i32 weight;          /**< Font weight (100..900). */
-  CMPBool italic;          /**< CMP_TRUE for italic. */
-  CMPColor color;          /**< Text color. */
+  const char *
+      utf8_family; /**< Font family name or fallback chain (comma-separated). */
+  cmp_i32 size_px; /**< Font size in pixels. */
+  cmp_i32 weight;  /**< Font weight (100..900) mapped to 'wght' axis. */
+  CMPBool italic;  /**< CMP_TRUE for italic (legacy support). */
+  CMPScalar
+      width_axis; /**< 'wdth' variable font axis (e.g. 100.0 for normal). */
+  CMPScalar optical_size; /**< 'opsz' variable font axis (e.g. 14.0). */
+  CMPScalar slant;        /**< 'slnt' variable font axis (e.g. 0.0 to -90.0). */
+  CMPScalar grade;        /**< 'GRAD' variable font axis (e.g. 0.0). */
+  CMPScalar letter_spacing; /**< Letter spacing (tracking) in pixels. */
+  CMPScalar line_height_px; /**< Line height in pixels (0.0 for auto). */
+  CMPColor color;           /**< Text color. */
 } CMPTextStyle;
 
 /**
@@ -39,7 +67,7 @@ typedef struct CMPTextBackend {
 } CMPTextBackend;
 
 /**
- * @brief Text widget stub.
+ * @brief Text widget.
  */
 typedef struct CMPTextWidget {
   CMPWidget widget;       /**< Widget interface (points to this instance). */
@@ -49,6 +77,7 @@ typedef struct CMPTextWidget {
   CMPTextMetrics metrics; /**< Cached metrics. */
   const char *utf8;       /**< UTF-8 text pointer. */
   cmp_usize utf8_len;     /**< UTF-8 length in bytes. */
+  cmp_u32 base_direction; /**< Base text direction. */
   CMPRect bounds;         /**< Layout bounds. */
   CMPBool owns_font;      /**< CMP_TRUE when widget owns the font. */
   CMPBool metrics_valid;  /**< CMP_TRUE when cached metrics are valid. */
@@ -96,12 +125,14 @@ CMP_API int CMP_CALL cmp_text_font_destroy(const CMPTextBackend *backend,
  * @param font Font handle to measure with.
  * @param utf8 UTF-8 byte buffer (may be NULL when utf8_len is 0).
  * @param utf8_len Length of the UTF-8 buffer in bytes.
+ * @param base_direction Base direction.
  * @param out_metrics Receives the text metrics.
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_measure_utf8(const CMPTextBackend *backend,
                                            CMPHandle font, const char *utf8,
                                            cmp_usize utf8_len,
+                                           cmp_u32 base_direction,
                                            CMPTextMetrics *out_metrics);
 
 /**
@@ -109,11 +140,13 @@ CMP_API int CMP_CALL cmp_text_measure_utf8(const CMPTextBackend *backend,
  * @param backend Text backend instance.
  * @param font Font handle to measure with.
  * @param utf8 UTF-8 null-terminated string.
+ * @param base_direction Base direction.
  * @param out_metrics Receives the text metrics.
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_text_measure_cstr(const CMPTextBackend *backend,
                                            CMPHandle font, const char *utf8,
+                                           cmp_u32 base_direction,
                                            CMPTextMetrics *out_metrics);
 
 /**
@@ -126,6 +159,32 @@ CMP_API int CMP_CALL cmp_text_measure_cstr(const CMPTextBackend *backend,
 CMP_API int CMP_CALL cmp_text_font_metrics(const CMPTextBackend *backend,
                                            CMPHandle font,
                                            CMPTextMetrics *out_metrics);
+
+/**
+ * @brief Shape UTF-8 text into a glyph layout (for BiDi/complex typography).
+ * @param backend Text backend instance.
+ * @param font Font handle.
+ * @param utf8 UTF-8 string to shape.
+ * @param utf8_len Length of string in bytes.
+ * @param base_direction Base text direction.
+ * @param out_layout Receives the shaped layout (caller must call free_layout).
+ * @return CMP_OK on success, CMP_ERR_UNSUPPORTED if backend lacks shaping, or a
+ * failure code.
+ */
+CMP_API int CMP_CALL cmp_text_shape_utf8(const CMPTextBackend *backend,
+                                         CMPHandle font, const char *utf8,
+                                         cmp_usize utf8_len,
+                                         cmp_u32 base_direction,
+                                         CMPTextLayout *out_layout);
+
+/**
+ * @brief Free a text layout created by cmp_text_shape_utf8.
+ * @param backend Text backend instance.
+ * @param layout The layout to free.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_text_free_layout(const CMPTextBackend *backend,
+                                          CMPTextLayout *layout);
 
 /**
  * @brief Initialize a text widget.

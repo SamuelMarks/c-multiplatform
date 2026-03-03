@@ -758,7 +758,7 @@ static int m3_navigation_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     rc = cmp_text_measure_utf8(&nav->text_backend, nav->font,
                                nav->items[i].utf8_label, nav->items[i].utf8_len,
-                               &metrics);
+                               0, &metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -774,7 +774,7 @@ static int m3_navigation_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, nav->font, nav->items[i].utf8_label,
-        nav->items[i].utf8_len, text_x, text_y, text_color);
+        nav->items[i].utf8_len, 0, text_x, text_y, text_color);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -861,6 +861,7 @@ static int m3_navigation_widget_get_semantics(
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   nav = (M3Navigation *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;

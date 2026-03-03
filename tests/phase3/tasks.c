@@ -555,7 +555,7 @@ int main(void) {
     CMP_TEST_EXPECT(cmp_tasks_test_object_op(999u, &type_id),
                     CMP_ERR_INVALID_ARGUMENT);
 
-    CMP_TEST_OK(cmp_tasks_test_stub_exercise());
+    CMP_TEST_OK(cmp_tasks_test_logic_exercise());
     CMP_TEST_OK(cmp_tasks_test_call_noop());
   }
 

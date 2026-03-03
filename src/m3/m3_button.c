@@ -287,7 +287,7 @@ static int m3_button_metrics_update(M3Button *button) {
 
   if (button->utf8_label != NULL) {
     rc = cmp_text_measure_utf8(&button->text_backend, button->font,
-                               button->utf8_label, button->utf8_len,
+                               button->utf8_label, button->utf8_len, 0,
                                &button->metrics);
     if (rc != CMP_OK) {
       return rc;
@@ -1151,7 +1151,7 @@ static int m3_button_widget_paint(void *widget, CMPPaintContext *ctx) {
              metrics.baseline;
 
     return ctx->gfx->text_vtable->draw_text(
-        ctx->gfx->ctx, button->font, button->utf8_label, button->utf8_len,
+        ctx->gfx->ctx, button->font, button->utf8_label, button->utf8_len, 0,
         text_x, text_y, text_color);
   }
 
@@ -1258,6 +1258,7 @@ static int m3_button_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   button = (M3Button *)widget;
   out_semantics->role = CMP_SEMANTIC_BUTTON;

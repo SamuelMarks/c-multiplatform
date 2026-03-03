@@ -2548,6 +2548,71 @@ static int cmp_win32_ws_get_time_ms(void *ws, cmp_u32 *out_time_ms) {
   return CMP_OK;
 }
 
+static int cmp_win32_ws_get_system_color(void *ws, cmp_u32 color_type,
+                                         CMPScalar *out_r, CMPScalar *out_g,
+                                         CMPScalar *out_b, CMPScalar *out_a) {
+  DWORD color = 0;
+  BOOL opaque = FALSE;
+  HMODULE dwm;
+  typedef HRESULT(WINAPI * DwmGetColorizationColor_t)(DWORD * pcrColorization,
+                                                      BOOL * pfOpaqueBlend);
+  DwmGetColorizationColor_t pfnDwmGetColorizationColor;
+
+  if (ws == NULL || out_r == NULL || out_g == NULL || out_b == NULL ||
+      out_a == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  if (color_type == CMP_SYSTEM_COLOR_ACCENT) {
+    dwm = LoadLibraryA("dwmapi.dll");
+    if (dwm) {
+      pfnDwmGetColorizationColor = (DwmGetColorizationColor_t)GetProcAddress(
+          dwm, "DwmGetColorizationColor");
+      if (pfnDwmGetColorizationColor &&
+          pfnDwmGetColorizationColor(&color, &opaque) == S_OK) {
+        *out_r = (CMPScalar)((color >> 16) & 0xFF) / 255.0f;
+        *out_g = (CMPScalar)((color >> 8) & 0xFF) / 255.0f;
+        *out_b = (CMPScalar)(color & 0xFF) / 255.0f;
+        *out_a = (CMPScalar)((color >> 24) & 0xFF) / 255.0f;
+        if (*out_a <= 0.0f)
+          *out_a = 1.0f;
+        FreeLibrary(dwm);
+        return CMP_OK;
+      }
+      FreeLibrary(dwm);
+    }
+
+    color = GetSysColor(COLOR_HIGHLIGHT);
+    *out_r = (CMPScalar)GetRValue(color) / 255.0f;
+    *out_g = (CMPScalar)GetGValue(color) / 255.0f;
+    *out_b = (CMPScalar)GetBValue(color) / 255.0f;
+    *out_a = 1.0f;
+    return CMP_OK;
+  } else if (color_type == CMP_SYSTEM_COLOR_BACKGROUND) {
+    color = GetSysColor(COLOR_WINDOW);
+    *out_r = (CMPScalar)GetRValue(color) / 255.0f;
+    *out_g = (CMPScalar)GetGValue(color) / 255.0f;
+    *out_b = (CMPScalar)GetBValue(color) / 255.0f;
+    *out_a = 1.0f;
+    return CMP_OK;
+  }
+
+  return CMP_ERR_UNSUPPORTED;
+}
+
+static int cmp_backend_ws_update_a11y_tree(void *ws,
+                                           const void *root_a11y_node) {
+  /* UIAutomation (UIA) bridge stub: building a native Windows a11y tree
+     requires implementing IRawElementProviderFragment and
+     IRawElementProviderFragmentRoot, and responding to WM_GETOBJECT. This is a
+     placeholder for the contract. */
+  (void)root_a11y_node;
+  if (ws == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  return CMP_ERR_UNSUPPORTED;
+}
+
 static const CMPWSVTable g_cmp_win32_ws_vtable = {
 
     cmp_win32_ws_init,
@@ -2580,7 +2645,9 @@ static const CMPWSVTable g_cmp_win32_ws_vtable = {
 
     cmp_win32_ws_pump_events,
 
-    cmp_win32_ws_get_time_ms};
+    cmp_win32_ws_get_time_ms,
+    cmp_win32_ws_get_system_color,
+    cmp_backend_ws_update_a11y_tree};
 
 static int cmp_win32_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
 
@@ -4053,6 +4120,7 @@ static int cmp_win32_text_destroy_font(void *text, CMPHandle font) {
 static int cmp_win32_text_measure_text(void *text, CMPHandle font,
 
                                        const char *utf8, cmp_usize utf8_len,
+                                       cmp_u32 base_direction,
 
                                        CMPScalar *out_width,
 
@@ -4078,6 +4146,7 @@ static int cmp_win32_text_measure_text(void *text, CMPHandle font,
 
   TEXTMETRIC tm;
 
+  (void)base_direction;
   if (text == NULL || out_width == NULL || out_height == NULL ||
 
       out_baseline == NULL) {
@@ -4180,6 +4249,7 @@ static int cmp_win32_text_measure_text(void *text, CMPHandle font,
 static int cmp_win32_text_draw_text(void *text, CMPHandle font,
 
                                     const char *utf8, cmp_usize utf8_len,
+                                    cmp_u32 base_direction,
 
                                     CMPScalar x, CMPScalar y, CMPColor color) {
 
@@ -4199,6 +4269,7 @@ static int cmp_win32_text_draw_text(void *text, CMPHandle font,
 
   COLORREF ref;
 
+  (void)base_direction;
   if (text == NULL) {
 
     return CMP_ERR_INVALID_ARGUMENT;
@@ -4267,9 +4338,13 @@ static int cmp_win32_text_draw_text(void *text, CMPHandle font,
 
 static const CMPTextVTable g_cmp_win32_text_vtable = {
 
-    cmp_win32_text_create_font, cmp_win32_text_destroy_font,
-
-    cmp_win32_text_measure_text, cmp_win32_text_draw_text};
+    cmp_win32_text_create_font,
+    cmp_win32_text_destroy_font,
+    cmp_win32_text_measure_text,
+    cmp_win32_text_draw_text,
+    NULL,
+    NULL,
+    NULL};
 
 static int cmp_win32_io_read_file(void *io, const char *utf8_path, void *buffer,
 

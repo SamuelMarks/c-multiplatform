@@ -464,12 +464,17 @@ static int m3_checkbox_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   checkbox = (M3Checkbox *)widget;
   out_semantics->role = CMP_SEMANTIC_CHECKBOX;
   out_semantics->flags = 0;
   if (checkbox->checked == CMP_TRUE) {
-    out_semantics->flags |= CMP_SEMANTIC_FLAG_SELECTED;
+    if (checkbox->mixed_state == CMP_TRUE) {
+      out_semantics->flags |= CMP_SEMANTIC_FLAG_MIXED_CHECKED;
+    } else {
+      out_semantics->flags |= CMP_SEMANTIC_FLAG_CHECKED;
+    }
   }
   if (checkbox->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_DISABLED;
@@ -687,12 +692,13 @@ static int m3_switch_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   sw = (M3Switch *)widget;
   out_semantics->role = CMP_SEMANTIC_SWITCH;
   out_semantics->flags = 0;
   if (sw->on == CMP_TRUE) {
-    out_semantics->flags |= CMP_SEMANTIC_FLAG_SELECTED;
+    out_semantics->flags |= CMP_SEMANTIC_FLAG_TOGGLED;
   }
   if (sw->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_DISABLED;
@@ -953,12 +959,13 @@ static int m3_radio_widget_get_semantics(
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   radio = (M3Radio *)widget;
   out_semantics->role = CMP_SEMANTIC_RADIO;
   out_semantics->flags = 0;
   if (radio->selected == CMP_TRUE) {
-    out_semantics->flags |= CMP_SEMANTIC_FLAG_SELECTED;
+    out_semantics->flags |= CMP_SEMANTIC_FLAG_CHECKED;
   }
   if (radio->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_DISABLED;
@@ -1081,8 +1088,11 @@ int CMP_CALL m3_checkbox_init(M3Checkbox *checkbox,
   memset(checkbox, 0, sizeof(*checkbox));
   checkbox->style = *style;
   checkbox->checked = checked;
+  checkbox->mixed_state = CMP_FALSE;
   checkbox->pressed = CMP_FALSE;
-  checkbox->widget.ctx = checkbox;
+  checkbox->on_change = NULL;
+  checkbox->on_change_ctx = NULL;
+
   checkbox->widget.vtable = &g_m3_checkbox_widget_vtable;
   checkbox->widget.handle.id = 0u;
   checkbox->widget.handle.generation = 0u;
@@ -1090,9 +1100,25 @@ int CMP_CALL m3_checkbox_init(M3Checkbox *checkbox,
   return CMP_OK;
 }
 
-int CMP_CALL m3_checkbox_set_checked(M3Checkbox *checkbox, CMPBool checked) {
+int CMP_CALL m3_checkbox_set_mixed_state(M3Checkbox *checkbox,
+                                         CMPBool mixed_state) {
   int rc;
 
+  if (checkbox == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  rc = m3_selection_validate_bool(mixed_state);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  checkbox->mixed_state = mixed_state;
+  return CMP_OK;
+}
+
+int CMP_CALL m3_checkbox_set_checked(M3Checkbox *checkbox, CMPBool checked) {
+  int rc;
   if (checkbox == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

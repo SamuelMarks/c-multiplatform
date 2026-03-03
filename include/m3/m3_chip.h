@@ -277,6 +277,64 @@ CMP_API int CMP_CALL m3_chip_set_on_delete(M3Chip *chip,
                                            CMPChipOnDelete on_delete,
                                            void *ctx);
 
+CMP_API int CMP_CALL m3_chip_test_set_fail_point(cmp_u32 fail_point);
+
+CMP_API int CMP_CALL m3_chip_test_set_color_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_chip_test_clear_fail_points(void);
+
+CMP_API int CMP_CALL m3_chip_test_style_init_layout(
+    M3ChipLayout *layout, CMPScalar padding_x, CMPScalar padding_y,
+    CMPScalar min_width, CMPScalar min_height, CMPScalar icon_size,
+    CMPScalar icon_gap, CMPScalar delete_thickness);
+
+CMP_API int CMP_CALL m3_chip_test_style_init_base(M3ChipStyle *style,
+                                                  cmp_u32 variant);
+
+CMP_API int CMP_CALL m3_chip_test_validate_color(const CMPColor *color);
+
+CMP_API int CMP_CALL m3_chip_test_color_set(CMPColor *color, CMPScalar r,
+                                            CMPScalar g, CMPScalar b,
+                                            CMPScalar a);
+
+CMP_API int CMP_CALL m3_chip_test_color_with_alpha(const CMPColor *base,
+                                                   CMPScalar alpha,
+                                                   CMPColor *out_color);
+
+CMP_API int CMP_CALL m3_chip_test_validate_text_style(const CMPTextStyle *style,
+                                                      CMPBool require_family);
+
+CMP_API int CMP_CALL m3_chip_test_validate_layout(const M3ChipLayout *layout);
+
+CMP_API int CMP_CALL m3_chip_test_validate_style(const M3ChipStyle *style,
+                                                 CMPBool require_family);
+
+CMP_API int CMP_CALL m3_chip_test_validate_measure_spec(CMPMeasureSpec spec);
+
+CMP_API int CMP_CALL m3_chip_test_validate_rect(const CMPRect *rect);
+
+CMP_API int CMP_CALL
+m3_chip_test_validate_backend(const CMPTextBackend *backend);
+
+CMP_API int CMP_CALL m3_chip_test_metrics_update(M3Chip *chip);
+
+CMP_API int CMP_CALL m3_chip_test_resolve_colors(const M3Chip *chip,
+                                                 CMPColor *out_background,
+                                                 CMPColor *out_text,
+                                                 CMPColor *out_outline,
+                                                 CMPColor *out_ripple);
+
+CMP_API int CMP_CALL m3_chip_test_resolve_corner(const M3Chip *chip,
+                                                 CMPScalar *out_corner);
+
+CMP_API int CMP_CALL m3_chip_test_compute_delete_bounds(M3Chip *chip,
+                                                        CMPRect *out_bounds);
+
+CMP_API int CMP_CALL m3_chip_test_draw_delete_icon(const CMPGfx *gfx,
+                                                   const CMPRect *bounds,
+                                                   CMPColor color,
+                                                   CMPScalar thickness);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

@@ -449,7 +449,7 @@ static int m3_tab_row_measure_max_text(const M3TabRow *row,
     }
     rc = cmp_text_measure_utf8(&row->text_backend, row->font,
                                row->items[i].utf8_label, row->items[i].utf8_len,
-                               &metrics);
+                               0, &metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -486,7 +486,7 @@ static int m3_tab_row_item_width(const M3TabRow *row, const M3TabItem *item,
 
   if (item->utf8_len > 0) {
     rc = cmp_text_measure_utf8(&row->text_backend, row->font, item->utf8_label,
-                               item->utf8_len, &metrics);
+                               item->utf8_len, 0, &metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1368,7 +1368,7 @@ static int m3_tab_row_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     rc = cmp_text_measure_utf8(&row->text_backend, row->font,
                                row->items[i].utf8_label, row->items[i].utf8_len,
-                               &metrics); /* GCOVR_EXCL_LINE */
+                               0, &metrics); /* GCOVR_EXCL_LINE */
     if (rc != CMP_OK) {
       return rc; /* GCOVR_EXCL_LINE */
     }
@@ -1386,7 +1386,7 @@ static int m3_tab_row_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, row->font, row->items[i].utf8_label,
-        row->items[i].utf8_len, text_x, text_y, text_color);
+        row->items[i].utf8_len, 0, text_x, text_y, text_color);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1503,6 +1503,7 @@ static int m3_tab_row_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   row = (M3TabRow *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;
@@ -2249,7 +2250,7 @@ static int m3_segmented_measure_max_text(const M3SegmentedButtons *buttons,
     }
     rc = cmp_text_measure_utf8(&buttons->text_backend, buttons->font,
                                buttons->items[i].utf8_label,
-                               buttons->items[i].utf8_len, &metrics);
+                               buttons->items[i].utf8_len, 0, &metrics);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -2790,7 +2791,7 @@ static int m3_segmented_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     rc = cmp_text_measure_utf8(&buttons->text_backend, buttons->font,
                                buttons->items[i].utf8_label,
-                               buttons->items[i].utf8_len, &metrics);
+                               buttons->items[i].utf8_len, 0, &metrics);
     if (rc != CMP_OK) {
       return rc; /* GCOVR_EXCL_LINE */
     }
@@ -2801,7 +2802,7 @@ static int m3_segmented_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, buttons->font, buttons->items[i].utf8_label,
-        buttons->items[i].utf8_len, text_x, text_y, text_color);
+        buttons->items[i].utf8_len, 0, text_x, text_y, text_color);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -2936,6 +2937,7 @@ static int m3_segmented_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   buttons = (M3SegmentedButtons *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;

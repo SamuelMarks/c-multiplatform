@@ -217,9 +217,11 @@ static int CMP_CALL doc_destroy_font(void *text, CMPHandle font) {
 
 static int CMP_CALL doc_measure_text(void *text, CMPHandle font,
                                      const char *utf8, cmp_usize utf8_len,
+                                     cmp_u32 base_direction,
                                      CMPScalar *out_width,
                                      CMPScalar *out_height,
                                      CMPScalar *out_baseline) {
+  (void)base_direction;
   CMP_UNUSED(text);
   CMP_UNUSED(font);
   CMP_UNUSED(utf8);
@@ -233,9 +235,10 @@ static int CMP_CALL doc_measure_text(void *text, CMPHandle font,
 }
 
 static int CMP_CALL doc_draw_text(void *text, CMPHandle font, const char *utf8,
-                                  cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                                  CMPColor color) {
+                                  cmp_usize utf8_len, cmp_u32 base_direction,
+                                  CMPScalar x, CMPScalar y, CMPColor color) {
   SvgContext *ctx = (SvgContext *)text;
+  (void)base_direction;
   CMP_UNUSED(font);
   fprintf(ctx->file,
           "  <text x=\"%f\" y=\"%f\" font-family=\"sans-serif\" "
@@ -248,8 +251,13 @@ static int CMP_CALL doc_draw_text(void *text, CMPHandle font, const char *utf8,
   return CMP_OK;
 }
 
-static const CMPTextVTable doc_text_vtable = {doc_create_font, doc_destroy_font,
-                                              doc_measure_text, doc_draw_text};
+static const CMPTextVTable doc_text_vtable = {doc_create_font,
+                                              doc_destroy_font,
+                                              doc_measure_text,
+                                              doc_draw_text,
+                                              NULL,
+                                              NULL,
+                                              NULL};
 
 static void write_json_entry(const char *category, const char *name,
                              const char *file) {

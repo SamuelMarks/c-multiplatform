@@ -404,6 +404,43 @@ typedef struct CMPWSVTable {
 #else
   int(CMP_CALL *get_time_ms)(void *ws, cmp_u32 *out_time_ms);
 #endif
+
+/** @brief System accent color type. */
+#define CMP_SYSTEM_COLOR_ACCENT 1
+/** @brief System window background color type. */
+#define CMP_SYSTEM_COLOR_BACKGROUND 2
+
+/**
+ * @brief Get a system color from the window system.
+ * @param ws Window system instance.
+ * @param color_type Type of system color requested (CMP_SYSTEM_COLOR_*).
+ * @param out_r Receives red channel (0..1).
+ * @param out_g Receives green channel (0..1).
+ * @param out_b Receives blue channel (0..1).
+ * @param out_a Receives alpha channel (0..1).
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
+  int get_system_color(void *ws, cmp_u32 color_type, CMPScalar *out_r,
+                       CMPScalar *out_g, CMPScalar *out_b, CMPScalar *out_a);
+#else
+  int(CMP_CALL *get_system_color)(void *ws, cmp_u32 color_type,
+                                  CMPScalar *out_r, CMPScalar *out_g,
+                                  CMPScalar *out_b, CMPScalar *out_a);
+#endif
+
+/**
+ * @brief Update the native OS accessibility semantics tree.
+ * @param ws Window system instance.
+ * @param root_a11y_node Root node of the internal accessibility tree.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
+  int update_a11y_tree(void *ws, const void *root_a11y_node);
+#else
+  int(CMP_CALL *update_a11y_tree)(void *ws, const void *root_a11y_node);
+#endif
+
 } CMPWSVTable;
 
 /**

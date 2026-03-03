@@ -431,8 +431,10 @@ static int m3_linear_progress_widget_get_semantics(
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   progress = (M3LinearProgress *)widget;
+  memset(out_semantics, 0, sizeof(*out_semantics));
   out_semantics->role = CMP_SEMANTIC_NONE;
   out_semantics->flags = 0;
   if (progress->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
@@ -889,8 +891,10 @@ m3_circular_progress_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   progress = (M3CircularProgress *)widget;
+  memset(out_semantics, 0, sizeof(*out_semantics));
   out_semantics->role = CMP_SEMANTIC_NONE;
   out_semantics->flags = 0;
   if (progress->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
@@ -1549,7 +1553,8 @@ static int m3_slider_widget_event(void *widget, const CMPInputEvent *event,
     if (slider->pressed == CMP_TRUE) {
       return CMP_ERR_STATE;
     }
-    rc = m3_slider_value_from_x(slider, (CMPScalar)event->data.pointer.x,
+    rc = m3_slider_value_from_x(slider,
+                                (CMPScalar)(CMPScalar)event->data.pointer.x,
                                 &next_value); /* GCOVR_EXCL_LINE */
     if (rc != CMP_OK) {
       return rc;
@@ -1565,7 +1570,8 @@ static int m3_slider_widget_event(void *widget, const CMPInputEvent *event,
     if (slider->pressed == CMP_FALSE) {
       return CMP_OK;
     }
-    rc = m3_slider_value_from_x(slider, (CMPScalar)event->data.pointer.x,
+    rc = m3_slider_value_from_x(slider,
+                                (CMPScalar)(CMPScalar)event->data.pointer.x,
                                 &next_value); /* GCOVR_EXCL_LINE */
     if (rc != CMP_OK) {
       return rc;
@@ -1595,8 +1601,10 @@ static int m3_slider_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   slider = (M3Slider *)widget;
+  memset(out_semantics, 0, sizeof(*out_semantics));
   out_semantics->role = CMP_SEMANTIC_SLIDER;
   out_semantics->flags = 0;
   if (slider->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
@@ -1608,6 +1616,9 @@ static int m3_slider_widget_get_semantics(void *widget,
   out_semantics->utf8_label = slider->utf8_label;
   out_semantics->utf8_hint = NULL;
   out_semantics->utf8_value = NULL;
+  out_semantics->range_min = slider->min_value;
+  out_semantics->range_max = slider->max_value;
+  out_semantics->range_value = slider->value;
   return CMP_OK;
 }
 
@@ -1869,6 +1880,442 @@ int CMP_CALL m3_slider_set_on_change(M3Slider *slider,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
+  slider->on_change = on_change;
+  slider->on_change_ctx = ctx;
+  return CMP_OK;
+}
+
+static int m3_range_slider_widget_measure(void *widget, CMPMeasureSpec width,
+                                          CMPMeasureSpec height,
+                                          CMPSize *out_size) {
+  M3RangeSlider *slider = (M3RangeSlider *)widget;
+  int rc;
+
+  if (slider == NULL || out_size == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  rc = m3_slider_validate_style(&slider->style);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  out_size->width = slider->style.track_length;
+  out_size->height = slider->style.thumb_radius * 2.0f;
+
+  if (width.mode == CMP_MEASURE_EXACTLY) {
+    out_size->width = width.size;
+  } else if (width.mode == CMP_MEASURE_AT_MOST &&
+             out_size->width > width.size) {
+    out_size->width = width.size;
+  }
+  if (height.mode == CMP_MEASURE_EXACTLY) {
+    out_size->height = height.size;
+  } else if (height.mode == CMP_MEASURE_AT_MOST &&
+             out_size->height > height.size) {
+    out_size->height = height.size;
+  }
+
+  return CMP_OK;
+}
+
+static int m3_range_slider_widget_layout(void *widget, CMPRect bounds) {
+  M3RangeSlider *slider = (M3RangeSlider *)widget;
+  if (slider == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  slider->bounds = bounds;
+  return CMP_OK;
+}
+
+static int m3_range_slider_widget_paint(void *widget, CMPPaintContext *ctx) {
+  M3RangeSlider *slider = (M3RangeSlider *)widget;
+  CMPColor track_color, active_color, thumb_color;
+  CMPRect inactive_track, active_track;
+  CMPScalar range, fraction_start, fraction_end;
+  CMPScalar track_y;
+  int rc;
+
+  if (slider == NULL || ctx == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  if (ctx->gfx == NULL || ctx->gfx->vtable == NULL ||
+      ctx->gfx->vtable->draw_rect == NULL) {
+    return CMP_OK;
+  }
+
+  rc = m3_slider_validate_style(&slider->style);
+  if (rc != CMP_OK)
+    return rc;
+  rc = m3_slider_validate_range(slider->min_value, slider->max_value);
+  if (rc != CMP_OK)
+    return rc;
+
+  if (slider->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
+    track_color = slider->style.disabled_track_color;
+    active_color = slider->style.disabled_active_track_color;
+    thumb_color = slider->style.disabled_thumb_color;
+  } else {
+    track_color = slider->style.track_color;
+    active_color = slider->style.active_track_color;
+    thumb_color = slider->style.thumb_color;
+  }
+
+  range = slider->max_value - slider->min_value;
+  fraction_start = (slider->start_value - slider->min_value) / range;
+  fraction_end = (slider->end_value - slider->min_value) / range;
+
+  track_y = slider->bounds.y +
+            (slider->bounds.height - slider->style.track_height) * 0.5f;
+
+  inactive_track.x = slider->bounds.x + slider->style.thumb_radius;
+  inactive_track.y = track_y;
+  inactive_track.width =
+      slider->bounds.width - slider->style.thumb_radius * 2.0f;
+  inactive_track.height = slider->style.track_height;
+
+  ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &inactive_track, track_color,
+                              slider->style.track_corner_radius);
+
+  active_track.x = inactive_track.x + inactive_track.width * fraction_start;
+  active_track.y = track_y;
+  active_track.width = inactive_track.width * (fraction_end - fraction_start);
+  active_track.height = slider->style.track_height;
+
+  ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &active_track, active_color,
+                              slider->style.track_corner_radius);
+
+  {
+    CMPRect thumb_rect;
+    thumb_rect.width = slider->style.thumb_radius * 2.0f;
+    thumb_rect.height = slider->style.thumb_radius * 2.0f;
+
+    thumb_rect.x = active_track.x - slider->style.thumb_radius;
+    thumb_rect.y =
+        slider->bounds.y + (slider->bounds.height - thumb_rect.height) * 0.5f;
+    ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &thumb_rect, thumb_color,
+                                slider->style.thumb_radius);
+
+    thumb_rect.x =
+        active_track.x + active_track.width - slider->style.thumb_radius;
+    ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &thumb_rect, thumb_color,
+                                slider->style.thumb_radius);
+  }
+
+  return CMP_OK;
+}
+
+static int m3_range_slider_widget_event(void *widget,
+                                        const CMPInputEvent *event,
+                                        CMPBool *out_handled) {
+  M3RangeSlider *slider = (M3RangeSlider *)widget;
+  CMPScalar range, fraction, new_val;
+  CMPScalar track_w, dx;
+
+  if (slider == NULL || event == NULL || out_handled == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  *out_handled = CMP_FALSE;
+
+  if (slider->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
+    return CMP_OK;
+  }
+
+  range = slider->max_value - slider->min_value;
+  if (range <= 0.0f)
+    return CMP_OK;
+
+  track_w = slider->bounds.width - slider->style.thumb_radius * 2.0f;
+  if (track_w <= 0.0f)
+    return CMP_OK;
+
+  if (event->type == CMP_INPUT_POINTER_DOWN) {
+    if ((CMPScalar)event->data.pointer.x >= slider->bounds.x &&
+        (CMPScalar)event->data.pointer.x <=
+            slider->bounds.x + slider->bounds.width &&
+        event->data.pointer.y >= slider->bounds.y &&
+        event->data.pointer.y <= slider->bounds.y + slider->bounds.height) {
+
+      *out_handled = CMP_TRUE;
+      dx = (CMPScalar)event->data.pointer.x -
+           (slider->bounds.x + slider->style.thumb_radius);
+      fraction = dx / track_w;
+      if (fraction < 0.0f)
+        fraction = 0.0f;
+      if (fraction > 1.0f)
+        fraction = 1.0f;
+
+      m3_slider_snap_value(slider->min_value + fraction * range,
+                           slider->min_value, slider->max_value, slider->step,
+                           &new_val);
+
+      {
+        CMPScalar d_start = new_val - slider->start_value;
+        CMPScalar d_end;
+        if (d_start < 0.0f)
+          d_start = -d_start;
+        d_end = new_val - slider->end_value;
+        if (d_end < 0.0f)
+          d_end = -d_end;
+
+        if (d_start <= d_end) {
+          slider->is_dragging_start = CMP_TRUE;
+          slider->start_value = new_val;
+        } else {
+          slider->is_dragging_end = CMP_TRUE;
+          slider->end_value = new_val;
+        }
+      }
+
+      if (slider->on_change) {
+        slider->on_change(slider->on_change_ctx, slider, slider->start_value,
+                          slider->end_value);
+      }
+    }
+  } else if (event->type == CMP_INPUT_POINTER_MOVE) {
+    if (slider->is_dragging_start || slider->is_dragging_end) {
+      *out_handled = CMP_TRUE;
+      dx = (CMPScalar)event->data.pointer.x -
+           (slider->bounds.x + slider->style.thumb_radius);
+      fraction = dx / track_w;
+      if (fraction < 0.0f)
+        fraction = 0.0f;
+      if (fraction > 1.0f)
+        fraction = 1.0f;
+
+      m3_slider_snap_value(slider->min_value + fraction * range,
+                           slider->min_value, slider->max_value, slider->step,
+                           &new_val);
+
+      if (slider->is_dragging_start) {
+        slider->start_value = new_val;
+        if (slider->start_value > slider->end_value) {
+          slider->start_value = slider->end_value;
+        }
+      } else {
+        slider->end_value = new_val;
+        if (slider->end_value < slider->start_value) {
+          slider->end_value = slider->start_value;
+        }
+      }
+
+      if (slider->on_change) {
+        slider->on_change(slider->on_change_ctx, slider, slider->start_value,
+                          slider->end_value);
+      }
+    }
+  } else if (event->type == CMP_INPUT_POINTER_UP) {
+    if (slider->is_dragging_start || slider->is_dragging_end) {
+      slider->is_dragging_start = CMP_FALSE;
+      slider->is_dragging_end = CMP_FALSE;
+      *out_handled = CMP_TRUE;
+    }
+  }
+
+  return CMP_OK;
+}
+
+static int m3_range_slider_widget_get_semantics(void *widget,
+                                                CMPSemantics *out_semantics) {
+  M3RangeSlider *slider = (M3RangeSlider *)widget;
+  if (slider == NULL || out_semantics == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  memset(out_semantics, 0, sizeof(*out_semantics));
+  out_semantics->role = CMP_SEMANTIC_SLIDER;
+  out_semantics->flags = 0;
+  if (slider->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
+    out_semantics->flags |= CMP_SEMANTIC_FLAG_DISABLED;
+  }
+  if (slider->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) {
+    out_semantics->flags |= CMP_SEMANTIC_FLAG_FOCUSABLE;
+  }
+  out_semantics->utf8_label = slider->utf8_label;
+  out_semantics->utf8_hint = "Range Slider";
+  out_semantics->utf8_value = NULL;
+  out_semantics->range_min = slider->min_value;
+  out_semantics->range_max = slider->max_value;
+  out_semantics->range_value =
+      slider->start_value; /* or end, start is fine for range representation */
+  return CMP_OK;
+}
+
+static int m3_range_slider_widget_destroy(void *widget) {
+  M3RangeSlider *slider = (M3RangeSlider *)widget;
+  if (slider == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  return CMP_OK;
+}
+
+static const CMPWidgetVTable g_m3_range_slider_widget_vtable = {
+    m3_range_slider_widget_measure,       m3_range_slider_widget_layout,
+    m3_range_slider_widget_paint,         m3_range_slider_widget_event,
+    m3_range_slider_widget_get_semantics, m3_range_slider_widget_destroy};
+
+CMP_API int CMP_CALL m3_range_slider_init(
+    M3RangeSlider *slider, const M3SliderStyle *style, CMPScalar min_value,
+    CMPScalar max_value, CMPScalar start_value, CMPScalar end_value) {
+  int rc;
+
+  if (slider == NULL || style == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  rc = m3_slider_validate_style(style);
+  if (rc != CMP_OK)
+    return rc;
+  rc = m3_slider_validate_range(min_value, max_value);
+  if (rc != CMP_OK)
+    return rc;
+  if (start_value < min_value || start_value > max_value)
+    return CMP_ERR_RANGE;
+  if (end_value < min_value || end_value > max_value)
+    return CMP_ERR_RANGE;
+  if (start_value > end_value)
+    return CMP_ERR_RANGE;
+
+  memset(slider, 0, sizeof(*slider));
+  slider->widget.vtable = &g_m3_range_slider_widget_vtable;
+  slider->widget.flags = CMP_WIDGET_FLAG_FOCUSABLE;
+  slider->style = *style;
+  slider->min_value = min_value;
+  slider->max_value = max_value;
+  slider->start_value = start_value;
+  slider->end_value = end_value;
+  slider->step = M3_SLIDER_DEFAULT_STEP;
+
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_range_slider_set_values(M3RangeSlider *slider,
+                                                CMPScalar start_value,
+                                                CMPScalar end_value) {
+  int rc;
+
+  if (slider == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  rc = m3_slider_validate_range(slider->min_value, slider->max_value);
+  if (rc != CMP_OK)
+    return rc;
+
+  if (start_value < slider->min_value || start_value > slider->max_value)
+    return CMP_ERR_RANGE;
+  if (end_value < slider->min_value || end_value > slider->max_value)
+    return CMP_ERR_RANGE;
+
+  if (start_value > end_value) {
+    CMPScalar temp = start_value;
+    start_value = end_value;
+    end_value = temp;
+  }
+
+  m3_slider_snap_value(start_value, slider->min_value, slider->max_value,
+                       slider->step, &slider->start_value);
+  m3_slider_snap_value(end_value, slider->min_value, slider->max_value,
+                       slider->step, &slider->end_value);
+
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_range_slider_get_values(const M3RangeSlider *slider,
+                                                CMPScalar *out_start_value,
+                                                CMPScalar *out_end_value) {
+  if (slider == NULL || out_start_value == NULL || out_end_value == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  *out_start_value = slider->start_value;
+  *out_end_value = slider->end_value;
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_range_slider_set_range(M3RangeSlider *slider,
+                                               CMPScalar min_value,
+                                               CMPScalar max_value) {
+  int rc;
+
+  if (slider == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  rc = m3_slider_validate_range(min_value, max_value);
+  if (rc != CMP_OK)
+    return rc;
+
+  slider->min_value = min_value;
+  slider->max_value = max_value;
+
+  m3_slider_snap_value(slider->start_value, slider->min_value,
+                       slider->max_value, slider->step, &slider->start_value);
+  m3_slider_snap_value(slider->end_value, slider->min_value, slider->max_value,
+                       slider->step, &slider->end_value);
+
+  if (slider->start_value > slider->end_value) {
+    slider->start_value = slider->end_value;
+  }
+
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_range_slider_set_step(M3RangeSlider *slider,
+                                              CMPScalar step) {
+  int rc;
+
+  if (slider == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  rc = m3_slider_validate_step(step);
+  if (rc != CMP_OK)
+    return rc;
+
+  slider->step = step;
+
+  m3_slider_snap_value(slider->start_value, slider->min_value,
+                       slider->max_value, slider->step, &slider->start_value);
+  m3_slider_snap_value(slider->end_value, slider->min_value, slider->max_value,
+                       slider->step, &slider->end_value);
+
+  if (slider->start_value > slider->end_value) {
+    slider->start_value = slider->end_value;
+  }
+
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_range_slider_set_style(M3RangeSlider *slider,
+                                               const M3SliderStyle *style) {
+  int rc;
+
+  if (slider == NULL || style == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  rc = m3_slider_validate_style(style);
+  if (rc != CMP_OK)
+    return rc;
+
+  slider->style = *style;
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_range_slider_set_label(M3RangeSlider *slider,
+                                               const char *utf8_label) {
+  if (slider == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  slider->utf8_label = utf8_label;
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_range_slider_set_on_change(
+    M3RangeSlider *slider, CMPRangeSliderOnChange on_change, void *ctx) {
+  if (slider == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
   slider->on_change = on_change;
   slider->on_change_ctx = ctx;
   return CMP_OK;

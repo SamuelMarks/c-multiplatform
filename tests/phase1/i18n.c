@@ -830,6 +830,61 @@ static int test_i18n_branch_sweep(TestAlloc *alloc_state,
   return 0;
 }
 
+static int test_i18n_plural(void) {
+  cmp_u32 category;
+
+  CMP_TEST_EXPECT(cmp_i18n_plural_category(NULL, 1, &category),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_i18n_plural_category("en", 1, NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
+
+  /* English */
+  CMP_TEST_OK(cmp_i18n_plural_category("en", 1, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_ONE);
+  CMP_TEST_OK(cmp_i18n_plural_category("en", 0, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_OTHER);
+  CMP_TEST_OK(cmp_i18n_plural_category("en", 2, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_OTHER);
+
+  /* French */
+  CMP_TEST_OK(cmp_i18n_plural_category("fr", 0, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_ONE);
+  CMP_TEST_OK(cmp_i18n_plural_category("fr", 1, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_ONE);
+  CMP_TEST_OK(cmp_i18n_plural_category("fr", 2, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_OTHER);
+
+  /* Russian */
+  CMP_TEST_OK(cmp_i18n_plural_category("ru", 1, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_ONE);
+  CMP_TEST_OK(cmp_i18n_plural_category("ru", 2, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_FEW);
+  CMP_TEST_OK(cmp_i18n_plural_category("ru", 5, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_MANY);
+  CMP_TEST_OK(cmp_i18n_plural_category("ru", 11, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_MANY);
+
+  /* Arabic */
+  CMP_TEST_OK(cmp_i18n_plural_category("ar", 0, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_ZERO);
+  CMP_TEST_OK(cmp_i18n_plural_category("ar", 1, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_ONE);
+  CMP_TEST_OK(cmp_i18n_plural_category("ar", 2, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_TWO);
+  CMP_TEST_OK(cmp_i18n_plural_category("ar", 3, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_FEW);
+  CMP_TEST_OK(cmp_i18n_plural_category("ar", 11, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_MANY);
+  CMP_TEST_OK(cmp_i18n_plural_category("ar", 100, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_OTHER);
+
+  /* Unknown (fallback) */
+  CMP_TEST_OK(cmp_i18n_plural_category("xx", 1, &category));
+  CMP_TEST_ASSERT(category == CMP_I18N_PLURAL_OTHER);
+
+  return 0;
+}
+
 int main(void) {
   CMPI18n i18n = {0};
   CMPI18n i18n_fail;
@@ -1794,11 +1849,13 @@ int main(void) {
   CMP_TEST_OK(cmp_i18n_shutdown(&i18n_fail));
 
   CMP_TEST_EXPECT(cmp_i18n_shutdown(&i18n_fail), CMP_ERR_STATE);
-
   if (test_i18n_coverage_hooks(&alloc_state, &test_allocator) != 0) {
     return 1;
   }
   if (test_i18n_branch_sweep(&alloc_state, &test_allocator) != 0) {
+    return 1;
+  }
+  if (test_i18n_plural() != 0) {
     return 1;
   }
 

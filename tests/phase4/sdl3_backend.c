@@ -186,8 +186,8 @@ int main(void) {
         CMPScalar height;
         CMPScalar baseline;
 
-        CMP_TEST_OK(gfx.text_vtable->measure_text(gfx.ctx, font, "", 0, &width,
-                                                  &height, &baseline));
+        CMP_TEST_OK(gfx.text_vtable->measure_text(gfx.ctx, font, "", 0, 0,
+                                                  &width, &height, &baseline));
         CMP_TEST_OK(gfx.text_vtable->destroy_font(gfx.ctx, font));
       } else {
         CMP_TEST_ASSERT(text_rc == CMP_ERR_NOT_FOUND ||

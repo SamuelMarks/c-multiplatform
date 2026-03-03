@@ -11,3 +11,21 @@ docs/generated/
 docs/doc_*.json
 docs/*.md
 !docs/pages/
+
+# Scripts and patches
+*.py
+*.pyc
+*.sh
+
+# Coverage artifacts
+*.gcda
+*.gcno
+test_motion
+test_motion-*
+
+# Temp files
+sed*
+patch_*
+
+!tools/update_coverage_badges.sh
+!tools/make_badge.sh

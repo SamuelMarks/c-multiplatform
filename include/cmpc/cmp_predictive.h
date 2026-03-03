@@ -194,6 +194,8 @@ CMP_API int CMP_CALL cmp_predictive_back_test_validate_handler(
     const CMPPredictiveBackHandler *handler);
 #endif
 
+CMP_API int CMP_CALL cmp_predictive_test_set_event_init_fail(CMPBool enable);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

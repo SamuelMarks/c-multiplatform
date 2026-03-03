@@ -1,5 +1,6 @@
 #include "m3/m3_color.h"
 #include "test_utils.h"
+#include <string.h>
 
 static int cmp_color_near_u8(cmp_u8 a, cmp_u8 b, cmp_u8 tol) {
   int diff;
@@ -12,7 +13,24 @@ static int cmp_color_near_u8(cmp_u8 a, cmp_u8 b, cmp_u8 tol) {
   return (diff <= (int)tol) ? 1 : 0;
 }
 
+#include "cmpc/cmp_api_ws.h"
+int CMP_CALL mock_get_system_color(void *ctx, cmp_u32 color_type,
+                                   CMPScalar *out_r, CMPScalar *out_g,
+                                   CMPScalar *out_b, CMPScalar *out_a) {
+  if (ctx != NULL)
+    return CMP_ERR_UNKNOWN;
+  if (color_type == CMP_SYSTEM_COLOR_ACCENT) {
+    *out_r = 1.5f;  /* Test clamping > 1 */
+    *out_g = -0.5f; /* Test clamping < 0 */
+    *out_b = 0.5f;
+    *out_a = 1.5f; /* Test clamping > 1 */
+    return CMP_OK;
+  }
+  return CMP_ERR_NOT_FOUND;
+}
+
 int main(void) {
+
   M3ColorHct hct = {0};
   M3ColorHct hct2 = {0};
   M3TonalPalette palette;
@@ -227,6 +245,22 @@ int main(void) {
   CMP_TEST_ASSERT(scheme_light.background != scheme_dark.background);
   CMP_TEST_ASSERT(scheme_light.error != scheme_dark.error);
 
+  /* Test M3SchemeVariant values */
+  CMP_TEST_EXPECT(m3_scheme_generate_variant(0xFF3366FFu, CMP_FALSE,
+                                             M3_SCHEME_VARIANT_TONAL_SPOT,
+                                             NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(m3_scheme_generate_variant(
+      0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_EXPRESSIVE, &scheme_light));
+  CMP_TEST_OK(m3_scheme_generate_variant(
+      0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_FIDELITY, &scheme_light));
+  CMP_TEST_OK(m3_scheme_generate_variant(
+      0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_CONTENT, &scheme_light));
+  CMP_TEST_OK(m3_scheme_generate_variant(
+      0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_VIBRANT, &scheme_light));
+  CMP_TEST_OK(m3_scheme_generate_variant(
+      0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_NEUTRAL, &scheme_light));
+
   {
     cmp_u32 pixels[4] = {0xFF000000, 0xFFFFFFFF, 0xFFFF0000, 0xFF00FF00};
     cmp_u32 seed = 0;
@@ -242,13 +276,14 @@ int main(void) {
     /* It should pick one of the saturated ones, probably Red because it's first
      * high-chroma hit */
     CMP_TEST_EXPECT(seed == 0xFFFF0000 ? CMP_OK : CMP_ERR_UNKNOWN, CMP_OK);
-    }
+  }
 
-    {
+  {
     CMPScalar opacity;
     cmp_u32 blended;
 
-    CMP_TEST_EXPECT(m3_color_surface_tint_opacity(0, NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_color_surface_tint_opacity(0, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(m3_color_surface_tint_opacity(6, &opacity), CMP_ERR_RANGE);
 
     CMP_TEST_OK(m3_color_surface_tint_opacity(0, &opacity));
@@ -264,18 +299,52 @@ int main(void) {
     CMP_TEST_OK(m3_color_surface_tint_opacity(5, &opacity));
     CMP_TEST_ASSERT(opacity == 0.14f);
 
-    CMP_TEST_EXPECT(m3_color_blend_surface_tint(0, 0, 0.0f, NULL), CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(m3_color_blend_surface_tint(0, 0, -0.1f, &blended), CMP_ERR_RANGE);
-    CMP_TEST_EXPECT(m3_color_blend_surface_tint(0, 0, 1.1f, &blended), CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(m3_color_blend_surface_tint(0, 0, 0.0f, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_color_blend_surface_tint(0, 0, -0.1f, &blended),
+                    CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(m3_color_blend_surface_tint(0, 0, 1.1f, &blended),
+                    CMP_ERR_RANGE);
 
-    CMP_TEST_OK(m3_color_blend_surface_tint(0xFF000000u, 0xFFFFFFFFu, 0.0f, &blended));
+    CMP_TEST_OK(
+        m3_color_blend_surface_tint(0xFF000000u, 0xFFFFFFFFu, 0.0f, &blended));
     CMP_TEST_ASSERT(blended == 0xFF000000u);
-    CMP_TEST_OK(m3_color_blend_surface_tint(0xFF000000u, 0xFFFFFFFFu, 1.0f, &blended));
+    CMP_TEST_OK(
+        m3_color_blend_surface_tint(0xFF000000u, 0xFFFFFFFFu, 1.0f, &blended));
     CMP_TEST_ASSERT(blended == 0xFFFFFFFFu);
-    CMP_TEST_OK(m3_color_blend_surface_tint(0xFF000000u, 0xFFFFFFFFu, 0.5f, &blended));
+    CMP_TEST_OK(
+        m3_color_blend_surface_tint(0xFF000000u, 0xFFFFFFFFu, 0.5f, &blended));
     /* Halfway between 0 and 255 is 127 */
     CMP_TEST_ASSERT(blended == 0xFF7F7F7Fu);
-    }
+  }
 
-    return 0;
+  {
+    M3Scheme scheme;
+    CMPWSVTable vtable;
+    CMPWS ws;
+
+    extern int CMP_CALL mock_get_system_color(
+        void *ctx, cmp_u32 color_type, CMPScalar *out_r, CMPScalar *out_g,
+        CMPScalar *out_b, CMPScalar *out_a);
+
+    memset(&vtable, 0, sizeof(vtable));
+    memset(&ws, 0, sizeof(ws));
+    vtable.get_system_color = mock_get_system_color;
+    ws.vtable = &vtable;
+
+    CMP_TEST_EXPECT(m3_scheme_generate_system(NULL, CMP_FALSE, &scheme),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_scheme_generate_system(&ws, CMP_FALSE, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    /* Fail */
+    ws.ctx = (void *)1;
+    CMP_TEST_EXPECT(m3_scheme_generate_system(&ws, CMP_FALSE, &scheme),
+                    CMP_ERR_UNKNOWN);
+
+    /* Success */
+    ws.ctx = NULL;
+    CMP_TEST_OK(m3_scheme_generate_system(&ws, CMP_FALSE, &scheme));
+  }
+  return 0;
 }

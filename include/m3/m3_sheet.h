@@ -353,6 +353,33 @@ CMP_API int CMP_CALL m3_side_sheet_get_bounds(const M3SideSheet *sheet,
 CMP_API int CMP_CALL m3_side_sheet_get_content_bounds(const M3SideSheet *sheet,
                                                       CMPRect *out_bounds);
 
+CMP_API int CMP_CALL m3_sheet_test_set_fail_point(cmp_u32 fail_point);
+
+CMP_API int CMP_CALL m3_sheet_test_set_color_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_sheet_test_clear_fail_points(void);
+
+CMP_API int CMP_CALL m3_sheet_test_validate_color(const CMPColor *color);
+
+CMP_API int CMP_CALL m3_sheet_test_color_set(CMPColor *color, CMPScalar r,
+                                             CMPScalar g, CMPScalar b,
+                                             CMPScalar a);
+
+CMP_API int CMP_CALL m3_sheet_test_validate_edges(const CMPLayoutEdges *edges);
+
+CMP_API int CMP_CALL m3_sheet_test_validate_measure_spec(CMPMeasureSpec spec);
+
+CMP_API int CMP_CALL m3_sheet_test_validate_rect(const CMPRect *rect);
+
+CMP_API int CMP_CALL m3_sheet_test_validate_style(const M3SheetStyle *style);
+
+CMP_API int CMP_CALL m3_sheet_test_apply_offset(
+    M3Sheet *sheet, CMPScalar offset, CMPBool reset_velocity,
+    CMPBool *out_changed); /* GCOVR_EXCL_LINE */
+
+CMP_API int CMP_CALL m3_sheet_test_compute_scrim_alpha(const M3Sheet *sheet,
+                                                       CMPScalar *out_alpha);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

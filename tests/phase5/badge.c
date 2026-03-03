@@ -12,8 +12,9 @@ static int mock_create_font(void *text, const char *utf8_family,
 }
 static int mock_destroy_font(void *text, CMPHandle font) { return CMP_OK; }
 static int mock_measure_text(void *text, CMPHandle font, const char *utf8,
-                             cmp_usize utf8_len, CMPScalar *out_width,
-                             CMPScalar *out_height, CMPScalar *out_baseline) {
+                             cmp_usize utf8_len, cmp_u32 base_direction,
+                             CMPScalar *out_width, CMPScalar *out_height,
+                             CMPScalar *out_baseline) {
   if (out_width)
     *out_width = 10.0f;
   if (out_height)
@@ -23,8 +24,8 @@ static int mock_measure_text(void *text, CMPHandle font, const char *utf8,
   return CMP_OK;
 }
 static int mock_draw_text(void *text, CMPHandle font, const char *utf8,
-                          cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                          CMPColor color) {
+                          cmp_usize utf8_len, cmp_u32 base_direction,
+                          CMPScalar x, CMPScalar y, CMPColor color) {
   return CMP_OK;
 }
 static const CMPTextVTable mock_text_vtable = {

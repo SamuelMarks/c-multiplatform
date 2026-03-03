@@ -397,6 +397,195 @@ CMP_API int CMP_CALL m3_segmented_buttons_get_selected_state(
 CMP_API int CMP_CALL m3_segmented_buttons_set_on_select(
     M3SegmentedButtons *buttons, CMPSegmentedOnSelect on_select, void *ctx);
 
+CMP_API int CMP_CALL m3_tab_row_test_set_fail_point(cmp_u32 point);
+
+CMP_API int CMP_CALL m3_tab_row_test_set_color_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_tab_row_test_clear_fail_points(void);
+
+CMP_API int CMP_CALL m3_segmented_test_set_fail_point(cmp_u32 point);
+
+CMP_API int CMP_CALL m3_segmented_test_set_color_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_segmented_test_clear_fail_points(void);
+
+CMP_API int CMP_CALL m3_tab_row_test_validate_color(const CMPColor *color);
+
+CMP_API int CMP_CALL m3_tab_row_test_color_set(CMPColor *color, CMPScalar r,
+                                               CMPScalar g, CMPScalar b,
+                                               CMPScalar a);
+
+CMP_API int CMP_CALL m3_tab_row_test_color_with_alpha(const CMPColor *base,
+                                                      CMPScalar alpha,
+                                                      CMPColor *out_color);
+
+CMP_API int CMP_CALL
+m3_tab_row_test_validate_edges(const CMPLayoutEdges *edges);
+
+CMP_API int CMP_CALL m3_tab_row_test_validate_text_style(
+    const CMPTextStyle *style, CMPBool require_family);
+
+CMP_API int CMP_CALL m3_tab_row_test_validate_style(const M3TabRowStyle *style,
+                                                    CMPBool require_family);
+
+CMP_API int CMP_CALL m3_tab_row_test_validate_items(const M3TabItem *items,
+                                                    cmp_usize count);
+
+CMP_API int CMP_CALL m3_tab_row_test_validate_measure_spec(CMPMeasureSpec spec);
+
+CMP_API int CMP_CALL m3_tab_row_test_validate_rect(const CMPRect *rect);
+
+CMP_API int CMP_CALL
+m3_tab_row_test_validate_backend(const CMPTextBackend *backend);
+
+CMP_API int CMP_CALL m3_tab_row_test_measure_content(const M3TabRow *row,
+                                                     cmp_u32 mode,
+                                                     CMPScalar *out_width,
+                                                     CMPScalar *out_height);
+
+CMP_API int CMP_CALL m3_tab_row_test_color_should_fail_null(void);
+
+CMP_API int CMP_CALL m3_tab_row_test_fail_point_match_null(void);
+
+CMP_API int CMP_CALL m3_tab_row_test_force_color_error(CMPBool enable);
+
+CMP_API int CMP_CALL
+m3_tab_row_test_set_fail_point_error_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_tab_row_test_set_value_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_tab_row_test_set_start_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_tab_row_test_measure_max_text(const M3TabRow *row,
+                                                      CMPScalar *out_width,
+                                                      CMPScalar *out_height,
+                                                      CMPScalar *out_baseline);
+
+CMP_API int CMP_CALL m3_tab_row_test_item_width(const M3TabRow *row,
+                                                const M3TabItem *item,
+                                                CMPScalar *out_width);
+
+CMP_API int CMP_CALL m3_tab_row_test_compute_layout(
+    const M3TabRow *row, CMPScalar *out_content_width, CMPScalar *out_tab_width,
+    CMPScalar *out_tab_height, cmp_u32 *out_mode);
+
+CMP_API int CMP_CALL
+m3_tab_row_test_compute_layout_null_out(const M3TabRow *row);
+
+CMP_API int CMP_CALL m3_tab_row_test_clamp_scroll(M3TabRow *row, cmp_u32 mode,
+                                                  CMPScalar content_width,
+                                                  CMPScalar available_width);
+
+CMP_API int CMP_CALL m3_tab_row_test_clamp_scroll_null_layout(M3TabRow *row);
+
+CMP_API int CMP_CALL m3_tab_row_test_indicator_target_null_layout(
+    const M3TabRow *row, CMPScalar *out_pos, CMPScalar *out_width);
+
+CMP_API int CMP_CALL
+m3_tab_row_test_sync_indicator_null_layout(M3TabRow *row, CMPBool animate);
+
+CMP_API int CMP_CALL m3_tab_row_test_item_rect_null_layout(const M3TabRow *row,
+                                                           cmp_usize index,
+                                                           CMPRect *out_rect);
+
+CMP_API int CMP_CALL m3_tab_row_test_hit_test_null_layout(const M3TabRow *row,
+                                                          cmp_i32 x, cmp_i32 y,
+                                                          cmp_usize *out_index);
+
+CMP_API int CMP_CALL m3_segmented_test_validate_color(const CMPColor *color);
+
+CMP_API int CMP_CALL m3_segmented_test_color_set(CMPColor *color, CMPScalar r,
+                                                 CMPScalar g, CMPScalar b,
+                                                 CMPScalar a);
+
+CMP_API int CMP_CALL m3_segmented_test_color_with_alpha(const CMPColor *base,
+                                                        CMPScalar alpha,
+                                                        CMPColor *out_color);
+
+CMP_API int CMP_CALL
+m3_segmented_test_validate_edges(const CMPLayoutEdges *edges);
+
+CMP_API int CMP_CALL m3_segmented_test_validate_text_style(
+    const CMPTextStyle *style, CMPBool require_family);
+
+CMP_API int CMP_CALL m3_segmented_test_validate_style(
+    const M3SegmentedStyle *style, CMPBool require_family);
+
+CMP_API int CMP_CALL
+m3_segmented_test_validate_items(const M3SegmentedItem *items, cmp_usize count);
+
+CMP_API int CMP_CALL
+m3_segmented_test_validate_measure_spec(CMPMeasureSpec spec);
+
+CMP_API int CMP_CALL m3_segmented_test_validate_rect(const CMPRect *rect);
+
+CMP_API int CMP_CALL
+m3_segmented_test_validate_backend(const CMPTextBackend *backend);
+
+CMP_API int CMP_CALL m3_segmented_test_validate_mode(cmp_u32 mode);
+
+CMP_API int CMP_CALL m3_segmented_test_validate_selected_states(
+    const CMPBool *states, cmp_usize count);
+
+CMP_API int CMP_CALL
+m3_segmented_test_measure_content(const M3SegmentedButtons *buttons,
+                                  CMPScalar *out_width, CMPScalar *out_height);
+
+CMP_API int CMP_CALL m3_segmented_test_color_should_fail_null(void);
+
+CMP_API int CMP_CALL m3_segmented_test_fail_point_match_null(void);
+
+CMP_API int CMP_CALL m3_segmented_test_force_color_error(CMPBool enable);
+
+CMP_API int CMP_CALL
+m3_segmented_test_set_fail_point_error_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_segmented_test_measure_max_text(
+    const M3SegmentedButtons *buttons, CMPScalar *out_width,
+    CMPScalar *out_height, CMPScalar *out_baseline);
+
+CMP_API int CMP_CALL m3_segmented_test_compute_layout(
+    const M3SegmentedButtons *buttons, CMPScalar *out_content_width,
+    CMPScalar *out_segment_width, CMPScalar *out_segment_height,
+    CMPScalar *out_spacing);
+
+CMP_API int CMP_CALL
+m3_segmented_test_compute_layout_null_out(const M3SegmentedButtons *buttons);
+
+CMP_API int CMP_CALL m3_segmented_test_hit_test(
+    const M3SegmentedButtons *buttons, CMPScalar start_x, CMPScalar start_y,
+    CMPScalar segment_width, CMPScalar segment_height, CMPScalar spacing,
+    CMPScalar content_width, cmp_i32 x, cmp_i32 y, cmp_usize *out_index);
+
+CMP_API int CMP_CALL m3_segmented_test_hit_test_null_layout(
+    const M3SegmentedButtons *buttons, cmp_i32 x, cmp_i32 y,
+    cmp_usize *out_index);
+
+CMP_API int CMP_CALL m3_segmented_test_is_selected(
+    const M3SegmentedButtons *buttons, cmp_usize index, CMPBool *out_selected);
+
+CMP_API int CMP_CALL m3_tab_row_test_indicator_target(
+    const M3TabRow *row, cmp_u32 mode, CMPScalar tab_width, CMPScalar spacing,
+    CMPScalar content_width, CMPScalar start_x, CMPScalar start_y,
+    CMPScalar tab_height, CMPScalar *out_pos, CMPScalar *out_width);
+
+CMP_API int CMP_CALL m3_tab_row_test_sync_indicator(
+    M3TabRow *row, cmp_u32 mode, CMPScalar tab_width, CMPScalar spacing,
+    CMPScalar content_width, CMPScalar start_x, CMPScalar start_y,
+    CMPScalar tab_height, CMPBool animate);
+
+CMP_API int CMP_CALL m3_tab_row_test_item_rect(
+    const M3TabRow *row, cmp_u32 mode, CMPScalar start_x, CMPScalar start_y,
+    CMPScalar tab_width, CMPScalar tab_height, CMPScalar spacing,
+    CMPScalar content_width, CMPScalar available_width, cmp_usize index,
+    CMPRect *out_rect);
+
+CMP_API int CMP_CALL m3_tab_row_test_hit_test(
+    const M3TabRow *row, cmp_u32 mode, CMPScalar start_x, CMPScalar start_y,
+    CMPScalar tab_width, CMPScalar tab_height, CMPScalar spacing,
+    CMPScalar content_width, CMPScalar available_width, cmp_i32 x, cmp_i32 y,
+    cmp_usize *out_index);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

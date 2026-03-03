@@ -942,6 +942,7 @@ static int m3_sheet_widget_get_semantics(
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   sheet = (M3Sheet *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;

@@ -160,7 +160,8 @@ static int m3_badge_measure(void *widget, CMPMeasureSpec width,
         (badge->font.id != 0 || badge->font.generation != 0)) {
       CMPTextMetrics temp_metrics = {0};
       cmp_text_measure_utf8(&badge->text_backend, badge->font,
-                            badge->utf8_label, badge->utf8_len, &temp_metrics);
+                            badge->utf8_label, badge->utf8_len, 0,
+                            &temp_metrics);
       text_size.width = temp_metrics.width;
       text_size.height = temp_metrics.height;
     }
@@ -221,7 +222,8 @@ static int m3_badge_paint(void *widget, CMPPaintContext *ctx) {
       CMPScalar text_x, text_y;
 
       cmp_text_measure_utf8(&badge->text_backend, badge->font,
-                            badge->utf8_label, badge->utf8_len, &text_metrics);
+                            badge->utf8_label, badge->utf8_len, 0,
+                            &text_metrics);
 
       text_x =
           badge->bounds.x + (badge->bounds.width - text_metrics.width) * 0.5f;
@@ -230,7 +232,7 @@ static int m3_badge_paint(void *widget, CMPPaintContext *ctx) {
                badge->metrics.baseline;
 
       ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, badge->font,
-                                       badge->utf8_label, badge->utf8_len,
+                                       badge->utf8_label, badge->utf8_len, 0,
                                        text_x, text_y, badge->style.text_color);
     }
   }
@@ -252,6 +254,7 @@ static int m3_badge_get_semantics(void *widget, CMPSemantics *out_semantics) {
   if (badge == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
   out_semantics->role = CMP_SEMANTIC_TEXT;
   out_semantics->flags = 0;
   out_semantics->utf8_label = badge->utf8_label;

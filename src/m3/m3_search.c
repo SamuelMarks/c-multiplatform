@@ -257,6 +257,7 @@ static int m3_search_bar_get_semantics(void *widget,
   if (bar == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
   return bar->field.widget.vtable->get_semantics(&bar->field, out_semantics);
 }
 

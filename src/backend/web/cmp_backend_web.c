@@ -3132,22 +3132,45 @@ static int cmp_web_ws_get_time_ms(void *ws, cmp_u32 *out_time_ms) {
   return cmp_web_backend_time_now_ms(out_time_ms);
 }
 
-static const CMPWSVTable g_cmp_web_ws_vtable = {cmp_web_ws_init,
-                                                cmp_web_ws_shutdown,
-                                                cmp_web_ws_create_window,
-                                                cmp_web_ws_destroy_window,
-                                                cmp_web_ws_show_window,
-                                                cmp_web_ws_hide_window,
-                                                cmp_web_ws_set_window_title,
-                                                cmp_web_ws_set_window_size,
-                                                cmp_web_ws_get_window_size,
-                                                cmp_web_ws_set_window_dpi_scale,
-                                                cmp_web_ws_get_window_dpi_scale,
-                                                cmp_web_ws_set_clipboard_text,
-                                                cmp_web_ws_get_clipboard_text,
-                                                cmp_web_ws_poll_event,
-                                                cmp_web_ws_pump_events,
-                                                cmp_web_ws_get_time_ms};
+static int cmp_backend_ws_get_system_color(void *ws, cmp_u32 color_type,
+                                           CMPScalar *out_r, CMPScalar *out_g,
+                                           CMPScalar *out_b, CMPScalar *out_a) {
+  (void)color_type;
+  if (ws == NULL || out_r == NULL || out_g == NULL || out_b == NULL ||
+      out_a == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  return CMP_ERR_UNSUPPORTED;
+}
+
+static int cmp_backend_ws_update_a11y_tree(void *ws,
+                                           const void *root_a11y_node) {
+  (void)root_a11y_node;
+  if (ws == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  return CMP_ERR_UNSUPPORTED;
+}
+
+static const CMPWSVTable g_cmp_web_ws_vtable = {
+    cmp_web_ws_init,
+    cmp_web_ws_shutdown,
+    cmp_web_ws_create_window,
+    cmp_web_ws_destroy_window,
+    cmp_web_ws_show_window,
+    cmp_web_ws_hide_window,
+    cmp_web_ws_set_window_title,
+    cmp_web_ws_set_window_size,
+    cmp_web_ws_get_window_size,
+    cmp_web_ws_set_window_dpi_scale,
+    cmp_web_ws_get_window_dpi_scale,
+    cmp_web_ws_set_clipboard_text,
+    cmp_web_ws_get_clipboard_text,
+    cmp_web_ws_poll_event,
+    cmp_web_ws_pump_events,
+    cmp_web_ws_get_time_ms,
+    cmp_backend_ws_get_system_color,
+    cmp_backend_ws_update_a11y_tree};
 
 static int cmp_web_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
                                    cmp_i32 height, CMPScalar dpi_scale) {
@@ -4318,6 +4341,7 @@ static int cmp_web_text_destroy_font(void *text, CMPHandle font) {
 
 static int cmp_web_text_measure_text(void *text, CMPHandle font,
                                      const char *utf8, cmp_usize utf8_len,
+                                     cmp_u32 base_direction,
                                      CMPScalar *out_width,
                                      CMPScalar *out_height,
                                      CMPScalar *out_baseline) {
@@ -4326,6 +4350,7 @@ static int cmp_web_text_measure_text(void *text, CMPHandle font,
   CMPScalar size;
   int rc;
 
+  (void)base_direction;
   if (text == NULL || out_width == NULL || out_height == NULL ||
       out_baseline == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -4350,8 +4375,8 @@ static int cmp_web_text_measure_text(void *text, CMPHandle font,
 }
 
 static int cmp_web_text_draw_text(void *text, CMPHandle font, const char *utf8,
-                                  cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                                  CMPColor color) {
+                                  cmp_usize utf8_len, cmp_u32 base_direction,
+                                  CMPScalar x, CMPScalar y, CMPColor color) {
   struct CMPWebBackend *backend;
   int rc;
 
@@ -4359,6 +4384,7 @@ static int cmp_web_text_draw_text(void *text, CMPHandle font, const char *utf8,
   CMP_UNUSED(y);
   CMP_UNUSED(color);
 
+  (void)base_direction;
   if (text == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -4376,9 +4402,13 @@ static int cmp_web_text_draw_text(void *text, CMPHandle font, const char *utf8,
   return CMP_OK;
 }
 
-static const CMPTextVTable g_cmp_web_text_vtable = {
-    cmp_web_text_create_font, cmp_web_text_destroy_font,
-    cmp_web_text_measure_text, cmp_web_text_draw_text};
+static const CMPTextVTable g_cmp_web_text_vtable = {cmp_web_text_create_font,
+                                                    cmp_web_text_destroy_font,
+                                                    cmp_web_text_measure_text,
+                                                    cmp_web_text_draw_text,
+                                                    NULL,
+                                                    NULL,
+                                                    NULL};
 
 static int cmp_web_io_read_file(void *io, const char *utf8_path, void *buffer,
                                 cmp_usize buffer_size, cmp_usize *out_read) {

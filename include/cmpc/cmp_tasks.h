@@ -253,10 +253,10 @@ CMP_API int CMP_CALL cmp_tasks_test_sleep_case(cmp_u32 mode);
  */
 CMP_API int CMP_CALL cmp_tasks_test_destroy_state(void);
 /**
- * @brief Exercise test-only stubs for coverage.
+ * @brief Exercise test-only logic for coverage.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_tasks_test_stub_exercise(void);
+CMP_API int CMP_CALL cmp_tasks_test_logic_exercise(void);
 /**
  * @brief Test wrapper for signal-stop thread entry null handling.
  * @return CMP_OK on success or a failure code.

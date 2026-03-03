@@ -121,6 +121,18 @@ CMP_API int CMP_CALL m3_tonal_palette_tone_argb(const M3TonalPalette *palette,
                                                 cmp_u32 *out_argb);
 
 /**
+ * @brief Dynamic color scheme variants (Material Design 3).
+ */
+typedef enum M3SchemeVariant {
+  M3_SCHEME_VARIANT_TONAL_SPOT = 0, /**< Default: Tonal Spot. */
+  M3_SCHEME_VARIANT_EXPRESSIVE, /**< Expressive: Shifted hues, high chroma. */
+  M3_SCHEME_VARIANT_FIDELITY,   /**< Fidelity: Matches source color exactly. */
+  M3_SCHEME_VARIANT_CONTENT,    /**< Content: Designed for image extraction. */
+  M3_SCHEME_VARIANT_VIBRANT,    /**< Vibrant: Maximum chroma scheme. */
+  M3_SCHEME_VARIANT_NEUTRAL     /**< Neutral: Low chroma throughout. */
+} M3SchemeVariant;
+
+/**
  * @brief Generate a dynamic color scheme from a source color.
  * @param source_argb Source color in ARGB.
  * @param dark CMP_TRUE for dark scheme; CMP_FALSE for light scheme.
@@ -131,11 +143,36 @@ CMP_API int CMP_CALL m3_scheme_generate(cmp_u32 source_argb, CMPBool dark,
                                         M3Scheme *out_scheme);
 
 /**
+ * @brief Generate a specific variant of dynamic color scheme.
+ * @param source_argb Source color in ARGB.
+ * @param dark CMP_TRUE for dark scheme; CMP_FALSE for light scheme.
+ * @param variant The scheme variant to generate.
+ * @param out_scheme Receives the generated scheme.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_scheme_generate_variant(cmp_u32 source_argb,
+                                                CMPBool dark,
+                                                M3SchemeVariant variant,
+                                                M3Scheme *out_scheme);
+
+/**
  * @brief Get the surface tint opacity for a specific elevation level (0..5).
  * @param elevation_level Elevation level (0 to 5).
  * @param out_opacity Receives the alpha multiplier (0.0 to 1.0).
  * @return CMP_OK on success or a failure code.
  */
+struct CMPWS;
+
+/**
+ * @brief Generate a dynamic color scheme from the system accent color.
+ * @param ws Window system instance.
+ * @param dark CMP_TRUE for dark scheme; CMP_FALSE for light scheme.
+ * @param out_scheme Receives the generated scheme.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_scheme_generate_system(struct CMPWS *ws, CMPBool dark,
+                                               M3Scheme *out_scheme);
+
 CMP_API int CMP_CALL m3_color_surface_tint_opacity(cmp_u32 elevation_level,
                                                    CMPScalar *out_opacity);
 

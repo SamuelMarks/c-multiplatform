@@ -1198,6 +1198,74 @@ int CMP_CALL cmp_i18n_locale_init(CMPI18nLocale *locale) {
   return cmp_i18n_locale_preset_en_us(locale);
 }
 
+static CMPBool starts_with(const char *str, const char *prefix) {
+  while (*prefix) {
+    if (*prefix++ != *str++)
+      return CMP_FALSE;
+  }
+  return CMP_TRUE;
+}
+
+int CMP_CALL cmp_i18n_plural_category(const char *locale_tag, cmp_i32 number,
+                                      cmp_u32 *out_category) {
+  cmp_i32 n = number < 0 ? -number : number;
+
+  if (locale_tag == NULL || out_category == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  /* Default fallback to Other */
+  *out_category = CMP_I18N_PLURAL_OTHER;
+
+  /* English, German, Spanish, Arabic, French approximations based on CLDR */
+  if (starts_with(locale_tag, "en") || starts_with(locale_tag, "es") ||
+      starts_with(locale_tag, "de")) {
+    if (n == 1) {
+      *out_category = CMP_I18N_PLURAL_ONE;
+    } else {
+      *out_category = CMP_I18N_PLURAL_OTHER;
+    }
+  } else if (starts_with(locale_tag, "fr")) {
+    if (n == 0 || n == 1) {
+      *out_category = CMP_I18N_PLURAL_ONE;
+    } else {
+      *out_category = CMP_I18N_PLURAL_OTHER;
+    }
+  } else if (starts_with(locale_tag, "ru") || starts_with(locale_tag, "uk")) {
+    int mod10 = n % 10;
+    int mod100 = n % 100;
+    if (mod10 == 1 && mod100 != 11) {
+      *out_category = CMP_I18N_PLURAL_ONE;
+    } else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+      *out_category = CMP_I18N_PLURAL_FEW;
+    } else if (mod10 == 0 || (mod10 >= 5 && mod10 <= 9) ||
+               (mod100 >= 11 && mod100 <= 14)) {
+      *out_category = CMP_I18N_PLURAL_MANY;
+    } else {
+      *out_category = CMP_I18N_PLURAL_OTHER;
+    }
+  } else if (starts_with(locale_tag, "ar")) {
+    if (n == 0) {
+      *out_category = CMP_I18N_PLURAL_ZERO;
+    } else if (n == 1) {
+      *out_category = CMP_I18N_PLURAL_ONE;
+    } else if (n == 2) {
+      *out_category = CMP_I18N_PLURAL_TWO;
+    } else {
+      int mod100 = n % 100;
+      if (mod100 >= 3 && mod100 <= 10) {
+        *out_category = CMP_I18N_PLURAL_FEW;
+      } else if (mod100 >= 11 && mod100 <= 99) {
+        *out_category = CMP_I18N_PLURAL_MANY;
+      } else {
+        *out_category = CMP_I18N_PLURAL_OTHER;
+      }
+    }
+  }
+
+  return CMP_OK;
+}
+
 int CMP_CALL cmp_i18n_locale_from_tag(const char *locale_tag,
                                       CMPI18nLocale *out_locale) {
   CMPBool match;

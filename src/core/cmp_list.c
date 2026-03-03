@@ -949,6 +949,7 @@ static int cmp_list_widget_get_semantics(
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   view = (CMPListView *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;
@@ -1182,6 +1183,7 @@ cmp_grid_widget_get_semantics(void *widget, CMPSemantics *out_semantics) {
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   view = (CMPGridView *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;

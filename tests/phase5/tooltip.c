@@ -40,8 +40,8 @@ static int test_text_create_font(void *text, const char *utf8_family,
 static int test_text_destroy_font(void *text, CMPHandle font) { return CMP_OK; }
 
 static int test_text_measure_text(void *text, CMPHandle font, const char *utf8,
-                                  cmp_usize utf8_len, CMPScalar *out_width,
-                                  CMPScalar *out_height,
+                                  cmp_usize utf8_len, cmp_u32 base_direction,
+                                  CMPScalar *out_width, CMPScalar *out_height,
                                   CMPScalar *out_baseline) {
   if (out_width)
     *out_width = 10.0f;
@@ -53,17 +53,21 @@ static int test_text_measure_text(void *text, CMPHandle font, const char *utf8,
 }
 
 static int test_text_draw_text(void *text, CMPHandle font, const char *utf8,
-                               cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                               CMPColor color) {
+                               cmp_usize utf8_len, cmp_u32 base_direction,
+                               CMPScalar x, CMPScalar y, CMPColor color) {
   TestBackend *backend = (TestBackend *)text;
   if (backend)
     backend->draw_text_calls++;
   return CMP_OK;
 }
 
-static const CMPTextVTable g_test_text_vtable = {
-    test_text_create_font, test_text_destroy_font, test_text_measure_text,
-    test_text_draw_text};
+static const CMPTextVTable g_test_text_vtable = {test_text_create_font,
+                                                 test_text_destroy_font,
+                                                 test_text_measure_text,
+                                                 test_text_draw_text,
+                                                 NULL,
+                                                 NULL,
+                                                 NULL};
 
 static int test_tooltip(void) {
   CMPTooltipStyle plain_style;

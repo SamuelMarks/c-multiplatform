@@ -12,8 +12,10 @@ int CMP_CALL m3_window_size_class(CMPScalar width, cmp_u32 *out_class) {
     *out_class = M3_WINDOW_CLASS_COMPACT;
   } else if (width < 840.0f) {
     *out_class = M3_WINDOW_CLASS_MEDIUM;
-  } else {
+  } else if (width < 1200.0f) {
     *out_class = M3_WINDOW_CLASS_EXPANDED;
+  } else {
+    *out_class = M3_WINDOW_CLASS_EXTRA_LARGE;
   }
   return CMP_OK;
 }
@@ -70,7 +72,7 @@ int CMP_CALL m3_adaptive_list_detail_layout(const M3AdaptiveLayout *layout,
     out_secondary->y = bounds.y;
     out_secondary->height = bounds.height;
     out_secondary->width = avail_w - out_primary->width;
-  } else {
+  } else { /* EXPANDED or EXTRA_LARGE */
     spacing = 24.0f;
     primary_w = 360.0f;
     if (primary_w > bounds.width) {
@@ -89,6 +91,114 @@ int CMP_CALL m3_adaptive_list_detail_layout(const M3AdaptiveLayout *layout,
     if (out_secondary->width < 0.0f) {
       out_secondary->width = 0.0f;
     }
+  }
+
+  return CMP_OK;
+}
+
+int CMP_CALL m3_adaptive_feed_layout(const M3AdaptiveLayout *layout,
+                                     CMPRect bounds, CMPRect *out_primary,
+                                     CMPRect *out_secondary) {
+  CMPScalar margins, spacing;
+
+  if (layout == NULL || out_primary == NULL || out_secondary == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  if (bounds.width < 0.0f || bounds.height < 0.0f) {
+    return CMP_ERR_RANGE;
+  }
+
+  if (layout->window_class == M3_WINDOW_CLASS_COMPACT) {
+    *out_primary = bounds;
+    out_secondary->x = bounds.x;
+    out_secondary->y = bounds.y;
+    out_secondary->width = 0.0f;
+    out_secondary->height = 0.0f;
+  } else if (layout->window_class == M3_WINDOW_CLASS_MEDIUM) {
+    margins = 24.0f;
+    out_primary->x = bounds.x + margins;
+    out_primary->y = bounds.y;
+    out_primary->height = bounds.height;
+    out_primary->width = bounds.width - margins * 2.0f;
+    if (out_primary->width < 0.0f)
+      out_primary->width = 0.0f;
+
+    out_secondary->x = bounds.x;
+    out_secondary->y = bounds.y;
+    out_secondary->width = 0.0f;
+    out_secondary->height = 0.0f;
+  } else { /* EXPANDED or EXTRA_LARGE */
+    margins = 24.0f;
+    spacing = 24.0f;
+
+    out_secondary->width = 300.0f;
+    if (out_secondary->width > bounds.width) {
+      out_secondary->width = bounds.width;
+    }
+
+    out_primary->width =
+        bounds.width - out_secondary->width - spacing - margins * 2.0f;
+    if (out_primary->width < 0.0f)
+      out_primary->width = 0.0f;
+    if (out_primary->width > 840.0f) { /* Max feed width */
+      out_primary->width = 840.0f;
+    }
+
+    out_primary->x = bounds.x + margins +
+                     (bounds.width - margins * 2.0f - out_primary->width -
+                      out_secondary->width - spacing) *
+                         0.5f;
+    out_primary->y = bounds.y;
+    out_primary->height = bounds.height;
+
+    out_secondary->x = out_primary->x + out_primary->width + spacing;
+    out_secondary->y = bounds.y;
+    out_secondary->height = bounds.height;
+  }
+
+  return CMP_OK;
+}
+
+int CMP_CALL m3_adaptive_supporting_pane_layout(const M3AdaptiveLayout *layout,
+                                                CMPRect bounds,
+                                                CMPRect *out_primary,
+                                                CMPRect *out_secondary) {
+  CMPScalar margins, spacing;
+
+  if (layout == NULL || out_primary == NULL || out_secondary == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  if (bounds.width < 0.0f || bounds.height < 0.0f) {
+    return CMP_ERR_RANGE;
+  }
+
+  if (layout->window_class == M3_WINDOW_CLASS_COMPACT ||
+      layout->window_class == M3_WINDOW_CLASS_MEDIUM) {
+    *out_primary = bounds;
+    out_secondary->x = bounds.x;
+    out_secondary->y = bounds.y;
+    out_secondary->width = 0.0f;
+    out_secondary->height = 0.0f;
+  } else { /* EXPANDED or EXTRA_LARGE */
+    margins = 24.0f;
+    spacing = 24.0f;
+
+    out_secondary->width = 360.0f;
+    if (out_secondary->width > bounds.width) {
+      out_secondary->width = bounds.width;
+    }
+
+    out_primary->x = bounds.x + margins;
+    out_primary->y = bounds.y;
+    out_primary->height = bounds.height;
+    out_primary->width =
+        bounds.width - out_secondary->width - spacing - margins * 2.0f;
+    if (out_primary->width < 0.0f)
+      out_primary->width = 0.0f;
+
+    out_secondary->x = out_primary->x + out_primary->width + spacing;
+    out_secondary->y = bounds.y;
+    out_secondary->height = bounds.height;
   }
 
   return CMP_OK;

@@ -82,8 +82,8 @@ static int test_text_destroy_font(void *text, CMPHandle font) {
 }
 
 static int test_text_measure_text(void *text, CMPHandle font, const char *utf8,
-                                  cmp_usize utf8_len, CMPScalar *out_width,
-                                  CMPScalar *out_height,
+                                  cmp_usize utf8_len, cmp_u32 base_direction,
+                                  CMPScalar *out_width, CMPScalar *out_height,
                                   CMPScalar *out_baseline) {
   TestTextBackend *backend;
 
@@ -117,8 +117,8 @@ static int test_text_measure_text(void *text, CMPHandle font, const char *utf8,
 }
 
 static int test_text_draw_text(void *text, CMPHandle font, const char *utf8,
-                               cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                               CMPColor color) {
+                               cmp_usize utf8_len, cmp_u32 base_direction,
+                               CMPScalar x, CMPScalar y, CMPColor color) {
   TestTextBackend *backend;
 
   if (text == NULL) {
@@ -144,22 +144,48 @@ static int test_text_draw_text(void *text, CMPHandle font, const char *utf8,
   return CMP_OK;
 }
 
-static const CMPTextVTable g_test_text_vtable = {
-    test_text_create_font, test_text_destroy_font, test_text_measure_text,
-    test_text_draw_text};
+static const CMPTextVTable g_test_text_vtable = {test_text_create_font,
+                                                 test_text_destroy_font,
+                                                 test_text_measure_text,
+                                                 test_text_draw_text,
+                                                 NULL,
+                                                 NULL,
+                                                 NULL};
 
-static const CMPTextVTable g_test_text_vtable_no_draw = {
-    test_text_create_font, test_text_destroy_font, test_text_measure_text,
-    NULL};
+static const CMPTextVTable g_test_text_vtable_no_draw = {test_text_create_font,
+                                                         test_text_destroy_font,
+                                                         test_text_measure_text,
+                                                         NULL,
+                                                         NULL,
+                                                         NULL,
+                                                         NULL};
 
 static const CMPTextVTable g_test_text_vtable_no_measure = {
-    test_text_create_font, test_text_destroy_font, NULL, test_text_draw_text};
+    test_text_create_font,
+    test_text_destroy_font,
+    NULL,
+    test_text_draw_text,
+    NULL,
+    NULL,
+    NULL};
 
 static const CMPTextVTable g_test_text_vtable_no_destroy = {
-    test_text_create_font, NULL, test_text_measure_text, test_text_draw_text};
+    test_text_create_font,
+    NULL,
+    test_text_measure_text,
+    test_text_draw_text,
+    NULL,
+    NULL,
+    NULL};
 
 static const CMPTextVTable g_test_text_vtable_no_create = {
-    NULL, test_text_destroy_font, test_text_measure_text, test_text_draw_text};
+    NULL,
+    test_text_destroy_font,
+    test_text_measure_text,
+    test_text_draw_text,
+    NULL,
+    NULL,
+    NULL};
 
 static int cmp_near(CMPScalar a, CMPScalar b, CMPScalar tol) {
   CMPScalar diff;
@@ -335,53 +361,56 @@ int main(void) {
   CMP_TEST_OK(cmp_text_font_destroy(&text_backend, font));
   font = saved_font;
 
-  CMP_TEST_EXPECT(cmp_text_measure_utf8(NULL, font, "abc", 3, &metrics),
+  CMP_TEST_EXPECT(cmp_text_measure_utf8(NULL, font, "abc", 3, 0, &metrics),
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(
-      cmp_text_measure_utf8(&invalid_backend, font, "abc", 3, &metrics),
+      cmp_text_measure_utf8(&invalid_backend, font, "abc", 3, 0, &metrics),
       CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_text_measure_utf8(&text_backend, font, NULL, 3, &metrics),
-                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      cmp_text_measure_utf8(&text_backend, font, NULL, 3, 0, &metrics),
+      CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_text_measure_utf8(&text_backend, font, "abc", 3, NULL),
                   CMP_ERR_INVALID_ARGUMENT);
 
   text_backend.vtable = &g_test_text_vtable_no_measure;
   CMP_TEST_EXPECT(
-      cmp_text_measure_utf8(&text_backend, font, "abc", 3, &metrics),
+      cmp_text_measure_utf8(&text_backend, font, "abc", 3, 0, &metrics),
       CMP_ERR_UNSUPPORTED);
   text_backend.vtable = &g_test_text_vtable;
 
   backend.fail_measure = 1;
   CMP_TEST_EXPECT(
-      cmp_text_measure_utf8(&text_backend, font, "abc", 3, &metrics),
+      cmp_text_measure_utf8(&text_backend, font, "abc", 3, 0, &metrics),
       CMP_ERR_IO);
   backend.fail_measure = 0;
 
   backend.negative_metrics = 1;
   CMP_TEST_EXPECT(
-      cmp_text_measure_utf8(&text_backend, font, "abc", 3, &metrics),
+      cmp_text_measure_utf8(&text_backend, font, "abc", 3, 0, &metrics),
       CMP_ERR_RANGE);
   backend.negative_metrics = 0;
 
-  CMP_TEST_OK(cmp_text_measure_utf8(&text_backend, font, "abc", 3, &metrics));
+  CMP_TEST_OK(
+      cmp_text_measure_utf8(&text_backend, font, "abc", 3, 0, &metrics));
   CMP_TEST_ASSERT(cmp_near(metrics.width, 30.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(metrics.height, 20.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(metrics.baseline, 15.0f, 0.001f));
 
-  CMP_TEST_EXPECT(cmp_text_measure_cstr(NULL, font, "abc", &metrics),
+  CMP_TEST_EXPECT(cmp_text_measure_cstr(NULL, font, "abc", 0, &metrics),
                   CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_text_measure_cstr(&text_backend, font, NULL, &metrics),
+  CMP_TEST_EXPECT(cmp_text_measure_cstr(&text_backend, font, NULL, 0, &metrics),
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_text_test_set_cstr_limit(2));
-  CMP_TEST_EXPECT(cmp_text_measure_cstr(&text_backend, font, "abcd", &metrics),
-                  CMP_ERR_OVERFLOW);
+  CMP_TEST_EXPECT(
+      cmp_text_measure_cstr(&text_backend, font, "abcd", 0, &metrics),
+      CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_text_test_set_cstr_limit(0));
 
   CMP_TEST_OK(cmp_text_font_metrics(&text_backend, font, &metrics));
   CMP_TEST_ASSERT(cmp_near(metrics.width, 0.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(metrics.height, 20.0f, 0.001f));
 
-  CMP_TEST_OK(cmp_text_measure_cstr(&text_backend, font, "", &metrics));
+  CMP_TEST_OK(cmp_text_measure_cstr(&text_backend, font, "", 0, &metrics));
   CMP_TEST_ASSERT(cmp_near(metrics.width, 0.0f, 0.001f));
 
   CMP_TEST_EXPECT(cmp_text_test_cstrlen(NULL, &cstr_len),

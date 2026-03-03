@@ -298,7 +298,7 @@ m3_menu_update_metrics(M3Menu *menu,
       }
       rc = cmp_text_measure_utf8(&menu->text_backend, menu->font,
                                  menu->items[i].utf8_label,
-                                 menu->items[i].utf8_len, &metrics);
+                                 menu->items[i].utf8_len, 0, &metrics);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -799,7 +799,7 @@ static int m3_menu_widget_paint(void *widget,
 
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, menu->font, /* GCOVR_EXCL_LINE */
-        item->utf8_label, item->utf8_len, text_x, text_y,
+        item->utf8_label, item->utf8_len, 0, text_x, text_y,
         color);         /* GCOVR_EXCL_LINE */
     if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
       return rc;
@@ -897,6 +897,7 @@ static int m3_menu_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   menu = (M3Menu *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;

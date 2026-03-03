@@ -764,6 +764,26 @@ static int cmp_gtk4_ws_get_time(void *c, cmp_u32 *t) {
   return CMP_OK;
 }
 
+static int cmp_backend_ws_get_system_color(void *ws, cmp_u32 color_type,
+                                           CMPScalar *out_r, CMPScalar *out_g,
+                                           CMPScalar *out_b, CMPScalar *out_a) {
+  (void)color_type;
+  if (ws == NULL || out_r == NULL || out_g == NULL || out_b == NULL ||
+      out_a == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  return CMP_ERR_UNSUPPORTED;
+}
+
+static int cmp_backend_ws_update_a11y_tree(void *ws,
+                                           const void *root_a11y_node) {
+  (void)root_a11y_node;
+  if (ws == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  return CMP_ERR_UNSUPPORTED;
+}
+
 static const CMPWSVTable g_cmp_gtk4_ws_vtable = {cmp_gtk4_ws_init,
                                                  cmp_gtk4_ws_shutdown,
                                                  cmp_gtk4_ws_create_window,

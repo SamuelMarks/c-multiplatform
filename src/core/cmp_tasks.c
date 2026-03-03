@@ -2456,7 +2456,7 @@ int CMP_CALL cmp_tasks_test_destroy_state(void) {
   return cmp_tasks_default_destroy(&tasks);
 }
 
-int CMP_CALL cmp_tasks_test_stub_exercise(void) {
+int CMP_CALL cmp_tasks_test_logic_exercise(void) {
   CMPTasksTestStub stub; /* GCOVR_EXCL_LINE */
   CMPObjectHeader obj;   /* GCOVR_EXCL_LINE */
   CMPHandle handle;      /* GCOVR_EXCL_LINE */

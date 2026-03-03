@@ -66,6 +66,8 @@ typedef struct M3ListItem {
   CMPBool pressed;             /**< CMP_TRUE when pressed. */
   M3ListItemOnPress on_press;  /**< Press callback. */
   void *on_press_ctx;          /**< Callback context. */
+  cmp_i32 semantic_index;      /**< Index in the list (1-based, 0 if N/A). */
+  cmp_i32 semantic_size;       /**< Total size of the list (0 if N/A). */
 } M3ListItem;
 
 /**
@@ -136,6 +138,17 @@ CMP_API int CMP_CALL m3_list_item_set_widgets(M3ListItem *item,
 CMP_API int CMP_CALL m3_list_item_set_on_press(M3ListItem *item,
                                                M3ListItemOnPress on_press,
                                                void *ctx);
+
+/**
+ * @brief Set the semantic list position for accessibility.
+ * @param item List item instance.
+ * @param index 1-based index of the item (0 for none).
+ * @param size Total size of the list (0 for none).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_list_item_set_semantic_position(M3ListItem *item,
+                                                        cmp_i32 index,
+                                                        cmp_i32 size);
 
 /**
  * @brief Test wrapper helper.

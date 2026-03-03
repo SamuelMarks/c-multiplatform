@@ -337,6 +337,124 @@ CMP_API int CMP_CALL m3_slider_set_on_change(M3Slider *slider,
                                              CMPSliderOnChange on_change,
                                              void *ctx);
 
+struct M3RangeSlider;
+
+/**
+ * @brief Range slider value change callback signature.
+ * @param ctx User callback context pointer.
+ * @param slider Range slider instance that changed.
+ * @param start_value New start value.
+ * @param end_value New end value.
+ * @return CMP_OK on success or a failure code.
+ */
+typedef int(CMP_CALL *CMPRangeSliderOnChange)(void *ctx,
+                                              struct M3RangeSlider *slider,
+                                              CMPScalar start_value,
+                                              CMPScalar end_value);
+
+/**
+ * @brief Range slider widget instance.
+ */
+typedef struct M3RangeSlider {
+  CMPWidget widget;          /**< Widget interface (points to this instance). */
+  M3SliderStyle style;       /**< Current slider style. */
+  CMPRect bounds;            /**< Current widget bounds. */
+  CMPScalar min_value;       /**< Minimum possible value. */
+  CMPScalar max_value;       /**< Maximum possible value. */
+  CMPScalar start_value;     /**< Selected start value. */
+  CMPScalar end_value;       /**< Selected end value. */
+  CMPScalar step;            /**< Step size (0 for continuous). */
+  CMPBool is_dragging_start; /**< Internal: dragging start thumb. */
+  CMPBool is_dragging_end;   /**< Internal: dragging end thumb. */
+  const char *utf8_label;    /**< Semantic label (may be NULL). */
+  CMPRangeSliderOnChange on_change; /**< Change callback (may be NULL). */
+  void *on_change_ctx;              /**< Change callback context pointer. */
+} M3RangeSlider;
+
+/**
+ * @brief Initialize a range slider widget.
+ * @param slider Range slider instance.
+ * @param style Slider style descriptor.
+ * @param min_value Minimum value.
+ * @param max_value Maximum value.
+ * @param start_value Initial start value.
+ * @param end_value Initial end value.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_range_slider_init(
+    M3RangeSlider *slider, const M3SliderStyle *style, CMPScalar min_value,
+    CMPScalar max_value, CMPScalar start_value, CMPScalar end_value);
+
+/**
+ * @brief Update the range slider values.
+ * @param slider Range slider instance.
+ * @param start_value New start value.
+ * @param end_value New end value.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_range_slider_set_values(M3RangeSlider *slider,
+                                                CMPScalar start_value,
+                                                CMPScalar end_value);
+
+/**
+ * @brief Retrieve the range slider values.
+ * @param slider Range slider instance.
+ * @param out_start_value Receives the current start value.
+ * @param out_end_value Receives the current end value.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_range_slider_get_values(const M3RangeSlider *slider,
+                                                CMPScalar *out_start_value,
+                                                CMPScalar *out_end_value);
+
+/**
+ * @brief Update the range slider value range bounds.
+ * @param slider Range slider instance.
+ * @param min_value New minimum value.
+ * @param max_value New maximum value.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_range_slider_set_range(M3RangeSlider *slider,
+                                               CMPScalar min_value,
+                                               CMPScalar max_value);
+
+/**
+ * @brief Update the range slider step size.
+ * @param slider Range slider instance.
+ * @param step Step size (0 for continuous).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_range_slider_set_step(M3RangeSlider *slider,
+                                              CMPScalar step);
+
+/**
+ * @brief Update the range slider style.
+ * @param slider Range slider instance.
+ * @param style New slider style descriptor.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_range_slider_set_style(M3RangeSlider *slider,
+                                               const M3SliderStyle *style);
+
+/**
+ * @brief Update the range slider semantics label.
+ * @param slider Range slider instance.
+ * @param utf8_label Null-terminated label string (may be NULL).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_range_slider_set_label(M3RangeSlider *slider,
+                                               const char *utf8_label);
+
+/**
+ * @brief Assign a range slider change callback.
+ * @param slider Range slider instance.
+ * @param on_change Change callback (may be NULL to clear).
+ * @param ctx Callback context pointer.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_range_slider_set_on_change(
+    M3RangeSlider *slider, CMPRangeSliderOnChange on_change, void *ctx);
+
 #ifdef CMP_TESTING
 /**
  * @brief Set a progress test fail point.

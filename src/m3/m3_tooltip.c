@@ -88,7 +88,7 @@ static int m3_tooltip_metrics_update(M3Tooltip *tooltip) {
     tooltip->metrics.has_title = CMP_FALSE;
     if (tooltip->body_len > 0u) {
       rc = cmp_text_measure_utf8(&tooltip->text_backend, tooltip->plain_font,
-                                 tooltip->utf8_body, tooltip->body_len,
+                                 tooltip->utf8_body, tooltip->body_len, 0,
                                  &tooltip->metrics.body_metrics);
       if (rc != CMP_OK) {
         return rc; /* GCOVR_EXCL_LINE */
@@ -99,7 +99,7 @@ static int m3_tooltip_metrics_update(M3Tooltip *tooltip) {
     /* Rich tooltip */
     if (tooltip->title_len > 0u && tooltip->utf8_title != NULL) {
       rc = cmp_text_measure_utf8(&tooltip->text_backend, tooltip->title_font,
-                                 tooltip->utf8_title, tooltip->title_len,
+                                 tooltip->utf8_title, tooltip->title_len, 0,
                                  &tooltip->metrics.title_metrics);
       if (rc != CMP_OK) {
         return rc; /* GCOVR_EXCL_LINE */
@@ -111,7 +111,7 @@ static int m3_tooltip_metrics_update(M3Tooltip *tooltip) {
 
     if (tooltip->body_len > 0u && tooltip->utf8_body != NULL) {
       rc = cmp_text_measure_utf8(&tooltip->text_backend, tooltip->body_font,
-                                 tooltip->utf8_body, tooltip->body_len,
+                                 tooltip->utf8_body, tooltip->body_len, 0,
                                  &tooltip->metrics.body_metrics);
       if (rc != CMP_OK) {
         return rc; /* GCOVR_EXCL_LINE */
@@ -242,7 +242,7 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
     if (tooltip->metrics.has_body == CMP_TRUE) {
       rc = ctx->gfx->text_vtable->draw_text(
           ctx->gfx->ctx, tooltip->plain_font, tooltip->utf8_body,
-          tooltip->body_len, text_x, text_y, text_color);
+          tooltip->body_len, 0, text_x, text_y, text_color);
       if (rc != CMP_OK) {
         return rc; /* GCOVR_EXCL_LINE */
       }
@@ -261,7 +261,7 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
       text_y += tooltip->metrics.title_metrics.baseline;
       rc = ctx->gfx->text_vtable->draw_text(
           ctx->gfx->ctx, tooltip->title_font, tooltip->utf8_title,
-          tooltip->title_len, text_x, text_y, text_color);
+          tooltip->title_len, 0, text_x, text_y, text_color);
       if (rc != CMP_OK) {
         return rc; /* GCOVR_EXCL_LINE */
       }
@@ -274,7 +274,7 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
       text_y += tooltip->metrics.body_metrics.baseline;
       rc = ctx->gfx->text_vtable->draw_text(
           ctx->gfx->ctx, tooltip->body_font, tooltip->utf8_body,
-          tooltip->body_len, text_x, text_y, text_color);
+          tooltip->body_len, 0, text_x, text_y, text_color);
       if (rc != CMP_OK) {
         return rc; /* GCOVR_EXCL_LINE */
       }
@@ -300,6 +300,7 @@ static int m3_tooltip_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
   tooltip = (M3Tooltip *)widget;
 
   out_semantics->role = CMP_SEMANTIC_TEXT;

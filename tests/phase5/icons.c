@@ -103,8 +103,8 @@ static int test_text_destroy_font(void *text, CMPHandle font) {
 }
 
 static int test_text_measure_text(void *text, CMPHandle font, const char *utf8,
-                                  cmp_usize utf8_len, CMPScalar *out_width,
-                                  CMPScalar *out_height,
+                                  cmp_usize utf8_len, cmp_u32 base_direction,
+                                  CMPScalar *out_width, CMPScalar *out_height,
                                   CMPScalar *out_baseline) {
   TestTextBackend *backend;
 
@@ -132,8 +132,8 @@ static int test_text_measure_text(void *text, CMPHandle font, const char *utf8,
 }
 
 static int test_text_draw_text(void *text, CMPHandle font, const char *utf8,
-                               cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                               CMPColor color) {
+                               cmp_usize utf8_len, cmp_u32 base_direction,
+                               CMPScalar x, CMPScalar y, CMPColor color) {
   TestTextBackend *backend;
 
   if (text == NULL) {
@@ -159,22 +159,48 @@ static int test_text_draw_text(void *text, CMPHandle font, const char *utf8,
   return CMP_OK;
 }
 
-static const CMPTextVTable g_test_text_vtable = {
-    test_text_create_font, test_text_destroy_font, test_text_measure_text,
-    test_text_draw_text};
+static const CMPTextVTable g_test_text_vtable = {test_text_create_font,
+                                                 test_text_destroy_font,
+                                                 test_text_measure_text,
+                                                 test_text_draw_text,
+                                                 NULL,
+                                                 NULL,
+                                                 NULL};
 
-static const CMPTextVTable g_test_text_vtable_no_draw = {
-    test_text_create_font, test_text_destroy_font, test_text_measure_text,
-    NULL};
+static const CMPTextVTable g_test_text_vtable_no_draw = {test_text_create_font,
+                                                         test_text_destroy_font,
+                                                         test_text_measure_text,
+                                                         NULL,
+                                                         NULL,
+                                                         NULL,
+                                                         NULL};
 
 static const CMPTextVTable g_test_text_vtable_no_create = {
-    NULL, test_text_destroy_font, test_text_measure_text, test_text_draw_text};
+    NULL,
+    test_text_destroy_font,
+    test_text_measure_text,
+    test_text_draw_text,
+    NULL,
+    NULL,
+    NULL};
 
 static const CMPTextVTable g_test_text_vtable_no_measure = {
-    test_text_create_font, test_text_destroy_font, NULL, test_text_draw_text};
+    test_text_create_font,
+    test_text_destroy_font,
+    NULL,
+    test_text_draw_text,
+    NULL,
+    NULL,
+    NULL};
 
 static const CMPTextVTable g_test_text_vtable_no_destroy = {
-    test_text_create_font, NULL, test_text_measure_text, test_text_draw_text};
+    test_text_create_font,
+    NULL,
+    test_text_measure_text,
+    test_text_draw_text,
+    NULL,
+    NULL,
+    NULL};
 
 static int test_gfx_draw_path(void *gfx, const CMPPath *path, CMPColor color) {
   TestGfxBackend *backend;

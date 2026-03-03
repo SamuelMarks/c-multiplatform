@@ -260,6 +260,7 @@ static int m3_segmented_get_semantics(void *widget,
   if (group == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
   out_semantics->role = CMP_SEMANTIC_NONE;
   out_semantics->flags = CMP_SEMANTIC_FLAG_FOCUSABLE;
   out_semantics->utf8_label = "Segmented Group";

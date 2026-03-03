@@ -1522,5 +1522,162 @@ int main(void) {
   CMP_TEST_OK(slider.widget.vtable->destroy(slider.widget.ctx));
   CMP_TEST_ASSERT(slider.widget.vtable == NULL);
 
+  /* M3RangeSlider tests */
+  {
+    M3RangeSlider rslider;
+    CMPScalar s, e;
+    CMPMeasureSpec unspec = {CMP_MEASURE_UNSPECIFIED, 0.0f};
+
+    CMP_TEST_EXPECT(
+        m3_range_slider_init(NULL, &slider_style, 0.0f, 1.0f, 0.2f, 0.8f),
+        CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        m3_range_slider_init(&rslider, NULL, 0.0f, 1.0f, 0.2f, 0.8f),
+        CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        m3_range_slider_init(&rslider, &slider_style, 1.0f, 0.0f, 0.2f, 0.8f),
+        CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(
+        m3_range_slider_init(&rslider, &slider_style, 0.0f, 1.0f, -0.2f, 0.8f),
+        CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(
+        m3_range_slider_init(&rslider, &slider_style, 0.0f, 1.0f, 0.2f, 1.2f),
+        CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(
+        m3_range_slider_init(&rslider, &slider_style, 0.0f, 1.0f, 0.8f, 0.2f),
+        CMP_ERR_RANGE);
+
+    CMP_TEST_OK(
+        m3_range_slider_init(&rslider, &slider_style, 0.0f, 1.0f, 0.2f, 0.8f));
+    CMP_TEST_ASSERT(rslider.start_value == 0.2f);
+    CMP_TEST_ASSERT(rslider.end_value == 0.8f);
+
+    CMP_TEST_EXPECT(m3_range_slider_get_values(NULL, &s, &e),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(m3_range_slider_get_values(&rslider, &s, &e));
+    CMP_TEST_ASSERT(s == 0.2f && e == 0.8f);
+
+    CMP_TEST_EXPECT(m3_range_slider_set_values(NULL, 0.3f, 0.7f),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_range_slider_set_values(&rslider, -1.0f, 0.7f),
+                    CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(m3_range_slider_set_values(&rslider, 0.3f, 2.0f),
+                    CMP_ERR_RANGE);
+
+    CMP_TEST_OK(m3_range_slider_set_values(&rslider, 0.3f, 0.7f));
+    CMP_TEST_ASSERT(rslider.start_value == 0.3f && rslider.end_value == 0.7f);
+    CMP_TEST_OK(m3_range_slider_set_values(&rslider, 0.6f,
+                                           0.4f)); /* Should auto-swap */
+    CMP_TEST_ASSERT(rslider.start_value == 0.4f && rslider.end_value == 0.6f);
+
+    CMP_TEST_EXPECT(m3_range_slider_set_range(NULL, 0.0f, 2.0f),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_range_slider_set_range(&rslider, 2.0f, 0.0f),
+                    CMP_ERR_RANGE);
+    CMP_TEST_OK(m3_range_slider_set_range(&rslider, 0.0f, 2.0f));
+
+    CMP_TEST_EXPECT(m3_range_slider_set_step(NULL, 0.1f),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_range_slider_set_step(&rslider, -0.1f), CMP_ERR_RANGE);
+    CMP_TEST_OK(m3_range_slider_set_step(&rslider, 0.1f));
+
+    CMP_TEST_EXPECT(m3_range_slider_set_style(NULL, &slider_style),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_range_slider_set_style(&rslider, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(m3_range_slider_set_style(&rslider, &slider_style));
+
+    CMP_TEST_EXPECT(m3_range_slider_set_label(NULL, "Hi"),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(m3_range_slider_set_label(&rslider, "Hi"));
+
+    CMP_TEST_EXPECT(m3_range_slider_set_on_change(NULL, NULL, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(m3_range_slider_set_on_change(&rslider, NULL, NULL));
+
+    /* Measure, Layout, Paint, Semantics, Destroy coverage */
+    CMP_TEST_EXPECT(rslider.widget.vtable->measure(NULL, unspec, unspec, &size),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(
+        rslider.widget.vtable->measure(&rslider, unspec, unspec, NULL),
+        CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(
+        rslider.widget.vtable->measure(&rslider, unspec, unspec, &size));
+
+    {
+      CMPMeasureSpec exact = {CMP_MEASURE_EXACTLY, 100.0f};
+      CMPMeasureSpec at_most = {CMP_MEASURE_AT_MOST, 5.0f};
+      CMP_TEST_OK(
+          rslider.widget.vtable->measure(&rslider, exact, exact, &size));
+      CMP_TEST_ASSERT(size.width == 100.0f && size.height == 100.0f);
+      CMP_TEST_OK(
+          rslider.widget.vtable->measure(&rslider, at_most, at_most, &size));
+      CMP_TEST_ASSERT(size.width == 5.0f && size.height == 5.0f);
+    }
+
+    CMP_TEST_EXPECT(rslider.widget.vtable->layout(NULL, bounds),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(rslider.widget.vtable->layout(&rslider, bounds));
+
+    CMP_TEST_EXPECT(rslider.widget.vtable->paint(NULL, &paint_ctx),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(rslider.widget.vtable->paint(&rslider, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    /* Paint with null gfx vtable */
+    paint_ctx.gfx = &gfx;
+    gfx.vtable = NULL;
+    CMP_TEST_OK(rslider.widget.vtable->paint(&rslider, &paint_ctx));
+    gfx.vtable = &g_test_vtable;
+
+    CMP_TEST_OK(rslider.widget.vtable->paint(&rslider, &paint_ctx));
+
+    CMP_TEST_EXPECT(rslider.widget.vtable->get_semantics(NULL, &semantics),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(rslider.widget.vtable->get_semantics(&rslider, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(rslider.widget.vtable->get_semantics(&rslider, &semantics));
+
+    CMP_TEST_EXPECT(rslider.widget.vtable->event(NULL, &event, &handled),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(rslider.widget.vtable->event(&rslider, NULL, &handled),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(rslider.widget.vtable->event(&rslider, &event, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+
+    rslider.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
+    CMP_TEST_OK(rslider.widget.vtable->paint(&rslider, &paint_ctx));
+    CMP_TEST_OK(rslider.widget.vtable->get_semantics(&rslider, &semantics));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    rslider.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
+
+    rslider.max_value = rslider.min_value; /* zero range */
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    rslider.max_value = 1.0f;
+
+    bounds.width = 0.0f;
+    CMP_TEST_OK(rslider.widget.vtable->layout(&rslider, bounds));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    bounds.width = 300.0f;
+    CMP_TEST_OK(rslider.widget.vtable->layout(&rslider, bounds));
+
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 90, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+
+    /* Drag past bounds */
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, -10, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, 100, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 100, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+
+    CMP_TEST_EXPECT(rslider.widget.vtable->destroy(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(rslider.widget.vtable->destroy(&rslider));
+  }
+
   return 0;
 }

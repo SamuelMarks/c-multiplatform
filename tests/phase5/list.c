@@ -55,6 +55,12 @@ int main(void) {
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_list_item_set_on_press(&item, test_on_press, &called));
 
+  CMP_TEST_EXPECT(m3_list_item_set_semantic_position(NULL, 1, 5),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(m3_list_item_set_semantic_position(&item, 1, 5));
+  CMP_TEST_ASSERT(item.semantic_index == 1);
+  CMP_TEST_ASSERT(item.semantic_size == 5);
+
   CMP_TEST_OK(m3_list_test_helper());
 
   {

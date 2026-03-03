@@ -1,6 +1,7 @@
 #include "m3/m3_carousel.h"
 #include "cmpc/cmp_core.h"
 #include <stdlib.h>
+#include <string.h>
 
 static int m3_carousel_measure(void *widget, CMPMeasureSpec width,
                                CMPMeasureSpec height, CMPSize *out_size);
@@ -246,6 +247,7 @@ static int m3_carousel_get_semantics(void *widget,
   if (carousel == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
   out_semantics->role = CMP_SEMANTIC_NONE;
   out_semantics->flags = CMP_SEMANTIC_FLAG_FOCUSABLE;
   out_semantics->utf8_label = "Carousel";

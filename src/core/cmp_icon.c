@@ -931,7 +931,7 @@ static int cmp_icon_measure_font(const CMPGfx *gfx, const CMPIconStyle *style,
     return rc;
   }
 
-  rc = gfx->text_vtable->measure_text(gfx->ctx, font, utf8_name, utf8_len,
+  rc = gfx->text_vtable->measure_text(gfx->ctx, font, utf8_name, utf8_len, 0,
                                       &width, &height, &baseline);
   if (rc != CMP_OK) {
     cleanup_rc = gfx->text_vtable->destroy_font(gfx->ctx, font);
@@ -991,7 +991,7 @@ static int cmp_icon_draw_font(const CMPGfx *gfx, const CMPRect *bounds,
     return rc; /* GCOVR_EXCL_LINE */
   }
 
-  rc = gfx->text_vtable->measure_text(gfx->ctx, font, utf8_name, utf8_len,
+  rc = gfx->text_vtable->measure_text(gfx->ctx, font, utf8_name, utf8_len, 0,
                                       &width, &height, &baseline);
   if (rc != CMP_OK) {
     cleanup_rc =
@@ -1012,7 +1012,7 @@ static int cmp_icon_draw_font(const CMPGfx *gfx, const CMPRect *bounds,
   x = bounds->x + (bounds->width - width) * 0.5f;
   y = bounds->y + (bounds->height - height) * 0.5f + baseline;
 
-  rc = gfx->text_vtable->draw_text(gfx->ctx, font, utf8_name, utf8_len, x, y,
+  rc = gfx->text_vtable->draw_text(gfx->ctx, font, utf8_name, utf8_len, 0, x, y,
                                    style->color);
 
   cleanup_rc = gfx->text_vtable->destroy_font(gfx->ctx, font);

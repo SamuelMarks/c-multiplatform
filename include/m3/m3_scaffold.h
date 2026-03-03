@@ -174,6 +174,56 @@ CMP_API int CMP_CALL m3_scaffold_get_safe_area(const M3Scaffold *scaffold,
 CMP_API int CMP_CALL m3_scaffold_step(M3Scaffold *scaffold, CMPScalar dt,
                                       CMPBool *out_changed);
 
+CMP_API int CMP_CALL
+m3_scaffold_test_validate_edges(const CMPLayoutEdges *edges);
+
+CMP_API int CMP_CALL
+m3_scaffold_test_validate_style(const M3ScaffoldStyle *style);
+
+CMP_API int CMP_CALL
+m3_scaffold_test_validate_measure_spec(CMPMeasureSpec spec);
+
+CMP_API int CMP_CALL m3_scaffold_test_validate_rect(const CMPRect *rect);
+
+CMP_API int CMP_CALL m3_scaffold_test_compute_safe_bounds(
+    const CMPRect *bounds, const CMPLayoutEdges *safe_area,
+    CMPRect *out_bounds);
+
+CMP_API int CMP_CALL m3_scaffold_test_compute_fab_target(
+    const M3ScaffoldStyle *style, CMPScalar snackbar_height,
+    CMPScalar *out_offset);
+
+CMP_API int CMP_CALL m3_scaffold_test_widget_is_visible(const CMPWidget *widget,
+                                                        CMPBool *out_visible);
+
+CMP_API int CMP_CALL m3_scaffold_test_measure_child(CMPWidget *child,
+                                                    CMPMeasureSpec width,
+                                                    CMPMeasureSpec height,
+                                                    CMPSize *out_size);
+
+CMP_API int CMP_CALL m3_scaffold_test_layout_child(CMPWidget *child,
+                                                   const CMPRect *bounds);
+
+CMP_API int CMP_CALL m3_scaffold_test_paint_child(CMPWidget *child,
+                                                  CMPPaintContext *ctx);
+
+CMP_API int CMP_CALL m3_scaffold_test_event_child(CMPWidget *child,
+                                                  const CMPInputEvent *event,
+                                                  CMPBool *out_handled);
+
+CMP_API int CMP_CALL m3_scaffold_test_event_get_position(
+    const CMPInputEvent *event, CMPBool *out_has_pos, CMPScalar *out_x,
+    CMPScalar *out_y);
+
+CMP_API int CMP_CALL m3_scaffold_test_child_hit(CMPWidget *child,
+                                                const CMPRect *bounds,
+                                                CMPScalar x, CMPScalar y,
+                                                CMPBool *out_hit);
+
+CMP_API int CMP_CALL m3_scaffold_test_apply_measure_spec(CMPScalar desired,
+                                                         CMPMeasureSpec spec,
+                                                         CMPScalar *out_value);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

@@ -112,9 +112,10 @@ typedef struct CMPRenderCmdDrawText {
   const char *utf8;   /**< UTF-8 text pointer (must remain valid for the list
                          lifetime). */
   cmp_usize utf8_len; /**< UTF-8 length in bytes. */
-  CMPScalar x;        /**< X origin in pixels. */
-  CMPScalar y;        /**< Y origin in pixels. */
-  CMPColor color;     /**< Text color. */
+  cmp_u32 base_direction; /**< Base text direction. */
+  CMPScalar x;            /**< X origin in pixels. */
+  CMPScalar y;            /**< Y origin in pixels. */
+  CMPColor color;         /**< Text color. */
 } CMPRenderCmdDrawText;
 
 /**

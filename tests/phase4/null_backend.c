@@ -792,38 +792,38 @@ int main(void) {
     CMP_TEST_OK(gfx.text_vtable->create_font(gfx.ctx, "Sans", 12, 400,
                                              CMP_FALSE, &font));
 
-    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(NULL, font, "hi", 2, &scale,
-                                                  &scale, &scale),
+    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(NULL, font, "hi", 2, 0,
+                                                  &scale, &scale, &scale),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, invalid_handle, "hi",
-                                                  2, &scale, &scale, &scale),
+                                                  2, 0, &scale, &scale, &scale),
                     CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, NULL, 2,
+    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, NULL, 2, 0,
                                                   &scale, &scale, &scale),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, NULL,
                                                   &scale, &scale),
                     CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2,
+    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0,
                                                   &scale, NULL, &scale),
                     CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2,
+    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0,
                                                   &scale, &scale, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_OK(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &scale,
+    CMP_TEST_OK(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0, &scale,
                                               &scale, &scale));
 
     CMP_TEST_EXPECT(
-        gfx.text_vtable->draw_text(NULL, font, "hi", 2, 0.0f, 0.0f, color),
+        gfx.text_vtable->draw_text(NULL, font, "hi", 2, 0, 0.0f, 0.0f, color),
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(gfx.text_vtable->draw_text(gfx.ctx, invalid_handle, "hi", 2,
-                                               0.0f, 0.0f, color),
+                                               0, 0.0f, 0.0f, color),
                     CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(
-        gfx.text_vtable->draw_text(gfx.ctx, font, NULL, 2, 0.0f, 0.0f, color),
-        CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_OK(
-        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color));
+    CMP_TEST_EXPECT(gfx.text_vtable->draw_text(gfx.ctx, font, NULL, 2, 0, 0.0f,
+                                               0.0f, color),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0, 0.0f,
+                                           0.0f, color));
 
     CMP_TEST_EXPECT(gfx.text_vtable->destroy_font(NULL, font),
                     CMP_ERR_INVALID_ARGUMENT);
@@ -1351,34 +1351,37 @@ int main(void) {
     CMP_TEST_OK(gfx.text_vtable->create_font(gfx.ctx, "Sans", 12, 400,
                                              CMP_FALSE, &font));
     CMP_TEST_NULL_FORCE_FAIL_AT(
-        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &width, &height,
-                                      &baseline),
+        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0, &width,
+                                      &height, &baseline),
         1u);
     CMP_TEST_NULL_FORCE_FAIL_AT(
-        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &width, &height,
-                                      &baseline),
+        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0, &width,
+                                      &height, &baseline),
         2u);
     CMP_TEST_NULL_FORCE_FAIL_AT(
-        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &width, &height,
-                                      &baseline),
+        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0, &width,
+                                      &height, &baseline),
         3u);
-    CMP_TEST_OK(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &width,
+    CMP_TEST_OK(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0, &width,
                                               &height, &baseline));
     color.r = 1.0f;
     color.g = 1.0f;
     color.b = 1.0f;
     color.a = 1.0f;
-    CMP_TEST_NULL_FORCE_FAIL_AT(
-        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color),
-        1u);
-    CMP_TEST_NULL_FORCE_FAIL_AT(
-        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color),
-        2u);
-    CMP_TEST_NULL_FORCE_FAIL_AT(
-        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color),
-        3u);
-    CMP_TEST_OK(
-        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color));
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.text_vtable->draw_text(gfx.ctx, font, "hi",
+                                                           2, 0, 0.0f, 0.0f,
+                                                           color),
+                                1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.text_vtable->draw_text(gfx.ctx, font, "hi",
+                                                           2, 0, 0.0f, 0.0f,
+                                                           color),
+                                2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.text_vtable->draw_text(gfx.ctx, font, "hi",
+                                                           2, 0, 0.0f, 0.0f,
+                                                           color),
+                                3u);
+    CMP_TEST_OK(gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0, 0.0f,
+                                           0.0f, color));
     CMP_TEST_OK(gfx.text_vtable->destroy_font(gfx.ctx, font));
 
     CMP_TEST_NULL_FORCE_FAIL(ws.vtable->set_clipboard_text(ws.ctx, "clip"));
@@ -1595,19 +1598,21 @@ int main(void) {
     CMP_TEST_OK(gfx.text_vtable->create_font(gfx.ctx, "Sans", 12, 400,
                                              CMP_FALSE, &font));
     CMP_TEST_NULL_FORCE_FAIL_AT(
-        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &text_width,
+        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0, &text_width,
                                       &text_height, &baseline),
         1u);
     CMP_TEST_NULL_FORCE_FAIL_AT(
-        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, &text_width,
+        gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0, &text_width,
                                       &text_height, &baseline),
         2u);
-    CMP_TEST_NULL_FORCE_FAIL_AT(
-        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color),
-        1u);
-    CMP_TEST_NULL_FORCE_FAIL_AT(
-        gfx.text_vtable->draw_text(gfx.ctx, font, "hi", 2, 0.0f, 0.0f, color),
-        2u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.text_vtable->draw_text(gfx.ctx, font, "hi",
+                                                           2, 0, 0.0f, 0.0f,
+                                                           color),
+                                1u);
+    CMP_TEST_NULL_FORCE_FAIL_AT(gfx.text_vtable->draw_text(gfx.ctx, font, "hi",
+                                                           2, 0, 0.0f, 0.0f,
+                                                           color),
+                                2u);
     CMP_TEST_NULL_FORCE_FAIL_AT(gfx.text_vtable->destroy_font(gfx.ctx, font),
                                 1u);
     CMP_TEST_NULL_FORCE_FAIL_AT(gfx.text_vtable->destroy_font(gfx.ctx, font),

@@ -635,7 +635,7 @@ static int cmp_text_field_update_text_metrics(CMPTextField *field) {
 
   rc =
       cmp_text_measure_utf8(&field->text_backend, field->text_font, field->utf8,
-                            field->utf8_len, &field->text_metrics);
+                            field->utf8_len, 0, &field->text_metrics);
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (cmp_text_field_test_fail_point_match(
           CMP_TEXT_FIELD_TEST_FAIL_TEXT_MEASURE)) { /* GCOVR_EXCL_LINE */
@@ -669,7 +669,7 @@ static int cmp_text_field_update_label_metrics(CMPTextField *field) {
   }
 
   rc = cmp_text_measure_utf8(&field->text_backend, field->label_font,
-                             field->utf8_label, field->label_len,
+                             field->utf8_label, field->label_len, 0,
                              &field->label_metrics);
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (cmp_text_field_test_fail_point_match(
@@ -696,7 +696,7 @@ static int cmp_text_field_update_placeholder_metrics(CMPTextField *field) {
   }
 
   rc = cmp_text_measure_utf8(&field->text_backend, field->text_font,
-                             field->utf8_placeholder, field->placeholder_len,
+                             field->utf8_placeholder, field->placeholder_len, 0,
                              &field->placeholder_metrics);
 #ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
   if (cmp_text_field_test_fail_point_match(
@@ -949,7 +949,7 @@ cmp_text_field_measure_prefix(CMPTextField *field, cmp_usize offset,
   }
 
   rc = cmp_text_measure_utf8(&field->text_backend, field->text_font,
-                             field->utf8, offset, &metrics);
+                             field->utf8, offset, 0, &metrics);
 #ifdef CMP_TESTING
   if (cmp_text_field_test_fail_point_match(
           CMP_TEXT_FIELD_TEST_FAIL_TEXT_MEASURE)) { /* GCOVR_EXCL_LINE */
@@ -1450,8 +1450,8 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
                           field->text_font_metrics.baseline;
 
     rc = ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, field->text_font,
-                                          field->utf8, field->utf8_len, text_x,
-                                          textDrawY, text_color);
+                                          field->utf8, field->utf8_len, 0,
+                                          text_x, textDrawY, text_color);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1464,7 +1464,7 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, field->text_font, field->utf8_placeholder,
-        field->placeholder_len, text_x, textDrawY, placeholder_color);
+        field->placeholder_len, 0, text_x, textDrawY, placeholder_color);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1493,7 +1493,7 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
         label_rest_y + (label_float_y - label_rest_y) * field->label_value;
     rc = ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, field->label_font,
                                           field->utf8_label, field->label_len,
-                                          label_x, label_y, label_color);
+                                          0, label_x, label_y, label_color);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1711,7 +1711,17 @@ cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
     }
     *out_handled = CMP_TRUE;
     return CMP_OK;
+
   case CMP_INPUT_TEXT_EDIT: /* GCOVR_EXCL_LINE */
+    if (event->data.text_edit.length > 0 &&
+        event->data.text_edit.utf8 != NULL) {
+      /* Soft Keyboard IME Composition (Fallback/Direct insert for now) */
+      rc = cmp_text_field_insert_utf8(field, event->data.text_edit.utf8,
+                                      event->data.text_edit.length);
+      if (rc != CMP_OK) {
+        return rc;
+      }
+    }
     field->focused = CMP_TRUE;
     rc = cmp_text_field_sync_label(field);
     if (rc != CMP_OK) {
@@ -1720,6 +1730,26 @@ cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
     *out_handled = CMP_TRUE;
     return CMP_OK;
   case CMP_INPUT_KEY_DOWN: /* GCOVR_EXCL_LINE */
+    if ((event->modifiers & CMP_MOD_CTRL) ||
+        (event->modifiers & CMP_MOD_META)) {
+      if (event->data.key.key_code == 'C' || event->data.key.key_code == 'c' ||
+          event->data.key.key_code == 'X' || event->data.key.key_code == 'x' ||
+          event->data.key.key_code == 'V' || event->data.key.key_code == 'v' ||
+          event->data.key.key_code == 'A' || event->data.key.key_code == 'a') {
+        /* Text field doesn't have WS context to interact with clipboard
+           directly, this is usually handled at the app level. But we can
+           implement select all. */
+        if (event->data.key.key_code == 'A' ||
+            event->data.key.key_code == 'a') {
+          field->selection_start = 0;
+          field->selection_end = field->utf8_len;
+          field->cursor = field->utf8_len;
+          cmp_text_field_reset_cursor_blink(field);
+          *out_handled = CMP_TRUE;
+          return CMP_OK;
+        }
+      }
+    }
     if (event->data.key.key_code == 8u || event->data.key.key_code == 127u ||
         event->data.key.key_code == 46u) {
       rc = (event->data.key.key_code == 46u)
@@ -1799,6 +1829,7 @@ static int cmp_text_field_widget_get_semantics(
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   field = (CMPTextField *)widget;
   out_semantics->role = CMP_SEMANTIC_TEXT_FIELD;

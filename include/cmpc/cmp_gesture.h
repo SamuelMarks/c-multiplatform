@@ -154,6 +154,34 @@ CMP_API int CMP_CALL cmp_gesture_test_hit_test(const CMPRenderNode *node,
                                                CMPWidget **out_widget);
 #endif
 
+CMP_API int CMP_CALL cmp_gesture_test_set_contains_error(CMPBool enable);
+CMP_API int CMP_CALL cmp_gesture_test_set_reset_fail(CMPBool enable);
+CMP_API int CMP_CALL cmp_gesture_test_set_velocity_error(CMPBool enable);
+CMP_API int CMP_CALL cmp_gesture_test_set_distance_error(CMPBool enable);
+CMP_API int CMP_CALL cmp_gesture_test_set_distance_error_after(cmp_i32 calls);
+CMP_API int CMP_CALL cmp_gesture_test_set_config_init_fail(CMPBool enable);
+CMP_API int CMP_CALL cmp_gesture_test_validate_rect(const CMPRect *rect);
+CMP_API int CMP_CALL cmp_gesture_test_distance_sq(CMPScalar x0, CMPScalar y0,
+                                                  CMPScalar x1, CMPScalar y1,
+                                                  CMPScalar *out_dist);
+CMP_API int CMP_CALL cmp_gesture_test_time_delta(cmp_u32 start, cmp_u32 end,
+                                                 cmp_u32 *out_delta);
+CMP_API int CMP_CALL cmp_gesture_test_velocity(CMPScalar x0, CMPScalar y0,
+                                               CMPScalar x1, CMPScalar y1,
+                                               cmp_u32 dt_ms, CMPScalar *out_vx,
+                                               CMPScalar *out_vy);
+CMP_API int CMP_CALL cmp_gesture_test_dispatch_to_widget(
+    CMPWidget *widget, const CMPInputEvent *event, CMPBool *out_handled);
+CMP_API int CMP_CALL cmp_gesture_test_emit(CMPWidget *widget,
+                                           const CMPInputEvent *source,
+                                           cmp_u32 type,
+                                           const CMPGestureEvent *gesture,
+                                           CMPBool *out_handled);
+CMP_API int CMP_CALL
+cmp_gesture_test_reset_pointer(CMPGestureDispatcher *dispatcher);
+CMP_API int CMP_CALL
+cmp_gesture_test_clear_state(CMPGestureDispatcher *dispatcher);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

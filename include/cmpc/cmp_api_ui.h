@@ -54,6 +54,14 @@ extern "C" {
 #define CMP_SEMANTIC_FLAG_FOCUSABLE 0x04
 /** @brief Semantics node is focused. */
 #define CMP_SEMANTIC_FLAG_FOCUSED 0x08
+/** @brief Semantics node is checked (used for checkboxes/radios). */
+#define CMP_SEMANTIC_FLAG_CHECKED 0x10
+/** @brief Semantics node is partially checked (mixed state). */
+#define CMP_SEMANTIC_FLAG_MIXED_CHECKED 0x20
+/** @brief Semantics node is expanded (for accordions/menus). */
+#define CMP_SEMANTIC_FLAG_EXPANDED 0x40
+/** @brief Semantics node is toggled (for switches). */
+#define CMP_SEMANTIC_FLAG_TOGGLED 0x80
 
 /**
  * @brief Layout constraint for a single axis.
@@ -81,6 +89,11 @@ typedef struct CMPSemantics {
   const char *utf8_label; /**< Primary label text in UTF-8. */
   const char *utf8_hint;  /**< Hint text in UTF-8. */
   const char *utf8_value; /**< Value text in UTF-8. */
+  cmp_i32 list_index; /**< Index in a list (1-based), or 0 if not applicable. */
+  cmp_i32 list_size;  /**< Total size of the list, or 0 if not applicable. */
+  CMPScalar range_min; /**< Minimum value for range roles (sliders/progress). */
+  CMPScalar range_max; /**< Maximum value for range roles. */
+  CMPScalar range_value; /**< Current value for range roles. */
 } CMPSemantics;
 
 /**

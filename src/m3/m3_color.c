@@ -1,5 +1,6 @@
 #include "m3/m3_color.h"
 
+#include "cmpc/cmp_api_ws.h"
 #include <math.h>
 
 #define M3_COLOR_PI 3.14159265358979323846
@@ -418,6 +419,13 @@ static CMPScalar m3_scheme_max_chroma(CMPScalar value, CMPScalar minimum) {
 
 int CMP_CALL m3_scheme_generate(cmp_u32 source_argb, CMPBool dark,
                                 M3Scheme *out_scheme) {
+  return m3_scheme_generate_variant(source_argb, dark,
+                                    M3_SCHEME_VARIANT_TONAL_SPOT, out_scheme);
+}
+
+int CMP_CALL m3_scheme_generate_variant(cmp_u32 source_argb, CMPBool dark,
+                                        M3SchemeVariant variant,
+                                        M3Scheme *out_scheme) {
   M3ColorHct source_hct;
   M3TonalPalette primary;
   M3TonalPalette secondary;
@@ -441,28 +449,115 @@ int CMP_CALL m3_scheme_generate(cmp_u32 source_argb, CMPBool dark,
   hue = source_hct.hue;
   chroma = source_hct.chroma;
 
-  rc =
-      m3_tonal_palette_init(&primary, hue, m3_scheme_max_chroma(chroma, 48.0f));
-  if (rc != CMP_OK) {
-    return rc;
-  }
-  rc = m3_tonal_palette_init(&secondary, hue,
-                             m3_scheme_max_chroma(chroma * 0.33f, 16.0f));
-  if (rc != CMP_OK) {
-    return rc;
-  }
-  rc = m3_tonal_palette_init(&tertiary, hue + 60.0f,
-                             m3_scheme_max_chroma(chroma * 0.5f, 24.0f));
-  if (rc != CMP_OK) {
-    return rc;
-  }
-  rc = m3_tonal_palette_init(&neutral, hue, 4.0f);
-  if (rc != CMP_OK) {
-    return rc;
-  }
-  rc = m3_tonal_palette_init(&neutral_variant, hue, 8.0f);
-  if (rc != CMP_OK) {
-    return rc;
+  if (variant == M3_SCHEME_VARIANT_EXPRESSIVE) {
+    hue = m3_wrap_hue(hue + 120.0f);
+    rc = m3_tonal_palette_init(&primary, hue, 40.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&secondary, hue, 24.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&tertiary, m3_wrap_hue(hue + 120.0f), 32.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&neutral, hue + 15.0f, 8.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&neutral_variant, hue + 15.0f, 12.0f);
+    if (rc != CMP_OK)
+      return rc;
+  } else if (variant == M3_SCHEME_VARIANT_FIDELITY) {
+    rc = m3_tonal_palette_init(&primary, hue, chroma);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(
+        &secondary, hue, m3_scheme_max_chroma(chroma - 32.0f, chroma * 0.5f));
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&tertiary, m3_wrap_hue(hue + 30.0f), chroma);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&neutral, hue, chroma / 8.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&neutral_variant, hue, (chroma / 8.0f) + 4.0f);
+    if (rc != CMP_OK)
+      return rc;
+  } else if (variant == M3_SCHEME_VARIANT_CONTENT) {
+    rc = m3_tonal_palette_init(&primary, hue, chroma);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(
+        &secondary, hue, m3_scheme_max_chroma(chroma - 32.0f, chroma * 0.5f));
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&tertiary, m3_wrap_hue(hue + 15.0f),
+                               chroma - 8.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&neutral, hue, chroma / 8.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&neutral_variant, hue, (chroma / 8.0f) + 4.0f);
+    if (rc != CMP_OK)
+      return rc;
+  } else if (variant == M3_SCHEME_VARIANT_VIBRANT) {
+    rc = m3_tonal_palette_init(&primary, hue, 200.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&secondary, hue, 24.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&tertiary, m3_wrap_hue(hue + 45.0f), 32.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&neutral, hue, 10.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&neutral_variant, hue, 12.0f);
+    if (rc != CMP_OK)
+      return rc;
+  } else if (variant == M3_SCHEME_VARIANT_NEUTRAL) {
+    rc = m3_tonal_palette_init(&primary, hue, 16.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&secondary, hue, 8.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&tertiary, hue, 16.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&neutral, hue, 2.0f);
+    if (rc != CMP_OK)
+      return rc;
+    rc = m3_tonal_palette_init(&neutral_variant, hue, 2.0f);
+    if (rc != CMP_OK)
+      return rc;
+  } else {
+    /* TONAL SPOT (Default) */
+    rc = m3_tonal_palette_init(&primary, hue,
+                               m3_scheme_max_chroma(chroma, 48.0f));
+    if (rc != CMP_OK) {
+      return rc;
+    }
+    rc = m3_tonal_palette_init(&secondary, hue,
+                               m3_scheme_max_chroma(chroma * 0.33f, 16.0f));
+    if (rc != CMP_OK) {
+      return rc;
+    }
+    rc = m3_tonal_palette_init(&tertiary, hue + 60.0f,
+                               m3_scheme_max_chroma(chroma * 0.5f, 24.0f));
+    if (rc != CMP_OK) {
+      return rc;
+    }
+    rc = m3_tonal_palette_init(&neutral, hue, 4.0f);
+    if (rc != CMP_OK) {
+      return rc;
+    }
+    rc = m3_tonal_palette_init(&neutral_variant, hue, 8.0f);
+    if (rc != CMP_OK) {
+      return rc;
+    }
   }
   rc = m3_tonal_palette_init(&error, 25.0f, 84.0f);
   if (rc != CMP_OK) {
@@ -888,9 +983,9 @@ CMP_API int CMP_CALL m3_color_extract_seed_from_image(
       continue; /* Ignore transparent */
 
     {
-      CMPScalar rf = r / 255.0f;
-      CMPScalar gf = g / 255.0f;
-      CMPScalar bf = b / 255.0f;
+      CMPScalar rf = (CMPScalar)r / 255.0f;
+      CMPScalar gf = (CMPScalar)g / 255.0f;
+      CMPScalar bf = (CMPScalar)b / 255.0f;
       CMPScalar max_val = rf > gf ? (rf > bf ? rf : bf) : (gf > bf ? gf : bf);
       CMPScalar min_val = rf < gf ? (rf < bf ? rf : bf) : (gf < bf ? gf : bf);
       CMPScalar chroma = max_val - min_val;
@@ -910,4 +1005,45 @@ CMP_API int CMP_CALL m3_color_extract_seed_from_image(
 
   *out_seed_argb = best_color;
   return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_scheme_generate_system(struct CMPWS *ws, CMPBool dark,
+                                               M3Scheme *out_scheme) {
+  CMPScalar r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
+  cmp_u32 source_argb;
+  int rc;
+
+  if (ws == NULL || ws->vtable == NULL || out_scheme == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  rc = ws->vtable->get_system_color(ws->ctx, CMP_SYSTEM_COLOR_ACCENT, &r, &g,
+                                    &b, &a);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  if (r < 0.0f)
+    r = 0.0f;
+  else if (r > 1.0f)
+    r = 1.0f;
+  if (g < 0.0f)
+    g = 0.0f;
+  else if (g > 1.0f)
+    g = 1.0f;
+  if (b < 0.0f)
+    b = 0.0f;
+  else if (b > 1.0f)
+    b = 1.0f;
+  if (a < 0.0f)
+    a = 0.0f;
+  else if (a > 1.0f)
+    a = 1.0f;
+
+  source_argb = ((cmp_u32)(a * 255.0f + 0.5f) << 24) |
+                ((cmp_u32)(r * 255.0f + 0.5f) << 16) |
+                ((cmp_u32)(g * 255.0f + 0.5f) << 8) |
+                (cmp_u32)(b * 255.0f + 0.5f);
+
+  return m3_scheme_generate(source_argb, dark, out_scheme);
 }

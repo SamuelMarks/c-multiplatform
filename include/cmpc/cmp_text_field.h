@@ -309,6 +309,106 @@ CMP_API int CMP_CALL cmp_text_field_step(CMPTextField *field, CMPScalar dt,
 CMP_API int CMP_CALL cmp_text_field_set_on_change(
     CMPTextField *field, CMPTextFieldOnChange on_change, void *ctx);
 
+CMP_API int CMP_CALL cmp_text_field_test_set_fail_point(cmp_u32 fail_point);
+
+CMP_API int CMP_CALL
+cmp_text_field_test_set_color_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL
+cmp_text_field_test_set_overflow_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL
+cmp_text_field_test_set_font_metrics_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL cmp_text_field_test_set_offset_skip_early(CMPBool enable);
+
+CMP_API int CMP_CALL cmp_text_field_test_clear_fail_points(void);
+
+CMP_API int CMP_CALL cmp_text_field_test_validate_color(const CMPColor *color);
+
+CMP_API int CMP_CALL cmp_text_field_test_color_set(CMPColor *color, CMPScalar r,
+                                                   CMPScalar g, CMPScalar b,
+                                                   CMPScalar a);
+
+CMP_API int CMP_CALL cmp_text_field_test_validate_text_style(
+    const CMPTextStyle *style, CMPBool require_family);
+
+CMP_API int CMP_CALL cmp_text_field_test_validate_style(
+    const CMPTextFieldStyle *style, CMPBool require_text_family,
+    /* GCOVR_EXCL_LINE */ CMPBool require_label_family); /* GCOVR_EXCL_LINE */
+
+CMP_API int CMP_CALL
+cmp_text_field_test_validate_backend(const CMPTextBackend *backend);
+
+CMP_API int CMP_CALL
+cmp_text_field_test_validate_measure_spec(CMPMeasureSpec spec);
+
+CMP_API int CMP_CALL cmp_text_field_test_validate_rect(const CMPRect *rect);
+
+CMP_API int CMP_CALL cmp_text_field_test_usize_max(cmp_usize *out_value);
+
+CMP_API int CMP_CALL cmp_text_field_test_add_overflow(cmp_usize a, cmp_usize b,
+                                                      cmp_usize *out_value);
+
+CMP_API int CMP_CALL cmp_text_field_test_reserve(CMPTextField *field,
+                                                 cmp_usize required);
+
+CMP_API int CMP_CALL cmp_text_field_test_validate_utf8(const char *utf8,
+                                                       cmp_usize utf8_len);
+
+CMP_API int CMP_CALL cmp_text_field_test_validate_offset(const char *utf8,
+                                                         cmp_usize utf8_len,
+                                                         cmp_usize offset);
+
+CMP_API int CMP_CALL cmp_text_field_test_prev_offset(const char *utf8,
+                                                     cmp_usize utf8_len,
+                                                     cmp_usize offset,
+                                                     cmp_usize *out_offset);
+
+CMP_API int CMP_CALL cmp_text_field_test_next_offset(const char *utf8,
+                                                     cmp_usize utf8_len,
+                                                     cmp_usize offset,
+                                                     cmp_usize *out_offset);
+
+CMP_API int CMP_CALL
+cmp_text_field_test_update_text_metrics(CMPTextField *field);
+
+CMP_API int CMP_CALL
+cmp_text_field_test_update_label_metrics(CMPTextField *field);
+
+CMP_API int CMP_CALL
+cmp_text_field_test_update_placeholder_metrics(CMPTextField *field);
+
+CMP_API int CMP_CALL
+cmp_text_field_test_update_font_metrics(CMPTextField *field);
+
+CMP_API int CMP_CALL cmp_text_field_test_sync_label(CMPTextField *field);
+
+CMP_API int CMP_CALL
+cmp_text_field_test_reset_cursor_blink(CMPTextField *field);
+
+CMP_API int CMP_CALL cmp_text_field_test_set_text_internal(
+    CMPTextField *field, const char *utf8_text, cmp_usize utf8_len,
+    CMPBool notify);
+
+CMP_API int CMP_CALL cmp_text_field_test_delete_range(CMPTextField *field,
+                                                      cmp_usize start,
+                                                      cmp_usize end,
+                                                      CMPBool notify);
+
+CMP_API int CMP_CALL cmp_text_field_test_measure_prefix(CMPTextField *field,
+                                                        cmp_usize offset,
+                                                        CMPScalar *out_width);
+
+CMP_API int CMP_CALL cmp_text_field_test_offset_for_x(CMPTextField *field,
+                                                      CMPScalar x,
+                                                      cmp_usize *out_offset);
+
+CMP_API int CMP_CALL cmp_text_field_test_resolve_colors(
+    const CMPTextField *field, CMPColor *out_container, CMPColor *out_outline,
+    CMPColor *out_text, CMPColor *out_label, CMPColor *out_placeholder,
+    CMPColor *out_cursor, CMPColor *out_selection, CMPColor *out_handle);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

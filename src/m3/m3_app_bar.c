@@ -339,7 +339,7 @@ static int m3_app_bar_measure_title(const M3AppBar *bar,
   }
 
   return cmp_text_measure_utf8(&bar->text_backend, bar->title_font,
-                               bar->utf8_title, bar->title_len, out_metrics);
+                               bar->utf8_title, bar->title_len, 0, out_metrics);
 }
 
 static int m3_app_bar_compute_content_bounds(const M3AppBar *bar,
@@ -690,9 +690,9 @@ static int m3_app_bar_widget_paint(void *widget, CMPPaintContext *ctx) {
     return rc;
   }
 
-  rc = ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, bar->title_font,
-                                        bar->utf8_title, bar->title_len, text_x,
-                                        text_y, bar->style.title_style.color);
+  rc = ctx->gfx->text_vtable->draw_text(
+      ctx->gfx->ctx, bar->title_font, bar->utf8_title, bar->title_len, 0,
+      text_x, text_y, bar->style.title_style.color);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -717,6 +717,7 @@ static int m3_app_bar_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   bar = (M3AppBar *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;

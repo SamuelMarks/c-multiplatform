@@ -91,6 +91,26 @@ CMP_API int CMP_CALL cmp_video_read_frame(CMPVideoDecoder *decoder,
                                           CMPVideoFrame *out_frame,
                                           CMPBool *out_has_frame);
 
+CMP_API int CMP_CALL cmp_video_test_set_read_u32_fail_after(cmp_u32 call_count);
+CMP_API int CMP_CALL
+cmp_video_test_set_mul_overflow_fail_after(cmp_u32 call_count);
+CMP_API int CMP_CALL cmp_video_test_mul_overflow(cmp_usize a, cmp_usize b,
+                                                 cmp_usize *out_result);
+CMP_API int CMP_CALL cmp_video_test_read_u32_le(const cmp_u8 *data,
+                                                cmp_usize size,
+                                                cmp_usize offset,
+                                                cmp_u32 *out_val);
+CMP_API int CMP_CALL
+cmp_video_test_fallback_parse(const CMPVideoOpenRequest *request);
+CMP_API int CMP_CALL cmp_video_test_fallback_open(
+    CMPVideoDecoder *decoder, const CMPVideoOpenRequest *request);
+CMP_API int CMP_CALL cmp_video_test_fallback_close(CMPVideoDecoder *decoder);
+CMP_API int CMP_CALL cmp_video_test_fallback_read_frame_raw(
+    CMPVideoDecoder *decoder, CMPVideoFrame *out_frame, CMPBool *out_handled);
+CMP_API int CMP_CALL cmp_video_test_fallback_read_frame_case(
+    cmp_u32 a, cmp_u32 b, cmp_u32 c, cmp_u32 d, cmp_u32 e, cmp_u32 f,
+    cmp_usize g, CMPVideoFrame *out_frame, CMPBool *out_handled);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

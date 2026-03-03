@@ -16,6 +16,9 @@ CMP_API int CMP_CALL m3_typography_scale_init(M3TypographyScale *scale) {
     CMPTextStyle *style = &scale->roles[i];
     style->utf8_family = M3_TYPOGRAPHY_DEFAULT_FAMILY;
     style->italic = CMP_FALSE;
+    style->width_axis = 100.0f;
+    style->slant = 0.0f;
+    style->grade = 0.0f;
     style->color.r = 0.0f;
     style->color.g = 0.0f;
     style->color.b = 0.0f;
@@ -25,66 +28,99 @@ CMP_API int CMP_CALL m3_typography_scale_init(M3TypographyScale *scale) {
     case M3_TYPOGRAPHY_DISPLAY_LARGE:
       style->size_px = 57;
       style->weight = 400;
+      style->line_height_px = 64.0f;
+      style->letter_spacing = -0.25f;
       break;
     case M3_TYPOGRAPHY_DISPLAY_MEDIUM:
       style->size_px = 45;
       style->weight = 400;
+      style->line_height_px = 52.0f;
+      style->letter_spacing = 0.0f;
       break;
     case M3_TYPOGRAPHY_DISPLAY_SMALL:
       style->size_px = 36;
       style->weight = 400;
+      style->line_height_px = 44.0f;
+      style->letter_spacing = 0.0f;
       break;
     case M3_TYPOGRAPHY_HEADLINE_LARGE:
       style->size_px = 32;
       style->weight = 400;
+      style->line_height_px = 40.0f;
+      style->letter_spacing = 0.0f;
       break;
     case M3_TYPOGRAPHY_HEADLINE_MEDIUM:
       style->size_px = 28;
       style->weight = 400;
+      style->line_height_px = 36.0f;
+      style->letter_spacing = 0.0f;
       break;
     case M3_TYPOGRAPHY_HEADLINE_SMALL:
       style->size_px = 24;
       style->weight = 400;
+      style->line_height_px = 32.0f;
+      style->letter_spacing = 0.0f;
       break;
     case M3_TYPOGRAPHY_TITLE_LARGE:
       style->size_px = 22;
       style->weight = 400;
+      style->line_height_px = 28.0f;
+      style->letter_spacing = 0.0f;
       break;
     case M3_TYPOGRAPHY_TITLE_MEDIUM:
       style->size_px = 16;
       style->weight = 500;
+      style->line_height_px = 24.0f;
+      style->letter_spacing = 0.15f;
       break;
     case M3_TYPOGRAPHY_TITLE_SMALL:
       style->size_px = 14;
       style->weight = 500;
+      style->line_height_px = 20.0f;
+      style->letter_spacing = 0.1f;
       break;
     case M3_TYPOGRAPHY_LABEL_LARGE:
       style->size_px = 14;
       style->weight = 500;
+      style->line_height_px = 20.0f;
+      style->letter_spacing = 0.1f;
       break;
     case M3_TYPOGRAPHY_LABEL_MEDIUM:
       style->size_px = 12;
       style->weight = 500;
+      style->line_height_px = 16.0f;
+      style->letter_spacing = 0.5f;
       break;
     case M3_TYPOGRAPHY_LABEL_SMALL:
       style->size_px = 11;
       style->weight = 500;
+      style->line_height_px = 16.0f;
+      style->letter_spacing = 0.5f;
       break;
     case M3_TYPOGRAPHY_BODY_LARGE:
       style->size_px = 16;
       style->weight = 400;
+      style->line_height_px = 24.0f;
+      style->letter_spacing = 0.5f;
       break;
     case M3_TYPOGRAPHY_BODY_MEDIUM:
       style->size_px = 14;
       style->weight = 400;
+      style->line_height_px = 20.0f;
+      style->letter_spacing = 0.25f;
       break;
     case M3_TYPOGRAPHY_BODY_SMALL:
       style->size_px = 12;
       style->weight = 400;
+      style->line_height_px = 16.0f;
+      style->letter_spacing = 0.4f;
       break;
     case M3_TYPOGRAPHY_ROLE_COUNT:
       break;
     }
+
+    /* Optical size typically matches the physical size in standard M3 usage. */
+    style->optical_size = (CMPScalar)style->size_px;
   }
 
   return CMP_OK;

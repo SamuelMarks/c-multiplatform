@@ -180,6 +180,62 @@ CMP_API int CMP_CALL m3_app_bar_get_height(const M3AppBar *bar,
 CMP_API int CMP_CALL m3_app_bar_get_content_bounds(const M3AppBar *bar,
                                                    CMPRect *out_bounds);
 
+CMP_API int CMP_CALL m3_app_bar_test_set_fail_point(cmp_u32 fail_point);
+
+CMP_API int CMP_CALL m3_app_bar_test_set_color_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_app_bar_test_clear_fail_points(void);
+
+CMP_API int CMP_CALL m3_app_bar_test_set_match_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_app_bar_test_set_color_error_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_app_bar_test_set_collapse_fail(CMPBool enable);
+
+CMP_API int CMP_CALL m3_app_bar_test_validate_color(const CMPColor *color);
+
+CMP_API int CMP_CALL m3_app_bar_test_color_set(CMPColor *color, CMPScalar r,
+                                               CMPScalar g, CMPScalar b,
+                                               CMPScalar a);
+
+CMP_API int CMP_CALL
+m3_app_bar_test_validate_edges(const CMPLayoutEdges *edges);
+
+CMP_API int CMP_CALL m3_app_bar_test_validate_text_style(
+    const CMPTextStyle *style, CMPBool require_family);
+
+CMP_API int CMP_CALL m3_app_bar_test_validate_style(const M3AppBarStyle *style,
+                                                    CMPBool require_family);
+
+CMP_API int CMP_CALL m3_app_bar_test_call_color_should_fail(CMPBool *out_fail);
+
+CMP_API int CMP_CALL m3_app_bar_test_call_fail_point_match(cmp_u32 point,
+                                                           CMPBool *out_match);
+
+CMP_API int CMP_CALL m3_app_bar_test_validate_measure_spec(CMPMeasureSpec spec);
+
+CMP_API int CMP_CALL m3_app_bar_test_validate_rect(const CMPRect *rect);
+
+CMP_API int CMP_CALL m3_app_bar_test_compute_collapse_range(
+    const M3AppBarStyle *style, CMPScalar *out_range);
+
+CMP_API int CMP_CALL m3_app_bar_test_compute_current_height(
+    const M3AppBar *bar, CMPScalar *out_height);
+
+CMP_API int CMP_CALL m3_app_bar_test_compute_content_bounds(
+    const M3AppBar *bar, CMPRect *out_bounds);
+
+CMP_API int CMP_CALL m3_app_bar_test_compute_title_position(
+    const M3AppBar *bar, const CMPTextMetrics *metrics, CMPScalar *out_x,
+    CMPScalar *out_y);
+
+CMP_API int CMP_CALL m3_app_bar_test_measure_title(const M3AppBar *bar,
+                                                   CMPTextMetrics *out_metrics);
+
+CMP_API int CMP_CALL m3_app_bar_test_apply_scroll(M3AppBar *bar,
+                                                  CMPScalar delta,
+                                                  CMPScalar *out_consumed);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

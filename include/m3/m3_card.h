@@ -141,6 +141,46 @@ CMP_API int CMP_CALL m3_card_set_on_click(M3Card *card, CMPCardOnClick on_click,
 CMP_API int CMP_CALL m3_card_get_content_bounds(const M3Card *card,
                                                 CMPRect *out_bounds);
 
+CMP_API int CMP_CALL m3_card_test_set_fail_point(cmp_u32 fail_point);
+
+CMP_API int CMP_CALL m3_card_test_set_color_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_card_test_clear_fail_points(void);
+
+CMP_API int CMP_CALL m3_card_test_validate_color(const CMPColor *color);
+
+CMP_API int CMP_CALL m3_card_test_color_set(CMPColor *color, CMPScalar r,
+                                            CMPScalar g, CMPScalar b,
+                                            CMPScalar a);
+
+CMP_API int CMP_CALL m3_card_test_color_with_alpha(const CMPColor *base,
+                                                   CMPScalar alpha,
+                                                   CMPColor *out_color);
+
+CMP_API int CMP_CALL m3_card_test_validate_edges(const CMPLayoutEdges *edges);
+
+CMP_API int CMP_CALL m3_card_test_validate_style(const M3CardStyle *style);
+
+CMP_API int CMP_CALL m3_card_test_validate_measure_spec(CMPMeasureSpec spec);
+
+CMP_API int CMP_CALL m3_card_test_validate_rect(const CMPRect *rect);
+
+CMP_API int CMP_CALL m3_card_test_measure_content(const M3CardStyle *style,
+                                                  CMPScalar *out_width,
+                                                  CMPScalar *out_height);
+
+CMP_API int CMP_CALL m3_card_test_compute_inner(const M3Card *card,
+                                                CMPRect *out_inner,
+                                                CMPScalar *out_corner);
+
+CMP_API int CMP_CALL m3_card_test_compute_content_bounds(const M3Card *card,
+                                                         CMPRect *out_bounds);
+
+CMP_API int CMP_CALL m3_card_test_resolve_colors(const M3Card *card,
+                                                 CMPColor *out_background,
+                                                 CMPColor *out_outline,
+                                                 CMPColor *out_ripple);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

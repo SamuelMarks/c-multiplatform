@@ -220,6 +220,46 @@ CMP_API int CMP_CALL m3_button_set_on_click(M3Button *button,
                                             CMPButtonOnClick on_click,
                                             void *ctx);
 
+CMP_API int CMP_CALL m3_button_test_set_fail_point(cmp_u32 fail_point);
+
+CMP_API int CMP_CALL m3_button_test_set_color_fail_after(cmp_u32 call_count);
+
+CMP_API int CMP_CALL m3_button_test_clear_fail_points(void);
+
+CMP_API int CMP_CALL m3_button_test_validate_color(const CMPColor *color);
+
+CMP_API int CMP_CALL m3_button_test_color_set(CMPColor *color, CMPScalar r,
+                                              CMPScalar g, CMPScalar b,
+                                              CMPScalar a);
+
+CMP_API int CMP_CALL m3_button_test_color_with_alpha(const CMPColor *base,
+                                                     CMPScalar alpha,
+                                                     CMPColor *out_color);
+
+CMP_API int CMP_CALL m3_button_test_validate_text_style(
+    const CMPTextStyle *style, CMPBool require_family);
+
+CMP_API int CMP_CALL m3_button_test_validate_style(const M3ButtonStyle *style,
+                                                   CMPBool require_family);
+
+CMP_API int CMP_CALL m3_button_test_validate_measure_spec(CMPMeasureSpec spec);
+
+CMP_API int CMP_CALL m3_button_test_validate_rect(const CMPRect *rect);
+
+CMP_API int CMP_CALL
+m3_button_test_validate_backend(const CMPTextBackend *backend);
+
+CMP_API int CMP_CALL m3_button_test_metrics_update(M3Button *button);
+
+CMP_API int CMP_CALL m3_button_test_resolve_colors(const M3Button *button,
+                                                   CMPColor *out_background,
+                                                   CMPColor *out_text,
+                                                   CMPColor *out_outline,
+                                                   CMPColor *out_ripple);
+
+CMP_API int CMP_CALL m3_button_test_resolve_corner(const M3Button *button,
+                                                   CMPScalar *out_corner);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

@@ -413,11 +413,12 @@ cmp_render_record_draw_texture(void *gfx, CMPHandle texture, const CMPRect *src,
 
 static int cmp_render_record_draw_text(void *text, CMPHandle font,
                                        const char *utf8, cmp_usize utf8_len,
-                                       CMPScalar x, CMPScalar y,
-                                       CMPColor color) {
+                                       cmp_u32 base_direction, CMPScalar x,
+                                       CMPScalar y, CMPColor color) {
   CMPRenderRecorder *recorder;
   CMPRenderCmd cmd;
 
+  (void)base_direction;
   if (text == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -467,9 +468,11 @@ static int cmp_render_record_destroy_font(void *text, CMPHandle font) {
 
 static int
 cmp_render_record_measure_text(void *text, CMPHandle font, const char *utf8,
-                               cmp_usize utf8_len, CMPScalar *out_width,
+                               cmp_usize utf8_len, cmp_u32 base_direction,
+                               CMPScalar *out_width,
                                CMPScalar *out_height, /* GCOVR_EXCL_LINE */
                                CMPScalar *out_baseline) {
+  (void)base_direction;
   CMP_UNUSED(font);
   CMP_UNUSED(utf8);
   CMP_UNUSED(utf8_len);
@@ -500,8 +503,13 @@ static const CMPGfxVTable g_cmp_render_record_vtable =
 
 static const CMPTextVTable g_cmp_render_record_text_vtable =
     {/* GCOVR_EXCL_LINE */
-     cmp_render_record_create_font, cmp_render_record_destroy_font,
-     cmp_render_record_measure_text, cmp_render_record_draw_text};
+     cmp_render_record_create_font,
+     cmp_render_record_destroy_font,
+     cmp_render_record_measure_text,
+     cmp_render_record_draw_text,
+     NULL,
+     NULL,
+     NULL};
 
 static int cmp_render_validate_node(const CMPRenderNode *node) {
   cmp_usize i; /* GCOVR_EXCL_LINE */
@@ -807,8 +815,9 @@ int CMP_CALL cmp_render_list_execute(const CMPRenderList *list, CMPGfx *gfx) {
       }
       rc = gfx->text_vtable->draw_text(
           gfx->ctx, cmd->data.draw_text.font, cmd->data.draw_text.utf8,
-          cmd->data.draw_text.utf8_len, cmd->data.draw_text.x,
-          cmd->data.draw_text.y, cmd->data.draw_text.color);
+          cmd->data.draw_text.utf8_len, cmd->data.draw_text.base_direction,
+          cmd->data.draw_text.x, cmd->data.draw_text.y,
+          cmd->data.draw_text.color);
       break;
     default:
       return CMP_ERR_INVALID_ARGUMENT;

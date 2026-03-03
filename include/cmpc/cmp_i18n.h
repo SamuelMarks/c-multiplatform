@@ -674,6 +674,31 @@ CMP_API int CMP_CALL cmp_i18n_test_parse_table(CMPI18n *i18n, const char *data,
                                                CMPBool overwrite);
 #endif
 
+/**
+ * @brief Get the text direction.
+ * @param i18n The i18n context.
+ * @param out_direction Pointer to store the direction.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_i18n_get_direction(const CMPI18n *i18n,
+                                            cmp_u32 *out_direction);
+
+/**
+ * @brief Set the locale to Arabic (Saudi Arabia) for testing.
+ * @param out_locale The locale object to initialize.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL
+cmp_i18n_test_locale_preset_ar_sa(CMPI18nLocale *out_locale);
+
+/**
+ * @brief Set the locale to Hebrew (Israel) for testing.
+ * @param out_locale The locale object to initialize.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL
+cmp_i18n_test_locale_preset_he_il(CMPI18nLocale *out_locale);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

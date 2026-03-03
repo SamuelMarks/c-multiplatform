@@ -41,13 +41,53 @@ target_include_directories(cmp_headers INTERFACE
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
+option(CMP_ENABLE_ASAN "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+option(CMP_ENABLE_VALGRIND "Enable Valgrind target for testing" OFF)
+
 set(CMP_WARNINGS_C
     $<$<C_COMPILER_ID:MSVC>:/W4>
+    $<$<C_COMPILER_ID:MSVC>:/Za>
+    $<$<C_COMPILER_ID:MSVC>:/sdl>
+    $<$<C_COMPILER_ID:MSVC>:/RTC1>
     $<$<C_COMPILER_ID:MSVC>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:/WX>>
-    $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wall>
-    $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wextra>
-    $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wpedantic>
-    $<$<NOT:$<C_COMPILER_ID:MSVC>>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:-Werror>>
+    $<$<C_COMPILER_ID:GNU>:-Wall>
+    $<$<C_COMPILER_ID:GNU>:-Wextra>
+    $<$<C_COMPILER_ID:GNU>:-pedantic>
+    $<$<C_COMPILER_ID:GNU>:-ansi>
+    $<$<C_COMPILER_ID:GNU>:-Wconversion>
+    $<$<C_COMPILER_ID:GNU>:-Wsign-conversion>
+    $<$<C_COMPILER_ID:GNU>:-Wcast-qual>
+    $<$<C_COMPILER_ID:GNU>:-Wformat=2>
+    $<$<C_COMPILER_ID:GNU>:-Wundef>
+    $<$<C_COMPILER_ID:GNU>:-Wshadow>
+    $<$<C_COMPILER_ID:GNU>:-Wcast-align>
+    $<$<C_COMPILER_ID:GNU>:-Wstrict-prototypes>
+    $<$<C_COMPILER_ID:GNU>:-Wmissing-prototypes>
+    $<$<C_COMPILER_ID:GNU>:-Wmissing-declarations>
+    $<$<C_COMPILER_ID:GNU>:-Wredundant-decls>
+    $<$<C_COMPILER_ID:GNU>:-Wnested-externs>
+    $<$<C_COMPILER_ID:GNU>:-Winline>
+    $<$<C_COMPILER_ID:GNU>:-Wvla>
+    $<$<C_COMPILER_ID:GNU>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:-Werror>>
+    $<$<C_COMPILER_ID:Clang>:-Wall>
+    $<$<C_COMPILER_ID:Clang>:-Wextra>
+    $<$<C_COMPILER_ID:Clang>:-pedantic>
+    $<$<C_COMPILER_ID:Clang>:-ansi>
+    $<$<C_COMPILER_ID:Clang>:-Wconversion>
+    $<$<C_COMPILER_ID:Clang>:-Wsign-conversion>
+    $<$<C_COMPILER_ID:Clang>:-Wcast-qual>
+    $<$<C_COMPILER_ID:Clang>:-Wformat=2>
+    $<$<C_COMPILER_ID:Clang>:-Wundef>
+    $<$<C_COMPILER_ID:Clang>:-Wshadow>
+    $<$<C_COMPILER_ID:Clang>:-Wcast-align>
+    $<$<C_COMPILER_ID:Clang>:-Wstrict-prototypes>
+    $<$<C_COMPILER_ID:Clang>:-Wmissing-prototypes>
+    $<$<C_COMPILER_ID:Clang>:-Wmissing-declarations>
+    $<$<C_COMPILER_ID:Clang>:-Wredundant-decls>
+    $<$<C_COMPILER_ID:Clang>:-Wnested-externs>
+    $<$<C_COMPILER_ID:Clang>:-Winline>
+    $<$<C_COMPILER_ID:Clang>:-Wvla>
+    $<$<C_COMPILER_ID:Clang>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:-Werror>>
 )
 
 function(cmp_apply_c_settings target_name)
@@ -59,6 +99,15 @@ function(cmp_apply_c_settings target_name)
             target_link_options(${target_name} PRIVATE --coverage)
         else()
             message(FATAL_ERROR "CMP_ENABLE_COVERAGE is only supported with GCC or Clang.")
+        endif()
+    endif()
+
+    if(CMP_ENABLE_ASAN)
+        if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+            target_compile_options(${target_name} PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
+            target_link_options(${target_name} PRIVATE -fsanitize=address,undefined)
+        else()
+            message(WARNING "AddressSanitizer is primarily supported with GCC/Clang.")
         endif()
     endif()
 endfunction()
@@ -116,6 +165,7 @@ add_library(m3
     src/m3/m3_color.c
     src/m3/m3_adaptive.c
     src/m3/m3_typography.c
+    src/m3/m3_motion.c
     src/m3/m3_text_field.c
     src/m3/m3_search.c
     src/m3/m3_carousel.c
@@ -138,6 +188,8 @@ add_library(m3
     src/m3/m3_progress.c
     src/m3/m3_date_picker.c
     src/m3/m3_time_picker.c
+    src/m3/m3_pull_to_refresh.c
+    src/m3/m3_shape.c
 )
 add_library(m3::m3 ALIAS m3)
 target_include_directories(m3 PUBLIC
@@ -155,6 +207,20 @@ if(CMP_ENABLE_COVERAGE)
     else()
         message(FATAL_ERROR "CMP_ENABLE_COVERAGE is only supported with GCC or Clang.")
     endif()
+endif()
+
+if(CMP_ENABLE_ASAN)
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(cmpc PUBLIC -fsanitize=address,undefined -fno-omit-frame-pointer)
+        target_link_options(cmpc PUBLIC -fsanitize=address,undefined)
+        target_compile_options(m3 PUBLIC -fsanitize=address,undefined -fno-omit-frame-pointer)
+        target_link_options(m3 PUBLIC -fsanitize=address,undefined)
+    endif()
+endif()
+
+if(CMP_ENABLE_VALGRIND)
+    set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1")
+    find_program(MEMORYCHECK_COMMAND valgrind)
 endif()
 
 if(BUILD_SHARED_LIBS AND WIN32)
@@ -594,6 +660,18 @@ if(BUILD_TESTING)
     target_link_libraries(cmp_phase5_segmented PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_segmented COMMAND cmp_phase5_segmented)
 
+    add_executable(cmp_phase5_progress tests/phase5/progress.c)
+    target_link_libraries(cmp_phase5_progress PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_progress COMMAND cmp_phase5_progress)
+
+    add_executable(cmp_phase5_pull_to_refresh tests/phase5/pull_to_refresh.c)
+    target_link_libraries(cmp_phase5_pull_to_refresh PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_pull_to_refresh COMMAND cmp_phase5_pull_to_refresh)
+
+    add_executable(cmp_phase5_shape tests/phase5/shape.c)
+    target_link_libraries(cmp_phase5_shape PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_shape COMMAND cmp_phase5_shape)
+
     add_executable(cmp_phase5_divider tests/phase5/divider.c)
     target_link_libraries(cmp_phase5_divider PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_divider COMMAND cmp_phase5_divider)
@@ -630,6 +708,10 @@ if(BUILD_TESTING)
     add_test(NAME cmp_phase5_side_sheet COMMAND cmp_phase5_side_sheet)
 
     add_executable(cmp_phase5_buttons tests/phase5/buttons.c)
+    add_executable(cmp_phase5_motion tests/phase5/motion.c)
+    target_link_libraries(cmp_phase5_motion PRIVATE cmpc m3)
+    add_test(NAME cmp_phase5_motion COMMAND cmp_phase5_motion)
+
     target_link_libraries(cmp_phase5_buttons PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_buttons COMMAND cmp_phase5_buttons)
 endif()

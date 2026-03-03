@@ -355,8 +355,8 @@ static int test_text_destroy_font(void *text, CMPHandle font) {
 }
 
 static int test_text_measure_text(void *text, CMPHandle font, const char *utf8,
-                                  cmp_usize utf8_len, CMPScalar *out_width,
-                                  CMPScalar *out_height,
+                                  cmp_usize utf8_len, cmp_u32 base_direction,
+                                  CMPScalar *out_width, CMPScalar *out_height,
                                   CMPScalar *out_baseline) {
   CMP_UNUSED(text);
   CMP_UNUSED(font);
@@ -369,8 +369,8 @@ static int test_text_measure_text(void *text, CMPHandle font, const char *utf8,
 }
 
 static int test_text_draw_text(void *text, CMPHandle font, const char *utf8,
-                               cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                               CMPColor color) {
+                               cmp_usize utf8_len, cmp_u32 base_direction,
+                               CMPScalar x, CMPScalar y, CMPColor color) {
   TestBackend *backend;
 
   CMP_UNUSED(font);
@@ -399,9 +399,13 @@ static const CMPGfxVTable g_test_gfx_vtable = {
     test_gfx_create_texture, test_gfx_update_texture, test_gfx_destroy_texture,
     test_gfx_draw_texture};
 
-static const CMPTextVTable g_test_text_vtable = {
-    test_text_create_font, test_text_destroy_font, test_text_measure_text,
-    test_text_draw_text};
+static const CMPTextVTable g_test_text_vtable = {test_text_create_font,
+                                                 test_text_destroy_font,
+                                                 test_text_measure_text,
+                                                 test_text_draw_text,
+                                                 NULL,
+                                                 NULL,
+                                                 NULL};
 
 #define SCENARIO_OK 0
 #define SCENARIO_DRAW_RECT_ONLY 1
@@ -539,8 +543,8 @@ static int test_widget_paint(void *ctx, CMPPaintContext *paint_ctx) {
     if (paint_ctx->gfx->text_vtable == NULL) {
       return CMP_ERR_INVALID_ARGUMENT;
     }
-    rc = paint_ctx->gfx->text_vtable->draw_text(paint_ctx->gfx->ctx, handle,
-                                                "Hi", 2, 10.0f, 12.0f, color);
+    rc = paint_ctx->gfx->text_vtable->draw_text(
+        paint_ctx->gfx->ctx, handle, "Hi", 2, 0, 10.0f, 12.0f, color);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -584,8 +588,8 @@ static int test_widget_paint(void *ctx, CMPPaintContext *paint_ctx) {
     if (paint_ctx->gfx->text_vtable == NULL) {
       return CMP_ERR_INVALID_ARGUMENT;
     }
-    return paint_ctx->gfx->text_vtable->draw_text(paint_ctx->gfx->ctx, handle,
-                                                  NULL, 4, 0.0f, 0.0f, color);
+    return paint_ctx->gfx->text_vtable->draw_text(
+        paint_ctx->gfx->ctx, handle, NULL, 4, 0, 0.0f, 0.0f, color);
   case SCENARIO_CREATE_TEXTURE_INVALID:
     return paint_ctx->gfx->vtable->create_texture(
         paint_ctx->gfx->ctx, 1, 1, CMP_TEX_FORMAT_RGBA8, NULL, 0, NULL);
@@ -636,7 +640,7 @@ static int test_widget_paint(void *ctx, CMPPaintContext *paint_ctx) {
       return CMP_ERR_INVALID_ARGUMENT;
     }
     return paint_ctx->gfx->text_vtable->measure_text(
-        paint_ctx->gfx->ctx, handle, "Hi", 2, &out_width, &out_height,
+        paint_ctx->gfx->ctx, handle, "Hi", 2, 0, &out_width, &out_height,
         &out_baseline);
   case SCENARIO_RECORD_ERRORS: {
     FakeRecorder fake;
@@ -752,13 +756,13 @@ static int test_widget_paint(void *ctx, CMPPaintContext *paint_ctx) {
     }
 
     if (paint_ctx->gfx->text_vtable != NULL) {
-      if (paint_ctx->gfx->text_vtable->draw_text(NULL, handle, "Hi", 2, 0.0f,
+      if (paint_ctx->gfx->text_vtable->draw_text(NULL, handle, "Hi", 2, 0, 0.0f,
                                                  0.0f, color) !=
           CMP_ERR_INVALID_ARGUMENT) {
         ok = 0;
       }
       if (paint_ctx->gfx->text_vtable->draw_text(
-              &fake, handle, "Hi", 2, 0.0f, 0.0f, color) != CMP_ERR_STATE) {
+              &fake, handle, "Hi", 2, 0, 0.0f, 0.0f, color) != CMP_ERR_STATE) {
         ok = 0;
       }
     }

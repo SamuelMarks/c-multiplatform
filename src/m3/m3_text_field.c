@@ -251,7 +251,8 @@ static int m3_text_field_measure(void *widget, CMPMeasureSpec width,
   }
 
   if (field->utf8_supporting != NULL || field->utf8_error != NULL) {
-    core_size.height += field->style.supporting_text_style.size_px + 8.0f;
+    core_size.height +=
+        (CMPScalar)field->style.supporting_text_style.size_px + 8.0f;
   }
 
   *out_size = core_size;
@@ -268,7 +269,8 @@ static int m3_text_field_layout(void *widget, CMPRect bounds) {
 
   core_bounds = bounds;
   if (field->utf8_supporting != NULL || field->utf8_error != NULL) {
-    core_bounds.height -= (field->style.supporting_text_style.size_px + 8.0f);
+    core_bounds.height -=
+        ((CMPScalar)field->style.supporting_text_style.size_px + 8.0f);
     if (core_bounds.height < 0.0f)
       core_bounds.height = 0.0f;
   }
@@ -309,7 +311,8 @@ static int m3_text_field_paint(void *widget, CMPPaintContext *ctx) {
     text_bounds.y =
         field->core_field.bounds.y + field->core_field.bounds.height + 4.0f;
     text_bounds.width = field->core_field.bounds.width - 32.0f;
-    text_bounds.height = field->style.supporting_text_style.size_px + 4.0f;
+    text_bounds.height =
+        (CMPScalar)field->style.supporting_text_style.size_px + 4.0f;
 
     rc = field->core_field.text_backend.vtable->create_font(
         field->core_field.text_backend.ctx,
@@ -321,10 +324,10 @@ static int m3_text_field_paint(void *widget, CMPPaintContext *ctx) {
       CMPScalar w = 0, h = 0, baseline = 0;
       field->core_field.text_backend.vtable->measure_text(
           field->core_field.text_backend.ctx, font, sub_text, strlen(sub_text),
-          &w, &h, &baseline);
+          0, &w, &h, &baseline);
       field->core_field.text_backend.vtable->draw_text(
           field->core_field.text_backend.ctx, font, sub_text, strlen(sub_text),
-          text_bounds.x, text_bounds.y + baseline, sub_color);
+          0, text_bounds.x, text_bounds.y + baseline, sub_color);
       field->core_field.text_backend.vtable->destroy_font(
           field->core_field.text_backend.ctx, font);
     }
@@ -353,6 +356,7 @@ static int m3_text_field_get_semantics(void *widget,
   if (field == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
   return field->core_field.widget.vtable->get_semantics(&field->core_field,
                                                         out_semantics);
 }

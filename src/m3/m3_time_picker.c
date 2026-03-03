@@ -1004,6 +1004,7 @@ static int m3_time_picker_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   picker = (M3TimePicker *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;

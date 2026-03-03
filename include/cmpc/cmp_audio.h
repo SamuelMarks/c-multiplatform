@@ -81,6 +81,20 @@ CMP_API int CMP_CALL cmp_audio_decode(CMPAudioDecoder *decoder,
 CMP_API int CMP_CALL cmp_audio_free(CMPAudioDecoder *decoder,
                                     CMPAudioData *audio);
 
+CMP_API int CMP_CALL cmp_audio_test_set_read_u16_fail_after(cmp_u32 call_count);
+CMP_API int CMP_CALL cmp_audio_test_set_read_u32_fail_after(cmp_u32 call_count);
+CMP_API int CMP_CALL cmp_audio_test_read_u16_le(const cmp_u8 *data,
+                                                cmp_usize size,
+                                                cmp_usize offset,
+                                                cmp_u16 *out_val);
+CMP_API int CMP_CALL cmp_audio_test_read_u32_le(const cmp_u8 *data,
+                                                cmp_usize size,
+                                                cmp_usize offset,
+                                                cmp_u32 *out_val);
+CMP_API int CMP_CALL cmp_audio_test_decode_wav(
+    const CMPAudioDecodeRequest *request, const CMPAllocator *allocator,
+    CMPAudioData *out_data);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

@@ -82,6 +82,7 @@ typedef struct M3Checkbox {
   const char *utf8_label; /**< UTF-8 label for semantics (optional). */
   cmp_usize utf8_len;     /**< UTF-8 label length in bytes. */
   CMPBool checked;        /**< CMP_TRUE when checked. */
+  CMPBool mixed_state;    /**< CMP_TRUE when in mixed (indeterminate) state. */
   CMPBool pressed;        /**< CMP_TRUE when pressed. */
   CMPCheckboxOnChange on_change; /**< Change callback (may be NULL). */
   void *on_change_ctx;           /**< Change callback context pointer. */
@@ -142,6 +143,15 @@ CMP_API int CMP_CALL m3_checkbox_set_style(M3Checkbox *checkbox,
 CMP_API int CMP_CALL m3_checkbox_set_label(M3Checkbox *checkbox,
                                            const char *utf8_label,
                                            cmp_usize utf8_len);
+
+/**
+ * @brief Update the checkbox mixed (indeterminate) state.
+ * @param checkbox Checkbox widget instance.
+ * @param mixed_state New mixed state.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_checkbox_set_mixed_state(M3Checkbox *checkbox,
+                                                 CMPBool mixed_state);
 
 /**
  * @brief Assign a checkbox change callback.

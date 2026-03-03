@@ -382,7 +382,8 @@ int CMP_CALL cmp_audio_free(CMPAudioDecoder *decoder, CMPAudioData *audio) {
       return rc;
     }
   } else if (audio->data != NULL) {
-    rc = decoder->allocator.free(decoder->allocator.ctx, (void *)audio->data);
+    rc = decoder->allocator.free(decoder->allocator.ctx,
+                                 (void *)(cmp_usize)(const void *)audio->data);
     if (rc != CMP_OK) {
       return rc;
     }

@@ -485,7 +485,8 @@ int CMP_CALL cmp_image_free(CMPImageDecoder *decoder, CMPImageData *image) {
       return rc;
     }
   } else if (image->data != NULL) {
-    rc = decoder->allocator.free(decoder->allocator.ctx, (void *)image->data);
+    rc = decoder->allocator.free(decoder->allocator.ctx,
+                                 (void *)(cmp_usize)(const void *)image->data);
     if (rc != CMP_OK) {
       return rc;
     }

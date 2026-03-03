@@ -363,6 +363,13 @@ CMP_API int CMP_CALL
 cmp_extras_test_validate_badge_placement(const CMPBadgePlacement *placement);
 #endif
 
+CMP_API int CMP_CALL
+cmp_extras_test_set_tooltip_size_range_fail(CMPBool enable);
+CMP_API int CMP_CALL cmp_extras_test_set_badge_size_range_fail(CMPBool enable);
+CMP_API int CMP_CALL cmp_extras_test_validate_size(const CMPSize *size);
+CMP_API int CMP_CALL
+cmp_extras_test_validate_text_metrics(const CMPTextMetrics *metrics);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

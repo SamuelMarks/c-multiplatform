@@ -19,8 +19,8 @@ static int test_create_font(void *text, const char *utf8_family,
 }
 static int test_destroy_font(void *text, CMPHandle font) { return CMP_OK; }
 static int test_measure_text(void *text, CMPHandle font, const char *utf8,
-                             cmp_usize utf8_len, CMPScalar *w, CMPScalar *h,
-                             CMPScalar *baseline) {
+                             cmp_usize utf8_len, cmp_u32 base_direction,
+                             CMPScalar *w, CMPScalar *h, CMPScalar *baseline) {
   if (w)
     *w = 10.0f;
   if (h)
@@ -30,13 +30,18 @@ static int test_measure_text(void *text, CMPHandle font, const char *utf8,
   return CMP_OK;
 }
 static int test_draw_text(void *text, CMPHandle font, const char *utf8,
-                          cmp_usize utf8_len, CMPScalar x, CMPScalar y,
-                          CMPColor color) {
+                          cmp_usize utf8_len, cmp_u32 base_direction,
+                          CMPScalar x, CMPScalar y, CMPColor color) {
   return CMP_OK;
 }
 
-static const CMPTextVTable mock_vtable = {test_create_font, test_destroy_font,
-                                          test_measure_text, test_draw_text};
+static const CMPTextVTable mock_vtable = {test_create_font,
+                                          test_destroy_font,
+                                          test_measure_text,
+                                          test_draw_text,
+                                          NULL,
+                                          NULL,
+                                          NULL};
 
 int main(void) {
   M3TextFieldStyle style;

@@ -135,7 +135,7 @@ static int m3_dialog_measure_optional_text(const CMPTextBackend *backend,
     return CMP_OK;
   }
 
-  return cmp_text_measure_utf8(backend, font, utf8, len, out_metrics);
+  return cmp_text_measure_utf8(backend, font, utf8, len, 0, out_metrics);
 }
 
 static CMPBool m3_dialog_point_in_rect(const CMPRect *rect, CMPScalar x,
@@ -729,7 +729,7 @@ static int m3_alert_dialog_draw_action_text(
   }
 
   return ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, dialog->action_font,
-                                          utf8, len, text_x, text_y,
+                                          utf8, len, 0, text_x, text_y,
                                           dialog->style.action_style.color);
 }
 
@@ -811,7 +811,7 @@ static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
   if (dialog->title_len > 0u) {
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, dialog->title_font, dialog->utf8_title,
-        dialog->title_len, content_rect.x,
+        dialog->title_len, 0, content_rect.x,
         cursor_y + dialog->title_metrics.baseline,
         dialog->style.title_style.color);
     if (rc != CMP_OK) {
@@ -825,7 +825,7 @@ static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
   if (dialog->body_len > 0u) {
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, dialog->body_font, dialog->utf8_body, dialog->body_len,
-        content_rect.x, cursor_y + dialog->body_metrics.baseline,
+        0, content_rect.x, cursor_y + dialog->body_metrics.baseline,
         dialog->style.body_style.color);
     if (rc != CMP_OK) {
       return rc;
@@ -935,6 +935,7 @@ static int m3_alert_dialog_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   dialog = (M3AlertDialog *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;
@@ -1298,7 +1299,7 @@ static int m3_fullscreen_dialog_draw_action_text(
   }
 
   return ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, dialog->action_font,
-                                          utf8, len, text_x, text_y,
+                                          utf8, len, 0, text_x, text_y,
                                           dialog->style.action_style.color);
 }
 
@@ -1377,7 +1378,7 @@ static int m3_fullscreen_dialog_widget_paint(void *widget,
   if (dialog->title_len > 0u) {
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, dialog->title_font, dialog->utf8_title,
-        dialog->title_len, content_rect.x,
+        dialog->title_len, 0, content_rect.x,
         cursor_y + dialog->title_metrics.baseline,
         dialog->style.title_style.color);
     if (rc != CMP_OK) {
@@ -1391,7 +1392,7 @@ static int m3_fullscreen_dialog_widget_paint(void *widget,
   if (dialog->body_len > 0u) {
     rc = ctx->gfx->text_vtable->draw_text(
         ctx->gfx->ctx, dialog->body_font, dialog->utf8_body, dialog->body_len,
-        content_rect.x, cursor_y + dialog->body_metrics.baseline,
+        0, content_rect.x, cursor_y + dialog->body_metrics.baseline,
         dialog->style.body_style.color);
     if (rc != CMP_OK) {
       return rc;
@@ -1471,6 +1472,7 @@ m3_fullscreen_dialog_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   dialog = (M3FullScreenDialog *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;
@@ -1806,7 +1808,7 @@ static int m3_snackbar_draw_action_text(
   }
 
   return ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, snackbar->action_font,
-                                          utf8, len, text_x, text_y,
+                                          utf8, len, 0, text_x, text_y,
                                           snackbar->style.action_style.color);
 }
 
@@ -1898,10 +1900,10 @@ static int m3_snackbar_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   if (snackbar->message_len > 0u) {
-    rc = ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, snackbar->message_font,
-                                          snackbar->utf8_message,
-                                          snackbar->message_len, text_x, text_y,
-                                          snackbar->style.message_style.color);
+    rc = ctx->gfx->text_vtable->draw_text(
+        ctx->gfx->ctx, snackbar->message_font, snackbar->utf8_message,
+        snackbar->message_len, 0, text_x, text_y,
+        snackbar->style.message_style.color);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1971,6 +1973,7 @@ static int m3_snackbar_widget_get_semantics(void *widget,
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
 
   snackbar = (M3Snackbar *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;

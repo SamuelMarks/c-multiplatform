@@ -1,5 +1,7 @@
 #include "cmpc/cmp_a11y.h"
+#include "cmpc/cmp_api_ws.h"
 #include "test_utils.h"
+#include <string.h>
 
 int CMP_CALL cmp_a11y_test_set_fail_clear(CMPBool enable);
 
@@ -291,7 +293,37 @@ static int test_sibling_queries(void) {
   return CMP_OK;
 }
 
+static int test_ws_a11y_bridge(void) {
+  /* Simple mock of the WS bridge */
+  CMPA11yNode root;
+  CMPWS ws;
+  CMPWSVTable vtable;
+  extern int CMP_CALL mock_update_a11y_tree(void *ctx, const void *root_node);
+
+  memset(&ws, 0, sizeof(ws));
+  memset(&vtable, 0, sizeof(vtable));
+  vtable.update_a11y_tree = mock_update_a11y_tree;
+  ws.vtable = &vtable;
+
+  CMP_TEST_OK(cmp_a11y_node_init(&root, NULL, NULL));
+
+  CMP_TEST_EXPECT(ws.vtable->update_a11y_tree(NULL, &root),
+                  CMP_ERR_INVALID_ARGUMENT);
+  ws.ctx = &ws;
+  CMP_TEST_OK(ws.vtable->update_a11y_tree(ws.ctx, &root));
+
+  return CMP_OK;
+}
+
+int CMP_CALL mock_update_a11y_tree(void *ctx, const void *root_node) {
+  if (ctx == NULL || root_node == NULL)
+    return CMP_ERR_INVALID_ARGUMENT;
+  return CMP_OK;
+}
+
 int main(void) {
+  if (test_ws_a11y_bridge() != 0)
+    return 1;
   CMP_TEST_OK(test_semantics_init_defaults());
   CMP_TEST_OK(test_node_init_and_setters());
   CMP_TEST_OK(test_node_set_children());

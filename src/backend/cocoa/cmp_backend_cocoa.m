@@ -245,13 +245,77 @@ static int ws_get_time(void *ctx, uint32_t *ms) {
     return CMP_OK;
 }
 
+
+static int cmp_backend_ws_get_system_color(void *ws, cmp_u32 color_type, CMPScalar *out_r, CMPScalar *out_g, CMPScalar *out_b, CMPScalar *out_a) {
+  (void)ws;
+  if (out_r == NULL || out_g == NULL || out_b == NULL || out_a == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  
+  @autoreleasepool {
+    if (color_type == CMP_SYSTEM_COLOR_ACCENT) {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+      if (@available(macOS 10.14, *)) {
+        NSColor *color = [[NSColor controlAccentColor] colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+        if (color) {
+          CGFloat r, g, b, a;
+          [color getRed:&r green:&g blue:&b alpha:&a];
+          *out_r = (CMPScalar)r;
+          *out_g = (CMPScalar)g;
+          *out_b = (CMPScalar)b;
+          *out_a = (CMPScalar)a;
+          return CMP_OK;
+        }
+      }
+#endif
+      /* Fallback to generic blue */
+      NSColor *color = [[NSColor selectedControlColor] colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+      if (color) {
+        CGFloat r, g, b, a;
+        [color getRed:&r green:&g blue:&b alpha:&a];
+        *out_r = (CMPScalar)r;
+        *out_g = (CMPScalar)g;
+        *out_b = (CMPScalar)b;
+        *out_a = (CMPScalar)a;
+        return CMP_OK;
+      }
+    } else if (color_type == CMP_SYSTEM_COLOR_BACKGROUND) {
+      NSColor *color = [[NSColor windowBackgroundColor] colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+      if (color) {
+        CGFloat r, g, b, a;
+        [color getRed:&r green:&g blue:&b alpha:&a];
+        *out_r = (CMPScalar)r;
+        *out_g = (CMPScalar)g;
+        *out_b = (CMPScalar)b;
+        *out_a = (CMPScalar)a;
+        return CMP_OK;
+      }
+    }
+  }
+  
+  return CMP_ERR_UNSUPPORTED;
+}
+
+
+static int cmp_backend_ws_update_a11y_tree(void *ws, const void *root_a11y_node) {
+  /* NSAccessibility bridge stub: fully building a native macOS a11y tree requires
+     mirroring the CMPA11yNode hierarchy into NSAccessibilityElement instances and 
+     attaching them to the NSWindow/NSView. This is a placeholder for the contract. */
+  (void)root_a11y_node;
+  if (ws == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  return CMP_ERR_UNSUPPORTED;
+}
+
 static const CMPWSVTable g_ws_vtable = {
     ws_init, ws_shutdown, ws_create_window, ws_destroy_window,
     ws_show_window, ws_hide_window, ws_set_window_title,
     ws_set_window_size, ws_get_window_size,
     ws_set_window_dpi, ws_get_window_dpi,
     ws_set_clipboard, ws_get_clipboard,
-    ws_poll_event, ws_pump, ws_get_time
+    ws_poll_event, ws_pump, ws_get_time,
+    cmp_backend_ws_get_system_color, cmp_backend_ws_update_a11y_tree
 };
 
 /* --- Graphics Implementation (CoreGraphics) --- */

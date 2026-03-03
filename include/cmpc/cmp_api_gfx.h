@@ -320,7 +320,8 @@ typedef int(CMP_CALL *CMPTextDestroyFontFn)(void *text, CMPHandle font);
  */
 typedef int(CMP_CALL *CMPTextMeasureTextFn)(
     void *text, CMPHandle font, const char *utf8, cmp_usize utf8_len,
-    CMPScalar *out_width, CMPScalar *out_height, CMPScalar *out_baseline);
+    cmp_u32 base_direction, CMPScalar *out_width, CMPScalar *out_height,
+    CMPScalar *out_baseline);
 
 /**
  * @brief Draw UTF-8 text.
@@ -335,8 +336,49 @@ typedef int(CMP_CALL *CMPTextMeasureTextFn)(
  */
 typedef int(CMP_CALL *CMPTextDrawTextFn)(void *text, CMPHandle font,
                                          const char *utf8, cmp_usize utf8_len,
-                                         CMPScalar x, CMPScalar y,
-                                         CMPColor color);
+                                         cmp_u32 base_direction, CMPScalar x,
+                                         CMPScalar y, CMPColor color);
+
+struct CMPTextLayout;
+
+/**
+ * @brief Shape UTF-8 text into a layout using HarfBuzz/CoreText/DirectWrite.
+ * @param text Text backend instance.
+ * @param font Font handle.
+ * @param utf8 UTF-8 string to shape.
+ * @param utf8_len Length of string in bytes.
+ * @param base_direction Base direction.
+ * @param out_layout Receives the shaped layout (caller must free glyphs).
+ * @return CMP_OK on success or a failure code.
+ */
+typedef int(CMP_CALL *CMPTextShapeTextFn)(void *text, CMPHandle font,
+                                          const char *utf8, cmp_usize utf8_len,
+                                          cmp_u32 base_direction,
+                                          struct CMPTextLayout *out_layout);
+
+/**
+ * @brief Free resources allocated by a shape_text call.
+ * @param text Text backend instance.
+ * @param layout The layout to free.
+ * @return CMP_OK on success or a failure code.
+ */
+typedef int(CMP_CALL *CMPTextFreeLayoutFn)(void *text,
+                                           struct CMPTextLayout *layout);
+
+/**
+ * @brief Draw a pre-shaped text layout.
+ * @param text Text backend instance.
+ * @param font Font handle.
+ * @param layout The shaped text layout.
+ * @param x Origin X coordinate.
+ * @param y Origin Y coordinate.
+ * @param color Text color.
+ * @return CMP_OK on success or a failure code.
+ */
+typedef int(CMP_CALL *CMPTextDrawLayoutFn)(void *text, CMPHandle font,
+                                           const struct CMPTextLayout *layout,
+                                           CMPScalar x, CMPScalar y,
+                                           CMPColor color);
 
 /**
  * @brief Text rendering virtual table.
@@ -350,6 +392,12 @@ typedef struct CMPTextVTable {
   CMPTextMeasureTextFn measure_text;
   /** @brief Draw UTF-8 text. */
   CMPTextDrawTextFn draw_text;
+  /** @brief Optional: Shape text into glyphs (BiDi/complex layout). */
+  CMPTextShapeTextFn shape_text;
+  /** @brief Optional: Free shaped text layout. */
+  CMPTextFreeLayoutFn free_layout;
+  /** @brief Optional: Draw pre-shaped text layout. */
+  CMPTextDrawLayoutFn draw_layout;
 } CMPTextVTable;
 
 /**

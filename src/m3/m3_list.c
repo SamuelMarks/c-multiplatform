@@ -143,6 +143,17 @@ CMP_API int CMP_CALL m3_list_item_set_on_press(M3ListItem *item,
   return CMP_OK;
 }
 
+CMP_API int CMP_CALL m3_list_item_set_semantic_position(M3ListItem *item,
+                                                        cmp_i32 index,
+                                                        cmp_i32 size) {
+  if (item == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  item->semantic_index = index;
+  item->semantic_size = size;
+  return CMP_OK;
+}
+
 CMP_API int CMP_CALL m3_list_test_helper(void) { return CMP_OK; }
 
 static int m3_list_item_measure(void *widget, CMPMeasureSpec width,
@@ -245,10 +256,10 @@ static int m3_list_item_paint(void *widget, CMPPaintContext *ctx) {
     if (rc == CMP_OK) {
       item->text_backend.vtable->measure_text(
           item->text_backend.ctx, font, item->utf8_headline,
-          strlen(item->utf8_headline), &w, &h, &baseline);
+          strlen(item->utf8_headline), 0, &w, &h, &baseline);
       item->text_backend.vtable->draw_text(
           item->text_backend.ctx, font, item->utf8_headline,
-          strlen(item->utf8_headline), text_x, text_y + baseline,
+          strlen(item->utf8_headline), 0, text_x, text_y + baseline,
           item->style.headline_style.color);
       item->text_backend.vtable->destroy_font(item->text_backend.ctx, font);
     }
@@ -297,13 +308,13 @@ static int m3_list_item_event(void *widget, const CMPInputEvent *event,
 
   bounds = item->bounds;
   if (event->type == CMP_INPUT_POINTER_DOWN) {
-    if (event->data.pointer.x >= bounds.x &&
-        event->data.pointer.x <= bounds.x + bounds.width &&
-        event->data.pointer.y >= bounds.y &&
-        event->data.pointer.y <= bounds.y + bounds.height) {
+    if ((CMPScalar)event->data.pointer.x >= bounds.x &&
+        (CMPScalar)event->data.pointer.x <= bounds.x + bounds.width &&
+        (CMPScalar)event->data.pointer.y >= bounds.y &&
+        (CMPScalar)event->data.pointer.y <= bounds.y + bounds.height) {
       item->pressed = CMP_TRUE;
-      cmp_ripple_start(&item->ripple, event->data.pointer.x,
-                       event->data.pointer.y, bounds.width, 0.3f,
+      cmp_ripple_start(&item->ripple, (CMPScalar)event->data.pointer.x,
+                       (CMPScalar)event->data.pointer.y, bounds.width, 0.3f,
                        item->style.ripple_color);
       *out_handled = CMP_TRUE;
     }
@@ -327,11 +338,14 @@ static int m3_list_item_get_semantics(void *widget,
   if (item == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
   out_semantics->role = CMP_SEMANTIC_BUTTON;
   out_semantics->flags = CMP_SEMANTIC_FLAG_FOCUSABLE;
   out_semantics->utf8_label = item->utf8_headline;
   out_semantics->utf8_hint = NULL;
   out_semantics->utf8_value = NULL;
+  out_semantics->list_index = item->semantic_index;
+  out_semantics->list_size = item->semantic_size;
   return CMP_OK;
 }
 

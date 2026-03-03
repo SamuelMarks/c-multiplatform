@@ -147,6 +147,7 @@ static int m3_divider_get_semantics(void *widget, CMPSemantics *out_semantics) {
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  memset(out_semantics, 0, sizeof(*out_semantics));
   /* Dividers typically don't have semantic value unless explicitly set */
   out_semantics->role = CMP_SEMANTIC_NONE;
   out_semantics->flags = 0;
