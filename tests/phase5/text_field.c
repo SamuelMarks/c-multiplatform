@@ -43,6 +43,10 @@ static const CMPTextVTable mock_vtable = {test_create_font,
                                           NULL,
                                           NULL};
 
+static int test_draw_rect(void *ctx, const CMPRect *r, CMPColor c, CMPScalar radius) { return CMP_OK; }
+static int test_push_clip(void *ctx, const CMPRect *r) { return CMP_OK; }
+static int test_pop_clip(void *ctx) { return CMP_OK; }
+
 int main(void) {
   M3TextFieldStyle style;
   M3TextField field;
@@ -112,6 +116,51 @@ int main(void) {
   CMP_TEST_EXPECT(len, 4);
 
   CMP_TEST_OK(m3_text_field_test_helper());
+  /* Test init failure */
+  {
+      CMPTextBackend bad_backend = {0};
+      CMP_TEST_EXPECT(m3_text_field_init(&field, &style, allocator, bad_backend), CMP_ERR_INVALID_ARGUMENT);
+  }
+
+  /* Test measure failure */
+  {
+      CMPSize size;
+      CMPMeasureSpec m_bad = {999, -1.0f};
+      CMP_TEST_EXPECT(field.widget.vtable->measure(&field, m_bad, m_bad, &size), CMP_ERR_INVALID_ARGUMENT);
+  }
+
+  /* Test layout < 0 */
+  {
+      CMPRect bounds = {0, 0, 100, 5};
+      m3_text_field_set_supporting_text(&field, "Support");
+      CMP_TEST_OK(field.widget.vtable->layout(&field, bounds));
+      m3_text_field_set_supporting_text(&field, NULL);
+  }
+
+  /* Test event disabled */
+  {
+      CMPBool handled = CMP_TRUE;
+      CMPInputEvent event = {0};
+      event.type = CMP_INPUT_POINTER_DOWN;
+      m3_text_field_set_disabled(&field, CMP_TRUE);
+      CMP_TEST_OK(field.widget.vtable->event(&field, &event, &handled));
+      CMP_TEST_EXPECT(handled, CMP_FALSE);
+      m3_text_field_set_disabled(&field, CMP_FALSE);
+  }
+
+  /* Test on_change */
+  {
+      CMPInputEvent event = {0};
+      CMPBool handled;
+      int rc;
+      m3_text_field_set_on_change(&field, test_on_change, &called);
+      event.type = CMP_INPUT_TEXT_UTF8;
+      event.data.text_utf8.utf8 = "abc";
+      event.data.text_utf8.length = 3;
+      called = 0;
+      rc = field.widget.vtable->event(&field, &event, &handled);
+      CMP_TEST_EXPECT(called, 1);
+  }
 
   {
     CMPSize size;
@@ -148,19 +197,22 @@ int main(void) {
     CMP_TEST_OK(field.widget.vtable->get_semantics(&field, &semantics));
 
     {
+      static const CMPGfxVTable dummy_gfx_vtable = {NULL, NULL, NULL, test_draw_rect, NULL, NULL, test_push_clip, test_pop_clip};
       CMPGfx gfx = {0};
       CMPPaintContext pctx = {0};
+      gfx.vtable = &dummy_gfx_vtable;
+      gfx.text_vtable = &mock_vtable;
       pctx.gfx = &gfx;
       CMP_TEST_EXPECT(field.widget.vtable->paint(NULL, &pctx),
                       CMP_ERR_INVALID_ARGUMENT);
       CMP_TEST_EXPECT(field.widget.vtable->paint(&field, NULL),
                       CMP_ERR_INVALID_ARGUMENT);
-      CMP_TEST_EXPECT(field.widget.vtable->paint(&field, &pctx),
-                      CMP_ERR_UNSUPPORTED);
 
       CMP_TEST_OK(m3_text_field_set_error(&field, "Error"));
-      CMP_TEST_EXPECT(field.widget.vtable->paint(&field, &pctx),
-                      CMP_ERR_UNSUPPORTED);
+      CMP_TEST_OK(field.widget.vtable->paint(&field, &pctx));
+      
+      CMP_TEST_OK(m3_text_field_set_error(&field, NULL));
+      CMP_TEST_OK(field.widget.vtable->paint(&field, &pctx));
     }
 
     CMP_TEST_EXPECT(field.widget.vtable->destroy(NULL),
