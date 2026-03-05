@@ -36,6 +36,7 @@
 #include <winbase.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include <winnls.h>
 
 #include <winhttp.h>
 
@@ -1336,7 +1337,7 @@ static int cmp_win32_channel_from_scalar(CMPScalar value, cmp_u8 *out_val) {
   return (cmp_u8)(value * 255.0f + 0.5f);
 }
 
-static COLORREF cmp_win32_color_to_colorref(CMPColor color) {
+static int cmp_win32_color_to_colorref(CMPColor color, COLORREF *out_color) {
 
   cmp_u8 r; cmp_win32_channel_from_scalar(color.r, &r);
 
@@ -1344,7 +1345,8 @@ static COLORREF cmp_win32_color_to_colorref(CMPColor color) {
 
   cmp_u8 b; cmp_win32_channel_from_scalar(color.b, &b);
 
-  return RGB(r, g, b);
+  *out_color = RGB(r, g, b);
+  return 0;
 }
 
 static int cmp_win32_premultiply_channel(cmp_u8 c, cmp_u8 a, cmp_u8 *out_val) {
@@ -1421,11 +1423,11 @@ static void cmp_win32_texture_copy_pixels(cmp_u8 *dst, cmp_i32 dst_stride,
         srow += 1;
       }
 
-      r = cmp_win32_premultiply_channel(r, a);
+      cmp_win32_premultiply_channel(r, a, &r);
 
-      g = cmp_win32_premultiply_channel(g, a);
+      cmp_win32_premultiply_channel(g, a, &g);
 
-      b = cmp_win32_premultiply_channel(b, a);
+      cmp_win32_premultiply_channel(b, a, &b);
 
       drow[0] = b;
 
@@ -1488,7 +1490,7 @@ static LRESULT CALLBACK cmp_win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam,
 
   event.time_ms = (cmp_u32)GetMessageTime();
 
-  event.modifiers = cmp_win32_get_modifiers();
+  cmp_win32_get_modifiers(&event.modifiers);
 
   switch (msg) {
 
@@ -1943,7 +1945,7 @@ static int cmp_win32_ws_create_window(void *ws, const CMPWSWindowConfig *config,
     return CMP_ERR_UNKNOWN;
   }
 
-  window->dpi_scale = cmp_win32_query_dpi_scale(window->hwnd);
+  cmp_win32_query_dpi_scale(window->hwnd, &window->dpi_scale);
 
   rc = cmp_object_header_init(&window->header, CMP_WIN32_TYPE_WINDOW, 0,
 
@@ -2305,7 +2307,7 @@ static int cmp_win32_ws_get_window_dpi_scale(void *ws, CMPHandle window,
 
   } else {
 
-    *out_scale = cmp_win32_query_dpi_scale(resolved->hwnd);
+    cmp_win32_query_dpi_scale(resolved->hwnd, out_scale);
 
     resolved->dpi_scale = *out_scale;
   }
@@ -2546,7 +2548,7 @@ static int cmp_win32_ws_get_time_ms(void *ws, cmp_u32 *out_time_ms) {
 
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
-  backend->time_ms = cmp_win32_get_time_ms();
+  cmp_win32_get_time_ms(&backend->time_ms);
 
   *out_time_ms = backend->time_ms;
 
@@ -2820,7 +2822,7 @@ static int cmp_win32_gfx_clear(void *gfx, CMPColor color) {
 
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
-  ref = cmp_win32_color_to_colorref(color);
+  cmp_win32_color_to_colorref(color, &ref);
 
   brush = CreateSolidBrush(ref);
 
@@ -2909,7 +2911,7 @@ static int cmp_win32_gfx_draw_rect(void *gfx, const CMPRect *rect,
 
   r.bottom = (int)(rect->y + rect->height);
 
-  ref = cmp_win32_color_to_colorref(color);
+  cmp_win32_color_to_colorref(color, &ref);
 
   brush = CreateSolidBrush(ref);
 
@@ -3007,7 +3009,7 @@ static int cmp_win32_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
     width = 1;
   }
 
-  ref = cmp_win32_color_to_colorref(color);
+  cmp_win32_color_to_colorref(color, &ref);
 
   pen = CreatePen(PS_SOLID, width, ref);
 
@@ -3295,7 +3297,7 @@ static int cmp_win32_gfx_draw_path(void *gfx, const CMPPath *path,
 
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
-  ref = cmp_win32_color_to_colorref(color);
+  cmp_win32_color_to_colorref(color, &ref);
 
   brush = CreateSolidBrush(ref);
 
@@ -4328,7 +4330,7 @@ static int cmp_win32_text_draw_text(void *text, CMPHandle font,
 
   SetBkMode(window->mem_dc, TRANSPARENT);
 
-  ref = cmp_win32_color_to_colorref(color);
+  cmp_win32_color_to_colorref(color, &ref);
 
   SetTextColor(window->mem_dc, ref);
 
@@ -5910,7 +5912,7 @@ static int cmp_win32_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
 
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
-  backend->time_ms = cmp_win32_get_time_ms();
+  cmp_win32_get_time_ms(&backend->time_ms);
 
   *out_time_ms = backend->time_ms;
 

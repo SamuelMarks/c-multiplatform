@@ -15,10 +15,11 @@ typedef struct {
   int initialized;
 } AndroidState;
 
-static double get_time(void) {
+static int get_time(double *out_time) {
   struct timespec ts;
   clock_gettime(CLOCK_MONOTONIC, &ts);
-  return ts.tv_sec + ts.tv_nsec / 1e9;
+  *out_time = ts.tv_sec + ts.tv_nsec / 1e9;
+  return 0;
 }
 
 static void on_cmd(struct android_app *app, int32_t cmd) {
@@ -59,7 +60,8 @@ void android_main(struct android_app *app) {
   app->userData = &state;
   app->onAppCmd = on_cmd;
 
-  double last = get_time();
+  double last = 0;
+  get_time(&last);
 
   while (1) {
     int events;
@@ -83,7 +85,8 @@ void android_main(struct android_app *app) {
         demo_app_handle_event(state.demo, &evt, &h);
       }
 
-      double now = get_time();
+      double now = 0;
+      get_time(&now);
       demo_app_update(state.demo, now - last);
       last = now;
 

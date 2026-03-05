@@ -48,7 +48,8 @@ int main(int argc, char *argv[]) {
         // Important: Init resources here to load fonts/images
         demo_app_init_resources(app, &gfx, &env);
 
-        double last = get_time();
+        double last = 0;
+  get_time(&last);
         int running = 1;
 
         while (running) {
@@ -73,7 +74,8 @@ int main(int argc, char *argv[]) {
                 demo_app_handle_event(app, &evt, &h);
             }
 
-            double now = get_time();
+            double now = 0;
+    get_time(&now);
             demo_app_update(app, now - last);
             last = now;
 
