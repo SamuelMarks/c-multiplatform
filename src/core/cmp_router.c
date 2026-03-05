@@ -15,13 +15,13 @@ static cmp_usize cmp_router_usize_max_value(void) {
   return (cmp_usize) ~(cmp_usize)0;
 }
 
-static cmp_usize cmp_router_cstr_limit(void) {
+static int cmp_router_cstr_limit(cmp_usize *out_val) {
 #ifdef CMP_TESTING
   if (g_router_cstr_limit_override != 0) {
-    return g_router_cstr_limit_override;
+    *out_val = g_router_cstr_limit_override; return 0;
   }
 #endif
-  return cmp_router_usize_max_value();
+  *out_val = cmp_router_usize_max_value(); return 0;
 }
 
 static int cmp_router_cstrlen(const char *cstr, cmp_usize *out_len) {
@@ -41,7 +41,7 @@ static int cmp_router_cstrlen(const char *cstr, cmp_usize *out_len) {
   }
 #endif
 
-  max_len = cmp_router_cstr_limit();
+  cmp_router_cstr_limit(&max_len);
   len = 0;
 
   while (cstr[len] != '\0') {

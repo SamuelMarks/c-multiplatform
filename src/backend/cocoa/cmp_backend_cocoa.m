@@ -215,8 +215,12 @@ static int ws_get_clipboard(void *ctx, char *buf, size_t size, size_t *len) {
     *len = utf8Len;
 
     if (buf && size > 0) {
+#if defined(_MSC_VER)
+        strncpy_s(buf, size, utf8, _TRUNCATE);
+#else
         strncpy(buf, utf8, size - 1);
         buf[size - 1] = '\0';
+#endif
     }
 
     return CMP_OK;

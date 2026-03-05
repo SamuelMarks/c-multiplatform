@@ -204,7 +204,10 @@ static int CMP_CALL cmp_tasks_test_free_ex(void *ctx, void *ptr) {
 
 #if defined(_WIN32) || defined(_WIN64) /* GCOVR_EXCL_LINE */
 #define CMP_TASKS_USE_WIN32 1          /* GCOVR_EXCL_LINE */
-#include <windows.h>                   /* GCOVR_EXCL_LINE */
+#include <windef.h>
+#include <winbase.h>
+#include <wingdi.h>
+#include <winuser.h>                   /* GCOVR_EXCL_LINE */
 #else                                  /* GCOVR_EXCL_LINE */
 #define CMP_TASKS_USE_PTHREAD 1        /* GCOVR_EXCL_LINE */
 #include <errno.h>                     /* GCOVR_EXCL_LINE */
@@ -488,7 +491,7 @@ struct CMPTasksDefault {
   int last_task_error;
 };
 
-static cmp_u32 cmp_u32_max_value(void) { return (cmp_u32) ~(cmp_u32)0; }
+#define cmp_u32_max_value() ((cmp_u32)~(cmp_u32)0)
 
 static cmp_usize cmp_usize_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
 

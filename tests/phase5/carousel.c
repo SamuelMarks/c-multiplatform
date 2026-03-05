@@ -1,5 +1,6 @@
 #include "m3/m3_carousel.h"
 #include "test_utils.h"
+#include <string.h>
 
 static int test_measure(void *widget, CMPMeasureSpec width,
                         CMPMeasureSpec height, CMPSize *out_size) {

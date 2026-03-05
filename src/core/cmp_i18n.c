@@ -1,5 +1,9 @@
 #include "cmpc/cmp_i18n.h"
 
+#include <string.h>
+#define STARTS_WITH(s, p) (strncmp(s, p, strlen(p)) == 0)
+
+
 #include "cmpc/cmp_datetime.h"
 #include "cmpc/cmp_utf8.h"
 

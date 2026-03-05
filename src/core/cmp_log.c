@@ -4,7 +4,10 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #define CMP_LOG_USE_WIN32 1
-#include <windows.h>
+#include <windef.h>
+#include <winbase.h>
+#include <wingdi.h>
+#include <winuser.h>
 #else
 #define CMP_LOG_USE_PTHREAD 1
 #include <pthread.h>
@@ -40,13 +43,13 @@ static cmp_usize g_log_io_call_count = 0;
 
 static cmp_usize cmp_usize_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
 
-static cmp_usize cmp_log_cstr_limit(void) {
+static int cmp_log_cstr_limit(cmp_usize *out_val) {
 #ifdef CMP_TESTING
   if (g_log_cstr_limit_override != 0) {
-    return g_log_cstr_limit_override;
+    *out_val = g_log_cstr_limit_override; return 0;
   }
 #endif
-  return cmp_usize_max_value();
+  *out_val = cmp_usize_max_value(); return 0;
 }
 
 static int cmp_log_cstrlen(const char *cstr, cmp_usize *out_len) {
@@ -57,7 +60,7 @@ static int cmp_log_cstrlen(const char *cstr, cmp_usize *out_len) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  max_len = cmp_log_cstr_limit();
+  cmp_log_cstr_limit(&max_len);
   length = 0;
 
   while (cstr[length] != '\0') {

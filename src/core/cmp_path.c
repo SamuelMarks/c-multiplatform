@@ -11,7 +11,7 @@ int CMP_CALL cmp_path_test_set_force_reserve(CMPBool enable) {
 }
 #endif
 
-static cmp_usize cmp_path_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
+#define cmp_path_max_value() ((cmp_usize)~(cmp_usize)0)
 
 static int cmp_path_add_overflow(cmp_usize a, cmp_usize b,
                                  cmp_usize *out_value) {

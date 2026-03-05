@@ -23,7 +23,7 @@ typedef struct CMPHandleSystemImpl {
   cmp_u32 free_head;
 } CMPHandleSystemImpl;
 
-static cmp_u32 cmp_u32_max_value(void) { return (cmp_u32) ~(cmp_u32)0; }
+#define cmp_u32_max_value() ((cmp_u32)~(cmp_u32)0)
 
 static int cmp_handle_system_resolve_impl(CMPHandleSystemImpl *impl,
                                           CMPHandle handle, void **out_obj) {

@@ -7,13 +7,13 @@ static CMPBool g_cmp_utf8_relaxed_checks = CMP_FALSE;
 
 static cmp_usize cmp_usize_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
 
-static cmp_usize cmp_utf8_cstr_limit(void) {
+static int cmp_utf8_cstr_limit(cmp_usize *out_val) {
 #ifdef CMP_TESTING
   if (cmp_utf8_test_limit_value != 0) {
-    return cmp_utf8_test_limit_value;
+    *out_val = cmp_utf8_test_limit_value; return 0;
   }
 #endif
-  return cmp_usize_max_value();
+  *out_val = cmp_usize_max_value(); return 0;
 }
 
 static int cmp_utf8_cstrlen(const char *cstr, cmp_usize *out_len) {
@@ -24,7 +24,7 @@ static int cmp_utf8_cstrlen(const char *cstr, cmp_usize *out_len) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  max_len = cmp_utf8_cstr_limit();
+  cmp_utf8_cstr_limit(&max_len);
   length = 0;
 
   while (cstr[length] != '\0') {

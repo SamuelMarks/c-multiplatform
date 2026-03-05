@@ -240,7 +240,7 @@ static int cmp_ios_camera_apply_preset(AVCaptureSession *session, cmp_u32 width,
     return CMP_ERR_UNSUPPORTED;
 }
 
-static CMPBool cmp_ios_camera_output_supports_format(AVCaptureVideoDataOutput *output, OSType pixel_format)
+static int cmp_ios_camera_output_supports_format(AVCaptureVideoDataOutput *output, OSType pixel_format)
 {
     NSArray *formats;
     NSNumber *value;

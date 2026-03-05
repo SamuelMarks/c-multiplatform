@@ -116,7 +116,7 @@ static int cmp_icon_validate_svg(const CMPIconSvg *svg) {
   return CMP_OK;
 }
 
-static cmp_usize cmp_icon_cstr_limit(void) {
+static int cmp_icon_cstr_limit(cmp_usize *out_val) {
   cmp_usize max_len;
 
   max_len = (cmp_usize) ~(cmp_usize)0;
@@ -125,7 +125,7 @@ static cmp_usize cmp_icon_cstr_limit(void) {
     max_len = g_cmp_icon_test_cstr_limit;
   }
 #endif /* GCOVR_EXCL_LINE */
-  return max_len;
+  *out_val = max_len; return 0;
 }
 
 static int cmp_icon_cstrlen(const char *cstr, cmp_usize *out_len) {
@@ -136,7 +136,7 @@ static int cmp_icon_cstrlen(const char *cstr, cmp_usize *out_len) {
     return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
   }
 
-  max_len = cmp_icon_cstr_limit();
+  cmp_icon_cstr_limit(&max_len);
   length = 0;
   while (cstr[length] != '\0') {
     if (length == max_len) {

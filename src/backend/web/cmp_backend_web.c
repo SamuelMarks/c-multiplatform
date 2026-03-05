@@ -2011,7 +2011,7 @@ static int cmp_web_backend_set_canvas_size(struct CMPWebBackend *backend,
   return CMP_OK;
 }
 
-static EM_BOOL cmp_web_on_mouse_down(int event_type,
+static int cmp_web_on_mouse_down(int event_type,
                                      const EmscriptenMouseEvent *event,
                                      void *user_data) {
   struct CMPWebBackend *backend;
@@ -2052,7 +2052,7 @@ static EM_BOOL cmp_web_on_mouse_down(int event_type,
   return EM_TRUE;
 }
 
-static EM_BOOL cmp_web_on_mouse_up(int event_type,
+static int cmp_web_on_mouse_up(int event_type,
                                    const EmscriptenMouseEvent *event,
                                    void *user_data) {
   struct CMPWebBackend *backend;
@@ -2093,7 +2093,7 @@ static EM_BOOL cmp_web_on_mouse_up(int event_type,
   return EM_TRUE;
 }
 
-static EM_BOOL cmp_web_on_mouse_move(int event_type,
+static int cmp_web_on_mouse_move(int event_type,
                                      const EmscriptenMouseEvent *event,
                                      void *user_data) {
   struct CMPWebBackend *backend;
@@ -2134,7 +2134,7 @@ static EM_BOOL cmp_web_on_mouse_move(int event_type,
   return EM_TRUE;
 }
 
-static EM_BOOL cmp_web_on_wheel(int event_type,
+static int cmp_web_on_wheel(int event_type,
                                 const EmscriptenWheelEvent *event,
                                 void *user_data) {
   struct CMPWebBackend *backend;
@@ -2189,7 +2189,7 @@ static EM_BOOL cmp_web_on_wheel(int event_type,
   return EM_TRUE;
 }
 
-static EM_BOOL cmp_web_on_touch(int event_type,
+static int cmp_web_on_touch(int event_type,
                                 const EmscriptenTouchEvent *event,
                                 void *user_data) {
   struct CMPWebBackend *backend;
@@ -2252,7 +2252,7 @@ static EM_BOOL cmp_web_on_touch(int event_type,
   return EM_TRUE;
 }
 
-static EM_BOOL cmp_web_on_key_down(int event_type,
+static int cmp_web_on_key_down(int event_type,
                                    const EmscriptenKeyboardEvent *event,
                                    void *user_data) {
   struct CMPWebBackend *backend;
@@ -2290,7 +2290,7 @@ static EM_BOOL cmp_web_on_key_down(int event_type,
   return EM_TRUE;
 }
 
-static EM_BOOL cmp_web_on_key_up(int event_type,
+static int cmp_web_on_key_up(int event_type,
                                  const EmscriptenKeyboardEvent *event,
                                  void *user_data) {
   struct CMPWebBackend *backend;
@@ -2328,7 +2328,7 @@ static EM_BOOL cmp_web_on_key_up(int event_type,
   return EM_TRUE;
 }
 
-static EM_BOOL cmp_web_on_key_press(int event_type,
+static int cmp_web_on_key_press(int event_type,
                                     const EmscriptenKeyboardEvent *event,
                                     void *user_data) {
   struct CMPWebBackend *backend;
@@ -2383,7 +2383,7 @@ static EM_BOOL cmp_web_on_key_press(int event_type,
   return EM_TRUE;
 }
 
-static EM_BOOL cmp_web_on_focus(int event_type,
+static int cmp_web_on_focus(int event_type,
                                 const EmscriptenFocusEvent *event,
                                 void *user_data) {
   struct CMPWebBackend *backend;
@@ -2411,7 +2411,7 @@ static EM_BOOL cmp_web_on_focus(int event_type,
   return EM_TRUE;
 }
 
-static EM_BOOL cmp_web_on_blur(int event_type,
+static int cmp_web_on_blur(int event_type,
                                const EmscriptenFocusEvent *event,
                                void *user_data) {
   struct CMPWebBackend *backend;
@@ -2439,7 +2439,7 @@ static EM_BOOL cmp_web_on_blur(int event_type,
   return EM_TRUE;
 }
 
-static EM_BOOL cmp_web_on_resize(int event_type, const EmscriptenUiEvent *event,
+static int cmp_web_on_resize(int event_type, const EmscriptenUiEvent *event,
                                  void *user_data) {
   struct CMPWebBackend *backend;
   CMPWebWindow *window;

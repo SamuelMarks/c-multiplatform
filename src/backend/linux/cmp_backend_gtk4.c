@@ -283,15 +283,18 @@ static int cmp_gtk4_global_shutdown(struct CMPGTK4Backend *backend) {
   return CMP_OK;
 }
 
-static cmp_u32 cmp_gtk4_get_time_ms(void) {
+static int cmp_gtk4_get_time_ms(cmp_u32 *out_time) {
   gint64 us;
   us = g_get_monotonic_time();
-  if (us < 0)
-    return 0u;
-  return (cmp_u32)(us / 1000);
+  if (us < 0) {
+    *out_time = 0u;
+    return 0;
+  }
+  *out_time = (cmp_u32)(us / 1000);
+  return 0;
 }
 
-static cmp_u32 cmp_gtk4_modifiers_from_state(GdkModifierType state) {
+static int cmp_gtk4_modifiers_from_state(GdkModifierType state, cmp_u32 *out_mods) {
   cmp_u32 mods = 0u;
   if ((state & GDK_SHIFT_MASK) != 0)
     mods |= CMP_MOD_SHIFT;
@@ -303,10 +306,10 @@ static cmp_u32 cmp_gtk4_modifiers_from_state(GdkModifierType state) {
     mods |= CMP_MOD_META;
   if ((state & GDK_LOCK_MASK) != 0)
     mods |= CMP_MOD_CAPS;
-  return mods;
+  *out_mods = mods; return 0;
 }
 
-static cmp_i32 cmp_gtk4_buttons_from_state(GdkModifierType state) {
+static int cmp_gtk4_buttons_from_state(GdkModifierType state, cmp_i32 *out_buttons) {
   cmp_i32 buttons = 0;
   if ((state & GDK_BUTTON1_MASK) != 0)
     buttons |= 1;
@@ -318,7 +321,7 @@ static cmp_i32 cmp_gtk4_buttons_from_state(GdkModifierType state) {
     buttons |= 1 << 3;
   if ((state & GDK_BUTTON5_MASK) != 0)
     buttons |= 1 << 4;
-  return buttons;
+  *out_buttons = buttons; return 0;
 }
 
 static int cmp_gtk4_queue_event(struct CMPGTK4Backend *backend,
@@ -344,7 +347,7 @@ static void cmp_gtk4_queue_window_resize(struct CMPGTK4Window *window,
   e.type = CMP_INPUT_WINDOW_RESIZE;
   e.modifiers = 0;
   e.reserved = 0;
-  e.time_ms = cmp_gtk4_get_time_ms();
+  cmp_gtk4_get_time_ms(&e.time_ms);
   e.window = window->header.handle;
   e.data.window.width = w;
   e.data.window.height = h;
@@ -481,13 +484,13 @@ static int cmp_gtk4_ws_shutdown(void *ctx) {
   return CMP_OK;
 }
 
-static gboolean on_close(GtkWindow *w, gpointer u) {
+static int on_close(GtkWindow *w, gpointer u) {
   struct CMPGTK4Window *win = (struct CMPGTK4Window *)u;
   CMPInputEvent e;
   (void)w;
   memset(&e, 0, sizeof(e));
   e.type = CMP_INPUT_WINDOW_CLOSE;
-  e.time_ms = cmp_gtk4_get_time_ms();
+  cmp_gtk4_get_time_ms(&e.time_ms);
   e.window = win->header.handle;
   e.modifiers = 0;
   e.reserved = 0;
@@ -510,7 +513,8 @@ static void on_click_pressed(GtkGestureClick *g, int n, double x, double y,
   CMPInputEvent e;
   GdkModifierType state =
       gtk_event_controller_get_current_event_state(GTK_EVENT_CONTROLLER(g));
-  int btn = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(g));
+  int btn;
+  btn = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(g));
   (void)n;
 
   if (win->area) {
@@ -519,15 +523,15 @@ static void on_click_pressed(GtkGestureClick *g, int n, double x, double y,
 
   memset(&e, 0, sizeof(e));
   e.type = CMP_INPUT_POINTER_DOWN;
-  e.time_ms = cmp_gtk4_get_time_ms();
+  cmp_gtk4_get_time_ms(&e.time_ms);
   e.window = win->header.handle;
-  e.modifiers = cmp_gtk4_modifiers_from_state(state);
+  cmp_gtk4_modifiers_from_state(state, &e.modifiers);
   e.data.pointer.x = (int)x;
   e.data.pointer.y = (int)y;
 
   {
     const int btn_flag = (btn > 0) ? (1 << (btn - 1)) : 1;
-    e.data.pointer.buttons = cmp_gtk4_buttons_from_state(state) | btn_flag;
+    cmp_gtk4_buttons_from_state(state, &e.data.pointer.buttons); e.data.pointer.buttons |= btn_flag;
   }
   cmp_gtk4_queue_event(win->backend, &e);
 }
@@ -538,18 +542,19 @@ static void on_click_released(GtkGestureClick *g, int n, double x, double y,
   CMPInputEvent e;
   GdkModifierType state =
       gtk_event_controller_get_current_event_state(GTK_EVENT_CONTROLLER(g));
-  int btn = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(g));
+  int btn;
+  btn = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(g));
   (void)n;
 
   memset(&e, 0, sizeof(e));
   e.type = CMP_INPUT_POINTER_UP;
-  e.time_ms = cmp_gtk4_get_time_ms();
+  cmp_gtk4_get_time_ms(&e.time_ms);
   e.window = win->header.handle;
-  e.modifiers = cmp_gtk4_modifiers_from_state(state);
+  cmp_gtk4_modifiers_from_state(state, &e.modifiers);
   e.data.pointer.x = (int)x;
   e.data.pointer.y = (int)y;
 
-  e.data.pointer.buttons = cmp_gtk4_buttons_from_state(state);
+  cmp_gtk4_buttons_from_state(state, &e.data.pointer.buttons);
 
   {
     const int btn_flag = (btn > 0) ? (1 << (btn - 1)) : 1;
@@ -568,16 +573,16 @@ static void on_motion(GtkEventControllerMotion *c, double x, double y,
 
   memset(&e, 0, sizeof(e));
   e.type = CMP_INPUT_POINTER_MOVE;
-  e.time_ms = cmp_gtk4_get_time_ms();
+  cmp_gtk4_get_time_ms(&e.time_ms);
   e.window = win->header.handle;
-  e.modifiers = cmp_gtk4_modifiers_from_state(state);
+  cmp_gtk4_modifiers_from_state(state, &e.modifiers);
   e.data.pointer.x = (int)x;
   e.data.pointer.y = (int)y;
-  e.data.pointer.buttons = cmp_gtk4_buttons_from_state(state);
+  cmp_gtk4_buttons_from_state(state, &e.data.pointer.buttons);
   cmp_gtk4_queue_event(win->backend, &e);
 }
 
-static gboolean on_key_pressed(GtkEventControllerKey *c, guint key_val,
+static int on_key_pressed(GtkEventControllerKey *c, guint key_val,
                                guint key_code, GdkModifierType state,
                                gpointer u) {
   struct CMPGTK4Window *win = (struct CMPGTK4Window *)u;
@@ -586,7 +591,8 @@ static gboolean on_key_pressed(GtkEventControllerKey *c, guint key_val,
   (void)key_code;
 
   /* Fix: Map GDK keysyms to standard ASCII/Control codes for Tab/Enter/BS */
-  guint mapped_key = key_val;
+  guint mapped_key;
+  mapped_key = key_val;
   if (key_val == GDK_KEY_Tab || key_val == GDK_KEY_ISO_Left_Tab) {
     mapped_key = 9;
   } else if (key_val == GDK_KEY_Return || key_val == GDK_KEY_KP_Enter) {
@@ -599,9 +605,9 @@ static gboolean on_key_pressed(GtkEventControllerKey *c, guint key_val,
 
   memset(&e, 0, sizeof(e));
   e.type = CMP_INPUT_KEY_DOWN;
-  e.time_ms = cmp_gtk4_get_time_ms();
+  cmp_gtk4_get_time_ms(&e.time_ms);
   e.window = win->header.handle;
-  e.modifiers = cmp_gtk4_modifiers_from_state(state);
+  cmp_gtk4_modifiers_from_state(state, &e.modifiers);
   e.data.key.key_code = mapped_key;
   e.data.key.native_code = key_val;
 
@@ -610,7 +616,7 @@ static gboolean on_key_pressed(GtkEventControllerKey *c, guint key_val,
   if (key_val < 128 && key_val >= 32) {
     memset(&e, 0, sizeof(e));
     e.type = CMP_INPUT_TEXT;
-    e.time_ms = cmp_gtk4_get_time_ms();
+    cmp_gtk4_get_time_ms(&e.time_ms);
     e.window = win->header.handle;
     e.data.text.utf8[0] = (char)key_val;
     e.data.text.utf8[1] = '\0';
@@ -760,7 +766,7 @@ static int cmp_gtk4_ws_poll_event(void *c, CMPInputEvent *e, CMPBool *h) {
 
 static int cmp_gtk4_ws_get_time(void *c, cmp_u32 *t) {
   (void)c;
-  *t = cmp_gtk4_get_time_ms();
+  cmp_gtk4_get_time_ms(t);
   return CMP_OK;
 }
 
@@ -799,7 +805,9 @@ static const CMPWSVTable g_cmp_gtk4_ws_vtable = {cmp_gtk4_ws_init,
                                                  NULL,
                                                  cmp_gtk4_ws_poll_event,
                                                  cmp_gtk4_ws_pump_events,
-                                                 cmp_gtk4_ws_get_time};
+                                                 cmp_gtk4_ws_get_time,
+                                                 cmp_backend_ws_get_system_color,
+                                                 cmp_backend_ws_update_a11y_tree};
 
 /* --- Graphics (CMPGfx) --- */
 
@@ -1241,7 +1249,7 @@ static int txt_destroy(void *c, CMPHandle h) {
 }
 
 static const CMPTextVTable g_cmp_gtk4_text_vtable = {txt_create, txt_destroy,
-                                                     txt_meas, txt_draw};
+                                                     txt_meas, txt_draw, NULL, NULL, NULL};
 
 /* --- Environment Stubs --- */
 static int env_get_io(void *e, CMPIO *io) {
@@ -1286,7 +1294,7 @@ static int env_get_tasks(void *e, CMPTasks *t) {
 }
 static int env_get_time(void *e, cmp_u32 *t) {
   (void)e;
-  *t = cmp_gtk4_get_time_ms();
+  cmp_gtk4_get_time_ms(t);
   return CMP_OK;
 }
 

@@ -30,7 +30,10 @@
 
 #endif
 
-#include <windows.h>
+#include <windef.h>
+#include <winbase.h>
+#include <wingdi.h>
+#include <winuser.h>
 
 #include <winhttp.h>
 
@@ -630,7 +633,7 @@ static int cmp_win32_backend_push_event(struct CMPWin32Backend *backend,
   return rc;
 }
 
-static cmp_u32 cmp_win32_get_modifiers(void) {
+static int cmp_win32_get_modifiers(cmp_u32 *out_mods) {
 
   cmp_u32 mods = 0u;
 
@@ -666,10 +669,10 @@ static cmp_u32 cmp_win32_get_modifiers(void) {
     mods |= CMP_MOD_NUM;
   }
 
-  return mods;
+  *out_mods = mods; return 0;
 }
 
-static cmp_u32 cmp_win32_get_time_ms(void) { return (cmp_u32)GetTickCount(); }
+static int cmp_win32_get_time_ms(cmp_u32 *out_time) { return (cmp_u32)GetTickCount(); }
 
 static int cmp_win32_utf8_to_wide_alloc(struct CMPWin32Backend *backend,
 
@@ -1145,7 +1148,7 @@ static int cmp_win32_window_flags_to_style(cmp_u32 flags, DWORD *out_style,
   return CMP_OK;
 }
 
-static CMPScalar cmp_win32_query_dpi_scale(HWND hwnd) {
+static int cmp_win32_query_dpi_scale(HWND hwnd, CMPScalar *out_scale) {
 
   HDC hdc;
 
@@ -1316,16 +1319,16 @@ static int cmp_win32_apply_transform(CMPWin32Window *window,
   return CMP_OK;
 }
 
-static cmp_u8 cmp_win32_channel_from_scalar(CMPScalar value) {
+static int cmp_win32_channel_from_scalar(CMPScalar value, cmp_u8 *out_val) {
 
   if (value <= 0.0f) {
 
-    return 0u;
+    *out_val = 0u; return 0;
   }
 
   if (value >= 1.0f) {
 
-    return 255u;
+    *out_val = 255u; return 0;
   }
 
   return (cmp_u8)(value * 255.0f + 0.5f);
@@ -1333,18 +1336,18 @@ static cmp_u8 cmp_win32_channel_from_scalar(CMPScalar value) {
 
 static COLORREF cmp_win32_color_to_colorref(CMPColor color) {
 
-  cmp_u8 r = cmp_win32_channel_from_scalar(color.r);
+  cmp_u8 r; cmp_win32_channel_from_scalar(color.r, &r);
 
-  cmp_u8 g = cmp_win32_channel_from_scalar(color.g);
+  cmp_u8 g; cmp_win32_channel_from_scalar(color.g, &g);
 
-  cmp_u8 b = cmp_win32_channel_from_scalar(color.b);
+  cmp_u8 b; cmp_win32_channel_from_scalar(color.b, &b);
 
   return RGB(r, g, b);
 }
 
-static cmp_u8 cmp_win32_premultiply_channel(cmp_u8 c, cmp_u8 a) {
+static int cmp_win32_premultiply_channel(cmp_u8 c, cmp_u8 a, cmp_u8 *out_val) {
 
-  return (cmp_u8)((((cmp_u32)c) * ((cmp_u32)a) + 127u) / 255u);
+  *out_val = (cmp_u8)((((cmp_u32)c) * ((cmp_u32)a) + 127u) / 255u); return 0;
 }
 
 static void cmp_win32_texture_copy_pixels(cmp_u8 *dst, cmp_i32 dst_stride,

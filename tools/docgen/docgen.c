@@ -1,5 +1,12 @@
 
 #include <stdio.h>
+
+#if defined(_MSC_VER)
+#define NUM_FORMAT "%d"
+#else
+#define NUM_FORMAT "%d"
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -40,8 +47,8 @@ static int CMP_CALL svg_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
   ctx->width = width;
   ctx->height = height;
   fprintf(ctx->file,
-          "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%d\" "
-          "height=\"%d\" viewBox=\"0 0 %d %d\">\n",
+          "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" NUM_FORMAT "\" "
+          "height=\"" NUM_FORMAT "\" viewBox=\"0 0 " NUM_FORMAT " " NUM_FORMAT "\">\n",
           width, height, width, height);
   return CMP_OK;
 }
@@ -63,7 +70,7 @@ static void print_color(FILE *f, CMPColor c) {
   int r = (int)(c.r * 255.0f);
   int g = (int)(c.g * 255.0f);
   int b = (int)(c.b * 255.0f);
-  fprintf(f, "rgb(%d,%d,%d)", r, g, b);
+  fprintf(f, "rgb(" NUM_FORMAT "," NUM_FORMAT "," NUM_FORMAT ")", r, g, b);
 }
 
 static float get_alpha(CMPColor c) { return c.a; }
@@ -287,10 +294,23 @@ static void generate_widget(const char *category, const char *name,
   null_h.id = 0;
   null_h.generation = 0;
 
+  #if defined(_MSC_VER)
+  sprintf_s(relative_filename, sizeof(relative_filename), "assets/%s_%s_%s_%s.svg", category, name,
+          g_platform, g_theme);
+#else
   sprintf(relative_filename, "assets/%s_%s_%s_%s.svg", category, name,
           g_platform, g_theme);
+#endif
+  #if defined(_MSC_VER)
+  sprintf_s(svg_filename, sizeof(svg_filename), "docs/%s", relative_filename);
+#else
   sprintf(svg_filename, "docs/%s", relative_filename);
+#endif
+  #if defined(_MSC_VER)
+  fopen_s(&svg_ctx.file, svg_filename, "wb");
+#else
   svg_ctx.file = fopen(svg_filename, "wb");
+#endif
   if (!svg_ctx.file) {
     printf("Failed to open %s\n", svg_filename);
     return;
@@ -405,8 +425,16 @@ int main(int argc, char **argv) {
   }
 #endif
 
+  #if defined(_MSC_VER)
+  sprintf_s(json_filename, sizeof(json_filename), "docs/doc_%s_%s.json", g_platform, g_theme);
+#else
   sprintf(json_filename, "docs/doc_%s_%s.json", g_platform, g_theme);
+#endif
+  #if defined(_MSC_VER)
+  fopen_s(&g_json_file, json_filename, "w");
+#else
   g_json_file = fopen(json_filename, "w");
+#endif
   if (!g_json_file) {
     printf("Failed to open json %s\n", json_filename);
     return 1;
