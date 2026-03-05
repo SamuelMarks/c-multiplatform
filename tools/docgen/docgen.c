@@ -1,11 +1,19 @@
 
 #include <stdio.h>
 
+
 #if defined(_MSC_VER)
 #define NUM_FORMAT "%d"
+#define PRINTF_ERR(...) fprintf_s(stderr, __VA_ARGS__)
+#define PRINTF_OUT(...) printf_s(__VA_ARGS__)
+#define PRINTF_FILE(file, ...) fprintf_s(file, __VA_ARGS__)
 #else
 #define NUM_FORMAT "%d"
+#define PRINTF_ERR(...) fprintf(stderr, __VA_ARGS__)
+#define PRINTF_OUT(...) printf(__VA_ARGS__)
+#define PRINTF_FILE(file, ...) fprintf(file, __VA_ARGS__)
 #endif
+
 
 #include <stdlib.h>
 #include <string.h>
@@ -46,7 +54,7 @@ static int CMP_CALL svg_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
   CMP_UNUSED(dpi_scale);
   ctx->width = width;
   ctx->height = height;
-  fprintf(ctx->file,
+  PRINTF_FILE(ctx->file,
           "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" NUM_FORMAT "\" "
           "height=\"" NUM_FORMAT "\" viewBox=\"0 0 " NUM_FORMAT " " NUM_FORMAT "\">\n",
           width, height, width, height);
@@ -56,7 +64,7 @@ static int CMP_CALL svg_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
 static int CMP_CALL svg_end_frame(void *gfx, CMPHandle window) {
   SvgContext *ctx = (SvgContext *)gfx;
   CMP_UNUSED(window);
-  fprintf(ctx->file, "</svg>\n");
+  PRINTF_FILE(ctx->file, "</svg>\n");
   return CMP_OK;
 }
 
@@ -70,7 +78,7 @@ static void print_color(FILE *f, CMPColor c) {
   int r = (int)(c.r * 255.0f);
   int g = (int)(c.g * 255.0f);
   int b = (int)(c.b * 255.0f);
-  fprintf(f, "rgb(" NUM_FORMAT "," NUM_FORMAT "," NUM_FORMAT ")", r, g, b);
+  PRINTF_FILE(f, "rgb(" NUM_FORMAT "," NUM_FORMAT "," NUM_FORMAT ")", r, g, b);
 }
 
 static float get_alpha(CMPColor c) { return c.a; }
@@ -78,13 +86,13 @@ static float get_alpha(CMPColor c) { return c.a; }
 static int CMP_CALL svg_draw_rect(void *gfx, const CMPRect *rect,
                                   CMPColor color, CMPScalar corner_radius) {
   SvgContext *ctx = (SvgContext *)gfx;
-  fprintf(ctx->file,
+  PRINTF_FILE(ctx->file,
           "  <rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"%f\" "
           "ry=\"%f\" fill=\"",
           rect->x, rect->y, rect->width, rect->height, corner_radius,
           corner_radius);
   print_color(ctx->file, color);
-  fprintf(ctx->file, "\" fill-opacity=\"%f\" />\n", get_alpha(color));
+  PRINTF_FILE(ctx->file, "\" fill-opacity=\"%f\" />\n", get_alpha(color));
   return CMP_OK;
 }
 
@@ -92,11 +100,11 @@ static int CMP_CALL svg_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
                                   CMPScalar x1, CMPScalar y1, CMPColor color,
                                   CMPScalar thickness) {
   SvgContext *ctx = (SvgContext *)gfx;
-  fprintf(ctx->file,
+  PRINTF_FILE(ctx->file,
           "  <line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"", x0, y0,
           x1, y1);
   print_color(ctx->file, color);
-  fprintf(ctx->file, "\" stroke-width=\"%f\" stroke-opacity=\"%f\" />\n",
+  PRINTF_FILE(ctx->file, "\" stroke-width=\"%f\" stroke-opacity=\"%f\" />\n",
           thickness, get_alpha(color));
   return CMP_OK;
 }
@@ -105,28 +113,28 @@ static int CMP_CALL svg_draw_path(void *gfx, const CMPPath *path,
                                   CMPColor color) {
   SvgContext *ctx = (SvgContext *)gfx;
   cmp_usize i;
-  fprintf(ctx->file, "  <path d=\"");
+  PRINTF_FILE(ctx->file, "  <path d=\"");
   for (i = 0; i < path->count; ++i) {
     CMPPathCmd *cmd = &path->commands[i];
     if (cmd->type == CMP_PATH_CMD_MOVE_TO) {
-      fprintf(ctx->file, "M %f %f ", cmd->data.move_to.x, cmd->data.move_to.y);
+      PRINTF_FILE(ctx->file, "M %f %f ", cmd->data.move_to.x, cmd->data.move_to.y);
     } else if (cmd->type == CMP_PATH_CMD_LINE_TO) {
-      fprintf(ctx->file, "L %f %f ", cmd->data.line_to.x, cmd->data.line_to.y);
+      PRINTF_FILE(ctx->file, "L %f %f ", cmd->data.line_to.x, cmd->data.line_to.y);
     } else if (cmd->type == CMP_PATH_CMD_QUAD_TO) {
-      fprintf(ctx->file, "Q %f %f %f %f ", cmd->data.quad_to.cx,
+      PRINTF_FILE(ctx->file, "Q %f %f %f %f ", cmd->data.quad_to.cx,
               cmd->data.quad_to.cy, cmd->data.quad_to.x, cmd->data.quad_to.y);
     } else if (cmd->type == CMP_PATH_CMD_CUBIC_TO) {
-      fprintf(ctx->file, "C %f %f %f %f %f %f ", cmd->data.cubic_to.cx1,
+      PRINTF_FILE(ctx->file, "C %f %f %f %f %f %f ", cmd->data.cubic_to.cx1,
               cmd->data.cubic_to.cy1, cmd->data.cubic_to.cx2,
               cmd->data.cubic_to.cy2, cmd->data.cubic_to.x,
               cmd->data.cubic_to.y);
     } else if (cmd->type == CMP_PATH_CMD_CLOSE) {
-      fprintf(ctx->file, "Z ");
+      PRINTF_FILE(ctx->file, "Z ");
     }
   }
-  fprintf(ctx->file, "\" fill=\"");
+  PRINTF_FILE(ctx->file, "\" fill=\"");
   print_color(ctx->file, color);
-  fprintf(ctx->file, "\" fill-opacity=\"%f\" />\n", get_alpha(color));
+  PRINTF_FILE(ctx->file, "\" fill-opacity=\"%f\" />\n", get_alpha(color));
   return CMP_OK;
 }
 
@@ -247,14 +255,14 @@ static int CMP_CALL doc_draw_text(void *text, CMPHandle font, const char *utf8,
   SvgContext *ctx = (SvgContext *)text;
   (void)base_direction;
   CMP_UNUSED(font);
-  fprintf(ctx->file,
+  PRINTF_FILE(ctx->file,
           "  <text x=\"%f\" y=\"%f\" font-family=\"sans-serif\" "
           "font-size=\"14px\" fill=\"",
           x, y + 10.0f);
   print_color(ctx->file, color);
-  fprintf(ctx->file, "\" fill-opacity=\"%f\">", get_alpha(color));
+  PRINTF_FILE(ctx->file, "\" fill-opacity=\"%f\">", get_alpha(color));
   fwrite(utf8, 1, utf8_len, ctx->file);
-  fprintf(ctx->file, "</text>\n");
+  PRINTF_FILE(ctx->file, "</text>\n");
   return CMP_OK;
 }
 
@@ -269,9 +277,9 @@ static const CMPTextVTable doc_text_vtable = {doc_create_font,
 static void write_json_entry(const char *category, const char *name,
                              const char *file) {
   if (!g_first_widget) {
-    fprintf(g_json_file, ",\n");
+    PRINTF_FILE(g_json_file, ",\n");
   }
-  fprintf(g_json_file,
+  PRINTF_FILE(g_json_file,
           "    { \"category\": \"%s\", \"name\": \"%s\", \"file\": \"%s\" }",
           category, name, file);
   g_first_widget = 0;
@@ -312,7 +320,7 @@ static void generate_widget(const char *category, const char *name,
   svg_ctx.file = fopen(svg_filename, "wb");
 #endif
   if (!svg_ctx.file) {
-    printf("Failed to open %s\n", svg_filename);
+    PRINTF_OUT("Failed to open %s\n", svg_filename);
     return;
   }
 
@@ -436,14 +444,14 @@ int main(int argc, char **argv) {
   g_json_file = fopen(json_filename, "w");
 #endif
   if (!g_json_file) {
-    printf("Failed to open json %s\n", json_filename);
+    PRINTF_OUT("Failed to open json %s\n", json_filename);
     return 1;
   }
 
-  fprintf(g_json_file, "{\n");
-  fprintf(g_json_file, "  \"platform\": \"%s\",\n", g_platform);
-  fprintf(g_json_file, "  \"theme\": \"%s\",\n", g_theme);
-  fprintf(g_json_file, "  \"widgets\": [\n");
+  PRINTF_FILE(g_json_file, "{\n");
+  PRINTF_FILE(g_json_file, "  \"platform\": \"%s\",\n", g_platform);
+  PRINTF_FILE(g_json_file, "  \"theme\": \"%s\",\n", g_theme);
+  PRINTF_FILE(g_json_file, "  \"widgets\": [\n");
 
   /* Buttons */
   m3_button_style_init_filled(&button_style);
@@ -636,9 +644,9 @@ int main(int argc, char **argv) {
                    &button.widget, NULL);
   generate_widget("scaffold", "default", &scaffold.widget);
 
-  fprintf(g_json_file, "\n  ]\n}\n");
+  PRINTF_FILE(g_json_file, "\n  ]\n}\n");
   fclose(g_json_file);
 
-  printf("Generated JSON manifest in %s\n", json_filename);
+  PRINTF_OUT("Generated JSON manifest in %s\n", json_filename);
   return 0;
 }

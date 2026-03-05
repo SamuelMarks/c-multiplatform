@@ -2034,8 +2034,8 @@ static int m3_range_slider_widget_event(void *widget,
     if ((CMPScalar)event->data.pointer.x >= slider->bounds.x && /* GCOVR_EXCL_LINE */
         (CMPScalar)event->data.pointer.x <=
             slider->bounds.x + slider->bounds.width && /* GCOVR_EXCL_LINE */
-        event->data.pointer.y >= slider->bounds.y && /* GCOVR_EXCL_LINE */
-        event->data.pointer.y <= slider->bounds.y + slider->bounds.height) { /* GCOVR_EXCL_LINE */
+        (CMPScalar)event->data.pointer.y >= slider->bounds.y && /* GCOVR_EXCL_LINE */
+        (CMPScalar)event->data.pointer.y <= slider->bounds.y + slider->bounds.height) { /* GCOVR_EXCL_LINE */
 
       *out_handled = CMP_TRUE; /* GCOVR_EXCL_LINE */
       dx = (CMPScalar)event->data.pointer.x - /* GCOVR_EXCL_LINE */

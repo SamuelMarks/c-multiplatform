@@ -7,6 +7,15 @@
 #include <winbase.h>
 #include <winuser.h>
 
+
+#if defined(_MSC_VER)
+#define PRINTF_ERR(...) fprintf_s(stderr, __VA_ARGS__)
+#define PRINTF_OUT(...) printf_s(__VA_ARGS__)
+#else
+#define PRINTF_ERR(...) fprintf(stderr, __VA_ARGS__)
+#define PRINTF_OUT(...) printf(__VA_ARGS__)
+#endif
+
 #if defined(_MSC_VER)
 #define NUM_FORMAT "%d"
 #else
@@ -29,7 +38,7 @@ void CreateDebugConsole(void) {
   freopen("CONOUT$", "w", stdout);
   freopen("CONOUT$", "w", stderr);
 #endif
-  printf("Debug console attached.\n");
+  PRINTF_OUT("Debug console attached.\n");
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
@@ -60,7 +69,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
   /* 3. Initialize Config & Force Defaults */
   rc = cmp_win32_backend_config_init(&config);
   if (rc != CMP_OK) {
-    fprintf(stderr, "Backend config init failed: " NUM_FORMAT "\n", rc);
+    PRINTF_ERR( "Backend config init failed: " NUM_FORMAT "\n", rc);
     return 1;
   }
 
@@ -71,13 +80,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
   config.enable_logging = CMP_TRUE;
 
   /* 4. Create Backend */
-  printf("Creating Win32 Backend...\n");
+  PRINTF_OUT("Creating Win32 Backend...\n");
   rc = cmp_win32_backend_create(&config, &backend);
   if (rc != CMP_OK) {
-    fprintf(stderr, "Failed to create Win32 backend. Error Code: " NUM_FORMAT "\n", rc);
+    PRINTF_ERR( "Failed to create Win32 backend. Error Code: " NUM_FORMAT "\n", rc);
     /* Keep console open for a moment so we can read the error */
     if (IsDebuggerPresent()) {
-      printf("Press Enter to exit...");
+      PRINTF_OUT("Press Enter to exit...");
       getchar();
     }
     return 1;
@@ -89,7 +98,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
   cmp_win32_backend_get_gfx(backend, &gfx);
   cmp_win32_backend_get_env(backend, &env);
 
-  printf("Backend created. Creating window...\n");
+  PRINTF_OUT("Backend created. Creating window...\n");
 
   CMPWSWindowConfig wincfg = {400, 600, "CMPC Demo (Win32)",
                               CMP_WS_WINDOW_RESIZABLE};
@@ -97,7 +106,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
   /* Access via the struct directly (ws.vtable) */
   rc = ws.vtable->create_window(ws.ctx, &wincfg, &window);
   if (rc != CMP_OK) {
-    fprintf(stderr, "Failed to create window: " NUM_FORMAT "\n", rc);
+    PRINTF_ERR( "Failed to create window: " NUM_FORMAT "\n", rc);
     return 1;
   }
 
@@ -105,14 +114,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
 
   cmp_get_default_allocator(&alloc);
 
-  printf("Creating Demo App...\n");
+  PRINTF_OUT("Creating Demo App...\n");
   demo_app_create(&alloc, &app);
 
-  printf("Initializing Resources...\n");
+  PRINTF_OUT("Initializing Resources...\n");
   // Pass pointers to the stack structs
   demo_app_init_resources(app, &gfx, &env);
 
-  printf("Running Loop...\n");
+  PRINTF_OUT("Running Loop...\n");
   int running = 1;
   CMPInputEvent event;
   CMPBool has_event;
@@ -140,7 +149,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
     Sleep(16);
   }
 
-  printf("Shutting down...\n");
+  PRINTF_OUT("Shutting down...\n");
   demo_app_destroy(app);
   ws.vtable->destroy_window(ws.ctx, window);
   cmp_win32_backend_destroy(backend);

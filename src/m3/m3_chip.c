@@ -986,10 +986,10 @@ static int m3_chip_widget_event(void *widget, const CMPInputEvent *event,
       if (rc != CMP_OK) {
         return rc;
       }
-      if (event->data.pointer.x >= delete_bounds.x &&
-          event->data.pointer.x <= delete_bounds.x + delete_bounds.width && /* GCOVR_EXCL_LINE */
-          event->data.pointer.y >= delete_bounds.y && /* GCOVR_EXCL_LINE */
-          event->data.pointer.y <= delete_bounds.y + delete_bounds.height) { /* GCOVR_EXCL_LINE */
+      if ((CMPScalar)event->data.pointer.x >= delete_bounds.x &&
+          (CMPScalar)event->data.pointer.x <= delete_bounds.x + delete_bounds.width && /* GCOVR_EXCL_LINE */
+          (CMPScalar)event->data.pointer.y >= delete_bounds.y && /* GCOVR_EXCL_LINE */
+          (CMPScalar)event->data.pointer.y <= delete_bounds.y + delete_bounds.height) { /* GCOVR_EXCL_LINE */
         hit_delete = CMP_TRUE;
       }
     }
