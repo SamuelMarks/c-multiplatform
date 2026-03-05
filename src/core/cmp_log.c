@@ -4,6 +4,8 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #define CMP_LOG_USE_WIN32 1
+#include <stdarg.h>
+#include <stddef.h>
 #include <windef.h>
 #include <winbase.h>
 #include <wingdi.h>

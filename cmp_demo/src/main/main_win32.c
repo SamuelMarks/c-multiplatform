@@ -1,6 +1,8 @@
 #include "app/demo_app.h"
 #include "cmpc/cmp_backend_win32.h"
 #include <stdio.h>
+#include <stdarg.h>
+#include <stddef.h>
 #include <windef.h>
 #include <winbase.h>
 #include <winuser.h>
@@ -15,9 +17,18 @@
 /* Helper to allow viewing printf output in a Win32 GUI app */
 void CreateDebugConsole(void) {
   AllocConsole();
+#if defined(_MSC_VER)
+  {
+    FILE *dummy;
+    freopen_s(&dummy, "CONIN$", "r", stdin);
+    freopen_s(&dummy, "CONOUT$", "w", stdout);
+    freopen_s(&dummy, "CONOUT$", "w", stderr);
+  }
+#else
   freopen("CONIN$", "r", stdin);
   freopen("CONOUT$", "w", stdout);
   freopen("CONOUT$", "w", stderr);
+#endif
   printf("Debug console attached.\n");
 }
 

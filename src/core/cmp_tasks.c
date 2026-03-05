@@ -204,6 +204,8 @@ static int CMP_CALL cmp_tasks_test_free_ex(void *ctx, void *ptr) {
 
 #if defined(_WIN32) || defined(_WIN64) /* GCOVR_EXCL_LINE */
 #define CMP_TASKS_USE_WIN32 1          /* GCOVR_EXCL_LINE */
+#include <stdarg.h>
+#include <stddef.h>
 #include <windef.h>
 #include <winbase.h>
 #include <wingdi.h>
