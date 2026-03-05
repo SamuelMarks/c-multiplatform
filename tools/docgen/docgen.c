@@ -394,9 +394,15 @@ int main(int argc, char **argv) {
   cmp_text_backend_from_gfx(&dummy_gfx, &text_backend);
 
 #if defined(_WIN32)
-  system("mkdir docs\\assets >nul 2>&1");
+  {
+    int ret = system("mkdir docs\\assets >nul 2>&1");
+    (void)ret;
+  }
 #else
-  system("mkdir -p docs/assets");
+  {
+    int ret = system("mkdir -p docs/assets");
+    (void)ret;
+  }
 #endif
 
   sprintf(json_filename, "docs/doc_%s_%s.json", g_platform, g_theme);

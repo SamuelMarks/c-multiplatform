@@ -730,7 +730,8 @@ int main(void) {
     CMPSize size;
     CMPPaintContext p_ctx = {0};
     CMPGfx p_gfx = {0};
-    int dummy_ctx = 0;
+    TestButtonBackend dummy_ctx;
+    test_backend_init(&dummy_ctx);
     p_gfx.ctx = &dummy_ctx;
     p_gfx.vtable = &g_test_gfx_vtable;
     p_gfx.text_vtable = &g_test_text_vtable;
@@ -756,7 +757,8 @@ int main(void) {
     CMPRect icon_bounds = {0, 0, 100, 40};
     CMPPaintContext icon_ctx = {0};
     CMPGfx mock_gfx = {0};
-    int dummy_ctx = 0;
+    TestButtonBackend dummy_ctx;
+    test_backend_init(&dummy_ctx);
     mock_gfx.ctx = &dummy_ctx;
     mock_gfx.vtable = &g_test_gfx_vtable;
     mock_gfx.text_vtable = &g_test_text_vtable;
