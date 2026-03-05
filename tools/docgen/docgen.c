@@ -12,6 +12,9 @@
 #include <string.h>
 #include <stdarg.h>
 
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((format(printf, 1, 2)))
+#endif
 static int doc_printf_out(const char *fmt, ...) {
   int ret;
   va_list args;
@@ -25,6 +28,9 @@ static int doc_printf_out(const char *fmt, ...) {
   return ret;
 }
 
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((format(printf, 2, 3)))
+#endif
 static int doc_printf_file(FILE *f, const char *fmt, ...) {
   int ret;
   va_list args;

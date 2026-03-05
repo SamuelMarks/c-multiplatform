@@ -8,6 +8,8 @@ static void test_arena_basic(void) {
     void *ptr1, *ptr2, *ptr3;
     CMPArenaStats stats;
 
+    memset(&arena, 0, sizeof(arena));
+
     if (cmp_arena_init(&arena, NULL, 1024) != CMP_OK) { fprintf(stderr, "Failed at line %d\n", __LINE__); exit(1); };
     
     if (cmp_arena_alloc(&arena, 100, 8, &ptr1) != CMP_OK) { fprintf(stderr, "Failed at line %d\n", __LINE__); exit(1); };
@@ -31,6 +33,8 @@ static void test_arena_edge_cases(void) {
     void *ptr;
     CMPArenaStats stats;
 
+    memset(&arena, 0, sizeof(arena));
+
     if (cmp_arena_init(NULL, NULL, 1024) == CMP_OK) { fprintf(stderr, "Failed at line %d\n", __LINE__); exit(1); };
     if (cmp_arena_init(&arena, NULL, 1024) != CMP_OK) { fprintf(stderr, "Failed at line %d\n", __LINE__); exit(1); };
     
@@ -51,6 +55,8 @@ static void test_arena_edge_cases(void) {
 static void test_arena_testing_hooks(void) {
     CMPArena arena;
     void *ptr;
+
+    memset(&arena, 0, sizeof(arena));
 
     if (cmp_arena_init(&arena, NULL, 1024) != CMP_OK) { fprintf(stderr, "Failed at line %d\n", __LINE__); exit(1); };
     

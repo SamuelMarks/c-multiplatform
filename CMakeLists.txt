@@ -48,7 +48,7 @@ set(CMP_WARNINGS_C
     $<$<C_COMPILER_ID:MSVC>:/W4>
     $<$<C_COMPILER_ID:MSVC>:/Za>
     $<$<C_COMPILER_ID:MSVC>:/sdl>
-    $<$<C_COMPILER_ID:MSVC>:/RTC1>
+    $<$<AND:$<C_COMPILER_ID:MSVC>,$<CONFIG:Debug>>:/RTC1>
     $<$<C_COMPILER_ID:MSVC>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:/WX>>
     $<$<C_COMPILER_ID:GNU>:-Wall>
     $<$<C_COMPILER_ID:GNU>:-Wextra>
