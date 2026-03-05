@@ -302,6 +302,13 @@ static int test_adaptive_feed_layout(void) {
   if (prim.width != 840.0f)
     return 1; /* Capped */
 
+  /* Expanded max width feed RTL */
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) !=
+      CMP_OK)
+    return 1;
+  if (prim.width != 840.0f)
+    return 1; /* Capped */
+
   return 0;
 }
 
@@ -360,6 +367,12 @@ static int test_adaptive_supporting_pane_layout(void) {
     return 1;
   if (prim.width != 1200.0f - 360.0f - 24.0f - 48.0f)
     return 1;
+    
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_TRUE) != CMP_OK)
+    return 1;
+  if (sec.x != 24.0f)
+    return 1;
 
   /* Expanded too small */
   bounds.width = 200.0f;
@@ -393,15 +406,43 @@ static int test_adaptive_rtl_layouts(void) {
   if (prim.x <= sec.x)
     return 1;
 
+  /* RTL Medium */
+  layout.window_class = M3_WINDOW_CLASS_MEDIUM;
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_TRUE) !=
+      CMP_OK)
+    return 1;
+  if (sec.x != 0.0f)
+    return 1;
+  if (prim.x <= sec.x)
+    return 1;
+  layout.window_class = M3_WINDOW_CLASS_EXPANDED;
+
+  /* RTL Medium Feed */
+  layout.window_class = M3_WINDOW_CLASS_MEDIUM;
   if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK)
     return 1;
   if (prim.x <= sec.x)
     return 1;
 
+  /* RTL Expanded Feed */
+  layout.window_class = M3_WINDOW_CLASS_EXPANDED;
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK)
+    return 1;
+  if (prim.x <= sec.x)
+    return 1;
+
+  /* RTL Medium Supporting Pane */
+  layout.window_class = M3_WINDOW_CLASS_MEDIUM;
   if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
                                          CMP_TRUE) != CMP_OK)
     return 1;
-  if (prim.x <= sec.x)
+
+  /* RTL Expanded Supporting Pane */
+  layout.window_class = M3_WINDOW_CLASS_EXPANDED;
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_TRUE) != CMP_OK)
+    return 1;
+  if (sec.x != 24.0f)
     return 1;
 
   return 0;

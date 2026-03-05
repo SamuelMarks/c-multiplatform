@@ -381,7 +381,7 @@ CMP_API int CMP_CALL m3_radio_set_on_change(M3Radio *radio,
                                             CMPRadioOnChange on_change,
                                             void *ctx);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Set a selection test fail point.
  * @param point Fail point identifier.

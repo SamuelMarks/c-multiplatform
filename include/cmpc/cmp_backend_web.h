@@ -90,7 +90,7 @@ CMP_API int CMP_CALL cmp_web_backend_get_gfx(CMPWebBackend *backend,
 CMP_API int CMP_CALL cmp_web_backend_get_env(CMPWebBackend *backend,
                                              CMPEnv *out_env);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Force cmp_web_backend_config_init to fail for coverage.
  * @param fail Set to CMP_TRUE to force the next init to fail.

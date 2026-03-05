@@ -367,7 +367,7 @@ CMP_API int CMP_CALL cmp_grid_view_get_visible(const CMPGridView *view,
                                                CMPRenderNode ***out_nodes,
                                                cmp_usize *out_count);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Set a list test fail point.
  * @param fail_point Fail point identifier.

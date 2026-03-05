@@ -255,7 +255,7 @@ CMP_API int CMP_CALL cmp_render_node_set_children(CMPRenderNode *node,
 CMP_API int CMP_CALL cmp_render_build(const CMPRenderNode *root,
                                       CMPRenderList *list, CMPScalar dpi_scale);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for render add-overflow helper.
  * @param a First operand.

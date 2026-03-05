@@ -171,7 +171,7 @@ typedef struct CMPAllocator {
  */
 CMP_API int CMP_CALL cmp_get_default_allocator(CMPAllocator *out_alloc);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Force default allocator retrieval to fail when enabled (tests only).
  * @param fail CMP_TRUE to force failure, CMP_FALSE to restore normal behavior.

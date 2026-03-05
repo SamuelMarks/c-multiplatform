@@ -131,7 +131,7 @@ CMP_API int CMP_CALL cmp_scroll_chain_post_scroll(
     const CMPScrollDelta *child_consumed, CMPScrollDelta *out_consumed,
     CMPScrollDelta *out_remaining);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for scroll consumption validation.
  * @param consumed Consumed delta to validate.

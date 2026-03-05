@@ -112,6 +112,7 @@ int main(void) {
   CMP_TEST_OK(cmp_log_init(&default_alloc));
   CMP_TEST_EXPECT(cmp_log_init(&default_alloc), CMP_ERR_STATE);
 
+  CMP_TEST_OK(cmp_log_write(CMP_LOG_LEVEL_INFO, NULL, "hello-no-tag"));
   CMP_TEST_OK(
       cmp_log_test_default_sink(NULL, CMP_LOG_LEVEL_INFO, "", "msg", 3));
   CMP_TEST_OK(

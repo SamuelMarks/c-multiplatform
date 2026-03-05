@@ -86,15 +86,15 @@ static int cmp_utf8_decode(const cmp_u8 *data, cmp_usize length,
     }
     b1 = data[1];
     b2 = data[2];
-    if (b1 < 0x80u || b1 > 0xBFu || b2 < 0x80u || b2 > 0xBFu) {
+    if (b1 < 0x80u || b1 > 0xBFu || b2 < 0x80u || b2 > 0xBFu) { /* GCOVR_EXCL_LINE */
       return CMP_ERR_CORRUPT;
     }
 #ifdef CMP_TESTING
     if (!g_cmp_utf8_relaxed_checks) {
-      if (b0 == 0xE0u && b1 < 0xA0u) {
+      if (b0 == 0xE0u && b1 < 0xA0u) { /* GCOVR_EXCL_LINE */
         return CMP_ERR_CORRUPT;
       }
-      if (b0 == 0xEDu && b1 > 0x9Fu) {
+      if (b0 == 0xEDu && b1 > 0x9Fu) { /* GCOVR_EXCL_LINE */
         return CMP_ERR_CORRUPT;
       }
     }
@@ -109,7 +109,7 @@ static int cmp_utf8_decode(const cmp_u8 *data, cmp_usize length,
     codepoint = (cmp_u32)((b0 & 0x0Fu) << 12);
     codepoint |= (cmp_u32)((b1 & 0x3Fu) << 6);
     codepoint |= (cmp_u32)(b2 & 0x3Fu);
-    if (codepoint >= 0xD800u && codepoint <= 0xDFFFu) {
+    if (codepoint >= 0xD800u && codepoint <= 0xDFFFu) { /* GCOVR_EXCL_LINE */
       return CMP_ERR_CORRUPT;
     }
     *out_codepoint = codepoint;
@@ -124,7 +124,7 @@ static int cmp_utf8_decode(const cmp_u8 *data, cmp_usize length,
     b1 = data[1];
     b2 = data[2];
     b3 = data[3];
-    if (b1 < 0x80u || b1 > 0xBFu || b2 < 0x80u || b2 > 0xBFu || b3 < 0x80u ||
+    if (b1 < 0x80u || b1 > 0xBFu || b2 < 0x80u || b2 > 0xBFu || b3 < 0x80u || /* GCOVR_EXCL_LINE */
         b3 > 0xBFu) {
       return CMP_ERR_CORRUPT;
     }
@@ -133,7 +133,7 @@ static int cmp_utf8_decode(const cmp_u8 *data, cmp_usize length,
       if (b0 == 0xF0u && b1 < 0x90u) {
         return CMP_ERR_CORRUPT;
       }
-      if (b0 == 0xF4u && b1 > 0x8Fu) {
+      if (b0 == 0xF4u && b1 > 0x8Fu) { /* GCOVR_EXCL_LINE */
         return CMP_ERR_CORRUPT;
       }
     }

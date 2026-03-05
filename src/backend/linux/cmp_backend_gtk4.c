@@ -1381,31 +1381,62 @@ void __cmp_gtk4_test_refs(void) {
 
 /* Stubs for unavailable */
 #else
-/* ... (Stubs omitted for brevity, they are needed if !GTK4_AVAILABLE but header
- * included) ... */
+/* GCOVR_EXCL_START */
 int CMP_CALL cmp_gtk4_backend_create(const CMPGTK4BackendConfig *config,
                                      CMPGTK4Backend **out) {
-  (void)config;
-  (void)out;
+  CMPGTK4BackendConfig local_config;
+  int rc;
+
+  if (out == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  *out = NULL;
+
+  if (config == NULL) {
+    rc = cmp_gtk4_backend_config_init(&local_config);
+    if (rc != CMP_OK) {
+      return rc;
+    }
+    config = &local_config;
+  }
+
+  rc = cmp_gtk4_backend_validate_config(config);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
   return CMP_ERR_UNSUPPORTED;
 }
+
 int CMP_CALL cmp_gtk4_backend_destroy(CMPGTK4Backend *b) {
-  (void)b;
-  return CMP_OK;
+  if (b == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  return CMP_ERR_UNSUPPORTED;
 }
+
 int CMP_CALL cmp_gtk4_backend_get_ws(CMPGTK4Backend *b, CMPWS *ws) {
-  (void)b;
-  (void)ws;
+  if (b == NULL || ws == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  memset(ws, 0, sizeof(*ws));
   return CMP_ERR_UNSUPPORTED;
 }
+
 int CMP_CALL cmp_gtk4_backend_get_gfx(CMPGTK4Backend *b, CMPGfx *gfx) {
-  (void)b;
-  (void)gfx;
+  if (b == NULL || gfx == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  memset(gfx, 0, sizeof(*gfx));
   return CMP_ERR_UNSUPPORTED;
 }
+
 int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *b, CMPEnv *env) {
-  (void)b;
-  (void)env;
+  if (b == NULL || env == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  memset(env, 0, sizeof(*env));
   return CMP_ERR_UNSUPPORTED;
 }
+/* GCOVR_EXCL_STOP */
 #endif

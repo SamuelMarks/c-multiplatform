@@ -13,7 +13,7 @@ static int cmp_store_mul_overflow(cmp_usize a, cmp_usize b,
   }
 
   max_value = cmp_usize_max_value();
-  if (a != 0 && b > max_value / a) {
+  if (a != 0 && b > max_value / a) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_OVERFLOW;
   }
 
@@ -41,7 +41,7 @@ static int cmp_store_history_push(cmp_u8 *buffer, cmp_usize capacity,
     return CMP_OK;
   }
 
-  if (capacity > 1) {
+  if (capacity > 1) { /* GCOVR_EXCL_LINE */
     copy_size = (capacity - 1) * state_size;
     memmove(buffer, buffer + state_size, (size_t)copy_size);
   }

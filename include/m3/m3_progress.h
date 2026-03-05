@@ -455,7 +455,7 @@ CMP_API int CMP_CALL m3_range_slider_set_label(M3RangeSlider *slider,
 CMP_API int CMP_CALL m3_range_slider_set_on_change(
     M3RangeSlider *slider, CMPRangeSliderOnChange on_change, void *ctx);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Set a progress test fail point.
  * @param fail_point Fail point identifier.

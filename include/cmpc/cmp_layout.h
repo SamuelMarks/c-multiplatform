@@ -217,7 +217,7 @@ CMP_API int CMP_CALL cmp_layout_compute(CMPLayoutNode *root,
                                         CMPLayoutMeasureSpec width,
                                         CMPLayoutMeasureSpec height);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for validating measure specs.
  * @param spec Measure spec to validate.

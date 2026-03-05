@@ -88,7 +88,7 @@ CMP_API int CMP_CALL cmp_path_cubic_to(CMPPath *path, CMPScalar cx1,
  */
 CMP_API int CMP_CALL cmp_path_close(CMPPath *path);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for overflow-safe addition.
  * @param a First operand.

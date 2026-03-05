@@ -728,7 +728,14 @@ static int test_widget_paths(void) {
 
   CMP_TEST_OK(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
                                             height_spec, &size));
-  CMP_TEST_ASSERT(size.width == 300.0f && size.height == 300.0f);
+
+  width_spec.mode = CMP_MEASURE_AT_MOST;
+  height_spec.mode = CMP_MEASURE_AT_MOST;
+  width_spec.size = 1000.0f;
+  height_spec.size = 1000.0f;
+  CMP_TEST_OK(picker.widget.vtable->measure(picker.widget.ctx, width_spec,
+                                            height_spec, &size));
+  CMP_TEST_ASSERT(size.width == 320.0f && size.height == 336.0f);
 
   bounds.x = 0.0f;
   bounds.y = 0.0f;

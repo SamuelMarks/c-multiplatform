@@ -273,7 +273,7 @@ CMP_API int CMP_CALL m3_menu_set_on_action(M3Menu *menu,
                                            CMPMenuOnAction on_action,
                                            void *ctx);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test hook to force negative panel size computation.
  * @param enable CMP_TRUE to force a negative size on the next computation.

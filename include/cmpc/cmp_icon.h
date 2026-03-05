@@ -133,7 +133,7 @@ CMP_API int CMP_CALL cmp_icon_draw_cstr(
     const CMPGfx *gfx, const CMPRect *bounds, const CMPIconStyle *style,
     const char *utf8_name, const CMPIconSvg *svg, cmp_u32 render_mode);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Set an icon test fail point.
  * @param fail_point Fail point identifier.

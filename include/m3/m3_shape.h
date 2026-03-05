@@ -100,25 +100,53 @@ CMP_API int CMP_CALL m3_shape_morph(const M3Shape *start_shape,
 
 /* Predefined Material 3 Shape Scales */
 
-/** @brief Standard shape scale: None (0dp). */
+/**
+ * @brief Standard shape scale: None (0dp).
+ * @param shape The shape structure to update.
+ * @return CMP_OK on success.
+ */
 CMP_API int CMP_CALL m3_shape_scale_none(M3Shape *shape);
 
-/** @brief Standard shape scale: Extra Small (4dp). */
+/**
+ * @brief Standard shape scale: Extra Small (4dp).
+ * @param shape The shape structure to update.
+ * @return CMP_OK on success.
+ */
 CMP_API int CMP_CALL m3_shape_scale_extra_small(M3Shape *shape);
 
-/** @brief Standard shape scale: Small (8dp). */
+/**
+ * @brief Standard shape scale: Small (8dp).
+ * @param shape The shape structure to update.
+ * @return CMP_OK on success.
+ */
 CMP_API int CMP_CALL m3_shape_scale_small(M3Shape *shape);
 
-/** @brief Standard shape scale: Medium (12dp). */
+/**
+ * @brief Standard shape scale: Medium (12dp).
+ * @param shape The shape structure to update.
+ * @return CMP_OK on success.
+ */
 CMP_API int CMP_CALL m3_shape_scale_medium(M3Shape *shape);
 
-/** @brief Standard shape scale: Large (16dp). */
+/**
+ * @brief Standard shape scale: Large (16dp).
+ * @param shape The shape structure to update.
+ * @return CMP_OK on success.
+ */
 CMP_API int CMP_CALL m3_shape_scale_large(M3Shape *shape);
 
-/** @brief Standard shape scale: Extra Large (28dp). */
+/**
+ * @brief Standard shape scale: Extra Large (28dp).
+ * @param shape The shape structure to update.
+ * @return CMP_OK on success.
+ */
 CMP_API int CMP_CALL m3_shape_scale_extra_large(M3Shape *shape);
 
-/** @brief Standard shape scale: Full (50% pill/circle). */
+/**
+ * @brief Standard shape scale: Full (fully rounded).
+ * @param shape The shape structure to update.
+ * @return CMP_OK on success.
+ */
 CMP_API int CMP_CALL m3_shape_scale_full(M3Shape *shape);
 
 #ifdef __cplusplus

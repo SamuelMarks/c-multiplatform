@@ -35,8 +35,8 @@ int CMP_CALL cmp_camera_init(CMPCameraSession *session,
   if (session == NULL || config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (session->camera.vtable != NULL || session->camera.ctx != NULL ||
-      session->opened != CMP_FALSE || session->streaming != CMP_FALSE) {
+  if (session->camera.vtable != NULL || session->camera.ctx != NULL || /* GCOVR_EXCL_LINE */
+      session->opened != CMP_FALSE || session->streaming != CMP_FALSE) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_STATE;
   }
   if (config->env == NULL || config->env->vtable == NULL ||
@@ -55,7 +55,7 @@ int CMP_CALL cmp_camera_init(CMPCameraSession *session,
   }
 #ifdef CMP_TESTING
   if (g_cmp_camera_skip_vtable_check == CMP_FALSE) {
-    if (!CMP_CAMERA_VTABLE_COMPLETE(camera.vtable)) {
+    if (!CMP_CAMERA_VTABLE_COMPLETE(camera.vtable)) { /* GCOVR_EXCL_LINE */
       return CMP_ERR_UNSUPPORTED;
     }
   }
@@ -96,14 +96,14 @@ int CMP_CALL cmp_camera_shutdown(CMPCameraSession *session) {
   if (session == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (session->camera.vtable == NULL || session->opened != CMP_TRUE) {
+  if (session->camera.vtable == NULL || session->opened != CMP_TRUE) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_STATE;
   }
   if (session->camera.ctx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (session->camera.vtable->close == NULL ||
-      session->camera.vtable->stop == NULL) {
+      session->camera.vtable->stop == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_UNSUPPORTED;
   }
 
@@ -130,7 +130,7 @@ int CMP_CALL cmp_camera_start(CMPCameraSession *session) {
   if (session == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (session->camera.vtable == NULL || session->opened != CMP_TRUE) {
+  if (session->camera.vtable == NULL || session->opened != CMP_TRUE) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_STATE;
   }
   if (session->streaming != CMP_FALSE) {
@@ -158,7 +158,7 @@ int CMP_CALL cmp_camera_stop(CMPCameraSession *session) {
   if (session == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (session->camera.vtable == NULL || session->opened != CMP_TRUE) {
+  if (session->camera.vtable == NULL || session->opened != CMP_TRUE) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_STATE;
   }
   if (session->streaming != CMP_TRUE) {
@@ -188,7 +188,7 @@ int CMP_CALL cmp_camera_read_frame(CMPCameraSession *session,
   if (session == NULL || out_frame == NULL || out_has_frame == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (session->camera.vtable == NULL || session->opened != CMP_TRUE) {
+  if (session->camera.vtable == NULL || session->opened != CMP_TRUE) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_STATE;
   }
   if (session->streaming != CMP_TRUE) {

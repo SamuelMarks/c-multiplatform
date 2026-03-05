@@ -29,3 +29,25 @@ patch_*
 
 !tools/update_coverage_badges.sh
 !tools/make_badge.sh
+
+# Temp and output files
+coverage.*
+coverage_report.txt
+doxygen.log
+gcovr_output.txt
+missed_lines.txt
+uncovered.txt
+out.txt
+*.patch
+*.orig
+*.rej
+math_extra.c
+
+# Debug tests
+debug_*
+test_arena_debug
+test_arena_debug.c
+
+# Make sure badges are not ignored
+!docs/badges/*
+

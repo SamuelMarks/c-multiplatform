@@ -95,7 +95,7 @@ CMP_API int CMP_CALL cmp_camera_copy_frame(const CMPCameraFrame *frame,
                                            void *dst, cmp_usize dst_capacity,
                                            cmp_usize *out_size);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test hook to bypass camera vtable completeness checks.
  * @param enable CMP_TRUE to bypass, CMP_FALSE to enforce normal checks.

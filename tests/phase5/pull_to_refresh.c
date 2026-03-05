@@ -178,6 +178,10 @@ static int test_ptr_widget(void) {
   ptr.drag_offset = 20.0f;
   CMP_TEST_OK(ptr.widget.vtable->paint(&ptr, &paint_ctx));
 
+  /* Paint with drag offset exceeding max_drag */
+  ptr.drag_offset = style.max_drag + 10.0f;
+  CMP_TEST_OK(ptr.widget.vtable->paint(&ptr, &paint_ctx));
+
   /* Paint refreshing */
   ptr.is_refreshing = CMP_TRUE;
   CMP_TEST_OK(ptr.widget.vtable->paint(&ptr, &paint_ctx));

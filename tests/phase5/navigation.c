@@ -257,7 +257,7 @@ static int test_style_init(void) {
   CMP_TEST_ASSERT(style.text_style.size_px == 14);
   CMP_TEST_ASSERT(style.text_style.weight == 400);
   CMP_TEST_ASSERT(style.text_style.italic == CMP_FALSE);
-  CMP_TEST_ASSERT(style.text_style.utf8_family == NULL);
+  CMP_TEST_ASSERT(strcmp(style.text_style.utf8_family, "sans-serif") == 0);
   CMP_TEST_ASSERT(cmp_near(style.background_color.a, 0.0f, 0.001f));
   CMP_TEST_ASSERT(cmp_near(style.selected_text_color.a, 1.0f, 0.001f));
 

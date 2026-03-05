@@ -362,6 +362,7 @@ static int test_menu_validation_helpers(void) {
                   CMP_ERR_INVALID_ARGUMENT);
   rc = cmp_text_style_init(&style);
   CMP_TEST_OK(rc);
+  style.utf8_family = NULL;
   CMP_TEST_EXPECT(m3_menu_test_validate_text_style(&style, CMP_TRUE),
                   CMP_ERR_INVALID_ARGUMENT);
   style.utf8_family = "Test";

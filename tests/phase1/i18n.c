@@ -281,17 +281,24 @@ static int test_i18n_coverage_hooks(TestAlloc *alloc_state,
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_i18n_test_locale_preset_de_de(NULL),
                   CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_i18n_test_locale_preset_ar_sa(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_i18n_test_locale_preset_he_il(NULL),
+                  CMP_ERR_INVALID_ARGUMENT);
 
-  CMP_TEST_OK(cmp_i18n_test_set_ascii_lower_fail_after(1u));
-  CMP_TEST_EXPECT(cmp_i18n_locale_from_tag("zz-ZZ", &locale), CMP_ERR_IO);
+  CMP_TEST_OK(cmp_i18n_test_locale_preset_ar_sa(&locale));
+  CMP_TEST_OK(cmp_i18n_test_locale_preset_he_il(&locale));
+
+  {
+    cmp_u32 i;
+    for (i = 1; i <= 12; i++) {
+      CMP_TEST_OK(cmp_i18n_test_set_ascii_lower_fail_after(i));
+      CMP_TEST_EXPECT(cmp_i18n_locale_from_tag("zz-ZZ", &locale), CMP_ERR_IO);
+    }
+  }
+
   CMP_TEST_OK(cmp_i18n_test_set_ascii_lower_fail_after(2u));
   CMP_TEST_EXPECT(cmp_i18n_test_tag_equals("aa", "aa", &equal), CMP_ERR_IO);
-  CMP_TEST_OK(cmp_i18n_test_set_ascii_lower_fail_after(3u));
-  CMP_TEST_EXPECT(cmp_i18n_locale_from_tag("zz-ZZ", &locale), CMP_ERR_IO);
-  CMP_TEST_OK(cmp_i18n_test_set_ascii_lower_fail_after(5u));
-  CMP_TEST_EXPECT(cmp_i18n_locale_from_tag("zz-ZZ", &locale), CMP_ERR_IO);
-  CMP_TEST_OK(cmp_i18n_test_set_ascii_lower_fail_after(7u));
-  CMP_TEST_EXPECT(cmp_i18n_locale_from_tag("zz-ZZ", &locale), CMP_ERR_IO);
   CMP_TEST_OK(cmp_i18n_test_set_ascii_lower_fail_after(0u));
 
   CMP_TEST_OK(cmp_i18n_test_force_utf8_error(CMP_TRUE));

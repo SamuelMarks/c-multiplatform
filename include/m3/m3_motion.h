@@ -14,12 +14,15 @@ extern "C" {
 
 #define M3_SHARED_AXIS_SLIDE_DISTANCE 30.0f
 
+/**
+ * @brief Represents the result of a motion calculation.
+ */
 typedef struct M3MotionResult {
-  CMPScalar opacity;
-  CMPScalar scale_x;
-  CMPScalar scale_y;
-  CMPScalar offset_x;
-  CMPScalar offset_y;
+  CMPScalar opacity; /**< The computed opacity. */
+  CMPScalar scale_x; /**< The computed horizontal scale. */
+  CMPScalar scale_y; /**< The computed vertical scale. */
+  CMPScalar offset_x; /**< The computed horizontal offset. */
+  CMPScalar offset_y; /**< The computed vertical offset. */
 } M3MotionResult;
 
 CMP_API int CMP_CALL m3_motion_shared_axis(cmp_u32 axis, CMPBool forward,

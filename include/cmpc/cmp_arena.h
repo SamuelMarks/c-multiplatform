@@ -83,14 +83,14 @@ CMP_API int CMP_CALL cmp_arena_alloc(CMPArena *arena, cmp_usize size,
 CMP_API int CMP_CALL cmp_arena_get_stats(const CMPArena *arena,
                                          CMPArenaStats *out_stats);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Force arena alignment failure during growth (tests only).
- * @param enable CMP_TRUE to force failure, CMP_FALSE to restore normal
+ * @param fail_count 1 to force failure on first call, 2 on second, 0 to restore normal
  * behavior.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_arena_test_set_force_align_fail(CMPBool enable);
+CMP_API int CMP_CALL cmp_arena_test_set_force_align_fail(int fail_count);
 
 /**
  * @brief Force arena offset overflow during allocation (tests only).

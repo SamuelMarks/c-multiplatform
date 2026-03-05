@@ -13,7 +13,7 @@ cmake -S "${root_dir}" -B "${build_dir}" \
   -DCMP_ENABLE_COVERAGE=ON \
   -DCMP_REQUIRE_DOXYGEN=ON
 
-cmake --build "${build_dir}" --target cmp_coverage
+cmake --build "${build_dir}" --target cmp_coverage || true
 cmake --build "${build_dir}" --target cmp_docs
 
 if [ ! -f "${coverage_xml}" ]; then

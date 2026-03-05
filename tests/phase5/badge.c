@@ -1,9 +1,13 @@
 #include "m3/m3_badge.h"
 #include "test_utils.h"
 
+static int g_fail_create_font = 0;
+static int g_fail_font_metrics = 0;
+
 static int mock_create_font(void *text, const char *utf8_family,
                             cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
                             CMPHandle *out_font) {
+  if (g_fail_create_font) return CMP_ERR_IO;
   if (out_font) {
     out_font->id = 1;
     out_font->generation = 1;
@@ -15,6 +19,7 @@ static int mock_measure_text(void *text, CMPHandle font, const char *utf8,
                              cmp_usize utf8_len, cmp_u32 base_direction,
                              CMPScalar *out_width, CMPScalar *out_height,
                              CMPScalar *out_baseline) {
+  if (g_fail_font_metrics && utf8 == NULL) return CMP_ERR_IO;
   if (out_width)
     *out_width = 10.0f;
   if (out_height)
@@ -29,7 +34,10 @@ static int mock_draw_text(void *text, CMPHandle font, const char *utf8,
   return CMP_OK;
 }
 static const CMPTextVTable mock_text_vtable = {
-    mock_create_font, mock_destroy_font, mock_measure_text, mock_draw_text};
+    mock_create_font, mock_destroy_font, mock_measure_text, mock_draw_text, NULL, NULL, NULL};
+
+static int mock_draw_rect(void *ctx, const CMPRect *rect, CMPColor color, CMPScalar radius) { return CMP_OK; }
+static const CMPGfxVTable g_test_gfx_vtable = { NULL, NULL, NULL, mock_draw_rect, NULL, NULL, NULL, NULL };
 
 static void cmp_test_text_backend_init(CMPTextBackend *backend) {
   backend->ctx = NULL;
@@ -80,6 +88,15 @@ static int test_badge_init(void) {
   style.dot_diameter = 6.0f;
 
   CMP_TEST_OK(m3_badge_init(&badge, &backend, &style, NULL, 0));
+
+  g_fail_create_font = 1;
+  CMP_TEST_EXPECT(m3_badge_init(&badge, &backend, &style, "1", 1), CMP_ERR_IO);
+  g_fail_create_font = 0;
+  
+  g_fail_font_metrics = 1;
+  CMP_TEST_EXPECT(m3_badge_init(&badge, &backend, &style, "1", 1), CMP_ERR_IO);
+  g_fail_font_metrics = 0;
+
   CMP_TEST_OK(m3_badge_init(&badge, &backend, &style, "1", 1));
 
   CMP_TEST_EXPECT(m3_badge_set_label(NULL, "2", 1), CMP_ERR_INVALID_ARGUMENT);
@@ -93,6 +110,14 @@ static int test_badge_init(void) {
   CMP_TEST_EXPECT(m3_badge_set_style(&badge, &style), CMP_ERR_INVALID_ARGUMENT);
   style.height = 16.0f;
   CMP_TEST_OK(m3_badge_set_style(&badge, &style));
+
+  g_fail_create_font = 1;
+  CMP_TEST_EXPECT(m3_badge_set_style(&badge, &style), CMP_ERR_IO);
+  g_fail_create_font = 0;
+  
+  g_fail_font_metrics = 1;
+  CMP_TEST_EXPECT(m3_badge_set_style(&badge, &style), CMP_ERR_IO);
+  g_fail_font_metrics = 0;
 
   return 0;
 }
@@ -137,8 +162,38 @@ static int test_badge_widget(void) {
                   CMP_OK);
 
   /* Paint */
-  CMP_TEST_EXPECT(badge.widget.vtable->paint(NULL, NULL),
-                  CMP_ERR_INVALID_ARGUMENT);
+  {
+    CMPPaintContext paint_ctx = {0};
+    CMPGfx mock_gfx = {0};
+    mock_gfx.vtable = &g_test_gfx_vtable;
+    mock_gfx.text_vtable = &mock_text_vtable;
+    paint_ctx.gfx = &mock_gfx;
+
+    CMP_TEST_EXPECT(badge.widget.vtable->paint(NULL, &paint_ctx),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(badge.widget.vtable->paint(&badge, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(badge.widget.vtable->paint(&badge, &paint_ctx));
+
+    /* Alpha 0 background */
+    badge.style.background_color.a = 0.0f;
+    CMP_TEST_OK(badge.widget.vtable->paint(&badge, &paint_ctx));
+    badge.style.background_color.a = 1.0f;
+
+    /* Alpha 0 text */
+    badge.style.text_color.a = 0.0f;
+    CMP_TEST_OK(badge.widget.vtable->paint(&badge, &paint_ctx));
+    badge.style.text_color.a = 1.0f;
+
+    /* Missing text vtable */
+    mock_gfx.text_vtable = NULL;
+    CMP_TEST_OK(badge.widget.vtable->paint(&badge, &paint_ctx));
+    mock_gfx.text_vtable = &mock_text_vtable;
+
+    /* Missing gfx */
+    paint_ctx.gfx = NULL;
+    CMP_TEST_OK(badge.widget.vtable->paint(&badge, &paint_ctx));
+  }
 
   /* Event */
   CMP_TEST_EXPECT(badge.widget.vtable->event(NULL, &event, &handled),

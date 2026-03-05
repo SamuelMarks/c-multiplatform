@@ -53,6 +53,18 @@ typedef struct M3SearchBar {
 } M3SearchBar;
 
 /**
+ * @brief Search view state.
+ */
+typedef struct M3SearchView {
+  CMPWidget widget;             /**< Widget interface. */
+  CMPWidget *search_bar;        /**< Linked search bar widget. */
+  CMPWidget *content;           /**< Content widget to display. */
+  CMPRect bounds;               /**< Full screen layout bounds. */
+  CMPAnimController expansion;  /**< Expansion animation controller. */
+  CMPBool is_active;            /**< CMP_TRUE when search view is expanded. */
+} M3SearchView;
+
+/**
  * @brief Initialize a search bar style with defaults.
  * @param style Style descriptor.
  * @return CMP_OK on success or a failure code.
@@ -102,6 +114,27 @@ CMP_API int CMP_CALL m3_search_bar_set_icons(M3SearchBar *search_bar,
 CMP_API int CMP_CALL m3_search_bar_set_on_change(M3SearchBar *search_bar,
                                                  M3SearchOnChange on_change,
                                                  void *ctx);
+
+/**
+ * @brief Initialize a search view widget.
+ * @param search_view Search view instance.
+ * @param search_bar Attached search bar widget.
+ * @param content Internal search content widget.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_search_view_init(M3SearchView *search_view,
+                                         CMPWidget *search_bar,
+                                         CMPWidget *content);
+
+/**
+ * @brief Update the search view expansion state.
+ * @param search_view Search view instance.
+ * @param active Expand if CMP_TRUE, collapse if CMP_FALSE.
+ * @param animate CMP_TRUE to animate transition.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_search_view_set_active(M3SearchView *search_view,
+                                               CMPBool active, CMPBool animate);
 
 /**
  * @brief Test wrapper helper.

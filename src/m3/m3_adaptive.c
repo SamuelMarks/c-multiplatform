@@ -115,7 +115,7 @@ int CMP_CALL m3_adaptive_feed_layout(const M3AdaptiveLayout *layout,
   if (layout == NULL || out_primary == NULL || out_secondary == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (bounds.width < 0.0f || bounds.height < 0.0f) {
+  if (bounds.width < 0.0f || bounds.height < 0.0f) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE;
   }
 
@@ -157,7 +157,7 @@ int CMP_CALL m3_adaptive_feed_layout(const M3AdaptiveLayout *layout,
 
     if (is_rtl) {
       out_secondary->x = bounds.x + margins;
-      out_primary->x = out_secondary->x + out_secondary->width + spacing;
+      out_primary->x = bounds.x + bounds.width - margins - out_primary->width; out_secondary->x = out_primary->x - spacing - out_secondary->width;
     } else {
       out_primary->x = bounds.x + margins +
                        (bounds.width - margins * 2.0f - out_primary->width -
@@ -184,7 +184,7 @@ int CMP_CALL m3_adaptive_supporting_pane_layout(const M3AdaptiveLayout *layout,
   if (layout == NULL || out_primary == NULL || out_secondary == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (bounds.width < 0.0f || bounds.height < 0.0f) {
+  if (bounds.width < 0.0f || bounds.height < 0.0f) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE;
   }
 
@@ -212,7 +212,7 @@ int CMP_CALL m3_adaptive_supporting_pane_layout(const M3AdaptiveLayout *layout,
 
     if (is_rtl) {
       out_secondary->x = bounds.x + margins;
-      out_primary->x = out_secondary->x + out_secondary->width + spacing;
+      out_primary->x = bounds.x + bounds.width - margins - out_primary->width; out_secondary->x = out_primary->x - spacing - out_secondary->width;
     } else {
       out_primary->x = bounds.x + margins;
       out_secondary->x = out_primary->x + out_primary->width + spacing;

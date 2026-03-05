@@ -89,7 +89,7 @@ CMP_API int CMP_CALL cmp_win32_backend_get_gfx(CMPWin32Backend *backend,
 CMP_API int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend,
                                                CMPEnv *out_env);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Force cmp_win32_backend_config_init to fail for coverage.
  * @param fail Set to CMP_TRUE to force the next init to fail.

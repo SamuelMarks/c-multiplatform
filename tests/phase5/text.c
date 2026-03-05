@@ -8,9 +8,12 @@ typedef struct TestTextBackend {
   int destroy_calls;
   int measure_calls;
   int draw_calls;
+  int shape_calls;
+  int free_calls;
   int fail_create;
   int fail_measure;
   int fail_draw;
+  int fail_shape;
   int negative_metrics;
   CMPHandle last_font;
   cmp_i32 last_size;
@@ -144,12 +147,49 @@ static int test_text_draw_text(void *text, CMPHandle font, const char *utf8,
   return CMP_OK;
 }
 
+static int test_text_shape_text(void *text, CMPHandle font, const char *utf8,
+                                cmp_usize utf8_len, cmp_u32 base_direction,
+                                CMPTextLayout *out_layout) {
+  TestTextBackend *backend;
+
+  if (text == NULL || out_layout == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  if (utf8 == NULL && utf8_len != 0) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  if (font.id == 0u && font.generation == 0u) {
+    return CMP_ERR_STATE;
+  }
+
+  backend = (TestTextBackend *)text;
+  backend->shape_calls += 1;
+  if (backend->fail_shape) {
+    return CMP_ERR_IO;
+  }
+
+  memset(out_layout, 0, sizeof(*out_layout));
+  return CMP_OK;
+}
+
+static int test_text_free_layout(void *text, CMPTextLayout *layout) {
+  TestTextBackend *backend;
+
+  if (text == NULL || layout == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  backend = (TestTextBackend *)text;
+  backend->free_calls += 1;
+  return CMP_OK;
+}
+
 static const CMPTextVTable g_test_text_vtable = {test_text_create_font,
                                                  test_text_destroy_font,
                                                  test_text_measure_text,
                                                  test_text_draw_text,
-                                                 NULL,
-                                                 NULL,
+                                                 test_text_shape_text,
+                                                 test_text_free_layout,
                                                  NULL};
 
 static const CMPTextVTable g_test_text_vtable_no_draw = {test_text_create_font,
@@ -369,7 +409,7 @@ int main(void) {
   CMP_TEST_EXPECT(
       cmp_text_measure_utf8(&text_backend, font, NULL, 3, 0, &metrics),
       CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_text_measure_utf8(&text_backend, font, "abc", 3, NULL),
+  CMP_TEST_EXPECT(cmp_text_measure_utf8(&text_backend, font, "abc", 3, 0, NULL),
                   CMP_ERR_INVALID_ARGUMENT);
 
   text_backend.vtable = &g_test_text_vtable_no_measure;
@@ -421,6 +461,28 @@ int main(void) {
   CMP_TEST_OK(cmp_text_test_set_cstr_limit(0));
   CMP_TEST_OK(cmp_text_test_cstrlen("abc", &cstr_len));
   CMP_TEST_ASSERT(cstr_len == 3u);
+
+  {
+    CMPTextLayout layout;
+    CMP_TEST_EXPECT(cmp_text_shape_utf8(NULL, font, "abc", 3, 0, &layout), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_text_shape_utf8(&text_backend, font, "abc", 3, 0, NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_text_shape_utf8(&text_backend, font, NULL, 3, 0, &layout), CMP_ERR_INVALID_ARGUMENT);
+    
+    text_backend.vtable = &g_test_text_vtable_no_measure;
+    CMP_TEST_EXPECT(cmp_text_shape_utf8(&text_backend, font, "abc", 3, 0, &layout), CMP_ERR_UNSUPPORTED);
+    text_backend.vtable = &g_test_text_vtable;
+
+    CMP_TEST_OK(cmp_text_shape_utf8(&text_backend, font, "abc", 3, 0, &layout));
+    
+    CMP_TEST_EXPECT(cmp_text_free_layout(NULL, &layout), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_text_free_layout(&text_backend, NULL), CMP_ERR_INVALID_ARGUMENT);
+
+    text_backend.vtable = &g_test_text_vtable_no_measure;
+    CMP_TEST_EXPECT(cmp_text_free_layout(&text_backend, &layout), CMP_ERR_UNSUPPORTED);
+    text_backend.vtable = &g_test_text_vtable;
+
+    CMP_TEST_OK(cmp_text_free_layout(&text_backend, &layout));
+  }
 
   CMP_TEST_OK(cmp_text_font_destroy(&text_backend, font));
   CMP_TEST_ASSERT(backend.destroy_calls == 1);

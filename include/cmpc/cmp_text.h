@@ -229,7 +229,7 @@ CMP_API int CMP_CALL cmp_text_widget_set_style(CMPTextWidget *widget,
 CMP_API int CMP_CALL cmp_text_widget_get_metrics(CMPTextWidget *widget,
                                                  CMPTextMetrics *out_metrics);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for color validation.
  * @param color Color to validate.

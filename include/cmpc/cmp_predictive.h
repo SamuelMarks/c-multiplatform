@@ -176,7 +176,7 @@ CMP_API int CMP_CALL cmp_predictive_back_commit(
 CMP_API int CMP_CALL cmp_predictive_back_cancel(
     CMPPredictiveBack *predictive, const CMPPredictiveBackEvent *event);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for predictive back event validation.
  * @param event Event payload to validate.

@@ -95,7 +95,7 @@ CMP_API int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
                                         CMPWidget **out_target,
                                         CMPBool *out_handled);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for validating a render rectangle.
  * @param rect Rectangle to validate.

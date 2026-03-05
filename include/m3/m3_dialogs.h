@@ -486,7 +486,7 @@ CMP_API int CMP_CALL m3_snackbar_set_on_action(M3Snackbar *snackbar,
                                                CMPSnackbarOnAction on_action,
                                                void *ctx);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /** @brief No test failure injected. */
 #define M3_DIALOG_TEST_FAIL_NONE 0u
 /** @brief Fail alert dialog compute actions. */

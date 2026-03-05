@@ -24,6 +24,10 @@ static const CMPWidgetVTable mock_vtable = {test_measure,   test_layout,
                                             test_paint,     test_event,
                                             test_semantics, test_destroy};
 
+static int dummy_draw_rect(void *ctx, const CMPRect *bounds, CMPColor color, CMPScalar corner_radius) {
+    return CMP_OK;
+}
+
 int main(void) {
   M3CarouselStyle style;
   M3Carousel carousel;
@@ -33,6 +37,7 @@ int main(void) {
 
   CMP_TEST_EXPECT(m3_carousel_style_init(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_carousel_style_init(&style));
+  style.background_color.a = 1.0f;
   CMP_TEST_EXPECT(style.item_spacing == 8.0f ? CMP_OK : CMP_ERR_UNKNOWN,
                   CMP_OK);
 
@@ -72,6 +77,19 @@ int main(void) {
     CMP_TEST_EXPECT(carousel.widget.vtable->layout(NULL, bounds),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(carousel.widget.vtable->layout(&carousel, bounds));
+    
+    CMPPaintContext pctx;
+    memset(&pctx, 0, sizeof(pctx));
+    CMPGfx gfx;
+    CMPGfxVTable gvt;
+    memset(&gfx, 0, sizeof(gfx));
+    memset(&gvt, 0, sizeof(gvt));
+    gvt.draw_rect = dummy_draw_rect;
+    gfx.vtable = &gvt;
+    pctx.gfx = &gfx;
+    CMP_TEST_EXPECT(carousel.widget.vtable->paint(NULL, &pctx), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(carousel.widget.vtable->paint(&carousel, NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(carousel.widget.vtable->paint(&carousel, &pctx));
 
     CMP_TEST_EXPECT(carousel.widget.vtable->event(NULL, &event, &handled),
                     CMP_ERR_INVALID_ARGUMENT);

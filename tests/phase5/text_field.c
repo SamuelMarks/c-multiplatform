@@ -129,11 +129,35 @@ int main(void) {
       CMP_TEST_EXPECT(field.widget.vtable->measure(&field, m_bad, m_bad, &size), CMP_ERR_INVALID_ARGUMENT);
   }
 
+  {
+      CMPMeasureSpec m100 = {CMP_MEASURE_EXACTLY, 100.0f};
+      CMPSize size;
+      CMP_TEST_OK(m3_text_field_set_supporting_text(&field, "Support"));
+      CMP_TEST_OK(field.widget.vtable->measure(&field, m100, m100, &size));
+      CMP_TEST_OK(m3_text_field_set_supporting_text(&field, NULL));
+  }
+
   /* Test layout < 0 */
   {
       CMPRect bounds = {0, 0, 100, 5};
       m3_text_field_set_supporting_text(&field, "Support");
       CMP_TEST_OK(field.widget.vtable->layout(&field, bounds));
+      m3_text_field_set_supporting_text(&field, NULL);
+  }
+
+  /* Test painting with supporting text */
+  {
+      CMPRect bounds = {0, 0, 100, 100};
+      CMPPaintContext paint_ctx = {0};
+      CMPGfx gfx = {0};
+      static const CMPGfxVTable dummy_gfx_vtable = {NULL, NULL, NULL, test_draw_rect, NULL, NULL, test_push_clip, test_pop_clip};
+      paint_ctx.gfx = &gfx;
+      gfx.vtable = &dummy_gfx_vtable;
+      gfx.text_vtable = &mock_vtable;
+
+      m3_text_field_set_supporting_text(&field, "Support");
+      CMP_TEST_OK(field.widget.vtable->layout(&field, bounds));
+      CMP_TEST_OK(field.widget.vtable->paint(&field, &paint_ctx));
       m3_text_field_set_supporting_text(&field, NULL);
   }
 
@@ -160,6 +184,9 @@ int main(void) {
       called = 0;
       rc = field.widget.vtable->event(&field, &event, &handled);
       CMP_TEST_EXPECT(called, 1);
+
+      m3_text_field_set_on_change(&field, NULL, NULL);
+      rc = field.widget.vtable->event(&field, &event, &handled);
   }
 
   {

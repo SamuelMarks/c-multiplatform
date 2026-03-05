@@ -309,7 +309,7 @@ CMP_API int CMP_CALL m3_date_picker_get_cell(const M3DatePicker *picker,
                                              cmp_usize index,
                                              M3DatePickerCell *out_cell);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test hook for validating colors.
  * @param color Color to validate.

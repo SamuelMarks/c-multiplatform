@@ -1655,9 +1655,56 @@ int main(void) {
     CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
     rslider.max_value = 1.0f;
 
-    bounds.width = 0.0f;
+    bounds.width = 100.0f;
     CMP_TEST_OK(rslider.widget.vtable->layout(&rslider, bounds));
+    rslider.widget.flags |= CMP_WIDGET_FLAG_FOCUSABLE;
+
+    /* Start drag on the first thumb */
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 20, 10));
     CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    CMP_TEST_ASSERT(handled == CMP_TRUE);
+    if (rslider.is_dragging_start == CMP_FALSE && rslider.is_dragging_end == CMP_FALSE) printf("DRAG START FAIL\n");
+
+    /* Move first thumb */
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, 30, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    CMP_TEST_ASSERT(handled == CMP_TRUE);
+
+    /* Move first thumb out of bounds (past end_value) */
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, 90, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    CMP_TEST_ASSERT(handled == CMP_TRUE);
+
+    /* End drag */
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 90, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    CMP_TEST_ASSERT(handled == CMP_TRUE);
+    CMP_TEST_ASSERT(rslider.is_dragging_start == CMP_FALSE);
+    CMP_TEST_ASSERT(rslider.is_dragging_end == CMP_FALSE);
+
+    /* Start drag on the second thumb */
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 90, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    CMP_TEST_ASSERT(handled == CMP_TRUE);
+
+    /* Move second thumb out of bounds (before start_value) */
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, 10, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    CMP_TEST_ASSERT(handled == CMP_TRUE);
+
+    /* End drag */
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    CMP_TEST_ASSERT(handled == CMP_TRUE);
+    CMP_TEST_ASSERT(rslider.is_dragging_start == CMP_FALSE);
+    CMP_TEST_ASSERT(rslider.is_dragging_end == CMP_FALSE);
+    /* Move and end without dragging */
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_MOVE, 10, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    CMP_TEST_ASSERT(handled == CMP_FALSE);
+    CMP_TEST_OK(init_pointer_event(&event, CMP_INPUT_POINTER_UP, 10, 10));
+    CMP_TEST_OK(rslider.widget.vtable->event(&rslider, &event, &handled));
+    CMP_TEST_ASSERT(handled == CMP_FALSE);
     bounds.width = 300.0f;
     CMP_TEST_OK(rslider.widget.vtable->layout(&rslider, bounds));
 

@@ -159,7 +159,7 @@ CMP_API int CMP_CALL cmp_storage_save(const CMPStorage *storage, CMPIO *io,
 CMP_API int CMP_CALL cmp_storage_load(CMPStorage *storage, CMPIO *io,
                                       const char *utf8_path);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for overflow-safe multiplication.
  * @param a First operand.

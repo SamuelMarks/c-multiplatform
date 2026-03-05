@@ -192,7 +192,7 @@ CMP_API int CMP_CALL cmp_router_get_current(const CMPRouter *router,
  */
 CMP_API int CMP_CALL cmp_router_clear(CMPRouter *router);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Override the maximum C-string length for router helpers.
  * @param max_len Maximum allowed length (0 disables override).

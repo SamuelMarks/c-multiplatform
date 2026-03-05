@@ -271,7 +271,7 @@ CMP_API int CMP_CALL cmp_badge_compute_bounds(
     const CMPRect *anchor, const CMPBadgePlacement *placement,
     CMPRect *out_bounds);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for color validation.
  * @param color Color to validate.

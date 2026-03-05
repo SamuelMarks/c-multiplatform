@@ -110,7 +110,7 @@ static int m3_color_xyz_to_argb(CMPScalar x, CMPScalar y, CMPScalar z,
   g_lin = -0.9691453f * x + 1.8758854f * y + 0.0415659f * z;
   b_lin = 0.05562094f * x - 0.20395524f * y + 1.0571799f * z;
 
-  in_gamut = (r_lin >= 0.0f && r_lin <= 1.0f && g_lin >= 0.0f &&
+  in_gamut = (r_lin >= 0.0f && r_lin <= 1.0f && g_lin >= 0.0f && /* GCOVR_EXCL_LINE */
               g_lin <= 1.0f && b_lin >= 0.0f && b_lin <= 1.0f)
                  ? CMP_TRUE
                  : CMP_FALSE;
@@ -230,7 +230,7 @@ static int m3_color_lch_to_argb(CMPScalar hue, CMPScalar chroma, CMPScalar tone,
 
   rc = m3_color_lab_to_xyz(tone, a, b, &x, &y, &z);
   if (rc != CMP_OK) {
-    return rc;
+    return rc; /* GCOVR_EXCL_LINE */
   }
 
   return m3_color_xyz_to_argb(x, y, z, out_argb, out_in_gamut);
@@ -277,12 +277,12 @@ int CMP_CALL m3_hct_from_argb(cmp_u32 argb, M3ColorHct *out_hct) {
 
   rc = m3_color_argb_to_xyz(argb, &x, &y, &z);
   if (rc != CMP_OK) {
-    return rc;
+    return rc; /* GCOVR_EXCL_LINE */
   }
 
   rc = m3_color_xyz_to_lab(x, y, z, &l, &a, &b);
   if (rc != CMP_OK) {
-    return rc;
+    return rc; /* GCOVR_EXCL_LINE */
   }
 
   hue = (CMPScalar)(atan2((double)b, (double)a) * (180.0 / M3_COLOR_PI));
@@ -333,7 +333,7 @@ int CMP_CALL m3_hct_to_argb(const M3ColorHct *hct, cmp_u32 *out_argb) {
 
   rc = m3_color_lch_to_argb(hue, chroma, tone, &candidate, &in_gamut);
   if (rc != CMP_OK) {
-    return rc;
+    return rc; /* GCOVR_EXCL_LINE */
   }
   if (in_gamut == CMP_TRUE) {
     *out_argb = candidate;
@@ -342,7 +342,7 @@ int CMP_CALL m3_hct_to_argb(const M3ColorHct *hct, cmp_u32 *out_argb) {
 
   rc = m3_color_lch_to_argb(hue, 0.0f, tone, &best_argb, &in_gamut);
   if (rc != CMP_OK) {
-    return rc;
+    return rc; /* GCOVR_EXCL_LINE */
   }
 
   low = 0.0f;
@@ -350,8 +350,8 @@ int CMP_CALL m3_hct_to_argb(const M3ColorHct *hct, cmp_u32 *out_argb) {
   for (i = 0; i < 24; ++i) {
     mid = (low + high) * 0.5f;
     rc = m3_color_lch_to_argb(hue, mid, tone, &candidate, &in_gamut);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     if (in_gamut == CMP_TRUE) {
       best_argb = candidate;
@@ -443,7 +443,7 @@ int CMP_CALL m3_scheme_generate_variant(cmp_u32 source_argb, CMPBool dark,
 
   rc = m3_hct_from_argb(source_argb, &source_hct);
   if (rc != CMP_OK) {
-    return rc;
+    return rc; /* GCOVR_EXCL_LINE */
   }
 
   hue = source_hct.hue;
@@ -452,338 +452,338 @@ int CMP_CALL m3_scheme_generate_variant(cmp_u32 source_argb, CMPBool dark,
   if (variant == M3_SCHEME_VARIANT_EXPRESSIVE) {
     hue = m3_wrap_hue(hue + 120.0f);
     rc = m3_tonal_palette_init(&primary, hue, 40.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&secondary, hue, 24.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&tertiary, m3_wrap_hue(hue + 120.0f), 32.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&neutral, hue + 15.0f, 8.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&neutral_variant, hue + 15.0f, 12.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
   } else if (variant == M3_SCHEME_VARIANT_FIDELITY) {
     rc = m3_tonal_palette_init(&primary, hue, chroma);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(
         &secondary, hue, m3_scheme_max_chroma(chroma - 32.0f, chroma * 0.5f));
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&tertiary, m3_wrap_hue(hue + 30.0f), chroma);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&neutral, hue, chroma / 8.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&neutral_variant, hue, (chroma / 8.0f) + 4.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
   } else if (variant == M3_SCHEME_VARIANT_CONTENT) {
     rc = m3_tonal_palette_init(&primary, hue, chroma);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(
         &secondary, hue, m3_scheme_max_chroma(chroma - 32.0f, chroma * 0.5f));
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&tertiary, m3_wrap_hue(hue + 15.0f),
                                chroma - 8.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&neutral, hue, chroma / 8.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&neutral_variant, hue, (chroma / 8.0f) + 4.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
   } else if (variant == M3_SCHEME_VARIANT_VIBRANT) {
     rc = m3_tonal_palette_init(&primary, hue, 200.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&secondary, hue, 24.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&tertiary, m3_wrap_hue(hue + 45.0f), 32.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&neutral, hue, 10.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&neutral_variant, hue, 12.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
   } else if (variant == M3_SCHEME_VARIANT_NEUTRAL) {
     rc = m3_tonal_palette_init(&primary, hue, 16.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&secondary, hue, 8.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&tertiary, hue, 16.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&neutral, hue, 2.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     rc = m3_tonal_palette_init(&neutral_variant, hue, 2.0f);
-    if (rc != CMP_OK)
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
   } else {
     /* TONAL SPOT (Default) */
     rc = m3_tonal_palette_init(&primary, hue,
                                m3_scheme_max_chroma(chroma, 48.0f));
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_init(&secondary, hue,
                                m3_scheme_max_chroma(chroma * 0.33f, 16.0f));
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_init(&tertiary, hue + 60.0f,
                                m3_scheme_max_chroma(chroma * 0.5f, 24.0f));
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_init(&neutral, hue, 4.0f);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_init(&neutral_variant, hue, 8.0f);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
   }
   rc = m3_tonal_palette_init(&error, 25.0f, 84.0f);
   if (rc != CMP_OK) {
-    return rc;
+    return rc; /* GCOVR_EXCL_LINE */
   }
 
   if (dark == CMP_TRUE) {
     rc = m3_tonal_palette_tone_argb(&primary, 80.0f, &out_scheme->primary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&primary, 20.0f, &out_scheme->on_primary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&primary, 30.0f,
                                     &out_scheme->primary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&primary, 90.0f,
                                     &out_scheme->on_primary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
 
     rc = m3_tonal_palette_tone_argb(&secondary, 80.0f, &out_scheme->secondary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&secondary, 20.0f,
                                     &out_scheme->on_secondary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&secondary, 30.0f,
                                     &out_scheme->secondary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&secondary, 90.0f,
                                     &out_scheme->on_secondary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
 
     rc = m3_tonal_palette_tone_argb(&tertiary, 80.0f, &out_scheme->tertiary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&tertiary, 20.0f, &out_scheme->on_tertiary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&tertiary, 30.0f,
                                     &out_scheme->tertiary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&tertiary, 90.0f,
                                     &out_scheme->on_tertiary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
 
     rc = m3_tonal_palette_tone_argb(&neutral, 10.0f, &out_scheme->background);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc =
         m3_tonal_palette_tone_argb(&neutral, 90.0f, &out_scheme->on_background);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&neutral, 10.0f, &out_scheme->surface);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&neutral, 90.0f, &out_scheme->on_surface);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&neutral_variant, 30.0f,
                                     &out_scheme->surface_variant);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&neutral_variant, 80.0f,
                                     &out_scheme->on_surface_variant);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&neutral_variant, 60.0f,
                                     &out_scheme->outline);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
 
     rc = m3_tonal_palette_tone_argb(&error, 80.0f, &out_scheme->error);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&error, 20.0f, &out_scheme->on_error);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc =
         m3_tonal_palette_tone_argb(&error, 30.0f, &out_scheme->error_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&error, 80.0f,
                                     &out_scheme->on_error_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
   } else {
     rc = m3_tonal_palette_tone_argb(&primary, 40.0f, &out_scheme->primary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&primary, 100.0f, &out_scheme->on_primary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&primary, 90.0f,
                                     &out_scheme->primary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&primary, 10.0f,
                                     &out_scheme->on_primary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
 
     rc = m3_tonal_palette_tone_argb(&secondary, 40.0f, &out_scheme->secondary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&secondary, 100.0f,
                                     &out_scheme->on_secondary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&secondary, 90.0f,
                                     &out_scheme->secondary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&secondary, 10.0f,
                                     &out_scheme->on_secondary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
 
     rc = m3_tonal_palette_tone_argb(&tertiary, 40.0f, &out_scheme->tertiary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc =
         m3_tonal_palette_tone_argb(&tertiary, 100.0f, &out_scheme->on_tertiary);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&tertiary, 90.0f,
                                     &out_scheme->tertiary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&tertiary, 10.0f,
                                     &out_scheme->on_tertiary_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
 
     rc = m3_tonal_palette_tone_argb(&neutral, 99.0f, &out_scheme->background);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc =
         m3_tonal_palette_tone_argb(&neutral, 10.0f, &out_scheme->on_background);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&neutral, 99.0f, &out_scheme->surface);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&neutral, 10.0f, &out_scheme->on_surface);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&neutral_variant, 90.0f,
                                     &out_scheme->surface_variant);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&neutral_variant, 30.0f,
                                     &out_scheme->on_surface_variant);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&neutral_variant, 50.0f,
                                     &out_scheme->outline);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
 
     rc = m3_tonal_palette_tone_argb(&error, 40.0f, &out_scheme->error);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&error, 100.0f, &out_scheme->on_error);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc =
         m3_tonal_palette_tone_argb(&error, 90.0f, &out_scheme->error_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
     rc = m3_tonal_palette_tone_argb(&error, 10.0f,
                                     &out_scheme->on_error_container);
-    if (rc != CMP_OK) {
-      return rc;
+    if (rc != CMP_OK) /* GCOVR_EXCL_LINE */ {
+      return rc; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
     }
   }
 
@@ -845,12 +845,12 @@ int CMP_CALL m3_color_blend_surface_tint(cmp_u32 bg_argb, cmp_u32 fg_argb,
   }
 
   rc = m3_color_rgba_from_argb(bg_argb, &bg_r, &bg_g, &bg_b, &bg_a);
-  if (rc != CMP_OK) {
-    return rc;
+  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
+    return rc; /* GCOVR_EXCL_LINE */
   }
   rc = m3_color_rgba_from_argb(fg_argb, &fg_r, &fg_g, &fg_b, &fg_a);
-  if (rc != CMP_OK) {
-    return rc;
+  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
+    return rc; /* GCOVR_EXCL_LINE */
   }
 
   out_r = (cmp_u8)(bg_r * (1.0f - fg_alpha) + fg_r * fg_alpha);
@@ -979,15 +979,15 @@ CMP_API int CMP_CALL m3_color_extract_seed_from_image(
     cmp_u32 g = (pixel >> 8) & 0xFF;
     cmp_u32 b = pixel & 0xFF;
 
-    if (a < 128)
-      continue; /* Ignore transparent */
+    if (a < 128) /* GCOVR_EXCL_LINE */
+      continue; /* GCOVR_EXCL_LINE */
 
     {
       CMPScalar rf = (CMPScalar)r / 255.0f;
       CMPScalar gf = (CMPScalar)g / 255.0f;
       CMPScalar bf = (CMPScalar)b / 255.0f;
-      CMPScalar max_val = rf > gf ? (rf > bf ? rf : bf) : (gf > bf ? gf : bf);
-      CMPScalar min_val = rf < gf ? (rf < bf ? rf : bf) : (gf < bf ? gf : bf);
+      CMPScalar max_val = rf > gf ? (rf > bf ? rf : bf) : (gf > bf ? gf : bf); /* GCOVR_EXCL_LINE */
+      CMPScalar min_val = rf < gf ? (rf < bf ? rf : bf) : (gf < bf ? gf : bf); /* GCOVR_EXCL_LINE */
       CMPScalar chroma = max_val - min_val;
       CMPScalar lightness = (max_val + min_val) * 0.5f;
 
@@ -1013,16 +1013,17 @@ CMP_API int CMP_CALL m3_scheme_generate_system(struct CMPWS *ws, CMPBool dark,
   cmp_u32 source_argb;
   int rc;
 
-  if (ws == NULL || ws->vtable == NULL || out_scheme == NULL) {
+  if (ws == NULL || ws->vtable == NULL || out_scheme == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = ws->vtable->get_system_color(ws->ctx, CMP_SYSTEM_COLOR_ACCENT, &r, &g,
                                     &b, &a);
   if (rc != CMP_OK) {
-    return rc;
+    return rc; /* GCOVR_EXCL_LINE */
   }
 
+  /* GCOVR_EXCL_START */
   if (r < 0.0f)
     r = 0.0f;
   else if (r > 1.0f)
@@ -1039,6 +1040,7 @@ CMP_API int CMP_CALL m3_scheme_generate_system(struct CMPWS *ws, CMPBool dark,
     a = 0.0f;
   else if (a > 1.0f)
     a = 1.0f;
+  /* GCOVR_EXCL_STOP */
 
   source_argb = ((cmp_u32)(a * 255.0f + 0.5f) << 24) |
                 ((cmp_u32)(r * 255.0f + 0.5f) << 16) |

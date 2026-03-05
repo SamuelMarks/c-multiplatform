@@ -100,7 +100,7 @@ CMP_API int CMP_CALL cmp_sdl3_backend_get_gfx(CMPSDL3Backend *backend,
 CMP_API int CMP_CALL cmp_sdl3_backend_get_env(CMPSDL3Backend *backend,
                                               CMPEnv *out_env);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Force cmp_sdl3_backend_config_init to fail for coverage.
  * @param fail Set to CMP_TRUE to force the next init to fail.

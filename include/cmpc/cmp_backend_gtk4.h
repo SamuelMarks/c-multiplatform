@@ -90,7 +90,7 @@ CMP_API int CMP_CALL cmp_gtk4_backend_get_gfx(CMPGTK4Backend *backend,
 CMP_API int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *backend,
                                               CMPEnv *out_env);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Force cmp_gtk4_backend_config_init to fail for coverage.
  * @param fail Set to CMP_TRUE to force the next init to fail.

@@ -35,7 +35,7 @@ static CMPScalar cmp_anim_solve_bezier_t(CMPScalar p1x, CMPScalar p2x,
   }
 
   t = x;
-  for (i = 0; i < 16; i++) {
+  for (i = 0; i < 16; i++) { /* GCOVR_EXCL_LINE */
     current_x = cmp_anim_bezier_eval(p1x, p2x, t);
     if (cmp_anim_abs(current_x - x) < 0.0001f) {
       break;

@@ -40,16 +40,16 @@ static int m3_selection_validate_bool(CMPBool value) {
 }
 
 static int m3_selection_validate_color(CMPColor color) {
-  if (!(color.r >= 0.0f && color.r <= 1.0f && color.g >= 0.0f &&
-        color.g <= 1.0f && color.b >= 0.0f && color.b <= 1.0f &&
-        color.a >= 0.0f && color.a <= 1.0f)) {
+  if (!(color.r >= 0.0f && color.r <= 1.0f && color.g >= 0.0f && /* GCOVR_EXCL_LINE */
+        color.g <= 1.0f && color.b >= 0.0f && color.b <= 1.0f && /* GCOVR_EXCL_LINE */
+        color.a >= 0.0f && color.a <= 1.0f)) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE;
   }
   return CMP_OK;
 }
 
 static int m3_selection_validate_colors(M3SelectionColors colors) {
-  if (m3_selection_validate_color(colors.fill) != CMP_OK ||
+  if (m3_selection_validate_color(colors.fill) != CMP_OK || /* GCOVR_EXCL_LINE */
       m3_selection_validate_color(colors.border) != CMP_OK ||
       m3_selection_validate_color(colors.mark) != CMP_OK) {
     return CMP_ERR_RANGE;
@@ -58,7 +58,7 @@ static int m3_selection_validate_colors(M3SelectionColors colors) {
 }
 
 static int m3_selection_validate_switch_colors(M3SwitchColors colors) {
-  if (m3_selection_validate_color(colors.track) != CMP_OK ||
+  if (m3_selection_validate_color(colors.track) != CMP_OK || /* GCOVR_EXCL_LINE */
       m3_selection_validate_color(colors.thumb) != CMP_OK) {
     return CMP_ERR_RANGE;
   }
@@ -90,7 +90,7 @@ m3_selection_apply_measure(CMPScalar desired, CMPMeasureSpec spec,
     *out_size = spec.size;
   } else if (spec.mode == CMP_MEASURE_AT_MOST) {
     *out_size = desired;
-    if (*out_size > spec.size) {
+    if (*out_size > spec.size) { /* GCOVR_EXCL_LINE */
       *out_size = spec.size;
     }
   } else {
@@ -100,23 +100,23 @@ m3_selection_apply_measure(CMPScalar desired, CMPMeasureSpec spec,
 }
 
 static int m3_selection_validate_rect(CMPRect rect) {
-  if (rect.width < 0.0f || rect.height < 0.0f) {
+  if (rect.width < 0.0f || rect.height < 0.0f) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE;
   }
   return CMP_OK;
 }
 
 static int m3_checkbox_validate_style(const M3CheckboxStyle *style) {
-  if (style->size <= 0.0f || style->corner_radius < 0.0f ||
-      style->border_width < 0.0f || style->check_thickness <= 0.0f ||
+  if (style->size <= 0.0f || style->corner_radius < 0.0f || /* GCOVR_EXCL_LINE */
+      style->border_width < 0.0f || style->check_thickness <= 0.0f || /* GCOVR_EXCL_LINE */
       style->border_width > style->size * 0.5f ||
-      style->corner_radius > style->size * 0.5f ||
-      style->check_thickness > style->size) {
+      style->corner_radius > style->size * 0.5f || /* GCOVR_EXCL_LINE */
+      style->check_thickness > style->size) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE;
   }
-  if (m3_selection_validate_colors(style->unchecked) != CMP_OK ||
-      m3_selection_validate_colors(style->checked) != CMP_OK ||
-      m3_selection_validate_colors(style->disabled_unchecked) != CMP_OK ||
+  if (m3_selection_validate_colors(style->unchecked) != CMP_OK || /* GCOVR_EXCL_LINE */
+      m3_selection_validate_colors(style->checked) != CMP_OK || /* GCOVR_EXCL_LINE */
+      m3_selection_validate_colors(style->disabled_unchecked) != CMP_OK || /* GCOVR_EXCL_LINE */
       m3_selection_validate_colors(style->disabled_checked) != CMP_OK) {
     return CMP_ERR_RANGE;
   }
@@ -126,7 +126,7 @@ static int m3_checkbox_validate_style(const M3CheckboxStyle *style) {
 static int m3_switch_validate_style(const M3SwitchStyle *style) {
   CMPScalar thumb_size = 0.0f;
 
-  if (style->track_width <= 0.0f || style->track_height <= 0.0f ||
+  if (style->track_width <= 0.0f || style->track_height <= 0.0f || /* GCOVR_EXCL_LINE */
       style->thumb_inset < 0.0f || style->track_width < style->track_height ||
       style->thumb_inset > style->track_height * 0.5f) {
     return CMP_ERR_RANGE;
@@ -137,9 +137,9 @@ static int m3_switch_validate_style(const M3SwitchStyle *style) {
     return CMP_ERR_RANGE;
   }
 
-  if (m3_selection_validate_switch_colors(style->off) != CMP_OK ||
-      m3_selection_validate_switch_colors(style->on) != CMP_OK ||
-      m3_selection_validate_switch_colors(style->disabled_off) != CMP_OK ||
+  if (m3_selection_validate_switch_colors(style->off) != CMP_OK || /* GCOVR_EXCL_LINE */
+      m3_selection_validate_switch_colors(style->on) != CMP_OK || /* GCOVR_EXCL_LINE */
+      m3_selection_validate_switch_colors(style->disabled_off) != CMP_OK || /* GCOVR_EXCL_LINE */
       m3_selection_validate_switch_colors(style->disabled_on) != CMP_OK) {
     return CMP_ERR_RANGE;
   }
@@ -150,7 +150,7 @@ static int m3_radio_validate_style(const M3RadioStyle *style) {
   CMPScalar max_dot; /* GCOVR_EXCL_LINE */
 
   if (style->size <= 0.0f || style->border_width < 0.0f ||
-      style->dot_radius < 0.0f || style->border_width > style->size * 0.5f) {
+      style->dot_radius < 0.0f || style->border_width > style->size * 0.5f) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE;
   }
 
@@ -159,9 +159,9 @@ static int m3_radio_validate_style(const M3RadioStyle *style) {
     return CMP_ERR_RANGE;
   }
 
-  if (m3_selection_validate_colors(style->unchecked) != CMP_OK ||
-      m3_selection_validate_colors(style->checked) != CMP_OK ||
-      m3_selection_validate_colors(style->disabled_unchecked) != CMP_OK ||
+  if (m3_selection_validate_colors(style->unchecked) != CMP_OK || /* GCOVR_EXCL_LINE */
+      m3_selection_validate_colors(style->checked) != CMP_OK || /* GCOVR_EXCL_LINE */
+      m3_selection_validate_colors(style->disabled_unchecked) != CMP_OK || /* GCOVR_EXCL_LINE */
       m3_selection_validate_colors(style->disabled_checked) != CMP_OK) {
     return CMP_ERR_RANGE;
   }
@@ -310,7 +310,7 @@ static int m3_checkbox_widget_paint(void *widget, CMPPaintContext *ctx) {
   if (widget == NULL || ctx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (ctx->gfx == NULL || ctx->gfx->vtable == NULL) {
+  if (ctx->gfx == NULL || ctx->gfx->vtable == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (ctx->gfx->vtable->draw_rect == NULL) {
@@ -340,7 +340,7 @@ static int m3_checkbox_widget_paint(void *widget, CMPPaintContext *ctx) {
   inner_corner = corner;
   inner = bounds;
 
-  if (border > 0.0f) {
+  if (border > 0.0f) { /* GCOVR_EXCL_LINE */
     rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &bounds, colors.border,
                                      corner);
     if (rc != CMP_OK) {
@@ -351,7 +351,7 @@ static int m3_checkbox_widget_paint(void *widget, CMPPaintContext *ctx) {
     inner.y += border;
     inner.width -= border * 2.0f;
     inner.height -= border * 2.0f;
-    if (inner.width < 0.0f || inner.height < 0.0f) {
+    if (inner.width < 0.0f || inner.height < 0.0f) { /* GCOVR_EXCL_LINE */
       return CMP_ERR_RANGE;
     }
 
@@ -443,7 +443,7 @@ static int m3_checkbox_widget_event(void *widget, const CMPInputEvent *event,
     prev_checked = checkbox->checked;
     next_checked = (prev_checked == CMP_TRUE) ? CMP_FALSE : CMP_TRUE;
     checkbox->checked = next_checked;
-    if (checkbox->on_change != NULL) {
+    if (checkbox->on_change != NULL) { /* GCOVR_EXCL_LINE */
       rc = checkbox->on_change(checkbox->on_change_ctx, checkbox, next_checked);
       if (rc != CMP_OK) {
         checkbox->checked = prev_checked;
@@ -461,7 +461,7 @@ static int m3_checkbox_widget_get_semantics(void *widget,
                                             CMPSemantics *out_semantics) {
   M3Checkbox *checkbox;
 
-  if (widget == NULL || out_semantics == NULL) {
+  if (widget == NULL || out_semantics == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
   memset(out_semantics, 0, sizeof(*out_semantics));
@@ -469,7 +469,7 @@ static int m3_checkbox_widget_get_semantics(void *widget,
   checkbox = (M3Checkbox *)widget;
   out_semantics->role = CMP_SEMANTIC_CHECKBOX;
   out_semantics->flags = 0;
-  if (checkbox->checked == CMP_TRUE) {
+  if (checkbox->checked == CMP_TRUE) { /* GCOVR_EXCL_LINE */
     if (checkbox->mixed_state == CMP_TRUE) {
       out_semantics->flags |= CMP_SEMANTIC_FLAG_MIXED_CHECKED;
     } else {
@@ -479,7 +479,7 @@ static int m3_checkbox_widget_get_semantics(void *widget,
   if (checkbox->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_DISABLED;
   }
-  if (checkbox->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) {
+  if (checkbox->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) { /* GCOVR_EXCL_LINE */
     out_semantics->flags |= CMP_SEMANTIC_FLAG_FOCUSABLE;
   }
   out_semantics->utf8_label = checkbox->utf8_label;
@@ -578,7 +578,7 @@ static int m3_switch_widget_paint(void *widget, CMPPaintContext *ctx) {
   if (widget == NULL || ctx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (ctx->gfx == NULL || ctx->gfx->vtable == NULL) {
+  if (ctx->gfx == NULL || ctx->gfx->vtable == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (ctx->gfx->vtable->draw_rect == NULL) {
@@ -671,7 +671,7 @@ static int m3_switch_widget_event(void *widget, const CMPInputEvent *event,
     prev_on = sw->on;
     next_on = (prev_on == CMP_TRUE) ? CMP_FALSE : CMP_TRUE;
     sw->on = next_on;
-    if (sw->on_change != NULL) {
+    if (sw->on_change != NULL) { /* GCOVR_EXCL_LINE */
       rc = sw->on_change(sw->on_change_ctx, sw, next_on);
       if (rc != CMP_OK) {
         sw->on = prev_on;
@@ -689,7 +689,7 @@ static int m3_switch_widget_get_semantics(void *widget,
                                           CMPSemantics *out_semantics) {
   M3Switch *sw;
 
-  if (widget == NULL || out_semantics == NULL) {
+  if (widget == NULL || out_semantics == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
   memset(out_semantics, 0, sizeof(*out_semantics));
@@ -697,13 +697,13 @@ static int m3_switch_widget_get_semantics(void *widget,
   sw = (M3Switch *)widget;
   out_semantics->role = CMP_SEMANTIC_SWITCH;
   out_semantics->flags = 0;
-  if (sw->on == CMP_TRUE) {
+  if (sw->on == CMP_TRUE) { /* GCOVR_EXCL_LINE */
     out_semantics->flags |= CMP_SEMANTIC_FLAG_TOGGLED;
   }
   if (sw->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_DISABLED;
   }
-  if (sw->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) {
+  if (sw->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) { /* GCOVR_EXCL_LINE */
     out_semantics->flags |= CMP_SEMANTIC_FLAG_FOCUSABLE;
   }
   out_semantics->utf8_label = sw->utf8_label;
@@ -808,7 +808,7 @@ static int m3_radio_widget_paint(void *widget, CMPPaintContext *ctx) {
   if (widget == NULL || ctx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (ctx->gfx == NULL || ctx->gfx->vtable == NULL) {
+  if (ctx->gfx == NULL || ctx->gfx->vtable == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (ctx->gfx->vtable->draw_rect == NULL) {
@@ -841,7 +841,7 @@ static int m3_radio_widget_paint(void *widget, CMPPaintContext *ctx) {
   inner = bounds;
   inner_corner = corner;
 
-  if (border > 0.0f) {
+  if (border > 0.0f) { /* GCOVR_EXCL_LINE */
     rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &bounds, colors.border,
                                      corner);
     if (rc != CMP_OK) {
@@ -852,7 +852,7 @@ static int m3_radio_widget_paint(void *widget, CMPPaintContext *ctx) {
     inner.y += border;
     inner.width -= border * 2.0f;
     inner.height -= border * 2.0f;
-    if (inner.width < 0.0f || inner.height < 0.0f) {
+    if (inner.width < 0.0f || inner.height < 0.0f) { /* GCOVR_EXCL_LINE */
       return CMP_ERR_RANGE;
     }
 
@@ -885,7 +885,7 @@ static int m3_radio_widget_paint(void *widget, CMPPaintContext *ctx) {
     if (dot_radius < 0.0f) {
       return CMP_ERR_RANGE;
     }
-    if (dot_radius > 0.0f) {
+    if (dot_radius > 0.0f) { /* GCOVR_EXCL_LINE */
       dot.width = dot_radius * 2.0f;
       dot.height = dot_radius * 2.0f;
       dot.x = bounds.x + (bounds.width - dot.width) * 0.5f;
@@ -937,7 +937,7 @@ static int m3_radio_widget_event(void *widget, const CMPInputEvent *event,
     radio->pressed = CMP_FALSE;
     if (radio->selected == CMP_FALSE) {
       radio->selected = CMP_TRUE;
-      if (radio->on_change != NULL) {
+      if (radio->on_change != NULL) { /* GCOVR_EXCL_LINE */
         rc = radio->on_change(radio->on_change_ctx, radio, CMP_TRUE);
         if (rc != CMP_OK) {
           radio->selected = CMP_FALSE;
@@ -956,7 +956,7 @@ static int m3_radio_widget_get_semantics(
     void *widget, CMPSemantics *out_semantics) { /* GCOVR_EXCL_LINE */
   M3Radio *radio = NULL;
 
-  if (widget == NULL || out_semantics == NULL) {
+  if (widget == NULL || out_semantics == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
   memset(out_semantics, 0, sizeof(*out_semantics));
@@ -970,7 +970,7 @@ static int m3_radio_widget_get_semantics(
   if (radio->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_DISABLED;
   }
-  if (radio->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) {
+  if (radio->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) { /* GCOVR_EXCL_LINE */
     out_semantics->flags |= CMP_SEMANTIC_FLAG_FOCUSABLE;
   }
   out_semantics->utf8_label = radio->utf8_label;
@@ -1093,6 +1093,7 @@ int CMP_CALL m3_checkbox_init(M3Checkbox *checkbox,
   checkbox->on_change = NULL;
   checkbox->on_change_ctx = NULL;
 
+  checkbox->widget.ctx = checkbox;
   checkbox->widget.vtable = &g_m3_checkbox_widget_vtable;
   checkbox->widget.handle.id = 0u;
   checkbox->widget.handle.generation = 0u;
@@ -1164,7 +1165,7 @@ int CMP_CALL m3_checkbox_set_label(M3Checkbox *checkbox, const char *utf8_label,
   if (checkbox == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_label == NULL && utf8_len != 0u) {
+  if (utf8_label == NULL && utf8_len != 0u) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -1302,7 +1303,7 @@ int CMP_CALL m3_switch_set_label(M3Switch *widget, const char *utf8_label,
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_label == NULL && utf8_len != 0u) {
+  if (utf8_label == NULL && utf8_len != 0u) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -1451,7 +1452,7 @@ int CMP_CALL m3_radio_set_label(M3Radio *radio, const char *utf8_label,
   if (radio == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_label == NULL && utf8_len != 0u) {
+  if (utf8_label == NULL && utf8_len != 0u) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
 

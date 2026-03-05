@@ -145,7 +145,7 @@ CMP_API int CMP_CALL cmp_ios_backend_predictive_back_commit(
 CMP_API int CMP_CALL cmp_ios_backend_predictive_back_cancel(
     CMPIOSBackend *backend, const CMPPredictiveBackEvent *event);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Force cmp_ios_backend_config_init to fail for coverage.
  * @param fail Set to CMP_TRUE to force the next init to fail.

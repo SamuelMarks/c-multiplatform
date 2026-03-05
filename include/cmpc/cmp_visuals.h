@@ -158,7 +158,7 @@ CMP_API int CMP_CALL cmp_shadow_set(CMPShadow *shadow, CMPScalar offset_x,
 CMP_API int CMP_CALL cmp_shadow_paint(const CMPShadow *shadow, CMPGfx *gfx,
                                       const CMPRect *rect, const CMPRect *clip);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /** @brief Fail point: force shadow normalization error. */
 #ifndef CMP_VISUALS_TEST_FAIL_SHADOW_NORM
 #define CMP_VISUALS_TEST_FAIL_SHADOW_NORM 18u

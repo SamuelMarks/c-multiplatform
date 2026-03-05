@@ -231,7 +231,7 @@ CMP_API int CMP_CALL cmp_handle_system_default_create(
  */
 CMP_API int CMP_CALL cmp_handle_system_default_destroy(CMPHandleSystem *sys);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Force handle validation to fail when enabled (tests only).
  * @param fail CMP_TRUE to force failure, CMP_FALSE to restore normal behavior.

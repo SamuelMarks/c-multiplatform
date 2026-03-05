@@ -207,9 +207,17 @@ int main(void) {
 #ifdef CMP_TESTING
   CMP_TEST_OK(cmp_arena_init(&arena, NULL, 16));
   CMP_TEST_OK(cmp_arena_alloc(&arena, 8, 8, &ptr));
-  CMP_TEST_OK(cmp_arena_test_set_force_align_fail(CMP_TRUE));
+  CMP_TEST_OK(cmp_arena_test_set_force_align_fail(1));
   CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 32, 8, &ptr2), CMP_ERR_OVERFLOW);
-  CMP_TEST_OK(cmp_arena_test_set_force_align_fail(CMP_FALSE));
+  CMP_TEST_OK(cmp_arena_test_set_force_align_fail(0));
+
+  CMP_TEST_OK(cmp_arena_test_set_force_align_fail(2));
+  CMP_TEST_EXPECT(cmp_arena_alloc(&arena, 32, 8, &ptr2), CMP_ERR_OVERFLOW);
+  CMP_TEST_OK(cmp_arena_test_set_force_align_fail(0));
+
+  CMP_TEST_OK(cmp_arena_test_set_force_align_fail(3));
+  CMP_TEST_OK(cmp_arena_alloc(&arena, 32, 8, &ptr2));
+  CMP_TEST_OK(cmp_arena_test_set_force_align_fail(0));
   CMP_TEST_OK(cmp_arena_shutdown(&arena));
 
   CMP_TEST_OK(cmp_arena_init(&arena, NULL, 16));

@@ -32,30 +32,33 @@ typedef struct M3TonalPalette {
 /**
  * @brief Dynamic color scheme output.
  */
+/**
+ * @brief Represents a full Material 3 color scheme.
+ */
 typedef struct M3Scheme {
-  cmp_u32 primary;
-  cmp_u32 on_primary;
-  cmp_u32 primary_container;
-  cmp_u32 on_primary_container;
-  cmp_u32 secondary;
-  cmp_u32 on_secondary;
-  cmp_u32 secondary_container;
-  cmp_u32 on_secondary_container;
-  cmp_u32 tertiary;
-  cmp_u32 on_tertiary;
-  cmp_u32 tertiary_container;
-  cmp_u32 on_tertiary_container;
-  cmp_u32 background;
-  cmp_u32 on_background;
-  cmp_u32 surface;
-  cmp_u32 on_surface;
-  cmp_u32 surface_variant;
-  cmp_u32 on_surface_variant;
-  cmp_u32 outline;
-  cmp_u32 error;
-  cmp_u32 on_error;
-  cmp_u32 error_container;
-  cmp_u32 on_error_container;
+  cmp_u32 primary;                 /**< Primary color. */
+  cmp_u32 on_primary;              /**< On-primary color. */
+  cmp_u32 primary_container;       /**< Primary container color. */
+  cmp_u32 on_primary_container;    /**< On-primary container color. */
+  cmp_u32 secondary;               /**< Secondary color. */
+  cmp_u32 on_secondary;            /**< On-secondary color. */
+  cmp_u32 secondary_container;     /**< Secondary container color. */
+  cmp_u32 on_secondary_container;  /**< On-secondary container color. */
+  cmp_u32 tertiary;                /**< Tertiary color. */
+  cmp_u32 on_tertiary;             /**< On-tertiary color. */
+  cmp_u32 tertiary_container;      /**< Tertiary container color. */
+  cmp_u32 on_tertiary_container;   /**< On-tertiary container color. */
+  cmp_u32 background;              /**< Background color. */
+  cmp_u32 on_background;           /**< On-background color. */
+  cmp_u32 surface;                 /**< Surface color. */
+  cmp_u32 on_surface;              /**< On-surface color. */
+  cmp_u32 surface_variant;         /**< Surface variant color. */
+  cmp_u32 on_surface_variant;      /**< On-surface variant color. */
+  cmp_u32 outline;                 /**< Outline color. */
+  cmp_u32 error;                   /**< Error color. */
+  cmp_u32 on_error;                /**< On-error color. */
+  cmp_u32 error_container;         /**< Error container color. */
+  cmp_u32 on_error_container;      /**< On-error container color. */
 } M3Scheme;
 
 /**
@@ -173,6 +176,12 @@ struct CMPWS;
 CMP_API int CMP_CALL m3_scheme_generate_system(struct CMPWS *ws, CMPBool dark,
                                                M3Scheme *out_scheme);
 
+/**
+ * @brief Get the surface tint opacity for a given elevation level.
+ * @param elevation_level The elevation level.
+ * @param out_opacity Output pointer for the opacity scalar.
+ * @return CMP_OK on success.
+ */
 CMP_API int CMP_CALL m3_color_surface_tint_opacity(cmp_u32 elevation_level,
                                                    CMPScalar *out_opacity);
 
@@ -189,7 +198,7 @@ CMP_API int CMP_CALL m3_color_blend_surface_tint(cmp_u32 bg_argb,
                                                  CMPScalar fg_alpha,
                                                  cmp_u32 *out_argb);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Force argb-to-XYZ conversion failures for testing.
  * @param fail CMP_TRUE to force failure; CMP_FALSE to disable.

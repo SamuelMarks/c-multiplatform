@@ -195,7 +195,7 @@ CMP_API int CMP_CALL m3_navigation_set_on_select(
 CMP_API int CMP_CALL m3_navigation_get_mode(const M3Navigation *nav,
                                             cmp_u32 *out_mode);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for navigation color validation.
  * @param color Color to validate.

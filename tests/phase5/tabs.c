@@ -506,7 +506,7 @@ static int test_tab_row_style_init(void) {
   CMP_TEST_ASSERT(style.text_style.size_px == 14);
   CMP_TEST_ASSERT(style.text_style.weight == 400);
   CMP_TEST_ASSERT(style.text_style.italic == CMP_FALSE);
-  CMP_TEST_ASSERT(style.text_style.utf8_family == NULL);
+  CMP_TEST_ASSERT(style.text_style.utf8_family != NULL);
   CMP_TEST_OK(tabs_near(style.background_color.a, 0.0f, 0.001f, &near));
   CMP_TEST_ASSERT(near == CMP_TRUE);
 
@@ -2553,6 +2553,51 @@ static int test_tab_row_branch_sweep(void) {
 
   row.bounds = bounds;
   CMP_TEST_OK(row.widget.vtable->layout(row.widget.ctx, bounds));
+
+  /* Test RTL layout */
+  row.style.is_rtl = CMP_TRUE;
+  CMP_TEST_OK(row.widget.vtable->layout(row.widget.ctx, bounds));
+  
+  /* Test RTL event */
+  {
+    CMPInputEvent ev = {0};
+    CMPBool handled;
+    ev.type = CMP_INPUT_POINTER_DOWN;
+    ev.data.pointer.x = 10.0f;
+    ev.data.pointer.y = 10.0f;
+    row.pressed_index = M3_TAB_INVALID_INDEX;
+    CMP_TEST_OK(row.widget.vtable->event(row.widget.ctx, &ev, &handled));
+  }
+  
+  /* Test RTL paint */
+  {
+    CMPPaintContext p_ctx = {0};
+    CMPGfx mock_gfx = {0};
+    mock_gfx.ctx = &backend_state;
+    mock_gfx.vtable = &g_test_gfx_vtable;
+    mock_gfx.text_vtable = &g_test_text_vtable;
+    p_ctx.gfx = &mock_gfx;
+    row.selected_index = 0;
+    CMP_TEST_OK(row.widget.vtable->paint(row.widget.ctx, &p_ctx));
+
+    /* Test scrollable mode RTL */
+    row.style.mode = M3_TAB_MODE_SCROLLABLE;
+    CMP_TEST_OK(row.widget.vtable->layout(row.widget.ctx, bounds));
+    CMP_TEST_OK(row.widget.vtable->paint(row.widget.ctx, &p_ctx));
+    {
+      CMPInputEvent ev = {0};
+      CMPBool handled;
+      ev.type = CMP_INPUT_POINTER_DOWN;
+      ev.data.pointer.x = 10.0f;
+      ev.data.pointer.y = 10.0f;
+      row.pressed_index = M3_TAB_INVALID_INDEX;
+      CMP_TEST_OK(row.widget.vtable->event(row.widget.ctx, &ev, &handled));
+    }
+    row.style.mode = M3_TAB_MODE_FIXED;
+    row.pressed_index = M3_TAB_INVALID_INDEX;
+  }
+  row.style.is_rtl = CMP_FALSE;
+  row.pressed_index = M3_TAB_INVALID_INDEX;
   CMP_TEST_OK(m3_tab_row_test_set_fail_point_error_after(4u));
   CMP_TEST_EXPECT(row.widget.vtable->paint(row.widget.ctx, &paint_ctx),
                   CMP_ERR_IO);

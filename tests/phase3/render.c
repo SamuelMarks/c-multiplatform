@@ -634,7 +634,7 @@ static int test_widget_paint(void *ctx, CMPPaintContext *paint_ctx) {
       return CMP_ERR_INVALID_ARGUMENT;
     }
     return paint_ctx->gfx->text_vtable->measure_text(
-        paint_ctx->gfx->ctx, handle, "Hi", 2, NULL, &out_height, &out_baseline);
+        paint_ctx->gfx->ctx, handle, "Hi", 2, 0, NULL, &out_height, &out_baseline);
   case SCENARIO_MEASURE_TEXT_UNSUPPORTED:
     if (paint_ctx->gfx->text_vtable == NULL) {
       return CMP_ERR_INVALID_ARGUMENT;

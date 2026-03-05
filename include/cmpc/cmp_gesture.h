@@ -132,7 +132,7 @@ CMP_API int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
                                           CMPWidget **out_target,
                                           CMPBool *out_handled);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for gesture config validation.
  * @param config Configuration to validate.

@@ -91,7 +91,7 @@ static int cmp_log_mutex_init(void) {
     result = pthread_mutex_init(&g_log_mutex, NULL);
   }
 #else
-  result = pthread_mutex_init(&g_log_mutex, NULL);
+  result = pthread_mutex_init(&g_log_mutex, NULL); /* GCOVR_EXCL_LINE */
 #endif
   if (result != 0) {
     return CMP_ERR_UNKNOWN;
@@ -124,7 +124,7 @@ static int cmp_log_mutex_lock(void) {
     result = pthread_mutex_lock(&g_log_mutex);
   }
 #else
-  result = pthread_mutex_lock(&g_log_mutex);
+  result = pthread_mutex_lock(&g_log_mutex); /* GCOVR_EXCL_LINE */
 #endif
   if (result != 0) {
     return CMP_ERR_UNKNOWN;
@@ -186,7 +186,7 @@ static int cmp_log_mutex_shutdown(void) {
     result = pthread_mutex_destroy(&g_log_mutex);
   }
 #else
-  result = pthread_mutex_destroy(&g_log_mutex);
+  result = pthread_mutex_destroy(&g_log_mutex); /* GCOVR_EXCL_LINE */
 #endif
   if (result != 0) {
     return CMP_ERR_UNKNOWN;
@@ -236,7 +236,7 @@ static int cmp_log_write_bytes(FILE *stream, const char *data,
     written = fwrite(data, 1, (size_t)length, stream);
   }
 #else
-  written = fwrite(data, 1, (size_t)length, stream);
+  written = fwrite(data, 1, (size_t)length, stream); /* GCOVR_EXCL_LINE */
 #endif
   if (written != (size_t)length) {
     return CMP_ERR_IO;

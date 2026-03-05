@@ -1241,6 +1241,33 @@ static int test_scaffold_step(void) {
   return 0;
 }
 
+static int test_scaffold_rtl(void) {
+  M3Scaffold scaffold;
+  M3ScaffoldStyle style;
+  TestScaffoldWidget body;
+  TestScaffoldWidget fab;
+  CMPRect bounds;
+
+  CMP_TEST_OK(m3_scaffold_style_init(&style));
+  style.is_rtl = CMP_TRUE;
+  CMP_TEST_OK(test_widget_init(&body, 100.0f, 100.0f));
+  CMP_TEST_OK(test_widget_init(&fab, 10.0f, 10.0f));
+
+  CMP_TEST_OK(m3_scaffold_init(&scaffold, &style, &body.widget, NULL, NULL,
+                               &fab.widget, NULL));
+
+  bounds.x = 0.0f;
+  bounds.y = 0.0f;
+  bounds.width = 200.0f;
+  bounds.height = 200.0f;
+  CMP_TEST_OK(scaffold.widget.vtable->layout(scaffold.widget.ctx, bounds));
+
+  /* Check that FAB is on the left in RTL */
+  CMP_TEST_ASSERT(scaffold.fab_bounds.x == style.fab_margin_x);
+  
+  return 0;
+}
+
 int main(void) {
   CMP_TEST_ASSERT(test_scaffold_helpers() == 0);
   CMP_TEST_ASSERT(test_scaffold_style_init() == 0);
@@ -1251,5 +1278,6 @@ int main(void) {
   CMP_TEST_ASSERT(test_scaffold_event() == 0);
   CMP_TEST_ASSERT(test_scaffold_semantics_destroy() == 0);
   CMP_TEST_ASSERT(test_scaffold_step() == 0);
+  CMP_TEST_ASSERT(test_scaffold_rtl() == 0);
   return 0;
 }

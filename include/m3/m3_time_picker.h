@@ -227,7 +227,7 @@ CMP_API int CMP_CALL m3_time_picker_set_on_change(
  */
 CMP_API int CMP_CALL m3_time_picker_update(M3TimePicker *picker);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test hook to force dial-size zeroing in metrics computation.
  * @param enable CMP_TRUE to force the next dial computation to zero out.

@@ -44,11 +44,11 @@ typedef struct M3Carousel {
   CMPWidget **items;     /**< Array of child item widgets. */
   cmp_usize item_count;  /**< Number of items. */
   cmp_usize capacity;    /**< Capacity of items array. */
-  CMPScalar scroll_offset;
-  CMPScalar content_extent;
-  CMPBool dragging;
-  cmp_i32 last_pointer_x;
-  cmp_u32 last_time_ms;
+  CMPScalar scroll_offset;  /**< Current scroll offset. */
+  CMPScalar content_extent; /**< Total content width. */
+  CMPBool dragging;         /**< Whether the user is dragging. */
+  cmp_i32 last_pointer_x;   /**< Last pointer X position. */
+  cmp_u32 last_time_ms;     /**< Last time in milliseconds. */
   CMPScalar velocity;           /**< Scroll physics state. */
   CMPRect bounds;               /**< Layout bounds. */
   cmp_usize selected_index;     /**< Currently selected or snapped index. */

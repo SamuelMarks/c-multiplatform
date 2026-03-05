@@ -47,7 +47,7 @@ CMP_API int CMP_CALL cmp_tasks_default_create(
  */
 CMP_API int CMP_CALL cmp_tasks_default_destroy(CMPTasks *tasks);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /* Failure injection points for task tests. */
 #define CMP_TASKS_TEST_FAIL_NONE 0u
 #define CMP_TASKS_TEST_FAIL_TIME_NOW 1u

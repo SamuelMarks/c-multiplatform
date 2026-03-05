@@ -198,7 +198,7 @@ CMP_API int CMP_CALL cmp_store_copy_redo_state(const CMPStore *store,
                                                void *out_state,
                                                cmp_usize state_size);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for overflow-safe multiplication.
  * @param a First operand.

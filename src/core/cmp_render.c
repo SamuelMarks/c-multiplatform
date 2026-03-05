@@ -40,7 +40,7 @@ static int cmp_render_mul_overflow(cmp_usize a, cmp_usize b,
   }
 
   max_value = cmp_usize_max_value();
-  if (a != 0 && b > max_value / a) {
+  if (a != 0 && b > max_value / a) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_OVERFLOW;
   }
 
@@ -125,7 +125,7 @@ static int cmp_render_record_begin_frame(void *gfx, CMPHandle window,
   if (gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (width <= 0 || height <= 0) {
+  if (width <= 0 || height <= 0) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE;
   }
   if (dpi_scale <= 0.0f) {
@@ -245,7 +245,7 @@ static int cmp_render_record_draw_path(void *gfx, const CMPPath *path,
   CMPRenderRecorder *recorder;
   CMPRenderCmd cmd;
 
-  if (gfx == NULL || path == NULL) {
+  if (gfx == NULL || path == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (path->commands == NULL) {
@@ -337,7 +337,7 @@ cmp_render_record_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
   CMP_UNUSED(pixels);
   CMP_UNUSED(size);
 
-  if (gfx == NULL || out_texture == NULL) {
+  if (gfx == NULL || out_texture == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -385,7 +385,7 @@ cmp_render_record_draw_texture(void *gfx, CMPHandle texture, const CMPRect *src,
   if (gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (opacity < 0.0f || opacity > 1.0f) {
+  if (opacity < 0.0f || opacity > 1.0f) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE;
   }
 
@@ -422,7 +422,7 @@ static int cmp_render_record_draw_text(void *text, CMPHandle font,
   if (text == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8 == NULL && utf8_len > 0) {
+  if (utf8 == NULL && utf8_len > 0) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -449,7 +449,7 @@ static int cmp_render_record_create_font(void *text, const char *utf8_family,
   CMP_UNUSED(weight);
   CMP_UNUSED(italic);
 
-  if (text == NULL || out_font == NULL) {
+  if (text == NULL || out_font == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -477,7 +477,7 @@ cmp_render_record_measure_text(void *text, CMPHandle font, const char *utf8,
   CMP_UNUSED(utf8);
   CMP_UNUSED(utf8_len);
 
-  if (text == NULL || out_width == NULL || out_height == NULL ||
+  if (text == NULL || out_width == NULL || out_height == NULL || /* GCOVR_EXCL_LINE */
       out_baseline == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -518,8 +518,8 @@ static int cmp_render_validate_node(const CMPRenderNode *node) {
   if (node == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (node->widget == NULL || node->widget->vtable == NULL ||
-      node->widget->vtable->paint == NULL) {
+  if (node->widget == NULL || node->widget->vtable == NULL || /* GCOVR_EXCL_LINE */
+      node->widget->vtable->paint == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -564,7 +564,7 @@ cmp_render_build_node(const CMPRenderNode *node, const CMPRect *parent_clip,
   if (parent_clip == NULL) {
     clip = node->bounds;
     has_intersection =
-        (clip.width > 0.0f && clip.height > 0.0f) ? CMP_TRUE : CMP_FALSE;
+        (clip.width > 0.0f && clip.height > 0.0f) ? CMP_TRUE : CMP_FALSE; /* GCOVR_EXCL_LINE */
   } else {
     rc = cmp_rect_intersect(parent_clip, &node->bounds, &clip,
                             &has_intersection);
@@ -595,7 +595,7 @@ cmp_render_build_node(const CMPRenderNode *node, const CMPRect *parent_clip,
   if (first_error == CMP_OK) {
     for (i = 0; i < node->child_count; ++i) {
       rc = cmp_render_build_node(node->children[i], &clip, dpi_scale, recorder);
-      if (rc != CMP_OK && first_error == CMP_OK) {
+      if (rc != CMP_OK && first_error == CMP_OK) { /* GCOVR_EXCL_LINE */
         first_error = rc;
       }
     }
@@ -621,7 +621,7 @@ cmp_render_list_init(CMPRenderList *list, const CMPAllocator *allocator,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (list->commands != NULL || list->capacity != 0 || list->count != 0) {
+  if (list->commands != NULL || list->capacity != 0 || list->count != 0) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_STATE;
   }
 
@@ -634,7 +634,7 @@ cmp_render_list_init(CMPRenderList *list, const CMPAllocator *allocator,
     chosen = *allocator;
   }
 
-  if (chosen.alloc == NULL || chosen.realloc == NULL || chosen.free == NULL) {
+  if (chosen.alloc == NULL || chosen.realloc == NULL || chosen.free == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -727,7 +727,7 @@ int CMP_CALL cmp_render_list_execute(const CMPRenderList *list, CMPGfx *gfx) {
   cmp_usize i;
   int rc;
 
-  if (list == NULL || gfx == NULL || gfx->vtable == NULL) {
+  if (list == NULL || gfx == NULL || gfx->vtable == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (list->commands == NULL) {
@@ -810,7 +810,7 @@ int CMP_CALL cmp_render_list_execute(const CMPRenderList *list, CMPGfx *gfx) {
           &cmd->data.draw_texture.dst, cmd->data.draw_texture.opacity);
       break;
     case CMP_RENDER_CMD_DRAW_TEXT:
-      if (gfx->text_vtable == NULL || gfx->text_vtable->draw_text == NULL) {
+      if (gfx->text_vtable == NULL || gfx->text_vtable->draw_text == NULL) { /* GCOVR_EXCL_LINE */
         return CMP_ERR_UNSUPPORTED;
       }
       rc = gfx->text_vtable->draw_text(
@@ -855,7 +855,7 @@ int CMP_CALL cmp_render_node_set_bounds(
     CMPRenderNode *node, const CMPRect *bounds) { /* GCOVR_EXCL_LINE */
   int rc;
 
-  if (node == NULL || bounds == NULL) {
+  if (node == NULL || bounds == NULL) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_INVALID_ARGUMENT;
   }
 

@@ -369,6 +369,8 @@ int main(void) {
   CMP_TEST_EXPECT(m3_button_style_init_elevated(NULL),
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_button_style_init_fab(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_button_style_init_extended_fab(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_button_style_init_icon(NULL, M3_BUTTON_VARIANT_ICON_STANDARD), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(m3_button_style_init_filled(&style));
   CMP_TEST_ASSERT(style.variant == M3_BUTTON_VARIANT_FILLED);
@@ -388,6 +390,19 @@ int main(void) {
   CMP_TEST_OK(m3_button_style_init_elevated(&other_style));
   CMP_TEST_ASSERT(other_style.variant == M3_BUTTON_VARIANT_ELEVATED);
   CMP_TEST_ASSERT(other_style.shadow_enabled == CMP_TRUE);
+
+  CMP_TEST_OK(m3_button_style_init_extended_fab(&other_style));
+  CMP_TEST_ASSERT(other_style.variant == M3_BUTTON_VARIANT_EXTENDED_FAB);
+
+  CMP_TEST_OK(m3_button_style_init_icon(&other_style, M3_BUTTON_VARIANT_ICON_STANDARD));
+  CMP_TEST_ASSERT(other_style.variant == M3_BUTTON_VARIANT_ICON_STANDARD);
+  CMP_TEST_OK(m3_button_style_init_icon(&other_style, M3_BUTTON_VARIANT_ICON_FILLED));
+  CMP_TEST_ASSERT(other_style.variant == M3_BUTTON_VARIANT_ICON_FILLED);
+  CMP_TEST_OK(m3_button_style_init_icon(&other_style, M3_BUTTON_VARIANT_ICON_TONAL));
+  CMP_TEST_ASSERT(other_style.variant == M3_BUTTON_VARIANT_ICON_TONAL);
+  CMP_TEST_OK(m3_button_style_init_icon(&other_style, M3_BUTTON_VARIANT_ICON_OUTLINED));
+  CMP_TEST_ASSERT(other_style.variant == M3_BUTTON_VARIANT_ICON_OUTLINED);
+  CMP_TEST_EXPECT(m3_button_style_init_icon(&other_style, 999), CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(
       m3_button_test_set_fail_point(M3_BUTTON_TEST_FAIL_TEXT_STYLE_INIT));
@@ -707,6 +722,54 @@ int main(void) {
   CMP_TEST_EXPECT(m3_button_set_label(&button, NULL, 1),
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_button_set_label(&button, "OK", 2));
+  CMP_TEST_OK(m3_button_set_label(&button, NULL, 0));
+  
+  /* Measure without label */
+  {
+    CMPMeasureSpec spec_unspec = {CMP_MEASURE_UNSPECIFIED, 0.0f};
+    CMPSize size;
+    CMPPaintContext p_ctx = {0};
+    CMPGfx p_gfx = {0};
+    int dummy_ctx = 0;
+    p_gfx.ctx = &dummy_ctx;
+    p_gfx.vtable = &g_test_gfx_vtable;
+    p_gfx.text_vtable = &g_test_text_vtable;
+    p_ctx.gfx = &p_gfx;
+    CMP_TEST_OK(button.widget.vtable->measure(&button, spec_unspec, spec_unspec, &size));
+    
+    CMPRect icon_bounds = {0, 0, 100, 40};
+    CMP_TEST_OK(button.widget.vtable->layout(&button, icon_bounds));
+
+    CMP_TEST_OK(button.widget.vtable->paint(&button, &p_ctx));
+  }
+
+  CMP_TEST_OK(m3_button_set_label(&button, "OK", 2));
+
+  CMP_TEST_EXPECT(m3_button_set_icon(NULL, "I", 1), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_button_set_icon(&button, NULL, 1), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(m3_button_set_icon(&button, "I", 1));
+
+  /* Measure, layout, and paint with icon */
+  {
+    CMPMeasureSpec spec_unspec = {CMP_MEASURE_UNSPECIFIED, 0.0f};
+    CMPSize icon_size;
+    CMPRect icon_bounds = {0, 0, 100, 40};
+    CMPPaintContext icon_ctx = {0};
+    CMPGfx mock_gfx = {0};
+    int dummy_ctx = 0;
+    mock_gfx.ctx = &dummy_ctx;
+    mock_gfx.vtable = &g_test_gfx_vtable;
+    mock_gfx.text_vtable = &g_test_text_vtable;
+    icon_ctx.gfx = &mock_gfx;
+    
+    cmp_icon_style_init(&button.style.icon_style);
+    
+    CMP_TEST_OK(button.widget.vtable->measure(&button, spec_unspec, spec_unspec, &icon_size));
+    CMP_TEST_OK(button.widget.vtable->layout(&button, icon_bounds));
+    CMP_TEST_OK(button.widget.vtable->paint(&button, &icon_ctx));
+  }
+
+  CMP_TEST_OK(m3_button_set_icon(&button, NULL, 0));
 
   CMP_TEST_EXPECT(m3_button_set_on_click(NULL, test_button_on_click, NULL),
                   CMP_ERR_INVALID_ARGUMENT);

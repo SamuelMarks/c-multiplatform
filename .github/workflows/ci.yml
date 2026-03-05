@@ -93,7 +93,7 @@ jobs:
         run: ctest --test-dir build-coverage --output-on-failure
       - name: Coverage (Phase 1)
         run: |
-          gcovr -r . --object-directory build-coverage \
+          gcovr --merge-mode-functions=merge-use-line-0 -r . --object-directory build-coverage \
             --filter 'src/.*' \
             --print-summary \
             --fail-under-line 100 \

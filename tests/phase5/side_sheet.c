@@ -333,6 +333,11 @@ static int test_side_sheet(void) {
   CMP_TEST_OK(sheet.widget.vtable->event(&sheet, &event, &handled));
   CMP_TEST_ASSERT(sheet.open == CMP_TRUE);
 
+  CMP_TEST_EXPECT(m3_side_sheet_get_open(NULL, &is_open), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_side_sheet_get_open(&sheet, NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(m3_side_sheet_get_open(&sheet, &is_open));
+  CMP_TEST_ASSERT(is_open == CMP_TRUE);
+
   return 0;
 }
 

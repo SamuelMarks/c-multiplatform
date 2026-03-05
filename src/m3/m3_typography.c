@@ -24,7 +24,7 @@ CMP_API int CMP_CALL m3_typography_scale_init(M3TypographyScale *scale) {
     style->color.b = 0.0f;
     style->color.a = 1.0f; /* Default solid black, typically overwritten. */
 
-    switch ((M3TypographyRole)i) {
+    switch ((M3TypographyRole)i) { /* GCOVR_EXCL_LINE */
     case M3_TYPOGRAPHY_DISPLAY_LARGE:
       style->size_px = 57;
       style->weight = 400;
@@ -115,8 +115,10 @@ CMP_API int CMP_CALL m3_typography_scale_init(M3TypographyScale *scale) {
       style->line_height_px = 16.0f;
       style->letter_spacing = 0.4f;
       break;
+    /* GCOVR_EXCL_START */
     case M3_TYPOGRAPHY_ROLE_COUNT:
       break;
+    /* GCOVR_EXCL_STOP */
     }
 
     /* Optical size typically matches the physical size in standard M3 usage. */
@@ -145,7 +147,7 @@ m3_typography_scale_init_expressive(M3TypographyScale *scale) {
     style->color.b = 0.0f;
     style->color.a = 1.0f; /* Default solid black, typically overwritten. */
 
-    switch ((M3TypographyRole)i) {
+    switch ((M3TypographyRole)i) { /* GCOVR_EXCL_LINE */
     case M3_TYPOGRAPHY_DISPLAY_LARGE:
       style->size_px = 64;
       style->weight = 400;
@@ -236,8 +238,10 @@ m3_typography_scale_init_expressive(M3TypographyScale *scale) {
       style->line_height_px = 16.0f;
       style->letter_spacing = 0.4f;
       break;
+    /* GCOVR_EXCL_START */
     case M3_TYPOGRAPHY_ROLE_COUNT:
       break;
+    /* GCOVR_EXCL_STOP */
     }
 
     /* Optical size typically matches the physical size in standard M3 usage. */

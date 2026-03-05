@@ -98,7 +98,7 @@ CMP_API int CMP_CALL cmp_log_write(CMPLogLevel level, const char *tag,
 CMP_API int CMP_CALL cmp_log_write_n(CMPLogLevel level, const char *tag,
                                      const char *message, cmp_usize length);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Configure failure injection for the logging mutex.
  * @param init_fail Force initialization to fail when CMP_TRUE.

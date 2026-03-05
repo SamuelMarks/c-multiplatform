@@ -272,6 +272,15 @@ int main(void) {
   CMP_TEST_EXPECT(m3_checkbox_set_checked(&checkbox, 2),
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_checkbox_set_checked(&checkbox, CMP_TRUE));
+
+  CMP_TEST_EXPECT(m3_checkbox_set_mixed_state(NULL, CMP_TRUE),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(m3_checkbox_set_mixed_state(&checkbox, 2),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(m3_checkbox_set_mixed_state(&checkbox, CMP_TRUE));
+  CMP_TEST_OK(checkbox.widget.vtable->get_semantics(&checkbox, &semantics));
+  CMP_TEST_ASSERT((semantics.flags & CMP_SEMANTIC_FLAG_MIXED_CHECKED) != 0);
+  CMP_TEST_OK(m3_checkbox_set_mixed_state(&checkbox, CMP_FALSE));
   CMP_TEST_OK(m3_checkbox_get_checked(&checkbox, &state));
   CMP_TEST_ASSERT(state == CMP_TRUE);
   CMP_TEST_EXPECT(m3_checkbox_get_checked(NULL, &state),
@@ -1135,7 +1144,7 @@ int main(void) {
   radio.selected = CMP_TRUE;
   radio.widget.flags |= CMP_WIDGET_FLAG_DISABLED;
   CMP_TEST_OK(radio.widget.vtable->get_semantics(radio.widget.ctx, &semantics));
-  CMP_TEST_ASSERT((semantics.flags & CMP_SEMANTIC_FLAG_SELECTED) != 0u);
+  CMP_TEST_ASSERT((semantics.flags & CMP_SEMANTIC_FLAG_CHECKED) != 0u);
   CMP_TEST_ASSERT((semantics.flags & CMP_SEMANTIC_FLAG_DISABLED) != 0u);
   radio.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
 

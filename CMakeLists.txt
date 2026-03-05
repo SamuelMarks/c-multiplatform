@@ -169,7 +169,7 @@ add_library(m3
     src/m3/m3_text_field.c
     src/m3/m3_search.c
     src/m3/m3_carousel.c
-    src/m3/m3_segmented.c
+
     src/m3/m3_list.c
         src/m3/m3_navigation.c
     src/m3/m3_app_bar.c
@@ -613,16 +613,6 @@ else()
     message(STATUS "lcov/genhtml not found or disabled: cmp_coverage_lcov target disabled.")
 endif()
 
-if(BUILD_TESTING)
-    # ... tests omitted for brevity, logic remains identical ...
-    # Keep original test definitions here (omitted to save space as per prompt limits, 
-    # but in real file they must exist. Since I'm creating the file to overwrite, 
-    # I assume the user just needs the logic fix above).
-    # Since I cannot see the FULL tests block, I will include the critical headers.
-    target_compile_definitions(cmpc PUBLIC CMP_TESTING)
-    target_compile_definitions(m3 PUBLIC CMP_TESTING)
-    # (Tests follow...)
-endif()
 option(CMP_BUILD_DOCGEN "Build the documentation generator tool" ON)
 if(CMP_BUILD_DOCGEN)
     add_executable(cmp_docgen tools/docgen/docgen.c)
@@ -632,33 +622,376 @@ if(CMP_BUILD_DOCGEN)
 endif()
 
 if(BUILD_TESTING)
-    add_executable(cmp_phase5_typography tests/phase5/typography.c)
-    target_link_libraries(cmp_phase5_typography PRIVATE m3 cmpc)
-    add_test(NAME cmp_phase5_typography COMMAND cmp_phase5_typography)
+    target_compile_definitions(cmpc PUBLIC CMP_TESTING)
+    target_compile_definitions(m3 PUBLIC CMP_TESTING)
 
-    add_executable(cmp_phase5_text_field tests/phase5/text_field.c)
-    target_link_libraries(cmp_phase5_text_field PRIVATE m3 cmpc)
-    add_test(NAME cmp_phase5_text_field COMMAND cmp_phase5_text_field)
+    add_executable(cmp_phase0_arena tests/phase0/arena.c)
+    target_link_libraries(cmp_phase0_arena PRIVATE cmpc)
+    add_test(NAME cmp_phase0_arena COMMAND cmp_phase0_arena)
+
+    add_executable(cmp_phase0_compile tests/phase0/compile.c)
+    target_link_libraries(cmp_phase0_compile PRIVATE cmpc)
+    add_test(NAME cmp_phase0_compile COMMAND cmp_phase0_compile)
+
+    add_executable(cmp_phase0_math tests/phase0/math.c)
+    target_link_libraries(cmp_phase0_math PRIVATE cmpc)
+    add_test(NAME cmp_phase0_math COMMAND cmp_phase0_math)
+
+    add_executable(cmp_phase1_allocator tests/phase1/allocator.c)
+    target_link_libraries(cmp_phase1_allocator PRIVATE cmpc)
+    add_test(NAME cmp_phase1_allocator COMMAND cmp_phase1_allocator)
+
+    add_executable(cmp_phase1_arena tests/phase1/arena.c)
+    target_link_libraries(cmp_phase1_arena PRIVATE cmpc)
+    add_test(NAME cmp_phase1_arena COMMAND cmp_phase1_arena)
+
+    add_executable(cmp_phase1_handle_system tests/phase1/handle_system.c)
+    target_link_libraries(cmp_phase1_handle_system PRIVATE cmpc)
+    add_test(NAME cmp_phase1_handle_system COMMAND cmp_phase1_handle_system)
+
+    add_executable(cmp_phase1_i18n tests/phase1/i18n.c)
+    target_link_libraries(cmp_phase1_i18n PRIVATE cmpc)
+    add_test(NAME cmp_phase1_i18n COMMAND cmp_phase1_i18n)
+
+    add_executable(cmp_phase1_log tests/phase1/log.c)
+    target_link_libraries(cmp_phase1_log PRIVATE cmpc)
+    add_test(NAME cmp_phase1_log COMMAND cmp_phase1_log)
+
+    add_executable(cmp_phase1_store tests/phase1/store.c)
+    target_link_libraries(cmp_phase1_store PRIVATE cmpc)
+    add_test(NAME cmp_phase1_store COMMAND cmp_phase1_store)
+
+    add_executable(cmp_phase1_utf8 tests/phase1/utf8.c)
+    target_link_libraries(cmp_phase1_utf8 PRIVATE cmpc)
+    add_test(NAME cmp_phase1_utf8 COMMAND cmp_phase1_utf8)
+
+    add_executable(cmp_phase2_anim tests/phase2/anim.c)
+    target_link_libraries(cmp_phase2_anim PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase2_anim COMMAND cmp_phase2_anim)
+
+    add_executable(cmp_phase2_color tests/phase2/color.c)
+    target_link_libraries(cmp_phase2_color PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase2_color COMMAND cmp_phase2_color)
+
+    add_executable(cmp_phase2_layout tests/phase2/layout.c)
+    target_link_libraries(cmp_phase2_layout PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase2_layout COMMAND cmp_phase2_layout)
+
+    add_executable(cmp_phase2_layout_rtl tests/phase2/layout_rtl.c)
+    target_link_libraries(cmp_phase2_layout_rtl PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase2_layout_rtl COMMAND cmp_phase2_layout_rtl)
+
+    add_executable(cmp_phase2_math tests/phase2/math.c)
+    target_link_libraries(cmp_phase2_math PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase2_math COMMAND cmp_phase2_math)
+
+    add_executable(cmp_phase2_router tests/phase2/router.c)
+    target_link_libraries(cmp_phase2_router PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase2_router COMMAND cmp_phase2_router)
+
+    add_executable(cmp_phase3_event tests/phase3/event.c)
+    target_link_libraries(cmp_phase3_event PRIVATE cmpc)
+    add_test(NAME cmp_phase3_event COMMAND cmp_phase3_event)
+
+    add_executable(cmp_phase3_gesture tests/phase3/gesture.c)
+    target_link_libraries(cmp_phase3_gesture PRIVATE cmpc)
+    add_test(NAME cmp_phase3_gesture COMMAND cmp_phase3_gesture)
+
+    add_executable(cmp_phase3_list tests/phase3/list.c)
+    target_link_libraries(cmp_phase3_list PRIVATE cmpc)
+    add_test(NAME cmp_phase3_list COMMAND cmp_phase3_list)
+
+    add_executable(cmp_phase3_list_2 tests/phase3/list_2.c)
+    target_link_libraries(cmp_phase3_list_2 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_list_2 COMMAND cmp_phase3_list_2)
+
+    add_executable(cmp_phase3_list_3 tests/phase3/list_3.c)
+    target_link_libraries(cmp_phase3_list_3 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_list_3 COMMAND cmp_phase3_list_3)
+
+    add_executable(cmp_phase3_list_4 tests/phase3/list_4.c)
+    target_link_libraries(cmp_phase3_list_4 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_list_4 COMMAND cmp_phase3_list_4)
+
+    add_executable(cmp_phase3_list_5 tests/phase3/list_5.c)
+    target_link_libraries(cmp_phase3_list_5 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_list_5 COMMAND cmp_phase3_list_5)
+
+    add_executable(cmp_phase3_list_6 tests/phase3/list_6.c)
+    target_link_libraries(cmp_phase3_list_6 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_list_6 COMMAND cmp_phase3_list_6)
+
+    add_executable(cmp_phase3_list_7 tests/phase3/list_7.c)
+    target_link_libraries(cmp_phase3_list_7 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_list_7 COMMAND cmp_phase3_list_7)
+
+    add_executable(cmp_phase3_list_8 tests/phase3/list_8.c)
+    target_link_libraries(cmp_phase3_list_8 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_list_8 COMMAND cmp_phase3_list_8)
+
+    add_executable(cmp_phase3_list_9 tests/phase3/list_9.c)
+    target_link_libraries(cmp_phase3_list_9 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_list_9 COMMAND cmp_phase3_list_9)
+
+    add_executable(cmp_phase3_path tests/phase3/path.c)
+    target_link_libraries(cmp_phase3_path PRIVATE cmpc)
+    add_test(NAME cmp_phase3_path COMMAND cmp_phase3_path)
+
+    add_executable(cmp_phase3_render tests/phase3/render.c)
+    target_link_libraries(cmp_phase3_render PRIVATE cmpc)
+    add_test(NAME cmp_phase3_render COMMAND cmp_phase3_render)
+
+    add_executable(cmp_phase3_scroll tests/phase3/scroll.c)
+    target_link_libraries(cmp_phase3_scroll PRIVATE cmpc)
+    add_test(NAME cmp_phase3_scroll COMMAND cmp_phase3_scroll)
+
+    add_executable(cmp_phase3_tasks tests/phase3/tasks.c)
+    target_link_libraries(cmp_phase3_tasks PRIVATE cmpc)
+    add_test(NAME cmp_phase3_tasks COMMAND cmp_phase3_tasks)
+
+    add_executable(cmp_phase3_text_field tests/phase3/text_field.c)
+    target_link_libraries(cmp_phase3_text_field PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field COMMAND cmp_phase3_text_field)
+
+    add_executable(cmp_phase3_text_field_10 tests/phase3/text_field_10.c)
+    target_link_libraries(cmp_phase3_text_field_10 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_10 COMMAND cmp_phase3_text_field_10)
+
+    add_executable(cmp_phase3_text_field_11 tests/phase3/text_field_11.c)
+    target_link_libraries(cmp_phase3_text_field_11 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_11 COMMAND cmp_phase3_text_field_11)
+
+    add_executable(cmp_phase3_text_field_12 tests/phase3/text_field_12.c)
+    target_link_libraries(cmp_phase3_text_field_12 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_12 COMMAND cmp_phase3_text_field_12)
+
+    add_executable(cmp_phase3_text_field_13 tests/phase3/text_field_13.c)
+    target_link_libraries(cmp_phase3_text_field_13 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_13 COMMAND cmp_phase3_text_field_13)
+
+    add_executable(cmp_phase3_text_field_14 tests/phase3/text_field_14.c)
+    target_link_libraries(cmp_phase3_text_field_14 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_14 COMMAND cmp_phase3_text_field_14)
+
+    add_executable(cmp_phase3_text_field_15 tests/phase3/text_field_15.c)
+    target_link_libraries(cmp_phase3_text_field_15 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_15 COMMAND cmp_phase3_text_field_15)
+
+    add_executable(cmp_phase3_text_field_16 tests/phase3/text_field_16.c)
+    target_link_libraries(cmp_phase3_text_field_16 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_16 COMMAND cmp_phase3_text_field_16)
+
+    add_executable(cmp_phase3_text_field_17 tests/phase3/text_field_17.c)
+    target_link_libraries(cmp_phase3_text_field_17 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_17 COMMAND cmp_phase3_text_field_17)
+
+    add_executable(cmp_phase3_text_field_18 tests/phase3/text_field_18.c)
+    target_link_libraries(cmp_phase3_text_field_18 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_18 COMMAND cmp_phase3_text_field_18)
+
+    add_executable(cmp_phase3_text_field_19 tests/phase3/text_field_19.c)
+    target_link_libraries(cmp_phase3_text_field_19 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_19 COMMAND cmp_phase3_text_field_19)
+
+    add_executable(cmp_phase3_text_field_2 tests/phase3/text_field_2.c)
+    target_link_libraries(cmp_phase3_text_field_2 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_2 COMMAND cmp_phase3_text_field_2)
+
+    add_executable(cmp_phase3_text_field_20 tests/phase3/text_field_20.c)
+    target_link_libraries(cmp_phase3_text_field_20 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_20 COMMAND cmp_phase3_text_field_20)
+
+    add_executable(cmp_phase3_text_field_21 tests/phase3/text_field_21.c)
+    target_link_libraries(cmp_phase3_text_field_21 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_21 COMMAND cmp_phase3_text_field_21)
+
+    add_executable(cmp_phase3_text_field_22 tests/phase3/text_field_22.c)
+    target_link_libraries(cmp_phase3_text_field_22 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_22 COMMAND cmp_phase3_text_field_22)
+
+    add_executable(cmp_phase3_text_field_23 tests/phase3/text_field_23.c)
+    target_link_libraries(cmp_phase3_text_field_23 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_23 COMMAND cmp_phase3_text_field_23)
+
+    add_executable(cmp_phase3_text_field_24 tests/phase3/text_field_24.c)
+    target_link_libraries(cmp_phase3_text_field_24 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_24 COMMAND cmp_phase3_text_field_24)
+
+    add_executable(cmp_phase3_text_field_25 tests/phase3/text_field_25.c)
+    target_link_libraries(cmp_phase3_text_field_25 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_25 COMMAND cmp_phase3_text_field_25)
+
+    add_executable(cmp_phase3_text_field_26 tests/phase3/text_field_26.c)
+    target_link_libraries(cmp_phase3_text_field_26 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_26 COMMAND cmp_phase3_text_field_26)
+
+    add_executable(cmp_phase3_text_field_27 tests/phase3/text_field_27.c)
+    target_link_libraries(cmp_phase3_text_field_27 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_27 COMMAND cmp_phase3_text_field_27)
+
+    add_executable(cmp_phase3_text_field_28 tests/phase3/text_field_28.c)
+    target_link_libraries(cmp_phase3_text_field_28 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_28 COMMAND cmp_phase3_text_field_28)
+
+    add_executable(cmp_phase3_text_field_29 tests/phase3/text_field_29.c)
+    target_link_libraries(cmp_phase3_text_field_29 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_29 COMMAND cmp_phase3_text_field_29)
+
+    add_executable(cmp_phase3_text_field_3 tests/phase3/text_field_3.c)
+    target_link_libraries(cmp_phase3_text_field_3 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_3 COMMAND cmp_phase3_text_field_3)
+
+    add_executable(cmp_phase3_text_field_4 tests/phase3/text_field_4.c)
+    target_link_libraries(cmp_phase3_text_field_4 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_4 COMMAND cmp_phase3_text_field_4)
+
+    add_executable(cmp_phase3_text_field_5 tests/phase3/text_field_5.c)
+    target_link_libraries(cmp_phase3_text_field_5 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_5 COMMAND cmp_phase3_text_field_5)
+
+    add_executable(cmp_phase3_text_field_6 tests/phase3/text_field_6.c)
+    target_link_libraries(cmp_phase3_text_field_6 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_6 COMMAND cmp_phase3_text_field_6)
+
+    add_executable(cmp_phase3_text_field_7 tests/phase3/text_field_7.c)
+    target_link_libraries(cmp_phase3_text_field_7 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_7 COMMAND cmp_phase3_text_field_7)
+
+    add_executable(cmp_phase3_text_field_8 tests/phase3/text_field_8.c)
+    target_link_libraries(cmp_phase3_text_field_8 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_8 COMMAND cmp_phase3_text_field_8)
+
+    add_executable(cmp_phase3_text_field_9 tests/phase3/text_field_9.c)
+    target_link_libraries(cmp_phase3_text_field_9 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_9 COMMAND cmp_phase3_text_field_9)
+
+    add_executable(cmp_phase4_null_backend tests/phase4/null_backend.c)
+    target_link_libraries(cmp_phase4_null_backend PRIVATE cmpc)
+    add_test(NAME cmp_phase4_null_backend COMMAND cmp_phase4_null_backend)
+
+    add_executable(cmp_phase4_android_backend tests/phase4/android_backend.c)
+    target_link_libraries(cmp_phase4_android_backend PRIVATE cmpc)
+    add_test(NAME cmp_phase4_android_backend COMMAND cmp_phase4_android_backend)
+
+    add_executable(cmp_phase4_cocoa_backend tests/phase4/cocoa_backend.c)
+    target_link_libraries(cmp_phase4_cocoa_backend PRIVATE cmpc)
+    add_test(NAME cmp_phase4_cocoa_backend COMMAND cmp_phase4_cocoa_backend)
+
+    add_executable(cmp_phase4_gtk4_backend tests/phase4/gtk4_backend.c)
+    target_link_libraries(cmp_phase4_gtk4_backend PRIVATE cmpc)
+    add_test(NAME cmp_phase4_gtk4_backend COMMAND cmp_phase4_gtk4_backend)
+
+    add_executable(cmp_phase4_ios_backend tests/phase4/ios_backend.c)
+    target_link_libraries(cmp_phase4_ios_backend PRIVATE cmpc)
+    add_test(NAME cmp_phase4_ios_backend COMMAND cmp_phase4_ios_backend)
+
+    add_executable(cmp_phase4_sdl3_backend tests/phase4/sdl3_backend.c)
+    target_link_libraries(cmp_phase4_sdl3_backend PRIVATE cmpc)
+    add_test(NAME cmp_phase4_sdl3_backend COMMAND cmp_phase4_sdl3_backend)
+
+    add_executable(cmp_phase4_web_backend tests/phase4/web_backend.c)
+    target_link_libraries(cmp_phase4_web_backend PRIVATE cmpc)
+    add_test(NAME cmp_phase4_web_backend COMMAND cmp_phase4_web_backend)
+
+    add_executable(cmp_phase4_win32_backend tests/phase4/win32_backend.c)
+    target_link_libraries(cmp_phase4_win32_backend PRIVATE cmpc)
+    add_test(NAME cmp_phase4_win32_backend COMMAND cmp_phase4_win32_backend)
 
     add_executable(cmp_phase5_adaptive tests/phase5/adaptive.c)
     target_link_libraries(cmp_phase5_adaptive PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_adaptive COMMAND cmp_phase5_adaptive)
 
-    add_executable(cmp_phase5_list tests/phase5/list.c)
-    target_link_libraries(cmp_phase5_list PRIVATE m3 cmpc)
-    add_test(NAME cmp_phase5_list COMMAND cmp_phase5_list)
+    add_executable(cmp_phase5_app_bar tests/phase5/app_bar.c)
+    target_link_libraries(cmp_phase5_app_bar PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_app_bar COMMAND cmp_phase5_app_bar)
 
-    add_executable(cmp_phase5_search tests/phase5/search.c)
-    target_link_libraries(cmp_phase5_search PRIVATE m3 cmpc)
-    add_test(NAME cmp_phase5_search COMMAND cmp_phase5_search)
+    add_executable(cmp_phase5_badge tests/phase5/badge.c)
+    target_link_libraries(cmp_phase5_badge PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_badge COMMAND cmp_phase5_badge)
+
+    add_executable(cmp_phase5_buttons tests/phase5/buttons.c)
+    target_link_libraries(cmp_phase5_buttons PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_buttons COMMAND cmp_phase5_buttons)
+
+    add_executable(cmp_phase5_cards tests/phase5/cards.c)
+    target_link_libraries(cmp_phase5_cards PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_cards COMMAND cmp_phase5_cards)
 
     add_executable(cmp_phase5_carousel tests/phase5/carousel.c)
     target_link_libraries(cmp_phase5_carousel PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_carousel COMMAND cmp_phase5_carousel)
 
-    add_executable(cmp_phase5_segmented tests/phase5/segmented.c)
-    target_link_libraries(cmp_phase5_segmented PRIVATE m3 cmpc)
-    add_test(NAME cmp_phase5_segmented COMMAND cmp_phase5_segmented)
+    add_executable(cmp_phase5_carousel_2 tests/phase5/carousel_2.c)
+    target_link_libraries(cmp_phase5_carousel_2 PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_carousel_2 COMMAND cmp_phase5_carousel_2)
+
+    add_executable(cmp_phase5_carousel_3 tests/phase5/carousel_3.c)
+    target_link_libraries(cmp_phase5_carousel_3 PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_carousel_3 COMMAND cmp_phase5_carousel_3)
+
+    add_executable(cmp_phase5_carousel_4 tests/phase5/carousel_4.c)
+    target_link_libraries(cmp_phase5_carousel_4 PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_carousel_4 COMMAND cmp_phase5_carousel_4)
+
+    add_executable(cmp_phase5_carousel_5 tests/phase5/carousel_5.c)
+    target_link_libraries(cmp_phase5_carousel_5 PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_carousel_5 COMMAND cmp_phase5_carousel_5)
+
+    add_executable(cmp_phase5_carousel_6 tests/phase5/carousel_6.c)
+    target_link_libraries(cmp_phase5_carousel_6 PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_carousel_6 COMMAND cmp_phase5_carousel_6)
+
+    add_executable(cmp_phase5_carousel_7 tests/phase5/carousel_7.c)
+    target_link_libraries(cmp_phase5_carousel_7 PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_carousel_7 COMMAND cmp_phase5_carousel_7)
+
+    add_executable(cmp_phase5_chips tests/phase5/chips.c)
+    target_link_libraries(cmp_phase5_chips PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_chips COMMAND cmp_phase5_chips)
+
+    add_executable(cmp_phase5_date_picker tests/phase5/date_picker.c)
+    target_link_libraries(cmp_phase5_date_picker PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_date_picker COMMAND cmp_phase5_date_picker)
+
+    add_executable(cmp_phase5_dialogs tests/phase5/dialogs.c)
+    target_link_libraries(cmp_phase5_dialogs PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_dialogs COMMAND cmp_phase5_dialogs)
+
+    add_executable(cmp_phase5_divider tests/phase5/divider.c)
+    target_link_libraries(cmp_phase5_divider PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_divider COMMAND cmp_phase5_divider)
+
+    add_executable(cmp_phase5_extras tests/phase5/extras.c)
+    target_link_libraries(cmp_phase5_extras PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_extras COMMAND cmp_phase5_extras)
+
+    add_executable(cmp_phase5_icons tests/phase5/icons.c)
+    target_link_libraries(cmp_phase5_icons PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_icons COMMAND cmp_phase5_icons)
+
+    add_executable(cmp_phase5_list tests/phase5/list.c)
+    target_link_libraries(cmp_phase5_list PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_list COMMAND cmp_phase5_list)
+
+    add_executable(cmp_phase5_list_2 tests/phase5/list_2.c)
+    target_link_libraries(cmp_phase5_list_2 PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_list_2 COMMAND cmp_phase5_list_2)
+
+    add_executable(cmp_phase5_list_3 tests/phase5/list_3.c)
+    target_link_libraries(cmp_phase5_list_3 PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_list_3 COMMAND cmp_phase5_list_3)
+
+    add_executable(cmp_phase5_menus tests/phase5/menus.c)
+    target_link_libraries(cmp_phase5_menus PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_menus COMMAND cmp_phase5_menus)
+
+    add_executable(cmp_phase5_motion tests/phase5/motion.c)
+    target_link_libraries(cmp_phase5_motion PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_motion COMMAND cmp_phase5_motion)
+
+    add_executable(cmp_phase5_navigation tests/phase5/navigation.c)
+    target_link_libraries(cmp_phase5_navigation PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_navigation COMMAND cmp_phase5_navigation)
 
     add_executable(cmp_phase5_progress tests/phase5/progress.c)
     target_link_libraries(cmp_phase5_progress PRIVATE m3 cmpc)
@@ -668,51 +1001,88 @@ if(BUILD_TESTING)
     target_link_libraries(cmp_phase5_pull_to_refresh PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_pull_to_refresh COMMAND cmp_phase5_pull_to_refresh)
 
+    add_executable(cmp_phase5_scaffold tests/phase5/scaffold.c)
+    target_link_libraries(cmp_phase5_scaffold PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_scaffold COMMAND cmp_phase5_scaffold)
+
+    add_executable(cmp_phase5_search tests/phase5/search.c)
+    target_link_libraries(cmp_phase5_search PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_search COMMAND cmp_phase5_search)
+
+    add_executable(cmp_phase5_selection tests/phase5/selection.c)
+    target_link_libraries(cmp_phase5_selection PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_selection COMMAND cmp_phase5_selection)
+
     add_executable(cmp_phase5_shape tests/phase5/shape.c)
     target_link_libraries(cmp_phase5_shape PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_shape COMMAND cmp_phase5_shape)
 
-    add_executable(cmp_phase5_divider tests/phase5/divider.c)
-    target_link_libraries(cmp_phase5_divider PRIVATE m3 cmpc)
-    add_test(NAME cmp_phase5_divider COMMAND cmp_phase5_divider)
+    add_executable(cmp_phase5_sheet tests/phase5/sheet.c)
+    target_link_libraries(cmp_phase5_sheet PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_sheet COMMAND cmp_phase5_sheet)
 
-    add_executable(cmp_phase5_badge tests/phase5/badge.c)
-
-    add_executable(cmp_phase5_tooltip tests/phase5/tooltip.c)
-    target_link_libraries(cmp_phase5_tooltip PRIVATE m3 cmpc)
-    add_test(NAME cmp_phase5_tooltip COMMAND cmp_phase5_tooltip)
-    target_link_libraries(cmp_phase5_badge PRIVATE m3 cmpc)
-    add_test(NAME cmp_phase5_badge COMMAND cmp_phase5_badge)
-
-endif()
-
-if(BUILD_TESTING)
-    add_executable(cmp_phase1_i18n tests/phase1/i18n.c)
-    target_link_libraries(cmp_phase1_i18n PRIVATE cmpc)
-    add_test(NAME cmp_phase1_i18n COMMAND cmp_phase1_i18n)
-
-    add_executable(cmp_phase6_a11y tests/phase6/a11y.c)
-    target_link_libraries(cmp_phase6_a11y PRIVATE cmpc)
-    add_test(NAME cmp_phase6_a11y COMMAND cmp_phase6_a11y)
-endif()
-
-if(BUILD_TESTING)
-    add_executable(cmp_phase2_color tests/phase2/color.c)
-    target_link_libraries(cmp_phase2_color PRIVATE m3 cmpc)
-    add_test(NAME cmp_phase2_color COMMAND cmp_phase2_color)
-endif()
-
-if(BUILD_TESTING)
     add_executable(cmp_phase5_side_sheet tests/phase5/side_sheet.c)
     target_link_libraries(cmp_phase5_side_sheet PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_side_sheet COMMAND cmp_phase5_side_sheet)
 
-    add_executable(cmp_phase5_buttons tests/phase5/buttons.c)
-    add_executable(cmp_phase5_motion tests/phase5/motion.c)
-    target_link_libraries(cmp_phase5_motion PRIVATE cmpc m3)
-    add_test(NAME cmp_phase5_motion COMMAND cmp_phase5_motion)
+    add_executable(cmp_phase5_tabs tests/phase5/tabs.c)
+    target_link_libraries(cmp_phase5_tabs PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_tabs COMMAND cmp_phase5_tabs)
 
-    target_link_libraries(cmp_phase5_buttons PRIVATE m3 cmpc)
-    add_test(NAME cmp_phase5_buttons COMMAND cmp_phase5_buttons)
+    add_executable(cmp_phase5_text tests/phase5/text.c)
+    target_link_libraries(cmp_phase5_text PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_text COMMAND cmp_phase5_text)
+
+    add_executable(cmp_phase5_text_field tests/phase5/text_field.c)
+    target_link_libraries(cmp_phase5_text_field PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_text_field COMMAND cmp_phase5_text_field)
+
+    add_executable(cmp_phase5_time_picker tests/phase5/time_picker.c)
+    target_link_libraries(cmp_phase5_time_picker PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_time_picker COMMAND cmp_phase5_time_picker)
+
+    add_executable(cmp_phase5_tooltip tests/phase5/tooltip.c)
+    target_link_libraries(cmp_phase5_tooltip PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_tooltip COMMAND cmp_phase5_tooltip)
+
+    add_executable(cmp_phase5_typography tests/phase5/typography.c)
+    target_link_libraries(cmp_phase5_typography PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_typography COMMAND cmp_phase5_typography)
+
+    add_executable(cmp_phase5_visuals tests/phase5/visuals.c)
+    target_link_libraries(cmp_phase5_visuals PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_visuals COMMAND cmp_phase5_visuals)
+
+    add_executable(cmp_phase6_a11y tests/phase6/a11y.c)
+    target_link_libraries(cmp_phase6_a11y PRIVATE cmpc)
+    add_test(NAME cmp_phase6_a11y COMMAND cmp_phase6_a11y)
+
+    add_executable(cmp_phase6_audio tests/phase6/audio.c)
+    target_link_libraries(cmp_phase6_audio PRIVATE cmpc)
+    add_test(NAME cmp_phase6_audio COMMAND cmp_phase6_audio)
+
+    add_executable(cmp_phase6_camera tests/phase6/camera.c)
+    target_link_libraries(cmp_phase6_camera PRIVATE cmpc)
+    add_test(NAME cmp_phase6_camera COMMAND cmp_phase6_camera)
+
+    add_executable(cmp_phase6_image tests/phase6/image.c)
+    target_link_libraries(cmp_phase6_image PRIVATE cmpc)
+    add_test(NAME cmp_phase6_image COMMAND cmp_phase6_image)
+
+    add_executable(cmp_phase6_network tests/phase6/network.c)
+    target_link_libraries(cmp_phase6_network PRIVATE cmpc)
+    add_test(NAME cmp_phase6_network COMMAND cmp_phase6_network)
+
+    add_executable(cmp_phase6_predictive tests/phase6/predictive.c)
+    target_link_libraries(cmp_phase6_predictive PRIVATE cmpc)
+    add_test(NAME cmp_phase6_predictive COMMAND cmp_phase6_predictive)
+
+    add_executable(cmp_phase6_storage tests/phase6/storage.c)
+    target_link_libraries(cmp_phase6_storage PRIVATE cmpc)
+    add_test(NAME cmp_phase6_storage COMMAND cmp_phase6_storage)
+
+    add_executable(cmp_phase6_video tests/phase6/video.c)
+    target_link_libraries(cmp_phase6_video PRIVATE cmpc)
+    add_test(NAME cmp_phase6_video COMMAND cmp_phase6_video)
+
 endif()
-

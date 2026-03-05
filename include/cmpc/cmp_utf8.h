@@ -68,7 +68,7 @@ CMP_API int CMP_CALL cmp_utf8_iter_init_cstr(CMPUtf8Iter *iter,
 CMP_API int CMP_CALL cmp_utf8_iter_next(CMPUtf8Iter *iter,
                                         cmp_u32 *out_codepoint);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Override the maximum C-string length used for UTF-8 validation.
  * @param max_len Maximum allowed length.

@@ -80,7 +80,7 @@ CMP_API int CMP_CALL cmp_null_backend_get_gfx(CMPNullBackend *backend,
 CMP_API int CMP_CALL cmp_null_backend_get_env(CMPNullBackend *backend,
                                               CMPEnv *out_env);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Override backend initialization state (tests only).
  * @param backend Backend instance.

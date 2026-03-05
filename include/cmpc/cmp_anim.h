@@ -226,7 +226,7 @@ CMP_API int CMP_CALL cmp_anim_controller_is_running(
  */
 CMP_API int CMP_CALL cmp_anim_controller_stop(CMPAnimController *controller);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for easing evaluation.
  * @param easing Easing mode (CMP_ANIM_EASE_*).

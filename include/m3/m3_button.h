@@ -168,10 +168,29 @@ CMP_API int CMP_CALL m3_button_style_init_elevated(M3ButtonStyle *style);
  */
 CMP_API int CMP_CALL m3_button_style_init_fab(M3ButtonStyle *style);
 
+/**
+ * @brief Initialize an icon button style.
+ * @param style Style structure to initialize.
+ * @param variant Button variant.
+ * @return CMP_OK on success.
+ */
 CMP_API int CMP_CALL m3_button_style_init_icon(M3ButtonStyle *style,
                                                cmp_u32 variant);
+
+/**
+ * @brief Initialize an extended FAB button style.
+ * @param style Style structure to initialize.
+ * @return CMP_OK on success.
+ */
 CMP_API int CMP_CALL m3_button_style_init_extended_fab(M3ButtonStyle *style);
 
+/**
+ * @brief Set the icon for a button.
+ * @param button The button widget.
+ * @param utf8_icon UTF-8 encoded icon string.
+ * @param icon_len Length of the icon string.
+ * @return CMP_OK on success.
+ */
 CMP_API int CMP_CALL m3_button_set_icon(M3Button *button, const char *utf8_icon,
                                         cmp_usize icon_len);
 

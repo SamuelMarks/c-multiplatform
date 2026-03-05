@@ -413,7 +413,7 @@ CMP_API int CMP_CALL cmp_i18n_plural_category(const char *locale_tag,
                                               cmp_i32 number,
                                               cmp_u32 *out_category);
 
-#ifdef CMP_TESTING
+#if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for overflow-safe multiplication.
  * @param a First operand.
