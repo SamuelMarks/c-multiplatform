@@ -231,7 +231,7 @@ static int m3_badge_paint(void *widget, CMPPaintContext *ctx) {
                (badge->bounds.height - badge->metrics.height) * 0.5f +
                badge->metrics.baseline;
 
-      ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, badge->font,
+      cmp_text_draw_utf8_gfx(ctx->gfx, badge->font,
                                        badge->utf8_label, badge->utf8_len, 0,
                                        text_x, text_y, badge->style.text_color);
     }

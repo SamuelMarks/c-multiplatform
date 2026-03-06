@@ -1143,7 +1143,7 @@ static const CMPGfxVTable g_cmp_gtk4_gfx_vtable = {cmp_gtk4_gfx_begin_frame,
 
 /* --- Text Backend --- */
 
-static int txt_meas(void *c, CMPHandle f, const char *u, size_t l, float *w,
+static int txt_meas(void *c, CMPHandle f, const char *u, size_t l, cmp_u32 dir, float *w,
                     float *h, float *b) {
   struct CMPGTK4Backend *be = (struct CMPGTK4Backend *)c;
   CMPGTK4Font *font;
@@ -1181,7 +1181,7 @@ static int txt_meas(void *c, CMPHandle f, const char *u, size_t l, float *w,
   return CMP_OK;
 }
 
-static int txt_draw(void *c, CMPHandle f, const char *u, size_t l, float x,
+static int txt_draw(void *c, CMPHandle f, const char *u, size_t l, cmp_u32 dir, float x,
                     float y, CMPColor col) {
   struct CMPGTK4Backend *b = (struct CMPGTK4Backend *)c;
   CMPGTK4Font *font;
@@ -1386,6 +1386,14 @@ void __cmp_gtk4_test_refs(void) {
   (void)cmp_gtk4_backend_validate_config(NULL);
 }
 #endif
+CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend, CMPHandle window_handle, const char *path) {
+  struct CMPGTK4Window *w;
+  if (cmp_gtk4_backend_resolve((struct CMPGTK4Backend *)backend, window_handle, CMP_GTK4_TYPE_WINDOW, (void **)&w) != CMP_OK)
+    return CMP_ERR_INVALID_ARGUMENT;
+  if (!w->surface) return CMP_ERR_STATE;
+  if (cairo_surface_write_to_png(w->surface, path) != CAIRO_STATUS_SUCCESS) return CMP_ERR_IO;
+  return CMP_OK;
+}
 
 /* Stubs for unavailable */
 #else
@@ -1447,4 +1455,5 @@ int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *b, CMPEnv *env) {
   return CMP_ERR_UNSUPPORTED;
 }
 /* GCOVR_EXCL_STOP */
+CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend, CMPHandle window_handle, const char *path) { return CMP_ERR_UNSUPPORTED; } /* GCOVR_EXCL_LINE */
 #endif

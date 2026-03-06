@@ -13,6 +13,32 @@ extern "C" {
 #include <limits.h>
 #include <stddef.h>
 
+/**
+ * @def CMP_SIZE_FORMAT
+ * @brief Size formatter for printf.
+ */
+#if defined(_MSC_VER)
+#define CMP_SIZE_FORMAT "%Iu"
+#else
+#define CMP_SIZE_FORMAT "%zu"
+#endif
+
+/**
+ * @def CMP_SNPRINTF
+ * @brief Safe snprintf macro.
+ */
+/**
+ * @def CMP_STRNCPY
+ * @brief Safe strncpy macro.
+ */
+#if defined(_MSC_VER)
+#define CMP_SNPRINTF sprintf_s
+#define CMP_STRNCPY strncpy_s
+#else
+#define CMP_SNPRINTF snprintf
+#define CMP_STRNCPY strncpy
+#endif
+
 /** @brief Major version number. */
 #define CMP_VERSION_MAJOR 0
 /** @brief Minor version number. */

@@ -29,7 +29,7 @@ extern "C" {
 /** @brief Default FAB slide animation duration in seconds. */
 #define M3_SCAFFOLD_DEFAULT_FAB_SLIDE_DURATION 0.2f
 /** @brief Default FAB slide easing. */
-#define M3_SCAFFOLD_DEFAULT_FAB_SLIDE_EASING CMP_ANIM_EASE_OUT
+#define M3_SCAFFOLD_DEFAULT_FAB_SLIDE_EASING CMP_ANIM_EASE_EMPHASIZED
 
 /**
  * @brief Scaffold style descriptor.

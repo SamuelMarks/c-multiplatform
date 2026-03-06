@@ -64,6 +64,9 @@ static int m3_scaffold_validate_style(const M3ScaffoldStyle *style) {
   case CMP_ANIM_EASE_IN:
   case CMP_ANIM_EASE_OUT:
   case CMP_ANIM_EASE_IN_OUT:
+  case CMP_ANIM_EASE_EMPHASIZED:
+  case CMP_ANIM_EASE_EMPHASIZED_DECELERATE:
+  case CMP_ANIM_EASE_EMPHASIZED_ACCELERATE:
     break;
   default:
     return CMP_ERR_RANGE;

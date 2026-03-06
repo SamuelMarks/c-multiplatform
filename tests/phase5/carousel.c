@@ -29,7 +29,34 @@ static int dummy_draw_rect(void *ctx, const CMPRect *bounds, CMPColor color, CMP
     return CMP_OK;
 }
 
+static int test_carousel_variants(void) {
+
+  M3CarouselStyle style;
+
+  
+
+  if (m3_carousel_style_init_hero(NULL) != CMP_ERR_INVALID_ARGUMENT) return 1;
+
+  if (m3_carousel_style_init_hero(&style) != CMP_OK) return 1;
+
+  if (style.variant != M3_CAROUSEL_VARIANT_HERO) return 1;
+
+  
+
+  if (m3_carousel_style_init_multi_browse(NULL) != CMP_ERR_INVALID_ARGUMENT) return 1;
+
+  if (m3_carousel_style_init_multi_browse(&style) != CMP_OK) return 1;
+
+  if (style.variant != M3_CAROUSEL_VARIANT_MULTI_BROWSE) return 1;
+
+  
+
+  return 0;
+
+}
+
 int main(void) {
+  if (test_carousel_variants() != 0) return 1;
   M3CarouselStyle style;
   M3Carousel carousel;
   CMPWidget child;
@@ -115,3 +142,4 @@ int main(void) {
 
   return 0;
 }
+

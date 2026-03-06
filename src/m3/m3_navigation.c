@@ -772,8 +772,7 @@ static int m3_navigation_widget_paint(void *widget, CMPPaintContext *ctx) {
       text_color = nav->style.selected_text_color;
     }
 
-    rc = ctx->gfx->text_vtable->draw_text(
-        ctx->gfx->ctx, nav->font, nav->items[i].utf8_label,
+    rc = cmp_text_draw_utf8_gfx(ctx->gfx, nav->font, nav->items[i].utf8_label,
         nav->items[i].utf8_len, 0, text_x, text_y, text_color);
     if (rc != CMP_OK) {
       return rc;

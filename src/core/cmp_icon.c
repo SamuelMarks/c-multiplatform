@@ -987,7 +987,7 @@ static int cmp_icon_draw_font(const CMPGfx *gfx, const CMPRect *bounds,
   rc = gfx->text_vtable->create_font(gfx->ctx, style->utf8_family,
                                      style->size_px, style->weight,
                                      style->italic, &font);
-  if (rc != CMP_OK) {
+  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
     return rc; /* GCOVR_EXCL_LINE */
   }
 

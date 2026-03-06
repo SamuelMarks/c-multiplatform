@@ -39,7 +39,7 @@ extern "C" {
 /** @brief Default indicator animation duration in seconds. */
 #define M3_TAB_DEFAULT_INDICATOR_DURATION 0.2f
 /** @brief Default indicator easing mode. */
-#define M3_TAB_DEFAULT_INDICATOR_EASING CMP_ANIM_EASE_OUT
+#define M3_TAB_DEFAULT_INDICATOR_EASING CMP_ANIM_EASE_EMPHASIZED
 
 /**
  * @brief Tab item descriptor.

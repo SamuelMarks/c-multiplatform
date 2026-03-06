@@ -4,6 +4,21 @@ static CMPScalar cmp_anim_abs(CMPScalar value) {
   return (value < 0.0f) ? -value : value;
 }
 
+static CMPBool g_cmp_anim_reduced_motion = CMP_FALSE;
+
+CMP_API int CMP_CALL cmp_anim_set_reduced_motion(CMPBool enable) {
+  g_cmp_anim_reduced_motion = enable;
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL cmp_anim_get_reduced_motion(CMPBool *out_enable) {
+  if (out_enable == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  *out_enable = g_cmp_anim_reduced_motion;
+  return CMP_OK;
+}
+
 static CMPScalar cmp_anim_clamp01(CMPScalar value) {
   if (value < 0.0f) {
     return 0.0f;
@@ -153,7 +168,7 @@ int CMP_CALL cmp_anim_timing_step(CMPAnimTiming *timing, CMPScalar dt,
     return CMP_ERR_RANGE;
   }
 
-  if (timing->duration == 0.0f) {
+  if (timing->duration == 0.0f || g_cmp_anim_reduced_motion == CMP_TRUE) {
     timing->elapsed = timing->duration;
     *out_value = timing->to;
     *out_finished = CMP_TRUE;
@@ -245,6 +260,13 @@ int CMP_CALL cmp_spring_step(CMPSpring *spring, CMPScalar dt,
   }
 
   displacement = spring->position - spring->target;
+
+  if (g_cmp_anim_reduced_motion == CMP_TRUE) {
+    spring->position = spring->target;
+    spring->velocity = 0.0f;
+    *out_finished = CMP_TRUE;
+    return CMP_OK;
+  }
 
   if (dt > 0.0f) {
     acceleration = (-spring->stiffness * displacement -

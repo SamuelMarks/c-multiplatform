@@ -3,8 +3,10 @@
 
 
 #if defined(_MSC_VER)
+#undef NUM_FORMAT
 #define NUM_FORMAT "%d"
 #else
+#undef NUM_FORMAT
 #define NUM_FORMAT "%d"
 #endif
 

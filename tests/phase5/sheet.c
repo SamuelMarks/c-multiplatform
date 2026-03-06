@@ -153,6 +153,31 @@ static int init_pointer_event(CMPInputEvent *event, cmp_u32 type, cmp_i32 x,
   return CMP_OK;
 }
 
+static int test_sheet_hinge_logic(void) {
+  M3SheetStyle hinge_style;
+  M3Sheet hinge_sheet;
+  CMPRect overlay_bounds = {0.0f, 0.0f, 1000.0f, 1000.0f};
+  
+  CMP_TEST_OK(m3_sheet_style_init_modal(&hinge_style));
+  hinge_style.hinge.is_separating = CMP_TRUE;
+  hinge_style.hinge.bounds.x = 490.0f;
+  hinge_style.hinge.bounds.y = 0.0f;
+  hinge_style.hinge.bounds.width = 20.0f;
+  hinge_style.hinge.bounds.height = 1000.0f;
+  
+  /* Tabletop Posture */
+  hinge_style.hinge.posture = M3_POSTURE_HALF_OPENED_TABLETOP;
+  CMP_TEST_OK(m3_sheet_init(&hinge_sheet, &hinge_style));
+  CMP_TEST_OK(hinge_sheet.widget.vtable->layout(&hinge_sheet, overlay_bounds));
+  
+  /* Book Posture */
+  hinge_style.hinge.posture = M3_POSTURE_HALF_OPENED_BOOK;
+  CMP_TEST_OK(m3_sheet_set_style(&hinge_sheet, &hinge_style));
+  CMP_TEST_OK(hinge_sheet.widget.vtable->layout(&hinge_sheet, overlay_bounds));
+
+  return CMP_OK;
+}
+
 static int init_gesture_event(CMPInputEvent *event, cmp_u32 type, CMPScalar x,
                               CMPScalar y, CMPScalar start_x, CMPScalar start_y,
                               CMPScalar total_y, CMPScalar velocity_y) {
@@ -168,6 +193,7 @@ static int init_gesture_event(CMPInputEvent *event, cmp_u32 type, CMPScalar x,
   event->data.gesture.start_y = start_y;
   event->data.gesture.total_y = total_y;
   event->data.gesture.velocity_y = velocity_y;
+
   return CMP_OK;
 }
 
@@ -940,6 +966,10 @@ static int test_sheet_step(void) {
 int main(void) {
   int rc;
 
+  rc = test_sheet_hinge_logic();
+  if (rc != 0) {
+    return rc;
+  }
   rc = test_sheet_helpers();
   if (rc != 0) {
     return rc;

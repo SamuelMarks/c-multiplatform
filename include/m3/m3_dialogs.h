@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 #include "cmpc/cmp_layout.h"
+#include "m3/m3_adaptive.h"
 #include "cmpc/cmp_text.h"
 #include "cmpc/cmp_visuals.h"
 
@@ -75,6 +76,7 @@ typedef struct M3AlertDialogStyle {
   CMPTextStyle body_style;   /**< Text style for the body. */
   CMPTextStyle action_style; /**< Text style for action labels. */
   CMPColor background_color; /**< Dialog background color. */
+  M3FoldableHinge hinge;         /**< Hinge parameters for foldables. */
   CMPColor scrim_color;      /**< Scrim color used behind the dialog. */
   CMPShadow shadow;          /**< Shadow descriptor. */
   CMPBool shadow_enabled;    /**< CMP_TRUE when shadow rendering is enabled. */
@@ -158,6 +160,7 @@ typedef struct M3FullScreenDialogStyle {
   CMPTextStyle body_style;   /**< Text style for the body. */
   CMPTextStyle action_style; /**< Text style for the action label. */
   CMPColor background_color; /**< Dialog background color. */
+  M3FoldableHinge hinge;         /**< Hinge parameters for foldables. */
   CMPColor scrim_color;      /**< Scrim color used behind the dialog. */
   CMPShadow shadow;          /**< Shadow descriptor. */
   CMPBool shadow_enabled;    /**< CMP_TRUE when shadow rendering is enabled. */
@@ -239,7 +242,8 @@ typedef struct M3SnackbarStyle {
       action_padding_y; /**< Vertical padding for the action button (>= 0). */
   CMPTextStyle message_style; /**< Text style for the message. */
   CMPTextStyle action_style;  /**< Text style for the action label. */
-  CMPColor background_color;  /**< Snackbar background color. */
+  CMPColor background_color; /**< Dialog background color. */
+  M3FoldableHinge hinge;         /**< Hinge parameters for foldables. */
 } M3SnackbarStyle;
 
 /**

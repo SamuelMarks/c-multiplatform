@@ -1,4 +1,5 @@
 #include "cmpc/cmp_backend_cocoa.h"
+#include "cmpc/cmp_a11y.h"
 #include <Cocoa/Cocoa.h>
 #import <AVFoundation/AVFoundation.h>
 #import <CoreVideo/CoreVideo.h>
@@ -218,7 +219,7 @@ static int ws_get_clipboard(void *ctx, char *buf, size_t size, size_t *len) {
 #if defined(_MSC_VER)
         strncpy_s(buf, size, utf8, _TRUNCATE);
 #else
-        strncpy(buf, utf8, size - 1);
+        CMP_STRNCPY(buf, utf8, size - 1);
         buf[size - 1] = '\0';
 #endif
     }
@@ -301,15 +302,75 @@ static int cmp_backend_ws_get_system_color(void *ws, cmp_u32 color_type, CMPScal
 }
 
 
+static NSAccessibilityRole get_cocoa_role(cmp_u32 role) {
+    switch (role) {
+        case 1: return NSAccessibilityButtonRole; /* BUTTON */
+        case 2: return NSAccessibilityStaticTextRole; /* TEXT */
+        case 3: return NSAccessibilityImageRole; /* IMAGE */
+        case 4: return NSAccessibilitySliderRole; /* SLIDER */
+        case 5: return NSAccessibilityCheckBoxRole; /* CHECKBOX */
+        case 6: return NSAccessibilityCheckBoxRole; /* SWITCH */
+        case 7: return NSAccessibilityRadioButtonRole; /* RADIO */
+        case 8: return NSAccessibilityTextFieldRole; /* TEXT_FIELD */
+        case 9: return NSAccessibilityProgressIndicatorRole; /* PROGRESS */
+        case 10: return NSAccessibilityWindowRole; /* DIALOG */
+        case 11: return NSAccessibilityMenuRole; /* MENU */
+        case 12: return NSAccessibilityListRole; /* LIST */
+        case 13: return NSAccessibilityRowRole; /* LIST_ITEM */
+        case 14: return NSAccessibilityTabGroupRole; /* TAB_BAR */
+        case 15: return NSAccessibilityRadioButtonRole; /* TAB */
+        case 16: return NSAccessibilityStaticTextRole; /* HEADER */
+        case 17: return NSAccessibilityGroupRole; /* CONTAINER */
+        default: return NSAccessibilityUnknownRole;
+    }
+}
+
+static NSAccessibilityElement* create_a11y_element(const void *node_ptr) {
+    const CMPA11yNode *node = (const CMPA11yNode *)node_ptr;
+    if (node == NULL) return nil;
+
+    NSAccessibilityElement *el = [NSAccessibilityElement accessibilityElementWithRole:get_cocoa_role(node->semantics.role)
+                                                                           frame:NSZeroRect
+                                                                           label:node->semantics.utf8_label ? [NSString stringWithUTF8String:node->semantics.utf8_label] : @""
+                                                                           parent:nil];
+    if (node->semantics.utf8_value) {
+        [el accessibilitySetValue:[NSString stringWithUTF8String:node->semantics.utf8_value] forAttribute:NSAccessibilityValueAttribute];
+    }
+    if (node->semantics.utf8_hint) {
+        [el accessibilitySetValue:[NSString stringWithUTF8String:node->semantics.utf8_hint] forAttribute:NSAccessibilityHelpAttribute];
+    }
+    
+    NSMutableArray *children = [NSMutableArray arrayWithCapacity:node->child_count];
+    for (cmp_usize i = 0; i < node->child_count; i++) {
+        NSAccessibilityElement *child = create_a11y_element(node->children[i]);
+        if (child) {
+            [child accessibilitySetOverrideValue:el forAttribute:NSAccessibilityParentAttribute];
+            [children addObject:child];
+        }
+    }
+    if (children.count > 0) {
+        [el accessibilitySetOverrideValue:children forAttribute:NSAccessibilityChildrenAttribute];
+    }
+    return el;
+}
+
 static int cmp_backend_ws_update_a11y_tree(void *ws, const void *root_a11y_node) {
-  /* NSAccessibility bridge stub: fully building a native macOS a11y tree requires
-     mirroring the CMPA11yNode hierarchy into NSAccessibilityElement instances and 
-     attaching them to the NSWindow/NSView. This is a placeholder for the contract. */
-  (void)root_a11y_node;
   if (ws == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  return CMP_ERR_UNSUPPORTED;
+  CMPCocoaBackend *backend = (CMPCocoaBackend*)ws;
+  if (backend->windows.count > 0) {
+      id win = backend->windows[0];
+      if (win != [NSNull null]) {
+          NSView *view = [win contentView];
+          NSAccessibilityElement *rootEl = create_a11y_element(root_a11y_node);
+          if (rootEl) {
+              [rootEl accessibilitySetOverrideValue:view forAttribute:NSAccessibilityParentAttribute];
+              [view setAccessibilityChildren:@[rootEl]];
+          }
+      }
+  }
+  return CMP_OK;
 }
 
 static const CMPWSVTable g_ws_vtable = {

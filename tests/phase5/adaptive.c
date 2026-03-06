@@ -105,7 +105,7 @@ static int test_window_size_class(void) {
 }
 
 static int test_adaptive_list_detail_measure(void) {
-  M3AdaptiveLayout layout;
+  M3AdaptiveLayout layout = {0};
   CMPScalar w, h;
 
   layout.safe_width = 1000.0f;
@@ -138,7 +138,7 @@ static int test_adaptive_list_detail_measure(void) {
 }
 
 static int test_adaptive_list_detail_layout(void) {
-  M3AdaptiveLayout layout;
+  M3AdaptiveLayout layout = {0};
   CMPRect bounds;
   CMPRect prim, sec;
 
@@ -221,7 +221,7 @@ static int test_adaptive_list_detail_layout(void) {
 }
 
 static int test_adaptive_feed_layout(void) {
-  M3AdaptiveLayout layout;
+  M3AdaptiveLayout layout = {0};
   CMPRect bounds;
   CMPRect prim, sec;
 
@@ -313,7 +313,7 @@ static int test_adaptive_feed_layout(void) {
 }
 
 static int test_adaptive_supporting_pane_layout(void) {
-  M3AdaptiveLayout layout;
+  M3AdaptiveLayout layout = {0};
   CMPRect bounds;
   CMPRect prim, sec;
 
@@ -388,7 +388,7 @@ static int test_adaptive_supporting_pane_layout(void) {
 }
 
 static int test_adaptive_rtl_layouts(void) {
-  M3AdaptiveLayout layout;
+  M3AdaptiveLayout layout = {0};
   CMPRect bounds;
   CMPRect prim, sec;
 

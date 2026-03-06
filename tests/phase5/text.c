@@ -237,6 +237,48 @@ static int cmp_near(CMPScalar a, CMPScalar b, CMPScalar tol) {
   return (diff <= tol) ? 1 : 0;
 }
 
+
+static int test_text_draw_layout(void *text, CMPHandle font, const CMPTextLayout *layout, CMPScalar x, CMPScalar y, CMPColor color) {
+  TestTextBackend *b = (TestTextBackend *)text;
+  b->draw_calls++;
+  return CMP_OK;
+}
+
+static int test_text_draw_utf8_variants(void) {
+  TestTextBackend mock;
+  CMPTextBackend text_backend;
+  CMPHandle font = {1, 1};
+  CMPColor color = {255, 255, 255, 255};
+  CMPTextVTable test_vt = g_test_text_vtable;
+  CMPGfx gfx;
+  
+  memset(&mock, 0, sizeof(mock));
+  text_backend.ctx = &mock;
+  text_backend.vtable = &test_vt;
+  gfx.ctx = &mock;
+  gfx.text_vtable = &test_vt;
+  
+  CMP_TEST_EXPECT(cmp_text_draw_utf8(NULL, font, "abc", 3, 0, 0, 0, color), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_text_draw_utf8_gfx(NULL, font, "abc", 3, 0, 0, 0, color), CMP_ERR_INVALID_ARGUMENT);
+  
+  /* Fallback without layout */
+  test_vt.shape_text = NULL;
+  test_vt.draw_layout = NULL;
+  test_vt.free_layout = NULL;
+  CMP_TEST_OK(cmp_text_draw_utf8(&text_backend, font, "abc", 3, 0, 0, 0, color));
+  CMP_TEST_OK(cmp_text_draw_utf8_gfx(&gfx, font, "abc", 3, 0, 0, 0, color));
+  
+  /* With layout */
+  test_vt.shape_text = test_text_shape_text;
+  test_vt.draw_layout = test_text_draw_layout;
+  test_vt.free_layout = test_text_free_layout;
+  
+  CMP_TEST_OK(cmp_text_draw_utf8(&text_backend, font, "abc", 3, 0, 0, 0, color));
+  CMP_TEST_OK(cmp_text_draw_utf8_gfx(&gfx, font, "abc", 3, 0, 0, 0, color));
+
+  return 0;
+}
+
 int main(void) {
   TestTextBackend backend;
   CMPTextBackend text_backend;
@@ -763,5 +805,6 @@ int main(void) {
   CMP_TEST_OK(rc);
   CMP_TEST_ASSERT(backend.destroy_calls >= 1);
 
+  if (test_text_draw_utf8_variants() != 0) return 1;
   return 0;
 }

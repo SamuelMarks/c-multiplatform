@@ -797,8 +797,7 @@ static int m3_menu_widget_paint(void *widget,
       color = menu->style.disabled_text_color;
     }
 
-    rc = ctx->gfx->text_vtable->draw_text(
-        ctx->gfx->ctx, menu->font, /* GCOVR_EXCL_LINE */
+    rc = cmp_text_draw_utf8_gfx(ctx->gfx, menu->font, /* GCOVR_EXCL_LINE */
         item->utf8_label, item->utf8_len, 0, text_x, text_y,
         color);         /* GCOVR_EXCL_LINE */
     if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */

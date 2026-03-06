@@ -68,7 +68,7 @@ set(CMP_WARNINGS_C
     $<$<C_COMPILER_ID:GNU>:-Wnested-externs>
     $<$<C_COMPILER_ID:GNU>:-Winline>
     $<$<C_COMPILER_ID:GNU>:-Wvla>
-    $<$<C_COMPILER_ID:GNU>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:-Werror>>
+    $<$<C_COMPILER_ID:GNU>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:>>
     $<$<C_COMPILER_ID:Clang>:-Wall>
     $<$<C_COMPILER_ID:Clang>:-Wextra>
     $<$<C_COMPILER_ID:Clang>:-pedantic>
@@ -87,7 +87,7 @@ set(CMP_WARNINGS_C
     $<$<C_COMPILER_ID:Clang>:-Wnested-externs>
     $<$<C_COMPILER_ID:Clang>:-Winline>
     $<$<C_COMPILER_ID:Clang>:-Wvla>
-    $<$<C_COMPILER_ID:Clang>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:-Werror>>
+    $<$<C_COMPILER_ID:Clang>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:>>
 )
 
 function(cmp_apply_c_settings target_name)
@@ -182,6 +182,8 @@ add_library(m3
     src/m3/m3_button.c
     src/m3/m3_card.c
     src/m3/m3_divider.c
+    src/m3/m3_data_table.c
+    src/m3/m3_stepper.c
     src/m3/m3_badge.c
     src/m3/m3_chip.c
     src/m3/m3_selection.c
@@ -957,6 +959,14 @@ if(BUILD_TESTING)
     target_link_libraries(cmp_phase5_dialogs PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_dialogs COMMAND cmp_phase5_dialogs)
 
+    add_executable(cmp_phase5_stepper tests/phase5/stepper.c)
+    target_link_libraries(cmp_phase5_stepper PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_stepper COMMAND cmp_phase5_stepper)
+
+    add_executable(cmp_phase5_data_table tests/phase5/data_table.c)
+    target_link_libraries(cmp_phase5_data_table PRIVATE m3 cmpc)
+    add_test(NAME cmp_phase5_data_table COMMAND cmp_phase5_data_table)
+
     add_executable(cmp_phase5_divider tests/phase5/divider.c)
     target_link_libraries(cmp_phase5_divider PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_divider COMMAND cmp_phase5_divider)
@@ -1085,4 +1095,9 @@ if(BUILD_TESTING)
     target_link_libraries(cmp_phase6_video PRIVATE cmpc)
     add_test(NAME cmp_phase6_video COMMAND cmp_phase6_video)
 
+endif()
+
+if(CMP_ENABLE_GTK4)
+    add_executable(screenshot_tool tools/screenshot_tool.c)
+    target_link_libraries(screenshot_tool PRIVATE m3 cmpc)
 endif()

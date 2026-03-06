@@ -78,7 +78,8 @@ typedef int(CMP_CALL *CMPButtonOnClick)(void *ctx, struct M3Button *button);
  * @brief Button style descriptor.
  */
 typedef struct M3ButtonStyle {
-  cmp_u32 variant;           /**< Button variant (CMP_BUTTON_VARIANT_*). */
+  cmp_u32 variant; /**< Button visual variant. */
+  CMPBool is_rtl;            /**< CMP_TRUE if layout should be right-to-left. */           /**< Button variant (CMP_BUTTON_VARIANT_*). */
   CMPTextStyle text_style;   /**< Label text style. */
   CMPColor background_color; /**< Fill color. */
   CMPColor outline_color;    /**< Outline color. */

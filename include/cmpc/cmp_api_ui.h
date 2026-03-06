@@ -45,6 +45,24 @@ extern "C" {
 #define CMP_SEMANTIC_RADIO 7
 /** @brief Text field semantic role. */
 #define CMP_SEMANTIC_TEXT_FIELD 8
+/** @brief Progress indicator semantic role. */
+#define CMP_SEMANTIC_PROGRESS 9
+/** @brief Dialog semantic role. */
+#define CMP_SEMANTIC_DIALOG 10
+/** @brief Menu semantic role. */
+#define CMP_SEMANTIC_MENU 11
+/** @brief List semantic role. */
+#define CMP_SEMANTIC_LIST 12
+/** @brief List item semantic role. */
+#define CMP_SEMANTIC_LIST_ITEM 13
+/** @brief Tab bar semantic role. */
+#define CMP_SEMANTIC_TAB_BAR 14
+/** @brief Tab semantic role. */
+#define CMP_SEMANTIC_TAB 15
+/** @brief Header semantic role. */
+#define CMP_SEMANTIC_HEADER 16
+/** @brief Container semantic role. */
+#define CMP_SEMANTIC_CONTAINER 17
 
 /** @brief Semantics node is disabled. */
 #define CMP_SEMANTIC_FLAG_DISABLED 0x01

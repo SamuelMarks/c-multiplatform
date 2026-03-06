@@ -3,6 +3,7 @@
 #include "cmpc/cmp_log.h"
 #include "cmpc/cmp_math.h"
 #include "cmpc/cmp_object.h"
+#include "cmpc/cmp_a11y.h"
 
 #include <limits.h>
 #include <math.h>
@@ -3143,13 +3144,106 @@ static int cmp_backend_ws_get_system_color(void *ws, cmp_u32 color_type,
   return CMP_ERR_UNSUPPORTED;
 }
 
+#if defined(CMP_WEB_AVAILABLE)
+EM_JS(void, cmp_web_a11y_init_container, (), {
+  var root = document.getElementById("cmp-a11y-root");
+  if (!root) {
+    root = document.createElement("div");
+    root.id = "cmp-a11y-root";
+    root.style.position = "absolute";
+    root.style.left = "-10000px";
+    root.style.top = "-10000px";
+    root.style.width = "1px";
+    root.style.height = "1px";
+    root.style.overflow = "hidden";
+    document.body.appendChild(root);
+  } else {
+    root.innerHTML = "";
+  }
+});
+
+EM_JS(void, cmp_web_a11y_append_node, (cmp_u32 role, cmp_u32 flags, const char* label_ptr, const char* hint_ptr, const char* val_ptr), {
+  var root = document.getElementById("cmp-a11y-root");
+  if (!root) return;
+  var el = document.createElement("div");
+  var roleStr = "group";
+  if (role === 1) roleStr = "button";
+  else if (role === 2) roleStr = "text";
+  else if (role === 3) roleStr = "img";
+  else if (role === 4) roleStr = "slider";
+  else if (role === 5) roleStr = "checkbox";
+  else if (role === 6) roleStr = "switch";
+  else if (role === 7) roleStr = "radio";
+  else if (role === 8) roleStr = "textbox";
+  else if (role === 9) roleStr = "progressbar";
+  else if (role === 10) roleStr = "dialog";
+  else if (role === 11) roleStr = "menu";
+  else if (role === 12) roleStr = "list";
+  else if (role === 13) roleStr = "listitem";
+  else if (role === 14) roleStr = "tablist";
+  else if (role === 15) roleStr = "tab";
+  else if (role === 16) roleStr = "heading";
+  else if (role === 17) roleStr = "group";
+  el.setAttribute("role", roleStr);
+  
+  var text = "";
+  if (label_ptr) text += UTF8ToString(label_ptr) + " ";
+  if (val_ptr) text += UTF8ToString(val_ptr) + " ";
+  if (hint_ptr) text += UTF8ToString(hint_ptr);
+  el.innerText = text.trim();
+  
+  if (flags & 0x01) el.setAttribute("aria-disabled", "true");
+  if (flags & 0x02) el.setAttribute("aria-selected", "true");
+  if (flags & 0x10) el.setAttribute("aria-checked", "true");
+  if (flags & 0x40) el.setAttribute("aria-expanded", "true");
+  if (flags & 0x80) el.setAttribute("aria-checked", "true");
+  
+  if (flags & 0x04) el.tabIndex = -1;
+  if (flags & 0x08) {
+    el.setAttribute("data-focused", "true");
+    setTimeout(function() { el.focus(); }, 0);
+  }
+  
+  root.appendChild(el);
+});
+
+static void cmp_web_a11y_traverse(const CMPA11yNode *node) {
+  cmp_usize i;
+  
+  if (node == NULL) {
+    return;
+  }
+  
+  if (node->semantics.role != CMP_SEMANTIC_NONE) {
+    cmp_web_a11y_append_node(
+      node->semantics.role,
+      node->semantics.flags,
+      node->semantics.utf8_label,
+      node->semantics.utf8_hint,
+      node->semantics.utf8_value);
+  }
+  
+  for (i = 0; i < node->child_count; i++) {
+    cmp_web_a11y_traverse(node->children[i]);
+  }
+}
+#endif
+
 static int cmp_backend_ws_update_a11y_tree(void *ws,
                                            const void *root_a11y_node) {
-  (void)root_a11y_node;
   if (ws == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+#if defined(CMP_WEB_AVAILABLE)
+  if (root_a11y_node != NULL) {
+    cmp_web_a11y_init_container();
+    cmp_web_a11y_traverse((const CMPA11yNode *)root_a11y_node);
+  }
+  return CMP_OK;
+#else
+  (void)root_a11y_node;
   return CMP_ERR_UNSUPPORTED;
+#endif
 }
 
 static const CMPWSVTable g_cmp_web_ws_vtable = {

@@ -421,7 +421,7 @@ static int cmp_route_match_len(const char *pattern, cmp_usize pattern_len,
     if (path_seg == NULL) {
       if (pat_seg_len == 1 && pat_seg[0] == '*') { /* GCOVR_EXCL_LINE */
         rc = cmp_route_has_more_segments(pat_str, pat_len, p_idx, &has_more);
-        if (rc != CMP_OK) return rc;
+        if (rc != CMP_OK) return rc; /* GCOVR_EXCL_LINE */
         if (has_more == CMP_TRUE) {
           return CMP_ERR_INVALID_ARGUMENT;
         }
@@ -435,7 +435,7 @@ static int cmp_route_match_len(const char *pattern, cmp_usize pattern_len,
 
     if (pat_seg_len == 1 && pat_seg[0] == '*') {
       rc = cmp_route_has_more_segments(pat_str, pat_len, p_idx, &has_more);
-      if (rc != CMP_OK) return rc;
+      if (rc != CMP_OK) return rc; /* GCOVR_EXCL_LINE */
       if (has_more == CMP_TRUE) {
         return CMP_ERR_INVALID_ARGUMENT;
       }
@@ -507,7 +507,7 @@ static int cmp_route_validate_pattern(const char *pattern) {
   }
   if (seg_len == 1 && seg[0] == '*') {
     rc = cmp_route_has_more_segments(pat_str, pat_len, index, &has_more);
-    if (rc != CMP_OK) return rc;
+    if (rc != CMP_OK) return rc; /* GCOVR_EXCL_LINE */
     if (has_more == CMP_TRUE) {
       return CMP_ERR_INVALID_ARGUMENT;
     }

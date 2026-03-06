@@ -161,6 +161,44 @@ CMP_API int CMP_CALL cmp_text_font_metrics(const CMPTextBackend *backend,
                                            CMPTextMetrics *out_metrics);
 
 /**
+ * @brief Draw a UTF-8 buffer using a CMPGfx context, attempting shaping.
+ * @param gfx Graphics context.
+ * @param font Font handle.
+ * @param utf8 UTF-8 byte buffer.
+ * @param utf8_len Length of buffer in bytes.
+ * @param base_direction Base direction.
+ * @param x X coordinate.
+ * @param y Y coordinate (baseline).
+ * @param color Text color.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_text_draw_utf8_gfx(const CMPGfx *gfx,
+                                        CMPHandle font, const char *utf8,
+                                        cmp_usize utf8_len,
+                                        cmp_u32 base_direction,
+                                        CMPScalar x, CMPScalar y,
+                                        CMPColor color);
+
+/**
+ * @brief Draw a UTF-8 buffer, attempting shaping (BiDi) if supported.
+ * @param backend Text backend instance.
+ * @param font Font handle.
+ * @param utf8 UTF-8 byte buffer.
+ * @param utf8_len Length of buffer in bytes.
+ * @param base_direction Base direction.
+ * @param x X coordinate.
+ * @param y Y coordinate (baseline).
+ * @param color Text color.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_text_draw_utf8(const CMPTextBackend *backend,
+                                        CMPHandle font, const char *utf8,
+                                        cmp_usize utf8_len,
+                                        cmp_u32 base_direction,
+                                        CMPScalar x, CMPScalar y,
+                                        CMPColor color);
+
+/**
  * @brief Shape UTF-8 text into a glyph layout (for BiDi/complex typography).
  * @param backend Text backend instance.
  * @param font Font handle.

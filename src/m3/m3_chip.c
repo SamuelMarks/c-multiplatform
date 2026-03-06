@@ -914,7 +914,7 @@ static int m3_chip_widget_paint(void *widget, CMPPaintContext *ctx) {
 
   if (chip->utf8_label != NULL || chip->utf8_len == 0) {
     if (chip->utf8_label != NULL && chip->utf8_len != 0) { /* GCOVR_EXCL_LINE */
-      rc = ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, chip->font,
+      rc = cmp_text_draw_utf8_gfx(ctx->gfx, chip->font,
                                             chip->utf8_label, chip->utf8_len, 0,
                                             text_x, text_y, text_color);
       if (rc != CMP_OK) {

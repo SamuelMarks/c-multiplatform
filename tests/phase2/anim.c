@@ -265,5 +265,29 @@ int main(void) {
   CMP_TEST_OK(cmp_anim_controller_step(&controller, 0.1f, &value, &finished));
   CMP_TEST_ASSERT(finished == CMP_TRUE);
 
+  /* Test reduced motion setting */
+  CMP_TEST_EXPECT(cmp_anim_get_reduced_motion(NULL), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(cmp_anim_get_reduced_motion(&finished));
+  CMP_TEST_ASSERT(finished == CMP_FALSE);
+
+  CMP_TEST_OK(cmp_anim_set_reduced_motion(CMP_TRUE));
+  CMP_TEST_OK(cmp_anim_get_reduced_motion(&finished));
+  CMP_TEST_ASSERT(finished == CMP_TRUE);
+
+  /* Test timing step with reduced motion */
+  CMP_TEST_OK(cmp_anim_timing_init(&timing, 0.0f, 10.0f, 1.0f, CMP_ANIM_EASE_LINEAR));
+  CMP_TEST_OK(cmp_anim_timing_step(&timing, 0.1f, &value, &finished));
+  CMP_TEST_ASSERT(finished == CMP_TRUE);
+  CMP_TEST_ASSERT(value == 10.0f);
+
+  /* Test spring step with reduced motion */
+  CMP_TEST_OK(cmp_spring_init(&spring, 0.0f, 10.0f, 60.0f, 8.0f, 1.0f));
+  CMP_TEST_OK(cmp_spring_step(&spring, 0.1f, &finished));
+  CMP_TEST_ASSERT(finished == CMP_TRUE);
+  CMP_TEST_ASSERT(spring.position == 10.0f);
+
+  /* Restore reduced motion */
+  CMP_TEST_OK(cmp_anim_set_reduced_motion(CMP_FALSE));
+
   return 0;
 }

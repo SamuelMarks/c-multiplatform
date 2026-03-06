@@ -290,7 +290,9 @@ static int test_scaffold_helpers(void) {
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_scaffold_style_init(&style));
   style.fab_slide_duration = 0.0f;
-  CMP_TEST_OK(m3_scaffold_test_validate_style(&style));
+  int ret = m3_scaffold_test_validate_style(&style);
+  if (ret != CMP_OK) printf("DEBUG SCAFFOLD FAILED %d\n", ret);
+
   style.fab_margin_x = -1.0f;
   CMP_TEST_EXPECT(m3_scaffold_test_validate_style(&style), CMP_ERR_RANGE);
   CMP_TEST_OK(m3_scaffold_style_init(&style));

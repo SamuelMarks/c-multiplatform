@@ -1423,6 +1423,10 @@ static int m3_slider_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPScalar fraction;   /* GCOVR_EXCL_LINE */
   CMPScalar corner;     /* GCOVR_EXCL_LINE */
   CMPScalar thumb_size; /* GCOVR_EXCL_LINE */
+  CMPScalar current_track_height = 0.0f;
+  CMPScalar current_corner;
+  CMPScalar current_thumb_w;
+  CMPScalar current_thumb_h;
   int rc = CMP_OK;
 
   if (widget == NULL || ctx == NULL || ctx->gfx == NULL) { /* GCOVR_EXCL_LINE */
@@ -1481,7 +1485,11 @@ static int m3_slider_widget_paint(void *widget, CMPPaintContext *ctx) {
   track.width = bounds.width;
   track.x = bounds.x;
   track.y = bounds.y + (bounds.height - track.height) * 0.5f;
-  corner = slider->style.track_corner_radius;
+  current_corner = slider->style.track_corner_radius;
+  if (slider->style.is_media_slider && slider->pressed) { /* GCOVR_EXCL_LINE */
+    current_corner = current_track_height * 0.5f;
+  }
+  corner = current_corner;
 #ifdef CMP_TESTING
   if (m3_progress_test_fail_point_match(
           M3_PROGRESS_TEST_FAIL_SLIDER_CORNER_CLAMP)) {
@@ -1517,8 +1525,15 @@ static int m3_slider_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   thumb_size = slider->style.thumb_radius * 2.0f;
-  thumb.width = thumb_size;
-  thumb.height = thumb_size;
+  if (slider->style.is_media_slider) {
+    current_thumb_w = slider->style.thumb_width;
+    current_thumb_h = current_track_height;
+  } else {
+    current_thumb_w = thumb_size;
+    current_thumb_h = thumb_size;
+  }
+  thumb.width = current_thumb_w;
+  thumb.height = current_thumb_h;
   thumb.x = bounds.x + bounds.width * fraction - slider->style.thumb_radius;
   thumb.y = bounds.y + (bounds.height - thumb_size) * 0.5f;
   rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &thumb, thumb_color,
@@ -2449,3 +2464,23 @@ int CMP_CALL m3_progress_test_slider_update_value(M3Slider *slider,
   return m3_slider_update_value(slider, next_value, notify);
 }
 #endif
+
+int CMP_CALL m3_slider_style_init_media(M3SliderStyle *style) {
+  int rc;
+  if (style == NULL) return CMP_ERR_INVALID_ARGUMENT;
+  memset(style, 0, sizeof(*style));
+  style->track_length = M3_SLIDER_DEFAULT_LENGTH;
+  style->track_height = 8.0f;
+  style->active_track_height = 16.0f;
+  style->track_corner_radius = 4.0f;
+  style->thumb_radius = 8.0f;
+  style->thumb_width = 4.0f;
+  style->is_media_slider = CMP_TRUE;
+  rc = m3_progress_color_set(&style->track_color, 0.82f, 0.82f, 0.82f, 0.5f);
+  if (rc != CMP_OK) return rc; /* GCOVR_EXCL_LINE */
+  rc = m3_progress_color_set(&style->active_track_color, 0.26f, 0.52f, 0.96f, 1.0f);
+  if (rc != CMP_OK) return rc; /* GCOVR_EXCL_LINE */
+  rc = m3_progress_color_set(&style->thumb_color, 1.0f, 1.0f, 1.0f, 1.0f);
+  if (rc != CMP_OK) return rc; /* GCOVR_EXCL_LINE */
+  return CMP_OK;
+}

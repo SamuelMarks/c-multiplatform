@@ -638,7 +638,46 @@ static int test_progress_helpers(void) {
   return CMP_OK;
 }
 
+static int test_slider_media_style(void) {
+
+  M3SliderStyle style;
+
+  if (m3_slider_style_init_media(NULL) != CMP_ERR_INVALID_ARGUMENT) return 1;
+
+
+  if (m3_slider_style_init_media(&style) != CMP_OK) return 1;
+  if (style.is_media_slider != CMP_TRUE) return 1;
+  if (style.track_height != 8.0f) return 1;
+  if (style.active_track_height != 16.0f) return 1;
+  
+  /* Paint test for media slider */
+  {
+    M3Slider slider;
+    CMPGfx gfx;
+    CMPPaintContext paint_ctx;
+    TestProgressBackend backend;
+    test_backend_init(&backend);
+    gfx.ctx = &backend;
+    gfx.vtable = &g_test_vtable;
+    paint_ctx.gfx = &gfx;
+    paint_ctx.clip.x = 0; paint_ctx.clip.y = 0; paint_ctx.clip.width = 1000; paint_ctx.clip.height = 1000;
+    paint_ctx.dpi_scale = 1.0f;
+    
+    m3_slider_init(&slider, &style, 0.0f, 1.0f, 0.5f);
+    CMPRect bounds = {0.0f, 0.0f, 100.0f, 40.0f};
+    slider.widget.vtable->layout(&slider, bounds);
+    
+    slider.pressed = CMP_TRUE;
+    slider.widget.vtable->paint(&slider, &paint_ctx);
+  }
+
+
+  return 0;
+
+}
+
 int main(void) {
+  if (test_slider_media_style() != 0) return 1;
   TestProgressBackend backend;
   CMPGfx gfx;
   CMPPaintContext paint_ctx;
@@ -1728,3 +1767,4 @@ int main(void) {
 
   return 0;
 }
+

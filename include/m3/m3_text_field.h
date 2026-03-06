@@ -33,7 +33,8 @@ extern "C" {
  * @brief Material 3 Text Field style descriptor.
  */
 typedef struct M3TextFieldStyle {
-  cmp_u32 variant;                    /**< Variant (M3_TEXT_FIELD_VARIANT_*). */
+  cmp_u32 variant; /**< Text field visual variant. */
+  CMPBool is_rtl;                     /**< CMP_TRUE if layout should be right-to-left. */                    /**< Variant (M3_TEXT_FIELD_VARIANT_*). */
   CMPTextFieldStyle core;             /**< Core text field styling. */
   CMPColor error_color;               /**< Color for error state. */
   CMPColor supporting_color;          /**< Color for supporting text. */

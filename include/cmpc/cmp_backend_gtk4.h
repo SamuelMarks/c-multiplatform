@@ -111,4 +111,14 @@ cmp_gtk4_backend_test_validate_config(const CMPGTK4BackendConfig *config);
 } /* extern "C" */
 #endif
 
+
+/**
+ * @brief Save the current window surface to a PNG file.
+ * @param backend GTK4 backend.
+ * @param window Window handle.
+ * @param path Output PNG file path.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend, CMPHandle window, const char *path);
+
 #endif /* CMP_BACKEND_GTK4_H */

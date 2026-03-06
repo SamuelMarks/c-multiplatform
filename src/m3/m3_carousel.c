@@ -20,6 +20,10 @@ CMP_API int CMP_CALL m3_carousel_style_init(M3CarouselStyle *style) {
   if (style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
+  style->variant = M3_CAROUSEL_VARIANT_STANDARD;
+  style->item_width = 0.0f;
+  style->hero_width = 0.0f;
+  style->min_item_width = 0.0f;
   style->item_spacing = 8.0f;
   style->snap_velocity = 500.0f;
   style->background_color.r = 0.0f;
@@ -264,5 +268,37 @@ static int m3_carousel_destroy(void *widget) {
   if (carousel->items != NULL) { /* GCOVR_EXCL_LINE */
     free(carousel->items);
   }
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_carousel_style_init_hero(M3CarouselStyle *style) {
+  if (style == NULL) return CMP_ERR_INVALID_ARGUMENT;
+  style->variant = M3_CAROUSEL_VARIANT_STANDARD;
+  style->item_width = 0.0f;
+  style->hero_width = 0.0f;
+  style->min_item_width = 0.0f;
+  style->item_spacing = 8.0f;
+  style->snap_velocity = 500.0f;
+  style->background_color.r = 0.0f; style->background_color.g = 0.0f; style->background_color.b = 0.0f; style->background_color.a = 0.0f;
+  style->variant = M3_CAROUSEL_VARIANT_HERO;
+  style->item_width = 56.0f; /* Small peeking items */
+  style->hero_width = 300.0f; /* Large focused item */
+  style->min_item_width = 56.0f;
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL m3_carousel_style_init_multi_browse(M3CarouselStyle *style) {
+  if (style == NULL) return CMP_ERR_INVALID_ARGUMENT;
+  style->variant = M3_CAROUSEL_VARIANT_STANDARD;
+  style->item_width = 0.0f;
+  style->hero_width = 0.0f;
+  style->min_item_width = 0.0f;
+  style->item_spacing = 8.0f;
+  style->snap_velocity = 500.0f;
+  style->background_color.r = 0.0f; style->background_color.g = 0.0f; style->background_color.b = 0.0f; style->background_color.a = 0.0f;
+  style->variant = M3_CAROUSEL_VARIANT_MULTI_BROWSE;
+  style->item_width = 0.0f; /* dynamic based on min_item_width */
+  style->hero_width = 0.0f;
+  style->min_item_width = 160.0f;
   return CMP_OK;
 }

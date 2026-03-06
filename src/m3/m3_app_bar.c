@@ -701,8 +701,7 @@ static int m3_app_bar_widget_paint(void *widget, CMPPaintContext *ctx) {
     return rc;
   }
 
-  rc = ctx->gfx->text_vtable->draw_text(
-      ctx->gfx->ctx, bar->title_font, bar->utf8_title, bar->title_len,
+  rc = cmp_text_draw_utf8_gfx(ctx->gfx, bar->title_font, bar->utf8_title, bar->title_len,
       bar->style.is_rtl ? 1 : 0, text_x, text_y, bar->style.title_style.color);
   if (rc != CMP_OK) {
     return rc;

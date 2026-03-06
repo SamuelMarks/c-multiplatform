@@ -16,8 +16,22 @@ extern "C" {
 /**
  * @brief Material 3 Carousel style descriptor.
  */
+/** 
+ * @brief Carousel variant type. 
+ */ 
+typedef enum M3CarouselVariant { 
+  M3_CAROUSEL_VARIANT_STANDARD = 0, 
+  M3_CAROUSEL_VARIANT_HERO = 1, 
+  M3_CAROUSEL_VARIANT_MULTI_BROWSE = 2 
+} M3CarouselVariant;
+
+/** @brief Carousel style configuration. */
 typedef struct M3CarouselStyle {
   CMPScalar item_spacing;    /**< Spacing between items. */
+  M3CarouselVariant variant; /**< The variant of the carousel. */ 
+  CMPScalar item_width;      /**< Width of items (ignored if <= 0). */ 
+  CMPScalar hero_width;      /**< Hero item width for hero variant. */ 
+  CMPScalar min_item_width;  /**< Minimum item width for multi-browse. */
   CMPScalar snap_velocity;   /**< Velocity threshold for snapping. */
   CMPColor background_color; /**< Background color. */
 } M3CarouselStyle;
@@ -62,6 +76,19 @@ typedef struct M3Carousel {
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL m3_carousel_style_init(M3CarouselStyle *style);
+/**
+ * @brief Initialize a hero carousel style.
+ * @param style The style to initialize.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_carousel_style_init_hero(M3CarouselStyle *style);
+
+/**
+ * @brief Initialize a multi-browse carousel style.
+ * @param style The style to initialize.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL m3_carousel_style_init_multi_browse(M3CarouselStyle *style);
 
 /**
  * @brief Initialize a Material 3 carousel.

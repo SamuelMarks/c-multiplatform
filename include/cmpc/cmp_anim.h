@@ -226,6 +226,21 @@ CMP_API int CMP_CALL cmp_anim_controller_is_running(
  */
 CMP_API int CMP_CALL cmp_anim_controller_stop(CMPAnimController *controller);
 
+/**
+ * @brief Globally enable or disable reduced motion.
+ * When enabled, animations will complete immediately.
+ * @param enable CMP_TRUE to enable reduced motion.
+ * @return CMP_OK on success.
+ */
+CMP_API int CMP_CALL cmp_anim_set_reduced_motion(CMPBool enable);
+
+/**
+ * @brief Query the global reduced motion setting.
+ * @param out_enable Receives CMP_TRUE if reduced motion is enabled.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_anim_get_reduced_motion(CMPBool *out_enable);
+
 #if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Test wrapper for easing evaluation.

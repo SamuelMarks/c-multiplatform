@@ -12,6 +12,7 @@ extern "C" {
 
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_layout.h"
+#include "m3/m3_adaptive.h"
 #include "cmpc/cmp_visuals.h"
 
 /** @brief Standard bottom sheet variant. */
@@ -95,6 +96,7 @@ typedef int(CMP_CALL *CMPSideSheetOnAction)(void *ctx,
  */
 typedef struct M3SheetStyle {
   cmp_u32 variant;        /**< Sheet variant (CMP_SHEET_VARIANT_*). */
+  M3FoldableHinge hinge;  /**< Hinge parameters for foldables. */
   CMPLayoutEdges padding; /**< Padding around sheet contents. */
   CMPScalar height;       /**< Preferred sheet height in pixels (>= 0). */
   CMPScalar min_height;   /**< Minimum sheet height in pixels (>= 0). */
@@ -138,7 +140,8 @@ typedef struct M3Sheet {
  * @brief Side sheet style descriptor.
  */
 typedef struct M3SideSheetStyle {
-  cmp_u32 variant;        /**< Sheet variant (M3_SIDE_SHEET_VARIANT_*). */
+  cmp_u32 variant;        /**< Sheet variant (CMP_SHEET_VARIANT_*). */
+  M3FoldableHinge hinge;  /**< Hinge parameters for foldables. */
   cmp_u32 placement;      /**< Placement (M3_SIDE_SHEET_PLACEMENT_*). */
   CMPLayoutEdges padding; /**< Padding around sheet contents. */
   CMPScalar width;        /**< Preferred sheet width in pixels (>= 0). */

@@ -51,6 +51,28 @@ int CMP_CALL m3_adaptive_list_detail_layout(const M3AdaptiveLayout *layout,
     return CMP_ERR_RANGE;
   }
 
+  if (layout->hinge.is_separating && (layout->hinge.bounds.height >= layout->hinge.bounds.width || layout->hinge.posture == M3_POSTURE_HALF_OPENED_BOOK)) { /* GCOVR_EXCL_LINE */
+    out_primary->y = bounds.y;
+    out_primary->height = bounds.height;
+    out_secondary->y = bounds.y;
+    out_secondary->height = bounds.height;
+    if (is_rtl) {
+      out_secondary->x = bounds.x;
+      out_secondary->width = layout->hinge.bounds.x - bounds.x;
+      out_primary->x = layout->hinge.bounds.x + layout->hinge.bounds.width;
+      out_primary->width = bounds.x + bounds.width - out_primary->x;
+    } else {
+      out_primary->x = bounds.x;
+      out_primary->width = layout->hinge.bounds.x - bounds.x;
+      out_secondary->x = layout->hinge.bounds.x + layout->hinge.bounds.width;
+      out_secondary->width = bounds.x + bounds.width - out_secondary->x;
+    }
+    if (out_primary->width < 0.0f) out_primary->width = 0.0f; /* GCOVR_EXCL_LINE */
+    if (out_secondary->width < 0.0f) out_secondary->width = 0.0f; /* GCOVR_EXCL_LINE */
+    return CMP_OK;
+  }
+
+
   if (layout->window_class == M3_WINDOW_CLASS_COMPACT) {
     *out_primary = bounds;
     out_secondary->x = bounds.x;
@@ -118,6 +140,28 @@ int CMP_CALL m3_adaptive_feed_layout(const M3AdaptiveLayout *layout,
   if (bounds.width < 0.0f || bounds.height < 0.0f) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE;
   }
+
+  if (layout->hinge.is_separating && (layout->hinge.bounds.height >= layout->hinge.bounds.width || layout->hinge.posture == M3_POSTURE_HALF_OPENED_BOOK)) { /* GCOVR_EXCL_LINE */
+    out_primary->y = bounds.y;
+    out_primary->height = bounds.height;
+    out_secondary->y = bounds.y;
+    out_secondary->height = bounds.height;
+    if (is_rtl) {
+      out_secondary->x = bounds.x;
+      out_secondary->width = layout->hinge.bounds.x - bounds.x;
+      out_primary->x = layout->hinge.bounds.x + layout->hinge.bounds.width;
+      out_primary->width = bounds.x + bounds.width - out_primary->x;
+    } else {
+      out_primary->x = bounds.x;
+      out_primary->width = layout->hinge.bounds.x - bounds.x;
+      out_secondary->x = layout->hinge.bounds.x + layout->hinge.bounds.width;
+      out_secondary->width = bounds.x + bounds.width - out_secondary->x;
+    }
+    if (out_primary->width < 0.0f) out_primary->width = 0.0f; /* GCOVR_EXCL_LINE */
+    if (out_secondary->width < 0.0f) out_secondary->width = 0.0f; /* GCOVR_EXCL_LINE */
+    return CMP_OK;
+  }
+
 
   if (layout->window_class == M3_WINDOW_CLASS_COMPACT) {
     *out_primary = bounds;
@@ -187,6 +231,28 @@ int CMP_CALL m3_adaptive_supporting_pane_layout(const M3AdaptiveLayout *layout,
   if (bounds.width < 0.0f || bounds.height < 0.0f) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE;
   }
+
+  if (layout->hinge.is_separating && (layout->hinge.bounds.height >= layout->hinge.bounds.width || layout->hinge.posture == M3_POSTURE_HALF_OPENED_BOOK)) { /* GCOVR_EXCL_LINE */
+    out_primary->y = bounds.y;
+    out_primary->height = bounds.height;
+    out_secondary->y = bounds.y;
+    out_secondary->height = bounds.height;
+    if (is_rtl) {
+      out_secondary->x = bounds.x;
+      out_secondary->width = layout->hinge.bounds.x - bounds.x;
+      out_primary->x = layout->hinge.bounds.x + layout->hinge.bounds.width;
+      out_primary->width = bounds.x + bounds.width - out_primary->x;
+    } else {
+      out_primary->x = bounds.x;
+      out_primary->width = layout->hinge.bounds.x - bounds.x;
+      out_secondary->x = layout->hinge.bounds.x + layout->hinge.bounds.width;
+      out_secondary->width = bounds.x + bounds.width - out_secondary->x;
+    }
+    if (out_primary->width < 0.0f) out_primary->width = 0.0f; /* GCOVR_EXCL_LINE */
+    if (out_secondary->width < 0.0f) out_secondary->width = 0.0f; /* GCOVR_EXCL_LINE */
+    return CMP_OK;
+  }
+
 
   if (layout->window_class == M3_WINDOW_CLASS_COMPACT ||
       layout->window_class == M3_WINDOW_CLASS_MEDIUM) {

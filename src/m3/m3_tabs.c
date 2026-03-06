@@ -330,7 +330,10 @@ static int m3_tab_row_validate_style(const M3TabRowStyle *style,
   if (style->indicator_anim_easing != CMP_ANIM_EASE_LINEAR && /* GCOVR_EXCL_LINE */
       style->indicator_anim_easing != CMP_ANIM_EASE_IN && /* GCOVR_EXCL_LINE */
       style->indicator_anim_easing != CMP_ANIM_EASE_OUT &&
-      style->indicator_anim_easing != CMP_ANIM_EASE_IN_OUT) { /* GCOVR_EXCL_LINE */
+      style->indicator_anim_easing != CMP_ANIM_EASE_IN_OUT && /* GCOVR_EXCL_LINE */
+      style->indicator_anim_easing != CMP_ANIM_EASE_EMPHASIZED &&
+      style->indicator_anim_easing != CMP_ANIM_EASE_EMPHASIZED_DECELERATE && /* GCOVR_EXCL_LINE */
+      style->indicator_anim_easing != CMP_ANIM_EASE_EMPHASIZED_ACCELERATE) { /* GCOVR_EXCL_LINE */
     return CMP_ERR_RANGE;
   }
 
@@ -1418,8 +1421,7 @@ static int m3_tab_row_widget_paint(void *widget, CMPPaintContext *ctx) {
       text_color = row->style.selected_text_color;
     }
 
-    rc = ctx->gfx->text_vtable->draw_text(
-        ctx->gfx->ctx, row->font, row->items[i].utf8_label,
+    rc = cmp_text_draw_utf8_gfx(ctx->gfx, row->font, row->items[i].utf8_label,
         row->items[i].utf8_len, row->style.is_rtl ? 1 : 0, text_x, text_y,
         text_color);
     if (rc != CMP_OK) {
@@ -2844,8 +2846,7 @@ static int m3_segmented_widget_paint(void *widget, CMPPaintContext *ctx) {
     text_y = segment_rect.y + (segment_rect.height - metrics.height) * 0.5f +
              metrics.baseline;
 
-    rc = ctx->gfx->text_vtable->draw_text(
-        ctx->gfx->ctx, buttons->font, buttons->items[i].utf8_label,
+    rc = cmp_text_draw_utf8_gfx(ctx->gfx, buttons->font, buttons->items[i].utf8_label,
         buttons->items[i].utf8_len, buttons->style.is_rtl ? 1 : 0, text_x,
         text_y, text_color);
     if (rc != CMP_OK) {

@@ -240,8 +240,7 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
              tooltip->metrics.body_metrics.baseline;
 
     if (tooltip->metrics.has_body == CMP_TRUE) { /* GCOVR_EXCL_LINE */
-      rc = ctx->gfx->text_vtable->draw_text(
-          ctx->gfx->ctx, tooltip->plain_font, tooltip->utf8_body,
+      rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->plain_font, tooltip->utf8_body,
           tooltip->body_len, 0, text_x, text_y, text_color);
       if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
         return rc; /* GCOVR_EXCL_LINE */
@@ -259,8 +258,7 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     if (tooltip->metrics.has_title == CMP_TRUE) { /* GCOVR_EXCL_LINE */
       text_y += tooltip->metrics.title_metrics.baseline;
-      rc = ctx->gfx->text_vtable->draw_text(
-          ctx->gfx->ctx, tooltip->title_font, tooltip->utf8_title,
+      rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->title_font, tooltip->utf8_title,
           tooltip->title_len, 0, text_x, text_y, text_color);
       if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
         return rc; /* GCOVR_EXCL_LINE */
@@ -272,8 +270,7 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     if (tooltip->metrics.has_body == CMP_TRUE) { /* GCOVR_EXCL_LINE */
       text_y += tooltip->metrics.body_metrics.baseline;
-      rc = ctx->gfx->text_vtable->draw_text(
-          ctx->gfx->ctx, tooltip->body_font, tooltip->utf8_body,
+      rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->body_font, tooltip->utf8_body,
           tooltip->body_len, 0, text_x, text_y, text_color);
       if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
         return rc; /* GCOVR_EXCL_LINE */

@@ -126,6 +126,16 @@ CMP_API int CMP_CALL m3_tonal_palette_tone_argb(const M3TonalPalette *palette,
 /**
  * @brief Dynamic color scheme variants (Material Design 3).
  */
+/** 
+ * @brief Contrast level for dynamic color schemes. 
+ */ 
+typedef enum M3ContrastLevel { 
+  M3_CONTRAST_STANDARD = 0, /**< Standard contrast (default). */ 
+  M3_CONTRAST_MEDIUM,       /**< Medium contrast. */ 
+  M3_CONTRAST_HIGH          /**< High contrast. */ 
+} M3ContrastLevel;
+
+/** @brief Variant for scheme generation. */
 typedef enum M3SchemeVariant {
   M3_SCHEME_VARIANT_TONAL_SPOT = 0, /**< Default: Tonal Spot. */
   M3_SCHEME_VARIANT_EXPRESSIVE, /**< Expressive: Shifted hues, high chroma. */
@@ -165,6 +175,21 @@ CMP_API int CMP_CALL m3_scheme_generate_variant(cmp_u32 source_argb,
  * @return CMP_OK on success or a failure code.
  */
 struct CMPWS;
+
+/** 
+ * @brief Generate a dynamic color scheme with a specific variant and contrast level. 
+ * @param source_argb Source color in ARGB. 
+ * @param dark CMP_TRUE for dark scheme; CMP_FALSE for light scheme. 
+ * @param variant The scheme variant to use. 
+ * @param contrast The contrast level to apply. 
+ * @param out_scheme Receives the generated scheme. 
+ * @return CMP_OK on success or a failure code. 
+ */
+CMP_API int CMP_CALL m3_scheme_generate_with_contrast(cmp_u32 source_argb, 
+                                                      CMPBool dark, 
+                                                      M3SchemeVariant variant, 
+                                                      M3ContrastLevel contrast, 
+                                                      M3Scheme *out_scheme);
 
 /**
  * @brief Generate a dynamic color scheme from the system accent color.

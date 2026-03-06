@@ -325,8 +325,7 @@ static int m3_text_field_paint(void *widget, CMPPaintContext *ctx) {
       field->core_field.text_backend.vtable->measure_text(
           field->core_field.text_backend.ctx, font, sub_text, strlen(sub_text),
           0, &w, &h, &baseline);
-      field->core_field.text_backend.vtable->draw_text(
-          field->core_field.text_backend.ctx, font, sub_text, strlen(sub_text),
+      cmp_text_draw_utf8(&field->core_field.text_backend, font, sub_text, strlen(sub_text),
           0, text_bounds.x, text_bounds.y + baseline, sub_color);
       field->core_field.text_backend.vtable->destroy_font(
           field->core_field.text_backend.ctx, font);
