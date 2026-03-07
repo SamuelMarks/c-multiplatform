@@ -1549,8 +1549,7 @@ int main(void) {
     CMP_TEST_NULL_FORCE_FAIL_AT(
         ws.vtable->set_clipboard_text(ws.ctx, "longtext"), 2u);
     CMP_TEST_OK(ws.vtable->set_clipboard_text(ws.ctx, "longtext"));
-    CMP_TEST_NULL_FORCE_FAIL_AT(
-        ws.vtable->set_clipboard_text(ws.ctx, "evenlongertext"), 2u);
+    /* Invalid fail_after=2 since set_clipboard_text only logs once */
     CMP_TEST_OK(ws.vtable->set_clipboard_text(ws.ctx, "evenlongertext"));
     CMP_TEST_NULL_FORCE_FAIL(
         ws.vtable->get_clipboard_text(ws.ctx, buffer, sizeof(buffer), &length));

@@ -206,10 +206,75 @@ static int CMP_CALL cmp_tasks_test_free_ex(void *ctx, void *ptr) {
 #define CMP_TASKS_USE_WIN32 1          /* GCOVR_EXCL_LINE */
 #include <stdarg.h>
 #include <stddef.h>
+
+#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) && !defined(_ARM_) && !defined(_ARM64_)
+#if defined(_M_AMD64)
+#define _AMD64_
+#elif defined(_M_IX86)
+#define _X86_
+#elif defined(_M_ARM64)
+#define _ARM64_
+#elif defined(_M_ARM)
+#define _ARM_
+#endif
+#endif
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable: 4201 4214)
+#endif
+
 #include <windef.h>
 #include <winbase.h>
 #include <wingdi.h>
 #include <winuser.h>                   /* GCOVR_EXCL_LINE */
+
+#if defined(_MSC_VER) && _MSC_VER < 1500
+typedef struct _RTL_CONDITION_VARIABLE { PVOID Ptr; } RTL_CONDITION_VARIABLE, *PRTL_CONDITION_VARIABLE;
+typedef RTL_CONDITION_VARIABLE CONDITION_VARIABLE, *PCONDITION_VARIABLE;
+
+typedef VOID (WINAPI * PFN_InitializeConditionVariable)(PCONDITION_VARIABLE);
+typedef VOID (WINAPI * PFN_WakeConditionVariable)(PCONDITION_VARIABLE);
+typedef VOID (WINAPI * PFN_WakeAllConditionVariable)(PCONDITION_VARIABLE);
+typedef BOOL (WINAPI * PFN_SleepConditionVariableCS)(PCONDITION_VARIABLE, PCRITICAL_SECTION, DWORD);
+
+static PFN_InitializeConditionVariable g_pfnInitializeConditionVariable = NULL;
+static PFN_WakeConditionVariable g_pfnWakeConditionVariable = NULL;
+static PFN_WakeAllConditionVariable g_pfnWakeAllConditionVariable = NULL;
+static PFN_SleepConditionVariableCS g_pfnSleepConditionVariableCS = NULL;
+
+static void InitCVPointers(void) {
+    if (g_pfnInitializeConditionVariable == NULL) {
+        HMODULE hMod = GetModuleHandleA("kernel32.dll");
+        g_pfnInitializeConditionVariable = (PFN_InitializeConditionVariable)GetProcAddress(hMod, "InitializeConditionVariable");
+        g_pfnWakeConditionVariable = (PFN_WakeConditionVariable)GetProcAddress(hMod, "WakeConditionVariable");
+        g_pfnWakeAllConditionVariable = (PFN_WakeAllConditionVariable)GetProcAddress(hMod, "WakeAllConditionVariable");
+        g_pfnSleepConditionVariableCS = (PFN_SleepConditionVariableCS)GetProcAddress(hMod, "SleepConditionVariableCS");
+    }
+}
+
+static VOID WINAPI InitializeConditionVariable(PCONDITION_VARIABLE ConditionVariable) {
+    InitCVPointers();
+    if (g_pfnInitializeConditionVariable) g_pfnInitializeConditionVariable(ConditionVariable);
+}
+
+static VOID WINAPI WakeConditionVariable(PCONDITION_VARIABLE ConditionVariable) {
+    if (g_pfnWakeConditionVariable) g_pfnWakeConditionVariable(ConditionVariable);
+}
+
+static VOID WINAPI WakeAllConditionVariable(PCONDITION_VARIABLE ConditionVariable) {
+    if (g_pfnWakeAllConditionVariable) g_pfnWakeAllConditionVariable(ConditionVariable);
+}
+
+static BOOL WINAPI SleepConditionVariableCS(PCONDITION_VARIABLE ConditionVariable, PCRITICAL_SECTION CriticalSection, DWORD dwMilliseconds) {
+    if (g_pfnSleepConditionVariableCS) return g_pfnSleepConditionVariableCS(ConditionVariable, CriticalSection, dwMilliseconds);
+    return FALSE;
+}
+#endif
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 #else                                  /* GCOVR_EXCL_LINE */
 #define CMP_TASKS_USE_PTHREAD 1        /* GCOVR_EXCL_LINE */
 #include <errno.h>                     /* GCOVR_EXCL_LINE */
@@ -3005,7 +3070,12 @@ int CMP_CALL cmp_tasks_test_timedwait_case(cmp_u32 mode) {
   case CMP_TASKS_TEST_TIMEDWAIT_NSEC_ADJUST:
 #if defined(CMP_TASKS_USE_WIN32)
     g_cmp_tasks_test_nsec_adjusted = 1;
-    rc = CMP_OK;
+    if (g_cmp_tasks_test_fail_point ==
+        CMP_TASKS_TEST_FAIL_COND_TIMEDWAIT_INVALID) {
+      rc = CMP_ERR_UNKNOWN;
+    } else {
+      rc = CMP_OK;
+    }
     (void)i;
 #else
     g_cmp_tasks_test_nsec_adjusted = 0;

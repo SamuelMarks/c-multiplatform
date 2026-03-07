@@ -30,6 +30,23 @@
 
 #endif
 
+#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) && !defined(_ARM_) && !defined(_ARM64_)
+#if defined(_M_AMD64)
+#define _AMD64_
+#elif defined(_M_IX86)
+#define _X86_
+#elif defined(_M_ARM64)
+#define _ARM64_
+#elif defined(_M_ARM)
+#define _ARM_
+#endif
+#endif
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable: 4201 4214)
+#endif
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <windef.h>
@@ -38,7 +55,14 @@
 #include <winuser.h>
 #include <winnls.h>
 
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1500
+#define CMP_WIN32_USE_WINHTTP 1
 #include <winhttp.h>
+#endif
 
 #endif
 
@@ -352,6 +376,7 @@ static int cmp_win32_add_usize(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
   return CMP_OK;
 }
 
+#ifdef CMP_WIN32_USE_WINHTTP
 static int cmp_win32_network_error_from_winhttp(DWORD error_code) {
 
   switch (error_code) {
@@ -451,6 +476,8 @@ static int cmp_win32_network_copy_wide_range(struct CMPWin32Backend *backend,
 
   return CMP_OK;
 }
+
+#endif
 
 static int cmp_win32_backend_log(struct CMPWin32Backend *backend,
 
@@ -675,7 +702,7 @@ static int cmp_win32_get_modifiers(cmp_u32 *out_mods) {
   *out_mods = mods; return 0;
 }
 
-static int cmp_win32_get_time_ms(cmp_u32 *out_time) { return (cmp_u32)GetTickCount(); }
+static int cmp_win32_get_time_ms(cmp_u32 *out_time) { *out_time = (cmp_u32)GetTickCount(); return CMP_OK; }
 
 static int cmp_win32_utf8_to_wide_alloc(struct CMPWin32Backend *backend,
 
@@ -1159,11 +1186,14 @@ static int cmp_win32_query_dpi_scale(HWND hwnd, CMPScalar *out_scale) {
 
   CMPScalar scale;
 
+  if (out_scale == NULL) return CMP_ERR_INVALID_ARGUMENT;
+
   hdc = GetDC(hwnd);
 
   if (hdc == NULL) {
 
-    return 1.0f;
+    *out_scale = 1.0f;
+    return CMP_OK;
   }
 
   dpi = GetDeviceCaps(hdc, LOGPIXELSX);
@@ -1172,7 +1202,8 @@ static int cmp_win32_query_dpi_scale(HWND hwnd, CMPScalar *out_scale) {
 
   if (dpi <= 0) {
 
-    return 1.0f;
+    *out_scale = 1.0f;
+    return CMP_OK;
   }
 
   scale = (CMPScalar)dpi / 96.0f;
@@ -1182,7 +1213,8 @@ static int cmp_win32_query_dpi_scale(HWND hwnd, CMPScalar *out_scale) {
     scale = 1.0f;
   }
 
-  return scale;
+  *out_scale = scale;
+  return CMP_OK;
 }
 
 static int cmp_win32_window_ensure_backbuffer(CMPWin32Window *window,
@@ -1339,11 +1371,12 @@ static int cmp_win32_channel_from_scalar(CMPScalar value, cmp_u8 *out_val) {
 
 static int cmp_win32_color_to_colorref(CMPColor color, COLORREF *out_color) {
 
-  cmp_u8 r; cmp_win32_channel_from_scalar(color.r, &r);
-
-  cmp_u8 g; cmp_win32_channel_from_scalar(color.g, &g);
-
-  cmp_u8 b; cmp_win32_channel_from_scalar(color.b, &b);
+  cmp_u8 r;
+  cmp_u8 g;
+  cmp_u8 b;
+  cmp_win32_channel_from_scalar(color.r, &r);
+  cmp_win32_channel_from_scalar(color.g, &g);
+  cmp_win32_channel_from_scalar(color.b, &b);
 
   *out_color = RGB(r, g, b);
   return 0;
@@ -4772,6 +4805,7 @@ static const CMPCameraVTable g_cmp_win32_camera_vtable = {
 
     cmp_win32_camera_stop,  cmp_win32_camera_read_frame};
 
+#ifdef CMP_WIN32_USE_WINHTTP
 static int cmp_win32_network_request(void *net,
 
                                      const CMPNetworkRequest *request,
@@ -5480,6 +5514,30 @@ static int cmp_win32_network_free_response(void *net,
   return CMP_OK;
 }
 
+#else
+static int cmp_win32_network_request(void *net,
+                                     const CMPNetworkRequest *request,
+                                     const CMPAllocator *allocator,
+                                     CMPNetworkResponse *out_response) {
+  CMP_UNUSED(net);
+  CMP_UNUSED(request);
+  CMP_UNUSED(allocator);
+  if (out_response != NULL) {
+    memset(out_response, 0, sizeof(*out_response));
+  }
+  return CMP_ERR_UNSUPPORTED;
+}
+static int cmp_win32_network_free_response(void *net,
+                                           const CMPAllocator *allocator,
+                                           CMPNetworkResponse *response) {
+  CMP_UNUSED(net);
+  CMP_UNUSED(allocator);
+  if (response != NULL) {
+    memset(response, 0, sizeof(*response));
+  }
+  return CMP_ERR_UNSUPPORTED;
+}
+#endif
 static const CMPNetworkVTable g_cmp_win32_network_vtable = {
 
     cmp_win32_network_request, cmp_win32_network_free_response};

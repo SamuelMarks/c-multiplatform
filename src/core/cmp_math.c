@@ -144,7 +144,7 @@ int CMP_CALL cmp_mat3_identity(CMPMat3 *out_mat) {
 
 int CMP_CALL cmp_mat3_mul(const CMPMat3 *a, const CMPMat3 *b,
                           CMPMat3 *out_mat) {
-  CMPMat3 tmp;
+  CMPMat3 tmp = {{0}};
   int row;
   int col;
   int idx;

@@ -6,10 +6,32 @@
 #define CMP_LOG_USE_WIN32 1
 #include <stdarg.h>
 #include <stddef.h>
+
+#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) && !defined(_ARM_) && !defined(_ARM64_)
+#if defined(_M_AMD64)
+#define _AMD64_
+#elif defined(_M_IX86)
+#define _X86_
+#elif defined(_M_ARM64)
+#define _ARM64_
+#elif defined(_M_ARM)
+#define _ARM_
+#endif
+#endif
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable: 4201 4214)
+#endif
+
 #include <windef.h>
 #include <winbase.h>
 #include <wingdi.h>
 #include <winuser.h>
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 #else
 #define CMP_LOG_USE_PTHREAD 1
 #include <pthread.h>

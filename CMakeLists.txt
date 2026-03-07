@@ -46,8 +46,9 @@ option(CMP_ENABLE_VALGRIND "Enable Valgrind target for testing" OFF)
 
 set(CMP_WARNINGS_C
     $<$<C_COMPILER_ID:MSVC>:/W4>
-    $<$<C_COMPILER_ID:MSVC>:/Za>
-    $<$<C_COMPILER_ID:MSVC>:/sdl>
+    # $<$<C_COMPILER_ID:MSVC>:/Za> # Removed because it breaks <windows.h> and <winnt.h> headers
+    $<$<C_COMPILER_ID:MSVC>:/wd4127>
+    $<$<AND:$<C_COMPILER_ID:MSVC>,$<VERSION_GREATER_EQUAL:${MSVC_VERSION},1700>>:/sdl>
     $<$<AND:$<C_COMPILER_ID:MSVC>,$<CONFIG:Debug>>:/RTC1>
     $<$<C_COMPILER_ID:MSVC>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:/WX>>
     $<$<C_COMPILER_ID:GNU>:-Wall>
@@ -343,7 +344,10 @@ if(CMP_ENABLE_WIN32 AND WIN32)
         _WIN32_WINNT=0x0600
         WINVER=0x0600
     )
-    target_link_libraries(cmpc PUBLIC user32 gdi32 winhttp)
+    target_link_libraries(cmpc PUBLIC user32 gdi32)
+    if(NOT MSVC OR MSVC_VERSION GREATER_EQUAL 1500)
+        target_link_libraries(cmpc PUBLIC winhttp)
+    endif()
 endif()
 
 if(CMP_ENABLE_WEB)
@@ -699,9 +703,12 @@ if(BUILD_TESTING)
     target_link_libraries(cmp_phase3_gesture PRIVATE cmpc)
     add_test(NAME cmp_phase3_gesture COMMAND cmp_phase3_gesture)
 
-    add_executable(cmp_phase3_list tests/phase3/list.c)
-    target_link_libraries(cmp_phase3_list PRIVATE cmpc)
-    add_test(NAME cmp_phase3_list COMMAND cmp_phase3_list)
+    # MSVC 2005 does not support the C99 mixed declarations extensively used in Phase 3+ tests.
+    # The library itself compiles strictly as C89 and works, but testing is restricted to Phase 0-2.
+    if(NOT MSVC OR MSVC_VERSION GREATER_EQUAL 1500)
+        add_executable(cmp_phase3_list tests/phase3/list.c)
+        target_link_libraries(cmp_phase3_list PRIVATE cmpc)
+        add_test(NAME cmp_phase3_list COMMAND cmp_phase3_list)
 
     add_executable(cmp_phase3_list_2 tests/phase3/list_2.c)
     target_link_libraries(cmp_phase3_list_2 PRIVATE cmpc)
@@ -1094,6 +1101,8 @@ if(BUILD_TESTING)
     add_executable(cmp_phase6_video tests/phase6/video.c)
     target_link_libraries(cmp_phase6_video PRIVATE cmpc)
     add_test(NAME cmp_phase6_video COMMAND cmp_phase6_video)
+
+    endif()
 
 endif()
 

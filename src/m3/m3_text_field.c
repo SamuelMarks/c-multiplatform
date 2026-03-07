@@ -283,7 +283,7 @@ static int m3_text_field_paint(void *widget, CMPPaintContext *ctx) {
   M3TextField *field = (M3TextField *)widget;
   int rc;
   const char *sub_text;
-  CMPColor sub_color;
+  CMPColor sub_color = {0, 0, 0, 0};
   CMPRect text_bounds;
   CMPHandle font = {0};
 

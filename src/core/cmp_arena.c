@@ -11,7 +11,11 @@ struct CMPArenaBlock {
   struct CMPArenaBlock *next;
   cmp_usize capacity;
   cmp_usize offset;
-  unsigned char data[1];
+  union {
+    unsigned char data[1];
+    void *_align_ptr;
+    double _align_d;
+  } u;
 };
 
 static cmp_usize cmp_usize_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
@@ -270,7 +274,7 @@ int CMP_CALL cmp_arena_alloc(CMPArena *arena, cmp_usize size,
     return rc;
   }
 
-  *out_ptr = (void *)(block->data + aligned_offset); /* GCOVR_EXCL_LINE */
+  *out_ptr = (void *)(block->u.data + aligned_offset); /* GCOVR_EXCL_LINE */
   block->offset = new_offset;
   return CMP_OK;
 }

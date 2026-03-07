@@ -1455,5 +1455,5 @@ int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *b, CMPEnv *env) {
   return CMP_ERR_UNSUPPORTED;
 }
 /* GCOVR_EXCL_STOP */
-CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend, CMPHandle window_handle, const char *path) { return CMP_ERR_UNSUPPORTED; } /* GCOVR_EXCL_LINE */
+CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend, CMPHandle window_handle, const char *path) { CMP_UNUSED(backend); CMP_UNUSED(window_handle); CMP_UNUSED(path); return CMP_ERR_UNSUPPORTED; } /* GCOVR_EXCL_LINE */
 #endif

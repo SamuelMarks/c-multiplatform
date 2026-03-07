@@ -131,10 +131,12 @@ static void test_math_edge_cases(void) {
     if (cmp_rect_contains_point(&a, 5, 11, &cont) != CMP_OK || cont) exit(1);
 
     if (cmp_mat3_transform_point(NULL, 1, 1, &out_x, NULL) == CMP_OK) exit(1);
-    CMPMat3 zmat;
-    cmp_mat3_identity(&zmat);
-    zmat.m[8] = 0.0f; /* Make tw=0 for x=0, y=0 */
-    if (cmp_mat3_transform_point(&zmat, 0, 0, &out_x, &out_y) != CMP_ERR_RANGE) exit(1);
+    {
+      CMPMat3 zmat;
+      cmp_mat3_identity(&zmat);
+      zmat.m[8] = 0.0f; /* Make tw=0 for x=0, y=0 */
+      if (cmp_mat3_transform_point(&zmat, 0, 0, &out_x, &out_y) != CMP_ERR_RANGE) exit(1);
+    }
 }
 
 int main(void) {
