@@ -34,6 +34,13 @@ extern "C" {
 /** @brief Material 3 Standard Accelerate curve. */
 #define CMP_ANIM_EASE_STANDARD_ACCELERATE 9
 
+/** @brief Fluent 2 Standard easing. */
+#define CMP_ANIM_EASE_F2_STANDARD 10
+/** @brief Fluent 2 Decelerate easing. */
+#define CMP_ANIM_EASE_F2_DECELERATE 11
+/** @brief Fluent 2 Accelerate easing. */
+#define CMP_ANIM_EASE_F2_ACCELERATE 12
+
 /** @brief Controller idle mode. */
 #define CMP_ANIM_MODE_NONE 0
 /** @brief Controller timing mode. */

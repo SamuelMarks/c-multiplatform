@@ -10,6 +10,15 @@
 
 #include <wchar.h>
 
+#ifndef DWMWA_SYSTEMBACKDROP_TYPE
+#define DWMWA_SYSTEMBACKDROP_TYPE 38
+#define DWMSBT_AUTO 0
+#define DWMSBT_NONE 1
+#define DWMSBT_MAINWINDOW 2
+#define DWMSBT_TRANSIENTWINDOW 3
+#define DWMSBT_TABBEDWINDOW 4
+#endif
+
 #if defined(CMP_WIN32_AVAILABLE)
 
 #ifndef _WIN32_WINNT
@@ -59,10 +68,47 @@
 #pragma warning(pop)
 #endif
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1500
-#define CMP_WIN32_USE_WINHTTP 1
+#if defined(CMP_WIN32_USE_WINHTTP)
 #include <winhttp.h>
 #endif
+
+#ifndef UiaRootObjectId
+#define UiaRootObjectId -25
+#endif
+
+static void cmp_win32_apply_backdrop(HWND hwnd, cmp_u32 backdrop_type) {
+    HMODULE dwmapi;
+    typedef HRESULT(WINAPI * DwmSetWindowAttribute_t)(HWND, DWORD, LPCVOID, DWORD);
+    DwmSetWindowAttribute_t set_attr;
+    DWORD type = DWMSBT_AUTO;
+
+    if (backdrop_type == CMP_WS_BACKDROP_NONE) {
+        return; /* Let OS handle it */
+    }
+
+    dwmapi = LoadLibraryA("dwmapi.dll");
+    if (!dwmapi) {
+        return;
+    }
+
+    set_attr = (DwmSetWindowAttribute_t)(void *)GetProcAddress(dwmapi, "DwmSetWindowAttribute");
+    if (!set_attr) {
+        FreeLibrary(dwmapi);
+        return;
+    }
+
+    if (backdrop_type == CMP_WS_BACKDROP_MICA) {
+        type = DWMSBT_MAINWINDOW;
+    } else if (backdrop_type == CMP_WS_BACKDROP_MICA_ALT) {
+        type = DWMSBT_TABBEDWINDOW;
+    } else if (backdrop_type == CMP_WS_BACKDROP_ACRYLIC) {
+        type = DWMSBT_TRANSIENTWINDOW;
+    }
+
+    set_attr(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, &type, sizeof(type));
+
+    FreeLibrary(dwmapi);
+}
 
 #endif
 
@@ -1505,6 +1551,29 @@ static LRESULT CALLBACK cmp_win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam,
     return TRUE;
   }
 
+  if (msg == WM_NCHITTEST) {
+      /* If the window has custom drawn title bars but we want Windows 11 snap layouts, 
+         we must return HTCAPTION, HTMAXBUTTON, etc, from hit testing based on where the mouse is.
+         For a completely custom client area acting as a title bar, responding HTCAPTION allows dragging,
+         and responding HTMAXBUTTON triggers the snap assist flyout on hover.
+         Since LibCMPC draws its own UI, we would ideally route this to `cmp_api_ws` to ask the UI tree,
+         but for now we provide the hook. We let it pass to DefWindowProc if we don't handle it.
+      */
+      LRESULT hit = DefWindowProc(hwnd, msg, wparam, lparam);
+      
+      /* Optional logic could be placed here if `window` tracks custom title bar rects */
+
+      return hit;
+  }
+  
+  if (msg == WM_GETOBJECT) {
+      if (lparam == UiaRootObjectId) {
+          /* Route request for UIAutomation provider down to the internal UI tree state */
+          /* Out of scope for this C file without COM initialization, but this is the hook */
+          return 0; /* Let UIAutomationCore.dll handle fallback */
+      }
+  }
+
   if (window == NULL) {
 
     return DefWindowProc(hwnd, msg, wparam, lparam);
@@ -1977,6 +2046,8 @@ static int cmp_win32_ws_create_window(void *ws, const CMPWSWindowConfig *config,
 
     return CMP_ERR_UNKNOWN;
   }
+
+  cmp_win32_apply_backdrop(window->hwnd, config->backdrop_type);
 
   cmp_win32_query_dpi_scale(window->hwnd, &window->dpi_scale);
 

@@ -74,8 +74,27 @@ static int ws_create_window(void *ctx, const CMPWSWindowConfig *config, CMPHandl
         [win center];
 
         // Ensure the window has a valid content view for drawing
-        if (![win contentView]) {
-            [win setContentView:[[NSView alloc] initWithFrame:frame]];
+        NSView *contentView = [[NSView alloc] initWithFrame:frame];
+        [win setContentView:contentView];
+
+        // Apply macOS Visual Effect Materials if requested by CMP_WS_BACKDROP_*
+        if (config->backdrop_type != CMP_WS_BACKDROP_NONE) {
+            NSVisualEffectView *effectView = [[NSVisualEffectView alloc] initWithFrame:frame];
+            effectView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+            effectView.blendingMode = NSVisualEffectBlendingModeBehindWindow;
+            effectView.state = NSVisualEffectStateActive;
+            
+            if (config->backdrop_type == CMP_WS_BACKDROP_MICA || config->backdrop_type == CMP_WS_BACKDROP_MICA_ALT) {
+                effectView.material = NSVisualEffectMaterialWindowBackground;
+            } else if (config->backdrop_type == CMP_WS_BACKDROP_ACRYLIC) {
+                effectView.material = NSVisualEffectMaterialPopover;
+            } else {
+                effectView.material = NSVisualEffectMaterialAppearanceBased;
+            }
+            
+            [contentView addSubview:effectView];
+            win.backgroundColor = [NSColor clearColor];
+            win.opaque = NO;
         }
 
         [backend->windows addObject:win];

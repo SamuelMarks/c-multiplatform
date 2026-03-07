@@ -183,6 +183,15 @@ typedef struct CMPInputEvent {
   CMPInputEventData data; /**< Event payload. */
 } CMPInputEvent;
 
+/** @brief Disable system backdrop. */
+#define CMP_WS_BACKDROP_NONE 0
+/** @brief Standard Mica backdrop. */
+#define CMP_WS_BACKDROP_MICA 1
+/** @brief Mica Alt backdrop for tabbed apps. */
+#define CMP_WS_BACKDROP_MICA_ALT 2
+/** @brief Acrylic blur backdrop. */
+#define CMP_WS_BACKDROP_ACRYLIC 3
+
 /**
  * @brief Window creation configuration.
  */
@@ -191,6 +200,7 @@ typedef struct CMPWSWindowConfig {
   cmp_i32 height;         /**< Initial height in pixels. */
   const char *utf8_title; /**< Window title in UTF-8. */
   cmp_u32 flags;          /**< Window flags (CMP_WS_WINDOW_*). */
+  cmp_u32 backdrop_type;  /**< System backdrop (CMP_WS_BACKDROP_*). */
 } CMPWSWindowConfig;
 
 /**

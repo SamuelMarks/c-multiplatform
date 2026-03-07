@@ -2742,6 +2742,35 @@ static int cmp_web_ws_shutdown(void *ws) {
   return CMP_OK;
 }
 
+#if defined(CMP_WEB_AVAILABLE)
+EM_JS(void, cmp_web_apply_backdrop_js, (const char* canvas_id, cmp_u32 backdrop_type), {
+    var canvas = document.querySelector(UTF8ToString(canvas_id));
+    if (!canvas) return;
+    
+    // Fluent 2 Backdrop Mappings
+    if (backdrop_type === 1 || backdrop_type === 2) { // MICA or MICA_ALT
+        // Apply Mica-like subtle tint
+        document.body.style.backgroundColor = "#f3f3f3"; // light default
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.style.backgroundColor = "#202020";
+        }
+        canvas.style.backgroundColor = "transparent";
+    } else if (backdrop_type === 3) { // ACRYLIC
+        // Apply Acrylic CSS blur
+        canvas.style.backdropFilter = "blur(30px) saturate(125%)";
+        canvas.style.webkitBackdropFilter = "blur(30px) saturate(125%)";
+        canvas.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            canvas.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+        }
+    } else {
+        canvas.style.backdropFilter = "none";
+        canvas.style.webkitBackdropFilter = "none";
+        canvas.style.backgroundColor = "transparent";
+    }
+});
+#endif
+
 static int cmp_web_ws_create_window(void *ws, const CMPWSWindowConfig *config,
                                     CMPHandle *out_window) {
   struct CMPWebBackend *backend;
@@ -2782,6 +2811,10 @@ static int cmp_web_ws_create_window(void *ws, const CMPWSWindowConfig *config,
     ratio = 1.0;
   }
   window->dpi_scale = (CMPScalar)ratio;
+
+#if defined(CMP_WEB_AVAILABLE)
+  cmp_web_apply_backdrop_js(backend->canvas_id, config->backdrop_type);
+#endif
 
   rc = cmp_object_header_init(&window->header, CMP_WEB_TYPE_WINDOW, 0,
                               &g_cmp_web_window_vtable);

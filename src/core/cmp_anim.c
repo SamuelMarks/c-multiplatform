@@ -119,12 +119,19 @@ static int cmp_anim_ease_apply(cmp_u32 easing, CMPScalar t,
   case CMP_ANIM_EASE_STANDARD_ACCELERATE:
     *out_value = cmp_anim_cubic_bezier(clamped, 0.3f, 0.0f, 1.0f, 1.0f);
     return CMP_OK;
+  case CMP_ANIM_EASE_F2_STANDARD:
+    *out_value = cmp_anim_cubic_bezier(clamped, 0.0f, 0.0f, 0.0f, 1.0f);
+    return CMP_OK;
+  case CMP_ANIM_EASE_F2_DECELERATE:
+    *out_value = cmp_anim_cubic_bezier(clamped, 0.0f, 0.0f, 0.0f, 1.0f);
+    return CMP_OK;
+  case CMP_ANIM_EASE_F2_ACCELERATE:
+    *out_value = cmp_anim_cubic_bezier(clamped, 1.0f, 0.0f, 1.0f, 1.0f);
+    return CMP_OK;
   default:
     return CMP_ERR_INVALID_ARGUMENT;
   }
-}
-
-int CMP_CALL cmp_anim_timing_init(CMPAnimTiming *timing, CMPScalar from,
+  }int CMP_CALL cmp_anim_timing_init(CMPAnimTiming *timing, CMPScalar from,
                                   CMPScalar to, CMPScalar duration,
                                   cmp_u32 easing) {
   CMPScalar eased;

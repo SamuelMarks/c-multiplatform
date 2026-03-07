@@ -201,6 +201,35 @@ target_include_directories(m3 PUBLIC
 )
 target_link_libraries(m3 PUBLIC cmpc)
 
+add_library(f2
+    src/f2/f2_color.c
+    src/f2/f2_typography.c
+    src/f2/f2_button.c
+    src/f2/f2_selection.c
+    src/f2/f2_text_field.c
+    src/f2/f2_slider.c
+    src/f2/f2_progress.c
+    src/f2/f2_badge.c
+    src/f2/f2_link.c
+    src/f2/f2_card.c
+    src/f2/f2_flyout.c
+    src/f2/f2_dialog.c
+    src/f2/f2_tooltip.c
+    src/f2/f2_spin_button.c
+    src/f2/f2_searchbox.c
+    src/f2/f2_navigation.c
+    src/f2/f2_command_bar.c
+    src/f2/f2_data_components.c
+    src/f2/f2_message_bar.c
+    src/f2/f2_avatar.c
+)
+add_library(f2::f2 ALIAS f2)
+target_include_directories(f2 PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+target_link_libraries(f2 PUBLIC cmpc)
+
 if(CMP_ENABLE_COVERAGE)
     if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
         target_compile_options(cmpc PUBLIC -O0 -g --coverage)
@@ -905,6 +934,10 @@ if(BUILD_TESTING)
     add_executable(cmp_phase4_win32_backend tests/phase4/win32_backend.c)
     target_link_libraries(cmp_phase4_win32_backend PRIVATE cmpc)
     add_test(NAME cmp_phase4_win32_backend COMMAND cmp_phase4_win32_backend)
+
+    add_executable(cmp_phase5_f2_tests tests/phase5/f2_tests.c)
+    target_link_libraries(cmp_phase5_f2_tests PRIVATE f2 cmpc)
+    add_test(NAME cmp_phase5_f2_tests COMMAND cmp_phase5_f2_tests)
 
     add_executable(cmp_phase5_adaptive tests/phase5/adaptive.c)
     target_link_libraries(cmp_phase5_adaptive PRIVATE m3 cmpc)
