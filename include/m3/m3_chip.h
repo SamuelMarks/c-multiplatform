@@ -277,59 +277,178 @@ CMP_API int CMP_CALL m3_chip_set_on_delete(M3Chip *chip,
                                            CMPChipOnDelete on_delete,
                                            void *ctx);
 
+/**
+ * @brief Helper for test coverage.
+ * @param fail_point Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_set_fail_point(cmp_u32 fail_point);
 
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_set_color_fail_after(cmp_u32 call_count);
 
+/**
+ * @brief Helper for test coverage.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_clear_fail_points(void);
 
+/**
+ * @brief Helper for test coverage.
+ * @param layout Parameter for testing.
+ * @param padding_x Parameter for testing.
+ * @param padding_y Parameter for testing.
+ * @param min_width Parameter for testing.
+ * @param min_height Parameter for testing.
+ * @param icon_size Parameter for testing.
+ * @param icon_gap Parameter for testing.
+ * @param delete_thickness Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_style_init_layout(
     M3ChipLayout *layout, CMPScalar padding_x, CMPScalar padding_y,
     CMPScalar min_width, CMPScalar min_height, CMPScalar icon_size,
     CMPScalar icon_gap, CMPScalar delete_thickness);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param variant Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_style_init_base(M3ChipStyle *style,
                                                   cmp_u32 variant);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_validate_color(const CMPColor *color);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @param r Parameter for testing.
+ * @param g Parameter for testing.
+ * @param b Parameter for testing.
+ * @param a Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_color_set(CMPColor *color, CMPScalar r,
                                             CMPScalar g, CMPScalar b,
                                             CMPScalar a);
 
+/**
+ * @brief Helper for test coverage.
+ * @param base Parameter for testing.
+ * @param alpha Parameter for testing.
+ * @param out_color Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_color_with_alpha(const CMPColor *base,
                                                    CMPScalar alpha,
                                                    CMPColor *out_color);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param require_family Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_validate_text_style(const CMPTextStyle *style,
                                                       CMPBool require_family);
 
+/**
+ * @brief Helper for test coverage.
+ * @param layout Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_validate_layout(const M3ChipLayout *layout);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param require_family Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_validate_style(const M3ChipStyle *style,
                                                  CMPBool require_family);
 
+/**
+ * @brief Helper for test coverage.
+ * @param spec Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_validate_measure_spec(CMPMeasureSpec spec);
 
+/**
+ * @brief Helper for test coverage.
+ * @param rect Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_validate_rect(const CMPRect *rect);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param backend Parameter for testing.
+ * @return Test result.
+ */
 m3_chip_test_validate_backend(const CMPTextBackend *backend);
 
+/**
+ * @brief Helper for test coverage.
+ * @param chip Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_metrics_update(M3Chip *chip);
 
+/**
+ * @brief Helper for test coverage.
+ * @param chip Parameter for testing.
+ * @param out_background Parameter for testing.
+ * @param out_text Parameter for testing.
+ * @param out_outline Parameter for testing.
+ * @param out_ripple Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_resolve_colors(const M3Chip *chip,
                                                  CMPColor *out_background,
                                                  CMPColor *out_text,
                                                  CMPColor *out_outline,
                                                  CMPColor *out_ripple);
 
+/**
+ * @brief Helper for test coverage.
+ * @param chip Parameter for testing.
+ * @param out_corner Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_resolve_corner(const M3Chip *chip,
                                                  CMPScalar *out_corner);
 
+/**
+ * @brief Helper for test coverage.
+ * @param chip Parameter for testing.
+ * @param out_bounds Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_compute_delete_bounds(M3Chip *chip,
                                                         CMPRect *out_bounds);
 
+/**
+ * @brief Helper for test coverage.
+ * @param gfx Parameter for testing.
+ * @param bounds Parameter for testing.
+ * @param color Parameter for testing.
+ * @param thickness Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_chip_test_draw_delete_icon(const CMPGfx *gfx,
                                                    const CMPRect *bounds,
                                                    CMPColor color,

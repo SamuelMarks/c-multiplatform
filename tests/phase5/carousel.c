@@ -74,12 +74,44 @@ int main(void) {
   CMP_TEST_EXPECT(m3_carousel_init(&carousel, NULL, NULL, 0),
                   CMP_ERR_INVALID_ARGUMENT);
 
+  CMP_TEST_EXPECT(m3_carousel_init(&carousel, &style, NULL, (cmp_usize)~(cmp_usize)0 / sizeof(CMPWidget *)),
+                  CMP_ERR_OUT_OF_MEMORY);
+  carousel.widget.vtable->destroy(&carousel);
+  CMP_TEST_OK(m3_carousel_init(&carousel, &style, NULL, 0));
+  
+  {
+    CMPWidget *test_items[2];
+    test_items[0] = &child;
+    test_items[1] = &child;
+    CMP_TEST_OK(m3_carousel_init(&carousel, &style, test_items, 2));
+    carousel.widget.vtable->destroy(&carousel);
+  }
+  
   CMP_TEST_OK(m3_carousel_init(&carousel, &style, NULL, 0));
 
   CMP_TEST_EXPECT(m3_carousel_add_item(NULL, &child), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_carousel_add_item(&carousel, NULL),
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_carousel_add_item(&carousel, &child));
+
+  {
+    cmp_usize i;
+    for (i = 0; i < 4; i++) {
+        CMP_TEST_OK(m3_carousel_add_item(&carousel, &child));
+    }
+  }
+
+  {
+    cmp_usize old_cap = carousel.capacity;
+    cmp_usize old_count = carousel.item_count;
+    CMPWidget** old_items = carousel.items;
+    carousel.capacity = (cmp_usize)~(cmp_usize)0 / sizeof(CMPWidget *);
+    carousel.item_count = carousel.capacity;
+    CMP_TEST_EXPECT(m3_carousel_add_item(&carousel, &child), CMP_ERR_OUT_OF_MEMORY);
+    carousel.capacity = old_cap;
+    carousel.item_count = old_count;
+    carousel.items = old_items;
+  }
 
   CMP_TEST_EXPECT(m3_carousel_set_on_select(NULL, NULL, NULL),
                   CMP_ERR_INVALID_ARGUMENT);
@@ -102,6 +134,11 @@ int main(void) {
         CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(carousel.widget.vtable->measure(&carousel, m300, m300, &size));
 
+    CMPMeasureSpec m_unspec = {CMP_MEASURE_UNSPECIFIED, 0.0f};
+    CMPMeasureSpec m_atmost = {CMP_MEASURE_AT_MOST, 300.0f};
+    CMP_TEST_OK(carousel.widget.vtable->measure(&carousel, m_unspec, m_unspec, &size));
+    CMP_TEST_OK(carousel.widget.vtable->measure(&carousel, m_atmost, m_atmost, &size));
+
     CMP_TEST_EXPECT(carousel.widget.vtable->layout(NULL, bounds),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(carousel.widget.vtable->layout(&carousel, bounds));
@@ -117,6 +154,13 @@ int main(void) {
     pctx.gfx = &gfx;
     CMP_TEST_EXPECT(carousel.widget.vtable->paint(NULL, &pctx), CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(carousel.widget.vtable->paint(&carousel, NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_OK(carousel.widget.vtable->paint(&carousel, &pctx));
+
+    pctx.gfx = NULL;
+    CMP_TEST_OK(carousel.widget.vtable->paint(&carousel, &pctx));
+
+    pctx.gfx = &gfx;
+    carousel.style.background_color.a = 0.0f;
     CMP_TEST_OK(carousel.widget.vtable->paint(&carousel, &pctx));
 
     CMP_TEST_EXPECT(carousel.widget.vtable->event(NULL, &event, &handled),

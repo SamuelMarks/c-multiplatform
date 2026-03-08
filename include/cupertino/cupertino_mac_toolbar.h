@@ -18,14 +18,15 @@ extern "C" {
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
 
+/** @brief Maximum number of items in a macOS toolbar. */
 #define CUPERTINO_MAC_TOOLBAR_MAX_ITEMS 16
 
 /** @brief Represents an item in a macOS toolbar. */
 typedef struct CupertinoMacToolbarItem {
-    char title_utf8[64];
-    cmp_usize title_len;
-    CMPBool is_search;
-    CMPBool is_flexible_space;
+    char title_utf8[64];       /**< Title text in UTF-8. */
+    cmp_usize title_len;       /**< Length of title text. */
+    CMPBool is_search;         /**< Whether the item is a search field. */
+    CMPBool is_flexible_space; /**< Whether the item is a flexible spacer. */
 } CupertinoMacToolbarItem;
 
 /** @brief Cupertino macOS Toolbar Widget */
@@ -33,8 +34,8 @@ typedef struct CupertinoMacToolbar {
     CMPWidget widget;                             /**< Base widget interface. */
     CMPTextBackend text_backend;                  /**< Text backend for drawing labels. */
     
-    CupertinoMacToolbarItem items[CUPERTINO_MAC_TOOLBAR_MAX_ITEMS];
-    cmp_usize item_count;
+    CupertinoMacToolbarItem items[CUPERTINO_MAC_TOOLBAR_MAX_ITEMS]; /**< List of toolbar items. */
+    cmp_usize item_count;                         /**< Number of items in the toolbar. */
     
     CMPRect bounds;                               /**< Layout bounds. */
     CMPBool is_dark_mode;                         /**< Dark mode styling. */

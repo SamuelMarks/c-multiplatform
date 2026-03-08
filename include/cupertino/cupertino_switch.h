@@ -57,7 +57,7 @@ CMP_API int CMP_CALL cupertino_switch_update(CupertinoSwitch *switch_inst, doubl
 /**
  * @brief Renders the switch.
  * @param switch_inst Pointer to the switch instance.
- * @param renderer Pointer to the renderer used for drawing.
+ * @param ctx Pointer to the renderer used for drawing.
  * @return CMP_OK on success or an error code.
  */
 CMP_API int CMP_CALL cupertino_switch_paint(const CupertinoSwitch *switch_inst, CMPPaintContext *ctx);

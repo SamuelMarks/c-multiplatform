@@ -1397,7 +1397,7 @@ CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend, CMPHandl
 
 /* Stubs for unavailable */
 #else
-/* GCOVR_EXCL_START */
+
 int CMP_CALL cmp_gtk4_backend_create(const CMPGTK4BackendConfig *config,
                                      CMPGTK4Backend **out) {
   CMPGTK4BackendConfig local_config;
@@ -1454,6 +1454,6 @@ int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *b, CMPEnv *env) {
   memset(env, 0, sizeof(*env));
   return CMP_ERR_UNSUPPORTED;
 }
-/* GCOVR_EXCL_STOP */
-CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend, CMPHandle window_handle, const char *path) { CMP_UNUSED(backend); CMP_UNUSED(window_handle); CMP_UNUSED(path); return CMP_ERR_UNSUPPORTED; } /* GCOVR_EXCL_LINE */
+
+CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend, CMPHandle window_handle, const char *path) { CMP_UNUSED(backend); CMP_UNUSED(window_handle); CMP_UNUSED(path); return CMP_ERR_UNSUPPORTED; }
 #endif

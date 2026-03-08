@@ -24,13 +24,13 @@ static int m3_time_picker_validate_color(const CMPColor *color) {
   if (!(color->r >= 0.0f && color->r <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-  if (!(color->g >= 0.0f && color->g <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->g >= 0.0f && color->g <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-  if (!(color->b >= 0.0f && color->b <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->b >= 0.0f && color->b <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-  if (!(color->a >= 0.0f && color->a <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->a >= 0.0f && color->a <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
   return CMP_OK;
@@ -40,8 +40,8 @@ static int m3_time_picker_validate_edges(const CMPLayoutEdges *edges) {
   if (edges == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (edges->left < 0.0f || edges->right < 0.0f || edges->top < 0.0f || /* GCOVR_EXCL_LINE */
-      edges->bottom < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (edges->left < 0.0f || edges->right < 0.0f || edges->top < 0.0f ||
+      edges->bottom < 0.0f) {
     return CMP_ERR_RANGE;
   }
   return CMP_OK;
@@ -243,7 +243,7 @@ static int m3_time_picker_compute_metrics(const M3TimePicker *picker,
     return CMP_OK;
   }
 
-  dial_size = (avail_width < avail_height) ? avail_width : avail_height; /* GCOVR_EXCL_LINE */
+  dial_size = (avail_width < avail_height) ? avail_width : avail_height;
 #ifdef CMP_TESTING
   if (g_m3_time_picker_test_force_dial_size_zero == CMP_TRUE) {
     g_m3_time_picker_test_force_dial_size_zero = CMP_FALSE;
@@ -440,7 +440,7 @@ static int m3_time_picker_hour_to_index(cmp_u32 hour, cmp_u32 format,
 static int m3_time_picker_pick_time(const M3TimePicker *picker, CMPScalar x,
                                     CMPScalar y, cmp_u32 field,
                                     CMPTime *out_time,
-                                    CMPBool *out_valid) { /* GCOVR_EXCL_LINE */
+                                    CMPBool *out_valid) {
   M3TimePickerMetrics metrics;
   CMPTime time;
   CMPScalar dx;
@@ -505,7 +505,7 @@ static int m3_time_picker_pick_time(const M3TimePicker *picker, CMPScalar x,
 
     inner_ring = CMP_FALSE;
     if (picker->format == M3_TIME_PICKER_FORMAT_24H &&
-        metrics.inner_radius > 0.0f) { /* GCOVR_EXCL_LINE */
+        metrics.inner_radius > 0.0f) {
       threshold = (metrics.outer_radius + metrics.inner_radius) * 0.5f;
       if (dist < threshold) {
         inner_ring = CMP_TRUE;
@@ -585,7 +585,7 @@ static int m3_time_picker_draw_circle(CMPGfx *gfx, CMPScalar cx, CMPScalar cy,
   CMPRect rect;
   int rc;
 
-  if (gfx == NULL || gfx->vtable == NULL || gfx->vtable->draw_rect == NULL) { /* GCOVR_EXCL_LINE */
+  if (gfx == NULL || gfx->vtable == NULL || gfx->vtable->draw_rect == NULL) {
     return CMP_ERR_UNSUPPORTED;
   }
   if (radius < 0.0f) {
@@ -650,8 +650,8 @@ static int m3_time_picker_resolve_colors(const M3TimePicker *picker,
                                          CMPColor *out_selection) {
   int rc;
 
-  if (picker == NULL || out_background == NULL || out_ring == NULL || /* GCOVR_EXCL_LINE */
-      out_hand == NULL || out_selection == NULL) { /* GCOVR_EXCL_LINE */
+  if (picker == NULL || out_background == NULL || out_ring == NULL ||
+      out_hand == NULL || out_selection == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -736,8 +736,8 @@ static int m3_time_picker_compute_hand(const M3TimePicker *picker,
     }
     step = (CMPScalar)(M3_TIME_PICKER_PI * 2.0f) / 12.0f;
     *out_angle = (CMPScalar)index * step;
-    if (picker->format == M3_TIME_PICKER_FORMAT_24H && inner_ring == CMP_TRUE && /* GCOVR_EXCL_LINE */
-        metrics->inner_radius > 0.0f) { /* GCOVR_EXCL_LINE */
+    if (picker->format == M3_TIME_PICKER_FORMAT_24H && inner_ring == CMP_TRUE &&
+        metrics->inner_radius > 0.0f) {
       radius = metrics->inner_radius;
     }
   } else {
@@ -786,7 +786,7 @@ static int m3_time_picker_widget_measure(void *widget, CMPMeasureSpec width,
     out_size->width = width.size;
   } else if (width.mode == CMP_MEASURE_AT_MOST) {
     out_size->width = desired;
-    if (out_size->width > width.size) { /* GCOVR_EXCL_LINE */
+    if (out_size->width > width.size) {
       out_size->width = width.size;
     }
   } else {
@@ -804,7 +804,7 @@ static int m3_time_picker_widget_measure(void *widget, CMPMeasureSpec width,
     out_size->height = height.size;
   } else if (height.mode == CMP_MEASURE_AT_MOST) {
     out_size->height = desired;
-    if (out_size->height > height.size) { /* GCOVR_EXCL_LINE */
+    if (out_size->height > height.size) {
       out_size->height = height.size;
     }
   } else {
@@ -890,7 +890,7 @@ static int m3_time_picker_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   if (picker->format == M3_TIME_PICKER_FORMAT_24H &&
-      metrics.inner_radius > 0.0f) { /* GCOVR_EXCL_LINE */
+      metrics.inner_radius > 0.0f) {
     rc = m3_time_picker_draw_ring(
         ctx->gfx, metrics.center_x, metrics.center_y, metrics.inner_radius,
         picker->style.ring_thickness, ring, background);
@@ -1245,11 +1245,11 @@ int CMP_CALL m3_time_picker_set_period(M3TimePicker *picker, cmp_u32 period) {
 
   next = picker->time;
   if (period == M3_TIME_PICKER_PERIOD_AM) {
-    if (next.hour >= 12u) { /* GCOVR_EXCL_LINE */
+    if (next.hour >= 12u) {
       next.hour -= 12u;
     }
   } else {
-    if (next.hour < 12u) { /* GCOVR_EXCL_LINE */
+    if (next.hour < 12u) {
       next.hour += 12u;
     }
   }

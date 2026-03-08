@@ -310,101 +310,292 @@ CMP_API int CMP_CALL cmp_text_field_step(CMPTextField *field, CMPScalar dt,
 CMP_API int CMP_CALL cmp_text_field_set_on_change(
     CMPTextField *field, CMPTextFieldOnChange on_change, void *ctx);
 
+/**
+ * @brief Helper for test coverage.
+ * @param fail_point Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_set_fail_point(cmp_u32 fail_point);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 cmp_text_field_test_set_color_fail_after(cmp_u32 call_count);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 cmp_text_field_test_set_overflow_fail_after(cmp_u32 call_count);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 cmp_text_field_test_set_font_metrics_fail_after(cmp_u32 call_count);
 
+/**
+ * @brief Helper for test coverage.
+ * @param enable Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_set_offset_skip_early(CMPBool enable);
 
+/**
+ * @brief Helper for test coverage.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_clear_fail_points(void);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_validate_color(const CMPColor *color);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @param r Parameter for testing.
+ * @param g Parameter for testing.
+ * @param b Parameter for testing.
+ * @param a Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_color_set(CMPColor *color, CMPScalar r,
                                                    CMPScalar g, CMPScalar b,
                                                    CMPScalar a);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param require_family Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_validate_text_style(
     const CMPTextStyle *style, CMPBool require_family);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param require_text_family Parameter for testing.
+ * @param require_label_family Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_validate_style(
     const CMPTextFieldStyle *style, CMPBool require_text_family,
-    /* GCOVR_EXCL_LINE */ CMPBool require_label_family); /* GCOVR_EXCL_LINE */
+    CMPBool require_label_family);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param backend Parameter for testing.
+ * @return Test result.
+ */
 cmp_text_field_test_validate_backend(const CMPTextBackend *backend);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param spec Parameter for testing.
+ * @return Test result.
+ */
 cmp_text_field_test_validate_measure_spec(CMPMeasureSpec spec);
 
+/**
+ * @brief Helper for test coverage.
+ * @param rect Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_validate_rect(const CMPRect *rect);
 
+/**
+ * @brief Helper for test coverage.
+ * @param out_value Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_usize_max(cmp_usize *out_value);
 
+/**
+ * @brief Helper for test coverage.
+ * @param a Parameter for testing.
+ * @param b Parameter for testing.
+ * @param out_value Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_add_overflow(cmp_usize a, cmp_usize b,
                                                       cmp_usize *out_value);
 
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @param required Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_reserve(CMPTextField *field,
                                                  cmp_usize required);
 
+/**
+ * @brief Helper for test coverage.
+ * @param utf8 Parameter for testing.
+ * @param utf8_len Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_validate_utf8(const char *utf8,
                                                        cmp_usize utf8_len);
 
+/**
+ * @brief Helper for test coverage.
+ * @param utf8 Parameter for testing.
+ * @param utf8_len Parameter for testing.
+ * @param offset Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_validate_offset(const char *utf8,
                                                          cmp_usize utf8_len,
                                                          cmp_usize offset);
 
+/**
+ * @brief Helper for test coverage.
+ * @param utf8 Parameter for testing.
+ * @param utf8_len Parameter for testing.
+ * @param offset Parameter for testing.
+ * @param out_offset Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_prev_offset(const char *utf8,
                                                      cmp_usize utf8_len,
                                                      cmp_usize offset,
                                                      cmp_usize *out_offset);
 
+/**
+ * @brief Helper for test coverage.
+ * @param utf8 Parameter for testing.
+ * @param utf8_len Parameter for testing.
+ * @param offset Parameter for testing.
+ * @param out_offset Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_next_offset(const char *utf8,
                                                      cmp_usize utf8_len,
                                                      cmp_usize offset,
                                                      cmp_usize *out_offset);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @return Test result.
+ */
 cmp_text_field_test_update_text_metrics(CMPTextField *field);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @return Test result.
+ */
 cmp_text_field_test_update_label_metrics(CMPTextField *field);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @return Test result.
+ */
 cmp_text_field_test_update_placeholder_metrics(CMPTextField *field);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @return Test result.
+ */
 cmp_text_field_test_update_font_metrics(CMPTextField *field);
 
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_sync_label(CMPTextField *field);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @return Test result.
+ */
 cmp_text_field_test_reset_cursor_blink(CMPTextField *field);
 
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @param utf8_text Parameter for testing.
+ * @param utf8_len Parameter for testing.
+ * @param notify Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_set_text_internal(
     CMPTextField *field, const char *utf8_text, cmp_usize utf8_len,
     CMPBool notify);
 
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @param start Parameter for testing.
+ * @param end Parameter for testing.
+ * @param notify Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_delete_range(CMPTextField *field,
                                                       cmp_usize start,
                                                       cmp_usize end,
                                                       CMPBool notify);
 
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @param offset Parameter for testing.
+ * @param out_width Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_measure_prefix(CMPTextField *field,
                                                         cmp_usize offset,
                                                         CMPScalar *out_width);
 
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @param x Parameter for testing.
+ * @param out_offset Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_offset_for_x(CMPTextField *field,
                                                       CMPScalar x,
                                                       cmp_usize *out_offset);
 
+/**
+ * @brief Helper for test coverage.
+ * @param field Parameter for testing.
+ * @param out_container Parameter for testing.
+ * @param out_outline Parameter for testing.
+ * @param out_text Parameter for testing.
+ * @param out_label Parameter for testing.
+ * @param out_placeholder Parameter for testing.
+ * @param out_cursor Parameter for testing.
+ * @param out_selection Parameter for testing.
+ * @param out_handle Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_text_field_test_resolve_colors(
     const CMPTextField *field, CMPColor *out_container, CMPColor *out_outline,
     CMPColor *out_text, CMPColor *out_label, CMPColor *out_placeholder,

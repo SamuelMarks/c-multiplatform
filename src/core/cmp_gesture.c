@@ -5,7 +5,7 @@
 #ifdef CMP_TESTING
 static CMPBool g_cmp_gesture_test_force_contains_error = CMP_FALSE;
 static CMPBool g_cmp_gesture_test_force_reset_fail =
-    CMP_FALSE; /* GCOVR_EXCL_LINE */
+    CMP_FALSE;
 static CMPBool g_cmp_gesture_test_force_velocity_error = CMP_FALSE;
 static CMPBool g_cmp_gesture_test_force_distance_error = CMP_FALSE;
 static CMPBool g_cmp_gesture_test_force_config_init_fail = CMP_FALSE;
@@ -16,7 +16,7 @@ static int cmp_gesture_validate_rect(const CMPRect *rect) {
   if (rect == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (rect->width < 0.0f || rect->height < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (rect->width < 0.0f || rect->height < 0.0f) {
     return CMP_ERR_RANGE;
   }
   return CMP_OK;
@@ -49,7 +49,7 @@ static int cmp_gesture_distance_sq(CMPScalar x0, CMPScalar y0, CMPScalar x1,
   if (out_value == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+#ifdef CMP_TESTING
   if (g_cmp_gesture_test_force_distance_error == CMP_TRUE) {
     g_cmp_gesture_test_force_distance_error = CMP_FALSE;
     return CMP_ERR_UNKNOWN;
@@ -111,7 +111,7 @@ static int cmp_gesture_hit_test(const CMPRenderNode *node, CMPScalar x,
                                 CMPScalar y, CMPWidget **out_widget) {
   CMPBool contains;
   cmp_usize i;
-  int rc; /* GCOVR_EXCL_LINE */
+  int rc;
 
   if (node == NULL || out_widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -178,7 +178,7 @@ static int cmp_gesture_dispatch_to_widget(CMPWidget *widget,
                                           const CMPInputEvent *event,
                                           CMPBool *out_handled) {
   CMPBool handled;
-  int rc; /* GCOVR_EXCL_LINE */
+  int rc;
 
   if (out_handled == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -190,7 +190,7 @@ static int cmp_gesture_dispatch_to_widget(CMPWidget *widget,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (widget->vtable == NULL || widget->vtable->event == NULL) { /* GCOVR_EXCL_LINE */
+  if (widget->vtable == NULL || widget->vtable->event == NULL) {
     return CMP_OK;
   }
 
@@ -207,7 +207,7 @@ static int cmp_gesture_dispatch_to_widget(CMPWidget *widget,
 static int cmp_gesture_emit(CMPWidget *widget, const CMPInputEvent *source,
                             cmp_u32 type, const CMPGestureEvent *gesture,
                             CMPBool *out_handled) {
-  CMPInputEvent event; /* GCOVR_EXCL_LINE */
+  CMPInputEvent event;
   int rc;
 
   if (out_handled == NULL) {
@@ -309,7 +309,7 @@ int CMP_CALL cmp_gesture_config_init(CMPGestureConfig *config) {
 
 int CMP_CALL cmp_gesture_dispatcher_init(CMPGestureDispatcher *dispatcher,
                                          const CMPGestureConfig *config) {
-  CMPGestureConfig defaults; /* GCOVR_EXCL_LINE */
+  CMPGestureConfig defaults;
   int rc;
 
   if (dispatcher == NULL) {
@@ -377,7 +377,7 @@ int CMP_CALL cmp_gesture_dispatcher_set_config(CMPGestureDispatcher *dispatcher,
                                                const CMPGestureConfig *config) {
   int rc;
 
-  if (dispatcher == NULL || config == NULL) { /* GCOVR_EXCL_LINE */
+  if (dispatcher == NULL || config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (!dispatcher->initialized) {
@@ -395,7 +395,7 @@ int CMP_CALL cmp_gesture_dispatcher_set_config(CMPGestureDispatcher *dispatcher,
 
 int CMP_CALL cmp_gesture_dispatcher_get_config(
     const CMPGestureDispatcher *dispatcher, CMPGestureConfig *out_config) {
-  if (dispatcher == NULL || out_config == NULL) { /* GCOVR_EXCL_LINE */
+  if (dispatcher == NULL || out_config == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (!dispatcher->initialized) {
@@ -414,10 +414,10 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
   CMPWidget *target;
   CMPBool handled;
   CMPBool handled_any;
-  CMPScalar x; /* GCOVR_EXCL_LINE */
+  CMPScalar x;
   CMPScalar y;
   CMPScalar dist_sq;
-  CMPScalar drag_threshold_sq; /* GCOVR_EXCL_LINE */
+  CMPScalar drag_threshold_sq;
   CMPScalar tap_threshold_sq;
   CMPScalar double_tap_threshold_sq;
   CMPScalar delta_x;
@@ -441,7 +441,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
   }
 
   *out_handled = CMP_FALSE;
-  if (out_target != NULL) { /* GCOVR_EXCL_LINE */
+  if (out_target != NULL) {
     *out_target = NULL;
   }
 
@@ -478,7 +478,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
     dispatcher->last_y = y;
     dispatcher->velocity_x = 0.0f;
     dispatcher->velocity_y = 0.0f;
-    if (out_target != NULL) { /* GCOVR_EXCL_LINE */
+    if (out_target != NULL) {
       *out_target = target;
     }
     return CMP_OK;
@@ -546,8 +546,8 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
       if (rc != CMP_OK) {
         return rc;
       }
-      handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE; /* GCOVR_EXCL_LINE */
-      if (out_target != NULL) { /* GCOVR_EXCL_LINE */
+      handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE;
+      if (out_target != NULL) {
         *out_target = dispatcher->active_widget;
       }
       *out_handled = handled_any;
@@ -585,8 +585,8 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
       if (rc != CMP_OK) {
         return rc;
       }
-      handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE; /* GCOVR_EXCL_LINE */
-      if (out_target != NULL) { /* GCOVR_EXCL_LINE */
+      handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE;
+      if (out_target != NULL) {
         *out_target = dispatcher->active_widget;
       }
       *out_handled = handled_any;
@@ -668,13 +668,13 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
       if (rc != CMP_OK) {
         return rc;
       }
-      handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE; /* GCOVR_EXCL_LINE */
+      handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE;
 
       fling_threshold_sq = dispatcher->config.fling_min_velocity *
                            dispatcher->config.fling_min_velocity;
       speed_sq = dispatcher->velocity_x * dispatcher->velocity_x +
                  dispatcher->velocity_y * dispatcher->velocity_y;
-      if (speed_sq >= fling_threshold_sq) { /* GCOVR_EXCL_LINE */
+      if (speed_sq >= fling_threshold_sq) {
         gesture.delta_x = 0.0f;
         gesture.delta_y = 0.0f;
         gesture.velocity_x = dispatcher->velocity_x;
@@ -686,12 +686,12 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
         if (rc != CMP_OK) {
           return rc;
         }
-        handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE; /* GCOVR_EXCL_LINE */
+        handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE;
       }
 
       dispatcher->has_last_tap = CMP_FALSE;
     } else if (duration >= dispatcher->config.long_press_ms &&
-               dist_sq <= tap_threshold_sq) { /* GCOVR_EXCL_LINE */
+               dist_sq <= tap_threshold_sq) {
       CMPGestureEvent gesture;
 
       gesture.pointer_id = dispatcher->active_pointer;
@@ -713,17 +713,17 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
       if (rc != CMP_OK) {
         return rc;
       }
-      handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE; /* GCOVR_EXCL_LINE */
+      handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE;
       dispatcher->has_last_tap = CMP_FALSE;
-    } else if (duration <= dispatcher->config.tap_max_ms && /* GCOVR_EXCL_LINE */
-               dist_sq <= tap_threshold_sq) { /* GCOVR_EXCL_LINE */
+    } else if (duration <= dispatcher->config.tap_max_ms &&
+               dist_sq <= tap_threshold_sq) {
       CMPBool double_tap;
       CMPScalar tap_dist_sq;
       cmp_u32 tap_dt;
 
       double_tap = CMP_FALSE;
       if (dispatcher->has_last_tap &&
-          dispatcher->last_tap_widget == dispatcher->active_widget) { /* GCOVR_EXCL_LINE */
+          dispatcher->last_tap_widget == dispatcher->active_widget) {
         if (event->time_ms >= dispatcher->last_tap_time) {
           tap_dt = event->time_ms - dispatcher->last_tap_time;
           rc = cmp_gesture_distance_sq(dispatcher->last_tap_x,
@@ -732,8 +732,8 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
           if (rc != CMP_OK) {
             return rc;
           }
-          if (tap_dt <= dispatcher->config.double_tap_max_ms && /* GCOVR_EXCL_LINE */
-              tap_dist_sq <= double_tap_threshold_sq) { /* GCOVR_EXCL_LINE */
+          if (tap_dt <= dispatcher->config.double_tap_max_ms &&
+              tap_dist_sq <= double_tap_threshold_sq) {
             double_tap = CMP_TRUE;
           }
         } else {
@@ -763,7 +763,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
         if (rc != CMP_OK) {
           return rc;
         }
-        handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE; /* GCOVR_EXCL_LINE */
+        handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE;
         dispatcher->has_last_tap = CMP_FALSE;
       } else {
         CMPGestureEvent gesture;
@@ -787,7 +787,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
         if (rc != CMP_OK) {
           return rc;
         }
-        handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE; /* GCOVR_EXCL_LINE */
+        handled_any = (handled_any || handled) ? CMP_TRUE : CMP_FALSE;
         dispatcher->has_last_tap = CMP_TRUE;
         dispatcher->last_tap_time = event->time_ms;
         dispatcher->last_tap_x = x;
@@ -796,7 +796,7 @@ int CMP_CALL cmp_gesture_dispatch(CMPGestureDispatcher *dispatcher,
       }
     }
 
-    if (out_target != NULL) { /* GCOVR_EXCL_LINE */
+    if (out_target != NULL) {
       *out_target = dispatcher->active_widget;
     }
     *out_handled = handled_any;

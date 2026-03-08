@@ -10,12 +10,12 @@ CMP_API int CMP_CALL m3_data_table_test_clear_fail_points(void);
 
 int CMP_CALL m3_data_table_test_set_fail_point(cmp_u32 fail_point) {
   g_m3_data_table_test_fail_point = fail_point;
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+  return CMP_OK;
 }
 
 int CMP_CALL m3_data_table_test_clear_fail_points(void) {
   g_m3_data_table_test_fail_point = 0u;
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+  return CMP_OK;
 }
 #endif
 
@@ -54,7 +54,7 @@ CMP_API int CMP_CALL m3_data_table_draw_headers(CMPPaintContext* ctx, const M3Da
   }
 #endif
   
-  if (table->column_count == 0 || table->columns == NULL) { /* GCOVR_EXCL_LINE */
+  if (table->column_count == 0 || table->columns == NULL) {
     return CMP_OK; /* Nothing to draw */
   }
 

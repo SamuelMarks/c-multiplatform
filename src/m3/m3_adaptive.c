@@ -51,7 +51,7 @@ int CMP_CALL m3_adaptive_list_detail_layout(const M3AdaptiveLayout *layout,
     return CMP_ERR_RANGE;
   }
 
-  if (layout->hinge.is_separating && (layout->hinge.bounds.height >= layout->hinge.bounds.width || layout->hinge.posture == M3_POSTURE_HALF_OPENED_BOOK)) { /* GCOVR_EXCL_LINE */
+  if (layout->hinge.is_separating && (layout->hinge.bounds.height >= layout->hinge.bounds.width || layout->hinge.posture == M3_POSTURE_HALF_OPENED_BOOK)) {
     out_primary->y = bounds.y;
     out_primary->height = bounds.height;
     out_secondary->y = bounds.y;
@@ -67,8 +67,8 @@ int CMP_CALL m3_adaptive_list_detail_layout(const M3AdaptiveLayout *layout,
       out_secondary->x = layout->hinge.bounds.x + layout->hinge.bounds.width;
       out_secondary->width = bounds.x + bounds.width - out_secondary->x;
     }
-    if (out_primary->width < 0.0f) out_primary->width = 0.0f; /* GCOVR_EXCL_LINE */
-    if (out_secondary->width < 0.0f) out_secondary->width = 0.0f; /* GCOVR_EXCL_LINE */
+    if (out_primary->width < 0.0f) out_primary->width = 0.0f;
+    if (out_secondary->width < 0.0f) out_secondary->width = 0.0f;
     return CMP_OK;
   }
 
@@ -137,11 +137,11 @@ int CMP_CALL m3_adaptive_feed_layout(const M3AdaptiveLayout *layout,
   if (layout == NULL || out_primary == NULL || out_secondary == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (bounds.width < 0.0f || bounds.height < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (bounds.width < 0.0f || bounds.height < 0.0f) {
     return CMP_ERR_RANGE;
   }
 
-  if (layout->hinge.is_separating && (layout->hinge.bounds.height >= layout->hinge.bounds.width || layout->hinge.posture == M3_POSTURE_HALF_OPENED_BOOK)) { /* GCOVR_EXCL_LINE */
+  if (layout->hinge.is_separating && (layout->hinge.bounds.height >= layout->hinge.bounds.width || layout->hinge.posture == M3_POSTURE_HALF_OPENED_BOOK)) {
     out_primary->y = bounds.y;
     out_primary->height = bounds.height;
     out_secondary->y = bounds.y;
@@ -157,8 +157,8 @@ int CMP_CALL m3_adaptive_feed_layout(const M3AdaptiveLayout *layout,
       out_secondary->x = layout->hinge.bounds.x + layout->hinge.bounds.width;
       out_secondary->width = bounds.x + bounds.width - out_secondary->x;
     }
-    if (out_primary->width < 0.0f) out_primary->width = 0.0f; /* GCOVR_EXCL_LINE */
-    if (out_secondary->width < 0.0f) out_secondary->width = 0.0f; /* GCOVR_EXCL_LINE */
+    if (out_primary->width < 0.0f) out_primary->width = 0.0f;
+    if (out_secondary->width < 0.0f) out_secondary->width = 0.0f;
     return CMP_OK;
   }
 
@@ -228,11 +228,11 @@ int CMP_CALL m3_adaptive_supporting_pane_layout(const M3AdaptiveLayout *layout,
   if (layout == NULL || out_primary == NULL || out_secondary == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (bounds.width < 0.0f || bounds.height < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (bounds.width < 0.0f || bounds.height < 0.0f) {
     return CMP_ERR_RANGE;
   }
 
-  if (layout->hinge.is_separating && (layout->hinge.bounds.height >= layout->hinge.bounds.width || layout->hinge.posture == M3_POSTURE_HALF_OPENED_BOOK)) { /* GCOVR_EXCL_LINE */
+  if (layout->hinge.is_separating && (layout->hinge.bounds.height >= layout->hinge.bounds.width || layout->hinge.posture == M3_POSTURE_HALF_OPENED_BOOK)) {
     out_primary->y = bounds.y;
     out_primary->height = bounds.height;
     out_secondary->y = bounds.y;
@@ -248,8 +248,8 @@ int CMP_CALL m3_adaptive_supporting_pane_layout(const M3AdaptiveLayout *layout,
       out_secondary->x = layout->hinge.bounds.x + layout->hinge.bounds.width;
       out_secondary->width = bounds.x + bounds.width - out_secondary->x;
     }
-    if (out_primary->width < 0.0f) out_primary->width = 0.0f; /* GCOVR_EXCL_LINE */
-    if (out_secondary->width < 0.0f) out_secondary->width = 0.0f; /* GCOVR_EXCL_LINE */
+    if (out_primary->width < 0.0f) out_primary->width = 0.0f;
+    if (out_secondary->width < 0.0f) out_secondary->width = 0.0f;
     return CMP_OK;
   }
 

@@ -245,6 +245,11 @@ static int test_adaptive_feed_layout(void) {
       CMP_ERR_RANGE)
     return 1;
   bounds.width = 400.0f;
+  bounds.height = -1.0f;
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_ERR_RANGE)
+    return 1;
+  bounds.height = 800.0f;
 
   /* Compact */
   if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
@@ -337,6 +342,11 @@ static int test_adaptive_supporting_pane_layout(void) {
                                          CMP_FALSE) != CMP_ERR_RANGE)
     return 1;
   bounds.width = 400.0f;
+  bounds.height = -1.0f;
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_FALSE) != CMP_ERR_RANGE)
+    return 1;
+  bounds.height = 800.0f;
 
   /* Compact */
   if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
@@ -448,6 +458,41 @@ static int test_adaptive_rtl_layouts(void) {
   return 0;
 }
 
+static int test_adaptive_hinge(void) {
+  M3AdaptiveLayout layout = {0};
+  CMPRect bounds = {0.0f, 0.0f, 1000.0f, 800.0f};
+  CMPRect prim, sec;
+
+  layout.hinge.is_separating = CMP_TRUE;
+  layout.hinge.posture = M3_POSTURE_HALF_OPENED_BOOK;
+  layout.hinge.bounds.x = 400.0f;
+  layout.hinge.bounds.y = 0.0f;
+  layout.hinge.bounds.width = 10.0f;
+  layout.hinge.bounds.height = 800.0f;
+
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
+
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
+
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
+
+  /* Hinge with extreme bounds to trigger negative width handling */
+  bounds.width = 100.0f;
+  layout.hinge.bounds.x = 200.0f;
+  layout.hinge.bounds.width = 50.0f;
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
+
+  return 0;
+}
+
 #include <stdio.h>
 
 int main(void) {
@@ -477,6 +522,10 @@ int main(void) {
   }
   if (test_adaptive_rtl_layouts() != 0) {
     printf("rtl layout failed\n");
+    return 1;
+  }
+  if (test_adaptive_hinge() != 0) {
+    printf("hinge layout failed\n");
     return 1;
   }
   return 0;

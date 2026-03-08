@@ -87,6 +87,21 @@ static int test_badge_init(void) {
                   CMP_ERR_INVALID_ARGUMENT);
   style.dot_diameter = 6.0f;
 
+  style.min_width = -1.0f;
+  CMP_TEST_EXPECT(m3_badge_init(&badge, &backend, &style, NULL, 0),
+                  CMP_ERR_INVALID_ARGUMENT);
+  style.min_width = 16.0f;
+
+  style.height = -1.0f;
+  CMP_TEST_EXPECT(m3_badge_init(&badge, &backend, &style, NULL, 0),
+                  CMP_ERR_INVALID_ARGUMENT);
+  style.height = 16.0f;
+
+  style.padding_x = -1.0f;
+  CMP_TEST_EXPECT(m3_badge_init(&badge, &backend, &style, NULL, 0),
+                  CMP_ERR_INVALID_ARGUMENT);
+  style.padding_x = 4.0f;
+
   CMP_TEST_OK(m3_badge_init(&badge, &backend, &style, NULL, 0));
 
   g_fail_create_font = 1;
@@ -144,6 +159,14 @@ static int test_badge_widget(void) {
   CMP_TEST_EXPECT(badge.widget.vtable->measure(&badge, unspec, unspec, NULL),
                   CMP_ERR_INVALID_ARGUMENT);
 
+  /* Force text width to be very small to test min_width */
+  badge.style.min_width = 100.0f;
+  badge.style.padding_x = 0.0f;
+  CMP_TEST_OK(badge.widget.vtable->measure(&badge, unspec, unspec, &size));
+  CMP_TEST_EXPECT(size.width == badge.style.min_width ? CMP_OK : CMP_ERR_UNKNOWN, CMP_OK);
+  badge.style.min_width = M3_BADGE_DEFAULT_MIN_WIDTH;
+  badge.style.padding_x = M3_BADGE_DEFAULT_PADDING_X;
+
   CMP_TEST_OK(badge.widget.vtable->measure(&badge, unspec, unspec, &size));
   CMP_TEST_EXPECT(size.width >= style.min_width ? CMP_OK : CMP_ERR_UNKNOWN,
                   CMP_OK);
@@ -174,6 +197,27 @@ static int test_badge_widget(void) {
     CMP_TEST_EXPECT(badge.widget.vtable->paint(&badge, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(badge.widget.vtable->paint(&badge, &paint_ctx));
+
+    /* Missing gfx->vtable */
+    mock_gfx.vtable = NULL;
+    CMP_TEST_OK(badge.widget.vtable->paint(&badge, &paint_ctx));
+    mock_gfx.vtable = &g_test_gfx_vtable;
+
+    /* Missing draw_rect */
+    {
+      CMPGfxVTable no_draw_rect_vtable = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+      mock_gfx.vtable = &no_draw_rect_vtable;
+      CMP_TEST_OK(badge.widget.vtable->paint(&badge, &paint_ctx));
+      mock_gfx.vtable = &g_test_gfx_vtable;
+    }
+
+    /* Missing text_vtable->draw_text */
+    {
+      CMPTextVTable no_draw_text_vtable = { mock_create_font, mock_destroy_font, mock_measure_text, NULL, NULL, NULL, NULL };
+      mock_gfx.text_vtable = &no_draw_text_vtable;
+      CMP_TEST_OK(badge.widget.vtable->paint(&badge, &paint_ctx));
+      mock_gfx.text_vtable = &mock_text_vtable;
+    }
 
     /* Alpha 0 background */
     badge.style.background_color.a = 0.0f;

@@ -32,32 +32,32 @@ typedef enum CupertinoMenuItemStyle {
 
 /** @brief Descriptor for a single item in the menu */
 typedef struct CupertinoMenuItem {
-    const char *title_utf8;
-    cmp_usize title_len;
-    const char *shortcut_utf8; /**< E.g., "⌘C" (macOS only) */
-    cmp_usize shortcut_len;
-    CupertinoMenuItemStyle style;
-    CMPBool is_disabled;
-    void *user_data;
+    const char *title_utf8;       /**< UTF-8 string for the title. */
+    cmp_usize title_len;          /**< Length of the title string in bytes. */
+    const char *shortcut_utf8;    /**< E.g., "⌘C" (macOS only) */
+    cmp_usize shortcut_len;       /**< Length of the shortcut string in bytes. */
+    CupertinoMenuItemStyle style; /**< Item style (default, destructive, separator). */
+    CMPBool is_disabled;          /**< If true, the item is disabled and unselectable. */
+    void *user_data;              /**< Custom user data associated with the item. */
 } CupertinoMenuItem;
 
 /** @brief Menu style descriptor */
 typedef struct CupertinoMenuStyle {
-    CupertinoMenuVariant variant;
+    CupertinoMenuVariant variant;       /**< Menu variant (macOS or iOS). */
     CupertinoBlurStyle background_blur; /**< Used heavily on iOS, partially on macOS (BehindWindow). */
     CMPColor tint_color;                /**< Hover/selection background color (usually blue). */
     CMPColor text_color;                /**< Standard text color. */
     CMPColor destructive_color;         /**< Text color for destructive items. */
-    CMPBool is_dark_mode;
-    CMPTextStyle label_style;
-    CMPTextStyle shortcut_style;
+    CMPBool is_dark_mode;               /**< If true, renders the menu in dark mode. */
+    CMPTextStyle label_style;           /**< Text style for menu item labels. */
+    CMPTextStyle shortcut_style;        /**< Text style for menu item shortcuts. */
 } CupertinoMenuStyle;
 
 /** @brief Menu widget instance */
 typedef struct CupertinoMenu {
     CMPWidget widget;             /**< Widget interface. */
-    CMPTextBackend text_backend;
-    CupertinoMenuStyle style;
+    CMPTextBackend text_backend;  /**< Text backend for drawing labels. */
+    CupertinoMenuStyle style;     /**< Visual style configuration for the menu. */
     
     CMPRect bounds;               /**< The calculated bounds of the menu. */
     CMPRect anchor_rect;          /**< The rect that spawned the menu. */

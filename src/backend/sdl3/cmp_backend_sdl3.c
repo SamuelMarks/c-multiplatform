@@ -107,7 +107,6 @@ int CMP_CALL cmp_sdl3_backend_config_init(CMPSDL3BackendConfig *config) {
   return CMP_OK;
 }
 
-/* GCOVR_EXCL_START */
 #if defined(CMP_SDL3_AVAILABLE)
 
 #define CMP_SDL3_TYPE_WINDOW 1
@@ -4243,7 +4242,6 @@ int CMP_CALL cmp_sdl3_backend_get_env(CMPSDL3Backend *backend,
   return CMP_OK;
 }
 
-/* GCOVR_EXCL_STOP */
 #else
 
 int CMP_CALL cmp_sdl3_backend_create(const CMPSDL3BackendConfig *config,

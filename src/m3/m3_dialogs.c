@@ -122,10 +122,10 @@ static int m3_dialog_measure_optional_text(const CMPTextBackend *backend,
                                            cmp_usize len,
                                            CMPTextMetrics *out_metrics) {
   if (out_metrics == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (utf8 == NULL && len != 0u) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   if (len == 0u) {
@@ -309,7 +309,7 @@ static int m3_dialog_destroy_fonts(const CMPTextBackend *backend,
 
   rc = CMP_OK;
   for (i = 0; i < count; ++i) {
-    if (fonts[i].id == 0u && fonts[i].generation == 0u) { /* GCOVR_EXCL_LINE */
+    if (fonts[i].id == 0u && fonts[i].generation == 0u) {
       continue;
     }
     destroy_rc = cmp_text_font_destroy(backend, fonts[i]);
@@ -331,15 +331,15 @@ static int m3_alert_dialog_validate_style(const M3AlertDialogStyle *style,
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (style->corner_radius < 0.0f || style->min_width < 0.0f ||
-      style->max_width < 0.0f) { /* GCOVR_EXCL_LINE */
+      style->max_width < 0.0f) {
     return CMP_ERR_RANGE;
   }
   if (style->max_width > 0.0f && style->max_width < style->min_width) {
     return CMP_ERR_RANGE;
   }
-  if (style->title_body_spacing < 0.0f || style->body_action_spacing < 0.0f || /* GCOVR_EXCL_LINE */
-      style->action_spacing < 0.0f || style->action_padding_x < 0.0f || /* GCOVR_EXCL_LINE */
-      style->action_padding_y < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (style->title_body_spacing < 0.0f || style->body_action_spacing < 0.0f ||
+      style->action_spacing < 0.0f || style->action_padding_x < 0.0f ||
+      style->action_padding_y < 0.0f) {
     return CMP_ERR_RANGE;
   }
   if (style->shadow_enabled != CMP_FALSE && style->shadow_enabled != CMP_TRUE) {
@@ -382,7 +382,7 @@ static int m3_alert_dialog_metrics_update(M3AlertDialog *dialog) {
   int rc;
 
   if (dialog == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   if (dialog->metrics_valid == CMP_TRUE) {
@@ -399,7 +399,7 @@ static int m3_alert_dialog_metrics_update(M3AlertDialog *dialog) {
                                        dialog->utf8_body, dialog->body_len,
                                        &dialog->body_metrics);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_dialog_measure_optional_text(
       &dialog->text_backend, dialog->action_font, dialog->utf8_confirm,
@@ -429,9 +429,9 @@ static int m3_alert_dialog_compute_actions(const M3AlertDialog *dialog,
   CMPBool has_confirm;
   CMPBool has_dismiss;
 
-  if (dialog == NULL || out_total_width == NULL || out_height == NULL || /* GCOVR_EXCL_LINE */
-      out_confirm_width == NULL || out_dismiss_width == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (dialog == NULL || out_total_width == NULL || out_height == NULL ||
+      out_confirm_width == NULL || out_dismiss_width == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 #ifdef CMP_TESTING
   if (m3_dialog_test_fail_point_match(
@@ -481,7 +481,7 @@ static int m3_alert_dialog_layout_actions(M3AlertDialog *dialog) {
   CMPScalar actions_width;
   CMPScalar actions_height;
   CMPScalar confirm_width;
-  CMPScalar dismiss_width; /* GCOVR_EXCL_LINE */
+  CMPScalar dismiss_width;
   CMPScalar x;
   int rc;
 
@@ -508,7 +508,7 @@ static int m3_alert_dialog_layout_actions(M3AlertDialog *dialog) {
     cursor_y += dialog->body_metrics.height;
   }
   if ((dialog->confirm_len > 0u || dialog->dismiss_len > 0u) &&
-      (dialog->title_len > 0u || dialog->body_len > 0u)) { /* GCOVR_EXCL_LINE */
+      (dialog->title_len > 0u || dialog->body_len > 0u)) {
     cursor_y += dialog->style.body_action_spacing;
   }
 
@@ -601,7 +601,7 @@ static int m3_alert_dialog_widget_measure(void *widget, CMPMeasureSpec width,
   rc = m3_alert_dialog_compute_actions(dialog, &actions_width, &actions_height,
                                        &confirm_width, &dismiss_width);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   content_width = dialog->title_metrics.width;
   if (dialog->body_metrics.width > content_width) {
@@ -615,20 +615,20 @@ static int m3_alert_dialog_widget_measure(void *widget, CMPMeasureSpec width,
       content_width + dialog->style.padding.left + dialog->style.padding.right;
   desired_height = dialog->style.padding.top + dialog->style.padding.bottom;
 
-  if (dialog->title_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (dialog->title_len > 0u) {
     desired_height += dialog->title_metrics.height;
   }
-  if (dialog->title_len > 0u && dialog->body_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (dialog->title_len > 0u && dialog->body_len > 0u) {
     desired_height += dialog->style.title_body_spacing;
   }
-  if (dialog->body_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (dialog->body_len > 0u) {
     desired_height += dialog->body_metrics.height;
   }
-  if ((dialog->confirm_len > 0u || dialog->dismiss_len > 0u) && /* GCOVR_EXCL_LINE */
-      (dialog->title_len > 0u || dialog->body_len > 0u)) { /* GCOVR_EXCL_LINE */
+  if ((dialog->confirm_len > 0u || dialog->dismiss_len > 0u) &&
+      (dialog->title_len > 0u || dialog->body_len > 0u)) {
     desired_height += dialog->style.body_action_spacing;
   }
-  if (actions_height > 0.0f) { /* GCOVR_EXCL_LINE */
+  if (actions_height > 0.0f) {
     desired_height += actions_height;
   }
 
@@ -643,7 +643,7 @@ static int m3_alert_dialog_widget_measure(void *widget, CMPMeasureSpec width,
   if (width.mode == CMP_MEASURE_EXACTLY) {
     out_size->width = width.size;
   } else if (width.mode == CMP_MEASURE_AT_MOST) {
-    out_size->width = (desired_width > width.size) ? width.size : desired_width; /* GCOVR_EXCL_LINE */
+    out_size->width = (desired_width > width.size) ? width.size : desired_width;
   } else {
     out_size->width = desired_width;
   }
@@ -674,12 +674,12 @@ static int m3_alert_dialog_widget_layout(void *widget, CMPRect bounds) {
   }
 
   rc = m3_alert_dialog_validate_style(&dialog->style, CMP_FALSE);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   rc = m3_alert_dialog_metrics_update(dialog);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   dialog->bounds = bounds;
@@ -688,21 +688,21 @@ static int m3_alert_dialog_widget_layout(void *widget, CMPRect bounds) {
 
 static int m3_alert_dialog_draw_action_text(
     const M3AlertDialog *dialog, const CMPRect *bounds,
-    const CMPTextMetrics *metrics, /* GCOVR_EXCL_LINE */
+    const CMPTextMetrics *metrics,
     const char *utf8, cmp_usize len, CMPPaintContext *ctx) {
   CMPScalar text_x;
   CMPScalar text_y;
   CMPScalar available_width;
   CMPScalar available_height = 0.0f;
 
-  if (dialog == NULL || bounds == NULL || metrics == NULL || ctx == NULL) { /* GCOVR_EXCL_LINE */
+  if (dialog == NULL || bounds == NULL || metrics == NULL || ctx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (utf8 == NULL && len != 0u) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (len == 0u) {
-    return CMP_OK; /* GCOVR_EXCL_LINE */
+    return CMP_OK;
   }
   available_width = bounds->width - dialog->style.action_padding_x * 2.0f;
   available_height = bounds->height - dialog->style.action_padding_y * 2.0f;
@@ -716,8 +716,8 @@ static int m3_alert_dialog_draw_action_text(
   if (available_width <= metrics->width) {
     text_x = bounds->x + dialog->style.action_padding_x;
   } else {
-    text_x = bounds->x + dialog->style.action_padding_x + /* GCOVR_EXCL_LINE */
-             (available_width - metrics->width) * 0.5f;   /* GCOVR_EXCL_LINE */
+    text_x = bounds->x + dialog->style.action_padding_x +
+             (available_width - metrics->width) * 0.5f;  
   }
 
   if (available_height <= metrics->height) {
@@ -725,7 +725,7 @@ static int m3_alert_dialog_draw_action_text(
   } else {
     text_y = bounds->y + dialog->style.action_padding_y +
              (available_height - metrics->height) * 0.5f +
-             metrics->baseline; /* GCOVR_EXCL_LINE */
+             metrics->baseline;
   }
 
   return cmp_text_draw_utf8_gfx(ctx->gfx, dialog->action_font,
@@ -738,9 +738,9 @@ static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPRect content_rect;
   const CMPRect *shadow_clip;
   CMPScalar cursor_y;
-  int rc; /* GCOVR_EXCL_LINE */
+  int rc;
 
-  if (widget == NULL || ctx == NULL || ctx->gfx == NULL || /* GCOVR_EXCL_LINE */
+  if (widget == NULL || ctx == NULL || ctx->gfx == NULL ||
       ctx->gfx->vtable == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -750,16 +750,16 @@ static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
 
   shadow_clip = NULL;
   if (ctx->gfx->vtable->push_clip != NULL &&
-      ctx->gfx->vtable->pop_clip != NULL) { /* GCOVR_EXCL_LINE */
-    shadow_clip = &ctx->clip; /* GCOVR_EXCL_LINE */
+      ctx->gfx->vtable->pop_clip != NULL) {
+    shadow_clip = &ctx->clip;
   }
 
   if ((rc = m3_alert_dialog_validate_style(&dialog->style, CMP_FALSE)) !=
       CMP_OK) {
     return rc;
   }
-  if ((rc = m3_alert_dialog_metrics_update(dialog)) != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if ((rc = m3_alert_dialog_metrics_update(dialog)) != CMP_OK) {
+    return rc;
   }
 
   if (dialog->style.scrim_enabled == CMP_TRUE) {
@@ -774,7 +774,7 @@ static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
     rc = cmp_shadow_paint(&dialog->style.shadow, ctx->gfx, &dialog->bounds,
                           shadow_clip);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   }
 
@@ -787,8 +787,8 @@ static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
 
   if (ctx->gfx->text_vtable == NULL ||
       ctx->gfx->text_vtable->draw_text == NULL) {
-    if (dialog->title_len > 0u || dialog->body_len > 0u || /* GCOVR_EXCL_LINE */
-        dialog->confirm_len > 0u || dialog->dismiss_len > 0u) { /* GCOVR_EXCL_LINE */
+    if (dialog->title_len > 0u || dialog->body_len > 0u ||
+        dialog->confirm_len > 0u || dialog->dismiss_len > 0u) {
       return CMP_ERR_UNSUPPORTED;
     }
     return CMP_OK;
@@ -814,7 +814,7 @@ static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
         cursor_y + dialog->title_metrics.baseline,
         dialog->style.title_style.color);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     cursor_y += dialog->title_metrics.height;
   }
@@ -832,7 +832,7 @@ static int m3_alert_dialog_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   if ((dialog->confirm_len > 0u || dialog->dismiss_len > 0u) &&
-      (dialog->title_len > 0u || dialog->body_len > 0u)) { /* GCOVR_EXCL_LINE */
+      (dialog->title_len > 0u || dialog->body_len > 0u)) {
     cursor_y += dialog->style.body_action_spacing;
     CMP_UNUSED(cursor_y);
   }
@@ -901,7 +901,7 @@ static int m3_alert_dialog_widget_event(void *widget,
         dialog->on_action != NULL) {
       rc = dialog->on_action(
           dialog->on_action_ctx, dialog,
-          M3_ALERT_DIALOG_ACTION_CONFIRM); /* GCOVR_EXCL_LINE */
+          M3_ALERT_DIALOG_ACTION_CONFIRM);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -912,8 +912,8 @@ static int m3_alert_dialog_widget_event(void *widget,
   if (dialog->pressed_dismiss == CMP_TRUE) {
     dialog->pressed_dismiss = CMP_FALSE;
     *out_handled = CMP_TRUE;
-    if (m3_dialog_point_in_rect(&dialog->dismiss_bounds, x, y) == CMP_TRUE && /* GCOVR_EXCL_LINE */
-        dialog->on_action != NULL) { /* GCOVR_EXCL_LINE */
+    if (m3_dialog_point_in_rect(&dialog->dismiss_bounds, x, y) == CMP_TRUE &&
+        dialog->on_action != NULL) {
       rc = dialog->on_action(dialog->on_action_ctx, dialog,
                              M3_ALERT_DIALOG_ACTION_DISMISS);
       if (rc != CMP_OK) {
@@ -985,8 +985,8 @@ m3_fullscreen_dialog_validate_style(const M3FullScreenDialogStyle *style,
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (style->corner_radius < 0.0f || style->title_body_spacing < 0.0f ||
-      style->body_action_spacing < 0.0f || style->action_padding_x < 0.0f || /* GCOVR_EXCL_LINE */
-      style->action_padding_y < 0.0f) { /* GCOVR_EXCL_LINE */
+      style->body_action_spacing < 0.0f || style->action_padding_x < 0.0f ||
+      style->action_padding_y < 0.0f) {
     return CMP_ERR_RANGE;
   }
   if (style->shadow_enabled != CMP_FALSE && style->shadow_enabled != CMP_TRUE) {
@@ -1025,7 +1025,7 @@ static int m3_fullscreen_dialog_metrics_update(M3FullScreenDialog *dialog) {
   int rc;
 
   if (dialog == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   if (dialog->metrics_valid == CMP_TRUE) {
@@ -1036,7 +1036,7 @@ static int m3_fullscreen_dialog_metrics_update(M3FullScreenDialog *dialog) {
       &dialog->text_backend, dialog->title_font, dialog->utf8_title,
       dialog->title_len, &dialog->title_metrics);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_dialog_measure_optional_text(&dialog->text_backend, dialog->body_font,
                                        dialog->utf8_body, dialog->body_len,
@@ -1058,7 +1058,7 @@ static int m3_fullscreen_dialog_metrics_update(M3FullScreenDialog *dialog) {
 static int m3_fullscreen_dialog_compute_action(const M3FullScreenDialog *dialog,
                                                CMPScalar *out_width,
                                                CMPScalar *out_height) {
-  if (dialog == NULL || out_width == NULL || out_height == NULL) { /* GCOVR_EXCL_LINE */
+  if (dialog == NULL || out_width == NULL || out_height == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 #ifdef CMP_TESTING
@@ -1099,21 +1099,21 @@ static int m3_fullscreen_dialog_layout_action(M3FullScreenDialog *dialog) {
   content_width = dialog->bounds.width - dialog->style.padding.left -
                   dialog->style.padding.right;
   if (content_width < 0.0f) {
-    content_width = 0.0f; /* GCOVR_EXCL_LINE */
+    content_width = 0.0f;
   }
 
   cursor_y = content_y;
-  if (dialog->title_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (dialog->title_len > 0u) {
     cursor_y += dialog->title_metrics.height;
   }
-  if (dialog->title_len > 0u && dialog->body_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (dialog->title_len > 0u && dialog->body_len > 0u) {
     cursor_y += dialog->style.title_body_spacing;
   }
-  if (dialog->body_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (dialog->body_len > 0u) {
     cursor_y += dialog->body_metrics.height;
   }
   if (dialog->action_len > 0u &&
-      (dialog->title_len > 0u || dialog->body_len > 0u)) { /* GCOVR_EXCL_LINE */
+      (dialog->title_len > 0u || dialog->body_len > 0u)) {
     cursor_y += dialog->style.body_action_spacing;
   }
 
@@ -1165,8 +1165,8 @@ static int m3_fullscreen_dialog_widget_measure(void *widget,
     return rc;
   }
   rc = m3_fullscreen_dialog_validate_style(&dialog->style, CMP_FALSE);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = m3_fullscreen_dialog_metrics_update(dialog);
@@ -1177,12 +1177,12 @@ static int m3_fullscreen_dialog_widget_measure(void *widget,
   rc = m3_fullscreen_dialog_compute_action(dialog, &action_width,
                                            &action_height);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   content_width = dialog->title_metrics.width;
   if (dialog->body_metrics.width > content_width) {
-    content_width = dialog->body_metrics.width; /* GCOVR_EXCL_LINE */
+    content_width = dialog->body_metrics.width;
   }
   if (action_width > content_width) {
     content_width = action_width;
@@ -1192,20 +1192,20 @@ static int m3_fullscreen_dialog_widget_measure(void *widget,
       content_width + dialog->style.padding.left + dialog->style.padding.right;
   desired_height = dialog->style.padding.top + dialog->style.padding.bottom;
 
-  if (dialog->title_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (dialog->title_len > 0u) {
     desired_height += dialog->title_metrics.height;
   }
-  if (dialog->title_len > 0u && dialog->body_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (dialog->title_len > 0u && dialog->body_len > 0u) {
     desired_height += dialog->style.title_body_spacing;
   }
-  if (dialog->body_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (dialog->body_len > 0u) {
     desired_height += dialog->body_metrics.height;
   }
-  if (dialog->action_len > 0u && /* GCOVR_EXCL_LINE */
-      (dialog->title_len > 0u || dialog->body_len > 0u)) { /* GCOVR_EXCL_LINE */
+  if (dialog->action_len > 0u &&
+      (dialog->title_len > 0u || dialog->body_len > 0u)) {
     desired_height += dialog->style.body_action_spacing;
   }
-  if (action_height > 0.0f) { /* GCOVR_EXCL_LINE */
+  if (action_height > 0.0f) {
     desired_height += action_height;
   }
 
@@ -1231,8 +1231,8 @@ static int m3_fullscreen_dialog_widget_measure(void *widget,
 
 static int m3_fullscreen_dialog_widget_layout(void *widget, CMPRect bounds) {
   M3FullScreenDialog *dialog =
-      (M3FullScreenDialog *)widget; /* GCOVR_EXCL_LINE */
-  int rc;                           /* GCOVR_EXCL_LINE */
+      (M3FullScreenDialog *)widget;
+  int rc;                          
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1262,30 +1262,30 @@ static int m3_fullscreen_dialog_draw_action_text(
   CMPScalar available_width = 0.0f;
   CMPScalar available_height = 0.0f;
 
-  if (dialog == NULL || bounds == NULL || metrics == NULL || ctx == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (dialog == NULL || bounds == NULL || metrics == NULL || ctx == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8 == NULL && len != 0u) { /* GCOVR_EXCL_LINE */
+  if (utf8 == NULL && len != 0u) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (len == 0u) {
-    return CMP_OK; /* GCOVR_EXCL_LINE */
+    return CMP_OK;
   }
 
   available_width = bounds->width - dialog->style.action_padding_x * 2.0f;
   available_height = bounds->height - dialog->style.action_padding_y * 2.0f;
   if (available_width < 0.0f) {
-    available_width = 0.0f; /* GCOVR_EXCL_LINE */
+    available_width = 0.0f;
   }
   if (available_height < 0.0f) {
-    available_height = 0.0f; /* GCOVR_EXCL_LINE */
+    available_height = 0.0f;
   }
 
   if (available_width <= metrics->width) {
     text_x = bounds->x + dialog->style.action_padding_x;
   } else {
-    text_x = bounds->x + dialog->style.action_padding_x + /* GCOVR_EXCL_LINE */
-             (available_width - metrics->width) * 0.5f;   /* GCOVR_EXCL_LINE */
+    text_x = bounds->x + dialog->style.action_padding_x +
+             (available_width - metrics->width) * 0.5f;  
   }
 
   if (available_height <= metrics->height) {
@@ -1293,7 +1293,7 @@ static int m3_fullscreen_dialog_draw_action_text(
   } else {
     text_y = bounds->y + dialog->style.action_padding_y +
              (available_height - metrics->height) * 0.5f +
-             metrics->baseline; /* GCOVR_EXCL_LINE */
+             metrics->baseline;
   }
 
   return cmp_text_draw_utf8_gfx(ctx->gfx, dialog->action_font,
@@ -1309,7 +1309,7 @@ static int m3_fullscreen_dialog_widget_paint(void *widget,
   CMPScalar cursor_y;
   int rc;
 
-  if (widget == NULL || ctx == NULL || ctx->gfx == NULL || /* GCOVR_EXCL_LINE */
+  if (widget == NULL || ctx == NULL || ctx->gfx == NULL ||
       ctx->gfx->vtable == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1319,7 +1319,7 @@ static int m3_fullscreen_dialog_widget_paint(void *widget,
 
   shadow_clip = NULL;
   if (ctx->gfx->vtable->push_clip != NULL &&
-      ctx->gfx->vtable->pop_clip != NULL) { /* GCOVR_EXCL_LINE */
+      ctx->gfx->vtable->pop_clip != NULL) {
     shadow_clip = &ctx->clip;
   }
   dialog = (M3FullScreenDialog *)widget;
@@ -1336,15 +1336,15 @@ static int m3_fullscreen_dialog_widget_paint(void *widget,
     rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &ctx->clip,
                                      dialog->style.scrim_color, 0.0f);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   }
 
   if (dialog->style.shadow_enabled == CMP_TRUE) {
     rc = cmp_shadow_paint(&dialog->style.shadow, ctx->gfx,
-                          &dialog->bounds, /* GCOVR_EXCL_LINE */
-                          shadow_clip);    /* GCOVR_EXCL_LINE */
-    if (rc != CMP_OK) {                    /* GCOVR_EXCL_LINE */
+                          &dialog->bounds,
+                          shadow_clip);   
+    if (rc != CMP_OK) {                   
       return rc;
     }
   }
@@ -1358,8 +1358,8 @@ static int m3_fullscreen_dialog_widget_paint(void *widget,
 
   if (ctx->gfx->text_vtable == NULL ||
       ctx->gfx->text_vtable->draw_text == NULL) {
-    if (dialog->title_len > 0u || dialog->body_len > 0u || /* GCOVR_EXCL_LINE */
-        dialog->action_len > 0u) { /* GCOVR_EXCL_LINE */
+    if (dialog->title_len > 0u || dialog->body_len > 0u ||
+        dialog->action_len > 0u) {
       return CMP_ERR_UNSUPPORTED;
     }
     return CMP_OK;
@@ -1383,10 +1383,10 @@ static int m3_fullscreen_dialog_widget_paint(void *widget,
     }
     cursor_y += dialog->title_metrics.height;
   }
-  if (dialog->title_len > 0u && dialog->body_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (dialog->title_len > 0u && dialog->body_len > 0u) {
     cursor_y += dialog->style.title_body_spacing;
   }
-  if (dialog->body_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (dialog->body_len > 0u) {
     rc = cmp_text_draw_utf8_gfx(ctx->gfx, dialog->body_font, dialog->utf8_body, dialog->body_len,
         0, content_rect.x, cursor_y + dialog->body_metrics.baseline,
         dialog->style.body_style.color);
@@ -1396,8 +1396,8 @@ static int m3_fullscreen_dialog_widget_paint(void *widget,
     cursor_y += dialog->body_metrics.height;
   }
 
-  if (dialog->action_len > 0u && /* GCOVR_EXCL_LINE */
-      (dialog->title_len > 0u || dialog->body_len > 0u)) { /* GCOVR_EXCL_LINE */
+  if (dialog->action_len > 0u &&
+      (dialog->title_len > 0u || dialog->body_len > 0u)) {
     cursor_y += dialog->style.body_action_spacing;
     CMP_UNUSED(cursor_y);
   }
@@ -1438,18 +1438,18 @@ static int m3_fullscreen_dialog_widget_event(void *widget,
     if (dialog->pressed_action == CMP_TRUE) {
       return CMP_ERR_STATE;
     }
-    if (m3_dialog_point_in_rect(&dialog->action_bounds, x, y) == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+    if (m3_dialog_point_in_rect(&dialog->action_bounds, x, y) == CMP_TRUE) {
       dialog->pressed_action = CMP_TRUE;
       *out_handled = CMP_TRUE;
     }
     return CMP_OK;
   }
 
-  if (dialog->pressed_action == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (dialog->pressed_action == CMP_TRUE) {
     dialog->pressed_action = CMP_FALSE;
     *out_handled = CMP_TRUE;
-    if (m3_dialog_point_in_rect(&dialog->action_bounds, x, y) == CMP_TRUE && /* GCOVR_EXCL_LINE */
-        dialog->on_action != NULL) { /* GCOVR_EXCL_LINE */
+    if (m3_dialog_point_in_rect(&dialog->action_bounds, x, y) == CMP_TRUE &&
+        dialog->on_action != NULL) {
       rc = dialog->on_action(dialog->on_action_ctx, dialog);
       if (rc != CMP_OK) {
         return rc;
@@ -1495,7 +1495,7 @@ static int m3_fullscreen_dialog_widget_destroy(void *widget) {
   }
 
   dialog = (M3FullScreenDialog *)widget;
-  if (dialog->owns_fonts == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (dialog->owns_fonts == CMP_TRUE) {
     fonts[0] = dialog->title_font;
     fonts[1] = dialog->body_font;
     fonts[2] = dialog->action_font;
@@ -1507,7 +1507,7 @@ static int m3_fullscreen_dialog_widget_destroy(void *widget) {
 }
 
 static const CMPWidgetVTable g_m3_fullscreen_dialog_widget_vtable = {
-    m3_fullscreen_dialog_widget_measure, /* GCOVR_EXCL_LINE */
+    m3_fullscreen_dialog_widget_measure,
     m3_fullscreen_dialog_widget_layout,
     m3_fullscreen_dialog_widget_paint,
     m3_fullscreen_dialog_widget_event,
@@ -1521,10 +1521,10 @@ static int m3_snackbar_validate_style(const M3SnackbarStyle *style,
   if (style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (style->corner_radius < 0.0f || style->min_width < 0.0f || /* GCOVR_EXCL_LINE */
-      style->max_width < 0.0f || style->min_height < 0.0f || /* GCOVR_EXCL_LINE */
-      style->action_spacing < 0.0f || style->action_padding_x < 0.0f || /* GCOVR_EXCL_LINE */
-      style->action_padding_y < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (style->corner_radius < 0.0f || style->min_width < 0.0f ||
+      style->max_width < 0.0f || style->min_height < 0.0f ||
+      style->action_spacing < 0.0f || style->action_padding_x < 0.0f ||
+      style->action_padding_y < 0.0f) {
     return CMP_ERR_RANGE;
   }
   if (style->max_width > 0.0f && style->max_width < style->min_width) {
@@ -1567,7 +1567,7 @@ static int m3_snackbar_metrics_update(M3Snackbar *snackbar) {
       &snackbar->text_backend, snackbar->message_font, snackbar->utf8_message,
       snackbar->message_len, &snackbar->message_metrics);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_dialog_measure_optional_text(
       &snackbar->text_backend, snackbar->action_font, snackbar->utf8_action,
@@ -1582,9 +1582,9 @@ static int m3_snackbar_metrics_update(M3Snackbar *snackbar) {
 
 static int
 m3_snackbar_compute_action(const M3Snackbar *snackbar, CMPScalar *out_width,
-                           CMPScalar *out_height) { /* GCOVR_EXCL_LINE */
-  if (snackbar == NULL || out_width == NULL || out_height == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+                           CMPScalar *out_height) {
+  if (snackbar == NULL || out_width == NULL || out_height == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 #ifdef CMP_TESTING
   if (m3_dialog_test_fail_point_match(
@@ -1614,19 +1614,19 @@ static int m3_snackbar_layout_action(M3Snackbar *snackbar) {
   int rc = CMP_OK;
 
   if (snackbar == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   content_x = snackbar->bounds.x + snackbar->style.padding.left;
   content_width = snackbar->bounds.width - snackbar->style.padding.left -
                   snackbar->style.padding.right;
   if (content_width < 0.0f) {
-    content_width = 0.0f; /* GCOVR_EXCL_LINE */
+    content_width = 0.0f;
   }
 
   rc = m3_snackbar_compute_action(snackbar, &action_width, &action_height);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if (action_width <= 0.0f) {
@@ -1669,18 +1669,18 @@ static int m3_snackbar_widget_measure(void *widget, CMPMeasureSpec width,
   if ((rc = m3_dialog_validate_measure_spec(height)) != CMP_OK) {
     return rc;
   }
-  if (((snackbar = (M3Snackbar *)widget), /* GCOVR_EXCL_LINE */
+  if (((snackbar = (M3Snackbar *)widget),
        (rc = m3_snackbar_validate_style(&snackbar->style, CMP_FALSE))) !=
       CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   if ((rc = m3_snackbar_metrics_update(snackbar)) != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc = m3_snackbar_compute_action(snackbar, &action_width, &action_height);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   content_width = snackbar->message_metrics.width;
   if (action_width > 0.0f) {
@@ -1691,7 +1691,7 @@ static int m3_snackbar_widget_measure(void *widget, CMPMeasureSpec width,
                   snackbar->style.padding.right;
   desired_height = snackbar->style.padding.top + snackbar->style.padding.bottom;
 
-  if (snackbar->message_metrics.height > desired_height) { /* GCOVR_EXCL_LINE */
+  if (snackbar->message_metrics.height > desired_height) {
     desired_height = snackbar->message_metrics.height +
                      snackbar->style.padding.top +
                      snackbar->style.padding.bottom;
@@ -1711,7 +1711,7 @@ static int m3_snackbar_widget_measure(void *widget, CMPMeasureSpec width,
     desired_width = snackbar->style.max_width;
   }
   if (desired_height < snackbar->style.min_height) {
-    desired_height = snackbar->style.min_height; /* GCOVR_EXCL_LINE */
+    desired_height = snackbar->style.min_height;
   }
 
   if (width.mode == CMP_MEASURE_EXACTLY) {
@@ -1726,7 +1726,7 @@ static int m3_snackbar_widget_measure(void *widget, CMPMeasureSpec width,
     out_size->height = height.size;
   } else if (height.mode == CMP_MEASURE_AT_MOST) {
     out_size->height =
-        (desired_height > height.size) ? height.size : desired_height; /* GCOVR_EXCL_LINE */
+        (desired_height > height.size) ? height.size : desired_height;
   } else {
     out_size->height = desired_height;
   }
@@ -1762,23 +1762,23 @@ static int m3_snackbar_widget_layout(void *widget, CMPRect bounds) {
 }
 
 static int m3_snackbar_draw_action_text(
-    const M3Snackbar *snackbar, const CMPRect *bounds, /* GCOVR_EXCL_LINE */
-    const CMPTextMetrics *metrics,                     /* GCOVR_EXCL_LINE */
+    const M3Snackbar *snackbar, const CMPRect *bounds,
+    const CMPTextMetrics *metrics,                    
     const char *utf8, cmp_usize len,
-    CMPPaintContext *ctx) { /* GCOVR_EXCL_LINE */
-  CMPScalar text_x;         /* GCOVR_EXCL_LINE */
+    CMPPaintContext *ctx) {
+  CMPScalar text_x;        
   CMPScalar text_y;
   CMPScalar available_width;
   CMPScalar available_height;
 
-  if (snackbar == NULL || bounds == NULL || metrics == NULL || ctx == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (snackbar == NULL || bounds == NULL || metrics == NULL || ctx == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8 == NULL && len != 0u) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (utf8 == NULL && len != 0u) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (len == 0u) {
-    return CMP_OK; /* GCOVR_EXCL_LINE */
+    return CMP_OK;
   }
   available_width = bounds->width - snackbar->style.action_padding_x * 2.0f;
   available_height = bounds->height - snackbar->style.action_padding_y * 2.0f;
@@ -1817,7 +1817,7 @@ static int m3_snackbar_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPScalar available_height = 0.0f;
   int rc;
 
-  if (widget == NULL || ctx == NULL || ctx->gfx == NULL || /* GCOVR_EXCL_LINE */
+  if (widget == NULL || ctx == NULL || ctx->gfx == NULL ||
       ctx->gfx->vtable == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1827,22 +1827,22 @@ static int m3_snackbar_widget_paint(void *widget, CMPPaintContext *ctx) {
 
   snackbar = (M3Snackbar *)widget;
   rc = m3_snackbar_validate_style(&snackbar->style, CMP_FALSE);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if ((rc = m3_snackbar_metrics_update(snackbar)) != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if ((rc = m3_snackbar_metrics_update(snackbar)) != CMP_OK) {
+    return rc;
   }
 
   rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &snackbar->bounds,
                                    snackbar->style.background_color,
                                    snackbar->style.corner_radius);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   if (ctx->gfx->text_vtable == NULL ||
       ctx->gfx->text_vtable->draw_text == NULL) {
-    if (snackbar->message_len > 0u || snackbar->action_len > 0u) { /* GCOVR_EXCL_LINE */
+    if (snackbar->message_len > 0u || snackbar->action_len > 0u) {
       return CMP_ERR_UNSUPPORTED;
     }
     return CMP_OK;
@@ -1855,10 +1855,10 @@ static int m3_snackbar_widget_paint(void *widget, CMPPaintContext *ctx) {
   content_rect.height = snackbar->bounds.height - snackbar->style.padding.top -
                         snackbar->style.padding.bottom;
   if (content_rect.width < 0.0f) {
-    content_rect.width = 0.0f; /* GCOVR_EXCL_LINE */
+    content_rect.width = 0.0f;
   }
   if (content_rect.height < 0.0f) {
-    content_rect.height = 0.0f; /* GCOVR_EXCL_LINE */
+    content_rect.height = 0.0f;
   }
 
   available_width = content_rect.width;
@@ -1882,20 +1882,20 @@ static int m3_snackbar_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   if (available_width <= snackbar->message_metrics.width) {
-    text_x = content_rect.x; /* GCOVR_EXCL_LINE */
-  } else {                   /* GCOVR_EXCL_LINE */
+    text_x = content_rect.x;
+  } else {                  
     text_x = content_rect.x;
   }
 
   if (available_height <= snackbar->message_metrics.height) {
     text_y = content_rect.y + snackbar->message_metrics.baseline;
-  } else { /* GCOVR_EXCL_LINE */
+  } else {
     text_y = content_rect.y +
              (available_height - snackbar->message_metrics.height) * 0.5f +
              snackbar->message_metrics.baseline;
   }
 
-  if (snackbar->message_len > 0u) { /* GCOVR_EXCL_LINE */
+  if (snackbar->message_len > 0u) {
     rc = cmp_text_draw_utf8_gfx(ctx->gfx, snackbar->message_font, snackbar->utf8_message,
         snackbar->message_len, 0, text_x, text_y,
         snackbar->style.message_style.color);
@@ -1939,18 +1939,18 @@ static int m3_snackbar_widget_event(void *widget, const CMPInputEvent *event,
     if (snackbar->pressed_action == CMP_TRUE) {
       return CMP_ERR_STATE;
     }
-    if (m3_dialog_point_in_rect(&snackbar->action_bounds, x, y) == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+    if (m3_dialog_point_in_rect(&snackbar->action_bounds, x, y) == CMP_TRUE) {
       snackbar->pressed_action = CMP_TRUE;
       *out_handled = CMP_TRUE;
     }
     return CMP_OK;
   }
 
-  if (snackbar->pressed_action == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (snackbar->pressed_action == CMP_TRUE) {
     snackbar->pressed_action = CMP_FALSE;
     *out_handled = CMP_TRUE;
-    if (m3_dialog_point_in_rect(&snackbar->action_bounds, x, y) == CMP_TRUE && /* GCOVR_EXCL_LINE */
-        snackbar->on_action != NULL) { /* GCOVR_EXCL_LINE */
+    if (m3_dialog_point_in_rect(&snackbar->action_bounds, x, y) == CMP_TRUE &&
+        snackbar->on_action != NULL) {
       rc = snackbar->on_action(snackbar->on_action_ctx, snackbar);
       if (rc != CMP_OK) {
         return rc;
@@ -1973,8 +1973,8 @@ static int m3_snackbar_widget_get_semantics(void *widget,
   snackbar = (M3Snackbar *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;
   out_semantics->flags = 0;
-  if (snackbar->widget.flags & CMP_WIDGET_FLAG_DISABLED) { /* GCOVR_EXCL_LINE */
-    out_semantics->flags |= CMP_SEMANTIC_FLAG_DISABLED; /* GCOVR_EXCL_LINE */
+  if (snackbar->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
+    out_semantics->flags |= CMP_SEMANTIC_FLAG_DISABLED;
   }
   if (snackbar->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_FOCUSABLE;
@@ -1995,7 +1995,7 @@ static int m3_snackbar_widget_destroy(void *widget) {
   }
 
   snackbar = (M3Snackbar *)widget;
-  if (snackbar->owns_fonts == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (snackbar->owns_fonts == CMP_TRUE) {
     fonts[0] = snackbar->message_font;
     fonts[1] = snackbar->action_font;
     rc = m3_dialog_destroy_fonts(&snackbar->text_backend, fonts, 2u);
@@ -2093,8 +2093,8 @@ int CMP_CALL m3_alert_dialog_style_init(M3AlertDialogStyle *style) {
   shadow_color.a = 0.24f;
   rc = cmp_shadow_set(&style->shadow, 0.0f, 8.0f, 16.0f, 0.0f,
                       style->corner_radius, 4u, shadow_color);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   style->shadow_enabled = CMP_TRUE;
@@ -2106,10 +2106,10 @@ int CMP_CALL m3_alert_dialog_init(M3AlertDialog *dialog,
                                   const CMPTextBackend *backend,
                                   const M3AlertDialogStyle *style,
                                   const char *utf8_title,
-                                  cmp_usize title_len, /* GCOVR_EXCL_LINE */
+                                  cmp_usize title_len,
                                   const char *utf8_body, cmp_usize body_len) {
   CMPHandle fonts[2];
-  int rc; /* GCOVR_EXCL_LINE */
+  int rc;
   int cleanup_rc;
 
   if (dialog == NULL || backend == NULL) {
@@ -2168,11 +2168,11 @@ int CMP_CALL m3_alert_dialog_init(M3AlertDialog *dialog,
   rc = cmp_text_font_create(backend, &style->body_style, &dialog->body_font);
   if (rc != CMP_OK) {
     cleanup_rc = m3_dialog_destroy_fonts(backend, &dialog->title_font,
-                                         1u); /* GCOVR_EXCL_LINE */
-    if (cleanup_rc != CMP_OK) { /* GCOVR_EXCL_LINE */
+                                         1u);
+    if (cleanup_rc != CMP_OK) {
       return cleanup_rc;
     }
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc =
       cmp_text_font_create(backend, &style->action_style, &dialog->action_font);
@@ -2180,9 +2180,9 @@ int CMP_CALL m3_alert_dialog_init(M3AlertDialog *dialog,
     fonts[0] = dialog->title_font;
     fonts[1] = dialog->body_font;
     cleanup_rc =
-        m3_dialog_destroy_fonts(backend, fonts, 2u); /* GCOVR_EXCL_LINE */
-    if (cleanup_rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return cleanup_rc; /* GCOVR_EXCL_LINE */
+        m3_dialog_destroy_fonts(backend, fonts, 2u);
+    if (cleanup_rc != CMP_OK) {
+      return cleanup_rc;
     }
     return rc;
   }
@@ -2201,7 +2201,7 @@ int CMP_CALL m3_alert_dialog_set_title(M3AlertDialog *dialog,
   if (dialog == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_title == NULL && title_len != 0u) { /* GCOVR_EXCL_LINE */
+  if (utf8_title == NULL && title_len != 0u) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -2217,21 +2217,21 @@ int CMP_CALL m3_alert_dialog_set_body(M3AlertDialog *dialog,
   if (dialog == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_body == NULL && body_len != 0u) { /* GCOVR_EXCL_LINE */
+  if (utf8_body == NULL && body_len != 0u) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
   dialog->utf8_body = utf8_body;
-  dialog->body_len = body_len; /* GCOVR_EXCL_LINE */
+  dialog->body_len = body_len;
   dialog->metrics_valid = CMP_FALSE;
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+  return CMP_OK;
 }
 
 int CMP_CALL m3_alert_dialog_set_actions(
-    M3AlertDialog *dialog, const char *utf8_confirm, /* GCOVR_EXCL_LINE */
+    M3AlertDialog *dialog, const char *utf8_confirm,
     cmp_usize confirm_len, const char *utf8_dismiss, cmp_usize dismiss_len) {
   if (dialog == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (utf8_confirm == NULL && confirm_len != 0u) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2250,7 +2250,7 @@ int CMP_CALL m3_alert_dialog_set_actions(
 
 int CMP_CALL m3_alert_dialog_set_style(
     M3AlertDialog *dialog,
-    const M3AlertDialogStyle *style) { /* GCOVR_EXCL_LINE */
+    const M3AlertDialogStyle *style) {
   CMPHandle new_title;
   CMPHandle new_body;
   CMPHandle new_action;
@@ -2298,7 +2298,7 @@ int CMP_CALL m3_alert_dialog_set_style(
     return (cleanup_rc != CMP_OK) ? cleanup_rc : rc;
   }
 
-  if (dialog->owns_fonts == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (dialog->owns_fonts == CMP_TRUE) {
     old_fonts[0] = dialog->title_font;
     old_fonts[1] = dialog->body_font;
     old_fonts[2] = dialog->action_font;
@@ -2309,8 +2309,8 @@ int CMP_CALL m3_alert_dialog_set_style(
       new_fonts[2] = new_action;
       cleanup_rc =
           m3_dialog_destroy_fonts(&dialog->text_backend, new_fonts, 3u);
-      if (cleanup_rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return cleanup_rc; /* GCOVR_EXCL_LINE */
+      if (cleanup_rc != CMP_OK) {
+        return cleanup_rc;
       }
       return rc;
     }
@@ -2354,8 +2354,8 @@ int CMP_CALL m3_fullscreen_dialog_style_init(M3FullScreenDialogStyle *style) {
     return rc;
   }
   rc = cmp_text_style_init(&style->action_style);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   style->padding.left = M3_FULLSCREEN_DIALOG_DEFAULT_PADDING_X;
@@ -2395,8 +2395,8 @@ int CMP_CALL m3_fullscreen_dialog_style_init(M3FullScreenDialogStyle *style) {
   style->scrim_color.a = 0.0f;
 
   rc = cmp_shadow_init(&style->shadow);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   shadow_color.r = 0.0f;
@@ -2405,8 +2405,8 @@ int CMP_CALL m3_fullscreen_dialog_style_init(M3FullScreenDialogStyle *style) {
   shadow_color.a = 0.24f;
   rc = cmp_shadow_set(&style->shadow, 0.0f, 6.0f, 12.0f, 0.0f,
                       style->corner_radius, 3u, shadow_color);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   style->shadow_enabled = CMP_FALSE;
@@ -2415,12 +2415,12 @@ int CMP_CALL m3_fullscreen_dialog_style_init(M3FullScreenDialogStyle *style) {
 }
 
 int CMP_CALL m3_fullscreen_dialog_init(
-    M3FullScreenDialog *dialog,    /* GCOVR_EXCL_LINE */
-    const CMPTextBackend *backend, /* GCOVR_EXCL_LINE */
+    M3FullScreenDialog *dialog,   
+    const CMPTextBackend *backend,
     const M3FullScreenDialogStyle *style, const char *utf8_title,
     cmp_usize title_len, const char *utf8_body, cmp_usize body_len) {
   CMPHandle fonts[2];
-  int rc; /* GCOVR_EXCL_LINE */
+  int rc;
   int cleanup_rc;
 
   if (dialog == NULL || backend == NULL) {
@@ -2506,7 +2506,7 @@ int CMP_CALL m3_fullscreen_dialog_set_title(M3FullScreenDialog *dialog,
   if (dialog == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_title == NULL && title_len != 0u) { /* GCOVR_EXCL_LINE */
+  if (utf8_title == NULL && title_len != 0u) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -2519,17 +2519,17 @@ int CMP_CALL m3_fullscreen_dialog_set_title(M3FullScreenDialog *dialog,
 int CMP_CALL m3_fullscreen_dialog_set_body(M3FullScreenDialog *dialog,
                                            const char *utf8_body,
                                            cmp_usize body_len) {
-  if (dialog == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (dialog == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_body == NULL && body_len != 0u) { /* GCOVR_EXCL_LINE */
+  if (utf8_body == NULL && body_len != 0u) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  dialog->utf8_body = utf8_body; /* GCOVR_EXCL_LINE */
+  dialog->utf8_body = utf8_body;
   dialog->body_len = body_len;
   dialog->metrics_valid = CMP_FALSE;
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+  return CMP_OK;
 }
 
 int CMP_CALL m3_fullscreen_dialog_set_action(M3FullScreenDialog *dialog,
@@ -2600,7 +2600,7 @@ int CMP_CALL m3_fullscreen_dialog_set_style(
     return rc;
   }
 
-  if (dialog->owns_fonts == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (dialog->owns_fonts == CMP_TRUE) {
     old_fonts[0] = dialog->title_font;
     old_fonts[1] = dialog->body_font;
     old_fonts[2] = dialog->action_font;
@@ -2651,8 +2651,8 @@ int CMP_CALL m3_snackbar_style_init(M3SnackbarStyle *style) {
     return rc;
   }
   rc = cmp_text_style_init(&style->action_style);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   style->padding.left = M3_SNACKBAR_DEFAULT_PADDING_X;
@@ -2733,18 +2733,18 @@ int CMP_CALL m3_snackbar_init(M3Snackbar *snackbar,
 
   rc = cmp_text_font_create(backend, &style->message_style,
                             &snackbar->message_font);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   rc = cmp_text_font_create(backend, &style->action_style,
                             &snackbar->action_font);
   if (rc != CMP_OK) {
     cleanup_rc = m3_dialog_destroy_fonts(backend, &snackbar->message_font,
-                                         1u); /* GCOVR_EXCL_LINE */
-    if (cleanup_rc != CMP_OK) {               /* GCOVR_EXCL_LINE */
-      return cleanup_rc;                      /* GCOVR_EXCL_LINE */
+                                         1u);
+    if (cleanup_rc != CMP_OK) {              
+      return cleanup_rc;                     
     }
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   m3_snackbar_widget_vtable_init();
@@ -2759,10 +2759,10 @@ int CMP_CALL m3_snackbar_init(M3Snackbar *snackbar,
 int CMP_CALL m3_snackbar_set_message(M3Snackbar *snackbar,
                                      const char *utf8_message,
                                      cmp_usize message_len) {
-  if (snackbar == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (snackbar == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_message == NULL && message_len != 0u) { /* GCOVR_EXCL_LINE */
+  if (utf8_message == NULL && message_len != 0u) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -2775,8 +2775,8 @@ int CMP_CALL m3_snackbar_set_message(M3Snackbar *snackbar,
 int CMP_CALL m3_snackbar_set_action(M3Snackbar *snackbar,
                                     const char *utf8_action,
                                     cmp_usize action_len) {
-  if (snackbar == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (snackbar == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (utf8_action == NULL && action_len != 0u) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2827,7 +2827,7 @@ int CMP_CALL m3_snackbar_set_style(M3Snackbar *snackbar,
     return rc;
   }
 
-  if (snackbar->owns_fonts == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (snackbar->owns_fonts == CMP_TRUE) {
     old_fonts[0] = snackbar->message_font;
     old_fonts[1] = snackbar->action_font;
     rc = m3_dialog_destroy_fonts(&snackbar->text_backend, old_fonts, 2u);
@@ -2836,8 +2836,8 @@ int CMP_CALL m3_snackbar_set_style(M3Snackbar *snackbar,
       new_fonts[1] = new_action;
       cleanup_rc =
           m3_dialog_destroy_fonts(&snackbar->text_backend, new_fonts, 2u);
-      if (cleanup_rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return cleanup_rc; /* GCOVR_EXCL_LINE */
+      if (cleanup_rc != CMP_OK) {
+        return cleanup_rc;
       }
       return rc;
     }
@@ -2854,8 +2854,8 @@ int CMP_CALL m3_snackbar_set_style(M3Snackbar *snackbar,
 int CMP_CALL m3_snackbar_set_on_action(M3Snackbar *snackbar,
                                        CMPSnackbarOnAction on_action,
                                        void *ctx) {
-  if (snackbar == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (snackbar == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   snackbar->on_action = on_action;

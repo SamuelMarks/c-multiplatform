@@ -21,13 +21,13 @@
 #define CMP_LIST_TEST_FAIL_LIST_ITEM_BOUNDS 14u
 #define CMP_LIST_TEST_FAIL_LIST_RENDER_BOUNDS 15u
 #define CMP_LIST_TEST_FAIL_GRID_ITEM_BOUNDS 16u
-#define CMP_LIST_TEST_FAIL_GRID_RENDER_BOUNDS 17u /* GCOVR_EXCL_LINE */
+#define CMP_LIST_TEST_FAIL_GRID_RENDER_BOUNDS 17u
 #define CMP_LIST_TEST_FAIL_LIST_MEASURE_CONTENT_NEGATIVE 18u
-#define CMP_LIST_TEST_FAIL_GRID_MEASURE_CONTENT_NEGATIVE /* GCOVR_EXCL_LINE */ \
-  19u                                                    /* GCOVR_EXCL_LINE */
+#define CMP_LIST_TEST_FAIL_GRID_MEASURE_CONTENT_NEGATIVE \
+  19u                                                   
 
 static cmp_u32 g_cmp_list_test_fail_point =
-    CMP_LIST_TEST_FAIL_NONE; /* GCOVR_EXCL_LINE */
+    CMP_LIST_TEST_FAIL_NONE;
 
 static CMPBool cmp_list_test_fail_point_match(cmp_u32 point) {
   if (g_cmp_list_test_fail_point != point) {
@@ -36,7 +36,7 @@ static CMPBool cmp_list_test_fail_point_match(cmp_u32 point) {
   g_cmp_list_test_fail_point = CMP_LIST_TEST_FAIL_NONE;
   return CMP_TRUE;
 }
-#endif /* GCOVR_EXCL_LINE */
+#endif
 
 static cmp_usize cmp_list_usize_max_value(void) {
   return (cmp_usize) ~(cmp_usize)0;
@@ -51,7 +51,7 @@ static int cmp_list_mul_overflow(cmp_usize a, cmp_usize b,
   }
 
   max_value = cmp_list_usize_max_value();
-  if (a != 0 && b > max_value / a) { /* GCOVR_EXCL_LINE */
+  if (a != 0 && b > max_value / a) {
     return CMP_ERR_OVERFLOW;
   }
 
@@ -63,16 +63,16 @@ static int cmp_list_validate_color(const CMPColor *color) {
   if (color == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (!(color->r >= 0.0f && color->r <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->r >= 0.0f && color->r <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-  if (!(color->g >= 0.0f && color->g <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->g >= 0.0f && color->g <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-  if (!(color->b >= 0.0f && color->b <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->b >= 0.0f && color->b <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-  if (!(color->a >= 0.0f && color->a <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->a >= 0.0f && color->a <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
   return CMP_OK;
@@ -177,7 +177,7 @@ cmp_list_compute_content_extent(cmp_usize item_count, CMPScalar item_extent,
   if (out_extent == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (item_extent < 0.0f || spacing < 0.0f || padding_start < 0.0f || /* GCOVR_EXCL_LINE */
+  if (item_extent < 0.0f || spacing < 0.0f || padding_start < 0.0f ||
       padding_end < 0.0f) {
     return CMP_ERR_RANGE;
   }
@@ -225,10 +225,10 @@ cmp_list_compute_visible_range(cmp_usize item_count, CMPScalar item_extent,
   *out_last = CMP_LIST_INVALID_INDEX;
   *out_count = 0;
 
-  if (item_count == 0 || viewport <= 0.0f) { /* GCOVR_EXCL_LINE */
+  if (item_count == 0 || viewport <= 0.0f) {
     return CMP_OK;
   }
-  if (item_extent <= 0.0f || spacing < 0.0f || padding_start < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (item_extent <= 0.0f || spacing < 0.0f || padding_start < 0.0f) {
     return CMP_ERR_RANGE;
   }
 
@@ -365,7 +365,7 @@ static int cmp_grid_compute_visible_range(const CMPGridView *view,
     viewport = view->bounds.width;
   }
 
-  if (item_main <= 0.0f || spacing_main < 0.0f || padding_main < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (item_main <= 0.0f || spacing_main < 0.0f || padding_main < 0.0f) {
     return CMP_ERR_RANGE;
   }
   if (viewport <= 0.0f) {
@@ -497,7 +497,7 @@ static int cmp_list_compute_item_bounds(const CMPListView *view,
   CMPScalar height;
   CMPScalar stride;
 
-  if (view == NULL || out_bounds == NULL) { /* GCOVR_EXCL_LINE */
+  if (view == NULL || out_bounds == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (index >= view->item_count) {
@@ -543,14 +543,14 @@ static int cmp_grid_compute_item_bounds(const CMPGridView *view,
   CMPScalar x;
   CMPScalar y;
 
-  if (view == NULL || out_bounds == NULL) { /* GCOVR_EXCL_LINE */
+  if (view == NULL || out_bounds == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (index >= view->item_count) {
     return CMP_ERR_NOT_FOUND;
   }
 
-  if (view->style.item_width <= 0.0f || view->style.item_height <= 0.0f) { /* GCOVR_EXCL_LINE */
+  if (view->style.item_width <= 0.0f || view->style.item_height <= 0.0f) {
     return CMP_ERR_RANGE;
   }
 
@@ -653,7 +653,7 @@ static int cmp_grid_view_update_metrics(CMPGridView *view) {
     viewport = view->bounds.width;
   }
 
-  if (spacing_main < 0.0f || item_main < 0.0f || padding_start < 0.0f || /* GCOVR_EXCL_LINE */
+  if (spacing_main < 0.0f || item_main < 0.0f || padding_start < 0.0f ||
       padding_end < 0.0f) {
     return CMP_ERR_RANGE;
   }
@@ -709,7 +709,7 @@ static int cmp_list_reserve_slots(CMPListSlot **slots,
                                   CMPRenderNode ***visible_nodes,
                                   cmp_usize *slot_capacity,
                                   const CMPAllocator *allocator,
-                                  cmp_usize capacity) { /* GCOVR_EXCL_LINE */
+                                  cmp_usize capacity) {
   CMPListSlot *new_slots;
   CMPRenderNode **new_nodes;
   cmp_usize slot_bytes;
@@ -756,7 +756,7 @@ static int cmp_list_reserve_slots(CMPListSlot **slots,
     return rc;
   }
 
-  if (*slots != NULL && *slot_capacity > 0) { /* GCOVR_EXCL_LINE */
+  if (*slots != NULL && *slot_capacity > 0) {
     cmp_usize copy_bytes;
     rc = cmp_list_mul_overflow(*slot_capacity, (cmp_usize)sizeof(CMPListSlot),
                                &copy_bytes);
@@ -795,7 +795,7 @@ static int cmp_list_reserve_slots(CMPListSlot **slots,
 
 static int cmp_list_widget_measure(void *widget, CMPMeasureSpec width,
                                    CMPMeasureSpec height,
-                                   CMPSize *out_size) { /* GCOVR_EXCL_LINE */
+                                   CMPSize *out_size) {
   CMPListView *view = NULL;
   CMPScalar content_width = 0.0f;
   CMPScalar content_height = 0.0f;
@@ -832,21 +832,21 @@ static int cmp_list_widget_measure(void *widget, CMPMeasureSpec width,
     content_width = view->content_extent;
     content_height = view->style.padding.top + view->style.padding.bottom;
   }
-#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+#ifdef CMP_TESTING
   if (cmp_list_test_fail_point_match(
           CMP_LIST_TEST_FAIL_LIST_MEASURE_CONTENT_NEGATIVE)) {
     content_width = -1.0f;
   }
-#endif /* GCOVR_EXCL_LINE */
+#endif
 
-  if (content_width < 0.0f || content_height < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (content_width < 0.0f || content_height < 0.0f) {
     return CMP_ERR_RANGE;
   }
 
   if (width.mode == CMP_MEASURE_EXACTLY) {
     out_size->width = width.size;
   } else if (width.mode == CMP_MEASURE_AT_MOST) {
-    out_size->width = (content_width > width.size) ? width.size : content_width; /* GCOVR_EXCL_LINE */
+    out_size->width = (content_width > width.size) ? width.size : content_width;
   } else {
     out_size->width = content_width;
   }
@@ -855,7 +855,7 @@ static int cmp_list_widget_measure(void *widget, CMPMeasureSpec width,
     out_size->height = height.size;
   } else if (height.mode == CMP_MEASURE_AT_MOST) {
     out_size->height =
-        (content_height > height.size) ? height.size : content_height; /* GCOVR_EXCL_LINE */
+        (content_height > height.size) ? height.size : content_height;
   } else {
     out_size->height = content_height;
   }
@@ -902,7 +902,7 @@ static int cmp_list_widget_paint(void *widget, CMPPaintContext *ctx) {
   if (view->style.background_color.a <= 0.0f) {
     return CMP_OK;
   }
-  if (ctx->gfx->vtable == NULL || ctx->gfx->vtable->draw_rect == NULL) { /* GCOVR_EXCL_LINE */
+  if (ctx->gfx->vtable == NULL || ctx->gfx->vtable->draw_rect == NULL) {
     return CMP_ERR_UNSUPPORTED;
   }
 
@@ -911,10 +911,10 @@ static int cmp_list_widget_paint(void *widget, CMPPaintContext *ctx) {
 }
 
 static int cmp_list_widget_event(void *widget, const CMPInputEvent *event,
-                                 CMPBool *out_handled) { /* GCOVR_EXCL_LINE */
+                                 CMPBool *out_handled) {
   CMPListView *view = NULL;
-  CMPScalar delta; /* GCOVR_EXCL_LINE */
-  int rc;          /* GCOVR_EXCL_LINE */
+  CMPScalar delta;
+  int rc;         
 
   if (widget == NULL || event == NULL || out_handled == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -951,7 +951,7 @@ static int cmp_list_widget_event(void *widget, const CMPInputEvent *event,
 }
 
 static int cmp_list_widget_get_semantics(
-    void *widget, CMPSemantics *out_semantics) { /* GCOVR_EXCL_LINE */
+    void *widget, CMPSemantics *out_semantics) {
   CMPListView *view = NULL;
 
   if (widget == NULL || out_semantics == NULL) {
@@ -983,15 +983,15 @@ static int cmp_list_widget_destroy(void *widget) {
   view = (CMPListView *)widget;
   rc = CMP_OK;
 
-  if (view->slots != NULL && view->allocator.free != NULL) { /* GCOVR_EXCL_LINE */
+  if (view->slots != NULL && view->allocator.free != NULL) {
     rc2 = view->allocator.free(view->allocator.ctx, view->slots);
-    if (rc2 != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+    if (rc2 != CMP_OK && rc == CMP_OK) {
       rc = rc2;
     }
   }
-  if (view->visible_nodes != NULL && view->allocator.free != NULL) { /* GCOVR_EXCL_LINE */
+  if (view->visible_nodes != NULL && view->allocator.free != NULL) {
     rc2 = view->allocator.free(view->allocator.ctx, view->visible_nodes);
-    if (rc2 != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+    if (rc2 != CMP_OK && rc == CMP_OK) {
       rc = rc2;
     }
   }
@@ -1016,13 +1016,13 @@ static int cmp_list_widget_destroy(void *widget) {
   return rc;
 }
 
-static const CMPWidgetVTable g_cmp_list_widget_vtable = /* GCOVR_EXCL_LINE */
+static const CMPWidgetVTable g_cmp_list_widget_vtable =
     {cmp_list_widget_measure,
-     cmp_list_widget_layout, /* GCOVR_EXCL_LINE */
+     cmp_list_widget_layout,
      cmp_list_widget_paint,
-     cmp_list_widget_event, /* GCOVR_EXCL_LINE */
+     cmp_list_widget_event,
      cmp_list_widget_get_semantics,
-     cmp_list_widget_destroy}; /* GCOVR_EXCL_LINE */
+     cmp_list_widget_destroy};
 
 static int cmp_grid_widget_measure(void *widget, CMPMeasureSpec width,
                                    CMPMeasureSpec height, CMPSize *out_size) {
@@ -1080,7 +1080,7 @@ static int cmp_grid_widget_measure(void *widget, CMPMeasureSpec width,
   if (width.mode == CMP_MEASURE_EXACTLY) {
     out_size->width = width.size;
   } else if (width.mode == CMP_MEASURE_AT_MOST) {
-    out_size->width = (content_width > width.size) ? width.size : content_width; /* GCOVR_EXCL_LINE */
+    out_size->width = (content_width > width.size) ? width.size : content_width;
   } else {
     out_size->width = content_width;
   }
@@ -1089,7 +1089,7 @@ static int cmp_grid_widget_measure(void *widget, CMPMeasureSpec width,
     out_size->height = height.size;
   } else if (height.mode == CMP_MEASURE_AT_MOST) {
     out_size->height =
-        (content_height > height.size) ? height.size : content_height; /* GCOVR_EXCL_LINE */
+        (content_height > height.size) ? height.size : content_height;
   } else {
     out_size->height = content_height;
   }
@@ -1098,8 +1098,8 @@ static int cmp_grid_widget_measure(void *widget, CMPMeasureSpec width,
 }
 
 static int cmp_grid_widget_layout(void *widget, CMPRect bounds) {
-  CMPGridView *view; /* GCOVR_EXCL_LINE */
-  int rc;            /* GCOVR_EXCL_LINE */
+  CMPGridView *view;
+  int rc;           
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1119,7 +1119,7 @@ static int cmp_grid_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPGridView *view = NULL;
   int rc = CMP_OK;
 
-  if (widget == NULL || ctx == NULL || ctx->gfx == NULL) { /* GCOVR_EXCL_LINE */
+  if (widget == NULL || ctx == NULL || ctx->gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -1136,7 +1136,7 @@ static int cmp_grid_widget_paint(void *widget, CMPPaintContext *ctx) {
   if (view->style.background_color.a <= 0.0f) {
     return CMP_OK;
   }
-  if (ctx->gfx->vtable == NULL || ctx->gfx->vtable->draw_rect == NULL) { /* GCOVR_EXCL_LINE */
+  if (ctx->gfx->vtable == NULL || ctx->gfx->vtable->draw_rect == NULL) {
     return CMP_ERR_UNSUPPORTED;
   }
 
@@ -1145,7 +1145,7 @@ static int cmp_grid_widget_paint(void *widget, CMPPaintContext *ctx) {
 }
 
 static int cmp_grid_widget_event(void *widget, const CMPInputEvent *event,
-                                 CMPBool *out_handled) { /* GCOVR_EXCL_LINE */
+                                 CMPBool *out_handled) {
   CMPGridView *view = NULL;
   CMPScalar delta = 0.0f;
   int rc = CMP_OK;
@@ -1184,7 +1184,7 @@ static int cmp_grid_widget_event(void *widget, const CMPInputEvent *event,
   return CMP_OK;
 }
 
-static int /* GCOVR_EXCL_LINE */
+static int
 cmp_grid_widget_get_semantics(void *widget, CMPSemantics *out_semantics) {
   CMPGridView *view;
 
@@ -1217,15 +1217,15 @@ static int cmp_grid_widget_destroy(void *widget) {
   view = (CMPGridView *)widget;
   rc = CMP_OK;
 
-  if (view->slots != NULL && view->allocator.free != NULL) { /* GCOVR_EXCL_LINE */
+  if (view->slots != NULL && view->allocator.free != NULL) {
     rc2 = view->allocator.free(view->allocator.ctx, view->slots);
-    if (rc2 != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+    if (rc2 != CMP_OK && rc == CMP_OK) {
       rc = rc2;
     }
   }
-  if (view->visible_nodes != NULL && view->allocator.free != NULL) { /* GCOVR_EXCL_LINE */
+  if (view->visible_nodes != NULL && view->allocator.free != NULL) {
     rc2 = view->allocator.free(view->allocator.ctx, view->visible_nodes);
-    if (rc2 != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+    if (rc2 != CMP_OK && rc == CMP_OK) {
       rc = rc2;
     }
   }
@@ -1299,7 +1299,7 @@ int CMP_CALL cmp_list_view_init(CMPListView *view, const CMPListStyle *style,
     alloc = *allocator;
   }
 
-  if (alloc.alloc == NULL || alloc.realloc == NULL || alloc.free == NULL) { /* GCOVR_EXCL_LINE */
+  if (alloc.alloc == NULL || alloc.realloc == NULL || alloc.free == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -1423,7 +1423,7 @@ int CMP_CALL cmp_list_view_get_content_extent(const CMPListView *view,
 
 int CMP_CALL cmp_list_view_get_required_slots(const CMPListView *view,
                                               cmp_usize *out_required) {
-  CMPListView temp; /* GCOVR_EXCL_LINE */
+  CMPListView temp;
   CMPScalar padding_start;
   CMPScalar viewport;
   cmp_usize first;
@@ -1479,7 +1479,7 @@ int CMP_CALL cmp_list_view_reserve(CMPListView *view, cmp_usize capacity) {
     return rc;
   }
 
-  if (capacity > 0 && view->visible_nodes != NULL) { /* GCOVR_EXCL_LINE */
+  if (capacity > 0 && view->visible_nodes != NULL) {
     memset(view->visible_nodes, 0,
            (size_t)(capacity * sizeof(CMPRenderNode *)));
   }
@@ -1528,7 +1528,7 @@ int CMP_CALL cmp_list_view_update(CMPListView *view) {
   rc = cmp_list_compute_visible_range(
       view->item_count, view->style.item_extent, view->style.spacing,
       padding_start, view->scroll_offset, viewport, view->style.overscan,
-      &first, &last, &count); /* GCOVR_EXCL_LINE */
+      &first, &last, &count);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1538,14 +1538,14 @@ int CMP_CALL cmp_list_view_update(CMPListView *view) {
   view->visible_last = CMP_LIST_INVALID_INDEX;
 
   if (count == 0) {
-    if (view->visible_nodes != NULL && view->slot_capacity > 0) { /* GCOVR_EXCL_LINE */
+    if (view->visible_nodes != NULL && view->slot_capacity > 0) {
       memset(view->visible_nodes, 0,
              (size_t)(view->slot_capacity * sizeof(CMPRenderNode *)));
     }
     return CMP_OK;
   }
 
-  if (view->slots == NULL || view->visible_nodes == NULL) { /* GCOVR_EXCL_LINE */
+  if (view->slots == NULL || view->visible_nodes == NULL) {
     return CMP_ERR_STATE;
   }
   if (view->slot_capacity < count) {
@@ -1567,7 +1567,7 @@ int CMP_CALL cmp_list_view_update(CMPListView *view) {
     if (rc != CMP_OK) {
       return rc;
     }
-    if (slot->node.widget == NULL || slot->node.widget->vtable == NULL) { /* GCOVR_EXCL_LINE */
+    if (slot->node.widget == NULL || slot->node.widget->vtable == NULL) {
       return CMP_ERR_STATE;
     }
 
@@ -1662,7 +1662,7 @@ int CMP_CALL cmp_grid_view_init(CMPGridView *view, const CMPGridStyle *style,
     alloc = *allocator;
   }
 
-  if (alloc.alloc == NULL || alloc.realloc == NULL || alloc.free == NULL) { /* GCOVR_EXCL_LINE */
+  if (alloc.alloc == NULL || alloc.realloc == NULL || alloc.free == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -1817,7 +1817,7 @@ int CMP_CALL cmp_grid_view_get_required_slots(const CMPGridView *view,
 }
 
 int CMP_CALL cmp_grid_view_reserve(CMPGridView *view, cmp_usize capacity) {
-  int rc; /* GCOVR_EXCL_LINE */
+  int rc;
 
   if (view == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1829,7 +1829,7 @@ int CMP_CALL cmp_grid_view_reserve(CMPGridView *view, cmp_usize capacity) {
     return rc;
   }
 
-  if (capacity > 0 && view->visible_nodes != NULL) { /* GCOVR_EXCL_LINE */
+  if (capacity > 0 && view->visible_nodes != NULL) {
     memset(view->visible_nodes, 0,
            (size_t)(capacity * sizeof(CMPRenderNode *)));
   }
@@ -1875,14 +1875,14 @@ int CMP_CALL cmp_grid_view_update(CMPGridView *view) {
   view->visible_last = CMP_LIST_INVALID_INDEX;
 
   if (count == 0) {
-    if (view->visible_nodes != NULL && view->slot_capacity > 0) { /* GCOVR_EXCL_LINE */
+    if (view->visible_nodes != NULL && view->slot_capacity > 0) {
       memset(view->visible_nodes, 0,
              (size_t)(view->slot_capacity * sizeof(CMPRenderNode *)));
     }
     return CMP_OK;
   }
 
-  if (view->slots == NULL || view->visible_nodes == NULL) { /* GCOVR_EXCL_LINE */
+  if (view->slots == NULL || view->visible_nodes == NULL) {
     return CMP_ERR_STATE;
   }
   if (view->slot_capacity < count) {
@@ -1904,7 +1904,7 @@ int CMP_CALL cmp_grid_view_update(CMPGridView *view) {
     if (rc != CMP_OK) {
       return rc;
     }
-    if (slot->node.widget == NULL || slot->node.widget->vtable == NULL) { /* GCOVR_EXCL_LINE */
+    if (slot->node.widget == NULL || slot->node.widget->vtable == NULL) {
       return CMP_ERR_STATE;
     }
 

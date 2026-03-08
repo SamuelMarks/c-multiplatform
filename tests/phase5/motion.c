@@ -24,6 +24,8 @@ static int test_shared_axis(void) {
   if (enter.opacity != 1.0f)
     return 1;
 
+  m3_motion_shared_axis(M3_SHARED_AXIS_Z, CMP_FALSE, 0.5f, &enter, &exit);
+
   return 0;
 }
 
@@ -31,6 +33,8 @@ static int test_fade_through(void) {
   M3MotionResult enter = {0}, exit = {0};
 
   if (m3_motion_fade_through(0.5f, NULL, &exit) != CMP_ERR_INVALID_ARGUMENT)
+    return 1;
+  if (m3_motion_fade_through(0.5f, &enter, NULL) != CMP_ERR_INVALID_ARGUMENT)
     return 1;
 
   m3_motion_fade_through(0.2f, &enter, &exit);
@@ -61,7 +65,12 @@ static int test_container_transform(void) {
   if (m3_motion_container_transform(start, end, 0.5f, NULL, &enter, &exit) !=
       CMP_ERR_INVALID_ARGUMENT)
     return 1;
-
+  if (m3_motion_container_transform(start, end, 0.5f, &out, NULL, &exit) !=
+      CMP_ERR_INVALID_ARGUMENT)
+    return 1;
+  if (m3_motion_container_transform(start, end, 0.5f, &out, &enter, NULL) !=
+      CMP_ERR_INVALID_ARGUMENT)
+    return 1;
   m3_motion_container_transform(start, end, 0.5f, &out, &enter, &exit);
   if (out.x != 50.0f || out.width != 150.0f)
     return 1;

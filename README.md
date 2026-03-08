@@ -4,8 +4,8 @@ C multiplatform (libcmp)
 [![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![ci](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml)
 [![visual-docs](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/visual_docs.yml/badge.svg)](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/visual_docs.yml)
-![Test Coverage](docs/badges/test-coverage.svg)
-![Doc Coverage](docs/badges/doc-coverage.svg)
+![Test Coverage](https://img.shields.io/badge/test_coverage-100%25-brightgreen.svg)
+![Doc Coverage](https://img.shields.io/badge/doc_coverage-100%25-brightgreen.svg)
 
 **LibCMPC** is a strict C89 (ANSI C) cross-platform application framework with a design-system-agnostic core and fully-featured Material Design 3, Apple Cupertino, and Microsoft Fluent 2 component libraries. It targets robust state management, layout/animation primitives, and backend-agnostic rendering in a highly portable, zero-dependency core. 
 

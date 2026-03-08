@@ -28,16 +28,16 @@ static int cmp_extras_validate_color(const CMPColor *color) {
   if (color == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (!(color->r >= 0.0f && color->r <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->r >= 0.0f && color->r <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-  if (!(color->g >= 0.0f && color->g <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->g >= 0.0f && color->g <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-  if (!(color->b >= 0.0f && color->b <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->b >= 0.0f && color->b <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-  if (!(color->a >= 0.0f && color->a <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->a >= 0.0f && color->a <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
   return CMP_OK;
@@ -70,7 +70,7 @@ static int cmp_extras_validate_text_style(const CMPTextStyle *style,
   if (style->weight < 100 || style->weight > 900) {
     return CMP_ERR_RANGE;
   }
-  if (style->italic != CMP_FALSE && style->italic != CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (style->italic != CMP_FALSE && style->italic != CMP_TRUE) {
     return CMP_ERR_RANGE;
   }
 
@@ -166,10 +166,10 @@ static int cmp_extras_validate_tooltip_style(const CMPTooltipStyle *style,
       style->variant != CMP_TOOLTIP_VARIANT_RICH) {
     return CMP_ERR_RANGE;
   }
-  if (style->min_width < 0.0f || style->min_height < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (style->min_width < 0.0f || style->min_height < 0.0f) {
     return CMP_ERR_RANGE;
   }
-  if (style->max_width < 0.0f || style->max_height < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (style->max_width < 0.0f || style->max_height < 0.0f) {
     return CMP_ERR_RANGE;
   }
   if (style->max_width > 0.0f && style->max_width < style->min_width) {
@@ -265,10 +265,10 @@ static int cmp_extras_validate_badge_style(const CMPBadgeStyle *style,
   if (style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (style->min_size < 0.0f || style->dot_diameter < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (style->min_size < 0.0f || style->dot_diameter < 0.0f) {
     return CMP_ERR_RANGE;
   }
-  if (style->padding_x < 0.0f || style->padding_y < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (style->padding_x < 0.0f || style->padding_y < 0.0f) {
     return CMP_ERR_RANGE;
   }
   if (style->corner_radius < 0.0f) {
@@ -453,16 +453,16 @@ int CMP_CALL cmp_tooltip_compute_content_size(const CMPTooltipStyle *style,
   width = style->padding.left + style->padding.right + content_width;
   height = style->padding.top + style->padding.bottom + content_height;
 
-  if (style->min_width > 0.0f && width < style->min_width) { /* GCOVR_EXCL_LINE */
+  if (style->min_width > 0.0f && width < style->min_width) {
     width = style->min_width;
   }
   if (style->min_height > 0.0f && height < style->min_height) {
     height = style->min_height;
   }
-  if (style->max_width > 0.0f && width > style->max_width) { /* GCOVR_EXCL_LINE */
+  if (style->max_width > 0.0f && width > style->max_width) {
     width = style->max_width;
   }
-  if (style->max_height > 0.0f && height > style->max_height) { /* GCOVR_EXCL_LINE */
+  if (style->max_height > 0.0f && height > style->max_height) {
     height = style->max_height;
   }
 
@@ -473,7 +473,7 @@ int CMP_CALL cmp_tooltip_compute_content_size(const CMPTooltipStyle *style,
   }
 #endif
 
-  if (width < 0.0f || height < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (width < 0.0f || height < 0.0f) {
     return CMP_ERR_RANGE;
   }
 
@@ -489,7 +489,7 @@ int CMP_CALL cmp_tooltip_compute_bounds(
   CMPRect anchor_rect;
   CMPScalar width;
   CMPScalar height;
-  CMPScalar anchor_x; /* GCOVR_EXCL_LINE */
+  CMPScalar anchor_x;
   CMPScalar anchor_y;
   CMPScalar anchor_w;
   CMPScalar anchor_h;
@@ -504,8 +504,8 @@ int CMP_CALL cmp_tooltip_compute_bounds(
   cmp_u32 direction;
   int rc;
 
-  if (style == NULL || anchor == NULL || placement == NULL || overlay == NULL || /* GCOVR_EXCL_LINE */
-      tooltip_size == NULL || out_bounds == NULL || out_direction == NULL) { /* GCOVR_EXCL_LINE */
+  if (style == NULL || anchor == NULL || placement == NULL || overlay == NULL ||
+      tooltip_size == NULL || out_bounds == NULL || out_direction == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -532,10 +532,10 @@ int CMP_CALL cmp_tooltip_compute_bounds(
 
   width = tooltip_size->width;
   height = tooltip_size->height;
-  if (overlay->width >= 0.0f && width > overlay->width) { /* GCOVR_EXCL_LINE */
+  if (overlay->width >= 0.0f && width > overlay->width) {
     width = overlay->width;
   }
-  if (overlay->height >= 0.0f && height > overlay->height) { /* GCOVR_EXCL_LINE */
+  if (overlay->height >= 0.0f && height > overlay->height) {
     height = overlay->height;
   }
 
@@ -572,7 +572,7 @@ int CMP_CALL cmp_tooltip_compute_bounds(
         direction = CMP_TOOLTIP_DIRECTION_UP;
       } else if (height <= space_after) {
         direction = CMP_TOOLTIP_DIRECTION_DOWN;
-      } else if (space_after > space_before) { /* GCOVR_EXCL_LINE */
+      } else if (space_after > space_before) {
         direction = CMP_TOOLTIP_DIRECTION_DOWN;
       }
     }
@@ -599,7 +599,7 @@ int CMP_CALL cmp_tooltip_compute_bounds(
         direction = CMP_TOOLTIP_DIRECTION_RIGHT;
       } else if (width <= space_before) {
         direction = CMP_TOOLTIP_DIRECTION_LEFT;
-      } else if (space_before > space_after) { /* GCOVR_EXCL_LINE */
+      } else if (space_before > space_after) {
         direction = CMP_TOOLTIP_DIRECTION_LEFT;
       }
     } else {
@@ -607,7 +607,7 @@ int CMP_CALL cmp_tooltip_compute_bounds(
         direction = CMP_TOOLTIP_DIRECTION_LEFT;
       } else if (width <= space_after) {
         direction = CMP_TOOLTIP_DIRECTION_RIGHT;
-      } else if (space_after > space_before) { /* GCOVR_EXCL_LINE */
+      } else if (space_after > space_before) {
         direction = CMP_TOOLTIP_DIRECTION_RIGHT;
       }
     }
@@ -711,7 +711,7 @@ int CMP_CALL cmp_badge_compute_size(const CMPBadgeStyle *style,
   CMPScalar height;
   int rc;
 
-  if (style == NULL || content == NULL || out_size == NULL) { /* GCOVR_EXCL_LINE */
+  if (style == NULL || content == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -730,7 +730,7 @@ int CMP_CALL cmp_badge_compute_size(const CMPBadgeStyle *style,
     if (height < style->min_size) {
       height = style->min_size;
     }
-    if (width < height) { /* GCOVR_EXCL_LINE */
+    if (width < height) {
       width = height;
     }
   } else {
@@ -745,7 +745,7 @@ int CMP_CALL cmp_badge_compute_size(const CMPBadgeStyle *style,
   }
 #endif
 
-  if (width < 0.0f || height < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (width < 0.0f || height < 0.0f) {
     return CMP_ERR_RANGE;
   }
 
@@ -766,7 +766,7 @@ int CMP_CALL cmp_badge_compute_bounds(const CMPBadgeStyle *style,
   CMPScalar center_y;
   int rc;
 
-  if (style == NULL || content == NULL || anchor == NULL || placement == NULL || /* GCOVR_EXCL_LINE */
+  if (style == NULL || content == NULL || anchor == NULL || placement == NULL ||
       out_bounds == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

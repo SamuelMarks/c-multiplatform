@@ -13,15 +13,24 @@
 #define CMP_ICON_TEST_FAIL_PATH_APPEND 2u
 
 static cmp_u32 g_cmp_icon_test_fail_point = CMP_ICON_TEST_FAIL_NONE;
+static cmp_u32 g_cmp_icon_test_fail_countdown = 0u;
 static cmp_usize g_cmp_icon_test_cstr_limit = 0;
 
 int CMP_CALL cmp_icon_test_set_fail_point(cmp_u32 fail_point) {
   g_cmp_icon_test_fail_point = fail_point;
+  g_cmp_icon_test_fail_countdown = 0u;
+  return CMP_OK;
+}
+
+int CMP_CALL cmp_icon_test_set_fail_point_countdown(cmp_u32 fail_point, cmp_u32 countdown) {
+  g_cmp_icon_test_fail_point = fail_point;
+  g_cmp_icon_test_fail_countdown = countdown;
   return CMP_OK;
 }
 
 int CMP_CALL cmp_icon_test_clear_fail_points(void) {
   g_cmp_icon_test_fail_point = CMP_ICON_TEST_FAIL_NONE;
+  g_cmp_icon_test_fail_countdown = 0u;
   return CMP_OK;
 }
 
@@ -34,10 +43,14 @@ static int cmp_icon_test_fail_point_match(cmp_u32 point) {
   if (g_cmp_icon_test_fail_point != point) {
     return 0;
   }
+  if (g_cmp_icon_test_fail_countdown > 0u) {
+    g_cmp_icon_test_fail_countdown -= 1u;
+    return 0;
+  }
   g_cmp_icon_test_fail_point = CMP_ICON_TEST_FAIL_NONE;
   return 1;
 }
-#endif /* GCOVR_EXCL_LINE */
+#endif
 
 typedef struct CMPIconSvgTransform {
   CMPScalar scale;
@@ -120,11 +133,11 @@ static int cmp_icon_cstr_limit(cmp_usize *out_val) {
   cmp_usize max_len;
 
   max_len = (cmp_usize) ~(cmp_usize)0;
-#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+#ifdef CMP_TESTING
   if (g_cmp_icon_test_cstr_limit != 0) {
     max_len = g_cmp_icon_test_cstr_limit;
   }
-#endif /* GCOVR_EXCL_LINE */
+#endif
   *out_val = max_len; return 0;
 }
 
@@ -133,7 +146,7 @@ static int cmp_icon_cstrlen(const char *cstr, cmp_usize *out_len) {
   cmp_usize max_len;
 
   if (cstr == NULL || out_len == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   cmp_icon_cstr_limit(&max_len);
@@ -190,10 +203,10 @@ static int cmp_icon_select_render_mode(const CMPGfx *gfx, const char *utf8_name,
   int rc;
 
   if (out_mode == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (utf8_name == NULL && utf8_len != 0u) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   has_font = cmp_icon_gfx_supports_font(gfx, require_draw);
@@ -204,7 +217,7 @@ static int cmp_icon_select_render_mode(const CMPGfx *gfx, const char *utf8_name,
       return CMP_ERR_UNSUPPORTED;
     }
     if (utf8_name == NULL) {
-      return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+      return CMP_ERR_INVALID_ARGUMENT;
     }
     *out_mode = CMP_ICON_RENDER_FONT;
     return CMP_OK;
@@ -222,19 +235,19 @@ static int cmp_icon_select_render_mode(const CMPGfx *gfx, const char *utf8_name,
     return CMP_OK;
   }
 
-  if (has_font && utf8_name != NULL) { /* GCOVR_EXCL_LINE */
+  if (has_font && utf8_name != NULL) {
     *out_mode = CMP_ICON_RENDER_FONT;
     return CMP_OK;
   }
   if (has_svg && svg != NULL) {
     rc = cmp_icon_validate_svg(svg);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     *out_mode = CMP_ICON_RENDER_SVG;
     return CMP_OK;
   }
-  return CMP_ERR_UNSUPPORTED; /* GCOVR_EXCL_LINE */
+  return CMP_ERR_UNSUPPORTED;
 }
 
 static void cmp_icon_svg_transform_point(const CMPIconSvgTransform *xf,
@@ -248,7 +261,7 @@ static void cmp_icon_svg_skip_separators(const char **cursor) {
   const char *p;
 
   if (cursor == NULL || *cursor == NULL) {
-    return; /* GCOVR_EXCL_LINE */
+    return;
   }
 
   p = *cursor;
@@ -268,8 +281,8 @@ static int cmp_icon_svg_parse_number(const char **cursor,
   char *endptr;
   double value;
 
-  if (cursor == NULL || *cursor == NULL || out_value == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (cursor == NULL || *cursor == NULL || out_value == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   p = *cursor;
@@ -293,9 +306,9 @@ static int cmp_icon_svg_parse_number(const char **cursor,
     *cursor = endptr;
     return CMP_ERR_RANGE;
   }
-  if (value > (double)FLT_MAX || value < (double)-FLT_MAX) { /* GCOVR_EXCL_LINE */
-    *cursor = endptr;     /* GCOVR_EXCL_LINE */
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+  if (value > (double)FLT_MAX || value < (double)-FLT_MAX) {
+    *cursor = endptr;    
+    return CMP_ERR_RANGE;
   }
 
   *out_value = (CMPScalar)value;
@@ -320,7 +333,7 @@ static int cmp_icon_svg_parse_pair(const char **cursor, CMPScalar *out_x,
 
 static int cmp_icon_map_path_result(int rc) {
   if (rc == CMP_ERR_STATE) {
-    return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_CORRUPT;
   }
   return rc;
 }
@@ -331,11 +344,11 @@ static int cmp_icon_path_move_to(CMPPath *path, const CMPIconSvgTransform *xf,
   CMPScalar ty;
   int rc;
 
-#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+#ifdef CMP_TESTING
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_APPEND)) {
     return CMP_ERR_IO;
   }
-#endif /* GCOVR_EXCL_LINE */
+#endif
 
   cmp_icon_svg_transform_point(xf, x, y, &tx, &ty);
   rc = cmp_path_move_to(path, tx, ty);
@@ -348,11 +361,11 @@ static int cmp_icon_path_line_to(CMPPath *path, const CMPIconSvgTransform *xf,
   CMPScalar ty;
   int rc;
 
-#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+#ifdef CMP_TESTING
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_APPEND)) {
-    return CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_IO;
   }
-#endif /* GCOVR_EXCL_LINE */
+#endif
 
   cmp_icon_svg_transform_point(xf, x, y, &tx, &ty);
   rc = cmp_path_line_to(path, tx, ty);
@@ -368,11 +381,11 @@ static int cmp_icon_path_quad_to(CMPPath *path, const CMPIconSvgTransform *xf,
   CMPScalar ty;
   int rc;
 
-#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+#ifdef CMP_TESTING
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_APPEND)) {
-    return CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_IO;
   }
-#endif /* GCOVR_EXCL_LINE */
+#endif
 
   cmp_icon_svg_transform_point(xf, cx, cy, &tcx, &tcy);
   cmp_icon_svg_transform_point(xf, x, y, &tx, &ty);
@@ -391,11 +404,11 @@ static int cmp_icon_path_cubic_to(CMPPath *path, const CMPIconSvgTransform *xf,
   CMPScalar ty;
   int rc;
 
-#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+#ifdef CMP_TESTING
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_APPEND)) {
-    return CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_IO;
   }
-#endif /* GCOVR_EXCL_LINE */
+#endif
 
   cmp_icon_svg_transform_point(xf, cx1, cy1, &tcx1, &tcy1);
   cmp_icon_svg_transform_point(xf, cx2, cy2, &tcx2, &tcy2);
@@ -407,11 +420,11 @@ static int cmp_icon_path_cubic_to(CMPPath *path, const CMPIconSvgTransform *xf,
 static int cmp_icon_path_close(CMPPath *path) {
   int rc;
 
-#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+#ifdef CMP_TESTING
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_APPEND)) {
-    return CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_IO;
   }
-#endif /* GCOVR_EXCL_LINE */
+#endif
 
   rc = cmp_path_close(path);
   return cmp_icon_map_path_result(rc);
@@ -427,10 +440,10 @@ static int cmp_icon_svg_compute_transform(const CMPIconSvg *svg,
   CMPScalar scaled_h;
 
   if (svg == NULL || bounds == NULL || out_xf == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (svg->viewbox_width <= 0.0f || svg->viewbox_height <= 0.0f) {
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_RANGE;
   }
 
   scale_x = bounds->width / svg->viewbox_width;
@@ -473,7 +486,7 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
   char last_cmd;
 
   if (data == NULL || xf == NULL || path == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   p = data;
@@ -499,7 +512,7 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
 
     cmd = *p;
     p += 1;
-    relative = (cmd >= 'a' && cmd <= 'z') ? 1 : 0; /* GCOVR_EXCL_LINE */
+    relative = (cmd >= 'a' && cmd <= 'z') ? 1 : 0;
     saw_command = 1;
 
     switch (cmd) {
@@ -510,7 +523,7 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
         rc = cmp_icon_svg_parse_pair(&p, &x, &y);
         if (rc == CMP_ERR_NOT_FOUND) {
           if (!got_any) {
-            return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+            return CMP_ERR_CORRUPT;
           }
           break;
         }
@@ -530,9 +543,9 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
           start_y = y;
           got_any = 1;
         } else {
-          rc = cmp_icon_path_line_to(path, xf, x, y); /* GCOVR_EXCL_LINE */
-          if (rc != CMP_OK) {                         /* GCOVR_EXCL_LINE */
-            return rc;                                /* GCOVR_EXCL_LINE */
+          rc = cmp_icon_path_line_to(path, xf, x, y);
+          if (rc != CMP_OK) {                        
+            return rc;                               
           }
         }
         cur_x = x;
@@ -546,8 +559,8 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
       while (1) {
         rc = cmp_icon_svg_parse_pair(&p, &x, &y);
         if (rc == CMP_ERR_NOT_FOUND) {
-          if (!got_any) { /* GCOVR_EXCL_LINE */
-            return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+          if (!got_any) {
+            return CMP_ERR_CORRUPT;
           }
           break;
         }
@@ -560,7 +573,7 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
         }
         rc = cmp_icon_path_line_to(path, xf, x, y);
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         cur_x = x;
         cur_y = y;
@@ -575,20 +588,20 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
         rc = cmp_icon_svg_parse_number(&p, &x);
         if (rc == CMP_ERR_NOT_FOUND) {
           if (!got_any) {
-            return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+            return CMP_ERR_CORRUPT;
           }
           break;
         }
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         if (relative) {
           x += cur_x;
         }
         y = cur_y;
         rc = cmp_icon_path_line_to(path, xf, x, y);
-        if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-          return rc; /* GCOVR_EXCL_LINE */
+        if (rc != CMP_OK) {
+          return rc;
         }
         cur_x = x;
         got_any = 1;
@@ -602,20 +615,20 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
         rc = cmp_icon_svg_parse_number(&p, &y);
         if (rc == CMP_ERR_NOT_FOUND) {
           if (!got_any) {
-            return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+            return CMP_ERR_CORRUPT;
           }
           break;
         }
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         if (relative) {
           y += cur_y;
         }
         x = cur_x;
         rc = cmp_icon_path_line_to(path, xf, x, y);
-        if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-          return rc; /* GCOVR_EXCL_LINE */
+        if (rc != CMP_OK) {
+          return rc;
         }
         cur_y = y;
         got_any = 1;
@@ -628,27 +641,27 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
       while (1) {
         rc = cmp_icon_svg_parse_pair(&p, &x1, &y1);
         if (rc == CMP_ERR_NOT_FOUND) {
-          if (!got_any) { /* GCOVR_EXCL_LINE */
-            return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+          if (!got_any) {
+            return CMP_ERR_CORRUPT;
           }
           break;
         }
-        if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-          return rc; /* GCOVR_EXCL_LINE */
+        if (rc != CMP_OK) {
+          return rc;
         }
         rc = cmp_icon_svg_parse_pair(&p, &x2, &y2);
         if (rc == CMP_ERR_NOT_FOUND) {
-          return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+          return CMP_ERR_CORRUPT;
         }
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         rc = cmp_icon_svg_parse_pair(&p, &x, &y);
         if (rc == CMP_ERR_NOT_FOUND) {
-          return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+          return CMP_ERR_CORRUPT;
         }
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         if (relative) {
           x1 += cur_x;
@@ -660,7 +673,7 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
         }
         rc = cmp_icon_path_cubic_to(path, xf, x1, y1, x2, y2, x, y);
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         cur_x = x;
         cur_y = y;
@@ -677,19 +690,19 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
         rc = cmp_icon_svg_parse_pair(&p, &x2, &y2);
         if (rc == CMP_ERR_NOT_FOUND) {
           if (!got_any) {
-            return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+            return CMP_ERR_CORRUPT;
           }
           break;
         }
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         rc = cmp_icon_svg_parse_pair(&p, &x, &y);
         if (rc == CMP_ERR_NOT_FOUND) {
-          return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+          return CMP_ERR_CORRUPT;
         }
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         if (relative) {
           x2 += cur_x;
@@ -698,16 +711,16 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
           y += cur_y;
         }
         if (last_cmd == 'C' || last_cmd == 'c' || last_cmd == 'S' ||
-            last_cmd == 's') { /* GCOVR_EXCL_LINE */
+            last_cmd == 's') {
           x1 = cur_x * 2.0f - last_cx;
           y1 = cur_y * 2.0f - last_cy;
         } else {
-          x1 = cur_x; /* GCOVR_EXCL_LINE */
-          y1 = cur_y; /* GCOVR_EXCL_LINE */
+          x1 = cur_x;
+          y1 = cur_y;
         }
         rc = cmp_icon_path_cubic_to(path, xf, x1, y1, x2, y2, x, y);
-        if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-          return rc; /* GCOVR_EXCL_LINE */
+        if (rc != CMP_OK) {
+          return rc;
         }
         cur_x = x;
         cur_y = y;
@@ -724,19 +737,19 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
         rc = cmp_icon_svg_parse_pair(&p, &x1, &y1);
         if (rc == CMP_ERR_NOT_FOUND) {
           if (!got_any) {
-            return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+            return CMP_ERR_CORRUPT;
           }
           break;
         }
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         rc = cmp_icon_svg_parse_pair(&p, &x, &y);
         if (rc == CMP_ERR_NOT_FOUND) {
-          return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+          return CMP_ERR_CORRUPT;
         }
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         if (relative) {
           x1 += cur_x;
@@ -746,7 +759,7 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
         }
         rc = cmp_icon_path_quad_to(path, xf, x1, y1, x, y);
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         cur_x = x;
         cur_y = y;
@@ -763,28 +776,28 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
         rc = cmp_icon_svg_parse_pair(&p, &x, &y);
         if (rc == CMP_ERR_NOT_FOUND) {
           if (!got_any) {
-            return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+            return CMP_ERR_CORRUPT;
           }
           break;
         }
         if (rc != CMP_OK) {
-          return rc; /* GCOVR_EXCL_LINE */
+          return rc;
         }
         if (relative) {
           x += cur_x;
           y += cur_y;
         }
         if (last_cmd == 'Q' || last_cmd == 'q' || last_cmd == 'T' ||
-            last_cmd == 't') { /* GCOVR_EXCL_LINE */
+            last_cmd == 't') {
           x1 = cur_x * 2.0f - last_qx;
           y1 = cur_y * 2.0f - last_qy;
         } else {
-          x1 = cur_x; /* GCOVR_EXCL_LINE */
-          y1 = cur_y; /* GCOVR_EXCL_LINE */
+          x1 = cur_x;
+          y1 = cur_y;
         }
         rc = cmp_icon_path_quad_to(path, xf, x1, y1, x, y);
-        if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-          return rc; /* GCOVR_EXCL_LINE */
+        if (rc != CMP_OK) {
+          return rc;
         }
         cur_x = x;
         cur_y = y;
@@ -798,7 +811,7 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
     case 'z':
       rc = cmp_icon_path_close(path);
       if (rc != CMP_OK) {
-        return rc; /* GCOVR_EXCL_LINE */
+        return rc;
       }
       cur_x = start_x;
       cur_y = start_y;
@@ -810,7 +823,7 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
   }
 
   if (!saw_command) {
-    return CMP_ERR_CORRUPT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_CORRUPT;
   }
 
   return CMP_OK;
@@ -822,30 +835,16 @@ static int cmp_icon_svg_build_path(const CMPIconSvg *svg, const CMPRect *bounds,
   int rc;
   int cleanup_rc;
 
-  if (svg == NULL || bounds == NULL || path == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
-  }
-
-  rc = cmp_icon_validate_svg(svg);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
-  }
-
-  rc = cmp_icon_validate_rect(bounds);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
-  }
-
   rc = cmp_icon_svg_compute_transform(svg, bounds, &xf);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
-#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+#ifdef CMP_TESTING
   if (cmp_icon_test_fail_point_match(CMP_ICON_TEST_FAIL_PATH_INIT)) {
     return CMP_ERR_IO;
   }
-#endif /* GCOVR_EXCL_LINE */
+#endif
 
   path->commands = NULL;
   path->count = 0;
@@ -856,15 +855,15 @@ static int cmp_icon_svg_build_path(const CMPIconSvg *svg, const CMPRect *bounds,
   path->allocator.free = NULL;
 
   rc = cmp_path_init(path, NULL, 0);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = cmp_icon_svg_parse(svg->utf8_path, &xf, path);
   if (rc != CMP_OK) {
     cleanup_rc = cmp_path_shutdown(path);
-    if (cleanup_rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return cleanup_rc; /* GCOVR_EXCL_LINE */
+    if (cleanup_rc != CMP_OK) {
+      return cleanup_rc;
     }
     return rc;
   }
@@ -879,19 +878,19 @@ static int cmp_icon_measure_svg(const CMPIconStyle *style,
   CMPScalar w;
   CMPScalar h;
 
-  if (style == NULL || svg == NULL || out_metrics == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (style == NULL || svg == NULL || out_metrics == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (svg->viewbox_width <= 0.0f || svg->viewbox_height <= 0.0f) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+  if (svg->viewbox_width <= 0.0f || svg->viewbox_height <= 0.0f) {
+    return CMP_ERR_RANGE;
   }
 
   size = (CMPScalar)style->size_px;
   if (svg->viewbox_width >= svg->viewbox_height) {
-    w = size;                                              /* GCOVR_EXCL_LINE */
-    h = size * (svg->viewbox_height / svg->viewbox_width); /* GCOVR_EXCL_LINE */
-  } else {                                                 /* GCOVR_EXCL_LINE */
+    w = size;                                             
+    h = size * (svg->viewbox_height / svg->viewbox_width);
+  } else {                                                
     h = size;
     w = size * (svg->viewbox_width / svg->viewbox_height);
   }
@@ -912,14 +911,14 @@ static int cmp_icon_measure_font(const CMPGfx *gfx, const CMPIconStyle *style,
   int rc;
   int cleanup_rc;
 
-  if (gfx == NULL || style == NULL || out_metrics == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (gfx == NULL || style == NULL || out_metrics == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_name == NULL && utf8_len != 0u) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (utf8_name == NULL && utf8_len != 0u) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (!cmp_icon_gfx_supports_font(gfx, CMP_FALSE)) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_UNSUPPORTED; /* GCOVR_EXCL_LINE */
+  if (!cmp_icon_gfx_supports_font(gfx, CMP_FALSE)) {
+    return CMP_ERR_UNSUPPORTED;
   }
 
   font.id = 0u;
@@ -935,16 +934,16 @@ static int cmp_icon_measure_font(const CMPGfx *gfx, const CMPIconStyle *style,
                                       &width, &height, &baseline);
   if (rc != CMP_OK) {
     cleanup_rc = gfx->text_vtable->destroy_font(gfx->ctx, font);
-    if (cleanup_rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return cleanup_rc; /* GCOVR_EXCL_LINE */
+    if (cleanup_rc != CMP_OK) {
+      return cleanup_rc;
     }
     return rc;
   }
 
-  if (width < 0.0f || height < 0.0f || baseline < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (width < 0.0f || height < 0.0f || baseline < 0.0f) {
     cleanup_rc = gfx->text_vtable->destroy_font(gfx->ctx, font);
-    if (cleanup_rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return cleanup_rc; /* GCOVR_EXCL_LINE */
+    if (cleanup_rc != CMP_OK) {
+      return cleanup_rc;
     }
     return CMP_ERR_RANGE;
   }
@@ -972,14 +971,14 @@ static int cmp_icon_draw_font(const CMPGfx *gfx, const CMPRect *bounds,
   int rc;
   int cleanup_rc;
 
-  if (gfx == NULL || bounds == NULL || style == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (gfx == NULL || bounds == NULL || style == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_name == NULL && utf8_len != 0u) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (utf8_name == NULL && utf8_len != 0u) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (!cmp_icon_gfx_supports_font(gfx, CMP_TRUE)) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_UNSUPPORTED; /* GCOVR_EXCL_LINE */
+  if (!cmp_icon_gfx_supports_font(gfx, CMP_TRUE)) {
+    return CMP_ERR_UNSUPPORTED;
   }
 
   font.id = 0u;
@@ -987,24 +986,24 @@ static int cmp_icon_draw_font(const CMPGfx *gfx, const CMPRect *bounds,
   rc = gfx->text_vtable->create_font(gfx->ctx, style->utf8_family,
                                      style->size_px, style->weight,
                                      style->italic, &font);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = gfx->text_vtable->measure_text(gfx->ctx, font, utf8_name, utf8_len, 0,
                                       &width, &height, &baseline);
   if (rc != CMP_OK) {
     cleanup_rc =
-        gfx->text_vtable->destroy_font(gfx->ctx, font); /* GCOVR_EXCL_LINE */
-    if (cleanup_rc != CMP_OK) {                         /* GCOVR_EXCL_LINE */
-      return cleanup_rc;                                /* GCOVR_EXCL_LINE */
+        gfx->text_vtable->destroy_font(gfx->ctx, font);
+    if (cleanup_rc != CMP_OK) {                        
+      return cleanup_rc;
     }
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
-  if (width < 0.0f || height < 0.0f || baseline < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (width < 0.0f || height < 0.0f || baseline < 0.0f) {
     cleanup_rc = gfx->text_vtable->destroy_font(gfx->ctx, font);
-    if (cleanup_rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return cleanup_rc; /* GCOVR_EXCL_LINE */
+    if (cleanup_rc != CMP_OK) {
+      return cleanup_rc;
     }
     return CMP_ERR_RANGE;
   }
@@ -1016,8 +1015,8 @@ static int cmp_icon_draw_font(const CMPGfx *gfx, const CMPRect *bounds,
                                    style->color);
 
   cleanup_rc = gfx->text_vtable->destroy_font(gfx->ctx, font);
-  if (cleanup_rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return cleanup_rc; /* GCOVR_EXCL_LINE */
+  if (cleanup_rc != CMP_OK) {
+    return cleanup_rc;
   }
   if (rc != CMP_OK) {
     return rc;
@@ -1031,11 +1030,11 @@ static int cmp_icon_draw_svg(const CMPGfx *gfx, const CMPRect *bounds,
   int rc;
   int cleanup_rc;
 
-  if (gfx == NULL || bounds == NULL || style == NULL || svg == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (gfx == NULL || bounds == NULL || style == NULL || svg == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (!cmp_icon_gfx_supports_svg(gfx)) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_UNSUPPORTED; /* GCOVR_EXCL_LINE */
+  if (!cmp_icon_gfx_supports_svg(gfx)) {
+    return CMP_ERR_UNSUPPORTED;
   }
 
   rc = cmp_icon_svg_build_path(svg, bounds, &path);
@@ -1045,8 +1044,8 @@ static int cmp_icon_draw_svg(const CMPGfx *gfx, const CMPRect *bounds,
 
   rc = gfx->vtable->draw_path(gfx->ctx, &path, style->color);
   cleanup_rc = cmp_path_shutdown(&path);
-  if (cleanup_rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return cleanup_rc; /* GCOVR_EXCL_LINE */
+  if (cleanup_rc != CMP_OK) {
+    return cleanup_rc;
   }
   return rc;
 }
@@ -1087,20 +1086,20 @@ int CMP_CALL cmp_icon_measure_utf8(const CMPGfx *gfx, const CMPIconStyle *style,
   int rc;
   cmp_u32 resolved_mode;
 
-  if (gfx == NULL || style == NULL || out_metrics == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (gfx == NULL || style == NULL || out_metrics == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_name == NULL && utf8_len != 0u) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (utf8_name == NULL && utf8_len != 0u) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = cmp_icon_validate_style(style);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   rc = cmp_icon_validate_render_mode(render_mode);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = cmp_icon_select_render_mode(gfx, utf8_name, utf8_len, svg, render_mode,
@@ -1122,8 +1121,8 @@ int CMP_CALL cmp_icon_measure_cstr(const CMPGfx *gfx, const CMPIconStyle *style,
   cmp_usize len;
   int rc;
 
-  if (utf8_name == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (utf8_name == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = cmp_icon_cstrlen(utf8_name, &len);
@@ -1142,20 +1141,20 @@ int CMP_CALL cmp_icon_draw_utf8(const CMPGfx *gfx, const CMPRect *bounds,
   int rc;
   cmp_u32 resolved_mode;
 
-  if (gfx == NULL || bounds == NULL || style == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (gfx == NULL || bounds == NULL || style == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_name == NULL && utf8_len != 0u) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (utf8_name == NULL && utf8_len != 0u) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = cmp_icon_validate_style(style);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   rc = cmp_icon_validate_rect(bounds);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   rc = cmp_icon_validate_render_mode(render_mode);
   if (rc != CMP_OK) {
@@ -1194,7 +1193,7 @@ int CMP_CALL cmp_icon_draw_cstr(const CMPGfx *gfx, const CMPRect *bounds,
                             render_mode);
 }
 
-#ifdef CMP_TESTING /* GCOVR_EXCL_LINE */
+#ifdef CMP_TESTING
 int CMP_CALL cmp_icon_test_cstrlen(const char *cstr, cmp_usize *out_len) {
   int (*fn)(const char *, cmp_usize *) = cmp_icon_cstrlen;
   return fn(cstr, out_len);
@@ -1245,7 +1244,7 @@ int CMP_CALL cmp_icon_test_svg_compute_transform(const CMPIconSvg *svg,
   CMPIconSvgTransform *out_xf = &xf;
   int rc;
 
-  if (out_scale == NULL || out_offset_x == NULL || out_offset_y == NULL) { /* GCOVR_EXCL_LINE */
+  if (out_scale == NULL || out_offset_x == NULL || out_offset_y == NULL) {
     out_xf = NULL;
   }
 
@@ -1262,6 +1261,14 @@ int CMP_CALL cmp_icon_test_svg_compute_transform(const CMPIconSvg *svg,
   *out_offset_x = xf.offset_x;
   *out_offset_y = xf.offset_y;
   return CMP_OK;
+}
+
+int CMP_CALL cmp_icon_test_svg_build_path(const CMPIconSvg *svg,
+                                          const CMPRect *bounds,
+                                          CMPPath *path) {
+  int (*fn)(const CMPIconSvg *, const CMPRect *, CMPPath *) =
+      cmp_icon_svg_build_path;
+  return fn(svg, bounds, path);
 }
 
 int CMP_CALL cmp_icon_test_svg_parse(const char *data, CMPBool provide_xf,
@@ -1285,8 +1292,8 @@ int CMP_CALL cmp_icon_test_svg_parse(const char *data, CMPBool provide_xf,
   if (path_ptr != NULL) {
     memset(&path, 0, sizeof(path));
     rc = cmp_path_init(&path, NULL, 0);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      return rc;
     }
   }
 
@@ -1298,8 +1305,8 @@ int CMP_CALL cmp_icon_test_svg_parse(const char *data, CMPBool provide_xf,
 
   if (path_ptr != NULL) {
     int cleanup_rc = cmp_path_shutdown(&path);
-    if (cleanup_rc != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
-      rc = cleanup_rc; /* GCOVR_EXCL_LINE */
+    if (cleanup_rc != CMP_OK && rc == CMP_OK) {
+      rc = cleanup_rc;
     }
   }
 
@@ -1321,4 +1328,4 @@ int CMP_CALL cmp_icon_test_validate_rect(const CMPRect *rect) {
 int CMP_CALL cmp_icon_test_validate_svg(const CMPIconSvg *svg) {
   return cmp_icon_validate_svg(svg);
 }
-#endif /* GCOVR_EXCL_LINE */
+#endif

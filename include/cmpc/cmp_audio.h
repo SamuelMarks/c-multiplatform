@@ -81,16 +81,49 @@ CMP_API int CMP_CALL cmp_audio_decode(CMPAudioDecoder *decoder,
 CMP_API int CMP_CALL cmp_audio_free(CMPAudioDecoder *decoder,
                                     CMPAudioData *audio);
 
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_audio_test_set_read_u16_fail_after(cmp_u32 call_count);
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_audio_test_set_read_u32_fail_after(cmp_u32 call_count);
+/**
+ * @brief Helper for test coverage.
+ * @param data Parameter for testing.
+ * @param size Parameter for testing.
+ * @param offset Parameter for testing.
+ * @param out_val Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_audio_test_read_u16_le(const cmp_u8 *data,
                                                 cmp_usize size,
                                                 cmp_usize offset,
                                                 cmp_u16 *out_val);
+/**
+ * @brief Helper for test coverage.
+ * @param data Parameter for testing.
+ * @param size Parameter for testing.
+ * @param offset Parameter for testing.
+ * @param out_val Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_audio_test_read_u32_le(const cmp_u8 *data,
                                                 cmp_usize size,
                                                 cmp_usize offset,
                                                 cmp_u32 *out_val);
+/**
+ * @brief Helper for test coverage.
+ * @param request Parameter for testing.
+ * @param allocator Parameter for testing.
+ * @param out_data Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_audio_test_decode_wav(
     const CMPAudioDecodeRequest *request, const CMPAllocator *allocator,
     CMPAudioData *out_data);

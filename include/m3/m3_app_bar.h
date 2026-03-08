@@ -181,58 +181,178 @@ CMP_API int CMP_CALL m3_app_bar_get_height(const M3AppBar *bar,
 CMP_API int CMP_CALL m3_app_bar_get_content_bounds(const M3AppBar *bar,
                                                    CMPRect *out_bounds);
 
+/**
+ * @brief Helper for test coverage.
+ * @param fail_point Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_set_fail_point(cmp_u32 fail_point);
 
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_set_color_fail_after(cmp_u32 call_count);
 
+/**
+ * @brief Helper for test coverage.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_clear_fail_points(void);
 
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_set_match_fail_after(cmp_u32 call_count);
 
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_set_color_error_after(cmp_u32 call_count);
 
+/**
+ * @brief Helper for test coverage.
+ * @param enable Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_set_collapse_fail(CMPBool enable);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_validate_color(const CMPColor *color);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @param r Parameter for testing.
+ * @param g Parameter for testing.
+ * @param b Parameter for testing.
+ * @param a Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_color_set(CMPColor *color, CMPScalar r,
                                                CMPScalar g, CMPScalar b,
                                                CMPScalar a);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param edges Parameter for testing.
+ * @return Test result.
+ */
 m3_app_bar_test_validate_edges(const CMPLayoutEdges *edges);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param require_family Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_validate_text_style(
     const CMPTextStyle *style, CMPBool require_family);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param require_family Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_validate_style(const M3AppBarStyle *style,
                                                     CMPBool require_family);
 
+/**
+ * @brief Helper for test coverage.
+ * @param out_fail Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_call_color_should_fail(CMPBool *out_fail);
 
+/**
+ * @brief Helper for test coverage.
+ * @param point Parameter for testing.
+ * @param out_match Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_call_fail_point_match(cmp_u32 point,
                                                            CMPBool *out_match);
 
+/**
+ * @brief Helper for test coverage.
+ * @param spec Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_validate_measure_spec(CMPMeasureSpec spec);
 
+/**
+ * @brief Helper for test coverage.
+ * @param rect Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_validate_rect(const CMPRect *rect);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param out_range Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_compute_collapse_range(
     const M3AppBarStyle *style, CMPScalar *out_range);
 
+/**
+ * @brief Helper for test coverage.
+ * @param bar Parameter for testing.
+ * @param out_height Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_compute_current_height(
     const M3AppBar *bar, CMPScalar *out_height);
 
+/**
+ * @brief Helper for test coverage.
+ * @param bar Parameter for testing.
+ * @param out_bounds Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_compute_content_bounds(
     const M3AppBar *bar, CMPRect *out_bounds);
 
+/**
+ * @brief Helper for test coverage.
+ * @param bar Parameter for testing.
+ * @param metrics Parameter for testing.
+ * @param out_x Parameter for testing.
+ * @param out_y Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_compute_title_position(
     const M3AppBar *bar, const CMPTextMetrics *metrics, CMPScalar *out_x,
     CMPScalar *out_y);
 
+/**
+ * @brief Helper for test coverage.
+ * @param bar Parameter for testing.
+ * @param out_metrics Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_measure_title(const M3AppBar *bar,
                                                    CMPTextMetrics *out_metrics);
 
+/**
+ * @brief Helper for test coverage.
+ * @param bar Parameter for testing.
+ * @param delta Parameter for testing.
+ * @param out_consumed Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_app_bar_test_apply_scroll(M3AppBar *bar,
                                                   CMPScalar delta,
                                                   CMPScalar *out_consumed);

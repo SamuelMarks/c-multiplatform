@@ -103,7 +103,7 @@ static int m3_scaffold_compute_fab_target(const M3ScaffoldStyle *style,
                                           CMPScalar *out_offset) {
   CMPScalar offset;
 
-  if (style == NULL || out_offset == NULL) { /* GCOVR_EXCL_LINE */
+  if (style == NULL || out_offset == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (snackbar_height < 0.0f) {
@@ -117,8 +117,8 @@ static int m3_scaffold_compute_fab_target(const M3ScaffoldStyle *style,
 
   offset = snackbar_height + style->fab_snackbar_spacing +
            style->snackbar_margin_y - style->fab_margin_y;
-  if (offset < 0.0f) { /* GCOVR_EXCL_LINE */
-    offset = 0.0f; /* GCOVR_EXCL_LINE */
+  if (offset < 0.0f) {
+    offset = 0.0f;
   }
   *out_offset = offset;
   return CMP_OK;
@@ -157,11 +157,11 @@ static int m3_scaffold_measure_child(CMPWidget *child, CMPMeasureSpec width,
     return rc;
   }
   rc = m3_scaffold_validate_measure_spec(height);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
-  if (child->vtable == NULL || child->vtable->measure == NULL) { /* GCOVR_EXCL_LINE */
+  if (child->vtable == NULL || child->vtable->measure == NULL) {
     return CMP_ERR_UNSUPPORTED;
   }
 
@@ -180,7 +180,7 @@ static int m3_scaffold_layout_child(CMPWidget *child, const CMPRect *bounds) {
     return rc;
   }
 
-  if (child->vtable == NULL || child->vtable->layout == NULL) { /* GCOVR_EXCL_LINE */
+  if (child->vtable == NULL || child->vtable->layout == NULL) {
     return CMP_ERR_UNSUPPORTED;
   }
 
@@ -192,7 +192,7 @@ static int m3_scaffold_paint_child(CMPWidget *child, CMPPaintContext *ctx) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (child->vtable == NULL || child->vtable->paint == NULL) { /* GCOVR_EXCL_LINE */
+  if (child->vtable == NULL || child->vtable->paint == NULL) {
     return CMP_ERR_UNSUPPORTED;
   }
 
@@ -212,7 +212,7 @@ static int m3_scaffold_event_child(CMPWidget *child, const CMPInputEvent *event,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (child->vtable == NULL || child->vtable->event == NULL) { /* GCOVR_EXCL_LINE */
+  if (child->vtable == NULL || child->vtable->event == NULL) {
     return CMP_OK;
   }
 
@@ -309,8 +309,8 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
   CMPBool visible;
   int rc;
 
-  if (widget == NULL || out_size == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (widget == NULL || out_size == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = m3_scaffold_validate_measure_spec(width);
@@ -318,8 +318,8 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
     return rc;
   }
   rc = m3_scaffold_validate_measure_spec(height);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   scaffold = (M3Scaffold *)widget;
@@ -378,10 +378,10 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
   snackbar_size.height = 0.0f;
 
   rc = m3_scaffold_widget_is_visible(scaffold->top_bar, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (visible == CMP_TRUE) {
     rc = m3_scaffold_measure_child(scaffold->top_bar, child_width, child_height,
                                    &top_size);
     if (rc != CMP_OK) {
@@ -390,10 +390,10 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->bottom_bar, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (visible == CMP_TRUE) {
     rc = m3_scaffold_measure_child(scaffold->bottom_bar, child_width,
                                    child_height, &bottom_size);
     if (rc != CMP_OK) {
@@ -402,10 +402,10 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->body, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (visible == CMP_TRUE) {
     rc = m3_scaffold_measure_child(scaffold->body, child_width, child_height,
                                    &body_size);
     if (rc != CMP_OK) {
@@ -414,10 +414,10 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->fab, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (visible == CMP_TRUE) {
     rc = m3_scaffold_measure_child(scaffold->fab, child_width, child_height,
                                    &fab_size);
     if (rc != CMP_OK) {
@@ -426,10 +426,10 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->snackbar, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (visible == CMP_TRUE) {
     rc = m3_scaffold_measure_child(scaffold->snackbar, child_width,
                                    child_height, &snackbar_size);
     if (rc != CMP_OK) {
@@ -440,16 +440,16 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
   safe_width_needed = 0.0f;
   safe_height_needed = 0.0f;
 
-  if (top_size.width > safe_width_needed) { /* GCOVR_EXCL_LINE */
+  if (top_size.width > safe_width_needed) {
     safe_width_needed = top_size.width;
   }
-  if (bottom_size.width > safe_width_needed) { /* GCOVR_EXCL_LINE */
-    safe_width_needed = bottom_size.width; /* GCOVR_EXCL_LINE */
+  if (bottom_size.width > safe_width_needed) {
+    safe_width_needed = bottom_size.width;
   }
 
   body_width_needed = body_size.width;
   body_height_needed = body_size.height;
-  if (body_width_needed > 0.0f || body_height_needed > 0.0f) { /* GCOVR_EXCL_LINE */
+  if (body_width_needed > 0.0f || body_height_needed > 0.0f) {
     body_width_needed +=
         scaffold->style.padding.left + scaffold->style.padding.right;
     body_height_needed +=
@@ -466,8 +466,8 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
   }
 
   fab_width_needed = fab_size.width + scaffold->style.fab_margin_x * 2.0f;
-  if (fab_width_needed > safe_width_needed) { /* GCOVR_EXCL_LINE */
-    safe_width_needed = fab_width_needed; /* GCOVR_EXCL_LINE */
+  if (fab_width_needed > safe_width_needed) {
+    safe_width_needed = fab_width_needed;
   }
 
   safe_height_needed =
@@ -484,7 +484,7 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
                       fab_size.height;
   if (top_size.height + fab_height_needed > safe_height_needed) {
     safe_height_needed =
-        top_size.height + fab_height_needed; /* GCOVR_EXCL_LINE */
+        top_size.height + fab_height_needed;
   }
 
   desired_width =
@@ -493,13 +493,13 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
       safe_height_needed + scaffold->safe_area.top + scaffold->safe_area.bottom;
 
   rc = m3_scaffold_apply_measure_spec(desired_width, width, &out_size->width);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   rc =
       m3_scaffold_apply_measure_spec(desired_height, height, &out_size->height);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   return CMP_OK;
@@ -529,8 +529,8 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
   CMPBool visible;
   int rc;
 
-  if (widget == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (widget == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = m3_scaffold_validate_rect(&bounds);
@@ -540,12 +540,12 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
 
   scaffold = (M3Scaffold *)widget;
   rc = m3_scaffold_validate_style(&scaffold->style);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   rc = m3_scaffold_validate_edges(&scaffold->safe_area);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   scaffold->bounds = bounds;
@@ -574,17 +574,17 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
   snackbar_size.height = 0.0f;
 
   rc = m3_scaffold_widget_is_visible(scaffold->top_bar, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   if (visible == CMP_TRUE) {
     rc = m3_scaffold_measure_child(scaffold->top_bar, width_spec, height_spec,
                                    &top_size);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      return rc;
     }
-    if (top_size.height > safe_height) { /* GCOVR_EXCL_LINE */
-      return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    if (top_size.height > safe_height) {
+      return CMP_ERR_RANGE;
     }
     scaffold->top_bar_bounds.x = safe_bounds.x;
     scaffold->top_bar_bounds.y = safe_bounds.y;
@@ -602,17 +602,17 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->bottom_bar, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   if (visible == CMP_TRUE) {
     rc = m3_scaffold_measure_child(scaffold->bottom_bar, width_spec,
                                    height_spec, &bottom_size);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      return rc;
     }
-    if (bottom_size.height > safe_height) { /* GCOVR_EXCL_LINE */
-      return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    if (bottom_size.height > safe_height) {
+      return CMP_ERR_RANGE;
     }
     scaffold->bottom_bar_bounds.x = safe_bounds.x;
     scaffold->bottom_bar_bounds.width = safe_width;
@@ -633,16 +633,16 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
 
   available_height = safe_height - scaffold->top_bar_bounds.height -
                      scaffold->bottom_bar_bounds.height;
-  if (available_height < 0.0f) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+  if (available_height < 0.0f) {
+    return CMP_ERR_RANGE;
   }
 
   body_width =
       safe_width - scaffold->style.padding.left - scaffold->style.padding.right;
   body_height = available_height - scaffold->style.padding.top -
                 scaffold->style.padding.bottom;
-  if (body_width < 0.0f || body_height < 0.0f) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+  if (body_width < 0.0f || body_height < 0.0f) {
+    return CMP_ERR_RANGE;
   }
 
   if (scaffold->style.is_rtl == CMP_TRUE) {
@@ -658,10 +658,10 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
   scaffold->body_bounds.height = body_height;
 
   rc = m3_scaffold_widget_is_visible(scaffold->body, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (visible == CMP_TRUE) {
     rc = m3_scaffold_layout_child(scaffold->body, &scaffold->body_bounds);
     if (rc != CMP_OK) {
       return rc;
@@ -669,14 +669,14 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->snackbar, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   if (visible == CMP_TRUE) {
     snackbar_available_width =
         safe_width - scaffold->style.snackbar_margin_x * 2.0f;
-    if (snackbar_available_width < 0.0f) { /* GCOVR_EXCL_LINE */
-      return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    if (snackbar_available_width < 0.0f) {
+      return CMP_ERR_RANGE;
     }
 
     width_spec.mode = CMP_MEASURE_AT_MOST;
@@ -686,12 +686,12 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
 
     rc = m3_scaffold_measure_child(scaffold->snackbar, width_spec, height_spec,
                                    &snackbar_size);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      return rc;
     }
-    if (snackbar_size.width > snackbar_available_width || /* GCOVR_EXCL_LINE */
-        snackbar_size.height > safe_height) { /* GCOVR_EXCL_LINE */
-      return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    if (snackbar_size.width > snackbar_available_width ||
+        snackbar_size.height > safe_height) {
+      return CMP_ERR_RANGE;
     }
 
     scaffold->snackbar_bounds.width = snackbar_size.width;
@@ -702,8 +702,8 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
     scaffold->snackbar_bounds.y =
         safe_bounds.y + safe_height - scaffold->bottom_bar_bounds.height -
         scaffold->style.snackbar_margin_y - snackbar_size.height;
-    if (scaffold->snackbar_bounds.y < safe_bounds.y) { /* GCOVR_EXCL_LINE */
-      return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    if (scaffold->snackbar_bounds.y < safe_bounds.y) {
+      return CMP_ERR_RANGE;
     }
 
     rc = m3_scaffold_layout_child(scaffold->snackbar,
@@ -712,22 +712,22 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
       return rc;
     }
   } else {
-    scaffold->snackbar_bounds.x = safe_bounds.x; /* GCOVR_EXCL_LINE */
-    scaffold->snackbar_bounds.y = safe_bounds.y; /* GCOVR_EXCL_LINE */
-    scaffold->snackbar_bounds.width = 0.0f;      /* GCOVR_EXCL_LINE */
-    scaffold->snackbar_bounds.height = 0.0f;     /* GCOVR_EXCL_LINE */
+    scaffold->snackbar_bounds.x = safe_bounds.x;
+    scaffold->snackbar_bounds.y = safe_bounds.y;
+    scaffold->snackbar_bounds.width = 0.0f;     
+    scaffold->snackbar_bounds.height = 0.0f;    
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->fab, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (visible == CMP_TRUE) {
     fab_available_width = safe_width - scaffold->style.fab_margin_x * 2.0f;
     fab_available_height = safe_height - scaffold->bottom_bar_bounds.height -
                            scaffold->style.fab_margin_y * 2.0f;
-    if (fab_available_width < 0.0f || fab_available_height < 0.0f) { /* GCOVR_EXCL_LINE */
-      return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    if (fab_available_width < 0.0f || fab_available_height < 0.0f) {
+      return CMP_ERR_RANGE;
     }
 
     width_spec.mode = CMP_MEASURE_AT_MOST;
@@ -737,12 +737,12 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
 
     rc = m3_scaffold_measure_child(scaffold->fab, width_spec, height_spec,
                                    &fab_size);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      return rc;
     }
-    if (fab_size.width > fab_available_width || /* GCOVR_EXCL_LINE */
-        fab_size.height > fab_available_height) { /* GCOVR_EXCL_LINE */
-      return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    if (fab_size.width > fab_available_width ||
+        fab_size.height > fab_available_height) {
+      return CMP_ERR_RANGE;
     }
 
     if (scaffold->style.is_rtl == CMP_TRUE) {
@@ -759,8 +759,8 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
     if (scaffold->snackbar_bounds.height > 0.0f) {
       rc = m3_scaffold_compute_fab_target(
           &scaffold->style, scaffold->snackbar_bounds.height, &target_offset);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
     }
 
@@ -768,8 +768,8 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
       rc = cmp_anim_controller_start_timing(
           &scaffold->fab_anim, scaffold->fab_offset, target_offset,
           scaffold->style.fab_slide_duration, scaffold->style.fab_slide_easing);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
       scaffold->fab_target_offset = target_offset;
       if (scaffold->style.fab_slide_duration == 0.0f) {
@@ -787,10 +787,10 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
       return rc;
     }
   } else {
-    scaffold->fab_bounds.x = safe_bounds.x; /* GCOVR_EXCL_LINE */
-    scaffold->fab_bounds.y = safe_bounds.y; /* GCOVR_EXCL_LINE */
-    scaffold->fab_bounds.width = 0.0f;      /* GCOVR_EXCL_LINE */
-    scaffold->fab_bounds.height = 0.0f;     /* GCOVR_EXCL_LINE */
+    scaffold->fab_bounds.x = safe_bounds.x;
+    scaffold->fab_bounds.y = safe_bounds.y;
+    scaffold->fab_bounds.width = 0.0f;     
+    scaffold->fab_bounds.height = 0.0f;    
   }
 
   return CMP_OK;
@@ -801,15 +801,15 @@ static int m3_scaffold_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPBool visible;
   int rc;
 
-  if (widget == NULL || ctx == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (widget == NULL || ctx == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   scaffold = (M3Scaffold *)widget;
 
   rc = m3_scaffold_widget_is_visible(scaffold->body, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   if (visible == CMP_TRUE) {
     rc = m3_scaffold_paint_child(scaffold->body, ctx);
@@ -819,10 +819,10 @@ static int m3_scaffold_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->top_bar, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (visible == CMP_TRUE) {
     rc = m3_scaffold_paint_child(scaffold->top_bar, ctx);
     if (rc != CMP_OK) {
       return rc;
@@ -830,10 +830,10 @@ static int m3_scaffold_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->bottom_bar, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (visible == CMP_TRUE) {
     rc = m3_scaffold_paint_child(scaffold->bottom_bar, ctx);
     if (rc != CMP_OK) {
       return rc;
@@ -841,10 +841,10 @@ static int m3_scaffold_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->snackbar, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (visible == CMP_TRUE) {
     rc = m3_scaffold_paint_child(scaffold->snackbar, ctx);
     if (rc != CMP_OK) {
       return rc;
@@ -852,10 +852,10 @@ static int m3_scaffold_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->fab, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (visible == CMP_TRUE) {
     rc = m3_scaffold_paint_child(scaffold->fab, ctx);
     if (rc != CMP_OK) {
       return rc;
@@ -872,8 +872,8 @@ static int m3_scaffold_event_dispatch_to_child(CMPWidget *child,
   int rc;
 
   rc = m3_scaffold_widget_is_visible(child, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   if (visible != CMP_TRUE) {
     *out_handled = CMP_FALSE;
@@ -885,7 +885,7 @@ static int m3_scaffold_event_dispatch_to_child(CMPWidget *child,
 
 static int m3_scaffold_event_hit_test(const CMPRect *bounds, CMPScalar x,
                                       CMPScalar y, CMPBool *out_hit) {
-  if (bounds == NULL || out_hit == NULL) { /* GCOVR_EXCL_LINE */
+  if (bounds == NULL || out_hit == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   return cmp_rect_contains_point(bounds, x, y, out_hit);
@@ -903,8 +903,8 @@ static int m3_scaffold_child_hit(CMPWidget *child, const CMPRect *bounds,
   *out_hit = CMP_FALSE;
 
   rc = m3_scaffold_widget_is_visible(child, &visible);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   if (visible != CMP_TRUE) {
     return CMP_OK;
@@ -937,8 +937,8 @@ static int m3_scaffold_widget_event(void *widget, const CMPInputEvent *event,
   }
 
   rc = m3_scaffold_event_get_position(event, &has_pos, &x, &y);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   if (has_pos == CMP_FALSE) {
@@ -950,8 +950,8 @@ static int m3_scaffold_widget_event(void *widget, const CMPInputEvent *event,
   }
 
   rc = m3_scaffold_child_hit(scaffold->fab, &scaffold->fab_bounds, x, y, &hit);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   if (hit == CMP_TRUE) {
     return m3_scaffold_event_child(scaffold->fab, event, out_handled);
@@ -959,8 +959,8 @@ static int m3_scaffold_widget_event(void *widget, const CMPInputEvent *event,
 
   rc = m3_scaffold_child_hit(scaffold->snackbar, &scaffold->snackbar_bounds, x,
                              y, &hit);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   if (hit == CMP_TRUE) {
     return m3_scaffold_event_child(scaffold->snackbar, event, out_handled);
@@ -968,8 +968,8 @@ static int m3_scaffold_widget_event(void *widget, const CMPInputEvent *event,
 
   rc = m3_scaffold_child_hit(scaffold->bottom_bar, &scaffold->bottom_bar_bounds,
                              x, y, &hit);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   if (hit == CMP_TRUE) {
     return m3_scaffold_event_child(scaffold->bottom_bar, event, out_handled);
@@ -977,8 +977,8 @@ static int m3_scaffold_widget_event(void *widget, const CMPInputEvent *event,
 
   rc = m3_scaffold_child_hit(scaffold->top_bar, &scaffold->top_bar_bounds, x, y,
                              &hit);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   if (hit == CMP_TRUE) {
     return m3_scaffold_event_child(scaffold->top_bar, event, out_handled);
@@ -986,14 +986,14 @@ static int m3_scaffold_widget_event(void *widget, const CMPInputEvent *event,
 
   rc =
       m3_scaffold_child_hit(scaffold->body, &scaffold->body_bounds, x, y, &hit);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
-  if (hit == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (hit == CMP_TRUE) {
     return m3_scaffold_event_child(scaffold->body, event, out_handled);
   }
 
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+  return CMP_OK;
 }
 
 static int m3_scaffold_widget_get_semantics(void *widget,
@@ -1008,10 +1008,10 @@ static int m3_scaffold_widget_get_semantics(void *widget,
   scaffold = (M3Scaffold *)widget;
   out_semantics->role = CMP_SEMANTIC_NONE;
   out_semantics->flags = 0u;
-  if (scaffold->widget.flags & CMP_WIDGET_FLAG_DISABLED) { /* GCOVR_EXCL_LINE */
+  if (scaffold->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_DISABLED;
   }
-  if (scaffold->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) { /* GCOVR_EXCL_LINE */
+  if (scaffold->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_FOCUSABLE;
   }
   out_semantics->utf8_label = NULL;
@@ -1072,8 +1072,8 @@ int CMP_CALL m3_scaffold_style_init(M3ScaffoldStyle *style) {
                             M3_SCAFFOLD_DEFAULT_PADDING_Y,
                             M3_SCAFFOLD_DEFAULT_PADDING_X,
                             M3_SCAFFOLD_DEFAULT_PADDING_Y);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   style->fab_margin_x = M3_SCAFFOLD_DEFAULT_FAB_MARGIN;
@@ -1118,8 +1118,8 @@ int CMP_CALL m3_scaffold_init(M3Scaffold *scaffold,
   scaffold->fab_target_offset = 0.0f;
 
   rc = cmp_anim_controller_init(&scaffold->fab_anim);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   scaffold->widget.ctx = scaffold;
@@ -1148,16 +1148,16 @@ int CMP_CALL m3_scaffold_set_style(M3Scaffold *scaffold,
 }
 
 int CMP_CALL m3_scaffold_set_body(M3Scaffold *scaffold, CMPWidget *body) {
-  if (scaffold == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (scaffold == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   scaffold->body = body;
   return CMP_OK;
 }
 
 int CMP_CALL m3_scaffold_set_top_bar(M3Scaffold *scaffold, CMPWidget *top_bar) {
-  if (scaffold == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (scaffold == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   scaffold->top_bar = top_bar;
   return CMP_OK;
@@ -1165,16 +1165,16 @@ int CMP_CALL m3_scaffold_set_top_bar(M3Scaffold *scaffold, CMPWidget *top_bar) {
 
 int CMP_CALL m3_scaffold_set_bottom_bar(M3Scaffold *scaffold,
                                         CMPWidget *bottom_bar) {
-  if (scaffold == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (scaffold == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   scaffold->bottom_bar = bottom_bar;
   return CMP_OK;
 }
 
 int CMP_CALL m3_scaffold_set_fab(M3Scaffold *scaffold, CMPWidget *fab) {
-  if (scaffold == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (scaffold == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   scaffold->fab = fab;
   return CMP_OK;
@@ -1182,8 +1182,8 @@ int CMP_CALL m3_scaffold_set_fab(M3Scaffold *scaffold, CMPWidget *fab) {
 
 int CMP_CALL m3_scaffold_set_snackbar(M3Scaffold *scaffold,
                                       CMPWidget *snackbar) {
-  if (scaffold == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (scaffold == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   scaffold->snackbar = snackbar;
   return CMP_OK;
@@ -1193,8 +1193,8 @@ int CMP_CALL m3_scaffold_set_safe_area(M3Scaffold *scaffold,
                                        const CMPLayoutEdges *safe_area) {
   int rc;
 
-  if (scaffold == NULL || safe_area == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (scaffold == NULL || safe_area == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = m3_scaffold_validate_edges(safe_area);
@@ -1233,24 +1233,24 @@ int CMP_CALL m3_scaffold_step(M3Scaffold *scaffold, CMPScalar dt,
 
   *out_changed = CMP_FALSE;
 
-  if (scaffold->fab_anim.mode == CMP_ANIM_MODE_NONE) { /* GCOVR_EXCL_LINE */
-    return CMP_OK; /* GCOVR_EXCL_LINE */
+  if (scaffold->fab_anim.mode == CMP_ANIM_MODE_NONE) {
+    return CMP_OK;
   }
 
   prev_offset = scaffold->fab_offset;
   rc = cmp_anim_controller_step(&scaffold->fab_anim, dt, &value, &finished);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   scaffold->fab_offset = value;
   delta = value - prev_offset;
-  if (delta != 0.0f) { /* GCOVR_EXCL_LINE */
+  if (delta != 0.0f) {
     scaffold->fab_bounds.y -= delta;
-    if (scaffold->fab != NULL) { /* GCOVR_EXCL_LINE */
+    if (scaffold->fab != NULL) {
       rc = m3_scaffold_layout_child(scaffold->fab, &scaffold->fab_bounds);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
     }
     *out_changed = CMP_TRUE;

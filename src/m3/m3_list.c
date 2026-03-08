@@ -168,14 +168,14 @@ static int m3_list_item_measure(void *widget, CMPMeasureSpec width,
 
   if (width.mode == CMP_MEASURE_EXACTLY) {
     w = width.size;
-  } else if (width.mode == CMP_MEASURE_AT_MOST) { /* GCOVR_EXCL_LINE */
+  } else if (width.mode == CMP_MEASURE_AT_MOST) {
     w = width.size; /* List items usually expand to fill horizontally */
   }
 
   out_size->width = w;
   out_size->height = item->style.min_height;
 
-  if (height.mode == CMP_MEASURE_EXACTLY) { /* GCOVR_EXCL_LINE */
+  if (height.mode == CMP_MEASURE_EXACTLY) {
     out_size->height = height.size;
   }
 
@@ -237,23 +237,23 @@ static int m3_list_item_paint(void *widget, CMPPaintContext *ctx) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (item->style.background_color.a > 0.0f && ctx->gfx != NULL) { /* GCOVR_EXCL_LINE */
+  if (item->style.background_color.a > 0.0f && ctx->gfx != NULL) {
     ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &item->bounds,
                                 item->style.background_color, 0.0f);
   }
 
   text_x = item->bounds.x + item->style.padding_x;
-  if (item->leading_widget != NULL) { /* GCOVR_EXCL_LINE */
+  if (item->leading_widget != NULL) {
     text_x += 40.0f + 16.0f; /* approximate icon width + padding */
   }
   text_y = item->bounds.y + (item->style.min_height * 0.5f) - 8.0f;
 
-  if (item->utf8_headline != NULL && item->text_backend.vtable != NULL) { /* GCOVR_EXCL_LINE */
+  if (item->utf8_headline != NULL && item->text_backend.vtable != NULL) {
     rc = item->text_backend.vtable->create_font(
         item->text_backend.ctx, item->style.headline_style.utf8_family,
         item->style.headline_style.size_px, item->style.headline_style.weight,
         item->style.headline_style.italic, &font);
-    if (rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+    if (rc == CMP_OK) {
       item->text_backend.vtable->measure_text(
           item->text_backend.ctx, font, item->utf8_headline,
           strlen(item->utf8_headline), 0, &w, &h, &baseline);
@@ -264,10 +264,10 @@ static int m3_list_item_paint(void *widget, CMPPaintContext *ctx) {
     }
   }
 
-  if (item->leading_widget != NULL) { /* GCOVR_EXCL_LINE */
+  if (item->leading_widget != NULL) {
     item->leading_widget->vtable->paint(item->leading_widget, ctx);
   }
-  if (item->trailing_widget != NULL) { /* GCOVR_EXCL_LINE */
+  if (item->trailing_widget != NULL) {
     item->trailing_widget->vtable->paint(item->trailing_widget, ctx);
   }
 
@@ -289,7 +289,7 @@ static int m3_list_item_event(void *widget, const CMPInputEvent *event,
     CMPBool child_handled = CMP_FALSE;
     item->leading_widget->vtable->event(item->leading_widget, event,
                                         &child_handled);
-    if (child_handled) { /* GCOVR_EXCL_LINE */
+    if (child_handled) {
       *out_handled = CMP_TRUE;
       return CMP_OK;
     }
@@ -299,7 +299,7 @@ static int m3_list_item_event(void *widget, const CMPInputEvent *event,
     CMPBool child_handled = CMP_FALSE;
     item->trailing_widget->vtable->event(item->trailing_widget, event,
                                          &child_handled);
-    if (child_handled) { /* GCOVR_EXCL_LINE */
+    if (child_handled) {
       *out_handled = CMP_TRUE;
       return CMP_OK;
     }
@@ -307,21 +307,21 @@ static int m3_list_item_event(void *widget, const CMPInputEvent *event,
 
   bounds = item->bounds;
   if (event->type == CMP_INPUT_POINTER_DOWN) {
-    if ((CMPScalar)event->data.pointer.x >= bounds.x && /* GCOVR_EXCL_LINE */
+    if ((CMPScalar)event->data.pointer.x >= bounds.x &&
         (CMPScalar)event->data.pointer.x <= bounds.x + bounds.width &&
-        (CMPScalar)event->data.pointer.y >= bounds.y && /* GCOVR_EXCL_LINE */
-        (CMPScalar)event->data.pointer.y <= bounds.y + bounds.height) { /* GCOVR_EXCL_LINE */
+        (CMPScalar)event->data.pointer.y >= bounds.y &&
+        (CMPScalar)event->data.pointer.y <= bounds.y + bounds.height) {
       item->pressed = CMP_TRUE;
       cmp_ripple_start(&item->ripple, (CMPScalar)event->data.pointer.x,
                        (CMPScalar)event->data.pointer.y, bounds.width, 0.3f,
                        item->style.ripple_color);
       *out_handled = CMP_TRUE;
     }
-  } else if (event->type == CMP_INPUT_POINTER_UP) { /* GCOVR_EXCL_LINE */
+  } else if (event->type == CMP_INPUT_POINTER_UP) {
     if (item->pressed) {
       item->pressed = CMP_FALSE;
       cmp_ripple_release(&item->ripple, 0.2f);
-      if (item->on_press != NULL) { /* GCOVR_EXCL_LINE */
+      if (item->on_press != NULL) {
         item->on_press(item->on_press_ctx, item);
       }
       *out_handled = CMP_TRUE;

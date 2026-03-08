@@ -356,30 +356,92 @@ CMP_API int CMP_CALL m3_side_sheet_get_bounds(const M3SideSheet *sheet,
 CMP_API int CMP_CALL m3_side_sheet_get_content_bounds(const M3SideSheet *sheet,
                                                       CMPRect *out_bounds);
 
+/**
+ * @brief Helper for test coverage.
+ * @param fail_point Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_sheet_test_set_fail_point(cmp_u32 fail_point);
 
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_sheet_test_set_color_fail_after(cmp_u32 call_count);
 
+/**
+ * @brief Helper for test coverage.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_sheet_test_clear_fail_points(void);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_sheet_test_validate_color(const CMPColor *color);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @param r Parameter for testing.
+ * @param g Parameter for testing.
+ * @param b Parameter for testing.
+ * @param a Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_sheet_test_color_set(CMPColor *color, CMPScalar r,
                                              CMPScalar g, CMPScalar b,
                                              CMPScalar a);
 
+/**
+ * @brief Helper for test coverage.
+ * @param edges Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_sheet_test_validate_edges(const CMPLayoutEdges *edges);
 
+/**
+ * @brief Helper for test coverage.
+ * @param spec Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_sheet_test_validate_measure_spec(CMPMeasureSpec spec);
 
+/**
+ * @brief Helper for test coverage.
+ * @param rect Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_sheet_test_validate_rect(const CMPRect *rect);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_sheet_test_validate_style(const M3SheetStyle *style);
 
+/**
+ * @brief Helper for test coverage.
+ * @param sheet Parameter for testing.
+ * @param offset Parameter for testing.
+ * @param reset_velocity Parameter for testing.
+ * @param out_changed Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_sheet_test_apply_offset(
     M3Sheet *sheet, CMPScalar offset, CMPBool reset_velocity,
-    CMPBool *out_changed); /* GCOVR_EXCL_LINE */
+    CMPBool *out_changed);
 
+/**
+ * @brief Helper for test coverage.
+ * @param sheet Parameter for testing.
+ * @param out_alpha Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_sheet_test_compute_scrim_alpha(const M3Sheet *sheet,
                                                        CMPScalar *out_alpha);
 

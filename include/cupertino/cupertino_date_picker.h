@@ -25,12 +25,12 @@ typedef struct CupertinoDatePicker {
     
     CMPRect bounds;                               /**< Layout bounds. */
     
-    cmp_i32 year;
-    cmp_i32 month;
-    cmp_i32 day;
+    cmp_i32 year;                                 /**< Selected year. */
+    cmp_i32 month;                                /**< Selected month (1-12). */
+    cmp_i32 day;                                  /**< Selected day (1-31). */
     
-    cmp_i32 hour;
-    cmp_i32 minute;
+    cmp_i32 hour;                                 /**< Selected hour (0-23). */
+    cmp_i32 minute;                               /**< Selected minute (0-59). */
     
     CMPBool is_time_only;                         /**< If true, only shows time. */
     CMPBool is_dark_mode;                         /**< Dark mode styling. */

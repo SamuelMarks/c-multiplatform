@@ -9,9 +9,9 @@ static int test_data_table_init(void) {
 
   CMP_TEST_EXPECT(m3_data_table_init(NULL), CMP_ERR_INVALID_ARGUMENT);
 
-  m3_data_table_test_set_fail_point(1u);
+  CMP_TEST_OK(m3_data_table_test_set_fail_point(1u));
   CMP_TEST_EXPECT(m3_data_table_init(&table), CMP_ERR_OUT_OF_MEMORY);
-  m3_data_table_test_clear_fail_points();
+  CMP_TEST_OK(m3_data_table_test_clear_fail_points());
 
   CMP_TEST_OK(m3_data_table_init(&table));
   CMP_TEST_ASSERT(table.column_count == 0);
@@ -29,11 +29,15 @@ static int test_data_table_draw_headers(void) {
   CMP_TEST_EXPECT(m3_data_table_draw_headers(NULL, &table), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_data_table_draw_headers(&ctx, NULL), CMP_ERR_INVALID_ARGUMENT);
 
-  m3_data_table_test_set_fail_point(2u);
+  CMP_TEST_OK(m3_data_table_test_set_fail_point(2u));
   CMP_TEST_EXPECT(m3_data_table_draw_headers(&ctx, &table), CMP_ERR_OUT_OF_MEMORY);
-  m3_data_table_test_clear_fail_points();
+  CMP_TEST_OK(m3_data_table_test_clear_fail_points());
 
   /* Empty table */
+  CMP_TEST_OK(m3_data_table_draw_headers(&ctx, &table));
+
+  table.column_count = 1;
+  table.columns = NULL;
   CMP_TEST_OK(m3_data_table_draw_headers(&ctx, &table));
 
   /* Non-empty table */
@@ -57,9 +61,9 @@ static int test_data_table_draw_row(void) {
   CMP_TEST_EXPECT(m3_data_table_draw_row(&ctx, NULL, 0, cells), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_data_table_draw_row(&ctx, &table, 0, NULL), CMP_ERR_INVALID_ARGUMENT);
 
-  m3_data_table_test_set_fail_point(3u);
+  CMP_TEST_OK(m3_data_table_test_set_fail_point(3u));
   CMP_TEST_EXPECT(m3_data_table_draw_row(&ctx, &table, 0, cells), CMP_ERR_OUT_OF_MEMORY);
-  m3_data_table_test_clear_fail_points();
+  CMP_TEST_OK(m3_data_table_test_clear_fail_points());
 
   /* Invalid row index */
   CMP_TEST_EXPECT(m3_data_table_draw_row(&ctx, &table, 0, cells), CMP_ERR_INVALID_ARGUMENT);
@@ -77,9 +81,9 @@ static int test_data_table_cleanup(void) {
 
   CMP_TEST_EXPECT(m3_data_table_cleanup(NULL), CMP_ERR_INVALID_ARGUMENT);
 
-  m3_data_table_test_set_fail_point(4u);
+  CMP_TEST_OK(m3_data_table_test_set_fail_point(4u));
   CMP_TEST_EXPECT(m3_data_table_cleanup(&table), CMP_ERR_OUT_OF_MEMORY);
-  m3_data_table_test_clear_fail_points();
+  CMP_TEST_OK(m3_data_table_test_clear_fail_points());
 
   CMP_TEST_OK(m3_data_table_cleanup(&table));
 

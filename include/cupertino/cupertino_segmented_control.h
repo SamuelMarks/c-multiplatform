@@ -19,6 +19,7 @@ extern "C" {
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
 
+/** @brief Maximum number of segments in a segmented control. */
 #define CUPERTINO_SEGMENTED_CONTROL_MAX_SEGMENTS 6
 
 /** @brief Cupertino Segmented Control Widget */
@@ -27,7 +28,7 @@ typedef struct CupertinoSegmentedControl {
     CMPTextBackend text_backend;                  /**< Text backend for drawing labels. */
     
     const char *segments[CUPERTINO_SEGMENTED_CONTROL_MAX_SEGMENTS]; /**< Segment labels in UTF-8. */
-    cmp_usize segment_lengths[CUPERTINO_SEGMENTED_CONTROL_MAX_SEGMENTS];
+    cmp_usize segment_lengths[CUPERTINO_SEGMENTED_CONTROL_MAX_SEGMENTS]; /**< Lengths of the segment strings. */
     cmp_usize segment_count;                      /**< Number of segments. */
     
     cmp_i32 selected_index;                       /**< Currently selected segment index. */

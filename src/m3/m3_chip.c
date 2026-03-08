@@ -210,7 +210,7 @@ static int m3_chip_validate_style(const M3ChipStyle *style,
   }
   rc = m3_chip_validate_layout(&style->dense_layout);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc = m3_chip_validate_text_style(&style->text_style, require_family);
@@ -224,35 +224,35 @@ static int m3_chip_validate_style(const M3ChipStyle *style,
   }
   rc = m3_chip_validate_color(&style->outline_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_validate_color(&style->selected_background_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_validate_color(&style->selected_outline_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_validate_color(&style->selected_text_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_validate_color(&style->disabled_background_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_validate_color(&style->disabled_outline_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_validate_color(&style->disabled_text_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_validate_color(&style->ripple_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return CMP_OK;
@@ -310,8 +310,8 @@ static int m3_chip_metrics_update(M3Chip *chip) {
 static int m3_chip_get_layout(const M3Chip *chip, M3ChipLayout *out_layout) {
   int rc;
 
-  if (chip == NULL || out_layout == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (chip == NULL || out_layout == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = m3_chip_validate_bool(chip->dense);
@@ -334,7 +334,7 @@ static int m3_chip_resolve_colors(const M3Chip *chip, CMPColor *out_background,
 
   if (chip == NULL || out_background == NULL || out_text == NULL ||
       out_outline == NULL || out_ripple == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   if (chip->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
@@ -360,15 +360,15 @@ static int m3_chip_resolve_colors(const M3Chip *chip, CMPColor *out_background,
   }
   rc = m3_chip_validate_color(out_text);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_validate_color(out_outline);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_validate_color(out_ripple);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return CMP_OK;
@@ -379,20 +379,20 @@ static int m3_chip_resolve_corner(const M3Chip *chip, CMPScalar *out_corner) {
   CMPScalar min_side;
 
   if (chip == NULL || out_corner == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (chip->style.corner_radius < 0.0f) {
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_RANGE;
   }
-  if (chip->bounds.width < 0.0f || chip->bounds.height < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (chip->bounds.width < 0.0f || chip->bounds.height < 0.0f) {
     return CMP_ERR_RANGE;
   }
 
   corner = chip->style.corner_radius;
   min_side = (chip->bounds.width < chip->bounds.height) ? chip->bounds.width
                                                         : chip->bounds.height;
-  if (min_side < 0.0f) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+  if (min_side < 0.0f) {
+    return CMP_ERR_RANGE;
   }
   if (corner > min_side * 0.5f) {
     corner = min_side * 0.5f;
@@ -418,9 +418,9 @@ static int m3_chip_compute_content_layout(M3Chip *chip,
   CMPScalar icon_y;
   int rc;
 
-  if (chip == NULL || layout == NULL || out_text_x == NULL || /* GCOVR_EXCL_LINE */
-      out_text_y == NULL || out_delete_bounds == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (chip == NULL || layout == NULL || out_text_x == NULL ||
+      out_text_y == NULL || out_delete_bounds == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   out_delete_bounds->x = 0.0f;
@@ -430,17 +430,17 @@ static int m3_chip_compute_content_layout(M3Chip *chip,
 
   rc = m3_chip_validate_layout(layout);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc = m3_chip_validate_rect(&chip->bounds);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc = m3_chip_metrics_update(chip);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   metrics = chip->metrics;
@@ -520,7 +520,7 @@ static int m3_chip_draw_delete_icon(const CMPGfx *gfx, const CMPRect *bounds,
     return CMP_ERR_UNSUPPORTED;
   }
   if (bounds->width < 0.0f || bounds->height < 0.0f) {
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_RANGE;
   }
   if (thickness < 0.0f) {
     return CMP_ERR_RANGE;
@@ -532,10 +532,10 @@ static int m3_chip_draw_delete_icon(const CMPGfx *gfx, const CMPRect *bounds,
   inset = thickness;
   max_inset = bounds->width * 0.5f;
   if (bounds->height * 0.5f < max_inset) {
-    max_inset = bounds->height * 0.5f; /* GCOVR_EXCL_LINE */
+    max_inset = bounds->height * 0.5f;
   }
   if (inset > max_inset) {
-    inset = max_inset; /* GCOVR_EXCL_LINE */
+    inset = max_inset;
   }
 
   x0 = bounds->x + inset;
@@ -548,8 +548,8 @@ static int m3_chip_draw_delete_icon(const CMPGfx *gfx, const CMPRect *bounds,
     return rc;
   }
   rc = gfx->vtable->draw_line(gfx->ctx, x0, y1, x1, y0, color, thickness);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
   return CMP_OK;
 }
@@ -562,7 +562,7 @@ static int m3_chip_style_init_layout(M3ChipLayout *layout, CMPScalar padding_x,
   int rc;
 
   if (layout == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   layout->padding_x = padding_x;
@@ -575,7 +575,7 @@ static int m3_chip_style_init_layout(M3ChipLayout *layout, CMPScalar padding_x,
 
   rc = m3_chip_validate_layout(layout);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return CMP_OK;
@@ -585,7 +585,7 @@ static int m3_chip_style_init_base(M3ChipStyle *style, cmp_u32 variant) {
   int rc;
 
   if (style == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   memset(style, 0, sizeof(*style));
@@ -611,8 +611,8 @@ static int m3_chip_style_init_base(M3ChipStyle *style, cmp_u32 variant) {
       M3_CHIP_DEFAULT_MIN_WIDTH, M3_CHIP_DEFAULT_MIN_HEIGHT,
       M3_CHIP_DEFAULT_ICON_SIZE, M3_CHIP_DEFAULT_ICON_GAP,
       M3_CHIP_DEFAULT_DELETE_THICKNESS);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = m3_chip_style_init_layout(
@@ -620,8 +620,8 @@ static int m3_chip_style_init_base(M3ChipStyle *style, cmp_u32 variant) {
       M3_CHIP_DENSE_MIN_WIDTH, M3_CHIP_DENSE_MIN_HEIGHT,
       M3_CHIP_DENSE_ICON_SIZE, M3_CHIP_DENSE_ICON_GAP,
       M3_CHIP_DENSE_DELETE_THICKNESS);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = m3_chip_color_set(&style->text_style.color, 0.0f, 0.0f, 0.0f, 1.0f);
@@ -630,45 +630,45 @@ static int m3_chip_style_init_base(M3ChipStyle *style, cmp_u32 variant) {
   }
   rc = m3_chip_color_set(&style->background_color, 1.0f, 1.0f, 1.0f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_color_set(&style->outline_color, 0.7f, 0.7f, 0.7f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_color_set(&style->selected_background_color, 0.9f, 0.9f, 0.9f,
                          1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc =
       m3_chip_color_set(&style->selected_outline_color, 0.6f, 0.6f, 0.6f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_color_set(&style->selected_text_color, 0.0f, 0.0f, 0.0f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_color_set(&style->ripple_color, 0.0f, 0.0f, 0.0f, 0.12f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc = m3_chip_color_with_alpha(&style->background_color, 0.12f,
                                 &style->disabled_background_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_color_with_alpha(&style->text_style.color, 0.38f,
                                 &style->disabled_text_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_color_with_alpha(&style->outline_color, 0.12f,
                                 &style->disabled_outline_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return CMP_OK;
@@ -684,8 +684,8 @@ static int m3_chip_widget_measure(void *widget, CMPMeasureSpec width,
   CMPScalar min_height;
   int rc;
 
-  if (widget == NULL || out_size == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (widget == NULL || out_size == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = m3_chip_validate_measure_spec(width);
@@ -693,45 +693,45 @@ static int m3_chip_widget_measure(void *widget, CMPMeasureSpec width,
     return rc;
   }
   rc = m3_chip_validate_measure_spec(height);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   chip = (M3Chip *)widget;
   rc = m3_chip_validate_style(&chip->style, CMP_FALSE);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = m3_chip_get_layout(chip, &layout);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = m3_chip_metrics_update(chip);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   metrics = chip->metrics;
   desired_width = metrics.width + layout.padding_x * 2.0f;
-  if (chip->show_delete == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (chip->show_delete == CMP_TRUE) {
     desired_width += layout.icon_gap + layout.icon_size;
   }
-  if (desired_width < layout.min_width) { /* GCOVR_EXCL_LINE */
-    desired_width = layout.min_width; /* GCOVR_EXCL_LINE */
+  if (desired_width < layout.min_width) {
+    desired_width = layout.min_width;
   }
 
   desired_height = metrics.height + layout.padding_y * 2.0f;
   min_height = layout.min_height;
-  if (chip->show_delete == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (chip->show_delete == CMP_TRUE) {
     if (layout.icon_size + layout.padding_y * 2.0f > min_height) {
       min_height =
-          layout.icon_size + layout.padding_y * 2.0f; /* GCOVR_EXCL_LINE */
+          layout.icon_size + layout.padding_y * 2.0f;
     }
   }
   if (desired_height < min_height) {
-    desired_height = min_height; /* GCOVR_EXCL_LINE */
+    desired_height = min_height;
   }
 
   if (width.mode == CMP_MEASURE_EXACTLY) {
@@ -739,16 +739,16 @@ static int m3_chip_widget_measure(void *widget, CMPMeasureSpec width,
   } else if (width.mode == CMP_MEASURE_AT_MOST) {
     out_size->width = (desired_width > width.size)
                           ? width.size
-                          : desired_width; /* GCOVR_EXCL_LINE */
-  } else {                                 /* GCOVR_EXCL_LINE */
+                          : desired_width;
+  } else {                                
     out_size->width = desired_width;
   }
 
-  if (height.mode == CMP_MEASURE_EXACTLY) { /* GCOVR_EXCL_LINE */
-    out_size->height = height.size; /* GCOVR_EXCL_LINE */
+  if (height.mode == CMP_MEASURE_EXACTLY) {
+    out_size->height = height.size;
   } else if (height.mode == CMP_MEASURE_AT_MOST) {
     out_size->height =
-        (desired_height > height.size) ? height.size : desired_height; /* GCOVR_EXCL_LINE */
+        (desired_height > height.size) ? height.size : desired_height;
   } else {
     out_size->height = desired_height;
   }
@@ -761,7 +761,7 @@ static int m3_chip_widget_layout(void *widget, CMPRect bounds) {
   int rc = CMP_OK;
 
   if (widget == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = m3_chip_validate_rect(&bounds);
@@ -792,7 +792,7 @@ static int m3_chip_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPBool ripple_active;
   int rc;
 
-  if (widget == NULL || ctx == NULL || ctx->gfx == NULL) { /* GCOVR_EXCL_LINE */
+  if (widget == NULL || ctx == NULL || ctx->gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (ctx->gfx->vtable == NULL) {
@@ -802,25 +802,25 @@ static int m3_chip_widget_paint(void *widget, CMPPaintContext *ctx) {
     return CMP_ERR_UNSUPPORTED;
   }
   if (ctx->gfx->text_vtable == NULL ||
-      ctx->gfx->text_vtable->draw_text == NULL) { /* GCOVR_EXCL_LINE */
+      ctx->gfx->text_vtable->draw_text == NULL) {
     return CMP_ERR_UNSUPPORTED;
   }
 
   chip = (M3Chip *)widget;
 
   rc = m3_chip_validate_style(&chip->style, CMP_FALSE);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = m3_chip_validate_rect(&chip->bounds);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = m3_chip_get_layout(chip, &layout);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = m3_chip_metrics_update(chip);
@@ -865,12 +865,12 @@ static int m3_chip_widget_paint(void *widget, CMPPaintContext *ctx) {
     inner.y = bounds.y + outline_width;
     inner.width = bounds.width - outline_width * 2.0f;
     inner.height = bounds.height - outline_width * 2.0f;
-    if (inner.width < 0.0f || inner.height < 0.0f) { /* GCOVR_EXCL_LINE */
+    if (inner.width < 0.0f || inner.height < 0.0f) {
       return CMP_ERR_RANGE;
     }
     inner_corner = corner_radius - outline_width;
-    if (inner_corner < 0.0f) { /* GCOVR_EXCL_LINE */
-      inner_corner = 0.0f; /* GCOVR_EXCL_LINE */
+    if (inner_corner < 0.0f) {
+      inner_corner = 0.0f;
     }
 
     rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &bounds, outline,
@@ -880,22 +880,22 @@ static int m3_chip_widget_paint(void *widget, CMPPaintContext *ctx) {
     }
     rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &inner, background,
                                      inner_corner);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      return rc;
     }
   } else {
     inner = bounds;
     inner_corner = corner_radius;
     rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &inner, background,
                                      inner_corner);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      return rc;
     }
   }
 
   rc = cmp_ripple_is_active(&chip->ripple, &ripple_active);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   if (ripple_active == CMP_TRUE) {
@@ -908,12 +908,12 @@ static int m3_chip_widget_paint(void *widget, CMPPaintContext *ctx) {
 
   rc = m3_chip_compute_content_layout(chip, &layout, &text_x, &text_y,
                                       &delete_bounds);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   if (chip->utf8_label != NULL || chip->utf8_len == 0) {
-    if (chip->utf8_label != NULL && chip->utf8_len != 0) { /* GCOVR_EXCL_LINE */
+    if (chip->utf8_label != NULL && chip->utf8_len != 0) {
       rc = cmp_text_draw_utf8_gfx(ctx->gfx, chip->font,
                                             chip->utf8_label, chip->utf8_len, 0,
                                             text_x, text_y, text_color);
@@ -925,7 +925,7 @@ static int m3_chip_widget_paint(void *widget, CMPPaintContext *ctx) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (chip->show_delete == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (chip->show_delete == CMP_TRUE) {
     rc = m3_chip_draw_delete_icon(ctx->gfx, &delete_bounds, text_color,
                                   layout.delete_icon_thickness);
     if (rc != CMP_OK) {
@@ -959,7 +959,7 @@ static int m3_chip_widget_event(void *widget, const CMPInputEvent *event,
     return CMP_OK;
   }
 
-  switch (event->type) { /* GCOVR_EXCL_LINE */
+  switch (event->type) {
   case CMP_INPUT_POINTER_DOWN:
     if (chip->pressed == CMP_TRUE) {
       return CMP_ERR_STATE;
@@ -976,20 +976,20 @@ static int m3_chip_widget_event(void *widget, const CMPInputEvent *event,
       return rc;
     }
     rc = m3_chip_get_layout(chip, &layout);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      return rc;
     }
     hit_delete = CMP_FALSE;
-    if (chip->show_delete == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+    if (chip->show_delete == CMP_TRUE) {
       rc = m3_chip_compute_content_layout(chip, &layout, &center_x, &center_y,
                                           &delete_bounds);
       if (rc != CMP_OK) {
         return rc;
       }
       if ((CMPScalar)event->data.pointer.x >= delete_bounds.x &&
-          (CMPScalar)event->data.pointer.x <= delete_bounds.x + delete_bounds.width && /* GCOVR_EXCL_LINE */
-          (CMPScalar)event->data.pointer.y >= delete_bounds.y && /* GCOVR_EXCL_LINE */
-          (CMPScalar)event->data.pointer.y <= delete_bounds.y + delete_bounds.height) { /* GCOVR_EXCL_LINE */
+          (CMPScalar)event->data.pointer.x <= delete_bounds.x + delete_bounds.width &&
+          (CMPScalar)event->data.pointer.y >= delete_bounds.y &&
+          (CMPScalar)event->data.pointer.y <= delete_bounds.y + delete_bounds.height) {
         hit_delete = CMP_TRUE;
       }
     }
@@ -1040,17 +1040,17 @@ static int m3_chip_widget_event(void *widget, const CMPInputEvent *event,
     }
     if (chip->pressed_delete == CMP_TRUE) {
       chip->pressed_delete = CMP_FALSE;
-      if (chip->on_delete != NULL) { /* GCOVR_EXCL_LINE */
+      if (chip->on_delete != NULL) {
         rc = chip->on_delete(chip->on_delete_ctx, chip);
         if (rc != CMP_OK) {
           return rc;
         }
       }
     } else {
-      if (chip->style.variant == M3_CHIP_VARIANT_FILTER) { /* GCOVR_EXCL_LINE */
+      if (chip->style.variant == M3_CHIP_VARIANT_FILTER) {
         chip->selected = (chip->selected == CMP_TRUE) ? CMP_FALSE : CMP_TRUE;
       }
-      if (chip->on_click != NULL) { /* GCOVR_EXCL_LINE */
+      if (chip->on_click != NULL) {
         rc = chip->on_click(chip->on_click_ctx, chip);
         if (rc != CMP_OK) {
           return rc;
@@ -1059,11 +1059,9 @@ static int m3_chip_widget_event(void *widget, const CMPInputEvent *event,
     }
     *out_handled = CMP_TRUE;
     return CMP_OK;
-  /* GCOVR_EXCL_START */
-  default:
+    default:
     return CMP_OK;
-  /* GCOVR_EXCL_STOP */
-  }
+    }
 }
 
 static int m3_chip_widget_get_semantics(void *widget,
@@ -1081,10 +1079,10 @@ static int m3_chip_widget_get_semantics(void *widget,
   if (chip->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_DISABLED;
   }
-  if (chip->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) { /* GCOVR_EXCL_LINE */
+  if (chip->widget.flags & CMP_WIDGET_FLAG_FOCUSABLE) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_FOCUSABLE;
   }
-  if (chip->selected == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (chip->selected == CMP_TRUE) {
     out_semantics->flags |= CMP_SEMANTIC_FLAG_SELECTED;
   }
   out_semantics->utf8_label = chip->utf8_label;
@@ -1103,10 +1101,10 @@ static int m3_chip_widget_destroy(void *widget) {
 
   chip = (M3Chip *)widget;
   rc = CMP_OK;
-  if (chip->owns_font == CMP_TRUE && /* GCOVR_EXCL_LINE */
-      (chip->font.id != 0u || chip->font.generation != 0u)) { /* GCOVR_EXCL_LINE */
+  if (chip->owns_font == CMP_TRUE &&
+      (chip->font.id != 0u || chip->font.generation != 0u)) {
     if (chip->text_backend.vtable != NULL &&
-        chip->text_backend.vtable->destroy_font != NULL) { /* GCOVR_EXCL_LINE */
+        chip->text_backend.vtable->destroy_font != NULL) {
       rc = chip->text_backend.vtable->destroy_font(chip->text_backend.ctx,
                                                    chip->font);
     } else {
@@ -1156,23 +1154,23 @@ int CMP_CALL m3_chip_style_init_filter(M3ChipStyle *style) {
   int rc;
 
   rc = m3_chip_style_init_base(style, M3_CHIP_VARIANT_FILTER);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = m3_chip_color_set(&style->selected_background_color, 0.85f, 0.92f, 1.0f,
                          1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_color_set(&style->selected_outline_color, 0.35f, 0.55f, 0.85f,
                          1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_color_set(&style->selected_text_color, 0.1f, 0.2f, 0.45f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return CMP_OK;
@@ -1182,19 +1180,19 @@ int CMP_CALL m3_chip_style_init_input(M3ChipStyle *style) {
   int rc;
 
   rc = m3_chip_style_init_base(style, M3_CHIP_VARIANT_INPUT);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   style->outline_width = 0.0f;
   rc = m3_chip_color_set(&style->background_color, 0.95f, 0.95f, 0.95f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_color_with_alpha(&style->background_color, 0.12f,
                                 &style->disabled_background_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return CMP_OK;
@@ -1204,28 +1202,28 @@ int CMP_CALL m3_chip_style_init_suggestion(M3ChipStyle *style) {
   int rc;
 
   rc = m3_chip_style_init_base(style, M3_CHIP_VARIANT_SUGGESTION);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = m3_chip_color_set(&style->outline_color, 0.8f, 0.8f, 0.8f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_color_with_alpha(&style->outline_color, 0.12f,
                                 &style->disabled_outline_color);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = m3_chip_color_set(&style->selected_background_color, 0.92f, 0.92f, 0.92f,
                          1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc =
       m3_chip_color_set(&style->selected_outline_color, 0.7f, 0.7f, 0.7f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return CMP_OK;
@@ -1239,7 +1237,7 @@ int CMP_CALL m3_chip_init(M3Chip *chip, const CMPTextBackend *backend,
   if (chip == NULL || backend == NULL || style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8_label == NULL && utf8_len != 0) { /* GCOVR_EXCL_LINE */
+  if (utf8_label == NULL && utf8_len != 0) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -1248,8 +1246,8 @@ int CMP_CALL m3_chip_init(M3Chip *chip, const CMPTextBackend *backend,
     return rc;
   }
   if (backend->vtable->create_font == NULL ||
-      backend->vtable->destroy_font == NULL || /* GCOVR_EXCL_LINE */
-      backend->vtable->measure_text == NULL || /* GCOVR_EXCL_LINE */
+      backend->vtable->destroy_font == NULL ||
+      backend->vtable->measure_text == NULL ||
       backend->vtable->draw_text == NULL) {
     return CMP_ERR_UNSUPPORTED;
   }
@@ -1283,8 +1281,8 @@ int CMP_CALL m3_chip_init(M3Chip *chip, const CMPTextBackend *backend,
   }
 
   rc = cmp_text_font_create(backend, &style->text_style, &chip->font);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   chip->widget.ctx = chip;
@@ -1315,12 +1313,12 @@ int CMP_CALL m3_chip_set_style(M3Chip *chip, const M3ChipStyle *style) {
   int rc = CMP_OK;
 
   if (chip == NULL || style == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = m3_chip_validate_style(style, CMP_TRUE);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = cmp_text_font_create(&chip->text_backend, &style->text_style, &new_font);
@@ -1328,7 +1326,7 @@ int CMP_CALL m3_chip_set_style(M3Chip *chip, const M3ChipStyle *style) {
     return rc;
   }
 
-  if (chip->owns_font == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (chip->owns_font == CMP_TRUE) {
     rc = cmp_text_font_destroy(&chip->text_backend, chip->font);
     if (rc != CMP_OK) {
       cmp_text_font_destroy(&chip->text_backend, new_font);
@@ -1523,7 +1521,7 @@ int CMP_CALL m3_chip_test_compute_delete_bounds(M3Chip *chip,
   CMPScalar text_y = 0.0f;
 
   if (chip == NULL || out_bounds == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   rc = m3_chip_get_layout(chip, &layout);

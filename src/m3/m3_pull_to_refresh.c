@@ -15,7 +15,7 @@ static int m3_ptr_pre_scroll(void *ctx, const CMPScrollDelta *delta,
   out_consumed->x = 0.0f;
   out_consumed->y = 0.0f;
 
-  if (delta->y > 0.0f && ptr->drag_offset > 0.0f) { /* GCOVR_EXCL_LINE */
+  if (delta->y > 0.0f && ptr->drag_offset > 0.0f) {
     if (delta->y >= ptr->drag_offset) {
       out_consumed->y = ptr->drag_offset;
       ptr->drag_offset = 0.0f;
@@ -44,7 +44,7 @@ static int m3_ptr_post_scroll(void *ctx, const CMPScrollDelta *delta,
 
   if (!ptr->is_refreshing) {
     remaining_y = delta->y - child_consumed->y;
-    if (remaining_y < 0.0f) { /* GCOVR_EXCL_LINE */
+    if (remaining_y < 0.0f) {
       /* Pulled down while at top */
       ptr->drag_offset += -remaining_y;
       out_consumed->y = remaining_y;
@@ -73,8 +73,8 @@ static int m3_ptr_measure(void *widget, CMPMeasureSpec width,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (ptr->child != NULL && ptr->child->vtable != NULL && /* GCOVR_EXCL_LINE */
-      ptr->child->vtable->measure != NULL) { /* GCOVR_EXCL_LINE */
+  if (ptr->child != NULL && ptr->child->vtable != NULL &&
+      ptr->child->vtable->measure != NULL) {
     ptr->child->vtable->measure(ptr->child, width, height, &child_size);
   }
 
@@ -96,8 +96,8 @@ static int m3_ptr_layout(void *widget, CMPRect bounds) {
   }
   ptr->bounds = bounds;
 
-  if (ptr->child != NULL && ptr->child->vtable != NULL && /* GCOVR_EXCL_LINE */
-      ptr->child->vtable->layout != NULL) { /* GCOVR_EXCL_LINE */
+  if (ptr->child != NULL && ptr->child->vtable != NULL &&
+      ptr->child->vtable->layout != NULL) {
     /* The child occupies the full bounds; the indicator is an overlay */
     ptr->child->vtable->layout(ptr->child, bounds);
   }
@@ -115,14 +115,14 @@ static int m3_ptr_paint(void *widget, CMPPaintContext *ctx) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (ptr->child != NULL && ptr->child->vtable != NULL && /* GCOVR_EXCL_LINE */
-      ptr->child->vtable->paint != NULL) { /* GCOVR_EXCL_LINE */
+  if (ptr->child != NULL && ptr->child->vtable != NULL &&
+      ptr->child->vtable->paint != NULL) {
     ptr->child->vtable->paint(ptr->child, ctx);
   }
 
-  if (ptr->drag_offset > 0.0f || ptr->is_refreshing) { /* GCOVR_EXCL_LINE */
-    if (ctx->gfx != NULL && ctx->gfx->vtable != NULL && /* GCOVR_EXCL_LINE */
-        ctx->gfx->vtable->draw_rect != NULL) { /* GCOVR_EXCL_LINE */
+  if (ptr->drag_offset > 0.0f || ptr->is_refreshing) {
+    if (ctx->gfx != NULL && ctx->gfx->vtable != NULL &&
+        ctx->gfx->vtable->draw_rect != NULL) {
       CMPScalar y_pos = ptr->bounds.y;
 
       if (ptr->is_refreshing) {
@@ -137,11 +137,11 @@ static int m3_ptr_paint(void *widget, CMPPaintContext *ctx) {
           ptr->bounds.x + (ptr->bounds.width - ind_bounds.width) * 0.5f;
       ind_bounds.y = y_pos - ind_bounds.height; /* Start above top edge */
 
-      if (ind_bounds.y > ptr->bounds.y + ptr->style.max_drag) { /* GCOVR_EXCL_LINE */
-        ind_bounds.y = ptr->bounds.y + ptr->style.max_drag; /* GCOVR_EXCL_LINE */
+      if (ind_bounds.y > ptr->bounds.y + ptr->style.max_drag) {
+        ind_bounds.y = ptr->bounds.y + ptr->style.max_drag;
       }
 
-      if (ptr->style.elevation > 0.0f) { /* GCOVR_EXCL_LINE */
+      if (ptr->style.elevation > 0.0f) {
         CMPColor shadow_color;
         shadow_color.r = 0.0f;
         shadow_color.g = 0.0f;
@@ -192,19 +192,19 @@ static int m3_ptr_event(void *widget, const CMPInputEvent *event,
   *out_handled = CMP_FALSE;
 
   /* Let child handle events first */
-  if (ptr->child != NULL && ptr->child->vtable != NULL && /* GCOVR_EXCL_LINE */
-      ptr->child->vtable->event != NULL) { /* GCOVR_EXCL_LINE */
+  if (ptr->child != NULL && ptr->child->vtable != NULL &&
+      ptr->child->vtable->event != NULL) {
     ptr->child->vtable->event(ptr->child, event, out_handled);
   }
 
   /* On pointer up, if drag offset is maxed, trigger refresh */
   if (event->type == CMP_INPUT_POINTER_UP) {
-    if (ptr->drag_offset >= ptr->style.max_drag && !ptr->is_refreshing) { /* GCOVR_EXCL_LINE */
+    if (ptr->drag_offset >= ptr->style.max_drag && !ptr->is_refreshing) {
       ptr->is_refreshing = CMP_TRUE;
-      if (ptr->on_refresh != NULL) { /* GCOVR_EXCL_LINE */
+      if (ptr->on_refresh != NULL) {
         ptr->on_refresh(ptr->on_refresh_ctx);
       }
-    } else if (!ptr->is_refreshing) { /* GCOVR_EXCL_LINE */
+    } else if (!ptr->is_refreshing) {
       /* Snap back */
       ptr->drag_offset = 0.0f;
     }
@@ -234,8 +234,8 @@ static int m3_ptr_destroy(void *widget) {
   if (ptr == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (ptr->child != NULL && ptr->child->vtable != NULL && /* GCOVR_EXCL_LINE */
-      ptr->child->vtable->destroy != NULL) { /* GCOVR_EXCL_LINE */
+  if (ptr->child != NULL && ptr->child->vtable != NULL &&
+      ptr->child->vtable->destroy != NULL) {
     ptr->child->vtable->destroy(ptr->child);
   }
   return CMP_OK;

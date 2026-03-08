@@ -26,7 +26,7 @@ static int cmp_storage_mul_overflow(cmp_usize a, cmp_usize b,
   }
 
   max_value = (cmp_usize) ~(cmp_usize)0;
-  if (a != 0 && b > max_value / a) { /* GCOVR_EXCL_LINE */
+  if (a != 0 && b > max_value / a) {
     return CMP_ERR_OVERFLOW;
   }
 
@@ -101,7 +101,7 @@ static int cmp_storage_find_entry(const CMPStorage *storage, const char *key,
   for (i = 0; i < storage->entry_count; ++i) {
     const CMPStorageEntry *entry = &storage->entries[i];
 
-    if (entry->key_len == key_len && entry->key != NULL && /* GCOVR_EXCL_LINE */
+    if (entry->key_len == key_len && entry->key != NULL &&
         memcmp(entry->key, key, (size_t)key_len) == 0) {
       *out_index = i;
       *out_found = CMP_TRUE;
@@ -119,9 +119,9 @@ static int cmp_storage_entry_release(CMPStorage *storage,
 
   rc = CMP_OK;
 
-  if (entry->key != NULL) { /* GCOVR_EXCL_LINE */
+  if (entry->key != NULL) {
     free_rc = storage->allocator.free(storage->allocator.ctx, entry->key);
-    if (free_rc != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+    if (free_rc != CMP_OK && rc == CMP_OK) {
       rc = free_rc;
     }
     entry->key = NULL;
@@ -129,7 +129,7 @@ static int cmp_storage_entry_release(CMPStorage *storage,
 
   if (entry->value != NULL) {
     free_rc = storage->allocator.free(storage->allocator.ctx, entry->value);
-    if (free_rc != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+    if (free_rc != CMP_OK && rc == CMP_OK) {
       rc = free_rc;
     }
     entry->value = NULL;
@@ -172,7 +172,7 @@ static int cmp_storage_grow(CMPStorage *storage, cmp_usize min_capacity) {
   }
 
   clear_count = new_capacity - storage->entry_capacity;
-  if (clear_count > 0) { /* GCOVR_EXCL_LINE */
+  if (clear_count > 0) {
     memset((CMPStorageEntry *)new_entries + storage->entry_capacity, 0,
            (size_t)(clear_count * sizeof(CMPStorageEntry)));
   }
@@ -213,13 +213,13 @@ int CMP_CALL cmp_storage_init(CMPStorage *storage,
     allocator = *config->allocator;
   } else {
     rc = cmp_get_default_allocator(&allocator);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
       return rc;
     }
   }
 
-  if (allocator.alloc == NULL || allocator.realloc == NULL || /* GCOVR_EXCL_LINE */
-      allocator.free == NULL) { /* GCOVR_EXCL_LINE */
+  if (allocator.alloc == NULL || allocator.realloc == NULL ||
+      allocator.free == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -262,13 +262,13 @@ int CMP_CALL cmp_storage_shutdown(CMPStorage *storage) {
 
   for (i = 0; i < storage->entry_count; ++i) {
     free_rc = cmp_storage_entry_release(storage, &storage->entries[i]);
-    if (free_rc != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+    if (free_rc != CMP_OK && rc == CMP_OK) {
       rc = free_rc;
     }
   }
 
   free_rc = storage->allocator.free(storage->allocator.ctx, storage->entries);
-  if (free_rc != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+  if (free_rc != CMP_OK && rc == CMP_OK) {
     rc = free_rc;
   }
 
@@ -312,7 +312,7 @@ int CMP_CALL cmp_storage_put(CMPStorage *storage, const char *utf8_key,
   }
 
   rc = cmp_storage_find_entry(storage, utf8_key, key_len, &index, &found);
-  CMP_STORAGE_RETURN_IF_ERROR(rc); /* GCOVR_EXCL_LINE */
+  CMP_STORAGE_RETURN_IF_ERROR(rc);
 
   if (found == CMP_TRUE) {
     if (overwrite == CMP_FALSE) {
@@ -321,7 +321,7 @@ int CMP_CALL cmp_storage_put(CMPStorage *storage, const char *utf8_key,
 
     entry = &storage->entries[index];
     if (value_len == 0) {
-      if (entry->value != NULL) { /* GCOVR_EXCL_LINE */
+      if (entry->value != NULL) {
         rc = storage->allocator.free(storage->allocator.ctx, entry->value);
         if (rc != CMP_OK) {
           return rc;
@@ -339,7 +339,7 @@ int CMP_CALL cmp_storage_put(CMPStorage *storage, const char *utf8_key,
     }
     memcpy(value_copy, value, (size_t)value_len);
 
-    if (entry->value != NULL) { /* GCOVR_EXCL_LINE */
+    if (entry->value != NULL) {
       rc = storage->allocator.free(storage->allocator.ctx, entry->value);
       if (rc != CMP_OK) {
         storage->allocator.free(storage->allocator.ctx, value_copy);
@@ -369,7 +369,7 @@ int CMP_CALL cmp_storage_put(CMPStorage *storage, const char *utf8_key,
   ((char *)key_copy)[key_len] = '\0';
 
   value_copy = NULL;
-  if (value_len > 0) { /* GCOVR_EXCL_LINE */
+  if (value_len > 0) {
     rc = storage->allocator.alloc(storage->allocator.ctx, value_len,
                                   &value_copy);
     if (rc != CMP_OK) {
@@ -403,7 +403,7 @@ int CMP_CALL cmp_storage_get(const CMPStorage *storage, const char *utf8_key,
   if (storage->entries == NULL) {
     return CMP_ERR_STATE;
   }
-  if (out_value == NULL && value_capacity != 0) { /* GCOVR_EXCL_LINE */
+  if (out_value == NULL && value_capacity != 0) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -411,7 +411,7 @@ int CMP_CALL cmp_storage_get(const CMPStorage *storage, const char *utf8_key,
   CMP_STORAGE_RETURN_IF_ERROR(rc);
 
   rc = cmp_storage_find_entry(storage, utf8_key, key_len, &index, &found);
-  CMP_STORAGE_RETURN_IF_ERROR(rc); /* GCOVR_EXCL_LINE */
+  CMP_STORAGE_RETURN_IF_ERROR(rc);
 
   if (found == CMP_FALSE) {
     *out_value_size = 0;
@@ -449,7 +449,7 @@ int CMP_CALL cmp_storage_contains(const CMPStorage *storage,
   CMP_STORAGE_RETURN_IF_ERROR(rc);
 
   rc = cmp_storage_find_entry(storage, utf8_key, key_len, &index, &found);
-  CMP_STORAGE_RETURN_IF_ERROR(rc); /* GCOVR_EXCL_LINE */
+  CMP_STORAGE_RETURN_IF_ERROR(rc);
 
   *out_exists = found;
   return CMP_OK;
@@ -473,7 +473,7 @@ int CMP_CALL cmp_storage_remove(CMPStorage *storage, const char *utf8_key,
   CMP_STORAGE_RETURN_IF_ERROR(rc);
 
   rc = cmp_storage_find_entry(storage, utf8_key, key_len, &index, &found);
-  CMP_STORAGE_RETURN_IF_ERROR(rc); /* GCOVR_EXCL_LINE */
+  CMP_STORAGE_RETURN_IF_ERROR(rc);
 
   if (found == CMP_FALSE) {
     return CMP_ERR_NOT_FOUND;
@@ -507,7 +507,7 @@ int CMP_CALL cmp_storage_clear(CMPStorage *storage) {
   rc = CMP_OK;
   for (i = 0; i < storage->entry_count; ++i) {
     free_rc = cmp_storage_entry_release(storage, &storage->entries[i]);
-    if (free_rc != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+    if (free_rc != CMP_OK && rc == CMP_OK) {
       rc = free_rc;
     }
   }
@@ -549,10 +549,10 @@ int CMP_CALL cmp_storage_save(const CMPStorage *storage, CMPIO *io,
   if (storage->entries == NULL) {
     return CMP_ERR_STATE;
   }
-  if (io->vtable == NULL || io->vtable->write_file == NULL) { /* GCOVR_EXCL_LINE */
+  if (io->vtable == NULL || io->vtable->write_file == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (storage->allocator.alloc == NULL || storage->allocator.free == NULL) { /* GCOVR_EXCL_LINE */
+  if (storage->allocator.alloc == NULL || storage->allocator.free == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -563,7 +563,7 @@ int CMP_CALL cmp_storage_save(const CMPStorage *storage, CMPIO *io,
   for (i = 0; i < storage->entry_count; ++i) {
     const CMPStorageEntry *entry = &storage->entries[i];
 
-    if (entry->key == NULL || (entry->value == NULL && entry->value_len != 0)) { /* GCOVR_EXCL_LINE */
+    if (entry->key == NULL || (entry->value == NULL && entry->value_len != 0)) {
       return CMP_ERR_STATE;
     }
 
@@ -573,11 +573,11 @@ int CMP_CALL cmp_storage_save(const CMPStorage *storage, CMPIO *io,
     CMP_STORAGE_RETURN_IF_ERROR(rc);
 
     rc = cmp_storage_add_overflow(total_size, (cmp_usize)8, &total_size);
-    CMP_STORAGE_RETURN_IF_ERROR(rc); /* GCOVR_EXCL_LINE */
+    CMP_STORAGE_RETURN_IF_ERROR(rc);
     rc = cmp_storage_add_overflow(total_size, entry->key_len, &total_size);
-    CMP_STORAGE_RETURN_IF_ERROR(rc); /* GCOVR_EXCL_LINE */
+    CMP_STORAGE_RETURN_IF_ERROR(rc);
     rc = cmp_storage_add_overflow(total_size, entry->value_len, &total_size);
-    CMP_STORAGE_RETURN_IF_ERROR(rc); /* GCOVR_EXCL_LINE */
+    CMP_STORAGE_RETURN_IF_ERROR(rc);
   }
 
   rc = storage->allocator.alloc(storage->allocator.ctx, total_size,
@@ -616,12 +616,12 @@ int CMP_CALL cmp_storage_save(const CMPStorage *storage, CMPIO *io,
     cmp_storage_write_u32_le(buffer + offset + 4u, value_len_u32);
 
     offset += 8u;
-    if (entry->key_len > 0) { /* GCOVR_EXCL_LINE */
+    if (entry->key_len > 0) {
       memcpy(buffer + offset, entry->key, (size_t)entry->key_len);
       offset += entry->key_len;
     }
 
-    if (entry->value_len > 0) { /* GCOVR_EXCL_LINE */
+    if (entry->value_len > 0) {
       memcpy(buffer + offset, entry->value, (size_t)entry->value_len);
       offset += entry->value_len;
     }
@@ -629,7 +629,7 @@ int CMP_CALL cmp_storage_save(const CMPStorage *storage, CMPIO *io,
 
   rc = io->vtable->write_file(io->ctx, utf8_path, buffer, total_size, CMP_TRUE);
   free_rc = storage->allocator.free(storage->allocator.ctx, buffer);
-  if (free_rc != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+  if (free_rc != CMP_OK && rc == CMP_OK) {
     rc = free_rc;
   }
   return rc;
@@ -657,11 +657,11 @@ int CMP_CALL cmp_storage_load(CMPStorage *storage, CMPIO *io,
   if (storage->entries == NULL) {
     return CMP_ERR_STATE;
   }
-  if (io->vtable == NULL || io->vtable->read_file_alloc == NULL) { /* GCOVR_EXCL_LINE */
+  if (io->vtable == NULL || io->vtable->read_file_alloc == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (storage->allocator.alloc == NULL || storage->allocator.free == NULL || /* GCOVR_EXCL_LINE */
-      storage->allocator.realloc == NULL) { /* GCOVR_EXCL_LINE */
+  if (storage->allocator.alloc == NULL || storage->allocator.free == NULL ||
+      storage->allocator.realloc == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -672,8 +672,8 @@ int CMP_CALL cmp_storage_load(CMPStorage *storage, CMPIO *io,
   if (rc != CMP_OK) {
     return rc;
   }
-  if (buffer == NULL || buffer_size < (cmp_usize)CMP_STORAGE_HEADER_SIZE) { /* GCOVR_EXCL_LINE */
-    if (buffer != NULL) { /* GCOVR_EXCL_LINE */
+  if (buffer == NULL || buffer_size < (cmp_usize)CMP_STORAGE_HEADER_SIZE) {
+    if (buffer != NULL) {
       free_rc = storage->allocator.free(storage->allocator.ctx, buffer);
       CMP_UNUSED(free_rc);
     }
@@ -681,9 +681,9 @@ int CMP_CALL cmp_storage_load(CMPStorage *storage, CMPIO *io,
   }
 
   if (buffer[0] != (cmp_u8)CMP_STORAGE_MAGIC_0 ||
-      buffer[1] != (cmp_u8)CMP_STORAGE_MAGIC_1 || /* GCOVR_EXCL_LINE */
-      buffer[2] != (cmp_u8)CMP_STORAGE_MAGIC_2 || /* GCOVR_EXCL_LINE */
-      buffer[3] != (cmp_u8)CMP_STORAGE_MAGIC_3) { /* GCOVR_EXCL_LINE */
+      buffer[1] != (cmp_u8)CMP_STORAGE_MAGIC_1 ||
+      buffer[2] != (cmp_u8)CMP_STORAGE_MAGIC_2 ||
+      buffer[3] != (cmp_u8)CMP_STORAGE_MAGIC_3) {
     free_rc = storage->allocator.free(storage->allocator.ctx, buffer);
     CMP_UNUSED(free_rc);
     return CMP_ERR_CORRUPT;
@@ -744,7 +744,7 @@ int CMP_CALL cmp_storage_load(CMPStorage *storage, CMPIO *io,
   }
 
   free_rc = storage->allocator.free(storage->allocator.ctx, buffer);
-  if (free_rc != CMP_OK && rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+  if (free_rc != CMP_OK && rc == CMP_OK) {
     rc = free_rc;
   }
 

@@ -91,22 +91,83 @@ CMP_API int CMP_CALL cmp_video_read_frame(CMPVideoDecoder *decoder,
                                           CMPVideoFrame *out_frame,
                                           CMPBool *out_has_frame);
 
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_video_test_set_read_u32_fail_after(cmp_u32 call_count);
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 cmp_video_test_set_mul_overflow_fail_after(cmp_u32 call_count);
+/**
+ * @brief Helper for test coverage.
+ * @param a Parameter for testing.
+ * @param b Parameter for testing.
+ * @param out_result Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_video_test_mul_overflow(cmp_usize a, cmp_usize b,
                                                  cmp_usize *out_result);
+/**
+ * @brief Helper for test coverage.
+ * @param data Parameter for testing.
+ * @param size Parameter for testing.
+ * @param offset Parameter for testing.
+ * @param out_val Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_video_test_read_u32_le(const cmp_u8 *data,
                                                 cmp_usize size,
                                                 cmp_usize offset,
                                                 cmp_u32 *out_val);
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param request Parameter for testing.
+ * @return Test result.
+ */
 cmp_video_test_fallback_parse(const CMPVideoOpenRequest *request);
+/**
+ * @brief Helper for test coverage.
+ * @param decoder Parameter for testing.
+ * @param request Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_video_test_fallback_open(
     CMPVideoDecoder *decoder, const CMPVideoOpenRequest *request);
+/**
+ * @brief Helper for test coverage.
+ * @param decoder Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_video_test_fallback_close(CMPVideoDecoder *decoder);
+/**
+ * @brief Helper for test coverage.
+ * @param decoder Parameter for testing.
+ * @param out_frame Parameter for testing.
+ * @param out_handled Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_video_test_fallback_read_frame_raw(
     CMPVideoDecoder *decoder, CMPVideoFrame *out_frame, CMPBool *out_handled);
+/**
+ * @brief Helper for test coverage.
+ * @param a Parameter for testing.
+ * @param b Parameter for testing.
+ * @param c Parameter for testing.
+ * @param d Parameter for testing.
+ * @param e Parameter for testing.
+ * @param f Parameter for testing.
+ * @param g Parameter for testing.
+ * @param out_frame Parameter for testing.
+ * @param out_handled Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_video_test_fallback_read_frame_case(
     cmp_u32 a, cmp_u32 b, cmp_u32 c, cmp_u32 d, cmp_u32 e, cmp_u32 f,
     cmp_usize g, CMPVideoFrame *out_frame, CMPBool *out_handled);

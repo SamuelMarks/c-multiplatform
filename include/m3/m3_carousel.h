@@ -123,7 +123,7 @@ CMP_API int CMP_CALL m3_carousel_set_on_select(M3Carousel *carousel,
                                                void *ctx);
 
 /**
- * @brief Test wrapper helper.
+ * @return Test result.\n * @brief Test wrapper helper.
  */
 CMP_API int CMP_CALL m3_carousel_test_helper(void);
 

@@ -49,14 +49,12 @@ cmp_android_backend_validate_config(const CMPAndroidBackendConfig *config) {
       config->predictive_back->initialized != CMP_TRUE) {
     return CMP_ERR_STATE;
   }
-/* GCOVR_EXCL_START */
 #if defined(CMP_ANDROID_AVAILABLE)
   if (config->java_vm == NULL || config->activity == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 #endif
-  /* GCOVR_EXCL_STOP */
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+  return CMP_OK;
 }
 
 #ifdef CMP_TESTING
@@ -112,7 +110,7 @@ int CMP_CALL cmp_android_backend_config_init(CMPAndroidBackendConfig *config) {
   return CMP_OK;
 }
 
-/* GCOVR_EXCL_START */
+
 #if defined(CMP_ANDROID_AVAILABLE)
 
 #define CMP_ANDROID_CAMERA_DEFAULT_WIDTH 640u
@@ -1336,7 +1334,7 @@ int CMP_CALL cmp_android_backend_predictive_back_cancel(
   return cmp_predictive_back_cancel(backend->predictive_back, event);
 }
 
-/* GCOVR_EXCL_STOP */
+
 #else
 
 int CMP_CALL cmp_android_backend_create(const CMPAndroidBackendConfig *config,

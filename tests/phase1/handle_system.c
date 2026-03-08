@@ -373,8 +373,13 @@ int main(void) {
   CMP_TEST_EXPECT(sys.vtable->init(&impl, 1), CMP_ERR_STATE);
   impl.slots = NULL;
 
+  CMP_TEST_OK(cmp_get_default_allocator(&impl.allocator));
   impl.allocator.alloc = NULL;
+  CMP_TEST_EXPECT(sys.vtable->init(&impl, 1), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(cmp_get_default_allocator(&impl.allocator));
   impl.allocator.realloc = NULL;
+  CMP_TEST_EXPECT(sys.vtable->init(&impl, 1), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(cmp_get_default_allocator(&impl.allocator));
   impl.allocator.free = NULL;
   CMP_TEST_EXPECT(sys.vtable->init(&impl, 1), CMP_ERR_INVALID_ARGUMENT);
 
@@ -426,6 +431,9 @@ int main(void) {
                   CMP_ERR_UNKNOWN);
   CMP_TEST_OK(cmp_object_test_set_handle_is_valid_fail(CMP_FALSE));
 #endif
+  obj.header.vtable = NULL;
+  CMP_TEST_EXPECT(sys.vtable->register_object(sys.ctx, &obj.header),
+                  CMP_ERR_INVALID_ARGUMENT);
   obj.header.vtable = &test_vtable_no_release;
   CMP_TEST_EXPECT(sys.vtable->register_object(NULL, &obj.header),
                   CMP_ERR_INVALID_ARGUMENT);

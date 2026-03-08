@@ -68,11 +68,11 @@ static int CMP_CALL m3_search_bar_on_field_change(void *ctx, M3TextField *field,
                                                   const char *utf8_text) {
   M3SearchBar *search_bar = (M3SearchBar *)ctx;
   (void)field;
-  if (search_bar->on_change != NULL) { /* GCOVR_EXCL_LINE */
+  if (search_bar->on_change != NULL) {
     return search_bar->on_change(search_bar->on_change_ctx, search_bar,
                                  utf8_text);
-  } /* GCOVR_EXCL_LINE */
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+  }
+  return CMP_OK;
 }
 
 CMP_API int CMP_CALL m3_search_bar_init(M3SearchBar *search_bar,
@@ -144,15 +144,15 @@ static int m3_search_bar_measure(void *widget, CMPMeasureSpec width,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (width.mode == CMP_MEASURE_EXACTLY || width.mode == CMP_MEASURE_AT_MOST) { /* GCOVR_EXCL_LINE */
-    w = width.size; /* GCOVR_EXCL_LINE */
+  if (width.mode == CMP_MEASURE_EXACTLY || width.mode == CMP_MEASURE_AT_MOST) {
+    w = width.size;
   }
 
   out_size->width = w;
   out_size->height = bar->style.min_height;
 
-  if (height.mode == CMP_MEASURE_EXACTLY) { /* GCOVR_EXCL_LINE */
-    out_size->height = height.size; /* GCOVR_EXCL_LINE */
+  if (height.mode == CMP_MEASURE_EXACTLY) {
+    out_size->height = height.size;
   }
 
   return CMP_OK;
@@ -175,7 +175,7 @@ static int m3_search_bar_layout(void *widget, CMPRect bounds) {
   content_x = bounds.x + 16.0f;
   content_w = bounds.width - 32.0f;
 
-  if (bar->leading_icon != NULL) { /* GCOVR_EXCL_LINE */
+  if (bar->leading_icon != NULL) {
     bar->leading_icon->vtable->measure(bar->leading_icon, unspec, unspec,
                                        &icon_size);
     icon_bounds.x = content_x;
@@ -188,7 +188,7 @@ static int m3_search_bar_layout(void *widget, CMPRect bounds) {
     content_w -= icon_size.width + 16.0f;
   }
 
-  if (bar->trailing_icon != NULL) { /* GCOVR_EXCL_LINE */
+  if (bar->trailing_icon != NULL) {
     bar->trailing_icon->vtable->measure(bar->trailing_icon, unspec, unspec,
                                         &icon_size);
     icon_bounds.x = bounds.x + bounds.width - 16.0f - icon_size.width;
@@ -216,19 +216,19 @@ static int m3_search_bar_paint(void *widget, CMPPaintContext *ctx) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (bar->style.background_color.a > 0.0f && ctx->gfx != NULL) { /* GCOVR_EXCL_LINE */
+  if (bar->style.background_color.a > 0.0f && ctx->gfx != NULL) {
     ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &bar->bounds,
                                 bar->style.background_color,
-                                bar->style.corner_radius); /* GCOVR_EXCL_LINE */
+                                bar->style.corner_radius);
   }
 
   bar->field.widget.vtable->paint(&bar->field, ctx);
 
-  if (bar->leading_icon != NULL) { /* GCOVR_EXCL_LINE */
-    bar->leading_icon->vtable->paint(bar->leading_icon, ctx); /* GCOVR_EXCL_LINE */
+  if (bar->leading_icon != NULL) {
+    bar->leading_icon->vtable->paint(bar->leading_icon, ctx);
   }
-  if (bar->trailing_icon != NULL) { /* GCOVR_EXCL_LINE */
-    bar->trailing_icon->vtable->paint(bar->trailing_icon, ctx); /* GCOVR_EXCL_LINE */
+  if (bar->trailing_icon != NULL) {
+    bar->trailing_icon->vtable->paint(bar->trailing_icon, ctx);
   }
 
   return CMP_OK;
@@ -244,17 +244,16 @@ static int m3_search_bar_event(void *widget, const CMPInputEvent *event,
 
   *out_handled = CMP_FALSE;
 
-  if (bar->leading_icon != NULL) { /* GCOVR_EXCL_LINE */
-    CMPBool handled = CMP_FALSE; /* GCOVR_EXCL_LINE */
-    bar->leading_icon->vtable->event(bar->leading_icon, event, &handled); /* GCOVR_EXCL_LINE */
-    if (handled) { /* GCOVR_EXCL_LINE */
-      *out_handled = CMP_TRUE; /* GCOVR_EXCL_LINE */
-      return CMP_OK; /* GCOVR_EXCL_LINE */
-    } /* GCOVR_EXCL_LINE */
+  if (bar->leading_icon != NULL) {
+    CMPBool handled = CMP_FALSE;
+    bar->leading_icon->vtable->event(bar->leading_icon, event, &handled);
+    if (handled) {
+      *out_handled = CMP_TRUE;
+      return CMP_OK;
+    }
   }
 
-  /* GCOVR_EXCL_START */
-  if (bar->trailing_icon != NULL) {
+    if (bar->trailing_icon != NULL) {
     CMPBool handled = CMP_FALSE;
     bar->trailing_icon->vtable->event(bar->trailing_icon, event, &handled);
     if (handled) {
@@ -262,9 +261,8 @@ static int m3_search_bar_event(void *widget, const CMPInputEvent *event,
       return CMP_OK;
     }
   }
-  /* GCOVR_EXCL_STOP */
-
-  return bar->field.widget.vtable->event(&bar->field, event, out_handled); /* GCOVR_EXCL_LINE */
+  
+  return bar->field.widget.vtable->event(&bar->field, event, out_handled);
 }
 
 static int m3_search_bar_get_semantics(void *widget,
@@ -318,11 +316,11 @@ CMP_API int CMP_CALL m3_search_view_set_active(M3SearchView *search_view,
                                        0.3f, CMP_ANIM_EASE_EMPHASIZED);
     } else {
       cmp_anim_controller_start_timing(&search_view->expansion, 1.0f, 0.0f,
-                                       0.25f, CMP_ANIM_EASE_EMPHASIZED_ACCELERATE); /* GCOVR_EXCL_LINE */
+                                       0.25f, CMP_ANIM_EASE_EMPHASIZED_ACCELERATE);
     }
   } else {
     cmp_anim_controller_stop(&search_view->expansion);
-    search_view->expansion.value = active == CMP_TRUE ? 1.0f : 0.0f; /* GCOVR_EXCL_LINE */
+    search_view->expansion.value = active == CMP_TRUE ? 1.0f : 0.0f;
   }
 
   return CMP_OK;
@@ -341,11 +339,11 @@ static int m3_search_view_measure(void *widget, CMPMeasureSpec width,
   out_size->width = width.size;
   out_size->height = height.size;
 
-  if (view->search_bar != NULL) { /* GCOVR_EXCL_LINE */
+  if (view->search_bar != NULL) {
     view->search_bar->vtable->measure(view->search_bar, width, height, &bar_size);
   }
-  if (view->content != NULL && view->is_active == CMP_TRUE) { /* GCOVR_EXCL_LINE */
-    view->content->vtable->measure(view->content, width, height, &content_size); /* GCOVR_EXCL_LINE */
+  if (view->content != NULL && view->is_active == CMP_TRUE) {
+    view->content->vtable->measure(view->content, width, height, &content_size);
   }
 
   return CMP_OK;
@@ -360,23 +358,23 @@ static int m3_search_view_layout(void *widget, CMPRect bounds) {
 
   view->bounds = bounds;
 
-  if (view->search_bar != NULL) { /* GCOVR_EXCL_LINE */
+  if (view->search_bar != NULL) {
     CMPRect bar_bounds = bounds;
-    if (view->is_active == CMP_FALSE && view->expansion.value == 0.0f) { /* GCOVR_EXCL_LINE */
+    if (view->is_active == CMP_FALSE && view->expansion.value == 0.0f) {
        /* Give it standard top padding when not expanded. (Simplified) */
-       bar_bounds.y += 16.0f; /* GCOVR_EXCL_LINE */
-       bar_bounds.x += 16.0f; /* GCOVR_EXCL_LINE */
-       bar_bounds.width -= 32.0f; /* GCOVR_EXCL_LINE */
-       bar_bounds.height = 56.0f; /* GCOVR_EXCL_LINE */
+       bar_bounds.y += 16.0f;
+       bar_bounds.x += 16.0f;
+       bar_bounds.width -= 32.0f;
+       bar_bounds.height = 56.0f;
     }
     view->search_bar->vtable->layout(view->search_bar, bar_bounds);
   }
   
-  if (view->content != NULL) { /* GCOVR_EXCL_LINE */
+  if (view->content != NULL) {
     CMPRect content_bounds = bounds;
     content_bounds.y += 56.0f; /* offset below bar */
-    content_bounds.height -= 56.0f; /* GCOVR_EXCL_LINE */
-    view->content->vtable->layout(view->content, content_bounds); /* GCOVR_EXCL_LINE */
+    content_bounds.height -= 56.0f;
+    view->content->vtable->layout(view->content, content_bounds);
   }
 
   return CMP_OK;
@@ -395,17 +393,17 @@ static int m3_search_view_paint(void *widget, CMPPaintContext *ctx) {
   /* 16.6ms assumed step if no tick provided */
   cmp_anim_controller_step(&view->expansion, 0.0166f, &frac, &finished);
 
-  if (frac > 0.0f && ctx->gfx != NULL) { /* GCOVR_EXCL_LINE */
-     bg.a = frac; /* GCOVR_EXCL_LINE */
-     ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &view->bounds, bg, 0.0f); /* GCOVR_EXCL_LINE */
+  if (frac > 0.0f && ctx->gfx != NULL) {
+     bg.a = frac;
+     ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &view->bounds, bg, 0.0f);
   }
 
-  if (view->search_bar != NULL) { /* GCOVR_EXCL_LINE */
+  if (view->search_bar != NULL) {
     view->search_bar->vtable->paint(view->search_bar, ctx);
   }
 
-  if (view->content != NULL && frac > 0.0f) { /* GCOVR_EXCL_LINE */
-    view->content->vtable->paint(view->content, ctx); /* GCOVR_EXCL_LINE */
+  if (view->content != NULL && frac > 0.0f) {
+    view->content->vtable->paint(view->content, ctx);
   }
 
   return CMP_OK;
@@ -421,20 +419,18 @@ static int m3_search_view_event(void *widget, const CMPInputEvent *event,
 
   *out_handled = CMP_FALSE;
 
-  if (view->is_active == CMP_TRUE && view->content != NULL) { /* GCOVR_EXCL_LINE */
-    view->content->vtable->event(view->content, event, out_handled); /* GCOVR_EXCL_LINE */
-    if (*out_handled == CMP_TRUE) { /* GCOVR_EXCL_LINE */
-      return CMP_OK; /* GCOVR_EXCL_LINE */
-    } /* GCOVR_EXCL_LINE */
+  if (view->is_active == CMP_TRUE && view->content != NULL) {
+    view->content->vtable->event(view->content, event, out_handled);
+    if (*out_handled == CMP_TRUE) {
+      return CMP_OK;
+    }
   }
 
-  /* GCOVR_EXCL_START */
-  if (view->search_bar != NULL) {
+    if (view->search_bar != NULL) {
     return view->search_bar->vtable->event(view->search_bar, event, out_handled);
   }
-  /* GCOVR_EXCL_STOP */
-
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+  
+  return CMP_OK;
 }
 
 static int m3_search_view_get_semantics(void *widget,
@@ -450,7 +446,7 @@ static int m3_search_view_get_semantics(void *widget,
 static int m3_search_view_destroy(void *widget) {
   M3SearchView *view = (M3SearchView *)widget;
   if (view == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   /* Does not destroy owned widgets. */
   return CMP_OK;

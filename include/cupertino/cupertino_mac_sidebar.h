@@ -18,15 +18,17 @@ extern "C" {
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
 
+/** @brief Maximum number of rows in a macOS sidebar. */
 #define CUPERTINO_MAC_SIDEBAR_MAX_ROWS 32
+/** @brief Maximum length of text for sidebar row titles. */
 #define CUPERTINO_MAC_SIDEBAR_MAX_TEXT 64
 
 /** @brief Represents a single row in a macOS sidebar. */
 typedef struct CupertinoMacSidebarRow {
-    char title_utf8[CUPERTINO_MAC_SIDEBAR_MAX_TEXT];
-    cmp_usize title_len;
-    CMPBool is_selected;
-    CMPBool is_section_header;
+    char title_utf8[CUPERTINO_MAC_SIDEBAR_MAX_TEXT]; /**< Title text in UTF-8. */
+    cmp_usize title_len;                             /**< Length of title text. */
+    CMPBool is_selected;                             /**< Whether the row is currently selected. */
+    CMPBool is_section_header;                       /**< Whether the row is a section header. */
 } CupertinoMacSidebarRow;
 
 /** @brief Cupertino macOS Sidebar Widget */
@@ -34,8 +36,8 @@ typedef struct CupertinoMacSidebar {
     CMPWidget widget;                             /**< Base widget interface. */
     CMPTextBackend text_backend;                  /**< Text backend for drawing labels. */
     
-    CupertinoMacSidebarRow rows[CUPERTINO_MAC_SIDEBAR_MAX_ROWS];
-    cmp_usize row_count;
+    CupertinoMacSidebarRow rows[CUPERTINO_MAC_SIDEBAR_MAX_ROWS]; /**< List of rows. */
+    cmp_usize row_count;                          /**< Number of rows in the sidebar. */
     
     CMPRect bounds;                               /**< Layout bounds. */
     CMPBool is_dark_mode;                         /**< Dark mode styling. */

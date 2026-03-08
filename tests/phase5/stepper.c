@@ -9,9 +9,9 @@ static int test_stepper_init(void) {
 
   CMP_TEST_EXPECT(m3_stepper_init(NULL), CMP_ERR_INVALID_ARGUMENT);
 
-  m3_stepper_test_set_fail_point(1u);
+  CMP_TEST_OK(m3_stepper_test_set_fail_point(1u));
   CMP_TEST_EXPECT(m3_stepper_init(&stepper), CMP_ERR_OUT_OF_MEMORY);
-  m3_stepper_test_clear_fail_points();
+  CMP_TEST_OK(m3_stepper_test_clear_fail_points());
 
   CMP_TEST_OK(m3_stepper_init(&stepper));
   CMP_TEST_ASSERT(stepper.step_count == 0);
@@ -29,11 +29,16 @@ static int test_stepper_draw(void) {
   CMP_TEST_EXPECT(m3_stepper_draw(NULL, &stepper), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_stepper_draw(&ctx, NULL), CMP_ERR_INVALID_ARGUMENT);
 
-  m3_stepper_test_set_fail_point(2u);
+  CMP_TEST_OK(m3_stepper_test_set_fail_point(2u));
   CMP_TEST_EXPECT(m3_stepper_draw(&ctx, &stepper), CMP_ERR_OUT_OF_MEMORY);
-  m3_stepper_test_clear_fail_points();
+  CMP_TEST_OK(m3_stepper_test_clear_fail_points());
 
   /* Empty stepper */
+  CMP_TEST_OK(m3_stepper_draw(&ctx, &stepper));
+
+  /* stepper with count but no steps array */
+  stepper.step_count = 1;
+  stepper.steps = NULL;
   CMP_TEST_OK(m3_stepper_draw(&ctx, &stepper));
 
   /* Non-empty stepper */
@@ -52,9 +57,9 @@ static int test_stepper_cleanup(void) {
 
   CMP_TEST_EXPECT(m3_stepper_cleanup(NULL), CMP_ERR_INVALID_ARGUMENT);
 
-  m3_stepper_test_set_fail_point(3u);
+  CMP_TEST_OK(m3_stepper_test_set_fail_point(3u));
   CMP_TEST_EXPECT(m3_stepper_cleanup(&stepper), CMP_ERR_OUT_OF_MEMORY);
-  m3_stepper_test_clear_fail_points();
+  CMP_TEST_OK(m3_stepper_test_clear_fail_points());
 
   CMP_TEST_OK(m3_stepper_cleanup(&stepper));
 

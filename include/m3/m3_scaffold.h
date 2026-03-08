@@ -176,51 +176,142 @@ CMP_API int CMP_CALL m3_scaffold_step(M3Scaffold *scaffold, CMPScalar dt,
                                       CMPBool *out_changed);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param edges Parameter for testing.
+ * @return Test result.
+ */
 m3_scaffold_test_validate_edges(const CMPLayoutEdges *edges);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @return Test result.
+ */
 m3_scaffold_test_validate_style(const M3ScaffoldStyle *style);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param spec Parameter for testing.
+ * @return Test result.
+ */
 m3_scaffold_test_validate_measure_spec(CMPMeasureSpec spec);
 
+/**
+ * @brief Helper for test coverage.
+ * @param rect Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_scaffold_test_validate_rect(const CMPRect *rect);
 
+/**
+ * @brief Helper for test coverage.
+ * @param bounds Parameter for testing.
+ * @param safe_area Parameter for testing.
+ * @param out_bounds Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_scaffold_test_compute_safe_bounds(
     const CMPRect *bounds, const CMPLayoutEdges *safe_area,
     CMPRect *out_bounds);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param snackbar_height Parameter for testing.
+ * @param out_offset Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_scaffold_test_compute_fab_target(
     const M3ScaffoldStyle *style, CMPScalar snackbar_height,
     CMPScalar *out_offset);
 
+/**
+ * @brief Helper for test coverage.
+ * @param widget Parameter for testing.
+ * @param out_visible Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_scaffold_test_widget_is_visible(const CMPWidget *widget,
                                                         CMPBool *out_visible);
 
+/**
+ * @brief Helper for test coverage.
+ * @param child Parameter for testing.
+ * @param width Parameter for testing.
+ * @param height Parameter for testing.
+ * @param out_size Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_scaffold_test_measure_child(CMPWidget *child,
                                                     CMPMeasureSpec width,
                                                     CMPMeasureSpec height,
                                                     CMPSize *out_size);
 
+/**
+ * @brief Helper for test coverage.
+ * @param child Parameter for testing.
+ * @param bounds Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_scaffold_test_layout_child(CMPWidget *child,
                                                    const CMPRect *bounds);
 
+/**
+ * @brief Helper for test coverage.
+ * @param child Parameter for testing.
+ * @param ctx Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_scaffold_test_paint_child(CMPWidget *child,
                                                   CMPPaintContext *ctx);
 
+/**
+ * @brief Helper for test coverage.
+ * @param child Parameter for testing.
+ * @param event Parameter for testing.
+ * @param out_handled Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_scaffold_test_event_child(CMPWidget *child,
                                                   const CMPInputEvent *event,
                                                   CMPBool *out_handled);
 
+/**
+ * @brief Helper for test coverage.
+ * @param event Parameter for testing.
+ * @param out_has_pos Parameter for testing.
+ * @param out_x Parameter for testing.
+ * @param out_y Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_scaffold_test_event_get_position(
     const CMPInputEvent *event, CMPBool *out_has_pos, CMPScalar *out_x,
     CMPScalar *out_y);
 
+/**
+ * @brief Helper for test coverage.
+ * @param child Parameter for testing.
+ * @param bounds Parameter for testing.
+ * @param x Parameter for testing.
+ * @param y Parameter for testing.
+ * @param out_hit Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_scaffold_test_child_hit(CMPWidget *child,
                                                 const CMPRect *bounds,
                                                 CMPScalar x, CMPScalar y,
                                                 CMPBool *out_hit);
 
+/**
+ * @brief Helper for test coverage.
+ * @param desired Parameter for testing.
+ * @param spec Parameter for testing.
+ * @param out_value Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_scaffold_test_apply_measure_spec(CMPScalar desired,
                                                          CMPMeasureSpec spec,
                                                          CMPScalar *out_value);

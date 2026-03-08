@@ -39,7 +39,7 @@ static int cmp_path_mul_overflow(cmp_usize a, cmp_usize b,
   }
 
   max_value = cmp_path_max_value();
-  if (a != 0 && b > max_value / a) { /* GCOVR_EXCL_LINE */
+  if (a != 0 && b > max_value / a) {
     return CMP_ERR_OVERFLOW;
   }
 
@@ -173,7 +173,7 @@ int CMP_CALL cmp_path_init(CMPPath *path, const CMPAllocator *allocator,
   if (path == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (path->commands != NULL || path->capacity != 0 || path->count != 0) { /* GCOVR_EXCL_LINE */
+  if (path->commands != NULL || path->capacity != 0 || path->count != 0) {
     return CMP_ERR_STATE;
   }
 
@@ -186,7 +186,7 @@ int CMP_CALL cmp_path_init(CMPPath *path, const CMPAllocator *allocator,
     chosen = *allocator;
   }
 
-  if (chosen.alloc == NULL || chosen.realloc == NULL || chosen.free == NULL) { /* GCOVR_EXCL_LINE */
+  if (chosen.alloc == NULL || chosen.realloc == NULL || chosen.free == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 

@@ -141,41 +141,124 @@ CMP_API int CMP_CALL m3_card_set_on_click(M3Card *card, CMPCardOnClick on_click,
 CMP_API int CMP_CALL m3_card_get_content_bounds(const M3Card *card,
                                                 CMPRect *out_bounds);
 
+/**
+ * @brief Helper for test coverage.
+ * @param fail_point Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_set_fail_point(cmp_u32 fail_point);
 
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_set_color_fail_after(cmp_u32 call_count);
 
+/**
+ * @brief Helper for test coverage.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_clear_fail_points(void);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_validate_color(const CMPColor *color);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @param r Parameter for testing.
+ * @param g Parameter for testing.
+ * @param b Parameter for testing.
+ * @param a Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_color_set(CMPColor *color, CMPScalar r,
                                             CMPScalar g, CMPScalar b,
                                             CMPScalar a);
 
+/**
+ * @brief Helper for test coverage.
+ * @param base Parameter for testing.
+ * @param alpha Parameter for testing.
+ * @param out_color Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_color_with_alpha(const CMPColor *base,
                                                    CMPScalar alpha,
                                                    CMPColor *out_color);
 
+/**
+ * @brief Helper for test coverage.
+ * @param edges Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_validate_edges(const CMPLayoutEdges *edges);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_validate_style(const M3CardStyle *style);
 
+/**
+ * @brief Helper for test coverage.
+ * @param spec Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_validate_measure_spec(CMPMeasureSpec spec);
 
+/**
+ * @brief Helper for test coverage.
+ * @param rect Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_validate_rect(const CMPRect *rect);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param out_width Parameter for testing.
+ * @param out_height Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_measure_content(const M3CardStyle *style,
                                                   CMPScalar *out_width,
                                                   CMPScalar *out_height);
 
+/**
+ * @brief Helper for test coverage.
+ * @param card Parameter for testing.
+ * @param out_inner Parameter for testing.
+ * @param out_corner Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_compute_inner(const M3Card *card,
                                                 CMPRect *out_inner,
                                                 CMPScalar *out_corner);
 
+/**
+ * @brief Helper for test coverage.
+ * @param card Parameter for testing.
+ * @param out_bounds Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_compute_content_bounds(const M3Card *card,
                                                          CMPRect *out_bounds);
 
+/**
+ * @brief Helper for test coverage.
+ * @param card Parameter for testing.
+ * @param out_background Parameter for testing.
+ * @param out_outline Parameter for testing.
+ * @param out_ripple Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_card_test_resolve_colors(const M3Card *card,
                                                  CMPColor *out_background,
                                                  CMPColor *out_outline,

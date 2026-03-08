@@ -33,7 +33,7 @@ static int cmp_a11y_find_child_index(const CMPA11yNode *parent,
                                      cmp_usize *out_index) {
   cmp_usize i;
 
-  if (parent->child_count > 0 && parent->children == NULL) { /* GCOVR_EXCL_LINE */
+  if (parent->child_count > 0 && parent->children == NULL) {
     return CMP_ERR_STATE;
   }
 
@@ -184,7 +184,7 @@ int CMP_CALL cmp_a11y_node_get_child(const CMPA11yNode *node, cmp_usize index,
   if (node == NULL || out_child == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (node->child_count > 0 && node->children == NULL) { /* GCOVR_EXCL_LINE */
+  if (node->child_count > 0 && node->children == NULL) {
     return CMP_ERR_STATE;
   }
   if (index >= node->child_count) {
@@ -272,17 +272,17 @@ static void cmp_a11y_find_all_focusable(CMPA11yNode *node, CMPA11yNode ***list,
   cmp_usize i;
 
   if ((node->semantics.flags & CMP_SEMANTIC_FLAG_FOCUSABLE) != 0 &&
-      (node->semantics.flags & CMP_SEMANTIC_FLAG_DISABLED) == 0) { /* GCOVR_EXCL_LINE */
+      (node->semantics.flags & CMP_SEMANTIC_FLAG_DISABLED) == 0) {
     if (*count >= *capacity) {
-      cmp_usize new_cap = (*capacity == 0) ? 16 : *capacity * 2; /* GCOVR_EXCL_LINE */
+      cmp_usize new_cap = (*capacity == 0) ? 16 : *capacity * 2;
       CMPA11yNode **new_list =
           (CMPA11yNode **)realloc(*list, new_cap * sizeof(CMPA11yNode *));
-      if (new_list != NULL) { /* GCOVR_EXCL_LINE */
+      if (new_list != NULL) {
         *list = new_list;
         *capacity = new_cap;
       }
     }
-    if (*count < *capacity) { /* GCOVR_EXCL_LINE */
+    if (*count < *capacity) {
       (*list)[*count] = node;
       *count += 1;
     }
@@ -301,7 +301,7 @@ CMP_API int CMP_CALL cmp_a11y_focus_next(CMPA11yNode *current,
   cmp_usize capacity = 0;
   cmp_usize i;
 
-  if (root == NULL || out_next == NULL) { /* GCOVR_EXCL_LINE */
+  if (root == NULL || out_next == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -309,11 +309,11 @@ CMP_API int CMP_CALL cmp_a11y_focus_next(CMPA11yNode *current,
 
   cmp_a11y_find_all_focusable(root, &list, &count, &capacity);
 
-  if (count > 0) { /* GCOVR_EXCL_LINE */
+  if (count > 0) {
     if (current == NULL) {
       *out_next = list[0];
     } else {
-      for (i = 0; i < count; i++) { /* GCOVR_EXCL_LINE */
+      for (i = 0; i < count; i++) {
         if (list[i] == current) {
           if (i + 1 < count) {
             *out_next = list[i + 1];
@@ -326,7 +326,7 @@ CMP_API int CMP_CALL cmp_a11y_focus_next(CMPA11yNode *current,
     }
   }
 
-  if (list != NULL) { /* GCOVR_EXCL_LINE */
+  if (list != NULL) {
     free(list);
   }
 
@@ -341,7 +341,7 @@ CMP_API int CMP_CALL cmp_a11y_focus_prev(CMPA11yNode *current,
   cmp_usize capacity = 0;
   cmp_usize i;
 
-  if (root == NULL || out_prev == NULL) { /* GCOVR_EXCL_LINE */
+  if (root == NULL || out_prev == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -349,11 +349,11 @@ CMP_API int CMP_CALL cmp_a11y_focus_prev(CMPA11yNode *current,
 
   cmp_a11y_find_all_focusable(root, &list, &count, &capacity);
 
-  if (count > 0) { /* GCOVR_EXCL_LINE */
+  if (count > 0) {
     if (current == NULL) {
       *out_prev = list[count - 1];
     } else {
-      for (i = 0; i < count; i++) { /* GCOVR_EXCL_LINE */
+      for (i = 0; i < count; i++) {
         if (list[i] == current) {
           if (i > 0) {
             *out_prev = list[i - 1];
@@ -366,7 +366,7 @@ CMP_API int CMP_CALL cmp_a11y_focus_prev(CMPA11yNode *current,
     }
   }
 
-  if (list != NULL) { /* GCOVR_EXCL_LINE */
+  if (list != NULL) {
     free(list);
   }
 

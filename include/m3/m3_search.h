@@ -137,7 +137,7 @@ CMP_API int CMP_CALL m3_search_view_set_active(M3SearchView *search_view,
                                                CMPBool active, CMPBool animate);
 
 /**
- * @brief Test wrapper helper.
+ * @return Test result.\n * @brief Test wrapper helper.
  */
 CMP_API int CMP_CALL m3_search_test_helper(void);
 

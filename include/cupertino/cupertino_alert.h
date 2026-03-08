@@ -19,6 +19,7 @@ extern "C" {
 #include "cupertino/cupertino_button.h"
 #include "cupertino/cupertino_typography.h"
 
+/** @brief Maximum number of actions an alert can have. */
 #define CUPERTINO_ALERT_MAX_ACTIONS 4
 
 /** @brief Cupertino Alert Widget */
@@ -30,7 +31,7 @@ typedef struct CupertinoAlert {
     const char *message_utf8;     /**< Message text. */
     cmp_usize message_len;        /**< Message text length. */
     
-    CupertinoButton actions[CUPERTINO_ALERT_MAX_ACTIONS];
+    CupertinoButton actions[CUPERTINO_ALERT_MAX_ACTIONS]; /**< List of alert actions. */
     cmp_usize action_count;       /**< Number of actions added. */
     
     CMPRect bounds;               /**< Layout bounds. */

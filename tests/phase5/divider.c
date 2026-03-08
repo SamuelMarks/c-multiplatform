@@ -28,6 +28,12 @@ int main(void) {
   style.thickness = -1.0f;
   CMP_TEST_EXPECT(m3_divider_init(&div, &style), CMP_ERR_INVALID_ARGUMENT);
   style.thickness = 1.0f;
+  style.inset_start = -1.0f;
+  CMP_TEST_EXPECT(m3_divider_init(&div, &style), CMP_ERR_INVALID_ARGUMENT);
+  style.inset_start = 0.0f;
+  style.inset_end = -1.0f;
+  CMP_TEST_EXPECT(m3_divider_init(&div, &style), CMP_ERR_INVALID_ARGUMENT);
+  style.inset_end = 0.0f;
   CMP_TEST_OK(m3_divider_init(&div, &style));
 
   CMP_TEST_EXPECT(m3_divider_set_style(NULL, &style), CMP_ERR_INVALID_ARGUMENT);
@@ -35,6 +41,12 @@ int main(void) {
   style.thickness = -1.0f;
   CMP_TEST_EXPECT(m3_divider_set_style(&div, &style), CMP_ERR_INVALID_ARGUMENT);
   style.thickness = 1.0f;
+  style.inset_start = -1.0f;
+  CMP_TEST_EXPECT(m3_divider_set_style(&div, &style), CMP_ERR_INVALID_ARGUMENT);
+  style.inset_start = 0.0f;
+  style.inset_end = -1.0f;
+  CMP_TEST_EXPECT(m3_divider_set_style(&div, &style), CMP_ERR_INVALID_ARGUMENT);
+  style.inset_end = 0.0f;
   CMP_TEST_OK(m3_divider_set_style(&div, &style));
 
   /* Measure Vertical */
@@ -82,6 +94,12 @@ int main(void) {
   style.color.a = 0.0f;
   m3_divider_init(&div, &style);
   CMP_TEST_OK(div.widget.vtable->paint(&div, &pctx));
+
+  style.color.a = 1.0f;
+  style.thickness = 0.0f;
+  m3_divider_init(&div, &style);
+  CMP_TEST_OK(div.widget.vtable->paint(&div, &pctx));
+  style.thickness = 1.0f;
   
   style.color.a = 1.0f;
   style.direction = CMP_LAYOUT_DIRECTION_COLUMN;

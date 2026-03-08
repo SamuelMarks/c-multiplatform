@@ -12,7 +12,7 @@ int CMP_CALL cmp_predictive_test_set_event_init_fail(CMPBool enable) {
 #endif
 
 static int cmp_predictive_back_validate_edge(cmp_u32 edge) {
-  if (edge == CMP_PREDICTIVE_BACK_EDGE_UNKNOWN || /* GCOVR_EXCL_LINE */
+  if (edge == CMP_PREDICTIVE_BACK_EDGE_UNKNOWN ||
       edge == CMP_PREDICTIVE_BACK_EDGE_LEFT ||
       edge == CMP_PREDICTIVE_BACK_EDGE_RIGHT) {
     return CMP_OK;
@@ -50,7 +50,7 @@ cmp_predictive_back_validate_handler(const CMPPredictiveBackHandler *handler) {
 static int cmp_predictive_back_call(const CMPPredictiveBackHandler *handler,
                                     cmp_u32 kind,
                                     const CMPPredictiveBackEvent *event) {
-  if (handler == NULL || handler->vtable == NULL) { /* GCOVR_EXCL_LINE */
+  if (handler == NULL || handler->vtable == NULL) {
     return CMP_OK;
   }
 
@@ -59,14 +59,14 @@ static int cmp_predictive_back_call(const CMPPredictiveBackHandler *handler,
       return handler->vtable->on_start(handler->ctx, event);
     }
   } else if (kind == 1u) {
-    if (handler->vtable->on_progress != NULL) { /* GCOVR_EXCL_LINE */
+    if (handler->vtable->on_progress != NULL) {
       return handler->vtable->on_progress(handler->ctx, event);
     }
   } else if (kind == 2u) {
-    if (handler->vtable->on_commit != NULL) { /* GCOVR_EXCL_LINE */
+    if (handler->vtable->on_commit != NULL) {
       return handler->vtable->on_commit(handler->ctx, event);
     }
-  } else if (kind == 3u) { /* GCOVR_EXCL_LINE */
+  } else if (kind == 3u) {
     if (handler->vtable->on_cancel != NULL) {
       return handler->vtable->on_cancel(handler->ctx, event);
     }
@@ -246,7 +246,7 @@ int CMP_CALL cmp_predictive_back_start(CMPPredictiveBack *predictive,
 
 int CMP_CALL cmp_predictive_back_progress(CMPPredictiveBack *predictive,
                                           const CMPPredictiveBackEvent *event) {
-  CMPPredictiveBackEvent prev_event; /* GCOVR_EXCL_LINE */
+  CMPPredictiveBackEvent prev_event;
   int rc;
 
   if (predictive == NULL || event == NULL) {
@@ -279,7 +279,7 @@ int CMP_CALL cmp_predictive_back_progress(CMPPredictiveBack *predictive,
 int CMP_CALL cmp_predictive_back_commit(CMPPredictiveBack *predictive,
                                         const CMPPredictiveBackEvent *event) {
   CMPPredictiveBackEvent prev_event;
-  CMPBool prev_active; /* GCOVR_EXCL_LINE */
+  CMPBool prev_active;
   int rc;
 
   if (predictive == NULL || event == NULL) {
@@ -315,7 +315,7 @@ int CMP_CALL cmp_predictive_back_commit(CMPPredictiveBack *predictive,
 int CMP_CALL cmp_predictive_back_cancel(CMPPredictiveBack *predictive,
                                         const CMPPredictiveBackEvent *event) {
   CMPPredictiveBackEvent prev_event;
-  CMPBool prev_active; /* GCOVR_EXCL_LINE */
+  CMPBool prev_active;
   int rc;
 
   if (predictive == NULL || event == NULL) {

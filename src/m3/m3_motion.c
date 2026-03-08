@@ -63,8 +63,8 @@ int CMP_CALL m3_motion_shared_axis(cmp_u32 axis, CMPBool forward,
     out_exiting->scale_x = 1.0f;
     out_exiting->scale_y = 1.0f;
   } else if (axis == M3_SHARED_AXIS_Z) {
-    enter_scale = forward ? (0.8f + 0.2f * fraction) : (1.1f - 0.1f * fraction); /* GCOVR_EXCL_LINE */
-    exit_scale = forward ? (1.0f + 0.1f * fraction) : (1.0f - 0.2f * fraction); /* GCOVR_EXCL_LINE */
+    enter_scale = forward ? (0.8f + 0.2f * fraction) : (1.1f - 0.1f * fraction);
+    exit_scale = forward ? (1.0f + 0.1f * fraction) : (1.0f - 0.2f * fraction);
 
     out_entering->offset_x = 0.0f;
     out_entering->offset_y = 0.0f;
@@ -85,7 +85,7 @@ int CMP_CALL m3_motion_shared_axis(cmp_u32 axis, CMPBool forward,
 int CMP_CALL m3_motion_fade_through(CMPScalar fraction,
                                     M3MotionResult *out_entering,
                                     M3MotionResult *out_exiting) {
-  if (out_entering == NULL || out_exiting == NULL) { /* GCOVR_EXCL_LINE */
+  if (out_entering == NULL || out_exiting == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (fraction < 0.0f)
@@ -115,7 +115,7 @@ int CMP_CALL m3_motion_container_transform(CMPRect start_bounds,
                                            CMPRect *out_bounds,
                                            M3MotionResult *out_entering,
                                            M3MotionResult *out_exiting) {
-  if (out_bounds == NULL || out_entering == NULL || out_exiting == NULL) { /* GCOVR_EXCL_LINE */
+  if (out_bounds == NULL || out_entering == NULL || out_exiting == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (fraction < 0.0f)
@@ -186,7 +186,7 @@ int CMP_CALL m3_motion_predictive_back(const CMPPredictiveBackEvent *event,
   /* Opacity fades slightly if approaching commit threshold */
   if (progress > 0.8f) {
     *out_opacity = 1.0f - ((progress - 0.8f) * 5.0f); /* Fades out at the very end */
-    if (*out_opacity < 0.0f) *out_opacity = 0.0f; /* GCOVR_EXCL_LINE */
+    if (*out_opacity <= 0.0f) *out_opacity = 0.0f;
   } else {
     *out_opacity = 1.0f;
   }

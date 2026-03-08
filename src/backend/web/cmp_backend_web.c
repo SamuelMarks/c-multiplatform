@@ -102,7 +102,6 @@ int CMP_CALL cmp_web_backend_config_init(CMPWebBackendConfig *config) {
   return CMP_OK;
 }
 
-/* GCOVR_EXCL_START */
 #if defined(CMP_WEB_AVAILABLE)
 
 #define CMP_WEB_TYPE_WINDOW 1
@@ -5396,16 +5395,15 @@ int CMP_CALL cmp_web_backend_get_env(CMPWebBackend *backend, CMPEnv *out_env) {
   return CMP_OK;
 }
 
-/* GCOVR_EXCL_STOP */
 #else
 
 int CMP_CALL
-cmp_web_backend_create(const CMPWebBackendConfig *config, /* GCOVR_EXCL_LINE */
-                       CMPWebBackend **out_backend) {     /* GCOVR_EXCL_LINE */
-  CMPWebBackendConfig local_config;                       /* GCOVR_EXCL_LINE */
+cmp_web_backend_create(const CMPWebBackendConfig *config,
+                       CMPWebBackend **out_backend) {    
+  CMPWebBackendConfig local_config;                      
   int rc;
 
-  if (out_backend == NULL) { /* GCOVR_EXCL_LINE */
+  if (out_backend == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   *out_backend = NULL;
@@ -5413,10 +5411,10 @@ cmp_web_backend_create(const CMPWebBackendConfig *config, /* GCOVR_EXCL_LINE */
   if (config == NULL) {
     rc = cmp_web_backend_config_init(&local_config);
     CMP_WEB_RETURN_IF_ERROR(rc);
-    config = &local_config; /* GCOVR_EXCL_LINE */
+    config = &local_config;
   }
 
-  rc = cmp_web_backend_validate_config(config); /* GCOVR_EXCL_LINE */
+  rc = cmp_web_backend_validate_config(config);
   CMP_WEB_RETURN_IF_ERROR(rc);
 
   return CMP_ERR_UNSUPPORTED;

@@ -7,7 +7,7 @@ static int cmp_scroll_validate_consumed_component(CMPScalar consumed,
       return CMP_ERR_RANGE;
     }
   } else if (available < 0.0f) {
-    if (consumed > 0.0f || consumed < available) { /* GCOVR_EXCL_LINE */
+    if (consumed > 0.0f || consumed < available) {
       return CMP_ERR_RANGE;
     }
   } else {
@@ -130,7 +130,7 @@ int CMP_CALL cmp_scroll_chain_pre_scroll(const CMPScrollChain *chain,
   total.x = 0.0f;
   total.y = 0.0f;
 
-  if ((remaining.x == 0.0f && remaining.y == 0.0f) || chain->count == 0u) { /* GCOVR_EXCL_LINE */
+  if ((remaining.x == 0.0f && remaining.y == 0.0f) || chain->count == 0u) {
     *out_consumed = total;
     *out_remaining = remaining;
     return CMP_OK;
@@ -190,7 +190,7 @@ int CMP_CALL cmp_scroll_chain_post_scroll(const CMPScrollChain *chain,
   total.x = 0.0f;
   total.y = 0.0f;
 
-  if ((remaining.x == 0.0f && remaining.y == 0.0f) || chain->count == 0u) { /* GCOVR_EXCL_LINE */
+  if ((remaining.x == 0.0f && remaining.y == 0.0f) || chain->count == 0u) {
     *out_consumed = total;
     *out_remaining = remaining;
     return CMP_OK;

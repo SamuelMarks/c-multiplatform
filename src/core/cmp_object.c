@@ -89,8 +89,8 @@ static int CMP_CALL cmp_handle_system_default_init(void *sys,
   if (impl->slots != NULL) {
     return CMP_ERR_STATE;
   }
-  if (impl->allocator.alloc == NULL || impl->allocator.realloc == NULL || /* GCOVR_EXCL_LINE */
-      impl->allocator.free == NULL) { /* GCOVR_EXCL_LINE */
+  if (impl->allocator.alloc == NULL || impl->allocator.realloc == NULL ||
+      impl->allocator.free == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -162,7 +162,7 @@ cmp_handle_system_default_register_object(void *sys, CMPObjectHeader *obj) {
   if (impl->slots == NULL) {
     return CMP_ERR_STATE;
   }
-  if (obj->vtable == NULL || obj->vtable->retain == NULL || /* GCOVR_EXCL_LINE */
+  if (obj->vtable == NULL || obj->vtable->retain == NULL ||
       obj->vtable->release == NULL || obj->vtable->destroy == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

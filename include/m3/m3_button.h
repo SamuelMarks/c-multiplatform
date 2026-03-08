@@ -240,43 +240,125 @@ CMP_API int CMP_CALL m3_button_set_on_click(M3Button *button,
                                             CMPButtonOnClick on_click,
                                             void *ctx);
 
+/**
+ * @brief Helper for test coverage.
+ * @param fail_point Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_set_fail_point(cmp_u32 fail_point);
 
+/**
+ * @brief Helper for test coverage.
+ * @param call_count Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_set_color_fail_after(cmp_u32 call_count);
 
+/**
+ * @brief Helper for test coverage.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_clear_fail_points(void);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_validate_color(const CMPColor *color);
 
+/**
+ * @brief Helper for test coverage.
+ * @param color Parameter for testing.
+ * @param r Parameter for testing.
+ * @param g Parameter for testing.
+ * @param b Parameter for testing.
+ * @param a Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_color_set(CMPColor *color, CMPScalar r,
                                               CMPScalar g, CMPScalar b,
                                               CMPScalar a);
 
+/**
+ * @brief Helper for test coverage.
+ * @param base Parameter for testing.
+ * @param alpha Parameter for testing.
+ * @param out_color Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_color_with_alpha(const CMPColor *base,
                                                      CMPScalar alpha,
                                                      CMPColor *out_color);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param require_family Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_validate_text_style(
     const CMPTextStyle *style, CMPBool require_family);
 
+/**
+ * @brief Helper for test coverage.
+ * @param style Parameter for testing.
+ * @param require_family Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_validate_style(const M3ButtonStyle *style,
                                                    CMPBool require_family);
 
+/**
+ * @brief Helper for test coverage.
+ * @param spec Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_validate_measure_spec(CMPMeasureSpec spec);
 
+/**
+ * @brief Helper for test coverage.
+ * @param rect Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_validate_rect(const CMPRect *rect);
 
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param backend Parameter for testing.
+ * @return Test result.
+ */
 m3_button_test_validate_backend(const CMPTextBackend *backend);
 
+/**
+ * @brief Helper for test coverage.
+ * @param button Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_metrics_update(M3Button *button);
 
+/**
+ * @brief Helper for test coverage.
+ * @param button Parameter for testing.
+ * @param out_background Parameter for testing.
+ * @param out_text Parameter for testing.
+ * @param out_outline Parameter for testing.
+ * @param out_ripple Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_resolve_colors(const M3Button *button,
                                                    CMPColor *out_background,
                                                    CMPColor *out_text,
                                                    CMPColor *out_outline,
                                                    CMPColor *out_ripple);
 
+/**
+ * @brief Helper for test coverage.
+ * @param button Parameter for testing.
+ * @param out_corner Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL m3_button_test_resolve_corner(const M3Button *button,
                                                    CMPScalar *out_corner);
 

@@ -11,13 +11,13 @@ static int cmp_text_validate_color(const CMPColor *color) {
   if (color == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (!(color->r >= 0.0f && color->r <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->r >= 0.0f && color->r <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-  if (!(color->g >= 0.0f && color->g <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->g >= 0.0f && color->g <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
-  if (!(color->b >= 0.0f && color->b <= 1.0f)) { /* GCOVR_EXCL_LINE */
+  if (!(color->b >= 0.0f && color->b <= 1.0f)) {
     return CMP_ERR_RANGE;
   }
   if (!(color->a >= 0.0f && color->a <= 1.0f)) {
@@ -38,10 +38,10 @@ static int cmp_text_validate_style(const CMPTextStyle *style) {
   if (style->size_px <= 0) {
     return CMP_ERR_RANGE;
   }
-  if (style->weight < 100 || style->weight > 900) { /* GCOVR_EXCL_LINE */
+  if (style->weight < 100 || style->weight > 900) {
     return CMP_ERR_RANGE;
   }
-  if (style->italic != CMP_FALSE && style->italic != CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (style->italic != CMP_FALSE && style->italic != CMP_TRUE) {
     return CMP_ERR_RANGE;
   }
 
@@ -109,7 +109,7 @@ static int cmp_text_widget_measure(void *widget, CMPMeasureSpec width,
   CMPTextMetrics metrics;
   int rc;
 
-  if (widget == NULL || out_size == NULL) { /* GCOVR_EXCL_LINE */
+  if (widget == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -198,7 +198,7 @@ static int cmp_text_widget_paint(void *widget, CMPPaintContext *ctx) {
 }
 
 static int cmp_text_widget_event(void *widget, const CMPInputEvent *event,
-                                 CMPBool *out_handled) { /* GCOVR_EXCL_LINE */
+                                 CMPBool *out_handled) {
   if (widget == NULL || event == NULL || out_handled == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -298,7 +298,7 @@ int CMP_CALL cmp_text_style_init(CMPTextStyle *style) {
 
 int CMP_CALL cmp_text_backend_from_gfx(const CMPGfx *gfx,
                                        CMPTextBackend *out_backend) {
-  if (gfx == NULL || out_backend == NULL) { /* GCOVR_EXCL_LINE */
+  if (gfx == NULL || out_backend == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (gfx->text_vtable == NULL) {
@@ -353,7 +353,7 @@ int CMP_CALL cmp_text_font_destroy(const CMPTextBackend *backend,
   if (backend->vtable->destroy_font == NULL) {
     return CMP_ERR_UNSUPPORTED;
   }
-  if (font.id == 0u && font.generation == 0u) { /* GCOVR_EXCL_LINE */
+  if (font.id == 0u && font.generation == 0u) {
     return CMP_OK;
   }
 
@@ -390,7 +390,7 @@ int CMP_CALL cmp_text_measure_utf8(const CMPTextBackend *backend,
   if (rc != CMP_OK) {
     return rc;
   }
-  if (width < 0.0f || height < 0.0f || baseline < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (width < 0.0f || height < 0.0f || baseline < 0.0f) {
     return CMP_ERR_RANGE;
   }
 
@@ -479,34 +479,33 @@ CMP_API int CMP_CALL cmp_text_draw_utf8(const CMPTextBackend *backend,
   if (backend == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8 == NULL && utf8_len > 0) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+  if (utf8 == NULL && utf8_len > 0) {
+    return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (backend->vtable == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_UNSUPPORTED; /* GCOVR_EXCL_LINE */
+  if (backend->vtable == NULL) {
+    return CMP_ERR_UNSUPPORTED;
   }
 
   if (backend->vtable->shape_text != NULL && backend->vtable->draw_layout != NULL) {
     rc = backend->vtable->shape_text(backend->ctx, font, utf8, utf8_len,
                                      base_direction, &layout);
-    if (rc == CMP_OK) { /* GCOVR_EXCL_LINE */
+    if (rc == CMP_OK) {
       rc = backend->vtable->draw_layout(backend->ctx, font, &layout, x, y, color);
-      
-      if (backend->vtable->free_layout != NULL) { /* GCOVR_EXCL_LINE */
+
+      if (backend->vtable->free_layout != NULL) {
         backend->vtable->free_layout(backend->ctx, &layout);
       }
       return rc;
     }
   }
 
-  if (backend->vtable->draw_text != NULL) { /* GCOVR_EXCL_LINE */
+  if (backend->vtable->draw_text != NULL) {
     return backend->vtable->draw_text(backend->ctx, font, utf8, utf8_len,
                                       base_direction, x, y, color);
   }
 
-  return CMP_ERR_UNSUPPORTED; /* GCOVR_EXCL_LINE */
-}
-
+  return CMP_ERR_UNSUPPORTED;
+  }
 CMP_API int CMP_CALL cmp_text_shape_utf8(const CMPTextBackend *backend,
                                          CMPHandle font, const char *utf8,
                                          cmp_usize utf8_len,
@@ -515,10 +514,10 @@ CMP_API int CMP_CALL cmp_text_shape_utf8(const CMPTextBackend *backend,
   if (backend == NULL || out_layout == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8 == NULL && utf8_len > 0) { /* GCOVR_EXCL_LINE */
+  if (utf8 == NULL && utf8_len > 0) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (backend->vtable == NULL || backend->vtable->shape_text == NULL) { /* GCOVR_EXCL_LINE */
+  if (backend->vtable == NULL || backend->vtable->shape_text == NULL) {
     return CMP_ERR_UNSUPPORTED;
   }
 
@@ -531,7 +530,7 @@ CMP_API int CMP_CALL cmp_text_free_layout(const CMPTextBackend *backend,
   if (backend == NULL || layout == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (backend->vtable == NULL || backend->vtable->free_layout == NULL) { /* GCOVR_EXCL_LINE */
+  if (backend->vtable == NULL || backend->vtable->free_layout == NULL) {
     return CMP_ERR_UNSUPPORTED;
   }
 
@@ -547,7 +546,7 @@ int CMP_CALL cmp_text_widget_init(CMPTextWidget *widget,
   if (widget == NULL || backend == NULL || style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  if (utf8 == NULL && utf8_len != 0) { /* GCOVR_EXCL_LINE */
+  if (utf8 == NULL && utf8_len != 0) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
@@ -606,7 +605,7 @@ int CMP_CALL cmp_text_widget_set_text(CMPTextWidget *widget, const char *utf8,
 int CMP_CALL cmp_text_widget_set_style(CMPTextWidget *widget,
                                        const CMPTextStyle *style) {
   CMPHandle new_font;
-  int rc; /* GCOVR_EXCL_LINE */
+  int rc;
 
   if (widget == NULL || style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -622,7 +621,7 @@ int CMP_CALL cmp_text_widget_set_style(CMPTextWidget *widget,
     return rc;
   }
 
-  if (widget->owns_font == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (widget->owns_font == CMP_TRUE) {
     cmp_text_font_destroy(&widget->backend, widget->font);
   }
 
@@ -634,7 +633,7 @@ int CMP_CALL cmp_text_widget_set_style(CMPTextWidget *widget,
 }
 
 int CMP_CALL cmp_text_widget_get_metrics(
-    CMPTextWidget *widget, CMPTextMetrics *out_metrics) { /* GCOVR_EXCL_LINE */
+    CMPTextWidget *widget, CMPTextMetrics *out_metrics) {
   int rc;
 
   if (widget == NULL || out_metrics == NULL) {

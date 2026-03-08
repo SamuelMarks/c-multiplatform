@@ -151,7 +151,7 @@ CMP_API int CMP_CALL m3_list_item_set_semantic_position(M3ListItem *item,
                                                         cmp_i32 size);
 
 /**
- * @brief Test wrapper helper.
+ * @return Test result.\n * @brief Test wrapper helper.
  */
 CMP_API int CMP_CALL m3_list_test_helper(void);
 

@@ -34,14 +34,28 @@ static CMPScalar cmp_anim_bezier_eval(CMPScalar p1, CMPScalar p2, CMPScalar t) {
   return 3.0f * mt * mt * t * p1 + 3.0f * mt * t * t * p2 + t * t * t;
 }
 
+static CMPScalar cmp_anim_solve_bezier_t_recurse(CMPScalar p1x, CMPScalar p2x,
+                                                 CMPScalar x, CMPScalar t,
+                                                 CMPScalar t0, CMPScalar t1) {
+  CMPScalar mt = 1.0f - t;
+  CMPScalar current_x =
+      3.0f * mt * mt * t * p1x + 3.0f * mt * t * t * p2x + t * t * t;
+  CMPScalar diff = current_x - x;
+
+  if (diff > -0.0001f && diff < 0.0001f) {
+    return t;
+  }
+
+  if (diff < 0.0f) {
+    t0 = t;
+  } else {
+    t1 = t;
+  }
+  return cmp_anim_solve_bezier_t_recurse(p1x, p2x, x, (t0 + t1) * 0.5f, t0, t1);
+}
+
 static CMPScalar cmp_anim_solve_bezier_t(CMPScalar p1x, CMPScalar p2x,
                                          CMPScalar x) {
-  CMPScalar t;
-  CMPScalar current_x;
-  int i;
-  CMPScalar t0 = 0.0f;
-  CMPScalar t1 = 1.0f;
-
   if (x <= 0.0f) {
     return 0.0f;
   }
@@ -49,20 +63,7 @@ static CMPScalar cmp_anim_solve_bezier_t(CMPScalar p1x, CMPScalar p2x,
     return 1.0f;
   }
 
-  t = x;
-  for (i = 0; i < 16; i++) { /* GCOVR_EXCL_LINE */
-    current_x = cmp_anim_bezier_eval(p1x, p2x, t);
-    if (cmp_anim_abs(current_x - x) < 0.0001f) {
-      break;
-    }
-    if (current_x < x) {
-      t0 = t;
-    } else {
-      t1 = t;
-    }
-    t = (t0 + t1) * 0.5f;
-  }
-  return t;
+  return cmp_anim_solve_bezier_t_recurse(p1x, p2x, x, x, 0.0f, 1.0f);
 }
 
 static CMPScalar cmp_anim_cubic_bezier(CMPScalar x, CMPScalar x1, CMPScalar y1,

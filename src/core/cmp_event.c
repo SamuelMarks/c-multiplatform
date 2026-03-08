@@ -31,7 +31,7 @@ static int cmp_event_validate_rect(const CMPRect *rect) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (rect->width < 0.0f || rect->height < 0.0f) { /* GCOVR_EXCL_LINE */
+  if (rect->width < 0.0f || rect->height < 0.0f) {
 
     return CMP_ERR_RANGE;
   }
@@ -115,7 +115,7 @@ static void cmp_event_traverse_focus(const CMPRenderNode *node,
 
   /* Visit children */
 
-  if (node->child_count > 0 && node->children != NULL) { /* GCOVR_EXCL_LINE */
+  if (node->child_count > 0 && node->children != NULL) {
 
     for (i = 0; i < node->child_count; ++i) {
 
@@ -242,7 +242,7 @@ static int cmp_event_dispatch_to_widget(CMPWidget *widget,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (widget->vtable == NULL || widget->vtable->event == NULL) { /* GCOVR_EXCL_LINE */
+  if (widget->vtable == NULL || widget->vtable->event == NULL) {
 
     return CMP_OK;
   }
@@ -462,7 +462,7 @@ int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
 
     if (target == NULL) {
 
-      if (event->type == CMP_INPUT_POINTER_DOWN) { /* GCOVR_EXCL_LINE */
+      if (event->type == CMP_INPUT_POINTER_DOWN) {
 
         dispatcher->focused = NULL;
 
@@ -481,7 +481,7 @@ int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
       return rc;
     }
 
-    if (event->type == CMP_INPUT_POINTER_DOWN) { /* GCOVR_EXCL_LINE */
+    if (event->type == CMP_INPUT_POINTER_DOWN) {
 
       if (cmp_event_widget_focusable(target)) {
 
@@ -527,7 +527,7 @@ int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
         return rc;
       }
 
-      if (out_target != NULL) { /* GCOVR_EXCL_LINE */
+      if (out_target != NULL) {
 
         *out_target = dispatcher->focused;
       }
@@ -572,7 +572,7 @@ int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
 
       /* Handle Case: No current focus, select first/last */
 
-      if (ctx.target == NULL && ctx.first != NULL) { /* GCOVR_EXCL_LINE */
+      if (ctx.target == NULL && ctx.first != NULL) {
 
         if (reverse) {
 
@@ -613,13 +613,13 @@ int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
         }
       }
 
-      if (next_focus != NULL) { /* GCOVR_EXCL_LINE */
+      if (next_focus != NULL) {
 
         dispatcher->focused = next_focus;
 
         dispatcher->focus_visible = CMP_TRUE;
 
-        if (out_target != NULL) { /* GCOVR_EXCL_LINE */
+        if (out_target != NULL) {
 
           *out_target = next_focus;
         }
@@ -654,7 +654,7 @@ int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
       return rc;
     }
 
-    if (out_target != NULL) { /* GCOVR_EXCL_LINE */
+    if (out_target != NULL) {
 
       *out_target = root->widget;
     }

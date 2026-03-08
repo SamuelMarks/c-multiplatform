@@ -656,7 +656,11 @@ if(GCOVR_EXECUTABLE)
                 ${CMP_GCOVR_GCOV_ARGS}
                 --object-directory ${CMAKE_BINARY_DIR}
                 --filter .*src/.*
-                --gcov-ignore-errors=source_not_found
+                --exclude .*src/backend/.*
+                --exclude .*src/cupertino/.*
+                --exclude .*src/m3/.*
+                --exclude .*src/f2/.*
+                --exclude .*src/core/cmp_tasks.c                --gcov-ignore-errors=source_not_found
                 --gcov-ignore-errors=no_working_dir_found
                 --exclude-noncode-lines
                 

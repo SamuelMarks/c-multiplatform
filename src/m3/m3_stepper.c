@@ -10,12 +10,12 @@ CMP_API int CMP_CALL m3_stepper_test_clear_fail_points(void);
 
 int CMP_CALL m3_stepper_test_set_fail_point(cmp_u32 fail_point) {
   g_m3_stepper_test_fail_point = fail_point;
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+  return CMP_OK;
 }
 
 int CMP_CALL m3_stepper_test_clear_fail_points(void) {
   g_m3_stepper_test_fail_point = 0u;
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+  return CMP_OK;
 }
 #endif
 
@@ -51,7 +51,7 @@ CMP_API int CMP_CALL m3_stepper_draw(CMPPaintContext* ctx, const M3Stepper* step
   }
 #endif
   
-  if (stepper->step_count == 0 || stepper->steps == NULL) { /* GCOVR_EXCL_LINE */
+  if (stepper->step_count == 0 || stepper->steps == NULL) {
     return CMP_OK; /* Nothing to draw */
   }
 

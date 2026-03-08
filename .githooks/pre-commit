@@ -3,6 +3,13 @@ set -eu
 
 root_dir=$(git rev-parse --show-toplevel)
 
+echo "Running precommit build & test..."
+build_dir="${root_dir}/build-precommit"
+cmake -S "${root_dir}" -B "${build_dir}"
+cmake --build "${build_dir}"
+(cd "${build_dir}" && ctest --output-on-failure)
+
+echo "Running coverage checks..."
 "${root_dir}/tools/update_coverage_badges.sh"
 
 git add "${root_dir}/docs/badges/test-coverage.svg"

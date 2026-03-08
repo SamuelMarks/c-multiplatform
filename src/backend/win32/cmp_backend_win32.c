@@ -235,7 +235,6 @@ int CMP_CALL cmp_win32_backend_config_init(CMPWin32BackendConfig *config) {
   return CMP_OK;
 }
 
-/* GCOVR_EXCL_START */
 
 #if defined(CMP_WIN32_AVAILABLE)
 
@@ -6460,7 +6459,6 @@ int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend,
   return CMP_OK;
 }
 
-/* GCOVR_EXCL_STOP */
 
 #else
 

@@ -66,7 +66,7 @@ CMP_API int CMP_CALL cupertino_activity_indicator_update(CupertinoActivityIndica
 /**
  * @brief Renders the activity indicator.
  * @param indicator Pointer to the indicator instance.
- * @param renderer Pointer to the renderer used for drawing.
+ * @param ctx Pointer to the paint context used for drawing.
  * @return CMP_OK on success or an error code.
  */
 CMP_API int CMP_CALL cupertino_activity_indicator_paint(const CupertinoActivityIndicator *indicator, CMPPaintContext *ctx);

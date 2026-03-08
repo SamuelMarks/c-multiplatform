@@ -1,6 +1,7 @@
 #include "cmpc/cmp_core.h"
 #include "m3/m3_text_field.h"
 #include "test_utils.h"
+#include <string.h>
 
 static int test_on_change(void *ctx, M3TextField *field, const char *text) {
   int *called = (int *)ctx;
@@ -96,6 +97,41 @@ int main(void) {
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_text_field_set_error(&field, "Error"));
   CMP_TEST_OK(m3_text_field_set_error(&field, NULL));
+
+  CMP_TEST_EXPECT(m3_text_field_get_text_len(NULL, &len), CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(m3_text_field_get_text_len(&field, &len));
+
+  {
+    CMPSize size;
+    CMPMeasureSpec m200 = {CMP_MEASURE_EXACTLY, 200.0f};
+    CMPRect bounds = {0, 0, 200, 50};
+    CMPPaintContext pctx;
+    CMPGfx gfx;
+    CMPGfxVTable gvt;
+    memset(&pctx, 0, sizeof(pctx));
+    memset(&gfx, 0, sizeof(gfx));
+    memset(&gvt, 0, sizeof(gvt));
+    gvt.draw_rect = test_draw_rect;
+    gvt.push_clip = test_push_clip;
+    gvt.pop_clip = test_pop_clip;
+    gfx.vtable = &gvt;
+    gfx.text_vtable = &mock_vtable;
+    pctx.gfx = &gfx;
+
+    CMP_TEST_OK(m3_text_field_set_supporting_text(&field, "Support"));
+    CMP_TEST_OK(field.widget.vtable->measure(&field, m200, m200, &size));
+    CMP_TEST_OK(field.widget.vtable->layout(&field, bounds));
+    CMP_TEST_OK(field.widget.vtable->paint(&field, &pctx));
+    
+    field.error = CMP_TRUE;
+    CMP_TEST_OK(m3_text_field_set_error(&field, "Error"));
+    CMP_TEST_OK(field.widget.vtable->measure(&field, m200, m200, &size));
+    CMP_TEST_OK(field.widget.vtable->layout(&field, bounds));
+    CMP_TEST_OK(field.widget.vtable->paint(&field, &pctx));
+    field.error = CMP_FALSE;
+    CMP_TEST_OK(m3_text_field_set_supporting_text(&field, NULL));
+    CMP_TEST_OK(m3_text_field_set_error(&field, NULL));
+  }
 
   CMP_TEST_EXPECT(m3_text_field_set_disabled(NULL, CMP_TRUE),
                   CMP_ERR_INVALID_ARGUMENT);

@@ -52,3 +52,30 @@ test_arena_debug.c
 # Make sure badges are not ignored
 !docs/badges/*
 
+
+# Executables and build artifacts
+*.exe
+*.dll
+*.lib
+*.a
+*.so
+*.dylib
+*.obj
+*.pdb
+*.ilk
+*.suo
+*.user
+
+# Random user additions
+find_x.*
+obj.txt
+llm.txt
+
+*.s
+
+COVERAGE_PROGRESS[0-9]*.md
+UNCOVERED.md
+
+*.swp
+*~
+.DS_Store

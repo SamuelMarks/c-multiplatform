@@ -194,6 +194,11 @@ CMP_API int CMP_CALL cmp_predictive_back_test_validate_handler(
     const CMPPredictiveBackHandler *handler);
 #endif
 
+/**
+ * @brief Helper for test coverage.
+ * @param enable Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_predictive_test_set_event_init_fail(CMPBool enable);
 
 #ifdef __cplusplus

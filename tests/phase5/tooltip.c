@@ -15,9 +15,12 @@ static void test_backend_init(TestBackend *backend) {
   memset(backend, 0, sizeof(*backend));
 }
 
+static int g_fail_draw_rect = 0;
+
 static int test_gfx_draw_rect(void *gfx, const CMPRect *rect, CMPColor color,
                               CMPScalar corner_radius) {
   TestBackend *backend = (TestBackend *)gfx;
+  if (g_fail_draw_rect) return CMP_ERR_UNSUPPORTED;
   if (backend)
     backend->draw_rect_calls++;
   return CMP_OK;
@@ -27,9 +30,22 @@ static const CMPGfxVTable g_test_gfx_vtable = {
     NULL, NULL, NULL, test_gfx_draw_rect, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL};
 
+static int g_fail_create_font = 0;
+static int g_fail_create_font_count = 0;
+static int g_fail_destroy_font = 0;
+static int g_fail_measure = 0;
+static int g_fail_measure_count = 0;
+static int g_fail_draw = 0;
+static int g_fail_draw_count = 0;
+
 static int test_text_create_font(void *text, const char *utf8_family,
                                  cmp_i32 size_px, cmp_i32 weight,
                                  CMPBool italic, CMPHandle *out_font) {
+  if (g_fail_create_font) return CMP_ERR_UNSUPPORTED;
+  if (g_fail_create_font_count > 0) {
+    g_fail_create_font_count--;
+    if (g_fail_create_font_count == 0) return CMP_ERR_UNSUPPORTED;
+  }
   if (out_font) {
     out_font->id = 1u;
     out_font->generation = 1u;
@@ -37,12 +53,20 @@ static int test_text_create_font(void *text, const char *utf8_family,
   return CMP_OK;
 }
 
-static int test_text_destroy_font(void *text, CMPHandle font) { return CMP_OK; }
+static int test_text_destroy_font(void *text, CMPHandle font) { 
+  if (g_fail_destroy_font) return CMP_ERR_UNSUPPORTED;
+  return CMP_OK; 
+}
 
 static int test_text_measure_text(void *text, CMPHandle font, const char *utf8,
                                   cmp_usize utf8_len, cmp_u32 base_direction,
                                   CMPScalar *out_width, CMPScalar *out_height,
                                   CMPScalar *out_baseline) {
+  if (g_fail_measure) return CMP_ERR_UNSUPPORTED;
+  if (g_fail_measure_count > 0) {
+    g_fail_measure_count--;
+    if (g_fail_measure_count == 0) return CMP_ERR_UNSUPPORTED;
+  }
   if (out_width)
     *out_width = 10.0f;
   if (out_height)
@@ -56,6 +80,11 @@ static int test_text_draw_text(void *text, CMPHandle font, const char *utf8,
                                cmp_usize utf8_len, cmp_u32 base_direction,
                                CMPScalar x, CMPScalar y, CMPColor color) {
   TestBackend *backend = (TestBackend *)text;
+  if (g_fail_draw) return CMP_ERR_UNSUPPORTED;
+  if (g_fail_draw_count > 0) {
+    g_fail_draw_count--;
+    if (g_fail_draw_count == 0) return CMP_ERR_UNSUPPORTED;
+  }
   if (backend)
     backend->draw_text_calls++;
   return CMP_OK;
@@ -227,6 +256,117 @@ static int test_tooltip(void) {
   bad_ctx.gfx = &bad_gfx;
   CMP_TEST_EXPECT(tooltip.widget.vtable->paint(tooltip.widget.ctx, &bad_ctx),
                   CMP_ERR_UNSUPPORTED);
+  bad_gfx.vtable = &g_test_gfx_vtable;
+  CMP_TEST_EXPECT(tooltip.widget.vtable->paint(tooltip.widget.ctx, &bad_ctx),
+                  CMP_ERR_UNSUPPORTED);
+
+  /* Test fail create font (plain) */
+  g_fail_create_font = 1;
+  CMP_TEST_EXPECT(m3_tooltip_init(&tooltip, &text_backend, &plain_style, &anchor,
+                                  &placement, overlay, "Hello", 5u),
+                  CMP_ERR_UNSUPPORTED);
+  g_fail_create_font = 0;
+
+  /* Test fail create font (rich) */
+  g_fail_create_font = 1;
+  CMP_TEST_EXPECT(m3_tooltip_init(&tooltip, &text_backend, &rich_style, &anchor,
+                                  &placement, overlay, "Hello", 5u),
+                  CMP_ERR_UNSUPPORTED);
+  g_fail_create_font = 0;
+
+  /* Test fail create font (rich body - 2nd font) */
+  g_fail_create_font_count = 1;
+  CMP_TEST_EXPECT(m3_tooltip_init(&tooltip, &text_backend, &rich_style, &anchor,
+                                  &placement, overlay, "Hello", 5u),
+                  CMP_ERR_UNSUPPORTED);
+  g_fail_create_font_count = 0;
+
+  /* Test measure fail plain */
+  CMP_TEST_OK(m3_tooltip_init(&tooltip, &text_backend, &plain_style, &anchor,
+                              &placement, overlay, "Hello", 5u));
+  g_fail_measure = 1;
+  CMP_TEST_EXPECT(tooltip.widget.vtable->measure(tooltip.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_UNSUPPORTED);
+  CMP_TEST_EXPECT(tooltip.widget.vtable->layout(tooltip.widget.ctx, bounds),
+                  CMP_ERR_UNSUPPORTED);
+  g_fail_measure = 0;
+
+  /* Test draw fail plain */
+  CMP_TEST_OK(m3_tooltip_init(&tooltip, &text_backend, &plain_style, &anchor,
+                              &placement, overlay, "Hello", 5u));
+  tooltip.widget.vtable->measure(tooltip.widget.ctx, width_spec, height_spec, &size);
+  tooltip.widget.vtable->layout(tooltip.widget.ctx, bounds);
+  g_fail_draw = 1;
+  CMP_TEST_EXPECT(tooltip.widget.vtable->paint(tooltip.widget.ctx, &ctx),
+                  CMP_ERR_UNSUPPORTED);
+  g_fail_draw = 0;
+
+  /* Test measure fail rich title */
+  CMP_TEST_OK(m3_tooltip_init(&tooltip, &text_backend, &rich_style, &anchor,
+                              &placement, overlay, "Hello", 5u));
+  m3_tooltip_set_title(&tooltip, "Title", 5u);
+  g_fail_measure = 1;
+  CMP_TEST_EXPECT(tooltip.widget.vtable->measure(tooltip.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_UNSUPPORTED);
+  g_fail_measure = 0;
+
+  /* Test measure fail rich body */
+  CMP_TEST_OK(m3_tooltip_init(&tooltip, &text_backend, &rich_style, &anchor,
+                              &placement, overlay, "Hello", 5u));
+  m3_tooltip_set_title(&tooltip, "Title", 5u);
+  g_fail_measure_count = 1;
+  CMP_TEST_EXPECT(tooltip.widget.vtable->measure(tooltip.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_UNSUPPORTED);
+  g_fail_measure_count = 0;
+
+  /* Test draw fail rich body */
+  CMP_TEST_OK(m3_tooltip_init(&tooltip, &text_backend, &rich_style, &anchor,
+                              &placement, overlay, "Hello", 5u));
+  m3_tooltip_set_title(&tooltip, "Title", 5u);
+  tooltip.widget.vtable->measure(tooltip.widget.ctx, width_spec, height_spec, &size);
+  tooltip.widget.vtable->layout(tooltip.widget.ctx, bounds);
+  g_fail_draw_count = 1;
+  CMP_TEST_EXPECT(tooltip.widget.vtable->paint(tooltip.widget.ctx, &ctx),
+                  CMP_ERR_UNSUPPORTED);
+  g_fail_draw_count = 0;
+
+  /* Test draw fail rich title */
+  CMP_TEST_OK(m3_tooltip_init(&tooltip, &text_backend, &rich_style, &anchor,
+                              &placement, overlay, "Hello", 5u));
+  m3_tooltip_set_title(&tooltip, "Title", 5u);
+  tooltip.widget.vtable->measure(tooltip.widget.ctx, width_spec, height_spec, &size);
+  tooltip.widget.vtable->layout(tooltip.widget.ctx, bounds);
+  g_fail_draw = 1;
+  CMP_TEST_EXPECT(tooltip.widget.vtable->paint(tooltip.widget.ctx, &ctx),
+                  CMP_ERR_UNSUPPORTED);
+  g_fail_draw = 0;
+  
+  /* Test invalid style in measure/layout to fail cmp_tooltip_compute_content_size */
+  CMP_TEST_OK(m3_tooltip_init(&tooltip, &text_backend, &plain_style, &anchor,
+                              &placement, overlay, "Hello", 5u));
+  tooltip.style.padding.left = -10.0f; /* Invalid padding */
+  CMP_TEST_EXPECT(tooltip.widget.vtable->measure(tooltip.widget.ctx, width_spec, height_spec, &size),
+                  CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(tooltip.widget.vtable->layout(tooltip.widget.ctx, bounds),
+                  CMP_ERR_RANGE);
+  tooltip.style.padding.left = plain_style.padding.left; /* Restore */
+
+  /* Test draw rect fail */
+  CMP_TEST_OK(m3_tooltip_init(&tooltip, &text_backend, &plain_style, &anchor,
+                              &placement, overlay, "Hello", 5u));
+  tooltip.widget.vtable->measure(tooltip.widget.ctx, width_spec, height_spec, &size);
+  tooltip.widget.vtable->layout(tooltip.widget.ctx, bounds);
+  g_fail_draw_rect = 1;
+  CMP_TEST_EXPECT(tooltip.widget.vtable->paint(tooltip.widget.ctx, &ctx),
+                  CMP_ERR_UNSUPPORTED);
+  g_fail_draw_rect = 0;
+
+  /* Force destroy to fail to hit cleanup_rc branch */
+  CMP_TEST_OK(m3_tooltip_init(&tooltip, &text_backend, &plain_style, &anchor,
+                              &placement, overlay, "Hello", 5u));
+  g_fail_destroy_font = 1;
+  tooltip.widget.vtable->destroy(tooltip.widget.ctx);
+  g_fail_destroy_font = 0;
 
   return 0;
 }

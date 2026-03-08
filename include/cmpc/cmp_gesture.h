@@ -154,32 +154,120 @@ CMP_API int CMP_CALL cmp_gesture_test_hit_test(const CMPRenderNode *node,
                                                CMPWidget **out_widget);
 #endif
 
+/**
+ * @brief Helper for test coverage.
+ * @param enable Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_set_contains_error(CMPBool enable);
+/**
+ * @brief Helper for test coverage.
+ * @param enable Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_set_reset_fail(CMPBool enable);
+/**
+ * @brief Helper for test coverage.
+ * @param enable Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_set_velocity_error(CMPBool enable);
+/**
+ * @brief Helper for test coverage.
+ * @param enable Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_set_distance_error(CMPBool enable);
+/**
+ * @brief Helper for test coverage.
+ * @param calls Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_set_distance_error_after(cmp_i32 calls);
+/**
+ * @brief Helper for test coverage.
+ * @param enable Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_set_config_init_fail(CMPBool enable);
+/**
+ * @brief Helper for test coverage.
+ * @param rect Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_validate_rect(const CMPRect *rect);
+/**
+ * @brief Helper for test coverage.
+ * @param x0 Parameter for testing.
+ * @param y0 Parameter for testing.
+ * @param x1 Parameter for testing.
+ * @param y1 Parameter for testing.
+ * @param out_dist Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_distance_sq(CMPScalar x0, CMPScalar y0,
                                                   CMPScalar x1, CMPScalar y1,
                                                   CMPScalar *out_dist);
+/**
+ * @brief Helper for test coverage.
+ * @param start Parameter for testing.
+ * @param end Parameter for testing.
+ * @param out_delta Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_time_delta(cmp_u32 start, cmp_u32 end,
                                                  cmp_u32 *out_delta);
+/**
+ * @brief Helper for test coverage.
+ * @param x0 Parameter for testing.
+ * @param y0 Parameter for testing.
+ * @param x1 Parameter for testing.
+ * @param y1 Parameter for testing.
+ * @param dt_ms Parameter for testing.
+ * @param out_vx Parameter for testing.
+ * @param out_vy Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_velocity(CMPScalar x0, CMPScalar y0,
                                                CMPScalar x1, CMPScalar y1,
                                                cmp_u32 dt_ms, CMPScalar *out_vx,
                                                CMPScalar *out_vy);
+/**
+ * @brief Helper for test coverage.
+ * @param widget Parameter for testing.
+ * @param event Parameter for testing.
+ * @param out_handled Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_dispatch_to_widget(
     CMPWidget *widget, const CMPInputEvent *event, CMPBool *out_handled);
+/**
+ * @brief Helper for test coverage.
+ * @param widget Parameter for testing.
+ * @param source Parameter for testing.
+ * @param type Parameter for testing.
+ * @param gesture Parameter for testing.
+ * @param out_handled Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_gesture_test_emit(CMPWidget *widget,
                                            const CMPInputEvent *source,
                                            cmp_u32 type,
                                            const CMPGestureEvent *gesture,
                                            CMPBool *out_handled);
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param dispatcher Parameter for testing.
+ * @return Test result.
+ */
 cmp_gesture_test_reset_pointer(CMPGestureDispatcher *dispatcher);
 CMP_API int CMP_CALL
+/**
+ * @brief Helper for test coverage.
+ * @param dispatcher Parameter for testing.
+ * @return Test result.
+ */
 cmp_gesture_test_clear_state(CMPGestureDispatcher *dispatcher);
 
 #ifdef __cplusplus

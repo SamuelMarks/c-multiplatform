@@ -50,7 +50,7 @@ CMP_API int CMP_CALL cupertino_slider_set_value(CupertinoSlider *slider, CMPScal
 /**
  * @brief Renders the slider.
  * @param slider Pointer to the slider instance.
- * @param renderer Pointer to the renderer used for drawing.
+ * @param ctx Pointer to the renderer used for drawing.
  * @return CMP_OK on success or an error code.
  */
 CMP_API int CMP_CALL cupertino_slider_paint(const CupertinoSlider *slider, CMPPaintContext *ctx);

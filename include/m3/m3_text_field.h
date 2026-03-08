@@ -177,7 +177,7 @@ CMP_API int CMP_CALL m3_text_field_get_text_len(const M3TextField *text_field,
                                                 cmp_usize *out_len);
 
 /**
- * @brief Helper for test coverage.
+ * @return Test result.\n * @brief Helper for test coverage.
  */
 CMP_API int CMP_CALL m3_text_field_test_helper(void);
 

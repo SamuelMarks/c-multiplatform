@@ -18,6 +18,7 @@ extern "C" {
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
 
+/** @brief Maximum length of text in a text field. */
 #define CUPERTINO_TEXT_FIELD_MAX_LENGTH 256
 
 /** @brief Text field styles matching iOS UIKit */

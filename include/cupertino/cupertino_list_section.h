@@ -18,17 +18,19 @@ extern "C" {
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
 
+/** @brief Maximum number of rows in a list section. */
 #define CUPERTINO_LIST_MAX_ROWS 20
+/** @brief Maximum length of text for list row title and value. */
 #define CUPERTINO_LIST_MAX_TEXT 128
 
 /** @brief Represents a single row in a Cupertino list section. */
 typedef struct CupertinoListRow {
-    char title_utf8[CUPERTINO_LIST_MAX_TEXT];
-    cmp_usize title_len;
-    char value_utf8[CUPERTINO_LIST_MAX_TEXT];
-    cmp_usize value_len;
-    CMPBool has_chevron;
-    CMPBool is_pressed;
+    char title_utf8[CUPERTINO_LIST_MAX_TEXT]; /**< Title text in UTF-8. */
+    cmp_usize title_len;                      /**< Length of title text. */
+    char value_utf8[CUPERTINO_LIST_MAX_TEXT]; /**< Value text in UTF-8. */
+    cmp_usize value_len;                      /**< Length of value text. */
+    CMPBool has_chevron;                      /**< Whether the row has a disclosure chevron. */
+    CMPBool is_pressed;                       /**< Whether the row is currently pressed. */
 } CupertinoListRow;
 
 /** @brief Cupertino List Section Widget */
@@ -36,14 +38,14 @@ typedef struct CupertinoListSection {
     CMPWidget widget;                             /**< Base widget interface. */
     CMPTextBackend text_backend;                  /**< Text backend for drawing labels. */
     
-    char header_utf8[CUPERTINO_LIST_MAX_TEXT];
-    cmp_usize header_len;
+    char header_utf8[CUPERTINO_LIST_MAX_TEXT];    /**< Header text in UTF-8. */
+    cmp_usize header_len;                         /**< Length of header text. */
     
-    char footer_utf8[CUPERTINO_LIST_MAX_TEXT];
-    cmp_usize footer_len;
+    char footer_utf8[CUPERTINO_LIST_MAX_TEXT];    /**< Footer text in UTF-8. */
+    cmp_usize footer_len;                         /**< Length of footer text. */
     
-    CupertinoListRow rows[CUPERTINO_LIST_MAX_ROWS];
-    cmp_usize row_count;
+    CupertinoListRow rows[CUPERTINO_LIST_MAX_ROWS]; /**< List of rows. */
+    cmp_usize row_count;                          /**< Number of rows in the section. */
     
     CMPRect bounds;                               /**< Layout bounds. */
     CMPBool is_dark_mode;                         /**< Dark mode styling. */

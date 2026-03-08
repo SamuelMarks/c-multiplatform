@@ -231,6 +231,17 @@ CMP_API int CMP_CALL cmp_icon_test_svg_compute_transform(
     CMPScalar *out_offset_x, CMPScalar *out_offset_y);
 
 /**
+ * @brief Test wrapper for SVG build path.
+ * @param svg SVG descriptor.
+ * @param bounds Destination bounds.
+ * @param path Destination path.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_icon_test_svg_build_path(const CMPIconSvg *svg,
+                                                  const CMPRect *bounds,
+                                                  CMPPath *path);
+
+/**
  * @brief Test wrapper for SVG path parsing.
  * @param data SVG path data.
  * @param provide_xf Whether to provide a transform.

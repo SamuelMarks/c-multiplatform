@@ -19,6 +19,7 @@ extern "C" {
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
 
+/** @brief Maximum number of items in a picker. */
 #define CUPERTINO_PICKER_MAX_ITEMS 32
 
 /** @brief Cupertino Picker Widget */
@@ -27,7 +28,7 @@ typedef struct CupertinoPicker {
     CMPTextBackend text_backend;                  /**< Text backend for drawing labels. */
     
     const char *items[CUPERTINO_PICKER_MAX_ITEMS]; /**< Items in UTF-8. */
-    cmp_usize item_lengths[CUPERTINO_PICKER_MAX_ITEMS];
+    cmp_usize item_lengths[CUPERTINO_PICKER_MAX_ITEMS]; /**< Lengths of the item strings. */
     cmp_usize item_count;                         /**< Number of items. */
     
     cmp_i32 selected_index;                       /**< Currently selected item index. */

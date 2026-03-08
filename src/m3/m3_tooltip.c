@@ -11,10 +11,10 @@ static int m3_tooltip_destroy_fonts(const CMPTextBackend *backend,
   int rc = CMP_OK;
   int cleanup_rc;
   for (i = 0; i < count; ++i) {
-    if (fonts[i].id != 0u || fonts[i].generation != 0u) { /* GCOVR_EXCL_LINE */
+    if (fonts[i].id != 0u || fonts[i].generation != 0u) {
       cleanup_rc = cmp_text_font_destroy(backend, fonts[i]);
-      if (cleanup_rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        rc = cleanup_rc; /* GCOVR_EXCL_LINE */
+      if (cleanup_rc != CMP_OK) {
+        rc = cleanup_rc;
       }
       fonts[i].id = 0u;
       fonts[i].generation = 0u;
@@ -24,14 +24,10 @@ static int m3_tooltip_destroy_fonts(const CMPTextBackend *backend,
 }
 
 int CMP_CALL m3_tooltip_style_init_plain(CMPTooltipStyle *style) {
-  int rc;
   if (style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  rc = cmp_tooltip_style_init_plain(style);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
-  }
+  cmp_tooltip_style_init_plain(style);
 
   style->text_style.size_px = 12;
   style->text_style.weight = 400;
@@ -51,8 +47,8 @@ int CMP_CALL m3_tooltip_style_init_rich(CMPTooltipStyle *style) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   rc = cmp_tooltip_style_init_rich(style);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   style->title_style.size_px = 14;
@@ -76,7 +72,7 @@ static int m3_tooltip_metrics_update(M3Tooltip *tooltip) {
   int rc;
 
   if (tooltip == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (tooltip->metrics_valid == CMP_TRUE) {
     return CMP_OK;
@@ -86,39 +82,39 @@ static int m3_tooltip_metrics_update(M3Tooltip *tooltip) {
 
   if (tooltip->style.variant == CMP_TOOLTIP_VARIANT_PLAIN) {
     tooltip->metrics.has_title = CMP_FALSE;
-    if (tooltip->body_len > 0u) { /* GCOVR_EXCL_LINE */
+    if (tooltip->body_len > 0u) {
       rc = cmp_text_measure_utf8(&tooltip->text_backend, tooltip->plain_font,
                                  tooltip->utf8_body, tooltip->body_len, 0,
                                  &tooltip->metrics.body_metrics);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
       tooltip->metrics.has_body = CMP_TRUE;
     }
   } else {
     /* Rich tooltip */
-    if (tooltip->title_len > 0u && tooltip->utf8_title != NULL) { /* GCOVR_EXCL_LINE */
+    if (tooltip->title_len > 0u && tooltip->utf8_title != NULL) {
       rc = cmp_text_measure_utf8(&tooltip->text_backend, tooltip->title_font,
                                  tooltip->utf8_title, tooltip->title_len, 0,
                                  &tooltip->metrics.title_metrics);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
       tooltip->metrics.has_title = CMP_TRUE;
     } else {
-      tooltip->metrics.has_title = CMP_FALSE; /* GCOVR_EXCL_LINE */
+      tooltip->metrics.has_title = CMP_FALSE;
     }
 
-    if (tooltip->body_len > 0u && tooltip->utf8_body != NULL) { /* GCOVR_EXCL_LINE */
+    if (tooltip->body_len > 0u && tooltip->utf8_body != NULL) {
       rc = cmp_text_measure_utf8(&tooltip->text_backend, tooltip->body_font,
                                  tooltip->utf8_body, tooltip->body_len, 0,
                                  &tooltip->metrics.body_metrics);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
       tooltip->metrics.has_body = CMP_TRUE;
     } else {
-      tooltip->metrics.has_body = CMP_FALSE; /* GCOVR_EXCL_LINE */
+      tooltip->metrics.has_body = CMP_FALSE;
     }
   }
 
@@ -143,14 +139,14 @@ static int m3_tooltip_widget_measure(void *widget, CMPMeasureSpec width_spec,
   tooltip = (M3Tooltip *)widget;
 
   rc = m3_tooltip_metrics_update(tooltip);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = cmp_tooltip_compute_content_size(&tooltip->style, &tooltip->metrics,
                                         &content_size);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   /* We do not strictly use width_spec/height_spec for constraints unless
@@ -176,21 +172,21 @@ static int m3_tooltip_widget_layout(void *widget, CMPRect bounds) {
   tooltip = (M3Tooltip *)widget;
 
   rc = m3_tooltip_metrics_update(tooltip);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = cmp_tooltip_compute_content_size(&tooltip->style, &tooltip->metrics,
                                         &content_size);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   rc = cmp_tooltip_compute_bounds(
       &tooltip->style, &tooltip->anchor, &tooltip->placement, &tooltip->overlay,
       &content_size, &tooltip->bounds, &tooltip->resolved_direction);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   return CMP_OK;
@@ -206,27 +202,27 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (ctx->gfx == NULL || ctx->gfx->vtable == NULL || /* GCOVR_EXCL_LINE */
-      ctx->gfx->vtable->draw_rect == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_UNSUPPORTED; /* GCOVR_EXCL_LINE */
+  if (ctx->gfx == NULL || ctx->gfx->vtable == NULL ||
+      ctx->gfx->vtable->draw_rect == NULL) {
+    return CMP_ERR_UNSUPPORTED;
   }
 
-  if (ctx->gfx->text_vtable == NULL || /* GCOVR_EXCL_LINE */
-      ctx->gfx->text_vtable->draw_text == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_UNSUPPORTED; /* GCOVR_EXCL_LINE */
+  if (ctx->gfx->text_vtable == NULL ||
+      ctx->gfx->text_vtable->draw_text == NULL) {
+    return CMP_ERR_UNSUPPORTED;
   }
 
   tooltip = (M3Tooltip *)widget;
 
-  if (tooltip->bounds.width <= 0.0f || tooltip->bounds.height <= 0.0f) { /* GCOVR_EXCL_LINE */
+  if (tooltip->bounds.width <= 0.0f || tooltip->bounds.height <= 0.0f) {
     return CMP_OK;
   }
 
   rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &tooltip->bounds,
                                    tooltip->style.background_color,
                                    tooltip->style.corner_radius);
-  if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-    return rc; /* GCOVR_EXCL_LINE */
+  if (rc != CMP_OK) {
+    return rc;
   }
 
   if (tooltip->style.variant == CMP_TOOLTIP_VARIANT_PLAIN) {
@@ -239,11 +235,11 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
     text_y = tooltip->bounds.y + tooltip->style.padding.top +
              tooltip->metrics.body_metrics.baseline;
 
-    if (tooltip->metrics.has_body == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+    if (tooltip->metrics.has_body == CMP_TRUE) {
       rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->plain_font, tooltip->utf8_body,
           tooltip->body_len, 0, text_x, text_y, text_color);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
     }
   } else {
@@ -256,24 +252,24 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
     text_x = tooltip->bounds.x + tooltip->style.padding.left;
     text_y = tooltip->bounds.y + tooltip->style.padding.top;
 
-    if (tooltip->metrics.has_title == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+    if (tooltip->metrics.has_title == CMP_TRUE) {
       text_y += tooltip->metrics.title_metrics.baseline;
       rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->title_font, tooltip->utf8_title,
           tooltip->title_len, 0, text_x, text_y, text_color);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
       text_y += (tooltip->metrics.title_metrics.height -
                  tooltip->metrics.title_metrics.baseline) +
                 tooltip->style.title_body_spacing;
     }
 
-    if (tooltip->metrics.has_body == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+    if (tooltip->metrics.has_body == CMP_TRUE) {
       text_y += tooltip->metrics.body_metrics.baseline;
       rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->body_font, tooltip->utf8_body,
           tooltip->body_len, 0, text_x, text_y, text_color);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
     }
   }
@@ -317,7 +313,7 @@ static int m3_tooltip_widget_destroy(void *widget) {
   }
   tooltip = (M3Tooltip *)widget;
 
-  if (tooltip->owns_fonts == CMP_TRUE) { /* GCOVR_EXCL_LINE */
+  if (tooltip->owns_fonts == CMP_TRUE) {
     fonts[0] = tooltip->plain_font;
     fonts[1] = tooltip->title_font;
     fonts[2] = tooltip->body_font;
@@ -353,30 +349,30 @@ int CMP_CALL m3_tooltip_init(M3Tooltip *tooltip,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  if (text_backend->vtable == NULL || /* GCOVR_EXCL_LINE */
-      text_backend->vtable->create_font == NULL || /* GCOVR_EXCL_LINE */
-      text_backend->vtable->destroy_font == NULL || /* GCOVR_EXCL_LINE */
-      text_backend->vtable->measure_text == NULL || /* GCOVR_EXCL_LINE */
-      text_backend->vtable->draw_text == NULL) { /* GCOVR_EXCL_LINE */
-    return CMP_ERR_UNSUPPORTED; /* GCOVR_EXCL_LINE */ /* GCOVR_EXCL_LINE */
+  if (text_backend->vtable == NULL ||
+      text_backend->vtable->create_font == NULL ||
+      text_backend->vtable->destroy_font == NULL ||
+      text_backend->vtable->measure_text == NULL ||
+      text_backend->vtable->draw_text == NULL) {
+    return CMP_ERR_UNSUPPORTED;
   }
 
   memset(fonts, 0, sizeof(fonts));
 
   if (style->variant == CMP_TOOLTIP_VARIANT_PLAIN) {
     rc = cmp_text_font_create(text_backend, &style->text_style, &fonts[0]);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      return rc;
     }
   } else {
     rc = cmp_text_font_create(text_backend, &style->title_style, &fonts[1]);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      return rc;
     }
     rc = cmp_text_font_create(text_backend, &style->body_style, &fonts[2]);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      m3_tooltip_destroy_fonts(text_backend, fonts, 3u); /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      m3_tooltip_destroy_fonts(text_backend, fonts, 3u);
+      return rc;
     }
   }
 

@@ -13,7 +13,8 @@ cmake -S "${root_dir}" -B "${build_dir}" \
   -DCMP_ENABLE_COVERAGE=ON \
   -DCMP_REQUIRE_DOXYGEN=ON
 
-cmake --build "${build_dir}" --target cmp_coverage || true
+cmake --build "${build_dir}"
+cmake --build "${build_dir}" --target cmp_coverage
 cmake --build "${build_dir}" --target cmp_docs
 
 if [ ! -f "${coverage_xml}" ]; then
@@ -29,6 +30,11 @@ fi
 
 line_pct=$(awk -v rate="${line_rate}" 'BEGIN { printf "%.0f", rate * 100 }')
 
+if [ "${line_pct}" -lt 100 ]; then
+  echo "Test coverage is below 100% (${line_pct}%). Cannot commit." >&2
+  exit 1
+fi
+
 color="e05d44"
 if [ "${line_pct}" -ge 100 ]; then
   color="4c1"
@@ -43,6 +49,13 @@ fi
   "${line_pct}%" \
   "${color}" \
   "${badge_dir}/test-coverage.svg"
+
+doxy_warn="${build_dir}/doxygen_warnings.log"
+if [ -f "${doxy_warn}" ] && [ -s "${doxy_warn}" ]; then
+  echo "Doxygen warnings found. Doc coverage is below 100%. Cannot commit." >&2
+  cat "${doxy_warn}" >&2
+  exit 1
+fi
 
 "${script_dir}/make_badge.sh" \
   "doc coverage" \

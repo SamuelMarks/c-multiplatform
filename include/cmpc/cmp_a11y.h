@@ -140,6 +140,11 @@ CMP_API int CMP_CALL cmp_a11y_focus_prev(CMPA11yNode *current,
                                          CMPA11yNode *root,
                                          CMPA11yNode **out_prev);
 
+/**
+ * @brief Helper for test coverage.
+ * @param enable Parameter for testing.
+ * @return Test result.
+ */
 CMP_API int CMP_CALL cmp_a11y_test_set_fail_clear(CMPBool enable);
 
 #ifdef __cplusplus
