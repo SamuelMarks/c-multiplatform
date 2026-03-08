@@ -1,4 +1,6 @@
 #include "cupertino/cupertino_menu.h"
+#include "cmpc/cmp_path.h"
+#include "cupertino/cupertino_shape.h"
 #include <string.h>
 
 #define CUPERTINO_MENU_ITEM_HEIGHT_MAC 22.0f

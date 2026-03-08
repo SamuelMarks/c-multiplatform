@@ -107,7 +107,78 @@ static int test_cupertino_menu(void) {
 
     return 0;
 }
+static int CMP_CALL mock_draw_rect(void *gfx, const CMPRect *rect, CMPColor color, CMPScalar corner_radius) { return CMP_OK; }
+static int CMP_CALL mock_draw_line(void *gfx, CMPScalar x0, CMPScalar y0, CMPScalar x1, CMPScalar y1, CMPColor color, CMPScalar thickness) { return CMP_OK; }
+static int CMP_CALL mock_draw_path(void *gfx, const CMPPath *path, CMPColor color) { return CMP_OK; }
+
+static const CMPGfxVTable mock_gfx_vtable = {
+    NULL, NULL, NULL,
+    mock_draw_rect,
+    mock_draw_line,
+    mock_draw_path,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL
+};
+
+static int test_cupertino_menu_paint(void) {
+    CupertinoMenu menu;
+    CMPTextBackend text_backend;
+    CupertinoMenuItem items[3] = {0};
+    CMPPaintContext pctx = {0};
+    CMPGfx gfx = {0};
+
+    text_backend.ctx = NULL;
+    text_backend.vtable = &mock_text_vtable;
+
+    gfx.vtable = &mock_gfx_vtable;
+    gfx.text_vtable = &mock_text_vtable;
+    pctx.gfx = &gfx;
+
+    CMP_TEST_OK(cupertino_menu_init(&menu, &text_backend, CUPERTINO_MENU_MAC_OS));
+    
+    items[0].title_utf8 = "Copy";
+    items[0].title_len = 4;
+    items[0].style = CUPERTINO_MENU_ITEM_DEFAULT;
+
+    items[1].style = CUPERTINO_MENU_ITEM_SEPARATOR;
+
+    items[2].title_utf8 = "Delete";
+    items[2].title_len = 6;
+    items[2].style = CUPERTINO_MENU_ITEM_DESTRUCTIVE;
+    items[2].is_disabled = CMP_TRUE;
+
+    CMP_TEST_OK(cupertino_menu_set_items(&menu, items, 3));
+    CMP_TEST_OK(cupertino_menu_set_hover(&menu, 0));
+
+    menu.bounds.x = 0;
+    menu.bounds.y = 0;
+    menu.bounds.width = 150;
+    menu.bounds.height = 100;
+    menu.animation_progress = 1.0f;
+
+    CMP_TEST_EXPECT(cupertino_menu_paint(NULL, &pctx), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cupertino_menu_paint(&menu, NULL), CMP_ERR_INVALID_ARGUMENT);
+
+    CMP_TEST_OK(cupertino_menu_paint(&menu, &pctx));
+
+    /* Test dark mode, iOS */
+    menu.style.is_dark_mode = CMP_TRUE;
+    menu.style.variant = CUPERTINO_MENU_IOS;
+    CMP_TEST_OK(cupertino_menu_paint(&menu, &pctx));
+
+    /* Test edge cases */
+    menu.animation_progress = 0.0f;
+    CMP_TEST_OK(cupertino_menu_paint(&menu, &pctx));
+    menu.animation_progress = 1.0f;
+
+    menu.item_count = 0;
+    CMP_TEST_OK(cupertino_menu_paint(&menu, &pctx));
+    menu.item_count = 3;
+
+    return 0;
+}
+
 int main(void) {
     if (test_cupertino_menu() != 0) return 1;
+    if (test_cupertino_menu_paint() != 0) return 1;
     return 0;
 }
