@@ -43,8 +43,10 @@ FetchContent_MakeAvailable(cmpc)
 add_executable(app main.c)
 # Core-only usage:
 target_link_libraries(app PRIVATE cmp::cmpc)
-# Material 3 widgets/styles:
+# Design system widgets/styles (Material 3, Cupertino, or Fluent 2):
 # target_link_libraries(app PRIVATE m3::m3)
+# target_link_libraries(app PRIVATE cupertino::cupertino)
+# target_link_libraries(app PRIVATE f2::f2)
 ```
 
 ### Visual Documentation Pipeline

@@ -9,11 +9,11 @@ Directory Layout
 
 - `include/cmpc/` — ABI contracts (`cmp_api_*`) plus design-system-agnostic public headers (core systems, widgets, a11y,
   media helpers).
-- `include/m3/` — Material 3 design-system public headers (widgets, palettes, styling defaults).
+- `include/m3/`, `include/cupertino/`, `include/f2/` — Design-system public headers (widgets, palettes, styling defaults).
 - `src/core/` — Core logic: allocators/arena/utf8/log/store/i18n, math/layout/anim/router/path, render/event/gesture/
   scroll/tasks, a11y and predictive back helpers, widgets (visuals/text/icon/text_field/list/extras), and media/helpers
   (image/audio/video decoders, storage/camera/network).
-- `src/m3/` — Material 3 implementations: HCT color science, widget styling and components (buttons, navigation, app bars,
+- `src/m3/`, `src/cupertino/`, `src/f2/` — Design-system implementations: widget styling and components (buttons, navigation, app bars,
   tabs, dialogs, sheets, scaffold, menus, cards, chips, selection controls, progress, date/time pickers).
 - `src/backend/<platform>/` — Platform implementations of the `cmp_api_*` V-Tables (null, sdl3, linux/gtk4, cocoa,
   win32, web, ios, android).

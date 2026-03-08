@@ -1,7 +1,7 @@
 Example ideas
 =============
 
-This plan outlines the feature gaps between the current state of **LibCMPC** (core APIs through Phase 6 are implemented; backend coverage varies) and the requirements to port high-fidelity sample apps. LibCMPC currently ships the **Material 3** (`m3`) library; **Apple Cupertino** and **Microsoft Fluent** are planned.
+This plan outlines the feature gaps between the current state of **LibCMPC** (core APIs through Phase 6 are implemented; backend coverage varies) and the requirements to port high-fidelity sample apps. LibCMPC currently ships the **Material 3** (`m3`), **Apple Cupertino** (`cupertino`), and **Microsoft Fluent 2** (`f2`) libraries.
 
 Sample app sources (roadmap)
 ----------------------------
@@ -14,7 +14,7 @@ The goal is to copy/port these example apps to validate design-system parity and
 
 ---
 
-The primary gaps for Material 3 sample parity are in **Multimedia** (image/audio), **Advanced Graphics** (gradients/shaders), and **Rich Text**.
+The primary gaps for sample parity across these design systems are in **Multimedia** (image/audio), **Advanced Graphics** (gradients/shaders), and **Rich Text**.
 
 ### 1. Multimedia & Assets Subsytem
 *Essential for almost all samples (JetNews, Jetsnack, Jetchat, Jetcaster).*
@@ -71,4 +71,4 @@ To reach parity with the sample apps, the recommended implementation order is:
 2.  **Rich Text:** Essential for JetNews and realistic app content.
 3.  **Advanced Layouts:** Staggered grids and collapsing mechanics.
 4.  **Audio + IME:** Audio output and keyboard control.
-5.  **Design Systems + Samples:** Cupertino + Fluent widgets, then port the official sample apps for each design system.
+5.  **Samples:** Port the official sample apps for each design system.

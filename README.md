@@ -7,7 +7,7 @@ C multiplatform (libcmp)
 ![Test Coverage](docs/badges/test-coverage.svg)
 ![Doc Coverage](docs/badges/doc-coverage.svg)
 
-**LibCMPC** is a strict C89 (ANSI C) cross-platform application framework with a design-system-agnostic core and a fully-featured Material Design 3 component library. It targets robust state management, layout/animation primitives, and backend-agnostic rendering in a highly portable, zero-dependency core. 
+**LibCMPC** is a strict C89 (ANSI C) cross-platform application framework with a design-system-agnostic core and fully-featured Material Design 3, Apple Cupertino, and Microsoft Fluent 2 component libraries. It targets robust state management, layout/animation primitives, and backend-agnostic rendering in a highly portable, zero-dependency core. 
 
 This project is architected specifically for **Context-Window Scalability**, decoupling Interfaces (Contracts) from Implementations. This allows for modular development and makes the codebase distinctively friendly for LLM-assisted coding and maintenance.
 
@@ -15,7 +15,7 @@ This project is architected specifically for **Context-Window Scalability**, dec
 
 *   **Strict C89 ABI:** Compiles on virtually any C compiler (MSVC, GCC, Clang, TCC).
 *   **Zero Dependencies:** Core layout, math, text bounds, rendering queues, and data structures are completely self-contained.
-*   **Material 3 Library:** A comprehensive suite of native M3 widgets (Buttons, Cards, Chips, Selection, Progress, Dialogs, Sheets, App Bars, Navigation, and Scaffold).
+*   **Design System Libraries:** Comprehensive suites of native widgets for Material 3, Apple Cupertino, and Microsoft Fluent 2 (Buttons, Cards, Chips, Selection, Progress, Dialogs, Sheets, App Bars, Navigation, and Scaffold).
 *   **Visual Documentation Generator:** A fully automated headless vector renderer that translates layout & drawing commands into SVG tables via GitHub Actions, proving the UI logic without needing a screen.
 *   **Layout + Animation:** Flex-style layout, springs, gesture/scroll helpers, predictive back events.
 *   **Accessibility Semantics:** A11y primitives and widget semantics metadata.
@@ -35,9 +35,9 @@ This project is architected specifically for **Context-Window Scalability**, dec
 The project structure is designed to separate the **Contract** (Phase 0) from the **Implementation**.
 
 *   **`include/cmpc/`**: ABI contracts (`cmp_api_*`) plus public headers for core systems, widgets, accessibility, media, and helpers.
-*   **`include/m3/`**: Material 3 design-system headers (widgets, palettes, styling defaults).
+*   **`include/m3/`, `include/cupertino/`, `include/f2/`**: Design-system specific headers (widgets, palettes, styling defaults).
 *   **`src/core/`**: Core logic (allocators, utf8/log/store/i18n, math/layout/anim/predictive, render/event/gesture/scroll/tasks, a11y, widgets, image/audio/video decoders, storage/network/camera helpers).
-*   **`src/m3/`**: Material 3 implementations (color/HCT and widgets: app bar, navigation, tabs, dialogs, sheets, scaffold, menus, buttons, cards, chips, selection, progress, date/time pickers).
+*   **`src/m3/`, `src/cupertino/`, `src/f2/`**: Design-system specific implementations (color/HCT and widgets).
 *   **`src/backend/`**: Platform-specific implementations of the `cmp_api_*` V-Tables (per backend subdirectory).
 *   **`tools/docgen/`**: The headless vector rendering pipeline for visual documentation.
 *   **`packaging/`**: Packaging scripts and stubs for desktop, mobile, web, and SDL3 builds.
@@ -135,7 +135,7 @@ git config core.hooksPath .githooks
 | **2. Core Logic** | Math, HCT color, layout, animation, router, path | ✅ Complete |
 | **3. Engine** | Render lists, event dispatching, gesture/scroll, task runner | ✅ Complete |
 | **4. Backends** | Null, SDL3, GTK4, Cocoa, Win32, Web, iOS, Android | ✅ Implemented |
-| **5. Components** | Core widgets + Extensive M3 widget library | ✅ Complete |
+| **5. Components** | Core widgets + Extensive M3, Cupertino, and Fluent 2 widget libraries | ✅ Complete |
 | **6. Media + Helpers** | Storage, camera, network, image/audio/video, a11y | ✅ Core APIs complete |
 | **7. Packaging** | Android/iOS/Web/Desktop/SDL3 packaging targets | 🚧 In progress |
 | **8. Docs + Visuals** | Interactive Doxygen APIs, Automated SVG widget tours | ✅ Complete |
