@@ -17,6 +17,8 @@ extern "C" {
 #define CMP_WS_WINDOW_RESIZABLE 0x01
 /** @brief Window has no system border. */
 #define CMP_WS_WINDOW_BORDERLESS 0x02
+/** @brief Window uses macOS-style inline traffic lights (when borderless). */
+#define CMP_WS_WINDOW_MAC_TRAFFIC_LIGHTS 0x10
 /** @brief Window starts in fullscreen mode. */
 #define CMP_WS_WINDOW_FULLSCREEN 0x04
 /** @brief Window requests high-DPI scaling. */
@@ -185,12 +187,16 @@ typedef struct CMPInputEvent {
 
 /** @brief Disable system backdrop. */
 #define CMP_WS_BACKDROP_NONE 0
-/** @brief Standard Mica backdrop. */
+/** @brief Standard Windows Mica backdrop. */
 #define CMP_WS_BACKDROP_MICA 1
-/** @brief Mica Alt backdrop for tabbed apps. */
+/** @brief Windows Mica Alt backdrop for tabbed apps. */
 #define CMP_WS_BACKDROP_MICA_ALT 2
-/** @brief Acrylic blur backdrop. */
+/** @brief Windows Acrylic blur backdrop. */
 #define CMP_WS_BACKDROP_ACRYLIC 3
+/** @brief macOS BehindWindow vibrancy backdrop. */
+#define CMP_WS_BACKDROP_VIBRANCY_BEHIND_WINDOW 4
+/** @brief macOS UnderWindowBackground vibrancy backdrop. */
+#define CMP_WS_BACKDROP_VIBRANCY_UNDER_WINDOW 5
 
 /**
  * @brief Window creation configuration.
@@ -420,6 +426,17 @@ typedef struct CMPWSVTable {
 /** @brief System window background color type. */
 #define CMP_SYSTEM_COLOR_BACKGROUND 2
 
+/** @brief System cursor types. */
+#define CMP_CURSOR_DEFAULT 0
+#define CMP_CURSOR_TEXT 1       
+#define CMP_CURSOR_POINTER 2    
+#define CMP_CURSOR_CROSSHAIR 3  
+#define CMP_CURSOR_EW_RESIZE 4  
+#define CMP_CURSOR_NS_RESIZE 5  
+#define CMP_CURSOR_NESW_RESIZE 6
+#define CMP_CURSOR_NWSE_RESIZE 7
+#define CMP_CURSOR_NOT_ALLOWED 8
+
 /**
  * @brief Get a system color from the window system.
  * @param ws Window system instance.
@@ -439,6 +456,18 @@ typedef struct CMPWSVTable {
                                   CMPScalar *out_b, CMPScalar *out_a);
 #endif
 
+/**
+ * @brief Set the system cursor.
+ * @param ws Window system instance.
+ * @param window Window handle to update.
+ * @param cursor_type The cursor type to apply.
+ * @return CMP_OK on success or a failure code.
+ */
+#ifdef CMP_DOXYGEN
+  int set_cursor(void *ws, CMPHandle window, cmp_u32 cursor_type);
+#else
+  int(CMP_CALL *set_cursor)(void *ws, CMPHandle window, cmp_u32 cursor_type);
+#endif
 /**
  * @brief Update the native OS accessibility semantics tree.
  * @param ws Window system instance.

@@ -2719,7 +2719,7 @@ static int cmp_backend_ws_update_a11y_tree(void *ws,
   if (ws == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  
+
   if (root_a11y_node != NULL) {
     struct CMPWin32Backend *backend = (struct CMPWin32Backend *)ws;
     if (backend->active_window && backend->active_window->hwnd) {
@@ -2728,44 +2728,92 @@ static int cmp_backend_ws_update_a11y_tree(void *ws,
       NotifyWinEvent(EVENT_OBJECT_LOCATIONCHANGE, backend->active_window->hwnd, OBJID_CLIENT, CHILDID_SELF);
     }
   }
-  
+
+  return CMP_OK;
+}
+
+static int cmp_win32_ws_set_cursor(void *ws, CMPHandle window, cmp_u32 cursor_type) {
+  struct CMPWin32Backend *backend;
+  CMPWin32Window *resolved;
+  LPCWSTR win32_cursor_id = (LPCWSTR)IDC_ARROW;
+  HCURSOR hCursor;
+  int rc;
+
+  if (ws == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  backend = (struct CMPWin32Backend *)ws;
+
+  rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_INFO, "ws.set_cursor");
+  CMP_WIN32_RETURN_IF_ERROR(rc);
+
+  if (window.id == 0) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW, (void **)&resolved);
+  CMP_WIN32_RETURN_IF_ERROR(rc);
+
+  switch (cursor_type) {
+    case CMP_CURSOR_DEFAULT:
+      win32_cursor_id = (LPCWSTR)IDC_ARROW;
+      break;
+    case CMP_CURSOR_TEXT:
+      win32_cursor_id = (LPCWSTR)IDC_IBEAM;
+      break;
+    case CMP_CURSOR_POINTER:
+      win32_cursor_id = (LPCWSTR)IDC_HAND;
+      break;
+    case CMP_CURSOR_CROSSHAIR:
+      win32_cursor_id = (LPCWSTR)IDC_CROSS;
+      break;
+    case CMP_CURSOR_EW_RESIZE:
+      win32_cursor_id = (LPCWSTR)IDC_SIZEWE;
+      break;
+    case CMP_CURSOR_NS_RESIZE:
+      win32_cursor_id = (LPCWSTR)IDC_SIZENS;
+      break;
+    case CMP_CURSOR_NESW_RESIZE:
+      win32_cursor_id = (LPCWSTR)IDC_SIZENESW;
+      break;
+    case CMP_CURSOR_NWSE_RESIZE:
+      win32_cursor_id = (LPCWSTR)IDC_SIZENWSE;
+      break;
+    case CMP_CURSOR_NOT_ALLOWED:
+      win32_cursor_id = (LPCWSTR)IDC_NO;
+      break;
+    default:
+      return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  hCursor = LoadCursorW(NULL, win32_cursor_id);
+  if (hCursor != NULL) {
+    SetCursor(hCursor);
+  }
+
   return CMP_OK;
 }
 
 static const CMPWSVTable g_cmp_win32_ws_vtable = {
-
     cmp_win32_ws_init,
-
     cmp_win32_ws_shutdown,
-
     cmp_win32_ws_create_window,
-
     cmp_win32_ws_destroy_window,
-
     cmp_win32_ws_show_window,
-
     cmp_win32_ws_hide_window,
-
     cmp_win32_ws_set_window_title,
-
     cmp_win32_ws_set_window_size,
-
     cmp_win32_ws_get_window_size,
-
     cmp_win32_ws_set_window_dpi_scale,
-
     cmp_win32_ws_get_window_dpi_scale,
-
     cmp_win32_ws_set_clipboard_text,
-
     cmp_win32_ws_get_clipboard_text,
-
     cmp_win32_ws_poll_event,
-
     cmp_win32_ws_pump_events,
-
     cmp_win32_ws_get_time_ms,
     cmp_win32_ws_get_system_color,
+    cmp_win32_ws_set_cursor,
     cmp_backend_ws_update_a11y_tree};
 
 static int cmp_win32_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,

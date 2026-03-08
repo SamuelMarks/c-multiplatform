@@ -610,6 +610,16 @@ static int cmp_backend_ws_get_system_color(void *ws, cmp_u32 color_type,
   return CMP_ERR_UNSUPPORTED;
 }
 
+
+static int cmp_null_ws_set_cursor(void *ws, CMPHandle window, cmp_u32 cursor_type) {
+  (void)window;
+  (void)cursor_type;
+  if (ws == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  return CMP_ERR_UNSUPPORTED;
+}
+
 static int cmp_backend_ws_update_a11y_tree(void *ws,
                                            const void *root_a11y_node) {
   (void)root_a11y_node;
@@ -636,7 +646,7 @@ static const CMPWSVTable g_cmp_null_ws_vtable = {
     cmp_null_ws_poll_event,
     cmp_null_ws_pump_events,
     cmp_null_ws_get_time_ms,
-    cmp_backend_ws_get_system_color,
+    cmp_backend_ws_get_system_color, cmp_null_ws_set_cursor,
     cmp_backend_ws_update_a11y_tree};
 
 static int cmp_null_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,

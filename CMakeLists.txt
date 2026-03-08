@@ -44,12 +44,37 @@ target_include_directories(cmp_headers INTERFACE
 option(CMP_ENABLE_ASAN "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 option(CMP_ENABLE_VALGRIND "Enable Valgrind target for testing" OFF)
 
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option(CMP_MSVC_STATIC_CRT "Use static CRT (/MT, /MTd) on MSVC" OFF)
+option(CMP_UNICODE "Build with UNICODE and _UNICODE defined" ON)
+option(CMP_SINGLE_THREADED "Build as single threaded (disables multithreading support)" OFF)
+option(CMP_ENABLE_LTO "Enable Link-Time Optimization (LTO)" OFF)
+set(CMP_MSVC_RUNTIME_CHECKS "RTC1" CACHE STRING "MSVC Runtime checks: RTC1, RTCs, RTCu, OFF")
+
+if(MSVC)
+    if(CMP_MSVC_STATIC_CRT)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    else()
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+    endif()
+endif()
+
+if(CMP_ENABLE_LTO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT ipo_supported OUTPUT ipo_error)
+    if(ipo_supported)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    else()
+        message(WARNING "IPO/LTO is not supported: ${ipo_error}")
+    endif()
+endif()
+
 set(CMP_WARNINGS_C
     $<$<C_COMPILER_ID:MSVC>:/W4>
     # $<$<C_COMPILER_ID:MSVC>:/Za> # Removed because it breaks <windows.h> and <winnt.h> headers
     $<$<C_COMPILER_ID:MSVC>:/wd4127>
     $<$<AND:$<C_COMPILER_ID:MSVC>,$<VERSION_GREATER_EQUAL:${MSVC_VERSION},1700>>:/sdl>
-    $<$<AND:$<C_COMPILER_ID:MSVC>,$<CONFIG:Debug>>:/RTC1>
+    $<$<AND:$<C_COMPILER_ID:MSVC>,$<CONFIG:Debug>,$<NOT:$<STREQUAL:${CMP_MSVC_RUNTIME_CHECKS},OFF>>>:/${CMP_MSVC_RUNTIME_CHECKS}>
     $<$<C_COMPILER_ID:MSVC>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:/WX>>
     $<$<C_COMPILER_ID:GNU>:-Wall>
     $<$<C_COMPILER_ID:GNU>:-Wextra>
@@ -229,6 +254,44 @@ target_include_directories(f2 PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 target_link_libraries(f2 PUBLIC cmpc)
+
+add_library(cupertino
+    src/cupertino/cupertino_color.c
+    src/cupertino/cupertino_shape.c
+    src/cupertino/cupertino_typography.c
+    src/cupertino/cupertino_button.c
+    src/cupertino/cupertino_blur.c
+    src/cupertino/cupertino_haptics.c
+    src/cupertino/cupertino_navigation_bar.c
+    src/cupertino/cupertino_tab_bar.c
+    src/cupertino/cupertino_action_sheet.c
+    src/cupertino/cupertino_pull_to_refresh.c
+    src/cupertino/cupertino_menu.c
+    src/cupertino/cupertino_switch.c
+    src/cupertino/cupertino_slider.c
+    src/cupertino/cupertino_activity_indicator.c
+    src/cupertino/cupertino_alert.c
+    src/cupertino/cupertino_segmented_control.c
+    src/cupertino/cupertino_progress_bar.c
+    src/cupertino/cupertino_stepper.c
+    src/cupertino/cupertino_text_field.c
+    src/cupertino/cupertino_mac_traffic_lights.c
+    src/cupertino/cupertino_list_section.c
+    src/cupertino/cupertino_picker.c
+    src/cupertino/cupertino_detent_sheet.c
+    src/cupertino/cupertino_mac_sidebar.c
+    src/cupertino/cupertino_tv_card.c
+    src/cupertino/cupertino_watch_button.c
+    src/cupertino/cupertino_date_picker.c
+    src/cupertino/cupertino_mac_toolbar.c
+    src/cupertino/cupertino_focus_ring.c
+)
+add_library(cupertino::cupertino ALIAS cupertino)
+target_include_directories(cupertino PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+target_link_libraries(cupertino PUBLIC cmpc)
 
 if(CMP_ENABLE_COVERAGE)
     if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
@@ -708,6 +771,10 @@ if(BUILD_TESTING)
     target_link_libraries(cmp_phase2_color PRIVATE m3 cmpc)
     add_test(NAME cmp_phase2_color COMMAND cmp_phase2_color)
 
+    add_executable(cmp_phase2_cupertino_color tests/phase2/cupertino_color.c)
+    target_link_libraries(cmp_phase2_cupertino_color PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase2_cupertino_color COMMAND cmp_phase2_cupertino_color)
+
     add_executable(cmp_phase2_layout tests/phase2/layout.c)
     target_link_libraries(cmp_phase2_layout PRIVATE m3 cmpc)
     add_test(NAME cmp_phase2_layout COMMAND cmp_phase2_layout)
@@ -774,6 +841,10 @@ if(BUILD_TESTING)
     add_executable(cmp_phase3_path tests/phase3/path.c)
     target_link_libraries(cmp_phase3_path PRIVATE cmpc)
     add_test(NAME cmp_phase3_path COMMAND cmp_phase3_path)
+
+    add_executable(cmp_phase3_cupertino_shape tests/phase3/cupertino_shape.c)
+    target_link_libraries(cmp_phase3_cupertino_shape PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase3_cupertino_shape COMMAND cmp_phase3_cupertino_shape)
 
     add_executable(cmp_phase3_render tests/phase3/render.c)
     target_link_libraries(cmp_phase3_render PRIVATE cmpc)
@@ -1098,6 +1169,119 @@ if(BUILD_TESTING)
     add_executable(cmp_phase5_typography tests/phase5/typography.c)
     target_link_libraries(cmp_phase5_typography PRIVATE m3 cmpc)
     add_test(NAME cmp_phase5_typography COMMAND cmp_phase5_typography)
+
+    add_executable(cmp_phase5_cupertino_typography tests/phase5/cupertino_typography.c)
+    target_link_libraries(cmp_phase5_cupertino_typography PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_typography COMMAND cmp_phase5_cupertino_typography)
+
+    
+    add_executable(cmp_phase5_cupertino_switch tests/phase5/cupertino_switch.c)
+    target_link_libraries(cmp_phase5_cupertino_switch PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_switch COMMAND cmp_phase5_cupertino_switch)
+
+    add_executable(cmp_phase5_cupertino_slider tests/phase5/cupertino_slider.c)
+    target_link_libraries(cmp_phase5_cupertino_slider PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_slider COMMAND cmp_phase5_cupertino_slider)
+
+    add_executable(cmp_phase5_cupertino_activity_indicator tests/phase5/cupertino_activity_indicator.c)
+    target_link_libraries(cmp_phase5_cupertino_activity_indicator PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_activity_indicator COMMAND cmp_phase5_cupertino_activity_indicator)
+
+    
+    add_executable(cmp_phase5_cupertino_segmented_control tests/phase5/cupertino_segmented_control.c)
+    target_link_libraries(cmp_phase5_cupertino_segmented_control PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_segmented_control COMMAND cmp_phase5_cupertino_segmented_control)
+
+    add_executable(cmp_phase5_cupertino_progress_bar tests/phase5/cupertino_progress_bar.c)
+    target_link_libraries(cmp_phase5_cupertino_progress_bar PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_progress_bar COMMAND cmp_phase5_cupertino_progress_bar)
+
+    add_executable(cmp_phase5_cupertino_stepper tests/phase5/cupertino_stepper.c)
+    target_link_libraries(cmp_phase5_cupertino_stepper PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_stepper COMMAND cmp_phase5_cupertino_stepper)
+
+    
+    add_executable(cmp_phase5_cupertino_mac_traffic_lights tests/phase5/cupertino_mac_traffic_lights.c)
+    target_link_libraries(cmp_phase5_cupertino_mac_traffic_lights PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_mac_traffic_lights COMMAND cmp_phase5_cupertino_mac_traffic_lights)
+
+    add_executable(cmp_phase5_cupertino_list_section tests/phase5/cupertino_list_section.c)
+    target_link_libraries(cmp_phase5_cupertino_list_section PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_list_section COMMAND cmp_phase5_cupertino_list_section)
+
+    add_executable(cmp_phase5_cupertino_picker tests/phase5/cupertino_picker.c)
+    target_link_libraries(cmp_phase5_cupertino_picker PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_picker COMMAND cmp_phase5_cupertino_picker)
+
+    
+    add_executable(cmp_phase5_cupertino_mac_sidebar tests/phase5/cupertino_mac_sidebar.c)
+    target_link_libraries(cmp_phase5_cupertino_mac_sidebar PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_mac_sidebar COMMAND cmp_phase5_cupertino_mac_sidebar)
+
+    add_executable(cmp_phase5_cupertino_tv_card tests/phase5/cupertino_tv_card.c)
+    target_link_libraries(cmp_phase5_cupertino_tv_card PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_tv_card COMMAND cmp_phase5_cupertino_tv_card)
+
+    add_executable(cmp_phase5_cupertino_watch_button tests/phase5/cupertino_watch_button.c)
+    target_link_libraries(cmp_phase5_cupertino_watch_button PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_watch_button COMMAND cmp_phase5_cupertino_watch_button)
+
+    
+    add_executable(cmp_phase5_cupertino_mac_toolbar tests/phase5/cupertino_mac_toolbar.c)
+    target_link_libraries(cmp_phase5_cupertino_mac_toolbar PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_mac_toolbar COMMAND cmp_phase5_cupertino_mac_toolbar)
+
+    add_executable(cmp_phase5_cupertino_focus_ring tests/phase5/cupertino_focus_ring.c)
+    target_link_libraries(cmp_phase5_cupertino_focus_ring PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_focus_ring COMMAND cmp_phase5_cupertino_focus_ring)
+
+    add_executable(cmp_phase5_cupertino_date_picker tests/phase5/cupertino_date_picker.c)
+    target_link_libraries(cmp_phase5_cupertino_date_picker PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_date_picker COMMAND cmp_phase5_cupertino_date_picker)
+
+    add_executable(cmp_phase5_cupertino_detent_sheet tests/phase5/cupertino_detent_sheet.c)
+    target_link_libraries(cmp_phase5_cupertino_detent_sheet PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_detent_sheet COMMAND cmp_phase5_cupertino_detent_sheet)
+
+    add_executable(cmp_phase5_cupertino_text_field tests/phase5/cupertino_text_field.c)
+    target_link_libraries(cmp_phase5_cupertino_text_field PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_text_field COMMAND cmp_phase5_cupertino_text_field)
+
+    add_executable(cmp_phase5_cupertino_alert tests/phase5/cupertino_alert.c)
+    target_link_libraries(cmp_phase5_cupertino_alert PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_alert COMMAND cmp_phase5_cupertino_alert)
+
+    add_executable(cmp_phase5_cupertino_button tests/phase5/cupertino_button.c)
+    target_link_libraries(cmp_phase5_cupertino_button PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_button COMMAND cmp_phase5_cupertino_button)
+
+    add_executable(cmp_phase5_cupertino_blur tests/phase5/cupertino_blur.c)
+    target_link_libraries(cmp_phase5_cupertino_blur PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_blur COMMAND cmp_phase5_cupertino_blur)
+
+    add_executable(cmp_phase5_cupertino_haptics tests/phase5/cupertino_haptics.c)
+    target_link_libraries(cmp_phase5_cupertino_haptics PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_haptics COMMAND cmp_phase5_cupertino_haptics)
+
+    add_executable(cmp_phase5_cupertino_navigation_bar tests/phase5/cupertino_navigation_bar.c)
+    target_link_libraries(cmp_phase5_cupertino_navigation_bar PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_navigation_bar COMMAND cmp_phase5_cupertino_navigation_bar)
+
+    add_executable(cmp_phase5_cupertino_tab_bar tests/phase5/cupertino_tab_bar.c)
+    target_link_libraries(cmp_phase5_cupertino_tab_bar PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_tab_bar COMMAND cmp_phase5_cupertino_tab_bar)
+
+    add_executable(cmp_phase5_cupertino_action_sheet tests/phase5/cupertino_action_sheet.c)
+    target_link_libraries(cmp_phase5_cupertino_action_sheet PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_action_sheet COMMAND cmp_phase5_cupertino_action_sheet)
+
+    add_executable(cmp_phase5_cupertino_pull_to_refresh tests/phase5/cupertino_pull_to_refresh.c)
+    target_link_libraries(cmp_phase5_cupertino_pull_to_refresh PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_pull_to_refresh COMMAND cmp_phase5_cupertino_pull_to_refresh)
+
+    add_executable(cmp_phase5_cupertino_menu tests/phase5/cupertino_menu.c)
+    target_link_libraries(cmp_phase5_cupertino_menu PRIVATE cupertino cmpc)
+    add_test(NAME cmp_phase5_cupertino_menu COMMAND cmp_phase5_cupertino_menu)
 
     add_executable(cmp_phase5_visuals tests/phase5/visuals.c)
     target_link_libraries(cmp_phase5_visuals PRIVATE m3 cmpc)
