@@ -18,8 +18,9 @@ extern "C" {
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
 
-#define CUPERTINO_TAB_BAR_MAX_ITEMS 5 /**< Maximum allowed items in a tab bar  \
-                                       */
+#define CUPERTINO_TAB_BAR_MAX_ITEMS                                            \
+  5 /**< Maximum allowed items in a tab bar                                    \
+     */
 
 /** @brief Tab Bar item descriptor */
 typedef struct CupertinoTabBarItem {

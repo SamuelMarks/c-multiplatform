@@ -25,10 +25,12 @@
 #pragma warning(disable : 4201 4214)
 #endif
 
-#include <winbase.h>
+/* clang-format off */
 #include <windef.h>
+#include <winbase.h>
 #include <wingdi.h>
 #include <winuser.h>
+/* clang-format on */
 
 #if defined(_MSC_VER)
 #pragma warning(pop)

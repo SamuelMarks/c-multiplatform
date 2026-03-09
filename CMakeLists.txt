@@ -1336,5 +1336,5 @@ endif()
 
 if(CMP_ENABLE_GTK4)
     add_executable(screenshot_tool tools/screenshot_tool.c)
-    target_link_libraries(screenshot_tool PRIVATE m3 cmpc)
+    target_link_libraries(screenshot_tool PRIVATE m3 f2 cupertino cmpc)
 endif()

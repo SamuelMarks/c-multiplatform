@@ -222,10 +222,12 @@ static int CMP_CALL cmp_tasks_test_free_ex(void *ctx, void *ptr) {
 #pragma warning(disable : 4201 4214)
 #endif
 
-#include <winbase.h>
+/* clang-format off */
 #include <windef.h>
+#include <winbase.h>
 #include <wingdi.h>
 #include <winuser.h>
+/* clang-format on */
 
 #if defined(_MSC_VER) && _MSC_VER < 1500
 typedef struct _RTL_CONDITION_VARIABLE {

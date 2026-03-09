@@ -145,6 +145,7 @@ int main(void) {
     CMP_TEST_ASSERT(field.selection_start == 0);
     CMP_TEST_ASSERT(field.selection_end == 3);
     CMP_TEST_ASSERT(field.cursor == 0);
+    cmp_text_field_set_text(&field, NULL, 0);
   }
 
   cmp_usize start, end;

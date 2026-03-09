@@ -66,8 +66,8 @@ typedef struct CMPTextFieldStyle {
   CMPColor disabled_label_color;     /**< Label color when disabled. */
   CMPColor placeholder_color;        /**< Placeholder color. */
   CMPBool is_rtl;
-      /**< CMP_TRUE if text layout should be right-to-left. */ /**< Placeholder
-                                                                  text color. */
+  /**< CMP_TRUE if text layout should be right-to-left. */ /**< Placeholder
+                                                              text color. */
   CMPColor disabled_placeholder_color; /**< Placeholder color when disabled. */
   CMPColor cursor_color;               /**< Cursor color. */
   CMPColor selection_color;            /**< Selection highlight color. */

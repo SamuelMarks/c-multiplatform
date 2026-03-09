@@ -59,11 +59,14 @@
 
 #include <stdarg.h>
 #include <stddef.h>
-#include <winbase.h>
+
+/* clang-format off */
 #include <windef.h>
+#include <winbase.h>
 #include <wingdi.h>
 #include <winnls.h>
 #include <winuser.h>
+/* clang-format on */
 
 #if defined(_MSC_VER)
 #pragma warning(pop)

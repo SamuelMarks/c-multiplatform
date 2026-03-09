@@ -772,6 +772,13 @@ static int cmp_text_field_sync_label(CMPTextField *field) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
+#ifdef CMP_TESTING
+  if (cmp_text_field_test_fail_point_match(
+          CMP_TEXT_FIELD_TEST_FAIL_EVENT_SYNC_LABEL)) {
+    return CMP_ERR_IO;
+  }
+#endif
+
   if (field->utf8_label == NULL || field->label_len == 0u) {
     field->label_value = 0.0f;
     rc = cmp_anim_controller_start_timing(&field->label_anim, 0.0f, 0.0f, 0.0f,
@@ -789,6 +796,14 @@ static int cmp_text_field_sync_label(CMPTextField *field) {
   }
 
   target = (field->focused == CMP_TRUE || field->utf8_len > 0u) ? 1.0f : 0.0f;
+
+#ifdef CMP_TESTING
+  if (cmp_text_field_test_fail_point_match(
+          CMP_TEXT_FIELD_TEST_FAIL_ANIM_START)) {
+    return CMP_ERR_IO;
+  }
+#endif
+
   if (field->label_value == target) {
     return CMP_OK;
   }
@@ -796,12 +811,6 @@ static int cmp_text_field_sync_label(CMPTextField *field) {
   rc = cmp_anim_controller_start_timing(
       &field->label_anim, field->label_value, target,
       field->style.label_anim_duration, CMP_ANIM_EASE_OUT);
-#ifdef CMP_TESTING
-  if (cmp_text_field_test_fail_point_match(
-          CMP_TEXT_FIELD_TEST_FAIL_ANIM_START)) {
-    rc = CMP_ERR_IO;
-  }
-#endif
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1613,12 +1622,7 @@ static int cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
     field->selecting = CMP_TRUE;
     field->focused = CMP_TRUE;
     rc = cmp_text_field_sync_label(field);
-#ifdef CMP_TESTING
-    if (cmp_text_field_test_fail_point_match(
-            CMP_TEXT_FIELD_TEST_FAIL_EVENT_SYNC_LABEL)) {
-      rc = CMP_ERR_IO;
-    }
-#endif
+
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1660,12 +1664,7 @@ static int cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
     }
     field->focused = CMP_TRUE;
     rc = cmp_text_field_sync_label(field);
-#ifdef CMP_TESTING
-    if (cmp_text_field_test_fail_point_match(
-            CMP_TEXT_FIELD_TEST_FAIL_EVENT_SYNC_LABEL)) {
-      rc = CMP_ERR_IO;
-    }
-#endif
+
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1682,12 +1681,7 @@ static int cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
     }
     field->focused = CMP_TRUE;
     rc = cmp_text_field_sync_label(field);
-#ifdef CMP_TESTING
-    if (cmp_text_field_test_fail_point_match(
-            CMP_TEXT_FIELD_TEST_FAIL_EVENT_SYNC_LABEL)) {
-      rc = CMP_ERR_IO;
-    }
-#endif
+
     if (rc != CMP_OK) {
       return rc;
     }
@@ -2429,6 +2423,7 @@ int CMP_CALL cmp_text_field_set_style(CMPTextField *field,
 int CMP_CALL cmp_text_field_set_selection(CMPTextField *field, cmp_usize start,
                                           cmp_usize end) {
   cmp_usize tmp;
+  cmp_usize orig_end = end;
   int rc;
 
   if (field == NULL) {
@@ -2456,7 +2451,7 @@ int CMP_CALL cmp_text_field_set_selection(CMPTextField *field, cmp_usize start,
 
   field->selection_start = start;
   field->selection_end = end;
-  field->cursor = end;
+  field->cursor = orig_end;
   cmp_text_field_reset_cursor_blink(field);
   return CMP_OK;
 }
@@ -2547,6 +2542,12 @@ int CMP_CALL cmp_text_field_step(CMPTextField *field, CMPScalar dt,
   changed = CMP_FALSE;
 
   if (field->label_anim.mode != CMP_ANIM_MODE_NONE) {
+#ifdef CMP_TESTING
+    if (cmp_text_field_test_fail_point_match(
+            CMP_TEXT_FIELD_TEST_FAIL_ANIM_START)) {
+      return CMP_ERR_IO;
+    }
+#endif
     rc = cmp_anim_controller_step(&field->label_anim, dt, &value, &finished);
     if (rc != CMP_OK) {
       return rc;

@@ -3,9 +3,12 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <winbase.h>
+
+/* clang-format off */
 #include <windef.h>
+#include <winbase.h>
 #include <winuser.h>
+/* clang-format on */
 
 #if defined(_MSC_VER)
 #define NUM_FORMAT "%d"
