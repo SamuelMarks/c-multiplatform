@@ -99,13 +99,14 @@ CMP_API int CMP_CALL cmp_image_test_decode_raw_rgba8(
     CMPImageData *out_image);
 #endif
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param call_count Parameter for testing.
- * @return Test result.
- */
-cmp_image_test_set_mul_overflow_fail_after(cmp_u32 call_count);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param call_count Parameter for testing.
+     * @return Test result.
+     */
+    cmp_image_test_set_mul_overflow_fail_after(cmp_u32 call_count);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -10,10 +10,12 @@ static cmp_usize cmp_usize_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
 static int cmp_utf8_cstr_limit(cmp_usize *out_val) {
 #ifdef CMP_TESTING
   if (cmp_utf8_test_limit_value != 0) {
-    *out_val = cmp_utf8_test_limit_value; return 0;
+    *out_val = cmp_utf8_test_limit_value;
+    return 0;
   }
 #endif
-  *out_val = cmp_usize_max_value(); return 0;
+  *out_val = cmp_usize_max_value();
+  return 0;
 }
 
 static int cmp_utf8_cstrlen(const char *cstr, cmp_usize *out_len) {

@@ -255,20 +255,22 @@ CMP_API int CMP_CALL cmp_gesture_test_emit(CMPWidget *widget,
                                            cmp_u32 type,
                                            const CMPGestureEvent *gesture,
                                            CMPBool *out_handled);
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param dispatcher Parameter for testing.
- * @return Test result.
- */
-cmp_gesture_test_reset_pointer(CMPGestureDispatcher *dispatcher);
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param dispatcher Parameter for testing.
- * @return Test result.
- */
-cmp_gesture_test_clear_state(CMPGestureDispatcher *dispatcher);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param dispatcher Parameter for testing.
+     * @return Test result.
+     */
+    cmp_gesture_test_reset_pointer(CMPGestureDispatcher *dispatcher);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param dispatcher Parameter for testing.
+     * @return Test result.
+     */
+    cmp_gesture_test_clear_state(CMPGestureDispatcher *dispatcher);
 
 #ifdef __cplusplus
 } /* extern "C" */

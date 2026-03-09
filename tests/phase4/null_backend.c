@@ -521,22 +521,30 @@ int main(void) {
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(ws.vtable->get_time_ms(NULL, &time_ms),
                     CMP_ERR_INVALID_ARGUMENT);
-                    
+
     /* System color */
     {
       CMPScalar r, g, b, a;
-      CMP_TEST_EXPECT(ws.vtable->get_system_color(NULL, 0, &r, &g, &b, &a), CMP_ERR_INVALID_ARGUMENT);
-      CMP_TEST_EXPECT(ws.vtable->get_system_color(ws.ctx, 0, NULL, &g, &b, &a), CMP_ERR_INVALID_ARGUMENT);
-      CMP_TEST_EXPECT(ws.vtable->get_system_color(ws.ctx, 0, &r, NULL, &b, &a), CMP_ERR_INVALID_ARGUMENT);
-      CMP_TEST_EXPECT(ws.vtable->get_system_color(ws.ctx, 0, &r, &g, NULL, &a), CMP_ERR_INVALID_ARGUMENT);
-      CMP_TEST_EXPECT(ws.vtable->get_system_color(ws.ctx, 0, &r, &g, &b, NULL), CMP_ERR_INVALID_ARGUMENT);
-      CMP_TEST_EXPECT(ws.vtable->get_system_color(ws.ctx, 0, &r, &g, &b, &a), CMP_ERR_UNSUPPORTED);
+      CMP_TEST_EXPECT(ws.vtable->get_system_color(NULL, 0, &r, &g, &b, &a),
+                      CMP_ERR_INVALID_ARGUMENT);
+      CMP_TEST_EXPECT(ws.vtable->get_system_color(ws.ctx, 0, NULL, &g, &b, &a),
+                      CMP_ERR_INVALID_ARGUMENT);
+      CMP_TEST_EXPECT(ws.vtable->get_system_color(ws.ctx, 0, &r, NULL, &b, &a),
+                      CMP_ERR_INVALID_ARGUMENT);
+      CMP_TEST_EXPECT(ws.vtable->get_system_color(ws.ctx, 0, &r, &g, NULL, &a),
+                      CMP_ERR_INVALID_ARGUMENT);
+      CMP_TEST_EXPECT(ws.vtable->get_system_color(ws.ctx, 0, &r, &g, &b, NULL),
+                      CMP_ERR_INVALID_ARGUMENT);
+      CMP_TEST_EXPECT(ws.vtable->get_system_color(ws.ctx, 0, &r, &g, &b, &a),
+                      CMP_ERR_UNSUPPORTED);
     }
-    
+
     /* A11y tree */
     {
-      CMP_TEST_EXPECT(ws.vtable->update_a11y_tree(NULL, NULL), CMP_ERR_INVALID_ARGUMENT);
-      CMP_TEST_EXPECT(ws.vtable->update_a11y_tree(ws.ctx, NULL), CMP_ERR_UNSUPPORTED);
+      CMP_TEST_EXPECT(ws.vtable->update_a11y_tree(NULL, NULL),
+                      CMP_ERR_INVALID_ARGUMENT);
+      CMP_TEST_EXPECT(ws.vtable->update_a11y_tree(ws.ctx, NULL),
+                      CMP_ERR_UNSUPPORTED);
     }
 
     CMP_TEST_EXPECT(ws.vtable->show_window(ws.ctx, invalid_handle),
@@ -819,8 +827,8 @@ int main(void) {
     CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, NULL, 2, 0,
                                                   &scale, &scale, &scale),
                     CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0, NULL,
-                                                  &scale, &scale),
+    CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0,
+                                                  NULL, &scale, &scale),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(gfx.text_vtable->measure_text(gfx.ctx, font, "hi", 2, 0,
                                                   &scale, NULL, &scale),

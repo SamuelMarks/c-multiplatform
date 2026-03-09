@@ -191,8 +191,7 @@ static int m3_menu_validate_measure_spec(CMPMeasureSpec spec) {
   return CMP_OK;
 }
 
-static int
-m3_menu_validate_anchor(const M3MenuAnchor *anchor) {
+static int m3_menu_validate_anchor(const M3MenuAnchor *anchor) {
   int rc;
 
   if (anchor == NULL) {
@@ -249,10 +248,8 @@ static CMPScalar m3_menu_clamp(CMPScalar value, CMPScalar min_value,
   return value;
 }
 
-static int
-m3_menu_update_metrics(M3Menu *menu,
-                       CMPScalar *out_text_width,
-                       CMPBool *out_has_label) {
+static int m3_menu_update_metrics(M3Menu *menu, CMPScalar *out_text_width,
+                                  CMPBool *out_has_label) {
   CMPTextMetrics metrics;
   CMPScalar max_width;
   CMPBool has_label = CMP_FALSE;
@@ -317,11 +314,9 @@ m3_menu_update_metrics(M3Menu *menu,
   return CMP_OK;
 }
 
-static int
-m3_menu_compute_panel_size(M3Menu *menu,
-                           CMPScalar *out_width, 
-                           CMPScalar *out_height,
-                           CMPBool *out_has_label) {
+static int m3_menu_compute_panel_size(M3Menu *menu, CMPScalar *out_width,
+                                      CMPScalar *out_height,
+                                      CMPBool *out_has_label) {
   CMPScalar text_width;
   CMPScalar width;
   CMPScalar height;
@@ -374,8 +369,7 @@ m3_menu_compute_panel_size(M3Menu *menu,
 }
 
 static int
-m3_menu_compute_panel_bounds(const M3Menu *menu,
-                             const CMPRect *overlay,
+m3_menu_compute_panel_bounds(const M3Menu *menu, const CMPRect *overlay,
                              CMPScalar panel_width, CMPScalar panel_height,
                              CMPRect *out_bounds, cmp_u32 *out_direction) {
   CMPRect anchor;
@@ -470,8 +464,7 @@ m3_menu_compute_panel_bounds(const M3Menu *menu,
 
     if (menu->placement.align == M3_MENU_ALIGN_START) {
       x = anchor_x;
-    } else if (menu->placement.align ==
-               M3_MENU_ALIGN_CENTER) {
+    } else if (menu->placement.align == M3_MENU_ALIGN_CENTER) {
       x = anchor_x + (anchor_w - panel_width) * 0.5f;
     } else {
       x = anchor_x + anchor_w - panel_width;
@@ -533,8 +526,8 @@ m3_menu_compute_panel_bounds(const M3Menu *menu,
   x = m3_menu_clamp(x, min_x, max_x);
   y = m3_menu_clamp(y, min_y, max_y);
 
-  out_bounds->x = x;              
-  out_bounds->y = y;              
+  out_bounds->x = x;
+  out_bounds->y = y;
   out_bounds->width = panel_width;
   out_bounds->height = panel_height;
   *out_direction = direction;
@@ -576,8 +569,7 @@ static int m3_menu_hit_test(const M3Menu *menu, CMPScalar x, CMPScalar y,
     return CMP_OK;
   }
 
-  content_y =
-      menu->menu_bounds.y + menu->style.padding.top;
+  content_y = menu->menu_bounds.y + menu->style.padding.top;
   if (y < content_y) {
     *out_inside = CMP_TRUE;
     return CMP_OK;
@@ -602,7 +594,7 @@ static int m3_menu_hit_test(const M3Menu *menu, CMPScalar x, CMPScalar y,
 
   if (offset - (CMPScalar)index * stride >= menu->style.item_height) {
     *out_inside = CMP_TRUE;
-    return CMP_OK;         
+    return CMP_OK;
   }
 
   *out_inside = CMP_TRUE;
@@ -659,7 +651,7 @@ static int m3_menu_widget_measure(void *widget, CMPMeasureSpec width,
     if (desired_height > height.size) {
       desired_height = height.size;
     }
-  } else {                        
+  } else {
     desired_height = panel_height;
   }
 
@@ -700,14 +692,13 @@ static int m3_menu_widget_layout(void *widget, CMPRect bounds) {
     return rc;
   }
 
-  menu->overlay_bounds = bounds;                
-  menu->menu_bounds = panel_bounds;             
+  menu->overlay_bounds = bounds;
+  menu->menu_bounds = panel_bounds;
   menu->resolved_direction = resolved_direction;
-  return CMP_OK;                                
+  return CMP_OK;
 }
 
-static int m3_menu_widget_paint(void *widget,
-                                CMPPaintContext *ctx) {
+static int m3_menu_widget_paint(void *widget, CMPPaintContext *ctx) {
   M3Menu *menu;
   CMPRect clip;
   const CMPRect *shadow_clip;
@@ -771,10 +762,8 @@ static int m3_menu_widget_paint(void *widget,
     return CMP_ERR_UNSUPPORTED;
   }
 
-  content_x =
-      menu->menu_bounds.x + menu->style.padding.left;
-  content_y =
-      menu->menu_bounds.y + menu->style.padding.top;
+  content_x = menu->menu_bounds.x + menu->style.padding.left;
+  content_y = menu->menu_bounds.y + menu->style.padding.top;
   stride = menu->style.item_height + menu->style.item_spacing;
 
   text_offset = (menu->style.item_height - menu->font_metrics.height) * 0.5f;
@@ -797,9 +786,8 @@ static int m3_menu_widget_paint(void *widget,
       color = menu->style.disabled_text_color;
     }
 
-    rc = cmp_text_draw_utf8_gfx(ctx->gfx, menu->font,
-        item->utf8_label, item->utf8_len, 0, text_x, text_y,
-        color);        
+    rc = cmp_text_draw_utf8_gfx(ctx->gfx, menu->font, item->utf8_label,
+                                item->utf8_len, 0, text_x, text_y, color);
     if (rc != CMP_OK) {
       return rc;
     }
@@ -940,14 +928,14 @@ static int m3_menu_widget_destroy(void *widget) {
   menu->item_count = 0u;
   menu->pressed_index = M3_MENU_INVALID_INDEX;
   menu->owns_font = CMP_FALSE;
-  menu->open = CMP_FALSE;     
+  menu->open = CMP_FALSE;
   menu->on_action = NULL;
-  menu->on_action_ctx = NULL;   
+  menu->on_action_ctx = NULL;
   menu->text_backend.ctx = NULL;
   menu->text_backend.vtable = NULL;
   menu->widget.ctx = NULL;
   menu->widget.vtable = NULL;
-  return rc;                 
+  return rc;
 }
 
 static const CMPWidgetVTable g_m3_menu_widget_vtable = {
@@ -1319,8 +1307,7 @@ int CMP_CALL m3_menu_test_validate_style(const M3MenuStyle *style,
 int CMP_CALL m3_menu_test_update_metrics(M3Menu *menu,
                                          CMPScalar *out_text_width,
                                          CMPBool *out_has_label) {
-  return m3_menu_update_metrics(menu, out_text_width,
-                                out_has_label);
+  return m3_menu_update_metrics(menu, out_text_width, out_has_label);
 }
 
 int CMP_CALL m3_menu_test_compute_panel_size(M3Menu *menu, CMPScalar *out_width,
@@ -1330,21 +1317,15 @@ int CMP_CALL m3_menu_test_compute_panel_size(M3Menu *menu, CMPScalar *out_width,
 }
 
 int CMP_CALL m3_menu_test_compute_panel_bounds(
-                                               const M3Menu *menu,
-                                               const CMPRect *overlay,
-                                               CMPScalar panel_width,
-                                               CMPScalar panel_height,
-                                               CMPRect *out_bounds,
-                                               cmp_u32 *out_direction) {
+    const M3Menu *menu, const CMPRect *overlay, CMPScalar panel_width,
+    CMPScalar panel_height, CMPRect *out_bounds, cmp_u32 *out_direction) {
   return m3_menu_compute_panel_bounds(menu, overlay, panel_width, panel_height,
-                                      out_bounds,
-                                      out_direction);
+                                      out_bounds, out_direction);
 }
 
 int CMP_CALL m3_menu_test_hit_test(const M3Menu *menu, CMPScalar x, CMPScalar y,
                                    CMPBool *out_inside, cmp_usize *out_index) {
-  return m3_menu_hit_test(menu, x, y, out_inside,
-                          out_index);
+  return m3_menu_hit_test(menu, x, y, out_inside, out_index);
 }
 
 int CMP_CALL m3_menu_test_validate_color(const CMPColor *color) {
@@ -1356,40 +1337,33 @@ int CMP_CALL m3_menu_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
   return m3_menu_color_set(color, r, g, b, a);
 }
 
-int CMP_CALL
-m3_menu_test_validate_edges(const CMPLayoutEdges *edges) {
-  return m3_menu_validate_edges(edges);                   
+int CMP_CALL m3_menu_test_validate_edges(const CMPLayoutEdges *edges) {
+  return m3_menu_validate_edges(edges);
 }
 
-int CMP_CALL m3_menu_test_validate_text_style(
-    const CMPTextStyle *style,
-    CMPBool require_family) {
+int CMP_CALL m3_menu_test_validate_text_style(const CMPTextStyle *style,
+                                              CMPBool require_family) {
   return m3_menu_validate_text_style(style, require_family);
 }
 
-int CMP_CALL
-m3_menu_test_validate_measure_spec(CMPMeasureSpec spec) {
+int CMP_CALL m3_menu_test_validate_measure_spec(CMPMeasureSpec spec) {
   return m3_menu_validate_measure_spec(spec);
 }
 
-int CMP_CALL
-m3_menu_test_validate_rect(const CMPRect *rect) {
-  return m3_menu_validate_rect(rect);            
+int CMP_CALL m3_menu_test_validate_rect(const CMPRect *rect) {
+  return m3_menu_validate_rect(rect);
 }
 
-int CMP_CALL
-m3_menu_test_validate_anchor(const M3MenuAnchor *anchor) {
-  return m3_menu_validate_anchor(anchor);                 
+int CMP_CALL m3_menu_test_validate_anchor(const M3MenuAnchor *anchor) {
+  return m3_menu_validate_anchor(anchor);
 }
 
-int CMP_CALL m3_menu_test_validate_placement(
-    const M3MenuPlacement *placement) {        
+int CMP_CALL m3_menu_test_validate_placement(const M3MenuPlacement *placement) {
   return m3_menu_validate_placement(placement);
 }
 
-int CMP_CALL
-m3_menu_test_validate_items(const M3MenuItem *items,
-                            cmp_usize count) {
+int CMP_CALL m3_menu_test_validate_items(const M3MenuItem *items,
+                                         cmp_usize count) {
   return m3_menu_validate_items(items, count);
 }
 #endif

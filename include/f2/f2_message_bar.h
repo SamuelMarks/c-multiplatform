@@ -11,8 +11,8 @@ extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
-#include "f2/f2_color.h"
 #include "cmpc/cmp_text.h"
+#include "f2/f2_color.h"
 
 /** @brief Default message bar padding. */
 #define F2_MESSAGE_BAR_DEFAULT_PADDING 12.0f
@@ -41,7 +41,8 @@ struct F2MessageBar;
  * @param bar MessageBar instance.
  * @return CMP_OK on success.
  */
-typedef int(CMP_CALL *F2MessageBarOnAction)(void *ctx, struct F2MessageBar *bar);
+typedef int(CMP_CALL *F2MessageBarOnAction)(void *ctx,
+                                            struct F2MessageBar *bar);
 
 /**
  * @brief Fluent 2 MessageBar style descriptor.
@@ -62,18 +63,18 @@ typedef struct F2MessageBarStyle {
  * @brief Fluent 2 MessageBar widget instance.
  */
 typedef struct F2MessageBar {
-  CMPWidget widget;             /**< Widget interface. */
-  F2MessageBarStyle style;      /**< Current style. */
-  const char *utf8_text;        /**< Message text. */
-  cmp_usize text_len;           /**< Text length. */
-  const char *utf8_action;      /**< Action button text (if has_action). */
-  cmp_usize action_len;         /**< Action length. */
-  CMPRect bounds;               /**< Layout bounds. */
-  CMPBool is_visible;           /**< True if currently visible. */
-  F2MessageBarOnAction on_action; /**< Action callback. */
-  void *on_action_ctx;          /**< Action context. */
+  CMPWidget widget;                /**< Widget interface. */
+  F2MessageBarStyle style;         /**< Current style. */
+  const char *utf8_text;           /**< Message text. */
+  cmp_usize text_len;              /**< Text length. */
+  const char *utf8_action;         /**< Action button text (if has_action). */
+  cmp_usize action_len;            /**< Action length. */
+  CMPRect bounds;                  /**< Layout bounds. */
+  CMPBool is_visible;              /**< True if currently visible. */
+  F2MessageBarOnAction on_action;  /**< Action callback. */
+  void *on_action_ctx;             /**< Action context. */
   F2MessageBarOnAction on_dismiss; /**< Dismiss callback. */
-  void *on_dismiss_ctx;         /**< Dismiss context. */
+  void *on_dismiss_ctx;            /**< Dismiss context. */
 } F2MessageBar;
 
 /**
@@ -83,7 +84,9 @@ typedef struct F2MessageBar {
  * @param theme Active Fluent 2 theme used for extracting semantics.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_message_bar_style_init(F2MessageBarStyle *style, F2Intent intent, const F2Theme *theme);
+CMP_API int CMP_CALL f2_message_bar_style_init(F2MessageBarStyle *style,
+                                               F2Intent intent,
+                                               const F2Theme *theme);
 
 /**
  * @brief Initialize a Fluent 2 message bar widget.

@@ -7,7 +7,8 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) && !defined(_ARM_) && !defined(_ARM64_)
+#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) &&               \
+    !defined(_ARM_) && !defined(_ARM64_)
 #if defined(_M_AMD64)
 #define _AMD64_
 #elif defined(_M_IX86)
@@ -21,11 +22,11 @@
 
 #if defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(disable: 4201 4214)
+#pragma warning(disable : 4201 4214)
 #endif
 
-#include <windef.h>
 #include <winbase.h>
+#include <windef.h>
 #include <wingdi.h>
 #include <winuser.h>
 
@@ -70,10 +71,12 @@ static cmp_usize cmp_usize_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
 static int cmp_log_cstr_limit(cmp_usize *out_val) {
 #ifdef CMP_TESTING
   if (g_log_cstr_limit_override != 0) {
-    *out_val = g_log_cstr_limit_override; return 0;
+    *out_val = g_log_cstr_limit_override;
+    return 0;
   }
 #endif
-  *out_val = cmp_usize_max_value(); return 0;
+  *out_val = cmp_usize_max_value();
+  return 0;
 }
 
 static int cmp_log_cstrlen(const char *cstr, cmp_usize *out_len) {

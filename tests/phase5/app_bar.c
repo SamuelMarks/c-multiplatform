@@ -656,8 +656,8 @@ static int test_app_bar_style_init(void) {
 
   CMP_TEST_OK(m3_app_bar_style_init_bottom(&style));
   CMP_TEST_ASSERT(style.variant == M3_APP_BAR_VARIANT_BOTTOM);
-  CMP_TEST_ASSERT(
-      cmp_near(style.expanded_height, M3_APP_BAR_DEFAULT_BOTTOM_HEIGHT, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(style.expanded_height,
+                           M3_APP_BAR_DEFAULT_BOTTOM_HEIGHT, 0.001f));
 
 #ifdef CMP_TESTING
   CMP_TEST_OK(m3_app_bar_test_set_fail_point(M3_APP_BAR_TEST_FAIL_SHADOW_INIT));

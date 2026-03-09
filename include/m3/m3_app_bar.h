@@ -242,13 +242,14 @@ CMP_API int CMP_CALL m3_app_bar_test_color_set(CMPColor *color, CMPScalar r,
                                                CMPScalar g, CMPScalar b,
                                                CMPScalar a);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param edges Parameter for testing.
- * @return Test result.
- */
-m3_app_bar_test_validate_edges(const CMPLayoutEdges *edges);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param edges Parameter for testing.
+     * @return Test result.
+     */
+    m3_app_bar_test_validate_edges(const CMPLayoutEdges *edges);
 
 /**
  * @brief Helper for test coverage.

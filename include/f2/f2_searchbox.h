@@ -11,9 +11,9 @@ extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
-#include "f2/f2_text_field.h"
 #include "f2/f2_button.h"
 #include "f2/f2_color.h"
+#include "f2/f2_text_field.h"
 
 /**
  * @brief Fluent 2 SearchBox style descriptor.
@@ -34,7 +34,9 @@ struct F2SearchBox;
  * @param utf8_text Current text.
  * @return CMP_OK on success or a failure code.
  */
-typedef int(CMP_CALL *F2SearchBoxOnChange)(void *ctx, struct F2SearchBox *search_box, const char *utf8_text);
+typedef int(CMP_CALL *F2SearchBoxOnChange)(void *ctx,
+                                           struct F2SearchBox *search_box,
+                                           const char *utf8_text);
 
 /**
  * @brief SearchBox explicit search callback (e.g. hitting Enter).
@@ -43,22 +45,24 @@ typedef int(CMP_CALL *F2SearchBoxOnChange)(void *ctx, struct F2SearchBox *search
  * @param utf8_text Current text to search for.
  * @return CMP_OK on success.
  */
-typedef int(CMP_CALL *F2SearchBoxOnSearch)(void *ctx, struct F2SearchBox *search_box, const char *utf8_text);
+typedef int(CMP_CALL *F2SearchBoxOnSearch)(void *ctx,
+                                           struct F2SearchBox *search_box,
+                                           const char *utf8_text);
 
 /**
  * @brief Fluent 2 SearchBox widget.
  */
 typedef struct F2SearchBox {
-  CMPWidget widget;             /**< Widget interface. */
-  F2SearchBoxStyle style;       /**< Current style. */
-  F2TextField text_field;       /**< Internal text field widget. */
-  F2Button clear_button;        /**< Internal clear button. */
-  CMPRect bounds;               /**< Layout bounds. */
-  CMPBool has_text;             /**< True if the search box contains text. */
-  F2SearchBoxOnChange on_change;/**< Text change callback. */
-  void *on_change_ctx;          /**< Text change callback context. */
-  F2SearchBoxOnSearch on_search;/**< Search action callback. */
-  void *on_search_ctx;          /**< Search action callback context. */
+  CMPWidget widget;              /**< Widget interface. */
+  F2SearchBoxStyle style;        /**< Current style. */
+  F2TextField text_field;        /**< Internal text field widget. */
+  F2Button clear_button;         /**< Internal clear button. */
+  CMPRect bounds;                /**< Layout bounds. */
+  CMPBool has_text;              /**< True if the search box contains text. */
+  F2SearchBoxOnChange on_change; /**< Text change callback. */
+  void *on_change_ctx;           /**< Text change callback context. */
+  F2SearchBoxOnSearch on_search; /**< Search action callback. */
+  void *on_search_ctx;           /**< Search action callback context. */
 } F2SearchBox;
 
 /**
@@ -87,7 +91,8 @@ CMP_API int CMP_CALL f2_search_box_init(F2SearchBox *search_box,
  * @param utf8_text New text.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_search_box_set_text(F2SearchBox *search_box, const char *utf8_text);
+CMP_API int CMP_CALL f2_search_box_set_text(F2SearchBox *search_box,
+                                            const char *utf8_text);
 
 /**
  * @brief Assign callbacks for the search box.
@@ -99,8 +104,10 @@ CMP_API int CMP_CALL f2_search_box_set_text(F2SearchBox *search_box, const char 
  * @return CMP_OK on success.
  */
 CMP_API int CMP_CALL f2_search_box_set_callbacks(F2SearchBox *search_box,
-                                                 F2SearchBoxOnChange on_change, void *change_ctx,
-                                                 F2SearchBoxOnSearch on_search, void *search_ctx);
+                                                 F2SearchBoxOnChange on_change,
+                                                 void *change_ctx,
+                                                 F2SearchBoxOnSearch on_search,
+                                                 void *search_ctx);
 
 /**
  * @brief Clean up the search box.

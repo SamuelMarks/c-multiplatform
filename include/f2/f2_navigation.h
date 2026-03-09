@@ -3,7 +3,8 @@
 
 /**
  * @file f2_navigation.h
- * @brief Microsoft Fluent 2 Navigation components (NavigationView, TabList, Breadcrumb).
+ * @brief Microsoft Fluent 2 Navigation components (NavigationView, TabList,
+ * Breadcrumb).
  */
 
 #ifdef __cplusplus
@@ -30,31 +31,33 @@ typedef struct F2NavItem {
 
 /** @brief Display mode for NavigationView. */
 typedef enum F2NavViewMode {
-  F2_NAV_VIEW_MODE_LEFT = 0,    /**< Vertical, left-aligned. */
-  F2_NAV_VIEW_MODE_LEFT_COMPACT,/**< Vertical, icons only. */
-  F2_NAV_VIEW_MODE_TOP          /**< Horizontal, top-aligned. */
+  F2_NAV_VIEW_MODE_LEFT = 0,     /**< Vertical, left-aligned. */
+  F2_NAV_VIEW_MODE_LEFT_COMPACT, /**< Vertical, icons only. */
+  F2_NAV_VIEW_MODE_TOP           /**< Horizontal, top-aligned. */
 } F2NavViewMode;
 
 struct F2NavigationView;
 
 /** @brief NavigationView selection callback. */
-typedef int(CMP_CALL *F2NavViewOnSelect)(void *ctx, struct F2NavigationView *nav, cmp_usize index);
+typedef int(CMP_CALL *F2NavViewOnSelect)(void *ctx,
+                                         struct F2NavigationView *nav,
+                                         cmp_usize index);
 
 /** @brief Fluent 2 NavigationView style descriptor. */
 typedef struct F2NavViewStyle {
-  F2NavViewMode mode;          /**< Display mode. */
-  CMPColor background_color;   /**< Container background. */
-  CMPColor item_bg_normal;     /**< Normal item background. */
-  CMPColor item_bg_hover;      /**< Hover item background. */
-  CMPColor item_bg_pressed;    /**< Pressed item background. */
-  CMPColor item_bg_selected;   /**< Selected item background. */
-  CMPColor text_normal;        /**< Normal text color. */
-  CMPColor text_selected;      /**< Selected text color. */
-  CMPColor indicator_color;    /**< Selection indicator bar color. */
-  CMPTextStyle text_style;     /**< Label text style. */
-  CMPScalar item_height;       /**< Height of each item. */
-  CMPScalar compact_width;     /**< Width when in compact mode. */
-  CMPScalar expanded_width;    /**< Width when expanded. */
+  F2NavViewMode mode;        /**< Display mode. */
+  CMPColor background_color; /**< Container background. */
+  CMPColor item_bg_normal;   /**< Normal item background. */
+  CMPColor item_bg_hover;    /**< Hover item background. */
+  CMPColor item_bg_pressed;  /**< Pressed item background. */
+  CMPColor item_bg_selected; /**< Selected item background. */
+  CMPColor text_normal;      /**< Normal text color. */
+  CMPColor text_selected;    /**< Selected text color. */
+  CMPColor indicator_color;  /**< Selection indicator bar color. */
+  CMPTextStyle text_style;   /**< Label text style. */
+  CMPScalar item_height;     /**< Height of each item. */
+  CMPScalar compact_width;   /**< Width when in compact mode. */
+  CMPScalar expanded_width;  /**< Width when expanded. */
 } F2NavViewStyle;
 
 /** @brief Fluent 2 NavigationView widget. */
@@ -84,7 +87,10 @@ CMP_API int CMP_CALL f2_navigation_view_style_init(F2NavViewStyle *style);
  * @param count Number of items.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_navigation_view_init(F2NavigationView *nav, const F2NavViewStyle *style, const F2NavItem *items, cmp_usize count);
+CMP_API int CMP_CALL f2_navigation_view_init(F2NavigationView *nav,
+                                             const F2NavViewStyle *style,
+                                             const F2NavItem *items,
+                                             cmp_usize count);
 
 /**
  * @brief Set the selected index of the NavigationView.
@@ -92,7 +98,8 @@ CMP_API int CMP_CALL f2_navigation_view_init(F2NavigationView *nav, const F2NavV
  * @param index Selected index.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_navigation_view_set_selected(F2NavigationView *nav, cmp_usize index);
+CMP_API int CMP_CALL f2_navigation_view_set_selected(F2NavigationView *nav,
+                                                     cmp_usize index);
 
 /**
  * @brief Set the selection callback of the NavigationView.
@@ -101,7 +108,8 @@ CMP_API int CMP_CALL f2_navigation_view_set_selected(F2NavigationView *nav, cmp_
  * @param ctx Context pointer.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_navigation_view_set_on_select(F2NavigationView *nav, F2NavViewOnSelect on_select, void *ctx);
+CMP_API int CMP_CALL f2_navigation_view_set_on_select(
+    F2NavigationView *nav, F2NavViewOnSelect on_select, void *ctx);
 
 /* -------------------------------------------------------------------------- */
 /* TabList */
@@ -109,19 +117,20 @@ CMP_API int CMP_CALL f2_navigation_view_set_on_select(F2NavigationView *nav, F2N
 struct F2TabList;
 
 /** @brief TabList selection callback. */
-typedef int(CMP_CALL *F2TabListOnSelect)(void *ctx, struct F2TabList *tabs, cmp_usize index);
+typedef int(CMP_CALL *F2TabListOnSelect)(void *ctx, struct F2TabList *tabs,
+                                         cmp_usize index);
 
 /** @brief Fluent 2 TabList style descriptor. */
 typedef struct F2TabListStyle {
-  CMPColor text_normal;        /**< Normal tab text. */
-  CMPColor text_selected;      /**< Selected tab text. */
-  CMPColor indicator_color;    /**< Animated bottom indicator color. */
-  CMPColor bg_hover;           /**< Hover background. */
-  CMPColor bg_pressed;         /**< Pressed background. */
-  CMPTextStyle text_style;     /**< Tab text style. */
-  CMPScalar tab_height;        /**< Height of the tab row. */
-  CMPScalar indicator_height;  /**< Thickness of the indicator line. */
-  CMPScalar spacing;           /**< Spacing between tabs. */
+  CMPColor text_normal;       /**< Normal tab text. */
+  CMPColor text_selected;     /**< Selected tab text. */
+  CMPColor indicator_color;   /**< Animated bottom indicator color. */
+  CMPColor bg_hover;          /**< Hover background. */
+  CMPColor bg_pressed;        /**< Pressed background. */
+  CMPTextStyle text_style;    /**< Tab text style. */
+  CMPScalar tab_height;       /**< Height of the tab row. */
+  CMPScalar indicator_height; /**< Thickness of the indicator line. */
+  CMPScalar spacing;          /**< Spacing between tabs. */
 } F2TabListStyle;
 
 /** @brief Fluent 2 TabList widget. */
@@ -151,7 +160,9 @@ CMP_API int CMP_CALL f2_tab_list_style_init(F2TabListStyle *style);
  * @param count Number of items.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_tab_list_init(F2TabList *tabs, const F2TabListStyle *style, const F2NavItem *items, cmp_usize count);
+CMP_API int CMP_CALL f2_tab_list_init(F2TabList *tabs,
+                                      const F2TabListStyle *style,
+                                      const F2NavItem *items, cmp_usize count);
 
 /**
  * @brief Set the selected tab index.
@@ -168,7 +179,9 @@ CMP_API int CMP_CALL f2_tab_list_set_selected(F2TabList *tabs, cmp_usize index);
  * @param ctx Context pointer.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_tab_list_set_on_select(F2TabList *tabs, F2TabListOnSelect on_select, void *ctx);
+CMP_API int CMP_CALL f2_tab_list_set_on_select(F2TabList *tabs,
+                                               F2TabListOnSelect on_select,
+                                               void *ctx);
 
 /* -------------------------------------------------------------------------- */
 /* Breadcrumb */
@@ -176,27 +189,28 @@ CMP_API int CMP_CALL f2_tab_list_set_on_select(F2TabList *tabs, F2TabListOnSelec
 struct F2Breadcrumb;
 
 /** @brief Breadcrumb selection callback. */
-typedef int(CMP_CALL *F2BreadcrumbOnSelect)(void *ctx, struct F2Breadcrumb *nav, cmp_usize index);
+typedef int(CMP_CALL *F2BreadcrumbOnSelect)(void *ctx, struct F2Breadcrumb *nav,
+                                            cmp_usize index);
 
 /** @brief Fluent 2 Breadcrumb style descriptor. */
 typedef struct F2BreadcrumbStyle {
-  CMPColor text_normal;        /**< Parent text color. */
-  CMPColor text_current;       /**< Current (last) item text color. */
-  CMPColor chevron_color;      /**< Separator icon color. */
-  CMPColor bg_hover;           /**< Hover background for parents. */
-  CMPTextStyle text_style;     /**< Breadcrumb text style. */
-  CMPScalar item_spacing;      /**< Space between text and chevron. */
+  CMPColor text_normal;    /**< Parent text color. */
+  CMPColor text_current;   /**< Current (last) item text color. */
+  CMPColor chevron_color;  /**< Separator icon color. */
+  CMPColor bg_hover;       /**< Hover background for parents. */
+  CMPTextStyle text_style; /**< Breadcrumb text style. */
+  CMPScalar item_spacing;  /**< Space between text and chevron. */
 } F2BreadcrumbStyle;
 
 /** @brief Fluent 2 Breadcrumb widget. */
 typedef struct F2Breadcrumb {
-  CMPWidget widget;             /**< Widget interface. */
-  F2BreadcrumbStyle style;      /**< Current style. */
-  const F2NavItem *items;       /**< Array of items. */
-  cmp_usize item_count;         /**< Item count. */
-  CMPRect bounds;               /**< Layout bounds. */
+  CMPWidget widget;               /**< Widget interface. */
+  F2BreadcrumbStyle style;        /**< Current style. */
+  const F2NavItem *items;         /**< Array of items. */
+  cmp_usize item_count;           /**< Item count. */
+  CMPRect bounds;                 /**< Layout bounds. */
   F2BreadcrumbOnSelect on_select; /**< Selection callback. */
-  void *on_select_ctx;          /**< Selection callback context. */
+  void *on_select_ctx;            /**< Selection callback context. */
 } F2Breadcrumb;
 
 /**
@@ -214,7 +228,10 @@ CMP_API int CMP_CALL f2_breadcrumb_style_init(F2BreadcrumbStyle *style);
  * @param count Number of items.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_breadcrumb_init(F2Breadcrumb *nav, const F2BreadcrumbStyle *style, const F2NavItem *items, cmp_usize count);
+CMP_API int CMP_CALL f2_breadcrumb_init(F2Breadcrumb *nav,
+                                        const F2BreadcrumbStyle *style,
+                                        const F2NavItem *items,
+                                        cmp_usize count);
 
 /**
  * @brief Set the selection callback of the Breadcrumb.
@@ -223,7 +240,9 @@ CMP_API int CMP_CALL f2_breadcrumb_init(F2Breadcrumb *nav, const F2BreadcrumbSty
  * @param ctx Context pointer.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_breadcrumb_set_on_select(F2Breadcrumb *nav, F2BreadcrumbOnSelect on_select, void *ctx);
+CMP_API int CMP_CALL f2_breadcrumb_set_on_select(F2Breadcrumb *nav,
+                                                 F2BreadcrumbOnSelect on_select,
+                                                 void *ctx);
 
 #ifdef __cplusplus
 }

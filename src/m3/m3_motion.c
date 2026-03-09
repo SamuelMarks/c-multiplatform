@@ -154,42 +154,50 @@ int CMP_CALL m3_motion_predictive_back(const CMPPredictiveBackEvent *event,
   CMPScalar progress;
   CMPScalar scale;
   CMPScalar offset_x;
-  
-  if (event == NULL || out_bounds == NULL || out_corner_radius == NULL || out_opacity == NULL) {
+
+  if (event == NULL || out_bounds == NULL || out_corner_radius == NULL ||
+      out_opacity == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  
+
   progress = event->progress;
-  if (progress < 0.0f) progress = 0.0f;
-  if (progress > 1.0f) progress = 1.0f;
-  
+  if (progress < 0.0f)
+    progress = 0.0f;
+  if (progress > 1.0f)
+    progress = 1.0f;
+
   /* Predictive back typically scales down to 90% and shifts inwards by 8dp */
   scale = 1.0f - (0.1f * progress);
-  
-  /* Assume edge is LEFT for now (1 = left, 2 = right, 3 = top, 4 = bottom per typical Android constants) */
+
+  /* Assume edge is LEFT for now (1 = left, 2 = right, 3 = top, 4 = bottom per
+   * typical Android constants) */
   if (event->edge == 2) { /* CMP_PREDICTIVE_BACK_EDGE_RIGHT */
     offset_x = -8.0f * progress;
   } else {
     offset_x = 8.0f * progress;
   }
-  
+
   out_bounds->width = start_bounds.width * scale;
   out_bounds->height = start_bounds.height * scale;
-  
+
   /* Center the scaled bounds within the original frame, then apply offset */
-  out_bounds->x = start_bounds.x + ((start_bounds.width - out_bounds->width) * 0.5f) + offset_x;
-  out_bounds->y = start_bounds.y + ((start_bounds.height - out_bounds->height) * 0.5f);
-  
+  out_bounds->x = start_bounds.x +
+                  ((start_bounds.width - out_bounds->width) * 0.5f) + offset_x;
+  out_bounds->y =
+      start_bounds.y + ((start_bounds.height - out_bounds->height) * 0.5f);
+
   /* Corner radius interpolates up to 16dp */
   *out_corner_radius = 16.0f * progress;
-  
+
   /* Opacity fades slightly if approaching commit threshold */
   if (progress > 0.8f) {
-    *out_opacity = 1.0f - ((progress - 0.8f) * 5.0f); /* Fades out at the very end */
-    if (*out_opacity <= 0.0f) *out_opacity = 0.0f;
+    *out_opacity =
+        1.0f - ((progress - 0.8f) * 5.0f); /* Fades out at the very end */
+    if (*out_opacity <= 0.0f)
+      *out_opacity = 0.0f;
   } else {
     *out_opacity = 1.0f;
   }
-  
+
   return CMP_OK;
 }

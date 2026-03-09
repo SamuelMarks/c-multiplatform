@@ -1,9 +1,9 @@
 #include "cmpc/cmp_backend_web.h"
 
+#include "cmpc/cmp_a11y.h"
 #include "cmpc/cmp_log.h"
 #include "cmpc/cmp_math.h"
 #include "cmpc/cmp_object.h"
-#include "cmpc/cmp_a11y.h"
 
 #include <limits.h>
 #include <math.h>
@@ -2012,8 +2012,8 @@ static int cmp_web_backend_set_canvas_size(struct CMPWebBackend *backend,
 }
 
 static int cmp_web_on_mouse_down(int event_type,
-                                     const EmscriptenMouseEvent *event,
-                                     void *user_data) {
+                                 const EmscriptenMouseEvent *event,
+                                 void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2053,8 +2053,8 @@ static int cmp_web_on_mouse_down(int event_type,
 }
 
 static int cmp_web_on_mouse_up(int event_type,
-                                   const EmscriptenMouseEvent *event,
-                                   void *user_data) {
+                               const EmscriptenMouseEvent *event,
+                               void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2094,8 +2094,8 @@ static int cmp_web_on_mouse_up(int event_type,
 }
 
 static int cmp_web_on_mouse_move(int event_type,
-                                     const EmscriptenMouseEvent *event,
-                                     void *user_data) {
+                                 const EmscriptenMouseEvent *event,
+                                 void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2134,9 +2134,8 @@ static int cmp_web_on_mouse_move(int event_type,
   return EM_TRUE;
 }
 
-static int cmp_web_on_wheel(int event_type,
-                                const EmscriptenWheelEvent *event,
-                                void *user_data) {
+static int cmp_web_on_wheel(int event_type, const EmscriptenWheelEvent *event,
+                            void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2189,9 +2188,8 @@ static int cmp_web_on_wheel(int event_type,
   return EM_TRUE;
 }
 
-static int cmp_web_on_touch(int event_type,
-                                const EmscriptenTouchEvent *event,
-                                void *user_data) {
+static int cmp_web_on_touch(int event_type, const EmscriptenTouchEvent *event,
+                            void *user_data) {
   struct CMPWebBackend *backend;
   cmp_u32 mods;
   int rc;
@@ -2253,8 +2251,8 @@ static int cmp_web_on_touch(int event_type,
 }
 
 static int cmp_web_on_key_down(int event_type,
-                                   const EmscriptenKeyboardEvent *event,
-                                   void *user_data) {
+                               const EmscriptenKeyboardEvent *event,
+                               void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2291,8 +2289,8 @@ static int cmp_web_on_key_down(int event_type,
 }
 
 static int cmp_web_on_key_up(int event_type,
-                                 const EmscriptenKeyboardEvent *event,
-                                 void *user_data) {
+                             const EmscriptenKeyboardEvent *event,
+                             void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2329,8 +2327,8 @@ static int cmp_web_on_key_up(int event_type,
 }
 
 static int cmp_web_on_key_press(int event_type,
-                                    const EmscriptenKeyboardEvent *event,
-                                    void *user_data) {
+                                const EmscriptenKeyboardEvent *event,
+                                void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   cmp_u32 mods;
@@ -2383,9 +2381,8 @@ static int cmp_web_on_key_press(int event_type,
   return EM_TRUE;
 }
 
-static int cmp_web_on_focus(int event_type,
-                                const EmscriptenFocusEvent *event,
-                                void *user_data) {
+static int cmp_web_on_focus(int event_type, const EmscriptenFocusEvent *event,
+                            void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   int rc;
@@ -2411,9 +2408,8 @@ static int cmp_web_on_focus(int event_type,
   return EM_TRUE;
 }
 
-static int cmp_web_on_blur(int event_type,
-                               const EmscriptenFocusEvent *event,
-                               void *user_data) {
+static int cmp_web_on_blur(int event_type, const EmscriptenFocusEvent *event,
+                           void *user_data) {
   struct CMPWebBackend *backend;
   CMPInputEvent input;
   int rc;
@@ -2440,7 +2436,7 @@ static int cmp_web_on_blur(int event_type,
 }
 
 static int cmp_web_on_resize(int event_type, const EmscriptenUiEvent *event,
-                                 void *user_data) {
+                             void *user_data) {
   struct CMPWebBackend *backend;
   CMPWebWindow *window;
   CMPInputEvent input;
@@ -2742,32 +2738,36 @@ static int cmp_web_ws_shutdown(void *ws) {
 }
 
 #if defined(CMP_WEB_AVAILABLE)
-EM_JS(void, cmp_web_apply_backdrop_js, (const char* canvas_id, cmp_u32 backdrop_type), {
-    var canvas = document.querySelector(UTF8ToString(canvas_id));
-    if (!canvas) return;
-    
-    // Fluent 2 Backdrop Mappings
-    if (backdrop_type === 1 || backdrop_type === 2) { // MICA or MICA_ALT
-        // Apply Mica-like subtle tint
-        document.body.style.backgroundColor = "#f3f3f3"; // light default
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+EM_JS(void, cmp_web_apply_backdrop_js,
+      (const char *canvas_id, cmp_u32 backdrop_type), {
+        var canvas = document.querySelector(UTF8ToString(canvas_id));
+        if (!canvas)
+          return;
+
+        // Fluent 2 Backdrop Mappings
+        if (backdrop_type == = 1 || backdrop_type == = 2) { // MICA or MICA_ALT
+          // Apply Mica-like subtle tint
+          document.body.style.backgroundColor = "#f3f3f3"; // light default
+          if (window.matchMedia &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.body.style.backgroundColor = "#202020";
-        }
-        canvas.style.backgroundColor = "transparent";
-    } else if (backdrop_type === 3) { // ACRYLIC
-        // Apply Acrylic CSS blur
-        canvas.style.backdropFilter = "blur(30px) saturate(125%)";
-        canvas.style.webkitBackdropFilter = "blur(30px) saturate(125%)";
-        canvas.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          }
+          canvas.style.backgroundColor = "transparent";
+        } else if (backdrop_type == = 3) { // ACRYLIC
+          // Apply Acrylic CSS blur
+          canvas.style.backdropFilter = "blur(30px) saturate(125%)";
+          canvas.style.webkitBackdropFilter = "blur(30px) saturate(125%)";
+          canvas.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
+          if (window.matchMedia &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches) {
             canvas.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+          }
+        } else {
+          canvas.style.backdropFilter = "none";
+          canvas.style.webkitBackdropFilter = "none";
+          canvas.style.backgroundColor = "transparent";
         }
-    } else {
-        canvas.style.backdropFilter = "none";
-        canvas.style.webkitBackdropFilter = "none";
-        canvas.style.backgroundColor = "transparent";
-    }
-});
+      });
 #endif
 
 static int cmp_web_ws_create_window(void *ws, const CMPWSWindowConfig *config,
@@ -3194,67 +3194,94 @@ EM_JS(void, cmp_web_a11y_init_container, (), {
   }
 });
 
-EM_JS(void, cmp_web_a11y_append_node, (cmp_u32 role, cmp_u32 flags, const char* label_ptr, const char* hint_ptr, const char* val_ptr), {
-  var root = document.getElementById("cmp-a11y-root");
-  if (!root) return;
-  var el = document.createElement("div");
-  var roleStr = "group";
-  if (role === 1) roleStr = "button";
-  else if (role === 2) roleStr = "text";
-  else if (role === 3) roleStr = "img";
-  else if (role === 4) roleStr = "slider";
-  else if (role === 5) roleStr = "checkbox";
-  else if (role === 6) roleStr = "switch";
-  else if (role === 7) roleStr = "radio";
-  else if (role === 8) roleStr = "textbox";
-  else if (role === 9) roleStr = "progressbar";
-  else if (role === 10) roleStr = "dialog";
-  else if (role === 11) roleStr = "menu";
-  else if (role === 12) roleStr = "list";
-  else if (role === 13) roleStr = "listitem";
-  else if (role === 14) roleStr = "tablist";
-  else if (role === 15) roleStr = "tab";
-  else if (role === 16) roleStr = "heading";
-  else if (role === 17) roleStr = "group";
-  el.setAttribute("role", roleStr);
-  
-  var text = "";
-  if (label_ptr) text += UTF8ToString(label_ptr) + " ";
-  if (val_ptr) text += UTF8ToString(val_ptr) + " ";
-  if (hint_ptr) text += UTF8ToString(hint_ptr);
-  el.innerText = text.trim();
-  
-  if (flags & 0x01) el.setAttribute("aria-disabled", "true");
-  if (flags & 0x02) el.setAttribute("aria-selected", "true");
-  if (flags & 0x10) el.setAttribute("aria-checked", "true");
-  if (flags & 0x40) el.setAttribute("aria-expanded", "true");
-  if (flags & 0x80) el.setAttribute("aria-checked", "true");
-  
-  if (flags & 0x04) el.tabIndex = -1;
-  if (flags & 0x08) {
-    el.setAttribute("data-focused", "true");
-    setTimeout(function() { el.focus(); }, 0);
-  }
-  
-  root.appendChild(el);
-});
+EM_JS(void, cmp_web_a11y_append_node,
+      (cmp_u32 role, cmp_u32 flags, const char *label_ptr, const char *hint_ptr,
+       const char *val_ptr),
+      {
+        var root = document.getElementById("cmp-a11y-root");
+        if (!root)
+          return;
+        var el = document.createElement("div");
+        var roleStr = "group";
+        if (role == = 1)
+          roleStr = "button";
+        else if (role == = 2)
+          roleStr = "text";
+        else if (role == = 3)
+          roleStr = "img";
+        else if (role == = 4)
+          roleStr = "slider";
+        else if (role == = 5)
+          roleStr = "checkbox";
+        else if (role == = 6)
+          roleStr = "switch";
+        else if (role == = 7)
+          roleStr = "radio";
+        else if (role == = 8)
+          roleStr = "textbox";
+        else if (role == = 9)
+          roleStr = "progressbar";
+        else if (role == = 10)
+          roleStr = "dialog";
+        else if (role == = 11)
+          roleStr = "menu";
+        else if (role == = 12)
+          roleStr = "list";
+        else if (role == = 13)
+          roleStr = "listitem";
+        else if (role == = 14)
+          roleStr = "tablist";
+        else if (role == = 15)
+          roleStr = "tab";
+        else if (role == = 16)
+          roleStr = "heading";
+        else if (role == = 17)
+          roleStr = "group";
+        el.setAttribute("role", roleStr);
+
+        var text = "";
+        if (label_ptr)
+          text += UTF8ToString(label_ptr) + " ";
+        if (val_ptr)
+          text += UTF8ToString(val_ptr) + " ";
+        if (hint_ptr)
+          text += UTF8ToString(hint_ptr);
+        el.innerText = text.trim();
+
+        if (flags & 0x01)
+          el.setAttribute("aria-disabled", "true");
+        if (flags & 0x02)
+          el.setAttribute("aria-selected", "true");
+        if (flags & 0x10)
+          el.setAttribute("aria-checked", "true");
+        if (flags & 0x40)
+          el.setAttribute("aria-expanded", "true");
+        if (flags & 0x80)
+          el.setAttribute("aria-checked", "true");
+
+        if (flags & 0x04)
+          el.tabIndex = -1;
+        if (flags & 0x08) {
+          el.setAttribute("data-focused", "true");
+          setTimeout(function() { el.focus(); }, 0);
+        }
+
+        root.appendChild(el);
+      });
 
 static void cmp_web_a11y_traverse(const CMPA11yNode *node) {
   cmp_usize i;
-  
+
   if (node == NULL) {
     return;
   }
-  
+
   if (node->semantics.role != CMP_SEMANTIC_NONE) {
     cmp_web_a11y_append_node(
-      node->semantics.role,
-      node->semantics.flags,
-      node->semantics.utf8_label,
-      node->semantics.utf8_hint,
-      node->semantics.utf8_value);
+        node->semantics.role, node->semantics.flags, node->semantics.utf8_label,
+        node->semantics.utf8_hint, node->semantics.utf8_value);
   }
-  
+
   for (i = 0; i < node->child_count; i++) {
     cmp_web_a11y_traverse(node->children[i]);
   }
@@ -5397,10 +5424,9 @@ int CMP_CALL cmp_web_backend_get_env(CMPWebBackend *backend, CMPEnv *out_env) {
 
 #else
 
-int CMP_CALL
-cmp_web_backend_create(const CMPWebBackendConfig *config,
-                       CMPWebBackend **out_backend) {    
-  CMPWebBackendConfig local_config;                      
+int CMP_CALL cmp_web_backend_create(const CMPWebBackendConfig *config,
+                                    CMPWebBackend **out_backend) {
+  CMPWebBackendConfig local_config;
   int rc;
 
   if (out_backend == NULL) {

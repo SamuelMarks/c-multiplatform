@@ -483,8 +483,7 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
   fab_height_needed = bottom_size.height + scaffold->style.fab_margin_y * 2.0f +
                       fab_size.height;
   if (top_size.height + fab_height_needed > safe_height_needed) {
-    safe_height_needed =
-        top_size.height + fab_height_needed;
+    safe_height_needed = top_size.height + fab_height_needed;
   }
 
   desired_width =
@@ -714,8 +713,8 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
   } else {
     scaffold->snackbar_bounds.x = safe_bounds.x;
     scaffold->snackbar_bounds.y = safe_bounds.y;
-    scaffold->snackbar_bounds.width = 0.0f;     
-    scaffold->snackbar_bounds.height = 0.0f;    
+    scaffold->snackbar_bounds.width = 0.0f;
+    scaffold->snackbar_bounds.height = 0.0f;
   }
 
   rc = m3_scaffold_widget_is_visible(scaffold->fab, &visible);
@@ -789,8 +788,8 @@ static int m3_scaffold_widget_layout(void *widget, CMPRect bounds) {
   } else {
     scaffold->fab_bounds.x = safe_bounds.x;
     scaffold->fab_bounds.y = safe_bounds.y;
-    scaffold->fab_bounds.width = 0.0f;     
-    scaffold->fab_bounds.height = 0.0f;    
+    scaffold->fab_bounds.width = 0.0f;
+    scaffold->fab_bounds.height = 0.0f;
   }
 
   return CMP_OK;

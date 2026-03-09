@@ -10,10 +10,10 @@
 extern "C" {
 #endif
 
-#include "cmpc/cmp_core.h"
-#include "cmpc/cmp_math.h"
 #include "cmpc/cmp_api_gfx.h"
 #include "cmpc/cmp_api_ui.h"
+#include "cmpc/cmp_core.h"
+#include "cmpc/cmp_math.h"
 
 /**
  * @brief Paints a macOS-style focus ring around a given bound.
@@ -23,7 +23,10 @@ extern "C" {
  * @param is_dark_mode True if dark mode styling is required.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL cupertino_focus_ring_paint(CMPPaintContext *ctx, CMPRect bounds, CMPScalar corner_radius, CMPBool is_dark_mode);
+CMP_API int CMP_CALL cupertino_focus_ring_paint(CMPPaintContext *ctx,
+                                                CMPRect bounds,
+                                                CMPScalar corner_radius,
+                                                CMPBool is_dark_mode);
 
 #ifdef __cplusplus
 }

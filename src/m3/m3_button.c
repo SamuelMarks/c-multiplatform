@@ -304,8 +304,7 @@ static int m3_button_metrics_update(M3Button *button) {
 
 static int m3_button_resolve_colors(const M3Button *button,
                                     CMPColor *out_background,
-                                    CMPColor *out_text,
-                                    CMPColor *out_outline,
+                                    CMPColor *out_text, CMPColor *out_outline,
                                     CMPColor *out_ripple) {
   int rc;
 
@@ -1150,8 +1149,9 @@ static int m3_button_widget_paint(void *widget, CMPPaintContext *ctx) {
     text_y = bounds.y + bounds.height * 0.5f - metrics.height * 0.5f +
              metrics.baseline;
 
-    return cmp_text_draw_utf8_gfx(ctx->gfx, button->font, button->utf8_label, button->utf8_len, 0,
-        text_x, text_y, text_color);
+    return cmp_text_draw_utf8_gfx(ctx->gfx, button->font, button->utf8_label,
+                                  button->utf8_len, 0, text_x, text_y,
+                                  text_color);
   }
 
   return CMP_OK;

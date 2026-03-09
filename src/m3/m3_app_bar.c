@@ -453,7 +453,7 @@ static int m3_app_bar_compute_title_position(const M3AppBar *bar,
                                  : bar->style.padding.left;
     *out_x =
         bar->bounds.x + padding_left + (content_width - metrics->width) * 0.5f;
-    } else {
+  } else {
     if (bar->style.is_rtl == CMP_TRUE) {
       *out_x = bar->bounds.x + bar->bounds.width - bar->style.padding.right -
                metrics->width;
@@ -461,7 +461,7 @@ static int m3_app_bar_compute_title_position(const M3AppBar *bar,
       *out_x = bar->bounds.x + bar->style.padding.left;
     }
   }
-  
+
   collapsed_y = bar->bounds.y + bar->style.padding.top +
                 (collapsed_height - metrics->height) * 0.5f + metrics->baseline;
   expanded_y = bar->bounds.y + bar->style.padding.top + expanded_height -
@@ -699,8 +699,9 @@ static int m3_app_bar_widget_paint(void *widget, CMPPaintContext *ctx) {
     return rc;
   }
 
-  rc = cmp_text_draw_utf8_gfx(ctx->gfx, bar->title_font, bar->utf8_title, bar->title_len,
-      bar->style.is_rtl ? 1 : 0, text_x, text_y, bar->style.title_style.color);
+  rc = cmp_text_draw_utf8_gfx(ctx->gfx, bar->title_font, bar->utf8_title,
+                              bar->title_len, bar->style.is_rtl ? 1 : 0, text_x,
+                              text_y, bar->style.title_style.color);
   if (rc != CMP_OK) {
     return rc;
   }

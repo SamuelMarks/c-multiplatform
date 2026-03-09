@@ -13,40 +13,42 @@ struct M3TypographyProps {
   CMPScalar letter_spacing;
 };
 
-static const struct M3TypographyProps g_m3_default_props[M3_TYPOGRAPHY_ROLE_COUNT] = {
-  { 57, 400, 64.0f, -0.25f }, /* DISPLAY_LARGE */
-  { 45, 400, 52.0f,  0.0f  }, /* DISPLAY_MEDIUM */
-  { 36, 400, 44.0f,  0.0f  }, /* DISPLAY_SMALL */
-  { 32, 400, 40.0f,  0.0f  }, /* HEADLINE_LARGE */
-  { 28, 400, 36.0f,  0.0f  }, /* HEADLINE_MEDIUM */
-  { 24, 400, 32.0f,  0.0f  }, /* HEADLINE_SMALL */
-  { 22, 400, 28.0f,  0.0f  }, /* TITLE_LARGE */
-  { 16, 500, 24.0f,  0.15f }, /* TITLE_MEDIUM */
-  { 14, 500, 20.0f,  0.1f  }, /* TITLE_SMALL */
-  { 14, 500, 20.0f,  0.1f  }, /* LABEL_LARGE */
-  { 12, 500, 16.0f,  0.5f  }, /* LABEL_MEDIUM */
-  { 11, 500, 16.0f,  0.5f  }, /* LABEL_SMALL */
-  { 16, 400, 24.0f,  0.5f  }, /* BODY_LARGE */
-  { 14, 400, 20.0f,  0.25f }, /* BODY_MEDIUM */
-  { 12, 400, 16.0f,  0.4f  }  /* BODY_SMALL */
+static const struct M3TypographyProps
+    g_m3_default_props[M3_TYPOGRAPHY_ROLE_COUNT] = {
+        {57, 400, 64.0f, -0.25f}, /* DISPLAY_LARGE */
+        {45, 400, 52.0f, 0.0f},   /* DISPLAY_MEDIUM */
+        {36, 400, 44.0f, 0.0f},   /* DISPLAY_SMALL */
+        {32, 400, 40.0f, 0.0f},   /* HEADLINE_LARGE */
+        {28, 400, 36.0f, 0.0f},   /* HEADLINE_MEDIUM */
+        {24, 400, 32.0f, 0.0f},   /* HEADLINE_SMALL */
+        {22, 400, 28.0f, 0.0f},   /* TITLE_LARGE */
+        {16, 500, 24.0f, 0.15f},  /* TITLE_MEDIUM */
+        {14, 500, 20.0f, 0.1f},   /* TITLE_SMALL */
+        {14, 500, 20.0f, 0.1f},   /* LABEL_LARGE */
+        {12, 500, 16.0f, 0.5f},   /* LABEL_MEDIUM */
+        {11, 500, 16.0f, 0.5f},   /* LABEL_SMALL */
+        {16, 400, 24.0f, 0.5f},   /* BODY_LARGE */
+        {14, 400, 20.0f, 0.25f},  /* BODY_MEDIUM */
+        {12, 400, 16.0f, 0.4f}    /* BODY_SMALL */
 };
 
-static const struct M3TypographyProps g_m3_expressive_props[M3_TYPOGRAPHY_ROLE_COUNT] = {
-  { 64, 400, 76.0f, -0.5f  }, /* DISPLAY_LARGE */
-  { 52, 400, 64.0f, -0.25f }, /* DISPLAY_MEDIUM */
-  { 44, 400, 52.0f,  0.0f  }, /* DISPLAY_SMALL */
-  { 40, 400, 52.0f,  0.0f  }, /* HEADLINE_LARGE */
-  { 36, 400, 48.0f,  0.0f  }, /* HEADLINE_MEDIUM */
-  { 32, 400, 40.0f,  0.0f  }, /* HEADLINE_SMALL */
-  { 28, 400, 36.0f,  0.0f  }, /* TITLE_LARGE */
-  { 16, 500, 24.0f,  0.15f }, /* TITLE_MEDIUM */
-  { 14, 500, 20.0f,  0.1f  }, /* TITLE_SMALL */
-  { 14, 500, 20.0f,  0.1f  }, /* LABEL_LARGE */
-  { 12, 500, 16.0f,  0.5f  }, /* LABEL_MEDIUM */
-  { 11, 500, 16.0f,  0.5f  }, /* LABEL_SMALL */
-  { 16, 400, 24.0f,  0.5f  }, /* BODY_LARGE */
-  { 14, 400, 20.0f,  0.25f }, /* BODY_MEDIUM */
-  { 12, 400, 16.0f,  0.4f  }  /* BODY_SMALL */
+static const struct M3TypographyProps
+    g_m3_expressive_props[M3_TYPOGRAPHY_ROLE_COUNT] = {
+        {64, 400, 76.0f, -0.5f},  /* DISPLAY_LARGE */
+        {52, 400, 64.0f, -0.25f}, /* DISPLAY_MEDIUM */
+        {44, 400, 52.0f, 0.0f},   /* DISPLAY_SMALL */
+        {40, 400, 52.0f, 0.0f},   /* HEADLINE_LARGE */
+        {36, 400, 48.0f, 0.0f},   /* HEADLINE_MEDIUM */
+        {32, 400, 40.0f, 0.0f},   /* HEADLINE_SMALL */
+        {28, 400, 36.0f, 0.0f},   /* TITLE_LARGE */
+        {16, 500, 24.0f, 0.15f},  /* TITLE_MEDIUM */
+        {14, 500, 20.0f, 0.1f},   /* TITLE_SMALL */
+        {14, 500, 20.0f, 0.1f},   /* LABEL_LARGE */
+        {12, 500, 16.0f, 0.5f},   /* LABEL_MEDIUM */
+        {11, 500, 16.0f, 0.5f},   /* LABEL_SMALL */
+        {16, 400, 24.0f, 0.5f},   /* BODY_LARGE */
+        {14, 400, 20.0f, 0.25f},  /* BODY_MEDIUM */
+        {12, 400, 16.0f, 0.4f}    /* BODY_SMALL */
 };
 
 CMP_API int CMP_CALL m3_typography_scale_init(M3TypographyScale *scale) {

@@ -4,8 +4,7 @@
 
 #ifdef CMP_TESTING
 static CMPBool g_cmp_gesture_test_force_contains_error = CMP_FALSE;
-static CMPBool g_cmp_gesture_test_force_reset_fail =
-    CMP_FALSE;
+static CMPBool g_cmp_gesture_test_force_reset_fail = CMP_FALSE;
 static CMPBool g_cmp_gesture_test_force_velocity_error = CMP_FALSE;
 static CMPBool g_cmp_gesture_test_force_distance_error = CMP_FALSE;
 static CMPBool g_cmp_gesture_test_force_config_init_fail = CMP_FALSE;

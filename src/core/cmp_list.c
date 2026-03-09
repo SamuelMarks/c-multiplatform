@@ -23,11 +23,9 @@
 #define CMP_LIST_TEST_FAIL_GRID_ITEM_BOUNDS 16u
 #define CMP_LIST_TEST_FAIL_GRID_RENDER_BOUNDS 17u
 #define CMP_LIST_TEST_FAIL_LIST_MEASURE_CONTENT_NEGATIVE 18u
-#define CMP_LIST_TEST_FAIL_GRID_MEASURE_CONTENT_NEGATIVE \
-  19u                                                   
+#define CMP_LIST_TEST_FAIL_GRID_MEASURE_CONTENT_NEGATIVE 19u
 
-static cmp_u32 g_cmp_list_test_fail_point =
-    CMP_LIST_TEST_FAIL_NONE;
+static cmp_u32 g_cmp_list_test_fail_point = CMP_LIST_TEST_FAIL_NONE;
 
 static CMPBool cmp_list_test_fail_point_match(cmp_u32 point) {
   if (g_cmp_list_test_fail_point != point) {
@@ -794,8 +792,7 @@ static int cmp_list_reserve_slots(CMPListSlot **slots,
 }
 
 static int cmp_list_widget_measure(void *widget, CMPMeasureSpec width,
-                                   CMPMeasureSpec height,
-                                   CMPSize *out_size) {
+                                   CMPMeasureSpec height, CMPSize *out_size) {
   CMPListView *view = NULL;
   CMPScalar content_width = 0.0f;
   CMPScalar content_height = 0.0f;
@@ -914,7 +911,7 @@ static int cmp_list_widget_event(void *widget, const CMPInputEvent *event,
                                  CMPBool *out_handled) {
   CMPListView *view = NULL;
   CMPScalar delta;
-  int rc;         
+  int rc;
 
   if (widget == NULL || event == NULL || out_handled == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -950,8 +947,8 @@ static int cmp_list_widget_event(void *widget, const CMPInputEvent *event,
   return CMP_OK;
 }
 
-static int cmp_list_widget_get_semantics(
-    void *widget, CMPSemantics *out_semantics) {
+static int cmp_list_widget_get_semantics(void *widget,
+                                         CMPSemantics *out_semantics) {
   CMPListView *view = NULL;
 
   if (widget == NULL || out_semantics == NULL) {
@@ -1016,13 +1013,10 @@ static int cmp_list_widget_destroy(void *widget) {
   return rc;
 }
 
-static const CMPWidgetVTable g_cmp_list_widget_vtable =
-    {cmp_list_widget_measure,
-     cmp_list_widget_layout,
-     cmp_list_widget_paint,
-     cmp_list_widget_event,
-     cmp_list_widget_get_semantics,
-     cmp_list_widget_destroy};
+static const CMPWidgetVTable g_cmp_list_widget_vtable = {
+    cmp_list_widget_measure,       cmp_list_widget_layout,
+    cmp_list_widget_paint,         cmp_list_widget_event,
+    cmp_list_widget_get_semantics, cmp_list_widget_destroy};
 
 static int cmp_grid_widget_measure(void *widget, CMPMeasureSpec width,
                                    CMPMeasureSpec height, CMPSize *out_size) {
@@ -1099,7 +1093,7 @@ static int cmp_grid_widget_measure(void *widget, CMPMeasureSpec width,
 
 static int cmp_grid_widget_layout(void *widget, CMPRect bounds) {
   CMPGridView *view;
-  int rc;           
+  int rc;
 
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1184,8 +1178,8 @@ static int cmp_grid_widget_event(void *widget, const CMPInputEvent *event,
   return CMP_OK;
 }
 
-static int
-cmp_grid_widget_get_semantics(void *widget, CMPSemantics *out_semantics) {
+static int cmp_grid_widget_get_semantics(void *widget,
+                                         CMPSemantics *out_semantics) {
   CMPGridView *view;
 
   if (widget == NULL || out_semantics == NULL) {

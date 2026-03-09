@@ -1,70 +1,63 @@
 # Skills for LibCMPC Development
 
-## Widget Development
-### Create a New Widget
-Create a new UI component adhering to the strict C89 LibCMPC widget lifecycle.
-1.  **Header (`include/cmpc/`, `include/m3/`, `include/cupertino/`, or `include/f2/`)**:
-    *   Define the `Style` struct representing the component's visual properties.
-    *   Define the `Widget` struct. The very first member MUST be `CMPWidget widget;` to allow struct casting.
-    *   Declare `_<system>_<widget>_style_init`, `_init`, setters, and API functions.
-2.  **Source (`src/core/`, `src/m3/`, `src/cupertino/`, or `src/f2/`)**:
-    *   Implement static V-Table functions: `measure`, `layout`, `paint`, `event`, `semantics`, and `destroy`.
-    *   Implement `_init`: Assign `widget.vtable`, initialize the style, helpers (animators/scroll), and internal state.
-    *   **Constraint**: All variable declarations MUST be at the very top of their respective block/function scope (Strict C89). Use `/* */` for comments.
+## 1. Core Principles & Strict C89 Constraints
+When executing tasks in this repository, always strictly adhere to these C89 constraints:
+*   **Variable Declarations**: All variables MUST be declared at the very beginning of their enclosing block scope. 
+*   **Comments**: Use `/* ... */` for comments. Never use C99-style `//` comments.
+*   **Dependencies**: Rely only on standard ANSI C libraries. Do not include external dependencies in the core framework.
+*   **Error Handling**: Return `int` status codes (`CMP_OK` for success, or specific `CMP_ERR_*` values like `CMP_ERR_UNSUPPORTED`).
+*   **Allocators**: Rely on the injected `CMPAllocator` contexts. Avoid hidden global state and ensure leak-free handling.
 
-### Implement Layout Logic
-Implement the `measure` and `layout` V-Table functions for a widget.
-*   **Measure**: Calculate the desired `CMPSize` based on `CMPMeasureSpec` constraints (Unspecified, Exactly, AtMost). Be graceful and compute intrinsic bounds if specs are `CMP_MEASURE_UNSPECIFIED`.
-*   **Layout**: Accept new `CMPRect bounds` from the parent. Update internal geometry (e.g., child positions, text metrics) based on these exact bounds.
+## 2. Widget Creation Lifecycle
+Create a new UI component adhering to the strictly decoupled C89 LibCMPC widget lifecycle.
 
-### Implement Paint Logic
-Implement the `paint` V-Table function to emit rendering commands.
-*   Use `ctx->gfx` to draw primitives (rects, paths, textures).
-*   Use `ctx->gfx->text_vtable` for text rendering.
-*   Respect `ctx->clip`. Push/Pop clips if drawing outside bounds is possible.
-*   Check for backend capabilities gracefully (e.g., `if (ctx->gfx->draw_path == NULL) return CMP_ERR_UNSUPPORTED;`).
+### A. Header Definition (`include/{cmpc,m3,cupertino,f2}/`)
+*   **Style Struct**: Define `CMP<System><Widget>Style` representing visual properties (colors, typography, radii).
+*   **Widget Struct**: Define the struct. **Crucial Rule**: The very first member MUST be `CMPWidget widget;` to allow safe generic struct casting.
+*   **API Signatures**: Declare initialization functions (`_init`, `_style_init`), setters, and specific API interactions.
 
-### Implement Semantics (Accessibility)
-Implement the `semantics` V-Table function to populate `CMPSemantics`.
-*   Map widget state to accessibility roles (button, slider, text field).
-*   Provide ARIA-like labels, values, and traits for screen readers.
+### B. Source Implementation (`src/{core,m3,cupertino,f2}/`)
+*   **V-Table Setup**: Implement static functions for `measure`, `layout`, `paint`, `event`, `semantics`, and `destroy`.
+*   **Measure**: Calculate `CMPSize` based on `CMPMeasureSpec` constraints (Unspecified, Exactly, AtMost).
+*   **Layout**: Accept final `CMPRect bounds` from the parent to update internal node geometry and text metrics.
+*   **Paint**: 
+    *   Use `ctx->gfx` for drawing primitives.
+    *   Push/Pop clips (`ctx->clip`) if drawing outside bounds is possible.
+    *   Check capabilities gracefully (e.g., `if (!ctx->gfx->draw_path) return CMP_ERR_UNSUPPORTED;`).
+*   **Event**: Handle `CMPInputEvent` interactions (hover, press, focus) and drive internal `cmp_anim` animators.
+*   **Semantics**: Populate `CMPSemantics` mapping to accessibility roles for screen readers (VoiceOver, UIA).
 
-## Backend Implementation
-Backends reside in `src/backend/<platform>/`. If a feature is unavailable on the target OS, return `CMP_ERR_UNSUPPORTED`.
+## 3. Design System Fidelity
+When modifying or adding widgets, adhere to the specific requirements of the target design system:
 
-### Implement Graphics Interface (`CMPGfx`)
-Map LibCMPC rendering commands to native graphics APIs (GDI, Cairo, CoreGraphics, WebGL).
-*   Translate `CMPRect`, `CMPColor`, `CMPPoint` to platform native types.
-*   LibCMPC uses a top-left origin coordinate system; apply transforms if the native API differs.
+### Material Design 3 (`m3`)
+*   **Color & Theming**: Leverage `m3_color.h` HCT (Hue, Chroma, Tone) science for tonal palettes and dynamic colors.
+*   **Layouts**: Support Canonical Layouts and Adaptive Window classes where applicable.
+*   **Motion**: Use the `m3_motion.h` predefined easing curves (Emphasized, Standard) and integrate predictive back.
 
-### Implement Window System (`CMPWS`)
-Handle OS-level windowing and input.
-*   Manage window creation, destruction, DPI scaling, and resize events.
-*   Translate platform events (Win32 messages, NSEvents, SDL_Events) into `CMPInputEvent` structs and dispatch them.
-*   Handle Predictive Back gestures for edge-swipe navigation (`cmp_predictive`).
+### Apple Cupertino (`cupertino`)
+*   **Geometry**: Use Apple's continuous curves (`kCACornerCurveContinuous` / squircles) over standard circular arcs.
+*   **Motion**: Ensure interactions feel native by using interruptible spring physics (`cmp_spring_init`).
+*   **Materials**: Emulate iOS/macOS vibrancy and background blurs, mapping them structurally so backends like macOS can hook into `NSVisualEffectView`.
+*   **Accessibility**: Heavily map traits to dynamic type sizing and VoiceOver interactions.
 
-### Implement Environment (`CMPEnv`)
-Handle OS-level capabilities and I/O.
-*   Implement `CMPTasks` for the main event loop and background threads.
-*   Map native APIs for storage, camera, network, and clipboard.
-*   Integrate native image, audio, and video decoders where applicable.
+### Microsoft Fluent 2 (`f2`)
+*   **Materials**: Integrate with Mica and Acrylic backdrops, mapping deeply to Windows Win32 backends (`DWMWA_SYSTEMBACKDROP_TYPE`).
+*   **Elevation**: Follow standard Fluent 2 shadow ramps (Levels 2, 4, 8, 16, 64) and 1px structural borders.
+*   **Typography**: Utilize the Fluent specific scale mapped optimally to `Segoe UI Variable`.
 
-## Design Systems
-### Add a Design System Component
-Port a component from Material 3 (`m3`), Apple Cupertino (`cupertino`), or Microsoft Fluent 2 (`f2`).
-*   Create a dedicated style struct strictly matching the system's design tokens (e.g., `container_color`, `tonal_elevation`, `typography`).
-*   Implement interaction state (pressed, hovered, focused, disabled) update logic in the `event` handler, driving internal animators.
-*   Keep logic completely platform-agnostic.
+## 4. Backend Implementations (`src/backend/<platform>/`)
+Backends implement the ABI V-Tables. If an OS feature is missing, return `CMP_ERR_UNSUPPORTED` rather than failing.
+*   **Graphics Interface (`CMPGfx`)**: Map rendering commands to native APIs (GDI, Cairo, CoreGraphics, WebGL). Ensure top-left origin coordinates.
+*   **Window System (`CMPWS`)**: Manage windowing, DPI scales, input event translation to `CMPInputEvent`, and predictive back edge-swipes.
+*   **Environment (`CMPEnv`)**: Implement main event loops (`CMPTasks`) and map native OS capabilities (storage, camera, network, clipboard).
 
-## Visual Documentation & Tooling
-### Add to Visual Documentation (`cmp_docgen`)
-Update the headless vector documentation generator in `tools/docgen/`.
-*   When a new widget is created, write a render test in `tools/docgen/` that initializes the widget and pumps mock events (e.g., hover, press).
-*   `cmp_docgen` uses a Null/Mock `CMPGfx` V-Table to intercept drawing commands and output pure SVG strings.
+## 5. Visual Documentation (`cmp_docgen`)
+*   LibCMPC uses a headless vector renderer for documentation. It mocks the `CMPGfx` V-Table to intercept drawing commands and output pure SVG strings.
+*   When a new widget is created, **always write a render test in `tools/docgen/`** that initializes the widget and pumps mock events (e.g., hover, press) to generate the visual documentation.
 
-## Testing & Quality
-### Write Phase Tests
-Create a test executable in `tests/phaseX/` to validate specific logic modules.
+## 6. Testing & Quality (`tests/phaseX/`)
+*   Create test executables for each specific logic module phase.
 *   Use `#ifdef CMP_TESTING` hooks to inject error states (e.g., specific `malloc` failures, backend stub failures).
 *   Verify memory leak freedom by checking custom `CMPAllocator` stats if available.
-*   Validate behavior strictly against the `cmp_api_*` contract, not the implementation details.
+*   Validate behavioral correctness strictly against the `cmp_api_*` contract, not the implementation details.

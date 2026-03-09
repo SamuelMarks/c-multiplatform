@@ -35,10 +35,16 @@ static int test_draw_text(void *text, CMPHandle font, const char *utf8,
   return CMP_OK;
 }
 
-static int mock_measure(void *w, CMPMeasureSpec x, CMPMeasureSpec y, CMPSize *sz) { return CMP_OK; }
+static int mock_measure(void *w, CMPMeasureSpec x, CMPMeasureSpec y,
+                        CMPSize *sz) {
+  return CMP_OK;
+}
 static int mock_layout(void *w, CMPRect bounds) { return CMP_OK; }
 static int mock_paint(void *w, CMPPaintContext *ctx) { return CMP_OK; }
-static int mock_event(void *w, const CMPInputEvent *e, CMPBool *h) { *h = CMP_TRUE; return CMP_OK; }
+static int mock_event(void *w, const CMPInputEvent *e, CMPBool *h) {
+  *h = CMP_TRUE;
+  return CMP_OK;
+}
 
 static const CMPTextVTable mock_vtable = {test_create_font,
                                           test_destroy_font,
@@ -48,7 +54,8 @@ static const CMPTextVTable mock_vtable = {test_create_font,
                                           NULL,
                                           NULL};
 
-static int mock_draw_rect(void *ctx, const CMPRect *rect, CMPColor color, CMPScalar radius) {
+static int mock_draw_rect(void *ctx, const CMPRect *rect, CMPColor color,
+                          CMPScalar radius) {
   return CMP_OK;
 }
 
@@ -60,8 +67,7 @@ int main(void) {
   int called = 0;
 
   static const CMPWidgetVTable mock_widget_vtable = {
-      mock_measure, mock_layout, mock_paint, mock_event, NULL, NULL
-  };
+      mock_measure, mock_layout, mock_paint, mock_event, NULL, NULL};
   CMPWidget mock_widget = {0};
   mock_widget.vtable = &mock_widget_vtable;
 
@@ -86,10 +92,9 @@ int main(void) {
 
   CMP_TEST_EXPECT(m3_search_bar_set_icons(NULL, NULL, NULL),
                   CMP_ERR_INVALID_ARGUMENT);
-  
+
   static const CMPWidgetVTable mock_icon_vtable = {
-      mock_measure, mock_layout, mock_paint, mock_event, NULL, NULL
-  };
+      mock_measure, mock_layout, mock_paint, mock_event, NULL, NULL};
   static CMPWidget leading;
   static CMPWidget trailing;
   memset(&leading, 0, sizeof(leading));
@@ -133,8 +138,7 @@ int main(void) {
     CMPPaintContext ctx = {0};
 
     static const CMPGfxVTable mock_gfx_vtable = {
-        NULL, NULL, NULL, mock_draw_rect, NULL, NULL, NULL, NULL
-    };
+        NULL, NULL, NULL, mock_draw_rect, NULL, NULL, NULL, NULL};
     CMPGfx mock_gfx = {0};
 
     mock_gfx.vtable = &mock_gfx_vtable;
@@ -186,11 +190,14 @@ int main(void) {
     CMPMeasureSpec m100 = {1, 300.0f};
     CMPPaintContext pctx = {0};
 
-    CMP_TEST_EXPECT(m3_search_view_init(NULL, &bar.widget, NULL), CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(m3_search_view_init(&view, NULL, NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_search_view_init(NULL, &bar.widget, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_search_view_init(&view, NULL, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(m3_search_view_init(&view, &bar.widget, &bar.widget));
 
-    CMP_TEST_EXPECT(m3_search_view_set_active(NULL, CMP_TRUE, CMP_FALSE), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(m3_search_view_set_active(NULL, CMP_TRUE, CMP_FALSE),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(m3_search_view_set_active(&view, CMP_TRUE, CMP_FALSE));
     CMP_TEST_OK(m3_search_view_set_active(&view, CMP_FALSE, CMP_TRUE));
     CMP_TEST_OK(m3_search_view_set_active(&view, CMP_TRUE, CMP_TRUE));
@@ -229,7 +236,8 @@ int main(void) {
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(view.widget.vtable->get_semantics(&view, &semantics));
 
-    CMP_TEST_EXPECT(view.widget.vtable->destroy(NULL), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(view.widget.vtable->destroy(NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(view.widget.vtable->destroy(&view));
   }
 

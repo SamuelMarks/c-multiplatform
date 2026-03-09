@@ -212,19 +212,25 @@ static int test_card_helpers(void) {
 
   CMP_TEST_EXPECT(m3_card_test_validate_color((const CMPColor *)null_color),
                   CMP_ERR_INVALID_ARGUMENT);
-  color.r = -0.1f; color.g = 0.0f; color.b = 0.0f; color.a = 0.0f;
+  color.r = -0.1f;
+  color.g = 0.0f;
+  color.b = 0.0f;
+  color.a = 0.0f;
   CMP_TEST_EXPECT(m3_card_test_validate_color(&color), CMP_ERR_RANGE);
   color.r = 1.1f;
   CMP_TEST_EXPECT(m3_card_test_validate_color(&color), CMP_ERR_RANGE);
-  color.r = 0.0f; color.g = -0.1f;
+  color.r = 0.0f;
+  color.g = -0.1f;
   CMP_TEST_EXPECT(m3_card_test_validate_color(&color), CMP_ERR_RANGE);
   color.g = 1.2f;
   CMP_TEST_EXPECT(m3_card_test_validate_color(&color), CMP_ERR_RANGE);
-  color.g = 0.0f; color.b = -0.1f;
+  color.g = 0.0f;
+  color.b = -0.1f;
   CMP_TEST_EXPECT(m3_card_test_validate_color(&color), CMP_ERR_RANGE);
   color.b = 1.2f;
   CMP_TEST_EXPECT(m3_card_test_validate_color(&color), CMP_ERR_RANGE);
-  color.b = 0.0f; color.a = -0.1f;
+  color.b = 0.0f;
+  color.a = -0.1f;
   CMP_TEST_EXPECT(m3_card_test_validate_color(&color), CMP_ERR_RANGE);
   color.a = 1.2f;
   CMP_TEST_EXPECT(m3_card_test_validate_color(&color), CMP_ERR_RANGE);
@@ -474,10 +480,12 @@ static int test_card_helpers(void) {
       CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(m3_card_test_resolve_colors(&card, NULL, &outline, &ripple),
                   CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_card_test_resolve_colors(&card, &background, NULL, &ripple),
-                  CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_card_test_resolve_colors(&card, &background, &outline, NULL),
-                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      m3_card_test_resolve_colors(&card, &background, NULL, &ripple),
+      CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(
+      m3_card_test_resolve_colors(&card, &background, &outline, NULL),
+      CMP_ERR_INVALID_ARGUMENT);
 
   card.style.background_color.r = -1.0f;
   CMP_TEST_EXPECT(
@@ -952,7 +960,8 @@ int main(void) {
 
   /* cmp_ripple_release fails with CMP_ERR_STATE, it should return CMP_OK */
   card.pressed = CMP_TRUE;
-  card.ripple.state = 99; /* bad state to trigger CMP_ERR_STATE from ripple_release */
+  card.ripple.state =
+      99; /* bad state to trigger CMP_ERR_STATE from ripple_release */
   CMP_TEST_OK(card.widget.vtable->event(card.widget.ctx, &event, &handled));
   card.ripple.state = CMP_RIPPLE_STATE_IDLE;
 

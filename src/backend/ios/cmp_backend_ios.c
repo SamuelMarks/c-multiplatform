@@ -81,7 +81,6 @@ int CMP_CALL cmp_ios_backend_config_init(CMPIOSBackendConfig *config) {
   return CMP_OK;
 }
 
-
 #if defined(CMP_IOS_AVAILABLE)
 
 struct CMPIOSBackend {
@@ -320,7 +319,6 @@ int CMP_CALL cmp_ios_backend_predictive_back_cancel(
   }
   return cmp_predictive_back_cancel(backend->predictive_back, event);
 }
-
 
 #else
 

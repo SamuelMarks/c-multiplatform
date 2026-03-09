@@ -11,8 +11,8 @@ extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
-#include "f2/f2_text_field.h"
 #include "f2/f2_button.h"
+#include "f2/f2_text_field.h"
 
 /**
  * @brief Fluent 2 SpinButton style descriptor.
@@ -31,24 +31,26 @@ struct F2SpinButton;
  * @param value New value.
  * @return CMP_OK on success or a failure code.
  */
-typedef int(CMP_CALL *F2SpinButtonOnChange)(void *ctx, struct F2SpinButton *spin_button, CMPScalar value);
+typedef int(CMP_CALL *F2SpinButtonOnChange)(void *ctx,
+                                            struct F2SpinButton *spin_button,
+                                            CMPScalar value);
 
 /**
  * @brief Fluent 2 SpinButton widget.
  */
 typedef struct F2SpinButton {
-  CMPWidget widget;             /**< Widget interface. */
-  F2SpinButtonStyle style;      /**< Current style. */
-  F2TextField text_field;       /**< Internal text field widget. */
-  F2Button up_button;           /**< Internal up button. */
-  F2Button down_button;         /**< Internal down button. */
-  CMPRect bounds;               /**< Layout bounds. */
-  CMPScalar value;              /**< Current numeric value. */
-  CMPScalar min_value;          /**< Minimum numeric value. */
-  CMPScalar max_value;          /**< Maximum numeric value. */
-  CMPScalar step;               /**< Increment/decrement step. */
+  CMPWidget widget;               /**< Widget interface. */
+  F2SpinButtonStyle style;        /**< Current style. */
+  F2TextField text_field;         /**< Internal text field widget. */
+  F2Button up_button;             /**< Internal up button. */
+  F2Button down_button;           /**< Internal down button. */
+  CMPRect bounds;                 /**< Layout bounds. */
+  CMPScalar value;                /**< Current numeric value. */
+  CMPScalar min_value;            /**< Minimum numeric value. */
+  CMPScalar max_value;            /**< Maximum numeric value. */
+  CMPScalar step;                 /**< Increment/decrement step. */
   F2SpinButtonOnChange on_change; /**< Change callback. */
-  void *on_change_ctx;          /**< Callback context. */
+  void *on_change_ctx;            /**< Callback context. */
 } F2SpinButton;
 
 /**
@@ -83,7 +85,8 @@ CMP_API int CMP_CALL f2_spin_button_init(F2SpinButton *spin_button,
  * @param value New value.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_spin_button_set_value(F2SpinButton *spin_button, CMPScalar value);
+CMP_API int CMP_CALL f2_spin_button_set_value(F2SpinButton *spin_button,
+                                              CMPScalar value);
 
 /**
  * @brief Set the change callback.
@@ -92,7 +95,8 @@ CMP_API int CMP_CALL f2_spin_button_set_value(F2SpinButton *spin_button, CMPScal
  * @param ctx Context pointer.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_spin_button_set_on_change(F2SpinButton *spin_button, F2SpinButtonOnChange on_change, void *ctx);
+CMP_API int CMP_CALL f2_spin_button_set_on_change(
+    F2SpinButton *spin_button, F2SpinButtonOnChange on_change, void *ctx);
 
 /**
  * @brief Clean up the spin button.

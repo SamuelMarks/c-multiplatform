@@ -31,20 +31,21 @@ struct F2Slider;
  * @param value New value.
  * @return CMP_OK on success or a failure code.
  */
-typedef int(CMP_CALL *F2SliderOnChange)(void *ctx, struct F2Slider *slider, CMPScalar value);
+typedef int(CMP_CALL *F2SliderOnChange)(void *ctx, struct F2Slider *slider,
+                                        CMPScalar value);
 
 /**
  * @brief Fluent 2 Slider style descriptor.
  */
 typedef struct F2SliderStyle {
-  CMPBool is_rtl;             /**< Layout direction. */
-  CMPScalar track_height;     /**< Height of the slider track. */
-  CMPScalar thumb_radius;     /**< Thumb outer radius. */
-  CMPScalar thumb_inner_radius; /**< Thumb inner dot radius. */
-  CMPColor track_color;       /**< Unfilled track color. */
-  CMPColor active_track_color;/**< Filled track color. */
-  CMPColor thumb_color;       /**< Outer thumb color. */
-  CMPColor thumb_inner_color; /**< Inner thumb dot color. */
+  CMPBool is_rtl;                /**< Layout direction. */
+  CMPScalar track_height;        /**< Height of the slider track. */
+  CMPScalar thumb_radius;        /**< Thumb outer radius. */
+  CMPScalar thumb_inner_radius;  /**< Thumb inner dot radius. */
+  CMPColor track_color;          /**< Unfilled track color. */
+  CMPColor active_track_color;   /**< Filled track color. */
+  CMPColor thumb_color;          /**< Outer thumb color. */
+  CMPColor thumb_inner_color;    /**< Inner thumb dot color. */
   CMPColor disabled_track_color; /**< Disabled track color. */
   CMPColor disabled_thumb_color; /**< Disabled thumb color. */
 } F2SliderStyle;
@@ -53,18 +54,18 @@ typedef struct F2SliderStyle {
  * @brief Fluent 2 Slider widget instance.
  */
 typedef struct F2Slider {
-  CMPWidget widget;         /**< Widget interface. */
-  F2SliderStyle style;      /**< Current style. */
-  CMPRect bounds;           /**< Layout bounds. */
-  CMPScalar min_value;      /**< Minimum value. */
-  CMPScalar max_value;      /**< Maximum value. */
-  CMPScalar value;          /**< Current value. */
-  CMPScalar step;           /**< Step value (0 for continuous). */
-  CMPBool disabled;         /**< Disabled state. */
-  CMPBool hovered;          /**< Hover state. */
-  CMPBool pressed;          /**< Pressed state. */
+  CMPWidget widget;           /**< Widget interface. */
+  F2SliderStyle style;        /**< Current style. */
+  CMPRect bounds;             /**< Layout bounds. */
+  CMPScalar min_value;        /**< Minimum value. */
+  CMPScalar max_value;        /**< Maximum value. */
+  CMPScalar value;            /**< Current value. */
+  CMPScalar step;             /**< Step value (0 for continuous). */
+  CMPBool disabled;           /**< Disabled state. */
+  CMPBool hovered;            /**< Hover state. */
+  CMPBool pressed;            /**< Pressed state. */
   F2SliderOnChange on_change; /**< Change callback. */
-  void *on_change_ctx;      /**< Change callback context. */
+  void *on_change_ctx;        /**< Change callback context. */
 } F2Slider;
 
 /**
@@ -85,8 +86,7 @@ CMP_API int CMP_CALL f2_slider_style_init(F2SliderStyle *style);
  */
 CMP_API int CMP_CALL f2_slider_init(F2Slider *slider,
                                     const F2SliderStyle *style,
-                                    CMPScalar min_value,
-                                    CMPScalar max_value,
+                                    CMPScalar min_value, CMPScalar max_value,
                                     CMPScalar value);
 
 /**

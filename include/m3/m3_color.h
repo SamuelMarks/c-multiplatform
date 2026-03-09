@@ -36,29 +36,29 @@ typedef struct M3TonalPalette {
  * @brief Represents a full Material 3 color scheme.
  */
 typedef struct M3Scheme {
-  cmp_u32 primary;                 /**< Primary color. */
-  cmp_u32 on_primary;              /**< On-primary color. */
-  cmp_u32 primary_container;       /**< Primary container color. */
-  cmp_u32 on_primary_container;    /**< On-primary container color. */
-  cmp_u32 secondary;               /**< Secondary color. */
-  cmp_u32 on_secondary;            /**< On-secondary color. */
-  cmp_u32 secondary_container;     /**< Secondary container color. */
-  cmp_u32 on_secondary_container;  /**< On-secondary container color. */
-  cmp_u32 tertiary;                /**< Tertiary color. */
-  cmp_u32 on_tertiary;             /**< On-tertiary color. */
-  cmp_u32 tertiary_container;      /**< Tertiary container color. */
-  cmp_u32 on_tertiary_container;   /**< On-tertiary container color. */
-  cmp_u32 background;              /**< Background color. */
-  cmp_u32 on_background;           /**< On-background color. */
-  cmp_u32 surface;                 /**< Surface color. */
-  cmp_u32 on_surface;              /**< On-surface color. */
-  cmp_u32 surface_variant;         /**< Surface variant color. */
-  cmp_u32 on_surface_variant;      /**< On-surface variant color. */
-  cmp_u32 outline;                 /**< Outline color. */
-  cmp_u32 error;                   /**< Error color. */
-  cmp_u32 on_error;                /**< On-error color. */
-  cmp_u32 error_container;         /**< Error container color. */
-  cmp_u32 on_error_container;      /**< On-error container color. */
+  cmp_u32 primary;                /**< Primary color. */
+  cmp_u32 on_primary;             /**< On-primary color. */
+  cmp_u32 primary_container;      /**< Primary container color. */
+  cmp_u32 on_primary_container;   /**< On-primary container color. */
+  cmp_u32 secondary;              /**< Secondary color. */
+  cmp_u32 on_secondary;           /**< On-secondary color. */
+  cmp_u32 secondary_container;    /**< Secondary container color. */
+  cmp_u32 on_secondary_container; /**< On-secondary container color. */
+  cmp_u32 tertiary;               /**< Tertiary color. */
+  cmp_u32 on_tertiary;            /**< On-tertiary color. */
+  cmp_u32 tertiary_container;     /**< Tertiary container color. */
+  cmp_u32 on_tertiary_container;  /**< On-tertiary container color. */
+  cmp_u32 background;             /**< Background color. */
+  cmp_u32 on_background;          /**< On-background color. */
+  cmp_u32 surface;                /**< Surface color. */
+  cmp_u32 on_surface;             /**< On-surface color. */
+  cmp_u32 surface_variant;        /**< Surface variant color. */
+  cmp_u32 on_surface_variant;     /**< On-surface variant color. */
+  cmp_u32 outline;                /**< Outline color. */
+  cmp_u32 error;                  /**< Error color. */
+  cmp_u32 on_error;               /**< On-error color. */
+  cmp_u32 error_container;        /**< Error container color. */
+  cmp_u32 on_error_container;     /**< On-error container color. */
 } M3Scheme;
 
 /**
@@ -126,13 +126,13 @@ CMP_API int CMP_CALL m3_tonal_palette_tone_argb(const M3TonalPalette *palette,
 /**
  * @brief Dynamic color scheme variants (Material Design 3).
  */
-/** 
- * @brief Contrast level for dynamic color schemes. 
- */ 
-typedef enum M3ContrastLevel { 
-  M3_CONTRAST_STANDARD = 0, /**< Standard contrast (default). */ 
-  M3_CONTRAST_MEDIUM,       /**< Medium contrast. */ 
-  M3_CONTRAST_HIGH          /**< High contrast. */ 
+/**
+ * @brief Contrast level for dynamic color schemes.
+ */
+typedef enum M3ContrastLevel {
+  M3_CONTRAST_STANDARD = 0, /**< Standard contrast (default). */
+  M3_CONTRAST_MEDIUM,       /**< Medium contrast. */
+  M3_CONTRAST_HIGH          /**< High contrast. */
 } M3ContrastLevel;
 
 /** @brief Variant for scheme generation. */
@@ -176,19 +176,20 @@ CMP_API int CMP_CALL m3_scheme_generate_variant(cmp_u32 source_argb,
  */
 struct CMPWS;
 
-/** 
- * @brief Generate a dynamic color scheme with a specific variant and contrast level. 
- * @param source_argb Source color in ARGB. 
- * @param dark CMP_TRUE for dark scheme; CMP_FALSE for light scheme. 
- * @param variant The scheme variant to use. 
- * @param contrast The contrast level to apply. 
- * @param out_scheme Receives the generated scheme. 
- * @return CMP_OK on success or a failure code. 
+/**
+ * @brief Generate a dynamic color scheme with a specific variant and contrast
+ * level.
+ * @param source_argb Source color in ARGB.
+ * @param dark CMP_TRUE for dark scheme; CMP_FALSE for light scheme.
+ * @param variant The scheme variant to use.
+ * @param contrast The contrast level to apply.
+ * @param out_scheme Receives the generated scheme.
+ * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_scheme_generate_with_contrast(cmp_u32 source_argb, 
-                                                      CMPBool dark, 
-                                                      M3SchemeVariant variant, 
-                                                      M3ContrastLevel contrast, 
+CMP_API int CMP_CALL m3_scheme_generate_with_contrast(cmp_u32 source_argb,
+                                                      CMPBool dark,
+                                                      M3SchemeVariant variant,
+                                                      M3ContrastLevel contrast,
                                                       M3Scheme *out_scheme);
 
 /**

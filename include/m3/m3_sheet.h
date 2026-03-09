@@ -12,8 +12,8 @@ extern "C" {
 
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_layout.h"
-#include "m3/m3_adaptive.h"
 #include "cmpc/cmp_visuals.h"
+#include "m3/m3_adaptive.h"
 
 /** @brief Standard bottom sheet variant. */
 #define M3_SHEET_VARIANT_STANDARD 1
@@ -432,9 +432,10 @@ CMP_API int CMP_CALL m3_sheet_test_validate_style(const M3SheetStyle *style);
  * @param out_changed Parameter for testing.
  * @return Test result.
  */
-CMP_API int CMP_CALL m3_sheet_test_apply_offset(
-    M3Sheet *sheet, CMPScalar offset, CMPBool reset_velocity,
-    CMPBool *out_changed);
+CMP_API int CMP_CALL m3_sheet_test_apply_offset(M3Sheet *sheet,
+                                                CMPScalar offset,
+                                                CMPBool reset_velocity,
+                                                CMPBool *out_changed);
 
 /**
  * @brief Helper for test coverage.

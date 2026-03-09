@@ -3,7 +3,6 @@
 #include <string.h>
 #define STARTS_WITH(s, p) (strncmp(s, p, strlen(p)) == 0)
 
-
 #include "cmpc/cmp_datetime.h"
 #include "cmpc/cmp_utf8.h"
 
@@ -1243,7 +1242,8 @@ int CMP_CALL cmp_i18n_plural_category(const char *locale_tag, cmp_i32 number,
     } else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
       *out_category = CMP_I18N_PLURAL_FEW;
     } else {
-      /* 0, 5-9, 11-14 fall into many. 'other' is for fractions which we don't support here */
+      /* 0, 5-9, 11-14 fall into many. 'other' is for fractions which we don't
+       * support here */
       *out_category = CMP_I18N_PLURAL_MANY;
     }
   } else if (starts_with(locale_tag, "ar")) {
@@ -1673,10 +1673,9 @@ int CMP_CALL cmp_i18n_get(const CMPI18n *i18n, const char *utf8_key,
 }
 
 int CMP_CALL cmp_i18n_contains(const CMPI18n *i18n, const char *utf8_key,
-                               cmp_usize key_len,
-                               CMPBool *out_exists) {
-  cmp_usize index;                                   
-  CMPBool found;                                     
+                               cmp_usize key_len, CMPBool *out_exists) {
+  cmp_usize index;
+  CMPBool found;
   int rc;
 
   if (i18n == NULL || out_exists == NULL) {
@@ -1806,9 +1805,9 @@ int CMP_CALL cmp_i18n_load_table(CMPI18n *i18n, CMPIO *io,
   return rc;
 }
 
-int CMP_CALL cmp_i18n_load_table_buffer(
-    CMPI18n *i18n, const char *data, cmp_usize size, CMPBool clear_existing,
-    CMPBool overwrite) {
+int CMP_CALL cmp_i18n_load_table_buffer(CMPI18n *i18n, const char *data,
+                                        cmp_usize size, CMPBool clear_existing,
+                                        CMPBool overwrite) {
   if (i18n == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2053,11 +2052,9 @@ int CMP_CALL cmp_i18n_test_locale_preset_de_de(CMPI18nLocale *out_locale) {
   return cmp_i18n_locale_preset_de_de(out_locale);
 }
 
-int CMP_CALL cmp_i18n_test_parse_table(CMPI18n *i18n,
-                                       const char *data,
+int CMP_CALL cmp_i18n_test_parse_table(CMPI18n *i18n, const char *data,
                                        cmp_usize size, CMPBool clear_existing,
                                        CMPBool overwrite) {
-  return cmp_i18n_parse_table(i18n, data, size, clear_existing,
-                              overwrite);
+  return cmp_i18n_parse_table(i18n, data, size, clear_existing, overwrite);
 }
 #endif

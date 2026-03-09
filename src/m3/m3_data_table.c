@@ -19,7 +19,7 @@ int CMP_CALL m3_data_table_test_clear_fail_points(void) {
 }
 #endif
 
-CMP_API int CMP_CALL m3_data_table_init(M3DataTable* table) {
+CMP_API int CMP_CALL m3_data_table_init(M3DataTable *table) {
   if (table == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -44,7 +44,8 @@ CMP_API int CMP_CALL m3_data_table_init(M3DataTable* table) {
   return CMP_OK;
 }
 
-CMP_API int CMP_CALL m3_data_table_draw_headers(CMPPaintContext* ctx, const M3DataTable* table) {
+CMP_API int CMP_CALL m3_data_table_draw_headers(CMPPaintContext *ctx,
+                                                const M3DataTable *table) {
   if (ctx == NULL || table == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -53,17 +54,20 @@ CMP_API int CMP_CALL m3_data_table_draw_headers(CMPPaintContext* ctx, const M3Da
     return CMP_ERR_OUT_OF_MEMORY;
   }
 #endif
-  
+
   if (table->column_count == 0 || table->columns == NULL) {
     return CMP_OK; /* Nothing to draw */
   }
 
   /* Dummy drawing for headers */
-  
+
   return CMP_OK;
 }
 
-CMP_API int CMP_CALL m3_data_table_draw_row(CMPPaintContext* ctx, const M3DataTable* table, cmp_u32 row_index, const char** cells) {
+CMP_API int CMP_CALL m3_data_table_draw_row(CMPPaintContext *ctx,
+                                            const M3DataTable *table,
+                                            cmp_u32 row_index,
+                                            const char **cells) {
   if (ctx == NULL || table == NULL || cells == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -78,11 +82,11 @@ CMP_API int CMP_CALL m3_data_table_draw_row(CMPPaintContext* ctx, const M3DataTa
   }
 
   /* Dummy drawing for a row */
-  
+
   return CMP_OK;
 }
 
-CMP_API int CMP_CALL m3_data_table_cleanup(M3DataTable* table) {
+CMP_API int CMP_CALL m3_data_table_cleanup(M3DataTable *table) {
   if (table == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

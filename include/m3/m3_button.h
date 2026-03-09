@@ -79,11 +79,14 @@ typedef int(CMP_CALL *CMPButtonOnClick)(void *ctx, struct M3Button *button);
  */
 typedef struct M3ButtonStyle {
   cmp_u32 variant; /**< Button visual variant. */
-  CMPBool is_rtl;            /**< CMP_TRUE if layout should be right-to-left. */           /**< Button variant (CMP_BUTTON_VARIANT_*). */
-  CMPTextStyle text_style;   /**< Label text style. */
-  CMPColor background_color; /**< Fill color. */
-  CMPColor outline_color;    /**< Outline color. */
-  CMPColor ripple_color;     /**< Ripple overlay color. */
+  CMPBool is_rtl;
+      /**< CMP_TRUE if layout should be right-to-left. */ /**< Button variant
+                                                             (CMP_BUTTON_VARIANT_*).
+                                                           */
+  CMPTextStyle text_style;            /**< Label text style. */
+  CMPColor background_color;          /**< Fill color. */
+  CMPColor outline_color;             /**< Outline color. */
+  CMPColor ripple_color;              /**< Ripple overlay color. */
   CMPColor disabled_background_color; /**< Fill color when disabled. */
   CMPColor disabled_text_color;       /**< Text color when disabled. */
   CMPColor disabled_outline_color;    /**< Outline color when disabled. */
@@ -323,13 +326,14 @@ CMP_API int CMP_CALL m3_button_test_validate_measure_spec(CMPMeasureSpec spec);
  */
 CMP_API int CMP_CALL m3_button_test_validate_rect(const CMPRect *rect);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param backend Parameter for testing.
- * @return Test result.
- */
-m3_button_test_validate_backend(const CMPTextBackend *backend);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param backend Parameter for testing.
+     * @return Test result.
+     */
+    m3_button_test_validate_backend(const CMPTextBackend *backend);
 
 /**
  * @brief Helper for test coverage.

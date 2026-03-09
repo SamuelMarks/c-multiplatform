@@ -64,8 +64,10 @@ typedef struct CMPTextFieldStyle {
   CMPColor disabled_outline_color;   /**< Outline color when disabled. */
   CMPColor disabled_text_color;      /**< Text color when disabled. */
   CMPColor disabled_label_color;     /**< Label color when disabled. */
-  CMPColor placeholder_color; /**< Placeholder color. */
-  CMPBool is_rtl;                    /**< CMP_TRUE if text layout should be right-to-left. */        /**< Placeholder text color. */
+  CMPColor placeholder_color;        /**< Placeholder color. */
+  CMPBool is_rtl;
+      /**< CMP_TRUE if text layout should be right-to-left. */ /**< Placeholder
+                                                                  text color. */
   CMPColor disabled_placeholder_color; /**< Placeholder color when disabled. */
   CMPColor cursor_color;               /**< Cursor color. */
   CMPColor selection_color;            /**< Selection highlight color. */
@@ -317,29 +319,32 @@ CMP_API int CMP_CALL cmp_text_field_set_on_change(
  */
 CMP_API int CMP_CALL cmp_text_field_test_set_fail_point(cmp_u32 fail_point);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param call_count Parameter for testing.
- * @return Test result.
- */
-cmp_text_field_test_set_color_fail_after(cmp_u32 call_count);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param call_count Parameter for testing.
+     * @return Test result.
+     */
+    cmp_text_field_test_set_color_fail_after(cmp_u32 call_count);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param call_count Parameter for testing.
- * @return Test result.
- */
-cmp_text_field_test_set_overflow_fail_after(cmp_u32 call_count);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param call_count Parameter for testing.
+     * @return Test result.
+     */
+    cmp_text_field_test_set_overflow_fail_after(cmp_u32 call_count);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param call_count Parameter for testing.
- * @return Test result.
- */
-cmp_text_field_test_set_font_metrics_fail_after(cmp_u32 call_count);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param call_count Parameter for testing.
+     * @return Test result.
+     */
+    cmp_text_field_test_set_font_metrics_fail_after(cmp_u32 call_count);
 
 /**
  * @brief Helper for test coverage.
@@ -394,21 +399,23 @@ CMP_API int CMP_CALL cmp_text_field_test_validate_style(
     const CMPTextFieldStyle *style, CMPBool require_text_family,
     CMPBool require_label_family);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param backend Parameter for testing.
- * @return Test result.
- */
-cmp_text_field_test_validate_backend(const CMPTextBackend *backend);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param backend Parameter for testing.
+     * @return Test result.
+     */
+    cmp_text_field_test_validate_backend(const CMPTextBackend *backend);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param spec Parameter for testing.
- * @return Test result.
- */
-cmp_text_field_test_validate_measure_spec(CMPMeasureSpec spec);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param spec Parameter for testing.
+     * @return Test result.
+     */
+    cmp_text_field_test_validate_measure_spec(CMPMeasureSpec spec);
 
 /**
  * @brief Helper for test coverage.
@@ -489,37 +496,41 @@ CMP_API int CMP_CALL cmp_text_field_test_next_offset(const char *utf8,
                                                      cmp_usize offset,
                                                      cmp_usize *out_offset);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param field Parameter for testing.
- * @return Test result.
- */
-cmp_text_field_test_update_text_metrics(CMPTextField *field);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param field Parameter for testing.
+     * @return Test result.
+     */
+    cmp_text_field_test_update_text_metrics(CMPTextField *field);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param field Parameter for testing.
- * @return Test result.
- */
-cmp_text_field_test_update_label_metrics(CMPTextField *field);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param field Parameter for testing.
+     * @return Test result.
+     */
+    cmp_text_field_test_update_label_metrics(CMPTextField *field);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param field Parameter for testing.
- * @return Test result.
- */
-cmp_text_field_test_update_placeholder_metrics(CMPTextField *field);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param field Parameter for testing.
+     * @return Test result.
+     */
+    cmp_text_field_test_update_placeholder_metrics(CMPTextField *field);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param field Parameter for testing.
- * @return Test result.
- */
-cmp_text_field_test_update_font_metrics(CMPTextField *field);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param field Parameter for testing.
+     * @return Test result.
+     */
+    cmp_text_field_test_update_font_metrics(CMPTextField *field);
 
 /**
  * @brief Helper for test coverage.
@@ -528,13 +539,14 @@ cmp_text_field_test_update_font_metrics(CMPTextField *field);
  */
 CMP_API int CMP_CALL cmp_text_field_test_sync_label(CMPTextField *field);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param field Parameter for testing.
- * @return Test result.
- */
-cmp_text_field_test_reset_cursor_blink(CMPTextField *field);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param field Parameter for testing.
+     * @return Test result.
+     */
+    cmp_text_field_test_reset_cursor_blink(CMPTextField *field);
 
 /**
  * @brief Helper for test coverage.

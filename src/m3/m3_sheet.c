@@ -367,8 +367,7 @@ static int m3_sheet_update_hidden(M3Sheet *sheet) {
   if (sheet->offset >= height && height > 0.0f) {
     sheet->widget.flags |= CMP_WIDGET_FLAG_HIDDEN;
   } else if (height > 0.0f) {
-    sheet->widget.flags &=
-        (cmp_u32)~CMP_WIDGET_FLAG_HIDDEN;
+    sheet->widget.flags &= (cmp_u32)~CMP_WIDGET_FLAG_HIDDEN;
   }
 
   return CMP_OK;
@@ -377,7 +376,7 @@ static int m3_sheet_update_hidden(M3Sheet *sheet) {
 static int m3_sheet_start_animation(M3Sheet *sheet, CMPScalar target) {
   CMPScalar height;
   CMPScalar clamped;
-  int rc;           
+  int rc;
 
   if (sheet == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -497,9 +496,9 @@ int CMP_CALL m3_sheet_test_validate_style(const M3SheetStyle *style) {
   return m3_sheet_validate_style(style);
 }
 
-int CMP_CALL m3_sheet_test_apply_offset(
-    M3Sheet *sheet, CMPScalar offset, CMPBool reset_velocity,
-    CMPBool *out_changed) {
+int CMP_CALL m3_sheet_test_apply_offset(M3Sheet *sheet, CMPScalar offset,
+                                        CMPBool reset_velocity,
+                                        CMPBool *out_changed) {
   return m3_sheet_apply_offset(sheet, offset, reset_velocity, out_changed);
 }
 
@@ -645,7 +644,7 @@ static int m3_sheet_widget_measure(void *widget, CMPMeasureSpec width,
   } else if (width.mode == CMP_MEASURE_AT_MOST) {
     if (desired_width > 0.0f && desired_width < width.size) {
       out_size->width = desired_width;
-    } else {                          
+    } else {
       out_size->width = width.size;
     }
   } else {
@@ -831,7 +830,7 @@ static int m3_sheet_widget_event(void *widget, const CMPInputEvent *event,
       *out_handled = CMP_TRUE;
     }
     return CMP_OK;
-  case CMP_INPUT_POINTER_UP:  
+  case CMP_INPUT_POINTER_UP:
   case CMP_INPUT_POINTER_MOVE:
   case CMP_INPUT_POINTER_SCROLL:
     if (sheet->style.scrim_enabled == CMP_TRUE) {
@@ -930,14 +929,14 @@ static int m3_sheet_widget_event(void *widget, const CMPInputEvent *event,
     }
     *out_handled = CMP_TRUE;
     return CMP_OK;
-  default:        
+  default:
     return CMP_OK;
   }
 }
 
-static int m3_sheet_widget_get_semantics(
-    void *widget, CMPSemantics *out_semantics) {
-  M3Sheet *sheet;                               
+static int m3_sheet_widget_get_semantics(void *widget,
+                                         CMPSemantics *out_semantics) {
+  M3Sheet *sheet;
 
   if (widget == NULL || out_semantics == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1137,9 +1136,9 @@ int CMP_CALL m3_sheet_set_open(M3Sheet *sheet, CMPBool open) {
   if (sheet->sheet_bounds.height <= 0.0f ||
       sheet->offset >= sheet->sheet_bounds.height) {
     sheet->widget.flags |= CMP_WIDGET_FLAG_HIDDEN;
-    rc = cmp_anim_controller_stop(&sheet->anim);  
-    if (rc != CMP_OK) {                           
-      return rc;                                  
+    rc = cmp_anim_controller_stop(&sheet->anim);
+    if (rc != CMP_OK) {
+      return rc;
     }
     return CMP_OK;
   }
@@ -1211,8 +1210,8 @@ int CMP_CALL m3_sheet_step(M3Sheet *sheet, CMPScalar dt, CMPBool *out_changed) {
 
   if (finished == CMP_TRUE) {
     rc = m3_sheet_update_hidden(sheet);
-    if (rc != CMP_OK) {                
-      return rc;                       
+    if (rc != CMP_OK) {
+      return rc;
     }
   }
 

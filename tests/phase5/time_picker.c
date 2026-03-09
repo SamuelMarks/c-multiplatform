@@ -419,11 +419,11 @@ static int test_helpers(void) {
   CMP_TEST_OK(m3_time_picker_test_set_force_dial_size_zero(CMP_TRUE));
   CMP_TEST_OK(m3_time_picker_test_compute_metrics(&picker, &metrics));
   CMP_TEST_ASSERT(metrics.outer_radius == 0.0f);
-  
+
   picker.bounds.width = 80.0f;
   picker.bounds.height = 100.0f;
   CMP_TEST_OK(m3_time_picker_test_compute_metrics(&picker, &metrics));
-  
+
   CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(NULL, &out_background,
                                                      &out_ring, &out_hand,
                                                      &out_selection),
@@ -431,14 +431,16 @@ static int test_helpers(void) {
   CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, NULL, &out_ring,
                                                      &out_hand, &out_selection),
                   CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background, NULL,
-                                                     &out_hand, &out_selection),
+  CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background,
+                                                     NULL, &out_hand,
+                                                     &out_selection),
                   CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background, &out_ring,
-                                                     NULL, &out_selection),
+  CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background,
+                                                     &out_ring, NULL,
+                                                     &out_selection),
                   CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(&picker, &out_background, &out_ring,
-                                                     &out_hand, NULL),
+  CMP_TEST_EXPECT(m3_time_picker_test_resolve_colors(
+                      &picker, &out_background, &out_ring, &out_hand, NULL),
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(m3_time_picker_test_resolve_colors(
       &picker, &out_background, &out_ring, &out_hand, &out_selection));
@@ -1211,7 +1213,7 @@ static int test_event_and_paint(void) {
   CMP_TEST_EXPECT(m3_time_picker_test_draw_circle(
                       NULL, 0.0f, 0.0f, 1.0f, picker.style.background_color),
                   CMP_ERR_UNSUPPORTED);
-  
+
   gfx.vtable = &g_test_vtable_no_rect;
   CMP_TEST_EXPECT(m3_time_picker_test_draw_circle(
                       &gfx, 0.0f, 0.0f, 1.0f, picker.style.background_color),

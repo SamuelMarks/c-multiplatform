@@ -142,6 +142,15 @@ CMP_API int CMP_CALL cmp_icon_draw_cstr(
 CMP_API int CMP_CALL cmp_icon_test_set_fail_point(cmp_u32 fail_point);
 
 /**
+ * @brief Set an icon test fail point with a countdown.
+ * @param fail_point Fail point identifier.
+ * @param countdown Number of hits before failing.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_icon_test_set_fail_point_countdown(cmp_u32 fail_point,
+                                                            cmp_u32 countdown);
+
+/**
  * @brief Clear icon test fail points.
  * @return CMP_OK on success or a failure code.
  */

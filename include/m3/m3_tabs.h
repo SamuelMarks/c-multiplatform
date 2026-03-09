@@ -470,13 +470,14 @@ CMP_API int CMP_CALL m3_tab_row_test_color_with_alpha(const CMPColor *base,
                                                       CMPScalar alpha,
                                                       CMPColor *out_color);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param edges Parameter for testing.
- * @return Test result.
- */
-m3_tab_row_test_validate_edges(const CMPLayoutEdges *edges);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param edges Parameter for testing.
+     * @return Test result.
+     */
+    m3_tab_row_test_validate_edges(const CMPLayoutEdges *edges);
 
 /**
  * @brief Helper for test coverage.
@@ -519,13 +520,14 @@ CMP_API int CMP_CALL m3_tab_row_test_validate_measure_spec(CMPMeasureSpec spec);
  */
 CMP_API int CMP_CALL m3_tab_row_test_validate_rect(const CMPRect *rect);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param backend Parameter for testing.
- * @return Test result.
- */
-m3_tab_row_test_validate_backend(const CMPTextBackend *backend);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param backend Parameter for testing.
+     * @return Test result.
+     */
+    m3_tab_row_test_validate_backend(const CMPTextBackend *backend);
 
 /**
  * @brief Helper for test coverage.
@@ -559,13 +561,14 @@ CMP_API int CMP_CALL m3_tab_row_test_fail_point_match_null(void);
  */
 CMP_API int CMP_CALL m3_tab_row_test_force_color_error(CMPBool enable);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param call_count Parameter for testing.
- * @return Test result.
- */
-m3_tab_row_test_set_fail_point_error_after(cmp_u32 call_count);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param call_count Parameter for testing.
+     * @return Test result.
+     */
+    m3_tab_row_test_set_fail_point_error_after(cmp_u32 call_count);
 
 /**
  * @brief Helper for test coverage.
@@ -618,13 +621,14 @@ CMP_API int CMP_CALL m3_tab_row_test_compute_layout(
     const M3TabRow *row, CMPScalar *out_content_width, CMPScalar *out_tab_width,
     CMPScalar *out_tab_height, cmp_u32 *out_mode);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param row Parameter for testing.
- * @return Test result.
- */
-m3_tab_row_test_compute_layout_null_out(const M3TabRow *row);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param row Parameter for testing.
+     * @return Test result.
+     */
+    m3_tab_row_test_compute_layout_null_out(const M3TabRow *row);
 
 /**
  * @brief Helper for test coverage.
@@ -655,14 +659,15 @@ CMP_API int CMP_CALL m3_tab_row_test_clamp_scroll_null_layout(M3TabRow *row);
 CMP_API int CMP_CALL m3_tab_row_test_indicator_target_null_layout(
     const M3TabRow *row, CMPScalar *out_pos, CMPScalar *out_width);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param row Parameter for testing.
- * @param animate Parameter for testing.
- * @return Test result.
- */
-m3_tab_row_test_sync_indicator_null_layout(M3TabRow *row, CMPBool animate);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param row Parameter for testing.
+     * @param animate Parameter for testing.
+     * @return Test result.
+     */
+    m3_tab_row_test_sync_indicator_null_layout(M3TabRow *row, CMPBool animate);
 
 /**
  * @brief Helper for test coverage.
@@ -718,13 +723,14 @@ CMP_API int CMP_CALL m3_segmented_test_color_with_alpha(const CMPColor *base,
                                                         CMPScalar alpha,
                                                         CMPColor *out_color);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param edges Parameter for testing.
- * @return Test result.
- */
-m3_segmented_test_validate_edges(const CMPLayoutEdges *edges);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param edges Parameter for testing.
+     * @return Test result.
+     */
+    m3_segmented_test_validate_edges(const CMPLayoutEdges *edges);
 
 /**
  * @brief Helper for test coverage.
@@ -744,22 +750,25 @@ CMP_API int CMP_CALL m3_segmented_test_validate_text_style(
 CMP_API int CMP_CALL m3_segmented_test_validate_style(
     const M3SegmentedStyle *style, CMPBool require_family);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param items Parameter for testing.
- * @param count Parameter for testing.
- * @return Test result.
- */
-m3_segmented_test_validate_items(const M3SegmentedItem *items, cmp_usize count);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param items Parameter for testing.
+     * @param count Parameter for testing.
+     * @return Test result.
+     */
+    m3_segmented_test_validate_items(const M3SegmentedItem *items,
+                                     cmp_usize count);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param spec Parameter for testing.
- * @return Test result.
- */
-m3_segmented_test_validate_measure_spec(CMPMeasureSpec spec);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param spec Parameter for testing.
+     * @return Test result.
+     */
+    m3_segmented_test_validate_measure_spec(CMPMeasureSpec spec);
 
 /**
  * @brief Helper for test coverage.
@@ -768,13 +777,14 @@ m3_segmented_test_validate_measure_spec(CMPMeasureSpec spec);
  */
 CMP_API int CMP_CALL m3_segmented_test_validate_rect(const CMPRect *rect);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param backend Parameter for testing.
- * @return Test result.
- */
-m3_segmented_test_validate_backend(const CMPTextBackend *backend);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param backend Parameter for testing.
+     * @return Test result.
+     */
+    m3_segmented_test_validate_backend(const CMPTextBackend *backend);
 
 /**
  * @brief Helper for test coverage.
@@ -792,16 +802,18 @@ CMP_API int CMP_CALL m3_segmented_test_validate_mode(cmp_u32 mode);
 CMP_API int CMP_CALL m3_segmented_test_validate_selected_states(
     const CMPBool *states, cmp_usize count);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param buttons Parameter for testing.
- * @param out_width Parameter for testing.
- * @param out_height Parameter for testing.
- * @return Test result.
- */
-m3_segmented_test_measure_content(const M3SegmentedButtons *buttons,
-                                  CMPScalar *out_width, CMPScalar *out_height);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param buttons Parameter for testing.
+     * @param out_width Parameter for testing.
+     * @param out_height Parameter for testing.
+     * @return Test result.
+     */
+    m3_segmented_test_measure_content(const M3SegmentedButtons *buttons,
+                                      CMPScalar *out_width,
+                                      CMPScalar *out_height);
 
 /**
  * @brief Helper for test coverage.
@@ -822,13 +834,14 @@ CMP_API int CMP_CALL m3_segmented_test_fail_point_match_null(void);
  */
 CMP_API int CMP_CALL m3_segmented_test_force_color_error(CMPBool enable);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param call_count Parameter for testing.
- * @return Test result.
- */
-m3_segmented_test_set_fail_point_error_after(cmp_u32 call_count);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param call_count Parameter for testing.
+     * @return Test result.
+     */
+    m3_segmented_test_set_fail_point_error_after(cmp_u32 call_count);
 
 /**
  * @brief Helper for test coverage.
@@ -856,13 +869,15 @@ CMP_API int CMP_CALL m3_segmented_test_compute_layout(
     CMPScalar *out_segment_width, CMPScalar *out_segment_height,
     CMPScalar *out_spacing);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param buttons Parameter for testing.
- * @return Test result.
- */
-m3_segmented_test_compute_layout_null_out(const M3SegmentedButtons *buttons);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param buttons Parameter for testing.
+     * @return Test result.
+     */
+    m3_segmented_test_compute_layout_null_out(
+        const M3SegmentedButtons *buttons);
 
 /**
  * @brief Helper for test coverage.

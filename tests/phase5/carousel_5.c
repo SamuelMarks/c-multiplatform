@@ -34,19 +34,18 @@ int main(void) {
   CMPWidget child;
   child.vtable = &mock_vtable;
   CMPWidget *items[] = {&child, &child, &child};
-  
+
   m3_carousel_style_init(&style);
   m3_carousel_init(&carousel, &style, items, 3);
-  
+
   CMPRect bounds = {0, 0, 300, 100};
   carousel.widget.vtable->layout(&carousel, bounds);
-  
-  
+
   int i;
   for (i = 0; i < 10; ++i) {
-      m3_carousel_add_item(&carousel, &child);
+    m3_carousel_add_item(&carousel, &child);
   }
-  
+
   carousel.widget.vtable->destroy(&carousel);
   return 0;
 }

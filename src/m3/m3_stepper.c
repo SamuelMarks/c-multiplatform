@@ -19,7 +19,7 @@ int CMP_CALL m3_stepper_test_clear_fail_points(void) {
 }
 #endif
 
-CMP_API int CMP_CALL m3_stepper_init(M3Stepper* stepper) {
+CMP_API int CMP_CALL m3_stepper_init(M3Stepper *stepper) {
   if (stepper == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -41,7 +41,8 @@ CMP_API int CMP_CALL m3_stepper_init(M3Stepper* stepper) {
   return CMP_OK;
 }
 
-CMP_API int CMP_CALL m3_stepper_draw(CMPPaintContext* ctx, const M3Stepper* stepper) {
+CMP_API int CMP_CALL m3_stepper_draw(CMPPaintContext *ctx,
+                                     const M3Stepper *stepper) {
   if (ctx == NULL || stepper == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -50,17 +51,17 @@ CMP_API int CMP_CALL m3_stepper_draw(CMPPaintContext* ctx, const M3Stepper* step
     return CMP_ERR_OUT_OF_MEMORY;
   }
 #endif
-  
+
   if (stepper->step_count == 0 || stepper->steps == NULL) {
     return CMP_OK; /* Nothing to draw */
   }
 
   /* Dummy drawing for a stepper */
-  
+
   return CMP_OK;
 }
 
-CMP_API int CMP_CALL m3_stepper_cleanup(M3Stepper* stepper) {
+CMP_API int CMP_CALL m3_stepper_cleanup(M3Stepper *stepper) {
   if (stepper == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

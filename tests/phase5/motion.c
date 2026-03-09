@@ -11,7 +11,9 @@ static int test_shared_axis(void) {
       CMP_ERR_INVALID_ARGUMENT)
     return 1;
 
-  if (m3_motion_shared_axis(999, CMP_TRUE, 0.5f, &enter, &exit) != CMP_ERR_INVALID_ARGUMENT) return 1;
+  if (m3_motion_shared_axis(999, CMP_TRUE, 0.5f, &enter, &exit) !=
+      CMP_ERR_INVALID_ARGUMENT)
+    return 1;
   m3_motion_shared_axis(M3_SHARED_AXIS_X, CMP_TRUE, 0.5f, &enter, &exit);
   if (enter.opacity <= 0.0f || exit.opacity >= 1.0f)
     return 1;
@@ -92,35 +94,43 @@ static int test_predictive_back(void) {
   CMPRect out = {0};
   CMPScalar radius = 0.0f, opacity = 0.0f;
 
-  if (m3_motion_predictive_back(NULL, start, &out, &radius, &opacity) != CMP_ERR_INVALID_ARGUMENT)
+  if (m3_motion_predictive_back(NULL, start, &out, &radius, &opacity) !=
+      CMP_ERR_INVALID_ARGUMENT)
     return 1;
-  if (m3_motion_predictive_back(&event, start, NULL, &radius, &opacity) != CMP_ERR_INVALID_ARGUMENT)
+  if (m3_motion_predictive_back(&event, start, NULL, &radius, &opacity) !=
+      CMP_ERR_INVALID_ARGUMENT)
     return 1;
-  if (m3_motion_predictive_back(&event, start, &out, NULL, &opacity) != CMP_ERR_INVALID_ARGUMENT)
+  if (m3_motion_predictive_back(&event, start, &out, NULL, &opacity) !=
+      CMP_ERR_INVALID_ARGUMENT)
     return 1;
-  if (m3_motion_predictive_back(&event, start, &out, &radius, NULL) != CMP_ERR_INVALID_ARGUMENT)
+  if (m3_motion_predictive_back(&event, start, &out, &radius, NULL) !=
+      CMP_ERR_INVALID_ARGUMENT)
     return 1;
 
   event.progress = 0.5f;
   event.edge = 1;
-  if (m3_motion_predictive_back(&event, start, &out, &radius, &opacity) != CMP_OK)
+  if (m3_motion_predictive_back(&event, start, &out, &radius, &opacity) !=
+      CMP_OK)
     return 1;
   if (out.width != 95.0f || radius != 8.0f || opacity != 1.0f)
     return 1;
 
   event.progress = 0.9f;
   event.edge = 2;
-  if (m3_motion_predictive_back(&event, start, &out, &radius, &opacity) != CMP_OK)
+  if (m3_motion_predictive_back(&event, start, &out, &radius, &opacity) !=
+      CMP_OK)
     return 1;
   if (opacity > 0.6f)
     return 1;
 
   event.progress = -0.5f;
-  if (m3_motion_predictive_back(&event, start, &out, &radius, &opacity) != CMP_OK)
+  if (m3_motion_predictive_back(&event, start, &out, &radius, &opacity) !=
+      CMP_OK)
     return 1;
 
   event.progress = 1.5f;
-  if (m3_motion_predictive_back(&event, start, &out, &radius, &opacity) != CMP_OK)
+  if (m3_motion_predictive_back(&event, start, &out, &radius, &opacity) !=
+      CMP_OK)
     return 1;
 
   return 0;

@@ -363,13 +363,14 @@ CMP_API int CMP_CALL
 cmp_extras_test_validate_badge_placement(const CMPBadgePlacement *placement);
 #endif
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param enable Parameter for testing.
- * @return Test result.
- */
-cmp_extras_test_set_tooltip_size_range_fail(CMPBool enable);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param enable Parameter for testing.
+     * @return Test result.
+     */
+    cmp_extras_test_set_tooltip_size_range_fail(CMPBool enable);
 /**
  * @brief Helper for test coverage.
  * @param enable Parameter for testing.
@@ -382,13 +383,14 @@ CMP_API int CMP_CALL cmp_extras_test_set_badge_size_range_fail(CMPBool enable);
  * @return Test result.
  */
 CMP_API int CMP_CALL cmp_extras_test_validate_size(const CMPSize *size);
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param metrics Parameter for testing.
- * @return Test result.
- */
-cmp_extras_test_validate_text_metrics(const CMPTextMetrics *metrics);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param metrics Parameter for testing.
+     * @return Test result.
+     */
+    cmp_extras_test_validate_text_metrics(const CMPTextMetrics *metrics);
 
 #ifdef __cplusplus
 } /* extern "C" */

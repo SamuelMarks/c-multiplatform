@@ -76,9 +76,8 @@ static int m3_selection_validate_measure_spec(CMPMeasureSpec spec) {
   return CMP_OK;
 }
 
-static int
-m3_selection_apply_measure(CMPScalar desired, CMPMeasureSpec spec,
-                           CMPScalar *out_size) {
+static int m3_selection_apply_measure(CMPScalar desired, CMPMeasureSpec spec,
+                                      CMPScalar *out_size) {
   int rc = CMP_OK;
 
   rc = m3_selection_validate_measure_spec(spec);
@@ -168,12 +167,11 @@ static int m3_radio_validate_style(const M3RadioStyle *style) {
   return CMP_OK;
 }
 
-static int m3_checkbox_resolve_colors(
-    const M3Checkbox *checkbox,     
-    M3SelectionColors *out_colors) {
+static int m3_checkbox_resolve_colors(const M3Checkbox *checkbox,
+                                      M3SelectionColors *out_colors) {
 #ifdef CMP_TESTING
   if (m3_selection_test_consume_fail(
-          M3_SELECTION_TEST_FAIL_CHECKBOX_RESOLVE_COLORS)) { /* GCOVR_EXCL_LINE */
+          M3_SELECTION_TEST_FAIL_CHECKBOX_RESOLVE_COLORS)) {
     return CMP_ERR_UNKNOWN;
   }
 #endif
@@ -193,10 +191,9 @@ static int m3_checkbox_resolve_colors(
   return CMP_OK;
 }
 
-static int
-m3_switch_resolve_colors(const M3Switch *widget,
-                         M3SwitchColors *out_colors) {
-#ifdef CMP_TESTING                                    
+static int m3_switch_resolve_colors(const M3Switch *widget,
+                                    M3SwitchColors *out_colors) {
+#ifdef CMP_TESTING
   if (m3_selection_test_consume_fail(
           M3_SELECTION_TEST_FAIL_SWITCH_RESOLVE_COLORS)) {
     return CMP_ERR_UNKNOWN;
@@ -218,8 +215,8 @@ m3_switch_resolve_colors(const M3Switch *widget,
   return CMP_OK;
 }
 
-static int
-cmp_radio_resolve_colors(const M3Radio *radio, M3SelectionColors *out_colors) {
+static int cmp_radio_resolve_colors(const M3Radio *radio,
+                                    M3SelectionColors *out_colors) {
 #ifdef CMP_TESTING
   if (m3_selection_test_consume_fail(
           M3_SELECTION_TEST_FAIL_RADIO_RESOLVE_COLORS)) {
@@ -738,14 +735,10 @@ static int m3_switch_widget_destroy(void *widget) {
   return CMP_OK;
 }
 
-static const CMPWidgetVTable g_m3_switch_widget_vtable =
-    {
-     m3_switch_widget_measure,
-     m3_switch_widget_layout,
-     m3_switch_widget_paint,
-     m3_switch_widget_event,
-     m3_switch_widget_get_semantics,
-     m3_switch_widget_destroy};
+static const CMPWidgetVTable g_m3_switch_widget_vtable = {
+    m3_switch_widget_measure,       m3_switch_widget_layout,
+    m3_switch_widget_paint,         m3_switch_widget_event,
+    m3_switch_widget_get_semantics, m3_switch_widget_destroy};
 
 static int m3_radio_widget_measure(void *widget, CMPMeasureSpec width,
                                    CMPMeasureSpec height, CMPSize *out_size) {
@@ -951,8 +944,8 @@ static int m3_radio_widget_event(void *widget, const CMPInputEvent *event,
   }
 }
 
-static int m3_radio_widget_get_semantics(
-    void *widget, CMPSemantics *out_semantics) {
+static int m3_radio_widget_get_semantics(void *widget,
+                                         CMPSemantics *out_semantics) {
   M3Radio *radio = NULL;
 
   if (widget == NULL || out_semantics == NULL) {
@@ -1005,14 +998,10 @@ static int m3_radio_widget_destroy(void *widget) {
   return CMP_OK;
 }
 
-static const CMPWidgetVTable g_m3_radio_widget_vtable =
-    {
-     m3_radio_widget_measure,
-     m3_radio_widget_layout,
-     m3_radio_widget_paint,
-     m3_radio_widget_event,
-     m3_radio_widget_get_semantics,
-     m3_radio_widget_destroy};
+static const CMPWidgetVTable g_m3_radio_widget_vtable = {
+    m3_radio_widget_measure,       m3_radio_widget_layout,
+    m3_radio_widget_paint,         m3_radio_widget_event,
+    m3_radio_widget_get_semantics, m3_radio_widget_destroy};
 
 int CMP_CALL m3_checkbox_style_init(M3CheckboxStyle *style) {
   if (style == NULL) {
@@ -1173,9 +1162,9 @@ int CMP_CALL m3_checkbox_set_label(M3Checkbox *checkbox, const char *utf8_label,
   return CMP_OK;
 }
 
-int CMP_CALL m3_checkbox_set_on_change(
-    M3Checkbox *checkbox, CMPCheckboxOnChange on_change,
-    void *ctx) {
+int CMP_CALL m3_checkbox_set_on_change(M3Checkbox *checkbox,
+                                       CMPCheckboxOnChange on_change,
+                                       void *ctx) {
   if (checkbox == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -1312,8 +1301,7 @@ int CMP_CALL m3_switch_set_label(M3Switch *widget, const char *utf8_label,
 }
 
 int CMP_CALL m3_switch_set_on_change(M3Switch *widget,
-                                     CMPSwitchOnChange on_change,
-                                     void *ctx) {
+                                     CMPSwitchOnChange on_change, void *ctx) {
   if (widget == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

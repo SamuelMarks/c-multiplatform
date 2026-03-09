@@ -15,33 +15,36 @@ extern "C" {
 
 /** @brief Cupertino/HIG typography text styles. */
 typedef enum CupertinoTypographyStyle {
-    CUPERTINO_TYPOGRAPHY_LARGE_TITLE = 0,
-    CUPERTINO_TYPOGRAPHY_TITLE_1,
-    CUPERTINO_TYPOGRAPHY_TITLE_2,
-    CUPERTINO_TYPOGRAPHY_TITLE_3,
-    CUPERTINO_TYPOGRAPHY_HEADLINE,
-    CUPERTINO_TYPOGRAPHY_BODY,
-    CUPERTINO_TYPOGRAPHY_CALLOUT,
-    CUPERTINO_TYPOGRAPHY_SUBHEADLINE,
-    CUPERTINO_TYPOGRAPHY_FOOTNOTE,
-    CUPERTINO_TYPOGRAPHY_CAPTION_1,
-    CUPERTINO_TYPOGRAPHY_CAPTION_2,
-    CUPERTINO_TYPOGRAPHY_STYLE_COUNT
+  CUPERTINO_TYPOGRAPHY_LARGE_TITLE = 0,
+  CUPERTINO_TYPOGRAPHY_TITLE_1,
+  CUPERTINO_TYPOGRAPHY_TITLE_2,
+  CUPERTINO_TYPOGRAPHY_TITLE_3,
+  CUPERTINO_TYPOGRAPHY_HEADLINE,
+  CUPERTINO_TYPOGRAPHY_BODY,
+  CUPERTINO_TYPOGRAPHY_CALLOUT,
+  CUPERTINO_TYPOGRAPHY_SUBHEADLINE,
+  CUPERTINO_TYPOGRAPHY_FOOTNOTE,
+  CUPERTINO_TYPOGRAPHY_CAPTION_1,
+  CUPERTINO_TYPOGRAPHY_CAPTION_2,
+  CUPERTINO_TYPOGRAPHY_STYLE_COUNT
 } CupertinoTypographyStyle;
 
 /**
  * @brief Cupertino typography scale holding styles for all text sizes.
  */
 typedef struct CupertinoTypographyScale {
-    CMPTextStyle styles[CUPERTINO_TYPOGRAPHY_STYLE_COUNT]; /**< Text styles by hierarchy. */
+  CMPTextStyle styles[CUPERTINO_TYPOGRAPHY_STYLE_COUNT]; /**< Text styles by
+                                                            hierarchy. */
 } CupertinoTypographyScale;
 
 /**
- * @brief Initialize a default Cupertino typography scale (San Francisco system font).
+ * @brief Initialize a default Cupertino typography scale (San Francisco system
+ * font).
  * @param scale Typography scale to initialize.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cupertino_typography_scale_init(CupertinoTypographyScale *scale);
+CMP_API int CMP_CALL
+cupertino_typography_scale_init(CupertinoTypographyScale *scale);
 
 /**
  * @brief Retrieve a specific text style from a typography scale.
@@ -50,9 +53,9 @@ CMP_API int CMP_CALL cupertino_typography_scale_init(CupertinoTypographyScale *s
  * @param out_style Pointer to receive the text style.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cupertino_typography_get_style(const CupertinoTypographyScale *scale,
-                                                    CupertinoTypographyStyle style_id,
-                                                    CMPTextStyle *out_style);
+CMP_API int CMP_CALL cupertino_typography_get_style(
+    const CupertinoTypographyScale *scale, CupertinoTypographyStyle style_id,
+    CMPTextStyle *out_style);
 
 /**
  * @brief Apply a uniform color to all styles in a scale.
@@ -60,7 +63,8 @@ CMP_API int CMP_CALL cupertino_typography_get_style(const CupertinoTypographySca
  * @param color The text color to apply.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cupertino_typography_scale_set_color(CupertinoTypographyScale *scale, CMPColor color);
+CMP_API int CMP_CALL cupertino_typography_scale_set_color(
+    CupertinoTypographyScale *scale, CMPColor color);
 
 #ifdef __cplusplus
 }

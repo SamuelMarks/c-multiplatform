@@ -18,10 +18,12 @@ static cmp_usize cmp_router_usize_max_value(void) {
 static int cmp_router_cstr_limit(cmp_usize *out_val) {
 #ifdef CMP_TESTING
   if (g_router_cstr_limit_override != 0) {
-    *out_val = g_router_cstr_limit_override; return 0;
+    *out_val = g_router_cstr_limit_override;
+    return 0;
   }
 #endif
-  *out_val = cmp_router_usize_max_value(); return 0;
+  *out_val = cmp_router_usize_max_value();
+  return 0;
 }
 
 static int cmp_router_cstrlen(const char *cstr, cmp_usize *out_len) {
@@ -421,7 +423,8 @@ static int cmp_route_match_len(const char *pattern, cmp_usize pattern_len,
     if (path_seg == NULL) {
       if (pat_seg_len == 1 && pat_seg[0] == '*') {
         rc = cmp_route_has_more_segments(pat_str, pat_len, p_idx, &has_more);
-        if (rc != CMP_OK) return rc;
+        if (rc != CMP_OK)
+          return rc;
         if (has_more == CMP_TRUE) {
           return CMP_ERR_INVALID_ARGUMENT;
         }
@@ -435,7 +438,8 @@ static int cmp_route_match_len(const char *pattern, cmp_usize pattern_len,
 
     if (pat_seg_len == 1 && pat_seg[0] == '*') {
       rc = cmp_route_has_more_segments(pat_str, pat_len, p_idx, &has_more);
-      if (rc != CMP_OK) return rc;
+      if (rc != CMP_OK)
+        return rc;
       if (has_more == CMP_TRUE) {
         return CMP_ERR_INVALID_ARGUMENT;
       }
@@ -501,18 +505,20 @@ static int cmp_route_validate_pattern(const char *pattern) {
 
   index = 0;
   for (;;) {
-  cmp_route_next_segment(pat_str, pat_len, &index, &seg, &seg_len);
-  if (seg == NULL) {
-    return CMP_OK;
-  }
-  if (seg_len == 1 && seg[0] == '*') {
-    rc = cmp_route_has_more_segments(pat_str, pat_len, index, &has_more);
-    if (rc != CMP_OK) return rc;
-    if (has_more == CMP_TRUE) {
-      return CMP_ERR_INVALID_ARGUMENT;
+    cmp_route_next_segment(pat_str, pat_len, &index, &seg, &seg_len);
+    if (seg == NULL) {
+      return CMP_OK;
     }
-    return CMP_OK;
-  }    if (seg_len > 0 && seg[0] == ':') {
+    if (seg_len == 1 && seg[0] == '*') {
+      rc = cmp_route_has_more_segments(pat_str, pat_len, index, &has_more);
+      if (rc != CMP_OK)
+        return rc;
+      if (has_more == CMP_TRUE) {
+        return CMP_ERR_INVALID_ARGUMENT;
+      }
+      return CMP_OK;
+    }
+    if (seg_len > 0 && seg[0] == ':') {
       if (seg_len == 1) {
         return CMP_ERR_INVALID_ARGUMENT;
       }
@@ -599,10 +605,9 @@ static int cmp_router_find_route(const CMPRouter *router, const char *path,
 }
 
 static int cmp_router_copy_path(CMPRouter *router, const char *path,
-                                cmp_usize path_len,
-                                char **out_copy) {
-  cmp_usize alloc_size;                           
-  void *mem;                                      
+                                cmp_usize path_len, char **out_copy) {
+  cmp_usize alloc_size;
+  void *mem;
   int rc;
 
   if (router == NULL || path == NULL || out_copy == NULL) {
@@ -1000,8 +1005,7 @@ int CMP_CALL cmp_router_test_has_more_segments(const char *str, cmp_usize len,
 int CMP_CALL cmp_router_test_match_len(
     const char *pattern, cmp_usize pattern_len, const char *path,
     cmp_usize path_len, CMPRouteParam *params, cmp_usize max_params,
-    cmp_usize *out_param_count,
-    CMPBool *out_match) {
+    cmp_usize *out_param_count, CMPBool *out_match) {
   return cmp_route_match_len(pattern, pattern_len, path, path_len, params,
                              max_params, out_param_count, out_match);
 }

@@ -11,8 +11,8 @@ extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
-#include "cmpc/cmp_path.h"
 #include "cmpc/cmp_layout.h"
+#include "cmpc/cmp_path.h"
 
 /**
  * @brief Appends a continuous corner curve (squircle) rectangle to a path.
@@ -29,11 +29,9 @@ extern "C" {
  * @param bl_radius Bottom-left corner radius.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cupertino_shape_append_squircle(CMPPath *path, CMPRect bounds,
-                                                     CMPScalar tl_radius,
-                                                     CMPScalar tr_radius,
-                                                     CMPScalar br_radius,
-                                                     CMPScalar bl_radius);
+CMP_API int CMP_CALL cupertino_shape_append_squircle(
+    CMPPath *path, CMPRect bounds, CMPScalar tl_radius, CMPScalar tr_radius,
+    CMPScalar br_radius, CMPScalar bl_radius);
 
 #ifdef __cplusplus
 }

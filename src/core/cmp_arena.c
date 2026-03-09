@@ -225,7 +225,8 @@ int CMP_CALL cmp_arena_alloc(CMPArena *arena, cmp_usize size,
   block = arena->current;
   rc = cmp_arena_align_offset(block->offset, alignment, &aligned_offset);
 #ifdef CMP_TESTING
-  if (g_cmp_arena_force_align_fail_count > 0 && --g_cmp_arena_force_align_fail_count == 0) {
+  if (g_cmp_arena_force_align_fail_count > 0 &&
+      --g_cmp_arena_force_align_fail_count == 0) {
     rc = CMP_ERR_OVERFLOW;
   }
 #endif
@@ -255,7 +256,8 @@ int CMP_CALL cmp_arena_alloc(CMPArena *arena, cmp_usize size,
     block = new_block;
     rc = cmp_arena_align_offset(block->offset, alignment, &aligned_offset);
 #ifdef CMP_TESTING
-    if (g_cmp_arena_force_align_fail_count > 0 && --g_cmp_arena_force_align_fail_count == 0) {
+    if (g_cmp_arena_force_align_fail_count > 0 &&
+        --g_cmp_arena_force_align_fail_count == 0) {
       rc = CMP_ERR_OVERFLOW;
     }
 #endif

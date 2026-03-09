@@ -946,6 +946,13 @@ if(BUILD_TESTING)
     target_link_libraries(cmp_phase3_text_field_28 PRIVATE cmpc)
     add_test(NAME cmp_phase3_text_field_28 COMMAND cmp_phase3_text_field_28)
 
+    add_executable(cmp_phase3_text_field_30 tests/phase3/text_field_30.c)
+    target_link_libraries(cmp_phase3_text_field_30 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_30 COMMAND cmp_phase3_text_field_30)
+
+    add_executable(cmp_phase3_text_field_31 tests/phase3/text_field_31.c)
+    target_link_libraries(cmp_phase3_text_field_31 PRIVATE cmpc)
+    add_test(NAME cmp_phase3_text_field_31 COMMAND cmp_phase3_text_field_31)
     add_executable(cmp_phase3_text_field_29 tests/phase3/text_field_29.c)
     target_link_libraries(cmp_phase3_text_field_29 PRIVATE cmpc)
     add_test(NAME cmp_phase3_text_field_29 COMMAND cmp_phase3_text_field_29)

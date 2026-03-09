@@ -32,7 +32,8 @@ struct F2Dialog;
  * @param action_id The action that was triggered.
  * @return CMP_OK on success or a failure code.
  */
-typedef int(CMP_CALL *F2DialogOnAction)(void *ctx, struct F2Dialog *dialog, cmp_u32 action_id);
+typedef int(CMP_CALL *F2DialogOnAction)(void *ctx, struct F2Dialog *dialog,
+                                        cmp_u32 action_id);
 
 /**
  * @brief Fluent 2 Dialog style descriptor.
@@ -53,14 +54,14 @@ typedef struct F2DialogStyle {
  * @brief Fluent 2 Dialog widget instance.
  */
 typedef struct F2Dialog {
-  CMPWidget widget;             /**< Widget interface. */
-  F2DialogStyle style;          /**< Current style. */
-  const char *utf8_title;       /**< Optional title text. */
-  const char *utf8_body;        /**< Optional body text. */
-  CMPRect bounds;               /**< Layout bounds. */
-  CMPBool is_open;              /**< True if currently open/visible. */
-  F2DialogOnAction on_action;   /**< Action callback. */
-  void *on_action_ctx;          /**< Action callback context. */
+  CMPWidget widget;           /**< Widget interface. */
+  F2DialogStyle style;        /**< Current style. */
+  const char *utf8_title;     /**< Optional title text. */
+  const char *utf8_body;      /**< Optional body text. */
+  CMPRect bounds;             /**< Layout bounds. */
+  CMPBool is_open;            /**< True if currently open/visible. */
+  F2DialogOnAction on_action; /**< Action callback. */
+  void *on_action_ctx;        /**< Action callback context. */
 } F2Dialog;
 
 /**
@@ -104,7 +105,9 @@ CMP_API int CMP_CALL f2_dialog_close(F2Dialog *dialog);
  * @param ctx Context pointer.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_dialog_set_on_action(F2Dialog *dialog, F2DialogOnAction on_action, void *ctx);
+CMP_API int CMP_CALL f2_dialog_set_on_action(F2Dialog *dialog,
+                                             F2DialogOnAction on_action,
+                                             void *ctx);
 
 #ifdef __cplusplus
 }

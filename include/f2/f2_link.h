@@ -28,28 +28,28 @@ typedef int(CMP_CALL *F2LinkOnClick)(void *ctx, struct F2Link *link);
  * @brief Fluent 2 Link style descriptor.
  */
 typedef struct F2LinkStyle {
-  CMPTextStyle text_style;   /**< Base text style. */
-  CMPColor text_color;       /**< Normal text color. */
-  CMPColor hover_color;      /**< Hover text color. */
-  CMPColor pressed_color;    /**< Pressed text color. */
-  CMPColor disabled_color;   /**< Disabled text color. */
-  CMPBool has_underline;     /**< True if naturally underlined. */
+  CMPTextStyle text_style; /**< Base text style. */
+  CMPColor text_color;     /**< Normal text color. */
+  CMPColor hover_color;    /**< Hover text color. */
+  CMPColor pressed_color;  /**< Pressed text color. */
+  CMPColor disabled_color; /**< Disabled text color. */
+  CMPBool has_underline;   /**< True if naturally underlined. */
 } F2LinkStyle;
 
 /**
  * @brief Fluent 2 Link widget instance.
  */
 typedef struct F2Link {
-  CMPWidget widget;         /**< Widget interface. */
-  F2LinkStyle style;        /**< Current style. */
-  const char *utf8_text;    /**< UTF-8 text (may be NULL). */
-  cmp_usize utf8_len;       /**< Length of the text. */
-  CMPRect bounds;           /**< Layout bounds. */
-  CMPBool disabled;         /**< Disabled state. */
-  CMPBool hovered;          /**< Hover state. */
-  CMPBool pressed;          /**< Pressed state. */
-  F2LinkOnClick on_click;   /**< Click callback. */
-  void *on_click_ctx;       /**< Click callback context. */
+  CMPWidget widget;       /**< Widget interface. */
+  F2LinkStyle style;      /**< Current style. */
+  const char *utf8_text;  /**< UTF-8 text (may be NULL). */
+  cmp_usize utf8_len;     /**< Length of the text. */
+  CMPRect bounds;         /**< Layout bounds. */
+  CMPBool disabled;       /**< Disabled state. */
+  CMPBool hovered;        /**< Hover state. */
+  CMPBool pressed;        /**< Pressed state. */
+  F2LinkOnClick on_click; /**< Click callback. */
+  void *on_click_ctx;     /**< Click callback context. */
 } F2Link;
 
 /**
@@ -67,10 +67,8 @@ CMP_API int CMP_CALL f2_link_style_init(F2LinkStyle *style);
  * @param utf8_len Length of the text.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_link_init(F2Link *link,
-                                  const F2LinkStyle *style,
-                                  const char *utf8_text,
-                                  cmp_usize utf8_len);
+CMP_API int CMP_CALL f2_link_init(F2Link *link, const F2LinkStyle *style,
+                                  const char *utf8_text, cmp_usize utf8_len);
 
 /**
  * @brief Set link text.
@@ -79,7 +77,8 @@ CMP_API int CMP_CALL f2_link_init(F2Link *link,
  * @param utf8_len Length.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_link_set_text(F2Link *link, const char *utf8_text, cmp_usize utf8_len);
+CMP_API int CMP_CALL f2_link_set_text(F2Link *link, const char *utf8_text,
+                                      cmp_usize utf8_len);
 
 /**
  * @brief Set link disabled state.
@@ -96,7 +95,8 @@ CMP_API int CMP_CALL f2_link_set_disabled(F2Link *link, CMPBool disabled);
  * @param ctx Context.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_link_set_on_click(F2Link *link, F2LinkOnClick on_click, void *ctx);
+CMP_API int CMP_CALL f2_link_set_on_click(F2Link *link, F2LinkOnClick on_click,
+                                          void *ctx);
 
 #ifdef __cplusplus
 }

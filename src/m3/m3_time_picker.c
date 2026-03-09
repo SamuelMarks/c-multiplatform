@@ -439,8 +439,7 @@ static int m3_time_picker_hour_to_index(cmp_u32 hour, cmp_u32 format,
 
 static int m3_time_picker_pick_time(const M3TimePicker *picker, CMPScalar x,
                                     CMPScalar y, cmp_u32 field,
-                                    CMPTime *out_time,
-                                    CMPBool *out_valid) {
+                                    CMPTime *out_time, CMPBool *out_valid) {
   M3TimePickerMetrics metrics;
   CMPTime time;
   CMPScalar dx;

@@ -1023,7 +1023,7 @@ CMP_API int CMP_CALL m3_scheme_generate_system(struct CMPWS *ws, CMPBool dark,
     return rc;
   }
 
-    if (r < 0.0f)
+  if (r < 0.0f)
     r = 0.0f;
   else if (r > 1.0f)
     r = 1.0f;
@@ -1039,7 +1039,7 @@ CMP_API int CMP_CALL m3_scheme_generate_system(struct CMPWS *ws, CMPBool dark,
     a = 0.0f;
   else if (a > 1.0f)
     a = 1.0f;
-  
+
   source_argb = ((cmp_u32)(a * 255.0f + 0.5f) << 24) |
                 ((cmp_u32)(r * 255.0f + 0.5f) << 16) |
                 ((cmp_u32)(g * 255.0f + 0.5f) << 8) |
@@ -1054,27 +1054,31 @@ int CMP_CALL m3_scheme_generate_with_contrast(cmp_u32 source_argb, CMPBool dark,
                                               M3Scheme *out_scheme) {
   int rc;
   cmp_u32 blend_color;
-  
+
   if (out_scheme == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  
+
   rc = m3_scheme_generate_variant(source_argb, dark, variant, out_scheme);
   if (rc != CMP_OK) {
     return rc;
   }
-  
+
   blend_color = dark ? 0xFFFFFFFF : 0xFF000000;
-  
+
   if (contrast == M3_CONTRAST_MEDIUM) {
-    m3_color_blend_surface_tint(out_scheme->primary, blend_color, 0.2f, &out_scheme->primary);
-    m3_color_blend_surface_tint(out_scheme->surface, blend_color, 0.05f, &out_scheme->surface);
+    m3_color_blend_surface_tint(out_scheme->primary, blend_color, 0.2f,
+                                &out_scheme->primary);
+    m3_color_blend_surface_tint(out_scheme->surface, blend_color, 0.05f,
+                                &out_scheme->surface);
   } else if (contrast == M3_CONTRAST_HIGH) {
-    m3_color_blend_surface_tint(out_scheme->primary, blend_color, 0.4f, &out_scheme->primary);
-    m3_color_blend_surface_tint(out_scheme->surface, blend_color, 0.1f, &out_scheme->surface);
+    m3_color_blend_surface_tint(out_scheme->primary, blend_color, 0.4f,
+                                &out_scheme->primary);
+    m3_color_blend_surface_tint(out_scheme->surface, blend_color, 0.1f,
+                                &out_scheme->surface);
     out_scheme->on_primary = dark ? 0xFF000000 : 0xFFFFFFFF;
     out_scheme->on_surface = dark ? 0xFFFFFFFF : 0xFF000000;
   }
-  
+
   return CMP_OK;
 }

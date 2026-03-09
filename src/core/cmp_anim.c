@@ -132,7 +132,8 @@ static int cmp_anim_ease_apply(cmp_u32 easing, CMPScalar t,
   default:
     return CMP_ERR_INVALID_ARGUMENT;
   }
-  }int CMP_CALL cmp_anim_timing_init(CMPAnimTiming *timing, CMPScalar from,
+}
+int CMP_CALL cmp_anim_timing_init(CMPAnimTiming *timing, CMPScalar from,
                                   CMPScalar to, CMPScalar duration,
                                   cmp_u32 easing) {
   CMPScalar eased;

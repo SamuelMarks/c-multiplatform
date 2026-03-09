@@ -39,7 +39,8 @@
 
 #endif
 
-#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) && !defined(_ARM_) && !defined(_ARM64_)
+#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) &&               \
+    !defined(_ARM_) && !defined(_ARM64_)
 #if defined(_M_AMD64)
 #define _AMD64_
 #elif defined(_M_IX86)
@@ -53,16 +54,16 @@
 
 #if defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(disable: 4201 4214)
+#pragma warning(disable : 4201 4214)
 #endif
 
 #include <stdarg.h>
 #include <stddef.h>
-#include <windef.h>
 #include <winbase.h>
+#include <windef.h>
 #include <wingdi.h>
-#include <winuser.h>
 #include <winnls.h>
+#include <winuser.h>
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
@@ -77,37 +78,39 @@
 #endif
 
 static void cmp_win32_apply_backdrop(HWND hwnd, cmp_u32 backdrop_type) {
-    HMODULE dwmapi;
-    typedef HRESULT(WINAPI * DwmSetWindowAttribute_t)(HWND, DWORD, LPCVOID, DWORD);
-    DwmSetWindowAttribute_t set_attr;
-    DWORD type = DWMSBT_AUTO;
+  HMODULE dwmapi;
+  typedef HRESULT(WINAPI * DwmSetWindowAttribute_t)(HWND, DWORD, LPCVOID,
+                                                    DWORD);
+  DwmSetWindowAttribute_t set_attr;
+  DWORD type = DWMSBT_AUTO;
 
-    if (backdrop_type == CMP_WS_BACKDROP_NONE) {
-        return; /* Let OS handle it */
-    }
+  if (backdrop_type == CMP_WS_BACKDROP_NONE) {
+    return; /* Let OS handle it */
+  }
 
-    dwmapi = LoadLibraryA("dwmapi.dll");
-    if (!dwmapi) {
-        return;
-    }
+  dwmapi = LoadLibraryA("dwmapi.dll");
+  if (!dwmapi) {
+    return;
+  }
 
-    set_attr = (DwmSetWindowAttribute_t)(void *)GetProcAddress(dwmapi, "DwmSetWindowAttribute");
-    if (!set_attr) {
-        FreeLibrary(dwmapi);
-        return;
-    }
-
-    if (backdrop_type == CMP_WS_BACKDROP_MICA) {
-        type = DWMSBT_MAINWINDOW;
-    } else if (backdrop_type == CMP_WS_BACKDROP_MICA_ALT) {
-        type = DWMSBT_TABBEDWINDOW;
-    } else if (backdrop_type == CMP_WS_BACKDROP_ACRYLIC) {
-        type = DWMSBT_TRANSIENTWINDOW;
-    }
-
-    set_attr(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, &type, sizeof(type));
-
+  set_attr = (DwmSetWindowAttribute_t)(void *)GetProcAddress(
+      dwmapi, "DwmSetWindowAttribute");
+  if (!set_attr) {
     FreeLibrary(dwmapi);
+    return;
+  }
+
+  if (backdrop_type == CMP_WS_BACKDROP_MICA) {
+    type = DWMSBT_MAINWINDOW;
+  } else if (backdrop_type == CMP_WS_BACKDROP_MICA_ALT) {
+    type = DWMSBT_TABBEDWINDOW;
+  } else if (backdrop_type == CMP_WS_BACKDROP_ACRYLIC) {
+    type = DWMSBT_TRANSIENTWINDOW;
+  }
+
+  set_attr(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, &type, sizeof(type));
+
+  FreeLibrary(dwmapi);
 }
 
 #endif
@@ -234,7 +237,6 @@ int CMP_CALL cmp_win32_backend_config_init(CMPWin32BackendConfig *config) {
 
   return CMP_OK;
 }
-
 
 #if defined(CMP_WIN32_AVAILABLE)
 
@@ -404,6 +406,7 @@ static int cmp_win32_mul_usize(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
   return CMP_OK;
 }
 
+#ifdef CMP_WIN32_USE_WINHTTP
 static int cmp_win32_add_usize(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
 
   if (out_value == NULL) {
@@ -420,6 +423,7 @@ static int cmp_win32_add_usize(cmp_usize a, cmp_usize b, cmp_usize *out_value) {
 
   return CMP_OK;
 }
+#endif
 
 #ifdef CMP_WIN32_USE_WINHTTP
 static int cmp_win32_network_error_from_winhttp(DWORD error_code) {
@@ -744,10 +748,14 @@ static int cmp_win32_get_modifiers(cmp_u32 *out_mods) {
     mods |= CMP_MOD_NUM;
   }
 
-  *out_mods = mods; return 0;
+  *out_mods = mods;
+  return 0;
 }
 
-static int cmp_win32_get_time_ms(cmp_u32 *out_time) { *out_time = (cmp_u32)GetTickCount(); return CMP_OK; }
+static int cmp_win32_get_time_ms(cmp_u32 *out_time) {
+  *out_time = (cmp_u32)GetTickCount();
+  return CMP_OK;
+}
 
 static int cmp_win32_utf8_to_wide_alloc(struct CMPWin32Backend *backend,
 
@@ -1231,7 +1239,8 @@ static int cmp_win32_query_dpi_scale(HWND hwnd, CMPScalar *out_scale) {
 
   CMPScalar scale;
 
-  if (out_scale == NULL) return CMP_ERR_INVALID_ARGUMENT;
+  if (out_scale == NULL)
+    return CMP_ERR_INVALID_ARGUMENT;
 
   hdc = GetDC(hwnd);
 
@@ -1403,12 +1412,14 @@ static int cmp_win32_channel_from_scalar(CMPScalar value, cmp_u8 *out_val) {
 
   if (value <= 0.0f) {
 
-    *out_val = 0u; return 0;
+    *out_val = 0u;
+    return 0;
   }
 
   if (value >= 1.0f) {
 
-    *out_val = 255u; return 0;
+    *out_val = 255u;
+    return 0;
   }
 
   return (cmp_u8)(value * 255.0f + 0.5f);
@@ -1429,7 +1440,8 @@ static int cmp_win32_color_to_colorref(CMPColor color, COLORREF *out_color) {
 
 static int cmp_win32_premultiply_channel(cmp_u8 c, cmp_u8 a, cmp_u8 *out_val) {
 
-  *out_val = (cmp_u8)((((cmp_u32)c) * ((cmp_u32)a) + 127u) / 255u); return 0;
+  *out_val = (cmp_u8)((((cmp_u32)c) * ((cmp_u32)a) + 127u) / 255u);
+  return 0;
 }
 
 static void cmp_win32_texture_copy_pixels(cmp_u8 *dst, cmp_i32 dst_stride,
@@ -1551,26 +1563,31 @@ static LRESULT CALLBACK cmp_win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam,
   }
 
   if (msg == WM_NCHITTEST) {
-      /* If the window has custom drawn title bars but we want Windows 11 snap layouts, 
-         we must return HTCAPTION, HTMAXBUTTON, etc, from hit testing based on where the mouse is.
-         For a completely custom client area acting as a title bar, responding HTCAPTION allows dragging,
-         and responding HTMAXBUTTON triggers the snap assist flyout on hover.
-         Since LibCMPC draws its own UI, we would ideally route this to `cmp_api_ws` to ask the UI tree,
-         but for now we provide the hook. We let it pass to DefWindowProc if we don't handle it.
-      */
-      LRESULT hit = DefWindowProc(hwnd, msg, wparam, lparam);
-      
-      /* Optional logic could be placed here if `window` tracks custom title bar rects */
+    /* If the window has custom drawn title bars but we want Windows 11 snap
+       layouts, we must return HTCAPTION, HTMAXBUTTON, etc, from hit testing
+       based on where the mouse is. For a completely custom client area acting
+       as a title bar, responding HTCAPTION allows dragging, and responding
+       HTMAXBUTTON triggers the snap assist flyout on hover. Since LibCMPC draws
+       its own UI, we would ideally route this to `cmp_api_ws` to ask the UI
+       tree, but for now we provide the hook. We let it pass to DefWindowProc if
+       we don't handle it.
+    */
+    LRESULT hit = DefWindowProc(hwnd, msg, wparam, lparam);
 
-      return hit;
+    /* Optional logic could be placed here if `window` tracks custom title bar
+     * rects */
+
+    return hit;
   }
-  
+
   if (msg == WM_GETOBJECT) {
-      if (lparam == UiaRootObjectId) {
-          /* Route request for UIAutomation provider down to the internal UI tree state */
-          /* Out of scope for this C file without COM initialization, but this is the hook */
-          return 0; /* Let UIAutomationCore.dll handle fallback */
-      }
+    if (lparam == UiaRootObjectId) {
+      /* Route request for UIAutomation provider down to the internal UI tree
+       * state */
+      /* Out of scope for this C file without COM initialization, but this is
+       * the hook */
+      return 0; /* Let UIAutomationCore.dll handle fallback */
+    }
   }
 
   if (window == NULL) {
@@ -2712,9 +2729,10 @@ static int cmp_win32_ws_get_system_color(void *ws, cmp_u32 color_type,
 
 static int cmp_backend_ws_update_a11y_tree(void *ws,
                                            const void *root_a11y_node) {
-  /* MSAA/UIA stub for Windows: we map the semantic tree to MSAA properties 
+  /* MSAA/UIA stub for Windows: we map the semantic tree to MSAA properties
      and notify the system that the tree has changed so screen readers re-query.
-     Full UIA is implemented out-of-band via COM, but here we fulfill the interface contract. */
+     Full UIA is implemented out-of-band via COM, but here we fulfill the
+     interface contract. */
   if (ws == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2722,16 +2740,20 @@ static int cmp_backend_ws_update_a11y_tree(void *ws,
   if (root_a11y_node != NULL) {
     struct CMPWin32Backend *backend = (struct CMPWin32Backend *)ws;
     if (backend->active_window && backend->active_window->hwnd) {
-      /* Signal to the OS that the UI tree has updated (requires screen reader to query) */
-      NotifyWinEvent(EVENT_OBJECT_REORDER, backend->active_window->hwnd, OBJID_CLIENT, CHILDID_SELF);
-      NotifyWinEvent(EVENT_OBJECT_LOCATIONCHANGE, backend->active_window->hwnd, OBJID_CLIENT, CHILDID_SELF);
+      /* Signal to the OS that the UI tree has updated (requires screen reader
+       * to query) */
+      NotifyWinEvent(EVENT_OBJECT_REORDER, backend->active_window->hwnd,
+                     OBJID_CLIENT, CHILDID_SELF);
+      NotifyWinEvent(EVENT_OBJECT_LOCATIONCHANGE, backend->active_window->hwnd,
+                     OBJID_CLIENT, CHILDID_SELF);
     }
   }
 
   return CMP_OK;
 }
 
-static int cmp_win32_ws_set_cursor(void *ws, CMPHandle window, cmp_u32 cursor_type) {
+static int cmp_win32_ws_set_cursor(void *ws, CMPHandle window,
+                                   cmp_u32 cursor_type) {
   struct CMPWin32Backend *backend;
   CMPWin32Window *resolved;
   LPCWSTR win32_cursor_id = (LPCWSTR)IDC_ARROW;
@@ -2751,39 +2773,40 @@ static int cmp_win32_ws_set_cursor(void *ws, CMPHandle window, cmp_u32 cursor_ty
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW, (void **)&resolved);
+  rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
+                                 (void **)&resolved);
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
   switch (cursor_type) {
-    case CMP_CURSOR_DEFAULT:
-      win32_cursor_id = (LPCWSTR)IDC_ARROW;
-      break;
-    case CMP_CURSOR_TEXT:
-      win32_cursor_id = (LPCWSTR)IDC_IBEAM;
-      break;
-    case CMP_CURSOR_POINTER:
-      win32_cursor_id = (LPCWSTR)IDC_HAND;
-      break;
-    case CMP_CURSOR_CROSSHAIR:
-      win32_cursor_id = (LPCWSTR)IDC_CROSS;
-      break;
-    case CMP_CURSOR_EW_RESIZE:
-      win32_cursor_id = (LPCWSTR)IDC_SIZEWE;
-      break;
-    case CMP_CURSOR_NS_RESIZE:
-      win32_cursor_id = (LPCWSTR)IDC_SIZENS;
-      break;
-    case CMP_CURSOR_NESW_RESIZE:
-      win32_cursor_id = (LPCWSTR)IDC_SIZENESW;
-      break;
-    case CMP_CURSOR_NWSE_RESIZE:
-      win32_cursor_id = (LPCWSTR)IDC_SIZENWSE;
-      break;
-    case CMP_CURSOR_NOT_ALLOWED:
-      win32_cursor_id = (LPCWSTR)IDC_NO;
-      break;
-    default:
-      return CMP_ERR_INVALID_ARGUMENT;
+  case CMP_CURSOR_DEFAULT:
+    win32_cursor_id = (LPCWSTR)IDC_ARROW;
+    break;
+  case CMP_CURSOR_TEXT:
+    win32_cursor_id = (LPCWSTR)IDC_IBEAM;
+    break;
+  case CMP_CURSOR_POINTER:
+    win32_cursor_id = (LPCWSTR)IDC_HAND;
+    break;
+  case CMP_CURSOR_CROSSHAIR:
+    win32_cursor_id = (LPCWSTR)IDC_CROSS;
+    break;
+  case CMP_CURSOR_EW_RESIZE:
+    win32_cursor_id = (LPCWSTR)IDC_SIZEWE;
+    break;
+  case CMP_CURSOR_NS_RESIZE:
+    win32_cursor_id = (LPCWSTR)IDC_SIZENS;
+    break;
+  case CMP_CURSOR_NESW_RESIZE:
+    win32_cursor_id = (LPCWSTR)IDC_SIZENESW;
+    break;
+  case CMP_CURSOR_NWSE_RESIZE:
+    win32_cursor_id = (LPCWSTR)IDC_SIZENWSE;
+    break;
+  case CMP_CURSOR_NOT_ALLOWED:
+    win32_cursor_id = (LPCWSTR)IDC_NO;
+    break;
+  default:
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   hCursor = LoadCursorW(NULL, win32_cursor_id);
@@ -6458,7 +6481,6 @@ int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend,
 
   return CMP_OK;
 }
-
 
 #else
 

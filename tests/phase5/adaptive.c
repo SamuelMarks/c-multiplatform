@@ -308,8 +308,7 @@ static int test_adaptive_feed_layout(void) {
     return 1; /* Capped */
 
   /* Expanded max width feed RTL */
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) !=
-      CMP_OK)
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK)
     return 1;
   if (prim.width != 840.0f)
     return 1; /* Capped */
@@ -377,7 +376,7 @@ static int test_adaptive_supporting_pane_layout(void) {
     return 1;
   if (prim.width != 1200.0f - 360.0f - 24.0f - 48.0f)
     return 1;
-    
+
   if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
                                          CMP_TRUE) != CMP_OK)
     return 1;
@@ -470,25 +469,47 @@ static int test_adaptive_hinge(void) {
   layout.hinge.bounds.width = 10.0f;
   layout.hinge.bounds.height = 800.0f;
 
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
+    return 1;
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_TRUE) !=
+      CMP_OK)
+    return 1;
 
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
+    return 1;
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK)
+    return 1;
 
-  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
-  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_FALSE) != CMP_OK)
+    return 1;
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_TRUE) != CMP_OK)
+    return 1;
 
   /* Hinge with extreme bounds to trigger negative width handling */
   bounds.width = 100.0f;
   layout.hinge.bounds.x = 200.0f;
   layout.hinge.bounds.width = 50.0f;
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
-  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec, CMP_FALSE) != CMP_OK) return 1;
-  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
-  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
-  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK) return 1;
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
+    return 1;
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_FALSE) !=
+      CMP_OK)
+    return 1;
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_FALSE) != CMP_OK)
+    return 1;
+  if (m3_adaptive_list_detail_layout(&layout, bounds, &prim, &sec, CMP_TRUE) !=
+      CMP_OK)
+    return 1;
+  if (m3_adaptive_feed_layout(&layout, bounds, &prim, &sec, CMP_TRUE) != CMP_OK)
+    return 1;
+  if (m3_adaptive_supporting_pane_layout(&layout, bounds, &prim, &sec,
+                                         CMP_TRUE) != CMP_OK)
+    return 1;
 
   return 0;
 }

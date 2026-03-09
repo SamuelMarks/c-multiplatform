@@ -47,15 +47,15 @@ typedef struct F2SemanticColors {
  * @brief Fluent 2 theme tokens (light or dark).
  */
 typedef struct F2Theme {
-  cmp_u32 background;               /**< Base background */
-  cmp_u32 fill_color_transparent;   /**< Transparent fill */
-  cmp_u32 fill_color_subtle;        /**< Subtle fill */
-  cmp_u32 fill_color_control;       /**< Control fill */
-  cmp_u32 fill_color_text;          /**< Text fill */
-  cmp_u32 accent_fill_color_default;/**< Default accent fill */
+  cmp_u32 background;                /**< Base background */
+  cmp_u32 fill_color_transparent;    /**< Transparent fill */
+  cmp_u32 fill_color_subtle;         /**< Subtle fill */
+  cmp_u32 fill_color_control;        /**< Control fill */
+  cmp_u32 fill_color_text;           /**< Text fill */
+  cmp_u32 accent_fill_color_default; /**< Default accent fill */
 
-  F2ColorRamp neutral; /**< Neutral palette */
-  F2ColorRamp brand;   /**< Brand palette */
+  F2ColorRamp neutral;        /**< Neutral palette */
+  F2ColorRamp brand;          /**< Brand palette */
   F2SemanticColors semantics; /**< Semantic colors */
 } F2Theme;
 
@@ -65,7 +65,8 @@ typedef struct F2Theme {
  * @param out_ramp Pointer to the F2ColorRamp to receive the shades.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL f2_color_ramp_generate(cmp_u32 base_argb, F2ColorRamp *out_ramp);
+CMP_API int CMP_CALL f2_color_ramp_generate(cmp_u32 base_argb,
+                                            F2ColorRamp *out_ramp);
 
 /**
  * @brief Generate a complete Fluent 2 theme based on a brand color.
@@ -74,15 +75,18 @@ CMP_API int CMP_CALL f2_color_ramp_generate(cmp_u32 base_argb, F2ColorRamp *out_
  * @param out_theme Pointer to the F2Theme to receive the generated tokens.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL f2_theme_generate(cmp_u32 brand_argb, CMPBool is_dark, F2Theme *out_theme);
+CMP_API int CMP_CALL f2_theme_generate(cmp_u32 brand_argb, CMPBool is_dark,
+                                       F2Theme *out_theme);
 
 /**
  * @brief Apply Windows High Contrast Mode (HCM) mappings to a theme.
  * @param theme The theme to override with High Contrast tokens.
- * @param is_dark_hcm True if the HCM theme is a dark variant (e.g. Aquatic, Desert).
+ * @param is_dark_hcm True if the HCM theme is a dark variant (e.g. Aquatic,
+ * Desert).
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_theme_apply_high_contrast(F2Theme *theme, CMPBool is_dark_hcm);
+CMP_API int CMP_CALL f2_theme_apply_high_contrast(F2Theme *theme,
+                                                  CMPBool is_dark_hcm);
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,6 @@
-#include <string.h>
 #include "m3/m3_carousel.h"
 #include "test_utils.h"
+#include <string.h>
 
 static int test_measure(void *widget, CMPMeasureSpec width,
                         CMPMeasureSpec height, CMPSize *out_size) {
@@ -34,23 +34,22 @@ int main(void) {
   CMPWidget child;
   child.vtable = &mock_vtable;
   CMPWidget *items[] = {&child, &child, &child};
-  
+
   m3_carousel_style_init(&style);
   m3_carousel_init(&carousel, &style, items, 3);
-  
+
   CMPRect bounds = {0, 0, 300, 100};
   carousel.widget.vtable->layout(&carousel, bounds);
-  
+
   CMPInputEvent ev;
   memset(&ev, 0, sizeof(ev));
   CMPBool handled;
-  
-  
+
   ev.type = CMP_INPUT_POINTER_DOWN;
   ev.data.pointer.x = 25.0f;
   ev.data.pointer.y = 25.0f;
   carousel.widget.vtable->event(&carousel, &ev, &handled);
-  
+
   carousel.widget.vtable->destroy(&carousel);
   return 0;
 }

@@ -444,13 +444,14 @@ CMP_API int CMP_CALL m3_menu_test_set_style_fail_text_style(CMPBool enable);
  */
 CMP_API int CMP_CALL m3_menu_test_set_style_fail_shadow_init(CMPBool enable);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param enable Parameter for testing.
- * @return Test result.
- */
-m3_menu_test_set_style_fail_background_color(CMPBool enable);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param enable Parameter for testing.
+     * @return Test result.
+     */
+    m3_menu_test_set_style_fail_background_color(CMPBool enable);
 
 /**
  * @brief Helper for test coverage.

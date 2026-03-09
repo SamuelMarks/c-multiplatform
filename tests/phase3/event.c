@@ -525,39 +525,46 @@ int main(void) {
 
     /* Tab when no focus */
     init_key_event(&event, CMP_INPUT_KEY_DOWN, 9u);
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
+    CMP_TEST_OK(
+        cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(handled == CMP_TRUE);
     CMP_TEST_ASSERT(target == &root_widget);
 
     /* Tab forward */
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
+    CMP_TEST_OK(
+        cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(handled == CMP_TRUE);
     CMP_TEST_ASSERT(target == &widget1);
 
     /* Tab forward again */
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
+    CMP_TEST_OK(
+        cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(handled == CMP_TRUE);
     CMP_TEST_ASSERT(target == &widget2);
 
     /* Tab forward wraps */
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
+    CMP_TEST_OK(
+        cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(handled == CMP_TRUE);
     CMP_TEST_ASSERT(target == &root_widget);
 
     /* Shift-Tab backward */
     event.modifiers = CMP_MOD_SHIFT;
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
+    CMP_TEST_OK(
+        cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(handled == CMP_TRUE);
     CMP_TEST_ASSERT(target == &widget2);
 
     /* Shift-Tab backward again */
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
+    CMP_TEST_OK(
+        cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(handled == CMP_TRUE);
     CMP_TEST_ASSERT(target == &widget1);
 
     /* Shift-Tab when no focus */
     CMP_TEST_OK(cmp_event_dispatcher_clear_focus(&dispatcher));
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
+    CMP_TEST_OK(
+        cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(handled == CMP_TRUE);
     CMP_TEST_ASSERT(target == &widget2);
 
@@ -565,25 +572,32 @@ int main(void) {
     CMP_TEST_OK(cmp_event_dispatcher_clear_focus(&dispatcher));
     widget1.flags |= CMP_WIDGET_FLAG_HIDDEN;
     event.modifiers = 0;
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled)); /* root */
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled)); /* skips widget1 -> widget2 */
+    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target,
+                                   &handled)); /* root */
+    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target,
+                                   &handled)); /* skips widget1 -> widget2 */
     CMP_TEST_ASSERT(target == &widget2);
     widget1.flags &= ~CMP_WIDGET_FLAG_HIDDEN;
 
     /* NULL node in children handles safely during traverse */
     children[1] = NULL;
     CMP_TEST_OK(cmp_event_dispatcher_clear_focus(&dispatcher));
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled)); /* root */
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled)); /* widget1 */
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled)); /* wraps to root */
+    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target,
+                                   &handled)); /* root */
+    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target,
+                                   &handled)); /* widget1 */
+    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target,
+                                   &handled)); /* wraps to root */
     CMP_TEST_ASSERT(target == &root_widget);
     children[1] = &child2;
-    
+
     /* NULL widget in child handles safely during traverse */
     child1.widget = NULL;
     CMP_TEST_OK(cmp_event_dispatcher_clear_focus(&dispatcher));
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled)); /* root */
-    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled)); /* skips child1 -> widget2 */
+    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target,
+                                   &handled)); /* root */
+    CMP_TEST_OK(cmp_event_dispatch(&dispatcher, &root, &event, &target,
+                                   &handled)); /* skips child1 -> widget2 */
     CMP_TEST_ASSERT(target == &widget2);
     child1.widget = &widget1;
 

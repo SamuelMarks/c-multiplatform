@@ -429,15 +429,15 @@ typedef struct CMPWSVTable {
 /** @brief System cursor types. */
 #define CMP_CURSOR_DEFAULT 0
 /** @brief Text cursor. */
-#define CMP_CURSOR_TEXT 1       
+#define CMP_CURSOR_TEXT 1
 /** @brief Pointer cursor. */
-#define CMP_CURSOR_POINTER 2    
+#define CMP_CURSOR_POINTER 2
 /** @brief Crosshair cursor. */
-#define CMP_CURSOR_CROSSHAIR 3  
+#define CMP_CURSOR_CROSSHAIR 3
 /** @brief East-West resize cursor. */
-#define CMP_CURSOR_EW_RESIZE 4  
+#define CMP_CURSOR_EW_RESIZE 4
 /** @brief North-South resize cursor. */
-#define CMP_CURSOR_NS_RESIZE 5  
+#define CMP_CURSOR_NS_RESIZE 5
 /** @brief Northeast-Southwest resize cursor. */
 #define CMP_CURSOR_NESW_RESIZE 6
 /** @brief Northwest-Southeast resize cursor. */

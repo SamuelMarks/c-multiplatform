@@ -50,13 +50,13 @@ typedef int(CMP_CALL *F2ButtonOnClick)(void *ctx, struct F2Button *button);
  * @brief Fluent 2 Button style descriptor.
  */
 typedef struct F2ButtonStyle {
-  cmp_u32 variant; /**< Button visual variant. */
-  CMPBool is_rtl;  /**< CMP_TRUE if layout should be right-to-left. */
+  cmp_u32 variant;           /**< Button visual variant. */
+  CMPBool is_rtl;            /**< CMP_TRUE if layout should be right-to-left. */
   CMPTextStyle text_style;   /**< Label text style. */
   CMPColor background_color; /**< Fill color. */
-  CMPColor background_hover_color; /**< Hover fill color. */
-  CMPColor background_pressed_color; /**< Pressed fill color. */
-  CMPColor outline_color;    /**< Outline color. */
+  CMPColor background_hover_color;    /**< Hover fill color. */
+  CMPColor background_pressed_color;  /**< Pressed fill color. */
+  CMPColor outline_color;             /**< Outline color. */
   CMPColor disabled_background_color; /**< Fill color when disabled. */
   CMPColor disabled_text_color;       /**< Text color when disabled. */
   CMPColor disabled_outline_color;    /**< Outline color when disabled. */
@@ -66,11 +66,11 @@ typedef struct F2ButtonStyle {
   CMPScalar padding_y;                /**< Vertical padding in pixels. */
   CMPScalar min_width;                /**< Minimum width in pixels. */
   CMPScalar min_height;               /**< Minimum height in pixels. */
-  CMPShadow shadow;        /**< Shadow descriptor for buttons. */
-  CMPBool shadow_enabled;  /**< CMP_TRUE when shadow is enabled. */
-  CMPIconStyle icon_style; /**< Optional icon style. */
-  CMPScalar icon_spacing;  /**< Spacing between icon and text. */
-  CMPScalar icon_diameter; /**< Icon button diameter in pixels. */
+  CMPShadow shadow;                   /**< Shadow descriptor for buttons. */
+  CMPBool shadow_enabled;             /**< CMP_TRUE when shadow is enabled. */
+  CMPIconStyle icon_style;            /**< Optional icon style. */
+  CMPScalar icon_spacing;             /**< Spacing between icon and text. */
+  CMPScalar icon_diameter;            /**< Icon button diameter in pixels. */
 } F2ButtonStyle;
 
 /**
@@ -85,15 +85,15 @@ typedef struct F2Button {
   const char *utf8_icon;       /**< UTF-8 icon name (may be NULL). */
   cmp_usize icon_len;          /**< UTF-8 icon name length in bytes. */
   CMPIconMetrics icon_metrics; /**< Cached icon metrics. */
-  const char *utf8_label;    /**< UTF-8 label text (may be NULL when empty). */
-  cmp_usize utf8_len;        /**< UTF-8 label length in bytes. */
-  CMPRect bounds;            /**< Layout bounds. */
-  CMPBool hovered;           /**< CMP_TRUE when hovered. */
-  CMPBool pressed;           /**< CMP_TRUE when pressed. */
-  CMPBool metrics_valid;     /**< CMP_TRUE when text metrics are valid. */
-  CMPBool owns_font;         /**< CMP_TRUE when widget owns the font. */
-  F2ButtonOnClick on_click;  /**< Click callback (may be NULL). */
-  void *on_click_ctx;        /**< Click callback context pointer. */
+  const char *utf8_label;   /**< UTF-8 label text (may be NULL when empty). */
+  cmp_usize utf8_len;       /**< UTF-8 label length in bytes. */
+  CMPRect bounds;           /**< Layout bounds. */
+  CMPBool hovered;          /**< CMP_TRUE when hovered. */
+  CMPBool pressed;          /**< CMP_TRUE when pressed. */
+  CMPBool metrics_valid;    /**< CMP_TRUE when text metrics are valid. */
+  CMPBool owns_font;        /**< CMP_TRUE when widget owns the font. */
+  F2ButtonOnClick on_click; /**< Click callback (may be NULL). */
+  void *on_click_ctx;       /**< Click callback context pointer. */
 } F2Button;
 
 /**
@@ -181,10 +181,10 @@ CMP_API int CMP_CALL f2_button_set_on_click(F2Button *button,
  * @brief Fluent 2 Toggle Button widget instance.
  */
 typedef struct F2ToggleButton {
-  CMPWidget widget;         /**< Widget interface. */
-  F2Button core;            /**< Core button structure. */
-  CMPBool is_toggled;       /**< CMP_TRUE when toggled on. */
-  CMPColor toggled_bg_color;/**< Background color when toggled. */
+  CMPWidget widget;            /**< Widget interface. */
+  F2Button core;               /**< Core button structure. */
+  CMPBool is_toggled;          /**< CMP_TRUE when toggled on. */
+  CMPColor toggled_bg_color;   /**< Background color when toggled. */
   CMPColor toggled_text_color; /**< Text color when toggled. */
 } F2ToggleButton;
 
@@ -211,7 +211,8 @@ CMP_API int CMP_CALL f2_toggle_button_init(F2ToggleButton *toggle_button,
  * @param is_toggled New toggle state.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_toggle_button_set_toggled(F2ToggleButton *toggle_button, CMPBool is_toggled);
+CMP_API int CMP_CALL f2_toggle_button_set_toggled(F2ToggleButton *toggle_button,
+                                                  CMPBool is_toggled);
 
 /**
  * @brief Fluent 2 Split Button widget instance.
@@ -244,7 +245,8 @@ CMP_API int CMP_CALL f2_split_button_init(F2SplitButton *split_button,
  * @param is_open True to mark dropdown as open.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_split_button_set_dropdown_open(F2SplitButton *split_button, CMPBool is_open);
+CMP_API int CMP_CALL
+f2_split_button_set_dropdown_open(F2SplitButton *split_button, CMPBool is_open);
 
 #ifdef __cplusplus
 }

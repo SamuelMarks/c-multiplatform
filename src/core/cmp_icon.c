@@ -22,7 +22,8 @@ int CMP_CALL cmp_icon_test_set_fail_point(cmp_u32 fail_point) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_icon_test_set_fail_point_countdown(cmp_u32 fail_point, cmp_u32 countdown) {
+int CMP_CALL cmp_icon_test_set_fail_point_countdown(cmp_u32 fail_point,
+                                                    cmp_u32 countdown) {
   g_cmp_icon_test_fail_point = fail_point;
   g_cmp_icon_test_fail_countdown = countdown;
   return CMP_OK;
@@ -138,7 +139,8 @@ static int cmp_icon_cstr_limit(cmp_usize *out_val) {
     max_len = g_cmp_icon_test_cstr_limit;
   }
 #endif
-  *out_val = max_len; return 0;
+  *out_val = max_len;
+  return 0;
 }
 
 static int cmp_icon_cstrlen(const char *cstr, cmp_usize *out_len) {
@@ -307,7 +309,7 @@ static int cmp_icon_svg_parse_number(const char **cursor,
     return CMP_ERR_RANGE;
   }
   if (value > (double)FLT_MAX || value < (double)-FLT_MAX) {
-    *cursor = endptr;    
+    *cursor = endptr;
     return CMP_ERR_RANGE;
   }
 
@@ -544,8 +546,8 @@ static int cmp_icon_svg_parse(const char *data, const CMPIconSvgTransform *xf,
           got_any = 1;
         } else {
           rc = cmp_icon_path_line_to(path, xf, x, y);
-          if (rc != CMP_OK) {                        
-            return rc;                               
+          if (rc != CMP_OK) {
+            return rc;
           }
         }
         cur_x = x;
@@ -888,9 +890,9 @@ static int cmp_icon_measure_svg(const CMPIconStyle *style,
 
   size = (CMPScalar)style->size_px;
   if (svg->viewbox_width >= svg->viewbox_height) {
-    w = size;                                             
+    w = size;
     h = size * (svg->viewbox_height / svg->viewbox_width);
-  } else {                                                
+  } else {
     h = size;
     w = size * (svg->viewbox_width / svg->viewbox_height);
   }
@@ -993,9 +995,8 @@ static int cmp_icon_draw_font(const CMPGfx *gfx, const CMPRect *bounds,
   rc = gfx->text_vtable->measure_text(gfx->ctx, font, utf8_name, utf8_len, 0,
                                       &width, &height, &baseline);
   if (rc != CMP_OK) {
-    cleanup_rc =
-        gfx->text_vtable->destroy_font(gfx->ctx, font);
-    if (cleanup_rc != CMP_OK) {                        
+    cleanup_rc = gfx->text_vtable->destroy_font(gfx->ctx, font);
+    if (cleanup_rc != CMP_OK) {
       return cleanup_rc;
     }
     return rc;

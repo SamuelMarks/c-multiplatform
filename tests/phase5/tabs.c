@@ -688,7 +688,11 @@ static int test_tab_row_validation_helpers(void) {
                   CMP_ERR_RANGE);
   style = base_style;
   style.text_style.utf8_family = NULL;
-  { int ret = m3_tab_row_test_validate_style(&style, CMP_TRUE); if (ret != CMP_ERR_INVALID_ARGUMENT) printf("DEBUG TABS FAILED %d\n", ret); }
+  {
+    int ret = m3_tab_row_test_validate_style(&style, CMP_TRUE);
+    if (ret != CMP_ERR_INVALID_ARGUMENT)
+      printf("DEBUG TABS FAILED %d\n", ret);
+  }
   style = base_style;
   style.selected_text_color.a = 2.0f;
   CMP_TEST_EXPECT(m3_tab_row_test_validate_style(&style, CMP_TRUE),
@@ -2556,7 +2560,7 @@ static int test_tab_row_branch_sweep(void) {
   /* Test RTL layout */
   row.style.is_rtl = CMP_TRUE;
   CMP_TEST_OK(row.widget.vtable->layout(row.widget.ctx, bounds));
-  
+
   /* Test RTL event */
   {
     CMPInputEvent ev = {0};
@@ -2567,7 +2571,7 @@ static int test_tab_row_branch_sweep(void) {
     row.pressed_index = M3_TAB_INVALID_INDEX;
     CMP_TEST_OK(row.widget.vtable->event(row.widget.ctx, &ev, &handled));
   }
-  
+
   /* Test RTL paint */
   {
     CMPPaintContext p_ctx = {0};

@@ -175,29 +175,32 @@ CMP_API int CMP_CALL m3_scaffold_get_safe_area(const M3Scaffold *scaffold,
 CMP_API int CMP_CALL m3_scaffold_step(M3Scaffold *scaffold, CMPScalar dt,
                                       CMPBool *out_changed);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param edges Parameter for testing.
- * @return Test result.
- */
-m3_scaffold_test_validate_edges(const CMPLayoutEdges *edges);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param edges Parameter for testing.
+     * @return Test result.
+     */
+    m3_scaffold_test_validate_edges(const CMPLayoutEdges *edges);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param style Parameter for testing.
- * @return Test result.
- */
-m3_scaffold_test_validate_style(const M3ScaffoldStyle *style);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param style Parameter for testing.
+     * @return Test result.
+     */
+    m3_scaffold_test_validate_style(const M3ScaffoldStyle *style);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param spec Parameter for testing.
- * @return Test result.
- */
-m3_scaffold_test_validate_measure_spec(CMPMeasureSpec spec);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param spec Parameter for testing.
+     * @return Test result.
+     */
+    m3_scaffold_test_validate_measure_spec(CMPMeasureSpec spec);
 
 /**
  * @brief Helper for test coverage.

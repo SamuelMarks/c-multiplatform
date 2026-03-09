@@ -326,11 +326,10 @@ static int cmp_render_record_set_transform(void *gfx,
   return cmp_render_list_append(recorder->list, &cmd);
 }
 
-static int
-cmp_render_record_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
-                                 cmp_u32 format,
-                                 const void *pixels, cmp_usize size,
-                                 CMPHandle *out_texture) {
+static int cmp_render_record_create_texture(void *gfx, cmp_i32 width,
+                                            cmp_i32 height, cmp_u32 format,
+                                            const void *pixels, cmp_usize size,
+                                            CMPHandle *out_texture) {
   CMP_UNUSED(width);
   CMP_UNUSED(height);
   CMP_UNUSED(format);
@@ -345,8 +344,7 @@ cmp_render_record_create_texture(void *gfx, cmp_i32 width, cmp_i32 height,
 }
 
 static int cmp_render_record_update_texture(void *gfx, CMPHandle texture,
-                                            cmp_i32 x, cmp_i32 y,
-                                            cmp_i32 width,
+                                            cmp_i32 x, cmp_i32 y, cmp_i32 width,
                                             cmp_i32 height, const void *pixels,
                                             cmp_usize size) {
   CMP_UNUSED(texture);
@@ -374,10 +372,10 @@ static int cmp_render_record_destroy_texture(void *gfx, CMPHandle texture) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-static int
-cmp_render_record_draw_texture(void *gfx, CMPHandle texture, const CMPRect *src,
-                               const CMPRect *dst,
-                               CMPScalar opacity) {
+static int cmp_render_record_draw_texture(void *gfx, CMPHandle texture,
+                                          const CMPRect *src,
+                                          const CMPRect *dst,
+                                          CMPScalar opacity) {
   CMPRenderRecorder *recorder;
   CMPRenderCmd cmd;
   int rc;
@@ -466,12 +464,12 @@ static int cmp_render_record_destroy_font(void *text, CMPHandle font) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-static int
-cmp_render_record_measure_text(void *text, CMPHandle font, const char *utf8,
-                               cmp_usize utf8_len, cmp_u32 base_direction,
-                               CMPScalar *out_width,
-                               CMPScalar *out_height,
-                               CMPScalar *out_baseline) {
+static int cmp_render_record_measure_text(void *text, CMPHandle font,
+                                          const char *utf8, cmp_usize utf8_len,
+                                          cmp_u32 base_direction,
+                                          CMPScalar *out_width,
+                                          CMPScalar *out_height,
+                                          CMPScalar *out_baseline) {
   (void)base_direction;
   CMP_UNUSED(font);
   CMP_UNUSED(utf8);
@@ -485,31 +483,23 @@ cmp_render_record_measure_text(void *text, CMPHandle font, const char *utf8,
   return CMP_ERR_UNSUPPORTED;
 }
 
-static const CMPGfxVTable g_cmp_render_record_vtable =
-    {
-     cmp_render_record_begin_frame,
-     cmp_render_record_end_frame,
-     cmp_render_record_clear,
-     cmp_render_record_draw_rect,
-     cmp_render_record_draw_line,
-     cmp_render_record_draw_path,
-     cmp_render_record_push_clip,
-     cmp_render_record_pop_clip,
-     cmp_render_record_set_transform,
-     cmp_render_record_create_texture,
-     cmp_render_record_update_texture,
-     cmp_render_record_destroy_texture,
-     cmp_render_record_draw_texture};
+static const CMPGfxVTable g_cmp_render_record_vtable = {
+    cmp_render_record_begin_frame,    cmp_render_record_end_frame,
+    cmp_render_record_clear,          cmp_render_record_draw_rect,
+    cmp_render_record_draw_line,      cmp_render_record_draw_path,
+    cmp_render_record_push_clip,      cmp_render_record_pop_clip,
+    cmp_render_record_set_transform,  cmp_render_record_create_texture,
+    cmp_render_record_update_texture, cmp_render_record_destroy_texture,
+    cmp_render_record_draw_texture};
 
-static const CMPTextVTable g_cmp_render_record_text_vtable =
-    {
-     cmp_render_record_create_font,
-     cmp_render_record_destroy_font,
-     cmp_render_record_measure_text,
-     cmp_render_record_draw_text,
-     NULL,
-     NULL,
-     NULL};
+static const CMPTextVTable g_cmp_render_record_text_vtable = {
+    cmp_render_record_create_font,
+    cmp_render_record_destroy_font,
+    cmp_render_record_measure_text,
+    cmp_render_record_draw_text,
+    NULL,
+    NULL,
+    NULL};
 
 static int cmp_render_validate_node(const CMPRenderNode *node) {
   cmp_usize i;
@@ -541,10 +531,10 @@ static int cmp_render_validate_node(const CMPRenderNode *node) {
   return CMP_OK;
 }
 
-static int
-cmp_render_build_node(const CMPRenderNode *node, const CMPRect *parent_clip,
-                      CMPScalar dpi_scale,
-                      CMPRenderRecorder *recorder) {
+static int cmp_render_build_node(const CMPRenderNode *node,
+                                 const CMPRect *parent_clip,
+                                 CMPScalar dpi_scale,
+                                 CMPRenderRecorder *recorder) {
   CMPRect clip;
   CMPBool has_intersection;
   CMPPaintContext ctx;
@@ -609,9 +599,9 @@ cmp_render_build_node(const CMPRenderNode *node, const CMPRect *parent_clip,
   return first_error;
 }
 
-int CMP_CALL
-cmp_render_list_init(CMPRenderList *list, const CMPAllocator *allocator,
-                     cmp_usize initial_capacity) {
+int CMP_CALL cmp_render_list_init(CMPRenderList *list,
+                                  const CMPAllocator *allocator,
+                                  cmp_usize initial_capacity) {
   CMPAllocator chosen;
   cmp_usize bytes;
   void *mem;
@@ -851,8 +841,8 @@ int CMP_CALL cmp_render_node_init(CMPRenderNode *node, CMPWidget *widget,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_render_node_set_bounds(
-    CMPRenderNode *node, const CMPRect *bounds) {
+int CMP_CALL cmp_render_node_set_bounds(CMPRenderNode *node,
+                                        const CMPRect *bounds) {
   int rc;
 
   if (node == NULL || bounds == NULL) {

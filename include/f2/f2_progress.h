@@ -24,19 +24,19 @@ extern "C" {
  * @brief Fluent 2 Linear Progress style.
  */
 typedef struct F2LinearProgressStyle {
-  CMPScalar height;        /**< Track height. */
-  CMPColor track_color;    /**< Track color. */
-  CMPColor fill_color;     /**< Fill color. */
+  CMPScalar height;     /**< Track height. */
+  CMPColor track_color; /**< Track color. */
+  CMPColor fill_color;  /**< Fill color. */
 } F2LinearProgressStyle;
 
 /**
  * @brief Fluent 2 Linear Progress widget.
  */
 typedef struct F2LinearProgress {
-  CMPWidget widget;              /**< Widget interface. */
-  F2LinearProgressStyle style;   /**< Current style. */
-  CMPRect bounds;                /**< Layout bounds. */
-  CMPScalar value;               /**< Progress value (0.0 to 1.0). If < 0, indeterminate. */
+  CMPWidget widget;            /**< Widget interface. */
+  F2LinearProgressStyle style; /**< Current style. */
+  CMPRect bounds;              /**< Layout bounds. */
+  CMPScalar value; /**< Progress value (0.0 to 1.0). If < 0, indeterminate. */
 } F2LinearProgress;
 
 /**
@@ -44,7 +44,8 @@ typedef struct F2LinearProgress {
  * @param style Style descriptor to initialize.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL f2_linear_progress_style_init(F2LinearProgressStyle *style);
+CMP_API int CMP_CALL
+f2_linear_progress_style_init(F2LinearProgressStyle *style);
 
 /**
  * @brief Initialize a Fluent 2 linear progress widget.
@@ -63,26 +64,27 @@ CMP_API int CMP_CALL f2_linear_progress_init(F2LinearProgress *progress,
  * @param value New value.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL f2_linear_progress_set_value(F2LinearProgress *progress, CMPScalar value);
+CMP_API int CMP_CALL f2_linear_progress_set_value(F2LinearProgress *progress,
+                                                  CMPScalar value);
 
 /**
  * @brief Fluent 2 Circular Progress (Progress Ring) style.
  */
 typedef struct F2CircularProgressStyle {
-  CMPScalar size;          /**< Ring diameter. */
-  CMPScalar thickness;     /**< Stroke thickness. */
-  CMPColor track_color;    /**< Unfilled track color. */
-  CMPColor fill_color;     /**< Filled color. */
+  CMPScalar size;       /**< Ring diameter. */
+  CMPScalar thickness;  /**< Stroke thickness. */
+  CMPColor track_color; /**< Unfilled track color. */
+  CMPColor fill_color;  /**< Filled color. */
 } F2CircularProgressStyle;
 
 /**
  * @brief Fluent 2 Circular Progress (Progress Ring) widget.
  */
 typedef struct F2CircularProgress {
-  CMPWidget widget;                /**< Widget interface. */
-  F2CircularProgressStyle style;   /**< Current style. */
-  CMPRect bounds;                  /**< Layout bounds. */
-  CMPScalar value;                 /**< Progress value (0.0 to 1.0). If < 0, indeterminate. */
+  CMPWidget widget;              /**< Widget interface. */
+  F2CircularProgressStyle style; /**< Current style. */
+  CMPRect bounds;                /**< Layout bounds. */
+  CMPScalar value; /**< Progress value (0.0 to 1.0). If < 0, indeterminate. */
 } F2CircularProgress;
 
 /**
@@ -90,7 +92,8 @@ typedef struct F2CircularProgress {
  * @param style Style descriptor to initialize.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL f2_circular_progress_style_init(F2CircularProgressStyle *style);
+CMP_API int CMP_CALL
+f2_circular_progress_style_init(F2CircularProgressStyle *style);
 
 /**
  * @brief Initialize a Fluent 2 circular progress widget.
@@ -99,9 +102,9 @@ CMP_API int CMP_CALL f2_circular_progress_style_init(F2CircularProgressStyle *st
  * @param value Initial value (0.0 to 1.0, or -1.0 for indeterminate).
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL f2_circular_progress_init(F2CircularProgress *progress,
-                                               const F2CircularProgressStyle *style,
-                                               CMPScalar value);
+CMP_API int CMP_CALL f2_circular_progress_init(
+    F2CircularProgress *progress, const F2CircularProgressStyle *style,
+    CMPScalar value);
 
 /**
  * @brief Set circular progress value.
@@ -109,7 +112,8 @@ CMP_API int CMP_CALL f2_circular_progress_init(F2CircularProgress *progress,
  * @param value New value.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL f2_circular_progress_set_value(F2CircularProgress *progress, CMPScalar value);
+CMP_API int CMP_CALL
+f2_circular_progress_set_value(F2CircularProgress *progress, CMPScalar value);
 
 #ifdef __cplusplus
 }

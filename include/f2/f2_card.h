@@ -50,13 +50,13 @@ typedef struct F2CardStyle {
  * @brief Fluent 2 Card widget instance.
  */
 typedef struct F2Card {
-  CMPWidget widget;         /**< Widget interface. */
-  F2CardStyle style;        /**< Current style. */
-  CMPRect bounds;           /**< Layout bounds. */
-  CMPBool hovered;          /**< Hover state. */
-  CMPBool pressed;          /**< Pressed state. */
-  F2CardOnClick on_click;   /**< Click callback. */
-  void *on_click_ctx;       /**< Click callback context. */
+  CMPWidget widget;       /**< Widget interface. */
+  F2CardStyle style;      /**< Current style. */
+  CMPRect bounds;         /**< Layout bounds. */
+  CMPBool hovered;        /**< Hover state. */
+  CMPBool pressed;        /**< Pressed state. */
+  F2CardOnClick on_click; /**< Click callback. */
+  void *on_click_ctx;     /**< Click callback context. */
 } F2Card;
 
 /**
@@ -81,7 +81,8 @@ CMP_API int CMP_CALL f2_card_init(F2Card *card, const F2CardStyle *style);
  * @param ctx Context pointer.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_card_set_on_click(F2Card *card, F2CardOnClick on_click, void *ctx);
+CMP_API int CMP_CALL f2_card_set_on_click(F2Card *card, F2CardOnClick on_click,
+                                          void *ctx);
 
 #ifdef __cplusplus
 }

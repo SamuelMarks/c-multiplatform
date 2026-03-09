@@ -259,9 +259,11 @@ static int expect_svg_draw(const CMPGfx *gfx, const CMPRect *bounds,
                            const char *path, int expected_rc) {
   int rc;
   svg->utf8_path = path;
-  rc = cmp_icon_draw_utf8(gfx, bounds, style, NULL, 0u, svg, CMP_ICON_RENDER_SVG);
+  rc = cmp_icon_draw_utf8(gfx, bounds, style, NULL, 0u, svg,
+                          CMP_ICON_RENDER_SVG);
   if (rc != expected_rc) {
-    printf("expect_svg_draw failed for path: %s (expected %d, got %d)\n", path, expected_rc, rc);
+    printf("expect_svg_draw failed for path: %s (expected %d, got %d)\n", path,
+           expected_rc, rc);
   }
   CMP_TEST_EXPECT(rc, expected_rc);
   return CMP_OK;
@@ -471,19 +473,26 @@ int main(void) {
 
   {
     CMPPath dummy_path;
-    CMP_TEST_EXPECT(cmp_icon_test_svg_build_path(NULL, &bounds, &dummy_path), CMP_ERR_INVALID_ARGUMENT);
+    CMP_TEST_EXPECT(cmp_icon_test_svg_build_path(NULL, &bounds, &dummy_path),
+                    CMP_ERR_INVALID_ARGUMENT);
     svg_bad = svg;
     svg_bad.utf8_path = "M0 0";
     CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_INIT));
-    CMP_TEST_EXPECT(cmp_icon_test_svg_build_path(&svg_bad, &bounds, &dummy_path), CMP_ERR_IO);
+    CMP_TEST_EXPECT(
+        cmp_icon_test_svg_build_path(&svg_bad, &bounds, &dummy_path),
+        CMP_ERR_IO);
     CMP_TEST_OK(cmp_icon_test_clear_fail_points());
-    
+
     svg_bad.utf8_path = "Z";
-    CMP_TEST_EXPECT(cmp_icon_test_svg_build_path(&svg_bad, &bounds, &dummy_path), CMP_ERR_CORRUPT);
+    CMP_TEST_EXPECT(
+        cmp_icon_test_svg_build_path(&svg_bad, &bounds, &dummy_path),
+        CMP_ERR_CORRUPT);
 
     CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
     svg_bad.utf8_path = "M0 0 L10 10";
-    CMP_TEST_EXPECT(cmp_icon_test_svg_build_path(&svg_bad, &bounds, &dummy_path), CMP_ERR_UNKNOWN);
+    CMP_TEST_EXPECT(
+        cmp_icon_test_svg_build_path(&svg_bad, &bounds, &dummy_path),
+        CMP_ERR_UNKNOWN);
     CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
   }
 
@@ -574,7 +583,8 @@ int main(void) {
   CMP_TEST_OK(cmp_icon_test_svg_parse("M0 0", CMP_TRUE, CMP_TRUE));
 
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_TRUE));
-  CMP_TEST_EXPECT(cmp_icon_test_svg_parse("M0 0", CMP_TRUE, CMP_TRUE), CMP_ERR_UNKNOWN);
+  CMP_TEST_EXPECT(cmp_icon_test_svg_parse("M0 0", CMP_TRUE, CMP_TRUE),
+                  CMP_ERR_UNKNOWN);
   CMP_TEST_OK(cmp_core_test_set_default_allocator_fail(CMP_FALSE));
 
   test_text_backend_init(&text_backend);
@@ -865,10 +875,14 @@ int main(void) {
                               CMP_ERR_RANGE));
   CMP_TEST_OK(
       expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 Vnan", CMP_ERR_RANGE));
-  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 L", CMP_ERR_CORRUPT));
-  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 l", CMP_ERR_CORRUPT));
-  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 C", CMP_ERR_CORRUPT));
-  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 c", CMP_ERR_CORRUPT));
+  CMP_TEST_OK(
+      expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 L", CMP_ERR_CORRUPT));
+  CMP_TEST_OK(
+      expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 l", CMP_ERR_CORRUPT));
+  CMP_TEST_OK(
+      expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 C", CMP_ERR_CORRUPT));
+  CMP_TEST_OK(
+      expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 c", CMP_ERR_CORRUPT));
   CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 C0 0",
                               CMP_ERR_CORRUPT));
   CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 c0 0",
@@ -887,18 +901,18 @@ int main(void) {
                               CMP_ERR_CORRUPT));
   CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 c0 0 1 1 2",
                               CMP_ERR_CORRUPT));
-  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 C0 0 1 1 2 2 3",
-                              CMP_ERR_CORRUPT));
-  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 c0 0 1 1 2 2 3",
-                              CMP_ERR_CORRUPT));
-  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 C0 0 1 1 2 2 3 4",
-                              CMP_ERR_CORRUPT));
-  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 c0 0 1 1 2 2 3 4",
-                              CMP_ERR_CORRUPT));
-  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 C0 0 1 1 2 2 3 4 5",
-                              CMP_ERR_CORRUPT));
-  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 c0 0 1 1 2 2 3 4 5",
-                              CMP_ERR_CORRUPT));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg,
+                              "M0 0 C0 0 1 1 2 2 3", CMP_ERR_CORRUPT));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg,
+                              "M0 0 c0 0 1 1 2 2 3", CMP_ERR_CORRUPT));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg,
+                              "M0 0 C0 0 1 1 2 2 3 4", CMP_ERR_CORRUPT));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg,
+                              "M0 0 c0 0 1 1 2 2 3 4", CMP_ERR_CORRUPT));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg,
+                              "M0 0 C0 0 1 1 2 2 3 4 5", CMP_ERR_CORRUPT));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg,
+                              "M0 0 c0 0 1 1 2 2 3 4 5", CMP_ERR_CORRUPT));
   CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg,
                               "M0 0 C0 0 1 1 nan 2", CMP_ERR_RANGE));
   CMP_TEST_OK(
@@ -972,110 +986,84 @@ int main(void) {
       expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 10 10", CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
   CMP_TEST_OK(
       expect_svg_draw(&gfx, &bounds, &style, &svg, "m1 1 10 10", CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
-
-
 
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
   CMP_TEST_OK(
       expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 L10 10", CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
   CMP_TEST_OK(
       expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 l10 10", CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
-
 
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
   CMP_TEST_OK(
       expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 H10", CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
   CMP_TEST_OK(
       expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 h10", CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
-
 
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
   CMP_TEST_OK(
       expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 V10", CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
   CMP_TEST_OK(
       expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 v10", CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
-  CMP_TEST_OK(
-      expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 C0 0 1 1 2 2", CMP_ERR_IO));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 C0 0 1 1 2 2",
+                              CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
-
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
-  CMP_TEST_OK(
-      expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 c0 0 1 1 2 2", CMP_ERR_IO));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 c0 0 1 1 2 2",
+                              CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
-  CMP_TEST_OK(
-      expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 S1 1 2 2", CMP_ERR_IO));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 S1 1 2 2",
+                              CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
-  CMP_TEST_OK(
-      expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 s1 1 2 2", CMP_ERR_IO));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 s1 1 2 2",
+                              CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
-  CMP_TEST_OK(
-      expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 Q0 0 1 1", CMP_ERR_IO));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 Q0 0 1 1",
+                              CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
-  CMP_TEST_OK(
-      expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 q0 0 1 1", CMP_ERR_IO));
+  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 q0 0 1 1",
+                              CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
-
-
 
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
   CMP_TEST_OK(
       expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 T1 1", CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
   CMP_TEST_OK(
       expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 t1 1", CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
-
-
   CMP_TEST_OK(cmp_icon_test_set_fail_point(CMP_ICON_TEST_FAIL_PATH_APPEND));
-  CMP_TEST_OK(expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 Z", CMP_ERR_IO));
+  CMP_TEST_OK(
+      expect_svg_draw(&gfx, &bounds, &style, &svg, "M0 0 Z", CMP_ERR_IO));
   CMP_TEST_OK(cmp_icon_test_clear_fail_points());
 
   svg.utf8_path = "M1e309 0";
@@ -1115,19 +1103,31 @@ int main(void) {
   CMP_TEST_ASSERT(cmp_near(metrics.height, 10.0f, 0.001f));
 
   /* Measure/draw invalid args not already covered */
-  CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, NULL, 5u, &svg, CMP_ICON_RENDER_SVG, &metrics), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 5u, &svg, CMP_ICON_RENDER_SVG), CMP_ERR_INVALID_ARGUMENT);
-  
+  CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, NULL, 5u, &svg,
+                                        CMP_ICON_RENDER_SVG, &metrics),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 5u, &svg,
+                                     CMP_ICON_RENDER_SVG),
+                  CMP_ERR_INVALID_ARGUMENT);
+
   style.size_px = 0; /* Invalid style */
-  CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, NULL, 0u, &svg, CMP_ICON_RENDER_SVG, &metrics), CMP_ERR_RANGE);
-  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg, CMP_ICON_RENDER_SVG), CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, NULL, 0u, &svg,
+                                        CMP_ICON_RENDER_SVG, &metrics),
+                  CMP_ERR_RANGE);
+  CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bounds, &style, NULL, 0u, &svg,
+                                     CMP_ICON_RENDER_SVG),
+                  CMP_ERR_RANGE);
   style.size_px = 20;
-  
-  CMP_TEST_EXPECT(cmp_icon_measure_utf8(&gfx, &style, NULL, 0u, &svg, 9999u, &metrics), CMP_ERR_INVALID_ARGUMENT);
-  
+
+  CMP_TEST_EXPECT(
+      cmp_icon_measure_utf8(&gfx, &style, NULL, 0u, &svg, 9999u, &metrics),
+      CMP_ERR_INVALID_ARGUMENT);
+
   {
     CMPRect bad_bounds = {-1.0f, -1.0f, -1.0f, -1.0f};
-    CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bad_bounds, &style, NULL, 0u, &svg, CMP_ICON_RENDER_SVG), CMP_ERR_RANGE);
+    CMP_TEST_EXPECT(cmp_icon_draw_utf8(&gfx, &bad_bounds, &style, NULL, 0u,
+                                       &svg, CMP_ICON_RENDER_SVG),
+                    CMP_ERR_RANGE);
   }
 
   return 0;

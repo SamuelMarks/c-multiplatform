@@ -16,21 +16,21 @@ extern "C" {
 /**
  * @brief Material 3 Carousel style descriptor.
  */
-/** 
- * @brief Carousel variant type. 
- */ 
-typedef enum M3CarouselVariant { 
-  M3_CAROUSEL_VARIANT_STANDARD = 0, 
-  M3_CAROUSEL_VARIANT_HERO = 1, 
-  M3_CAROUSEL_VARIANT_MULTI_BROWSE = 2 
+/**
+ * @brief Carousel variant type.
+ */
+typedef enum M3CarouselVariant {
+  M3_CAROUSEL_VARIANT_STANDARD = 0,
+  M3_CAROUSEL_VARIANT_HERO = 1,
+  M3_CAROUSEL_VARIANT_MULTI_BROWSE = 2
 } M3CarouselVariant;
 
 /** @brief Carousel style configuration. */
 typedef struct M3CarouselStyle {
   CMPScalar item_spacing;    /**< Spacing between items. */
-  M3CarouselVariant variant; /**< The variant of the carousel. */ 
-  CMPScalar item_width;      /**< Width of items (ignored if <= 0). */ 
-  CMPScalar hero_width;      /**< Hero item width for hero variant. */ 
+  M3CarouselVariant variant; /**< The variant of the carousel. */
+  CMPScalar item_width;      /**< Width of items (ignored if <= 0). */
+  CMPScalar hero_width;      /**< Hero item width for hero variant. */
   CMPScalar min_item_width;  /**< Minimum item width for multi-browse. */
   CMPScalar snap_velocity;   /**< Velocity threshold for snapping. */
   CMPColor background_color; /**< Background color. */
@@ -53,16 +53,16 @@ typedef int(CMP_CALL *M3CarouselOnSelect)(void *ctx,
  * @brief Material 3 Carousel widget.
  */
 typedef struct M3Carousel {
-  CMPWidget widget;      /**< Widget interface. */
-  M3CarouselStyle style; /**< Carousel styling. */
-  CMPWidget **items;     /**< Array of child item widgets. */
-  cmp_usize item_count;  /**< Number of items. */
-  cmp_usize capacity;    /**< Capacity of items array. */
-  CMPScalar scroll_offset;  /**< Current scroll offset. */
-  CMPScalar content_extent; /**< Total content width. */
-  CMPBool dragging;         /**< Whether the user is dragging. */
-  cmp_i32 last_pointer_x;   /**< Last pointer X position. */
-  cmp_u32 last_time_ms;     /**< Last time in milliseconds. */
+  CMPWidget widget;             /**< Widget interface. */
+  M3CarouselStyle style;        /**< Carousel styling. */
+  CMPWidget **items;            /**< Array of child item widgets. */
+  cmp_usize item_count;         /**< Number of items. */
+  cmp_usize capacity;           /**< Capacity of items array. */
+  CMPScalar scroll_offset;      /**< Current scroll offset. */
+  CMPScalar content_extent;     /**< Total content width. */
+  CMPBool dragging;             /**< Whether the user is dragging. */
+  cmp_i32 last_pointer_x;       /**< Last pointer X position. */
+  cmp_u32 last_time_ms;         /**< Last time in milliseconds. */
   CMPScalar velocity;           /**< Scroll physics state. */
   CMPRect bounds;               /**< Layout bounds. */
   cmp_usize selected_index;     /**< Currently selected or snapped index. */
@@ -88,7 +88,8 @@ CMP_API int CMP_CALL m3_carousel_style_init_hero(M3CarouselStyle *style);
  * @param style The style to initialize.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL m3_carousel_style_init_multi_browse(M3CarouselStyle *style);
+CMP_API int CMP_CALL
+m3_carousel_style_init_multi_browse(M3CarouselStyle *style);
 
 /**
  * @brief Initialize a Material 3 carousel.

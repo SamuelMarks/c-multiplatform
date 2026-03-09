@@ -222,8 +222,10 @@ typedef struct M3SliderStyle {
   CMPScalar track_length;        /**< Track length in pixels (> 0). */
   CMPScalar track_height;        /**< Track height in pixels (> 0). */
   CMPScalar track_corner_radius; /**< Track corner radius in pixels (>= 0). */
-  CMPBool is_media_slider;       /**< CMP_TRUE for expressive morphing media slider. */ 
-  CMPScalar active_track_height; /**< Height of active track when dragging media slider. */ 
+  CMPBool
+      is_media_slider; /**< CMP_TRUE for expressive morphing media slider. */
+  CMPScalar active_track_height; /**< Height of active track when dragging media
+                                    slider. */
   CMPScalar thumb_width;         /**< Thumb width in pixels (capsule). */
   CMPScalar thumb_radius;        /**< Thumb radius in pixels (> 0). */
   CMPColor track_color;          /**< Inactive track color. */
@@ -260,11 +262,11 @@ typedef struct M3Slider {
  */
 CMP_API int CMP_CALL m3_slider_style_init(M3SliderStyle *style);
 
-/** 
- * @brief Initialize a slider style for expressive media controls. 
- * @param style Style descriptor to initialize. 
- * @return CMP_OK on success or a failure code. 
- */ 
+/**
+ * @brief Initialize a slider style for expressive media controls.
+ * @param style Style descriptor to initialize.
+ * @return CMP_OK on success or a failure code.
+ */
 CMP_API int CMP_CALL m3_slider_style_init_media(M3SliderStyle *style);
 
 /**

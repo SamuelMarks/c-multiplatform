@@ -58,11 +58,11 @@ typedef struct F2BadgeStyle {
  * @brief Fluent 2 Badge widget.
  */
 typedef struct F2Badge {
-  CMPWidget widget;          /**< Widget interface. */
-  F2BadgeStyle style;        /**< Current style. */
-  const char *utf8_label;    /**< UTF-8 label text (NULL for dot). */
-  cmp_usize utf8_len;        /**< Label text length. */
-  CMPRect bounds;            /**< Layout bounds. */
+  CMPWidget widget;       /**< Widget interface. */
+  F2BadgeStyle style;     /**< Current style. */
+  const char *utf8_label; /**< UTF-8 label text (NULL for dot). */
+  cmp_usize utf8_len;     /**< Label text length. */
+  CMPRect bounds;         /**< Layout bounds. */
 } F2Badge;
 
 /**
@@ -80,10 +80,8 @@ CMP_API int CMP_CALL f2_badge_style_init(F2BadgeStyle *style);
  * @param utf8_len Length of the label.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_badge_init(F2Badge *badge,
-                                   const F2BadgeStyle *style,
-                                   const char *utf8_label,
-                                   cmp_usize utf8_len);
+CMP_API int CMP_CALL f2_badge_init(F2Badge *badge, const F2BadgeStyle *style,
+                                   const char *utf8_label, cmp_usize utf8_len);
 
 /**
  * @brief Update the badge label.
@@ -92,8 +90,8 @@ CMP_API int CMP_CALL f2_badge_init(F2Badge *badge,
  * @param utf8_len Length of the label.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_badge_set_label(F2Badge *badge, const char *utf8_label, cmp_usize utf8_len);
-
+CMP_API int CMP_CALL f2_badge_set_label(F2Badge *badge, const char *utf8_label,
+                                        cmp_usize utf8_len);
 
 /**
  * @brief Fluent 2 Presence Badge style descriptor.
@@ -112,10 +110,10 @@ typedef struct F2PresenceBadgeStyle {
  * @brief Fluent 2 Presence Badge widget.
  */
 typedef struct F2PresenceBadge {
-  CMPWidget widget;                 /**< Widget interface. */
-  F2PresenceBadgeStyle style;       /**< Current style. */
-  F2PresenceState state;            /**< Presence state. */
-  CMPRect bounds;                   /**< Layout bounds. */
+  CMPWidget widget;           /**< Widget interface. */
+  F2PresenceBadgeStyle style; /**< Current style. */
+  F2PresenceState state;      /**< Presence state. */
+  CMPRect bounds;             /**< Layout bounds. */
 } F2PresenceBadge;
 
 /**
@@ -142,7 +140,8 @@ CMP_API int CMP_CALL f2_presence_badge_init(F2PresenceBadge *badge,
  * @param state New state.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_presence_badge_set_state(F2PresenceBadge *badge, F2PresenceState state);
+CMP_API int CMP_CALL f2_presence_badge_set_state(F2PresenceBadge *badge,
+                                                 F2PresenceState state);
 
 #ifdef __cplusplus
 }

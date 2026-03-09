@@ -12,11 +12,9 @@
 #include <string.h>
 
 #ifdef CMP_TESTING
-static cmp_u32 g_cmp_tasks_test_fail_point =
-    CMP_TASKS_TEST_FAIL_NONE;                 
+static cmp_u32 g_cmp_tasks_test_fail_point = CMP_TASKS_TEST_FAIL_NONE;
 static int g_cmp_tasks_test_nsec_adjusted = 0;
-static cmp_u32 g_cmp_tasks_test_thread_create_fail_after =
-    0u;                                                 
+static cmp_u32 g_cmp_tasks_test_thread_create_fail_after = 0u;
 static cmp_u32 g_cmp_tasks_test_thread_create_count = 0;
 
 static int cmp_tasks_test_consume_fail(cmp_u32 point) {
@@ -132,9 +130,9 @@ static int CMP_CALL cmp_tasks_test_unregister_ex(void *ctx, CMPHandle handle) {
   return CMP_OK;
 }
 
-static int CMP_CALL cmp_tasks_test_alloc_ex(
-    void *ctx, cmp_usize size, void **out_ptr) {
-  CMPTasksTestStub *stub;                       
+static int CMP_CALL cmp_tasks_test_alloc_ex(void *ctx, cmp_usize size,
+                                            void **out_ptr) {
+  CMPTasksTestStub *stub;
 
   if (ctx == NULL || out_ptr == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -157,9 +155,8 @@ static int CMP_CALL cmp_tasks_test_alloc_ex(
   return CMP_OK;
 }
 
-static int CMP_CALL
-cmp_tasks_test_realloc_ex(void *ctx, void *ptr, cmp_usize size,
-                          void **out_ptr) {
+static int CMP_CALL cmp_tasks_test_realloc_ex(void *ctx, void *ptr,
+                                              cmp_usize size, void **out_ptr) {
   CMPTasksTestStub *stub = NULL;
   void *mem = NULL;
 
@@ -203,11 +200,12 @@ static int CMP_CALL cmp_tasks_test_free_ex(void *ctx, void *ptr) {
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-#define CMP_TASKS_USE_WIN32 1         
+#define CMP_TASKS_USE_WIN32 1
 #include <stdarg.h>
 #include <stddef.h>
 
-#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) && !defined(_ARM_) && !defined(_ARM64_)
+#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) &&               \
+    !defined(_ARM_) && !defined(_ARM64_)
 #if defined(_M_AMD64)
 #define _AMD64_
 #elif defined(_M_IX86)
@@ -221,22 +219,25 @@ static int CMP_CALL cmp_tasks_test_free_ex(void *ctx, void *ptr) {
 
 #if defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(disable: 4201 4214)
+#pragma warning(disable : 4201 4214)
 #endif
 
-#include <windef.h>
 #include <winbase.h>
+#include <windef.h>
 #include <wingdi.h>
-#include <winuser.h>                  
+#include <winuser.h>
 
 #if defined(_MSC_VER) && _MSC_VER < 1500
-typedef struct _RTL_CONDITION_VARIABLE { PVOID Ptr; } RTL_CONDITION_VARIABLE, *PRTL_CONDITION_VARIABLE;
+typedef struct _RTL_CONDITION_VARIABLE {
+  PVOID Ptr;
+} RTL_CONDITION_VARIABLE, *PRTL_CONDITION_VARIABLE;
 typedef RTL_CONDITION_VARIABLE CONDITION_VARIABLE, *PCONDITION_VARIABLE;
 
-typedef VOID (WINAPI * PFN_InitializeConditionVariable)(PCONDITION_VARIABLE);
-typedef VOID (WINAPI * PFN_WakeConditionVariable)(PCONDITION_VARIABLE);
-typedef VOID (WINAPI * PFN_WakeAllConditionVariable)(PCONDITION_VARIABLE);
-typedef BOOL (WINAPI * PFN_SleepConditionVariableCS)(PCONDITION_VARIABLE, PCRITICAL_SECTION, DWORD);
+typedef VOID(WINAPI *PFN_InitializeConditionVariable)(PCONDITION_VARIABLE);
+typedef VOID(WINAPI *PFN_WakeConditionVariable)(PCONDITION_VARIABLE);
+typedef VOID(WINAPI *PFN_WakeAllConditionVariable)(PCONDITION_VARIABLE);
+typedef BOOL(WINAPI *PFN_SleepConditionVariableCS)(PCONDITION_VARIABLE,
+                                                   PCRITICAL_SECTION, DWORD);
 
 static PFN_InitializeConditionVariable g_pfnInitializeConditionVariable = NULL;
 static PFN_WakeConditionVariable g_pfnWakeConditionVariable = NULL;
@@ -244,55 +245,72 @@ static PFN_WakeAllConditionVariable g_pfnWakeAllConditionVariable = NULL;
 static PFN_SleepConditionVariableCS g_pfnSleepConditionVariableCS = NULL;
 
 static void InitCVPointers(void) {
-    if (g_pfnInitializeConditionVariable == NULL) {
-        HMODULE hMod = GetModuleHandleA("kernel32.dll");
-        g_pfnInitializeConditionVariable = (PFN_InitializeConditionVariable)GetProcAddress(hMod, "InitializeConditionVariable");
-        g_pfnWakeConditionVariable = (PFN_WakeConditionVariable)GetProcAddress(hMod, "WakeConditionVariable");
-        g_pfnWakeAllConditionVariable = (PFN_WakeAllConditionVariable)GetProcAddress(hMod, "WakeAllConditionVariable");
-        g_pfnSleepConditionVariableCS = (PFN_SleepConditionVariableCS)GetProcAddress(hMod, "SleepConditionVariableCS");
-    }
+  if (g_pfnInitializeConditionVariable == NULL) {
+    HMODULE hMod = GetModuleHandleA("kernel32.dll");
+    g_pfnInitializeConditionVariable =
+        (PFN_InitializeConditionVariable)GetProcAddress(
+            hMod, "InitializeConditionVariable");
+    g_pfnWakeConditionVariable = (PFN_WakeConditionVariable)GetProcAddress(
+        hMod, "WakeConditionVariable");
+    g_pfnWakeAllConditionVariable =
+        (PFN_WakeAllConditionVariable)GetProcAddress(
+            hMod, "WakeAllConditionVariable");
+    g_pfnSleepConditionVariableCS =
+        (PFN_SleepConditionVariableCS)GetProcAddress(
+            hMod, "SleepConditionVariableCS");
+  }
 }
 
-static VOID WINAPI InitializeConditionVariable(PCONDITION_VARIABLE ConditionVariable) {
-    InitCVPointers();
-    if (g_pfnInitializeConditionVariable) g_pfnInitializeConditionVariable(ConditionVariable);
+static VOID WINAPI
+InitializeConditionVariable(PCONDITION_VARIABLE ConditionVariable) {
+  InitCVPointers();
+  if (g_pfnInitializeConditionVariable)
+    g_pfnInitializeConditionVariable(ConditionVariable);
 }
 
-static VOID WINAPI WakeConditionVariable(PCONDITION_VARIABLE ConditionVariable) {
-    if (g_pfnWakeConditionVariable) g_pfnWakeConditionVariable(ConditionVariable);
+static VOID WINAPI
+WakeConditionVariable(PCONDITION_VARIABLE ConditionVariable) {
+  if (g_pfnWakeConditionVariable)
+    g_pfnWakeConditionVariable(ConditionVariable);
 }
 
-static VOID WINAPI WakeAllConditionVariable(PCONDITION_VARIABLE ConditionVariable) {
-    if (g_pfnWakeAllConditionVariable) g_pfnWakeAllConditionVariable(ConditionVariable);
+static VOID WINAPI
+WakeAllConditionVariable(PCONDITION_VARIABLE ConditionVariable) {
+  if (g_pfnWakeAllConditionVariable)
+    g_pfnWakeAllConditionVariable(ConditionVariable);
 }
 
-static BOOL WINAPI SleepConditionVariableCS(PCONDITION_VARIABLE ConditionVariable, PCRITICAL_SECTION CriticalSection, DWORD dwMilliseconds) {
-    if (g_pfnSleepConditionVariableCS) return g_pfnSleepConditionVariableCS(ConditionVariable, CriticalSection, dwMilliseconds);
-    return FALSE;
+static BOOL WINAPI SleepConditionVariableCS(
+    PCONDITION_VARIABLE ConditionVariable, PCRITICAL_SECTION CriticalSection,
+    DWORD dwMilliseconds) {
+  if (g_pfnSleepConditionVariableCS)
+    return g_pfnSleepConditionVariableCS(ConditionVariable, CriticalSection,
+                                         dwMilliseconds);
+  return FALSE;
 }
 #endif
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
-#else                                 
-#define CMP_TASKS_USE_PTHREAD 1       
-#include <errno.h>                    
-#include <pthread.h>                  
-#include <sys/time.h>                 
-#include <time.h>                     
-#include <unistd.h>                   
-#endif                                
+#else
+#define CMP_TASKS_USE_PTHREAD 1
+#include <errno.h>
+#include <pthread.h>
+#include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
+#endif
 
-#define CMP_TASKS_DEFAULT_WORKERS 1         
-#define CMP_TASKS_DEFAULT_QUEUE_CAPACITY 64 
+#define CMP_TASKS_DEFAULT_WORKERS 1
+#define CMP_TASKS_DEFAULT_QUEUE_CAPACITY 64
 #define CMP_TASKS_DEFAULT_HANDLE_CAPACITY 64
 
 #define CMP_TASK_OBJECT_THREAD 1
-#define CMP_TASK_OBJECT_MUTEX 2 
+#define CMP_TASK_OBJECT_MUTEX 2
 
 #if defined(CMP_TASKS_USE_WIN32)
-typedef struct CMPNativeMutex { 
+typedef struct CMPNativeMutex {
   CRITICAL_SECTION cs;
 } CMPNativeMutex;
 
@@ -302,20 +320,20 @@ typedef struct CMPNativeCond {
 
 typedef struct CMPNativeThread {
   HANDLE handle;
-  DWORD id;     
+  DWORD id;
 } CMPNativeThread;
 #else
 typedef struct CMPNativeMutex {
-  pthread_mutex_t mutex;       
-} CMPNativeMutex;              
+  pthread_mutex_t mutex;
+} CMPNativeMutex;
 
 typedef struct CMPNativeCond {
   pthread_cond_t cond;
 } CMPNativeCond;
 
 typedef struct CMPNativeThread {
-  pthread_t thread;             
-} CMPNativeThread;              
+  pthread_t thread;
+} CMPNativeThread;
 #endif
 
 #if defined(CMP_TASKS_USE_PTHREAD)
@@ -406,10 +424,9 @@ static int cmp_tasks_pthread_cond_broadcast(pthread_cond_t *cond) {
   return rc;
 }
 
-static int
-cmp_tasks_pthread_cond_wait(pthread_cond_t *cond,
-                            pthread_mutex_t *mutex) {
-#ifdef CMP_TESTING                                   
+static int cmp_tasks_pthread_cond_wait(pthread_cond_t *cond,
+                                       pthread_mutex_t *mutex) {
+#ifdef CMP_TESTING
   if (cmp_tasks_test_consume_fail(CMP_TASKS_TEST_FAIL_COND_WAIT)) {
     return EINVAL;
   }
@@ -434,7 +451,7 @@ static int cmp_tasks_pthread_cond_timedwait(pthread_cond_t *cond,
 
 static int cmp_tasks_pthread_create(pthread_t *thread, void *(*entry)(void *),
                                     void *user) {
-#ifdef CMP_TESTING                               
+#ifdef CMP_TESTING
   if (g_cmp_tasks_test_thread_create_fail_after > 0) {
     g_cmp_tasks_test_thread_create_count += 1;
     if (g_cmp_tasks_test_thread_create_count ==
@@ -478,7 +495,7 @@ static int cmp_tasks_nanosleep(struct timespec *req_spec);
 static int cmp_tasks_usleep(cmp_u32 usec) {
 #if defined(CMP_TASKS_USE_PTHREAD)
   struct timespec req;
-#endif                
+#endif
 #if defined(CMP_TASKS_USE_PTHREAD)
   {
     req.tv_sec = (time_t)(usec / 1000000u);
@@ -491,7 +508,7 @@ static int cmp_tasks_usleep(cmp_u32 usec) {
     }
     return 0;
   }
-#else 
+#else
   return usleep((unsigned int)usec);
 #endif
 }
@@ -510,9 +527,9 @@ static int cmp_tasks_nanosleep(struct timespec *req_spec) {
 #endif
 
 typedef struct CMPTaskItem {
-  CMPTaskFn fn;             
-  void *user;               
-  cmp_u32 due_time_ms;      
+  CMPTaskFn fn;
+  void *user;
+  cmp_u32 due_time_ms;
 } CMPTaskItem;
 
 typedef struct CMPTasksDefault CMPTasksDefault;
@@ -526,7 +543,7 @@ typedef struct CMPTaskWorker {
 typedef struct CMPTaskThread {
   CMPObjectHeader header;
   CMPTasksDefault *runner;
-  CMPNativeThread thread; 
+  CMPNativeThread thread;
   CMPThreadFn entry;
   void *user;
   CMPBool joined;
@@ -543,8 +560,8 @@ typedef struct CMPTaskMutex {
 struct CMPTasksDefault {
   CMPAllocator allocator;
   CMPHandleSystem handles;
-  CMPTasks tasks;          
-  CMPTaskItem *queue;      
+  CMPTasks tasks;
+  CMPTaskItem *queue;
   cmp_usize queue_capacity;
   cmp_usize queue_count;
   CMPNativeMutex queue_mutex;
@@ -558,7 +575,7 @@ struct CMPTasksDefault {
   int last_task_error;
 };
 
-#define cmp_u32_max_value() ((cmp_u32)~(cmp_u32)0)
+#define cmp_u32_max_value() ((cmp_u32) ~(cmp_u32)0)
 
 static cmp_usize cmp_usize_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
 
@@ -672,7 +689,7 @@ static int cmp_native_mutex_unlock(CMPNativeMutex *mutex) {
   if (mutex == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-#if defined(CMP_TASKS_USE_WIN32)   
+#if defined(CMP_TASKS_USE_WIN32)
   LeaveCriticalSection(&mutex->cs);
 #ifdef CMP_TESTING
   if (cmp_tasks_test_consume_fail(CMP_TASKS_TEST_FAIL_MUTEX_UNLOCK)) {
@@ -680,7 +697,7 @@ static int cmp_native_mutex_unlock(CMPNativeMutex *mutex) {
   }
 #endif
   return CMP_OK;
-#else 
+#else
   if (cmp_tasks_pthread_mutex_unlock(&mutex->mutex) != 0) {
     return CMP_ERR_UNKNOWN;
   }
@@ -700,7 +717,7 @@ static int cmp_native_cond_init(CMPNativeCond *cond) {
 #endif
   InitializeConditionVariable(&cond->cond);
   return CMP_OK;
-#else 
+#else
   if (cmp_tasks_pthread_cond_init(&cond->cond) != 0) {
     return CMP_ERR_UNKNOWN;
   }
@@ -731,16 +748,15 @@ static int cmp_native_cond_signal(CMPNativeCond *cond) {
   if (cond == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
-#if defined(CMP_TASKS_USE_WIN32)     
+#if defined(CMP_TASKS_USE_WIN32)
   WakeConditionVariable(&cond->cond);
 #ifdef CMP_TESTING
-  if (cmp_tasks_test_consume_fail(
-                                  CMP_TASKS_TEST_FAIL_COND_SIGNAL)) { /* GCOVR_EXCL_LINE */
+  if (cmp_tasks_test_consume_fail(CMP_TASKS_TEST_FAIL_COND_SIGNAL)) {
     return CMP_ERR_UNKNOWN;
   }
 #endif
   return CMP_OK;
-#else 
+#else
   if (cmp_tasks_pthread_cond_signal(&cond->cond) != 0) {
     return CMP_ERR_UNKNOWN;
   }
@@ -755,8 +771,7 @@ static int cmp_native_cond_broadcast(CMPNativeCond *cond) {
 #if defined(CMP_TASKS_USE_WIN32)
   WakeAllConditionVariable(&cond->cond);
 #ifdef CMP_TESTING
-  if (cmp_tasks_test_consume_fail(
-          CMP_TASKS_TEST_FAIL_COND_BROADCAST)) {
+  if (cmp_tasks_test_consume_fail(CMP_TASKS_TEST_FAIL_COND_BROADCAST)) {
     return CMP_ERR_UNKNOWN;
   }
 #endif
@@ -779,12 +794,11 @@ static int cmp_native_cond_wait(CMPNativeCond *cond, CMPNativeMutex *mutex) {
     return CMP_ERR_UNKNOWN;
   }
 #endif
-  if (!SleepConditionVariableCS(&cond->cond, &mutex->cs,
-                                INFINITE)) {
+  if (!SleepConditionVariableCS(&cond->cond, &mutex->cs, INFINITE)) {
     return CMP_ERR_UNKNOWN;
   }
   return CMP_OK;
-#else           
+#else
   if (cmp_tasks_pthread_cond_wait(&cond->cond, &mutex->mutex) != 0) {
     return CMP_ERR_UNKNOWN;
   }
@@ -808,8 +822,7 @@ static int cmp_native_cond_timedwait(CMPNativeCond *cond, CMPNativeMutex *mutex,
     return CMP_ERR_UNKNOWN;
   }
   if (cmp_tasks_test_consume_fail(CMP_TASKS_TEST_FAIL_COND_TIMEDWAIT_TIMEOUT)) {
-    g_cmp_tasks_test_fail_point =
-        CMP_TASKS_TEST_FAIL_COND_TIMEDWAIT_ERROR;
+    g_cmp_tasks_test_fail_point = CMP_TASKS_TEST_FAIL_COND_TIMEDWAIT_ERROR;
     return CMP_ERR_TIMEOUT;
   }
   if (cmp_tasks_test_consume_fail(CMP_TASKS_TEST_FAIL_COND_TIMEDWAIT_ERROR)) {
@@ -822,13 +835,13 @@ static int cmp_native_cond_timedwait(CMPNativeCond *cond, CMPNativeMutex *mutex,
     }
     return CMP_ERR_UNKNOWN;
   }
-  return CMP_OK;  
-#else             
+  return CMP_OK;
+#else
   {
     struct timeval tv;
     struct timespec ts;
     cmp_u32 ms_part;
-    long nsec; 
+    long nsec;
     time_t sec;
     int wait_rc;
 
@@ -902,23 +915,21 @@ static int cmp_native_thread_create(
       return CMP_ERR_UNKNOWN;
     }
   }
-  if (cmp_tasks_test_consume_fail(
-          CMP_TASKS_TEST_FAIL_THREAD_CREATE)) {
-    return CMP_ERR_UNKNOWN;                    
+  if (cmp_tasks_test_consume_fail(CMP_TASKS_TEST_FAIL_THREAD_CREATE)) {
+    return CMP_ERR_UNKNOWN;
   }
 #endif
-  thread->handle =
-      CreateThread(NULL, 0, entry, user, 0, &thread->id);
-  if (thread->handle == NULL) {                          
+  thread->handle = CreateThread(NULL, 0, entry, user, 0, &thread->id);
+  if (thread->handle == NULL) {
     return CMP_ERR_UNKNOWN;
   }
   return CMP_OK;
-#else           
+#else
   if (cmp_tasks_pthread_create(&thread->thread, entry, user) != 0) {
     return CMP_ERR_UNKNOWN;
   }
   return CMP_OK;
-#endif          
+#endif
 }
 
 static int cmp_native_thread_join(CMPNativeThread *thread) {
@@ -932,13 +943,12 @@ static int cmp_native_thread_join(CMPNativeThread *thread) {
   CloseHandle(thread->handle);
   thread->handle = NULL;
 #ifdef CMP_TESTING
-  if (cmp_tasks_test_consume_fail(
-          CMP_TASKS_TEST_FAIL_THREAD_JOIN)) {
+  if (cmp_tasks_test_consume_fail(CMP_TASKS_TEST_FAIL_THREAD_JOIN)) {
     return CMP_ERR_UNKNOWN;
   }
 #endif
   return CMP_OK;
-#else 
+#else
   if (cmp_tasks_pthread_join(thread->thread) != 0) {
     return CMP_ERR_UNKNOWN;
   }
@@ -1034,21 +1044,16 @@ static int cmp_task_object_get_type_id(void *obj, cmp_u32 *out_type_id) {
   return cmp_object_get_type_id((CMPObjectHeader *)obj, out_type_id);
 }
 
-static const CMPObjectVTable g_cmp_task_thread_vtable =
-    {                                                
-     cmp_task_object_retain, cmp_task_object_release,
-     cmp_task_thread_destroy,                        
-     cmp_task_object_get_type_id};                   
+static const CMPObjectVTable g_cmp_task_thread_vtable = {
+    cmp_task_object_retain, cmp_task_object_release, cmp_task_thread_destroy,
+    cmp_task_object_get_type_id};
 
-static const CMPObjectVTable g_cmp_task_mutex_vtable =
-    {
-     cmp_task_object_retain, cmp_task_object_release,
-     cmp_task_mutex_destroy,      
-     cmp_task_object_get_type_id};
+static const CMPObjectVTable g_cmp_task_mutex_vtable = {
+    cmp_task_object_retain, cmp_task_object_release, cmp_task_mutex_destroy,
+    cmp_task_object_get_type_id};
 
 static int cmp_tasks_queue_push(CMPTasksDefault *runner, CMPTaskFn fn,
-                                void *user,
-                                cmp_u32 due_time_ms) {
+                                void *user, cmp_u32 due_time_ms) {
   if (runner->queue_count >= runner->queue_capacity) {
     return CMP_ERR_BUSY;
   }
@@ -1062,9 +1067,9 @@ static int cmp_tasks_queue_push(CMPTasksDefault *runner, CMPTaskFn fn,
 static int cmp_tasks_queue_pick(CMPTasksDefault *runner, CMPTaskItem *out_task,
                                 cmp_u32 *out_wait_ms) {
   cmp_u32 now;
-  cmp_u32 earliest_due;    
+  cmp_u32 earliest_due;
   cmp_usize earliest_index;
-  cmp_usize i;             
+  cmp_usize i;
   int rc;
 
   if (runner->queue_count == 0) {
@@ -1105,16 +1110,16 @@ static int cmp_tasks_queue_pick(CMPTasksDefault *runner, CMPTaskItem *out_task,
 static CMP_TASK_THREAD_RETURN CMP_TASK_THREAD_CALL
 cmp_tasks_worker_entry(void *user) {
   CMPTasksDefault *runner;
-  int rc;     
+  int rc;
   int task_rc;
 
   runner = (CMPTasksDefault *)user;
   if (runner == NULL) {
 #if defined(CMP_TASKS_USE_WIN32)
     return 0;
-#else        
+#else
     return NULL;
-#endif       
+#endif
   }
 
   for (;;) {
@@ -1178,10 +1183,10 @@ cmp_tasks_worker_entry(void *user) {
   }
 
 #if defined(CMP_TASKS_USE_WIN32)
-  return 0;                     
-#else                           
+  return 0;
+#else
   return NULL;
-#endif                          
+#endif
 }
 
 static CMP_TASK_THREAD_RETURN CMP_TASK_THREAD_CALL
@@ -1191,27 +1196,26 @@ cmp_tasks_thread_entry(void *user) {
   thread = (CMPTaskThread *)user;
   if (thread == NULL || thread->entry == NULL) {
 #if defined(CMP_TASKS_USE_WIN32)
-    return 0;                   
-#else                           
+    return 0;
+#else
     return NULL;
-#endif                          
+#endif
   }
 
   thread->result = thread->entry(thread->user);
 
 #if defined(CMP_TASKS_USE_WIN32)
-  return 0;                     
-#else                           
+  return 0;
+#else
   return NULL;
-#endif                          
+#endif
 }
 
-static int
-cmp_tasks_default_thread_create(void *tasks, CMPThreadFn entry, void *user,
-                                CMPHandle *out_thread) {
-  CMPTasksDefault *runner;                              
-  CMPTaskThread *thread;                                
-  int rc;                                               
+static int cmp_tasks_default_thread_create(void *tasks, CMPThreadFn entry,
+                                           void *user, CMPHandle *out_thread) {
+  CMPTasksDefault *runner;
+  CMPTaskThread *thread;
+  int rc;
 
   if (tasks == NULL || entry == NULL || out_thread == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1239,9 +1243,8 @@ cmp_tasks_default_thread_create(void *tasks, CMPThreadFn entry, void *user,
   } else
 #endif
   {
-    rc =
-        cmp_object_header_init(&thread->header, CMP_TASK_OBJECT_THREAD, 0,
-                               &g_cmp_task_thread_vtable);
+    rc = cmp_object_header_init(&thread->header, CMP_TASK_OBJECT_THREAD, 0,
+                                &g_cmp_task_thread_vtable);
   }
   if (rc != CMP_OK) {
     runner->allocator.free(runner->allocator.ctx, thread);
@@ -1276,9 +1279,9 @@ cmp_tasks_default_thread_create(void *tasks, CMPThreadFn entry, void *user,
 
 static int cmp_tasks_default_thread_join(void *tasks, CMPHandle thread_handle) {
   CMPTasksDefault *runner;
-  CMPTaskThread *thread;  
-  void *resolved;         
-  int rc;                 
+  CMPTaskThread *thread;
+  void *resolved;
+  int rc;
 
   if (tasks == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1389,9 +1392,9 @@ static int cmp_tasks_default_mutex_create(void *tasks, CMPHandle *out_mutex) {
 static int cmp_tasks_default_mutex_destroy(void *tasks,
                                            CMPHandle mutex_handle) {
   CMPTasksDefault *runner;
-  CMPTaskMutex *mutex;    
-  void *resolved;         
-  int rc;                 
+  CMPTaskMutex *mutex;
+  void *resolved;
+  int rc;
 
   if (tasks == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1466,9 +1469,9 @@ static int cmp_tasks_default_mutex_lock(void *tasks, CMPHandle mutex_handle) {
 
 static int cmp_tasks_default_mutex_unlock(void *tasks, CMPHandle mutex_handle) {
   CMPTasksDefault *runner;
-  CMPTaskMutex *mutex;    
-  void *resolved;         
-  int rc;                 
+  CMPTaskMutex *mutex;
+  void *resolved;
+  int rc;
 
   if (tasks == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1508,8 +1511,8 @@ static int cmp_tasks_default_sleep_ms(void *tasks, cmp_u32 ms) {
 
 static int cmp_tasks_default_task_post(void *tasks, CMPTaskFn fn, void *user) {
   CMPTasksDefault *runner;
-  int rc;                 
-  int unlock_rc;          
+  int rc;
+  int unlock_rc;
 
   if (tasks == NULL || fn == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1543,7 +1546,7 @@ static int cmp_tasks_default_task_post_delayed(void *tasks, CMPTaskFn fn,
   CMPTasksDefault *runner;
   cmp_u32 now;
   cmp_u32 due_time;
-  int rc;       
+  int rc;
   int unlock_rc;
 
   if (tasks == NULL || fn == NULL) {
@@ -1613,9 +1616,9 @@ int CMP_CALL cmp_tasks_default_create(const CMPTasksDefaultConfig *config,
   CMPTasksDefault *runner;
   CMPAllocator allocator;
   cmp_usize worker_count;
-  cmp_usize queue_capacity; 
+  cmp_usize queue_capacity;
   cmp_usize handle_capacity;
-  cmp_usize i;              
+  cmp_usize i;
   int rc;
   int first_error;
 
@@ -1864,8 +1867,8 @@ int CMP_CALL cmp_tasks_default_destroy(CMPTasks *tasks) {
 }
 
 #ifdef CMP_TESTING
-int CMP_CALL cmp_tasks_test_mul_overflow(
-    cmp_usize a, cmp_usize b, cmp_usize *out_value) {
+int CMP_CALL cmp_tasks_test_mul_overflow(cmp_usize a, cmp_usize b,
+                                         cmp_usize *out_value) {
   return cmp_tasks_mul_overflow(a, b, out_value);
 }
 
@@ -1905,8 +1908,8 @@ int CMP_CALL cmp_tasks_test_call_native(cmp_u32 op) {
 }
 
 int CMP_CALL cmp_tasks_test_thread_destroy_case(cmp_u32 mode) {
-  CMPTasksDefault runner;              
-  CMPTaskThread thread;                
+  CMPTasksDefault runner;
+  CMPTaskThread thread;
   CMPHandleSystemVTable handles_vtable;
   CMPTasksTestStub stub;
 
@@ -1975,7 +1978,7 @@ int CMP_CALL cmp_tasks_test_mutex_destroy_case(cmp_u32 mode) {
   CMPTaskMutex mutex;
   CMPHandleSystemVTable handles_vtable;
   CMPTasksTestStub stub;
-  int rc;               
+  int rc;
 
   memset(&runner, 0, sizeof(runner));
   memset(&mutex, 0, sizeof(mutex));
@@ -2068,10 +2071,10 @@ static CMP_TASK_THREAD_RETURN CMP_TASK_THREAD_CALL
 cmp_tasks_test_quick_exit(void *user) {
   (void)user;
 #if defined(CMP_TASKS_USE_WIN32)
-  return 0;                     
-#else                           
+  return 0;
+#else
   return NULL;
-#endif                          
+#endif
 }
 
 static CMP_TASK_THREAD_RETURN CMP_TASK_THREAD_CALL
@@ -2082,7 +2085,7 @@ cmp_tasks_test_signal_stop_entry(void *user) {
   if (runner == NULL) {
 #if defined(CMP_TASKS_USE_WIN32)
     return 0;
-#else 
+#else
     return NULL;
 #endif
   }
@@ -2093,10 +2096,10 @@ cmp_tasks_test_signal_stop_entry(void *user) {
   cmp_native_mutex_unlock(&runner->queue_mutex);
 
 #if defined(CMP_TASKS_USE_WIN32)
-  return 0;                     
-#else                           
+  return 0;
+#else
   return NULL;
-#endif                          
+#endif
 }
 
 int CMP_CALL cmp_tasks_test_thread_entry_case(cmp_u32 mode) {
@@ -2118,11 +2121,11 @@ int CMP_CALL cmp_tasks_test_thread_entry_case(cmp_u32 mode) {
 }
 
 int CMP_CALL cmp_tasks_test_thread_create_case(cmp_u32 mode) {
-  CMPTasksDefault runner;              
+  CMPTasksDefault runner;
   CMPHandleSystemVTable handles_vtable;
   CMPTasksTestStub stub;
   CMPHandle out_thread;
-  int rc;              
+  int rc;
 
   memset(&runner, 0, sizeof(runner));
   memset(&handles_vtable, 0, sizeof(handles_vtable));
@@ -2149,13 +2152,11 @@ int CMP_CALL cmp_tasks_test_thread_create_case(cmp_u32 mode) {
   case CMP_TASKS_TEST_THREAD_CREATE_ALLOC_FAIL:
     stub.rc_alloc = CMP_ERR_OUT_OF_MEMORY;
     return cmp_tasks_default_thread_create(&runner, cmp_tasks_test_task_noop,
-                                           NULL,
-                                           &out_thread);
-  case CMP_TASKS_TEST_THREAD_CREATE_OBJECT_FAIL:        
+                                           NULL, &out_thread);
+  case CMP_TASKS_TEST_THREAD_CREATE_OBJECT_FAIL:
     cmp_tasks_test_set_fail_point(CMP_TASKS_TEST_FAIL_OBJECT_INIT);
-    rc =
-        cmp_tasks_default_thread_create(&runner, cmp_tasks_test_task_noop, NULL,
-                                        &out_thread);
+    rc = cmp_tasks_default_thread_create(&runner, cmp_tasks_test_task_noop,
+                                         NULL, &out_thread);
     cmp_tasks_test_clear_fail_point();
     return rc;
   case CMP_TASKS_TEST_THREAD_CREATE_NATIVE_FAIL:
@@ -2167,20 +2168,19 @@ int CMP_CALL cmp_tasks_test_thread_create_case(cmp_u32 mode) {
   case CMP_TASKS_TEST_THREAD_CREATE_REGISTER_FAIL:
     stub.rc_register = CMP_ERR_UNKNOWN;
     return cmp_tasks_default_thread_create(&runner, cmp_tasks_test_task_noop,
-                                           NULL,
-                                           &out_thread);
-  default:                                              
+                                           NULL, &out_thread);
+  default:
     return CMP_ERR_INVALID_ARGUMENT;
   }
 }
 
 int CMP_CALL cmp_tasks_test_thread_join_case(cmp_u32 mode) {
-  CMPTasksDefault runner;              
+  CMPTasksDefault runner;
   CMPHandleSystemVTable handles_vtable;
-  CMPTasksTestStub stub;               
+  CMPTasksTestStub stub;
   CMPTaskThread *thread;
   CMPHandle handle;
-  int rc;          
+  int rc;
 
   memset(&runner, 0, sizeof(runner));
   memset(&handles_vtable, 0, sizeof(handles_vtable));
@@ -2290,8 +2290,8 @@ int CMP_CALL cmp_tasks_test_thread_join_case(cmp_u32 mode) {
 int CMP_CALL cmp_tasks_test_mutex_create_case(cmp_u32 mode) {
   CMPTasksDefault runner;
   CMPHandleSystemVTable handles_vtable;
-  CMPTasksTestStub stub;               
-  CMPHandle handle;                    
+  CMPTasksTestStub stub;
+  CMPHandle handle;
   int rc;
 
   memset(&runner, 0, sizeof(runner));
@@ -2394,7 +2394,7 @@ int CMP_CALL cmp_tasks_test_default_mutex_destroy_case(cmp_u32 mode) {
     cmp_native_mutex_destroy(&mutex->mutex);
     free(mutex);
     return rc;
-  case CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_UNREGISTER_FAIL: /* GCOVR_EXCL_LINE */
+  case CMP_TASKS_TEST_DEFAULT_MUTEX_DESTROY_UNREGISTER_FAIL:
     mutex = (CMPTaskMutex *)cmp_tasks_test_malloc(sizeof(*mutex));
     if (mutex == NULL) {
       return CMP_ERR_OUT_OF_MEMORY;
@@ -2463,9 +2463,9 @@ int CMP_CALL cmp_tasks_test_mutex_lock_case(cmp_u32 mode) {
 }
 
 int CMP_CALL cmp_tasks_test_mutex_unlock_case(cmp_u32 mode) {
-  CMPTasksDefault runner;              
+  CMPTasksDefault runner;
   CMPHandleSystemVTable handles_vtable;
-  CMPTasksTestStub stub;               
+  CMPTasksTestStub stub;
   CMPTaskMutex mutex;
   CMPHandle handle;
 
@@ -2513,7 +2513,7 @@ int CMP_CALL cmp_tasks_test_sleep_case(cmp_u32 mode) {
 }
 
 int CMP_CALL cmp_tasks_test_destroy_state(void) {
-  CMPTasks tasks;        
+  CMPTasks tasks;
   CMPTasksDefault runner;
 
   memset(&tasks, 0, sizeof(tasks));
@@ -2526,11 +2526,11 @@ int CMP_CALL cmp_tasks_test_destroy_state(void) {
 
 int CMP_CALL cmp_tasks_test_logic_exercise(void) {
   CMPTasksTestStub stub;
-  CMPObjectHeader obj;  
-  CMPHandle handle;     
-  void *out_ptr;        
+  CMPObjectHeader obj;
+  CMPHandle handle;
+  void *out_ptr;
   int rc;
-  int result;  
+  int result;
   int clear_rc;
 
   memset(&stub, 0, sizeof(stub));
@@ -2654,12 +2654,12 @@ int CMP_CALL cmp_tasks_test_signal_stop_null(void) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_tasks_test_queue_case(
-    cmp_u32 mode, cmp_u32 *out_wait_ms, cmp_u32 *out_due_time,
-    cmp_usize *out_count) {
-  CMPTasksDefault runner;  
-  CMPTaskItem items[2];    
-  CMPTaskItem picked;      
+int CMP_CALL cmp_tasks_test_queue_case(cmp_u32 mode, cmp_u32 *out_wait_ms,
+                                       cmp_u32 *out_due_time,
+                                       cmp_usize *out_count) {
+  CMPTasksDefault runner;
+  CMPTaskItem items[2];
+  CMPTaskItem picked;
   cmp_u32 wait_ms;
   int rc;
 
@@ -2735,7 +2735,7 @@ int CMP_CALL cmp_tasks_test_queue_case(
 
 int CMP_CALL cmp_tasks_test_post_case(cmp_u32 mode) {
   CMPTasksDefault runner;
-  CMPTaskItem items[1];  
+  CMPTaskItem items[1];
   int rc;
 
   memset(&runner, 0, sizeof(runner));
@@ -2791,8 +2791,8 @@ int CMP_CALL cmp_tasks_test_post_case(cmp_u32 mode) {
 int CMP_CALL cmp_tasks_test_post_delayed_case(cmp_u32 mode) {
   CMPTasksDefault runner;
   CMPTaskItem items[1];
-  cmp_u32 max_delay;   
-  int rc;              
+  cmp_u32 max_delay;
+  int rc;
 
   memset(&runner, 0, sizeof(runner));
   memset(items, 0, sizeof(items));
@@ -2861,7 +2861,7 @@ int CMP_CALL cmp_tasks_test_post_delayed_case(cmp_u32 mode) {
 
 int CMP_CALL cmp_tasks_test_worker_case(cmp_u32 mode) {
   CMPTasksDefault runner;
-  CMPTaskItem items[1];  
+  CMPTaskItem items[1];
   CMPNativeThread thread;
   int rc;
   int join_rc;
@@ -2949,8 +2949,8 @@ int CMP_CALL cmp_tasks_test_worker_case(cmp_u32 mode) {
 }
 
 int CMP_CALL cmp_tasks_test_object_op(cmp_u32 mode, cmp_u32 *out_type_id) {
-  CMPTaskThread thread;         
-  CMPObjectVTable bad_vtable;   
+  CMPTaskThread thread;
+  CMPObjectVTable bad_vtable;
   const CMPObjectVTable *vtable;
   int rc;
 
@@ -2999,7 +2999,7 @@ cmp_tasks_test_signal_entry(void *user) {
   if (runner == NULL) {
 #if defined(CMP_TASKS_USE_WIN32)
     return 0;
-#else 
+#else
     return NULL;
 #endif
   }
@@ -3009,10 +3009,10 @@ cmp_tasks_test_signal_entry(void *user) {
   cmp_native_mutex_unlock(&runner->queue_mutex);
 
 #if defined(CMP_TASKS_USE_WIN32)
-  return 0;                     
-#else                           
+  return 0;
+#else
   return NULL;
-#endif                          
+#endif
 }
 
 int CMP_CALL cmp_tasks_test_timedwait_case(cmp_u32 mode) {

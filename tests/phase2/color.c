@@ -265,19 +265,37 @@ int main(void) {
     cmp_u32 pixels[4] = {0xFF000000, 0xFFFFFFFF, 0xFFFF0000, 0xFF00FF00};
     cmp_u32 seed = 0;
 
-  CMP_TEST_EXPECT(m3_scheme_generate_with_contrast(0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_TONAL_SPOT, M3_CONTRAST_STANDARD, NULL), CMP_ERR_INVALID_ARGUMENT);
-  {
-    M3Scheme test_scheme;
-    m3_color_test_set_tonal_palette_init_fail_call(1);
-    CMP_TEST_EXPECT(m3_scheme_generate_with_contrast(0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_TONAL_SPOT, M3_CONTRAST_STANDARD, &test_scheme), CMP_ERR_UNKNOWN);
-    m3_color_test_reset_failures();
-  }
-  CMP_TEST_OK(m3_scheme_generate_with_contrast(0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_TONAL_SPOT, M3_CONTRAST_STANDARD, &scheme_light));
-  CMP_TEST_OK(m3_scheme_generate_with_contrast(0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_TONAL_SPOT, M3_CONTRAST_MEDIUM, &scheme_light));
-  CMP_TEST_OK(m3_scheme_generate_with_contrast(0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_TONAL_SPOT, M3_CONTRAST_HIGH, &scheme_light));
-  CMP_TEST_OK(m3_scheme_generate_with_contrast(0xFF3366FFu, CMP_TRUE, M3_SCHEME_VARIANT_TONAL_SPOT, M3_CONTRAST_STANDARD, &scheme_dark));
-  CMP_TEST_OK(m3_scheme_generate_with_contrast(0xFF3366FFu, CMP_TRUE, M3_SCHEME_VARIANT_TONAL_SPOT, M3_CONTRAST_MEDIUM, &scheme_dark));
-  CMP_TEST_OK(m3_scheme_generate_with_contrast(0xFF3366FFu, CMP_TRUE, M3_SCHEME_VARIANT_TONAL_SPOT, M3_CONTRAST_HIGH, &scheme_dark));
+    CMP_TEST_EXPECT(m3_scheme_generate_with_contrast(
+                        0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_TONAL_SPOT,
+                        M3_CONTRAST_STANDARD, NULL),
+                    CMP_ERR_INVALID_ARGUMENT);
+    {
+      M3Scheme test_scheme;
+      m3_color_test_set_tonal_palette_init_fail_call(1);
+      CMP_TEST_EXPECT(m3_scheme_generate_with_contrast(
+                          0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_TONAL_SPOT,
+                          M3_CONTRAST_STANDARD, &test_scheme),
+                      CMP_ERR_UNKNOWN);
+      m3_color_test_reset_failures();
+    }
+    CMP_TEST_OK(m3_scheme_generate_with_contrast(
+        0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_TONAL_SPOT,
+        M3_CONTRAST_STANDARD, &scheme_light));
+    CMP_TEST_OK(m3_scheme_generate_with_contrast(
+        0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_TONAL_SPOT,
+        M3_CONTRAST_MEDIUM, &scheme_light));
+    CMP_TEST_OK(m3_scheme_generate_with_contrast(
+        0xFF3366FFu, CMP_FALSE, M3_SCHEME_VARIANT_TONAL_SPOT, M3_CONTRAST_HIGH,
+        &scheme_light));
+    CMP_TEST_OK(m3_scheme_generate_with_contrast(
+        0xFF3366FFu, CMP_TRUE, M3_SCHEME_VARIANT_TONAL_SPOT,
+        M3_CONTRAST_STANDARD, &scheme_dark));
+    CMP_TEST_OK(m3_scheme_generate_with_contrast(
+        0xFF3366FFu, CMP_TRUE, M3_SCHEME_VARIANT_TONAL_SPOT, M3_CONTRAST_MEDIUM,
+        &scheme_dark));
+    CMP_TEST_OK(m3_scheme_generate_with_contrast(
+        0xFF3366FFu, CMP_TRUE, M3_SCHEME_VARIANT_TONAL_SPOT, M3_CONTRAST_HIGH,
+        &scheme_dark));
     CMP_TEST_EXPECT(m3_color_extract_seed_from_image(NULL, 4, &seed),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(m3_color_extract_seed_from_image(pixels, 4, NULL),

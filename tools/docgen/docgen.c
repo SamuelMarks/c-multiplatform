@@ -1,7 +1,6 @@
 
 #include <stdio.h>
 
-
 #if defined(_MSC_VER)
 #undef NUM_FORMAT
 #define NUM_FORMAT "%d"
@@ -10,14 +9,15 @@
 #define NUM_FORMAT "%d"
 #endif
 
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 
 #if defined(__GNUC__) || defined(__clang__)
 __attribute__((format(printf, 1, 2)))
 #endif
-static int doc_printf_out(const char *fmt, ...) {
+static int
+doc_printf_out(const char *fmt, ...) {
   int ret;
   va_list args;
   va_start(args, fmt);
@@ -33,7 +33,8 @@ static int doc_printf_out(const char *fmt, ...) {
 #if defined(__GNUC__) || defined(__clang__)
 __attribute__((format(printf, 2, 3)))
 #endif
-static int doc_printf_file(FILE *f, const char *fmt, ...) {
+static int
+doc_printf_file(FILE *f, const char *fmt, ...) {
   int ret;
   va_list args;
   va_start(args, fmt);
@@ -82,10 +83,12 @@ static int CMP_CALL svg_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
   CMP_UNUSED(dpi_scale);
   ctx->width = width;
   ctx->height = height;
-  doc_printf_file(ctx->file,
-          "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" NUM_FORMAT "\" "
-          "height=\"" NUM_FORMAT "\" viewBox=\"0 0 " NUM_FORMAT " " NUM_FORMAT "\">\n",
-          width, height, width, height);
+  doc_printf_file(
+      ctx->file,
+      "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" NUM_FORMAT "\" "
+      "height=\"" NUM_FORMAT "\" viewBox=\"0 0 " NUM_FORMAT " " NUM_FORMAT
+      "\">\n",
+      width, height, width, height);
   return CMP_OK;
 }
 
@@ -106,7 +109,8 @@ static void print_color(FILE *f, CMPColor c) {
   int r = (int)(c.r * 255.0f);
   int g = (int)(c.g * 255.0f);
   int b = (int)(c.b * 255.0f);
-  doc_printf_file(f, "rgb(" NUM_FORMAT "," NUM_FORMAT "," NUM_FORMAT ")", r, g, b);
+  doc_printf_file(f, "rgb(" NUM_FORMAT "," NUM_FORMAT "," NUM_FORMAT ")", r, g,
+                  b);
 }
 
 static float get_alpha(CMPColor c) { return c.a; }
@@ -114,11 +118,12 @@ static float get_alpha(CMPColor c) { return c.a; }
 static int CMP_CALL svg_draw_rect(void *gfx, const CMPRect *rect,
                                   CMPColor color, CMPScalar corner_radius) {
   SvgContext *ctx = (SvgContext *)gfx;
-  doc_printf_file(ctx->file,
-          "  <rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"%f\" "
-          "ry=\"%f\" fill=\"",
-          rect->x, rect->y, rect->width, rect->height, corner_radius,
-          corner_radius);
+  doc_printf_file(
+      ctx->file,
+      "  <rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"%f\" "
+      "ry=\"%f\" fill=\"",
+      rect->x, rect->y, rect->width, rect->height, corner_radius,
+      corner_radius);
   print_color(ctx->file, color);
   doc_printf_file(ctx->file, "\" fill-opacity=\"%f\" />\n", get_alpha(color));
   return CMP_OK;
@@ -129,11 +134,12 @@ static int CMP_CALL svg_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
                                   CMPScalar thickness) {
   SvgContext *ctx = (SvgContext *)gfx;
   doc_printf_file(ctx->file,
-          "  <line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"", x0, y0,
-          x1, y1);
+                  "  <line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"",
+                  x0, y0, x1, y1);
   print_color(ctx->file, color);
-  doc_printf_file(ctx->file, "\" stroke-width=\"%f\" stroke-opacity=\"%f\" />\n",
-          thickness, get_alpha(color));
+  doc_printf_file(ctx->file,
+                  "\" stroke-width=\"%f\" stroke-opacity=\"%f\" />\n",
+                  thickness, get_alpha(color));
   return CMP_OK;
 }
 
@@ -145,17 +151,20 @@ static int CMP_CALL svg_draw_path(void *gfx, const CMPPath *path,
   for (i = 0; i < path->count; ++i) {
     CMPPathCmd *cmd = &path->commands[i];
     if (cmd->type == CMP_PATH_CMD_MOVE_TO) {
-      doc_printf_file(ctx->file, "M %f %f ", cmd->data.move_to.x, cmd->data.move_to.y);
+      doc_printf_file(ctx->file, "M %f %f ", cmd->data.move_to.x,
+                      cmd->data.move_to.y);
     } else if (cmd->type == CMP_PATH_CMD_LINE_TO) {
-      doc_printf_file(ctx->file, "L %f %f ", cmd->data.line_to.x, cmd->data.line_to.y);
+      doc_printf_file(ctx->file, "L %f %f ", cmd->data.line_to.x,
+                      cmd->data.line_to.y);
     } else if (cmd->type == CMP_PATH_CMD_QUAD_TO) {
       doc_printf_file(ctx->file, "Q %f %f %f %f ", cmd->data.quad_to.cx,
-              cmd->data.quad_to.cy, cmd->data.quad_to.x, cmd->data.quad_to.y);
+                      cmd->data.quad_to.cy, cmd->data.quad_to.x,
+                      cmd->data.quad_to.y);
     } else if (cmd->type == CMP_PATH_CMD_CUBIC_TO) {
       doc_printf_file(ctx->file, "C %f %f %f %f %f %f ", cmd->data.cubic_to.cx1,
-              cmd->data.cubic_to.cy1, cmd->data.cubic_to.cx2,
-              cmd->data.cubic_to.cy2, cmd->data.cubic_to.x,
-              cmd->data.cubic_to.y);
+                      cmd->data.cubic_to.cy1, cmd->data.cubic_to.cx2,
+                      cmd->data.cubic_to.cy2, cmd->data.cubic_to.x,
+                      cmd->data.cubic_to.y);
     } else if (cmd->type == CMP_PATH_CMD_CLOSE) {
       doc_printf_file(ctx->file, "Z ");
     }
@@ -284,9 +293,9 @@ static int CMP_CALL doc_draw_text(void *text, CMPHandle font, const char *utf8,
   (void)base_direction;
   CMP_UNUSED(font);
   doc_printf_file(ctx->file,
-          "  <text x=\"%f\" y=\"%f\" font-family=\"sans-serif\" "
-          "font-size=\"14px\" fill=\"",
-          x, y + 10.0f);
+                  "  <text x=\"%f\" y=\"%f\" font-family=\"sans-serif\" "
+                  "font-size=\"14px\" fill=\"",
+                  x, y + 10.0f);
   print_color(ctx->file, color);
   doc_printf_file(ctx->file, "\" fill-opacity=\"%f\">", get_alpha(color));
   fwrite(utf8, 1, utf8_len, ctx->file);
@@ -307,9 +316,10 @@ static void write_json_entry(const char *category, const char *name,
   if (!g_first_widget) {
     doc_printf_file(g_json_file, ",\n");
   }
-  doc_printf_file(g_json_file,
-          "    { \"category\": \"%s\", \"name\": \"%s\", \"file\": \"%s\" }",
-          category, name, file);
+  doc_printf_file(
+      g_json_file,
+      "    { \"category\": \"%s\", \"name\": \"%s\", \"file\": \"%s\" }",
+      category, name, file);
   g_first_widget = 0;
 }
 
@@ -330,19 +340,19 @@ static void generate_widget(const char *category, const char *name,
   null_h.id = 0;
   null_h.generation = 0;
 
-  #if defined(_MSC_VER)
-  sprintf_s(relative_filename, sizeof(relative_filename), "assets/%s_%s_%s_%s.svg", category, name,
-          g_platform, g_theme);
+#if defined(_MSC_VER)
+  sprintf_s(relative_filename, sizeof(relative_filename),
+            "assets/%s_%s_%s_%s.svg", category, name, g_platform, g_theme);
 #else
   sprintf(relative_filename, "assets/%s_%s_%s_%s.svg", category, name,
           g_platform, g_theme);
 #endif
-  #if defined(_MSC_VER)
+#if defined(_MSC_VER)
   sprintf_s(svg_filename, sizeof(svg_filename), "docs/%s", relative_filename);
 #else
   sprintf(svg_filename, "docs/%s", relative_filename);
 #endif
-  #if defined(_MSC_VER)
+#if defined(_MSC_VER)
   fopen_s(&svg_ctx.file, svg_filename, "wb");
 #else
   svg_ctx.file = fopen(svg_filename, "wb");
@@ -461,12 +471,13 @@ int main(int argc, char **argv) {
   }
 #endif
 
-  #if defined(_MSC_VER)
-  sprintf_s(json_filename, sizeof(json_filename), "docs/doc_%s_%s.json", g_platform, g_theme);
+#if defined(_MSC_VER)
+  sprintf_s(json_filename, sizeof(json_filename), "docs/doc_%s_%s.json",
+            g_platform, g_theme);
 #else
   sprintf(json_filename, "docs/doc_%s_%s.json", g_platform, g_theme);
 #endif
-  #if defined(_MSC_VER)
+#if defined(_MSC_VER)
   fopen_s(&g_json_file, json_filename, "w");
 #else
   g_json_file = fopen(json_filename, "w");

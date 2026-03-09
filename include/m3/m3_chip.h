@@ -393,13 +393,14 @@ CMP_API int CMP_CALL m3_chip_test_validate_measure_spec(CMPMeasureSpec spec);
  */
 CMP_API int CMP_CALL m3_chip_test_validate_rect(const CMPRect *rect);
 
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param backend Parameter for testing.
- * @return Test result.
- */
-m3_chip_test_validate_backend(const CMPTextBackend *backend);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param backend Parameter for testing.
+     * @return Test result.
+     */
+    m3_chip_test_validate_backend(const CMPTextBackend *backend);
 
 /**
  * @brief Helper for test coverage.

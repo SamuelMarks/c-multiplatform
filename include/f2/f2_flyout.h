@@ -34,11 +34,11 @@ typedef struct F2FlyoutStyle {
  * @brief Fluent 2 Flyout widget instance.
  */
 typedef struct F2Flyout {
-  CMPWidget widget;         /**< Widget interface. */
-  F2FlyoutStyle style;      /**< Current style. */
-  CMPRect bounds;           /**< Layout bounds. */
-  CMPRect anchor_bounds;    /**< Bounds of the anchor element. */
-  CMPBool is_open;          /**< True if currently open/visible. */
+  CMPWidget widget;      /**< Widget interface. */
+  F2FlyoutStyle style;   /**< Current style. */
+  CMPRect bounds;        /**< Layout bounds. */
+  CMPRect anchor_bounds; /**< Bounds of the anchor element. */
+  CMPBool is_open;       /**< True if currently open/visible. */
 } F2Flyout;
 
 /**
@@ -54,7 +54,8 @@ CMP_API int CMP_CALL f2_flyout_style_init(F2FlyoutStyle *style);
  * @param style Style descriptor.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_flyout_init(F2Flyout *flyout, const F2FlyoutStyle *style);
+CMP_API int CMP_CALL f2_flyout_init(F2Flyout *flyout,
+                                    const F2FlyoutStyle *style);
 
 /**
  * @brief Show the flyout anchored to a specific rect.

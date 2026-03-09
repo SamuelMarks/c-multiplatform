@@ -258,8 +258,8 @@ static int m3_list_item_paint(void *widget, CMPPaintContext *ctx) {
           item->text_backend.ctx, font, item->utf8_headline,
           strlen(item->utf8_headline), 0, &w, &h, &baseline);
       cmp_text_draw_utf8(&item->text_backend, font, item->utf8_headline,
-          strlen(item->utf8_headline), 0, text_x, text_y + baseline,
-          item->style.headline_style.color);
+                         strlen(item->utf8_headline), 0, text_x,
+                         text_y + baseline, item->style.headline_style.color);
       item->text_backend.vtable->destroy_font(item->text_backend.ctx, font);
     }
   }

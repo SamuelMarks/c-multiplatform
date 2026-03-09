@@ -1,6 +1,6 @@
-#include <string.h>
 #include "m3/m3_carousel.h"
 #include "test_utils.h"
+#include <string.h>
 
 static int test_measure(void *widget, CMPMeasureSpec width,
                         CMPMeasureSpec height, CMPSize *out_size) {
@@ -31,43 +31,43 @@ int main(void) {
   CMPWidget child;
   child.vtable = &mock_vtable;
   CMPWidget *items[] = {&child};
-  
+
   m3_carousel_style_init(&style);
   m3_carousel_init(&carousel, &style, items, 1);
-  
+
   CMPRect bounds = {0, 0, 300, 100};
   carousel.widget.vtable->layout(&carousel, bounds);
-  
+
   CMPPaintContext pctx;
   memset(&pctx, 0, sizeof(pctx));
   carousel.widget.vtable->paint(&carousel, &pctx);
-  
+
   CMPInputEvent ev;
   memset(&ev, 0, sizeof(ev));
   CMPBool handled;
-  
+
   ev.type = CMP_INPUT_POINTER_DOWN;
   ev.data.pointer.x = 10;
   carousel.widget.vtable->event(&carousel, &ev, &handled);
-  
+
   ev.type = CMP_INPUT_POINTER_MOVE;
   ev.data.pointer.x = 20;
   carousel.widget.vtable->event(&carousel, &ev, &handled);
-  
+
   ev.type = CMP_INPUT_POINTER_UP;
   carousel.widget.vtable->event(&carousel, &ev, &handled);
-  
+
   ev.type = CMP_INPUT_GESTURE_FLING;
   ev.data.gesture.velocity_x = 100.0f;
   carousel.widget.vtable->event(&carousel, &ev, &handled);
-  
+
   ev.type = CMP_INPUT_KEY_DOWN;
-  ev.data.key.key_code = 2; 
+  ev.data.key.key_code = 2;
   carousel.widget.vtable->event(&carousel, &ev, &handled);
-  
-  ev.data.key.key_code = 3; 
+
+  ev.data.key.key_code = 3;
   carousel.widget.vtable->event(&carousel, &ev, &handled);
-  
+
   carousel.widget.vtable->destroy(&carousel);
   return 0;
 }

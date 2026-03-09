@@ -85,23 +85,30 @@ int main(void) {
   CMP_TEST_ASSERT(cmp_anim_near(value, 0.125f, 0.0001f));
   CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_IN_OUT, 0.75f, &value));
   CMP_TEST_ASSERT(cmp_anim_near(value, 0.875f, 0.0001f));
-  
+
   for (i = 0; i <= 100; i++) {
     CMPScalar t = (CMPScalar)i / 100.0f;
     CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_EMPHASIZED, t, &value));
     CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_STANDARD, t, &value));
   }
   CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_EMPHASIZED, 0.5f, &value));
-  CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_EMPHASIZED_DECELERATE, 0.5f, &value));
-  CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_EMPHASIZED_ACCELERATE, 0.5f, &value));
+  CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_EMPHASIZED_DECELERATE,
+                                       0.5f, &value));
+  CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_EMPHASIZED_ACCELERATE,
+                                       0.5f, &value));
   CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_STANDARD, 0.5f, &value));
-  CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_STANDARD_DECELERATE, 0.5f, &value));
-  CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_STANDARD_ACCELERATE, 0.5f, &value));
+  CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_STANDARD_DECELERATE, 0.5f,
+                                       &value));
+  CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_STANDARD_ACCELERATE, 0.5f,
+                                       &value));
   CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_STANDARD, 0.0f, &value));
   CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_STANDARD, 1.0f, &value));
-  CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_F2_STANDARD, 0.5f, &value));
-  CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_F2_DECELERATE, 0.5f, &value));
-  CMP_TEST_OK(cmp_anim_test_apply_ease(CMP_ANIM_EASE_F2_ACCELERATE, 0.5f, &value));
+  CMP_TEST_OK(
+      cmp_anim_test_apply_ease(CMP_ANIM_EASE_F2_STANDARD, 0.5f, &value));
+  CMP_TEST_OK(
+      cmp_anim_test_apply_ease(CMP_ANIM_EASE_F2_DECELERATE, 0.5f, &value));
+  CMP_TEST_OK(
+      cmp_anim_test_apply_ease(CMP_ANIM_EASE_F2_ACCELERATE, 0.5f, &value));
 
   CMP_TEST_EXPECT(cmp_spring_init(NULL, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f),
                   CMP_ERR_INVALID_ARGUMENT);
@@ -284,7 +291,8 @@ int main(void) {
   CMP_TEST_ASSERT(finished == CMP_TRUE);
 
   /* Test timing step with reduced motion */
-  CMP_TEST_OK(cmp_anim_timing_init(&timing, 0.0f, 10.0f, 1.0f, CMP_ANIM_EASE_LINEAR));
+  CMP_TEST_OK(
+      cmp_anim_timing_init(&timing, 0.0f, 10.0f, 1.0f, CMP_ANIM_EASE_LINEAR));
   CMP_TEST_OK(cmp_anim_timing_step(&timing, 0.1f, &value, &finished));
   CMP_TEST_ASSERT(finished == CMP_TRUE);
   CMP_TEST_ASSERT(value == 10.0f);

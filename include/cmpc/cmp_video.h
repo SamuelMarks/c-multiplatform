@@ -97,13 +97,14 @@ CMP_API int CMP_CALL cmp_video_read_frame(CMPVideoDecoder *decoder,
  * @return Test result.
  */
 CMP_API int CMP_CALL cmp_video_test_set_read_u32_fail_after(cmp_u32 call_count);
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param call_count Parameter for testing.
- * @return Test result.
- */
-cmp_video_test_set_mul_overflow_fail_after(cmp_u32 call_count);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param call_count Parameter for testing.
+     * @return Test result.
+     */
+    cmp_video_test_set_mul_overflow_fail_after(cmp_u32 call_count);
 /**
  * @brief Helper for test coverage.
  * @param a Parameter for testing.
@@ -125,13 +126,14 @@ CMP_API int CMP_CALL cmp_video_test_read_u32_le(const cmp_u8 *data,
                                                 cmp_usize size,
                                                 cmp_usize offset,
                                                 cmp_u32 *out_val);
-CMP_API int CMP_CALL
-/**
- * @brief Helper for test coverage.
- * @param request Parameter for testing.
- * @return Test result.
- */
-cmp_video_test_fallback_parse(const CMPVideoOpenRequest *request);
+CMP_API int
+    CMP_CALL
+    /**
+     * @brief Helper for test coverage.
+     * @param request Parameter for testing.
+     * @return Test result.
+     */
+    cmp_video_test_fallback_parse(const CMPVideoOpenRequest *request);
 /**
  * @brief Helper for test coverage.
  * @param decoder Parameter for testing.

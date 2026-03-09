@@ -26,9 +26,9 @@ extern "C" {
  * @brief Fluent 2 Text Field style descriptor.
  */
 typedef struct F2TextFieldStyle {
-  CMPBool is_rtl;             /**< CMP_TRUE if layout should be right-to-left. */
-  CMPTextFieldStyle core;     /**< Core text field styling. */
-  CMPColor error_color;       /**< Color for error state. */
+  CMPBool is_rtl;         /**< CMP_TRUE if layout should be right-to-left. */
+  CMPTextFieldStyle core; /**< Core text field styling. */
+  CMPColor error_color;   /**< Color for error state. */
   CMPColor bottom_line_color; /**< Color for the rest state bottom stroke. */
   CMPColor bottom_line_focus_color; /**< Color for the focused bottom stroke. */
 } F2TextFieldStyle;
@@ -50,13 +50,13 @@ typedef int(CMP_CALL *F2TextFieldOnChange)(void *ctx,
  * @brief Fluent 2 Text Field widget.
  */
 typedef struct F2TextField {
-  CMPWidget widget;             /**< Widget interface. */
-  CMPTextField core;            /**< Core text field widget instance. */
-  F2TextFieldStyle style;       /**< Current style. */
-  CMPBool is_error;             /**< CMP_TRUE if in error state. */
-  CMPBool is_disabled;          /**< CMP_TRUE if disabled. */
-  F2TextFieldOnChange on_change;/**< Change callback. */
-  void *on_change_ctx;          /**< Change callback context. */
+  CMPWidget widget;              /**< Widget interface. */
+  CMPTextField core;             /**< Core text field widget instance. */
+  F2TextFieldStyle style;        /**< Current style. */
+  CMPBool is_error;              /**< CMP_TRUE if in error state. */
+  CMPBool is_disabled;           /**< CMP_TRUE if disabled. */
+  F2TextFieldOnChange on_change; /**< Change callback. */
+  void *on_change_ctx;           /**< Change callback context. */
 } F2TextField;
 
 /**

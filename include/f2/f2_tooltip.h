@@ -39,12 +39,12 @@ typedef struct F2TooltipStyle {
  * @brief Fluent 2 Tooltip widget instance.
  */
 typedef struct F2Tooltip {
-  CMPWidget widget;         /**< Widget interface. */
-  F2TooltipStyle style;     /**< Current style. */
-  const char *utf8_text;    /**< Optional tooltip text. */
-  CMPRect bounds;           /**< Layout bounds. */
-  CMPRect anchor_bounds;    /**< Bounds of the anchor element. */
-  CMPBool is_visible;       /**< True if currently open/visible. */
+  CMPWidget widget;      /**< Widget interface. */
+  F2TooltipStyle style;  /**< Current style. */
+  const char *utf8_text; /**< Optional tooltip text. */
+  CMPRect bounds;        /**< Layout bounds. */
+  CMPRect anchor_bounds; /**< Bounds of the anchor element. */
+  CMPBool is_visible;    /**< True if currently open/visible. */
 } F2Tooltip;
 
 /**

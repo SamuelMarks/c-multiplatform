@@ -193,8 +193,7 @@ static int cmp_text_widget_paint(void *widget, CMPPaintContext *ctx) {
   x = text->bounds.x;
   y = text->bounds.y + metrics.baseline;
   return cmp_text_draw_utf8_gfx(ctx->gfx, text->font, text->utf8,
-                                          text->utf8_len, 0, x, y,
-                                          text->style.color);
+                                text->utf8_len, 0, x, y, text->style.color);
 }
 
 static int cmp_text_widget_event(void *widget, const CMPInputEvent *event,
@@ -452,27 +451,26 @@ int CMP_CALL cmp_text_font_metrics(const CMPTextBackend *backend,
   return cmp_text_measure_utf8(backend, font, NULL, 0, 0, out_metrics);
 }
 
-CMP_API int CMP_CALL cmp_text_draw_utf8_gfx(const CMPGfx *gfx,
-                                        CMPHandle font, const char *utf8,
-                                        cmp_usize utf8_len,
-                                        cmp_u32 base_direction,
-                                        CMPScalar x, CMPScalar y,
-                                        CMPColor color) {
+CMP_API int CMP_CALL cmp_text_draw_utf8_gfx(const CMPGfx *gfx, CMPHandle font,
+                                            const char *utf8,
+                                            cmp_usize utf8_len,
+                                            cmp_u32 base_direction, CMPScalar x,
+                                            CMPScalar y, CMPColor color) {
   CMPTextBackend backend;
   if (gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   backend.ctx = gfx->ctx;
   backend.vtable = gfx->text_vtable;
-  return cmp_text_draw_utf8(&backend, font, utf8, utf8_len, base_direction, x, y, color);
+  return cmp_text_draw_utf8(&backend, font, utf8, utf8_len, base_direction, x,
+                            y, color);
 }
 
 CMP_API int CMP_CALL cmp_text_draw_utf8(const CMPTextBackend *backend,
                                         CMPHandle font, const char *utf8,
                                         cmp_usize utf8_len,
-                                        cmp_u32 base_direction,
-                                        CMPScalar x, CMPScalar y,
-                                        CMPColor color) {
+                                        cmp_u32 base_direction, CMPScalar x,
+                                        CMPScalar y, CMPColor color) {
   int rc;
   CMPTextLayout layout;
 
@@ -486,11 +484,13 @@ CMP_API int CMP_CALL cmp_text_draw_utf8(const CMPTextBackend *backend,
     return CMP_ERR_UNSUPPORTED;
   }
 
-  if (backend->vtable->shape_text != NULL && backend->vtable->draw_layout != NULL) {
+  if (backend->vtable->shape_text != NULL &&
+      backend->vtable->draw_layout != NULL) {
     rc = backend->vtable->shape_text(backend->ctx, font, utf8, utf8_len,
                                      base_direction, &layout);
     if (rc == CMP_OK) {
-      rc = backend->vtable->draw_layout(backend->ctx, font, &layout, x, y, color);
+      rc = backend->vtable->draw_layout(backend->ctx, font, &layout, x, y,
+                                        color);
 
       if (backend->vtable->free_layout != NULL) {
         backend->vtable->free_layout(backend->ctx, &layout);
@@ -505,7 +505,7 @@ CMP_API int CMP_CALL cmp_text_draw_utf8(const CMPTextBackend *backend,
   }
 
   return CMP_ERR_UNSUPPORTED;
-  }
+}
 CMP_API int CMP_CALL cmp_text_shape_utf8(const CMPTextBackend *backend,
                                          CMPHandle font, const char *utf8,
                                          cmp_usize utf8_len,
@@ -632,8 +632,8 @@ int CMP_CALL cmp_text_widget_set_style(CMPTextWidget *widget,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_text_widget_get_metrics(
-    CMPTextWidget *widget, CMPTextMetrics *out_metrics) {
+int CMP_CALL cmp_text_widget_get_metrics(CMPTextWidget *widget,
+                                         CMPTextMetrics *out_metrics) {
   int rc;
 
   if (widget == NULL || out_metrics == NULL) {

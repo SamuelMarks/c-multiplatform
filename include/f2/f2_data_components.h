@@ -3,7 +3,8 @@
 
 /**
  * @file f2_data_components.h
- * @brief Microsoft Fluent 2 DataGrid, ComboBox, DatePicker, and TreeView widgets.
+ * @brief Microsoft Fluent 2 DataGrid, ComboBox, DatePicker, and TreeView
+ * widgets.
  */
 
 #ifdef __cplusplus
@@ -25,21 +26,22 @@ extern "C" {
 
 /** @brief Fluent 2 DataGrid style. */
 typedef struct F2DataGridStyle {
-  CMPColor header_bg;          /**< Header row background color. */
-  CMPColor row_bg_normal;      /**< Normal row background color. */
-  CMPColor row_bg_hover;       /**< Hover row background color. */
-  CMPColor row_bg_selected;    /**< Selected row background color. */
-  CMPColor border_color;       /**< Grid border / divider color. */
-  CMPTextStyle header_text;    /**< Header text style. */
-  CMPTextStyle cell_text;      /**< Cell text style. */
-  CMPScalar row_height;        /**< Height of each data row. */
-  CMPScalar header_height;     /**< Height of the header row. */
+  CMPColor header_bg;       /**< Header row background color. */
+  CMPColor row_bg_normal;   /**< Normal row background color. */
+  CMPColor row_bg_hover;    /**< Hover row background color. */
+  CMPColor row_bg_selected; /**< Selected row background color. */
+  CMPColor border_color;    /**< Grid border / divider color. */
+  CMPTextStyle header_text; /**< Header text style. */
+  CMPTextStyle cell_text;   /**< Cell text style. */
+  CMPScalar row_height;     /**< Height of each data row. */
+  CMPScalar header_height;  /**< Height of the header row. */
 } F2DataGridStyle;
 
 struct F2DataGrid;
 
 /** @brief DataGrid row selection callback. */
-typedef int(CMP_CALL *F2DataGridOnSelect)(void *ctx, struct F2DataGrid *grid, cmp_usize row_index);
+typedef int(CMP_CALL *F2DataGridOnSelect)(void *ctx, struct F2DataGrid *grid,
+                                          cmp_usize row_index);
 
 /** @brief Fluent 2 DataGrid widget. */
 typedef struct F2DataGrid {
@@ -68,7 +70,9 @@ CMP_API int CMP_CALL f2_data_grid_style_init(F2DataGridStyle *style);
  * @param rows Number of rows.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_data_grid_init(F2DataGrid *grid, const F2DataGridStyle *style, cmp_usize columns, cmp_usize rows);
+CMP_API int CMP_CALL f2_data_grid_init(F2DataGrid *grid,
+                                       const F2DataGridStyle *style,
+                                       cmp_usize columns, cmp_usize rows);
 
 /**
  * @brief Set the selected row index.
@@ -76,7 +80,8 @@ CMP_API int CMP_CALL f2_data_grid_init(F2DataGrid *grid, const F2DataGridStyle *
  * @param row_index Index of the selected row.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_data_grid_set_selected(F2DataGrid *grid, cmp_usize row_index);
+CMP_API int CMP_CALL f2_data_grid_set_selected(F2DataGrid *grid,
+                                               cmp_usize row_index);
 
 /**
  * @brief Set the row selection callback.
@@ -85,23 +90,26 @@ CMP_API int CMP_CALL f2_data_grid_set_selected(F2DataGrid *grid, cmp_usize row_i
  * @param ctx Context pointer.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_data_grid_set_on_select(F2DataGrid *grid, F2DataGridOnSelect on_select, void *ctx);
+CMP_API int CMP_CALL f2_data_grid_set_on_select(F2DataGrid *grid,
+                                                F2DataGridOnSelect on_select,
+                                                void *ctx);
 
 /* -------------------------------------------------------------------------- */
 /* ComboBox / Select */
 
 /** @brief Fluent 2 ComboBox style. */
 typedef struct F2ComboBoxStyle {
-  F2TextFieldStyle text_field; /**< Input field styling. */
-  CMPColor dropdown_bg;        /**< Background for the dropdown list. */
-  CMPColor item_hover_bg;      /**< Hover background for list items. */
-  CMPScalar max_dropdown_height;/**< Max height before scrolling. */
+  F2TextFieldStyle text_field;   /**< Input field styling. */
+  CMPColor dropdown_bg;          /**< Background for the dropdown list. */
+  CMPColor item_hover_bg;        /**< Hover background for list items. */
+  CMPScalar max_dropdown_height; /**< Max height before scrolling. */
 } F2ComboBoxStyle;
 
 struct F2ComboBox;
 
 /** @brief ComboBox selection callback. */
-typedef int(CMP_CALL *F2ComboBoxOnSelect)(void *ctx, struct F2ComboBox *combo, cmp_usize index);
+typedef int(CMP_CALL *F2ComboBoxOnSelect)(void *ctx, struct F2ComboBox *combo,
+                                          cmp_usize index);
 
 /** @brief Fluent 2 ComboBox widget. */
 typedef struct F2ComboBox {
@@ -132,7 +140,10 @@ CMP_API int CMP_CALL f2_combo_box_style_init(F2ComboBoxStyle *style);
  * @param items Number of items.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_combo_box_init(F2ComboBox *combo, const CMPTextBackend *backend, const F2ComboBoxStyle *style, CMPAllocator *alloc, cmp_usize items);
+CMP_API int CMP_CALL f2_combo_box_init(F2ComboBox *combo,
+                                       const CMPTextBackend *backend,
+                                       const F2ComboBoxStyle *style,
+                                       CMPAllocator *alloc, cmp_usize items);
 
 /**
  * @brief Set the selected item index.
@@ -140,7 +151,8 @@ CMP_API int CMP_CALL f2_combo_box_init(F2ComboBox *combo, const CMPTextBackend *
  * @param index Index of the selected item.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_combo_box_set_selected(F2ComboBox *combo, cmp_usize index);
+CMP_API int CMP_CALL f2_combo_box_set_selected(F2ComboBox *combo,
+                                               cmp_usize index);
 
 /**
  * @brief Set the open state of the dropdown.
@@ -157,7 +169,9 @@ CMP_API int CMP_CALL f2_combo_box_set_open(F2ComboBox *combo, CMPBool open);
  * @param ctx Context pointer.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_combo_box_set_on_select(F2ComboBox *combo, F2ComboBoxOnSelect on_select, void *ctx);
+CMP_API int CMP_CALL f2_combo_box_set_on_select(F2ComboBox *combo,
+                                                F2ComboBoxOnSelect on_select,
+                                                void *ctx);
 
 /**
  * @brief Clean up the ComboBox widget.
@@ -171,31 +185,34 @@ CMP_API int CMP_CALL f2_combo_box_cleanup(F2ComboBox *combo);
 
 /** @brief Fluent 2 DatePicker style. */
 typedef struct F2DatePickerStyle {
-  CMPColor header_bg;          /**< Background of the month/year header. */
-  CMPColor day_bg_normal;      /**< Normal day background. */
-  CMPColor day_bg_hover;       /**< Hover day background. */
-  CMPColor day_bg_selected;    /**< Selected day background. */
-  CMPColor day_bg_today;       /**< Current day background. */
-  CMPTextStyle header_text;    /**< Header text style. */
-  CMPTextStyle day_text;       /**< Day cell text style. */
-  CMPScalar cell_size;         /**< Size of a day cell (width & height). */
+  CMPColor header_bg;       /**< Background of the month/year header. */
+  CMPColor day_bg_normal;   /**< Normal day background. */
+  CMPColor day_bg_hover;    /**< Hover day background. */
+  CMPColor day_bg_selected; /**< Selected day background. */
+  CMPColor day_bg_today;    /**< Current day background. */
+  CMPTextStyle header_text; /**< Header text style. */
+  CMPTextStyle day_text;    /**< Day cell text style. */
+  CMPScalar cell_size;      /**< Size of a day cell (width & height). */
 } F2DatePickerStyle;
 
 struct F2DatePicker;
 
 /** @brief DatePicker selection callback. */
-typedef int(CMP_CALL *F2DatePickerOnSelect)(void *ctx, struct F2DatePicker *picker, cmp_u32 year, cmp_u8 month, cmp_u8 day);
+typedef int(CMP_CALL *F2DatePickerOnSelect)(void *ctx,
+                                            struct F2DatePicker *picker,
+                                            cmp_u32 year, cmp_u8 month,
+                                            cmp_u8 day);
 
 /** @brief Fluent 2 DatePicker widget. */
 typedef struct F2DatePicker {
-  CMPWidget widget;             /**< Widget interface. */
-  F2DatePickerStyle style;      /**< Current style. */
-  cmp_u32 selected_year;        /**< Selected year. */
-  cmp_u8 selected_month;        /**< Selected month (1-12). */
-  cmp_u8 selected_day;          /**< Selected day (1-31). */
-  CMPRect bounds;               /**< Layout bounds. */
+  CMPWidget widget;               /**< Widget interface. */
+  F2DatePickerStyle style;        /**< Current style. */
+  cmp_u32 selected_year;          /**< Selected year. */
+  cmp_u8 selected_month;          /**< Selected month (1-12). */
+  cmp_u8 selected_day;            /**< Selected day (1-31). */
+  CMPRect bounds;                 /**< Layout bounds. */
   F2DatePickerOnSelect on_select; /**< Selection callback. */
-  void *on_select_ctx;          /**< Callback context. */
+  void *on_select_ctx;            /**< Callback context. */
 } F2DatePicker;
 
 /**
@@ -211,7 +228,8 @@ CMP_API int CMP_CALL f2_date_picker_style_init(F2DatePickerStyle *style);
  * @param style Style descriptor.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_date_picker_init(F2DatePicker *picker, const F2DatePickerStyle *style);
+CMP_API int CMP_CALL f2_date_picker_init(F2DatePicker *picker,
+                                         const F2DatePickerStyle *style);
 
 /**
  * @brief Set the selected date.
@@ -221,7 +239,8 @@ CMP_API int CMP_CALL f2_date_picker_init(F2DatePicker *picker, const F2DatePicke
  * @param day Day.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_date_picker_set_date(F2DatePicker *picker, cmp_u32 year, cmp_u8 month, cmp_u8 day);
+CMP_API int CMP_CALL f2_date_picker_set_date(F2DatePicker *picker, cmp_u32 year,
+                                             cmp_u8 month, cmp_u8 day);
 
 /**
  * @brief Set the selection callback.
@@ -230,27 +249,30 @@ CMP_API int CMP_CALL f2_date_picker_set_date(F2DatePicker *picker, cmp_u32 year,
  * @param ctx Context pointer.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_date_picker_set_on_select(F2DatePicker *picker, F2DatePickerOnSelect on_select, void *ctx);
+CMP_API int CMP_CALL f2_date_picker_set_on_select(
+    F2DatePicker *picker, F2DatePickerOnSelect on_select, void *ctx);
 
 /* -------------------------------------------------------------------------- */
 /* TreeView */
 
 /** @brief Fluent 2 TreeView style. */
 typedef struct F2TreeViewStyle {
-  CMPColor item_bg_normal;     /**< Normal item background. */
-  CMPColor item_bg_hover;      /**< Hover item background. */
-  CMPColor item_bg_selected;   /**< Selected item background. */
-  CMPTextStyle text_style;     /**< Item text style. */
-  CMPScalar indent_width;      /**< Pixels to indent per depth level. */
-  CMPScalar item_height;       /**< Height of each tree item. */
+  CMPColor item_bg_normal;   /**< Normal item background. */
+  CMPColor item_bg_hover;    /**< Hover item background. */
+  CMPColor item_bg_selected; /**< Selected item background. */
+  CMPTextStyle text_style;   /**< Item text style. */
+  CMPScalar indent_width;    /**< Pixels to indent per depth level. */
+  CMPScalar item_height;     /**< Height of each tree item. */
 } F2TreeViewStyle;
 
 struct F2TreeView;
 
 /** @brief TreeView selection callback. */
-typedef int(CMP_CALL *F2TreeViewOnSelect)(void *ctx, struct F2TreeView *tree, cmp_usize item_id);
+typedef int(CMP_CALL *F2TreeViewOnSelect)(void *ctx, struct F2TreeView *tree,
+                                          cmp_usize item_id);
 /** @brief TreeView expand/collapse callback. */
-typedef int(CMP_CALL *F2TreeViewOnExpand)(void *ctx, struct F2TreeView *tree, cmp_usize item_id, CMPBool expanded);
+typedef int(CMP_CALL *F2TreeViewOnExpand)(void *ctx, struct F2TreeView *tree,
+                                          cmp_usize item_id, CMPBool expanded);
 
 /** @brief Fluent 2 TreeView widget. */
 typedef struct F2TreeView {
@@ -277,7 +299,8 @@ CMP_API int CMP_CALL f2_tree_view_style_init(F2TreeViewStyle *style);
  * @param style Style descriptor.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_tree_view_init(F2TreeView *tree, const F2TreeViewStyle *style);
+CMP_API int CMP_CALL f2_tree_view_init(F2TreeView *tree,
+                                       const F2TreeViewStyle *style);
 
 /**
  * @brief Set the selected item ID.
@@ -285,7 +308,8 @@ CMP_API int CMP_CALL f2_tree_view_init(F2TreeView *tree, const F2TreeViewStyle *
  * @param item_id Item ID.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_tree_view_set_selected(F2TreeView *tree, cmp_usize item_id);
+CMP_API int CMP_CALL f2_tree_view_set_selected(F2TreeView *tree,
+                                               cmp_usize item_id);
 
 /**
  * @brief Set the tree view callbacks.
@@ -297,8 +321,10 @@ CMP_API int CMP_CALL f2_tree_view_set_selected(F2TreeView *tree, cmp_usize item_
  * @return CMP_OK on success.
  */
 CMP_API int CMP_CALL f2_tree_view_set_callbacks(F2TreeView *tree,
-                                                F2TreeViewOnSelect on_select, void *select_ctx,
-                                                F2TreeViewOnExpand on_expand, void *expand_ctx);
+                                                F2TreeViewOnSelect on_select,
+                                                void *select_ctx,
+                                                F2TreeViewOnExpand on_expand,
+                                                void *expand_ctx);
 
 #ifdef __cplusplus
 }

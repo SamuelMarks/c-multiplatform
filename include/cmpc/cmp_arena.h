@@ -86,8 +86,8 @@ CMP_API int CMP_CALL cmp_arena_get_stats(const CMPArena *arena,
 #if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Force arena alignment failure during growth (tests only).
- * @param fail_count 1 to force failure on first call, 2 on second, 0 to restore normal
- * behavior.
+ * @param fail_count 1 to force failure on first call, 2 on second, 0 to restore
+ * normal behavior.
  * @return CMP_OK on success or a failure code.
  */
 CMP_API int CMP_CALL cmp_arena_test_set_force_align_fail(int fail_count);

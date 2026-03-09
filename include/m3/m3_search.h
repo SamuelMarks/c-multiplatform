@@ -56,12 +56,12 @@ typedef struct M3SearchBar {
  * @brief Search view state.
  */
 typedef struct M3SearchView {
-  CMPWidget widget;             /**< Widget interface. */
-  CMPWidget *search_bar;        /**< Linked search bar widget. */
-  CMPWidget *content;           /**< Content widget to display. */
-  CMPRect bounds;               /**< Full screen layout bounds. */
-  CMPAnimController expansion;  /**< Expansion animation controller. */
-  CMPBool is_active;            /**< CMP_TRUE when search view is expanded. */
+  CMPWidget widget;            /**< Widget interface. */
+  CMPWidget *search_bar;       /**< Linked search bar widget. */
+  CMPWidget *content;          /**< Content widget to display. */
+  CMPRect bounds;              /**< Full screen layout bounds. */
+  CMPAnimController expansion; /**< Expansion animation controller. */
+  CMPBool is_active;           /**< CMP_TRUE when search view is expanded. */
 } M3SearchView;
 
 /**

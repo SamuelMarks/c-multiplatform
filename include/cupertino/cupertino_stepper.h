@@ -10,23 +10,24 @@
 extern "C" {
 #endif
 
+#include "cmpc/cmp_api_gfx.h"
+#include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_math.h"
-#include "cmpc/cmp_api_ui.h"
-#include "cmpc/cmp_api_gfx.h"
 #include "cupertino/cupertino_color.h"
 
 /** @brief Cupertino Stepper Widget */
 typedef struct CupertinoStepper {
-    CMPWidget widget;             /**< Base widget interface. */
-    double value;                 /**< Current value. */
-    double min_value;             /**< Minimum value. */
-    double max_value;             /**< Maximum value. */
-    double step_value;            /**< Value to increment/decrement by. */
-    CMPRect bounds;               /**< Layout bounds. */
-    CMPBool is_dark_mode;         /**< Dark mode styling. */
-    CMPBool is_disabled;          /**< Disabled state. */
-    int pressed_button;           /**< Which button is pressed (-1: none, 0: minus, 1: plus). */
+  CMPWidget widget;     /**< Base widget interface. */
+  double value;         /**< Current value. */
+  double min_value;     /**< Minimum value. */
+  double max_value;     /**< Maximum value. */
+  double step_value;    /**< Value to increment/decrement by. */
+  CMPRect bounds;       /**< Layout bounds. */
+  CMPBool is_dark_mode; /**< Dark mode styling. */
+  CMPBool is_disabled;  /**< Disabled state. */
+  int pressed_button;   /**< Which button is pressed (-1: none, 0: minus, 1:
+                           plus). */
 } CupertinoStepper;
 
 /**
@@ -42,7 +43,8 @@ CMP_API int CMP_CALL cupertino_stepper_init(CupertinoStepper *stepper);
  * @param value The value to set.
  * @return CMP_OK on success or an error code.
  */
-CMP_API int CMP_CALL cupertino_stepper_set_value(CupertinoStepper *stepper, double value);
+CMP_API int CMP_CALL cupertino_stepper_set_value(CupertinoStepper *stepper,
+                                                 double value);
 
 /**
  * @brief Renders the stepper.
@@ -50,7 +52,8 @@ CMP_API int CMP_CALL cupertino_stepper_set_value(CupertinoStepper *stepper, doub
  * @param ctx Pointer to the paint context.
  * @return CMP_OK on success or an error code.
  */
-CMP_API int CMP_CALL cupertino_stepper_paint(const CupertinoStepper *stepper, CMPPaintContext *ctx);
+CMP_API int CMP_CALL cupertino_stepper_paint(const CupertinoStepper *stepper,
+                                             CMPPaintContext *ctx);
 
 #ifdef __cplusplus
 }

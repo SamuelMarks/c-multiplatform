@@ -236,8 +236,9 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
              tooltip->metrics.body_metrics.baseline;
 
     if (tooltip->metrics.has_body == CMP_TRUE) {
-      rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->plain_font, tooltip->utf8_body,
-          tooltip->body_len, 0, text_x, text_y, text_color);
+      rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->plain_font,
+                                  tooltip->utf8_body, tooltip->body_len, 0,
+                                  text_x, text_y, text_color);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -254,8 +255,9 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     if (tooltip->metrics.has_title == CMP_TRUE) {
       text_y += tooltip->metrics.title_metrics.baseline;
-      rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->title_font, tooltip->utf8_title,
-          tooltip->title_len, 0, text_x, text_y, text_color);
+      rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->title_font,
+                                  tooltip->utf8_title, tooltip->title_len, 0,
+                                  text_x, text_y, text_color);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -266,8 +268,9 @@ static int m3_tooltip_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     if (tooltip->metrics.has_body == CMP_TRUE) {
       text_y += tooltip->metrics.body_metrics.baseline;
-      rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->body_font, tooltip->utf8_body,
-          tooltip->body_len, 0, text_x, text_y, text_color);
+      rc = cmp_text_draw_utf8_gfx(ctx->gfx, tooltip->body_font,
+                                  tooltip->utf8_body, tooltip->body_len, 0,
+                                  text_x, text_y, text_color);
       if (rc != CMP_OK) {
         return rc;
       }

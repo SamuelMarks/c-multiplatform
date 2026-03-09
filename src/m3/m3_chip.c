@@ -726,8 +726,7 @@ static int m3_chip_widget_measure(void *widget, CMPMeasureSpec width,
   min_height = layout.min_height;
   if (chip->show_delete == CMP_TRUE) {
     if (layout.icon_size + layout.padding_y * 2.0f > min_height) {
-      min_height =
-          layout.icon_size + layout.padding_y * 2.0f;
+      min_height = layout.icon_size + layout.padding_y * 2.0f;
     }
   }
   if (desired_height < min_height) {
@@ -737,10 +736,8 @@ static int m3_chip_widget_measure(void *widget, CMPMeasureSpec width,
   if (width.mode == CMP_MEASURE_EXACTLY) {
     out_size->width = width.size;
   } else if (width.mode == CMP_MEASURE_AT_MOST) {
-    out_size->width = (desired_width > width.size)
-                          ? width.size
-                          : desired_width;
-  } else {                                
+    out_size->width = (desired_width > width.size) ? width.size : desired_width;
+  } else {
     out_size->width = desired_width;
   }
 
@@ -914,9 +911,9 @@ static int m3_chip_widget_paint(void *widget, CMPPaintContext *ctx) {
 
   if (chip->utf8_label != NULL || chip->utf8_len == 0) {
     if (chip->utf8_label != NULL && chip->utf8_len != 0) {
-      rc = cmp_text_draw_utf8_gfx(ctx->gfx, chip->font,
-                                            chip->utf8_label, chip->utf8_len, 0,
-                                            text_x, text_y, text_color);
+      rc =
+          cmp_text_draw_utf8_gfx(ctx->gfx, chip->font, chip->utf8_label,
+                                 chip->utf8_len, 0, text_x, text_y, text_color);
       if (rc != CMP_OK) {
         return rc;
       }
@@ -987,9 +984,11 @@ static int m3_chip_widget_event(void *widget, const CMPInputEvent *event,
         return rc;
       }
       if ((CMPScalar)event->data.pointer.x >= delete_bounds.x &&
-          (CMPScalar)event->data.pointer.x <= delete_bounds.x + delete_bounds.width &&
+          (CMPScalar)event->data.pointer.x <=
+              delete_bounds.x + delete_bounds.width &&
           (CMPScalar)event->data.pointer.y >= delete_bounds.y &&
-          (CMPScalar)event->data.pointer.y <= delete_bounds.y + delete_bounds.height) {
+          (CMPScalar)event->data.pointer.y <=
+              delete_bounds.y + delete_bounds.height) {
         hit_delete = CMP_TRUE;
       }
     }
@@ -1059,9 +1058,9 @@ static int m3_chip_widget_event(void *widget, const CMPInputEvent *event,
     }
     *out_handled = CMP_TRUE;
     return CMP_OK;
-    default:
+  default:
     return CMP_OK;
-    }
+  }
 }
 
 static int m3_chip_widget_get_semantics(void *widget,

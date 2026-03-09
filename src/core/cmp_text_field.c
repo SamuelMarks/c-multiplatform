@@ -32,13 +32,10 @@
 #define CMP_TEXT_FIELD_TEST_FAIL_EVENT_SYNC_LABEL 22u
 
 static cmp_u32 g_cmp_text_field_test_fail_point = CMP_TEXT_FIELD_TEST_FAIL_NONE;
-static cmp_u32 g_cmp_text_field_test_color_fail_after =
-    0u;
-static cmp_u32 g_cmp_text_field_test_overflow_fail_after =
-    0u;
+static cmp_u32 g_cmp_text_field_test_color_fail_after = 0u;
+static cmp_u32 g_cmp_text_field_test_overflow_fail_after = 0u;
 static cmp_u32 g_cmp_text_field_test_font_metrics_fail_after = 0u;
-static CMPBool g_cmp_text_field_test_offset_skip_early =
-    CMP_FALSE;
+static CMPBool g_cmp_text_field_test_offset_skip_early = CMP_FALSE;
 
 int CMP_CALL cmp_text_field_test_set_fail_point(cmp_u32 fail_point) {
   g_cmp_text_field_test_fail_point = fail_point;
@@ -133,8 +130,7 @@ static int cmp_text_field_validate_color(const CMPColor *color) {
 }
 
 static int cmp_text_field_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                    CMPScalar b,
-                                    CMPScalar a) {
+                                    CMPScalar b, CMPScalar a) {
   if (color == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -162,9 +158,10 @@ static int cmp_text_field_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
   return CMP_OK;
 }
 
-static int
-cmp_text_field_validate_text_style(const CMPTextStyle *style,
-                                   CMPBool require_family) {
+static int cmp_text_field_validate_utf8(const char *utf8, cmp_usize utf8_len);
+
+static int cmp_text_field_validate_text_style(const CMPTextStyle *style,
+                                              CMPBool require_family) {
   int rc;
 
   if (style == NULL) {
@@ -172,6 +169,13 @@ cmp_text_field_validate_text_style(const CMPTextStyle *style,
   }
   if (require_family == CMP_TRUE && style->utf8_family == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
+  }
+  if (style->utf8_family != NULL) {
+    rc = cmp_text_field_validate_utf8(style->utf8_family,
+                                      strlen(style->utf8_family));
+    if (rc != CMP_OK) {
+      return rc;
+    }
   }
   if (style->size_px <= 0) {
     return CMP_ERR_RANGE;
@@ -191,10 +195,10 @@ cmp_text_field_validate_text_style(const CMPTextStyle *style,
   return CMP_OK;
 }
 
-static int cmp_text_field_validate_style(
-    const CMPTextFieldStyle *style, CMPBool require_text_family,
-    CMPBool require_label_family) {
-  int rc;                          
+static int cmp_text_field_validate_style(const CMPTextFieldStyle *style,
+                                         CMPBool require_text_family,
+                                         CMPBool require_label_family) {
+  int rc;
 
   if (style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -320,13 +324,12 @@ static cmp_usize cmp_text_field_usize_max(void) {
   return (cmp_usize) ~(cmp_usize)0;
 }
 
-static int
-cmp_text_field_add_overflow(cmp_usize a, cmp_usize b,
-                            cmp_usize *out_value) {
-  cmp_usize max_value;                             
+static int cmp_text_field_add_overflow(cmp_usize a, cmp_usize b,
+                                       cmp_usize *out_value) {
+  cmp_usize max_value;
 
   if (out_value == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
 #ifdef CMP_TESTING
@@ -346,17 +349,17 @@ cmp_text_field_add_overflow(cmp_usize a, cmp_usize b,
 
 static int cmp_text_field_reserve(CMPTextField *field, cmp_usize required) {
   cmp_usize new_capacity;
-  void *mem;             
-  int rc;                
+  void *mem;
+  int rc;
 
   if (field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (required == 0u) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (field->allocator.realloc == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   if (required <= field->utf8_capacity) {
@@ -373,18 +376,18 @@ static int cmp_text_field_reserve(CMPTextField *field, cmp_usize required) {
   if (field->utf8_capacity == 0u) {
     new_capacity = CMP_TEXT_FIELD_DEFAULT_CAPACITY;
   } else if (field->utf8_capacity > cmp_text_field_usize_max() / 2u) {
-    if (field->utf8_capacity < required) { /* GCOVR_EXCL_LINE */
-      return CMP_ERR_OVERFLOW; /* GCOVR_EXCL_LINE */
+    if (field->utf8_capacity < required) {
+      return CMP_ERR_OVERFLOW;
     }
-    new_capacity = field->utf8_capacity; /* GCOVR_EXCL_LINE */
+    new_capacity = field->utf8_capacity;
   } else {
     new_capacity = field->utf8_capacity * 2u;
   }
 
   while (new_capacity < required) {
     if (new_capacity > cmp_text_field_usize_max() / 2u) {
-      new_capacity = required; /* GCOVR_EXCL_LINE */
-      break; /* GCOVR_EXCL_LINE */
+      new_capacity = required;
+      break;
     }
     new_capacity *= 2u;
   }
@@ -399,7 +402,7 @@ static int cmp_text_field_reserve(CMPTextField *field, cmp_usize required) {
   rc = field->allocator.realloc(field->allocator.ctx, field->utf8, new_capacity,
                                 &mem);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   field->utf8 = (char *)mem;
@@ -409,7 +412,7 @@ static int cmp_text_field_reserve(CMPTextField *field, cmp_usize required) {
 
 static int cmp_text_field_validate_utf8(const char *utf8, cmp_usize utf8_len) {
   CMPBool valid;
-  int rc;       
+  int rc;
 
   if (utf8 == NULL) {
     if (utf8_len == 0u) {
@@ -429,18 +432,17 @@ static int cmp_text_field_validate_utf8(const char *utf8, cmp_usize utf8_len) {
     return rc;
   }
   if (!valid) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   return CMP_OK;
 }
 
-static int
-cmp_text_field_validate_offset(const char *utf8, cmp_usize utf8_len,
-                               cmp_usize offset) {
+static int cmp_text_field_validate_offset(const char *utf8, cmp_usize utf8_len,
+                                          cmp_usize offset) {
   CMPUtf8Iter iter;
-  cmp_u32 codepoint;    
+  cmp_u32 codepoint;
   cmp_usize last_offset;
-  int rc;               
+  int rc;
 
   if (offset > utf8_len) {
     return CMP_ERR_RANGE;
@@ -453,7 +455,7 @@ cmp_text_field_validate_offset(const char *utf8, cmp_usize utf8_len,
   }
 #else
   if (offset == utf8_len || offset == 0u) {
-    return CMP_OK;                         
+    return CMP_OK;
   }
 #endif
 
@@ -491,45 +493,43 @@ cmp_text_field_validate_offset(const char *utf8, cmp_usize utf8_len,
       return CMP_OK;
     }
     if (iter.offset > offset) {
-      break; /* GCOVR_EXCL_LINE */
+      break;
     }
     last_offset = iter.offset;
     CMP_UNUSED(codepoint);
   }
 
   if (last_offset == offset) {
-    return CMP_OK; /* GCOVR_EXCL_LINE */
+    return CMP_OK;
   }
   return CMP_ERR_RANGE;
 }
 
-static int
-cmp_text_field_prev_offset(const char *utf8, cmp_usize utf8_len,
-                           cmp_usize offset,
-                           cmp_usize *out_offset) {
-  CMPUtf8Iter iter;                                
-  cmp_u32 codepoint;                               
-  cmp_usize last_offset;                           
-  int rc;                                          
+static int cmp_text_field_prev_offset(const char *utf8, cmp_usize utf8_len,
+                                      cmp_usize offset, cmp_usize *out_offset) {
+  CMPUtf8Iter iter;
+  cmp_u32 codepoint;
+  cmp_usize last_offset;
+  int rc;
 
   if (out_offset == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (offset == 0u) {
-    *out_offset = 0u; /* GCOVR_EXCL_LINE */
-    return CMP_OK; /* GCOVR_EXCL_LINE */
+    *out_offset = 0u;
+    return CMP_OK;
   }
 
   rc = cmp_text_field_validate_offset(utf8, utf8_len, offset);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc = cmp_utf8_iter_init(&iter, utf8, utf8_len);
 #ifdef CMP_TESTING
   if (cmp_text_field_test_fail_point_match(
           CMP_TEXT_FIELD_TEST_FAIL_UTF8_ITER_INIT)) {
-    rc = CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+    rc = CMP_ERR_IO;
   }
 #endif
   if (rc != CMP_OK) {
@@ -542,18 +542,18 @@ cmp_text_field_prev_offset(const char *utf8, cmp_usize utf8_len,
 #ifdef CMP_TESTING
     if (cmp_text_field_test_fail_point_match(
             CMP_TEXT_FIELD_TEST_FAIL_UTF8_ITER_NEXT)) {
-      rc = CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+      rc = CMP_ERR_IO;
     }
     if (cmp_text_field_test_fail_point_match(
-            CMP_TEXT_FIELD_TEST_FAIL_UTF8_ITER_NOT_FOUND)) { /* GCOVR_EXCL_LINE */
-      rc = CMP_ERR_NOT_FOUND; /* GCOVR_EXCL_LINE */
+            CMP_TEXT_FIELD_TEST_FAIL_UTF8_ITER_NOT_FOUND)) {
+      rc = CMP_ERR_NOT_FOUND;
     }
 #endif
     if (rc == CMP_ERR_NOT_FOUND) {
-      break; /* GCOVR_EXCL_LINE */
+      break;
     }
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     if (iter.offset >= offset) {
       break;
@@ -566,32 +566,30 @@ cmp_text_field_prev_offset(const char *utf8, cmp_usize utf8_len,
   return CMP_OK;
 }
 
-static int
-cmp_text_field_next_offset(const char *utf8, cmp_usize utf8_len,
-                           cmp_usize offset,
-                           cmp_usize *out_offset) {
+static int cmp_text_field_next_offset(const char *utf8, cmp_usize utf8_len,
+                                      cmp_usize offset, cmp_usize *out_offset) {
   CMPUtf8Iter iter = {0};
   cmp_u32 codepoint;
-  int rc;           
+  int rc;
 
   if (out_offset == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (offset >= utf8_len) {
-    *out_offset = utf8_len; /* GCOVR_EXCL_LINE */
-    return CMP_OK; /* GCOVR_EXCL_LINE */
+    *out_offset = utf8_len;
+    return CMP_OK;
   }
 
   rc = cmp_text_field_validate_offset(utf8, utf8_len, offset);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc = cmp_utf8_iter_init(&iter, utf8, utf8_len);
 #ifdef CMP_TESTING
   if (cmp_text_field_test_fail_point_match(
           CMP_TEXT_FIELD_TEST_FAIL_UTF8_ITER_INIT)) {
-    rc = CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+    rc = CMP_ERR_IO;
   }
 #endif
   if (rc != CMP_OK) {
@@ -603,18 +601,18 @@ cmp_text_field_next_offset(const char *utf8, cmp_usize utf8_len,
 #ifdef CMP_TESTING
     if (cmp_text_field_test_fail_point_match(
             CMP_TEXT_FIELD_TEST_FAIL_UTF8_ITER_NEXT)) {
-      rc = CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+      rc = CMP_ERR_IO;
     }
     if (cmp_text_field_test_fail_point_match(
             CMP_TEXT_FIELD_TEST_FAIL_UTF8_ITER_NOT_FOUND)) {
-      rc = CMP_ERR_NOT_FOUND; /* GCOVR_EXCL_LINE */
+      rc = CMP_ERR_NOT_FOUND;
     }
 #endif
     if (rc == CMP_ERR_NOT_FOUND) {
-      break; /* GCOVR_EXCL_LINE */
+      break;
     }
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     if (iter.offset > offset) {
       *out_offset = iter.offset;
@@ -623,15 +621,15 @@ cmp_text_field_next_offset(const char *utf8, cmp_usize utf8_len,
     CMP_UNUSED(codepoint);
   }
 
-  *out_offset = utf8_len; /* GCOVR_EXCL_LINE */
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+  *out_offset = utf8_len;
+  return CMP_OK;
 }
 
 static int cmp_text_field_update_text_metrics(CMPTextField *field) {
   int rc;
 
   if (field == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (field->text_metrics_valid == CMP_TRUE) {
     return CMP_OK;
@@ -658,18 +656,18 @@ static int cmp_text_field_update_label_metrics(CMPTextField *field) {
   int rc;
 
   if (field == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (field->label_metrics_valid == CMP_TRUE) {
     return CMP_OK;
   }
 
   if (field->label_font.id == 0u && field->label_font.generation == 0u) {
-    field->label_metrics.width = 0.0f; /* GCOVR_EXCL_LINE */
-    field->label_metrics.height = 0.0f; /* GCOVR_EXCL_LINE */
-    field->label_metrics.baseline = 0.0f; /* GCOVR_EXCL_LINE */
-    field->label_metrics_valid = CMP_TRUE; /* GCOVR_EXCL_LINE */
-    return CMP_OK; /* GCOVR_EXCL_LINE */
+    field->label_metrics.width = 0.0f;
+    field->label_metrics.height = 0.0f;
+    field->label_metrics.baseline = 0.0f;
+    field->label_metrics_valid = CMP_TRUE;
+    return CMP_OK;
   }
 
   rc = cmp_text_measure_utf8(&field->text_backend, field->label_font,
@@ -693,7 +691,7 @@ static int cmp_text_field_update_placeholder_metrics(CMPTextField *field) {
   int rc;
 
   if (field == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (field->placeholder_metrics_valid == CMP_TRUE) {
     return CMP_OK;
@@ -720,7 +718,7 @@ static int cmp_text_field_update_font_metrics(CMPTextField *field) {
   int rc;
 
   if (field == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   if (field->font_metrics_valid == CMP_TRUE) {
     return CMP_OK;
@@ -746,20 +744,20 @@ static int cmp_text_field_update_font_metrics(CMPTextField *field) {
                                &field->label_font_metrics);
 #ifdef CMP_TESTING
     if (cmp_text_field_test_fail_point_match(
-            CMP_TEXT_FIELD_TEST_FAIL_LABEL_FONT_METRICS)) { /* GCOVR_EXCL_LINE */
+            CMP_TEXT_FIELD_TEST_FAIL_LABEL_FONT_METRICS)) {
       rc = CMP_ERR_IO;
     }
     if (cmp_text_field_test_font_metrics_should_fail()) {
-      rc = CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+      rc = CMP_ERR_IO;
     }
 #endif
     if (rc != CMP_OK) {
       return rc;
     }
   } else {
-    field->label_font_metrics.width = 0.0f; /* GCOVR_EXCL_LINE */
-    field->label_font_metrics.height = 0.0f; /* GCOVR_EXCL_LINE */
-    field->label_font_metrics.baseline = 0.0f; /* GCOVR_EXCL_LINE */
+    field->label_font_metrics.width = 0.0f;
+    field->label_font_metrics.height = 0.0f;
+    field->label_font_metrics.baseline = 0.0f;
   }
 
   field->font_metrics_valid = CMP_TRUE;
@@ -768,7 +766,7 @@ static int cmp_text_field_update_font_metrics(CMPTextField *field) {
 
 static int cmp_text_field_sync_label(CMPTextField *field) {
   CMPScalar target;
-  int rc;          
+  int rc;
 
   if (field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -776,17 +774,16 @@ static int cmp_text_field_sync_label(CMPTextField *field) {
 
   if (field->utf8_label == NULL || field->label_len == 0u) {
     field->label_value = 0.0f;
-    rc = cmp_anim_controller_start_timing(
-        &field->label_anim, 0.0f, 0.0f, 0.0f,
-        CMP_ANIM_EASE_OUT);
+    rc = cmp_anim_controller_start_timing(&field->label_anim, 0.0f, 0.0f, 0.0f,
+                                          CMP_ANIM_EASE_OUT);
 #ifdef CMP_TESTING
     if (cmp_text_field_test_fail_point_match(
             CMP_TEXT_FIELD_TEST_FAIL_ANIM_START)) {
-      rc = CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+      rc = CMP_ERR_IO;
     }
 #endif
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     return CMP_OK;
   }
@@ -796,22 +793,21 @@ static int cmp_text_field_sync_label(CMPTextField *field) {
     return CMP_OK;
   }
 
-  rc =
-      cmp_anim_controller_start_timing(&field->label_anim, field->label_value,
-                                       target, field->style.label_anim_duration,
-                                       CMP_ANIM_EASE_OUT);
+  rc = cmp_anim_controller_start_timing(
+      &field->label_anim, field->label_value, target,
+      field->style.label_anim_duration, CMP_ANIM_EASE_OUT);
 #ifdef CMP_TESTING
   if (cmp_text_field_test_fail_point_match(
           CMP_TEXT_FIELD_TEST_FAIL_ANIM_START)) {
-    rc = CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+    rc = CMP_ERR_IO;
   }
 #endif
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if (field->style.label_anim_duration == 0.0f) {
-    field->label_value = target; /* GCOVR_EXCL_LINE */
+    field->label_value = target;
   }
 
   return CMP_OK;
@@ -819,18 +815,18 @@ static int cmp_text_field_sync_label(CMPTextField *field) {
 
 static void cmp_text_field_reset_cursor_blink(CMPTextField *field) {
   if (field == NULL) {
-    return; /* GCOVR_EXCL_LINE */
+    return;
   }
   field->cursor_visible = CMP_TRUE;
   field->cursor_timer = 0.0f;
 }
 
-static int
-cmp_text_field_set_text_internal(CMPTextField *field, const char *utf8_text,
-                                 cmp_usize utf8_len,
-                                 CMPBool notify) {
-  cmp_usize required;                             
-  int rc;                                         
+static int cmp_text_field_set_text_internal(CMPTextField *field,
+                                            const char *utf8_text,
+                                            cmp_usize utf8_len,
+                                            CMPBool notify) {
+  cmp_usize required;
+  int rc;
 
   if (field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -843,12 +839,12 @@ cmp_text_field_set_text_internal(CMPTextField *field, const char *utf8_text,
 
   rc = cmp_text_field_add_overflow(utf8_len, 1u, &required);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc = cmp_text_field_reserve(field, required);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if (utf8_len > 0u && utf8_text != NULL) {
@@ -865,7 +861,7 @@ cmp_text_field_set_text_internal(CMPTextField *field, const char *utf8_text,
 
   rc = cmp_text_field_sync_label(field);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if (notify == CMP_TRUE && field->on_change != NULL) {
@@ -873,7 +869,7 @@ cmp_text_field_set_text_internal(CMPTextField *field, const char *utf8_text,
         field->on_change(field->on_change_ctx, field,
                          field->utf8_len ? field->utf8 : NULL, field->utf8_len);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   }
 
@@ -881,19 +877,18 @@ cmp_text_field_set_text_internal(CMPTextField *field, const char *utf8_text,
 }
 
 static int cmp_text_field_delete_range(CMPTextField *field, cmp_usize start,
-                                       cmp_usize end,   
-                                       CMPBool notify) {
-  cmp_usize tail_len;                                   
-  int rc;                                               
+                                       cmp_usize end, CMPBool notify) {
+  cmp_usize tail_len;
+  int rc;
 
   if (field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (start > end) {
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_RANGE;
   }
   if (end > field->utf8_len) {
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_RANGE;
   }
 
   tail_len = field->utf8_len - end;
@@ -912,26 +907,25 @@ static int cmp_text_field_delete_range(CMPTextField *field, cmp_usize start,
 
   rc = cmp_text_field_sync_label(field);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if (notify == CMP_TRUE && field->on_change != NULL) {
     rc =
-        field->on_change(field->on_change_ctx, field, /* GCOVR_EXCL_LINE */
-                         field->utf8_len ? field->utf8 : NULL, field->utf8_len); /* GCOVR_EXCL_LINE */
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+        field->on_change(field->on_change_ctx, field,
+                         field->utf8_len ? field->utf8 : NULL, field->utf8_len);
+    if (rc != CMP_OK) {
+      return rc;
     }
   }
 
   return CMP_OK;
 }
 
-static int
-cmp_text_field_measure_prefix(CMPTextField *field, cmp_usize offset,
-                              CMPScalar *out_width) {
-  CMPTextMetrics metrics;                            
-  int rc;                                            
+static int cmp_text_field_measure_prefix(CMPTextField *field, cmp_usize offset,
+                                         CMPScalar *out_width) {
+  CMPTextMetrics metrics;
+  int rc;
 
   if (field == NULL || out_width == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -943,12 +937,12 @@ cmp_text_field_measure_prefix(CMPTextField *field, cmp_usize offset,
   }
 #endif
   if (offset > field->utf8_len) {
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_RANGE;
   }
 
   rc = cmp_text_field_validate_offset(field->utf8, field->utf8_len, offset);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc = cmp_text_measure_utf8(&field->text_backend, field->text_font,
@@ -956,27 +950,26 @@ cmp_text_field_measure_prefix(CMPTextField *field, cmp_usize offset,
 #ifdef CMP_TESTING
   if (cmp_text_field_test_fail_point_match(
           CMP_TEXT_FIELD_TEST_FAIL_TEXT_MEASURE)) {
-    rc = CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+    rc = CMP_ERR_IO;
   }
 #endif
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   *out_width = metrics.width;
   return CMP_OK;
 }
 
-static int
-cmp_text_field_offset_for_x(CMPTextField *field, CMPScalar x,
-                            cmp_usize *out_offset) {
-  CMPUtf8Iter iter;                                 
-  cmp_u32 codepoint;                                
-  cmp_usize prev_offset;                            
-  cmp_usize candidate;                              
-  CMPScalar prev_width;                             
-  CMPScalar width;                                  
-  int rc;                                           
+static int cmp_text_field_offset_for_x(CMPTextField *field, CMPScalar x,
+                                       cmp_usize *out_offset) {
+  CMPUtf8Iter iter;
+  cmp_u32 codepoint;
+  cmp_usize prev_offset;
+  cmp_usize candidate;
+  CMPScalar prev_width;
+  CMPScalar width;
+  int rc;
 
   if (field == NULL || out_offset == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -996,11 +989,11 @@ cmp_text_field_offset_for_x(CMPTextField *field, CMPScalar x,
 #ifdef CMP_TESTING
   if (cmp_text_field_test_fail_point_match(
           CMP_TEXT_FIELD_TEST_FAIL_UTF8_ITER_INIT)) {
-    rc = CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+    rc = CMP_ERR_IO;
   }
 #endif
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   prev_offset = 0u;
@@ -1013,7 +1006,7 @@ cmp_text_field_offset_for_x(CMPTextField *field, CMPScalar x,
       rc = CMP_ERR_IO;
     }
     if (cmp_text_field_test_fail_point_match(
-            CMP_TEXT_FIELD_TEST_FAIL_UTF8_ITER_NOT_FOUND)) { /* GCOVR_EXCL_LINE */
+            CMP_TEXT_FIELD_TEST_FAIL_UTF8_ITER_NOT_FOUND)) {
       rc = CMP_ERR_NOT_FOUND;
     }
 #endif
@@ -1026,7 +1019,7 @@ cmp_text_field_offset_for_x(CMPTextField *field, CMPScalar x,
     candidate = iter.offset;
     rc = cmp_text_field_measure_prefix(field, candidate, &width);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     if (width >= x) {
       if ((x - prev_width) <= (width - x)) {
@@ -1045,20 +1038,16 @@ cmp_text_field_offset_for_x(CMPTextField *field, CMPScalar x,
   return CMP_OK;
 }
 
-static int
-cmp_text_field_resolve_colors(const CMPTextField *field,
-                              CMPColor *out_container,
-                              CMPColor *out_outline,
-                              CMPColor *out_text, CMPColor *out_label,
-                              CMPColor *out_placeholder,
-                              CMPColor *out_cursor, CMPColor *out_selection,
-                              CMPColor *out_handle) {
-  int rc;                                            
+static int cmp_text_field_resolve_colors(
+    const CMPTextField *field, CMPColor *out_container, CMPColor *out_outline,
+    CMPColor *out_text, CMPColor *out_label, CMPColor *out_placeholder,
+    CMPColor *out_cursor, CMPColor *out_selection, CMPColor *out_handle) {
+  int rc;
 
   if (field == NULL || out_container == NULL || out_outline == NULL ||
       out_text == NULL || out_label == NULL || out_placeholder == NULL ||
       out_cursor == NULL || out_selection == NULL || out_handle == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 #ifdef CMP_TESTING
   if (cmp_text_field_test_fail_point_match(
@@ -1123,17 +1112,16 @@ cmp_text_field_resolve_colors(const CMPTextField *field,
   return CMP_OK;
 }
 
-static int
-cmp_text_field_widget_measure(void *widget, CMPMeasureSpec width,
-                              CMPMeasureSpec height,
-                              CMPSize *out_size) {  
-  CMPTextField *field;                              
-  CMPScalar desired_width;                          
-  CMPScalar desired_height;                         
-  CMPTextMetrics text_metrics;                      
+static int cmp_text_field_widget_measure(void *widget, CMPMeasureSpec width,
+                                         CMPMeasureSpec height,
+                                         CMPSize *out_size) {
+  CMPTextField *field;
+  CMPScalar desired_width;
+  CMPScalar desired_height;
+  CMPTextMetrics text_metrics;
   CMPTextMetrics label_metrics;
   CMPTextMetrics placeholder_metrics;
-  int rc;                            
+  int rc;
 
   if (widget == NULL || out_size == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1152,9 +1140,8 @@ cmp_text_field_widget_measure(void *widget, CMPMeasureSpec width,
 
   rc = cmp_text_field_validate_style(
       &field->style, CMP_TRUE,
-      (field->utf8_label != NULL && field->label_len > 0u)
-          ? CMP_TRUE
-          : CMP_FALSE);
+      (field->utf8_label != NULL && field->label_len > 0u) ? CMP_TRUE
+                                                           : CMP_FALSE);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1242,34 +1229,34 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
   CMPRect inner;
   CMPRect content;
   CMPRect selection_rect = {0};
-  CMPRect handle_rect;        
-  CMPScalar outline_width;    
-  CMPScalar corner_radius;    
-  CMPScalar inner_corner;     
-  CMPScalar available_height; 
-  CMPScalar text_top;         
+  CMPRect handle_rect;
+  CMPScalar outline_width;
+  CMPScalar corner_radius;
+  CMPScalar inner_corner;
+  CMPScalar available_height;
+  CMPScalar text_top;
   /*CMPScalar text_baseline;*/
-  CMPScalar label_baseline;   
-  CMPScalar label_rest_y;     
+  CMPScalar label_baseline;
+  CMPScalar label_rest_y;
   CMPScalar label_float_y;
   CMPScalar label_y;
   CMPScalar label_x;
-  CMPScalar text_x; 
+  CMPScalar text_x;
   CMPScalar caret_x;
   CMPScalar start_x;
   CMPScalar end_x;
   CMPScalar temp_scalar;
   CMPScalar handle_radius;
   CMPScalar handle_height;
-  CMPColor container;     
-  CMPColor outline;       
+  CMPColor container;
+  CMPColor outline;
   CMPColor text_color;
-  CMPColor label_color;      
+  CMPColor label_color;
   CMPColor placeholder_color;
-  CMPColor cursor_color;     
-  CMPColor selection_color;  
-  CMPColor handle_color;     
-  int rc;                    
+  CMPColor cursor_color;
+  CMPColor selection_color;
+  CMPColor handle_color;
+  int rc;
 
   if (widget == NULL || ctx == NULL || ctx->gfx == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -1286,9 +1273,8 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
 
   rc = cmp_text_field_validate_style(
       &field->style, CMP_TRUE,
-      (field->utf8_label != NULL && field->label_len > 0u)
-          ? CMP_TRUE
-          : CMP_FALSE);
+      (field->utf8_label != NULL && field->label_len > 0u) ? CMP_TRUE
+                                                           : CMP_FALSE);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1317,8 +1303,7 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
 
   rc = cmp_text_field_resolve_colors(
       field, &container, &outline, &text_color, &label_color,
-      &placeholder_color, &cursor_color, &selection_color,
-      &handle_color);                                     
+      &placeholder_color, &cursor_color, &selection_color, &handle_color);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -1363,18 +1348,18 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
 
     inner_corner = corner_radius - outline_width;
     if (inner_corner < 0.0f) {
-      inner_corner = 0.0f; /* GCOVR_EXCL_LINE */
+      inner_corner = 0.0f;
     }
   } else {
-    inner = bounds; /* GCOVR_EXCL_LINE */
-    inner_corner = corner_radius; /* GCOVR_EXCL_LINE */
+    inner = bounds;
+    inner_corner = corner_radius;
   }
 
   if (container.a > 0.0f) {
     rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &inner, container,
                                      inner_corner);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   }
 
@@ -1383,15 +1368,15 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
   content.width = bounds.width - field->style.padding_x * 2.0f;
   content.height = bounds.height - field->style.padding_y * 2.0f;
   if (content.width < 0.0f) {
-    content.width = 0.0f; /* GCOVR_EXCL_LINE */
+    content.width = 0.0f;
   }
   if (content.height < 0.0f) {
-    content.height = 0.0f; /* GCOVR_EXCL_LINE */
+    content.height = 0.0f;
   }
 
   available_height = content.height - field->text_font_metrics.height;
   if (available_height < 0.0f) {
-    available_height = 0.0f; /* GCOVR_EXCL_LINE */
+    available_height = 0.0f;
   }
   text_top = content.y + available_height * 0.5f;
   /* text_baseline = field->text_font_metrics.baseline; */
@@ -1400,46 +1385,45 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
   if (ctx->gfx->vtable->push_clip != NULL) {
     rc = ctx->gfx->vtable->push_clip(ctx->gfx->ctx, &inner);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   }
 
   if (field->selection_start != field->selection_end &&
-      selection_color.a > 0.0f) { /* GCOVR_EXCL_LINE */
-    rc = cmp_text_field_measure_prefix(field, field->selection_start, &start_x); /* GCOVR_EXCL_LINE */
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+      selection_color.a > 0.0f) {
+    rc = cmp_text_field_measure_prefix(field, field->selection_start, &start_x);
+    if (rc != CMP_OK) {
+      return rc;
     }
-    rc = cmp_text_field_measure_prefix(field, field->selection_end, &end_x); /* GCOVR_EXCL_LINE */
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    rc = cmp_text_field_measure_prefix(field, field->selection_end, &end_x);
+    if (rc != CMP_OK) {
+      return rc;
     }
-    if (end_x < start_x) { /* GCOVR_EXCL_LINE */
-      temp_scalar = start_x; /* GCOVR_EXCL_LINE */
-      start_x = end_x; /* GCOVR_EXCL_LINE */
-      end_x = temp_scalar; /* GCOVR_EXCL_LINE */
+    if (end_x < start_x) {
+      temp_scalar = start_x;
+      start_x = end_x;
+      end_x = temp_scalar;
     }
-    selection_rect.x = text_x + start_x; /* GCOVR_EXCL_LINE */
-    selection_rect.y = text_top; /* GCOVR_EXCL_LINE */
-    selection_rect.width = end_x - start_x; /* GCOVR_EXCL_LINE */
+    selection_rect.x = text_x + start_x;
+    selection_rect.y = text_top;
+    selection_rect.width = end_x - start_x;
 #ifdef CMP_TESTING
-    if (cmp_text_field_test_fail_point_match( /* GCOVR_EXCL_LINE */
-            CMP_TEXT_FIELD_TEST_FAIL_SELECTION_WIDTH_NEGATIVE)) { /* GCOVR_EXCL_LINE */
-      selection_rect.width = -1.0f; /* GCOVR_EXCL_LINE */
+    if (cmp_text_field_test_fail_point_match(
+            CMP_TEXT_FIELD_TEST_FAIL_SELECTION_WIDTH_NEGATIVE)) {
+      selection_rect.width = -1.0f;
     }
 #endif
-    selection_rect.height = field->text_font_metrics.height; /* GCOVR_EXCL_LINE */
-    if (selection_rect.width < 0.0f) { /* GCOVR_EXCL_LINE */
-      selection_rect.width = 0.0f; /* GCOVR_EXCL_LINE */
+    selection_rect.height = field->text_font_metrics.height;
+    if (selection_rect.width < 0.0f) {
+      selection_rect.width = 0.0f;
     }
-    if (selection_rect.height < 0.0f) { /* GCOVR_EXCL_LINE */
-      selection_rect.height = 0.0f; /* GCOVR_EXCL_LINE */
+    if (selection_rect.height < 0.0f) {
+      selection_rect.height = 0.0f;
     }
-    rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &selection_rect, /* GCOVR_EXCL_LINE */
-                                     selection_color,
-                                     0.0f);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &selection_rect,
+                                     selection_color, 0.0f);
+    if (rc != CMP_OK) {
+      return rc;
     }
   }
 
@@ -1454,20 +1438,20 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
                                           field->utf8, field->utf8_len, 0,
                                           text_x, textDrawY, text_color);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
-  } else if ((field->utf8_placeholder != NULL && field->placeholder_len > 0u) && /* GCOVR_EXCL_LINE */
-             (field->utf8_label == NULL || field->label_len == 0u || /* GCOVR_EXCL_LINE */
-              field->label_value > 0.0f)) { /* GCOVR_EXCL_LINE */
-    CMPScalar centerY = bounds.y + bounds.height * 0.5f; /* GCOVR_EXCL_LINE */
-    CMPScalar textDrawY = centerY - field->text_font_metrics.height * 0.5f + /* GCOVR_EXCL_LINE */
-                          field->text_font_metrics.baseline; /* GCOVR_EXCL_LINE */
+  } else if ((field->utf8_placeholder != NULL && field->placeholder_len > 0u) &&
+             (field->utf8_label == NULL || field->label_len == 0u ||
+              field->label_value > 0.0f)) {
+    CMPScalar centerY = bounds.y + bounds.height * 0.5f;
+    CMPScalar textDrawY = centerY - field->text_font_metrics.height * 0.5f +
+                          field->text_font_metrics.baseline;
 
-    rc = ctx->gfx->text_vtable->draw_text( /* GCOVR_EXCL_LINE */
-        ctx->gfx->ctx, field->text_font, field->utf8_placeholder, /* GCOVR_EXCL_LINE */
+    rc = ctx->gfx->text_vtable->draw_text(
+        ctx->gfx->ctx, field->text_font, field->utf8_placeholder,
         field->placeholder_len, 0, text_x, textDrawY, placeholder_color);
-    if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+    if (rc != CMP_OK) {
+      return rc;
     }
   }
 
@@ -1496,7 +1480,7 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
                                           field->utf8_label, field->label_len,
                                           0, label_x, label_y, label_color);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   }
 
@@ -1506,7 +1490,7 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
       cursor_color.a > 0.0f) {
     rc = cmp_text_field_measure_prefix(field, field->cursor, &caret_x);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
 
     /* FIX: Center cursor vertically in the box */
@@ -1521,65 +1505,65 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
 
 #ifdef CMP_TESTING
     if (cmp_text_field_test_fail_point_match(
-            CMP_TEXT_FIELD_TEST_FAIL_CURSOR_WIDTH_NEGATIVE)) { /* GCOVR_EXCL_LINE */
-      selection_rect.width = -1.0f; /* GCOVR_EXCL_LINE */
+            CMP_TEXT_FIELD_TEST_FAIL_CURSOR_WIDTH_NEGATIVE)) {
+      selection_rect.width = -1.0f;
     }
     if (cmp_text_field_test_fail_point_match(
-            CMP_TEXT_FIELD_TEST_FAIL_CURSOR_HEIGHT_NEGATIVE)) { /* GCOVR_EXCL_LINE */
-      selection_rect.height = -1.0f; /* GCOVR_EXCL_LINE */
+            CMP_TEXT_FIELD_TEST_FAIL_CURSOR_HEIGHT_NEGATIVE)) {
+      selection_rect.height = -1.0f;
     }
 #endif
     if (selection_rect.width < 0.0f) {
-      selection_rect.width = 0.0f; /* GCOVR_EXCL_LINE */
+      selection_rect.width = 0.0f;
     }
     if (selection_rect.height < 0.0f) {
-      selection_rect.height = 0.0f; /* GCOVR_EXCL_LINE */
+      selection_rect.height = 0.0f;
     }
     rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &selection_rect,
                                      cursor_color, 0.0f);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   }
 
   if (field->selection_start != field->selection_end && handle_color.a > 0.0f) {
-    handle_radius = field->style.handle_radius; /* GCOVR_EXCL_LINE */
-    handle_height = field->style.handle_height; /* GCOVR_EXCL_LINE */
-    if (handle_height < handle_radius * 2.0f) { /* GCOVR_EXCL_LINE */
-      handle_height = handle_radius * 2.0f; /* GCOVR_EXCL_LINE */
+    handle_radius = field->style.handle_radius;
+    handle_height = field->style.handle_height;
+    if (handle_height < handle_radius * 2.0f) {
+      handle_height = handle_radius * 2.0f;
     }
-    if (handle_radius > 0.0f && handle_height > 0.0f) { /* GCOVR_EXCL_LINE */
-      rc = cmp_text_field_measure_prefix(field, field->selection_start, /* GCOVR_EXCL_LINE */
+    if (handle_radius > 0.0f && handle_height > 0.0f) {
+      rc = cmp_text_field_measure_prefix(field, field->selection_start,
                                          &start_x);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
-      rc = cmp_text_field_measure_prefix(field, field->selection_end, &end_x); /* GCOVR_EXCL_LINE */
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      rc = cmp_text_field_measure_prefix(field, field->selection_end, &end_x);
+      if (rc != CMP_OK) {
+        return rc;
       }
-      if (end_x < start_x) { /* GCOVR_EXCL_LINE */
-        temp_scalar = start_x; /* GCOVR_EXCL_LINE */
-        start_x = end_x; /* GCOVR_EXCL_LINE */
-        end_x = temp_scalar; /* GCOVR_EXCL_LINE */
-      }
-
-      handle_rect.width = handle_radius * 2.0f; /* GCOVR_EXCL_LINE */
-      handle_rect.height = handle_height; /* GCOVR_EXCL_LINE */
-      handle_rect.x = text_x + start_x - handle_radius; /* GCOVR_EXCL_LINE */
-      handle_rect.y = /* GCOVR_EXCL_LINE */
-          text_top + field->text_font_metrics.height - handle_height * 0.5f; /* GCOVR_EXCL_LINE */
-      rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &handle_rect, /* GCOVR_EXCL_LINE */
-                                       handle_color, handle_radius);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (end_x < start_x) {
+        temp_scalar = start_x;
+        start_x = end_x;
+        end_x = temp_scalar;
       }
 
-      handle_rect.x = text_x + end_x - handle_radius; /* GCOVR_EXCL_LINE */
-      rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &handle_rect, /* GCOVR_EXCL_LINE */
+      handle_rect.width = handle_radius * 2.0f;
+      handle_rect.height = handle_height;
+      handle_rect.x = text_x + start_x - handle_radius;
+      handle_rect.y =
+          text_top + field->text_font_metrics.height - handle_height * 0.5f;
+      rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &handle_rect,
                                        handle_color, handle_radius);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
+      }
+
+      handle_rect.x = text_x + end_x - handle_radius;
+      rc = ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &handle_rect,
+                                       handle_color, handle_radius);
+      if (rc != CMP_OK) {
+        return rc;
       }
     }
   }
@@ -1587,23 +1571,22 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
   if (ctx->gfx->vtable->pop_clip != NULL) {
     rc = ctx->gfx->vtable->pop_clip(ctx->gfx->ctx);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   }
 
   return CMP_OK;
 }
 
-static int
-cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
-                            CMPBool *out_handled) {
-  CMPTextField *field;                             
+static int cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
+                                       CMPBool *out_handled) {
+  CMPTextField *field;
   cmp_usize offset;
   cmp_usize other;
-  int rc;         
+  int rc;
 
   if (widget == NULL || event == NULL || out_handled == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   *out_handled = CMP_FALSE;
@@ -1611,18 +1594,18 @@ cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
   field = (CMPTextField *)widget;
 
   if (field->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
-    return CMP_OK; /* GCOVR_EXCL_LINE */
+    return CMP_OK;
   }
 
   switch (event->type) {
   case CMP_INPUT_POINTER_DOWN:
-    rc = cmp_text_field_offset_for_x(
-        field,
-        (CMPScalar)event->data.pointer.x - field->bounds.x -
-            field->style.padding_x,
-        &offset);
+    rc = cmp_text_field_offset_for_x(field,
+                                     (CMPScalar)event->data.pointer.x -
+                                         field->bounds.x -
+                                         field->style.padding_x,
+                                     &offset);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     field->cursor = offset;
     field->selection_start = offset;
@@ -1652,7 +1635,7 @@ cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
                                          field->style.padding_x,
                                      &offset);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     field->cursor = offset;
     field->selection_end = offset;
@@ -1661,41 +1644,41 @@ cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
     return CMP_OK;
   case CMP_INPUT_POINTER_UP:
     if (field->selecting == CMP_FALSE) {
-      return CMP_OK; /* GCOVR_EXCL_LINE */
+      return CMP_OK;
     }
     field->selecting = CMP_FALSE;
     *out_handled = CMP_TRUE;
     return CMP_OK;
   case CMP_INPUT_TEXT:
     if (event->data.text.length == 0u) {
-      return CMP_OK; /* GCOVR_EXCL_LINE */
+      return CMP_OK;
     }
     rc = cmp_text_field_insert_utf8(field, event->data.text.utf8,
                                     (cmp_usize)event->data.text.length);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     field->focused = CMP_TRUE;
     rc = cmp_text_field_sync_label(field);
 #ifdef CMP_TESTING
     if (cmp_text_field_test_fail_point_match(
             CMP_TEXT_FIELD_TEST_FAIL_EVENT_SYNC_LABEL)) {
-      rc = CMP_ERR_IO; /* GCOVR_EXCL_LINE */
+      rc = CMP_ERR_IO;
     }
 #endif
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     *out_handled = CMP_TRUE;
     return CMP_OK;
   case CMP_INPUT_TEXT_UTF8:
     if (event->data.text_utf8.length == 0u) {
-      return CMP_OK; /* GCOVR_EXCL_LINE */
+      return CMP_OK;
     }
     rc = cmp_text_field_insert_utf8(field, event->data.text_utf8.utf8,
                                     event->data.text_utf8.length);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     field->focused = CMP_TRUE;
     rc = cmp_text_field_sync_label(field);
@@ -1718,13 +1701,13 @@ cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
       rc = cmp_text_field_insert_utf8(field, event->data.text_edit.utf8,
                                       event->data.text_edit.length);
       if (rc != CMP_OK) {
-        return rc; /* GCOVR_EXCL_LINE */
+        return rc;
       }
     }
     field->focused = CMP_TRUE;
     rc = cmp_text_field_sync_label(field);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     *out_handled = CMP_TRUE;
     return CMP_OK;
@@ -1752,68 +1735,68 @@ cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
     if (event->data.key.key_code == 8u || event->data.key.key_code == 127u ||
         event->data.key.key_code == 46u) {
       rc = (event->data.key.key_code == 46u)
-               ? cmp_text_field_delete_forward(field) /* GCOVR_EXCL_LINE */
+               ? cmp_text_field_delete_forward(field)
                : cmp_text_field_backspace(field);
       if (rc != CMP_OK) {
-        return rc; /* GCOVR_EXCL_LINE */
+        return rc;
       }
       field->focused = CMP_TRUE;
       rc = cmp_text_field_sync_label(field);
       if (rc != CMP_OK) {
-        return rc; /* GCOVR_EXCL_LINE */
+        return rc;
       }
       *out_handled = CMP_TRUE;
       return CMP_OK;
     }
     if (event->data.key.key_code == 37u || event->data.key.key_code == 0x25u ||
         event->data.key.key_code == 1073741904u) {
-      rc = cmp_text_field_prev_offset(field->utf8, field->utf8_len, /* GCOVR_EXCL_LINE */
+      rc = cmp_text_field_prev_offset(field->utf8, field->utf8_len,
                                       field->cursor, &other);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
-      field->cursor = other; /* GCOVR_EXCL_LINE */
-      field->selection_start = other; /* GCOVR_EXCL_LINE */
-      field->selection_end = other; /* GCOVR_EXCL_LINE */
-      cmp_text_field_reset_cursor_blink(field); /* GCOVR_EXCL_LINE */
-      field->focused = CMP_TRUE; /* GCOVR_EXCL_LINE */
-      *out_handled = CMP_TRUE; /* GCOVR_EXCL_LINE */
-      return CMP_OK; /* GCOVR_EXCL_LINE */
+      field->cursor = other;
+      field->selection_start = other;
+      field->selection_end = other;
+      cmp_text_field_reset_cursor_blink(field);
+      field->focused = CMP_TRUE;
+      *out_handled = CMP_TRUE;
+      return CMP_OK;
     }
     if (event->data.key.key_code == 39u || event->data.key.key_code == 0x27u ||
         event->data.key.key_code == 1073741903u) {
-      rc = cmp_text_field_next_offset(field->utf8, field->utf8_len, /* GCOVR_EXCL_LINE */
+      rc = cmp_text_field_next_offset(field->utf8, field->utf8_len,
                                       field->cursor, &other);
-      if (rc != CMP_OK) { /* GCOVR_EXCL_LINE */
-        return rc; /* GCOVR_EXCL_LINE */
+      if (rc != CMP_OK) {
+        return rc;
       }
-      field->cursor = other; /* GCOVR_EXCL_LINE */
-      field->selection_start = other; /* GCOVR_EXCL_LINE */
-      field->selection_end = other; /* GCOVR_EXCL_LINE */
-      cmp_text_field_reset_cursor_blink(field); /* GCOVR_EXCL_LINE */
-      field->focused = CMP_TRUE; /* GCOVR_EXCL_LINE */
-      *out_handled = CMP_TRUE; /* GCOVR_EXCL_LINE */
-      return CMP_OK; /* GCOVR_EXCL_LINE */
+      field->cursor = other;
+      field->selection_start = other;
+      field->selection_end = other;
+      cmp_text_field_reset_cursor_blink(field);
+      field->focused = CMP_TRUE;
+      *out_handled = CMP_TRUE;
+      return CMP_OK;
     }
     if (event->data.key.key_code == 36u || event->data.key.key_code == 0x24u ||
         event->data.key.key_code == 1073741898u) {
-      field->cursor = 0u; /* GCOVR_EXCL_LINE */
-      field->selection_start = 0u; /* GCOVR_EXCL_LINE */
-      field->selection_end = 0u; /* GCOVR_EXCL_LINE */
-      cmp_text_field_reset_cursor_blink(field); /* GCOVR_EXCL_LINE */
-      field->focused = CMP_TRUE; /* GCOVR_EXCL_LINE */
-      *out_handled = CMP_TRUE; /* GCOVR_EXCL_LINE */
-      return CMP_OK; /* GCOVR_EXCL_LINE */
+      field->cursor = 0u;
+      field->selection_start = 0u;
+      field->selection_end = 0u;
+      cmp_text_field_reset_cursor_blink(field);
+      field->focused = CMP_TRUE;
+      *out_handled = CMP_TRUE;
+      return CMP_OK;
     }
     if (event->data.key.key_code == 35u || event->data.key.key_code == 0x23u ||
         event->data.key.key_code == 1073741901u) {
-      field->cursor = field->utf8_len; /* GCOVR_EXCL_LINE */
-      field->selection_start = field->utf8_len; /* GCOVR_EXCL_LINE */
-      field->selection_end = field->utf8_len; /* GCOVR_EXCL_LINE */
-      cmp_text_field_reset_cursor_blink(field); /* GCOVR_EXCL_LINE */
-      field->focused = CMP_TRUE; /* GCOVR_EXCL_LINE */
-      *out_handled = CMP_TRUE; /* GCOVR_EXCL_LINE */
-      return CMP_OK; /* GCOVR_EXCL_LINE */
+      field->cursor = field->utf8_len;
+      field->selection_start = field->utf8_len;
+      field->selection_end = field->utf8_len;
+      cmp_text_field_reset_cursor_blink(field);
+      field->focused = CMP_TRUE;
+      *out_handled = CMP_TRUE;
+      return CMP_OK;
     }
     return CMP_OK;
   default:
@@ -1821,12 +1804,12 @@ cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
   }
 }
 
-static int cmp_text_field_widget_get_semantics(
-    void *widget, CMPSemantics *out_semantics) {
-  CMPTextField *field;                          
+static int cmp_text_field_widget_get_semantics(void *widget,
+                                               CMPSemantics *out_semantics) {
+  CMPTextField *field;
 
   if (widget == NULL || out_semantics == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
   memset(out_semantics, 0, sizeof(*out_semantics));
 
@@ -1850,11 +1833,11 @@ static int cmp_text_field_widget_get_semantics(
 
 static int cmp_text_field_widget_destroy(void *widget) {
   CMPTextField *field;
-  int rc;             
-  int rc2;            
+  int rc;
+  int rc2;
 
   if (widget == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   field = (CMPTextField *)widget;
@@ -1867,10 +1850,10 @@ static int cmp_text_field_widget_destroy(void *widget) {
         rc2 = field->text_backend.vtable->destroy_font(field->text_backend.ctx,
                                                        field->text_font);
         if (rc2 != CMP_OK && rc == CMP_OK) {
-          rc = rc2; /* GCOVR_EXCL_LINE */
+          rc = rc2;
         }
-      } else if (rc == CMP_OK) { /* GCOVR_EXCL_LINE */
-        rc = CMP_ERR_UNSUPPORTED; /* GCOVR_EXCL_LINE */
+      } else if (rc == CMP_OK) {
+        rc = CMP_ERR_UNSUPPORTED;
       }
     }
     if (field->label_font.id != 0u || field->label_font.generation != 0u) {
@@ -1879,10 +1862,10 @@ static int cmp_text_field_widget_destroy(void *widget) {
         rc2 = field->text_backend.vtable->destroy_font(field->text_backend.ctx,
                                                        field->label_font);
         if (rc2 != CMP_OK && rc == CMP_OK) {
-          rc = rc2; /* GCOVR_EXCL_LINE */
+          rc = rc2;
         }
-      } else if (rc == CMP_OK) { /* GCOVR_EXCL_LINE */
-        rc = CMP_ERR_UNSUPPORTED; /* GCOVR_EXCL_LINE */
+      } else if (rc == CMP_OK) {
+        rc = CMP_ERR_UNSUPPORTED;
       }
     }
   }
@@ -1924,14 +1907,10 @@ static int cmp_text_field_widget_destroy(void *widget) {
   return rc;
 }
 
-static const CMPWidgetVTable
-    g_cmp_text_field_widget_vtable =
-    {cmp_text_field_widget_measure,
-     cmp_text_field_widget_layout,
-     cmp_text_field_widget_paint,
-     cmp_text_field_widget_event,
-     cmp_text_field_widget_get_semantics,
-     cmp_text_field_widget_destroy};
+static const CMPWidgetVTable g_cmp_text_field_widget_vtable = {
+    cmp_text_field_widget_measure,       cmp_text_field_widget_layout,
+    cmp_text_field_widget_paint,         cmp_text_field_widget_event,
+    cmp_text_field_widget_get_semantics, cmp_text_field_widget_destroy};
 
 int CMP_CALL cmp_text_field_style_init(CMPTextFieldStyle *style) {
   int rc;
@@ -1978,71 +1957,71 @@ int CMP_CALL cmp_text_field_style_init(CMPTextFieldStyle *style) {
   rc =
       cmp_text_field_color_set(&style->container_color, 1.0f, 1.0f, 1.0f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_color_set(&style->outline_color, 0.0f, 0.0f, 0.0f, 0.38f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_color_set(&style->focused_outline_color, 0.2f, 0.4f, 0.9f,
                                 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_color_set(&style->disabled_container_color, 0.95f, 0.95f,
                                 0.95f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_color_set(&style->disabled_outline_color, 0.0f, 0.0f,
                                 0.0f, 0.12f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_color_set(&style->disabled_text_color, 0.0f, 0.0f, 0.0f,
                                 0.38f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_color_set(&style->disabled_label_color, 0.0f, 0.0f, 0.0f,
                                 0.38f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_color_set(&style->placeholder_color, 0.0f, 0.0f, 0.0f,
                                 0.6f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_color_set(&style->disabled_placeholder_color, 0.0f, 0.0f,
                                 0.0f, 0.38f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_color_set(&style->cursor_color, 0.2f, 0.4f, 0.9f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc =
       cmp_text_field_color_set(&style->selection_color, 0.2f, 0.4f, 0.9f, 0.3f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_color_set(&style->handle_color, 0.2f, 0.4f, 0.9f, 1.0f);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return CMP_OK;
 }
 
-int CMP_CALL cmp_text_field_init(
-    CMPTextField *field, const CMPTextBackend *backend,
-    const CMPTextFieldStyle *style,                    
-    const CMPAllocator *allocator,                     
-    const char *utf8_text, cmp_usize utf8_len) {       
-  CMPAllocator alloc;                                  
-  int rc;                                              
+int CMP_CALL cmp_text_field_init(CMPTextField *field,
+                                 const CMPTextBackend *backend,
+                                 const CMPTextFieldStyle *style,
+                                 const CMPAllocator *allocator,
+                                 const char *utf8_text, cmp_usize utf8_len) {
+  CMPAllocator alloc;
+  int rc;
 
   if (field == NULL || backend == NULL || style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2055,20 +2034,20 @@ int CMP_CALL cmp_text_field_init(
 
   rc = cmp_text_field_validate_style(style, CMP_TRUE, CMP_FALSE);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if (allocator == NULL) {
     rc = cmp_get_default_allocator(&alloc);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   } else {
     alloc = *allocator;
   }
 
   if (alloc.alloc == NULL || alloc.realloc == NULL || alloc.free == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_INVALID_ARGUMENT;
   }
 
   memset(field, 0, sizeof(*field));
@@ -2116,20 +2095,20 @@ int CMP_CALL cmp_text_field_init(
 
   rc = cmp_text_font_create(backend, &style->text_style, &field->text_font);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if (style->label_style.utf8_family != NULL) {
     rc = cmp_text_font_create(backend, &style->label_style, &field->label_font);
     if (rc != CMP_OK) {
-      cmp_text_font_destroy(backend, field->text_font); /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+      cmp_text_font_destroy(backend, field->text_font);
+      return rc;
     }
   }
 
   rc = cmp_text_field_set_text_internal(field, utf8_text, utf8_len, CMP_FALSE);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   field->widget.ctx = field;
@@ -2162,7 +2141,7 @@ int CMP_CALL cmp_text_field_insert_utf8(CMPTextField *field,
                                         cmp_usize utf8_len) {
   cmp_usize insert_at;
   cmp_usize tail_len;
-  cmp_usize new_len; 
+  cmp_usize new_len;
   cmp_usize required = 0u;
   int rc;
 
@@ -2175,34 +2154,34 @@ int CMP_CALL cmp_text_field_insert_utf8(CMPTextField *field,
 
   rc = cmp_text_field_validate_utf8(utf8_text, utf8_len);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if (field->selection_start != field->selection_end) {
     rc = cmp_text_field_delete_range(field, field->selection_start,
                                      field->selection_end, CMP_FALSE);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   }
 
   insert_at = field->cursor;
   if (insert_at > field->utf8_len) {
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_RANGE;
   }
 
   rc = cmp_text_field_validate_offset(field->utf8, field->utf8_len, insert_at);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc = cmp_text_field_add_overflow(field->utf8_len, utf8_len, &new_len);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_add_overflow(new_len, 1u, &required);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc = cmp_text_field_reserve(field, required);
@@ -2230,7 +2209,7 @@ int CMP_CALL cmp_text_field_insert_utf8(CMPTextField *field,
 
   rc = cmp_text_field_sync_label(field);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if (field->on_change != NULL) {
@@ -2238,7 +2217,7 @@ int CMP_CALL cmp_text_field_insert_utf8(CMPTextField *field,
         field->on_change(field->on_change_ctx, field,
                          field->utf8_len ? field->utf8 : NULL, field->utf8_len);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   }
 
@@ -2251,7 +2230,7 @@ int CMP_CALL cmp_text_field_delete_selection(CMPTextField *field) {
   }
 
   if (field->selection_start == field->selection_end) {
-    return CMP_OK; /* GCOVR_EXCL_LINE */
+    return CMP_OK;
   }
 
   return cmp_text_field_delete_range(field, field->selection_start,
@@ -2260,7 +2239,7 @@ int CMP_CALL cmp_text_field_delete_selection(CMPTextField *field) {
 
 int CMP_CALL cmp_text_field_backspace(CMPTextField *field) {
   cmp_usize prev;
-  int rc;        
+  int rc;
 
   if (field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2277,7 +2256,7 @@ int CMP_CALL cmp_text_field_backspace(CMPTextField *field) {
   rc = cmp_text_field_prev_offset(field->utf8, field->utf8_len, field->cursor,
                                   &prev);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return cmp_text_field_delete_range(field, prev, field->cursor, CMP_TRUE);
@@ -2285,33 +2264,33 @@ int CMP_CALL cmp_text_field_backspace(CMPTextField *field) {
 
 int CMP_CALL cmp_text_field_delete_forward(CMPTextField *field) {
   cmp_usize next;
-  int rc;        
+  int rc;
 
   if (field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
   if (field->selection_start != field->selection_end) {
-    return cmp_text_field_delete_selection(field); /* GCOVR_EXCL_LINE */
+    return cmp_text_field_delete_selection(field);
   }
 
   if (field->cursor >= field->utf8_len) {
-    return CMP_OK; /* GCOVR_EXCL_LINE */
+    return CMP_OK;
   }
 
   rc = cmp_text_field_next_offset(field->utf8, field->utf8_len, field->cursor,
                                   &next);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return cmp_text_field_delete_range(field, field->cursor, next, CMP_TRUE);
 }
 
-int CMP_CALL
-cmp_text_field_set_label(CMPTextField *field, const char *utf8_label,
-                         cmp_usize label_len) {
-  int rc;                                      
+int CMP_CALL cmp_text_field_set_label(CMPTextField *field,
+                                      const char *utf8_label,
+                                      cmp_usize label_len) {
+  int rc;
 
   if (field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2322,18 +2301,18 @@ cmp_text_field_set_label(CMPTextField *field, const char *utf8_label,
 
   rc = cmp_text_field_validate_utf8(utf8_label, label_len);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if ((utf8_label != NULL && label_len > 0u) &&
       (field->label_font.id == 0u && field->label_font.generation == 0u)) {
     if (field->style.label_style.utf8_family == NULL) {
-      return CMP_ERR_INVALID_ARGUMENT; /* GCOVR_EXCL_LINE */
+      return CMP_ERR_INVALID_ARGUMENT;
     }
     rc = cmp_text_font_create(&field->text_backend, &field->style.label_style,
                               &field->label_font);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
   }
 
@@ -2344,16 +2323,16 @@ cmp_text_field_set_label(CMPTextField *field, const char *utf8_label,
 
   rc = cmp_text_field_sync_label(field);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return CMP_OK;
 }
 
-int CMP_CALL cmp_text_field_set_placeholder(
-    CMPTextField *field, const char *utf8_placeholder,
-    cmp_usize placeholder_len) {                      
-  int rc;                                             
+int CMP_CALL cmp_text_field_set_placeholder(CMPTextField *field,
+                                            const char *utf8_placeholder,
+                                            cmp_usize placeholder_len) {
+  int rc;
 
   if (field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2364,7 +2343,7 @@ int CMP_CALL cmp_text_field_set_placeholder(
 
   rc = cmp_text_field_validate_utf8(utf8_placeholder, placeholder_len);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   field->utf8_placeholder = utf8_placeholder;
@@ -2373,14 +2352,14 @@ int CMP_CALL cmp_text_field_set_placeholder(
   return CMP_OK;
 }
 
-int CMP_CALL cmp_text_field_set_style(
-    CMPTextField *field, const CMPTextFieldStyle *style) {
-  CMPHandle new_text_font;                                
-  CMPHandle new_label_font;                               
-  CMPBool need_label;                                     
-  int rc_destroy;                                         
-  int rc2;                                                
-  int rc;                                                 
+int CMP_CALL cmp_text_field_set_style(CMPTextField *field,
+                                      const CMPTextFieldStyle *style) {
+  CMPHandle new_text_font;
+  CMPHandle new_label_font;
+  CMPBool need_label;
+  int rc_destroy;
+  int rc2;
+  int rc;
 
   if (field == NULL || style == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2390,7 +2369,7 @@ int CMP_CALL cmp_text_field_set_style(
                                                                     : CMP_FALSE;
   rc = cmp_text_field_validate_style(style, CMP_TRUE, need_label);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   rc_destroy = CMP_OK;
@@ -2403,27 +2382,27 @@ int CMP_CALL cmp_text_field_set_style(
   rc = cmp_text_font_create(&field->text_backend, &style->text_style,
                             &new_text_font);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if (need_label == CMP_TRUE) {
     rc = cmp_text_font_create(&field->text_backend, &style->label_style,
                               &new_label_font);
     if (rc != CMP_OK) {
-      cmp_text_font_destroy(&field->text_backend, new_text_font); /* GCOVR_EXCL_LINE */
-      return rc; /* GCOVR_EXCL_LINE */
+      cmp_text_font_destroy(&field->text_backend, new_text_font);
+      return rc;
     }
   }
 
   if (field->owns_fonts == CMP_TRUE) {
     rc2 = cmp_text_font_destroy(&field->text_backend, field->text_font);
     if (rc2 != CMP_OK) {
-      rc_destroy = rc2; /* GCOVR_EXCL_LINE */
+      rc_destroy = rc2;
     }
     if (field->label_font.id != 0u || field->label_font.generation != 0u) {
       rc2 = cmp_text_font_destroy(&field->text_backend, field->label_font);
       if (rc2 != CMP_OK && rc_destroy == CMP_OK) {
-        rc_destroy = rc2; /* GCOVR_EXCL_LINE */
+        rc_destroy = rc2;
       }
     }
   }
@@ -2439,18 +2418,18 @@ int CMP_CALL cmp_text_field_set_style(
 
   rc = cmp_text_field_sync_label(field);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   if (rc_destroy != CMP_OK) {
-    return rc_destroy; /* GCOVR_EXCL_LINE */
+    return rc_destroy;
   }
   return CMP_OK;
 }
 
 int CMP_CALL cmp_text_field_set_selection(CMPTextField *field, cmp_usize start,
                                           cmp_usize end) {
-  cmp_usize tmp;                                          
-  int rc;                                                 
+  cmp_usize tmp;
+  int rc;
 
   if (field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2462,17 +2441,17 @@ int CMP_CALL cmp_text_field_set_selection(CMPTextField *field, cmp_usize start,
 
   rc = cmp_text_field_validate_offset(field->utf8, field->utf8_len, start);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
   rc = cmp_text_field_validate_offset(field->utf8, field->utf8_len, end);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   if (start > end) {
-    tmp = start; /* GCOVR_EXCL_LINE */
-    start = end; /* GCOVR_EXCL_LINE */
-    end = tmp; /* GCOVR_EXCL_LINE */
+    tmp = start;
+    start = end;
+    end = tmp;
   }
 
   field->selection_start = start;
@@ -2482,9 +2461,9 @@ int CMP_CALL cmp_text_field_set_selection(CMPTextField *field, cmp_usize start,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_text_field_get_selection(
-    const CMPTextField *field, cmp_usize *out_start,
-    cmp_usize *out_end) {                           
+int CMP_CALL cmp_text_field_get_selection(const CMPTextField *field,
+                                          cmp_usize *out_start,
+                                          cmp_usize *out_end) {
   if (field == NULL || out_start == NULL || out_end == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2507,7 +2486,7 @@ int CMP_CALL cmp_text_field_set_cursor(CMPTextField *field, cmp_usize cursor) {
 
   rc = cmp_text_field_validate_offset(field->utf8, field->utf8_len, cursor);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   field->cursor = cursor;
@@ -2517,8 +2496,8 @@ int CMP_CALL cmp_text_field_set_cursor(CMPTextField *field, cmp_usize cursor) {
   return CMP_OK;
 }
 
-int CMP_CALL cmp_text_field_get_cursor(
-    const CMPTextField *field, cmp_usize *out_cursor) {
+int CMP_CALL cmp_text_field_get_cursor(const CMPTextField *field,
+                                       cmp_usize *out_cursor) {
   if (field == NULL || out_cursor == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2534,7 +2513,7 @@ int CMP_CALL cmp_text_field_set_focus(CMPTextField *field, CMPBool focused) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   if (focused != CMP_FALSE && focused != CMP_TRUE) {
-    return CMP_ERR_RANGE; /* GCOVR_EXCL_LINE */
+    return CMP_ERR_RANGE;
   }
 
   field->focused = focused;
@@ -2544,7 +2523,7 @@ int CMP_CALL cmp_text_field_set_focus(CMPTextField *field, CMPBool focused) {
 
   rc = cmp_text_field_sync_label(field);
   if (rc != CMP_OK) {
-    return rc; /* GCOVR_EXCL_LINE */
+    return rc;
   }
 
   return CMP_OK;
@@ -2552,11 +2531,11 @@ int CMP_CALL cmp_text_field_set_focus(CMPTextField *field, CMPBool focused) {
 
 int CMP_CALL cmp_text_field_step(CMPTextField *field, CMPScalar dt,
                                  CMPBool *out_changed) {
-  CMPScalar value;                                      
-  CMPBool finished;                                     
-  CMPBool changed;                                      
-  CMPBool previous;                                     
-  int rc;                                               
+  CMPScalar value;
+  CMPBool finished;
+  CMPBool changed;
+  CMPBool previous;
+  int rc;
 
   if (field == NULL || out_changed == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -2570,7 +2549,7 @@ int CMP_CALL cmp_text_field_step(CMPTextField *field, CMPScalar dt,
   if (field->label_anim.mode != CMP_ANIM_MODE_NONE) {
     rc = cmp_anim_controller_step(&field->label_anim, dt, &value, &finished);
     if (rc != CMP_OK) {
-      return rc; /* GCOVR_EXCL_LINE */
+      return rc;
     }
     if (value != field->label_value) {
       field->label_value = value;
@@ -2581,25 +2560,25 @@ int CMP_CALL cmp_text_field_step(CMPTextField *field, CMPScalar dt,
   if (field->focused == CMP_TRUE && field->style.cursor_blink_period > 0.0f) {
     field->cursor_timer += dt;
     while (field->cursor_timer >= field->style.cursor_blink_period) {
-      field->cursor_timer -= field->style.cursor_blink_period; /* GCOVR_EXCL_LINE */
+      field->cursor_timer -= field->style.cursor_blink_period;
     }
     previous = field->cursor_visible;
     field->cursor_visible =
         (field->cursor_timer < field->style.cursor_blink_period * 0.5f)
-            ? CMP_TRUE  
+            ? CMP_TRUE
             : CMP_FALSE;
     if (previous != field->cursor_visible) {
-      changed = CMP_TRUE; /* GCOVR_EXCL_LINE */
+      changed = CMP_TRUE;
     }
-  } else if (field->focused == CMP_TRUE) { /* GCOVR_EXCL_LINE */
-    if (field->cursor_visible == CMP_FALSE) { /* GCOVR_EXCL_LINE */
-      field->cursor_visible = CMP_TRUE; /* GCOVR_EXCL_LINE */
-      changed = CMP_TRUE; /* GCOVR_EXCL_LINE */
+  } else if (field->focused == CMP_TRUE) {
+    if (field->cursor_visible == CMP_FALSE) {
+      field->cursor_visible = CMP_TRUE;
+      changed = CMP_TRUE;
     }
   } else {
-    if (field->cursor_visible == CMP_TRUE) { /* GCOVR_EXCL_LINE */
-      field->cursor_visible = CMP_FALSE; /* GCOVR_EXCL_LINE */
-      changed = CMP_TRUE; /* GCOVR_EXCL_LINE */
+    if (field->cursor_visible == CMP_TRUE) {
+      field->cursor_visible = CMP_FALSE;
+      changed = CMP_TRUE;
     }
   }
 
@@ -2607,9 +2586,9 @@ int CMP_CALL cmp_text_field_step(CMPTextField *field, CMPScalar dt,
   return CMP_OK;
 }
 
-int CMP_CALL cmp_text_field_set_on_change(
-    CMPTextField *field, CMPTextFieldOnChange on_change,
-    void *ctx) {                                        
+int CMP_CALL cmp_text_field_set_on_change(CMPTextField *field,
+                                          CMPTextFieldOnChange on_change,
+                                          void *ctx) {
   if (field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -2635,10 +2614,9 @@ int CMP_CALL cmp_text_field_test_validate_text_style(const CMPTextStyle *style,
   return cmp_text_field_validate_text_style(style, require_family);
 }
 
-int CMP_CALL cmp_text_field_test_validate_style(
-    const CMPTextFieldStyle *style,
-    CMPBool require_text_family,   
-    CMPBool require_label_family) {
+int CMP_CALL cmp_text_field_test_validate_style(const CMPTextFieldStyle *style,
+                                                CMPBool require_text_family,
+                                                CMPBool require_label_family) {
   return cmp_text_field_validate_style(style, require_text_family,
                                        require_label_family);
 }
@@ -2703,8 +2681,8 @@ int CMP_CALL cmp_text_field_test_update_text_metrics(CMPTextField *field) {
   return cmp_text_field_update_text_metrics(field);
 }
 
-int CMP_CALL cmp_text_field_test_update_label_metrics(CMPTextField *field) { /* GCOVR_EXCL_LINE */
-  return cmp_text_field_update_label_metrics(field); /* GCOVR_EXCL_LINE */
+int CMP_CALL cmp_text_field_test_update_label_metrics(CMPTextField *field) {
+  return cmp_text_field_update_label_metrics(field);
 }
 
 int CMP_CALL
@@ -2720,9 +2698,9 @@ int CMP_CALL cmp_text_field_test_sync_label(CMPTextField *field) {
   return cmp_text_field_sync_label(field);
 }
 
-int CMP_CALL cmp_text_field_test_reset_cursor_blink(CMPTextField *field) { /* GCOVR_EXCL_LINE */
-  cmp_text_field_reset_cursor_blink(field); /* GCOVR_EXCL_LINE */
-  return CMP_OK; /* GCOVR_EXCL_LINE */
+int CMP_CALL cmp_text_field_test_reset_cursor_blink(CMPTextField *field) {
+  cmp_text_field_reset_cursor_blink(field);
+  return CMP_OK;
 }
 
 int CMP_CALL cmp_text_field_test_set_text_internal(CMPTextField *field,

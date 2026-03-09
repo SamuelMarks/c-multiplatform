@@ -1,12 +1,11 @@
 #include "app/demo_app.h"
 #include "cmpc/cmp_backend_win32.h"
-#include <stdio.h>
 #include <stdarg.h>
 #include <stddef.h>
-#include <windef.h>
+#include <stdio.h>
 #include <winbase.h>
+#include <windef.h>
 #include <winuser.h>
-
 
 #if defined(_MSC_VER)
 #define NUM_FORMAT "%d"
@@ -39,7 +38,6 @@ static int demo_printf_out(const char *fmt, ...) {
   va_end(args);
   return ret;
 }
-
 
 /* Helper to allow viewing printf output in a Win32 GUI app */
 void CreateDebugConsole(void) {
@@ -87,7 +85,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
   /* 3. Initialize Config & Force Defaults */
   rc = cmp_win32_backend_config_init(&config);
   if (rc != CMP_OK) {
-    demo_printf_err( "Backend config init failed: " NUM_FORMAT "\n", rc);
+    demo_printf_err("Backend config init failed: " NUM_FORMAT "\n", rc);
     return 1;
   }
 
@@ -101,7 +99,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
   demo_printf_out("Creating Win32 Backend...\n");
   rc = cmp_win32_backend_create(&config, &backend);
   if (rc != CMP_OK) {
-    demo_printf_err( "Failed to create Win32 backend. Error Code: " NUM_FORMAT "\n", rc);
+    demo_printf_err(
+        "Failed to create Win32 backend. Error Code: " NUM_FORMAT "\n", rc);
     /* Keep console open for a moment so we can read the error */
     if (IsDebuggerPresent()) {
       demo_printf_out("Press Enter to exit...");
@@ -124,7 +123,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
   /* Access via the struct directly (ws.vtable) */
   rc = ws.vtable->create_window(ws.ctx, &wincfg, &window);
   if (rc != CMP_OK) {
-    demo_printf_err( "Failed to create window: " NUM_FORMAT "\n", rc);
+    demo_printf_err("Failed to create window: " NUM_FORMAT "\n", rc);
     return 1;
   }
 

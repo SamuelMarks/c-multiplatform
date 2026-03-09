@@ -39,38 +39,43 @@ static int cmp_event_validate_rect(const CMPRect *rect) {
   return CMP_OK;
 }
 
-
-static int _cmp_event_widget_focusable_internal(const CMPWidget *widget, CMPBool *out_focusable);
+static int _cmp_event_widget_focusable_internal(const CMPWidget *widget,
+                                                CMPBool *out_focusable);
 static int cmp_event_widget_focusable_wrapper(const CMPWidget *w) {
-    CMPBool f = 0;
-    _cmp_event_widget_focusable_internal(w, &f);
-    return f;
+  CMPBool f = 0;
+  _cmp_event_widget_focusable_internal(w, &f);
+  return f;
 }
 #define cmp_event_widget_focusable(w) cmp_event_widget_focusable_wrapper(w)
-static int _cmp_event_widget_focusable_internal(const CMPWidget *widget, CMPBool *out_focusable) {
-
+static int _cmp_event_widget_focusable_internal(const CMPWidget *widget,
+                                                CMPBool *out_focusable) {
 
   if (widget == NULL) {
 
-    *out_focusable = CMP_FALSE; return 0;
+    *out_focusable = CMP_FALSE;
+    return 0;
   }
 
   if (widget->flags & CMP_WIDGET_FLAG_HIDDEN) {
 
-    *out_focusable = CMP_FALSE; return 0;
+    *out_focusable = CMP_FALSE;
+    return 0;
   }
 
   if (widget->flags & CMP_WIDGET_FLAG_DISABLED) {
 
-    *out_focusable = CMP_FALSE; return 0;
+    *out_focusable = CMP_FALSE;
+    return 0;
   }
 
   if (widget->flags & CMP_WIDGET_FLAG_FOCUSABLE) {
 
-    *out_focusable = CMP_TRUE; return 0;
+    *out_focusable = CMP_TRUE;
+    return 0;
   }
 
-  *out_focusable = CMP_FALSE; return 0;
+  *out_focusable = CMP_FALSE;
+  return 0;
 }
 
 static void cmp_event_traverse_focus(const CMPRenderNode *node,

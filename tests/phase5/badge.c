@@ -7,7 +7,8 @@ static int g_fail_font_metrics = 0;
 static int mock_create_font(void *text, const char *utf8_family,
                             cmp_i32 size_px, cmp_i32 weight, CMPBool italic,
                             CMPHandle *out_font) {
-  if (g_fail_create_font) return CMP_ERR_IO;
+  if (g_fail_create_font)
+    return CMP_ERR_IO;
   if (out_font) {
     out_font->id = 1;
     out_font->generation = 1;
@@ -19,7 +20,8 @@ static int mock_measure_text(void *text, CMPHandle font, const char *utf8,
                              cmp_usize utf8_len, cmp_u32 base_direction,
                              CMPScalar *out_width, CMPScalar *out_height,
                              CMPScalar *out_baseline) {
-  if (g_fail_font_metrics && utf8 == NULL) return CMP_ERR_IO;
+  if (g_fail_font_metrics && utf8 == NULL)
+    return CMP_ERR_IO;
   if (out_width)
     *out_width = 10.0f;
   if (out_height)
@@ -33,11 +35,20 @@ static int mock_draw_text(void *text, CMPHandle font, const char *utf8,
                           CMPScalar x, CMPScalar y, CMPColor color) {
   return CMP_OK;
 }
-static const CMPTextVTable mock_text_vtable = {
-    mock_create_font, mock_destroy_font, mock_measure_text, mock_draw_text, NULL, NULL, NULL};
+static const CMPTextVTable mock_text_vtable = {mock_create_font,
+                                               mock_destroy_font,
+                                               mock_measure_text,
+                                               mock_draw_text,
+                                               NULL,
+                                               NULL,
+                                               NULL};
 
-static int mock_draw_rect(void *ctx, const CMPRect *rect, CMPColor color, CMPScalar radius) { return CMP_OK; }
-static const CMPGfxVTable g_test_gfx_vtable = { NULL, NULL, NULL, mock_draw_rect, NULL, NULL, NULL, NULL };
+static int mock_draw_rect(void *ctx, const CMPRect *rect, CMPColor color,
+                          CMPScalar radius) {
+  return CMP_OK;
+}
+static const CMPGfxVTable g_test_gfx_vtable = {NULL, NULL, NULL, mock_draw_rect,
+                                               NULL, NULL, NULL, NULL};
 
 static void cmp_test_text_backend_init(CMPTextBackend *backend) {
   backend->ctx = NULL;
@@ -107,7 +118,7 @@ static int test_badge_init(void) {
   g_fail_create_font = 1;
   CMP_TEST_EXPECT(m3_badge_init(&badge, &backend, &style, "1", 1), CMP_ERR_IO);
   g_fail_create_font = 0;
-  
+
   g_fail_font_metrics = 1;
   CMP_TEST_EXPECT(m3_badge_init(&badge, &backend, &style, "1", 1), CMP_ERR_IO);
   g_fail_font_metrics = 0;
@@ -129,7 +140,7 @@ static int test_badge_init(void) {
   g_fail_create_font = 1;
   CMP_TEST_EXPECT(m3_badge_set_style(&badge, &style), CMP_ERR_IO);
   g_fail_create_font = 0;
-  
+
   g_fail_font_metrics = 1;
   CMP_TEST_EXPECT(m3_badge_set_style(&badge, &style), CMP_ERR_IO);
   g_fail_font_metrics = 0;
@@ -163,7 +174,8 @@ static int test_badge_widget(void) {
   badge.style.min_width = 100.0f;
   badge.style.padding_x = 0.0f;
   CMP_TEST_OK(badge.widget.vtable->measure(&badge, unspec, unspec, &size));
-  CMP_TEST_EXPECT(size.width == badge.style.min_width ? CMP_OK : CMP_ERR_UNKNOWN, CMP_OK);
+  CMP_TEST_EXPECT(
+      size.width == badge.style.min_width ? CMP_OK : CMP_ERR_UNKNOWN, CMP_OK);
   badge.style.min_width = M3_BADGE_DEFAULT_MIN_WIDTH;
   badge.style.padding_x = M3_BADGE_DEFAULT_PADDING_X;
 
@@ -205,7 +217,8 @@ static int test_badge_widget(void) {
 
     /* Missing draw_rect */
     {
-      CMPGfxVTable no_draw_rect_vtable = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+      CMPGfxVTable no_draw_rect_vtable = {NULL, NULL, NULL, NULL,
+                                          NULL, NULL, NULL, NULL};
       mock_gfx.vtable = &no_draw_rect_vtable;
       CMP_TEST_OK(badge.widget.vtable->paint(&badge, &paint_ctx));
       mock_gfx.vtable = &g_test_gfx_vtable;
@@ -213,7 +226,13 @@ static int test_badge_widget(void) {
 
     /* Missing text_vtable->draw_text */
     {
-      CMPTextVTable no_draw_text_vtable = { mock_create_font, mock_destroy_font, mock_measure_text, NULL, NULL, NULL, NULL };
+      CMPTextVTable no_draw_text_vtable = {mock_create_font,
+                                           mock_destroy_font,
+                                           mock_measure_text,
+                                           NULL,
+                                           NULL,
+                                           NULL,
+                                           NULL};
       mock_gfx.text_vtable = &no_draw_text_vtable;
       CMP_TEST_OK(badge.widget.vtable->paint(&badge, &paint_ctx));
       mock_gfx.text_vtable = &mock_text_vtable;

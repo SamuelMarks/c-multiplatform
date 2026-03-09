@@ -42,7 +42,8 @@ struct F2CommandBar;
  * @param command_id The ID of the command clicked.
  * @return CMP_OK on success.
  */
-typedef int(CMP_CALL *F2CommandBarOnAction)(void *ctx, struct F2CommandBar *bar, cmp_u32 command_id);
+typedef int(CMP_CALL *F2CommandBarOnAction)(void *ctx, struct F2CommandBar *bar,
+                                            cmp_u32 command_id);
 
 /**
  * @brief Fluent 2 CommandBar style descriptor.
@@ -59,15 +60,16 @@ typedef struct F2CommandBarStyle {
  * @brief Fluent 2 CommandBar widget instance.
  */
 typedef struct F2CommandBar {
-  CMPWidget widget;             /**< Widget interface. */
-  F2CommandBarStyle style;      /**< Current style. */
+  CMPWidget widget;                      /**< Widget interface. */
+  F2CommandBarStyle style;               /**< Current style. */
   const F2CommandBarItem *primary_items; /**< Primary items array. */
-  cmp_usize primary_count;      /**< Number of primary items. */
-  const F2CommandBarItem *secondary_items; /**< Secondary (overflow) items array. */
-  cmp_usize secondary_count;    /**< Number of secondary items. */
-  CMPRect bounds;               /**< Layout bounds. */
+  cmp_usize primary_count;               /**< Number of primary items. */
+  const F2CommandBarItem
+      *secondary_items;           /**< Secondary (overflow) items array. */
+  cmp_usize secondary_count;      /**< Number of secondary items. */
+  CMPRect bounds;                 /**< Layout bounds. */
   F2CommandBarOnAction on_action; /**< Action callback. */
-  void *on_action_ctx;          /**< Callback context. */
+  void *on_action_ctx;            /**< Callback context. */
 } F2CommandBar;
 
 /**
@@ -87,12 +89,10 @@ CMP_API int CMP_CALL f2_command_bar_style_init(F2CommandBarStyle *style);
  * @param secondary_count Number of secondary items.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_command_bar_init(F2CommandBar *bar,
-                                         const F2CommandBarStyle *style,
-                                         const F2CommandBarItem *primary_items,
-                                         cmp_usize primary_count,
-                                         const F2CommandBarItem *secondary_items,
-                                         cmp_usize secondary_count);
+CMP_API int CMP_CALL f2_command_bar_init(
+    F2CommandBar *bar, const F2CommandBarStyle *style,
+    const F2CommandBarItem *primary_items, cmp_usize primary_count,
+    const F2CommandBarItem *secondary_items, cmp_usize secondary_count);
 
 /**
  * @brief Set the action callback for the command bar.
@@ -101,9 +101,8 @@ CMP_API int CMP_CALL f2_command_bar_init(F2CommandBar *bar,
  * @param ctx Context pointer.
  * @return CMP_OK on success.
  */
-CMP_API int CMP_CALL f2_command_bar_set_on_action(F2CommandBar *bar,
-                                                  F2CommandBarOnAction on_action,
-                                                  void *ctx);
+CMP_API int CMP_CALL f2_command_bar_set_on_action(
+    F2CommandBar *bar, F2CommandBarOnAction on_action, void *ctx);
 
 #ifdef __cplusplus
 }

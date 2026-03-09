@@ -172,12 +172,11 @@ CMP_API int CMP_CALL cmp_text_font_metrics(const CMPTextBackend *backend,
  * @param color Text color.
  * @return CMP_OK on success or a failure code.
  */
-CMP_API int CMP_CALL cmp_text_draw_utf8_gfx(const CMPGfx *gfx,
-                                        CMPHandle font, const char *utf8,
-                                        cmp_usize utf8_len,
-                                        cmp_u32 base_direction,
-                                        CMPScalar x, CMPScalar y,
-                                        CMPColor color);
+CMP_API int CMP_CALL cmp_text_draw_utf8_gfx(const CMPGfx *gfx, CMPHandle font,
+                                            const char *utf8,
+                                            cmp_usize utf8_len,
+                                            cmp_u32 base_direction, CMPScalar x,
+                                            CMPScalar y, CMPColor color);
 
 /**
  * @brief Draw a UTF-8 buffer, attempting shaping (BiDi) if supported.
@@ -194,9 +193,8 @@ CMP_API int CMP_CALL cmp_text_draw_utf8_gfx(const CMPGfx *gfx,
 CMP_API int CMP_CALL cmp_text_draw_utf8(const CMPTextBackend *backend,
                                         CMPHandle font, const char *utf8,
                                         cmp_usize utf8_len,
-                                        cmp_u32 base_direction,
-                                        CMPScalar x, CMPScalar y,
-                                        CMPColor color);
+                                        cmp_u32 base_direction, CMPScalar x,
+                                        CMPScalar y, CMPColor color);
 
 /**
  * @brief Shape UTF-8 text into a glyph layout (for BiDi/complex typography).

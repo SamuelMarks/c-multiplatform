@@ -294,7 +294,8 @@ static int cmp_gtk4_get_time_ms(cmp_u32 *out_time) {
   return 0;
 }
 
-static int cmp_gtk4_modifiers_from_state(GdkModifierType state, cmp_u32 *out_mods) {
+static int cmp_gtk4_modifiers_from_state(GdkModifierType state,
+                                         cmp_u32 *out_mods) {
   cmp_u32 mods = 0u;
   if ((state & GDK_SHIFT_MASK) != 0)
     mods |= CMP_MOD_SHIFT;
@@ -306,10 +307,12 @@ static int cmp_gtk4_modifiers_from_state(GdkModifierType state, cmp_u32 *out_mod
     mods |= CMP_MOD_META;
   if ((state & GDK_LOCK_MASK) != 0)
     mods |= CMP_MOD_CAPS;
-  *out_mods = mods; return 0;
+  *out_mods = mods;
+  return 0;
 }
 
-static int cmp_gtk4_buttons_from_state(GdkModifierType state, cmp_i32 *out_buttons) {
+static int cmp_gtk4_buttons_from_state(GdkModifierType state,
+                                       cmp_i32 *out_buttons) {
   cmp_i32 buttons = 0;
   if ((state & GDK_BUTTON1_MASK) != 0)
     buttons |= 1;
@@ -321,7 +324,8 @@ static int cmp_gtk4_buttons_from_state(GdkModifierType state, cmp_i32 *out_butto
     buttons |= 1 << 3;
   if ((state & GDK_BUTTON5_MASK) != 0)
     buttons |= 1 << 4;
-  *out_buttons = buttons; return 0;
+  *out_buttons = buttons;
+  return 0;
 }
 
 static int cmp_gtk4_queue_event(struct CMPGTK4Backend *backend,
@@ -531,7 +535,8 @@ static void on_click_pressed(GtkGestureClick *g, int n, double x, double y,
 
   {
     const int btn_flag = (btn > 0) ? (1 << (btn - 1)) : 1;
-    cmp_gtk4_buttons_from_state(state, &e.data.pointer.buttons); e.data.pointer.buttons |= btn_flag;
+    cmp_gtk4_buttons_from_state(state, &e.data.pointer.buttons);
+    e.data.pointer.buttons |= btn_flag;
   }
   cmp_gtk4_queue_event(win->backend, &e);
 }
@@ -583,8 +588,7 @@ static void on_motion(GtkEventControllerMotion *c, double x, double y,
 }
 
 static int on_key_pressed(GtkEventControllerKey *c, guint key_val,
-                               guint key_code, GdkModifierType state,
-                               gpointer u) {
+                          guint key_code, GdkModifierType state, gpointer u) {
   struct CMPGTK4Window *win = (struct CMPGTK4Window *)u;
   CMPInputEvent e;
   (void)c;
@@ -790,24 +794,25 @@ static int cmp_backend_ws_update_a11y_tree(void *ws,
   return CMP_ERR_UNSUPPORTED;
 }
 
-static const CMPWSVTable g_cmp_gtk4_ws_vtable = {cmp_gtk4_ws_init,
-                                                 cmp_gtk4_ws_shutdown,
-                                                 cmp_gtk4_ws_create_window,
-                                                 cmp_gtk4_ws_destroy_window,
-                                                 cmp_gtk4_ws_show_window,
-                                                 cmp_gtk4_ws_hide_window,
-                                                 NULL,
-                                                 NULL,
-                                                 cmp_gtk4_ws_get_size,
-                                                 NULL,
-                                                 cmp_gtk4_ws_get_dpi,
-                                                 NULL,
-                                                 NULL,
-                                                 cmp_gtk4_ws_poll_event,
-                                                 cmp_gtk4_ws_pump_events,
-                                                 cmp_gtk4_ws_get_time,
-                                                 cmp_backend_ws_get_system_color,
-                                                 cmp_backend_ws_update_a11y_tree};
+static const CMPWSVTable g_cmp_gtk4_ws_vtable = {
+    cmp_gtk4_ws_init,
+    cmp_gtk4_ws_shutdown,
+    cmp_gtk4_ws_create_window,
+    cmp_gtk4_ws_destroy_window,
+    cmp_gtk4_ws_show_window,
+    cmp_gtk4_ws_hide_window,
+    NULL,
+    NULL,
+    cmp_gtk4_ws_get_size,
+    NULL,
+    cmp_gtk4_ws_get_dpi,
+    NULL,
+    NULL,
+    cmp_gtk4_ws_poll_event,
+    cmp_gtk4_ws_pump_events,
+    cmp_gtk4_ws_get_time,
+    cmp_backend_ws_get_system_color,
+    cmp_backend_ws_update_a11y_tree};
 
 /* --- Graphics (CMPGfx) --- */
 
@@ -1143,8 +1148,8 @@ static const CMPGfxVTable g_cmp_gtk4_gfx_vtable = {cmp_gtk4_gfx_begin_frame,
 
 /* --- Text Backend --- */
 
-static int txt_meas(void *c, CMPHandle f, const char *u, size_t l, cmp_u32 dir, float *w,
-                    float *h, float *b) {
+static int txt_meas(void *c, CMPHandle f, const char *u, size_t l, cmp_u32 dir,
+                    float *w, float *h, float *b) {
   struct CMPGTK4Backend *be = (struct CMPGTK4Backend *)c;
   CMPGTK4Font *font;
   PangoContext *context;
@@ -1181,8 +1186,8 @@ static int txt_meas(void *c, CMPHandle f, const char *u, size_t l, cmp_u32 dir, 
   return CMP_OK;
 }
 
-static int txt_draw(void *c, CMPHandle f, const char *u, size_t l, cmp_u32 dir, float x,
-                    float y, CMPColor col) {
+static int txt_draw(void *c, CMPHandle f, const char *u, size_t l, cmp_u32 dir,
+                    float x, float y, CMPColor col) {
   struct CMPGTK4Backend *b = (struct CMPGTK4Backend *)c;
   CMPGTK4Font *font;
   PangoLayout *layout;
@@ -1248,8 +1253,8 @@ static int txt_destroy(void *c, CMPHandle h) {
   return cmp_gtk4_font_destroy(NULL);
 }
 
-static const CMPTextVTable g_cmp_gtk4_text_vtable = {txt_create, txt_destroy,
-                                                     txt_meas, txt_draw, NULL, NULL, NULL};
+static const CMPTextVTable g_cmp_gtk4_text_vtable = {
+    txt_create, txt_destroy, txt_meas, txt_draw, NULL, NULL, NULL};
 
 /* --- Environment Stubs --- */
 static int env_get_io(void *e, CMPIO *io) {
@@ -1386,12 +1391,17 @@ void __cmp_gtk4_test_refs(void) {
   (void)cmp_gtk4_backend_validate_config(NULL);
 }
 #endif
-CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend, CMPHandle window_handle, const char *path) {
+CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend,
+                                               CMPHandle window_handle,
+                                               const char *path) {
   struct CMPGTK4Window *w;
-  if (cmp_gtk4_backend_resolve((struct CMPGTK4Backend *)backend, window_handle, CMP_GTK4_TYPE_WINDOW, (void **)&w) != CMP_OK)
+  if (cmp_gtk4_backend_resolve((struct CMPGTK4Backend *)backend, window_handle,
+                               CMP_GTK4_TYPE_WINDOW, (void **)&w) != CMP_OK)
     return CMP_ERR_INVALID_ARGUMENT;
-  if (!w->surface) return CMP_ERR_STATE;
-  if (cairo_surface_write_to_png(w->surface, path) != CAIRO_STATUS_SUCCESS) return CMP_ERR_IO;
+  if (!w->surface)
+    return CMP_ERR_STATE;
+  if (cairo_surface_write_to_png(w->surface, path) != CAIRO_STATUS_SUCCESS)
+    return CMP_ERR_IO;
   return CMP_OK;
 }
 
@@ -1455,5 +1465,12 @@ int CMP_CALL cmp_gtk4_backend_get_env(CMPGTK4Backend *b, CMPEnv *env) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend, CMPHandle window_handle, const char *path) { CMP_UNUSED(backend); CMP_UNUSED(window_handle); CMP_UNUSED(path); return CMP_ERR_UNSUPPORTED; }
+CMP_API int CMP_CALL cmp_gtk4_backend_save_png(CMPGTK4Backend *backend,
+                                               CMPHandle window_handle,
+                                               const char *path) {
+  CMP_UNUSED(backend);
+  CMP_UNUSED(window_handle);
+  CMP_UNUSED(path);
+  return CMP_ERR_UNSUPPORTED;
+}
 #endif

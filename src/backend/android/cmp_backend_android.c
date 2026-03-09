@@ -110,7 +110,6 @@ int CMP_CALL cmp_android_backend_config_init(CMPAndroidBackendConfig *config) {
   return CMP_OK;
 }
 
-
 #if defined(CMP_ANDROID_AVAILABLE)
 
 #define CMP_ANDROID_CAMERA_DEFAULT_WIDTH 640u
@@ -1333,7 +1332,6 @@ int CMP_CALL cmp_android_backend_predictive_back_cancel(
   }
   return cmp_predictive_back_cancel(backend->predictive_back, event);
 }
-
 
 #else
 

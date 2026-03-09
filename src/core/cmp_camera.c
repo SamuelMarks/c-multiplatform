@@ -59,7 +59,7 @@ int CMP_CALL cmp_camera_init(CMPCameraSession *session,
       return CMP_ERR_UNSUPPORTED;
     }
   }
-#else 
+#else
   if (!CMP_CAMERA_VTABLE_COMPLETE(camera.vtable)) {
     return CMP_ERR_UNSUPPORTED;
   }
