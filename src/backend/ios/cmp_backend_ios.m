@@ -96,7 +96,6 @@ typedef struct CMPIOSBackend {
     CMPEnv env;
     CMPEnv null_env;
     CMPCamera camera;
-    CMPNetwork network;
     CMPPredictiveBack *predictive_back;
     CMPBool initialized;
     CMPBool camera_opened;
@@ -1141,387 +1140,15 @@ static int cmp_ios_network_apply_cf_headers(CFHTTPMessageRef message, const char
     return CMP_OK;
 }
 
-static int cmp_ios_network_request_cfnetwork(void *net, const CMPNetworkRequest *request, const CMPAllocator *allocator,
-    CMPNetworkResponse *out_response)
-{
-    CMPIOSBackend *backend;
-    CFStringRef url_string;
-    CFURLRef url;
-    CFStringRef method;
-    CFHTTPMessageRef message;
-    CFDataRef body_data;
-    CFReadStreamRef stream;
-    CFHTTPMessageRef response_message;
-    CFStreamError stream_error;
-    CFIndex bytes_read;
-    UInt8 buffer[4096];
-    void *body;
-    void *new_body;
-    cmp_usize total_size;
-    cmp_usize capacity;
-    cmp_usize alloc_size;
-    cmp_usize url_len;
-    cmp_usize method_len;
-    int rc;
-
-    if (net == NULL || request == NULL || allocator == NULL || out_response == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    if (allocator->alloc == NULL || allocator->realloc == NULL || allocator->free == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    if (request->method == NULL || request->url == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    if (request->method[0] == '\0' || request->url[0] == '\0') {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    if (request->body_size > 0 && request->body == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-
-    url_len = (cmp_usize)strlen(request->url);
-    if (url_len > (cmp_usize)LONG_MAX) {
-        return CMP_ERR_RANGE;
-    }
-    method_len = (cmp_usize)strlen(request->method);
-    if (method_len > (cmp_usize)LONG_MAX) {
-        return CMP_ERR_RANGE;
-    }
-    if (request->body_size > (cmp_usize)LONG_MAX) {
-        return CMP_ERR_RANGE;
-    }
-
-    backend = (CMPIOSBackend *)net;
-    CMP_UNUSED(backend);
-
-    memset(out_response, 0, sizeof(*out_response));
-
-    url_string = CFStringCreateWithBytes(kCFAllocatorDefault, (const UInt8 *)request->url, (CFIndex)url_len,
-        kCFStringEncodingUTF8, false);
-    if (url_string == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    url = CFURLCreateWithString(kCFAllocatorDefault, url_string, NULL);
-    CFRelease(url_string);
-    if (url == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-
-    method = CFStringCreateWithBytes(kCFAllocatorDefault, (const UInt8 *)request->method, (CFIndex)method_len,
-        kCFStringEncodingUTF8, false);
-    if (method == NULL) {
-        CFRelease(url);
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-
-    message = CFHTTPMessageCreateRequest(kCFAllocatorDefault, method, url, kCFHTTPVersion1_1);
-    CFRelease(method);
-    CFRelease(url);
-    if (message == NULL) {
-        return CMP_ERR_OUT_OF_MEMORY;
-    }
-
-    rc = cmp_ios_network_apply_cf_headers(message, request->headers);
-    if (rc != CMP_OK) {
-        CFRelease(message);
-        return rc;
-    }
-
-    if (request->body_size > 0) {
-        body_data = CFDataCreate(kCFAllocatorDefault, (const UInt8 *)request->body, (CFIndex)request->body_size);
-        if (body_data == NULL) {
-            CFRelease(message);
-            return CMP_ERR_OUT_OF_MEMORY;
-        }
-        CFHTTPMessageSetBody(message, body_data);
-        CFRelease(body_data);
-    }
-
-    stream = CFReadStreamCreateForHTTPRequest(kCFAllocatorDefault, message);
-    CFRelease(message);
-    if (stream == NULL) {
-        return CMP_ERR_OUT_OF_MEMORY;
-    }
-
-    if (request->timeout_ms > 0u) {
-        double seconds = ((double)request->timeout_ms) / 1000.0;
-        CFNumberRef timeout = CFNumberCreate(kCFAllocatorDefault, kCFNumberDoubleType, &seconds);
-        if (timeout != NULL) {
-            CFReadStreamSetProperty(stream, kCFStreamPropertyReadTimeout, timeout);
-            CFReadStreamSetProperty(stream, kCFStreamPropertyWriteTimeout, timeout);
-            CFRelease(timeout);
-        }
-    }
-
-    if (!CFReadStreamOpen(stream)) {
-        stream_error = CFReadStreamGetError(stream);
-        CFReadStreamClose(stream);
-        CFRelease(stream);
-        return cmp_ios_network_error_from_cf_stream(stream_error);
-    }
-
-    response_message = (CFHTTPMessageRef)CFReadStreamCopyProperty(stream, kCFStreamPropertyHTTPResponseHeader);
-    if (response_message != NULL) {
-        long status_code = CFHTTPMessageGetResponseStatusCode(response_message);
-        if (status_code > 0) {
-            out_response->status_code = (cmp_u32)status_code;
-        }
-        CFRelease(response_message);
-    }
-
-    body = NULL;
-    new_body = NULL;
-    total_size = 0;
-    capacity = 0;
-
-    for (;;) {
-        bytes_read = CFReadStreamRead(stream, buffer, (CFIndex)sizeof(buffer));
-        if (bytes_read < 0) {
-            stream_error = CFReadStreamGetError(stream);
-            rc = cmp_ios_network_error_from_cf_stream(stream_error);
-            goto cleanup;
-        }
-        if (bytes_read == 0) {
-            rc = CMP_OK;
-            break;
-        }
-
-        rc = cmp_ios_network_add_overflow(total_size, (cmp_usize)bytes_read, &alloc_size);
-        if (rc != CMP_OK) {
-            goto cleanup;
-        }
-
-        if (alloc_size > capacity) {
-            new_body = NULL;
-            if (body == NULL) {
-                rc = allocator->alloc(allocator->ctx, alloc_size, &new_body);
-            } else {
-                rc = allocator->realloc(allocator->ctx, body, alloc_size, &new_body);
-            }
-            if (rc != CMP_OK) {
-                goto cleanup;
-            }
-            body = new_body;
-            capacity = alloc_size;
-        }
-
-        memcpy((cmp_u8 *)body + total_size, buffer, (size_t)bytes_read);
-        total_size += (cmp_usize)bytes_read;
-    }
-
-cleanup:
-    CFReadStreamClose(stream);
-    CFRelease(stream);
-
-    if (rc != CMP_OK) {
-        if (body != NULL) {
-            allocator->free(allocator->ctx, body);
-        }
-        memset(out_response, 0, sizeof(*out_response));
-        return rc;
-    }
-
-    out_response->body = body;
-    out_response->body_size = total_size;
-    return CMP_OK;
-}
 
 #endif
 
 #if !defined(CMP_APPLE_USE_CFNETWORK_C)
-static int cmp_ios_network_request_foundation(void *net, const CMPNetworkRequest *request, const CMPAllocator *allocator,
-    CMPNetworkResponse *out_response)
-{
-    CMPIOSBackend *backend;
-    NSString *url_string;
-    NSURL *url;
-    NSMutableURLRequest *url_request;
-    NSString *method;
-    NSData *body_data;
-    NSURLResponse *response;
-    NSHTTPURLResponse *http_response;
-    NSError *error;
-    NSData *data;
-    void *body;
-    cmp_usize body_size;
-    int rc;
-
-    if (net == NULL || request == NULL || allocator == NULL || out_response == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    if (allocator->alloc == NULL || allocator->realloc == NULL || allocator->free == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    if (request->method == NULL || request->url == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    if (request->method[0] == '\0' || request->url[0] == '\0') {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    if (request->body_size > 0 && request->body == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-
-    backend = (CMPIOSBackend *)net;
-    CMP_UNUSED(backend);
-
-    memset(out_response, 0, sizeof(*out_response));
-
-    url_string = [[NSString alloc] initWithBytes:request->url
-                                          length:(NSUInteger)strlen(request->url)
-                                        encoding:NSUTF8StringEncoding];
-    if (url_string == nil) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-
-    url = [NSURL URLWithString:url_string];
-    if (url == nil) {
-#if !defined(CMP_IOS_ARC)
-        [url_string release];
-#endif
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-
-    url_request = [[NSMutableURLRequest alloc] initWithURL:url];
-    if (url_request == nil) {
-#if !defined(CMP_IOS_ARC)
-        [url_string release];
-#endif
-        return CMP_ERR_OUT_OF_MEMORY;
-    }
-
-    method = [[NSString alloc] initWithBytes:request->method
-                                      length:(NSUInteger)strlen(request->method)
-                                    encoding:NSUTF8StringEncoding];
-    if (method == nil) {
-#if !defined(CMP_IOS_ARC)
-        [url_request release];
-        [url_string release];
-#endif
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    [url_request setHTTPMethod:method];
-
-    if (request->timeout_ms > 0u) {
-        [url_request setTimeoutInterval:((NSTimeInterval)request->timeout_ms) / 1000.0];
-    }
-
-    rc = cmp_ios_network_apply_headers(url_request, request->headers);
-    if (rc != CMP_OK) {
-#if !defined(CMP_IOS_ARC)
-        [method release];
-        [url_request release];
-        [url_string release];
-#endif
-        return rc;
-    }
-
-    body_data = nil;
-    if (request->body_size > 0) {
-        body_data = [[NSData alloc] initWithBytes:request->body length:(NSUInteger)request->body_size];
-        if (body_data == nil) {
-#if !defined(CMP_IOS_ARC)
-            [method release];
-            [url_request release];
-            [url_string release];
-#endif
-            return CMP_ERR_OUT_OF_MEMORY;
-        }
-        [url_request setHTTPBody:body_data];
-    }
-
-    response = nil;
-    error = nil;
-    data = [NSURLConnection sendSynchronousRequest:url_request returningResponse:&response error:&error];
-
-#if !defined(CMP_IOS_ARC)
-    if (body_data != nil) {
-        [body_data release];
-    }
-    [method release];
-    [url_request release];
-    [url_string release];
-#endif
-
-    if (error != nil) {
-        return cmp_ios_network_error_from_ns_error(error);
-    }
-
-    out_response->status_code = 0u;
-    if (response != nil && [response isKindOfClass:[NSHTTPURLResponse class]]) {
-        http_response = (NSHTTPURLResponse *)response;
-        if ([http_response statusCode] > 0) {
-            out_response->status_code = (cmp_u32)[http_response statusCode];
-        }
-    }
-
-    body = NULL;
-    body_size = 0u;
-    if (data != nil && [data length] > 0) {
-        body_size = (cmp_usize)[data length];
-        rc = allocator->alloc(allocator->ctx, body_size, &body);
-        if (rc != CMP_OK) {
-            out_response->status_code = 0u;
-            out_response->body = NULL;
-            out_response->body_size = 0u;
-            return rc;
-        }
-        memcpy(body, [data bytes], (size_t)body_size);
-    }
-
-    out_response->body = body;
-    out_response->body_size = body_size;
-    return CMP_OK;
-}
 
 #endif
 
-static int cmp_ios_network_request(void *net, const CMPNetworkRequest *request, const CMPAllocator *allocator,
-    CMPNetworkResponse *out_response)
-{
-#if defined(CMP_APPLE_USE_CFNETWORK_C)
-    return cmp_ios_network_request_cfnetwork(net, request, allocator, out_response);
-#else
-    return cmp_ios_network_request_foundation(net, request, allocator, out_response);
-#endif
-}
 
-static int cmp_ios_network_free_response(void *net, const CMPAllocator *allocator, CMPNetworkResponse *response)
-{
-    CMPIOSBackend *backend;
-    int rc;
 
-    if (net == NULL || allocator == NULL || response == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    if (allocator->alloc == NULL || allocator->realloc == NULL || allocator->free == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-    if (response->body_size > 0 && response->body == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-
-    backend = (CMPIOSBackend *)net;
-    CMP_UNUSED(backend);
-
-    if (response->body != NULL) {
-        rc = allocator->free(allocator->ctx, (void *)response->body);
-        if (rc != CMP_OK) {
-            return rc;
-        }
-    }
-
-    response->body = NULL;
-    response->body_size = 0;
-    response->status_code = 0;
-    return CMP_OK;
-}
-
-static const CMPNetworkVTable g_cmp_ios_network_vtable = {
-    cmp_ios_network_request,
-    cmp_ios_network_free_response
-};
 
 static int cmp_ios_env_get_io(void *env, CMPIO *out_io)
 {
@@ -1599,18 +1226,6 @@ static int cmp_ios_env_get_audio(void *env, CMPAudio *out_audio)
     return CMP_ERR_UNSUPPORTED;
 }
 
-static int cmp_ios_env_get_network(void *env, CMPNetwork *out_network)
-{
-    CMPIOSBackend *backend;
-
-    if (env == NULL || out_network == NULL) {
-        return CMP_ERR_INVALID_ARGUMENT;
-    }
-
-    backend = (CMPIOSBackend *)env;
-    *out_network = backend->network;
-    return CMP_OK;
-}
 
 static int cmp_ios_env_get_tasks(void *env, CMPTasks *out_tasks)
 {
@@ -1649,8 +1264,7 @@ static const CMPEnvVTable g_cmp_ios_env_vtable = {
     cmp_ios_env_get_image,
     cmp_ios_env_get_video,
     cmp_ios_env_get_audio,
-    cmp_ios_env_get_network,
-    cmp_ios_env_get_tasks,
+        cmp_ios_env_get_tasks,
     cmp_ios_env_get_time_ms
 };
 
@@ -1761,8 +1375,6 @@ int CMP_CALL cmp_ios_backend_create(const CMPIOSBackendConfig *config, CMPIOSBac
     backend->env.vtable = &g_cmp_ios_env_vtable;
     backend->camera.ctx = backend;
     backend->camera.vtable = &g_cmp_ios_camera_vtable;
-    backend->network.ctx = backend;
-    backend->network.vtable = &g_cmp_ios_network_vtable;
     backend->camera_opened = CMP_FALSE;
     backend->camera_streaming = CMP_FALSE;
     backend->camera_has_frame = CMP_FALSE;
@@ -1815,8 +1427,6 @@ int CMP_CALL cmp_ios_backend_destroy(CMPIOSBackend *backend)
     backend->null_env.vtable = NULL;
     backend->camera.ctx = NULL;
     backend->camera.vtable = NULL;
-    backend->network.ctx = NULL;
-    backend->network.vtable = NULL;
     backend->predictive_back = NULL;
 
     rc = allocator.free(allocator.ctx, backend);

@@ -116,7 +116,8 @@ int main(void) {
   ev.type = CMP_INPUT_TEXT_EDIT;
   ev.data.text_edit.utf8 = "A";
   ev.data.text_edit.length = 1;
-  CMP_TEST_EXPECT(field.widget.vtable->event(&field, &ev, &handled), CMP_OK);
+  CMP_TEST_EXPECT(field.widget.vtable->event(&field, &ev, &handled),
+                  CMP_ERR_IO);
 
   field.widget.vtable->destroy(&field);
   return 0;

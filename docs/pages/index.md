@@ -9,8 +9,8 @@ LibCMPC provides a robust, zero-dependency, highly scalable UI and system abstra
 
 - \subpage tour "Tour the Widgets" - See the visual design system across all platforms.
 - \subpage philosophy "Theory & Philosophy" - Read about the architectural decisions driving LibCMPC.
+- \subpage modalities "Execution Modalities" - Guide on configuring sync, async, and multithreaded architectures.
 - [API Documentation](annotated.html) - Browse the C89 API references.
-
 ## Features
 
 - **Strict C89:** Compiles everywhere, from MSVC to GCC to Emscripten.

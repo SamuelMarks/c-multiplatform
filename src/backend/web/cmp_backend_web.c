@@ -226,7 +226,6 @@ struct CMPWebBackend {
   CMPIO io;
   CMPSensors sensors;
   CMPCamera camera;
-  CMPNetwork network;
   CMPTasks tasks;
   CMPBool initialized;
   CMPBool log_enabled;
@@ -4846,50 +4845,6 @@ static const CMPCameraVTable g_cmp_web_camera_vtable = {
     cmp_web_camera_close, cmp_web_camera_start,
     cmp_web_camera_stop,  cmp_web_camera_read_frame};
 
-static int cmp_web_network_request(void *net, const CMPNetworkRequest *request,
-                                   const CMPAllocator *allocator,
-                                   CMPNetworkResponse *out_response) {
-  struct CMPWebBackend *backend;
-  int rc;
-
-  CMP_UNUSED(request);
-  CMP_UNUSED(allocator);
-
-  if (net == NULL || out_response == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-
-  backend = (struct CMPWebBackend *)net;
-  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "network.request");
-  CMP_WEB_RETURN_IF_ERROR(rc);
-
-  memset(out_response, 0, sizeof(*out_response));
-  return CMP_ERR_UNSUPPORTED;
-}
-
-static int cmp_web_network_free_response(void *net,
-                                         const CMPAllocator *allocator,
-                                         CMPNetworkResponse *response) {
-  struct CMPWebBackend *backend;
-  int rc;
-
-  CMP_UNUSED(allocator);
-  CMP_UNUSED(response);
-
-  if (net == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-
-  backend = (struct CMPWebBackend *)net;
-  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
-                           "network.free_response");
-  CMP_WEB_RETURN_IF_ERROR(rc);
-  return CMP_OK;
-}
-
-static const CMPNetworkVTable g_cmp_web_network_vtable = {
-    cmp_web_network_request, cmp_web_network_free_response};
-
 static int cmp_web_tasks_thread_create(void *tasks, CMPThreadFn entry,
                                        void *user, CMPHandle *out_thread) {
   struct CMPWebBackend *backend;
@@ -5148,22 +5103,6 @@ static int cmp_web_env_get_audio(void *env, CMPAudio *out_audio) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-static int cmp_web_env_get_network(void *env, CMPNetwork *out_network) {
-  struct CMPWebBackend *backend;
-  int rc;
-
-  if (env == NULL || out_network == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-
-  backend = (struct CMPWebBackend *)env;
-  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "env.get_network");
-  CMP_WEB_RETURN_IF_ERROR(rc);
-
-  *out_network = backend->network;
-  return CMP_OK;
-}
-
 static int cmp_web_env_get_tasks(void *env, CMPTasks *out_tasks) {
   struct CMPWebBackend *backend;
   int rc;
@@ -5196,9 +5135,9 @@ static int cmp_web_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
 }
 
 static const CMPEnvVTable g_cmp_web_env_vtable = {
-    cmp_web_env_get_io,      cmp_web_env_get_sensors, cmp_web_env_get_camera,
-    cmp_web_env_get_image,   cmp_web_env_get_video,   cmp_web_env_get_audio,
-    cmp_web_env_get_network, cmp_web_env_get_tasks,   cmp_web_env_get_time_ms};
+    cmp_web_env_get_io,    cmp_web_env_get_sensors, cmp_web_env_get_camera,
+    cmp_web_env_get_image, cmp_web_env_get_video,   cmp_web_env_get_audio,
+    cmp_web_env_get_tasks, cmp_web_env_get_time_ms};
 
 int CMP_CALL cmp_web_backend_create(const CMPWebBackendConfig *config,
                                     CMPWebBackend **out_backend) {
@@ -5283,8 +5222,6 @@ int CMP_CALL cmp_web_backend_create(const CMPWebBackendConfig *config,
   backend->sensors.vtable = &g_cmp_web_sensors_vtable;
   backend->camera.ctx = backend;
   backend->camera.vtable = &g_cmp_web_camera_vtable;
-  backend->network.ctx = backend;
-  backend->network.vtable = &g_cmp_web_network_vtable;
   backend->tasks.ctx = backend;
   backend->tasks.vtable = &g_cmp_web_tasks_vtable;
   backend->initialized = CMP_TRUE;
@@ -5376,8 +5313,6 @@ int CMP_CALL cmp_web_backend_destroy(CMPWebBackend *backend) {
   backend->sensors.vtable = NULL;
   backend->camera.ctx = NULL;
   backend->camera.vtable = NULL;
-  backend->network.ctx = NULL;
-  backend->network.vtable = NULL;
   backend->tasks.ctx = NULL;
   backend->tasks.vtable = NULL;
 

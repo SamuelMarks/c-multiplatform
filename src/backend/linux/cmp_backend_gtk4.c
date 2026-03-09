@@ -207,7 +207,6 @@ struct CMPGTK4Backend {
   CMPImage image;
   CMPVideo video;
   CMPAudio audio;
-  CMPNetwork network;
   CMPTasks tasks;
   CMPBool initialized;
   CMPBool log_enabled;
@@ -1287,11 +1286,6 @@ static int env_get_aud(void *e, CMPAudio *a) {
   (void)a;
   return CMP_ERR_UNSUPPORTED;
 }
-static int env_get_net(void *e, CMPNetwork *n) {
-  (void)e;
-  (void)n;
-  return CMP_ERR_UNSUPPORTED;
-}
 static int env_get_tasks(void *e, CMPTasks *t) {
   (void)e;
   (void)t;
@@ -1304,8 +1298,8 @@ static int env_get_time(void *e, cmp_u32 *t) {
 }
 
 static const CMPEnvVTable g_cmp_gtk4_env_vtable = {
-    env_get_io,  env_get_sensors, env_get_cam,   env_get_img, env_get_vid,
-    env_get_aud, env_get_net,     env_get_tasks, env_get_time};
+    env_get_io,  env_get_sensors, env_get_cam,   env_get_img,
+    env_get_vid, env_get_aud,     env_get_tasks, env_get_time};
 
 /* --- PUBLIC API --- */
 

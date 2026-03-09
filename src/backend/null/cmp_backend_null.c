@@ -91,7 +91,6 @@ struct CMPNullBackend {
   CMPImage image;
   CMPVideo video;
   CMPAudio audio;
-  CMPNetwork network;
   CMPTasks tasks;
   CMPBool initialized;
   CMPBool log_enabled;
@@ -1517,53 +1516,6 @@ static int cmp_null_audio_free(void *audio, const CMPAllocator *allocator,
 static const CMPAudioVTable g_cmp_null_audio_vtable = {cmp_null_audio_decode,
                                                        cmp_null_audio_free};
 
-static int cmp_null_network_request(void *net, const CMPNetworkRequest *request,
-                                    const CMPAllocator *allocator,
-                                    CMPNetworkResponse *out_response) {
-  struct CMPNullBackend *backend;
-  int rc;
-
-  if (net == NULL || request == NULL || allocator == NULL ||
-      out_response == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-  if (allocator->alloc == NULL || allocator->realloc == NULL ||
-      allocator->free == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-
-  backend = (struct CMPNullBackend *)net;
-  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "network.request");
-  CMP_NULL_RETURN_IF_ERROR(rc);
-
-  memset(out_response, 0, sizeof(*out_response));
-  return CMP_ERR_UNSUPPORTED;
-}
-
-static int cmp_null_network_free_response(void *net,
-                                          const CMPAllocator *allocator,
-                                          CMPNetworkResponse *response) {
-  struct CMPNullBackend *backend;
-  int rc;
-
-  if (net == NULL || allocator == NULL || response == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-  if (allocator->alloc == NULL || allocator->realloc == NULL ||
-      allocator->free == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-
-  backend = (struct CMPNullBackend *)net;
-  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
-                            "network.free_response");
-  CMP_NULL_RETURN_IF_ERROR(rc);
-  return CMP_ERR_UNSUPPORTED;
-}
-
-static const CMPNetworkVTable g_cmp_null_network_vtable = {
-    cmp_null_network_request, cmp_null_network_free_response};
-
 static int cmp_null_tasks_thread_create(void *tasks, CMPThreadFn entry,
                                         void *user, CMPHandle *out_thread) {
   struct CMPNullBackend *backend;
@@ -1821,22 +1773,6 @@ static int cmp_null_env_get_audio(void *env, CMPAudio *out_audio) {
   return CMP_OK;
 }
 
-static int cmp_null_env_get_network(void *env, CMPNetwork *out_network) {
-  struct CMPNullBackend *backend;
-  int rc;
-
-  if (env == NULL || out_network == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-
-  backend = (struct CMPNullBackend *)env;
-  rc = cmp_null_backend_log(backend, CMP_LOG_LEVEL_INFO, "env.get_network");
-  CMP_NULL_RETURN_IF_ERROR(rc);
-
-  *out_network = backend->network;
-  return CMP_OK;
-}
-
 static int cmp_null_env_get_tasks(void *env, CMPTasks *out_tasks) {
   struct CMPNullBackend *backend;
   int rc;
@@ -1871,11 +1807,9 @@ static int cmp_null_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
 }
 
 static const CMPEnvVTable g_cmp_null_env_vtable = {
-    cmp_null_env_get_io,      cmp_null_env_get_sensors,
-    cmp_null_env_get_camera,  cmp_null_env_get_image,
-    cmp_null_env_get_video,   cmp_null_env_get_audio,
-    cmp_null_env_get_network, cmp_null_env_get_tasks,
-    cmp_null_env_get_time_ms};
+    cmp_null_env_get_io,    cmp_null_env_get_sensors, cmp_null_env_get_camera,
+    cmp_null_env_get_image, cmp_null_env_get_video,   cmp_null_env_get_audio,
+    cmp_null_env_get_tasks, cmp_null_env_get_time_ms};
 
 int CMP_CALL cmp_null_backend_config_init(CMPNullBackendConfig *config) {
   if (config == NULL) {
@@ -1972,8 +1906,6 @@ int CMP_CALL cmp_null_backend_create(const CMPNullBackendConfig *config,
   backend->video.vtable = &g_cmp_null_video_vtable;
   backend->audio.ctx = backend;
   backend->audio.vtable = &g_cmp_null_audio_vtable;
-  backend->network.ctx = backend;
-  backend->network.vtable = &g_cmp_null_network_vtable;
   backend->tasks.ctx = backend;
   backend->tasks.vtable = &g_cmp_null_tasks_vtable;
   backend->initialized = CMP_TRUE;
@@ -2035,8 +1967,6 @@ int CMP_CALL cmp_null_backend_destroy(CMPNullBackend *backend) {
   backend->video.vtable = NULL;
   backend->audio.ctx = NULL;
   backend->audio.vtable = NULL;
-  backend->network.ctx = NULL;
-  backend->network.vtable = NULL;
   backend->tasks.ctx = NULL;
   backend->tasks.vtable = NULL;
 

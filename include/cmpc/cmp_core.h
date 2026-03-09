@@ -191,6 +191,342 @@ typedef struct CMPAllocator {
 } CMPAllocator;
 
 /**
+ * @brief Execution modalities for the framework's event loop and task
+ * scheduler.
+ */
+typedef enum CMPModality {
+  CMP_MODALITY_SYNC_SINGLE,  /**< Traditional blocking loop, single threaded. */
+  CMP_MODALITY_SYNC_MULTI,   /**< Blocking main loop, thread pool for tasks. */
+  CMP_MODALITY_ASYNC_SINGLE, /**< Non-blocking async event loop, single
+                                threaded. */
+  CMP_MODALITY_ASYNC_MULTI,  /**< Non-blocking async event loop, thread pool. */
+  CMP_MODALITY_GREENTHREADS, /**< Cooperative user-space fibers/coroutines. */
+  CMP_MODALITY_MULTIPROCESS_ACTOR /**< Isolated processes communicating via
+                                     messages. */
+} CMPModality;
+
+/**
+ * @brief Abstract event loop interface.
+ */
+typedef struct CMPEventLoop CMPEventLoop;
+
+/**
+ * @brief Represents an I/O handle polled by an async event loop.
+ */
+typedef void *CMPEventLoopIOHandle;
+
+/**
+ * @brief Represents a timer handle managed by an async event loop.
+ */
+typedef void *CMPEventLoopTimerHandle;
+
+/**
+ * @brief Type of I/O event.
+ */
+typedef enum CMPEventLoopIOFlags {
+  CMP_EVENT_LOOP_IO_READ = 1,
+  CMP_EVENT_LOOP_IO_WRITE = 2
+} CMPEventLoopIOFlags;
+
+/**
+ * @brief Callback fired when an I/O handle is ready.
+ * @param ctx User context.
+ * @param handle The I/O handle.
+ * @param flags Flags indicating readiness (read/write).
+ * @return CMP_OK on success.
+ */
+typedef int(CMP_CALL *CMPEventLoopIOCallback)(void *ctx,
+                                              CMPEventLoopIOHandle handle,
+                                              cmp_u32 flags);
+
+/**
+ * @brief Callback fired when a timer elapses.
+ * @param ctx User context.
+ * @param handle The timer handle.
+ * @return CMP_OK on success.
+ */
+typedef int(CMP_CALL *CMPEventLoopTimerCallback)(
+    void *ctx, CMPEventLoopTimerHandle handle);
+
+/**
+ * @brief Callback to schedule a task into the event loop from a worker thread.
+ * @param ctx User context.
+ * @return CMP_OK on success.
+ */
+typedef int(CMP_CALL *CMPEventLoopWakeCallback)(void *ctx);
+
+/**
+ * @brief Event loop interface vtable.
+ */
+typedef struct CMPEventLoopVTable {
+  /**
+   * @brief Run the event loop.
+   * @param ctx Event loop context.
+   * @return CMP_OK on success or an error code.
+   */
+  int(CMP_CALL *run)(void *ctx);
+
+  /**
+   * @brief Stop the event loop.
+   * @param ctx Event loop context.
+   * @return CMP_OK on success or an error code.
+   */
+  int(CMP_CALL *stop)(void *ctx);
+
+  /**
+   * @brief Add an I/O file descriptor to the loop.
+   * @param ctx Event loop context.
+   * @param fd File descriptor/socket.
+   * @param flags Read/Write flags.
+   * @param cb Callback function.
+   * @param cb_ctx Callback context.
+   * @param out_handle Receives the I/O handle.
+   * @return CMP_OK on success.
+   */
+  int(CMP_CALL *add_io)(void *ctx, int fd, cmp_u32 flags,
+                        CMPEventLoopIOCallback cb, void *cb_ctx,
+                        CMPEventLoopIOHandle *out_handle);
+
+  /**
+   * @brief Remove an I/O file descriptor from the loop.
+   * @param ctx Event loop context.
+   * @param handle Handle to remove.
+   * @return CMP_OK on success.
+   */
+  int(CMP_CALL *remove_io)(void *ctx, CMPEventLoopIOHandle handle);
+
+  /**
+   * @brief Set a timer in the loop.
+   * @param ctx Event loop context.
+   * @param timeout_ms Timeout in milliseconds.
+   * @param repeat If true, timer repeats.
+   * @param cb Callback function.
+   * @param cb_ctx Callback context.
+   * @param out_handle Receives the timer handle.
+   * @return CMP_OK on success.
+   */
+  int(CMP_CALL *set_timer)(void *ctx, cmp_u32 timeout_ms, CMPBool repeat,
+                           CMPEventLoopTimerCallback cb, void *cb_ctx,
+                           CMPEventLoopTimerHandle *out_handle);
+
+  /**
+   * @brief Clear a timer from the loop.
+   * @param ctx Event loop context.
+   * @param handle Timer handle.
+   * @return CMP_OK on success.
+   */
+  int(CMP_CALL *clear_timer)(void *ctx, CMPEventLoopTimerHandle handle);
+
+  /**
+   * @brief Wake up the event loop from another thread.
+   * @param ctx Event loop context.
+   * @param cb Callback to run on the main event loop thread.
+   * @param cb_ctx Callback context.
+   * @return CMP_OK on success.
+   */
+  int(CMP_CALL *wake)(void *ctx, CMPEventLoopWakeCallback cb, void *cb_ctx);
+
+} CMPEventLoopVTable;
+
+/**
+ * @brief Event loop abstraction.
+ */
+struct CMPEventLoop {
+  void *ctx;                        /**< Implementation context. */
+  const CMPEventLoopVTable *vtable; /**< Interface methods. */
+};
+
+/**
+ * @brief Run the event loop.
+ * @param loop The event loop.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_event_loop_run(CMPEventLoop *loop);
+
+/**
+ * @brief Stop the event loop.
+ * @param loop The event loop.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_event_loop_stop(CMPEventLoop *loop);
+
+/**
+ * @brief Add an I/O descriptor to the event loop.
+ * @param loop Event loop handle.
+ * @param fd File descriptor to monitor.
+ * @param flags Events to monitor for (e.g. CMP_EVENT_LOOP_IO_READ).
+ * @param cb Callback function to invoke.
+ * @param cb_ctx User context for the callback.
+ * @param out_handle Receives the I/O handle.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_event_loop_add_io(CMPEventLoop *loop, int fd,
+                                           cmp_u32 flags,
+                                           CMPEventLoopIOCallback cb,
+                                           void *cb_ctx,
+                                           CMPEventLoopIOHandle *out_handle);
+
+/**
+ * @brief Remove an I/O descriptor from the event loop.
+ * @param loop Event loop handle.
+ * @param handle Handle returned by add_io.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_event_loop_remove_io(CMPEventLoop *loop,
+                                              CMPEventLoopIOHandle handle);
+
+/**
+ * @brief Set a timer on the event loop.
+ * @param loop Event loop handle.
+ * @param timeout_ms Timeout in milliseconds.
+ * @param repeat If true, the timer will repeat automatically.
+ * @param cb Callback function to invoke.
+ * @param cb_ctx User context for the callback.
+ * @param out_handle Receives the timer handle.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL
+cmp_event_loop_set_timer(CMPEventLoop *loop, cmp_u32 timeout_ms, CMPBool repeat,
+                         CMPEventLoopTimerCallback cb, void *cb_ctx,
+                         CMPEventLoopTimerHandle *out_handle);
+
+/**
+ * @brief Clear a timer from the event loop.
+ * @param loop Event loop handle.
+ * @param handle Handle returned by set_timer.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_event_loop_clear_timer(CMPEventLoop *loop,
+                                                CMPEventLoopTimerHandle handle);
+
+/**
+ * @brief Wake the event loop from another thread to execute a callback.
+ * @param loop Event loop handle.
+ * @param cb Callback function to execute on the event loop thread.
+ * @param cb_ctx User context for the callback.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_event_loop_wake(CMPEventLoop *loop,
+                                         CMPEventLoopWakeCallback cb,
+                                         void *cb_ctx);
+
+/**
+ * @brief Schedule a single-shot timer on the global event loop.
+ * @param timeout_ms Delay in milliseconds.
+ * @param cb Timer callback function.
+ * @param user User data context passed to the callback.
+ * @param out_handle Optional pointer to receive the timer handle.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_set_timeout(cmp_u32 timeout_ms,
+                                     CMPEventLoopTimerCallback cb, void *user,
+                                     CMPEventLoopTimerHandle *out_handle);
+
+/**
+ * @brief Schedule a repeating interval timer on the global event loop.
+ * @param interval_ms Delay between executions in milliseconds.
+ * @param cb Timer callback function.
+ * @param user User data context passed to the callback.
+ * @param out_handle Optional pointer to receive the timer handle.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_set_interval(cmp_u32 interval_ms,
+                                      CMPEventLoopTimerCallback cb, void *user,
+                                      CMPEventLoopTimerHandle *out_handle);
+
+/**
+ * @brief Clear a timer from the global event loop.
+ * @param handle Handle of the timer to clear.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_clear_timeout(CMPEventLoopTimerHandle handle);
+
+/**
+ * @brief Configuration for a synchronous single-threaded event loop.
+ */
+typedef struct CMPSyncEventLoopConfig {
+  void *ctx; /**< Context passed to the tick function. */
+  int(CMP_CALL *on_tick)(void *ctx,
+                         CMPBool *out_continue); /**< Tick callback. */
+} CMPSyncEventLoopConfig;
+
+/**
+ * @brief Initialize a synchronous event loop backend.
+ * @param alloc Allocator to use for internal state.
+ * @param config Configuration containing the tick callback.
+ * @param out_loop Output abstract event loop.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_event_loop_sync_init(
+    CMPAllocator *alloc, const CMPSyncEventLoopConfig *config,
+    CMPEventLoop *out_loop);
+
+/**
+ * @brief Destroy a synchronous event loop backend.
+ * @param alloc Allocator used during initialization.
+ * @param loop Event loop to destroy.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_event_loop_sync_destroy(CMPAllocator *alloc,
+                                                 CMPEventLoop *loop);
+
+/**
+ * @brief Configuration for an asynchronous event loop.
+ */
+typedef struct CMPAsyncEventLoopConfig {
+  void *ctx; /**< Context passed to the poll function. */
+  int(CMP_CALL *on_poll_ui)(
+      void *ctx, CMPBool *out_continue); /**< Callback to poll UI events. */
+} CMPAsyncEventLoopConfig;
+
+/**
+ * @brief Initialize an asynchronous event loop backend.
+ * @param alloc Allocator to use for internal state.
+ * @param config Configuration containing the UI poll callback.
+ * @param out_loop Output abstract event loop.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_event_loop_async_init(
+    CMPAllocator *alloc, const CMPAsyncEventLoopConfig *config,
+    CMPEventLoop *out_loop);
+
+/**
+ * @brief Destroy an asynchronous event loop backend.
+ * @param alloc Allocator used during initialization.
+ * @param loop Event loop to destroy.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_event_loop_async_destroy(CMPAllocator *alloc,
+                                                  CMPEventLoop *loop);
+
+/**
+ * @brief Application configuration.
+ */
+typedef struct CMPAppConfig {
+  CMPModality modality; /**< Selected execution modality. */
+} CMPAppConfig;
+
+/**
+ * @brief Initialize application configuration with default values.
+ * @param config Pointer to configuration struct.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_app_config_init(CMPAppConfig *config);
+
+/**
+ * @brief Initialize the framework with a given configuration.
+ * @param config Pointer to initialized configuration struct.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_app_init(const CMPAppConfig *config);
+
+/**
+ * @brief Destroy the framework global state.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_app_destroy(void);
+
+/**
  * @brief Obtain the default system allocator.
  * @param out_alloc Receives the allocator interface.
  * @return CMP_OK on success or a failure code.

@@ -159,7 +159,6 @@ struct CMPSDL3Backend {
   CMPImage image;
   CMPVideo video;
   CMPAudio audio;
-  CMPNetwork network;
   CMPTasks tasks;
   CMPBool tasks_owned;
   CMPBool tasks_enabled;
@@ -3410,239 +3409,6 @@ static int cmp_sdl3_network_append_headers(struct CMPSDL3Backend *backend,
 }
 #endif
 
-static int cmp_sdl3_network_request(void *net, const CMPNetworkRequest *request,
-                                    const CMPAllocator *allocator,
-                                    CMPNetworkResponse *out_response) {
-  struct CMPSDL3Backend *backend;
-#if defined(CMP_LIBCURL_AVAILABLE)
-  CURL *curl;
-  CURLcode curl_rc;
-  struct curl_slist *header_list;
-  CMPSDL3CurlBuffer buffer;
-  long response_code;
-  long timeout_ms;
-  long body_len;
-#endif
-  int rc;
-
-  if (net == NULL || request == NULL || allocator == NULL ||
-      out_response == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-  if (allocator->alloc == NULL || allocator->realloc == NULL ||
-      allocator->free == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-
-  backend = (struct CMPSDL3Backend *)net;
-  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "network.request");
-  CMP_SDL3_RETURN_IF_ERROR(rc);
-
-  memset(out_response, 0, sizeof(*out_response));
-#if defined(CMP_LIBCURL_AVAILABLE)
-  if (request->method == NULL || request->url == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-  if (request->method[0] == '\0' || request->url[0] == '\0') {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-  if (request->body_size > 0 && request->body == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-  if (request->timeout_ms > 0u && request->timeout_ms > (cmp_u32)LONG_MAX) {
-    return CMP_ERR_RANGE;
-  }
-  if (request->body_size > (cmp_usize)LONG_MAX) {
-    return CMP_ERR_RANGE;
-  }
-
-  curl = NULL;
-  header_list = NULL;
-  buffer.allocator = allocator;
-  buffer.data = NULL;
-  buffer.size = 0u;
-  buffer.capacity = 0u;
-  buffer.error = CMP_OK;
-
-  curl = curl_easy_init();
-  if (curl == NULL) {
-    rc = CMP_ERR_OUT_OF_MEMORY;
-    goto cleanup;
-  }
-
-  curl_rc = curl_easy_setopt(curl, CURLOPT_URL, request->url);
-  if (curl_rc != CURLE_OK) {
-    rc = cmp_sdl3_network_error_from_curl(curl_rc);
-    goto cleanup;
-  }
-
-  curl_rc = curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request->method);
-  if (curl_rc != CURLE_OK) {
-    rc = cmp_sdl3_network_error_from_curl(curl_rc);
-    goto cleanup;
-  }
-
-  curl_rc = curl_easy_setopt(curl, CURLOPT_USERAGENT, "LibCMPC/1.0");
-  if (curl_rc != CURLE_OK) {
-    rc = cmp_sdl3_network_error_from_curl(curl_rc);
-    goto cleanup;
-  }
-
-  curl_rc =
-      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cmp_sdl3_network_write_cb);
-  if (curl_rc != CURLE_OK) {
-    rc = cmp_sdl3_network_error_from_curl(curl_rc);
-    goto cleanup;
-  }
-
-  curl_rc = curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-  if (curl_rc != CURLE_OK) {
-    rc = cmp_sdl3_network_error_from_curl(curl_rc);
-    goto cleanup;
-  }
-
-  curl_rc = curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
-  if (curl_rc != CURLE_OK) {
-    rc = cmp_sdl3_network_error_from_curl(curl_rc);
-    goto cleanup;
-  }
-
-  if (request->timeout_ms > 0u) {
-    timeout_ms = (long)request->timeout_ms;
-    curl_rc = curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeout_ms);
-    if (curl_rc != CURLE_OK) {
-      rc = cmp_sdl3_network_error_from_curl(curl_rc);
-      goto cleanup;
-    }
-    curl_rc = curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, timeout_ms);
-    if (curl_rc != CURLE_OK) {
-      rc = cmp_sdl3_network_error_from_curl(curl_rc);
-      goto cleanup;
-    }
-  }
-
-  if (request->headers != NULL && request->headers[0] != '\0') {
-    rc = cmp_sdl3_network_append_headers(backend, request->headers,
-                                         &header_list);
-    if (rc != CMP_OK) {
-      goto cleanup;
-    }
-    if (header_list != NULL) {
-      curl_rc = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header_list);
-      if (curl_rc != CURLE_OK) {
-        rc = cmp_sdl3_network_error_from_curl(curl_rc);
-        goto cleanup;
-      }
-    }
-  }
-
-  if (request->body_size > 0u) {
-    body_len = (long)request->body_size;
-    curl_rc = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request->body);
-    if (curl_rc != CURLE_OK) {
-      rc = cmp_sdl3_network_error_from_curl(curl_rc);
-      goto cleanup;
-    }
-    curl_rc = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, body_len);
-    if (curl_rc != CURLE_OK) {
-      rc = cmp_sdl3_network_error_from_curl(curl_rc);
-      goto cleanup;
-    }
-  }
-
-  curl_rc = curl_easy_perform(curl);
-  if (curl_rc != CURLE_OK) {
-    if (buffer.error != CMP_OK) {
-      rc = buffer.error;
-    } else {
-      rc = cmp_sdl3_network_error_from_curl(curl_rc);
-    }
-    goto cleanup;
-  }
-
-  if (buffer.error != CMP_OK) {
-    rc = buffer.error;
-    goto cleanup;
-  }
-
-  response_code = 0;
-  curl_rc = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-  if (curl_rc != CURLE_OK) {
-    rc = cmp_sdl3_network_error_from_curl(curl_rc);
-    goto cleanup;
-  }
-  if (response_code < 0 ||
-      (cmp_usize)response_code > (cmp_usize)((cmp_u32) ~(cmp_u32)0)) {
-    rc = CMP_ERR_RANGE;
-    goto cleanup;
-  }
-
-  out_response->status_code = (cmp_u32)response_code;
-  out_response->body = buffer.data;
-  out_response->body_size = buffer.size;
-  buffer.data = NULL;
-  rc = CMP_OK;
-
-cleanup:
-  if (header_list != NULL) {
-    curl_slist_free_all(header_list);
-  }
-  if (curl != NULL) {
-    curl_easy_cleanup(curl);
-  }
-  if (buffer.data != NULL) {
-    allocator->free(allocator->ctx, buffer.data);
-  }
-  if (rc != CMP_OK) {
-    memset(out_response, 0, sizeof(*out_response));
-  }
-  return rc;
-#else
-  return CMP_ERR_UNSUPPORTED;
-#endif
-}
-
-static int cmp_sdl3_network_free_response(void *net,
-                                          const CMPAllocator *allocator,
-                                          CMPNetworkResponse *response) {
-  struct CMPSDL3Backend *backend;
-  int rc;
-
-  if (net == NULL || allocator == NULL || response == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-  if (allocator->alloc == NULL || allocator->realloc == NULL ||
-      allocator->free == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-  if (response->body_size > 0 && response->body == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-
-  backend = (struct CMPSDL3Backend *)net;
-  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_DEBUG,
-                            "network.free_response");
-  CMP_SDL3_RETURN_IF_ERROR(rc);
-#if defined(CMP_LIBCURL_AVAILABLE)
-  if (response->body != NULL) {
-    rc = allocator->free(allocator->ctx, (void *)response->body);
-    if (rc != CMP_OK) {
-      return rc;
-    }
-  }
-
-  response->body = NULL;
-  response->body_size = 0u;
-  response->status_code = 0u;
-  return CMP_OK;
-#else
-  return CMP_ERR_UNSUPPORTED;
-#endif
-}
-
-static const CMPNetworkVTable g_cmp_sdl3_network_vtable = {
-    cmp_sdl3_network_request, cmp_sdl3_network_free_response};
-
 static int cmp_sdl3_tasks_thread_create(void *tasks, CMPThreadFn entry,
                                         void *user, CMPHandle *out_thread) {
   struct CMPSDL3Backend *backend;
@@ -3884,22 +3650,6 @@ static int cmp_sdl3_env_get_audio(void *env, CMPAudio *out_audio) {
   return CMP_OK;
 }
 
-static int cmp_sdl3_env_get_network(void *env, CMPNetwork *out_network) {
-  struct CMPSDL3Backend *backend;
-  int rc;
-
-  if (env == NULL || out_network == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-
-  backend = (struct CMPSDL3Backend *)env;
-  rc = cmp_sdl3_backend_log(backend, CMP_LOG_LEVEL_INFO, "env.get_network");
-  CMP_SDL3_RETURN_IF_ERROR(rc);
-
-  *out_network = backend->network;
-  return CMP_OK;
-}
-
 static int cmp_sdl3_env_get_tasks(void *env, CMPTasks *out_tasks) {
   struct CMPSDL3Backend *backend;
   int rc;
@@ -3932,11 +3682,9 @@ static int cmp_sdl3_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
 }
 
 static const CMPEnvVTable g_cmp_sdl3_env_vtable = {
-    cmp_sdl3_env_get_io,      cmp_sdl3_env_get_sensors,
-    cmp_sdl3_env_get_camera,  cmp_sdl3_env_get_image,
-    cmp_sdl3_env_get_video,   cmp_sdl3_env_get_audio,
-    cmp_sdl3_env_get_network, cmp_sdl3_env_get_tasks,
-    cmp_sdl3_env_get_time_ms};
+    cmp_sdl3_env_get_io,    cmp_sdl3_env_get_sensors, cmp_sdl3_env_get_camera,
+    cmp_sdl3_env_get_image, cmp_sdl3_env_get_video,   cmp_sdl3_env_get_audio,
+    cmp_sdl3_env_get_tasks, cmp_sdl3_env_get_time_ms};
 
 int CMP_CALL cmp_sdl3_backend_create(const CMPSDL3BackendConfig *config,
                                      CMPSDL3Backend **out_backend) {
@@ -4107,8 +3855,6 @@ int CMP_CALL cmp_sdl3_backend_create(const CMPSDL3BackendConfig *config,
   backend->video.vtable = &g_cmp_sdl3_video_vtable;
   backend->audio.ctx = backend;
   backend->audio.vtable = &g_cmp_sdl3_audio_vtable;
-  backend->network.ctx = backend;
-  backend->network.vtable = &g_cmp_sdl3_network_vtable;
 
   backend->initialized = CMP_TRUE;
 
@@ -4191,8 +3937,6 @@ int CMP_CALL cmp_sdl3_backend_destroy(CMPSDL3Backend *backend) {
   backend->video.vtable = NULL;
   backend->audio.ctx = NULL;
   backend->audio.vtable = NULL;
-  backend->network.ctx = NULL;
-  backend->network.vtable = NULL;
   backend->tasks.ctx = NULL;
   backend->tasks.vtable = NULL;
 

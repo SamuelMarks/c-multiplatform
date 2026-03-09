@@ -25,6 +25,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
+      - name: Normalize line endings
+        shell: bash
+        run: find . -type f -exec dos2unix {} + || true
       
       - name: Install libcurl (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
@@ -57,6 +60,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - name: Normalize line endings
+        shell: bash
+        run: find . -type f -exec dos2unix {} + || true
       
       - name: Install dependencies
         run: |

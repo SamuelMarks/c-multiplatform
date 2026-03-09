@@ -23,8 +23,6 @@ option(CMP_ENABLE_WIN32 "Enable Win32 backend" ON)
 option(CMP_ENABLE_WEB "Enable Web (Emscripten) backend" OFF)
 option(CMP_ENABLE_WEBGPU "Enable WebGPU renderer for the Web backend" OFF)
 option(CMP_ENABLE_IOS "Enable iOS backend" OFF)
-option(CMP_APPLE_USE_CFNETWORK_C "Use CFNetwork C APIs for Apple network backends" ON)
-option(CMP_ENABLE_LIBCURL "Enable libcurl-backed network support" ON)
 if(ANDROID)
     set(CMP_ENABLE_ANDROID_DEFAULT ON)
 else()
@@ -45,6 +43,114 @@ option(CMP_ENABLE_ASAN "Enable AddressSanitizer and UndefinedBehaviorSanitizer" 
 option(CMP_ENABLE_VALGRIND "Enable Valgrind target for testing" OFF)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option(TRY_SYS_LIB "Try to use system libraries if vcpkg is not available" ON)
+option(CMP_FAT_LIBRARY "Build a single fat library" OFF)
+
+include(FetchContent)
+macro(cmp_resolve_dependency pkg config_flag)
+    set(_VCPKG_APPLICABLE ON)
+    if(MINGW OR CYGWIN OR (MSVC AND MSVC_VERSION LESS 1500))
+        set(_VCPKG_APPLICABLE OFF)
+    endif()
+
+    set(${pkg}_FOUND_LOCAL OFF)
+
+    # a) Try vcpkg
+    if(_VCPKG_APPLICABLE AND (DEFINED CMAKE_TOOLCHAIN_FILE AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg\\.cmake"))
+        find_package(${pkg} ${config_flag} QUIET)
+        if(${pkg}_FOUND OR TARGET ${pkg}::${pkg} OR TARGET ${pkg})
+            set(${pkg}_FOUND_LOCAL ON)
+            set(${pkg}_FOUND ON)
+            message(STATUS "Resolved ${pkg} via vcpkg")
+        endif()
+    endif()
+
+    # b) Try system if TRY_SYS_LIB
+    if(NOT ${pkg}_FOUND_LOCAL AND TRY_SYS_LIB)
+        find_package(${pkg} ${config_flag} QUIET)
+        if(${pkg}_FOUND OR TARGET ${pkg}::${pkg} OR TARGET ${pkg})
+            set(${pkg}_FOUND_LOCAL ON)
+            set(${pkg}_FOUND ON)
+            message(STATUS "Resolved ${pkg} via system")
+        endif()
+    endif()
+
+    # c) Try FetchContent
+    if(NOT ${pkg}_FOUND_LOCAL)
+        message(STATUS "Resolving ${pkg} via FetchContent...")
+        if("${pkg}" STREQUAL "SDL3")
+            FetchContent_Declare(
+                SDL3
+                GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+                GIT_TAG release-3.4.2
+            )
+            FetchContent_MakeAvailable(SDL3)
+            if(TARGET SDL3::SDL3)
+                set(${pkg}_FOUND_LOCAL ON)
+            elseif(TARGET SDL3::SDL3-shared)
+                add_library(SDL3::SDL3 ALIAS SDL3::SDL3-shared)
+                set(${pkg}_FOUND_LOCAL ON)
+            elseif(TARGET SDL3::SDL3-static)
+                add_library(SDL3::SDL3 ALIAS SDL3::SDL3-static)
+                set(${pkg}_FOUND_LOCAL ON)
+            elseif(TARGET SDL3)
+                add_library(SDL3::SDL3 ALIAS SDL3)
+                set(${pkg}_FOUND_LOCAL ON)
+            endif()
+            set(${pkg}_FOUND ON)
+        elseif("${pkg}" STREQUAL "SDL3_ttf")
+            FetchContent_Declare(
+                SDL3_ttf
+                GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
+                GIT_TAG release-3.2.2
+            )
+            FetchContent_MakeAvailable(SDL3_ttf)
+            if(TARGET SDL3_ttf::SDL3_ttf)
+                set(${pkg}_FOUND_LOCAL ON)
+            elseif(TARGET SDL3_ttf::SDL3_ttf-static)
+                add_library(SDL3_ttf::SDL3_ttf ALIAS SDL3_ttf::SDL3_ttf-static)
+                set(${pkg}_FOUND_LOCAL ON)
+            elseif(TARGET SDL3_ttf)
+                add_library(SDL3_ttf::SDL3_ttf ALIAS SDL3_ttf)
+                set(${pkg}_FOUND_LOCAL ON)
+            endif()
+            set(${pkg}_FOUND ON)
+        elseif("${pkg}" STREQUAL "c-abstract-http")
+            FetchContent_Declare(
+                c_abstract_http
+                GIT_REPOSITORY https://github.com/SamuelMarks/c-abstract-http.git
+                GIT_TAG master
+            )
+            FetchContent_GetProperties(c_abstract_http)
+            if(NOT c_abstract_http_POPULATED)
+                FetchContent_Populate(c_abstract_http)
+            endif()
+            
+            set(C_ABSTRACT_HTTP_HEADER_ONLY OFF CACHE BOOL "" FORCE)
+            set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            if(CMP_FAT_LIBRARY)
+                set(_PREV_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+                set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+            endif()
+            
+            add_subdirectory(${c_abstract_http_SOURCE_DIR} ${c_abstract_http_BINARY_DIR} EXCLUDE_FROM_ALL)
+            if(TARGET c-abstract-http-test)
+            endif()
+            
+            if(CMP_FAT_LIBRARY)
+                set(BUILD_SHARED_LIBS ${_PREV_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
+            endif()
+            set(BUILD_TESTING ON CACHE BOOL "" FORCE)
+            set(${pkg}_FOUND_LOCAL ON)
+            set(${pkg}_FOUND ON)
+        endif()
+
+        if(NOT ${pkg}_FOUND_LOCAL)
+            message(FATAL_ERROR "Failed to resolve dependency ${pkg} via vcpkg, system, or FetchContent.")
+        endif()
+        set(CMP_HAS_FETCHED_DEPS ON)
+    endif()
+endmacro()
 option(CMP_MSVC_STATIC_CRT "Use static CRT (/MT, /MTd) on MSVC" OFF)
 option(CMP_UNICODE "Build with UNICODE and _UNICODE defined" ON)
 option(CMP_SINGLE_THREADED "Build as single threaded (disables multithreading support)" OFF)
@@ -138,40 +244,48 @@ function(cmp_apply_c_settings target_name)
     endif()
 endfunction()
 
-add_library(cmpc
-    src/core/cmp_core.c
-    src/core/cmp_object.c
-    src/core/cmp_arena.c
-    src/core/cmp_utf8.c
-    src/core/cmp_log.c
-    src/core/cmp_store.c
-    src/core/cmp_storage.c
-    src/core/cmp_i18n.c
-    src/core/cmp_math.c
-    src/core/cmp_layout.c
-    src/core/cmp_a11y.c
-    src/core/cmp_anim.c
-    src/core/cmp_router.c
-    src/core/cmp_predictive.c
-    src/core/cmp_path.c
-    src/core/cmp_render.c
-    src/core/cmp_event.c
-    src/core/cmp_gesture.c
-    src/core/cmp_scroll.c
-    src/core/cmp_tasks.c
-    src/core/cmp_visuals.c
-    src/core/cmp_text.c
-    src/core/cmp_icon.c
-    src/core/cmp_extras.c
-    src/core/cmp_text_field.c
-    src/core/cmp_list.c
-    src/core/cmp_camera.c
-    src/core/cmp_image.c
-    src/core/cmp_video.c
-    src/core/cmp_audio.c
-    src/core/cmp_network.c
-    src/backend/null/cmp_backend_null.c
-    src/backend/sdl3/cmp_backend_sdl3.c
+  add_library(cmpc
+  src/core/cmp_core.c
+  src/core/cmp_object.c
+  src/core/cmp_arena.c
+  src/core/cmp_utf8.c
+  src/core/cmp_log.c
+  src/core/cmp_store.c
+  src/core/cmp_storage.c
+  src/core/cmp_i18n.c
+  src/core/cmp_math.c
+  src/core/cmp_layout.c
+  src/core/cmp_a11y.c
+  src/core/cmp_anim.c
+  src/core/cmp_router.c
+  src/core/cmp_predictive.c
+  src/core/cmp_path.c
+  src/core/cmp_render.c
+  src/core/cmp_event.c
+  src/core/cmp_gesture.c
+  src/core/cmp_scroll.c
+  src/core/cmp_event_loop_sync.c
+  src/core/cmp_event_loop_async.c
+  src/core/cmp_tasks.c
+  src/core/cmp_message.c
+  src/core/cmp_fiber.c
+  src/core/cmp_process.c
+  src/core/cmp_shm.c
+  src/core/cmp_sync.c
+  src/core/cmp_deadlock.c
+  src/core/cmp_visuals.c
+  src/core/cmp_text.c
+  src/core/cmp_icon.c
+  src/core/cmp_extras.c
+  src/core/cmp_text_field.c
+  src/core/cmp_list.c
+  src/core/cmp_camera.c
+  src/core/cmp_image.c
+  src/core/cmp_video.c
+  src/core/cmp_audio.c
+  src/core/cmp_fs.c
+  src/core/cmp_net.c
+  src/backend/null/cmp_backend_null.c    src/backend/sdl3/cmp_backend_sdl3.c
     src/backend/linux/cmp_backend_gtk4.c
     src/backend/cocoa/cmp_backend_cocoa.c
     src/backend/win32/cmp_backend_win32.c
@@ -249,6 +363,9 @@ add_library(f2
     src/f2/f2_avatar.c
 )
 add_library(f2::f2 ALIAS f2)
+if(CMP_FAT_LIBRARY)
+set_target_properties(f2 PROPERTIES OUTPUT_NAME "c-multiplatform-f2")
+endif()
 target_include_directories(f2 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -287,6 +404,9 @@ add_library(cupertino
     src/cupertino/cupertino_focus_ring.c
 )
 add_library(cupertino::cupertino ALIAS cupertino)
+if(CMP_FAT_LIBRARY)
+set_target_properties(cupertino PROPERTIES OUTPUT_NAME "c-multiplatform-cupertino")
+endif()
 target_include_directories(cupertino PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -328,11 +448,14 @@ endif()
 set(CMP_HAS_SDL3 OFF)
 set(CMP_HAS_SDL3_TTF OFF)
 set(CMP_HAS_GTK4 OFF)
+
+cmp_resolve_dependency(c-abstract-http "")
+target_link_libraries(cmpc PUBLIC c-abstract-http)
 set(CMP_HAS_LIBCURL OFF)
 
 # FIX: Applied definitions to 'cmpc' instead of 'm3' so backend sources see them
 if(CMP_ENABLE_SDL3)
-    find_package(SDL3 CONFIG QUIET)
+    cmp_resolve_dependency(SDL3 CONFIG)
     if(SDL3_FOUND)
         set(CMP_HAS_SDL3 ON)
         target_link_libraries(cmpc PUBLIC SDL3::SDL3)
@@ -346,7 +469,7 @@ if(CMP_ENABLE_SDL3_TTF)
     if(NOT CMP_ENABLE_SDL3)
         message(WARNING "CMP_ENABLE_SDL3_TTF is ON but CMP_ENABLE_SDL3 is OFF; SDL3_ttf support disabled.")
     else()
-        find_package(SDL3_ttf CONFIG QUIET)
+        cmp_resolve_dependency(SDL3_ttf CONFIG)
         if(TARGET SDL3_ttf::SDL3_ttf)
             set(CMP_HAS_SDL3_TTF ON)
             target_link_libraries(cmpc PUBLIC SDL3_ttf::SDL3_ttf)
@@ -377,25 +500,6 @@ if(CMP_ENABLE_GTK4)
     endif()
 endif()
 
-if(CMP_ENABLE_LIBCURL)
-    find_package(CURL QUIET)
-    if(CURL_FOUND)
-        set(CMP_HAS_LIBCURL ON)
-        if(TARGET CURL::libcurl)
-            target_link_libraries(cmpc PUBLIC CURL::libcurl)
-        else()
-            if(CURL_INCLUDE_DIRS)
-                target_include_directories(cmpc PUBLIC ${CURL_INCLUDE_DIRS})
-            endif()
-            if(CURL_LIBRARIES)
-                target_link_libraries(cmpc PUBLIC ${CURL_LIBRARIES})
-            endif()
-        endif()
-        target_compile_definitions(cmpc PUBLIC CMP_LIBCURL_AVAILABLE)
-    else()
-        message(WARNING "libcurl not found: libcurl-backed network support disabled.")
-    endif()
-endif()
 
 if(CMP_ENABLE_COCOA)
     if(APPLE)
@@ -412,11 +516,10 @@ if(CMP_ENABLE_COCOA)
             find_library(AVFOUNDATION_FRAMEWORK AVFoundation)
             find_library(COREMEDIA_FRAMEWORK CoreMedia)
             find_library(COREVIDEO_FRAMEWORK CoreVideo)
-            find_library(CFNETWORK_FRAMEWORK CFNetwork)
-            if(COCOA_FRAMEWORK AND COREGRAPHICS_FRAMEWORK AND CORETEXT_FRAMEWORK AND AVFOUNDATION_FRAMEWORK AND COREMEDIA_FRAMEWORK AND COREVIDEO_FRAMEWORK AND CFNETWORK_FRAMEWORK)
+            if(COCOA_FRAMEWORK AND COREGRAPHICS_FRAMEWORK AND CORETEXT_FRAMEWORK AND AVFOUNDATION_FRAMEWORK AND COREMEDIA_FRAMEWORK AND COREVIDEO_FRAMEWORK)
                 target_sources(cmpc PRIVATE src/backend/cocoa/cmp_backend_cocoa.m)
                 target_link_libraries(cmpc PUBLIC ${COCOA_FRAMEWORK} ${COREGRAPHICS_FRAMEWORK} ${CORETEXT_FRAMEWORK}
-                    ${AVFOUNDATION_FRAMEWORK} ${COREMEDIA_FRAMEWORK} ${COREVIDEO_FRAMEWORK} ${CFNETWORK_FRAMEWORK})
+                    ${AVFOUNDATION_FRAMEWORK} ${COREMEDIA_FRAMEWORK} ${COREVIDEO_FRAMEWORK})
                 target_compile_definitions(cmpc PUBLIC CMP_COCOA_AVAILABLE)
             else()
                 message(WARNING "Cocoa frameworks not found: Cocoa backend will be stubbed.")
@@ -497,11 +600,10 @@ if(CMP_ENABLE_IOS AND APPLE AND CMAKE_SYSTEM_NAME STREQUAL "iOS")
         find_library(AVFOUNDATION_FRAMEWORK AVFoundation)
         find_library(COREMEDIA_FRAMEWORK CoreMedia)
         find_library(COREVIDEO_FRAMEWORK CoreVideo)
-        find_library(CFNETWORK_FRAMEWORK CFNetwork)
-        if(UIKIT_FRAMEWORK AND AVFOUNDATION_FRAMEWORK AND COREMEDIA_FRAMEWORK AND COREVIDEO_FRAMEWORK AND CFNETWORK_FRAMEWORK)
+        if(UIKIT_FRAMEWORK AND AVFOUNDATION_FRAMEWORK AND COREMEDIA_FRAMEWORK AND COREVIDEO_FRAMEWORK)
             target_sources(cmpc PRIVATE src/backend/ios/cmp_backend_ios.m)
             target_link_libraries(cmpc PUBLIC ${UIKIT_FRAMEWORK} ${AVFOUNDATION_FRAMEWORK} ${COREMEDIA_FRAMEWORK}
-                ${COREVIDEO_FRAMEWORK} ${CFNETWORK_FRAMEWORK})
+                ${COREVIDEO_FRAMEWORK})
             target_compile_definitions(cmpc PUBLIC CMP_IOS_AVAILABLE)
         else()
             message(WARNING "iOS frameworks not found: iOS backend will be stubbed.")
@@ -518,12 +620,16 @@ else()
     target_sources(cmpc PRIVATE src/backend/ios/cmp_backend_ios.c)
 endif()
 
-if(APPLE AND CMP_APPLE_USE_CFNETWORK_C)
-    target_compile_definitions(cmpc PUBLIC CMP_APPLE_USE_CFNETWORK_C)
-endif()
+
 
 cmp_apply_c_settings(cmpc)
+if(CMP_FAT_LIBRARY)
+set_target_properties(cmpc PROPERTIES OUTPUT_NAME "c-multiplatform-core")
+endif()
 cmp_apply_c_settings(m3)
+if(CMP_FAT_LIBRARY)
+set_target_properties(m3 PROPERTIES OUTPUT_NAME "c-multiplatform-m3")
+endif()
 
 set_target_properties(m3 PROPERTIES
     VERSION ${PROJECT_VERSION}
@@ -588,6 +694,7 @@ install(FILES
     DESTINATION ${LIBCMPC_INSTALL_CMAKEDIR}
 )
 
+if(NOT CMP_HAS_FETCHED_DEPS)
 install(EXPORT LibCMPCTargets
     NAMESPACE cmp::
     DESTINATION ${LIBCMPC_INSTALL_CMAKEDIR}
@@ -605,6 +712,8 @@ export(EXPORT LibM3Targets
     FILE ${CMAKE_CURRENT_BINARY_DIR}/LibM3Targets.cmake
     NAMESPACE m3::
 )
+endif()
+
 
 if(CMP_ENABLE_PACKAGING)
     include(cmake/CMPPackaging.cmake)
@@ -766,6 +875,46 @@ if(BUILD_TESTING)
     add_executable(cmp_phase1_utf8 tests/phase1/utf8.c)
     target_link_libraries(cmp_phase1_utf8 PRIVATE cmpc)
     add_test(NAME cmp_phase1_utf8 COMMAND cmp_phase1_utf8)
+
+    add_executable(cmp_phase1_event_loop_sync tests/phase1/event_loop_sync.c)
+    target_link_libraries(cmp_phase1_event_loop_sync PRIVATE cmpc)
+    add_test(NAME cmp_phase1_event_loop_sync COMMAND cmp_phase1_event_loop_sync)
+
+    add_executable(cmp_phase1_event_loop_async tests/phase1/event_loop_async.c)
+    target_link_libraries(cmp_phase1_event_loop_async PRIVATE cmpc)
+    add_test(NAME cmp_phase1_event_loop_async COMMAND cmp_phase1_event_loop_async)
+
+    add_executable(cmp_phase1_message tests/phase1/message.c)
+    target_link_libraries(cmp_phase1_message PRIVATE cmpc)
+    add_test(NAME cmp_phase1_message COMMAND cmp_phase1_message)
+
+    add_executable(cmp_phase1_fiber tests/phase1/fiber.c)
+    target_link_libraries(cmp_phase1_fiber PRIVATE cmpc)
+    add_test(NAME cmp_phase1_fiber COMMAND cmp_phase1_fiber)
+
+    add_executable(cmp_phase1_process tests/phase1/process.c)
+    target_link_libraries(cmp_phase1_process PRIVATE cmpc)
+    add_test(NAME cmp_phase1_process COMMAND cmp_phase1_process)
+
+    add_executable(cmp_phase1_shm tests/phase1/shm.c)
+    target_link_libraries(cmp_phase1_shm PRIVATE cmpc)
+    add_test(NAME cmp_phase1_shm COMMAND cmp_phase1_shm)
+
+    add_executable(cmp_phase1_sync tests/phase1/sync.c)
+    target_link_libraries(cmp_phase1_sync PRIVATE cmpc)
+    add_test(NAME cmp_phase1_sync COMMAND cmp_phase1_sync)
+
+    add_executable(cmp_phase1_deadlock tests/phase1/deadlock.c)
+    target_link_libraries(cmp_phase1_deadlock PRIVATE cmpc)
+    add_test(NAME cmp_phase1_deadlock COMMAND cmp_phase1_deadlock)
+
+    add_executable(cmp_phase1_fs tests/phase1/fs.c)
+    target_link_libraries(cmp_phase1_fs PRIVATE cmpc)
+    add_test(NAME cmp_phase1_fs COMMAND cmp_phase1_fs)
+
+    add_executable(cmp_phase1_net tests/phase1/net.c)
+    target_link_libraries(cmp_phase1_net PRIVATE cmpc)
+    add_test(NAME cmp_phase1_net COMMAND cmp_phase1_net)
 
     add_executable(cmp_phase2_anim tests/phase2/anim.c)
     target_link_libraries(cmp_phase2_anim PRIVATE m3 cmpc)
@@ -1314,9 +1463,6 @@ if(BUILD_TESTING)
     target_link_libraries(cmp_phase6_image PRIVATE cmpc)
     add_test(NAME cmp_phase6_image COMMAND cmp_phase6_image)
 
-    add_executable(cmp_phase6_network tests/phase6/network.c)
-    target_link_libraries(cmp_phase6_network PRIVATE cmpc)
-    add_test(NAME cmp_phase6_network COMMAND cmp_phase6_network)
 
     add_executable(cmp_phase6_predictive tests/phase6/predictive.c)
     target_link_libraries(cmp_phase6_predictive PRIVATE cmpc)
@@ -1338,3 +1484,4 @@ if(CMP_ENABLE_GTK4)
     add_executable(screenshot_tool tools/screenshot_tool.c)
     target_link_libraries(screenshot_tool PRIVATE m3 f2 cupertino cmpc)
 endif()
+set_target_properties(c-abstract-http-test PROPERTIES EXCLUDE_FROM_ALL OFF)

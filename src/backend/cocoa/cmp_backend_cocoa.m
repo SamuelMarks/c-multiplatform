@@ -619,56 +619,8 @@ static CMPCameraVTable g_cam_vtable = {
     .open_with_config = env_cam_open_auto
 };
 
-static int net_request(void *ctx, const CMPNetworkRequest *req, const CMPAllocator *alloc, CMPNetworkResponse *out_resp) {
-    (void)ctx;
-    NSString *urlString = [NSString stringWithUTF8String:req->url];
-    NSURL *url = [NSURL URLWithString:urlString];
 
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    __block NSData *resultData = nil;
-    __block NSInteger statusCode = 0;
 
-    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        if (!error && data) {
-            resultData = data;
-            if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
-                statusCode = ((NSHTTPURLResponse*)response).statusCode;
-            }
-        }
-        dispatch_semaphore_signal(sema);
-    }];
-    [task resume];
-
-    dispatch_time_t timeout = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(req->timeout_ms * NSEC_PER_MSEC));
-    if (dispatch_semaphore_wait(sema, timeout) != 0) {
-        [task cancel];
-        return CMP_ERR_TIMEOUT;
-    }
-
-    if (resultData) {
-        out_resp->status_code = (cmp_u32)statusCode;
-        void *buf;
-        if (alloc->alloc(alloc->ctx, resultData.length, &buf) == 0) {
-            memcpy(buf, resultData.bytes, resultData.length);
-            out_resp->body = buf;
-            out_resp->body_size = resultData.length;
-            return CMP_OK;
-        }
-        return CMP_ERR_OUT_OF_MEMORY;
-    }
-
-    return CMP_ERR_IO;
-}
-
-static int net_free_resp(void *ctx, const CMPAllocator *alloc, CMPNetworkResponse *resp) {
-    (void)ctx;
-    if (resp->body) alloc->free(alloc->ctx, (void*)resp->body);
-    return CMP_OK;
-}
-
-static const CMPNetworkVTable g_net_vtable = {
-    net_request, net_free_resp
-};
 
 static int env_get_io(void* c, CMPIO *io) { (void)c; (void)io; return CMP_ERR_UNSUPPORTED; }
 static int env_get_sensors(void* c, CMPSensors *s) { (void)c; (void)s; return CMP_ERR_UNSUPPORTED; }
@@ -678,15 +630,12 @@ static int env_get_cam(void* c, CMPCamera *cam) {
 static int env_get_img(void* c, CMPImage *img) { (void)c; (void)img; return CMP_ERR_UNSUPPORTED; }
 static int env_get_vid(void* c, CMPVideo *v) { (void)c; (void)v; return CMP_ERR_UNSUPPORTED; }
 static int env_get_aud(void* c, CMPAudio *a) { (void)c; (void)a; return CMP_ERR_UNSUPPORTED; }
-static int env_get_net(void* c, CMPNetwork *n) {
-    n->ctx = c; n->vtable = &g_net_vtable; return CMP_OK;
-}
 static int env_get_tasks(void* c, CMPTasks *t) { (void)c; (void)t; return CMP_ERR_UNSUPPORTED; }
 static int env_get_time(void* c, uint32_t *t) { return ws_get_time(c, t); }
 
 static const CMPEnvVTable g_env_vtable = {
     env_get_io, env_get_sensors, env_get_cam, env_get_img,
-    env_get_vid, env_get_aud, env_get_net, env_get_tasks, env_get_time
+    env_get_vid, env_get_aud, env_get_tasks, env_get_time
 };
 
 /* --- Main Backend Entry Points --- */

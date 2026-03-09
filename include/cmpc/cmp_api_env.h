@@ -583,70 +583,17 @@ typedef struct CMPAudio {
 } CMPAudio;
 
 /**
- * @brief Network request description.
- */
-typedef struct CMPNetworkRequest {
-  const char *method;  /**< HTTP method name. */
-  const char *url;     /**< Request URL. */
-  const char *headers; /**< Raw header string, backend-defined format. */
-  const void *body;    /**< Request body bytes. */
-  cmp_usize body_size; /**< Request body size in bytes. */
-  cmp_u32 timeout_ms;  /**< Timeout in milliseconds. */
-} CMPNetworkRequest;
 
-/**
- * @brief Network response description.
  */
-typedef struct CMPNetworkResponse {
-  cmp_u32 status_code; /**< HTTP status code. */
-  const void *body;    /**< Response body bytes. */
-  cmp_usize body_size; /**< Response body size in bytes. */
-} CMPNetworkResponse;
+/**
 
-/**
- * @brief Network virtual table.
  */
-typedef struct CMPNetworkVTable {
 /**
- * @brief Execute a network request.
- * @param net Network backend instance.
- * @param request Request parameters.
- * @param allocator Allocator for response body storage.
- * @param out_response Receives the response data.
- * @return CMP_OK on success or a failure code.
- */
-#ifdef CMP_DOXYGEN
-  int request(void *net, const CMPNetworkRequest *request,
-              const CMPAllocator *allocator, CMPNetworkResponse *out_response);
-#else
-  int(CMP_CALL *request)(void *net, const CMPNetworkRequest *request,
-                         const CMPAllocator *allocator,
-                         CMPNetworkResponse *out_response);
-#endif
-/**
- * @brief Release resources in a response.
- * @param net Network backend instance.
- * @param allocator Allocator used for the response body.
- * @param response Response to free.
- * @return CMP_OK on success or a failure code.
- */
-#ifdef CMP_DOXYGEN
-  int free_response(void *net, const CMPAllocator *allocator,
-                    CMPNetworkResponse *response);
-#else
-  int(CMP_CALL *free_response)(void *net, const CMPAllocator *allocator,
-                               CMPNetworkResponse *response);
-#endif
-} CMPNetworkVTable;
 
-/**
- * @brief Network interface.
  */
-typedef struct CMPNetwork {
-  void *ctx;                      /**< Network backend context pointer. */
-  const CMPNetworkVTable *vtable; /**< Network virtual table. */
-} CMPNetwork;
+/**
 
+ */
 /**
  * @brief Task function signature.
  * @param user User data pointer.
@@ -832,13 +779,11 @@ typedef int(CMP_CALL *CMPEnvGetVideoFn)(void *env, CMPVideo *out_video);
 typedef int(CMP_CALL *CMPEnvGetAudioFn)(void *env, CMPAudio *out_audio);
 
 /**
- * @brief Retrieve the network interface.
+
  * @param env Environment backend instance.
- * @param out_network Receives the network interface.
+
  * @return CMP_OK on success or a failure code.
  */
-typedef int(CMP_CALL *CMPEnvGetNetworkFn)(void *env, CMPNetwork *out_network);
-
 /**
  * @brief Retrieve the tasking interface.
  * @param env Environment backend instance.
@@ -871,8 +816,6 @@ typedef struct CMPEnvVTable {
   CMPEnvGetVideoFn get_video;
   /** @brief Retrieve the audio decoder interface. */
   CMPEnvGetAudioFn get_audio;
-  /** @brief Retrieve the network interface. */
-  CMPEnvGetNetworkFn get_network;
   /** @brief Retrieve the tasking interface. */
   CMPEnvGetTasksFn get_tasks;
   /** @brief Get the current time in milliseconds. */

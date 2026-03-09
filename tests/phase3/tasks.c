@@ -182,6 +182,43 @@ static int thread_entry(void *user) {
   return CMP_OK;
 }
 
+typedef struct ProducerCtx {
+  CMPTasks tasks;
+  TaskState *state;
+  int num_posts;
+} ProducerCtx;
+
+static int producer_thread_entry(void *user) {
+  ProducerCtx *ctx;
+  int i;
+  int rc;
+
+  if (user == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  ctx = (ProducerCtx *)user;
+  for (i = 0; i < ctx->num_posts; i++) {
+    /* Randomly interleave immediate and delayed tasks */
+    if (i % 4 == 0) {
+      rc = ctx->tasks.vtable->task_post_delayed(ctx->tasks.ctx, task_increment,
+                                                ctx->state, 10);
+    } else {
+      rc = ctx->tasks.vtable->task_post(ctx->tasks.ctx, task_increment,
+                                        ctx->state);
+    }
+    if (rc != CMP_OK) {
+      return rc;
+    }
+    /* Small sleep to induce more interleaving */
+    if (i % 10 == 0) {
+      ctx->tasks.vtable->sleep_ms(ctx->tasks.ctx, 1);
+    }
+  }
+
+  return CMP_OK;
+}
+
 int main(void) {
   {
     CMPTasksDefaultConfig config;
@@ -1112,6 +1149,65 @@ int main(void) {
     CMP_TEST_OK(rc);
     CMP_TEST_EXPECT(tasks.vtable->task_post(tasks.ctx, task_increment, &state),
                     CMP_ERR_BUSY);
+
+    CMP_TEST_OK(tasks.vtable->mutex_destroy(tasks.ctx, state.mutex));
+    CMP_TEST_OK(cmp_tasks_default_destroy(&tasks));
+  }
+
+  {
+    CMPTasks tasks;
+    CMPTasksDefaultConfig config;
+    TaskState state;
+    int i, rc;
+    CMPHandle threads[8];
+    ProducerCtx ctxs[8];
+
+    /* High concurrency, lots of tasks to test queue race conditions */
+    CMP_TEST_OK(cmp_tasks_default_config_init(&config));
+    config.worker_count = 16;
+    config.queue_capacity = 256;
+    config.handle_capacity =
+        64; /* higher handle capacity for 8 extra producer threads */
+
+    CMP_TEST_OK(cmp_tasks_default_create(&config, &tasks));
+
+    state.tasks = tasks;
+    state.counter = 0;
+    state.fail = 0;
+    CMP_TEST_OK(tasks.vtable->mutex_create(tasks.ctx, &state.mutex));
+
+    for (i = 0; i < 200; i++) {
+      rc = tasks.vtable->task_post(tasks.ctx, task_increment, &state);
+      CMP_TEST_OK(rc);
+    }
+
+    for (i = 0; i < 20; i++) {
+      rc = tasks.vtable->task_post_delayed(tasks.ctx, task_increment, &state,
+                                           50);
+      CMP_TEST_OK(rc);
+    }
+
+    CMP_TEST_OK(wait_for_counter(&state, 220, 5000));
+    CMP_TEST_ASSERT(state.counter == 220);
+
+    /* Also stress from multiple producer threads posting tasks */
+    state.counter = 0;
+
+    for (i = 0; i < 8; i++) {
+      ctxs[i].tasks = tasks;
+      ctxs[i].state = &state;
+      ctxs[i].num_posts = 50; /* Total 8 * 50 = 400 posts */
+
+      CMP_TEST_OK(tasks.vtable->thread_create(tasks.ctx, producer_thread_entry,
+                                              &ctxs[i], &threads[i]));
+    }
+
+    for (i = 0; i < 8; i++) {
+      CMP_TEST_OK(tasks.vtable->thread_join(tasks.ctx, threads[i]));
+    }
+
+    CMP_TEST_OK(wait_for_counter(&state, 400, 10000));
+    CMP_TEST_ASSERT(state.counter == 400);
 
     CMP_TEST_OK(tasks.vtable->mutex_destroy(tasks.ctx, state.mutex));
     CMP_TEST_OK(cmp_tasks_default_destroy(&tasks));

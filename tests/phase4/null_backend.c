@@ -371,7 +371,6 @@ int main(void) {
     CMPImage image;
     CMPVideo video;
     CMPAudio audio;
-    CMPNetwork network;
     CMPTasks tasks;
     CMPAllocator default_alloc = {0};
     CMPAllocator bad_alloc = {0};
@@ -405,8 +404,6 @@ int main(void) {
     CMPVideoFrame video_frame;
     CMPAudioDecodeRequest audio_req;
     CMPAudioData audio_data;
-    CMPNetworkRequest net_req;
-    CMPNetworkResponse net_resp;
     TestTaskState task_state;
     void *data;
     int rc;
@@ -894,12 +891,6 @@ int main(void) {
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_OK(env.vtable->get_audio(env.ctx, &audio));
 
-    CMP_TEST_EXPECT(env.vtable->get_network(NULL, &network),
-                    CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(env.vtable->get_network(env.ctx, NULL),
-                    CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_OK(env.vtable->get_network(env.ctx, &network));
-
     CMP_TEST_EXPECT(env.vtable->get_tasks(NULL, &tasks),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(env.vtable->get_tasks(env.ctx, NULL),
@@ -1157,72 +1148,6 @@ int main(void) {
         audio.vtable->free_audio(audio.ctx, &default_alloc, &audio_data),
         CMP_ERR_UNSUPPORTED);
 
-    memset(&net_req, 0, sizeof(net_req));
-    CMP_TEST_EXPECT(
-        network.vtable->request(NULL, &net_req, &default_alloc, &net_resp),
-        CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(
-        network.vtable->request(network.ctx, NULL, &default_alloc, &net_resp),
-        CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(
-        network.vtable->request(network.ctx, &net_req, &default_alloc, NULL),
-        CMP_ERR_INVALID_ARGUMENT);
-    memset(&default_alloc, 0, sizeof(default_alloc));
-    CMP_TEST_EXPECT(network.vtable->request(network.ctx, &net_req,
-                                            &default_alloc, &net_resp),
-                    CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
-    bad_alloc = default_alloc;
-    bad_alloc.alloc = NULL;
-    CMP_TEST_EXPECT(
-        network.vtable->request(network.ctx, &net_req, &bad_alloc, &net_resp),
-        CMP_ERR_INVALID_ARGUMENT);
-    bad_alloc = default_alloc;
-    bad_alloc.realloc = NULL;
-    CMP_TEST_EXPECT(
-        network.vtable->request(network.ctx, &net_req, &bad_alloc, &net_resp),
-        CMP_ERR_INVALID_ARGUMENT);
-    bad_alloc = default_alloc;
-    bad_alloc.free = NULL;
-    CMP_TEST_EXPECT(
-        network.vtable->request(network.ctx, &net_req, &bad_alloc, &net_resp),
-        CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(network.vtable->request(network.ctx, &net_req,
-                                            &default_alloc, &net_resp),
-                    CMP_ERR_UNSUPPORTED);
-
-    CMP_TEST_EXPECT(
-        network.vtable->free_response(NULL, &default_alloc, &net_resp),
-        CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(network.vtable->free_response(network.ctx, NULL, &net_resp),
-                    CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(
-        network.vtable->free_response(network.ctx, &default_alloc, NULL),
-        CMP_ERR_INVALID_ARGUMENT);
-    memset(&default_alloc, 0, sizeof(default_alloc));
-    CMP_TEST_EXPECT(
-        network.vtable->free_response(network.ctx, &default_alloc, &net_resp),
-        CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
-    bad_alloc = default_alloc;
-    bad_alloc.alloc = NULL;
-    CMP_TEST_EXPECT(
-        network.vtable->free_response(network.ctx, &bad_alloc, &net_resp),
-        CMP_ERR_INVALID_ARGUMENT);
-    bad_alloc = default_alloc;
-    bad_alloc.realloc = NULL;
-    CMP_TEST_EXPECT(
-        network.vtable->free_response(network.ctx, &bad_alloc, &net_resp),
-        CMP_ERR_INVALID_ARGUMENT);
-    bad_alloc = default_alloc;
-    bad_alloc.free = NULL;
-    CMP_TEST_EXPECT(
-        network.vtable->free_response(network.ctx, &bad_alloc, &net_resp),
-        CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(
-        network.vtable->free_response(network.ctx, &default_alloc, &net_resp),
-        CMP_ERR_UNSUPPORTED);
-
     CMP_TEST_EXPECT(
         tasks.vtable->thread_create(NULL, test_task_ok, &task_state, &window2),
         CMP_ERR_INVALID_ARGUMENT);
@@ -1442,7 +1367,6 @@ int main(void) {
     CMPImage image;
     CMPVideo video;
     CMPAudio audio;
-    CMPNetwork network;
     CMPTasks tasks;
     CMPWSConfig ws_config;
     CMPWSWindowConfig win_config;
@@ -1475,8 +1399,6 @@ int main(void) {
     CMPImageData image_data;
     CMPAudioDecodeRequest audio_request;
     CMPAudioData audio_data;
-    CMPNetworkRequest network_request;
-    CMPNetworkResponse network_response;
     CMPFileInfo file_info;
     CMPBool exists;
     CMPColor color;
@@ -1494,7 +1416,6 @@ int main(void) {
     CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_image(env.ctx, &image));
     CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_video(env.ctx, &video));
     CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_audio(env.ctx, &audio));
-    CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_network(env.ctx, &network));
     CMP_TEST_NULL_FORCE_FAIL(env.vtable->get_tasks(env.ctx, &tasks));
     CMP_TEST_OK(env.vtable->get_io(env.ctx, &io));
     CMP_TEST_OK(env.vtable->get_sensors(env.ctx, &sensors));
@@ -1502,7 +1423,6 @@ int main(void) {
     CMP_TEST_OK(env.vtable->get_image(env.ctx, &image));
     CMP_TEST_OK(env.vtable->get_video(env.ctx, &video));
     CMP_TEST_OK(env.vtable->get_audio(env.ctx, &audio));
-    CMP_TEST_OK(env.vtable->get_network(env.ctx, &network));
     CMP_TEST_OK(env.vtable->get_tasks(env.ctx, &tasks));
 
     ws_config.utf8_app_name = "SweepApp";
@@ -1690,13 +1610,6 @@ int main(void) {
                                                   &default_alloc, &audio_data));
     CMP_TEST_NULL_FORCE_FAIL(
         audio.vtable->free_audio(audio.ctx, &default_alloc, &audio_data));
-
-    memset(&network_request, 0, sizeof(network_request));
-    memset(&network_response, 0, sizeof(network_response));
-    CMP_TEST_NULL_FORCE_FAIL(network.vtable->request(
-        network.ctx, &network_request, &default_alloc, &network_response));
-    CMP_TEST_NULL_FORCE_FAIL(network.vtable->free_response(
-        network.ctx, &default_alloc, &network_response));
 
     CMP_TEST_NULL_FORCE_FAIL(tasks.vtable->thread_create(
         tasks.ctx, test_task_ok, NULL, &task_handle));

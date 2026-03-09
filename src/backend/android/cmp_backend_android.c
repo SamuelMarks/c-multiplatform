@@ -1034,22 +1034,6 @@ static int cmp_android_env_get_audio(void *env, CMPAudio *out_audio) {
   return CMP_ERR_UNSUPPORTED;
 }
 
-static int cmp_android_env_get_network(void *env, CMPNetwork *out_network) {
-  struct CMPAndroidBackend *backend;
-
-  if (env == NULL || out_network == NULL) {
-    return CMP_ERR_INVALID_ARGUMENT;
-  }
-
-  backend = (struct CMPAndroidBackend *)env;
-  if (backend->null_env.vtable == NULL ||
-      backend->null_env.vtable->get_network == NULL) {
-    return CMP_ERR_STATE;
-  }
-  return backend->null_env.vtable->get_network(backend->null_env.ctx,
-                                               out_network);
-}
-
 static int cmp_android_env_get_tasks(void *env, CMPTasks *out_tasks) {
   struct CMPAndroidBackend *backend;
 
@@ -1082,11 +1066,10 @@ static int cmp_android_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
 }
 
 static const CMPEnvVTable g_cmp_android_env_vtable = {
-    cmp_android_env_get_io,      cmp_android_env_get_sensors,
-    cmp_android_env_get_camera,  cmp_android_env_get_image,
-    cmp_android_env_get_video,   cmp_android_env_get_audio,
-    cmp_android_env_get_network, cmp_android_env_get_tasks,
-    cmp_android_env_get_time_ms};
+    cmp_android_env_get_io,     cmp_android_env_get_sensors,
+    cmp_android_env_get_camera, cmp_android_env_get_image,
+    cmp_android_env_get_video,  cmp_android_env_get_audio,
+    cmp_android_env_get_tasks,  cmp_android_env_get_time_ms};
 
 int CMP_CALL cmp_android_backend_create(const CMPAndroidBackendConfig *config,
                                         CMPAndroidBackend **out_backend) {
