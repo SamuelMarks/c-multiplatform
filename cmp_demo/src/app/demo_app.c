@@ -60,8 +60,8 @@ struct DemoApp {
   CMPTextField tf_user;
   CMPTextField tf_pass;
   M3Button btn_login;
-  M3Snackbar login_snackbar; // Error message
-  // Layout Nodes
+  M3Snackbar login_snackbar; /* Error message */
+  /* Layout Nodes */
   CMPLayoutNode l_root;
   CMPLayoutNode l_card;
   CMPLayoutNode l_tf_user;
@@ -75,14 +75,14 @@ struct DemoApp {
   M3AppBar show_app_bar;
   CMPListView show_list;
   M3Button fab;
-  // Recycled widgets for list
+  /* Recycled widgets for list */
   M3Card r_card;
   M3Switch r_switch;
   M3Checkbox r_check;
   M3Slider r_slider;
   M3LinearProgress r_progress;
   M3Chip r_chip;
-  // Data State
+  /* Data State */
   CMPBool val_sw;
   CMPBool val_chk;
   CMPScalar val_slider;
@@ -93,7 +93,7 @@ struct DemoApp {
   M3Card det_card;
   M3Button btn_back;
   M3Button btn_action;
-  // Layout Nodes
+  /* Layout Nodes */
   CMPLayoutNode l_det_root;
   CMPLayoutNode l_det_card;
   CMPLayoutNode l_det_back;
@@ -329,13 +329,13 @@ int demo_app_init_resources(DemoApp *app, CMPGfx *gfx, CMPEnv *env) {
   m3_snackbar_init(&app->login_snackbar, &app->text_backend, &app->s_snackbar,
                    "", 0);
 
-  // Login Layout
+  /* Login Layout */
   CMPLayoutStyle s_col;
   cmp_layout_style_init(&s_col);
   s_col.direction = CMP_LAYOUT_DIRECTION_COLUMN;
   s_col.align_cross = CMP_LAYOUT_ALIGN_STRETCH;
 
-  // Root centers the card
+  /* Root centers the card */
   CMPLayoutStyle s_root = s_col;
   s_root.align_main = CMP_LAYOUT_ALIGN_CENTER;
   s_root.align_cross = CMP_LAYOUT_ALIGN_CENTER;
@@ -343,10 +343,10 @@ int demo_app_init_resources(DemoApp *app, CMPGfx *gfx, CMPEnv *env) {
   s_root.height = CMP_LAYOUT_AUTO;
   cmp_layout_node_init(&app->l_root, &s_root);
 
-  // Card contains inputs
+  /* Card contains inputs */
   CMPLayoutStyle s_card = s_col;
   s_card.padding = (CMPLayoutEdges){24, 24, 24, 24};
-  s_card.width = 340; // Increased width for better hit targets
+  s_card.width = 340; /* Increased width for better hit targets */
   s_card.height = CMP_LAYOUT_AUTO;
   cmp_layout_node_init(&app->l_card, &s_card);
 
@@ -398,7 +398,7 @@ int demo_app_init_resources(DemoApp *app, CMPGfx *gfx, CMPEnv *env) {
       &app->show_scaffold, &scaf_style, (CMPWidget *)&app->show_list,
       (CMPWidget *)&app->show_app_bar, NULL, (CMPWidget *)&app->fab, NULL);
 
-  // Initialize recycled widgets
+  /* Initialize recycled widgets */
   m3_card_init(&app->r_card, &app->s_card);
   m3_card_set_on_click(&app->r_card, on_list_card_click, app);
   m3_switch_init(&app->r_switch, &app->s_switch, CMP_FALSE);
@@ -427,7 +427,7 @@ int demo_app_init_resources(DemoApp *app, CMPGfx *gfx, CMPEnv *env) {
   m3_scaffold_init(&app->det_scaffold, &dscaf_style, NULL,
                    (CMPWidget *)&app->det_bar, NULL, NULL, NULL);
 
-  // Detail Layout inside body rect
+  /* Detail Layout inside body rect */
   CMPLayoutStyle s_det_center = s_root;
   cmp_layout_node_init(&app->l_det_root, &s_det_center);
 
@@ -549,7 +549,7 @@ int demo_app_handle_event(DemoApp *app, const CMPInputEvent *evt,
         }
       }
 
-      // Handle focus on Click
+      /* Handle focus on Click */
       if (h && evt->type == CMP_INPUT_POINTER_DOWN) {
         CMPWidget *prev = NULL;
         cmp_event_dispatcher_get_focus(&app->dispatcher, &prev);
@@ -606,7 +606,7 @@ int demo_app_render(DemoApp *app, CMPGfx *gfx, CMPHandle window, int width,
   cmp_render_list_reset(&app->render_list);
   gfx->vtable->begin_frame(gfx->ctx, window, width, height, (CMPScalar)dpi);
 
-  // Draw Material Surface Background
+  /* Draw Material Surface Background */
   gfx->vtable->clear(gfx->ctx, (CMPColor){0.98f, 0.98f, 0.98f, 1.0f});
 
   CMPRect screen_rect = {0, 0, (float)width, (float)height};
@@ -618,11 +618,11 @@ int demo_app_render(DemoApp *app, CMPGfx *gfx, CMPHandle window, int width,
 
     cmp_layout_compute(&app->l_root, &app->layout_dir, ws, hs);
 
-    // Manually traverse and paint based on layout result
-    // Note: Assuming cmp_layout returns absolute coordinates logic implies
-    // we do NOT add the parent offset manually if the engine recursively
-    // propagated it. Based on user feedback ("inputs separate from card...
-    // bottom left away"), previous manual addition was incorrect.
+    /* Manually traverse and paint based on layout result */
+    /* Note: Assuming cmp_layout returns absolute coordinates logic implies */
+    /* we do NOT add the parent offset manually if the engine recursively */
+    /* propagated it. Based on user feedback ("inputs separate from card... */
+    /* bottom left away"), previous manual addition was incorrect. */
 
     CMPRect r_card;
     cmp_layout_node_get_layout(&app->l_card, &r_card);
@@ -650,14 +650,14 @@ int demo_app_render(DemoApp *app, CMPGfx *gfx, CMPHandle window, int width,
     app->show_scaffold.widget.vtable->layout(&app->show_scaffold, screen_rect);
     app->show_scaffold.widget.vtable->paint(&app->show_scaffold, &pctx);
   } else if (app->current_screen == SCR_DETAIL) {
-    // 1. Paint Scaffold (Bar)
+    /* 1. Paint Scaffold (Bar) */
     app->det_scaffold.widget.vtable->measure(
         &app->det_scaffold, (CMPMeasureSpec){CMP_MEASURE_EXACTLY, (float)width},
         (CMPMeasureSpec){CMP_MEASURE_EXACTLY, (float)height}, NULL);
     app->det_scaffold.widget.vtable->layout(&app->det_scaffold, screen_rect);
     app->det_scaffold.widget.vtable->paint(&app->det_scaffold, &pctx);
 
-    // 2. Paint Content (Manually, using scaffold safe area as offset)
+    /* 2. Paint Content (Manually, using scaffold safe area as offset) */
     CMPRect body = app->det_scaffold.body_bounds;
     CMPLayoutMeasureSpec ws = {CMP_LAYOUT_MEASURE_EXACTLY, body.width};
     CMPLayoutMeasureSpec hs = {CMP_LAYOUT_MEASURE_EXACTLY, body.height};
@@ -671,14 +671,14 @@ int demo_app_render(DemoApp *app, CMPGfx *gfx, CMPHandle window, int width,
     app->det_card.widget.vtable->layout(&app->det_card, r);
     app->det_card.widget.vtable->paint(&app->det_card, &pctx);
 
-    // Map button positions relative to card layout logic if needed
-    // (Assuming detail uses standard absolute flow here too now)
+    /* Map button positions relative to card layout logic if needed */
+    /* (Assuming detail uses standard absolute flow here too now) */
     CMPRect r_btn;
 
     cmp_layout_node_get_layout(&app->l_det_back, &r_btn);
-    // Detail screen manual layout was relative to card body logic previously?
-    // If we assume same engine, we trust absolute coords, but we must add
-    // SCAFFOLD body offset
+    /* Detail screen manual layout was relative to card body logic previously? */
+    /* If we assume same engine, we trust absolute coords, but we must add */
+    /* SCAFFOLD body offset */
     r_btn.x += body.x;
     r_btn.y += body.y;
     app->btn_back.widget.vtable->layout(&app->btn_back, r_btn);
@@ -691,7 +691,7 @@ int demo_app_render(DemoApp *app, CMPGfx *gfx, CMPHandle window, int width,
     app->btn_action.widget.vtable->paint(&app->btn_action, &pctx);
   }
 
-  // Flush to GPU
+  /* Flush to GPU */
   cmp_render_list_execute(&app->render_list, gfx);
   gfx->vtable->end_frame(gfx->ctx, window);
   return CMP_OK;

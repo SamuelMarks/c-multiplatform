@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
       if (!has)
         break;
       if (evt.type == CMP_INPUT_WINDOW_CLOSE) {
-        // Handle close logic
+        /* Handle close logic */
       }
       CMPBool h;
       demo_app_handle_event(app, &evt, &h);

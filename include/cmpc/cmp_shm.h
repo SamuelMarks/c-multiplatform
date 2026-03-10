@@ -42,7 +42,7 @@ CMP_API int CMP_CALL cmp_shm_open(const char *name, cmp_usize size,
  * @param shm The shared memory handle.
  * @return Pointer to the mapped memory, or NULL on error.
  */
-CMP_API void *CMP_CALL cmp_shm_get_ptr(CMPSharedMemory *shm);
+CMP_API int CMP_CALL cmp_shm_get_ptr(CMPSharedMemory *shm, void **out_ptr);
 
 /**
  * @brief Close the shared memory handle (unmap it from this process).

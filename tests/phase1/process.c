@@ -39,7 +39,8 @@ int test_process(void) {
 
   rc = cmp_process_spawn(&alloc, &config, &proc);
   if (rc == CMP_OK) {
-    CMPIPCChannel *ipc = cmp_process_get_ipc(proc);
+    CMPIPCChannel *ipc = NULL;
+    cmp_process_get_ipc(proc, &ipc);
     CMPMessage msg;
     CMPMessage rmsg;
 

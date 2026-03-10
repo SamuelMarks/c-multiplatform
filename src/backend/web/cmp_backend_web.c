@@ -2743,17 +2743,17 @@ EM_JS(void, cmp_web_apply_backdrop_js,
         if (!canvas)
           return;
 
-        // Fluent 2 Backdrop Mappings
-        if (backdrop_type == = 1 || backdrop_type == = 2) { // MICA or MICA_ALT
-          // Apply Mica-like subtle tint
-          document.body.style.backgroundColor = "#f3f3f3"; // light default
+        /* Fluent 2 Backdrop Mappings */
+        if (backdrop_type === 1 || backdrop_type === 2) { /* MICA or MICA_ALT */
+          /* Apply Mica-like subtle tint */
+          document.body.style.backgroundColor = "#f3f3f3"; /* light default */
           if (window.matchMedia &&
               window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.body.style.backgroundColor = "#202020";
           }
           canvas.style.backgroundColor = "transparent";
-        } else if (backdrop_type == = 3) { // ACRYLIC
-          // Apply Acrylic CSS blur
+        } else if (backdrop_type === 3) { /* ACRYLIC */
+          /* Apply Acrylic CSS blur */
           canvas.style.backdropFilter = "blur(30px) saturate(125%)";
           canvas.style.webkitBackdropFilter = "blur(30px) saturate(125%)";
           canvas.style.backgroundColor = "rgba(255, 255, 255, 0.7)";

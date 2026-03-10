@@ -216,18 +216,18 @@ CMP_API int CMP_CALL cmp_actor_spawn(CMPMessageBus *bus,
   return CMP_OK;
 }
 
-CMP_API void *CMP_CALL cmp_actor_get_context(CMPActor *actor) {
-  if (actor == NULL) {
-    return NULL;
-  }
-  return actor->ctx;
+CMP_API int CMP_CALL cmp_actor_get_context(CMPActor *actor, void **out_context) {
+  if (!out_context) return 1;
+  if (actor == NULL) { return 1; }
+  *out_context = actor->ctx;
+  return 0;
 }
 
-CMP_API CMPActorState CMP_CALL cmp_actor_get_state(CMPActor *actor) {
-  if (actor == NULL) {
-    return CMP_ACTOR_STATE_STOPPED;
-  }
-  return actor->state;
+CMP_API int CMP_CALL cmp_actor_get_state(CMPActor *actor, CMPActorState *out_state) {
+  if (!out_state) return 1;
+  if (actor == NULL) { return 1; }
+  *out_state = actor->state;
+  return 0;
 }
 
 CMP_API int CMP_CALL cmp_actor_destroy(CMPMessageBus *bus, CMPActor *actor) {

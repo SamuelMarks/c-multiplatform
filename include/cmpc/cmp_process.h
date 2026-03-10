@@ -75,7 +75,7 @@ CMP_API int CMP_CALL cmp_process_destroy(CMPAllocator *alloc,
  * @param process The process handle.
  * @return IPC channel handle, or NULL if none established.
  */
-CMP_API CMPIPCChannel *CMP_CALL cmp_process_get_ipc(CMPProcess *process);
+CMP_API int CMP_CALL cmp_process_get_ipc(CMPProcess *process, CMPIPCChannel **out_channel);
 
 /**
  * @brief Send a message over an IPC channel.

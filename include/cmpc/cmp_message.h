@@ -170,14 +170,14 @@ CMP_API int CMP_CALL cmp_actor_spawn(CMPMessageBus *bus,
  * @param actor The actor.
  * @return Pointer to the context, or NULL.
  */
-CMP_API void *CMP_CALL cmp_actor_get_context(CMPActor *actor);
+CMP_API int CMP_CALL cmp_actor_get_context(CMPActor *actor, void **out_context);
 
 /**
  * @brief Get the current state of the actor.
  * @param actor The actor.
  * @return The state of the actor.
  */
-CMP_API CMPActorState CMP_CALL cmp_actor_get_state(CMPActor *actor);
+CMP_API int CMP_CALL cmp_actor_get_state(CMPActor *actor, CMPActorState *out_state);
 
 /**
  * @brief Destroy an actor and unregister it from the bus.

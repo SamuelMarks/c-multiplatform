@@ -147,11 +147,11 @@ CMP_API int CMP_CALL cmp_shm_open(const char *name, cmp_usize size,
   return CMP_OK;
 }
 
-CMP_API void *CMP_CALL cmp_shm_get_ptr(CMPSharedMemory *shm) {
-  if (shm == NULL) {
-    return NULL;
-  }
-  return shm->ptr;
+CMP_API int CMP_CALL cmp_shm_get_ptr(CMPSharedMemory *shm, void **out_ptr) {
+  if (!out_ptr) return 1;
+  if (shm == NULL) { return 1; }
+  *out_ptr = shm->ptr;
+  return 0;
 }
 
 CMP_API int CMP_CALL cmp_shm_close(CMPSharedMemory *shm) {

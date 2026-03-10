@@ -6,10 +6,10 @@
 
 /* --- Helpers for Color --- */
 
-// Helper to extract color components from CMPColor struct
+/* Helper to extract color components from CMPColor struct */
 static void get_cg_color_components(CMPColor c, CGFloat *r, CGFloat *g, CGFloat *b, CGFloat *a) {
-    // Fix: Access struct members directly as floats or bytes depending on definition.
-    // Assuming standard { uint8_t r, g, b, a; } based on build error context.
+    /* Fix: Access struct members directly as floats or bytes depending on definition. */
+    /* Assuming standard { uint8_t r, g, b, a; } based on build error context. */
     *r = (CGFloat)c.r / 255.0f;
     *g = (CGFloat)c.g / 255.0f;
     *b = (CGFloat)c.b / 255.0f;
@@ -20,17 +20,17 @@ static void get_cg_color_components(CMPColor c, CGFloat *r, CGFloat *g, CGFloat 
 
 struct CMPCocoaBackend {
     CMPAllocator allocator;
-    NSObject *lock; // Used for @synchronized
+    NSObject *lock; /* Used for @synchronized */
 
-    // Window System State
-    // Typed as generic NSMutableArray to store NSWindow* or NSNull*
+    /* Window System State */
+    /* Typed as generic NSMutableArray to store NSWindow* or NSNull* */
     NSMutableArray *windows;
 
-    // GFX State
-    NSGraphicsContext *currentContext; // Set between begin/end frame
+    /* GFX State */
+    NSGraphicsContext *currentContext; /* Set between begin/end frame */
     CGContextRef cgContext;
 
-    // Time State
+    /* Time State */
     NSTimeInterval startTime;
 };
 
@@ -73,11 +73,11 @@ static int ws_create_window(void *ctx, const CMPWSWindowConfig *config, CMPHandl
         }
         [win center];
 
-        // Ensure the window has a valid content view for drawing
+        /* Ensure the window has a valid content view for drawing */
         NSView *contentView = [[NSView alloc] initWithFrame:frame];
         [win setContentView:contentView];
 
-        // Apply macOS Visual Effect Materials if requested by CMP_WS_BACKDROP_*
+        /* Apply macOS Visual Effect Materials if requested by CMP_WS_BACKDROP_* */
         if (config->backdrop_type != CMP_WS_BACKDROP_NONE) {
             NSVisualEffectView *effectView = [[NSVisualEffectView alloc] initWithFrame:frame];
             effectView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
@@ -415,7 +415,7 @@ static int gfx_begin_frame(void *ctx, CMPHandle w, int width, int height, float 
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            // Immediate mode lock for legacy C-style drawing
+            /* Immediate mode lock for legacy C-style drawing */
             [view lockFocus];
 #pragma clang diagnostic pop
 
@@ -423,7 +423,7 @@ static int gfx_begin_frame(void *ctx, CMPHandle w, int width, int height, float 
             backend->cgContext = [backend->currentContext CGContext];
 
             CGContextSaveGState(backend->cgContext);
-            // Flip Y for standard 2D coords
+            /* Flip Y for standard 2D coords */
             CGContextTranslateCTM(backend->cgContext, 0, [view bounds].size.height);
             CGContextScaleCTM(backend->cgContext, 1.0, -1.0);
             return CMP_OK;
@@ -475,11 +475,11 @@ static int gfx_draw_rect(void *ctx, const CMPRect *r, CMPColor c, float rad) {
     get_cg_color_components(c, &red, &green, &blue, &alpha);
     CGContextSetRGBFillColor(backend->cgContext, red, green, blue, alpha);
 
-    // FIX: access via width/height
+    /* FIX: access via width/height */
     CGRect cgRect = CGRectMake(r->x, r->y, r->width, r->height);
 
     if (rad > 0.0f) {
-        // FIX: Use NSBezierPath (AppKit) instead of UIBezierPath (UIKit)
+        /* FIX: Use NSBezierPath (AppKit) instead of UIBezierPath (UIKit) */
         NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:cgRect xRadius:rad yRadius:rad];
         [path fill];
     } else {
@@ -514,7 +514,7 @@ static int gfx_push_clip(void *ctx, const CMPRect *r) {
     CMPCocoaBackend *b = (CMPCocoaBackend*)ctx;
     if(!b->cgContext) return CMP_ERR_INVALID_ARGUMENT;
     CGContextSaveGState(b->cgContext);
-    // FIX: width/height
+    /* FIX: width/height */
     CGRect clip = CGRectMake(r->x, r->y, r->width, r->height);
     CGContextClipToRect(b->cgContext, clip);
     return CMP_OK;
@@ -659,7 +659,7 @@ int cmp_cocoa_backend_create(const CMPCocoaBackendConfig *config, CMPCocoaBacken
 
     be->lock = [[NSObject alloc] init];
     be->windows = [[NSMutableArray alloc] init];
-    // Placeholder objects to keep indices 0 valid if needed
+    /* Placeholder objects to keep indices 0 valid if needed */
     [be->windows addObject:[NSNull null]];
 
     *out_backend = be;

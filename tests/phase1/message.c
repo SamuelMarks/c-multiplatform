@@ -63,6 +63,8 @@ int test_message_bus(void) {
   fail_allocator.free = fake_free;
 
   CMPMessageBus *bus = NULL;
+  void *ctx_ptr = NULL;
+  CMPActorState st;
   CMPMessageBusConfig config = {.max_subscribers = 2};
   CMPMessageBusConfig no_limit_config = {.max_subscribers = 0};
 
@@ -167,13 +169,15 @@ int test_message_bus(void) {
   CMP_TEST_EXPECT(cmp_actor_spawn(bus, &a_cfg, NULL), CMP_ERR_INVALID_ARGUMENT);
 
   /* Test actor getters with NULL */
-  CMP_TEST_EXPECT(cmp_actor_get_context(NULL) == NULL, 1);
-  CMP_TEST_EXPECT(cmp_actor_get_state(NULL), CMP_ACTOR_STATE_STOPPED);
+  CMP_TEST_EXPECT(cmp_actor_get_context(NULL, &ctx_ptr) != 0, 1);
+  CMP_TEST_EXPECT(cmp_actor_get_state(NULL, &st) != 0, 1);
 
   /* Spawn actor */
   CMP_TEST_OK(cmp_actor_spawn(bus, &a_cfg, &actor));
-  CMP_TEST_EXPECT(cmp_actor_get_context(actor) == (void *)123, 1);
-  CMP_TEST_EXPECT(cmp_actor_get_state(actor), CMP_ACTOR_STATE_RUNNING);
+  CMP_TEST_EXPECT(cmp_actor_get_context(actor, &ctx_ptr) == 0, 1);
+  CMP_TEST_EXPECT(ctx_ptr == (void *)123, 1);
+  CMP_TEST_EXPECT(cmp_actor_get_state(actor, &st) == 0, 1);
+  CMP_TEST_EXPECT(st, CMP_ACTOR_STATE_RUNNING);
 
   /* Publish to actor */
   test_handler_called = 0;
@@ -187,7 +191,8 @@ int test_message_bus(void) {
                           .type = 999,
                           .sender = NULL};
   CMP_TEST_OK(cmp_message_bus_publish(bus, &crash_msg));
-  CMP_TEST_EXPECT(cmp_actor_get_state(actor), CMP_ACTOR_STATE_RUNNING);
+  CMP_TEST_EXPECT(cmp_actor_get_state(actor, &st) == 0, 1);
+  CMP_TEST_EXPECT(st, CMP_ACTOR_STATE_RUNNING);
 
   /* Test invalid actor destroy */
   CMP_TEST_EXPECT(cmp_actor_destroy(NULL, actor), CMP_ERR_INVALID_ARGUMENT);
@@ -205,7 +210,8 @@ int test_message_bus(void) {
   a_cfg.restart_on_crash = 0;
   CMP_TEST_OK(cmp_actor_spawn(bus, &a_cfg, &actor));
   CMP_TEST_OK(cmp_message_bus_publish(bus, &crash_msg));
-  CMP_TEST_EXPECT(cmp_actor_get_state(actor), CMP_ACTOR_STATE_CRASHED);
+  CMP_TEST_EXPECT(cmp_actor_get_state(actor, &st) == 0, 1);
+  CMP_TEST_EXPECT(st, CMP_ACTOR_STATE_CRASHED);
 
   /* Message should be ignored if not running */
   test_handler_called = 0;

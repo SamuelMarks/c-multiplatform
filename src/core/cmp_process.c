@@ -324,11 +324,11 @@ CMP_API int CMP_CALL cmp_process_destroy(CMPAllocator *alloc,
   return CMP_OK;
 }
 
-CMP_API CMPIPCChannel *CMP_CALL cmp_process_get_ipc(CMPProcess *process) {
-  if (process == NULL) {
-    return NULL;
-  }
-  return process->ipc;
+CMP_API int CMP_CALL cmp_process_get_ipc(CMPProcess *process, CMPIPCChannel **out_channel) {
+  if (!out_channel) return 1;
+  if (process == NULL) { return 1; }
+  *out_channel = process->ipc;
+  return 0;
 }
 
 CMP_API int CMP_CALL cmp_ipc_send(CMPIPCChannel *channel,

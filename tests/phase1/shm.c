@@ -7,6 +7,7 @@ extern int CMP_CALL cmp_core_test_set_default_allocator_fail(CMPBool fail);
 int test_shm(void) {
   CMPSharedMemory *shm = NULL;
   CMPSharedMemory *shm_open = NULL;
+  void *pn = NULL;
 
   /* Test invalid args for create */
   CMP_TEST_EXPECT(cmp_shm_create(NULL, 1024, &shm), CMP_ERR_INVALID_ARGUMENT);
@@ -38,12 +39,16 @@ int test_shm(void) {
   int rc = cmp_shm_create("/test_shm_cmp_xyz123", 1024, &shm);
   CMP_TEST_EXPECT(rc, CMP_OK);
   if (rc == CMP_OK) {
-    CMP_TEST_EXPECT(cmp_shm_get_ptr(shm) != NULL, 1);
+    void *p = NULL;
+    cmp_shm_get_ptr(shm, &p);
+    CMP_TEST_EXPECT(p != NULL, 1);
 
     /* Open existing */
     CMP_TEST_OK(cmp_shm_open("/test_shm_cmp_xyz123", 1024, &shm_open));
     if (shm_open) {
-      CMP_TEST_EXPECT(cmp_shm_get_ptr(shm_open) != NULL, 1);
+      void *po = NULL;
+      cmp_shm_get_ptr(shm_open, &po);
+      CMP_TEST_EXPECT(po != NULL, 1);
 
       /* Test close with failing allocator fallback handling (though impossible
        * to hit normally unless customized) */
@@ -60,7 +65,7 @@ int test_shm(void) {
 
   /* Test invalid args for close and get_ptr */
   CMP_TEST_EXPECT(cmp_shm_close(NULL), CMP_ERR_INVALID_ARGUMENT);
-  CMP_TEST_EXPECT(cmp_shm_get_ptr(NULL) == NULL, 1);
+  CMP_TEST_EXPECT(cmp_shm_get_ptr(NULL, &pn) != 0, 1);
 
   /* Test invalid args for unlink */
   CMP_TEST_EXPECT(cmp_shm_unlink(NULL), CMP_ERR_INVALID_ARGUMENT);
