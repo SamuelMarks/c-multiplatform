@@ -96,7 +96,7 @@ static void cmp_win32_apply_backdrop(HWND hwnd, cmp_u32 backdrop_type) {
     return;
   }
 
-  set_attr = (DwmSetWindowAttribute_t)(void *)GetProcAddress(
+  set_attr = (DwmSetWindowAttribute_t)(void (*)(void))GetProcAddress(
       dwmapi, "DwmSetWindowAttribute");
   if (!set_attr) {
     FreeLibrary(dwmapi);
@@ -614,7 +614,8 @@ cmp_win32_backend_init_alpha_blend(struct CMPWin32Backend *backend) {
     return;
   }
 
-  fn = (CMPWin32AlphaBlendFn)GetProcAddress(module, "AlphaBlend");
+  fn = (CMPWin32AlphaBlendFn)(void (*)(void))GetProcAddress(module,
+                                                            "AlphaBlend");
 
   if (fn == NULL) {
 
@@ -2694,8 +2695,8 @@ static int cmp_win32_ws_get_system_color(void *ws, cmp_u32 color_type,
   if (color_type == CMP_SYSTEM_COLOR_ACCENT) {
     dwm = LoadLibraryA("dwmapi.dll");
     if (dwm) {
-      pfnDwmGetColorizationColor = (DwmGetColorizationColor_t)GetProcAddress(
-          dwm, "DwmGetColorizationColor");
+      pfnDwmGetColorizationColor = (DwmGetColorizationColor_t)(void (*)(
+          void))GetProcAddress(dwm, "DwmGetColorizationColor");
       if (pfnDwmGetColorizationColor &&
           pfnDwmGetColorizationColor(&color, &opaque) == S_OK) {
         *out_r = (CMPScalar)((color >> 16) & 0xFF) / 255.0f;
