@@ -243,7 +243,7 @@ static int test_env_get_image(void *env, CMPImage *out_image) {
 }
 
 static const CMPEnvVTable g_test_env_vtable = {
-    NULL, NULL, NULL, test_env_get_image, NULL, NULL, NULL, NULL, NULL};
+    NULL, NULL, NULL, test_env_get_image, NULL, NULL, NULL, NULL};
 
 static int test_env_reset(TestEnvState *env_state, TestImageState *image_state,
                           const CMPImageVTable *vtable) {

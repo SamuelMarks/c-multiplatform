@@ -286,7 +286,7 @@ static int test_env_get_video(void *env, CMPVideo *out_video) {
 }
 
 static const CMPEnvVTable g_test_env_vtable = {
-    NULL, NULL, NULL, NULL, test_env_get_video, NULL, NULL, NULL, NULL};
+    NULL, NULL, NULL, NULL, test_env_get_video, NULL, NULL, NULL};
 
 static int test_env_reset(TestEnvState *env_state, TestVideoState *video_state,
                           const CMPVideoVTable *vtable) {

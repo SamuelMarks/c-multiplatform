@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_net.h"
 #include <stdlib.h>
 #include <string.h>
@@ -17,6 +18,7 @@
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0600
 #endif
+#define C_ABSTRACT_HTTP_NO_MULTIPLATFORM_INTEGRATION
 #include <c_abstract_http/c_abstract_http.h>
 
 #if defined(_MSC_VER)
@@ -26,6 +28,7 @@
 #if defined(__GNUC__) || defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
+/* clang-format on */
 
 typedef struct CMPNetFetchCtx {
   CMPEnv *env;

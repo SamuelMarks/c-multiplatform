@@ -24,6 +24,7 @@
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0600
 #endif
+#define C_ABSTRACT_HTTP_NO_MULTIPLATFORM_INTEGRATION
 #define C_ABSTRACT_HTTP_IMPLEMENTATION
 #include <c_abstract_http/c_abstract_http.h>
 /* clang-format on */

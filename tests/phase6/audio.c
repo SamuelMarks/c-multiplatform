@@ -294,7 +294,7 @@ static int test_env_get_audio(void *env, CMPAudio *out_audio) {
 }
 
 static const CMPEnvVTable g_test_env_vtable = {
-    NULL, NULL, NULL, NULL, NULL, test_env_get_audio, NULL, NULL, NULL};
+    NULL, NULL, NULL, NULL, NULL, test_env_get_audio, NULL, NULL};
 
 static int test_env_reset(TestEnvState *env_state, TestAudioState *audio_state,
                           const CMPAudioVTable *vtable) {

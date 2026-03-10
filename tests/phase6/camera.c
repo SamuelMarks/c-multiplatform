@@ -187,10 +187,10 @@ static int test_env_get_camera(void *env, CMPCamera *out_camera) {
 }
 
 static const CMPEnvVTable g_test_env_vtable = {
-    NULL, NULL, test_env_get_camera, NULL, NULL, NULL, NULL, NULL, NULL};
+    NULL, NULL, test_env_get_camera, NULL, NULL, NULL, NULL, NULL};
 
 static const CMPEnvVTable g_test_env_vtable_no_camera = {
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 static int test_env_reset(TestEnvState *env_state,
                           TestCameraState *camera_state,
