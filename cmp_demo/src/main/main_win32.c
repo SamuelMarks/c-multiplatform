@@ -4,6 +4,18 @@
 #include <stddef.h>
 #include <stdio.h>
 
+#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) && \
+    !defined(_ARM_) && !defined(_ARM64_)
+#if defined(_M_AMD64)
+#define _AMD64_
+#elif defined(_M_IX86)
+#define _X86_
+#elif defined(_M_ARM64)
+#define _ARM64_
+#elif defined(_M_ARM)
+#define _ARM_
+#endif
+#endif
 /* clang-format off */
 #include <windef.h>
 #include <winbase.h>
@@ -11,9 +23,9 @@
 /* clang-format on */
 
 #if defined(_MSC_VER)
-#define NUM_FORMAT "%d"
+#define NUM_FORMAT "%I64d"
 #else
-#define NUM_FORMAT "%d"
+#define NUM_FORMAT "%lld"
 #endif
 
 static int demo_printf_err(const char *fmt, ...) {
@@ -62,16 +74,6 @@ void CreateDebugConsole(void) {
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
                    int nCmdShow) {
-  (void)hInstance;
-  (void)hPrev;
-  (void)lpCmdLine;
-  (void)nCmdShow;
-
-  /* 1. Attach Console so we can see why it dies */
-#ifdef _DEBUG
-  CreateDebugConsole();
-#endif
-
   CMPWin32BackendConfig config = {0};
   CMPWin32Backend *backend = NULL;
 
@@ -81,14 +83,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
   CMPEnv env = {0};
 
   CMPHandle window = {0};
-  DemoApp *app = NULL;
   CMPAllocator alloc;
-  int rc;
+  DemoApp *app = NULL;
 
-  /* 3. Initialize Config & Force Defaults */
+  int rc;
+  CMPWSWindowConfig wincfg = {400, 600, "CMPC Demo (Win32)",
+                              CMP_WS_WINDOW_RESIZABLE};
+  int running = 1;
+  CMPInputEvent event;
+  CMPBool has_event;
+  int w, h;
+  CMPBool handled;
+
+  (void)hInstance;
+  (void)hPrev;
+  (void)lpCmdLine;
+  (void)nCmdShow;
+/* 1. Attach Console so we can see why it dies */
+#ifdef _DEBUG
+CreateDebugConsole();
+#endif
+
+/* 3. Initialize Config & Force Defaults */
   rc = cmp_win32_backend_config_init(&config);
   if (rc != CMP_OK) {
-    demo_printf_err("Backend config init failed: " NUM_FORMAT "\n", rc);
+    demo_printf_err("Backend config init failed: " NUM_FORMAT "\n", (long long)rc);
     return 1;
   }
 
@@ -103,7 +122,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
   rc = cmp_win32_backend_create(&config, &backend);
   if (rc != CMP_OK) {
     demo_printf_err(
-        "Failed to create Win32 backend. Error Code: " NUM_FORMAT "\n", rc);
+        "Failed to create Win32 backend. Error Code: " NUM_FORMAT "\n", (long long)rc);
     /* Keep console open for a moment so we can read the error */
     if (IsDebuggerPresent()) {
       demo_printf_out("Press Enter to exit...");
@@ -120,13 +139,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
 
   demo_printf_out("Backend created. Creating window...\n");
 
-  CMPWSWindowConfig wincfg = {400, 600, "CMPC Demo (Win32)",
-                              CMP_WS_WINDOW_RESIZABLE};
-
   /* Access via the struct directly (ws.vtable) */
   rc = ws.vtable->create_window(ws.ctx, &wincfg, &window);
   if (rc != CMP_OK) {
-    demo_printf_err("Failed to create window: " NUM_FORMAT "\n", rc);
+    demo_printf_err("Failed to create window: " NUM_FORMAT "\n", (long long)rc);
     return 1;
   }
 
@@ -138,13 +154,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
   demo_app_create(&alloc, &app);
 
   demo_printf_out("Initializing Resources...\n");
-  // Pass pointers to the stack structs
+  /* Pass pointers to the stack structs */
   demo_app_init_resources(app, &gfx, &env);
 
   demo_printf_out("Running Loop...\n");
-  int running = 1;
-  CMPInputEvent event;
-  CMPBool has_event;
 
   while (running) {
     /* Poll events */
@@ -155,14 +168,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
       if (event.type == CMP_INPUT_WINDOW_CLOSE)
         running = 0;
 
-      CMPBool handled;
       demo_app_handle_event(app, &event, &handled);
     }
 
     /* Update & Render */
     demo_app_update(app, 0.016);
 
-    int w, h;
     ws.vtable->get_window_size(ws.ctx, window, &w, &h);
     demo_app_render(app, &gfx, window, w, h, 1.0f);
 

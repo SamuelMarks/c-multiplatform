@@ -69,7 +69,7 @@ cupertino_mac_toolbar_add_search(CupertinoMacToolbar *toolbar) {
   item = &toolbar->items[toolbar->item_count++];
   memset(item, 0, sizeof(*item));
   item->is_search = CMP_TRUE;
-#if defined(_MSC_VER) && !defined(__clang__)
+#if defined(_MSC_VER)
   strcpy_s(item->title_utf8, sizeof(item->title_utf8), "Search");
 #else
   strcpy(item->title_utf8, "Search");

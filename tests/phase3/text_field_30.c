@@ -627,7 +627,11 @@ int main(void) {
   CMP_TEST_EXPECT(widget->vtable->event(widget, &evt, &out_handled), CMP_OK);
   /* Widget event TEXT insert fail */
   evt.data.text.length = 1;
+#if defined(_MSC_VER)
+  strcpy_s(evt.data.text.utf8, sizeof(evt.data.text.utf8), "x");
+#else
   strcpy(evt.data.text.utf8, "x");
+#endif
   cmp_text_field_test_set_fail_point(7u);
   field.utf8_capacity = 0;
   CMP_TEST_EXPECT(widget->vtable->event(widget, &evt, &out_handled),
@@ -641,7 +645,11 @@ int main(void) {
   /* Widget event TEXT sync_label fail */
   evt.type = CMP_INPUT_TEXT;
   evt.data.text.length = 1;
+#if defined(_MSC_VER)
+  strcpy_s(evt.data.text.utf8, sizeof(evt.data.text.utf8), "y");
+#else
   strcpy(evt.data.text.utf8, "y");
+#endif
   cmp_text_field_test_set_fail_point(22u);
   CMP_TEST_EXPECT(widget->vtable->event(widget, &evt, &out_handled),
                   CMP_ERR_IO);

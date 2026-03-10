@@ -3,10 +3,10 @@
 
 #if defined(_MSC_VER)
 #undef NUM_FORMAT
-#define NUM_FORMAT "%d"
+#define NUM_FORMAT "%I64d"
 #else
 #undef NUM_FORMAT
-#define NUM_FORMAT "%d"
+#define NUM_FORMAT "%lld"
 #endif
 
 #include <stdarg.h>
@@ -88,7 +88,7 @@ static int CMP_CALL svg_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
       "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" NUM_FORMAT "\" "
       "height=\"" NUM_FORMAT "\" viewBox=\"0 0 " NUM_FORMAT " " NUM_FORMAT
       "\">\n",
-      width, height, width, height);
+      (long long)width, (long long)height, (long long)width, (long long)height);
   return CMP_OK;
 }
 
@@ -109,8 +109,8 @@ static void print_color(FILE *f, CMPColor c) {
   int r = (int)(c.r * 255.0f);
   int g = (int)(c.g * 255.0f);
   int b = (int)(c.b * 255.0f);
-  doc_printf_file(f, "rgb(" NUM_FORMAT "," NUM_FORMAT "," NUM_FORMAT ")", r, g,
-                  b);
+  doc_printf_file(f, "rgb(" NUM_FORMAT "," NUM_FORMAT "," NUM_FORMAT ")", (long long)r, (long long)g,
+                  (long long)b);
 }
 
 static float get_alpha(CMPColor c) { return c.a; }

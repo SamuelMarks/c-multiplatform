@@ -109,7 +109,7 @@ CMP_API int CMP_CALL cupertino_date_picker_paint(
 #if defined(NUM_FORMAT)
 /* Just using standard sprintf for basic formatting in this simulation */
 #endif
-#if defined(_MSC_VER) && !defined(__clang__)
+#if defined(_MSC_VER)
     sprintf_s(display_text, sizeof(display_text), "%d:%02d %s", h,
               picker->minute, ampm);
 #else
@@ -124,7 +124,7 @@ CMP_API int CMP_CALL cupertino_date_picker_paint(
     if (m > 11)
       m = 11;
 
-#if defined(_MSC_VER) && !defined(__clang__)
+#if defined(_MSC_VER)
     sprintf_s(display_text, sizeof(display_text), "%s %d, %d", months[m],
               picker->day, picker->year);
 #else

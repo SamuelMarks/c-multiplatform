@@ -3,7 +3,25 @@
 #include "test_utils.h"
 
 #if defined(_WIN32)
-#include <windows.h>
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) && \
+    !defined(_ARM_) && !defined(_ARM64_)
+#if defined(_M_AMD64)
+#define _AMD64_
+#elif defined(_M_IX86)
+#define _X86_
+#elif defined(_M_ARM64)
+#define _ARM64_
+#elif defined(_M_ARM)
+#define _ARM_
+#endif
+#endif
+/* clang-format off */
+#include <windef.h>
+#include <winbase.h>
+/* clang-format on */
 #else
 #include <pthread.h>
 #include <unistd.h>
