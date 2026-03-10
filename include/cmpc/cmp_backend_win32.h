@@ -6,6 +6,7 @@
  * @brief Win32 (GDI) backend for LibCMPC on Windows.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,6 +15,7 @@ extern "C" {
 #include "cmpc/cmp_api_gfx.h"
 #include "cmpc/cmp_api_ws.h"
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /** @brief Opaque Win32 backend instance. */
 typedef struct CMPWin32Backend CMPWin32Backend;

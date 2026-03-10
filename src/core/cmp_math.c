@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_math.h"
 
 #include <math.h>
+/* clang-format on */
 
 static CMPScalar cmp_scalar_max(CMPScalar a, CMPScalar b) {
   return (a > b) ? a : b;

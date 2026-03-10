@@ -1,8 +1,10 @@
+/* clang-format off */
 #include "cmpc/cmp_log.h"
 #include "test_utils.h"
 
 #include <stdio.h>
 #include <string.h>
+/* clang-format on */
 
 typedef struct TestSinkState {
   int calls;

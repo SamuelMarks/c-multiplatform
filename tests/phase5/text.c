@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_text.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 typedef struct TestTextBackend {
   int create_calls;

@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_badge.h"
 #include "cmpc/cmp_core.h"
 #include <string.h>
+/* clang-format on */
 
 static int m3_badge_measure(void *widget, CMPMeasureSpec width,
                             CMPMeasureSpec height, CMPSize *out_size);

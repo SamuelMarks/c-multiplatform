@@ -6,11 +6,13 @@
  * @brief Color science helpers (HCT, palettes, schemes) for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_math.h"
+/* clang-format on */
 
 /**
  * @brief Hue-Chroma-Tone color description.

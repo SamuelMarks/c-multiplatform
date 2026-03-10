@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_backend_android.h"
 
 #include <string.h>
@@ -21,6 +22,7 @@
 #define CMP_ANDROID_CAMERA2_AVAILABLE 0
 #endif
 #endif
+/* clang-format on */
 
 #define CMP_ANDROID_RETURN_IF_ERROR(rc)                                        \
   do {                                                                         \

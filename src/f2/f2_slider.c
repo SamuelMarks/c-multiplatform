@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "f2/f2_slider.h"
 #include "cmpc/cmp_core.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL f2_slider_style_init(F2SliderStyle *style) {
   if (!style) {

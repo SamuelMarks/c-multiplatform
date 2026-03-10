@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_backend_cocoa.h"
 
 #include <string.h>
+/* clang-format on */
 
 #define CMP_COCOA_RETURN_IF_ERROR(rc)                                          \
   do {                                                                         \

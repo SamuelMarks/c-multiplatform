@@ -7,12 +7,14 @@
  * @brief Chip widgets for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_text.h"
 #include "cmpc/cmp_visuals.h"
+/* clang-format on */
 
 /** @brief Assist chip variant. */
 #define M3_CHIP_VARIANT_ASSIST 1

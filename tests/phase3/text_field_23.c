@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_text_field.h"
 #include "test_utils.h"
 #include <string.h>
+/* clang-format on */
 
 int main(void) {
   CMP_TEST_EXPECT(cmp_text_field_test_validate_backend(NULL),

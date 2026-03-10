@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "m3/m3_selection.h"
 #include "test_utils.h"
 
@@ -11,6 +12,7 @@
 #define M3_SELECTION_TEST_FAIL_RADIO_DOT_RADIUS_NEGATIVE 5u
 #define M3_SELECTION_TEST_FAIL_RADIO_INNER_CORNER_NEGATIVE 6u
 #endif
+/* clang-format on */
 
 typedef struct TestSelectionBackend {
   int draw_rect_calls;

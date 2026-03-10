@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_segmented_control.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_segmented_control_init(
     CupertinoSegmentedControl *control, const CMPTextBackend *text_backend) {

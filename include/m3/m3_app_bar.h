@@ -6,6 +6,7 @@
  * @brief Top app bar widgets for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,6 +16,7 @@ extern "C" {
 #include "cmpc/cmp_scroll.h"
 #include "cmpc/cmp_text.h"
 #include "cmpc/cmp_visuals.h"
+/* clang-format on */
 
 /** @brief Small top app bar variant. */
 #define M3_APP_BAR_VARIANT_SMALL 1

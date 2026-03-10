@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_storage.h"
 
 #include <string.h>
+/* clang-format on */
 
 #define CMP_STORAGE_MAGIC_0 'M'
 #define CMP_STORAGE_MAGIC_1 '3'

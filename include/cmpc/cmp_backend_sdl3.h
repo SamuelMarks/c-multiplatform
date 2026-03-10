@@ -10,6 +10,7 @@
  *       path to a .ttf font file.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,6 +19,7 @@ extern "C" {
 #include "cmpc/cmp_api_gfx.h"
 #include "cmpc/cmp_api_ws.h"
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /** @brief SDL3 renderer uses hardware acceleration. */
 #define CMP_SDL3_RENDERER_ACCELERATED 0x01

@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_visuals.h"
 
 #include <math.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 #define CMP_VISUALS_TEST_FAIL_NONE 0u

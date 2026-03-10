@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_activity_indicator.h"
 #include "cupertino/cupertino_color.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL
 cupertino_activity_indicator_init(CupertinoActivityIndicator *indicator) {

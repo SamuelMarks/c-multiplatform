@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_backend_gtk4.h"
 
 #include "cmpc/cmp_log.h"
@@ -30,6 +31,7 @@
 #else
 #define CMP_GTK4_V4L2_AVAILABLE 0
 #endif
+/* clang-format on */
 
 #define CMP_GTK4_RETURN_IF_ERROR(rc)                                           \
                                                                                \

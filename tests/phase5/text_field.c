@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 #include "m3/m3_text_field.h"
 #include "test_utils.h"
 #include <string.h>
+/* clang-format on */
 
 static int test_on_change(void *ctx, M3TextField *field, const char *text) {
   int *called = (int *)ctx;

@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_stepper.h"
 
 #include <string.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 static cmp_u32 g_m3_stepper_test_fail_point = 0u;

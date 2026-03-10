@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_focus_ring.h"
 #include "cupertino/cupertino_color.h"
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_focus_ring_paint(CMPPaintContext *ctx,
                                                 CMPRect bounds,

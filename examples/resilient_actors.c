@@ -19,7 +19,7 @@ typedef struct {
 
 static int CMP_CALL worker_handler(CMPActor *actor, const CMPMessage *msg) {
   WorkerContext *ctx = NULL;
-  cmp_actor_get_context(actor, (void**)&ctx);
+  cmp_actor_get_context(actor, (void **)&ctx);
 
   if (msg->type == MSG_TYPE_CRASH_COMMAND) {
     printf("Worker %d received crash command! Simulating catastrophic "

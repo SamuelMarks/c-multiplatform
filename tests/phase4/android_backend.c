@@ -1,9 +1,11 @@
+/* clang-format off */
 #include "test_utils.h"
 
 #include "cmpc/cmp_backend_android.h"
 #include "cmpc/cmp_predictive.h"
 
 #include <string.h>
+/* clang-format on */
 
 int main(void) {
   CMPAndroidBackendConfig config;

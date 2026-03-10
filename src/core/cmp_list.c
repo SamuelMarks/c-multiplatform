@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_list.h"
 
 #include <string.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 #define CMP_LIST_TEST_FAIL_NONE 0u

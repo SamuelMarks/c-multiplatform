@@ -7,6 +7,7 @@
  * slider).
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,6 +15,7 @@ extern "C" {
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_text.h"
 #include "f2/f2_color.h"
+/* clang-format on */
 
 /** @brief Default Checkbox size. */
 #define F2_CHECKBOX_DEFAULT_SIZE 20.0f

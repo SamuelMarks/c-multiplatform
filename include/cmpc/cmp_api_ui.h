@@ -6,12 +6,14 @@
  * @brief UI widget contract ABI for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_gfx.h"
 #include "cmpc/cmp_api_ws.h"
+/* clang-format on */
 
 /** @brief No measurement constraint. */
 #define CMP_MEASURE_UNSPECIFIED 0

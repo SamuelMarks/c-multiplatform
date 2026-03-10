@@ -6,6 +6,7 @@
  * @brief Microsoft Fluent 2 Avatar widget.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,6 +15,7 @@ extern "C" {
 #include "cmpc/cmp_text.h"
 #include "f2/f2_badge.h"
 #include "f2/f2_color.h"
+/* clang-format on */
 
 /** @brief Default avatar size. */
 #define F2_AVATAR_DEFAULT_SIZE 32.0f

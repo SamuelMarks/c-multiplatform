@@ -6,12 +6,14 @@
  * @brief Multiprocess execution and IPC channels for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_message.h"
+/* clang-format on */
 
 /**
  * @brief Opaque handle for a child process.
@@ -75,7 +77,8 @@ CMP_API int CMP_CALL cmp_process_destroy(CMPAllocator *alloc,
  * @param process The process handle.
  * @return IPC channel handle, or NULL if none established.
  */
-CMP_API int CMP_CALL cmp_process_get_ipc(CMPProcess *process, CMPIPCChannel **out_channel);
+CMP_API int CMP_CALL cmp_process_get_ipc(CMPProcess *process,
+                                         CMPIPCChannel **out_channel);
 
 /**
  * @brief Send a message over an IPC channel.

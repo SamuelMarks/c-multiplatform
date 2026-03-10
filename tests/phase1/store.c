@@ -1,8 +1,10 @@
+/* clang-format off */
 #include "cmpc/cmp_store.h"
 #include "test_utils.h"
 
 #include <stdlib.h>
 #include <string.h>
+/* clang-format on */
 
 typedef struct CounterState {
   int value;

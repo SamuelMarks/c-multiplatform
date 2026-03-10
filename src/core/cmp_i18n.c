@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_i18n.h"
 
 #include <string.h>
@@ -7,6 +8,7 @@
 #include "cmpc/cmp_utf8.h"
 
 #include <string.h>
+/* clang-format on */
 
 #define CMP_I18N_USIZE_MAX ((cmp_usize) ~(cmp_usize)0)
 

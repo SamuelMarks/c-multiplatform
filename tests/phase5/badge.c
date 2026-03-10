@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "m3/m3_badge.h"
 #include "test_utils.h"
+/* clang-format on */
 
 static int g_fail_create_font = 0;
 static int g_fail_font_metrics = 0;

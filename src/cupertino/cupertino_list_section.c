@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_list_section.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_list_section_init(
     CupertinoListSection *section, const CMPTextBackend *text_backend) {

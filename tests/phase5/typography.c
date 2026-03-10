@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_typography.h"
 #include "test_utils.h"
 #include <string.h>
+/* clang-format on */
 
 int main(void) {
   M3TypographyScale scale;

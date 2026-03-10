@@ -1,9 +1,11 @@
+/* clang-format off */
 #include "cmpc/cmp_audio.h"
 #include "cmpc/cmp_core.h"
 #include "test_utils.h"
 
 #include <stdlib.h>
 #include <string.h>
+/* clang-format on */
 
 int CMP_CALL cmp_audio_test_set_read_u16_fail_after(cmp_u32 call_count);
 int CMP_CALL cmp_audio_test_set_read_u32_fail_after(cmp_u32 call_count);

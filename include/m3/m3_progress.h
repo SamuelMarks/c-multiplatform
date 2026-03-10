@@ -6,11 +6,13 @@
  * @brief Progress indicators and slider widgets for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
+/* clang-format on */
 
 /** @brief Default linear progress height in pixels. */
 #define M3_LINEAR_PROGRESS_DEFAULT_HEIGHT 4.0f

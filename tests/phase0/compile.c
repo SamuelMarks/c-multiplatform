@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_anim.h"
 #include "cmpc/cmp_api_env.h"
 #include "cmpc/cmp_api_gfx.h"
@@ -26,6 +27,7 @@
 #include "cmpc/cmp_visuals.h"
 #include "m3/m3_color.h"
 #include "m3/m3_selection.h"
+/* clang-format on */
 
 int main(void) {
   CMPAllocator alloc;

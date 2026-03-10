@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "m3/m3_shape.h"
 #include "test_utils.h"
+/* clang-format on */
 
 static int test_shape_init(void) {
   M3Shape shape;

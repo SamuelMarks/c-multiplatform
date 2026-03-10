@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_list.h"
 #include "test_utils.h"
 #include <string.h>
+/* clang-format on */
 
 static int test_measure(void *widget, CMPMeasureSpec width,
                         CMPMeasureSpec height, CMPSize *out_size) {

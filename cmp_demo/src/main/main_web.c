@@ -44,7 +44,8 @@ int main() {
   cmp_web_backend_get_ws(g_state.backend, &g_state.ws);
   cmp_web_backend_get_gfx(g_state.backend, &g_state.gfx);
 
-  /* We don't usually create a "window" in web the same way, but the abstraction */
+  /* We don't usually create a "window" in web the same way, but the abstraction
+   */
   /* holds */
   CMPWSWindowConfig wincfg = {0, 0, "Web",
                               0}; /* 0,0 lets browser determine canvas size */

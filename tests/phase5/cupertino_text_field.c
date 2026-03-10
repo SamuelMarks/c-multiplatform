@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_text_field.h"
 #include "../phase1/test_utils.h"
 #include <stddef.h>
+/* clang-format on */
 
 static int test_cupertino_text_field(void) {
   CupertinoTextField field;

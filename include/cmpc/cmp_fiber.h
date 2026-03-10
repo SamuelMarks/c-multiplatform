@@ -6,6 +6,7 @@
  * @brief Cooperative greenthreads/fibers for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_api_env.h"
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_fs.h"
+/* clang-format on */
 
 /**
  * @brief Opaque handle for a fiber.

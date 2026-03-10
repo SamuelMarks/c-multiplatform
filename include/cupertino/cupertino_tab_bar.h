@@ -7,6 +7,7 @@
  * capabilities.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,6 +18,7 @@ extern "C" {
 #include "cupertino/cupertino_blur.h"
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
+/* clang-format on */
 
 #define CUPERTINO_TAB_BAR_MAX_ITEMS                                            \
   5 /**< Maximum allowed items in a tab bar                                    \

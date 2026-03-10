@@ -6,12 +6,14 @@
  * @brief Window system abstraction ABI for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_math.h"
 #include "cmpc/cmp_object.h"
+/* clang-format on */
 
 /** @brief Window is resizable by the user. */
 #define CMP_WS_WINDOW_RESIZABLE 0x01

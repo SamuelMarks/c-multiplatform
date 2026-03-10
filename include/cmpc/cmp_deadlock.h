@@ -6,12 +6,14 @@
  * @brief Optional deadlock detection for LibCMPC mutexes.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_sync.h"
+/* clang-format on */
 
 /**
  * @brief Initialize the deadlock detector subsystem.

@@ -6,6 +6,7 @@
  * @brief Apple macOS style Window Control Buttons (Traffic Lights).
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,6 +16,7 @@ extern "C" {
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_math.h"
 #include "cupertino/cupertino_color.h"
+/* clang-format on */
 
 /** @brief Cupertino macOS Traffic Lights Widget */
 typedef struct CupertinoMacTrafficLights {

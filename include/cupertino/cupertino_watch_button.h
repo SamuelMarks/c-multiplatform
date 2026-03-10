@@ -6,6 +6,7 @@
  * @brief Apple watchOS style Full-Width Pill Button.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,6 +18,7 @@ extern "C" {
 #include "cmpc/cmp_text.h"
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
+/* clang-format on */
 
 /** @brief Cupertino watchOS Button Widget */
 typedef struct CupertinoWatchButton {

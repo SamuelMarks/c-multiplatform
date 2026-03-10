@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "m3/m3_app_bar.h"
 #include "test_utils.h"
 
@@ -10,6 +11,7 @@
 #define M3_APP_BAR_TEST_FAIL_COLOR_SET 3u
 #define M3_APP_BAR_TEST_FAIL_SCROLL_INIT 4u
 #endif
+/* clang-format on */
 
 int CMP_CALL m3_app_bar_test_set_fail_point(cmp_u32 fail_point);
 int CMP_CALL m3_app_bar_test_set_color_fail_after(cmp_u32 call_count);

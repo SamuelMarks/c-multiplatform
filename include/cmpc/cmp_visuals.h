@@ -6,12 +6,14 @@
  * @brief Visual primitives (ripple, shadow) for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_anim.h"
 #include "cmpc/cmp_api_gfx.h"
+/* clang-format on */
 
 /** @brief Ripple is idle (not visible). */
 #define CMP_RIPPLE_STATE_IDLE 0

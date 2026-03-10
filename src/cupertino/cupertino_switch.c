@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_switch.h"
 #include "cupertino/cupertino_color.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_switch_init(CupertinoSwitch *switch_inst) {
   if (switch_inst == NULL) {

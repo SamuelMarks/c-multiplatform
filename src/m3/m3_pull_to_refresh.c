@@ -1,9 +1,11 @@
+/* clang-format off */
 #include "m3/m3_pull_to_refresh.h"
 #include "cmpc/cmp_api_gfx.h"
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_icon.h"
 #include "cmpc/cmp_visuals.h"
 #include <string.h>
+/* clang-format on */
 
 static int m3_ptr_pre_scroll(void *ctx, const CMPScrollDelta *delta,
                              CMPScrollDelta *out_consumed) {

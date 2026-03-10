@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_predictive.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 int CMP_CALL cmp_predictive_test_set_event_init_fail(CMPBool enable);
 

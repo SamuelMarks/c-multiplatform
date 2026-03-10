@@ -1,4 +1,6 @@
+/* clang-format off */
 #include "cmpc/cmp_scroll.h"
+/* clang-format on */
 
 static int cmp_scroll_validate_consumed_component(CMPScalar consumed,
                                                   CMPScalar available) {

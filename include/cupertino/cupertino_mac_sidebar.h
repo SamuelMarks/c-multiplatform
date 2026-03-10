@@ -6,6 +6,7 @@
  * @brief Apple macOS style Translucent Sidebar.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,6 +18,7 @@ extern "C" {
 #include "cmpc/cmp_text.h"
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
+/* clang-format on */
 
 /** @brief Maximum number of rows in a macOS sidebar. */
 #define CUPERTINO_MAC_SIDEBAR_MAX_ROWS 32

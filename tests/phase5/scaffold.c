@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_scaffold.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 int CMP_CALL m3_scaffold_test_validate_edges(const CMPLayoutEdges *edges);
 int CMP_CALL m3_scaffold_test_validate_style(const M3ScaffoldStyle *style);

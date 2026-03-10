@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "f2/f2_tooltip.h"
 #include "cmpc/cmp_core.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL f2_tooltip_style_init(F2TooltipStyle *style) {
   if (!style) {

@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_shm.h"
 #include "test_utils.h"
+/* clang-format on */
 
 extern int CMP_CALL cmp_core_test_set_default_allocator_fail(CMPBool fail);
 

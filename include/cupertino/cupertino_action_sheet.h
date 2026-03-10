@@ -6,6 +6,7 @@
  * @brief Apple Cupertino Action Sheet (UIAlertControllerStyleActionSheet).
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -16,6 +17,7 @@ extern "C" {
 #include "cupertino/cupertino_blur.h"
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
+/* clang-format on */
 
 #define CUPERTINO_ACTION_SHEET_MAX_ACTIONS                                     \
   8 /**< Max actions allowed in one sheet */

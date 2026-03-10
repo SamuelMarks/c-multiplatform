@@ -6,12 +6,14 @@
  * @brief Navigation widgets (bar, rail, drawer) for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_layout.h"
 #include "cmpc/cmp_text.h"
+/* clang-format on */
 
 /** @brief Auto-select the navigation mode based on width. */
 #define M3_NAV_MODE_AUTO 0

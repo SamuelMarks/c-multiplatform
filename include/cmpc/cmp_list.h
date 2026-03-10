@@ -6,12 +6,14 @@
  * @brief Virtualized list and grid widgets for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_layout.h"
 #include "cmpc/cmp_render.h"
+/* clang-format on */
 
 /** @brief Vertical list orientation (scroll on Y axis). */
 #define CMP_LIST_ORIENTATION_VERTICAL 0

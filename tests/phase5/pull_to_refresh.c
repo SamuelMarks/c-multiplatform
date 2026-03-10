@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_pull_to_refresh.h"
 #include "test_utils.h"
 #include <string.h>
+/* clang-format on */
 
 static int mock_draw_rect(void *ctx, const CMPRect *rect, CMPColor color,
                           CMPScalar radius) {

@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_time_picker.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 #define CMP_TEST_PI 3.14159265358979323846f
 

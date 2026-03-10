@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_camera.h"
 
 #include <string.h>
@@ -5,6 +6,7 @@
 #ifdef CMP_TESTING
 static CMPBool g_cmp_camera_skip_vtable_check = CMP_FALSE;
 #endif
+/* clang-format on */
 
 #define CMP_CAMERA_VTABLE_HAS_OPEN(vtable)                                     \
   ((vtable)->open != NULL || (vtable)->open_with_config != NULL)

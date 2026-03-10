@@ -6,6 +6,7 @@
  * @brief Material 3 Search Bar and Search View widgets.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_text.h"
 #include "m3_text_field.h"
+/* clang-format on */
 
 /**
  * @brief Material 3 Search Bar style descriptor.

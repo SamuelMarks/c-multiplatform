@@ -9,6 +9,7 @@
  * using compiler intrinsics or Windows Interlocked functions.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -21,6 +22,7 @@ extern "C" {
 #endif
 #include <winsock2.h>
 #endif
+/* clang-format on */
 
 /**
  * @brief Atomically increment a 32-bit integer.

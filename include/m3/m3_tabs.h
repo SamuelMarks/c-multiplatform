@@ -6,6 +6,7 @@
  * @brief Tab row and segmented button widgets for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_anim.h"
 #include "cmpc/cmp_layout.h"
 #include "cmpc/cmp_text.h"
+/* clang-format on */
 
 /** @brief Fixed tab row layout (tabs share available width). */
 #define M3_TAB_MODE_FIXED 1

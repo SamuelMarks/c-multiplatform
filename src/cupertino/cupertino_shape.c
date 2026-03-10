@@ -1,4 +1,6 @@
+/* clang-format off */
 #include "cupertino/cupertino_shape.h"
+/* clang-format on */
 
 /* Squircle bezier control point factor.
    Standard circular is ~0.4477 (i.e., 1.0 - 0.5523).

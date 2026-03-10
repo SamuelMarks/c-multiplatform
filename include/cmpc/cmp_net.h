@@ -6,12 +6,14 @@
  * @brief Asynchronous networking operations for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_env.h"
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /**
  * @brief Network fetch asynchronous callback signature.

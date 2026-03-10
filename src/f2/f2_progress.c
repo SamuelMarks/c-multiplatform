@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "f2/f2_progress.h"
 #include "cmpc/cmp_core.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL
 f2_linear_progress_style_init(F2LinearProgressStyle *style) {

@@ -1,4 +1,10 @@
 /* clang-format off */
+#if !defined(_XOPEN_SOURCE)
+#define _XOPEN_SOURCE 700
+#endif
+#if !defined(_POSIX_C_SOURCE)
+#define _POSIX_C_SOURCE 200809L
+#endif
 #include "cmpc/cmp_process.h"
 
 #include <stdlib.h>
@@ -324,9 +330,13 @@ CMP_API int CMP_CALL cmp_process_destroy(CMPAllocator *alloc,
   return CMP_OK;
 }
 
-CMP_API int CMP_CALL cmp_process_get_ipc(CMPProcess *process, CMPIPCChannel **out_channel) {
-  if (!out_channel) return 1;
-  if (process == NULL) { return 1; }
+CMP_API int CMP_CALL cmp_process_get_ipc(CMPProcess *process,
+                                         CMPIPCChannel **out_channel) {
+  if (!out_channel)
+    return 1;
+  if (process == NULL) {
+    return 1;
+  }
   *out_channel = process->ipc;
   return 0;
 }

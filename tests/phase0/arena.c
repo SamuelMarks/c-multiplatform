@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_arena.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+/* clang-format on */
 
 static void test_arena_basic(void) {
   CMPArena arena;

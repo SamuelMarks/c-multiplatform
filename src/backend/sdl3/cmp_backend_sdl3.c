@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_backend_sdl3.h"
 
 #include "cmpc/cmp_log.h"
@@ -16,6 +17,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #endif
 #endif
+/* clang-format on */
 
 #define CMP_SDL3_RETURN_IF_ERROR(rc)                                           \
   do {                                                                         \

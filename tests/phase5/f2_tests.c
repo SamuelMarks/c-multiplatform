@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 #include "f2/f2_badge.h"
 #include "f2/f2_button.h"
@@ -1009,6 +1010,7 @@ static int test_f2_data_components(void) {
 
 #include "f2/f2_avatar.h"
 #include "f2/f2_message_bar.h"
+/* clang-format on */
 
 static int test_f2_message_bar(void) {
   F2Theme theme;

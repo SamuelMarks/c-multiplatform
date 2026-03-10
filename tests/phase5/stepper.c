@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "m3/m3_stepper.h"
 #include "test_utils.h"
+/* clang-format on */
 
 extern int CMP_CALL m3_stepper_test_set_fail_point(cmp_u32 fail_point);
 extern int CMP_CALL m3_stepper_test_clear_fail_points(void);

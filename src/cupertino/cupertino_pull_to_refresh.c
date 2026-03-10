@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_pull_to_refresh.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL
 cupertino_refresh_style_init(CupertinoRefreshStyle *style) {

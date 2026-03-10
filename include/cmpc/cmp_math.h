@@ -6,11 +6,13 @@
  * @brief Math and geometry ABI for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /** @brief Scalar type used for geometry and transforms. */
 typedef float CMPScalar;

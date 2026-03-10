@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_stepper.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_stepper_init(CupertinoStepper *stepper) {
   if (stepper == NULL) {

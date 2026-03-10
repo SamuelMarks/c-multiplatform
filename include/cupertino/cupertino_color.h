@@ -6,6 +6,7 @@
  * @brief Apple Cupertino semantic system colors for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_math.h"
 #include "cmpc/cmp_visuals.h"
+/* clang-format on */
 
 /**
  * @brief Apple Cupertino semantic system color identifiers.

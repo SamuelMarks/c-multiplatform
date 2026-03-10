@@ -9,6 +9,7 @@
  *       application. When using JNI, pass global references for any jobjects.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,6 +19,7 @@ extern "C" {
 #include "cmpc/cmp_api_ws.h"
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_predictive.h"
+/* clang-format on */
 
 /** @brief Opaque Android backend instance. */
 typedef struct CMPAndroidBackend CMPAndroidBackend;

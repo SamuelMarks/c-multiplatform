@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_gesture.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 int CMP_CALL cmp_gesture_test_set_contains_error(CMPBool enable);
 int CMP_CALL cmp_gesture_test_set_reset_fail(CMPBool enable);

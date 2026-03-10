@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_camera.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 typedef struct TestCameraState {
   int fail_open;

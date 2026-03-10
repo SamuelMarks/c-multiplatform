@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "f2/f2_typography.h"
 #include <string.h>
+/* clang-format on */
 
 static int set_style(CMPTextStyle *style, const char *family, cmp_i32 size,
                      cmp_i32 weight, CMPScalar line_height) {

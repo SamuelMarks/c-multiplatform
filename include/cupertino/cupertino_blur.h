@@ -6,12 +6,14 @@
  * @brief Apple Cupertino Vibrancy and Blur (UIBlurEffectStyle) mappings.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_visuals.h"
+/* clang-format on */
 
 /** @brief iOS UIBlurEffectStyle equivalents */
 typedef enum CupertinoBlurStyle {

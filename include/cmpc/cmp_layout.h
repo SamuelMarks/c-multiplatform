@@ -6,11 +6,13 @@
  * @brief Flex-style layout solver for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_math.h"
+/* clang-format on */
 
 /** @brief Sentinel value for automatic sizing. */
 #define CMP_LAYOUT_AUTO (-1.0f)

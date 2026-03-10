@@ -6,6 +6,7 @@
  * @brief Apple Cupertino Button components.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,6 +18,7 @@ extern "C" {
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_shape.h"
 #include "cupertino/cupertino_typography.h"
+/* clang-format on */
 
 /** @brief iOS 15+ Button Variants */
 typedef enum CupertinoButtonVariant {

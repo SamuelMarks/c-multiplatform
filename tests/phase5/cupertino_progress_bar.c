@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_progress_bar.h"
 #include "../phase1/test_utils.h"
 #include <stddef.h>
+/* clang-format on */
 
 static int test_cupertino_progress_bar(void) {
   CupertinoProgressBar bar;

@@ -6,11 +6,13 @@
  * @brief Accessibility semantics tree utilities for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
+/* clang-format on */
 
 /**
  * @brief Accessibility semantics node for tree traversal.

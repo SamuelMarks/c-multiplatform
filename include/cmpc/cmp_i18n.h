@@ -6,6 +6,7 @@
  * @brief Localization string tables and formatting helpers for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_api_env.h"
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_datetime.h"
+/* clang-format on */
 
 /** @brief Default entry capacity for I18N tables. */
 #define CMP_I18N_DEFAULT_CAPACITY 32u

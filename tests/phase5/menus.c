@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_menu.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 int CMP_CALL m3_menu_test_set_style_fail_text_style(CMPBool enable);
 int CMP_CALL m3_menu_test_set_style_fail_shadow_init(CMPBool enable);

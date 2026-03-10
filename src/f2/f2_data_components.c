@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "f2/f2_data_components.h"
 #include <string.h>
+/* clang-format on */
 
 /* -------------------------------------------------------------------------- */
 /* DataGrid / Table */

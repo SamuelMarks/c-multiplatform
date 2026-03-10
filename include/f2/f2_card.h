@@ -6,12 +6,14 @@
  * @brief Microsoft Fluent 2 Card widgets.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
 #include "f2/f2_color.h"
+/* clang-format on */
 
 /** @brief Default card padding. */
 #define F2_CARD_DEFAULT_PADDING 12.0f

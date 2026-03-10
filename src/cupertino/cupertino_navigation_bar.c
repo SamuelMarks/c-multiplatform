@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_navigation_bar.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL
 cupertino_navigation_bar_style_init(CupertinoNavigationBarStyle *style) {

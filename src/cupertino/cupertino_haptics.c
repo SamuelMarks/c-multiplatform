@@ -1,4 +1,6 @@
+/* clang-format off */
 #include "cupertino/cupertino_haptics.h"
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_haptic_trigger(const CMPWS *ws,
                                               CupertinoHapticType type) {

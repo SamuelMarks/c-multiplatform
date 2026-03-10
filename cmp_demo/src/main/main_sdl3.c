@@ -58,7 +58,8 @@ int main(int argc, char *argv[]) {
 
     int w = 0, h = 0;
     ws.vtable->get_window_size(ws.ctx, window, &w, &h);
-    demo_app_render(app, &gfx, window, w, h, 1.0f); /* Default DPI for SDL3 stub */
+    demo_app_render(app, &gfx, window, w, h,
+                    1.0f); /* Default DPI for SDL3 stub */
 
     SDL_Delay(16);
   }

@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_event.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 typedef struct TestWidget {
   int event_calls;

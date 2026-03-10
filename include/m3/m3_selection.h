@@ -6,11 +6,13 @@
  * @brief Selection widgets (checkbox, switch, radio) for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
+/* clang-format on */
 
 /** @brief Default checkbox size in pixels. */
 #define M3_CHECKBOX_DEFAULT_SIZE 20.0f

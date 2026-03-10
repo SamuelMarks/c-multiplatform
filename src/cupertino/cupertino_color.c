@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_color.h"
 #include <stddef.h>
+/* clang-format on */
 
 /* Helper to convert hex ARGB to CMPColor components */
 static void cupertino_color_from_hex(cmp_u32 argb, CMPColor *out_color) {

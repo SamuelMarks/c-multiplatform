@@ -1,9 +1,11 @@
+/* clang-format off */
 #include "cmpc/cmp_render.h"
 
 #ifdef CMP_TESTING
 static CMPBool g_cmp_render_force_reserve = CMP_FALSE;
 static CMPBool g_cmp_render_force_intersect_fail = CMP_FALSE;
 #endif
+/* clang-format on */
 
 #define CMP_RENDER_LIST_DEFAULT_CAPACITY 64
 

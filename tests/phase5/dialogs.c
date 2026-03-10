@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_dialogs.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 typedef struct TestDialogBackend {
   int create_calls;

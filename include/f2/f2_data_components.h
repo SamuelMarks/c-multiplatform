@@ -7,6 +7,7 @@
  * widgets.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,6 +16,7 @@ extern "C" {
 #include "cmpc/cmp_text.h"
 #include "f2/f2_color.h"
 #include "f2/f2_text_field.h"
+/* clang-format on */
 
 /* -------------------------------------------------------------------------- */
 /* DataGrid / Table */

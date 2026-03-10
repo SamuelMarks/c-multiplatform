@@ -6,11 +6,13 @@
  * @brief Nested scroll coordination for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_math.h"
+/* clang-format on */
 
 /**
  * @brief Scroll delta along horizontal and vertical axes.

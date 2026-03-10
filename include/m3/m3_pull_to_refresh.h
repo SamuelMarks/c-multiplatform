@@ -6,12 +6,14 @@
  * @brief Material 3 Pull-to-Refresh indicator and scroll parent integration.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_scroll.h"
+/* clang-format on */
 
 /**
  * @brief Refresh callback signature.

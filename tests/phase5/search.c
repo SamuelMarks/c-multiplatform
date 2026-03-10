@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_search.h"
 #include "test_utils.h"
 #include <string.h>
+/* clang-format on */
 
 static int test_on_change(void *ctx, M3SearchBar *bar, const char *query) {
   int *called = (int *)ctx;

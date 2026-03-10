@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_typography.h"
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_log.h"
 #include <string.h>
+/* clang-format on */
 
 /** @brief Default font family for M3. */
 #define M3_TYPOGRAPHY_DEFAULT_FAMILY "Roboto"

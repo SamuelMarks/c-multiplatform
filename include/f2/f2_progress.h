@@ -6,12 +6,14 @@
  * @brief Microsoft Fluent 2 progress indicators.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
 #include "f2/f2_color.h"
+/* clang-format on */
 
 /** @brief Default linear progress height. */
 #define F2_LINEAR_PROGRESS_DEFAULT_HEIGHT 2.0f

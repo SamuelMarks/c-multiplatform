@@ -6,6 +6,7 @@
  * @brief Microsoft Fluent 2 SearchBox widget.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,6 +15,7 @@ extern "C" {
 #include "f2/f2_button.h"
 #include "f2/f2_color.h"
 #include "f2/f2_text_field.h"
+/* clang-format on */
 
 /**
  * @brief Fluent 2 SearchBox style descriptor.

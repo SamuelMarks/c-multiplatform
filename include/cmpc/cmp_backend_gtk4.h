@@ -6,6 +6,7 @@
  * @brief GTK4 backend for LibCMPC on Linux.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,6 +15,7 @@ extern "C" {
 #include "cmpc/cmp_api_gfx.h"
 #include "cmpc/cmp_api_ws.h"
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /** @brief Opaque GTK4 backend instance. */
 typedef struct CMPGTK4Backend CMPGTK4Backend;

@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_message.h"
 #include "test_utils.h"
+/* clang-format on */
 
 static int test_handler_called = 0;
 static const CMPMessageTopic TEST_TOPIC = 1;

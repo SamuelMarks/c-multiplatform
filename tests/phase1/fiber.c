@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_fiber.h"
 #include "test_utils.h"
+/* clang-format on */
 
 int test_fiber_scheduler(void) {
   CMPAllocator alloc;

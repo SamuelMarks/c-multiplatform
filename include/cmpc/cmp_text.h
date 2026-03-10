@@ -6,11 +6,13 @@
  * @brief Text primitives and widget for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
+/* clang-format on */
 
 /** @brief Text measurement output. */
 typedef struct CMPTextMetrics {

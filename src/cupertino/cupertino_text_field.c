@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_text_field.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_text_field_init(
     CupertinoTextField *field, const CMPTextBackend *text_backend) {

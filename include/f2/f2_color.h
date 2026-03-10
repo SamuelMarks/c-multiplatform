@@ -6,12 +6,14 @@
  * @brief Microsoft Fluent 2 color system (palette generation, ramps, tokens).
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_math.h"
+/* clang-format on */
 
 /**
  * @brief Represents a Fluent 2 color ramp (10 to 100).

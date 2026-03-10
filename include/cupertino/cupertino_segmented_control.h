@@ -6,6 +6,7 @@
  * @brief Apple Cupertino style Segmented Control.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,6 +19,7 @@ extern "C" {
 #include "cmpc/cmp_text.h"
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
+/* clang-format on */
 
 /** @brief Maximum number of segments in a segmented control. */
 #define CUPERTINO_SEGMENTED_CONTROL_MAX_SEGMENTS 6

@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 #include "test_utils.h"
+/* clang-format on */
 
 int main(void) {
   CMPAllocator alloc;

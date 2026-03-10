@@ -6,11 +6,13 @@
  * @brief Key-value storage plugin for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_env.h"
+/* clang-format on */
 
 /** @brief Default entry capacity for storage instances. */
 #define CMP_STORAGE_DEFAULT_CAPACITY 16u

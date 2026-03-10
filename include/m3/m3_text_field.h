@@ -6,12 +6,14 @@
  * @brief Material 3 Text Field widgets (Filled and Outlined variants).
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_text_field.h"
 #include "cmpc/cmp_visuals.h"
+/* clang-format on */
 
 /** @brief Filled text field variant. */
 #define M3_TEXT_FIELD_VARIANT_FILLED 1

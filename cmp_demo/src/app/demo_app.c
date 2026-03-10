@@ -676,7 +676,8 @@ int demo_app_render(DemoApp *app, CMPGfx *gfx, CMPHandle window, int width,
     CMPRect r_btn;
 
     cmp_layout_node_get_layout(&app->l_det_back, &r_btn);
-    /* Detail screen manual layout was relative to card body logic previously? */
+    /* Detail screen manual layout was relative to card body logic previously?
+     */
     /* If we assume same engine, we trust absolute coords, but we must add */
     /* SCAFFOLD body offset */
     r_btn.x += body.x;

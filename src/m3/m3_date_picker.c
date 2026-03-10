@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_date_picker.h"
 
 #include <string.h>
+/* clang-format on */
 
 static int m3_date_picker_validate_bool(CMPBool value) {
   if (value != CMP_TRUE && value != CMP_FALSE) {

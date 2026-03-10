@@ -6,12 +6,14 @@
  * @brief Graphics abstraction ABI for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_math.h"
 #include "cmpc/cmp_object.h"
+/* clang-format on */
 
 /** @brief RGBA8 texture format. */
 #define CMP_TEX_FORMAT_RGBA8 1

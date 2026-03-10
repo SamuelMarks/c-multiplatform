@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_tooltip.h"
 #include "cmpc/cmp_core.h"
 #include "m3/m3_typography.h"
 #include <string.h>
+/* clang-format on */
 
 static CMPWidgetVTable g_m3_tooltip_widget_vtable;
 

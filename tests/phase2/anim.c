@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cmpc/cmp_anim.h"
 #include "test_utils.h"
+/* clang-format on */
 
 static int cmp_anim_near(CMPScalar a, CMPScalar b, CMPScalar tol) {
   CMPScalar diff;

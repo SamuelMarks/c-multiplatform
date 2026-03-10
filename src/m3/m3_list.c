@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_list.h"
 #include "cmpc/cmp_core.h"
 #include "m3/m3_typography.h"
 #include <string.h>
+/* clang-format on */
 
 static int m3_list_item_measure(void *widget, CMPMeasureSpec width,
                                 CMPMeasureSpec height, CMPSize *out_size);

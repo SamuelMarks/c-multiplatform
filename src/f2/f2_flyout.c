@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "f2/f2_flyout.h"
 #include "cmpc/cmp_core.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL f2_flyout_style_init(F2FlyoutStyle *style) {
   if (!style) {

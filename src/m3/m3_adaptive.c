@@ -1,4 +1,6 @@
+/* clang-format off */
 #include "m3/m3_adaptive.h"
+/* clang-format on */
 
 int CMP_CALL m3_window_size_class(CMPScalar width, cmp_u32 *out_class) {
   if (out_class == NULL) {

@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_tab_bar.h"
 #include "../phase1/test_utils.h"
 #include <stddef.h>
+/* clang-format on */
 
 /* Mock text backend for testing */
 static int CMP_CALL mock_create_font(void *text, const char *utf8_family,

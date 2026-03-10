@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_audio.h"
 
 #include <string.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 static cmp_u32 g_cmp_audio_test_read_u16_fail_after = 0u;

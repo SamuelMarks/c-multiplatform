@@ -8,6 +8,7 @@
  * @brief Button widgets for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,6 +16,7 @@ extern "C" {
 #include "cmpc/cmp_icon.h"
 #include "cmpc/cmp_text.h"
 #include "cmpc/cmp_visuals.h"
+/* clang-format on */
 
 /** @brief Filled button variant. */
 #define M3_BUTTON_VARIANT_FILLED 1

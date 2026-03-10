@@ -1,4 +1,6 @@
+/* clang-format off */
 #include "cupertino/cupertino_typography.h"
+/* clang-format on */
 
 static void cupertino_typography_init_style(CMPTextStyle *style,
                                             cmp_i32 size_px, cmp_i32 weight,

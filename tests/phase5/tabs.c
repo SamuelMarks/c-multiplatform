@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_tabs.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 #define M3_TAB_ROW_TEST_FAIL_STYLE_INIT 1u
 #define M3_TAB_ROW_TEST_FAIL_ANIM_INIT 2u

@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "f2/f2_message_bar.h"
 #include <string.h>
+/* clang-format on */
 
 static int f2_color_from_u32(cmp_u32 argb, CMPColor *out_color) {
   if (!out_color)

@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_api_gfx.h"
 #include "cmpc/cmp_core.h"
 #include "m3/m3_tooltip.h"
@@ -5,6 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
+/* clang-format on */
 
 typedef struct TestBackend {
   int draw_rect_calls;

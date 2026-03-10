@@ -1,3 +1,4 @@
+/* clang-format off */
 #ifndef M3_MOTION_H
 #define M3_MOTION_H
 
@@ -8,6 +9,7 @@ extern "C" {
 #include "cmpc/cmp_anim.h"
 #include "cmpc/cmp_math.h"
 #include "cmpc/cmp_predictive.h"
+/* clang-format on */
 
 #define M3_SHARED_AXIS_X 0
 #define M3_SHARED_AXIS_Y 1

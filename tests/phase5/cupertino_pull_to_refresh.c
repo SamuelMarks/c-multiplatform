@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_pull_to_refresh.h"
 #include "../phase1/test_utils.h"
 #include <stddef.h>
+/* clang-format on */
 
 static int test_cupertino_pull_to_refresh(void) {
   CupertinoRefreshControl ptr;

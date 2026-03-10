@@ -6,12 +6,14 @@
  * @brief Tooltip and badge helpers for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_layout.h"
 #include "cmpc/cmp_text.h"
+/* clang-format on */
 
 /** @brief Plain tooltip variant. */
 #define CMP_TOOLTIP_VARIANT_PLAIN 1

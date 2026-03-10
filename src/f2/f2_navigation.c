@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "f2/f2_navigation.h"
 #include "cmpc/cmp_core.h"
 #include <string.h>
+/* clang-format on */
 
 /* -------------------------------------------------------------------------- */
 /* NavigationView */

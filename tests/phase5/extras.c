@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_extras.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 int CMP_CALL cmp_extras_test_set_tooltip_size_range_fail(CMPBool enable);
 int CMP_CALL cmp_extras_test_set_badge_size_range_fail(CMPBool enable);

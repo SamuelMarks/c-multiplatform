@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_time_picker.h"
 
 #include <math.h>
 #include <string.h>
+/* clang-format on */
 
 #define M3_TIME_PICKER_PI 3.14159265358979323846f
 

@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) && \
+#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) &&               \
     !defined(_ARM_) && !defined(_ARM64_)
 #if defined(_M_AMD64)
 #define _AMD64_
@@ -101,13 +101,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine,
   (void)nCmdShow;
 /* 1. Attach Console so we can see why it dies */
 #ifdef _DEBUG
-CreateDebugConsole();
+  CreateDebugConsole();
 #endif
 
-/* 3. Initialize Config & Force Defaults */
+  /* 3. Initialize Config & Force Defaults */
   rc = cmp_win32_backend_config_init(&config);
   if (rc != CMP_OK) {
-    demo_printf_err("Backend config init failed: " NUM_FORMAT "\n", (long long)rc);
+    demo_printf_err("Backend config init failed: " NUM_FORMAT "\n",
+                    (long long)rc);
     return 1;
   }
 
@@ -121,8 +122,9 @@ CreateDebugConsole();
   demo_printf_out("Creating Win32 Backend...\n");
   rc = cmp_win32_backend_create(&config, &backend);
   if (rc != CMP_OK) {
-    demo_printf_err(
-        "Failed to create Win32 backend. Error Code: " NUM_FORMAT "\n", (long long)rc);
+    demo_printf_err("Failed to create Win32 backend. Error Code: " NUM_FORMAT
+                    "\n",
+                    (long long)rc);
     /* Keep console open for a moment so we can read the error */
     if (IsDebuggerPresent()) {
       demo_printf_out("Press Enter to exit...");

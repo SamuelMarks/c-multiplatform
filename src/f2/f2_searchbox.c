@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "f2/f2_searchbox.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL f2_search_box_style_init(F2SearchBoxStyle *style) {
   if (!style) {

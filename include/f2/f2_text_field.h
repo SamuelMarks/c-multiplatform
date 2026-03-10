@@ -6,12 +6,14 @@
  * @brief Microsoft Fluent 2 Text Field widgets.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_text_field.h"
 #include "f2/f2_color.h"
+/* clang-format on */
 
 /** @brief Default horizontal padding for F2 text fields. */
 #define F2_TEXT_FIELD_DEFAULT_PADDING_X 12.0f

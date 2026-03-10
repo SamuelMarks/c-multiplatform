@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_divider.h"
 #include "test_utils.h"
 #include <string.h>
+/* clang-format on */
 
 static int dummy_draw_line(void *ctx, CMPScalar x1, CMPScalar y1, CMPScalar x2,
                            CMPScalar y2, CMPColor color, CMPScalar thickness) {

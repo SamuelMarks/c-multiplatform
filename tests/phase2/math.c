@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_math.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 #define CMP_TEST_EPS 1.0e-4f
 

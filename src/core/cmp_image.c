@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_image.h"
 
 #include <string.h>
@@ -10,6 +11,7 @@ int CMP_CALL cmp_image_test_set_mul_overflow_fail_after(cmp_u32 call_count) {
   return CMP_OK;
 }
 #endif
+/* clang-format on */
 
 #define CMP_IMAGE_VTABLE_COMPLETE(vtable)                                      \
   ((vtable)->decode != NULL && (vtable)->free_image != NULL)

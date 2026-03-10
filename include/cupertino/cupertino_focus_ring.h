@@ -6,6 +6,7 @@
  * @brief Apple macOS style Focus Rings.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,6 +15,7 @@ extern "C" {
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_math.h"
+/* clang-format on */
 
 /**
  * @brief Paints a macOS-style focus ring around a given bound.

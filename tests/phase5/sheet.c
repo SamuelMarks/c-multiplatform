@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_sheet.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 #define M3_SHEET_TEST_FAIL_NONE 0u
 #define M3_SHEET_TEST_FAIL_SHADOW_INIT 1u

@@ -6,11 +6,13 @@
  * @brief Animation timing and spring physics for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_math.h"
+/* clang-format on */
 
 /** @brief Linear easing. */
 #define CMP_ANIM_EASE_LINEAR 0

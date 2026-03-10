@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_scaffold.h"
 
 #include <string.h>
+/* clang-format on */
 
 static int m3_scaffold_validate_edges(const CMPLayoutEdges *edges) {
   if (edges == NULL) {

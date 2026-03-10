@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_blur.h"
 #include <stddef.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL
 cupertino_blur_get_effect(CupertinoBlurStyle style_id, CMPBool is_dark,

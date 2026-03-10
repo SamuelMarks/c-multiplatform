@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_text.h"
 
 #include <string.h>
@@ -6,6 +7,7 @@
 static cmp_usize g_cmp_text_cstr_limit = 0;
 static cmp_u32 g_cmp_text_style_init_fail_after = 0u;
 #endif
+/* clang-format on */
 
 static int cmp_text_validate_color(const CMPColor *color) {
   if (color == NULL) {

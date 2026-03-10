@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_divider.h"
 #include "cmpc/cmp_core.h"
 #include <string.h>
+/* clang-format on */
 
 static int m3_divider_measure(void *widget, CMPMeasureSpec width,
                               CMPMeasureSpec height, CMPSize *out_size);

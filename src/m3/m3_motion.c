@@ -1,4 +1,6 @@
+/* clang-format off */
 #include "m3/m3_motion.h"
+/* clang-format on */
 
 static CMPScalar map_fraction(CMPScalar fraction, CMPScalar start,
                               CMPScalar end) {

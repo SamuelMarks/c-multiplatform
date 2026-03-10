@@ -6,11 +6,13 @@
  * @brief Synchronization primitives (Mutex, Semaphore, CondVar) for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /**
  * @brief Opaque handle for a Mutex.

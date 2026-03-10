@@ -6,11 +6,13 @@
  * @brief Vector path recording for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_gfx.h"
+/* clang-format on */
 
 /**
  * @brief Initialize a path.

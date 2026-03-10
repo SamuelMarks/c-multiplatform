@@ -6,12 +6,14 @@
  * @brief Core types, error codes, and ABI helpers for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <limits.h>
 #include <stddef.h>
+/* clang-format on */
 
 /**
  * @def CMP_SIZE_FORMAT

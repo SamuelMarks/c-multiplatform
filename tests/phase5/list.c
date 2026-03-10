@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "m3/m3_list.h"
 #include "test_utils.h"
+/* clang-format on */
 
 static int test_on_press(void *ctx, M3ListItem *item) {
   int *called = (int *)ctx;

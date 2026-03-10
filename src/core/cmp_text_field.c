@@ -1,8 +1,10 @@
+/* clang-format off */
 #include "cmpc/cmp_text_field.h"
 
 #include "cmpc/cmp_utf8.h"
 
 #include <string.h>
+/* clang-format on */
 
 #define CMP_TEXT_FIELD_DEFAULT_CAPACITY 16u
 

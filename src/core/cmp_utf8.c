@@ -1,9 +1,11 @@
+/* clang-format off */
 #include "cmpc/cmp_utf8.h"
 
 #ifdef CMP_TESTING
 static cmp_usize cmp_utf8_test_limit_value = 0;
 static CMPBool g_cmp_utf8_relaxed_checks = CMP_FALSE;
 #endif
+/* clang-format on */
 
 static cmp_usize cmp_usize_max_value(void) { return (cmp_usize) ~(cmp_usize)0; }
 

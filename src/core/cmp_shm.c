@@ -1,4 +1,10 @@
 /* clang-format off */
+#if !defined(_XOPEN_SOURCE)
+#define _XOPEN_SOURCE 700
+#endif
+#if !defined(_POSIX_C_SOURCE)
+#define _POSIX_C_SOURCE 200809L
+#endif
 #include "cmpc/cmp_shm.h"
 
 #include <stdlib.h>
@@ -148,8 +154,11 @@ CMP_API int CMP_CALL cmp_shm_open(const char *name, cmp_usize size,
 }
 
 CMP_API int CMP_CALL cmp_shm_get_ptr(CMPSharedMemory *shm, void **out_ptr) {
-  if (!out_ptr) return 1;
-  if (shm == NULL) { return 1; }
+  if (!out_ptr)
+    return 1;
+  if (shm == NULL) {
+    return 1;
+  }
   *out_ptr = shm->ptr;
   return 0;
 }

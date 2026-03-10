@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_slider.h"
 #include "cupertino/cupertino_color.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_slider_init(CupertinoSlider *slider) {
   if (slider == NULL) {

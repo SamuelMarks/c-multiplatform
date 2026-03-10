@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_mac_toolbar.h"
 #include "../phase1/test_utils.h"
 #include <stddef.h>
+/* clang-format on */
 
 static int test_cupertino_mac_toolbar(void) {
   CupertinoMacToolbar toolbar;

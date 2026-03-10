@@ -6,11 +6,13 @@
  * @brief Icon primitives and Material Symbols helpers for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_gfx.h"
+/* clang-format on */
 
 /** @brief Default Material Symbols font family. */
 #define CMP_ICON_DEFAULT_FAMILY "Material Symbols Outlined"

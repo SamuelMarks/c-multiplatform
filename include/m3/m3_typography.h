@@ -6,11 +6,13 @@
  * @brief Material 3 Typography system and standard text styles.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_text.h"
+/* clang-format on */
 
 /** @brief Material 3 typography roles. */
 typedef enum M3TypographyRole {

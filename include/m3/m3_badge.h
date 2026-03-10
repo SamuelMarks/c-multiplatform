@@ -6,6 +6,7 @@
  * @brief Material 3 Badge widget for notifications and status.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_layout.h"
 #include "cmpc/cmp_text.h"
+/* clang-format on */
 
 /** @brief Default dot badge diameter in pixels. */
 #define M3_BADGE_DEFAULT_DOT_DIAMETER 6.0f

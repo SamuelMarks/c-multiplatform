@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_utf8.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 int main(void) {
   CMPUtf8Iter iter;

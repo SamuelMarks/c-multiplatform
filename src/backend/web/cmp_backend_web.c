@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_backend_web.h"
 
 #include "cmpc/cmp_a11y.h"
@@ -18,6 +19,7 @@
 #include <webgpu/webgpu.h>
 #endif
 #endif
+/* clang-format on */
 
 #define CMP_WEB_RETURN_IF_ERROR(rc)                                            \
   do {                                                                         \
@@ -2744,7 +2746,8 @@ EM_JS(void, cmp_web_apply_backdrop_js,
           return;
 
         /* Fluent 2 Backdrop Mappings */
-        if (backdrop_type === 1 || backdrop_type === 2) { /* MICA or MICA_ALT */
+        if (backdrop_type == = 1 ||
+                               backdrop_type == = 2) { /* MICA or MICA_ALT */
           /* Apply Mica-like subtle tint */
           document.body.style.backgroundColor = "#f3f3f3"; /* light default */
           if (window.matchMedia &&
@@ -2752,7 +2755,7 @@ EM_JS(void, cmp_web_apply_backdrop_js,
             document.body.style.backgroundColor = "#202020";
           }
           canvas.style.backgroundColor = "transparent";
-        } else if (backdrop_type === 3) { /* ACRYLIC */
+        } else if (backdrop_type == = 3) { /* ACRYLIC */
           /* Apply Acrylic CSS blur */
           canvas.style.backdropFilter = "blur(30px) saturate(125%)";
           canvas.style.webkitBackdropFilter = "blur(30px) saturate(125%)";

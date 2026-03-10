@@ -1,4 +1,12 @@
+/* clang-format off */
+#if !defined(_XOPEN_SOURCE)
+#define _XOPEN_SOURCE 700
+#endif
+#if !defined(_POSIX_C_SOURCE)
+#define _POSIX_C_SOURCE 200809L
+#endif
 #include "cmpc/cmp_store.h"
+/* clang-format on */
 
 #include <string.h>
 

@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_watch_button.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_watch_button_init(
     CupertinoWatchButton *button, const CMPTextBackend *text_backend) {

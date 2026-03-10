@@ -1,8 +1,10 @@
+/* clang-format off */
 #include "test_utils.h"
 
 #include "cmpc/cmp_backend_win32.h"
 
 #include <string.h>
+/* clang-format on */
 
 int main(void) {
   CMPWin32BackendConfig config;

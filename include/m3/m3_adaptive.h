@@ -6,6 +6,7 @@
  * @brief Adaptive layouts and window size classes for Material 3.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_math.h"
+/* clang-format on */
 
 /** @brief Window size class: Compact. */
 #define M3_WINDOW_CLASS_COMPACT 0

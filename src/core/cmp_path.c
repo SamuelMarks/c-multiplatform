@@ -1,4 +1,6 @@
+/* clang-format off */
 #include "cmpc/cmp_path.h"
+/* clang-format on */
 
 #define CMP_PATH_DEFAULT_CAPACITY 16u
 

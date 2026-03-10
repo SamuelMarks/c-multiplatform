@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_carousel.h"
 #include "cmpc/cmp_core.h"
 #include <stdlib.h>
 #include <string.h>
+/* clang-format on */
 
 static int m3_carousel_measure(void *widget, CMPMeasureSpec width,
                                CMPMeasureSpec height, CMPSize *out_size);

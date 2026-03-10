@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_sheet.h"
 
 #include <string.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 #define M3_SHEET_TEST_FAIL_NONE 0u

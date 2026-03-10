@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_a11y.h"
 #include <stdlib.h>
 
@@ -9,6 +10,7 @@ int CMP_CALL cmp_a11y_test_set_fail_clear(CMPBool enable) {
   return CMP_OK;
 }
 #endif
+/* clang-format on */
 
 static int cmp_a11y_clear_semantics(CMPSemantics *semantics) {
   if (semantics == NULL) {

@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_gesture.h"
 
 #include <string.h>
@@ -10,6 +11,7 @@ static CMPBool g_cmp_gesture_test_force_distance_error = CMP_FALSE;
 static CMPBool g_cmp_gesture_test_force_config_init_fail = CMP_FALSE;
 static int g_cmp_gesture_test_distance_error_after = 0;
 #endif
+/* clang-format on */
 
 static int cmp_gesture_validate_rect(const CMPRect *rect) {
   if (rect == NULL) {

@@ -6,6 +6,7 @@
  * @brief Bottom sheet widgets for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,6 +15,7 @@ extern "C" {
 #include "cmpc/cmp_layout.h"
 #include "cmpc/cmp_visuals.h"
 #include "m3/m3_adaptive.h"
+/* clang-format on */
 
 /** @brief Standard bottom sheet variant. */
 #define M3_SHEET_VARIANT_STANDARD 1

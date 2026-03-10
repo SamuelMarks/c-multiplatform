@@ -6,6 +6,7 @@
  * @brief Apple Cupertino continuous corner curves (squircles) for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_layout.h"
 #include "cmpc/cmp_path.h"
+/* clang-format on */
 
 /**
  * @brief Appends a continuous corner curve (squircle) rectangle to a path.

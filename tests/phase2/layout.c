@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cmpc/cmp_layout.h"
 #include "test_utils.h"
+/* clang-format on */
 
 typedef struct MeasureCtx {
   CMPScalar width;

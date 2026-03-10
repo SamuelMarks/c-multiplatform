@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_object.h"
 
 #include <string.h>
@@ -6,6 +7,7 @@
 static CMPBool g_cmp_handle_is_valid_fail = CMP_FALSE;
 static CMPBool g_cmp_handle_unregister_force_null_obj = CMP_FALSE;
 #endif
+/* clang-format on */
 
 #define CMP_HANDLE_INDEX_INVALID ((cmp_u32) ~(cmp_u32)0)
 

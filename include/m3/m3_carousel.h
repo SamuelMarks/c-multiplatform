@@ -6,12 +6,14 @@
  * @brief Material 3 Carousel widgets.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_scroll.h"
+/* clang-format on */
 
 /**
  * @brief Material 3 Carousel style descriptor.

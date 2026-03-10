@@ -6,6 +6,7 @@
  * @brief Dialog and snackbar widgets for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,6 +15,7 @@ extern "C" {
 #include "cmpc/cmp_text.h"
 #include "cmpc/cmp_visuals.h"
 #include "m3/m3_adaptive.h"
+/* clang-format on */
 
 /** @brief Alert dialog confirm action identifier. */
 #define M3_ALERT_DIALOG_ACTION_CONFIRM 1u

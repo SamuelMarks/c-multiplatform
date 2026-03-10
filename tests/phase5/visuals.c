@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_visuals.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 #define CMP_VISUALS_TEST_FAIL_NONE 0u
 #define CMP_VISUALS_TEST_FAIL_RIPPLE_INIT_RADIUS 1u

@@ -6,6 +6,7 @@
  * @brief Microsoft Fluent 2 CommandBar widget.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_api_ui.h"
 #include "f2/f2_button.h"
 #include "f2/f2_color.h"
+/* clang-format on */
 
 /** @brief Default CommandBar height. */
 #define F2_COMMAND_BAR_DEFAULT_HEIGHT 44.0f

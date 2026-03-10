@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_carousel.h"
 #include "test_utils.h"
 #include <string.h>
+/* clang-format on */
 
 static int test_event(void *widget, const CMPInputEvent *event,
                       CMPBool *out_handled) {

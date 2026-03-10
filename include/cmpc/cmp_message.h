@@ -6,11 +6,13 @@
  * @brief Unified messaging bus and actor primitives for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /**
  * @brief Message type identifier.
@@ -177,7 +179,8 @@ CMP_API int CMP_CALL cmp_actor_get_context(CMPActor *actor, void **out_context);
  * @param actor The actor.
  * @return The state of the actor.
  */
-CMP_API int CMP_CALL cmp_actor_get_state(CMPActor *actor, CMPActorState *out_state);
+CMP_API int CMP_CALL cmp_actor_get_state(CMPActor *actor,
+                                         CMPActorState *out_state);
 
 /**
  * @brief Destroy an actor and unregister it from the bus.

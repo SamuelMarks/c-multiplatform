@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "f2/f2_color.h"
 #include "cmpc/cmp_math.h"
+/* clang-format on */
 
 static int interpolate_rgb(cmp_u8 r1, cmp_u8 g1, cmp_u8 b1, cmp_u8 r2,
                            cmp_u8 g2, cmp_u8 b2, CMPScalar t, cmp_u8 *out_r,

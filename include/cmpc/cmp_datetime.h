@@ -6,11 +6,13 @@
  * @brief Date/time primitives shared across LibCMPC components.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /** @brief Minimum supported year for dates. */
 #define CMP_DATE_MIN_YEAR 0

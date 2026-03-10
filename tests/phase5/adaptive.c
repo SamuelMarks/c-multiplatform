@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_anim.h"
 #include "cmpc/cmp_api_env.h"
 #include "cmpc/cmp_core.h"
@@ -515,6 +516,7 @@ static int test_adaptive_hinge(void) {
 }
 
 #include <stdio.h>
+/* clang-format on */
 
 int main(void) {
   if (test_anim_bezier() != 0) {

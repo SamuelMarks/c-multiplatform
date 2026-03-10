@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "m3/m3_motion.h"
 #include "test_utils.h"
+/* clang-format on */
 
 static int test_shared_axis(void) {
   M3MotionResult enter = {0}, exit = {0};

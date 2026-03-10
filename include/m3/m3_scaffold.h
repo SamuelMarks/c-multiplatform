@@ -6,6 +6,7 @@
  * @brief Scaffold layout orchestrator for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_anim.h"
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_layout.h"
+/* clang-format on */
 
 /** @brief Default scaffold horizontal padding in pixels. */
 #define M3_SCAFFOLD_DEFAULT_PADDING_X 0.0f

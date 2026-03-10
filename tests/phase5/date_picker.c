@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_date_picker.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 typedef struct TestDatePickerBackend {
   int draw_rect_calls;

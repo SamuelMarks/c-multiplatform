@@ -6,6 +6,7 @@
  * @brief Apple Cupertino style Text Field component.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,6 +18,7 @@ extern "C" {
 #include "cmpc/cmp_text.h"
 #include "cupertino/cupertino_color.h"
 #include "cupertino/cupertino_typography.h"
+/* clang-format on */
 
 /** @brief Maximum length of text in a text field. */
 #define CUPERTINO_TEXT_FIELD_MAX_LENGTH 256

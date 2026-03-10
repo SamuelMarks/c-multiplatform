@@ -1,9 +1,11 @@
+/* clang-format off */
 #include "cmpc/cmp_backend_null.h"
 
 #include "cmpc/cmp_log.h"
 #include "cmpc/cmp_object.h"
 
 #include <string.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 static cmp_usize g_cmp_null_test_fail_after = 0u;

@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_math.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+/* clang-format on */
 
 static void assert_equal(float a, float b, const char *msg) {
   if (fabs(a - b) > 0.001) {

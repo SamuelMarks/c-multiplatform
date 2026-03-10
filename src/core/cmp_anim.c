@@ -1,4 +1,6 @@
+/* clang-format off */
 #include "cmpc/cmp_anim.h"
+/* clang-format on */
 
 static CMPScalar cmp_anim_abs(CMPScalar value) {
   return (value < 0.0f) ? -value : value;

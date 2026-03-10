@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_focus_ring.h"
 #include "../phase1/test_utils.h"
 #include <stddef.h>
+/* clang-format on */
 
 static int test_cupertino_focus_ring(void) {
   CMPRect bounds = {10, 10, 100, 30};

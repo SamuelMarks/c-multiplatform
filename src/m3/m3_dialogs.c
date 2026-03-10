@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_dialogs.h"
 
 #include <string.h>
+/* clang-format on */
 
 static int m3_dialog_measure_optional_text(const CMPTextBackend *backend,
                                            CMPHandle font, const char *utf8,

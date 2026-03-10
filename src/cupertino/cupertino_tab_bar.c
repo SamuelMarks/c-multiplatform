@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_tab_bar.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_tab_bar_style_init(CupertinoTabBarStyle *style) {
   CupertinoTypographyScale typo;

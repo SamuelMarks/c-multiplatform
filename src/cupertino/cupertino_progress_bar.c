@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_progress_bar.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_progress_bar_init(CupertinoProgressBar *bar) {
   if (bar == NULL) {

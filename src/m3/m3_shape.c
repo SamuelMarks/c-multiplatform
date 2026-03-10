@@ -1,4 +1,6 @@
+/* clang-format off */
 #include "m3/m3_shape.h"
+/* clang-format on */
 
 CMP_API int CMP_CALL m3_shape_init_absolute(M3Shape *shape,
                                             CMPScalar radius_px) {

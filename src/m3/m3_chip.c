@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_chip.h"
 
 #include <string.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 #define M3_CHIP_TEST_FAIL_NONE 0u

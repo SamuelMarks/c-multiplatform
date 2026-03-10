@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_mac_traffic_lights.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL
 cupertino_mac_traffic_lights_init(CupertinoMacTrafficLights *lights) {

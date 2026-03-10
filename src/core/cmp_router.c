@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_router.h"
 
 #include <string.h>
@@ -8,6 +9,7 @@ static CMPBool g_router_force_slice_equals_fail = CMP_FALSE;
 static cmp_u32 g_router_cstr_fail_after = 0u;
 static cmp_u32 g_router_cstr_call_count = 0u;
 #endif
+/* clang-format on */
 
 static const char g_router_root_path[] = "/";
 

@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "f2/f2_spin_button.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL f2_spin_button_style_init(F2SpinButtonStyle *style) {
   if (!style) {

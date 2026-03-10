@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_icon.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 #define CMP_ICON_TEST_FAIL_NONE 0u
 #define CMP_ICON_TEST_FAIL_PATH_INIT 1u

@@ -1,9 +1,11 @@
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 #include "m3/m3_sheet.h"
 #include "test_utils.h"
 
 #include <stdio.h>
 #include <string.h>
+/* clang-format on */
 
 typedef struct TestSideSheetBackend {
   int draw_rect_calls;

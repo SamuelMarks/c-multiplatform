@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_action_sheet.h"
 #include "cupertino/cupertino_shape.h"
 #include <string.h>
+/* clang-format on */
 
 #define CUPERTINO_SHEET_CORNER_RADIUS 13.0f
 #define CUPERTINO_SHEET_MARGIN 8.0f

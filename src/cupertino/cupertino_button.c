@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_button.h"
 #include <string.h>
+/* clang-format on */
 
 static int cupertino_button_validate_style(const CupertinoButtonStyle *style) {
   if (style == NULL) {

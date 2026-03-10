@@ -6,11 +6,13 @@
  * @brief State store and time-travel helpers for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /**
  * @brief Action payload descriptor.

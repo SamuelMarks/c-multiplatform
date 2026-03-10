@@ -6,12 +6,14 @@
  * @brief Text field widget and editing helpers for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_anim.h"
 #include "cmpc/cmp_text.h"
+/* clang-format on */
 
 /** @brief Default horizontal padding for text fields. */
 #define CMP_TEXT_FIELD_DEFAULT_PADDING_X 12.0f

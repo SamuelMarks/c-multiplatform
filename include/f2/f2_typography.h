@@ -6,11 +6,13 @@
  * @brief Microsoft Fluent 2 typography system.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_text.h"
+/* clang-format on */
 
 /** @brief Fluent 2 typography roles. */
 typedef enum F2TypographyRole {

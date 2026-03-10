@@ -6,7 +6,7 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) && \
+#if defined(_MSC_VER) && !defined(_X86_) && !defined(_AMD64_) &&               \
     !defined(_ARM_) && !defined(_ARM64_)
 #if defined(_M_AMD64)
 #define _AMD64_

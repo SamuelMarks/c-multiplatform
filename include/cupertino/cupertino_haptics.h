@@ -6,12 +6,14 @@
  * @brief Apple Cupertino Haptics (UIFeedbackGenerator) mappings.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ws.h"
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /** @brief iOS UIFeedbackGenerator equivalents */
 typedef enum CupertinoHapticType {

@@ -1,9 +1,11 @@
+/* clang-format off */
 #include "cmpc/cmp_layout.h"
 
 #ifdef CMP_TESTING
 static CMPBool g_cmp_layout_force_style_init_fail = CMP_FALSE;
 static CMPBool g_cmp_layout_force_direction_fail = CMP_FALSE;
 #endif
+/* clang-format on */
 
 static CMPScalar cmp_layout_clamp_non_negative(CMPScalar value) {
   if (value < 0.0f) {

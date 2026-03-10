@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_watch_button.h"
 #include "../phase1/test_utils.h"
 #include <stddef.h>
+/* clang-format on */
 
 static int test_cupertino_watch_button(void) {
   CupertinoWatchButton button;

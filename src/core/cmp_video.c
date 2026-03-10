@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_video.h"
 
 #include <string.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 static cmp_u32 g_cmp_video_test_read_u32_fail_after = 0u;

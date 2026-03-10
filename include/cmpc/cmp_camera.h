@@ -6,11 +6,13 @@
  * @brief Camera plugin helpers for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_env.h"
+/* clang-format on */
 
 /**
  * @brief Camera session configuration.

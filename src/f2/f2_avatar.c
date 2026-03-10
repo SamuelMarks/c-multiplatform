@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "f2/f2_avatar.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL f2_avatar_style_init(F2AvatarStyle *style) {
   if (!style) {

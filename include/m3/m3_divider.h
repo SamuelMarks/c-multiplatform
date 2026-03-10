@@ -6,12 +6,14 @@
  * @brief Material 3 Divider widget.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_layout.h"
+/* clang-format on */
 
 /** @brief Default divider thickness in pixels. */
 #define M3_DIVIDER_DEFAULT_THICKNESS 1.0f

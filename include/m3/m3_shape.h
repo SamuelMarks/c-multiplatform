@@ -6,12 +6,14 @@
  * @brief Material 3 Shape system and expressive fluid radii for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_layout.h"
+/* clang-format on */
 
 /**
  * @brief Shape corner size specification type.

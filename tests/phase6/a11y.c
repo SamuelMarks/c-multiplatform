@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_a11y.h"
 #include "cmpc/cmp_api_ws.h"
 #include "test_utils.h"
 #include <string.h>
+/* clang-format on */
 
 int CMP_CALL cmp_a11y_test_set_fail_clear(CMPBool enable);
 

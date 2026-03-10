@@ -6,11 +6,13 @@
  * @brief Gesture recognition and dispatch for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_render.h"
+/* clang-format on */
 
 /** @brief Default max tap duration in milliseconds. */
 #define CMP_GESTURE_DEFAULT_TAP_MAX_MS 250u

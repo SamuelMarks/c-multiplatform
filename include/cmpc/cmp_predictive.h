@@ -6,11 +6,13 @@
  * @brief Predictive back gesture handling for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_math.h"
+/* clang-format on */
 
 /** @brief Predictive back edge is unspecified. */
 #define CMP_PREDICTIVE_BACK_EDGE_UNKNOWN 0u

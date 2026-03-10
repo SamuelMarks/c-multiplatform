@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "cmpc/cmp_scroll.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 typedef struct TestScrollParent {
   int pre_calls;

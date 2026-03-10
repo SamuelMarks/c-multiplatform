@@ -1,9 +1,11 @@
+/* clang-format off */
 #include "m3/m3_text_field.h"
 #include "cmpc/cmp_api_env.h"
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_core.h"
 #include "m3/m3_typography.h"
 #include <string.h>
+/* clang-format on */
 
 static int m3_text_field_measure(void *widget, CMPMeasureSpec width,
                                  CMPMeasureSpec height, CMPSize *out_size);

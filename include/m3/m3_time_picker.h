@@ -6,6 +6,7 @@
  * @brief Time picker widget for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_datetime.h"
 #include "cmpc/cmp_layout.h"
+/* clang-format on */
 
 /** @brief Minimum supported hour value. */
 #define M3_TIME_PICKER_MIN_HOUR 0u

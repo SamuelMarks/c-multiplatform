@@ -6,6 +6,7 @@
  * @brief Apple Cupertino Pull-to-Refresh indicator (UIRefreshControl).
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_scroll.h"
 #include "cupertino/cupertino_color.h"
+/* clang-format on */
 
 /**
  * @brief Refresh callback signature.

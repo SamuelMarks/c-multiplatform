@@ -1,8 +1,10 @@
+/* clang-format off */
 #include "test_utils.h"
 
 #include "cmpc/cmp_backend_web.h"
 
 #include <string.h>
+/* clang-format on */
 
 int main(void) {
   CMPWebBackendConfig config;

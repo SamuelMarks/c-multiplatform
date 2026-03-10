@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_event.h"
 
 #ifdef CMP_TESTING
@@ -5,6 +6,7 @@
 static CMPBool g_cmp_event_force_contains_error = CMP_FALSE;
 
 #endif
+/* clang-format on */
 
 typedef struct CMPFocusContext {
 

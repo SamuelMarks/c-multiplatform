@@ -6,6 +6,7 @@
  * @brief Apple Cupertino style Stepper component (+/-).
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,6 +16,7 @@ extern "C" {
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_math.h"
 #include "cupertino/cupertino_color.h"
+/* clang-format on */
 
 /** @brief Cupertino Stepper Widget */
 typedef struct CupertinoStepper {

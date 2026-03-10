@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_extras.h"
 
 #include <string.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 static CMPBool g_cmp_extras_test_force_tooltip_size_range = CMP_FALSE;

@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "m3/m3_color.h"
 #include "test_utils.h"
 #include <string.h>
@@ -14,6 +15,7 @@ static int cmp_color_near_u8(cmp_u8 a, cmp_u8 b, cmp_u8 tol) {
 }
 
 #include "cmpc/cmp_api_ws.h"
+/* clang-format on */
 int CMP_CALL mock_get_system_color(void *ctx, cmp_u32 color_type,
                                    CMPScalar *out_r, CMPScalar *out_g,
                                    CMPScalar *out_b, CMPScalar *out_a) {

@@ -6,6 +6,7 @@
  * @brief Material 3 Stepper (Multi-step flow indicator).
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_text.h"
+/* clang-format on */
 
 /**
  * @brief State for an individual step in a stepper.

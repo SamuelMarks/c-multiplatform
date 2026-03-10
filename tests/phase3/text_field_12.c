@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_text_field.h"
 #include "test_utils.h"
 #include <string.h>
+/* clang-format on */
 
 static int test_create_font(void *text, const char *utf8_family,
                             cmp_i32 size_px, cmp_i32 weight, CMPBool italic,

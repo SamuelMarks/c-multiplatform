@@ -6,12 +6,14 @@
  * @brief Asynchronous file system operations for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_env.h"
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /**
  * @brief File read asynchronous callback signature.

@@ -6,11 +6,13 @@
  * @brief Render command list and widget tree traversal for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
+/* clang-format on */
 
 /** @brief Render command: begin frame. */
 #define CMP_RENDER_CMD_BEGIN_FRAME 1

@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_segmented_control.h"
 #include "../phase1/test_utils.h"
 #include <stddef.h>
+/* clang-format on */
 
 static int test_cupertino_segmented_control(void) {
   CupertinoSegmentedControl control;

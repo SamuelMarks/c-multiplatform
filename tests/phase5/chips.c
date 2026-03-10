@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_chip.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 #define M3_CHIP_TEST_FAIL_NONE 0u
 #define M3_CHIP_TEST_FAIL_TEXT_STYLE_INIT 1u

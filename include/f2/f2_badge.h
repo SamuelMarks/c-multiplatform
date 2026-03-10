@@ -6,6 +6,7 @@
  * @brief Microsoft Fluent 2 Badge and PresenceBadge widgets.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_text.h"
 #include "f2/f2_color.h"
+/* clang-format on */
 
 /** @brief Default dot badge diameter. */
 #define F2_BADGE_DEFAULT_DOT_DIAMETER 8.0f

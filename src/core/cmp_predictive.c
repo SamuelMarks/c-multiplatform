@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_predictive.h"
 
 #include <string.h>
@@ -10,6 +11,7 @@ int CMP_CALL cmp_predictive_test_set_event_init_fail(CMPBool enable) {
   return CMP_OK;
 }
 #endif
+/* clang-format on */
 
 static int cmp_predictive_back_validate_edge(cmp_u32 edge) {
   if (edge == CMP_PREDICTIVE_BACK_EDGE_UNKNOWN ||

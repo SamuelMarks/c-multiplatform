@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_list.h"
 #include "test_utils.h"
 #include <string.h>
+/* clang-format on */
 
 static int bind_fn_impl(void *ctx, CMPListSlot *slot, cmp_usize index) {
   if (ctx) {

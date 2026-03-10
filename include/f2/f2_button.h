@@ -6,6 +6,7 @@
  * @brief Microsoft Fluent 2 button widgets.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_icon.h"
 #include "cmpc/cmp_text.h"
 #include "cmpc/cmp_visuals.h"
+/* clang-format on */
 
 /** @brief Primary button variant. */
 #define F2_BUTTON_VARIANT_PRIMARY 1

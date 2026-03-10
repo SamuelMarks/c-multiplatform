@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_picker.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_picker_init(CupertinoPicker *picker,
                                            const CMPTextBackend *text_backend) {

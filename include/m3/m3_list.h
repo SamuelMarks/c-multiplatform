@@ -6,6 +6,7 @@
  * @brief Material 3 List Item widgets.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 #include "cmpc/cmp_api_ui.h"
 #include "cmpc/cmp_text.h"
 #include "cmpc/cmp_visuals.h"
+/* clang-format on */
 
 /** @brief 1-line list item variant. */
 #define M3_LIST_ITEM_VARIANT_1_LINE 1

@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cupertino/cupertino_mac_sidebar.h"
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_mac_sidebar_init(
     CupertinoMacSidebar *sidebar, const CMPTextBackend *text_backend) {

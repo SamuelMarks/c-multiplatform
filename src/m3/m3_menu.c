@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "m3/m3_menu.h"
 
 #include <string.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 static CMPBool g_m3_menu_test_force_negative_panel = CMP_FALSE;

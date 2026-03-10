@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "f2/f2_button.h"
 #include <string.h>
+/* clang-format on */
 
 static int f2_button_style_init_base(F2ButtonStyle *style) {
   style->is_rtl = CMP_FALSE;

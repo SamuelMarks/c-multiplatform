@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "test_utils.h"
 
 #include "cmpc/cmp_backend_null.h"
@@ -7,6 +8,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+/* clang-format on */
 
 typedef struct TestAllocator {
   cmp_usize alloc_calls;

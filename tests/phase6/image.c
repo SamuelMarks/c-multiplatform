@@ -1,9 +1,11 @@
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_image.h"
 #include "test_utils.h"
 
 #include <stdlib.h>
 #include <string.h>
+/* clang-format on */
 
 int CMP_CALL cmp_image_test_mul_overflow(cmp_usize a, cmp_usize b,
                                          cmp_usize *out_value);

@@ -6,12 +6,14 @@
  * @brief Microsoft Fluent 2 slider widgets.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_api_ui.h"
 #include "f2/f2_color.h"
+/* clang-format on */
 
 /** @brief Default slider track height. */
 #define F2_SLIDER_DEFAULT_TRACK_HEIGHT 4.0f

@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cmpc/cmp_text_field.h"
 #include "test_utils.h"
+/* clang-format on */
 
 int main(void) {
   CMP_TEST_OK(cmp_text_field_test_set_fail_point(0));

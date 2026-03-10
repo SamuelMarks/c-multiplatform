@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cupertino/cupertino_date_picker.h"
 #include <stdio.h>
 #include <string.h>
+/* clang-format on */
 
 CMP_API int CMP_CALL cupertino_date_picker_init(
     CupertinoDatePicker *picker, const CMPTextBackend *text_backend) {

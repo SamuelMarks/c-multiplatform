@@ -1,8 +1,10 @@
+/* clang-format off */
 #include "cmpc/cmp_storage.h"
 #include "test_utils.h"
 
 #include <stdlib.h>
 #include <string.h>
+/* clang-format on */
 
 typedef struct TestAlloc {
   int fail_alloc_on_call;

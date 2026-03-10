@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_color.h"
 
 #include "cmpc/cmp_api_ws.h"
 #include <math.h>
+/* clang-format on */
 
 #define M3_COLOR_PI 3.14159265358979323846
 #define M3_COLOR_WHITE_X 0.95047f

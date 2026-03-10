@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_arena.h"
 
 #define CMP_ARENA_DEFAULT_BLOCK_SIZE 4096
@@ -6,6 +7,7 @@
 static int g_cmp_arena_force_align_fail_count = 0;
 static CMPBool g_cmp_arena_force_add_overflow = CMP_FALSE;
 #endif
+/* clang-format on */
 
 struct CMPArenaBlock {
   struct CMPArenaBlock *next;

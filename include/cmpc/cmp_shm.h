@@ -6,11 +6,13 @@
  * @brief Shared Memory Allocator for LibCMPC IPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 /**
  * @brief Opaque handle for a shared memory region.

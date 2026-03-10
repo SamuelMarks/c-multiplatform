@@ -6,11 +6,13 @@
  * @brief Event dispatcher and focus management for LibCMPC.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_render.h"
+/* clang-format on */
 
 /**
  * @brief Event dispatcher state.

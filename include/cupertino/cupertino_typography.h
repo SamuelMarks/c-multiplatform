@@ -6,12 +6,14 @@
  * @brief Apple Cupertino Typography system and Dynamic Type text styles.
  */
 
+/* clang-format off */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_text.h"
+/* clang-format on */
 
 /** @brief Cupertino/HIG typography text styles. */
 typedef enum CupertinoTypographyStyle {

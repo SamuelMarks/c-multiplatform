@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "m3/m3_navigation.h"
 #include "test_utils.h"
 
 #include <string.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 #define M3_NAV_TEST_FAIL_RESOLVE_MODE 1u
