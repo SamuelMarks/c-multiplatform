@@ -9,7 +9,35 @@
 #endif
 #include <winsock2.h>
 #else
+#if !defined(_XOPEN_SOURCE)
+#define _XOPEN_SOURCE 500
+#endif
 #include <ucontext.h>
+
+#if defined(__linux__)
+#ifndef __GLIBC__
+/* Musl libc lacks ucontext functions, provide stubs to avoid link errors */
+int getcontext(ucontext_t *ucp) {
+  CMP_UNUSED(ucp);
+  return -1;
+}
+int setcontext(const ucontext_t *ucp) {
+  CMP_UNUSED(ucp);
+  return -1;
+}
+void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...) {
+  CMP_UNUSED(ucp);
+  CMP_UNUSED(func);
+  CMP_UNUSED(argc);
+}
+int swapcontext(ucontext_t *oucp, const ucontext_t *ucp) {
+  CMP_UNUSED(oucp);
+  CMP_UNUSED(ucp);
+  return -1;
+}
+#endif
+#endif
+
 #endif
 /* clang-format on */
 
@@ -47,11 +75,6 @@ static void WINAPI fiber_startup(LPVOID param) {
   fiber->routine(fiber->arg);
   fiber->is_finished = 1;
   SwitchToFiber(fiber->scheduler->main_fiber);
-}
-#else
-static void fiber_startup(void) {
-  /* Using a global is unsafe if schedulers run on multiple OS threads.
-   * This is a simplified C89 ucontext implementation for MVP. */
 }
 #endif
 

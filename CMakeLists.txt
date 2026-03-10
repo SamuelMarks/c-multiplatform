@@ -119,7 +119,7 @@ macro(cmp_resolve_dependency pkg config_flag)
             FetchContent_Declare(
                 c_abstract_http
                 GIT_REPOSITORY https://github.com/SamuelMarks/c-abstract-http.git
-                GIT_TAG cbbf1dddcb6441a4cb10a2a25456e7960d44ff8c
+                GIT_TAG 75192b0f9c295334f6babeae1d38c1222ad3b2cb
             )
             FetchContent_GetProperties(c_abstract_http)
             if(NOT c_abstract_http_POPULATED)

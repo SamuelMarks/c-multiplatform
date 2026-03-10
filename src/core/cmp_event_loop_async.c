@@ -12,6 +12,9 @@
 #include <time.h>
 typedef CRITICAL_SECTION cmp_native_mutex_t;
 #else
+#if !defined(_XOPEN_SOURCE)
+#define _XOPEN_SOURCE 500
+#endif
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -193,7 +196,7 @@ static int CMP_CALL async_loop_run(void *ctx) {
       select(max_fd + 1, &read_fds, &write_fds, NULL, &tv);
     } else {
       if (wait_time > 0) {
-        usleep(wait_time * 1000);
+        select(0, NULL, NULL, NULL, &tv);
       }
     }
 #endif
@@ -234,12 +237,12 @@ static int CMP_CALL async_loop_run(void *ctx) {
       if ((io->flags & CMP_EVENT_LOOP_IO_READ) != 0 &&
           FD_ISSET(io->fd, &read_fds)) {
         if (io->cb != NULL)
-          io->cb(io->cb_ctx, io->handle);
+          io->cb(io->cb_ctx, io->handle, CMP_EVENT_LOOP_IO_READ);
       }
       if ((io->flags & CMP_EVENT_LOOP_IO_WRITE) != 0 &&
           FD_ISSET(io->fd, &write_fds)) {
         if (io->cb != NULL)
-          io->cb(io->cb_ctx, io->handle);
+          io->cb(io->cb_ctx, io->handle, CMP_EVENT_LOOP_IO_WRITE);
       }
     }
 #endif

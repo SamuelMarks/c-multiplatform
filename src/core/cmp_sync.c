@@ -82,6 +82,9 @@ CMP_API int CMP_CALL cmp_mutex_lock(CMPMutex *mutex) {
 }
 
 CMP_API int CMP_CALL cmp_mutex_trylock(CMPMutex *mutex) {
+#if !defined(_WIN32)
+  int rc;
+#endif
   if (mutex == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
@@ -92,7 +95,7 @@ CMP_API int CMP_CALL cmp_mutex_trylock(CMPMutex *mutex) {
   }
   return CMP_ERR_NOT_READY;
 #else
-  int rc = pthread_mutex_trylock(&mutex->m);
+  rc = pthread_mutex_trylock(&mutex->m);
   if (rc == 0) {
     return CMP_OK;
   } else if (rc == EBUSY) {

@@ -10,6 +10,9 @@
 #endif
 #include <winsock2.h>
 #else
+#if !defined(_XOPEN_SOURCE)
+#define _XOPEN_SOURCE 500
+#endif
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -188,10 +191,10 @@ error_win32:
     {
       char *argv[64]; /* MVP fixed size */
       int i = 0;
-      argv[0] = (char *)config->executable_path;
+      argv[0] = (char *)(cmp_usize)(const void *)config->executable_path;
       if (config->args != NULL) {
         for (i = 0; config->args[i] != NULL && i < 62; i++) {
-          argv[i + 1] = (char *)config->args[i];
+          argv[i + 1] = (char *)(cmp_usize)(const void *)config->args[i];
         }
       }
       argv[i + 1] = NULL;
