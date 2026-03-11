@@ -18,15 +18,15 @@ CMP_API int CMP_CALL f2_navigation_view_style_init(F2NavViewStyle *style) {
   style->compact_width = 48.0f;
   style->expanded_width = 240.0f;
 
-  style->background_color = (CMPColor){0.95f, 0.95f, 0.95f, 1.0f};
-  style->item_bg_normal = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->item_bg_hover = (CMPColor){0.90f, 0.90f, 0.90f, 1.0f};
-  style->item_bg_pressed = (CMPColor){0.85f, 0.85f, 0.85f, 1.0f};
-  style->item_bg_selected = (CMPColor){0.90f, 0.90f, 0.90f, 1.0f};
+  style->background_color = cmp_color_rgba(0.95f, 0.95f, 0.95f, 1.0f);
+  style->item_bg_normal = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->item_bg_hover = cmp_color_rgba(0.90f, 0.90f, 0.90f, 1.0f);
+  style->item_bg_pressed = cmp_color_rgba(0.85f, 0.85f, 0.85f, 1.0f);
+  style->item_bg_selected = cmp_color_rgba(0.90f, 0.90f, 0.90f, 1.0f);
 
-  style->text_normal = (CMPColor){0.1f, 0.1f, 0.1f, 1.0f};
-  style->text_selected = (CMPColor){0.0f, 0.0f, 0.0f, 1.0f};
-  style->indicator_color = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
+  style->text_normal = cmp_color_rgba(0.1f, 0.1f, 0.1f, 1.0f);
+  style->text_selected = cmp_color_rgba(0.0f, 0.0f, 0.0f, 1.0f);
+  style->indicator_color = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
 
   style->text_style.utf8_family =
       "Segoe UI Variable, system-ui, -apple-system, Roboto, Ubuntu";
@@ -85,11 +85,11 @@ CMP_API int CMP_CALL f2_tab_list_style_init(F2TabListStyle *style) {
   style->indicator_height = 2.0f;
   style->spacing = 16.0f;
 
-  style->text_normal = (CMPColor){0.4f, 0.4f, 0.4f, 1.0f};
-  style->text_selected = (CMPColor){0.0f, 0.0f, 0.0f, 1.0f};
-  style->indicator_color = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
-  style->bg_hover = (CMPColor){0.95f, 0.95f, 0.95f, 1.0f};
-  style->bg_pressed = (CMPColor){0.90f, 0.90f, 0.90f, 1.0f};
+  style->text_normal = cmp_color_rgba(0.4f, 0.4f, 0.4f, 1.0f);
+  style->text_selected = cmp_color_rgba(0.0f, 0.0f, 0.0f, 1.0f);
+  style->indicator_color = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
+  style->bg_hover = cmp_color_rgba(0.95f, 0.95f, 0.95f, 1.0f);
+  style->bg_pressed = cmp_color_rgba(0.90f, 0.90f, 0.90f, 1.0f);
 
   style->text_style.utf8_family =
       "Segoe UI Variable, system-ui, -apple-system, Roboto, Ubuntu";
@@ -145,10 +145,10 @@ CMP_API int CMP_CALL f2_breadcrumb_style_init(F2BreadcrumbStyle *style) {
   memset(style, 0, sizeof(*style));
 
   style->item_spacing = 8.0f;
-  style->text_normal = (CMPColor){0.4f, 0.4f, 0.4f, 1.0f};
-  style->text_current = (CMPColor){0.0f, 0.0f, 0.0f, 1.0f};
-  style->chevron_color = (CMPColor){0.6f, 0.6f, 0.6f, 1.0f};
-  style->bg_hover = (CMPColor){0.95f, 0.95f, 0.95f, 1.0f};
+  style->text_normal = cmp_color_rgba(0.4f, 0.4f, 0.4f, 1.0f);
+  style->text_current = cmp_color_rgba(0.0f, 0.0f, 0.0f, 1.0f);
+  style->chevron_color = cmp_color_rgba(0.6f, 0.6f, 0.6f, 1.0f);
+  style->bg_hover = cmp_color_rgba(0.95f, 0.95f, 0.95f, 1.0f);
 
   style->text_style.utf8_family =
       "Segoe UI Variable, system-ui, -apple-system, Roboto, Ubuntu";

@@ -146,13 +146,15 @@ CMP_API int CMP_CALL cupertino_date_picker_paint(
 
     if (cmp_text_font_create((void *)&picker->text_backend, &t_style, &font) ==
         CMP_OK) {
+      CMPScalar tx;
+      CMPScalar ty;
       cmp_text_measure_utf8((void *)&picker->text_backend, font, display_text,
                             text_len, 0, &metrics);
 
-      CMPScalar tx = picker->bounds.x + (picker->bounds.width / 2.0f) -
-                     (metrics.width / 2.0f);
-      CMPScalar ty = picker->bounds.y + (picker->bounds.height / 2.0f) -
-                     (metrics.height / 2.0f) + metrics.baseline;
+      tx = picker->bounds.x + (picker->bounds.width / 2.0f) -
+           (metrics.width / 2.0f);
+      ty = picker->bounds.y + (picker->bounds.height / 2.0f) -
+           (metrics.height / 2.0f) + metrics.baseline;
 
       /* Time picker in iOS often colors the text differently (e.g. system
        * blue/red) but inline date is usually primary text colored */

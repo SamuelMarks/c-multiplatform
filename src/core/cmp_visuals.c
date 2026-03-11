@@ -4,6 +4,16 @@
 #include <math.h>
 /* clang-format on */
 
+CMP_API CMPColor CMP_CALL cmp_color_rgba(CMPScalar r, CMPScalar g, CMPScalar b,
+                                         CMPScalar a) {
+  CMPColor c;
+  c.r = r;
+  c.g = g;
+  c.b = b;
+  c.a = a;
+  return c;
+}
+
 #ifdef CMP_TESTING
 #define CMP_VISUALS_TEST_FAIL_NONE 0u
 #define CMP_VISUALS_TEST_FAIL_RIPPLE_INIT_RADIUS 1u

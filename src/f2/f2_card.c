@@ -17,10 +17,10 @@ CMP_API int CMP_CALL f2_card_style_init(F2CardStyle *style) {
   style->min_height = F2_CARD_DEFAULT_MIN_SIZE;
   style->border_width = 1.0f;
 
-  style->background_color = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->border_color = (CMPColor){0.9f, 0.9f, 0.9f, 1.0f};
-  style->hover_border_color = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
-  style->pressed_color = (CMPColor){0.95f, 0.95f, 0.95f, 1.0f};
+  style->background_color = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->border_color = cmp_color_rgba(0.9f, 0.9f, 0.9f, 1.0f);
+  style->hover_border_color = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
+  style->pressed_color = cmp_color_rgba(0.95f, 0.95f, 0.95f, 1.0f);
 
   return CMP_OK;
 }

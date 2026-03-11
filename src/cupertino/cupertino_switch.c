@@ -63,12 +63,12 @@ CMP_API int CMP_CALL cupertino_switch_set_on(CupertinoSwitch *switch_inst,
 CMP_API int CMP_CALL cupertino_switch_update(CupertinoSwitch *switch_inst,
                                              double delta_time) {
   CMPBool finished;
+  CMPScalar out_val;
 
   if (switch_inst == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  CMPScalar out_val;
   cmp_anim_controller_step(&switch_inst->anim, (CMPScalar)delta_time, &out_val,
                            &finished);
 

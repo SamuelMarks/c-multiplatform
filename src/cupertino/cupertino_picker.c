@@ -162,19 +162,19 @@ CMP_API int CMP_CALL cupertino_picker_paint(const CupertinoPicker *picker,
     CMPScalar dist_from_center_units = (CMPScalar)i - picker->scroll_offset;
     CMPScalar y_offset = dist_from_center_units * item_height;
     CMPScalar item_center_y = center_y + y_offset;
+    CMPScalar scale;
+    CMPScalar alpha;
 
     /* Perspective/3D scaling effect simulation */
-    CMPScalar scale =
-        1.0f - ((dist_from_center_units < 0 ? -dist_from_center_units
-                                            : dist_from_center_units) *
-                0.1f);
+    scale = 1.0f - ((dist_from_center_units < 0 ? -dist_from_center_units
+                                                : dist_from_center_units) *
+                    0.1f);
     if (scale < 0.5f)
       scale = 0.5f;
 
-    CMPScalar alpha =
-        1.0f - ((dist_from_center_units < 0 ? -dist_from_center_units
-                                            : dist_from_center_units) *
-                0.3f);
+    alpha = 1.0f - ((dist_from_center_units < 0 ? -dist_from_center_units
+                                                : dist_from_center_units) *
+                    0.3f);
     if (alpha < 0.0f)
       alpha = 0.0f;
 
@@ -183,24 +183,25 @@ CMP_API int CMP_CALL cupertino_picker_paint(const CupertinoPicker *picker,
       CMPTextStyle txt_style;
       CMPHandle font = {0};
       CMPTextMetrics metrics = {0};
+      CMPColor draw_color = text_color;
 
       memset(&txt_style, 0, sizeof(txt_style));
       txt_style.size_px = 22.0f * scale; /* Standard size scaled */
       txt_style.weight = 400;
 
-      CMPColor draw_color = text_color;
       draw_color.a *= alpha;
 
       if (cmp_text_font_create((void *)&picker->text_backend, &txt_style,
                                &font) == CMP_OK) {
+        CMPScalar text_x;
+        CMPScalar text_y;
         cmp_text_measure_utf8((void *)&picker->text_backend, font,
                               picker->items[i], picker->item_lengths[i], 0,
                               &metrics);
 
-        CMPScalar text_x = picker->bounds.x + (picker->bounds.width / 2.0f) -
-                           (metrics.width / 2.0f);
-        CMPScalar text_y =
-            item_center_y - (metrics.height / 2.0f) + metrics.baseline;
+        text_x = picker->bounds.x + (picker->bounds.width / 2.0f) -
+                 (metrics.width / 2.0f);
+        text_y = item_center_y - (metrics.height / 2.0f) + metrics.baseline;
 
         cmp_text_draw_utf8_gfx(ctx->gfx, font, picker->items[i],
                                picker->item_lengths[i], 0, text_x, text_y,

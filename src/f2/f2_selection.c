@@ -14,25 +14,25 @@ CMP_API int CMP_CALL f2_checkbox_style_init(F2CheckboxStyle *style) {
   style->border_width = F2_CHECKBOX_DEFAULT_BORDER_WIDTH;
 
   /* These values represent typical Fluent 2 colors */
-  style->unchecked.fill = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->unchecked.border = (CMPColor){0.4f, 0.4f, 0.4f, 1.0f};
-  style->unchecked.mark = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
+  style->unchecked.fill = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->unchecked.border = cmp_color_rgba(0.4f, 0.4f, 0.4f, 1.0f);
+  style->unchecked.mark = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
 
-  style->checked.fill = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
-  style->checked.border = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
-  style->checked.mark = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
+  style->checked.fill = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
+  style->checked.border = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
+  style->checked.mark = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
 
-  style->mixed.fill = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
-  style->mixed.border = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
-  style->mixed.mark = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
+  style->mixed.fill = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
+  style->mixed.border = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
+  style->mixed.mark = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
 
-  style->disabled_unchecked.fill = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->disabled_unchecked.border = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
-  style->disabled_unchecked.mark = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
+  style->disabled_unchecked.fill = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->disabled_unchecked.border = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
+  style->disabled_unchecked.mark = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
 
-  style->disabled_checked.fill = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
-  style->disabled_checked.border = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
-  style->disabled_checked.mark = (CMPColor){0.5f, 0.5f, 0.5f, 1.0f};
+  style->disabled_checked.fill = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
+  style->disabled_checked.border = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
+  style->disabled_checked.mark = cmp_color_rgba(0.5f, 0.5f, 0.5f, 1.0f);
 
   return CMP_OK;
 }
@@ -83,21 +83,21 @@ CMP_API int CMP_CALL f2_switch_style_init(F2SwitchStyle *style) {
   style->track_width = F2_SWITCH_DEFAULT_TRACK_WIDTH;
   style->track_height = F2_SWITCH_DEFAULT_TRACK_HEIGHT;
 
-  style->off.fill = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->off.border = (CMPColor){0.4f, 0.4f, 0.4f, 1.0f};
-  style->off.mark = (CMPColor){0.4f, 0.4f, 0.4f, 1.0f};
+  style->off.fill = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->off.border = cmp_color_rgba(0.4f, 0.4f, 0.4f, 1.0f);
+  style->off.mark = cmp_color_rgba(0.4f, 0.4f, 0.4f, 1.0f);
 
-  style->on.fill = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
-  style->on.border = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
-  style->on.mark = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
+  style->on.fill = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
+  style->on.border = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
+  style->on.mark = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
 
-  style->disabled_off.fill = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->disabled_off.border = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
-  style->disabled_off.mark = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
+  style->disabled_off.fill = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->disabled_off.border = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
+  style->disabled_off.mark = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
 
-  style->disabled_on.fill = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
-  style->disabled_on.border = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
-  style->disabled_on.mark = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
+  style->disabled_on.fill = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
+  style->disabled_on.border = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
+  style->disabled_on.mark = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
 
   return CMP_OK;
 }
@@ -139,21 +139,21 @@ CMP_API int CMP_CALL f2_radio_style_init(F2RadioStyle *style) {
   style->border_width = F2_RADIO_DEFAULT_BORDER_WIDTH;
   style->dot_radius = F2_RADIO_DEFAULT_DOT_RADIUS;
 
-  style->unchecked.fill = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->unchecked.border = (CMPColor){0.4f, 0.4f, 0.4f, 1.0f};
-  style->unchecked.mark = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
+  style->unchecked.fill = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->unchecked.border = cmp_color_rgba(0.4f, 0.4f, 0.4f, 1.0f);
+  style->unchecked.mark = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
 
-  style->checked.fill = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->checked.border = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
-  style->checked.mark = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
+  style->checked.fill = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->checked.border = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
+  style->checked.mark = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
 
-  style->disabled_unchecked.fill = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->disabled_unchecked.border = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
-  style->disabled_unchecked.mark = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
+  style->disabled_unchecked.fill = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->disabled_unchecked.border = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
+  style->disabled_unchecked.mark = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
 
-  style->disabled_checked.fill = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->disabled_checked.border = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
-  style->disabled_checked.mark = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
+  style->disabled_checked.fill = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->disabled_checked.border = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
+  style->disabled_checked.mark = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
 
   return CMP_OK;
 }

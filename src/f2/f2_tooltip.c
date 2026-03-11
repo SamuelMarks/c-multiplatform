@@ -10,9 +10,9 @@ CMP_API int CMP_CALL f2_tooltip_style_init(F2TooltipStyle *style) {
   }
   memset(style, 0, sizeof(*style));
 
-  style->background_color = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->border_color = (CMPColor){0.9f, 0.9f, 0.9f, 1.0f};
-  style->text_color = (CMPColor){0.14f, 0.14f, 0.14f, 1.0f};
+  style->background_color = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->border_color = cmp_color_rgba(0.9f, 0.9f, 0.9f, 1.0f);
+  style->text_color = cmp_color_rgba(0.14f, 0.14f, 0.14f, 1.0f);
 
   style->corner_radius = F2_TOOLTIP_DEFAULT_CORNER_RADIUS;
   style->padding_x = F2_TOOLTIP_DEFAULT_PADDING;

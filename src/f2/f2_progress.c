@@ -11,8 +11,8 @@ f2_linear_progress_style_init(F2LinearProgressStyle *style) {
   }
   memset(style, 0, sizeof(*style));
   style->height = F2_LINEAR_PROGRESS_DEFAULT_HEIGHT;
-  style->track_color = (CMPColor){0.9f, 0.9f, 0.9f, 1.0f};
-  style->fill_color = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
+  style->track_color = cmp_color_rgba(0.9f, 0.9f, 0.9f, 1.0f);
+  style->fill_color = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
   return CMP_OK;
 }
 
@@ -44,9 +44,9 @@ f2_circular_progress_style_init(F2CircularProgressStyle *style) {
   memset(style, 0, sizeof(*style));
   style->size = F2_CIRCULAR_PROGRESS_DEFAULT_SIZE;
   style->thickness = F2_CIRCULAR_PROGRESS_DEFAULT_THICKNESS;
-  style->track_color = (CMPColor){
-      0.0f, 0.0f, 0.0f, 0.0f}; /* Fluent circular usually has no track */
-  style->fill_color = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
+  style->track_color = cmp_color_rgba(
+      0.0f, 0.0f, 0.0f, 0.0f); /* Fluent circular usually has no track */
+  style->fill_color = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
   return CMP_OK;
 }
 

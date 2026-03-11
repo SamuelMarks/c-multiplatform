@@ -213,6 +213,7 @@ CMP_API int CMP_CALL cupertino_mac_sidebar_paint(
       if (cmp_text_font_create((void *)&sidebar->text_backend, &row_style,
                                &font) == CMP_OK) {
         CMPScalar text_y;
+        CMPScalar indent;
         cmp_text_measure_utf8((void *)&sidebar->text_backend, font, "Ay", 2, 0,
                               &metrics);
         text_y = row_rect.y + (row_rect.height / 2.0f) -
@@ -220,7 +221,7 @@ CMP_API int CMP_CALL cupertino_mac_sidebar_paint(
 
         /* Indent normal rows if they follow a section header? Standard is just
          * padding. */
-        CMPScalar indent = row->is_section_header ? 0.0f : 8.0f;
+        indent = row->is_section_header ? 0.0f : 8.0f;
 
         cmp_text_draw_utf8_gfx(ctx->gfx, font, row->title_utf8, row->title_len,
                                0, row_rect.x + padding_x + indent, text_y,

@@ -7,6 +7,7 @@ include(GNUInstallDirs)
 set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 option(CMP_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(CMP_ENABLE_COVERAGE "Enable coverage instrumentation (GCC/Clang only)" OFF)
@@ -119,7 +120,7 @@ macro(cmp_resolve_dependency pkg config_flag)
             FetchContent_Declare(
                 c_abstract_http
                 GIT_REPOSITORY https://github.com/SamuelMarks/c-abstract-http.git
-                GIT_TAG 75192b0f9c295334f6babeae1d38c1222ad3b2cb
+                GIT_TAG 12972d41d41a810744c139c86751660ace665f90
             )
             FetchContent_GetProperties(c_abstract_http)
             if(NOT c_abstract_http_POPULATED)
@@ -132,7 +133,18 @@ macro(cmp_resolve_dependency pkg config_flag)
                 set(_PREV_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
                 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
             endif()
+
+            if(WIN32)
+                add_compile_definitions(_WIN32_WINNT=0x0600 WINVER=0x0600)
+            endif()
             
+            if(MSVC AND MSVC_VERSION LESS 1900)
+                add_compile_definitions(ENOTSUP=129)
+            endif()
+            if(MSVC AND MSVC_VERSION LESS 1500)
+                add_compile_options("/FI${CMAKE_CURRENT_SOURCE_DIR}/msvc2005_compat.h")
+            endif()
+
             add_subdirectory(${c_abstract_http_SOURCE_DIR} ${c_abstract_http_BINARY_DIR} EXCLUDE_FROM_ALL)
             if(TARGET c-abstract-http-test)
             endif()
@@ -439,10 +451,10 @@ if(CMP_ENABLE_VALGRIND)
 endif()
 
 if(BUILD_SHARED_LIBS AND WIN32)
-    target_compile_definitions(cmpc PRIVATE CMP_BUILD_DLL)
-    target_compile_definitions(cmpc INTERFACE CMP_USE_DLL)
-    target_compile_definitions(m3 PRIVATE CMP_BUILD_DLL)
-    target_compile_definitions(m3 INTERFACE CMP_USE_DLL)
+    target_compile_definitions(cmpc PRIVATE CMP_BUILD_DLL INTERFACE CMP_USE_DLL)
+    target_compile_definitions(m3 PRIVATE CMP_BUILD_DLL INTERFACE CMP_USE_DLL)
+    target_compile_definitions(f2 PRIVATE CMP_BUILD_DLL INTERFACE CMP_USE_DLL)
+    target_compile_definitions(cupertino PRIVATE CMP_BUILD_DLL INTERFACE CMP_USE_DLL)
 endif()
 
 set(CMP_HAS_SDL3 OFF)
@@ -535,12 +547,11 @@ endif()
 # FIX: Applied definitions to 'cmpc' for Win32
 if(CMP_ENABLE_WIN32 AND WIN32)
     target_compile_definitions(cmpc PUBLIC
-        CMP_WIN32_AVAILABLE
         _WIN32_WINNT=0x0600
         WINVER=0x0600
     )
     target_link_libraries(cmpc PUBLIC user32 gdi32)
-    if(NOT MSVC OR MSVC_VERSION GREATER_EQUAL 1500)
+    if(NOT MSVC OR MSVC_VERSION GREATER 1400)
         target_link_libraries(cmpc PUBLIC winhttp)
     endif()
 endif()
@@ -827,7 +838,9 @@ endif()
 option(CMP_BUILD_DOCGEN "Build the documentation generator tool" ON)
 if(CMP_BUILD_DOCGEN)
     add_executable(cmp_docgen tools/docgen/docgen.c)
-    target_compile_options(cmp_docgen PRIVATE -g)
+    if(NOT MSVC)
+        target_compile_options(cmp_docgen PRIVATE -g)
+    endif()
     target_link_libraries(cmp_docgen PRIVATE m3 cmpc)
     cmp_apply_c_settings(cmp_docgen)
 endif()
@@ -1484,4 +1497,17 @@ if(CMP_ENABLE_GTK4)
     add_executable(screenshot_tool tools/screenshot_tool.c)
     target_link_libraries(screenshot_tool PRIVATE m3 f2 cupertino cmpc)
 endif()
-set_target_properties(c-abstract-http-test PROPERTIES EXCLUDE_FROM_ALL OFF)
+if(TARGET c-abstract-http-test)
+    set_target_properties(c-abstract-http-test PROPERTIES EXCLUDE_FROM_ALL OFF)
+endif()
+
+if(WIN32 AND BUILD_SHARED_LIBS)
+    add_custom_command(TARGET cmpc POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:c-abstract-http> $<TARGET_FILE_DIR:cmpc>
+    )
+    if(TARGET c89stringutils)
+        add_custom_command(TARGET cmpc POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:c89stringutils> $<TARGET_FILE_DIR:cmpc>
+        )
+    endif()
+endif()

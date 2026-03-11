@@ -16,10 +16,10 @@ CMP_API int CMP_CALL f2_link_style_init(F2LinkStyle *style) {
   style->text_style.weight = 400;
 
   style->text_color =
-      (CMPColor){0.0f, 0.36f, 0.77f, 1.0f}; /* Fluent link color */
-  style->hover_color = (CMPColor){0.0f, 0.28f, 0.65f, 1.0f};
-  style->pressed_color = (CMPColor){0.0f, 0.18f, 0.45f, 1.0f};
-  style->disabled_color = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
+      cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f); /* Fluent link color */
+  style->hover_color = cmp_color_rgba(0.0f, 0.28f, 0.65f, 1.0f);
+  style->pressed_color = cmp_color_rgba(0.0f, 0.18f, 0.45f, 1.0f);
+  style->disabled_color = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
 
   style->has_underline = CMP_TRUE;
 

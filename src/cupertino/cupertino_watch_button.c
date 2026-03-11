@@ -74,12 +74,12 @@ CMP_API int CMP_CALL cupertino_watch_button_paint(
     bg_color.a = 0.5f;
     text_color.a = 0.5f;
   } else if (button->is_pressed) {
+    CMPScalar shrink = 2.0f;
     /* watchOS shrinks the button slightly and dims it when pressed */
     bg_color.r *= 0.8f;
     bg_color.g *= 0.8f;
     bg_color.b *= 0.8f;
 
-    CMPScalar shrink = 2.0f;
     draw_rect.x += shrink;
     draw_rect.y += shrink;
     draw_rect.width -= shrink * 2.0f;
@@ -103,13 +103,14 @@ CMP_API int CMP_CALL cupertino_watch_button_paint(
 
     if (cmp_text_font_create((void *)&button->text_backend, &t_style, &font) ==
         CMP_OK) {
+      CMPScalar tx;
+      CMPScalar ty;
       cmp_text_measure_utf8((void *)&button->text_backend, font,
                             button->title_utf8, button->title_len, 0, &metrics);
 
-      CMPScalar tx =
-          draw_rect.x + (draw_rect.width / 2.0f) - (metrics.width / 2.0f);
-      CMPScalar ty = draw_rect.y + (draw_rect.height / 2.0f) -
-                     (metrics.height / 2.0f) + metrics.baseline;
+      tx = draw_rect.x + (draw_rect.width / 2.0f) - (metrics.width / 2.0f);
+      ty = draw_rect.y + (draw_rect.height / 2.0f) - (metrics.height / 2.0f) +
+           metrics.baseline;
 
       cmp_text_draw_utf8_gfx(ctx->gfx, font, button->title_utf8,
                              button->title_len, 0, tx, ty, text_color);

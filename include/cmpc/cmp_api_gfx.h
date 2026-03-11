@@ -32,6 +32,17 @@ typedef struct CMPColor {
   CMPScalar a; /**< Alpha channel. */
 } CMPColor;
 
+/**
+ * @brief Helper to create a CMPColor.
+ * @param r Red channel (0..1)
+ * @param g Green channel (0..1)
+ * @param b Blue channel (0..1)
+ * @param a Alpha channel (0..1)
+ * @return CMPColor struct
+ */
+CMP_API CMPColor CMP_CALL cmp_color_rgba(CMPScalar r, CMPScalar g, CMPScalar b,
+                                         CMPScalar a);
+
 /** @brief Path command: move to. */
 #define CMP_PATH_CMD_MOVE_TO 1
 /** @brief Path command: line to. */

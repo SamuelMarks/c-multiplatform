@@ -13,6 +13,14 @@ int test_process(void) {
   int rc;
   const char *args[] = {"-v", NULL};
   CMPProcessConfig config;
+#ifdef _WIN32
+  const char *args_win[] = {"/c", "echo", "hello", NULL};
+#else
+  const char *args_posix[] = {"-c", "echo hello", NULL};
+#endif
+  CMPIPCChannel *ipc = NULL;
+  CMPMessage msg;
+  CMPMessage rmsg;
 
   CMP_TEST_OK(cmp_get_default_allocator(&alloc));
 
@@ -31,20 +39,15 @@ int test_process(void) {
   config.establish_ipc = CMP_TRUE;
 #ifdef _WIN32
   config.executable_path = "cmd.exe";
-  const char *args_win[] = {"/c", "echo", "hello", NULL};
   config.args = args_win;
 #else
   config.executable_path = "sh";
-  const char *args_posix[] = {"-c", "echo hello", NULL};
   config.args = args_posix;
 #endif
 
   rc = cmp_process_spawn(&alloc, &config, &proc);
   if (rc == CMP_OK) {
-    CMPIPCChannel *ipc = NULL;
     cmp_process_get_ipc(proc, &ipc);
-    CMPMessage msg;
-    CMPMessage rmsg;
 
     CMP_TEST_ASSERT(ipc != NULL);
 

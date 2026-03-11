@@ -10,8 +10,8 @@ CMP_API int CMP_CALL f2_avatar_style_init(F2AvatarStyle *style) {
   memset(style, 0, sizeof(*style));
 
   style->size = F2_AVATAR_DEFAULT_SIZE;
-  style->background_color = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f}; /* Blue */
-  style->text_color = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
+  style->background_color = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f); /* Blue */
+  style->text_color = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
   style->is_circular = CMP_TRUE;
   style->corner_radius = 4.0f; /* Used if not circular */
 

@@ -10,6 +10,7 @@ int test_shm(void) {
   CMPSharedMemory *shm = NULL;
   CMPSharedMemory *shm_open = NULL;
   void *pn = NULL;
+  int rc;
 
   /* Test invalid args for create */
   CMP_TEST_EXPECT(cmp_shm_create(NULL, 1024, &shm), CMP_ERR_INVALID_ARGUMENT);
@@ -38,7 +39,7 @@ int test_shm(void) {
   cmp_core_test_set_default_allocator_fail(CMP_FALSE);
 
   /* Create and close */
-  int rc = cmp_shm_create("/test_shm_cmp_xyz123", 1024, &shm);
+  rc = cmp_shm_create("/test_shm_cmp_xyz123", 1024, &shm);
   CMP_TEST_EXPECT(rc, CMP_OK);
   if (rc == CMP_OK) {
     void *p = NULL;

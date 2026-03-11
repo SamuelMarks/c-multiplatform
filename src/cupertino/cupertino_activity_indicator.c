@@ -148,12 +148,14 @@ CMP_API int CMP_CALL cupertino_activity_indicator_paint(
     spoke_rect.width = spoke_width;
     spoke_rect.height = spoke_length;
 
-    CMPColor spoke_color = draw_color;
-    spoke_color.a *= alpha;
+    {
+      CMPColor spoke_color = draw_color;
+      spoke_color.a *= alpha;
 
-    if (ctx->gfx->vtable->draw_rect) {
-      ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &spoke_rect, spoke_color,
-                                  spoke_width / 2.0f);
+      if (ctx->gfx->vtable->draw_rect) {
+        ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &spoke_rect, spoke_color,
+                                    spoke_width / 2.0f);
+      }
     }
   }
 

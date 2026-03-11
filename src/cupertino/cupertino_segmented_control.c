@@ -221,15 +221,16 @@ CMP_API int CMP_CALL cupertino_segmented_control_paint(
 
     if (cmp_text_font_create((void *)&control->text_backend, &text_style,
                              &font) == CMP_OK) {
+      CMPScalar seg_center_x, text_x, text_y;
       cmp_text_measure_utf8((void *)&control->text_backend, font,
                             control->segments[i], control->segment_lengths[i],
                             0, &metrics);
 
-      CMPScalar seg_center_x = control->bounds.x + padding +
-                               ((CMPScalar)i * segment_w) + (segment_w / 2.0f);
-      CMPScalar text_x = seg_center_x - (metrics.width / 2.0f);
-      CMPScalar text_y = control->bounds.y + (control->bounds.height / 2.0f) -
-                         (metrics.height / 2.0f) + metrics.baseline;
+      seg_center_x = control->bounds.x + padding + ((CMPScalar)i * segment_w) +
+                     (segment_w / 2.0f);
+      text_x = seg_center_x - (metrics.width / 2.0f);
+      text_y = control->bounds.y + (control->bounds.height / 2.0f) -
+               (metrics.height / 2.0f) + metrics.baseline;
 
       cmp_text_draw_utf8_gfx(ctx->gfx, font, control->segments[i],
                              control->segment_lengths[i], 0, text_x, text_y,

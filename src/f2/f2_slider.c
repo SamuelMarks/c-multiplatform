@@ -14,13 +14,13 @@ CMP_API int CMP_CALL f2_slider_style_init(F2SliderStyle *style) {
   style->thumb_radius = F2_SLIDER_DEFAULT_THUMB_RADIUS;
   style->thumb_inner_radius = F2_SLIDER_DEFAULT_THUMB_INNER_RADIUS;
 
-  style->track_color = (CMPColor){0.9f, 0.9f, 0.9f, 1.0f};
-  style->active_track_color = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
-  style->thumb_color = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->thumb_inner_color = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
+  style->track_color = cmp_color_rgba(0.9f, 0.9f, 0.9f, 1.0f);
+  style->active_track_color = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
+  style->thumb_color = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->thumb_inner_color = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
 
-  style->disabled_track_color = (CMPColor){0.95f, 0.95f, 0.95f, 1.0f};
-  style->disabled_thumb_color = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
+  style->disabled_track_color = cmp_color_rgba(0.95f, 0.95f, 0.95f, 1.0f);
+  style->disabled_thumb_color = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
 
   return CMP_OK;
 }

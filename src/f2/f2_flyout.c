@@ -15,9 +15,9 @@ CMP_API int CMP_CALL f2_flyout_style_init(F2FlyoutStyle *style) {
   style->border_width = 1.0f;
   style->has_beak = CMP_TRUE;
 
-  style->background_color = (CMPColor){
-      1.0f, 1.0f, 1.0f, 0.95f}; /* Fluent uses acrylic/translucency here */
-  style->border_color = (CMPColor){0.8f, 0.8f, 0.8f, 1.0f};
+  style->background_color = cmp_color_rgba(
+      1.0f, 1.0f, 1.0f, 0.95f); /* Fluent uses acrylic/translucency here */
+  style->border_color = cmp_color_rgba(0.8f, 0.8f, 0.8f, 1.0f);
 
   return CMP_OK;
 }

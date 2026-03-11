@@ -10,8 +10,8 @@ CMP_API int CMP_CALL f2_dialog_style_init(F2DialogStyle *style) {
   }
   memset(style, 0, sizeof(*style));
 
-  style->background_color = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->scrim_color = (CMPColor){0.0f, 0.0f, 0.0f, 0.4f};
+  style->background_color = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->scrim_color = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.4f);
 
   style->corner_radius = F2_DIALOG_DEFAULT_CORNER_RADIUS;
   style->padding_x = F2_DIALOG_DEFAULT_PADDING;
@@ -23,13 +23,13 @@ CMP_API int CMP_CALL f2_dialog_style_init(F2DialogStyle *style) {
       "Segoe UI Variable, system-ui, -apple-system, Roboto, Ubuntu";
   style->title_style.size_px = 20;
   style->title_style.weight = 600;
-  style->title_style.color = (CMPColor){0.0f, 0.0f, 0.0f, 1.0f};
+  style->title_style.color = cmp_color_rgba(0.0f, 0.0f, 0.0f, 1.0f);
 
   style->body_style.utf8_family =
       "Segoe UI Variable, system-ui, -apple-system, Roboto, Ubuntu";
   style->body_style.size_px = 14;
   style->body_style.weight = 400;
-  style->body_style.color = (CMPColor){0.2f, 0.2f, 0.2f, 1.0f};
+  style->body_style.color = cmp_color_rgba(0.2f, 0.2f, 0.2f, 1.0f);
 
   return CMP_OK;
 }

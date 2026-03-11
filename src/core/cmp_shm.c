@@ -58,9 +58,16 @@ CMP_API int CMP_CALL cmp_shm_create(const char *name, cmp_usize size,
   shm->size = size;
 
 #if defined(_WIN32)
-  shm->handle =
-      CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
-                         (DWORD)(size >> 32), (DWORD)(size & 0xFFFFFFFF), name);
+  {
+#if defined(_WIN64)
+    DWORD high_size = (DWORD)(size >> 32);
+#else
+    DWORD high_size = 0;
+#endif
+    shm->handle =
+        CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
+                           high_size, (DWORD)(size & 0xFFFFFFFF), name);
+  }
   if (shm->handle == NULL) {
     alloc.free(alloc.ctx, shm);
     return CMP_ERR_UNKNOWN;

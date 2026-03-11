@@ -39,11 +39,11 @@ CMP_API int CMP_CALL f2_button_style_init_primary(F2ButtonStyle *style) {
   }
   f2_button_style_init_base(style);
   style->variant = F2_BUTTON_VARIANT_PRIMARY;
-  style->background_color = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f}; /* Blue */
-  style->background_hover_color = (CMPColor){0.0f, 0.45f, 0.88f, 1.0f};
-  style->background_pressed_color = (CMPColor){0.0f, 0.28f, 0.65f, 1.0f};
-  style->text_style.color = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->outline_color = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
+  style->background_color = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f); /* Blue */
+  style->background_hover_color = cmp_color_rgba(0.0f, 0.45f, 0.88f, 1.0f);
+  style->background_pressed_color = cmp_color_rgba(0.0f, 0.28f, 0.65f, 1.0f);
+  style->text_style.color = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->outline_color = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
   return CMP_OK;
 }
 
@@ -53,11 +53,11 @@ CMP_API int CMP_CALL f2_button_style_init_standard(F2ButtonStyle *style) {
   }
   f2_button_style_init_base(style);
   style->variant = F2_BUTTON_VARIANT_STANDARD;
-  style->background_color = (CMPColor){0.99f, 0.99f, 0.99f, 1.0f};
-  style->background_hover_color = (CMPColor){0.96f, 0.96f, 0.96f, 1.0f};
-  style->background_pressed_color = (CMPColor){0.90f, 0.90f, 0.90f, 1.0f};
-  style->text_style.color = (CMPColor){0.14f, 0.14f, 0.14f, 1.0f};
-  style->outline_color = (CMPColor){0.82f, 0.82f, 0.82f, 1.0f};
+  style->background_color = cmp_color_rgba(0.99f, 0.99f, 0.99f, 1.0f);
+  style->background_hover_color = cmp_color_rgba(0.96f, 0.96f, 0.96f, 1.0f);
+  style->background_pressed_color = cmp_color_rgba(0.90f, 0.90f, 0.90f, 1.0f);
+  style->text_style.color = cmp_color_rgba(0.14f, 0.14f, 0.14f, 1.0f);
+  style->outline_color = cmp_color_rgba(0.82f, 0.82f, 0.82f, 1.0f);
   return CMP_OK;
 }
 
@@ -67,11 +67,11 @@ CMP_API int CMP_CALL f2_button_style_init_outline(F2ButtonStyle *style) {
   }
   f2_button_style_init_base(style);
   style->variant = F2_BUTTON_VARIANT_OUTLINE;
-  style->background_color = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->background_hover_color = (CMPColor){0.96f, 0.96f, 0.96f, 1.0f};
-  style->background_pressed_color = (CMPColor){0.90f, 0.90f, 0.90f, 1.0f};
-  style->text_style.color = (CMPColor){0.14f, 0.14f, 0.14f, 1.0f};
-  style->outline_color = (CMPColor){0.82f, 0.82f, 0.82f, 1.0f};
+  style->background_color = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->background_hover_color = cmp_color_rgba(0.96f, 0.96f, 0.96f, 1.0f);
+  style->background_pressed_color = cmp_color_rgba(0.90f, 0.90f, 0.90f, 1.0f);
+  style->text_style.color = cmp_color_rgba(0.14f, 0.14f, 0.14f, 1.0f);
+  style->outline_color = cmp_color_rgba(0.82f, 0.82f, 0.82f, 1.0f);
   return CMP_OK;
 }
 
@@ -81,11 +81,11 @@ CMP_API int CMP_CALL f2_button_style_init_subtle(F2ButtonStyle *style) {
   }
   f2_button_style_init_base(style);
   style->variant = F2_BUTTON_VARIANT_SUBTLE;
-  style->background_color = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->background_hover_color = (CMPColor){0.96f, 0.96f, 0.96f, 1.0f};
-  style->background_pressed_color = (CMPColor){0.90f, 0.90f, 0.90f, 1.0f};
-  style->text_style.color = (CMPColor){0.14f, 0.14f, 0.14f, 1.0f};
-  style->outline_color = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
+  style->background_color = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->background_hover_color = cmp_color_rgba(0.96f, 0.96f, 0.96f, 1.0f);
+  style->background_pressed_color = cmp_color_rgba(0.90f, 0.90f, 0.90f, 1.0f);
+  style->text_style.color = cmp_color_rgba(0.14f, 0.14f, 0.14f, 1.0f);
+  style->outline_color = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
   return CMP_OK;
 }
 
@@ -95,11 +95,11 @@ CMP_API int CMP_CALL f2_button_style_init_transparent(F2ButtonStyle *style) {
   }
   f2_button_style_init_base(style);
   style->variant = F2_BUTTON_VARIANT_TRANSPARENT;
-  style->background_color = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->background_hover_color = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->background_pressed_color = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
-  style->text_style.color = (CMPColor){0.14f, 0.14f, 0.14f, 1.0f};
-  style->outline_color = (CMPColor){0.0f, 0.0f, 0.0f, 0.0f};
+  style->background_color = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->background_hover_color = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->background_pressed_color = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
+  style->text_style.color = cmp_color_rgba(0.14f, 0.14f, 0.14f, 1.0f);
+  style->outline_color = cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f);
   return CMP_OK;
 }
 
@@ -174,8 +174,8 @@ CMP_API int CMP_CALL f2_toggle_button_init(F2ToggleButton *toggle_button,
   }
 
   toggle_button->is_toggled = is_toggled;
-  toggle_button->toggled_bg_color = (CMPColor){0.9f, 0.9f, 0.9f, 1.0f};
-  toggle_button->toggled_text_color = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
+  toggle_button->toggled_bg_color = cmp_color_rgba(0.9f, 0.9f, 0.9f, 1.0f);
+  toggle_button->toggled_text_color = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
 
   return CMP_OK;
 }

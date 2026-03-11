@@ -9,8 +9,8 @@ CMP_API int CMP_CALL f2_command_bar_style_init(F2CommandBarStyle *style) {
   }
   memset(style, 0, sizeof(*style));
 
-  style->background_color = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->border_color = (CMPColor){0.9f, 0.9f, 0.9f, 1.0f};
+  style->background_color = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->border_color = cmp_color_rgba(0.9f, 0.9f, 0.9f, 1.0f);
   style->height = F2_COMMAND_BAR_DEFAULT_HEIGHT;
   style->padding = F2_COMMAND_BAR_DEFAULT_PADDING;
 

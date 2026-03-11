@@ -122,10 +122,11 @@ CMP_API int CMP_CALL cupertino_mac_traffic_lights_paint(
     }
 
     if (ctx->gfx->vtable->draw_rect) {
+      CMPRect outline_rect;
       ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &btn_rect, draw_color, radius);
 
       /* Slight outline for contrast */
-      CMPRect outline_rect = btn_rect;
+      outline_rect = btn_rect;
       /* Inner stroke simulation */
       /* In a full implementation we'd draw an outline loop */
     }

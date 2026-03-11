@@ -236,6 +236,7 @@ CMP_API int CMP_CALL cupertino_list_section_paint(
       if (cmp_text_font_create((void *)&section->text_backend, &row_style,
                                &font) == CMP_OK) {
         CMPScalar text_y;
+        CMPScalar right_x;
         cmp_text_measure_utf8((void *)&section->text_backend, font, "Ay", 2, 0,
                               &metrics);
         text_y = row_rect.y + (row_height / 2.0f) - (metrics.height / 2.0f) +
@@ -246,7 +247,7 @@ CMP_API int CMP_CALL cupertino_list_section_paint(
                                0, row_rect.x + padding_x, text_y, title_color);
 
         /* Value & Chevron positioning */
-        CMPScalar right_x = row_rect.x + row_rect.width - padding_x;
+        right_x = row_rect.x + row_rect.width - padding_x;
 
         if (row->has_chevron && ctx->gfx->vtable->draw_line) {
           /* Draw Chevron > */

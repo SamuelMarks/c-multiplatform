@@ -12,7 +12,7 @@ CMP_API int CMP_CALL f2_search_box_style_init(F2SearchBoxStyle *style) {
   f2_text_field_style_init(&style->text_field_style);
   f2_button_style_init_transparent(&style->clear_button_style);
 
-  style->icon_color = (CMPColor){0.4f, 0.4f, 0.4f, 1.0f};
+  style->icon_color = cmp_color_rgba(0.4f, 0.4f, 0.4f, 1.0f);
   style->icon_size = 16.0f;
 
   return CMP_OK;

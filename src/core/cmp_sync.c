@@ -8,6 +8,9 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <winsock2.h>
+#if defined(_MSC_VER) && _MSC_VER < 1500
+#include "../../msvc2005_compat.h"
+#endif
 #else
 #include <pthread.h>
 #include <semaphore.h>

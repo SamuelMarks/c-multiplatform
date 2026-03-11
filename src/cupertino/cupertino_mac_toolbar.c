@@ -186,13 +186,14 @@ CMP_API int CMP_CALL cupertino_mac_toolbar_paint(
 
   for (i = 0; i < toolbar->item_count; i++) {
     const CupertinoMacToolbarItem *item = &toolbar->items[i];
+    CMPRect item_rect;
+    CMPColor search_bg;
 
     if (item->is_flexible_space) {
       current_x += flex_width;
       continue;
     }
 
-    CMPRect item_rect;
     item_rect.x = current_x;
     item_rect.y = toolbar->bounds.y + padding_y;
     item_rect.height = item_height;
@@ -201,9 +202,9 @@ CMP_API int CMP_CALL cupertino_mac_toolbar_paint(
       item_rect.width = 150.0f;
       if (ctx->gfx->vtable->draw_rect) {
         /* Search box background */
-        CMPColor search_bg = toolbar->is_dark_mode
-                                 ? (CMPColor){0.0f, 0.0f, 0.0f, 0.2f}
-                                 : (CMPColor){1.0f, 1.0f, 1.0f, 0.5f};
+        search_bg = toolbar->is_dark_mode
+                        ? cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.2f)
+                        : cmp_color_rgba(1.0f, 1.0f, 1.0f, 0.5f);
         ctx->gfx->vtable->draw_rect(ctx->gfx->ctx, &item_rect, search_bg, 6.0f);
       }
     } else {

@@ -28,13 +28,13 @@ CMP_API int CMP_CALL f2_text_field_style_init(F2TextFieldStyle *style) {
   style->core.label_style.size_px = 12;
   style->core.label_style.weight = 400;
 
-  style->core.container_color = (CMPColor){0.99f, 0.99f, 0.99f, 1.0f};
+  style->core.container_color = cmp_color_rgba(0.99f, 0.99f, 0.99f, 1.0f);
   style->core.outline_color =
-      (CMPColor){0.0f, 0.0f, 0.0f, 0.0f}; /* Handled as bottom line */
+      cmp_color_rgba(0.0f, 0.0f, 0.0f, 0.0f); /* Handled as bottom line */
 
-  style->bottom_line_color = (CMPColor){0.4f, 0.4f, 0.4f, 1.0f};
-  style->bottom_line_focus_color = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
-  style->error_color = (CMPColor){0.8f, 0.0f, 0.0f, 1.0f};
+  style->bottom_line_color = cmp_color_rgba(0.4f, 0.4f, 0.4f, 1.0f);
+  style->bottom_line_focus_color = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
+  style->error_color = cmp_color_rgba(0.8f, 0.0f, 0.0f, 1.0f);
 
   return CMP_OK;
 }

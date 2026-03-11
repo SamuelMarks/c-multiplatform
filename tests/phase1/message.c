@@ -53,22 +53,36 @@ static int CMP_CALL fake_free(void *ctx, void *ptr) {
 
 int test_message_bus(void) {
   CMPAllocator alloc;
+  CMPAllocator bad_alloc;
+  CMPAllocator fail_allocator;
+  CMPMessageBus *bus = NULL;
+  CMPMessageBus *bus2 = NULL;
+  void *ctx_ptr = NULL;
+  CMPActorState st;
+  CMPMessageBusConfig config;
+  CMPMessageBusConfig no_limit_config;
+  CMPMessageSubscription sub1 = NULL;
+  CMPMessageSubscription sub2 = NULL;
+  CMPMessageSubscription sub3 = NULL;
+  CMPMessage msg;
+  CMPActor *actor = NULL;
+  CMPActorConfig a_cfg;
+  CMPActorConfig bad_a_cfg;
+  CMPMessage crash_msg;
+
+  config.max_subscribers = 2;
+  no_limit_config.max_subscribers = 0;
+
   CMP_TEST_OK(cmp_get_default_allocator(&alloc));
-  CMPAllocator bad_alloc = alloc;
+
+  bad_alloc = alloc;
   bad_alloc.alloc = NULL;
   bad_alloc.free = NULL;
 
-  CMPAllocator fail_allocator;
   fail_allocator.ctx = NULL;
   fail_allocator.alloc = fail_alloc;
   fail_allocator.realloc = NULL;
   fail_allocator.free = fake_free;
-
-  CMPMessageBus *bus = NULL;
-  void *ctx_ptr = NULL;
-  CMPActorState st;
-  CMPMessageBusConfig config = {.max_subscribers = 2};
-  CMPMessageBusConfig no_limit_config = {.max_subscribers = 0};
 
   /* Test invalid args for create */
   CMP_TEST_EXPECT(cmp_message_bus_create(NULL, &config, &bus),
@@ -95,7 +109,6 @@ int test_message_bus(void) {
                   CMP_ERR_INVALID_ARGUMENT);
 
   /* Test invalid args for subscribe */
-  CMPMessageSubscription sub1 = NULL;
   CMP_TEST_EXPECT(
       cmp_message_bus_subscribe(NULL, TEST_TOPIC, my_handler, NULL, &sub1),
       CMP_ERR_INVALID_ARGUMENT);
@@ -110,20 +123,19 @@ int test_message_bus(void) {
       cmp_message_bus_subscribe(bus, TEST_TOPIC, my_handler, NULL, &sub1));
 
   /* Test max subscribers limit */
-  CMPMessageSubscription sub2 = NULL;
   CMP_TEST_OK(
       cmp_message_bus_subscribe(bus, TEST_TOPIC, my_handler, NULL, &sub2));
-  CMPMessageSubscription sub3 = NULL;
   CMP_TEST_EXPECT(
       cmp_message_bus_subscribe(bus, TEST_TOPIC, my_handler, NULL, &sub3),
       CMP_ERR_RANGE);
 
   /* Test invalid args for publish */
-  CMPMessage msg = {.topic = TEST_TOPIC,
-                    .payload = NULL,
-                    .payload_size = 0,
-                    .type = 0,
-                    .sender = NULL};
+  msg.type = 0;
+  msg.topic = TEST_TOPIC;
+  msg.payload = NULL;
+  msg.payload_size = 0;
+  msg.sender = NULL;
+
   CMP_TEST_EXPECT(cmp_message_bus_publish(NULL, &msg),
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_message_bus_publish(bus, NULL), CMP_ERR_INVALID_ARGUMENT);
@@ -155,13 +167,15 @@ int test_message_bus(void) {
   CMP_TEST_OK(cmp_message_bus_create(&alloc, &no_limit_config, &bus));
 
   /* Test actor invalid args */
-  CMPActor *actor = NULL;
-  CMPActorConfig a_cfg = {.topic = TEST_TOPIC,
-                          .handler = actor_handler,
-                          .ctx = (void *)123,
-                          .restart_on_crash = 1};
-  CMPActorConfig bad_a_cfg = {
-      .topic = TEST_TOPIC, .handler = NULL, .ctx = NULL, .restart_on_crash = 1};
+  a_cfg.handler = actor_handler;
+  a_cfg.ctx = (void *)123;
+  a_cfg.topic = TEST_TOPIC;
+  a_cfg.restart_on_crash = 1;
+
+  bad_a_cfg.handler = NULL;
+  bad_a_cfg.ctx = NULL;
+  bad_a_cfg.topic = TEST_TOPIC;
+  bad_a_cfg.restart_on_crash = 1;
 
   CMP_TEST_EXPECT(cmp_actor_spawn(NULL, &a_cfg, &actor),
                   CMP_ERR_INVALID_ARGUMENT);
@@ -187,11 +201,12 @@ int test_message_bus(void) {
   CMP_TEST_EXPECT(test_handler_called, 1);
 
   /* Publish crash message to actor with restart_on_crash = 1 */
-  CMPMessage crash_msg = {.topic = TEST_TOPIC,
-                          .payload = NULL,
-                          .payload_size = 0,
-                          .type = 999,
-                          .sender = NULL};
+  crash_msg.type = 999;
+  crash_msg.topic = TEST_TOPIC;
+  crash_msg.payload = NULL;
+  crash_msg.payload_size = 0;
+  crash_msg.sender = NULL;
+
   CMP_TEST_OK(cmp_message_bus_publish(bus, &crash_msg));
   CMP_TEST_EXPECT(cmp_actor_get_state(actor, &st) == 0, 1);
   CMP_TEST_EXPECT(st, CMP_ACTOR_STATE_RUNNING);
@@ -199,7 +214,7 @@ int test_message_bus(void) {
   /* Test invalid actor destroy */
   CMP_TEST_EXPECT(cmp_actor_destroy(NULL, actor), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_actor_destroy(bus, NULL), CMP_ERR_INVALID_ARGUMENT);
-  CMPMessageBus *bus2 = NULL;
+
   CMP_TEST_OK(cmp_message_bus_create(&alloc, &no_limit_config, &bus2));
   CMP_TEST_EXPECT(cmp_actor_destroy(bus2, actor), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_message_bus_destroy(&alloc, bus2));

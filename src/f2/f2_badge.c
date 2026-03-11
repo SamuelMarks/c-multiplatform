@@ -9,9 +9,9 @@ CMP_API int CMP_CALL f2_badge_style_init(F2BadgeStyle *style) {
     return CMP_ERR_INVALID_ARGUMENT;
   }
   memset(style, 0, sizeof(*style));
-  style->background_color =
-      (CMPColor){0.8f, 0.0f, 0.0f, 1.0f}; /* Fluent default red for alerts */
-  style->text_color = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
+  style->background_color = cmp_color_rgba(
+      0.8f, 0.0f, 0.0f, 1.0f); /* Fluent default red for alerts */
+  style->text_color = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
 
   style->text_style.utf8_family =
       "Segoe UI Variable, system-ui, -apple-system, Roboto, Ubuntu";
@@ -56,11 +56,12 @@ CMP_API int CMP_CALL f2_presence_badge_style_init(F2PresenceBadgeStyle *style) {
   style->size = F2_PRESENCE_BADGE_SIZE_MEDIUM;
   style->outline_width = 2.0f;
 
-  style->available_color = (CMPColor){0.0f, 0.8f, 0.0f, 1.0f}; /* Green */
-  style->away_color = (CMPColor){1.0f, 0.8f, 0.0f, 1.0f};      /* Yellow */
-  style->busy_color = (CMPColor){0.8f, 0.0f, 0.0f, 1.0f};      /* Red */
-  style->offline_color = (CMPColor){0.6f, 0.6f, 0.6f, 1.0f};   /* Gray */
-  style->outline_color = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f}; /* White cut-out */
+  style->available_color = cmp_color_rgba(0.0f, 0.8f, 0.0f, 1.0f); /* Green */
+  style->away_color = cmp_color_rgba(1.0f, 0.8f, 0.0f, 1.0f);      /* Yellow */
+  style->busy_color = cmp_color_rgba(0.8f, 0.0f, 0.0f, 1.0f);      /* Red */
+  style->offline_color = cmp_color_rgba(0.6f, 0.6f, 0.6f, 1.0f);   /* Gray */
+  style->outline_color =
+      cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f); /* White cut-out */
 
   return CMP_OK;
 }

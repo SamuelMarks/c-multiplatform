@@ -172,16 +172,19 @@ CMP_API int CMP_CALL cupertino_tv_card_paint(const CupertinoTVCard *card,
 
     if (cmp_text_font_create((void *)&card->text_backend, &t_style, &font) ==
         CMP_OK) {
+      CMPScalar tx;
+      CMPScalar ty;
+      CMPColor tc = text_color;
+
       cmp_text_measure_utf8((void *)&card->text_backend, font, card->title_utf8,
                             card->title_len, 0, &metrics);
 
-      CMPScalar tx =
+      tx =
           card->bounds.x + (card->bounds.width / 2.0f) - (metrics.width / 2.0f);
-      CMPScalar ty = card->bounds.y + card->bounds.height + 40.0f +
-                     metrics.baseline; /* Standard gap */
+      ty = card->bounds.y + card->bounds.height + 40.0f +
+           metrics.baseline; /* Standard gap */
 
       /* Text appears solid when focused, faded when unfocused */
-      CMPColor tc = text_color;
       tc.a = 0.5f + (0.5f * focus_progress);
 
       cmp_text_draw_utf8_gfx(ctx->gfx, font, card->title_utf8, card->title_len,

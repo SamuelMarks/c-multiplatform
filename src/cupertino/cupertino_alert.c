@@ -141,11 +141,11 @@ CMP_API int CMP_CALL cupertino_alert_paint(const CupertinoAlert *alert,
 
     if (cmp_text_font_create((void *)&alert->text_backend, &title_style,
                              &font) == CMP_OK) {
+      CMPScalar title_x;
       cmp_text_measure_utf8((void *)&alert->text_backend, font,
                             alert->title_utf8, alert->title_len, 0, &metrics);
 
-      CMPScalar title_x =
-          alert_rect.x + (alert_rect.width - metrics.width) / 2.0f;
+      title_x = alert_rect.x + (alert_rect.width - metrics.width) / 2.0f;
       cmp_text_draw_utf8_gfx(ctx->gfx, font, alert->title_utf8,
                              alert->title_len, 0, title_x,
                              content_y + metrics.baseline, text_color);
@@ -168,14 +168,14 @@ CMP_API int CMP_CALL cupertino_alert_paint(const CupertinoAlert *alert,
 
     if (cmp_text_font_create((void *)&alert->text_backend, &msg_style, &font) ==
         CMP_OK) {
+      CMPScalar msg_x;
       /* Basic multi-line measure would be here, assuming single line or simple
        * layout for now */
       cmp_text_measure_utf8((void *)&alert->text_backend, font,
                             alert->message_utf8, alert->message_len, 0,
                             &metrics);
 
-      CMPScalar msg_x =
-          alert_rect.x + (alert_rect.width - metrics.width) / 2.0f;
+      msg_x = alert_rect.x + (alert_rect.width - metrics.width) / 2.0f;
       content_y += 4.0f;
       cmp_text_draw_utf8_gfx(ctx->gfx, font, alert->message_utf8,
                              alert->message_len, 0, msg_x,

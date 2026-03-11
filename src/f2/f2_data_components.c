@@ -14,11 +14,11 @@ CMP_API int CMP_CALL f2_data_grid_style_init(F2DataGridStyle *style) {
   style->row_height = F2_DATA_GRID_DEFAULT_ROW_HEIGHT;
   style->header_height = F2_DATA_GRID_DEFAULT_HEADER_HEIGHT;
 
-  style->header_bg = (CMPColor){0.95f, 0.95f, 0.95f, 1.0f};
-  style->row_bg_normal = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->row_bg_hover = (CMPColor){0.95f, 0.95f, 0.95f, 1.0f};
-  style->row_bg_selected = (CMPColor){0.90f, 0.95f, 1.0f, 1.0f};
-  style->border_color = (CMPColor){0.9f, 0.9f, 0.9f, 1.0f};
+  style->header_bg = cmp_color_rgba(0.95f, 0.95f, 0.95f, 1.0f);
+  style->row_bg_normal = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->row_bg_hover = cmp_color_rgba(0.95f, 0.95f, 0.95f, 1.0f);
+  style->row_bg_selected = cmp_color_rgba(0.90f, 0.95f, 1.0f, 1.0f);
+  style->border_color = cmp_color_rgba(0.9f, 0.9f, 0.9f, 1.0f);
 
   style->header_text.utf8_family =
       "Segoe UI Variable, system-ui, -apple-system, Roboto, Ubuntu";
@@ -73,8 +73,8 @@ CMP_API int CMP_CALL f2_combo_box_style_init(F2ComboBoxStyle *style) {
   memset(style, 0, sizeof(*style));
 
   f2_text_field_style_init(&style->text_field);
-  style->dropdown_bg = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->item_hover_bg = (CMPColor){0.95f, 0.95f, 0.95f, 1.0f};
+  style->dropdown_bg = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->item_hover_bg = cmp_color_rgba(0.95f, 0.95f, 0.95f, 1.0f);
   style->max_dropdown_height = 250.0f;
   return CMP_OK;
 }
@@ -140,11 +140,11 @@ CMP_API int CMP_CALL f2_date_picker_style_init(F2DatePickerStyle *style) {
     return CMP_ERR_INVALID_ARGUMENT;
   memset(style, 0, sizeof(*style));
 
-  style->header_bg = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->day_bg_normal = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->day_bg_hover = (CMPColor){0.95f, 0.95f, 0.95f, 1.0f};
-  style->day_bg_selected = (CMPColor){0.0f, 0.36f, 0.77f, 1.0f};
-  style->day_bg_today = (CMPColor){0.90f, 0.90f, 0.90f, 1.0f};
+  style->header_bg = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->day_bg_normal = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->day_bg_hover = cmp_color_rgba(0.95f, 0.95f, 0.95f, 1.0f);
+  style->day_bg_selected = cmp_color_rgba(0.0f, 0.36f, 0.77f, 1.0f);
+  style->day_bg_today = cmp_color_rgba(0.90f, 0.90f, 0.90f, 1.0f);
 
   style->header_text.utf8_family =
       "Segoe UI Variable, system-ui, -apple-system, Roboto, Ubuntu";
@@ -197,9 +197,9 @@ CMP_API int CMP_CALL f2_tree_view_style_init(F2TreeViewStyle *style) {
     return CMP_ERR_INVALID_ARGUMENT;
   memset(style, 0, sizeof(*style));
 
-  style->item_bg_normal = (CMPColor){1.0f, 1.0f, 1.0f, 1.0f};
-  style->item_bg_hover = (CMPColor){0.95f, 0.95f, 0.95f, 1.0f};
-  style->item_bg_selected = (CMPColor){0.90f, 0.95f, 1.0f, 1.0f};
+  style->item_bg_normal = cmp_color_rgba(1.0f, 1.0f, 1.0f, 1.0f);
+  style->item_bg_hover = cmp_color_rgba(0.95f, 0.95f, 0.95f, 1.0f);
+  style->item_bg_selected = cmp_color_rgba(0.90f, 0.95f, 1.0f, 1.0f);
 
   style->text_style.utf8_family =
       "Segoe UI Variable, system-ui, -apple-system, Roboto, Ubuntu";

@@ -20,17 +20,22 @@ static int CMP_CALL fake_free(void *ctx, void *ptr) {
 
 int test_deadlock(void) {
   CMPAllocator alloc;
+  CMPAllocator bad_alloc;
+  CMPAllocator fail_a;
+  CMPMutex *m1 = NULL;
+  CMPMutex *m2 = NULL;
+
   CMP_TEST_OK(cmp_get_default_allocator(&alloc));
 
   CMP_TEST_EXPECT(cmp_deadlock_detector_init(NULL), CMP_ERR_INVALID_ARGUMENT);
-  CMPAllocator bad_alloc = alloc;
+
+  bad_alloc = alloc;
   bad_alloc.alloc = NULL;
   CMP_TEST_EXPECT(cmp_deadlock_detector_init(&bad_alloc),
                   CMP_ERR_INVALID_ARGUMENT);
 
   CMP_TEST_OK(cmp_deadlock_detector_init(&alloc));
 
-  CMPMutex *m1 = NULL, *m2 = NULL;
   CMP_TEST_OK(cmp_mutex_create(&alloc, &m1));
   CMP_TEST_OK(cmp_mutex_create(&alloc, &m2));
 
@@ -49,7 +54,11 @@ int test_deadlock(void) {
   cmp_deadlock_check_before_lock(m1, "test"); /* Should be fine, we own it */
 
   /* Out of memory in lock record */
-  CMPAllocator fail_a = {.alloc = fail_alloc, .free = fake_free, .ctx = NULL};
+  fail_a.alloc = fail_alloc;
+  fail_a.free = fake_free;
+  fail_a.ctx = NULL;
+  fail_a.realloc = NULL;
+
   cmp_deadlock_detector_destroy();
   cmp_deadlock_detector_init(&fail_a);
   cmp_deadlock_record_lock(m1); /* Will fail silently */

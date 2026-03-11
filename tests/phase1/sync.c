@@ -67,14 +67,28 @@ static void *signal_thread(void *arg) {
 
 int test_sync(void) {
   CMPAllocator alloc;
+  CMPAllocator bad_alloc;
+  CMPAllocator fail_allocator;
+  CMPMutex *mutex = NULL;
+  CMPSemaphore *sem = NULL;
+  CMPCondVar *cond = NULL;
+  ThreadData tdata;
+#if defined(_WIN32)
+  HANDLE hThread;
+#else
+  pthread_t thread;
+#endif
+
   CMP_TEST_OK(cmp_get_default_allocator(&alloc));
-  CMPAllocator bad_alloc = alloc;
+
+  bad_alloc = alloc;
   bad_alloc.alloc = NULL;
   bad_alloc.free = NULL;
-  CMPAllocator fail_allocator = {
-      .ctx = NULL, .alloc = fail_alloc, .free = fake_free};
 
-  CMPMutex *mutex = NULL;
+  fail_allocator.ctx = NULL;
+  fail_allocator.alloc = fail_alloc;
+  fail_allocator.realloc = NULL;
+  fail_allocator.free = fake_free;
 
   /* MUTEX */
   CMP_TEST_EXPECT(cmp_mutex_create(NULL, &mutex), CMP_ERR_INVALID_ARGUMENT);
@@ -97,7 +111,6 @@ int test_sync(void) {
   CMP_TEST_OK(cmp_mutex_unlock(mutex));
 
   /* SEMAPHORE */
-  CMPSemaphore *sem = NULL;
   CMP_TEST_EXPECT(cmp_semaphore_create(NULL, 1, &sem),
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_semaphore_create(&bad_alloc, 1, &sem),
@@ -124,7 +137,6 @@ int test_sync(void) {
   CMP_TEST_OK(cmp_semaphore_destroy(&alloc, sem));
 
   /* CONDVAR */
-  CMPCondVar *cond = NULL;
   CMP_TEST_EXPECT(cmp_condvar_create(NULL, &cond), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_EXPECT(cmp_condvar_create(&bad_alloc, &cond),
                   CMP_ERR_INVALID_ARGUMENT);
@@ -143,11 +155,11 @@ int test_sync(void) {
   CMP_TEST_OK(cmp_condvar_broadcast(cond));
 
   /* Test condvar wait with a thread */
-  ThreadData tdata = {.cond = cond, .mutex = mutex};
+  tdata.cond = cond;
+  tdata.mutex = mutex;
 #if defined(_WIN32)
-  HANDLE hThread = CreateThread(NULL, 0, signal_thread, &tdata, 0, NULL);
+  hThread = CreateThread(NULL, 0, signal_thread, &tdata, 0, NULL);
 #else
-  pthread_t thread;
   pthread_create(&thread, NULL, signal_thread, &tdata);
 #endif
 
