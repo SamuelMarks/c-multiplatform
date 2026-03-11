@@ -30,6 +30,15 @@ This project is architected specifically for **Context-Window Scalability**, dec
     *   **Android Backend:** NDK backend with Camera2 integration (API 24+).
 *   **Interface-Driven:** Pure virtual table architecture separates API definitions from execution logic.
 
+## 🧩 Ecosystem Integration
+
+LibCMPC is deeply integrated (or soon will be) with a suite of complementary C89 libraries to provide a complete, full-stack application development experience:
+
+*   **[c-abstract-http](../c-abstract-http/README.md)**: A robust, cross-platform abstract HTTP network library. Integrated into LibCMPC to provide native HTTP/HTTPS client calls directly within your multiplatform apps.
+*   **[c-orm](../c-orm/README.md)**: An abstract, cross-platform Object Relational Mapper for C. This will power our upcoming **Room-style interface** for LibCMPC, enabling seamless, type-safe local database storage (SQLite) for your mobile and desktop applications.
+*   **[cdd-c](../cdd-c/README.md)**: Our Compiler Driven Development tool. `cdd-c` orchestrates `c-abstract-http` and `c-orm` to automatically generate C client GUIs in LibCMPC directly from OpenAPI specifications.
+*   **[c-fs](../c-fs/README.md)**: A strictly C89 compliant port of C++17 `std::filesystem`. Almost ready, and will be integrated next to provide high-performance, cross-platform path and OS stream controls for LibCMPC applications.
+
 ## 📂 Architecture Strategy
 
 The project structure is designed to separate the **Contract** (Phase 0) from the **Implementation**.
@@ -139,5 +148,9 @@ git config core.hooksPath .githooks
 | **6. Media + Helpers** | Storage, camera, network, image/audio/video, a11y | ✅ Core APIs complete |
 | **7. Packaging** | Android/iOS/Web/Desktop/SDL3 packaging targets | 🚧 In progress |
 | **8. Docs + Visuals** | Interactive Doxygen APIs, Automated SVG widget tours | ✅ Complete |
-| **9. Example Apps** | Port official sample apps (Material/Compose equivalents) | 🗓️ Planned |
-| **10. Wasm Viewer** | Interactive widget demos directly in the documentation | 🗓️ Planned |
+| **9. File System** | Integration with `c-fs` for native std::filesystem parity | 🚧 In progress |
+| **10. Local Database** | "Room-style" ORM abstraction powered by `c-orm` | 🗓️ Planned |
+| **11. Network + APIs** | `c-abstract-http` integration for cross-platform REST clients | 🗓️ Planned |
+| **12. GUI Generation** | OpenAPI to LibCMPC client app generation using `cdd-c` | 🗓️ Planned |
+| **13. Example Apps** | Port official sample apps (Material/Compose equivalents) | 🗓️ Planned |
+| **14. Wasm Viewer** | Interactive widget demos directly in the documentation | 🗓️ Planned |

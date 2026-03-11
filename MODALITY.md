@@ -32,21 +32,22 @@ Offering these modalities as an `enum` choice to the framework user allows them 
 *   **Message Passing**: Threads or processes communicate by sending discrete messages rather than sharing memory (e.g., the Actor model, Go's channels).
     *   *Tradeoffs*: Drastically reduces the risk of race conditions and deadlocks since state is not shared. Forces a decoupled architecture. The downside is the overhead of copying or moving data into messages and the cognitive shift required to design around message queues.
 
-## Architectural Modifications
+## Architectural Modifications & `c-abstract-http` Integration
 
-To support this diverse set of execution modalities via a simple configuration choice (e.g., `cmp_init(CMP_MODALITY_ASYNC_EVENT_LOOP)`), the framework's core architecture must be heavily abstracted.
+To support this diverse set of execution modalities via a simple configuration choice (e.g., `cmp_init(CMP_MODALITY_ASYNC_EVENT_LOOP)`), LibCMPC offloads this complexity to its sibling library, **`c-abstract-http`**. While primarily a network library, `c-abstract-http` provides the robust, cross-platform concurrency engines required by LibCMPC.
 
-1.  **The Event Loop Abstraction**: The core of the framework can no longer be a simple `while(running)` loop making synchronous system calls. It must be an abstract `EventDispatcher`.
+1.  **The Event Loop Abstraction**: The core of the framework is an abstract `EventDispatcher` deeply bridged 1:1 with `c-abstract-http`'s non-blocking event loop (mimicking Node.js `uv_run`).
     *   If `CMP_MODALITY_SYNC` is chosen, the dispatcher just polls the OS for UI events and blocks until one arrives.
-    *   If `CMP_MODALITY_ASYNC_EVENT_LOOP` is chosen, the dispatcher integrates with an I/O completion port (epoll, kqueue, IOCP, or a library like libuv). It processes UI events, I/O callbacks, and timers in a single unified loop.
+    *   If `CMP_MODALITY_ASYNC_EVENT_LOOP` is chosen, the dispatcher integrates with `c-abstract-http`'s native asynchronous backends (epoll, kqueue, IOCP, or libuv fallback) to process UI events, I/O callbacks, and timers in a single unified loop.
 
-2.  **Pluggable Schedulers**: We need an internal `Scheduler` interface.
-    *   For multithreading, the scheduler spins up a Thread Pool. When the user calls `cmp_task_run()`, the task is queued to the pool.
-    *   For single-threading, `cmp_task_run()` might just queue the task to be run on the main event loop during idle time.
+2.  **Pluggable Schedulers**: We utilize `c-abstract-http`'s internal `Scheduler` interfaces.
+    *   For multithreading, it utilizes the cross-platform thread pool architecture with robust Mutex and CondVar abstractions.
+    *   For single-threading, tasks are queued to be run on the main event loop during idle time.
+    *   For Greenthreads, it leverages Fibers (Windows) and `ucontext_t` (POSIX).
 
-3.  **Unified Messaging Bus**: To support both Multithreading and Multiprocess (and Message Passing), the framework needs a core `MessageBus`.
-    *   Within the same process, the bus can pass pointers (with careful ownership semantics).
-    *   Across processes, the bus must serialize and deserialize messages over pipes or shared memory.
+3.  **Unified Messaging Bus**: To support both Multithreading and Multiprocessing (and Message Passing), LibCMPC leverages `c-abstract-http`'s core `MessageBus`.
+    *   Within the same process, the decentralized actor model and pub-sub bus route requests scalably.
+    *   Across processes, it utilizes built-in C89 binary IPC serialization over anonymous pipes.
 
 4.  **API Design**: The user configuration will look something like this:
     ```c

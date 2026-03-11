@@ -54,5 +54,15 @@ The `cmp_docgen` tool injects a custom `CMPGfxVTable` to intercept all rendering
 Accessibility + Predictive Back
 -------------------------------
 
-- `cmp_a11y` provides a small semantics surface that backends can map to native accessibility APIs.
+- `cmp_a11y` provides a small semantics surface that backends can map to native accessibility APIs.       
 - `cmp_predictive` reports predictive back gestures (start/progress/commit/cancel) for edge-swipe navigation.
+
+Ecosystem Integration
+---------------------
+
+LibCMPC sits at the core of a larger C89 application development ecosystem. It leverages several sibling libraries to provide a modern, full-stack application environment:
+
+- **Network & HTTP (`c-abstract-http`)**: Integrated to provide high-performance, asynchronous HTTP/HTTPS client calls across all supported platforms without bloating the core UI library. Used for API communication, image fetching, and streaming.
+- **Data Persistence (`c-orm`)**: Provides the foundation for a "Room-style" ORM interface within LibCMPC. It allows seamless, type-safe SQLite database storage for local caching, offline sync, and user data persistence.
+- **Code Generation (`cdd-c`)**: Our Compiler Driven Development tool parses OpenAPI specifications and C header files to automatically generate C client GUIs, networking models, and database schemas directly into your LibCMPC project.
+- **File System (`c-fs`)**: Provides a C++17 `std::filesystem` equivalent API, handling cross-platform paths, directory traversal, and OS-level file streams safely.

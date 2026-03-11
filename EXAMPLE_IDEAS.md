@@ -9,6 +9,9 @@ Sample app sources (roadmap)
 - Android Compose Samples (Material 3)
 - Apple SwiftUI / Cupertino sample apps (HIG samples)
 - Microsoft Fluent UI sample gallery/apps
+- **Ecosystem Apps**:
+  - **Auto-generated REST Client GUI**: A desktop/mobile application fully generated via `cdd-c` connecting to an OpenAPI service using `c-abstract-http` and local caching via `c-orm`.
+  - **Room-style Local Notebook**: A note-taking application persisting data locally via `c-orm` utilizing a Room-style declarative schema interface, storing binary artifacts via `c-fs`.
 
 The goal is to copy/port these example apps to validate design-system parity and stress-test the core APIs.
 

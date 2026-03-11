@@ -4,6 +4,8 @@ USAGE
 This guide shows how to build LibCMPC and wire core widgets (including text fields) into a simple loop.
 It also notes the current media decoding fallbacks and plugin helpers. Backends are opt-in and compiled behind CMake flags.
 
+> **Note:** For building full-stack applications with network connectivity, local database storage, and file system management, LibCMPC is designed to be used alongside `c-abstract-http`, `c-orm`, and `c-fs`. To automate the generation of API client models and UI, use `cdd-c`.
+
 ## System dependencies
 
 - macOS: build developer tools (XCode); runtime (none)
