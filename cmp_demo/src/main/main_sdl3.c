@@ -1,7 +1,9 @@
+/* clang-format off */
 #include <SDL3/SDL.h>
 #include <app/demo_app.h>
 #include <cmpc/cmp_backend_sdl3.h>
 #include <stdio.h>
+/* clang-format on */
 
 int main(int argc, char *argv[]) {
   (void)argc;

@@ -1,9 +1,11 @@
 #ifndef CMP_TEST_UTILS_H
 #define CMP_TEST_UTILS_H
 
+/* clang-format off */
 #include <stdio.h>
 
 #include "cmpc/cmp_core.h"
+/* clang-format on */
 
 #define CMP_TEST_ASSERT(condition)                                             \
   do {                                                                         \

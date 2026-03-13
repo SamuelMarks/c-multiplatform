@@ -3,6 +3,7 @@
 
 #include "cmpc/cmp_a11y.h"
 #include "cmpc/cmp_log.h"
+#include "cmpc/cmp_fs.h"
 #include "cmpc/cmp_math.h"
 #include "cmpc/cmp_object.h"
 
@@ -5019,8 +5020,8 @@ static int cmp_web_env_get_io(void *env, CMPIO *out_io) {
   rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "env.get_io");
   CMP_WEB_RETURN_IF_ERROR(rc);
 
-  *out_io = backend->io;
-  return CMP_OK;
+  out_io->ctx = backend;
+  return cmp_get_generic_io_vtable((const CMPIOVTable **)&out_io->vtable);
 }
 
 static int cmp_web_env_get_sensors(void *env, CMPSensors *out_sensors) {

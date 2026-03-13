@@ -1,5 +1,6 @@
 #include "cmpc/cmp_backend_win32.h"
 
+#include "cmpc/cmp_fs.h"
 #include "cmpc/cmp_log.h"
 
 #include "cmpc/cmp_object.h"
@@ -5207,9 +5208,8 @@ static int cmp_win32_env_get_io(void *env, CMPIO *out_io) {
 
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
-  *out_io = backend->io;
-
-  return CMP_OK;
+  out_io->ctx = backend;
+  return cmp_get_generic_io_vtable((const CMPIOVTable **)&out_io->vtable);
 }
 
 static int cmp_win32_env_get_sensors(void *env, CMPSensors *out_sensors) {

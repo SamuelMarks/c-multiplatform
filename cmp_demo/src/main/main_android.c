@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "demo_app.h"
 #include <android_native_app_glue.h>
 #include <cmpc/cmp_backend_android.h>
 #include <time.h>
+/* clang-format on */
 
 typedef struct {
   struct android_app *app;

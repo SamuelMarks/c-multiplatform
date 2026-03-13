@@ -45,6 +45,13 @@ CMP_API int CMP_CALL cmp_fs_read_async(CMPEnv *env, CMPTasks *tasks,
                                        const char *utf8_path,
                                        CMPFSReadCallback callback, void *user);
 
+/**
+ * @brief Get the generic c-fs based IO vtable.
+ * @param out_vtable Pointer to receive the vtable.
+ * @return CMP_OK on success or an error code.
+ */
+CMP_API int CMP_CALL cmp_get_generic_io_vtable(const CMPIOVTable **out_vtable);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

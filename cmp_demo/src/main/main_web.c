@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "app/demo_app.h"
 #include "cmpc/cmp_backend_web.h"
 #include <emscripten.h>
 #include <stdio.h>
+/* clang-format on */
 
 struct WebState {
   CMPWebBackend *backend;

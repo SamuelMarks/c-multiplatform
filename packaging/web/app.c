@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 
 #include <stdio.h>
+/* clang-format on */
 
 static int cmp_web_app_print(void) {
   if (puts("LibCMPC web packaging stub") < 0) {

@@ -1,10 +1,12 @@
 #ifndef DEMO_APP_H
 #define DEMO_APP_H
 
+/* clang-format off */
 #include <cmpc/cmp_api_env.h>
 #include <cmpc/cmp_api_gfx.h>
 #include <cmpc/cmp_api_ws.h>
 #include <cmpc/cmp_core.h>
+/* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {

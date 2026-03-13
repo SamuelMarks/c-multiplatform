@@ -913,9 +913,9 @@ int main(void) {
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(io.vtable->read_file(io.ctx, "path", NULL, 1, &clip_len),
                     CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(io.vtable->read_file(io.ctx, "path", clip_buffer,
+    CMP_TEST_EXPECT(io.vtable->read_file(io.ctx, "doesnotexist", clip_buffer,
                                          sizeof(clip_buffer), &clip_len),
-                    CMP_ERR_UNSUPPORTED);
+                    CMP_ERR_NOT_FOUND);
 
     CMP_TEST_EXPECT(io.vtable->read_file_alloc(NULL, "path", &default_alloc,
                                                &data, &clip_len),
@@ -949,9 +949,10 @@ int main(void) {
     CMP_TEST_EXPECT(io.vtable->read_file_alloc(io.ctx, "path", &partial_alloc,
                                                &data, &clip_len),
                     CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(io.vtable->read_file_alloc(io.ctx, "path", &default_alloc,
-                                               &data, &clip_len),
-                    CMP_ERR_UNSUPPORTED);
+    CMP_TEST_EXPECT(io.vtable->read_file_alloc(io.ctx, "doesnotexist",
+                                               &default_alloc, &data,
+                                               &clip_len),
+                    CMP_ERR_NOT_FOUND);
 
     CMP_TEST_EXPECT(
         io.vtable->write_file(NULL, "path", clip_buffer, 1, CMP_TRUE),
@@ -963,28 +964,26 @@ int main(void) {
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(
         io.vtable->write_file(io.ctx, "path", clip_buffer, 1, CMP_TRUE),
-        CMP_ERR_UNSUPPORTED);
+        CMP_OK);
 
     CMP_TEST_EXPECT(io.vtable->file_exists(NULL, "path", &has_event),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(io.vtable->file_exists(io.ctx, NULL, &has_event),
                     CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(io.vtable->file_exists(io.ctx, "path", &has_event),
-                    CMP_ERR_UNSUPPORTED);
+    CMP_TEST_OK(io.vtable->file_exists(io.ctx, "path", &has_event));
 
     CMP_TEST_EXPECT(io.vtable->delete_file(NULL, "path"),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(io.vtable->delete_file(io.ctx, NULL),
                     CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(io.vtable->delete_file(io.ctx, "path"),
-                    CMP_ERR_UNSUPPORTED);
+    CMP_TEST_EXPECT(io.vtable->delete_file(io.ctx, "path"), CMP_OK);
 
     CMP_TEST_EXPECT(io.vtable->stat_file(NULL, "path", &file_info),
                     CMP_ERR_INVALID_ARGUMENT);
     CMP_TEST_EXPECT(io.vtable->stat_file(io.ctx, NULL, &file_info),
                     CMP_ERR_INVALID_ARGUMENT);
-    CMP_TEST_EXPECT(io.vtable->stat_file(io.ctx, "path", &file_info),
-                    CMP_ERR_UNSUPPORTED);
+    CMP_TEST_EXPECT(io.vtable->stat_file(io.ctx, "doesnotexist", &file_info),
+                    CMP_ERR_NOT_FOUND);
 
     CMP_TEST_EXPECT(sensors.vtable->is_available(NULL, 0, &has_event),
                     CMP_ERR_INVALID_ARGUMENT);
@@ -1344,13 +1343,15 @@ int main(void) {
     CMP_TEST_OK(
         ws.vtable->get_clipboard_text(ws.ctx, buffer, sizeof(buffer), &length));
 
-    CMP_TEST_NULL_FORCE_FAIL(
-        io.vtable->read_file(io.ctx, "path", buffer, sizeof(buffer), &read));
+    CMP_TEST_EXPECT(
+        io.vtable->read_file(io.ctx, "path", buffer, sizeof(buffer), &read),
+        CMP_ERR_NOT_FOUND);
     CMP_TEST_OK(cmp_get_default_allocator(&default_alloc));
     data = NULL;
     data_size = 0;
-    CMP_TEST_NULL_FORCE_FAIL(io.vtable->read_file_alloc(
-        io.ctx, "path", &default_alloc, &data, &data_size));
+    CMP_TEST_EXPECT(io.vtable->read_file_alloc(io.ctx, "path", &default_alloc,
+                                               &data, &data_size),
+                    CMP_ERR_NOT_FOUND);
 
     CMP_TEST_NULL_FORCE_FAIL(ws.vtable->shutdown(ws.ctx));
     CMP_TEST_OK(ws.vtable->shutdown(ws.ctx));
@@ -1568,13 +1569,12 @@ int main(void) {
                                 3u);
     CMP_TEST_OK(gfx.text_vtable->destroy_font(gfx.ctx, font));
 
-    CMP_TEST_NULL_FORCE_FAIL(
-        io.vtable->read_file(io.ctx, "path", buffer, sizeof(buffer), &length));
-    CMP_TEST_NULL_FORCE_FAIL(
-        io.vtable->write_file(io.ctx, "path", buffer, 1, CMP_TRUE));
-    CMP_TEST_NULL_FORCE_FAIL(io.vtable->file_exists(io.ctx, "path", &exists));
-    CMP_TEST_NULL_FORCE_FAIL(io.vtable->delete_file(io.ctx, "path"));
-    CMP_TEST_NULL_FORCE_FAIL(io.vtable->stat_file(io.ctx, "path", &file_info));
+    CMP_TEST_EXPECT(
+        io.vtable->read_file(io.ctx, "path", buffer, sizeof(buffer), &length),
+        CMP_ERR_NOT_FOUND);
+    CMP_TEST_OK(io.vtable->file_exists(io.ctx, "path", &exists));
+    CMP_TEST_EXPECT(io.vtable->stat_file(io.ctx, "path", &file_info),
+                    CMP_ERR_NOT_FOUND);
 
     CMP_TEST_NULL_FORCE_FAIL(
         sensors.vtable->is_available(sensors.ctx, 0u, &exists));

@@ -1,3 +1,4 @@
+/* clang-format off */
 #include <cmpc/cmp_api_env.h>
 #include <cmpc/cmp_backend_gtk4.h>
 #include <cupertino/cupertino_button.h>
@@ -31,6 +32,7 @@
 #define MKDIR(path) _mkdir(path)
 #else
 #include <sys/stat.h>
+/* clang-format on */
 #define MKDIR(path) mkdir(path, 0777)
 #endif
 

@@ -1,4 +1,5 @@
 
+/* clang-format off */
 #include <stdio.h>
 
 #if defined(_MSC_VER)
@@ -66,6 +67,7 @@ doc_printf_file(FILE *f, const char *fmt, ...) {
 #include "m3/m3_selection.h"
 #include "m3/m3_sheet.h"
 #include "m3/m3_tabs.h"
+/* clang-format on */
 
 static const char *g_platform = "linux";
 static const char *g_theme = "material";

@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "demo_app.h"
 
 #include <stdio.h>
@@ -20,6 +21,7 @@
 #include <m3/m3_progress.h>
 #include <m3/m3_scaffold.h>
 #include <m3/m3_selection.h>
+/* clang-format on */
 
 /* Platform font selection */
 #if defined(_WIN32)

@@ -1,10 +1,12 @@
 /* node_js_clone.c */
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_net.h"
 #include "cmpc/cmp_tasks.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+/* clang-format on */
 
 typedef struct {
   CMPAllocator alloc;

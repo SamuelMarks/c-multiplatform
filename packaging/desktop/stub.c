@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 
 #include <stdio.h>
+/* clang-format on */
 
 static int cmp_stub_print(const char *message) {
   if (message == NULL) {

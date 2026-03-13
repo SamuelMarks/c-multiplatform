@@ -1,9 +1,11 @@
 /* resilient_actors.c */
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_message.h"
 #include "cmpc/cmp_tasks.h"
 #include <stdio.h>
 #include <stdlib.h>
+/* clang-format on */
 
 #define TOPIC_JOB 1
 #define TOPIC_STATUS 2

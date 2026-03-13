@@ -120,7 +120,9 @@ macro(cmp_resolve_dependency pkg config_flag)
             FetchContent_Declare(
                 c_abstract_http
                 GIT_REPOSITORY https://github.com/SamuelMarks/c-abstract-http.git
-                GIT_TAG 12972d41d41a810744c139c86751660ace665f90
+                GIT_TAG master
+                GIT_SHALLOW ON
+                UPDATE_DISCONNECTED ON
             )
             FetchContent_GetProperties(c_abstract_http)
             if(NOT c_abstract_http_POPULATED)
@@ -152,6 +154,40 @@ macro(cmp_resolve_dependency pkg config_flag)
             if(CMP_FAT_LIBRARY)
                 set(BUILD_SHARED_LIBS ${_PREV_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
             endif()
+            set(BUILD_TESTING ON CACHE BOOL "" FORCE)
+            set(${pkg}_FOUND_LOCAL ON)
+            set(${pkg}_FOUND ON)
+        elseif("${pkg}" STREQUAL "c-fs")
+            FetchContent_Declare(
+                c_fs
+                GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git
+                GIT_TAG master
+                GIT_SHALLOW ON
+                UPDATE_DISCONNECTED ON
+            )
+            FetchContent_GetProperties(c_fs)
+            if(NOT c_fs_POPULATED)
+                FetchContent_Populate(c_fs)
+            endif()
+            set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            add_subdirectory(${c_fs_SOURCE_DIR} ${c_fs_BINARY_DIR} EXCLUDE_FROM_ALL)
+            set(BUILD_TESTING ON CACHE BOOL "" FORCE)
+            set(${pkg}_FOUND_LOCAL ON)
+            set(${pkg}_FOUND ON)
+        elseif("${pkg}" STREQUAL "c-orm")
+            FetchContent_Declare(
+                c_orm
+                GIT_REPOSITORY https://github.com/SamuelMarks/c-orm.git
+                GIT_TAG master
+                GIT_SHALLOW ON
+                UPDATE_DISCONNECTED ON
+            )
+            FetchContent_GetProperties(c_orm)
+            if(NOT c_orm_POPULATED)
+                FetchContent_Populate(c_orm)
+            endif()
+            set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            add_subdirectory(${c_orm_SOURCE_DIR} ${c_orm_BINARY_DIR} EXCLUDE_FROM_ALL)
             set(BUILD_TESTING ON CACHE BOOL "" FORCE)
             set(${pkg}_FOUND_LOCAL ON)
             set(${pkg}_FOUND ON)
@@ -463,6 +499,13 @@ set(CMP_HAS_GTK4 OFF)
 
 cmp_resolve_dependency(c-abstract-http "")
 target_link_libraries(cmpc PUBLIC c-abstract-http)
+
+cmp_resolve_dependency(c-fs "")
+target_link_libraries(cmpc PUBLIC cfs)
+
+cmp_resolve_dependency(c-orm "")
+target_link_libraries(cmpc PUBLIC c-orm)
+
 set(CMP_HAS_LIBCURL OFF)
 
 # FIX: Applied definitions to 'cmpc' instead of 'm3' so backend sources see them

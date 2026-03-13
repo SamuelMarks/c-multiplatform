@@ -1,8 +1,10 @@
 /* heavy_compute.c */
+/* clang-format off */
 #include "cmpc/cmp_core.h"
 #include "cmpc/cmp_tasks.h"
 #include <stdio.h>
 #include <stdlib.h>
+/* clang-format on */
 
 #define CHUNKS 8
 #define ITERATIONS 10000000

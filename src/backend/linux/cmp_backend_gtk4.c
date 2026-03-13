@@ -2,6 +2,7 @@
 #include "cmpc/cmp_backend_gtk4.h"
 
 #include "cmpc/cmp_log.h"
+#include "cmpc/cmp_fs.h"
 #include "cmpc/cmp_object.h"
 
 #include <limits.h>

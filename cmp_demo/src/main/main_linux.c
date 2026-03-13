@@ -1,6 +1,8 @@
+/* clang-format off */
 #include <app/demo_app.h>
 #include <cmpc/cmp_backend_gtk4.h>
 #include <gtk/gtk.h>
+/* clang-format on */
 
 int main(int argc, char **argv) {
   gtk_init();

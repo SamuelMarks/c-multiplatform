@@ -1,8 +1,10 @@
 /* tests/test_app_logic.c */
+/* clang-format off */
 #include <app/demo_app.h>
 #include <assert.h>
 #include <cmpc/cmp_backend_null.h>
 #include <stdio.h>
+/* clang-format on */
 
 int main(void) {
   CMPAllocator alloc;
