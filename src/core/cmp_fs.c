@@ -144,11 +144,23 @@ CMP_API int CMP_CALL cmp_fs_read_async(CMPEnv *env, CMPTasks *tasks,
 
 static int cmp_cfs_path_init_utf8(cfs_path *p, const char *utf8_path) {
 #if defined(CFS_OS_WINDOWS) || defined(_WIN32)
-  cfs_size_t wlen = cfs_utf8_to_utf16(utf8_path, NULL, 0);
-  wchar_t *wbuf = (wchar_t *)malloc((wlen + 1) * sizeof(wchar_t));
+  cfs_size_t wlen = 0;
+  wchar_t *wbuf = NULL;
+  int rc;
+
+  rc = cfs_utf8_to_utf16(utf8_path, NULL, 0, &wlen);
+  if (rc != 0) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  wbuf = (wchar_t *)malloc((wlen + 1) * sizeof(wchar_t));
   if (wbuf == NULL)
     return CMP_ERR_OUT_OF_MEMORY;
-  cfs_utf8_to_utf16(utf8_path, wbuf, wlen);
+
+  rc = cfs_utf8_to_utf16(utf8_path, wbuf, wlen + 1, &wlen);
+  if (rc != 0) {
+    free(wbuf);
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
   wbuf[wlen] = 0;
   cfs_path_init_str(p, wbuf);
   free(wbuf);

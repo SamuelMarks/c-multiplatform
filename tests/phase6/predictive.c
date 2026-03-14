@@ -5,8 +5,6 @@
 #include <string.h>
 /* clang-format on */
 
-int CMP_CALL cmp_predictive_test_set_event_init_fail(CMPBool enable);
-
 typedef struct PredictiveHandlerState {
   int start_count;
   int progress_count;

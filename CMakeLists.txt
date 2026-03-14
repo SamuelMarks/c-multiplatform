@@ -123,6 +123,7 @@ macro(cmp_resolve_dependency pkg config_flag)
                 GIT_TAG master
                 GIT_SHALLOW ON
                 UPDATE_DISCONNECTED ON
+                UPDATE_COMMAND ""
             )
             FetchContent_GetProperties(c_abstract_http)
             if(NOT c_abstract_http_POPULATED)
@@ -131,6 +132,9 @@ macro(cmp_resolve_dependency pkg config_flag)
             
             set(C_ABSTRACT_HTTP_HEADER_ONLY OFF CACHE BOOL "" FORCE)
             set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            set(C_ABSTRACT_HTTP_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            set(C_FS_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            set(C_ORM_BUILD_TESTING OFF CACHE BOOL "" FORCE)
             if(CMP_FAT_LIBRARY)
                 set(_PREV_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
                 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
@@ -159,18 +163,24 @@ macro(cmp_resolve_dependency pkg config_flag)
             set(${pkg}_FOUND ON)
         elseif("${pkg}" STREQUAL "c-fs")
             FetchContent_Declare(
-                c_fs
+                cfs
                 GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git
                 GIT_TAG master
                 GIT_SHALLOW ON
                 UPDATE_DISCONNECTED ON
+                UPDATE_COMMAND ""
             )
-            FetchContent_GetProperties(c_fs)
-            if(NOT c_fs_POPULATED)
-                FetchContent_Populate(c_fs)
+            FetchContent_GetProperties(cfs)
+            if(NOT cfs_POPULATED)
+                FetchContent_Populate(cfs)
             endif()
             set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-            add_subdirectory(${c_fs_SOURCE_DIR} ${c_fs_BINARY_DIR} EXCLUDE_FROM_ALL)
+            set(C_ABSTRACT_HTTP_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            set(C_FS_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            set(C_ORM_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            if(NOT TARGET cfs)
+                add_subdirectory(${cfs_SOURCE_DIR} ${cfs_BINARY_DIR} EXCLUDE_FROM_ALL)
+            endif()
             set(BUILD_TESTING ON CACHE BOOL "" FORCE)
             set(${pkg}_FOUND_LOCAL ON)
             set(${pkg}_FOUND ON)
@@ -181,12 +191,16 @@ macro(cmp_resolve_dependency pkg config_flag)
                 GIT_TAG master
                 GIT_SHALLOW ON
                 UPDATE_DISCONNECTED ON
+                UPDATE_COMMAND ""
             )
             FetchContent_GetProperties(c_orm)
             if(NOT c_orm_POPULATED)
                 FetchContent_Populate(c_orm)
             endif()
             set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            set(C_ABSTRACT_HTTP_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            set(C_FS_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            set(C_ORM_BUILD_TESTING OFF CACHE BOOL "" FORCE)
             add_subdirectory(${c_orm_SOURCE_DIR} ${c_orm_BINARY_DIR} EXCLUDE_FROM_ALL)
             set(BUILD_TESTING ON CACHE BOOL "" FORCE)
             set(${pkg}_FOUND_LOCAL ON)
@@ -1541,7 +1555,7 @@ if(CMP_ENABLE_GTK4)
     target_link_libraries(screenshot_tool PRIVATE m3 f2 cupertino cmpc)
 endif()
 if(TARGET c-abstract-http-test)
-    set_target_properties(c-abstract-http-test PROPERTIES EXCLUDE_FROM_ALL OFF)
+    set_target_properties(c-abstract-http-test PROPERTIES EXCLUDE_FROM_ALL ON)
 endif()
 
 if(WIN32 AND BUILD_SHARED_LIBS)

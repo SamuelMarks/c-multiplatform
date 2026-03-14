@@ -7,21 +7,6 @@
 #include <string.h>
 /* clang-format on */
 
-int CMP_CALL cmp_image_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                         cmp_usize *out_value);
-int CMP_CALL cmp_image_test_set_mul_overflow_fail_after(cmp_u32 call_count);
-int CMP_CALL cmp_image_test_ppm_skip_ws(const cmp_u8 *data, cmp_usize size,
-                                        cmp_usize *offset);
-int CMP_CALL cmp_image_test_ppm_read_uint(const cmp_u8 *data, cmp_usize size,
-                                          cmp_usize *offset,
-                                          cmp_u32 *out_value);
-int CMP_CALL cmp_image_test_decode_ppm(const CMPImageDecodeRequest *request,
-                                       const CMPAllocator *allocator,
-                                       CMPImageData *out_image);
-int CMP_CALL cmp_image_test_decode_raw_rgba8(
-    const CMPImageDecodeRequest *request, const CMPAllocator *allocator,
-    CMPImageData *out_image);
-
 typedef struct TestImageState {
   int fail_decode;
   int fail_decode_rc;

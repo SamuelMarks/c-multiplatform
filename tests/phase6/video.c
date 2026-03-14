@@ -7,24 +7,6 @@
 #include <string.h>
 /* clang-format on */
 
-int CMP_CALL cmp_video_test_set_read_u32_fail_after(cmp_u32 call_count);
-int CMP_CALL cmp_video_test_set_mul_overflow_fail_after(cmp_u32 call_count);
-int CMP_CALL cmp_video_test_mul_overflow(cmp_usize a, cmp_usize b,
-                                         cmp_usize *out_value);
-int CMP_CALL cmp_video_test_read_u32_le(const cmp_u8 *data, cmp_usize size,
-                                        cmp_usize offset, cmp_u32 *out_value);
-int CMP_CALL cmp_video_test_fallback_parse(const CMPVideoOpenRequest *request);
-int CMP_CALL cmp_video_test_fallback_open(CMPVideoDecoder *decoder,
-                                          const CMPVideoOpenRequest *request);
-int CMP_CALL cmp_video_test_fallback_close(CMPVideoDecoder *decoder);
-int CMP_CALL cmp_video_test_fallback_read_frame_raw(CMPVideoDecoder *decoder,
-                                                    CMPVideoFrame *out_frame,
-                                                    CMPBool *out_has_frame);
-int CMP_CALL cmp_video_test_fallback_read_frame_case(
-    cmp_u32 width, cmp_u32 height, cmp_u32 fps_num, cmp_u32 fps_den,
-    cmp_u32 frame_count, cmp_u32 frame_index, cmp_usize frame_size,
-    CMPVideoFrame *out_frame, CMPBool *out_has_frame);
-
 #define TEST_VIDEO_M3V0_HEADER_SIZE 28u
 
 typedef struct TestVideoState {
