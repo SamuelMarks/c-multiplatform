@@ -62,6 +62,7 @@ typedef struct CMPTextFieldStyle {
   CMPColor container_color;          /**< Container fill color. */
   CMPColor outline_color;            /**< Outline color (idle). */
   CMPColor focused_outline_color;    /**< Outline color when focused. */
+  CMPColor error_outline_color;      /**< Outline color when invalid. */
   CMPColor disabled_container_color; /**< Container color when disabled. */
   CMPColor disabled_outline_color;   /**< Outline color when disabled. */
   CMPColor disabled_text_color;      /**< Text color when disabled. */
@@ -86,6 +87,8 @@ typedef struct CMPTextFieldStyle {
   CMPScalar cursor_blink_period; /**< Cursor blink period in seconds (>= 0). */
   CMPScalar handle_radius; /**< Selection handle radius in pixels (>= 0). */
   CMPScalar handle_height; /**< Selection handle height in pixels (>= 0). */
+  CMPBool is_obscured;     /**< CMP_TRUE to mask input for passwords. */
+  char obscure_char;       /**< Character to use when obscured (e.g. '*'). */
 } CMPTextFieldStyle;
 
 /**
@@ -111,6 +114,9 @@ typedef struct CMPTextField {
   cmp_usize cursor;          /**< Cursor byte offset in UTF-8 buffer. */
   cmp_usize selection_start; /**< Selection start byte offset. */
   cmp_usize selection_end;   /**< Selection end byte offset. */
+  char *obscured_utf8;       /**< Owned UTF-8 buffer for masked text. */
+  cmp_usize obscured_len;    /**< Masked text length in bytes. */
+  cmp_usize obscured_capacity; /**< Masked text capacity in bytes. */
   CMPBool selecting; /**< CMP_TRUE when pointer selection drag is active. */
   CMPBool
       text_metrics_valid; /**< CMP_TRUE when cached text metrics are valid. */
@@ -122,6 +128,7 @@ typedef struct CMPTextField {
       font_metrics_valid; /**< CMP_TRUE when cached font metrics are valid. */
   CMPBool owns_fonts;     /**< CMP_TRUE when widget owns font handles. */
   CMPBool focused;        /**< CMP_TRUE when field is focused. */
+  CMPBool is_invalid;     /**< CMP_TRUE when field content is invalid. */
   CMPBool cursor_visible; /**< CMP_TRUE when cursor is visible. */
   CMPScalar cursor_timer; /**< Cursor blink timer in seconds. */
   CMPAnimController label_anim;   /**< Label animation controller. */
@@ -293,6 +300,15 @@ CMP_API int CMP_CALL cmp_text_field_get_cursor(const CMPTextField *field,
  */
 CMP_API int CMP_CALL cmp_text_field_set_focus(CMPTextField *field,
                                               CMPBool focused);
+
+/**
+ * @brief Set the text field invalid state.
+ * @param field Text field instance.
+ * @param is_invalid CMP_TRUE if invalid, CMP_FALSE otherwise.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_text_field_set_invalid(CMPTextField *field,
+                                                CMPBool is_invalid);
 
 /**
  * @brief Step text field animations (label and cursor).

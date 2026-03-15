@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmpc/cmp_event.h"
+#include <string.h>
 
 #ifdef CMP_TESTING
 
@@ -230,6 +231,29 @@ static int cmp_event_hit_test(const CMPRenderNode *node, CMPScalar x,
 }
 
 static int cmp_event_dispatch_to_widget(CMPWidget *widget,
+                                        const CMPInputEvent *event,
+                                        CMPBool *out_handled);
+
+static void cmp_event_set_focused_widget(CMPEventDispatcher *dispatcher,
+                                         CMPWidget *new_focus) {
+  if (dispatcher->focused != new_focus) {
+    CMPInputEvent event;
+    CMPBool handled;
+    if (dispatcher->focused != NULL) {
+      memset(&event, 0, sizeof(event));
+      event.type = CMP_INPUT_BLUR;
+      cmp_event_dispatch_to_widget(dispatcher->focused, &event, &handled);
+    }
+    dispatcher->focused = new_focus;
+    if (new_focus != NULL) {
+      memset(&event, 0, sizeof(event));
+      event.type = CMP_INPUT_FOCUS;
+      cmp_event_dispatch_to_widget(new_focus, &event, &handled);
+    }
+  }
+}
+
+static int cmp_event_dispatch_to_widget(CMPWidget *widget,
 
                                         const CMPInputEvent *event,
 
@@ -351,7 +375,7 @@ int CMP_CALL cmp_event_dispatcher_set_focus(CMPEventDispatcher *dispatcher,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
-  dispatcher->focused = widget;
+  cmp_event_set_focused_widget(dispatcher, widget);
 
   return CMP_OK;
 }
@@ -368,7 +392,7 @@ int CMP_CALL cmp_event_dispatcher_clear_focus(CMPEventDispatcher *dispatcher) {
     return CMP_ERR_STATE;
   }
 
-  dispatcher->focused = NULL;
+  cmp_event_set_focused_widget(dispatcher, NULL);
 
   dispatcher->focus_visible = CMP_FALSE;
 
@@ -471,7 +495,7 @@ int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
 
       if (event->type == CMP_INPUT_POINTER_DOWN) {
 
-        dispatcher->focused = NULL;
+        cmp_event_set_focused_widget(dispatcher, NULL);
 
         dispatcher->focus_visible = CMP_FALSE;
       }
@@ -492,11 +516,11 @@ int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
 
       if (cmp_event_widget_focusable(target)) {
 
-        dispatcher->focused = target;
+        cmp_event_set_focused_widget(dispatcher, target);
 
       } else {
 
-        dispatcher->focused = NULL;
+        cmp_event_set_focused_widget(dispatcher, NULL);
       }
 
       dispatcher->focus_visible = CMP_FALSE;
@@ -622,7 +646,7 @@ int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
 
       if (next_focus != NULL) {
 
-        dispatcher->focused = next_focus;
+        cmp_event_set_focused_widget(dispatcher, next_focus);
 
         dispatcher->focus_visible = CMP_TRUE;
 
@@ -651,7 +675,7 @@ int CMP_CALL cmp_event_dispatch(CMPEventDispatcher *dispatcher,
 
     if (event->type == CMP_INPUT_WINDOW_BLUR) {
 
-      dispatcher->focused = NULL;
+      cmp_event_set_focused_widget(dispatcher, NULL);
 
       dispatcher->focus_visible = CMP_FALSE;
     }

@@ -81,6 +81,10 @@ extern "C" {
 #define CMP_INPUT_GESTURE_DRAG_END 19
 /** @brief Fling gesture event. */
 #define CMP_INPUT_GESTURE_FLING 20
+/** @brief Widget focus gained event. */
+#define CMP_INPUT_FOCUS 21
+/** @brief Widget focus lost event. */
+#define CMP_INPUT_BLUR 22
 
 /**
  * @brief Pointer input data.

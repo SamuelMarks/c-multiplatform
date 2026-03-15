@@ -312,7 +312,7 @@ int main(void) {
         cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(target == &widget2);
     CMP_TEST_ASSERT(handled == CMP_TRUE);
-    CMP_TEST_ASSERT(state2.event_calls == 1);
+    CMP_TEST_ASSERT(state2.event_calls == 2);
     CMP_TEST_ASSERT(state1.event_calls == 0);
     CMP_TEST_OK(cmp_event_dispatcher_get_focus(&dispatcher, &target));
     CMP_TEST_ASSERT(target == &widget2);
@@ -331,7 +331,7 @@ int main(void) {
     CMP_TEST_OK(
         cmp_event_dispatch(&dispatcher, &root, &event, &target, &handled));
     CMP_TEST_ASSERT(target == &widget1);
-    CMP_TEST_ASSERT(state1.event_calls == 1);
+    CMP_TEST_ASSERT(state1.event_calls == 2);
 
     widget2.flags = CMP_WIDGET_FLAG_FOCUSABLE | CMP_WIDGET_FLAG_HIDDEN;
     init_pointer_event(&event, CMP_INPUT_POINTER_DOWN, 10, 10);

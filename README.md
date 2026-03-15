@@ -144,7 +144,7 @@ git config core.hooksPath .githooks
 | **2. Core Logic** | Math, HCT color, layout, animation, router, path | ✅ Complete |
 | **3. Engine** | Render lists, event dispatching, gesture/scroll, task runner | ✅ Complete |
 | **4. Backends** | Null, SDL3, GTK4, Cocoa, Win32, Web, iOS, Android | ✅ Implemented |
-| **5. Components** | Core widgets + Extensive M3, Cupertino, and Fluent 2 widget libraries | ✅ Complete |
+| **5. Components** | Core widgets, M3, Cupertino, Fluent 2 + OAuth2 UI (Password masks, Focus, Validation) | ✅ Complete |
 | **6. Media + Helpers** | Storage, camera, network, image/audio/video, a11y | ✅ Core APIs complete |
 | **7. Packaging** | Android/iOS/Web/Desktop/SDL3 packaging targets | 🚧 In progress |
 | **8. Docs + Visuals** | Interactive Doxygen APIs, Automated SVG widget tours | ✅ Complete |

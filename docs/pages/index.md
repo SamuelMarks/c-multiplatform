@@ -16,4 +16,4 @@ LibCMPC provides a robust, zero-dependency, highly scalable UI and system abstra
 - **Strict C89:** Compiles everywhere, from MSVC to GCC to Emscripten.
 - **Dependency-free:** Implements its own rendering, layout, and data structures.
 - **Cross-Platform:** Write once, run on Windows, macOS, Linux, Android, iOS, and the Web.
-- **Scalable UI:** Fully implemented Material Design 3 (M3) widget set.
+- **Scalable UI:** Fully implemented Material Design 3 (M3), Apple Cupertino, and Microsoft Fluent 2 widget sets.

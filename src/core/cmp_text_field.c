@@ -248,6 +248,10 @@ static int cmp_text_field_validate_style(const CMPTextFieldStyle *style,
   if (rc != CMP_OK) {
     return rc;
   }
+  rc = cmp_text_field_validate_color(&style->error_outline_color);
+  if (rc != CMP_OK) {
+    return rc;
+  }
   rc = cmp_text_field_validate_color(&style->disabled_container_color);
   if (rc != CMP_OK) {
     return rc;
@@ -627,8 +631,71 @@ static int cmp_text_field_next_offset(const char *utf8, cmp_usize utf8_len,
   return CMP_OK;
 }
 
+static int cmp_text_field_update_text_metrics(CMPTextField *field);
+
+static cmp_usize cmp_text_field_count_codepoints(const char *utf8,
+                                                 cmp_usize offset) {
+  CMPUtf8Iter iter;
+  cmp_usize count = 0;
+  cmp_u32 cp;
+  if (utf8 == NULL || offset == 0) {
+    return 0;
+  }
+  if (cmp_utf8_iter_init(&iter, utf8, offset) == CMP_OK) {
+    while (cmp_utf8_iter_next(&iter, &cp) == CMP_OK) {
+      count++;
+    }
+  }
+  return count;
+}
+
+static int cmp_text_field_sync_obscured(CMPTextField *field) {
+  cmp_usize count;
+  cmp_usize new_cap;
+  void *mem;
+
+  if (field->style.is_obscured == CMP_FALSE) {
+    if (field->obscured_utf8 != NULL) {
+      if (field->allocator.free != NULL) {
+        field->allocator.free(field->allocator.ctx, field->obscured_utf8);
+      }
+      field->obscured_utf8 = NULL;
+      field->obscured_len = 0u;
+      field->obscured_capacity = 0u;
+    }
+    return CMP_OK;
+  }
+
+  count = cmp_text_field_count_codepoints(field->utf8, field->utf8_len);
+  if (count + 1u > field->obscured_capacity) {
+    new_cap = count + 1u;
+    if (new_cap < 32u) {
+      new_cap = 32u;
+    }
+    if (field->allocator.realloc == NULL) {
+      return CMP_ERR_UNSUPPORTED;
+    }
+    if (field->allocator.realloc(field->allocator.ctx, field->obscured_utf8,
+                                 new_cap, &mem) != CMP_OK) {
+      return CMP_ERR_OUT_OF_MEMORY;
+    }
+    field->obscured_utf8 = (char *)mem;
+    field->obscured_capacity = new_cap;
+  }
+  if (count > 0u) {
+    memset(field->obscured_utf8, field->style.obscure_char, count);
+  }
+  if (field->obscured_utf8 != NULL) {
+    field->obscured_utf8[count] = '\0';
+  }
+  field->obscured_len = count;
+  return CMP_OK;
+}
+
 static int cmp_text_field_update_text_metrics(CMPTextField *field) {
   int rc;
+  const char *meas_utf8;
+  cmp_usize meas_len;
 
   if (field == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -637,9 +704,18 @@ static int cmp_text_field_update_text_metrics(CMPTextField *field) {
     return CMP_OK;
   }
 
-  rc =
-      cmp_text_measure_utf8(&field->text_backend, field->text_font, field->utf8,
-                            field->utf8_len, 0, &field->text_metrics);
+  rc = cmp_text_field_sync_obscured(field);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  meas_utf8 = (field->style.is_obscured == CMP_TRUE) ? field->obscured_utf8
+                                                     : field->utf8;
+  meas_len = (field->style.is_obscured == CMP_TRUE) ? field->obscured_len
+                                                    : field->utf8_len;
+
+  rc = cmp_text_measure_utf8(&field->text_backend, field->text_font, meas_utf8,
+                             meas_len, 0, &field->text_metrics);
 #ifdef CMP_TESTING
   if (cmp_text_field_test_fail_point_match(
           CMP_TEXT_FIELD_TEST_FAIL_TEXT_MEASURE)) {
@@ -956,8 +1032,14 @@ static int cmp_text_field_measure_prefix(CMPTextField *field, cmp_usize offset,
     return rc;
   }
 
-  rc = cmp_text_measure_utf8(&field->text_backend, field->text_font,
-                             field->utf8, offset, 0, &metrics);
+  if (field->style.is_obscured == CMP_TRUE) {
+    rc = cmp_text_measure_utf8(
+        &field->text_backend, field->text_font, field->obscured_utf8,
+        cmp_text_field_count_codepoints(field->utf8, offset), 0, &metrics);
+  } else {
+    rc = cmp_text_measure_utf8(&field->text_backend, field->text_font,
+                               field->utf8, offset, 0, &metrics);
+  }
 #ifdef CMP_TESTING
   if (cmp_text_field_test_fail_point_match(
           CMP_TEXT_FIELD_TEST_FAIL_TEXT_MEASURE)) {
@@ -1075,9 +1157,13 @@ static int cmp_text_field_resolve_colors(
     *out_placeholder = field->style.disabled_placeholder_color;
   } else {
     *out_container = field->style.container_color;
-    *out_outline = (field->focused == CMP_TRUE)
-                       ? field->style.focused_outline_color
-                       : field->style.outline_color;
+    if (field->is_invalid == CMP_TRUE) {
+      *out_outline = field->style.error_outline_color;
+    } else {
+      *out_outline = (field->focused == CMP_TRUE)
+                         ? field->style.focused_outline_color
+                         : field->style.outline_color;
+    }
     *out_text = field->style.text_style.color;
     *out_label = field->style.label_style.color;
     *out_placeholder = field->style.placeholder_color;
@@ -1445,9 +1531,18 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
     CMPScalar textDrawY = centerY - field->text_font_metrics.height * 0.5f +
                           field->text_font_metrics.baseline;
 
-    rc = ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, field->text_font,
-                                          field->utf8, field->utf8_len, 0,
-                                          text_x, textDrawY, text_color);
+    {
+      const char *draw_utf8 = (field->style.is_obscured == CMP_TRUE)
+                                  ? field->obscured_utf8
+                                  : field->utf8;
+      cmp_usize draw_len = (field->style.is_obscured == CMP_TRUE)
+                               ? field->obscured_len
+                               : field->utf8_len;
+
+      rc = ctx->gfx->text_vtable->draw_text(ctx->gfx->ctx, field->text_font,
+                                            draw_utf8, draw_len, 0, text_x,
+                                            textDrawY, text_color);
+    }
     if (rc != CMP_OK) {
       return rc;
     }
@@ -1609,6 +1704,24 @@ static int cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
   }
 
   switch (event->type) {
+  case CMP_INPUT_FOCUS:
+    field->focused = CMP_TRUE;
+    rc = cmp_text_field_sync_label(field);
+    if (rc != CMP_OK) {
+      return rc;
+    }
+    cmp_text_field_reset_cursor_blink(field);
+    *out_handled = CMP_TRUE;
+    return CMP_OK;
+  case CMP_INPUT_BLUR:
+    field->focused = CMP_FALSE;
+    field->selecting = CMP_FALSE;
+    rc = cmp_text_field_sync_label(field);
+    if (rc != CMP_OK) {
+      return rc;
+    }
+    *out_handled = CMP_TRUE;
+    return CMP_OK;
   case CMP_INPUT_POINTER_DOWN:
     rc = cmp_text_field_offset_for_x(field,
                                      (CMPScalar)event->data.pointer.x -
@@ -1949,6 +2062,8 @@ int CMP_CALL cmp_text_field_style_init(CMPTextFieldStyle *style) {
   style->cursor_blink_period = CMP_TEXT_FIELD_DEFAULT_CURSOR_BLINK;
   style->handle_radius = CMP_TEXT_FIELD_DEFAULT_HANDLE_RADIUS;
   style->handle_height = CMP_TEXT_FIELD_DEFAULT_HANDLE_HEIGHT;
+  style->is_obscured = CMP_FALSE;
+  style->obscure_char = '*';
 
   rc =
       cmp_text_field_color_set(&style->container_color, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -1960,6 +2075,11 @@ int CMP_CALL cmp_text_field_style_init(CMPTextFieldStyle *style) {
     return rc;
   }
   rc = cmp_text_field_color_set(&style->focused_outline_color, 0.2f, 0.4f, 0.9f,
+                                1.0f);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+  rc = cmp_text_field_color_set(&style->error_outline_color, 0.9f, 0.2f, 0.2f,
                                 1.0f);
   if (rc != CMP_OK) {
     return rc;
@@ -2500,6 +2620,15 @@ int CMP_CALL cmp_text_field_get_cursor(const CMPTextField *field,
   }
 
   *out_cursor = field->cursor;
+  return CMP_OK;
+}
+
+int CMP_CALL cmp_text_field_set_invalid(CMPTextField *field,
+                                        CMPBool is_invalid) {
+  if (field == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  field->is_invalid = is_invalid;
   return CMP_OK;
 }
 

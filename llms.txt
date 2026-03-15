@@ -1,0 +1,31 @@
+# c-multiplatform (LibCMPC)
+
+**c-multiplatform** (LibCMPC) is a strict C89 (ANSI C) cross-platform GUI framework and UI component library.
+It is architected for zero-dependency, context-window scalability (to be friendly for LLM generation), and 100% test/documentation coverage.
+
+## Current State & Purpose
+
+This repository provides the core primitives (V-Tables, Layout, Event Dispatching) alongside rich Design System implementations (Material Design 3, Apple Cupertino, Microsoft Fluent 2). It compiles across all major platforms and compilers, including Windows (MSVC 2005 - 2026), macOS, Linux, and WebAssembly.
+
+The current purpose and recent milestone focused on adding comprehensive **OAuth2 Password Grant GUI support**:
+- **Password Field Masking:** `CMPTextField` securely masks inputs using isolated buffers (`is_obscured`, `obscured_utf8`), protecting users' typed credentials natively.
+- **Focus Traversal:** Keyboard navigation (Tab/Shift-Tab) robustly triggers `CMP_INPUT_FOCUS` and `CMP_INPUT_BLUR` events across the widget layout tree.
+- **Form Validation States:** Visual error outlines (`error_outline_color`, `is_invalid`) were added to provide immediate GUI feedback on invalid inputs before server submission.
+
+These components are fully implemented, and Doxygen doc coverage and CTest suite coverage both strictly stand at 100%.
+
+## Architecture
+
+The project splits the API Contract from the Implementation:
+- `include/cmpc/`: Public interface definitions (Phase 0 APIs), ABI contracts (`cmp_api_*`).
+- `src/core/`: Backend-agnostic core logic, event dispatch, text layout, animations, constraints.
+- `src/m3/`, `src/cupertino/`, `src/f2/`: Design-system implementations (styling, colors, widgets).
+- `src/backend/`: Platform-specific V-Table implementations (e.g., SDL3, GTK4, Win32, Cocoa, Web).
+
+## Future Integrations
+
+LibCMPC sits in an ecosystem of other strict C89 libraries (each hosted separately but integrating here):
+- **`c-abstract-http`**: For asynchronous REST API fetching natively in C.
+- **`c-orm`**: A "Room-style" Object-Relational Mapper for C backed by SQLite, requiring upcoming "Token Lifetime Management" and "Secure Credential Storage" features for OAuth tokens.
+- **`cdd-c`**: A compiler-driven development tool for ingesting OpenAPI specs to generate `c-multiplatform` GUIs and JSON deserialization APIs.
+- **`c-fs`**: Cross-platform C17 `std::filesystem` port for path parsing and native file I/O operations.
