@@ -269,8 +269,6 @@ static int cmp_video_fallback_read_frame(CMPVideoDecoder *decoder,
   cmp_u32 timestamp_ms;
   cmp_usize offset;
 
-
-
   if (decoder == NULL || out_frame == NULL || out_has_frame == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
   }

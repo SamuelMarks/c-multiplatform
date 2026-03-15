@@ -205,11 +205,17 @@ macro(cmp_resolve_dependency pkg config_flag)
             if(NOT c_orm_POPULATED)
                 FetchContent_Populate(c_orm)
             endif()
+            file(READ "${c_orm_SOURCE_DIR}/CMakeLists.txt" C_ORM_CML)
+            string(REPLACE "add_subdirectory(tests/e2e)" "" C_ORM_CML "${C_ORM_CML}")
+            file(WRITE "${c_orm_SOURCE_DIR}/CMakeLists.txt" "${C_ORM_CML}")
             set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
             set(C_ABSTRACT_HTTP_BUILD_TESTING OFF CACHE BOOL "" FORCE)
             set(C_FS_BUILD_TESTING OFF CACHE BOOL "" FORCE)
             set(C_ORM_BUILD_TESTING OFF CACHE BOOL "" FORCE)
             add_subdirectory(${c_orm_SOURCE_DIR} ${c_orm_BINARY_DIR} EXCLUDE_FROM_ALL)
+            if(MSVC)
+                target_compile_options(c-orm PRIVATE /wd4306)
+            endif()
             set(BUILD_TESTING ON CACHE BOOL "" FORCE)
             set(cfs_RESOLVED ON CACHE BOOL "" FORCE)
             set(c_fs_POPULATED ON CACHE BOOL "" FORCE)
@@ -253,6 +259,7 @@ set(CMP_WARNINGS_C
     $<$<C_COMPILER_ID:MSVC>:/W4>
     # $<$<C_COMPILER_ID:MSVC>:/Za> # Removed because it breaks <windows.h> and <winnt.h> headers
     $<$<C_COMPILER_ID:MSVC>:/wd4127>
+    $<$<C_COMPILER_ID:MSVC>:/wd4115>
     $<$<AND:$<C_COMPILER_ID:MSVC>,$<VERSION_GREATER_EQUAL:${MSVC_VERSION},1700>>:/sdl>
     $<$<AND:$<C_COMPILER_ID:MSVC>,$<CONFIG:Debug>,$<NOT:$<STREQUAL:${CMP_MSVC_RUNTIME_CHECKS},OFF>>>:/${CMP_MSVC_RUNTIME_CHECKS}>
     $<$<C_COMPILER_ID:MSVC>:$<$<BOOL:${CMP_WARNINGS_AS_ERRORS}>:/WX>>

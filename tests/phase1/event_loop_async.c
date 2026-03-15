@@ -60,6 +60,7 @@ static int test_async_loop(void) {
   int ticks;
   int timer_fired = 0;
   int wake_fired = 0;
+  int io_fired = 0;
   CMPEventLoopTimerHandle timer_handle;
   CMPEventLoopIOHandle io_handle;
 
@@ -111,7 +112,7 @@ static int test_async_loop(void) {
 
   /* Test IO */
   CMP_TEST_OK(cmp_event_loop_add_io(&loop, 0, CMP_EVENT_LOOP_IO_READ,
-                                    test_async_io_cb, NULL, &io_handle));
+                                    test_async_io_cb, &io_fired, &io_handle));
 
   /* Test Wake */
   CMP_TEST_OK(cmp_event_loop_wake(&loop, test_async_wake_cb, &wake_fired));
