@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
         
         DemoApp *app = NULL;
         demo_app_create(&alloc, &app);
-        // Important: Init resources here to load fonts/images
+        /* Important: Init resources here to load fonts/images */
         demo_app_init_resources(app, &gfx, &env);
 
         double last = 0;
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
             
             demo_app_render(app, &gfx, window, w, h, (float)s);
 
-            // Cap frame rate roughly
+            /* Cap frame rate roughly */
             [NSThread sleepForTimeInterval:0.016];
         }
         

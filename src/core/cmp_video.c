@@ -268,8 +268,8 @@ static int cmp_video_fallback_read_frame(CMPVideoDecoder *decoder,
   CMPVideoFallbackState *state;
   cmp_u32 timestamp_ms;
   cmp_usize offset;
-  cmp_usize numerator;
-  cmp_usize denominator;
+
+
 
   if (decoder == NULL || out_frame == NULL || out_has_frame == NULL) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -293,14 +293,16 @@ static int cmp_video_fallback_read_frame(CMPVideoDecoder *decoder,
   out_frame->data = state->frames + offset;
   out_frame->size = state->frame_size;
 
-  numerator = (cmp_usize)state->frame_index * 1000u * state->fps_den;
-  denominator = state->fps_num;
-  if (denominator == 0u) {
-    timestamp_ms = 0u;
-  } else if (numerator > 0xFFFFFFFFu * denominator) {
-    timestamp_ms = 0xFFFFFFFFu;
-  } else {
-    timestamp_ms = (cmp_u32)(numerator / denominator);
+  {
+    double d_num = (double)state->frame_index * 1000.0 * (double)state->fps_den;
+    double d_den = (double)state->fps_num;
+    if (d_den == 0.0) {
+      timestamp_ms = 0u;
+    } else if (d_num > 4294967295.0 * d_den) {
+      timestamp_ms = 0xFFFFFFFFu;
+    } else {
+      timestamp_ms = (cmp_u32)(d_num / d_den);
+    }
   }
   out_frame->timestamp_ms = timestamp_ms;
 

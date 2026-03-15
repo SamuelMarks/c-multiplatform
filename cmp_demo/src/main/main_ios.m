@@ -44,7 +44,7 @@
 - (void)tick:(CADisplayLink *)link {
     CMPInputEvent evt;
     CMPBool has;
-    // Process input
+    /* Process input */
     while (1) {
         _ws.vtable->poll_event(_ws.ctx, &evt, &has);
         if (!has) break;
