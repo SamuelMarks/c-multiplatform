@@ -5,11 +5,6 @@
 #include <string.h>
 /* clang-format on */
 
-int CMP_CALL m3_menu_test_set_style_fail_text_style(CMPBool enable);
-int CMP_CALL m3_menu_test_set_style_fail_shadow_init(CMPBool enable);
-int CMP_CALL m3_menu_test_set_style_fail_background_color(CMPBool enable);
-int CMP_CALL m3_menu_test_set_style_fail_disabled_color(CMPBool enable);
-
 typedef struct TestMenuBackend {
   int create_calls;
   int destroy_calls;

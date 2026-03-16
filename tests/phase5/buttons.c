@@ -17,31 +17,6 @@
 #define M3_BUTTON_TEST_FAIL_OUTLINE_WIDTH 9u
 #define M3_BUTTON_TEST_FAIL_RIPPLE_RELEASE 10u
 
-int CMP_CALL m3_button_test_set_fail_point(cmp_u32 fail_point);
-int CMP_CALL m3_button_test_set_color_fail_after(cmp_u32 call_count);
-int CMP_CALL m3_button_test_clear_fail_points(void);
-int CMP_CALL m3_button_test_validate_color(const CMPColor *color);
-int CMP_CALL m3_button_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                      CMPScalar b, CMPScalar a);
-int CMP_CALL m3_button_test_color_with_alpha(const CMPColor *base,
-                                             CMPScalar alpha,
-                                             CMPColor *out_color);
-int CMP_CALL m3_button_test_validate_text_style(const CMPTextStyle *style,
-                                                CMPBool require_family);
-int CMP_CALL m3_button_test_validate_style(const M3ButtonStyle *style,
-                                           CMPBool require_family);
-int CMP_CALL m3_button_test_validate_measure_spec(CMPMeasureSpec spec);
-int CMP_CALL m3_button_test_validate_rect(const CMPRect *rect);
-int CMP_CALL m3_button_test_validate_backend(const CMPTextBackend *backend);
-int CMP_CALL m3_button_test_metrics_update(M3Button *button);
-int CMP_CALL m3_button_test_resolve_colors(const M3Button *button,
-                                           CMPColor *out_background,
-                                           CMPColor *out_text,
-                                           CMPColor *out_outline,
-                                           CMPColor *out_ripple);
-int CMP_CALL m3_button_test_resolve_corner(const M3Button *button,
-                                           CMPScalar *out_corner);
-
 typedef struct TestButtonBackend {
   int create_calls;
   int destroy_calls;

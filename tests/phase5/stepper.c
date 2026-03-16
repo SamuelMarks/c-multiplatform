@@ -3,9 +3,6 @@
 #include "test_utils.h"
 /* clang-format on */
 
-extern int CMP_CALL m3_stepper_test_set_fail_point(cmp_u32 fail_point);
-extern int CMP_CALL m3_stepper_test_clear_fail_points(void);
-
 static int test_stepper_init(void) {
   M3Stepper stepper;
 

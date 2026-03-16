@@ -13,39 +13,6 @@
 #endif
 /* clang-format on */
 
-int CMP_CALL m3_app_bar_test_set_fail_point(cmp_u32 fail_point);
-int CMP_CALL m3_app_bar_test_set_color_fail_after(cmp_u32 call_count);
-int CMP_CALL m3_app_bar_test_clear_fail_points(void);
-int CMP_CALL m3_app_bar_test_set_match_fail_after(cmp_u32 call_count);
-int CMP_CALL m3_app_bar_test_set_color_error_after(cmp_u32 call_count);
-int CMP_CALL m3_app_bar_test_set_collapse_fail(CMPBool enable);
-int CMP_CALL m3_app_bar_test_call_color_should_fail(CMPBool *out_fail);
-int CMP_CALL m3_app_bar_test_call_fail_point_match(cmp_u32 point,
-                                                   CMPBool *out_match);
-int CMP_CALL m3_app_bar_test_validate_color(const CMPColor *color);
-int CMP_CALL m3_app_bar_test_color_set(CMPColor *color, CMPScalar r,
-                                       CMPScalar g, CMPScalar b, CMPScalar a);
-int CMP_CALL m3_app_bar_test_validate_edges(const CMPLayoutEdges *edges);
-int CMP_CALL m3_app_bar_test_validate_text_style(const CMPTextStyle *style,
-                                                 CMPBool require_family);
-int CMP_CALL m3_app_bar_test_validate_style(const M3AppBarStyle *style,
-                                            CMPBool require_family);
-int CMP_CALL m3_app_bar_test_validate_measure_spec(CMPMeasureSpec spec);
-int CMP_CALL m3_app_bar_test_validate_rect(const CMPRect *rect);
-int CMP_CALL m3_app_bar_test_compute_collapse_range(const M3AppBarStyle *style,
-                                                    CMPScalar *out_range);
-int CMP_CALL m3_app_bar_test_compute_current_height(const M3AppBar *bar,
-                                                    CMPScalar *out_height);
-int CMP_CALL m3_app_bar_test_compute_content_bounds(const M3AppBar *bar,
-                                                    CMPRect *out_bounds);
-int CMP_CALL m3_app_bar_test_compute_title_position(
-    const M3AppBar *bar, const CMPTextMetrics *metrics, CMPScalar *out_x,
-    CMPScalar *out_y);
-int CMP_CALL m3_app_bar_test_measure_title(const M3AppBar *bar,
-                                           CMPTextMetrics *out_metrics);
-int CMP_CALL m3_app_bar_test_apply_scroll(M3AppBar *bar, CMPScalar delta,
-                                          CMPScalar *out_consumed);
-
 typedef struct TestAppBarBackend {
   int create_calls;
   int destroy_calls;

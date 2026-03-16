@@ -5,8 +5,6 @@
 #include <string.h>
 /* clang-format on */
 
-int CMP_CALL cmp_a11y_test_set_fail_clear(CMPBool enable);
-
 static int test_semantics_init_defaults(void) {
   CMPSemantics semantics;
 

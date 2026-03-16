@@ -5,40 +5,6 @@
 #include <string.h>
 /* clang-format on */
 
-int CMP_CALL m3_scaffold_test_validate_edges(const CMPLayoutEdges *edges);
-int CMP_CALL m3_scaffold_test_validate_style(const M3ScaffoldStyle *style);
-int CMP_CALL m3_scaffold_test_validate_measure_spec(CMPMeasureSpec spec);
-int CMP_CALL m3_scaffold_test_validate_rect(const CMPRect *rect);
-int CMP_CALL m3_scaffold_test_compute_safe_bounds(
-    const CMPRect *bounds, const CMPLayoutEdges *safe_area,
-    CMPRect *out_bounds);
-int CMP_CALL m3_scaffold_test_compute_fab_target(const M3ScaffoldStyle *style,
-                                                 CMPScalar snackbar_height,
-                                                 CMPScalar *out_offset);
-int CMP_CALL m3_scaffold_test_widget_is_visible(const CMPWidget *widget,
-                                                CMPBool *out_visible);
-int CMP_CALL m3_scaffold_test_measure_child(CMPWidget *child,
-                                            CMPMeasureSpec width,
-                                            CMPMeasureSpec height,
-                                            CMPSize *out_size);
-int CMP_CALL m3_scaffold_test_layout_child(CMPWidget *child,
-                                           const CMPRect *bounds);
-int CMP_CALL m3_scaffold_test_paint_child(CMPWidget *child,
-                                          CMPPaintContext *ctx);
-int CMP_CALL m3_scaffold_test_event_child(CMPWidget *child,
-                                          const CMPInputEvent *event,
-                                          CMPBool *out_handled);
-int CMP_CALL m3_scaffold_test_event_get_position(const CMPInputEvent *event,
-                                                 CMPBool *out_has_pos,
-                                                 CMPScalar *out_x,
-                                                 CMPScalar *out_y);
-int CMP_CALL m3_scaffold_test_child_hit(CMPWidget *child, const CMPRect *bounds,
-                                        CMPScalar x, CMPScalar y,
-                                        CMPBool *out_hit);
-int CMP_CALL m3_scaffold_test_apply_measure_spec(CMPScalar desired,
-                                                 CMPMeasureSpec spec,
-                                                 CMPScalar *out_value);
-
 typedef struct TestScaffoldWidget {
   CMPWidget widget;
   CMPSize desired_size;

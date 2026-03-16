@@ -14,22 +14,6 @@
 #define M3_SHEET_TEST_FAIL_APPLY_OFFSET 6u
 #define M3_SHEET_TEST_FAIL_SCRIM_ALPHA 7u
 
-int CMP_CALL m3_sheet_test_set_fail_point(cmp_u32 fail_point);
-int CMP_CALL m3_sheet_test_set_color_fail_after(cmp_u32 call_count);
-int CMP_CALL m3_sheet_test_clear_fail_points(void);
-int CMP_CALL m3_sheet_test_validate_color(const CMPColor *color);
-int CMP_CALL m3_sheet_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                     CMPScalar b, CMPScalar a);
-int CMP_CALL m3_sheet_test_validate_edges(const CMPLayoutEdges *edges);
-int CMP_CALL m3_sheet_test_validate_measure_spec(CMPMeasureSpec spec);
-int CMP_CALL m3_sheet_test_validate_rect(const CMPRect *rect);
-int CMP_CALL m3_sheet_test_validate_style(const M3SheetStyle *style);
-int CMP_CALL m3_sheet_test_apply_offset(M3Sheet *sheet, CMPScalar offset,
-                                        CMPBool reset_velocity,
-                                        CMPBool *out_changed);
-int CMP_CALL m3_sheet_test_compute_scrim_alpha(const M3Sheet *sheet,
-                                               CMPScalar *out_alpha);
-
 typedef struct TestSheetBackend {
   int draw_rect_calls;
   int push_clip_calls;

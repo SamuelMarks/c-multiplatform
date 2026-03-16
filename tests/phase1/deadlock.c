@@ -3,8 +3,6 @@
 #include "test_utils.h"
 /* clang-format on */
 
-extern int CMP_CALL cmp_core_test_set_default_allocator_fail(CMPBool fail);
-
 static int CMP_CALL fail_alloc(void *ctx, cmp_usize size, void **out_ptr) {
   (void)ctx;
   (void)size;

@@ -16,42 +16,6 @@
 #define M3_CHIP_TEST_FAIL_OUTLINE_WIDTH 8u
 #define M3_CHIP_TEST_FAIL_DELETE_BOUNDS 9u
 
-int CMP_CALL m3_chip_test_set_fail_point(cmp_u32 fail_point);
-int CMP_CALL m3_chip_test_set_color_fail_after(cmp_u32 call_count);
-int CMP_CALL m3_chip_test_clear_fail_points(void);
-int CMP_CALL m3_chip_test_style_init_layout(
-    M3ChipLayout *layout, CMPScalar padding_x, CMPScalar padding_y,
-    CMPScalar min_width, CMPScalar min_height, CMPScalar icon_size,
-    CMPScalar icon_gap, CMPScalar delete_thickness);
-int CMP_CALL m3_chip_test_style_init_base(M3ChipStyle *style, cmp_u32 variant);
-int CMP_CALL m3_chip_test_validate_color(const CMPColor *color);
-int CMP_CALL m3_chip_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                    CMPScalar b, CMPScalar a);
-int CMP_CALL m3_chip_test_color_with_alpha(const CMPColor *base,
-                                           CMPScalar alpha,
-                                           CMPColor *out_color);
-int CMP_CALL m3_chip_test_validate_text_style(const CMPTextStyle *style,
-                                              CMPBool require_family);
-int CMP_CALL m3_chip_test_validate_layout(const M3ChipLayout *layout);
-int CMP_CALL m3_chip_test_validate_style(const M3ChipStyle *style,
-                                         CMPBool require_family);
-int CMP_CALL m3_chip_test_validate_measure_spec(CMPMeasureSpec spec);
-int CMP_CALL m3_chip_test_validate_rect(const CMPRect *rect);
-int CMP_CALL m3_chip_test_validate_backend(const CMPTextBackend *backend);
-int CMP_CALL m3_chip_test_metrics_update(M3Chip *chip);
-int CMP_CALL m3_chip_test_resolve_colors(const M3Chip *chip,
-                                         CMPColor *out_background,
-                                         CMPColor *out_text,
-                                         CMPColor *out_outline,
-                                         CMPColor *out_ripple);
-int CMP_CALL m3_chip_test_resolve_corner(const M3Chip *chip,
-                                         CMPScalar *out_corner);
-int CMP_CALL m3_chip_test_compute_delete_bounds(M3Chip *chip,
-                                                CMPRect *out_bounds);
-int CMP_CALL m3_chip_test_draw_delete_icon(const CMPGfx *gfx,
-                                           const CMPRect *bounds,
-                                           CMPColor color, CMPScalar thickness);
-
 typedef struct TestChipBackend {
   int create_calls;
   int destroy_calls;

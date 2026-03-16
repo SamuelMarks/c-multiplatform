@@ -5,31 +5,6 @@
 #include <string.h>
 /* clang-format on */
 
-int CMP_CALL cmp_gesture_test_set_contains_error(CMPBool enable);
-int CMP_CALL cmp_gesture_test_set_reset_fail(CMPBool enable);
-int CMP_CALL cmp_gesture_test_set_velocity_error(CMPBool enable);
-int CMP_CALL cmp_gesture_test_set_distance_error(CMPBool enable);
-int CMP_CALL cmp_gesture_test_set_distance_error_after(cmp_i32 calls);
-int CMP_CALL cmp_gesture_test_set_config_init_fail(CMPBool enable);
-int CMP_CALL cmp_gesture_test_validate_rect(const CMPRect *rect);
-int CMP_CALL cmp_gesture_test_distance_sq(CMPScalar x0, CMPScalar y0,
-                                          CMPScalar x1, CMPScalar y1,
-                                          CMPScalar *out_value);
-int CMP_CALL cmp_gesture_test_time_delta(cmp_u32 start, cmp_u32 end,
-                                         cmp_u32 *out_delta);
-int CMP_CALL cmp_gesture_test_velocity(CMPScalar x0, CMPScalar y0, CMPScalar x1,
-                                       CMPScalar y1, cmp_u32 dt_ms,
-                                       CMPScalar *out_vx, CMPScalar *out_vy);
-int CMP_CALL cmp_gesture_test_dispatch_to_widget(CMPWidget *widget,
-                                                 const CMPInputEvent *event,
-                                                 CMPBool *out_handled);
-int CMP_CALL cmp_gesture_test_emit(CMPWidget *widget,
-                                   const CMPInputEvent *source, cmp_u32 type,
-                                   const CMPGestureEvent *gesture,
-                                   CMPBool *out_handled);
-int CMP_CALL cmp_gesture_test_reset_pointer(CMPGestureDispatcher *dispatcher);
-int CMP_CALL cmp_gesture_test_clear_state(CMPGestureDispatcher *dispatcher);
-
 typedef struct TestWidget {
   int event_calls;
   int gesture_calls;

@@ -7,17 +7,6 @@
 #include <string.h>
 /* clang-format on */
 
-int CMP_CALL cmp_audio_test_set_read_u16_fail_after(cmp_u32 call_count);
-int CMP_CALL cmp_audio_test_set_read_u32_fail_after(cmp_u32 call_count);
-int CMP_CALL cmp_audio_test_read_u16_le(const cmp_u8 *data, cmp_usize size,
-                                        cmp_usize offset, cmp_u16 *out_value);
-int CMP_CALL cmp_audio_test_read_u32_le(const cmp_u8 *data, cmp_usize size,
-                                        cmp_usize offset, cmp_u32 *out_value);
-int CMP_CALL cmp_audio_test_decode_wav(const CMPAudioDecodeRequest *request,
-                                       const CMPAllocator *allocator,
-                                       CMPAudioData *out_audio);
-int CMP_CALL cmp_core_test_set_default_allocator_fail(CMPBool fail);
-
 typedef struct TestAudioState {
   int fail_decode;
   int fail_free;

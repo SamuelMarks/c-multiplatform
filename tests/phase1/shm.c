@@ -4,8 +4,6 @@
 #include "test_utils.h"
 /* clang-format on */
 
-extern int CMP_CALL cmp_core_test_set_default_allocator_fail(CMPBool fail);
-
 int test_shm(void) {
   CMPSharedMemory *shm = NULL;
   CMPSharedMemory *shm_open = NULL;

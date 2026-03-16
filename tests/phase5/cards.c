@@ -18,31 +18,6 @@
 #define M3_CARD_TEST_FAIL_MEASURE_CONTENT 10u
 #define M3_CARD_TEST_FAIL_CORNER_RADIUS 11u
 
-int CMP_CALL m3_card_test_set_fail_point(cmp_u32 fail_point);
-int CMP_CALL m3_card_test_set_color_fail_after(cmp_u32 call_count);
-int CMP_CALL m3_card_test_clear_fail_points(void);
-int CMP_CALL m3_card_test_validate_color(const CMPColor *color);
-int CMP_CALL m3_card_test_color_set(CMPColor *color, CMPScalar r, CMPScalar g,
-                                    CMPScalar b, CMPScalar a);
-int CMP_CALL m3_card_test_color_with_alpha(const CMPColor *base,
-                                           CMPScalar alpha,
-                                           CMPColor *out_color);
-int CMP_CALL m3_card_test_validate_edges(const CMPLayoutEdges *edges);
-int CMP_CALL m3_card_test_validate_style(const M3CardStyle *style);
-int CMP_CALL m3_card_test_validate_measure_spec(CMPMeasureSpec spec);
-int CMP_CALL m3_card_test_validate_rect(const CMPRect *rect);
-int CMP_CALL m3_card_test_measure_content(const M3CardStyle *style,
-                                          CMPScalar *out_width,
-                                          CMPScalar *out_height);
-int CMP_CALL m3_card_test_compute_inner(const M3Card *card, CMPRect *out_inner,
-                                        CMPScalar *out_corner);
-int CMP_CALL m3_card_test_compute_content_bounds(const M3Card *card,
-                                                 CMPRect *out_bounds);
-int CMP_CALL m3_card_test_resolve_colors(const M3Card *card,
-                                         CMPColor *out_background,
-                                         CMPColor *out_outline,
-                                         CMPColor *out_ripple);
-
 typedef struct TestCardBackend {
   int draw_rect_calls;
   int push_clip_calls;
