@@ -339,8 +339,10 @@ endfunction()
   src/core/cmp_a11y.c
   src/core/cmp_anim.c
   src/core/cmp_router.c
-  src/core/cmp_predictive.c
-  src/core/cmp_path.c
+  src/core/cmp_router_view.c
+  src/core/cmp_form.c
+  src/core/cmp_http_integration.c
+  src/core/cmp_predictive.c  src/core/cmp_path.c
   src/core/cmp_render.c
   src/core/cmp_event.c
   src/core/cmp_gesture.c
@@ -1079,6 +1081,18 @@ if(BUILD_TESTING)
     add_executable(cmp_phase3_list_9 tests/phase3/list_9.c)
     target_link_libraries(cmp_phase3_list_9 PRIVATE cmpc)
     add_test(NAME cmp_phase3_list_9 COMMAND cmp_phase3_list_9)
+
+    add_executable(cmp_phase3_router_view tests/phase3/router_view.c)
+    target_link_libraries(cmp_phase3_router_view PRIVATE cmpc)
+    add_test(NAME cmp_phase3_router_view COMMAND cmp_phase3_router_view)
+
+    add_executable(cmp_phase3_form tests/phase3/form.c)
+    target_link_libraries(cmp_phase3_form PRIVATE cmpc)
+    add_test(NAME cmp_phase3_form COMMAND cmp_phase3_form)
+
+    add_executable(cmp_phase3_http_integration tests/phase3/http_integration.c)
+    target_link_libraries(cmp_phase3_http_integration PRIVATE cmpc)
+    add_test(NAME cmp_phase3_http_integration COMMAND cmp_phase3_http_integration)
 
     add_executable(cmp_phase3_path tests/phase3/path.c)
     target_link_libraries(cmp_phase3_path PRIVATE cmpc)

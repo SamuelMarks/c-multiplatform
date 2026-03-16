@@ -85,6 +85,8 @@ extern "C" {
 #define CMP_INPUT_FOCUS 21
 /** @brief Widget focus lost event. */
 #define CMP_INPUT_BLUR 22
+/** @brief Custom application event. */
+#define CMP_INPUT_CUSTOM 23
 
 /**
  * @brief Pointer input data.
@@ -167,6 +169,14 @@ typedef struct CMPWindowEvent {
 } CMPWindowEvent;
 
 /**
+ * @brief Custom event data.
+ */
+typedef struct CMPCustomEvent {
+  cmp_u32 id;      /**< Custom event identifier. */
+  void *user_data; /**< Custom user data pointer. */
+} CMPCustomEvent;
+
+/**
  * @brief Discriminated union for input events.
  */
 typedef union CMPInputEventData {
@@ -177,6 +187,7 @@ typedef union CMPInputEventData {
   CMPTextEditEvent text_edit; /**< IME composition payload. */
   CMPGestureEvent gesture;    /**< Gesture payload. */
   CMPWindowEvent window;      /**< Window event payload. */
+  CMPCustomEvent custom;      /**< Custom event payload. */
 } CMPInputEventData;
 
 /**
