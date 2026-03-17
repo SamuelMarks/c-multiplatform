@@ -97,6 +97,7 @@ typedef struct CMPRouteEntry {
   char *path;            /**< Owned path string. */
   void *component;       /**< Built component pointer. */
 } CMPRouteEntry;
+struct CMPEnv;
 
 /**
  * @brief Router configuration.
@@ -107,6 +108,7 @@ typedef struct CMPRouterConfig {
   const CMPRoute *routes; /**< Route table. */
   cmp_usize route_count;  /**< Number of routes. */
   cmp_usize stack_capacity; /**< Maximum navigation stack size. */
+  const struct CMPEnv *env; /**< Environment for URL history sync (optional). */
 } CMPRouterConfig;
 
 /**
@@ -118,6 +120,7 @@ typedef struct CMPRouter {
   cmp_usize route_count;    /**< Number of routes. */
   CMPRouteEntry *stack;     /**< Navigation stack. */
   cmp_usize stack_capacity; /**< Stack capacity. */
+  const struct CMPEnv *env; /**< Environment for URL history sync (optional). */
   cmp_usize stack_size;     /**< Current stack size. */
 } CMPRouter;
 

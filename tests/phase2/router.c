@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmpc/cmp_router.h"
+#include "cmpc/cmp_api_env.h"
 #include "test_utils.h"
 
 #include <stdlib.h>
@@ -153,6 +154,57 @@ static int route_destroy(void *ctx, void *component) {
 
   CMP_UNUSED(component);
   return CMP_OK;
+}
+
+static int dummy_navigate_url(void *ctx, const char *url) {
+  char *called_url = (char *)ctx;
+  strcpy(called_url, url);
+  return CMP_OK;
+}
+
+static int test_router_env(void) {
+  CMPRouter router;
+  CMPRouterConfig config;
+  CMPRoute routes[1];
+  CMPEnv env;
+  CMPEnvVTable vtable;
+  char called_url[256];
+
+  RouteCtx route_ctx;
+
+  memset(&config, 0, sizeof(config));
+  memset(&env, 0, sizeof(env));
+  memset(&vtable, 0, sizeof(vtable));
+  memset(called_url, 0, sizeof(called_url));
+  memset(&route_ctx, 0, sizeof(route_ctx));
+
+  routes[0].pattern = "/test";
+  routes[0].build = route_build;
+  routes[0].destroy = route_destroy;
+  routes[0].ctx = &route_ctx;
+
+  vtable.navigate_url = dummy_navigate_url;
+  env.ctx = called_url;
+  env.vtable = &vtable;
+
+  config.routes = routes;
+  config.route_count = 1;
+  config.stack_capacity = 10;
+  config.env = &env;
+
+  CMP_TEST_OK(cmp_router_init(&router, &config));
+
+  CMP_TEST_OK(cmp_router_navigate(&router, "/test", NULL));
+  CMP_TEST_ASSERT(strcmp(called_url, "/test") == 0);
+
+  CMP_TEST_OK(cmp_router_navigate(&router, "/", NULL));
+  CMP_TEST_ASSERT(strcmp(called_url, "/") == 0);
+
+  CMP_TEST_OK(cmp_router_back(&router, NULL));
+  CMP_TEST_ASSERT(strcmp(called_url, "/test") == 0);
+
+  CMP_TEST_OK(cmp_router_shutdown(&router));
+  return 0;
 }
 
 int main(void) {
@@ -692,6 +744,8 @@ int main(void) {
                   CMP_ERR_OVERFLOW);
   CMP_TEST_EXPECT(cmp_uri_parse("abcd", &uri), CMP_ERR_OVERFLOW);
   CMP_TEST_OK(cmp_router_test_set_cstr_limit(0));
+
+  test_router_env();
 
   return 0;
 }

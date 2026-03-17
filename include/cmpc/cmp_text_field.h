@@ -139,6 +139,25 @@ typedef struct CMPTextField {
   cmp_usize placeholder_len;      /**< Placeholder text length in bytes. */
   CMPTextFieldOnChange on_change; /**< Change callback (may be NULL). */
   void *on_change_ctx;            /**< Change callback context pointer. */
+
+  /** Validation fields */
+  CMPBool is_required;  /**< CMP_TRUE if the field requires non-empty text. */
+  cmp_usize min_length; /**< Minimum text length in bytes. */
+  cmp_usize max_length; /**< Maximum text length in bytes (0 for no limit). */
+
+  /**
+   * @brief Validation callback for text fields.
+   * @param ctx Callback context.
+   * @param field Text field instance.
+   * @param utf8 Current UTF-8 text (may be NULL if empty).
+   * @param utf8_len Length of the current text in bytes.
+   * @param out_is_invalid Receives CMP_TRUE if validation failed.
+   * @return CMP_OK on success or a failure code.
+   */
+  int(CMP_CALL *on_validate)(void *ctx, struct CMPTextField *field,
+                             const char *utf8, cmp_usize utf8_len,
+                             CMPBool *out_is_invalid);
+  void *on_validate_ctx; /**< Context for validation callback. */
 } CMPTextField;
 
 /**
@@ -329,6 +348,48 @@ CMP_API int CMP_CALL cmp_text_field_step(CMPTextField *field, CMPScalar dt,
  */
 CMP_API int CMP_CALL cmp_text_field_set_on_change(
     CMPTextField *field, CMPTextFieldOnChange on_change, void *ctx);
+
+/**
+ * @brief Set the validation callback.
+ * @param field Text field instance.
+ * @param on_validate Callback function (may be NULL to clear).
+ * @param ctx Callback context.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_text_field_set_on_validate(
+    CMPTextField *field,
+    int(CMP_CALL *on_validate)(void *ctx, CMPTextField *field, const char *utf8,
+                               cmp_usize utf8_len, CMPBool *out_is_invalid),
+    void *ctx);
+
+/**
+ * @brief Set basic validation constraints.
+ * @param field Text field instance.
+ * @param is_required CMP_TRUE if the field cannot be empty.
+ * @param min_length Minimum UTF-8 length in bytes.
+ * @param max_length Maximum UTF-8 length in bytes (0 for no limit).
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_text_field_set_constraints(CMPTextField *field,
+                                                    CMPBool is_required,
+                                                    cmp_usize min_length,
+                                                    cmp_usize max_length);
+
+/**
+ * @brief Run validation checks on the text field and update is_invalid.
+ * @param field Text field instance.
+ * @param out_is_invalid Receives CMP_TRUE if the field is invalid.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_text_field_validate(CMPTextField *field,
+                                             CMPBool *out_is_invalid);
+
+/**
+ * @brief Check if a widget is a text field.
+ * @param widget Widget instance.
+ * @return CMP_TRUE if the widget is a text field.
+ */
+CMP_API CMPBool CMP_CALL cmp_widget_is_text_field(const CMPWidget *widget);
 
 /**
  * @brief Helper for test coverage.

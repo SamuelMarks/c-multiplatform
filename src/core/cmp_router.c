@@ -1,7 +1,8 @@
 /* clang-format off */
 #include "cmpc/cmp_router.h"
-
+#include "cmpc/cmp_api_env.h"
 #include <string.h>
+/* clang-format on */
 
 #ifdef CMP_TESTING
 static cmp_usize g_router_cstr_limit_override = 0;
@@ -704,6 +705,11 @@ static int cmp_router_navigate_path_len(CMPRouter *router, const char *path,
     *out_component = component;
   }
 
+  /* Sync with environment if configured */
+  if (router->env && router->env->vtable && router->env->vtable->navigate_url) {
+    router->env->vtable->navigate_url((void *)router->env, path_copy);
+  }
+
   return CMP_OK;
 }
 
@@ -753,6 +759,7 @@ int CMP_CALL cmp_router_init(CMPRouter *router, const CMPRouterConfig *config) {
   router->routes = config->routes;
   router->route_count = config->route_count;
   router->stack_capacity = config->stack_capacity;
+  router->env = config->env;
   router->stack_size = 0;
   router->stack = NULL;
 
@@ -878,6 +885,13 @@ int CMP_CALL cmp_router_back(CMPRouter *router, void **out_component) {
   if (out_component != NULL) {
     *out_component = router->stack[router->stack_size - 1].component;
   }
+
+  /* Sync with environment if configured */
+  if (router->env && router->env->vtable && router->env->vtable->navigate_url) {
+    router->env->vtable->navigate_url(
+        (void *)router->env, router->stack[router->stack_size - 1].path);
+  }
+
   return rc;
 }
 

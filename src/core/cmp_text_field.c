@@ -1716,6 +1716,7 @@ static int cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
   case CMP_INPUT_BLUR:
     field->focused = CMP_FALSE;
     field->selecting = CMP_FALSE;
+    cmp_text_field_validate(field, NULL);
     rc = cmp_text_field_sync_label(field);
     if (rc != CMP_OK) {
       return rc;
@@ -2021,6 +2022,13 @@ static const CMPWidgetVTable g_cmp_text_field_widget_vtable = {
     cmp_text_field_widget_paint,         cmp_text_field_widget_event,
     cmp_text_field_widget_get_semantics, cmp_text_field_widget_destroy};
 
+CMP_API CMPBool CMP_CALL cmp_widget_is_text_field(const CMPWidget *widget) {
+  if (widget != NULL && widget->vtable == &g_cmp_text_field_widget_vtable) {
+    return CMP_TRUE;
+  }
+  return CMP_FALSE;
+}
+
 int CMP_CALL cmp_text_field_style_init(CMPTextFieldStyle *style) {
   int rc;
 
@@ -2192,6 +2200,12 @@ int CMP_CALL cmp_text_field_init(CMPTextField *field,
   field->placeholder_len = 0u;
   field->on_change = NULL;
   field->on_change_ctx = NULL;
+
+  field->on_validate = NULL;
+  field->on_validate_ctx = NULL;
+  field->is_required = CMP_FALSE;
+  field->min_length = 0;
+  field->max_length = 0;
 
   rc = cmp_anim_controller_init(&field->label_anim);
 #ifdef CMP_TESTING
@@ -2620,6 +2634,63 @@ int CMP_CALL cmp_text_field_get_cursor(const CMPTextField *field,
   }
 
   *out_cursor = field->cursor;
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL cmp_text_field_set_on_validate(
+    CMPTextField *field,
+    int(CMP_CALL *on_validate)(void *ctx, CMPTextField *field, const char *utf8,
+                               cmp_usize utf8_len, CMPBool *out_is_invalid),
+    void *ctx) {
+  if (field == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  field->on_validate = on_validate;
+  field->on_validate_ctx = ctx;
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL cmp_text_field_set_constraints(CMPTextField *field,
+                                                    CMPBool is_required,
+                                                    cmp_usize min_length,
+                                                    cmp_usize max_length) {
+  if (field == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  field->is_required = is_required;
+  field->min_length = min_length;
+  field->max_length = max_length;
+  return CMP_OK;
+}
+
+CMP_API int CMP_CALL cmp_text_field_validate(CMPTextField *field,
+                                             CMPBool *out_is_invalid) {
+  CMPBool is_invalid = CMP_FALSE;
+  if (field == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  if (field->is_required && field->utf8_len == 0) {
+    is_invalid = CMP_TRUE;
+  } else if (field->utf8_len > 0 && field->utf8_len < field->min_length) {
+    is_invalid = CMP_TRUE;
+  } else if (field->max_length > 0 && field->utf8_len > field->max_length) {
+    is_invalid = CMP_TRUE;
+  }
+
+  if (field->on_validate) {
+    CMPBool custom_invalid = CMP_FALSE;
+    field->on_validate(field->on_validate_ctx, field, field->utf8,
+                       field->utf8_len, &custom_invalid);
+    if (custom_invalid) {
+      is_invalid = CMP_TRUE;
+    }
+  }
+
+  field->is_invalid = is_invalid;
+  if (out_is_invalid) {
+    *out_is_invalid = is_invalid;
+  }
   return CMP_OK;
 }
 

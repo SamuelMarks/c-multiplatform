@@ -1,7 +1,37 @@
 /* clang-format off */
 #include "cmpc/cmp_form.h"
+#include "cmpc/cmp_text_field.h"
 #include <stddef.h>
 /* clang-format on */
+
+CMP_API int CMP_CALL cmp_form_submit(CMPForm *form) {
+  cmp_usize i;
+  CMPBool all_valid = CMP_TRUE;
+
+  if (!form) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  if (form->is_submitting) {
+    return CMP_OK;
+  }
+
+  for (i = 0; i < form->input_count; ++i) {
+    if (cmp_widget_is_text_field(form->inputs[i])) {
+      CMPBool invalid = CMP_FALSE;
+      cmp_text_field_validate((CMPTextField *)form->inputs[i], &invalid);
+      if (invalid) {
+        all_valid = CMP_FALSE;
+      }
+    }
+  }
+
+  if (all_valid && form->on_submit) {
+    return form->on_submit(form->user_data, form);
+  }
+
+  return CMP_OK;
+}
 
 static int cmp_form_measure(void *widget, CMPMeasureSpec width,
                             CMPMeasureSpec height, CMPSize *out_size) {
@@ -91,7 +121,7 @@ static int cmp_form_event(void *widget, const CMPInputEvent *event,
 
       /* Only submit if focus is within our inputs or submit button,
          or if we just want to submit globally. Assuming globally for now. */
-      form->on_submit(form->user_data, form);
+      cmp_form_submit(form);
       *out_handled = CMP_TRUE;
       return CMP_OK;
     }

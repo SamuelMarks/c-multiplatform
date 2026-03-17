@@ -90,6 +90,13 @@ CMP_API int CMP_CALL cmp_form_set_submit(CMPForm *form, CMPWidget *submit_btn,
 CMP_API int CMP_CALL cmp_form_set_submitting(CMPForm *form,
                                              CMPBool is_submitting);
 
+/**
+ * @brief Trigger form submission manually (e.g., from a button callback).
+ * @param form Form instance.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_form_submit(CMPForm *form);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
