@@ -1257,6 +1257,19 @@ static int cmp_ios_env_get_time_ms(void *env, cmp_u32 *out_time_ms)
     return backend->null_env.vtable->get_time_ms(backend->null_env.ctx, out_time_ms);
 }
 
+static int CMP_CALL cmp_ios_env_navigate_url(void *env, const char *utf8_url) {
+  (void)env;
+  (void)utf8_url;
+  return CMP_ERR_UNSUPPORTED;
+}
+
+static int CMP_CALL cmp_ios_env_get_arg(void *env, const char *key, const char **out_value) {
+  (void)env;
+  (void)key;
+  if (out_value) *out_value = NULL;
+  return CMP_ERR_NOT_FOUND;
+}
+
 static const CMPEnvVTable g_cmp_ios_env_vtable = {
     cmp_ios_env_get_io,
     cmp_ios_env_get_sensors,
@@ -1264,9 +1277,10 @@ static const CMPEnvVTable g_cmp_ios_env_vtable = {
     cmp_ios_env_get_image,
     cmp_ios_env_get_video,
     cmp_ios_env_get_audio,
-        cmp_ios_env_get_tasks,
-    cmp_ios_env_get_time_ms
-};
+    cmp_ios_env_get_tasks,
+    cmp_ios_env_get_time_ms,
+    cmp_ios_env_navigate_url,
+    cmp_ios_env_get_arg};
 
 static int cmp_ios_backend_cleanup(CMPAllocator *allocator, CMPIOSBackend *backend, int primary_error)
 {

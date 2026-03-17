@@ -343,6 +343,7 @@ endfunction()
   src/core/cmp_i18n.c
   src/core/cmp_math.c
   src/core/cmp_layout.c
+  src/core/cmp_ui_builder.c
   src/core/cmp_a11y.c
   src/core/cmp_anim.c
   src/core/cmp_router.c
@@ -1026,7 +1027,10 @@ if(BUILD_TESTING)
     target_link_libraries(cmp_phase2_cupertino_color PRIVATE cupertino cmpc)
     add_test(NAME cmp_phase2_cupertino_color COMMAND cmp_phase2_cupertino_color)
 
-    add_executable(cmp_phase2_layout tests/phase2/layout.c)
+    add_executable(cmp_phase2_ui_builder tests/phase2/test_ui_builder.c)
+  target_link_libraries(cmp_phase2_ui_builder PRIVATE m3 cmpc)
+  add_test(NAME cmp_phase2_ui_builder COMMAND cmp_phase2_ui_builder)
+  add_executable(cmp_phase2_layout tests/phase2/layout.c)
     target_link_libraries(cmp_phase2_layout PRIVATE m3 cmpc)
     add_test(NAME cmp_phase2_layout COMMAND cmp_phase2_layout)
 

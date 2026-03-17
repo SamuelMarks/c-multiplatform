@@ -803,6 +803,24 @@ typedef int(CMP_CALL *CMPEnvGetTasksFn)(void *env, CMPTasks *out_tasks);
 typedef int(CMP_CALL *CMPEnvGetTimeMsFn)(void *env, cmp_u32 *out_time_ms);
 
 /**
+ * @brief Navigate to a new URL or push history state.
+ * @param env Environment backend instance.
+ * @param utf8_url The URL to navigate to.
+ * @return CMP_OK on success or a failure code.
+ */
+typedef int(CMP_CALL *CMPEnvNavigateUrlFn)(void *env, const char *utf8_url);
+
+/**
+ * @brief Retrieve a startup argument or URL query parameter by key.
+ * @param env Environment backend instance.
+ * @param key The key to look up.
+ * @param out_value Receives the value string, or NULL if not found.
+ * @return CMP_OK on success or a failure code.
+ */
+typedef int(CMP_CALL *CMPEnvGetArgFn)(void *env, const char *key,
+                                      const char **out_value);
+
+/**
  * @brief Environment virtual table.
  */
 typedef struct CMPEnvVTable {
@@ -822,6 +840,10 @@ typedef struct CMPEnvVTable {
   CMPEnvGetTasksFn get_tasks;
   /** @brief Get the current time in milliseconds. */
   CMPEnvGetTimeMsFn get_time_ms;
+  /** @brief Navigate to a URL or push history state. */
+  CMPEnvNavigateUrlFn navigate_url;
+  /** @brief Retrieve a startup argument. */
+  CMPEnvGetArgFn get_arg;
 } CMPEnvVTable;
 
 /**

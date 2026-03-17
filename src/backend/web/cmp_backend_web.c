@@ -5138,10 +5138,74 @@ static int cmp_web_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
   return cmp_web_backend_time_now_ms(out_time_ms);
 }
 
+static int CMP_CALL cmp_web_env_navigate_url(void *env, const char *utf8_url) {
+  (void)env;
+#ifdef __EMSCRIPTEN__
+  if (utf8_url == NULL)
+    return CMP_ERR_INVALID_ARGUMENT;
+  EM_ASM(
+      {
+        if (typeof window != = 'undefined' && window.history &&
+                               window.history.pushState) {
+          window.history.pushState(null, "", UTF8ToString($0));
+        }
+      },
+      utf8_url);
+  return CMP_OK;
+#else
+  (void)utf8_url;
+  return CMP_ERR_UNSUPPORTED;
+#endif
+}
+
+static int CMP_CALL cmp_web_env_get_arg(void *env, const char *key,
+                                        const char **out_value) {
+  struct CMPWebBackend *backend;
+  int rc;
+
+  if (env == NULL || key == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+  backend = (struct CMPWebBackend *)env;
+  rc = cmp_web_backend_log(backend, CMP_LOG_LEVEL_INFO, "env.get_arg");
+  CMP_WEB_RETURN_IF_ERROR(rc);
+
+#ifdef __EMSCRIPTEN__
+  {
+    char *val = (char *)EM_ASM_INT(
+        {
+          if (typeof window != = 'undefined' && window.location) {
+            var params = new URLSearchParams(window.location.search);
+            var res = params.get(UTF8ToString($0));
+            if (res != = null) {
+              var len = lengthBytesUTF8(res) + 1;
+              var ptr = _malloc(len);
+              stringToUTF8(res, ptr, len);
+              return ptr;
+            }
+          }
+          return 0;
+        },
+        key);
+    if (val != NULL) {
+      if (out_value != NULL)
+        *out_value = val;
+      return CMP_OK;
+    }
+  }
+#else
+  (void)key;
+#endif
+  if (out_value)
+    *out_value = NULL;
+  return CMP_ERR_NOT_FOUND;
+}
+
 static const CMPEnvVTable g_cmp_web_env_vtable = {
     cmp_web_env_get_io,    cmp_web_env_get_sensors, cmp_web_env_get_camera,
     cmp_web_env_get_image, cmp_web_env_get_video,   cmp_web_env_get_audio,
-    cmp_web_env_get_tasks, cmp_web_env_get_time_ms};
+    cmp_web_env_get_tasks, cmp_web_env_get_time_ms, cmp_web_env_navigate_url,
+    cmp_web_env_get_arg};
 
 int CMP_CALL cmp_web_backend_create(const CMPWebBackendConfig *config,
                                     CMPWebBackend **out_backend) {

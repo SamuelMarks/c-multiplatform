@@ -633,9 +633,23 @@ static int env_get_aud(void* c, CMPAudio *a) { (void)c; (void)a; return CMP_ERR_
 static int env_get_tasks(void* c, CMPTasks *t) { (void)c; (void)t; return CMP_ERR_UNSUPPORTED; }
 static int env_get_time(void* c, uint32_t *t) { return ws_get_time(c, t); }
 
+static int CMP_CALL env_navigate_url(void *env, const char *utf8_url) {
+  (void)env;
+  (void)utf8_url;
+  return CMP_ERR_UNSUPPORTED;
+}
+
+static int CMP_CALL env_get_arg(void *env, const char *key, const char **out_value) {
+  (void)env;
+  (void)key;
+  if (out_value) *out_value = NULL;
+  return CMP_ERR_NOT_FOUND;
+}
+
 static const CMPEnvVTable g_env_vtable = {
     env_get_io, env_get_sensors, env_get_cam, env_get_img,
-    env_get_vid, env_get_aud, env_get_tasks, env_get_time
+    env_get_vid, env_get_aud, env_get_tasks, env_get_time,
+    env_navigate_url, env_get_arg
 };
 
 /* --- Main Backend Entry Points --- */

@@ -1067,11 +1067,28 @@ static int cmp_android_env_get_time_ms(void *env, cmp_u32 *out_time_ms) {
                                                out_time_ms);
 }
 
+static int CMP_CALL cmp_android_env_navigate_url(void *env,
+                                                 const char *utf8_url) {
+  (void)env;
+  (void)utf8_url;
+  return CMP_ERR_UNSUPPORTED;
+}
+
+static int CMP_CALL cmp_android_env_get_arg(void *env, const char *key,
+                                            const char **out_value) {
+  (void)env;
+  (void)key;
+  if (out_value)
+    *out_value = NULL;
+  return CMP_ERR_NOT_FOUND;
+}
+
 static const CMPEnvVTable g_cmp_android_env_vtable = {
-    cmp_android_env_get_io,     cmp_android_env_get_sensors,
-    cmp_android_env_get_camera, cmp_android_env_get_image,
-    cmp_android_env_get_video,  cmp_android_env_get_audio,
-    cmp_android_env_get_tasks,  cmp_android_env_get_time_ms};
+    cmp_android_env_get_io,       cmp_android_env_get_sensors,
+    cmp_android_env_get_camera,   cmp_android_env_get_image,
+    cmp_android_env_get_video,    cmp_android_env_get_audio,
+    cmp_android_env_get_tasks,    cmp_android_env_get_time_ms,
+    cmp_android_env_navigate_url, cmp_android_env_get_arg};
 
 int CMP_CALL cmp_android_backend_create(const CMPAndroidBackendConfig *config,
                                         CMPAndroidBackend **out_backend) {
