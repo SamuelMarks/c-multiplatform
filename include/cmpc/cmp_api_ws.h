@@ -87,6 +87,8 @@ extern "C" {
 #define CMP_INPUT_BLUR 22
 /** @brief Custom application event. */
 #define CMP_INPUT_CUSTOM 23
+/** @brief Authentication state changed event. */
+#define CMP_EVENT_AUTH_CHANGED 24
 
 /**
  * @brief Pointer input data.

@@ -139,6 +139,17 @@ cmp_http_form_set_on_done(CMPHttpForm *http_form,
   return CMP_OK;
 }
 
+CMP_API int CMP_CALL cmp_http_form_set_loading_indicator(
+    CMPHttpForm *http_form, CMPWidget *loading_indicator) {
+  if (!http_form)
+    return CMP_ERR_INVALID_ARGUMENT;
+  http_form->loading_indicator = loading_indicator;
+  if (loading_indicator) {
+    loading_indicator->flags |= CMP_WIDGET_FLAG_DISABLED;
+  }
+  return CMP_OK;
+}
+
 CMP_API int CMP_CALL cmp_http_form_shutdown(CMPHttpForm *http_form) {
   if (!http_form) {
     return CMP_ERR_INVALID_ARGUMENT;
@@ -147,6 +158,7 @@ CMP_API int CMP_CALL cmp_http_form_shutdown(CMPHttpForm *http_form) {
   if (http_form->request) {
     if (http_form->request->url) {
       free(http_form->request->url);
+      http_form->request->url = NULL;
     }
     http_request_free(http_form->request);
     free(http_form->request);

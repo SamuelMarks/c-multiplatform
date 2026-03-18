@@ -645,6 +645,10 @@ static int cmp_router_navigate_path_len(CMPRouter *router, const char *path,
   const CMPRoute *route;
   char *path_copy;
   void *component;
+  CMPUri parsed;
+  const char *route_path;
+  cmp_usize route_path_len;
+  char *temp_path = NULL;
   int rc;
 
   if (router == NULL || path == NULL) {
@@ -678,7 +682,37 @@ static int cmp_router_navigate_path_len(CMPRouter *router, const char *path,
     return CMP_ERR_OVERFLOW;
   }
 
-  rc = cmp_router_find_route(router, path, path_len, &route);
+  rc = cmp_router_copy_path(router, path, path_len, &temp_path);
+  if (rc != CMP_OK)
+    return rc;
+  rc = cmp_uri_parse(temp_path, &parsed);
+  if (rc == CMP_OK && parsed.path.length > 0) {
+    route_path = parsed.path.data;
+    route_path_len = parsed.path.length;
+  } else if (rc == CMP_OK && parsed.path.length == 0) {
+    route_path = g_router_root_path;
+    route_path_len = 1;
+  } else {
+    route_path = temp_path;
+    route_path_len = path_len;
+  }
+
+  if (router->on_before_navigate) {
+    CMPBool allow = CMP_TRUE;
+    rc = router->on_before_navigate(router->on_before_navigate_ctx, router,
+                                    temp_path, &allow);
+    if (rc != CMP_OK) {
+      router->allocator.free(router->allocator.ctx, temp_path);
+      return rc;
+    }
+    if (!allow) {
+      router->allocator.free(router->allocator.ctx, temp_path);
+      return CMP_OK;
+    }
+  }
+
+  rc = cmp_router_find_route(router, route_path, route_path_len, &route);
+  router->allocator.free(router->allocator.ctx, temp_path);
   if (rc != CMP_OK) {
     return rc;
   }
@@ -707,9 +741,8 @@ static int cmp_router_navigate_path_len(CMPRouter *router, const char *path,
 
   /* Sync with environment if configured */
   if (router->env && router->env->vtable && router->env->vtable->navigate_url) {
-    router->env->vtable->navigate_url((void *)router->env, path_copy);
+    router->env->vtable->navigate_url((void *)router->env->ctx, path_copy);
   }
-
   return CMP_OK;
 }
 
@@ -760,6 +793,8 @@ int CMP_CALL cmp_router_init(CMPRouter *router, const CMPRouterConfig *config) {
   router->route_count = config->route_count;
   router->stack_capacity = config->stack_capacity;
   router->env = config->env;
+  router->on_before_navigate = config->on_before_navigate;
+  router->on_before_navigate_ctx = config->on_before_navigate_ctx;
   router->stack_size = 0;
   router->stack = NULL;
 
@@ -834,8 +869,6 @@ int CMP_CALL cmp_router_navigate(CMPRouter *router, const char *path,
 int CMP_CALL cmp_router_navigate_uri(CMPRouter *router, const char *uri,
                                      void **out_component) {
   CMPUri parsed;
-  const char *path;
-  cmp_usize path_len;
   int rc;
 
   if (router == NULL || uri == NULL) {
@@ -847,15 +880,34 @@ int CMP_CALL cmp_router_navigate_uri(CMPRouter *router, const char *uri,
     return rc;
   }
 
-  if (parsed.path.length == 0) {
-    path = g_router_root_path;
-    path_len = 1;
-  } else {
-    path = parsed.path.data;
-    path_len = parsed.path.length;
+  {
+    cmp_usize ulen = 0;
+    rc = cmp_router_cstrlen(uri, &ulen);
+    if (rc != CMP_OK)
+      return rc;
+    return cmp_router_navigate_path_len(router, uri, ulen, out_component);
   }
+}
 
-  return cmp_router_navigate_path_len(router, path, path_len, out_component);
+CMP_API int CMP_CALL cmp_router_get_query_param(const CMPRouter *router,
+                                                const char *key,
+                                                CMPUriSlice *out_value,
+                                                CMPBool *out_found) {
+  const char *curr_path = NULL;
+  CMPUri uri;
+  int rc;
+  if (!router || !key || !out_value || !out_found)
+    return CMP_ERR_INVALID_ARGUMENT;
+  *out_found = CMP_FALSE;
+  out_value->data = NULL;
+  out_value->length = 0;
+  rc = cmp_router_get_current(router, &curr_path, NULL);
+  if (rc != CMP_OK || !curr_path)
+    return rc;
+  rc = cmp_uri_parse(curr_path, &uri);
+  if (rc != CMP_OK)
+    return rc;
+  return cmp_uri_query_find(&uri, key, out_value, out_found);
 }
 
 int CMP_CALL cmp_router_can_back(const CMPRouter *router,
@@ -889,9 +941,8 @@ int CMP_CALL cmp_router_back(CMPRouter *router, void **out_component) {
   /* Sync with environment if configured */
   if (router->env && router->env->vtable && router->env->vtable->navigate_url) {
     router->env->vtable->navigate_url(
-        (void *)router->env, router->stack[router->stack_size - 1].path);
+        (void *)router->env->ctx, router->stack[router->stack_size - 1].path);
   }
-
   return rc;
 }
 

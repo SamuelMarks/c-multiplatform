@@ -144,6 +144,8 @@ typedef struct CMPTextField {
   CMPBool is_required;  /**< CMP_TRUE if the field requires non-empty text. */
   cmp_usize min_length; /**< Minimum text length in bytes. */
   cmp_usize max_length; /**< Maximum text length in bytes (0 for no limit). */
+  const char *validation_pattern; /**< Optional regex/glob pattern string for
+                                     validation. */
 
   /**
    * @brief Validation callback for text fields.
@@ -370,6 +372,17 @@ CMP_API int CMP_CALL cmp_text_field_set_on_validate(
  * @param max_length Maximum UTF-8 length in bytes (0 for no limit).
  * @return CMP_OK on success or a failure code.
  */
+/**
+ * @brief Set the validation pattern.
+ * @param field Text field instance.
+
+ * * @param pattern Optional regex/glob pattern string.
+ * @return CMP_OK on
+ * success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_text_field_set_validation_pattern(CMPTextField *field,
+                                                           const char *pattern);
+
 CMP_API int CMP_CALL cmp_text_field_set_constraints(CMPTextField *field,
                                                     CMPBool is_required,
                                                     cmp_usize min_length,

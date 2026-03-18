@@ -105,6 +105,9 @@ static int test_http_form(void) {
   CMP_TEST_EXPECT(cmp_http_form_set_on_done(NULL, dummy_http_on_done, &called),
                   CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_http_form_set_on_done(&form, dummy_http_on_done, &called));
+  CMP_TEST_EXPECT(cmp_http_form_set_loading_indicator(NULL, &root),
+                  CMP_ERR_INVALID_ARGUMENT);
+  CMP_TEST_OK(cmp_http_form_set_loading_indicator(&form, &root));
 
   CMP_TEST_EXPECT(cmp_http_form_tick(NULL), CMP_ERR_INVALID_ARGUMENT);
   CMP_TEST_OK(cmp_http_form_tick(&form));
@@ -132,6 +135,7 @@ static int test_http_form_other_methods(void) {
   CMPHttpForm form_get;
   CMPHttpForm form_default;
   CMPTextField tf;
+  memset(&tf, 0, sizeof(tf));
   CMPTextBackend tb;
   CMPTextFieldStyle ts;
   CMPWidget *inputs[1];
@@ -170,7 +174,7 @@ static int test_http_form_other_methods(void) {
   cmp_form_submit(&form_default.form);
   cmp_http_form_shutdown(&form_default);
 
-  if (tf.widget.vtable->destroy) {
+  if (tf.widget.vtable && tf.widget.vtable->destroy) {
     tf.widget.vtable->destroy(&tf.widget);
   }
 

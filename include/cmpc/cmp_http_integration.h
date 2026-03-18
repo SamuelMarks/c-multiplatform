@@ -58,6 +58,7 @@ typedef struct CMPHttpForm {
   struct HttpClient *client;         /**< HTTP client instance (internal). */
   struct HttpRequest *request;       /**< Active HTTP request handle. */
   struct HttpFuture *future;         /**< Active request future. */
+  CMPWidget *loading_indicator;      /**< Optional loading indicator widget. */
 } CMPHttpForm;
 
 /**
@@ -91,6 +92,15 @@ CMP_API int CMP_CALL cmp_http_form_set_on_done(
  * @param http_form HTTP form instance.
  * @return CMP_OK on success or a failure code.
  */
+/**
+ * @brief Configure an optional loading indicator.
+ * @param http_form HTTP form instance.
+ * @param loading_indicator Loading indicator widget.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_http_form_set_loading_indicator(
+    CMPHttpForm *http_form, CMPWidget *loading_indicator);
+
 CMP_API int CMP_CALL cmp_http_form_shutdown(CMPHttpForm *http_form);
 
 /**

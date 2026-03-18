@@ -353,6 +353,15 @@ static int cmp_text_field_add_overflow(cmp_usize a, cmp_usize b,
   return CMP_OK;
 }
 
+static void cmp_text_field_secure_zero(void *ptr, cmp_usize size) {
+  if (ptr) {
+    volatile char *p = (volatile char *)ptr;
+    while (size--) {
+      *p++ = 0;
+    }
+  }
+}
+
 static int cmp_text_field_reserve(CMPTextField *field, cmp_usize required) {
   cmp_usize new_capacity;
   void *mem;
@@ -405,8 +414,17 @@ static int cmp_text_field_reserve(CMPTextField *field, cmp_usize required) {
   }
 #endif
 
-  rc = field->allocator.realloc(field->allocator.ctx, field->utf8, new_capacity,
-                                &mem);
+  if (field->style.is_obscured && field->utf8) {
+    rc = field->allocator.alloc(field->allocator.ctx, new_capacity, &mem);
+    if (rc == CMP_OK && mem) {
+      memcpy(mem, field->utf8, field->utf8_capacity);
+      cmp_text_field_secure_zero(field->utf8, field->utf8_capacity);
+      field->allocator.free(field->allocator.ctx, field->utf8);
+    }
+  } else {
+    rc = field->allocator.realloc(field->allocator.ctx, field->utf8,
+                                  new_capacity, &mem);
+  }
   if (rc != CMP_OK) {
     return rc;
   }
@@ -657,6 +675,8 @@ static int cmp_text_field_sync_obscured(CMPTextField *field) {
   if (field->style.is_obscured == CMP_FALSE) {
     if (field->obscured_utf8 != NULL) {
       if (field->allocator.free != NULL) {
+        cmp_text_field_secure_zero(field->obscured_utf8,
+                                   field->obscured_capacity);
         field->allocator.free(field->allocator.ctx, field->obscured_utf8);
       }
       field->obscured_utf8 = NULL;
@@ -675,9 +695,18 @@ static int cmp_text_field_sync_obscured(CMPTextField *field) {
     if (field->allocator.realloc == NULL) {
       return CMP_ERR_UNSUPPORTED;
     }
-    if (field->allocator.realloc(field->allocator.ctx, field->obscured_utf8,
-                                 new_cap, &mem) != CMP_OK) {
-      return CMP_ERR_OUT_OF_MEMORY;
+    if (field->obscured_utf8) {
+      if (field->allocator.alloc(field->allocator.ctx, new_cap, &mem) != CMP_OK)
+        return CMP_ERR_OUT_OF_MEMORY;
+      memcpy(mem, field->obscured_utf8, field->obscured_capacity);
+      cmp_text_field_secure_zero(field->obscured_utf8,
+                                 field->obscured_capacity);
+      field->allocator.free(field->allocator.ctx, field->obscured_utf8);
+    } else {
+      if (field->allocator.realloc(field->allocator.ctx, field->obscured_utf8,
+                                   new_cap, &mem) != CMP_OK) {
+        return CMP_ERR_OUT_OF_MEMORY;
+      }
     }
     field->obscured_utf8 = (char *)mem;
     field->obscured_capacity = new_cap;
@@ -1159,13 +1188,14 @@ static int cmp_text_field_resolve_colors(
     *out_container = field->style.container_color;
     if (field->is_invalid == CMP_TRUE) {
       *out_outline = field->style.error_outline_color;
+      *out_label = field->style.error_outline_color;
     } else {
       *out_outline = (field->focused == CMP_TRUE)
                          ? field->style.focused_outline_color
                          : field->style.outline_color;
+      *out_label = field->style.label_style.color;
     }
     *out_text = field->style.text_style.color;
-    *out_label = field->style.label_style.color;
     *out_placeholder = field->style.placeholder_color;
   }
 
@@ -1831,6 +1861,13 @@ static int cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
         /* Text field doesn't have WS context to interact with clipboard
            directly, this is usually handled at the app level. But we can
            implement select all. */
+        if (field->style.is_obscured && (event->data.key.key_code == 'C' ||
+                                         event->data.key.key_code == 'c' ||
+                                         event->data.key.key_code == 'X' ||
+                                         event->data.key.key_code == 'x')) {
+          *out_handled = CMP_TRUE;
+          return CMP_OK;
+        }
         if (event->data.key.key_code == 'A' ||
             event->data.key.key_code == 'a') {
           field->selection_start = 0;
@@ -1981,6 +2018,9 @@ static int cmp_text_field_widget_destroy(void *widget) {
   }
 
   if (field->utf8 != NULL && field->allocator.free != NULL) {
+    if (field->style.is_obscured == CMP_TRUE) {
+      cmp_text_field_secure_zero(field->utf8, field->utf8_capacity);
+    }
     field->allocator.free(field->allocator.ctx, field->utf8);
   }
 
@@ -2650,6 +2690,14 @@ CMP_API int CMP_CALL cmp_text_field_set_on_validate(
   return CMP_OK;
 }
 
+CMP_API int CMP_CALL cmp_text_field_set_validation_pattern(
+    CMPTextField *field, const char *pattern) {
+  if (!field)
+    return CMP_ERR_INVALID_ARGUMENT;
+  field->validation_pattern = pattern;
+  return CMP_OK;
+}
+
 CMP_API int CMP_CALL cmp_text_field_set_constraints(CMPTextField *field,
                                                     CMPBool is_required,
                                                     cmp_usize min_length,
@@ -2676,6 +2724,30 @@ CMP_API int CMP_CALL cmp_text_field_validate(CMPTextField *field,
     is_invalid = CMP_TRUE;
   } else if (field->max_length > 0 && field->utf8_len > field->max_length) {
     is_invalid = CMP_TRUE;
+  }
+
+  if (field->validation_pattern && field->utf8 && !is_invalid) {
+    const char *p = field->validation_pattern;
+    const char *s = field->utf8;
+    cmp_usize plen = 0;
+    while (p[plen])
+      plen++;
+    if (plen > 0) {
+      if (p[0] == '^' && p[plen - 1] == '$') {
+        if (field->utf8_len != plen - 2 || memcmp(p + 1, s, plen - 2) != 0)
+          is_invalid = CMP_TRUE;
+      } else if (p[0] == '^') {
+        if (field->utf8_len < plen - 1 || memcmp(p + 1, s, plen - 1) != 0)
+          is_invalid = CMP_TRUE;
+      } else if (p[plen - 1] == '$') {
+        if (field->utf8_len < plen - 1 ||
+            memcmp(p, s + field->utf8_len - (plen - 1), plen - 1) != 0)
+          is_invalid = CMP_TRUE;
+      } else {
+        if (strstr(s, p) == NULL)
+          is_invalid = CMP_TRUE;
+      }
+    }
   }
 
   if (field->on_validate) {

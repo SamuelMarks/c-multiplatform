@@ -100,6 +100,19 @@ typedef struct CMPRouteEntry {
 struct CMPEnv;
 
 /**
+ * @brief Router before navigate callback.
+ * @param ctx Context pointer.
+ * @param router Router instance.
+ * @param path Target path.
+ * @param out_allow Receives CMP_TRUE if navigation should proceed.
+ * @return CMP_OK on success or a failure code.
+ */
+typedef int(CMP_CALL *CMPRouterBeforeNavigateFn)(void *ctx,
+                                                 struct CMPRouter *router,
+                                                 const char *path,
+                                                 CMPBool *out_allow);
+
+/**
  * @brief Router configuration.
  */
 typedef struct CMPRouterConfig {
@@ -109,6 +122,9 @@ typedef struct CMPRouterConfig {
   cmp_usize route_count;  /**< Number of routes. */
   cmp_usize stack_capacity; /**< Maximum navigation stack size. */
   const struct CMPEnv *env; /**< Environment for URL history sync (optional). */
+  CMPRouterBeforeNavigateFn
+      on_before_navigate;       /**< Route guard callback (optional). */
+  void *on_before_navigate_ctx; /**< Context for route guard. */
 } CMPRouterConfig;
 
 /**
@@ -122,6 +138,8 @@ typedef struct CMPRouter {
   cmp_usize stack_capacity; /**< Stack capacity. */
   const struct CMPEnv *env; /**< Environment for URL history sync (optional). */
   cmp_usize stack_size;     /**< Current stack size. */
+  CMPRouterBeforeNavigateFn on_before_navigate; /**< Route guard callback. */
+  void *on_before_navigate_ctx;                 /**< Context for route guard. */
 } CMPRouter;
 
 /**
@@ -159,6 +177,19 @@ CMP_API int CMP_CALL cmp_router_navigate(CMPRouter *router, const char *path,
  */
 CMP_API int CMP_CALL cmp_router_navigate_uri(CMPRouter *router, const char *uri,
                                              void **out_component);
+
+/**
+ * @brief Get a query parameter from the current route.
+ * @param router Router instance.
+ * @param key Null-terminated key string.
+ * @param out_value Receives the value slice.
+ * @param out_found Receives CMP_TRUE if found.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_router_get_query_param(const CMPRouter *router,
+                                                const char *key,
+                                                CMPUriSlice *out_value,
+                                                CMPBool *out_found);
 
 /**
  * @brief Check whether back navigation is possible.

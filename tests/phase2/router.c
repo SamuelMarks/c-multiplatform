@@ -156,6 +156,19 @@ static int route_destroy(void *ctx, void *component) {
   return CMP_OK;
 }
 
+static int dummy_route_guard(void *ctx, CMPRouter *router, const char *path,
+                             CMPBool *out_allow) {
+  if (strcmp(path, "/blocked") == 0) {
+    *out_allow = CMP_FALSE;
+    return CMP_OK;
+  }
+  if (strcmp(path, "/error") == 0) {
+    return CMP_ERR_IO;
+  }
+  *out_allow = CMP_TRUE;
+  return CMP_OK;
+}
+
 static int dummy_navigate_url(void *ctx, const char *url) {
   char *called_url = (char *)ctx;
   strcpy(called_url, url);
@@ -165,32 +178,42 @@ static int dummy_navigate_url(void *ctx, const char *url) {
 static int test_router_env(void) {
   CMPRouter router;
   CMPRouterConfig config;
-  CMPRoute routes[1];
+  CMPRoute routes[2];
   CMPEnv env;
   CMPEnvVTable vtable;
   char called_url[256];
 
   RouteCtx route_ctx;
+  RouteCtx root_ctx;
 
   memset(&config, 0, sizeof(config));
   memset(&env, 0, sizeof(env));
   memset(&vtable, 0, sizeof(vtable));
   memset(called_url, 0, sizeof(called_url));
   memset(&route_ctx, 0, sizeof(route_ctx));
+  memset(&root_ctx, 0, sizeof(root_ctx));
 
   routes[0].pattern = "/test";
   routes[0].build = route_build;
   routes[0].destroy = route_destroy;
   routes[0].ctx = &route_ctx;
 
+  routes[1].pattern = "/";
+  routes[1].build = route_build;
+  routes[1].destroy = route_destroy;
+  routes[1].ctx = &root_ctx;
+
   vtable.navigate_url = dummy_navigate_url;
   env.ctx = called_url;
   env.vtable = &vtable;
 
   config.routes = routes;
-  config.route_count = 1;
+  config.route_count = 2;
   config.stack_capacity = 10;
   config.env = &env;
+
+  config.on_before_navigate = dummy_route_guard;
+  config.on_before_navigate_ctx = NULL;
 
   CMP_TEST_OK(cmp_router_init(&router, &config));
 
@@ -679,6 +702,11 @@ int main(void) {
   CMP_TEST_OK(cmp_router_back(&router, &component));
   CMP_TEST_ASSERT(component == &home_ctx);
   CMP_TEST_ASSERT(user_ctx.destroy_called == 1);
+  CMP_TEST_OK(cmp_router_can_back(&router, &can_back));
+  CMP_TEST_ASSERT(can_back == CMP_TRUE);
+
+  CMP_TEST_OK(cmp_router_back(&router, &component));
+  CMP_TEST_ASSERT(component == &home_ctx);
   CMP_TEST_OK(cmp_router_can_back(&router, &can_back));
   CMP_TEST_ASSERT(can_back == CMP_FALSE);
   CMP_TEST_EXPECT(cmp_router_back(&router, &component), CMP_ERR_NOT_FOUND);
