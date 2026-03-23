@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "m3/m3_scaffold.h"
 
+#include <stdio.h>
 #include <string.h>
 /* clang-format on */
 
@@ -384,6 +385,8 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
     return rc;
   }
   if (visible == CMP_TRUE) {
+    printf("MEASURING TOP_BAR\n");
+    fflush(stdout);
     rc = m3_scaffold_measure_child(scaffold->top_bar, child_width, child_height,
                                    &top_size);
     if (rc != CMP_OK) {
@@ -396,6 +399,8 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
     return rc;
   }
   if (visible == CMP_TRUE) {
+    printf("MEASURING BOTTOM_BAR\n");
+    fflush(stdout);
     rc = m3_scaffold_measure_child(scaffold->bottom_bar, child_width,
                                    child_height, &bottom_size);
     if (rc != CMP_OK) {
@@ -408,6 +413,8 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
     return rc;
   }
   if (visible == CMP_TRUE) {
+    printf("MEASURING BODY\n");
+    fflush(stdout);
     rc = m3_scaffold_measure_child(scaffold->body, child_width, child_height,
                                    &body_size);
     if (rc != CMP_OK) {
@@ -420,6 +427,8 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
     return rc;
   }
   if (visible == CMP_TRUE) {
+    printf("MEASURING FAB\n");
+    fflush(stdout);
     rc = m3_scaffold_measure_child(scaffold->fab, child_width, child_height,
                                    &fab_size);
     if (rc != CMP_OK) {
@@ -432,6 +441,8 @@ static int m3_scaffold_widget_measure(void *widget, CMPMeasureSpec width,
     return rc;
   }
   if (visible == CMP_TRUE) {
+    printf("MEASURING SNACKBAR\n");
+    fflush(stdout);
     rc = m3_scaffold_measure_child(scaffold->snackbar, child_width,
                                    child_height, &snackbar_size);
     if (rc != CMP_OK) {

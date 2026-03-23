@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "cmpc/cmp_backend_ios.h"
 
 #include "cmpc/cmp_backend_null.h"
@@ -5,6 +6,7 @@
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
+/* clang-format on */
 
 #define CMP_IOS_RETURN_IF_ERROR(rc) \
     do { \

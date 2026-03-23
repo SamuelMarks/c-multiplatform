@@ -1303,6 +1303,19 @@ static int cmp_text_field_widget_measure(void *widget, CMPMeasureSpec width,
   }
   desired_width += field->style.padding_x * 2.0f;
 
+  if (field->style.suffix_widget) {
+    CMPSize suffix_size;
+    CMPMeasureSpec auto_spec;
+    auto_spec.mode = CMP_MEASURE_UNSPECIFIED;
+    auto_spec.size = 0.0f;
+    if (field->style.suffix_widget->vtable &&
+        field->style.suffix_widget->vtable->measure) {
+      field->style.suffix_widget->vtable->measure(
+          field->style.suffix_widget->ctx, auto_spec, auto_spec, &suffix_size);
+      desired_width += suffix_size.width;
+    }
+  }
+
   desired_height = field->text_font_metrics.height;
   if (field->label_font_metrics.height > desired_height) {
     desired_height = field->label_font_metrics.height;
@@ -1347,6 +1360,31 @@ static int cmp_text_field_widget_layout(void *widget, CMPRect bounds) {
 
   field = (CMPTextField *)widget;
   field->bounds = bounds;
+
+  if (field->style.suffix_widget) {
+    CMPSize suffix_size;
+    CMPMeasureSpec auto_spec;
+    auto_spec.mode = CMP_MEASURE_UNSPECIFIED;
+    auto_spec.size = 0.0f;
+    if (field->style.suffix_widget->vtable &&
+        field->style.suffix_widget->vtable->measure) {
+      field->style.suffix_widget->vtable->measure(
+          field->style.suffix_widget->ctx, auto_spec, auto_spec, &suffix_size);
+
+      field->suffix_bounds.x = bounds.x + bounds.width - suffix_size.width -
+                               12.0f; /* 12px from right edge */
+      field->suffix_bounds.y =
+          bounds.y + (bounds.height * 0.5f) - (suffix_size.height * 0.5f);
+      field->suffix_bounds.width = suffix_size.width;
+      field->suffix_bounds.height = suffix_size.height;
+
+      if (field->style.suffix_widget->vtable->layout) {
+        field->style.suffix_widget->vtable->layout(
+            field->style.suffix_widget->ctx, field->suffix_bounds);
+      }
+    }
+  }
+
   return CMP_OK;
 }
 
@@ -1436,7 +1474,11 @@ static int cmp_text_field_widget_paint(void *widget, CMPPaintContext *ctx) {
   }
 
   bounds = field->bounds;
-  outline_width = field->style.outline_width;
+  if (field->focused) {
+    outline_width = field->style.focused_outline_width;
+  } else {
+    outline_width = field->style.outline_width;
+  }
 #ifdef CMP_TESTING
   if (cmp_text_field_test_fail_point_match(
           CMP_TEXT_FIELD_TEST_FAIL_OUTLINE_RANGE)) {
@@ -1731,6 +1773,25 @@ static int cmp_text_field_widget_event(void *widget, const CMPInputEvent *event,
 
   if (field->widget.flags & CMP_WIDGET_FLAG_DISABLED) {
     return CMP_OK;
+  }
+
+  if (field->style.suffix_widget && field->style.suffix_widget->vtable &&
+      field->style.suffix_widget->vtable->event) {
+    if (event->type == CMP_INPUT_POINTER_DOWN ||
+        event->type == CMP_INPUT_POINTER_UP ||
+        event->type == CMP_INPUT_POINTER_MOVE) {
+      if (event->data.pointer.x >= field->suffix_bounds.x &&
+          event->data.pointer.x <=
+              field->suffix_bounds.x + field->suffix_bounds.width &&
+          event->data.pointer.y >= field->suffix_bounds.y &&
+          event->data.pointer.y <=
+              field->suffix_bounds.y + field->suffix_bounds.height) {
+        field->style.suffix_widget->vtable->event(
+            field->style.suffix_widget->ctx, event, out_handled);
+        if (*out_handled)
+          return CMP_OK;
+      }
+    }
   }
 
   switch (event->type) {
@@ -2104,6 +2165,7 @@ int CMP_CALL cmp_text_field_style_init(CMPTextFieldStyle *style) {
   style->min_height = CMP_TEXT_FIELD_DEFAULT_MIN_HEIGHT;
   style->corner_radius = CMP_TEXT_FIELD_DEFAULT_CORNER_RADIUS;
   style->outline_width = CMP_TEXT_FIELD_DEFAULT_OUTLINE_WIDTH;
+  style->focused_outline_width = CMP_TEXT_FIELD_DEFAULT_OUTLINE_WIDTH;
   style->label_float_offset = CMP_TEXT_FIELD_DEFAULT_LABEL_FLOAT_OFFSET;
   style->label_anim_duration = CMP_TEXT_FIELD_DEFAULT_LABEL_ANIM_DURATION;
   style->cursor_width = CMP_TEXT_FIELD_DEFAULT_CURSOR_WIDTH;

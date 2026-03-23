@@ -1086,8 +1086,13 @@ static int m3_button_widget_paint(void *widget, CMPPaintContext *ctx) {
       return rc;
     }
     if (ripple_active == CMP_TRUE) {
-      rc =
-          cmp_ripple_paint(&button->ripple, ctx->gfx, &ctx->clip, inner_corner);
+      CMPRect rip_clip = ctx->clip;
+      CMPScalar rip_corner = inner_corner;
+      if (button->style.variant >= M3_BUTTON_VARIANT_ICON_STANDARD &&
+          button->style.variant <= M3_BUTTON_VARIANT_ICON_OUTLINED) {
+        rip_corner = rip_clip.width * 0.5f;
+      }
+      rc = cmp_ripple_paint(&button->ripple, ctx->gfx, &rip_clip, rip_corner);
       if (rc != CMP_OK) {
         return rc;
       }

@@ -171,7 +171,11 @@ static int dummy_route_guard(void *ctx, CMPRouter *router, const char *path,
 
 static int dummy_navigate_url(void *ctx, const char *url) {
   char *called_url = (char *)ctx;
+#if defined(_MSC_VER)
+  strcpy_s(called_url, sizeof(called_url), url);
+#else
   strcpy(called_url, url);
+#endif
   return CMP_OK;
 }
 

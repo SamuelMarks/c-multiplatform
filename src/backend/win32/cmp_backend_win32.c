@@ -2,13 +2,10 @@
 
 #include "cmpc/cmp_fs.h"
 #include "cmpc/cmp_log.h"
-
 #include "cmpc/cmp_object.h"
-
 #include <limits.h>
-
+#include <stdio.h>
 #include <string.h>
-
 #include <wchar.h>
 
 #ifndef DWMWA_SYSTEMBACKDROP_TYPE
@@ -254,6 +251,149 @@ typedef BOOL(WINAPI *CMPWin32AlphaBlendFn)(HDC, int, int, int, int, HDC, int,
 
                                            int, int, int, BLENDFUNCTION);
 
+/* GDI+ Flat API Types */
+typedef enum CMPGpStatus {
+  CMP_GP_OK = 0,
+  CMP_GP_GENERIC_ERROR = 1,
+  CMP_GP_INVALID_PARAMETER = 2,
+  CMP_GP_OUT_OF_MEMORY = 3,
+  CMP_GP_OBJECT_BUSY = 4,
+  CMP_GP_INSUFFICIENT_BUFFER = 5,
+  CMP_GP_NOT_IMPLEMENTED = 6,
+  CMP_GP_WIN32_ERROR = 7,
+  CMP_GP_WRONG_STATE = 8,
+  CMP_GP_ABORTED = 9,
+  CMP_GP_FILE_NOT_FOUND = 10,
+  CMP_GP_VALUE_OVERFLOW = 11,
+  CMP_GP_ACCESS_DENIED = 12,
+  CMP_GP_UNKNOWN_IMAGE_FORMAT = 13,
+  CMP_GP_FONT_FAMILY_NOT_FOUND = 14,
+  CMP_GP_FONT_STYLE_NOT_FOUND = 15,
+  CMP_GP_NOT_TRUE_TYPE_FONT = 16,
+  CMP_GP_UNSUPPORTED_GDIPLUS_VERSION = 17,
+  CMP_GP_GDIPLUS_NOT_INITIALIZED = 18,
+  CMP_GP_PROPERTY_NOT_FOUND = 19,
+  CMP_GP_PROPERTY_NOT_SUPPORTED = 20,
+  CMP_GP_PROFILE_NOT_FOUND = 21
+} CMPGpStatus;
+
+typedef void CMPGpGraphics;
+typedef void CMPGpBrush;
+typedef void CMPGpSolidFill;
+typedef void CMPGpPen;
+typedef void CMPGpPath;
+typedef void CMPGpMatrix;
+
+typedef DWORD CMPGpARGB;
+typedef float CMPGpREAL;
+
+typedef enum CMPGpFillMode {
+  CMP_GP_FILL_MODE_ALTERNATE = 0,
+  CMP_GP_FILL_MODE_WINDING = 1
+} CMPGpFillMode;
+
+typedef enum CMPGpSmoothingMode {
+  CMP_GP_SMOOTHING_MODE_INVALID = -1,
+  CMP_GP_SMOOTHING_MODE_DEFAULT = 0,
+  CMP_GP_SMOOTHING_MODE_HIGH_SPEED = 1,
+  CMP_GP_SMOOTHING_MODE_HIGH_QUALITY = 2,
+  CMP_GP_SMOOTHING_MODE_NONE = 3,
+  CMP_GP_SMOOTHING_MODE_ANTI_ALIAS8X4 = 4,
+  CMP_GP_SMOOTHING_MODE_ANTI_ALIAS = 4,
+  CMP_GP_SMOOTHING_MODE_ANTI_ALIAS8X8 = 5
+} CMPGpSmoothingMode;
+
+typedef enum CMPGpUnit {
+  CMP_GP_UNIT_WORLD = 0,
+  CMP_GP_UNIT_DISPLAY = 1,
+  CMP_GP_UNIT_PIXEL = 2,
+  CMP_GP_UNIT_POINT = 3,
+  CMP_GP_UNIT_INCH = 4,
+  CMP_GP_UNIT_DOCUMENT = 5,
+  CMP_GP_UNIT_MILLIMETER = 6
+} CMPGpUnit;
+
+typedef enum CMPGpCombineMode {
+  CMP_GP_COMBINE_MODE_REPLACE = 0,
+  CMP_GP_COMBINE_MODE_INTERSECT = 1,
+  CMP_GP_COMBINE_MODE_UNION = 2,
+  CMP_GP_COMBINE_MODE_XOR = 3,
+  CMP_GP_COMBINE_MODE_EXCLUDE = 4,
+  CMP_GP_COMBINE_MODE_COMPLEMENT = 5
+} CMPGpCombineMode;
+
+typedef struct CMPGdiplusStartupInput {
+  UINT32 GdiplusVersion;
+  void *DebugEventCallback;
+  BOOL SuppressBackgroundThread;
+  BOOL SuppressExternalCodecs;
+} CMPGdiplusStartupInput;
+
+typedef struct CMPGdiplusStartupOutput {
+  void *NotificationHook;
+  void *NotificationUnhook;
+} CMPGdiplusStartupOutput;
+
+/* GDI+ Function Pointers */
+typedef CMPGpStatus(WINAPI *CMPGdiplusStartupFn)(ULONG_PTR *,
+                                                 const CMPGdiplusStartupInput *,
+                                                 CMPGdiplusStartupOutput *);
+typedef void(WINAPI *CMPGdiplusShutdownFn)(ULONG_PTR);
+
+typedef CMPGpStatus(WINAPI *CMPGdipCreateFromHDCFn)(HDC, CMPGpGraphics **);
+typedef CMPGpStatus(WINAPI *CMPGdipDeleteGraphicsFn)(CMPGpGraphics *);
+typedef CMPGpStatus(WINAPI *CMPGdipSetSmoothingModeFn)(CMPGpGraphics *,
+                                                       CMPGpSmoothingMode);
+typedef CMPGpStatus(WINAPI *CMPGdipGraphicsClearFn)(CMPGpGraphics *, CMPGpARGB);
+
+typedef CMPGpStatus(WINAPI *CMPGdipCreateSolidFillFn)(CMPGpARGB,
+                                                      CMPGpSolidFill **);
+typedef CMPGpStatus(WINAPI *CMPGdipDeleteBrushFn)(CMPGpBrush *);
+
+typedef CMPGpStatus(WINAPI *CMPGdipCreatePathFn)(CMPGpFillMode, CMPGpPath **);
+typedef CMPGpStatus(WINAPI *CMPGdipDeletePathFn)(CMPGpPath *);
+typedef CMPGpStatus(WINAPI *CMPGdipResetPathFn)(CMPGpPath *);
+typedef CMPGpStatus(WINAPI *CMPGdipAddPathRectangleFn)(CMPGpPath *, CMPGpREAL,
+                                                       CMPGpREAL, CMPGpREAL,
+                                                       CMPGpREAL);
+typedef CMPGpStatus(WINAPI *CMPGdipAddPathArcFn)(CMPGpPath *, CMPGpREAL,
+                                                 CMPGpREAL, CMPGpREAL,
+                                                 CMPGpREAL, CMPGpREAL,
+                                                 CMPGpREAL);
+typedef CMPGpStatus(WINAPI *CMPGdipAddPathLineFn)(CMPGpPath *, CMPGpREAL,
+                                                  CMPGpREAL, CMPGpREAL,
+                                                  CMPGpREAL);
+typedef CMPGpStatus(WINAPI *CMPGdipAddPathBezierFn)(CMPGpPath *, CMPGpREAL,
+                                                    CMPGpREAL, CMPGpREAL,
+                                                    CMPGpREAL, CMPGpREAL,
+                                                    CMPGpREAL, CMPGpREAL,
+                                                    CMPGpREAL);
+typedef CMPGpStatus(WINAPI *CMPGdipClosePathFigureFn)(CMPGpPath *);
+typedef CMPGpStatus(WINAPI *CMPGdipFillPathFn)(CMPGpGraphics *, CMPGpBrush *,
+                                               CMPGpPath *);
+typedef CMPGpStatus(WINAPI *CMPGdipDrawPathFn)(CMPGpGraphics *, CMPGpPen *,
+                                               CMPGpPath *);
+
+typedef CMPGpStatus(WINAPI *CMPGdipCreatePen1Fn)(CMPGpARGB, CMPGpREAL,
+                                                 CMPGpUnit, CMPGpPen **);
+typedef CMPGpStatus(WINAPI *CMPGdipDeletePenFn)(CMPGpPen *);
+typedef CMPGpStatus(WINAPI *CMPGdipDrawLineFn)(CMPGpGraphics *, CMPGpPen *,
+                                               CMPGpREAL, CMPGpREAL, CMPGpREAL,
+                                               CMPGpREAL);
+typedef CMPGpStatus(WINAPI *CMPGdipSetClipRectFn)(CMPGpGraphics *, CMPGpREAL,
+                                                  CMPGpREAL, CMPGpREAL,
+                                                  CMPGpREAL, CMPGpCombineMode);
+typedef CMPGpStatus(WINAPI *CMPGdipResetClipFn)(CMPGpGraphics *);
+typedef CMPGpStatus(WINAPI *CMPGdipSaveGraphicsFn)(CMPGpGraphics *, DWORD *);
+typedef CMPGpStatus(WINAPI *CMPGdipRestoreGraphicsFn)(CMPGpGraphics *, DWORD);
+typedef CMPGpStatus(WINAPI *CMPGdipCreateMatrix2Fn)(CMPGpREAL, CMPGpREAL,
+                                                    CMPGpREAL, CMPGpREAL,
+                                                    CMPGpREAL, CMPGpREAL,
+                                                    CMPGpMatrix **);
+typedef CMPGpStatus(WINAPI *CMPGdipDeleteMatrixFn)(CMPGpMatrix *);
+typedef CMPGpStatus(WINAPI *CMPGdipSetWorldTransformFn)(CMPGpGraphics *,
+                                                        CMPGpMatrix *);
+
 typedef struct CMPWin32EventQueue {
 
   CMPInputEvent events[CMP_WIN32_EVENT_CAPACITY];
@@ -279,6 +419,8 @@ typedef struct CMPWin32Window {
   HBITMAP dib;
 
   void *dib_pixels;
+
+  CMPGpGraphics *gdiplus_graphics;
 
   cmp_i32 width;
 
@@ -374,6 +516,38 @@ struct CMPWin32Backend {
 
   CMPWin32AlphaBlendFn alpha_blend;
 
+  /* GDI+ State */
+  HMODULE gdiplus;
+  ULONG_PTR gdiplus_token;
+  CMPGdiplusStartupFn gdiplus_startup;
+  CMPGdiplusShutdownFn gdiplus_shutdown;
+  CMPGdipCreateFromHDCFn gdip_create_from_hdc;
+  CMPGdipDeleteGraphicsFn gdip_delete_graphics;
+  CMPGdipSetSmoothingModeFn gdip_set_smoothing_mode;
+  CMPGdipGraphicsClearFn gdip_graphics_clear;
+  CMPGdipCreateSolidFillFn gdip_create_solid_fill;
+  CMPGdipDeleteBrushFn gdip_delete_brush;
+  CMPGdipCreatePathFn gdip_create_path;
+  CMPGdipDeletePathFn gdip_delete_path;
+  CMPGdipResetPathFn gdip_reset_path;
+  CMPGdipAddPathRectangleFn gdip_add_path_rectangle;
+  CMPGdipAddPathArcFn gdip_add_path_arc;
+  CMPGdipAddPathLineFn gdip_add_path_line;
+  CMPGdipAddPathBezierFn gdip_add_path_bezier;
+  CMPGdipClosePathFigureFn gdip_close_path_figure;
+  CMPGdipFillPathFn gdip_fill_path;
+  CMPGdipDrawPathFn gdip_draw_path;
+  CMPGdipCreatePen1Fn gdip_create_pen1;
+  CMPGdipDeletePenFn gdip_delete_pen;
+  CMPGdipDrawLineFn gdip_draw_line;
+  CMPGdipSetClipRectFn gdip_set_clip_rect;
+  CMPGdipResetClipFn gdip_reset_clip;
+  CMPGdipSaveGraphicsFn gdip_save_graphics;
+  CMPGdipRestoreGraphicsFn gdip_restore_graphics;
+  CMPGdipCreateMatrix2Fn gdip_create_matrix2;
+  CMPGdipDeleteMatrixFn gdip_delete_matrix;
+  CMPGdipSetWorldTransformFn gdip_set_world_transform;
+
   ATOM window_class;
 
   CMPBool class_registered;
@@ -385,6 +559,8 @@ struct CMPWin32Backend {
   CMPBool has_transform;
 
   cmp_usize clip_depth;
+
+  DWORD gdiplus_states[CMP_WIN32_CLIP_STACK_CAPACITY];
 
   CMPWin32EventQueue event_queue;
 };
@@ -592,7 +768,6 @@ static int cmp_win32_backend_log_last_error(struct CMPWin32Backend *backend,
 }
 
 static void
-
 cmp_win32_backend_init_alpha_blend(struct CMPWin32Backend *backend) {
 
   HMODULE module;
@@ -628,6 +803,107 @@ cmp_win32_backend_init_alpha_blend(struct CMPWin32Backend *backend) {
   backend->msimg32 = module;
 
   backend->alpha_blend = fn;
+}
+
+static void cmp_win32_backend_init_gdiplus(struct CMPWin32Backend *backend) {
+  HMODULE module;
+  CMPGdiplusStartupInput startup_input;
+
+  if (backend == NULL) {
+    return;
+  }
+
+  backend->gdiplus = NULL;
+  backend->gdiplus_token = 0;
+
+  module = LoadLibraryA("gdiplus.dll");
+  if (module == NULL) {
+    return;
+  }
+
+  backend->gdiplus_startup =
+      (CMPGdiplusStartupFn)(void (*)(void))GetProcAddress(module,
+                                                          "GdiplusStartup");
+  backend->gdiplus_shutdown =
+      (CMPGdiplusShutdownFn)(void (*)(void))GetProcAddress(module,
+                                                           "GdiplusShutdown");
+  backend->gdip_create_from_hdc = (CMPGdipCreateFromHDCFn)(void (*)(
+      void))GetProcAddress(module, "GdipCreateFromHDC");
+  backend->gdip_delete_graphics = (CMPGdipDeleteGraphicsFn)(void (*)(
+      void))GetProcAddress(module, "GdipDeleteGraphics");
+  backend->gdip_set_smoothing_mode = (CMPGdipSetSmoothingModeFn)(void (*)(
+      void))GetProcAddress(module, "GdipSetSmoothingMode");
+  backend->gdip_graphics_clear = (CMPGdipGraphicsClearFn)(void (*)(
+      void))GetProcAddress(module, "GdipGraphicsClear");
+  backend->gdip_create_solid_fill = (CMPGdipCreateSolidFillFn)(void (*)(
+      void))GetProcAddress(module, "GdipCreateSolidFill");
+  backend->gdip_delete_brush =
+      (CMPGdipDeleteBrushFn)(void (*)(void))GetProcAddress(module,
+                                                           "GdipDeleteBrush");
+  backend->gdip_create_path =
+      (CMPGdipCreatePathFn)(void (*)(void))GetProcAddress(module,
+                                                          "GdipCreatePath");
+  backend->gdip_delete_path =
+      (CMPGdipDeletePathFn)(void (*)(void))GetProcAddress(module,
+                                                          "GdipDeletePath");
+  backend->gdip_reset_path = (CMPGdipResetPathFn)(void (*)(void))GetProcAddress(
+      module, "GdipResetPath");
+  backend->gdip_add_path_rectangle = (CMPGdipAddPathRectangleFn)(void (*)(
+      void))GetProcAddress(module, "GdipAddPathRectangle");
+  backend->gdip_add_path_arc =
+      (CMPGdipAddPathArcFn)(void (*)(void))GetProcAddress(module,
+                                                          "GdipAddPathArc");
+  backend->gdip_add_path_line =
+      (CMPGdipAddPathLineFn)(void (*)(void))GetProcAddress(module,
+                                                           "GdipAddPathLine");
+  backend->gdip_add_path_bezier = (CMPGdipAddPathBezierFn)(void (*)(
+      void))GetProcAddress(module, "GdipAddPathBezier");
+  backend->gdip_close_path_figure = (CMPGdipClosePathFigureFn)(void (*)(
+      void))GetProcAddress(module, "GdipClosePathFigure");
+  backend->gdip_fill_path =
+      (CMPGdipFillPathFn)(void (*)(void))GetProcAddress(module, "GdipFillPath");
+  backend->gdip_draw_path =
+      (CMPGdipDrawPathFn)(void (*)(void))GetProcAddress(module, "GdipDrawPath");
+  backend->gdip_create_pen1 =
+      (CMPGdipCreatePen1Fn)(void (*)(void))GetProcAddress(module,
+                                                          "GdipCreatePen1");
+  backend->gdip_delete_pen = (CMPGdipDeletePenFn)(void (*)(void))GetProcAddress(
+      module, "GdipDeletePen");
+  backend->gdip_draw_line =
+      (CMPGdipDrawLineFn)(void (*)(void))GetProcAddress(module, "GdipDrawLine");
+  backend->gdip_set_clip_rect =
+      (CMPGdipSetClipRectFn)(void (*)(void))GetProcAddress(module,
+                                                           "GdipSetClipRect");
+  backend->gdip_reset_clip = (CMPGdipResetClipFn)(void (*)(void))GetProcAddress(
+      module, "GdipResetClip");
+  backend->gdip_save_graphics =
+      (CMPGdipSaveGraphicsFn)(void (*)(void))GetProcAddress(module,
+                                                            "GdipSaveGraphics");
+  backend->gdip_restore_graphics = (CMPGdipRestoreGraphicsFn)(void (*)(
+      void))GetProcAddress(module, "GdipRestoreGraphics");
+  backend->gdip_create_matrix2 = (CMPGdipCreateMatrix2Fn)(void (*)(
+      void))GetProcAddress(module, "GdipCreateMatrix2");
+  backend->gdip_delete_matrix =
+      (CMPGdipDeleteMatrixFn)(void (*)(void))GetProcAddress(module,
+                                                            "GdipDeleteMatrix");
+  backend->gdip_set_world_transform = (CMPGdipSetWorldTransformFn)(void (*)(
+      void))GetProcAddress(module, "GdipSetWorldTransform");
+
+  if (!backend->gdiplus_startup || !backend->gdiplus_shutdown ||
+      !backend->gdip_create_from_hdc) {
+    FreeLibrary(module);
+    backend->gdiplus = NULL;
+    return;
+  }
+
+  backend->gdiplus = module;
+
+  startup_input.GdiplusVersion = 1;
+  startup_input.DebugEventCallback = NULL;
+  startup_input.SuppressBackgroundThread = FALSE;
+  startup_input.SuppressExternalCodecs = FALSE;
+
+  backend->gdiplus_startup(&backend->gdiplus_token, &startup_input, NULL);
 }
 
 static void cmp_win32_event_queue_init(CMPWin32EventQueue *queue) {
@@ -1321,7 +1597,7 @@ static int cmp_win32_window_ensure_backbuffer(CMPWin32Window *window,
 
   bmi.bmiHeader.biWidth = width;
 
-  bmi.bmiHeader.biHeight = -height;
+  bmi.bmiHeader.biHeight = height;
 
   bmi.bmiHeader.biPlanes = 1;
 
@@ -1408,6 +1684,19 @@ static int cmp_win32_apply_transform(CMPWin32Window *window,
     return CMP_ERR_UNKNOWN;
   }
 
+  if (window->backend != NULL &&
+      window->backend->gdip_set_world_transform != NULL &&
+      window->gdiplus_graphics != NULL) {
+    CMPGpMatrix *gmatrix;
+    if (window->backend->gdip_create_matrix2(xform.eM11, xform.eM12, xform.eM21,
+                                             xform.eM22, xform.eDx, xform.eDy,
+                                             &gmatrix) == CMP_GP_OK) {
+      window->backend->gdip_set_world_transform(window->gdiplus_graphics,
+                                                gmatrix);
+      window->backend->gdip_delete_matrix(gmatrix);
+    }
+  }
+
   return CMP_OK;
 }
 
@@ -1438,6 +1727,21 @@ static int cmp_win32_color_to_colorref(CMPColor color, COLORREF *out_color) {
   cmp_win32_channel_from_scalar(color.b, &b);
 
   *out_color = RGB(r, g, b);
+  return 0;
+}
+
+static int cmp_win32_color_to_argb(CMPColor color, CMPGpARGB *out_color) {
+  cmp_u8 r;
+  cmp_u8 g;
+  cmp_u8 b;
+  cmp_u8 a;
+  cmp_win32_channel_from_scalar(color.r, &r);
+  cmp_win32_channel_from_scalar(color.g, &g);
+  cmp_win32_channel_from_scalar(color.b, &b);
+  cmp_win32_channel_from_scalar(color.a, &a);
+
+  *out_color = ((CMPGpARGB)a << 24) | ((CMPGpARGB)r << 16) |
+               ((CMPGpARGB)g << 8) | (CMPGpARGB)b;
   return 0;
 }
 
@@ -2908,6 +3212,20 @@ static int cmp_win32_gfx_begin_frame(void *gfx, CMPHandle window, cmp_i32 width,
 
   backend->clip_depth = 0u;
 
+  if (backend->gdip_create_from_hdc != NULL) {
+    if (resolved->gdiplus_graphics != NULL) {
+      backend->gdip_delete_graphics(resolved->gdiplus_graphics);
+      resolved->gdiplus_graphics = NULL;
+    }
+    backend->gdip_create_from_hdc(resolved->mem_dc,
+                                  &resolved->gdiplus_graphics);
+    if (resolved->gdiplus_graphics != NULL &&
+        backend->gdip_set_smoothing_mode != NULL) {
+      backend->gdip_set_smoothing_mode(resolved->gdiplus_graphics,
+                                       CMP_GP_SMOOTHING_MODE_ANTI_ALIAS);
+    }
+  }
+
   rc = cmp_win32_apply_transform(resolved, &backend->transform,
 
                                  backend->has_transform);
@@ -2949,15 +3267,24 @@ static int cmp_win32_gfx_end_frame(void *gfx, CMPHandle window) {
 
   CMP_WIN32_RETURN_IF_ERROR(rc);
 
+  if (backend->gdip_delete_graphics != NULL &&
+      resolved->gdiplus_graphics != NULL) {
+    backend->gdip_delete_graphics(resolved->gdiplus_graphics);
+    resolved->gdiplus_graphics = NULL;
+  }
+
   if (resolved->mem_dc != NULL && resolved->hwnd != NULL) {
 
     hdc = GetDC(resolved->hwnd);
 
     if (hdc != NULL) {
 
-      BitBlt(hdc, 0, 0, resolved->width, resolved->height, resolved->mem_dc, 0,
+      if (!BitBlt(hdc, 0, 0, resolved->width, resolved->height,
+                  resolved->mem_dc, 0,
 
-             0, SRCCOPY);
+                  0, SRCCOPY)) {
+        cmp_win32_backend_log_last_error(backend, "BitBlt failed");
+      }
 
       ReleaseDC(resolved->hwnd, hdc);
     }
@@ -2987,6 +3314,8 @@ static int cmp_win32_gfx_clear(void *gfx, CMPColor color) {
 
   COLORREF ref;
 
+  CMPGpARGB argb;
+
   int rc;
 
   if (gfx == NULL) {
@@ -3006,6 +3335,13 @@ static int cmp_win32_gfx_clear(void *gfx, CMPColor color) {
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.clear");
 
   CMP_WIN32_RETURN_IF_ERROR(rc);
+
+  if (backend->gdip_graphics_clear != NULL &&
+      window->gdiplus_graphics != NULL) {
+    cmp_win32_color_to_argb(color, &argb);
+    backend->gdip_graphics_clear(window->gdiplus_graphics, argb);
+    return CMP_OK;
+  }
 
   cmp_win32_color_to_colorref(color, &ref);
 
@@ -3055,6 +3391,10 @@ static int cmp_win32_gfx_draw_rect(void *gfx, const CMPRect *rect,
 
   int rc;
 
+  CMPGpARGB argb;
+  CMPGpSolidFill *solid_fill;
+  CMPGpPath *gpath;
+
   if (gfx == NULL || rect == NULL) {
 
     return CMP_ERR_INVALID_ARGUMENT;
@@ -3085,6 +3425,36 @@ static int cmp_win32_gfx_draw_rect(void *gfx, const CMPRect *rect,
 
   if (rect->width == 0.0f || rect->height == 0.0f) {
 
+    return CMP_OK;
+  }
+
+  if (backend->gdip_create_path != NULL && window->gdiplus_graphics != NULL) {
+    cmp_win32_color_to_argb(color, &argb);
+    if (backend->gdip_create_solid_fill(argb, &solid_fill) == CMP_GP_OK) {
+      if (backend->gdip_create_path(CMP_GP_FILL_MODE_ALTERNATE, &gpath) ==
+          CMP_GP_OK) {
+        if (corner_radius <= 0.0f) {
+          backend->gdip_add_path_rectangle(gpath, rect->x, rect->y, rect->width,
+                                           rect->height);
+        } else {
+          CMPScalar d = corner_radius * 2.0f;
+          backend->gdip_add_path_arc(gpath, rect->x, rect->y, d, d, 180.0f,
+                                     90.0f);
+          backend->gdip_add_path_arc(gpath, rect->x + rect->width - d, rect->y,
+                                     d, d, 270.0f, 90.0f);
+          backend->gdip_add_path_arc(gpath, rect->x + rect->width - d,
+                                     rect->y + rect->height - d, d, d, 0.0f,
+                                     90.0f);
+          backend->gdip_add_path_arc(gpath, rect->x, rect->y + rect->height - d,
+                                     d, d, 90.0f, 90.0f);
+          backend->gdip_close_path_figure(gpath);
+        }
+        backend->gdip_fill_path(window->gdiplus_graphics,
+                                (CMPGpBrush *)solid_fill, gpath);
+        backend->gdip_delete_path(gpath);
+      }
+      backend->gdip_delete_brush((CMPGpBrush *)solid_fill);
+    }
     return CMP_OK;
   }
 
@@ -3192,6 +3562,19 @@ static int cmp_win32_gfx_draw_line(void *gfx, CMPScalar x0, CMPScalar y0,
   if (width <= 0) {
 
     width = 1;
+  }
+
+  if (backend->gdip_draw_line != NULL && window->gdiplus_graphics != NULL) {
+    CMPGpARGB argb;
+    CMPGpPen *gpen;
+
+    cmp_win32_color_to_argb(color, &argb);
+    if (backend->gdip_create_pen1(argb, (CMPGpREAL)width, CMP_GP_UNIT_PIXEL,
+                                  &gpen) == CMP_GP_OK) {
+      backend->gdip_draw_line(window->gdiplus_graphics, gpen, x0, y0, x1, y1);
+      backend->gdip_delete_pen(gpen);
+    }
+    return CMP_OK;
   }
 
   cmp_win32_color_to_colorref(color, &ref);
@@ -3425,6 +3808,191 @@ static int cmp_win32_path_build(HDC dc, const CMPPath *path) {
   return CMP_OK;
 }
 
+static int cmp_win32_gdiplus_path_build(struct CMPWin32Backend *backend,
+                                        CMPGpPath *gpath, const CMPPath *path) {
+
+  CMPScalar current_x;
+
+  CMPScalar current_y;
+
+  CMPScalar start_x;
+
+  CMPScalar start_y;
+
+  CMPBool has_current;
+
+  cmp_usize i;
+
+  if (backend == NULL || gpath == NULL || path == NULL) {
+
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  if (path->commands == NULL) {
+
+    return CMP_ERR_STATE;
+  }
+
+  if (path->count == 0) {
+
+    return CMP_OK;
+  }
+
+  has_current = CMP_FALSE;
+
+  current_x = 0.0f;
+
+  current_y = 0.0f;
+
+  start_x = 0.0f;
+
+  start_y = 0.0f;
+
+  for (i = 0; i < path->count; ++i) {
+
+    const CMPPathCmd *cmd = &path->commands[i];
+
+    switch (cmd->type) {
+
+    case CMP_PATH_CMD_MOVE_TO:
+
+      current_x = cmd->data.move_to.x;
+
+      current_y = cmd->data.move_to.y;
+
+      start_x = current_x;
+
+      start_y = current_y;
+
+      has_current = CMP_TRUE;
+
+      /* GDI+ paths do not require an explicit "move to" command.
+       * The first point of a figure establishes the starting point.
+       * Since we might move without drawing, we can't do anything here
+       * until the next line/curve is drawn.
+       */
+      break;
+
+    case CMP_PATH_CMD_LINE_TO:
+
+      if (!has_current) {
+
+        return CMP_ERR_STATE;
+      }
+
+      if (backend->gdip_add_path_line(gpath, current_x, current_y,
+                                      cmd->data.line_to.x,
+                                      cmd->data.line_to.y) != CMP_GP_OK) {
+        return CMP_ERR_UNKNOWN;
+      }
+
+      current_x = cmd->data.line_to.x;
+
+      current_y = cmd->data.line_to.y;
+
+      break;
+
+    case CMP_PATH_CMD_QUAD_TO: {
+
+      CMPScalar cx1;
+
+      CMPScalar cy1;
+
+      CMPScalar cx2;
+
+      CMPScalar cy2;
+
+      CMPScalar x;
+
+      CMPScalar y;
+
+      if (!has_current) {
+
+        return CMP_ERR_STATE;
+      }
+
+      x = cmd->data.quad_to.x;
+
+      y = cmd->data.quad_to.y;
+
+      cx1 = current_x + (cmd->data.quad_to.cx - current_x) * (2.0f / 3.0f);
+
+      cy1 = current_y + (cmd->data.quad_to.cy - current_y) * (2.0f / 3.0f);
+
+      cx2 = x + (cmd->data.quad_to.cx - x) * (2.0f / 3.0f);
+
+      cy2 = y + (cmd->data.quad_to.cy - y) * (2.0f / 3.0f);
+
+      if (backend->gdip_add_path_bezier(gpath, current_x, current_y, cx1, cy1,
+                                        cx2, cy2, x, y) != CMP_GP_OK) {
+        return CMP_ERR_UNKNOWN;
+      }
+
+      current_x = x;
+
+      current_y = y;
+
+      break;
+    }
+
+    case CMP_PATH_CMD_CUBIC_TO: {
+
+      CMPScalar x;
+
+      CMPScalar y;
+
+      if (!has_current) {
+
+        return CMP_ERR_STATE;
+      }
+
+      x = cmd->data.cubic_to.x;
+
+      y = cmd->data.cubic_to.y;
+
+      if (backend->gdip_add_path_bezier(
+              gpath, current_x, current_y, cmd->data.cubic_to.cx1,
+              cmd->data.cubic_to.cy1, cmd->data.cubic_to.cx2,
+              cmd->data.cubic_to.cy2, x, y) != CMP_GP_OK) {
+        return CMP_ERR_UNKNOWN;
+      }
+
+      current_x = x;
+
+      current_y = y;
+
+      break;
+    }
+
+    case CMP_PATH_CMD_CLOSE:
+
+      if (!has_current) {
+
+        return CMP_ERR_STATE;
+      }
+
+      if (backend->gdip_close_path_figure(gpath) != CMP_GP_OK) {
+
+        return CMP_ERR_UNKNOWN;
+      }
+
+      current_x = start_x;
+
+      current_y = start_y;
+
+      has_current = CMP_FALSE;
+
+      break;
+
+    default:
+
+      return CMP_ERR_INVALID_ARGUMENT;
+    }
+  }
+
+  return CMP_OK;
+}
+
 static int cmp_win32_gfx_draw_path(void *gfx, const CMPPath *path,
 
                                    CMPColor color) {
@@ -3481,6 +4049,27 @@ static int cmp_win32_gfx_draw_path(void *gfx, const CMPPath *path,
   rc = cmp_win32_backend_log(backend, CMP_LOG_LEVEL_DEBUG, "gfx.draw_path");
 
   CMP_WIN32_RETURN_IF_ERROR(rc);
+
+  if (backend->gdip_create_path != NULL && window->gdiplus_graphics != NULL) {
+    CMPGpARGB argb;
+    CMPGpSolidFill *solid_fill;
+    CMPGpPath *gpath;
+
+    cmp_win32_color_to_argb(color, &argb);
+    if (backend->gdip_create_solid_fill(argb, &solid_fill) == CMP_GP_OK) {
+      if (backend->gdip_create_path(CMP_GP_FILL_MODE_ALTERNATE, &gpath) ==
+          CMP_GP_OK) {
+        result = cmp_win32_gdiplus_path_build(backend, gpath, path);
+        if (result == CMP_OK) {
+          backend->gdip_fill_path(window->gdiplus_graphics,
+                                  (CMPGpBrush *)solid_fill, gpath);
+        }
+        backend->gdip_delete_path(gpath);
+      }
+      backend->gdip_delete_brush((CMPGpBrush *)solid_fill);
+    }
+    return CMP_OK;
+  }
 
   cmp_win32_color_to_colorref(color, &ref);
 
@@ -3596,6 +4185,19 @@ static int cmp_win32_gfx_push_clip(void *gfx, const CMPRect *rect) {
     return CMP_ERR_OVERFLOW;
   }
 
+  if (backend->gdip_save_graphics != NULL && window->gdiplus_graphics != NULL) {
+    DWORD state;
+    if (backend->gdip_save_graphics(window->gdiplus_graphics, &state) ==
+        CMP_GP_OK) {
+      backend->gdiplus_states[backend->clip_depth] = state;
+      backend->gdip_set_clip_rect(window->gdiplus_graphics, rect->x, rect->y,
+                                  rect->width, rect->height,
+                                  CMP_GP_COMBINE_MODE_INTERSECT);
+    } else {
+      backend->gdiplus_states[backend->clip_depth] = 0;
+    }
+  }
+
   save_id = SaveDC(window->mem_dc);
 
   if (save_id == 0) {
@@ -3643,6 +4245,15 @@ static int cmp_win32_gfx_pop_clip(void *gfx) {
   if (backend->clip_depth == 0u) {
 
     return CMP_ERR_STATE;
+  }
+
+  if (backend->gdip_restore_graphics != NULL &&
+      window->gdiplus_graphics != NULL) {
+    if (backend->gdiplus_states[backend->clip_depth - 1u] != 0) {
+      backend->gdip_restore_graphics(
+          window->gdiplus_graphics,
+          backend->gdiplus_states[backend->clip_depth - 1u]);
+    }
   }
 
   if (!RestoreDC(window->mem_dc, -1)) {
@@ -5543,6 +6154,7 @@ int CMP_CALL cmp_win32_backend_create(const CMPWin32BackendConfig *config,
   backend->window_class = atom;
 
   cmp_win32_backend_init_alpha_blend(backend);
+  cmp_win32_backend_init_gdiplus(backend);
 
   cmp_win32_event_queue_init(&backend->event_queue);
 
@@ -5624,6 +6236,14 @@ int CMP_CALL cmp_win32_backend_destroy(CMPWin32Backend *backend) {
     backend->msimg32 = NULL;
 
     backend->alpha_blend = NULL;
+  }
+
+  if (backend->gdiplus != NULL) {
+    if (backend->gdiplus_shutdown) {
+      backend->gdiplus_shutdown(backend->gdiplus_token);
+    }
+    FreeLibrary(backend->gdiplus);
+    backend->gdiplus = NULL;
   }
 
   if (backend->log_owner) {
@@ -5733,6 +6353,66 @@ int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend,
   return CMP_OK;
 }
 
+int CMP_CALL cmp_win32_backend_save_bmp(CMPWin32Backend *backend,
+                                        CMPHandle window, const char *path) {
+  CMPWin32Window *resolved;
+  wchar_t *wide_path;
+  int rc;
+  FILE *f;
+  BITMAPFILEHEADER bfh;
+  BITMAPINFOHEADER bih;
+  cmp_usize data_size;
+
+  if (backend == NULL || path == NULL) {
+    return CMP_ERR_INVALID_ARGUMENT;
+  }
+
+  rc = cmp_win32_backend_resolve(backend, window, CMP_WIN32_TYPE_WINDOW,
+                                 (void **)&resolved);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  if (resolved->dib_pixels == NULL || resolved->width <= 0 ||
+      resolved->height <= 0) {
+    return CMP_ERR_STATE;
+  }
+
+  rc = cmp_win32_utf8_to_wide_alloc(backend, path, -1, &wide_path, NULL);
+  if (rc != CMP_OK) {
+    return rc;
+  }
+
+  f = _wfopen(wide_path, L"wb");
+  backend->allocator.free(backend->allocator.ctx, wide_path);
+  if (f == NULL) {
+    return CMP_ERR_UNKNOWN;
+  }
+
+  data_size = resolved->width * resolved->height * 4;
+
+  memset(&bfh, 0, sizeof(bfh));
+  bfh.bfType = 0x4D42; /* "BM" */
+  bfh.bfSize =
+      sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (DWORD)data_size;
+  bfh.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+
+  memset(&bih, 0, sizeof(bih));
+  bih.biSize = sizeof(BITMAPINFOHEADER);
+  bih.biWidth = resolved->width;
+  bih.biHeight = resolved->height; /* bottom-up DIBs have positive height */
+  bih.biPlanes = 1;
+  bih.biBitCount = 32;
+  bih.biCompression = BI_RGB;
+
+  fwrite(&bfh, sizeof(BITMAPFILEHEADER), 1, f);
+  fwrite(&bih, sizeof(BITMAPINFOHEADER), 1, f);
+  fwrite(resolved->dib_pixels, 1, data_size, f);
+  fclose(f);
+
+  return CMP_OK;
+}
+
 #else
 
 int CMP_CALL cmp_win32_backend_create(const CMPWin32BackendConfig *config,
@@ -5813,6 +6493,14 @@ int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend,
 
   memset(out_env, 0, sizeof(*out_env));
 
+  return CMP_ERR_UNSUPPORTED;
+}
+
+int CMP_CALL cmp_win32_backend_save_bmp(CMPWin32Backend *backend,
+                                        CMPHandle window, const char *path) {
+  (void)backend;
+  (void)window;
+  (void)path;
   return CMP_ERR_UNSUPPORTED;
 }
 

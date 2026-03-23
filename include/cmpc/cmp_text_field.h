@@ -67,7 +67,8 @@ typedef struct CMPTextFieldStyle {
   CMPColor disabled_outline_color;   /**< Outline color when disabled. */
   CMPColor disabled_text_color;      /**< Text color when disabled. */
   CMPColor disabled_label_color;     /**< Label color when disabled. */
-  CMPColor placeholder_color;        /**< Placeholder color. */
+  CMPColor label_background_color; /**< Label background color (for notches). */
+  CMPColor placeholder_color;      /**< Placeholder color. */
   CMPBool is_rtl;
   /**< CMP_TRUE if text layout should be right-to-left. */ /**< Placeholder
                                                               text color. */
@@ -76,19 +77,21 @@ typedef struct CMPTextFieldStyle {
   CMPColor selection_color;            /**< Selection highlight color. */
   CMPColor handle_color;               /**< Selection handle color. */
   CMPScalar outline_width;             /**< Outline width in pixels (>= 0). */
-  CMPScalar corner_radius;             /**< Corner radius in pixels (>= 0). */
-  CMPScalar padding_x;          /**< Horizontal padding in pixels (>= 0). */
-  CMPScalar padding_y;          /**< Vertical padding in pixels (>= 0). */
-  CMPScalar min_height;         /**< Minimum height in pixels (>= 0). */
+  CMPScalar focused_outline_width; /**< Outline width when focused (>= 0). */
+  CMPScalar corner_radius;         /**< Corner radius in pixels (>= 0). */
+  CMPScalar padding_x;             /**< Horizontal padding in pixels (>= 0). */
+  CMPScalar padding_y;             /**< Vertical padding in pixels (>= 0). */
+  CMPScalar min_height;            /**< Minimum height in pixels (>= 0). */
   CMPScalar label_float_offset; /**< Label floating offset from top (>= 0). */
   CMPScalar
       label_anim_duration; /**< Label animation duration in seconds (>= 0). */
   CMPScalar cursor_width;  /**< Cursor width in pixels (>= 0). */
   CMPScalar cursor_blink_period; /**< Cursor blink period in seconds (>= 0). */
-  CMPScalar handle_radius; /**< Selection handle radius in pixels (>= 0). */
-  CMPScalar handle_height; /**< Selection handle height in pixels (>= 0). */
-  CMPBool is_obscured;     /**< CMP_TRUE to mask input for passwords. */
-  char obscure_char;       /**< Character to use when obscured (e.g. '*'). */
+  CMPScalar handle_radius;  /**< Selection handle radius in pixels (>= 0). */
+  CMPScalar handle_height;  /**< Selection handle height in pixels (>= 0). */
+  CMPBool is_obscured;      /**< CMP_TRUE to mask input for passwords. */
+  char obscure_char;        /**< Character to use when obscured (e.g. '*'). */
+  CMPWidget *suffix_widget; /**< Optional suffix widget (e.g. icon button). */
 } CMPTextFieldStyle;
 
 /**
@@ -126,6 +129,7 @@ typedef struct CMPTextField {
                                        metrics are valid. */
   CMPBool
       font_metrics_valid; /**< CMP_TRUE when cached font metrics are valid. */
+  CMPRect suffix_bounds;  /**< Bounds for the optional suffix widget. */
   CMPBool owns_fonts;     /**< CMP_TRUE when widget owns font handles. */
   CMPBool focused;        /**< CMP_TRUE when field is focused. */
   CMPBool is_invalid;     /**< CMP_TRUE when field content is invalid. */

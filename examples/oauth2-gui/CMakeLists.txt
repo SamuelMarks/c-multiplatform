@@ -46,7 +46,7 @@ add_library(oauth2_gui_lib STATIC
     src/oauth2_gui.c
 )
 target_include_directories(oauth2_gui_lib PUBLIC include)
-target_link_libraries(oauth2_gui_lib PUBLIC cmpc m3 c-abstract-http c-orm)
+target_link_libraries(oauth2_gui_lib PUBLIC cmpc m3 f2 cupertino c-abstract-http c-orm)
 
 add_executable(oauth2_gui_app src/main.c)
 target_link_libraries(oauth2_gui_app PRIVATE oauth2_gui_lib)
@@ -65,7 +65,11 @@ if(OAUTH2_GUI_BUILD_TESTS)
 
     FetchContent_GetProperties(greatest SOURCE_DIR greatest_DIR)
 
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/actual")
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/expected")
+    
     add_executable(oauth2_gui_tests tests/test_oauth2_gui.c tests/test_main.c)
+    target_compile_definitions(oauth2_gui_tests PRIVATE OAUTH2_TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests")
     target_include_directories(oauth2_gui_tests PRIVATE ${greatest_DIR} include)
     target_link_libraries(oauth2_gui_tests PRIVATE oauth2_gui_lib)
     add_test(NAME oauth2_gui_tests COMMAND oauth2_gui_tests)

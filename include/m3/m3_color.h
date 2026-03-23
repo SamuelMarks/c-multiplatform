@@ -57,6 +57,7 @@ typedef struct M3Scheme {
   cmp_u32 surface_variant;        /**< Surface variant color. */
   cmp_u32 on_surface_variant;     /**< On-surface variant color. */
   cmp_u32 outline;                /**< Outline color. */
+  cmp_u32 outline_variant;        /**< Outline variant color. */
   cmp_u32 error;                  /**< Error color. */
   cmp_u32 on_error;               /**< On-error color. */
   cmp_u32 error_container;        /**< Error container color. */

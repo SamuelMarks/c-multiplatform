@@ -21,7 +21,7 @@ static int cmp_router_view_measure(void *widget, CMPMeasureSpec width,
   CMPWidget *curr = get_current_widget(view);
 
   if (curr && curr->vtable && curr->vtable->measure) {
-    return curr->vtable->measure(curr, width, height, out_size);
+    return curr->vtable->measure(curr->ctx, width, height, out_size);
   }
 
   out_size->width = 0;
@@ -36,7 +36,7 @@ static int cmp_router_view_layout(void *widget, CMPRect bounds) {
   view->bounds = bounds;
 
   if (curr && curr->vtable && curr->vtable->layout) {
-    return curr->vtable->layout(curr, bounds);
+    return curr->vtable->layout(curr->ctx, bounds);
   }
   return CMP_OK;
 }
@@ -46,7 +46,7 @@ static int cmp_router_view_paint(void *widget, CMPPaintContext *ctx) {
   CMPWidget *curr = get_current_widget(view);
 
   if (curr && curr->vtable && curr->vtable->paint) {
-    return curr->vtable->paint(curr, ctx);
+    return curr->vtable->paint(curr->ctx, ctx);
   }
   return CMP_OK;
 }
@@ -57,7 +57,7 @@ static int cmp_router_view_event(void *widget, const CMPInputEvent *event,
   CMPWidget *curr = get_current_widget(view);
 
   if (curr && curr->vtable && curr->vtable->event) {
-    return curr->vtable->event(curr, event, out_handled);
+    return curr->vtable->event(curr->ctx, event, out_handled);
   }
   return CMP_OK;
 }
@@ -68,7 +68,7 @@ static int cmp_router_view_get_semantics(void *widget,
   CMPWidget *curr = get_current_widget(view);
 
   if (curr && curr->vtable && curr->vtable->get_semantics) {
-    return curr->vtable->get_semantics(curr, out_semantics);
+    return curr->vtable->get_semantics(curr->ctx, out_semantics);
   }
 
   out_semantics->role = CMP_SEMANTIC_CONTAINER;
@@ -92,6 +92,7 @@ CMP_API int CMP_CALL cmp_router_view_init(CMPRouterView *view,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
+  view->widget.ctx = view;
   view->widget.vtable = &g_cmp_router_view_vtable;
   view->widget.flags = 0;
   view->router = router;

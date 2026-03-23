@@ -42,15 +42,15 @@ extern "C" {
 #define M3_BUTTON_VARIANT_EXTENDED_FAB 11
 
 /** @brief Default horizontal padding for buttons. */
-#define M3_BUTTON_DEFAULT_PADDING_X 12.0f
+#define M3_BUTTON_DEFAULT_PADDING_X 24.0f
 /** @brief Default vertical padding for buttons. */
 #define M3_BUTTON_DEFAULT_PADDING_Y 8.0f
 /** @brief Default minimum button width. */
 #define M3_BUTTON_DEFAULT_MIN_WIDTH 64.0f
 /** @brief Default minimum button height. */
-#define M3_BUTTON_DEFAULT_MIN_HEIGHT 36.0f
+#define M3_BUTTON_DEFAULT_MIN_HEIGHT 40.0f
 /** @brief Default button corner radius. */
-#define M3_BUTTON_DEFAULT_CORNER_RADIUS 4.0f
+#define M3_BUTTON_DEFAULT_CORNER_RADIUS 20.0f
 /** @brief Default outline width for outlined buttons. */
 #define M3_BUTTON_DEFAULT_OUTLINE_WIDTH 1.0f
 /** @brief Default icon-to-text spacing. */

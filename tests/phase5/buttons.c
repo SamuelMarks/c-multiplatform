@@ -825,8 +825,8 @@ int main(void) {
   height_spec.size = 0.0f;
   CMP_TEST_OK(button.widget.vtable->measure(button.widget.ctx, width_spec,
                                             height_spec, &size));
-  CMP_TEST_ASSERT(cmp_near(size.width, 64.0f, 0.001f));
-  CMP_TEST_ASSERT(cmp_near(size.height, 36.0f, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(size.width, 68.0f, 0.001f));
+  CMP_TEST_ASSERT(cmp_near(size.height, 40.0f, 0.001f));
 
   width_spec.mode = CMP_MEASURE_EXACTLY;
   width_spec.size = 80.0f;

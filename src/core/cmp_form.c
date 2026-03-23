@@ -33,13 +33,24 @@ CMP_API int CMP_CALL cmp_form_submit(CMPForm *form) {
   return CMP_OK;
 }
 
+#include <stdio.h>
+
 static int cmp_form_measure(void *widget, CMPMeasureSpec width,
                             CMPMeasureSpec height, CMPSize *out_size) {
   CMPForm *form = (CMPForm *)widget;
+  fprintf(stderr,
+          "[CMPForm] cmp_form_measure called! form=%p root_widget=%p vtable=%p "
+          "measure=%p\n",
+          form, form->root_widget,
+          form->root_widget ? form->root_widget->vtable : NULL,
+          form->root_widget && form->root_widget->vtable
+              ? (void *)form->root_widget->vtable->measure
+              : NULL);
+  fflush(stderr);
   if (form->root_widget && form->root_widget->vtable &&
       form->root_widget->vtable->measure) {
-    return form->root_widget->vtable->measure(form->root_widget, width, height,
-                                              out_size);
+    return form->root_widget->vtable->measure(form->root_widget->ctx, width,
+                                              height, out_size);
   }
   out_size->width = 0;
   out_size->height = 0;
@@ -49,9 +60,15 @@ static int cmp_form_measure(void *widget, CMPMeasureSpec width,
 static int cmp_form_layout(void *widget, CMPRect bounds) {
   CMPForm *form = (CMPForm *)widget;
   form->bounds = bounds;
+  fprintf(
+      stderr,
+      "[CMPForm] cmp_form_layout called! form=%p root_widget=%p vtable=%p\n",
+      form, form->root_widget,
+      form->root_widget ? form->root_widget->vtable : NULL);
+  fflush(stderr);
   if (form->root_widget && form->root_widget->vtable &&
       form->root_widget->vtable->layout) {
-    return form->root_widget->vtable->layout(form->root_widget, bounds);
+    return form->root_widget->vtable->layout(form->root_widget->ctx, bounds);
   }
   return CMP_OK;
 }
@@ -60,7 +77,7 @@ static int cmp_form_paint(void *widget, CMPPaintContext *ctx) {
   CMPForm *form = (CMPForm *)widget;
   if (form->root_widget && form->root_widget->vtable &&
       form->root_widget->vtable->paint) {
-    return form->root_widget->vtable->paint(form->root_widget, ctx);
+    return form->root_widget->vtable->paint(form->root_widget->ctx, ctx);
   }
   return CMP_OK;
 }
@@ -130,7 +147,7 @@ static int cmp_form_event(void *widget, const CMPInputEvent *event,
   /* Forward to root widget if not handled */
   if (form->root_widget && form->root_widget->vtable &&
       form->root_widget->vtable->event) {
-    return form->root_widget->vtable->event(form->root_widget, event,
+    return form->root_widget->vtable->event(form->root_widget->ctx, event,
                                             out_handled);
   }
 
@@ -142,7 +159,7 @@ static int cmp_form_get_semantics(void *widget, CMPSemantics *out_semantics) {
 
   if (form->root_widget && form->root_widget->vtable &&
       form->root_widget->vtable->get_semantics) {
-    return form->root_widget->vtable->get_semantics(form->root_widget,
+    return form->root_widget->vtable->get_semantics(form->root_widget->ctx,
                                                     out_semantics);
   }
 
@@ -166,6 +183,7 @@ CMP_API int CMP_CALL cmp_form_init(CMPForm *form,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
+  form->widget.ctx = form;
   form->widget.vtable = &g_cmp_form_vtable;
   form->widget.flags = 0;
   form->dispatcher = dispatcher;

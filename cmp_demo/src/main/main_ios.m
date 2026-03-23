@@ -1,6 +1,8 @@
+/* clang-format off */
 #include <cmpc/cmp_backend_ios.h>
 #include "demo_app.h"
 #import <UIKit/UIKit.h>
+/* clang-format on */
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 @property (strong, nonatomic) UIWindow *window;

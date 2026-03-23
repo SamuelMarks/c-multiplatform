@@ -1,6 +1,8 @@
+/* clang-format off */
 #include <cmpc/cmp_backend_cocoa.h>
 #include <app/demo_app.h>
 #import <Cocoa/Cocoa.h>
+/* clang-format on */
 
 static double get_time(void) {
     return [[NSDate date] timeIntervalSince1970];

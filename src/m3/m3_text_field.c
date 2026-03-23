@@ -77,6 +77,7 @@ CMP_API int CMP_CALL m3_text_field_style_init(M3TextFieldStyle *style,
     style->core.focused_outline_color.b = 0.933f;
     style->core.focused_outline_color.a = 1.0f;
     style->core.corner_radius = M3_TEXT_FIELD_DEFAULT_OUTLINED_RADIUS;
+    style->core.focused_outline_width = 2.0f;
   }
 
   style->error_color.r = 0.701f;
@@ -119,6 +120,7 @@ CMP_API int CMP_CALL m3_text_field_init(M3TextField *text_field,
     return CMP_ERR_INVALID_ARGUMENT;
   }
 
+  text_field->widget.ctx = text_field;
   text_field->widget.vtable = &m3_text_field_vtable;
   text_field->style = *style;
   text_field->error = CMP_FALSE;

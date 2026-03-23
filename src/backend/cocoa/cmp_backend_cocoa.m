@@ -1,8 +1,10 @@
+/* clang-format off */
 #include "cmpc/cmp_backend_cocoa.h"
 #include "cmpc/cmp_a11y.h"
 #include <Cocoa/Cocoa.h>
 #import <AVFoundation/AVFoundation.h>
 #import <CoreVideo/CoreVideo.h>
+/* clang-format on */
 
 /* --- Helpers for Color --- */
 

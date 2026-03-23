@@ -657,6 +657,11 @@ int CMP_CALL m3_scheme_generate_variant(cmp_u32 source_argb, CMPBool dark,
     if (rc != CMP_OK) {
       return rc;
     }
+    rc = m3_tonal_palette_tone_argb(&neutral_variant, 30.0f,
+                                    &out_scheme->outline_variant);
+    if (rc != CMP_OK) {
+      return rc;
+    }
 
     rc = m3_tonal_palette_tone_argb(&error, 80.0f, &out_scheme->error);
     if (rc != CMP_OK) {
@@ -765,6 +770,11 @@ int CMP_CALL m3_scheme_generate_variant(cmp_u32 source_argb, CMPBool dark,
     }
     rc = m3_tonal_palette_tone_argb(&neutral_variant, 50.0f,
                                     &out_scheme->outline);
+    if (rc != CMP_OK) {
+      return rc;
+    }
+    rc = m3_tonal_palette_tone_argb(&neutral_variant, 80.0f,
+                                    &out_scheme->outline_variant);
     if (rc != CMP_OK) {
       return rc;
     }

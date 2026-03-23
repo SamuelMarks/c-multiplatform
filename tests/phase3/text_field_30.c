@@ -399,6 +399,7 @@ int main(void) {
   field.widget.flags &= ~CMP_WIDGET_FLAG_DISABLED;
 
   /* Paint negative inner rect (outline_width > bounds/2) */
+  field.focused = CMP_FALSE;
   field.style.outline_width = 100.0f;
   CMP_TEST_EXPECT(widget->vtable->paint(widget, &paint_ctx), CMP_ERR_RANGE);
   field.style.outline_width = 1.0f;
@@ -632,7 +633,11 @@ int main(void) {
 #if defined(_MSC_VER)
   strcpy_s(evt.data.text.utf8, sizeof(evt.data.text.utf8), "x");
 #else
+#if defined(_MSC_VER)
+  strcpy_s(evt.data.text.utf8, sizeof(evt.data.text.utf8), "x");
+#else
   strcpy(evt.data.text.utf8, "x");
+#endif
 #endif
   cmp_text_field_test_set_fail_point(7u);
   field.utf8_capacity = 0;
@@ -650,7 +655,11 @@ int main(void) {
 #if defined(_MSC_VER)
   strcpy_s(evt.data.text.utf8, sizeof(evt.data.text.utf8), "y");
 #else
+#if defined(_MSC_VER)
+  strcpy_s(evt.data.text.utf8, sizeof(evt.data.text.utf8), "y");
+#else
   strcpy(evt.data.text.utf8, "y");
+#endif
 #endif
   cmp_text_field_test_set_fail_point(22u);
   CMP_TEST_EXPECT(widget->vtable->event(widget, &evt, &out_handled),

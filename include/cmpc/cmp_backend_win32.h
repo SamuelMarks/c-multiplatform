@@ -91,6 +91,17 @@ CMP_API int CMP_CALL cmp_win32_backend_get_gfx(CMPWin32Backend *backend,
 CMP_API int CMP_CALL cmp_win32_backend_get_env(CMPWin32Backend *backend,
                                                CMPEnv *out_env);
 
+/**
+ * @brief Save the current window surface to a BMP file.
+ * @param backend Win32 backend.
+ * @param window Window handle.
+ * @param path Output BMP file path.
+ * @return CMP_OK on success or a failure code.
+ */
+CMP_API int CMP_CALL cmp_win32_backend_save_bmp(CMPWin32Backend *backend,
+                                                CMPHandle window,
+                                                const char *path);
+
 #if defined(CMP_TESTING) && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 /**
  * @brief Force cmp_win32_backend_config_init to fail for coverage.

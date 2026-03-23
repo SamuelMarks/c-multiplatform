@@ -124,38 +124,23 @@ macro(cmp_resolve_dependency pkg config_flag)
                 GIT_SHALLOW ON
                 UPDATE_DISCONNECTED ON
                 UPDATE_COMMAND ""
+                EXCLUDE_FROM_ALL
             )
-            FetchContent_GetProperties(c_abstract_http)
-            if(NOT c_abstract_http_POPULATED)
-                FetchContent_Populate(c_abstract_http)
-            endif()
-            file(READ "${c_abstract_http_SOURCE_DIR}/CMakeLists.txt" C_ABS_CML)
-            string(REPLACE "-Werror" "" C_ABS_CML "${C_ABS_CML}")
-            string(REPLACE "target_include_directories(c-abstract-http PUBLIC include)" "target_include_directories(c-abstract-http SYSTEM PUBLIC include)" C_ABS_CML "${C_ABS_CML}")
-            file(WRITE "${c_abstract_http_SOURCE_DIR}/CMakeLists.txt" "${C_ABS_CML}")
-            
             set(C_ABSTRACT_HTTP_HEADER_ONLY OFF CACHE BOOL "" FORCE)
             set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
             set(C_ABSTRACT_HTTP_BUILD_TESTING OFF CACHE BOOL "" FORCE)
             set(C_FS_BUILD_TESTING OFF CACHE BOOL "" FORCE)
             set(C_ORM_BUILD_TESTING OFF CACHE BOOL "" FORCE)
-            if(CMP_FAT_LIBRARY)
-                set(_PREV_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-                set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-            endif()
-
             if(WIN32)
                 add_compile_definitions(_WIN32_WINNT=0x0600 WINVER=0x0600)
             endif()
-            
             if(MSVC AND MSVC_VERSION LESS 1900)
                 add_compile_definitions(ENOTSUP=129)
             endif()
             if(MSVC AND MSVC_VERSION LESS 1500)
                 add_compile_options("/FI${CMAKE_CURRENT_SOURCE_DIR}/msvc2005_compat.h")
             endif()
-
-            add_subdirectory(${c_abstract_http_SOURCE_DIR} ${c_abstract_http_BINARY_DIR} EXCLUDE_FROM_ALL)
+            FetchContent_MakeAvailable(c_abstract_http)
             if(TARGET c-abstract-http-test)
             endif()
             
@@ -171,17 +156,19 @@ macro(cmp_resolve_dependency pkg config_flag)
             set(${pkg}_FOUND ON)
         elseif("${pkg}" STREQUAL "c-fs")
             FetchContent_Declare(
-                c_fs
+                cfs
                 GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git
                 GIT_TAG master
                 GIT_SHALLOW ON
                 UPDATE_DISCONNECTED ON
                 UPDATE_COMMAND ""
+                EXCLUDE_FROM_ALL
             )
-            FetchContent_GetProperties(c_fs)
-            if(NOT c_fs_POPULATED)
-                FetchContent_Populate(c_fs)
-            endif()
+            set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            set(C_ABSTRACT_HTTP_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            set(C_FS_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            set(C_ORM_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+            FetchContent_MakeAvailable(cfs)
             set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
             set(C_ABSTRACT_HTTP_BUILD_TESTING OFF CACHE BOOL "" FORCE)
             set(C_FS_BUILD_TESTING OFF CACHE BOOL "" FORCE)
@@ -204,22 +191,13 @@ macro(cmp_resolve_dependency pkg config_flag)
                 GIT_SHALLOW ON
                 UPDATE_DISCONNECTED ON
                 UPDATE_COMMAND ""
+                EXCLUDE_FROM_ALL
             )
-            FetchContent_GetProperties(c_orm)
-            if(NOT c_orm_POPULATED)
-                FetchContent_Populate(c_orm)
-            endif()
-            file(READ "${c_orm_SOURCE_DIR}/CMakeLists.txt" C_ORM_CML)
-            string(REPLACE "add_subdirectory(tests/e2e)" "" C_ORM_CML "${C_ORM_CML}")
-            string(REPLACE "target_include_directories(sqlite3 PUBLIC \${sqlite3_SOURCE_DIR})" "target_include_directories(sqlite3 SYSTEM PUBLIC \${sqlite3_SOURCE_DIR})" C_ORM_CML "${C_ORM_CML}")
-            string(REPLACE "-Werror" "" C_ORM_CML "${C_ORM_CML}")
-            string(REPLACE "target_include_directories(c-orm PUBLIC" "target_include_directories(c-orm SYSTEM PUBLIC" C_ORM_CML "${C_ORM_CML}")
-            file(WRITE "${c_orm_SOURCE_DIR}/CMakeLists.txt" "${C_ORM_CML}")
             set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
             set(C_ABSTRACT_HTTP_BUILD_TESTING OFF CACHE BOOL "" FORCE)
             set(C_FS_BUILD_TESTING OFF CACHE BOOL "" FORCE)
             set(C_ORM_BUILD_TESTING OFF CACHE BOOL "" FORCE)
-            add_subdirectory(${c_orm_SOURCE_DIR} ${c_orm_BINARY_DIR} EXCLUDE_FROM_ALL)
+            FetchContent_MakeAvailable(c_orm)
             if(MSVC)
                 target_compile_options(c-orm PRIVATE /wd4306)
             endif()
@@ -635,6 +613,7 @@ if(CMP_ENABLE_WIN32 AND WIN32)
     target_compile_definitions(cmpc PUBLIC
         _WIN32_WINNT=0x0600
         WINVER=0x0600
+        CMP_WIN32_AVAILABLE
     )
     target_link_libraries(cmpc PUBLIC user32 gdi32)
     if(NOT MSVC OR MSVC_VERSION GREATER 1400)
