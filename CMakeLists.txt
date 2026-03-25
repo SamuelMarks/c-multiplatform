@@ -12,9 +12,9 @@ option(CMP_MULTI_THREADED "Multi-threaded linkage" ON)
 option(CMP_ENABLE_ASAN "Enable Address Sanitizer for automated leak scanning" OFF)
 
 if(PROJECT_IS_TOP_LEVEL)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY \${CMAKE_BINARY_DIR}/bin CACHE PATH "" FORCE)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY \${CMAKE_BINARY_DIR}/lib CACHE PATH "" FORCE)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY \${CMAKE_BINARY_DIR}/lib CACHE PATH "" FORCE)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin CACHE PATH "" FORCE)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib CACHE PATH "" FORCE)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib CACHE PATH "" FORCE)
 endif()
 
 
@@ -31,6 +31,12 @@ endif()
 option(CMP_LTO "Link-Time Optimization" OFF)
 option(CMP_STATIC_CRT "Use static CRT on MSVC" OFF)
 option(CMP_BUILD_EXAMPLES "Build standalone examples" ON)
+
+# Theme Toggles
+option(CMP_THEME_CUPERTINO "Enable Apple Cupertino (HIG) design system" ON)
+option(CMP_THEME_FLUENT2 "Enable Microsoft Fluent 2 design system" ON)
+option(CMP_THEME_MATERIAL3 "Enable Google Material 3 design system" ON)
+set(CMP_THEME_MODE "RUNTIME" CACHE STRING "Theme dispatch mode: RUNTIME, COMPILE_ENUM, SINGLE_STATIC")
 
 
 if(CMP_LTO)
@@ -100,21 +106,21 @@ target_include_directories(greatest INTERFACE ${greatest_SOURCE_DIR})
 
 # cfs
 set(CFS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(cfs URL https://github.com/SamuelMarks/c-fs/archive/refs/heads/master.zip DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+FetchContent_Declare(cfs GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git GIT_TAG master)
 FetchContent_MakeAvailable(cfs)
 
 # c89stringutils (Not from vcpkg to allow target_compile_definitions)
-FetchContent_Declare(c89stringutils URL https://github.com/offscale/c89stringutils/archive/refs/heads/master.zip DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+FetchContent_Declare(c89stringutils GIT_REPOSITORY https://github.com/offscale/c89stringutils.git GIT_TAG master)
 FetchContent_MakeAvailable(c89stringutils)
 
 # c_str_span (Not in vcpkg)
-FetchContent_Declare(c_str_span URL https://github.com/SamuelMarks/c-str-span/archive/refs/heads/master.zip DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+FetchContent_Declare(c_str_span GIT_REPOSITORY https://github.com/SamuelMarks/c-str-span.git GIT_TAG master
   PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/patch_c_str_span.cmake
 )
 FetchContent_MakeAvailable(c_str_span)
 
 # parson (Not in vcpkg)
-FetchContent_Declare(parson URL https://github.com/kgabis/parson/archive/refs/heads/master.zip DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+FetchContent_Declare(parson GIT_REPOSITORY https://github.com/kgabis/parson.git GIT_TAG master)
 FetchContent_MakeAvailable(parson)
 
 
@@ -124,23 +130,46 @@ set(C_ABSTRACT_HTTP_ENABLE_WEBSOCKETS ON CACHE BOOL "" FORCE)
 set(C_ABSTRACT_HTTP_ENABLE_SSE ON CACHE BOOL "" FORCE)
 set(C_ABSTRACT_HTTP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(c_abstract_http URL https://github.com/SamuelMarks/c-abstract-http/archive/refs/heads/master.zip DOWNLOAD_EXTRACT_TIMESTAMP TRUE PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/patch_abstract_http.cmake)
+FetchContent_Declare(c_abstract_http GIT_REPOSITORY https://github.com/SamuelMarks/c-abstract-http.git GIT_TAG master PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/patch_abstract_http.cmake)
 FetchContent_MakeAvailable(c_abstract_http)
 
 # cdd-c
 set(CDD_C_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(C_CDD_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(cdd_c URL https://github.com/SamuelMarks/cdd-c/archive/refs/heads/master.zip DOWNLOAD_EXTRACT_TIMESTAMP TRUE PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/patch_cdd.cmake)
+FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG master)
 
 # c-orm
 set(C_ORM_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(C_ORM_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(c_orm URL https://github.com/SamuelMarks/c-orm/archive/refs/heads/master.zip DOWNLOAD_EXTRACT_TIMESTAMP TRUE PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/patch_c_orm.cmake)
+FetchContent_Declare(c_orm GIT_REPOSITORY https://github.com/SamuelMarks/c-orm.git GIT_TAG master)
 
 FetchContent_MakeAvailable(cdd_c c_orm)
 
-add_library(cmp src/cmp_memory.c src/cmp_error.c src/cmp_string.c src/cmp_tls.c src/cmp_ring_buffer.c src/cmp_modality.c src/cmp_sync.c src/cmp_coroutine.c src/cmp_timer.c src/cmp_vfs.c src/cmp_http.c src/cmp_orm.c src/cmp_window.c src/cmp_event.c src/cmp_router.c src/cmp_layout.c src/cmp_ui.c)
+set(CMP_SOURCES src/cmp_memory.c src/cmp_error.c src/cmp_string.c src/cmp_tls.c src/cmp_ring_buffer.c src/cmp_modality.c src/cmp_sync.c src/cmp_coroutine.c src/cmp_timer.c src/cmp_vfs.c src/cmp_http.c src/cmp_orm.c src/cmp_window.c src/cmp_event.c src/cmp_router.c src/cmp_layout.c src/cmp_ui.c)
+
+if(CMP_THEME_CUPERTINO)
+    list(APPEND CMP_SOURCES src/cmp_ui_cupertino.c)
+    add_compile_definitions(CMP_THEME_CUPERTINO=1)
+endif()
+if(CMP_THEME_FLUENT2)
+    list(APPEND CMP_SOURCES src/cmp_ui_fluent2.c)
+    add_compile_definitions(CMP_THEME_FLUENT2=1)
+endif()
+if(CMP_THEME_MATERIAL3)
+    list(APPEND CMP_SOURCES src/cmp_ui_material3.c)
+    add_compile_definitions(CMP_THEME_MATERIAL3=1)
+endif()
+
+if(CMP_THEME_MODE STREQUAL "RUNTIME")
+    add_compile_definitions(CMP_THEME_MODE_RUNTIME=1)
+elseif(CMP_THEME_MODE STREQUAL "COMPILE_ENUM")
+    add_compile_definitions(CMP_THEME_MODE_COMPILE_ENUM=1)
+elseif(CMP_THEME_MODE STREQUAL "SINGLE_STATIC")
+    add_compile_definitions(CMP_THEME_MODE_SINGLE_STATIC=1)
+endif()
+
+add_library(cmp ${CMP_SOURCES})
 if(CMP_SHARED_LIBS)
     set_target_properties(cmp PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
@@ -213,7 +242,7 @@ add_custom_target(amalgamate
 )
 
 enable_testing()
-set(TEST_ENV_VARS "PATH=$<TARGET_FILE_DIR:cmp>;$<TARGET_FILE_DIR:c-orm>;$<TARGET_FILE_DIR:c-abstract-http>;$<TARGET_FILE_DIR:cfs>;$<TARGET_FILE_DIR:c_str_span>;$<TARGET_FILE_DIR:c89stringutils>;$<TARGET_FILE_DIR:parson>;$ENV{PATH};$<TARGET_FILE_DIR:c-abstract-http>;$<TARGET_FILE_DIR:c_str_span>")
+set(TEST_ENV_VARS "PATH=$<TARGET_FILE_DIR:cmp>\;$<TARGET_FILE_DIR:c-orm>\;$<TARGET_FILE_DIR:c-abstract-http>\;$<TARGET_FILE_DIR:cfs>\;$<TARGET_FILE_DIR:c_str_span>\;$<TARGET_FILE_DIR:c89stringutils>\;$<TARGET_FILE_DIR:parson>\\;${CMAKE_BINARY_DIR}/bin/$<CONFIG>\\;$ENV{PATH}")
 add_test(NAME cmp_test COMMAND cmp_test)
 add_test(NAME cmp_string_test COMMAND cmp_string_test)
 add_test(NAME cmp_tls_test COMMAND cmp_tls_test)
@@ -245,3 +274,8 @@ if(CMP_BUILD_EXAMPLES)
 endif()
 
 set_tests_properties(cmp_test cmp_string_test cmp_tls_test cmp_ring_buffer_test cmp_modality_single_test cmp_modality_threaded_test cmp_modality_async_test cmp_sync_test cmp_coroutine_test cmp_timer_test cmp_vfs_test cmp_http_test cmp_orm_test cmp_window_test cmp_event_test cmp_router_test cmp_layout_test cmp_ui_test cmp_error_test cmp_error_test_crash cmp_error_test_assert PROPERTIES ENVIRONMENT "${TEST_ENV_VARS}")
+
+
+
+
+
