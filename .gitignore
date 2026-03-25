@@ -82,3 +82,18 @@ UNCOVERED.md
 *.swp
 *~
 .DS_Store
+
+# Generated rules for clean git add .
+*.diff
+*.zip
+/*_PLAN*.md
+/*_EXTENDED.md
+/ANSWER*.md
+/COMPARISON.md
+/DEUGLY.md
+/EXAMPLES.md
+/GAPPP.md
+/GDI_MIGRATION_TASKS.md
+/test_*.c
+/file*
+/llms.txt

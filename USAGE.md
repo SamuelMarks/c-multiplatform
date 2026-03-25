@@ -1,242 +1,89 @@
-USAGE
-=====
+# Usage
 
-This guide shows how to build LibCMPC and wire core widgets (including text fields) into a simple loop.
-It also notes the current media decoding fallbacks and plugin helpers. Backends are opt-in and compiled behind CMake flags.
+This guide demonstrates how to build a basic LibCMPC application, initialize the modality engine, and render a UI tree.
 
-> **Note:** For building full-stack applications with network connectivity, local database storage, and file system management, LibCMPC is designed to be used alongside `c-abstract-http`, `c-orm`, and `c-fs`. To automate the generation of API client models and UI, use `cdd-c`.
-
-## System dependencies
-
-- macOS: build developer tools (XCode); runtime (none)
-- Windows: MSVC; runtime (none)
-- Linux; gcc, clang, tcc, etc.; runtime (gtk4)
-- Web: Emscripten
-
-## Build
-
-```sh
-cmake -S . -B build -D CMAKE_BUILD_TYPE=Debug
-cmake --build build
-ctest --test-dir build --output-on-failure
-```
-
-## Backend Selection
-
-Backends are enabled with CMake flags and may compile as stubs if their platform/dependencies are missing.
-
-### FetchContent (CMake)
-
-```cmake
-include(FetchContent)
-
-FetchContent_Declare(
-    cmpc
-    GIT_REPOSITORY https://github.com/SamuelMarks/c-multiplatform.git
-    GIT_TAG master
-)
-
-set(CMP_ENABLE_SDL3 ON CACHE BOOL "" FORCE)
-set(CMP_ENABLE_SDL3_TTF ON CACHE BOOL "" FORCE)
-set(CMP_ENABLE_LIBCURL ON CACHE BOOL "" FORCE)
-
-FetchContent_MakeAvailable(cmpc)
-
-add_executable(app main.c)
-# Core-only usage:
-target_link_libraries(app PRIVATE cmp::cmpc)
-# Design system widgets/styles (Material 3, Cupertino, or Fluent 2):
-# target_link_libraries(app PRIVATE m3::m3)
-# target_link_libraries(app PRIVATE cupertino::cupertino)
-# target_link_libraries(app PRIVATE f2::f2)
-```
-
-### Visual Documentation Pipeline
-
-The project features an autonomous headless vector documentation generator (`cmp_docgen`) that emits SVG files for UI verification.
-
-```bash
-# Build the docgen tool
-cmake -S . -B build -DCMP_BUILD_DOCGEN=ON
-cmake --build build --target cmp_docgen
-
-# Generate SVGs and JSON maps
-./build/cmp_docgen --platform linux --theme material
-
-# Render Markdown tables
-python3 tools/docgen/build_docs.py
-
-# Optional: Generate static HTML site with Doxygen
-cd docs && npm install
-cd ..
-cmake -S . -B build-docs -DCMP_REQUIRE_DOXYGEN=ON
-cmake --build build-docs --target cmp_docs
-```
-
-## Media Decoding (Fallback)
-
-LibCMPC ships minimal fallback decoders for development and tests:
-
-- **Images**: PPM (P6) and raw RGBA8 buffers.
-- **Audio**: WAV (PCM16).
-- **Video**: `M3V0` raw RGBA frame container.
-
-Backends can override these via `CMPEnv` for platform-native codecs.
-
-## Text Field Example
+## Basic Application Loop
 
 ```c
-#include "cmpc/cmp_text_field.h"
+#include "cmp.h"
+#include <stdio.h>
 
-int setup_text_field(CMPGfx *gfx, CMPTextField *field) {
-    CMPTextBackend backend;
-    CMPTextFieldStyle style;
-    int rc;
+int main(int argc, char **argv) {
+    cmp_window_t *window = NULL;
+    cmp_window_config_t config = {0};
+    cmp_modality_t modality;
+    cmp_ui_node_t *root_box = NULL;
+    cmp_ui_node_t *button = NULL;
 
-    rc = cmp_text_backend_from_gfx(gfx, &backend);
-    if (rc != CMP_OK) return rc;
+    /* 1. Initialize the Modality Engine (Single-threaded) */
+    if (cmp_modality_single_init(&modality) != CMP_SUCCESS) {
+        return 1;
+    }
 
-    rc = cmp_text_field_style_init(&style);
-    if (rc != CMP_OK) return rc;
+    /* 2. Initialize the Window System */
+    cmp_window_system_init();
 
-    style.text_style.utf8_family = "Sans";
-    style.label_style.utf8_family = "Sans";
+    config.title = "LibCMPC Hello World";
+    config.width = 800;
+    config.height = 600;
 
-    rc = cmp_text_field_init(field, &backend, &style, NULL, "", 0);
-    if (rc != CMP_OK) return rc;
+    if (cmp_window_create(&config, &window) != CMP_SUCCESS) {
+        return 1;
+    }
 
-    rc = cmp_text_field_set_label(field, "Email", 5);
-    if (rc != CMP_OK) return rc;
+    /* 3. Build the UI Tree */
+    cmp_ui_box_create(&root_box);
+    cmp_ui_button_create(&button, "Click Me!");
+    cmp_ui_node_add_child(root_box, button);
 
-    rc = cmp_text_field_set_placeholder(field, "name@example.com", 16);
-    if (rc != CMP_OK) return rc;
+    /* Bind the UI tree to the window */
+    cmp_window_set_ui_tree(window, root_box);
+    cmp_window_show(window);
 
-    return CMP_OK;
+    /* 4. Main Event Loop */
+    while (!cmp_window_should_close(window)) {
+        cmp_window_poll_events(window);
+        cmp_modality_run(&modality); /* Process async tasks, VFS, HTTP */
+    }
+
+    /* 5. Cleanup */
+    cmp_window_destroy(window);
+    cmp_window_system_shutdown();
+    cmp_modality_destroy(&modality);
+    cmp_ui_node_destroy(root_box);
+    
+    /* Optional: Print memory leak report */
+    cmp_mem_check_leaks();
+
+    return 0;
 }
 ```
 
-## Camera Capture Example
+## Adding Networking (c-abstract-http)
 
-The camera plugin exposes configuration for device selection, resolution, and pixel format. Use
-`cmp_camera_config_init` to start from defaults, then override fields in `config.config`.
-
-```c
-#include "cmpc/cmp_camera.h"
-
-int open_camera(CMPEnv *env, CMPCameraSession *session) {
-    CMPCameraSessionConfig config;
-    int rc;
-
-    rc = cmp_camera_config_init(&config);
-    if (rc != CMP_OK) return rc;
-
-    config.env = env;
-    config.config.facing = CMP_CAMERA_FACING_BACK;
-    config.config.width = 1280u;
-    config.config.height = 720u;
-    config.config.format = CMP_CAMERA_FORMAT_NV12;
-
-    rc = cmp_camera_init(session, &config);
-    if (rc != CMP_OK) return rc;
-
-    rc = cmp_camera_start(session);
-    if (rc != CMP_OK) {
-        cmp_camera_shutdown(session);
-        return rc;
-    }
-
-    return CMP_OK;
-}
-```
-
-## Network Request Example
-
-Use the network plugin to issue HTTP requests through the active backend. Responses
-must be released with `cmp_network_response_free` before shutting down the client.
+LibCMPC embeds `c-abstract-http`. You can utilize it within your modality loop:
 
 ```c
-#include "cmpc/cmp_network.h"
+struct HttpClient *client = NULL;
+cmp_http_client_create(&modality, &client);
 
-int fetch_url(CMPEnv *env, const char *url) {
-    CMPNetworkClient client;
-    CMPNetworkConfig config;
-    CMPNetworkRequest request;
-    CMPNetworkResponse response;
-    int rc;
-
-    rc = cmp_network_config_init(&config);
-    if (rc != CMP_OK) return rc;
-
-    config.env = env;
-
-    rc = cmp_network_init(&client, &config);
-    if (rc != CMP_OK) return rc;
-
-    rc = cmp_network_request_init(&request);
-    if (rc != CMP_OK) {
-        cmp_network_shutdown(&client);
-        return rc;
-    }
-
-    request.method = "GET";
-    request.url = url;
-    request.timeout_ms = 5000u;
-
-    rc = cmp_network_request(&client, &request, &response);
-    if (rc != CMP_OK) {
-        cmp_network_shutdown(&client);
-        return rc;
-    }
-
-    /* consume response.body/response.body_size here */
-
-    rc = cmp_network_response_free(&client, &response);
-    if (rc != CMP_OK) {
-        cmp_network_shutdown(&client);
-        return rc;
-    }
-
-    return cmp_network_shutdown(&client);
-}
+/* Issue an asynchronous GET request that resolves via the modality loop */
+cmp_http_client_get(client, "https://api.github.com/zen", my_callback_fn, user_data);
 ```
 
-## Storage Example
+## Integrating the Database (c-orm)
 
-The storage helper provides a simple key/value store with optional file persistence via `CMPIO`.
+Data binding allows UI nodes to automatically react to database changes:
 
 ```c
-#include "cmpc/cmp_storage.h"
+cmp_orm_observable_t *username_obs = NULL;
+/* Initialize observable from your ORM model... */
 
-int save_prefs(CMPEnv *env) {
-    CMPStorage storage;
-    CMPStorageConfig config;
-    CMPIO io;
-    int rc;
+cmp_ui_node_t *text_label;
+cmp_ui_text_create(&text_label, "Default User");
 
-    rc = cmp_storage_config_init(&config);
-    if (rc != CMP_OK) return rc;
-
-    rc = cmp_storage_init(&storage, &config);
-    if (rc != CMP_OK) return rc;
-
-    rc = cmp_storage_put(&storage, "theme", 5, "dark", 4, CMP_TRUE);
-    if (rc != CMP_OK) {
-        cmp_storage_shutdown(&storage);
-        return rc;
-    }
-
-    rc = env->vtable->get_io(env->ctx, &io);
-    if (rc != CMP_OK) {
-        cmp_storage_shutdown(&storage);
-        return rc;
-    }
-
-    rc = cmp_storage_save(&storage, &io, "prefs.m3s");
-    if (rc != CMP_OK) {
-        cmp_storage_shutdown(&storage);
-        return rc;
-    }
-
-    return cmp_storage_shutdown(&storage);
-}
+/* The label will now automatically update when the observable changes */
+cmp_ui_node_bind(text_label, username_obs, CMP_BIND_TEXT_CONTENT);
 ```
+
+For more comprehensive examples, see the `examples/` directory in the repository.

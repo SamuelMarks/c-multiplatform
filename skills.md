@@ -1,63 +1,59 @@
-# Skills for LibCMPC Development
+# C-Multiplatform Agent Skills & Mandates
 
-## 1. Core Principles & Strict C89 Constraints
-When executing tasks in this repository, always strictly adhere to these C89 constraints:
-*   **Variable Declarations**: All variables MUST be declared at the very beginning of their enclosing block scope. 
-*   **Comments**: Use `/* ... */` for comments. Never use C99-style `//` comments.
-*   **Dependencies**: Rely only on standard ANSI C libraries. Do not include external dependencies in the core framework.
-*   **Error Handling**: Return `int` status codes (`CMP_OK` for success, or specific `CMP_ERR_*` values like `CMP_ERR_UNSUPPORTED`).
-*   **Allocators**: Rely on the injected `CMPAllocator` contexts. Avoid hidden global state and ensure leak-free handling.
+This document provides explicit execution "skills" and workflow mandates for Large Language Models and AI agents working in the `c-multiplatform` repository. Adhere to these constraints flawlessly to ensure the codebase remains strictly compatible, leak-free, and idiomatically aligned with its C89 architecture.
 
-## 2. Widget Creation Lifecycle
-Create a new UI component adhering to the strictly decoupled C89 LibCMPC widget lifecycle.
+---
 
-### A. Header Definition (`include/{cmpc,m3,cupertino,f2}/`)
-*   **Style Struct**: Define `CMP<System><Widget>Style` representing visual properties (colors, typography, radii).
-*   **Widget Struct**: Define the struct. **Crucial Rule**: The very first member MUST be `CMPWidget widget;` to allow safe generic struct casting.
-*   **API Signatures**: Declare initialization functions (`_init`, `_style_init`), setters, and specific API interactions.
+## Skill 1: Strict C89 (ANSI C) Compliance
+You are operating in an environment where modern C conventions will break legacy compilers (like MSVC 6 or ancient embedded GCC).
+- **Rule**: Write ONLY standard C89.
+- **Comments**: Only block comments (`/* comment */`). Absolutely no `//` inline comments.
+- **Variable Declarations**: Variables MUST be declared at the very top of their enclosing block/scope. You cannot declare variables mid-function or inside a `for` loop initialization.
+- **Headers**: Never use `<windows.h>` directly to avoid massive namespace pollution. Guard POSIX or C99 headers (like `<stdint.h>`) with compiler version checks.
+- **Format**: Wrap include blocks in `/* clang-format off */` and `/* clang-format on */` to prevent auto-sorters from breaking include dependency orders. Wrap public headers in `extern "C"`.
 
-### B. Source Implementation (`src/{core,m3,cupertino,f2}/`)
-*   **V-Table Setup**: Implement static functions for `measure`, `layout`, `paint`, `event`, `semantics`, and `destroy`.
-*   **Measure**: Calculate `CMPSize` based on `CMPMeasureSpec` constraints (Unspecified, Exactly, AtMost).
-*   **Layout**: Accept final `CMPRect bounds` from the parent to update internal node geometry and text metrics.
-*   **Paint**: 
-    *   Use `ctx->gfx` for drawing primitives.
-    *   Push/Pop clips (`ctx->clip`) if drawing outside bounds is possible.
-    *   Check capabilities gracefully (e.g., `if (!ctx->gfx->draw_path) return CMP_ERR_UNSUPPORTED;`).
-*   **Event**: Handle `CMPInputEvent` interactions (hover, press, focus) and drive internal `cmp_anim` animators.
-*   **Semantics**: Populate `CMPSemantics` mapping to accessibility roles for screen readers (VoiceOver, UIA).
+## Skill 2: Memory Management & Leak Tracking
+LibCMPC manages its own memory to guarantee zero GC pauses and catch leaks at runtime.
+- **Rule**: NEVER use `malloc`, `calloc`, `realloc`, or `free` directly.
+- **Implementation**: 
+  - For standard dynamic heap allocations, use `CMP_MALLOC(size, &out_ptr)` and `CMP_FREE(ptr)`. These macros track allocations with file/line numbers.
+  - For scoped or frame-based data, utilize the arena allocator: `cmp_arena_alloc(&arena, size, &out_ptr)`.
+  - For high-frequency, fixed-size structs (like layout calculations or UI nodes), use the pool allocator: `cmp_pool_alloc(&pool, &out_ptr)`.
+- **Validation**: Ensure all allocated memory has a clear ownership model and is explicitly freed. Tests run `cmp_mem_check_leaks()` at the end, and the CI will fail if it returns > 0.
 
-## 3. Design System Fidelity
-When modifying or adding widgets, adhere to the specific requirements of the target design system:
+## Skill 3: Error Handling & Function Signatures
+LibCMPC uses a strict return-code contract to propagate errors safely without exceptions.
+- **Rule**: All logic functions must return an `int` indicating success or failure.
+- **Implementation**:
+  - `0` or `CMP_SUCCESS` indicates success.
+  - Non-zero values (`CMP_ERROR_OOM`, `CMP_ERROR_INVALID_ARG`, `CMP_ERROR_NOT_FOUND`) indicate failure.
+  - Always return output data via pointer arguments.
+  - **Example**: `int cmp_ui_box_create(cmp_ui_node_t **out_node)` NOT `cmp_ui_node_t* cmp_ui_box_create()`.
 
-### Material Design 3 (`m3`)
-*   **Color & Theming**: Leverage `m3_color.h` HCT (Hue, Chroma, Tone) science for tonal palettes and dynamic colors.
-*   **Layouts**: Support Canonical Layouts and Adaptive Window classes where applicable.
-*   **Motion**: Use the `m3_motion.h` predefined easing curves (Emphasized, Standard) and integrate predictive back.
+## Skill 4: UI & Layout Construction
+The framework completely decouples the logical UI tree, the mathematical Layout tree, and the Graphical renderer.
+- **Rule**: Never manually calculate or hardcode pixel coordinates for UI elements.
+- **Implementation**:
+  - Construct the UI tree using `cmp_ui_node_t` elements (`cmp_ui_box_create`, `cmp_ui_text_create`, `cmp_ui_button_create`).
+  - Append children using `cmp_ui_node_add_child`.
+  - Apply styling and dimensions via the Flexbox properties on the UI nodes.
+  - The framework's `cmp_layout_node_t` engine will automatically calculate X/Y bounds during the tick phase.
+  - Bind reactive data to `c-orm` observables using `cmp_ui_node_bind`.
 
-### Apple Cupertino (`cupertino`)
-*   **Geometry**: Use Apple's continuous curves (`kCACornerCurveContinuous` / squircles) over standard circular arcs.
-*   **Motion**: Ensure interactions feel native by using interruptible spring physics (`cmp_spring_init`).
-*   **Materials**: Emulate iOS/macOS vibrancy and background blurs, mapping them structurally so backends like macOS can hook into `NSVisualEffectView`.
-*   **Accessibility**: Heavily map traits to dynamic type sizing and VoiceOver interactions.
+## Skill 5: Modality & Concurrency Engine
+LibCMPC does not assume the host OS threading model.
+- **Rule**: Never block the main thread and never assume a single threading model.
+- **Implementation**:
+  - When writing asynchronous features (like network or disk I/O), dispatch work to the active `cmp_modality_t` instance using `cmp_modality_queue_task`.
+  - Use `cmp_ring_buffer_t` for thread-safe cross-thread messaging without Mutex locking.
+  - Utilize `cmp_tls.c` for Thread-Local Storage when managing context in `CMP_MODALITY_THREADED` mode.
 
-### Microsoft Fluent 2 (`f2`)
-*   **Materials**: Integrate with Mica and Acrylic backdrops, mapping deeply to Windows Win32 backends (`DWMWA_SYSTEMBACKDROP_TYPE`).
-*   **Elevation**: Follow standard Fluent 2 shadow ramps (Levels 2, 4, 8, 16, 64) and 1px structural borders.
-*   **Typography**: Utilize the Fluent specific scale mapped optimally to `Segoe UI Variable`.
+## Skill 6: Using the Amalgamated API (`cmp.h`)
+To maintain context-window scalability, the entire public API is consolidated.
+- **Rule**: `include/cmp.h` is the ultimate source of truth.
+- **Implementation**: When asked to implement a feature, always scan `include/cmp.h` first for existing interfaces, helper structs, and enums. Do not invent duplicate functionality if `cmp_string`, `cmp_timer`, or `cmp_vfs` already support the use case. If you need to modify the public API, you MUST update `include/cmp.h`.
 
-## 4. Backend Implementations (`src/backend/<platform>/`)
-Backends implement the ABI V-Tables. If an OS feature is missing, return `CMP_ERR_UNSUPPORTED` rather than failing.
-*   **Graphics Interface (`CMPGfx`)**: Map rendering commands to native APIs (GDI, Cairo, CoreGraphics, WebGL). Ensure top-left origin coordinates.
-*   **Window System (`CMPWS`)**: Manage windowing, DPI scales, input event translation to `CMPInputEvent`, and predictive back edge-swipes.
-*   **Environment (`CMPEnv`)**: Implement main event loops (`CMPTasks`) and map native OS capabilities (storage, camera, network, clipboard).
-
-## 5. Visual Documentation (`cmp_docgen`)
-*   LibCMPC uses a headless vector renderer for documentation. It mocks the `CMPGfx` V-Table to intercept drawing commands and output pure SVG strings.
-*   When a new widget is created, **always write a render test in `tools/docgen/`** that initializes the widget and pumps mock events (e.g., hover, press) to generate the visual documentation.
-
-## 6. Testing & Quality (`tests/phaseX/`)
-*   Create test executables for each specific logic module phase.
-*   Use `#ifdef CMP_TESTING` hooks to inject error states (e.g., specific `malloc` failures, backend stub failures).
-*   Verify memory leak freedom by checking custom `CMPAllocator` stats if available.
-*   Validate behavioral correctness strictly against the `cmp_api_*` contract, not the implementation details.
+## Skill 7: Testing & Verification
+A change is not complete until it is verified.
+- **Rule**: Always write or update tests using the `greatest` framework.
+- **Implementation**: Tests are located in the `tests/` directory. Each system has a dedicated file (e.g., `test_cmp_memory.c`, `test_cmp_ui.c`). After implementing a feature, write a test case, run `ctest`, and ensure `cmp_mem_check_leaks()` reports 0 un-freed allocations.

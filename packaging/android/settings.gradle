@@ -1,2 +1,0 @@
-rootProject.name = "libcmpc-android"
-include(":app")

@@ -1,68 +1,29 @@
-ARCHITECTURE
-============
+# C-Multiplatform Architecture & Standards
 
-LibCMPC is organized around a strict contract-first design that keeps interfaces (Phase 0) decoupled from
-implementations. This enables small context windows and modular development.
+LibCMPC has undergone a strategic rewrite to prioritize modality agnosticism, memory safety, and tight integration with a suite of C89 ecosystem libraries.
 
-Directory Layout
-----------------
+## Core Foundation & Memory
+All memory allocations in LibCMPC are routed through custom allocators to ensure zero leaks.
+- **Arena Allocator (`cmp_arena_t`)**: Used for per-frame or scoped allocations that can be discarded en-masse.
+- **Pool Allocator (`cmp_pool_t`)**: Fixed-size block allocation for high-frequency objects like UI nodes and layout calculations.
+- **Leak Tracking**: In debug builds, `CMP_MALLOC` and `CMP_FREE` automatically track allocations via `cmp_mem_record_t`, enabling `cmp_mem_check_leaks()` to report exact file and line numbers of un-freed memory.
 
-- `include/cmpc/` — ABI contracts (`cmp_api_*`) plus design-system-agnostic public headers (core systems, widgets, a11y,
-  media helpers).
-- `include/m3/`, `include/cupertino/`, `include/f2/` — Design-system public headers (widgets, palettes, styling defaults).
-- `src/core/` — Core logic: allocators/arena/utf8/log/store/i18n, math/layout/anim/router/path, render/event/gesture/
-  scroll/tasks, a11y and predictive back helpers, widgets (visuals/text/icon/text_field/list/extras), and media/helpers
-  (image/audio/video decoders, storage/camera/network).
-- `src/m3/`, `src/cupertino/`, `src/f2/` — Design-system implementations: widget styling and components (buttons, navigation, app bars,
-  tabs, dialogs, sheets, scaffold, menus, cards, chips, selection controls, progress, date/time pickers).
-- `src/backend/<platform>/` — Platform implementations of the `cmp_api_*` V-Tables (null, sdl3, linux/gtk4, cocoa,
-  win32, web, ios, android).
-- `tools/docgen/` — The autonomous headless vector documentation generator. Renders widgets into SVGs via the mock GFX V-Table.
-- `tests/` — Phase-scoped tests validating behavior and error handling.
-- `packaging/` — CMake-driven packaging scripts for desktop, mobile, web, and SDL3 builds.
+## Modality Engine (`cmp_modality_t`)
+The core innovation of LibCMPC is its modality-agnostic event loop.
+- **`CMP_MODALITY_SINGLE`**: A traditional blocking/polling loop suitable for simple games or legacy targets.
+- **`CMP_MODALITY_THREADED`**: Spawns a worker pool, safely dispatching tasks and UI events across threads using the lock-free `cmp_ring_buffer_t`.
+- **`CMP_MODALITY_ASYNC`**: Integrates with OS-native asynchronous APIs (epoll/kqueue/IOCP).
 
-Render + Event Flow
--------------------
+## Ecosystem Integrations
+Instead of reinventing the wheel, LibCMPC deeply embeds specialized C libraries:
+1. **Virtual File System (`cmp_vfs_t` -> `c-fs`)**: Allows mounting archives (ZIPs) and native directories. `cmp_vfs_read_file_async` ties directly into the Modality engine to prevent blocking the main thread during asset loading.
+2. **Network (`cmp_http` -> `c-abstract-http`)**: WebSockets, Server-Sent Events, and standard REST HTTP calls are dispatched and resolved within the `cmp_modality_t` loop.
+3. **State Management (`cmp_orm` -> `c-orm`)**: UI nodes can be directly bound to ORM fields using `cmp_ui_node_bind(node, observable)`. When the local SQLite database updates, the UI invalidates and redraws automatically.
 
-1. **Input**: Backends emit `CMPInputEvent` instances via `CMPWS`.
-2. **Dispatch**: `cmp_event_dispatch` routes events to widgets (and navigation/router helpers).
-3. **Layout**: Widgets are measured and laid out using `CMPMeasureSpec` and `CMPRect`.
-4. **Render**: Render lists are built and executed against `CMPGfx` (rects, text, textures).
-5. **Tasks**: Time-based updates (animations, delayed work) run via `CMPTasks`.
+## UI & Layout Pipeline
+1. **UI Tree (`cmp_ui_node_t`)**: Developers construct a logical tree of widgets (`cmp_ui_box`, `cmp_ui_button`, `cmp_ui_text_input`).
+2. **Layout Tree (`cmp_layout_node_t`)**: The UI tree generates a parallel Flexbox layout tree. `cmp_layout_calculate` resolves all absolute pixel coordinates based on the available window size.
+3. **Window System (`cmp_window_t`)**: The calculated UI tree is bound to an OS window via `cmp_window_set_ui_tree`. Events (clicks, typing) are routed via `cmp_event_t` down the tree to focused nodes.
 
-Backend Composition
--------------------
-
-Each backend exposes a consistent bundle of interfaces:
-
-- **Window system (`CMPWS`)** for windows, input, and DPI.
-- **Graphics (`CMPGfx`)** for rendering primitives and text.
-- **Environment (`CMPEnv`)** for IO, sensors, camera, image/audio/video decoders, network, tasks, and timing.
-
-Backends are compiled in behind build flags; missing platform dependencies produce stubs that report unavailable
-at runtime via `cmp_*_backend_is_available`.
-
-Widget Composition
-------------------
-
-Widgets are plain C structs that embed a `CMPWidget` header with a function V-Table (`measure`, `layout`, `paint`, `semantics`). Widgets can be combined into render trees and traversed by the render builder. Semantics are carried via `CMPSemantics` for accessibility.
-
-Headless Documentation Pipeline
--------------------------------
-The `cmp_docgen` tool injects a custom `CMPGfxVTable` to intercept all rendering commands (`draw_rect`, `draw_path`, etc.) and outputs pure vector SVG graphics. This is combined with automated Markdown and Doxygen generation inside GitHub actions to provide visual test feedback without needing a headless browser.
-
-Accessibility + Predictive Back
--------------------------------
-
-- `cmp_a11y` provides a small semantics surface that backends can map to native accessibility APIs.       
-- `cmp_predictive` reports predictive back gestures (start/progress/commit/cancel) for edge-swipe navigation.
-
-Ecosystem Integration
----------------------
-
-LibCMPC sits at the core of a larger C89 application development ecosystem. It leverages several sibling libraries to provide a modern, full-stack application environment:
-
-- **Network & HTTP (`c-abstract-http`)**: Integrated to provide high-performance, asynchronous HTTP/HTTPS client calls across all supported platforms without bloating the core UI library. Used for API communication, image fetching, and streaming.
-- **Data Persistence (`c-orm`)**: Provides the foundation for a "Room-style" ORM interface within LibCMPC. It allows seamless, type-safe SQLite database storage for local caching, offline sync, and user data persistence.
-- **Code Generation (`cdd-c`)**: Our Compiler Driven Development tool parses OpenAPI specifications and C header files to automatically generate C client GUIs, networking models, and database schemas directly into your LibCMPC project.
-- **File System (`c-fs`)**: Provides a C++17 `std::filesystem` equivalent API, handling cross-platform paths, directory traversal, and OS-level file streams safely.
+## Rendering Abstraction
+Rendering is decoupled from the windowing system via `cmp_renderer_create`. This allows the same UI tree to be drawn using SDL3, Native Win32 GDI, Apple Metal, or WebGL without changing the UI code.
