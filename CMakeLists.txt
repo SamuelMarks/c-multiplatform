@@ -106,21 +106,27 @@ target_include_directories(greatest INTERFACE ${greatest_SOURCE_DIR})
 
 # cfs
 set(CFS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(cfs GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git GIT_TAG master)
+FetchContent_Declare(cfs GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git GIT_TAG master
+    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+    )
 FetchContent_MakeAvailable(cfs)
 
 # c89stringutils (Not from vcpkg to allow target_compile_definitions)
-FetchContent_Declare(c89stringutils GIT_REPOSITORY https://github.com/offscale/c89stringutils.git GIT_TAG master)
+FetchContent_Declare(c89stringutils GIT_REPOSITORY https://github.com/offscale/c89stringutils.git GIT_TAG master
+    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+    )
 FetchContent_MakeAvailable(c89stringutils)
 
 # c_str_span (Not in vcpkg)
 FetchContent_Declare(c_str_span GIT_REPOSITORY https://github.com/SamuelMarks/c-str-span.git GIT_TAG master
-  PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/patch_c_str_span.cmake
+    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
 )
 FetchContent_MakeAvailable(c_str_span)
 
 # parson (Not in vcpkg)
-FetchContent_Declare(parson GIT_REPOSITORY https://github.com/kgabis/parson.git GIT_TAG master)
+FetchContent_Declare(parson GIT_REPOSITORY https://github.com/kgabis/parson.git GIT_TAG master
+    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+    )
 FetchContent_MakeAvailable(parson)
 
 
@@ -130,19 +136,24 @@ set(C_ABSTRACT_HTTP_ENABLE_WEBSOCKETS ON CACHE BOOL "" FORCE)
 set(C_ABSTRACT_HTTP_ENABLE_SSE ON CACHE BOOL "" FORCE)
 set(C_ABSTRACT_HTTP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(c_abstract_http GIT_REPOSITORY https://github.com/SamuelMarks/c-abstract-http.git GIT_TAG master PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/patch_abstract_http.cmake)
+FetchContent_Declare(c_abstract_http GIT_REPOSITORY https://github.com/SamuelMarks/c-abstract-http.git GIT_TAG master
+    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master)
 FetchContent_MakeAvailable(c_abstract_http)
 
 # cdd-c
 set(CDD_C_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(C_CDD_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG master)
+FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG master
+    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+    )
 
 # c-orm
 set(C_ORM_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(C_ORM_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(c_orm GIT_REPOSITORY https://github.com/SamuelMarks/c-orm.git GIT_TAG master)
+FetchContent_Declare(c_orm GIT_REPOSITORY https://github.com/SamuelMarks/c-orm.git GIT_TAG master
+    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+    )
 
 FetchContent_MakeAvailable(cdd_c c_orm)
 
