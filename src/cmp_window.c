@@ -28,6 +28,7 @@ struct cmp_window {
   cmp_window_drop_cb_t drop_cb;
   void *drop_user_data;
   cmp_ui_node_t *ui_tree;
+  float scale_factor;
 };
 
 #if defined(_WIN32)
@@ -204,7 +205,7 @@ static cmp_drop_target_t *create_drop_target(HWND hwnd, cmp_window_t *window) {
 #endif
 
 #if defined(_WIN32)
-static void render_node_gdi(HDC hdc, cmp_ui_node_t *node) {
+static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor) {
   size_t i;
   cmp_rect_t rect;
 
@@ -212,12 +213,18 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node) {
     return;
 
   rect = node->layout->computed_rect;
+  
+  /* Apply scale factor to layout values to translate to physical screen coordinates */
+  rect.x *= scale_factor;
+  rect.y *= scale_factor;
+  rect.width *= scale_factor;
+  rect.height *= scale_factor;
 
   if (node->type == 2) { /* Text */
     const char *text = (const char *)node->properties;
     if (text) {
       HFONT font =
-          CreateFontA(32, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+          CreateFontA((int)(32 * scale_factor), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
                       DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
                       DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial");
       HFONT old_font = (HFONT)SelectObject(hdc, font);
@@ -246,7 +253,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node) {
 
     if (label) {
       HFONT font =
-          CreateFontA(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+          CreateFontA((int)(24 * scale_factor), 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
                       DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
                       DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial");
       HFONT old_font = (HFONT)SelectObject(hdc, font);
@@ -254,7 +261,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node) {
       SetTextColor(hdc, RGB(255, 255, 255));
       SetBkMode(hdc, TRANSPARENT);
       TextOutA(hdc, (int)(rect.x + rect.width / 2.0f),
-               (int)(rect.y + (rect.height - 24.0f) / 2.0f), label,
+               (int)(rect.y + (rect.height - (24.0f * scale_factor)) / 2.0f), label,
                (int)strlen(label));
       SelectObject(hdc, old_font);
       DeleteObject(font);
@@ -346,7 +353,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node) {
   }
 
   for (i = 0; i < node->child_count; i++) {
-    render_node_gdi(hdc, node->children[i]);
+    render_node_gdi(hdc, node->children[i], scale_factor);
   }
 }
 #endif
@@ -359,6 +366,20 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
   case WM_CREATE: {
     CREATESTRUCTA *cs = (CREATESTRUCTA *)lParam;
     SetWindowLongPtrA(hwnd, GWLP_USERDATA, (LONG_PTR)cs->lpCreateParams);
+    /* Attempt to get DPI for the created window to set initial scale factor */
+    {
+        typedef UINT(WINAPI * GetDpiForWindow_fn)(HWND);
+        HMODULE user32 = GetModuleHandleA("user32.dll");
+        if (user32) {
+            GetDpiForWindow_fn get_dpi = (GetDpiForWindow_fn)GetProcAddress(user32, "GetDpiForWindow");
+            cmp_window_t *w = (cmp_window_t *)cs->lpCreateParams;
+            if (get_dpi && w) {
+                w->scale_factor = (float)get_dpi(hwnd) / 96.0f;
+            } else if (w) {
+                w->scale_factor = 1.0f; /* Fallback */
+            }
+        }
+    }
     return 0;
   }
   case WM_CLOSE:
@@ -372,6 +393,10 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
   case 0x02E0: /* WM_DPICHANGED */
   {
     /* Per-Monitor V2 DPI Awareness hooks and dynamic scaling events */
+    if (window) {
+        UINT new_dpi = HIWORD(wParam);
+        window->scale_factor = (float)new_dpi / 96.0f;
+    }
     RECT *prcNewWindow = (RECT *)lParam;
     SetWindowPos(hwnd, NULL, prcNewWindow->left, prcNewWindow->top,
                  prcNewWindow->right - prcNewWindow->left,
@@ -400,8 +425,8 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
       pt.x = GET_X_LPARAM(lParam);
       pt.y = GET_Y_LPARAM(lParam);
       ScreenToClient(hwnd, &pt);
-      evt.x = pt.x;
-      evt.y = pt.y;
+      evt.x = window ? (int)(pt.x / window->scale_factor) : pt.x;
+      evt.y = window ? (int)(pt.y / window->scale_factor) : pt.y;
     }
 
     cmp_event_push(&evt);
@@ -421,8 +446,8 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
       else
         evt.action = CMP_ACTION_MOVE;
 
-      evt.x = GET_X_LPARAM(lParam);
-      evt.y = GET_Y_LPARAM(lParam);
+      evt.x = (int)(GET_X_LPARAM(lParam) / window->scale_factor);
+      evt.y = (int)(GET_Y_LPARAM(lParam) / window->scale_factor);
       evt.source_id = 0; /* Primary mouse */
 
       cmp_event_push(&evt);
