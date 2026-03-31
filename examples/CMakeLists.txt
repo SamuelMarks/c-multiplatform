@@ -24,6 +24,3 @@ add_subdirectory(kotlin-multiplatform)
 add_subdirectory(google-material-android)
 add_subdirectory(apple-cupertino-ios)
 add_subdirectory(microsoft-fluent-2)
-add_subdirectory(theme_switcher_demo)
-
-add_subdirectory(compile_enum_demo)

@@ -3,7 +3,11 @@ C multiplatform (libcmp)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**LibCMPC** is a strict C89 (ANSI C) cross-platform application framework. Following a strategic rewrite, it provides a highly cohesive, monolithic core for building modality-agnostic GUI applications in native C. It integrates best-in-class sibling libraries for networking, file systems, and databases, while maintaining zero external dependencies for its core rendering and layout engines.
+**Purpose:** The main entry point and overview of the LibCMPC project.
+
+**Current State:** **LibCMPC** is a strict C89 (ANSI C) cross-platform application framework. Following a strategic rewrite, it provides a highly cohesive, monolithic core for building modality-agnostic GUI applications in native C. It integrates best-in-class sibling libraries for networking, file systems, and databases, while maintaining zero external dependencies for its core rendering and layout engines.
+
+**Upcoming Features:** The rendering and UI systems are currently being expanded to natively support **Google Material 3**, **Apple Cupertino / HIG**, and **Microsoft Fluent 2** design systems out-of-the-box.
 
 This project is architected specifically for **Context-Window Scalability**, utilizing an amalgamated header design (`cmp.h`) that makes the codebase distinctively friendly for LLM-assisted coding and maintenance.
 
@@ -26,11 +30,11 @@ The framework is organized into a cohesive, amalgamated structure:
 *   **`include/cmp.h`**: The single source of truth for all API contracts, structs, and interfaces.
 *   **`src/`**: Modular implementations of the core systems (`cmp_memory`, `cmp_layout`, `cmp_ui`, `cmp_window`, `cmp_modality`).
 *   **`tests/`**: Comprehensive test suites using the `greatest` framework, ensuring memory safety and behavioral correctness.
-*   **`examples/`**: Standalone GUI applications demonstrating real-world usage (e.g., OAuth2 Login flows).
+*   **`examples/`**: Standalone GUI applications demonstrating real-world usage (e.g., OAuth2 Login flows).     
 
 ## 🛠️ Build Instructions
 
-LibCMPC uses **CMake** and manages its internal ecosystem dependencies automatically via `FetchContent`.
+LibCMPC uses **CMake** and manages its internal ecosystem dependencies automatically via `FetchContent`.        
 
 ### Compile
 

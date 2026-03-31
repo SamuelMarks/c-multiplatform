@@ -168,13 +168,14 @@ static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
     cmp_layout_node_t *child = node->children[i];
     float child_main, child_cross, child_main_margin, child_cross_margin;
     cmp_layout_line_t *cur_line;
+    float c_w, c_h;
 
     if (child->position_type == CMP_POSITION_ABSOLUTE) {
       continue;
     }
 
-    float c_w = child->width;
-    float c_h = child->height;
+    c_w = child->width;
+    c_h = child->height;
     if (child->aspect_ratio > 0.0f) {
       if (c_w >= 0.0f && c_h < 0.0f) {
         c_h = c_w / child->aspect_ratio;
@@ -204,8 +205,10 @@ static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
       if (line_count >= line_capacity) {
         cmp_layout_line_t *new_lines;
         line_capacity *= 2;
-        CMP_MALLOC(sizeof(cmp_layout_line_t) * line_capacity,
-                   (void **)&new_lines);
+        if (CMP_MALLOC(sizeof(cmp_layout_line_t) * line_capacity,
+                       (void **)&new_lines) != CMP_SUCCESS) {
+          return;
+        }
         memcpy(new_lines, lines, sizeof(cmp_layout_line_t) * line_count);
         CMP_FREE(lines);
         lines = new_lines;
@@ -233,6 +236,7 @@ static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
     float remaining_main = main_avail_for_shrink - line->main_size;
     float main_offset = 0.0f;
     float spacing = 0.0f;
+    size_t processed = 0;
 
     if (remaining_main > 0.0f) {
       if (line->total_flex_grow <= 0.0f) {
@@ -255,23 +259,27 @@ static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
                       : (current_y + node->padding[0]);
     main_pos += main_offset;
 
-    size_t processed = 0;
     for (j = line->start; j < node->child_count && processed < line->count;
          j++) {
       cmp_layout_node_t *child = node->children[j];
+      float final_main, final_cross;
+      float c_avail_w, c_avail_h, c_x, c_y;
+      float child_main_margin;
+      float child_cross_margin;
+      float original_width;
+      float original_height;
+
       if (child->position_type == CMP_POSITION_ABSOLUTE)
         continue;
       processed++;
 
-      float final_main, final_cross;
-      float c_avail_w, c_avail_h, c_x, c_y;
-      float child_main_margin = is_row ? (child->margin[1] + child->margin[3])
-                                       : (child->margin[0] + child->margin[2]);
-      float child_cross_margin = is_row ? (child->margin[0] + child->margin[2])
-                                        : (child->margin[1] + child->margin[3]);
+      child_main_margin = is_row ? (child->margin[1] + child->margin[3])
+                                 : (child->margin[0] + child->margin[2]);
+      child_cross_margin = is_row ? (child->margin[0] + child->margin[2])
+                                  : (child->margin[1] + child->margin[3]);
 
-      float original_width = child->width;
-      float original_height = child->height;
+      original_width = child->width;
+      original_height = child->height;
 
       final_main = is_row ? child->width : child->height;
       if (final_main < 0.0f) {

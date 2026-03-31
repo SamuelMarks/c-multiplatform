@@ -213,8 +213,9 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor) {
     return;
 
   rect = node->layout->computed_rect;
-  
-  /* Apply scale factor to layout values to translate to physical screen coordinates */
+
+  /* Apply scale factor to layout values to translate to physical screen
+   * coordinates */
   rect.x *= scale_factor;
   rect.y *= scale_factor;
   rect.width *= scale_factor;
@@ -223,10 +224,10 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor) {
   if (node->type == 2) { /* Text */
     const char *text = (const char *)node->properties;
     if (text) {
-      HFONT font =
-          CreateFontA((int)(32 * scale_factor), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-                      DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-                      DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial");
+      HFONT font = CreateFontA(
+          (int)(32 * scale_factor), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+          DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+          DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial");
       HFONT old_font = (HFONT)SelectObject(hdc, font);
       SetTextAlign(hdc, TA_CENTER | TA_TOP);
       SetTextColor(hdc, RGB(0, 0, 0));
@@ -252,17 +253,17 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor) {
     DeleteObject(pen);
 
     if (label) {
-      HFONT font =
-          CreateFontA((int)(24 * scale_factor), 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
-                      DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-                      DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial");
+      HFONT font = CreateFontA(
+          (int)(24 * scale_factor), 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+          DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+          DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial");
       HFONT old_font = (HFONT)SelectObject(hdc, font);
       SetTextAlign(hdc, TA_CENTER | TA_TOP);
       SetTextColor(hdc, RGB(255, 255, 255));
       SetBkMode(hdc, TRANSPARENT);
       TextOutA(hdc, (int)(rect.x + rect.width / 2.0f),
-               (int)(rect.y + (rect.height - (24.0f * scale_factor)) / 2.0f), label,
-               (int)strlen(label));
+               (int)(rect.y + (rect.height - (24.0f * scale_factor)) / 2.0f),
+               label, (int)strlen(label));
       SelectObject(hdc, old_font);
       DeleteObject(font);
     }
@@ -368,17 +369,18 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
     SetWindowLongPtrA(hwnd, GWLP_USERDATA, (LONG_PTR)cs->lpCreateParams);
     /* Attempt to get DPI for the created window to set initial scale factor */
     {
-        typedef UINT(WINAPI * GetDpiForWindow_fn)(HWND);
-        HMODULE user32 = GetModuleHandleA("user32.dll");
-        if (user32) {
-            GetDpiForWindow_fn get_dpi = (GetDpiForWindow_fn)GetProcAddress(user32, "GetDpiForWindow");
-            cmp_window_t *w = (cmp_window_t *)cs->lpCreateParams;
-            if (get_dpi && w) {
-                w->scale_factor = (float)get_dpi(hwnd) / 96.0f;
-            } else if (w) {
-                w->scale_factor = 1.0f; /* Fallback */
-            }
+      typedef UINT(WINAPI * GetDpiForWindow_fn)(HWND);
+      HMODULE user32 = GetModuleHandleA("user32.dll");
+      if (user32) {
+        GetDpiForWindow_fn get_dpi =
+            (GetDpiForWindow_fn)GetProcAddress(user32, "GetDpiForWindow");
+        cmp_window_t *w = (cmp_window_t *)cs->lpCreateParams;
+        if (get_dpi && w) {
+          w->scale_factor = (float)get_dpi(hwnd) / 96.0f;
+        } else if (w) {
+          w->scale_factor = 1.0f; /* Fallback */
         }
+      }
     }
     return 0;
   }
@@ -392,12 +394,12 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
     return 0;
   case 0x02E0: /* WM_DPICHANGED */
   {
+    RECT *prcNewWindow = (RECT *)lParam;
     /* Per-Monitor V2 DPI Awareness hooks and dynamic scaling events */
     if (window) {
-        UINT new_dpi = HIWORD(wParam);
-        window->scale_factor = (float)new_dpi / 96.0f;
+      UINT new_dpi = HIWORD(wParam);
+      window->scale_factor = (float)new_dpi / 96.0f;
     }
-    RECT *prcNewWindow = (RECT *)lParam;
     SetWindowPos(hwnd, NULL, prcNewWindow->left, prcNewWindow->top,
                  prcNewWindow->right - prcNewWindow->left,
                  prcNewWindow->bottom - prcNewWindow->top,
@@ -518,7 +520,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
         FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
 
         if (window->ui_tree) {
-          render_node_gdi(hdc, window->ui_tree);
+          render_node_gdi(hdc, window->ui_tree, 1.0f);
         } else {
           SetTextAlign(hdc, TA_CENTER);
           SetTextColor(hdc, RGB(0, 0, 0));

@@ -1,5 +1,9 @@
 # Usage
 
+**Purpose:** This guide demonstrates how to build a basic LibCMPC application, initialize the modality engine, and render a UI tree.
+**Current State:** The framework allows for the composition of unstyled, primitive UI nodes (`cmp_ui_box`, `cmp_ui_button`, etc.) that are routed through a modality-agnostic event loop and flexbox layout engine.
+**Upcoming Features:** While current usage examples focus on primitive widgets, upcoming releases will introduce native theming capabilities, allowing developers to seamlessly apply **Material 3, Cupertino / HIG, or Fluent 2** styling profiles to their applications without changing business logic.
+
 This guide demonstrates how to build a basic LibCMPC application, initialize the modality engine, and render a UI tree.
 
 ## Basic Application Loop
@@ -51,7 +55,7 @@ int main(int argc, char **argv) {
     cmp_window_system_shutdown();
     cmp_modality_destroy(&modality);
     cmp_ui_node_destroy(root_box);
-    
+
     /* Optional: Print memory leak report */
     cmp_mem_check_leaks();
 

@@ -1,8 +1,5 @@
 /* clang-format off */
 #include "app.h"
-#if defined(_WIN32)
-#include <sdkddkver.h>
-#endif
 #include <cmp.h>
 #include <stdio.h>
 /* clang-format on */
@@ -274,4 +271,3 @@ int app_shutdown(void) {
 
   return CMP_SUCCESS;
 }
-

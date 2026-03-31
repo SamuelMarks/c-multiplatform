@@ -8,7 +8,8 @@
 
 /* Forward declare Windows APIs to avoid <windows.h> */
 __declspec(dllimport) void *__stdcall LoadLibraryA(const char *lpLibFileName);
-__declspec(dllimport) void *__stdcall GetProcAddress(void *hModule, const char *lpProcName);
+typedef int (__stdcall *FARPROC_t)(void);
+__declspec(dllimport) FARPROC_t __stdcall GetProcAddress(void *hModule, const char *lpProcName);
 __declspec(dllimport) unsigned short __stdcall RtlCaptureStackBackTrace(unsigned long FramesToSkip, unsigned long FramesToCapture, void **BackTrace, unsigned long *BackTraceHash);
 __declspec(dllimport) void *__stdcall GetCurrentProcess(void);
 

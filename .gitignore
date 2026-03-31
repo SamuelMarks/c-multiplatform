@@ -97,3 +97,9 @@ UNCOVERED.md
 /test_*.c
 /file*
 /llms.txt
+
+/...
+/bld*/
+/cmake/
+/run_my_test.ps1
+/test_*/

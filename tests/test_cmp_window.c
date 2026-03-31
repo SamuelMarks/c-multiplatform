@@ -375,6 +375,41 @@ TEST test_theme_and_visual_regression_apis(void) {
   PASS();
 }
 
+TEST test_pointer_lock(void) {
+  int res;
+  cmp_window_t *window = NULL;
+  cmp_window_config_t config;
+
+  res = cmp_window_system_init();
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  config.title = "Pointer Lock Test";
+  config.width = 800;
+  config.height = 600;
+
+  res = cmp_window_create(&config, &window);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  res = cmp_window_set_pointer_lock(window, CMP_POINTER_LOCKED);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  res = cmp_window_set_pointer_lock(window, CMP_POINTER_LOCKED_HIDDEN);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  res = cmp_window_set_pointer_lock(window, CMP_POINTER_UNLOCKED);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  res = cmp_window_set_pointer_lock(NULL, CMP_POINTER_LOCKED);
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
+
+  res = cmp_window_destroy(window);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  res = cmp_window_system_shutdown();
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+  PASS();
+}
+
 SUITE(window_suite) {
   RUN_TEST(test_window_lifecycle);
   RUN_TEST(test_window_drop_callback);
@@ -387,6 +422,7 @@ SUITE(window_suite) {
   RUN_TEST(test_sdl3_fallback_apis);
   RUN_TEST(test_scripting_apis);
   RUN_TEST(test_theme_and_visual_regression_apis);
+  RUN_TEST(test_pointer_lock);
 }
 GREATEST_MAIN_DEFS();
 

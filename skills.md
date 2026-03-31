@@ -1,5 +1,9 @@
 # C-Multiplatform Agent Skills & Mandates
 
+**Purpose:** This document provides explicit execution "skills" and workflow mandates for Large Language Models and AI agents working in the `c-multiplatform` repository.
+**Current State:** The repository is a strict C89 UI framework with custom allocators, explicit error handling, and decoupled UI/layout/rendering trees.
+**Upcoming Features:** Agents must be aware that the framework is currently expanding to implement rigorous, pixel-perfect design systems: **Material 3, Cupertino / HIG, and Fluent 2**. When generating UI code or styling, agents should prepare for and align with these incoming architectural tokens and compliance matrices.
+
 This document provides explicit execution "skills" and workflow mandates for Large Language Models and AI agents working in the `c-multiplatform` repository. Adhere to these constraints flawlessly to ensure the codebase remains strictly compatible, leak-free, and idiomatically aligned with its C89 architecture.
 
 ---
@@ -15,9 +19,9 @@ You are operating in an environment where modern C conventions will break legacy
 ## Skill 2: Memory Management & Leak Tracking
 LibCMPC manages its own memory to guarantee zero GC pauses and catch leaks at runtime.
 - **Rule**: NEVER use `malloc`, `calloc`, `realloc`, or `free` directly.
-- **Implementation**: 
+- **Implementation**:
   - For standard dynamic heap allocations, use `CMP_MALLOC(size, &out_ptr)` and `CMP_FREE(ptr)`. These macros track allocations with file/line numbers.
-  - For scoped or frame-based data, utilize the arena allocator: `cmp_arena_alloc(&arena, size, &out_ptr)`.
+  - For scoped or frame-based data, utilize the arena allocator: `cmp_arena_alloc(&arena, size, &out_ptr)`.     
   - For high-frequency, fixed-size structs (like layout calculations or UI nodes), use the pool allocator: `cmp_pool_alloc(&pool, &out_ptr)`.
 - **Validation**: Ensure all allocated memory has a clear ownership model and is explicitly freed. Tests run `cmp_mem_check_leaks()` at the end, and the CI will fail if it returns > 0.
 
@@ -28,7 +32,7 @@ LibCMPC uses a strict return-code contract to propagate errors safely without ex
   - `0` or `CMP_SUCCESS` indicates success.
   - Non-zero values (`CMP_ERROR_OOM`, `CMP_ERROR_INVALID_ARG`, `CMP_ERROR_NOT_FOUND`) indicate failure.
   - Always return output data via pointer arguments.
-  - **Example**: `int cmp_ui_box_create(cmp_ui_node_t **out_node)` NOT `cmp_ui_node_t* cmp_ui_box_create()`.
+  - **Example**: `int cmp_ui_box_create(cmp_ui_node_t **out_node)` NOT `cmp_ui_node_t* cmp_ui_box_create()`.    
 
 ## Skill 4: UI & Layout Construction
 The framework completely decouples the logical UI tree, the mathematical Layout tree, and the Graphical renderer.
@@ -37,7 +41,7 @@ The framework completely decouples the logical UI tree, the mathematical Layout 
   - Construct the UI tree using `cmp_ui_node_t` elements (`cmp_ui_box_create`, `cmp_ui_text_create`, `cmp_ui_button_create`).
   - Append children using `cmp_ui_node_add_child`.
   - Apply styling and dimensions via the Flexbox properties on the UI nodes.
-  - The framework's `cmp_layout_node_t` engine will automatically calculate X/Y bounds during the tick phase.
+  - The framework's `cmp_layout_node_t` engine will automatically calculate X/Y bounds during the tick phase.   
   - Bind reactive data to `c-orm` observables using `cmp_ui_node_bind`.
 
 ## Skill 5: Modality & Concurrency Engine

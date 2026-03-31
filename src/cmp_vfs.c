@@ -11,7 +11,7 @@
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0501
 #endif
-#include <windows.h>
+#include <winsock2.h>
 #else
 #include <unistd.h>
 #include <pthread.h>
@@ -817,21 +817,25 @@ int cmp_vfs_get_standard_path(int type, cmp_string_t *out_path) {
       cmp_string_append(out_path, "."); /* Fallback */
     }
   }
-#else
+#elif defined(__linux__) || defined(__CYGWIN__)
   {
-    /* On POSIX we fallback to cache directory / var/lib / app_data
-       or let the installer decide later. For now just use '.' or AppData */
-    const char *home = getenv("HOME");
-    if (home != NULL) {
-      cmp_string_append(out_path, home);
-#if defined(__APPLE__)
-      cmp_string_append(out_path, "/Library/Application Support/cmp");
-#else
-      cmp_string_append(out_path, "/.local/share/cmp");
-#endif
+    char exe_buf[1024];
+    ssize_t len = readlink("/proc/self/exe", exe_buf, sizeof(exe_buf) - 1);
+    if (len != -1) {
+      char *last_slash;
+      exe_buf[len] = '\0';
+      last_slash = strrchr(exe_buf, '/');
+      if (last_slash) {
+        *last_slash = '\0';
+      }
+      cmp_string_append(out_path, exe_buf);
     } else {
       cmp_string_append(out_path, "."); /* Fallback */
     }
+  }
+#else
+  {
+    cmp_string_append(out_path, "."); /* Fallback */
   }
 #endif
   break;

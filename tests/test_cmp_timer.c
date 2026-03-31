@@ -29,7 +29,7 @@ static void test_timer_func(void *arg) {
 }
 
 TEST test_timer_lifecycle(void) {
-  cmp_timer_t *timer = NULL;
+  cmp_timer_t *timer;
   test_timer_ctx_t ctx;
   int res;
 
