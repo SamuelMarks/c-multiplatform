@@ -10,6 +10,6 @@ jobs:
   build:
     uses: SamuelMarks/c-ci/.github/workflows/c-cmake-ci.yml@master
     with:
-      extra_apt_packages: "libcurl4-openssl-dev pkg-config"
-      extra_brew_packages: "curl pkg-config"
-      extra_winget_packages: "curl.curl pkg-config"
+      extra_apt_packages: "libcurl4-openssl-dev pkg-config libssl-dev"
+      extra_brew_packages: "curl pkg-config openssl"
+#      extra_winget_packages: "curl.curl pkg-config OpenSSL.OpenSSL"

@@ -175,6 +175,47 @@ if(NOT APPLE AND NOT WIN32 AND NOT MINGW AND NOT CYGWIN)
     endif()
 endif()
 
+# openssl dependency
+find_package(OpenSSL CONFIG QUIET)
+if(NOT OPENSSL_FOUND)
+    find_package(OpenSSL QUIET)
+endif()
+if(NOT OPENSSL_FOUND)
+    find_package(PkgConfig QUIET)
+    if(PKG_CONFIG_FOUND)
+        pkg_check_modules(OPENSSL QUIET openssl)
+        if(OPENSSL_FOUND)
+            # Map PkgConfig variables to find_package names
+            set(OPENSSL_LIBRARIES ${OPENSSL_LINK_LIBRARIES})
+            set(OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIRS})
+            set(OPENSSL_VERSION ${OPENSSL_VERSION})
+        endif()
+    endif()
+endif()
+
+if(NOT OPENSSL_FOUND)
+    # Manual system path fallback
+    find_path(OPENSSL_INCLUDE_DIR NAMES openssl/ssl.h PATHS /usr/local/include /usr/include)
+    find_library(OPENSSL_SSL_LIBRARY NAMES ssl libssl PATHS /usr/local/lib /usr/lib)
+    find_library(OPENSSL_CRYPTO_LIBRARY NAMES crypto libcrypto PATHS /usr/local/lib /usr/lib)
+    if(OPENSSL_INCLUDE_DIR AND OPENSSL_SSL_LIBRARY AND OPENSSL_CRYPTO_LIBRARY)
+        set(OPENSSL_FOUND TRUE)
+        set(OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
+        set(OPENSSL_LIBRARIES ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
+        message(STATUS "Found OpenSSL manually: ${OPENSSL_LIBRARIES}")
+    endif()
+endif()
+
+if(OPENSSL_FOUND)
+    set(C_ABSTRACT_HTTP_USE_OPENSSL ON CACHE BOOL "Use OpenSSL for cryptography" FORCE)
+endif()
+
+if(NOT APPLE AND NOT WIN32 AND NOT MINGW AND NOT CYGWIN)
+    if(NOT OPENSSL_FOUND)
+        message(FATAL_ERROR "openssl not found")
+    endif()
+endif()
+
 # c-abstract-http
 set(C_ABSTRACT_HTTP_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 set(C_ABSTRACT_HTTP_ENABLE_WEBSOCKETS ON CACHE BOOL "" FORCE)
