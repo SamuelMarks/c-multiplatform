@@ -137,6 +137,25 @@ FetchContent_Declare(parson GIT_REPOSITORY https://github.com/kgabis/parson.git 
     )
 FetchContent_MakeAvailable(parson)
 
+# curl dependency
+find_package(CURL CONFIG QUIET)
+if(NOT CURL_FOUND)
+    find_package(CURL QUIET)
+endif()
+if(NOT CURL_FOUND)
+    find_package(PkgConfig QUIET)
+    if(PKG_CONFIG_FOUND)
+        pkg_check_modules(CURL QUIET libcurl)
+    endif()
+endif()
+
+if(NOT APPLE AND NOT WIN32 AND NOT MINGW AND NOT CYGWIN)
+    if(CURL_FOUND)
+        set(C_ABSTRACT_HTTP_USE_LIBCURL ON CACHE BOOL "Use libcurl backend for abstract-http" FORCE)
+    else()
+        message(FATAL_ERROR "curl not found")
+    endif()
+endif()
 
 # c-abstract-http
 set(C_ABSTRACT_HTTP_BUILD_TESTING OFF CACHE BOOL "" FORCE)
