@@ -144,9 +144,75 @@ TEST test_router_dynamic_params(void) {
   PASS();
 }
 
+void *dummy_builder(const char *route_params) {
+  (void)route_params;
+  return NULL;
+}
+
+TEST test_routing_styles(void) {
+  cmp_router_t *router = NULL;
+  char title[128];
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_create(&router));
+
+  /* Mock register paths */
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_router_register(router, "/home", dummy_builder, NULL, NULL));
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_register(router, "/settings", dummy_builder,
+                                             NULL, NULL));
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_router_register(router, "/details", dummy_builder, NULL, NULL));
+
+  /* Push with presentation style */
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_push_with_style(
+                             router, "/home", CMP_PRESENTATION_STYLE_PUSH));
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_router_push_with_style(router, "/settings",
+                                       CMP_PRESENTATION_STYLE_SHEET));
+
+  /* Get Previous Title (Back button label) */
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_get_previous_title(router, title, 128));
+  ASSERT_STR_EQ("/home", title);
+
+  /* Pop */
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_pop_with_style(router));
+
+  /* Cannot get previous if only 1 item on stack */
+  ASSERT_EQ(CMP_ERROR_NOT_FOUND,
+            cmp_router_get_previous_title(router, title, 128));
+
+  /* Tab switching flushes stack */
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_push_with_style(
+                             router, "/details", CMP_PRESENTATION_STYLE_PUSH));
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_switch_tab(router, "/settings"));
+
+  ASSERT_EQ(CMP_ERROR_NOT_FOUND,
+            cmp_router_get_previous_title(router, title, 128));
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_destroy(router));
+  PASS();
+}
+
+TEST test_split_view(void) {
+  cmp_split_view_t *sv = NULL;
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_split_view_create(&sv));
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_split_view_set_routes(sv, "/master", "/detail"));
+
+  /* Bounds */
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_split_view_set_routes(NULL, "/m", "/d"));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_split_view_set_routes(sv, NULL, NULL));
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_split_view_destroy(sv));
+  PASS();
+}
+
 SUITE(router_suite) {
   RUN_TEST(test_router_lifecycle);
   RUN_TEST(test_router_navigation);
+  RUN_TEST(test_routing_styles);
+  RUN_TEST(test_split_view);
   RUN_TEST(test_router_dynamic_params);
 }
 

@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.14)
 project(c-multiplatform C)
 
+if(CYGWIN)
+    add_compile_definitions(_vsnprintf=vsnprintf _snprintf=snprintf)
+endif()
+
 set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -344,7 +348,7 @@ set(CMP_SOURCES
     src/cmp_ime.c
     src/cmp_spellcheck.c
     src/cmp_undo_redo.c
-    src/cmp_a11y_tree.c
+        src/cmp_a11y_tree.c
     src/cmp_screen_reader.c
     src/cmp_aria.c
     src/cmp_aria_relations.c
@@ -353,6 +357,29 @@ set(CMP_SOURCES
     src/cmp_focus_ring.c
     src/cmp_a11y_rotor.c
     src/cmp_a11y_action.c
+    src/cmp_auth_sec.c
+    src/cmp_permissions.c
+    src/cmp_promotion_link.c
+    src/cmp_spring_animator.c
+    src/cmp_system_geometry.c
+    src/cmp_symbols.c
+    src/cmp_gamepad_hig.c
+    src/cmp_stylus.c
+    src/cmp_keyboard_hig.c
+    src/cmp_complex_gesture_hig.c
+    src/cmp_collections.c
+    src/cmp_scroll_view.c
+    src/cmp_lists.c
+    src/cmp_text_fields.c
+    src/cmp_inputs.c
+    src/cmp_menu.c
+    src/cmp_system_button.c
+    src/cmp_deep_link.c
+    src/cmp_search_bar.c
+    src/cmp_tab_bar.c
+    src/cmp_nav_bar.c
+    src/cmp_materials.c
+    src/cmp_system_fonts.c
     src/cmp_dynamic_type.c
     src/cmp_prefers_reduced_motion.c
     src/cmp_a11y_transparency.c
@@ -362,8 +389,28 @@ set(CMP_SOURCES
     src/cmp_app_region.c
     src/cmp_clipboard.c
     src/cmp_csp.c
+    src/cmp_app_store_compliance.c
+    src/cmp_resilience_handling.c
+    src/cmp_resource_manager.c
+    src/cmp_documentation_dx.c
+    src/cmp_developer_experience.c
+    src/cmp_profiling_telemetry.c
+    src/cmp_testing_automation.c
+    src/cmp_interop_swift.c
+    src/cmp_carplay_specific.c
+    src/cmp_visionos_specific.c
+    src/cmp_tvos_specific.c
+    src/cmp_watchos_specific.c
+    src/cmp_macos_specific.c
+    src/cmp_ipados_specific.c
+    src/cmp_ios_specific.c
+    src/cmp_transactions_hig.c
+    src/cmp_media_avkit.c
+    src/cmp_os_communications.c
+    src/cmp_extensions.c
     src/cmp_dnd.c
     src/cmp_haptics.c
+    src/cmp_i18n_formatting.c
     src/cmp_i18n.c
     src/cmp_native_dialog.c
     src/cmp_network.c
@@ -671,6 +718,52 @@ target_link_libraries(cmp_a11y_rotor_test PRIVATE cmp greatest)
 add_executable(cmp_a11y_action_test tests/test_cmp_a11y_action.c)
 target_link_libraries(cmp_a11y_action_test PRIVATE cmp greatest)
 
+add_executable(cmp_auth_sec_test tests/test_cmp_auth_sec.c)
+target_link_libraries(cmp_auth_sec_test PRIVATE cmp greatest)
+add_executable(cmp_permissions_test tests/test_cmp_permissions.c)
+target_link_libraries(cmp_permissions_test PRIVATE cmp greatest)
+add_executable(cmp_promotion_link_test tests/test_cmp_promotion_link.c)
+target_link_libraries(cmp_promotion_link_test PRIVATE cmp greatest)
+add_executable(cmp_spring_animator_test tests/test_cmp_spring_animator.c)
+target_link_libraries(cmp_spring_animator_test PRIVATE cmp greatest)
+add_executable(cmp_system_geometry_test tests/test_cmp_system_geometry.c)
+target_link_libraries(cmp_system_geometry_test PRIVATE cmp greatest)
+add_executable(cmp_symbols_test tests/test_cmp_symbols.c)
+target_link_libraries(cmp_symbols_test PRIVATE cmp greatest)
+add_executable(cmp_gamepad_hig_test tests/test_cmp_gamepad_hig.c)
+target_link_libraries(cmp_gamepad_hig_test PRIVATE cmp greatest)
+add_executable(cmp_stylus_test tests/test_cmp_stylus.c)
+target_link_libraries(cmp_stylus_test PRIVATE cmp greatest)
+add_executable(cmp_keyboard_hig_test tests/test_cmp_keyboard_hig.c)
+target_link_libraries(cmp_keyboard_hig_test PRIVATE cmp greatest)
+add_executable(cmp_complex_gesture_hig_test tests/test_cmp_complex_gesture_hig.c)
+target_link_libraries(cmp_complex_gesture_hig_test PRIVATE cmp greatest)
+add_executable(cmp_collections_test tests/test_cmp_collections.c)
+target_link_libraries(cmp_collections_test PRIVATE cmp greatest)
+add_executable(cmp_scroll_view_test tests/test_cmp_scroll_view.c)
+target_link_libraries(cmp_scroll_view_test PRIVATE cmp greatest)
+add_executable(cmp_lists_test tests/test_cmp_lists.c)
+target_link_libraries(cmp_lists_test PRIVATE cmp greatest)
+add_executable(cmp_text_fields_test tests/test_cmp_text_fields.c)
+target_link_libraries(cmp_text_fields_test PRIVATE cmp greatest)
+add_executable(cmp_inputs_test tests/test_cmp_inputs.c)
+target_link_libraries(cmp_inputs_test PRIVATE cmp greatest)
+add_executable(cmp_menu_test tests/test_cmp_menu.c)
+target_link_libraries(cmp_menu_test PRIVATE cmp greatest)
+add_executable(cmp_system_button_test tests/test_cmp_system_button.c)
+target_link_libraries(cmp_system_button_test PRIVATE cmp greatest)
+add_executable(cmp_deep_link_test tests/test_cmp_deep_link.c)
+target_link_libraries(cmp_deep_link_test PRIVATE cmp greatest)
+add_executable(cmp_search_bar_test tests/test_cmp_search_bar.c)
+target_link_libraries(cmp_search_bar_test PRIVATE cmp greatest)
+add_executable(cmp_tab_bar_test tests/test_cmp_tab_bar.c)
+target_link_libraries(cmp_tab_bar_test PRIVATE cmp greatest)
+add_executable(cmp_nav_bar_test tests/test_cmp_nav_bar.c)
+target_link_libraries(cmp_nav_bar_test PRIVATE cmp greatest)
+add_executable(cmp_materials_test tests/test_cmp_materials.c)
+target_link_libraries(cmp_materials_test PRIVATE cmp greatest)
+add_executable(cmp_system_fonts_test tests/test_cmp_system_fonts.c)
+target_link_libraries(cmp_system_fonts_test PRIVATE cmp greatest)
 add_executable(cmp_dynamic_type_test tests/test_cmp_dynamic_type.c)
 target_link_libraries(cmp_dynamic_type_test PRIVATE cmp greatest)
 
@@ -697,6 +790,44 @@ add_executable(cmp_clipboard_test tests/test_cmp_clipboard.c)
 target_link_libraries(cmp_clipboard_test PRIVATE cmp greatest)
 add_executable(cmp_csp_test tests/test_cmp_csp.c)
 target_link_libraries(cmp_csp_test PRIVATE cmp greatest)
+add_executable(cmp_app_store_compliance_test tests/test_cmp_app_store_compliance.c)
+target_link_libraries(cmp_app_store_compliance_test PRIVATE cmp greatest)
+add_executable(cmp_resilience_handling_test tests/test_cmp_resilience_handling.c)
+target_link_libraries(cmp_resilience_handling_test PRIVATE cmp greatest)
+add_executable(cmp_resource_manager_test tests/test_cmp_resource_manager.c)
+target_link_libraries(cmp_resource_manager_test PRIVATE cmp greatest)
+add_executable(cmp_documentation_dx_test tests/test_cmp_documentation_dx.c)
+target_link_libraries(cmp_documentation_dx_test PRIVATE cmp greatest)
+add_executable(cmp_developer_experience_test tests/test_cmp_developer_experience.c)
+target_link_libraries(cmp_developer_experience_test PRIVATE cmp greatest)
+add_executable(cmp_profiling_telemetry_test tests/test_cmp_profiling_telemetry.c)
+target_link_libraries(cmp_profiling_telemetry_test PRIVATE cmp greatest)
+add_executable(cmp_testing_automation_test tests/test_cmp_testing_automation.c)
+target_link_libraries(cmp_testing_automation_test PRIVATE cmp greatest)
+add_executable(cmp_interop_swift_test tests/test_cmp_interop_swift.c)
+target_link_libraries(cmp_interop_swift_test PRIVATE cmp greatest)
+add_executable(cmp_carplay_specific_test tests/test_cmp_carplay_specific.c)
+target_link_libraries(cmp_carplay_specific_test PRIVATE cmp greatest)
+add_executable(cmp_visionos_specific_test tests/test_cmp_visionos_specific.c)
+target_link_libraries(cmp_visionos_specific_test PRIVATE cmp greatest)
+add_executable(cmp_tvos_specific_test tests/test_cmp_tvos_specific.c)
+target_link_libraries(cmp_tvos_specific_test PRIVATE cmp greatest)
+add_executable(cmp_watchos_specific_test tests/test_cmp_watchos_specific.c)
+target_link_libraries(cmp_watchos_specific_test PRIVATE cmp greatest)
+add_executable(cmp_macos_specific_test tests/test_cmp_macos_specific.c)
+target_link_libraries(cmp_macos_specific_test PRIVATE cmp greatest)
+add_executable(cmp_ipados_specific_test tests/test_cmp_ipados_specific.c)
+target_link_libraries(cmp_ipados_specific_test PRIVATE cmp greatest)
+add_executable(cmp_ios_specific_test tests/test_cmp_ios_specific.c)
+target_link_libraries(cmp_ios_specific_test PRIVATE cmp greatest)
+add_executable(cmp_transactions_hig_test tests/test_cmp_transactions_hig.c)
+target_link_libraries(cmp_transactions_hig_test PRIVATE cmp greatest)
+add_executable(cmp_media_avkit_test tests/test_cmp_media_avkit.c)
+target_link_libraries(cmp_media_avkit_test PRIVATE cmp greatest)
+add_executable(cmp_os_communications_test tests/test_cmp_os_communications.c)
+target_link_libraries(cmp_os_communications_test PRIVATE cmp greatest)
+add_executable(cmp_extensions_test tests/test_cmp_extensions.c)
+target_link_libraries(cmp_extensions_test PRIVATE cmp greatest)
 add_executable(cmp_dnd_test tests/test_cmp_dnd.c)
 target_link_libraries(cmp_dnd_test PRIVATE cmp greatest)
 add_executable(cmp_flex_align_test tests/test_cmp_flex_align.c)
@@ -707,6 +838,8 @@ add_executable(cmp_grid_test tests/test_cmp_grid.c)
 target_link_libraries(cmp_grid_test PRIVATE cmp greatest)
 add_executable(cmp_haptics_test tests/test_cmp_haptics.c)
 target_link_libraries(cmp_haptics_test PRIVATE cmp greatest)
+add_executable(cmp_i18n_formatting_test tests/test_cmp_i18n_formatting.c)
+target_link_libraries(cmp_i18n_formatting_test PRIVATE cmp greatest)
 add_executable(cmp_i18n_test tests/test_cmp_i18n.c)
 target_link_libraries(cmp_i18n_test PRIVATE cmp greatest)
 add_executable(cmp_media_query_test tests/test_cmp_media_query.c)
@@ -834,6 +967,29 @@ add_test(NAME cmp_focus_manager_test COMMAND cmp_focus_manager_test)
 add_test(NAME cmp_focus_ring_test COMMAND cmp_focus_ring_test)
 add_test(NAME cmp_a11y_rotor_test COMMAND cmp_a11y_rotor_test)
 add_test(NAME cmp_a11y_action_test COMMAND cmp_a11y_action_test)
+add_test(NAME cmp_auth_sec_test COMMAND cmp_auth_sec_test)
+add_test(NAME cmp_permissions_test COMMAND cmp_permissions_test)
+add_test(NAME cmp_promotion_link_test COMMAND cmp_promotion_link_test)
+add_test(NAME cmp_spring_animator_test COMMAND cmp_spring_animator_test)
+add_test(NAME cmp_system_geometry_test COMMAND cmp_system_geometry_test)
+add_test(NAME cmp_symbols_test COMMAND cmp_symbols_test)
+add_test(NAME cmp_gamepad_hig_test COMMAND cmp_gamepad_hig_test)
+add_test(NAME cmp_stylus_test COMMAND cmp_stylus_test)
+add_test(NAME cmp_keyboard_hig_test COMMAND cmp_keyboard_hig_test)
+add_test(NAME cmp_complex_gesture_hig_test COMMAND cmp_complex_gesture_hig_test)
+add_test(NAME cmp_collections_test COMMAND cmp_collections_test)
+add_test(NAME cmp_scroll_view_test COMMAND cmp_scroll_view_test)
+add_test(NAME cmp_lists_test COMMAND cmp_lists_test)
+add_test(NAME cmp_text_fields_test COMMAND cmp_text_fields_test)
+add_test(NAME cmp_inputs_test COMMAND cmp_inputs_test)
+add_test(NAME cmp_menu_test COMMAND cmp_menu_test)
+add_test(NAME cmp_system_button_test COMMAND cmp_system_button_test)
+add_test(NAME cmp_deep_link_test COMMAND cmp_deep_link_test)
+add_test(NAME cmp_search_bar_test COMMAND cmp_search_bar_test)
+add_test(NAME cmp_tab_bar_test COMMAND cmp_tab_bar_test)
+add_test(NAME cmp_nav_bar_test COMMAND cmp_nav_bar_test)
+add_test(NAME cmp_materials_test COMMAND cmp_materials_test)
+add_test(NAME cmp_system_fonts_test COMMAND cmp_system_fonts_test)
 add_test(NAME cmp_dynamic_type_test COMMAND cmp_dynamic_type_test)
 add_test(NAME cmp_prefers_reduced_motion_test COMMAND cmp_prefers_reduced_motion_test)
 add_test(NAME cmp_a11y_transparency_test COMMAND cmp_a11y_transparency_test)
@@ -844,11 +1000,31 @@ add_test(NAME cmp_app_region_test COMMAND cmp_app_region_test)
 add_test(NAME cmp_borders_test COMMAND cmp_borders_test)
 add_test(NAME cmp_clipboard_test COMMAND cmp_clipboard_test)
 add_test(NAME cmp_csp_test COMMAND cmp_csp_test)
+add_test(NAME cmp_app_store_compliance_test COMMAND cmp_app_store_compliance_test)
+add_test(NAME cmp_resilience_handling_test COMMAND cmp_resilience_handling_test)
+add_test(NAME cmp_resource_manager_test COMMAND cmp_resource_manager_test)
+add_test(NAME cmp_documentation_dx_test COMMAND cmp_documentation_dx_test)
+add_test(NAME cmp_developer_experience_test COMMAND cmp_developer_experience_test)
+add_test(NAME cmp_profiling_telemetry_test COMMAND cmp_profiling_telemetry_test)
+add_test(NAME cmp_testing_automation_test COMMAND cmp_testing_automation_test)
+add_test(NAME cmp_interop_swift_test COMMAND cmp_interop_swift_test)
+add_test(NAME cmp_carplay_specific_test COMMAND cmp_carplay_specific_test)
+add_test(NAME cmp_visionos_specific_test COMMAND cmp_visionos_specific_test)
+add_test(NAME cmp_tvos_specific_test COMMAND cmp_tvos_specific_test)
+add_test(NAME cmp_watchos_specific_test COMMAND cmp_watchos_specific_test)
+add_test(NAME cmp_macos_specific_test COMMAND cmp_macos_specific_test)
+add_test(NAME cmp_ipados_specific_test COMMAND cmp_ipados_specific_test)
+add_test(NAME cmp_ios_specific_test COMMAND cmp_ios_specific_test)
+add_test(NAME cmp_transactions_hig_test COMMAND cmp_transactions_hig_test)
+add_test(NAME cmp_media_avkit_test COMMAND cmp_media_avkit_test)
+add_test(NAME cmp_os_communications_test COMMAND cmp_os_communications_test)
+add_test(NAME cmp_extensions_test COMMAND cmp_extensions_test)
 add_test(NAME cmp_dnd_test COMMAND cmp_dnd_test)
 add_test(NAME cmp_flex_align_test COMMAND cmp_flex_align_test)
 add_test(NAME cmp_flow_test COMMAND cmp_flow_test)
 add_test(NAME cmp_grid_test COMMAND cmp_grid_test)
 add_test(NAME cmp_haptics_test COMMAND cmp_haptics_test)
+add_test(NAME cmp_i18n_formatting_test COMMAND cmp_i18n_formatting_test)
 add_test(NAME cmp_i18n_test COMMAND cmp_i18n_test)
 add_test(NAME cmp_media_query_test COMMAND cmp_media_query_test)
 add_test(NAME cmp_native_dialog_test COMMAND cmp_native_dialog_test)
@@ -874,7 +1050,7 @@ if(CMP_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
-set_tests_properties(cmp_test cmp_string_test cmp_tls_test cmp_ring_buffer_test cmp_modality_single_test cmp_modality_threaded_test cmp_modality_async_test cmp_sync_test cmp_coroutine_test cmp_timer_test cmp_vfs_test cmp_http_test cmp_orm_test cmp_window_test cmp_window_manager_test cmp_dpi_test cmp_event_test cmp_router_test cmp_layout_test cmp_ui_test cmp_svg_test cmp_gpu_test cmp_shader_test cmp_shader_cache_test cmp_msaa_test cmp_linear_blend_test cmp_tex_compression_test cmp_mipmap_test cmp_swapchain_test cmp_overdraw_test cmp_layer_tiling_test cmp_hit_test_test cmp_pointer_events_test cmp_event_bubbling_test cmp_passive_event_test cmp_pointer_capture_test cmp_gesture_test cmp_complex_gesture_test cmp_pointer_pressure_test cmp_touch_action_test cmp_context_menu_test cmp_hover_intent_test cmp_scroll_ctx_test cmp_scroll_velocity_test cmp_kinematics_test cmp_scrollbar_gutter_test cmp_scroll_anchor_test cmp_ptr_test cmp_tick_test cmp_dt_test cmp_transition_test cmp_keyframe_test cmp_anim_compose_test cmp_spring_ease_test cmp_bezier_ease_test cmp_step_ease_test cmp_motion_path_test cmp_scroll_timeline_test cmp_view_transition_test cmp_vt_shared_test cmp_discrete_transition_test cmp_flip_test cmp_form_controls_test cmp_validation_test cmp_input_mask_test cmp_indeterminate_test cmp_select_ui_test cmp_datalist_test cmp_range_slider_test cmp_color_picker_test cmp_date_picker_test cmp_caret_test cmp_selection_test cmp_editable_test cmp_ime_test cmp_spellcheck_test cmp_undo_redo_test cmp_a11y_tree_test cmp_screen_reader_test cmp_aria_test cmp_aria_relations_test cmp_aria_live_test cmp_focus_manager_test cmp_focus_ring_test cmp_a11y_rotor_test cmp_a11y_action_test cmp_dynamic_type_test cmp_prefers_reduced_motion_test cmp_a11y_transparency_test cmp_forced_colors_test cmp_sys_colors_test cmp_compositor_anim_test cmp_app_region_test cmp_borders_test cmp_clipboard_test cmp_csp_test cmp_dnd_test cmp_flex_align_test cmp_flow_test cmp_grid_test cmp_haptics_test cmp_i18n_test cmp_media_query_test cmp_native_dialog_test cmp_network_test cmp_pip_test cmp_position_test cmp_prefers_color_scheme_test cmp_print_ctx_test cmp_safe_areas_test cmp_system_menu_test cmp_titlebar_env_test cmp_visuals_test cmp_window_blur_test cmp_error_test cmp_error_test_crash cmp_error_test_assert PROPERTIES ENVIRONMENT "${TEST_ENV_VARS}")
+set_tests_properties(cmp_test cmp_string_test cmp_tls_test cmp_ring_buffer_test cmp_modality_single_test cmp_modality_threaded_test cmp_modality_async_test cmp_sync_test cmp_coroutine_test cmp_timer_test cmp_vfs_test cmp_http_test cmp_orm_test cmp_window_test cmp_window_manager_test cmp_dpi_test cmp_event_test cmp_router_test cmp_layout_test cmp_ui_test cmp_svg_test cmp_gpu_test cmp_shader_test cmp_shader_cache_test cmp_msaa_test cmp_linear_blend_test cmp_tex_compression_test cmp_mipmap_test cmp_swapchain_test cmp_overdraw_test cmp_layer_tiling_test cmp_hit_test_test cmp_pointer_events_test cmp_event_bubbling_test cmp_passive_event_test cmp_pointer_capture_test cmp_gesture_test cmp_complex_gesture_test cmp_pointer_pressure_test cmp_touch_action_test cmp_context_menu_test cmp_hover_intent_test cmp_scroll_ctx_test cmp_scroll_velocity_test cmp_kinematics_test cmp_scrollbar_gutter_test cmp_scroll_anchor_test cmp_ptr_test cmp_tick_test cmp_dt_test cmp_transition_test cmp_keyframe_test cmp_anim_compose_test cmp_spring_ease_test cmp_bezier_ease_test cmp_step_ease_test cmp_motion_path_test cmp_scroll_timeline_test cmp_view_transition_test cmp_vt_shared_test cmp_discrete_transition_test cmp_flip_test cmp_form_controls_test cmp_validation_test cmp_input_mask_test cmp_indeterminate_test cmp_select_ui_test cmp_datalist_test cmp_range_slider_test cmp_color_picker_test cmp_date_picker_test cmp_caret_test cmp_selection_test cmp_editable_test cmp_ime_test cmp_spellcheck_test cmp_undo_redo_test cmp_a11y_tree_test cmp_screen_reader_test cmp_aria_test cmp_aria_relations_test cmp_aria_live_test cmp_focus_manager_test cmp_focus_ring_test cmp_a11y_rotor_test cmp_a11y_action_test cmp_dynamic_type_test cmp_system_fonts_test cmp_materials_test cmp_nav_bar_test cmp_tab_bar_test cmp_search_bar_test cmp_deep_link_test cmp_system_button_test cmp_menu_test cmp_inputs_test cmp_text_fields_test cmp_lists_test cmp_scroll_view_test cmp_collections_test cmp_complex_gesture_hig_test cmp_keyboard_hig_test cmp_stylus_test cmp_gamepad_hig_test cmp_symbols_test cmp_system_geometry_test cmp_spring_animator_test cmp_promotion_link_test cmp_permissions_test cmp_auth_sec_test cmp_prefers_reduced_motion_test cmp_a11y_transparency_test cmp_forced_colors_test cmp_sys_colors_test cmp_compositor_anim_test cmp_app_region_test cmp_borders_test cmp_clipboard_test cmp_csp_test cmp_dnd_test cmp_extensions_test cmp_os_communications_test cmp_media_avkit_test cmp_transactions_hig_test cmp_ios_specific_test cmp_ipados_specific_test cmp_macos_specific_test cmp_watchos_specific_test cmp_tvos_specific_test cmp_visionos_specific_test cmp_carplay_specific_test cmp_interop_swift_test cmp_testing_automation_test cmp_profiling_telemetry_test cmp_developer_experience_test cmp_documentation_dx_test cmp_resource_manager_test cmp_resilience_handling_test cmp_app_store_compliance_test cmp_flex_align_test cmp_flow_test cmp_grid_test cmp_haptics_test cmp_i18n_test cmp_i18n_formatting_test cmp_media_query_test cmp_native_dialog_test cmp_network_test cmp_pip_test cmp_position_test cmp_prefers_color_scheme_test cmp_print_ctx_test cmp_safe_areas_test cmp_system_menu_test cmp_titlebar_env_test cmp_visuals_test cmp_window_blur_test cmp_error_test cmp_error_test_crash cmp_error_test_assert PROPERTIES ENVIRONMENT "${TEST_ENV_VARS}")
 
 
 

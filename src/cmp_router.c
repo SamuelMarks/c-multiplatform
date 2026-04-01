@@ -428,3 +428,127 @@ int cmp_os_register_uri_scheme(const char *scheme) {
 
   return CMP_SUCCESS;
 }
+
+int cmp_router_push_with_style(cmp_router_t *router, const char *uri,
+                               cmp_presentation_style_t style) {
+  if (!router || !uri)
+    return CMP_ERROR_INVALID_ARG;
+  /* Modifies internal vdom root mounting transitions (slide-left, slide-up
+   * sheet, crossfade) */
+  (void)style;
+  return cmp_router_push(router, uri); /* Uses base logic for now */
+}
+
+int cmp_router_pop_with_style(cmp_router_t *router) {
+  if (!router)
+    return CMP_ERROR_INVALID_ARG;
+  return cmp_router_pop(router);
+}
+
+int cmp_router_get_previous_title(cmp_router_t *router, char *out_title,
+                                  size_t title_cap) {
+  struct cmp_router *r = (struct cmp_router *)router;
+  if (!r || !out_title)
+    return CMP_ERROR_INVALID_ARG;
+
+  if (r->stack_count < 2) {
+    /* No previous view exists */
+    return CMP_ERROR_NOT_FOUND;
+  }
+
+  /* Simulating retrieving the <title> property from the previous route object
+   */
+#if defined(_MSC_VER)
+  strcpy_s(out_title, title_cap, r->stack[r->stack_count - 2]);
+#else
+  strcpy(out_title, r->stack[r->stack_count - 2]);
+#endif
+
+  return CMP_SUCCESS;
+}
+
+int cmp_router_switch_tab(cmp_router_t *router, const char *tab_uri) {
+  struct cmp_router *r = (struct cmp_router *)router;
+  size_t i;
+  if (!r || !tab_uri)
+    return CMP_ERROR_INVALID_ARG;
+
+  /* Clear down to just the root (index 0) and the new tab.
+     In a real tab layout, each tab has its own stack. For mock, just truncate
+     to root. */
+  for (i = 1; i < r->stack_count; ++i) {
+    CMP_FREE(r->stack[i]);
+  }
+  r->stack_count = 0; /* Flush all */
+
+  return cmp_router_push(router, tab_uri);
+}
+
+struct cmp_split_view {
+  char *master_route;
+  char *detail_route;
+};
+
+int cmp_split_view_create(cmp_split_view_t **out_split_view) {
+  struct cmp_split_view *ctx;
+  if (!out_split_view)
+    return CMP_ERROR_INVALID_ARG;
+  if (CMP_MALLOC(sizeof(struct cmp_split_view), (void **)&ctx) != CMP_SUCCESS)
+    return CMP_ERROR_OOM;
+
+  ctx->master_route = NULL;
+  ctx->detail_route = NULL;
+
+  *out_split_view = (cmp_split_view_t *)ctx;
+  return CMP_SUCCESS;
+}
+
+int cmp_split_view_destroy(cmp_split_view_t *split_view) {
+  struct cmp_split_view *ctx = (struct cmp_split_view *)split_view;
+  if (!ctx)
+    return CMP_SUCCESS;
+
+  if (ctx->master_route)
+    CMP_FREE(ctx->master_route);
+  if (ctx->detail_route)
+    CMP_FREE(ctx->detail_route);
+  CMP_FREE(ctx);
+  return CMP_SUCCESS;
+}
+
+int cmp_split_view_set_routes(cmp_split_view_t *split_view,
+                              const char *master_uri, const char *detail_uri) {
+  struct cmp_split_view *ctx = (struct cmp_split_view *)split_view;
+  size_t len;
+
+  if (!ctx || (!master_uri && !detail_uri))
+    return CMP_ERROR_INVALID_ARG;
+
+  if (master_uri) {
+    if (ctx->master_route)
+      CMP_FREE(ctx->master_route);
+    len = strlen(master_uri);
+    if (CMP_MALLOC(len + 1, (void **)&ctx->master_route) != CMP_SUCCESS)
+      return CMP_ERROR_OOM;
+#if defined(_MSC_VER)
+    strcpy_s(ctx->master_route, len + 1, master_uri);
+#else
+    strcpy(ctx->master_route, master_uri);
+#endif
+  }
+
+  if (detail_uri) {
+    if (ctx->detail_route)
+      CMP_FREE(ctx->detail_route);
+    len = strlen(detail_uri);
+    if (CMP_MALLOC(len + 1, (void **)&ctx->detail_route) != CMP_SUCCESS)
+      return CMP_ERROR_OOM;
+#if defined(_MSC_VER)
+    strcpy_s(ctx->detail_route, len + 1, detail_uri);
+#else
+    strcpy(ctx->detail_route, detail_uri);
+#endif
+  }
+
+  return CMP_SUCCESS;
+}

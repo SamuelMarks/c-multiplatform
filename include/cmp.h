@@ -1,6 +1,87 @@
 #ifndef CMP_H
 #define CMP_H
 
+/* Phase 12.1: C-Framework Bridging & Interoperability -> ABI Stability &
+ * Interfaces */
+
+/* If on Apple platforms, utilize clang/swift attributes to provide rich, safe
+ * importing into Swift */
+#if defined(__APPLE__) && defined(__has_feature)
+#if __has_feature(assume_nonnull)
+#define CMP_ASSUME_NONNULL_BEGIN _Pragma("clang assume_nonnull begin")
+#define CMP_ASSUME_NONNULL_END _Pragma("clang assume_nonnull end")
+#else
+#define CMP_ASSUME_NONNULL_BEGIN
+#define CMP_ASSUME_NONNULL_END
+#endif
+
+#if __has_feature(nullability)
+#define CMP_NONNULL _Nonnull
+#define CMP_NULLABLE _Nullable
+#define CMP_NULL_UNSPECIFIED _Null_unspecified
+#else
+#define CMP_NONNULL
+#define CMP_NULLABLE
+#define CMP_NULL_UNSPECIFIED
+#endif
+
+/* CoreFoundation enum equivalents mapped to NS_ENUM/NS_CLOSED_ENUM for Swift
+ * type-safety */
+#if __has_attribute(enum_extensibility)
+#define CMP_ENUM(_type, _name)                                                 \
+  enum __attribute__((enum_extensibility(open))) _name : _type _name;          \
+  enum _name : _type
+#define CMP_CLOSED_ENUM(_type, _name)                                          \
+  enum __attribute__((enum_extensibility(closed))) _name : _type _name;        \
+  enum _name : _type
+#else
+#define CMP_ENUM(_type, _name)                                                 \
+  _type _name;                                                                 \
+  enum
+#define CMP_CLOSED_ENUM(_type, _name)                                          \
+  _type _name;                                                                 \
+  enum
+#endif
+
+/* String typedef mapping to Swift Structs */
+#if __has_attribute(swift_wrapper)
+#define CMP_EXTENSIBLE_STRING_ENUM __attribute__((swift_wrapper(struct)))
+#else
+#define CMP_EXTENSIBLE_STRING_ENUM
+#endif
+
+/* Phase 12.2: Swift Refinements */
+#if __has_attribute(swift_private)
+#define CMP_REFINED_FOR_SWIFT __attribute__((swift_private))
+#else
+#define CMP_REFINED_FOR_SWIFT
+#endif
+
+#if __has_attribute(ns_returns_retained)
+#define CMP_RETURNS_RETAINED __attribute__((ns_returns_retained))
+#else
+#define CMP_RETURNS_RETAINED
+#endif
+
+#else /* Non-Apple fallbacks */
+
+#define CMP_ASSUME_NONNULL_BEGIN
+#define CMP_ASSUME_NONNULL_END
+#define CMP_NONNULL
+#define CMP_NULLABLE
+#define CMP_NULL_UNSPECIFIED
+#define CMP_ENUM(_type, _name)                                                 \
+  typedef _type _name;                                                         \
+  enum
+#define CMP_CLOSED_ENUM(_type, _name)                                          \
+  typedef _type _name;                                                         \
+  enum
+#define CMP_EXTENSIBLE_STRING_ENUM
+#define CMP_REFINED_FOR_SWIFT
+#define CMP_RETURNS_RETAINED
+
+#endif /* __APPLE__ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -1081,7 +1162,8 @@ int cmp_ui_node_set_pointer_events(cmp_ui_node_t *node,
 /**
  * @brief Get the pointer events state of a node
  * @param node The UI node to inspect
- * @return The pointer events state (cast to int), or an error/fallback state if invalid.
+ * @return The pointer events state (cast to int), or an error/fallback state if
+ * invalid.
  */
 int cmp_ui_node_get_pointer_events(cmp_ui_node_t *node);
 
@@ -1415,7 +1497,8 @@ int cmp_ui_node_set_touch_action(cmp_ui_node_t *node, uint32_t action);
 /**
  * @brief Retrieve the computed touch-action policy for a given UI node
  * @param node The UI node to inspect
- * @return The active touch action mask (cast to int), or CMP_TOUCH_ACTION_AUTO on failure
+ * @return The active touch action mask (cast to int), or CMP_TOUCH_ACTION_AUTO
+ * on failure
  */
 int cmp_ui_node_get_touch_action(const cmp_ui_node_t *node);
 
@@ -5486,6 +5569,286 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
                            const char *name);
 
 /**
+ * @brief Define standard a11y traits
+ */
+typedef enum cmp_a11y_trait {
+  CMP_A11Y_TRAIT_NONE = 0,
+  CMP_A11Y_TRAIT_BUTTON = 1 << 0,
+  CMP_A11Y_TRAIT_HEADER = 1 << 1,
+  CMP_A11Y_TRAIT_IMAGE = 1 << 2,
+  CMP_A11Y_TRAIT_LINK = 1 << 3,
+  CMP_A11Y_TRAIT_SEARCH_FIELD = 1 << 4,
+  CMP_A11Y_TRAIT_PLAYS_SOUND = 1 << 5,
+  CMP_A11Y_TRAIT_SELECTED = 1 << 6,
+  CMP_A11Y_TRAIT_NOT_ENABLED = 1 << 7
+} cmp_a11y_trait_t;
+
+/**
+ * @brief Set the a11y VoiceOver label of a node
+ */
+int cmp_a11y_tree_set_node_label(cmp_a11y_tree_t *tree, int node_id,
+                                 const char *label);
+
+/**
+ * @brief Set the a11y VoiceOver hint of a node
+ */
+int cmp_a11y_tree_set_node_hint(cmp_a11y_tree_t *tree, int node_id,
+                                const char *hint);
+
+/**
+ * @brief Set the a11y VoiceOver value of a node
+ */
+int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
+                                 const char *value);
+
+/**
+ * @brief Set the a11y VoiceOver traits of a node
+ */
+int cmp_a11y_tree_set_node_traits(cmp_a11y_tree_t *tree, int node_id,
+                                  uint32_t traits);
+
+/**
+ * @brief Group logically related elements into a single focusable VoiceOver
+ * node
+ */
+int cmp_a11y_tree_set_node_grouped(cmp_a11y_tree_t *tree, int node_id,
+                                   int is_grouped);
+
+/**
+ * @brief Add a custom VoiceOver action to expose swipe-actions or hidden
+ * buttons
+ */
+int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
+                                         const char *action_name);
+
+/**
+ * @brief Add a custom VoiceOver rotor to filter navigation by specific element
+ * types
+ */
+int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
+                                        const char *rotor_name);
+
+/**
+ * @brief Set the strict logical focus order of a node
+ */
+int cmp_a11y_tree_set_node_focus_order(cmp_a11y_tree_t *tree, int node_id,
+                                       int focus_order);
+
+/**
+ * @brief Enable braille screen input for text fields
+ */
+int cmp_a11y_tree_set_node_braille_input(cmp_a11y_tree_t *tree, int node_id,
+                                         int enabled);
+
+/**
+ * @brief Provide secondary audio descriptive tracks
+ */
+int cmp_a11y_tree_set_node_audio_description(cmp_a11y_tree_t *tree, int node_id,
+                                             const char *description_url);
+
+/**
+ * @brief Provide phonetic pronunciation guides for unusual words
+ */
+int cmp_a11y_tree_set_node_pronunciation(cmp_a11y_tree_t *tree, int node_id,
+                                         const char *pronunciation);
+
+/**
+ * @brief Allow direct interaction to bypass VoiceOver gestures
+ */
+int cmp_a11y_tree_set_node_direct_touch(cmp_a11y_tree_t *tree, int node_id,
+                                        int enabled);
+
+/**
+ * @brief Post an asynchronous a11y announcement
+ */
+int cmp_a11y_post_announcement(cmp_a11y_tree_t *tree, const char *announcement);
+
+/**
+ * @brief Dynamic Type Size Categories
+ */
+typedef enum cmp_a11y_content_size_category {
+  CMP_A11Y_CONTENT_SIZE_EXTRA_SMALL = 0,
+  CMP_A11Y_CONTENT_SIZE_SMALL,
+  CMP_A11Y_CONTENT_SIZE_MEDIUM,
+  CMP_A11Y_CONTENT_SIZE_LARGE, /* Default */
+  CMP_A11Y_CONTENT_SIZE_EXTRA_LARGE,
+  CMP_A11Y_CONTENT_SIZE_EXTRA_EXTRA_LARGE,
+  CMP_A11Y_CONTENT_SIZE_EXTRA_EXTRA_EXTRA_LARGE,
+  CMP_A11Y_CONTENT_SIZE_ACCESSIBILITY_MEDIUM,
+  CMP_A11Y_CONTENT_SIZE_ACCESSIBILITY_LARGE,
+  CMP_A11Y_CONTENT_SIZE_ACCESSIBILITY_EXTRA_LARGE,
+  CMP_A11Y_CONTENT_SIZE_ACCESSIBILITY_EXTRA_EXTRA_LARGE,
+  CMP_A11Y_CONTENT_SIZE_ACCESSIBILITY_EXTRA_EXTRA_EXTRA_LARGE
+} cmp_a11y_content_size_category_t;
+
+/**
+ * @brief Opaque Dynamic Type configuration structure
+ */
+typedef struct cmp_dynamic_type cmp_dynamic_type_t;
+
+/**
+ * @brief Create a Dynamic Type context
+ */
+int cmp_dynamic_type_create(cmp_dynamic_type_t **out_dynamic_type);
+
+/**
+ * @brief Destroy a Dynamic Type context
+ */
+int cmp_dynamic_type_destroy(cmp_dynamic_type_t *dynamic_type);
+
+/**
+ * @brief Set the current OS-level content size category
+ */
+int cmp_dynamic_type_set_category(cmp_dynamic_type_t *dynamic_type,
+                                  cmp_a11y_content_size_category_t category);
+
+/**
+ * @brief Apply dynamic scaling to a root font size based on category
+ */
+int cmp_dynamic_type_apply_scale(cmp_dynamic_type_t *dynamic_type,
+                                 float base_size, float *out_scaled_size);
+
+/**
+ * @brief Query if layout should reflow to vertical stacks (Accessibility sizes)
+ */
+int cmp_dynamic_type_should_reflow(cmp_dynamic_type_t *dynamic_type,
+                                   int *out_should_reflow);
+
+/**
+ * @brief Opaque Bold Text configuration structure
+ */
+typedef struct cmp_a11y_bold_text cmp_a11y_bold_text_t;
+
+/**
+ * @brief Create a Bold Text context
+ */
+int cmp_a11y_bold_text_create(cmp_a11y_bold_text_t **out_bold_text);
+
+/**
+ * @brief Destroy a Bold Text context
+ */
+int cmp_a11y_bold_text_destroy(cmp_a11y_bold_text_t *bold_text);
+
+/**
+ * @brief Set the current OS-level Bold Text setting
+ */
+int cmp_a11y_bold_text_set(cmp_a11y_bold_text_t *bold_text, int enabled);
+
+/**
+ * @brief Apply bold text weight adjustments
+ */
+int cmp_a11y_bold_text_apply(cmp_a11y_bold_text_t *bold_text, int base_weight,
+                             int *out_weight);
+
+/**
+ * @brief Opaque Button Shapes configuration structure
+ */
+typedef struct cmp_a11y_button_shapes cmp_a11y_button_shapes_t;
+
+/**
+ * @brief Create a Button Shapes context
+ */
+int cmp_a11y_button_shapes_create(cmp_a11y_button_shapes_t **out_button_shapes);
+
+/**
+ * @brief Destroy a Button Shapes context
+ */
+int cmp_a11y_button_shapes_destroy(cmp_a11y_button_shapes_t *button_shapes);
+
+/**
+ * @brief Set the current OS-level Button Shapes setting
+ */
+int cmp_a11y_button_shapes_set(cmp_a11y_button_shapes_t *button_shapes,
+                               int enabled);
+
+/**
+ * @brief Query if a button should draw explicit background shapes/underlines
+ */
+int cmp_a11y_button_shapes_should_draw(cmp_a11y_button_shapes_t *button_shapes,
+                                       int *out_should_draw);
+
+/**
+ * @brief Opaque Increase Contrast configuration structure
+ */
+typedef struct cmp_a11y_increase_contrast cmp_a11y_increase_contrast_t;
+
+/**
+ * @brief Create an Increase Contrast context
+ */
+int cmp_a11y_increase_contrast_create(
+    cmp_a11y_increase_contrast_t **out_increase_contrast);
+
+/**
+ * @brief Destroy an Increase Contrast context
+ */
+int cmp_a11y_increase_contrast_destroy(
+    cmp_a11y_increase_contrast_t *increase_contrast);
+
+/**
+ * @brief Set the current OS-level Increase Contrast setting
+ */
+int cmp_a11y_increase_contrast_set(
+    cmp_a11y_increase_contrast_t *increase_contrast, int enabled);
+
+/**
+ * @brief Apply increased contrast color adjustments (simulated via an
+ * opacity/darkening factor)
+ */
+int cmp_a11y_increase_contrast_apply(
+    cmp_a11y_increase_contrast_t *increase_contrast, float *out_opacity_factor);
+
+/**
+ * @brief Prevent smart invert colors acting as negatives for specific nodes
+ */
+int cmp_a11y_tree_set_node_ignores_invert(cmp_a11y_tree_t *tree, int node_id,
+                                          int ignores_invert);
+
+/**
+ * @brief Differentiate without color - use icons or distinct shapes for
+ * critical states
+ */
+int cmp_a11y_tree_set_node_differentiate_without_color(cmp_a11y_tree_t *tree,
+                                                       int node_id,
+                                                       int enabled);
+
+/**
+ * @brief Opaque macOS/iPadOS Hover Text Bubble structure
+ */
+typedef struct cmp_a11y_hover_text cmp_a11y_hover_text_t;
+
+/**
+ * @brief Create a Hover Text Bubble context
+ */
+int cmp_a11y_hover_text_create(cmp_a11y_hover_text_t **out_hover_text);
+
+/**
+ * @brief Destroy a Hover Text Bubble context
+ */
+int cmp_a11y_hover_text_destroy(cmp_a11y_hover_text_t *hover_text);
+
+/**
+ * @brief Retrieve High Contrast Text Bubble String for pointer hovers
+ */
+int cmp_a11y_hover_text_get_bubble(cmp_a11y_hover_text_t *hover_text,
+                                   int node_id, char *out_text,
+                                   size_t capacity);
+
+/**
+ * @brief Set the text for a node when pointer hover high contrast bubbles are
+ * enabled
+ */
+int cmp_a11y_tree_set_node_hover_text(cmp_a11y_tree_t *tree, int node_id,
+                                      const char *hover_text_string);
+
+/**
+ * @brief Enforce strict minimum contrast ratio of 4.5:1 against its background
+ * (or 3:1 for large text)
+ */
+int cmp_color_verify_contrast_ratio(uint32_t foreground_rgba,
+                                    uint32_t background_rgba, int is_large_text,
+                                    int *out_passes_wcag);
+
+/**
  * @brief Get the a11y semantic description of a node
  */
 int cmp_a11y_tree_get_node_desc(cmp_a11y_tree_t *tree, int node_id,
@@ -5830,6 +6193,66 @@ int cmp_prefers_reduced_motion_set(cmp_prefers_reduced_motion_t *rm,
  */
 int cmp_prefers_reduced_motion_apply(cmp_prefers_reduced_motion_t *rm,
                                      float *duration_ms);
+
+/**
+ * @brief Opaque Auto-Play Video Avoidance Context
+ */
+typedef struct cmp_a11y_autoplay_avoidance cmp_a11y_autoplay_avoidance_t;
+
+/**
+ * @brief Create an Auto-Play Avoidance Context
+ */
+int cmp_a11y_autoplay_avoidance_create(cmp_a11y_autoplay_avoidance_t **out_ctx);
+
+/**
+ * @brief Destroy an Auto-Play Avoidance Context
+ */
+int cmp_a11y_autoplay_avoidance_destroy(cmp_a11y_autoplay_avoidance_t *ctx);
+
+/**
+ * @brief Set the OS-level Auto-Play Video setting
+ */
+int cmp_a11y_autoplay_avoidance_set(cmp_a11y_autoplay_avoidance_t *ctx,
+                                    int enabled);
+
+/**
+ * @brief Query if videos/animations should autoplay
+ */
+int cmp_a11y_autoplay_should_play(cmp_a11y_autoplay_avoidance_t *ctx,
+                                  int *out_should_play);
+
+/**
+ * @brief Set a node as a Switch Control explicit focus anchor
+ */
+int cmp_a11y_tree_set_node_switch_control_anchor(cmp_a11y_tree_t *tree,
+                                                 int node_id, int is_anchor);
+
+/**
+ * @brief Map an element to the Voice Control grid, exposing numeric tags and
+ * phonetic labels
+ */
+int cmp_a11y_tree_set_node_voice_control_tag(cmp_a11y_tree_t *tree, int node_id,
+                                             const char *phonetic_label,
+                                             int numeric_grid_id);
+
+/**
+ * @brief Disable elements to conform with Guided Access
+ */
+int cmp_a11y_tree_set_node_guided_access_disabled(cmp_a11y_tree_t *tree,
+                                                  int node_id, int disabled);
+
+/**
+ * @brief Configure Time Limits / Cognitive Extensions
+ */
+int cmp_a11y_tree_set_node_cognitive_time_limit(cmp_a11y_tree_t *tree,
+                                                int node_id,
+                                                float time_extension_ms);
+
+/**
+ * @brief Attach visual alternatives for Sound Recognition/Captions
+ */
+int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
+                                         const char *caption);
 
 /**
  * @brief Opaque Reduced Transparency Context
@@ -6344,6 +6767,27 @@ int cmp_haptics_destroy(cmp_haptics_t *haptics);
  */
 int cmp_haptics_trigger(cmp_haptics_t *haptics, cmp_haptics_type_t type);
 
+/* Phase 4.3: Haptics (UIFeedbackGenerator) */
+
+/**
+ * @brief Preemptively "warm up" the haptic engine before an anticipated
+ * interaction to eliminate latency
+ */
+int cmp_haptics_prepare(cmp_haptics_t *haptics);
+
+/**
+ * @brief Synchronize haptic feedback with associated system UI sounds
+ */
+int cmp_haptics_trigger_with_audio_sync(cmp_haptics_t *haptics,
+                                        cmp_haptics_type_t type,
+                                        const char *audio_file_path);
+
+/**
+ * @brief Extra Impact Types for iOS 13+ (Rigid, Soft)
+ */
+int cmp_haptics_trigger_rigid(cmp_haptics_t *haptics);
+int cmp_haptics_trigger_soft(cmp_haptics_t *haptics);
+
 /**
  * @brief Picture-in-Picture (PiP) API
  */
@@ -6565,6 +7009,2998 @@ int cmp_flex_align_evaluate(cmp_flex_align_t align_val, float cross_size,
 int cmp_pointer_media_evaluate(const cmp_media_query_t *query,
                                const cmp_media_query_env_t *env,
                                int *out_matches);
+
+/* Phase 23: Privacy, Security & Permissions */
+
+/**
+ * @brief Opaque Permissions Context
+ */
+typedef struct cmp_permissions cmp_permissions_t;
+
+/**
+ * @brief Hardware Permission Types
+ */
+typedef enum cmp_permission_type {
+  CMP_PERMISSION_LOCATION = 0,
+  CMP_PERMISSION_CAMERA,
+  CMP_PERMISSION_MICROPHONE,
+  CMP_PERMISSION_PHOTO_LIBRARY,
+  CMP_PERMISSION_APP_TRACKING
+} cmp_permission_type_t;
+
+/**
+ * @brief Permission Status
+ */
+typedef enum cmp_permission_status {
+  CMP_PERMISSION_STATUS_NOT_DETERMINED = 0,
+  CMP_PERMISSION_STATUS_RESTRICTED,
+  CMP_PERMISSION_STATUS_DENIED,
+  CMP_PERMISSION_STATUS_AUTHORIZED,
+  CMP_PERMISSION_STATUS_LIMITED,               /* iOS 14+ Limited Photos */
+  CMP_PERMISSION_STATUS_AUTHORIZED_APPROXIMATE /* iOS 14+ Approximate Location
+                                                */
+} cmp_permission_status_t;
+
+/**
+ * @brief Create a Permissions Context
+ */
+int cmp_permissions_create(cmp_permissions_t **out_ctx);
+
+/**
+ * @brief Destroy a Permissions Context
+ */
+int cmp_permissions_destroy(cmp_permissions_t *ctx);
+
+/**
+ * @brief Check current permission status
+ */
+int cmp_permissions_get_status(cmp_permissions_t *ctx,
+                               cmp_permission_type_t type,
+                               cmp_permission_status_t *out_status);
+
+/**
+ * @brief Request permission contextually (with purpose string verification
+ * internally)
+ */
+int cmp_permissions_request(cmp_permissions_t *ctx, cmp_permission_type_t type);
+
+/**
+ * @brief Force Screen Recording Prevention (Blackout) for a specific node tree
+ */
+int cmp_tree_set_screen_recording_prevention(cmp_a11y_tree_t *tree, int node_id,
+                                             int enabled);
+
+/**
+ * @brief Opaque System Privacy Indicators Context (Microphone/Camera
+ * orange/green dots)
+ */
+typedef struct cmp_privacy_indicators cmp_privacy_indicators_t;
+
+/**
+ * @brief Create a Privacy Indicators Context
+ */
+int cmp_privacy_indicators_create(cmp_privacy_indicators_t **out_indicators);
+
+/**
+ * @brief Destroy a Privacy Indicators Context
+ */
+int cmp_privacy_indicators_destroy(cmp_privacy_indicators_t *indicators);
+
+/**
+ * @brief Verify if the custom UI obscures the system privacy indicators
+ * (returns error if it does)
+ */
+int cmp_privacy_indicators_verify_layout(cmp_privacy_indicators_t *indicators,
+                                         const cmp_rect_t *ui_bounds,
+                                         int *out_is_obscured);
+
+/* Phase 23 (Continued): Authentication & Security Types */
+
+/**
+ * @brief Opaque Sign in with Apple (SIWA) Context
+ */
+typedef struct cmp_siwa_ctx cmp_siwa_ctx_t;
+
+/**
+ * @brief Initialize SIWA (Checking OS capability)
+ */
+int cmp_siwa_create(cmp_siwa_ctx_t **out_ctx);
+
+/**
+ * @brief Destroy SIWA context
+ */
+int cmp_siwa_destroy(cmp_siwa_ctx_t *ctx);
+
+/**
+ * @brief Request SIWA authorization
+ * @param req_hidden_email Will request the private relay proxy email if 1
+ */
+int cmp_siwa_request(cmp_siwa_ctx_t *ctx, int req_hidden_email,
+                     char *out_token_buf, size_t token_cap);
+
+/**
+ * @brief Enforce precise Apple branding heuristics on a button node
+ */
+int cmp_tree_validate_siwa_branding(cmp_a11y_tree_t *tree, int node_id,
+                                    int *out_is_valid);
+
+/**
+ * @brief Opaque LocalAuthentication Context (Face ID / Touch ID)
+ */
+typedef struct cmp_local_auth cmp_local_auth_t;
+
+/**
+ * @brief Create Biometric Context
+ */
+int cmp_local_auth_create(cmp_local_auth_t **out_auth);
+
+/**
+ * @brief Destroy Biometric Context
+ */
+int cmp_local_auth_destroy(cmp_local_auth_t *auth);
+
+/**
+ * @brief Request Biometric Authentication (falling back to Passcode)
+ */
+int cmp_local_auth_request(cmp_local_auth_t *auth, const char *reason,
+                           int *out_success);
+
+/**
+ * @brief Opaque Secure Enclave / Keychain Context
+ */
+typedef struct cmp_keychain cmp_keychain_t;
+
+/**
+ * @brief Create Keychain Context
+ */
+int cmp_keychain_create(cmp_keychain_t **out_keychain);
+
+/**
+ * @brief Destroy Keychain Context
+ */
+int cmp_keychain_destroy(cmp_keychain_t *keychain);
+
+/**
+ * @brief Save secure credential to the OS keychain/enclave
+ */
+int cmp_keychain_save(cmp_keychain_t *keychain, const char *key,
+                      const char *secret);
+
+/**
+ * @brief Load secure credential from the OS keychain/enclave
+ */
+int cmp_keychain_load(cmp_keychain_t *keychain, const char *key,
+                      char *out_secret, size_t secret_cap);
+
+/**
+ * @brief Text Content Types for System AutoFill
+ */
+typedef enum cmp_text_content_type {
+  CMP_TEXT_CONTENT_TYPE_NONE = 0,
+  CMP_TEXT_CONTENT_TYPE_USERNAME,
+  CMP_TEXT_CONTENT_TYPE_PASSWORD,
+  CMP_TEXT_CONTENT_TYPE_NEW_PASSWORD,
+  CMP_TEXT_CONTENT_TYPE_ONE_TIME_CODE
+} cmp_text_content_type_t;
+
+/**
+ * @brief Tag a text field to trigger OS password managers
+ */
+int cmp_a11y_tree_set_node_text_content_type(cmp_a11y_tree_t *tree, int node_id,
+                                             cmp_text_content_type_t type);
+
+/**
+ * @brief Instruct the OS to blur the window entirely during the app
+ * switcher/backgrounding
+ */
+int cmp_window_set_secure_background_obscure(struct cmp_window *window,
+                                             int enabled);
+
+/**
+ * @brief Check OS APIs to see if a loaded image/video payload is flagged as
+ * explicit content
+ */
+int cmp_visuals_check_sensitive_content(const void *payload, size_t size,
+                                        int *out_is_sensitive);
+
+/* Phase 3: Visual Design & Rendering Architecture */
+
+/**
+ * @brief Opaque System Colors Context for mapping semantic colors
+ */
+typedef struct cmp_semantic_colors cmp_semantic_colors_t;
+
+/**
+ * @brief Create a Semantic Colors Context
+ */
+int cmp_semantic_colors_create(cmp_semantic_colors_t **out_ctx);
+
+/**
+ * @brief Destroy a Semantic Colors Context
+ */
+int cmp_semantic_colors_destroy(cmp_semantic_colors_t *ctx);
+
+/**
+ * @brief Resolve a semantic OS color (e.g., systemBlue,
+ * secondarySystemBackground) into 32-bit RGBA
+ */
+int cmp_semantic_colors_resolve(cmp_semantic_colors_t *ctx,
+                                const char *semantic_name, int is_dark_mode,
+                                uint32_t *out_rgba);
+
+/**
+ * @brief Set the global application tint/accent color
+ */
+int cmp_semantic_colors_set_tint_color(cmp_semantic_colors_t *ctx,
+                                       uint32_t tint_rgba);
+
+/**
+ * @brief Get the active tint color, handling fallback defaults
+ */
+int cmp_semantic_colors_get_tint_color(cmp_semantic_colors_t *ctx,
+                                       uint32_t *out_tint_rgba);
+
+/**
+ * @brief Resolve elevation background color for iOS dark mode (lighter grays
+ * instead of shadows)
+ */
+int cmp_semantic_colors_resolve_elevation(cmp_semantic_colors_t *ctx,
+                                          int elevation_level, int is_dark_mode,
+                                          uint32_t *out_rgba);
+
+/**
+ * @brief Opaque Color Profiling and P3 Context
+ */
+typedef struct cmp_color_pipeline cmp_color_pipeline_t;
+
+/**
+ * @brief Initialize the P3 16-bit / EDR rendering pipeline context
+ */
+int cmp_color_pipeline_create(cmp_color_pipeline_t **out_pipeline);
+
+/**
+ * @brief Destroy the color pipeline context
+ */
+int cmp_color_pipeline_destroy(cmp_color_pipeline_t *pipeline);
+
+/**
+ * @brief Check if the current display hardware natively supports Wide Color
+ * (Display P3)
+ */
+int cmp_color_pipeline_supports_p3(cmp_color_pipeline_t *pipeline,
+                                   int *out_supports_p3);
+
+/**
+ * @brief Check if the current display hardware natively supports Extended
+ * Dynamic Range (EDR/HDR)
+ */
+int cmp_color_pipeline_supports_edr(cmp_color_pipeline_t *pipeline,
+                                    int *out_supports_edr);
+
+/**
+ * @brief Convert an sRGB color to Display P3 color space
+ */
+int cmp_color_pipeline_srgb_to_p3(cmp_color_pipeline_t *pipeline, float r,
+                                  float g, float b, float *out_p3_r,
+                                  float *out_p3_g, float *out_p3_b);
+
+/* Phase 3.2: Typography & Text Rendering (Apple HIG specific) */
+
+/**
+ * @brief System Font Type Ecosystem
+ */
+typedef enum cmp_system_font_type {
+  CMP_SYSTEM_FONT_SF_PRO = 0,    /* Default iOS/macOS */
+  CMP_SYSTEM_FONT_SF_COMPACT,    /* watchOS */
+  CMP_SYSTEM_FONT_SF_MONO,       /* Code/Tabular */
+  CMP_SYSTEM_FONT_NEW_YORK,      /* Serif */
+  CMP_SYSTEM_FONT_SYSTEM_DEFAULT /* Fallback */
+} cmp_system_font_type_t;
+
+/**
+ * @brief System Text Styles (Dynamic Type sizing)
+ */
+typedef enum cmp_semantic_text_style {
+  CMP_TEXT_STYLE_LARGE_TITLE = 0,
+  CMP_TEXT_STYLE_TITLE_1,
+  CMP_TEXT_STYLE_TITLE_2,
+  CMP_TEXT_STYLE_TITLE_3,
+  CMP_TEXT_STYLE_HEADLINE,
+  CMP_TEXT_STYLE_BODY,
+  CMP_TEXT_STYLE_CALLOUT,
+  CMP_TEXT_STYLE_SUBHEAD,
+  CMP_TEXT_STYLE_FOOTNOTE,
+  CMP_TEXT_STYLE_CAPTION_1,
+  CMP_TEXT_STYLE_CAPTION_2
+} cmp_semantic_text_style_t;
+
+/**
+ * @brief Opaque System Font Resolution Context
+ */
+typedef struct cmp_system_fonts cmp_system_fonts_t;
+
+/**
+ * @brief Create a System Fonts Context
+ */
+int cmp_system_fonts_create(cmp_system_fonts_t **out_ctx);
+
+/**
+ * @brief Destroy a System Fonts Context
+ */
+int cmp_system_fonts_destroy(cmp_system_fonts_t *ctx);
+
+/**
+ * @brief Request an Apple ecosystem font (SF Pro, Compact, Mono, NY) by
+ * semantic style
+ */
+int cmp_system_fonts_request(cmp_system_fonts_t *ctx,
+                             cmp_system_font_type_t type,
+                             cmp_semantic_text_style_t style, int weight,
+                             cmp_font_t **out_font);
+
+/**
+ * @brief Automatically calculate optical size (Text vs Display variant) and
+ * dynamic tracking (letter-spacing) based on the requested point size.
+ */
+int cmp_system_fonts_get_tracking_and_optical(cmp_system_fonts_t *ctx,
+                                              float point_size,
+                                              int *out_is_display_variant,
+                                              float *out_tracking);
+
+/**
+ * @brief Set standard OpenType features (Kerning, Ligatures, Tabular Figures)
+ */
+int cmp_font_set_opentype_features(cmp_font_t *font, int enable_kerning,
+                                   int enable_ligatures,
+                                   int enable_tabular_figures);
+
+/**
+ * @brief Set variable font axes (Weight, Width)
+ */
+int cmp_font_set_variable_axes(cmp_font_t *font, float weight, float width);
+
+/**
+ * @brief Get the standard Apple line-height and leading metrics for a specific
+ * text style
+ */
+int cmp_system_fonts_get_metrics(cmp_system_fonts_t *ctx,
+                                 cmp_semantic_text_style_t style,
+                                 float *out_line_height, float *out_leading,
+                                 float *out_baseline_offset);
+
+/**
+ * @brief UIBlurEffect standard thickness styles
+ */
+typedef enum cmp_blur_style {
+  CMP_BLUR_STYLE_ULTRA_THIN = 0,
+  CMP_BLUR_STYLE_THIN,
+  CMP_BLUR_STYLE_REGULAR,
+  CMP_BLUR_STYLE_THICK,
+  CMP_BLUR_STYLE_PROMINENT
+} cmp_blur_style_t;
+
+/**
+ * @brief macOS Window Material Equivalencies
+ */
+typedef enum cmp_macos_material {
+  CMP_MACOS_MATERIAL_WINDOW_BACKGROUND = 0,
+  CMP_MACOS_MATERIAL_BEHIND_WINDOW,          /* Standard translucent sidebars */
+  CMP_MACOS_MATERIAL_UNDER_WINDOW_BACKGROUND /* Standard scrolling content */
+} cmp_macos_material_t;
+
+/**
+ * @brief UIVibrancyEffect mapping
+ */
+typedef enum cmp_vibrancy_style {
+  CMP_VIBRANCY_STYLE_NONE = 0,
+  CMP_VIBRANCY_STYLE_LABEL,
+  CMP_VIBRANCY_STYLE_SECONDARY_LABEL,
+  CMP_VIBRANCY_STYLE_TERTIARY_LABEL,
+  CMP_VIBRANCY_STYLE_FILL,
+  CMP_VIBRANCY_STYLE_SECONDARY_FILL
+} cmp_vibrancy_style_t;
+
+/**
+ * @brief Opaque Material and Blur Rendering Context
+ */
+typedef struct cmp_materials cmp_materials_t;
+
+/**
+ * @brief Initialize the Materials Context
+ */
+int cmp_materials_create(cmp_materials_t **out_materials);
+
+/**
+ * @brief Destroy the Materials Context
+ */
+int cmp_materials_destroy(cmp_materials_t *materials);
+
+/**
+ * @brief Evaluate the parameters for a standard UIBlurEffect style
+ * @param style The desired blur thickness
+ * @param out_radius_px Pointer to receive the underlying gaussian blur radius
+ * in pixels
+ * @param out_saturation_multiplier Pointer to receive the saturation boost
+ * factor
+ */
+int cmp_materials_resolve_blur_effect(cmp_materials_t *materials,
+                                      cmp_blur_style_t style,
+                                      float *out_radius_px,
+                                      float *out_saturation_multiplier);
+
+/**
+ * @brief Map a native macOS material to cross-platform shader hints
+ */
+int cmp_materials_resolve_macos_material(cmp_materials_t *materials,
+                                         cmp_macos_material_t material,
+                                         cmp_blur_style_t *out_mapped_style);
+
+/**
+ * @brief Retrieve blend modes required to implement UIVibrancyEffect (text
+ * layering over blur)
+ */
+int cmp_materials_resolve_vibrancy(cmp_materials_t *materials,
+                                   cmp_vibrancy_style_t style,
+                                   float *out_opacity,
+                                   int *out_requires_color_dodge);
+
+/**
+ * @brief Calculate the intermediate state of a blur material crossfade
+ * transition
+ * @param from_style The starting blur thickness
+ * @param to_style The ending blur thickness
+ * @param progress Normalised float [0.0 - 1.0] representing transition progress
+ * @param out_current_radius_px The interpolated blur radius to feed into the
+ * shader
+ */
+int cmp_materials_interpolate_blur_transition(cmp_materials_t *materials,
+                                              cmp_blur_style_t from_style,
+                                              cmp_blur_style_t to_style,
+                                              float progress,
+                                              float *out_current_radius_px);
+
+/* Phase 3.4: Iconography & SF Symbols */
+
+/**
+ * @brief Symbol Scale Constraints (Relative to current font size)
+ */
+typedef enum cmp_symbol_scale {
+  CMP_SYMBOL_SCALE_SMALL = 0,
+  CMP_SYMBOL_SCALE_MEDIUM, /* Default */
+  CMP_SYMBOL_SCALE_LARGE
+} cmp_symbol_scale_t;
+
+/**
+ * @brief Rendering mode for complex multi-layer symbols
+ */
+typedef enum cmp_symbol_rendering_mode {
+  CMP_SYMBOL_RENDERING_MONOCHROME = 0, /* Standard single color */
+  CMP_SYMBOL_RENDERING_HIERARCHICAL,   /* Opacity layers of a single color */
+  CMP_SYMBOL_RENDERING_PALETTE,        /* Explicit color per layer */
+  CMP_SYMBOL_RENDERING_MULTICOLOR      /* Intrinsic original full-color (e.g.
+                                          weather) */
+} cmp_symbol_rendering_mode_t;
+
+/**
+ * @brief Available symbol animation hooks (iOS 17+)
+ */
+typedef enum cmp_symbol_animation {
+  CMP_SYMBOL_ANIM_NONE = 0,
+  CMP_SYMBOL_ANIM_BOUNCE,
+  CMP_SYMBOL_ANIM_SCALE,
+  CMP_SYMBOL_ANIM_PULSE,
+  CMP_SYMBOL_ANIM_REPLACE,
+  CMP_SYMBOL_ANIM_VARIABLE_COLOR
+} cmp_symbol_animation_t;
+
+/**
+ * @brief Opaque Symbol Resolution Context
+ */
+typedef struct cmp_symbols cmp_symbols_t;
+
+/**
+ * @brief Create a Symbols Context
+ */
+int cmp_symbols_create(cmp_symbols_t **out_ctx);
+
+/**
+ * @brief Destroy a Symbols Context
+ */
+int cmp_symbols_destroy(cmp_symbols_t *ctx);
+
+/**
+ * @brief Retrieve an SF Symbol via its native OS identifier (e.g. "star.fill")
+ * Automatically matches the current text weight.
+ */
+int cmp_symbols_request(cmp_symbols_t *ctx, const char *symbol_name, int weight,
+                        cmp_symbol_scale_t scale, void **out_symbol_handle);
+
+/**
+ * @brief Apply rendering styles to a requested symbol
+ * @param colors Array of colors. Length determines palette slots.
+ *               Length=1 + Hierarchical = varying opacity.
+ *               Length=1 + Monochrome = single fill.
+ */
+int cmp_symbols_apply_style(cmp_symbols_t *ctx, void *symbol_handle,
+                            cmp_symbol_rendering_mode_t mode,
+                            const uint32_t *colors, size_t color_count);
+
+/**
+ * @brief Set the variable fill percentage for symbols that support Variable
+ * Color (e.g. Wi-Fi bars)
+ */
+int cmp_symbols_set_variable_value(cmp_symbols_t *ctx, void *symbol_handle,
+                                   float percentage);
+
+/**
+ * @brief Trigger an iOS 17+ style bounce/pulse animation on the symbol
+ */
+int cmp_symbols_trigger_animation(cmp_symbols_t *ctx, void *symbol_handle,
+                                  cmp_symbol_animation_t animation,
+                                  int looping);
+
+/**
+ * @brief Load a custom SVG explicitly exported via Apple's SF Symbols template
+ */
+int cmp_symbols_load_custom_template(cmp_symbols_t *ctx, const char *svg_path,
+                                     void **out_symbol_handle);
+
+/* Phase 3.5: Layout, Margins & Geometry */
+
+/**
+ * @brief Continuous Corners (Squircles) - Apple's kCACornerCurveContinuous
+ * formula
+ */
+int cmp_layout_set_corner_curve_continuous(cmp_layout_node_t *node,
+                                           int is_continuous);
+
+/**
+ * @brief Enforce precise pixel boundaries to prevent sub-pixel anti-aliasing
+ * blurring on borders and text
+ */
+int cmp_layout_enforce_pixel_alignment(cmp_layout_node_t *node, int is_aligned);
+
+/**
+ * @brief Opaque System Margins and Safe Area Constants Structure
+ */
+typedef struct cmp_system_geometry cmp_system_geometry_t;
+
+/**
+ * @brief Create a System Geometry Context
+ */
+int cmp_system_geometry_create(cmp_system_geometry_t **out_geom);
+
+/**
+ * @brief Destroy a System Geometry Context
+ */
+int cmp_system_geometry_destroy(cmp_system_geometry_t *geom);
+
+/**
+ * @brief Retrieve standard OS-level safe area insets (avoiding notches, home
+ * indicators)
+ */
+int cmp_system_geometry_get_safe_area(cmp_system_geometry_t *geom, int is_tvos,
+                                      cmp_rect_t *out_safe_insets);
+
+/**
+ * @brief Retrieve standard OS-level leading/trailing layout margins (16pt
+ * compact, 20pt regular)
+ */
+int cmp_system_geometry_get_layout_margins(cmp_system_geometry_t *geom,
+                                           int is_compact_width,
+                                           float *out_leading,
+                                           float *out_trailing);
+
+/**
+ * @brief Retrieve the readable content guide (max text width constraint for
+ * iPads/Macs)
+ */
+int cmp_system_geometry_get_readable_content_guide(
+    cmp_system_geometry_t *geom, float available_width,
+    float *out_max_readable_width);
+
+/* Phase 4.1: Spring Physics & Timing */
+
+/**
+ * @brief Opaque UIViewPropertyAnimator equivalency context
+ */
+typedef struct cmp_spring_animator cmp_spring_animator_t;
+
+/**
+ * @brief Create a scrubbable spring animator (CASpringAnimation equivalency)
+ * @param mass Mass of the simulated object (default 1.0)
+ * @param stiffness Spring stiffness (default 100.0)
+ * @param damping Spring damping (default 10.0)
+ * @param initial_velocity The velocity in points-per-second passed from a
+ * gesture (swipe/scroll)
+ */
+int cmp_spring_animator_create(float mass, float stiffness, float damping,
+                               float initial_velocity,
+                               cmp_spring_animator_t **out_animator);
+
+/**
+ * @brief Destroy a spring animator
+ */
+int cmp_spring_animator_destroy(cmp_spring_animator_t *animator);
+
+/**
+ * @brief Interpolate an animation mid-flight. The new animation uses the
+ * current presentation value and velocity as its starting point.
+ */
+int cmp_spring_animator_interrupt(cmp_spring_animator_t *animator,
+                                  float new_target_value);
+
+/**
+ * @brief Pause, scrub, or reverse the animation interactively
+ * @param fraction_complete Normalized progress [0.0 - 1.0] representing the
+ * scrub offset
+ */
+int cmp_spring_animator_scrub(cmp_spring_animator_t *animator,
+                              float fraction_complete);
+
+/**
+ * @brief Evaluate the current value of the spring, automatically accounting for
+ * overshoot & bounciness
+ * @param dt_seconds Time elapsed since the animation started
+ * @param out_current_value The output coordinate or property value
+ * @param out_is_settled 1 if the spring has completely settled (velocity is 0),
+ * otherwise 0
+ */
+int cmp_spring_animator_evaluate(cmp_spring_animator_t *animator,
+                                 float dt_seconds, float *out_current_value,
+                                 int *out_is_settled);
+
+/**
+ * @brief Convert raw swipe/pan gesture points into a points-per-second velocity
+ * metric to feed into a spring
+ */
+int cmp_spring_calculate_gesture_velocity(float delta_x, float delta_y,
+                                          float dt_seconds,
+                                          float *out_velocity_x,
+                                          float *out_velocity_y);
+
+/* Phase 4.2: ProMotion (120Hz) & Render Loop */
+
+/**
+ * @brief Opaque ProMotion/VRR Context
+ */
+typedef struct cmp_promotion_link cmp_promotion_link_t;
+
+/**
+ * @brief Available Target Frame Rates
+ */
+typedef enum cmp_frame_rate {
+  CMP_FRAME_RATE_DEFAULT = 0, /* Standard 60Hz */
+  CMP_FRAME_RATE_LOW,         /* 10Hz/24Hz VRR saving */
+  CMP_FRAME_RATE_HIGH         /* 120Hz ProMotion */
+} cmp_frame_rate_t;
+
+/**
+ * @brief Create a ProMotion DisplayLink Context
+ */
+int cmp_promotion_link_create(cmp_promotion_link_t **out_link);
+
+/**
+ * @brief Destroy a ProMotion DisplayLink Context
+ */
+int cmp_promotion_link_destroy(cmp_promotion_link_t *link);
+
+/**
+ * @brief Synchronize the render loop to CADisplayLink / Choreographer
+ * equivalent callbacks
+ */
+int cmp_promotion_link_sync(cmp_promotion_link_t *link, int is_sync_enabled);
+
+/**
+ * @brief Request an explicit preferred frame rate range (unlocks 120Hz if
+ * available)
+ */
+int cmp_promotion_link_request_rate(cmp_promotion_link_t *link,
+                                    cmp_frame_rate_t requested_rate);
+
+/**
+ * @brief Evaluates current UI activity (scrolling/animating vs static) to
+ * dynamically shift VRR targets
+ */
+int cmp_promotion_link_evaluate_vrr(cmp_promotion_link_t *link,
+                                    int is_animating, int is_scrolling,
+                                    cmp_frame_rate_t *out_target_rate);
+
+/**
+ * @brief Simulated telemetry hook: Validates that 0 frames were dropped in the
+ * last continuous scrolling/animating interaction window
+ */
+int cmp_promotion_link_validate_frame_drops(cmp_promotion_link_t *link,
+                                            int *out_dropped_frames);
+
+/* Phase 5.1: Routing Models (Apple HIG specific) */
+
+/**
+ * @brief Routing presentation styles
+ */
+typedef enum cmp_presentation_style {
+  CMP_PRESENTATION_STYLE_PUSH =
+      0, /* Standard Navigation Bar push/pop (Hierarchical) */
+  CMP_PRESENTATION_STYLE_TAB, /* Instant switch, pops stack to root (Flat) */
+  CMP_PRESENTATION_STYLE_SPLIT_VIEW, /* Master-Detail / Sidebar (Content-Driven)
+                                      */
+  CMP_PRESENTATION_STYLE_FULLSCREEN, /* Hides status bars (Immersive) */
+  CMP_PRESENTATION_STYLE_SHEET /* Slides from bottom, parent recedes (Modal) */
+} cmp_presentation_style_t;
+
+/**
+ * @brief Push a route onto the stack with a specific Apple HIG presentation
+ * style
+ */
+int cmp_router_push_with_style(cmp_router_t *router, const char *uri,
+                               cmp_presentation_style_t style);
+
+/**
+ * @brief Pop the current route (with specific animation based on how it was
+ * presented)
+ */
+int cmp_router_pop_with_style(cmp_router_t *router);
+
+/**
+ * @brief For Hierarchical navigation, retrieve the exact title of the
+ * *previous* view to populate the back button
+ */
+int cmp_router_get_previous_title(cmp_router_t *router, char *out_title,
+                                  size_t title_cap);
+
+/**
+ * @brief Force a specific tab to become active, automatically popping any deep
+ * navigation inside it back to root
+ */
+int cmp_router_switch_tab(cmp_router_t *router, const char *tab_uri);
+
+/**
+ * @brief Opaque Split View (Master-Detail) Controller
+ */
+typedef struct cmp_split_view cmp_split_view_t;
+
+/**
+ * @brief Create a Split View Controller context
+ */
+int cmp_split_view_create(cmp_split_view_t **out_split_view);
+
+/**
+ * @brief Destroy a Split View Controller
+ */
+int cmp_split_view_destroy(cmp_split_view_t *split_view);
+
+/**
+ * @brief Assign routes to the Master (Sidebar) and Detail (Content) panes
+ */
+int cmp_split_view_set_routes(cmp_split_view_t *split_view,
+                              const char *master_uri, const char *detail_uri);
+
+/* Phase 5.2: Navigation Bars (Apple HIG specific) */
+
+/**
+ * @brief Navigation Bar Appearance States
+ */
+typedef enum cmp_nav_bar_appearance {
+  CMP_NAV_BAR_APPEARANCE_STANDARD =
+      0,                          /* Solid/Blurred based on scroll position */
+  CMP_NAV_BAR_APPEARANCE_COMPACT, /* Condensed for landscape iPhones */
+  CMP_NAV_BAR_APPEARANCE_SCROLL_EDGE /* Transparent when scrolled to the very
+                                        top */
+} cmp_nav_bar_appearance_t;
+
+/**
+ * @brief Opaque Navigation Bar Context
+ */
+typedef struct cmp_nav_bar cmp_nav_bar_t;
+
+/**
+ * @brief Create a Navigation Bar Controller
+ */
+int cmp_nav_bar_create(cmp_nav_bar_t **out_nav_bar);
+
+/**
+ * @brief Destroy a Navigation Bar Controller
+ */
+int cmp_nav_bar_destroy(cmp_nav_bar_t *nav_bar);
+
+/**
+ * @brief Set Large Titles (Default True for primary views)
+ */
+int cmp_nav_bar_set_prefers_large_titles(cmp_nav_bar_t *nav_bar,
+                                         int prefers_large_titles);
+
+/**
+ * @brief Calculate the scroll collapse of a large title into a standard inline
+ * title
+ * @param scroll_y Current vertical scroll offset
+ * @param out_title_scale Output scale multiplier [1.0 to ~0.6]
+ * @param out_title_y_offset Output Y translation for the title text
+ */
+int cmp_nav_bar_calculate_scroll_collapse(cmp_nav_bar_t *nav_bar,
+                                          float scroll_y,
+                                          float *out_title_scale,
+                                          float *out_title_y_offset);
+
+/**
+ * @brief Configure the strict appearance state
+ */
+int cmp_nav_bar_set_appearance(cmp_nav_bar_t *nav_bar,
+                               cmp_nav_bar_appearance_t appearance);
+
+/**
+ * @brief Determine back button truncation based on available width and previous
+ * title length
+ * @param previous_title The raw string of the previous view's title
+ * @param available_width The layout width available before hitting center title
+ * @param out_label Populated with the exact string to render ("Back" if
+ * truncated)
+ */
+int cmp_nav_bar_resolve_back_button_label(cmp_nav_bar_t *nav_bar,
+                                          const char *previous_title,
+                                          float available_width,
+                                          char *out_label, size_t label_cap);
+
+/**
+ * @brief Configure exact OS-native Back Button Chevron layout metrics
+ */
+int cmp_nav_bar_get_chevron_metrics(cmp_nav_bar_t *nav_bar, float *out_weight,
+                                    float *out_leading_padding);
+
+/* Phase 5.3: Tab Bars & Toolbars (Apple HIG specific) */
+
+/**
+ * @brief Represents the placement rules for Tab Bars dynamically
+ */
+typedef enum cmp_tab_bar_placement {
+  CMP_TAB_BAR_PLACEMENT_BOTTOM = 0, /* Default iPhone */
+  CMP_TAB_BAR_PLACEMENT_LEADING     /* Default iPadOS/macOS Sidebar */
+} cmp_tab_bar_placement_t;
+
+/**
+ * @brief Opaque Tab Bar Controller
+ */
+typedef struct cmp_tab_bar cmp_tab_bar_t;
+
+/**
+ * @brief Create a Tab Bar Controller
+ */
+int cmp_tab_bar_create(cmp_tab_bar_t **out_tab_bar);
+
+/**
+ * @brief Destroy a Tab Bar Controller
+ */
+int cmp_tab_bar_destroy(cmp_tab_bar_t *tab_bar);
+
+/**
+ * @brief Add a tab to the controller. The framework enforces HIG limits
+ * internally (max 5 visible, rest overflow to 'More').
+ */
+int cmp_tab_bar_add_tab(cmp_tab_bar_t *tab_bar, const char *title,
+                        const char *symbol_icon, const char *route_uri);
+
+/**
+ * @brief Set a notification badge on a specific tab index
+ * @param badge_value Positive integer to display (e.g. 3), 0 to hide.
+ */
+int cmp_tab_bar_set_badge(cmp_tab_bar_t *tab_bar, size_t tab_index,
+                          int badge_value);
+
+/**
+ * @brief Resolve the dynamic layout constraints for the Tab Bar/Sidebar
+ * depending on the active Viewport width
+ * @param available_width The current container width (used to toggle iPhone vs
+ * iPad behaviors)
+ * @param out_placement Will return Bottom vs Leading
+ * @param out_material Will return standard vs BehindWindow material bindings
+ */
+int cmp_tab_bar_resolve_layout(cmp_tab_bar_t *tab_bar, float available_width,
+                               cmp_tab_bar_placement_t *out_placement,
+                               cmp_macos_material_t *out_material);
+
+/**
+ * @brief Contextual Toolbar Position Logic
+ * Retrieves HIG placement mapping for toolbars (bottom on iPhone,
+ * top-nav-integrated on iPad/Mac).
+ */
+int cmp_toolbar_resolve_placement(float available_width,
+                                  int *out_is_bottom_placed);
+
+/* Phase 5.4: Search Architecture (Apple HIG specific) */
+
+/**
+ * @brief Search Bar Display States
+ */
+typedef enum cmp_search_bar_state {
+  CMP_SEARCH_BAR_INACTIVE = 0, /* Centered placeholder, no cancel button */
+  CMP_SEARCH_BAR_ACTIVE /* Leading aligned, cancel button visible, clear button
+                           visible if text exists */
+} cmp_search_bar_state_t;
+
+/**
+ * @brief Opaque Search Controller
+ */
+typedef struct cmp_search_controller cmp_search_controller_t;
+
+/**
+ * @brief Create a Search Controller
+ */
+int cmp_search_controller_create(cmp_search_controller_t **out_controller);
+
+/**
+ * @brief Destroy a Search Controller
+ */
+int cmp_search_controller_destroy(cmp_search_controller_t *controller);
+
+/**
+ * @brief Set current text input in the search bar
+ */
+int cmp_search_controller_set_text(cmp_search_controller_t *controller,
+                                   const char *text);
+
+/**
+ * @brief Add a scope filter option (e.g. "All", "Unread")
+ */
+int cmp_search_controller_add_scope(cmp_search_controller_t *controller,
+                                    const char *scope_title);
+
+/**
+ * @brief Triggers focus and animates the placeholder from Center to Leading
+ */
+int cmp_search_controller_set_active(cmp_search_controller_t *controller,
+                                     int active);
+
+/**
+ * @brief Evaluates visual metrics for the search bar (clear button, cancel
+ * button offsets)
+ * @param out_show_clear Returns 1 if 'x' clear button should be rendered
+ * @param out_show_cancel Returns 1 if "Cancel" button should slide in from the
+ * right
+ * @param out_placeholder_offset Returns the X translation offset for the
+ * placeholder text (0.0 for leading, >0 for center based on width)
+ */
+int cmp_search_controller_resolve_metrics(cmp_search_controller_t *controller,
+                                          float available_width,
+                                          int *out_show_clear,
+                                          int *out_show_cancel,
+                                          float *out_placeholder_offset);
+
+/**
+ * @brief Submits suggestion results overlaid on the UI
+ */
+int cmp_search_controller_set_suggestions(cmp_search_controller_t *controller,
+                                          const char **suggestions,
+                                          size_t count);
+
+/* Phase 5.5: Deep Linking & State Restoration (Apple HIG specific) */
+
+/**
+ * @brief Opaque State Restoration Context (NSUserActivity/UIWindowScene
+ * equivalent)
+ */
+typedef struct cmp_state_restoration_ctx cmp_state_restoration_ctx_t;
+
+/**
+ * @brief Create a State Restoration Context
+ */
+int cmp_state_restoration_ctx_create(cmp_state_restoration_ctx_t **out_ctx);
+
+/**
+ * @brief Destroy a State Restoration Context
+ */
+int cmp_state_restoration_ctx_destroy(cmp_state_restoration_ctx_t *ctx);
+
+/**
+ * @brief Handles Universal Links (Deep Links) routing deeply into the framework
+ * Maps directly to NSUserActivity continuations on iOS/macOS.
+ */
+int cmp_deep_link_handle_universal_link(cmp_state_restoration_ctx_t *ctx,
+                                        const char *url_string,
+                                        cmp_router_t *router);
+
+/**
+ * @brief Encodes the current view controller and scroll state into a
+ * persistable buffer
+ * @param out_buffer The serialized state blob
+ * @param out_size The size of the serialized blob
+ */
+int cmp_state_restoration_encode(cmp_state_restoration_ctx_t *ctx,
+                                 cmp_router_t *router, void **out_buffer,
+                                 size_t *out_size);
+
+/**
+ * @brief Decodes a previously saved state buffer, restoring the exact
+ * navigation stack and scroll offsets
+ */
+int cmp_state_restoration_decode(cmp_state_restoration_ctx_t *ctx,
+                                 cmp_router_t *router, const void *buffer,
+                                 size_t size);
+
+/**
+ * @brief Registers a multi-window UIWindowScene state boundary.
+ * Essential for iPadOS/macOS to ensure separate windows don't overwrite each
+ * other's state restorations.
+ */
+int cmp_state_restoration_set_scene_id(cmp_state_restoration_ctx_t *ctx,
+                                       const char *scene_identifier);
+
+/* Phase 6.1: Buttons & Toggles (Apple HIG specific) */
+
+/**
+ * @brief Button styling configurations
+ */
+typedef enum cmp_button_style {
+  CMP_BUTTON_STYLE_PLAIN = 0, /* Text/Icon only, dim to 30% opacity on press */
+  CMP_BUTTON_STYLE_FILLED,    /* Solid prominent background (capsule or rounded
+                                 rect) */
+  CMP_BUTTON_STYLE_TINTED, /* 15-20% opacity background of the accent color */
+  CMP_BUTTON_STYLE_GRAY,   /* Subtle, translucent gray background */
+  CMP_BUTTON_STYLE_CLOSE   /* Small, circular, blurred gray background with dark
+                              'x' */
+} cmp_button_style_t;
+
+/**
+ * @brief Opaque Button Control
+ */
+typedef struct cmp_button cmp_button_t;
+
+/**
+ * @brief Opaque Toggle (Switch) Control
+ */
+typedef struct cmp_toggle cmp_toggle_t;
+
+/**
+ * @brief Create a Button Control
+ */
+int cmp_button_create(cmp_button_t **out_button);
+
+/**
+ * @brief Destroy a Button Control
+ */
+int cmp_button_destroy(cmp_button_t *button);
+
+/**
+ * @brief Set the button style
+ */
+int cmp_button_set_style(cmp_button_t *button, cmp_button_style_t style);
+
+/**
+ * @brief Handle a pointer down event, calculating immediate opacity drops
+ * @param is_pressed 1 for down, 0 for up/cancel
+ * @param out_opacity Returns the calculated visual opacity (e.g. 0.3f for PLAIN
+ * button down)
+ */
+int cmp_button_handle_press(cmp_button_t *button, int is_pressed,
+                            float *out_opacity);
+
+/**
+ * @brief Resolve background colors and opacities based on style
+ * @param out_bg_r Red channel
+ * @param out_bg_g Green channel
+ * @param out_bg_b Blue channel
+ * @param out_bg_a Alpha channel
+ */
+int cmp_button_resolve_background(cmp_button_t *button, float *out_bg_r,
+                                  float *out_bg_g, float *out_bg_b,
+                                  float *out_bg_a);
+
+/**
+ * @brief Create a Toggle Control (Switch)
+ */
+int cmp_toggle_create(cmp_toggle_t **out_toggle);
+
+/**
+ * @brief Destroy a Toggle Control
+ */
+int cmp_toggle_destroy(cmp_toggle_t *toggle);
+
+/**
+ * @brief Set toggle state (ON / OFF)
+ */
+int cmp_toggle_set_state(cmp_toggle_t *toggle, int is_on);
+
+/**
+ * @brief Get the visual parameters for the toggle thumb and track
+ * @param out_track_r Returns track red color
+ * @param out_track_g Returns track green color
+ * @param out_track_b Returns track blue color
+ * @param out_track_a Returns track alpha (translucent gray when OFF,
+ * green/accent when ON)
+ * @param out_thumb_x_offset Returns the X translation for the thumb (spring
+ * animated in real engine)
+ */
+int cmp_toggle_resolve_visuals(cmp_toggle_t *toggle, float *out_track_r,
+                               float *out_track_g, float *out_track_b,
+                               float *out_track_a, float *out_thumb_x_offset);
+
+/* Phase 6.2: Menus & Actions (Apple HIG specific) */
+
+/**
+ * @brief Menu Item Roles
+ */
+typedef enum cmp_menu_item_role {
+  CMP_MENU_ITEM_ROLE_STANDARD = 0,
+  CMP_MENU_ITEM_ROLE_DESTRUCTIVE, /* Rendered strictly in system red */
+  CMP_MENU_ITEM_ROLE_CANCEL       /* Distinct separation in action sheets */
+} cmp_menu_item_role_t;
+
+/**
+ * @brief Menu Item Checkmark States
+ */
+typedef enum cmp_menu_item_state {
+  CMP_MENU_ITEM_STATE_OFF = 0,
+  CMP_MENU_ITEM_STATE_ON,
+  CMP_MENU_ITEM_STATE_MIXED
+} cmp_menu_item_state_t;
+
+/**
+ * @brief Menu Presentation Style
+ */
+typedef enum cmp_menu_presentation {
+  CMP_MENU_PRESENTATION_CONTEXT =
+      0, /* Long-press, heavily blurred bg, lifts target */
+  CMP_MENU_PRESENTATION_ACTION_SHEET, /* Slide up from bottom */
+  CMP_MENU_PRESENTATION_POPOVER /* Floating panel with arrow pointing to origin
+                                 */
+} cmp_menu_presentation_t;
+
+/**
+ * @brief Opaque Menu Controller
+ */
+typedef struct cmp_menu cmp_menu_t;
+
+/**
+ * @brief Opaque Menu Item
+ */
+typedef struct cmp_menu_item cmp_menu_item_t;
+
+/**
+ * @brief Create a Menu Controller
+ */
+int cmp_menu_create(cmp_menu_t **out_menu,
+                    cmp_menu_presentation_t presentation);
+
+/**
+ * @brief Destroy a Menu Controller
+ */
+int cmp_menu_destroy(cmp_menu_t *menu);
+
+/**
+ * @brief Create a generic menu item
+ */
+int cmp_menu_item_create(cmp_menu_item_t **out_item, const char *title,
+                         const char *symbol, cmp_menu_item_role_t role);
+
+/**
+ * @brief Add an item to a menu
+ */
+int cmp_menu_add_item(cmp_menu_t *menu, cmp_menu_item_t *item);
+
+/**
+ * @brief Create a submenu item (infinitely nested)
+ */
+int cmp_menu_item_create_submenu(cmp_menu_item_t **out_item, const char *title,
+                                 const char *symbol, cmp_menu_t *child_menu);
+
+/**
+ * @brief Create a deferred menu item (shows loading spinner while async
+ * fetches)
+ */
+int cmp_menu_item_create_deferred(cmp_menu_item_t **out_item,
+                                  const char *title);
+
+/**
+ * @brief Set the checkmark state for a menu item
+ */
+int cmp_menu_item_set_state(cmp_menu_item_t *item, cmp_menu_item_state_t state);
+
+/**
+ * @brief Get presentation specifics for a menu
+ * @param out_bg_blur Returns 1 if background should be heavily blurred
+ * (Context)
+ * @param out_lift_target Returns 1 if the originating element should be
+ * visually lifted (Context)
+ * @param out_has_arrow Returns 1 if a popover arrow should be drawn
+ */
+int cmp_menu_resolve_presentation(cmp_menu_t *menu, int *out_bg_blur,
+                                  int *out_lift_target, int *out_has_arrow);
+
+/**
+ * @brief Resolves color and state icon for a menu item
+ * @param out_is_red Returns 1 if text should be system red (Destructive)
+ * @param out_state_icon Returns specific icon for ON/MIXED states (e.g.
+ * "checkmark", "minus")
+ */
+int cmp_menu_item_resolve_visuals(cmp_menu_item_t *item, int *out_is_red,
+                                  const char **out_state_icon);
+
+/* Phase 6.3: Inputs & Selectors (Apple HIG specific) */
+
+/**
+ * @brief Opaque Wheel Picker (Slot machine style)
+ */
+typedef struct cmp_wheel_picker cmp_wheel_picker_t;
+
+/**
+ * @brief Opaque Segmented Control
+ */
+typedef struct cmp_segmented_control cmp_segmented_control_t;
+
+/**
+ * @brief Opaque Stepper (+/- buttons)
+ */
+typedef struct cmp_stepper cmp_stepper_t;
+
+/**
+ * @brief Opaque Slider (Continuous track)
+ */
+typedef struct cmp_slider cmp_slider_t;
+
+/**
+ * @brief Create a Wheel Picker
+ */
+int cmp_wheel_picker_create(cmp_wheel_picker_t **out_picker);
+int cmp_wheel_picker_destroy(cmp_wheel_picker_t *picker);
+int cmp_wheel_picker_set_items(cmp_wheel_picker_t *picker, const char **items,
+                               size_t count);
+int cmp_wheel_picker_scroll(cmp_wheel_picker_t *picker, float delta_y);
+int cmp_wheel_picker_get_selected(cmp_wheel_picker_t *picker,
+                                  size_t *out_index);
+
+/**
+ * @brief Create a Segmented Control
+ */
+int cmp_segmented_control_create(cmp_segmented_control_t **out_control);
+int cmp_segmented_control_destroy(cmp_segmented_control_t *control);
+int cmp_segmented_control_set_segments(cmp_segmented_control_t *control,
+                                       const char **segments, size_t count);
+int cmp_segmented_control_select(cmp_segmented_control_t *control,
+                                 size_t index);
+int cmp_segmented_control_get_visuals(cmp_segmented_control_t *control,
+                                      size_t *out_selected_idx,
+                                      float *out_slider_offset_x);
+
+/**
+ * @brief Create a Stepper (+/-)
+ */
+int cmp_stepper_create(cmp_stepper_t **out_stepper);
+int cmp_stepper_destroy(cmp_stepper_t *stepper);
+int cmp_stepper_set_limits(cmp_stepper_t *stepper, int min_val, int max_val,
+                           int step);
+int cmp_stepper_get_value(cmp_stepper_t *stepper, int *out_val);
+int cmp_stepper_increment(cmp_stepper_t *stepper);
+int cmp_stepper_decrement(cmp_stepper_t *stepper);
+
+/**
+ * @brief Create a Slider
+ */
+int cmp_slider_create(cmp_slider_t **out_slider);
+int cmp_slider_destroy(cmp_slider_t *slider);
+int cmp_slider_set_limits(cmp_slider_t *slider, float min_val, float max_val);
+int cmp_slider_set_value(cmp_slider_t *slider, float val);
+int cmp_slider_get_visuals(cmp_slider_t *slider, float *out_thumb_x_percent);
+
+/**
+ * @brief Launch OS-native Color Picker
+ */
+int cmp_system_color_picker_show(cmp_window_t *window);
+
+/**
+ * @brief Launch OS-native Date Picker (Compact style)
+ */
+int cmp_system_date_picker_show(cmp_window_t *window);
+
+/* Phase 6.4: Text Fields & Editors (Apple HIG specific) */
+
+/**
+ * @brief Software Keyboard Layout Types
+ */
+typedef enum cmp_keyboard_type {
+  CMP_KEYBOARD_TYPE_DEFAULT = 0,
+  CMP_KEYBOARD_TYPE_EMAIL_ADDRESS,
+  CMP_KEYBOARD_TYPE_URL,
+  CMP_KEYBOARD_TYPE_NUMBER_PAD,
+  CMP_KEYBOARD_TYPE_DECIMAL_PAD,
+  CMP_KEYBOARD_TYPE_PHONE_PAD
+} cmp_keyboard_type_t;
+
+/**
+ * @brief Software Keyboard Return Key Types
+ */
+typedef enum cmp_return_key_type {
+  CMP_RETURN_KEY_DEFAULT = 0,
+  CMP_RETURN_KEY_GO,
+  CMP_RETURN_KEY_SEARCH,
+  CMP_RETURN_KEY_NEXT,
+  CMP_RETURN_KEY_DONE,
+  CMP_RETURN_KEY_SEND
+} cmp_return_key_type_t;
+
+/**
+ * @brief Auto-Capitalization Behaviors
+ */
+typedef enum cmp_auto_capitalization {
+  CMP_AUTO_CAPITALIZATION_NONE = 0,
+  CMP_AUTO_CAPITALIZATION_WORDS,
+  CMP_AUTO_CAPITALIZATION_SENTENCES,
+  CMP_AUTO_CAPITALIZATION_ALL_CHARACTERS
+} cmp_auto_capitalization_t;
+
+/**
+ * @brief Opaque Text Field Control
+ */
+typedef struct cmp_text_field cmp_text_field_t;
+
+/**
+ * @brief Create a Text Field
+ */
+int cmp_text_field_create(cmp_text_field_t **out_field);
+int cmp_text_field_destroy(cmp_text_field_t *field);
+
+/**
+ * @brief Configure OS keyboard hints
+ */
+int cmp_text_field_set_keyboard_type(cmp_text_field_t *field,
+                                     cmp_keyboard_type_t type);
+int cmp_text_field_set_return_key_type(cmp_text_field_t *field,
+                                       cmp_return_key_type_t type);
+int cmp_text_field_set_secure_text_entry(cmp_text_field_t *field, int secure);
+int cmp_text_field_set_auto_capitalization(cmp_text_field_t *field,
+                                           cmp_auto_capitalization_t cap);
+int cmp_text_field_set_spellcheck_enabled(cmp_text_field_t *field, int enabled);
+
+/**
+ * @brief Mount an input accessory view (custom toolbar above the soft keyboard)
+ */
+int cmp_text_field_set_input_accessory_view(cmp_text_field_t *field,
+                                            cmp_ui_node_t *accessory_node);
+
+/**
+ * @brief Data Detector Types (for Rich Text Views)
+ */
+typedef enum cmp_data_detector_types {
+  CMP_DATA_DETECTOR_NONE = 0,
+  CMP_DATA_DETECTOR_PHONE_NUMBER = 1 << 0,
+  CMP_DATA_DETECTOR_LINK = 1 << 1,
+  CMP_DATA_DETECTOR_ADDRESS = 1 << 2,
+  CMP_DATA_DETECTOR_CALENDAR_EVENT = 1 << 3,
+  CMP_DATA_DETECTOR_ALL = 0xFFFFFFFF
+} cmp_data_detector_types_t;
+
+/**
+ * @brief Opaque Rich Text View
+ */
+typedef struct cmp_rich_text_view cmp_rich_text_view_t;
+
+int cmp_rich_text_view_create(cmp_rich_text_view_t **out_view);
+int cmp_rich_text_view_destroy(cmp_rich_text_view_t *view);
+int cmp_rich_text_view_set_data_detectors(cmp_rich_text_view_t *view,
+                                          cmp_data_detector_types_t flags);
+
+/* Phase 7.1: Lists & Tables (Apple HIG specific) */
+
+/**
+ * @brief List Collection Styles
+ */
+typedef enum cmp_list_style {
+  CMP_LIST_STYLE_PLAIN = 0,    /* Edge-to-edge separators */
+  CMP_LIST_STYLE_GROUPED,      /* Blocks of rows with section headers */
+  CMP_LIST_STYLE_INSET_GROUPED /* iOS 15+ rounded blocks with margins */
+} cmp_list_style_t;
+
+/**
+ * @brief Swipe Action Execution Styles
+ */
+typedef enum cmp_swipe_action_style {
+  CMP_SWIPE_ACTION_STYLE_NORMAL = 0,
+  CMP_SWIPE_ACTION_STYLE_DESTRUCTIVE
+} cmp_swipe_action_style_t;
+
+/**
+ * @brief Opaque List Controller
+ */
+typedef struct cmp_list cmp_list_t;
+
+/**
+ * @brief Opaque List Row
+ */
+typedef struct cmp_list_row cmp_list_row_t;
+
+/**
+ * @brief Create a List Controller
+ */
+int cmp_list_create(cmp_list_t **out_list, cmp_list_style_t style);
+
+/**
+ * @brief Destroy a List Controller
+ */
+int cmp_list_destroy(cmp_list_t *list);
+
+/**
+ * @brief Add a basic row to the list
+ */
+int cmp_list_add_row(cmp_list_t *list, cmp_list_row_t *row);
+
+/**
+ * @brief Create a list row
+ */
+int cmp_list_row_create(cmp_list_row_t **out_row, const char *title);
+
+/**
+ * @brief Destroy a list row
+ */
+int cmp_list_row_destroy(cmp_list_row_t *row);
+
+/**
+ * @brief Configure separator insets
+ * @param inset_left Sets how far the separator indents to align with text,
+ * bypassing icons.
+ */
+int cmp_list_row_set_separator_inset(cmp_list_row_t *row, float inset_left);
+
+/**
+ * @brief Register a contextual swipe action
+ * @param is_leading 1 for swiping right-to-left (leading), 0 for left-to-right
+ * (trailing)
+ * @param allows_continuous 1 to allow execution via deep swipe
+ */
+int cmp_list_row_add_swipe_action(cmp_list_row_t *row, int is_leading,
+                                  const char *title,
+                                  cmp_swipe_action_style_t style,
+                                  int allows_continuous);
+
+/**
+ * @brief Enable edit mode on the list (reveals delete minus signs and reorder
+ * grabbers)
+ */
+int cmp_list_set_edit_mode(cmp_list_t *list, int is_editing);
+
+/**
+ * @brief Evaluates visual metrics based on list style and edit mode
+ * @param out_margin_horizontal Left/Right margins (0.0 for plain, ~16.0 for
+ * inset grouped)
+ * @param out_corner_radius Row clipping radius (0.0 for plain, ~10.0 for inset
+ * grouped ends)
+ * @param out_content_offset_x X offset for row content to make room for
+ * edit/delete buttons
+ */
+int cmp_list_resolve_metrics(cmp_list_t *list, float *out_margin_horizontal,
+                             float *out_corner_radius,
+                             float *out_content_offset_x);
+
+/* Phase 7.2: Scroll Views (Apple HIG specific) */
+
+/**
+ * @brief Scroll Deceleration Rates
+ */
+typedef enum cmp_scroll_deceleration_rate {
+  CMP_SCROLL_DECELERATION_NORMAL = 0, /* Standard list scrolling */
+  CMP_SCROLL_DECELERATION_FAST        /* Paging or gallery snapping */
+} cmp_scroll_deceleration_rate_t;
+
+/**
+ * @brief Keyboard Dismissal Modes
+ */
+typedef enum cmp_scroll_keyboard_dismiss {
+  CMP_SCROLL_KEYBOARD_DISMISS_NONE = 0,
+  CMP_SCROLL_KEYBOARD_DISMISS_ON_DRAG, /* Dismiss the moment a touch drag begins
+                                        */
+  CMP_SCROLL_KEYBOARD_DISMISS_INTERACTIVE /* Push the keyboard down
+                                             interactively as the user scrolls
+                                             down */
+} cmp_scroll_keyboard_dismiss_t;
+
+/**
+ * @brief Opaque Scroll View Extension Context
+ */
+typedef struct cmp_scroll_view cmp_scroll_view_t;
+
+/**
+ * @brief Create a Scroll View Extension
+ */
+int cmp_scroll_view_create(cmp_scroll_view_t **out_scroll_view);
+
+/**
+ * @brief Destroy a Scroll View Extension
+ */
+int cmp_scroll_view_destroy(cmp_scroll_view_t *scroll_view);
+
+/**
+ * @brief Sets the deceleration rate multiplier
+ */
+int cmp_scroll_view_set_deceleration_rate(cmp_scroll_view_t *scroll_view,
+                                          cmp_scroll_deceleration_rate_t rate);
+
+/**
+ * @brief Enables pagination mode (snapping to view bounds)
+ */
+int cmp_scroll_view_set_paging_enabled(cmp_scroll_view_t *scroll_view,
+                                       int is_paging_enabled);
+
+/**
+ * @brief Evaluates whether the scrollbar should be actively rendering based on
+ * state
+ * @param is_scrolling Current active scrolling state from touch/wheel
+ * @param time_since_last_scroll Milliseconds elapsed since the scroll stopped
+ * @param out_opacity Computed opacity of the scrollbar (1.0 during scroll,
+ * fading to 0.0)
+ */
+int cmp_scroll_view_evaluate_scrollbar(cmp_scroll_view_t *scroll_view,
+                                       int is_scrolling,
+                                       float time_since_last_scroll,
+                                       float *out_opacity);
+
+/**
+ * @brief Checks if a fast drag over the scroll indicator area should transition
+ * into interactive fast-scrolling
+ * @param pointer_x Current touch X
+ * @param pointer_y Current touch Y
+ * @param view_width Total width of the scroll view
+ * @param out_is_interactive Populated with 1 if the scrollbar is now captured
+ * by the user
+ */
+int cmp_scroll_view_hit_test_scrollbar(cmp_scroll_view_t *scroll_view,
+                                       float pointer_x, float pointer_y,
+                                       float view_width,
+                                       int *out_is_interactive);
+
+/**
+ * @brief Evaluates Apple's specific friction formula when over-scrolling past
+ * content bounds (Rubber-Banding)
+ * @param overscroll_delta The raw physical translation attempted past the bound
+ * @param view_dimension The total size of the viewport (used as the scaling
+ * denominator)
+ * @param out_visual_translation The actual translated pixel amount to render (a
+ * logarithmic curve)
+ */
+int cmp_scroll_view_calculate_rubber_band(cmp_scroll_view_t *scroll_view,
+                                          float overscroll_delta,
+                                          float view_dimension,
+                                          float *out_visual_translation);
+
+/**
+ * @brief Configure keyboard dismissal behaviors on scroll
+ */
+int cmp_scroll_view_set_keyboard_dismiss_mode(
+    cmp_scroll_view_t *scroll_view, cmp_scroll_keyboard_dismiss_t mode);
+
+/* Phase 7.3: Collections, Grids & Complex Layouts (Apple HIG specific) */
+
+/**
+ * @brief Opaque Collection View Controller
+ */
+typedef struct cmp_collection cmp_collection_t;
+
+/**
+ * @brief Opaque Compositional Layout Section
+ */
+typedef struct cmp_collection_section cmp_collection_section_t;
+
+/**
+ * @brief Opaque Diffable Data Source
+ */
+typedef struct cmp_diffable_datasource cmp_diffable_datasource_t;
+
+/**
+ * @brief Orthogonal Scrolling Behaviors
+ */
+typedef enum cmp_orthogonal_behavior {
+  CMP_ORTHOGONAL_NONE = 0,
+  CMP_ORTHOGONAL_CONTINUOUS,               /* Standard horizontal scrolling */
+  CMP_ORTHOGONAL_CONTINUOUS_GROUP_LEADING, /* Snaps to leading edge of groups */
+  CMP_ORTHOGONAL_PAGING                    /* Page-by-page snapping */
+} cmp_orthogonal_behavior_t;
+
+/**
+ * @brief Create a Collection View Controller
+ */
+int cmp_collection_create(cmp_collection_t **out_collection);
+
+/**
+ * @brief Destroy a Collection View Controller
+ */
+int cmp_collection_destroy(cmp_collection_t *collection);
+
+/**
+ * @brief Create a Compositional Layout Section
+ */
+int cmp_collection_section_create(cmp_collection_section_t **out_section);
+
+/**
+ * @brief Destroy a Compositional Layout Section
+ */
+int cmp_collection_section_destroy(cmp_collection_section_t *section);
+
+/**
+ * @brief Configure an adaptive Flow Layout that reflows columns dynamically
+ * @param min_column_width The absolute minimum width an item can be before
+ * reflowing into a new row
+ */
+int cmp_collection_section_set_flow_layout(cmp_collection_section_t *section,
+                                           float min_column_width);
+
+/**
+ * @brief Configure Orthogonal (perpendicular) scrolling for this specific
+ * section (e.g. an App Store carousel)
+ */
+int cmp_collection_section_set_orthogonal_behavior(
+    cmp_collection_section_t *section, cmp_orthogonal_behavior_t behavior);
+
+/**
+ * @brief Add a section to the main Collection View layout
+ */
+int cmp_collection_add_section(cmp_collection_t *collection,
+                               cmp_collection_section_t *section);
+
+/**
+ * @brief Create a Diffable Data Source
+ */
+int cmp_diffable_datasource_create(cmp_diffable_datasource_t **out_ds);
+
+/**
+ * @brief Destroy a Diffable Data Source
+ */
+int cmp_diffable_datasource_destroy(cmp_diffable_datasource_t *ds);
+
+/**
+ * @brief Apply a new state snapshot to the Diffable Data Source
+ * In reality, this calculates insertions, deletions, and moves based on hash
+ * hashes.
+ * @param items Array of arbitrary 64-bit identifier hashes representing the new
+ * state
+ */
+int cmp_diffable_datasource_apply_snapshot(cmp_diffable_datasource_t *ds,
+                                           const uint64_t *items, size_t count);
+
+/**
+ * @brief System UI Views
+ * Mounts OS-native abstractions seamlessly into the layout tree
+ */
+int cmp_system_map_view_mount(cmp_ui_node_t *node, float latitude,
+                              float longitude);
+int cmp_system_web_view_mount(cmp_ui_node_t *node, const char *url);
+
+/* Phase 8.1: Touch & Multi-Touch Gestures (Apple HIG specific) */
+
+/**
+ * @brief Gesture Disambiguation Conflict Resolution
+ * When two gesture recognizers recognize simultaneously, decide which one
+ * fails. E.g., fail a pan-horizontal if a pan-vertical is already tracking.
+ */
+int cmp_gesture_require_failure(cmp_gesture_t *primary_gesture,
+                                cmp_gesture_t *other_gesture_to_fail);
+
+/**
+ * @brief Configure pinch-to-zoom bounds
+ */
+int cmp_complex_gesture_set_zoom_limits(cmp_complex_gesture_t *gesture,
+                                        float min_scale, float max_scale);
+
+/**
+ * @brief Retrieve pinch-to-zoom centroid and scaled value
+ * @param out_centroid_x Output center X between fingers
+ * @param out_centroid_y Output center Y between fingers
+ * @param out_scale The calculated scale multiplier, incorporating
+ * rubber-banding if past limits
+ */
+int cmp_complex_gesture_get_zoom(const cmp_complex_gesture_t *gesture,
+                                 float *out_centroid_x, float *out_centroid_y,
+                                 float *out_scale);
+
+/**
+ * @brief Configure rotation snapping (e.g. snapping to 0, 90, 180 degrees)
+ */
+int cmp_complex_gesture_set_rotation_snapping(cmp_complex_gesture_t *gesture,
+                                              int enable_snapping);
+
+/**
+ * @brief Retrieve rotation angle
+ */
+int cmp_complex_gesture_get_rotation(const cmp_complex_gesture_t *gesture,
+                                     float *out_radians);
+
+/**
+ * @brief Screen Edge Swipe Back (Navigation Pop)
+ * Hooks into the routing engine to tie pop progress to finger position
+ */
+typedef struct cmp_edge_swipe cmp_edge_swipe_t;
+int cmp_edge_swipe_create(cmp_edge_swipe_t **out_swipe, cmp_router_t *router);
+int cmp_edge_swipe_destroy(cmp_edge_swipe_t *swipe);
+int cmp_edge_swipe_process(cmp_edge_swipe_t *swipe, float touch_x,
+                           float screen_width, cmp_gesture_state_t state);
+
+/**
+ * @brief Multi-Touch Override Safe-Guard
+ * Cancels active UI gestures if system gestures (3, 4, 5 fingers) are detected.
+ */
+int cmp_gesture_cancel_on_system_override(cmp_gesture_t *gesture,
+                                          int active_touches_count);
+
+/* Phase 8.2: Keyboard & Trackpad (Apple HIG specific) */
+
+/**
+ * @brief iPadOS Pointer Interaction Styles
+ */
+typedef enum cmp_pointer_interaction_style {
+  CMP_POINTER_INTERACTION_AUTOMATIC = 0,
+  CMP_POINTER_INTERACTION_LIFT, /* Pointer morphs into object, lifts it visually
+                                 */
+  CMP_POINTER_INTERACTION_HIGHLIGHT, /* Pointer shrinks, object background
+                                        highlights */
+  CMP_POINTER_INTERACTION_HOVER /* Pointer retains shape but scales up/down */
+} cmp_pointer_interaction_style_t;
+
+/**
+ * @brief Represents a system keyboard shortcut (e.g. Cmd-C, Shift-Tab)
+ */
+typedef struct cmp_keyboard_shortcut cmp_keyboard_shortcut_t;
+
+/**
+ * @brief Opaque UI Command (maps to UIMenu/UICommand/macOS menu bar)
+ */
+typedef struct cmp_ui_command cmp_ui_command_t;
+
+/**
+ * @brief Pointer Region Definition
+ */
+typedef struct cmp_pointer_region cmp_pointer_region_t;
+
+int cmp_pointer_region_create(cmp_pointer_region_t **out_region);
+int cmp_pointer_region_destroy(cmp_pointer_region_t *region);
+int cmp_pointer_region_set_style(cmp_pointer_region_t *region,
+                                 cmp_pointer_interaction_style_t style);
+
+/**
+ * @brief Retrieve computed morphing scales based on interaction style
+ * @param out_scale_x Populated with the scale factor for the pointer/element
+ */
+int cmp_pointer_region_get_morph_scale(cmp_pointer_region_t *region,
+                                       float *out_scale_x, float *out_scale_y);
+
+/**
+ * @brief Create a Keyboard Shortcut definition
+ * @param key The base character (e.g., 'c', 'v')
+ * @param modifier_flags Bitmask of modifiers (e.g., Command | Shift)
+ */
+int cmp_keyboard_shortcut_create(cmp_keyboard_shortcut_t **out_shortcut,
+                                 char key, uint32_t modifier_flags);
+int cmp_keyboard_shortcut_destroy(cmp_keyboard_shortcut_t *shortcut);
+
+/**
+ * @brief Create a UI Command node
+ * @param title The human-readable string displayed in the menu
+ * @param action_id A unique string identifier routed through the event bus
+ */
+int cmp_ui_command_create(cmp_ui_command_t **out_command, const char *title,
+                          const char *action_id);
+int cmp_ui_command_destroy(cmp_ui_command_t *command);
+
+/**
+ * @brief Bind a shortcut to a UI Command
+ */
+int cmp_ui_command_set_shortcut(cmp_ui_command_t *command,
+                                cmp_keyboard_shortcut_t *shortcut);
+
+/**
+ * @brief Accelerating Key Repeat Logic
+ * @param time_held_ms Milliseconds the key has been held down
+ * @param out_repeat_interval_ms The calculated delay before firing the next
+ * synthetic keypress event
+ */
+int cmp_keyboard_calculate_key_repeat(float time_held_ms,
+                                      float *out_repeat_interval_ms);
+
+/**
+ * @brief Trackpad Specific Gestures
+ * Natively supports two-finger semantic intent translations
+ */
+int cmp_trackpad_evaluate_gesture(float delta_x, float delta_y,
+                                  float *out_pan_x, float *out_pan_y);
+
+/* Phase 8.3: Apple Pencil & Stylus (Apple HIG specific) */
+
+/**
+ * @brief Stylus Hardware Interaction Events
+ */
+typedef enum cmp_stylus_event_type {
+  CMP_STYLUS_EVENT_DOUBLE_TAP = 0, /* Pencil Gen 2 */
+  CMP_STYLUS_EVENT_SQUEEZE         /* Pencil Pro */
+} cmp_stylus_event_type_t;
+
+/**
+ * @brief Opaque Stylus Interaction Context
+ */
+typedef struct cmp_stylus_context cmp_stylus_context_t;
+
+int cmp_stylus_context_create(cmp_stylus_context_t **out_context);
+int cmp_stylus_context_destroy(cmp_stylus_context_t *context);
+
+/**
+ * @brief Register a callback for hardware button/barrel events
+ */
+typedef void (*cmp_stylus_event_cb)(cmp_stylus_event_type_t event_type,
+                                    void *userdata);
+int cmp_stylus_context_set_event_callback(cmp_stylus_context_t *context,
+                                          cmp_stylus_event_cb callback,
+                                          void *userdata);
+
+/**
+ * @brief Evaluates stylus metrics for rendering digital ink (pressure,
+ * altitude, azimuth)
+ * @param event The generic pointer event containing raw OS metrics
+ * @param out_brush_opacity Populated based on pressure [0.0 - 1.0]
+ * @param out_brush_width Populated based on altitude/tilt (e.g. flat pencil
+ * draws wider strokes)
+ */
+int cmp_stylus_resolve_ink_metrics(const cmp_event_t *event, float base_width,
+                                   float *out_brush_opacity,
+                                   float *out_brush_width);
+
+/**
+ * @brief Evaluates Hover State (iPad Pro M2+)
+ * @param event The pointer event
+ * @param out_is_hovering 1 if the pencil is detected above the screen but not
+ * touching
+ * @param out_distance Distance from screen (normalized 0.0 to 1.0 if supported
+ * by OS, else just binary)
+ */
+int cmp_stylus_evaluate_hover(const cmp_event_t *event, int *out_is_hovering,
+                              float *out_distance);
+
+/**
+ * @brief Enable global Scribble (Handwriting to text) routing for standard text
+ * inputs
+ */
+int cmp_stylus_set_scribble_enabled(int is_enabled);
+
+/* Phase 8.4: Drag and Drop (Apple HIG specific extensions) */
+
+/**
+ * @brief Evaluates visual metrics during a drag initiation
+ * @param progress 0.0 (at rest) to 1.0 (fully lifted state)
+ * @param out_scale Returns the visual multiplier (e.g. 1.05 for lifted)
+ * @param out_shadow_opacity Returns the intensity of the drop shadow
+ */
+int cmp_dnd_evaluate_lift_animation(float progress, float *out_scale,
+                                    float *out_shadow_opacity);
+
+/**
+ * @brief Adds an additional item to the current drag session, grouping them
+ * into a visual stack
+ */
+int cmp_dnd_add_item_to_stack(cmp_dnd_t *dnd,
+                              const char *additional_payload_text);
+
+/**
+ * @brief Returns the total number of items currently grouped in this drag
+ * session
+ */
+int cmp_dnd_get_stack_count(const cmp_dnd_t *dnd, size_t *out_count);
+
+/**
+ * @brief Evaluates the visual highlight for a valid drop target
+ * @param is_hovered 1 if the drag pointer is currently inside this target
+ * bounds
+ * @param out_expansion_scale Returns > 1.0f if the target should slightly
+ * expand
+ * @param out_bg_overlay_opacity Returns the opacity for a selection highlight
+ * overlay
+ */
+int cmp_dnd_evaluate_drop_target_highlight(int is_hovered,
+                                           float *out_expansion_scale,
+                                           float *out_bg_overlay_opacity);
+
+/**
+ * @brief Manages "Spring Loading" (Hovering to open)
+ * @param hover_duration_ms How long the drag has been hovering over the target
+ * @param out_should_trigger Returns 1 if the threshold has been passed and the
+ * folder/link should open
+ */
+int cmp_dnd_evaluate_spring_loading(float hover_duration_ms,
+                                    int *out_should_trigger);
+
+/* Phase 8.5: Game Controllers (Apple HIG specific extensions) */
+
+/**
+ * @brief Game Controller D-Pad/Thumbstick to Focus Mapping
+ * Reads current gamepad state and emits simulated arrow key events to the event
+ * loop if thresholds are crossed, allowing full UI navigation via controller.
+ * @param gamepad The polled gamepad state
+ * @param dt_ms Time elapsed to handle synthetic repeat
+ */
+int cmp_gamepad_evaluate_focus_navigation(const cmp_gamepad_t *gamepad,
+                                          float dt_ms);
+
+/**
+ * @brief Haptic Rumble Waveforms
+ */
+typedef enum cmp_gamepad_rumble_type {
+  CMP_GAMEPAD_RUMBLE_LIGHT = 0,
+  CMP_GAMEPAD_RUMBLE_MEDIUM,
+  CMP_GAMEPAD_RUMBLE_HEAVY,
+  CMP_GAMEPAD_RUMBLE_SUCCESS,
+  CMP_GAMEPAD_RUMBLE_ERROR
+} cmp_gamepad_rumble_type_t;
+
+/**
+ * @brief Triggers a predefined rumble waveform on the controller
+ * @param index The controller index
+ * @param type The waveform to trigger
+ */
+int cmp_gamepad_trigger_rumble(int index, cmp_gamepad_rumble_type_t type);
+
+/**
+ * @brief Adaptive Trigger Resistance (DualSense mapping)
+ */
+typedef struct cmp_adaptive_trigger_config {
+  int is_active;
+  float start_position; /* 0.0 to 1.0 */
+  float resistance;     /* 0.0 to 1.0 */
+} cmp_adaptive_trigger_config_t;
+
+/**
+ * @brief Configure adaptive trigger resistance for L2/R2
+ * @param index The controller index
+ * @param is_left 1 for L2, 0 for R2
+ * @param config The resistance configuration
+ */
+int cmp_gamepad_set_adaptive_trigger(
+    int index, int is_left, const cmp_adaptive_trigger_config_t *config);
+
+/* Phase 9.1: App Extensions & Capabilities (Apple HIG specific) */
+
+/**
+ * @brief Widget Family Sizes (maps to WidgetFamily on Apple platforms)
+ */
+typedef enum cmp_widget_family {
+  CMP_WIDGET_FAMILY_SYSTEM_SMALL = 0,
+  CMP_WIDGET_FAMILY_SYSTEM_MEDIUM,
+  CMP_WIDGET_FAMILY_SYSTEM_LARGE,
+  CMP_WIDGET_FAMILY_SYSTEM_EXTRA_LARGE,
+  CMP_WIDGET_FAMILY_ACCESSORY_CIRCULAR, /* Lock Screen / Watch */
+  CMP_WIDGET_FAMILY_ACCESSORY_RECTANGULAR,
+  CMP_WIDGET_FAMILY_ACCESSORY_INLINE
+} cmp_widget_family_t;
+
+/**
+ * @brief Live Activity Presentation Contexts (Dynamic Island)
+ */
+typedef enum cmp_live_activity_presentation {
+  CMP_LIVE_ACTIVITY_PRESENTATION_LOCK_SCREEN = 0,
+  CMP_LIVE_ACTIVITY_PRESENTATION_COMPACT_LEADING, /* Dynamic Island */
+  CMP_LIVE_ACTIVITY_PRESENTATION_COMPACT_TRAILING,
+  CMP_LIVE_ACTIVITY_PRESENTATION_MINIMAL,
+  CMP_LIVE_ACTIVITY_PRESENTATION_EXPANDED
+} cmp_live_activity_presentation_t;
+
+/**
+ * @brief Opaque Widget Context
+ */
+typedef struct cmp_widget_ctx cmp_widget_ctx_t;
+
+/**
+ * @brief Opaque Live Activity Context
+ */
+typedef struct cmp_live_activity_ctx cmp_live_activity_ctx_t;
+
+/**
+ * @brief Initialize a constrained Widget Context (enforces memory/CPU limits)
+ */
+int cmp_widget_ctx_create(cmp_widget_ctx_t **out_ctx,
+                          cmp_widget_family_t family);
+int cmp_widget_ctx_destroy(cmp_widget_ctx_t *ctx);
+
+/**
+ * @brief Mount a static snapshot layout into the Widget Context
+ */
+int cmp_widget_mount_snapshot(cmp_widget_ctx_t *ctx, cmp_ui_node_t *root_node);
+
+/**
+ * @brief Configure Interactive Widget intent mapping (iOS 17+)
+ * App Intents map to specific button clicks on a widget, executing in the
+ * background.
+ */
+int cmp_widget_bind_intent(cmp_widget_ctx_t *ctx, cmp_ui_node_t *button_node,
+                           const char *intent_identifier);
+
+/**
+ * @brief Create a Live Activity (Dynamic Island)
+ */
+int cmp_live_activity_ctx_create(cmp_live_activity_ctx_t **out_ctx);
+int cmp_live_activity_ctx_destroy(cmp_live_activity_ctx_t *ctx);
+
+/**
+ * @brief Mount a specific layout for a Dynamic Island presentation state
+ */
+int cmp_live_activity_mount_presentation(
+    cmp_live_activity_ctx_t *ctx, cmp_live_activity_presentation_t presentation,
+    cmp_ui_node_t *node);
+
+/**
+ * @brief Utility to verify the framework executable size fits App Clip/App
+ * Extension limits
+ * @param out_is_compliant Returns 1 if total footprint is under the 10MB limit
+ */
+int cmp_extension_verify_footprint(int *out_is_compliant);
+
+/* Phase 9.2: OS Communications (Apple HIG specific) */
+
+/**
+ * @brief Opaque System Communication Context
+ */
+typedef struct cmp_os_communications cmp_os_communications_t;
+
+int cmp_os_communications_create(cmp_os_communications_t **out_ctx);
+int cmp_os_communications_destroy(cmp_os_communications_t *ctx);
+
+/**
+ * @brief Siri & App Intents Registration
+ * @param intent_id Unique identifier matching the INIntent definition
+ * @param title Human readable title for the Shortcuts App
+ */
+int cmp_os_communications_register_intent(cmp_os_communications_t *ctx,
+                                          const char *intent_id,
+                                          const char *title);
+
+/**
+ * @brief Show System Share Sheet (UIActivityViewController equivalent)
+ */
+int cmp_os_communications_show_share_sheet(cmp_os_communications_t *ctx,
+                                           cmp_window_t *window,
+                                           const char *url_to_share,
+                                           const char *text_to_share);
+
+/**
+ * @brief Broadcast current activity for Handoff (Continuity)
+ * @param activity_type Uniquely identifies the task type
+ * @param payload Arbitrary string (usually JSON/URI) representing state
+ */
+int cmp_os_communications_broadcast_handoff(cmp_os_communications_t *ctx,
+                                            const char *activity_type,
+                                            const char *payload);
+
+/**
+ * @brief Index content directly into the OS Search (CoreSpotlight)
+ */
+int cmp_os_communications_index_for_spotlight(cmp_os_communications_t *ctx,
+                                              const char *item_id,
+                                              const char *title,
+                                              const char *description);
+
+/**
+ * @brief Check if the current OS Focus Mode should suppress non-urgent UI
+ * updates (e.g. Work or Sleep modes active)
+ * @param out_is_suppressed Populated with 1 if focus mode is active and
+ * restrictive
+ */
+int cmp_os_communications_evaluate_focus_mode(cmp_os_communications_t *ctx,
+                                              int *out_is_suppressed);
+
+/**
+ * @brief Initialize a SharePlay (GroupActivities) session
+ */
+int cmp_os_communications_start_shareplay(cmp_os_communications_t *ctx,
+                                          const char *activity_id);
+
+/* Phase 9.3: Media, Audio & AVKit (Apple HIG specific) */
+
+/**
+ * @brief Audio Session Categories (maps to AVAudioSessionCategory)
+ */
+typedef enum cmp_audio_session_category {
+  CMP_AUDIO_SESSION_AMBIENT =
+      0, /* Silenced by ringer switch, mixes with other audio */
+  CMP_AUDIO_SESSION_SOLO_AMBIENT, /* Silenced by ringer switch, pauses other
+                                     audio */
+  CMP_AUDIO_SESSION_PLAYBACK,     /* Plays even if ringer switch is silent (e.g.
+                                     music apps) */
+  CMP_AUDIO_SESSION_RECORD,
+  CMP_AUDIO_SESSION_PLAY_AND_RECORD
+} cmp_audio_session_category_t;
+
+/**
+ * @brief Opaque Media Player Context (AVPlayerViewController equivalent)
+ */
+typedef struct cmp_media_player cmp_media_player_t;
+
+/**
+ * @brief Opaque Audio Session Context
+ */
+typedef struct cmp_audio_session cmp_audio_session_t;
+
+int cmp_media_player_create(cmp_media_player_t **out_player);
+int cmp_media_player_destroy(cmp_media_player_t *player);
+
+/**
+ * @brief Load a media URL
+ */
+int cmp_media_player_load_url(cmp_media_player_t *player, const char *url);
+
+/**
+ * @brief Mount the media player into the layout tree (uses OS native controls
+ * if requested)
+ */
+int cmp_media_player_mount(cmp_media_player_t *player, cmp_ui_node_t *node,
+                           int use_system_controls);
+
+/**
+ * @brief Set Picture-in-Picture capability
+ */
+int cmp_media_player_set_pip_enabled(cmp_media_player_t *player,
+                                     int is_enabled);
+
+/**
+ * @brief Configure the OS Now Playing Info Center (Lock Screen / Watch
+ * metadata)
+ */
+int cmp_media_player_update_now_playing(cmp_media_player_t *player,
+                                        const char *title, const char *artist,
+                                        float duration, float current_time);
+
+/**
+ * @brief Enable Spatial Audio processing capabilities
+ */
+int cmp_media_player_set_spatial_audio_enabled(cmp_media_player_t *player,
+                                               int is_enabled);
+
+/**
+ * @brief Handle remote commands (headphones, lock screen buttons)
+ */
+typedef void (*cmp_remote_command_cb)(int command_id, void *userdata);
+int cmp_media_player_set_remote_command_handler(cmp_media_player_t *player,
+                                                cmp_remote_command_cb callback,
+                                                void *userdata);
+
+int cmp_audio_session_create(cmp_audio_session_t **out_session);
+int cmp_audio_session_destroy(cmp_audio_session_t *session);
+
+/**
+ * @brief Set the global application audio session category
+ */
+int cmp_audio_session_set_category(cmp_audio_session_t *session,
+                                   cmp_audio_session_category_t category);
+
+/**
+ * @brief Activate the audio session (may pause background music depending on
+ * category)
+ */
+int cmp_audio_session_activate(cmp_audio_session_t *session);
+
+/* Phase 9.4: Transactions, Files & Cloud (Apple HIG specific) */
+
+/**
+ * @brief Opaque Payment Context
+ */
+typedef struct cmp_payment_ctx cmp_payment_ctx_t;
+
+/**
+ * @brief Opaque StoreKit Context
+ */
+typedef struct cmp_storekit_ctx cmp_storekit_ctx_t;
+
+/**
+ * @brief Opaque Cloud Sync Context
+ */
+typedef struct cmp_cloud_sync_ctx cmp_cloud_sync_ctx_t;
+
+/**
+ * @brief Apple Pay Button Styles
+ */
+typedef enum cmp_apple_pay_button_style {
+  CMP_APPLE_PAY_BUTTON_BLACK = 0,
+  CMP_APPLE_PAY_BUTTON_WHITE,
+  CMP_APPLE_PAY_BUTTON_WHITE_OUTLINE
+} cmp_apple_pay_button_style_t;
+
+/**
+ * @brief Apple Pay Button Types (e.g. "Buy with", "Subscribe with")
+ */
+typedef enum cmp_apple_pay_button_type {
+  CMP_APPLE_PAY_BUTTON_TYPE_PLAIN = 0,
+  CMP_APPLE_PAY_BUTTON_TYPE_BUY,
+  CMP_APPLE_PAY_BUTTON_TYPE_SUBSCRIBE
+} cmp_apple_pay_button_type_t;
+
+int cmp_payment_ctx_create(cmp_payment_ctx_t **out_ctx);
+int cmp_payment_ctx_destroy(cmp_payment_ctx_t *ctx);
+
+/**
+ * @brief Mounts an unmodified PKPaymentButton to the UI tree (HIG requirement)
+ */
+int cmp_payment_mount_apple_pay_button(cmp_payment_ctx_t *ctx,
+                                       cmp_ui_node_t *node,
+                                       cmp_apple_pay_button_style_t style,
+                                       cmp_apple_pay_button_type_t type);
+
+/**
+ * @brief Initiate an Apple Pay transaction
+ */
+int cmp_payment_request_apple_pay(cmp_payment_ctx_t *ctx,
+                                  const char *merchant_identifier,
+                                  const char *currency_code, float amount);
+
+int cmp_storekit_ctx_create(cmp_storekit_ctx_t **out_ctx);
+int cmp_storekit_ctx_destroy(cmp_storekit_ctx_t *ctx);
+
+/**
+ * @brief Triggers the native StoreKit purchase modal
+ */
+int cmp_storekit_purchase_product(cmp_storekit_ctx_t *ctx,
+                                  const char *product_identifier);
+
+/**
+ * @brief Triggers the native StoreKit restore purchases flow
+ */
+int cmp_storekit_restore_purchases(cmp_storekit_ctx_t *ctx);
+
+int cmp_cloud_sync_ctx_create(cmp_cloud_sync_ctx_t **out_ctx);
+int cmp_cloud_sync_ctx_destroy(cmp_cloud_sync_ctx_t *ctx);
+
+/**
+ * @brief Syncs a small string to NSUbiquitousKeyValueStore
+ */
+int cmp_cloud_sync_set_key_value(cmp_cloud_sync_ctx_t *ctx, const char *key,
+                                 const char *value);
+
+/**
+ * @brief Asynchronously syncs a large payload to CloudKit
+ */
+int cmp_cloud_sync_upload_record(cmp_cloud_sync_ctx_t *ctx,
+                                 const char *record_type, const char *record_id,
+                                 const char *json_payload);
+
+/**
+ * @brief Declare a file/folder to be exposed in the iOS Files App / macOS
+ * Finder
+ */
+int cmp_cloud_sync_expose_to_files_app(cmp_cloud_sync_ctx_t *ctx,
+                                       const char *relative_path);
+
+/* Phase 10.1: Platform-Specific Master Checklist -> iOS (iPhone) */
+
+/**
+ * @brief Modal Sheet Detents (Snap Points)
+ */
+typedef enum cmp_sheet_detent {
+  CMP_SHEET_DETENT_MEDIUM = 0, /* ~Half screen */
+  CMP_SHEET_DETENT_LARGE,      /* Full screen */
+  CMP_SHEET_DETENT_CUSTOM
+} cmp_sheet_detent_t;
+
+/**
+ * @brief Opaque iOS-specific features controller
+ */
+typedef struct cmp_ios_features cmp_ios_features_t;
+
+int cmp_ios_features_create(cmp_ios_features_t **out_features);
+int cmp_ios_features_destroy(cmp_ios_features_t *features);
+
+/**
+ * @brief Calculate auto-scroll offset to avoid soft keyboard obscuring an
+ * active input
+ * @param keyboard_height The OS-reported soft keyboard height
+ * @param input_y The absolute Y coordinate of the bottom of the focused text
+ * input
+ * @param view_height Total height of the screen
+ * @param out_scroll_adjustment Populated with the required vertical scroll
+ * offset delta
+ */
+int cmp_ios_calculate_keyboard_avoidance(float keyboard_height, float input_y,
+                                         float view_height,
+                                         float *out_scroll_adjustment);
+
+/**
+ * @brief Pull-to-Refresh mechanics
+ * Evaluates continuous negative scrolling against a threshold to trigger a
+ * native spinner
+ * @param current_overscroll_y The raw negative rubber-band overscroll
+ * @param out_spinner_opacity 0.0 to 1.0 based on pull depth
+ * @param out_should_trigger Returns 1 if pull crossed the threshold and
+ * released
+ */
+int cmp_ios_evaluate_pull_to_refresh(float current_overscroll_y,
+                                     float *out_spinner_opacity,
+                                     int *out_should_trigger);
+
+/**
+ * @brief Modal Sheet Detent Snapping
+ * @param current_y Current swipe/drag position of the modal sheet
+ * @param screen_height Total screen height
+ * @param out_snapped_detent Populates with the closest detent based on Apple's
+ * velocity/release heuristics
+ */
+int cmp_ios_evaluate_sheet_detent_snap(float current_y, float screen_height,
+                                       cmp_sheet_detent_t *out_snapped_detent);
+
+/**
+ * @brief Reachability Layout Mitigation
+ * Validates that active touches or geometry calculations don't break when the
+ * OS pushes the view bounds down halfway
+ */
+int cmp_ios_mitigate_reachability_offset(float *io_touch_y,
+                                         float reachability_offset);
+
+/**
+ * @brief Context Menu Peeking
+ * Evaluates pressure for iOS 13/14 style deep-press "peek" previews before
+ * popping into navigation.
+ * @param pressure 0.0 to 1.0 (from 3D Touch or simulated long press duration)
+ * @param out_preview_scale How large the preview card should render (starts
+ * small, scales up to ~0.8 before full "pop")
+ */
+int cmp_ios_evaluate_context_menu_peek(float pressure,
+                                       float *out_preview_scale);
+
+/* Phase 10.2: Platform-Specific Master Checklist -> iPadOS (iPad) */
+/**
+ * @brief iOS Size Classes
+ */
+typedef enum cmp_size_class {
+  CMP_SIZE_CLASS_COMPACT = 0, /* iPhone portrait, iPad Slide Over */
+  CMP_SIZE_CLASS_REGULAR      /* iPad full screen, iPhone Max landscape */
+} cmp_size_class_t;
+
+/**
+ * @brief Split View Styles
+ */
+typedef enum cmp_split_view_style {
+  CMP_SPLIT_VIEW_DOUBLE_COLUMN = 0,
+  CMP_SPLIT_VIEW_TRIPLE_COLUMN
+} cmp_split_view_style_t;
+
+/**
+ * @brief Opaque iPadOS features controller
+ */
+typedef struct cmp_ipados_features cmp_ipados_features_t;
+
+int cmp_ipados_features_create(cmp_ipados_features_t **out_features);
+int cmp_ipados_features_destroy(cmp_ipados_features_t *features);
+
+/**
+ * @brief Evaluates Size Classes based on dynamic window dimensions (handles
+ * multitasking/Slide Over)
+ */
+int cmp_ipados_resolve_size_classes(float window_width, float window_height,
+                                    cmp_size_class_t *out_horizontal,
+                                    cmp_size_class_t *out_vertical);
+
+/**
+ * @brief Resolves Sidebar layout behavior
+ * @param horizontal_class Evaluated size class
+ * @param out_is_collapsed Returns 1 if the sidebar should collapse into a
+ * toggle button (iPhone mode)
+ */
+int cmp_ipados_resolve_sidebar_state(cmp_size_class_t horizontal_class,
+                                     int *out_is_collapsed);
+
+/**
+ * @brief Request the OS to spawn a new, independent Window Scene (Stage Manager
+ * / Split View support)
+ */
+int cmp_ipados_request_scene_activation(cmp_ipados_features_t *features,
+                                        const char *activity_identifier);
+
+/**
+ * @brief Enable Center Stage (auto-panning/zooming) on supported iPad Pro
+ * cameras
+ */
+int cmp_ipados_set_center_stage_enabled(cmp_ipados_features_t *features,
+                                        int is_enabled);
+
+/* Phase 10.3: Platform-Specific Master Checklist -> macOS (Mac) */
+
+/**
+ * @brief Opaque macOS features controller
+ */
+typedef struct cmp_macos_features cmp_macos_features_t;
+
+int cmp_macos_features_create(cmp_macos_features_t **out_features);
+int cmp_macos_features_destroy(cmp_macos_features_t *features);
+
+/**
+ * @brief Toggles visibility of standard macOS window controls (Traffic Lights)
+ */
+int cmp_macos_set_window_controls_visible(cmp_macos_features_t *features,
+                                          int visible);
+
+/**
+ * @brief Sets a document proxy icon next to the window title
+ * @param file_url URL to the represented file, or NULL to remove
+ */
+int cmp_macos_set_document_proxy(cmp_macos_features_t *features,
+                                 const char *file_url);
+
+/**
+ * @brief Enables a system tray icon in the macOS menu bar
+ */
+int cmp_macos_set_menu_bar_extra(cmp_macos_features_t *features, int enabled);
+
+/**
+ * @brief Integrates directly with NSPrintOperation to show the macOS print
+ * dialog
+ */
+int cmp_macos_invoke_print_panel(cmp_macos_features_t *features);
+
+/**
+ * @brief Sets up the global application menu bar (File, Edit, View, etc.)
+ */
+int cmp_macos_setup_global_menu_bar(cmp_macos_features_t *features);
+
+/**
+ * @brief Creates a standard macOS desktop context menu (no blurred background)
+ */
+int cmp_macos_setup_context_menu(cmp_macos_features_t *features, void *node);
+
+/**
+ * @brief Sets precise mouse hover states for macOS UI elements
+ */
+int cmp_macos_set_hover_state(cmp_macos_features_t *features, void *node,
+                              int is_hovered);
+
+/**
+ * @brief Configures deep diffuse shadows for active windows, and flat for
+ * inactive
+ */
+int cmp_macos_set_window_shadow(cmp_macos_features_t *features, int is_active);
+
+/**
+ * @brief Enables native right-click "Customize Toolbar..." logic
+ */
+int cmp_macos_setup_toolbar_customization(cmp_macos_features_t *features);
+
+/* Phase 10.4: Platform-Specific Master Checklist -> watchOS (Apple Watch) */
+
+/**
+ * @brief Opaque watchOS features controller
+ */
+typedef struct cmp_watchos_features cmp_watchos_features_t;
+
+int cmp_watchos_features_create(cmp_watchos_features_t **out_features);
+int cmp_watchos_features_destroy(cmp_watchos_features_t *features);
+
+/**
+ * @brief Translates digital crown rotation to vertical scroll offsets,
+ * triggering detent haptics
+ */
+int cmp_watchos_handle_digital_crown(cmp_watchos_features_t *features,
+                                     float delta);
+
+/**
+ * @brief Responds to the physical Double Tap finger gesture on Series 9/Ultra 2
+ */
+int cmp_watchos_handle_double_tap(cmp_watchos_features_t *features);
+
+/**
+ * @brief Sets the Always-On Display (AOD) active state, dimming components and
+ * hiding sensitive info
+ */
+int cmp_watchos_set_aod_state(cmp_watchos_features_t *features,
+                              int is_wrist_down);
+
+/**
+ * @brief Exports rich JSON data mapped to CLKComplicationTemplate variants
+ */
+int cmp_watchos_export_complication_data(cmp_watchos_features_t *features,
+                                         const char *json_data);
+
+/**
+ * @brief Provides relevant UI snippets to the watchOS 10+ Smart Stack
+ */
+int cmp_watchos_export_smart_stack(cmp_watchos_features_t *features,
+                                   const char *json_data);
+
+/**
+ * @brief Removes side insets, cards, and borders to create a pure black #000000
+ * edge-to-edge layout
+ */
+int cmp_watchos_apply_edge_to_edge_styling(cmp_watchos_features_t *features,
+                                           void *node);
+
+/**
+ * @brief Adjusts primary action buttons to be full-width and pill-shaped at the
+ * bottom of the view
+ */
+int cmp_watchos_apply_pill_button_styling(cmp_watchos_features_t *features,
+                                          void *button_node);
+
+/**
+ * @brief Forces navigation routing into vertical, paginated scrolling or simple
+ * 1-deep push stacks
+ */
+int cmp_watchos_apply_hierarchical_pagination(cmp_watchos_features_t *features,
+                                              void *view_controller);
+
+/* Phase 10.5: Platform-Specific Master Checklist -> tvOS (Apple TV) */
+
+/**
+ * @brief Opaque tvOS features controller
+ */
+typedef struct cmp_tvos_features cmp_tvos_features_t;
+
+int cmp_tvos_features_create(cmp_tvos_features_t **out_features);
+int cmp_tvos_features_destroy(cmp_tvos_features_t *features);
+
+/**
+ * @brief Drives the 2D spatial navigation and applies parallax/spring scaling
+ * to the active node
+ */
+int cmp_tvos_handle_focus_engine_update(cmp_tvos_features_t *features,
+                                        void *focused_node, float *out_scale,
+                                        float *out_tilt_x, float *out_tilt_y);
+
+/**
+ * @brief Calculates generous outer margins for older physical television bezels
+ */
+int cmp_tvos_set_overscan_margins(cmp_tvos_features_t *features,
+                                  float *out_margin_top,
+                                  float *out_margin_bottom,
+                                  float *out_margin_left,
+                                  float *out_margin_right);
+
+/**
+ * @brief Provides dynamic, scrollable full-screen imagery or inset grids to the
+ * tvOS home screen Top Shelf
+ * @param is_inset 0 for Carousel, 1 for Inset
+ */
+int cmp_tvos_export_top_shelf(cmp_tvos_features_t *features, int is_inset,
+                              const char *json_data);
+
+/**
+ * @brief Responds to the physical Play/Pause button on the Siri Remote
+ */
+int cmp_tvos_handle_hardware_play_pause(cmp_tvos_features_t *features);
+
+/**
+ * @brief Responds to the physical Menu (Back) button on the Siri Remote
+ */
+int cmp_tvos_handle_hardware_menu_button(cmp_tvos_features_t *features);
+
+/* Phase 10.6: Platform-Specific Master Checklist -> visionOS (Spatial
+ * Computing) */
+
+/**
+ * @brief Opaque visionOS features controller
+ */
+typedef struct cmp_visionos_features cmp_visionos_features_t;
+
+int cmp_visionos_features_create(cmp_visionos_features_t **out_features);
+int cmp_visionos_features_destroy(cmp_visionos_features_t *features);
+
+/**
+ * @brief Applies standard OS glass background materials reacting to virtual
+ * room lighting
+ */
+int cmp_visionos_apply_glass_material(cmp_visionos_features_t *features,
+                                      void *node);
+
+/**
+ * @brief Renders a subtle glow/hover effect when the user looks at the element
+ * (eye tracking)
+ */
+int cmp_visionos_handle_eye_tracking_hover(cmp_visionos_features_t *features,
+                                           void *node, int is_looking);
+
+/**
+ * @brief Positions a modal element closer to the user on the Z-axis
+ */
+int cmp_visionos_set_modal_z_depth(cmp_visionos_features_t *features,
+                                   void *modal_node, float depth_offset);
+
+/**
+ * @brief Configures toolbars to float slightly outside and in front of the main
+ * window bounds
+ */
+int cmp_visionos_setup_ornament(cmp_visionos_features_t *features,
+                                void *toolbar_node);
+
+/**
+ * @brief Requests the OS to switch between mixed (0), progressive (1), and full
+ * (2) immersion styles
+ */
+int cmp_visionos_request_immersion_level(cmp_visionos_features_t *features,
+                                         int level);
+
+/**
+ * @brief Differentiates direct physical poke vs indirect look-and-pinch
+ */
+int cmp_visionos_handle_touch_event(cmp_visionos_features_t *features,
+                                    int is_direct, float x, float y, float z);
+
+/**
+ * @brief Configures whether the interface acts as a flat Window or a 3D Volume
+ */
+int cmp_visionos_set_window_geometry(cmp_visionos_features_t *features,
+                                     int is_volume);
+
+/**
+ * @brief Marks the app as a good citizen, sharing space without forcing
+ * Immersive takeover
+ */
+int cmp_visionos_set_shared_space_behavior(cmp_visionos_features_t *features,
+                                           int allow_shared);
+
+/* Phase 10.7: Platform-Specific Master Checklist -> CarPlay */
+
+/**
+ * @brief Opaque CarPlay features controller
+ */
+typedef struct cmp_carplay_features cmp_carplay_features_t;
+
+int cmp_carplay_features_create(cmp_carplay_features_t **out_features);
+int cmp_carplay_features_destroy(cmp_carplay_features_t *features);
+
+/**
+ * @brief Translates UI sub-tree to CarPlay standard high-contrast, minimal text
+ * styles
+ */
+int cmp_carplay_apply_driving_focus(cmp_carplay_features_t *features,
+                                    void *node);
+
+/**
+ * @brief Translates the layout tree strictly into CarPlay system templates
+ * (List, Grid, Map, Audio Player)
+ */
+int cmp_carplay_export_template_data(cmp_carplay_features_t *features,
+                                     const char *template_type,
+                                     const char *json_data);
+
+/**
+ * @brief Bridges UI actions to Siri Intents for pure voice navigation
+ */
+int cmp_carplay_handle_siri_intent(cmp_carplay_features_t *features,
+                                   const char *intent_id);
+
+/**
+ * @brief Maps rotary knob input to focus engine spatial navigation
+ */
+int cmp_carplay_handle_knob_navigation(cmp_carplay_features_t *features,
+                                       float delta);
+
+/**
+ * @brief Manages graceful offline degradation (tunnels, dead zones) without
+ * blocking alerts
+ */
+int cmp_carplay_set_network_status(cmp_carplay_features_t *features,
+                                   int is_online);
+
+/* Phase 11.2: Internationalization & Localization (i18n) -> Text, Data
+ * Formatting & Collation */
+
+/**
+ * @brief Opaque i18n formatting controller
+ */
+typedef struct cmp_i18n_formatting cmp_i18n_formatting_t;
+
+int cmp_i18n_formatting_create(cmp_i18n_formatting_t **out_format);
+int cmp_i18n_formatting_destroy(cmp_i18n_formatting_t *format);
+
+/**
+ * @brief Allows text labels to expand up to 50% without clipping for verbose
+ * languages
+ */
+int cmp_i18n_handle_dynamic_expansion(cmp_i18n_formatting_t *format,
+                                      void *text_node);
+
+/**
+ * @brief Parses localized .stringsdict files to handle plural forms and
+ * inflection (Grammar Agreement)
+ */
+int cmp_i18n_load_stringsdict(cmp_i18n_formatting_t *format,
+                              const char *file_data);
+
+/**
+ * @brief Formats unix timestamps according to OS locale rules
+ */
+int cmp_i18n_format_date(cmp_i18n_formatting_t *format,
+                         long long unix_timestamp, char *out_str,
+                         size_t max_len);
+
+/**
+ * @brief Formats currency dynamically pulling symbols and decimal separators
+ * from OS locale
+ */
+int cmp_i18n_format_currency(cmp_i18n_formatting_t *format, double amount,
+                             const char *currency_code, char *out_str,
+                             size_t max_len);
+
+/**
+ * @brief Uses system PersonNameComponentsFormatter equivalents for correct
+ * regional name ordering
+ */
+int cmp_i18n_format_person_name(cmp_i18n_formatting_t *format,
+                                const char *given_name, const char *family_name,
+                                char *out_str, size_t max_len);
+
+/**
+ * @brief Automatically converts and displays measurements based on locale (e.g.
+ * miles vs km)
+ */
+int cmp_i18n_format_measurement(cmp_i18n_formatting_t *format, double value,
+                                const char *unit, char *out_str,
+                                size_t max_len);
+
+/**
+ * @brief Formats arrays of strings naturally based on locale (e.g. "A, B y C"
+ * in Spanish)
+ */
+int cmp_i18n_format_list(cmp_i18n_formatting_t *format, const char **items,
+                         size_t item_count, char *out_str, size_t max_len);
+
+/**
+ * @brief Applies vertical layout rendering and ruby annotations for CJK scripts
+ */
+int cmp_i18n_apply_cjk_vertical_text(cmp_i18n_formatting_t *format,
+                                     void *text_node);
+
+/**
+ * @brief Sorts strings using localized collation rules (ignoring
+ * diacritics/case) instead of raw ASCII
+ */
+int cmp_i18n_localized_sort(cmp_i18n_formatting_t *format, const char *a,
+                            const char *b, int *out_result);
+
+/**
+ * @brief Placeholder for ABI stability initialization
+ */
+int cmp_interop_mock_init(void);
+
+/**
+ * @brief Safely bridges a CoreFoundation string (CFStringRef) to a Swift String
+ * via ARC
+ */
+int cmp_interop_cfstring_bridge(void *cf_string_ref);
+
+/**
+ * @brief Allocates an object utilizing
+s_returns_retained to seamlessly transfer ownership to ARC (+1 retain count)
+ */
+int cmp_interop_allocate_retained_object(void **out_object)
+    CMP_RETURNS_RETAINED;
+
+/**
+ * @brief Safely releases a bridged object at the C boundary (-1 retain count)
+ */
+int cmp_interop_release_object(void *object);
+
+/* Phase 13.1 & 13.2: Testing, Validation & Quality Assurance */
+
+/**
+ * @brief Opaque UI testing automation controller
+ */
+typedef struct cmp_testing_automation cmp_testing_automation_t;
+
+int cmp_testing_automation_create(cmp_testing_automation_t **out_automation);
+int cmp_testing_automation_destroy(cmp_testing_automation_t *automation);
+
+/**
+ * @brief Globally disables all transitions and springs to speed up tests
+ * (UIView.setAnimationsEnabled)
+ */
+int cmp_testing_set_animations_enabled(cmp_testing_automation_t *automation,
+                                       int enabled);
+
+/**
+ * @brief Automates UI testing by dispatching simulated touches based on A11y
+ * labels (XCTest equivalent)
+ */
+int cmp_testing_tap_by_accessibility_label(cmp_testing_automation_t *automation,
+                                           const char *label);
+
+/**
+ * @brief Triggers a pixel-perfect render comparing Light/Dark, Dynamic Type,
+ * and RTL states against baselines
+ */
+int cmp_testing_snapshot_verify(cmp_testing_automation_t *automation,
+                                void *node, const char *snapshot_name);
+
+/**
+ * @brief Performs strict structural checks akin to the Xcode Accessibility
+ * Inspector to catch contrast/size errors
+ */
+int cmp_testing_audit_accessibility(cmp_testing_automation_t *automation,
+                                    void *node);
+
+/* Phase 13.3: Memory, Threading & Performance Profiling */
+
+/**
+ * @brief Opaque profiling telemetry controller
+ */
+typedef struct cmp_profiling_telemetry cmp_profiling_telemetry_t;
+
+int cmp_profiling_telemetry_create(cmp_profiling_telemetry_t **out_telemetry);
+int cmp_profiling_telemetry_destroy(cmp_profiling_telemetry_t *telemetry);
+
+/**
+ * @brief Emits low-latency OSSignpost metrics for Xcode Instruments tracking
+ */
+int cmp_profiling_emit_os_signpost(cmp_profiling_telemetry_t *telemetry,
+                                   const char *event_name, int is_begin);
+
+/**
+ * @brief Enforces that layer mutations or render ticks execute solely on the
+ * main thread
+ */
+int cmp_profiling_enforce_main_thread(cmp_profiling_telemetry_t *telemetry);
+
+/**
+ * @brief Defers a heavy workload (text shaping, image decoding) to the
+ * background worker pool
+ */
+int cmp_profiling_offload_heavy_task(cmp_profiling_telemetry_t *telemetry,
+                                     void (*task)(void *), void *user_data);
+
+/**
+ * @brief Scans a UI tree and event graph for strong memory cycles, returning
+ * CMP_ERROR_CYCLE_DETECTED if found
+ */
+int cmp_profiling_detect_retain_cycles(cmp_profiling_telemetry_t *telemetry,
+                                       void *root_node);
+
+/**
+ * @brief Replaces an object pointer with NULL and cleans up references
+ * synchronously to prevent Zombie accesses
+ */
+int cmp_profiling_safe_destroy_node(cmp_profiling_telemetry_t *telemetry,
+                                    void **node_ptr);
+
+/* Phase 14.1: Documentation, DX & Framework APIs -> Developer Experience (DX)
+ */
+
+/**
+ * @brief Opaque Developer Experience (DX) toolset
+ */
+typedef struct cmp_developer_experience cmp_developer_experience_t;
+
+int cmp_developer_experience_create(cmp_developer_experience_t **out_dx);
+int cmp_developer_experience_destroy(cmp_developer_experience_t *dx);
+
+/**
+ * @brief Instantiates a node using a declarative API surface mimicking SwiftUI
+ */
+int cmp_dx_build_declarative_node(cmp_developer_experience_t *dx,
+                                  const char *type, void **out_node);
+
+/**
+ * @brief Applies strongly typed struct parameters for attributes rather than
+ * loose strings
+ */
+int cmp_dx_apply_typed_color(cmp_developer_experience_t *dx, void *node,
+                             int color_enum_val);
+
+/**
+ * @brief Connects the layout tree to a hot-reloading socket for Xcode
+ * Canvas-style Live Previews
+ */
+int cmp_dx_enable_live_preview(cmp_developer_experience_t *dx, void *root_node);
+
+/**
+ * @brief Exports the entire scene graph as a 3D visual hierarchy matching
+ * Xcode's Debug View Hierarchy
+ */
+int cmp_dx_export_debug_hierarchy(cmp_developer_experience_t *dx,
+                                  void *root_node, char *out_json,
+                                  size_t max_len);
+
+/* Phase 14.2: Documentation, DX & Framework APIs -> Documentation & Examples */
+
+/**
+ * @brief Placeholder for DocC and snippet validation checks
+ *
+ * > HIG Reference: This ensures all API surfaces are comprehensively documented
+ * > matching Apple's standard DocC syntax expectations.
+ *
+ * @code
+ * // Example:
+ * cmp_documentation_mock_init();
+ * @endcode
+ */
+int cmp_documentation_mock_init(void);
+
+/* Phase 15.1 & 15.2: Performance, Battery & System Resources */
+
+/**
+ * @brief Opaque system resource manager
+ */
+typedef struct cmp_resource_manager cmp_resource_manager_t;
+
+int cmp_resource_manager_create(cmp_resource_manager_t **out_rm);
+int cmp_resource_manager_destroy(cmp_resource_manager_t *rm);
+
+/**
+ * @brief Responds to ProcessInfo.thermalState (0=nominal, 1=fair, 2=serious,
+ * 3=critical) to scale frame rates
+ */
+int cmp_resources_set_thermal_state(cmp_resource_manager_t *rm, int state);
+
+/**
+ * @brief Responds to OS backgrounding events, instantly pausing loops,
+ * animations, and timers to save battery
+ */
+int cmp_resources_set_background_state(cmp_resource_manager_t *rm,
+                                       int is_backgrounded);
+
+/**
+ * @brief Explicitly marks nodes as opaque = true to skip costly alpha blending
+ * on the GPU
+ */
+int cmp_resources_mark_node_opaque(cmp_resource_manager_t *rm, void *node,
+                                   int is_opaque);
+
+/**
+ * @brief Respects the OS "Low Data Mode" flag, preventing large downloads or
+ * auto-playing videos
+ */
+int cmp_resources_set_low_data_mode(cmp_resource_manager_t *rm,
+                                    int is_low_data);
+
+/**
+ * @brief Asynchronously decodes and aggressively caches remote images resized
+ * to exact display geometry
+ */
+int cmp_resources_cache_remote_image(cmp_resource_manager_t *rm,
+                                     const char *url, float target_width,
+                                     float target_height);
+
+/**
+ * @brief Monitored drawRect equivalent that avoids allocating massive offscreen
+ * bitmap contexts unless strictly necessary
+ */
+int cmp_resources_allocate_offscreen_bitmap(cmp_resource_manager_t *rm,
+                                            float width, float height,
+                                            void **out_bitmap);
+
+/* Phase 16.1 & 16.2: Error Handling, Edge Cases & Resilience */
+
+/**
+ * @brief Opaque resilience and error state controller
+ */
+typedef struct cmp_resilience cmp_resilience_t;
+
+int cmp_resilience_create(cmp_resilience_t **out_res);
+int cmp_resilience_destroy(cmp_resilience_t *res);
+
+/**
+ * @brief Injects an informative "Empty State" (Icon, Title, CTA) when data
+ * sources are empty
+ */
+int cmp_resilience_show_empty_state(cmp_resilience_t *res,
+                                    void *container_node);
+
+/**
+ * @brief Renders a shimmering skeleton mimicking the final layout rather than a
+ * blocking spinner
+ */
+int cmp_resilience_show_loading_skeleton(cmp_resilience_t *res,
+                                         void *container_node);
+
+/**
+ * @brief Presents an inline banner or subtle toast notification for
+ * non-critical network failures
+ */
+int cmp_resilience_show_non_blocking_error(cmp_resilience_t *res,
+                                           void *container_node,
+                                           const char *msg);
+
+/**
+ * @brief Prompts the user to "Save Draft" or "Discard" when closing a dirty
+ * modal sheet
+ */
+int cmp_resilience_handle_discard_changes_prompt(cmp_resilience_t *res,
+                                                 void *sheet_node);
+
+/**
+ * @brief Provides a standard, safe fallback for hardware specific features
+ * (LiDAR, ARKit)
+ */
+int cmp_resilience_graceful_degradation(cmp_resilience_t *res,
+                                        const char *feature_name);
+
+/* Phase 17.1: App Store Review Guidelines Compliance */
+
+/**
+ * @brief Placeholder indicating that the framework restricts hidden features,
+ * Easter eggs, and non-native platform paradigms
+ */
+int cmp_app_store_mock_init(void);
 
 #ifdef __cplusplus
 }

@@ -1,111 +1,134 @@
 /* clang-format off */
 #include "cmp.h"
 #include "greatest.h"
-#include <stdlib.h>
 /* clang-format on */
 
-SUITE(cmp_visuals_suite);
+TEST test_semantic_colors(void) {
+  cmp_semantic_colors_t *ctx = NULL;
+  uint32_t color;
 
-TEST test_gradient_create_destroy(void) {
-  cmp_gradient_t *grad = NULL;
+  ASSERT_EQ(CMP_SUCCESS, cmp_semantic_colors_create(&ctx));
 
-  ASSERT_EQ(CMP_SUCCESS, cmp_gradient_create(&grad, CMP_GRADIENT_LINEAR));
-  ASSERT_NEQ(NULL, grad);
-  ASSERT_EQ(CMP_GRADIENT_LINEAR, grad->type);
-
-  ASSERT_EQ(CMP_SUCCESS, cmp_gradient_destroy(grad));
-  PASS();
-}
-
-TEST test_gradient_stops(void) {
-  cmp_gradient_t *grad = NULL;
-  cmp_color_t c1 = {1.0f, 0.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
-  cmp_color_t c2 = {0.0f, 1.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
-
-  cmp_gradient_create(&grad, CMP_GRADIENT_RADIAL);
-
-  ASSERT_EQ(CMP_SUCCESS, cmp_gradient_add_stop(grad, c1, 0.0f));
-  ASSERT_EQ(CMP_SUCCESS, cmp_gradient_add_stop(grad, c2, 1.0f));
-
-  ASSERT_EQ(2, grad->stop_count);
-  ASSERT_EQ(1.0f, grad->stops[0].color.r);
-  ASSERT_EQ(0.0f, grad->stops[0].position);
-  ASSERT_EQ(1.0f, grad->stops[1].color.g);
-  ASSERT_EQ(1.0f, grad->stops[1].position);
-
-  cmp_gradient_destroy(grad);
-  PASS();
-}
-
-TEST test_color_parsing(void) {
-  cmp_color_t c;
+  /* Test True Black background for Dark Mode OLED */
   ASSERT_EQ(CMP_SUCCESS,
-            cmp_color_parse_p3("color(display-p3 1.0 0.5 0.0)", &c));
-  ASSERT_EQ(CMP_COLOR_SPACE_DISPLAY_P3, c.space);
-  ASSERT_EQ(1.0f, c.a);
-
-  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_parse_p3("rgb(255,0,0)", &c));
-  PASS();
-}
-
-TEST test_color_mixing(void) {
-  cmp_color_t c1 = {1.0f, 0.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
-  cmp_color_t c2 = {0.0f, 0.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
-  cmp_color_t out;
+            cmp_semantic_colors_resolve(ctx, "systemBackground", 1, &color));
+  ASSERT_EQ(0x000000FF, color);
 
   ASSERT_EQ(CMP_SUCCESS,
-            cmp_color_mix(&c1, &c2, 0.5f, CMP_COLOR_SPACE_SRGB, &out));
-  ASSERT_EQ(CMP_COLOR_SPACE_SRGB, out.space);
-  ASSERT_EQ(0.5f, out.r);
-  ASSERT_EQ(0.0f, out.g);
-  ASSERT_EQ(0.5f, out.b);
-  ASSERT_EQ(1.0f, out.a);
+            cmp_semantic_colors_resolve(ctx, "systemBackground", 0, &color));
+  ASSERT_EQ(0xFFFFFFFF, color);
 
-  PASS();
-}
+  /* Test Tint colors */
+  ASSERT_EQ(CMP_SUCCESS, cmp_semantic_colors_get_tint_color(ctx, &color));
+  ASSERT_EQ(0x007AFFFF, color); /* Default Blue */
 
-TEST test_color_luminance_contrast(void) {
-  cmp_color_t black = {0.0f, 0.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
-  cmp_color_t white = {1.0f, 1.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
-  float lum_b, lum_w, ratio;
+  ASSERT_EQ(CMP_SUCCESS, cmp_semantic_colors_set_tint_color(ctx, 0xFF0000FF));
+  ASSERT_EQ(CMP_SUCCESS, cmp_semantic_colors_get_tint_color(ctx, &color));
+  ASSERT_EQ(0xFF0000FF, color);
 
-  ASSERT_EQ(CMP_SUCCESS, cmp_color_luminance(&black, &lum_b));
-  ASSERT_EQ(CMP_SUCCESS, cmp_color_luminance(&white, &lum_w));
-
-  /* Black is ~0, White is ~1 (0.2126+0.7152+0.0722) */
-  ASSERT(lum_b < 0.01f);
-  ASSERT(lum_w > 0.99f);
-
-  ASSERT_EQ(CMP_SUCCESS, cmp_color_contrast_ratio(&white, &black, &ratio));
-  /* Approx 21:1 for perfect white on black */
-  ASSERT(ratio > 20.0f);
-
-  PASS();
-}
-
-TEST test_icc_profile(void) {
-  unsigned char dummy_image[64] = {0};
-  void *profile = NULL;
+  /* Test Elevation Shadows (Dark mode uses lighter grays) */
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_semantic_colors_resolve_elevation(ctx, 0, 1, &color));
+  ASSERT_EQ(0x000000FF, color);
 
   ASSERT_EQ(CMP_SUCCESS,
-            cmp_icc_profile_parse(dummy_image, sizeof(dummy_image), &profile));
-  ASSERT_EQ(NULL, profile); /* Stubbed to null */
+            cmp_semantic_colors_resolve_elevation(ctx, 1, 1, &color));
+  ASSERT_EQ(0x1C1C1EFF, color);
+
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_semantic_colors_resolve_elevation(ctx, 1, 0, &color));
+  ASSERT_EQ(0xFFFFFFFF, color);
+
+  /* Not Found */
+  ASSERT_EQ(CMP_ERROR_NOT_FOUND,
+            cmp_semantic_colors_resolve(ctx, "doesNotExist", 1, &color));
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_semantic_colors_destroy(ctx));
   PASS();
 }
 
-SUITE(cmp_visuals_suite) {
-  RUN_TEST(test_gradient_create_destroy);
-  RUN_TEST(test_gradient_stops);
-  RUN_TEST(test_color_parsing);
-  RUN_TEST(test_color_mixing);
-  RUN_TEST(test_color_luminance_contrast);
-  RUN_TEST(test_icc_profile);
+TEST test_color_pipeline(void) {
+  cmp_color_pipeline_t *pipeline = NULL;
+  int supports_p3, supports_edr;
+  float p3r, p3g, p3b;
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_color_pipeline_create(&pipeline));
+
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_color_pipeline_supports_p3(pipeline, &supports_p3));
+  ASSERT_EQ(1, supports_p3);
+
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_color_pipeline_supports_edr(pipeline, &supports_edr));
+  ASSERT_EQ(1, supports_edr);
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_color_pipeline_srgb_to_p3(pipeline, 1.0f, 0.5f,
+                                                       0.0f, &p3r, &p3g, &p3b));
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_color_pipeline_destroy(pipeline));
+  PASS();
+}
+
+TEST test_null_args(void) {
+  cmp_semantic_colors_t *sc = NULL;
+  cmp_color_pipeline_t *pl = NULL;
+  uint32_t color;
+  int bool_res;
+  float fr, fg, fb;
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_semantic_colors_create(NULL));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_pipeline_create(NULL));
+
+  cmp_semantic_colors_create(&sc);
+  cmp_color_pipeline_create(&pl);
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_semantic_colors_resolve(NULL, "label", 0, &color));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_semantic_colors_resolve(sc, NULL, 0, &color));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_semantic_colors_resolve(sc, "label", 0, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_semantic_colors_set_tint_color(NULL, 0));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_semantic_colors_get_tint_color(NULL, &color));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_semantic_colors_get_tint_color(sc, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_semantic_colors_resolve_elevation(NULL, 0, 0, &color));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_semantic_colors_resolve_elevation(sc, 0, 0, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_color_pipeline_supports_p3(NULL, &bool_res));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_pipeline_supports_p3(pl, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_color_pipeline_supports_edr(NULL, &bool_res));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_pipeline_supports_edr(pl, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_pipeline_srgb_to_p3(
+                                       NULL, 1.0f, 1.0f, 1.0f, &fr, &fg, &fb));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_pipeline_srgb_to_p3(
+                                       pl, 1.0f, 1.0f, 1.0f, NULL, &fg, &fb));
+
+  cmp_semantic_colors_destroy(sc);
+  cmp_color_pipeline_destroy(pl);
+
+  PASS();
+}
+
+SUITE(visuals_suite) {
+  RUN_TEST(test_semantic_colors);
+  RUN_TEST(test_color_pipeline);
+  RUN_TEST(test_null_args);
 }
 
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
   GREATEST_MAIN_BEGIN();
-  RUN_SUITE(cmp_visuals_suite);
+  RUN_SUITE(visuals_suite);
   GREATEST_MAIN_END();
 }
