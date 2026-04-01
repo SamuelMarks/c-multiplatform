@@ -5,6 +5,11 @@ set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+# vcpkg integration
+if(DEFINED CMAKE_TOOLCHAIN_FILE AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg.cmake")
+    set(VCPKG_PREFER_SYSTEM_LIBS ON CACHE BOOL "" FORCE)
+endif()
+
 # Toggles
 option(CMP_SHARED_LIBS "Build shared library" OFF)
 option(CMP_UNICODE "Use Unicode charset (Windows)" OFF)
@@ -157,14 +162,18 @@ endif()
 
 if(NOT CURL_FOUND)
     # Manual system path fallback
-    find_path(CURL_INCLUDE_DIR NAMES curl/curl.h PATHS /usr/local/include /usr/include)
-    find_library(CURL_LIBRARY NAMES curl libcurl PATHS /usr/local/lib /usr/lib)
+    find_path(CURL_INCLUDE_DIR NAMES curl/curl.h PATHS /usr/local/include /usr/include /opt/homebrew/include /usr/local/opt/curl/include /opt/homebrew/opt/curl/include)
+    find_library(CURL_LIBRARY NAMES curl libcurl PATHS /usr/local/lib /usr/lib /opt/homebrew/lib /usr/local/opt/curl/lib /opt/homebrew/opt/curl/lib)
     if(CURL_INCLUDE_DIR AND CURL_LIBRARY)
         set(CURL_FOUND TRUE)
         set(CURL_INCLUDE_DIRS ${CURL_INCLUDE_DIR})
         set(CURL_LIBRARIES ${CURL_LIBRARY})
         message(STATUS "Found CURL manually: ${CURL_LIBRARIES}")
     endif()
+endif()
+
+if(CURL_FOUND)
+    set(CURL_ROOT_DIR "${CURL_INCLUDE_DIRS}/..")
 endif()
 
 if(NOT APPLE AND NOT WIN32 AND NOT MINGW AND NOT CYGWIN)
@@ -195,9 +204,9 @@ endif()
 
 if(NOT OPENSSL_FOUND)
     # Manual system path fallback
-    find_path(OPENSSL_INCLUDE_DIR NAMES openssl/ssl.h PATHS /usr/local/include /usr/include)
-    find_library(OPENSSL_SSL_LIBRARY NAMES ssl libssl PATHS /usr/local/lib /usr/lib)
-    find_library(OPENSSL_CRYPTO_LIBRARY NAMES crypto libcrypto PATHS /usr/local/lib /usr/lib)
+    find_path(OPENSSL_INCLUDE_DIR NAMES openssl/ssl.h PATHS /usr/local/include /usr/include /opt/homebrew/include /usr/local/opt/openssl/include /opt/homebrew/opt/openssl/include)
+    find_library(OPENSSL_SSL_LIBRARY NAMES ssl libssl PATHS /usr/local/lib /usr/lib /opt/homebrew/lib /usr/local/opt/openssl/lib /opt/homebrew/opt/openssl/lib)
+    find_library(OPENSSL_CRYPTO_LIBRARY NAMES crypto libcrypto PATHS /usr/local/lib /usr/lib /opt/homebrew/lib /usr/local/opt/openssl/lib /opt/homebrew/opt/openssl/lib)
     if(OPENSSL_INCLUDE_DIR AND OPENSSL_SSL_LIBRARY AND OPENSSL_CRYPTO_LIBRARY)
         set(OPENSSL_FOUND TRUE)
         set(OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
@@ -207,6 +216,8 @@ if(NOT OPENSSL_FOUND)
 endif()
 
 if(OPENSSL_FOUND)
+    set(OPENSSL_ROOT_DIR "${OPENSSL_INCLUDE_DIRS}/..")
+    set(OpenSSL_DIR "${OPENSSL_ROOT_DIR}")
     set(C_ABSTRACT_HTTP_USE_OPENSSL ON CACHE BOOL "Use OpenSSL for cryptography" FORCE)
 endif()
 
