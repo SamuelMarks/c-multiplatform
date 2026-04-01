@@ -125,6 +125,7 @@ FetchContent_Declare(c89stringutils GIT_REPOSITORY https://github.com/offscale/c
 FetchContent_MakeAvailable(c89stringutils)
 
 # c_str_span (Not in vcpkg)
+set(C_STR_SPAN_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(c_str_span GIT_REPOSITORY https://github.com/SamuelMarks/c-str-span.git GIT_TAG master
     UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
 )
