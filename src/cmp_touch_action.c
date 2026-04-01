@@ -14,13 +14,13 @@ int cmp_ui_node_set_touch_action(cmp_ui_node_t *node, uint32_t action) {
   return CMP_SUCCESS;
 }
 
-uint32_t cmp_ui_node_get_touch_action(const cmp_ui_node_t *node) {
+int cmp_ui_node_get_touch_action(const cmp_ui_node_t *node) {
   if (!node)
-    return CMP_TOUCH_ACTION_AUTO;
+    return (int)CMP_TOUCH_ACTION_AUTO;
 
   if (node->properties) {
-    return (uint32_t)(size_t)node->properties;
+    return (int)(size_t)node->properties;
   }
 
-  return CMP_TOUCH_ACTION_AUTO;
+  return (int)CMP_TOUCH_ACTION_AUTO;
 }

@@ -4,7 +4,7 @@
 /* clang-format on */
 
 TEST test_flex_align_start(void) {
-  double pos, size;
+  float pos, size;
   ASSERT_EQ(CMP_SUCCESS, cmp_flex_align_evaluate(CMP_FLEX_ALIGN_START, 100.0,
                                                  20.0, 0.0, 0.0, &pos, &size));
   ASSERT_EQ(0.0, pos);
@@ -13,7 +13,7 @@ TEST test_flex_align_start(void) {
 }
 
 TEST test_flex_align_end(void) {
-  double pos, size;
+  float pos, size;
   ASSERT_EQ(CMP_SUCCESS, cmp_flex_align_evaluate(CMP_FLEX_ALIGN_END, 100.0,
                                                  20.0, 0.0, 0.0, &pos, &size));
   ASSERT_EQ(80.0, pos);
@@ -22,7 +22,7 @@ TEST test_flex_align_end(void) {
 }
 
 TEST test_flex_align_center(void) {
-  double pos, size;
+  float pos, size;
   ASSERT_EQ(CMP_SUCCESS, cmp_flex_align_evaluate(CMP_FLEX_ALIGN_CENTER, 100.0,
                                                  20.0, 0.0, 0.0, &pos, &size));
   ASSERT_EQ(40.0, pos);
@@ -31,7 +31,7 @@ TEST test_flex_align_center(void) {
 }
 
 TEST test_flex_align_stretch(void) {
-  double pos, size;
+  float pos, size;
   ASSERT_EQ(CMP_SUCCESS, cmp_flex_align_evaluate(CMP_FLEX_ALIGN_STRETCH, 100.0,
                                                  20.0, 0.0, 0.0, &pos, &size));
   ASSERT_EQ(0.0, pos);
@@ -40,7 +40,7 @@ TEST test_flex_align_stretch(void) {
 }
 
 TEST test_flex_align_baseline(void) {
-  double pos, size;
+  float pos, size;
   ASSERT_EQ(CMP_SUCCESS, cmp_flex_align_evaluate(CMP_FLEX_ALIGN_BASELINE, 100.0,
                                                  20.0, 5.0, 15.0, &pos, &size));
   ASSERT_EQ(10.0, pos); /* max_baseline - item_baseline */
@@ -49,7 +49,7 @@ TEST test_flex_align_baseline(void) {
 }
 
 TEST test_flex_align_invalid(void) {
-  double pos, size;
+  float pos, size;
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_flex_align_evaluate(CMP_FLEX_ALIGN_START, 100.0, 20.0, 0.0, 0.0,
                                     NULL, &size));

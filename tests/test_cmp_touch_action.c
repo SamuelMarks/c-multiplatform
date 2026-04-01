@@ -6,29 +6,31 @@
 
 TEST test_touch_action_set_get(void) {
   cmp_ui_node_t node = {0};
-  uint32_t val;
+  int val;
 
   /* Validate default */
   val = cmp_ui_node_get_touch_action(&node);
-  ASSERT_EQ(CMP_TOUCH_ACTION_AUTO, val);
+  ASSERT_EQ((int)CMP_TOUCH_ACTION_AUTO, val);
 
   /* Validate single flags */
   ASSERT_EQ(CMP_SUCCESS,
-            cmp_ui_node_set_touch_action(&node, CMP_TOUCH_ACTION_NONE));
+            cmp_ui_node_set_touch_action(&node, (uint32_t)CMP_TOUCH_ACTION_NONE));
   val = cmp_ui_node_get_touch_action(&node);
-  ASSERT_EQ(CMP_TOUCH_ACTION_NONE, val);
+  ASSERT_EQ((int)CMP_TOUCH_ACTION_NONE, val);
 
   ASSERT_EQ(CMP_SUCCESS,
-            cmp_ui_node_set_touch_action(&node, CMP_TOUCH_ACTION_PAN_X));
+            cmp_ui_node_set_touch_action(&node, (uint32_t)CMP_TOUCH_ACTION_PAN_X));
   val = cmp_ui_node_get_touch_action(&node);
-  ASSERT_EQ(CMP_TOUCH_ACTION_PAN_X, val);
+  ASSERT_EQ((int)CMP_TOUCH_ACTION_PAN_X, val);
 
   /* Validate bitwise combinations */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_ui_node_set_touch_action(
-                &node, CMP_TOUCH_ACTION_PAN_X | CMP_TOUCH_ACTION_PINCH_ZOOM));
+                &node, (uint32_t)CMP_TOUCH_ACTION_PAN_X |
+                           (uint32_t)CMP_TOUCH_ACTION_PINCH_ZOOM));
   val = cmp_ui_node_get_touch_action(&node);
-  ASSERT_EQ((CMP_TOUCH_ACTION_PAN_X | CMP_TOUCH_ACTION_PINCH_ZOOM), val);
+  ASSERT_EQ(((int)CMP_TOUCH_ACTION_PAN_X | (int)CMP_TOUCH_ACTION_PINCH_ZOOM),
+            val);
 
   PASS();
 }
@@ -37,9 +39,9 @@ TEST test_touch_action_edge_cases(void) {
   cmp_ui_node_t node = {0};
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
-            cmp_ui_node_set_touch_action(NULL, CMP_TOUCH_ACTION_PAN_Y));
+            cmp_ui_node_set_touch_action(NULL, (uint32_t)CMP_TOUCH_ACTION_PAN_Y));
 
-  ASSERT_EQ(CMP_TOUCH_ACTION_AUTO, cmp_ui_node_get_touch_action(NULL));
+  ASSERT_EQ((int)CMP_TOUCH_ACTION_AUTO, cmp_ui_node_get_touch_action(NULL));
 
   (void)node; /* Suppress unused variable warning */
   PASS();

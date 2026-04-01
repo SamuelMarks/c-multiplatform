@@ -2,10 +2,10 @@
 #include "cmp.h"
 /* clang-format on */
 
-int cmp_flex_align_evaluate(cmp_flex_align_t align_val, double cross_size,
-                            double item_cross_size, double item_baseline,
-                            double max_baseline, double *out_position,
-                            double *out_cross_size) {
+int cmp_flex_align_evaluate(cmp_flex_align_t align_val, float cross_size,
+                            float item_cross_size, float item_baseline,
+                            float max_baseline, float *out_position,
+                            float *out_cross_size) {
   if (!out_position || !out_cross_size)
     return CMP_ERROR_INVALID_ARG;
 

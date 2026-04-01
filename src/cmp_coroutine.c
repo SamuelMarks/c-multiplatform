@@ -1,4 +1,7 @@
 /* clang-format off */
+#if defined(__APPLE__) && !defined(_XOPEN_SOURCE)
+#define _XOPEN_SOURCE 600
+#endif
 #include "cmp.h"
 #include <stdlib.h>
 
@@ -281,7 +284,9 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
   uc->uc_link = NULL;
 
   ptr_val = (uint64_t)(uintptr_t)co;
-  makecontext(uc, (void (*)())cmp_ucontext_entry, 2, (int)(uint32_t)ptr_val,
+  /* Use (void (*)(void)) cast to satisfy strict-prototypes while makecontext
+     expects void (*)() in some systems. Both work for calling with args. */
+  makecontext(uc, (void (*)(void))cmp_ucontext_entry, 2, (int)(uint32_t)ptr_val,
               (int)(uint32_t)(ptr_val >> 32));
 
   *out_co = co;

@@ -22,7 +22,7 @@ TEST test_overdraw_set_enabled(void) {
 
   cmp_window_system_init();
   cmp_window_create(&cfg, &win);
-  cmp_renderer_create(win, CMP_BACKEND_NONE, &renderer);
+  cmp_renderer_create(win, CMP_RENDER_BACKEND_DEFAULT, &renderer);
 
   ASSERT_EQ(CMP_SUCCESS, cmp_overdraw_create(&overdraw));
 
@@ -47,7 +47,7 @@ TEST test_overdraw_edge_cases(void) {
 
   cmp_window_system_init();
   cmp_window_create(&cfg, &win);
-  cmp_renderer_create(win, CMP_BACKEND_NONE, &renderer);
+  cmp_renderer_create(win, CMP_RENDER_BACKEND_DEFAULT, &renderer);
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_overdraw_create(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_overdraw_destroy(NULL));

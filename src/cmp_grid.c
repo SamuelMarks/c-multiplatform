@@ -38,8 +38,8 @@ int cmp_grid_ctx_destroy(cmp_grid_ctx_t *ctx) {
   return CMP_SUCCESS;
 }
 
-static int cmp_grid_ctx_add_item(cmp_grid_ctx_t *ctx, cmp_layout_node_t *node,
-                                 cmp_grid_item_t **out_item) {
+int cmp_grid_ctx_add_item(cmp_grid_ctx_t *ctx, cmp_layout_node_t *node,
+                          cmp_grid_item_t **out_item) {
   if (!ctx || !node)
     return CMP_ERROR_INVALID_ARG;
   if (ctx->item_count >= ctx->item_capacity) {
@@ -67,8 +67,8 @@ static int cmp_grid_ctx_add_item(cmp_grid_ctx_t *ctx, cmp_layout_node_t *node,
   return CMP_SUCCESS;
 }
 
-static int cmp_grid_track_evaluate(cmp_grid_track_size_t *track,
-                                   float container_size, float *out_size) {
+int cmp_grid_track_evaluate(cmp_grid_track_size_t *track, float container_size,
+                            float *out_size) {
   if (!track || !out_size)
     return CMP_ERROR_INVALID_ARG;
   switch (track->type) {
@@ -94,8 +94,8 @@ static int cmp_grid_track_evaluate(cmp_grid_track_size_t *track,
   return CMP_SUCCESS;
 }
 
-static int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
-                                  float available_height) {
+int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
+                           float available_height) {
   float total_fr_cols = 0.0f;
   float total_fr_rows = 0.0f;
   float free_width = available_width;
@@ -143,8 +143,8 @@ static int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
   return CMP_SUCCESS;
 }
 
-static int cmp_grid_minmax_resolve(cmp_grid_track_size_t *track,
-                                   float container_size, float *out_size) {
+int cmp_grid_minmax_resolve(cmp_grid_track_size_t *track, float container_size,
+                            float *out_size) {
   (void)container_size;
   if (!track || !out_size)
     return CMP_ERROR_INVALID_ARG;
@@ -155,8 +155,8 @@ static int cmp_grid_minmax_resolve(cmp_grid_track_size_t *track,
   return CMP_SUCCESS;
 }
 
-static int cmp_grid_repeat_expand(cmp_grid_track_size_t *track, int auto_fit,
-                                  float container_size, int *out_count) {
+int cmp_grid_repeat_expand(cmp_grid_track_size_t *track, int auto_fit,
+                           float container_size, int *out_count) {
   (void)auto_fit;
   if (!track || !out_count)
     return CMP_ERROR_INVALID_ARG;
@@ -170,10 +170,9 @@ static int cmp_grid_repeat_expand(cmp_grid_track_size_t *track, int auto_fit,
   return CMP_SUCCESS;
 }
 
-static int cmp_grid_placement_resolve(cmp_grid_placement_t *start,
-                                      cmp_grid_placement_t *end,
-                                      int track_count, int *out_start,
-                                      int *out_end) {
+int cmp_grid_placement_resolve(cmp_grid_placement_t *start,
+                               cmp_grid_placement_t *end, int track_count,
+                               int *out_start, int *out_end) {
   if (!start || !end || !out_start || !out_end)
     return CMP_ERROR_INVALID_ARG;
   *out_start = start->is_auto ? 1 : start->line;
@@ -186,9 +185,9 @@ static int cmp_grid_placement_resolve(cmp_grid_placement_t *start,
   return CMP_SUCCESS;
 }
 
-static int cmp_grid_area_resolve(cmp_grid_ctx_t *ctx, const char *name,
-                                 int *out_row_start, int *out_col_start,
-                                 int *out_row_end, int *out_col_end) {
+int cmp_grid_area_resolve(cmp_grid_ctx_t *ctx, const char *name,
+                          int *out_row_start, int *out_col_start,
+                          int *out_row_end, int *out_col_end) {
   size_t i;
   if (!ctx || !name || !out_row_start || !out_col_start || !out_row_end ||
       !out_col_end)
@@ -206,7 +205,7 @@ static int cmp_grid_area_resolve(cmp_grid_ctx_t *ctx, const char *name,
   return CMP_ERROR_NOT_FOUND;
 }
 
-static int cmp_grid_auto_dense_place(cmp_grid_ctx_t *ctx) {
+int cmp_grid_auto_dense_place(cmp_grid_ctx_t *ctx) {
   size_t i;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -221,7 +220,7 @@ static int cmp_grid_auto_dense_place(cmp_grid_ctx_t *ctx) {
   return CMP_SUCCESS;
 }
 
-static int cmp_grid_auto_sparse_place(cmp_grid_ctx_t *ctx) {
+int cmp_grid_auto_sparse_place(cmp_grid_ctx_t *ctx) {
   size_t i;
   int current_row = 1;
   int current_col = 1;
@@ -244,7 +243,7 @@ static int cmp_grid_auto_sparse_place(cmp_grid_ctx_t *ctx) {
   return CMP_SUCCESS;
 }
 
-static int cmp_grid_implicit_tracks_generate(cmp_grid_ctx_t *ctx) {
+int cmp_grid_implicit_tracks_generate(cmp_grid_ctx_t *ctx) {
   size_t i;
   int max_row = 0;
   int max_col = 0;
@@ -278,7 +277,7 @@ static int cmp_grid_implicit_tracks_generate(cmp_grid_ctx_t *ctx) {
   return CMP_SUCCESS;
 }
 
-static int cmp_subgrid_sync(cmp_grid_ctx_t *parent, cmp_grid_ctx_t *child) {
+int cmp_subgrid_sync(cmp_grid_ctx_t *parent, cmp_grid_ctx_t *child) {
   if (!parent || !child)
     return CMP_ERROR_INVALID_ARG;
   child->computed_row_count = parent->computed_row_count;
@@ -287,8 +286,8 @@ static int cmp_subgrid_sync(cmp_grid_ctx_t *parent, cmp_grid_ctx_t *child) {
   return CMP_SUCCESS;
 }
 
-static int cmp_grid_align_evaluate(cmp_grid_align_t align, float track_size,
-                                   float item_size, float *out_offset) {
+int cmp_grid_align_evaluate(cmp_grid_align_t align, float track_size,
+                            float item_size, float *out_offset) {
   if (!out_offset)
     return CMP_ERROR_INVALID_ARG;
   switch (align) {
@@ -310,15 +309,15 @@ static int cmp_grid_align_evaluate(cmp_grid_align_t align, float track_size,
   return CMP_SUCCESS;
 }
 
-static int cmp_masonry_layout(cmp_grid_ctx_t *ctx) {
+int cmp_masonry_layout(cmp_grid_ctx_t *ctx) {
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
   /* Simplified masonry layout placeholder */
   return CMP_SUCCESS;
 }
 
-static int cmp_grid_gap_apply(cmp_grid_ctx_t *ctx, float *out_row_gaps,
-                              float *out_col_gaps) {
+int cmp_grid_gap_apply(cmp_grid_ctx_t *ctx, float *out_row_gaps,
+                       float *out_col_gaps) {
   if (!ctx || !out_row_gaps || !out_col_gaps)
     return CMP_ERROR_INVALID_ARG;
   *out_row_gaps = ctx->row_gap;

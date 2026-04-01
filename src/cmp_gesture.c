@@ -47,12 +47,12 @@ int cmp_gesture_set_callback(cmp_gesture_t *gesture, cmp_gesture_cb_t callback,
   return CMP_SUCCESS;
 }
 
-cmp_gesture_state_t cmp_gesture_get_state(const cmp_gesture_t *gesture) {
+int cmp_gesture_get_state(const cmp_gesture_t *gesture) {
   const struct cmp_gesture *ctx = (const struct cmp_gesture *)gesture;
   if (!ctx)
-    return CMP_GESTURE_STATE_POSSIBLE;
+    return (int)CMP_GESTURE_STATE_POSSIBLE;
 
-  return ctx->state;
+  return (int)ctx->state;
 }
 
 int cmp_gesture_process_event(cmp_gesture_t *gesture,

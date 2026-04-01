@@ -50,8 +50,8 @@ TEST test_grid_add_item(void) {
 }
 
 TEST test_grid_placement_resolve(void) {
-  cmp_grid_placement_t start = {0, 0, 0};
-  cmp_grid_placement_t end = {0, 0, 0};
+  cmp_grid_placement_t start = {0, 0, 0, NULL};
+  cmp_grid_placement_t end = {0, 0, 0, NULL};
   int out_start = 0, out_end = 0;
 
   start.is_auto = 1;

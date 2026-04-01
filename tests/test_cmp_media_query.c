@@ -213,7 +213,7 @@ TEST test_resize_observer(void) {
 
   resize_count = 0;
   ASSERT_EQ(CMP_SUCCESS,
-            cmp_resize_observer_create(&obs, NULL, on_resize_callback));
+            cmp_resize_observer_create(&obs, on_resize_callback, NULL));
   ASSERT_NEQ(NULL, obs);
 
   ASSERT_EQ(CMP_SUCCESS, cmp_resize_observer_notify(obs, node, 100.0f, 100.0f));

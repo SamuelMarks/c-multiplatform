@@ -4,16 +4,6 @@
 #include <stdlib.h>
 /* clang-format on */
 
-static void complex_gesture_callback(cmp_gesture_t *gesture,
-                                     cmp_ui_node_t *node, void *user_data) {
-  (void)gesture;
-  (void)node;
-  if (user_data) {
-    int *counter = (int *)user_data;
-    (*counter)++;
-  }
-}
-
 TEST test_complex_gesture_create_destroy(void) {
   cmp_complex_gesture_t *gesture = NULL;
 

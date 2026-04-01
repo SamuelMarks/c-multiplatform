@@ -427,6 +427,11 @@ int cmp_modality_destroy(cmp_modality_t *mod);
 typedef void *cmp_mutex_t;
 typedef void *cmp_semaphore_t;
 typedef void *cmp_cond_t;
+#elif defined(__APPLE__)
+#include <pthread.h>
+typedef pthread_mutex_t cmp_mutex_t;
+typedef void *cmp_semaphore_t;
+typedef pthread_cond_t cmp_cond_t;
 #else
 #include <semaphore.h>
 typedef pthread_mutex_t cmp_mutex_t;
@@ -1076,9 +1081,9 @@ int cmp_ui_node_set_pointer_events(cmp_ui_node_t *node,
 /**
  * @brief Get the pointer events state of a node
  * @param node The UI node to inspect
- * @return The pointer events state, or an error/fallback state if invalid.
+ * @return The pointer events state (cast to int), or an error/fallback state if invalid.
  */
-cmp_pointer_events_t cmp_ui_node_get_pointer_events(cmp_ui_node_t *node);
+int cmp_ui_node_get_pointer_events(cmp_ui_node_t *node);
 
 #ifndef CMP_TEXTURE_T_DEFINED
 #define CMP_TEXTURE_T_DEFINED
@@ -1264,9 +1269,9 @@ int cmp_gesture_destroy(cmp_gesture_t *gesture);
 /**
  * @brief Get the current deterministic state of the gesture
  * @param gesture The gesture
- * @return The current cmp_gesture_state_t
+ * @return The current cmp_gesture_state_t (cast to int)
  */
-cmp_gesture_state_t cmp_gesture_get_state(const cmp_gesture_t *gesture);
+int cmp_gesture_get_state(const cmp_gesture_t *gesture);
 
 /**
  * @brief Feed a raw pointer event into the gesture state machine
@@ -1317,10 +1322,9 @@ int cmp_complex_gesture_process_event(cmp_complex_gesture_t *gesture,
 /**
  * @brief Get the current deterministic state of the complex gesture
  * @param gesture The complex gesture recognizer
- * @return The current state
+ * @return The current state (cast to int)
  */
-cmp_gesture_state_t
-cmp_complex_gesture_get_state(const cmp_complex_gesture_t *gesture);
+int cmp_complex_gesture_get_state(const cmp_complex_gesture_t *gesture);
 
 /**
  * @brief Retrieve the computed transformation deltas from a complex gesture
@@ -1411,9 +1415,9 @@ int cmp_ui_node_set_touch_action(cmp_ui_node_t *node, uint32_t action);
 /**
  * @brief Retrieve the computed touch-action policy for a given UI node
  * @param node The UI node to inspect
- * @return The active touch action mask, or CMP_TOUCH_ACTION_AUTO on failure
+ * @return The active touch action mask (cast to int), or CMP_TOUCH_ACTION_AUTO on failure
  */
-uint32_t cmp_ui_node_get_touch_action(const cmp_ui_node_t *node);
+int cmp_ui_node_get_touch_action(const cmp_ui_node_t *node);
 
 /**
  * @brief Opaque Context Menu Tracking State
@@ -3035,7 +3039,9 @@ typedef enum cmp_flex_wrap {
  */
 typedef enum cmp_position_type {
   CMP_POSITION_RELATIVE = 0,
-  CMP_POSITION_ABSOLUTE = 1
+  CMP_POSITION_ABSOLUTE = 1,
+  CMP_POSITION_FIXED = 2,
+  CMP_POSITION_STICKY = 3
 } cmp_position_type_t;
 
 /**
@@ -3118,6 +3124,54 @@ int cmp_layout_node_add_child(cmp_layout_node_t *parent,
  */
 int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
                          float available_height);
+
+/**
+ * @brief Calculate the Block Formatting Context for a node.
+ * @param node The layout node.
+ * @param available_width The available width for the BFC.
+ * @return 0 on success, or an error code.
+ */
+int cmp_bfc_calculate(cmp_layout_node_t *node, float available_width);
+
+/**
+ * @brief Calculate the Inline Formatting Context for a node.
+ * @param node The layout node.
+ * @param available_width The available width for the IFC.
+ * @return 0 on success, or an error code.
+ */
+int cmp_ifc_calculate(cmp_layout_node_t *node, float available_width);
+
+/**
+ * @brief Evaluate float displacement and clearing for a node.
+ * @param node The layout node.
+ * @param is_float Non-zero if the node is a float.
+ * @param clear Non-zero if the node clears previous floats.
+ * @param out_x Pointer to receive the calculated X displacement.
+ * @param out_y Pointer to receive the calculated Y displacement.
+ * @return 0 on success, or an error code.
+ */
+int cmp_float_evaluate(cmp_layout_node_t *node, int is_float, int clear,
+                       float *out_x, float *out_y);
+
+/**
+ * @brief Evaluate the shape-outside property for a floating node.
+ * @param node The layout node.
+ * @param float_rect The bounding box of the float.
+ * @param shape_radius The radius for circular shapes, or 0.
+ * @param margin The margin to apply around the shape.
+ * @return 0 on success, or an error code.
+ */
+int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
+                               float shape_radius, float margin);
+
+int cmp_table_evaluate(cmp_layout_node_t *node, int is_fixed);
+
+/**
+ * @brief Perform table border collapse resolution.
+ * @param table The table layout node.
+ * @return 0 on success, or an error code.
+ */
+int cmp_table_border_collapse(cmp_layout_node_t *table);
 
 /**
  * @brief Abstract representation of a UI component node mapped to the layout
@@ -3616,9 +3670,9 @@ int cmp_i18n_set_bidi_direction(cmp_text_direction_t dir);
 
 /**
  * @brief Get the currently active UI Bidi Layout Direction
- * @return The active direction
+ * @return The active direction (cast to int)
  */
-cmp_text_direction_t cmp_i18n_get_bidi_direction(void);
+int cmp_i18n_get_bidi_direction(void);
 
 /**
  * @brief Abstract Representation of a custom Shader Pipeline
@@ -4433,10 +4487,6 @@ int cmp_window_wasm_set_main_loop(cmp_modality_t *mod,
  */
 int cmp_window_destroy(cmp_window_t *window);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
 /**
  * @brief Missing types from previous implementation
  */
@@ -4462,6 +4512,142 @@ struct cmp_layer {
   size_t child_capacity;
 };
 typedef struct cmp_layer cmp_layer_t;
+
+/**
+ * @brief Evaluate absolute and relative positioning for a node.
+ * @param node The layout node.
+ * @param parent_rect The bounding box of the containing block.
+ * @return 0 on success, or an error code.
+ */
+int cmp_pos_absolute_relative(cmp_layout_node_t *node,
+                              const cmp_rect_t *parent_rect);
+
+/**
+ * @brief Evaluate fixed positioning for a node.
+ * @param node The layout node.
+ * @param viewport_rect The bounding box of the viewport.
+ * @return 0 on success, or an error code.
+ */
+int cmp_pos_fixed(cmp_layout_node_t *node, const cmp_rect_t *viewport_rect);
+
+/**
+ * @brief Evaluate sticky positioning for a node.
+ * @param node The layout node.
+ * @param scroll_offset The current scroll displacement.
+ * @param container_rect The bounding box of the sticky container.
+ * @return 0 on success, or an error code.
+ */
+int cmp_pos_sticky(cmp_layout_node_t *node, float scroll_offset,
+                   const cmp_rect_t *container_rect);
+
+/**
+ * @brief Position a floating node relative to an anchor element.
+ * @param floating_node The node to position.
+ * @param anchor_rect The bounding box of the anchor element.
+ * @return 0 on success, or an error code.
+ */
+int cmp_anchor_position(cmp_layout_node_t *floating_node,
+                        const cmp_rect_t *anchor_rect);
+
+/**
+ * @brief Handle fallback positioning for anchored elements.
+ * @param floating_node The node to position.
+ * @param anchor_rect The bounding box of the anchor.
+ * @param viewport_rect The bounding box of the viewport.
+ * @return 0 on success, or an error code.
+ */
+int cmp_anchor_fallback(cmp_layout_node_t *floating_node,
+                        const cmp_rect_t *anchor_rect,
+                        const cmp_rect_t *viewport_rect);
+
+/**
+ * @brief Calculate the size of a floating node based on its anchor.
+ * @param floating_node The node to size.
+ * @param anchor_rect The bounding box of the anchor.
+ * @return 0 on success, or an error code.
+ */
+int cmp_anchor_size(cmp_layout_node_t *floating_node,
+                    const cmp_rect_t *anchor_rect);
+
+/**
+ * @brief Create a new stacking context.
+ * @param out_ctx Pointer to receive the allocated stacking context.
+ * @param node The node that establishes the stacking context.
+ * @return 0 on success, or an error code.
+ */
+int cmp_stack_ctx_create(cmp_stack_ctx_t **out_ctx, cmp_layout_node_t *node);
+
+/**
+ * @brief Destroy a stacking context.
+ * @param ctx Stacking context to destroy.
+ * @return 0 on success, or an error code.
+ */
+int cmp_stack_ctx_destroy(cmp_stack_ctx_t *ctx);
+
+/**
+ * @brief Add a child stacking context to a parent.
+ * @param parent Parent stacking context.
+ * @param child Child stacking context.
+ * @return 0 on success, or an error code.
+ */
+int cmp_stack_ctx_add_child(cmp_stack_ctx_t *parent, cmp_stack_ctx_t *child);
+
+/**
+ * @brief Sort child stacking contexts by z-index.
+ * @param ctx The stacking context to sort.
+ * @return 0 on success, or an error code.
+ */
+int cmp_z_index_sort(cmp_stack_ctx_t *ctx);
+
+/**
+ * @brief Evaluate 3D transformations for a node.
+ * @param node The layout node.
+ * @param preserve_3d Non-zero to preserve 3D context for children.
+ * @return 0 on success, or an error code.
+ */
+int cmp_transform_3d_evaluate(cmp_layout_node_t *node, int preserve_3d);
+
+/**
+ * @brief Evaluate backface visibility for a node.
+ * @param node The layout node.
+ * @param is_hidden Non-zero if backface-visibility is hidden.
+ * @param rotation_y The current Y-axis rotation.
+ * @param out_visible Pointer to receive visibility result.
+ * @return 0 on success, or an error code.
+ */
+int cmp_backface_visibility_evaluate(cmp_layout_node_t *node, int is_hidden,
+                                     float rotation_y, int *out_visible);
+
+/**
+ * @brief Promote a node to the top layer.
+ * @param node The layout node.
+ * @return 0 on success, or an error code.
+ */
+int cmp_top_layer_promote(cmp_layout_node_t *node);
+
+/**
+ * @brief Toggle popover state for a node.
+ * @param node The layout node.
+ * @param state The target popover state.
+ * @return 0 on success, or an error code.
+ */
+int cmp_popover_toggle(cmp_layout_node_t *node, cmp_popover_state_t state);
+
+/**
+ * @brief Build a layer tree starting from a root node.
+ * @param root_node The root layout node.
+ * @param out_layer_root Pointer to receive the layer tree root.
+ * @return 0 on success, or an error code.
+ */
+int cmp_layer_tree_build(cmp_layout_node_t *root_node,
+                         cmp_layer_t **out_layer_root);
+
+/**
+ * @brief Destroy a layer tree.
+ * @param layer_root The root of the layer tree.
+ * @return 0 on success, or an error code.
+ */
+int cmp_layer_tree_destroy(cmp_layer_t *layer_root);
 
 typedef enum cmp_grid_track_type {
   CMP_GRID_TRACK_FIXED = 0,
@@ -4534,6 +4720,141 @@ typedef struct cmp_grid_ctx {
   float column_gap;
 } cmp_grid_ctx_t;
 
+/**
+ * @brief Create a new grid context.
+ * @param out_ctx Pointer to receive the allocated grid context.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_ctx_create(cmp_grid_ctx_t **out_ctx);
+
+/**
+ * @brief Destroy a grid context.
+ * @param ctx The grid context to destroy.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_ctx_destroy(cmp_grid_ctx_t *ctx);
+
+/**
+ * @brief Add a layout node as an item to the grid.
+ * @param ctx The grid context.
+ * @param node The layout node to add.
+ * @param out_item Optional pointer to receive the created grid item.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_ctx_add_item(cmp_grid_ctx_t *ctx, cmp_layout_node_t *node,
+                          cmp_grid_item_t **out_item);
+
+/**
+ * @brief Evaluate the size of a grid track.
+ * @param track The track size definition.
+ * @param container_size The size of the grid container in the relevant axis.
+ * @param out_size Pointer to receive the calculated size.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_track_evaluate(cmp_grid_track_size_t *track, float container_size,
+                            float *out_size);
+
+/**
+ * @brief Distribute available space among flexible (fr) grid tracks.
+ * @param ctx The grid context.
+ * @param available_width The available width for columns.
+ * @param available_height The available height for rows.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
+                           float available_height);
+
+/**
+ * @brief Resolve minmax() track size constraints.
+ * @param track The track size definition.
+ * @param container_size The container size in the relevant axis.
+ * @param out_size Pointer to receive the resolved size.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_minmax_resolve(cmp_grid_track_size_t *track, float container_size,
+                            float *out_size);
+
+/**
+ * @brief Expand repeat(auto-fill/auto-fit) track definitions.
+ * @param track The track size definition containing the repeat rule.
+ * @param auto_fit Non-zero if auto-fit is used, 0 for auto-fill.
+ * @param container_size The container size in the relevant axis.
+ * @param out_count Pointer to receive the number of tracks generated.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_repeat_expand(cmp_grid_track_size_t *track, int auto_fit,
+                           float container_size, int *out_count);
+
+/**
+ * @brief Resolve start and end lines for grid placement.
+ * @param start The start placement definition.
+ * @param end The end placement definition.
+ * @param track_count Total number of tracks in the axis.
+ * @param out_start Pointer to receive the resolved start line.
+ * @param out_end Pointer to receive the resolved end line.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_placement_resolve(cmp_grid_placement_t *start,
+                               cmp_grid_placement_t *end, int track_count,
+                               int *out_start, int *out_end);
+
+/**
+ * @brief Resolve a named grid area to its line coordinates.
+ * @param ctx The grid context.
+ * @param name The name of the grid area.
+ * @param out_row_start Pointer to receive the start row line.
+ * @param out_col_start Pointer to receive the start column line.
+ * @param out_row_end Pointer to receive the end row line.
+ * @param out_col_end Pointer to receive the end column line.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_area_resolve(cmp_grid_ctx_t *ctx, const char *name,
+                          int *out_row_start, int *out_col_start,
+                          int *out_row_end, int *out_col_end);
+
+/**
+ * @brief Perform automatic placement of items using the 'dense' packing
+ * algorithm.
+ * @param ctx The grid context.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_auto_dense_place(cmp_grid_ctx_t *ctx);
+
+/**
+ * @brief Perform automatic placement of items using the 'sparse' packing
+ * algorithm.
+ * @param ctx The grid context.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_auto_sparse_place(cmp_grid_ctx_t *ctx);
+
+/**
+ * @brief Generate implicit tracks based on item placement.
+ * @param ctx The grid context.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_implicit_tracks_generate(cmp_grid_ctx_t *ctx);
+
+/**
+ * @brief Synchronize subgrid tracks with the parent grid.
+ * @param parent The parent grid context.
+ * @param child The subgrid context.
+ * @return 0 on success, or an error code.
+ */
+int cmp_subgrid_sync(cmp_grid_ctx_t *parent, cmp_grid_ctx_t *child);
+
+int cmp_masonry_layout(cmp_grid_ctx_t *ctx);
+
+/**
+ * @brief Apply grid gaps to the computed layout.
+ * @param ctx The grid context.
+ * @param out_row_gaps Pointer to receive the row gap value.
+ * @param out_col_gaps Pointer to receive the column gap value.
+ * @return 0 on success, or an error code.
+ */
+int cmp_grid_gap_apply(cmp_grid_ctx_t *ctx, float *out_row_gaps,
+                       float *out_col_gaps);
+
 typedef enum cmp_grid_align {
   CMP_GRID_ALIGN_START = 0,
   CMP_GRID_ALIGN_END = 1,
@@ -4562,6 +4883,16 @@ typedef enum cmp_contain {
   CMP_CONTAIN_PAINT = 32
 } cmp_contain_t;
 
+/**
+ * @brief Evaluate CSS containment effects.
+ * @param contain The containment bitmask.
+ * @param out_isolates_layout Pointer to receive if layout is isolated.
+ * @param out_isolates_paint Pointer to receive if paint is isolated.
+ * @return 0 on success, or an error code.
+ */
+int cmp_contain_evaluate(cmp_contain_t contain, int *out_isolates_layout,
+                         int *out_isolates_paint);
+
 typedef enum cmp_gradient_type {
   CMP_GRADIENT_LINEAR = 0,
   CMP_GRADIENT_RADIAL = 1,
@@ -4578,6 +4909,57 @@ typedef struct cmp_gradient {
   cmp_gradient_stop_t *stops;
   size_t stop_count;
 } cmp_gradient_t;
+
+/**
+ * @brief Create a new gradient structure.
+ */
+int cmp_gradient_create(cmp_gradient_t **out_gradient,
+                        cmp_gradient_type_t type);
+
+/**
+ * @brief Destroy a gradient structure.
+ */
+int cmp_gradient_destroy(cmp_gradient_t *gradient);
+
+/**
+ * @brief Add a color stop to a gradient.
+ */
+int cmp_gradient_add_stop(cmp_gradient_t *gradient, cmp_color_t color,
+                          float position);
+
+/**
+ * @brief Parse a Display P3 color string.
+ */
+int cmp_color_parse_p3(const char *color_str, cmp_color_t *out_color);
+
+/**
+ * @brief Convert OKLCH color to sRGB.
+ */
+int cmp_color_oklch_to_srgb(const cmp_color_t *in_color,
+                            cmp_color_t *out_color);
+
+/**
+ * @brief Mix two colors in a specified color space.
+ */
+int cmp_color_mix(const cmp_color_t *c1, const cmp_color_t *c2, float weight,
+                  cmp_color_space_t space, cmp_color_t *out_color);
+
+/**
+ * @brief Calculate relative luminance of a color.
+ */
+int cmp_color_luminance(const cmp_color_t *color, float *out_luminance);
+
+/**
+ * @brief Calculate contrast ratio between two colors.
+ */
+int cmp_color_contrast_ratio(const cmp_color_t *c1, const cmp_color_t *c2,
+                             float *out_ratio);
+
+/**
+ * @brief Parse an ICC profile from an image buffer.
+ */
+int cmp_icc_profile_parse(const void *image_buffer, size_t size,
+                          void **out_profile_handle);
 
 typedef enum cmp_corner_shape {
   CMP_CORNER_ROUND = 0,
@@ -4596,6 +4978,22 @@ typedef struct cmp_radius {
   cmp_corner_shape_t corner_shape;
 } cmp_radius_t;
 
+/**
+ * @brief Initialize a radius structure.
+ */
+int cmp_radius_init(cmp_radius_t *out_radius);
+
+/**
+ * @brief Set all radius corners to a uniform value.
+ */
+int cmp_radius_set_uniform(cmp_radius_t *radius, float r);
+
+/**
+ * @brief Perform a hit test against a rounded rectangle.
+ */
+int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
+                        float x, float y, int *out_inside);
+
 typedef struct cmp_box_shadow {
   float offset_x;
   float offset_y;
@@ -4606,10 +5004,31 @@ typedef struct cmp_box_shadow {
   struct cmp_box_shadow *next;
 } cmp_box_shadow_t;
 
+/**
+ * @brief Create a new box shadow structure.
+ */
+int cmp_box_shadow_create(cmp_box_shadow_t **out_shadow);
+
+/**
+ * @brief Destroy a box shadow structure.
+ */
+int cmp_box_shadow_destroy(cmp_box_shadow_t *shadow);
+
+/**
+ * @brief Append a box shadow to a shadow chain.
+ */
+int cmp_box_shadow_append(cmp_box_shadow_t *root, cmp_box_shadow_t *next);
+
 typedef struct cmp_shadow_9patch {
   float elevation;
   cmp_texture_t *base_texture;
 } cmp_shadow_9patch_t;
+
+/**
+ * @brief Generate a 9-patch shadow for a given elevation.
+ */
+int cmp_shadow_9patch_generate(float elevation,
+                               cmp_shadow_9patch_t *out_shadow);
 
 typedef enum cmp_filter_op {
   CMP_FILTER_BLUR = 0,
@@ -4628,6 +5047,27 @@ typedef struct cmp_filter {
   float amount;
   struct cmp_filter *next;
 } cmp_filter_t;
+
+/**
+ * @brief Create a new filter structure.
+ */
+int cmp_filter_create(cmp_filter_t **out_filter, cmp_filter_op_t op,
+                      float amount);
+
+/**
+ * @brief Destroy a filter structure.
+ */
+int cmp_filter_destroy(cmp_filter_t *filter);
+
+/**
+ * @brief Append a filter to a filter chain.
+ */
+int cmp_filter_append(cmp_filter_t *root, cmp_filter_t *next);
+
+/**
+ * @brief Utility to mirror coordinates at image edges for backdrop filters.
+ */
+int cmp_backdrop_edge_mirror(int image_width, int x, int *out_clamped_x);
 
 typedef struct cmp_media_query_env {
   float viewport_width;
@@ -4656,12 +5096,63 @@ typedef struct cmp_media_query {
   int light_level;
 } cmp_media_query_t;
 
+/**
+ * @brief Evaluate a media query against the current environment.
+ * @param query The media query to evaluate.
+ * @param env The current environment state.
+ * @param out_matches Pointer to receive the evaluation result (1 for match, 0
+ * for no match).
+ * @return 0 on success, or an error code.
+ */
+int cmp_media_query_evaluate(const cmp_media_query_t *query,
+                             const cmp_media_query_env_t *env,
+                             int *out_matches);
+
+/**
+ * @brief Evaluate the update frequency media feature.
+ * @param query The media query definition.
+ * @param env The current environment state.
+ * @param out_matches Pointer to receive the evaluation result.
+ * @return 0 on success, or an error code.
+ */
+int cmp_update_media_evaluate(const cmp_media_query_t *query,
+                              const cmp_media_query_env_t *env,
+                              int *out_matches);
+
+/**
+ * @brief Evaluate the light-level media feature.
+ * @param query The media query definition.
+ * @param env The current environment state.
+ * @param out_matches Pointer to receive the evaluation result.
+ * @return 0 on success, or an error code.
+ */
+int cmp_light_level_evaluate(const cmp_media_query_t *query,
+                             const cmp_media_query_env_t *env,
+                             int *out_matches);
+
 typedef struct cmp_container_ctx {
   const char *name;
   cmp_container_type_t type;
   float inline_size;
   float block_size;
 } cmp_container_ctx_t;
+
+/**
+ * @brief Create a new container context for container queries.
+ * @param out_ctx Pointer to receive the allocated container context.
+ * @param type The type of container (size, inline-size, etc.).
+ * @param name Optional name for the container.
+ * @return 0 on success, or an error code.
+ */
+int cmp_container_ctx_create(cmp_container_ctx_t **out_ctx,
+                             cmp_container_type_t type, const char *name);
+
+/**
+ * @brief Destroy a container context.
+ * @param ctx The container context to destroy.
+ * @return 0 on success, or an error code.
+ */
+int cmp_container_ctx_destroy(cmp_container_ctx_t *ctx);
 
 typedef struct cmp_container_query {
   const char *name;
@@ -4681,11 +5172,36 @@ typedef struct cmp_style_query {
   const char *property_value;
 } cmp_style_query_t;
 
+/**
+ * @brief Evaluate a style query against a container's computed styles.
+ * @param query The style query definition.
+ * @param container_styles Array of styles from the container.
+ * @param num_styles Number of styles in the array.
+ * @param out_matches Pointer to receive the evaluation result.
+ * @return 0 on success, or an error code.
+ */
+int cmp_style_query_evaluate(const cmp_style_query_t *query,
+                             const cmp_style_query_t *container_styles,
+                             int num_styles, int *out_matches);
+
 typedef enum cmp_content_visibility {
   CMP_CONTENT_VISIBILITY_VISIBLE = 0,
   CMP_CONTENT_VISIBILITY_HIDDEN = 1,
   CMP_CONTENT_VISIBILITY_AUTO = 2
 } cmp_content_visibility_t;
+
+/**
+ * @brief Evaluate content visibility for a node.
+ * @param visibility The content-visibility property value.
+ * @param viewport The current viewport rectangle.
+ * @param node_rect The layout rectangle of the node.
+ * @param out_is_visible Pointer to receive the visibility result.
+ * @return 0 on success, or an error code.
+ */
+int cmp_content_visibility_evaluate(cmp_content_visibility_t visibility,
+                                    const cmp_rect_t *viewport,
+                                    const cmp_rect_t *node_rect,
+                                    int *out_is_visible);
 
 struct cmp_resize_observer {
   void (*on_resize)(struct cmp_resize_observer *, cmp_layout_node_t *, float,
@@ -5551,37 +6067,67 @@ typedef enum {
 typedef struct cmp_app_region cmp_app_region_t;
 #endif
 
+/**
+ * @brief Create a new app region context.
+ */
 int cmp_app_region_create(cmp_app_region_t **out_region);
+
+/**
+ * @brief Destroy an app region context.
+ */
 int cmp_app_region_destroy(cmp_app_region_t *region);
+
+/**
+ * @brief Add a rectangle to an app region.
+ */
 int cmp_app_region_add_rect(cmp_app_region_t *region, float x, float y,
                             float width, float height,
                             cmp_app_region_type_t type);
+
+/**
+ * @brief Clear app region rectangles.
+ */
 int cmp_app_region_clear(cmp_app_region_t *region);
+
+/**
+ * @brief Hit test against app region.
+ */
 int cmp_app_region_hit_test(const cmp_app_region_t *region, float x, float y,
                             cmp_app_region_type_t *out_type);
 
 /**
  * @brief System Titlebar Overlay
- * Evaluates env(titlebar-area-x) etc. to allow custom UI to safely position
- * itself alongside OS-rendered close/minimize buttons on macOS/Windows.
  */
 #ifndef CMP_TITLEBAR_ENV_T_DEFINED
 #define CMP_TITLEBAR_ENV_T_DEFINED
 typedef struct cmp_titlebar_env cmp_titlebar_env_t;
 #endif
 
+/**
+ * @brief Create a new titlebar env context.
+ */
 int cmp_titlebar_env_create(cmp_titlebar_env_t **out_env);
+
+/**
+ * @brief Destroy a titlebar env context.
+ */
 int cmp_titlebar_env_destroy(cmp_titlebar_env_t *env);
+
+/**
+ * @brief Set the titlebar area.
+ */
 int cmp_titlebar_env_set_area(cmp_titlebar_env_t *env, float x, float y,
                               float width, float height);
+
+/**
+ * @brief Get the titlebar area.
+ */
 int cmp_titlebar_env_get_area(const cmp_titlebar_env_t *env, float *out_x,
                               float *out_y, float *out_width,
                               float *out_height);
 
 /**
- * @brief Dark Mode & System Appearance
- * Automatically detects OS-level theme changes (Light/Dark) and hot-reloads
- * the active style tree via reactive CSS variable overrides.
+ * @brief Prefers Color Scheme
  */
 typedef enum {
   CMP_COLOR_SCHEME_LIGHT,
@@ -5593,45 +6139,69 @@ typedef enum {
 typedef struct cmp_prefers_color_scheme cmp_prefers_color_scheme_t;
 #endif
 
-int cmp_prefers_color_scheme_create(cmp_prefers_color_scheme_t **out_scheme);
-int cmp_prefers_color_scheme_destroy(cmp_prefers_color_scheme_t *scheme);
-int cmp_prefers_color_scheme_set(cmp_prefers_color_scheme_t *scheme,
-                                 cmp_color_scheme_t color_scheme);
-int cmp_prefers_color_scheme_get(const cmp_prefers_color_scheme_t *scheme,
-                                 cmp_color_scheme_t *out_color_scheme);
+/**
+ * @brief Create a new prefers color scheme context.
+ */
+int cmp_prefers_color_scheme_create(cmp_prefers_color_scheme_t **out_pcs);
 
 /**
- * @brief Clipboard API Integration
- * Interfaces with the OS clipboard to handle complex MIME types,
- * supporting plain text, rich text (HTML), and bitmap image payloads.
+ * @brief Destroy a prefers color scheme context.
  */
-typedef enum {
-  CMP_CLIPBOARD_FORMAT_TEXT,
-  CMP_CLIPBOARD_FORMAT_HTML,
-  CMP_CLIPBOARD_FORMAT_IMAGE
-} cmp_clipboard_format_t;
+int cmp_prefers_color_scheme_destroy(cmp_prefers_color_scheme_t *pcs);
 
+/**
+ * @brief Set the current color scheme.
+ */
+int cmp_prefers_color_scheme_set(cmp_prefers_color_scheme_t *pcs,
+                                 cmp_color_scheme_t scheme);
+
+/**
+ * @brief Get the current color scheme.
+ */
+int cmp_prefers_color_scheme_get(const cmp_prefers_color_scheme_t *pcs,
+                                 cmp_color_scheme_t *out_scheme);
+
+/**
+ * @brief Clipboard API
+ */
 #ifndef CMP_CLIPBOARD_T_DEFINED
 #define CMP_CLIPBOARD_T_DEFINED
 typedef struct cmp_clipboard cmp_clipboard_t;
 #endif
 
+/**
+ * @brief Create a new clipboard context.
+ */
 int cmp_clipboard_create(cmp_clipboard_t **out_clipboard);
+
+/**
+ * @brief Destroy a clipboard context.
+ */
 int cmp_clipboard_destroy(cmp_clipboard_t *clipboard);
+
+/**
+ * @brief Set clipboard text content.
+ */
 int cmp_clipboard_set_text(cmp_clipboard_t *clipboard, const char *text);
+
+/**
+ * @brief Get clipboard text content.
+ */
 int cmp_clipboard_get_text(const cmp_clipboard_t *clipboard, char **out_text);
+
+/**
+ * @brief Clear clipboard content.
+ */
 int cmp_clipboard_clear(cmp_clipboard_t *clipboard);
 
 /**
- * @brief System Drag and Drop API
- * Manages cross-application drag sessions, evaluating drop zones,
- * parsing file URIs, and generating dynamic drag ghost textures.
+ * @brief Drag and Drop (DND) API
  */
 typedef enum {
-  CMP_DND_OP_NONE,
-  CMP_DND_OP_COPY,
-  CMP_DND_OP_MOVE,
-  CMP_DND_OP_LINK
+  CMP_DND_OP_NONE = 0,
+  CMP_DND_OP_COPY = 1,
+  CMP_DND_OP_MOVE = 2,
+  CMP_DND_OP_LINK = 3
 } cmp_dnd_op_t;
 
 #ifndef CMP_DND_T_DEFINED
@@ -5639,23 +6209,45 @@ typedef enum {
 typedef struct cmp_dnd cmp_dnd_t;
 #endif
 
+/**
+ * @brief Create a new DND context.
+ */
 int cmp_dnd_create(cmp_dnd_t **out_dnd);
+
+/**
+ * @brief Destroy a DND context.
+ */
 int cmp_dnd_destroy(cmp_dnd_t *dnd);
-int cmp_dnd_set_payload_text(cmp_dnd_t *dnd, const char *text);
-int cmp_dnd_get_payload_text(const cmp_dnd_t *dnd, char **out_text);
+
+/**
+ * @brief Set DND operation.
+ */
 int cmp_dnd_set_operation(cmp_dnd_t *dnd, cmp_dnd_op_t op);
+
+/**
+ * @brief Get DND operation.
+ */
 int cmp_dnd_get_operation(const cmp_dnd_t *dnd, cmp_dnd_op_t *out_op);
 
 /**
- * @brief Native Dialog Interop
- * Fallback wrappers invoking OS-native file pickers, color pickers,
- * and print dialogs instead of rendering bespoke UI.
+ * @brief Set DND payload text.
+ */
+int cmp_dnd_set_payload_text(cmp_dnd_t *dnd, const char *text);
+
+/**
+ * @brief Get DND payload text.
+ */
+int cmp_dnd_get_payload_text(const cmp_dnd_t *dnd, char **out_text);
+
+/**
+ * @brief Native Dialog API
  */
 typedef enum {
+  CMP_DIALOG_TYPE_ALERT,
+  CMP_DIALOG_TYPE_CONFIRM,
+  CMP_DIALOG_TYPE_PROMPT,
   CMP_DIALOG_TYPE_FILE_OPEN,
-  CMP_DIALOG_TYPE_FILE_SAVE,
-  CMP_DIALOG_TYPE_COLOR_PICKER,
-  CMP_DIALOG_TYPE_PRINT
+  CMP_DIALOG_TYPE_FILE_SAVE
 } cmp_dialog_type_t;
 
 #ifndef CMP_NATIVE_DIALOG_T_DEFINED
@@ -5663,40 +6255,73 @@ typedef enum {
 typedef struct cmp_native_dialog cmp_native_dialog_t;
 #endif
 
+/**
+ * @brief Create a new native dialog.
+ */
 int cmp_native_dialog_create(cmp_native_dialog_t **out_dialog);
+
+/**
+ * @brief Destroy a native dialog.
+ */
 int cmp_native_dialog_destroy(cmp_native_dialog_t *dialog);
+
+/**
+ * @brief Show a native dialog.
+ */
 int cmp_native_dialog_show(cmp_native_dialog_t *dialog, cmp_dialog_type_t type);
+
+/**
+ * @brief Get the result string from a native dialog.
+ */
 int cmp_native_dialog_get_result_string(const cmp_native_dialog_t *dialog,
                                         char **out_result);
+
+/**
+ * @brief Set the result string for a native dialog (internal/mock).
+ */
 int cmp_native_dialog_set_result_string(cmp_native_dialog_t *dialog,
                                         const char *result);
 
 /**
- * @brief System Tray & Menu Bars
- * Maps defined UI structures to the macOS global menu bar or Windows system
- * tray contextual menus.
+ * @brief System Menu API
  */
 #ifndef CMP_SYSTEM_MENU_T_DEFINED
 #define CMP_SYSTEM_MENU_T_DEFINED
 typedef struct cmp_system_menu cmp_system_menu_t;
 #endif
 
+/**
+ * @brief Create a new system menu.
+ */
 int cmp_system_menu_create(cmp_system_menu_t **out_menu);
+
+/**
+ * @brief Destroy a system menu.
+ */
 int cmp_system_menu_destroy(cmp_system_menu_t *menu);
+
+/**
+ * @brief Add an item to the system menu.
+ */
 int cmp_system_menu_add_item(cmp_system_menu_t *menu, const char *label,
                              int id);
+
+/**
+ * @brief Show the system menu.
+ */
 int cmp_system_menu_show(cmp_system_menu_t *menu);
 
 /**
- * @brief Hardware Haptics Engine
- * Triggers precise linear resonant actuator (LRA) patterns (light impact,
- * selection change) for Cupertino/Material toggles and pull-to-refresh actions.
+ * @brief Haptics API
  */
 typedef enum {
   CMP_HAPTICS_TYPE_LIGHT_IMPACT,
   CMP_HAPTICS_TYPE_MEDIUM_IMPACT,
   CMP_HAPTICS_TYPE_HEAVY_IMPACT,
-  CMP_HAPTICS_TYPE_SELECTION_CHANGE
+  CMP_HAPTICS_TYPE_SELECTION_CHANGE,
+  CMP_HAPTICS_TYPE_SUCCESS,
+  CMP_HAPTICS_TYPE_WARNING,
+  CMP_HAPTICS_TYPE_ERROR
 } cmp_haptics_type_t;
 
 #ifndef CMP_HAPTICS_T_DEFINED
@@ -5704,46 +6329,89 @@ typedef enum {
 typedef struct cmp_haptics cmp_haptics_t;
 #endif
 
+/**
+ * @brief Create a new haptics context.
+ */
 int cmp_haptics_create(cmp_haptics_t **out_haptics);
+
+/**
+ * @brief Destroy a haptics context.
+ */
 int cmp_haptics_destroy(cmp_haptics_t *haptics);
+
+/**
+ * @brief Trigger haptic feedback.
+ */
 int cmp_haptics_trigger(cmp_haptics_t *haptics, cmp_haptics_type_t type);
 
 /**
- * @brief Picture-in-Picture (PiP) Hooks
- * Promotes specific video or UI sub-trees to floating OS-managed overlays
- * that persist across application minimization.
+ * @brief Picture-in-Picture (PiP) API
  */
 #ifndef CMP_PIP_T_DEFINED
 #define CMP_PIP_T_DEFINED
 typedef struct cmp_pip cmp_pip_t;
 #endif
 
+/**
+ * @brief Create a new PiP context.
+ */
 int cmp_pip_create(cmp_pip_t **out_pip);
+
+/**
+ * @brief Destroy a PiP context.
+ */
 int cmp_pip_destroy(cmp_pip_t *pip);
+
+/**
+ * @brief Enable PiP mode.
+ */
 int cmp_pip_enable(cmp_pip_t *pip, void *ui_node_or_video_stream);
+
+/**
+ * @brief Disable PiP mode.
+ */
 int cmp_pip_disable(cmp_pip_t *pip);
+
+/**
+ * @brief Check if PiP mode is active.
+ */
 int cmp_pip_is_active(const cmp_pip_t *pip, int *out_is_active);
 
 /**
- * @brief Print / PDF Generation Context
- * Evaluates @media print, respects page-break-before/after, and reroutes
- * rendering commands to a PDF generator backend instead of a GPU swapchain.
+ * @brief Print Context API
  */
 #ifndef CMP_PRINT_CTX_T_DEFINED
 #define CMP_PRINT_CTX_T_DEFINED
 typedef struct cmp_print_ctx cmp_print_ctx_t;
 #endif
 
-int cmp_print_ctx_create(cmp_print_ctx_t **out_ctx);
-int cmp_print_ctx_destroy(cmp_print_ctx_t *ctx);
+/**
+ * @brief Create a new print context.
+ */
+int cmp_print_ctx_create(cmp_print_ctx_t **out_pc);
+
+/**
+ * @brief Destroy a print context.
+ */
+int cmp_print_ctx_destroy(cmp_print_ctx_t *pc);
+
+/**
+ * @brief Begin a new page in print context.
+ */
 int cmp_print_ctx_begin_page(cmp_print_ctx_t *ctx);
+
+/**
+ * @brief End current page in print context.
+ */
 int cmp_print_ctx_end_page(cmp_print_ctx_t *ctx);
+
+/**
+ * @brief Save printed content to a PDF file.
+ */
 int cmp_print_ctx_save_pdf(cmp_print_ctx_t *ctx, const char *file_path);
 
 /**
- * @brief System Network Status
- * Hooks to OS network APIs to automatically adapt asset loading strategies
- * or show "offline" UI components.
+ * @brief Network Status API
  */
 typedef enum {
   CMP_NETWORK_STATUS_OFFLINE,
@@ -5756,33 +6424,59 @@ typedef enum {
 typedef struct cmp_network cmp_network_t;
 #endif
 
+/**
+ * @brief Create a new network context.
+ */
 int cmp_network_create(cmp_network_t **out_network);
+
+/**
+ * @brief Destroy a network context.
+ */
 int cmp_network_destroy(cmp_network_t *network);
+
+/**
+ * @brief Get the current network status.
+ */
 int cmp_network_get_status(const cmp_network_t *network,
                            cmp_network_status_t *out_status);
+
+/**
+ * @brief Set the network status (internal/mock).
+ */
 int cmp_network_set_status(cmp_network_t *network, cmp_network_status_t status);
 
 /**
- * @brief Localization String Interpolation
- * Fast lookup maps for localized string replacement, managing pluralization
- * rules and variable injection natively within text nodes.
+ * @brief I18n API
  */
 #ifndef CMP_I18N_T_DEFINED
 #define CMP_I18N_T_DEFINED
 typedef struct cmp_i18n cmp_i18n_t;
 #endif
 
+/**
+ * @brief Create a new i18n context.
+ */
 int cmp_i18n_create(cmp_i18n_t **out_i18n);
+
+/**
+ * @brief Destroy an i18n context.
+ */
 int cmp_i18n_destroy(cmp_i18n_t *i18n);
+
+/**
+ * @brief Add a localized string.
+ */
 int cmp_i18n_add_string(cmp_i18n_t *i18n, const char *locale, const char *key,
                         const char *value);
+
+/**
+ * @brief Get a localized string.
+ */
 int cmp_i18n_get_string(const cmp_i18n_t *i18n, const char *locale,
                         const char *key, char **out_value);
 
 /**
- * @brief Content Security Policy (CSP) Evaluator
- * Enforces strict security boundaries, preventing the arbitrary loading of
- * remote fonts, images, or stylesheets without explicit domain whitelisting.
+ * @brief Content Security Policy (CSP) API
  */
 typedef enum {
   CMP_CSP_RESOURCE_IMAGE,
@@ -5796,11 +6490,81 @@ typedef enum {
 typedef struct cmp_csp cmp_csp_t;
 #endif
 
+/**
+ * @brief Create a new CSP context.
+ */
 int cmp_csp_create(cmp_csp_t **out_csp);
+
+/**
+ * @brief Destroy a CSP context.
+ */
 int cmp_csp_destroy(cmp_csp_t *csp);
+
+/**
+ * @brief Add a domain to the CSP whitelist.
+ */
 int cmp_csp_add_domain(cmp_csp_t *csp, const char *domain);
+
+/**
+ * @brief Check if a domain is allowed by CSP.
+ */
 int cmp_csp_check_domain(const cmp_csp_t *csp, const char *domain,
                          cmp_csp_resource_type_t type, int *out_allowed);
+
+/**
+ * @brief Multi-column evaluation
+ */
+int cmp_multicolumn_evaluate(cmp_layout_node_t *node,
+                             cmp_column_fill_t fill_mode);
+
+/**
+ * @brief Grid alignment evaluation
+ */
+int cmp_grid_align_evaluate(cmp_grid_align_t align, float track_size,
+                            float item_size, float *out_offset);
+
+/**
+ * @brief Container query evaluation
+ */
+int cmp_container_query_evaluate(const cmp_container_query_t *query,
+                                 const cmp_container_ctx_t *ctx,
+                                 int *out_matches);
+
+/**
+ * @brief Create a new resize observer.
+ */
+int cmp_resize_observer_create(cmp_resize_observer_t **out_observer,
+                               void (*on_resize)(cmp_resize_observer_t *,
+                                                 cmp_layout_node_t *, float,
+                                                 float),
+                               void *user_data);
+
+/**
+ * @brief Destroy a resize observer.
+ */
+int cmp_resize_observer_destroy(cmp_resize_observer_t *observer);
+
+/**
+ * @brief Notify a resize observer of a change.
+ */
+int cmp_resize_observer_notify(cmp_resize_observer_t *observer,
+                               cmp_layout_node_t *node, float width,
+                               float height);
+
+/**
+ * @brief Evaluate flex alignment for a node.
+ */
+int cmp_flex_align_evaluate(cmp_flex_align_t align_val, float cross_size,
+                            float item_cross_size, float item_baseline,
+                            float max_baseline, float *out_position,
+                            float *out_cross_size);
+
+/**
+ * @brief Pointer media query evaluation
+ */
+int cmp_pointer_media_evaluate(const cmp_media_query_t *query,
+                               const cmp_media_query_env_t *env,
+                               int *out_matches);
 
 #ifdef __cplusplus
 }

@@ -1483,7 +1483,7 @@ int cmp_i18n_set_bidi_direction(cmp_text_direction_t dir) {
   return CMP_SUCCESS;
 }
 
-cmp_text_direction_t cmp_i18n_get_bidi_direction(void) { return g_bidi_dir; }
+int cmp_i18n_get_bidi_direction(void) { return (int)g_bidi_dir; }
 
 int cmp_window_set_ui_tree(cmp_window_t *window, cmp_ui_node_t *tree) {
   if (window == NULL) {

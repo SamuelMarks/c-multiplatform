@@ -221,10 +221,10 @@ int cmp_contain_evaluate(cmp_contain_t contain, int *out_isolates_layout,
 }
 
 int cmp_resize_observer_create(cmp_resize_observer_t **out_observer,
-                               void *user_data,
                                void (*on_resize)(struct cmp_resize_observer *,
                                                  cmp_layout_node_t *, float,
-                                                 float)) {
+                                                 float),
+                               void *user_data) {
   cmp_resize_observer_t *obs;
   if (!out_observer || !on_resize)
     return CMP_ERROR_INVALID_ARG;

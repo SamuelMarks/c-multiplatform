@@ -46,11 +46,13 @@ TEST test_window_lifecycle(void) {
   PASS();
 }
 
+#if defined(_WIN32)
 static void dummy_drop_callback(const char *path, void *user_data) {
   int *triggered = (int *)user_data;
   *triggered = 1;
   (void)path;
 }
+#endif
 
 TEST test_window_drop_callback(void) {
   int res;

@@ -22,6 +22,14 @@ typedef struct cmp_win32_cond {
 #endif
 /* clang-format on */
 
+#if defined(__APPLE__)
+typedef struct {
+  pthread_mutex_t mutex;
+  pthread_cond_t cond;
+  int count;
+} cmp_apple_sem_t;
+#endif
+
 int cmp_mutex_init(cmp_mutex_t *mutex) {
   if (mutex == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -102,6 +110,30 @@ int cmp_semaphore_init(cmp_semaphore_t *sem, int initial_count) {
   if (*sem == NULL) {
     return CMP_ERROR_OOM;
   }
+#elif defined(__APPLE__)
+  {
+    cmp_apple_sem_t *as;
+    int res;
+
+    res = CMP_MALLOC(sizeof(cmp_apple_sem_t), (void **)&as);
+    if (res != CMP_SUCCESS || as == NULL) {
+      return CMP_ERROR_OOM;
+    }
+
+    if (pthread_mutex_init(&as->mutex, NULL) != 0) {
+      CMP_FREE(as);
+      return CMP_ERROR_OOM;
+    }
+
+    if (pthread_cond_init(&as->cond, NULL) != 0) {
+      pthread_mutex_destroy(&as->mutex);
+      CMP_FREE(as);
+      return CMP_ERROR_OOM;
+    }
+
+    as->count = initial_count;
+    *sem = (cmp_semaphore_t)as;
+  }
 #else
   if (sem_init(sem, 0, initial_count) != 0) {
     return CMP_ERROR_OOM;
@@ -119,6 +151,16 @@ int cmp_semaphore_wait(cmp_semaphore_t *sem) {
   if (WaitForSingleObject(*sem, 0xFFFFFFFF) != 0) {
     return CMP_ERROR_INVALID_ARG;
   }
+#elif defined(__APPLE__)
+  {
+    cmp_apple_sem_t *as = (cmp_apple_sem_t *)(*sem);
+    pthread_mutex_lock(&as->mutex);
+    while (as->count <= 0) {
+      pthread_cond_wait(&as->cond, &as->mutex);
+    }
+    as->count--;
+    pthread_mutex_unlock(&as->mutex);
+  }
 #else
   while (sem_wait(sem) != 0) {
     /* Retry on EINTR */
@@ -135,6 +177,14 @@ int cmp_semaphore_post(cmp_semaphore_t *sem) {
 #if defined(_WIN32)
   if (ReleaseSemaphore(*sem, 1, NULL) == 0) {
     return CMP_ERROR_INVALID_ARG;
+  }
+#elif defined(__APPLE__)
+  {
+    cmp_apple_sem_t *as = (cmp_apple_sem_t *)(*sem);
+    pthread_mutex_lock(&as->mutex);
+    as->count++;
+    pthread_cond_signal(&as->cond);
+    pthread_mutex_unlock(&as->mutex);
   }
 #else
   if (sem_post(sem) != 0) {
@@ -154,6 +204,14 @@ int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
     return CMP_ERROR_INVALID_ARG;
   }
   *sem = NULL;
+#elif defined(__APPLE__)
+  {
+    cmp_apple_sem_t *as = (cmp_apple_sem_t *)(*sem);
+    pthread_mutex_destroy(&as->mutex);
+    pthread_cond_destroy(&as->cond);
+    CMP_FREE(as);
+    *sem = NULL;
+  }
 #else
   if (sem_destroy(sem) != 0) {
     return CMP_ERROR_INVALID_ARG;

@@ -205,7 +205,7 @@ int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
 
   /* initialize the free list */
   for (i = 0; i < block_count; ++i) {
-    block = (cmp_pool_block_t *)(pool->buffer + (i * block_size));
+    block = (cmp_pool_block_t *)(void *)(pool->buffer + (i * block_size));
     block->next = pool->free_list;
     pool->free_list = block;
   }

@@ -165,7 +165,127 @@ FetchContent_Declare(c_orm GIT_REPOSITORY https://github.com/SamuelMarks/c-orm.g
 
 FetchContent_MakeAvailable(cdd_c c_orm)
 
-set(CMP_SOURCES src/cmp_memory.c src/cmp_error.c src/cmp_string.c src/cmp_tls.c src/cmp_ring_buffer.c src/cmp_modality.c src/cmp_sync.c src/cmp_coroutine.c src/cmp_timer.c src/cmp_vfs.c src/cmp_http.c src/cmp_orm.c src/cmp_window.c src/cmp_window_manager.c src/cmp_dpi.c src/cmp_event.c src/cmp_router.c src/cmp_layout.c src/cmp_ui.c src/cmp_flex_align.c src/cmp_media_query.c src/cmp_grid.c src/cmp_flow.c src/cmp_position.c src/cmp_visuals.c src/cmp_borders.c src/cmp_svg.c src/cmp_gpu.c src/cmp_shader.c src/cmp_shader_cache.c src/cmp_msaa.c src/cmp_linear_blend.c src/cmp_tex_compression.c src/cmp_mipmap.c src/cmp_swapchain.c src/cmp_overdraw.c src/cmp_layer_tiling.c src/cmp_hit_test.c src/cmp_pointer_events.c src/cmp_event_bubbling.c src/cmp_passive_event.c src/cmp_pointer_capture.c src/cmp_gesture.c src/cmp_complex_gesture.c src/cmp_pointer_pressure.c src/cmp_touch_action.c src/cmp_context_menu.c src/cmp_hover_intent.c src/cmp_scroll_ctx.c src/cmp_scroll_velocity.c src/cmp_scroll_momentum.c src/cmp_overscroll.c src/cmp_rubber_band.c src/cmp_scroll_smooth.c src/cmp_scroll_snap_stop.c src/cmp_scroll_padding.c src/cmp_scrollbar_gutter.c src/cmp_scroll_anchor.c src/cmp_ptr.c src/cmp_tick.c src/cmp_dt.c src/cmp_transition.c src/cmp_keyframe.c src/cmp_anim_compose.c src/cmp_spring_ease.c src/cmp_bezier_ease.c src/cmp_step_ease.c src/cmp_motion_path.c src/cmp_scroll_timeline.c src/cmp_view_transition.c src/cmp_vt_shared.c src/cmp_discrete_transition.c src/cmp_flip.c src/cmp_form_controls.c src/cmp_validation.c src/cmp_input_mask.c src/cmp_indeterminate.c src/cmp_select_ui.c src/cmp_datalist.c src/cmp_range_slider.c src/cmp_color_picker.c src/cmp_date_picker.c src/cmp_caret.c src/cmp_selection.c src/cmp_editable.c src/cmp_ime.c src/cmp_spellcheck.c src/cmp_undo_redo.c src/cmp_a11y_tree.c src/cmp_screen_reader.c src/cmp_aria.c src/cmp_aria_relations.c src/cmp_aria_live.c src/cmp_focus_manager.c src/cmp_focus_ring.c src/cmp_a11y_rotor.c src/cmp_a11y_action.c src/cmp_dynamic_type.c src/cmp_prefers_reduced_motion.c src/cmp_a11y_transparency.c src/cmp_forced_colors.c src/cmp_sys_colors.c src/cmp_compositor_anim.c)
+set(CMP_SOURCES
+    src/cmp_memory.c
+    src/cmp_error.c
+    src/cmp_string.c
+    src/cmp_tls.c
+    src/cmp_ring_buffer.c
+    src/cmp_modality.c
+    src/cmp_sync.c
+    src/cmp_coroutine.c
+    src/cmp_timer.c
+    src/cmp_vfs.c
+    src/cmp_http.c
+    src/cmp_orm.c
+    src/cmp_window.c
+    src/cmp_window_manager.c
+    src/cmp_dpi.c
+    src/cmp_event.c
+    src/cmp_router.c
+    src/cmp_layout.c
+    src/cmp_ui.c
+    src/cmp_flex_align.c
+    src/cmp_media_query.c
+    src/cmp_grid.c
+    src/cmp_flow.c
+    src/cmp_position.c
+    src/cmp_visuals.c
+    src/cmp_borders.c
+    src/cmp_svg.c
+    src/cmp_gpu.c
+    src/cmp_shader.c
+    src/cmp_shader_cache.c
+    src/cmp_msaa.c
+    src/cmp_linear_blend.c
+    src/cmp_tex_compression.c
+    src/cmp_mipmap.c
+    src/cmp_swapchain.c
+    src/cmp_overdraw.c
+    src/cmp_layer_tiling.c
+    src/cmp_hit_test.c
+    src/cmp_pointer_events.c
+    src/cmp_event_bubbling.c
+    src/cmp_passive_event.c
+    src/cmp_pointer_capture.c
+    src/cmp_gesture.c
+    src/cmp_complex_gesture.c
+    src/cmp_pointer_pressure.c
+    src/cmp_touch_action.c
+    src/cmp_context_menu.c
+    src/cmp_hover_intent.c
+    src/cmp_scroll_ctx.c
+    src/cmp_scroll_velocity.c
+    src/cmp_scroll_momentum.c
+    src/cmp_overscroll.c
+    src/cmp_rubber_band.c
+    src/cmp_scroll_smooth.c
+    src/cmp_scroll_snap_stop.c
+    src/cmp_scroll_padding.c
+    src/cmp_scrollbar_gutter.c
+    src/cmp_scroll_anchor.c
+    src/cmp_ptr.c
+    src/cmp_tick.c
+    src/cmp_dt.c
+    src/cmp_transition.c
+    src/cmp_keyframe.c
+    src/cmp_anim_compose.c
+    src/cmp_spring_ease.c
+    src/cmp_bezier_ease.c
+    src/cmp_step_ease.c
+    src/cmp_motion_path.c
+    src/cmp_scroll_timeline.c
+    src/cmp_view_transition.c
+    src/cmp_vt_shared.c
+    src/cmp_discrete_transition.c
+    src/cmp_flip.c
+    src/cmp_form_controls.c
+    src/cmp_validation.c
+    src/cmp_input_mask.c
+    src/cmp_indeterminate.c
+    src/cmp_select_ui.c
+    src/cmp_datalist.c
+    src/cmp_range_slider.c
+    src/cmp_color_picker.c
+    src/cmp_date_picker.c
+    src/cmp_caret.c
+    src/cmp_selection.c
+    src/cmp_editable.c
+    src/cmp_ime.c
+    src/cmp_spellcheck.c
+    src/cmp_undo_redo.c
+    src/cmp_a11y_tree.c
+    src/cmp_screen_reader.c
+    src/cmp_aria.c
+    src/cmp_aria_relations.c
+    src/cmp_aria_live.c
+    src/cmp_focus_manager.c
+    src/cmp_focus_ring.c
+    src/cmp_a11y_rotor.c
+    src/cmp_a11y_action.c
+    src/cmp_dynamic_type.c
+    src/cmp_prefers_reduced_motion.c
+    src/cmp_a11y_transparency.c
+    src/cmp_forced_colors.c
+    src/cmp_sys_colors.c
+    src/cmp_compositor_anim.c
+    src/cmp_app_region.c
+    src/cmp_clipboard.c
+    src/cmp_csp.c
+    src/cmp_dnd.c
+    src/cmp_haptics.c
+    src/cmp_i18n.c
+    src/cmp_native_dialog.c
+    src/cmp_network.c
+    src/cmp_pip.c
+    src/cmp_prefers_color_scheme.c
+    src/cmp_print_ctx.c
+    src/cmp_safe_areas.c
+    src/cmp_system_menu.c
+    src/cmp_titlebar_env.c
+    src/cmp_window_blur.c
+)
+
 
 if(CMP_THEME_CUPERTINO)
     add_compile_definitions(CMP_THEME_CUPERTINO=1)
@@ -479,6 +599,51 @@ target_link_libraries(cmp_sys_colors_test PRIVATE cmp greatest)
 add_executable(cmp_compositor_anim_test tests/test_cmp_compositor_anim.c)
 target_link_libraries(cmp_compositor_anim_test PRIVATE cmp greatest)
 
+add_executable(cmp_app_region_test tests/test_cmp_app_region.c)
+target_link_libraries(cmp_app_region_test PRIVATE cmp greatest)
+add_executable(cmp_borders_test tests/test_cmp_borders.c)
+target_link_libraries(cmp_borders_test PRIVATE cmp greatest)
+add_executable(cmp_clipboard_test tests/test_cmp_clipboard.c)
+target_link_libraries(cmp_clipboard_test PRIVATE cmp greatest)
+add_executable(cmp_csp_test tests/test_cmp_csp.c)
+target_link_libraries(cmp_csp_test PRIVATE cmp greatest)
+add_executable(cmp_dnd_test tests/test_cmp_dnd.c)
+target_link_libraries(cmp_dnd_test PRIVATE cmp greatest)
+add_executable(cmp_flex_align_test tests/test_cmp_flex_align.c)
+target_link_libraries(cmp_flex_align_test PRIVATE cmp greatest)
+add_executable(cmp_flow_test tests/test_cmp_flow.c)
+target_link_libraries(cmp_flow_test PRIVATE cmp greatest)
+add_executable(cmp_grid_test tests/test_cmp_grid.c)
+target_link_libraries(cmp_grid_test PRIVATE cmp greatest)
+add_executable(cmp_haptics_test tests/test_cmp_haptics.c)
+target_link_libraries(cmp_haptics_test PRIVATE cmp greatest)
+add_executable(cmp_i18n_test tests/test_cmp_i18n.c)
+target_link_libraries(cmp_i18n_test PRIVATE cmp greatest)
+add_executable(cmp_media_query_test tests/test_cmp_media_query.c)
+target_link_libraries(cmp_media_query_test PRIVATE cmp greatest)
+add_executable(cmp_native_dialog_test tests/test_cmp_native_dialog.c)
+target_link_libraries(cmp_native_dialog_test PRIVATE cmp greatest)
+add_executable(cmp_network_test tests/test_cmp_network.c)
+target_link_libraries(cmp_network_test PRIVATE cmp greatest)
+add_executable(cmp_pip_test tests/test_cmp_pip.c)
+target_link_libraries(cmp_pip_test PRIVATE cmp greatest)
+add_executable(cmp_position_test tests/test_cmp_position.c)
+target_link_libraries(cmp_position_test PRIVATE cmp greatest)
+add_executable(cmp_prefers_color_scheme_test tests/test_cmp_prefers_color_scheme.c)
+target_link_libraries(cmp_prefers_color_scheme_test PRIVATE cmp greatest)
+add_executable(cmp_print_ctx_test tests/test_cmp_print_ctx.c)
+target_link_libraries(cmp_print_ctx_test PRIVATE cmp greatest)
+add_executable(cmp_safe_areas_test tests/test_cmp_safe_areas.c)
+target_link_libraries(cmp_safe_areas_test PRIVATE cmp greatest)
+add_executable(cmp_system_menu_test tests/test_cmp_system_menu.c)
+target_link_libraries(cmp_system_menu_test PRIVATE cmp greatest)
+add_executable(cmp_titlebar_env_test tests/test_cmp_titlebar_env.c)
+target_link_libraries(cmp_titlebar_env_test PRIVATE cmp greatest)
+add_executable(cmp_visuals_test tests/test_cmp_visuals.c)
+target_link_libraries(cmp_visuals_test PRIVATE cmp greatest)
+add_executable(cmp_window_blur_test tests/test_cmp_window_blur.c)
+target_link_libraries(cmp_window_blur_test PRIVATE cmp greatest)
+
 # Amalgamation script hook
 add_custom_target(amalgamate
     COMMAND ${CMAKE_COMMAND} -E echo "Generating cmp.h and cmp.c amalgamation..."
@@ -585,6 +750,28 @@ add_test(NAME cmp_a11y_transparency_test COMMAND cmp_a11y_transparency_test)
 add_test(NAME cmp_forced_colors_test COMMAND cmp_forced_colors_test)
 add_test(NAME cmp_sys_colors_test COMMAND cmp_sys_colors_test)
 add_test(NAME cmp_compositor_anim_test COMMAND cmp_compositor_anim_test)
+add_test(NAME cmp_app_region_test COMMAND cmp_app_region_test)
+add_test(NAME cmp_borders_test COMMAND cmp_borders_test)
+add_test(NAME cmp_clipboard_test COMMAND cmp_clipboard_test)
+add_test(NAME cmp_csp_test COMMAND cmp_csp_test)
+add_test(NAME cmp_dnd_test COMMAND cmp_dnd_test)
+add_test(NAME cmp_flex_align_test COMMAND cmp_flex_align_test)
+add_test(NAME cmp_flow_test COMMAND cmp_flow_test)
+add_test(NAME cmp_grid_test COMMAND cmp_grid_test)
+add_test(NAME cmp_haptics_test COMMAND cmp_haptics_test)
+add_test(NAME cmp_i18n_test COMMAND cmp_i18n_test)
+add_test(NAME cmp_media_query_test COMMAND cmp_media_query_test)
+add_test(NAME cmp_native_dialog_test COMMAND cmp_native_dialog_test)
+add_test(NAME cmp_network_test COMMAND cmp_network_test)
+add_test(NAME cmp_pip_test COMMAND cmp_pip_test)
+add_test(NAME cmp_position_test COMMAND cmp_position_test)
+add_test(NAME cmp_prefers_color_scheme_test COMMAND cmp_prefers_color_scheme_test)
+add_test(NAME cmp_print_ctx_test COMMAND cmp_print_ctx_test)
+add_test(NAME cmp_safe_areas_test COMMAND cmp_safe_areas_test)
+add_test(NAME cmp_system_menu_test COMMAND cmp_system_menu_test)
+add_test(NAME cmp_titlebar_env_test COMMAND cmp_titlebar_env_test)
+add_test(NAME cmp_visuals_test COMMAND cmp_visuals_test)
+add_test(NAME cmp_window_blur_test COMMAND cmp_window_blur_test)
 
 add_test(NAME cmp_error_test COMMAND cmp_error_test)
 add_test(NAME cmp_error_test_crash COMMAND cmp_error_test --crash)
@@ -597,7 +784,7 @@ if(CMP_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
-set_tests_properties(cmp_test cmp_string_test cmp_tls_test cmp_ring_buffer_test cmp_modality_single_test cmp_modality_threaded_test cmp_modality_async_test cmp_sync_test cmp_coroutine_test cmp_timer_test cmp_vfs_test cmp_http_test cmp_orm_test cmp_window_test cmp_window_manager_test cmp_dpi_test cmp_event_test cmp_router_test cmp_layout_test cmp_ui_test cmp_svg_test cmp_gpu_test cmp_shader_test cmp_shader_cache_test cmp_msaa_test cmp_linear_blend_test cmp_tex_compression_test cmp_mipmap_test cmp_swapchain_test cmp_overdraw_test cmp_layer_tiling_test cmp_hit_test_test cmp_pointer_events_test cmp_event_bubbling_test cmp_passive_event_test cmp_pointer_capture_test cmp_gesture_test cmp_complex_gesture_test cmp_pointer_pressure_test cmp_touch_action_test cmp_context_menu_test cmp_hover_intent_test cmp_scroll_ctx_test cmp_scroll_velocity_test cmp_kinematics_test cmp_scrollbar_gutter_test cmp_scroll_anchor_test cmp_ptr_test cmp_tick_test cmp_dt_test cmp_transition_test cmp_keyframe_test cmp_anim_compose_test cmp_spring_ease_test cmp_bezier_ease_test cmp_step_ease_test cmp_motion_path_test cmp_scroll_timeline_test cmp_view_transition_test cmp_vt_shared_test cmp_discrete_transition_test cmp_flip_test cmp_form_controls_test cmp_validation_test cmp_input_mask_test cmp_indeterminate_test cmp_select_ui_test cmp_datalist_test cmp_range_slider_test cmp_color_picker_test cmp_date_picker_test cmp_caret_test cmp_selection_test cmp_editable_test cmp_ime_test cmp_spellcheck_test cmp_undo_redo_test cmp_a11y_tree_test cmp_screen_reader_test cmp_aria_test cmp_aria_relations_test cmp_aria_live_test cmp_focus_manager_test cmp_focus_ring_test cmp_a11y_rotor_test cmp_a11y_action_test cmp_dynamic_type_test cmp_prefers_reduced_motion_test cmp_a11y_transparency_test cmp_forced_colors_test cmp_sys_colors_test cmp_compositor_anim_test cmp_error_test cmp_error_test_crash cmp_error_test_assert PROPERTIES ENVIRONMENT "${TEST_ENV_VARS}")
+set_tests_properties(cmp_test cmp_string_test cmp_tls_test cmp_ring_buffer_test cmp_modality_single_test cmp_modality_threaded_test cmp_modality_async_test cmp_sync_test cmp_coroutine_test cmp_timer_test cmp_vfs_test cmp_http_test cmp_orm_test cmp_window_test cmp_window_manager_test cmp_dpi_test cmp_event_test cmp_router_test cmp_layout_test cmp_ui_test cmp_svg_test cmp_gpu_test cmp_shader_test cmp_shader_cache_test cmp_msaa_test cmp_linear_blend_test cmp_tex_compression_test cmp_mipmap_test cmp_swapchain_test cmp_overdraw_test cmp_layer_tiling_test cmp_hit_test_test cmp_pointer_events_test cmp_event_bubbling_test cmp_passive_event_test cmp_pointer_capture_test cmp_gesture_test cmp_complex_gesture_test cmp_pointer_pressure_test cmp_touch_action_test cmp_context_menu_test cmp_hover_intent_test cmp_scroll_ctx_test cmp_scroll_velocity_test cmp_kinematics_test cmp_scrollbar_gutter_test cmp_scroll_anchor_test cmp_ptr_test cmp_tick_test cmp_dt_test cmp_transition_test cmp_keyframe_test cmp_anim_compose_test cmp_spring_ease_test cmp_bezier_ease_test cmp_step_ease_test cmp_motion_path_test cmp_scroll_timeline_test cmp_view_transition_test cmp_vt_shared_test cmp_discrete_transition_test cmp_flip_test cmp_form_controls_test cmp_validation_test cmp_input_mask_test cmp_indeterminate_test cmp_select_ui_test cmp_datalist_test cmp_range_slider_test cmp_color_picker_test cmp_date_picker_test cmp_caret_test cmp_selection_test cmp_editable_test cmp_ime_test cmp_spellcheck_test cmp_undo_redo_test cmp_a11y_tree_test cmp_screen_reader_test cmp_aria_test cmp_aria_relations_test cmp_aria_live_test cmp_focus_manager_test cmp_focus_ring_test cmp_a11y_rotor_test cmp_a11y_action_test cmp_dynamic_type_test cmp_prefers_reduced_motion_test cmp_a11y_transparency_test cmp_forced_colors_test cmp_sys_colors_test cmp_compositor_anim_test cmp_app_region_test cmp_borders_test cmp_clipboard_test cmp_csp_test cmp_dnd_test cmp_flex_align_test cmp_flow_test cmp_grid_test cmp_haptics_test cmp_i18n_test cmp_media_query_test cmp_native_dialog_test cmp_network_test cmp_pip_test cmp_position_test cmp_prefers_color_scheme_test cmp_print_ctx_test cmp_safe_areas_test cmp_system_menu_test cmp_titlebar_env_test cmp_visuals_test cmp_window_blur_test cmp_error_test cmp_error_test_crash cmp_error_test_assert PROPERTIES ENVIRONMENT "${TEST_ENV_VARS}")
 
 
 

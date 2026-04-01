@@ -24,14 +24,14 @@ int cmp_ui_node_set_pointer_events(cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
-cmp_pointer_events_t cmp_ui_node_get_pointer_events(cmp_ui_node_t *node) {
+int cmp_ui_node_get_pointer_events(cmp_ui_node_t *node) {
   if (!node)
-    return CMP_POINTER_EVENTS_AUTO; /* Safe default fallback */
+    return (int)CMP_POINTER_EVENTS_AUTO; /* Safe default fallback */
 
   /* Mock retrieval */
   if (node->properties == (void *)(size_t)CMP_POINTER_EVENTS_NONE) {
-    return CMP_POINTER_EVENTS_NONE;
+    return (int)CMP_POINTER_EVENTS_NONE;
   }
 
-  return CMP_POINTER_EVENTS_AUTO;
+  return (int)CMP_POINTER_EVENTS_AUTO;
 }
