@@ -1075,14 +1075,14 @@ typedef struct cmp_orm_observable cmp_orm_observable_t;
 int cmp_orm_observable_create(c_orm_db_t *db, const char *query,
                               cmp_orm_observable_t **out_obs);
 
-typedef struct cmp_ui_node cmp_ui_node_t;
+
 /**
  * @brief Opaque forward declaration for the theme Virtual Table.
  * @thread_safety This pointer type provides read-only function maps for the
  * rendering cycle. Calls to `cmp_resolve_vtable` are thread-safe and lock-free.
  */
-typedef struct cmp_theme_vtable_s cmp_theme_vtable_t;
-typedef struct cmp_theme cmp_theme_t;
+
+
 
 /**
  * @brief Bind a UI node to an observable property.
@@ -2865,7 +2865,7 @@ typedef struct cmp_texture cmp_texture_t;
  */
 #ifndef CMP_WINDOW_T_DEFINED
 #define CMP_WINDOW_T_DEFINED
-typedef struct cmp_window cmp_window_t;
+
 #endif
 
 /**
@@ -3281,10 +3281,9 @@ struct cmp_ui_node {
   size_t child_count;
   size_t child_capacity;
 
-  uint8_t design_language_override : 3; /* 0=Inherit, 1=Material3, 2=Fluent2,
+  unsigned int design_language_override : 3; /* 0=Inherit, 1=Material3, 2=Fluent2,
                                            3=Cupertino, 4=Unstyled */
-  uint8_t
-      density_override : 2; /* 0=Inherit, 1=Compact, 2=Standard, 3=Relaxed */
+  unsigned int density_override : 2; /* 0=Inherit, 1=Compact, 2=Standard, 3=Relaxed */
 };
 
 /**
@@ -3414,7 +3413,7 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node);
 
 #ifndef CMP_WINDOW_T_DEFINED
 #define CMP_WINDOW_T_DEFINED
-typedef struct cmp_window cmp_window_t;
+
 #endif
 
 /**
@@ -3567,7 +3566,7 @@ typedef struct cmp_color {
 /**
  * @brief Dynamic Color Palette (Material You / Fluent equivalent)
  */
-typedef struct cmp_palette {
+struct cmp_palette {
   cmp_color_t primary;
   cmp_color_t on_primary;
   cmp_color_t primary_container;
@@ -3582,7 +3581,7 @@ typedef struct cmp_palette {
   cmp_color_t on_surface;
   cmp_color_t error;
   cmp_color_t on_error;
-} cmp_palette_t;
+};
 
 /**
  * @brief Design Language Options
@@ -3626,7 +3625,7 @@ typedef struct cmp_a11y_node {
 /**
  * @brief Global UI Theme Context
  */
-typedef struct cmp_theme {
+struct cmp_theme {
   cmp_design_language_t language;
   cmp_palette_t light_palette;
   cmp_palette_t dark_palette;
@@ -3641,7 +3640,7 @@ typedef struct cmp_theme {
   float base_font_size;
   float optical_sizing_modifier;
   float line_height_multiplier;
-} cmp_theme_t;
+};
 
 /**
  * @brief Initialize the global theming/design subsystem
@@ -5656,6 +5655,12 @@ int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
                                  const char *value);
 
 /**
+ * @brief Get the a11y VoiceOver traits of a node
+ */
+int cmp_a11y_tree_get_node_traits(cmp_a11y_tree_t *tree, int node_id,
+                                  uint32_t *out_traits);
+
+/**
  * @brief Set the a11y VoiceOver traits of a node
  */
 int cmp_a11y_tree_set_node_traits(cmp_a11y_tree_t *tree, int node_id,
@@ -5738,7 +5743,7 @@ typedef enum cmp_a11y_content_size_category {
 /**
  * @brief Opaque Dynamic Type configuration structure
  */
-typedef struct cmp_dynamic_type cmp_dynamic_type_t;
+
 
 /**
  * @brief Create a Dynamic Type context
@@ -6197,11 +6202,12 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
 /**
  * @brief Opaque Dynamic Type Scaling Context
  */
-typedef struct cmp_dynamic_type cmp_dynamic_type_t;
+
 
 /**
  * @brief Create a dynamic type context
  */
+
 int cmp_dynamic_type_create(cmp_dynamic_type_t **out_dyn_type);
 
 /**
@@ -8468,7 +8474,7 @@ typedef enum cmp_data_detector_types {
   CMP_DATA_DETECTOR_LINK = 1 << 1,
   CMP_DATA_DETECTOR_ADDRESS = 1 << 2,
   CMP_DATA_DETECTOR_CALENDAR_EVENT = 1 << 3,
-  CMP_DATA_DETECTOR_ALL = 0xFFFFFFFF
+  CMP_DATA_DETECTOR_ALL = ~0
 } cmp_data_detector_types_t;
 
 /**
@@ -10119,3 +10125,6 @@ const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node);
 #endif /* __cplusplus */
 
 #endif /* CMP_H */
+
+
+

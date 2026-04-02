@@ -338,6 +338,23 @@ int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
   return CMP_ERROR_NOT_FOUND;
 }
 
+int cmp_a11y_tree_get_node_traits(cmp_a11y_tree_t *tree, int node_id,
+                                  uint32_t *out_traits) {
+  struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
+  size_t i;
+
+  if (!t || !out_traits)
+    return CMP_ERROR_INVALID_ARG;
+
+  for (i = 0; i < t->count; ++i) {
+    if (t->nodes[i].id == node_id) {
+      *out_traits = t->nodes[i].traits;
+      return CMP_SUCCESS;
+    }
+  }
+  return CMP_ERROR_NOT_FOUND;
+}
+
 int cmp_a11y_tree_set_node_traits(cmp_a11y_tree_t *tree, int node_id,
                                   uint32_t traits) {
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
@@ -762,29 +779,44 @@ int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
 
 int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
                             char *out_buffer, size_t buffer_size) {
-  if (!tree || !node || !out_buffer || buffer_size == 0)
+  size_t i;
+  if (!tree || !node)
     return CMP_ERROR_INVALID_ARG;
 
   /* Basic mock logic that maps the node's intrinsic traits based on type.
      Crucially, it bypasses `design_language_override` checking to assert pure
      UI equivalence. */
   if (node->type == 3) {
-/* Button */
+    /* Button */
+    cmp_a11y_tree_add_node(tree, node->layout->id, "button", "UIA Button");
+    cmp_a11y_tree_set_node_traits(tree, node->layout->id, CMP_A11Y_TRAIT_BUTTON);
+    if (out_buffer && buffer_size > 0) {
 #if defined(_MSC_VER)
-    strncpy_s(out_buffer, buffer_size, "{role: 'button', interactable: true}",
-              _TRUNCATE);
+      strncpy_s(out_buffer, buffer_size, "{role: 'button', interactable: true}",
+                _TRUNCATE);
 #else
-    strncpy(out_buffer, "{role: 'button', interactable: true}",
-            buffer_size - 1);
-    out_buffer[buffer_size - 1] = '\0';
+      strncpy(out_buffer, "{role: 'button', interactable: true}",
+              buffer_size - 1);
+      out_buffer[buffer_size - 1] = '\0';
 #endif
+    }
   } else {
+    cmp_a11y_tree_add_node(tree, node->layout->id, "generic", "generic");
+    if (out_buffer && buffer_size > 0) {
 #if defined(_MSC_VER)
-    strncpy_s(out_buffer, buffer_size, "{role: 'generic'}", _TRUNCATE);
+      strncpy_s(out_buffer, buffer_size, "{role: 'generic'}", _TRUNCATE);
 #else
-    strncpy(out_buffer, "{role: 'generic'}", buffer_size - 1);
-    out_buffer[buffer_size - 1] = '\0';
+      strncpy(out_buffer, "{role: 'generic'}", buffer_size - 1);
+      out_buffer[buffer_size - 1] = '\0';
 #endif
+    }
   }
+
+  for (i = 0; i < node->child_count; ++i) {
+    if (node->children[i]) {
+      cmp_a11y_tree_serialize(tree, node->children[i], NULL, 0);
+    }
+  }
+
   return CMP_SUCCESS;
 }

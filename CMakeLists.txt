@@ -158,10 +158,14 @@ add_library(greatest INTERFACE)
 target_include_directories(greatest INTERFACE ${greatest_SOURCE_DIR})
 
 # cfs
-set(CFS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(cfs GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git GIT_TAG master
-    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../c-fs/CMakeLists.txt")
+    message(STATUS "Using local c-fs for cfs")
+    FetchContent_Declare(cfs SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../c-fs")
+else()
+    FetchContent_Declare(cfs GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git GIT_TAG master
+        UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
     )
+endif()
 FetchContent_MakeAvailable(cfs)
 
 # c89stringutils (Not from vcpkg to allow target_compile_definitions)
@@ -171,7 +175,6 @@ FetchContent_Declare(c89stringutils GIT_REPOSITORY https://github.com/offscale/c
     )
 FetchContent_MakeAvailable(c89stringutils)
 
-set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
 # c_str_span (Not in vcpkg)
 set(C_STR_SPAN_BUILD_TESTING OFF CACHE BOOL "" FORCE)
@@ -272,30 +275,37 @@ if(NOT APPLE AND NOT WIN32 AND NOT MINGW AND NOT CYGWIN)
 endif()
 
 # c-abstract-http
-set(C_ABSTRACT_HTTP_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 set(C_ABSTRACT_HTTP_ENABLE_WEBSOCKETS ON CACHE BOOL "" FORCE)
 set(C_ABSTRACT_HTTP_ENABLE_SSE ON CACHE BOOL "" FORCE)
-set(C_ABSTRACT_HTTP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(c_abstract_http GIT_REPOSITORY https://github.com/SamuelMarks/c-abstract-http.git GIT_TAG master
-    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../c-abstract-http/CMakeLists.txt")
+    message(STATUS "Using local c-abstract-http for c_abstract_http")
+    FetchContent_Declare(c_abstract_http SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../c-abstract-http")
+else()
+    FetchContent_Declare(c_abstract_http GIT_REPOSITORY https://github.com/SamuelMarks/c-abstract-http.git GIT_TAG master
+        UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+    )
+endif()
 FetchContent_MakeAvailable(c_abstract_http)
 
 # cdd-c
-set(CDD_C_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(C_CDD_BUILD_TESTING OFF CACHE BOOL "" FORCE)
-set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-set(CDD_DEPS "FETCHCONTENT" CACHE STRING "" FORCE)
-FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG master
-    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../cdd-c/CMakeLists.txt")
+    message(STATUS "Using local cdd-c for cdd_c")
+    FetchContent_Declare(cdd_c SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../cdd-c")
+else()
+    FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG master
+        UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
     )
+endif()
 
 # c-orm
-set(C_ORM_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(C_ORM_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(c_orm GIT_REPOSITORY https://github.com/SamuelMarks/c-orm.git GIT_TAG master
-    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../c-orm/CMakeLists.txt")
+    message(STATUS "Using local c-orm for c_orm")
+    FetchContent_Declare(c_orm SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../c-orm")
+else()
+    FetchContent_Declare(c_orm GIT_REPOSITORY https://github.com/SamuelMarks/c-orm.git GIT_TAG master
+        UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
     )
+endif()
 
 FetchContent_MakeAvailable(cdd_c c_orm)
 

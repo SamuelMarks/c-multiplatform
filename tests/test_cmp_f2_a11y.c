@@ -24,7 +24,7 @@ TEST test_f2_uia_tree_validation(void) {
   /* Assert the button received the correct a11y traits from Fluent 2 mapping */
   /* This validates the a11y DOM tree translation */
   {
-    cmp_a11y_trait_t traits = 0;
+    uint32_t traits = 0;
     cmp_a11y_tree_get_node_traits(tree, btn->layout->id, &traits);
     ASSERT(traits & CMP_A11Y_TRAIT_BUTTON);
   }

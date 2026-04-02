@@ -48,14 +48,13 @@ TEST test_f2_visual_golden_baseline(void) {
   /* Capture framebuffer */
   res = cmp_test_capture_snapshot(win, &pixels, &width, &height);
   if (res == CMP_SUCCESS && pixels != NULL) {
-    /* We successfully captured the pixel buffer! 
+    /* We successfully captured the pixel buffer!
        A real pixel-diff algorithm would compare 'pixels' against a stored PNG.
        For the framework test, we assert the buffer exists and dimensions match. */
     ASSERT(width > 0);
     ASSERT(height > 0);
-    free(pixels);
+    CMP_FREE(pixels);
   }
-
   cmp_window_destroy(win);
   cmp_window_system_shutdown();
   cmp_event_system_shutdown();
