@@ -27,7 +27,8 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
-int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text) {
+int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
+                       int text_len) {
   cmp_ui_node_t *node;
   char *text_copy;
   size_t len;
@@ -48,25 +49,23 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text) {
     return CMP_ERROR_OOM;
   }
 
-  len = strlen(text);
+  len = (text_len < 0) ? strlen(text) : (size_t)text_len;
   if (CMP_MALLOC(len + 1, (void **)&text_copy) != CMP_SUCCESS) {
     cmp_layout_node_destroy(node->layout);
     CMP_FREE(node);
     return CMP_ERROR_OOM;
   }
 
-#if defined(_MSC_VER)
-  strcpy_s(text_copy, len + 1, text);
-#else
-  strcpy(text_copy, text);
-#endif
+  memcpy(text_copy, text, len);
+  text_copy[len] = '\0';
 
   node->properties = text_copy;
   *out_node = node;
   return CMP_SUCCESS;
 }
 
-int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label) {
+int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
+                         int label_len) {
   cmp_ui_node_t *node;
   char *label_copy;
   size_t len;
@@ -87,18 +86,15 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label) {
     return CMP_ERROR_OOM;
   }
 
-  len = strlen(label);
+  len = (label_len < 0) ? strlen(label) : (size_t)label_len;
   if (CMP_MALLOC(len + 1, (void **)&label_copy) != CMP_SUCCESS) {
     cmp_layout_node_destroy(node->layout);
     CMP_FREE(node);
     return CMP_ERROR_OOM;
   }
 
-#if defined(_MSC_VER)
-  strcpy_s(label_copy, len + 1, label);
-#else
-  strcpy(label_copy, label);
-#endif
+  memcpy(label_copy, label, len);
+  label_copy[len] = '\0';
 
   node->properties = label_copy;
   *out_node = node;

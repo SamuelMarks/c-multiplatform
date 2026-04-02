@@ -142,7 +142,7 @@ static int build_ui(void) {
     }
   }
 
-  res = cmp_ui_button_create(&btn, "Click me!");
+  res = cmp_ui_button_create(&btn, "Click me!", -1);
   if (res != CMP_SUCCESS) {
     return res;
   }
@@ -177,7 +177,7 @@ static int build_ui(void) {
     sprintf(text_buf, "Compose: %s!", platform_str);
 #endif
 
-    res = cmp_ui_text_create(&txt, text_buf);
+    res = cmp_ui_text_create(&txt, text_buf, -1);
     if (res == CMP_SUCCESS) {
       txt->layout->margin[0] = 60.0f; /* top margin */
       txt->layout->width = 600.0f;

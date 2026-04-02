@@ -162,6 +162,7 @@ int cmp_ui_command_set_shortcut(cmp_ui_command_t *command_opaque,
 
 int cmp_keyboard_calculate_key_repeat(float time_held_ms,
                                       float *out_repeat_interval_ms) {
+  float scale;
   if (!out_repeat_interval_ms)
     return CMP_ERROR_INVALID_ARG;
 
@@ -173,8 +174,7 @@ int cmp_keyboard_calculate_key_repeat(float time_held_ms,
 
   /* Accelerating curve based on duration held.
      Starts repeating every 100ms, scaling down to a minimum of 20ms */
-  float scale =
-      (time_held_ms - 500.0f) / 1000.0f; /* Progress over next 1 second */
+  scale = (time_held_ms - 500.0f) / 1000.0f; /* Progress over next 1 second */
   if (scale > 1.0f)
     scale = 1.0f;
 

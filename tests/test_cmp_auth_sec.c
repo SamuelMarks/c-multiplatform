@@ -7,16 +7,15 @@ TEST test_auth_siwa(void) {
   cmp_siwa_ctx_t *siwa = NULL;
   char token[256];
   int valid;
+  cmp_a11y_tree_t *tree = NULL;
 
   ASSERT_EQ(CMP_SUCCESS, cmp_siwa_create(&siwa));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_siwa_request(siwa, 1, token, 256));
   ASSERT_STR_EQ("apple_jwt_fake_token", token);
 
   ASSERT_EQ(CMP_SUCCESS, cmp_siwa_destroy(siwa));
 
   /* Test branding validation */
-  cmp_a11y_tree_t *tree = NULL;
   cmp_a11y_tree_create(&tree);
   cmp_a11y_tree_add_node(tree, 5, "button", "Sign In");
 
@@ -64,6 +63,7 @@ TEST test_auth_keychain(void) {
 TEST test_auth_ui_security(void) {
   cmp_a11y_tree_t *tree = NULL;
   int is_sensitive;
+  cmp_window_t *win = (cmp_window_t *)1; /* Fake window handle */
 
   cmp_a11y_tree_create(&tree);
   cmp_a11y_tree_add_node(tree, 10, "textfield", "Code");
@@ -72,8 +72,6 @@ TEST test_auth_ui_security(void) {
                              tree, 10, CMP_TEXT_CONTENT_TYPE_ONE_TIME_CODE));
 
   /* Simulated blurred bg */
-  cmp_window_t *win = (cmp_window_t *)1; /* Fake window handle */
-
   ASSERT_EQ(CMP_SUCCESS, cmp_window_set_secure_background_obscure(win, 1));
 
   cmp_a11y_tree_destroy(tree);

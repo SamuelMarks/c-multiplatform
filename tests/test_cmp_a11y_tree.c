@@ -317,10 +317,38 @@ TEST test_a11y_tree_cognitive_motion_sound(void) {
   cmp_a11y_tree_destroy(tree);
   PASS();
 }
+TEST test_a11y_theme_semantic_equivalence(void) {
+  cmp_a11y_tree_t *tree = NULL;
+  cmp_ui_node_t *node = NULL;
+  char buf1[256];
+  char buf2[256];
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_tree_create(&tree));
+  ASSERT_EQ(CMP_SUCCESS, cmp_ui_button_create(&node, "Submit", -1));
+
+  /* Mock Material 3 generation */
+  node->design_language_override = 1;
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_a11y_tree_serialize(tree, node, buf1, sizeof(buf1)));
+
+  /* Mock Cupertino generation */
+  node->design_language_override = 3;
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_a11y_tree_serialize(tree, node, buf2, sizeof(buf2)));
+
+  /* The layout theme should NEVER change the fundamental A11y roles and traits
+   * announced to the OS */
+  ASSERT_STR_EQ(buf1, buf2);
+
+  cmp_ui_node_destroy(node);
+  cmp_a11y_tree_destroy(tree);
+  PASS();
+}
 
 SUITE(a11y_tree_suite) {
   RUN_TEST(test_a11y_tree_lifecycle);
   RUN_TEST(test_a11y_tree_null_args);
+  RUN_TEST(test_a11y_theme_semantic_equivalence);
   RUN_TEST(test_a11y_tree_operations);
   RUN_TEST(test_a11y_tree_apple_compliance);
   RUN_TEST(test_a11y_tree_grouping_focus_rotors_actions);

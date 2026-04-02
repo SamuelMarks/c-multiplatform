@@ -9,6 +9,13 @@ set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+option(CMP_THEME_MODE_SINGLE_STATIC "Compile c-multiplatform with a single static theme (LTO zero overhead mode)" OFF)
+set(CMP_STATIC_THEME_PREFIX "cmp_cupertino" CACHE STRING "The name of the static theme to compile")
+
+if(CMP_THEME_MODE_SINGLE_STATIC)
+    add_compile_definitions(CMP_THEME_MODE_SINGLE_STATIC=1 CMP_STATIC_THEME_PREFIX=${CMP_STATIC_THEME_PREFIX})
+endif()
+
 # vcpkg integration
 if(DEFINED CMAKE_TOOLCHAIN_FILE AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg.cmake")
     set(VCPKG_PREFER_SYSTEM_LIBS ON CACHE BOOL "" FORCE)
@@ -45,16 +52,47 @@ option(CMP_BUILD_EXAMPLES "Build standalone examples" ON)
 option(CMP_THEME_CUPERTINO "Enable Apple Cupertino (HIG) design system" ON)
 option(CMP_THEME_FLUENT2 "Enable Microsoft Fluent 2 design system" ON)
 option(CMP_THEME_MATERIAL3 "Enable Google Material 3 design system" ON)
-set(CMP_THEME_MODE "RUNTIME" CACHE STRING "Theme dispatch mode: RUNTIME, COMPILE_ENUM, SINGLE_STATIC")
+option(CMP_THEME_UNSTYLED "Enable Base unstyled design system" ON)
+set(CMP_THEME_MODE "RUNTIME" CACHE STRING "Theme dispatch mode")
+set_property(CACHE CMP_THEME_MODE PROPERTY STRINGS "RUNTIME" "COMPILE_ENUM" "SINGLE_STATIC")
+
+option(CMP_BUILD_SHARED_LIB "Build dynamic library for FFI consumption" ON)
+option(CMP_GENERATE_BINDINGS "Auto-generate SWIG/cbindgen bindings if tools exist" OFF)
+
+if(CMP_THEME_MODE STREQUAL "SINGLE_STATIC")
+    set(theme_count 0)
+    if(CMP_THEME_CUPERTINO)
+        math(EXPR theme_count "${theme_count} + 1")
+        set(CMP_STATIC_THEME_PREFIX "cmp_cupertino")
+    endif()
+    if(CMP_THEME_FLUENT2)
+        math(EXPR theme_count "${theme_count} + 1")
+        set(CMP_STATIC_THEME_PREFIX "cmp_fluent2")
+    endif()
+    if(CMP_THEME_MATERIAL3)
+        math(EXPR theme_count "${theme_count} + 1")
+        set(CMP_STATIC_THEME_PREFIX "cmp_material3")
+    endif()
+    if(CMP_THEME_UNSTYLED)
+        math(EXPR theme_count "${theme_count} + 1")
+        set(CMP_STATIC_THEME_PREFIX "cmp_unstyled")
+    endif()
+    if(NOT theme_count EQUAL 1)
+        message(FATAL_ERROR "SINGLE_STATIC mode requires exactly one theme toggle to be ON")
+    endif()
+    add_compile_definitions(CMP_THEME_MODE_SINGLE_STATIC=1 CMP_STATIC_THEME_PREFIX=${CMP_STATIC_THEME_PREFIX})
+endif()
 
 
-if(CMP_LTO)
+if(CMP_LTO OR CMP_THEME_MODE STREQUAL "SINGLE_STATIC")
     include(CheckIPOSupported)
     check_ipo_supported(RESULT lto_supported)
     if(lto_supported)
         set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
     endif()
 endif()
+
+set(CMAKE_C_VISIBILITY_PRESET hidden)
 
 if(MINGW OR CYGWIN)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLLONG_MAX=9223372036854775807LL -DLLONG_MIN=\"(-LLONG_MAX-1LL)\"")
@@ -132,6 +170,8 @@ FetchContent_Declare(c89stringutils GIT_REPOSITORY https://github.com/offscale/c
     UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
     )
 FetchContent_MakeAvailable(c89stringutils)
+
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
 # c_str_span (Not in vcpkg)
 set(C_STR_SPAN_BUILD_TESTING OFF CACHE BOOL "" FORCE)
@@ -260,7 +300,7 @@ FetchContent_Declare(c_orm GIT_REPOSITORY https://github.com/SamuelMarks/c-orm.g
 FetchContent_MakeAvailable(cdd_c c_orm)
 
 set(CMP_SOURCES
-    src/cmp_memory.c
+    src/core/cmp_memory.c
     src/cmp_error.c
     src/cmp_string.c
     src/cmp_tls.c
@@ -269,21 +309,22 @@ set(CMP_SOURCES
     src/cmp_sync.c
     src/cmp_coroutine.c
     src/cmp_timer.c
-    src/cmp_vfs.c
+    src/core/cmp_vfs.c
     src/cmp_http.c
     src/cmp_orm.c
     src/cmp_window.c
     src/cmp_window_manager.c
     src/cmp_dpi.c
-    src/cmp_event.c
+    src/core/cmp_event.c
     src/cmp_router.c
-    src/cmp_layout.c
+    src/core/cmp_layout.c
     src/cmp_ui.c
     src/cmp_flex_align.c
     src/cmp_media_query.c
     src/cmp_grid.c
     src/cmp_flow.c
     src/cmp_position.c
+    src/themes/cmp_theme_dispatch.c
     src/cmp_visuals.c
     src/cmp_borders.c
     src/cmp_svg.c
@@ -299,7 +340,7 @@ set(CMP_SOURCES
     src/cmp_layer_tiling.c
     src/cmp_hit_test.c
     src/cmp_pointer_events.c
-    src/cmp_event_bubbling.c
+    src/core/cmp_event_bubbling.c
     src/cmp_passive_event.c
     src/cmp_pointer_capture.c
     src/cmp_gesture.c
@@ -337,14 +378,14 @@ set(CMP_SOURCES
     src/cmp_validation.c
     src/cmp_input_mask.c
     src/cmp_indeterminate.c
-    src/cmp_select_ui.c
+    src/widgets/cmp_select_ui.c
     src/cmp_datalist.c
-    src/cmp_range_slider.c
+    src/widgets/cmp_range_slider.c
     src/cmp_color_picker.c
     src/cmp_date_picker.c
     src/cmp_caret.c
     src/cmp_selection.c
-    src/cmp_editable.c
+    src/widgets/cmp_editable.c
     src/cmp_ime.c
     src/cmp_spellcheck.c
     src/cmp_undo_redo.c
@@ -361,7 +402,7 @@ set(CMP_SOURCES
     src/cmp_permissions.c
     src/cmp_promotion_link.c
     src/cmp_spring_animator.c
-    src/cmp_system_geometry.c
+    src/core/cmp_system_geometry.c
     src/cmp_symbols.c
     src/cmp_gamepad_hig.c
     src/cmp_stylus.c
@@ -370,14 +411,14 @@ set(CMP_SOURCES
     src/cmp_collections.c
     src/cmp_scroll_view.c
     src/cmp_lists.c
-    src/cmp_text_fields.c
+    src/widgets/cmp_text_fields.c
     src/cmp_inputs.c
-    src/cmp_menu.c
-    src/cmp_system_button.c
+    src/widgets/cmp_menu.c
+    src/widgets/cmp_system_button.c
     src/cmp_deep_link.c
-    src/cmp_search_bar.c
-    src/cmp_tab_bar.c
-    src/cmp_nav_bar.c
+    src/widgets/cmp_search_bar.c
+    src/widgets/cmp_tab_bar.c
+    src/widgets/cmp_nav_bar.c
     src/cmp_materials.c
     src/cmp_system_fonts.c
     src/cmp_dynamic_type.c
@@ -391,7 +432,7 @@ set(CMP_SOURCES
     src/cmp_csp.c
     src/cmp_app_store_compliance.c
     src/cmp_resilience_handling.c
-    src/cmp_resource_manager.c
+    src/core/cmp_resource_manager.c
     src/cmp_documentation_dx.c
     src/cmp_developer_experience.c
     src/cmp_profiling_telemetry.c
@@ -442,9 +483,24 @@ elseif(CMP_THEME_MODE STREQUAL "SINGLE_STATIC")
     add_compile_definitions(CMP_THEME_MODE_SINGLE_STATIC=1)
 endif()
 
-add_library(cmp ${CMP_SOURCES})
+set(CMP_THEME_SOURCES "")
+if(CMP_THEME_CUPERTINO)
+    list(APPEND CMP_THEME_SOURCES src/themes/cmp_cupertino.c)
+endif()
+if(CMP_THEME_FLUENT2)
+    list(APPEND CMP_THEME_SOURCES src/themes/cmp_fluent2.c)
+endif()
+if(CMP_THEME_MATERIAL3)
+    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3.c)
+endif()
+if(CMP_THEME_UNSTYLED)
+    list(APPEND CMP_THEME_SOURCES src/themes/cmp_unstyled.c)
+endif()
+
+add_library(cmp ${CMP_SOURCES} ${CMP_THEME_SOURCES})
 if(CMP_SHARED_LIBS)
     set_target_properties(cmp PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    target_compile_definitions(cmp PRIVATE CMP_BUILD_SHARED)
 endif()
 
 target_include_directories(cmp PUBLIC include)
@@ -533,6 +589,9 @@ add_executable(cmp_shader_cache_test tests/test_cmp_shader_cache.c)
 target_link_libraries(cmp_shader_cache_test PRIVATE cmp greatest)
 
 add_executable(cmp_msaa_test tests/test_cmp_msaa.c)
+add_executable(cmp_theme_test tests/test_cmp_theme.c)
+target_link_libraries(cmp_theme_test PRIVATE cmp)
+list(APPEND CMP_TESTS "cmp_theme_test")
 target_link_libraries(cmp_msaa_test PRIVATE cmp greatest)
 
 add_executable(cmp_linear_blend_test tests/test_cmp_linear_blend.c)

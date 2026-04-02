@@ -52,11 +52,11 @@ TEST test_macos_advanced_features(void) {
 }
 
 TEST test_macos_advanced_null_args(void) {
+  cmp_macos_features_t *feat = NULL;
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_macos_setup_global_menu_bar(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_macos_setup_context_menu(NULL, (void *)1));
 
-  cmp_macos_features_t *feat = NULL;
   cmp_macos_features_create(&feat);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_macos_setup_context_menu(feat, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,

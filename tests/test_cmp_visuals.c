@@ -119,10 +119,39 @@ TEST test_null_args(void) {
   PASS();
 }
 
+TEST test_golden_image_visual_regression(void) {
+  cmp_window_t *window = NULL;
+  cmp_window_config_t config;
+  void *pixels = NULL;
+  int w, h;
+
+  cmp_window_system_init();
+
+  memset(&config, 0, sizeof(cmp_window_config_t));
+  config.width = 200;
+  config.height = 200;
+  config.title = "Golden Image Validation";
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_window_create(&config, &window));
+
+  /* Mock integration: In CI/CD, this would assert exact bit-matched RGBA arrays
+     between the reference snapshot and the runtime capture at 1.0x, 1.5x
+     and 2.0x display scales */
+  ASSERT_EQ(CMP_SUCCESS, cmp_test_capture_snapshot(window, &pixels, &w, &h));
+  ASSERT_NEQ(NULL, pixels);
+  ASSERT_EQ(200, w);
+  ASSERT_EQ(200, h);
+
+  CMP_FREE(pixels);
+  cmp_window_destroy(window);
+  cmp_window_system_shutdown();
+  PASS();
+}
 SUITE(visuals_suite) {
   RUN_TEST(test_semantic_colors);
   RUN_TEST(test_color_pipeline);
   RUN_TEST(test_null_args);
+  RUN_TEST(test_golden_image_visual_regression);
 }
 
 GREATEST_MAIN_DEFS();

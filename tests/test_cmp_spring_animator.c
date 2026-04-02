@@ -7,6 +7,7 @@ TEST test_spring_animator(void) {
   cmp_spring_animator_t *anim = NULL;
   float val;
   int settled;
+  int i;
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_spring_animator_create(1.0f, 100.0f, 10.0f, 0.0f, &anim));
@@ -27,7 +28,6 @@ TEST test_spring_animator(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_spring_animator_interrupt(anim, 2.0f));
 
   /* Fast-forward to settled state (fake dt to force settle logic) */
-  int i;
   for (i = 0; i < 50; i++) {
     cmp_spring_animator_evaluate(anim, 0.1f, &val, &settled);
     if (settled)

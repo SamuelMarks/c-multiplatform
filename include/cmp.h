@@ -87,6 +87,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* clang-format off */
+#include "cmp_ffi.h"
 #include <stddef.h>
 
 #if defined(_MSC_VER) && _MSC_VER < 1600
@@ -1075,6 +1076,13 @@ int cmp_orm_observable_create(c_orm_db_t *db, const char *query,
                               cmp_orm_observable_t **out_obs);
 
 typedef struct cmp_ui_node cmp_ui_node_t;
+/**
+ * @brief Opaque forward declaration for the theme Virtual Table.
+ * @thread_safety This pointer type provides read-only function maps for the
+ * rendering cycle. Calls to `cmp_resolve_vtable` are thread-safe and lock-free.
+ */
+typedef struct cmp_theme_vtable_s cmp_theme_vtable_t;
+typedef struct cmp_theme cmp_theme_t;
 
 /**
  * @brief Bind a UI node to an observable property.
@@ -3272,6 +3280,11 @@ struct cmp_ui_node {
   struct cmp_ui_node **children;
   size_t child_count;
   size_t child_capacity;
+
+  uint8_t design_language_override : 3; /* 0=Inherit, 1=Material3, 2=Fluent2,
+                                           3=Cupertino, 4=Unstyled */
+  uint8_t
+      density_override : 2; /* 0=Inherit, 1=Compact, 2=Standard, 3=Relaxed */
 };
 
 /**
@@ -3285,17 +3298,21 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node);
  * @brief Initialize a UI text label component
  * @param out_node Pointer to receive the allocated node
  * @param text Initial text
+ * @param text_len Length of the text in bytes, or -1 if null-terminated
  * @return 0 on success, or an error code.
  */
-int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text);
+int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
+                       int text_len);
 
 /**
  * @brief Initialize a UI button component
  * @param out_node Pointer to receive the allocated node
  * @param label Text to display inside the button
+ * @param label_len Length of the label in bytes, or -1 if null-terminated
  * @return 0 on success, or an error code.
  */
-int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label);
+int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
+                         int label_len);
 
 /**
  * @brief Initialize a UI text input component
@@ -3613,10 +3630,17 @@ typedef struct cmp_theme {
   cmp_design_language_t language;
   cmp_palette_t light_palette;
   cmp_palette_t dark_palette;
+  cmp_palette_t high_contrast_palette;
   int is_dark_mode;
   int high_contrast_mode;
   int reduce_motion;
+  int increase_contrast;
+  int differentiate_without_color;
   float global_scale;
+  float density_multiplier;
+  float base_font_size;
+  float optical_sizing_modifier;
+  float line_height_multiplier;
 } cmp_theme_t;
 
 /**
@@ -3664,13 +3688,30 @@ int cmp_test_capture_snapshot(cmp_window_t *window, void **out_pixels,
                               int *out_width, int *out_height);
 
 /**
+ * @brief Initialize a new Theme context. Memory is owned by the caller/FFI
+ * boundary until destroyed.
+ * @param out_theme Pointer to receive the dynamically allocated theme.
+ * @return 0 on success, or an error code.
+ */
+CMP_API int cmp_theme_create(cmp_theme_t **out_theme);
+
+/**
+ * @brief Destroys a Theme context to prevent memory leaks across FFI
+ * boundaries.
+ * @param theme The theme to destroy.
+ * @return 0 on success, or an error code.
+ */
+CMP_API int cmp_theme_destroy(cmp_theme_t *theme);
+
+/**
  * @brief Generate a dynamic palette from a seed color (e.g. Material You
  * extraction)
  * @param seed The base color
  * @param out_palette Pointer to receive the generated palette
  * @return 0 on success, or an error code.
  */
-int cmp_theme_generate_palette(cmp_color_t seed, cmp_palette_t *out_palette);
+CMP_API int cmp_theme_generate_palette(cmp_color_t seed,
+                                       cmp_palette_t *out_palette);
 
 /**
  * @brief Apply a specific design language engine to the active window
@@ -5046,7 +5087,8 @@ int cmp_icc_profile_parse(const void *image_buffer, size_t size,
 
 typedef enum cmp_corner_shape {
   CMP_CORNER_ROUND = 0,
-  CMP_CORNER_SQUIRCLE = 1
+  CMP_CORNER_SQUIRCLE = 1,
+  CMP_CORNER_CUT = 2
 } cmp_corner_shape_t;
 
 typedef struct cmp_radius {
@@ -5567,6 +5609,18 @@ int cmp_a11y_tree_destroy(cmp_a11y_tree_t *tree);
  */
 int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
                            const char *name);
+
+/**
+ * @brief Serializes the state of an A11y Tree mapping to a specific UI Node for
+ * debugging and validation.
+ * @param tree The active a11y tree graph context.
+ * @param node The UI Node to query mapping constraints against.
+ * @param out_buffer String buffer to write into.
+ * @param buffer_size The size of the provided string buffer.
+ * @return 0 on success, or an error code.
+ */
+int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
+                            char *out_buffer, size_t buffer_size);
 
 /**
  * @brief Define standard a11y traits
@@ -7294,6 +7348,8 @@ typedef enum cmp_system_font_type {
   CMP_SYSTEM_FONT_SF_COMPACT,    /* watchOS */
   CMP_SYSTEM_FONT_SF_MONO,       /* Code/Tabular */
   CMP_SYSTEM_FONT_NEW_YORK,      /* Serif */
+  CMP_SYSTEM_FONT_SEGOE_UI,      /* Windows Fluent 2 Default */
+  CMP_SYSTEM_FONT_SEGOE_UI_VAR,  /* Windows Fluent 2 Variable */
   CMP_SYSTEM_FONT_SYSTEM_DEFAULT /* Fallback */
 } cmp_system_font_type_t;
 
@@ -7428,12 +7484,28 @@ int cmp_materials_resolve_blur_effect(cmp_materials_t *materials,
                                       float *out_radius_px,
                                       float *out_saturation_multiplier);
 
+typedef enum cmp_windows_material {
+  CMP_WINDOWS_MATERIAL_NONE = 0,
+  CMP_WINDOWS_MATERIAL_MICA,         /* Standard Mica (Windows 11) */
+  CMP_WINDOWS_MATERIAL_MICA_ALT,     /* Tabbed app background */
+  CMP_WINDOWS_MATERIAL_ACRYLIC_BASE, /* Semi-transparent layer */
+  CMP_WINDOWS_MATERIAL_ACRYLIC_THIN  /* Tooltips and flyouts */
+} cmp_windows_material_t;
+
 /**
  * @brief Map a native macOS material to cross-platform shader hints
  */
 int cmp_materials_resolve_macos_material(cmp_materials_t *materials,
                                          cmp_macos_material_t material,
                                          cmp_blur_style_t *out_mapped_style);
+
+/**
+ * @brief Request an OS-level window material composition (Mica/Acrylic) on
+ * Windows.
+ */
+int cmp_materials_request_windows_material(cmp_materials_t *materials,
+                                           cmp_window_t *window,
+                                           cmp_windows_material_t material);
 
 /**
  * @brief Retrieve blend modes required to implement UIVibrancyEffect (text
@@ -8064,24 +8136,21 @@ int cmp_button_destroy(cmp_button_t *button);
 int cmp_button_set_style(cmp_button_t *button, cmp_button_style_t style);
 
 /**
- * @brief Handle a pointer down event, calculating immediate opacity drops
- * @param is_pressed 1 for down, 0 for up/cancel
- * @param out_opacity Returns the calculated visual opacity (e.g. 0.3f for PLAIN
- * button down)
+ * @brief Handle an event targeted at the button (updates internal state like
+ * is_pressed)
  */
-int cmp_button_handle_press(cmp_button_t *button, int is_pressed,
-                            float *out_opacity);
+int cmp_button_handle_event(cmp_button_t *button, const cmp_event_t *event);
 
 /**
- * @brief Resolve background colors and opacities based on style
- * @param out_bg_r Red channel
- * @param out_bg_g Green channel
- * @param out_bg_b Blue channel
- * @param out_bg_a Alpha channel
+ * @brief Tick the button's internal state machine
  */
-int cmp_button_resolve_background(cmp_button_t *button, float *out_bg_r,
-                                  float *out_bg_g, float *out_bg_b,
-                                  float *out_bg_a);
+int cmp_button_update(cmp_button_t *button, float dt_ms);
+
+/**
+ * @brief Retrieves the current state of the button
+ */
+int cmp_button_get_state(const cmp_button_t *button,
+                         cmp_button_style_t *out_style, int *out_is_pressed);
 
 /**
  * @brief Create a Toggle Control (Switch)
@@ -8099,18 +8168,20 @@ int cmp_toggle_destroy(cmp_toggle_t *toggle);
 int cmp_toggle_set_state(cmp_toggle_t *toggle, int is_on);
 
 /**
- * @brief Get the visual parameters for the toggle thumb and track
- * @param out_track_r Returns track red color
- * @param out_track_g Returns track green color
- * @param out_track_b Returns track blue color
- * @param out_track_a Returns track alpha (translucent gray when OFF,
- * green/accent when ON)
- * @param out_thumb_x_offset Returns the X translation for the thumb (spring
- * animated in real engine)
+ * @brief Handle an event targeted at the toggle switch (e.g. click to flip
+ * state)
  */
-int cmp_toggle_resolve_visuals(cmp_toggle_t *toggle, float *out_track_r,
-                               float *out_track_g, float *out_track_b,
-                               float *out_track_a, float *out_thumb_x_offset);
+int cmp_toggle_handle_event(cmp_toggle_t *toggle, const cmp_event_t *event);
+
+/**
+ * @brief Tick the toggle switch's internal state machine
+ */
+int cmp_toggle_update(cmp_toggle_t *toggle, float dt_ms);
+
+/**
+ * @brief Retrieve current toggle state
+ */
+int cmp_toggle_get_state(const cmp_toggle_t *toggle, int *out_is_on);
 
 /* Phase 6.2: Menus & Actions (Apple HIG specific) */
 
@@ -8353,6 +8424,40 @@ int cmp_text_field_set_spellcheck_enabled(cmp_text_field_t *field, int enabled);
  */
 int cmp_text_field_set_input_accessory_view(cmp_text_field_t *field,
                                             cmp_ui_node_t *accessory_node);
+
+/**
+ * @brief Insert text at the current caret position.
+ * @param text UTF-8 string to insert.
+ */
+int cmp_text_field_insert_text(cmp_text_field_t *field, const char *text);
+
+/**
+ * @brief Delete one UTF-8 character before the caret.
+ */
+int cmp_text_field_delete_backward(cmp_text_field_t *field);
+
+/**
+ * @brief Set the caret position (byte offset).
+ */
+int cmp_text_field_set_caret_position(cmp_text_field_t *field, size_t pos);
+
+/**
+ * @brief Get the caret position.
+ */
+int cmp_text_field_get_caret_position(const cmp_text_field_t *field,
+                                      size_t *out_pos);
+
+/**
+ * @brief Get the current text buffer.
+ */
+int cmp_text_field_get_text(const cmp_text_field_t *field,
+                            const char **out_text);
+
+/**
+ * @brief Handle a keyboard or pointer event for text editing.
+ */
+int cmp_text_field_handle_event(cmp_text_field_t *field,
+                                const cmp_event_t *event);
 
 /**
  * @brief Data Detector Types (for Rich Text Views)
@@ -10001,6 +10106,13 @@ int cmp_resilience_graceful_degradation(cmp_resilience_t *res,
  * Easter eggs, and non-native platform paradigms
  */
 int cmp_app_store_mock_init(void);
+
+/**
+ * @brief Resolves the appropriate VTable for a given UI node.
+ * @param node The UI node to evaluate.
+ * @return A pointer to the correct theme VTable.
+ */
+const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node);
 
 #ifdef __cplusplus
 }

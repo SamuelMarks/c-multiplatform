@@ -51,6 +51,7 @@ int cmp_stylus_resolve_ink_metrics(const cmp_event_t *event, float base_width,
   /* Assume pointer is a stylus */
   /* Stubbed: Assuming type fields map for stylus */
   if (event->action != CMP_ACTION_CANCEL) {
+    float tilt_multiplier;
     /* Scale opacity directly by pressure */
     *out_brush_opacity = event->pressure;
     if (*out_brush_opacity < 0.1f)
@@ -60,8 +61,8 @@ int cmp_stylus_resolve_ink_metrics(const cmp_event_t *event, float base_width,
 
     /* Altitude: 0.0 is flat to screen, 1.0 is perpendicular.
        Flatter pencils draw wider "charcoal" strokes */
-    float tilt_multiplier = 1.0f + ((1.0f - 0.5f /* Stubbed altitude */) *
-                                    3.0f); /* Max 4x width if flat */
+    tilt_multiplier = 1.0f + ((1.0f - 0.5f /* Stubbed altitude */) *
+                              3.0f); /* Max 4x width if flat */
     *out_brush_width = base_width * tilt_multiplier;
   } else {
     *out_brush_opacity = 0.0f;

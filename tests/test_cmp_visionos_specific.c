@@ -76,11 +76,11 @@ TEST test_visionos_advanced_features(void) {
 }
 
 TEST test_visionos_advanced_null_args(void) {
+  cmp_visionos_features_t *feat = NULL;
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_visionos_set_window_geometry(NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_visionos_set_shared_space_behavior(NULL, 1));
 
-  cmp_visionos_features_t *feat = NULL;
   cmp_visionos_features_create(&feat);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_visionos_set_window_geometry(feat, -1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,

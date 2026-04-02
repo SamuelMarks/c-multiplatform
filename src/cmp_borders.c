@@ -2,6 +2,7 @@
 #include "cmp.h"
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 /* clang-format on */
 
 int cmp_radius_init(cmp_radius_t *out_radius) {
@@ -30,12 +31,122 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
                         float x, float y, int *out_inside) {
   if (!radius || !out_inside)
     return CMP_ERROR_INVALID_ARG;
-  /* Hit testing logic stub */
+
   if (x < 0 || y < 0 || x > width || y > height) {
     *out_inside = 0;
-  } else {
-    *out_inside = 1;
+    return CMP_SUCCESS;
   }
+
+  if (radius->top_left_x > 0 && x < radius->top_left_x &&
+      y < radius->top_left_y) {
+    float cx = radius->top_left_x;
+    float cy = radius->top_left_y;
+    if (radius->corner_shape == CMP_CORNER_SQUIRCLE) {
+      if (powf(fabsf(x - cx) / radius->top_left_x, 3.0f) +
+              powf(fabsf(y - cy) / radius->top_left_y, 3.0f) >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    } else if (radius->corner_shape == CMP_CORNER_CUT) {
+      if ((radius->top_left_x - x) / radius->top_left_x +
+              (radius->top_left_y - y) / radius->top_left_y >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    } else {
+      if (powf(x - cx, 2.0f) / powf(radius->top_left_x, 2.0f) +
+              powf(y - cy, 2.0f) / powf(radius->top_left_y, 2.0f) >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    }
+  }
+  if (radius->top_right_x > 0 && x > width - radius->top_right_x &&
+      y < radius->top_right_y) {
+    float cx = width - radius->top_right_x;
+    float cy = radius->top_right_y;
+    if (radius->corner_shape == CMP_CORNER_SQUIRCLE) {
+      if (powf(fabsf(x - cx) / radius->top_right_x, 3.0f) +
+              powf(fabsf(y - cy) / radius->top_right_y, 3.0f) >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    } else if (radius->corner_shape == CMP_CORNER_CUT) {
+      if ((x - cx) / radius->top_right_x +
+              (radius->top_right_y - y) / radius->top_right_y >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    } else {
+      if (powf(x - cx, 2.0f) / powf(radius->top_right_x, 2.0f) +
+              powf(y - cy, 2.0f) / powf(radius->top_right_y, 2.0f) >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    }
+  }
+  if (radius->bottom_left_x > 0 && x < radius->bottom_left_x &&
+      y > height - radius->bottom_left_y) {
+    float cx = radius->bottom_left_x;
+    float cy = height - radius->bottom_left_y;
+    if (radius->corner_shape == CMP_CORNER_SQUIRCLE) {
+      if (powf(fabsf(x - cx) / radius->bottom_left_x, 3.0f) +
+              powf(fabsf(y - cy) / radius->bottom_left_y, 3.0f) >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    } else if (radius->corner_shape == CMP_CORNER_CUT) {
+      if ((radius->bottom_left_x - x) / radius->bottom_left_x +
+              (y - cy) / radius->bottom_left_y >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    } else {
+      if (powf(x - cx, 2.0f) / powf(radius->bottom_left_x, 2.0f) +
+              powf(y - cy, 2.0f) / powf(radius->bottom_left_y, 2.0f) >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    }
+  }
+  if (radius->bottom_right_x > 0 && x > width - radius->bottom_right_x &&
+      y > height - radius->bottom_right_y) {
+    float cx = width - radius->bottom_right_x;
+    float cy = height - radius->bottom_right_y;
+    if (radius->corner_shape == CMP_CORNER_SQUIRCLE) {
+      if (powf(fabsf(x - cx) / radius->bottom_right_x, 3.0f) +
+              powf(fabsf(y - cy) / radius->bottom_right_y, 3.0f) >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    } else if (radius->corner_shape == CMP_CORNER_CUT) {
+      if ((x - cx) / radius->bottom_right_x +
+              (y - cy) / radius->bottom_right_y >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    } else {
+      if (powf(x - cx, 2.0f) / powf(radius->bottom_right_x, 2.0f) +
+              powf(y - cy, 2.0f) / powf(radius->bottom_right_y, 2.0f) >
+          1.0f) {
+        *out_inside = 0;
+        return CMP_SUCCESS;
+      }
+    }
+  }
+
+  *out_inside = 1;
   return CMP_SUCCESS;
 }
 

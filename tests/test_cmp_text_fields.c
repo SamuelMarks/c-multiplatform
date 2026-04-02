@@ -5,6 +5,7 @@
 
 TEST test_text_field_configurations(void) {
   cmp_text_field_t *ctx = NULL;
+  cmp_ui_node_t dummy_node; /* Assuming opaque pointer is fine for test */
 
   ASSERT_EQ(CMP_SUCCESS, cmp_text_field_create(&ctx));
 
@@ -18,7 +19,6 @@ TEST test_text_field_configurations(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_text_field_set_spellcheck_enabled(ctx, 1));
 
   /* Accessory View Mount */
-  cmp_ui_node_t dummy_node; /* Assuming opaque pointer is fine for test */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_text_field_set_input_accessory_view(ctx, &dummy_node));
 

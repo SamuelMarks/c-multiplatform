@@ -88,7 +88,6 @@ TEST test_increase_contrast(void) {
 
 TEST test_hover_text(void) {
   cmp_a11y_hover_text_t *ht = NULL;
-  cmp_a11y_autoplay_avoidance_t *ap = NULL;
   char buf[32];
 
   ASSERT_EQ(CMP_SUCCESS, cmp_a11y_hover_text_create(&ht));

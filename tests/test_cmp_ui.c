@@ -24,7 +24,7 @@ TEST test_ui_text(void) {
   cmp_ui_node_t *text = NULL;
   int res;
 
-  res = cmp_ui_text_create(&text, "Hello World");
+  res = cmp_ui_text_create(&text, "Hello World", -1);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(text != NULL);
   ASSERT_EQ_FMT(2, text->type, "%d");
@@ -42,8 +42,8 @@ TEST test_ui_hierarchy(void) {
   int res;
 
   cmp_ui_box_create(&box);
-  cmp_ui_text_create(&text1, "Item 1");
-  cmp_ui_text_create(&text2, "Item 2");
+  cmp_ui_text_create(&text1, "Item 1", -1);
+  cmp_ui_text_create(&text2, "Item 2", -1);
 
   res = cmp_ui_node_add_child(box, text1);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -70,7 +70,7 @@ TEST test_ui_advanced_primitives(void) {
   cmp_ui_node_t *btn = NULL, *input = NULL, *chk = NULL, *rad = NULL,
                 *img = NULL, *slider = NULL;
 
-  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_button_create(&btn, "Click Me"), "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_button_create(&btn, "Click Me", -1), "%d");
   ASSERT_EQ_FMT(3, btn->type, "%d");
   ASSERT_STR_EQ("Click Me", (char *)btn->properties);
   cmp_ui_node_destroy(btn);

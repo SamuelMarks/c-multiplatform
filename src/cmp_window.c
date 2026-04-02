@@ -1289,7 +1289,90 @@ int cmp_theme_generate_palette(cmp_color_t seed, cmp_palette_t *out_palette) {
     return CMP_ERROR_INVALID_ARG;
   /* Stub for color space math (e.g. HCT space generation for Material 3) */
   memset(out_palette, 0, sizeof(cmp_palette_t));
+
+  /* Primary */
   out_palette->primary = seed;
+  out_palette->on_primary.r = 1.0f - seed.r;
+  out_palette->on_primary.g = 1.0f - seed.g;
+  out_palette->on_primary.b = 1.0f - seed.b;
+  out_palette->on_primary.a = 1.0f;
+  out_palette->on_primary.space = CMP_COLOR_SPACE_SRGB;
+
+  out_palette->primary_container.r = seed.r * 0.8f;
+  out_palette->primary_container.g = seed.g * 0.8f;
+  out_palette->primary_container.b = seed.b * 0.8f;
+  out_palette->primary_container.a = 1.0f;
+  out_palette->primary_container.space = CMP_COLOR_SPACE_SRGB;
+
+  out_palette->on_primary_container.r = 1.0f - seed.r * 0.8f;
+  out_palette->on_primary_container.g = 1.0f - seed.g * 0.8f;
+  out_palette->on_primary_container.b = 1.0f - seed.b * 0.8f;
+  out_palette->on_primary_container.a = 1.0f;
+  out_palette->on_primary_container.space = CMP_COLOR_SPACE_SRGB;
+
+  /* Secondary */
+  out_palette->secondary.r = seed.r * 0.9f;
+  out_palette->secondary.g = seed.g * 0.9f;
+  out_palette->secondary.b = seed.b * 0.9f;
+  out_palette->secondary.a = 1.0f;
+  out_palette->secondary.space = CMP_COLOR_SPACE_SRGB;
+
+  out_palette->on_secondary.r = 1.0f - seed.r * 0.9f;
+  out_palette->on_secondary.g = 1.0f - seed.g * 0.9f;
+  out_palette->on_secondary.b = 1.0f - seed.b * 0.9f;
+  out_palette->on_secondary.a = 1.0f;
+  out_palette->on_secondary.space = CMP_COLOR_SPACE_SRGB;
+
+  out_palette->secondary_container.r = seed.r * 0.7f;
+  out_palette->secondary_container.g = seed.g * 0.7f;
+  out_palette->secondary_container.b = seed.b * 0.7f;
+  out_palette->secondary_container.a = 1.0f;
+  out_palette->secondary_container.space = CMP_COLOR_SPACE_SRGB;
+
+  out_palette->on_secondary_container.r = 1.0f - seed.r * 0.7f;
+  out_palette->on_secondary_container.g = 1.0f - seed.g * 0.7f;
+  out_palette->on_secondary_container.b = 1.0f - seed.b * 0.7f;
+  out_palette->on_secondary_container.a = 1.0f;
+  out_palette->on_secondary_container.space = CMP_COLOR_SPACE_SRGB;
+
+  /* Neutral / Background / Surface */
+  out_palette->background.r = 0.98f;
+  out_palette->background.g = 0.98f;
+  out_palette->background.b = 0.98f;
+  out_palette->background.a = 1.0f;
+  out_palette->background.space = CMP_COLOR_SPACE_SRGB;
+
+  out_palette->on_background.r = 0.1f;
+  out_palette->on_background.g = 0.1f;
+  out_palette->on_background.b = 0.1f;
+  out_palette->on_background.a = 1.0f;
+  out_palette->on_background.space = CMP_COLOR_SPACE_SRGB;
+
+  out_palette->surface.r = 1.0f;
+  out_palette->surface.g = 1.0f;
+  out_palette->surface.b = 1.0f;
+  out_palette->surface.a = 1.0f;
+  out_palette->surface.space = CMP_COLOR_SPACE_SRGB;
+
+  out_palette->on_surface.r = 0.1f;
+  out_palette->on_surface.g = 0.1f;
+  out_palette->on_surface.b = 0.1f;
+  out_palette->on_surface.a = 1.0f;
+  out_palette->on_surface.space = CMP_COLOR_SPACE_SRGB;
+
+  /* Error */
+  out_palette->error.r = 0.8f;
+  out_palette->error.g = 0.1f;
+  out_palette->error.b = 0.1f;
+  out_palette->error.a = 1.0f;
+  out_palette->error.space = CMP_COLOR_SPACE_SRGB;
+
+  out_palette->on_error.r = 1.0f;
+  out_palette->on_error.g = 1.0f;
+  out_palette->on_error.b = 1.0f;
+  out_palette->on_error.a = 1.0f;
+  out_palette->on_error.space = CMP_COLOR_SPACE_SRGB;
+
   return CMP_SUCCESS;
 }
 
@@ -1463,7 +1546,14 @@ int cmp_test_capture_snapshot(cmp_window_t *window, void **out_pixels,
                               int *out_width, int *out_height) {
   if (window == NULL || out_pixels == NULL)
     return CMP_ERROR_INVALID_ARG;
-  *out_pixels = NULL; /* Stub implementation */
+
+  if (CMP_MALLOC(window->config.width * window->config.height * 4,
+                 out_pixels) != CMP_SUCCESS)
+    return CMP_ERROR_OOM;
+
+  /* Zero out memory */
+  memset(*out_pixels, 0, window->config.width * window->config.height * 4);
+
   if (out_width)
     *out_width = window->config.width;
   if (out_height)
