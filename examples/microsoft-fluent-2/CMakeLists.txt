@@ -14,12 +14,11 @@ if(NOT TARGET cmp)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../include/cmp.h")
         FetchContent_Declare(cmp SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../")
     else()
-        FetchContent_Declare(cmp GIT_REPOSITORY https://github.com/SamuelMarks/c-multiplatform.git
-    GIT_TAG master)
+        FetchContent_Declare(cmp GIT_REPOSITORY https://github.com/SamuelMarks/c-multiplatform.git GIT_TAG master)
     endif()
     FetchContent_MakeAvailable(cmp)
 endif()
 
-add_custom_target(microsoft_fluent_2_example
-    COMMAND ${CMAKE_COMMAND} -E echo "Microsoft Fluent 2 Example Stub"
-)
+add_executable(cmp_example_microsoft_fluent_2 main.c app.c)
+target_link_libraries(cmp_example_microsoft_fluent_2 PRIVATE cmp)
+target_include_directories(cmp_example_microsoft_fluent_2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
