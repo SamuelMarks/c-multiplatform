@@ -789,7 +789,8 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
   if (node->type == 3) {
     /* Button */
     cmp_a11y_tree_add_node(tree, node->layout->id, "button", "UIA Button");
-    cmp_a11y_tree_set_node_traits(tree, node->layout->id, CMP_A11Y_TRAIT_BUTTON);
+    cmp_a11y_tree_set_node_traits(tree, node->layout->id,
+                                  CMP_A11Y_TRAIT_BUTTON);
     if (out_buffer && buffer_size > 0) {
 #if defined(_MSC_VER)
       strncpy_s(out_buffer, buffer_size, "{role: 'button', interactable: true}",

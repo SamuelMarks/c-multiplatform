@@ -11,11 +11,17 @@ extern "C" {
 /* clang-format on */
 
 /* 5.1 Menu (Context & Dropdown) */
+/** \brief Documented */
 typedef struct cmp_f2_menu_item_s {
+  /** \brief Documented */
   cmp_ui_node_t *leading_icon_node;
+  /** \brief Documented */
   cmp_ui_node_t *text_node;
+  /** \brief Documented */
   cmp_ui_node_t *shortcut_text_node;
+  /** \brief Documented */
   cmp_ui_node_t *trailing_chevron_node; /* For sub-menus */
+  /** \brief Documented */
   int is_disabled;
 } cmp_f2_menu_item_t;
 
@@ -34,8 +40,10 @@ CMP_API int cmp_f2_menu_create(cmp_ui_node_t **out_node);
  * @return 0 on success, or
  * an error code.
  */
-CMP_API int cmp_f2_menu_item_create(cmp_ui_node_t **out_node, const char *label);
-CMP_API int cmp_f2_menu_item_set_shortcut(cmp_ui_node_t *node, const char *shortcut);
+CMP_API int cmp_f2_menu_item_create(cmp_ui_node_t **out_node,
+                                    const char *label);
+CMP_API int cmp_f2_menu_item_set_shortcut(cmp_ui_node_t *node,
+                                          const char *shortcut);
 CMP_API int cmp_f2_menu_item_set_disabled(cmp_ui_node_t *node, int is_disabled);
 
 /* 5.2 NavigationView (App Navigation) */
@@ -45,17 +53,27 @@ typedef enum cmp_f2_nav_state {
   CMP_F2_NAV_STATE_OVERLAY
 } cmp_f2_nav_state_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_nav_view_s {
+  /** \brief Documented */
   cmp_f2_nav_state_t state;
+  /** \brief Documented */
   cmp_ui_node_t *header_node;
+  /** \brief Documented */
   cmp_ui_node_t *content_node;
+  /** \brief Documented */
   cmp_ui_node_t *footer_node;
 } cmp_f2_nav_view_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_nav_item_s {
+  /** \brief Documented */
   int is_active;
+  /** \brief Documented */
   cmp_ui_node_t *icon_node;
+  /** \brief Documented */
   cmp_ui_node_t *label_node;
+  /** \brief Documented */
   cmp_ui_node_t *active_indicator_node;
 } cmp_f2_nav_item_t;
 
@@ -67,7 +85,8 @@ typedef struct cmp_f2_nav_item_s {
  * an error code.
  */
 CMP_API int cmp_f2_nav_view_create(cmp_ui_node_t **out_node);
-CMP_API int cmp_f2_nav_view_set_state(cmp_ui_node_t *node, cmp_f2_nav_state_t state);
+CMP_API int cmp_f2_nav_view_set_state(cmp_ui_node_t *node,
+                                      cmp_f2_nav_state_t state);
 
 /**
  * @brief Initialize a Fluent 2 nav_item_create component.
@@ -92,13 +111,19 @@ typedef enum cmp_f2_tab_size {
   CMP_F2_TAB_SIZE_LARGE
 } cmp_f2_tab_size_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_tab_s {
+  /** \brief Documented */
   cmp_f2_tab_variant_t variant;
+  /** \brief Documented */
   cmp_f2_tab_size_t size;
+  /** \brief Documented */
   int is_vertical;
 
+  /** \brief Documented */
   cmp_ui_node_t *header_area_node;
   cmp_ui_node_t
+      /** \brief Documented */
       *active_indicator_node; /* Renders underline or background pill */
 } cmp_f2_tab_t;
 
@@ -109,10 +134,12 @@ typedef struct cmp_f2_tab_s {
  * @return 0 on success, or
  * an error code.
  */
-CMP_API int cmp_f2_tab_container_create(cmp_ui_node_t **out_node, int is_vertical);
+CMP_API int cmp_f2_tab_container_create(cmp_ui_node_t **out_node,
+                                        int is_vertical);
 CMP_API int cmp_f2_tab_container_set_variant(cmp_ui_node_t *node,
-                                     cmp_f2_tab_variant_t variant);
-CMP_API int cmp_f2_tab_container_set_size(cmp_ui_node_t *node, cmp_f2_tab_size_t size);
+                                             cmp_f2_tab_variant_t variant);
+CMP_API int cmp_f2_tab_container_set_size(cmp_ui_node_t *node,
+                                          cmp_f2_tab_size_t size);
 
 /**
  * @brief Initialize a Fluent 2 tab_item_create component.
@@ -125,7 +152,9 @@ CMP_API int cmp_f2_tab_item_create(cmp_ui_node_t **out_node, const char *label);
 CMP_API int cmp_f2_tab_item_set_selected(cmp_ui_node_t *node, int is_selected);
 
 /* 5.4 Breadcrumb */
+/** \brief Documented */
 typedef struct cmp_f2_breadcrumb_s {
+  /** \brief Documented */
   cmp_ui_node_t *container_node;
 } cmp_f2_breadcrumb_t;
 
@@ -144,13 +173,17 @@ CMP_API int cmp_f2_breadcrumb_create(cmp_ui_node_t **out_node);
  * @return 0 on success, or
  * an error code.
  */
-CMP_API int cmp_f2_breadcrumb_item_create(cmp_ui_node_t **out_node, const char *label,
-                                  int is_last);
+CMP_API int cmp_f2_breadcrumb_item_create(cmp_ui_node_t **out_node,
+                                          const char *label, int is_last);
 
 /* 5.5 Toolbar / CommandBar */
+/** \brief Documented */
 typedef struct cmp_f2_toolbar_s {
+  /** \brief Documented */
   cmp_ui_node_t *primary_commands_node;
+  /** \brief Documented */
   cmp_ui_node_t *secondary_commands_node;
+  /** \brief Documented */
   cmp_ui_node_t *overflow_menu_node;
 } cmp_f2_toolbar_t;
 
@@ -169,12 +202,18 @@ typedef enum cmp_f2_link_variant {
   CMP_F2_LINK_VARIANT_STANDALONE
 } cmp_f2_link_variant_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_link_s {
+  /** \brief Documented */
   cmp_f2_link_variant_t variant;
+  /** \brief Documented */
   int is_disabled;
+  /** \brief Documented */
   int is_visited;
 
+  /** \brief Documented */
   cmp_ui_node_t *text_node;
+  /** \brief Documented */
   cmp_ui_node_t *external_icon_node;
 } cmp_f2_link_t;
 
@@ -186,7 +225,7 @@ typedef struct cmp_f2_link_s {
  * code.
  */
 CMP_API int cmp_f2_link_create(cmp_ui_node_t **out_node, const char *label,
-                       cmp_f2_link_variant_t variant);
+                               cmp_f2_link_variant_t variant);
 CMP_API int cmp_f2_link_set_disabled(cmp_ui_node_t *node, int is_disabled);
 
 /* 5.7 Stepper / Wizard */
@@ -196,9 +235,13 @@ typedef enum cmp_f2_stepper_state {
   CMP_F2_STEPPER_STATE_UPCOMING
 } cmp_f2_stepper_state_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_stepper_item_s {
+  /** \brief Documented */
   cmp_f2_stepper_state_t state;
+  /** \brief Documented */
   cmp_ui_node_t *indicator_node;
+  /** \brief Documented */
   cmp_ui_node_t *label_node;
 } cmp_f2_stepper_item_t;
 
@@ -217,9 +260,10 @@ CMP_API int cmp_f2_stepper_create(cmp_ui_node_t **out_node);
  * @return 0 on success, or
  * an error code.
  */
-CMP_API int cmp_f2_stepper_item_create(cmp_ui_node_t **out_node, const char *label);
+CMP_API int cmp_f2_stepper_item_create(cmp_ui_node_t **out_node,
+                                       const char *label);
 CMP_API int cmp_f2_stepper_item_set_state(cmp_ui_node_t *node,
-                                  cmp_f2_stepper_state_t state);
+                                          cmp_f2_stepper_state_t state);
 
 #ifdef __cplusplus
 }

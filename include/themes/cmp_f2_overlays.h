@@ -17,14 +17,22 @@ typedef enum cmp_f2_dialog_variant {
   CMP_F2_DIALOG_VARIANT_FULLSCREEN
 } cmp_f2_dialog_variant_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_dialog_s {
+  /** \brief Documented */
   cmp_f2_dialog_variant_t variant;
+  /** \brief Documented */
   int is_open;
 
+  /** \brief Documented */
   cmp_ui_node_t *backdrop_node;
+  /** \brief Documented */
   cmp_ui_node_t *container_node;
+  /** \brief Documented */
   cmp_ui_node_t *title_node;
+  /** \brief Documented */
   cmp_ui_node_t *body_node;
+  /** \brief Documented */
   cmp_ui_node_t *footer_node;
 } cmp_f2_dialog_t;
 
@@ -36,7 +44,7 @@ typedef struct cmp_f2_dialog_s {
  * code.
  */
 CMP_API int cmp_f2_dialog_create(cmp_ui_node_t **out_node,
-                         cmp_f2_dialog_variant_t variant);
+                                 cmp_f2_dialog_variant_t variant);
 CMP_API int cmp_f2_dialog_set_open(cmp_ui_node_t *node, int is_open);
 
 /* 7.2 Flyout / Popover */
@@ -47,11 +55,16 @@ typedef enum cmp_f2_flyout_placement {
   CMP_F2_FLYOUT_PLACEMENT_RIGHT
 } cmp_f2_flyout_placement_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_flyout_s {
+  /** \brief Documented */
   cmp_f2_flyout_placement_t placement;
+  /** \brief Documented */
   int is_open;
 
+  /** \brief Documented */
   cmp_ui_node_t *anchor_node;
+  /** \brief Documented */
   cmp_ui_node_t *container_node;
 } cmp_f2_flyout_t;
 
@@ -62,15 +75,20 @@ typedef struct cmp_f2_flyout_s {
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_flyout_create(cmp_ui_node_t **out_node, cmp_ui_node_t *anchor);
+CMP_API int cmp_f2_flyout_create(cmp_ui_node_t **out_node,
+                                 cmp_ui_node_t *anchor);
 CMP_API int cmp_f2_flyout_set_placement(cmp_ui_node_t *node,
-                                cmp_f2_flyout_placement_t placement);
+                                        cmp_f2_flyout_placement_t placement);
 CMP_API int cmp_f2_flyout_set_open(cmp_ui_node_t *node, int is_open);
 
 /* 7.3 Tooltip */
+/** \brief Documented */
 typedef struct cmp_f2_tooltip_s {
+  /** \brief Documented */
   int is_visible;
+  /** \brief Documented */
   cmp_ui_node_t *anchor_node;
+  /** \brief Documented */
   cmp_ui_node_t *label_node;
 } cmp_f2_tooltip_t;
 
@@ -81,8 +99,8 @@ typedef struct cmp_f2_tooltip_s {
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_tooltip_create(cmp_ui_node_t **out_node, cmp_ui_node_t *anchor,
-                          const char *label);
+CMP_API int cmp_f2_tooltip_create(cmp_ui_node_t **out_node,
+                                  cmp_ui_node_t *anchor, const char *label);
 CMP_API int cmp_f2_tooltip_set_visible(cmp_ui_node_t *node, int is_visible);
 
 /* 7.4 Toast / Notification */
@@ -93,14 +111,22 @@ typedef enum cmp_f2_toast_intent {
   CMP_F2_TOAST_INTENT_ERROR
 } cmp_f2_toast_intent_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_toast_s {
+  /** \brief Documented */
   cmp_f2_toast_intent_t intent;
+  /** \brief Documented */
   int is_visible;
 
+  /** \brief Documented */
   cmp_ui_node_t *icon_node;
+  /** \brief Documented */
   cmp_ui_node_t *title_node;
+  /** \brief Documented */
   cmp_ui_node_t *body_node;
+  /** \brief Documented */
   cmp_ui_node_t *actions_node;
+  /** \brief Documented */
   cmp_ui_node_t *close_button_node;
 } cmp_f2_toast_t;
 
@@ -111,7 +137,8 @@ typedef struct cmp_f2_toast_s {
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_toast_create(cmp_ui_node_t **out_node, cmp_f2_toast_intent_t intent);
+CMP_API int cmp_f2_toast_create(cmp_ui_node_t **out_node,
+                                cmp_f2_toast_intent_t intent);
 CMP_API int cmp_f2_toast_set_visible(cmp_ui_node_t *node, int is_visible);
 
 /* 7.5 MessageBar (Inline Alert) */
@@ -120,8 +147,11 @@ typedef enum cmp_f2_messagebar_variant {
   CMP_F2_MESSAGEBAR_VARIANT_MULTILINE
 } cmp_f2_messagebar_variant_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_messagebar_s {
+  /** \brief Documented */
   cmp_f2_messagebar_variant_t variant;
+  /** \brief Documented */
   cmp_f2_toast_intent_t intent;
 } cmp_f2_messagebar_t;
 
@@ -133,9 +163,9 @@ typedef struct cmp_f2_messagebar_s {
  * an error code.
  */
 CMP_API int cmp_f2_messagebar_create(cmp_ui_node_t **out_node,
-                             cmp_f2_toast_intent_t intent);
+                                     cmp_f2_toast_intent_t intent);
 CMP_API int cmp_f2_messagebar_set_variant(cmp_ui_node_t *node,
-                                  cmp_f2_messagebar_variant_t variant);
+                                          cmp_f2_messagebar_variant_t variant);
 
 /* 7.6 ProgressBar & ProgressRing */
 typedef enum cmp_f2_progress_variant {
@@ -149,10 +179,15 @@ typedef enum cmp_f2_progress_state {
   CMP_F2_PROGRESS_STATE_ERROR
 } cmp_f2_progress_state_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_progress_s {
+  /** \brief Documented */
   cmp_f2_progress_variant_t variant;
+  /** \brief Documented */
   cmp_f2_progress_state_t state;
+  /** \brief Documented */
   float thickness;
+  /** \brief Documented */
   float value; /* 0.0 to 1.0 for determinate */
 } cmp_f2_progress_t;
 
@@ -173,9 +208,9 @@ CMP_API int cmp_f2_progress_bar_create(cmp_ui_node_t **out_node);
  */
 CMP_API int cmp_f2_progress_ring_create(cmp_ui_node_t **out_node);
 CMP_API int cmp_f2_progress_set_variant(cmp_ui_node_t *node,
-                                cmp_f2_progress_variant_t variant);
+                                        cmp_f2_progress_variant_t variant);
 CMP_API int cmp_f2_progress_set_state(cmp_ui_node_t *node,
-                              cmp_f2_progress_state_t state);
+                                      cmp_f2_progress_state_t state);
 CMP_API int cmp_f2_progress_set_value(cmp_ui_node_t *node, float value);
 
 /* 7.7 Skeleton / Shimmer */
@@ -185,8 +220,11 @@ typedef enum cmp_f2_skeleton_shape {
   CMP_F2_SKELETON_SHAPE_TEXT_LINE
 } cmp_f2_skeleton_shape_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_skeleton_s {
+  /** \brief Documented */
   cmp_f2_skeleton_shape_t shape;
+  /** \brief Documented */
   int is_animated;
 } cmp_f2_skeleton_t;
 
@@ -198,7 +236,7 @@ typedef struct cmp_f2_skeleton_s {
  * an error code.
  */
 CMP_API int cmp_f2_skeleton_create(cmp_ui_node_t **out_node,
-                           cmp_f2_skeleton_shape_t shape);
+                                   cmp_f2_skeleton_shape_t shape);
 CMP_API int cmp_f2_skeleton_set_animated(cmp_ui_node_t *node, int is_animated);
 
 #ifdef __cplusplus

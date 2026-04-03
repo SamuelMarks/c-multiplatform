@@ -27,10 +27,15 @@ typedef enum cmp_f2_checkbox_state {
   CMP_F2_CHECKBOX_STATE_INDETERMINATE
 } cmp_f2_checkbox_state_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_checkbox_s {
+  /** \brief Documented */
   cmp_f2_checkbox_size_t size;
+  /** \brief Documented */
   cmp_f2_checkbox_state_t state;
+  /** \brief Documented */
   cmp_f2_label_position_t label_position;
+  /** \brief Documented */
   int is_disabled;
 } cmp_f2_checkbox_t;
 
@@ -42,11 +47,12 @@ typedef struct cmp_f2_checkbox_s {
  * an error code.
  */
 CMP_API int cmp_f2_checkbox_create(cmp_ui_node_t **out_node, const char *label);
-CMP_API int cmp_f2_checkbox_set_size(cmp_ui_node_t *node, cmp_f2_checkbox_size_t size);
+CMP_API int cmp_f2_checkbox_set_size(cmp_ui_node_t *node,
+                                     cmp_f2_checkbox_size_t size);
 CMP_API int cmp_f2_checkbox_set_state(cmp_ui_node_t *node,
-                              cmp_f2_checkbox_state_t state);
+                                      cmp_f2_checkbox_state_t state);
 CMP_API int cmp_f2_checkbox_set_label_position(cmp_ui_node_t *node,
-                                       cmp_f2_label_position_t pos);
+                                               cmp_f2_label_position_t pos);
 CMP_API int cmp_f2_checkbox_set_disabled(cmp_ui_node_t *node, int disabled);
 
 /* 2.7 RadioGroup & RadioButton */
@@ -55,10 +61,15 @@ typedef enum cmp_f2_radio_size {
   CMP_F2_RADIO_SIZE_LARGE       /* 20px */
 } cmp_f2_radio_size_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_radio_s {
+  /** \brief Documented */
   cmp_f2_radio_size_t size;
+  /** \brief Documented */
   cmp_f2_label_position_t label_position;
+  /** \brief Documented */
   int is_selected;
+  /** \brief Documented */
   int is_disabled;
 } cmp_f2_radio_t;
 
@@ -70,7 +81,8 @@ typedef struct cmp_f2_radio_s {
  * code.
  */
 CMP_API int cmp_f2_radio_create(cmp_ui_node_t **out_node, const char *label);
-CMP_API int cmp_f2_radio_set_size(cmp_ui_node_t *node, cmp_f2_radio_size_t size);
+CMP_API int cmp_f2_radio_set_size(cmp_ui_node_t *node,
+                                  cmp_f2_radio_size_t size);
 CMP_API int cmp_f2_radio_set_selected(cmp_ui_node_t *node, int selected);
 CMP_API int cmp_f2_radio_set_disabled(cmp_ui_node_t *node, int disabled);
 
@@ -84,9 +96,13 @@ CMP_API int cmp_f2_radio_set_disabled(cmp_ui_node_t *node, int disabled);
 CMP_API int cmp_f2_radio_group_create(cmp_ui_node_t **out_node, int horizontal);
 
 /* 2.8 Switch / Toggle */
+/** \brief Documented */
 typedef struct cmp_f2_toggle_s {
+  /** \brief Documented */
   int is_on;
+  /** \brief Documented */
   int is_disabled;
+  /** \brief Documented */
   cmp_f2_label_position_t label_position;
 } cmp_f2_toggle_t;
 
@@ -107,15 +123,25 @@ typedef enum cmp_f2_slider_orientation {
   CMP_F2_SLIDER_VERTICAL
 } cmp_f2_slider_orientation_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_slider_s {
+  /** \brief Documented */
   cmp_f2_slider_orientation_t orientation;
+  /** \brief Documented */
   int is_range;
+  /** \brief Documented */
   int is_stepped;
+  /** \brief Documented */
   float min_val;
+  /** \brief Documented */
   float max_val;
+  /** \brief Documented */
   float step_val;
+  /** \brief Documented */
   float value1;
+  /** \brief Documented */
   float value2;
+  /** \brief Documented */
   int is_disabled;
 } cmp_f2_slider_t;
 
@@ -127,19 +153,26 @@ typedef struct cmp_f2_slider_s {
  * code.
  */
 CMP_API int cmp_f2_slider_create(cmp_ui_node_t **out_node,
-                         cmp_f2_slider_orientation_t orientation);
+                                 cmp_f2_slider_orientation_t orientation);
 CMP_API int cmp_f2_slider_set_range_mode(cmp_ui_node_t *node, int is_range);
-CMP_API int cmp_f2_slider_set_bounds(cmp_ui_node_t *node, float min_val, float max_val,
-                             float step_val);
-CMP_API int cmp_f2_slider_set_value(cmp_ui_node_t *node, float val1, float val2);
+CMP_API int cmp_f2_slider_set_bounds(cmp_ui_node_t *node, float min_val,
+                                     float max_val, float step_val);
+CMP_API int cmp_f2_slider_set_value(cmp_ui_node_t *node, float val1,
+                                    float val2);
 CMP_API int cmp_f2_slider_set_disabled(cmp_ui_node_t *node, int disabled);
 
 /* 2.10 SpinButton */
+/** \brief Documented */
 typedef struct cmp_f2_spin_button_s {
+  /** \brief Documented */
   float value;
+  /** \brief Documented */
   float min_val;
+  /** \brief Documented */
   float max_val;
+  /** \brief Documented */
   float step_val;
+  /** \brief Documented */
   int is_disabled;
 } cmp_f2_spin_button_t;
 
@@ -150,9 +183,10 @@ typedef struct cmp_f2_spin_button_s {
  * @return 0 on success, or
  * an error code.
  */
-CMP_API int cmp_f2_spin_button_create(cmp_ui_node_t **out_node, float initial_val);
+CMP_API int cmp_f2_spin_button_create(cmp_ui_node_t **out_node,
+                                      float initial_val);
 CMP_API int cmp_f2_spin_button_set_bounds(cmp_ui_node_t *node, float min_val,
-                                  float max_val, float step_val);
+                                          float max_val, float step_val);
 CMP_API int cmp_f2_spin_button_set_value(cmp_ui_node_t *node, float val);
 CMP_API int cmp_f2_spin_button_set_disabled(cmp_ui_node_t *node, int disabled);
 

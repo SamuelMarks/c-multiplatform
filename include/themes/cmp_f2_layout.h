@@ -27,7 +27,7 @@ extern "C" {
  * code.
  */
 CMP_API int cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
-                        float spacing_token);
+                                float spacing_token);
 
 /**
  * @brief Initialize a Fluent 2 Wrap Layout component.
@@ -46,7 +46,7 @@ CMP_API int cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
  * code.
  */
 CMP_API int cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
-                       float vertical_gap);
+                               float vertical_gap);
 
 /**
  * @brief Initialize a Fluent 2 Grid Layout component.
@@ -65,8 +65,8 @@ CMP_API int cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_grid_create(cmp_ui_node_t **out_node, int columns, float column_gap,
-                       float row_gap);
+CMP_API int cmp_f2_grid_create(cmp_ui_node_t **out_node, int columns,
+                               float column_gap, float row_gap);
 
 #ifdef __cplusplus
 }

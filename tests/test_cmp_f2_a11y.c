@@ -16,8 +16,9 @@ TEST test_f2_uia_tree_validation(void) {
 
   res = cmp_f2_button_create(&btn, "UIA Button", NULL);
   ASSERT_EQ(CMP_SUCCESS, res);
-  
-  /* Serialize layout to a11y tree simulating Windows Inspect.exe UIA population */
+
+  /* Serialize layout to a11y tree simulating Windows Inspect.exe UIA population
+   */
   res = cmp_a11y_tree_serialize(tree, btn, NULL, 0);
   ASSERT_EQ(CMP_SUCCESS, res);
 
@@ -43,7 +44,8 @@ TEST test_f2_dom_aria_validation(void) {
   res = cmp_a11y_tree_create(&tree);
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  /* Map the active a11y tree to an ARIA structure mimicking Emscripten Web output */
+  /* Map the active a11y tree to an ARIA structure mimicking Emscripten Web
+   * output */
   res = cmp_aria_create(tree, &aria);
   ASSERT_EQ(CMP_SUCCESS, res);
 
@@ -51,7 +53,7 @@ TEST test_f2_dom_aria_validation(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
 
   cmp_a11y_tree_serialize(tree, btn, NULL, 0);
-  
+
   /* Check ARIA roles sync logic */
   res = cmp_aria_sync(aria);
   ASSERT_EQ(CMP_SUCCESS, res);

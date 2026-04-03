@@ -1075,14 +1075,11 @@ typedef struct cmp_orm_observable cmp_orm_observable_t;
 int cmp_orm_observable_create(c_orm_db_t *db, const char *query,
                               cmp_orm_observable_t **out_obs);
 
-
 /**
  * @brief Opaque forward declaration for the theme Virtual Table.
  * @thread_safety This pointer type provides read-only function maps for the
  * rendering cycle. Calls to `cmp_resolve_vtable` are thread-safe and lock-free.
  */
-
-
 
 /**
  * @brief Bind a UI node to an observable property.
@@ -3281,9 +3278,10 @@ struct cmp_ui_node {
   size_t child_count;
   size_t child_capacity;
 
-  unsigned int design_language_override : 3; /* 0=Inherit, 1=Material3, 2=Fluent2,
-                                           3=Cupertino, 4=Unstyled */
-  unsigned int density_override : 2; /* 0=Inherit, 1=Compact, 2=Standard, 3=Relaxed */
+  unsigned int design_language_override : 3; /* 0=Inherit, 1=Material3,
+                                           2=Fluent2, 3=Cupertino, 4=Unstyled */
+  unsigned int
+      density_override : 2; /* 0=Inherit, 1=Compact, 2=Standard, 3=Relaxed */
 };
 
 /**
@@ -5744,7 +5742,6 @@ typedef enum cmp_a11y_content_size_category {
  * @brief Opaque Dynamic Type configuration structure
  */
 
-
 /**
  * @brief Create a Dynamic Type context
  */
@@ -6202,7 +6199,6 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
 /**
  * @brief Opaque Dynamic Type Scaling Context
  */
-
 
 /**
  * @brief Create a dynamic type context
@@ -10125,6 +10121,3 @@ const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node);
 #endif /* __cplusplus */
 
 #endif /* CMP_H */
-
-
-

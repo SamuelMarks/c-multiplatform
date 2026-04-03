@@ -31,15 +31,23 @@ typedef enum cmp_f2_text_input_state {
 } cmp_f2_text_input_state_t;
 
 /* 3.1 Input / TextField */
+/** \brief Documented */
 typedef struct cmp_f2_text_input_s {
+  /** \brief Documented */
   cmp_f2_text_input_variant_t variant;
+  /** \brief Documented */
   cmp_f2_text_input_size_t size;
+  /** \brief Documented */
   cmp_f2_text_input_state_t state;
+  /** \brief Documented */
   int is_password;
 
   /* Component sub-nodes */
+  /** \brief Documented */
   cmp_ui_node_t *leading_icon_node;
+  /** \brief Documented */
   cmp_ui_node_t *trailing_icon_node;
+  /** \brief Documented */
   cmp_ui_node_t *clear_button_node;
 } cmp_f2_text_input_t;
 
@@ -52,12 +60,13 @@ typedef struct cmp_f2_text_input_s {
  */
 CMP_API int cmp_f2_text_input_create(cmp_ui_node_t **out_node);
 CMP_API int cmp_f2_text_input_set_variant(cmp_ui_node_t *node,
-                                  cmp_f2_text_input_variant_t variant);
+                                          cmp_f2_text_input_variant_t variant);
 CMP_API int cmp_f2_text_input_set_size(cmp_ui_node_t *node,
-                               cmp_f2_text_input_size_t size);
+                                       cmp_f2_text_input_size_t size);
 CMP_API int cmp_f2_text_input_set_state(cmp_ui_node_t *node,
-                                cmp_f2_text_input_state_t state);
-CMP_API int cmp_f2_text_input_set_password_mode(cmp_ui_node_t *node, int is_password);
+                                        cmp_f2_text_input_state_t state);
+CMP_API int cmp_f2_text_input_set_password_mode(cmp_ui_node_t *node,
+                                                int is_password);
 
 /* 3.2 Textarea */
 typedef enum cmp_f2_textarea_resize {
@@ -67,11 +76,17 @@ typedef enum cmp_f2_textarea_resize {
   CMP_F2_TEXTAREA_RESIZE_BOTH
 } cmp_f2_textarea_resize_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_textarea_s {
+  /** \brief Documented */
   cmp_f2_text_input_size_t size;
+  /** \brief Documented */
   cmp_f2_text_input_state_t state;
+  /** \brief Documented */
   cmp_f2_textarea_resize_t resize_mode;
+  /** \brief Documented */
   int auto_grow;
+  /** \brief Documented */
   float max_height;
 } cmp_f2_textarea_t;
 
@@ -84,13 +99,14 @@ typedef struct cmp_f2_textarea_s {
  */
 CMP_API int cmp_f2_textarea_create(cmp_ui_node_t **out_node);
 CMP_API int cmp_f2_textarea_set_size(cmp_ui_node_t *node,
-                             cmp_f2_text_input_size_t size);
+                                     cmp_f2_text_input_size_t size);
 CMP_API int cmp_f2_textarea_set_state(cmp_ui_node_t *node,
-                              cmp_f2_text_input_state_t state);
-CMP_API int cmp_f2_textarea_set_resize_mode(cmp_ui_node_t *node,
-                                    cmp_f2_textarea_resize_t resize_mode);
+                                      cmp_f2_text_input_state_t state);
+CMP_API int
+cmp_f2_textarea_set_resize_mode(cmp_ui_node_t *node,
+                                cmp_f2_textarea_resize_t resize_mode);
 CMP_API int cmp_f2_textarea_set_auto_grow(cmp_ui_node_t *node, int auto_grow,
-                                  float max_height);
+                                          float max_height);
 
 /* 3.3 Field & Label */
 typedef enum cmp_f2_field_label_position {
@@ -98,14 +114,22 @@ typedef enum cmp_f2_field_label_position {
   CMP_F2_FIELD_LABEL_LEFT
 } cmp_f2_field_label_position_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_field_s {
+  /** \brief Documented */
   cmp_f2_field_label_position_t label_position;
+  /** \brief Documented */
   int is_required;
+  /** \brief Documented */
   cmp_f2_text_input_state_t validation_state;
 
+  /** \brief Documented */
   cmp_ui_node_t *label_node;
+  /** \brief Documented */
   cmp_ui_node_t *input_node;
+  /** \brief Documented */
   cmp_ui_node_t *help_text_node;
+  /** \brief Documented */
   cmp_ui_node_t *validation_message_node;
 } cmp_f2_field_t;
 
@@ -116,20 +140,25 @@ typedef struct cmp_f2_field_s {
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_field_create(cmp_ui_node_t **out_node, cmp_ui_node_t *input_node,
-                        const char *label);
+CMP_API int cmp_f2_field_create(cmp_ui_node_t **out_node,
+                                cmp_ui_node_t *input_node, const char *label);
 CMP_API int cmp_f2_field_set_label_position(cmp_ui_node_t *node,
-                                    cmp_f2_field_label_position_t pos);
+                                            cmp_f2_field_label_position_t pos);
 CMP_API int cmp_f2_field_set_required(cmp_ui_node_t *node, int is_required);
-CMP_API int cmp_f2_field_set_help_text(cmp_ui_node_t *node, const char *help_text);
-CMP_API int cmp_f2_field_set_validation_message(cmp_ui_node_t *node,
-                                        const char *message,
-                                        cmp_f2_text_input_state_t state);
+CMP_API int cmp_f2_field_set_help_text(cmp_ui_node_t *node,
+                                       const char *help_text);
+CMP_API int
+cmp_f2_field_set_validation_message(cmp_ui_node_t *node, const char *message,
+                                    cmp_f2_text_input_state_t state);
 
 /* 3.4 SearchBox */
+/** \brief Documented */
 typedef struct cmp_f2_searchbox_s {
+  /** \brief Documented */
   cmp_f2_text_input_size_t size;
+  /** \brief Documented */
   cmp_f2_text_input_state_t state;
+  /** \brief Documented */
   int is_collapsed; /* Icon only mode until clicked */
 } cmp_f2_searchbox_t;
 
@@ -142,10 +171,11 @@ typedef struct cmp_f2_searchbox_s {
  */
 CMP_API int cmp_f2_searchbox_create(cmp_ui_node_t **out_node);
 CMP_API int cmp_f2_searchbox_set_size(cmp_ui_node_t *node,
-                              cmp_f2_text_input_size_t size);
+                                      cmp_f2_text_input_size_t size);
 CMP_API int cmp_f2_searchbox_set_state(cmp_ui_node_t *node,
-                               cmp_f2_text_input_state_t state);
-CMP_API int cmp_f2_searchbox_set_collapsed_mode(cmp_ui_node_t *node, int is_collapsed);
+                                       cmp_f2_text_input_state_t state);
+CMP_API int cmp_f2_searchbox_set_collapsed_mode(cmp_ui_node_t *node,
+                                                int is_collapsed);
 
 #ifdef __cplusplus
 }

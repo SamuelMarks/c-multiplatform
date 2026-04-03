@@ -6,7 +6,7 @@
 /* clang-format on */
 
 CMP_API int cmp_f2_dropdown_create(cmp_ui_node_t **out_node,
-                           cmp_f2_dropdown_selection_mode_t mode) {
+                                   cmp_f2_dropdown_selection_mode_t mode) {
   cmp_f2_dropdown_t *data;
   int res;
 
@@ -49,7 +49,7 @@ CMP_API int cmp_f2_dropdown_create(cmp_ui_node_t **out_node,
 }
 
 CMP_API int cmp_f2_dropdown_set_variant(cmp_ui_node_t *node,
-                                cmp_f2_text_input_variant_t variant) {
+                                        cmp_f2_text_input_variant_t variant) {
   cmp_f2_dropdown_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -142,7 +142,8 @@ CMP_API int cmp_f2_listbox_create(cmp_ui_node_t **out_node) {
   return res;
 }
 
-CMP_API int cmp_f2_listbox_option_create(cmp_ui_node_t **out_node, const char *label) {
+CMP_API int cmp_f2_listbox_option_create(cmp_ui_node_t **out_node,
+                                         const char *label) {
   cmp_f2_listbox_option_t *data;
   int res;
 
@@ -176,7 +177,8 @@ CMP_API int cmp_f2_listbox_option_create(cmp_ui_node_t **out_node, const char *l
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_listbox_option_set_selected(cmp_ui_node_t *node, int is_selected) {
+CMP_API int cmp_f2_listbox_option_set_selected(cmp_ui_node_t *node,
+                                               int is_selected) {
   cmp_f2_listbox_option_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -185,7 +187,8 @@ CMP_API int cmp_f2_listbox_option_set_selected(cmp_ui_node_t *node, int is_selec
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_listbox_option_set_disabled(cmp_ui_node_t *node, int is_disabled) {
+CMP_API int cmp_f2_listbox_option_set_disabled(cmp_ui_node_t *node,
+                                               int is_disabled) {
   cmp_f2_listbox_option_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -195,7 +198,7 @@ CMP_API int cmp_f2_listbox_option_set_disabled(cmp_ui_node_t *node, int is_disab
 }
 
 CMP_API int cmp_f2_listbox_group_create(cmp_ui_node_t **out_node,
-                                const char *header_label) {
+                                        const char *header_label) {
   int res;
   cmp_ui_node_t *header_node = NULL;
 
@@ -217,7 +220,7 @@ CMP_API int cmp_f2_listbox_group_create(cmp_ui_node_t **out_node,
 }
 
 CMP_API int cmp_f2_color_picker_create(cmp_ui_node_t **out_node,
-                               uint32_t initial_color) {
+                                       uint32_t initial_color) {
   cmp_f2_color_picker_t *data;
   int res;
 
@@ -284,7 +287,8 @@ CMP_API int cmp_f2_calendar_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_calendar_set_view(cmp_ui_node_t *node, cmp_f2_calendar_view_t view) {
+CMP_API int cmp_f2_calendar_set_view(cmp_ui_node_t *node,
+                                     cmp_f2_calendar_view_t view) {
   cmp_f2_calendar_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -294,7 +298,7 @@ CMP_API int cmp_f2_calendar_set_view(cmp_ui_node_t *node, cmp_f2_calendar_view_t
 }
 
 CMP_API int cmp_f2_calendar_set_date(cmp_ui_node_t *node, int year, int month,
-                             int day) {
+                                     int day) {
   cmp_f2_calendar_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -377,8 +381,8 @@ CMP_API int cmp_f2_time_picker_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_time_picker_set_time(cmp_ui_node_t *node, int hour, int minute,
-                                int is_pm) {
+CMP_API int cmp_f2_time_picker_set_time(cmp_ui_node_t *node, int hour,
+                                        int minute, int is_pm) {
   cmp_f2_time_picker_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;

@@ -5,7 +5,8 @@
 #include <stdlib.h>
 /* clang-format on */
 
-CMP_API int cmp_f2_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
+CMP_API int cmp_f2_checkbox_create(cmp_ui_node_t **out_node,
+                                   const char *label) {
   cmp_f2_checkbox_t *data;
   int res;
 
@@ -33,7 +34,8 @@ CMP_API int cmp_f2_checkbox_create(cmp_ui_node_t **out_node, const char *label) 
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_checkbox_set_size(cmp_ui_node_t *node, cmp_f2_checkbox_size_t size) {
+CMP_API int cmp_f2_checkbox_set_size(cmp_ui_node_t *node,
+                                     cmp_f2_checkbox_size_t size) {
   cmp_f2_checkbox_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -43,7 +45,7 @@ CMP_API int cmp_f2_checkbox_set_size(cmp_ui_node_t *node, cmp_f2_checkbox_size_t
 }
 
 CMP_API int cmp_f2_checkbox_set_state(cmp_ui_node_t *node,
-                              cmp_f2_checkbox_state_t state) {
+                                      cmp_f2_checkbox_state_t state) {
   cmp_f2_checkbox_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -53,7 +55,7 @@ CMP_API int cmp_f2_checkbox_set_state(cmp_ui_node_t *node,
 }
 
 CMP_API int cmp_f2_checkbox_set_label_position(cmp_ui_node_t *node,
-                                       cmp_f2_label_position_t pos) {
+                                               cmp_f2_label_position_t pos) {
   cmp_f2_checkbox_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -102,7 +104,8 @@ CMP_API int cmp_f2_radio_create(cmp_ui_node_t **out_node, const char *label) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_radio_set_size(cmp_ui_node_t *node, cmp_f2_radio_size_t size) {
+CMP_API int cmp_f2_radio_set_size(cmp_ui_node_t *node,
+                                  cmp_f2_radio_size_t size) {
   cmp_f2_radio_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -129,7 +132,8 @@ CMP_API int cmp_f2_radio_set_disabled(cmp_ui_node_t *node, int disabled) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_radio_group_create(cmp_ui_node_t **out_node, int horizontal) {
+CMP_API int cmp_f2_radio_group_create(cmp_ui_node_t **out_node,
+                                      int horizontal) {
   int res;
   if (!out_node)
     return CMP_ERROR_INVALID_ARG;
@@ -189,7 +193,7 @@ CMP_API int cmp_f2_toggle_set_disabled(cmp_ui_node_t *node, int disabled) {
 }
 
 CMP_API int cmp_f2_slider_create(cmp_ui_node_t **out_node,
-                         cmp_f2_slider_orientation_t orientation) {
+                                 cmp_f2_slider_orientation_t orientation) {
   cmp_f2_slider_t *data;
   int res;
 
@@ -230,8 +234,8 @@ CMP_API int cmp_f2_slider_set_range_mode(cmp_ui_node_t *node, int is_range) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_slider_set_bounds(cmp_ui_node_t *node, float min_val, float max_val,
-                             float step_val) {
+CMP_API int cmp_f2_slider_set_bounds(cmp_ui_node_t *node, float min_val,
+                                     float max_val, float step_val) {
   cmp_f2_slider_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -243,7 +247,8 @@ CMP_API int cmp_f2_slider_set_bounds(cmp_ui_node_t *node, float min_val, float m
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_slider_set_value(cmp_ui_node_t *node, float val1, float val2) {
+CMP_API int cmp_f2_slider_set_value(cmp_ui_node_t *node, float val1,
+                                    float val2) {
   cmp_f2_slider_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -262,7 +267,8 @@ CMP_API int cmp_f2_slider_set_disabled(cmp_ui_node_t *node, int disabled) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_spin_button_create(cmp_ui_node_t **out_node, float initial_val) {
+CMP_API int cmp_f2_spin_button_create(cmp_ui_node_t **out_node,
+                                      float initial_val) {
   cmp_f2_spin_button_t *data;
   int res;
 
@@ -291,7 +297,7 @@ CMP_API int cmp_f2_spin_button_create(cmp_ui_node_t **out_node, float initial_va
 }
 
 CMP_API int cmp_f2_spin_button_set_bounds(cmp_ui_node_t *node, float min_val,
-                                  float max_val, float step_val) {
+                                          float max_val, float step_val) {
   cmp_f2_spin_button_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;

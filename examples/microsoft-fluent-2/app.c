@@ -43,7 +43,8 @@ static int manual_hit_test(cmp_ui_node_t *node, float x, float y) {
 
 static int build_ui(void) {
   cmp_ui_node_t *main_box = NULL;
-  cmp_ui_node_t *btn1 = NULL, *btn2 = NULL, *cb = NULL, *tg = NULL, *txt_in = NULL;
+  cmp_ui_node_t *btn1 = NULL, *btn2 = NULL, *cb = NULL, *tg = NULL,
+                *txt_in = NULL;
   int res;
 
   if (g_ui_tree != NULL) {
@@ -52,7 +53,8 @@ static int build_ui(void) {
   }
 
   res = cmp_ui_box_create(&g_ui_tree);
-  if (res != CMP_SUCCESS) return res;
+  if (res != CMP_SUCCESS)
+    return res;
 
   g_ui_tree->layout->direction = CMP_FLEX_COLUMN;
   g_ui_tree->layout->padding[0] = 24.0f;
@@ -62,29 +64,39 @@ static int build_ui(void) {
   g_ui_tree->layout->width = 800.0f;
   g_ui_tree->layout->height = 600.0f;
 
-  if (cmp_ui_box_create(&main_box) != CMP_SUCCESS) return CMP_ERROR_NOT_FOUND;
+  if (cmp_ui_box_create(&main_box) != CMP_SUCCESS)
+    return CMP_ERROR_NOT_FOUND;
   main_box->layout->direction = CMP_FLEX_COLUMN;
   main_box->layout->align_items = CMP_FLEX_ALIGN_START;
-  
-  if (cmp_f2_button_create(&btn1, "Primary Button", NULL) != CMP_SUCCESS) return CMP_ERROR_NOT_FOUND;
+
+  if (cmp_f2_button_create(&btn1, "Primary Button", NULL) != CMP_SUCCESS)
+    return CMP_ERROR_NOT_FOUND;
   cmp_f2_button_set_variant(btn1, CMP_F2_BUTTON_VARIANT_PRIMARY);
   btn1->layout->margin[2] = 16.0f;
-  
-  if (cmp_f2_button_create(&btn2, "Secondary Button", NULL) != CMP_SUCCESS) return CMP_ERROR_NOT_FOUND;
+
+  if (cmp_f2_button_create(&btn2, "Secondary Button", NULL) != CMP_SUCCESS)
+    return CMP_ERROR_NOT_FOUND;
   btn2->layout->margin[2] = 16.0f;
 
-  if (cmp_f2_checkbox_create(&cb, "Fluent 2 Checkbox") != CMP_SUCCESS) return CMP_ERROR_NOT_FOUND;
+  if (cmp_f2_checkbox_create(&cb, "Fluent 2 Checkbox") != CMP_SUCCESS)
+    return CMP_ERROR_NOT_FOUND;
   cb->layout->margin[2] = 16.0f;
-  
-  if (cmp_f2_toggle_create(&tg, "Fluent 2 Toggle") != CMP_SUCCESS) return CMP_ERROR_NOT_FOUND;
+
+  if (cmp_f2_toggle_create(&tg, "Fluent 2 Toggle") != CMP_SUCCESS)
+    return CMP_ERROR_NOT_FOUND;
   tg->layout->margin[2] = 16.0f;
 
-  if (cmp_f2_text_input_create(&txt_in) != CMP_SUCCESS) return CMP_ERROR_NOT_FOUND;
+  if (cmp_f2_text_input_create(&txt_in) != CMP_SUCCESS)
+    return CMP_ERROR_NOT_FOUND;
   txt_in->layout->margin[2] = 16.0f;
   txt_in->layout->width = 200.0f;
   txt_in->layout->height = 32.0f;
 
-  if (cmp_f2_button_create(&g_btn_theme, g_is_dark ? "Switch to Light Mode" : "Switch to Dark Mode", NULL) != CMP_SUCCESS) return CMP_ERROR_NOT_FOUND;
+  if (cmp_f2_button_create(&g_btn_theme,
+                           g_is_dark ? "Switch to Light Mode"
+                                     : "Switch to Dark Mode",
+                           NULL) != CMP_SUCCESS)
+    return CMP_ERROR_NOT_FOUND;
   g_btn_theme->layout->id = 101;
   g_btn_theme->layout->margin[2] = 16.0f;
 

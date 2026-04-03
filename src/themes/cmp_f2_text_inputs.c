@@ -36,7 +36,7 @@ CMP_API int cmp_f2_text_input_create(cmp_ui_node_t **out_node) {
 }
 
 CMP_API int cmp_f2_text_input_set_variant(cmp_ui_node_t *node,
-                                  cmp_f2_text_input_variant_t variant) {
+                                          cmp_f2_text_input_variant_t variant) {
   cmp_f2_text_input_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -46,7 +46,7 @@ CMP_API int cmp_f2_text_input_set_variant(cmp_ui_node_t *node,
 }
 
 CMP_API int cmp_f2_text_input_set_size(cmp_ui_node_t *node,
-                               cmp_f2_text_input_size_t size) {
+                                       cmp_f2_text_input_size_t size) {
   cmp_f2_text_input_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -56,7 +56,7 @@ CMP_API int cmp_f2_text_input_set_size(cmp_ui_node_t *node,
 }
 
 CMP_API int cmp_f2_text_input_set_state(cmp_ui_node_t *node,
-                                cmp_f2_text_input_state_t state) {
+                                        cmp_f2_text_input_state_t state) {
   cmp_f2_text_input_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -65,7 +65,8 @@ CMP_API int cmp_f2_text_input_set_state(cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_text_input_set_password_mode(cmp_ui_node_t *node, int is_password) {
+CMP_API int cmp_f2_text_input_set_password_mode(cmp_ui_node_t *node,
+                                                int is_password) {
   cmp_f2_text_input_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -106,7 +107,7 @@ CMP_API int cmp_f2_textarea_create(cmp_ui_node_t **out_node) {
 }
 
 CMP_API int cmp_f2_textarea_set_size(cmp_ui_node_t *node,
-                             cmp_f2_text_input_size_t size) {
+                                     cmp_f2_text_input_size_t size) {
   cmp_f2_textarea_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -116,7 +117,7 @@ CMP_API int cmp_f2_textarea_set_size(cmp_ui_node_t *node,
 }
 
 CMP_API int cmp_f2_textarea_set_state(cmp_ui_node_t *node,
-                              cmp_f2_text_input_state_t state) {
+                                      cmp_f2_text_input_state_t state) {
   cmp_f2_textarea_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -125,8 +126,9 @@ CMP_API int cmp_f2_textarea_set_state(cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_textarea_set_resize_mode(cmp_ui_node_t *node,
-                                    cmp_f2_textarea_resize_t resize_mode) {
+CMP_API int
+cmp_f2_textarea_set_resize_mode(cmp_ui_node_t *node,
+                                cmp_f2_textarea_resize_t resize_mode) {
   cmp_f2_textarea_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -136,7 +138,7 @@ CMP_API int cmp_f2_textarea_set_resize_mode(cmp_ui_node_t *node,
 }
 
 CMP_API int cmp_f2_textarea_set_auto_grow(cmp_ui_node_t *node, int auto_grow,
-                                  float max_height) {
+                                          float max_height) {
   cmp_f2_textarea_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -146,8 +148,8 @@ CMP_API int cmp_f2_textarea_set_auto_grow(cmp_ui_node_t *node, int auto_grow,
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_field_create(cmp_ui_node_t **out_node, cmp_ui_node_t *input_node,
-                        const char *label) {
+CMP_API int cmp_f2_field_create(cmp_ui_node_t **out_node,
+                                cmp_ui_node_t *input_node, const char *label) {
   cmp_f2_field_t *data;
   int res;
 
@@ -188,7 +190,7 @@ CMP_API int cmp_f2_field_create(cmp_ui_node_t **out_node, cmp_ui_node_t *input_n
 }
 
 CMP_API int cmp_f2_field_set_label_position(cmp_ui_node_t *node,
-                                    cmp_f2_field_label_position_t pos) {
+                                            cmp_f2_field_label_position_t pos) {
   cmp_f2_field_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -206,7 +208,8 @@ CMP_API int cmp_f2_field_set_required(cmp_ui_node_t *node, int is_required) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_field_set_help_text(cmp_ui_node_t *node, const char *help_text) {
+CMP_API int cmp_f2_field_set_help_text(cmp_ui_node_t *node,
+                                       const char *help_text) {
   cmp_f2_field_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -223,9 +226,9 @@ CMP_API int cmp_f2_field_set_help_text(cmp_ui_node_t *node, const char *help_tex
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_field_set_validation_message(cmp_ui_node_t *node,
-                                        const char *message,
-                                        cmp_f2_text_input_state_t state) {
+CMP_API int
+cmp_f2_field_set_validation_message(cmp_ui_node_t *node, const char *message,
+                                    cmp_f2_text_input_state_t state) {
   cmp_f2_field_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -263,7 +266,7 @@ CMP_API int cmp_f2_searchbox_create(cmp_ui_node_t **out_node) {
 }
 
 CMP_API int cmp_f2_searchbox_set_size(cmp_ui_node_t *node,
-                              cmp_f2_text_input_size_t size) {
+                                      cmp_f2_text_input_size_t size) {
   cmp_f2_searchbox_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -273,7 +276,7 @@ CMP_API int cmp_f2_searchbox_set_size(cmp_ui_node_t *node,
 }
 
 CMP_API int cmp_f2_searchbox_set_state(cmp_ui_node_t *node,
-                               cmp_f2_text_input_state_t state) {
+                                       cmp_f2_text_input_state_t state) {
   cmp_f2_searchbox_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -282,7 +285,8 @@ CMP_API int cmp_f2_searchbox_set_state(cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_searchbox_set_collapsed_mode(cmp_ui_node_t *node, int is_collapsed) {
+CMP_API int cmp_f2_searchbox_set_collapsed_mode(cmp_ui_node_t *node,
+                                                int is_collapsed) {
   cmp_f2_searchbox_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;

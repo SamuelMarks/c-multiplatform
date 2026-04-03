@@ -164,6 +164,28 @@ TEST test_scroll_padding(void) {
   PASS();
 }
 
+TEST test_overscroll(void) {
+  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_AUTO, 0));
+  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_AUTO, 1));
+  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_CONTAIN, 0));
+  ASSERT_EQ(0, cmp_overscroll_evaluate(CMP_OVERSCROLL_CONTAIN, 1));
+  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_NONE, 0));
+  ASSERT_EQ(0, cmp_overscroll_evaluate(CMP_OVERSCROLL_NONE, 1));
+  PASS();
+}
+
+TEST test_scroll_momentum(void) {
+  float offset = 0.0f;
+  float vel = 0.0f;
+  ASSERT_EQ(CMP_SUCCESS, cmp_scroll_momentum_calculate(1000.0f, 16.666f, 0.9f,
+                                                       &offset, &vel));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_scroll_momentum_calculate(1000.0f, 16.666f, 0.9f, NULL, &vel));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_scroll_momentum_calculate(
+                                       1000.0f, 16.666f, 0.9f, &offset, NULL));
+  PASS();
+}
+
 SUITE(cmp_kinematics_suite) {
   RUN_TEST(test_rubber_band_create_destroy);
   RUN_TEST(test_rubber_band_physics);
@@ -172,6 +194,8 @@ SUITE(cmp_kinematics_suite) {
   RUN_TEST(test_kinematics_edge_cases);
   RUN_TEST(test_scroll_snap_stop);
   RUN_TEST(test_scroll_padding);
+  RUN_TEST(test_overscroll);
+  RUN_TEST(test_scroll_momentum);
 }
 
 GREATEST_MAIN_DEFS();

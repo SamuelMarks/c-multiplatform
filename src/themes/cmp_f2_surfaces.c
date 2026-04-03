@@ -37,7 +37,7 @@ CMP_API int cmp_f2_card_create(cmp_ui_node_t **out_node) {
 }
 
 CMP_API int cmp_f2_card_set_variant(cmp_ui_node_t *node,
-                            cmp_f2_card_variant_t variant) {
+                                    cmp_f2_card_variant_t variant) {
   cmp_f2_card_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -47,7 +47,7 @@ CMP_API int cmp_f2_card_set_variant(cmp_ui_node_t *node,
 }
 
 CMP_API int cmp_f2_card_set_orientation(cmp_ui_node_t *node,
-                                cmp_f2_card_orientation_t orientation) {
+                                        cmp_f2_card_orientation_t orientation) {
   cmp_f2_card_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -98,7 +98,7 @@ CMP_API int cmp_f2_accordion_create(cmp_ui_node_t **out_node) {
 }
 
 CMP_API int cmp_f2_accordion_set_variant(cmp_ui_node_t *node,
-                                 cmp_f2_accordion_variant_t variant) {
+                                         cmp_f2_accordion_variant_t variant) {
   cmp_f2_accordion_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -107,7 +107,8 @@ CMP_API int cmp_f2_accordion_set_variant(cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_accordion_set_multi_expand(cmp_ui_node_t *node, int multi_expand) {
+CMP_API int cmp_f2_accordion_set_multi_expand(cmp_ui_node_t *node,
+                                              int multi_expand) {
   cmp_f2_accordion_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -117,7 +118,7 @@ CMP_API int cmp_f2_accordion_set_multi_expand(cmp_ui_node_t *node, int multi_exp
 }
 
 CMP_API int cmp_f2_accordion_panel_create(cmp_ui_node_t **out_node,
-                                  const char *header_label) {
+                                          const char *header_label) {
   cmp_f2_accordion_panel_t *data;
   int res;
 
@@ -151,7 +152,8 @@ CMP_API int cmp_f2_accordion_panel_create(cmp_ui_node_t **out_node,
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_accordion_panel_set_expanded(cmp_ui_node_t *node, int is_expanded) {
+CMP_API int cmp_f2_accordion_panel_set_expanded(cmp_ui_node_t *node,
+                                                int is_expanded) {
   cmp_f2_accordion_panel_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -189,8 +191,9 @@ CMP_API int cmp_f2_divider_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_divider_set_orientation(cmp_ui_node_t *node,
-                                   cmp_f2_divider_orientation_t orientation) {
+CMP_API int
+cmp_f2_divider_set_orientation(cmp_ui_node_t *node,
+                               cmp_f2_divider_orientation_t orientation) {
   cmp_f2_divider_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -207,8 +210,9 @@ CMP_API int cmp_f2_divider_set_orientation(cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_divider_set_appearance(cmp_ui_node_t *node,
-                                  cmp_f2_divider_appearance_t appearance) {
+CMP_API int
+cmp_f2_divider_set_appearance(cmp_ui_node_t *node,
+                              cmp_f2_divider_appearance_t appearance) {
   cmp_f2_divider_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -285,8 +289,9 @@ CMP_API int cmp_f2_scroll_view_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_scroll_view_set_behavior(cmp_ui_node_t *node,
-                                    cmp_f2_scrollbar_behavior_t behavior) {
+CMP_API int
+cmp_f2_scroll_view_set_behavior(cmp_ui_node_t *node,
+                                cmp_f2_scrollbar_behavior_t behavior) {
   cmp_f2_scroll_view_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -295,7 +300,8 @@ CMP_API int cmp_f2_scroll_view_set_behavior(cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_scroll_view_set_overlay_mode(cmp_ui_node_t *node, int is_overlay) {
+CMP_API int cmp_f2_scroll_view_set_overlay_mode(cmp_ui_node_t *node,
+                                                int is_overlay) {
   cmp_f2_scroll_view_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;

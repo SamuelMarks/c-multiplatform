@@ -6,8 +6,9 @@
 #include <stdlib.h>
 /* clang-format on */
 
-CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node, uint32_t codepoint_regular,
-                       uint32_t codepoint_filled, float size) {
+CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node,
+                               uint32_t codepoint_regular,
+                               uint32_t codepoint_filled, float size) {
   cmp_f2_icon_t *icon_data;
   int res;
   char codepoint_str[8];

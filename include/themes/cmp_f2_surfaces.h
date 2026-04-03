@@ -22,14 +22,22 @@ typedef enum cmp_f2_card_orientation {
   CMP_F2_CARD_ORIENTATION_HORIZONTAL
 } cmp_f2_card_orientation_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_card_s {
+  /** \brief Documented */
   cmp_f2_card_variant_t variant;
+  /** \brief Documented */
   cmp_f2_card_orientation_t orientation;
+  /** \brief Documented */
   int is_clickable;
 
+  /** \brief Documented */
   cmp_ui_node_t *header_node;
+  /** \brief Documented */
   cmp_ui_node_t *preview_node;
+  /** \brief Documented */
   cmp_ui_node_t *body_node;
+  /** \brief Documented */
   cmp_ui_node_t *footer_node;
 } cmp_f2_card_t;
 
@@ -41,9 +49,10 @@ typedef struct cmp_f2_card_s {
  * code.
  */
 CMP_API int cmp_f2_card_create(cmp_ui_node_t **out_node);
-CMP_API int cmp_f2_card_set_variant(cmp_ui_node_t *node, cmp_f2_card_variant_t variant);
+CMP_API int cmp_f2_card_set_variant(cmp_ui_node_t *node,
+                                    cmp_f2_card_variant_t variant);
 CMP_API int cmp_f2_card_set_orientation(cmp_ui_node_t *node,
-                                cmp_f2_card_orientation_t orientation);
+                                        cmp_f2_card_orientation_t orientation);
 CMP_API int cmp_f2_card_set_clickable(cmp_ui_node_t *node, int is_clickable);
 
 /* 6.2 Accordion */
@@ -52,16 +61,24 @@ typedef enum cmp_f2_accordion_variant {
   CMP_F2_ACCORDION_VARIANT_CONTAINED
 } cmp_f2_accordion_variant_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_accordion_s {
+  /** \brief Documented */
   cmp_f2_accordion_variant_t variant;
+  /** \brief Documented */
   int multi_expand;
 } cmp_f2_accordion_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_accordion_panel_s {
+  /** \brief Documented */
   int is_expanded;
 
+  /** \brief Documented */
   cmp_ui_node_t *header_node;
+  /** \brief Documented */
   cmp_ui_node_t *chevron_node;
+  /** \brief Documented */
   cmp_ui_node_t *content_body_node;
 } cmp_f2_accordion_panel_t;
 
@@ -74,8 +91,9 @@ typedef struct cmp_f2_accordion_panel_s {
  */
 CMP_API int cmp_f2_accordion_create(cmp_ui_node_t **out_node);
 CMP_API int cmp_f2_accordion_set_variant(cmp_ui_node_t *node,
-                                 cmp_f2_accordion_variant_t variant);
-CMP_API int cmp_f2_accordion_set_multi_expand(cmp_ui_node_t *node, int multi_expand);
+                                         cmp_f2_accordion_variant_t variant);
+CMP_API int cmp_f2_accordion_set_multi_expand(cmp_ui_node_t *node,
+                                              int multi_expand);
 
 /**
  * @brief Initialize a Fluent 2 accordion_panel_create component.
@@ -85,8 +103,9 @@ CMP_API int cmp_f2_accordion_set_multi_expand(cmp_ui_node_t *node, int multi_exp
  * an error code.
  */
 CMP_API int cmp_f2_accordion_panel_create(cmp_ui_node_t **out_node,
-                                  const char *header_label);
-CMP_API int cmp_f2_accordion_panel_set_expanded(cmp_ui_node_t *node, int is_expanded);
+                                          const char *header_label);
+CMP_API int cmp_f2_accordion_panel_set_expanded(cmp_ui_node_t *node,
+                                                int is_expanded);
 
 /* 6.3 Divider */
 typedef enum cmp_f2_divider_orientation {
@@ -100,9 +119,13 @@ typedef enum cmp_f2_divider_appearance {
   CMP_F2_DIVIDER_APPEARANCE_BRAND
 } cmp_f2_divider_appearance_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_divider_s {
+  /** \brief Documented */
   cmp_f2_divider_orientation_t orientation;
+  /** \brief Documented */
   cmp_f2_divider_appearance_t appearance;
+  /** \brief Documented */
   int is_inset;
 } cmp_f2_divider_t;
 
@@ -114,16 +137,22 @@ typedef struct cmp_f2_divider_s {
  * code.
  */
 CMP_API int cmp_f2_divider_create(cmp_ui_node_t **out_node);
-CMP_API int cmp_f2_divider_set_orientation(cmp_ui_node_t *node,
-                                   cmp_f2_divider_orientation_t orientation);
-CMP_API int cmp_f2_divider_set_appearance(cmp_ui_node_t *node,
-                                  cmp_f2_divider_appearance_t appearance);
+CMP_API int
+cmp_f2_divider_set_orientation(cmp_ui_node_t *node,
+                               cmp_f2_divider_orientation_t orientation);
+CMP_API int
+cmp_f2_divider_set_appearance(cmp_ui_node_t *node,
+                              cmp_f2_divider_appearance_t appearance);
 CMP_API int cmp_f2_divider_set_inset(cmp_ui_node_t *node, int is_inset);
 
 /* 6.4 SplitView / Resizer */
+/** \brief Documented */
 typedef struct cmp_f2_split_view_s {
+  /** \brief Documented */
   cmp_ui_node_t *pane_1_node;
+  /** \brief Documented */
   cmp_ui_node_t *resizer_node;
+  /** \brief Documented */
   cmp_ui_node_t *pane_2_node;
 } cmp_f2_split_view_t;
 
@@ -142,12 +171,18 @@ typedef enum cmp_f2_scrollbar_behavior {
   CMP_F2_SCROLLBAR_BEHAVIOR_ALWAYS_ON
 } cmp_f2_scrollbar_behavior_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_scroll_view_s {
+  /** \brief Documented */
   cmp_f2_scrollbar_behavior_t behavior;
+  /** \brief Documented */
   int is_overlay;
 
+  /** \brief Documented */
   cmp_ui_node_t *content_wrapper_node;
+  /** \brief Documented */
   cmp_ui_node_t *vertical_scrollbar_node;
+  /** \brief Documented */
   cmp_ui_node_t *horizontal_scrollbar_node;
 } cmp_f2_scroll_view_t;
 
@@ -159,9 +194,11 @@ typedef struct cmp_f2_scroll_view_s {
  * an error code.
  */
 CMP_API int cmp_f2_scroll_view_create(cmp_ui_node_t **out_node);
-CMP_API int cmp_f2_scroll_view_set_behavior(cmp_ui_node_t *node,
-                                    cmp_f2_scrollbar_behavior_t behavior);
-CMP_API int cmp_f2_scroll_view_set_overlay_mode(cmp_ui_node_t *node, int is_overlay);
+CMP_API int
+cmp_f2_scroll_view_set_behavior(cmp_ui_node_t *node,
+                                cmp_f2_scrollbar_behavior_t behavior);
+CMP_API int cmp_f2_scroll_view_set_overlay_mode(cmp_ui_node_t *node,
+                                                int is_overlay);
 
 #ifdef __cplusplus
 }

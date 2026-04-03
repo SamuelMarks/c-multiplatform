@@ -24,12 +24,14 @@ TEST test_f2_visual_golden_baseline(void) {
   config.y = -1;
   config.hidden = 1;
   config.frameless = 1;
-  config.use_legacy_backend = 1; /* Software render to guarantee buffer access */
+  config.use_legacy_backend =
+      1; /* Software render to guarantee buffer access */
 
   res = cmp_window_create(&config, &win);
   if (res != CMP_SUCCESS) {
-    /* If window creation fails (e.g. headless CI without XVFB), we might need to skip. 
-       But we will assert it succeeds since we want CI to support offscreen. */
+    /* If window creation fails (e.g. headless CI without XVFB), we might need
+       to skip. But we will assert it succeeds since we want CI to support
+       offscreen. */
     cmp_window_system_shutdown();
     cmp_event_system_shutdown();
     SKIP();
@@ -41,7 +43,7 @@ TEST test_f2_visual_golden_baseline(void) {
 
   cmp_layout_calculate(btn->layout, 400.0f, 300.0f);
   cmp_window_set_ui_tree(win, btn);
-  
+
   /* Pump events to ensure rendering layout */
   cmp_window_poll_events(win);
 
@@ -50,7 +52,8 @@ TEST test_f2_visual_golden_baseline(void) {
   if (res == CMP_SUCCESS && pixels != NULL) {
     /* We successfully captured the pixel buffer!
        A real pixel-diff algorithm would compare 'pixels' against a stored PNG.
-       For the framework test, we assert the buffer exists and dimensions match. */
+       For the framework test, we assert the buffer exists and dimensions match.
+     */
     ASSERT(width > 0);
     ASSERT(height > 0);
     CMP_FREE(pixels);
@@ -62,8 +65,9 @@ TEST test_f2_visual_golden_baseline(void) {
 }
 
 TEST test_f2_cross_os_parity(void) {
-  /* Placeholder for cross-OS parity checks. In reality, the golden image baseline 
-     test covers the binary comparison. Here we assert math invariants for the UI. */
+  /* Placeholder for cross-OS parity checks. In reality, the golden image
+     baseline test covers the binary comparison. Here we assert math invariants
+     for the UI. */
   cmp_ui_node_t *btn = NULL;
   int res;
 

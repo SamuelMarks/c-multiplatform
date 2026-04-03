@@ -1,4 +1,4 @@
-temp_*
+﻿temp_*
 vcpkg
 .gemini
 *.o
@@ -144,3 +144,48 @@ compile_commands.json
 vcpkg_installed/
 .clangd
 .cache
+# Extra wildcards for clean git add .
+*.log
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.swp
+*.swo
+*.swn
+*~
+*.core
+core
+*.a
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.out
+*.app
+*.i
+*.s
+
+# CMake extra
+/build*/
+CMakeScripts
+install_manifest.txt
+CTestTestfile.cmake
+_deps/
+
+# OS and specific files
+Thumbs.db
+ehthumbs.db
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Doc generated
+docs/doxygen_output.txt
+docs/warnings.txt
+docs/*.txt
+docs/*.log

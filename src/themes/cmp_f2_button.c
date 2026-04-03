@@ -62,15 +62,15 @@ static int cmp_f2_button_init_internal(cmp_ui_node_t **out_node,
 }
 
 CMP_API int cmp_f2_button_create(cmp_ui_node_t **out_node, const char *label,
-                         cmp_ui_node_t *icon) {
+                                 cmp_ui_node_t *icon) {
   return cmp_f2_button_init_internal(out_node, CMP_F2_BUTTON_TYPE_STANDARD,
                                      label, icon);
 }
 
 CMP_API int cmp_f2_compound_button_create(cmp_ui_node_t **out_node,
-                                  const char *primary_text,
-                                  const char *secondary_text,
-                                  cmp_ui_node_t *icon) {
+                                          const char *primary_text,
+                                          const char *secondary_text,
+                                          cmp_ui_node_t *icon) {
   int res;
   cmp_f2_button_t *btn_data;
 
@@ -93,8 +93,8 @@ CMP_API int cmp_f2_compound_button_create(cmp_ui_node_t **out_node,
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_menu_button_create(cmp_ui_node_t **out_node, const char *label,
-                              cmp_ui_node_t *icon) {
+CMP_API int cmp_f2_menu_button_create(cmp_ui_node_t **out_node,
+                                      const char *label, cmp_ui_node_t *icon) {
   int res;
   cmp_f2_button_t *btn_data;
 
@@ -115,8 +115,8 @@ CMP_API int cmp_f2_menu_button_create(cmp_ui_node_t **out_node, const char *labe
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_split_button_create(cmp_ui_node_t **out_node, const char *label,
-                               cmp_ui_node_t *icon) {
+CMP_API int cmp_f2_split_button_create(cmp_ui_node_t **out_node,
+                                       const char *label, cmp_ui_node_t *icon) {
   int res;
   cmp_f2_button_t *btn_data;
 
@@ -142,14 +142,15 @@ CMP_API int cmp_f2_split_button_create(cmp_ui_node_t **out_node, const char *lab
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_toggle_button_create(cmp_ui_node_t **out_node, const char *label,
-                                cmp_ui_node_t *icon) {
+CMP_API int cmp_f2_toggle_button_create(cmp_ui_node_t **out_node,
+                                        const char *label,
+                                        cmp_ui_node_t *icon) {
   return cmp_f2_button_init_internal(out_node, CMP_F2_BUTTON_TYPE_TOGGLE, label,
                                      icon);
 }
 
 CMP_API int cmp_f2_button_set_variant(cmp_ui_node_t *node,
-                              cmp_f2_button_variant_t variant) {
+                                      cmp_f2_button_variant_t variant) {
   cmp_f2_button_t *btn_data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -158,7 +159,8 @@ CMP_API int cmp_f2_button_set_variant(cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_button_set_size(cmp_ui_node_t *node, cmp_f2_button_size_t size) {
+CMP_API int cmp_f2_button_set_size(cmp_ui_node_t *node,
+                                   cmp_f2_button_size_t size) {
   cmp_f2_button_t *btn_data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -176,7 +178,8 @@ CMP_API int cmp_f2_button_set_size(cmp_ui_node_t *node, cmp_f2_button_size_t siz
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_button_set_shape(cmp_ui_node_t *node, cmp_f2_button_shape_t shape) {
+CMP_API int cmp_f2_button_set_shape(cmp_ui_node_t *node,
+                                    cmp_f2_button_shape_t shape) {
   cmp_f2_button_t *btn_data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -186,7 +189,8 @@ CMP_API int cmp_f2_button_set_shape(cmp_ui_node_t *node, cmp_f2_button_shape_t s
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_button_set_state(cmp_ui_node_t *node, cmp_f2_button_state_t state) {
+CMP_API int cmp_f2_button_set_state(cmp_ui_node_t *node,
+                                    cmp_f2_button_state_t state) {
   cmp_f2_button_t *btn_data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;

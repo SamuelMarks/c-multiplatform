@@ -32,12 +32,18 @@ typedef enum cmp_f2_avatar_shape {
   CMP_F2_AVATAR_SHAPE_SQUARE
 } cmp_f2_avatar_shape_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_avatar_s {
+  /** \brief Documented */
   cmp_f2_avatar_size_t size;
+  /** \brief Documented */
   cmp_f2_avatar_shape_t shape;
 
+  /** \brief Documented */
   cmp_ui_node_t *image_node;
+  /** \brief Documented */
   cmp_ui_node_t *initials_node;
+  /** \brief Documented */
   cmp_ui_node_t *icon_node;
 } cmp_f2_avatar_t;
 
@@ -57,9 +63,11 @@ typedef struct cmp_f2_avatar_s {
  * @param out_node Pointer to receive the allocated node.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_f2_avatar_create(cmp_ui_node_t **out_node, cmp_f2_avatar_size_t size,
-                         cmp_f2_avatar_shape_t shape);
-CMP_API int cmp_f2_avatar_set_initials(cmp_ui_node_t *node, const char *initials);
+CMP_API int cmp_f2_avatar_create(cmp_ui_node_t **out_node,
+                                 cmp_f2_avatar_size_t size,
+                                 cmp_f2_avatar_shape_t shape);
+CMP_API int cmp_f2_avatar_set_initials(cmp_ui_node_t *node,
+                                       const char *initials);
 
 /* 8.2 AvatarGroup */
 typedef enum cmp_f2_avatar_group_layout {
@@ -67,11 +75,16 @@ typedef enum cmp_f2_avatar_group_layout {
   CMP_F2_AVATAR_GROUP_LAYOUT_PIE
 } cmp_f2_avatar_group_layout_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_avatar_group_s {
+  /** \brief Documented */
   cmp_f2_avatar_group_layout_t layout;
+  /** \brief Documented */
   int max_count;
+  /** \brief Documented */
   int current_count;
 
+  /** \brief Documented */
   cmp_ui_node_t *overflow_node;
 } cmp_f2_avatar_group_t;
 
@@ -86,8 +99,8 @@ typedef struct cmp_f2_avatar_group_s {
  * @return 0 on success, or an error code.
  */
 CMP_API int cmp_f2_avatar_group_create(cmp_ui_node_t **out_node,
-                               cmp_f2_avatar_group_layout_t layout,
-                               int max_count);
+                                       cmp_f2_avatar_group_layout_t layout,
+                                       int max_count);
 
 /* 8.3 PresenceBadge */
 typedef enum cmp_f2_presence_status {
@@ -99,7 +112,9 @@ typedef enum cmp_f2_presence_status {
   CMP_F2_PRESENCE_OOF
 } cmp_f2_presence_status_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_presence_badge_s {
+  /** \brief Documented */
   cmp_f2_presence_status_t status;
 } cmp_f2_presence_badge_t;
 
@@ -114,7 +129,7 @@ typedef struct cmp_f2_presence_badge_s {
  * @return 0 on success, or an error code.
  */
 CMP_API int cmp_f2_presence_badge_create(cmp_ui_node_t **out_node,
-                                 cmp_f2_presence_status_t status);
+                                         cmp_f2_presence_status_t status);
 
 /* 8.4 Badge & InfoLabel */
 typedef enum cmp_f2_badge_variant {
@@ -129,10 +144,14 @@ typedef enum cmp_f2_badge_shape {
   CMP_F2_BADGE_SHAPE_CIRCULAR
 } cmp_f2_badge_shape_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_badge_s {
+  /** \brief Documented */
   cmp_f2_badge_variant_t variant;
+  /** \brief Documented */
   cmp_f2_badge_shape_t shape;
 
+  /** \brief Documented */
   cmp_ui_node_t *text_node;
 } cmp_f2_badge_t;
 
@@ -148,15 +167,21 @@ typedef struct cmp_f2_badge_s {
  */
 CMP_API int cmp_f2_badge_create(cmp_ui_node_t **out_node, const char *label);
 CMP_API int cmp_f2_badge_set_variant(cmp_ui_node_t *node,
-                             cmp_f2_badge_variant_t variant);
-CMP_API int cmp_f2_badge_set_shape(cmp_ui_node_t *node, cmp_f2_badge_shape_t shape);
+                                     cmp_f2_badge_variant_t variant);
+CMP_API int cmp_f2_badge_set_shape(cmp_ui_node_t *node,
+                                   cmp_f2_badge_shape_t shape);
 
 /* 8.5 Tag / TagGroup */
+/** \brief Documented */
 typedef struct cmp_f2_tag_s {
+  /** \brief Documented */
   int is_dismissible;
+  /** \brief Documented */
   int is_selected;
 
+  /** \brief Documented */
   cmp_ui_node_t *text_node;
+  /** \brief Documented */
   cmp_ui_node_t *dismiss_button_node;
 } cmp_f2_tag_t;
 
@@ -171,12 +196,15 @@ typedef struct cmp_f2_tag_s {
  * @return 0 on success, or an error code.
  */
 CMP_API int cmp_f2_tag_create(cmp_ui_node_t **out_node, const char *label,
-                      int is_dismissible);
+                              int is_dismissible);
 CMP_API int cmp_f2_tag_set_selected(cmp_ui_node_t *node, int is_selected);
 
 /* 8.6 DataGrid / Table */
+/** \brief Documented */
 typedef struct cmp_f2_datagrid_s {
+  /** \brief Documented */
   cmp_ui_node_t *header_row_node;
+  /** \brief Documented */
   cmp_ui_node_t *rows_container_node;
 } cmp_f2_datagrid_t;
 
@@ -200,12 +228,18 @@ CMP_API int cmp_f2_datagrid_create(cmp_ui_node_t **out_node);
 CMP_API int cmp_f2_datagrid_row_create(cmp_ui_node_t **out_node, int is_header);
 
 /* 8.7 Tree / TreeView */
+/** \brief Documented */
 typedef struct cmp_f2_tree_item_s {
+  /** \brief Documented */
   int is_expanded;
+  /** \brief Documented */
   int is_selected;
 
+  /** \brief Documented */
   cmp_ui_node_t *chevron_node;
+  /** \brief Documented */
   cmp_ui_node_t *content_node;
+  /** \brief Documented */
   cmp_ui_node_t *children_container_node;
 } cmp_f2_tree_item_t;
 
@@ -230,7 +264,8 @@ CMP_API int cmp_f2_tree_create(cmp_ui_node_t **out_node);
  * @param out_node Pointer to receive the allocated node.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_f2_tree_item_create(cmp_ui_node_t **out_node, const char *label);
+CMP_API int cmp_f2_tree_item_create(cmp_ui_node_t **out_node,
+                                    const char *label);
 CMP_API int cmp_f2_tree_item_set_expanded(cmp_ui_node_t *node, int is_expanded);
 CMP_API int cmp_f2_tree_item_set_selected(cmp_ui_node_t *node, int is_selected);
 

@@ -17,14 +17,22 @@ typedef enum cmp_f2_dropdown_selection_mode {
   CMP_F2_DROPDOWN_SELECTION_MULTIPLE
 } cmp_f2_dropdown_selection_mode_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_dropdown_s {
+  /** \brief Documented */
   cmp_f2_text_input_variant_t variant;
+  /** \brief Documented */
   cmp_f2_dropdown_selection_mode_t selection_mode;
+  /** \brief Documented */
   int is_open;
+  /** \brief Documented */
   int is_disabled;
 
+  /** \brief Documented */
   cmp_ui_node_t *trigger_node;
+  /** \brief Documented */
   cmp_ui_node_t *listbox_node; /* Container for options */
+  /** \brief Documented */
   cmp_ui_node_t *chevron_node;
 } cmp_f2_dropdown_t;
 
@@ -36,20 +44,27 @@ typedef struct cmp_f2_dropdown_s {
  * an error code.
  */
 CMP_API int cmp_f2_dropdown_create(cmp_ui_node_t **out_node,
-                           cmp_f2_dropdown_selection_mode_t mode);
+                                   cmp_f2_dropdown_selection_mode_t mode);
 CMP_API int cmp_f2_dropdown_set_variant(cmp_ui_node_t *node,
-                                cmp_f2_text_input_variant_t variant);
+                                        cmp_f2_text_input_variant_t variant);
 CMP_API int cmp_f2_dropdown_set_open(cmp_ui_node_t *node, int is_open);
 CMP_API int cmp_f2_dropdown_set_disabled(cmp_ui_node_t *node, int is_disabled);
 
 /* 4.2 ComboBox */
+/** \brief Documented */
 typedef struct cmp_f2_combobox_s {
+  /** \brief Documented */
   int is_freeform;
+  /** \brief Documented */
   int is_open;
+  /** \brief Documented */
   int is_disabled;
 
+  /** \brief Documented */
   cmp_ui_node_t *input_node; /* Editable text input */
+  /** \brief Documented */
   cmp_ui_node_t *listbox_node;
+  /** \brief Documented */
   cmp_ui_node_t *chevron_node;
 } cmp_f2_combobox_t;
 
@@ -65,10 +80,15 @@ CMP_API int cmp_f2_combobox_set_open(cmp_ui_node_t *node, int is_open);
 CMP_API int cmp_f2_combobox_set_disabled(cmp_ui_node_t *node, int is_disabled);
 
 /* 4.3 Listbox & Options */
+/** \brief Documented */
 typedef struct cmp_f2_listbox_option_s {
+  /** \brief Documented */
   int is_selected;
+  /** \brief Documented */
   int is_disabled;
+  /** \brief Documented */
   cmp_ui_node_t *checkmark_node; /* Visible if selected */
+  /** \brief Documented */
   cmp_ui_node_t *content_node;
 } cmp_f2_listbox_option_t;
 
@@ -87,9 +107,12 @@ CMP_API int cmp_f2_listbox_create(cmp_ui_node_t **out_node);
  * @return 0 on success, or
  * an error code.
  */
-CMP_API int cmp_f2_listbox_option_create(cmp_ui_node_t **out_node, const char *label);
-CMP_API int cmp_f2_listbox_option_set_selected(cmp_ui_node_t *node, int is_selected);
-CMP_API int cmp_f2_listbox_option_set_disabled(cmp_ui_node_t *node, int is_disabled);
+CMP_API int cmp_f2_listbox_option_create(cmp_ui_node_t **out_node,
+                                         const char *label);
+CMP_API int cmp_f2_listbox_option_set_selected(cmp_ui_node_t *node,
+                                               int is_selected);
+CMP_API int cmp_f2_listbox_option_set_disabled(cmp_ui_node_t *node,
+                                               int is_disabled);
 
 /**
  * @brief Initialize a Fluent 2 listbox_group_create component.
@@ -99,15 +122,21 @@ CMP_API int cmp_f2_listbox_option_set_disabled(cmp_ui_node_t *node, int is_disab
  * an error code.
  */
 CMP_API int cmp_f2_listbox_group_create(cmp_ui_node_t **out_node,
-                                const char *header_label);
+                                        const char *header_label);
 
 /* 4.4 ColorPicker */
+/** \brief Documented */
 typedef struct cmp_f2_color_picker_s {
+  /** \brief Documented */
   uint32_t current_color; /* 0xAARRGGBB */
 
+  /** \brief Documented */
   cmp_ui_node_t *hue_slider_node;
+  /** \brief Documented */
   cmp_ui_node_t *sv_area_node;
+  /** \brief Documented */
   cmp_ui_node_t *alpha_slider_node;
+  /** \brief Documented */
   cmp_ui_node_t *hex_input_node;
 } cmp_f2_color_picker_t;
 
@@ -119,7 +148,7 @@ typedef struct cmp_f2_color_picker_s {
  * an error code.
  */
 CMP_API int cmp_f2_color_picker_create(cmp_ui_node_t **out_node,
-                               uint32_t initial_color);
+                                       uint32_t initial_color);
 CMP_API int cmp_f2_color_picker_set_color(cmp_ui_node_t *node, uint32_t color);
 
 /* 4.5 Calendar & DatePicker */
@@ -129,22 +158,35 @@ typedef enum cmp_f2_calendar_view {
   CMP_F2_CALENDAR_VIEW_DECADE
 } cmp_f2_calendar_view_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_calendar_s {
+  /** \brief Documented */
   cmp_f2_calendar_view_t view_mode;
+  /** \brief Documented */
   int selected_year;
+  /** \brief Documented */
   int selected_month;
+  /** \brief Documented */
   int selected_day;
 
+  /** \brief Documented */
   cmp_ui_node_t *header_node; /* Month/Year title and arrows */
-  cmp_ui_node_t *grid_node;   /* Days/Months/Years grid */
+  /** \brief Documented */
+  cmp_ui_node_t *grid_node; /* Days/Months/Years grid */
 } cmp_f2_calendar_t;
 
+/** \brief Documented */
 typedef struct cmp_f2_date_picker_s {
+  /** \brief Documented */
   int is_open;
+  /** \brief Documented */
   int is_disabled;
 
+  /** \brief Documented */
   cmp_ui_node_t *input_node;
+  /** \brief Documented */
   cmp_ui_node_t *calendar_flyout_node;
+  /** \brief Documented */
   cmp_ui_node_t *icon_node;
 } cmp_f2_date_picker_t;
 
@@ -156,8 +198,10 @@ typedef struct cmp_f2_date_picker_s {
  * an error code.
  */
 CMP_API int cmp_f2_calendar_create(cmp_ui_node_t **out_node);
-CMP_API int cmp_f2_calendar_set_view(cmp_ui_node_t *node, cmp_f2_calendar_view_t view);
-CMP_API int cmp_f2_calendar_set_date(cmp_ui_node_t *node, int year, int month, int day);
+CMP_API int cmp_f2_calendar_set_view(cmp_ui_node_t *node,
+                                     cmp_f2_calendar_view_t view);
+CMP_API int cmp_f2_calendar_set_date(cmp_ui_node_t *node, int year, int month,
+                                     int day);
 
 /**
  * @brief Initialize a Fluent 2 date_picker_create component.
@@ -170,13 +214,20 @@ CMP_API int cmp_f2_date_picker_create(cmp_ui_node_t **out_node);
 CMP_API int cmp_f2_date_picker_set_open(cmp_ui_node_t *node, int is_open);
 
 /* 4.6 TimePicker */
+/** \brief Documented */
 typedef struct cmp_f2_time_picker_s {
+  /** \brief Documented */
   int is_open;
+  /** \brief Documented */
   int selected_hour;
+  /** \brief Documented */
   int selected_minute;
+  /** \brief Documented */
   int is_pm;
 
+  /** \brief Documented */
   cmp_ui_node_t *trigger_node; /* Often a dropdown or spin button */
+  /** \brief Documented */
   cmp_ui_node_t *listbox_flyout_node;
 } cmp_f2_time_picker_t;
 
@@ -188,8 +239,8 @@ typedef struct cmp_f2_time_picker_s {
  * an error code.
  */
 CMP_API int cmp_f2_time_picker_create(cmp_ui_node_t **out_node);
-CMP_API int cmp_f2_time_picker_set_time(cmp_ui_node_t *node, int hour, int minute,
-                                int is_pm);
+CMP_API int cmp_f2_time_picker_set_time(cmp_ui_node_t *node, int hour,
+                                        int minute, int is_pm);
 
 #ifdef __cplusplus
 }

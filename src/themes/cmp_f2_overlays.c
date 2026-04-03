@@ -6,7 +6,7 @@
 /* clang-format on */
 
 CMP_API int cmp_f2_dialog_create(cmp_ui_node_t **out_node,
-                         cmp_f2_dialog_variant_t variant) {
+                                 cmp_f2_dialog_variant_t variant) {
   cmp_f2_dialog_t *data;
   int res;
 
@@ -46,7 +46,8 @@ CMP_API int cmp_f2_dialog_set_open(cmp_ui_node_t *node, int is_open) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_flyout_create(cmp_ui_node_t **out_node, cmp_ui_node_t *anchor) {
+CMP_API int cmp_f2_flyout_create(cmp_ui_node_t **out_node,
+                                 cmp_ui_node_t *anchor) {
   cmp_f2_flyout_t *data;
   int res;
 
@@ -74,7 +75,7 @@ CMP_API int cmp_f2_flyout_create(cmp_ui_node_t **out_node, cmp_ui_node_t *anchor
 }
 
 CMP_API int cmp_f2_flyout_set_placement(cmp_ui_node_t *node,
-                                cmp_f2_flyout_placement_t placement) {
+                                        cmp_f2_flyout_placement_t placement) {
   cmp_f2_flyout_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -92,8 +93,8 @@ CMP_API int cmp_f2_flyout_set_open(cmp_ui_node_t *node, int is_open) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_tooltip_create(cmp_ui_node_t **out_node, cmp_ui_node_t *anchor,
-                          const char *label) {
+CMP_API int cmp_f2_tooltip_create(cmp_ui_node_t **out_node,
+                                  cmp_ui_node_t *anchor, const char *label) {
   cmp_f2_tooltip_t *data;
   int res;
 
@@ -136,7 +137,7 @@ CMP_API int cmp_f2_tooltip_set_visible(cmp_ui_node_t *node, int is_visible) {
 }
 
 CMP_API int cmp_f2_toast_create(cmp_ui_node_t **out_node,
-                        cmp_f2_toast_intent_t intent) {
+                                cmp_f2_toast_intent_t intent) {
   cmp_f2_toast_t *data;
   int res;
 
@@ -177,7 +178,7 @@ CMP_API int cmp_f2_toast_set_visible(cmp_ui_node_t *node, int is_visible) {
 }
 
 CMP_API int cmp_f2_messagebar_create(cmp_ui_node_t **out_node,
-                             cmp_f2_toast_intent_t intent) {
+                                     cmp_f2_toast_intent_t intent) {
   cmp_f2_messagebar_t *data;
   int res;
 
@@ -203,7 +204,7 @@ CMP_API int cmp_f2_messagebar_create(cmp_ui_node_t **out_node,
 }
 
 CMP_API int cmp_f2_messagebar_set_variant(cmp_ui_node_t *node,
-                                  cmp_f2_messagebar_variant_t variant) {
+                                          cmp_f2_messagebar_variant_t variant) {
   cmp_f2_messagebar_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -249,7 +250,7 @@ CMP_API int cmp_f2_progress_ring_create(cmp_ui_node_t **out_node) {
 }
 
 CMP_API int cmp_f2_progress_set_variant(cmp_ui_node_t *node,
-                                cmp_f2_progress_variant_t variant) {
+                                        cmp_f2_progress_variant_t variant) {
   cmp_f2_progress_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -259,7 +260,7 @@ CMP_API int cmp_f2_progress_set_variant(cmp_ui_node_t *node,
 }
 
 CMP_API int cmp_f2_progress_set_state(cmp_ui_node_t *node,
-                              cmp_f2_progress_state_t state) {
+                                      cmp_f2_progress_state_t state) {
   cmp_f2_progress_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -278,7 +279,7 @@ CMP_API int cmp_f2_progress_set_value(cmp_ui_node_t *node, float value) {
 }
 
 CMP_API int cmp_f2_skeleton_create(cmp_ui_node_t **out_node,
-                           cmp_f2_skeleton_shape_t shape) {
+                                   cmp_f2_skeleton_shape_t shape) {
   cmp_f2_skeleton_t *data;
   int res;
 

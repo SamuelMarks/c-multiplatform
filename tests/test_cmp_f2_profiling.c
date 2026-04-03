@@ -22,7 +22,8 @@ TEST test_f2_valgrind_asan_run(void) {
     cmp_ui_node_add_child(datagrid, row);
   }
 
-  /* Freeing the root node should cascade without leaks or use-after-free faults. */
+  /* Freeing the root node should cascade without leaks or use-after-free
+   * faults. */
   cmp_ui_node_destroy(datagrid);
   PASS();
 }
@@ -43,7 +44,7 @@ TEST test_f2_60fps_benchmark(void) {
 
   res = cmp_compositor_anim_create(0, &anim);
   ASSERT_EQ(CMP_SUCCESS, res);
-  
+
   start_val.opacity = 0.0f;
   end_val.opacity = 1.0f;
   res = cmp_compositor_anim_set_range(anim, &start_val, &end_val);
@@ -67,10 +68,11 @@ TEST test_f2_virtualization_stress(void) {
 
   res = cmp_f2_datagrid_create(&datagrid);
   ASSERT_EQ(CMP_SUCCESS, res);
-  
-  /* Mock an immense set of data without generating millions of actual DOM nodes */
+
+  /* Mock an immense set of data without generating millions of actual DOM nodes
+   */
   /* This tests virtualization hooks without blowing up memory. */
-  datagrid->layout->height = 1000000.0f; 
+  datagrid->layout->height = 1000000.0f;
   cmp_layout_calculate(datagrid->layout, 800.0f, 600.0f);
   ASSERT_EQ(1000000.0f, datagrid->layout->height);
 
@@ -100,7 +102,7 @@ TEST test_f2_platform_windowing(void) {
   if (res == CMP_SUCCESS) {
     /* Verify creation triggers layout correctly */
     cmp_window_poll_events(win);
-    
+
     cmp_window_destroy(win);
   }
 

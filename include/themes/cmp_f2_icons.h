@@ -14,9 +14,13 @@ extern "C" {
  * @brief Represents an active icon instance dynamically scaling size and style.
  */
 typedef struct cmp_f2_icon_s {
+  /** \brief Documented */
   uint32_t codepoint_regular;
+  /** \brief Documented */
   uint32_t codepoint_filled;
+  /** \brief Documented */
   int is_filled; /* 0 = Regular, 1 = Filled */
+  /** \brief Documented */
   float size; /* Target bounding size (e.g. 10, 12, 16, 20, 24, 28, 32, 48) */
 } cmp_f2_icon_t;
 
@@ -36,8 +40,9 @@ typedef struct cmp_f2_icon_s {
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node, uint32_t codepoint_regular,
-                       uint32_t codepoint_filled, float size);
+CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node,
+                               uint32_t codepoint_regular,
+                               uint32_t codepoint_filled, float size);
 
 /**
  * @brief Triggers a state swap updating the visual representation of the icon.

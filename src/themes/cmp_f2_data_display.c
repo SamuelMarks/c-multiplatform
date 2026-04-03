@@ -5,8 +5,9 @@
 #include <stdlib.h>
 /* clang-format on */
 
-CMP_API int cmp_f2_avatar_create(cmp_ui_node_t **out_node, cmp_f2_avatar_size_t size,
-                         cmp_f2_avatar_shape_t shape) {
+CMP_API int cmp_f2_avatar_create(cmp_ui_node_t **out_node,
+                                 cmp_f2_avatar_size_t size,
+                                 cmp_f2_avatar_shape_t shape) {
   cmp_f2_avatar_t *data;
   int res;
 
@@ -38,7 +39,8 @@ CMP_API int cmp_f2_avatar_create(cmp_ui_node_t **out_node, cmp_f2_avatar_size_t 
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_avatar_set_initials(cmp_ui_node_t *node, const char *initials) {
+CMP_API int cmp_f2_avatar_set_initials(cmp_ui_node_t *node,
+                                       const char *initials) {
   cmp_f2_avatar_t *data;
   int res;
 
@@ -57,8 +59,8 @@ CMP_API int cmp_f2_avatar_set_initials(cmp_ui_node_t *node, const char *initials
 }
 
 CMP_API int cmp_f2_avatar_group_create(cmp_ui_node_t **out_node,
-                               cmp_f2_avatar_group_layout_t layout,
-                               int max_count) {
+                                       cmp_f2_avatar_group_layout_t layout,
+                                       int max_count) {
   cmp_f2_avatar_group_t *data;
   int res;
 
@@ -91,7 +93,7 @@ CMP_API int cmp_f2_avatar_group_create(cmp_ui_node_t **out_node,
 }
 
 CMP_API int cmp_f2_presence_badge_create(cmp_ui_node_t **out_node,
-                                 cmp_f2_presence_status_t status) {
+                                         cmp_f2_presence_status_t status) {
   cmp_f2_presence_badge_t *data;
   int res;
 
@@ -149,7 +151,7 @@ CMP_API int cmp_f2_badge_create(cmp_ui_node_t **out_node, const char *label) {
 }
 
 CMP_API int cmp_f2_badge_set_variant(cmp_ui_node_t *node,
-                             cmp_f2_badge_variant_t variant) {
+                                     cmp_f2_badge_variant_t variant) {
   cmp_f2_badge_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -158,7 +160,8 @@ CMP_API int cmp_f2_badge_set_variant(cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_badge_set_shape(cmp_ui_node_t *node, cmp_f2_badge_shape_t shape) {
+CMP_API int cmp_f2_badge_set_shape(cmp_ui_node_t *node,
+                                   cmp_f2_badge_shape_t shape) {
   cmp_f2_badge_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -168,7 +171,7 @@ CMP_API int cmp_f2_badge_set_shape(cmp_ui_node_t *node, cmp_f2_badge_shape_t sha
 }
 
 CMP_API int cmp_f2_tag_create(cmp_ui_node_t **out_node, const char *label,
-                      int is_dismissible) {
+                              int is_dismissible) {
   cmp_f2_tag_t *data;
   int res;
 
@@ -236,7 +239,8 @@ CMP_API int cmp_f2_datagrid_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_datagrid_row_create(cmp_ui_node_t **out_node, int is_header) {
+CMP_API int cmp_f2_datagrid_row_create(cmp_ui_node_t **out_node,
+                                       int is_header) {
   int res;
   if (!out_node)
     return CMP_ERROR_INVALID_ARG;
@@ -262,7 +266,8 @@ CMP_API int cmp_f2_tree_create(cmp_ui_node_t **out_node) {
   return res;
 }
 
-CMP_API int cmp_f2_tree_item_create(cmp_ui_node_t **out_node, const char *label) {
+CMP_API int cmp_f2_tree_item_create(cmp_ui_node_t **out_node,
+                                    const char *label) {
   cmp_f2_tree_item_t *data;
   int res;
 
@@ -297,7 +302,8 @@ CMP_API int cmp_f2_tree_item_create(cmp_ui_node_t **out_node, const char *label)
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_tree_item_set_expanded(cmp_ui_node_t *node, int is_expanded) {
+CMP_API int cmp_f2_tree_item_set_expanded(cmp_ui_node_t *node,
+                                          int is_expanded) {
   cmp_f2_tree_item_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
@@ -306,7 +312,8 @@ CMP_API int cmp_f2_tree_item_set_expanded(cmp_ui_node_t *node, int is_expanded) 
   return CMP_SUCCESS;
 }
 
-CMP_API int cmp_f2_tree_item_set_selected(cmp_ui_node_t *node, int is_selected) {
+CMP_API int cmp_f2_tree_item_set_selected(cmp_ui_node_t *node,
+                                          int is_selected) {
   cmp_f2_tree_item_t *data;
   if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;

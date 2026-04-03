@@ -64,7 +64,7 @@ static void cmp_f2_generate_ramp(uint32_t base_color,
 }
 
 CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
-                          cmp_f2_theme_t *out_theme) {
+                                  cmp_f2_theme_t *out_theme) {
   (void)is_dark; /* To be used when mapping semantic tokens or when altering
                     base tones */
 
@@ -588,9 +588,11 @@ CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
 }
 
 CMP_API int cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
-                             uint32_t highlight, uint32_t highlight_text,
-                             uint32_t button_face, uint32_t button_text,
-                             uint32_t gray_text, cmp_f2_theme_t *out_theme) {
+                                     uint32_t highlight,
+                                     uint32_t highlight_text,
+                                     uint32_t button_face, uint32_t button_text,
+                                     uint32_t gray_text,
+                                     cmp_f2_theme_t *out_theme) {
   (void)button_text;
 
   if (!out_theme) {

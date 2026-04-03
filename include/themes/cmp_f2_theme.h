@@ -14,21 +14,37 @@ extern "C" {
  * 160).
  */
 typedef struct cmp_f2_color_ramp_s {
+  /** \brief Documented */
   uint32_t step_10;
+  /** \brief Documented */
   uint32_t step_20;
+  /** \brief Documented */
   uint32_t step_30;
+  /** \brief Documented */
   uint32_t step_40;
+  /** \brief Documented */
   uint32_t step_50;
+  /** \brief Documented */
   uint32_t step_60;
+  /** \brief Documented */
   uint32_t step_70;
+  /** \brief Documented */
   uint32_t step_80;
+  /** \brief Documented */
   uint32_t step_90;
+  /** \brief Documented */
   uint32_t step_100;
+  /** \brief Documented */
   uint32_t step_110;
+  /** \brief Documented */
   uint32_t step_120;
+  /** \brief Documented */
   uint32_t step_130;
+  /** \brief Documented */
   uint32_t step_140;
+  /** \brief Documented */
   uint32_t step_150;
+  /** \brief Documented */
   uint32_t step_160;
 } cmp_f2_color_ramp_t;
 
@@ -36,11 +52,17 @@ typedef struct cmp_f2_color_ramp_s {
  * @brief Represents a Fluent 2 composite shadow (ambient + directional/key).
  */
 typedef struct cmp_f2_shadow_s {
+  /** \brief Documented */
   float y1;
+  /** \brief Documented */
   float blur1;
+  /** \brief Documented */
   uint32_t color1; /* ARGB format 0xAARRGGBB */
+  /** \brief Documented */
   float y2;
+  /** \brief Documented */
   float blur2;
+  /** \brief Documented */
   uint32_t color2; /* ARGB format 0xAARRGGBB */
 } cmp_f2_shadow_t;
 
@@ -49,264 +71,466 @@ typedef struct cmp_f2_shadow_s {
  */
 typedef struct cmp_f2_theme_s {
   /* Global Neutral Palette */
+  /** \brief Documented */
   uint32_t neutral_10;
+  /** \brief Documented */
   uint32_t neutral_12;
+  /** \brief Documented */
   uint32_t neutral_14;
+  /** \brief Documented */
   uint32_t neutral_16;
+  /** \brief Documented */
   uint32_t neutral_20;
+  /** \brief Documented */
   uint32_t neutral_22;
+  /** \brief Documented */
   uint32_t neutral_24;
+  /** \brief Documented */
   uint32_t neutral_26;
+  /** \brief Documented */
   uint32_t neutral_28;
+  /** \brief Documented */
   uint32_t neutral_30;
+  /** \brief Documented */
   uint32_t neutral_32;
+  /** \brief Documented */
   uint32_t neutral_34;
+  /** \brief Documented */
   uint32_t neutral_36;
+  /** \brief Documented */
   uint32_t neutral_38;
+  /** \brief Documented */
   uint32_t neutral_40;
+  /** \brief Documented */
   uint32_t neutral_42;
+  /** \brief Documented */
   uint32_t neutral_44;
+  /** \brief Documented */
   uint32_t neutral_46;
+  /** \brief Documented */
   uint32_t neutral_48;
+  /** \brief Documented */
   uint32_t neutral_50;
+  /** \brief Documented */
   uint32_t neutral_60;
+  /** \brief Documented */
   uint32_t neutral_70;
+  /** \brief Documented */
   uint32_t neutral_80;
+  /** \brief Documented */
   uint32_t neutral_90;
+  /** \brief Documented */
   uint32_t neutral_100;
 
   /* Global Brand Palette */
+  /** \brief Documented */
   cmp_f2_color_ramp_t brand;
 
   /* Global Shared Palettes */
+  /** \brief Documented */
   cmp_f2_color_ramp_t red;
+  /** \brief Documented */
   cmp_f2_color_ramp_t dark_red;
+  /** \brief Documented */
   cmp_f2_color_ramp_t cranberry;
+  /** \brief Documented */
   cmp_f2_color_ramp_t pumpkin;
+  /** \brief Documented */
   cmp_f2_color_ramp_t peach;
+  /** \brief Documented */
   cmp_f2_color_ramp_t marigold;
+  /** \brief Documented */
   cmp_f2_color_ramp_t yellow;
+  /** \brief Documented */
   cmp_f2_color_ramp_t gold;
+  /** \brief Documented */
   cmp_f2_color_ramp_t brass;
+  /** \brief Documented */
   cmp_f2_color_ramp_t brown;
+  /** \brief Documented */
   cmp_f2_color_ramp_t forest;
+  /** \brief Documented */
   cmp_f2_color_ramp_t seafoam;
+  /** \brief Documented */
   cmp_f2_color_ramp_t dark_green;
+  /** \brief Documented */
   cmp_f2_color_ramp_t light_teal;
+  /** \brief Documented */
   cmp_f2_color_ramp_t teal;
+  /** \brief Documented */
   cmp_f2_color_ramp_t steel;
+  /** \brief Documented */
   cmp_f2_color_ramp_t blue;
+  /** \brief Documented */
   cmp_f2_color_ramp_t royal_blue;
+  /** \brief Documented */
   cmp_f2_color_ramp_t cornflower;
+  /** \brief Documented */
   cmp_f2_color_ramp_t navy;
+  /** \brief Documented */
   cmp_f2_color_ramp_t lavender;
+  /** \brief Documented */
   cmp_f2_color_ramp_t purple;
+  /** \brief Documented */
   cmp_f2_color_ramp_t grape;
+  /** \brief Documented */
   cmp_f2_color_ramp_t berry;
+  /** \brief Documented */
   cmp_f2_color_ramp_t pink;
+  /** \brief Documented */
   cmp_f2_color_ramp_t magenta;
+  /** \brief Documented */
   cmp_f2_color_ramp_t plum;
 
   /* Layering Tokens */
+  /** \brief Documented */
   uint32_t color_neutral_background_1;
+  /** \brief Documented */
   uint32_t color_neutral_background_1_hover;
+  /** \brief Documented */
   uint32_t color_neutral_background_1_pressed;
+  /** \brief Documented */
   uint32_t color_neutral_background_1_selected;
 
+  /** \brief Documented */
   uint32_t color_neutral_background_2;
+  /** \brief Documented */
   uint32_t color_neutral_background_2_hover;
+  /** \brief Documented */
   uint32_t color_neutral_background_2_pressed;
+  /** \brief Documented */
   uint32_t color_neutral_background_2_selected;
 
+  /** \brief Documented */
   uint32_t color_neutral_background_3;
+  /** \brief Documented */
   uint32_t color_neutral_background_3_hover;
+  /** \brief Documented */
   uint32_t color_neutral_background_3_pressed;
+  /** \brief Documented */
   uint32_t color_neutral_background_3_selected;
 
+  /** \brief Documented */
   uint32_t color_neutral_background_4;
+  /** \brief Documented */
   uint32_t color_neutral_background_4_hover;
+  /** \brief Documented */
   uint32_t color_neutral_background_4_pressed;
+  /** \brief Documented */
   uint32_t color_neutral_background_4_selected;
 
+  /** \brief Documented */
   uint32_t color_neutral_background_5;
+  /** \brief Documented */
   uint32_t color_neutral_background_5_hover;
+  /** \brief Documented */
   uint32_t color_neutral_background_5_pressed;
+  /** \brief Documented */
   uint32_t color_neutral_background_5_selected;
 
+  /** \brief Documented */
   uint32_t color_neutral_background_6;
 
   /* Surface Tokens */
+  /** \brief Documented */
   uint32_t color_transparent_background;
+  /** \brief Documented */
   uint32_t color_transparent_background_hover;
+  /** \brief Documented */
   uint32_t color_transparent_background_pressed;
+  /** \brief Documented */
   uint32_t color_transparent_background_selected;
 
   /* Foreground Tokens */
+  /** \brief Documented */
   uint32_t color_neutral_foreground_1;
+  /** \brief Documented */
   uint32_t color_neutral_foreground_2;
+  /** \brief Documented */
   uint32_t color_neutral_foreground_3;
+  /** \brief Documented */
   uint32_t color_neutral_foreground_4;
+  /** \brief Documented */
   uint32_t color_neutral_foreground_static_inverted;
 
   /* Brand Tokens */
+  /** \brief Documented */
   uint32_t color_brand_background;
+  /** \brief Documented */
   uint32_t color_brand_background_hover;
+  /** \brief Documented */
   uint32_t color_brand_background_pressed;
+  /** \brief Documented */
   uint32_t color_brand_background_selected;
+  /** \brief Documented */
   uint32_t color_brand_foreground_1;
+  /** \brief Documented */
   uint32_t color_brand_foreground_2;
 
   /* Stroke Tokens */
+  /** \brief Documented */
   uint32_t color_neutral_stroke_1;
+  /** \brief Documented */
   uint32_t color_neutral_stroke_2;
+  /** \brief Documented */
   uint32_t color_neutral_stroke_accessible;
 
   /* Focus Tokens */
+  /** \brief Documented */
   uint32_t color_stroke_focus_1;
+  /** \brief Documented */
   uint32_t color_stroke_focus_2;
 
   /* Status Tokens */
+  /** \brief Documented */
   uint32_t color_success_background;
+  /** \brief Documented */
   uint32_t color_success_foreground;
+  /** \brief Documented */
   uint32_t color_success_stroke;
 
+  /** \brief Documented */
   uint32_t color_warning_background;
+  /** \brief Documented */
   uint32_t color_warning_foreground;
+  /** \brief Documented */
   uint32_t color_warning_stroke;
 
+  /** \brief Documented */
   uint32_t color_danger_background;
+  /** \brief Documented */
   uint32_t color_danger_foreground;
+  /** \brief Documented */
   uint32_t color_danger_stroke;
 
+  /** \brief Documented */
   uint32_t color_severe_warning_background;
+  /** \brief Documented */
   uint32_t color_severe_warning_foreground;
+  /** \brief Documented */
   uint32_t color_severe_warning_stroke;
 
+  /** \brief Documented */
   uint32_t color_info_background;
+  /** \brief Documented */
   uint32_t color_info_foreground;
+  /** \brief Documented */
   uint32_t color_info_stroke;
   /* Alpha/Transparent Colors */
+  /** \brief Documented */
   uint32_t color_neutral_background_alpha;
+  /** \brief Documented */
   uint32_t color_brand_background_alpha;
 
   /* Typography Tokens */
+  /** \brief Documented */
   const char *font_family_base;
+  /** \brief Documented */
   const char *font_family_monospace;
+  /** \brief Documented */
   const char *font_family_numeric;
 
+  /** \brief Documented */
   uint16_t font_weight_regular;
+  /** \brief Documented */
   uint16_t font_weight_medium;
+  /** \brief Documented */
   uint16_t font_weight_semibold;
+  /** \brief Documented */
   uint16_t font_weight_bold;
 
+  /** \brief Documented */
   float font_size_caption_2;
+  /** \brief Documented */
   float line_height_caption_2;
+  /** \brief Documented */
   float font_size_caption_1;
+  /** \brief Documented */
   float line_height_caption_1;
 
+  /** \brief Documented */
   float font_size_body_1;
+  /** \brief Documented */
   float line_height_body_1;
+  /** \brief Documented */
   float font_size_body_2;
+  /** \brief Documented */
   float line_height_body_2;
 
+  /** \brief Documented */
   float font_size_subtitle_1;
+  /** \brief Documented */
   float line_height_subtitle_1;
+  /** \brief Documented */
   float font_size_subtitle_2;
+  /** \brief Documented */
   float line_height_subtitle_2;
 
+  /** \brief Documented */
   float font_size_title_1;
+  /** \brief Documented */
   float line_height_title_1;
+  /** \brief Documented */
   float font_size_title_2;
+  /** \brief Documented */
   float line_height_title_2;
+  /** \brief Documented */
   float font_size_title_3;
+  /** \brief Documented */
   float line_height_title_3;
 
+  /** \brief Documented */
   float font_size_display;
+  /** \brief Documented */
   float line_height_display;
 
   /* Letter Spacing (Tracking) */
+  /** \brief Documented */
   float letter_spacing_caption_2;
+  /** \brief Documented */
   float letter_spacing_caption_1;
+  /** \brief Documented */
   float letter_spacing_body_1;
+  /** \brief Documented */
   float letter_spacing_body_2;
+  /** \brief Documented */
   float letter_spacing_subtitle_1;
+  /** \brief Documented */
   float letter_spacing_subtitle_2;
+  /** \brief Documented */
   float letter_spacing_title_1;
+  /** \brief Documented */
   float letter_spacing_title_2;
+  /** \brief Documented */
   float letter_spacing_title_3;
+  /** \brief Documented */
   float letter_spacing_display;
 
   /* Optical Sizing support mappings */
+  /** \brief Documented */
   const char *font_family_optical_display;
+  /** \brief Documented */
   const char *font_family_optical_text;
+  /** \brief Documented */
   const char *font_family_optical_small;
 
   /* Spacing Tokens */
+  /** \brief Documented */
   float spacing_none;
+  /** \brief Documented */
   float spacing_xxs;
+  /** \brief Documented */
   float spacing_xs;
+  /** \brief Documented */
   float spacing_s;
+  /** \brief Documented */
   float spacing_m;
+  /** \brief Documented */
   float spacing_l;
+  /** \brief Documented */
   float spacing_xl;
+  /** \brief Documented */
   float spacing_xxl;
+  /** \brief Documented */
   float spacing_xxxl;
+  /** \brief Documented */
   float spacing_max;
 
   /* Shape, Borders & Corner Radius */
+  /** \brief Documented */
   float radius_none;
+  /** \brief Documented */
   float radius_small;
+  /** \brief Documented */
   float radius_medium;
+  /** \brief Documented */
   float radius_large;
+  /** \brief Documented */
   float radius_xlarge;
+  /** \brief Documented */
   float radius_xxlarge;
+  /** \brief Documented */
   float radius_circular;
 
   /* Stroke Widths */
+  /** \brief Documented */
   float stroke_width_thin;
+  /** \brief Documented */
   float stroke_width_thick;
+  /** \brief Documented */
   float stroke_width_thicker;
+  /** \brief Documented */
   float stroke_width_thickest;
 
   /* Focus Rings */
+  /** \brief Documented */
   float focus_ring_inner_width;
+  /** \brief Documented */
   float focus_ring_outer_width;
+  /** \brief Documented */
   float focus_ring_offset;
 
   /* Motion & Animation: Durations (ms) */
+  /** \brief Documented */
   float duration_ultra_fast;
+  /** \brief Documented */
   float duration_faster;
+  /** \brief Documented */
   float duration_fast;
+  /** \brief Documented */
   float duration_normal;
+  /** \brief Documented */
   float duration_gentle;
+  /** \brief Documented */
   float duration_slow;
+  /** \brief Documented */
   float duration_slower;
 
   /* Motion & Animation: Easing Curves (Cubic Bezier control points: x1, y1, x2,
    * y2) */
+  /** \brief Documented */
   float ease_linear[4];
+  /** \brief Documented */
   float ease_accelerate_max[4];
+  /** \brief Documented */
   float ease_accelerate_mid[4];
+  /** \brief Documented */
   float ease_accelerate_min[4];
+  /** \brief Documented */
   float ease_decelerate_max[4];
+  /** \brief Documented */
   float ease_decelerate_mid[4];
+  /** \brief Documented */
   float ease_decelerate_min[4];
+  /** \brief Documented */
   float ease_max_standard[4];
+  /** \brief Documented */
   float ease_standard[4];
 
   /* Elevation & Shadows */
+  /** \brief Documented */
   cmp_f2_shadow_t shadow_2;
+  /** \brief Documented */
   cmp_f2_shadow_t shadow_4;
+  /** \brief Documented */
   cmp_f2_shadow_t shadow_8;
+  /** \brief Documented */
   cmp_f2_shadow_t shadow_16;
+  /** \brief Documented */
   cmp_f2_shadow_t shadow_28;
+  /** \brief Documented */
   cmp_f2_shadow_t shadow_64;
 
   /* Materials */
+  /** \brief Documented */
   uint32_t material_mica_background;
+  /** \brief Documented */
   uint32_t material_mica_alt_background;
+  /** \brief Documented */
   uint32_t material_acrylic_background;
+  /** \brief Documented */
   float material_acrylic_blur;
+  /** \brief Documented */
   uint32_t material_acrylic_fallback;
 } cmp_f2_theme_t;
 
@@ -320,7 +544,7 @@ typedef struct cmp_f2_theme_s {
  * @return CMP_SUCCESS on success, or an error code.
  */
 CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
-                          cmp_f2_theme_t *out_theme);
+                                  cmp_f2_theme_t *out_theme);
 
 /**
  * @brief Generates High Contrast tokens based on OS provided system colors.
@@ -336,9 +560,11 @@ CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
  * @return CMP_SUCCESS on success, or an error code.
  */
 CMP_API int cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
-                             uint32_t highlight, uint32_t highlight_text,
-                             uint32_t button_face, uint32_t button_text,
-                             uint32_t gray_text, cmp_f2_theme_t *out_theme);
+                                     uint32_t highlight,
+                                     uint32_t highlight_text,
+                                     uint32_t button_face, uint32_t button_text,
+                                     uint32_t gray_text,
+                                     cmp_f2_theme_t *out_theme);
 
 #ifdef __cplusplus
 }
