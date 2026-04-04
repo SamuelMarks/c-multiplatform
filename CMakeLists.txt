@@ -184,7 +184,7 @@ FetchContent_Declare(c_str_span GIT_REPOSITORY https://github.com/SamuelMarks/c-
 FetchContent_MakeAvailable(c_str_span)
 
 # parson (Not in vcpkg)
-FetchContent_Declare(parson GIT_REPOSITORY https://github.com/kgabis/parson.git GIT_TAG master
+FetchContent_Declare(parson GIT_REPOSITORY https://github.com/SamuelMarks/parson.git GIT_TAG master
     UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
     )
 FetchContent_MakeAvailable(parson)
@@ -265,7 +265,9 @@ endif()
 if(OPENSSL_FOUND)
     set(OPENSSL_ROOT_DIR "${OPENSSL_INCLUDE_DIRS}/..")
     set(OpenSSL_DIR "${OPENSSL_ROOT_DIR}")
-    set(C_ABSTRACT_HTTP_USE_OPENSSL ON CACHE BOOL "Use OpenSSL for cryptography" FORCE)
+    if(NOT WIN32 AND NOT MINGW AND NOT CYGWIN)
+        set(C_ABSTRACT_HTTP_USE_OPENSSL ON CACHE BOOL "Use OpenSSL for cryptography" FORCE)
+    endif()
 endif()
 
 if(NOT APPLE AND NOT WIN32 AND NOT MINGW AND NOT CYGWIN)

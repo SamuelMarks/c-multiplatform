@@ -22,5 +22,6 @@ endif()
 
 add_subdirectory(kotlin-multiplatform)
 add_subdirectory(google-material-android)
+add_subdirectory(google/material-catalog)
 add_subdirectory(apple-cupertino-ios)
 add_subdirectory(microsoft-fluent-2)
