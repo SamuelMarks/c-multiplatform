@@ -1,13 +1,15 @@
 C multiplatform (libcmp)
 ========================
 
-[![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Test Coverage](docs/badges/test-coverage.svg)](docs/badges/test-coverage.svg) [![Doc Coverage](docs/badges/doc-coverage.svg)](docs/badges/doc-coverage.svg)
 
 **Purpose:** The main entry point and overview of the LibCMPC project.
 
 **Current State:** **LibCMPC** is a strict C89 (ANSI C) cross-platform application framework. Following a strategic rewrite, it provides a highly cohesive, monolithic core for building modality-agnostic GUI applications in native C. It integrates best-in-class sibling libraries for networking, file systems, and databases, while maintaining zero external dependencies for its core rendering and layout engines.
 
 **Upcoming Features:** The rendering and UI systems are currently being expanded to natively support **Google Material 3**, **Apple Cupertino / HIG**, and **Microsoft Fluent 2** design systems out-of-the-box.
+
+**Next Stage in Roadmap:** The immediate next stage in our roadmap is **replicating ALL sample apps from Apple, Google, and Microsoft**. This massive undertaking will validate our design system implementations, ensure pixel-perfect compliance, and provide developers with real-world reference architectures.
 
 This project is architected specifically for **Context-Window Scalability**, utilizing an amalgamated header design (`cmp.h`) that makes the codebase distinctively friendly for LLM-assisted coding and maintenance.
 
