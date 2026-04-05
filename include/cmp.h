@@ -1120,10 +1120,14 @@ typedef enum cmp_action {
 } cmp_action_t;
 
 /**
- * @brief Normalized Multi-modal Input Event Structure
+ * @brief Multi-modal Input Event Structure
  */
+#define CMP_EVENT_TYPE_MOUSE 1
+#define CMP_EVENT_TYPE_TOUCH 2
+#define CMP_EVENT_TYPE_KEYBOARD 3
+
 typedef struct cmp_event {
-  uint32_t type; /* e.g. MOUSE, TOUCH, KEYBOARD */
+  uint32_t type; /* e.g. CMP_EVENT_TYPE_MOUSE */
   cmp_action_t action;
   int x;
   int y;
@@ -3141,6 +3145,7 @@ typedef struct cmp_layout_node {
   cmp_flex_wrap_t flex_wrap;
   cmp_flex_align_t justify_content;
   cmp_flex_align_t align_items;
+  cmp_flex_align_t align_self;
   cmp_position_type_t position_type;
 
   /* Style constraints */
@@ -3178,6 +3183,9 @@ typedef struct cmp_layout_node {
   struct cmp_layout_node **children;
   size_t child_count;
   size_t child_capacity;
+  uint32_t bg_color;
+  uint32_t text_color;
+  float font_size;
 } cmp_layout_node_t;
 
 /**
@@ -3277,12 +3285,28 @@ struct cmp_ui_node {
   struct cmp_ui_node **children;
   size_t child_count;
   size_t child_capacity;
+  uint32_t bg_color;
+  uint32_t text_color;
+  float font_size;
+
+  struct cmp_event_listener_node *event_listeners;
 
   unsigned int design_language_override : 3; /* 0=Inherit, 1=Material3,
                                            2=Fluent2, 3=Cupertino, 4=Unstyled */
   unsigned int
       density_override : 2; /* 0=Inherit, 1=Compact, 2=Standard, 3=Relaxed */
 };
+
+/**
+ * @brief Represents an attached event listener on a UI node
+ */
+typedef struct cmp_event_listener_node {
+  uint32_t event_type;
+  int capture;
+  void (*callback)(cmp_event_t *, struct cmp_ui_node *, void *);
+  void *user_data;
+  struct cmp_event_listener_node *next;
+} cmp_event_listener_node_t;
 
 /**
  * @brief Initialize a base UI box component (container)
@@ -4619,6 +4643,9 @@ typedef struct cmp_stack_ctx {
   struct cmp_stack_ctx **children;
   size_t child_count;
   size_t child_capacity;
+  uint32_t bg_color;
+  uint32_t text_color;
+  float font_size;
 } cmp_stack_ctx_t;
 
 typedef enum cmp_popover_state {
@@ -4631,6 +4658,9 @@ struct cmp_layer {
   struct cmp_layer **children;
   size_t child_count;
   size_t child_capacity;
+  uint32_t bg_color;
+  uint32_t text_color;
+  float font_size;
 };
 typedef struct cmp_layer cmp_layer_t;
 
@@ -5430,6 +5460,9 @@ typedef struct cmp_svg_node {
   struct cmp_svg_node **children;
   size_t child_count;
   size_t child_capacity;
+  uint32_t bg_color;
+  uint32_t text_color;
+  float font_size;
 } cmp_svg_node_t;
 
 /**
@@ -10115,6 +10148,1767 @@ int cmp_app_store_mock_init(void);
  * @return A pointer to the correct theme VTable.
  */
 const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node);
+
+/* --- From a11y_theme.h --- */
+/**
+ * \brief Types of simulated color blindness for the application's palettes.
+ */
+typedef enum {
+  CMP_COLOR_BLIND_NONE = 0,
+  CMP_COLOR_BLIND_PROTANOPIA,   /* Red-blind */
+  CMP_COLOR_BLIND_DEUTERANOPIA, /* Green-blind */
+  CMP_COLOR_BLIND_TRITANOPIA    /* Blue-blind */
+} cmp_color_blind_type_t;
+
+/**
+ * \brief Contains application theme colors, dynamically adjusted based on A11y.
+ */
+typedef struct {
+  int is_high_contrast;
+
+  /* Basic palette */
+  cmp_color_t background;
+  cmp_color_t foreground;
+  cmp_color_t primary_accent;
+  cmp_color_t error_text;
+} cmp_a11y_theme_t;
+
+/**
+ * \brief Initializes A11Y theme context.
+ * \return 0 on success.
+ */
+int cmp_a11y_theme_init(void);
+
+/**
+ * \brief Cleans up A11Y theme context.
+ * \return 0 on success.
+ */
+int cmp_a11y_theme_cleanup(void);
+
+/**
+ * \brief Triggers an OS query to detect if High Contrast Mode is enabled.
+ * \return 1 if enabled, 0 if disabled or undetected.
+ */
+int cmp_a11y_detect_high_contrast(void);
+
+/**
+ * \brief Updates the application theme palette, applying High Contrast
+ * overrides and selected Color Blindness shifts if active.
+ * \param type The color blindness simulation target.
+ * \param out_theme Pointer to receive the adjusted theme.
+ * \return 0 on success.
+ */
+int cmp_a11y_build_theme(cmp_color_blind_type_t type,
+                         cmp_a11y_theme_t *out_theme);
+
+/* --- From android_ndk_bridge.h --- */
+/**
+ * @brief Context for bridging Android NDK events to the native C core.
+ */
+typedef struct cmp_android_ndk_bridge cmp_android_ndk_bridge_t;
+
+/**
+ * @brief Creates the Android NDK bridge manager.
+ * @param out_bridge Pointer to receive the manager instance.
+ * @return 0 on success.
+ */
+int cmp_android_ndk_bridge_create(cmp_android_ndk_bridge_t **out_bridge);
+
+/**
+ * @brief Destroys the Android NDK bridge manager.
+ * @param bridge The manager.
+ * @return 0 on success.
+ */
+int cmp_android_ndk_bridge_destroy(cmp_android_ndk_bridge_t *bridge);
+
+/**
+ * @brief Ticks the NDK event loop, pumping input events and vsync into
+ *        the shared application state.
+ * @param bridge The manager.
+ * @param delta_time Time elapsed since last frame.
+ * @return 0 on success.
+ */
+int cmp_android_ndk_bridge_tick(cmp_android_ndk_bridge_t *bridge,
+                                float delta_time);
+
+/* --- From android_scoped_storage.h --- */
+/**
+ * @brief Manager context for Android Scoped Storage operations via JNI.
+ */
+typedef struct cmp_android_storage cmp_android_storage_t;
+
+/**
+ * @brief Creates the Android Scoped Storage manager.
+ * @param out_storage Pointer to receive the manager instance.
+ * @return 0 on success.
+ */
+int cmp_android_storage_create(cmp_android_storage_t **out_storage);
+
+/**
+ * @brief Destroys the Android Scoped Storage manager.
+ * @param storage The manager to destroy.
+ * @return 0 on success.
+ */
+int cmp_android_storage_destroy(cmp_android_storage_t *storage);
+
+/**
+ * @brief Prompts the user to select a directory via the Android Storage Access
+ * Framework (SAF) Action Open Document Tree intent, granting persistent URI
+ * permissions.
+ * @param storage The manager.
+ * @param out_uri_string Pointer to receive the granted persistent URI string
+ * (must be freed).
+ * @return 0 on success.
+ */
+int cmp_android_storage_request_tree_access(cmp_android_storage_t *storage,
+                                            char **out_uri_string);
+
+/**
+ * @brief Checks if a specific Scoped Storage URI is fully accessible
+ * (read/write) via DocumentFile.
+ * @param storage The manager.
+ * @param uri_string The URI string returned from SAF.
+ * @param out_can_write Pointer to receive 1 if accessible, 0 otherwise.
+ * @return 0 on success.
+ */
+int cmp_android_storage_check_access(cmp_android_storage_t *storage,
+                                     const char *uri_string,
+                                     int *out_can_write);
+
+/* --- From android_vulkan_gles.h --- */
+/**
+ * @brief Context for managing Vulkan and OpenGL ES 3.0 rendering contexts on
+ * Android.
+ */
+typedef struct cmp_android_renderer cmp_android_renderer_t;
+
+/**
+ * @brief Creates the Android renderer context.
+ * @param out_renderer Pointer to receive the context.
+ * @return 0 on success.
+ */
+int cmp_android_renderer_create(cmp_android_renderer_t **out_renderer);
+
+/**
+ * @brief Destroys the Android renderer context.
+ * @param renderer The context.
+ * @return 0 on success.
+ */
+int cmp_android_renderer_destroy(cmp_android_renderer_t *renderer);
+
+/**
+ * @brief Attempts to initialize a Vulkan instance and swapchain.
+ *        Falls back gracefully to OpenGL ES 3.0 if Vulkan is unavailable.
+ * @param renderer The context.
+ * @param window The target cross-platform window.
+ * @param out_backend Pointer to receive the successfully initialized backend
+ * enum.
+ * @return 0 on success.
+ */
+int cmp_android_renderer_initialize_fallback(cmp_android_renderer_t *renderer,
+                                             cmp_window_t *window,
+                                             int *out_backend);
+
+/* --- From apple_gestures.h --- */
+/**
+ * @brief Manages Apple-specific multi-touch trackpad and screen gestures.
+ */
+typedef struct cmp_apple_gestures cmp_apple_gestures_t;
+
+/**
+ * @brief Creates the Apple gestures manager.
+ * @param out_gestures Pointer to receive the manager.
+ * @return 0 on success, or a CMP_ERROR code.
+ */
+int cmp_apple_gestures_create(cmp_apple_gestures_t **out_gestures);
+
+/**
+ * @brief Destroys the Apple gestures manager.
+ * @param gestures The manager.
+ * @return 0 on success.
+ */
+int cmp_apple_gestures_destroy(cmp_apple_gestures_t *gestures);
+
+/**
+ * @brief Enables native Trackpad pinch-to-zoom, fluid swipe, and rotation
+ * gestures for the target window's view hierarchy.
+ * @param gestures The manager.
+ * @param window The cross-platform window pointer.
+ * @param enable_pinch 1 to enable semantic pinch-to-zoom, 0 to disable.
+ * @param enable_rotation 1 to enable semantic rotation, 0 to disable.
+ * @param enable_swipe 1 to enable fluid two-finger swipe, 0 to disable.
+ * @return 0 on success.
+ */
+int cmp_apple_gestures_enable(cmp_apple_gestures_t *gestures,
+                              cmp_window_t *window, int enable_pinch,
+                              int enable_rotation, int enable_swipe);
+
+/* --- From background_blur.h --- */
+/**
+ * @brief Context for managing cross-platform window background blur.
+ *        Wraps NSVisualEffectView, UIVisualEffectView,
+ *        DwmEnableBlurBehindWindow, _KDE_NET_WM_BLUR_BEHIND, and
+ *        RenderEffect.createBlurEffect.
+ */
+typedef struct cmp_background_blur cmp_background_blur_t;
+
+/**
+ * @brief Creates the background blur manager.
+ * @param out_blur Pointer to receive the manager instance.
+ * @return 0 on success, or a CMP_ERROR code.
+ */
+int cmp_background_blur_create(cmp_background_blur_t **out_blur);
+
+/**
+ * @brief Destroys the background blur manager.
+ * @param blur The manager to destroy.
+ * @return 0 on success.
+ */
+int cmp_background_blur_destroy(cmp_background_blur_t *blur);
+
+/**
+ * @brief Enables or disables background blur for a specified window.
+ * @param blur The blur manager.
+ * @param window The cross-platform window instance.
+ * @param enabled 1 to enable blur, 0 to disable.
+ * @return 0 on success.
+ */
+int cmp_background_blur_set_enabled(cmp_background_blur_t *blur,
+                                    cmp_window_t *window, int enabled);
+
+/**
+ * @brief Queries if background blur is currently enabled for a window.
+ * @param blur The blur manager.
+ * @param window The cross-platform window instance.
+ * @param out_enabled Pointer to receive 1 if enabled, 0 otherwise.
+ * @return 0 on success.
+ */
+int cmp_background_blur_is_enabled(const cmp_background_blur_t *blur,
+                                   const cmp_window_t *window,
+                                   int *out_enabled);
+
+/* --- From breadcrumbs.h --- */
+/**
+ * \brief Breadcrumb path segment item.
+ */
+typedef struct cmp_breadcrumb {
+  char label[128];
+  int is_active;
+} cmp_breadcrumb_t;
+
+/**
+ * \brief Breadcrumb UI Navigation state container.
+ */
+typedef struct cmp_breadcrumbs cmp_breadcrumbs_t;
+
+/**
+ * \brief Create a new breadcrumb navigation context.
+ * \return 0 on success.
+ */
+int cmp_breadcrumbs_create(cmp_breadcrumbs_t **out_crumbs);
+
+/**
+ * \brief Destroy breadcrumbs context.
+ * \return 0 on success.
+ */
+int cmp_breadcrumbs_destroy(cmp_breadcrumbs_t *crumbs);
+
+/**
+ * \brief Set the active file path, updating the UI navigation path hierarchy.
+ * \param crumbs Breadcrumbs context.
+ * \param full_path Path string (e.g. "src/main/editor.c").
+ * \return 0 on success.
+ */
+int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path);
+
+/**
+ * \brief Get total count of breadcrumb segments parsed from the last set_path.
+ * \return 0 on success.
+ */
+int cmp_breadcrumbs_get_count(const cmp_breadcrumbs_t *crumbs,
+                              size_t *out_count);
+
+/**
+ * \brief Access an individual breadcrumb label in the path.
+ * \return 0 on success.
+ */
+int cmp_breadcrumbs_get_segment(const cmp_breadcrumbs_t *crumbs, size_t index,
+                                cmp_breadcrumb_t **out_segment);
+
+/* --- From code_block.h --- */
+/**
+ * \brief Advanced Code Block UI component container.
+ */
+typedef struct cmp_code_block cmp_code_block_t;
+
+/**
+ * \brief Create a code block view component wrapper.
+ * \return 0 on success.
+ */
+int cmp_code_block_create(cmp_code_block_t **out_block);
+
+/**
+ * \brief Destroy code block view.
+ * \return 0 on success.
+ */
+int cmp_code_block_destroy(cmp_code_block_t *block);
+
+/**
+ * \brief Toggles the expanded/collapsed state (code folding).
+ * \return 0 on success.
+ */
+int cmp_code_block_toggle_fold(cmp_code_block_t *block);
+
+/**
+ * \brief Queries whether the code block is currently expanded (1) or collapsed
+ * (0).
+ * \return 0 on success.
+ */
+int cmp_code_block_is_expanded(const cmp_code_block_t *block,
+                               int *out_is_expanded);
+
+/**
+ * \brief Injects a token-level highlight to bind a code block symbol to an
+ * original prompt reference.
+ * \return 0 on success.
+ */
+int cmp_code_block_add_reference_highlight(cmp_code_block_t *block,
+                                           size_t offset, size_t length,
+                                           const char *reference_id);
+
+/* --- From code_block_clipboard.h --- */
+/**
+ * \brief Represents the state of the clipboard overlay button.
+ */
+typedef enum {
+  CMP_CLIPBOARD_STATE_IDLE = 0,
+  CMP_CLIPBOARD_STATE_HOVERED,
+  CMP_CLIPBOARD_STATE_COPIED
+} cmp_clipboard_state_t;
+
+/**
+ * \brief UI Component managing the "Copy to Clipboard" overlay on code blocks.
+ */
+typedef struct cmp_clipboard_overlay cmp_clipboard_overlay_t;
+
+/**
+ * \brief Create a new clipboard overlay context.
+ * \return 0 on success.
+ */
+int cmp_clipboard_overlay_create(cmp_clipboard_overlay_t **out_overlay);
+
+/**
+ * \brief Destroy a clipboard overlay context.
+ * \return 0 on success.
+ */
+int cmp_clipboard_overlay_destroy(cmp_clipboard_overlay_t *overlay);
+
+/**
+ * \brief Attach the overlay to a specific code block and render its state.
+ * \param block The code block being wrapped.
+ * \param state Current interaction state of the overlay button.
+ * \return 0 on success.
+ */
+int cmp_clipboard_overlay_render(cmp_clipboard_overlay_t *overlay,
+                                 cmp_code_block_t *block,
+                                 cmp_clipboard_state_t state);
+
+/**
+ * \brief Handle the click event on the overlay.
+ *        Actually fires the OS-level copy operation via c-multiplatform.
+ * \param overlay The overlay context.
+ * \param window The parent OS window context required to access the clipboard.
+ * \param raw_code The unformatted source code text to inject into the
+ * clipboard.
+ * \return 0 on success.
+ */
+int cmp_clipboard_overlay_copy(cmp_clipboard_overlay_t *overlay,
+                               cmp_window_t *window, const char *raw_code);
+
+/* --- From command_palette.h --- */
+/**
+ * \brief A single command palette item.
+ */
+typedef struct cmp_command_item {
+  char id[64];
+  char display_text[256];
+  char subtext[256];
+  int score; /* For fuzzy sorting */
+} cmp_command_item_t;
+
+/**
+ * \brief Command Palette context.
+ */
+typedef struct cmp_command_palette cmp_command_palette_t;
+
+/**
+ * \brief Create a command palette context.
+ * \return 0 on success.
+ */
+int cmp_command_palette_create(cmp_command_palette_t **out_palette);
+
+/**
+ * \brief Destroy a command palette context.
+ * \return 0 on success.
+ */
+int cmp_command_palette_destroy(cmp_command_palette_t *palette);
+
+/**
+ * \brief Add an item to the command palette search index.
+ * \return 0 on success.
+ */
+int cmp_command_palette_add_item(cmp_command_palette_t *palette, const char *id,
+                                 const char *display_text, const char *subtext);
+
+/**
+ * \brief Fuzzy search the registered items.
+ * \param query The search string (e.g. "ctmain").
+ * \param out_results An array of pointers to the matched items, sorted by
+ * score.
+ * \param max_results The capacity of out_results array.
+ * \param out_count The number of matches found.
+ * \return 0 on success.
+ */
+int cmp_command_palette_search(cmp_command_palette_t *palette,
+                               const char *query,
+                               cmp_command_item_t **out_results,
+                               size_t max_results, size_t *out_count);
+
+/* --- From custom_chrome.h --- */
+/**
+ * \brief Initialize the custom window chrome regions.
+ * \return 0 on success, or an error code.
+ */
+int cmp_custom_chrome_init(void);
+
+/**
+ * \brief Clean up the custom window chrome regions.
+ * \return 0 on success, or an error code.
+ */
+int cmp_custom_chrome_cleanup(void);
+
+/* --- From workspace_layout.h --- */
+/**
+ * \brief Workspace panes supported by the layout engine.
+ */
+typedef enum {
+  CMP_PANE_SIDEBAR = 0,
+  CMP_PANE_CHAT,
+  CMP_PANE_EDITOR,
+  CMP_PANE_COUNT
+} cmp_pane_type_t;
+
+/**
+ * \brief Workspace Layout Engine instance.
+ *        Manages frameless splitters, glassy sidebars, and docking.
+ */
+typedef struct cmp_workspace_layout cmp_workspace_layout_t;
+
+/**
+ * \brief Create a new workspace layout engine.
+ * \return 0 on success.
+ */
+int cmp_workspace_layout_create(cmp_workspace_layout_t **out_layout);
+
+/**
+ * \brief Destroy the layout engine.
+ * \return 0 on success.
+ */
+int cmp_workspace_layout_destroy(cmp_workspace_layout_t *layout);
+
+/**
+ * \brief Set the width of a specific pane. Automatically handles splitter
+ * constraints.
+ * \return 0 on success.
+ */
+int cmp_workspace_layout_set_pane_width(cmp_workspace_layout_t *layout,
+                                        cmp_pane_type_t pane, float width);
+
+/**
+ * \brief Get the width of a specific pane.
+ * \return 0 on success.
+ */
+int cmp_workspace_layout_get_pane_width(const cmp_workspace_layout_t *layout,
+                                        cmp_pane_type_t pane, float *out_width);
+
+/**
+ * \brief Enable or disable the glassy material effect on the sidebar.
+ * \return 0 on success.
+ */
+int cmp_workspace_layout_set_sidebar_glass(cmp_workspace_layout_t *layout,
+                                           int enable_glass);
+
+/**
+ * \brief Perform hit-testing against the frameless splitters to allow resizing.
+ * \param x Mouse X coordinate.
+ * \param y Mouse Y coordinate.
+ * \param out_is_over_splitter Set to 1 if the mouse is over a draggable
+ * splitter.
+ * \return 0 on success.
+ */
+int cmp_workspace_layout_hit_test_splitters(
+    const cmp_workspace_layout_t *layout, float x, float y,
+    int *out_is_over_splitter);
+
+/* --- From docking_framework.h --- */
+/**
+ * \brief Represents the state of a floating or docked tool panel.
+ */
+typedef enum {
+  CMP_PANEL_STATE_DOCKED = 0,
+  CMP_PANEL_STATE_FLOATING,
+  CMP_PANEL_STATE_HIDDEN
+} cmp_panel_state_t;
+
+/**
+ * \brief A single tool panel in the docking framework.
+ */
+typedef struct cmp_tool_panel {
+  char id[64];
+  char title[128];
+  cmp_panel_state_t state;
+  float floating_x;
+  float floating_y;
+  float width;
+  float height;
+  cmp_pane_type_t docked_pane; /* Which main workspace pane it's docked to */
+} cmp_tool_panel_t;
+
+/**
+ * \brief Full Docking Framework context.
+ */
+typedef struct cmp_docking_framework cmp_docking_framework_t;
+
+/**
+ * \brief Create a new docking framework.
+ * \return 0 on success.
+ */
+int cmp_docking_framework_create(cmp_docking_framework_t **out_docking);
+
+/**
+ * \brief Destroy a docking framework.
+ * \return 0 on success.
+ */
+int cmp_docking_framework_destroy(cmp_docking_framework_t *docking);
+
+/**
+ * \brief Register a new tool panel.
+ * \param docking The docking context.
+ * \param id Unique panel identifier.
+ * \param title Display title.
+ * \param default_pane Where it docks by default.
+ * \return 0 on success.
+ */
+int cmp_docking_framework_register_panel(cmp_docking_framework_t *docking,
+                                         const char *id, const char *title,
+                                         cmp_pane_type_t default_pane);
+
+/**
+ * \brief Undock a panel, making it float at specific coordinates.
+ * \return 0 on success.
+ */
+int cmp_docking_framework_float_panel(cmp_docking_framework_t *docking,
+                                      const char *id, float x, float y);
+
+/**
+ * \brief Dock a floating panel back into a specific workspace pane.
+ * \return 0 on success.
+ */
+int cmp_docking_framework_dock_panel(cmp_docking_framework_t *docking,
+                                     const char *id, cmp_pane_type_t pane);
+
+/**
+ * \brief Get a panel's current configuration/state.
+ * \return 0 on success.
+ */
+int cmp_docking_framework_get_panel(const cmp_docking_framework_t *docking,
+                                    const char *id,
+                                    cmp_tool_panel_t **out_panel);
+
+/* --- From dpi_awareness.h --- */
+/**
+ * \brief Initialize High-DPI Per-Monitor v2 Awareness logic.
+ * \return 0 on success, or an error code.
+ */
+int cmp_dpi_awareness_init(void);
+
+/**
+ * \brief Clean up DPI resources.
+ * \return 0 on success, or an error code.
+ */
+int cmp_dpi_awareness_cleanup(void);
+
+/* --- From embedded_pty.h --- */
+/**
+ * \brief Context for an embedded pseudoterminal running a background process.
+ */
+typedef struct cmp_embedded_pty cmp_embedded_pty_t;
+
+/**
+ * \brief Create a new PTY context.
+ * \return 0 on success.
+ */
+int cmp_embedded_pty_create(cmp_embedded_pty_t **out_pty);
+
+/**
+ * \brief Destroy a PTY context.
+ * \return 0 on success.
+ */
+int cmp_embedded_pty_destroy(cmp_embedded_pty_t *pty);
+
+/**
+ * \brief Spawn a new shell process in the PTY.
+ * \param command The command to run (e.g. "bash", "cmd.exe").
+ * \return 0 on success.
+ */
+int cmp_embedded_pty_spawn(cmp_embedded_pty_t *pty, const char *command);
+
+/**
+ * \brief Write input to the PTY's stdin.
+ * \return 0 on success.
+ */
+int cmp_embedded_pty_write(cmp_embedded_pty_t *pty, const char *input,
+                           size_t length);
+
+/**
+ * \brief Read available output from the PTY's stdout/stderr.
+ * \param out_buffer Pre-allocated buffer.
+ * \param max_len Buffer size.
+ * \param out_read Bytes actually read.
+ * \return 0 on success.
+ */
+int cmp_embedded_pty_read(cmp_embedded_pty_t *pty, char *out_buffer,
+                          size_t max_len, size_t *out_read);
+
+/* --- From emscripten_indexeddb_vfs.h --- */
+/**
+ * @brief Context for managing the Emscripten Virtual File System mapped to
+ * IndexedDB.
+ */
+typedef struct cmp_indexeddb_vfs cmp_indexeddb_vfs_t;
+
+/**
+ * @brief Creates the IndexedDB VFS manager.
+ * @param out_vfs Pointer to receive the manager instance.
+ * @return 0 on success.
+ */
+int cmp_indexeddb_vfs_create(cmp_indexeddb_vfs_t **out_vfs);
+
+/**
+ * @brief Destroys the IndexedDB VFS manager.
+ * @param vfs The manager to destroy.
+ * @return 0 on success.
+ */
+int cmp_indexeddb_vfs_destroy(cmp_indexeddb_vfs_t *vfs);
+
+/**
+ * @brief Mounts an IndexedDB database to a specific VFS path.
+ * @param vfs The manager.
+ * @param mount_path The virtual path (e.g., "/data").
+ * @param db_name The IndexedDB database name.
+ * @return 0 on success.
+ */
+int cmp_indexeddb_vfs_mount(cmp_indexeddb_vfs_t *vfs, const char *mount_path,
+                            const char *db_name);
+
+/**
+ * @brief Syncs VFS memory changes down to IndexedDB persistently.
+ * @param vfs The manager.
+ * @return 0 on success.
+ */
+int cmp_indexeddb_vfs_sync(cmp_indexeddb_vfs_t *vfs);
+
+/* --- From file_watcher.h --- */
+/**
+ * \brief Callback fired when a file within the workspace is
+ * created/modified/deleted.
+ * \param path The virtual path modified.
+ * \param event_type 1=Created, 2=Modified, 3=Deleted.
+ * \param user_data Custom pointer provided during initialization.
+ */
+typedef void (*cmp_file_watch_cb_t)(const char *path, int event_type,
+                                    void *user_data);
+
+/**
+ * \brief File watcher context.
+ */
+typedef struct cmp_file_watcher cmp_file_watcher_t;
+
+/**
+ * \brief Create file watcher.
+ * \return 0 on success.
+ */
+int cmp_file_watcher_create(cmp_file_watcher_t **out_watcher);
+
+/**
+ * \brief Destroy file watcher.
+ * \return 0 on success.
+ */
+int cmp_file_watcher_destroy(cmp_file_watcher_t *watcher);
+
+/**
+ * \brief Start watching a directory recursively.
+ * \param dir_path The directory to watch.
+ * \param cb The callback fired on changes.
+ * \param user_data Passed to callback.
+ * \return 0 on success.
+ */
+int cmp_file_watcher_start(cmp_file_watcher_t *watcher, const char *dir_path,
+                           cmp_file_watch_cb_t cb, void *user_data);
+
+/**
+ * \brief Stop watching.
+ * \return 0 on success.
+ */
+int cmp_file_watcher_stop(cmp_file_watcher_t *watcher);
+
+/* --- From focus_navigation.h --- */
+/**
+ * \brief Focus navigation wrapper (Tab-to-navigate compliance).
+ */
+typedef struct cmp_focus_nav cmp_focus_nav_t;
+
+/**
+ * \brief Create a new focus navigation context.
+ * \param tree The associated A11Y tree.
+ * \param out_nav Receives the new context.
+ * \return 0 on success.
+ */
+int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav);
+
+/**
+ * \brief Destroy a focus navigation context.
+ * \return 0 on success.
+ */
+int cmp_focus_nav_destroy(cmp_focus_nav_t *nav);
+
+/**
+ * \brief Process a Tab key press to move focus forward or backward.
+ * \param nav The focus navigation context.
+ * \param is_shift_pressed 1 to move backward (Shift+Tab), 0 to move forward.
+ * \return 0 on success.
+ */
+int cmp_focus_nav_handle_tab(cmp_focus_nav_t *nav, int is_shift_pressed);
+
+/* --- From hardware_accel.h --- */
+/**
+ * \brief Verifies if the active rendering backend is hardware-accelerated
+ *        (GPU) or if it has fallen back to a software rasterizer (CPU).
+ *        Logs the result to stdout.
+ * \return 0 if hardware accelerated, 1 if CPU fallback, or negative error code.
+ */
+int cmp_verify_hardware_acceleration(void);
+
+/* --- From image_preview.h --- */
+/**
+ * \brief Image Preview Decoder Context.
+ */
+typedef struct cmp_image_preview cmp_image_preview_t;
+
+/**
+ * \brief Create a new image preview context.
+ * \return 0 on success.
+ */
+int cmp_image_preview_create(cmp_image_preview_t **out_preview);
+
+/**
+ * \brief Destroy an image preview context.
+ * \return 0 on success.
+ */
+int cmp_image_preview_destroy(cmp_image_preview_t *preview);
+
+/**
+ * \brief Load an image from a Base64-encoded inline markdown image block.
+ * \param base64_data The raw base64 string.
+ * \param out_raw_pixels Allocated buffer with raw RGBA pixel data.
+ * \param out_width Width of the image.
+ * \param out_height Height of the image.
+ * \return 0 on success.
+ */
+int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
+                                  const char *base64_data,
+                                  unsigned char **out_raw_pixels,
+                                  int *out_width, int *out_height);
+
+/**
+ * \brief Free a pixel buffer previously returned by load_base64.
+ * \return 0 on success.
+ */
+int cmp_image_preview_free_pixels(unsigned char *pixels);
+
+/* --- From input_layout.h --- */
+/**
+ * \brief Represents an attached file pill in the input box.
+ */
+typedef struct cmp_attachment_pill cmp_attachment_pill_t;
+
+/**
+ * \brief Auto-expanding multiline input text layout engine.
+ */
+typedef struct cmp_input_layout cmp_input_layout_t;
+
+/**
+ * \brief Create a new input layout engine.
+ * \return 0 on success.
+ */
+int cmp_input_layout_create(cmp_input_layout_t **out_layout);
+
+/**
+ * \brief Destroy an input layout engine.
+ * \return 0 on success.
+ */
+int cmp_input_layout_destroy(cmp_input_layout_t *layout);
+
+/**
+ * \brief Update text contents, recalculating height up to a max_lines limit.
+ * \param new_text The raw text string inside the input field.
+ * \param out_height The calculated required height for the input box UI.
+ * \return 0 on success.
+ */
+int cmp_input_layout_update_text(cmp_input_layout_t *layout,
+                                 const char *new_text, float *out_height);
+
+/**
+ * \brief Attach a file pill to the current prompt.
+ * \param filename e.g. "main.c"
+ * \return 0 on success.
+ */
+int cmp_input_layout_add_attachment(cmp_input_layout_t *layout,
+                                    const char *filename);
+
+/**
+ * \brief Retrieve count of active attachments in the input UI.
+ * \return 0 on success.
+ */
+int cmp_input_layout_get_attachment_count(const cmp_input_layout_t *layout,
+                                          size_t *out_count);
+
+/* --- From ios_background_refresh.h --- */
+/**
+ * @brief Context for managing iOS Background App Refresh for long-running AI
+ * agent tasks.
+ */
+typedef struct cmp_ios_background_refresh cmp_ios_background_refresh_t;
+
+/**
+ * @brief Creates the Background App Refresh manager.
+ * @param out_refresh Pointer to receive the manager instance.
+ * @return 0 on success.
+ */
+int cmp_ios_background_refresh_create(
+    cmp_ios_background_refresh_t **out_refresh);
+
+/**
+ * @brief Destroys the Background App Refresh manager.
+ * @param refresh The manager.
+ * @return 0 on success.
+ */
+int cmp_ios_background_refresh_destroy(cmp_ios_background_refresh_t *refresh);
+
+/**
+ * @brief Requests additional background execution time from the OS to complete
+ *        a long-running agent task before the app is suspended.
+ * @param refresh The manager.
+ * @param out_task_id Pointer to receive an opaque task identifier from the OS.
+ * @return 0 on success.
+ */
+int cmp_ios_background_refresh_begin_task(cmp_ios_background_refresh_t *refresh,
+                                          int *out_task_id);
+
+/**
+ * @brief Notifies the OS that a background task has completed, allowing the app
+ *        to suspend safely.
+ * @param refresh The manager.
+ * @param task_id The task identifier obtained from begin_task.
+ * @return 0 on success.
+ */
+int cmp_ios_background_refresh_end_task(cmp_ios_background_refresh_t *refresh,
+                                        int task_id);
+
+/* --- From ipados_multitasking.h --- */
+/**
+ * @brief Context for managing iPadOS-specific multitasking features,
+ *        including Split View, Slide Over, and Stage Manager scene activation.
+ */
+typedef struct cmp_ipados_multitasking cmp_ipados_multitasking_t;
+
+/**
+ * @brief Creates the iPadOS multitasking manager.
+ * @param out_mt Pointer to receive the manager instance.
+ * @return 0 on success, or a CMP_ERROR code.
+ */
+int cmp_ipados_multitasking_create(cmp_ipados_multitasking_t **out_mt);
+
+/**
+ * @brief Destroys the iPadOS multitasking manager.
+ * @param mt The manager to destroy.
+ * @return 0 on success.
+ */
+int cmp_ipados_multitasking_destroy(cmp_ipados_multitasking_t *mt);
+
+/**
+ * @brief Requests the OS to spawn a new independent window scene
+ *        (e.g., tearing off a tab into Split View or Stage Manager).
+ * @param mt The manager.
+ * @param activity_identifier An identifier linking the UI intent to the new
+ * scene.
+ * @return 0 on success, or CMP_ERROR_PLATFORM if not supported.
+ */
+int cmp_ipados_multitasking_request_scene(cmp_ipados_multitasking_t *mt,
+                                          const char *activity_identifier);
+
+/**
+ * @brief Queries the current semantic size class (Compact/Regular)
+ *        to dynamically adapt the workspace layout (e.g., hiding sidebars).
+ * @param mt The manager.
+ * @param width Current window width.
+ * @param height Current window height.
+ * @param out_horizontal Pointer to receive the horizontal size class.
+ * @param out_vertical Pointer to receive the vertical size class.
+ * @return 0 on success.
+ */
+int cmp_ipados_multitasking_resolve_layout(cmp_ipados_multitasking_t *mt,
+                                           float width, float height,
+                                           cmp_size_class_t *out_horizontal,
+                                           cmp_size_class_t *out_vertical);
+
+/* --- From keyboard_avoidance.h --- */
+/**
+ * @brief Context for managing on-screen virtual keyboard avoidance (panning).
+ */
+typedef struct cmp_keyboard_avoidance cmp_keyboard_avoidance_t;
+
+/**
+ * @brief Creates a keyboard avoidance manager.
+ * @param out_avoider Pointer to receive the manager.
+ * @return 0 on success, or a CMP_ERROR code.
+ */
+int cmp_keyboard_avoidance_create(cmp_keyboard_avoidance_t **out_avoider);
+
+/**
+ * @brief Destroys the keyboard avoidance manager.
+ * @param avoider The manager to destroy.
+ * @return 0 on success.
+ */
+int cmp_keyboard_avoidance_destroy(cmp_keyboard_avoidance_t *avoider);
+
+/**
+ * @brief Computes the necessary Y-axis view panning offset to prevent the
+ * on-screen keyboard from obscuring the focused input layout.
+ * @param avoider The manager.
+ * @param keyboard_height The height of the soft keyboard from the bottom of the
+ * screen.
+ * @param input_bottom_y The absolute Y coordinate of the bottom of the focused
+ * input.
+ * @param screen_height The total height of the screen/window.
+ * @param out_y_offset Pointer to receive the calculated scroll/pan adjustment.
+ * @return 0 on success.
+ */
+int cmp_keyboard_avoidance_compute_offset(cmp_keyboard_avoidance_t *avoider,
+                                          float keyboard_height,
+                                          float input_bottom_y,
+                                          float screen_height,
+                                          float *out_y_offset);
+
+/* --- From markdown_parser.h --- */
+/**
+ * \brief Markdown AST Node Types.
+ */
+typedef enum {
+  CMP_MD_NODE_TEXT = 0,
+  CMP_MD_NODE_PARAGRAPH,
+  CMP_MD_NODE_HEADER,
+  CMP_MD_NODE_LIST,
+  CMP_MD_NODE_LIST_ITEM,
+  CMP_MD_NODE_BOLD,
+  CMP_MD_NODE_ITALIC,
+  CMP_MD_NODE_CODE_BLOCK,
+  CMP_MD_NODE_INLINE_CODE,
+  CMP_MD_NODE_BLOCKQUOTE,
+  CMP_MD_NODE_TABLE,
+  CMP_MD_NODE_TABLE_ROW,
+  CMP_MD_NODE_TABLE_CELL
+} cmp_md_node_type_t;
+
+/**
+ * \brief A single Markdown AST node.
+ */
+typedef struct cmp_md_node cmp_md_node_t;
+struct cmp_md_node {
+  cmp_md_node_type_t type;
+  char *content; /* Text content if applicable, else NULL */
+  int level;     /* For headers (1-6) */
+
+  cmp_md_node_t **children;
+  size_t child_count;
+  size_t child_capacity;
+  uint32_t bg_color;
+  uint32_t text_color;
+  float font_size;
+};
+
+/**
+ * \brief Markdown parser context.
+ */
+typedef struct cmp_markdown_parser cmp_markdown_parser_t;
+
+/**
+ * \brief Create a new markdown parser context.
+ * \return 0 on success.
+ */
+int cmp_markdown_parser_create(cmp_markdown_parser_t **out_parser);
+
+/**
+ * \brief Destroy a markdown parser context.
+ * \return 0 on success.
+ */
+int cmp_markdown_parser_destroy(cmp_markdown_parser_t *parser);
+
+/**
+ * \brief Parse raw markdown text into an AST.
+ * \param parser The parser context.
+ * \param markdown_text The raw text to parse.
+ * \param out_root The returned AST root node.
+ * \return 0 on success.
+ */
+int cmp_markdown_parser_parse(cmp_markdown_parser_t *parser,
+                              const char *markdown_text,
+                              cmp_md_node_t **out_root);
+
+/**
+ * \brief Recursively free an AST node and its children.
+ * \return 0 on success.
+ */
+int cmp_md_node_destroy(cmp_md_node_t *node);
+
+/* --- From math_renderer.h --- */
+/**
+ * \brief Streaming math rendering context.
+ */
+typedef struct cmp_math_renderer cmp_math_renderer_t;
+
+/**
+ * \brief Create a new math renderer context.
+ * \return 0 on success.
+ */
+int cmp_math_renderer_create(cmp_math_renderer_t **out_renderer);
+
+/**
+ * \brief Destroy a math renderer context.
+ * \return 0 on success.
+ */
+int cmp_math_renderer_destroy(cmp_math_renderer_t *renderer);
+
+/**
+ * \brief Parse a string of LaTeX/KaTeX into a visual node tree.
+ * \param is_inline 1 if inline math ($), 0 if block ($$).
+ * \return 0 on success.
+ */
+int cmp_math_renderer_parse(cmp_math_renderer_t *renderer,
+                            const char *latex_string, int is_inline,
+                            void **out_visual_tree);
+
+/* --- From mermaid_renderer.h --- */
+/**
+ * \brief Mermaid.js diagram generation context.
+ */
+typedef struct cmp_mermaid_renderer cmp_mermaid_renderer_t;
+
+/**
+ * \brief Create a new mermaid diagram renderer.
+ * \return 0 on success.
+ */
+int cmp_mermaid_renderer_create(cmp_mermaid_renderer_t **out_renderer);
+
+/**
+ * \brief Destroy a mermaid renderer context.
+ * \return 0 on success.
+ */
+int cmp_mermaid_renderer_destroy(cmp_mermaid_renderer_t *renderer);
+
+/**
+ * \brief Generate SVG path data from Mermaid markdown syntax.
+ * \return 0 on success.
+ */
+int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
+                                      const char *mermaid_syntax,
+                                      char **out_svg_xml);
+
+/**
+ * \brief Free an SVG XML string allocated by generate_svg.
+ * \return 0 on success.
+ */
+int cmp_mermaid_renderer_free_svg(char *svg_xml);
+
+/* --- From minimap.h --- */
+/**
+ * \brief Editor Minimap rendering context.
+ */
+typedef struct cmp_minimap cmp_minimap_t;
+
+/**
+ * \brief Create an editor minimap context.
+ * \return 0 on success.
+ */
+int cmp_minimap_create(cmp_minimap_t **out_minimap);
+
+/**
+ * \brief Destroy an editor minimap context.
+ * \return 0 on success.
+ */
+int cmp_minimap_destroy(cmp_minimap_t *minimap);
+
+/**
+ * \brief Set the raw text buffer that the minimap will mirror.
+ * \return 0 on success.
+ */
+int cmp_minimap_set_text(cmp_minimap_t *minimap, const char *text);
+
+/**
+ * \brief Update the viewport scroll ratio to map the active minimap highlight.
+ * \param minimap The minimap context.
+ * \param viewport_y The Y offset of the main editor view.
+ * \param viewport_height The height of the main editor view.
+ * \param total_height The total scrollable height of the document.
+ * \return 0 on success.
+ */
+int cmp_minimap_update_viewport(cmp_minimap_t *minimap, float viewport_y,
+                                float viewport_height, float total_height);
+
+/**
+ * \brief Generate/Calculate the rendering geometry or layout for the minimap.
+ * \return 0 on success.
+ */
+int cmp_minimap_compute_layout(cmp_minimap_t *minimap);
+
+/* --- From multi_window.h --- */
+/**
+ * @brief Represents an independent OS window created from a torn-off tab.
+ */
+typedef struct cmp_multi_window cmp_multi_window_t;
+
+/**
+ * @brief Initialize the multi-window manager.
+ * @return 0 on success, non-zero on error.
+ */
+int cmp_multi_window_init(void);
+
+/**
+ * @brief Cleanup the multi-window manager.
+ * @return 0 on success, non-zero on error.
+ */
+int cmp_multi_window_cleanup(void);
+
+/**
+ * @brief Tear off a tab into a new independent OS window.
+ * @param tab_id The ID of the tab to tear off.
+ * @param out_window Pointer to store the created window handle.
+ * @return 0 on success, non-zero on error.
+ */
+int cmp_multi_window_tear_off(const char *tab_id,
+                              cmp_multi_window_t **out_window);
+
+/**
+ * @brief Merge an independent window back into the main application window as a
+ * tab.
+ * @param window The window to merge back.
+ * @return 0 on success, non-zero on error.
+ */
+int cmp_multi_window_merge_back(cmp_multi_window_t *window);
+
+/**
+ * @brief Update all active independent OS windows (e.g., event loop
+ * processing).
+ * @return 0 on success, non-zero on error.
+ */
+int cmp_multi_window_update_all(void);
+
+/* --- From os_integration.h --- */
+/**
+ * \brief Copy text directly to the OS clipboard.
+ * \param window The main application window context.
+ * \param text The null-terminated UTF-8 text to copy.
+ * \return 0 on success.
+ */
+int cmp_os_copy_to_clipboard(cmp_window_t *window, const char *text);
+
+/**
+ * \brief Attach OS file drop handling to the input box logic.
+ * \param window The main application window context.
+ * \return 0 on success.
+ */
+int cmp_os_enable_file_drag_drop(cmp_window_t *window);
+
+/**
+ * \brief Verify Voice-to-Text OS dictation readiness.
+ * \return 1 if supported, 0 otherwise.
+ */
+int cmp_os_is_voice_dictation_supported(void);
+
+/**
+ * \brief Start an OS native voice dictation capture.
+ * \return 0 on success.
+ */
+int cmp_os_start_voice_dictation(void);
+
+/* --- From os_media_notifications.h --- */
+/**
+ * @brief Show a native OS desktop notification (e.g., via DBus on Linux).
+ * @param title The title of the notification.
+ * @param body The body text of the notification.
+ * @return 0 on success.
+ */
+int cmp_os_notify(const char *title, const char *body);
+
+/**
+ * @brief Context for managing OS-level media controls (e.g., MPRIS via DBus).
+ */
+typedef struct cmp_os_media_controls cmp_os_media_controls_t;
+
+/**
+ * @brief Creates an OS media controls manager.
+ * @param out_controls Pointer to receive the manager.
+ * @return 0 on success.
+ */
+int cmp_os_media_controls_create(cmp_os_media_controls_t **out_controls);
+
+/**
+ * @brief Destroys the OS media controls manager.
+ * @param controls The manager.
+ * @return 0 on success.
+ */
+int cmp_os_media_controls_destroy(cmp_os_media_controls_t *controls);
+
+/**
+ * @brief Updates the OS "Now Playing" information metadata.
+ * @param controls The manager.
+ * @param title The media title.
+ * @param artist The media artist.
+ * @param duration Total duration in seconds.
+ * @param current_time Current playback time in seconds.
+ * @return 0 on success.
+ */
+int cmp_os_media_controls_update(cmp_os_media_controls_t *controls,
+                                 const char *title, const char *artist,
+                                 float duration, float current_time);
+
+/**
+ * @brief Callback signature for OS media remote commands (Play, Pause, Next,
+ * Prev).
+ */
+typedef void (*cmp_media_command_cb)(int command_id, void *userdata);
+
+/**
+ * @brief Sets a callback to receive hardware/OS media keys.
+ * @param controls The manager.
+ * @param callback The function to call when an OS media button is pressed.
+ * @param userdata Opaque pointer passed back to the callback.
+ * @return 0 on success.
+ */
+int cmp_os_media_controls_set_handler(cmp_os_media_controls_t *controls,
+                                      cmp_media_command_cb callback,
+                                      void *userdata);
+
+/* --- From os_scrollbars.h --- */
+/**
+ * \brief Custom Scrollbar physics configuration.
+ */
+typedef struct cmp_os_scrollbar cmp_os_scrollbar_t;
+
+/**
+ * \brief Create a new scrollbar physics context.
+ * \return 0 on success.
+ */
+int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar);
+
+/**
+ * \brief Destroy scrollbar context.
+ * \return 0 on success.
+ */
+int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar);
+
+/**
+ * \brief Process mouse wheel / trackpad scroll input and apply OS-specific
+ * inertia and easing.
+ * \param scrollbar Context.
+ * \param raw_delta_y Unfiltered delta from the OS event.
+ * \param delta_time_ms Delta time since last frame in milliseconds.
+ * \param out_smoothed_y Returns the smoothed incremental scroll step for this
+ * frame.
+ * \return 0 on success.
+ */
+int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar, float raw_delta_y,
+                          unsigned int delta_time_ms, float *out_smoothed_y);
+
+/* --- From power_awareness.h --- */
+/**
+ * \brief Initialize system power and thermal awareness.
+ *        Registers OS callbacks (e.g. WM_POWERBROADCAST on Windows)
+ *        to dynamically throttle animations and background tasks.
+ * \return 0 on success, or an error code.
+ */
+int cmp_power_awareness_init(void);
+
+/**
+ * \brief Poll current power status and apply throttling if necessary.
+ * \return 0 on success.
+ */
+int cmp_power_awareness_poll(void);
+
+/* --- From safe_area_handler.h --- */
+/**
+ * @brief Handle for the safe area manager.
+ */
+typedef struct cmp_safe_area_handler cmp_safe_area_handler_t;
+
+/**
+ * @brief Creates a safe area handler context.
+ * @param out_handler Pointer to receive the handler.
+ * @return 0 on success.
+ */
+int cmp_safe_area_handler_create(cmp_safe_area_handler_t **out_handler);
+
+/**
+ * @brief Destroys the safe area handler.
+ * @param handler The handler context.
+ * @return 0 on success.
+ */
+int cmp_safe_area_handler_destroy(cmp_safe_area_handler_t *handler);
+
+/**
+ * @brief Queries the OS for safe area insets (notches, dynamic islands) and
+ * applies them to the given window's workspace layout.
+ * @param handler The handler context.
+ * @param window The multiplatform window.
+ * @param out_top Pointer to receive the top inset.
+ * @param out_bottom Pointer to receive the bottom inset.
+ * @param out_left Pointer to receive the left inset.
+ * @param out_right Pointer to receive the right inset.
+ * @return 0 on success.
+ */
+int cmp_safe_area_handler_query_insets(cmp_safe_area_handler_t *handler,
+                                       cmp_window_t *window, int *out_top,
+                                       int *out_bottom, int *out_left,
+                                       int *out_right);
+
+/* --- From sandbox_exec.h --- */
+/**
+ * \brief Isolated execution sandbox manager.
+ */
+typedef struct cmp_sandbox_exec cmp_sandbox_exec_t;
+
+/**
+ * \brief Create an embedded execution sandbox.
+ * \return 0 on success.
+ */
+int cmp_sandbox_exec_create(cmp_sandbox_exec_t **out_sandbox);
+
+/**
+ * \brief Destroy a sandbox manager.
+ * \return 0 on success.
+ */
+int cmp_sandbox_exec_destroy(cmp_sandbox_exec_t *sandbox);
+
+/**
+ * \brief Spawn a detached, captured sandbox to run source code.
+ * \param language The language (e.g. "python", "sh").
+ * \param code The snippet to execute.
+ * \param out_output Dynamically allocated output string captured from
+ * stdout/stderr.
+ * \return 0 on success.
+ */
+int cmp_sandbox_exec_run(cmp_sandbox_exec_t *sandbox, const char *language,
+                         const char *code, char **out_output);
+
+/**
+ * \brief Free an output buffer returned by run.
+ * \return 0 on success.
+ */
+int cmp_sandbox_exec_free_output(char *output);
+
+/* --- From secure_network.h --- */
+/**
+ * \brief Secure Network Configuration.
+ */
+typedef struct cmp_secure_network cmp_secure_network_t;
+
+/**
+ * \brief Create secure network context.
+ * \return 0 on success.
+ */
+int cmp_secure_network_create(cmp_secure_network_t **out_net);
+
+/**
+ * \brief Destroy secure network context.
+ * \return 0 on success.
+ */
+int cmp_secure_network_destroy(cmp_secure_network_t *net);
+
+/**
+ * \brief Execute a TLS 1.3 / HTTPS request safely via c-abstract-http.
+ * \return 0 on success.
+ */
+int cmp_secure_network_send_https(cmp_secure_network_t *net, const char *url,
+                                  int *out_status_code);
+
+/**
+ * \brief Configure the context to route via HTTP or SOCKS5 proxies.
+ * \return 0 on success.
+ */
+int cmp_secure_network_set_proxy(cmp_secure_network_t *net,
+                                 const char *proxy_url);
+
+/**
+ * \brief Integrate OS-Native Secure Key Storage to retrieve API tokens.
+ *        Queries Credential Manager (Win) or Keychain (Mac).
+ * \return 0 on success.
+ */
+int cmp_secure_network_retrieve_credential(const char *key_name,
+                                           char *out_secret, size_t max_len);
+
+/* --- From status_bar.h --- */
+/**
+ * \brief Status bar context for reporting active token counts and metrics.
+ */
+typedef struct cmp_status_bar cmp_status_bar_t;
+
+/**
+ * \brief Create a new status bar.
+ * \return 0 on success.
+ */
+int cmp_status_bar_create(cmp_status_bar_t **out_bar);
+
+/**
+ * \brief Destroy a status bar.
+ * \return 0 on success.
+ */
+int cmp_status_bar_destroy(cmp_status_bar_t *bar);
+
+/**
+ * \brief Update backend text status.
+ * \return 0 on success.
+ */
+int cmp_status_bar_set_backend_status(cmp_status_bar_t *bar,
+                                      const char *status);
+
+/**
+ * \brief Update token usage statistics.
+ * \return 0 on success.
+ */
+int cmp_status_bar_update_token_usage(cmp_status_bar_t *bar, int prompt_tokens,
+                                      int completion_tokens);
+
+/**
+ * \brief Update GPU/System memory status.
+ * \param bar The status bar.
+ * \param system_memory_mb Overall process memory used.
+ * \param vram_used_mb VRAM used explicitly by the local LLM.
+ * \return 0 on success.
+ */
+int cmp_status_bar_update_memory_metrics(cmp_status_bar_t *bar,
+                                         float system_memory_mb,
+                                         float vram_used_mb);
+
+/* --- From syntax_highlight.h --- */
+/**
+ * \brief Token types mapped for syntax highlighting.
+ */
+typedef enum {
+  CMP_TOKEN_NORMAL = 0,
+  CMP_TOKEN_KEYWORD,
+  CMP_TOKEN_STRING,
+  CMP_TOKEN_NUMBER,
+  CMP_TOKEN_COMMENT,
+  CMP_TOKEN_OPERATOR,
+  CMP_TOKEN_FUNCTION
+} cmp_token_type_t;
+
+/**
+ * \brief A highlighted span within a code string.
+ */
+typedef struct {
+  size_t start_offset;
+  size_t length;
+  cmp_token_type_t type;
+} cmp_highlight_span_t;
+
+/**
+ * \brief Syntax highlighter context (wraps Tree-sitter or regex lexer).
+ */
+typedef struct cmp_syntax_highlighter cmp_syntax_highlighter_t;
+
+/**
+ * \brief Create a new syntax highlighter context.
+ * \return 0 on success.
+ */
+int cmp_syntax_highlighter_create(cmp_syntax_highlighter_t **out_hl);
+
+/**
+ * \brief Destroy a syntax highlighter context.
+ * \return 0 on success.
+ */
+int cmp_syntax_highlighter_destroy(cmp_syntax_highlighter_t *hl);
+
+/**
+ * \brief Parse source code and generate an array of syntax highlight spans.
+ * \param hl The syntax highlighter.
+ * \param source_code The code string.
+ * \param language The language identifier (e.g. "c", "python", "js").
+ * \param out_spans Output array of spans (dynamically allocated).
+ * \param out_count Number of spans written to the array.
+ * \return 0 on success.
+ */
+int cmp_syntax_highlighter_parse(cmp_syntax_highlighter_t *hl,
+                                 const char *source_code, const char *language,
+                                 cmp_highlight_span_t **out_spans,
+                                 size_t *out_count);
+
+/**
+ * \brief Free spans allocated by parse.
+ */
+int cmp_syntax_highlighter_free_spans(cmp_highlight_span_t *spans);
+
+/* --- From tab_navigation.h --- */
+/**
+ * \brief A single editor tab.
+ */
+typedef struct cmp_editor_tab {
+  char title[256];
+  char file_path[1024];
+  int is_active;
+  int is_modified;
+} cmp_editor_tab_t;
+
+/**
+ * \brief Tabbed navigation context.
+ */
+typedef struct cmp_tab_nav cmp_tab_nav_t;
+
+/**
+ * \brief Create a new tab navigation context.
+ * \return 0 on success.
+ */
+int cmp_tab_nav_create(cmp_tab_nav_t **out_nav);
+
+/**
+ * \brief Destroy a tab navigation context.
+ * \return 0 on success.
+ */
+int cmp_tab_nav_destroy(cmp_tab_nav_t *nav);
+
+/**
+ * \brief Add a new tab.
+ * \return 0 on success.
+ */
+int cmp_tab_nav_add_tab(cmp_tab_nav_t *nav, const char *title,
+                        const char *file_path);
+
+/**
+ * \brief Close a tab at the specified index.
+ * \return 0 on success.
+ */
+int cmp_tab_nav_close_tab(cmp_tab_nav_t *nav, size_t index);
+
+/**
+ * \brief Reorder tabs (drag and drop simulation).
+ * \return 0 on success.
+ */
+int cmp_tab_nav_move_tab(cmp_tab_nav_t *nav, size_t from_index,
+                         size_t to_index);
+
+/**
+ * \brief Get total number of tabs.
+ * \return 0 on success.
+ */
+int cmp_tab_nav_get_count(const cmp_tab_nav_t *nav, size_t *out_count);
+
+/**
+ * \brief Get a tab by index.
+ * \return 0 on success.
+ */
+int cmp_tab_nav_get_tab(const cmp_tab_nav_t *nav, size_t index,
+                        cmp_editor_tab_t **out_tab);
+
+/* --- From toast_notifications.h --- */
+/**
+ * \brief Notification severity levels.
+ */
+typedef enum {
+  CMP_TOAST_INFO = 0,
+  CMP_TOAST_SUCCESS,
+  CMP_TOAST_WARNING,
+  CMP_TOAST_ERROR
+} cmp_toast_level_t;
+
+/**
+ * \brief A single ephemeral toast notification.
+ */
+typedef struct cmp_toast cmp_toast_t;
+
+/**
+ * \brief Toast manager context.
+ */
+typedef struct cmp_toast_manager cmp_toast_manager_t;
+
+/**
+ * \brief Create a new toast manager.
+ * \return 0 on success.
+ */
+int cmp_toast_manager_create(cmp_toast_manager_t **out_manager);
+
+/**
+ * \brief Destroy a toast manager.
+ * \return 0 on success.
+ */
+int cmp_toast_manager_destroy(cmp_toast_manager_t *manager);
+
+/**
+ * \brief Push a new ephemeral slide notification.
+ * \param manager The toast manager context.
+ * \param level Severity level (Info/Success/Warn/Error).
+ * \param message The message text.
+ * \param duration_ms Time in milliseconds before the toast disappears.
+ * \return 0 on success.
+ */
+int cmp_toast_manager_push(cmp_toast_manager_t *manager,
+                           cmp_toast_level_t level, const char *message,
+                           unsigned int duration_ms);
+
+/**
+ * \brief Tick the manager to process animations and timed dismissals.
+ * \param manager The toast manager context.
+ * \param delta_time_ms Delta time since last tick in ms.
+ * \return 0 on success.
+ */
+int cmp_toast_manager_tick(cmp_toast_manager_t *manager,
+                           unsigned int delta_time_ms);
+
+/**
+ * \brief Query how many toasts are currently active.
+ * \return 0 on success.
+ */
+int cmp_toast_manager_get_active_count(const cmp_toast_manager_t *manager,
+                                       size_t *out_count);
+
+/* --- From typography.h --- */
+/**
+ * \brief The typography engine context.
+ */
+typedef struct cmp_typography cmp_typography_t;
+
+/**
+ * \brief Create a typography context.
+ * \return 0 on success.
+ */
+int cmp_typography_create(cmp_typography_t **out_typo);
+
+/**
+ * \brief Destroy a typography context.
+ * \return 0 on success.
+ */
+int cmp_typography_destroy(cmp_typography_t *typo);
+
+/**
+ * \brief Set the primary programming font and enable ligatures.
+ * \param font_path Path to the font file (e.g. FiraCode.ttf).
+ * \param enable_ligatures 1 to enable OpenType ligatures, 0 to disable.
+ * \return 0 on success.
+ */
+int cmp_typography_set_primary_font(cmp_typography_t *typo,
+                                    const char *font_path,
+                                    int enable_ligatures);
+
+/**
+ * \brief Add a fallback font to the chain for CJK or Emoji characters.
+ * \param font_path Path to the fallback font file.
+ * \return 0 on success.
+ */
+int cmp_typography_add_fallback_font(cmp_typography_t *typo,
+                                     const char *font_path);
+
+/**
+ * \brief Configure the bidirectional (Bidi) layout direction globally.
+ * \param is_rtl 1 for Right-To-Left (Arabic/Hebrew), 0 for Left-To-Right.
+ * \return 0 on success.
+ */
+int cmp_typography_set_bidi_direction(cmp_typography_t *typo, int is_rtl);
+
+/* --- From wayland_protocols.h --- */
+/**
+ * @brief Context for managing Wayland specific protocols like
+ * wp_fractional_scale_v1.
+ */
+typedef struct cmp_wayland_protocols cmp_wayland_protocols_t;
+
+/**
+ * @brief Creates the Wayland protocols manager.
+ * @param out_protocols Pointer to receive the manager.
+ * @return 0 on success.
+ */
+int cmp_wayland_protocols_create(cmp_wayland_protocols_t **out_protocols);
+
+/**
+ * @brief Destroys the Wayland protocols manager.
+ * @param protocols The manager.
+ * @return 0 on success.
+ */
+int cmp_wayland_protocols_destroy(cmp_wayland_protocols_t *protocols);
+
+/**
+ * @brief Binds required protocols like wp_fractional_scale_v1 and
+ * xdg_decoration.
+ * @param protocols The manager.
+ * @param window The cross-platform window.
+ * @return 0 on success.
+ */
+int cmp_wayland_protocols_bind(cmp_wayland_protocols_t *protocols,
+                               cmp_window_t *window);
+
+/* --- From webgl_canvas.h --- */
+/**
+ * @brief Context for managing WebGL2/WebGPU rendering on HTML5 canvas via
+ * Emscripten.
+ */
+typedef struct cmp_webgl_canvas cmp_webgl_canvas_t;
+
+/**
+ * @brief Creates the WebGL canvas manager.
+ * @param out_canvas Pointer to receive the manager.
+ * @return 0 on success.
+ */
+int cmp_webgl_canvas_create(cmp_webgl_canvas_t **out_canvas);
+
+/**
+ * @brief Destroys the WebGL canvas manager.
+ * @param canvas The manager.
+ * @return 0 on success.
+ */
+int cmp_webgl_canvas_destroy(cmp_webgl_canvas_t *canvas);
+
+/**
+ * @brief Initializes the Emscripten rendering bindings to the target DOM
+ * element.
+ * @param canvas The manager.
+ * @param dom_selector The HTML ID selector (e.g., "#canvas").
+ * @return 0 on success.
+ */
+int cmp_webgl_canvas_bind(cmp_webgl_canvas_t *canvas, const char *dom_selector);
+
+/* --- From win32_input.h --- */
+/**
+ * \brief Enable advanced Win32 Touch, Pen, and Windows Ink input.
+ * \return 0 on success, or an error code.
+ */
+int cmp_win32_init_touch_ink(void);
+
+/* --- From win32_window.h --- */
+/**
+ * \brief Request an OS-level window material composition (Mica/Acrylic) on
+ * Windows.
+ */
+int cmp_win32_request_windows_material(cmp_materials_t *materials,
+                                       cmp_window_t *window,
+                                       cmp_windows_material_t material);
 
 #ifdef __cplusplus
 }

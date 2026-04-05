@@ -1,5 +1,7 @@
-﻿#include "cmp.h"
+﻿/* clang-format off */
+#include "cmp.h"
 #include "greatest.h"
+/* clang-format on */
 
 TEST test_cmp_window_manager_create_destroy(void) {
   cmp_window_manager_t *manager = NULL;

@@ -213,146 +213,93 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor) {
     return;
 
   rect = node->layout->computed_rect;
-
-  /* Apply scale factor to layout values to translate to physical screen
-   * coordinates */
   rect.x *= scale_factor;
   rect.y *= scale_factor;
   rect.width *= scale_factor;
   rect.height *= scale_factor;
 
-  if (node->type == 2) { /* Text */
-    const char *text = (const char *)node->properties;
-    if (text) {
-      HFONT font = CreateFontA(
-          (int)(32 * scale_factor), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-          DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-          DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial");
-      HFONT old_font = (HFONT)SelectObject(hdc, font);
-      SetTextAlign(hdc, TA_CENTER | TA_TOP);
-      SetTextColor(hdc, RGB(0, 0, 0));
-      SetBkMode(hdc, TRANSPARENT);
-      TextOutA(hdc, (int)(rect.x + rect.width / 2.0f), (int)rect.y, text,
-               (int)strlen(text));
-      SelectObject(hdc, old_font);
-      DeleteObject(font);
+  {
+    uint32_t box_color = node->bg_color;
+
+    if (node->type == 8) {
+      uint32_t bg = node->bg_color;
+      uint8_t a = (bg >> 24) & 0xFF;
+      if (a > 0) {
+        uint8_t r = (bg >> 16) & 0xFF;
+        uint8_t g = (bg >> 8) & 0xFF;
+        uint8_t b = bg & 0xFF;
+        HBRUSH br = CreateSolidBrush(RGB(r, g, b));
+        HPEN pen = CreatePen(PS_SOLID, 1, RGB(r, g, b));
+        HBRUSH old_br = (HBRUSH)SelectObject(hdc, br);
+        HPEN old_pen = (HPEN)SelectObject(hdc, pen);
+
+        /* 12dp corner radius */
+        RoundRect(hdc, (int)rect.x, (int)rect.y, (int)(rect.x + rect.width),
+                  (int)(rect.y + rect.height), (int)(12.0f * scale_factor), (int)(12.0f * scale_factor));
+
+        SelectObject(hdc, old_br);
+        SelectObject(hdc, old_pen);
+        DeleteObject(br);
+        DeleteObject(pen);
+      }
+    } else if (box_color != 0) {
+      uint8_t a = (box_color >> 24) & 0xFF;
+      if (a > 0) {
+        uint8_t r = (box_color >> 16) & 0xFF;
+        uint8_t g = (box_color >> 8) & 0xFF;
+        uint8_t b = box_color & 0xFF;
+        HBRUSH br = CreateSolidBrush(RGB(r, g, b));
+        RECT rct;
+        rct.left = (int)rect.x;
+        rct.top = (int)rect.y;
+        rct.right = (int)(rect.x + rect.width);
+        rct.bottom = (int)(rect.y + rect.height);
+        FillRect(hdc, &rct, br);
+        DeleteObject(br);
+      }
     }
-  } else if (node->type == 3) { /* Button */
-    const char *label = (const char *)node->properties;
-    HBRUSH br = CreateSolidBrush(RGB(103, 80, 164)); /* Purple */
-    HBRUSH old_br = (HBRUSH)SelectObject(hdc, br);
-    HPEN pen = CreatePen(PS_SOLID, 1, RGB(103, 80, 164));
-    HPEN old_pen = (HPEN)SelectObject(hdc, pen);
 
-    RoundRect(hdc, (int)rect.x, (int)rect.y, (int)(rect.x + rect.width),
-              (int)(rect.y + rect.height), (int)rect.height, (int)rect.height);
+    if (node->type == 2 || node->type == 3 || node->type == 4 || node->type == 11 || node->type == 14) {
+      const char *text = (const char *)node->properties;
+      if (node->type == 4 && text == NULL) text = "Ask anything";
+      if (node->type == 11 && text == NULL) text = "GPT-4o (Default) \xE2\x96\xBE";
+      if (node->type == 14 && text == NULL) text = "Let's build";
 
-    SelectObject(hdc, old_br);
-    SelectObject(hdc, old_pen);
-    DeleteObject(br);
-    DeleteObject(pen);
+      if (text) {
+        uint32_t tc_uint = node->text_color;
+        uint8_t tc_a = (tc_uint >> 24) & 0xFF;
+        uint32_t tc = RGB((tc_uint >> 16) & 0xFF, (tc_uint >> 8) & 0xFF, tc_uint & 0xFF);
+        HFONT font;
+        HFONT old_font;
+        int size = (int)(32 * scale_factor);
+        if (node->type == 14) size = (int)(48 * scale_factor);
+        if (node->type == 4 || node->type == 11) size = (int)(20 * scale_factor);
+        if (node->type == 3) size = (int)(24 * scale_factor);
 
-    if (label) {
-      HFONT font = CreateFontA(
-          (int)(24 * scale_factor), 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
-          DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-          DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial");
-      HFONT old_font = (HFONT)SelectObject(hdc, font);
-      SetTextAlign(hdc, TA_CENTER | TA_TOP);
-      SetTextColor(hdc, RGB(255, 255, 255));
-      SetBkMode(hdc, TRANSPARENT);
-      TextOutA(hdc, (int)(rect.x + rect.width / 2.0f),
-               (int)(rect.y + (rect.height - (24.0f * scale_factor)) / 2.0f),
-               label, (int)strlen(label));
-      SelectObject(hdc, old_font);
-      DeleteObject(font);
-    }
-  } else if (node->type == 7) { /* ImageView */
-    const char *path = (const char *)node->properties;
-    if (path && strstr(path, "compose.svg")) {
-      int cx = (int)(rect.x + rect.width / 2.0f);
-      int cy = (int)(rect.y + rect.height / 2.0f);
-      int size = (int)(rect.width < rect.height ? rect.width : rect.height) / 2;
-      double R = (double)size * 0.8;
-      double r = R * 0.4;
-      double sqrt3_2 = 0.86602540378; /* sqrt(3)/2 */
-      HPEN null_pen;
-      HPEN old_pen;
-      HBRUSH br_top, br_right, br_left, br_hole, old_br;
-      POINT pts[6];
+        if (tc_a == 0) {
+            tc = RGB(240, 240, 240);
+        }
 
-      null_pen = CreatePen(PS_NULL, 0, 0);
-      old_pen = (HPEN)SelectObject(hdc, null_pen);
+        font = CreateFontA(
+            size, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+            DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+            DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial");
+        old_font = (HFONT)SelectObject(hdc, font);
+        SetTextAlign(hdc, TA_CENTER | TA_TOP);
+        SetTextColor(hdc, tc);
+        SetBkMode(hdc, TRANSPARENT);
 
-      /* Top Face: Light Blue (#4DB6F7) */
-      br_top = CreateSolidBrush(RGB(77, 182, 247));
-      old_br = (HBRUSH)SelectObject(hdc, br_top);
-      pts[0].x = cx;
-      pts[0].y = (int)(cy - R);
-      pts[1].x = (int)(cx + R * sqrt3_2);
-      pts[1].y = (int)(cy - R * 0.5);
-      pts[2].x = cx;
-      pts[2].y = cy;
-      pts[3].x = (int)(cx - R * sqrt3_2);
-      pts[3].y = (int)(cy - R * 0.5);
-      Polygon(hdc, pts, 4);
-      SelectObject(hdc, old_br);
-      DeleteObject(br_top);
+        if (node->type == 14) {
+          TextOutA(hdc, (int)(rect.x + rect.width / 2.0f), (int)(rect.y + (rect.height - size) / 2.0f), text, (int)strlen(text));
+        } else {
+          TextOutA(hdc, (int)(rect.x + rect.width / 2.0f), (int)rect.y, text, (int)strlen(text));
+        }
 
-      /* Right Face: Vibrant Purple (#7F52FF) */
-      br_right = CreateSolidBrush(RGB(127, 82, 255));
-      old_br = (HBRUSH)SelectObject(hdc, br_right);
-      pts[0].x = (int)(cx + R * sqrt3_2);
-      pts[0].y = (int)(cy - R * 0.5);
-      pts[1].x = (int)(cx + R * sqrt3_2);
-      pts[1].y = (int)(cy + R * 0.5);
-      pts[2].x = cx;
-      pts[2].y = (int)(cy + R);
-      pts[3].x = cx;
-      pts[3].y = cy;
-      Polygon(hdc, pts, 4);
-      SelectObject(hdc, old_br);
-      DeleteObject(br_right);
-
-      /* Left Face: Medium Blue (#3993F8) */
-      br_left = CreateSolidBrush(RGB(57, 147, 248));
-      old_br = (HBRUSH)SelectObject(hdc, br_left);
-      pts[0].x = cx;
-      pts[0].y = cy;
-      pts[1].x = cx;
-      pts[1].y = (int)(cy + R);
-      pts[2].x = (int)(cx - R * sqrt3_2);
-      pts[2].y = (int)(cy + R * 0.5);
-      pts[3].x = (int)(cx - R * sqrt3_2);
-      pts[3].y = (int)(cy - R * 0.5);
-      Polygon(hdc, pts, 4);
-      SelectObject(hdc, old_br);
-      DeleteObject(br_left);
-
-      /* Center Hole: Black */
-      br_hole = CreateSolidBrush(RGB(0, 0, 0));
-      old_br = (HBRUSH)SelectObject(hdc, br_hole);
-      pts[0].x = cx;
-      pts[0].y = (int)(cy - r);
-      pts[1].x = (int)(cx + r * sqrt3_2);
-      pts[1].y = (int)(cy - r * 0.5);
-      pts[2].x = (int)(cx + r * sqrt3_2);
-      pts[2].y = (int)(cy + r * 0.5);
-      pts[3].x = cx;
-      pts[3].y = (int)(cy + r);
-      pts[4].x = (int)(cx - r * sqrt3_2);
-      pts[4].y = (int)(cy + r * 0.5);
-      pts[5].x = (int)(cx - r * sqrt3_2);
-      pts[5].y = (int)(cy - r * 0.5);
-      Polygon(hdc, pts, 6);
-      SelectObject(hdc, old_br);
-      DeleteObject(br_hole);
-
-      SelectObject(hdc, old_pen);
-      DeleteObject(null_pen);
+        SelectObject(hdc, old_font);
+        DeleteObject(font);
+      }
     }
   }
-
   for (i = 0; i < node->child_count; i++) {
     render_node_gdi(hdc, node->children[i], scale_factor);
   }
@@ -517,13 +464,13 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
         DeleteDC(memDC);
       } else {
         /* Normal simple Paint for now, DirectX layers on top later */
-        FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
+        /* FillRect removed to allow transparency */
 
         if (window->ui_tree) {
           render_node_gdi(hdc, window->ui_tree, 1.0f);
         } else {
           SetTextAlign(hdc, TA_CENTER);
-          SetTextColor(hdc, RGB(0, 0, 0));
+          SetTextColor(hdc, RGB(240, 240, 240));
           SetBkMode(hdc, TRANSPARENT);
           TextOutA(hdc, window->config.width / 2, window->config.height / 2,
                    "Hello World", 11);
@@ -1081,6 +1028,7 @@ int cmp_window_destroy(cmp_window_t *window) {
 
 #if defined(_WIN32)
   if (window->hwnd) {
+    SetWindowLongPtrA(window->hwnd, GWLP_USERDATA, 0);
     DestroyWindow(window->hwnd);
     window->hwnd = NULL;
   }
@@ -1587,3 +1535,5 @@ int cmp_window_set_ui_tree(cmp_window_t *window, cmp_ui_node_t *tree) {
 #endif
   return CMP_SUCCESS;
 }
+
+

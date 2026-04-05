@@ -90,6 +90,13 @@ int32_t cmp_material3_layout_sidebar(cmp_ui_node_t *node) {
 
 int32_t cmp_material3_draw_button(const cmp_ui_node_t *node) {
   (void)node;
+  /* TODO: Inject cmp_gpu_t draw calls or display list nodes */
+  return CMP_SUCCESS;
+}
+
+int32_t cmp_material3_draw_card(const cmp_ui_node_t *node) {
+  (void)node;
+  /* TODO: Inject cmp_gpu_t draw calls or display list nodes */
   return CMP_SUCCESS;
 }
 
@@ -119,11 +126,6 @@ int32_t cmp_material3_draw_radio(const cmp_ui_node_t *node) {
 }
 
 int32_t cmp_material3_draw_progress(const cmp_ui_node_t *node) {
-  (void)node;
-  return CMP_SUCCESS;
-}
-
-int32_t cmp_material3_draw_card(const cmp_ui_node_t *node) {
   (void)node;
   return CMP_SUCCESS;
 }

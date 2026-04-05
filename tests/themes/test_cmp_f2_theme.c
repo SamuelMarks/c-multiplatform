@@ -61,9 +61,9 @@ TEST test_f2_semantic_tokens(void) {
   ASSERT_EQ(theme_dark.dark_green.step_30, theme_dark.color_success_background);
 
   /* Alpha Tokens */
-  ASSERT_EQ((0x80 << 24) | theme_light.neutral_90,
+  ASSERT_EQ(((uint32_t)0x80 << 24) | theme_light.neutral_90,
             theme_light.color_neutral_background_alpha);
-  ASSERT_EQ((0x80 << 24) | theme_dark.neutral_12,
+  ASSERT_EQ(((uint32_t)0x80 << 24) | theme_dark.neutral_12,
             theme_dark.color_neutral_background_alpha);
 
   PASS();
@@ -95,7 +95,8 @@ TEST test_f2_high_contrast(void) {
   ASSERT_EQ(highlight_text, theme_hc.color_brand_foreground_1);
 
   /* Alpha should be 0xFF opaque */
-  ASSERT_EQ((0xFF << 24) | window, theme_hc.color_neutral_background_alpha);
+  ASSERT_EQ(((uint32_t)0xFF << 24) | window,
+            theme_hc.color_neutral_background_alpha);
 
   PASS();
 }
@@ -161,16 +162,17 @@ TEST test_f2_shadows_and_materials(void) {
   ASSERT_EQ(0.0f, theme_hc.shadow_64.y1);
 
   /* Materials */
-  ASSERT_EQ((0xFF << 24) | theme_light.neutral_90,
+  ASSERT_EQ(((uint32_t)0xFF << 24) | theme_light.neutral_90,
             theme_light.material_mica_background);
   ASSERT_EQ(30.0f, theme_light.material_acrylic_blur);
 
-  ASSERT_EQ((0xFF << 24) | theme_dark.neutral_10,
+  ASSERT_EQ(((uint32_t)0xFF << 24) | theme_dark.neutral_10,
             theme_dark.material_mica_background);
   ASSERT_EQ(30.0f, theme_dark.material_acrylic_blur);
 
   /* HC Materials fallback to window colors */
-  ASSERT_EQ((0xFF << 24) | 0x000000, theme_hc.material_mica_background);
+  ASSERT_EQ(((uint32_t)0xFF << 24) | 0x000000,
+            theme_hc.material_mica_background);
   ASSERT_EQ(0.0f, theme_hc.material_acrylic_blur);
 
   PASS();

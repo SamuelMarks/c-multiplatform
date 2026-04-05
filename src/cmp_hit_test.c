@@ -37,6 +37,36 @@ int cmp_hit_test_destroy(cmp_hit_test_t *hit_test) {
   return CMP_SUCCESS;
 }
 
+static cmp_ui_node_t *hit_test_recursive(cmp_ui_node_t *node, float x, float y) {
+  size_t i;
+  cmp_ui_node_t *hit = NULL;
+  cmp_ui_node_t *child_hit = NULL;
+
+  if (!node || !node->layout)
+    return NULL;
+
+  /* Check if point is inside this node's bounds */
+  if (x >= node->layout->computed_rect.x &&
+      x <= (node->layout->computed_rect.x + node->layout->computed_rect.width) &&
+      y >= node->layout->computed_rect.y &&
+      y <= (node->layout->computed_rect.y + node->layout->computed_rect.height)) {
+    
+    /* It's a potential hit. Now check children in reverse order (top z-index first) */
+    /* Since we don't have explicit z-index yet, document order usually implies later children draw on top */
+    for (i = node->child_count; i > 0; i--) {
+      child_hit = hit_test_recursive(node->children[i - 1], x, y);
+      if (child_hit) {
+        return child_hit;
+      }
+    }
+
+    /* If no children hit, but this node was hit, return this node */
+    hit = node;
+  }
+
+  return hit;
+}
+
 int cmp_hit_test_query(cmp_hit_test_t *hit_test, float x, float y,
                        cmp_ui_node_t **out_node) {
   struct cmp_hit_test *ctx = (struct cmp_hit_test *)hit_test;
@@ -44,23 +74,24 @@ int cmp_hit_test_query(cmp_hit_test_t *hit_test, float x, float y,
   if (!ctx || !out_node)
     return CMP_ERROR_INVALID_ARG;
 
-  /* In a real engine, this reverses the 3D Layer Tree CSS transforms via ray
-     casting against the bounding boxes of the tree elements. Here we simulate.
-   */
-
   /* If a coordinate is negative, simulate a miss (offscreen) */
   if (x < 0.0f || y < 0.0f) {
     *out_node = NULL;
     return CMP_ERROR_NOT_FOUND;
   }
 
-  /* Simulate finding a hit */
+  /* Simulate finding a hit using the mock bypass if set */
   if (ctx->mock_hit_result) {
     *out_node = ctx->mock_hit_result;
     return CMP_SUCCESS;
   }
 
-  /* No explicit mock set, just return not found */
-  *out_node = NULL;
+  /* Actual recursive hit testing */
+  *out_node = hit_test_recursive(ctx->tree, x, y);
+
+  if (*out_node) {
+    return CMP_SUCCESS;
+  }
+
   return CMP_ERROR_NOT_FOUND;
 }

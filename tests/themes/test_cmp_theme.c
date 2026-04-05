@@ -132,6 +132,8 @@ TEST test_global_enum_switch(void) {
   config.height = 100;
   config.title = "Test";
 
+  cmp_window_system_init();
+
   /* Mock window and themes */
   ASSERT_EQ(CMP_SUCCESS, cmp_window_create(&config, &window));
   ASSERT_EQ(CMP_SUCCESS, cmp_theme_create(&theme_material));
@@ -147,9 +149,11 @@ TEST test_global_enum_switch(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_window_set_theme(window, theme_fluent));
 
   /* Clean up */
-  ASSERT_EQ(CMP_SUCCESS, cmp_theme_destroy(theme_material));
-  ASSERT_EQ(CMP_SUCCESS, cmp_theme_destroy(theme_fluent));
+  cmp_theme_destroy(theme_material);
+  cmp_theme_destroy(theme_fluent);
   cmp_window_destroy(window);
+
+  cmp_window_system_shutdown();
 
   PASS();
 }

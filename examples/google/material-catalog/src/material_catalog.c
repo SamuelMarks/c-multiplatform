@@ -5,6 +5,14 @@
 #include <string.h>
 /* clang-format on */
 
+static uint32_t catalog_color_to_uint32(const cmp_color_t *c) {
+  uint32_t r = (uint32_t)(c->r * 255.0f);
+  uint32_t g = (uint32_t)(c->g * 255.0f);
+  uint32_t b = (uint32_t)(c->b * 255.0f);
+  uint32_t a = (uint32_t)(c->a * 255.0f);
+  return (r << 24) | (g << 16) | (b << 8) | a;
+}
+
 /**
  * @brief Global registry of Material components.
  */
@@ -406,38 +414,56 @@ int material_catalog_get_palette(catalog_palette_id_t id, catalog_theme_t theme,
   return MATERIAL_CATALOG_SUCCESS;
 }
 
-static const theme_typography_style_t g_typography_scales[13] = {
-    {96.0f, -1.5f, 300, THEME_FONT_DEFAULT}, /* H1 */
-    {60.0f, -0.5f, 300, THEME_FONT_DEFAULT}, /* H2 */
-    {48.0f, 0.0f, 400, THEME_FONT_DEFAULT},  /* H3 */
-    {34.0f, 0.25f, 400, THEME_FONT_DEFAULT}, /* H4 */
-    {24.0f, 0.0f, 400, THEME_FONT_DEFAULT},  /* H5 */
-    {20.0f, 0.15f, 500, THEME_FONT_DEFAULT}, /* H6 */
-    {16.0f, 0.15f, 400, THEME_FONT_DEFAULT}, /* Subtitle1 */
-    {14.0f, 0.1f, 500, THEME_FONT_DEFAULT},  /* Subtitle2 */
-    {16.0f, 0.5f, 400, THEME_FONT_DEFAULT},  /* Body1 */
-    {14.0f, 0.25f, 400, THEME_FONT_DEFAULT}, /* Body2 */
-    {14.0f, 1.25f, 500, THEME_FONT_DEFAULT}, /* Button */
-    {12.0f, 0.4f, 400, THEME_FONT_DEFAULT},  /* Caption */
-    {10.0f, 1.5f, 400, THEME_FONT_DEFAULT}   /* Overline */
+static const theme_typography_style_t g_typography_scales[15] = {
+    {57.0f, -0.25f, 400, THEME_FONT_DEFAULT}, /* Display Large */
+    {45.0f, 0.0f, 400, THEME_FONT_DEFAULT},   /* Display Medium */
+    {36.0f, 0.0f, 400, THEME_FONT_DEFAULT},   /* Display Small */
+    {32.0f, 0.0f, 400, THEME_FONT_DEFAULT},   /* Headline Large */
+    {28.0f, 0.0f, 400, THEME_FONT_DEFAULT},   /* Headline Medium */
+    {24.0f, 0.0f, 400, THEME_FONT_DEFAULT},   /* Headline Small */
+    {22.0f, 0.0f, 400, THEME_FONT_DEFAULT},   /* Title Large */
+    {16.0f, 0.15f, 500, THEME_FONT_DEFAULT},  /* Title Medium */
+    {14.0f, 0.1f, 500, THEME_FONT_DEFAULT},   /* Title Small */
+    {14.0f, 0.1f, 500, THEME_FONT_DEFAULT},   /* Label Large */
+    {12.0f, 0.5f, 500, THEME_FONT_DEFAULT},   /* Label Medium */
+    {11.0f, 0.5f, 500, THEME_FONT_DEFAULT},   /* Label Small */
+    {16.0f, 0.5f, 400, THEME_FONT_DEFAULT},   /* Body Large */
+    {14.0f, 0.25f, 400, THEME_FONT_DEFAULT},  /* Body Medium */
+    {12.0f, 0.4f, 400, THEME_FONT_DEFAULT}    /* Body Small */
 };
 
 int material_catalog_get_typography_style(theme_typography_scale_t scale,
                                           theme_typography_style_t *out_style) {
   if (!out_style)
     return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if ((int)scale < 0 || (int)scale > 12)
+  if ((int)scale < 0 || (int)scale > 14)
     return MATERIAL_CATALOG_ERROR_NULL_POINTER;
   *out_style = g_typography_scales[scale];
   return MATERIAL_CATALOG_SUCCESS;
 }
 
-int material_catalog_load_fonts(void) {
-  /* In a full implementation, we'd use
-   * cmp_font_load("vfs://fonts/Roboto-Regular.ttf", 16.0f, &g_roboto_regular);
-   */
-  /* For now, this is a mock since we don't have font files checked into the
-   * catalog */
+int material_catalog_load_fonts(material_catalog_state_t *state) {
+  int i;
+  if (!state)
+    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
+
+  /* Zero out the array first */
+  for (i = 0; i < 15; ++i) {
+    state->fonts[i] = NULL;
+  }
+
+  /* Load standard typography font families via c-fs (VFS) mapped to scales */
+  for (i = 0; i < 15; ++i) {
+    const char *font_path = "vfs://fonts/Roboto-Regular.ttf";
+    if (g_typography_scales[i].font_weight >= 500) {
+      font_path = "vfs://fonts/Roboto-Medium.ttf";
+    }
+    /* We ignore missing font errors since the catalog repo might not have the
+     * files checked in yet */
+    cmp_font_load(font_path, g_typography_scales[i].font_size,
+                  &state->fonts[i]);
+  }
+
   return MATERIAL_CATALOG_SUCCESS;
 }
 
@@ -458,17 +484,54 @@ int material_catalog_get_shape_radius(theme_shape_size_t size,
 
 int material_catalog_render_theme_picker(material_catalog_state_t *state,
                                          cmp_ui_node_t *container) {
+  cmp_ui_node_t *scrim;
   cmp_ui_node_t *sheet;
   cmp_ui_node_t *title;
   cmp_ui_node_t *reset_btn;
+  cmp_ui_node_t *drag_handle;
+  cmp_m3_sheet_metrics_t sheet_metrics;
+  float tonal_opacity, dummy_y, dummy_b, dummy_a, dummy_s;
+  cmp_color_t sheet_bg;
 
   if (!state || !container)
     return MATERIAL_CATALOG_ERROR_NULL_POINTER;
 
-  /* Renders bottom sheet base */
+  cmp_m3_sheet_resolve(CMP_M3_SHEET_BOTTOM_MODAL, &sheet_metrics);
+
+  /* Render Scrim */
+  if (sheet_metrics.has_scrim) {
+    if (cmp_ui_box_create(&scrim) == 0) {
+      scrim->layout->position_type = CMP_POSITION_ABSOLUTE;
+      scrim->layout->width = state->window_width;
+      scrim->layout->height = state->window_height;
+      scrim->layout->position[0] = 0;
+      scrim->layout->position[3] = 0;
+
+      /* Scrim is black at 32% opacity */
+      scrim->bg_color = (0x51 << 24) | 0x000000;
+
+      /* Intercept clicks */
+      cmp_ui_node_add_event_listener(scrim, CMP_EVENT_TYPE_MOUSE, 0, NULL, NULL);
+      cmp_ui_node_add_child(container, scrim);
+    }
+  }
+
+  /* Render Bottom Sheet base */
   if (cmp_ui_box_create(&sheet) != 0) {
     return MATERIAL_CATALOG_ERROR_OUT_OF_MEMORY;
   }
+
+  cmp_m3_elevation_resolve(sheet_metrics.elevation, &tonal_opacity, &dummy_y, &dummy_b, &dummy_a, &dummy_s);
+  {
+      cmp_linear_blend_t *blend;
+      cmp_linear_blend_create(2.2f, &blend);
+      cmp_linear_blend_mix(blend, &state->sys_colors.surface, &state->sys_colors.primary, tonal_opacity, &sheet_bg);
+      cmp_linear_blend_destroy(blend);
+  }
+
+  sheet->bg_color = catalog_color_to_uint32(&sheet_bg);
+  sheet->design_language_override = 1; /* M3 */
+  /* Corner radius handling typically done natively during GDI render based on shape metric */
 
   sheet->layout->position_type = CMP_POSITION_ABSOLUTE;
   sheet->layout->width = state->window_width;
@@ -476,13 +539,26 @@ int material_catalog_render_theme_picker(material_catalog_state_t *state,
   sheet->layout->position[0] = state->window_height - 400.0f; /* top */
   sheet->layout->position[3] = 0;                             /* left */
   sheet->layout->direction = CMP_FLEX_COLUMN;
-  sheet->layout->padding[0] = 24.0f; /* top */
+  sheet->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+  sheet->layout->padding[0] = 22.0f; /* top */
   sheet->layout->padding[1] = 16.0f; /* right */
   sheet->layout->padding[3] = 16.0f; /* left */
+
+  /* Drag Handle */
+  if (sheet_metrics.has_drag_handle) {
+      if (cmp_ui_box_create(&drag_handle) == 0) {
+          drag_handle->layout->width = 32.0f;
+          drag_handle->layout->height = 4.0f;
+          drag_handle->layout->margin[2] = 22.0f; /* margin-bottom to title */
+          drag_handle->bg_color = catalog_color_to_uint32(&state->sys_colors.outline);
+          cmp_ui_node_add_child(sheet, drag_handle);
+      }
+  }
 
   /* Title */
   if (cmp_ui_text_create(&title, "Theme Settings", -1) == 0) {
     title->layout->margin[2] = 16.0f;
+    title->text_color = catalog_color_to_uint32(&state->sys_colors.on_surface);
     cmp_ui_node_add_child(sheet, title);
   }
 
@@ -494,6 +570,7 @@ int material_catalog_render_theme_picker(material_catalog_state_t *state,
       color_row->layout->direction = CMP_FLEX_ROW;
       color_row->layout->margin[2] = 16.0f;
       if (cmp_ui_text_create(&color_lbl, "[ Colors ]", -1) == 0) {
+        color_lbl->text_color = catalog_color_to_uint32(&state->sys_colors.on_surface);
         cmp_ui_node_add_child(color_row, color_lbl);
       }
       cmp_ui_node_add_child(sheet, color_row);
@@ -508,6 +585,7 @@ int material_catalog_render_theme_picker(material_catalog_state_t *state,
       typo_row->layout->direction = CMP_FLEX_ROW;
       typo_row->layout->margin[2] = 16.0f;
       if (cmp_ui_text_create(&typo_lbl, "[ Typography ]", -1) == 0) {
+        typo_lbl->text_color = catalog_color_to_uint32(&state->sys_colors.on_surface);
         cmp_ui_node_add_child(typo_row, typo_lbl);
       }
       cmp_ui_node_add_child(sheet, typo_row);
@@ -522,7 +600,6 @@ int material_catalog_render_theme_picker(material_catalog_state_t *state,
   cmp_ui_node_add_child(container, sheet);
   return MATERIAL_CATALOG_SUCCESS;
 }
-
 int material_catalog_apply_shape(cmp_ui_node_t *node,
                                  theme_shape_corner_family_t family,
                                  float radius) {
@@ -534,6 +611,12 @@ int material_catalog_apply_shape(cmp_ui_node_t *node,
   (void)radius;
   return MATERIAL_CATALOG_SUCCESS;
 }
+
+typedef struct click_ctx {
+  material_catalog_state_t *state;
+  int id;
+  int index;
+} click_ctx_t;
 
 static void back_btn_clicked(cmp_event_t *evt, cmp_ui_node_t *node,
                              void *user_data);
@@ -559,7 +642,7 @@ int material_catalog_render_scrim(material_catalog_state_t *state,
   /* TODO: Apply exact rgba(0,0,0,0.32) background */
 
   /* Block underlying clicks by capturing them and doing nothing */
-  cmp_ui_node_add_event_listener(scrim, 1, 0, NULL, NULL);
+  cmp_ui_node_add_event_listener(scrim, CMP_EVENT_TYPE_MOUSE, 0, back_btn_clicked, NULL);
 
   cmp_ui_node_add_child(container, scrim);
   return MATERIAL_CATALOG_SUCCESS;
@@ -600,23 +683,51 @@ int material_catalog_render_more_menu(material_catalog_state_t *state,
 
 static void ripple_event_handler(cmp_event_t *evt, cmp_ui_node_t *node,
                                  void *user_data) {
-  (void)node;
-  (void)user_data;
+  material_catalog_state_t *state = (material_catalog_state_t *)user_data;
+  float base_opacity = 0.0f;
+  float anim_opacity = 0.0f;
+  float final_opacity = 0.0f;
 
-  /* Mock logic for updating state layer overlays */
+  if (evt == NULL || node == NULL)
+    return;
+
+  /* Logic for updating state layer overlays */
   if (evt->action == CMP_ACTION_DOWN) {
     /* Trigger 12% pressed overlay, trigger expanding ripple animation */
+    anim_opacity = 0.12f;
   } else if (evt->action == CMP_ACTION_UP || evt->action == CMP_ACTION_CANCEL) {
     /* Trigger 4% hover overlay if cursor still over, fade out ripple */
+    anim_opacity = 0.04f;
+  } else if (evt->action == CMP_ACTION_MOVE) {
+    /* Trigger 4% hover overlay */
+    anim_opacity = 0.04f;
+  }
+
+  /* Hook into the ripple animation rendering pipeline */
+  if (cmp_anim_compose_numerical(base_opacity, anim_opacity,
+                                 CMP_ANIM_COMPOSE_REPLACE,
+                                 &final_opacity) == 0) {
+    /* Hack for mock catalog: we store the ripple opacity in the upper bits of
+       layout flex_shrink or similar safe spot, but `node->properties` is safer
+       if the node is a Card (since we used properties for background color).
+       Actually, `cmp_ui_node_t` doesn't have an explicit `state_layer` field
+       unless we augment it. We will trigger a repaint request. */
+    (void)final_opacity;
+    if (state) {
+      /* Here we'd mark the specific node DIRTY_PAINT, but we'll invalidate the
+       * whole UI for this mock */
+      material_catalog_invalidate_ui(state);
+    }
   }
 }
 
-int material_catalog_apply_ripple(cmp_ui_node_t *node) {
+int material_catalog_apply_ripple(material_catalog_state_t *state,
+                                  cmp_ui_node_t *node) {
   if (!node)
     return MATERIAL_CATALOG_ERROR_NULL_POINTER;
 
-  cmp_ui_node_add_event_listener(node, 1 /* Pointer Events */, 0,
-                                 ripple_event_handler, NULL);
+  cmp_ui_node_add_event_listener(node, CMP_EVENT_TYPE_MOUSE, 0,
+                                 ripple_event_handler, state);
 
   return MATERIAL_CATALOG_SUCCESS;
 }
@@ -627,10 +738,14 @@ int material_catalog_render_top_app_bar(material_catalog_state_t *state,
                                         int show_back_button) {
   cmp_ui_node_t *app_bar;
   cmp_ui_node_t *title_node;
-  cmp_palette_t palette;
+  cmp_m3_top_app_bar_metrics_t metrics;
+  cmp_m3_icon_button_metrics_t btn_metrics;
 
   if (!state || !container)
     return MATERIAL_CATALOG_ERROR_NULL_POINTER;
+
+  cmp_m3_top_app_bar_resolve(CMP_M3_TOP_APP_BAR_CENTER_ALIGNED, &metrics);
+  cmp_m3_icon_button_resolve(CMP_M3_ICON_BUTTON_STANDARD, &btn_metrics);
 
   if (cmp_ui_box_create(&app_bar) != 0) {
     return MATERIAL_CATALOG_ERROR_OUT_OF_MEMORY;
@@ -638,28 +753,80 @@ int material_catalog_render_top_app_bar(material_catalog_state_t *state,
 
   app_bar->layout->direction = CMP_FLEX_ROW;
   app_bar->layout->width = state->window_width;
-  app_bar->layout->height =
-      64.0f + state->window_insets.y; /* 64dp content + safe area */
+  app_bar->layout->height = metrics.height_collapsed + state->window_insets.y;
   app_bar->layout->padding[0] = state->window_insets.y; /* padding-top */
-  app_bar->layout->padding[1] = 16.0f;                  /* padding-right */
-  app_bar->layout->padding[3] = 16.0f;                  /* padding-left */
+  app_bar->layout->padding[1] = 4.0f;                   /* padding-right */
+  app_bar->layout->padding[3] = 4.0f;                   /* padding-left */
   app_bar->layout->align_items = CMP_FLEX_ALIGN_CENTER;
 
-  material_catalog_get_palette(CATALOG_PALETTE_BLUE, state->current_theme,
-                               &palette);
-  /* TODO: Apply palette surface color to app_bar background */
+  app_bar->bg_color = catalog_color_to_uint32(&state->sys_colors.surface);
+  app_bar->design_language_override = 1;
 
   if (show_back_button) {
     cmp_ui_node_t *back_btn;
-    if (cmp_ui_button_create(&back_btn, "<-", -1) == 0) {
-      back_btn->layout->margin[1] = 16.0f;
-      cmp_ui_node_add_event_listener(back_btn, 1, 0, back_btn_clicked, state);
+    if (cmp_ui_image_view_create(&back_btn, "vfs://assets/ic_arrow_back.svg") == 0) {
+      click_ctx_t *ctx;
+      back_btn->layout->width = btn_metrics.target_size;
+      back_btn->layout->height = btn_metrics.target_size;
+      /* Mock properties to hold icon tinting */
+      back_btn->properties = (void*)(uintptr_t)catalog_color_to_uint32(&state->sys_colors.on_surface);
+      if (cmp_arena_alloc(&state->state_arena, sizeof(click_ctx_t),
+                          (void **)&ctx) == 0) {
+        ctx->state = state;
+        ctx->id = 0;
+        ctx->index = 0;
+        cmp_ui_node_add_event_listener(back_btn, 1, 0, back_btn_clicked, ctx);
+      }
+      material_catalog_apply_ripple(state, back_btn);
       cmp_ui_node_add_child(app_bar, back_btn);
+    }
+  } else {
+    /* Empty spacer so the title stays centered */
+    cmp_ui_node_t *spacer;
+    if (cmp_ui_box_create(&spacer) == 0) {
+      spacer->layout->width = btn_metrics.target_size;
+      spacer->layout->height = btn_metrics.target_size;
+      cmp_ui_node_add_child(app_bar, spacer);
     }
   }
 
   if (cmp_ui_text_create(&title_node, title ? title : "", -1) == 0) {
+    title_node->layout->flex_grow = 1.0f;
+    title_node->text_color = catalog_color_to_uint32(&state->sys_colors.on_surface);
+    /* In a real implementation we would attach the font pointer from state->fonts[THEME_TYPOGRAPHY_TITLE_LARGE] */
+    title_node->properties = state->fonts[THEME_TYPOGRAPHY_TITLE_LARGE];
     cmp_ui_node_add_child(app_bar, title_node);
+  }
+
+  /* Right trailing actions: Pin, Palette, Ellipsis */
+  {
+    cmp_ui_node_t *pin_btn;
+    cmp_ui_node_t *palette_btn;
+    cmp_ui_node_t *more_btn;
+
+    if (cmp_ui_image_view_create(&pin_btn, "vfs://assets/ic_push_pin.svg") == 0) {
+      pin_btn->layout->width = btn_metrics.target_size;
+      pin_btn->layout->height = btn_metrics.target_size;
+      pin_btn->properties = (void*)(uintptr_t)catalog_color_to_uint32(&state->sys_colors.on_surface);
+      material_catalog_apply_ripple(state, pin_btn);
+      cmp_ui_node_add_child(app_bar, pin_btn);
+    }
+
+    if (cmp_ui_image_view_create(&palette_btn, "vfs://assets/ic_palette.svg") == 0) {
+      palette_btn->layout->width = btn_metrics.target_size;
+      palette_btn->layout->height = btn_metrics.target_size;
+      palette_btn->properties = (void*)(uintptr_t)catalog_color_to_uint32(&state->sys_colors.on_surface);
+      material_catalog_apply_ripple(state, palette_btn);
+      cmp_ui_node_add_child(app_bar, palette_btn);
+    }
+
+    if (cmp_ui_image_view_create(&more_btn, "vfs://assets/ic_more_vert.svg") == 0) {
+      more_btn->layout->width = btn_metrics.target_size;
+      more_btn->layout->height = btn_metrics.target_size;
+      more_btn->properties = (void*)(uintptr_t)catalog_color_to_uint32(&state->sys_colors.on_surface);
+      material_catalog_apply_ripple(state, more_btn);
+      cmp_ui_node_add_child(app_bar, more_btn);
+    }
   }
 
   cmp_ui_node_add_child(container, app_bar);
@@ -773,6 +940,10 @@ int material_catalog_apply_viewport_culling(material_catalog_state_t *state,
 
 int material_catalog_init(material_catalog_state_t *state) {
   cmp_window_config_t config;
+  cmp_dpi_t *dpi = NULL;
+  float monitor_scale = 1.0f;
+  cmp_color_t seed_color = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
+
   if (state == NULL) {
     return MATERIAL_CATALOG_ERROR_NULL_POINTER;
   }
@@ -783,6 +954,15 @@ int material_catalog_init(material_catalog_state_t *state) {
 
   if (cmp_window_system_init() != 0) {
     return MATERIAL_CATALOG_ERROR_INITIALIZATION_FAILED;
+  }
+
+  if (cmp_dpi_awareness_init() == 0) {
+    if (cmp_dpi_create(&dpi) == 0) {
+      if (cmp_dpi_get_monitor_scale(dpi, 0, &monitor_scale) != 0) {
+        monitor_scale = 1.0f;
+      }
+      cmp_dpi_destroy(dpi);
+    }
   }
 
   memset(state, 0, sizeof(material_catalog_state_t));
@@ -802,13 +982,16 @@ int material_catalog_init(material_catalog_state_t *state) {
     return MATERIAL_CATALOG_ERROR_OUT_OF_MEMORY;
   }
 
-  state->window_width = 1024.0f;
-  state->window_height = 768.0f;
+  state->window_width = 1024.0f * monitor_scale;
+  state->window_height = 768.0f * monitor_scale;
   state->current_theme = CATALOG_THEME_SYSTEM;
   state->router.stack_size = 1;
   state->router.stack[0].screen_id = CATALOG_SCREEN_HOME;
   state->is_ui_dirty = 1;
   state->is_rtl = 0; /* Default LTR */
+
+  cmp_m3_sys_colors_generate(seed_color, 0 /* default light */,
+                             CMP_M3_CONTRAST_STANDARD, &state->sys_colors);
 
   memset(&config, 0, sizeof(config));
   config.width = (uint32_t)state->window_width;
@@ -828,6 +1011,7 @@ int material_catalog_init(material_catalog_state_t *state) {
   }
 
   material_catalog_update_insets(state);
+  material_catalog_load_fonts(state);
 
   return MATERIAL_CATALOG_SUCCESS;
 }
@@ -856,12 +1040,6 @@ void material_catalog_navigate_back(material_catalog_state_t *state) {
     material_catalog_invalidate_ui(state);
   }
 }
-
-typedef struct click_ctx {
-  material_catalog_state_t *state;
-  int id;
-  int index;
-} click_ctx_t;
 
 static void back_btn_clicked(cmp_event_t *evt, cmp_ui_node_t *node,
                              void *user_data) {
@@ -919,24 +1097,87 @@ int material_catalog_render_home_screen(material_catalog_state_t *state,
   grid->layout->padding[3] = 16.0f;
 
   for (i = 0; i < g_component_count; ++i) {
-    cmp_ui_node_t *btn;
+    cmp_ui_node_t *card;
+    cmp_ui_node_t *icon;
+    cmp_ui_node_t *label;
+    cmp_ui_node_t *border_bottom;
+    cmp_ui_node_t *border_right;
     click_ctx_t *ctx;
 
-    if (cmp_ui_button_create(&btn, g_components[i].name, -1) == 0) {
-      btn->layout->width = (state->window_width - 32.0f) / cellsCount;
-      btn->layout->height = 120.0f; /* Fixed card height */
-      btn->layout->margin[0] = 8.0f;
-      btn->layout->margin[2] = 8.0f;
+    if (cmp_ui_box_create(&card) == 0) {
+      cmp_m3_card_metrics_t card_metrics;
+      float tonal_opacity, dummy_y, dummy_b, dummy_a, dummy_s;
+      cmp_color_t card_bg;
+
+      card->type = 8;                     /* Card */
+      card->design_language_override = 1; /* M3 */
+
+      cmp_m3_card_resolve(CMP_M3_CARD_ELEVATED, &card_metrics);
+      cmp_m3_elevation_resolve(card_metrics.elevation, &tonal_opacity, &dummy_y, &dummy_b, &dummy_a, &dummy_s);
+
+      {
+          cmp_linear_blend_t *blend;
+          cmp_linear_blend_create(2.2f, &blend);
+          cmp_linear_blend_mix(blend, &state->sys_colors.surface, &state->sys_colors.primary, tonal_opacity, &card_bg);
+          cmp_linear_blend_destroy(blend);
+      }
+      card->bg_color = catalog_color_to_uint32(&card_bg);
+
+      card->layout->width = (state->window_width - 32.0f) / cellsCount;
+      card->layout->height = 120.0f; /* Fixed card height */      card->layout->margin[0] = 0.0f;
+      card->layout->margin[2] = 0.0f;
+      card->layout->direction = CMP_FLEX_COLUMN;
+      card->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+      card->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
+      card->layout->position_type = CMP_POSITION_RELATIVE;
 
       if (cmp_arena_alloc(&state->ui_arena, sizeof(click_ctx_t),
                           (void **)&ctx) == 0) {
         ctx->state = state;
         ctx->id = g_components[i].id;
         ctx->index = 0;
-        cmp_ui_node_add_event_listener(btn, 1, 0, comp_btn_clicked, ctx);
+        cmp_ui_node_add_event_listener(card, 1, 0, comp_btn_clicked, ctx);
       }
 
-      cmp_ui_node_add_child(grid, btn);
+      material_catalog_apply_ripple(state, card);
+
+      /* Mock SVG icon (using image view) */
+      if (cmp_ui_image_view_create(&icon, "vfs://assets/ic_component.svg") ==
+          0) {
+        icon->layout->width = 48.0f;
+        icon->layout->height = 48.0f;
+        icon->layout->margin[2] = 16.0f; /* margin-bottom */
+        cmp_ui_node_add_child(card, icon);
+      }
+
+      /* Component label */
+      if (cmp_ui_text_create(&label, g_components[i].name, -1) == 0) {
+        cmp_ui_node_add_child(card, label);
+      }
+
+      /* gridItemBorder: bottom */
+      if (cmp_ui_box_create(&border_bottom) == 0) {
+        border_bottom->layout->position_type = CMP_POSITION_ABSOLUTE;
+        border_bottom->layout->position[2] = 0.0f; /* bottom */
+        border_bottom->layout->position[3] = 0.0f; /* left */
+        border_bottom->layout->width = card->layout->width;
+        border_bottom->layout->height = 1.0f; /* 1dp */
+        /* Normally we'd set background color for the border here */
+        cmp_ui_node_add_child(card, border_bottom);
+      }
+
+      /* gridItemBorder: right */
+      if (cmp_ui_box_create(&border_right) == 0) {
+        border_right->layout->position_type = CMP_POSITION_ABSOLUTE;
+        border_right->layout->position[0] = 0.0f; /* top */
+        border_right->layout->position[1] = 0.0f; /* right */
+        border_right->layout->width = 1.0f;       /* 1dp */
+        border_right->layout->height = card->layout->height;
+        /* Normally we'd set background color for the border here */
+        cmp_ui_node_add_child(card, border_right);
+      }
+
+      cmp_ui_node_add_child(grid, card);
     }
   }
 
@@ -964,14 +1205,13 @@ int material_catalog_create_scroll_view(material_catalog_state_t *state,
 static void render_component_details(material_catalog_state_t *state,
                                      cmp_ui_node_t *container,
                                      int component_id) {
-  cmp_ui_node_t *back_btn;
-  cmp_ui_node_t *title;
+  cmp_ui_node_t *scroll_node;
+  cmp_ui_node_t *hero_icon;
   cmp_ui_node_t *desc;
   const material_component_t *comp = NULL;
   const material_example_t *examples;
   int example_count = 0;
   int i;
-  char buf[256];
 
   for (i = 0; i < g_component_count; ++i) {
     if (g_components[i].id == component_id) {
@@ -980,120 +1220,152 @@ static void render_component_details(material_catalog_state_t *state,
     }
   }
 
-  if (cmp_ui_button_create(&back_btn, "<- Back", -1) == 0) {
-    back_btn->layout->margin[0] = 16.0f;
-    back_btn->layout->margin[3] = 16.0f;
-    cmp_ui_node_add_event_listener(back_btn, 1, 0, back_btn_clicked, state);
-    cmp_ui_node_add_child(container, back_btn);
-  }
+  if (!comp)
+    return;
 
-  if (comp) {
-    sprintf(buf, "Component: %s", comp->name);
-    if (cmp_ui_text_create(&title, buf, -1) == 0) {
-      title->layout->margin[0] = 16.0f;
-      title->layout->margin[3] = 16.0f;
-      cmp_ui_node_add_child(container, title);
+  material_catalog_render_top_app_bar(state, container, comp->name, 1);
+
+  if (material_catalog_create_scroll_view(state, &scroll_node) == 0) {
+    scroll_node->layout->flex_grow = 1.0f;
+    scroll_node->layout->width = state->window_width;
+    scroll_node->layout->height =
+        state->window_height - (64.0f + state->window_insets.y);
+
+    /* Header: 108dp centered hero icon */
+    if (cmp_ui_image_view_create(&hero_icon, "vfs://assets/ic_component.svg") ==
+        0) {
+      hero_icon->layout->width = 108.0f;
+      hero_icon->layout->height = 108.0f;
+      hero_icon->layout->align_self = CMP_FLEX_ALIGN_CENTER;
+      hero_icon->layout->margin[0] = 32.0f;
+      hero_icon->layout->margin[2] = 32.0f;
+      cmp_ui_node_add_child(scroll_node, hero_icon);
     }
 
+    /* Body: Description typography */
     if (cmp_ui_text_create(&desc, comp->description, -1) == 0) {
-      desc->layout->margin[0] = 8.0f;
+      desc->layout->margin[0] = 16.0f;
+      desc->layout->margin[1] = 16.0f;
+      desc->layout->margin[2] = 32.0f;
       desc->layout->margin[3] = 16.0f;
-      cmp_ui_node_add_child(container, desc);
+      /* Medium alpha text color applied conceptually via cmp_theme_t */
+      cmp_ui_node_add_child(scroll_node, desc);
     }
 
     examples = get_examples_for_component(component_id, &example_count);
     for (i = 0; i < example_count; ++i) {
-      cmp_ui_node_t *example_btn;
+      cmp_ui_node_t *example_item;
+      cmp_ui_node_t *example_label;
+      cmp_ui_node_t *chevron;
+      cmp_ui_node_t *border_bottom;
       click_ctx_t *ctx;
 
-      if (cmp_ui_button_create(&example_btn, examples[i].name, -1) == 0) {
-        example_btn->layout->margin[0] = 8.0f;
-        example_btn->layout->margin[3] = 32.0f; /* indent */
+      if (cmp_ui_box_create(&example_item) == 0) {
+        example_item->layout->direction = CMP_FLEX_ROW;
+        example_item->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+        example_item->layout->justify_content = CMP_FLEX_ALIGN_SPACE_BETWEEN;
+        example_item->layout->width = state->window_width;
+        example_item->layout->height = 56.0f;
+        example_item->layout->padding[1] = 16.0f;
+        example_item->layout->padding[3] = 16.0f;
+        example_item->layout->position_type = CMP_POSITION_RELATIVE;
 
         if (cmp_arena_alloc(&state->ui_arena, sizeof(click_ctx_t),
                             (void **)&ctx) == 0) {
           ctx->state = state;
           ctx->id = component_id;
           ctx->index = i;
-          cmp_ui_node_add_event_listener(example_btn, 1, 0, example_btn_clicked,
-                                         ctx);
+          cmp_ui_node_add_event_listener(example_item, 1, 0,
+                                         example_btn_clicked, ctx);
         }
 
-        cmp_ui_node_add_child(container, example_btn);
+        material_catalog_apply_ripple(state, example_item);
+
+        if (cmp_ui_text_create(&example_label, examples[i].name, -1) == 0) {
+          cmp_ui_node_add_child(example_item, example_label);
+        }
+
+        if (cmp_ui_text_create(&chevron, ">", -1) == 0) {
+          /* Mock right chevron icon */
+          cmp_ui_node_add_child(example_item, chevron);
+        }
+
+        /* 1dp border bottom */
+        if (cmp_ui_box_create(&border_bottom) == 0) {
+          border_bottom->layout->position_type = CMP_POSITION_ABSOLUTE;
+          border_bottom->layout->position[2] = 0.0f; /* bottom */
+          border_bottom->layout->position[3] = 0.0f; /* left */
+          border_bottom->layout->width = state->window_width;
+          border_bottom->layout->height = 1.0f; /* 1dp */
+          /* Normally set background color for divider here */
+          cmp_ui_node_add_child(example_item, border_bottom);
+        }
+
+        cmp_ui_node_add_child(scroll_node, example_item);
       }
     }
+    cmp_ui_node_add_child(container, scroll_node);
   }
 }
 
 static void render_example_viewer(material_catalog_state_t *state,
                                   cmp_ui_node_t *container, int component_id,
                                   int example_index) {
-  cmp_ui_node_t *back_btn;
-  cmp_ui_node_t *title;
   const material_example_t *examples;
   int example_count = 0;
-  char buf[256];
-
-  if (cmp_ui_button_create(&back_btn, "<- Back", -1) == 0) {
-    back_btn->layout->margin[0] = 16.0f;
-    back_btn->layout->margin[3] = 16.0f;
-    cmp_ui_node_add_event_listener(back_btn, 1, 0, back_btn_clicked, state);
-    cmp_ui_node_add_child(container, back_btn);
-  }
+  cmp_ui_node_t *example_content;
 
   examples = get_examples_for_component(component_id, &example_count);
   if (examples && example_index < example_count) {
-    sprintf(buf, "Example: %s", examples[example_index].name);
-    if (cmp_ui_text_create(&title, buf, -1) == 0) {
-      title->layout->margin[0] = 16.0f;
-      title->layout->margin[3] = 16.0f;
-      cmp_ui_node_add_child(container, title);
-    }
+    material_catalog_render_top_app_bar(state, container,
+                                        examples[example_index].name, 1);
 
-    if (examples[example_index].render) {
-      examples[example_index].render(container);
-    } else {
-      cmp_ui_node_t *placeholder;
-      if (cmp_ui_text_create(&placeholder, "(Example implementation pending)",
-                             -1) == 0) {
-        placeholder->layout->margin[0] = 32.0f;
-        placeholder->layout->margin[3] = 16.0f;
-        cmp_ui_node_add_child(container, placeholder);
+    if (cmp_ui_box_create(&example_content) == 0) {
+      example_content->layout->flex_grow = 1.0f;
+      example_content->layout->width = state->window_width;
+      example_content->layout->height =
+          state->window_height - (64.0f + state->window_insets.y);
+      example_content->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
+      example_content->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+
+      if (examples[example_index].render) {
+        examples[example_index].render(example_content);
+      } else {
+        cmp_ui_node_t *placeholder;
+        if (cmp_ui_text_create(&placeholder, "(Example implementation pending)",
+                               -1) == 0) {
+          cmp_ui_node_add_child(example_content, placeholder);
+        }
       }
+      cmp_ui_node_add_child(container, example_content);
     }
   }
 }
 
 int material_catalog_render_top_app_bar_example(material_catalog_state_t *state,
                                                 cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Top App Bar variations rendered here)", -1) ==
-      0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  /* Create an instance of a center-aligned top app bar to simulate M3 visuals
-   */
-  {
-    cmp_ui_node_t *mock_bar;
-    cmp_m3_top_app_bar_metrics_t metrics;
-    cmp_m3_top_app_bar_resolve(CMP_M3_TOP_APP_BAR_CENTER_ALIGNED, &metrics);
+  cmp_ui_box_create(&widget);
+  widget->layout->width = state->window_width;
+  widget->layout->height = 64.0f;
 
-    if (cmp_ui_box_create(&mock_bar) == 0) {
-      mock_bar->layout->width = state->window_width - 32.0f;
-      mock_bar->layout->height = metrics.height_collapsed;
-      mock_bar->layout->margin[0] = 32.0f;
-      mock_bar->layout->margin[3] = 16.0f;
-      /* Mock drawing of the center-aligned style */
-      cmp_ui_node_add_child(container, mock_bar);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_bottom_app_bar_example(
@@ -1128,79 +1400,52 @@ int material_catalog_render_bottom_app_bar_example(
 
 int material_catalog_render_backdrop_example(material_catalog_state_t *state,
                                              cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Backdrop variations rendered here)", -1) ==
-      0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  /* Mock backdrop scaffold creation */
-  {
-    cmp_ui_node_t *mock_backdrop;
-    if (cmp_ui_box_create(&mock_backdrop) == 0) {
-      cmp_ui_node_t *back_layer;
-      cmp_ui_node_t *front_layer;
+  cmp_ui_box_create(&widget);
+  widget->layout->width = state->window_width;
+  widget->layout->height = state->window_height;
 
-      mock_backdrop->layout->width = state->window_width;
-      mock_backdrop->layout->height = state->window_height;
-      mock_backdrop->layout->position_type = CMP_POSITION_RELATIVE;
-
-      if (cmp_ui_box_create(&back_layer) == 0) {
-        back_layer->layout->width = CMP_UNIT_PERCENT(100.0f);
-        back_layer->layout->height = CMP_UNIT_PERCENT(100.0f);
-        back_layer->layout->position_type = CMP_POSITION_ABSOLUTE;
-        cmp_ui_node_add_child(mock_backdrop, back_layer);
-      }
-
-      if (cmp_ui_box_create(&front_layer) == 0) {
-        front_layer->layout->width = CMP_UNIT_PERCENT(100.0f);
-        front_layer->layout->height = CMP_UNIT_PERCENT(100.0f);
-        front_layer->layout->position_type = CMP_POSITION_ABSOLUTE;
-        front_layer->layout->position[0] = 56.0f; /* drop below top app bar */
-        /* M3 Shape Family standard large top corners */
-        material_catalog_apply_shape(front_layer, THEME_SHAPE_ROUNDED, 16.0f);
-        cmp_ui_node_add_child(mock_backdrop, front_layer);
-      }
-
-      cmp_ui_node_add_child(container, mock_backdrop);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_badges_example(material_catalog_state_t *state,
                                            cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Badges variations rendered here)", -1) == 0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  /* Create an instance of a badge to simulate M3 visuals */
-  {
-    cmp_ui_node_t *mock_badge;
-    cmp_m3_badge_metrics_t metrics;
-    cmp_m3_badge_resolve(CMP_M3_BADGE_LARGE, &metrics);
+  cmp_ui_button_create(&widget, "Badge", -1);
 
-    if (cmp_ui_box_create(&mock_badge) == 0) {
-      mock_badge->layout->width = 24.0f; /* Large badge min width */
-      mock_badge->layout->height = metrics.height;
-      mock_badge->layout->margin[0] = 32.0f;
-      mock_badge->layout->margin[3] = 16.0f;
-      /* Mock drawing of the badge style */
-      cmp_ui_node_add_child(container, mock_badge);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_bottom_navigation_example(
@@ -1265,118 +1510,100 @@ int material_catalog_render_navigation_rail_example(
 
 int material_catalog_render_buttons_example(material_catalog_state_t *state,
                                             cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Buttons variations rendered here)", -1) == 0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_btn;
-    cmp_m3_button_metrics_t metrics;
-    cmp_m3_button_resolve(CMP_M3_BUTTON_ELEVATED, 0, &metrics);
+  cmp_ui_button_create(&widget, "Elevated Button", -1);
 
-    if (cmp_ui_box_create(&mock_btn) == 0) {
-      mock_btn->layout->width = 120.0f;
-      mock_btn->layout->height = metrics.height;
-      mock_btn->layout->margin[0] = 32.0f;
-      mock_btn->layout->margin[3] = 16.0f;
-      /* Mock drawing of elevated button style */
-      cmp_ui_node_add_child(container, mock_btn);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_fabs_example(material_catalog_state_t *state,
                                          cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(FAB variations rendered here)", -1) == 0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_fab;
-    cmp_m3_fab_metrics_t metrics;
-    cmp_m3_fab_resolve(CMP_M3_FAB_STANDARD, 0, &metrics);
+  cmp_ui_button_create(&widget, "+", -1);
 
-    if (cmp_ui_box_create(&mock_fab) == 0) {
-      mock_fab->layout->width = metrics.container_width;
-      mock_fab->layout->height = metrics.container_height;
-      mock_fab->layout->margin[0] = 32.0f;
-      mock_fab->layout->margin[3] = 16.0f;
-      /* Mock drawing of FAB style */
-      cmp_ui_node_add_child(container, mock_fab);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_cards_example(material_catalog_state_t *state,
                                           cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Cards variations rendered here)", -1) == 0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_card;
-    cmp_m3_card_metrics_t metrics;
-    cmp_m3_card_resolve(CMP_M3_CARD_ELEVATED, &metrics);
+  cmp_ui_box_create(&widget);
+  widget->layout->width = 150;
+  widget->layout->height = 100;
 
-    if (cmp_ui_box_create(&mock_card) == 0) {
-      mock_card->layout->width = 120.0f;
-      mock_card->layout->height = 120.0f;
-      mock_card->layout->margin[0] = 32.0f;
-      mock_card->layout->margin[3] = 16.0f;
-      /* Mock drawing of elevated card style */
-      cmp_ui_node_add_child(container, mock_card);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_checkboxes_example(material_catalog_state_t *state,
                                                cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Checkboxes variations rendered here)", -1) ==
-      0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_box;
-    cmp_m3_checkbox_metrics_t metrics;
-    cmp_m3_checkbox_resolve(&metrics);
+  cmp_ui_checkbox_create(&widget, "Material Checkbox");
 
-    if (cmp_ui_box_create(&mock_box) == 0) {
-      mock_box->layout->width = metrics.touch_target_size;
-      mock_box->layout->height = metrics.touch_target_size;
-      mock_box->layout->margin[0] = 32.0f;
-      mock_box->layout->margin[3] = 16.0f;
-      cmp_ui_node_add_child(container, mock_box);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_radio_buttons_example(
@@ -1411,150 +1638,126 @@ int material_catalog_render_radio_buttons_example(
 
 int material_catalog_render_switches_example(material_catalog_state_t *state,
                                              cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Switches variations rendered here)", -1) ==
-      0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_box;
-    cmp_m3_switch_metrics_t metrics;
-    cmp_m3_switch_resolve(&metrics);
+  cmp_ui_checkbox_create(&widget, "Switch Toggle");
 
-    if (cmp_ui_box_create(&mock_box) == 0) {
-      mock_box->layout->width = metrics.track_width;
-      mock_box->layout->height = metrics.track_height;
-      mock_box->layout->margin[0] = 32.0f;
-      mock_box->layout->margin[3] = 16.0f;
-      cmp_ui_node_add_child(container, mock_box);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_chips_example(material_catalog_state_t *state,
                                           cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Chips variations rendered here)", -1) == 0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_chip;
-    cmp_m3_chip_metrics_t metrics;
-    cmp_m3_chip_resolve(CMP_M3_CHIP_ASSIST, 0, &metrics);
+  cmp_ui_button_create(&widget, "Assist Chip", -1);
 
-    if (cmp_ui_box_create(&mock_chip) == 0) {
-      mock_chip->layout->width = 80.0f; /* approximate standard chip width */
-      mock_chip->layout->height = metrics.height;
-      mock_chip->layout->margin[0] = 32.0f;
-      mock_chip->layout->margin[3] = 16.0f;
-      mock_chip->layout->padding[1] = metrics.padding_right;
-      mock_chip->layout->padding[3] = metrics.padding_left;
-      /* Mock drawing of chip style */
-      cmp_ui_node_add_child(container, mock_chip);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_dialogs_example(material_catalog_state_t *state,
                                             cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Dialogs variations rendered here)", -1) == 0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_dialog;
-    cmp_m3_dialog_metrics_t metrics;
-    cmp_m3_dialog_resolve(CMP_M3_DIALOG_BASIC, &metrics);
+  cmp_ui_box_create(&widget);
+  widget->layout->width = 300;
+  widget->layout->height = 200;
 
-    if (cmp_ui_box_create(&mock_dialog) == 0) {
-      mock_dialog->layout->width = 280.0f;  /* standard dialog width */
-      mock_dialog->layout->height = 200.0f; /* roughly simulated height */
-      mock_dialog->layout->margin[0] = 32.0f;
-      mock_dialog->layout->margin[3] = 16.0f;
-      /* Mock drawing of dialog style */
-      cmp_ui_node_add_child(container, mock_dialog);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_lists_example(material_catalog_state_t *state,
                                           cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Lists variations rendered here)", -1) == 0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_list;
-    cmp_m3_list_metrics_t metrics;
-    cmp_m3_list_resolve(CMP_M3_LIST_ONE_LINE, &metrics);
+  cmp_ui_box_create(&widget);
+  widget->layout->width = 300;
+  widget->layout->height = 50;
 
-    if (cmp_ui_box_create(&mock_list) == 0) {
-      mock_list->layout->width = state->window_width - 32.0f;
-      mock_list->layout->height = metrics.height;
-      mock_list->layout->margin[0] = 32.0f;
-      mock_list->layout->margin[3] = 16.0f;
-      mock_list->layout->padding[3] = metrics.padding_left;
-      /* Mock drawing of list style */
-      cmp_ui_node_add_child(container, mock_list);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_menus_example(material_catalog_state_t *state,
                                           cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Menus variations rendered here)", -1) == 0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_menu;
-    cmp_m3_menu_metrics_t metrics;
-    cmp_m3_menu_resolve(&metrics);
+  cmp_ui_dropdown_create(&widget);
 
-    if (cmp_ui_box_create(&mock_menu) == 0) {
-      mock_menu->layout->width = 200.0f;  /* approximate standard menu width */
-      mock_menu->layout->height = 150.0f; /* simulated content height */
-      mock_menu->layout->margin[0] = 32.0f;
-      mock_menu->layout->margin[3] = 16.0f;
-      /* Mock drawing of menu style */
-      cmp_ui_node_add_child(container, mock_menu);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_drawers_sheets_example(
@@ -1634,93 +1837,76 @@ int material_catalog_render_progress_indicators_example(
 
 int material_catalog_render_sliders_example(material_catalog_state_t *state,
                                             cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Sliders variations rendered here)", -1) == 0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_slider;
-    cmp_m3_slider_metrics_t metrics;
-    cmp_m3_slider_resolve(&metrics);
+  cmp_ui_slider_create(&widget, 0.0f, 100.0f);
 
-    if (cmp_ui_box_create(&mock_slider) == 0) {
-      mock_slider->layout->width = state->window_width - 32.0f;
-      mock_slider->layout->height =
-          metrics.track_height_active; /* roughly track height */
-      mock_slider->layout->margin[0] = 32.0f;
-      mock_slider->layout->margin[3] = 16.0f;
-      /* Mock drawing of slider style */
-      cmp_ui_node_add_child(container, mock_slider);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_snackbars_example(material_catalog_state_t *state,
                                               cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Snackbars variations rendered here)", -1) ==
-      0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_snackbar;
-    cmp_m3_snackbar_metrics_t metrics;
-    cmp_m3_snackbar_resolve(&metrics);
+  cmp_ui_button_create(&widget, "Snackbar Demo", -1);
 
-    if (cmp_ui_box_create(&mock_snackbar) == 0) {
-      mock_snackbar->layout->width = state->window_width - 32.0f;
-      mock_snackbar->layout->height = 48.0f; /* standard min height */
-      mock_snackbar->layout->margin[0] = 32.0f;
-      mock_snackbar->layout->margin[3] = 16.0f;
-      mock_snackbar->layout->padding[1] = metrics.padding_left_right;
-      mock_snackbar->layout->padding[3] = metrics.padding_left_right;
-      /* Mock drawing of snackbar style */
-      cmp_ui_node_add_child(container, mock_snackbar);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_tabs_example(material_catalog_state_t *state,
                                          cmp_ui_node_t *container) {
+  cmp_ui_node_t *widget = NULL;
   cmp_ui_node_t *lbl;
   if (!state || !container)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Tabs variations rendered here)", -1) == 0) {
+    return 1; /* NULL_POINTER */
+
+  if (cmp_ui_text_create(&lbl, "Example component:", -1) == 0) {
     lbl->layout->margin[0] = 32.0f;
     lbl->layout->margin[3] = 16.0f;
     cmp_ui_node_add_child(container, lbl);
   }
 
-  {
-    cmp_ui_node_t *mock_tabs;
-    cmp_m3_tabs_metrics_t metrics;
-    cmp_m3_tabs_resolve(CMP_M3_TABS_PRIMARY, &metrics);
+  cmp_ui_box_create(&widget);
+  widget->layout->width = 400;
+  widget->layout->height = 48;
 
-    if (cmp_ui_box_create(&mock_tabs) == 0) {
-      mock_tabs->layout->width = state->window_width;
-      mock_tabs->layout->height = metrics.height;
-      mock_tabs->layout->margin[0] = 32.0f;
-      mock_tabs->layout->margin[3] = 16.0f;
-      /* Mock drawing of tabs style */
-      cmp_ui_node_add_child(container, mock_tabs);
-    }
+  if (widget) {
+    widget->design_language_override = 1;
+    widget->layout->margin[0] = 32.0f;
+    widget->layout->margin[3] = 16.0f;
+    cmp_ui_node_add_child(container, widget);
   }
-
-  return MATERIAL_CATALOG_SUCCESS;
+  return 0; /* SUCCESS */
 }
 
 int material_catalog_render_text_fields_example(material_catalog_state_t *state,
@@ -1771,6 +1957,10 @@ int material_catalog_recompose_ui(material_catalog_state_t *state) {
   }
 
   state->root_node->design_language_override = 1; /* Material 3 */
+  state->root_node->bg_color =
+      catalog_color_to_uint32(&state->sys_colors.surface);
+  state->root_node->text_color =
+      catalog_color_to_uint32(&state->sys_colors.on_surface);
   state->root_node->layout->direction = CMP_FLEX_COLUMN;
   state->root_node->layout->width = state->window_width;
   state->root_node->layout->height = state->window_height;
@@ -1822,9 +2012,16 @@ int material_catalog_run(material_catalog_state_t *state) {
     cmp_window_poll_events(state->window);
 
     while (cmp_event_pop(&evt) == 0) {
-      /* Handle input events, update state, and trigger
-       * material_catalog_invalidate_ui() */
-      /* e.g. update state based on pointer events */
+      cmp_hit_test_t *ht;
+      cmp_ui_node_t *target = NULL;
+
+      if (cmp_hit_test_create(state->root_node, &ht) == 0) {
+        if (cmp_hit_test_query(ht, (float)evt.x, (float)evt.y, &target) == 0 &&
+            target != NULL) {
+          cmp_event_dispatch_run(state->root_node, target, &evt);
+        }
+        cmp_hit_test_destroy(ht);
+      }
     }
 
     if (state->is_ui_dirty) {
@@ -1859,6 +2056,7 @@ int material_catalog_cleanup(material_catalog_state_t *state) {
 
   cmp_window_system_shutdown();
   cmp_event_system_shutdown();
+  cmp_dpi_awareness_cleanup();
 
   return MATERIAL_CATALOG_SUCCESS;
 }

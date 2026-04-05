@@ -302,14 +302,14 @@ CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
   /* E.g., 50% opacity neutral background */
   if (is_dark) {
     out_theme->color_neutral_background_alpha =
-        (0x80 << 24) | out_theme->neutral_12;
+        (0x80U << 24) | out_theme->neutral_12;
     out_theme->color_brand_background_alpha =
-        (0x80 << 24) | out_theme->brand.step_100;
+        (0x80U << 24) | out_theme->brand.step_100;
   } else {
     out_theme->color_neutral_background_alpha =
-        (0x80 << 24) | out_theme->neutral_90;
+        (0x80U << 24) | out_theme->neutral_90;
     out_theme->color_brand_background_alpha =
-        (0x80 << 24) | out_theme->brand.step_80;
+        (0x80U << 24) | out_theme->brand.step_80;
   }
 
 /* Typography Tokens */
@@ -522,11 +522,11 @@ CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
     out_theme->shadow_64.color2 = 0x1A000000;
 
     /* Materials */
-    out_theme->material_mica_background = (0xFF << 24) | out_theme->neutral_10;
+    out_theme->material_mica_background = (0xFFU << 24) | out_theme->neutral_10;
     out_theme->material_mica_alt_background =
-        (0xFF << 24) | out_theme->neutral_12;
+        (0xFFU << 24) | out_theme->neutral_12;
     out_theme->material_acrylic_background =
-        (0x80 << 24) | out_theme->neutral_10;
+        (0x80U << 24) | out_theme->neutral_10;
     out_theme->material_acrylic_blur = 30.0f;
     out_theme->material_acrylic_fallback = out_theme->neutral_14;
 
@@ -575,11 +575,11 @@ CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
     out_theme->shadow_64.color2 = 0x33000000;
 
     /* Materials */
-    out_theme->material_mica_background = (0xFF << 24) | out_theme->neutral_90;
+    out_theme->material_mica_background = (0xFFU << 24) | out_theme->neutral_90;
     out_theme->material_mica_alt_background =
-        (0xFF << 24) | out_theme->neutral_100;
+        (0xFFU << 24) | out_theme->neutral_100;
     out_theme->material_acrylic_background =
-        (0x80 << 24) | out_theme->neutral_90;
+        (0x80U << 24) | out_theme->neutral_90;
     out_theme->material_acrylic_blur = 30.0f;
     out_theme->material_acrylic_fallback = out_theme->neutral_80;
   }
@@ -673,8 +673,8 @@ CMP_API int cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
   out_theme->color_info_stroke = window_text;
 
   /* Alphas remain completely opaque in HC mode for accessibility */
-  out_theme->color_neutral_background_alpha = (0xFF << 24) | window;
-  out_theme->color_brand_background_alpha = (0xFF << 24) | highlight;
+  out_theme->color_neutral_background_alpha = (0xFFU << 24) | window;
+  out_theme->color_brand_background_alpha = (0xFFU << 24) | highlight;
 
   /* Spacing Tokens (Same as standard) */
   out_theme->spacing_none = 0.0f;
@@ -724,9 +724,9 @@ CMP_API int cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
   out_theme->shadow_64 = out_theme->shadow_2;
 
   /* Materials */
-  out_theme->material_mica_background = (0xFF << 24) | window;
-  out_theme->material_mica_alt_background = (0xFF << 24) | window;
-  out_theme->material_acrylic_background = (0xFF << 24) | window;
+  out_theme->material_mica_background = (0xFFU << 24) | window;
+  out_theme->material_mica_alt_background = (0xFFU << 24) | window;
+  out_theme->material_acrylic_background = (0xFFU << 24) | window;
   out_theme->material_acrylic_blur = 0.0f;
   out_theme->material_acrylic_fallback = window;
 

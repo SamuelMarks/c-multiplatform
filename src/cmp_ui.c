@@ -456,8 +456,18 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
 int cmp_ui_node_destroy(cmp_ui_node_t *node) {
   size_t i;
 
+  cmp_event_listener_node_t *listener;
+  cmp_event_listener_node_t *next_listener;
+
   if (node == NULL) {
     return CMP_ERROR_INVALID_ARG;
+  }
+
+  listener = node->event_listeners;
+  while (listener) {
+    next_listener = listener->next;
+    CMP_FREE(listener);
+    listener = next_listener;
   }
 
   for (i = 0; i < node->child_count; i++) {

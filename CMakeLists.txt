@@ -531,7 +531,52 @@ if(CMP_THEME_UNSTYLED)
     list(APPEND CMP_THEME_SOURCES src/themes/cmp_unstyled.c)
 endif()
 
-add_library(cmp ${CMP_SOURCES} ${CMP_THEME_SOURCES})
+add_library(cmp ${CMP_SOURCES} ${CMP_THEME_SOURCES}      src/cmp_a11y_theme.c
+      src/cmp_android_ndk_bridge.c
+      src/cmp_android_scoped_storage.c
+      src/cmp_android_vulkan_gles.c
+      src/cmp_apple_gestures.c
+      src/cmp_background_blur.c
+      src/cmp_breadcrumbs.c
+      src/cmp_code_block.c
+      src/cmp_code_block_clipboard.c
+      src/cmp_command_palette.c
+      src/cmp_custom_chrome.c
+      src/cmp_docking_framework.c
+      src/cmp_dpi_awareness.c
+      src/cmp_embedded_pty.c
+      src/cmp_emscripten_indexeddb_vfs.c
+      src/cmp_file_watcher.c
+      src/cmp_focus_navigation.c
+      src/cmp_hardware_accel.c
+      src/cmp_image_preview.c
+      src/cmp_input_layout.c
+      src/cmp_ios_background_refresh.c
+      src/cmp_ipados_multitasking.c
+      src/cmp_keyboard_avoidance.c
+      src/cmp_markdown_parser.c
+      src/cmp_math_renderer.c
+      src/cmp_mermaid_renderer.c
+      src/cmp_minimap.c
+      src/cmp_multi_window.c
+      src/cmp_os_integration.c
+      src/cmp_os_media_notifications.c
+      src/cmp_os_scrollbars.c
+      src/cmp_power_awareness.c
+      src/cmp_safe_area_handler.c
+      src/cmp_sandbox_exec.c
+      src/cmp_secure_network.c
+      src/cmp_status_bar.c
+      src/cmp_syntax_highlight.c
+      src/cmp_tab_navigation.c
+      src/cmp_toast_notifications.c
+      src/cmp_typography.c
+      src/cmp_wayland_protocols.c
+      src/cmp_webgl_canvas.c
+      src/cmp_win32_input.c
+      src/cmp_win32_window.c
+      src/cmp_workspace_layout.c
+  )
 if(CMP_SHARED_LIBS)
     set_target_properties(cmp PROPERTIES POSITION_INDEPENDENT_CODE ON)
     target_compile_definitions(cmp PRIVATE CMP_BUILD_SHARED)

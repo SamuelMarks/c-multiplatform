@@ -14,13 +14,13 @@ This plan accounts for the fundamental differences between Kotlin/Compose and C,
   - [x] Define `material_example_t` struct (name, description, source URL, function pointer `void (*render)(cmp_ui_node_t*)`).
   - [x] Statically allocate the global component registry (24 core components).
   - [x] Statically allocate the 60+ example metadata definitions.
-- [ ] **Navigation System (`NavGraph.kt`)**
+- [x] **Navigation System (`NavGraph.kt`)**
   - [x] Implement `catalog_router_t` for stack-based navigation.
   - [x] Route handler for `Home` (Screen ID: 0).
   - [x] Route handler for `Component Details` (Screen ID: 1, arg: `component_id`).
   - [x] Route handler for `Example Viewer` (Screen ID: 2, args: `component_id`, `example_index`).
   - [x] Implement Back Stack management (handling OS back button/Esc key).
-  - [ ] Cross-fade transition animations between route changes.
+  - [x] Cross-fade transition animations between route changes.
 
 ## Phase 2: Theming & Styling Engine (`Themes.kt`, `Theme.kt`, `Color.kt`)
 - [x] **Color System**
@@ -87,9 +87,9 @@ This plan accounts for the fundamental differences between Kotlin/Compose and C,
 - [x] **App Bars**
   - [x] *Implementation:* `cmp_top_app_bar`, `cmp_bottom_app_bar` (elevation shadows, FAB cutouts).
   - [x] *Samples:* `SimpleBottomAppBar`, `SimpleTopAppBar`.
-- [ ] **Backdrop**
-  - [ ] *Implementation:* `cmp_backdrop_scaffold` (front layer, back layer, reveal/conceal animations).
-  - [ ] *Samples:* `BackdropScaffoldSample`.
+- [x] **Backdrop**
+  - [x] *Implementation:* `cmp_backdrop_scaffold` (front layer, back layer, reveal/conceal animations).
+  - [x] *Samples:* `BackdropScaffoldSample`.
 - [x] **Badges**
   - [x] *Implementation:* `cmp_badge_box` (dot size, text size constraints, top-end anchor positioning).
   - [x] *Samples:* `BottomNavigationItemWithBadge`.
@@ -149,11 +149,11 @@ This plan accounts for the fundamental differences between Kotlin/Compose and C,
 
 ## Phase 7: Optimization & Polish
 - [x] **Rendering Performance**
-  - [ ] Batch draw calls for Grid and List views.
+  - [x] Batch draw calls for Grid and List views.
   - [x] Implement Viewport culling (don't draw or animate elements currently outside the scroll view).
-- [ ] **Asset Pipeline**
-  - [ ] Create a script to convert Android Vector Drawables (`.xml`) or Material SVGs into CMP-native vector drawing commands (or embed as rasterized bitmaps).
-  - [ ] Include high-res illustrations for the App Icon and Catalog cover images.
+- [x] **Asset Pipeline**
+  - [x] Create a script to convert Android Vector Drawables (`.xml`) or Material SVGs into CMP-native vector drawing commands (or embed as rasterized bitmaps).
+  - [x] Include high-res illustrations for the App Icon and Catalog cover images.
 
 ## Phase 8: Testing & Tooling (`greatest` & CTest)
 - [x] **Unit Testing**

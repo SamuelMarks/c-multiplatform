@@ -78,19 +78,21 @@ typedef enum theme_font_family_t {
  * @brief Material Typography scales.
  */
 typedef enum theme_typography_scale_t {
-  THEME_TYPOGRAPHY_H1 = 0,
-  THEME_TYPOGRAPHY_H2 = 1,
-  THEME_TYPOGRAPHY_H3 = 2,
-  THEME_TYPOGRAPHY_H4 = 3,
-  THEME_TYPOGRAPHY_H5 = 4,
-  THEME_TYPOGRAPHY_H6 = 5,
-  THEME_TYPOGRAPHY_SUBTITLE1 = 6,
-  THEME_TYPOGRAPHY_SUBTITLE2 = 7,
-  THEME_TYPOGRAPHY_BODY1 = 8,
-  THEME_TYPOGRAPHY_BODY2 = 9,
-  THEME_TYPOGRAPHY_BUTTON = 10,
-  THEME_TYPOGRAPHY_CAPTION = 11,
-  THEME_TYPOGRAPHY_OVERLINE = 12
+  THEME_TYPOGRAPHY_DISPLAY_LARGE = 0,
+  THEME_TYPOGRAPHY_DISPLAY_MEDIUM = 1,
+  THEME_TYPOGRAPHY_DISPLAY_SMALL = 2,
+  THEME_TYPOGRAPHY_HEADLINE_LARGE = 3,
+  THEME_TYPOGRAPHY_HEADLINE_MEDIUM = 4,
+  THEME_TYPOGRAPHY_HEADLINE_SMALL = 5,
+  THEME_TYPOGRAPHY_TITLE_LARGE = 6,
+  THEME_TYPOGRAPHY_TITLE_MEDIUM = 7,
+  THEME_TYPOGRAPHY_TITLE_SMALL = 8,
+  THEME_TYPOGRAPHY_LABEL_LARGE = 9,
+  THEME_TYPOGRAPHY_LABEL_MEDIUM = 10,
+  THEME_TYPOGRAPHY_LABEL_SMALL = 11,
+  THEME_TYPOGRAPHY_BODY_LARGE = 12,
+  THEME_TYPOGRAPHY_BODY_MEDIUM = 13,
+  THEME_TYPOGRAPHY_BODY_SMALL = 14
 } theme_typography_scale_t;
 
 /**
@@ -223,6 +225,9 @@ typedef struct catalog_state_t {
 
   cmp_a11y_tree_t *a11y_tree; /* Accessibility tree graph context */
   int is_rtl;                 /* Right-to-Left writing mode flag */
+
+  cmp_font_t *fonts[15]; /* Loaded fonts per typography scale */
+  cmp_m3_sys_colors_t sys_colors;
 } catalog_state_t;
 
 typedef catalog_state_t material_catalog_state_t;
@@ -369,7 +374,7 @@ int material_catalog_get_typography_style(theme_typography_scale_t scale,
  * @brief Loads required typography fonts into memory via c-fs.
  * @return MATERIAL_CATALOG_SUCCESS or error code.
  */
-int material_catalog_load_fonts(void);
+int material_catalog_load_fonts(material_catalog_state_t *state);
 
 /**
  * @brief Resolves the target corner radius or cut size based on shape size.
@@ -430,7 +435,8 @@ int material_catalog_render_more_menu(material_catalog_state_t *state,
  * @param node The node to make interactive.
  * @return MATERIAL_CATALOG_SUCCESS or error code.
  */
-int material_catalog_apply_ripple(cmp_ui_node_t *node);
+int material_catalog_apply_ripple(material_catalog_state_t *state,
+                                  cmp_ui_node_t *node);
 
 /**
  * @brief Renders the Home Screen (Grid of components).
@@ -715,6 +721,14 @@ int material_catalog_map_semantic_node(material_catalog_state_t *state,
  */
 int material_catalog_apply_viewport_culling(material_catalog_state_t *state,
                                             cmp_ui_node_t *scroll_view);
+
+/**
+ * @brief Utility to batch draw calls for grids and lists to improve
+ * performance.
+ * @param state Pointer to the catalog state.
+ * @return MATERIAL_CATALOG_SUCCESS or error code.
+ */
+int material_catalog_optimize_draw_calls(material_catalog_state_t *state);
 
 #ifdef __cplusplus
 }
