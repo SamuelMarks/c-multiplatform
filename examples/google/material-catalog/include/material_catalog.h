@@ -8,6 +8,7 @@ extern "C" {
 
 #include <cmp.h>
 #include <themes/cmp_material3_color.h>
+#include <themes/cmp_material3_layout.h>
 #include <themes/cmp_material3_navigation.h>
 #include <themes/cmp_material3_communication.h>
 #include <themes/cmp_material3_components.h>
@@ -117,12 +118,15 @@ typedef enum theme_shape_corner_family_t {
 
 /**
  * @enum theme_shape_size_t
- * @brief Material Catalog shape size constraints.
+ * @brief Material shape sizes.
  */
 typedef enum theme_shape_size_t {
-  THEME_SHAPE_SMALL = 0,  /* Max 16dp */
-  THEME_SHAPE_MEDIUM = 1, /* Max 32dp */
-  THEME_SHAPE_LARGE = 2   /* Max 48dp */
+  THEME_SHAPE_EXTRA_SMALL = 0, /* 4dp */
+  THEME_SHAPE_SMALL = 1,       /* 8dp */
+  THEME_SHAPE_MEDIUM = 2,      /* 12dp */
+  THEME_SHAPE_LARGE = 3,       /* 16dp */
+  THEME_SHAPE_EXTRA_LARGE = 4, /* 28dp */
+  THEME_SHAPE_FULL = 5         /* Circle */
 } theme_shape_size_t;
 
 /**
@@ -131,7 +135,7 @@ typedef enum theme_shape_size_t {
  */
 typedef struct material_theme_t {
   catalog_theme_t mode;
-  catalog_palette_id_t palette_id;
+  cmp_color_t seed_color;
   theme_font_family_t font_family;
   theme_shape_corner_family_t shape_family;
 } material_theme_t;
@@ -215,8 +219,12 @@ typedef struct catalog_state_t {
   catalog_theme_t current_theme;
   float window_width;
   float window_height;
+  float content_width;
+  float content_height;
+  float dpi_scale;
 
   cmp_rect_t window_insets; /* Safe areas padding */
+  cmp_m3_window_size_class_t size_class;
 
   cmp_arena_t ui_arena;
   cmp_arena_t state_arena;
@@ -228,6 +236,7 @@ typedef struct catalog_state_t {
 
   cmp_font_t *fonts[15]; /* Loaded fonts per typography scale */
   cmp_m3_sys_colors_t sys_colors;
+  cmp_m3_palettes_t palettes;
 } catalog_state_t;
 
 typedef catalog_state_t material_catalog_state_t;
@@ -673,6 +682,8 @@ int material_catalog_render_tabs_example(material_catalog_state_t *state,
  */
 int material_catalog_render_text_fields_example(material_catalog_state_t *state,
                                                 cmp_ui_node_t *container);
+
+#define dp_to_px(state, dp) ((dp) * (state)->dpi_scale)
 
 /**
  * @brief Utility for cut corner path generation on CMP Nodes (stub).

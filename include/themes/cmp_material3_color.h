@@ -34,6 +34,50 @@ CMP_API int cmp_m3_linear_to_hct(const cmp_color_t *in_color, float *out_hue,
                                  float *out_chroma, float *out_tone);
 
 /**
+ * @brief Material 3 Tonal Palette
+ */
+typedef struct cmp_m3_tonal_palette {
+  cmp_color_t tone0;
+  cmp_color_t tone10;
+  cmp_color_t tone20;
+  cmp_color_t tone30;
+  cmp_color_t tone40;
+  cmp_color_t tone50;
+  cmp_color_t tone60;
+  cmp_color_t tone70;
+  cmp_color_t tone80;
+  cmp_color_t tone90;
+  cmp_color_t tone95;
+  cmp_color_t tone99;
+  cmp_color_t tone100;
+} cmp_m3_tonal_palette_t;
+
+/**
+ * @brief Complete set of Material 3 Core Palettes
+ */
+typedef struct cmp_m3_palettes {
+  cmp_m3_tonal_palette_t primary;
+  cmp_m3_tonal_palette_t secondary;
+  cmp_m3_tonal_palette_t tertiary;
+  cmp_m3_tonal_palette_t error;
+  cmp_m3_tonal_palette_t neutral;
+  cmp_m3_tonal_palette_t neutral_variant;
+} cmp_m3_palettes_t;
+
+/**
+ * @brief Generate a single Tonal Palette from hue and chroma
+ */
+CMP_API int
+cmp_m3_generate_tonal_palette_hct(float hue, float chroma,
+                                  cmp_m3_tonal_palette_t *out_palette);
+
+/**
+ * @brief Generate all Core Palettes from a seed color
+ */
+CMP_API int cmp_m3_palettes_generate(cmp_color_t seed,
+                                     cmp_m3_palettes_t *out_palettes);
+
+/**
  * @brief Generate Tonal Palette (tones 0-100)
  */
 CMP_API int cmp_m3_generate_tonal_palette(float hue, float chroma, float tone,

@@ -13,32 +13,17 @@ TEST test_initialization(void) {
 
   ASSERT_EQ(MATERIAL_CATALOG_ERROR_NULL_POINTER, material_catalog_init(NULL));
 
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_cleanup(&state));
   PASS();
 }
 
 TEST test_ui_creation(void) {
   material_catalog_state_t state;
-  cmp_window_config_t config;
-  memset(&config, 0, sizeof(config));
-
   ASSERT_EQ(MATERIAL_CATALOG_ERROR_NULL_POINTER,
             material_catalog_create_ui(NULL));
 
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_create_ui(&state));
 
@@ -51,21 +36,14 @@ TEST test_run(void) {
 
   ASSERT_EQ(MATERIAL_CATALOG_ERROR_NULL_POINTER, material_catalog_run(NULL));
 
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   material_catalog_create_ui(&state);
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
   {
-      void* hwnd = FindWindowA("CmpWindowClass", "Test");
-      ASSERT_NEQ(NULL, hwnd);
-      PostMessageA(hwnd, 0x0010, 0, 0); /* 0x0010 is WM_CLOSE */
+    void *hwnd = FindWindowA("CmpWindowClass", "Material Catalog");
+    ASSERT_NEQ(NULL, hwnd);
+    PostMessageA(hwnd, 0x0010, 0, 0); /* 0x0010 is WM_CLOSE */
   }
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_run(&state));
 #endif
@@ -109,14 +87,7 @@ TEST test_get_examples(void) {
 
 TEST test_routing(void) {
   material_catalog_state_t state;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
 
   ASSERT_EQ(1, state.router.stack_size);
   ASSERT_EQ(CATALOG_SCREEN_HOME, state.router.stack[0].screen_id);
@@ -145,7 +116,6 @@ TEST test_color_utilities(void) {
   cmp_color_t black = {0.0f, 0.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
   cmp_color_t white = {1.0f, 1.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
   cmp_color_t on_color;
-  cmp_palette_t palette;
   int is_light;
   float ratio;
 
@@ -168,16 +138,6 @@ TEST test_color_utilities(void) {
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
             material_catalog_get_contrast_ratio(&white, &black, &ratio));
   ASSERT(ratio > 20.0f); /* Should be 21.0 */
-
-  ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
-            material_catalog_get_palette(CATALOG_PALETTE_BLUE,
-                                         CATALOG_THEME_LIGHT, &palette));
-  ASSERT_NEQ(0.0f, palette.primary.a); /* Should be populated */
-
-  ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
-            material_catalog_get_palette(CATALOG_PALETTE_RED,
-                                         CATALOG_THEME_DARK, &palette));
-  ASSERT_NEQ(0.0f, palette.primary.a); /* Should be populated */
 
   PASS();
 }
@@ -205,17 +165,29 @@ TEST test_typography_utilities(void) {
 
 TEST test_shape_utilities(void) {
   float radius;
+  ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_get_shape_radius(
+                                          THEME_SHAPE_EXTRA_SMALL, &radius));
+  ASSERT_EQ(4.0f, radius);
+
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
             material_catalog_get_shape_radius(THEME_SHAPE_SMALL, &radius));
-  ASSERT_EQ(16.0f, radius);
+  ASSERT_EQ(8.0f, radius);
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
             material_catalog_get_shape_radius(THEME_SHAPE_MEDIUM, &radius));
-  ASSERT_EQ(32.0f, radius);
+  ASSERT_EQ(12.0f, radius);
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
             material_catalog_get_shape_radius(THEME_SHAPE_LARGE, &radius));
-  ASSERT_EQ(48.0f, radius);
+  ASSERT_EQ(16.0f, radius);
+
+  ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_get_shape_radius(
+                                          THEME_SHAPE_EXTRA_LARGE, &radius));
+  ASSERT_EQ(28.0f, radius);
+
+  ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
+            material_catalog_get_shape_radius(THEME_SHAPE_FULL, &radius));
+  ASSERT_EQ(1000.0f, radius);
 
   ASSERT_EQ(MATERIAL_CATALOG_ERROR_NULL_POINTER,
             material_catalog_get_shape_radius((theme_shape_size_t)99, &radius));
@@ -224,9 +196,11 @@ TEST test_shape_utilities(void) {
 
 TEST test_theme_persistence(void) {
   theme_saver_t saver;
+  cmp_color_t pink = {1.0f, 0.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
+  cmp_color_t blue = {0.0f, 0.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
   saver.config_file_path = "test_theme_config.bin";
   saver.current.mode = CATALOG_THEME_DARK;
-  saver.current.palette_id = CATALOG_PALETTE_PINK;
+  saver.current.seed_color = pink;
   saver.current.font_family = THEME_FONT_MONOSPACE;
   saver.current.shape_family = THEME_SHAPE_CUT;
 
@@ -234,11 +208,11 @@ TEST test_theme_persistence(void) {
 
   /* Modify state to ensure load overrides */
   saver.current.mode = CATALOG_THEME_LIGHT;
-  saver.current.palette_id = CATALOG_PALETTE_BLUE;
+  saver.current.seed_color = blue;
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_load_theme(&saver));
   ASSERT_EQ(CATALOG_THEME_DARK, saver.current.mode);
-  ASSERT_EQ(CATALOG_PALETTE_PINK, saver.current.palette_id);
+  ASSERT_EQ(1.0f, saver.current.seed_color.r); /* Pink check */
   ASSERT_EQ(THEME_FONT_MONOSPACE, saver.current.font_family);
   ASSERT_EQ(THEME_SHAPE_CUT, saver.current.shape_family);
 
@@ -249,14 +223,7 @@ TEST test_theme_persistence(void) {
 
 TEST test_insets(void) {
   material_catalog_state_t state;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_update_insets(&state));
   ASSERT_EQ(24.0f, state.window_insets.y);      /* Mock status bar */
@@ -272,14 +239,7 @@ TEST test_top_app_bar(void) {
   cmp_ui_node_t *app_bar;
   cmp_m3_top_app_bar_metrics_t metrics;
 
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   /* With back button */
@@ -293,7 +253,8 @@ TEST test_top_app_bar(void) {
   app_bar = root->children[0];
   ASSERT_EQ(CMP_FLEX_ROW, app_bar->layout->direction);
   ASSERT_EQ(metrics.height_collapsed + 24.0f,
-            app_bar->layout->height); /* metrics.height_collapsed + status bar height */
+            app_bar->layout
+                ->height); /* metrics.height_collapsed + status bar height */
 
   material_catalog_cleanup(&state);
   PASS();
@@ -302,14 +263,7 @@ TEST test_top_app_bar(void) {
 TEST test_scrim(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -329,14 +283,7 @@ TEST test_launch_url(void) {
 TEST test_more_menu(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -349,14 +296,7 @@ TEST test_more_menu(void) {
 TEST test_apply_ripple(void) {
   cmp_ui_node_t *root;
   material_catalog_state_t state;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -370,19 +310,52 @@ TEST test_home_screen(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
 
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
             material_catalog_render_home_screen(&state, root));
   /* Should contain Top App Bar and the Grid */
+  ASSERT(root->child_count > 0);
+
+  /* Find grid */
+  if (root->child_count > 1 && root->children[1]->child_count > 0) {
+    cmp_ui_node_t *grid = root->children[1];
+    cmp_ui_node_t *card = grid->children[0];
+    ASSERT_EQ(dp_to_px(&state, 180.0f),
+              card->layout->height); /* Card height strictly 180dp */
+  }
+
+  material_catalog_cleanup(&state);
+  PASS();
+}
+
+TEST test_component_details(void) {
+  material_catalog_state_t state;
+  cmp_ui_node_t *root;
+
+  ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
+  ASSERT_EQ(0, cmp_ui_box_create(&root));
+
+  /* Component 0 = Color */
+  ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
+            material_catalog_render_component_details(&state, root, 0));
+
+  ASSERT(root->child_count > 0);
+
+  material_catalog_cleanup(&state);
+  PASS();
+}
+
+TEST test_theme_picker(void) {
+  material_catalog_state_t state;
+  cmp_ui_node_t *root;
+
+  ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
+  ASSERT_EQ(0, cmp_ui_box_create(&root));
+
+  ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
+            material_catalog_render_theme_picker(&state, root));
   ASSERT(root->child_count > 0);
 
   material_catalog_cleanup(&state);
@@ -392,14 +365,7 @@ TEST test_home_screen(void) {
 TEST test_backdrop_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -413,14 +379,7 @@ TEST test_backdrop_example(void) {
 TEST test_badges_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -434,14 +393,7 @@ TEST test_badges_example(void) {
 TEST test_bottom_navigation_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -455,14 +407,7 @@ TEST test_bottom_navigation_example(void) {
 TEST test_navigation_rail_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -476,14 +421,7 @@ TEST test_navigation_rail_example(void) {
 TEST test_buttons_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -497,14 +435,7 @@ TEST test_buttons_example(void) {
 TEST test_fabs_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -518,14 +449,7 @@ TEST test_fabs_example(void) {
 TEST test_cards_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -541,14 +465,7 @@ TEST test_selection_controls_example(void) {
   cmp_ui_node_t *root1;
   cmp_ui_node_t *root2;
   cmp_ui_node_t *root3;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
 
   ASSERT_EQ(0, cmp_ui_box_create(&root1));
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -575,14 +492,7 @@ TEST test_selection_controls_example(void) {
 TEST test_chips_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -596,14 +506,7 @@ TEST test_chips_example(void) {
 TEST test_dialogs_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -617,14 +520,7 @@ TEST test_dialogs_example(void) {
 TEST test_lists_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -638,14 +534,7 @@ TEST test_lists_example(void) {
 TEST test_menus_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -659,14 +548,7 @@ TEST test_menus_example(void) {
 TEST test_drawers_sheets_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -680,14 +562,7 @@ TEST test_drawers_sheets_example(void) {
 TEST test_progress_indicators_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -701,14 +576,7 @@ TEST test_progress_indicators_example(void) {
 TEST test_sliders_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -722,14 +590,7 @@ TEST test_sliders_example(void) {
 TEST test_snackbars_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -743,14 +604,7 @@ TEST test_snackbars_example(void) {
 TEST test_tabs_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -764,14 +618,7 @@ TEST test_tabs_example(void) {
 TEST test_text_fields_example(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS,
@@ -785,14 +632,7 @@ TEST test_text_fields_example(void) {
 TEST test_semantic_mapping(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   ASSERT_EQ(
@@ -813,20 +653,13 @@ static void dummy_event_cb(cmp_event_t *evt, cmp_ui_node_t *node,
 TEST test_focus_management(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   /* Mock check for focus logic via adding keyboard event hooks */
-  ASSERT_EQ(0,
-            cmp_ui_node_add_event_listener(root, CMP_EVENT_TYPE_KEYBOARD /* Keyboard event mapping */,
-                                           0, dummy_event_cb, NULL));
+  ASSERT_EQ(0, cmp_ui_node_add_event_listener(
+                   root, CMP_EVENT_TYPE_KEYBOARD /* Keyboard event mapping */,
+                   0, dummy_event_cb, NULL));
 
   material_catalog_cleanup(&state);
   PASS();
@@ -834,14 +667,7 @@ TEST test_focus_management(void) {
 
 TEST test_rtl_support(void) {
   material_catalog_state_t state;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
 
   /* Default is LTR */
   ASSERT_EQ(0, state.is_rtl);
@@ -856,14 +682,7 @@ TEST test_rtl_support(void) {
 TEST test_viewport_culling(void) {
   material_catalog_state_t state;
   cmp_ui_node_t *root;
-  cmp_window_config_t config;
-  cmp_window_system_init();
   ASSERT_EQ(MATERIAL_CATALOG_SUCCESS, material_catalog_init(&state));
-  memset(&config, 0, sizeof(config));
-  config.width = 1024;
-  config.height = 768;
-  config.title = "Test";
-  cmp_window_create(&config, &state.window);
   ASSERT_EQ(0, cmp_ui_box_create(&root));
 
   /* Validate abstract stub doesn't break execution */
@@ -895,6 +714,7 @@ SUITE(material_catalog_suite) {
   RUN_TEST(test_more_menu);
   RUN_TEST(test_apply_ripple);
   RUN_TEST(test_home_screen);
+  RUN_TEST(test_theme_picker);
   RUN_TEST(test_backdrop_example);
   RUN_TEST(test_badges_example);
   RUN_TEST(test_bottom_navigation_example);

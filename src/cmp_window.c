@@ -235,7 +235,8 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor) {
 
         /* 12dp corner radius */
         RoundRect(hdc, (int)rect.x, (int)rect.y, (int)(rect.x + rect.width),
-                  (int)(rect.y + rect.height), (int)(12.0f * scale_factor), (int)(12.0f * scale_factor));
+                  (int)(rect.y + rect.height), (int)(12.0f * scale_factor),
+                  (int)(12.0f * scale_factor));
 
         SelectObject(hdc, old_br);
         SelectObject(hdc, old_pen);
@@ -259,42 +260,61 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor) {
       }
     }
 
-    if (node->type == 2 || node->type == 3 || node->type == 4 || node->type == 11 || node->type == 14) {
+    if (node->type == 2 || node->type == 3 || node->type == 4 ||
+        node->type == 11 || node->type == 14) {
       const char *text = (const char *)node->properties;
-      if (node->type == 4 && text == NULL) text = "Ask anything";
-      if (node->type == 11 && text == NULL) text = "GPT-4o (Default) \xE2\x96\xBE";
-      if (node->type == 14 && text == NULL) text = "Let's build";
+      if (node->type == 4 && text == NULL)
+        text = "Ask anything";
+      if (node->type == 11 && text == NULL)
+        text = "GPT-4o (Default) \xE2\x96\xBE";
+      if (node->type == 14 && text == NULL)
+        text = "Let's build";
 
       if (text) {
         uint32_t tc_uint = node->text_color;
         uint8_t tc_a = (tc_uint >> 24) & 0xFF;
-        uint32_t tc = RGB((tc_uint >> 16) & 0xFF, (tc_uint >> 8) & 0xFF, tc_uint & 0xFF);
+        uint32_t tc =
+            RGB((tc_uint >> 16) & 0xFF, (tc_uint >> 8) & 0xFF, tc_uint & 0xFF);
         HFONT font;
         HFONT old_font;
-        int size = (int)(32 * scale_factor);
-        if (node->type == 14) size = (int)(48 * scale_factor);
-        if (node->type == 4 || node->type == 11) size = (int)(20 * scale_factor);
-        if (node->type == 3) size = (int)(24 * scale_factor);
-
-        if (tc_a == 0) {
-            tc = RGB(240, 240, 240);
+        int size;
+        if (node->font_size > 0.0f) {
+          size = (int)(node->font_size * scale_factor);
+        } else {
+          size = (int)(32 * scale_factor);
+          if (node->type == 14)
+            size = (int)(48 * scale_factor);
+          if (node->type == 4 || node->type == 11)
+            size = (int)(20 * scale_factor);
+          if (node->type == 3)
+            size = (int)(24 * scale_factor);
         }
 
-        font = CreateFontA(
-            size, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-            DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-            DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Arial");
+        if (tc_a == 0) {
+          tc = RGB(240, 240, 240);
+        }
+
+        font = CreateFontA(size, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+                           DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+                           CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+                           DEFAULT_PITCH | FF_DONTCARE, "Arial");
         old_font = (HFONT)SelectObject(hdc, font);
         SetTextAlign(hdc, TA_CENTER | TA_TOP);
         SetTextColor(hdc, tc);
         SetBkMode(hdc, TRANSPARENT);
 
         if (node->type == 14) {
-          TextOutA(hdc, (int)(rect.x + rect.width / 2.0f), (int)(rect.y + (rect.height - size) / 2.0f), text, (int)strlen(text));
+          TextOutA(hdc, (int)(rect.x + rect.width / 2.0f),
+                   (int)(rect.y + (rect.height - size) / 2.0f), text,
+                   (int)strlen(text));
+        } else if (node->type == 3 || node->type == 4) {
+          TextOutA(hdc, (int)(rect.x + rect.width / 2.0f),
+                   (int)(rect.y + (rect.height - size) / 2.0f), text,
+                   (int)strlen(text));
         } else {
-          TextOutA(hdc, (int)(rect.x + rect.width / 2.0f), (int)rect.y, text, (int)strlen(text));
+          TextOutA(hdc, (int)(rect.x + rect.width / 2.0f), (int)rect.y, text,
+                   (int)strlen(text));
         }
-
         SelectObject(hdc, old_font);
         DeleteObject(font);
       }
@@ -351,6 +371,28 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
                  prcNewWindow->right - prcNewWindow->left,
                  prcNewWindow->bottom - prcNewWindow->top,
                  SWP_NOZORDER | SWP_NOACTIVATE);
+
+    if (window) {
+      cmp_event_t evt;
+      memset(&evt, 0, sizeof(evt));
+      evt.type = CMP_EVENT_TYPE_RESIZE;
+      evt.x = (int32_t)((prcNewWindow->right - prcNewWindow->left) /
+                        window->scale_factor);
+      evt.y = (int32_t)((prcNewWindow->bottom - prcNewWindow->top) /
+                        window->scale_factor);
+      cmp_event_push(&evt);
+    }
+    return 0;
+  }
+  case WM_SIZE: {
+    if (window) {
+      cmp_event_t evt;
+      memset(&evt, 0, sizeof(evt));
+      evt.type = CMP_EVENT_TYPE_RESIZE;
+      evt.x = (int32_t)(LOWORD(lParam) / window->scale_factor); /* width */
+      evt.y = (int32_t)(HIWORD(lParam) / window->scale_factor); /* height */
+      cmp_event_push(&evt);
+    }
     return 0;
   }
   case 0x0246: /* WM_POINTERDOWN */
@@ -467,7 +509,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
         /* FillRect removed to allow transparency */
 
         if (window->ui_tree) {
-          render_node_gdi(hdc, window->ui_tree, 1.0f);
+          render_node_gdi(hdc, window->ui_tree, window->scale_factor);
         } else {
           SetTextAlign(hdc, TA_CENTER);
           SetTextColor(hdc, RGB(240, 240, 240));
@@ -1535,5 +1577,3 @@ int cmp_window_set_ui_tree(cmp_window_t *window, cmp_ui_node_t *tree) {
 #endif
   return CMP_SUCCESS;
 }
-
-

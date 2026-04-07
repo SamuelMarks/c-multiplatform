@@ -37,7 +37,8 @@ int cmp_hit_test_destroy(cmp_hit_test_t *hit_test) {
   return CMP_SUCCESS;
 }
 
-static cmp_ui_node_t *hit_test_recursive(cmp_ui_node_t *node, float x, float y) {
+static cmp_ui_node_t *hit_test_recursive(cmp_ui_node_t *node, float x,
+                                         float y) {
   size_t i;
   cmp_ui_node_t *hit = NULL;
   cmp_ui_node_t *child_hit = NULL;
@@ -47,12 +48,16 @@ static cmp_ui_node_t *hit_test_recursive(cmp_ui_node_t *node, float x, float y) 
 
   /* Check if point is inside this node's bounds */
   if (x >= node->layout->computed_rect.x &&
-      x <= (node->layout->computed_rect.x + node->layout->computed_rect.width) &&
+      x <=
+          (node->layout->computed_rect.x + node->layout->computed_rect.width) &&
       y >= node->layout->computed_rect.y &&
-      y <= (node->layout->computed_rect.y + node->layout->computed_rect.height)) {
-    
-    /* It's a potential hit. Now check children in reverse order (top z-index first) */
-    /* Since we don't have explicit z-index yet, document order usually implies later children draw on top */
+      y <= (node->layout->computed_rect.y +
+            node->layout->computed_rect.height)) {
+
+    /* It's a potential hit. Now check children in reverse order (top z-index
+     * first) */
+    /* Since we don't have explicit z-index yet, document order usually implies
+     * later children draw on top */
     for (i = node->child_count; i > 0; i--) {
       child_hit = hit_test_recursive(node->children[i - 1], x, y);
       if (child_hit) {

@@ -2,10 +2,27 @@
 #include "cmp.h"
 
 #if defined(_WIN32)
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
+typedef unsigned int UINT;
+typedef unsigned long DWORD;
+typedef int BOOL;
+typedef char *LPSTR;
+typedef void *PVOID;
+
+#define SPI_GETHIGHCONTRAST 66
+#define HCF_HIGHCONTRASTON  0x00000001
+
+typedef struct tagHIGHCONTRASTA {
+    UINT cbSize;
+    DWORD dwFlags;
+    LPSTR lpszDefaultScheme;
+} HIGHCONTRASTA, *LPHIGHCONTRASTA;
+
+__declspec(dllimport) BOOL __stdcall SystemParametersInfoA(
+    UINT uiAction,
+    UINT uiParam,
+    PVOID pvParam,
+    UINT fWinIni
+);
 #endif
 /* clang-format on */
 

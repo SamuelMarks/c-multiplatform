@@ -1125,9 +1125,10 @@ typedef enum cmp_action {
 #define CMP_EVENT_TYPE_MOUSE 1
 #define CMP_EVENT_TYPE_TOUCH 2
 #define CMP_EVENT_TYPE_KEYBOARD 3
+#define CMP_EVENT_TYPE_RESIZE 4
 
 typedef struct cmp_event {
-  uint32_t type; /* e.g. CMP_EVENT_TYPE_MOUSE */
+  uint32_t type; /* e.g. CMP_EVENT_TYPE_MOUSE, CMP_EVENT_TYPE_RESIZE */
   cmp_action_t action;
   int x;
   int y;
