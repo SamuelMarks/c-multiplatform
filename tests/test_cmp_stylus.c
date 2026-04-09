@@ -9,14 +9,13 @@ TEST test_stylus_ink_metrics(void) {
 
   ev.action = CMP_ACTION_DOWN;
   ev.pressure = 0.5f;
-  /* Simulating altitude implicitly since union extensions are opaque in this
-   * stub */
+  ev.altitude = 0.5f;
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_stylus_resolve_ink_metrics(&ev, 10.0f, &opacity, &width));
   ASSERT_EQ(0.5f, opacity);
-  /* Width testing is relaxed due to lack of explicit altitude mapping in stub
-   * event_t */
+  /* Width testing with explicit altitude mapping */
+  ASSERT(width > 10.0f);
 
   PASS();
 }
@@ -27,11 +26,13 @@ TEST test_stylus_hover(void) {
   float distance;
 
   ev.action = CMP_ACTION_MOVE;
-  ev.pressure = 0.0f; /* 0 pressure + movement = hover in our stub */
+  ev.pressure = 0.0f; /* 0 pressure + movement = hover */
+  ev.distance = 0.5f;
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_stylus_evaluate_hover(&ev, &is_hovering, &distance));
   ASSERT_EQ(1, is_hovering);
+  ASSERT_EQ(0.5f, distance);
 
   ev.pressure = 0.5f; /* Actual touch */
   ASSERT_EQ(CMP_SUCCESS,

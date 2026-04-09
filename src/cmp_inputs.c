@@ -384,7 +384,8 @@ int cmp_slider_get_visuals(cmp_slider_t *slider_opaque,
   return CMP_SUCCESS;
 }
 
-/* System Dialog Stubs */
+/* System Dialog Wrappers (Platform-specific implementations to be added in
+ * Phase 25) */
 
 int cmp_system_color_picker_show(cmp_window_t *window) {
   if (!window)

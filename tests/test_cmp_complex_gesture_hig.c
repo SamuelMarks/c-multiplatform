@@ -53,9 +53,11 @@ TEST test_edge_swipe_pop(void) {
 }
 
 TEST test_gesture_overrides(void) {
-  cmp_gesture_t *dummy1 =
-      (cmp_gesture_t *)1; /* Using pointer addresses for stub tests */
-  cmp_gesture_t *dummy2 = (cmp_gesture_t *)2;
+  cmp_gesture_t *dummy1 = NULL;
+  cmp_gesture_t *dummy2 = NULL;
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_gesture_create(&dummy1));
+  ASSERT_EQ(CMP_SUCCESS, cmp_gesture_create(&dummy2));
 
   /* Dependency linking */
   ASSERT_EQ(CMP_SUCCESS, cmp_gesture_require_failure(dummy1, dummy2));
@@ -64,6 +66,9 @@ TEST test_gesture_overrides(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_gesture_cancel_on_system_override(dummy1, 1));
   ASSERT_EQ(CMP_SUCCESS, cmp_gesture_cancel_on_system_override(
                              dummy1, 4)); /* Would cancel internally */
+
+  cmp_gesture_destroy(dummy1);
+  cmp_gesture_destroy(dummy2);
 
   PASS();
 }

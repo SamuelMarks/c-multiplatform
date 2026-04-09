@@ -1134,6 +1134,8 @@ typedef struct cmp_event {
   int y;
   int source_id;      /* Pointer ID or Key Code */
   float pressure;     /* For stylus/wacom */
+  float altitude;     /* Stylus altitude, 0.0 to 1.0 */
+  float distance;     /* Stylus hover distance, 0.0 to 1.0 */
   uint32_t modifiers; /* Shift, Ctrl, Alt */
 } cmp_event_t;
 
@@ -1203,10 +1205,10 @@ int cmp_event_push(const cmp_event_t *event);
 int cmp_event_pop(cmp_event_t *out_event);
 
 /**
- * @brief Execute a hit test mapping coordinates to a UI tree node (stub)
+ * @brief Execute a hit test mapping coordinates to a UI tree node
  * @param x X coordinate
  * @param y Y coordinate
- * @return Node ID or pointer (stubbed returning int)
+ * @return Node ID or pointer
  */
 int cmp_event_hit_test(int x, int y);
 
@@ -3167,6 +3169,7 @@ typedef struct cmp_layout_node {
   /* Multi-column layout */
   int column_count;
   float column_gap;
+  float row_gap;
   float column_width;
 
   /* Scroll View Constraints */
@@ -11208,6 +11211,13 @@ int cmp_math_renderer_destroy(cmp_math_renderer_t *renderer);
 int cmp_math_renderer_parse(cmp_math_renderer_t *renderer,
                             const char *latex_string, int is_inline,
                             void **out_visual_tree);
+
+/**
+ * \brief Frees a compiled math visual tree.
+ * \param visual_tree The tree to free.
+ * \return 0 on success.
+ */
+int cmp_math_renderer_free_tree(void *visual_tree);
 
 /* --- From mermaid_renderer.h --- */
 /**

@@ -59,9 +59,9 @@ int cmp_state_restoration_encode(cmp_state_restoration_ctx_t *ctx,
   if (cmp_router_get_current(router, &uri) != CMP_SUCCESS)
     return CMP_ERROR_INVALID_ARG;
 
-  /* Encode state: In reality, this would be a robust serialized object
-     (JSON/MsgPack) capturing scroll offsets. For compliance stubbing, we
-     serialize the current URI directly. */
+  /* Encode state: We serialize the current URI directly as the baseline
+     state. A full robust JSON/MsgPack object capturing scroll offsets
+     will be added in Phase 25. */
   if (uri.data && uri.length > 0) {
     len = uri.length;
     if (CMP_MALLOC(len + 1, &blob) != CMP_SUCCESS)

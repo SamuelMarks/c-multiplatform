@@ -62,6 +62,31 @@ TEST test_bezier_ease_evaluate(void) {
   ASSERT_IN_RANGE(0.5f, val, 0.001f);
 
   cmp_bezier_ease_destroy(bezier);
+
+  /* Standard Ease (0.25, 0.1, 0.25, 1.0) */
+  cmp_bezier_ease_create(0.25f, 0.1f, 0.25f, 1.0f, &bezier);
+
+  res = cmp_bezier_ease_evaluate(bezier, 0.5f, &val);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  /* The standard ease evaluated at t=0.5 is approx 0.802 */
+  ASSERT(val > 0.5f);
+  ASSERT_IN_RANGE(0.802f, val, 0.01f);
+
+  cmp_bezier_ease_destroy(bezier);
+
+  /* Ease with initial slope 0 to trigger slope == 0 break */
+  cmp_bezier_ease_create(0.0f, 0.0f, 0.0f, 1.0f, &bezier);
+  res = cmp_bezier_ease_evaluate(bezier, 0.5f, &val);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  cmp_bezier_ease_destroy(bezier);
+
+  /* Ease going beyond bounds to check clipping */
+  cmp_bezier_ease_create(0.5f, -0.5f, 0.5f, 1.5f, &bezier);
+  res = cmp_bezier_ease_evaluate(bezier, 0.5f, &val);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_IN_RANGE(0.5f, val, 0.001f);
+  cmp_bezier_ease_destroy(bezier);
+
   PASS();
 }
 

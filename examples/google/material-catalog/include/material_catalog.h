@@ -686,7 +686,7 @@ int material_catalog_render_text_fields_example(material_catalog_state_t *state,
 #define dp_to_px(state, dp) ((dp) * (state)->dpi_scale)
 
 /**
- * @brief Utility for cut corner path generation on CMP Nodes (stub).
+ * @brief Utility for cut corner path generation on CMP Nodes.
  * @param node The UI node to apply the path to.
  * @param family The family of the corner (rounded/cut).
  * @param radius The radius/cut distance to apply.

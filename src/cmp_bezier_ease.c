@@ -48,18 +48,31 @@ static float cubic_bezier(float p0, float p1, float p2, float p3, float t) {
   float uuu = uu * u;
   float ttt = tt * t;
 
-  float p = uuu * p0;   /* first term */
-  p += 3 * uu * t * p1; /* second term */
-  p += 3 * u * tt * p2; /* third term */
-  p += ttt * p3;        /* fourth term */
+  float p = uuu * p0;      /* first term */
+  p += 3.0f * uu * t * p1; /* second term */
+  p += 3.0f * u * tt * p2; /* third term */
+  p += ttt * p3;           /* fourth term */
 
   return p;
+}
+
+/* Helper to evaluate cubic bezier derivative polynomial */
+static float cubic_bezier_derivative(float p0, float p1, float p2, float p3,
+                                     float t) {
+  float u = 1.0f - t;
+  float dt_p0 = 3.0f * u * u * (p1 - p0);
+  float dt_p1 = 6.0f * u * t * (p2 - p1);
+  float dt_p2 = 3.0f * t * t * (p3 - p2);
+  return dt_p0 + dt_p1 + dt_p2;
 }
 
 int cmp_bezier_ease_evaluate(cmp_bezier_ease_t *bezier, float t,
                              float *out_value) {
   struct cmp_bezier_ease *b = (struct cmp_bezier_ease *)bezier;
-  float u;
+  float guess_t;
+  float current_x;
+  float current_slope;
+  int i;
 
   if (!b || !out_value || t < 0.0f || t > 1.0f)
     return CMP_ERROR_INVALID_ARG;
@@ -73,17 +86,23 @@ int cmp_bezier_ease_evaluate(cmp_bezier_ease_t *bezier, float t,
     return CMP_SUCCESS;
   }
 
-  /* Since x goes from 0 to 1, for a proper easing function we need to find the
-     'u' value where cubic_bezier(0, x1, x2, 1, u) == t. For simplicity in this
-     stub, we'll approximate u = t for common curves, or we would implement a
-     Newton-Raphson solver here for precise mapping. Here we just evaluate the Y
-     curve directly for demonstration as a fast path. */
+  /* Newton-Raphson solver to find u where Bx(u) - t = 0 */
+  guess_t = t;
+  for (i = 0; i < 8; ++i) {
+    current_x = cubic_bezier(0.0f, b->x1, b->x2, 1.0f, guess_t) - t;
+    current_slope = cubic_bezier_derivative(0.0f, b->x1, b->x2, 1.0f, guess_t);
+    if (current_slope == 0.0f) {
+      break;
+    }
+    guess_t -= current_x / current_slope;
+  }
 
-  /* A true implementation requires finding root of Bx(u) - t = 0 to find u,
-   * then evaluating By(u) */
-  /* This is a placeholder for the math: */
-  u = t; /* approximation */
+  if (guess_t < 0.0f) {
+    guess_t = 0.0f;
+  } else if (guess_t > 1.0f) {
+    guess_t = 1.0f;
+  }
 
-  *out_value = cubic_bezier(0.0f, b->y1, b->y2, 1.0f, u);
+  *out_value = cubic_bezier(0.0f, b->y1, b->y2, 1.0f, guess_t);
   return CMP_SUCCESS;
 }

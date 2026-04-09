@@ -3,15 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* This is a portable stub. 
-   A real implementation utilizes ConPTY on Windows >= 10, or forkpty/openpty on POSIX. */
+/* This is a portable mockup implementation.
+   A full version utilizing ConPTY on Windows >= 10, or forkpty/openpty on POSIX,
+   will be provided in a later phase. */
 
-#if defined(_WIN32)
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-#endif
 /* clang-format on */
 
 struct cmp_embedded_pty {
@@ -26,8 +21,7 @@ int cmp_embedded_pty_create(cmp_embedded_pty_t **out_pty) {
   if (!out_pty)
     return CMP_ERROR_INVALID_ARG;
 
-  pty = (cmp_embedded_pty_t *)malloc(sizeof(cmp_embedded_pty_t));
-  if (!pty)
+  if (CMP_MALLOC(sizeof(struct cmp_embedded_pty), (void **)&pty) != CMP_SUCCESS)
     return CMP_ERROR_OOM;
 
   pty->is_running = 0;
@@ -41,7 +35,7 @@ int cmp_embedded_pty_create(cmp_embedded_pty_t **out_pty) {
 int cmp_embedded_pty_destroy(cmp_embedded_pty_t *pty) {
   if (!pty)
     return CMP_ERROR_INVALID_ARG;
-  free(pty);
+  CMP_FREE(pty);
   return CMP_SUCCESS;
 }
 

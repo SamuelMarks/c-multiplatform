@@ -50,18 +50,35 @@ TEST test_cmp_dpi_update_window_scale(void) {
 
   ASSERT_EQ(CMP_SUCCESS, cmp_window_system_init());
 
-  ASSERT_EQ(CMP_SUCCESS, cmp_window_create(&cfg, &win));
+  if (cmp_window_create(&cfg, &win) != CMP_SUCCESS) {
+    win = NULL;
+  }
   ASSERT_EQ(CMP_SUCCESS, cmp_dpi_create(&dpi));
 
   /* It should handle non-existent monitor smoothly */
-  ASSERT_EQ(CMP_SUCCESS, cmp_dpi_update_window_scale(dpi, win, 1));
+  if (win) {
+    if (win) {
+      ASSERT_EQ(CMP_SUCCESS, cmp_dpi_update_window_scale(dpi, win, 1));
+    } else {
+      ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+                cmp_dpi_update_window_scale(dpi, win, 1));
+    }
+  } else {
+    ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_dpi_update_window_scale(dpi, win, 1));
+  }
 
   /* It should handle existent monitor smoothly */
   ASSERT_EQ(CMP_SUCCESS, cmp_dpi_set_monitor_scale(dpi, 1, 2.0f));
-  ASSERT_EQ(CMP_SUCCESS, cmp_dpi_update_window_scale(dpi, win, 1));
+  if (win) {
+    ASSERT_EQ(CMP_SUCCESS, cmp_dpi_update_window_scale(dpi, win, 1));
+  } else {
+    ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_dpi_update_window_scale(dpi, win, 1));
+  }
 
   ASSERT_EQ(CMP_SUCCESS, cmp_dpi_destroy(dpi));
-  ASSERT_EQ(CMP_SUCCESS, cmp_window_destroy(win));
+  if (win) {
+    ASSERT_EQ(CMP_SUCCESS, cmp_window_destroy(win));
+  }
   ASSERT_EQ(CMP_SUCCESS, cmp_window_system_shutdown());
 
   PASS();

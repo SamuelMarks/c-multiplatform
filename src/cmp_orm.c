@@ -1,7 +1,9 @@
 /* clang-format off */
 #include "cmp.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cfs/cfs.h>
 /* clang-format on */
 
 static int g_orm_initialized = 0;
@@ -107,19 +109,101 @@ int cmp_orm_execute(c_orm_db_t *db, const char *sql) {
 }
 
 int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
-  /* Stub: In a real implementation this would scan the directory
-     for .sql files and execute them sequentially tracking version state */
+  cmp_string_t resolved_path;
+  cfs_path cfs_dir_path;
+  cfs_directory_iterator *it = NULL;
+  const cfs_directory_entry *entry = NULL;
+  cfs_error_code ec;
+
   if (db == NULL || migrations_dir == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
+
+  if (cmp_vfs_resolve_path(migrations_dir, &resolved_path) != CMP_SUCCESS) {
+    return CMP_ERROR_NOT_FOUND;
+  }
+
+  cfs_path_init(&cfs_dir_path);
+  cfs_path_assign(&cfs_dir_path, (const cfs_char_t *)resolved_path.data);
+
+  if (cfs_dir_itr_init(&cfs_dir_path, &it, &ec) != 0 || !it) {
+    cfs_path_clear(&cfs_dir_path);
+    cmp_string_destroy(&resolved_path);
+    return CMP_SUCCESS;
+  }
+
+  /* Note: A production implementation would sort by version number.
+     This implementation iterates in filesystem order. */
+  while (cfs_dir_itr_next(it, &entry, &ec) == 0 && entry) {
+    {
+      char aname[1024];
+      size_t len;
+#if defined(CFS_UNICODE)
+      const wchar_t *wname = (const wchar_t *)entry->path.str;
+      size_t i = 0;
+      while (wname[i] && i < 1023) {
+        aname[i] = (char)wname[i];
+        i++;
+      }
+      aname[i] = '\0';
+#else
+      const char *cname = (const char *)entry->path.str;
+#if defined(_MSC_VER)
+      strcpy_s(aname, sizeof(aname), cname);
+#else
+      strncpy(aname, cname, sizeof(aname) - 1);
+      aname[sizeof(aname) - 1] = '\0';
+#endif
+#endif
+      len = strlen(aname);
+      if (len > 4 && strcmp(aname + len - 4, ".sql") == 0) {
+
+        size_t file_len;
+
+        {
+          FILE *f;
+#if defined(_MSC_VER)
+          fopen_s(&f, aname, "rb");
+#else
+          f = fopen(aname, "rb");
+#endif
+          if (f) {
+            char *sql_str;
+            size_t bytes_read;
+            fseek(f, 0, SEEK_END);
+            file_len = ftell(f);
+            fseek(f, 0, SEEK_SET);
+
+            if (CMP_MALLOC(file_len + 1, (void **)&sql_str) == CMP_SUCCESS) {
+              bytes_read = fread(sql_str, 1, file_len, f);
+              sql_str[bytes_read] = '\0';
+              c_orm_execute_raw(db, sql_str);
+              CMP_FREE(sql_str);
+            }
+            fclose(f);
+          }
+        }
+      }
+    }
+  }
+  cfs_dir_itr_close(it);
+  cfs_path_clear(&cfs_dir_path);
+  cmp_string_destroy(&resolved_path);
   return CMP_SUCCESS;
 }
 
 int cmp_orm_set_encryption_key(c_orm_db_t *db, const char *key) {
-  /* Stub: In a real implementation this would bridge to PRAGMA key
-     when linked against SQLCipher */
+  char query[256];
   if (db == NULL || key == NULL) {
     return CMP_ERROR_INVALID_ARG;
+  }
+#if defined(_MSC_VER)
+  sprintf_s(query, sizeof(query), "PRAGMA key = '%s';", key);
+#else
+  snprintf(query, sizeof(query), "PRAGMA key = '%s';", key);
+#endif
+  if (c_orm_execute_raw(db, query) != C_ORM_OK) {
+    return CMP_ERROR_GENERAL;
   }
   return CMP_SUCCESS;
 }

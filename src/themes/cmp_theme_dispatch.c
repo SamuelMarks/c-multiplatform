@@ -12,9 +12,17 @@
  * @param node The UI node to evaluate.
  * @return A pointer to the correct theme VTable.
  */
+static const cmp_theme_vtable_t *g_default_theme_vtable = NULL;
+
+CMP_API void cmp_theme_set_default_vtable(const cmp_theme_vtable_t *vtable) {
+  g_default_theme_vtable = vtable;
+}
+
 #ifndef CMP_THEME_MODE_SINGLE_STATIC
 const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node) {
   if (!node) {
+    if (g_default_theme_vtable)
+      return g_default_theme_vtable;
     return cmp_theme_get_unstyled_vtable(); /* Fallback */
   }
 
@@ -54,9 +62,10 @@ const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node) {
     }
   }
 
-  /* If no override found, check global app context */
-  /* TODO: We need a global context or window context to provide the default.
-   * For now, default to Unstyled. */
+  if (g_default_theme_vtable) {
+    return g_default_theme_vtable;
+  }
+
   return cmp_theme_get_unstyled_vtable();
 }
 

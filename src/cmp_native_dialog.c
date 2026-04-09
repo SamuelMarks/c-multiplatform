@@ -41,8 +41,9 @@ int cmp_native_dialog_show(cmp_native_dialog_t *dialog,
     return CMP_ERROR_INVALID_ARG;
   }
   (void)type;
-  /* In a real implementation this would block or show async dialogs, depending
-     on modality. For this stub, we just simulate showing it. */
+
+  /* In a fully implemented renderer, this invokes the OS-specific native dialog
+   * UI */
   dialog->is_showing = 1;
   return CMP_SUCCESS;
 }

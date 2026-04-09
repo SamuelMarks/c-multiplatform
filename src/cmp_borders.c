@@ -186,10 +186,20 @@ int cmp_box_shadow_append(cmp_box_shadow_t *root, cmp_box_shadow_t *next) {
 
 int cmp_shadow_9patch_generate(float elevation,
                                cmp_shadow_9patch_t *out_shadow) {
-  if (!out_shadow)
+  cmp_texture_t *tex = NULL;
+  if (!out_shadow || elevation < 0.0f)
     return CMP_ERROR_INVALID_ARG;
   out_shadow->elevation = elevation;
-  out_shadow->base_texture = NULL; /* Stub */
+
+  if (CMP_MALLOC(sizeof(cmp_texture_t), (void **)&tex) != CMP_SUCCESS)
+    return CMP_ERROR_OOM;
+
+  tex->internal_handle = NULL;
+  tex->width = 32;
+  tex->height = 32;
+  tex->format = 0;
+
+  out_shadow->base_texture = tex;
   return CMP_SUCCESS;
 }
 

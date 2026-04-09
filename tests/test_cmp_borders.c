@@ -56,7 +56,16 @@ TEST test_shadow_9patch(void) {
   cmp_shadow_9patch_t shadow;
   ASSERT_EQ(CMP_SUCCESS, cmp_shadow_9patch_generate(4.0f, &shadow));
   ASSERT_EQ(4.0f, shadow.elevation);
-  ASSERT_EQ(NULL, shadow.base_texture);
+  ASSERT_NEQ(NULL, shadow.base_texture);
+  ASSERT_EQ(32, shadow.base_texture->width);
+  ASSERT_EQ(32, shadow.base_texture->height);
+
+  /* Clean up the texture pointer allocated by the generation */
+  cmp_texture_destroy(shadow.base_texture);
+
+  /* Test null args / invalid elevation */
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_shadow_9patch_generate(-1.0f, &shadow));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_shadow_9patch_generate(4.0f, NULL));
   PASS();
 }
 

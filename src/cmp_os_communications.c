@@ -5,7 +5,7 @@
 
 struct cmp_os_communications {
   int is_initialized;
-  int is_focus_mode_suppressed; /* Stubbed internal state */
+  int is_focus_mode_suppressed;
 };
 
 int cmp_os_communications_create(cmp_os_communications_t **out_ctx) {

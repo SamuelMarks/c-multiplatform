@@ -95,9 +95,5 @@ int cmp_secure_network_retrieve_credential(const char *key_name,
 #endif
 #endif
 
-  /* Fallback stub if not found / not Windows */
-  strncpy(out_secret, "mock_secure_token", max_len - 1);
-  out_secret[max_len - 1] = '\0';
-
-  return CMP_SUCCESS;
+  return CMP_ERROR_NOT_FOUND;
 }

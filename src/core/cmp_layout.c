@@ -218,6 +218,7 @@ static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
       cur_line->start = i;
     }
 
+    if (cur_line->count > 0) cur_line->main_size += (is_row ? node->column_gap : node->row_gap);
     cur_line->count++;
     cur_line->main_size += child_main + child_main_margin;
     cur_line->total_flex_grow += child->flex_grow;
@@ -354,6 +355,7 @@ static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
       child->height = original_height;
 
       main_pos += final_main + child_main_margin + spacing;
+      if (processed < line->count) main_pos += (is_row ? node->column_gap : node->row_gap);
     }
 
     if (main_pos - (is_row ? (current_x + node->padding[3])
@@ -381,6 +383,7 @@ static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
 
     cross_pos += line->cross_size;
     global_cross_max += line->cross_size;
+    if (i < line_count - 1) { float cross_gap = is_row ? node->row_gap : node->column_gap; cross_pos += cross_gap; global_cross_max += cross_gap; }
   }
 
   for (i = 0; i < node->child_count; i++) {

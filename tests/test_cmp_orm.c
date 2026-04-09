@@ -97,6 +97,14 @@ TEST test_orm_features(void) {
   res = cmp_orm_connect("virt:/test_db/test_features.sqlite", &db);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
+  res = cmp_orm_execute(
+      db, "CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT);");
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  res = cmp_orm_execute(db, "INSERT INTO test (id, name) VALUES (1, 'hello');");
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  /* Call migrate pointing to the virtual directory */
   res = cmp_orm_migrate(db, "virt:/migrations");
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
@@ -121,6 +129,8 @@ TEST test_orm_features(void) {
 
   res = cmp_orm_disconnect(db);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  remove("test_features.sqlite");
 
   cmp_orm_shutdown();
   cmp_vfs_shutdown();

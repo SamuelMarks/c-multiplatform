@@ -276,10 +276,10 @@ struct cmp_theme_vtable_s {
 };
 
 #ifndef CMP_THEME_MODE_SINGLE_STATIC
-const cmp_theme_vtable_t *cmp_theme_get_material3_vtable(void);
-const cmp_theme_vtable_t *cmp_theme_get_fluent2_vtable(void);
-const cmp_theme_vtable_t *cmp_theme_get_cupertino_vtable(void);
-const cmp_theme_vtable_t *cmp_theme_get_unstyled_vtable(void);
+CMP_API const cmp_theme_vtable_t *cmp_theme_get_material3_vtable(void);
+CMP_API const cmp_theme_vtable_t *cmp_theme_get_fluent2_vtable(void);
+CMP_API const cmp_theme_vtable_t *cmp_theme_get_cupertino_vtable(void);
+CMP_API const cmp_theme_vtable_t *cmp_theme_get_unstyled_vtable(void);
 
 /* Cross-Language FFI boundaries */
 CMP_API const cmp_theme_vtable_t *cmp_ffi_get_material3_vtable(void);

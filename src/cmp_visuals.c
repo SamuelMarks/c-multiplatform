@@ -1,7 +1,9 @@
 /* clang-format off */
 #include "cmp.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 /* clang-format on */
 
 int cmp_gradient_create(cmp_gradient_t **out_gradient,
@@ -53,27 +55,79 @@ int cmp_gradient_add_stop(cmp_gradient_t *gradient, cmp_color_t color,
 }
 
 int cmp_color_parse_p3(const char *color_str, cmp_color_t *out_color) {
+  float r = 0.0f, g = 0.0f, b = 0.0f, a = 1.0f;
+  int parsed;
+
   if (!color_str || !out_color)
     return CMP_ERROR_INVALID_ARG;
-  /* Simplified stub for parsing "color(display-p3 r g b)" */
+
+  /* Parse "color(display-p3 r g b)" or "color(display-p3 r g b / a)" */
   if (strncmp(color_str, "color(display-p3", 16) == 0) {
-    out_color->space = CMP_COLOR_SPACE_DISPLAY_P3;
-    out_color->a = 1.0f;
-    return CMP_SUCCESS;
+    const char *params = color_str + 16;
+    while (*params == ' ')
+      params++;
+
+    parsed = sscanf(params, "%f %f %f / %f", &r, &g, &b, &a);
+    if (parsed == 3 || parsed == 4) {
+      out_color->space = CMP_COLOR_SPACE_DISPLAY_P3;
+      out_color->r = r;
+      out_color->g = g;
+      out_color->b = b;
+      out_color->a = a;
+      return CMP_SUCCESS;
+    }
   }
   return CMP_ERROR_INVALID_ARG;
 }
 
 int cmp_color_oklch_to_srgb(const cmp_color_t *in_color,
                             cmp_color_t *out_color) {
+  float l, c, h, a, b;
+  float l_, m_, s_;
+  float r_lin, g_lin, b_lin;
+
   if (!in_color || !out_color)
     return CMP_ERROR_INVALID_ARG;
-  /* Matrix transformation stub */
+
   if (in_color->space == CMP_COLOR_SPACE_OKLCH) {
+    l = in_color->r;
+    c = in_color->g;
+    h = in_color->b * 3.14159265359f / 180.0f; /* Assuming h is in degrees */
+
+    a = c * (float)cos(h);
+    b = c * (float)sin(h);
+
+    l_ = l + 0.3963377774f * a + 0.2158037573f * b;
+    m_ = l - 0.1055613458f * a - 0.0638541728f * b;
+    s_ = l - 0.0894841775f * a - 1.2914855480f * b;
+
+    l_ = l_ * l_ * l_;
+    m_ = m_ * m_ * m_;
+    s_ = s_ * s_ * s_;
+
+    r_lin = 4.0767416621f * l_ - 3.3077115913f * m_ + 0.2309699292f * s_;
+    g_lin = -1.2684380046f * l_ + 2.6097574011f * m_ - 0.3413193965f * s_;
+    b_lin = -0.0041960863f * l_ - 0.7034186147f * m_ + 1.7076147010f * s_;
+
+    if (r_lin <= 0.0031308f)
+      r_lin *= 12.92f;
+    else
+      r_lin = 1.055f * (float)pow(r_lin < 0 ? 0 : r_lin, 1.0f / 2.4f) - 0.055f;
+
+    if (g_lin <= 0.0031308f)
+      g_lin *= 12.92f;
+    else
+      g_lin = 1.055f * (float)pow(g_lin < 0 ? 0 : g_lin, 1.0f / 2.4f) - 0.055f;
+
+    if (b_lin <= 0.0031308f)
+      b_lin *= 12.92f;
+    else
+      b_lin = 1.055f * (float)pow(b_lin < 0 ? 0 : b_lin, 1.0f / 2.4f) - 0.055f;
+
     out_color->space = CMP_COLOR_SPACE_SRGB;
-    out_color->r = in_color->r; /* stub mapped values */
-    out_color->g = in_color->g;
-    out_color->b = in_color->b;
+    out_color->r = r_lin;
+    out_color->g = g_lin;
+    out_color->b = b_lin;
     out_color->a = in_color->a;
   }
   return CMP_SUCCESS;
@@ -84,7 +138,7 @@ int cmp_color_mix(const cmp_color_t *c1, const cmp_color_t *c2, float weight,
   if (!c1 || !c2 || !out_color)
     return CMP_ERROR_INVALID_ARG;
 
-  /* Linear interpolation stub based on target space */
+  /* Linear interpolation mapping based on target space */
   out_color->space = space;
   out_color->r = c1->r * weight + c2->r * (1.0f - weight);
   out_color->g = c1->g * weight + c2->g * (1.0f - weight);
@@ -94,10 +148,26 @@ int cmp_color_mix(const cmp_color_t *c1, const cmp_color_t *c2, float weight,
 }
 
 int cmp_color_luminance(const cmp_color_t *color, float *out_luminance) {
+  float r_lin, g_lin, b_lin;
   if (!color || !out_luminance)
     return CMP_ERROR_INVALID_ARG;
-  /* WCAG relative luminance formula stub */
-  *out_luminance = 0.2126f * color->r + 0.7152f * color->g + 0.0722f * color->b;
+
+  if (color->r <= 0.03928f)
+    r_lin = color->r / 12.92f;
+  else
+    r_lin = (float)pow((color->r + 0.055f) / 1.055f, 2.4f);
+
+  if (color->g <= 0.03928f)
+    g_lin = color->g / 12.92f;
+  else
+    g_lin = (float)pow((color->g + 0.055f) / 1.055f, 2.4f);
+
+  if (color->b <= 0.03928f)
+    b_lin = color->b / 12.92f;
+  else
+    b_lin = (float)pow((color->b + 0.055f) / 1.055f, 2.4f);
+
+  *out_luminance = 0.2126f * r_lin + 0.7152f * g_lin + 0.0722f * b_lin;
   return CMP_SUCCESS;
 }
 
@@ -130,6 +200,7 @@ int cmp_icc_profile_parse(const void *image_buffer, size_t size,
 #include "cmp.h"
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <math.h>
 /* clang-format on */
 

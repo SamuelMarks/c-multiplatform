@@ -1,0 +1,105 @@
+## `src/themes/cmp_cupertino.c`
+- [✓] `cmp_cupertino_measure_button`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_measure_text_input`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_measure_slider`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_measure_toggle`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_measure_checkbox`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_measure_radio`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_measure_progress`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_measure_dropdown`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_layout_nav_bar`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_layout_tab_bar`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_layout_dialog_content`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_layout_sidebar`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_draw_text_input`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_draw_slider`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_draw_toggle`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_draw_checkbox`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_draw_radio`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_draw_progress`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_draw_card`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_draw_tooltip`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_draw_menu`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_draw_focus_ring`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_get_ripple_config`: Empty implementation / void cast stub
+- [✓] `cmp_cupertino_get_state_layer_opacity`: Empty implementation / void cast stub
+
+## `src/themes/cmp_fluent2.c`
+- [✓] `cmp_fluent2_measure_button`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_measure_text_input`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_measure_slider`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_measure_toggle`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_measure_checkbox`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_measure_radio`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_measure_progress`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_measure_dropdown`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_layout_nav_bar`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_layout_tab_bar`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_layout_dialog_content`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_layout_sidebar`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_draw_button`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_draw_text_input`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_draw_slider`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_draw_toggle`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_draw_checkbox`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_draw_radio`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_draw_progress`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_draw_card`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_draw_tooltip`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_draw_menu`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_get_spring_config`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_get_ripple_config`: Empty implementation / void cast stub
+- [✓] `cmp_fluent2_get_state_layer_opacity`: Empty implementation / void cast stub
+
+## `src/themes/cmp_material3.c`
+- [✓] `cmp_material3_draw_button`: TODO: Inject cmp_gpu_t draw calls or display list nodes
+- [✓] `cmp_material3_draw_card`: TODO: Inject cmp_gpu_t draw calls or display list nodes
+- [✓] `cmp_material3_measure_button`: Empty implementation / void cast stub
+- [✓] `cmp_material3_measure_text_input`: Empty implementation / void cast stub
+- [✓] `cmp_material3_measure_slider`: Empty implementation / void cast stub
+- [✓] `cmp_material3_measure_toggle`: Empty implementation / void cast stub
+- [✓] `cmp_material3_measure_checkbox`: Empty implementation / void cast stub
+- [✓] `cmp_material3_measure_radio`: Empty implementation / void cast stub
+- [✓] `cmp_material3_measure_progress`: Empty implementation / void cast stub
+- [✓] `cmp_material3_measure_dropdown`: Empty implementation / void cast stub
+- [✓] `cmp_material3_layout_nav_bar`: Empty implementation / void cast stub
+- [✓] `cmp_material3_layout_tab_bar`: Empty implementation / void cast stub
+- [✓] `cmp_material3_layout_dialog_content`: Empty implementation / void cast stub
+- [✓] `cmp_material3_layout_sidebar`: Empty implementation / void cast stub
+- [✓] `cmp_material3_draw_text_input`: Empty implementation / void cast stub
+- [✓] `cmp_material3_draw_slider`: Empty implementation / void cast stub
+- [✓] `cmp_material3_draw_toggle`: Empty implementation / void cast stub
+- [✓] `cmp_material3_draw_checkbox`: Empty implementation / void cast stub
+- [✓] `cmp_material3_draw_radio`: Empty implementation / void cast stub
+- [✓] `cmp_material3_draw_progress`: Empty implementation / void cast stub
+- [✓] `cmp_material3_draw_tooltip`: Empty implementation / void cast stub
+- [✓] `cmp_material3_draw_menu`: Empty implementation / void cast stub
+- [✓] `cmp_material3_draw_focus_ring`: Empty implementation / void cast stub
+- [✓] `cmp_material3_get_spring_config`: Empty implementation / void cast stub
+
+## `src/themes/cmp_unstyled.c`
+- [✓] `cmp_unstyled_measure_button`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_measure_text_input`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_measure_slider`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_measure_toggle`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_measure_checkbox`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_measure_radio`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_measure_progress`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_measure_dropdown`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_layout_nav_bar`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_layout_tab_bar`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_layout_dialog_content`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_layout_sidebar`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_draw_slider`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_draw_toggle`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_draw_checkbox`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_draw_radio`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_draw_progress`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_draw_card`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_draw_tooltip`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_draw_menu`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_draw_focus_ring`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_get_spring_config`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_get_ripple_config`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_get_state_layer_opacity`: Empty implementation / void cast stub
+- [✓] `cmp_unstyled_get_transition_duration`: Empty implementation / void cast stub

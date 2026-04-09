@@ -52,8 +52,22 @@ int cmp_input_mask_apply(cmp_input_mask_t *mask, const char *raw_input,
 
   while (p < pattern_len && i < input_len && o < out_capacity - 1) {
     if (internal_mask->pattern[p] == 'X') {
-      /* Assume 'X' means any char in this simple stub */
       out_buffer[o++] = raw_input[i++];
+    } else if (internal_mask->pattern[p] == '9') {
+      if (raw_input[i] >= '0' && raw_input[i] <= '9') {
+        out_buffer[o++] = raw_input[i++];
+      } else {
+        i++;
+        continue;
+      }
+    } else if (internal_mask->pattern[p] == 'A') {
+      if ((raw_input[i] >= 'a' && raw_input[i] <= 'z') ||
+          (raw_input[i] >= 'A' && raw_input[i] <= 'Z')) {
+        out_buffer[o++] = raw_input[i++];
+      } else {
+        i++;
+        continue;
+      }
     } else {
       /* Static char in mask */
       out_buffer[o++] = internal_mask->pattern[p];
@@ -66,6 +80,7 @@ int cmp_input_mask_apply(cmp_input_mask_t *mask, const char *raw_input,
 
   /* Add remaining static chars if input ends exactly before them */
   while (p < pattern_len && internal_mask->pattern[p] != 'X' &&
+         internal_mask->pattern[p] != '9' && internal_mask->pattern[p] != 'A' &&
          o < out_capacity - 1) {
     out_buffer[o++] = internal_mask->pattern[p];
     p++;

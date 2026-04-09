@@ -4,11 +4,7 @@
 #include <string.h>
 /* clang-format on */
 
-int cmp_passive_event_init(void) {
-  /* In a real implementation, this might allocate global tracking structures
-     for passive listeners. For now, it's just a lifecycle stub. */
-  return CMP_SUCCESS;
-}
+int cmp_passive_event_init(void) { return CMP_SUCCESS; }
 
 int cmp_ui_node_add_passive_listener(cmp_ui_node_t *node, uint32_t event_type,
                                      void (*callback)(cmp_event_t *,

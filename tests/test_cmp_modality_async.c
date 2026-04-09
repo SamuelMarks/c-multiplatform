@@ -3,7 +3,7 @@
 #include "greatest.h"
 /* clang-format on */
 
-TEST test_modality_async_stubs(void) {
+TEST test_modality_async_init_cleanup(void) {
   cmp_modality_t mod;
   int res;
 
@@ -16,7 +16,7 @@ TEST test_modality_async_stubs(void) {
   PASS();
 }
 
-SUITE(modality_async_suite) { RUN_TEST(test_modality_async_stubs); }
+SUITE(modality_async_suite) { RUN_TEST(test_modality_async_init_cleanup); }
 
 GREATEST_MAIN_DEFS();
 

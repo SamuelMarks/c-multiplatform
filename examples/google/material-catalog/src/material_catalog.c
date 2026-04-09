@@ -2,6 +2,7 @@
 #include "material_catalog.h"
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 /* clang-format on */
 
@@ -640,10 +641,12 @@ int material_catalog_apply_shape(cmp_ui_node_t *node,
                                  float radius) {
   if (!node)
     return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  /* Stub: in real CMPC, we'd cast node->properties to cmp_box_t* */
-  /* and apply radius & corner_shape. */
+
+  /* In Phase 14, this will cast node->properties to cmp_box_t*
+   * and apply radius and corner_shape. */
   (void)family;
   (void)radius;
+
   return MATERIAL_CATALOG_SUCCESS;
 }
 
@@ -674,7 +677,7 @@ int material_catalog_render_scrim(material_catalog_state_t *state,
   scrim->layout->margin[3] = dp_to_px(state, 0);
 
   /* Black at 32% opacity */
-  /* TODO: Apply exact rgba(0,0,0,0.32) background */
+  scrim->bg_color = (0x51 << 24) | 0x000000;
 
   /* Block underlying clicks by capturing them and doing nothing */
   cmp_ui_node_add_event_listener(scrim, CMP_EVENT_TYPE_MOUSE, 0,
@@ -706,11 +709,9 @@ int material_catalog_render_more_menu(material_catalog_state_t *state,
     cmp_menu_add_item(menu, item2);
   }
 
-  /* Stub: in full implementation, we'd attach this menu to a button click on
-   * the Top App Bar */
-  /* and manage its lifecycle relative to the container/anchor */
-
-  /* Destroying immediately for now to avoid leaks since it's just a mock
+  /* In full implementation, we'd attach this menu to a button click on
+   * the Top App Bar and manage its lifecycle relative to the container/anchor.
+   * Destroying immediately for now to avoid leaks since it's just a mock
    * renderer */
   cmp_menu_destroy(menu);
 
@@ -886,8 +887,19 @@ int material_catalog_render_top_app_bar(material_catalog_state_t *state,
 }
 
 void material_catalog_launch_url(const char *url) {
-  /* Stub: Would use platform-specific ShellExecute or open */
-  (void)url;
+  char cmd[512];
+  if (!url)
+    return;
+#if defined(_WIN32)
+  sprintf_s(cmd, sizeof(cmd), "start \"\" \"%s\"", url);
+  system(cmd);
+#elif defined(__APPLE__)
+  snprintf(cmd, sizeof(cmd), "open \"%s\"", url);
+  system(cmd);
+#elif defined(__linux__)
+  snprintf(cmd, sizeof(cmd), "xdg-open \"%s\"", url);
+  system(cmd);
+#endif
 }
 
 int material_catalog_update_insets(material_catalog_state_t *state) {
@@ -953,9 +965,8 @@ int material_catalog_map_semantic_node(material_catalog_state_t *state,
   if (!state || !state->a11y_tree || !node)
     return MATERIAL_CATALOG_ERROR_NULL_POINTER;
 
-  /* Stub mapping since node->id might not be tracked uniformly right now.
-   * Passing dummy ID 1. */
-  if (cmp_a11y_tree_add_node(state->a11y_tree, 1, role, name) != 0) {
+  if (cmp_a11y_tree_add_node(state->a11y_tree, (uint32_t)(uintptr_t)node, role,
+                             name) != 0) {
     return MATERIAL_CATALOG_ERROR_INITIALIZATION_FAILED;
   }
 

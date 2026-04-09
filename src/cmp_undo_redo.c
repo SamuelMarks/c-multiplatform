@@ -45,18 +45,32 @@ int cmp_undo_redo_push(cmp_undo_redo_t *stack, const char *state) {
   struct cmp_undo_redo *internal_stack = (struct cmp_undo_redo *)stack;
   size_t len;
   char *new_state = NULL;
+  int i;
 
   if (!internal_stack || !state)
     return CMP_ERROR_INVALID_ARG;
 
+  /* Discard any redo history if we are pushing a new state while not at the top
+   */
+  if (internal_stack->position < internal_stack->count) {
+    for (i = internal_stack->position; i < internal_stack->count; ++i) {
+      if (internal_stack->stack[i]) {
+        CMP_FREE(internal_stack->stack[i]);
+        internal_stack->stack[i] = NULL;
+      }
+    }
+    internal_stack->count = internal_stack->position;
+  }
+
   if (internal_stack->count >= 10) {
-    /* Simple drop oldest for stub */
+    /* Shift array to drop the oldest state */
     if (internal_stack->stack[0]) {
       CMP_FREE(internal_stack->stack[0]);
     }
     memmove(&internal_stack->stack[0], &internal_stack->stack[1],
             9 * sizeof(char *));
     internal_stack->count--;
+    internal_stack->position--;
   }
 
   len = strlen(state);

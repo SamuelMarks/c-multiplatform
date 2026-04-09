@@ -2,6 +2,13 @@
 #include "app.h"
 #include "cmp.h"
 #include <stdio.h>
+#include <string.h>
+#include "themes/cmp_f2_text_inputs.h"
+#include "themes/cmp_material3_text_inputs.h"
+#include "themes/cmp_material3_components.h"
+#include "themes/cmp_f2_button.h"
+#include "themes/cmp_cupertino.h"
+
 
 #ifdef _WIN32
 extern int __stdcall GetSystemMetrics(int nIndex);
@@ -24,6 +31,22 @@ static float g_dpi_scale = 1.0f;
 static int g_focused_input = 0;
 static char g_user_text[256] = "";
 static char g_pass_text[256] = "";
+static cmp_a11y_tree_t *g_a11y_tree = NULL;
+static cmp_screen_reader_t *g_screen_reader = NULL;
+static cmp_focus_ring_t *g_focus_ring = NULL;
+static cmp_focus_manager_t *g_focus_manager = NULL;
+static cmp_aria_t *g_aria = NULL;
+static cmp_caret_t *g_caret = NULL;
+static cmp_keyboard_avoidance_t *g_kb_avoidance = NULL;
+static cmp_form_controls_t *g_form_controls = NULL;
+static cmp_hover_intent_t *g_hover_intent = NULL;
+static cmp_compositor_anim_t *g_btn_opacity_anim = NULL;
+static cmp_keyframe_t *g_loading_spinner = NULL;
+static int g_is_hovering_btn = 0;
+static int g_is_loading = 0;
+static float g_btn_opacity = 1.0f;
+#define ID_TITLE 100
+
 static char g_pass_display[256] = "";
 
 #define ID_THEME_BTN 101
@@ -40,36 +63,61 @@ static char g_pass_display[256] = "";
  * @param y The Y coordinate
  * @return The ID of the node that was hit, or -1 if none
  */
-static int manual_hit_test(cmp_ui_node_t *node, float x, float y) {
-  size_t i;
-  if (!node || !node->layout) {
-    return -1;
-  }
-  if (x >= node->layout->computed_rect.x &&
-      x <= node->layout->computed_rect.x + node->layout->computed_rect.width &&
-      y >= node->layout->computed_rect.y &&
-      y <= node->layout->computed_rect.y + node->layout->computed_rect.height) {
-    int hit = -1;
-    for (i = 0; i < node->child_count; ++i) {
-      int child_hit = manual_hit_test(node->children[i], x, y);
-      if (child_hit != -1) {
-        hit = child_hit;
-      }
-    }
-    if (hit != -1) {
-      return hit;
-    }
-    if (node->layout->id != 0) {
-      return node->layout->id;
-    }
-  }
-  return -1;
-}
 
 /**
  * @brief Constructs the application's UI tree
  * @return 0 on success, or an error code
  */
+
+static void add_i18n_text(cmp_ui_node_t *parent, const char *key,
+                          cmp_ui_node_t **out_node) {
+  cmp_string_t localized = {0};
+  if (cmp_i18n_translate(key, &localized) == CMP_SUCCESS && localized.data) {
+    cmp_ui_text_create(out_node, localized.data, -1);
+    cmp_string_destroy(&localized);
+  } else {
+    cmp_ui_text_create(out_node, key, -1);
+  }
+  if (parent && out_node && *out_node) {
+    cmp_ui_node_add_child(parent, *out_node);
+  }
+}
+
+static void set_i18n_button(cmp_ui_node_t **btn, const char *key) {
+  cmp_string_t localized = {0};
+  const char *text = key;
+  if (cmp_i18n_translate(key, &localized) == CMP_SUCCESS && localized.data) {
+    text = localized.data;
+  }
+  if (g_current_theme == 2) {
+    cmp_f2_button_create(btn, text, NULL);
+    if (*btn) {
+      cmp_f2_button_set_variant(*btn, CMP_F2_BUTTON_VARIANT_PRIMARY);
+      {
+        cmp_ui_node_t *t = NULL;
+        if (cmp_ui_text_create(&t, text, -1) == CMP_SUCCESS) {
+          t->text_color = 0xFFFFFFFF;
+          cmp_ui_node_add_child(*btn, t);
+        }
+      }
+    }
+  } else {
+    cmp_ui_button_create(btn, text, -1);
+    if (*btn && g_current_theme == 1) {
+      cmp_m3_button_metrics_t m3b;
+      if (cmp_m3_button_resolve(CMP_M3_BUTTON_FILLED, 0, &m3b) == CMP_SUCCESS) {
+        (*btn)->layout->padding[3] = m3b.padding_left;
+        (*btn)->layout->padding[1] = m3b.padding_right;
+        (*btn)->layout->height = m3b.height;
+      }
+    } else if (*btn && g_current_theme == 3) {
+      (*btn)->layout->height = 44.0f;
+    }
+  }
+  if (localized.data)
+    cmp_string_destroy(&localized);
+}
+
 static int build_ui(void) {
   cmp_ui_node_t *top_bar = NULL;
   cmp_ui_node_t *theme_btn = NULL;
@@ -161,7 +209,8 @@ static int build_ui(void) {
 
     if (g_current_route == 1) {
       cmp_ui_node_t *logout_btn = NULL;
-      if (cmp_ui_button_create(&logout_btn, "Logout", -1) == CMP_SUCCESS) {
+      set_i18n_button(&logout_btn, "Logout");
+      if (logout_btn) {
         logout_btn->layout->id = ID_LOGOUT_BTN;
         logout_btn->layout->width = 120.0f;
         logout_btn->layout->height = btn_h;
@@ -191,7 +240,8 @@ static int build_ui(void) {
       break;
     }
 
-    if (cmp_ui_button_create(&theme_btn, theme_name, -1) == CMP_SUCCESS) {
+    set_i18n_button(&theme_btn, theme_name);
+    if (theme_btn) {
       theme_btn->layout->id = ID_THEME_BTN;
       theme_btn->layout->width = 200.0f;
       theme_btn->layout->height = btn_h;
@@ -246,7 +296,16 @@ static int build_ui(void) {
       }
 
       /* Username Field */
-      if (cmp_ui_box_create(&user_container) == CMP_SUCCESS) {
+
+      if (g_current_theme == 2) {
+        cmp_f2_text_input_create(&user_container);
+        cmp_f2_text_input_set_variant(user_container,
+                                      CMP_F2_TEXT_INPUT_VARIANT_OUTLINE);
+      } else {
+        cmp_ui_text_input_create(&user_container);
+      }
+      if (user_container) {
+
         user_container->layout->id = ID_USER_IN;
         user_container->layout->width = g_window_width - 64.0f;
         user_container->layout->height = input_h;
@@ -254,7 +313,7 @@ static int build_ui(void) {
         user_container->bg_color = input_bg;
         user_container->layout->direction = CMP_FLEX_COLUMN;
 
-        cmp_ui_text_create(&user_lbl, "Username", -1);
+        add_i18n_text(NULL, "Username", &user_lbl);
         user_lbl->bg_color = 0;
 
         if (user_active) {
@@ -271,7 +330,21 @@ static int build_ui(void) {
           user_val->bg_color = 0;
           user_val->layout->height = 30.0f;
           user_val->layout->padding[3] = input_pad;
+
           cmp_ui_node_add_child(user_container, user_val);
+          if (g_caret && is_user_focused) {
+            int is_visible = 0;
+            cmp_caret_update_blink(g_caret, 16.0, &is_visible);
+            if (is_visible) {
+              cmp_ui_node_t *caret_node = NULL;
+              cmp_ui_box_create(&caret_node);
+              caret_node->layout->width = 2.0f;
+              caret_node->layout->height = 20.0f;
+              caret_node->bg_color = btn_bg;
+              cmp_ui_node_add_child(user_container, caret_node);
+            }
+          }
+
         } else {
           user_lbl->font_size = 16.0f;
           user_lbl->text_color = lbl_color;
@@ -291,7 +364,15 @@ static int build_ui(void) {
       }
 
       /* Password Field */
-      if (cmp_ui_box_create(&pass_container) == CMP_SUCCESS) {
+
+      if (g_current_theme == 2) {
+        cmp_f2_text_input_create(&pass_container);
+        cmp_f2_text_input_set_password_mode(pass_container, 1);
+      } else {
+        cmp_ui_text_input_create(&pass_container);
+      }
+      if (pass_container) {
+
         pass_container->layout->id = ID_PASS_IN;
         pass_container->layout->width = g_window_width - 64.0f;
         pass_container->layout->height = input_h;
@@ -299,7 +380,7 @@ static int build_ui(void) {
         pass_container->bg_color = input_bg;
         pass_container->layout->direction = CMP_FLEX_COLUMN;
 
-        cmp_ui_text_create(&pass_lbl, "Password", -1);
+        add_i18n_text(NULL, "Password", &pass_lbl);
         pass_lbl->bg_color = 0;
 
         if (pass_active) {
@@ -322,7 +403,21 @@ static int build_ui(void) {
           pass_val->bg_color = 0;
           pass_val->layout->height = 30.0f;
           pass_val->layout->padding[3] = input_pad;
+
           cmp_ui_node_add_child(pass_container, pass_val);
+          if (g_caret && is_pass_focused) {
+            int is_visible = 0;
+            cmp_caret_update_blink(g_caret, 16.0, &is_visible);
+            if (is_visible) {
+              cmp_ui_node_t *caret_node = NULL;
+              cmp_ui_box_create(&caret_node);
+              caret_node->layout->width = 2.0f;
+              caret_node->layout->height = 20.0f;
+              caret_node->bg_color = btn_bg;
+              cmp_ui_node_add_child(pass_container, caret_node);
+            }
+          }
+
         } else {
           pass_lbl->font_size = 16.0f;
           pass_lbl->text_color = lbl_color;
@@ -341,13 +436,15 @@ static int build_ui(void) {
         cmp_ui_node_add_child(content_box, pass_container);
       }
 
-      if (cmp_ui_button_create(&login_btn, "Login", -1) == CMP_SUCCESS) {
+      set_i18n_button(&login_btn, "Login");
+      if (login_btn) {
         login_btn->layout->id = ID_LOGIN_BTN;
         login_btn->layout->width = g_window_width - 64.0f;
         login_btn->layout->height = btn_h;
         login_btn->layout->padding[1] = btn_pad;
         login_btn->layout->padding[3] = btn_pad;
-        login_btn->bg_color = btn_bg;
+        login_btn->bg_color =
+            (btn_bg & 0x00FFFFFF) | ((uint32_t)(255.0f * g_btn_opacity) << 24);
         login_btn->text_color = btn_text;
         cmp_ui_node_add_child(content_box, login_btn);
       }
@@ -462,8 +559,67 @@ int app_run(void) {
         continue;
       }
 
+      if (evt.type == 1) { /* CMP_EVENT_TYPE_POINTER_MOVE */
+        int hn = -1;
+        cmp_hit_test_t *ht = NULL;
+        cmp_ui_node_t *hnode = NULL;
+        if (cmp_hit_test_create(g_ui_tree, &ht) == CMP_SUCCESS) {
+          if (cmp_hit_test_query(ht, (float)evt.x, (float)evt.y, &hnode) ==
+                  CMP_SUCCESS &&
+              hnode) {
+            cmp_ui_node_t *curr = hnode;
+            while (curr) {
+              if (curr->layout && curr->layout->id == ID_LOGIN_BTN) {
+                hn = ID_LOGIN_BTN;
+                break;
+              }
+              curr = curr->parent;
+            }
+          }
+          cmp_hit_test_destroy(ht);
+        }
+
+        if (hn == ID_LOGIN_BTN) {
+          if (!g_is_hovering_btn) {
+            if (cmp_hover_intent_process(g_hover_intent, &evt, 16.0f)) {
+              cmp_compositor_val_t s = {0}, e = {0};
+              g_is_hovering_btn = 1;
+              s.opacity = g_btn_opacity;
+              e.opacity = 0.8f;
+              cmp_compositor_anim_set_range(g_btn_opacity_anim, &s, &e);
+            }
+          }
+        } else {
+          if (g_is_hovering_btn) {
+            cmp_compositor_val_t s = {0}, e = {0};
+            g_is_hovering_btn = 0;
+            s.opacity = g_btn_opacity;
+            e.opacity = 1.0f;
+            cmp_compositor_anim_set_range(g_btn_opacity_anim, &s, &e);
+          }
+          evt.action = CMP_ACTION_CANCEL;
+          cmp_hover_intent_process(g_hover_intent, &evt, 0.0f);
+        }
+      }
+
       if (evt.action == CMP_ACTION_DOWN && (evt.type == 1 || evt.type == 2)) {
-        int hit_node = manual_hit_test(g_ui_tree, (float)evt.x, (float)evt.y);
+        int hit_node = -1;
+        cmp_hit_test_t *ht = NULL;
+        cmp_ui_node_t *hn = NULL;
+        if (cmp_hit_test_create(g_ui_tree, &ht) == CMP_SUCCESS) {
+          if (cmp_hit_test_query(ht, (float)evt.x, (float)evt.y, &hn) ==
+                  CMP_SUCCESS &&
+              hn) {
+            while (hn) {
+              if (hn->layout && hn->layout->id != 0) {
+                hit_node = hn->layout->id;
+                break;
+              }
+              hn = hn->parent;
+            }
+          }
+          cmp_hit_test_destroy(ht);
+        }
 
         if (hit_node == ID_USER_IN || hit_node == ID_PASS_IN) {
           g_focused_input = hit_node;

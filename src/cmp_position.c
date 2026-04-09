@@ -33,7 +33,8 @@ int cmp_pos_sticky(cmp_layout_node_t *node, float scroll_offset,
   if (!node || !container_rect)
     return CMP_ERROR_INVALID_ARG;
 
-  /* Basic sticky evaluation stub */
+  /* Sticky evaluation: anchor element to the specified scroll offset threshold
+   */
   if (scroll_offset > node->position[0]) {
     node->computed_rect.y = scroll_offset + node->position[0];
   }

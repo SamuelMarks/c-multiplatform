@@ -9,43 +9,202 @@ extern "C" {
 #include "cmp_theme_core.h"
 /* clang-format on */
 
+/**
+ * @brief Measures a Cupertino-style button.
+ * @param node The UI node.
+ * @param width Output calculated width.
+ * @param height Output calculated height.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_measure_button(const cmp_ui_node_t *node, float *width,
                                      float *height);
+/**
+ * @brief Measures a Cupertino-style text input.
+ * @param node The UI node.
+ * @param width Output calculated width.
+ * @param height Output calculated height.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_measure_text_input(const cmp_ui_node_t *node,
                                          float *width, float *height);
+/**
+ * @brief Measures a Cupertino-style slider.
+ * @param node The UI node.
+ * @param width Output calculated width.
+ * @param height Output calculated height.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_measure_slider(const cmp_ui_node_t *node, float *width,
                                      float *height);
+/**
+ * @brief Measures a Cupertino-style toggle switch.
+ * @param node The UI node.
+ * @param width Output calculated width.
+ * @param height Output calculated height.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_measure_toggle(const cmp_ui_node_t *node, float *width,
                                      float *height);
+/**
+ * @brief Measures a Cupertino-style checkbox.
+ * @param node The UI node.
+ * @param width Output calculated width.
+ * @param height Output calculated height.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_measure_checkbox(const cmp_ui_node_t *node, float *width,
                                        float *height);
+/**
+ * @brief Measures a Cupertino-style radio button.
+ * @param node The UI node.
+ * @param width Output calculated width.
+ * @param height Output calculated height.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_measure_radio(const cmp_ui_node_t *node, float *width,
                                     float *height);
+/**
+ * @brief Measures a Cupertino-style progress bar.
+ * @param node The UI node.
+ * @param width Output calculated width.
+ * @param height Output calculated height.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_measure_progress(const cmp_ui_node_t *node, float *width,
                                        float *height);
+/**
+ * @brief Measures a Cupertino-style dropdown menu.
+ * @param node The UI node.
+ * @param width Output calculated width.
+ * @param height Output calculated height.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_measure_dropdown(const cmp_ui_node_t *node, float *width,
                                        float *height);
+/**
+ * @brief Lays out a Cupertino-style navigation bar.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_layout_nav_bar(cmp_ui_node_t *node);
+/**
+ * @brief Lays out a Cupertino-style tab bar.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_layout_tab_bar(cmp_ui_node_t *node);
+/**
+ * @brief Lays out Cupertino-style dialog content.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_layout_dialog_content(cmp_ui_node_t *node);
+/**
+ * @brief Lays out a Cupertino-style sidebar.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_layout_sidebar(cmp_ui_node_t *node);
+/**
+ * @brief Draws a Cupertino-style button.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_draw_button(const cmp_ui_node_t *node);
+/**
+ * @brief Draws a Cupertino-style text input.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_draw_text_input(const cmp_ui_node_t *node);
+/**
+ * @brief Draws a Cupertino-style slider.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_draw_slider(const cmp_ui_node_t *node);
+/**
+ * @brief Draws a Cupertino-style toggle switch.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_draw_toggle(const cmp_ui_node_t *node);
+/**
+ * @brief Draws a Cupertino-style checkbox.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_draw_checkbox(const cmp_ui_node_t *node);
+/**
+ * @brief Draws a Cupertino-style radio button.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_draw_radio(const cmp_ui_node_t *node);
+/**
+ * @brief Draws a Cupertino-style progress bar.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_draw_progress(const cmp_ui_node_t *node);
+/**
+ * @brief Draws a Cupertino-style card.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_draw_card(const cmp_ui_node_t *node);
+/**
+ * @brief Draws a Cupertino-style tooltip.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_draw_tooltip(const cmp_ui_node_t *node);
+/**
+ * @brief Draws a Cupertino-style menu.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_draw_menu(const cmp_ui_node_t *node);
+/**
+ * @brief Draws a Cupertino-style focus ring.
+ * @param node The UI node.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_draw_focus_ring(const cmp_ui_node_t *node);
+/**
+ * @brief Gets the spring animation configuration for Cupertino-style elements.
+ * @param node The UI node.
+ * @param mass Output mass value.
+ * @param stiffness Output stiffness value.
+ * @param damping Output damping value.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_get_spring_config(const cmp_ui_node_t *node, float *mass,
                                         float *stiffness, float *damping);
+/**
+ * @brief Gets the ripple animation configuration for Cupertino-style elements.
+ * @param node The UI node.
+ * @param duration Output ripple duration.
+ * @param opacity Output ripple opacity.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_get_ripple_config(const cmp_ui_node_t *node,
                                         float *duration, float *opacity);
+/**
+ * @brief Gets the state layer opacity for Cupertino-style elements.
+ * @param node The UI node.
+ * @param state The current UI state.
+ * @param opacity Output opacity value.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_get_state_layer_opacity(const cmp_ui_node_t *node,
                                               int32_t state, float *opacity);
+/**
+ * @brief Gets the transition duration for Cupertino-style elements.
+ * @param node The UI node.
+ * @param duration Output transition duration.
+ * @return CMP_SUCCESS on success, error code otherwise.
+ */
 int32_t cmp_cupertino_get_transition_duration(const cmp_ui_node_t *node,
                                               float *duration);
 

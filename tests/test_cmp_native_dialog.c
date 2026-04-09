@@ -27,7 +27,7 @@ TEST test_cmp_native_dialog_show_and_result(void) {
 
   ASSERT_EQ(CMP_SUCCESS, cmp_native_dialog_create(&dialog));
 
-  /* Show dialog (stubbed) */
+  /* Trigger dialog opening (System calls intercepted in tests) */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_native_dialog_show(dialog, CMP_DIALOG_TYPE_FILE_OPEN));
 

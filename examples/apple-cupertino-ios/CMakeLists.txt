@@ -20,6 +20,5 @@ if(NOT TARGET cmp)
     FetchContent_MakeAvailable(cmp)
 endif()
 
-add_custom_target(apple_cupertino_ios_example
-    COMMAND ${CMAKE_COMMAND} -E echo "Apple Cupertino iOS Example Stub"
-)
+add_executable(apple_cupertino_ios_example src/main.c)
+target_link_libraries(apple_cupertino_ios_example PRIVATE cmp)

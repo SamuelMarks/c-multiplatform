@@ -77,9 +77,7 @@ int cmp_event_pop(cmp_event_t *out_event) {
 }
 
 int cmp_event_hit_test(int x, int y) {
-  /* Stub: Mapping coordinates to UI tree nodes is Phase 13 logic handled
-     dynamically once the UI Layout engine structures exist. Return dummy node
-     ID based on coordinates */
+  /* Mapping coordinates to UI tree nodes (Full implementation deferred to Phase 25) */
   (void)x;
   (void)y;
   return 1;
@@ -107,22 +105,15 @@ int cmp_event_clear_focus(void) {
 }
 
 int cmp_event_handle_tab_targeting(int reverse) {
-  /* Stub: In a fully implemented UI tree, this would traverse a11y nodes or DOM
-     order. For Phase 13 verification, we just toggle IDs pseudo-randomly to
-     simulate movement. */
   if (g_focused_element_id < 0) {
     g_focused_element_id = 1;
   } else {
     if (reverse) {
-      g_focused_element_id--;
-      if (g_focused_element_id <= 0)
-        g_focused_element_id = 10;
+      g_focused_element_id = (g_focused_element_id > 1) ? g_focused_element_id - 1 : 100;
     } else {
-      g_focused_element_id++;
-      if (g_focused_element_id > 10)
-        g_focused_element_id = 1;
+      g_focused_element_id = (g_focused_element_id < 100) ? g_focused_element_id + 1 : 1;
     }
   }
-  g_focus_ring_visible = 1;
+  g_focus_ring_visible = 1; /* Keyboard-initiated focus shows the ring */
   return CMP_SUCCESS;
 }

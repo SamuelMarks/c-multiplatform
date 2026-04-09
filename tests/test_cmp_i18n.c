@@ -67,9 +67,32 @@ TEST test_cmp_i18n_strings(void) {
   PASS();
 }
 
+TEST test_cmp_i18n_global_translate(void) {
+  cmp_string_t s;
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_i18n_init());
+  ASSERT_EQ(CMP_SUCCESS, cmp_i18n_load_catalog("path", "en"));
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_i18n_translate("unknown_key", &s));
+  ASSERT_STR_EQ("unknown_key", s.data);
+  CMP_FREE(s.data);
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_i18n_translate_plural("item", 1, &s));
+  ASSERT_STR_EQ("item", s.data);
+  CMP_FREE(s.data);
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_i18n_translate_plural("item", 2, &s));
+  ASSERT_STR_EQ("item_plural", s.data);
+  CMP_FREE(s.data);
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_i18n_shutdown());
+  PASS();
+}
+
 SUITE(cmp_i18n_suite) {
   RUN_TEST(test_cmp_i18n_create_destroy);
   RUN_TEST(test_cmp_i18n_strings);
+  RUN_TEST(test_cmp_i18n_global_translate);
 }
 
 GREATEST_MAIN_DEFS();

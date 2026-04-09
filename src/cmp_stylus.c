@@ -49,7 +49,6 @@ int cmp_stylus_resolve_ink_metrics(const cmp_event_t *event, float base_width,
     return CMP_ERROR_INVALID_ARG;
 
   /* Assume pointer is a stylus */
-  /* Stubbed: Assuming type fields map for stylus */
   if (event->action != CMP_ACTION_CANCEL) {
     float tilt_multiplier;
     /* Scale opacity directly by pressure */
@@ -61,8 +60,8 @@ int cmp_stylus_resolve_ink_metrics(const cmp_event_t *event, float base_width,
 
     /* Altitude: 0.0 is flat to screen, 1.0 is perpendicular.
        Flatter pencils draw wider "charcoal" strokes */
-    tilt_multiplier = 1.0f + ((1.0f - 0.5f /* Stubbed altitude */) *
-                              3.0f); /* Max 4x width if flat */
+    tilt_multiplier =
+        1.0f + ((1.0f - event->altitude) * 3.0f); /* Max 4x width if flat */
     *out_brush_width = base_width * tilt_multiplier;
   } else {
     *out_brush_opacity = 0.0f;
@@ -78,11 +77,9 @@ int cmp_stylus_evaluate_hover(const cmp_event_t *event, int *out_is_hovering,
     return CMP_ERROR_INVALID_ARG;
 
   /* Represents the iPad Pro M2+ hover event before touch */
-  /* Stubbed hover interaction logic */
   if (event->action == CMP_ACTION_MOVE && event->pressure == 0.0f) {
     *out_is_hovering = 1;
-    *out_distance =
-        0.5f /* Stubbed distance */; /* Assumes OS normalizes to 0-1 */
+    *out_distance = event->distance; /* Assumes OS normalizes to 0-1 */
   } else {
     *out_is_hovering = 0;
     *out_distance = 0.0f;

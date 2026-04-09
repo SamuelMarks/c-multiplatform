@@ -20,6 +20,5 @@ if(NOT TARGET cmp)
     FetchContent_MakeAvailable(cmp)
 endif()
 
-add_custom_target(google_material_android_example
-    COMMAND ${CMAKE_COMMAND} -E echo "Google Material Android Example Stub"
-)
+add_executable(google_material_android_example src/main.c)
+target_link_libraries(google_material_android_example PRIVATE cmp)

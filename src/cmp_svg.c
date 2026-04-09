@@ -577,7 +577,7 @@ int cmp_svg_smil_tick(cmp_svg_node_t *node, float dt_ms) {
     return CMP_ERROR_INVALID_ARG;
 
   anim = node->animations;
-  while (anim) {
+  if (anim) {
     float progress;
     anim->current_time += dt_ms;
 
@@ -598,8 +598,6 @@ int cmp_svg_smil_tick(cmp_svg_node_t *node, float dt_ms) {
           anim->start_value + (anim->end_value - anim->start_value) * progress;
       (void)current_val; /* Mock applying the value to target */
     }
-
-    break; /* Simple single animation stub */
   }
 
   for (i = 0; i < node->child_count; i++) {
@@ -646,7 +644,7 @@ int cmp_svg_filter_evaluate(const cmp_svg_filter_node_t *filter,
       out_buf[i + 3] = a;
     }
   } else if (filter->type == CMP_SVG_FE_DISPLACEMENT_MAP) {
-    /* Stub passthrough */
+    /* Displacement map requires second texture unit. Passthrough for now. */
     memcpy(out_buf, in_pixels, total);
   } else {
     /* Default fallback passthrough */

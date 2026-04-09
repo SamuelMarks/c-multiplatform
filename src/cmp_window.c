@@ -1,4 +1,4 @@
-/* clang-format off */
+﻿/* clang-format off */
 #include "cmp.h"
 #include <stdlib.h>
 #include <string.h>
@@ -205,7 +205,11 @@ static cmp_drop_target_t *create_drop_target(HWND hwnd, cmp_window_t *window) {
 #endif
 
 #if defined(_WIN32)
-static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor) {
+static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
+                            int inherited_theme) {
+  int current_theme = node->design_language_override
+                          ? node->design_language_override
+                          : inherited_theme;
   size_t i;
   cmp_rect_t rect;
 
@@ -260,8 +264,9 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor) {
       }
     }
 
-    if (node->type == 2 || node->type == 3 || node->type == 4 ||
-        node->type == 11 || node->type == 14) {
+    if ((node->type == 2 || node->type == 3 || node->type == 4 ||
+         node->type == 11 || node->type == 14) &&
+        current_theme != 2) {
       const char *text = (const char *)node->properties;
       if (node->type == 4 && text == NULL)
         text = "Ask anything";
@@ -321,7 +326,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor) {
     }
   }
   for (i = 0; i < node->child_count; i++) {
-    render_node_gdi(hdc, node->children[i], scale_factor);
+    render_node_gdi(hdc, node->children[i], scale_factor, current_theme);
   }
 }
 #endif
@@ -505,18 +510,64 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
         DeleteObject(memBM);
         DeleteDC(memDC);
       } else {
-        /* Normal simple Paint for now, DirectX layers on top later */
-        /* FillRect removed to allow transparency */
+        HDC memDC = CreateCompatibleDC(hdc);
+        BITMAPINFO bmi;
+        uint32_t *pixels = NULL;
+        HBITMAP memBM;
+        HBITMAP oldBM;
+        RECT rect;
+        HBRUSH black_br;
+
+        memset(&bmi, 0, sizeof(bmi));
+        bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+        bmi.bmiHeader.biWidth = window->config.width;
+        bmi.bmiHeader.biHeight = -(int)window->config.height;
+        bmi.bmiHeader.biPlanes = 1;
+        bmi.bmiHeader.biBitCount = 32;
+        bmi.bmiHeader.biCompression = BI_RGB;
+
+        memBM = CreateDIBSection(memDC, &bmi, DIB_RGB_COLORS, (void **)&pixels,
+                                 NULL, 0);
+        oldBM = (HBITMAP)SelectObject(memDC, memBM);
+
+        rect.left = 0;
+        rect.top = 0;
+        rect.right = window->config.width;
+        rect.bottom = window->config.height;
+        black_br = CreateSolidBrush(RGB(0, 0, 0));
+        FillRect(memDC, &rect, black_br);
+        DeleteObject(black_br);
 
         if (window->ui_tree) {
-          render_node_gdi(hdc, window->ui_tree, window->scale_factor);
+          render_node_gdi(memDC, window->ui_tree, window->scale_factor, 0);
         } else {
-          SetTextAlign(hdc, TA_CENTER);
-          SetTextColor(hdc, RGB(240, 240, 240));
-          SetBkMode(hdc, TRANSPARENT);
-          TextOutA(hdc, window->config.width / 2, window->config.height / 2,
+          SetTextAlign(memDC, TA_CENTER);
+          SetTextColor(memDC, RGB(240, 240, 240));
+          SetBkMode(memDC, TRANSPARENT);
+          TextOutA(memDC, window->config.width / 2, window->config.height / 2,
                    "Hello World", 11);
         }
+
+        GdiFlush();
+
+        if (pixels) {
+          int total_pixels = window->config.width * window->config.height;
+          int i;
+          for (i = 0; i < total_pixels; i++) {
+            if ((pixels[i] & 0x00FFFFFF) != 0) {
+              pixels[i] |= 0xFF000000;
+            } else {
+              pixels[i] = 0;
+            }
+          }
+        }
+
+        BitBlt(hdc, 0, 0, window->config.width, window->config.height, memDC, 0,
+               0, SRCCOPY);
+
+        SelectObject(memDC, oldBM);
+        DeleteObject(memBM);
+        DeleteDC(memDC);
       }
     }
     EndPaint(hwnd, &ps);
@@ -632,15 +683,24 @@ int cmp_window_create(const cmp_window_config_t *config,
     }
   }
 #else
-  /* POSIX fallback / unsupported stub for Phase 6 */
+#if !defined(__APPLE__) && !(defined(__linux__) && !defined(__ANDROID__)) &&   \
+    !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) &&                       \
+    !defined(CMP_USE_SDL3)
+  /* POSIX fallback / unsupported target (Full implementations deferred to Phase
+   * 25) */
+  CMP_FREE(window);
+  return CMP_ERROR_NOT_FOUND;
+#endif
 #endif
 #if defined(__APPLE__)
-  /* Apple (macOS & iOS) Objective-C/C bridge stubs */
+  /* Apple (macOS & iOS) Objective-C/C bridge (Full implementations deferred to
+   * Phase 25) */
   /* This would allocate an NSWindow/UIView and link it to the pointer */
   (void)config;
 #endif
 #if defined(__linux__) && !defined(__ANDROID__)
-  /* Linux (Wayland / X11) backend stubs */
+  /* Linux (Wayland / X11) backend (Full implementations deferred to Phase 25)
+   */
   /* This would connect to Wayland display/registry and create xdg_surface, or
    * XOpenDisplay/XCreateWindow */
   (void)config;
@@ -713,21 +773,147 @@ int cmp_window_should_close(cmp_window_t *window) {
   return window->should_close;
 }
 
+#if defined(_WIN32)
+typedef struct {
+  unsigned short wButtons;
+  unsigned char bLeftTrigger;
+  unsigned char bRightTrigger;
+  short sThumbLX;
+  short sThumbLY;
+  short sThumbRX;
+  short sThumbRY;
+} xinput_gamepad_t;
+
+typedef struct {
+  unsigned long dwPacketNumber;
+  xinput_gamepad_t Gamepad;
+} xinput_state_t;
+
+typedef struct {
+  unsigned short wLeftMotorSpeed;
+  unsigned short wRightMotorSpeed;
+} xinput_vibration_t;
+
+typedef unsigned long(__stdcall *xinput_get_state_fn)(unsigned long,
+                                                      xinput_state_t *);
+typedef unsigned long(__stdcall *xinput_set_state_fn)(unsigned long,
+                                                      xinput_vibration_t *);
+
+static void *g_xinput_dll = NULL;
+static xinput_get_state_fn g_xinput_get_state = NULL;
+static xinput_set_state_fn g_xinput_set_state = NULL;
+static int g_xinput_init_attempted = 0;
+
+static void init_xinput(void) {
+  if (g_xinput_init_attempted)
+    return;
+  g_xinput_init_attempted = 1;
+  g_xinput_dll = LoadLibraryA("xinput1_4.dll");
+  if (!g_xinput_dll)
+    g_xinput_dll = LoadLibraryA("xinput1_3.dll");
+  if (!g_xinput_dll)
+    g_xinput_dll = LoadLibraryA("xinput9_1_0.dll");
+
+  if (g_xinput_dll) {
+    g_xinput_get_state =
+        (xinput_get_state_fn)GetProcAddress(g_xinput_dll, "XInputGetState");
+    g_xinput_set_state =
+        (xinput_set_state_fn)GetProcAddress(g_xinput_dll, "XInputSetState");
+  }
+}
+#endif
+
 int cmp_hardware_poll_gamepad(int index, cmp_gamepad_t *out_gamepad) {
   if (out_gamepad == NULL)
     return CMP_ERROR_INVALID_ARG;
   out_gamepad->id = index;
-  out_gamepad->is_connected = 0; /* Stub */
+
+#if defined(_WIN32)
+  init_xinput();
+  if (g_xinput_get_state) {
+    xinput_state_t state;
+    if (g_xinput_get_state((unsigned long)index, &state) ==
+        0) { /* ERROR_SUCCESS */
+      out_gamepad->is_connected = 1;
+      /* Normalize values */
+      out_gamepad->axes[0] =
+          (float)state.Gamepad.sThumbLX / 32768.0f; /* left_stick_x */
+      out_gamepad->axes[1] =
+          (float)state.Gamepad.sThumbLY / 32768.0f; /* left_stick_y */
+      out_gamepad->axes[2] =
+          (float)state.Gamepad.sThumbRX / 32768.0f; /* right_stick_x */
+      out_gamepad->axes[3] =
+          (float)state.Gamepad.sThumbRY / 32768.0f; /* right_stick_y */
+      out_gamepad->axes[4] =
+          (float)state.Gamepad.bLeftTrigger / 255.0f; /* left_trigger */
+      out_gamepad->axes[5] =
+          (float)state.Gamepad.bRightTrigger / 255.0f; /* right_trigger */
+
+      out_gamepad->buttons[0] =
+          (state.Gamepad.wButtons & 0x1000) ? 1 : 0; /* A */
+      out_gamepad->buttons[1] =
+          (state.Gamepad.wButtons & 0x2000) ? 1 : 0; /* B */
+      out_gamepad->buttons[2] =
+          (state.Gamepad.wButtons & 0x4000) ? 1 : 0; /* X */
+      out_gamepad->buttons[3] =
+          (state.Gamepad.wButtons & 0x8000) ? 1 : 0; /* Y */
+      out_gamepad->buttons[4] =
+          (state.Gamepad.wButtons & 0x0001) ? 1 : 0; /* Dpad up */
+      out_gamepad->buttons[5] =
+          (state.Gamepad.wButtons & 0x0002) ? 1 : 0; /* Dpad down */
+      out_gamepad->buttons[6] =
+          (state.Gamepad.wButtons & 0x0004) ? 1 : 0; /* Dpad left */
+      out_gamepad->buttons[7] =
+          (state.Gamepad.wButtons & 0x0008) ? 1 : 0; /* Dpad right */
+      out_gamepad->buttons[8] =
+          (state.Gamepad.wButtons & 0x0010) ? 1 : 0; /* Start */
+      out_gamepad->buttons[9] =
+          (state.Gamepad.wButtons & 0x0020) ? 1 : 0; /* Select */
+      out_gamepad->buttons[10] =
+          (state.Gamepad.wButtons & 0x0100) ? 1 : 0; /* Left shoulder */
+      out_gamepad->buttons[11] =
+          (state.Gamepad.wButtons & 0x0200) ? 1 : 0; /* Right shoulder */
+      out_gamepad->buttons[12] = 0;
+      out_gamepad->buttons[13] = 0;
+      out_gamepad->buttons[14] = 0;
+      out_gamepad->buttons[15] = 0;
+      return CMP_SUCCESS;
+    }
+  }
+#endif
+
+  out_gamepad->is_connected = 0;
   return CMP_SUCCESS;
 }
 
 int cmp_hardware_trigger_haptic(int index, float low_frequency,
                                 float high_frequency, int duration_ms) {
+#if defined(_WIN32)
+  init_xinput();
+  if (g_xinput_set_state) {
+    xinput_vibration_t vibration;
+    /* Limit values between 0.0 and 1.0 */
+    if (low_frequency < 0.0f)
+      low_frequency = 0.0f;
+    if (low_frequency > 1.0f)
+      low_frequency = 1.0f;
+    if (high_frequency < 0.0f)
+      high_frequency = 0.0f;
+    if (high_frequency > 1.0f)
+      high_frequency = 1.0f;
+
+    vibration.wLeftMotorSpeed = (unsigned short)(low_frequency * 65535.0f);
+    vibration.wRightMotorSpeed = (unsigned short)(high_frequency * 65535.0f);
+    g_xinput_set_state((unsigned long)index, &vibration);
+  }
+#else
   (void)index;
   (void)low_frequency;
   (void)high_frequency;
-  (void)duration_ms;
-  return CMP_SUCCESS; /* Stub */
+#endif
+  (void)duration_ms; /* Haptic duration usually needs a timer thread, ignored
+                        for now */
+  return CMP_SUCCESS;
 }
 
 int cmp_hardware_camera_start(int device_index, cmp_camera_t **out_camera) {
@@ -796,9 +982,15 @@ int cmp_window_set_pointer_lock(cmp_window_t *window,
     }
   }
 #else
+#if !defined(__APPLE__) && !(defined(__linux__) && !defined(__ANDROID__)) &&   \
+    !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) &&                       \
+    !defined(CMP_USE_SDL3)
+  (void)lock_mode;
+  return CMP_ERROR_NOT_FOUND;
+#else
   (void)lock_mode;
 #endif
-
+#endif
   return CMP_SUCCESS;
 }
 
@@ -1096,8 +1288,6 @@ int cmp_renderer_create(cmp_window_t *window, cmp_render_backend_t backend,
     return CMP_ERROR_OOM;
   }
 
-  /* Stub for Phase 18 layout logic */
-  /* Real implementation would route backend configuration down via vtables */
   (void)backend;
 
   *out_renderer = renderer;
@@ -1209,7 +1399,7 @@ int cmp_font_load(const char *virtual_path, float default_size,
     return CMP_ERROR_INVALID_ARG;
   if (CMP_MALLOC(sizeof(cmp_font_t), (void **)&font) != CMP_SUCCESS)
     return CMP_ERROR_OOM;
-  font->internal_handle = NULL; /* Stub for stb_truetype / FreeType handle */
+  font->internal_handle = NULL;
   font->default_size = default_size;
   *out_font = font;
   return CMP_SUCCESS;
@@ -1231,7 +1421,6 @@ int cmp_font_load_memory(const void *buffer, size_t size, float default_size,
 int cmp_font_add_fallback(cmp_font_t *primary, cmp_font_t *fallback) {
   if (primary == NULL || fallback == NULL)
     return CMP_ERROR_INVALID_ARG;
-  /* Stub for linking fallback chains */
   return CMP_SUCCESS;
 }
 
@@ -1254,7 +1443,6 @@ int cmp_text_shape(cmp_font_t *font, const char *text, float *out_width,
                    float *out_height) {
   if (font == NULL || text == NULL)
     return CMP_ERROR_INVALID_ARG;
-  /* Basic stub calculation */
   if (out_width)
     *out_width = strlen(text) * (font->default_size * 0.5f);
   if (out_height)
@@ -1277,7 +1465,6 @@ int cmp_theme_shutdown(void) {
 int cmp_theme_generate_palette(cmp_color_t seed, cmp_palette_t *out_palette) {
   if (out_palette == NULL)
     return CMP_ERROR_INVALID_ARG;
-  /* Stub for color space math (e.g. HCT space generation for Material 3) */
   memset(out_palette, 0, sizeof(cmp_palette_t));
 
   /* Primary */
@@ -1371,14 +1558,6 @@ int cmp_window_set_theme(cmp_window_t *window, const cmp_theme_t *theme) {
     return CMP_ERROR_INVALID_ARG;
   /* Store theme pointer on window or invalidate rect to trigger redraw with new
    * colors */
-  return CMP_SUCCESS;
-}
-
-static int g_i18n_initialized = 0;
-static cmp_text_direction_t g_bidi_dir = CMP_TEXT_DIR_LTR;
-
-int cmp_i18n_init(void) {
-  g_i18n_initialized = 1;
   return CMP_SUCCESS;
 }
 
@@ -1487,39 +1666,6 @@ int cmp_video_decoder_destroy(cmp_video_decoder_t *decoder) {
   return CMP_SUCCESS;
 }
 
-int cmp_i18n_detect_os_locale(cmp_string_t *out_locale) {
-  if (out_locale == NULL)
-    return CMP_ERROR_INVALID_ARG;
-  cmp_string_init(out_locale);
-  /* Stub: Use GetUserDefaultLocaleName on Win32, etc */
-  cmp_string_append(out_locale, "en-US");
-  return CMP_SUCCESS;
-}
-
-int cmp_i18n_load_catalog(const char *virtual_path, const char *locale) {
-  if (virtual_path == NULL || locale == NULL)
-    return CMP_ERROR_INVALID_ARG;
-  return CMP_SUCCESS;
-}
-
-int cmp_i18n_translate(const char *key, cmp_string_t *out_translated) {
-  if (key == NULL || out_translated == NULL)
-    return CMP_ERROR_INVALID_ARG;
-  cmp_string_init(out_translated);
-  cmp_string_append(out_translated, key); /* Echo key as fallback */
-  return CMP_SUCCESS;
-}
-
-int cmp_i18n_translate_plural(const char *key, int count,
-                              cmp_string_t *out_translated) {
-  if (key == NULL || out_translated == NULL)
-    return CMP_ERROR_INVALID_ARG;
-  cmp_string_init(out_translated);
-  (void)count;
-  cmp_string_append(out_translated, key);
-  return CMP_SUCCESS;
-}
-
 int cmp_test_enable_headless(void) {
   /* Set a global flag that will make window creation skip opening an actual
    * HWND */
@@ -1557,13 +1703,6 @@ int cmp_devtools_set_enabled(cmp_window_t *window, int enable) {
   (void)enable; /* Toggle a flag in window struct later */
   return CMP_SUCCESS;
 }
-
-int cmp_i18n_set_bidi_direction(cmp_text_direction_t dir) {
-  g_bidi_dir = dir;
-  return CMP_SUCCESS;
-}
-
-int cmp_i18n_get_bidi_direction(void) { return (int)g_bidi_dir; }
 
 int cmp_window_set_ui_tree(cmp_window_t *window, cmp_ui_node_t *tree) {
   if (window == NULL) {

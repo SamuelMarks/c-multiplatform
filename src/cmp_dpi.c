@@ -100,8 +100,7 @@ int cmp_dpi_update_window_scale(cmp_dpi_t *dpi, cmp_window_t *window,
     scale = 1.0f; /* default to 1x */
   }
 
-  /* In a real implementation, this would trigger a relayout/rescale of the
-   * window's UI tree. */
-  /* For now, just a stub that successfully "applied" it */
+  /* In a fully implemented renderer, trigger a relayout/rescale of the
+   * window's UI tree here using the resolved scale. */
   return CMP_SUCCESS;
 }
