@@ -158,14 +158,9 @@ add_library(greatest INTERFACE)
 target_include_directories(greatest INTERFACE ${greatest_SOURCE_DIR})
 
 # cfs
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../c-fs/CMakeLists.txt")
-    message(STATUS "Using local c-fs for cfs")
-    FetchContent_Declare(cfs SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../c-fs")
-else()
-    FetchContent_Declare(cfs GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git GIT_TAG master
-        UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
-    )
-endif()
+FetchContent_Declare(cfs GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git GIT_TAG master
+    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+)
 FetchContent_MakeAvailable(cfs)
 
 # c89stringutils (Not from vcpkg to allow target_compile_definitions)
@@ -188,6 +183,9 @@ FetchContent_Declare(parson GIT_REPOSITORY https://github.com/SamuelMarks/parson
     UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
     )
 FetchContent_MakeAvailable(parson)
+if(TARGET parson AND NOT TARGET parson::parson)
+    add_library(parson::parson ALIAS parson)
+endif()
 
 # curl dependency
 find_package(CURL CONFIG QUIET)
@@ -290,24 +288,14 @@ endif()
 FetchContent_MakeAvailable(c_abstract_http)
 
 # cdd-c
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../cdd-c/CMakeLists.txt")
-    message(STATUS "Using local cdd-c for cdd_c")
-    FetchContent_Declare(cdd_c SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../cdd-c")
-else()
-    FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG master
-        UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
-    )
-endif()
+FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG master
+    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+)
 
 # c-orm
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../c-orm/CMakeLists.txt")
-    message(STATUS "Using local c-orm for c_orm")
-    FetchContent_Declare(c_orm SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../c-orm")
-else()
-    FetchContent_Declare(c_orm GIT_REPOSITORY https://github.com/SamuelMarks/c-orm.git GIT_TAG master
-        UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
-    )
-endif()
+FetchContent_Declare(c_orm GIT_REPOSITORY https://github.com/SamuelMarks/c-orm.git GIT_TAG master
+    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+)
 
 FetchContent_MakeAvailable(cdd_c c_orm)
 
@@ -459,6 +447,11 @@ set(CMP_SOURCES
     src/cmp_ios_specific.c
     src/cmp_transactions_hig.c
     src/cmp_media_avkit.c
+    src/cmp_ink_ripple.c
+    src/cmp_lottie.c
+    src/cmp_fluent.c
+    src/cmp_compositor_thread.c
+    src/cmp_apz.c
     src/cmp_os_communications.c
     src/cmp_extensions.c
     src/cmp_dnd.c
@@ -576,6 +569,32 @@ add_library(cmp ${CMP_SOURCES} ${CMP_THEME_SOURCES}      src/cmp_a11y_theme.c
       src/cmp_win32_input.c
       src/cmp_win32_window.c
       src/cmp_workspace_layout.c
+    src/cmp_audio_capture.c
+    src/cmp_credential_manager.c
+    src/cmp_global_hotkey.c
+    src/cmp_mmap.c
+    src/cmp_plugin_loader.c
+    src/cmp_pty.c
+    src/cmp_regex.c
+    src/cmp_screen_capture.c
+    src/cmp_sse_parser.c
+    src/cmp_tree_sitter.c
+    src/cmp_ui_accordion.c
+    src/cmp_ui_avatar.c
+    src/cmp_ui_badge.c
+    src/cmp_ui_breadcrumbs.c
+    src/cmp_ui_chip.c
+    src/cmp_ui_code_block.c
+    src/cmp_ui_diff.c
+    src/cmp_ui_markdown.c
+    src/cmp_ui_progress_bar.c
+    src/cmp_ui_skeleton.c
+    src/cmp_ui_spinner.c
+    src/cmp_ui_splitter.c
+    src/cmp_ui_terminal.c
+    src/cmp_ui_tooltip.c
+    src/cmp_ui_tree_view.c
+    src/cmp_ui_virtual_list.c
   )
 if(CMP_SHARED_LIBS)
     set_target_properties(cmp PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -587,8 +606,9 @@ target_link_libraries(cmp PUBLIC cfs c-abstract-http c-orm c_cdd)
 if(WIN32)
     if(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 15.0)
         # MSVC 2005 (v8.0) does not have dwmapi.lib by default
+        target_link_libraries(cmp PRIVATE msimg32)
     else()
-        target_link_libraries(cmp PRIVATE dwmapi)
+        target_link_libraries(cmp PRIVATE dwmapi msimg32)
     endif()
 endif()
 
@@ -660,7 +680,20 @@ add_executable(cmp_svg_test tests/test_cmp_svg.c)
 target_link_libraries(cmp_svg_test PRIVATE cmp greatest)
 
 add_executable(cmp_gpu_test tests/test_cmp_gpu.c)
-target_link_libraries(cmp_gpu_test PRIVATE cmp greatest)
+  target_link_libraries(cmp_gpu_test PRIVATE cmp greatest)
+
+add_executable(cmp_command_buffer_test tests/test_cmp_command_buffer.c)
+target_link_libraries(cmp_command_buffer_test PRIVATE cmp greatest)
+
+add_executable(cmp_render_graph_test tests/test_cmp_render_graph.c)
+target_link_libraries(cmp_render_graph_test PRIVATE cmp greatest)
+
+add_executable(cmp_pso_cache_test tests/test_cmp_pso_cache.c)
+target_link_libraries(cmp_pso_cache_test PRIVATE cmp greatest)
+
+add_executable(cmp_gpu_allocator_test tests/test_cmp_gpu_allocator.c)
+target_link_libraries(cmp_gpu_allocator_test PRIVATE cmp greatest)
+
 
 add_executable(cmp_shader_test tests/test_cmp_shader.c)
 target_link_libraries(cmp_shader_test PRIVATE cmp greatest)
@@ -669,11 +702,21 @@ add_executable(cmp_shader_cache_test tests/test_cmp_shader_cache.c)
 target_link_libraries(cmp_shader_cache_test PRIVATE cmp greatest)
 
 add_executable(cmp_msaa_test tests/test_cmp_msaa.c)
+add_executable(cmp_compositor_thread_test tests/test_cmp_compositor_thread.c)
+add_executable(cmp_apz_test tests/test_cmp_apz.c)
+add_executable(cmp_fluent_test tests/test_cmp_fluent.c)
+add_executable(cmp_ink_ripple_test tests/test_cmp_ink_ripple.c)
+add_executable(cmp_lottie_test tests/test_cmp_lottie.c)
 add_executable(cmp_theme_test tests/themes/test_cmp_theme.c)
 target_link_libraries(cmp_theme_test PRIVATE cmp greatest)
 add_test(NAME cmp_theme_test COMMAND cmp_theme_test)
 list(APPEND CMP_TESTS "cmp_theme_test")
 target_link_libraries(cmp_msaa_test PRIVATE cmp greatest)
+target_link_libraries(cmp_compositor_thread_test PRIVATE cmp greatest)
+target_link_libraries(cmp_apz_test PRIVATE cmp greatest)
+target_link_libraries(cmp_fluent_test PRIVATE cmp greatest)
+target_link_libraries(cmp_ink_ripple_test PRIVATE cmp greatest)
+target_link_libraries(cmp_lottie_test PRIVATE cmp greatest)
 
 add_executable(cmp_linear_blend_test tests/test_cmp_linear_blend.c)
 target_link_libraries(cmp_linear_blend_test PRIVATE cmp greatest)
@@ -1051,9 +1094,20 @@ add_test(NAME cmp_layout_test COMMAND cmp_layout_test)
 add_test(NAME cmp_ui_test COMMAND cmp_ui_test)
 add_test(NAME cmp_svg_test COMMAND cmp_svg_test)
 add_test(NAME cmp_gpu_test COMMAND cmp_gpu_test)
+
+  add_test(NAME cmp_command_buffer_test COMMAND cmp_command_buffer_test)
+  add_test(NAME cmp_render_graph_test COMMAND cmp_render_graph_test)
+  add_test(NAME cmp_pso_cache_test COMMAND cmp_pso_cache_test)
+  add_test(NAME cmp_gpu_allocator_test COMMAND cmp_gpu_allocator_test)
+
 add_test(NAME cmp_shader_test COMMAND cmp_shader_test)
 add_test(NAME cmp_shader_cache_test COMMAND cmp_shader_cache_test)
 add_test(NAME cmp_msaa_test COMMAND cmp_msaa_test)
+add_test(NAME cmp_compositor_thread_test COMMAND cmp_compositor_thread_test)
+add_test(NAME cmp_apz_test COMMAND cmp_apz_test)
+add_test(NAME cmp_fluent_test COMMAND cmp_fluent_test)
+add_test(NAME cmp_ink_ripple_test COMMAND cmp_ink_ripple_test)
+add_test(NAME cmp_lottie_test COMMAND cmp_lottie_test)
 add_test(NAME cmp_linear_blend_test COMMAND cmp_linear_blend_test)
 add_test(NAME cmp_tex_compression_test COMMAND cmp_tex_compression_test)
 add_test(NAME cmp_mipmap_test COMMAND cmp_mipmap_test)
@@ -1300,7 +1354,7 @@ if(CMP_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
-set_tests_properties(cmp_test cmp_string_test cmp_tls_test cmp_ring_buffer_test cmp_modality_single_test cmp_modality_threaded_test cmp_modality_async_test cmp_sync_test cmp_coroutine_test cmp_timer_test cmp_vfs_test cmp_http_test cmp_orm_test cmp_window_test cmp_window_manager_test cmp_dpi_test cmp_event_test cmp_router_test cmp_layout_test cmp_ui_test cmp_svg_test cmp_gpu_test cmp_shader_test cmp_shader_cache_test cmp_msaa_test cmp_theme_test cmp_linear_blend_test cmp_tex_compression_test cmp_mipmap_test cmp_swapchain_test cmp_overdraw_test cmp_layer_tiling_test cmp_hit_test_test cmp_pointer_events_test cmp_event_bubbling_test cmp_passive_event_test cmp_pointer_capture_test cmp_gesture_test cmp_complex_gesture_test cmp_pointer_pressure_test cmp_touch_action_test cmp_context_menu_test cmp_hover_intent_test cmp_scroll_ctx_test cmp_scroll_velocity_test cmp_kinematics_test cmp_scrollbar_gutter_test cmp_scroll_anchor_test cmp_ptr_test cmp_tick_test cmp_dt_test cmp_transition_test cmp_keyframe_test cmp_anim_compose_test cmp_spring_ease_test cmp_bezier_ease_test cmp_step_ease_test cmp_motion_path_test cmp_scroll_timeline_test cmp_view_transition_test cmp_vt_shared_test cmp_discrete_transition_test cmp_flip_test cmp_form_controls_test cmp_validation_test cmp_input_mask_test cmp_indeterminate_test cmp_select_ui_test cmp_datalist_test cmp_range_slider_test cmp_color_picker_test cmp_date_picker_test cmp_caret_test cmp_selection_test cmp_editable_test cmp_ime_test cmp_spellcheck_test cmp_undo_redo_test cmp_a11y_tree_test cmp_a11y_theme_test cmp_screen_reader_test cmp_aria_test cmp_aria_relations_test cmp_aria_live_test cmp_focus_manager_test cmp_focus_ring_test cmp_a11y_rotor_test cmp_a11y_action_test cmp_dynamic_type_test cmp_system_fonts_test cmp_materials_test cmp_nav_bar_test cmp_tab_bar_test cmp_search_bar_test cmp_deep_link_test cmp_system_button_test cmp_menu_test cmp_inputs_test cmp_text_fields_test cmp_lists_test cmp_scroll_view_test cmp_collections_test cmp_complex_gesture_hig_test cmp_keyboard_hig_test cmp_stylus_test cmp_gamepad_hig_test cmp_symbols_test cmp_system_geometry_test cmp_spring_animator_test cmp_promotion_link_test cmp_permissions_test cmp_auth_sec_test cmp_prefers_reduced_motion_test cmp_a11y_transparency_test cmp_forced_colors_test cmp_sys_colors_test cmp_compositor_anim_test cmp_app_region_test cmp_borders_test cmp_clipboard_test cmp_csp_test cmp_app_store_compliance_test cmp_resilience_handling_test cmp_resource_manager_test cmp_documentation_dx_test cmp_developer_experience_test cmp_profiling_telemetry_test cmp_testing_automation_test cmp_interop_swift_test cmp_carplay_specific_test cmp_visionos_specific_test cmp_tvos_specific_test cmp_watchos_specific_test cmp_macos_specific_test cmp_ipados_specific_test cmp_ios_specific_test cmp_transactions_hig_test cmp_media_avkit_test cmp_os_communications_test cmp_extensions_test cmp_dnd_test cmp_flex_align_test cmp_flow_test cmp_grid_test cmp_haptics_test cmp_i18n_test cmp_i18n_formatting_test cmp_media_query_test cmp_native_dialog_test cmp_network_test cmp_pip_test cmp_position_test cmp_prefers_color_scheme_test cmp_print_ctx_test cmp_safe_areas_test cmp_system_menu_test cmp_titlebar_env_test cmp_visuals_test cmp_window_blur_test cmp_background_blur_test cmp_error_test cmp_error_test_crash cmp_image_preview_test cmp_math_renderer_test cmp_syntax_highlight_test cmp_error_test_assert cmp_f2_a11y_test cmp_f2_button_test cmp_f2_data_display_test cmp_f2_dropdowns_test cmp_f2_icons_test cmp_f2_inputs_test cmp_f2_layout_test cmp_f2_menus_test cmp_f2_overlays_test cmp_f2_profiling_test cmp_f2_surfaces_test cmp_f2_text_inputs_test cmp_f2_theme_test cmp_f2_visual_regression_test cmp_material3_color_test cmp_material3_sys_test cmp_material3_layout_test cmp_material3_components_test cmp_material3_text_inputs_test cmp_material3_information_test cmp_material3_pickers_menus_test cmp_cupertino_test cmp_fluent2_stubs_test cmp_material3_stubs_test cmp_unstyled_stubs_test PROPERTIES ENVIRONMENT "${TEST_ENV_VARS}")
+set_tests_properties(cmp_test cmp_string_test cmp_tls_test cmp_ring_buffer_test cmp_modality_single_test cmp_modality_threaded_test cmp_modality_async_test cmp_sync_test cmp_coroutine_test cmp_timer_test cmp_vfs_test cmp_http_test cmp_orm_test cmp_window_test cmp_window_manager_test cmp_dpi_test cmp_event_test cmp_router_test cmp_layout_test cmp_ui_test cmp_svg_test cmp_gpu_test cmp_command_buffer_test cmp_render_graph_test cmp_pso_cache_test cmp_gpu_allocator_test cmp_shader_test cmp_shader_cache_test cmp_msaa_test cmp_theme_test cmp_linear_blend_test cmp_tex_compression_test cmp_mipmap_test cmp_swapchain_test cmp_overdraw_test cmp_layer_tiling_test cmp_hit_test_test cmp_pointer_events_test cmp_event_bubbling_test cmp_passive_event_test cmp_pointer_capture_test cmp_gesture_test cmp_complex_gesture_test cmp_pointer_pressure_test cmp_touch_action_test cmp_context_menu_test cmp_hover_intent_test cmp_scroll_ctx_test cmp_scroll_velocity_test cmp_kinematics_test cmp_scrollbar_gutter_test cmp_scroll_anchor_test cmp_ptr_test cmp_tick_test cmp_dt_test cmp_transition_test cmp_keyframe_test cmp_anim_compose_test cmp_spring_ease_test cmp_bezier_ease_test cmp_step_ease_test cmp_motion_path_test cmp_scroll_timeline_test cmp_view_transition_test cmp_vt_shared_test cmp_discrete_transition_test cmp_flip_test cmp_form_controls_test cmp_validation_test cmp_input_mask_test cmp_indeterminate_test cmp_select_ui_test cmp_datalist_test cmp_range_slider_test cmp_color_picker_test cmp_date_picker_test cmp_caret_test cmp_selection_test cmp_editable_test cmp_ime_test cmp_spellcheck_test cmp_undo_redo_test cmp_a11y_tree_test cmp_a11y_theme_test cmp_screen_reader_test cmp_aria_test cmp_aria_relations_test cmp_aria_live_test cmp_focus_manager_test cmp_focus_ring_test cmp_a11y_rotor_test cmp_a11y_action_test cmp_dynamic_type_test cmp_system_fonts_test cmp_materials_test cmp_nav_bar_test cmp_tab_bar_test cmp_search_bar_test cmp_deep_link_test cmp_system_button_test cmp_menu_test cmp_inputs_test cmp_text_fields_test cmp_lists_test cmp_scroll_view_test cmp_collections_test cmp_complex_gesture_hig_test cmp_keyboard_hig_test cmp_stylus_test cmp_gamepad_hig_test cmp_symbols_test cmp_system_geometry_test cmp_spring_animator_test cmp_promotion_link_test cmp_permissions_test cmp_auth_sec_test cmp_prefers_reduced_motion_test cmp_a11y_transparency_test cmp_forced_colors_test cmp_sys_colors_test cmp_compositor_anim_test cmp_app_region_test cmp_borders_test cmp_clipboard_test cmp_csp_test cmp_app_store_compliance_test cmp_resilience_handling_test cmp_resource_manager_test cmp_documentation_dx_test cmp_developer_experience_test cmp_profiling_telemetry_test cmp_testing_automation_test cmp_interop_swift_test cmp_carplay_specific_test cmp_visionos_specific_test cmp_tvos_specific_test cmp_watchos_specific_test cmp_macos_specific_test cmp_ipados_specific_test cmp_ios_specific_test cmp_transactions_hig_test cmp_media_avkit_test cmp_os_communications_test cmp_extensions_test cmp_dnd_test cmp_flex_align_test cmp_flow_test cmp_grid_test cmp_haptics_test cmp_i18n_test cmp_i18n_formatting_test cmp_media_query_test cmp_native_dialog_test cmp_network_test cmp_pip_test cmp_position_test cmp_prefers_color_scheme_test cmp_print_ctx_test cmp_safe_areas_test cmp_system_menu_test cmp_titlebar_env_test cmp_visuals_test cmp_window_blur_test cmp_background_blur_test cmp_error_test cmp_error_test_crash cmp_image_preview_test cmp_math_renderer_test cmp_syntax_highlight_test cmp_error_test_assert cmp_f2_a11y_test cmp_f2_button_test cmp_f2_data_display_test cmp_f2_dropdowns_test cmp_f2_icons_test cmp_f2_inputs_test cmp_f2_layout_test cmp_f2_menus_test cmp_f2_overlays_test cmp_f2_profiling_test cmp_f2_surfaces_test cmp_f2_text_inputs_test cmp_f2_theme_test cmp_f2_visual_regression_test cmp_material3_color_test cmp_material3_sys_test cmp_material3_layout_test cmp_material3_components_test cmp_material3_text_inputs_test cmp_material3_information_test cmp_material3_pickers_menus_test cmp_cupertino_test cmp_fluent2_stubs_test cmp_material3_stubs_test cmp_unstyled_stubs_test cmp_compositor_thread_test cmp_apz_test cmp_fluent_test cmp_ink_ripple_test cmp_lottie_test PROPERTIES ENVIRONMENT "${TEST_ENV_VARS}")
 
 
 
@@ -1310,3 +1364,10 @@ set_tests_properties(cmp_test cmp_string_test cmp_tls_test cmp_ring_buffer_test 
 
 endif()
 
+
+
+set_target_properties(cmp_compositor_thread_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+set_target_properties(cmp_apz_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+set_target_properties(cmp_fluent_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+set_target_properties(cmp_ink_ripple_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+set_target_properties(cmp_lottie_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")

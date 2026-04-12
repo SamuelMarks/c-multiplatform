@@ -199,7 +199,9 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
 
 int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
   cmp_ui_node_t *node;
-  char *path_copy;
+  char *path_copy = NULL;
+  cmp_svg_renderer_t *renderer = NULL;
+  void **props = NULL;
   size_t len;
 
   if (out_node == NULL || image_path == NULL) {
@@ -219,19 +221,53 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
   }
 
   len = strlen(image_path);
-  if (CMP_MALLOC(len + 1, (void **)&path_copy) != CMP_SUCCESS) {
-    cmp_layout_node_destroy(node->layout);
-    CMP_FREE(node);
-    return CMP_ERROR_OOM;
+  if (CMP_MALLOC(len + 1, (void **)&path_copy) == CMP_SUCCESS) {
+#if defined(_MSC_VER)
+    strcpy_s(path_copy, len + 1, image_path);
+#else
+    strcpy(path_copy, image_path);
+#endif
   }
 
-#if defined(_MSC_VER)
-  strcpy_s(path_copy, len + 1, image_path);
-#else
-  strcpy(path_copy, image_path);
-#endif
+  if (strstr(image_path, ".svg") != NULL) {
+    void *buffer = NULL;
+    size_t size = 0;
+    if (cmp_svg_renderer_create(&renderer, 0.5f) == CMP_SUCCESS) {
+      if (cmp_vfs_read_file_sync(image_path, &buffer, &size) == CMP_SUCCESS &&
+          buffer != NULL) {
+        char *svg_str;
+        if (CMP_MALLOC(size + 1, (void **)&svg_str) == CMP_SUCCESS) {
+          char *p;
+          memcpy(svg_str, buffer, size);
+          svg_str[size] = '\0';
 
-  node->properties = path_copy;
+          p = strstr(svg_str, " d=\"");
+          if (p) {
+            char *start = p + 4;
+            char *end = strchr(start, '"');
+            if (end) {
+              *end = '\0';
+              cmp_svg_parse_path_str(start, renderer);
+            }
+          }
+          CMP_FREE(svg_str);
+        }
+        CMP_FREE(buffer);
+      }
+    }
+  }
+
+  if (CMP_MALLOC(sizeof(void *) * 2, (void **)&props) == CMP_SUCCESS) {
+    props[0] = path_copy;
+    props[1] = renderer;
+    node->properties = props;
+  } else {
+    if (path_copy)
+      CMP_FREE(path_copy);
+    if (renderer)
+      cmp_svg_renderer_destroy(renderer);
+  }
+
   *out_node = node;
   return CMP_SUCCESS;
 }
@@ -453,6 +489,75 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
   return CMP_SUCCESS;
 }
 
+int disabled_cmp_event_dispatch_run(cmp_ui_node_t *tree,
+                                    cmp_ui_node_t *target_node,
+                                    cmp_event_t *event) {
+  cmp_ui_node_t *path[64];
+  int path_len = 0;
+  int i;
+  cmp_ui_node_t *curr = target_node;
+
+  if (tree == NULL || target_node == NULL || event == NULL) {
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  /* Build path from target up to root */
+  while (curr != NULL && path_len < 64) {
+    path[path_len++] = curr;
+    if (curr == tree)
+      break;
+    curr = curr->parent;
+  }
+
+  /* Phase 1: Capturing (Root down to Target) */
+  for (i = path_len - 1; i >= 0; i--) {
+    cmp_event_listener_node_t *listener = path[i]->event_listeners;
+    while (listener) {
+      if (listener->event_type == event->type && listener->capture) {
+        listener->callback(event, path[i], listener->user_data);
+      }
+      listener = listener->next;
+    }
+  }
+
+  /* Phase 2: Bubbling (Target up to Root) */
+  for (i = 0; i < path_len; i++) {
+    cmp_event_listener_node_t *listener = path[i]->event_listeners;
+    while (listener) {
+      if (listener->event_type == event->type && !listener->capture) {
+        listener->callback(event, path[i], listener->user_data);
+      }
+      listener = listener->next;
+    }
+  }
+
+  return CMP_SUCCESS;
+}
+
+int disabled_cmp_ui_node_add_event_listener(
+    cmp_ui_node_t *node, uint32_t event_type, int capture,
+    void (*callback)(cmp_event_t *, cmp_ui_node_t *, void *), void *user_data) {
+  cmp_event_listener_node_t *listener;
+
+  if (node == NULL || callback == NULL) {
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  if (CMP_MALLOC(sizeof(cmp_event_listener_node_t), (void **)&listener) !=
+      CMP_SUCCESS) {
+    return CMP_ERROR_OOM;
+  }
+
+  listener->event_type = event_type;
+  listener->capture = capture;
+  listener->callback = callback;
+  listener->user_data = user_data;
+  listener->next = node->event_listeners;
+  node->event_listeners = listener;
+
+  return CMP_SUCCESS;
+}
+
 int cmp_ui_node_destroy(cmp_ui_node_t *node) {
   size_t i;
 
@@ -489,6 +594,13 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
 
   if (node->type == 2 && node->properties != NULL) {
     /* Free text string */
+    CMP_FREE(node->properties);
+  } else if (node->type == 7 && node->properties != NULL) {
+    void **props = (void **)node->properties;
+    if (props[0])
+      CMP_FREE(props[0]);
+    if (props[1])
+      cmp_svg_renderer_destroy((cmp_svg_renderer_t *)props[1]);
     CMP_FREE(node->properties);
   }
 

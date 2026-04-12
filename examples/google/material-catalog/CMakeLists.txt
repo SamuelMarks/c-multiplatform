@@ -37,9 +37,26 @@ if(NOT TARGET c_cdd)
     FetchContent_MakeAvailable(cdd_c)
 endif()
 
-add_executable(material_catalog 
+add_executable(material_catalog
     src/main.c
     src/material_catalog.c
+    src/m3_memory.c
+    src/m3_state.c
+    src/m3_events.c
+    src/m3_router.c
+    src/m3_color.c
+    src/m3_typography.c
+    src/m3_shapes.c
+    src/m3_motion.c
+    src/m3_adaptive.c
+    src/m3_buttons.c
+    src/m3_communication.c
+    src/m3_containment.c
+    src/m3_navigation.c
+    src/m3_inputs.c
+    src/m3_ripple.c
+    src/m3_a11y.c
+    src/m3_i18n.c
 )
 
 target_include_directories(material_catalog PRIVATE include)
@@ -55,6 +72,23 @@ endif()
 add_executable(test_material_catalog
     tests/test_material_catalog.c
     src/material_catalog.c
+    src/m3_memory.c
+    src/m3_state.c
+    src/m3_events.c
+    src/m3_router.c
+    src/m3_color.c
+    src/m3_typography.c
+    src/m3_shapes.c
+    src/m3_motion.c
+    src/m3_adaptive.c
+    src/m3_buttons.c
+    src/m3_communication.c
+    src/m3_containment.c
+    src/m3_navigation.c
+    src/m3_inputs.c
+    src/m3_ripple.c
+    src/m3_a11y.c
+    src/m3_i18n.c
 )
 target_include_directories(test_material_catalog PRIVATE include)
 target_link_libraries(test_material_catalog PRIVATE cmp cfs c-abstract-http c-orm c_cdd greatest)
@@ -62,6 +96,23 @@ target_link_libraries(test_material_catalog PRIVATE cmp cfs c-abstract-http c-or
 add_executable(screenshot_generator
     tests/screenshot_generator.c
     src/material_catalog.c
+    src/m3_memory.c
+    src/m3_state.c
+    src/m3_events.c
+    src/m3_router.c
+    src/m3_color.c
+    src/m3_typography.c
+    src/m3_shapes.c
+    src/m3_motion.c
+    src/m3_adaptive.c
+    src/m3_buttons.c
+    src/m3_communication.c
+    src/m3_containment.c
+    src/m3_navigation.c
+    src/m3_inputs.c
+    src/m3_ripple.c
+    src/m3_a11y.c
+    src/m3_i18n.c
 )
 target_include_directories(screenshot_generator PRIVATE include)
 target_link_libraries(screenshot_generator PRIVATE cmp cfs c-abstract-http c-orm c_cdd)

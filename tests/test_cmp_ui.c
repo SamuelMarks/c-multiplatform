@@ -90,8 +90,8 @@ TEST test_ui_advanced_primitives(void) {
   cmp_ui_node_destroy(rad);
 
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_image_view_create(&img, "test.png"), "%d");
-  ASSERT_EQ_FMT(7, img->type, "%d");
-  ASSERT_STR_EQ("test.png", (char *)img->properties);
+  ASSERT_EQ(7, img->type);
+  ASSERT_STR_EQ("test.png", (char *)(((void **)img->properties)[0]));
   cmp_ui_node_destroy(img);
 
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_slider_create(&slider, 10.0f, 50.0f), "%d");

@@ -252,3 +252,90 @@ int cmp_backdrop_edge_mirror(int image_width, int x, int *out_clamped_x) {
   }
   return CMP_SUCCESS;
 }
+int cmp_shadow_9patch_generate_blur(cmp_shadow_9patch_t *shadow,
+                                    cmp_gpu_t *gpu) {
+  if (!shadow || !gpu)
+    return CMP_ERROR_INVALID_ARG;
+  /* STUB: Implement multi-pass separable Gaussian blur */
+  return CMP_SUCCESS;
+}
+
+int cmp_shadow_atlas_create(int width, int height,
+                            cmp_shadow_atlas_t **out_atlas) {
+  cmp_shadow_atlas_t *atlas;
+  if (!out_atlas || width <= 0 || height <= 0)
+    return CMP_ERROR_INVALID_ARG;
+  if (CMP_MALLOC(sizeof(cmp_shadow_atlas_t), (void **)&atlas) != CMP_SUCCESS)
+    return CMP_ERROR_OOM;
+  atlas->atlas_texture = NULL;
+  atlas->width = width;
+  atlas->height = height;
+  *out_atlas = atlas;
+  return CMP_SUCCESS;
+}
+
+int cmp_shadow_atlas_destroy(cmp_shadow_atlas_t *atlas) {
+  if (!atlas)
+    return CMP_SUCCESS;
+  if (atlas->atlas_texture)
+    cmp_texture_destroy(atlas->atlas_texture);
+  CMP_FREE(atlas);
+  return CMP_SUCCESS;
+}
+
+int cmp_backdrop_kawase_blur(cmp_texture_t *bg_texture, float radius,
+                             cmp_texture_t **out_blurred) {
+  (void)radius;
+  if (!bg_texture || !out_blurred)
+    return CMP_ERROR_INVALID_ARG;
+  *out_blurred = bg_texture; /* STUB */
+  return CMP_SUCCESS;
+}
+
+int cmp_blend_mode_resolve(cmp_mix_blend_mode_t mode,
+                           int *out_gpu_blend_state) {
+  if (!out_gpu_blend_state)
+    return CMP_ERROR_INVALID_ARG;
+  *out_gpu_blend_state = (int)mode; /* STUB */
+  return CMP_SUCCESS;
+}
+
+int cmp_isolation_context_begin(cmp_isolation_context_t *ctx) {
+  if (!ctx)
+    return CMP_ERROR_INVALID_ARG;
+  ctx->is_isolated = 1;
+  return CMP_SUCCESS;
+}
+
+int cmp_isolation_context_end(cmp_isolation_context_t *ctx) {
+  if (!ctx)
+    return CMP_ERROR_INVALID_ARG;
+  ctx->is_isolated = 0;
+  return CMP_SUCCESS;
+}
+
+int cmp_mask_image_apply(cmp_texture_t *source, cmp_mask_image_t *mask,
+                         cmp_texture_t **out_result) {
+  if (!source || !mask || !out_result)
+    return CMP_ERROR_INVALID_ARG;
+  *out_result = source; /* STUB */
+  return CMP_SUCCESS;
+}
+
+int cmp_svg_filter_fe_color_matrix(cmp_texture_t *source,
+                                   cmp_svg_fe_color_matrix_t *matrix,
+                                   cmp_texture_t **out_result) {
+  if (!source || !matrix || !out_result)
+    return CMP_ERROR_INVALID_ARG;
+  *out_result = source; /* STUB */
+  return CMP_SUCCESS;
+}
+
+int cmp_svg_filter_fe_displacement_map(cmp_texture_t *source,
+                                       cmp_svg_fe_displacement_map_t *map,
+                                       cmp_texture_t **out_result) {
+  if (!source || !map || !out_result)
+    return CMP_ERROR_INVALID_ARG;
+  *out_result = source; /* STUB */
+  return CMP_SUCCESS;
+}

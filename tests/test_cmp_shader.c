@@ -68,12 +68,30 @@ TEST test_cmp_shader_init_null(void) {
   PASS();
 }
 
+TEST test_cmp_shader_get_rounded_rect_sdf_glsl(void) {
+  const char *source = NULL;
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_shader_get_rounded_rect_sdf_glsl(NULL));
+  ASSERT_EQ(CMP_SUCCESS, cmp_shader_get_rounded_rect_sdf_glsl(&source));
+  ASSERT_NEQ(NULL, source);
+  PASS();
+}
+
+TEST test_cmp_shader_get_squircle_sdf_glsl(void) {
+  const char *source = NULL;
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_shader_get_squircle_sdf_glsl(NULL));
+  ASSERT_EQ(CMP_SUCCESS, cmp_shader_get_squircle_sdf_glsl(&source));
+  ASSERT_NEQ(NULL, source);
+  PASS();
+}
+
 SUITE(cmp_shader_suite) {
   RUN_TEST(test_cmp_shader_init_rounded_rect);
   RUN_TEST(test_cmp_shader_init_gradient);
   RUN_TEST(test_cmp_shader_init_sdf_text);
   RUN_TEST(test_cmp_shader_destroy_null);
   RUN_TEST(test_cmp_shader_init_null);
+  RUN_TEST(test_cmp_shader_get_rounded_rect_sdf_glsl);
+  RUN_TEST(test_cmp_shader_get_squircle_sdf_glsl);
 }
 
 GREATEST_MAIN_DEFS();

@@ -147,3 +147,88 @@ int cmp_typography_set_bidi_direction(cmp_typography_t *typo, int is_rtl) {
   return cmp_i18n_set_bidi_direction(is_rtl ? CMP_TEXT_DIR_RTL
                                             : CMP_TEXT_DIR_LTR);
 }
+int cmp_freetype_glyph_rasterize(const char *font_file_path, int glyph_index,
+                                 cmp_texture_t **out_glyph_texture,
+                                 cmp_glyph_metrics_t *out_metrics) {
+  (void)glyph_index;
+  if (!font_file_path || !out_glyph_texture || !out_metrics)
+    return CMP_ERROR_INVALID_ARG;
+  *out_glyph_texture = NULL; /* STUB */
+  out_metrics->bearing_x = 0;
+  out_metrics->bearing_y = 0;
+  out_metrics->advance_x = 0;
+  out_metrics->advance_y = 0;
+  return CMP_SUCCESS;
+}
+
+int cmp_harfbuzz_text_shape(cmp_font_t *font, const char *utf8_text, int is_rtl,
+                            int *out_glyph_count) {
+  (void)is_rtl;
+  if (!font || !utf8_text || !out_glyph_count)
+    return CMP_ERROR_INVALID_ARG;
+  *out_glyph_count = 0; /* STUB */
+  return CMP_SUCCESS;
+}
+
+int cmp_arabic_indic_shape(cmp_font_t *font, const char *utf8_text,
+                           int *out_glyph_count) {
+  if (!font || !utf8_text || !out_glyph_count)
+    return CMP_ERROR_INVALID_ARG;
+  *out_glyph_count = 0; /* STUB */
+  return CMP_SUCCESS;
+}
+
+int cmp_bidi_run_split(const char *utf8_text, int *out_run_count,
+                       int **out_run_is_rtl) {
+  if (!utf8_text || !out_run_count || !out_run_is_rtl)
+    return CMP_ERROR_INVALID_ARG;
+  *out_run_count = 0; /* STUB */
+  *out_run_is_rtl = NULL;
+  return CMP_SUCCESS;
+}
+
+int cmp_font_render_sdf(cmp_font_t *font, int glyph_index,
+                        cmp_texture_t **out_sdf_texture) {
+  (void)glyph_index;
+  if (!font || !out_sdf_texture)
+    return CMP_ERROR_INVALID_ARG;
+  *out_sdf_texture = NULL; /* STUB */
+  return CMP_SUCCESS;
+}
+
+int cmp_font_render_msdf(cmp_font_t *font, int glyph_index,
+                         cmp_texture_t **out_msdf_texture) {
+  (void)glyph_index;
+  if (!font || !out_msdf_texture)
+    return CMP_ERROR_INVALID_ARG;
+  *out_msdf_texture = NULL; /* STUB */
+  return CMP_SUCCESS;
+}
+
+int cmp_font_render_subpixel_lcd(cmp_font_t *font, int glyph_index,
+                                 cmp_texture_t **out_lcd_texture) {
+  (void)glyph_index;
+  if (!font || !out_lcd_texture)
+    return CMP_ERROR_INVALID_ARG;
+  *out_lcd_texture = NULL; /* STUB */
+  return CMP_SUCCESS;
+}
+
+int cmp_font_render_color_emoji(cmp_font_t *font, int glyph_index,
+                                cmp_texture_t **out_emoji_texture) {
+  (void)glyph_index;
+  if (!font || !out_emoji_texture)
+    return CMP_ERROR_INVALID_ARG;
+  *out_emoji_texture = NULL; /* STUB */
+  return CMP_SUCCESS;
+}
+
+int cmp_variable_font_axis_interpolate(cmp_font_t *font, const char *axis_tag,
+                                       float value,
+                                       cmp_font_t **out_interpolated_font) {
+  (void)value;
+  if (!font || !axis_tag || !out_interpolated_font)
+    return CMP_ERROR_INVALID_ARG;
+  *out_interpolated_font = font; /* STUB */
+  return CMP_SUCCESS;
+}

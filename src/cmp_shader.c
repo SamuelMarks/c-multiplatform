@@ -41,3 +41,21 @@ int cmp_shader_destroy(cmp_shader_t *shader) {
   }
   return CMP_SUCCESS;
 }
+
+int cmp_shader_get_rounded_rect_sdf_glsl(const char **out_source) {
+  if (!out_source)
+    return CMP_ERROR_INVALID_ARG;
+  *out_source =
+      "void main() { float d = length(max(abs(pos) - size + radius, 0.0)) - "
+      "radius; gl_FragColor = vec4(1.0, 1.0, 1.0, step(d, 0.0)); }";
+  return CMP_SUCCESS;
+}
+
+int cmp_shader_get_squircle_sdf_glsl(const char **out_source) {
+  if (!out_source)
+    return CMP_ERROR_INVALID_ARG;
+  *out_source =
+      "void main() { float d = pow(abs(pos.x), 3.0) + pow(abs(pos.y), 3.0) - "
+      "pow(radius, 3.0); gl_FragColor = vec4(1.0, 1.0, 1.0, step(d, 0.0)); }";
+  return CMP_SUCCESS;
+}

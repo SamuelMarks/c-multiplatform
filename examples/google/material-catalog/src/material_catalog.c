@@ -6,6 +6,8 @@
 #include <string.h>
 /* clang-format on */
 
+m3_catalog_state_t *g_m3_state = NULL;
+
 static uint32_t catalog_color_to_uint32(const cmp_color_t *c) {
   uint32_t r = (uint32_t)(c->r * 255.0f);
   uint32_t g = (uint32_t)(c->g * 255.0f);
@@ -718,57 +720,6 @@ int material_catalog_render_more_menu(material_catalog_state_t *state,
   return MATERIAL_CATALOG_SUCCESS;
 }
 
-static void ripple_event_handler(cmp_event_t *evt, cmp_ui_node_t *node,
-                                 void *user_data) {
-  material_catalog_state_t *state = (material_catalog_state_t *)user_data;
-  float base_opacity = 0.0f;
-  float anim_opacity = 0.0f;
-  float final_opacity = 0.0f;
-
-  if (evt == NULL || node == NULL)
-    return;
-
-  /* Logic for updating state layer overlays */
-  if (evt->action == CMP_ACTION_DOWN) {
-    /* Trigger 12% pressed overlay, trigger expanding ripple animation */
-    anim_opacity = 0.12f;
-  } else if (evt->action == CMP_ACTION_UP || evt->action == CMP_ACTION_CANCEL) {
-    /* Trigger 4% hover overlay if cursor still over, fade out ripple */
-    anim_opacity = 0.04f;
-  } else if (evt->action == CMP_ACTION_MOVE) {
-    /* Trigger 4% hover overlay */
-    anim_opacity = 0.04f;
-  }
-
-  /* Hook into the ripple animation rendering pipeline */
-  if (cmp_anim_compose_numerical(base_opacity, anim_opacity,
-                                 CMP_ANIM_COMPOSE_REPLACE,
-                                 &final_opacity) == 0) {
-    /* Hack for mock catalog: we store the ripple opacity in the upper bits of
-       layout flex_shrink or similar safe spot, but `node->properties` is safer
-       if the node is a Card (since we used properties for background color).
-       Actually, `cmp_ui_node_t` doesn't have an explicit `state_layer` field
-       unless we augment it. We will trigger a repaint request. */
-    (void)final_opacity;
-    if (state) {
-      /* Here we'd mark the specific node DIRTY_PAINT, but we'll invalidate the
-       * whole UI for this mock */
-      material_catalog_invalidate_ui(state);
-    }
-  }
-}
-
-int material_catalog_apply_ripple(material_catalog_state_t *state,
-                                  cmp_ui_node_t *node) {
-  if (!node)
-    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-
-  cmp_ui_node_add_event_listener(node, CMP_EVENT_TYPE_MOUSE, 0,
-                                 ripple_event_handler, state);
-
-  return MATERIAL_CATALOG_SUCCESS;
-}
-
 int material_catalog_render_top_app_bar(material_catalog_state_t *state,
                                         cmp_ui_node_t *container,
                                         const char *title,
@@ -813,8 +764,8 @@ int material_catalog_render_top_app_bar(material_catalog_state_t *state,
       back_btn->layout->width = btn_metrics.target_size;
       back_btn->layout->height = btn_metrics.target_size;
       /* Mock properties to hold icon tinting */
-      back_btn->properties = (void *)(uintptr_t)catalog_color_to_uint32(
-          &state->sys_colors.on_surface);
+      back_btn->text_color =
+          catalog_color_to_uint32(&state->sys_colors.on_surface);
       if (cmp_arena_alloc(&state->state_arena, sizeof(click_ctx_t),
                           (void **)&ctx) == 0) {
         ctx->state = state;
@@ -841,7 +792,8 @@ int material_catalog_render_top_app_bar(material_catalog_state_t *state,
         catalog_color_to_uint32(&state->sys_colors.on_surface);
     /* In a real implementation we would attach the font pointer from
      * state->fonts[THEME_TYPOGRAPHY_TITLE_LARGE] */
-    title_node->properties = state->fonts[THEME_TYPOGRAPHY_TITLE_LARGE];
+    title_node->font_size =
+        g_typography_scales[THEME_TYPOGRAPHY_TITLE_LARGE].font_size;
     cmp_ui_node_add_child(app_bar, title_node);
   }
 
@@ -855,8 +807,8 @@ int material_catalog_render_top_app_bar(material_catalog_state_t *state,
         0) {
       pin_btn->layout->width = btn_metrics.target_size;
       pin_btn->layout->height = btn_metrics.target_size;
-      pin_btn->properties = (void *)(uintptr_t)catalog_color_to_uint32(
-          &state->sys_colors.on_surface);
+      pin_btn->text_color =
+          catalog_color_to_uint32(&state->sys_colors.on_surface);
       material_catalog_apply_ripple(state, pin_btn);
       cmp_ui_node_add_child(app_bar, pin_btn);
     }
@@ -865,8 +817,8 @@ int material_catalog_render_top_app_bar(material_catalog_state_t *state,
         0) {
       palette_btn->layout->width = btn_metrics.target_size;
       palette_btn->layout->height = btn_metrics.target_size;
-      palette_btn->properties = (void *)(uintptr_t)catalog_color_to_uint32(
-          &state->sys_colors.on_surface);
+      palette_btn->text_color =
+          catalog_color_to_uint32(&state->sys_colors.on_surface);
       material_catalog_apply_ripple(state, palette_btn);
       cmp_ui_node_add_child(app_bar, palette_btn);
     }
@@ -875,8 +827,8 @@ int material_catalog_render_top_app_bar(material_catalog_state_t *state,
         0) {
       more_btn->layout->width = btn_metrics.target_size;
       more_btn->layout->height = btn_metrics.target_size;
-      more_btn->properties = (void *)(uintptr_t)catalog_color_to_uint32(
-          &state->sys_colors.on_surface);
+      more_btn->text_color =
+          catalog_color_to_uint32(&state->sys_colors.on_surface);
       material_catalog_apply_ripple(state, more_btn);
       cmp_ui_node_add_child(app_bar, more_btn);
     }
@@ -1020,6 +972,10 @@ int material_catalog_init(material_catalog_state_t *state) {
     printf("cmp_window_system_init failed\n");
     return MATERIAL_CATALOG_ERROR_INITIALIZATION_FAILED;
   }
+
+  /* Mount VFS assets */
+  cmp_vfs_mount("vfs://fonts", "examples/google/material-catalog/assets");
+  cmp_vfs_mount("vfs://assets", "examples/google/material-catalog/assets");
 
   if (cmp_dpi_awareness_init() == 0) {
     if (cmp_dpi_create(&dpi) == 0) {
@@ -1232,8 +1188,7 @@ int material_catalog_render_home_screen(material_catalog_state_t *state,
             dp_to_px(state, 32.0f); /* Push it to center vertically roughly */
 
         /* Store tint for drawing */
-        icon->properties =
-            (void *)(uintptr_t)catalog_color_to_uint32(&icon_tint);
+        icon->text_color = catalog_color_to_uint32(&icon_tint);
         cmp_ui_node_add_child(card, icon);
       }
 
@@ -1244,8 +1199,8 @@ int material_catalog_render_home_screen(material_catalog_state_t *state,
         label->layout->margin[3] = dp_to_px(state, 16.0f);
         label->text_color =
             catalog_color_to_uint32(&state->sys_colors.on_surface);
-        label->properties =
-            state->fonts[THEME_TYPOGRAPHY_TITLE_SMALL]; /* Use M3 Title Small */
+        label->font_size = g_typography_scales[THEME_TYPOGRAPHY_TITLE_SMALL]
+                               .font_size; /* Use M3 Title Small */
         cmp_ui_node_add_child(card, label);
       }
 
@@ -1381,7 +1336,8 @@ int material_catalog_render_component_details(material_catalog_state_t *state,
         if (cmp_ui_text_create(&example_label, examples[i].name, -1) == 0) {
           example_label->text_color =
               catalog_color_to_uint32(&state->sys_colors.on_surface);
-          example_label->properties = state->fonts[THEME_TYPOGRAPHY_BODY_LARGE];
+          example_label->font_size =
+              g_typography_scales[THEME_TYPOGRAPHY_BODY_LARGE].font_size;
           cmp_ui_node_add_child(example_item, example_label);
         }
 
@@ -1677,7 +1633,8 @@ int material_catalog_render_badges_example(material_catalog_state_t *state,
       if (cmp_ui_text_create(&num_lbl, "3", -1) == 0) {
         num_lbl->text_color =
             catalog_color_to_uint32(&state->sys_colors.on_error);
-        num_lbl->properties = state->fonts[THEME_TYPOGRAPHY_LABEL_SMALL];
+        num_lbl->font_size =
+            g_typography_scales[THEME_TYPOGRAPHY_LABEL_SMALL].font_size;
         cmp_ui_node_add_child(widget, num_lbl);
       }
       cmp_ui_node_add_child(container, widget);
@@ -1691,25 +1648,99 @@ int material_catalog_render_bottom_navigation_example(
   cmp_ui_node_t *lbl = NULL;
   if (!state || !container)
     return MATERIAL_CATALOG_ERROR_NULL_POINTER;
-  if (cmp_ui_text_create(&lbl, "(Bottom Navigation variations rendered here)",
-                         -1) == 0) {
+  if (cmp_ui_text_create(&lbl, "Bottom Navigation", -1) == 0) {
     lbl->layout->margin[0] = dp_to_px(state, 32.0f);
     lbl->layout->margin[3] = dp_to_px(state, 16.0f);
     cmp_ui_node_add_child(container, lbl);
   }
 
   {
-    cmp_ui_node_t *mock_nav = NULL;
+    cmp_ui_node_t *nav = NULL;
     cmp_m3_bottom_nav_metrics_t metrics;
     cmp_m3_bottom_nav_resolve(&metrics);
 
-    if (cmp_ui_box_create(&mock_nav) == 0) {
-      mock_nav->layout->width = state->content_width - dp_to_px(state, 32.0f);
-      mock_nav->layout->height = metrics.height;
-      mock_nav->layout->margin[0] = dp_to_px(state, 32.0f);
-      mock_nav->layout->margin[3] = dp_to_px(state, 16.0f);
-      /* Mock drawing of bottom nav style */
-      cmp_ui_node_add_child(container, mock_nav);
+    if (cmp_ui_box_create(&nav) == 0) {
+      int i;
+      nav->design_language_override = 1;
+      nav->layout->width = state->content_width - dp_to_px(state, 32.0f);
+      nav->layout->height = metrics.height;
+      nav->layout->margin[0] = dp_to_px(state, 32.0f);
+      nav->layout->margin[3] = dp_to_px(state, 16.0f);
+      nav->layout->direction = CMP_FLEX_ROW;
+      nav->layout->justify_content = CMP_FLEX_ALIGN_SPACE_AROUND;
+      nav->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+      nav->bg_color =
+          catalog_color_to_uint32(&state->sys_colors.surface_container);
+      nav->border_radius =
+          0.0f; /* Usually spans full width, but here in a box */
+
+      for (i = 0; i < 3; i++) {
+        cmp_ui_node_t *item = NULL;
+        if (cmp_ui_box_create(&item) == 0) {
+          cmp_ui_node_t *indicator = NULL;
+          cmp_ui_node_t *icon = NULL;
+          cmp_ui_node_t *text = NULL;
+
+          item->design_language_override = 1;
+          item->layout->direction = CMP_FLEX_COLUMN;
+          item->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+          item->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
+          item->layout->flex_grow = 1.0f;
+          item->layout->height = metrics.height;
+          item->layout->padding[1] = dp_to_px(state, 12.0f);
+          item->layout->padding[3] = dp_to_px(state, 16.0f);
+
+          material_catalog_apply_ripple(state, item);
+
+          /* Active Indicator Box */
+          if (cmp_ui_box_create(&indicator) == 0) {
+            indicator->design_language_override = 1;
+            indicator->layout->width = metrics.active_indicator_width;
+            indicator->layout->height = metrics.active_indicator_height;
+            indicator->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+            indicator->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
+            indicator->layout->position_type = CMP_POSITION_RELATIVE;
+            indicator->border_radius = metrics.active_indicator_height * 0.5f;
+
+            if (i == 0) {
+              /* Selected State */
+              indicator->bg_color = catalog_color_to_uint32(
+                  &state->sys_colors.secondary_container);
+            } else {
+              /* Unselected State */
+              indicator->bg_color = 0;
+            }
+
+            /* Icon */
+            if (cmp_ui_image_view_create(
+                    &icon, i == 0 ? "vfs://assets/ic_component.svg"
+                                  : "vfs://assets/ic_palette.svg") == 0) {
+              icon->layout->width = dp_to_px(state, 24.0f);
+              icon->layout->height = dp_to_px(state, 24.0f);
+              icon->text_color = catalog_color_to_uint32(
+                  i == 0 ? &state->sys_colors.on_secondary_container
+                         : &state->sys_colors.on_surface_variant);
+              cmp_ui_node_add_child(indicator, icon);
+            }
+
+            cmp_ui_node_add_child(item, indicator);
+          }
+
+          /* Label */
+          if (cmp_ui_text_create(&text, i == 0 ? "Selected" : "Tab", -1) == 0) {
+            text->layout->margin[1] = dp_to_px(state, 4.0f);
+            text->font_size = 12.0f;
+            text->text_color = catalog_color_to_uint32(
+                i == 0 ? &state->sys_colors.on_surface
+                       : &state->sys_colors.on_surface_variant);
+            cmp_ui_node_add_child(item, text);
+          }
+
+          cmp_ui_node_add_child(nav, item);
+        }
+      }
+
+      cmp_ui_node_add_child(container, nav);
     }
   }
 
@@ -2022,6 +2053,7 @@ int material_catalog_render_cards_example(material_catalog_state_t *state,
   {
     cmp_ui_node_t *widget = NULL;
     if (cmp_ui_box_create(&widget) == 0) {
+      widget->type = 8; /* Card */
       widget->design_language_override = 1;
       widget->layout->width = dp_to_px(state, 150.0f);
       widget->layout->height = dp_to_px(state, 100.0f);
@@ -2029,6 +2061,8 @@ int material_catalog_render_cards_example(material_catalog_state_t *state,
       widget->layout->margin[3] = dp_to_px(state, 16.0f);
       widget->bg_color =
           catalog_color_to_uint32(&state->sys_colors.surface_container_low);
+      widget->elevation = 1.0f; /* 1dp elevation for elevated card */
+      widget->border_radius = 12.0f;
       cmp_ui_node_add_child(container, widget);
     }
   }
@@ -2044,6 +2078,7 @@ int material_catalog_render_cards_example(material_catalog_state_t *state,
   {
     cmp_ui_node_t *widget = NULL;
     if (cmp_ui_box_create(&widget) == 0) {
+      widget->type = 8; /* Card */
       widget->design_language_override = 1;
       widget->layout->width = dp_to_px(state, 150.0f);
       widget->layout->height = dp_to_px(state, 100.0f);
@@ -2051,6 +2086,7 @@ int material_catalog_render_cards_example(material_catalog_state_t *state,
       widget->layout->margin[3] = dp_to_px(state, 16.0f);
       widget->bg_color =
           catalog_color_to_uint32(&state->sys_colors.surface_container_highest);
+      widget->border_radius = 12.0f;
       cmp_ui_node_add_child(container, widget);
     }
   }
@@ -2066,23 +2102,17 @@ int material_catalog_render_cards_example(material_catalog_state_t *state,
   {
     cmp_ui_node_t *widget = NULL;
     if (cmp_ui_box_create(&widget) == 0) {
-      cmp_ui_node_t *border = NULL;
+      widget->type = 8; /* Card */
       widget->design_language_override = 1;
       widget->layout->width = dp_to_px(state, 150.0f);
       widget->layout->height = dp_to_px(state, 100.0f);
       widget->layout->margin[0] = dp_to_px(state, 16.0f);
       widget->layout->margin[3] = dp_to_px(state, 16.0f);
       widget->bg_color = catalog_color_to_uint32(&state->sys_colors.surface);
-      widget->layout->position_type = CMP_POSITION_RELATIVE;
-
-      if (cmp_ui_box_create(&border) == 0) {
-        border->layout->position_type = CMP_POSITION_ABSOLUTE;
-        border->layout->width = widget->layout->width;
-        border->layout->height = widget->layout->height;
-        /* Draw 1dp outline */
-        cmp_ui_node_add_child(widget, border);
-      }
-
+      widget->border_radius = 12.0f;
+      widget->border_width = 1.0f;
+      widget->border_color =
+          catalog_color_to_uint32(&state->sys_colors.outline);
       cmp_ui_node_add_child(container, widget);
     }
   }

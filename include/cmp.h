@@ -1,6 +1,32 @@
 #ifndef CMP_H
 #define CMP_H
 
+/* Restoring wiped missing types from previous agents */
+typedef struct cmp_icc_profile cmp_icc_profile_t;
+typedef struct cmp_hw_video_decoder cmp_hw_video_decoder_t;
+typedef struct cmp_mipmap_generator cmp_mipmap_generator_t;
+typedef struct cmp_mask_image cmp_mask_image_t;
+typedef struct cmp_svg_fe_color_matrix cmp_svg_fe_color_matrix_t;
+typedef struct cmp_svg_fe_displacement_map cmp_svg_fe_displacement_map_t;
+
+struct cmp_texture;
+
+typedef struct cmp_shadow_atlas {
+  struct cmp_texture *atlas_texture;
+  int width;
+  int height;
+} cmp_shadow_atlas_t;
+
+typedef struct cmp_glyph_metrics {
+  float bearing_x, bearing_y;
+  float advance_x, advance_y;
+} cmp_glyph_metrics_t;
+
+int cmp_freetype_glyph_rasterize(const char *font_file_path, int glyph_index,
+                                 struct cmp_texture **out_glyph_texture,
+                                 cmp_glyph_metrics_t *out_metrics);
+
+
 /* Phase 12.1: C-Framework Bridging & Interoperability -> ABI Stability &
  * Interfaces */
 
@@ -3289,9 +3315,33 @@ struct cmp_ui_node {
   struct cmp_ui_node **children;
   size_t child_count;
   size_t child_capacity;
+  /** Background color in ARGB/RGBA hex */
   uint32_t bg_color;
+  /** Text color in ARGB/RGBA hex */
   uint32_t text_color;
+  /** Font size in logical pixels */
   float font_size;
+
+  /** Border radius for rounded corners in logical pixels */
+  float border_radius;
+  /** Shadow elevation depth in logical pixels (e.g. 1.0f to 24.0f) */
+  float elevation;
+  /** Border width in logical pixels */
+  float border_width;
+  /** Border color in ARGB/RGBA hex */
+  uint32_t border_color;
+  /** Overall node opacity (0.0f to 1.0f) */
+  float opacity;
+
+  /** UI States */
+  int is_hovered;
+  int is_pressed;
+  int is_focused;
+  float ripple_radius;
+  float ripple_x;
+  float ripple_y;
+  float hover_opacity;
+  float press_opacity;
 
   struct cmp_event_listener_node *event_listeners;
 
@@ -4135,6 +4185,13 @@ int cmp_swapchain_acquire_next_image(cmp_swapchain_t *swapchain,
 int cmp_swapchain_present(cmp_swapchain_t *swapchain);
 
 /**
+ * @brief Get the native OS surface handle for the swapchain
+ * @param swapchain The swapchain context
+ * @return The native OS surface handle bound to the swapchain, or NULL.
+ */
+void *cmp_swapchain_get_os_surface_handle(cmp_swapchain_t *swapchain);
+
+/**
  * @brief Opaque Overdraw Visualizer Context
  */
 typedef struct cmp_overdraw cmp_overdraw_t;
@@ -4635,6 +4692,13 @@ int cmp_window_wasm_set_main_loop(cmp_modality_t *mod,
  * @return 0 on success, or an error code.
  */
 int cmp_window_destroy(cmp_window_t *window);
+
+/**
+ * @brief Get the native OS surface handle for the window (HWND, NSView, xdg_surface, etc.)
+ * @param window The window context
+ * @return The native handle or NULL if unsupported.
+ */
+void *cmp_window_get_native_handle(cmp_window_t *window);
 
 /**
  * @brief Missing types from previous implementation
@@ -5524,6 +5588,9 @@ typedef struct cmp_svg_renderer {
   float *vertices;
   size_t vertex_count;
   size_t vertex_capacity;
+  int *subpath_counts;
+  size_t num_subpaths;
+  size_t subpath_capacity;
   float tolerance;
   float current_x;
   float current_y;
@@ -5544,6 +5611,8 @@ int cmp_svg_renderer_arc_to(cmp_svg_renderer_t *renderer, float rx, float ry,
                             float x_axis_rotation, int large_arc_flag,
                             int sweep_flag, float x, float y);
 int cmp_svg_renderer_close(cmp_svg_renderer_t *renderer);
+
+int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer);
 
 int cmp_svg_path_tessellate(cmp_svg_path_type_t path_type, const float *data,
                             size_t data_len, float **out_vertices,
@@ -5574,10 +5643,22 @@ typedef enum cmp_gpu_backend_type {
   CMP_BACKEND_CPU_SOFTWARE = 5 /* Windows 98 / Legacy fallback */
 } cmp_gpu_backend_type_t;
 
-typedef struct cmp_gpu {
+typedef struct cmp_gpu cmp_gpu_t;
+
+/**
+ * @brief Unified GPU abstraction vtable for bridging Vulkan, Metal, DX12, etc.
+ */
+typedef struct cmp_gpu_vtable {
+  int (*begin_frame)(cmp_gpu_t *gpu);
+  int (*end_frame)(cmp_gpu_t *gpu);
+  int (*destroy)(cmp_gpu_t *gpu);
+} cmp_gpu_vtable_t;
+
+struct cmp_gpu {
   cmp_gpu_backend_type_t backend;
   void *context;
-} cmp_gpu_t;
+  const cmp_gpu_vtable_t *vtable;
+};
 
 typedef struct cmp_vbo {
   float *data;
@@ -5590,12 +5671,24 @@ struct cmp_ubo {
   size_t size;
 };
 
+/**
+ * @brief Test if a bounding box intersects the viewport (Frustum Culling)
+ * @param node_rect The bounding box of the node
+ * @param viewport_rect The bounding box of the viewport/camera
+ * @param out_is_visible Pointer to receive 1 if visible, 0 if completely culled
+ * @return 0 on success, or an error code.
+ */
+int cmp_frustum_culling_test(const cmp_rect_t *node_rect, const cmp_rect_t *viewport_rect, int *out_is_visible);
+
 typedef struct cmp_draw_call {
   int texture_id;
   int shader_id;
   int blend_mode;
   size_t vertex_offset;
   size_t vertex_count;
+  /* Scissor / Clipping */
+  int scissor_enable;
+  cmp_rect_t scissor_rect;
 } cmp_draw_call_t;
 
 typedef struct cmp_draw_call_optimizer {
@@ -5607,6 +5700,8 @@ typedef struct cmp_draw_call_optimizer {
 int cmp_gpu_create(cmp_gpu_backend_type_t preferred_backend,
                    cmp_gpu_t **out_gpu);
 int cmp_gpu_destroy(cmp_gpu_t *gpu);
+int cmp_gpu_begin_frame(cmp_gpu_t *gpu);
+int cmp_gpu_end_frame(cmp_gpu_t *gpu);
 int cmp_vbo_create(cmp_vbo_t **out_vbo);
 int cmp_vbo_append(cmp_vbo_t *vbo, const float *vertices, size_t count);
 int cmp_vbo_destroy(cmp_vbo_t *vbo);
@@ -5620,6 +5715,72 @@ int cmp_draw_call_optimizer_optimize(cmp_draw_call_optimizer_t *opt);
 int cmp_draw_call_optimizer_destroy(cmp_draw_call_optimizer_t *opt);
 
 /* ========================================================================= */
+
+typedef struct cmp_command_buffer cmp_command_buffer_t;
+int cmp_command_buffer_create(cmp_gpu_t *gpu, int is_secondary, cmp_command_buffer_t **out_cb);
+int cmp_command_buffer_destroy(cmp_command_buffer_t *cb);
+int cmp_command_buffer_begin(cmp_command_buffer_t *cb);
+int cmp_command_buffer_end(cmp_command_buffer_t *cb);
+int cmp_command_buffer_execute_commands(cmp_command_buffer_t *primary, cmp_command_buffer_t **secondaries, int count);
+int cmp_command_buffer_draw(cmp_command_buffer_t *cb, const cmp_draw_call_t *call);
+
+typedef struct cmp_render_pass_config {
+  int id;
+  int dependency_count;
+  int dependencies[16];
+  void (*execute_cb)(cmp_command_buffer_t *cb, void *user_data);
+  void *user_data;
+} cmp_render_pass_config_t;
+
+typedef struct cmp_render_graph cmp_render_graph_t;
+int cmp_render_graph_create(cmp_render_graph_t **out_graph);
+int cmp_render_graph_destroy(cmp_render_graph_t *graph);
+int cmp_render_graph_add_pass(cmp_render_graph_t *graph, const cmp_render_pass_config_t *config);
+int cmp_render_graph_execute(cmp_render_graph_t *graph, cmp_command_buffer_t *cb);
+
+typedef struct cmp_pipeline_state {
+  cmp_shader_t *vertex_shader;
+  cmp_shader_t *fragment_shader;
+  int blend_mode;
+  int depth_test_enable;
+  int depth_write_enable;
+  int cull_mode;
+  /* Stencil */
+  int stencil_test_enable;
+  int stencil_reference;
+  int stencil_compare_op;
+  int stencil_pass_op;
+  int stencil_fail_op;
+  int stencil_depth_fail_op;
+} cmp_pipeline_state_t;
+typedef struct cmp_pso cmp_pso_t;
+typedef struct cmp_pso_cache cmp_pso_cache_t;
+
+int cmp_pso_cache_create(cmp_pso_cache_t **out_cache);
+int cmp_pso_cache_destroy(cmp_pso_cache_t *cache);
+int cmp_pso_cache_get_or_create(cmp_pso_cache_t *cache, const cmp_pipeline_state_t *state, cmp_pso_t **out_pso);
+
+int cmp_command_buffer_bind_pso(cmp_command_buffer_t *cb, cmp_pso_t *pso);
+
+typedef struct cmp_gpu_allocator cmp_gpu_allocator_t;
+int cmp_gpu_allocator_create(cmp_gpu_t *gpu, size_t block_size, cmp_gpu_allocator_t **out_allocator);
+int cmp_gpu_allocator_destroy(cmp_gpu_allocator_t *allocator);
+int cmp_gpu_allocator_alloc(cmp_gpu_allocator_t *allocator, size_t size, size_t alignment, void **out_mem, size_t *out_offset);
+int cmp_gpu_allocator_free(cmp_gpu_allocator_t *allocator, void *mem);
+
+typedef struct cmp_atlas cmp_atlas_t;
+int cmp_atlas_create(cmp_gpu_t *gpu, int width, int height, cmp_atlas_t **out_atlas);
+int cmp_atlas_destroy(cmp_atlas_t *atlas);
+int cmp_atlas_insert(cmp_atlas_t *atlas, int width, int height, const void *pixels, int *out_x, int *out_y);
+int cmp_atlas_evict(cmp_atlas_t *atlas);
+
+typedef struct cmp_tex_compression cmp_tex_compression_t;
+int cmp_tex_compression_decode_astc(const void *data, size_t size, void **out_rgba, int *out_width, int *out_height);
+int cmp_tex_compression_decode_bc7(const void *data, size_t size, void **out_rgba, int *out_width, int *out_height);
+
+int cmp_shader_compile_spirv(const char *source, size_t size, cmp_shader_t **out_shader);
+int cmp_shader_compile_msl(const char *source, size_t size, cmp_shader_t **out_shader);
+
 /* Phase 21: Accessibility (A11y) & Screen Readers                           */
 /* ========================================================================= */
 
@@ -11925,4 +12086,124 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
 }
 #endif /* __cplusplus */
 
+#include "cmp_audio_capture.h"
+#include "cmp_credential_manager.h"
+#include "cmp_global_hotkey.h"
+#include "cmp_mmap.h"
+#include "cmp_plugin_loader.h"
+#include "cmp_pty.h"
+#include "cmp_regex.h"
+#include "cmp_screen_capture.h"
+#include "cmp_sse_parser.h"
+#include "cmp_tree_sitter.h"
+#include "cmp_ui_accordion.h"
+#include "cmp_ui_avatar.h"
+#include "cmp_ui_badge.h"
+#include "cmp_ui_breadcrumbs.h"
+#include "cmp_ui_chip.h"
+#include "cmp_ui_code_block.h"
+#include "cmp_ui_diff.h"
+#include "cmp_ui_markdown.h"
+#include "cmp_ui_progress_bar.h"
+#include "cmp_ui_skeleton.h"
+#include "cmp_ui_spinner.h"
+#include "cmp_ui_splitter.h"
+#include "cmp_ui_terminal.h"
+#include "cmp_ui_tooltip.h"
+#include "cmp_ui_tree_view.h"
+#include "cmp_ui_virtual_list.h"
+
+
+CMP_API int cmp_icc_profile_destroy(cmp_icc_profile_t *profile);
+CMP_API int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile, float *out_matrix3x3);
+CMP_API int cmp_icc_profile_is_wide_gamut(const cmp_icc_profile_t *profile, int *out_is_wide);
+
+CMP_API int cmp_mipmap_generator_create(cmp_mipmap_generator_t **out_gen);
+CMP_API int cmp_mipmap_generator_destroy(cmp_mipmap_generator_t *gen);
+CMP_API int cmp_mipmap_generator_generate(cmp_mipmap_generator_t *gen, const void *image_data, size_t width, size_t height, void **out_mipmaps, size_t *out_levels);
+
+CMP_API int cmp_shadow_atlas_create(int width, int height, cmp_shadow_atlas_t **out_atlas);
+CMP_API int cmp_shadow_atlas_destroy(cmp_shadow_atlas_t *atlas);
+
+CMP_API int cmp_mask_image_apply(struct cmp_texture *source, cmp_mask_image_t *mask, struct cmp_texture **out_result);
+CMP_API int cmp_svg_filter_fe_color_matrix(struct cmp_texture *source, cmp_svg_fe_color_matrix_t *matrix, struct cmp_texture **out_result);
+CMP_API int cmp_svg_filter_fe_displacement_map(struct cmp_texture *source, cmp_svg_fe_displacement_map_t *map, struct cmp_texture **out_result);
+
+
+
+
+
+
+
+typedef struct cmp_ink_ripple cmp_ink_ripple_t;
+
+CMP_API int cmp_ink_ripple_create(cmp_ink_ripple_t **out_ripple);
+CMP_API int cmp_ink_ripple_destroy(cmp_ink_ripple_t *ripple);
+CMP_API int cmp_ink_ripple_update(cmp_ink_ripple_t *ripple, float dt_ms);
+CMP_API int cmp_ink_ripple_trigger(cmp_ink_ripple_t *ripple, float start_x, float start_y);
+
+
+
+
+
+
+
+
+
+
+
+typedef struct cmp_ink_ripple cmp_ink_ripple_t;
+
+CMP_API int cmp_ink_ripple_create(cmp_ink_ripple_t **out_ripple);
+CMP_API int cmp_ink_ripple_destroy(cmp_ink_ripple_t *ripple);
+CMP_API int cmp_ink_ripple_update(cmp_ink_ripple_t *ripple, float dt_ms);
+CMP_API int cmp_ink_ripple_trigger(cmp_ink_ripple_t *ripple, float start_x, float start_y);
+
+
+
+
+
+
+typedef enum {
+  CMP_BLEND_MODE_NORMAL = 0,
+  CMP_BLEND_MODE_MULTIPLY = 1
+} cmp_mix_blend_mode_t;
+
+typedef struct cmp_isolation_context {
+  int is_isolated;
+} cmp_isolation_context_t;
+
+CMP_API int cmp_blend_mode_resolve(cmp_mix_blend_mode_t mode, int *out_gpu_blend_state);
+CMP_API int cmp_isolation_context_begin(cmp_isolation_context_t *ctx);
+CMP_API int cmp_isolation_context_end(cmp_isolation_context_t *ctx);
+
+
+CMP_API int cmp_shadow_9patch_generate_blur(cmp_shadow_9patch_t *shadow, cmp_gpu_t *gpu);
+CMP_API int cmp_backdrop_kawase_blur(struct cmp_texture *bg_texture, float radius, struct cmp_texture **out_blurred);
+
+
+/* TRUE_PLAN Phase 4 */
+CMP_API int cmp_shader_get_rounded_rect_sdf_glsl(const char **out_source);
+CMP_API int cmp_shader_get_squircle_sdf_glsl(const char **out_source);
+
+CMP_API int cmp_svg_path_tessellate_ear_clipping(const float *polygon_data,
+                                         size_t data_len, float **out_vertices,
+                                         size_t *out_vertex_count);
+CMP_API int cmp_svg_renderer_bezier_subdivide(struct cmp_svg_renderer *renderer, float cx1,
+                                      float cy1, float cx2, float cy2, float x,
+                                      float y, float screen_space_error);
+CMP_API int cmp_svg_stroke_expand(const float *path_data, size_t data_len,
+                          float stroke_width, int line_join, int line_cap,
+                          float **out_vertices, size_t *out_vertex_count);
+
+CMP_API int cmp_svg_fill_even_odd(struct cmp_command_buffer *cb, const float *path_data,
+                          size_t data_len);
+
+CMP_API int cmp_swapchain_set_msaa(struct cmp_swapchain *swapchain, int sample_count);
+
+CMP_API int cmp_svg_path_morph(const float *path_data_a, const float *path_data_b,
+                       size_t data_len, float t, float **out_path_data);
+
+CMP_API int cmp_color_srgb_to_oklch(const cmp_color_t *in_color, cmp_color_t *out_color);
+CMP_API int cmp_color_oklch_to_srgb(const cmp_color_t *in_color, cmp_color_t *out_color);
 #endif /* CMP_H */

@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "cmp.h"
 #include "greatest.h"
+#include <math.h>
 /* clang-format on */
 
 TEST test_semantic_colors(void) {
@@ -113,6 +114,10 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_pipeline_srgb_to_p3(
                                        pl, 1.0f, 1.0f, 1.0f, NULL, &fg, &fb));
 
+  cmp_color_t color_in = {0};
+  cmp_color_t color_out = {0};
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_srgb_to_oklch(NULL, &color_out));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_srgb_to_oklch(&color_in, NULL));
   cmp_semantic_colors_destroy(sc);
   cmp_color_pipeline_destroy(pl);
 
@@ -152,11 +157,70 @@ TEST test_golden_image_visual_regression(void) {
   cmp_window_system_shutdown();
   PASS();
 }
+TEST test_color_srgb_to_oklch_and_back(void) {
+  cmp_color_t srgb_in = {0.5f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
+  cmp_color_t oklch_out;
+  cmp_color_t srgb_out;
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_color_srgb_to_oklch(&srgb_in, &oklch_out));
+  ASSERT_EQ(CMP_COLOR_SPACE_OKLCH, oklch_out.space);
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_color_oklch_to_srgb(&oklch_out, &srgb_out));
+  ASSERT_EQ(CMP_COLOR_SPACE_SRGB, srgb_out.space);
+
+  ASSERT(fabs(srgb_in.r - srgb_out.r) < 0.01f);
+  ASSERT(fabs(srgb_in.g - srgb_out.g) < 0.01f);
+  ASSERT(fabs(srgb_in.b - srgb_out.b) < 0.01f);
+  ASSERT_EQ(srgb_in.a, srgb_out.a);
+
+  PASS();
+}
+
+TEST test_color_mix_oklch(void) {
+  cmp_color_t c1 = {1.0f, 0.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
+  cmp_color_t c2 = {0.0f, 0.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
+  cmp_color_t out;
+
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_color_mix(&c1, &c2, 0.5f, CMP_COLOR_SPACE_OKLCH, &out));
+  ASSERT_EQ(CMP_COLOR_SPACE_OKLCH, out.space);
+
+  PASS();
+}
+
+TEST test_color_luminance(void) {
+  cmp_color_t black = {0.0f, 0.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
+  cmp_color_t white = {1.0f, 1.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
+  float lum_black, lum_white;
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_color_luminance(&black, &lum_black));
+  ASSERT_EQ(CMP_SUCCESS, cmp_color_luminance(&white, &lum_white));
+
+  ASSERT(lum_black < 0.01f);
+  ASSERT(lum_white > 0.99f);
+
+  PASS();
+}
+
+TEST test_color_contrast(void) {
+  cmp_color_t black = {0.0f, 0.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
+  cmp_color_t white = {1.0f, 1.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB};
+  float ratio;
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_color_contrast_ratio(&white, &black, &ratio));
+  ASSERT(ratio > 20.9f); /* 21:1 is theoretical max */
+
+  PASS();
+}
 SUITE(visuals_suite) {
   RUN_TEST(test_semantic_colors);
   RUN_TEST(test_color_pipeline);
   RUN_TEST(test_null_args);
   RUN_TEST(test_golden_image_visual_regression);
+  RUN_TEST(test_color_srgb_to_oklch_and_back);
+  RUN_TEST(test_color_mix_oklch);
+  RUN_TEST(test_color_luminance);
+  RUN_TEST(test_color_contrast);
 }
 
 GREATEST_MAIN_DEFS();

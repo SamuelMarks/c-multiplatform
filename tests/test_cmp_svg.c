@@ -309,6 +309,78 @@ TEST test_svg_filter_evaluate(void) {
   PASS();
 }
 
+TEST test_cmp_svg_path_tessellate_ear_clipping(void) {
+  float data[] = {0, 0, 10, 0, 10, 10, 0, 10};
+  float *out = NULL;
+  size_t count = 0;
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_svg_path_tessellate_ear_clipping(NULL, 8, &out, &count));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_svg_path_tessellate_ear_clipping(data, 0, &out, &count));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_svg_path_tessellate_ear_clipping(data, 8, NULL, &count));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_svg_path_tessellate_ear_clipping(data, 8, &out, NULL));
+
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_svg_path_tessellate_ear_clipping(data, 8, &out, &count));
+  ASSERT_EQ(4, count);
+  ASSERT_NEQ(NULL, out);
+  CMP_FREE(out);
+  PASS();
+}
+
+TEST test_cmp_svg_renderer_bezier_subdivide(void) {
+  cmp_svg_renderer_t *r;
+  ASSERT_EQ(CMP_SUCCESS, cmp_svg_renderer_create(&r, 0.5f));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_svg_renderer_bezier_subdivide(NULL, 0, 0, 10, 0, 10, 10, 1.0f));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_svg_renderer_bezier_subdivide(r, 0, 0, 10, 0, 10, 10, 0.0f));
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_svg_renderer_bezier_subdivide(r, 0, 0, 10, 0, 10, 10, 0.5f));
+  cmp_svg_renderer_destroy(r);
+  PASS();
+}
+
+TEST test_cmp_svg_stroke_expand(void) {
+  float data[] = {0, 0, 10, 10};
+  float *out = NULL;
+  size_t count = 0;
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_svg_stroke_expand(NULL, 4, 1.0f, 0, 0, &out, &count));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_svg_stroke_expand(data, 4, 0.0f, 0, 0, &out, &count));
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_svg_stroke_expand(data, 4, 1.0f, 0, 0, &out, &count));
+  ASSERT_EQ(4, count);
+  ASSERT_NEQ(NULL, out);
+  CMP_FREE(out);
+  PASS();
+}
+
+TEST test_cmp_svg_fill_even_odd(void) {
+  float data[] = {0, 0};
+  cmp_command_buffer_t *cb = (cmp_command_buffer_t *)0x123;
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_svg_fill_even_odd(NULL, data, 2));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_svg_fill_even_odd(cb, NULL, 2));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_svg_fill_even_odd(cb, data, 0));
+  ASSERT_EQ(CMP_SUCCESS, cmp_svg_fill_even_odd(cb, data, 2));
+  PASS();
+}
+
+TEST test_cmp_svg_path_morph(void) {
+  float a[] = {0, 0};
+  float b[] = {10, 10};
+  float *out = NULL;
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_svg_path_morph(NULL, b, 2, 0.5f, &out));
+  ASSERT_EQ(CMP_SUCCESS, cmp_svg_path_morph(a, b, 2, 0.5f, &out));
+  ASSERT_NEQ(NULL, out);
+  ASSERT_EQ(5.0f, out[0]);
+  CMP_FREE(out);
+  PASS();
+}
+
 SUITE(cmp_svg_suite) {
   RUN_TEST(test_svg_viewbox);
   RUN_TEST(test_svg_path_tessellate);

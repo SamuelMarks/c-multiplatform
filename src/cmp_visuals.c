@@ -188,21 +188,86 @@ int cmp_color_contrast_ratio(const cmp_color_t *c1, const cmp_color_t *c2,
   return CMP_SUCCESS;
 }
 
+struct cmp_icc_profile {
+  unsigned char *data;
+  size_t size;
+  int is_wide_gamut;
+  float color_matrix[9];
+};
+
 int cmp_icc_profile_parse(const void *image_buffer, size_t size,
-                          void **out_profile_handle) {
-  if (!image_buffer || size == 0 || !out_profile_handle)
+                          cmp_icc_profile_t **out_profile) {
+  struct cmp_icc_profile *profile = NULL;
+  const unsigned char *buf = (const unsigned char *)image_buffer;
+  int found_icc = 0;
+  size_t i;
+
+  if (!image_buffer || size == 0 || !out_profile)
     return CMP_ERROR_INVALID_ARG;
-  /* Read ICC chunks logic placeholder */
-  *out_profile_handle = NULL;
+
+  /* Basic naive search for 'ICC_PROFILE' string in APP2 or iCCP chunk */
+  for (i = 0; i < size - 12; i++) {
+    if (memcmp(buf + i, "ICC_PROFILE", 11) == 0 || memcmp(buf + i, "iCCP", 4) == 0) {
+      found_icc = 1;
+      break;
+    }
+  }
+
+  if (CMP_MALLOC(sizeof(struct cmp_icc_profile), (void **)&profile) !=
+      CMP_SUCCESS)
+    return CMP_ERROR_OOM;
+
+  profile->data = NULL;
+  profile->size = 0;
+  profile->is_wide_gamut = 0;
+  
+  /* Identity matrix default */
+  profile->color_matrix[0] = 1.0f; profile->color_matrix[1] = 0.0f; profile->color_matrix[2] = 0.0f;
+  profile->color_matrix[3] = 0.0f; profile->color_matrix[4] = 1.0f; profile->color_matrix[5] = 0.0f;
+  profile->color_matrix[6] = 0.0f; profile->color_matrix[7] = 0.0f; profile->color_matrix[8] = 1.0f;
+
+  if (found_icc) {
+    /* If found, we mock a Display P3 or wide gamut profile detection based on heuristics */
+    /* Real implementation would parse the ICC tags (desc, wtpt, rXYZ, etc.) */
+    profile->is_wide_gamut = 1;
+    /* Mocked Display P3 to sRGB or similar matrix */
+    profile->color_matrix[0] = 1.2249f; profile->color_matrix[1] = -0.2247f; profile->color_matrix[2] = 0.0f;
+    profile->color_matrix[3] = -0.0420f; profile->color_matrix[4] = 1.0419f; profile->color_matrix[5] = 0.0f;
+    profile->color_matrix[6] = -0.0196f; profile->color_matrix[7] = -0.0786f; profile->color_matrix[8] = 1.0979f;
+  }
+
+  *out_profile = (cmp_icc_profile_t *)profile;
   return CMP_SUCCESS;
 }
-/* clang-format off */
-#include "cmp.h"
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <math.h>
-/* clang-format on */
+
+int cmp_icc_profile_destroy(cmp_icc_profile_t *profile) {
+  struct cmp_icc_profile *p = (struct cmp_icc_profile *)profile;
+  if (!p)
+    return CMP_ERROR_INVALID_ARG;
+  if (p->data)
+    CMP_FREE(p->data);
+  CMP_FREE(p);
+  return CMP_SUCCESS;
+}
+
+int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile, float *out_matrix3x3) {
+  const struct cmp_icc_profile *p = (const struct cmp_icc_profile *)profile;
+  int i;
+  if (!p || !out_matrix3x3)
+    return CMP_ERROR_INVALID_ARG;
+  for (i = 0; i < 9; i++) {
+    out_matrix3x3[i] = p->color_matrix[i];
+  }
+  return CMP_SUCCESS;
+}
+
+int cmp_icc_profile_is_wide_gamut(const cmp_icc_profile_t *profile, int *out_is_wide) {
+  const struct cmp_icc_profile *p = (const struct cmp_icc_profile *)profile;
+  if (!p || !out_is_wide)
+    return CMP_ERROR_INVALID_ARG;
+  *out_is_wide = p->is_wide_gamut;
+  return CMP_SUCCESS;
+}
 
 struct cmp_semantic_colors {
   uint32_t tint_color;
@@ -359,6 +424,53 @@ int cmp_color_pipeline_srgb_to_p3(cmp_color_pipeline_t *pipeline, float r,
   *out_p3_r = r * 0.95f;
   *out_p3_g = g * 0.95f;
   *out_p3_b = b * 0.95f;
+
+  return CMP_SUCCESS;
+}
+int cmp_color_srgb_to_oklch(const cmp_color_t *in_color,
+                            cmp_color_t *out_color) {
+  float lin_r, lin_g, lin_b;
+  float l, m, s;
+  float l_, m_, s_;
+  float l_ok, a_, b_;
+  float c, h;
+
+  if (!in_color || !out_color)
+    return CMP_ERROR_INVALID_ARG;
+
+  lin_r = in_color->r <= 0.04045f
+              ? in_color->r / 12.92f
+              : (float)pow((in_color->r + 0.055f) / 1.055f, 2.4f);
+  lin_g = in_color->g <= 0.04045f
+              ? in_color->g / 12.92f
+              : (float)pow((in_color->g + 0.055f) / 1.055f, 2.4f);
+  lin_b = in_color->b <= 0.04045f
+              ? in_color->b / 12.92f
+              : (float)pow((in_color->b + 0.055f) / 1.055f, 2.4f);
+
+  l = 0.4122214708f * lin_r + 0.5363325363f * lin_g + 0.0514459929f * lin_b;
+  m = 0.2119034982f * lin_r + 0.6806995451f * lin_g + 0.1073969566f * lin_b;
+  s = 0.0883024619f * lin_r + 0.2817188376f * lin_g + 0.6299787005f * lin_b;
+
+  l_ = (float)pow(l, 1.0f / 3.0f);
+  m_ = (float)pow(m, 1.0f / 3.0f);
+  s_ = (float)pow(s, 1.0f / 3.0f);
+
+  l_ok = 0.2104542553f * l_ + 0.7936177850f * m_ - 0.0040720468f * s_;
+  a_ = 1.9779984951f * l_ - 2.4285922050f * m_ + 0.4505937099f * s_;
+  b_ = 0.0259040371f * l_ + 0.7827717662f * m_ - 0.8086757660f * s_;
+
+  c = (float)sqrt(a_ * a_ + b_ * b_);
+  h = (float)atan2(b_, a_);
+  h = h * 180.0f / 3.14159265358979323846f;
+  if (h < 0.0f)
+    h += 360.0f;
+
+  out_color->r = l_ok;
+  out_color->g = c;
+  out_color->b = h;
+  out_color->a = in_color->a;
+  out_color->space = CMP_COLOR_SPACE_OKLCH;
 
   return CMP_SUCCESS;
 }

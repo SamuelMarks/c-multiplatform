@@ -422,7 +422,7 @@ int32_t cmp_fluent2_get_state_layer_opacity(const cmp_ui_node_t *node,
 
   /* Adjust state layer opacity based on Fluent 2 design language */
   if (opacity) {
-    if (state == 1) /* hover */
+    if (state == 1)     /* hover */
       *opacity = 0.06f; /* standard subtle hover in fluent */
     else
       *opacity = 0.0f;

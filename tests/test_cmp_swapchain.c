@@ -24,8 +24,11 @@ TEST test_swapchain_create_destroy(void) {
     ASSERT_EQ(CMP_ERROR_INVALID_ARG,
               cmp_swapchain_create(win, CMP_SWAPCHAIN_FIFO, &swapchain));
   }
-  if (win)
+  if (win) {
+    void *os_handle = cmp_swapchain_get_os_surface_handle(swapchain);
+    (void)os_handle;
     ASSERT_NEQ(NULL, swapchain);
+  }
 
   if (swapchain) {
     ASSERT_EQ(CMP_SUCCESS, cmp_swapchain_destroy(swapchain));
@@ -123,6 +126,27 @@ TEST test_swapchain_edge_cases(void) {
   }
   cmp_window_destroy(win);
   cmp_window_system_shutdown();
+  PASS();
+}
+
+TEST test_cmp_swapchain_set_msaa(void) {
+  cmp_swapchain_t *swapchain;
+  cmp_window_t *window;
+
+  cmp_window_config_t cfg;
+  memset(&cfg, 0, sizeof(cfg));
+  cfg.width = 800;
+  cfg.height = 600;
+  cfg.title = "Test";
+  cmp_window_create(&cfg, &window);
+  cmp_swapchain_create(window, CMP_SWAPCHAIN_FIFO, &swapchain);
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_swapchain_set_msaa(NULL, 4));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_swapchain_set_msaa(swapchain, 0));
+  ASSERT_EQ(CMP_SUCCESS, cmp_swapchain_set_msaa(swapchain, 4));
+
+  cmp_swapchain_destroy(swapchain);
+  cmp_window_destroy(window);
   PASS();
 }
 

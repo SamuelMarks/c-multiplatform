@@ -240,6 +240,9 @@ typedef struct catalog_state_t {
 } catalog_state_t;
 
 typedef catalog_state_t material_catalog_state_t;
+typedef catalog_state_t m3_catalog_state_t;
+
+extern m3_catalog_state_t *g_m3_state;
 
 /**
  * @brief Initializes the Material Catalog application state.

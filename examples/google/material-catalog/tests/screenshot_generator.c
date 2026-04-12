@@ -90,6 +90,8 @@ int main(void) {
 
       /* Give the layout engine a frame to render */
       cmp_window_render_test_frame(state.window);
+      cmp_window_poll_events(state.window);
+      cmp_window_render_test_frame(state.window);
 
       {
         int res = cmp_test_capture_snapshot(state.window, &pixels, &w, &h);

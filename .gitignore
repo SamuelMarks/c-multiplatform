@@ -1,4 +1,4 @@
-﻿temp_*
+temp_*
 vcpkg
 .gemini
 *.o
@@ -278,3 +278,8 @@ cscope.out
 *.vsproj
 *.vcxproj.user
 
+# Root level helper scripts and temporary append files
+/*.js
+/*.ps1
+/append_*.c
+/append_*.txt

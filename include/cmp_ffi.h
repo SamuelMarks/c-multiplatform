@@ -16,7 +16,7 @@ typedef unsigned char uint8_t;
 #include <stdint.h>
 #endif
 
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__CYGWIN__)
 #if defined(CMP_BUILD_SHARED)
 #define CMP_API __declspec(dllexport)
 #elif defined(CMP_USE_SHARED)
