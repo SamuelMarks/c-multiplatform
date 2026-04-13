@@ -113,11 +113,10 @@ TEST test_null_args(void) {
                                        NULL, 1.0f, 1.0f, 1.0f, &fr, &fg, &fb));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_pipeline_srgb_to_p3(
                                        pl, 1.0f, 1.0f, 1.0f, NULL, &fg, &fb));
-
-  cmp_color_t color_in = {0};
-  cmp_color_t color_out = {0};
-  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_srgb_to_oklch(NULL, &color_out));
-  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_srgb_to_oklch(&color_in, NULL));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_color_srgb_to_oklch(NULL, NULL /* color_out */));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_color_srgb_to_oklch(NULL /* color_in */, NULL));
   cmp_semantic_colors_destroy(sc);
   cmp_color_pipeline_destroy(pl);
 

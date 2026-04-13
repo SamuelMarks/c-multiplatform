@@ -98,4 +98,38 @@ int m3_adaptive_get_feed_layout(m3_window_size_class_t size_class, m3_feed_layou
 
     return 0;
 }
+
+int m3_adaptive_update_transition(m3_adaptive_transition_state_t* state, m3_window_size_class_t target_class, float dt) {
+    float transition_speed;
+    
+    if (!state) {
+        return -1;
+    }
+
+    transition_speed = 3.0f; /* Arbitrary speed for animation, ~333ms */
+
+    if (state->current_class != target_class) {
+        if (!state->is_animating) {
+            state->is_animating = 1;
+            state->previous_class = state->current_class;
+            state->progress = 0.0f;
+        } else if (state->previous_class == target_class) {
+            /* Reversed transition mid-way */
+            state->previous_class = state->current_class;
+            state->progress = 1.0f - state->progress;
+        }
+        state->current_class = target_class;
+    }
+
+    if (state->is_animating) {
+        state->progress += dt * transition_speed;
+        if (state->progress >= 1.0f) {
+            state->progress = 1.0f;
+            state->is_animating = 0;
+            state->previous_class = state->current_class;
+        }
+    }
+
+    return 0;
+}
 /* clang-format on */

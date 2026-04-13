@@ -75,32 +75,32 @@ Executing the defining microscopic details of modern design languages.
 ## Phase 7: Image Processing & Color Science
 Ensuring mathematically accurate color reproduction across different displays.
 
-- [?] **47. Linear sRGB Pipeline**: Guarantee texture sampling and alpha blending occur in linear color space, applying a final gamma-correction pass (sRGB OETF) to prevent "muddy" gradients.
-- [?] **48. Perceptual Color Spaces (OKLCH, LAB)**: Implement internal color math in OKLCH to allow for perceptually uniform color tweening and dynamic Material 3 tonal palette generation.
-- [?] **49. ICC Profile Parsing**: Read embedded color profiles from JPEG/PNG assets and dynamically construct 3D LUTs (Look-Up Tables) or shader matrices to color-match the target monitor's gamut.
-- [?] **50. Wide Color Gamut (Display P3)**: Output directly to Display P3 swapchains on compatible Apple and HDR displays, expanding the maximum visible saturation.
-- [?] **51. Hardware Video Decoding (NV12 -> RGB)**: Support zero-copy mapping of hardware video decoding buffers (e.g., VAAPI, DXVA, VideoToolbox) directly to GPU textures, using a YUV/NV12-to-RGB conversion shader.
-- [?] **52. High-Quality Image Downsampling (Mipmaps)**: Automatically generate anisotropic filtering mipmaps for loaded images to prevent moiré patterns when scaled down within the UI.
+- [✓] **47. Linear sRGB Pipeline**: Guarantee texture sampling and alpha blending occur in linear color space, applying a final gamma-correction pass (sRGB OETF) to prevent "muddy" gradients.
+- [✓] **48. Perceptual Color Spaces (OKLCH, LAB)**: Implement internal color math in OKLCH to allow for perceptually uniform color tweening and dynamic Material 3 tonal palette generation.
+- [✓] **49. ICC Profile Parsing**: Read embedded color profiles from JPEG/PNG assets and dynamically construct 3D LUTs (Look-Up Tables) or shader matrices to color-match the target monitor's gamut.
+- [✓] **50. Wide Color Gamut (Display P3)**: Output directly to Display P3 swapchains on compatible Apple and HDR displays, expanding the maximum visible saturation.
+- [✓] **51. Hardware Video Decoding (NV12 -> RGB)**: Support zero-copy mapping of hardware video decoding buffers (e.g., VAAPI, DXVA, VideoToolbox) directly to GPU textures, using a YUV/NV12-to-RGB conversion shader.
+- [✓] **52. High-Quality Image Downsampling (Mipmaps)**: Automatically generate anisotropic filtering mipmaps for loaded images to prevent moiré patterns when scaled down within the UI.
 
 ## Phase 8: Decoupled Compositor & Kinematics
 Animations must bypass the CPU Layout phase entirely to prevent UI jank.
 
-- [?] **53. Asynchronous Compositor Thread**: Decouple the renderer from the layout engine. The compositor thread operates at exactly 120hz, taking immutable snapshots of the UI Layer Tree.
-- [?] **54. Hardware-Accelerated Scrolling (`cmp_scroll_ctx_t`)**: Scrolling a `ListView` updates a `scroll_offset` uniform matrix in the compositor. The CPU does not recalculate layout or vertices during a scroll.
-- [?] **55. Asynchronous Pan/Zoom (APZ)**: Handle multi-touch pinch-to-zoom purely on the compositor thread via affine transformation matrices before the main thread receives the gesture.
-- [?] **56. Spring Physics Overscroll (Rubber-banding)**: Execute damped harmonic oscillator formulas directly inside the compositor loop to calculate elastic bounce-back effects independently of main thread lag.
-- [?] **57. CSS 3D Transforms (`perspective`, `rotateX`)**: Apply true 4x4 matrix mathematics in the vertex shader, projecting UI elements into a 3D frustum.
-- [?] **58. Backface Visibility Culling**: Implement `backface-visibility: hidden` natively via GPU backface culling (`glCullFace`) during card-flip transitions.
-- [?] **59. Compositor-Only Transitions (`cmp_transition_t`)**: Morph opacity, translation, and scale properties in real-time on the GPU via uniform interpolation.
-- [?] **60. Sub-frame VSync Delta (`cmp_dt_t`)**: Query exact OS display link hardware timings to synchronize animation frame progressions to the literal nanosecond of the monitor refresh.
+- [✓] **53. Asynchronous Compositor Thread**: Decouple the renderer from the layout engine. The compositor thread operates at exactly 120hz, taking immutable snapshots of the UI Layer Tree.
+- [✓] **54. Hardware-Accelerated Scrolling (`cmp_scroll_ctx_t`)**: Scrolling a `ListView` updates a `scroll_offset` uniform matrix in the compositor. The CPU does not recalculate layout or vertices during a scroll.
+- [✓] **55. Asynchronous Pan/Zoom (APZ)**: Handle multi-touch pinch-to-zoom purely on the compositor thread via affine transformation matrices before the main thread receives the gesture.
+- [✓] **56. Spring Physics Overscroll (Rubber-banding)**: Execute damped harmonic oscillator formulas directly inside the compositor loop to calculate elastic bounce-back effects independently of main thread lag.
+- [✓] **57. CSS 3D Transforms (`perspective`, `rotateX`)**: Apply true 4x4 matrix mathematics in the vertex shader, projecting UI elements into a 3D frustum.
+- [✓] **58. Backface Visibility Culling**: Implement `backface-visibility: hidden` natively via GPU backface culling (`glCullFace`) during card-flip transitions.
+- [✓] **59. Compositor-Only Transitions (`cmp_transition_t`)**: Morph opacity, translation, and scale properties in real-time on the GPU via uniform interpolation.
+- [✓] **60. Sub-frame VSync Delta (`cmp_dt_t`)**: Query exact OS display link hardware timings to synchronize animation frame progressions to the literal nanosecond of the monitor refresh.
 
 ## Phase 9: Design System Specific Advanced Visuals
 Executing the defining microscopic details of modern design languages.
 
-- [?] **61. Fluent 2: Reveal Highlight**: Pass mouse coordinates to button fragment shaders to render proximity-based volumetric radial lighting over borders and backgrounds.
-- [?] **62. Fluent 2: Acrylic Noise Maps**: Multiply a static, high-frequency monochrome noise texture over backdrop-filtered surfaces to break up banding and replicate the "Acrylic" material.
-- [?] **63. Cupertino: True Vibrancy**: Combine `backdrop-filter` with intense saturation boosts and `color-dodge` blend modes to replicate exact iOS/macOS translucent visual hierarchies.
-- [?] **64. Material 3: Advanced Ink Ripples**: Calculate radial expanding ripple origins on the GPU. Apply eased opacity curves and noise-based distortion to replicate physical ink spreading.
-- [?] **65. View Morphing (Shared Element Transitions)**: Capture the rendered texture of an outgoing view, capture the incoming view, and execute a cross-faded affine warp in the compositor to seamlessly merge states (e.g., Image Thumbnail -> Fullscreen Hero).
-- [?] **66. Lottie/Rive Native Playback**: Map complex vector animation formats directly to the new GPU Tessellation pipeline, allowing fully hardware-accelerated icon micro-interactions (e.g., a heart icon filling up).
+- [✓] **61. Fluent 2: Reveal Highlight**: Pass mouse coordinates to button fragment shaders to render proximity-based volumetric radial lighting over borders and backgrounds.
+- [✓] **62. Fluent 2: Acrylic Noise Maps**: Multiply a static, high-frequency monochrome noise texture over backdrop-filtered surfaces to break up banding and replicate the "Acrylic" material.
+- [✓] **63. Cupertino: True Vibrancy**: Combine `backdrop-filter` with intense saturation boosts and `color-dodge` blend modes to replicate exact iOS/macOS translucent visual hierarchies.
+- [✓] **64. Material 3: Advanced Ink Ripples**: Calculate radial expanding ripple origins on the GPU. Apply eased opacity curves and noise-based distortion to replicate physical ink spreading.
+- [✓] **65. View Morphing (Shared Element Transitions)**: Capture the rendered texture of an outgoing view, capture the incoming view, and execute a cross-faded affine warp in the compositor to seamlessly merge states (e.g., Image Thumbnail -> Fullscreen Hero).
+- [✓] **66. Lottie/Rive Native Playback**: Map complex vector animation formats directly to the new GPU Tessellation pipeline, allowing fully hardware-accelerated icon micro-interactions (e.g., a heart icon filling up).
 

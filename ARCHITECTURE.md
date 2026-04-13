@@ -14,9 +14,9 @@ All memory allocations in LibCMPC are routed through custom allocators to ensure
 
 ## Modality Engine (`cmp_modality_t`)
 The core innovation of LibCMPC is its modality-agnostic event loop.
-- **`CMP_MODALITY_SINGLE`**: A traditional blocking/polling loop suitable for simple games or legacy targets.   
-- **`CMP_MODALITY_THREADED`**: Spawns a worker pool, safely dispatching tasks and UI events across threads using the lock-free `cmp_ring_buffer_t`.
-- **`CMP_MODALITY_ASYNC`**: Integrates with OS-native asynchronous APIs (epoll/kqueue/IOCP).
+- **`CMP_MODALITY_SYNC_SINGLE`**: A traditional blocking/polling loop suitable for simple games or legacy targets.   
+- **`CMP_MODALITY_SYNC_MULTI`**: Spawns a worker pool, safely dispatching tasks and UI events across threads using the lock-free `cmp_ring_buffer_t`.
+- **`CMP_MODALITY_ASYNC_SINGLE`**: Integrates with OS-native asynchronous APIs (epoll/kqueue/IOCP).
 
 ## Ecosystem Integrations
 Instead of reinventing the wheel, LibCMPC deeply embeds specialized C libraries:

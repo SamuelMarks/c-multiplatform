@@ -43,6 +43,18 @@ int m3_button_create(material_catalog_state_t* state, const m3_button_config_t* 
     btn->layout->padding[3] = dp_to_px(state, 24.0f); /* Left */
     btn->layout->padding[1] = dp_to_px(state, 24.0f); /* Right */
 
+    /* Leading icon */
+    if (config->leading_icon) {
+        cmp_ui_node_t* icon_node;
+        if (cmp_ui_image_view_create(&icon_node, config->leading_icon) == 0) {
+            icon_node->layout->width = dp_to_px(state, 18.0f);
+            icon_node->layout->height = dp_to_px(state, 18.0f);
+            icon_node->layout->margin[1] = dp_to_px(state, 8.0f); /* Right margin */
+            cmp_ui_node_add_child(btn, icon_node);
+        }
+        btn->layout->padding[3] = dp_to_px(state, 16.0f); /* Reduce left padding when leading icon is present */
+    }
+
     /* Text */
     if (config->label) {
         cmp_ui_node_t* text_node;
@@ -50,6 +62,18 @@ int m3_button_create(material_catalog_state_t* state, const m3_button_config_t* 
         if (cmp_ui_text_create(&text_node, config->label, len) == 0) {
             cmp_ui_node_add_child(btn, text_node);
         }
+    }
+
+    /* Trailing icon */
+    if (config->trailing_icon) {
+        cmp_ui_node_t* icon_node;
+        if (cmp_ui_image_view_create(&icon_node, config->trailing_icon) == 0) {
+            icon_node->layout->width = dp_to_px(state, 18.0f);
+            icon_node->layout->height = dp_to_px(state, 18.0f);
+            icon_node->layout->margin[3] = dp_to_px(state, 8.0f); /* Left margin */
+            cmp_ui_node_add_child(btn, icon_node);
+        }
+        btn->layout->padding[1] = dp_to_px(state, 16.0f); /* Reduce right padding when trailing icon is present */
     }
 
     /* Colors and border */

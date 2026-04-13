@@ -1,0 +1,93 @@
+/* clang-format off */
+#include "cmp_ui_switch.h"
+#include <stdlib.h>
+#include <string.h>
+/* clang-format on */
+
+struct cmp_ui_switch {
+  cmp_ui_node_t *node_root;
+  cmp_ui_node_t *node_thumb;
+  int is_on;
+};
+
+int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
+  cmp_ui_switch_t *sw;
+  int err;
+
+  if (!out_switch) {
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  err = CMP_MALLOC(sizeof(cmp_ui_switch_t), (void **)&sw);
+  if (err != CMP_SUCCESS) {
+    return err;
+  }
+  memset(sw, 0, sizeof(cmp_ui_switch_t));
+
+  /* Create the track background */
+  err = cmp_ui_box_create(&sw->node_root);
+  if (err != CMP_SUCCESS) {
+    CMP_FREE(sw);
+    return err;
+  }
+
+  /* Create the thumb */
+  err = cmp_ui_box_create(&sw->node_thumb);
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(sw->node_root);
+    CMP_FREE(sw);
+    return err;
+  }
+
+  sw->is_on = 0; /* Default OFF */
+
+  sw->node_root->layout->direction = CMP_FLEX_ROW;
+  sw->node_root->bg_color = 0xFFCCCCCC;  /* Track off color */
+  sw->node_thumb->bg_color = 0xFFFFFFFF; /* Thumb color */
+
+  cmp_ui_node_add_child(sw->node_root, sw->node_thumb);
+
+  *out_switch = sw;
+  return CMP_SUCCESS;
+}
+
+int cmp_ui_switch_destroy(cmp_ui_switch_t *sw) {
+  if (!sw) {
+    return CMP_ERROR_INVALID_ARG;
+  }
+  CMP_FREE(sw);
+  return CMP_SUCCESS;
+}
+
+int cmp_ui_switch_get_node(cmp_ui_switch_t *sw, cmp_ui_node_t **out_node) {
+  if (!sw || !out_node) {
+    return CMP_ERROR_INVALID_ARG;
+  }
+  *out_node = sw->node_root;
+  return CMP_SUCCESS;
+}
+
+int cmp_ui_switch_set_on(cmp_ui_switch_t *sw, int is_on) {
+  if (!sw) {
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  sw->is_on = is_on;
+  /* Visual changes would be handled by updating layout padding /
+   * justify_content to push the thumb, and altering track background colors */
+  if (is_on) {
+    sw->node_root->bg_color = 0xFF2196F3; /* Active track color */
+  } else {
+    sw->node_root->bg_color = 0xFFCCCCCC; /* Inactive track color */
+  }
+
+  return CMP_SUCCESS;
+}
+int cmp_ui_switch_bind_a11y(cmp_ui_switch_t *widget, cmp_a11y_tree_t *tree) {
+  if (!widget || !tree) {
+    return CMP_ERROR_INVALID_ARG;
+  }
+  cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "switch",
+                         "Switch");
+  return CMP_SUCCESS;
+}

@@ -431,11 +431,49 @@ static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
   }
 }
 
+static void translate_descendants(cmp_layout_node_t *node, float dx) {
+  size_t i;
+  if (!node) return;
+  for (i = 0; i < node->child_count; i++) {
+    node->children[i]->computed_rect.x += dx;
+    translate_descendants(node->children[i], dx);
+  }
+}
+
+static void apply_rtl_mirroring(cmp_layout_node_t *node) {
+  size_t i;
+  if (!node) return;
+
+  if (node->direction == CMP_FLEX_ROW) {
+    for (i = 0; i < node->child_count; i++) {
+      cmp_layout_node_t *child = node->children[i];
+      if (child->position_type != CMP_POSITION_ABSOLUTE) {
+        float local_x = child->computed_rect.x - node->computed_rect.x;
+        float new_x = node->computed_rect.x + node->computed_rect.width - local_x - child->computed_rect.width;
+        float dx = new_x - child->computed_rect.x;
+        if (dx != 0.0f) {
+          child->computed_rect.x = new_x;
+          translate_descendants(child, dx);
+        }
+      }
+    }
+  }
+
+  for (i = 0; i < node->child_count; i++) {
+    apply_rtl_mirroring(node->children[i]);
+  }
+}
+
 int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
                          float available_height) {
   if (root == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
   calculate_node_pass(root, 0.0f, 0.0f, available_width, available_height);
+
+  if (cmp_i18n_get_bidi_direction() == CMP_TEXT_DIR_RTL) {
+    apply_rtl_mirroring(root);
+  }
+
   return CMP_SUCCESS;
 }

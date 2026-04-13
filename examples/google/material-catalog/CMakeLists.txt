@@ -57,6 +57,7 @@ add_executable(material_catalog
     src/m3_ripple.c
     src/m3_a11y.c
     src/m3_i18n.c
+    src/m3_theme_studio.c
 )
 
 target_include_directories(material_catalog PRIVATE include)
@@ -89,6 +90,7 @@ add_executable(test_material_catalog
     src/m3_ripple.c
     src/m3_a11y.c
     src/m3_i18n.c
+    src/m3_theme_studio.c
 )
 target_include_directories(test_material_catalog PRIVATE include)
 target_link_libraries(test_material_catalog PRIVATE cmp cfs c-abstract-http c-orm c_cdd greatest)
@@ -113,6 +115,7 @@ add_executable(screenshot_generator
     src/m3_ripple.c
     src/m3_a11y.c
     src/m3_i18n.c
+    src/m3_theme_studio.c
 )
 target_include_directories(screenshot_generator PRIVATE include)
 target_link_libraries(screenshot_generator PRIVATE cmp cfs c-abstract-http c-orm c_cdd)

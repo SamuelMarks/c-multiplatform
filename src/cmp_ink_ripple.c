@@ -41,7 +41,8 @@ int cmp_ink_ripple_update(cmp_ink_ripple_t *ripple, float dt_ms) {
   return CMP_SUCCESS;
 }
 
-int cmp_ink_ripple_trigger(cmp_ink_ripple_t *ripple, float start_x, float start_y) {
+int cmp_ink_ripple_trigger(cmp_ink_ripple_t *ripple, float start_x,
+                           float start_y) {
   struct cmp_ink_ripple *ctx = (struct cmp_ink_ripple *)ripple;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;

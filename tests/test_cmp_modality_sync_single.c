@@ -25,9 +25,9 @@ TEST test_modality_single_lifecycle(void) {
   ctx.count = 0;
   ctx.mod = &mod;
 
-  res = cmp_modality_single_init(&mod);
+  res = cmp_modality_sync_single_init(&mod);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
-  ASSERT(mod.type == CMP_MODALITY_SINGLE);
+  ASSERT(mod.type == CMP_MODALITY_SYNC_SINGLE);
 
   /* Queue 5 tasks */
   for (i = 0; i < 5; i++) {

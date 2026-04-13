@@ -196,7 +196,7 @@ struct cmp_icc_profile {
 };
 
 int cmp_icc_profile_parse(const void *image_buffer, size_t size,
-                          cmp_icc_profile_t **out_profile) {
+                          void **out_profile) {
   struct cmp_icc_profile *profile = NULL;
   const unsigned char *buf = (const unsigned char *)image_buffer;
   int found_icc = 0;
@@ -206,8 +206,9 @@ int cmp_icc_profile_parse(const void *image_buffer, size_t size,
     return CMP_ERROR_INVALID_ARG;
 
   /* Basic naive search for 'ICC_PROFILE' string in APP2 or iCCP chunk */
-  for (i = 0; i < size - 12; i++) {
-    if (memcmp(buf + i, "ICC_PROFILE", 11) == 0 || memcmp(buf + i, "iCCP", 4) == 0) {
+  for (i = 0; i + 11 <= size; i++) {
+    if (memcmp(buf + i, "ICC_PROFILE", 11) == 0 ||
+        memcmp(buf + i, "iCCP", 4) == 0) {
       found_icc = 1;
       break;
     }
@@ -220,20 +221,33 @@ int cmp_icc_profile_parse(const void *image_buffer, size_t size,
   profile->data = NULL;
   profile->size = 0;
   profile->is_wide_gamut = 0;
-  
+
   /* Identity matrix default */
-  profile->color_matrix[0] = 1.0f; profile->color_matrix[1] = 0.0f; profile->color_matrix[2] = 0.0f;
-  profile->color_matrix[3] = 0.0f; profile->color_matrix[4] = 1.0f; profile->color_matrix[5] = 0.0f;
-  profile->color_matrix[6] = 0.0f; profile->color_matrix[7] = 0.0f; profile->color_matrix[8] = 1.0f;
+  profile->color_matrix[0] = 1.0f;
+  profile->color_matrix[1] = 0.0f;
+  profile->color_matrix[2] = 0.0f;
+  profile->color_matrix[3] = 0.0f;
+  profile->color_matrix[4] = 1.0f;
+  profile->color_matrix[5] = 0.0f;
+  profile->color_matrix[6] = 0.0f;
+  profile->color_matrix[7] = 0.0f;
+  profile->color_matrix[8] = 1.0f;
 
   if (found_icc) {
-    /* If found, we mock a Display P3 or wide gamut profile detection based on heuristics */
+    /* If found, we mock a Display P3 or wide gamut profile detection based on
+     * heuristics */
     /* Real implementation would parse the ICC tags (desc, wtpt, rXYZ, etc.) */
     profile->is_wide_gamut = 1;
     /* Mocked Display P3 to sRGB or similar matrix */
-    profile->color_matrix[0] = 1.2249f; profile->color_matrix[1] = -0.2247f; profile->color_matrix[2] = 0.0f;
-    profile->color_matrix[3] = -0.0420f; profile->color_matrix[4] = 1.0419f; profile->color_matrix[5] = 0.0f;
-    profile->color_matrix[6] = -0.0196f; profile->color_matrix[7] = -0.0786f; profile->color_matrix[8] = 1.0979f;
+    profile->color_matrix[0] = 1.2249f;
+    profile->color_matrix[1] = -0.2247f;
+    profile->color_matrix[2] = 0.0f;
+    profile->color_matrix[3] = -0.0420f;
+    profile->color_matrix[4] = 1.0419f;
+    profile->color_matrix[5] = 0.0f;
+    profile->color_matrix[6] = -0.0196f;
+    profile->color_matrix[7] = -0.0786f;
+    profile->color_matrix[8] = 1.0979f;
   }
 
   *out_profile = (cmp_icc_profile_t *)profile;
@@ -250,7 +264,8 @@ int cmp_icc_profile_destroy(cmp_icc_profile_t *profile) {
   return CMP_SUCCESS;
 }
 
-int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile, float *out_matrix3x3) {
+int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile,
+                               float *out_matrix3x3) {
   const struct cmp_icc_profile *p = (const struct cmp_icc_profile *)profile;
   int i;
   if (!p || !out_matrix3x3)
@@ -261,7 +276,8 @@ int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile, float *out_matr
   return CMP_SUCCESS;
 }
 
-int cmp_icc_profile_is_wide_gamut(const cmp_icc_profile_t *profile, int *out_is_wide) {
+int cmp_icc_profile_is_wide_gamut(const cmp_icc_profile_t *profile,
+                                  int *out_is_wide) {
   const struct cmp_icc_profile *p = (const struct cmp_icc_profile *)profile;
   if (!p || !out_is_wide)
     return CMP_ERROR_INVALID_ARG;

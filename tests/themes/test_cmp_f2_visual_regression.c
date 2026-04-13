@@ -4,6 +4,7 @@
 #include "greatest.h"
 #include "themes/cmp_f2_button.h"
 #include "themes/cmp_f2_theme.h"
+#include "../test_visual_regression_utils.h"
 /* clang-format on */
 
 TEST test_f2_visual_golden_baseline(void) {
@@ -50,13 +51,12 @@ TEST test_f2_visual_golden_baseline(void) {
   /* Capture framebuffer */
   res = cmp_test_capture_snapshot(win, &pixels, &width, &height);
   if (res == CMP_SUCCESS && pixels != NULL) {
-    /* We successfully captured the pixel buffer!
-       A real pixel-diff algorithm would compare 'pixels' against a stored PNG.
-       For the framework test, we assert the buffer exists and dimensions match.
-     */
     ASSERT(width > 0);
     ASSERT(height > 0);
+    res = cmp_test_compare_golden("f2_golden_button.bmp",
+                                  (const unsigned char *)pixels, width, height);
     CMP_FREE(pixels);
+    ASSERT_EQ(0, res);
   }
   cmp_window_destroy(win);
   cmp_window_system_shutdown();

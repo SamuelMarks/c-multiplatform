@@ -50,7 +50,7 @@ LibCMPC does not assume the host OS threading model.
 - **Implementation**:
   - When writing asynchronous features (like network or disk I/O), dispatch work to the active `cmp_modality_t` instance using `cmp_modality_queue_task`.
   - Use `cmp_ring_buffer_t` for thread-safe cross-thread messaging without Mutex locking.
-  - Utilize `cmp_tls.c` for Thread-Local Storage when managing context in `CMP_MODALITY_THREADED` mode.
+  - Utilize `cmp_tls.c` for Thread-Local Storage when managing context in `CMP_MODALITY_SYNC_MULTI` mode.
 
 ## Skill 6: Using the Amalgamated API (`cmp.h`)
 To maintain context-window scalability, the entire public API is consolidated.

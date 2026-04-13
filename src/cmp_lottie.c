@@ -10,7 +10,8 @@ struct cmp_lottie {
   float total_duration_ms;
 };
 
-int cmp_lottie_create(const char *json_buffer, size_t size, cmp_lottie_t **out_lottie) {
+int cmp_lottie_create(const char *json_buffer, size_t size,
+                      cmp_lottie_t **out_lottie) {
   struct cmp_lottie *ctx;
   if (!json_buffer || size == 0 || !out_lottie)
     return CMP_ERROR_INVALID_ARG;

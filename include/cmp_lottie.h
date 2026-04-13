@@ -2,6 +2,8 @@
 #ifndef CMP_LOTTIE_H
 #define CMP_LOTTIE_H
 
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

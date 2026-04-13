@@ -31,7 +31,8 @@ int cmp_apz_destroy(cmp_apz_t *apz) {
   return CMP_SUCCESS;
 }
 
-int cmp_apz_inject_gesture(cmp_apz_t *apz, float delta_x, float delta_y, float scale) {
+int cmp_apz_inject_gesture(cmp_apz_t *apz, float delta_x, float delta_y,
+                           float scale) {
   struct cmp_apz *ctx = (struct cmp_apz *)apz;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;

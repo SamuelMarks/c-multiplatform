@@ -720,6 +720,15 @@ int material_catalog_render_more_menu(material_catalog_state_t *state,
   return MATERIAL_CATALOG_SUCCESS;
 }
 
+static void palette_btn_clicked(cmp_event_t *evt, cmp_ui_node_t *node,
+                                void *user_data) {
+  (void)node;
+  if (evt->action == CMP_ACTION_UP) {
+    material_catalog_state_t *state = (material_catalog_state_t *)user_data;
+    material_catalog_navigate_to(state, CATALOG_SCREEN_THEME_STUDIO, 0, 0);
+  }
+}
+
 int material_catalog_render_top_app_bar(material_catalog_state_t *state,
                                         cmp_ui_node_t *container,
                                         const char *title,
@@ -819,6 +828,8 @@ int material_catalog_render_top_app_bar(material_catalog_state_t *state,
       palette_btn->layout->height = btn_metrics.target_size;
       palette_btn->text_color =
           catalog_color_to_uint32(&state->sys_colors.on_surface);
+      cmp_ui_node_add_event_listener(palette_btn, 1, 0, palette_btn_clicked,
+                                     state);
       material_catalog_apply_ripple(state, palette_btn);
       cmp_ui_node_add_child(app_bar, palette_btn);
     }
@@ -2960,6 +2971,8 @@ int material_catalog_recompose_ui(material_catalog_state_t *state) {
     } else if (current_route->screen_id == CATALOG_SCREEN_EXAMPLE_VIEWER) {
       render_example_viewer(state, content_area, current_route->component_id,
                             current_route->example_index);
+    } else if (current_route->screen_id == CATALOG_SCREEN_THEME_STUDIO) {
+      material_catalog_render_theme_studio(state, content_area);
     }
   }
 

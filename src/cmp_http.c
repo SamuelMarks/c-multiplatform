@@ -35,14 +35,14 @@ int cmp_http_client_create(cmp_modality_t *mod,
 
   /* Map cmp_modality_t to enum ExecutionModality */
   switch (mod->type) {
-  case CMP_MODALITY_SINGLE:
+  case CMP_MODALITY_SYNC_SINGLE:
     http_mod = MODALITY_SYNC;
     break;
-  case CMP_MODALITY_THREADED:
+  case CMP_MODALITY_SYNC_MULTI:
     http_mod = MODALITY_THREAD_POOL;
     break;
-  case CMP_MODALITY_ASYNC:
-  case CMP_MODALITY_EVENTLOOP:
+  case CMP_MODALITY_ASYNC_SINGLE:
+  case CMP_MODALITY_ASYNC_MULTI:
     http_mod = MODALITY_ASYNC;
     break;
   default:
@@ -404,7 +404,7 @@ int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (mod->type == CMP_MODALITY_ASYNC || mod->type == CMP_MODALITY_EVENTLOOP) {
+  if (mod->type == CMP_MODALITY_ASYNC_SINGLE || mod->type == CMP_MODALITY_ASYNC_MULTI) {
     if (c_abstract_http_ws_async_register(client, req, on_msg, on_err, on_close,
                                           user_data) != 0) {
       return CMP_ERROR_INVALID_ARG;
@@ -499,7 +499,7 @@ int cmp_http_sse_run(cmp_modality_t *mod, struct HttpClient *client,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (mod->type == CMP_MODALITY_ASYNC || mod->type == CMP_MODALITY_EVENTLOOP) {
+  if (mod->type == CMP_MODALITY_ASYNC_SINGLE || mod->type == CMP_MODALITY_ASYNC_MULTI) {
     if (c_abstract_http_sse_async_register(client, req, on_evt, on_err,
                                            on_close, user_data) != 0) {
       return CMP_ERROR_INVALID_ARG;

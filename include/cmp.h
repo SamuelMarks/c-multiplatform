@@ -26,7 +26,6 @@ int cmp_freetype_glyph_rasterize(const char *font_file_path, int glyph_index,
                                  struct cmp_texture **out_glyph_texture,
                                  cmp_glyph_metrics_t *out_metrics);
 
-
 /* Phase 12.1: C-Framework Bridging & Interoperability -> ABI Stability &
  * Interfaces */
 
@@ -437,13 +436,39 @@ int cmp_ring_buffer_destroy(cmp_ring_buffer_t *rb);
 /**
  * @brief Modality execution paradigms
  */
-typedef enum {
-  CMP_MODALITY_SINGLE = 0,   /**< Single-threaded blocking/polling loop */
-  CMP_MODALITY_THREADED = 1, /**< Multi-threaded worker pool */
-  CMP_MODALITY_ASYNC = 2,    /**< Asynchronous event loop (epoll/IOCP) */
-  CMP_MODALITY_EVENTLOOP =
-      3 /**< External event loop integration (Node.js/Qt) */
-} cmp_modality_type_t;
+typedef enum CmpModality cmp_modality_type_t;
+
+typedef struct CmpAppConfig cmp_app_config_t;
+
+int cmp_app_init(cmp_app_config_t *config);
+
+typedef void (*cmp_run_loop_fn)(void *);
+
+typedef struct CddMessage cmp_msg_t;
+typedef struct CddMessageBus cmp_msg_bus_t;
+typedef struct CddActor cmp_actor_t;
+
+/**
+ * @brief Subscribe to a message channel.
+ */
+int cmp_msg_subscribe(cmp_msg_bus_t *bus, const char *channel, void *callback);
+
+/**
+ * @brief Publish a message to a channel.
+ */
+int cmp_msg_publish(cmp_msg_bus_t *bus, const char *channel,
+                    const cmp_msg_t *msg);
+
+/**
+ * @brief Spawn an Actor.
+ */
+int cmp_actor_spawn(cmp_msg_bus_t *bus, const char *name, void *handler,
+                    void *state, cmp_actor_t **actor);
+
+/**
+ * @brief Restart an actor on failure (Supervision).
+ */
+int cmp_actor_supervise(cmp_actor_t *actor);
 
 /**
  * @brief Represents the core context for an executing modality
@@ -474,21 +499,27 @@ typedef pthread_t cmp_thread_t;
  * @param mod Pointer to modality struct
  * @return 0 on success, or an error code.
  */
-int cmp_modality_async_init(cmp_modality_t *mod);
+int cmp_modality_async_single_init(cmp_modality_t *mod);
 
 /**
  * @brief Initialize an eventloop integration modality (Node.js/Qt)
  * @param mod Pointer to modality struct
  * @return 0 on success, or an error code.
  */
-int cmp_modality_eventloop_init(cmp_modality_t *mod);
+int cmp_modality_async_multi_init(cmp_modality_t *mod);
+
+int cmp_modality_greenthreads_init(cmp_modality_t *mod);
+int cmp_modality_multiprocess_init(cmp_modality_t *mod);
+
+typedef struct CddProcess cmp_process_t;
+int cmp_process_spawn(cmp_process_t **proc);
 
 /**
  * @brief Initialize a single-threaded polling modality
  * @param mod Pointer to modality struct
  * @return 0 on success, or an error code.
  */
-int cmp_modality_single_init(cmp_modality_t *mod);
+int cmp_modality_sync_single_init(cmp_modality_t *mod);
 
 /**
  * @brief Initialize a multi-threaded worker pool modality
@@ -496,7 +527,7 @@ int cmp_modality_single_init(cmp_modality_t *mod);
  * @param num_workers Number of background worker threads to spawn
  * @return 0 on success, or an error code.
  */
-int cmp_modality_threaded_init(cmp_modality_t *mod, int num_workers);
+int cmp_modality_sync_multi_init(cmp_modality_t *mod, int num_workers);
 
 /**
  * @brief Queue a task into the modality execution loop
@@ -574,6 +605,41 @@ int cmp_mutex_unlock(cmp_mutex_t *mutex);
  * @return 0 on success, or an error code.
  */
 int cmp_mutex_destroy(cmp_mutex_t *mutex);
+
+/**
+ * @brief Atomic Operations Abstraction
+ */
+#if defined(_MSC_VER) && !defined(__clang__)
+#include <intrin.h>
+#pragma intrinsic(_InterlockedIncrement)
+#pragma intrinsic(_InterlockedDecrement)
+#pragma intrinsic(_InterlockedExchangeAdd)
+#endif
+
+typedef struct cmp_atomic_int {
+#if defined(_MSC_VER) && !defined(__clang__)
+  volatile long val;
+#else
+  volatile int val;
+#endif
+} cmp_atomic_int_t;
+
+static int cmp_atomic_add(cmp_atomic_int_t *obj, int amount) {
+#if defined(_MSC_VER) && !defined(__clang__)
+  return (int)_InterlockedExchangeAdd(&obj->val, amount);
+#else
+  return __atomic_fetch_add(&obj->val, amount, __ATOMIC_SEQ_CST);
+#endif
+}
+
+static int cmp_atomic_load(cmp_atomic_int_t *obj) {
+#if defined(_MSC_VER) && !defined(__clang__)
+  long res = _InterlockedExchangeAdd(&obj->val, 0);
+  return (int)res;
+#else
+  return __atomic_load_n(&obj->val, __ATOMIC_SEQ_CST);
+#endif
+}
 
 /**
  * @brief Initialize a cross-platform Semaphore
@@ -967,8 +1033,8 @@ int cmp_http_ws_init(struct HttpRequest *req,
 
 /**
  * @brief Read WebSocket events synchronously or queue to modality.
- * @param mod The modality to execute on (if CMP_MODALITY_ASYNC, it registers
- * it).
+ * @param mod The modality to execute on (if CMP_MODALITY_ASYNC_SINGLE, it
+ * registers it).
  * @param client The HTTP client.
  * @param req The HTTP request.
  * @param on_msg Message callback.
@@ -3682,6 +3748,8 @@ typedef struct cmp_state_layer {
   float current_radius;
   float max_radius;
   float current_opacity;
+  float origin_x;
+  float origin_y;
   int is_active;
 } cmp_state_layer_t;
 
@@ -4694,7 +4762,8 @@ int cmp_window_wasm_set_main_loop(cmp_modality_t *mod,
 int cmp_window_destroy(cmp_window_t *window);
 
 /**
- * @brief Get the native OS surface handle for the window (HWND, NSView, xdg_surface, etc.)
+ * @brief Get the native OS surface handle for the window (HWND, NSView,
+ * xdg_surface, etc.)
  * @param window The window context
  * @return The native handle or NULL if unsupported.
  */
@@ -5678,7 +5747,9 @@ struct cmp_ubo {
  * @param out_is_visible Pointer to receive 1 if visible, 0 if completely culled
  * @return 0 on success, or an error code.
  */
-int cmp_frustum_culling_test(const cmp_rect_t *node_rect, const cmp_rect_t *viewport_rect, int *out_is_visible);
+int cmp_frustum_culling_test(const cmp_rect_t *node_rect,
+                             const cmp_rect_t *viewport_rect,
+                             int *out_is_visible);
 
 typedef struct cmp_draw_call {
   int texture_id;
@@ -5717,12 +5788,16 @@ int cmp_draw_call_optimizer_destroy(cmp_draw_call_optimizer_t *opt);
 /* ========================================================================= */
 
 typedef struct cmp_command_buffer cmp_command_buffer_t;
-int cmp_command_buffer_create(cmp_gpu_t *gpu, int is_secondary, cmp_command_buffer_t **out_cb);
+int cmp_command_buffer_create(cmp_gpu_t *gpu, int is_secondary,
+                              cmp_command_buffer_t **out_cb);
 int cmp_command_buffer_destroy(cmp_command_buffer_t *cb);
 int cmp_command_buffer_begin(cmp_command_buffer_t *cb);
 int cmp_command_buffer_end(cmp_command_buffer_t *cb);
-int cmp_command_buffer_execute_commands(cmp_command_buffer_t *primary, cmp_command_buffer_t **secondaries, int count);
-int cmp_command_buffer_draw(cmp_command_buffer_t *cb, const cmp_draw_call_t *call);
+int cmp_command_buffer_execute_commands(cmp_command_buffer_t *primary,
+                                        cmp_command_buffer_t **secondaries,
+                                        int count);
+int cmp_command_buffer_draw(cmp_command_buffer_t *cb,
+                            const cmp_draw_call_t *call);
 
 typedef struct cmp_render_pass_config {
   int id;
@@ -5735,8 +5810,10 @@ typedef struct cmp_render_pass_config {
 typedef struct cmp_render_graph cmp_render_graph_t;
 int cmp_render_graph_create(cmp_render_graph_t **out_graph);
 int cmp_render_graph_destroy(cmp_render_graph_t *graph);
-int cmp_render_graph_add_pass(cmp_render_graph_t *graph, const cmp_render_pass_config_t *config);
-int cmp_render_graph_execute(cmp_render_graph_t *graph, cmp_command_buffer_t *cb);
+int cmp_render_graph_add_pass(cmp_render_graph_t *graph,
+                              const cmp_render_pass_config_t *config);
+int cmp_render_graph_execute(cmp_render_graph_t *graph,
+                             cmp_command_buffer_t *cb);
 
 typedef struct cmp_pipeline_state {
   cmp_shader_t *vertex_shader;
@@ -5758,28 +5835,40 @@ typedef struct cmp_pso_cache cmp_pso_cache_t;
 
 int cmp_pso_cache_create(cmp_pso_cache_t **out_cache);
 int cmp_pso_cache_destroy(cmp_pso_cache_t *cache);
-int cmp_pso_cache_get_or_create(cmp_pso_cache_t *cache, const cmp_pipeline_state_t *state, cmp_pso_t **out_pso);
+int cmp_pso_cache_get_or_create(cmp_pso_cache_t *cache,
+                                const cmp_pipeline_state_t *state,
+                                cmp_pso_t **out_pso);
 
 int cmp_command_buffer_bind_pso(cmp_command_buffer_t *cb, cmp_pso_t *pso);
 
 typedef struct cmp_gpu_allocator cmp_gpu_allocator_t;
-int cmp_gpu_allocator_create(cmp_gpu_t *gpu, size_t block_size, cmp_gpu_allocator_t **out_allocator);
+int cmp_gpu_allocator_create(cmp_gpu_t *gpu, size_t block_size,
+                             cmp_gpu_allocator_t **out_allocator);
 int cmp_gpu_allocator_destroy(cmp_gpu_allocator_t *allocator);
-int cmp_gpu_allocator_alloc(cmp_gpu_allocator_t *allocator, size_t size, size_t alignment, void **out_mem, size_t *out_offset);
+int cmp_gpu_allocator_alloc(cmp_gpu_allocator_t *allocator, size_t size,
+                            size_t alignment, void **out_mem,
+                            size_t *out_offset);
 int cmp_gpu_allocator_free(cmp_gpu_allocator_t *allocator, void *mem);
 
 typedef struct cmp_atlas cmp_atlas_t;
-int cmp_atlas_create(cmp_gpu_t *gpu, int width, int height, cmp_atlas_t **out_atlas);
+int cmp_atlas_create(cmp_gpu_t *gpu, int width, int height,
+                     cmp_atlas_t **out_atlas);
 int cmp_atlas_destroy(cmp_atlas_t *atlas);
-int cmp_atlas_insert(cmp_atlas_t *atlas, int width, int height, const void *pixels, int *out_x, int *out_y);
+int cmp_atlas_insert(cmp_atlas_t *atlas, int width, int height,
+                     const void *pixels, int *out_x, int *out_y);
 int cmp_atlas_evict(cmp_atlas_t *atlas);
 
-typedef struct cmp_tex_compression cmp_tex_compression_t;
-int cmp_tex_compression_decode_astc(const void *data, size_t size, void **out_rgba, int *out_width, int *out_height);
-int cmp_tex_compression_decode_bc7(const void *data, size_t size, void **out_rgba, int *out_width, int *out_height);
+int cmp_tex_compression_decode_astc(const void *data, size_t size,
+                                    void **out_rgba, int *out_width,
+                                    int *out_height);
+int cmp_tex_compression_decode_bc7(const void *data, size_t size,
+                                   void **out_rgba, int *out_width,
+                                   int *out_height);
 
-int cmp_shader_compile_spirv(const char *source, size_t size, cmp_shader_t **out_shader);
-int cmp_shader_compile_msl(const char *source, size_t size, cmp_shader_t **out_shader);
+int cmp_shader_compile_spirv(const char *source, size_t size,
+                             cmp_shader_t **out_shader);
+int cmp_shader_compile_msl(const char *source, size_t size,
+                           cmp_shader_t **out_shader);
 
 /* Phase 21: Accessibility (A11y) & Screen Readers                           */
 /* ========================================================================= */
@@ -12097,72 +12186,65 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
 #include "cmp_sse_parser.h"
 #include "cmp_tree_sitter.h"
 #include "cmp_ui_accordion.h"
+#include "cmp_ui_action_button.h"
+#include "cmp_ui_app_bar.h"
 #include "cmp_ui_avatar.h"
 #include "cmp_ui_badge.h"
+#include "cmp_ui_bottom_sheet.h"
 #include "cmp_ui_breadcrumbs.h"
+#include "cmp_ui_card.h"
 #include "cmp_ui_chip.h"
 #include "cmp_ui_code_block.h"
+#include "cmp_ui_dialog.h"
 #include "cmp_ui_diff.h"
+#include "cmp_ui_divider.h"
+#include "cmp_ui_fab.h"
+#include "cmp_ui_icon_button.h"
 #include "cmp_ui_markdown.h"
+#include "cmp_ui_modal_drawer.h"
+#include "cmp_ui_navigation_rail.h"
 #include "cmp_ui_progress_bar.h"
+#include "cmp_ui_progress_indicator.h"
+#include "cmp_ui_segmented_button.h"
 #include "cmp_ui_skeleton.h"
+#include "cmp_ui_snackbar.h"
 #include "cmp_ui_spinner.h"
 #include "cmp_ui_splitter.h"
+#include "cmp_ui_switch.h"
+#include "cmp_ui_tabs.h"
 #include "cmp_ui_terminal.h"
+#include "cmp_ui_text_field.h"
 #include "cmp_ui_tooltip.h"
 #include "cmp_ui_tree_view.h"
 #include "cmp_ui_virtual_list.h"
 
-
 CMP_API int cmp_icc_profile_destroy(cmp_icc_profile_t *profile);
-CMP_API int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile, float *out_matrix3x3);
-CMP_API int cmp_icc_profile_is_wide_gamut(const cmp_icc_profile_t *profile, int *out_is_wide);
+CMP_API int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile,
+                                       float *out_matrix3x3);
+CMP_API int cmp_icc_profile_is_wide_gamut(const cmp_icc_profile_t *profile,
+                                          int *out_is_wide);
 
 CMP_API int cmp_mipmap_generator_create(cmp_mipmap_generator_t **out_gen);
 CMP_API int cmp_mipmap_generator_destroy(cmp_mipmap_generator_t *gen);
-CMP_API int cmp_mipmap_generator_generate(cmp_mipmap_generator_t *gen, const void *image_data, size_t width, size_t height, void **out_mipmaps, size_t *out_levels);
+CMP_API int cmp_mipmap_generator_generate(cmp_mipmap_generator_t *gen,
+                                          const void *image_data, size_t width,
+                                          size_t height, void **out_mipmaps,
+                                          size_t *out_levels);
 
-CMP_API int cmp_shadow_atlas_create(int width, int height, cmp_shadow_atlas_t **out_atlas);
+CMP_API int cmp_shadow_atlas_create(int width, int height,
+                                    cmp_shadow_atlas_t **out_atlas);
 CMP_API int cmp_shadow_atlas_destroy(cmp_shadow_atlas_t *atlas);
 
-CMP_API int cmp_mask_image_apply(struct cmp_texture *source, cmp_mask_image_t *mask, struct cmp_texture **out_result);
-CMP_API int cmp_svg_filter_fe_color_matrix(struct cmp_texture *source, cmp_svg_fe_color_matrix_t *matrix, struct cmp_texture **out_result);
-CMP_API int cmp_svg_filter_fe_displacement_map(struct cmp_texture *source, cmp_svg_fe_displacement_map_t *map, struct cmp_texture **out_result);
-
-
-
-
-
-
-
-typedef struct cmp_ink_ripple cmp_ink_ripple_t;
-
-CMP_API int cmp_ink_ripple_create(cmp_ink_ripple_t **out_ripple);
-CMP_API int cmp_ink_ripple_destroy(cmp_ink_ripple_t *ripple);
-CMP_API int cmp_ink_ripple_update(cmp_ink_ripple_t *ripple, float dt_ms);
-CMP_API int cmp_ink_ripple_trigger(cmp_ink_ripple_t *ripple, float start_x, float start_y);
-
-
-
-
-
-
-
-
-
-
-
-typedef struct cmp_ink_ripple cmp_ink_ripple_t;
-
-CMP_API int cmp_ink_ripple_create(cmp_ink_ripple_t **out_ripple);
-CMP_API int cmp_ink_ripple_destroy(cmp_ink_ripple_t *ripple);
-CMP_API int cmp_ink_ripple_update(cmp_ink_ripple_t *ripple, float dt_ms);
-CMP_API int cmp_ink_ripple_trigger(cmp_ink_ripple_t *ripple, float start_x, float start_y);
-
-
-
-
-
+CMP_API int cmp_mask_image_apply(struct cmp_texture *source,
+                                 cmp_mask_image_t *mask,
+                                 struct cmp_texture **out_result);
+CMP_API int cmp_svg_filter_fe_color_matrix(struct cmp_texture *source,
+                                           cmp_svg_fe_color_matrix_t *matrix,
+                                           struct cmp_texture **out_result);
+CMP_API int
+cmp_svg_filter_fe_displacement_map(struct cmp_texture *source,
+                                   cmp_svg_fe_displacement_map_t *map,
+                                   struct cmp_texture **out_result);
 
 typedef enum {
   CMP_BLEND_MODE_NORMAL = 0,
@@ -12173,37 +12255,56 @@ typedef struct cmp_isolation_context {
   int is_isolated;
 } cmp_isolation_context_t;
 
-CMP_API int cmp_blend_mode_resolve(cmp_mix_blend_mode_t mode, int *out_gpu_blend_state);
+CMP_API int cmp_blend_mode_resolve(cmp_mix_blend_mode_t mode,
+                                   int *out_gpu_blend_state);
 CMP_API int cmp_isolation_context_begin(cmp_isolation_context_t *ctx);
 CMP_API int cmp_isolation_context_end(cmp_isolation_context_t *ctx);
 
-
-CMP_API int cmp_shadow_9patch_generate_blur(cmp_shadow_9patch_t *shadow, cmp_gpu_t *gpu);
-CMP_API int cmp_backdrop_kawase_blur(struct cmp_texture *bg_texture, float radius, struct cmp_texture **out_blurred);
-
+CMP_API int cmp_shadow_9patch_generate_blur(cmp_shadow_9patch_t *shadow,
+                                            cmp_gpu_t *gpu);
+CMP_API int cmp_backdrop_kawase_blur(struct cmp_texture *bg_texture,
+                                     float radius,
+                                     struct cmp_texture **out_blurred);
 
 /* TRUE_PLAN Phase 4 */
 CMP_API int cmp_shader_get_rounded_rect_sdf_glsl(const char **out_source);
 CMP_API int cmp_shader_get_squircle_sdf_glsl(const char **out_source);
 
 CMP_API int cmp_svg_path_tessellate_ear_clipping(const float *polygon_data,
-                                         size_t data_len, float **out_vertices,
-                                         size_t *out_vertex_count);
-CMP_API int cmp_svg_renderer_bezier_subdivide(struct cmp_svg_renderer *renderer, float cx1,
-                                      float cy1, float cx2, float cy2, float x,
-                                      float y, float screen_space_error);
+                                                 size_t data_len,
+                                                 float **out_vertices,
+                                                 size_t *out_vertex_count);
+CMP_API int cmp_svg_renderer_bezier_subdivide(struct cmp_svg_renderer *renderer,
+                                              float cx1, float cy1, float cx2,
+                                              float cy2, float x, float y,
+                                              float screen_space_error);
 CMP_API int cmp_svg_stroke_expand(const float *path_data, size_t data_len,
-                          float stroke_width, int line_join, int line_cap,
-                          float **out_vertices, size_t *out_vertex_count);
+                                  float stroke_width, int line_join,
+                                  int line_cap, float **out_vertices,
+                                  size_t *out_vertex_count);
 
-CMP_API int cmp_svg_fill_even_odd(struct cmp_command_buffer *cb, const float *path_data,
-                          size_t data_len);
+CMP_API int cmp_svg_fill_even_odd(struct cmp_command_buffer *cb,
+                                  const float *path_data, size_t data_len);
 
-CMP_API int cmp_swapchain_set_msaa(struct cmp_swapchain *swapchain, int sample_count);
+CMP_API int cmp_swapchain_set_msaa(struct cmp_swapchain *swapchain,
+                                   int sample_count);
 
-CMP_API int cmp_svg_path_morph(const float *path_data_a, const float *path_data_b,
-                       size_t data_len, float t, float **out_path_data);
+CMP_API int cmp_svg_path_morph(const float *path_data_a,
+                               const float *path_data_b, size_t data_len,
+                               float t, float **out_path_data);
 
-CMP_API int cmp_color_srgb_to_oklch(const cmp_color_t *in_color, cmp_color_t *out_color);
-CMP_API int cmp_color_oklch_to_srgb(const cmp_color_t *in_color, cmp_color_t *out_color);
+CMP_API int cmp_color_srgb_to_oklch(const cmp_color_t *in_color,
+                                    cmp_color_t *out_color);
+CMP_API int cmp_color_oklch_to_srgb(const cmp_color_t *in_color,
+                                    cmp_color_t *out_color);
+CMP_API int cmp_state_layer_update(cmp_state_layer_t *layer, float dt_ms);
+CMP_API int cmp_state_layer_trigger_ripple(cmp_state_layer_t *layer,
+                                           float start_x, float start_y,
+                                           float max_radius);
+CMP_API int cmp_state_layer_trigger_fluent_reveal(cmp_state_layer_t *layer,
+                                                  float pointer_x,
+                                                  float pointer_y);
+CMP_API int cmp_state_layer_apply_vibrancy_mask(cmp_state_layer_t *layer,
+                                                cmp_vibrancy_style_t style);
+
 #endif /* CMP_H */

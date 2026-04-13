@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     cmp_ui_node_t *button = NULL;
 
     /* 1. Initialize the Modality Engine (Single-threaded) */
-    if (cmp_modality_single_init(&modality) != CMP_SUCCESS) {
+    if (cmp_modality_sync_single_init(&modality) != CMP_SUCCESS) {
         return 1;
     }
 

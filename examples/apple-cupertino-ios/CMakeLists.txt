@@ -20,5 +20,5 @@ if(NOT TARGET cmp)
     FetchContent_MakeAvailable(cmp)
 endif()
 
-add_executable(apple_cupertino_ios_example src/main.c)
+add_executable(apple_cupertino_ios_example src/main.c src/app.c)
 target_link_libraries(apple_cupertino_ios_example PRIVATE cmp)

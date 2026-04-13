@@ -22,7 +22,7 @@ TEST test_http_client_creation(void) {
   int res;
 
   cmp_http_init();
-  cmp_modality_single_init(&mod);
+  cmp_modality_sync_single_init(&mod);
 
   res = cmp_http_client_create(&mod, &client);
 #if defined(_WIN32) && defined(_MSC_VER) && _MSC_VER < 1600

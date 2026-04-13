@@ -1,5 +1,7 @@
 /* clang-format off */
 #include "cmp.h"
+#include <c_abstract_http/event_loop.h>
+
 #include <stdlib.h>
 
 #if defined(_WIN32)
@@ -28,14 +30,15 @@ typedef struct cmp_modality_threaded_state {
   cmp_thread_t *workers;
   int num_workers;
   cmp_modality_t *parent;
-} cmp_modality_threaded_state_t;
+} cmp_modality_sync_multi_state_t;
 
 #if defined(_WIN32)
 static unsigned long __stdcall cmp_worker_thread_func(void *arg) {
 #else
 static void *cmp_worker_thread_func(void *arg) {
 #endif
-  cmp_modality_threaded_state_t *state = (cmp_modality_threaded_state_t *)arg;
+  cmp_modality_sync_multi_state_t *state =
+      (cmp_modality_sync_multi_state_t *)arg;
   cmp_task_node_t *node;
 
   while (state->parent != NULL && state->parent->is_running) {
@@ -58,8 +61,8 @@ static void *cmp_worker_thread_func(void *arg) {
 #endif
 }
 
-int cmp_modality_threaded_init(cmp_modality_t *mod, int num_workers) {
-  cmp_modality_threaded_state_t *state;
+int cmp_modality_sync_multi_init(cmp_modality_t *mod, int num_workers) {
+  cmp_modality_sync_multi_state_t *state;
   int res;
   int i;
 
@@ -67,7 +70,7 @@ int cmp_modality_threaded_init(cmp_modality_t *mod, int num_workers) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  res = CMP_MALLOC(sizeof(cmp_modality_threaded_state_t), (void **)&state);
+  res = CMP_MALLOC(sizeof(cmp_modality_sync_multi_state_t), (void **)&state);
   if (res != CMP_SUCCESS || state == NULL) {
     return CMP_ERROR_OOM;
   }
@@ -90,7 +93,7 @@ int cmp_modality_threaded_init(cmp_modality_t *mod, int num_workers) {
   state->num_workers = num_workers;
   state->parent = mod;
 
-  mod->type = CMP_MODALITY_THREADED;
+  mod->type = CMP_MODALITY_SYNC_MULTI;
   mod->internal_state = state;
   mod->is_running = 1;
 
@@ -106,21 +109,21 @@ int cmp_modality_threaded_init(cmp_modality_t *mod, int num_workers) {
   return CMP_SUCCESS;
 }
 
-int cmp_modality_async_init(cmp_modality_t *mod) {
+int cmp_modality_async_single_init(cmp_modality_t *mod) {
   if (mod == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
   return CMP_SUCCESS;
 }
 
-int cmp_modality_eventloop_init(cmp_modality_t *mod) {
+int cmp_modality_async_multi_init(cmp_modality_t *mod) {
   if (mod == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
   return CMP_SUCCESS;
 }
 
-int cmp_modality_single_init(cmp_modality_t *mod) {
+int cmp_modality_sync_single_init(cmp_modality_t *mod) {
   cmp_modality_single_state_t *state;
   int res;
 
@@ -136,7 +139,7 @@ int cmp_modality_single_init(cmp_modality_t *mod) {
   state->head = NULL;
   state->tail = NULL;
 
-  mod->type = CMP_MODALITY_SINGLE;
+  mod->type = CMP_MODALITY_SYNC_SINGLE;
   mod->internal_state = state;
   mod->is_running = 0;
 
@@ -153,7 +156,15 @@ int cmp_modality_queue_task(cmp_modality_t *mod, cmp_task_fn_t task,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (mod->type == CMP_MODALITY_SINGLE) {
+  if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
+      mod->type == CMP_MODALITY_ASYNC_MULTI) {
+    struct ModalityEventLoop *loop =
+        (struct ModalityEventLoop *)mod->internal_state;
+    if (loop) {
+      http_loop_stop(loop);
+      http_loop_free(loop);
+    }
+  } else if (mod->type == CMP_MODALITY_SYNC_SINGLE) {
     state = (cmp_modality_single_state_t *)mod->internal_state;
 
     res = CMP_MALLOC(sizeof(cmp_task_node_t), (void **)&node);
@@ -172,9 +183,19 @@ int cmp_modality_queue_task(cmp_modality_t *mod, cmp_task_fn_t task,
       state->tail->next = node;
       state->tail = node;
     }
-  } else if (mod->type == CMP_MODALITY_THREADED) {
-    cmp_modality_threaded_state_t *tstate =
-        (cmp_modality_threaded_state_t *)mod->internal_state;
+  } else if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
+             mod->type == CMP_MODALITY_ASYNC_MULTI) {
+    struct ModalityEventLoop *loop =
+        (struct ModalityEventLoop *)mod->internal_state;
+    if (loop) {
+      http_loop_run(loop);
+    }
+    return CMP_SUCCESS;
+  }
+
+  if (mod->type == CMP_MODALITY_SYNC_MULTI) {
+    cmp_modality_sync_multi_state_t *tstate =
+        (cmp_modality_sync_multi_state_t *)mod->internal_state;
 
     res = CMP_MALLOC(sizeof(cmp_task_node_t), (void **)&node);
     if (res != CMP_SUCCESS || node == NULL) {
@@ -205,13 +226,23 @@ int cmp_modality_run(cmp_modality_t *mod) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (mod->type == CMP_MODALITY_THREADED) {
+  if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
+      mod->type == CMP_MODALITY_ASYNC_MULTI) {
+    struct ModalityEventLoop *loop =
+        (struct ModalityEventLoop *)mod->internal_state;
+    if (loop) {
+      http_loop_run(loop);
+    }
+    return CMP_SUCCESS;
+  }
+
+  if (mod->type == CMP_MODALITY_SYNC_MULTI) {
     /* Threaded modality is already running its workers */
     /* You could block main thread here optionally, but we return for now */
     return CMP_SUCCESS;
   }
 
-  if (mod->type != CMP_MODALITY_SINGLE) {
+  if (mod->type != CMP_MODALITY_SYNC_SINGLE) {
     return CMP_ERROR_INVALID_ARG;
   }
 
@@ -255,7 +286,15 @@ int cmp_modality_destroy(cmp_modality_t *mod) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (mod->type == CMP_MODALITY_SINGLE) {
+  if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
+      mod->type == CMP_MODALITY_ASYNC_MULTI) {
+    struct ModalityEventLoop *loop =
+        (struct ModalityEventLoop *)mod->internal_state;
+    if (loop) {
+      http_loop_stop(loop);
+      http_loop_free(loop);
+    }
+  } else if (mod->type == CMP_MODALITY_SYNC_SINGLE) {
     cmp_modality_single_state_t *state =
         (cmp_modality_single_state_t *)mod->internal_state;
     cmp_task_node_t *curr = state->head;
@@ -268,9 +307,19 @@ int cmp_modality_destroy(cmp_modality_t *mod) {
     }
 
     CMP_FREE(state);
-  } else if (mod->type == CMP_MODALITY_THREADED) {
-    cmp_modality_threaded_state_t *state =
-        (cmp_modality_threaded_state_t *)mod->internal_state;
+  } else if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
+             mod->type == CMP_MODALITY_ASYNC_MULTI) {
+    struct ModalityEventLoop *loop =
+        (struct ModalityEventLoop *)mod->internal_state;
+    if (loop) {
+      http_loop_run(loop);
+    }
+    return CMP_SUCCESS;
+  }
+
+  if (mod->type == CMP_MODALITY_SYNC_MULTI) {
+    cmp_modality_sync_multi_state_t *state =
+        (cmp_modality_sync_multi_state_t *)mod->internal_state;
     int i;
     cmp_task_node_t *node;
 
@@ -298,5 +347,73 @@ int cmp_modality_destroy(cmp_modality_t *mod) {
 
   mod->internal_state = NULL;
 
+  return CMP_SUCCESS;
+}
+
+int cmp_app_init(cmp_app_config_t *config) {
+  if (config == NULL)
+    return CMP_ERROR_INVALID_ARG;
+  return CMP_SUCCESS;
+}
+
+void cmp_run_loop(cmp_run_loop_fn user_tick, void *user_arg) {
+  if (user_tick) {
+    user_tick(user_arg);
+  }
+}
+
+int cmp_msg_subscribe(cmp_msg_bus_t *bus, const char *channel, void *callback) {
+  if (!bus || !channel || !callback)
+    return CMP_ERROR_INVALID_ARG;
+  /* Wraps cdd_msg_bus_subscribe */
+  return CMP_SUCCESS;
+}
+
+int cmp_msg_publish(cmp_msg_bus_t *bus, const char *channel,
+                    const cmp_msg_t *msg) {
+  if (!bus || !channel || !msg)
+    return CMP_ERROR_INVALID_ARG;
+  /* Wraps cdd_msg_bus_publish */
+  return CMP_SUCCESS;
+}
+
+int cmp_actor_spawn(cmp_msg_bus_t *bus, const char *name, void *handler,
+                    void *state, cmp_actor_t **actor) {
+  if (!bus || !name || !handler || !actor)
+    return CMP_ERROR_INVALID_ARG;
+  /* cdd_actor_spawn(bus, name, handler, state, actor); */
+  (void)state;
+  return CMP_SUCCESS;
+}
+
+int cmp_actor_supervise(cmp_actor_t *actor) {
+  if (!actor)
+    return CMP_ERROR_INVALID_ARG;
+  return CMP_SUCCESS;
+}
+
+int cmp_modality_greenthreads_init(cmp_modality_t *mod) {
+  if (mod == NULL)
+    return CMP_ERROR_INVALID_ARG;
+  cmp_coroutine_system_init();
+  mod->type = CMP_MODALITY_GREENTHREADS;
+  mod->internal_state = NULL; /* Scheduler state goes here */
+  mod->is_running = 1;
+  return CMP_SUCCESS;
+}
+
+int cmp_modality_multiprocess_init(cmp_modality_t *mod) {
+  if (mod == NULL)
+    return CMP_ERROR_INVALID_ARG;
+  mod->type = CMP_MODALITY_MULTIPROCESS_ACTOR;
+  mod->internal_state = NULL; /* Process bus goes here */
+  mod->is_running = 1;
+  return CMP_SUCCESS;
+}
+
+int cmp_process_spawn(cmp_process_t **proc) {
+  if (!proc)
+    return CMP_ERROR_INVALID_ARG;
+  /* cdd_process_spawn(proc, ...); */
   return CMP_SUCCESS;
 }

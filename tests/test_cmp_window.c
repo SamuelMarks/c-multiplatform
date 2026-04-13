@@ -298,7 +298,7 @@ TEST test_wasm_apis(void) {
   int res;
   cmp_modality_t mod;
 
-  cmp_modality_single_init(&mod);
+  cmp_modality_sync_single_init(&mod);
 
   res = cmp_window_wasm_init("#canvas");
 #if defined(__EMSCRIPTEN__)

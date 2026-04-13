@@ -20,5 +20,5 @@ if(NOT TARGET cmp)
     FetchContent_MakeAvailable(cmp)
 endif()
 
-add_executable(google_material_android_example src/main.c)
+add_executable(google_material_android_example src/main.c src/app.c)
 target_link_libraries(google_material_android_example PRIVATE cmp)

@@ -79,7 +79,7 @@ TEST test_vfs_read_async(void) {
   FILE *f;
 
   cmp_vfs_init();
-  cmp_modality_single_init(&mod);
+  cmp_modality_sync_single_init(&mod);
 
   /* Create dummy file */
   f = fopen("dummy_async.txt", "wb");

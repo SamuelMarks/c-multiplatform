@@ -14,7 +14,8 @@ int cmp_compositor_thread_create(cmp_compositor_thread_t **out_thread) {
   struct cmp_compositor_thread *ctx;
   if (!out_thread)
     return CMP_ERROR_INVALID_ARG;
-  if (CMP_MALLOC(sizeof(struct cmp_compositor_thread), (void **)&ctx) != CMP_SUCCESS)
+  if (CMP_MALLOC(sizeof(struct cmp_compositor_thread), (void **)&ctx) !=
+      CMP_SUCCESS)
     return CMP_ERROR_OOM;
   memset(ctx, 0, sizeof(struct cmp_compositor_thread));
   ctx->is_running = 1;
@@ -31,7 +32,8 @@ int cmp_compositor_thread_destroy(cmp_compositor_thread_t *thread) {
   return CMP_SUCCESS;
 }
 
-int cmp_compositor_thread_push_tree(cmp_compositor_thread_t *thread, void *layer_tree_opaque) {
+int cmp_compositor_thread_push_tree(cmp_compositor_thread_t *thread,
+                                    void *layer_tree_opaque) {
   struct cmp_compositor_thread *ctx = (struct cmp_compositor_thread *)thread;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;

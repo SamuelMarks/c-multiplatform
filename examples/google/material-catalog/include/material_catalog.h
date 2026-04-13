@@ -183,7 +183,8 @@ typedef struct material_example_t {
 typedef enum catalog_screen_id_t {
   CATALOG_SCREEN_HOME = 0,
   CATALOG_SCREEN_COMPONENT_DETAILS = 1,
-  CATALOG_SCREEN_EXAMPLE_VIEWER = 2
+  CATALOG_SCREEN_EXAMPLE_VIEWER = 2,
+  CATALOG_SCREEN_THEME_STUDIO = 3
 } catalog_screen_id_t;
 
 /**
@@ -685,6 +686,15 @@ int material_catalog_render_tabs_example(material_catalog_state_t *state,
  */
 int material_catalog_render_text_fields_example(material_catalog_state_t *state,
                                                 cmp_ui_node_t *container);
+
+/**
+ * @brief Renders the Theme Studio tool.
+ * @param state Pointer to the catalog state.
+ * @param container The container node.
+ * @return MATERIAL_CATALOG_SUCCESS or error code.
+ */
+int material_catalog_render_theme_studio(material_catalog_state_t *state,
+                                         cmp_ui_node_t *container);
 
 #define dp_to_px(state, dp) ((dp) * (state)->dpi_scale)
 

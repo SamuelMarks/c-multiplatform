@@ -60,6 +60,16 @@ typedef enum m3_feed_layout {
 } m3_feed_layout_t;
 
 /**
+ * @brief State for tracking animated threshold crossings.
+ */
+typedef struct m3_adaptive_transition_state {
+    m3_window_size_class_t previous_class;
+    m3_window_size_class_t current_class;
+    float progress; /* 0.0 to 1.0 */
+    int is_animating;
+} m3_adaptive_transition_state_t;
+
+/**
  * @brief Determines the window size class based on the given width in dp.
  * 
  * @param width_dp The width of the window in density-independent pixels.
@@ -103,6 +113,16 @@ int m3_adaptive_get_supporting_pane_layout(m3_window_size_class_t size_class, m3
  * @return int 0 on success, non-zero on error.
  */
 int m3_adaptive_get_feed_layout(m3_window_size_class_t size_class, m3_feed_layout_t* out_layout);
+
+/**
+ * @brief Updates the adaptive transition state.
+ *
+ * @param state Pointer to the transition state to update.
+ * @param target_class The newly computed target window size class.
+ * @param dt Delta time in seconds.
+ * @return int 0 on success, non-zero on error.
+ */
+int m3_adaptive_update_transition(m3_adaptive_transition_state_t* state, m3_window_size_class_t target_class, float dt);
 
 #ifdef __cplusplus
 }
