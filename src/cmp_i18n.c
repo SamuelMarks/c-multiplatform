@@ -1,15 +1,16 @@
 /* clang-format off */
 #include "cmp.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
 
 typedef struct cmp_i18n_entry {
-  char *locale;
-  char *key;
-  char *value;
+  const char *locale; /* Interned */
+  const char *key;    /* Interned */
+  char *value;        /* Dynamic */
 } cmp_i18n_entry_t;
 
 struct cmp_i18n {
@@ -17,6 +18,67 @@ struct cmp_i18n {
   size_t count;
   size_t capacity;
 };
+
+static char **g_interned_strings = NULL;
+static size_t g_interned_count = 0;
+static size_t g_interned_capacity = 0;
+
+static const char *intern_string(const char *str) {
+  size_t i;
+  char **new_pool;
+  size_t new_cap;
+  size_t len;
+  char *new_str;
+
+  if (!str)
+    return NULL;
+
+  for (i = 0; i < g_interned_count; i++) {
+    if (strcmp(g_interned_strings[i], str) == 0) {
+      return g_interned_strings[i];
+    }
+  }
+
+  if (g_interned_count >= g_interned_capacity) {
+    new_cap = g_interned_capacity == 0 ? 64 : g_interned_capacity * 2;
+    if (CMP_MALLOC(new_cap * sizeof(char *), (void **)&new_pool) !=
+        CMP_SUCCESS) {
+      return NULL;
+    }
+    if (g_interned_strings) {
+      memcpy(new_pool, g_interned_strings, g_interned_count * sizeof(char *));
+      CMP_FREE(g_interned_strings);
+    }
+    g_interned_strings = new_pool;
+    g_interned_capacity = new_cap;
+  }
+
+  len = strlen(str);
+  if (CMP_MALLOC(len + 1, (void **)&new_str) != CMP_SUCCESS) {
+    return NULL;
+  }
+#if defined(_MSC_VER)
+  strcpy_s(new_str, len + 1, str);
+#else
+  strcpy(new_str, str);
+#endif
+
+  g_interned_strings[g_interned_count++] = new_str;
+  return new_str;
+}
+
+static void free_interned_strings(void) {
+  size_t i;
+  if (g_interned_strings) {
+    for (i = 0; i < g_interned_count; i++) {
+      CMP_FREE(g_interned_strings[i]);
+    }
+    CMP_FREE(g_interned_strings);
+    g_interned_strings = NULL;
+    g_interned_count = 0;
+    g_interned_capacity = 0;
+  }
+}
 
 int cmp_i18n_create(cmp_i18n_t **out_i18n) {
   cmp_i18n_t *i18n;
@@ -38,12 +100,6 @@ int cmp_i18n_destroy(cmp_i18n_t *i18n) {
   }
   if (i18n->entries) {
     for (i = 0; i < i18n->count; i++) {
-      if (i18n->entries[i].locale) {
-        CMP_FREE(i18n->entries[i].locale);
-      }
-      if (i18n->entries[i].key) {
-        CMP_FREE(i18n->entries[i].key);
-      }
       if (i18n->entries[i].value) {
         CMP_FREE(i18n->entries[i].value);
       }
@@ -55,7 +111,10 @@ int cmp_i18n_destroy(cmp_i18n_t *i18n) {
 }
 
 static int str_duplicate(const char *src, char **out_dst) {
-  size_t len = strlen(src);
+  size_t len;
+  if (!src || !out_dst)
+    return CMP_ERROR_INVALID_ARG;
+  len = strlen(src);
   if (CMP_MALLOC(len + 1, (void **)out_dst) != CMP_SUCCESS) {
     return CMP_ERROR_OOM;
   }
@@ -69,13 +128,24 @@ static int str_duplicate(const char *src, char **out_dst) {
 
 int cmp_i18n_add_string(cmp_i18n_t *i18n, const char *locale, const char *key,
                         const char *value) {
+  const char *interned_locale;
+  const char *interned_key;
+  cmp_i18n_entry_t *new_entries;
+  size_t new_cap;
+
   if (!i18n || !locale || !key || !value) {
     return CMP_ERROR_INVALID_ARG;
   }
 
+  interned_locale = intern_string(locale);
+  interned_key = intern_string(key);
+
+  if (!interned_locale || !interned_key) {
+    return CMP_ERROR_OOM;
+  }
+
   if (i18n->count >= i18n->capacity) {
-    size_t new_cap = i18n->capacity == 0 ? 8 : i18n->capacity * 2;
-    cmp_i18n_entry_t *new_entries;
+    new_cap = i18n->capacity == 0 ? 8 : i18n->capacity * 2;
     if (CMP_MALLOC(new_cap * sizeof(cmp_i18n_entry_t), (void **)&new_entries) !=
         CMP_SUCCESS) {
       return CMP_ERROR_OOM;
@@ -89,17 +159,9 @@ int cmp_i18n_add_string(cmp_i18n_t *i18n, const char *locale, const char *key,
     i18n->capacity = new_cap;
   }
 
-  if (str_duplicate(locale, &i18n->entries[i18n->count].locale) !=
-      CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
-  }
-  if (str_duplicate(key, &i18n->entries[i18n->count].key) != CMP_SUCCESS) {
-    CMP_FREE(i18n->entries[i18n->count].locale);
-    return CMP_ERROR_OOM;
-  }
+  i18n->entries[i18n->count].locale = interned_locale;
+  i18n->entries[i18n->count].key = interned_key;
   if (str_duplicate(value, &i18n->entries[i18n->count].value) != CMP_SUCCESS) {
-    CMP_FREE(i18n->entries[i18n->count].locale);
-    CMP_FREE(i18n->entries[i18n->count].key);
     return CMP_ERROR_OOM;
   }
 
@@ -144,6 +206,7 @@ int cmp_i18n_shutdown(void) {
     return CMP_SUCCESS;
   cmp_i18n_destroy(g_global_i18n);
   g_global_i18n = NULL;
+  free_interned_strings();
   g_i18n_initialized = 0;
   return CMP_SUCCESS;
 }
@@ -162,15 +225,57 @@ int cmp_i18n_detect_os_locale(cmp_string_t *out_locale) {
 }
 
 int cmp_i18n_load_catalog(const char *virtual_path, const char *locale) {
+  void *buffer = NULL;
+  size_t size = 0;
+  char *text;
+  char *line;
+  char *saveptr = NULL;
+  int err;
+
   if (!g_i18n_initialized)
     return CMP_ERROR_INVALID_STATE;
-  (void)virtual_path;
+
+  err = cmp_vfs_read_file_sync(virtual_path, &buffer, &size);
+  if (err != CMP_SUCCESS)
+    return err;
+
+  if (CMP_MALLOC(size + 1, (void **)&text) != CMP_SUCCESS) {
+    CMP_FREE(buffer);
+    return CMP_ERROR_OOM;
+  }
+  memcpy(text, buffer, size);
+  text[size] = '\0';
+  CMP_FREE(buffer);
+
 #if defined(_MSC_VER)
-  strcpy_s(g_current_locale, 32, locale);
+  strcpy_s(g_current_locale, sizeof(g_current_locale), locale);
+  line = strtok_s(text, "\n", &saveptr);
 #else
-  strncpy(g_current_locale, locale, 31);
-  g_current_locale[31] = '\0';
+  strncpy(g_current_locale, locale, sizeof(g_current_locale) - 1);
+  g_current_locale[sizeof(g_current_locale) - 1] = '\0';
+  line = strtok_r(text, "\n", &saveptr);
 #endif
+
+  while (line != NULL) {
+    char *eq = strchr(line, '=');
+    if (eq) {
+      char *val;
+      char *cr;
+      *eq = '\0';
+      val = eq + 1;
+      cr = strchr(val, '\r');
+      if (cr)
+        *cr = '\0';
+
+      cmp_i18n_add_string(g_global_i18n, locale, line, val);
+    }
+#if defined(_MSC_VER)
+    line = strtok_s(NULL, "\n", &saveptr);
+#else
+    line = strtok_r(NULL, "\n", &saveptr);
+#endif
+  }
+  CMP_FREE(text);
   return CMP_SUCCESS;
 }
 
@@ -218,3 +323,116 @@ int cmp_i18n_set_bidi_direction(cmp_text_direction_t dir) {
 }
 
 int cmp_i18n_get_bidi_direction(void) { return g_bidi_dir; }
+
+int cmp_i18n_is_rtl(void) {
+  return cmp_i18n_get_bidi_direction() == CMP_TEXT_DIR_RTL;
+}
+
+typedef union {
+  const char *s;
+  int d;
+} cmp_fmt_arg_val_t;
+
+int cmp_i18n_format(const char *format_str, cmp_string_t *out_str, ...) {
+  va_list args;
+  int i;
+  const char *p;
+  char buffer[2048];
+  char *buf_ptr;
+  size_t buf_remain;
+
+  char types[16];
+  int max_index = 0;
+  cmp_fmt_arg_val_t arg_vals[16];
+
+  memset(types, 0, sizeof(types));
+
+  p = format_str;
+  while (*p) {
+    if (*p == '%' && p[1] >= '1' && p[1] <= '9' && p[2] == '$' &&
+        (p[3] == 's' || p[3] == 'd')) {
+      int idx = p[1] - '0';
+      types[idx] = p[3];
+      if (idx > max_index)
+        max_index = idx;
+      p += 4;
+    } else {
+      p++;
+    }
+  }
+
+  va_start(args, out_str);
+  for (i = 1; i <= max_index; i++) {
+    if (types[i] == 's') {
+      arg_vals[i].s = va_arg(args, const char *);
+    } else if (types[i] == 'd') {
+      arg_vals[i].d = va_arg(args, int);
+    } else {
+      arg_vals[i].d = va_arg(args, int);
+    }
+  }
+  va_end(args);
+
+  p = format_str;
+  buffer[0] = '\0';
+  buf_ptr = buffer;
+  buf_remain = sizeof(buffer) - 1;
+
+  while (*p && buf_remain > 0) {
+    if (*p == '%' && p[1] >= '1' && p[1] <= '9' && p[2] == '$' &&
+        (p[3] == 's' || p[3] == 'd')) {
+      int idx = p[1] - '0';
+      if (p[3] == 's') {
+        const char *s = arg_vals[idx].s;
+        if (s) {
+          size_t slen = strlen(s);
+          if (slen > buf_remain)
+            slen = buf_remain;
+#if defined(_MSC_VER)
+          strncpy_s(buf_ptr, buf_remain + 1, s, slen);
+#else
+          strncpy(buf_ptr, s, slen);
+#endif
+          buf_ptr += slen;
+          buf_remain -= slen;
+        }
+      } else if (p[3] == 'd') {
+        char dbuf[32];
+        size_t dlen;
+#if defined(_MSC_VER)
+        sprintf_s(dbuf, sizeof(dbuf), "%d", arg_vals[idx].d);
+#else
+        sprintf(dbuf, "%d", arg_vals[idx].d);
+#endif
+        dlen = strlen(dbuf);
+        if (dlen > buf_remain)
+          dlen = buf_remain;
+#if defined(_MSC_VER)
+        strncpy_s(buf_ptr, buf_remain + 1, dbuf, dlen);
+#else
+        strncpy(buf_ptr, dbuf, dlen);
+#endif
+        buf_ptr += dlen;
+        buf_remain -= dlen;
+      }
+      p += 4;
+    } else {
+      *buf_ptr++ = *p++;
+      buf_remain--;
+    }
+  }
+  *buf_ptr = '\0';
+
+  out_str->length = strlen(buffer);
+  out_str->capacity = out_str->length + 1;
+  if (CMP_MALLOC(out_str->capacity, (void **)&out_str->data) != CMP_SUCCESS) {
+    return CMP_ERROR_OOM;
+  }
+#if defined(_MSC_VER)
+  strcpy_s(out_str->data, out_str->capacity, buffer);
+#else
+  strcpy(out_str->data, buffer);
+#endif
+
+  return CMP_SUCCESS;
+}

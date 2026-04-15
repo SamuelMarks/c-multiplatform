@@ -447,6 +447,18 @@ typedef void (*cmp_run_loop_fn)(void *);
 typedef struct CddMessage cmp_msg_t;
 typedef struct CddMessageBus cmp_msg_bus_t;
 typedef struct CddActor cmp_actor_t;
+typedef struct CddProcess cmp_process_t;
+
+int cmp_msg_create(cmp_msg_t **msg);
+int cmp_msg_destroy(cmp_msg_t *msg);
+int cmp_msg_set_payload(cmp_msg_t *msg, const void *payload, size_t size);
+int cmp_msg_serialize(const cmp_msg_t *msg, uint8_t **buffer,
+                      size_t *buffer_size);
+int cmp_msg_deserialize(const uint8_t *buffer, size_t buffer_size,
+                        cmp_msg_t **msg);
+int cmp_process_send(cmp_process_t *proc, const cmp_msg_t *msg);
+int cmp_process_recv(cmp_process_t *proc, cmp_msg_t **msg);
+int cmp_process_destroy(cmp_process_t *proc);
 
 /**
  * @brief Subscribe to a message channel.
@@ -511,7 +523,6 @@ int cmp_modality_async_multi_init(cmp_modality_t *mod);
 int cmp_modality_greenthreads_init(cmp_modality_t *mod);
 int cmp_modality_multiprocess_init(cmp_modality_t *mod);
 
-typedef struct CddProcess cmp_process_t;
 int cmp_process_spawn(cmp_process_t **proc);
 
 /**
@@ -2161,6 +2172,41 @@ int cmp_compositor_anim_step(cmp_compositor_anim_t *anim, double dt_ms,
                              int *out_finished);
 
 /**
+ * @brief Opaque Framebuffer Capture Context
+ */
+typedef struct cmp_framebuffer_capture cmp_framebuffer_capture_t;
+
+/**
+ * @brief Capture the current framebuffer for a cross-fade transition
+ *
+ * @param window The window to capture from
+ * @param out_capture The resulting captured framebuffer
+ */
+CMP_API int
+cmp_compositor_capture_framebuffer(cmp_window_t *window,
+                                   cmp_framebuffer_capture_t **out_capture);
+
+/**
+ * @brief Release a captured framebuffer
+ */
+CMP_API int
+cmp_compositor_release_framebuffer(cmp_framebuffer_capture_t *capture);
+
+/**
+ * @brief Start a cross-fade transition blending from the captured buffer to the
+ * current state
+ *
+ * @param window The window to animate
+ * @param old_buffer The captured framebuffer to fade out
+ * @param duration_ms Duration of the cross-fade in milliseconds
+ * @param easing_curve Optional curve (e.g., Emphasized Decelerate)
+ */
+CMP_API int
+cmp_compositor_start_crossfade(cmp_window_t *window,
+                               cmp_framebuffer_capture_t *old_buffer,
+                               double duration_ms, const float *easing_curve);
+
+/**
  * @brief Opaque CSS Transition state
  */
 typedef struct cmp_transition cmp_transition_t;
@@ -3383,8 +3429,14 @@ struct cmp_ui_node {
   size_t child_capacity;
   /** Background color in ARGB/RGBA hex */
   uint32_t bg_color;
+  /** Background color reference in ARGB/RGBA hex. If non-NULL, overrides
+   * bg_color */
+  const uint32_t *bg_color_ref;
   /** Text color in ARGB/RGBA hex */
   uint32_t text_color;
+  /** Text color reference in ARGB/RGBA hex. If non-NULL, overrides text_color
+   */
+  const uint32_t *text_color_ref;
   /** Font size in logical pixels */
   float font_size;
 
@@ -3392,11 +3444,17 @@ struct cmp_ui_node {
   float border_radius;
   /** Shadow elevation depth in logical pixels (e.g. 1.0f to 24.0f) */
   float elevation;
-  /** Border width in logical pixels */
+  /** Shadow tint color in ARGB/RGBA hex. If 0, defaults to black. */
+  uint32_t shadow_color;
+  /** Shadow tint color reference in ARGB/RGBA hex. If non-NULL, overrides
+   * shadow_color */
+  const uint32_t *shadow_color_ref; /** Border width in logical pixels */
   float border_width;
   /** Border color in ARGB/RGBA hex */
   uint32_t border_color;
-  /** Overall node opacity (0.0f to 1.0f) */
+  /** Border color reference in ARGB/RGBA hex. If non-NULL, overrides
+   * border_color */
+  const uint32_t *border_color_ref; /** Overall node opacity (0.0f to 1.0f) */
   float opacity;
 
   /** UI States */
@@ -3411,12 +3469,13 @@ struct cmp_ui_node {
 
   struct cmp_event_listener_node *event_listeners;
 
-  unsigned int design_language_override : 3; /* 0=Inherit, 1=Material3,
-                                           2=Fluent2, 3=Cupertino, 4=Unstyled */
+  unsigned int
+      design_language_override : 3; /* 0=Inherit, 1=Material3,
+                                   2=Fluent2, 3=Cupertino, 4=Unstyled */
   unsigned int
       density_override : 2; /* 0=Inherit, 1=Compact, 2=Standard, 3=Relaxed */
+  unsigned int is_rtl_mirrored : 1; /* 1=Mirror SVG/Rendering for RTL */
 };
-
 /**
  * @brief Represents an attached event listener on a UI node
  */
@@ -3580,6 +3639,26 @@ typedef struct cmp_window_config {
 typedef void (*cmp_window_drop_cb_t)(const char *path, void *user_data);
 
 /**
+ * @brief Callback fired when the window is resized.
+ * @param width The new width
+ * @param height The new height
+ * @param user_data Optional user pointer
+ */
+typedef void (*cmp_window_resize_cb_t)(int width, int height, void *user_data);
+
+/**
+ * @brief Register a callback to receive synchronous resize events for the
+ * window
+ * @param window The window instance
+ * @param resize_cb The callback function to receive dimensions
+ * @param user_data Data passed directly into the callback
+ * @return 0 on success, or an error code.
+ */
+int cmp_window_set_resize_callback(cmp_window_t *window,
+                                   cmp_window_resize_cb_t resize_cb,
+                                   void *user_data);
+
+/**
  * @brief Register a callback to receive drag and drop events for the window
  * @param window The window instance
  * @param drop_cb The callback function to receive file paths
@@ -3617,6 +3696,9 @@ struct cmp_texture {
 typedef struct cmp_font {
   void *internal_handle;
   float default_size;
+  struct cmp_font **fallbacks;
+  size_t fallback_count;
+  size_t fallback_capacity;
 } cmp_font_t;
 
 /**
@@ -3717,12 +3799,27 @@ struct cmp_palette {
   cmp_color_t on_secondary;
   cmp_color_t secondary_container;
   cmp_color_t on_secondary_container;
+  cmp_color_t tertiary;
+  cmp_color_t on_tertiary;
+  cmp_color_t tertiary_container;
+  cmp_color_t on_tertiary_container;
+  cmp_color_t error;
+  cmp_color_t on_error;
+  cmp_color_t error_container;
+  cmp_color_t on_error_container;
   cmp_color_t background;
   cmp_color_t on_background;
   cmp_color_t surface;
   cmp_color_t on_surface;
-  cmp_color_t error;
-  cmp_color_t on_error;
+  cmp_color_t surface_variant;
+  cmp_color_t on_surface_variant;
+  cmp_color_t outline;
+  cmp_color_t outline_variant;
+  cmp_color_t shadow;
+  cmp_color_t scrim;
+  cmp_color_t inverse_surface;
+  cmp_color_t inverse_on_surface;
+  cmp_color_t inverse_primary;
 };
 
 /**
@@ -3922,6 +4019,22 @@ int cmp_i18n_translate_plural(const char *key, int count,
                               cmp_string_t *out_translated);
 
 /**
+ * @brief Formats a string with positional arguments mimicking sprintf (e.g.,
+ * %1$s, %2$d), providing built-in localization layout parsing.
+ *
+ * Implements Phase 10 API Documentation goals: This lightweight replacement
+ * for `sprintf` manages positional argument reordering natively for i18n
+ * languages, gracefully handling missing or cyclical format arguments without
+ * causing out-of-bounds heap reading or segmentation faults.
+ *
+ * @param format_str The format string containing positional markers
+ * @param out_str Pointer to receive the formatted string. Must be destroyed.
+ * @param ... Variable arguments matching the positional markers
+ * @return 0 on success, or an error code.
+ */
+int cmp_i18n_format(const char *format_str, cmp_string_t *out_str, ...);
+
+/**
  * @brief Bidi Layout Configuration applied at the UI hierarchy level
  */
 typedef struct cmp_i18n_bidi_state {
@@ -3940,6 +4053,12 @@ int cmp_i18n_set_bidi_direction(cmp_text_direction_t dir);
  * @return The active direction (cast to int)
  */
 int cmp_i18n_get_bidi_direction(void);
+
+/**
+ * @brief Utility function to easily check if current bidi direction is RTL.
+ * @return 1 if RTL, 0 otherwise.
+ */
+int cmp_i18n_is_rtl(void);
 
 /**
  * @brief Abstract Representation of a custom Shader Pipeline

@@ -1,4 +1,5 @@
 #include "m3_color.h"
+#include "material_catalog.h"
 
 /* Helper to safely retrieve tones from palette. If exact tone isn't mapped,
  * fallback to nearest or interpolate if needed. But cmp_m3_tonal_palette_t
@@ -222,5 +223,99 @@ int m3_color_tween_roles(const m3_color_roles_t *start,
   out_roles->outline_variant =
       tween_color(start->outline_variant, end->outline_variant, t);
 
+  return 0;
+}
+static uint32_t color_to_hex(cmp_color_t color) {
+  uint32_t r = (uint32_t)(color.r * 255.0f);
+  uint32_t g = (uint32_t)(color.g * 255.0f);
+  uint32_t b = (uint32_t)(color.b * 255.0f);
+  uint32_t a = (uint32_t)(color.a * 255.0f);
+  return (a << 24) | (r << 16) | (g << 8) | b;
+}
+
+int material_catalog_update_sys_colors_hex(material_catalog_state_t *state) {
+  if (!state)
+    return -1;
+  state->sys_colors_hex.primary = color_to_hex(state->sys_colors.primary);
+  state->sys_colors_hex.on_primary = color_to_hex(state->sys_colors.on_primary);
+  state->sys_colors_hex.primary_container =
+      color_to_hex(state->sys_colors.primary_container);
+  state->sys_colors_hex.on_primary_container =
+      color_to_hex(state->sys_colors.on_primary_container);
+  state->sys_colors_hex.secondary = color_to_hex(state->sys_colors.secondary);
+  state->sys_colors_hex.on_secondary =
+      color_to_hex(state->sys_colors.on_secondary);
+  state->sys_colors_hex.secondary_container =
+      color_to_hex(state->sys_colors.secondary_container);
+  state->sys_colors_hex.on_secondary_container =
+      color_to_hex(state->sys_colors.on_secondary_container);
+  state->sys_colors_hex.tertiary = color_to_hex(state->sys_colors.tertiary);
+  state->sys_colors_hex.on_tertiary =
+      color_to_hex(state->sys_colors.on_tertiary);
+  state->sys_colors_hex.tertiary_container =
+      color_to_hex(state->sys_colors.tertiary_container);
+  state->sys_colors_hex.on_tertiary_container =
+      color_to_hex(state->sys_colors.on_tertiary_container);
+  state->sys_colors_hex.error = color_to_hex(state->sys_colors.error);
+  state->sys_colors_hex.on_error = color_to_hex(state->sys_colors.on_error);
+  state->sys_colors_hex.error_container =
+      color_to_hex(state->sys_colors.error_container);
+  state->sys_colors_hex.on_error_container =
+      color_to_hex(state->sys_colors.on_error_container);
+  state->sys_colors_hex.surface_dim =
+      color_to_hex(state->sys_colors.surface_dim);
+  state->sys_colors_hex.surface = color_to_hex(state->sys_colors.surface);
+  state->sys_colors_hex.surface_bright =
+      color_to_hex(state->sys_colors.surface_bright);
+  state->sys_colors_hex.surface_container_lowest =
+      color_to_hex(state->sys_colors.surface_container_lowest);
+  state->sys_colors_hex.surface_container_low =
+      color_to_hex(state->sys_colors.surface_container_low);
+  state->sys_colors_hex.surface_container =
+      color_to_hex(state->sys_colors.surface_container);
+  state->sys_colors_hex.surface_container_high =
+      color_to_hex(state->sys_colors.surface_container_high);
+  state->sys_colors_hex.surface_container_highest =
+      color_to_hex(state->sys_colors.surface_container_highest);
+  state->sys_colors_hex.on_surface = color_to_hex(state->sys_colors.on_surface);
+  state->sys_colors_hex.on_surface_variant =
+      color_to_hex(state->sys_colors.on_surface_variant);
+  state->sys_colors_hex.outline = color_to_hex(state->sys_colors.outline);
+  state->sys_colors_hex.outline_variant =
+      color_to_hex(state->sys_colors.outline_variant);
+  state->sys_colors_hex.inverse_surface =
+      color_to_hex(state->sys_colors.inverse_surface);
+  state->sys_colors_hex.inverse_on_surface =
+      color_to_hex(state->sys_colors.inverse_on_surface);
+  state->sys_colors_hex.inverse_primary =
+      color_to_hex(state->sys_colors.inverse_primary);
+  state->sys_colors_hex.scrim = color_to_hex(state->sys_colors.scrim);
+  state->sys_colors_hex.shadow = color_to_hex(state->sys_colors.shadow);
+  state->sys_colors_hex.surface_tint =
+      color_to_hex(state->sys_colors.surface_tint);
+  state->sys_colors_hex.primary_fixed =
+      color_to_hex(state->sys_colors.primary_fixed);
+  state->sys_colors_hex.primary_fixed_dim =
+      color_to_hex(state->sys_colors.primary_fixed_dim);
+  state->sys_colors_hex.on_primary_fixed =
+      color_to_hex(state->sys_colors.on_primary_fixed);
+  state->sys_colors_hex.on_primary_fixed_variant =
+      color_to_hex(state->sys_colors.on_primary_fixed_variant);
+  state->sys_colors_hex.secondary_fixed =
+      color_to_hex(state->sys_colors.secondary_fixed);
+  state->sys_colors_hex.secondary_fixed_dim =
+      color_to_hex(state->sys_colors.secondary_fixed_dim);
+  state->sys_colors_hex.on_secondary_fixed =
+      color_to_hex(state->sys_colors.on_secondary_fixed);
+  state->sys_colors_hex.on_secondary_fixed_variant =
+      color_to_hex(state->sys_colors.on_secondary_fixed_variant);
+  state->sys_colors_hex.tertiary_fixed =
+      color_to_hex(state->sys_colors.tertiary_fixed);
+  state->sys_colors_hex.tertiary_fixed_dim =
+      color_to_hex(state->sys_colors.tertiary_fixed_dim);
+  state->sys_colors_hex.on_tertiary_fixed =
+      color_to_hex(state->sys_colors.on_tertiary_fixed);
+  state->sys_colors_hex.on_tertiary_fixed_variant =
+      color_to_hex(state->sys_colors.on_tertiary_fixed_variant);
   return 0;
 }

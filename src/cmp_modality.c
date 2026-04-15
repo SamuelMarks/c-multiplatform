@@ -156,15 +156,7 @@ int cmp_modality_queue_task(cmp_modality_t *mod, cmp_task_fn_t task,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
-      mod->type == CMP_MODALITY_ASYNC_MULTI) {
-    struct ModalityEventLoop *loop =
-        (struct ModalityEventLoop *)mod->internal_state;
-    if (loop) {
-      http_loop_stop(loop);
-      http_loop_free(loop);
-    }
-  } else if (mod->type == CMP_MODALITY_SYNC_SINGLE) {
+  if (mod->type == CMP_MODALITY_SYNC_SINGLE) {
     state = (cmp_modality_single_state_t *)mod->internal_state;
 
     res = CMP_MALLOC(sizeof(cmp_task_node_t), (void **)&node);
@@ -183,17 +175,8 @@ int cmp_modality_queue_task(cmp_modality_t *mod, cmp_task_fn_t task,
       state->tail->next = node;
       state->tail = node;
     }
-  } else if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
-             mod->type == CMP_MODALITY_ASYNC_MULTI) {
-    struct ModalityEventLoop *loop =
-        (struct ModalityEventLoop *)mod->internal_state;
-    if (loop) {
-      http_loop_run(loop);
-    }
     return CMP_SUCCESS;
-  }
-
-  if (mod->type == CMP_MODALITY_SYNC_MULTI) {
+  } else if (mod->type == CMP_MODALITY_SYNC_MULTI) {
     cmp_modality_sync_multi_state_t *tstate =
         (cmp_modality_sync_multi_state_t *)mod->internal_state;
 
@@ -211,11 +194,10 @@ int cmp_modality_queue_task(cmp_modality_t *mod, cmp_task_fn_t task,
       CMP_FREE(node);
       return res;
     }
-  } else {
-    return CMP_ERROR_INVALID_ARG;
+    return CMP_SUCCESS;
   }
 
-  return CMP_SUCCESS;
+  return CMP_ERROR_INVALID_ARG;
 }
 
 int cmp_modality_run(cmp_modality_t *mod) {
@@ -408,12 +390,5 @@ int cmp_modality_multiprocess_init(cmp_modality_t *mod) {
   mod->type = CMP_MODALITY_MULTIPROCESS_ACTOR;
   mod->internal_state = NULL; /* Process bus goes here */
   mod->is_running = 1;
-  return CMP_SUCCESS;
-}
-
-int cmp_process_spawn(cmp_process_t **proc) {
-  if (!proc)
-    return CMP_ERROR_INVALID_ARG;
-  /* cdd_process_spawn(proc, ...); */
   return CMP_SUCCESS;
 }

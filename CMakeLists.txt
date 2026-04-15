@@ -6,6 +6,7 @@ if(CYGWIN)
 endif()
 
 set(CMAKE_C_STANDARD 90)
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
@@ -183,6 +184,7 @@ FetchContent_Declare(parson GIT_REPOSITORY https://github.com/SamuelMarks/parson
     UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
     )
 FetchContent_MakeAvailable(parson)
+include_directories(SYSTEM ${parson_SOURCE_DIR})
 if(TARGET parson AND NOT TARGET parson::parson)
     add_library(parson::parson ALIAS parson)
 endif()
@@ -447,6 +449,7 @@ set(CMP_SOURCES
     src/cmp_ios_specific.c
     src/cmp_transactions_hig.c
     src/cmp_media_avkit.c
+    src/cmp_ipc.c
     src/cmp_ink_ripple.c
     src/cmp_lottie.c
     src/cmp_fluent.c
@@ -462,6 +465,9 @@ set(CMP_SOURCES
     src/cmp_network.c
     src/cmp_pip.c
     src/cmp_prefers_color_scheme.c
+    src/cmp_system_theme_win32.c
+    src/cmp_system_theme_linux.c
+    src/cmp_system_theme_android_web.c
     src/cmp_print_ctx.c
     src/cmp_safe_areas.c
     src/cmp_system_menu.c
@@ -469,6 +475,9 @@ set(CMP_SOURCES
     src/cmp_window_blur.c
 )
 
+if(APPLE)
+    list(APPEND CMP_SOURCES src/cmp_system_theme_darwin.m)
+endif()
 
 if(CMP_THEME_CUPERTINO)
     add_compile_definitions(CMP_THEME_CUPERTINO=1)
@@ -1003,6 +1012,10 @@ target_link_libraries(cmp_sys_colors_test PRIVATE cmp greatest)
 add_executable(cmp_compositor_anim_test tests/test_cmp_compositor_anim.c)
 target_link_libraries(cmp_compositor_anim_test PRIVATE cmp greatest)
 
+add_executable(cmp_ipc_test tests/test_cmp_ipc.c)
+target_link_libraries(cmp_ipc_test PRIVATE cmp greatest)
+add_test(NAME cmp_ipc_test COMMAND cmp_ipc_test)
+
 add_executable(cmp_app_region_test tests/test_cmp_app_region.c)
 target_link_libraries(cmp_app_region_test PRIVATE cmp greatest)
 add_executable(cmp_borders_test tests/test_cmp_borders.c)
@@ -1353,6 +1366,10 @@ add_executable(cmp_material3_color_test tests/themes/test_cmp_material3_color.c)
 target_link_libraries(cmp_material3_color_test PRIVATE cmp greatest)
 add_test(NAME cmp_material3_color_test COMMAND cmp_material3_color_test)
 
+add_executable(cmp_vfs_theme_test tests/themes/test_cmp_vfs_theme.c)
+target_link_libraries(cmp_vfs_theme_test PRIVATE cmp greatest)
+add_test(NAME cmp_vfs_theme_test COMMAND cmp_vfs_theme_test)
+
 add_executable(cmp_material3_sys_test tests/themes/test_cmp_material3_sys.c)
 target_link_libraries(cmp_material3_sys_test PRIVATE cmp greatest)
 add_test(NAME cmp_material3_sys_test COMMAND cmp_material3_sys_test)
@@ -1415,8 +1432,10 @@ endif()
 
 
 
-set_target_properties(cmp_compositor_thread_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
-set_target_properties(cmp_apz_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
-set_target_properties(cmp_fluent_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
-set_target_properties(cmp_ink_ripple_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
-set_target_properties(cmp_lottie_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+if(TARGET cmp_compositor_thread_test)
+    set_target_properties(cmp_compositor_thread_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+    set_target_properties(cmp_apz_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+    set_target_properties(cmp_fluent_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+    set_target_properties(cmp_ink_ripple_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+    set_target_properties(cmp_lottie_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+endif()

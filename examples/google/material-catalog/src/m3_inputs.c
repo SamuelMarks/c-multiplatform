@@ -14,8 +14,6 @@ static uint32_t color_to_hex(cmp_color_t color) {
 int m3_checkbox_create(material_catalog_state_t* state, const m3_checkbox_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* box;
     cmp_ui_node_t* check_icon;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -23,12 +21,6 @@ int m3_checkbox_create(material_catalog_state_t* state, const m3_checkbox_config
 
     if (cmp_ui_box_create(&box) != 0) {
         return -1;
-    }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
     }
     
     /* Min touch target 48x48, visual is 18x18 */
@@ -43,33 +35,33 @@ int m3_checkbox_create(material_catalog_state_t* state, const m3_checkbox_config
     box->border_radius = 2.0f; /* 2dp corner radius for checkboxes */
 
     if (config->is_disabled) {
-        box->bg_color = color_to_hex(roles.on_surface); /* Actually 38% outline, but mock */
+        box->bg_color_ref = &state->sys_colors_hex.on_surface; /* Actually 38% outline, but mock */
         if (config->state == M3_CHECKBOX_STATE_CHECKED || config->state == M3_CHECKBOX_STATE_INDETERMINATE) {
-            box->bg_color = color_to_hex(roles.on_surface); /* 38% filled */
+            box->bg_color_ref = &state->sys_colors_hex.on_surface; /* 38% filled */
             box->opacity = 0.38f;
             box->border_width = 0.0f;
         } else {
             box->bg_color = 0; /* transparent */
             box->border_width = 2.0f;
-            box->border_color = color_to_hex(roles.on_surface);
+            box->border_color_ref = &state->sys_colors_hex.on_surface;
             box->opacity = 0.38f;
         }
     } else if (config->is_error) {
         if (config->state == M3_CHECKBOX_STATE_UNCHECKED) {
             box->bg_color = 0;
             box->border_width = 2.0f;
-            box->border_color = color_to_hex(roles.error);
+            box->border_color_ref = &state->sys_colors_hex.error;
         } else {
-            box->bg_color = color_to_hex(roles.error);
+            box->bg_color_ref = &state->sys_colors_hex.error;
             box->border_width = 0.0f;
         }
     } else {
         if (config->state == M3_CHECKBOX_STATE_UNCHECKED) {
             box->bg_color = 0;
             box->border_width = 2.0f;
-            box->border_color = color_to_hex(roles.on_surface_variant);
+            box->border_color_ref = &state->sys_colors_hex.on_surface_variant;
         } else {
-            box->bg_color = color_to_hex(roles.primary);
+            box->bg_color_ref = &state->sys_colors_hex.primary;
             box->border_width = 0.0f;
         }
     }
@@ -81,11 +73,11 @@ int m3_checkbox_create(material_catalog_state_t* state, const m3_checkbox_config
             check_icon->layout->height = dp_to_px(state, 14.0f);
             
             if (config->is_disabled) {
-                check_icon->text_color = color_to_hex(roles.surface);
+                check_icon->text_color_ref = &state->sys_colors_hex.surface;
             } else if (config->is_error) {
-                check_icon->text_color = color_to_hex(roles.on_error);
+                check_icon->text_color_ref = &state->sys_colors_hex.on_error;
             } else {
-                check_icon->text_color = color_to_hex(roles.on_primary);
+                check_icon->text_color_ref = &state->sys_colors_hex.on_primary;
             }
             cmp_ui_node_add_child(box, check_icon);
         }
@@ -125,8 +117,6 @@ int m3_checkbox_create(material_catalog_state_t* state, const m3_checkbox_config
 int m3_radio_button_create(material_catalog_state_t* state, const m3_radio_button_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* rb;
     cmp_ui_node_t* inner;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -134,12 +124,6 @@ int m3_radio_button_create(material_catalog_state_t* state, const m3_radio_butto
 
     if (cmp_ui_box_create(&rb) != 0) {
         return -1;
-    }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
     }
     
     rb->layout->width = dp_to_px(state, 20.0f);
@@ -157,9 +141,9 @@ int m3_radio_button_create(material_catalog_state_t* state, const m3_radio_butto
             inner->layout->width = dp_to_px(state, 10.0f);
             inner->layout->height = dp_to_px(state, 10.0f);
             if (config->is_disabled) {
-                inner->bg_color = color_to_hex(roles.on_surface); /* 38% */
+                inner->bg_color_ref = &state->sys_colors_hex.on_surface; /* 38% */
             } else {
-                inner->bg_color = color_to_hex(roles.primary);
+                inner->bg_color_ref = &state->sys_colors_hex.primary;
             }
             cmp_ui_node_add_child(rb, inner);
         }
@@ -176,8 +160,6 @@ int m3_radio_button_create(material_catalog_state_t* state, const m3_radio_butto
 int m3_switch_create(material_catalog_state_t* state, const m3_switch_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* track;
     cmp_ui_node_t* thumb;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -185,12 +167,6 @@ int m3_switch_create(material_catalog_state_t* state, const m3_switch_config_t* 
 
     if (cmp_ui_box_create(&track) != 0) {
         return -1;
-    }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
     }
     
     track->layout->width = dp_to_px(state, 52.0f);
@@ -202,14 +178,14 @@ int m3_switch_create(material_catalog_state_t* state, const m3_switch_config_t* 
     track->border_radius = 16.0f; /* Circular ends (32 / 2) */
 
     if (config->is_disabled) {
-        track->bg_color = color_to_hex(roles.surface_container_highest); /* 12% alpha */
+        track->bg_color_ref = &state->sys_colors_hex.surface_container_highest; /* 12% alpha */
         track->opacity = 0.12f;
         track->border_width = config->is_on ? 0.0f : 2.0f;
-        track->border_color = color_to_hex(roles.on_surface); /* 12% alpha */
+        track->border_color_ref = &state->sys_colors_hex.on_surface; /* 12% alpha */
     } else {
-        track->bg_color = config->is_on ? color_to_hex(roles.primary) : color_to_hex(roles.surface_container_highest);
+        track->bg_color_ref = config->is_on ? &state->sys_colors_hex.primary : &state->sys_colors_hex.surface_container_highest;
         track->border_width = config->is_on ? 0.0f : 2.0f;
-        track->border_color = color_to_hex(roles.outline);
+        track->border_color_ref = &state->sys_colors_hex.outline;
     }
 
     if (cmp_ui_box_create(&thumb) == 0) {
@@ -230,16 +206,16 @@ int m3_switch_create(material_catalog_state_t* state, const m3_switch_config_t* 
         }
 
         if (config->is_disabled) {
-            thumb->bg_color = color_to_hex(config->is_on ? roles.surface : roles.on_surface); /* 38% alpha */
+            thumb->bg_color_ref = config->is_on ? &state->sys_colors_hex.surface : &state->sys_colors_hex.on_surface; /* 38% alpha */
             thumb->opacity = config->is_on ? 1.0f : 0.38f;
         } else {
-            thumb->bg_color = color_to_hex(config->is_on ? roles.on_primary : roles.outline);
+            thumb->bg_color_ref = config->is_on ? &state->sys_colors_hex.on_primary : &state->sys_colors_hex.outline;
         }
 
         if (config->show_icon && config->is_on) {
             cmp_ui_node_t* icon;
             if (cmp_ui_image_view_create(&icon, "vfs://assets/ic_check.svg") == 0) {
-                icon->text_color = color_to_hex(config->is_disabled ? roles.on_surface : roles.on_primary_container);
+                icon->text_color_ref = config->is_disabled ? &state->sys_colors_hex.on_surface : &state->sys_colors_hex.on_primary_container;
                 icon->layout->width = dp_to_px(state, 16.0f);
                 icon->layout->height = dp_to_px(state, 16.0f);
                 thumb->layout->align_items = CMP_FLEX_ALIGN_CENTER;
@@ -285,8 +261,6 @@ int m3_switch_create(material_catalog_state_t* state, const m3_switch_config_t* 
     }
 int m3_chip_create(material_catalog_state_t* state, const m3_chip_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* chip;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -295,21 +269,15 @@ int m3_chip_create(material_catalog_state_t* state, const m3_chip_config_t* conf
     if (cmp_ui_box_create(&chip) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
     chip->layout->height = dp_to_px(state, 32.0f);
     chip->layout->direction = CMP_FLEX_ROW;
     chip->layout->align_items = CMP_FLEX_ALIGN_CENTER;
     
     if (config->is_elevated) {
-        chip->bg_color = color_to_hex(roles.surface_container_low);
+        chip->bg_color_ref = &state->sys_colors_hex.surface_container_low;
     } else {
-        chip->bg_color = config->is_selected ? color_to_hex(roles.secondary_container) : color_to_hex(roles.surface);
+        chip->bg_color_ref = config->is_selected ? &state->sys_colors_hex.secondary_container : &state->sys_colors_hex.surface;
     }
 
     /* Padding */
@@ -321,7 +289,7 @@ int m3_chip_create(material_catalog_state_t* state, const m3_chip_config_t* conf
         cmp_ui_node_t* lead;
         const char* str = config->leading_icon ? config->leading_icon : "v";
         if (cmp_ui_text_create(&lead, str, (int)strlen(str)) == 0) {
-            lead->text_color = color_to_hex(config->is_selected ? roles.on_secondary_container : roles.primary);
+            lead->text_color_ref = config->is_selected ? &state->sys_colors_hex.on_secondary_container : &state->sys_colors_hex.primary;
             lead->layout->margin[1] = dp_to_px(state, 8.0f); /* Right margin */
             cmp_ui_node_add_child(chip, lead);
         }
@@ -331,7 +299,7 @@ int m3_chip_create(material_catalog_state_t* state, const m3_chip_config_t* conf
     if (config->label) {
         cmp_ui_node_t* text;
         if (cmp_ui_text_create(&text, config->label, (int)strlen(config->label)) == 0) {
-            text->text_color = color_to_hex(config->is_selected ? roles.on_secondary_container : roles.on_surface);
+            text->text_color_ref = config->is_selected ? &state->sys_colors_hex.on_secondary_container : &state->sys_colors_hex.on_surface;
             text->font_size = dp_to_px(state, 14.0f);
             cmp_ui_node_add_child(chip, text);
         }
@@ -341,7 +309,7 @@ int m3_chip_create(material_catalog_state_t* state, const m3_chip_config_t* conf
     if (config->trailing_icon) {
         cmp_ui_node_t* trail;
         if (cmp_ui_text_create(&trail, config->trailing_icon, (int)strlen(config->trailing_icon)) == 0) {
-            trail->text_color = color_to_hex(roles.on_surface_variant);
+            trail->text_color_ref = &state->sys_colors_hex.on_surface_variant;
             trail->layout->margin[3] = dp_to_px(state, 8.0f); /* Left margin */
             if (config->on_trailing_click && !config->is_disabled) {
                 cmp_ui_node_add_event_listener(trail, CMP_EVENT_TYPE_MOUSE, 1, config->on_trailing_click, config->user_data);
@@ -362,8 +330,6 @@ int m3_slider_create(material_catalog_state_t* state, const m3_slider_config_t* 
     cmp_ui_node_t* slider;
     cmp_ui_node_t* track;
     cmp_ui_node_t* thumb;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -371,12 +337,6 @@ int m3_slider_create(material_catalog_state_t* state, const m3_slider_config_t* 
 
     if (cmp_ui_box_create(&slider) != 0) {
         return -1;
-    }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
     }
     
     slider->layout->height = dp_to_px(state, 48.0f); /* Touch target */
@@ -387,12 +347,12 @@ int m3_slider_create(material_catalog_state_t* state, const m3_slider_config_t* 
     if (cmp_ui_box_create(&track) == 0) {
         track->layout->height = dp_to_px(state, 16.0f); /* Inactive track height */
         track->layout->width = -1.0f;
-        track->bg_color = color_to_hex(roles.surface_container_highest);
+        track->bg_color_ref = &state->sys_colors_hex.surface_container_highest;
         
         if (cmp_ui_box_create(&thumb) == 0) {
             thumb->layout->width = dp_to_px(state, 20.0f);
             thumb->layout->height = dp_to_px(state, 20.0f);
-            thumb->bg_color = color_to_hex(roles.primary);
+            thumb->bg_color_ref = &state->sys_colors_hex.primary;
             /* Positioning thumb via margins or absolute is complex without full Flexbox support active.
                We'll inject it into the track. */
             cmp_ui_node_add_child(track, thumb);
@@ -410,8 +370,6 @@ int m3_range_slider_create(material_catalog_state_t* state, const m3_range_slide
     cmp_ui_node_t* track;
     cmp_ui_node_t* thumb1;
     cmp_ui_node_t* thumb2;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -419,12 +377,6 @@ int m3_range_slider_create(material_catalog_state_t* state, const m3_range_slide
 
     if (cmp_ui_box_create(&slider) != 0) {
         return -1;
-    }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
     }
     
     slider->layout->height = dp_to_px(state, 48.0f); /* Touch target */
@@ -435,19 +387,19 @@ int m3_range_slider_create(material_catalog_state_t* state, const m3_range_slide
     if (cmp_ui_box_create(&track) == 0) {
         track->layout->height = dp_to_px(state, 16.0f);
         track->layout->width = -1.0f;
-        track->bg_color = color_to_hex(roles.surface_container_highest);
+        track->bg_color_ref = &state->sys_colors_hex.surface_container_highest;
         
         if (cmp_ui_box_create(&thumb1) == 0) {
             thumb1->layout->width = dp_to_px(state, 20.0f);
             thumb1->layout->height = dp_to_px(state, 20.0f);
-            thumb1->bg_color = color_to_hex(roles.primary);
+            thumb1->bg_color_ref = &state->sys_colors_hex.primary;
             cmp_ui_node_add_child(track, thumb1);
         }
         
         if (cmp_ui_box_create(&thumb2) == 0) {
             thumb2->layout->width = dp_to_px(state, 20.0f);
             thumb2->layout->height = dp_to_px(state, 20.0f);
-            thumb2->bg_color = color_to_hex(roles.primary);
+            thumb2->bg_color_ref = &state->sys_colors_hex.primary;
             cmp_ui_node_add_child(track, thumb2);
         }
         
@@ -462,8 +414,6 @@ int m3_text_field_create(material_catalog_state_t* state, const m3_text_field_co
     cmp_ui_node_t* field;
     cmp_ui_node_t* content_row = NULL;
     cmp_ui_node_t* text_col = NULL;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -471,12 +421,6 @@ int m3_text_field_create(material_catalog_state_t* state, const m3_text_field_co
 
     if (cmp_ui_box_create(&field) != 0) {
         return -1;
-    }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
     }
     
     field->layout->direction = CMP_FLEX_COLUMN;
@@ -488,7 +432,7 @@ int m3_text_field_create(material_catalog_state_t* state, const m3_text_field_co
     content_row->layout->align_items = CMP_FLEX_ALIGN_CENTER;
 
     if (config->type == M3_TEXT_FIELD_TYPE_FILLED) {
-        content_row->bg_color = color_to_hex(roles.surface_container_highest);
+        content_row->bg_color_ref = &state->sys_colors_hex.surface_container_highest;
         content_row->layout->padding[3] = dp_to_px(state, 16.0f);
         content_row->layout->padding[1] = dp_to_px(state, 16.0f);
         /* Filled text field has rounded top corners */
@@ -496,11 +440,11 @@ int m3_text_field_create(material_catalog_state_t* state, const m3_text_field_co
         /* bottom border */
         content_row->border_width = dp_to_px(state, config->is_focused || config->is_error ? 2.0f : 1.0f);
         if (config->is_error) {
-            content_row->border_color = color_to_hex(roles.error);
+            content_row->border_color_ref = &state->sys_colors_hex.error;
         } else if (config->is_focused) {
-            content_row->border_color = color_to_hex(roles.primary);
+            content_row->border_color_ref = &state->sys_colors_hex.primary;
         } else {
-            content_row->border_color = color_to_hex(roles.on_surface_variant);
+            content_row->border_color_ref = &state->sys_colors_hex.on_surface_variant;
         }
     } else {
         content_row->bg_color = 0;
@@ -510,18 +454,18 @@ int m3_text_field_create(material_catalog_state_t* state, const m3_text_field_co
         /* outline border */
         content_row->border_width = dp_to_px(state, config->is_focused || config->is_error ? 2.0f : 1.0f);
         if (config->is_error) {
-            content_row->border_color = color_to_hex(roles.error);
+            content_row->border_color_ref = &state->sys_colors_hex.error;
         } else if (config->is_focused) {
-            content_row->border_color = color_to_hex(roles.primary);
+            content_row->border_color_ref = &state->sys_colors_hex.primary;
         } else {
-            content_row->border_color = color_to_hex(roles.outline);
+            content_row->border_color_ref = &state->sys_colors_hex.outline;
         }
     }
 
     if (config->leading_icon) {
         cmp_ui_node_t* lead;
         if (cmp_ui_text_create(&lead, config->leading_icon, (int)strlen(config->leading_icon)) == 0) {
-            lead->text_color = color_to_hex(config->is_error ? roles.on_error_container : roles.on_surface_variant);
+            lead->text_color_ref = config->is_error ? &state->sys_colors_hex.on_error_container : &state->sys_colors_hex.on_surface_variant;
             lead->layout->margin[1] = dp_to_px(state, 16.0f);
             cmp_ui_node_add_child(content_row, lead);
         }
@@ -536,7 +480,7 @@ int m3_text_field_create(material_catalog_state_t* state, const m3_text_field_co
         /* Both present, label floats */
         cmp_ui_node_t* lbl;
         if (cmp_ui_text_create(&lbl, config->label, (int)strlen(config->label)) == 0) {
-            lbl->text_color = color_to_hex(config->is_error ? roles.error : (config->is_focused ? roles.primary : roles.on_surface_variant));
+            lbl->text_color_ref = config->is_error ? &state->sys_colors_hex.error : (config->is_focused ? &state->sys_colors_hex.primary : &state->sys_colors_hex.on_surface_variant);
             lbl->font_size = dp_to_px(state, 12.0f);
             cmp_ui_node_add_child(text_col, lbl);
         }
@@ -544,7 +488,7 @@ int m3_text_field_create(material_catalog_state_t* state, const m3_text_field_co
         /* Only label, acts as placeholder */
         cmp_ui_node_t* lbl;
         if (cmp_ui_text_create(&lbl, config->label, (int)strlen(config->label)) == 0) {
-            lbl->text_color = color_to_hex(config->is_error ? roles.error : roles.on_surface_variant);
+            lbl->text_color_ref = config->is_error ? &state->sys_colors_hex.error : &state->sys_colors_hex.on_surface_variant;
             lbl->font_size = dp_to_px(state, 16.0f);
             cmp_ui_node_add_child(text_col, lbl);
         }
@@ -553,7 +497,7 @@ int m3_text_field_create(material_catalog_state_t* state, const m3_text_field_co
     if (config->text) {
         cmp_ui_node_t* txt;
         if (cmp_ui_text_create(&txt, config->text, (int)strlen(config->text)) == 0) {
-            txt->text_color = color_to_hex(roles.on_surface);
+            txt->text_color_ref = &state->sys_colors_hex.on_surface;
             txt->font_size = dp_to_px(state, 16.0f);
             cmp_ui_node_add_child(text_col, txt);
         }
@@ -564,7 +508,7 @@ int m3_text_field_create(material_catalog_state_t* state, const m3_text_field_co
     if (config->trailing_icon) {
         cmp_ui_node_t* trail;
         if (cmp_ui_text_create(&trail, config->trailing_icon, (int)strlen(config->trailing_icon)) == 0) {
-            trail->text_color = color_to_hex(config->is_error ? roles.error : roles.on_surface_variant);
+            trail->text_color_ref = config->is_error ? &state->sys_colors_hex.error : &state->sys_colors_hex.on_surface_variant;
             trail->layout->margin[3] = dp_to_px(state, 16.0f);
             cmp_ui_node_add_child(content_row, trail);
         }
@@ -575,7 +519,7 @@ int m3_text_field_create(material_catalog_state_t* state, const m3_text_field_co
     if (config->supporting_text) {
         cmp_ui_node_t* supp;
         if (cmp_ui_text_create(&supp, config->supporting_text, (int)strlen(config->supporting_text)) == 0) {
-            supp->text_color = color_to_hex(config->is_error ? roles.error : roles.on_surface_variant);
+            supp->text_color_ref = config->is_error ? &state->sys_colors_hex.error : &state->sys_colors_hex.on_surface_variant;
             supp->font_size = dp_to_px(state, 12.0f);
             supp->layout->padding[3] = dp_to_px(state, 16.0f);
             supp->layout->padding[1] = dp_to_px(state, 16.0f);

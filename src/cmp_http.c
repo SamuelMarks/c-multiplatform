@@ -404,7 +404,8 @@ int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (mod->type == CMP_MODALITY_ASYNC_SINGLE || mod->type == CMP_MODALITY_ASYNC_MULTI) {
+  if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
+      mod->type == CMP_MODALITY_ASYNC_MULTI) {
     if (c_abstract_http_ws_async_register(client, req, on_msg, on_err, on_close,
                                           user_data) != 0) {
       return CMP_ERROR_INVALID_ARG;
@@ -499,7 +500,8 @@ int cmp_http_sse_run(cmp_modality_t *mod, struct HttpClient *client,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (mod->type == CMP_MODALITY_ASYNC_SINGLE || mod->type == CMP_MODALITY_ASYNC_MULTI) {
+  if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
+      mod->type == CMP_MODALITY_ASYNC_MULTI) {
     if (c_abstract_http_sse_async_register(client, req, on_evt, on_err,
                                            on_close, user_data) != 0) {
       return CMP_ERROR_INVALID_ARG;

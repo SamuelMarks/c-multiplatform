@@ -16,6 +16,7 @@
 #include "m3_inputs.h"
 #include "m3_a11y.h"
 #include "m3_i18n.h"
+#include <math.h>
 #include <greatest.h>
 
 #if defined(_WIN32) || defined(__CYGWIN__)
@@ -358,8 +359,8 @@ TEST test_home_screen(void) {
   if (root->child_count > 1 && root->children[1]->child_count > 0) {
     cmp_ui_node_t *grid = root->children[1];
     cmp_ui_node_t *card = grid->children[0];
-    ASSERT_EQ(dp_to_px(&state, 180.0f),
-              card->layout->height); /* Card height strictly 180dp */
+    ASSERT(fabs(dp_to_px(&state, 180.0f) - card->layout->height) <
+           0.1f); /* Card height strictly 180dp */
   }
 
   material_catalog_cleanup(&state);

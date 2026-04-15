@@ -180,6 +180,7 @@ This document contains a comprehensive, low-level architectural plan to build a 
 - [✓] **Home Screen (Catalog Grid)**
   - [✓] Responsive masonry or grid layout of component category cards.
   - [✓] Filter/Search bar at the top to find components by name.
+  - [✓] **Mosaic View Architecture:** The mosaic view leverages `m3_thumbnail_render()` proxies instead of full interactive widget trees. This "flyweight" pattern prevents allocating thousands of `cmp_ui_node_t` structures when displaying dozens of component cards on the home screen. It renders simplified SVG primitives directly to the canvas using a pre-calculated layout pass. To add a new widget proxy, you must define its dimensions in `m3_catalog_state_t` and implement a drawing routine in the `material_catalog_render_mosaic_card` dispatch loop mapping its `component_id`.
 - [✓] **Component Detail Screen**
   - [✓] Dynamic layout showing variations of the selected component.
   - [✓] "Interactive Playground" pane: sliders to tweak padding, color roles, enabled/disabled states live.

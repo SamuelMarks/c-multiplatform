@@ -11,18 +11,16 @@ static uint32_t color_to_hex(cmp_color_t color) {
     return (a << 24) | (r << 16) | (g << 8) | b;
 }
 
-static void set_button_colors(cmp_ui_node_t* node, cmp_color_t bg, cmp_color_t fg) {
+static void set_button_colors(cmp_ui_node_t* node, const uint32_t *bg_ref, const uint32_t *fg_ref) {
     if (node) {
-        node->bg_color = color_to_hex(bg);
-        node->text_color = color_to_hex(fg);
+        node->bg_color_ref = bg_ref;
+        node->text_color_ref = fg_ref;
     }
 }
 
 int m3_button_create(material_catalog_state_t* state, const m3_button_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* btn;
-    cmp_color_t bg = {0}, fg = {0}, border = {0};
-    m3_color_roles_t roles;
-    int is_dark;
+    const uint32_t *bg_ref = NULL; const uint32_t *fg_ref = NULL; const uint32_t *border_ref = NULL;
     int res;
 
     if (!state || !config || !out_node) {
@@ -77,56 +75,51 @@ int m3_button_create(material_catalog_state_t* state, const m3_button_config_t* 
     }
 
     /* Colors and border */
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
 
+    
     if (config->is_disabled) {
-        fg = roles.on_surface;
-        fg.a = 0.38f;
-        
+        fg_ref = &state->sys_colors_hex.on_surface;
+        btn->opacity = 0.38f;
+
         if (config->type == M3_BUTTON_TYPE_FILLED || config->type == M3_BUTTON_TYPE_ELEVATED || config->type == M3_BUTTON_TYPE_FILLED_TONAL) {
-            bg = roles.on_surface;
-            bg.a = 0.12f;
+            bg_ref = &state->sys_colors_hex.on_surface;
+            /* For background, ideally 12%. Opacity covers the whole node, so it is a compromise */
         } else {
-            bg.a = 0.0f;
+            bg_ref = NULL;
         }
     } else {
         switch (config->type) {
             case M3_BUTTON_TYPE_ELEVATED:
-                bg = roles.surface_container_low;
-                fg = roles.primary;
+                bg_ref = &state->sys_colors_hex.surface_container_low;
+                fg_ref = &state->sys_colors_hex.primary;
                 btn->elevation = 1.0f; /* 1dp elevation */
                 break;
             case M3_BUTTON_TYPE_FILLED:
-                bg = roles.primary;
-                fg = roles.on_primary;
+                bg_ref = &state->sys_colors_hex.primary;
+                fg_ref = &state->sys_colors_hex.on_primary;
                 break;
             case M3_BUTTON_TYPE_FILLED_TONAL:
-                bg = roles.secondary_container;
-                fg = roles.on_secondary_container;
+                bg_ref = &state->sys_colors_hex.secondary_container;
+                fg_ref = &state->sys_colors_hex.on_secondary_container;
                 break;
             case M3_BUTTON_TYPE_OUTLINED:
-                bg.a = 0.0f;
-                fg = roles.primary;
-                border = roles.outline;
+                bg_ref = NULL;
+                fg_ref = &state->sys_colors_hex.primary;
+                border_ref = &state->sys_colors_hex.outline;
                 btn->border_width = 1.0f;
-                btn->border_color = color_to_hex(border);
+                btn->border_color_ref = border_ref;
                 break;
             case M3_BUTTON_TYPE_TEXT:
-                bg.a = 0.0f;
-                fg = roles.primary;
+                bg_ref = NULL;
+                fg_ref = &state->sys_colors_hex.primary;
                 btn->layout->padding[3] = dp_to_px(state, 12.0f);
                 btn->layout->padding[1] = dp_to_px(state, 12.0f);
                 break;
         }
     }
+btn->border_radius = 20.0f; /* Fully rounded corners for standard buttons (40dp height / 2) */
 
-    btn->border_radius = 20.0f; /* Fully rounded corners for standard buttons (40dp height / 2) */
-
-    set_button_colors(btn, bg, fg);
+    set_button_colors(btn, bg_ref, fg_ref);
 
     if (config->on_click && !config->is_disabled) {
         cmp_ui_node_add_event_listener(btn, CMP_EVENT_TYPE_MOUSE, 1 /* CMP_ACTION_CLICK substitute, CMP_ACTION_UP usually 2, let's just use 0 or something valid */, config->on_click, config->user_data);
@@ -139,8 +132,6 @@ int m3_button_create(material_catalog_state_t* state, const m3_button_config_t* 
 int m3_fab_create(material_catalog_state_t* state, const m3_fab_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* fab;
     float size_px;
-    m3_color_roles_t roles;
-    int is_dark;
 
     if (!state || !config || !out_node) {
         return -1;
@@ -172,13 +163,7 @@ int m3_fab_create(material_catalog_state_t* state, const m3_fab_config_t* config
     fab->layout->min_height = size_px;
     fab->elevation = 3.0f; /* 3dp resting elevation */
     
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
-    
-    set_button_colors(fab, roles.primary_container, roles.on_primary_container);
+    set_button_colors(fab, &state->sys_colors_hex.primary_container, &state->sys_colors_hex.on_primary_container);
 
     if (config->label) {
         cmp_ui_node_t* text_node;
@@ -238,7 +223,7 @@ int m3_segmented_button_create(material_catalog_state_t* state, const char** seg
         config.type = M3_BUTTON_TYPE_TEXT;
         config.label = segments[i];
         config.on_click = on_segment_changed;
-        config.user_data = user_data; 
+        config.user_data = user_data ? user_data : (void*)(uintptr_t)i; 
         
         if (m3_button_create(state, &config, &btn) == 0) {
             cmp_ui_node_add_child(group, btn);

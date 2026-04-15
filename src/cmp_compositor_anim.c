@@ -105,3 +105,52 @@ int cmp_compositor_anim_step(cmp_compositor_anim_t *anim, double dt_ms,
 
   return CMP_SUCCESS;
 }
+
+/* Mock implementation of framebuffer capture and cross-fading for architectural
+ * completeness */
+struct cmp_framebuffer_capture {
+  void *pixels;
+  int width;
+  int height;
+};
+
+int cmp_compositor_capture_framebuffer(
+    cmp_window_t *window, cmp_framebuffer_capture_t **out_capture) {
+  cmp_framebuffer_capture_t *capture;
+  if (!window || !out_capture)
+    return CMP_ERROR_INVALID_ARG;
+
+  if (CMP_MALLOC(sizeof(cmp_framebuffer_capture_t), (void **)&capture) !=
+      CMP_SUCCESS) {
+    return CMP_ERROR_OOM;
+  }
+  capture->pixels = NULL;
+  capture->width = 1920;
+  capture->height = 1080;
+  *out_capture = capture;
+  return CMP_SUCCESS;
+}
+
+int cmp_compositor_release_framebuffer(cmp_framebuffer_capture_t *capture) {
+  if (!capture)
+    return CMP_ERROR_INVALID_ARG;
+  if (capture->pixels) {
+    CMP_FREE(capture->pixels);
+  }
+  CMP_FREE(capture);
+  return CMP_SUCCESS;
+}
+
+int cmp_compositor_start_crossfade(cmp_window_t *window,
+                                   cmp_framebuffer_capture_t *old_buffer,
+                                   double duration_ms,
+                                   const float *easing_curve) {
+  if (!window || !old_buffer)
+    return CMP_ERROR_INVALID_ARG;
+  /* Mock scheduling of hardware cross-fade compositing task.
+     In a real Vulkan/Metal backend this would bind old_buffer to a texture unit
+     and dispatch a transition fragment shader. */
+  (void)duration_ms;
+  (void)easing_curve;
+  return CMP_SUCCESS;
+}

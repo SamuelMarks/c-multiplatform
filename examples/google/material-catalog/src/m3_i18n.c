@@ -3,11 +3,78 @@
 #include <stddef.h>
 #include <string.h>
 
+#if defined(_MSC_VER)
+#define STRNCPY_S(dest, destsz, src, count) strncpy_s(dest, destsz, src, count)
+#else
+#define STRNCPY_S(dest, destsz, src, count) strncpy(dest, src, count)
+#endif
+
+typedef struct {
+  const char *key;
+  const char *en;
+  const char *ar;
+  const char *he;
+} i18n_entry_t;
+
+static const i18n_entry_t dictionary[] = {
+  {"title_theme_studio", "Theme Studio & Settings", "استوديو السمات والإعدادات", "סטודיו לערכות נושא והגדרות"},
+  {"label_language", "Language", "اللغة", "שפה"},
+  {"val_english_us", "English (US)", "الإنجليزية (الولايات المتحدة)", "אנגלית (ארה\"ב)"},
+  {"label_high_contrast", "High Contrast Mode", "وضع التباين العالي", "מצב ניגודיות גבוהה"},
+  {"title_colors_hct", "Colors & HCT", "الألوان ونظام HCT", "צבעים ו-HCT"},
+  {"label_seed_color", "Seed Color (Hex)", "لون البذرة (Hex)", "צבע בסיס (הקס)"},
+  {"title_live_preview", "Live Preview", "معاينة حية", "תצוגה מקדימה חיה"},
+  {"label_typography", "Typography", "الطباعة", "טיפוגרפיה"},
+  {"label_shapes", "Shapes", "الأشكال", "צורות"},
+  {"btn_system", "System", "النظام", "מערכת"},
+  {"btn_light", "Light", "فاتح", "בהיר"},
+  {"btn_dark", "Dark", "داكن", "כהה"},
+  {"btn_save", "Save", "حفظ", "שמור"},
+  {"btn_cancel", "Cancel", "إلغاء", "ביטול"},
+  {"app_title", "Material 3 Catalog", "كتالوج ماتيريال 3", "קטלוג Material 3"},
+  {NULL, NULL, NULL, NULL}
+};
+
 int m3_i18n_init(material_catalog_state_t *state) {
   if (!state)
     return MATERIAL_CATALOG_ERROR_NULL_POINTER;
   state->is_rtl = 0; /* Default Left-to-Right */
+  STRNCPY_S(state->current_locale, sizeof(state->current_locale), "en-US", 5);
+  state->current_locale[5] = '\0';
   return MATERIAL_CATALOG_SUCCESS;
+}
+
+int m3_i18n_set_locale(material_catalog_state_t *state, const char *locale) {
+  int is_rtl;
+  if (!state || !locale)
+    return MATERIAL_CATALOG_ERROR_NULL_POINTER;
+
+  STRNCPY_S(state->current_locale, sizeof(state->current_locale), locale, sizeof(state->current_locale) - 1);
+  state->current_locale[sizeof(state->current_locale) - 1] = '\0';
+
+  is_rtl = (strncmp(locale, "ar", 2) == 0 || strncmp(locale, "he", 2) == 0) ? 1 : 0;
+  return m3_i18n_set_rtl(state, is_rtl);
+}
+
+const char *m3_i18n_get_string(material_catalog_state_t *state, const char *key) {
+  int i = 0;
+  int is_ar = 0;
+  int is_he = 0;
+
+  if (!state || !key) return key;
+
+  is_ar = (strncmp(state->current_locale, "ar", 2) == 0);
+  is_he = (strncmp(state->current_locale, "he", 2) == 0);
+
+  while (dictionary[i].key != NULL) {
+    if (strcmp(dictionary[i].key, key) == 0) {
+      if (is_ar && dictionary[i].ar) return dictionary[i].ar;
+      if (is_he && dictionary[i].he) return dictionary[i].he;
+      return dictionary[i].en;
+    }
+    i++;
+  }
+  return key; /* Fallback to key if not found */
 }
 
 int m3_i18n_set_rtl(material_catalog_state_t *state, int is_rtl) {
@@ -62,10 +129,11 @@ static void mirror_node_layout(cmp_ui_node_t *node) {
   }
 
   /* Check if it's an image node with a directional icon */
-  if (node->type == 2 && node->properties) {
-    /* If type=2 is an Image, and it's a directional icon we would mark it to be drawn mirrored.
-       Since we lack a direct `transform: scaleX(-1)` attribute on `cmp_ui_node_t`,
-       a real implementation would set a bit in `design_language_override` or similar. */
+  if (node->type == 7 && node->properties) {
+    const char *img_path = (const char *)node->properties;
+    if (m3_i18n_is_directional_icon(img_path)) {
+      node->is_rtl_mirrored = 1;
+    }
   }
 
   /* Recurse */

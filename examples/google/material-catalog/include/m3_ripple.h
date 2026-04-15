@@ -33,6 +33,13 @@ typedef struct m3_ripple_state_t {
  */
 int material_catalog_apply_ripple(material_catalog_state_t *state, cmp_ui_node_t *node);
 
+/**
+ * @brief Update all active ripples in the state.
+ * @param state The catalog state context.
+ * @param dt_ms Delta time in milliseconds.
+ */
+void material_catalog_update_ripples(material_catalog_state_t *state, float dt_ms);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

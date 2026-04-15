@@ -109,10 +109,10 @@ To support this diverse set of execution modalities via a simple configuration c
 - [✓] 41. **Test Suite - Sync**: Write extensive unit tests asserting behavior in synchronous modes.
 - [✓] 42. **Test Suite - Async**: Write tests ensuring callbacks fire correctly in the async event loop.
 - [✓] 43. **Test Suite - Threading**: Write stress tests for the thread pool to catch race conditions.
-- [ ] 44. **Test Suite - IPC**: Write tests validating message serialization and multiprocess communication.
-- [ ] 45. **Example App - Node.js Clone**: Create a sample app demonstrating the asynchronous event loop serving HTTP requests while rendering UI.
-- [ ] 46. **Example App - Heavy Compute**: Create a sample app demonstrating multithreading (e.g., real-time raytracing or fractal generation) keeping the UI smooth.
-- [ ] 47. **Example App - Resilient Actors**: Create a multiprocess example where background workers intentionally crash and are revived by the main process.
-- [ ] 48. **Documentation - Modalities**: Write detailed guides in `docs/` explaining when to use each modality.
-- [ ] 49. **Documentation - API Ref**: Update API reference for all new concurrency, task, and messaging functions.
-- [ ] 50. **Final Review & Profiling**: Audit the event loop and thread pool overhead to ensure performance regressions are not introduced in simple modalities.
+- [✓] 44. **Test Suite - IPC**: Write tests validating message serialization and multiprocess communication.
+- [✓] 45. **Example App - Node.js Clone**: Create a sample app demonstrating the asynchronous event loop serving HTTP requests while rendering UI.
+- [✓] 46. **Example App - Heavy Compute**: Create a sample app demonstrating multithreading (e.g., real-time raytracing or fractal generation) keeping the UI smooth.
+- [✓] 47. **Example App - Resilient Actors**: Create a multiprocess example where background workers intentionally crash and are revived by the main process.
+- [✓] 48. **Documentation - Modalities**: Write detailed guides in `docs/` explaining when to use each modality.
+- [✓] 49. **Documentation - API Ref**: Update API reference for all new concurrency, task, and messaging functions.
+- [✓] 50. **Final Review & Profiling**: Audit the event loop and thread pool overhead to ensure performance regressions are not introduced in simple modalities.

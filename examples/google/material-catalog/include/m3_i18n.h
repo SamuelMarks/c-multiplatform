@@ -17,6 +17,22 @@ extern "C" {
 int m3_i18n_init(material_catalog_state_t *state);
 
 /**
+ * @brief Sets the current locale and updates RTL direction if necessary.
+ * @param state The catalog state.
+ * @param locale The locale string (e.g. "en-US", "ar-SA").
+ * @return MATERIAL_CATALOG_SUCCESS or an error code.
+ */
+int m3_i18n_set_locale(material_catalog_state_t *state, const char *locale);
+
+/**
+ * @brief Retrieves a localized string by key.
+ * @param state The catalog state.
+ * @param key The string key.
+ * @return The localized string, or the key if not found.
+ */
+const char *m3_i18n_get_string(material_catalog_state_t *state, const char *key);
+
+/**
  * @brief Sets the layout mirroring direction.
  * @param state The catalog state.
  * @param is_rtl 1 for RTL (Right-to-Left), 0 for LTR (Left-to-Right).

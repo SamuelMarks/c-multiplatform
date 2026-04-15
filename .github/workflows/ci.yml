@@ -10,6 +10,7 @@ jobs:
   build:
     uses: SamuelMarks/c-ci/.github/workflows/c-cmake-ci.yml@master
     with:
-      extra_apt_packages: "libcurl4-openssl-dev pkg-config libssl-dev libsqlite3-dev"
+      # xvfb required for OSMesa / Headless Linux visual regression testing
+      extra_apt_packages: "libcurl4-openssl-dev pkg-config libssl-dev libsqlite3-dev xvfb libgl1-mesa-dev libosmesa6-dev"
       extra_brew_packages: "curl pkg-config openssl sqlite"
 #      extra_winget_packages: "curl.curl pkg-config OpenSSL.OpenSSL"

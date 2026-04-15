@@ -37,6 +37,8 @@ struct cmp_window {
   cmp_renderer_t *renderer;
   cmp_window_drop_cb_t drop_cb;
   void *drop_user_data;
+  cmp_window_resize_cb_t resize_cb;
+  void *resize_user_data;
   cmp_ui_node_t *ui_tree;
   float scale_factor;
 };
@@ -229,6 +231,44 @@ static cmp_drop_target_t *create_drop_target(HWND hwnd, cmp_window_t *window) {
 #endif
 
 #if defined(_WIN32)
+static void win32_box_blur_alpha(uint8_t *pixels, int width, int height,
+                                 int stride, int radius) {
+  uint8_t *temp;
+  int x, y, i;
+  if (radius < 1)
+    return;
+  temp = (uint8_t *)malloc(width * height);
+  if (!temp)
+    return;
+  for (y = 0; y < height; y++) {
+    for (x = 0; x < width; x++) {
+      int sum = 0, count = 0;
+      for (i = -radius; i <= radius; i++) {
+        int px = x + i;
+        if (px >= 0 && px < width) {
+          sum += pixels[y * stride + px * 4 + 3];
+          count++;
+        }
+      }
+      temp[y * width + x] = (uint8_t)(sum / count);
+    }
+  }
+  for (y = 0; y < height; y++) {
+    for (x = 0; x < width; x++) {
+      int sum = 0, count = 0;
+      for (i = -radius; i <= radius; i++) {
+        int py = y + i;
+        if (py >= 0 && py < height) {
+          sum += temp[py * width + x];
+          count++;
+        }
+      }
+      pixels[y * stride + x * 4 + 3] = (uint8_t)(sum / count);
+    }
+  }
+  free(temp);
+}
+
 static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
                             int inherited_theme) {
   int current_theme = node->design_language_override
@@ -238,9 +278,18 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
   cmp_rect_t rect;
   uint32_t box_color;
   float opacity;
+  uint32_t bg_color_val;
+  uint32_t text_color_val;
+  uint32_t border_color_val;
 
   if (!node || !node->layout)
     return;
+
+  bg_color_val = node->bg_color_ref ? *(node->bg_color_ref) : node->bg_color;
+  text_color_val =
+      node->text_color_ref ? *(node->text_color_ref) : node->text_color;
+  border_color_val =
+      node->border_color_ref ? *(node->border_color_ref) : node->border_color;
 
   rect = node->layout->computed_rect;
   rect.x *= scale_factor;
@@ -248,65 +297,103 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
   rect.width *= scale_factor;
   rect.height *= scale_factor;
 
-  box_color = node->bg_color;
+  box_color = bg_color_val;
   opacity = node->opacity > 0.0f ? node->opacity : 1.0f;
 
   if (node->elevation > 0.0f && opacity > 0.0f) {
     int shadow_blur = (int)(node->elevation * scale_factor);
     int shadow_offset = (int)(node->elevation * scale_factor * 0.5f);
-    int num_layers = 3;
-    int j;
+    int sr = (int)(node->border_radius * scale_factor * 2.0f);
+    int iw = (int)rect.width;
+    int ih = (int)rect.height;
+    int pad = shadow_blur * 2 + 4;
+    int tex_w = iw + pad * 2;
+    int tex_h = ih + pad * 2;
+    HDC memDC = CreateCompatibleDC(hdc);
+    BITMAPINFO bmi;
+    uint8_t *pixels = NULL;
+    HBITMAP memBM;
+    HBITMAP oldBM;
 
-    for (j = 0; j < num_layers; j++) {
-      int cur_blur = shadow_blur * (j + 1) / num_layers;
-      int cur_alpha =
-          (int)(40.0f * opacity / (float)num_layers); /* 40 max alpha */
-      if (cur_alpha > 0) {
-        HDC memDC = CreateCompatibleDC(hdc);
-        HBITMAP memBM =
-            CreateCompatibleBitmap(hdc, (int)rect.width + cur_blur * 2,
-                                   (int)rect.height + cur_blur * 2);
-        HBITMAP oldBM = (HBITMAP)SelectObject(memDC, memBM);
-        RECT rct;
-        HBRUSH br = CreateSolidBrush(RGB(0, 0, 0));
-        BLENDFUNCTION bf = {0};
-        HRGN rgn = NULL;
-        int sr = (int)(node->border_radius * scale_factor * 2.0f) + cur_blur;
+    memset(&bmi, 0, sizeof(bmi));
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = tex_w;
+    bmi.bmiHeader.biHeight = -tex_h;
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biCompression = BI_RGB;
 
-        rct.left = 0;
-        rct.top = 0;
-        rct.right = (int)rect.width + cur_blur * 2;
-        rct.bottom = (int)rect.height + cur_blur * 2;
-        FillRect(memDC, &rct, br);
+    memBM = CreateDIBSection(memDC, &bmi, DIB_RGB_COLORS, (void **)&pixels,
+                             NULL, 0);
+    if (memBM && pixels) {
+      oldBM = (HBITMAP)SelectObject(memDC, memBM);
+      memset(pixels, 0, tex_w * tex_h * 4);
+
+      {
+        HBRUSH br = CreateSolidBrush(RGB(255, 255, 255));
+        HPEN pen = CreatePen(PS_NULL, 0, RGB(0, 0, 0));
+        HBRUSH old_br = (HBRUSH)SelectObject(memDC, br);
+        HPEN old_pen = (HPEN)SelectObject(memDC, pen);
+        int radius = sr > 0 ? sr : (int)(12.0f * scale_factor * 2.0f);
+
+        RoundRect(memDC, pad, pad, pad + iw + 1, pad + ih + 1, radius, radius);
+
+        SelectObject(memDC, old_br);
+        SelectObject(memDC, old_pen);
         DeleteObject(br);
+        DeleteObject(pen);
+        GdiFlush();
 
-        if (sr > 0 || node->type == 8) {
-          int radius =
-              sr > 0 ? sr : (int)(12.0f * scale_factor * 2.0f) + cur_blur;
-          rgn = CreateRoundRectRgn(0, 0, rct.right + 1, rct.bottom + 1, radius,
-                                   radius);
-          SelectClipRgn(hdc, rgn);
+        {
+          int total = tex_w * tex_h;
+          int pxi;
+          for (pxi = 0; pxi < total; pxi++) {
+            if (pixels[pxi * 4] > 128) {
+              pixels[pxi * 4 + 3] = 255;
+            } else {
+              pixels[pxi * 4 + 3] = 0;
+            }
+            pixels[pxi * 4] = 0;
+            pixels[pxi * 4 + 1] = 0;
+            pixels[pxi * 4 + 2] = 0;
+          }
         }
 
-        bf.BlendOp = AC_SRC_OVER;
-        bf.BlendFlags = 0;
-        bf.SourceConstantAlpha = (BYTE)cur_alpha;
-        bf.AlphaFormat = 0;
+        win32_box_blur_alpha(pixels, tex_w, tex_h, tex_w, shadow_blur);
+        win32_box_blur_alpha(pixels, tex_w, tex_h, tex_w, shadow_blur);
 
-        AlphaBlend(hdc, (int)rect.x - cur_blur,
-                   (int)rect.y - cur_blur + shadow_offset, rct.right,
-                   rct.bottom, memDC, 0, 0, rct.right, rct.bottom, bf);
-
-        if (rgn) {
-          SelectClipRgn(hdc, NULL);
-          DeleteObject(rgn);
+        {
+          uint8_t r = 0, g = 0, b = 0;
+          float base_alpha = opacity * 0.35f;
+          int total = tex_w * tex_h;
+          int pxi;
+          if (node->shadow_color != 0) {
+            r = (node->shadow_color >> 16) & 0xFF;
+            g = (node->shadow_color >> 8) & 0xFF;
+            b = node->shadow_color & 0xFF;
+          }
+          for (pxi = 0; pxi < total; pxi++) {
+            float a = (pixels[pxi * 4 + 3] / 255.0f) * base_alpha;
+            pixels[pxi * 4 + 0] = (uint8_t)(b * a);
+            pixels[pxi * 4 + 1] = (uint8_t)(g * a);
+            pixels[pxi * 4 + 2] = (uint8_t)(r * a);
+            pixels[pxi * 4 + 3] = (uint8_t)(a * 255.0f);
+          }
         }
-
-        SelectObject(memDC, oldBM);
-        DeleteObject(memBM);
-        DeleteDC(memDC);
       }
+
+      {
+        BLENDFUNCTION bf = {0};
+        bf.BlendOp = AC_SRC_OVER;
+        bf.SourceConstantAlpha = 255;
+        bf.AlphaFormat = AC_SRC_ALPHA;
+        AlphaBlend(hdc, (int)rect.x - pad, (int)rect.y - pad + shadow_offset,
+                   tex_w, tex_h, memDC, 0, 0, tex_w, tex_h, bf);
+      }
+      SelectObject(memDC, oldBM);
+      DeleteObject(memBM);
     }
+    DeleteDC(memDC);
   }
 
   if (box_color != 0 || node->border_width > 0.0f) {
@@ -330,13 +417,21 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
     if (a > 0) {
       if (a == 255) {
         HBRUSH br = CreateSolidBrush(RGB(r, g, b));
-        HPEN pen = CreatePen(PS_NULL, 0, RGB(0, 0, 0));
+        HPEN pen = NULL;
+        if (node->border_width > 0.0f) {
+          uint8_t pr = (border_color_val >> 16) & 0xFF;
+          uint8_t pg = (border_color_val >> 8) & 0xFF;
+          uint8_t pb = border_color_val & 0xFF;
+          pen = CreatePen(PS_SOLID, (int)(node->border_width * scale_factor),
+                          RGB(pr, pg, pb));
+        } else {
+          pen = CreatePen(PS_NULL, 0, RGB(0, 0, 0));
+        }
         HBRUSH old_br = (HBRUSH)SelectObject(hdc, br);
         HPEN old_pen = (HPEN)SelectObject(hdc, pen);
-
         if (node->border_radius > 0.0f || node->type == 8) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
-          RoundRect(hdc, ix, iy, ix + iw, iy + ih, radius, radius);
+          RoundRect(hdc, ix, iy, ix + iw + 1, iy + ih + 1, radius, radius);
         } else {
           Rectangle(hdc, ix, iy, ix + iw + 1, iy + ih + 1);
         }
@@ -404,8 +499,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         RECT rct;
         /* Typical material state layer color is based on on-surface or
          * on-primary, usually we use text_color */
-        uint32_t overlay_color =
-            node->text_color ? node->text_color : 0xFF000000;
+        uint32_t overlay_color = text_color_val ? text_color_val : 0xFF000000;
         uint8_t or = (overlay_color >> 16) & 0xFF;
         uint8_t og = (overlay_color >> 8) & 0xFF;
         uint8_t ob = overlay_color & 0xFF;
@@ -453,8 +547,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         HBITMAP memBM = CreateCompatibleBitmap(hdc, iw, ih);
         HBITMAP oldBM = (HBITMAP)SelectObject(memDC, memBM);
         RECT rct;
-        uint32_t overlay_color =
-            node->text_color ? node->text_color : 0xFF000000;
+        uint32_t overlay_color = text_color_val ? text_color_val : 0xFF000000;
         uint8_t or = (overlay_color >> 16) & 0xFF;
         uint8_t og = (overlay_color >> 8) & 0xFF;
         uint8_t ob = overlay_color & 0xFF;
@@ -523,8 +616,8 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
       }
     }
 
-    if (node->border_width > 0.0f && node->border_color != 0) {
-      uint32_t bc = node->border_color;
+    if (node->border_width > 0.0f && border_color_val != 0) {
+      uint32_t bc = border_color_val;
       uint8_t ba = (uint8_t)(((bc >> 24) & 0xFF) * opacity);
       if (ba > 0) {
         uint8_t br = (bc >> 16) & 0xFF;
@@ -563,7 +656,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         text = "Let's build";
 
       if (text) {
-        uint32_t tc_uint = node->text_color;
+        uint32_t tc_uint = text_color_val;
         uint8_t tc_a = (tc_uint >> 24) & 0xFF;
         uint32_t tc =
             RGB((tc_uint >> 16) & 0xFF, (tc_uint >> 8) & 0xFF, tc_uint & 0xFF);
@@ -590,7 +683,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
                            DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
                            CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
                            DEFAULT_PITCH | FF_DONTCARE,
-                           current_theme == 1 ? "Roboto" : "Arial");
+                           current_theme == 1 ? "Segoe UI" : "Arial");
         old_font = (HFONT)SelectObject(hdc, font);
         SetTextAlign(hdc, TA_CENTER | TA_TOP);
         SetTextColor(hdc, tc);
@@ -628,8 +721,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
       float scale_x, scale_y, svg_scale, off_x, off_y;
       POINT *pts;
       int *counts;
-      uint32_t fill_color =
-          node->text_color != 0 ? node->text_color : 0xFF000000;
+      uint32_t fill_color = text_color_val != 0 ? text_color_val : 0xFF000000;
       uint8_t a = (uint8_t)(((fill_color >> 24) & 0xFF) * opacity);
       uint8_t r = (fill_color >> 16) & 0xFF;
       uint8_t g = (fill_color >> 8) & 0xFF;
@@ -814,6 +906,19 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
     }
     return 0;
   }
+  case WM_SIZING: {
+    if (window) {
+      RECT *rect = (RECT *)lParam;
+      int width = rect->right - rect->left;
+      int height = rect->bottom - rect->top;
+      window->config.width = width;
+      window->config.height = height;
+      if (window->resize_cb) {
+        window->resize_cb(width, height, window->resize_user_data);
+      }
+    }
+    return TRUE;
+  }
   case WM_SIZE: {
     if (window) {
       cmp_event_t evt;
@@ -821,6 +926,15 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
       evt.type = CMP_EVENT_TYPE_RESIZE;
       evt.x = (int32_t)(LOWORD(lParam) / window->scale_factor); /* width */
       evt.y = (int32_t)(HIWORD(lParam) / window->scale_factor); /* height */
+
+      window->config.width = LOWORD(lParam);
+      window->config.height = HIWORD(lParam);
+
+      if (window->resize_cb) {
+        window->resize_cb(window->config.width, window->config.height,
+                          window->resize_user_data);
+      }
+
       cmp_event_push(&evt);
     }
     return 0;
@@ -1160,6 +1274,18 @@ int cmp_window_set_drop_callback(cmp_window_t *window,
   window->drop_user_data = user_data;
   return CMP_SUCCESS;
 }
+
+int cmp_window_set_resize_callback(cmp_window_t *window,
+                                   cmp_window_resize_cb_t resize_cb,
+                                   void *user_data) {
+  if (window == NULL) {
+    return CMP_ERROR_INVALID_ARG;
+  }
+  window->resize_cb = resize_cb;
+  window->resize_user_data = user_data;
+  return CMP_SUCCESS;
+}
+
 int cmp_window_show(cmp_window_t *window) {
   if (window == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1426,6 +1552,7 @@ int cmp_window_render_test_frame(cmp_window_t *window) {
 
 #if defined(_WIN32)
   InvalidateRect(window->hwnd, NULL, TRUE);
+  UpdateWindow(window->hwnd);
 #endif
 
   return CMP_SUCCESS;
@@ -1827,6 +1954,10 @@ int cmp_font_load(const char *virtual_path, float default_size,
   if (CMP_MALLOC(sizeof(cmp_font_t), (void **)&font) != CMP_SUCCESS)
     return CMP_ERROR_OOM;
 
+  font->fallbacks = NULL;
+  font->fallback_count = 0;
+  font->fallback_capacity = 0;
+
   if (cmp_vfs_read_file_sync(virtual_path, &buffer, &size) == CMP_SUCCESS) {
 #if defined(_WIN32)
     DWORD num_fonts = 0;
@@ -1839,7 +1970,6 @@ int cmp_font_load(const char *virtual_path, float default_size,
   } else {
     font->internal_handle = NULL;
   }
-
   font->default_size = default_size;
   *out_font = font;
   return CMP_SUCCESS;
@@ -1852,6 +1982,11 @@ int cmp_font_load_memory(const void *buffer, size_t size, float default_size,
     return CMP_ERROR_INVALID_ARG;
   if (CMP_MALLOC(sizeof(cmp_font_t), (void **)&font) != CMP_SUCCESS)
     return CMP_ERROR_OOM;
+
+  font->fallbacks = NULL;
+  font->fallback_count = 0;
+  font->fallback_capacity = 0;
+
 #if defined(_WIN32)
   {
     DWORD num_fonts = 0;
@@ -1870,6 +2005,24 @@ int cmp_font_load_memory(const void *buffer, size_t size, float default_size,
 int cmp_font_add_fallback(cmp_font_t *primary, cmp_font_t *fallback) {
   if (primary == NULL || fallback == NULL)
     return CMP_ERROR_INVALID_ARG;
+
+  if (primary->fallback_count >= primary->fallback_capacity) {
+    size_t new_cap =
+        primary->fallback_capacity == 0 ? 4 : primary->fallback_capacity * 2;
+    struct cmp_font **new_arr;
+    if (CMP_MALLOC(new_cap * sizeof(struct cmp_font *), (void **)&new_arr) !=
+        CMP_SUCCESS)
+      return CMP_ERROR_OOM;
+    if (primary->fallbacks) {
+      memcpy(new_arr, primary->fallbacks,
+             primary->fallback_count * sizeof(struct cmp_font *));
+      CMP_FREE(primary->fallbacks);
+    }
+    primary->fallbacks = new_arr;
+    primary->fallback_capacity = new_cap;
+  }
+
+  primary->fallbacks[primary->fallback_count++] = fallback;
   return CMP_SUCCESS;
 }
 
@@ -1889,6 +2042,9 @@ int cmp_font_destroy(cmp_font_t *font) {
     RemoveFontMemResourceEx((HANDLE)font->internal_handle);
   }
 #endif
+  if (font->fallbacks) {
+    CMP_FREE(font->fallbacks);
+  }
   CMP_FREE(font);
   return CMP_SUCCESS;
 }

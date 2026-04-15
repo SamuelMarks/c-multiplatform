@@ -15,8 +15,6 @@ static uint32_t color_to_hex(cmp_color_t color) {
 
 int m3_card_create(material_catalog_state_t* state, const m3_card_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* card;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -25,27 +23,21 @@ int m3_card_create(material_catalog_state_t* state, const m3_card_config_t* conf
     if (cmp_ui_box_create(&card) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
     switch (config->type) {
         case M3_CARD_TYPE_ELEVATED:
-            card->bg_color = color_to_hex(roles.surface_container_low);
+            card->bg_color_ref = &state->sys_colors_hex.surface_container_low;
             /* Elevation shadow usually mapped via style property in real CMP */
             /* card->style->box_shadow_blur = dp_to_px(state, 1.0f); */
             break;
         case M3_CARD_TYPE_FILLED:
-            card->bg_color = color_to_hex(roles.surface_container_highest);
+            card->bg_color_ref = &state->sys_colors_hex.surface_container_highest;
             /* 0dp elevation */
             break;
         case M3_CARD_TYPE_OUTLINED:
-            card->bg_color = color_to_hex(roles.surface);
+            card->bg_color_ref = &state->sys_colors_hex.surface;
             /* card->style->border_width = dp_to_px(state, 1.0f);
-               card->style->border_color = color_to_hex(roles.outline); */
+               card->style->border_color_ref = &state->sys_colors_hex.outline; */
             break;
     }
 
@@ -73,8 +65,6 @@ int m3_card_create(material_catalog_state_t* state, const m3_card_config_t* conf
 
 int m3_divider_create(material_catalog_state_t* state, const m3_divider_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* divider;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -83,14 +73,8 @@ int m3_divider_create(material_catalog_state_t* state, const m3_divider_config_t
     if (cmp_ui_box_create(&divider) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
-    divider->bg_color = color_to_hex(roles.outline_variant);
+    divider->bg_color_ref = &state->sys_colors_hex.outline_variant;
 
     if (config->is_vertical) {
         divider->layout->width = dp_to_px(state, 1.0f);
@@ -120,8 +104,6 @@ int m3_dialog_create(material_catalog_state_t* state, const m3_dialog_config_t* 
     cmp_ui_node_t* dialog;
     cmp_ui_node_t* content_col = NULL;
     cmp_ui_node_t* actions_row = NULL;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -130,14 +112,8 @@ int m3_dialog_create(material_catalog_state_t* state, const m3_dialog_config_t* 
     if (cmp_ui_box_create(&dialog) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
-    dialog->bg_color = color_to_hex(roles.surface_container_high);
+    dialog->bg_color_ref = &state->sys_colors_hex.surface_container_high;
     /* 3rd level elevation, 28dp extra large shape */
     
     dialog->layout->direction = CMP_FLEX_COLUMN;
@@ -165,7 +141,7 @@ int m3_dialog_create(material_catalog_state_t* state, const m3_dialog_config_t* 
     if (config->icon) {
         cmp_ui_node_t* icon_node;
         if (cmp_ui_text_create(&icon_node, config->icon, (int)strlen(config->icon)) == 0) {
-            icon_node->text_color = color_to_hex(roles.secondary);
+            icon_node->text_color_ref = &state->sys_colors_hex.secondary;
             icon_node->layout->margin[2] = dp_to_px(state, 16.0f); /* Bottom margin */
             cmp_ui_node_add_child(content_col, icon_node);
         }
@@ -174,7 +150,7 @@ int m3_dialog_create(material_catalog_state_t* state, const m3_dialog_config_t* 
     if (config->headline) {
         cmp_ui_node_t* title_node;
         if (cmp_ui_text_create(&title_node, config->headline, (int)strlen(config->headline)) == 0) {
-            title_node->text_color = color_to_hex(roles.on_surface);
+            title_node->text_color_ref = &state->sys_colors_hex.on_surface;
             title_node->font_size = dp_to_px(state, 24.0f); /* Headline Small */
             title_node->layout->margin[2] = dp_to_px(state, 16.0f);
             cmp_ui_node_add_child(content_col, title_node);
@@ -184,7 +160,7 @@ int m3_dialog_create(material_catalog_state_t* state, const m3_dialog_config_t* 
     if (config->supporting_text) {
         cmp_ui_node_t* text_node;
         if (cmp_ui_text_create(&text_node, config->supporting_text, (int)strlen(config->supporting_text)) == 0) {
-            text_node->text_color = color_to_hex(roles.on_surface_variant);
+            text_node->text_color_ref = &state->sys_colors_hex.on_surface_variant;
             text_node->font_size = dp_to_px(state, 14.0f); /* Body Medium */
             cmp_ui_node_add_child(content_col, text_node);
         }
@@ -233,8 +209,6 @@ int m3_dialog_create(material_catalog_state_t* state, const m3_dialog_config_t* 
 
 int m3_bottom_sheet_create(material_catalog_state_t* state, const m3_bottom_sheet_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* sheet;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -243,14 +217,8 @@ int m3_bottom_sheet_create(material_catalog_state_t* state, const m3_bottom_shee
     if (cmp_ui_box_create(&sheet) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
-    sheet->bg_color = color_to_hex(roles.surface_container_low);
+    sheet->bg_color_ref = &state->sys_colors_hex.surface_container_low;
     /* 28dp top corners, 0dp bottom */
     
     sheet->layout->direction = CMP_FLEX_COLUMN;
@@ -263,13 +231,13 @@ int m3_bottom_sheet_create(material_catalog_state_t* state, const m3_bottom_shee
     if (config->type == M3_BOTTOM_SHEET_TYPE_MODAL) {
         /* Scrim rendering and fling velocity to dismiss is managed outside by the engine/router, 
            but we create the container node here. Modal implies it sits in an overlay container. */
-        sheet->bg_color = color_to_hex(roles.surface_container_low);
+        sheet->bg_color_ref = &state->sys_colors_hex.surface_container_low;
     }
 
     if (config->show_drag_handle) {
         cmp_ui_node_t* handle;
         if (cmp_ui_box_create(&handle) == 0) {
-            handle->bg_color = color_to_hex(roles.on_surface_variant);
+            handle->bg_color_ref = &state->sys_colors_hex.on_surface_variant;
             handle->layout->width = dp_to_px(state, 32.0f);
             handle->layout->height = dp_to_px(state, 4.0f);
             handle->layout->margin[0] = dp_to_px(state, 22.0f); /* Top margin */

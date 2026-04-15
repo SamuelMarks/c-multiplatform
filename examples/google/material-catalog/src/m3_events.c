@@ -35,11 +35,16 @@ int m3_event_engine_cleanup(m3_event_engine_t *engine) {
   return 0;
 }
 
+#define M3_KEY_LEFT 37
+#define M3_KEY_UP 38
+#define M3_KEY_RIGHT 39
+#define M3_KEY_DOWN 40
+
 int m3_event_process(m3_event_engine_t *engine, material_catalog_state_t *state,
                      const cmp_event_t *event, uint32_t current_time_ms) {
-  uint32_t dt_ms;
   float dx;
   float dy;
+  uint32_t dt_ms;
 
   if (!engine || !state || !event) {
     return 1;
@@ -51,6 +56,34 @@ int m3_event_process(m3_event_engine_t *engine, material_catalog_state_t *state,
   /* Focus ring is strictly for keyboard traversal */
   if (event->type == CMP_EVENT_TYPE_KEYBOARD) {
     engine->is_focus_ring_visible = 1;
+    if (event->action == CMP_ACTION_DOWN && state->focus_manager) {
+      int direction = -1;
+      if (event->source_id == M3_KEY_UP)
+        direction = 0;
+      else if (event->source_id == M3_KEY_DOWN)
+        direction = 1;
+      else if (event->source_id == M3_KEY_LEFT)
+        direction = 2;
+      else if (event->source_id == M3_KEY_RIGHT)
+        direction = 3;
+
+      if (direction != -1) {
+        int current_id =
+            engine->focused_node ? (int)(uintptr_t)engine->focused_node : 0;
+        int next_id = 0;
+        if (cmp_focus_manager_navigate(state->focus_manager, current_id,
+                                       direction, &next_id) == 0 &&
+            next_id != 0) {
+          engine->focused_node = (cmp_ui_node_t *)(uintptr_t)next_id;
+          cmp_focus_manager_set_focus(state->focus_manager, next_id, 1);
+          if (engine->focused_node && engine->focused_node->properties) {
+            state->focused_component_id =
+                (int)(uintptr_t)engine->focused_node->properties;
+          }
+          state->is_ui_dirty = 1;
+        }
+      }
+    }
   } else if (event->type == CMP_EVENT_TYPE_MOUSE ||
              event->type == CMP_EVENT_TYPE_TOUCH) {
     if (event->action == CMP_ACTION_DOWN) {

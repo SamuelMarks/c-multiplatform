@@ -14,8 +14,6 @@ static uint32_t color_to_hex(cmp_color_t color) {
 
 int m3_badge_create(material_catalog_state_t* state, const m3_badge_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* badge;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -24,14 +22,8 @@ int m3_badge_create(material_catalog_state_t* state, const m3_badge_config_t* co
     if (cmp_ui_box_create(&badge) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
-    badge->bg_color = color_to_hex(roles.error);
+    badge->bg_color_ref = &state->sys_colors_hex.error;
 
     if (config->type == M3_BADGE_TYPE_SMALL_DOT) {
         float size = dp_to_px(state, 6.0f);
@@ -69,7 +61,7 @@ int m3_badge_create(material_catalog_state_t* state, const m3_badge_config_t* co
         }
 
         if (cmp_ui_text_create(&text_node, num_str, (int)strlen(num_str)) == 0) {
-            text_node->text_color = color_to_hex(roles.on_error);
+            text_node->text_color_ref = &state->sys_colors_hex.on_error;
             /* Label small typography, 11sp */
             text_node->font_size = dp_to_px(state, 11.0f);
             cmp_ui_node_add_child(badge, text_node);
@@ -88,8 +80,6 @@ int m3_badge_create(material_catalog_state_t* state, const m3_badge_config_t* co
 
 int m3_progress_create(material_catalog_state_t* state, const m3_progress_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* progress;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !out_node) {
         return -1;
@@ -98,12 +88,6 @@ int m3_progress_create(material_catalog_state_t* state, const m3_progress_config
     if (cmp_ui_box_create(&progress) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
     if (config->type == M3_PROGRESS_TYPE_LINEAR) {
         cmp_ui_node_t* track;
@@ -111,10 +95,10 @@ int m3_progress_create(material_catalog_state_t* state, const m3_progress_config
         progress->layout->height = dp_to_px(state, 4.0f);
         progress->layout->width = 100.0f; /* 100% width default */
         progress->layout->flex_grow = 1.0f; /* Expand */
-        progress->bg_color = color_to_hex(roles.surface_container_highest);
+        progress->bg_color_ref = &state->sys_colors_hex.surface_container_highest;
 
         if (cmp_ui_box_create(&track) == 0) {
-            track->bg_color = color_to_hex(roles.primary);
+            track->bg_color_ref = &state->sys_colors_hex.primary;
             track->layout->height = dp_to_px(state, 4.0f);
             if (config->is_determinate) {
                 float clamp_p = config->progress < 0.0f ? 0.0f : (config->progress > 1.0f ? 1.0f : config->progress);
@@ -144,8 +128,6 @@ int m3_progress_create(material_catalog_state_t* state, const m3_progress_config
 int m3_snackbar_create(material_catalog_state_t* state, const m3_snackbar_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* snackbar;
     cmp_ui_node_t* text_node;
-    m3_color_roles_t roles;
-    int is_dark;
     
     if (!state || !config || !config->text || !out_node) {
         return -1;
@@ -154,14 +136,8 @@ int m3_snackbar_create(material_catalog_state_t* state, const m3_snackbar_config
     if (cmp_ui_box_create(&snackbar) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
-    snackbar->bg_color = color_to_hex(roles.inverse_surface);
+    snackbar->bg_color_ref = &state->sys_colors_hex.inverse_surface;
     
     snackbar->layout->min_height = dp_to_px(state, 48.0f);
     snackbar->layout->direction = CMP_FLEX_ROW;
@@ -172,7 +148,7 @@ int m3_snackbar_create(material_catalog_state_t* state, const m3_snackbar_config
     snackbar->layout->padding[2] = dp_to_px(state, 14.0f); /* Bottom */
 
     if (cmp_ui_text_create(&text_node, config->text, (int)strlen(config->text)) == 0) {
-        text_node->text_color = color_to_hex(roles.inverse_on_surface);
+        text_node->text_color_ref = &state->sys_colors_hex.inverse_on_surface;
         text_node->font_size = dp_to_px(state, 14.0f);
         text_node->layout->flex_grow = 1.0f; /* Push actions to the right */
         cmp_ui_node_add_child(snackbar, text_node);
@@ -184,7 +160,7 @@ int m3_snackbar_create(material_catalog_state_t* state, const m3_snackbar_config
         /* Would need to include m3_buttons.h and create a Text button, but we avoid dependency tangle 
            by just creating a simple text node acting as a button for this mock */
         if (cmp_ui_text_create(&action_btn, config->action_label, (int)strlen(config->action_label)) == 0) {
-            action_btn->text_color = color_to_hex(roles.inverse_primary);
+            action_btn->text_color_ref = &state->sys_colors_hex.inverse_primary;
             action_btn->font_size = dp_to_px(state, 14.0f);
             action_btn->layout->padding[3] = dp_to_px(state, 8.0f);
             cmp_ui_node_add_child(snackbar, action_btn);
@@ -195,7 +171,7 @@ int m3_snackbar_create(material_catalog_state_t* state, const m3_snackbar_config
         cmp_ui_node_t* close_btn;
         const char* x_icon = "X";
         if (cmp_ui_text_create(&close_btn, x_icon, 1) == 0) {
-            close_btn->text_color = color_to_hex(roles.inverse_on_surface);
+            close_btn->text_color_ref = &state->sys_colors_hex.inverse_on_surface;
             close_btn->layout->padding[3] = dp_to_px(state, 12.0f);
             cmp_ui_node_add_child(snackbar, close_btn);
         }

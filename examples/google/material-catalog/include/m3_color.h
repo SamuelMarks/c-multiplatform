@@ -76,6 +76,9 @@ int m3_color_generate_roles(cmp_color_t seed, int is_dark, m3_color_roles_t *out
  */
 int m3_color_tween_roles(const m3_color_roles_t *start, const m3_color_roles_t *end, float t, m3_color_roles_t *out_roles);
 
+struct catalog_state;
+int material_catalog_update_sys_colors_hex(struct catalog_state *state);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

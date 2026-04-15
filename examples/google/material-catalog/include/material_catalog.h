@@ -212,7 +212,56 @@ typedef struct catalog_router_t {
  * @struct material_catalog_state_t
  * @brief Application state for the Material Catalog.
  */
-typedef struct catalog_state_t {
+typedef struct {
+  uint32_t primary;
+  uint32_t on_primary;
+  uint32_t primary_container;
+  uint32_t on_primary_container;
+  uint32_t secondary;
+  uint32_t on_secondary;
+  uint32_t secondary_container;
+  uint32_t on_secondary_container;
+  uint32_t tertiary;
+  uint32_t on_tertiary;
+  uint32_t tertiary_container;
+  uint32_t on_tertiary_container;
+  uint32_t error;
+  uint32_t on_error;
+  uint32_t error_container;
+  uint32_t on_error_container;
+  uint32_t surface_dim;
+  uint32_t surface;
+  uint32_t surface_bright;
+  uint32_t surface_container_lowest;
+  uint32_t surface_container_low;
+  uint32_t surface_container;
+  uint32_t surface_container_high;
+  uint32_t surface_container_highest;
+  uint32_t on_surface;
+  uint32_t on_surface_variant;
+  uint32_t outline;
+  uint32_t outline_variant;
+  uint32_t inverse_surface;
+  uint32_t inverse_on_surface;
+  uint32_t inverse_primary;
+  uint32_t scrim;
+  uint32_t shadow;
+  uint32_t surface_tint;
+  uint32_t primary_fixed;
+  uint32_t primary_fixed_dim;
+  uint32_t on_primary_fixed;
+  uint32_t on_primary_fixed_variant;
+  uint32_t secondary_fixed;
+  uint32_t secondary_fixed_dim;
+  uint32_t on_secondary_fixed;
+  uint32_t on_secondary_fixed_variant;
+  uint32_t tertiary_fixed;
+  uint32_t tertiary_fixed_dim;
+  uint32_t on_tertiary_fixed;
+  uint32_t on_tertiary_fixed_variant;
+} m3_sys_colors_hex_t;
+
+typedef struct catalog_state {
   cmp_window_t *window;
   cmp_ui_node_t *root_node;
 
@@ -230,13 +279,19 @@ typedef struct catalog_state_t {
   cmp_arena_t ui_arena;
   cmp_arena_t state_arena;
 
-  int is_ui_dirty; /* Flag to trigger recomposition */
+  int is_ui_dirty;    /* Flag to trigger full recomposition */
+  int is_paint_dirty; /* Flag to trigger simple repaint */
 
-  cmp_a11y_tree_t *a11y_tree; /* Accessibility tree graph context */
-  int is_rtl;                 /* Right-to-Left writing mode flag */
+  cmp_a11y_tree_t *a11y_tree;         /* Accessibility tree graph context */
+  cmp_focus_manager_t *focus_manager; /* Focus management context */
+  void *event_engine_ptr;             /* Pointer to the event engine */
+  int focused_component_id;           /* ID of currently focused component */
+  int is_rtl;                         /* Right-to-Left writing mode flag */
+  char current_locale[16]; /* Current locale string (e.g. en-US, ar-SA) */
 
   cmp_font_t *fonts[15]; /* Loaded fonts per typography scale */
   cmp_m3_sys_colors_t sys_colors;
+  m3_sys_colors_hex_t sys_colors_hex;
   cmp_m3_palettes_t palettes;
 } catalog_state_t;
 
@@ -269,6 +324,13 @@ int material_catalog_create_ui(material_catalog_state_t *state);
  * @param state Pointer to the catalog state struct.
  */
 void material_catalog_invalidate_ui(material_catalog_state_t *state);
+
+/**
+ * @brief Invalidates the paint state, causing a redraw without recomposition.
+ *
+ * @param state Pointer to the catalog state struct.
+ */
+void material_catalog_invalidate_paint(material_catalog_state_t *state);
 
 /**
  * @brief Navigates to a specific screen, pushing it onto the back stack.

@@ -10,7 +10,8 @@ TEST test_ink_ripple_lifecycle(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_ink_ripple_create(&ripple));
   ASSERT_NEQ(NULL, ripple);
 
-  ASSERT_EQ(CMP_SUCCESS, cmp_ink_ripple_trigger(ripple, 50.0f, 50.0f));
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_ink_ripple_trigger(ripple, 50.0f, 50.0f, 100.0f, 100.0f));
   ASSERT_EQ(CMP_SUCCESS, cmp_ink_ripple_update(ripple, 16.6f));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_ink_ripple_destroy(ripple));

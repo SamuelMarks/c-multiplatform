@@ -12,8 +12,11 @@ int cmp_event_system_init(void) {
     return CMP_SUCCESS;
   }
 
-  /* Arbitrary robust queue size for normalization before dispatch */
-  if (cmp_ring_buffer_init(&g_event_queue, 1024) != CMP_SUCCESS) {
+  /* Robust queue size for normalization before dispatch.
+   * Increased to 131072 to comfortably absorb thousands of 
+   * WM_MOUSEMOVE and WM_SIZE events emitted during slow Windows 
+   * modal resize drag loops where PeekMessage is temporarily blocked. */
+  if (cmp_ring_buffer_init(&g_event_queue, 131072) != CMP_SUCCESS) {
     return CMP_ERROR_OOM;
   }
 

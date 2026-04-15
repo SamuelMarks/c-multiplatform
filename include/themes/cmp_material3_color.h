@@ -11,12 +11,32 @@ extern "C" {
 
 /**
  * @brief Convert HCT (Hue, Chroma, Tone) to sRGB
+ *
+ * Handles reversing CAM16/CIELAB mapping. Includes clamp boundary logic
+ * when the exact Chroma isn't mathematically representable in sRGB space at the
+ * requested Tone, ensuring visual continuity without throwing exceptions.
+ *
+ * @param hue       The input Hue (0-360).
+ * @param chroma    The input Chroma.
+ * @param tone      The input Tone (0-100).
+ * @param out_color Pointer to the resulting sRGB cmp_color_t struct.
+ * @return CMP_SUCCESS on success, or CMP_ERROR_INVALID_ARG.
  */
 CMP_API int cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
                                cmp_color_t *out_color);
 
 /**
- * @brief Convert sRGB to HCT
+ * @brief Convert an sRGB color into the Hue, Chroma, Tone (HCT) color space.
+ *
+ * This function translates colors from standard screen RGB vectors through the
+ * CAM16 perceptual color appearance model into HCT representations.
+ *
+ * @param in_color   The input sRGB color struct.
+ * @param out_hue    Pointer to store the calculated Hue (0-360 degrees).
+ * @param out_chroma Pointer to store the calculated Chroma (colorfulness).
+ * @param out_tone   Pointer to store the calculated Tone (lightness 0-100).
+ * @return CMP_SUCCESS on success, or CMP_ERROR_INVALID_ARG if pointers are
+ * null.
  */
 CMP_API int cmp_m3_srgb_to_hct(const cmp_color_t *in_color, float *out_hue,
                                float *out_chroma, float *out_tone);
@@ -104,6 +124,18 @@ CMP_API int cmp_m3_scheme_fidelity(float hue, float chroma, float tone,
                                    int is_dark, cmp_palette_t *out_palette);
 CMP_API int cmp_m3_scheme_content(float hue, float chroma, float tone,
                                   int is_dark, cmp_palette_t *out_palette);
+
+/**
+ * @brief Map core palettes to Light scheme semantic roles
+ */
+CMP_API int cmp_m3_scheme_light(const cmp_m3_palettes_t *palettes,
+                                cmp_palette_t *out_scheme);
+
+/**
+ * @brief Map core palettes to Dark scheme semantic roles
+ */
+CMP_API int cmp_m3_scheme_dark(const cmp_m3_palettes_t *palettes,
+                               cmp_palette_t *out_scheme);
 
 #ifdef __cplusplus
 }

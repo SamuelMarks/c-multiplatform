@@ -118,6 +118,24 @@ int cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
   if (!out_color)
     return CMP_ERROR_INVALID_ARG;
 
+  if (tone <= 0.01f) {
+    out_color->r = 0.0f;
+    out_color->g = 0.0f;
+    out_color->b = 0.0f;
+    out_color->a = 1.0f;
+    out_color->space = CMP_COLOR_SPACE_SRGB;
+    return CMP_SUCCESS;
+  }
+
+  if (tone >= 99.99f) {
+    out_color->r = 1.0f;
+    out_color->g = 1.0f;
+    out_color->b = 1.0f;
+    out_color->a = 1.0f;
+    out_color->space = CMP_COLOR_SPACE_SRGB;
+    return CMP_SUCCESS;
+  }
+
   l = tone;
   a = chroma * (float)cos(hue * M_PI / 180.0f);
   b = chroma * (float)sin(hue * M_PI / 180.0f);
@@ -354,3 +372,81 @@ int cmp_m3_scheme_content(float hue, float chroma, float tone, int is_dark,
                      &out_palette->primary);
   return CMP_SUCCESS;
 }
+
+int cmp_m3_scheme_light(const cmp_m3_palettes_t *palettes,
+                        cmp_palette_t *out_scheme) {
+  if (!palettes || !out_scheme)
+    return CMP_ERROR_INVALID_ARG;
+
+  out_scheme->primary = palettes->primary.tone40;
+  out_scheme->on_primary = palettes->primary.tone100;
+  out_scheme->primary_container = palettes->primary.tone90;
+  out_scheme->on_primary_container = palettes->primary.tone10;
+  out_scheme->secondary = palettes->secondary.tone40;
+  out_scheme->on_secondary = palettes->secondary.tone100;
+  out_scheme->secondary_container = palettes->secondary.tone90;
+  out_scheme->on_secondary_container = palettes->secondary.tone10;
+  out_scheme->tertiary = palettes->tertiary.tone40;
+  out_scheme->on_tertiary = palettes->tertiary.tone100;
+  out_scheme->tertiary_container = palettes->tertiary.tone90;
+  out_scheme->on_tertiary_container = palettes->tertiary.tone10;
+  out_scheme->error = palettes->error.tone40;
+  out_scheme->on_error = palettes->error.tone100;
+  out_scheme->error_container = palettes->error.tone90;
+  out_scheme->on_error_container = palettes->error.tone10;
+  out_scheme->background = palettes->neutral.tone99;
+  out_scheme->on_background = palettes->neutral.tone10;
+  out_scheme->surface = palettes->neutral.tone99;
+  out_scheme->on_surface = palettes->neutral.tone10;
+  out_scheme->surface_variant = palettes->neutral_variant.tone90;
+  out_scheme->on_surface_variant = palettes->neutral_variant.tone30;
+  out_scheme->outline = palettes->neutral_variant.tone50;
+  out_scheme->outline_variant = palettes->neutral_variant.tone80;
+  out_scheme->shadow = palettes->neutral.tone0;
+  out_scheme->scrim = palettes->neutral.tone0;
+  out_scheme->inverse_surface = palettes->neutral.tone20;
+  out_scheme->inverse_on_surface = palettes->neutral.tone95;
+  out_scheme->inverse_primary = palettes->primary.tone80;
+
+  return CMP_SUCCESS;
+}
+
+int cmp_m3_scheme_dark(const cmp_m3_palettes_t *palettes,
+                       cmp_palette_t *out_scheme) {
+  if (!palettes || !out_scheme)
+    return CMP_ERROR_INVALID_ARG;
+
+  out_scheme->primary = palettes->primary.tone80;
+  out_scheme->on_primary = palettes->primary.tone20;
+  out_scheme->primary_container = palettes->primary.tone30;
+  out_scheme->on_primary_container = palettes->primary.tone90;
+  out_scheme->secondary = palettes->secondary.tone80;
+  out_scheme->on_secondary = palettes->secondary.tone20;
+  out_scheme->secondary_container = palettes->secondary.tone30;
+  out_scheme->on_secondary_container = palettes->secondary.tone90;
+  out_scheme->tertiary = palettes->tertiary.tone80;
+  out_scheme->on_tertiary = palettes->tertiary.tone20;
+  out_scheme->tertiary_container = palettes->tertiary.tone30;
+  out_scheme->on_tertiary_container = palettes->tertiary.tone90;
+  out_scheme->error = palettes->error.tone80;
+  out_scheme->on_error = palettes->error.tone20;
+  out_scheme->error_container = palettes->error.tone30;
+  out_scheme->on_error_container = palettes->error.tone90;
+  out_scheme->background = palettes->neutral.tone10;
+  out_scheme->on_background = palettes->neutral.tone90;
+  out_scheme->surface = palettes->neutral.tone10;
+  out_scheme->on_surface = palettes->neutral.tone90;
+  out_scheme->surface_variant = palettes->neutral_variant.tone30;
+  out_scheme->on_surface_variant = palettes->neutral_variant.tone80;
+  out_scheme->outline = palettes->neutral_variant.tone60;
+  out_scheme->outline_variant = palettes->neutral_variant.tone30;
+  out_scheme->shadow = palettes->neutral.tone0;
+  out_scheme->scrim = palettes->neutral.tone0;
+  out_scheme->inverse_surface = palettes->neutral.tone90;
+  out_scheme->inverse_on_surface = palettes->neutral.tone20;
+  out_scheme->inverse_primary = palettes->primary.tone40;
+
+  return CMP_SUCCESS;
+}
+ 
+ 

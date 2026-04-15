@@ -471,7 +471,7 @@ int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
   }
   calculate_node_pass(root, 0.0f, 0.0f, available_width, available_height);
 
-  if (cmp_i18n_get_bidi_direction() == CMP_TEXT_DIR_RTL) {
+  if (cmp_i18n_is_rtl()) {
     apply_rtl_mirroring(root);
   }
 

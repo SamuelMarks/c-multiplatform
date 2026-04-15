@@ -16,8 +16,6 @@ int m3_top_app_bar_create(material_catalog_state_t* state, const m3_top_app_bar_
     cmp_ui_node_t* left_box = NULL;
     cmp_ui_node_t* right_box = NULL;
     cmp_ui_node_t* title_node;
-    m3_color_roles_t roles;
-    int is_dark;
     int i;
     
     if (!state || !config || !out_node) {
@@ -27,17 +25,11 @@ int m3_top_app_bar_create(material_catalog_state_t* state, const m3_top_app_bar_
     if (cmp_ui_box_create(&bar) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
     if (config->is_scrolled) {
-        bar->bg_color = color_to_hex(roles.surface_container);
+        bar->bg_color_ref = &state->sys_colors_hex.surface_container;
     } else {
-        bar->bg_color = color_to_hex(roles.surface);
+        bar->bg_color_ref = &state->sys_colors_hex.surface;
     }
     
     bar->layout->direction = CMP_FLEX_ROW;
@@ -65,7 +57,7 @@ int m3_top_app_bar_create(material_catalog_state_t* state, const m3_top_app_bar_
     if (config->nav_icon) {
         cmp_ui_node_t* nav_node;
         if (cmp_ui_text_create(&nav_node, config->nav_icon, (int)strlen(config->nav_icon)) == 0) {
-            nav_node->text_color = color_to_hex(roles.on_surface);
+            nav_node->text_color_ref = &state->sys_colors_hex.on_surface;
             nav_node->layout->padding[3] = dp_to_px(state, 16.0f);
             nav_node->layout->padding[1] = dp_to_px(state, 16.0f);
             if (config->on_nav_click) {
@@ -77,7 +69,7 @@ int m3_top_app_bar_create(material_catalog_state_t* state, const m3_top_app_bar_
 
     if (config->type != M3_TOP_APP_BAR_TYPE_CENTER_ALIGNED && config->title) {
         if (cmp_ui_text_create(&title_node, config->title, (int)strlen(config->title)) == 0) {
-            title_node->text_color = color_to_hex(roles.on_surface);
+            title_node->text_color_ref = &state->sys_colors_hex.on_surface;
             title_node->font_size = dp_to_px(state, config->type == M3_TOP_APP_BAR_TYPE_SMALL || config->is_scrolled ? 22.0f : 28.0f);
             if (!config->nav_icon) title_node->layout->padding[3] = dp_to_px(state, 16.0f);
             cmp_ui_node_add_child(left_box, title_node);
@@ -88,7 +80,7 @@ int m3_top_app_bar_create(material_catalog_state_t* state, const m3_top_app_bar_
 
     if (config->type == M3_TOP_APP_BAR_TYPE_CENTER_ALIGNED && config->title) {
         if (cmp_ui_text_create(&title_node, config->title, (int)strlen(config->title)) == 0) {
-            title_node->text_color = color_to_hex(roles.on_surface);
+            title_node->text_color_ref = &state->sys_colors_hex.on_surface;
             title_node->font_size = dp_to_px(state, 22.0f);
             title_node->layout->position_type = CMP_POSITION_ABSOLUTE;
             /* Mock centering via layout engine */
@@ -104,7 +96,7 @@ int m3_top_app_bar_create(material_catalog_state_t* state, const m3_top_app_bar_
         for (i = 0; i < config->action_count; ++i) {
             cmp_ui_node_t* act_node;
             if (cmp_ui_text_create(&act_node, config->action_icons[i], (int)strlen(config->action_icons[i])) == 0) {
-                act_node->text_color = color_to_hex(roles.on_surface_variant);
+                act_node->text_color_ref = &state->sys_colors_hex.on_surface_variant;
                 act_node->layout->padding[3] = dp_to_px(state, 12.0f);
                 if (i == config->action_count - 1) {
                     act_node->layout->padding[1] = dp_to_px(state, 16.0f);
@@ -122,8 +114,6 @@ int m3_top_app_bar_create(material_catalog_state_t* state, const m3_top_app_bar_
 
 int m3_bottom_app_bar_create(material_catalog_state_t* state, const m3_bottom_app_bar_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* bar;
-    m3_color_roles_t roles;
-    int is_dark;
     int i;
     
     if (!state || !config || !out_node) {
@@ -133,14 +123,8 @@ int m3_bottom_app_bar_create(material_catalog_state_t* state, const m3_bottom_ap
     if (cmp_ui_box_create(&bar) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
-    bar->bg_color = color_to_hex(roles.surface_container);
+    bar->bg_color_ref = &state->sys_colors_hex.surface_container;
     bar->layout->height = dp_to_px(state, 80.0f);
     bar->layout->width = -1.0f;
     bar->layout->direction = CMP_FLEX_ROW;
@@ -156,7 +140,7 @@ int m3_bottom_app_bar_create(material_catalog_state_t* state, const m3_bottom_ap
         for (i = 0; i < config->action_count; ++i) {
             cmp_ui_node_t* icon;
             if (cmp_ui_text_create(&icon, config->action_icons[i], (int)strlen(config->action_icons[i])) == 0) {
-                icon->text_color = color_to_hex(roles.on_surface_variant);
+                icon->text_color_ref = &state->sys_colors_hex.on_surface_variant;
                 icon->layout->padding[1] = dp_to_px(state, 24.0f);
                 cmp_ui_node_add_child(act_box, icon);
             }
@@ -182,8 +166,6 @@ int m3_bottom_app_bar_create(material_catalog_state_t* state, const m3_bottom_ap
 
 int m3_navigation_bar_create(material_catalog_state_t* state, const m3_navigation_bar_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* bar;
-    m3_color_roles_t roles;
-    int is_dark;
     int i;
     
     if (!state || !config || !out_node) {
@@ -193,14 +175,8 @@ int m3_navigation_bar_create(material_catalog_state_t* state, const m3_navigatio
     if (cmp_ui_box_create(&bar) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
-    bar->bg_color = color_to_hex(roles.surface_container);
+    bar->bg_color_ref = &state->sys_colors_hex.surface_container;
     bar->layout->height = dp_to_px(state, 80.0f);
     bar->layout->width = -1.0f;
     bar->layout->direction = CMP_FLEX_ROW;
@@ -226,7 +202,7 @@ int m3_navigation_bar_create(material_catalog_state_t* state, const m3_navigatio
         icon_box->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
         
         if (is_selected) {
-            icon_box->bg_color = color_to_hex(roles.secondary_container);
+            icon_box->bg_color_ref = &state->sys_colors_hex.secondary_container;
             /* radius 16dp */
         }
         
@@ -234,7 +210,7 @@ int m3_navigation_bar_create(material_catalog_state_t* state, const m3_navigatio
             cmp_ui_node_t* icon_txt;
             const char* ico_str = is_selected && config->items[i].active_icon ? config->items[i].active_icon : config->items[i].icon;
             if (cmp_ui_text_create(&icon_txt, ico_str, (int)strlen(ico_str)) == 0) {
-                icon_txt->text_color = color_to_hex(is_selected ? roles.on_secondary_container : roles.on_surface_variant);
+                icon_txt->text_color_ref = is_selected ? &state->sys_colors_hex.on_secondary_container : &state->sys_colors_hex.on_surface_variant;
                 cmp_ui_node_add_child(icon_box, icon_txt);
             }
         }
@@ -243,7 +219,7 @@ int m3_navigation_bar_create(material_catalog_state_t* state, const m3_navigatio
 
         if (!config->hide_labels) {
             if (cmp_ui_text_create(&label, config->items[i].label, (int)strlen(config->items[i].label)) == 0) {
-                label->text_color = color_to_hex(is_selected ? roles.on_surface : roles.on_surface_variant);
+                label->text_color_ref = is_selected ? &state->sys_colors_hex.on_surface : &state->sys_colors_hex.on_surface_variant;
                 label->font_size = dp_to_px(state, 12.0f); /* Label medium */
                 label->layout->margin[0] = dp_to_px(state, 4.0f); /* Top margin */
                 cmp_ui_node_add_child(item_box, label);
@@ -261,8 +237,6 @@ int m3_navigation_bar_create(material_catalog_state_t* state, const m3_navigatio
 
 int m3_navigation_rail_create(material_catalog_state_t* state, const m3_navigation_rail_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* rail;
-    m3_color_roles_t roles;
-    int is_dark;
     int i;
     
     if (!state || !config || !out_node) {
@@ -272,14 +246,8 @@ int m3_navigation_rail_create(material_catalog_state_t* state, const m3_navigati
     if (cmp_ui_box_create(&rail) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
-    rail->bg_color = color_to_hex(roles.surface);
+    rail->bg_color_ref = &state->sys_colors_hex.surface;
     rail->layout->width = dp_to_px(state, 80.0f);
     rail->layout->height = -1.0f;
     rail->layout->direction = CMP_FLEX_COLUMN;
@@ -296,7 +264,7 @@ int m3_navigation_rail_create(material_catalog_state_t* state, const m3_navigati
     if (config->has_menu) {
         cmp_ui_node_t* menu;
         if (cmp_ui_text_create(&menu, "M", 1) == 0) {
-            menu->text_color = color_to_hex(roles.on_surface_variant);
+            menu->text_color_ref = &state->sys_colors_hex.on_surface_variant;
             menu->layout->margin[0] = dp_to_px(state, 24.0f);
             cmp_ui_node_add_child(rail, menu);
         }
@@ -334,11 +302,11 @@ int m3_navigation_rail_create(material_catalog_state_t* state, const m3_navigati
             icon_box->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
             
             if (is_selected) {
-                icon_box->bg_color = color_to_hex(roles.secondary_container);
+                icon_box->bg_color_ref = &state->sys_colors_hex.secondary_container;
             }
             
             if (cmp_ui_text_create(&icon_txt, config->items[i].icon, (int)strlen(config->items[i].icon)) == 0) {
-                icon_txt->text_color = color_to_hex(is_selected ? roles.on_secondary_container : roles.on_surface_variant);
+                icon_txt->text_color_ref = is_selected ? &state->sys_colors_hex.on_secondary_container : &state->sys_colors_hex.on_surface_variant;
                 cmp_ui_node_add_child(icon_box, icon_txt);
             }
             cmp_ui_node_add_child(item_box, icon_box);
@@ -347,7 +315,7 @@ int m3_navigation_rail_create(material_catalog_state_t* state, const m3_navigati
         if (config->items[i].label) {
             cmp_ui_node_t* label;
             if (cmp_ui_text_create(&label, config->items[i].label, (int)strlen(config->items[i].label)) == 0) {
-                label->text_color = color_to_hex(is_selected ? roles.on_surface : roles.on_surface_variant);
+                label->text_color_ref = is_selected ? &state->sys_colors_hex.on_surface : &state->sys_colors_hex.on_surface_variant;
                 label->font_size = dp_to_px(state, 12.0f);
                 label->layout->margin[0] = dp_to_px(state, 4.0f);
                 cmp_ui_node_add_child(item_box, label);
@@ -363,8 +331,6 @@ int m3_navigation_rail_create(material_catalog_state_t* state, const m3_navigati
 
 int m3_navigation_drawer_create(material_catalog_state_t* state, const m3_navigation_drawer_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* drawer;
-    m3_color_roles_t roles;
-    int is_dark;
     int i;
     
     if (!state || !config || !out_node) {
@@ -374,14 +340,8 @@ int m3_navigation_drawer_create(material_catalog_state_t* state, const m3_naviga
     if (cmp_ui_box_create(&drawer) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
-    drawer->bg_color = color_to_hex(roles.surface_container_low);
+    drawer->bg_color_ref = &state->sys_colors_hex.surface_container_low;
     drawer->layout->width = dp_to_px(state, 360.0f);
     drawer->layout->height = -1.0f;
     drawer->layout->direction = CMP_FLEX_COLUMN;
@@ -392,7 +352,7 @@ int m3_navigation_drawer_create(material_catalog_state_t* state, const m3_naviga
     if (config->headline) {
         cmp_ui_node_t* head;
         if (cmp_ui_text_create(&head, config->headline, (int)strlen(config->headline)) == 0) {
-            head->text_color = color_to_hex(roles.on_surface_variant);
+            head->text_color_ref = &state->sys_colors_hex.on_surface_variant;
             head->font_size = dp_to_px(state, 14.0f);
             head->layout->margin[3] = dp_to_px(state, 16.0f);
             head->layout->margin[2] = dp_to_px(state, 16.0f);
@@ -412,14 +372,14 @@ int m3_navigation_drawer_create(material_catalog_state_t* state, const m3_naviga
         item_box->layout->padding[3] = dp_to_px(state, 16.0f);
         
         if (is_selected) {
-            item_box->bg_color = color_to_hex(roles.secondary_container);
+            item_box->bg_color_ref = &state->sys_colors_hex.secondary_container;
             /* shape full (pill) */
         }
         
         if (config->items[i].icon) {
             cmp_ui_node_t* icon_txt;
             if (cmp_ui_text_create(&icon_txt, config->items[i].icon, (int)strlen(config->items[i].icon)) == 0) {
-                icon_txt->text_color = color_to_hex(is_selected ? roles.on_secondary_container : roles.on_surface_variant);
+                icon_txt->text_color_ref = is_selected ? &state->sys_colors_hex.on_secondary_container : &state->sys_colors_hex.on_surface_variant;
                 icon_txt->layout->margin[1] = dp_to_px(state, 12.0f);
                 cmp_ui_node_add_child(item_box, icon_txt);
             }
@@ -428,7 +388,7 @@ int m3_navigation_drawer_create(material_catalog_state_t* state, const m3_naviga
         if (config->items[i].label) {
             cmp_ui_node_t* label;
             if (cmp_ui_text_create(&label, config->items[i].label, (int)strlen(config->items[i].label)) == 0) {
-                label->text_color = color_to_hex(is_selected ? roles.on_surface : roles.on_surface_variant);
+                label->text_color_ref = is_selected ? &state->sys_colors_hex.on_surface : &state->sys_colors_hex.on_surface_variant;
                 label->font_size = dp_to_px(state, 14.0f);
                 cmp_ui_node_add_child(item_box, label);
             }
@@ -443,8 +403,6 @@ int m3_navigation_drawer_create(material_catalog_state_t* state, const m3_naviga
 
 int m3_tabs_create(material_catalog_state_t* state, const m3_tabs_config_t* config, cmp_ui_node_t** out_node) {
     cmp_ui_node_t* tabs;
-    m3_color_roles_t roles;
-    int is_dark;
     int i;
     
     if (!state || !config || !out_node) {
@@ -454,14 +412,8 @@ int m3_tabs_create(material_catalog_state_t* state, const m3_tabs_config_t* conf
     if (cmp_ui_box_create(&tabs) != 0) {
         return -1;
     }
-
-    is_dark = (state->current_theme == CATALOG_THEME_DARK) ? 1 : 0;
-    {
-        cmp_color_t seed = {0.4f, 0.2f, 0.8f, 1.0f, CMP_COLOR_SPACE_SRGB};
-        m3_color_generate_roles(seed, is_dark, &roles);
-    }
     
-    tabs->bg_color = color_to_hex(roles.surface);
+    tabs->bg_color_ref = &state->sys_colors_hex.surface;
     tabs->layout->direction = CMP_FLEX_ROW;
     tabs->layout->width = -1.0f;
     tabs->layout->height = dp_to_px(state, 48.0f);
@@ -489,7 +441,7 @@ int m3_tabs_create(material_catalog_state_t* state, const m3_tabs_config_t* conf
         if (config->tab_icons && config->tab_icons[i]) {
             cmp_ui_node_t* icon;
             if (cmp_ui_text_create(&icon, config->tab_icons[i], (int)strlen(config->tab_icons[i])) == 0) {
-                icon->text_color = color_to_hex(is_selected ? roles.primary : roles.on_surface_variant);
+                icon->text_color_ref = is_selected ? &state->sys_colors_hex.primary : &state->sys_colors_hex.on_surface_variant;
                 cmp_ui_node_add_child(tab, icon);
             }
             tabs->layout->height = dp_to_px(state, 64.0f); /* Taller if icons present */
@@ -498,7 +450,7 @@ int m3_tabs_create(material_catalog_state_t* state, const m3_tabs_config_t* conf
         if (config->tab_labels && config->tab_labels[i]) {
             cmp_ui_node_t* label;
             if (cmp_ui_text_create(&label, config->tab_labels[i], (int)strlen(config->tab_labels[i])) == 0) {
-                label->text_color = color_to_hex(is_selected ? roles.primary : roles.on_surface_variant);
+                label->text_color_ref = is_selected ? &state->sys_colors_hex.primary : &state->sys_colors_hex.on_surface_variant;
                 label->font_size = dp_to_px(state, 14.0f);
                 cmp_ui_node_add_child(tab, label);
             }
@@ -508,7 +460,7 @@ int m3_tabs_create(material_catalog_state_t* state, const m3_tabs_config_t* conf
             /* Active indicator */
             cmp_ui_node_t* indicator;
             if (cmp_ui_box_create(&indicator) == 0) {
-                indicator->bg_color = color_to_hex(roles.primary);
+                indicator->bg_color_ref = &state->sys_colors_hex.primary;
                 indicator->layout->height = dp_to_px(state, config->type == M3_TABS_TYPE_PRIMARY ? 3.0f : 2.0f);
                 indicator->layout->position_type = CMP_POSITION_ABSOLUTE;
                 indicator->layout->position[2] = 0.0f; /* Bottom */
