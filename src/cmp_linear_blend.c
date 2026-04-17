@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -11,36 +12,58 @@ struct cmp_linear_blend {
 };
 
 int cmp_linear_blend_create(float gamma, cmp_linear_blend_t **out_blend) {
-  struct cmp_linear_blend *blend;
-  if (!out_blend)
-    return CMP_ERROR_INVALID_ARG;
-  if (gamma <= 0.0f)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  struct cmp_linear_blend *blend = NULL;
 
-  if (CMP_MALLOC(sizeof(struct cmp_linear_blend), (void **)&blend) !=
-      CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  if (!out_blend) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_linear_blend_create: Invalid argument "
+              "(out_blend=NULL)\n");
+    return rc;
+  }
+  if (gamma <= 0.0f) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_linear_blend_create: Invalid gamma\n");
+    return rc;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_linear_blend), (void **)&blend);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_linear_blend_create: Out of memory\n");
+    return rc;
+  }
 
   blend->display_gamma = gamma;
   blend->inv_gamma = 1.0f / gamma;
 
   *out_blend = (cmp_linear_blend_t *)blend;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_linear_blend_destroy(cmp_linear_blend_t *blend) {
-  if (!blend)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!blend) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_linear_blend_destroy: Invalid argument\n");
+    return rc;
+  }
+
   CMP_FREE(blend);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_linear_blend_srgb_to_linear(cmp_linear_blend_t *blend,
                                     const cmp_color_t *srgb,
                                     cmp_color_t *out_linear) {
+  int rc = CMP_SUCCESS;
   struct cmp_linear_blend *ctx = (struct cmp_linear_blend *)blend;
-  if (!ctx || !srgb || !out_linear)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx || !srgb || !out_linear) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_linear_blend_srgb_to_linear: Invalid argument\n");
+    return rc;
+  }
 
   out_linear->r = (float)pow((double)srgb->r, (double)ctx->display_gamma);
   out_linear->g = (float)pow((double)srgb->g, (double)ctx->display_gamma);
@@ -49,15 +72,20 @@ int cmp_linear_blend_srgb_to_linear(cmp_linear_blend_t *blend,
   out_linear->space =
       CMP_COLOR_SPACE_SRGB; /* still in standard gamut, just linear value */
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_linear_blend_linear_to_srgb(cmp_linear_blend_t *blend,
                                     const cmp_color_t *linear,
                                     cmp_color_t *out_srgb) {
+  int rc = CMP_SUCCESS;
   struct cmp_linear_blend *ctx = (struct cmp_linear_blend *)blend;
-  if (!ctx || !linear || !out_srgb)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx || !linear || !out_srgb) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_linear_blend_linear_to_srgb: Invalid argument\n");
+    return rc;
+  }
 
   out_srgb->r = (float)pow((double)linear->r, (double)ctx->inv_gamma);
   out_srgb->g = (float)pow((double)linear->g, (double)ctx->inv_gamma);
@@ -65,31 +93,40 @@ int cmp_linear_blend_linear_to_srgb(cmp_linear_blend_t *blend,
   out_srgb->a = linear->a;
   out_srgb->space = CMP_COLOR_SPACE_SRGB;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_linear_blend_mix(cmp_linear_blend_t *blend, const cmp_color_t *bg,
                          const cmp_color_t *fg, float alpha,
                          cmp_color_t *out_blended) {
+  int rc = CMP_SUCCESS;
   cmp_color_t bg_lin, fg_lin, mix_lin;
   float blend_alpha;
-  int err;
 
-  if (!blend || !bg || !fg || !out_blended)
-    return CMP_ERROR_INVALID_ARG;
+  if (!blend || !bg || !fg || !out_blended) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_linear_blend_mix: Invalid argument\n");
+    return rc;
+  }
 
   if (alpha < 0.0f)
     alpha = 0.0f;
   if (alpha > 1.0f)
     alpha = 1.0f;
 
-  err = cmp_linear_blend_srgb_to_linear(blend, bg, &bg_lin);
-  if (err != CMP_SUCCESS)
-    return err;
+  rc = cmp_linear_blend_srgb_to_linear(blend, bg, &bg_lin);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_linear_blend_mix: cmp_linear_blend_srgb_to_linear "
+              "failed for bg\n");
+    return rc;
+  }
 
-  err = cmp_linear_blend_srgb_to_linear(blend, fg, &fg_lin);
-  if (err != CMP_SUCCESS)
-    return err;
+  rc = cmp_linear_blend_srgb_to_linear(blend, fg, &fg_lin);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_linear_blend_mix: cmp_linear_blend_srgb_to_linear "
+              "failed for fg\n");
+    return rc;
+  }
 
   blend_alpha = fg->a * alpha;
 
@@ -116,5 +153,10 @@ int cmp_linear_blend_mix(cmp_linear_blend_t *blend, const cmp_color_t *bg,
     mix_lin.b = 0.0f;
   }
 
-  return cmp_linear_blend_linear_to_srgb(blend, &mix_lin, out_blended);
+  rc = cmp_linear_blend_linear_to_srgb(blend, &mix_lin, out_blended);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_linear_blend_mix: cmp_linear_blend_linear_to_srgb "
+              "failed\n");
+  }
+  return rc;
 }

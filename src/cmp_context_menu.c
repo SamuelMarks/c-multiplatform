@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -10,36 +11,54 @@ struct cmp_context_menu {
 };
 
 int cmp_context_menu_create(cmp_context_menu_t **out_menu) {
-  struct cmp_context_menu *ctx;
+  int rc = CMP_SUCCESS;
+  struct cmp_context_menu *ctx = NULL;
 
-  if (!out_menu)
-    return CMP_ERROR_INVALID_ARG;
+  if (!out_menu) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_context_menu_create: Invalid argument (out_menu=NULL)\n");
+    return rc;
+  }
 
-  if (CMP_MALLOC(sizeof(struct cmp_context_menu), (void **)&ctx) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(struct cmp_context_menu), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_context_menu_create: Out of memory\n");
+    return rc;
+  }
 
   memset(ctx, 0, sizeof(struct cmp_context_menu));
 
   *out_menu = (cmp_context_menu_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_context_menu_destroy(cmp_context_menu_t *menu) {
+  int rc = CMP_SUCCESS;
   struct cmp_context_menu *ctx = (struct cmp_context_menu *)menu;
-  if (!ctx)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_context_menu_destroy: Invalid argument (menu=NULL)\n");
+    return rc;
+  }
 
   CMP_FREE(ctx);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_context_menu_set_callback(cmp_context_menu_t *menu,
                                   cmp_context_menu_cb_t callback,
                                   void *user_data) {
+  int rc = CMP_SUCCESS;
   struct cmp_context_menu *ctx = (struct cmp_context_menu *)menu;
 
-  if (!ctx || !callback)
-    return CMP_ERROR_INVALID_ARG;
+  if (!ctx || !callback) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_context_menu_set_callback: Invalid argument\n");
+    return rc;
+  }
 
   (void)user_data; /* Supress compiler warning */
 
@@ -49,16 +68,20 @@ int cmp_context_menu_set_callback(cmp_context_menu_t *menu,
   /* This is just a simulated structural save */
   ctx = (struct cmp_context_menu *)((size_t)ctx | 0); /* Mock use */
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_context_menu_process_event(cmp_context_menu_t *menu,
                                    const cmp_event_t *event) {
+  int rc = CMP_SUCCESS;
   struct cmp_context_menu *ctx = (struct cmp_context_menu *)menu;
   int is_trigger = 0;
 
-  if (!ctx || !event)
-    return CMP_ERROR_INVALID_ARG;
+  if (!ctx || !event) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_context_menu_process_event: Invalid argument\n");
+    return rc;
+  }
 
   /* Simulated logic: Right click triggers context menu */
   /* Modifiers bitmask mock: bit 1 = right click */
@@ -80,5 +103,5 @@ int cmp_context_menu_process_event(cmp_context_menu_t *menu,
     return 1; /* Represents 'handled' or 'triggered' */
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

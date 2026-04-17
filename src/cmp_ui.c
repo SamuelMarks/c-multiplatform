@@ -1,26 +1,37 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
 
 int cmp_ui_box_create(cmp_ui_node_t **out_node) {
+  int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_box_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 1; /* Box */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   *out_node = node;
@@ -29,24 +40,34 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
 
 int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
                        int text_len) {
+  int rc;
   cmp_ui_node_t *node;
   char *text_copy;
   size_t len;
 
   if (out_node == NULL || text == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_text_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_text_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 2; /* Text */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   len = (text_len < 0) ? strlen(text) : (size_t)text_len;
@@ -66,24 +87,34 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
 
 int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
                          int label_len) {
+  int rc;
   cmp_ui_node_t *node;
   char *label_copy;
   size_t len;
 
   if (out_node == NULL || label == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_button_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_button_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 3; /* Button */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   len = (label_len < 0) ? strlen(label) : (size_t)label_len;
@@ -102,22 +133,32 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
 }
 
 int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
+  int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_text_input_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_text_input_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 4; /* Text Input */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   *out_node = node;
@@ -125,23 +166,33 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
 }
 
 int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
+  int rc;
   cmp_ui_node_t *node;
   char *label_copy = NULL;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_checkbox_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_checkbox_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 5; /* Checkbox */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   if (label != NULL) {
@@ -165,23 +216,33 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
 }
 
 int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
+  int rc;
   cmp_ui_node_t *node;
   int *group_prop;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_radio_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_radio_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 6; /* Radio */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   if (CMP_MALLOC(sizeof(int), (void **)&group_prop) != CMP_SUCCESS) {
@@ -198,6 +259,7 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
 }
 
 int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
+  int rc;
   cmp_ui_node_t *node;
   char *path_copy = NULL;
   cmp_svg_renderer_t *renderer = NULL;
@@ -205,19 +267,28 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
   size_t len;
 
   if (out_node == NULL || image_path == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_image_view_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_image_view_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 7; /* ImageView */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   len = strlen(image_path);
@@ -273,23 +344,33 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
 }
 
 int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
+  int rc;
   cmp_ui_node_t *node;
   float *bounds;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_slider_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_slider_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 8; /* Slider */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   if (CMP_MALLOC(sizeof(float) * 2, (void **)&bounds) != CMP_SUCCESS) {
@@ -307,22 +388,32 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
 }
 
 int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
+  int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_list_view_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_list_view_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 9; /* ListView */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   *out_node = node;
@@ -330,23 +421,33 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
 }
 
 int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
+  int rc;
   cmp_ui_node_t *node;
   int *cols_prop;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_grid_view_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_grid_view_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 10; /* GridView */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   if (CMP_MALLOC(sizeof(int), (void **)&cols_prop) != CMP_SUCCESS) {
@@ -363,22 +464,32 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
 }
 
 int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
+  int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_dropdown_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_dropdown_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 11; /* Dropdown */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   *out_node = node;
@@ -386,22 +497,32 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
 }
 
 int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
+  int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_modal_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_modal_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 12; /* Modal */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   *out_node = node;
@@ -409,22 +530,32 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
 }
 
 int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
+  int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_canvas_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_canvas_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 13; /* Canvas */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   *out_node = node;
@@ -432,22 +563,32 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
 }
 
 int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
+  int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_rich_text_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_rich_text_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
   node->type = 14; /* Rich Text */
 
-  if (cmp_layout_node_create(&node->layout) != CMP_SUCCESS) {
+  rc = cmp_layout_node_create(&node->layout);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
+              cmp_strerror(rc));
+    return rc;
   }
 
   *out_node = node;
@@ -455,8 +596,11 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
 }
 
 int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
+  int rc;
   if (parent == NULL || child == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_node_add_child: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   if (parent->child_count >= parent->child_capacity) {
@@ -464,9 +608,12 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
         parent->child_capacity == 0 ? 4 : parent->child_capacity * 2;
     cmp_ui_node_t **new_children;
 
-    if (CMP_MALLOC(sizeof(cmp_ui_node_t *) * new_cap, (void **)&new_children) !=
-        CMP_SUCCESS) {
-      return CMP_ERROR_OOM;
+    rc = CMP_MALLOC(sizeof(cmp_ui_node_t *) * new_cap, (void **)&new_children);
+    if (rc != CMP_SUCCESS) {
+      if (rc == CMP_SUCCESS)
+        rc = CMP_ERROR_OOM;
+      LOG_DEBUG("cmp_ui_node_add_child CMP_MALLOC: %s\n", cmp_strerror(rc));
+      return rc;
     }
 
     if (parent->children != NULL) {
@@ -559,13 +706,16 @@ int disabled_cmp_ui_node_add_event_listener(
 }
 
 int cmp_ui_node_destroy(cmp_ui_node_t *node) {
+  int rc;
   size_t i;
 
   cmp_event_listener_node_t *listener;
   cmp_event_listener_node_t *next_listener;
 
   if (node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ui_node_destroy: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   listener = node->event_listeners;

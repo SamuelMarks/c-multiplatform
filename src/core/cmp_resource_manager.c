@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 /* clang-format on */
 
@@ -26,8 +27,13 @@ int cmp_resource_manager_create(cmp_resource_manager_t **out_rm) {
 }
 
 int cmp_resource_manager_destroy(cmp_resource_manager_t *rm_opaque) {
-  if (rm_opaque)
-    CMP_FREE(rm_opaque);
+  int rc;
+  if (!rm_opaque) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_resource_manager_destroy: %s\n", cmp_strerror(rc));
+    return rc;
+  }
+  CMP_FREE(rm_opaque);
   return CMP_SUCCESS;
 }
 

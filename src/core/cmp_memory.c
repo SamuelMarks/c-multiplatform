@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #if defined(_WIN32)
@@ -106,10 +107,12 @@ int cmp_mem_check_leaks(void) {
 }
 
 int cmp_arena_init(cmp_arena_t *arena, size_t size) {
-  int res;
+  int rc;
 
   if (arena == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_arena_init: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   if (size == 0) {
@@ -119,9 +122,11 @@ int cmp_arena_init(cmp_arena_t *arena, size_t size) {
     return CMP_SUCCESS;
   }
 
-  res = CMP_MALLOC(size, (void **)&arena->buffer);
-  if (res != CMP_SUCCESS || arena->buffer == NULL) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(size, (void **)&arena->buffer);
+  if (rc != CMP_SUCCESS || arena->buffer == NULL) {
+    if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_arena_init CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   arena->capacity = size;
@@ -131,8 +136,12 @@ int cmp_arena_init(cmp_arena_t *arena, size_t size) {
 }
 
 int cmp_arena_alloc(cmp_arena_t *arena, size_t size, void **out_ptr) {
+  int rc;
+
   if (arena == NULL || out_ptr == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_arena_alloc: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   if (size == 0) {
@@ -141,7 +150,9 @@ int cmp_arena_alloc(cmp_arena_t *arena, size_t size, void **out_ptr) {
   }
 
   if (arena->offset + size > arena->capacity) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_arena_alloc (capacity exceeded): %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   *out_ptr = arena->buffer + arena->offset;
@@ -151,8 +162,12 @@ int cmp_arena_alloc(cmp_arena_t *arena, size_t size, void **out_ptr) {
 }
 
 int cmp_arena_free(cmp_arena_t *arena) {
+  int rc;
+
   if (arena == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_arena_free: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   if (arena->buffer != NULL) {
@@ -167,13 +182,15 @@ int cmp_arena_free(cmp_arena_t *arena) {
 }
 
 int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
-  int res;
+  int rc;
   size_t i;
   size_t total_size;
   cmp_pool_block_t *block;
 
   if (pool == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_pool_init: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   if (block_size < sizeof(cmp_pool_block_t)) {
@@ -194,9 +211,11 @@ int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
   }
 
   total_size = block_size * block_count;
-  res = CMP_MALLOC(total_size, (void **)&pool->buffer);
-  if (res != CMP_SUCCESS || pool->buffer == NULL) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(total_size, (void **)&pool->buffer);
+  if (rc != CMP_SUCCESS || pool->buffer == NULL) {
+    if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_pool_init CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   pool->capacity = block_count;
@@ -214,10 +233,13 @@ int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
 }
 
 int cmp_pool_alloc(cmp_pool_t *pool, void **out_ptr) {
+  int rc;
   cmp_pool_block_t *block;
 
   if (pool == NULL || out_ptr == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_pool_alloc: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   if (pool->capacity == 0) {
@@ -226,7 +248,9 @@ int cmp_pool_alloc(cmp_pool_t *pool, void **out_ptr) {
   }
 
   if (pool->free_list == NULL) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_pool_alloc (no free blocks): %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   block = pool->free_list;
@@ -237,21 +261,28 @@ int cmp_pool_alloc(cmp_pool_t *pool, void **out_ptr) {
 }
 
 int cmp_pool_free(cmp_pool_t *pool, void *ptr) {
+  int rc;
   cmp_pool_block_t *block;
 
   if (pool == NULL || ptr == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_pool_free: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   /* check if pointer is within the buffer bounds */
   if ((uint8_t *)ptr < pool->buffer ||
       (uint8_t *)ptr >= pool->buffer + (pool->capacity * pool->block_size)) {
-    return CMP_ERROR_BOUNDS;
+    rc = CMP_ERROR_BOUNDS;
+    LOG_DEBUG("cmp_pool_free (out of bounds): %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   /* check alignment */
   if (((uint8_t *)ptr - pool->buffer) % pool->block_size != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_pool_free (misaligned): %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   block = (cmp_pool_block_t *)ptr;
@@ -262,8 +293,12 @@ int cmp_pool_free(cmp_pool_t *pool, void *ptr) {
 }
 
 int cmp_pool_destroy(cmp_pool_t *pool) {
+  int rc;
+
   if (pool == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_pool_destroy: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   if (pool->buffer != NULL) {

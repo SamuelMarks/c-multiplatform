@@ -21,13 +21,20 @@ struct cmp_aria {
 };
 
 int cmp_aria_create(cmp_a11y_tree_t *tree, cmp_aria_t **out_aria) {
-  struct cmp_aria *aria;
+  int rc = CMP_SUCCESS;
+  struct cmp_aria *aria = NULL;
 
-  if (!tree || !out_aria)
-    return CMP_ERROR_INVALID_ARG;
+  if (!tree || !out_aria) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error in cmp_aria_create: Invalid argument\n");
+    return rc;
+  }
 
-  if (CMP_MALLOC(sizeof(struct cmp_aria), (void **)&aria) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(struct cmp_aria), (void **)&aria);
+  if (rc != CMP_SUCCESS) {
+    fprintf(stderr, "Error in cmp_aria_create: Out of memory\n");
+    return rc;
+  }
 
   aria->tree = tree;
   aria->nodes = NULL;
@@ -35,27 +42,33 @@ int cmp_aria_create(cmp_a11y_tree_t *tree, cmp_aria_t **out_aria) {
   aria->capacity = 0;
 
   *out_aria = (cmp_aria_t *)aria;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_aria_destroy(cmp_aria_t *aria) {
+  int rc = CMP_SUCCESS;
   struct cmp_aria *a = (struct cmp_aria *)aria;
 
-  if (!a)
-    return CMP_ERROR_INVALID_ARG;
+  if (!a) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr,
+            "Error in cmp_aria_destroy: Invalid argument (aria=NULL)\n");
+    return rc;
+  }
 
   if (a->nodes) {
     CMP_FREE(a->nodes);
   }
 
   CMP_FREE(a);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 static cmp_aria_node_t *_cmp_aria_find_or_add_node(struct cmp_aria *a,
                                                    int node_id) {
+  int rc = CMP_SUCCESS;
   size_t i;
-  cmp_aria_node_t *new_nodes;
+  cmp_aria_node_t *new_nodes = NULL;
   size_t new_capacity;
 
   for (i = 0; i < a->count; ++i) {
@@ -66,9 +79,12 @@ static cmp_aria_node_t *_cmp_aria_find_or_add_node(struct cmp_aria *a,
 
   if (a->count >= a->capacity) {
     new_capacity = a->capacity == 0 ? 16 : a->capacity * 2;
-    if (CMP_MALLOC(new_capacity * sizeof(cmp_aria_node_t),
-                   (void **)&new_nodes) != CMP_SUCCESS)
+    rc =
+        CMP_MALLOC(new_capacity * sizeof(cmp_aria_node_t), (void **)&new_nodes);
+    if (rc != CMP_SUCCESS) {
+      fprintf(stderr, "Error in _cmp_aria_find_or_add_node: Out of memory\n");
       return NULL;
+    }
 
     if (a->nodes) {
       memcpy(new_nodes, a->nodes, a->count * sizeof(cmp_aria_node_t));
@@ -88,31 +104,47 @@ static cmp_aria_node_t *_cmp_aria_find_or_add_node(struct cmp_aria *a,
 }
 
 int cmp_aria_set_role(cmp_aria_t *aria, int node_id, cmp_aria_role_t role) {
+  int rc = CMP_SUCCESS;
   struct cmp_aria *a = (struct cmp_aria *)aria;
   cmp_aria_node_t *node;
 
-  if (!a)
-    return CMP_ERROR_INVALID_ARG;
+  if (!a) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr,
+            "Error in cmp_aria_set_role: Invalid argument (aria=NULL)\n");
+    return rc;
+  }
 
   node = _cmp_aria_find_or_add_node(a, node_id);
-  if (!node)
-    return CMP_ERROR_OOM;
+  if (!node) {
+    rc = CMP_ERROR_OOM;
+    fprintf(stderr, "Error in cmp_aria_set_role: Failed to find or add node\n");
+    return rc;
+  }
 
   node->role = role;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_aria_set_state_bool(cmp_aria_t *aria, int node_id,
                             const char *state_name, int value) {
+  int rc = CMP_SUCCESS;
   struct cmp_aria *a = (struct cmp_aria *)aria;
   cmp_aria_node_t *node;
 
-  if (!a || !state_name)
-    return CMP_ERROR_INVALID_ARG;
+  if (!a || !state_name) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error in cmp_aria_set_state_bool: Invalid argument\n");
+    return rc;
+  }
 
   node = _cmp_aria_find_or_add_node(a, node_id);
-  if (!node)
-    return CMP_ERROR_OOM;
+  if (!node) {
+    rc = CMP_ERROR_OOM;
+    fprintf(stderr,
+            "Error in cmp_aria_set_state_bool: Failed to find or add node\n");
+    return rc;
+  }
 
   if (strcmp(state_name, "aria-expanded") == 0) {
     node->is_expanded = value ? 1 : 0;
@@ -121,16 +153,20 @@ int cmp_aria_set_state_bool(cmp_aria_t *aria, int node_id,
   }
   /* Other states would be handled similarly */
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_aria_sync(cmp_aria_t *aria) {
+  int rc = CMP_SUCCESS;
   struct cmp_aria *a = (struct cmp_aria *)aria;
   size_t i;
   const char *role_str;
 
-  if (!a)
-    return CMP_ERROR_INVALID_ARG;
+  if (!a) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error in cmp_aria_sync: Invalid argument (aria=NULL)\n");
+    return rc;
+  }
 
   /* Iterate through the ARIA nodes and sync them with the underlying a11y tree
    */
@@ -174,9 +210,14 @@ int cmp_aria_sync(cmp_aria_t *aria) {
        * this framework architecture, updating via re-adding or internal mapping
        * is the simulated path.
        */
-      cmp_a11y_tree_add_node(a->tree, a->nodes[i].node_id, role_str, NULL);
+      rc = cmp_a11y_tree_add_node(a->tree, a->nodes[i].node_id, role_str, NULL);
+      if (rc != CMP_SUCCESS) {
+        fprintf(stderr,
+                "Error in cmp_aria_sync: Failed to add node to a11y tree\n");
+        return rc;
+      }
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

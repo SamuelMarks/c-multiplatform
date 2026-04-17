@@ -1,13 +1,19 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 /* clang-format on */
 
 int cmp_flex_align_evaluate(cmp_flex_align_t align_val, float cross_size,
                             float item_cross_size, float item_baseline,
                             float max_baseline, float *out_position,
                             float *out_cross_size) {
-  if (!out_position || !out_cross_size)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!out_position || !out_cross_size) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_flex_align_evaluate: Invalid argument\n");
+    return rc;
+  }
 
   *out_cross_size = item_cross_size;
   *out_position = 0.0;
@@ -17,7 +23,7 @@ int cmp_flex_align_evaluate(cmp_flex_align_t align_val, float cross_size,
   } else if (align_val == CMP_FLEX_ALIGN_END) {
     *out_position = cross_size - item_cross_size;
   } else if (align_val == CMP_FLEX_ALIGN_CENTER) {
-    *out_position = (cross_size - item_cross_size) * 0.5;
+    *out_position = (cross_size - item_cross_size) * 0.5f;
   } else if (align_val == CMP_FLEX_ALIGN_STRETCH) {
     *out_position = 0.0;
     *out_cross_size = cross_size;
@@ -30,5 +36,5 @@ int cmp_flex_align_evaluate(cmp_flex_align_t align_val, float cross_size,
     *out_position = 0.0;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -1,11 +1,13 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
 
 int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
                            cmp_event_t *event) {
+  int rc;
   cmp_ui_node_t **ancestors;
   int ancestor_count = 0;
   int capacity = 16;
@@ -13,12 +15,17 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
   int i;
   cmp_event_listener_node_t *listener;
 
-  if (!tree || !target_node || !event)
-    return CMP_ERROR_INVALID_ARG;
+  if (!tree || !target_node || !event) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_event_dispatch_run: %s\n", cmp_strerror(rc));
+    return rc;
+  }
 
-  if (CMP_MALLOC(sizeof(cmp_ui_node_t *) * capacity, (void **)&ancestors) !=
-      CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_node_t *) * capacity, (void **)&ancestors);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_event_dispatch_run CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   /* 1. Build Ancestor Chain */
@@ -28,10 +35,13 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
       cmp_ui_node_t **new_ancestors;
       capacity *= 2;
       /* In a pure C89 system without realloc, we allocate new and copy */
-      if (CMP_MALLOC(sizeof(cmp_ui_node_t *) * capacity,
-                     (void **)&new_ancestors) != CMP_SUCCESS) {
+      rc = CMP_MALLOC(sizeof(cmp_ui_node_t *) * capacity,
+                     (void **)&new_ancestors);
+      if (rc != CMP_SUCCESS) {
+        if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
+        LOG_DEBUG("cmp_event_dispatch_run (realloc) CMP_MALLOC: %s\n", cmp_strerror(rc));
         CMP_FREE(ancestors);
-        return CMP_ERROR_OOM;
+        return rc;
       }
       memcpy(new_ancestors, ancestors,
              sizeof(cmp_ui_node_t *) * ancestor_count);

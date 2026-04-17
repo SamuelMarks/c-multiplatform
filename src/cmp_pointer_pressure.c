@@ -1,38 +1,57 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
 
 int cmp_pointer_pressure_create(cmp_pointer_pressure_t **out_pressure) {
-  struct cmp_pointer_pressure *ctx;
+  int rc = CMP_SUCCESS;
+  struct cmp_pointer_pressure *ctx = NULL;
 
-  if (!out_pressure)
-    return CMP_ERROR_INVALID_ARG;
+  if (!out_pressure) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_pointer_pressure_create: Invalid argument\n");
+    return rc;
+  }
 
-  if (CMP_MALLOC(sizeof(cmp_stylus_data_t), (void **)&ctx) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_stylus_data_t), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_pointer_pressure_create: Out of memory\n");
+    return rc;
+  }
 
   memset(ctx, 0, sizeof(cmp_stylus_data_t));
 
   *out_pressure = (cmp_pointer_pressure_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_pointer_pressure_destroy(cmp_pointer_pressure_t *pressure) {
+  int rc = CMP_SUCCESS;
   struct cmp_pointer_pressure *ctx = (struct cmp_pointer_pressure *)pressure;
-  if (!ctx)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_pointer_pressure_destroy: Invalid argument\n");
+    return rc;
+  }
 
   CMP_FREE(ctx);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_pointer_pressure_process_event(cmp_pointer_pressure_t *pressure,
                                        const cmp_event_t *event) {
+  int rc = CMP_SUCCESS;
   cmp_stylus_data_t *ctx = (cmp_stylus_data_t *)pressure;
-  if (!ctx || !event)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx || !event) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_pointer_pressure_process_event: Invalid argument\n");
+    return rc;
+  }
 
   /* Mock mapping from raw event payload into the tracking struct */
   ctx->pressure = event->pressure;
@@ -45,16 +64,21 @@ int cmp_pointer_pressure_process_event(cmp_pointer_pressure_t *pressure,
   /* Mock mapping tilt */
   ctx->tilt_x = (float)(event->modifiers >> 16);
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_pointer_pressure_get_data(const cmp_pointer_pressure_t *pressure,
                                   cmp_stylus_data_t *out_data) {
+  int rc = CMP_SUCCESS;
   const cmp_stylus_data_t *ctx = (const cmp_stylus_data_t *)pressure;
-  if (!ctx || !out_data)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx || !out_data) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_pointer_pressure_get_data: Invalid argument\n");
+    return rc;
+  }
 
   memcpy(out_data, ctx, sizeof(cmp_stylus_data_t));
 
-  return CMP_SUCCESS;
+  return rc;
 }

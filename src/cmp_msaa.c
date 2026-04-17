@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -13,14 +14,26 @@ struct cmp_msaa {
 
 int cmp_msaa_create(uint8_t sample_count, uint32_t width, uint32_t height,
                     cmp_msaa_t **out_msaa) {
-  cmp_msaa_t *msaa;
-  if (!out_msaa)
-    return CMP_ERROR_INVALID_ARG;
-  if (sample_count == 0 || width == 0 || height == 0)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  cmp_msaa_t *msaa = NULL;
 
-  if (CMP_MALLOC(sizeof(cmp_msaa_t), (void **)&msaa) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  if (!out_msaa) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_msaa_create: Invalid argument\n");
+    return rc;
+  }
+
+  if (sample_count == 0 || width == 0 || height == 0) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_msaa_create: Invalid configuration\n");
+    return rc;
+  }
+
+  rc = CMP_MALLOC(sizeof(cmp_msaa_t), (void **)&msaa);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_msaa_create: Out of memory\n");
+    return rc;
+  }
 
   memset(msaa, 0, sizeof(cmp_msaa_t));
   msaa->sample_count = sample_count;
@@ -28,36 +41,51 @@ int cmp_msaa_create(uint8_t sample_count, uint32_t width, uint32_t height,
   msaa->height = height;
 
   /* Mock allocation for the internal renderbuffer based on samples */
-  if (CMP_MALLOC(width * height * 4 * sample_count,
-                 &msaa->internal_renderbuffer) != CMP_SUCCESS) {
+  rc = CMP_MALLOC(width * height * 4 * sample_count,
+                  &msaa->internal_renderbuffer);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(msaa);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG("Error in cmp_msaa_create: Out of memory for renderbuffer\n");
+    return rc;
   }
 
   /* Initialize the mock buffer to zero */
   memset(msaa->internal_renderbuffer, 0, width * height * 4 * sample_count);
 
   *out_msaa = msaa;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_msaa_destroy(cmp_msaa_t *msaa) {
-  if (!msaa)
-    return CMP_ERROR_INVALID_ARG;
-  if (msaa->internal_renderbuffer)
+  int rc = CMP_SUCCESS;
+
+  if (!msaa) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_msaa_destroy: Invalid argument\n");
+    return rc;
+  }
+  if (msaa->internal_renderbuffer) {
     CMP_FREE(msaa->internal_renderbuffer);
+  }
   CMP_FREE(msaa);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_msaa_resolve(cmp_msaa_t *msaa, cmp_texture_t *target_texture) {
-  if (!msaa || !target_texture)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!msaa || !target_texture) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_msaa_resolve: Invalid argument\n");
+    return rc;
+  }
 
   /* Ensure dimensions match */
   if (msaa->width != (uint32_t)target_texture->width ||
       msaa->height != (uint32_t)target_texture->height) {
-    return CMP_ERROR_BOUNDS;
+    rc = CMP_ERROR_BOUNDS;
+    LOG_DEBUG("Error in cmp_msaa_resolve: Mismatched bounds\n");
+    return rc;
   }
 
   /* In a real implementation, this would trigger a GPU blit or software
@@ -73,5 +101,5 @@ int cmp_msaa_resolve(cmp_msaa_t *msaa, cmp_texture_t *target_texture) {
      * for the abstraction. */
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

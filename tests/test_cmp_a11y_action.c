@@ -89,6 +89,14 @@ TEST test_a11y_action_execute_events(void) {
   ASSERT_EQ(CMP_ACTION_MOVE, evt.action);
   ASSERT_EQ(-50, evt.y);
 
+  /* Test Scroll Backward */
+  res = cmp_a11y_action_execute(action, 25, CMP_A11Y_ACTION_SCROLL_BACKWARD);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  res = cmp_event_pop(&evt);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(CMP_ACTION_MOVE, evt.action);
+  ASSERT_EQ(50, evt.y);
+
   /* Test Focus */
   res = cmp_a11y_action_execute(action, 30, CMP_A11Y_ACTION_FOCUS);
   ASSERT_EQ(CMP_SUCCESS, res);

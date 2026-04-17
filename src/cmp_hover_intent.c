@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -15,13 +16,20 @@ struct cmp_hover_intent {
 };
 
 int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
-  struct cmp_hover_intent *ctx;
+  int rc = CMP_SUCCESS;
+  struct cmp_hover_intent *ctx = NULL;
 
-  if (!out_intent)
-    return CMP_ERROR_INVALID_ARG;
+  if (!out_intent) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_hover_intent_create: Invalid argument\n");
+    return rc;
+  }
 
-  if (CMP_MALLOC(sizeof(struct cmp_hover_intent), (void **)&ctx) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(struct cmp_hover_intent), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_hover_intent_create: Out of memory\n");
+    return rc;
+  }
 
   memset(ctx, 0, sizeof(struct cmp_hover_intent));
   ctx->required_time_ms = 150.0f; /* Default 150ms hover delay */
@@ -30,25 +38,34 @@ int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
   ctx->last_y = -1.0f;
 
   *out_intent = (cmp_hover_intent_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_hover_intent_destroy(cmp_hover_intent_t *intent) {
+  int rc = CMP_SUCCESS;
   struct cmp_hover_intent *ctx = (struct cmp_hover_intent *)intent;
-  if (!ctx)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_hover_intent_destroy: Invalid argument\n");
+    return rc;
+  }
 
   CMP_FREE(ctx);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_hover_intent_process(cmp_hover_intent_t *intent,
                              const cmp_event_t *event, float dt_ms) {
+  int rc = 0; /* Returns boolean 0 or 1, or negative error */
   struct cmp_hover_intent *ctx = (struct cmp_hover_intent *)intent;
   float dx, dy, dist;
 
-  if (!ctx || !event)
-    return CMP_ERROR_INVALID_ARG;
+  if (!ctx || !event) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_hover_intent_process: Invalid argument\n");
+    return rc;
+  }
 
   /* If it's a new interaction or pointer left bounding area entirely, reset */
   if (event->action == CMP_ACTION_CANCEL) {
@@ -56,7 +73,7 @@ int cmp_hover_intent_process(cmp_hover_intent_t *intent,
     ctx->time_spent_in_bounds = 0.0f;
     ctx->last_x = -1.0f;
     ctx->last_y = -1.0f;
-    return 0;
+    return rc; /* 0 */
   }
 
   if (ctx->last_x < 0.0f && ctx->last_y < 0.0f) {
@@ -65,7 +82,7 @@ int cmp_hover_intent_process(cmp_hover_intent_t *intent,
     ctx->last_y = (float)event->y;
     ctx->time_spent_in_bounds = 0.0f;
     ctx->is_active = 1;
-    return 0;
+    return rc; /* 0 */
   }
 
   /* Calculate movement distance */
@@ -78,7 +95,7 @@ int cmp_hover_intent_process(cmp_hover_intent_t *intent,
     ctx->time_spent_in_bounds = 0.0f;
     ctx->last_x = (float)event->x;
     ctx->last_y = (float)event->y;
-    return 0; /* Still deliberating */
+    return rc; /* 0: Still deliberating */
   }
 
   /* Target is steady inside tolerance radius, accumulate time */
@@ -86,8 +103,8 @@ int cmp_hover_intent_process(cmp_hover_intent_t *intent,
 
   /* Confirmed hover intent! */
   if (ctx->time_spent_in_bounds >= ctx->required_time_ms) {
-    return 1;
+    rc = 1;
   }
 
-  return 0;
+  return rc;
 }

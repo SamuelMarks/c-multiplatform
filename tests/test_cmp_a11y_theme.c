@@ -18,7 +18,8 @@ TEST test_cmp_a11y_detect_high_contrast(void) {
 }
 
 TEST test_cmp_a11y_build_theme_null(void) {
-  ASSERT_EQ(-1, cmp_a11y_build_theme(CMP_COLOR_BLIND_NONE, NULL));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_a11y_build_theme(CMP_COLOR_BLIND_NONE, NULL));
   PASS();
 }
 

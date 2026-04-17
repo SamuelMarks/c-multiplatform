@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -11,15 +12,20 @@ struct cmp_docking_framework {
 };
 
 int cmp_docking_framework_create(cmp_docking_framework_t **out_docking) {
-  cmp_docking_framework_t *dock;
+  int rc = CMP_SUCCESS;
+  cmp_docking_framework_t *dock = NULL;
 
   if (!out_docking) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_docking_framework_create: Invalid argument\n");
+    return rc;
   }
 
   dock = (cmp_docking_framework_t *)malloc(sizeof(cmp_docking_framework_t));
   if (!dock) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("Error in cmp_docking_framework_create: Out of memory\n");
+    return rc;
   }
 
   dock->capacity = 16;
@@ -28,17 +34,24 @@ int cmp_docking_framework_create(cmp_docking_framework_t **out_docking) {
       (cmp_tool_panel_t **)malloc(dock->capacity * sizeof(cmp_tool_panel_t *));
   if (!dock->panels) {
     free(dock);
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("Error in cmp_docking_framework_create: Out of memory allocating "
+              "panels\n");
+    return rc;
   }
 
   *out_docking = dock;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_docking_framework_destroy(cmp_docking_framework_t *docking) {
+  int rc = CMP_SUCCESS;
   size_t i;
+
   if (!docking) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_docking_framework_destroy: Invalid argument\n");
+    return rc;
   }
 
   for (i = 0; i < docking->count; i++) {
@@ -47,24 +60,28 @@ int cmp_docking_framework_destroy(cmp_docking_framework_t *docking) {
   free(docking->panels);
   free(docking);
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_docking_framework_register_panel(cmp_docking_framework_t *docking,
                                          const char *id, const char *title,
                                          cmp_pane_type_t default_pane) {
-  cmp_tool_panel_t *panel;
-  cmp_tool_panel_t **new_array;
+  int rc = CMP_SUCCESS;
+  cmp_tool_panel_t *panel = NULL;
+  cmp_tool_panel_t **new_array = NULL;
   size_t i;
 
   if (!docking || !id || !title) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_docking_framework_register_panel: Invalid argument\n");
+    return rc;
   }
 
   for (i = 0; i < docking->count; i++) {
     if (strcmp(docking->panels[i]->id, id) == 0) {
       /* Already registered */
-      return CMP_SUCCESS;
+      return rc;
     }
   }
 
@@ -73,14 +90,20 @@ int cmp_docking_framework_register_panel(cmp_docking_framework_t *docking,
     new_array = (cmp_tool_panel_t **)realloc(
         docking->panels, docking->capacity * sizeof(cmp_tool_panel_t *));
     if (!new_array) {
-      return CMP_ERROR_OOM;
+      rc = CMP_ERROR_OOM;
+      LOG_DEBUG("Error in cmp_docking_framework_register_panel: Out of memory "
+                "reallocating array\n");
+      return rc;
     }
     docking->panels = new_array;
   }
 
   panel = (cmp_tool_panel_t *)malloc(sizeof(cmp_tool_panel_t));
   if (!panel) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("Error in cmp_docking_framework_register_panel: Out of memory "
+              "allocating panel\n");
+    return rc;
   }
 
   strncpy(panel->id, id, sizeof(panel->id) - 1);
@@ -97,7 +120,7 @@ int cmp_docking_framework_register_panel(cmp_docking_framework_t *docking,
   panel->docked_pane = default_pane;
 
   docking->panels[docking->count++] = panel;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 static cmp_tool_panel_t *find_panel(const cmp_docking_framework_t *docking,
@@ -113,57 +136,72 @@ static cmp_tool_panel_t *find_panel(const cmp_docking_framework_t *docking,
 
 int cmp_docking_framework_float_panel(cmp_docking_framework_t *docking,
                                       const char *id, float x, float y) {
-  cmp_tool_panel_t *panel;
+  int rc = CMP_SUCCESS;
+  cmp_tool_panel_t *panel = NULL;
 
   if (!docking || !id) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_docking_framework_float_panel: Invalid argument\n");
+    return rc;
   }
 
   panel = find_panel(docking, id);
   if (!panel) {
-    return CMP_ERROR_NOT_FOUND;
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("Error in cmp_docking_framework_float_panel: Panel not found\n");
+    return rc;
   }
 
   panel->state = CMP_PANEL_STATE_FLOATING;
   panel->floating_x = x;
   panel->floating_y = y;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_docking_framework_dock_panel(cmp_docking_framework_t *docking,
                                      const char *id, cmp_pane_type_t pane) {
-  cmp_tool_panel_t *panel;
+  int rc = CMP_SUCCESS;
+  cmp_tool_panel_t *panel = NULL;
 
   if (!docking || !id) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_docking_framework_dock_panel: Invalid argument\n");
+    return rc;
   }
 
   panel = find_panel(docking, id);
   if (!panel) {
-    return CMP_ERROR_NOT_FOUND;
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("Error in cmp_docking_framework_dock_panel: Panel not found\n");
+    return rc;
   }
 
   panel->state = CMP_PANEL_STATE_DOCKED;
   panel->docked_pane = pane;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_docking_framework_get_panel(const cmp_docking_framework_t *docking,
                                     const char *id,
                                     cmp_tool_panel_t **out_panel) {
-  cmp_tool_panel_t *panel;
+  int rc = CMP_SUCCESS;
+  cmp_tool_panel_t *panel = NULL;
 
   if (!docking || !id || !out_panel) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_docking_framework_get_panel: Invalid argument\n");
+    return rc;
   }
 
   panel = find_panel(docking, id);
   if (!panel) {
-    return CMP_ERROR_NOT_FOUND;
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("Error in cmp_docking_framework_get_panel: Panel not found\n");
+    return rc;
   }
 
   *out_panel = panel;
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 /* clang-format on */
 
@@ -8,31 +9,48 @@ struct cmp_ios_features {
 };
 
 int cmp_ios_features_create(cmp_ios_features_t **out_features) {
-  struct cmp_ios_features *ctx;
-  if (!out_features)
-    return CMP_ERROR_INVALID_ARG;
-  if (CMP_MALLOC(sizeof(struct cmp_ios_features), (void **)&ctx) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  int rc = CMP_SUCCESS;
+  struct cmp_ios_features *ctx = NULL;
+
+  if (!out_features) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_ios_features_create: Invalid argument\n");
+    return rc;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_ios_features), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_ios_features_create: Out of memory\n");
+    return rc;
+  }
 
   ctx->is_ready = 1;
   *out_features = (cmp_ios_features_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_ios_features_destroy(cmp_ios_features_t *features_opaque) {
-  if (features_opaque)
+  int rc = CMP_SUCCESS;
+
+  if (features_opaque) {
     CMP_FREE(features_opaque);
-  return CMP_SUCCESS;
+  }
+  return rc;
 }
 
 int cmp_ios_calculate_keyboard_avoidance(float keyboard_height, float input_y,
                                          float view_height,
                                          float *out_scroll_adjustment) {
+  int rc = CMP_SUCCESS;
   float visible_height, overlap;
 
   if (!out_scroll_adjustment || keyboard_height < 0.0f || input_y < 0.0f ||
-      view_height <= 0.0f)
-    return CMP_ERROR_INVALID_ARG;
+      view_height <= 0.0f) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_ios_calculate_keyboard_avoidance: Invalid argument\n");
+    return rc;
+  }
 
   visible_height = view_height - keyboard_height;
 
@@ -45,21 +63,26 @@ int cmp_ios_calculate_keyboard_avoidance(float keyboard_height, float input_y,
   } else {
     *out_scroll_adjustment = 0.0f;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_ios_evaluate_pull_to_refresh(float current_overscroll_y,
                                      float *out_spinner_opacity,
                                      int *out_should_trigger) {
+  int rc = CMP_SUCCESS;
   float progress;
-  if (!out_spinner_opacity || !out_should_trigger)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!out_spinner_opacity || !out_should_trigger) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_ios_evaluate_pull_to_refresh: Invalid argument\n");
+    return rc;
+  }
 
   /* HIG: threshold is around 100-120pts of negative overscroll */
   if (current_overscroll_y >= 0.0f) {
     *out_spinner_opacity = 0.0f;
     *out_should_trigger = 0;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   /* Inverse because scrolling up is negative Y */
@@ -70,15 +93,20 @@ int cmp_ios_evaluate_pull_to_refresh(float current_overscroll_y,
   *out_spinner_opacity = progress;
   *out_should_trigger = (current_overscroll_y <= -100.0f) ? 1 : 0;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_ios_evaluate_sheet_detent_snap(float current_y, float screen_height,
                                        cmp_sheet_detent_t *out_snapped_detent) {
+  int rc = CMP_SUCCESS;
   float half, full, dist_half, dist_full;
 
-  if (screen_height <= 0.0f || !out_snapped_detent)
-    return CMP_ERROR_INVALID_ARG;
+  if (screen_height <= 0.0f || !out_snapped_detent) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_ios_evaluate_sheet_detent_snap: Invalid argument\n");
+    return rc;
+  }
 
   /* Y origin is top-down (0 is top of screen).
      Medium Detent rests roughly halfway down. */
@@ -94,30 +122,42 @@ int cmp_ios_evaluate_sheet_detent_snap(float current_y, float screen_height,
     *out_snapped_detent = CMP_SHEET_DETENT_MEDIUM;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_ios_mitigate_reachability_offset(float *io_touch_y,
                                          float reachability_offset) {
-  if (!io_touch_y || reachability_offset < 0.0f)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!io_touch_y || reachability_offset < 0.0f) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_ios_mitigate_reachability_offset: Invalid argument\n");
+    return rc;
+  }
 
   /* Apple pushes the whole root UIWindow down by half the screen height.
      Physical touches on the screen need to be mapped back up by that offset to
      hit the correct elements. */
   *io_touch_y -= reachability_offset;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_ios_evaluate_context_menu_peek(float pressure,
                                        float *out_preview_scale) {
-  if (!out_preview_scale || pressure < 0.0f || pressure > 1.0f)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!out_preview_scale || pressure < 0.0f || pressure > 1.0f) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_ios_evaluate_context_menu_peek: Invalid argument\n");
+    return rc;
+  }
 
   /* Starts at ~0.6, scales to 0.8 as pressure increases. Pops to 1.0 full
    * navigation if pressure hits max (not handled here) */
   *out_preview_scale = 0.6f + (pressure * 0.2f);
 
-  return CMP_SUCCESS;
+  return rc;
 }

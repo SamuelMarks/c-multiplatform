@@ -1,18 +1,25 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
 
 int cmp_layout_node_create(cmp_layout_node_t **out_node) {
+  int rc;
   cmp_layout_node_t *node;
 
   if (out_node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_layout_node_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&node) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_layout_node_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_layout_node_t));
@@ -34,10 +41,13 @@ int cmp_layout_node_create(cmp_layout_node_t **out_node) {
 }
 
 int cmp_layout_node_destroy(cmp_layout_node_t *node) {
+  int rc;
   size_t i;
 
   if (node == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_layout_node_destroy: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   for (i = 0; i < node->child_count; i++) {

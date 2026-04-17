@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -9,36 +10,53 @@ struct cmp_datalist {
 };
 
 int cmp_datalist_create(cmp_datalist_t **out_datalist) {
-  struct cmp_datalist *datalist;
+  int rc = CMP_SUCCESS;
+  struct cmp_datalist *datalist = NULL;
 
-  if (!out_datalist)
-    return CMP_ERROR_INVALID_ARG;
+  if (!out_datalist) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_datalist_create: Invalid argument (out_datalist=NULL)\n");
+    return rc;
+  }
 
-  if (CMP_MALLOC(sizeof(struct cmp_datalist), (void **)&datalist) !=
-      CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(struct cmp_datalist), (void **)&datalist);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_datalist_create: Out of memory\n");
+    return rc;
+  }
 
   memset(datalist, 0, sizeof(struct cmp_datalist));
 
   *out_datalist = (cmp_datalist_t *)datalist;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_datalist_destroy(cmp_datalist_t *datalist) {
+  int rc = CMP_SUCCESS;
   struct cmp_datalist *internal_datalist = (struct cmp_datalist *)datalist;
-  if (!internal_datalist)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!internal_datalist) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_datalist_destroy: Invalid argument (datalist=NULL)\n");
+    return rc;
+  }
 
   CMP_FREE(internal_datalist);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_datalist_filter(cmp_datalist_t *datalist, const char *input_string) {
+  int rc = CMP_SUCCESS;
   struct cmp_datalist *internal_datalist = (struct cmp_datalist *)datalist;
 
-  if (!internal_datalist || !input_string)
-    return CMP_ERROR_INVALID_ARG;
+  if (!internal_datalist || !input_string) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_datalist_filter: Invalid argument\n");
+    return rc;
+  }
 
   /* Filter logic placeholder */
-  return CMP_SUCCESS;
+  return rc;
 }

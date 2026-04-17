@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -11,40 +12,59 @@ struct cmp_gesture {
 };
 
 int cmp_gesture_create(cmp_gesture_t **out_gesture) {
-  struct cmp_gesture *ctx;
+  int rc = CMP_SUCCESS;
+  struct cmp_gesture *ctx = NULL;
 
-  if (!out_gesture)
-    return CMP_ERROR_INVALID_ARG;
+  if (!out_gesture) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_gesture_create: Invalid argument (out_gesture=NULL)\n");
+    return rc;
+  }
 
-  if (CMP_MALLOC(sizeof(struct cmp_gesture), (void **)&ctx) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(struct cmp_gesture), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_gesture_create: Out of memory\n");
+    return rc;
+  }
 
   memset(ctx, 0, sizeof(struct cmp_gesture));
   ctx->state = CMP_GESTURE_STATE_POSSIBLE;
 
   *out_gesture = (cmp_gesture_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_gesture_destroy(cmp_gesture_t *gesture) {
+  int rc = CMP_SUCCESS;
   struct cmp_gesture *ctx = (struct cmp_gesture *)gesture;
-  if (!ctx)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_gesture_destroy: Invalid argument (gesture=NULL)\n");
+    return rc;
+  }
 
   CMP_FREE(ctx);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_gesture_set_callback(cmp_gesture_t *gesture, cmp_gesture_cb_t callback,
                              void *user_data) {
+  int rc = CMP_SUCCESS;
   struct cmp_gesture *ctx = (struct cmp_gesture *)gesture;
-  if (!ctx || !callback)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx || !callback) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_gesture_set_callback: Invalid argument\n");
+    return rc;
+  }
 
   ctx->callback = callback;
   ctx->user_data = user_data;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_gesture_get_state(const cmp_gesture_t *gesture) {
@@ -57,10 +77,14 @@ int cmp_gesture_get_state(const cmp_gesture_t *gesture) {
 
 int cmp_gesture_process_event(cmp_gesture_t *gesture,
                               const cmp_event_t *event) {
+  int rc = CMP_SUCCESS;
   struct cmp_gesture *ctx = (struct cmp_gesture *)gesture;
 
-  if (!ctx || !event)
-    return CMP_ERROR_INVALID_ARG;
+  if (!ctx || !event) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_gesture_process_event: Invalid argument\n");
+    return rc;
+  }
 
   /* Mock deterministic state progression based on standard action flow */
   if (event->action == CMP_ACTION_DOWN) {
@@ -91,5 +115,5 @@ int cmp_gesture_process_event(cmp_gesture_t *gesture,
     ctx->state = CMP_GESTURE_STATE_POSSIBLE; /* Loop back to idle */
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

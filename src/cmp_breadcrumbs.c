@@ -2,6 +2,7 @@
 #include "cmp.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 /* clang-format on */
 
 #define MAX_BREADCRUMBS 32
@@ -12,38 +13,53 @@ struct cmp_breadcrumbs {
 };
 
 int cmp_breadcrumbs_create(cmp_breadcrumbs_t **out_crumbs) {
-  cmp_breadcrumbs_t *crumbs;
+  int rc = CMP_SUCCESS;
+  cmp_breadcrumbs_t *crumbs = NULL;
 
   if (!out_crumbs) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error in cmp_breadcrumbs_create: Invalid argument "
+                    "(out_crumbs=NULL)\n");
+    return rc;
   }
 
   crumbs = (cmp_breadcrumbs_t *)malloc(sizeof(cmp_breadcrumbs_t));
   if (!crumbs) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    fprintf(stderr, "Error in cmp_breadcrumbs_create: Out of memory\n");
+    return rc;
   }
 
   crumbs->count = 0;
 
   *out_crumbs = crumbs;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_breadcrumbs_destroy(cmp_breadcrumbs_t *crumbs) {
+  int rc = CMP_SUCCESS;
+
   if (!crumbs) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(
+        stderr,
+        "Error in cmp_breadcrumbs_destroy: Invalid argument (crumbs=NULL)\n");
+    return rc;
   }
   free(crumbs);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
+  int rc = CMP_SUCCESS;
   const char *start;
   const char *p;
   size_t len;
 
   if (!crumbs || !full_path) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error in cmp_breadcrumbs_set_path: Invalid argument\n");
+    return rc;
   }
 
   crumbs->count = 0;
@@ -79,25 +95,34 @@ int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
     start = p;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_breadcrumbs_get_count(const cmp_breadcrumbs_t *crumbs,
                               size_t *out_count) {
+  int rc = CMP_SUCCESS;
+
   if (!crumbs || !out_count) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error in cmp_breadcrumbs_get_count: Invalid argument\n");
+    return rc;
   }
 
   *out_count = crumbs->count;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_breadcrumbs_get_segment(const cmp_breadcrumbs_t *crumbs, size_t index,
                                 cmp_breadcrumb_t **out_segment) {
+  int rc = CMP_SUCCESS;
+
   if (!crumbs || !out_segment || index >= crumbs->count) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error in cmp_breadcrumbs_get_segment: Invalid argument or "
+                    "index out of bounds\n");
+    return rc;
   }
 
   *out_segment = (cmp_breadcrumb_t *)&crumbs->segments[index];
-  return CMP_SUCCESS;
+  return rc;
 }

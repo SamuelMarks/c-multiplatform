@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <c_abstract_http/event_loop.h>
 
 #include <stdlib.h>
@@ -201,11 +202,14 @@ int cmp_modality_queue_task(cmp_modality_t *mod, cmp_task_fn_t task,
 }
 
 int cmp_modality_run(cmp_modality_t *mod) {
-  cmp_modality_single_state_t *state;
-  cmp_task_node_t *node;
+  int rc = CMP_SUCCESS;
+  cmp_modality_single_state_t *state = NULL;
+  cmp_task_node_t *node = NULL;
 
   if (mod == NULL || mod->internal_state == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_modality_run: Invalid argument\n");
+    return rc;
   }
 
   if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
@@ -215,17 +219,19 @@ int cmp_modality_run(cmp_modality_t *mod) {
     if (loop) {
       http_loop_run(loop);
     }
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (mod->type == CMP_MODALITY_SYNC_MULTI) {
     /* Threaded modality is already running its workers */
     /* You could block main thread here optionally, but we return for now */
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (mod->type != CMP_MODALITY_SYNC_SINGLE) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_modality_run: Unsupported modality type\n");
+    return rc;
   }
 
   state = (cmp_modality_single_state_t *)mod->internal_state;
@@ -251,21 +257,27 @@ int cmp_modality_run(cmp_modality_t *mod) {
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_modality_stop(cmp_modality_t *mod) {
+  int rc = CMP_SUCCESS;
   if (mod == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_modality_stop: Invalid argument\n");
+    return rc;
   }
 
   mod->is_running = 0;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_modality_destroy(cmp_modality_t *mod) {
+  int rc = CMP_SUCCESS;
   if (mod == NULL || mod->internal_state == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_modality_destroy: Invalid argument\n");
+    return rc;
   }
 
   if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
@@ -280,7 +292,7 @@ int cmp_modality_destroy(cmp_modality_t *mod) {
     cmp_modality_single_state_t *state =
         (cmp_modality_single_state_t *)mod->internal_state;
     cmp_task_node_t *curr = state->head;
-    cmp_task_node_t *next;
+    cmp_task_node_t *next = NULL;
 
     while (curr != NULL) {
       next = curr->next;
@@ -296,7 +308,7 @@ int cmp_modality_destroy(cmp_modality_t *mod) {
     if (loop) {
       http_loop_run(loop);
     }
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (mod->type == CMP_MODALITY_SYNC_MULTI) {
@@ -329,13 +341,17 @@ int cmp_modality_destroy(cmp_modality_t *mod) {
 
   mod->internal_state = NULL;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_app_init(cmp_app_config_t *config) {
-  if (config == NULL)
-    return CMP_ERROR_INVALID_ARG;
-  return CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
+  if (config == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_app_init: Invalid argument\n");
+    return rc;
+  }
+  return rc;
 }
 
 void cmp_run_loop(cmp_run_loop_fn user_tick, void *user_arg) {
@@ -345,50 +361,74 @@ void cmp_run_loop(cmp_run_loop_fn user_tick, void *user_arg) {
 }
 
 int cmp_msg_subscribe(cmp_msg_bus_t *bus, const char *channel, void *callback) {
-  if (!bus || !channel || !callback)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  if (!bus || !channel || !callback) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_msg_subscribe: Invalid argument\n");
+    return rc;
+  }
   /* Wraps cdd_msg_bus_subscribe */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_msg_publish(cmp_msg_bus_t *bus, const char *channel,
                     const cmp_msg_t *msg) {
-  if (!bus || !channel || !msg)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  if (!bus || !channel || !msg) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_msg_publish: Invalid argument\n");
+    return rc;
+  }
   /* Wraps cdd_msg_bus_publish */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_actor_spawn(cmp_msg_bus_t *bus, const char *name, void *handler,
                     void *state, cmp_actor_t **actor) {
-  if (!bus || !name || !handler || !actor)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  if (!bus || !name || !handler || !actor) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_actor_spawn: Invalid argument\n");
+    return rc;
+  }
   /* cdd_actor_spawn(bus, name, handler, state, actor); */
   (void)state;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_actor_supervise(cmp_actor_t *actor) {
-  if (!actor)
-    return CMP_ERROR_INVALID_ARG;
-  return CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
+  if (!actor) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_actor_supervise: Invalid argument\n");
+    return rc;
+  }
+  return rc;
 }
 
 int cmp_modality_greenthreads_init(cmp_modality_t *mod) {
-  if (mod == NULL)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  if (mod == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_modality_greenthreads_init: Invalid argument\n");
+    return rc;
+  }
   cmp_coroutine_system_init();
   mod->type = CMP_MODALITY_GREENTHREADS;
   mod->internal_state = NULL; /* Scheduler state goes here */
   mod->is_running = 1;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_modality_multiprocess_init(cmp_modality_t *mod) {
-  if (mod == NULL)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  if (mod == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_modality_multiprocess_init: Invalid argument\n");
+    return rc;
+  }
   mod->type = CMP_MODALITY_MULTIPROCESS_ACTOR;
   mod->internal_state = NULL; /* Process bus goes here */
   mod->is_running = 1;
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_compositor_anim {
@@ -11,15 +12,19 @@ struct cmp_compositor_anim {
 
 int cmp_compositor_anim_create(cmp_compositor_prop_t property,
                                cmp_compositor_anim_t **out_anim) {
-  cmp_compositor_anim_t *anim;
+  int rc = CMP_SUCCESS;
+  cmp_compositor_anim_t *anim = NULL;
 
   if (!out_anim) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_compositor_anim_create: Invalid argument\n");
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_compositor_anim_t), (void **)&anim) !=
-      CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_compositor_anim_t), (void **)&anim);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_compositor_anim_create: Out of memory\n");
+    return rc;
   }
 
   anim->property = property;
@@ -37,36 +42,47 @@ int cmp_compositor_anim_create(cmp_compositor_prop_t property,
   }
 
   *out_anim = anim;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_compositor_anim_destroy(cmp_compositor_anim_t *anim) {
+  int rc = CMP_SUCCESS;
+
   if (!anim) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_compositor_anim_destroy: Invalid argument\n");
+    return rc;
   }
   CMP_FREE(anim);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_compositor_anim_set_range(cmp_compositor_anim_t *anim,
                                   const cmp_compositor_val_t *start_val,
                                   const cmp_compositor_val_t *end_val) {
+  int rc = CMP_SUCCESS;
+
   if (!anim || !start_val || !end_val) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_compositor_anim_set_range: Invalid argument\n");
+    return rc;
   }
 
   anim->start_val = *start_val;
   anim->end_val = *end_val;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_compositor_anim_step(cmp_compositor_anim_t *anim, double dt_ms,
                              double duration_ms, cmp_compositor_val_t *out_val,
                              int *out_finished) {
+  int rc = CMP_SUCCESS;
   double progress;
 
   if (!anim || !out_val || !out_finished) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_compositor_anim_step: Invalid argument\n");
+    return rc;
   }
 
   if (dt_ms < 0.0) {
@@ -103,7 +119,7 @@ int cmp_compositor_anim_step(cmp_compositor_anim_t *anim, double dt_ms,
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /* Mock implementation of framebuffer capture and cross-fading for architectural
@@ -116,41 +132,62 @@ struct cmp_framebuffer_capture {
 
 int cmp_compositor_capture_framebuffer(
     cmp_window_t *window, cmp_framebuffer_capture_t **out_capture) {
-  cmp_framebuffer_capture_t *capture;
-  if (!window || !out_capture)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  cmp_framebuffer_capture_t *capture = NULL;
 
-  if (CMP_MALLOC(sizeof(cmp_framebuffer_capture_t), (void **)&capture) !=
-      CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  if (!window || !out_capture) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_compositor_capture_framebuffer: Invalid argument\n");
+    return rc;
   }
+
+  rc = CMP_MALLOC(sizeof(cmp_framebuffer_capture_t), (void **)&capture);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_compositor_capture_framebuffer: Out of memory\n");
+    return rc;
+  }
+
   capture->pixels = NULL;
   capture->width = 1920;
   capture->height = 1080;
   *out_capture = capture;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_compositor_release_framebuffer(cmp_framebuffer_capture_t *capture) {
-  if (!capture)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!capture) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_compositor_release_framebuffer: Invalid argument\n");
+    return rc;
+  }
+
   if (capture->pixels) {
     CMP_FREE(capture->pixels);
   }
   CMP_FREE(capture);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_compositor_start_crossfade(cmp_window_t *window,
                                    cmp_framebuffer_capture_t *old_buffer,
                                    double duration_ms,
                                    const float *easing_curve) {
-  if (!window || !old_buffer)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!window || !old_buffer) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_compositor_start_crossfade: Invalid argument\n");
+    return rc;
+  }
+
   /* Mock scheduling of hardware cross-fade compositing task.
      In a real Vulkan/Metal backend this would bind old_buffer to a texture unit
      and dispatch a transition fragment shader. */
   (void)duration_ms;
   (void)easing_curve;
-  return CMP_SUCCESS;
+  return rc;
 }

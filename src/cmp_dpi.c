@@ -1,6 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
-
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -16,83 +16,106 @@ struct cmp_dpi {
 };
 
 int cmp_dpi_create(cmp_dpi_t **out_dpi) {
-  cmp_dpi_t *dpi;
+  int rc = CMP_SUCCESS;
+  cmp_dpi_t *dpi = NULL;
 
   if (out_dpi == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_dpi_create: Invalid argument (out_dpi=NULL)\n");
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_dpi_t), (void **)&dpi) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_dpi_t), (void **)&dpi);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_dpi_create: Out of memory\n");
+    return rc;
   }
 
   memset(dpi, 0, sizeof(cmp_dpi_t));
 
   *out_dpi = dpi;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_dpi_destroy(cmp_dpi_t *dpi) {
+  int rc = CMP_SUCCESS;
+
   if (dpi == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_dpi_destroy: Invalid argument (dpi=NULL)\n");
+    return rc;
   }
 
   CMP_FREE(dpi);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_dpi_set_monitor_scale(cmp_dpi_t *dpi, int monitor_id, float scale) {
+  int rc = CMP_SUCCESS;
   int i;
 
   if (dpi == NULL || scale <= 0.0f) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_dpi_set_monitor_scale: Invalid argument\n");
+    return rc;
   }
 
   for (i = 0; i < dpi->monitor_count; ++i) {
     if (dpi->monitors[i].monitor_id == monitor_id) {
       dpi->monitors[i].scale = scale;
-      return CMP_SUCCESS;
+      return rc;
     }
   }
 
   if (dpi->monitor_count >= CMP_MAX_MONITORS) {
-    return CMP_ERROR_BOUNDS;
+    rc = CMP_ERROR_BOUNDS;
+    LOG_DEBUG(
+        "Error in cmp_dpi_set_monitor_scale: Maximum monitor count reached\n");
+    return rc;
   }
 
   dpi->monitors[dpi->monitor_count].monitor_id = monitor_id;
   dpi->monitors[dpi->monitor_count].scale = scale;
   dpi->monitor_count++;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_dpi_get_monitor_scale(const cmp_dpi_t *dpi, int monitor_id,
                               float *out_scale) {
+  int rc = CMP_SUCCESS;
   int i;
 
   if (dpi == NULL || out_scale == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_dpi_get_monitor_scale: Invalid argument\n");
+    return rc;
   }
 
   for (i = 0; i < dpi->monitor_count; ++i) {
     if (dpi->monitors[i].monitor_id == monitor_id) {
       *out_scale = dpi->monitors[i].scale;
-      return CMP_SUCCESS;
+      return rc;
     }
   }
 
   /* Default scale if monitor not found */
   *out_scale = 1.0f;
-  return CMP_ERROR_NOT_FOUND;
+  rc = CMP_ERROR_NOT_FOUND;
+  LOG_DEBUG("Error in cmp_dpi_get_monitor_scale: Monitor not found\n");
+  return rc;
 }
 
 int cmp_dpi_update_window_scale(cmp_dpi_t *dpi, cmp_window_t *window,
                                 int monitor_id) {
+  int rc = CMP_SUCCESS;
   float scale;
   int err;
 
   if (dpi == NULL || window == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_dpi_update_window_scale: Invalid argument\n");
+    return rc;
   }
 
   err = cmp_dpi_get_monitor_scale(dpi, monitor_id, &scale);
@@ -102,5 +125,5 @@ int cmp_dpi_update_window_scale(cmp_dpi_t *dpi, cmp_window_t *window,
 
   /* In a fully implemented renderer, trigger a relayout/rescale of the
    * window's UI tree here using the resolved scale. */
-  return CMP_SUCCESS;
+  return rc;
 }

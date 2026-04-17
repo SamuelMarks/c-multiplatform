@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -171,8 +172,14 @@ int cmp_content_visibility_evaluate(cmp_content_visibility_t visibility,
                                     const cmp_rect_t *viewport,
                                     const cmp_rect_t *node_rect,
                                     int *out_is_visible) {
-  if (!viewport || !node_rect || !out_is_visible)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  int x_overlap, y_overlap;
+
+  if (!viewport || !node_rect || !out_is_visible) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_content_visibility_evaluate: Invalid argument\n");
+    return rc;
+  }
 
   if (visibility == CMP_CONTENT_VISIBILITY_VISIBLE) {
     *out_is_visible = 1;
@@ -180,36 +187,41 @@ int cmp_content_visibility_evaluate(cmp_content_visibility_t visibility,
     *out_is_visible = 0;
   } else { /* AUTO */
     /* Simple AABB intersection check */
-    int x_overlap = (node_rect->x < viewport->x + viewport->width) &&
-                    (node_rect->x + node_rect->width > viewport->x);
-    int y_overlap = (node_rect->y < viewport->y + viewport->height) &&
-                    (node_rect->y + node_rect->height > viewport->y);
+    x_overlap = (node_rect->x < viewport->x + viewport->width) &&
+                (node_rect->x + node_rect->width > viewport->x);
+    y_overlap = (node_rect->y < viewport->y + viewport->height) &&
+                (node_rect->y + node_rect->height > viewport->y);
     *out_is_visible = x_overlap && y_overlap;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_contain_evaluate(cmp_contain_t contain, int *out_isolates_layout,
                          int *out_isolates_paint) {
-  if (!out_isolates_layout || !out_isolates_paint)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!out_isolates_layout || !out_isolates_paint) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_contain_evaluate: Invalid argument\n");
+    return rc;
+  }
 
   *out_isolates_layout = 0;
   *out_isolates_paint = 0;
 
   if (contain == CMP_CONTAIN_NONE)
-    return CMP_SUCCESS;
+    return rc;
 
   if (contain & CMP_CONTAIN_STRICT) {
     *out_isolates_layout = 1;
     *out_isolates_paint = 1;
-    return CMP_SUCCESS;
+    return rc;
   }
   if (contain & CMP_CONTAIN_CONTENT) {
     *out_isolates_layout = 1;
     *out_isolates_paint = 1;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (contain & CMP_CONTAIN_LAYOUT)
@@ -217,7 +229,7 @@ int cmp_contain_evaluate(cmp_contain_t contain, int *out_isolates_layout,
   if (contain & CMP_CONTAIN_PAINT)
     *out_isolates_paint = 1;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_resize_observer_create(cmp_resize_observer_t **out_observer,
@@ -225,12 +237,19 @@ int cmp_resize_observer_create(cmp_resize_observer_t **out_observer,
                                                  cmp_layout_node_t *, float,
                                                  float),
                                void *user_data) {
-  cmp_resize_observer_t *obs;
-  if (!out_observer || !on_resize)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  cmp_resize_observer_t *obs = NULL;
 
-  if (CMP_MALLOC(sizeof(cmp_resize_observer_t), (void **)&obs) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  if (!out_observer || !on_resize) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_resize_observer_create: Invalid argument\n");
+    return rc;
+  }
+
+  rc = CMP_MALLOC(sizeof(cmp_resize_observer_t), (void **)&obs);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_resize_observer_create: Out of memory\n");
+    return rc;
   }
 
   memset(obs, 0, sizeof(cmp_resize_observer_t));
@@ -238,23 +257,33 @@ int cmp_resize_observer_create(cmp_resize_observer_t **out_observer,
   obs->on_resize = on_resize;
 
   *out_observer = obs;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_resize_observer_destroy(cmp_resize_observer_t *observer) {
-  if (!observer)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!observer) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_resize_observer_destroy: Invalid argument\n");
+    return rc;
+  }
   CMP_FREE(observer);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_resize_observer_notify(cmp_resize_observer_t *observer,
                                cmp_layout_node_t *node, float new_width,
                                float new_height) {
-  if (!observer || !node)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!observer || !node) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_resize_observer_notify: Invalid argument\n");
+    return rc;
+  }
   if (observer->on_resize) {
     observer->on_resize(observer, node, new_width, new_height);
   }
-  return CMP_SUCCESS;
+  return rc;
 }

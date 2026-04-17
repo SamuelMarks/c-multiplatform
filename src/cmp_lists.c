@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -27,11 +28,20 @@ struct cmp_list {
 };
 
 int cmp_list_create(cmp_list_t **out_list, cmp_list_style_t style) {
-  struct cmp_list *ctx;
-  if (!out_list)
-    return CMP_ERROR_INVALID_ARG;
-  if (CMP_MALLOC(sizeof(struct cmp_list), (void **)&ctx) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  int rc = CMP_SUCCESS;
+  struct cmp_list *ctx = NULL;
+
+  if (!out_list) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_list_create: Invalid argument\n");
+    return rc;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_list), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_list_create: Out of memory\n");
+    return rc;
+  }
 
   ctx->style = style;
   ctx->is_editing = 0;
@@ -40,40 +50,53 @@ int cmp_list_create(cmp_list_t **out_list, cmp_list_style_t style) {
   ctx->row_capacity = 0;
 
   *out_list = (cmp_list_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_list_destroy(cmp_list_t *list_opaque) {
+  int rc = CMP_SUCCESS;
   struct cmp_list *ctx = (struct cmp_list *)list_opaque;
   size_t i;
-  if (!ctx)
-    return CMP_SUCCESS;
+
+  if (!ctx) {
+    return rc;
+  }
 
   if (ctx->rows) {
     for (i = 0; i < ctx->row_count; ++i) {
-      if (ctx->rows[i])
-        cmp_list_row_destroy((cmp_list_row_t *)ctx->rows[i]);
+      if (ctx->rows[i]) {
+        rc = cmp_list_row_destroy((cmp_list_row_t *)ctx->rows[i]);
+        if (rc != CMP_SUCCESS) {
+          LOG_DEBUG("Error in cmp_list_destroy: cmp_list_row_destroy failed\n");
+        }
+      }
     }
     CMP_FREE(ctx->rows);
   }
   CMP_FREE(ctx);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_list_add_row(cmp_list_t *list_opaque, cmp_list_row_t *row_opaque) {
+  int rc = CMP_SUCCESS;
   struct cmp_list *ctx = (struct cmp_list *)list_opaque;
   struct cmp_list_row *row = (struct cmp_list_row *)row_opaque;
-  cmp_list_row_t **new_rows;
+  cmp_list_row_t **new_rows = NULL;
   size_t new_cap;
 
-  if (!ctx || !row)
-    return CMP_ERROR_INVALID_ARG;
+  if (!ctx || !row) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_list_add_row: Invalid argument\n");
+    return rc;
+  }
 
   if (ctx->row_count == ctx->row_capacity) {
     new_cap = ctx->row_capacity == 0 ? 8 : ctx->row_capacity * 2;
-    if (CMP_MALLOC(new_cap * sizeof(cmp_list_row_t *), (void **)&new_rows) !=
-        CMP_SUCCESS)
-      return CMP_ERROR_OOM;
+    rc = CMP_MALLOC(new_cap * sizeof(cmp_list_row_t *), (void **)&new_rows);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_list_add_row: Out of memory allocating rows\n");
+      return rc;
+    }
     if (ctx->rows) {
       memcpy(new_rows, ctx->rows, ctx->row_count * sizeof(cmp_list_row_t *));
       CMP_FREE(ctx->rows);
@@ -83,25 +106,37 @@ int cmp_list_add_row(cmp_list_t *list_opaque, cmp_list_row_t *row_opaque) {
   }
 
   ctx->rows[ctx->row_count++] = row;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_list_row_create(cmp_list_row_t **out_row, const char *title) {
-  struct cmp_list_row *ctx;
+  int rc = CMP_SUCCESS;
+  struct cmp_list_row *ctx = NULL;
   size_t len;
-  if (!out_row || !title)
-    return CMP_ERROR_INVALID_ARG;
 
-  if (CMP_MALLOC(sizeof(struct cmp_list_row), (void **)&ctx) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  if (!out_row || !title) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_list_row_create: Invalid argument\n");
+    return rc;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_list_row), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_list_row_create: Out of memory\n");
+    return rc;
+  }
 
   ctx->separator_inset_left = 16.0f; /* Default HIG left margin */
   ctx->actions = NULL;
   ctx->action_count = 0;
 
   len = strlen(title);
-  if (CMP_MALLOC(len + 1, (void **)&ctx->title) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(len + 1, (void **)&ctx->title);
+  if (rc != CMP_SUCCESS) {
+    CMP_FREE(ctx);
+    LOG_DEBUG("Error in cmp_list_row_create: Out of memory allocating title\n");
+    return rc;
+  }
 #if defined(_MSC_VER)
   strcpy_s(ctx->title, len + 1, title);
 #else
@@ -109,14 +144,17 @@ int cmp_list_row_create(cmp_list_row_t **out_row, const char *title) {
 #endif
 
   *out_row = (cmp_list_row_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_list_row_destroy(cmp_list_row_t *row_opaque) {
+  int rc = CMP_SUCCESS;
   struct cmp_list_row *ctx = (struct cmp_list_row *)row_opaque;
   size_t i;
-  if (!ctx)
-    return CMP_SUCCESS;
+
+  if (!ctx) {
+    return rc;
+  }
 
   if (ctx->title)
     CMP_FREE(ctx->title);
@@ -128,31 +166,45 @@ int cmp_list_row_destroy(cmp_list_row_t *row_opaque) {
     CMP_FREE(ctx->actions);
   }
   CMP_FREE(ctx);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_list_row_set_separator_inset(cmp_list_row_t *row_opaque,
                                      float inset_left) {
+  int rc = CMP_SUCCESS;
   struct cmp_list_row *ctx = (struct cmp_list_row *)row_opaque;
-  if (!ctx)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_list_row_set_separator_inset: Invalid argument\n");
+    return rc;
+  }
   ctx->separator_inset_left = inset_left;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_list_row_add_swipe_action(cmp_list_row_t *row_opaque, int is_leading,
                                   const char *title,
                                   cmp_swipe_action_style_t style,
                                   int allows_continuous) {
+  int rc = CMP_SUCCESS;
   struct cmp_list_row *ctx = (struct cmp_list_row *)row_opaque;
-  cmp_swipe_action_t *new_actions;
+  cmp_swipe_action_t *new_actions = NULL;
   size_t len;
-  if (!ctx || !title)
-    return CMP_ERROR_INVALID_ARG;
 
-  if (CMP_MALLOC((ctx->action_count + 1) * sizeof(cmp_swipe_action_t),
-                 (void **)&new_actions) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  if (!ctx || !title) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_list_row_add_swipe_action: Invalid argument\n");
+    return rc;
+  }
+
+  rc = CMP_MALLOC((ctx->action_count + 1) * sizeof(cmp_swipe_action_t),
+                  (void **)&new_actions);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_list_row_add_swipe_action: Out of memory actions "
+              "array\n");
+    return rc;
+  }
 
   if (ctx->actions) {
     memcpy(new_actions, ctx->actions,
@@ -162,9 +214,11 @@ int cmp_list_row_add_swipe_action(cmp_list_row_t *row_opaque, int is_leading,
   ctx->actions = new_actions;
 
   len = strlen(title);
-  if (CMP_MALLOC(len + 1, (void **)&ctx->actions[ctx->action_count].title) !=
-      CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(len + 1, (void **)&ctx->actions[ctx->action_count].title);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_list_row_add_swipe_action: Out of memory title\n");
+    return rc;
+  }
 #if defined(_MSC_VER)
   strcpy_s(ctx->actions[ctx->action_count].title, len + 1, title);
 #else
@@ -176,25 +230,36 @@ int cmp_list_row_add_swipe_action(cmp_list_row_t *row_opaque, int is_leading,
   ctx->actions[ctx->action_count].allows_continuous = allows_continuous;
 
   ctx->action_count++;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_list_set_edit_mode(cmp_list_t *list_opaque, int is_editing) {
+  int rc = CMP_SUCCESS;
   struct cmp_list *ctx = (struct cmp_list *)list_opaque;
-  if (!ctx)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_list_set_edit_mode: Invalid argument\n");
+    return rc;
+  }
+
   ctx->is_editing = is_editing;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_list_resolve_metrics(cmp_list_t *list_opaque,
                              float *out_margin_horizontal,
                              float *out_corner_radius,
                              float *out_content_offset_x) {
+  int rc = CMP_SUCCESS;
   struct cmp_list *ctx = (struct cmp_list *)list_opaque;
+
   if (!ctx || !out_margin_horizontal || !out_corner_radius ||
-      !out_content_offset_x)
-    return CMP_ERROR_INVALID_ARG;
+      !out_content_offset_x) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_list_resolve_metrics: Invalid argument\n");
+    return rc;
+  }
 
   if (ctx->style == CMP_LIST_STYLE_INSET_GROUPED) {
     *out_margin_horizontal =
@@ -213,5 +278,5 @@ int cmp_list_resolve_metrics(cmp_list_t *list_opaque,
     *out_content_offset_x = 0.0f;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

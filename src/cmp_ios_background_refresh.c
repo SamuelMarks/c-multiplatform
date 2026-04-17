@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 /* clang-format on */
 
@@ -10,34 +11,51 @@ struct cmp_ios_background_refresh {
 
 int cmp_ios_background_refresh_create(
     cmp_ios_background_refresh_t **out_refresh) {
-  cmp_ios_background_refresh_t *r;
+  int rc = CMP_SUCCESS;
+  cmp_ios_background_refresh_t *r = NULL;
 
-  if (!out_refresh)
-    return CMP_ERROR_INVALID_ARG;
+  if (!out_refresh) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_ios_background_refresh_create: Invalid argument\n");
+    return rc;
+  }
 
-  r = (cmp_ios_background_refresh_t *)malloc(
-      sizeof(cmp_ios_background_refresh_t));
-  if (!r)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ios_background_refresh_t), (void **)&r);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_ios_background_refresh_create: Out of memory\n");
+    return rc;
+  }
 
   r->is_active = 0;
   r->current_task_id = 0;
   *out_refresh = r;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_ios_background_refresh_destroy(cmp_ios_background_refresh_t *refresh) {
-  if (!refresh)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!refresh) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_ios_background_refresh_destroy: Invalid argument\n");
+    return rc;
+  }
   free(refresh);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_ios_background_refresh_begin_task(cmp_ios_background_refresh_t *refresh,
                                           int *out_task_id) {
-  if (!refresh || !out_task_id)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!refresh || !out_task_id) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_ios_background_refresh_begin_task: Invalid argument\n");
+    return rc;
+  }
 
   /* Mock: In reality this calls [[UIApplication sharedApplication]
    * beginBackgroundTaskWithExpirationHandler] */
@@ -45,13 +63,19 @@ int cmp_ios_background_refresh_begin_task(cmp_ios_background_refresh_t *refresh,
   refresh->is_active = 1;
   *out_task_id = refresh->current_task_id;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_ios_background_refresh_end_task(cmp_ios_background_refresh_t *refresh,
                                         int task_id) {
-  if (!refresh)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!refresh) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_ios_background_refresh_end_task: Invalid argument\n");
+    return rc;
+  }
 
   /* Mock: In reality this calls [[UIApplication sharedApplication]
    * endBackgroundTask] */
@@ -59,5 +83,5 @@ int cmp_ios_background_refresh_end_task(cmp_ios_background_refresh_t *refresh,
     refresh->is_active = 0;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

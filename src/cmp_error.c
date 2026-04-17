@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -123,11 +124,12 @@ static void cmp_crash_handler(int sig) {
 }
 
 int cmp_crash_handler_init(void) {
+  int rc = CMP_SUCCESS;
   signal(SIGSEGV, cmp_crash_handler);
   signal(SIGABRT, cmp_crash_handler);
   signal(SIGILL, cmp_crash_handler);
   signal(SIGFPE, cmp_crash_handler);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 void cmp_assert_fail(const char *condition, const char *file, int line) {
@@ -135,4 +137,36 @@ void cmp_assert_fail(const char *condition, const char *file, int line) {
           line);
   cmp_dump_stack_trace();
   exit(1);
+}
+
+#include <stdarg.h>
+void cmp_log_debug(const char *fmt, ...) {
+  va_list args;
+  fprintf(stderr, "[DEBUG] ");
+  va_start(args, fmt);
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+}
+
+const char *cmp_strerror(int error) {
+  switch (error) {
+  case 0:
+    return "Success"; /* CMP_SUCCESS */
+  case CMP_ERROR_OOM:
+    return "Out of memory";
+  case CMP_ERROR_INVALID_ARG:
+    return "Invalid argument provided";
+  case CMP_ERROR_NOT_FOUND:
+    return "Resource not found";
+  case CMP_ERROR_BOUNDS:
+    return "Out of bounds access";
+  case CMP_ERROR_IO:
+    return "I/O error";
+  case CMP_ERROR_INVALID_STATE:
+    return "Object in invalid state";
+  case CMP_ERROR_GENERAL:
+    return "General/Unknown error";
+  default:
+    return "Unknown error code";
+  }
 }

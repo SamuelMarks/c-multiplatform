@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -23,48 +24,65 @@ struct cmp_math_visual_tree {
 };
 
 int cmp_math_renderer_create(cmp_math_renderer_t **out_renderer) {
-  cmp_math_renderer_t *renderer;
+  int rc = CMP_SUCCESS;
+  cmp_math_renderer_t *renderer = NULL;
+
   if (!out_renderer) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_math_renderer_create: Invalid argument\n");
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_math_renderer_t), (void **)&renderer) !=
-      CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_math_renderer_t), (void **)&renderer);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_math_renderer_create: Out of memory\n");
+    return rc;
   }
 
   renderer->is_initialized = 1;
   *out_renderer = renderer;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_math_renderer_destroy(cmp_math_renderer_t *renderer) {
+  int rc = CMP_SUCCESS;
+
   if (!renderer) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_math_renderer_destroy: Invalid argument\n");
+    return rc;
   }
   CMP_FREE(renderer);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_math_renderer_parse(cmp_math_renderer_t *renderer,
                             const char *latex_string, int is_inline,
                             void **out_visual_tree) {
-  struct cmp_math_visual_tree *tree;
+  int rc = CMP_SUCCESS;
+  struct cmp_math_visual_tree *tree = NULL;
   size_t len;
 
   if (!renderer || !latex_string || !out_visual_tree) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_math_renderer_parse: Invalid argument\n");
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(struct cmp_math_visual_tree), (void **)&tree) !=
-      CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(struct cmp_math_visual_tree), (void **)&tree);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG(
+        "Error in cmp_math_renderer_parse: Out of memory for visual tree\n");
+    return rc;
   }
 
   len = strlen(latex_string);
-  if (CMP_MALLOC(len + 1, (void **)&tree->raw_latex) != CMP_SUCCESS) {
+  rc = CMP_MALLOC(len + 1, (void **)&tree->raw_latex);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(tree);
-    return CMP_ERROR_OOM;
+    LOG_DEBUG(
+        "Error in cmp_math_renderer_parse: Out of memory for raw_latex\n");
+    return rc;
   }
 
 #if defined(_MSC_VER)
@@ -76,19 +94,24 @@ int cmp_math_renderer_parse(cmp_math_renderer_t *renderer,
   tree->is_inline = is_inline;
   *out_visual_tree = tree;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_math_renderer_free_tree(void *visual_tree) {
+  int rc = CMP_SUCCESS;
   struct cmp_math_visual_tree *tree =
       (struct cmp_math_visual_tree *)visual_tree;
-  if (!tree)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!tree) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_math_renderer_free_tree: Invalid argument\n");
+    return rc;
+  }
 
   if (tree->raw_latex) {
     CMP_FREE(tree->raw_latex);
   }
   CMP_FREE(tree);
 
-  return CMP_SUCCESS;
+  return rc;
 }

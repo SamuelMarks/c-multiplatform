@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 /* clang-format on */
 
@@ -10,45 +11,63 @@ struct cmp_focus_nav {
 };
 
 int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
-  cmp_focus_nav_t *nav;
-  int result;
+  int rc = CMP_SUCCESS;
+  cmp_focus_nav_t *nav = NULL;
 
   if (!tree || !out_nav) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_focus_nav_create: Invalid argument\n");
+    return rc;
   }
 
   nav = (cmp_focus_nav_t *)malloc(sizeof(cmp_focus_nav_t));
   if (!nav) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("Error in cmp_focus_nav_create: Out of memory\n");
+    return rc;
   }
 
   nav->tree = tree;
   nav->current_focus_id = -1;
 
-  result = cmp_focus_ring_create(tree, &nav->ring);
-  if (result != CMP_SUCCESS) {
+  rc = cmp_focus_ring_create(tree, &nav->ring);
+  if (rc != CMP_SUCCESS) {
     free(nav);
-    return result;
+    LOG_DEBUG("Error in cmp_focus_nav_create: Failed to create focus ring\n");
+    return rc;
   }
 
   *out_nav = nav;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_focus_nav_destroy(cmp_focus_nav_t *nav) {
+  int rc = CMP_SUCCESS;
+
   if (!nav) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_focus_nav_destroy: Invalid argument\n");
+    return rc;
   }
   if (nav->ring) {
-    cmp_focus_ring_destroy(nav->ring);
+    rc = cmp_focus_ring_destroy(nav->ring);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG(
+          "Error in cmp_focus_nav_destroy: Failed to destroy focus ring\n");
+    }
   }
   free(nav);
-  return CMP_SUCCESS;
+  return rc; /* Percolating the most recent rc, although typically we want to
+                destroy nav anyway */
 }
 
 int cmp_focus_nav_handle_tab(cmp_focus_nav_t *nav, int is_shift_pressed) {
+  int rc = CMP_SUCCESS;
+
   if (!nav) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_focus_nav_handle_tab: Invalid argument\n");
+    return rc;
   }
 
   /*
@@ -58,13 +77,23 @@ int cmp_focus_nav_handle_tab(cmp_focus_nav_t *nav, int is_shift_pressed) {
   (void)is_shift_pressed;
 
   /* Tell the focus ring to render keyboard navigation visual cues */
-  cmp_focus_ring_set_keyboard_mode(nav->ring, 1);
+  rc = cmp_focus_ring_set_keyboard_mode(nav->ring, 1);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG(
+        "Error in cmp_focus_nav_handle_tab: Failed to set keyboard mode\n");
+    return rc;
+  }
 
   /* Dummy advancement, in reality this queries the DOM/Tree */
   nav->current_focus_id++;
 
   /* Mirror the focus into the native focus ring */
-  cmp_focus_ring_node_focused(nav->ring, nav->current_focus_id);
+  rc = cmp_focus_ring_node_focused(nav->ring, nav->current_focus_id);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG(
+        "Error in cmp_focus_nav_handle_tab: Failed to focus node on ring\n");
+    return rc;
+  }
 
-  return CMP_SUCCESS;
+  return rc;
 }

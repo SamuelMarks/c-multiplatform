@@ -20,14 +20,20 @@ struct cmp_aria_relations {
 
 int cmp_aria_relations_create(cmp_a11y_tree_t *tree,
                               cmp_aria_relations_t **out_rels) {
-  struct cmp_aria_relations *rels;
+  int rc = CMP_SUCCESS;
+  struct cmp_aria_relations *rels = NULL;
 
-  if (!tree || !out_rels)
-    return CMP_ERROR_INVALID_ARG;
+  if (!tree || !out_rels) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error in cmp_aria_relations_create: Invalid argument\n");
+    return rc;
+  }
 
-  if (CMP_MALLOC(sizeof(struct cmp_aria_relations), (void **)&rels) !=
-      CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(struct cmp_aria_relations), (void **)&rels);
+  if (rc != CMP_SUCCESS) {
+    fprintf(stderr, "Error in cmp_aria_relations_create: Out of memory\n");
+    return rc;
+  }
 
   rels->tree = tree;
   rels->relations = NULL;
@@ -35,37 +41,51 @@ int cmp_aria_relations_create(cmp_a11y_tree_t *tree,
   rels->capacity = 0;
 
   *out_rels = (cmp_aria_relations_t *)rels;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_aria_relations_destroy(cmp_aria_relations_t *rels) {
+  int rc = CMP_SUCCESS;
   struct cmp_aria_relations *r = (struct cmp_aria_relations *)rels;
 
-  if (!r)
-    return CMP_ERROR_INVALID_ARG;
+  if (!r) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(
+        stderr,
+        "Error in cmp_aria_relations_destroy: Invalid argument (rels=NULL)\n");
+    return rc;
+  }
 
   if (r->relations) {
     CMP_FREE(r->relations);
   }
 
   CMP_FREE(r);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_aria_relations_add(cmp_aria_relations_t *rels, int source_id,
                            int target_id, cmp_aria_relation_type_t rel_type) {
+  int rc = CMP_SUCCESS;
   struct cmp_aria_relations *r = (struct cmp_aria_relations *)rels;
-  cmp_aria_relation_t *new_relations;
+  cmp_aria_relation_t *new_relations = NULL;
   size_t new_capacity;
 
-  if (!r)
-    return CMP_ERROR_INVALID_ARG;
+  if (!r) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr,
+            "Error in cmp_aria_relations_add: Invalid argument (rels=NULL)\n");
+    return rc;
+  }
 
   if (r->count >= r->capacity) {
     new_capacity = r->capacity == 0 ? 16 : r->capacity * 2;
-    if (CMP_MALLOC(new_capacity * sizeof(cmp_aria_relation_t),
-                   (void **)&new_relations) != CMP_SUCCESS)
-      return CMP_ERROR_OOM;
+    rc = CMP_MALLOC(new_capacity * sizeof(cmp_aria_relation_t),
+                    (void **)&new_relations);
+    if (rc != CMP_SUCCESS) {
+      fprintf(stderr, "Error in cmp_aria_relations_add: Out of memory\n");
+      return rc;
+    }
 
     if (r->relations) {
       memcpy(new_relations, r->relations,
@@ -81,15 +101,20 @@ int cmp_aria_relations_add(cmp_aria_relations_t *rels, int source_id,
   r->relations[r->count].rel_type = rel_type;
   r->count++;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_aria_relations_sync(cmp_aria_relations_t *rels) {
+  int rc = CMP_SUCCESS;
   struct cmp_aria_relations *r = (struct cmp_aria_relations *)rels;
   size_t i;
 
-  if (!r)
-    return CMP_ERROR_INVALID_ARG;
+  if (!r) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr,
+            "Error in cmp_aria_relations_sync: Invalid argument (rels=NULL)\n");
+    return rc;
+  }
 
   /* Iterate through relationships and apply them to the a11y tree.
    * This is a simulated sync matching the architectural pattern
@@ -105,5 +130,5 @@ int cmp_aria_relations_sync(cmp_aria_relations_t *rels) {
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

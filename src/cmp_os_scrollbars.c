@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 /* clang-format on */
 
@@ -10,15 +11,20 @@ struct cmp_os_scrollbar {
 };
 
 int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar) {
-  cmp_os_scrollbar_t *scrollbar;
+  int rc = CMP_SUCCESS;
+  cmp_os_scrollbar_t *scrollbar = NULL;
 
   if (!out_scrollbar) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_os_scrollbar_create: Invalid argument\n");
+    return rc;
   }
 
   scrollbar = (cmp_os_scrollbar_t *)malloc(sizeof(cmp_os_scrollbar_t));
   if (!scrollbar) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("Error in cmp_os_scrollbar_create: Out of memory\n");
+    return rc;
   }
 
   scrollbar->current_velocity = 0.0f;
@@ -32,30 +38,37 @@ int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar) {
 #endif
 
   *out_scrollbar = scrollbar;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar) {
+  int rc = CMP_SUCCESS;
+
   if (!scrollbar) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_os_scrollbar_destroy: Invalid argument\n");
+    return rc;
   }
 
   free(scrollbar);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar, float raw_delta_y,
                           unsigned int delta_time_ms, float *out_smoothed_y) {
+  int rc = CMP_SUCCESS;
   float dt_seconds;
 
   if (!scrollbar || !out_smoothed_y) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_os_scrollbar_step: Invalid argument\n");
+    return rc;
   }
 
   dt_seconds = delta_time_ms / 1000.0f;
   if (dt_seconds <= 0.0f) {
     *out_smoothed_y = 0.0f;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   /* Add incoming impulse */
@@ -75,5 +88,5 @@ int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar, float raw_delta_y,
   }
 
   *out_smoothed_y = scrollbar->current_velocity * dt_seconds;
-  return CMP_SUCCESS;
+  return rc;
 }

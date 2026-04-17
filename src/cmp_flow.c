@@ -1,31 +1,47 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
 
 int cmp_bfc_calculate(cmp_layout_node_t *node, float available_width) {
-  if (!node)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!node) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_bfc_calculate: Invalid argument (node=NULL)\n");
+    return rc;
+  }
   /* Simplified BFC logic: block takes full available width */
   node->computed_rect.width = available_width;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_ifc_calculate(cmp_layout_node_t *node, float available_width) {
-  if (!node)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!node) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_ifc_calculate: Invalid argument (node=NULL)\n");
+    return rc;
+  }
   /* Inline shrinks to content, wrapped within available width */
   if (node->computed_rect.width > available_width) {
     node->computed_rect.width = available_width;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_float_evaluate(cmp_layout_node_t *node, int is_float, int clear,
                        float *out_x, float *out_y) {
-  if (!node || !out_x || !out_y)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!node || !out_x || !out_y) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_float_evaluate: Invalid argument\n");
+    return rc;
+  }
 
   if (is_float) {
     /* Basic float displacement */
@@ -36,13 +52,19 @@ int cmp_float_evaluate(cmp_layout_node_t *node, int is_float, int clear,
     *out_x = 0.0f;
     *out_y += node->computed_rect.height;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
                                float shape_radius, float margin) {
-  if (!node)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!node) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_shape_outside_evaluate: Invalid argument (node=NULL)\n");
+    return rc;
+  }
   /* Wrap content logic placeholder */
   if (shape_radius > 0) {
     /* Circular wrapping adjustment */
@@ -51,18 +73,25 @@ int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
     /* Rectangular wrapping */
     node->computed_rect.width -= (float_rect.width + margin);
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_multicolumn_evaluate(cmp_layout_node_t *node,
                              cmp_column_fill_t fill_mode) {
+  int rc = CMP_SUCCESS;
   float total_gap;
   float content_width;
-  if (!node)
-    return CMP_ERROR_INVALID_ARG;
 
-  if (node->column_count <= 1)
-    return CMP_SUCCESS;
+  if (!node) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_multicolumn_evaluate: Invalid argument (node=NULL)\n");
+    return rc;
+  }
+
+  if (node->column_count <= 1) {
+    return rc;
+  }
 
   total_gap = node->column_gap * (node->column_count - 1);
   content_width = node->computed_rect.width - total_gap;
@@ -77,23 +106,34 @@ int cmp_multicolumn_evaluate(cmp_layout_node_t *node,
     /* Balance content height evenly */
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_table_evaluate(cmp_layout_node_t *node, int is_fixed) {
-  if (!node)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!node) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_table_evaluate: Invalid argument (node=NULL)\n");
+    return rc;
+  }
   if (is_fixed) {
     /* Fixed layout algorithm */
   } else {
     /* Auto layout algorithm */
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_table_border_collapse(cmp_layout_node_t *table) {
-  if (!table)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!table) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_table_border_collapse: Invalid argument (table=NULL)\n");
+    return rc;
+  }
   /* Conflict resolution logic */
-  return CMP_SUCCESS;
+  return rc;
 }

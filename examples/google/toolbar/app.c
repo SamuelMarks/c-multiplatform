@@ -12,10 +12,14 @@ static int g_is_rtl = 0;
 static int g_lang = 0;
 static int g_palette_idx = 0;
 
-static const uint32_t surface_light[] = { 0xFFFEF7FF, 0xFFF8FDFF, 0xFFFFFBF7, 0xFFFFF8FB };
-static const uint32_t surface_dark[] =  { 0xFF141218, 0xFF0E1419, 0xFF121411, 0xFF1A110F };
-static const uint32_t on_surface_light[] = { 0xFF1D1B20, 0xFF191C20, 0xFF1A1C19, 0xFF201A19 };
-static const uint32_t on_surface_dark[] = { 0xFFE6E0E9, 0xFFE1E2E8, 0xFFE2E3DF, 0xFFEAE0DF };
+static const uint32_t surface_light[] = {0xFFFEF7FF, 0xFFF8FDFF, 0xFFFFFBF7,
+                                         0xFFFFF8FB};
+static const uint32_t surface_dark[] = {0xFF141218, 0xFF0E1419, 0xFF121411,
+                                        0xFF1A110F};
+static const uint32_t on_surface_light[] = {0xFF1D1B20, 0xFF191C20, 0xFF1A1C19,
+                                            0xFF201A19};
+static const uint32_t on_surface_dark[] = {0xFFE6E0E9, 0xFFE1E2E8, 0xFFE2E3DF,
+                                           0xFFEAE0DF};
 
 static int build_ui(void);
 
@@ -29,7 +33,8 @@ static void on_lang_click(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
   build_ui();
   if (g_ui_tree) {
     /* Use current window bounds */
-    cmp_layout_calculate(g_ui_tree->layout, g_ui_tree->layout->width, g_ui_tree->layout->height);
+    cmp_layout_calculate(g_ui_tree->layout, g_ui_tree->layout->width,
+                         g_ui_tree->layout->height);
   }
   if (g_window)
     cmp_window_set_ui_tree(g_window, g_ui_tree);
@@ -46,7 +51,8 @@ static void on_theme_click(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
   g_is_dark = !g_is_dark;
   build_ui();
   if (g_ui_tree) {
-    cmp_layout_calculate(g_ui_tree->layout, g_ui_tree->layout->width, g_ui_tree->layout->height);
+    cmp_layout_calculate(g_ui_tree->layout, g_ui_tree->layout->width,
+                         g_ui_tree->layout->height);
   }
   if (g_window) {
     cmp_window_set_ui_tree(g_window, g_ui_tree);
@@ -68,7 +74,8 @@ static void on_palette_click(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
   g_palette_idx = (g_palette_idx + 1) % 4;
   build_ui();
   if (g_ui_tree) {
-    cmp_layout_calculate(g_ui_tree->layout, g_ui_tree->layout->width, g_ui_tree->layout->height);
+    cmp_layout_calculate(g_ui_tree->layout, g_ui_tree->layout->width,
+                         g_ui_tree->layout->height);
   }
   if (g_window) {
     cmp_window_set_ui_tree(g_window, g_ui_tree);
@@ -90,7 +97,8 @@ static int create_m3_icon_button(cmp_ui_node_t **out_btn, const char *icon_str,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (cmp_ui_icon_button_create(&icon_btn, icon_str, 0 /* STANDARD */) != CMP_SUCCESS) {
+  if (cmp_ui_icon_button_create(&icon_btn, icon_str, 0 /* STANDARD */) !=
+      CMP_SUCCESS) {
     return CMP_ERROR_NOT_FOUND;
   }
 
@@ -105,18 +113,21 @@ static int create_m3_icon_button(cmp_ui_node_t **out_btn, const char *icon_str,
   btn_node->border_radius = 24.0f;  /* 50% border radius for circle */
   btn_node->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
   btn_node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
-  
+
   /* The child is the text node containing the icon */
   if (btn_node->child_count > 0) {
-      btn_node->children[0]->font_size = 24.0f; /* 1.5rem (24dp) icon glyph size */
-      /* font-variation-settings logic goes here conceptually */
-      btn_node->children[0]->text_color = g_is_dark ? on_surface_dark[g_palette_idx] : on_surface_light[g_palette_idx]; /* M3 On Surface Variant */
+    btn_node->children[0]->font_size =
+        24.0f; /* 1.5rem (24dp) icon glyph size */
+    /* font-variation-settings logic goes here conceptually */
+    btn_node->children[0]->text_color =
+        g_is_dark ? on_surface_dark[g_palette_idx]
+                  : on_surface_light[g_palette_idx]; /* M3 On Surface Variant */
   }
 
   /* Interactive state layers: hover/pressed opacity setup */
   btn_node->hover_opacity = 0.08f; /* 8% hover overlay */
   btn_node->press_opacity = 0.12f; /* 12% pressed overlay */
-  
+
   /* Apply default transparent bg color */
   btn_node->bg_color = 0x00000000;
 
@@ -124,13 +135,14 @@ static int create_m3_icon_button(cmp_ui_node_t **out_btn, const char *icon_str,
     /* Setup accessibility role and label */
     cmp_a11y_tree_t *tree = NULL;
     if (cmp_a11y_tree_create(&tree) == CMP_SUCCESS) {
-       cmp_a11y_tree_add_node(tree, btn_node->layout->id, "button", aria_label);
-       /* In a real app we'd bind this tree to the window/document */
+      cmp_a11y_tree_add_node(tree, btn_node->layout->id, "button", aria_label);
+      /* In a real app we'd bind this tree to the window/document */
     }
   }
 
   if (cb) {
-    (void)cmp_ui_node_add_event_listener(btn_node, 1 /*MOUSE*/, 2 /*UP*/, cb, NULL);
+    (void)cmp_ui_node_add_event_listener(btn_node, 1 /*MOUSE*/, 2 /*UP*/, cb,
+                                         NULL);
   }
 
   *out_btn = btn_node;
@@ -172,8 +184,9 @@ static int build_ui(void) {
   g_ui_tree->layout->width = 1024.0f;
   g_ui_tree->layout->height = -1.0f;
   g_ui_tree->layout->justify_content = CMP_FLEX_ALIGN_START;
-  g_ui_tree->bg_color = g_is_dark ? surface_dark[g_palette_idx] : surface_light[g_palette_idx]; /* Surface */
-  g_ui_tree->design_language_override = 1;                   /* M3 */
+  g_ui_tree->bg_color = g_is_dark ? surface_dark[g_palette_idx]
+                                  : surface_light[g_palette_idx]; /* Surface */
+  g_ui_tree->design_language_override = 1;                        /* M3 */
 
   /* M3 Top App Bar */
   rc = cmp_ui_box_create(&app_bar);
@@ -186,22 +199,26 @@ static int build_ui(void) {
   app_bar->layout->flex_shrink = 0.0f;
   app_bar->layout->justify_content = CMP_FLEX_ALIGN_SPACE_BETWEEN;
   app_bar->layout->align_items = CMP_FLEX_ALIGN_CENTER;
-  app_bar->layout->padding[0] = 8.0f;                      /* Top */
-  app_bar->layout->padding[1] = g_is_rtl ? 16.0f : 4.0f;   /* Right */
-  app_bar->layout->padding[2] = 8.0f;                      /* Bottom */
-  app_bar->layout->padding[3] = g_is_rtl ? 4.0f : 16.0f;   /* Left */
-  app_bar->bg_color = g_is_dark ? surface_dark[g_palette_idx] : surface_light[g_palette_idx]; /* Surface */
+  app_bar->layout->padding[0] = 8.0f;                    /* Top */
+  app_bar->layout->padding[1] = g_is_rtl ? 16.0f : 4.0f; /* Right */
+  app_bar->layout->padding[2] = 8.0f;                    /* Bottom */
+  app_bar->layout->padding[3] = g_is_rtl ? 4.0f : 16.0f; /* Left */
+  app_bar->bg_color = g_is_dark ? surface_dark[g_palette_idx]
+                                : surface_light[g_palette_idx]; /* Surface */
 
-    if (g_lang == 1) {
-    title_text = "\xD7\x94\xD7\x99\xD7\x99 \xD7\xA1\xD7\xA8\xD7\x92\xD7\x9C \xD7\xA0\xD7\x99\xD7\x95\xD7\x95\xD7\x98"; /* Hebrew */
+  if (g_lang == 1) {
+    title_text = "\xD7\x94\xD7\x99\xD7\x99 \xD7\xA1\xD7\xA8\xD7\x92\xD7\x9C "
+                 "\xD7\xA0\xD7\x99\xD7\x95\xD7\x95\xD7\x98"; /* Hebrew */
   } else if (g_lang == 2) {
     title_text = "\xD9\x85\xD8\xB1\xD8\xAD\xD8\xA8\xD8\xA7 navbar"; /* Arabic */
   }
 
   rc = cmp_ui_text_create(&title, title_text, -1);
   if (rc == CMP_SUCCESS) {
-    title->text_color = g_is_dark ? on_surface_dark[g_palette_idx] : on_surface_light[g_palette_idx]; /* On Surface */
-    title->font_size = 22.0f;                                /* Title Large */
+    title->text_color = g_is_dark
+                            ? on_surface_dark[g_palette_idx]
+                            : on_surface_light[g_palette_idx]; /* On Surface */
+    title->font_size = 22.0f;                                  /* Title Large */
     title->layout->flex_shrink = 1.0f;
     title->layout->width = 200.0f;
   }
@@ -215,10 +232,13 @@ static int build_ui(void) {
     actions_row->layout->column_gap = 8.0f;
     actions_row->layout->flex_shrink = 0.0f;
 
-    (void)create_m3_icon_button(&btn_lang, "language", "Switch Language", on_lang_click);
-    (void)create_m3_icon_button(
-        &btn_theme, g_is_dark ? "light_mode" : "dark_mode", "Toggle dark mode", on_theme_click);
-    (void)create_m3_icon_button(&btn_palette, "palette", "Change theme color", on_palette_click);
+    (void)create_m3_icon_button(&btn_lang, "language", "Switch Language",
+                                on_lang_click);
+    (void)create_m3_icon_button(&btn_theme,
+                                g_is_dark ? "light_mode" : "dark_mode",
+                                "Toggle dark mode", on_theme_click);
+    (void)create_m3_icon_button(&btn_palette, "palette", "Change theme color",
+                                on_palette_click);
 
     if (g_is_rtl) {
       cmp_ui_node_add_child(actions_row, btn_palette);
@@ -300,9 +320,11 @@ int app_run(void) {
     while (cmp_event_pop(&evt) == CMP_SUCCESS) {
       cmp_hit_test_t *ht;
       cmp_ui_node_t *target = NULL;
-      
+
       if (cmp_hit_test_create(g_ui_tree, &ht) == CMP_SUCCESS) {
-        if (cmp_hit_test_query(ht, (float)evt.x, (float)evt.y, &target) == CMP_SUCCESS && target != NULL) {
+        if (cmp_hit_test_query(ht, (float)evt.x, (float)evt.y, &target) ==
+                CMP_SUCCESS &&
+            target != NULL) {
           cmp_event_dispatch_run(g_ui_tree, target, &evt);
         }
         cmp_hit_test_destroy(ht);

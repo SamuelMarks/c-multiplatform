@@ -93,7 +93,7 @@ if(CMP_LTO OR CMP_THEME_MODE STREQUAL "SINGLE_STATIC")
     endif()
 endif()
 
-set(CMAKE_C_VISIBILITY_PRESET hidden)
+# set(CMAKE_C_VISIBILITY_PRESET hidden)
 
 if(MINGW OR CYGWIN)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLLONG_MAX=9223372036854775807LL -DLLONG_MIN=\"(-LLONG_MAX-1LL)\"")
@@ -622,6 +622,10 @@ add_library(cmp ${CMP_SOURCES} ${CMP_THEME_SOURCES}      src/cmp_a11y_theme.c
 if(CMP_SHARED_LIBS)
     set_target_properties(cmp PROPERTIES POSITION_INDEPENDENT_CODE ON)
     target_compile_definitions(cmp PRIVATE CMP_BUILD_SHARED)
+endif()
+
+if(MINGW)
+    target_link_options(cmp PRIVATE "-Wl,--export-all-symbols")
 endif()
 
 target_include_directories(cmp PUBLIC include)

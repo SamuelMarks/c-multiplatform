@@ -283,3 +283,12 @@ cscope.out
 /*.ps1
 /append_*.c
 /append_*.txt
+
+# Even more wildcards for careless git add
+*_out.txt
+*_log.txt
+*_err.txt
+*error.txt
+*.dat
+test.c
+path

@@ -1,6 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
-
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -10,61 +10,102 @@ struct cmp_haptics {
 };
 
 int cmp_haptics_create(cmp_haptics_t **out_haptics) {
-  cmp_haptics_t *haptics;
+  int rc = CMP_SUCCESS;
+  cmp_haptics_t *haptics = NULL;
+
   if (!out_haptics) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_haptics_create: Invalid argument (out_haptics=NULL)\n");
+    return rc;
   }
-  if (CMP_MALLOC(sizeof(cmp_haptics_t), (void **)&haptics) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+
+  rc = CMP_MALLOC(sizeof(cmp_haptics_t), (void **)&haptics);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_haptics_create: Out of memory\n");
+    return rc;
   }
+
   memset(haptics, 0, sizeof(cmp_haptics_t));
   haptics->last_triggered_type = -1;
   *out_haptics = haptics;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_haptics_destroy(cmp_haptics_t *haptics) {
+  int rc = CMP_SUCCESS;
+
   if (!haptics) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_haptics_destroy: Invalid argument\n");
+    return rc;
   }
   CMP_FREE(haptics);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_haptics_trigger(cmp_haptics_t *haptics, cmp_haptics_type_t type) {
+  int rc = CMP_SUCCESS;
+
   if (!haptics) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_haptics_trigger: Invalid argument\n");
+    return rc;
   }
+
   haptics->last_triggered_type = type;
   /* Actual OS-specific haptic API calls would go here */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_haptics_prepare(cmp_haptics_t *haptics) {
-  if (!haptics)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!haptics) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_haptics_prepare: Invalid argument\n");
+    return rc;
+  }
+
   /* Simulating OS-level prepare() to wake the Taptic Engine */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_haptics_trigger_with_audio_sync(cmp_haptics_t *haptics,
                                         cmp_haptics_type_t type,
                                         const char *audio_file_path) {
-  if (!haptics || !audio_file_path)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!haptics || !audio_file_path) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_haptics_trigger_with_audio_sync: Invalid argument\n");
+    return rc;
+  }
+
   (void)type;
   /* Simulating audio-haptic dispatch syncing */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_haptics_trigger_rigid(cmp_haptics_t *haptics) {
-  if (!haptics)
-    return CMP_ERROR_INVALID_ARG;
-  return CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
+
+  if (!haptics) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_haptics_trigger_rigid: Invalid argument\n");
+    return rc;
+  }
+  return rc;
 }
 
 int cmp_haptics_trigger_soft(cmp_haptics_t *haptics) {
-  if (!haptics)
-    return CMP_ERROR_INVALID_ARG;
-  return CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
+
+  if (!haptics) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_haptics_trigger_soft: Invalid argument\n");
+    return rc;
+  }
+  return rc;
 }

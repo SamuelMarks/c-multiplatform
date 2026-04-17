@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 /* clang-format on */
 
@@ -8,29 +9,47 @@ struct cmp_materials {
 };
 
 int cmp_materials_create(cmp_materials_t **out_materials) {
-  struct cmp_materials *ctx;
-  if (!out_materials)
-    return CMP_ERROR_INVALID_ARG;
-  if (CMP_MALLOC(sizeof(struct cmp_materials), (void **)&ctx) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  int rc = CMP_SUCCESS;
+  struct cmp_materials *ctx = NULL;
+
+  if (!out_materials) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_materials_create: Invalid argument\n");
+    return rc;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_materials), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_materials_create: Out of memory\n");
+    return rc;
+  }
+
   ctx->is_initialized = 1;
   *out_materials = (cmp_materials_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_materials_destroy(cmp_materials_t *materials) {
-  if (materials)
+  int rc = CMP_SUCCESS;
+
+  if (materials) {
     CMP_FREE(materials);
-  return CMP_SUCCESS;
+  }
+  return rc;
 }
 
 int cmp_materials_resolve_blur_effect(cmp_materials_t *materials,
                                       cmp_blur_style_t style,
                                       float *out_radius_px,
                                       float *out_saturation_multiplier) {
+  int rc = CMP_SUCCESS;
   struct cmp_materials *c = (struct cmp_materials *)materials;
-  if (!c || !out_radius_px || !out_saturation_multiplier)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!c || !out_radius_px || !out_saturation_multiplier) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_materials_resolve_blur_effect: Invalid argument\n");
+    return rc;
+  }
 
   /* Simulating Apple HIG blur radii and saturation boosts */
   switch (style) {
@@ -59,15 +78,21 @@ int cmp_materials_resolve_blur_effect(cmp_materials_t *materials,
     *out_saturation_multiplier = 1.5f;
     break;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_materials_resolve_macos_material(cmp_materials_t *materials,
                                          cmp_macos_material_t material,
                                          cmp_blur_style_t *out_mapped_style) {
+  int rc = CMP_SUCCESS;
   struct cmp_materials *c = (struct cmp_materials *)materials;
-  if (!c || !out_mapped_style)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!c || !out_mapped_style) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_materials_resolve_macos_material: Invalid argument\n");
+    return rc;
+  }
 
   switch (material) {
   case CMP_MACOS_MATERIAL_WINDOW_BACKGROUND:
@@ -84,16 +109,21 @@ int cmp_materials_resolve_macos_material(cmp_materials_t *materials,
     *out_mapped_style = CMP_BLUR_STYLE_REGULAR;
     break;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_materials_resolve_vibrancy(cmp_materials_t *materials,
                                    cmp_vibrancy_style_t style,
                                    float *out_opacity,
                                    int *out_requires_color_dodge) {
+  int rc = CMP_SUCCESS;
   struct cmp_materials *c = (struct cmp_materials *)materials;
-  if (!c || !out_opacity || !out_requires_color_dodge)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!c || !out_opacity || !out_requires_color_dodge) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_materials_resolve_vibrancy: Invalid argument\n");
+    return rc;
+  }
 
   /* UIVibrancyEffect uses color dodge/burn plus opacity layering */
   switch (style) {
@@ -126,7 +156,7 @@ int cmp_materials_resolve_vibrancy(cmp_materials_t *materials,
     *out_requires_color_dodge = 0;
     break;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_materials_interpolate_blur_transition(cmp_materials_t *materials,
@@ -134,12 +164,16 @@ int cmp_materials_interpolate_blur_transition(cmp_materials_t *materials,
                                               cmp_blur_style_t to_style,
                                               float progress,
                                               float *out_current_radius_px) {
+  int rc = CMP_SUCCESS;
   struct cmp_materials *c = (struct cmp_materials *)materials;
   float from_rad, from_sat, to_rad, to_sat;
-  int res;
 
-  if (!c || !out_current_radius_px)
-    return CMP_ERROR_INVALID_ARG;
+  if (!c || !out_current_radius_px) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_materials_interpolate_blur_transition: Invalid "
+              "argument\n");
+    return rc;
+  }
 
   /* Clamp progress */
   if (progress < 0.0f)
@@ -147,19 +181,24 @@ int cmp_materials_interpolate_blur_transition(cmp_materials_t *materials,
   if (progress > 1.0f)
     progress = 1.0f;
 
-  res = cmp_materials_resolve_blur_effect(materials, from_style, &from_rad,
-                                          &from_sat);
-  if (res != CMP_SUCCESS)
-    return res;
+  rc = cmp_materials_resolve_blur_effect(materials, from_style, &from_rad,
+                                         &from_sat);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_materials_interpolate_blur_transition: "
+              "cmp_materials_resolve_blur_effect from failed\n");
+    return rc;
+  }
 
-  res =
-      cmp_materials_resolve_blur_effect(materials, to_style, &to_rad, &to_sat);
-  if (res != CMP_SUCCESS)
-    return res;
+  rc = cmp_materials_resolve_blur_effect(materials, to_style, &to_rad, &to_sat);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_materials_interpolate_blur_transition: "
+              "cmp_materials_resolve_blur_effect to failed\n");
+    return rc;
+  }
 
   /* Linear interpolation of the blur radius (crossfade equivalents handle the
    * visual density) */
   *out_current_radius_px = from_rad + ((to_rad - from_rad) * progress);
 
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -1,6 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
-#include "cmp.h"
+#include "cmp_log.h"
 #include <stdio.h>
 
 #if defined(_WIN32)
@@ -14,16 +14,24 @@
 static cmp_resource_manager_t *g_resource_manager = NULL;
 
 int cmp_power_awareness_init(void) {
-  int result = cmp_resource_manager_create(&g_resource_manager);
-  if (result != CMP_SUCCESS) {
-    return result;
+  int rc = CMP_SUCCESS;
+
+  rc = cmp_resource_manager_create(&g_resource_manager);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_power_awareness_init: cmp_resource_manager_create "
+              "failed\n");
+    return rc;
   }
-  return 0;
+  return rc;
 }
 
 int cmp_power_awareness_poll(void) {
+  int rc = CMP_SUCCESS;
+
   if (!g_resource_manager) {
-    return CMP_ERROR_INVALID_STATE;
+    rc = CMP_ERROR_INVALID_STATE;
+    LOG_DEBUG("Error in cmp_power_awareness_poll: Not initialized\n");
+    return rc;
   }
 
 #if defined(_WIN32)
@@ -56,5 +64,5 @@ int cmp_power_awareness_poll(void) {
      platform specific calls in the future. */
 #endif
 
-  return 0;
+  return rc;
 }

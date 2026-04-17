@@ -4,6 +4,7 @@
 /* clang-format off */
 #include "cmp_ffi.h"
 /* clang-format on */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

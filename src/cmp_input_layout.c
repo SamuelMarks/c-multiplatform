@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -19,37 +20,51 @@ struct cmp_input_layout {
 };
 
 int cmp_input_layout_create(cmp_input_layout_t **out_layout) {
-  cmp_input_layout_t *layout;
+  int rc = CMP_SUCCESS;
+  cmp_input_layout_t *layout = NULL;
 
-  if (!out_layout)
-    return CMP_ERROR_INVALID_ARG;
+  if (!out_layout) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_input_layout_create: Invalid argument\n");
+    return rc;
+  }
 
-  layout = (cmp_input_layout_t *)malloc(sizeof(cmp_input_layout_t));
-  if (!layout)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_input_layout_t), (void **)&layout);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_input_layout_create: Out of memory\n");
+    return rc;
+  }
 
   layout->line_height = 20.0f;
   layout->max_lines = 10;
   layout->attachment_count = 0;
 
   *out_layout = layout;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_input_layout_destroy(cmp_input_layout_t *layout) {
-  if (!layout)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+
+  if (!layout) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_input_layout_destroy: Invalid argument\n");
+    return rc;
+  }
   free(layout);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_input_layout_update_text(cmp_input_layout_t *layout,
                                  const char *new_text, float *out_height) {
+  int rc = CMP_SUCCESS;
   int num_lines = 1;
   const char *p;
 
   if (!layout || !new_text || !out_height) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_input_layout_update_text: Invalid argument\n");
+    return rc;
   }
 
   /* Count newlines */
@@ -71,17 +86,24 @@ int cmp_input_layout_update_text(cmp_input_layout_t *layout,
     *out_height += 30.0f;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_input_layout_add_attachment(cmp_input_layout_t *layout,
                                     const char *filename) {
+  int rc = CMP_SUCCESS;
+
   if (!layout || !filename) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_input_layout_add_attachment: Invalid argument\n");
+    return rc;
   }
 
   if (layout->attachment_count >= MAX_ATTACHMENTS) {
-    return CMP_ERROR_BOUNDS;
+    rc = CMP_ERROR_BOUNDS;
+    LOG_DEBUG(
+        "Error in cmp_input_layout_add_attachment: Max attachments reached\n");
+    return rc;
   }
 
   strncpy(layout->attachments[layout->attachment_count].filename, filename,
@@ -89,15 +111,20 @@ int cmp_input_layout_add_attachment(cmp_input_layout_t *layout,
   layout->attachments[layout->attachment_count].filename[255] = '\0';
   layout->attachment_count++;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_input_layout_get_attachment_count(const cmp_input_layout_t *layout,
                                           size_t *out_count) {
+  int rc = CMP_SUCCESS;
+
   if (!layout || !out_count) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG(
+        "Error in cmp_input_layout_get_attachment_count: Invalid argument\n");
+    return rc;
   }
 
   *out_count = layout->attachment_count;
-  return CMP_SUCCESS;
+  return rc;
 }

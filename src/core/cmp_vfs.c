@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -81,16 +82,21 @@ int cmp_vfs_shutdown(void) {
 }
 
 int cmp_vfs_mount(const char *mount_point, const char *real_path) {
+  int rc;
   cmp_vfs_mount_entry_t *entry;
   size_t mp_len, rp_len;
 
   if (mount_point == NULL || real_path == NULL || !g_vfs_initialized) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_vfs_mount: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_vfs_mount_entry_t), (void **)&entry) !=
-      CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_vfs_mount_entry_t), (void **)&entry);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_vfs_mount CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   mp_len = strlen(mount_point);
@@ -121,11 +127,14 @@ int cmp_vfs_mount(const char *mount_point, const char *real_path) {
 }
 
 int cmp_vfs_resolve_path(const char *virtual_path, cmp_string_t *out_path) {
+  int rc;
   cmp_vfs_mount_entry_t *curr;
   size_t mp_len;
 
   if (virtual_path == NULL || out_path == NULL || !g_vfs_initialized) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_vfs_resolve_path: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   cmp_string_init(out_path);

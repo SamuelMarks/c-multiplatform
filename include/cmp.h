@@ -12290,10 +12290,6 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
                                        cmp_window_t *window,
                                        cmp_windows_material_t material);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
 #include "cmp_audio_capture.h"
 #include "cmp_credential_manager.h"
 #include "cmp_global_hotkey.h"
@@ -12425,5 +12421,10 @@ CMP_API int cmp_state_layer_trigger_fluent_reveal(cmp_state_layer_t *layer,
                                                   float pointer_y);
 CMP_API int cmp_state_layer_apply_vibrancy_mask(cmp_state_layer_t *layer,
                                                 cmp_vibrancy_style_t style);
+
+const char *cmp_strerror(int error);
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* CMP_H */

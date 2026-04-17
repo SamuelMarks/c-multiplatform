@@ -1,34 +1,40 @@
 /* clang-format off */
 #include "cmp.h"
-#include "cmp.h"
-
+#include "cmp_log.h"
 #include <stdio.h>
 /* clang-format on */
 
 static cmp_dpi_t *g_dpi_manager = NULL;
 
 int cmp_dpi_awareness_init(void) {
-  int result;
+  int rc = CMP_SUCCESS;
 
   if (g_dpi_manager) {
-    return CMP_SUCCESS;
+    return rc;
   }
 
-  result = cmp_dpi_create(&g_dpi_manager);
-  if (result != CMP_SUCCESS) {
+  rc = cmp_dpi_create(&g_dpi_manager);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG(
+        "Error in cmp_dpi_awareness_init: Failed to create DPI manager\n");
     printf("[DPI] WARNING: Failed to initialize High-DPI context.\n");
-    return result;
+    return rc;
   }
 
   printf("[DPI] SUCCESS: Per-Monitor v2 High-DPI Awareness initialized.\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_dpi_awareness_cleanup(void) {
+  int rc = CMP_SUCCESS;
+
   if (g_dpi_manager) {
-    int result = cmp_dpi_destroy(g_dpi_manager);
+    rc = cmp_dpi_destroy(g_dpi_manager);
     g_dpi_manager = NULL;
-    return result;
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_dpi_awareness_cleanup: Failed to destroy DPI "
+                "manager\n");
+    }
   }
-  return CMP_SUCCESS;
+  return rc;
 }

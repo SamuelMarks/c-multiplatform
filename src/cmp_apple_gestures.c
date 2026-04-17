@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "cmp.h"
 #include <stdlib.h>
+#include <stdio.h>
 /* clang-format on */
 
 struct cmp_apple_gestures {
@@ -10,46 +11,66 @@ struct cmp_apple_gestures {
 };
 
 int cmp_apple_gestures_create(cmp_apple_gestures_t **out_gestures) {
-  cmp_apple_gestures_t *gest;
+  int rc = CMP_SUCCESS;
+  cmp_apple_gestures_t *gest = NULL;
 
-  if (!out_gestures)
-    return CMP_ERROR_INVALID_ARG;
+  if (!out_gestures) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error in cmp_apple_gestures_create: Invalid argument "
+                    "(out_gestures=NULL)\n");
+    return rc;
+  }
 
-  gest = (cmp_apple_gestures_t *)malloc(sizeof(cmp_apple_gestures_t));
-  if (!gest)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_apple_gestures_t), (void **)&gest);
+  if (rc != CMP_SUCCESS) {
+    fprintf(stderr, "Error in cmp_apple_gestures_create: Out of memory\n");
+    return rc;
+  }
 
   gest->pinch_enabled = 0;
   gest->rotation_enabled = 0;
   gest->swipe_enabled = 0;
 
   *out_gestures = gest;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_apple_gestures_destroy(cmp_apple_gestures_t *gestures) {
-  if (!gestures)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
 
-  free(gestures);
-  return CMP_SUCCESS;
+  if (!gestures) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error in cmp_apple_gestures_destroy: Invalid argument "
+                    "(gestures=NULL)\n");
+    return rc;
+  }
+
+  CMP_FREE(gestures);
+  return rc;
 }
 
 int cmp_apple_gestures_enable(cmp_apple_gestures_t *gestures,
                               cmp_window_t *window, int enable_pinch,
                               int enable_rotation, int enable_swipe) {
-  int err;
-  if (!gestures || !window)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
 
-  err = cmp_window_apple_enable_gestures(window, enable_pinch, enable_rotation,
-                                         enable_swipe);
-  if (err != CMP_SUCCESS)
-    return err;
+  if (!gestures || !window) {
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error in cmp_apple_gestures_enable: Invalid argument\n");
+    return rc;
+  }
+
+  rc = cmp_window_apple_enable_gestures(window, enable_pinch, enable_rotation,
+                                        enable_swipe);
+  if (rc != CMP_SUCCESS) {
+    fprintf(stderr, "Error in cmp_apple_gestures_enable: Failed to enable "
+                    "gestures on window\n");
+    return rc;
+  }
 
   gestures->pinch_enabled = enable_pinch;
   gestures->rotation_enabled = enable_rotation;
   gestures->swipe_enabled = enable_swipe;
 
-  return CMP_SUCCESS;
+  return rc;
 }

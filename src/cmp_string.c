@@ -2,21 +2,26 @@
 #include "cmp.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 /* clang-format on */
 
 int cmp_string_init(cmp_string_t *str) {
+  int rc = CMP_SUCCESS;
   if (str == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error %d: %s (cmp_string_init)\n", rc, cmp_strerror(rc));
+    return rc;
   }
 
   str->data = NULL;
   str->length = 0;
   str->capacity = 0;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_string_append(cmp_string_t *str, const char *append) {
+  int rc = CMP_SUCCESS;
   size_t append_len;
   size_t new_len;
   char *new_data;
@@ -24,12 +29,14 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
   size_t new_capacity;
 
   if (str == NULL || append == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error %d: %s (cmp_string_append)\n", rc, cmp_strerror(rc));
+    return rc;
   }
 
   append_len = strlen(append);
   if (append_len == 0) {
-    return CMP_SUCCESS;
+    return rc;
   }
 
   new_len = str->length + append_len;
@@ -41,12 +48,18 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
     }
 
     if (str->data == NULL) {
-      if (CMP_MALLOC(new_capacity, (void **)&new_data) != CMP_SUCCESS) {
-        return CMP_ERROR_OOM;
+      rc = CMP_MALLOC(new_capacity, (void **)&new_data);
+      if (rc != CMP_SUCCESS) {
+        fprintf(stderr, "Error %d: %s (cmp_string_append alloc failed)\n", rc,
+                cmp_strerror(rc));
+        return rc;
       }
     } else {
-      if (CMP_MALLOC(new_capacity, (void **)&new_data) != CMP_SUCCESS) {
-        return CMP_ERROR_OOM;
+      rc = CMP_MALLOC(new_capacity, (void **)&new_data);
+      if (rc != CMP_SUCCESS) {
+        fprintf(stderr, "Error %d: %s (cmp_string_append realloc failed)\n", rc,
+                cmp_strerror(rc));
+        return rc;
       }
 #if defined(_MSC_VER)
       memcpy_s(new_data, new_capacity, str->data, str->length + 1);
@@ -68,12 +81,16 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
 
   str->length = new_len;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_string_destroy(cmp_string_t *str) {
+  int rc = CMP_SUCCESS;
   if (str == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(stderr, "Error %d: %s (cmp_string_destroy)\n", rc,
+            cmp_strerror(rc));
+    return rc;
   }
 
   if (str->data != NULL) {
@@ -84,5 +101,5 @@ int cmp_string_destroy(cmp_string_t *str) {
   str->length = 0;
   str->capacity = 0;
 
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include <stdio.h>
 
 #if defined(_WIN32)
 typedef unsigned int UINT;
@@ -27,13 +28,15 @@ __declspec(dllimport) BOOL __stdcall SystemParametersInfoA(
 /* clang-format on */
 
 int cmp_a11y_theme_init(void) {
+  int rc = CMP_SUCCESS;
   /* Initialize any underlying resources or OS hooks if needed */
-  return 0;
+  return rc;
 }
 
 int cmp_a11y_theme_cleanup(void) {
+  int rc = CMP_SUCCESS;
   /* Clean up */
-  return 0;
+  return rc;
 }
 
 int cmp_a11y_detect_high_contrast(void) {
@@ -101,10 +104,15 @@ static void apply_color_blindness(cmp_color_blind_type_t type,
 
 int cmp_a11y_build_theme(cmp_color_blind_type_t type,
                          cmp_a11y_theme_t *out_theme) {
+  int rc = CMP_SUCCESS;
   int is_hc;
 
   if (!out_theme) {
-    return -1;
+    rc = CMP_ERROR_INVALID_ARG;
+    fprintf(
+        stderr,
+        "Error in cmp_a11y_build_theme: Invalid argument (out_theme=NULL)\n");
+    return rc;
   }
 
   is_hc = cmp_a11y_detect_high_contrast();
@@ -148,5 +156,5 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
                           &out_theme->error_text);
   }
 
-  return 0;
+  return rc;
 }

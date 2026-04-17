@@ -1,20 +1,22 @@
 /* clang-format off */
 #include "cmp.h"
-#include "cmp.h"
+#include "cmp_log.h"
 #include <stdio.h>
 /* clang-format on */
 
 int cmp_verify_hardware_acceleration(void) {
+  int rc = CMP_SUCCESS;
   cmp_gpu_t *gpu = NULL;
   int is_cpu_fallback = 0;
-  int result;
 
   /* Attempt to create the preferred GPU backend (let cmp choose best available)
    */
-  result = cmp_gpu_create((cmp_gpu_backend_type_t)0, &gpu);
-  if (result != CMP_SUCCESS || !gpu) {
+  rc = cmp_gpu_create((cmp_gpu_backend_type_t)0, &gpu);
+  if (rc != CMP_SUCCESS || !gpu) {
+    LOG_DEBUG("Error in cmp_verify_hardware_acceleration: Failed to initialize "
+              "any rendering backend\n");
     printf("[Hardware] FATAL: Failed to initialize any rendering backend.\n");
-    return result;
+    return rc;
   }
 
   /* Verify if the resolved backend is the legacy CPU software rasterizer */
@@ -29,7 +31,11 @@ int cmp_verify_hardware_acceleration(void) {
   }
 
   /* Destroy the context since this is just a verification pass */
-  cmp_gpu_destroy(gpu);
+  rc = cmp_gpu_destroy(gpu);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_verify_hardware_acceleration: Failed to destroy "
+              "gpu context\n");
+  }
 
   return is_cpu_fallback;
 }

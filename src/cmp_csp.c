@@ -1,6 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
-
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -16,23 +16,36 @@ struct cmp_csp {
 };
 
 int cmp_csp_create(cmp_csp_t **out_csp) {
-  cmp_csp_t *csp;
+  int rc = CMP_SUCCESS;
+  cmp_csp_t *csp = NULL;
+
   if (!out_csp) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_csp_create: Invalid argument (out_csp=NULL)\n");
+    return rc;
   }
-  if (CMP_MALLOC(sizeof(cmp_csp_t), (void **)&csp) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+
+  rc = CMP_MALLOC(sizeof(cmp_csp_t), (void **)&csp);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_csp_create: Out of memory\n");
+    return rc;
   }
+
   memset(csp, 0, sizeof(cmp_csp_t));
   *out_csp = csp;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_csp_destroy(cmp_csp_t *csp) {
+  int rc = CMP_SUCCESS;
   size_t i;
+
   if (!csp) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_csp_destroy: Invalid argument (csp=NULL)\n");
+    return rc;
   }
+
   if (csp->domains) {
     for (i = 0; i < csp->count; i++) {
       if (csp->domains[i].domain) {
@@ -41,35 +54,57 @@ int cmp_csp_destroy(cmp_csp_t *csp) {
     }
     CMP_FREE(csp->domains);
   }
+
   CMP_FREE(csp);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 static int str_duplicate(const char *src, char **out_dst) {
-  size_t len = strlen(src);
-  if (CMP_MALLOC(len + 1, (void **)out_dst) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  int rc = CMP_SUCCESS;
+  size_t len;
+
+  if (!src || !out_dst) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in str_duplicate: Invalid argument\n");
+    return rc;
   }
+
+  len = strlen(src);
+  rc = CMP_MALLOC(len + 1, (void **)out_dst);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in str_duplicate: Out of memory\n");
+    return rc;
+  }
+
 #if defined(_MSC_VER)
   strcpy_s(*out_dst, len + 1, src);
 #else
   strcpy(*out_dst, src);
 #endif
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 int cmp_csp_add_domain(cmp_csp_t *csp, const char *domain) {
+  int rc = CMP_SUCCESS;
+  size_t new_cap;
+  cmp_csp_domain_t *new_domains = NULL;
+
   if (!csp || !domain) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_csp_add_domain: Invalid argument\n");
+    return rc;
   }
 
   if (csp->count >= csp->capacity) {
-    size_t new_cap = csp->capacity == 0 ? 8 : csp->capacity * 2;
-    cmp_csp_domain_t *new_domains;
-    if (CMP_MALLOC(new_cap * sizeof(cmp_csp_domain_t), (void **)&new_domains) !=
-        CMP_SUCCESS) {
-      return CMP_ERROR_OOM;
+    new_cap = csp->capacity == 0 ? 8 : csp->capacity * 2;
+    rc = CMP_MALLOC(new_cap * sizeof(cmp_csp_domain_t), (void **)&new_domains);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG(
+          "Error in cmp_csp_add_domain: Out of memory allocating domains\n");
+      return rc;
     }
+
     if (csp->domains) {
       memcpy(new_domains, csp->domains, csp->count * sizeof(cmp_csp_domain_t));
       CMP_FREE(csp->domains);
@@ -78,21 +113,26 @@ int cmp_csp_add_domain(cmp_csp_t *csp, const char *domain) {
     csp->capacity = new_cap;
   }
 
-  if (str_duplicate(domain, &csp->domains[csp->count].domain) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = str_duplicate(domain, &csp->domains[csp->count].domain);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_csp_add_domain: str_duplicate failed\n");
+    return rc;
   }
 
   csp->count++;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_csp_check_domain(const cmp_csp_t *csp, const char *domain,
                          cmp_csp_resource_type_t type, int *out_allowed) {
+  int rc = CMP_SUCCESS;
   size_t i;
   (void)type; /* For this basic implementation, type does not change outcome */
 
   if (!csp || !domain || !out_allowed) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_csp_check_domain: Invalid argument\n");
+    return rc;
   }
 
   *out_allowed = 0;
@@ -104,5 +144,5 @@ int cmp_csp_check_domain(const cmp_csp_t *csp, const char *domain,
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

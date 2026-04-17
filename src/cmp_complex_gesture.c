@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -24,37 +25,54 @@ struct cmp_complex_gesture {
 };
 
 int cmp_complex_gesture_create(cmp_complex_gesture_t **out_gesture) {
-  struct cmp_complex_gesture *ctx;
+  int rc = CMP_SUCCESS;
+  struct cmp_complex_gesture *ctx = NULL;
 
-  if (!out_gesture)
-    return CMP_ERROR_INVALID_ARG;
+  if (!out_gesture) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_complex_gesture_create: Invalid argument "
+              "(out_gesture=NULL)\n");
+    return rc;
+  }
 
-  if (CMP_MALLOC(sizeof(struct cmp_complex_gesture), (void **)&ctx) !=
-      CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(struct cmp_complex_gesture), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_complex_gesture_create: Out of memory\n");
+    return rc;
+  }
 
   memset(ctx, 0, sizeof(struct cmp_complex_gesture));
   ctx->state = CMP_GESTURE_STATE_POSSIBLE;
 
   *out_gesture = (cmp_complex_gesture_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_complex_gesture_destroy(cmp_complex_gesture_t *gesture) {
+  int rc = CMP_SUCCESS;
   struct cmp_complex_gesture *ctx = (struct cmp_complex_gesture *)gesture;
-  if (!ctx)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!ctx) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_complex_gesture_destroy: Invalid argument "
+              "(gesture=NULL)\n");
+    return rc;
+  }
 
   CMP_FREE(ctx);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_complex_gesture_process_event(cmp_complex_gesture_t *gesture,
                                       const cmp_event_t *event) {
+  int rc = CMP_SUCCESS;
   struct cmp_complex_gesture *ctx = (struct cmp_complex_gesture *)gesture;
 
-  if (!ctx || !event)
-    return CMP_ERROR_INVALID_ARG;
+  if (!ctx || !event) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_complex_gesture_process_event: Invalid argument\n");
+    return rc;
+  }
 
   /* Simplified state machine mock handling for test validation */
   if (event->action == CMP_ACTION_DOWN) {
@@ -103,7 +121,7 @@ int cmp_complex_gesture_process_event(cmp_complex_gesture_t *gesture,
     ctx->state = CMP_GESTURE_STATE_POSSIBLE;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_complex_gesture_get_state(const cmp_complex_gesture_t *gesture) {
@@ -118,11 +136,16 @@ int cmp_complex_gesture_get_state(const cmp_complex_gesture_t *gesture) {
 int cmp_complex_gesture_get_deltas(const cmp_complex_gesture_t *gesture,
                                    float *out_pan_x, float *out_pan_y,
                                    float *out_scale, float *out_rotation) {
+  int rc = CMP_SUCCESS;
   const struct cmp_complex_gesture *ctx =
       (const struct cmp_complex_gesture *)gesture;
 
-  if (!ctx)
-    return CMP_ERROR_INVALID_ARG;
+  if (!ctx) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_complex_gesture_get_deltas: Invalid argument "
+              "(gesture=NULL)\n");
+    return rc;
+  }
 
   if (out_pan_x)
     *out_pan_x = ctx->current_pan_x - ctx->start_pan_x;
@@ -136,5 +159,5 @@ int cmp_complex_gesture_get_deltas(const cmp_complex_gesture_t *gesture,
   if (out_rotation)
     *out_rotation = 0.0f;
 
-  return CMP_SUCCESS;
+  return rc;
 }

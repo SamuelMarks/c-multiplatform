@@ -6,6 +6,7 @@
 #endif
 
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -1164,14 +1165,21 @@ int cmp_window_system_shutdown(void) {
 
 int cmp_window_create(const cmp_window_config_t *config,
                       cmp_window_t **out_window) {
+  int rc;
   cmp_window_t *window;
 
   if (config == NULL || out_window == NULL || !g_window_initialized) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_window_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_window_t), (void **)&window) != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_window_t), (void **)&window);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_window_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   memset(window, 0, sizeof(cmp_window_t));
@@ -1267,8 +1275,11 @@ int cmp_window_create(const cmp_window_config_t *config,
 int cmp_window_set_drop_callback(cmp_window_t *window,
                                  cmp_window_drop_cb_t drop_cb,
                                  void *user_data) {
+  int rc;
   if (window == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_window_set_drop_callback: %s\n", cmp_strerror(rc));
+    return rc;
   }
   window->drop_cb = drop_cb;
   window->drop_user_data = user_data;
@@ -1278,8 +1289,11 @@ int cmp_window_set_drop_callback(cmp_window_t *window,
 int cmp_window_set_resize_callback(cmp_window_t *window,
                                    cmp_window_resize_cb_t resize_cb,
                                    void *user_data) {
+  int rc;
   if (window == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_window_set_resize_callback: %s\n", cmp_strerror(rc));
+    return rc;
   }
   window->resize_cb = resize_cb;
   window->resize_user_data = user_data;
@@ -1287,8 +1301,11 @@ int cmp_window_set_resize_callback(cmp_window_t *window,
 }
 
 int cmp_window_show(cmp_window_t *window) {
+  int rc;
   if (window == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_window_show: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
 #if defined(_WIN32)
@@ -1300,8 +1317,11 @@ int cmp_window_show(cmp_window_t *window) {
 }
 
 int cmp_window_poll_events(cmp_window_t *window) {
+  int rc;
   if (window == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_window_poll_events: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
 #if defined(_WIN32)
@@ -1808,8 +1828,11 @@ int cmp_scripting_python_generate_bindings(const char *output_path) {
 }
 
 int cmp_window_destroy(cmp_window_t *window) {
+  int rc;
   if (window == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_window_destroy: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
 #if defined(_WIN32)
@@ -2384,8 +2407,11 @@ int cmp_devtools_set_enabled(cmp_window_t *window, int enable) {
 }
 
 int cmp_window_set_ui_tree(cmp_window_t *window, cmp_ui_node_t *tree) {
+  int rc;
   if (window == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_window_set_ui_tree: %s\n", cmp_strerror(rc));
+    return rc;
   }
   window->ui_tree = tree;
 #if defined(_WIN32)

@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -21,11 +22,21 @@ struct cmp_diffable_datasource {
 };
 
 int cmp_collection_create(cmp_collection_t **out_collection) {
+  int rc;
   struct cmp_collection *ctx;
-  if (!out_collection)
-    return CMP_ERROR_INVALID_ARG;
-  if (CMP_MALLOC(sizeof(struct cmp_collection), (void **)&ctx) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  if (!out_collection) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_collection_create: %s\n", cmp_strerror(rc));
+    return rc;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_collection), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_collection_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
+  }
 
   ctx->sections = NULL;
   ctx->section_count = 0;
@@ -54,12 +65,21 @@ int cmp_collection_destroy(cmp_collection_t *collection_opaque) {
 }
 
 int cmp_collection_section_create(cmp_collection_section_t **out_section) {
+  int rc;
   struct cmp_collection_section *ctx;
-  if (!out_section)
-    return CMP_ERROR_INVALID_ARG;
-  if (CMP_MALLOC(sizeof(struct cmp_collection_section), (void **)&ctx) !=
-      CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  if (!out_section) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_collection_section_create: %s\n", cmp_strerror(rc));
+    return rc;
+  }
+  rc = CMP_MALLOC(sizeof(struct cmp_collection_section), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_collection_section_create CMP_MALLOC: %s\n",
+              cmp_strerror(rc));
+    return rc;
+  }
 
   ctx->min_column_width = 0.0f;
   ctx->orthogonal_behavior = CMP_ORTHOGONAL_NONE;
@@ -99,20 +119,30 @@ int cmp_collection_section_set_orthogonal_behavior(
 
 int cmp_collection_add_section(cmp_collection_t *collection_opaque,
                                cmp_collection_section_t *section_opaque) {
+  int rc;
   struct cmp_collection *ctx = (struct cmp_collection *)collection_opaque;
   struct cmp_collection_section *sec =
       (struct cmp_collection_section *)section_opaque;
   cmp_collection_section_t **new_secs;
   size_t new_cap;
 
-  if (!ctx || !sec)
-    return CMP_ERROR_INVALID_ARG;
+  if (!ctx || !sec) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_collection_add_section: %s\n", cmp_strerror(rc));
+    return rc;
+  }
 
   if (ctx->section_count == ctx->capacity) {
     new_cap = ctx->capacity == 0 ? 4 : ctx->capacity * 2;
-    if (CMP_MALLOC(new_cap * sizeof(cmp_collection_section_t *),
-                   (void **)&new_secs) != CMP_SUCCESS)
-      return CMP_ERROR_OOM;
+    rc = CMP_MALLOC(new_cap * sizeof(cmp_collection_section_t *),
+                    (void **)&new_secs);
+    if (rc != CMP_SUCCESS) {
+      if (rc == CMP_SUCCESS)
+        rc = CMP_ERROR_OOM;
+      LOG_DEBUG("cmp_collection_add_section CMP_MALLOC: %s\n",
+                cmp_strerror(rc));
+      return rc;
+    }
     if (ctx->sections) {
       memcpy(new_secs, ctx->sections,
              ctx->section_count * sizeof(cmp_collection_section_t *));
@@ -127,12 +157,21 @@ int cmp_collection_add_section(cmp_collection_t *collection_opaque,
 }
 
 int cmp_diffable_datasource_create(cmp_diffable_datasource_t **out_ds) {
+  int rc;
   struct cmp_diffable_datasource *ctx;
-  if (!out_ds)
-    return CMP_ERROR_INVALID_ARG;
-  if (CMP_MALLOC(sizeof(struct cmp_diffable_datasource), (void **)&ctx) !=
-      CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  if (!out_ds) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_diffable_datasource_create: %s\n", cmp_strerror(rc));
+    return rc;
+  }
+  rc = CMP_MALLOC(sizeof(struct cmp_diffable_datasource), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_diffable_datasource_create CMP_MALLOC: %s\n",
+              cmp_strerror(rc));
+    return rc;
+  }
 
   ctx->current_state = NULL;
   ctx->count = 0;
@@ -156,17 +195,26 @@ int cmp_diffable_datasource_destroy(cmp_diffable_datasource_t *ds_opaque) {
 int cmp_diffable_datasource_apply_snapshot(cmp_diffable_datasource_t *ds_opaque,
                                            const uint64_t *items,
                                            size_t count) {
+  int rc;
   struct cmp_diffable_datasource *ctx =
       (struct cmp_diffable_datasource *)ds_opaque;
   uint64_t *new_state = NULL;
 
-  if (!ctx || (!items && count > 0))
-    return CMP_ERROR_INVALID_ARG;
+  if (!ctx || (!items && count > 0)) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_diffable_datasource_apply_snapshot: %s\n", cmp_strerror(rc));
+    return rc;
+  }
 
   if (count > 0) {
-    if (CMP_MALLOC(count * sizeof(uint64_t), (void **)&new_state) !=
-        CMP_SUCCESS)
-      return CMP_ERROR_OOM;
+    rc = CMP_MALLOC(count * sizeof(uint64_t), (void **)&new_state);
+    if (rc != CMP_SUCCESS) {
+      if (rc == CMP_SUCCESS)
+        rc = CMP_ERROR_OOM;
+      LOG_DEBUG("cmp_diffable_datasource_apply_snapshot CMP_MALLOC: %s\n",
+                cmp_strerror(rc));
+      return rc;
+    }
     memcpy(new_state, items, count * sizeof(uint64_t));
   }
 

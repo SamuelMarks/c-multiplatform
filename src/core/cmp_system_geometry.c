@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 /* clang-format on */
 
@@ -40,8 +41,13 @@ int cmp_system_geometry_create(cmp_system_geometry_t **out_geom) {
 }
 
 int cmp_system_geometry_destroy(cmp_system_geometry_t *geom) {
-  if (geom)
-    CMP_FREE(geom);
+  int rc;
+  if (!geom) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_system_geometry_destroy: %s\n", cmp_strerror(rc));
+    return rc;
+  }
+  CMP_FREE(geom);
   return CMP_SUCCESS;
 }
 

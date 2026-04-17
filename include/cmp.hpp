@@ -1,8 +1,15 @@
 #pragma once
+/* clang-format off */
 #include "cmp.h"
 #include <memory>
 #include <stdexcept>
 #include <string>
+/* clang-format on */
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 
 namespace cmp {
 

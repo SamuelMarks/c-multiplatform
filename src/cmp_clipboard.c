@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "cmp.h"
 
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -10,12 +11,19 @@ struct cmp_clipboard {
 };
 
 int cmp_clipboard_create(cmp_clipboard_t **out_clipboard) {
+  int rc;
   cmp_clipboard_t *clipboard;
   if (!out_clipboard) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_clipboard_create: %s\n", cmp_strerror(rc));
+    return rc;
   }
-  if (CMP_MALLOC(sizeof(cmp_clipboard_t), (void **)&clipboard) != 0) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_clipboard_t), (void **)&clipboard);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_clipboard_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
   memset(clipboard, 0, sizeof(cmp_clipboard_t));
   *out_clipboard = clipboard;
@@ -23,8 +31,11 @@ int cmp_clipboard_create(cmp_clipboard_t **out_clipboard) {
 }
 
 int cmp_clipboard_destroy(cmp_clipboard_t *clipboard) {
+  int rc;
   if (!clipboard) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_clipboard_destroy: %s\n", cmp_strerror(rc));
+    return rc;
   }
   if (clipboard->text_data) {
     CMP_FREE(clipboard->text_data);
@@ -34,9 +45,12 @@ int cmp_clipboard_destroy(cmp_clipboard_t *clipboard) {
 }
 
 int cmp_clipboard_set_text(cmp_clipboard_t *clipboard, const char *text) {
+  int rc;
   size_t len;
   if (!clipboard || !text) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_clipboard_set_text: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   if (clipboard->text_data) {
@@ -45,8 +59,12 @@ int cmp_clipboard_set_text(cmp_clipboard_t *clipboard, const char *text) {
   }
 
   len = strlen(text);
-  if (CMP_MALLOC(len + 1, (void **)&clipboard->text_data) != 0) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(len + 1, (void **)&clipboard->text_data);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_clipboard_set_text CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
 #if defined(_MSC_VER)
@@ -59,9 +77,12 @@ int cmp_clipboard_set_text(cmp_clipboard_t *clipboard, const char *text) {
 }
 
 int cmp_clipboard_get_text(const cmp_clipboard_t *clipboard, char **out_text) {
+  int rc;
   size_t len;
   if (!clipboard || !out_text) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_clipboard_get_text: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
   if (!clipboard->text_data) {
@@ -70,8 +91,12 @@ int cmp_clipboard_get_text(const cmp_clipboard_t *clipboard, char **out_text) {
   }
 
   len = strlen(clipboard->text_data);
-  if (CMP_MALLOC(len + 1, (void **)out_text) != 0) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(len + 1, (void **)out_text);
+  if (rc != CMP_SUCCESS) {
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_clipboard_get_text CMP_MALLOC: %s\n", cmp_strerror(rc));
+    return rc;
   }
 
 #if defined(_MSC_VER)
@@ -84,8 +109,11 @@ int cmp_clipboard_get_text(const cmp_clipboard_t *clipboard, char **out_text) {
 }
 
 int cmp_clipboard_clear(cmp_clipboard_t *clipboard) {
+  int rc;
   if (!clipboard) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_clipboard_clear: %s\n", cmp_strerror(rc));
+    return rc;
   }
   if (clipboard->text_data) {
     CMP_FREE(clipboard->text_data);

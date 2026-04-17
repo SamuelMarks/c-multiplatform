@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -14,13 +15,20 @@ struct cmp_motion_path {
 };
 
 int cmp_motion_path_create(cmp_motion_path_t **out_path) {
-  struct cmp_motion_path *path;
+  int rc = CMP_SUCCESS;
+  struct cmp_motion_path *path = NULL;
 
-  if (!out_path)
-    return CMP_ERROR_INVALID_ARG;
+  if (!out_path) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_motion_path_create: Invalid argument\n");
+    return rc;
+  }
 
-  if (CMP_MALLOC(sizeof(struct cmp_motion_path), (void **)&path) != CMP_SUCCESS)
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(struct cmp_motion_path), (void **)&path);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_motion_path_create: Out of memory\n");
+    return rc;
+  }
 
   memset(path, 0, sizeof(struct cmp_motion_path));
 
@@ -35,16 +43,21 @@ int cmp_motion_path_create(cmp_motion_path_t **out_path) {
   path->p3y = 0.0f;
 
   *out_path = (cmp_motion_path_t *)path;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_motion_path_destroy(cmp_motion_path_t *path) {
+  int rc = CMP_SUCCESS;
   struct cmp_motion_path *internal_path = (struct cmp_motion_path *)path;
-  if (!internal_path)
-    return CMP_ERROR_INVALID_ARG;
+
+  if (!internal_path) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_motion_path_destroy: Invalid argument\n");
+    return rc;
+  }
 
   CMP_FREE(internal_path);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 static float eval_bezier(float p0, float p1, float p2, float p3, float t) {
@@ -74,14 +87,18 @@ static float eval_bezier_derivative(float p0, float p1, float p2, float p3,
 int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
                              float offset_rotate, float *out_x, float *out_y,
                              float *out_angle) {
+  int rc = CMP_SUCCESS;
   struct cmp_motion_path *p = (struct cmp_motion_path *)path;
   float dx;
   float dy;
   float angle_rad;
 
   if (!p || !out_x || !out_y || !out_angle || distance < 0.0f ||
-      distance > 1.0f)
-    return CMP_ERROR_INVALID_ARG;
+      distance > 1.0f) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_motion_path_evaluate: Invalid argument\n");
+    return rc;
+  }
 
   *out_x = eval_bezier(p->p0x, p->p1x, p->p2x, p->p3x, distance);
   *out_y = eval_bezier(p->p0y, p->p1y, p->p2y, p->p3y, distance);
@@ -92,5 +109,5 @@ int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
   angle_rad = (float)atan2(dy, dx);
   *out_angle = angle_rad * (180.0f / 3.14159265f) + offset_rotate;
 
-  return CMP_SUCCESS;
+  return rc;
 }

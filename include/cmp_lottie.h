@@ -1,8 +1,10 @@
-/* clang-format off */
+
 #ifndef CMP_LOTTIE_H
 #define CMP_LOTTIE_H
 
+/* clang-format off */
 #include <stddef.h>
+/* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +22,8 @@ typedef struct cmp_lottie cmp_lottie_t;
  * @param out_lottie Pointer to receive the context
  * @return 0 on success
  */
-int cmp_lottie_create(const char *json_buffer, size_t size, cmp_lottie_t **out_lottie);
+int cmp_lottie_create(const char *json_buffer, size_t size,
+                      cmp_lottie_t **out_lottie);
 
 /**
  * @brief Destroy a Lottie animation context
@@ -41,4 +44,3 @@ int cmp_lottie_step(cmp_lottie_t *lottie, float dt_ms);
 }
 #endif
 #endif /* CMP_LOTTIE_H */
-/* clang-format on */
