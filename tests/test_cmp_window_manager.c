@@ -1,4 +1,4 @@
-﻿/* clang-format off */
+/* clang-format off */
 #include "cmp.h"
 #include "greatest.h"
 /* clang-format on */

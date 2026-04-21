@@ -1,0 +1,18 @@
+* text=auto
+
+*.c text
+*.h text
+*.cpp text
+*.hpp text
+*.md text
+*.txt text
+*.json text
+*.yml text
+*.yaml text
+
+# Windows scripts must have CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Shell scripts must have LF
+*.sh text eol=lf

@@ -1,4 +1,4 @@
-﻿/* clang-format off */
+/* clang-format off */
 #include "cmp.h"
 #include <stdlib.h>
 /* clang-format on */
