@@ -39,6 +39,7 @@ extern "C" {
  *********************************************************************/
 #if 0
 
+/* clang-format off */
 #include "greatest.h"
 
 TEST foo_should_foo(void) {
@@ -137,6 +138,7 @@ int main(int argc, char **argv) {
 
 #if GREATEST_USE_TIME
 #include <time.h>
+/* clang-format on */
 #endif
 
 /* Floating point type, for ASSERT_IN_RANGE. */
@@ -339,7 +341,7 @@ void greatest_set_test_suffix(const char *suffix);
 #define GREATEST_VA_ARGS
 #endif
 
-#if defined(__STDC_LIB_EXT1__) || defined(_MSC_VER) || defined(__MINGW32__)
+#if defined(_MSC_VER)
 #define strncat_s_else_insec strncat_s
 #else
 #define strncat_s_else_insec(dest, _, src, count) strncat(dest, src, count)

@@ -57,8 +57,11 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
     cx = radius->top_left_x;
     cy = radius->top_left_y;
     if (radius->corner_shape == CMP_CORNER_SQUIRCLE) {
-      if (powf(fabsf(x - cx) / radius->top_left_x, 3.0f) +
-              powf(fabsf(y - cy) / radius->top_left_y, 3.0f) >
+      if ((float)pow((double)(float)fabs((double)x - cx) / radius->top_left_x,
+                     3.0f) +
+              (float)pow((double)(float)fabs((double)y - cy) /
+                             radius->top_left_y,
+                         3.0f) >
           1.0f) {
         *out_inside = 0;
         return rc;
@@ -71,8 +74,10 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
         return rc;
       }
     } else {
-      if (powf(x - cx, 2.0f) / powf(radius->top_left_x, 2.0f) +
-              powf(y - cy, 2.0f) / powf(radius->top_left_y, 2.0f) >
+      if ((float)pow((double)x - cx, 2.0f) /
+                  (float)pow((double)radius->top_left_x, 2.0f) +
+              (float)pow((double)y - cy, 2.0f) /
+                  (float)pow((double)radius->top_left_y, 2.0f) >
           1.0f) {
         *out_inside = 0;
         return rc;
@@ -84,8 +89,11 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
     cx = width - radius->top_right_x;
     cy = radius->top_right_y;
     if (radius->corner_shape == CMP_CORNER_SQUIRCLE) {
-      if (powf(fabsf(x - cx) / radius->top_right_x, 3.0f) +
-              powf(fabsf(y - cy) / radius->top_right_y, 3.0f) >
+      if ((float)pow((double)(float)fabs((double)x - cx) / radius->top_right_x,
+                     3.0f) +
+              (float)pow((double)(float)fabs((double)y - cy) /
+                             radius->top_right_y,
+                         3.0f) >
           1.0f) {
         *out_inside = 0;
         return rc;
@@ -98,8 +106,10 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
         return rc;
       }
     } else {
-      if (powf(x - cx, 2.0f) / powf(radius->top_right_x, 2.0f) +
-              powf(y - cy, 2.0f) / powf(radius->top_right_y, 2.0f) >
+      if ((float)pow((double)x - cx, 2.0f) /
+                  (float)pow((double)radius->top_right_x, 2.0f) +
+              (float)pow((double)y - cy, 2.0f) /
+                  (float)pow((double)radius->top_right_y, 2.0f) >
           1.0f) {
         *out_inside = 0;
         return rc;
@@ -111,8 +121,12 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
     cx = radius->bottom_left_x;
     cy = height - radius->bottom_left_y;
     if (radius->corner_shape == CMP_CORNER_SQUIRCLE) {
-      if (powf(fabsf(x - cx) / radius->bottom_left_x, 3.0f) +
-              powf(fabsf(y - cy) / radius->bottom_left_y, 3.0f) >
+      if ((float)pow((double)(float)fabs((double)x - cx) /
+                         radius->bottom_left_x,
+                     3.0f) +
+              (float)pow((double)(float)fabs((double)y - cy) /
+                             radius->bottom_left_y,
+                         3.0f) >
           1.0f) {
         *out_inside = 0;
         return rc;
@@ -125,8 +139,10 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
         return rc;
       }
     } else {
-      if (powf(x - cx, 2.0f) / powf(radius->bottom_left_x, 2.0f) +
-              powf(y - cy, 2.0f) / powf(radius->bottom_left_y, 2.0f) >
+      if ((float)pow((double)x - cx, 2.0f) /
+                  (float)pow((double)radius->bottom_left_x, 2.0f) +
+              (float)pow((double)y - cy, 2.0f) /
+                  (float)pow((double)radius->bottom_left_y, 2.0f) >
           1.0f) {
         *out_inside = 0;
         return rc;
@@ -138,8 +154,12 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
     cx = width - radius->bottom_right_x;
     cy = height - radius->bottom_right_y;
     if (radius->corner_shape == CMP_CORNER_SQUIRCLE) {
-      if (powf(fabsf(x - cx) / radius->bottom_right_x, 3.0f) +
-              powf(fabsf(y - cy) / radius->bottom_right_y, 3.0f) >
+      if ((float)pow((double)(float)fabs((double)x - cx) /
+                         radius->bottom_right_x,
+                     3.0f) +
+              (float)pow((double)(float)fabs((double)y - cy) /
+                             radius->bottom_right_y,
+                         3.0f) >
           1.0f) {
         *out_inside = 0;
         return rc;
@@ -152,8 +172,10 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
         return rc;
       }
     } else {
-      if (powf(x - cx, 2.0f) / powf(radius->bottom_right_x, 2.0f) +
-              powf(y - cy, 2.0f) / powf(radius->bottom_right_y, 2.0f) >
+      if ((float)pow((double)x - cx, 2.0f) /
+                  (float)pow((double)radius->bottom_right_x, 2.0f) +
+              (float)pow((double)y - cy, 2.0f) /
+                  (float)pow((double)radius->bottom_right_y, 2.0f) >
           1.0f) {
         *out_inside = 0;
         return rc;

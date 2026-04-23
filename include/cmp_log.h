@@ -10,12 +10,12 @@
 extern "C" {
 #endif /* __cplusplus */
 
+void cmp_log_debug(const char *fmt, ...);
+
 #ifndef LOG_DEBUG
 #ifdef DEBUG
-void cmp_log_debug(const char *fmt, ...);
 #define LOG_DEBUG cmp_log_debug
 #else
-void cmp_log_debug(const char *fmt, ...);
 #define LOG_DEBUG 1 ? (void)0 : cmp_log_debug
 #endif /* DEBUG */
 #endif /* !LOG_DEBUG */

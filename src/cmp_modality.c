@@ -49,8 +49,10 @@ static void *cmp_worker_thread_func(void *arg) {
     } else {
 #if defined(_WIN32)
       Sleep(1);
+#elif defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+      /* no-op or delay */
 #else
-      usleep(1000);
+    usleep(1000);
 #endif
     }
   }
@@ -251,6 +253,8 @@ int cmp_modality_run(cmp_modality_t *mod) {
       /* Sleep to prevent 100% CPU on idle */
 #if defined(_WIN32)
       Sleep(1);
+#elif defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+      /* no-op or delay */
 #else
       usleep(1000);
 #endif

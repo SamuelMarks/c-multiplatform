@@ -15,7 +15,9 @@
 #include <winsock2.h>
 #else
 #include <unistd.h>
+#if !defined(__WATCOMC__) && !defined(__DOS__)
 #include <pthread.h>
+#endif
 #include <fcntl.h>
 #if defined(__linux__)
 #include <sys/inotify.h>

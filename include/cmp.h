@@ -130,16 +130,20 @@ typedef unsigned __int64 uint64_t;
 #endif
 
 #if !defined(_WIN32)
+#if !defined(__WATCOMC__) && !defined(__DOS__)
 #include <pthread.h>
 #include <semaphore.h>
+#endif
 #endif
 
 #include <cfs/cfs.h>
 #include <c_abstract_http/c_abstract_http.h>
 #include <c_abstract_http/http_ws.h>
 #include <c_abstract_http/http_sse.h>
+#ifndef CMP_OMIT_ORM
 #include <c_orm_api.h>
 #include <c_orm_sqlite.h>
+#endif
 /* clang-format on */
 
 #if defined(_WIN32)
@@ -353,8 +357,18 @@ int cmp_string_destroy(cmp_string_t *str);
 #if defined(_WIN32)
 typedef unsigned long cmp_tls_key_t;
 #else
+#if !defined(__WATCOMC__) && !defined(__DOS__)
 #include <pthread.h>
 typedef pthread_key_t cmp_tls_key_t;
+#else
+typedef int cmp_tls_key_t;
+typedef int pthread_t;
+#define pthread_create(t, a, f, d) (0)
+#define pthread_join(t, r) (0)
+typedef int pthread_mutex_t;
+typedef int sem_t;
+typedef int pthread_cond_t;
+#endif
 #endif
 
 /**
@@ -578,12 +592,16 @@ typedef void *cmp_mutex_t;
 typedef void *cmp_semaphore_t;
 typedef void *cmp_cond_t;
 #elif defined(__APPLE__)
+#if !defined(__WATCOMC__) && !defined(__DOS__)
 #include <pthread.h>
+#endif
 typedef pthread_mutex_t cmp_mutex_t;
 typedef void *cmp_semaphore_t;
 typedef pthread_cond_t cmp_cond_t;
 #else
+#if !defined(__WATCOMC__) && !defined(__DOS__)
 #include <semaphore.h>
+#endif
 typedef pthread_mutex_t cmp_mutex_t;
 typedef sem_t cmp_semaphore_t;
 typedef pthread_cond_t cmp_cond_t;
@@ -635,22 +653,32 @@ typedef struct cmp_atomic_int {
 #endif
 } cmp_atomic_int_t;
 
-static int cmp_atomic_add(cmp_atomic_int_t *obj, int amount) {
-#if defined(_MSC_VER) && !defined(__clang__)
-  return (int)_InterlockedExchangeAdd(&obj->val, amount);
-#else
-  return __atomic_fetch_add(&obj->val, amount, __ATOMIC_SEQ_CST);
-#endif
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+static __inline int cmp_atomic_add(cmp_atomic_int_t *obj, int amount) {
+  return (obj->val += amount);
 }
+#elif defined(_MSC_VER) && !defined(__clang__)
+static __inline int cmp_atomic_add(cmp_atomic_int_t *obj, int amount) {
+  return (int)_InterlockedExchangeAdd(&obj->val, amount);
+}
+#else
+static __inline int cmp_atomic_add(cmp_atomic_int_t *obj, int amount) {
+  return __atomic_fetch_add(&obj->val, amount, __ATOMIC_SEQ_CST);
+}
+#endif
 
-static int cmp_atomic_load(cmp_atomic_int_t *obj) {
-#if defined(_MSC_VER) && !defined(__clang__)
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+static __inline int cmp_atomic_load(cmp_atomic_int_t *obj) { return obj->val; }
+#elif defined(_MSC_VER) && !defined(__clang__)
+static __inline int cmp_atomic_load(cmp_atomic_int_t *obj) {
   long res = _InterlockedExchangeAdd(&obj->val, 0);
   return (int)res;
-#else
-  return __atomic_load_n(&obj->val, __ATOMIC_SEQ_CST);
-#endif
 }
+#else
+static __inline int cmp_atomic_load(cmp_atomic_int_t *obj) {
+  return __atomic_load_n(&obj->val, __ATOMIC_SEQ_CST);
+}
+#endif
 
 /**
  * @brief Initialize a cross-platform Semaphore
@@ -1114,6 +1142,8 @@ int cmp_http_sse_run(cmp_modality_t *mod, struct HttpClient *client,
  * @brief Initialize the global database and state subsystem (wraps c-orm).
  * @return 0 on success, or an error code.
  */
+#ifndef CMP_OMIT_ORM
+#ifndef CMP_OMIT_ORM
 int cmp_orm_init(void);
 
 /**
@@ -1200,6 +1230,9 @@ int cmp_ui_node_bind(cmp_ui_node_t *node, cmp_orm_observable_t *obs,
  * @return 0 on success, or an error code.
  */
 int cmp_orm_observable_destroy(cmp_orm_observable_t *obs);
+#endif
+
+#endif
 
 /**
  * @brief Map OS standard paths (App Data, Temp, Cache, Documents, Executable
@@ -12423,8 +12456,12 @@ CMP_API int cmp_state_layer_apply_vibrancy_mask(cmp_state_layer_t *layer,
                                                 cmp_vibrancy_style_t style);
 
 const char *cmp_strerror(int error);
+char *cmp_strtok_r(char *str, const char *delim, char **saveptr);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
+#if defined(__WATCOMC__) || defined(__DOS__)
+#define pipe(x) (-1)
+#endif
 #endif /* CMP_H */

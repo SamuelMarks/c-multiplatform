@@ -18,6 +18,13 @@ TEST test_m3_color_conversion(void) {
   float hue, chroma, tone;
   float diff;
   int i;
+  cmp_color_t test_colors[] = {
+      {0.0f, 0.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB}, /* Black */
+      {1.0f, 1.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB}, /* White */
+      {0.5f, 0.5f, 0.5f, 1.0f, CMP_COLOR_SPACE_SRGB}, /* Gray */
+      {0.0f, 1.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB}, /* Green */
+      {0.0f, 0.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB}, /* Blue */
+      {0.12f, 0.34f, 0.56f, 1.0f, CMP_COLOR_SPACE_SRGB}};
 
   /* Test 1: Pure Red */
   original.r = 1.0f;
@@ -32,13 +39,6 @@ TEST test_m3_color_conversion(void) {
   ASSERT(diff < 0.05f);
 
   /* Test 2: Random known colors */
-  cmp_color_t test_colors[] = {
-      {0.0f, 0.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB}, /* Black */
-      {1.0f, 1.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB}, /* White */
-      {0.5f, 0.5f, 0.5f, 1.0f, CMP_COLOR_SPACE_SRGB}, /* Gray */
-      {0.0f, 1.0f, 0.0f, 1.0f, CMP_COLOR_SPACE_SRGB}, /* Green */
-      {0.0f, 0.0f, 1.0f, 1.0f, CMP_COLOR_SPACE_SRGB}, /* Blue */
-      {0.12f, 0.34f, 0.56f, 1.0f, CMP_COLOR_SPACE_SRGB}};
 
   for (i = 0; i < 6; i++) {
     ASSERT_EQ(CMP_SUCCESS,

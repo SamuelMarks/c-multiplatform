@@ -122,29 +122,6 @@ int cmp_router_register(cmp_router_t *router, const char *path,
 }
 
 /* C89 safe implementation of string tokenization with saved state */
-static char *cmp_strtok_r(char *str, const char *delim, char **saveptr) {
-  char *token;
-  if (str == NULL) {
-    str = *saveptr;
-  }
-  if (str == NULL) {
-    return NULL;
-  }
-  str += strspn(str, delim);
-  if (*str == '\0') {
-    *saveptr = NULL;
-    return NULL;
-  }
-  token = str;
-  str = strpbrk(token, delim);
-  if (str == NULL) {
-    *saveptr = NULL;
-  } else {
-    *str = '\0';
-    *saveptr = str + 1;
-  }
-  return token;
-}
 
 static int internal_execute_route(cmp_router_t *router, const char *uri) {
   cmp_route_entry_t *curr = router->routes;

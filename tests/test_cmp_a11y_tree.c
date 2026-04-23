@@ -4,6 +4,8 @@
 #include <string.h>
 /* clang-format on */
 
+#if !defined(__WATCOMC__) || defined(__386__)
+
 TEST test_a11y_tree_lifecycle(void) {
   cmp_a11y_tree_t *tree = NULL;
   int res = cmp_a11y_tree_create(&tree);
@@ -356,10 +358,14 @@ SUITE(a11y_tree_suite) {
   RUN_TEST(test_a11y_tree_cognitive_motion_sound);
 }
 
+#endif
+
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
   GREATEST_MAIN_BEGIN();
+#if !defined(__WATCOMC__) || defined(__386__)
   RUN_SUITE(a11y_tree_suite);
+#endif
   GREATEST_MAIN_END();
 }

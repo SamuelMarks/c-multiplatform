@@ -103,3 +103,32 @@ int cmp_string_destroy(cmp_string_t *str) {
 
   return rc;
 }
+
+char *cmp_strtok_r(char *str, const char *delim, char **saveptr) {
+#if defined(_MSC_VER)
+  return strtok_s(str, delim, saveptr);
+#elif defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+  char *end;
+  if (str == NULL) {
+    str = *saveptr;
+  }
+  if (str == NULL) {
+    return NULL;
+  }
+  str += strspn(str, delim);
+  if (*str == '\0') {
+    *saveptr = NULL;
+    return NULL;
+  }
+  end = str + strcspn(str, delim);
+  if (*end == '\0') {
+    *saveptr = NULL;
+  } else {
+    *end = '\0';
+    *saveptr = end + 1;
+  }
+  return str;
+#else
+  return strtok_r(str, delim, saveptr);
+#endif
+}

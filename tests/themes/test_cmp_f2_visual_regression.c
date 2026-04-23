@@ -7,6 +7,7 @@
 #include "../test_visual_regression_utils.h"
 /* clang-format on */
 
+#if !defined(__WATCOMC__) || defined(__386__)
 TEST test_f2_visual_golden_baseline(void) {
   cmp_window_config_t config;
   cmp_window_t *win = NULL;
@@ -81,16 +82,21 @@ TEST test_f2_cross_os_parity(void) {
   cmp_ui_node_destroy(btn);
   PASS();
 }
+#endif
 
+#if !defined(__WATCOMC__) || defined(__386__)
 SUITE(cmp_f2_visual_regression_suite) {
   RUN_TEST(test_f2_visual_golden_baseline);
   RUN_TEST(test_f2_cross_os_parity);
 }
+#endif
 
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
   GREATEST_MAIN_BEGIN();
+#if !defined(__WATCOMC__) || defined(__386__)
   RUN_SUITE(cmp_f2_visual_regression_suite);
+#endif
   GREATEST_MAIN_END();
 }

@@ -50,7 +50,11 @@ static void *cmp_timer_thread_func(void *arg) {
 #if defined(_WIN32)
     Sleep(timer->interval_ms);
 #else
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+    /* delay(timer->interval_ms); */
+#else
     usleep(timer->interval_ms * 1000);
+#endif
 #endif
 
     if (!timer->is_running) {

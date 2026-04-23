@@ -231,6 +231,10 @@ TEST test_layout_debug_print(void) {
   cmp_ui_node_t *root = NULL;
   cmp_ui_node_t *btn = NULL;
   cmp_ui_node_t *label = NULL;
+  int res;
+  cmp_hit_test_t *ht = NULL;
+  cmp_ui_node_t *target = NULL;
+  cmp_event_t evt = {0};
 
   cmp_ui_box_create(&root);
   root->layout->width = 400;
@@ -252,14 +256,11 @@ TEST test_layout_debug_print(void) {
   cmp_ui_node_add_child(root, btn);
   cmp_layout_calculate(root->layout, 400, 300);
 
-  cmp_hit_test_t *ht = NULL;
-  cmp_ui_node_t *target = NULL;
   cmp_hit_test_create(root, &ht);
   
-  int res = cmp_hit_test_query(ht, 60.0f, 60.0f, &target);
+  res = cmp_hit_test_query(ht, 60.0f, 60.0f, &target);
   printf("Hit query result: %d. Target: %p (label=%p, btn=%p)\n", res, (void*)target, (void*)label, (void*)btn);
   
-  cmp_event_t evt = {0};
   evt.type = 1;
   evt.action = 2; /* UP */
   evt.x = 60;

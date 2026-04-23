@@ -38,6 +38,8 @@ TEST test_msg_serialization(void) {
 
 TEST test_multiprocess_communication(void) {
   cmp_process_t *proc = NULL;
+  cmp_msg_t *msg = NULL;
+  cmp_msg_t *response = NULL;
   int err;
 
   err = cmp_process_spawn(&proc);
@@ -45,14 +47,12 @@ TEST test_multiprocess_communication(void) {
   ASSERT(proc != NULL);
 
   /* Send and receive message */
-  cmp_msg_t *msg;
   cmp_msg_create(&msg);
   cmp_msg_set_payload(msg, "ping", 5);
 
   err = cmp_process_send(proc, msg);
   ASSERT_EQ(CMP_SUCCESS, err);
 
-  cmp_msg_t *response = NULL;
   /* Not blocking for real in this mock test, just verifying API */
   err = cmp_process_recv(proc, &response);
   ASSERT_EQ(CMP_SUCCESS, err);

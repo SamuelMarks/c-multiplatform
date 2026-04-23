@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmp.h"
 #include "greatest.h"
 #include <string.h>
+/* clang-format on */
 
 static void dummy_pass_execute(cmp_command_buffer_t *cb, void *user_data) {
   int *order = (int *)user_data;

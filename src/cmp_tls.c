@@ -1,3 +1,34 @@
+#include "cmp.h"
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+int cmp_tls_key_create(cmp_tls_key_t *out_key) {
+  *out_key = 0;
+  return CMP_SUCCESS;
+}
+int cmp_tls_key_delete(cmp_tls_key_t key) {
+  (void)key;
+  return CMP_SUCCESS;
+}
+int cmp_tls_set(cmp_tls_key_t key, void *value) {
+  (void)key;
+  (void)value;
+  return CMP_SUCCESS;
+}
+int cmp_tls_get(cmp_tls_key_t key, void **out_value) {
+  (void)key;
+  *out_value = NULL;
+  return CMP_SUCCESS;
+}
+#else
+#include "cmp.h"
+#if 0 || defined(__WATCOMC__) || defined(__DOS__)
+int cmp_tls_key_create(cmp_tls_key_t *out_key) { *out_key = 0; return CMP_SUCCESS; }
+int cmp_tls_key_delete(cmp_tls_key_t key) { (void)key; return CMP_SUCCESS; }
+int cmp_tls_set(cmp_tls_key_t key, void *value) { (void)key; (void)value; return CMP_SUCCESS; }
+int cmp_tls_get(cmp_tls_key_t key, void **out_value) { (void)key; *out_value = NULL; return CMP_SUCCESS; }
+#else
+#if 0 || defined(__WATCOMC__) || defined(__DOS__)
+#include "cmp.h"
+#else
 /* clang-format off */
 #include "cmp.h"
 
@@ -95,3 +126,9 @@ int cmp_tls_get(cmp_tls_key_t key, void **out_value) {
 
 #endif
 /* clang-format on */
+
+#endif
+
+#endif
+
+#endif

@@ -1,3 +1,16 @@
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+#include "cmp.h"
+int cmp_coroutine_system_init(void) { return CMP_SUCCESS; }
+int cmp_coroutine_system_shutdown(void) { return CMP_SUCCESS; }
+int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
+                         cmp_coroutine_fn_t fn, void *arg) {
+  return CMP_ERROR_NOT_FOUND;
+}
+int cmp_coroutine_resume(cmp_coroutine_t *co) { return CMP_ERROR_NOT_FOUND; }
+int cmp_coroutine_yield(cmp_coroutine_t *co) { return CMP_ERROR_NOT_FOUND; }
+int cmp_coroutine_destroy(cmp_coroutine_t *co) { return CMP_ERROR_NOT_FOUND; }
+
+#else
 /* clang-format off */
 #if defined(__APPLE__) && !defined(_XOPEN_SOURCE)
 #define _XOPEN_SOURCE 600
@@ -442,5 +455,7 @@ int cmp_coroutine_destroy(cmp_coroutine_t *co) {
             "platform\n");
   return rc;
 }
+
+#endif
 
 #endif

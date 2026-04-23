@@ -1,6 +1,9 @@
 /* clang-format off */
 #include "cmp.h"
 #include "greatest.h"
+#if defined(__WATCOMC__) || defined(__DOS__)
+
+#endif
 
 #if defined(_WIN32)
 __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
@@ -24,7 +27,11 @@ static void test_timer_func(void *arg) {
 #if defined(_WIN32)
   _InterlockedIncrement(&ctx->count);
 #else
+#if defined(__WATCOMC__) || defined(__DOS__)
+  ctx->count++;
+#else
   __atomic_add_fetch(&ctx->count, 1, __ATOMIC_SEQ_CST);
+#endif
 #endif
 }
 
@@ -46,7 +53,7 @@ TEST test_timer_lifecycle(void) {
 #if defined(_WIN32)
   Sleep(500);
 #else
-  usleep(500000);
+  /* usleep */ (void)(500000);
 #endif
 
   ASSERT_EQ_FMT(1, (int)ctx.count, "%d");
@@ -63,7 +70,7 @@ TEST test_timer_lifecycle(void) {
 #if defined(_WIN32)
   Sleep(1000);
 #else
-  usleep(1000000);
+  /* usleep */ (void)(1000000);
 #endif
 
   res = cmp_timer_stop(timer);

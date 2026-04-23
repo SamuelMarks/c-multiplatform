@@ -1,5 +1,7 @@
+/* clang-format off */
 #include "cmp.h"
 #include "greatest.h"
+/* clang-format on */
 
 TEST test_gpu_allocator(void) {
   cmp_gpu_t *gpu = NULL;

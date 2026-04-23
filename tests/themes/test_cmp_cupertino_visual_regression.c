@@ -6,6 +6,7 @@
 #include "../test_visual_regression_utils.h"
 /* clang-format on */
 
+#if !defined(__WATCOMC__) || defined(__386__)
 TEST test_cupertino_visual_golden_baseline(void) {
   cmp_window_config_t config;
   cmp_window_t *win = NULL;
@@ -60,15 +61,20 @@ TEST test_cupertino_visual_golden_baseline(void) {
   cmp_event_system_shutdown();
   PASS();
 }
+#endif
 
+#if !defined(__WATCOMC__) || defined(__386__)
 SUITE(cmp_cupertino_visual_regression_suite) {
   RUN_TEST(test_cupertino_visual_golden_baseline);
 }
+#endif
 
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
   GREATEST_MAIN_BEGIN();
+#if !defined(__WATCOMC__) || defined(__386__)
   RUN_SUITE(cmp_cupertino_visual_regression_suite);
+#endif
   GREATEST_MAIN_END();
 }

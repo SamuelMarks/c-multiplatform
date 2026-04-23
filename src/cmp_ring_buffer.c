@@ -25,6 +25,19 @@ int cmp_ring_buffer_init(cmp_ring_buffer_t *rb, size_t capacity) {
   return CMP_SUCCESS;
 }
 
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
+  size_t current_tail = rb->tail;
+  size_t current_head = rb->head;
+  size_t next_head = (current_head + 1) % rb->capacity;
+  if (next_head == current_tail) {
+    return CMP_ERROR_BOUNDS;
+  }
+  rb->buffer[current_head] = item;
+  rb->head = next_head;
+  return CMP_SUCCESS;
+}
+#else
 int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
   size_t current_tail;
   size_t next_tail;
@@ -67,7 +80,20 @@ int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
 
   return CMP_SUCCESS;
 }
+#endif
 
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
+  size_t current_tail = rb->tail;
+  size_t current_head = rb->head;
+  if (current_head == current_tail) {
+    return CMP_ERROR_NOT_FOUND;
+  }
+  *out_item = rb->buffer[current_tail];
+  rb->tail = (current_tail + 1) % rb->capacity;
+  return CMP_SUCCESS;
+}
+#else
 int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
   size_t current_head;
   size_t next_head;
@@ -114,6 +140,7 @@ int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
 
   return CMP_SUCCESS;
 }
+#endif
 
 int cmp_ring_buffer_destroy(cmp_ring_buffer_t *rb) {
   if (rb == NULL) {

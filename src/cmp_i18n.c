@@ -331,7 +331,7 @@ int cmp_i18n_load_catalog(const char *virtual_path, const char *locale) {
 #else
   strncpy(g_current_locale, locale, sizeof(g_current_locale) - 1);
   g_current_locale[sizeof(g_current_locale) - 1] = '\0';
-  line = strtok_r(text, "\n", &saveptr);
+  line = cmp_strtok_r(text, "\n", &saveptr);
 #endif
 
   while (line != NULL) {
@@ -353,7 +353,7 @@ int cmp_i18n_load_catalog(const char *virtual_path, const char *locale) {
 #if defined(_MSC_VER)
     line = strtok_s(NULL, "\n", &saveptr);
 #else
-    line = strtok_r(NULL, "\n", &saveptr);
+    line = cmp_strtok_r(NULL, "\n", &saveptr);
 #endif
   }
   CMP_FREE(text);

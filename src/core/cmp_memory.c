@@ -11,8 +11,24 @@ __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #define CMP_MEM_UNLOCK() do { g_mem_lock = 0; } while (0)
 #else
 #include <unistd.h>
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+#define CMP_MEM_LOCK() do { } while (0)
+#else
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+#define CMP_MEM_LOCK() do { } while (0)
+#else
 #define CMP_MEM_LOCK() do { while (__atomic_test_and_set(&g_mem_lock, __ATOMIC_ACQUIRE)) usleep(10); } while (0)
+#endif
+#endif
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+#define CMP_MEM_UNLOCK() do { } while (0)
+#else
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+#define CMP_MEM_UNLOCK() do { } while (0)
+#else
 #define CMP_MEM_UNLOCK() do { __atomic_clear(&g_mem_lock, __ATOMIC_RELEASE); } while (0)
+#endif
+#endif
 #endif
 /* clang-format on */
 

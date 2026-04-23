@@ -1,3 +1,79 @@
+#include "cmp.h"
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+int cmp_semaphore_init(cmp_semaphore_t *sem, int count) {
+  (void)sem;
+  (void)count;
+  return CMP_SUCCESS;
+}
+int cmp_semaphore_wait(cmp_semaphore_t *sem) {
+  (void)sem;
+  return CMP_SUCCESS;
+}
+int cmp_semaphore_post(cmp_semaphore_t *sem) {
+  (void)sem;
+  return CMP_SUCCESS;
+}
+int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
+  (void)sem;
+  return CMP_SUCCESS;
+}
+int cmp_mutex_init(cmp_mutex_t *mutex) {
+  (void)mutex;
+  return CMP_SUCCESS;
+}
+int cmp_mutex_lock(cmp_mutex_t *mutex) {
+  (void)mutex;
+  return CMP_SUCCESS;
+}
+int cmp_mutex_unlock(cmp_mutex_t *mutex) {
+  (void)mutex;
+  return CMP_SUCCESS;
+}
+int cmp_mutex_destroy(cmp_mutex_t *mutex) {
+  (void)mutex;
+  return CMP_SUCCESS;
+}
+int cmp_cond_init(cmp_cond_t *cond) {
+  (void)cond;
+  return CMP_SUCCESS;
+}
+int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
+  (void)cond;
+  (void)mutex;
+  return CMP_SUCCESS;
+}
+int cmp_cond_signal(cmp_cond_t *cond) {
+  (void)cond;
+  return CMP_SUCCESS;
+}
+int cmp_cond_broadcast(cmp_cond_t *cond) {
+  (void)cond;
+  return CMP_SUCCESS;
+}
+int cmp_cond_destroy(cmp_cond_t *cond) {
+  (void)cond;
+  return CMP_SUCCESS;
+}
+#else
+#include "cmp.h"
+#if 0 || defined(__WATCOMC__) || defined(__DOS__)
+int cmp_semaphore_init(cmp_semaphore_t *sem, int count) { (void)sem; (void)count; return CMP_SUCCESS; }
+int cmp_semaphore_wait(cmp_semaphore_t *sem) { (void)sem; return CMP_SUCCESS; }
+int cmp_semaphore_post(cmp_semaphore_t *sem) { (void)sem; return CMP_SUCCESS; }
+int cmp_semaphore_destroy(cmp_semaphore_t *sem) { (void)sem; return CMP_SUCCESS; }
+int cmp_mutex_init(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+int cmp_mutex_lock(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+int cmp_mutex_unlock(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+int cmp_mutex_destroy(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+int cmp_cond_init(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
+int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) { (void)cond; (void)mutex; return CMP_SUCCESS; }
+int cmp_cond_signal(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
+int cmp_cond_broadcast(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
+int cmp_cond_destroy(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
+#else
+#if 0 || defined(__WATCOMC__) || defined(__DOS__)
+#include "cmp.h"
+#else
 /* clang-format off */
 #include "cmp.h"
 #include <stdlib.h>
@@ -383,3 +459,9 @@ int cmp_cond_destroy(cmp_cond_t *cond) {
 #endif
   return CMP_SUCCESS;
 }
+
+#endif
+
+#endif
+
+#endif

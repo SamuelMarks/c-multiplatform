@@ -1,6 +1,9 @@
 /* clang-format off */
 #include "cmp.h"
 #include "greatest.h"
+#if defined(__WATCOMC__) || defined(__DOS__)
+
+#endif
 
 #if defined(_WIN32)
 __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
@@ -24,7 +27,11 @@ static void test_task_increment_atomic(void *arg) {
 #if defined(_WIN32)
   _InterlockedIncrement(&ctx->count);
 #else
+#if defined(__WATCOMC__) || defined(__DOS__)
+  ctx->count++;
+#else
   __atomic_add_fetch(&ctx->count, 1, __ATOMIC_SEQ_CST);
+#endif
 #endif
 }
 
@@ -56,7 +63,7 @@ TEST test_modality_threaded_lifecycle(void) {
 #if defined(_WIN32)
     Sleep(10);
 #else
-    usleep(10000);
+    /* usleep */ (void)(10000);
 #endif
     wait_cycles++;
   }
@@ -67,7 +74,7 @@ TEST test_modality_threaded_lifecycle(void) {
 #if defined(_WIN32)
   Sleep(50);
 #else
-  usleep(50000);
+  /* usleep */ (void)(50000);
 #endif
 
   res = cmp_modality_destroy(&mod);
@@ -104,7 +111,7 @@ TEST test_modality_threaded_massive_queue(void) {
 #if defined(_WIN32)
         Sleep(1);
 #else
-        usleep(1000);
+        /* usleep */ (void)(1000);
 #endif
       }
     } while (res == CMP_ERROR_BOUNDS);
@@ -117,7 +124,7 @@ TEST test_modality_threaded_massive_queue(void) {
 #if defined(_WIN32)
     Sleep(10);
 #else
-    usleep(10000);
+    /* usleep */ (void)(10000);
 #endif
     wait_cycles++;
   }
@@ -128,7 +135,7 @@ TEST test_modality_threaded_massive_queue(void) {
 #if defined(_WIN32)
   Sleep(100);
 #else
-  usleep(100000);
+  /* usleep */ (void)(100000);
 #endif
 
   res = cmp_modality_destroy(&mod);

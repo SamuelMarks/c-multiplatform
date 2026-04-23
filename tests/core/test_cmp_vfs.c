@@ -1,6 +1,9 @@
 /* clang-format off */
 #include "cmp.h"
 #include "greatest.h"
+#if defined(__WATCOMC__) || defined(__DOS__)
+
+#endif
 #include <stdio.h>
 
 #if defined(_WIN32)
@@ -208,7 +211,7 @@ TEST test_vfs_watch(void) {
 #if defined(_WIN32)
   Sleep(100);
 #else
-  usleep(100000);
+  /* usleep */ (void)(100000);
 #endif
 
   /*

@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "cmp.h"
 #include "greatest.h"
 #include <string.h>
+/* clang-format on */
 
 TEST test_pso_caching(void) {
   cmp_pso_cache_t *cache = NULL;

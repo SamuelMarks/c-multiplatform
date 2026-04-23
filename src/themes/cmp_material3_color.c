@@ -2,6 +2,9 @@
 #include "cmp.h"
 #include "themes/cmp_material3_color.h"
 #include <math.h>
+#if defined(__WATCOMC__) || defined(__DOS__)
+#define fmodf(x, y) (float)fmod((double)(x), (double)(y))
+#endif
 /* clang-format on */
 
 #ifndef M_PI
@@ -448,5 +451,3 @@ int cmp_m3_scheme_dark(const cmp_m3_palettes_t *palettes,
 
   return CMP_SUCCESS;
 }
- 
- 

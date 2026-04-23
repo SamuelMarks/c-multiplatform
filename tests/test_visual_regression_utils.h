@@ -1,9 +1,11 @@
 #ifndef TEST_VISUAL_REGRESSION_UTILS_H
 #define TEST_VISUAL_REGRESSION_UTILS_H
 
+/* clang-format off */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+/* clang-format on */
 
 static int cmp_test_write_bmp(const char *filename, const unsigned char *pixels,
                               int width, int height) {
@@ -20,19 +22,19 @@ static int cmp_test_write_bmp(const char *filename, const unsigned char *pixels,
     return -1;
 
   header[2] = (unsigned char)(file_size);
-  header[3] = (unsigned char)(file_size >> 8);
-  header[4] = (unsigned char)(file_size >> 16);
-  header[5] = (unsigned char)(file_size >> 24);
+  header[3] = (unsigned char)((unsigned long)file_size >> 8);
+  header[4] = (unsigned char)((unsigned long)file_size >> 16);
+  header[5] = (unsigned char)((unsigned long)file_size >> 24);
 
   header[18] = (unsigned char)(width);
-  header[19] = (unsigned char)(width >> 8);
-  header[20] = (unsigned char)(width >> 16);
-  header[21] = (unsigned char)(width >> 24);
+  header[19] = (unsigned char)((unsigned long)width >> 8);
+  header[20] = (unsigned char)((unsigned long)width >> 16);
+  header[21] = (unsigned char)((unsigned long)width >> 24);
 
   header[22] = (unsigned char)(-height);
-  header[23] = (unsigned char)((-height) >> 8);
-  header[24] = (unsigned char)((-height) >> 16);
-  header[25] = (unsigned char)((-height) >> 24);
+  header[23] = (unsigned char)((unsigned long)(-height) >> 8);
+  header[24] = (unsigned char)((unsigned long)(-height) >> 16);
+  header[25] = (unsigned char)((unsigned long)(-height) >> 24);
 
   fwrite(header, 1, 54, f);
   for (i = 0; i < width * height; i++) {
