@@ -292,3 +292,11 @@ cscope.out
 *.dat
 test.c
 path
+
+# Additional aggressive ignores
+*.err
+err.txt
+t.c
+t[0-9]*.c
+*_FIX*.md
+*_PLAN*.md
