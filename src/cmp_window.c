@@ -664,6 +664,9 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         HFONT font;
         HFONT old_font;
         int size;
+        int wlen;
+        WCHAR *wtext;
+
         if (node->font_size > 0.0f) {
           size = (int)(node->font_size * scale_factor);
         } else {
@@ -680,30 +683,39 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
           tc = RGB(240, 240, 240);
         }
 
-        font = CreateFontA(size, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-                           DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-                           CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-                           DEFAULT_PITCH | FF_DONTCARE,
-                           current_theme == 1 ? "Segoe UI" : "Arial");
-        old_font = (HFONT)SelectObject(hdc, font);
-        SetTextAlign(hdc, TA_CENTER | TA_TOP);
-        SetTextColor(hdc, tc);
-        SetBkMode(hdc, TRANSPARENT);
+        wlen = MultiByteToWideChar(CP_UTF8, 0, text, -1, NULL, 0);
+        if (wlen > 0) {
+          if (CMP_MALLOC(wlen * sizeof(WCHAR), (void **)&wtext) ==
+              CMP_SUCCESS) {
+            MultiByteToWideChar(CP_UTF8, 0, text, -1, wtext, wlen);
 
-        if (node->type == 14) {
-          TextOutA(hdc, (int)(rect.x + rect.width / 2.0f),
-                   (int)(rect.y + (rect.height - size) / 2.0f), text,
-                   (int)strlen(text));
-        } else if (node->type == 3 || node->type == 4) {
-          TextOutA(hdc, (int)(rect.x + rect.width / 2.0f),
-                   (int)(rect.y + (rect.height - size) / 2.0f), text,
-                   (int)strlen(text));
-        } else {
-          TextOutA(hdc, (int)(rect.x + rect.width / 2.0f), (int)rect.y, text,
-                   (int)strlen(text));
+            font = CreateFontW(size, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+                               DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+                               CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+                               DEFAULT_PITCH | FF_DONTCARE,
+                               current_theme == 1 ? L"Segoe UI" : L"Arial");
+            old_font = (HFONT)SelectObject(hdc, font);
+            SetTextAlign(hdc, TA_CENTER | TA_TOP);
+            SetTextColor(hdc, tc);
+            SetBkMode(hdc, TRANSPARENT);
+
+            if (node->type == 14) {
+              TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
+                       (int)(rect.y + (rect.height - size) / 2.0f), wtext,
+                       wlen - 1);
+            } else if (node->type == 3 || node->type == 4) {
+              TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
+                       (int)(rect.y + (rect.height - size) / 2.0f), wtext,
+                       wlen - 1);
+            } else {
+              TextOutW(hdc, (int)(rect.x + rect.width / 2.0f), (int)rect.y,
+                       wtext, wlen - 1);
+            }
+            SelectObject(hdc, old_font);
+            DeleteObject(font);
+            CMP_FREE(wtext);
+          }
         }
-        SelectObject(hdc, old_font);
-        DeleteObject(font);
       }
     }
   }

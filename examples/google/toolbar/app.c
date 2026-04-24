@@ -34,8 +34,8 @@ static int g_is_rtl = 0;
 static app_language_t g_lang = APP_LANG_EN;
 static app_theme_palette_t g_palette_idx = APP_PALETTE_DEFAULT;
 static float g_scale_factor = 1.0f; /* NATIVE DPI SCALE FIX */
-static float g_window_width = 800.0f;
-static float g_window_height = 600.0f;
+static float g_window_width = 1024.0f;
+static float g_window_height = 768.0f;
 
 static const uint32_t surface_light[] = {0xFFFEF7FF, 0xFFF8FDFF, 0xFFFFFBF7,
                                          0xFFFFF8FB};
@@ -287,6 +287,7 @@ static int build_ui(void) {
     actions_row->layout->height = 40.0f;
     actions_row->layout->align_items = CMP_FLEX_ALIGN_CENTER;
     actions_row->layout->justify_content = CMP_FLEX_ALIGN_END;
+    actions_row->layout->flex_shrink = 0.0f;
 
     if (btn_lang) {
       rc = cmp_ui_node_add_child(actions_row, btn_lang);
