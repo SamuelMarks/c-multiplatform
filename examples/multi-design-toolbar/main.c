@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
 
-  printf("Starting Google Toolbar Example...\n");
+  printf("Starting Multi-Design System Toolbar Example...\n");
   if (app_init() != 0) {
     fprintf(stderr, "Failed to initialize application.\n");
     return 1;

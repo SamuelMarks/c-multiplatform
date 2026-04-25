@@ -24,6 +24,7 @@ This project is architected specifically for **Context-Window Scalability**, uti
     *   **VFS (`c-fs`):** Transparent virtual file system mounting and asynchronous reads.
     *   **HTTP/WebSockets (`c-abstract-http`):** Native networking integration directly into the modality event loop.
     *   **ORM (`c-orm`):** Local SQLite persistence with data-binding observables (`cmp_orm_observable_t`) tied directly to UI nodes.
+    *   **Generic Data Binding:** In-memory, typed primitive observables (`cmp_databinding_t`) supporting N-way binding configurations for reactive application state without database overhead.
 
 ## 📂 Architecture Strategy
 

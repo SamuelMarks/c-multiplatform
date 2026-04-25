@@ -22,7 +22,7 @@ The core innovation of LibCMPC is its modality-agnostic event loop.
 Instead of reinventing the wheel, LibCMPC deeply embeds specialized C libraries:
 1. **Virtual File System (`cmp_vfs_t` -> `c-fs`)**: Allows mounting archives (ZIPs) and native directories. `cmp_vfs_read_file_async` ties directly into the Modality engine to prevent blocking the main thread during asset loading.
 2. **Network (`cmp_http` -> `c-abstract-http`)**: WebSockets, Server-Sent Events, and standard REST HTTP calls are dispatched and resolved within the `cmp_modality_t` loop.
-3. **State Management (`cmp_orm` -> `c-orm`)**: UI nodes can be directly bound to ORM fields using `cmp_ui_node_bind(node, observable)`. When the local SQLite database updates, the UI invalidates and redraws automatically.  
+3. **State Management & Databinding (`cmp_orm` -> `c-orm`, `cmp_databinding_t`)**: UI nodes can be directly bound to ORM fields using `cmp_ui_node_bind(node, observable)` or to generic in-memory typed values using `cmp_ui_node_bind_generic(node, binding, property)`. When data updates, the bound UI property invalidates and redraws automatically.  
 
 ## UI & Layout Pipeline
 1. **UI Tree (`cmp_ui_node_t`)**: Developers construct a logical tree of widgets (`cmp_ui_box`, `cmp_ui_button`, `cmp_ui_text_input`).

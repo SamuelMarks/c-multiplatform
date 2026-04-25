@@ -645,9 +645,8 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
   }
 
   {
-    if ((node->type == 2 || node->type == 3 || node->type == 4 ||
-         node->type == 11 || node->type == 14) &&
-        current_theme != 2) {
+    if (node->type == 2 || node->type == 3 || node->type == 4 ||
+        node->type == 11 || node->type == 14) {
       const char *text = (const char *)node->properties;
       if (node->type == 4 && text == NULL)
         text = "Ask anything";

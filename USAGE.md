@@ -75,6 +75,27 @@ cmp_http_client_create(&modality, &client);
 cmp_http_client_get(client, "https://api.github.com/zen", my_callback_fn, user_data);
 ```
 
+## Generic Data Binding
+
+In addition to database observables, you can bind UI nodes directly to generic primitives (strings, integers, floats, booleans) using the generic data binding framework:
+
+```c
+cmp_databinding_t *title_binding = NULL;
+cmp_databinding_create(&title_binding, CMP_DATA_TYPE_STRING);
+
+cmp_ui_node_t *text_label;
+cmp_ui_text_create(&text_label, "Default Title", -1);
+
+/* The label will automatically update when the binding is modified */
+cmp_ui_node_bind_generic(text_label, title_binding, "text");
+
+/* Later in your application logic... */
+cmp_databinding_set_string(title_binding, "New Title");
+
+/* Cleanup */
+cmp_databinding_destroy(title_binding);
+```
+
 ## Integrating the Database (c-orm)
 
 Data binding allows UI nodes to automatically react to database changes:

@@ -1235,6 +1235,79 @@ int cmp_orm_observable_destroy(cmp_orm_observable_t *obs);
 #endif
 
 /**
+ * @brief Generic Data Binding types
+ */
+typedef enum cmp_data_type {
+  CMP_DATA_TYPE_STRING = 0,
+  CMP_DATA_TYPE_INT,
+  CMP_DATA_TYPE_FLOAT,
+  CMP_DATA_TYPE_BOOL
+} cmp_data_type_t;
+
+typedef struct cmp_databinding_s cmp_databinding_t;
+
+/**
+ * @brief Callback for when bound data changes.
+ * @param binding The databinding that changed.
+ * @param user_data The context passed when adding the listener.
+ */
+typedef void (*cmp_databinding_cb_t)(cmp_databinding_t *binding,
+                                     void *user_data);
+
+/**
+ * @brief Create a new generic databinding.
+ * @param out_binding Pointer to receive the allocated binding.
+ * @param type The type of data this binding holds.
+ * @return 0 on success, or an error code.
+ */
+int cmp_databinding_create(cmp_databinding_t **out_binding,
+                           cmp_data_type_t type);
+
+/**
+ * @brief Destroy a generic databinding.
+ * @param binding The databinding to destroy.
+ * @return 0 on success, or an error code.
+ */
+int cmp_databinding_destroy(cmp_databinding_t *binding);
+
+/**
+ * @brief Set the string value of a databinding.
+ * @param binding The databinding.
+ * @param val The new string value.
+ * @return 0 on success, or an error code.
+ */
+int cmp_databinding_set_string(cmp_databinding_t *binding, const char *val);
+
+/**
+ * @brief Get the string value of a databinding.
+ * @param binding The databinding.
+ * @param out_val Pointer to receive the string value.
+ * @return 0 on success, or an error code.
+ */
+int cmp_databinding_get_string(cmp_databinding_t *binding,
+                               const char **out_val);
+
+/**
+ * @brief Add a listener to be notified when the databinding changes.
+ * @param binding The databinding.
+ * @param cb The callback function.
+ * @param user_data User context to pass to the callback.
+ * @return 0 on success, or an error code.
+ */
+int cmp_databinding_add_listener(cmp_databinding_t *binding,
+                                 cmp_databinding_cb_t cb, void *user_data);
+
+/**
+ * @brief Bind a UI node to a databinding (generic).
+ * @param node The UI node to bind.
+ * @param binding The databinding to use.
+ * @param property_name The property of the UI node to bind (e.g. "text").
+ * @return 0 on success, or an error code.
+ */
+int cmp_ui_node_bind_generic(cmp_ui_node_t *node, cmp_databinding_t *binding,
+                             const char *property_name);
+
+/**
  * @brief Map OS standard paths (App Data, Temp, Cache, Documents, Executable
  * Directory).
  * @param type The type of standard path to resolve (1=AppData, 2=Temp, 3=Cache,

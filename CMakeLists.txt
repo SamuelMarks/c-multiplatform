@@ -375,6 +375,7 @@ list(APPEND CMP_SOURCES
     src/cmp_router.c
     src/core/cmp_layout.c
     src/cmp_ui.c
+    src/cmp_databinding.c
     src/cmp_flex_align.c
     src/cmp_media_query.c
     src/cmp_grid.c

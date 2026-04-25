@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(cmp_example_google_toolbar C)
+project(cmp_example_multi_design_toolbar C)
 
 set(CMAKE_C_STANDARD 90)
 
@@ -19,6 +19,6 @@ if(NOT TARGET cmp)
     FetchContent_MakeAvailable(cmp)
 endif()
 
-add_executable(cmp_example_google_toolbar main.c app.c)
-target_link_libraries(cmp_example_google_toolbar PRIVATE cmp)
-target_include_directories(cmp_example_google_toolbar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+add_executable(cmp_example_multi_design_toolbar main.c app.c)
+target_link_libraries(cmp_example_multi_design_toolbar PRIVATE cmp)
+target_include_directories(cmp_example_multi_design_toolbar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

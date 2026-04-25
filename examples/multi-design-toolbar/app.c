@@ -32,9 +32,11 @@ static cmp_ui_node_t *g_ui_tree = NULL;
 static int g_is_dark = 0;
 static int g_is_rtl = 0;
 static app_language_t g_lang = APP_LANG_EN;
+static app_design_language_t g_design_lang = APP_DESIGN_INHERIT;
+static cmp_databinding_t *g_title_binding = NULL;
 static app_theme_palette_t g_palette_idx = APP_PALETTE_DEFAULT;
 static float g_scale_factor = 1.0f; /* NATIVE DPI SCALE FIX */
-static float g_window_width = 1024.0f;
+static float g_window_width = 1280.0f;
 static float g_window_height = 768.0f;
 
 static const uint32_t surface_light[] = {0xFFFEF7FF, 0xFFF8FDFF, 0xFFFFFBF7,
@@ -45,6 +47,45 @@ static const uint32_t surface_dark[] = {0xFF141218, 0xFF0E1419, 0xFF121411,
 static int build_ui(void);
 
 static int g_needs_rebuild = 0;
+
+static void update_title_binding(void) {
+  char buf[128];
+  const char *design_str = "Inherit";
+
+  if (!g_title_binding) {
+    return;
+  }
+
+  switch (g_design_lang) {
+  case APP_DESIGN_INHERIT: design_str = "Inherit"; break;
+  case APP_DESIGN_MATERIAL3: design_str = "Material 3"; break;
+  case APP_DESIGN_FLUENT2: design_str = "Fluent 2"; break;
+  case APP_DESIGN_CUPERTINO: design_str = "Cupertino"; break;
+  case APP_DESIGN_UNSTYLED: design_str = "Unstyled"; break;
+  }
+
+  if (g_lang == APP_LANG_HE) {
+#if defined(_MSC_VER)
+    sprintf_s(buf, sizeof(buf), "\xD7\xA2\xD7\x99\xD7\xA6\xD7\x95\xD7\x91 %s", design_str);
+#else
+    sprintf(buf, "\xD7\xA2\xD7\x99\xD7\xA6\xD7\x95\xD7\x91 %s", design_str);
+#endif
+  } else if (g_lang == APP_LANG_AR) {
+#if defined(_MSC_VER)
+    sprintf_s(buf, sizeof(buf), "\xD8\xAA\xD8\xB5\xD9\x85\xD9\x8A\xD9\x85 %s", design_str);
+#else
+    sprintf(buf, "\xD8\xAA\xD8\xB5\xD9\x85\xD9\x8A\xD9\x85 %s", design_str);
+#endif
+  } else {
+#if defined(_MSC_VER)
+    sprintf_s(buf, sizeof(buf), "%s Design", design_str);
+#else
+    sprintf(buf, "%s Design", design_str);
+#endif
+  }
+
+  cmp_databinding_set_string(g_title_binding, buf);
+}
 
 static void on_lang_click(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
   int rc;
@@ -63,6 +104,7 @@ static void on_lang_click(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_i18n_set_bidi_direction failed: %d\n", rc);
   }
+  update_title_binding();
   g_needs_rebuild = 1;
 }
 
@@ -96,6 +138,27 @@ static void on_palette_click(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
   }
 
   g_palette_idx = (app_theme_palette_t)((g_palette_idx + 1) % 4);
+  g_needs_rebuild = 1;
+  if (rc != 0) {
+    LOG_DEBUG("rc %d\n", rc);
+  }
+}
+
+static void on_design_click(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
+  int rc;
+  rc = 0;
+  if (evt && evt->action != CMP_ACTION_UP) {
+    LOG_DEBUG("Ignoring non-UP event for design click\n");
+    return;
+  }
+  if (node || ctx) {
+    LOG_DEBUG("Clicked design node\n");
+  }
+
+  g_design_lang = (app_design_language_t)((g_design_lang + 1) % 5);
+
+  update_title_binding();
+
   g_needs_rebuild = 1;
   if (rc != 0) {
     LOG_DEBUG("rc %d\n", rc);
@@ -188,8 +251,9 @@ static int build_ui(void) {
   cmp_ui_node_t *btn_lang = NULL;
   cmp_ui_node_t *btn_theme = NULL;
   cmp_ui_node_t *btn_palette = NULL;
+  cmp_ui_node_t *btn_design = NULL;
   cmp_ui_node_t *divider = NULL;
-  const char *title_text = "Hello navbar";
+  const char *title_text = "Multi-Design System Toolbar Example";
 
   if (g_ui_tree != NULL) {
     rc = cmp_ui_node_destroy(g_ui_tree);
@@ -212,9 +276,7 @@ static int build_ui(void) {
   g_ui_tree->layout->align_items = CMP_FLEX_ALIGN_STRETCH;
   g_ui_tree->bg_color = g_is_dark ? 0xFF000000 : 0xFFF0F0F0;
 
-  /* Crucial: Keep APP_DESIGN_INHERIT so GDI fallback rendering draws our native
-   * nodes */
-  g_ui_tree->design_language_override = APP_DESIGN_INHERIT;
+  g_ui_tree->design_language_override = g_design_lang;
 
   rc = cmp_ui_box_create(&app_bar);
   if (rc != CMP_SUCCESS) {
@@ -246,9 +308,12 @@ static int build_ui(void) {
 
   rc = cmp_ui_text_create(&title, title_text, -1);
   if (rc == CMP_SUCCESS) {
+    if (g_title_binding) {
+      cmp_ui_node_bind_generic(title, g_title_binding, "text");
+    }
     title->text_color = g_is_dark ? 0xFFE6E0E9 : 0xFF1D1B20;
     title->font_size = 22.0f;
-    title->layout->width = 200.0f;
+    title->layout->width = 400.0f;
     title->layout->height =
         -1.0f; /* Auto-height for perfect vertical centering */
     title->layout->flex_shrink = 1.0f;
@@ -273,17 +338,25 @@ static int build_ui(void) {
     LOG_DEBUG("create_simple_button palette failed: %d\n", rc);
   }
 
+  rc = create_simple_button(&btn_design, "DSG", "Change design system",
+                            on_design_click);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("create_simple_button design failed: %d\n", rc);
+  }
+
   /* Add margins to buttons for spacing */
   if (btn_theme)
     btn_theme->layout->margin[3] = 16.0f;
   if (btn_palette)
     btn_palette->layout->margin[3] = 16.0f;
+  if (btn_design)
+    btn_design->layout->margin[3] = 16.0f;
 
   rc = cmp_ui_box_create(&actions_row);
   if (rc == CMP_SUCCESS) {
     actions_row->layout->direction = CMP_FLEX_ROW;
     actions_row->layout->width =
-        240.0f; /* Fixed width prevents off-screen layout math bugs */
+        320.0f; /* Fixed width prevents off-screen layout math bugs */
     actions_row->layout->height = 40.0f;
     actions_row->layout->align_items = CMP_FLEX_ALIGN_CENTER;
     actions_row->layout->justify_content = CMP_FLEX_ALIGN_END;
@@ -301,6 +374,11 @@ static int build_ui(void) {
     }
     if (btn_palette) {
       rc = cmp_ui_node_add_child(actions_row, btn_palette);
+      if (rc != CMP_SUCCESS)
+        LOG_DEBUG("cmp_ui_node_add_child failed: %d\n", rc);
+    }
+    if (btn_design) {
+      rc = cmp_ui_node_add_child(actions_row, btn_design);
       if (rc != CMP_SUCCESS)
         LOG_DEBUG("cmp_ui_node_add_child failed: %d\n", rc);
     }
@@ -347,6 +425,11 @@ int app_init(void) {
   cmp_window_config_t config;
   cmp_dpi_t *dpi = NULL;
 
+  rc = cmp_databinding_create(&g_title_binding, CMP_DATA_TYPE_STRING);
+  if (rc == CMP_SUCCESS) {
+    cmp_databinding_set_string(g_title_binding, "Inherit");
+  }
+
   rc = cmp_event_system_init();
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_event_system_init failed: %d\n", rc);
@@ -375,7 +458,7 @@ int app_init(void) {
     }
   }
 
-  config.title = "Google Toolbar Example";
+  config.title = "Multi-Design System Toolbar Example";
   config.width = (int)g_window_width;
   config.height = (int)g_window_height;
   config.x = -1;
@@ -506,6 +589,11 @@ int app_run(void) {
 
 int app_shutdown(void) {
   int rc;
+
+  if (g_title_binding) {
+    cmp_databinding_destroy(g_title_binding);
+    g_title_binding = NULL;
+  }
 
   if (g_ui_tree) {
     rc = cmp_ui_node_destroy(g_ui_tree);
