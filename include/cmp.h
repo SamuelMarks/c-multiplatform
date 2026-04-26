@@ -300,7 +300,7 @@ int cmp_crash_handler_init(void);
 /**
  * @brief Dump the current stack trace to stderr
  */
-void cmp_dump_stack_trace(void);
+int cmp_dump_stack_trace(void);
 
 /**
  * @brief Internal assertion failure handler
@@ -1812,7 +1812,7 @@ int cmp_hover_intent_destroy(cmp_hover_intent_t *intent);
  * an error code.
  */
 int cmp_hover_intent_process(cmp_hover_intent_t *intent,
-                             const cmp_event_t *event, float dt_ms);
+                             const cmp_event_t *event, float dt_ms, int *out_confirmed);
 
 /**
  * @brief Independent Scroll Context decoupled from Layout step
@@ -4177,7 +4177,7 @@ int cmp_i18n_get_bidi_direction(void);
  * @brief Utility function to easily check if current bidi direction is RTL.
  * @return 1 if RTL, 0 otherwise.
  */
-int cmp_i18n_is_rtl(void);
+int cmp_i18n_is_rtl(int *out_is_rtl);
 
 /**
  * @brief Abstract Representation of a custom Shader Pipeline
@@ -11389,7 +11389,7 @@ int cmp_focus_nav_handle_tab(cmp_focus_nav_t *nav, int is_shift_pressed);
  *        Logs the result to stdout.
  * \return 0 if hardware accelerated, 1 if CPU fallback, or negative error code.
  */
-int cmp_verify_hardware_acceleration(void);
+int cmp_verify_hardware_acceleration(int *out_is_cpu_fallback);
 
 /* --- From image_preview.h --- */
 /**

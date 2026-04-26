@@ -1,19 +1,25 @@
 /* clang-format off */
 #include "cmp.h"
-#include "cmp.h"
+#include "cmp_log.h"
 
 #if defined(_WIN32)
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
 
-#if defined(_MSC_VER) && _MSC_VER <= 1400
-/* MSVC 2005 doesn't have dwmapi.h */
-#else
-#include <dwmapi.h>
-#pragma comment(lib, "dwmapi.lib")
+#ifndef S_OK
+#define S_OK ((HRESULT)0L)
 #endif
+
+#ifndef WINAPI
+#define WINAPI __stdcall
+#endif
+
+__declspec(dllimport) HMODULE WINAPI LoadLibraryA(const char* lpLibFileName);
+__declspec(dllimport) HMODULE WINAPI GetModuleHandleA(const char* lpModuleName);
+__declspec(dllimport) void* WINAPI GetProcAddress(HMODULE hModule, const char* lpProcName);
+__declspec(dllimport) BOOL WINAPI FreeLibrary(HMODULE hLibModule);
 
 /* Fallback definitions for older SDKs */
 #ifndef DWM_BB_ENABLE
@@ -26,8 +32,7 @@ typedef struct _DWM_BLURBEHIND {
 } DWM_BLURBEHIND;
 #endif
 
-typedef HRESULT(WINAPI *pfnDwmEnableBlurBehindWindow)(HWND,
-                                                      const DWM_BLURBEHIND *);
+typedef HRESULT(WINAPI *pfnDwmEnableBlurBehindWindow)(HWND, const DWM_BLURBEHIND *);
 typedef struct _MARGINS_DWM {
   int cxLeftWidth;
   int cxRightWidth;
@@ -92,16 +97,16 @@ typedef BOOL(WINAPI *pfnSetWindowCompositionAttribute)(
 #endif
 
 /**
- * @brief cmp_win32_request_windows_material
+ * @brief Requests a specific Windows material effect for a window.
  *
- * @param materials Parameter description.
- * @param window Parameter description.
- * @param material Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param materials The materials context.
+ * @param window The window to apply the material to.
+ * @param material The desired material effect.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_win32_request_windows_material(cmp_materials_t *materials,
-                                           cmp_window_t *window,
-                                           cmp_windows_material_t material) {
+                                       cmp_window_t *window,
+                                       cmp_windows_material_t material) {
   HWND hwnd;
   HMODULE hUser, hDwm;
   pfnSetWindowCompositionAttribute setWindowCompositionAttribute;
@@ -114,11 +119,15 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
 
   (void)materials; /* Unused for now */
 
-  if (!window)
+  if (!window) {
+    LOG_DEBUG("cmp_win32_request_windows_material: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
   hwnd = window->hwnd;
-  if (!hwnd)
+  if (!hwnd) {
+    LOG_DEBUG("cmp_win32_request_windows_material: Invalid state (no HWND)\n");
     return CMP_ERROR_INVALID_STATE;
+  }
 
   hDwm = LoadLibraryA("dwmapi.dll");
   if (hDwm) {
@@ -151,52 +160,52 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
   }
 
   if (material == CMP_WINDOWS_MATERIAL_MICA ||
-        material == CMP_WINDOWS_MATERIAL_MICA_ALT ||
-        material == CMP_WINDOWS_MATERIAL_ACRYLIC_BASE ||
-        material == CMP_WINDOWS_MATERIAL_ACRYLIC_THIN) {
-      if (dwmSetWindowAttribute) {
-        /* Try Windows 11 System Backdrop Type */
-        if (material == CMP_WINDOWS_MATERIAL_MICA) {
-          mica_type = DWMSBT_MAINWINDOW;
-        } else if (material == CMP_WINDOWS_MATERIAL_MICA_ALT) {
-          mica_type = DWMSBT_TABBEDWINDOW;
-        } else {
-          mica_type = 3; /* DWMSBT_TRANSIENTWINDOW */
-        }
+      material == CMP_WINDOWS_MATERIAL_MICA_ALT ||
+      material == CMP_WINDOWS_MATERIAL_ACRYLIC_BASE ||
+      material == CMP_WINDOWS_MATERIAL_ACRYLIC_THIN) {
+    if (dwmSetWindowAttribute) {
+      /* Try Windows 11 System Backdrop Type */
+      if (material == CMP_WINDOWS_MATERIAL_MICA) {
+        mica_type = DWMSBT_MAINWINDOW;
+      } else if (material == CMP_WINDOWS_MATERIAL_MICA_ALT) {
+        mica_type = DWMSBT_TABBEDWINDOW;
+      } else {
+        mica_type = 3; /* DWMSBT_TRANSIENTWINDOW */
+      }
 
-        /* First try newer Windows 11 API (System Backdrop Type) */
-        if (dwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, &mica_type,
-                                  sizeof(mica_type)) == S_OK) {
-          if (hDwm)
-            FreeLibrary(hDwm);
-          return CMP_SUCCESS;
-        }
+      /* First try newer Windows 11 API (System Backdrop Type) */
+      if (dwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, &mica_type,
+                                sizeof(mica_type)) == S_OK) {
+        if (hDwm)
+          FreeLibrary(hDwm);
+        return CMP_SUCCESS;
+      }
 
-        /* Fallback to older Windows 11 API (Mica Effect boolean) */
-        if (dwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &true_val,
-                                  sizeof(true_val)) == S_OK) {
-          if (hDwm)
-            FreeLibrary(hDwm);
-          return CMP_SUCCESS;
-        }
+      /* Fallback to older Windows 11 API (Mica Effect boolean) */
+      if (dwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &true_val,
+                                sizeof(true_val)) == S_OK) {
+        if (hDwm)
+          FreeLibrary(hDwm);
+        return CMP_SUCCESS;
       }
     }
+  }
 
-    /* Try Windows 10 Acrylic via SetWindowCompositionAttribute */
-    hUser = GetModuleHandleA("user32.dll");
-    if (hUser) {
-      setWindowCompositionAttribute =
-          (pfnSetWindowCompositionAttribute)GetProcAddress(
-              hUser, "SetWindowCompositionAttribute");
-      if (setWindowCompositionAttribute) {
-        ACCENT_POLICY policy;
-        WINDOWCOMPOSITIONATTRIBDATA data;
+  /* Try Windows 10 Acrylic via SetWindowCompositionAttribute */
+  hUser = GetModuleHandleA("user32.dll");
+  if (hUser) {
+    setWindowCompositionAttribute =
+        (pfnSetWindowCompositionAttribute)GetProcAddress(
+            hUser, "SetWindowCompositionAttribute");
+    if (setWindowCompositionAttribute) {
+      ACCENT_POLICY policy;
+      WINDOWCOMPOSITIONATTRIBDATA data;
 
-        policy.AccentState = (material == CMP_WINDOWS_MATERIAL_ACRYLIC_THIN ||
-                              material == CMP_WINDOWS_MATERIAL_ACRYLIC_BASE)
-                                 ? ACCENT_ENABLE_ACRYLICBLURBEHIND
-                                 : ACCENT_ENABLE_BLURBEHIND;
-        policy.AccentFlags = 0x20 | 0x40 | 0x80 | 0x100; /* Preserve borders and titlebar */
+      policy.AccentState = (material == CMP_WINDOWS_MATERIAL_ACRYLIC_THIN ||
+                            material == CMP_WINDOWS_MATERIAL_ACRYLIC_BASE)
+                               ? ACCENT_ENABLE_ACRYLICBLURBEHIND
+                               : ACCENT_ENABLE_BLURBEHIND;
+      policy.AccentFlags = 0x20 | 0x40 | 0x80 | 0x100; /* Preserve borders and titlebar */
       /* Optional: Gradient color for Acrylic (AABBGGRR). Example: 0x01000000
        * for slightly dark */
       policy.GradientColor = 0x01000000;

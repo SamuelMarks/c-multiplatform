@@ -5,18 +5,22 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief Opaque internal structure for UI Divider widget.
+ */
 struct cmp_ui_divider {
+  /** @brief The root node of the divider */
   cmp_ui_node_t *node_root;
 };
 
 /**
  * @brief cmp_ui_divider_create
  *
- * @param out_divider Parameter description.
+ * @param out_divider Pointer to store the created divider.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_divider_create(cmp_ui_divider_t **out_divider) {
-  cmp_ui_divider_t *divider;
+  cmp_ui_divider_t *divider = NULL;
   int rc;
 
   if (!out_divider) {
@@ -27,21 +31,23 @@ int cmp_ui_divider_create(cmp_ui_divider_t **out_divider) {
   rc = CMP_MALLOC(sizeof(cmp_ui_divider_t), (void **)&divider);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_divider_create: OOM\n");
-    return rc;
+    return CMP_ERROR_OOM;
   }
   memset(divider, 0, sizeof(cmp_ui_divider_t));
 
   rc = cmp_ui_box_create(&divider->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_divider_create: cmp_ui_box_create failed\n");
-    CMP_FREE(divider);
-    return rc;
+    rc = CMP_FREE(divider);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_divider_create: CMP_FREE failed\n");
+    }
+    return CMP_ERROR_GENERAL;
   }
 
-  /* Usually a divider is 1px tall and takes 100% width or similar */
-  /* Here we simply provide a background color; exact dimensions would
-     be provided via styles. */
-  divider->node_root->bg_color = 0xFFCCCCCC;
+  if (divider->node_root) {
+    divider->node_root->bg_color = 0xFFCCCCCC;
+  }
 
   *out_divider = divider;
   return CMP_SUCCESS;
@@ -50,7 +56,7 @@ int cmp_ui_divider_create(cmp_ui_divider_t **out_divider) {
 /**
  * @brief cmp_ui_divider_destroy
  *
- * @param divider Parameter description.
+ * @param divider The divider component.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_divider_destroy(cmp_ui_divider_t *divider) {
@@ -80,8 +86,8 @@ int cmp_ui_divider_destroy(cmp_ui_divider_t *divider) {
 /**
  * @brief cmp_ui_divider_get_node
  *
- * @param divider Parameter description.
- * @param out_node Parameter description.
+ * @param divider The divider component.
+ * @param out_node Pointer to store the underlying UI node.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_divider_get_node(cmp_ui_divider_t *divider,
@@ -97,8 +103,8 @@ int cmp_ui_divider_get_node(cmp_ui_divider_t *divider,
 /**
  * @brief cmp_ui_divider_bind_a11y
  *
- * @param widget Parameter description.
- * @param tree Parameter description.
+ * @param widget The component.
+ * @param tree The accessibility tree.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_divider_bind_a11y(cmp_ui_divider_t *widget, cmp_a11y_tree_t *tree) {

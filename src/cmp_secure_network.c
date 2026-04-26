@@ -4,17 +4,39 @@
 #include <string.h>
 
 #if defined(_WIN32)
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
 #if defined(_MSC_VER) && _MSC_VER <= 1400
 /* MSVC 2005 missing wincred.h */
 #else
-#include <wincred.h>
 #include "cmp_log.h"
 #pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "credui.lib")
+
+typedef unsigned long DWORD;
+typedef unsigned char BYTE;
+typedef void* PVOID;
+
+typedef struct _CREDENTIALA {
+    DWORD Flags;
+    DWORD Type;
+    char* TargetName;
+    char* Comment;
+    struct {
+        DWORD dwLowDateTime;
+        DWORD dwHighDateTime;
+    } LastWritten;
+    DWORD CredentialBlobSize;
+    BYTE* CredentialBlob;
+    DWORD Persist;
+    DWORD AttributeCount;
+    PVOID Attributes;
+    char* TargetAlias;
+    char* UserName;
+} CREDENTIALA, *PCREDENTIALA;
+
+__declspec(dllimport) int __stdcall CredReadA(const char* TargetName, DWORD Type, DWORD Flags, PCREDENTIALA* Credential);
+__declspec(dllimport) void __stdcall CredFree(PVOID Buffer);
+
+#define CRED_TYPE_GENERIC 1
 #endif
 #endif
 
@@ -26,20 +48,23 @@ struct cmp_secure_network {
 };
 
 /**
- * @brief cmp_secure_network_create
+ * @brief Allocates and initializes a secure network context.
  *
- * @param out_net Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param out_net A pointer to a pointer that will hold the created network
+ * context.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_secure_network_create(cmp_secure_network_t **out_net) {
   int rc = CMP_SUCCESS;
   cmp_secure_network_t *net;
-  if (!out_net)
+  if (!out_net) {
+    LOG_DEBUG("cmp_secure_network_create: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   rc = CMP_MALLOC(sizeof(cmp_secure_network_t), (void **)&(net));
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("OOM\n");
+    LOG_DEBUG("cmp_secure_network_create: OOM\n");
     return CMP_ERROR_OOM;
   }
 
@@ -51,34 +76,40 @@ int cmp_secure_network_create(cmp_secure_network_t **out_net) {
 }
 
 /**
- * @brief cmp_secure_network_destroy
+ * @brief Destroys a secure network context and frees its memory.
  *
- * @param net Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param net The network context to destroy.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_secure_network_destroy(cmp_secure_network_t *net) {
   int rc = CMP_SUCCESS;
-  if (!net)
+  if (!net) {
+    LOG_DEBUG("cmp_secure_network_destroy: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
   rc = CMP_FREE(net);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Free failed\n");
+    LOG_DEBUG("cmp_secure_network_destroy: Free failed with code %d\n", rc);
+    return rc;
   }
   return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_secure_network_send_https
+ * @brief Sends an HTTPS request using the given network context.
  *
- * @param net Parameter description.
- * @param url Parameter description.
- * @param out_status_code Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param net The secure network context.
+ * @param url The URL to send the request to.
+ * @param out_status_code A pointer to an int that will hold the HTTP status
+ * code.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_secure_network_send_https(cmp_secure_network_t *net, const char *url,
                                   int *out_status_code) {
-  if (!net || !url || !out_status_code)
+  if (!net || !url || !out_status_code) {
+    LOG_DEBUG("cmp_secure_network_send_https: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   /* Real integration uses c_abstract_http logic to negotiate TLS 1.3 socket */
 
@@ -87,16 +118,18 @@ int cmp_secure_network_send_https(cmp_secure_network_t *net, const char *url,
 }
 
 /**
- * @brief cmp_secure_network_set_proxy
+ * @brief Sets a proxy for the secure network context.
  *
- * @param net Parameter description.
- * @param proxy_url Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param net The secure network context.
+ * @param proxy_url The proxy URL string to set.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_secure_network_set_proxy(cmp_secure_network_t *net,
                                  const char *proxy_url) {
-  if (!net || !proxy_url)
+  if (!net || !proxy_url) {
+    LOG_DEBUG("cmp_secure_network_set_proxy: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   strncpy(net->proxy_url, proxy_url, 255);
   net->proxy_url[255] = '\0';
@@ -106,17 +139,19 @@ int cmp_secure_network_set_proxy(cmp_secure_network_t *net,
 }
 
 /**
- * @brief cmp_secure_network_retrieve_credential
+ * @brief Retrieves a credential from the system's secure store.
  *
- * @param key_name Parameter description.
- * @param out_secret Parameter description.
- * @param max_len Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param key_name The name/key of the credential to retrieve.
+ * @param out_secret A buffer to hold the retrieved secret.
+ * @param max_len The maximum length of the out_secret buffer.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_secure_network_retrieve_credential(const char *key_name,
                                            char *out_secret, size_t max_len) {
-  if (!key_name || !out_secret || max_len == 0)
+  if (!key_name || !out_secret || max_len == 0) {
+    LOG_DEBUG("cmp_secure_network_retrieve_credential: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
 #if defined(_WIN32)
 #if defined(_MSC_VER) && _MSC_VER <= 1400
@@ -138,5 +173,6 @@ int cmp_secure_network_retrieve_credential(const char *key_name,
 #endif
 #endif
 
+  LOG_DEBUG("cmp_secure_network_retrieve_credential: Not found\n");
   return CMP_ERROR_NOT_FOUND;
 }

@@ -20,26 +20,28 @@ struct cmp_caret {
  */
 int cmp_caret_create(cmp_caret_t **out_caret) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_caret *caret = NULL;
 
-  if (!out_caret) {
+  if (out_caret == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_caret_create: Invalid argument (out_caret=NULL): %s\n",
-                err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_caret_create: Invalid argument (out_caret=NULL): %s\n",
+                  err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_caret), (void **)&caret);
   if (rc != CMP_SUCCESS) {
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_caret_create: Out of memory: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_caret_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
@@ -48,6 +50,7 @@ int cmp_caret_create(cmp_caret_t **out_caret) {
   caret->is_visible = 1;
 
   *out_caret = (cmp_caret_t *)caret;
+  cmp_log_debug("cmp_caret_create: Successfully created caret context\n");
   return rc;
 }
 
@@ -59,20 +62,23 @@ int cmp_caret_create(cmp_caret_t **out_caret) {
  */
 int cmp_caret_destroy(cmp_caret_t *caret) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_caret *internal_caret = (struct cmp_caret *)caret;
 
-  if (!internal_caret) {
+  if (internal_caret == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_caret_destroy: Invalid argument (caret=NULL): %s\n",
-                err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_caret_destroy: Invalid argument (caret=NULL): %s\n",
+                  err_str);
     return rc;
   }
 
   CMP_FREE(internal_caret);
+  cmp_log_debug("cmp_caret_destroy: Successfully destroyed caret context\n");
   return rc;
 }
 
@@ -87,15 +93,17 @@ int cmp_caret_destroy(cmp_caret_t *caret) {
 int cmp_caret_update_blink(cmp_caret_t *caret, double dt_ms,
                            int *out_is_visible) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_caret *internal_caret = (struct cmp_caret *)caret;
 
-  if (!internal_caret || !out_is_visible || dt_ms < 0.0) {
+  if (internal_caret == NULL || out_is_visible == NULL || dt_ms < 0.0) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_caret_update_blink: Invalid argument: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_caret_update_blink: Invalid argument: %s\n", err_str);
     return rc;
   }
 
@@ -107,6 +115,7 @@ int cmp_caret_update_blink(cmp_caret_t *caret, double dt_ms,
   }
 
   *out_is_visible = internal_caret->is_visible;
-
+  cmp_log_debug("cmp_caret_update_blink: Updated caret blink, visible=%d\n",
+                *out_is_visible);
   return rc;
 }

@@ -20,16 +20,26 @@ struct cmp_edge_swipe {
 int cmp_gesture_require_failure(cmp_gesture_t *primary_gesture,
                                 cmp_gesture_t *other_gesture_to_fail) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!primary_gesture || !other_gesture_to_fail) {
+  if (primary_gesture == NULL || other_gesture_to_fail == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_gesture_require_failure: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_gesture_require_failure: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
+
   /* Internally tracks a dependency graph between recognizers.
      If primary_gesture enters BEGAN state, other_gesture is forced into
      CANCELLED. */
-  return rc;
+  cmp_log_debug(
+      "cmp_gesture_require_failure: Associated gesture failure dependency\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -43,15 +53,25 @@ int cmp_gesture_require_failure(cmp_gesture_t *primary_gesture,
 int cmp_complex_gesture_set_zoom_limits(cmp_complex_gesture_t *gesture_opaque,
                                         float min_scale, float max_scale) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!gesture_opaque || min_scale >= max_scale) {
+  if (gesture_opaque == NULL || min_scale >= max_scale) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_complex_gesture_set_zoom_limits: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_complex_gesture_set_zoom_limits: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
+
   /* Configure limits inside the opaque struct */
-  return rc;
+  cmp_log_debug(
+      "cmp_complex_gesture_set_zoom_limits: Set zoom limits to %.2f-%.2f\n",
+      min_scale, max_scale);
+  return CMP_SUCCESS;
 }
 
 /**
@@ -67,18 +87,29 @@ int cmp_complex_gesture_get_zoom(const cmp_complex_gesture_t *gesture_opaque,
                                  float *out_centroid_x, float *out_centroid_y,
                                  float *out_scale) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!gesture_opaque || !out_centroid_x || !out_centroid_y || !out_scale) {
+  if (gesture_opaque == NULL || out_centroid_x == NULL ||
+      out_centroid_y == NULL || out_scale == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_complex_gesture_get_zoom: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_complex_gesture_get_zoom: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
+
   /* In reality, calculates centroid from active touches and derives ratio from
    * initial distance */
   *out_centroid_x = 0.0f;
   *out_centroid_y = 0.0f;
   *out_scale = 1.0f;
-  return rc;
+
+  cmp_log_debug("cmp_complex_gesture_get_zoom: Got zoom data\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -91,15 +122,26 @@ int cmp_complex_gesture_get_zoom(const cmp_complex_gesture_t *gesture_opaque,
 int cmp_complex_gesture_set_rotation_snapping(
     cmp_complex_gesture_t *gesture_opaque, int enable_snapping) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
+
   (void)enable_snapping;
 
-  if (!gesture_opaque) {
+  if (gesture_opaque == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_complex_gesture_set_rotation_snapping: Invalid "
-              "argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_complex_gesture_set_rotation_snapping: Invalid argument: %s\n",
+        err_str);
     return rc;
   }
-  return rc;
+
+  cmp_log_debug(
+      "cmp_complex_gesture_set_rotation_snapping: Configured snapping\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -112,14 +154,23 @@ int cmp_complex_gesture_set_rotation_snapping(
 int cmp_complex_gesture_get_rotation(
     const cmp_complex_gesture_t *gesture_opaque, float *out_radians) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!gesture_opaque || !out_radians) {
+  if (gesture_opaque == NULL || out_radians == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_complex_gesture_get_rotation: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_complex_gesture_get_rotation: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
+
   *out_radians = 0.0f;
-  return rc;
+  cmp_log_debug("cmp_complex_gesture_get_rotation: Got rotation data\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -131,17 +182,27 @@ int cmp_complex_gesture_get_rotation(
  */
 int cmp_edge_swipe_create(cmp_edge_swipe_t **out_swipe, cmp_router_t *router) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_edge_swipe *ctx = NULL;
 
-  if (!out_swipe || !router) {
+  if (out_swipe == NULL || router == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_edge_swipe_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_edge_swipe_create: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_edge_swipe), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_edge_swipe_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_edge_swipe_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
@@ -149,7 +210,9 @@ int cmp_edge_swipe_create(cmp_edge_swipe_t **out_swipe, cmp_router_t *router) {
   ctx->pop_progress = 0.0f;
 
   *out_swipe = (cmp_edge_swipe_t *)ctx;
-  return rc;
+  cmp_log_debug(
+      "cmp_edge_swipe_create: Successfully created edge swipe context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -160,11 +223,27 @@ int cmp_edge_swipe_create(cmp_edge_swipe_t **out_swipe, cmp_router_t *router) {
  */
 int cmp_edge_swipe_destroy(cmp_edge_swipe_t *swipe_opaque) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (swipe_opaque) {
-    CMP_FREE(swipe_opaque);
+  if (swipe_opaque == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_edge_swipe_destroy: Invalid argument: %s\n", err_str);
+    return rc;
   }
-  return rc;
+
+  rc = CMP_FREE(swipe_opaque);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_edge_swipe_destroy: CMP_FREE failed\n");
+  }
+
+  cmp_log_debug(
+      "cmp_edge_swipe_destroy: Successfully destroyed edge swipe context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -179,20 +258,28 @@ int cmp_edge_swipe_destroy(cmp_edge_swipe_t *swipe_opaque) {
 int cmp_edge_swipe_process(cmp_edge_swipe_t *swipe_opaque, float touch_x,
                            float screen_width, cmp_gesture_state_t state) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_edge_swipe *ctx = (struct cmp_edge_swipe *)swipe_opaque;
   float threshold;
 
-  if (!ctx || screen_width <= 0.0f) {
+  if (ctx == NULL || screen_width <= 0.0f) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_edge_swipe_process: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_edge_swipe_process: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   ctx->pop_progress = touch_x / screen_width;
-  if (ctx->pop_progress < 0.0f)
+  if (ctx->pop_progress < 0.0f) {
     ctx->pop_progress = 0.0f;
-  if (ctx->pop_progress > 1.0f)
+  }
+  if (ctx->pop_progress > 1.0f) {
     ctx->pop_progress = 1.0f;
+  }
 
   if (state == CMP_GESTURE_STATE_ENDED ||
       state == CMP_GESTURE_STATE_CANCELLED) {
@@ -201,7 +288,12 @@ int cmp_edge_swipe_process(cmp_edge_swipe_t *swipe_opaque, float touch_x,
       /* Commit the pop */
       rc = cmp_router_pop(ctx->router);
       if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("Error in cmp_edge_swipe_process: Router pop failed\n");
+        err_rc = cmp_strerror(rc, &err_str);
+        if (err_rc != CMP_SUCCESS) {
+          err_str = "Unknown";
+        }
+        cmp_log_debug("cmp_edge_swipe_process: Router pop failed: %s\n",
+                      err_str);
       }
       return rc;
     } else {
@@ -210,7 +302,8 @@ int cmp_edge_swipe_process(cmp_edge_swipe_t *swipe_opaque, float touch_x,
     }
   }
 
-  return rc;
+  cmp_log_debug("cmp_edge_swipe_process: Processed swipe\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -223,11 +316,18 @@ int cmp_edge_swipe_process(cmp_edge_swipe_t *swipe_opaque, float touch_x,
 int cmp_gesture_cancel_on_system_override(cmp_gesture_t *gesture_opaque,
                                           int active_touches_count) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!gesture_opaque) {
+  if (gesture_opaque == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_gesture_cancel_on_system_override: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_gesture_cancel_on_system_override: Invalid argument: %s\n",
+        err_str);
     return rc;
   }
 
@@ -236,8 +336,12 @@ int cmp_gesture_cancel_on_system_override(cmp_gesture_t *gesture_opaque,
     /* Forcing cancellation ensures UI does not conflict with OS multitasking
      * gestures */
     /* internally triggers CMP_GESTURE_STATE_CANCELLED */
-    return rc;
+    cmp_log_debug(
+        "cmp_gesture_cancel_on_system_override: System override triggered\n");
+    return CMP_SUCCESS;
   }
 
-  return rc;
+  cmp_log_debug(
+      "cmp_gesture_cancel_on_system_override: No override required\n");
+  return CMP_SUCCESS;
 }

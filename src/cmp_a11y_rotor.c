@@ -27,26 +27,28 @@ struct cmp_a11y_rotor {
  */
 int cmp_a11y_rotor_create(cmp_a11y_tree_t *tree, cmp_a11y_rotor_t **out_rotor) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_rotor *rotor = NULL;
 
-  if (!tree || !out_rotor) {
+  if (tree == NULL || out_rotor == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_a11y_rotor_create: Invalid argument: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_a11y_rotor_create: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_a11y_rotor), (void **)&rotor);
   if (rc != CMP_SUCCESS) {
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_a11y_rotor_create: Out of memory allocating : %s\n",
-                err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_a11y_rotor_create: Out of memory allocating : %s\n",
+                  err_str);
     return rc;
   }
 
@@ -56,6 +58,8 @@ int cmp_a11y_rotor_create(cmp_a11y_tree_t *tree, cmp_a11y_rotor_t **out_rotor) {
   rotor->capacity = 0;
 
   *out_rotor = (cmp_a11y_rotor_t *)rotor;
+  cmp_log_debug(
+      "cmp_a11y_rotor_create: Successfully created a11y rotor context\n");
   return rc;
 }
 
@@ -67,24 +71,29 @@ int cmp_a11y_rotor_create(cmp_a11y_tree_t *tree, cmp_a11y_rotor_t **out_rotor) {
  */
 int cmp_a11y_rotor_destroy(cmp_a11y_rotor_t *rotor) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_rotor *r = (struct cmp_a11y_rotor *)rotor;
 
-  if (!r) {
+  if (r == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_a11y_rotor_destroy: Invalid argument (rotor=NULL): %s\n",
-                err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_a11y_rotor_destroy: Invalid argument (rotor=NULL): %s\n",
+                  err_str);
     return rc;
   }
 
-  if (r->nodes) {
+  if (r->nodes != NULL) {
+    cmp_log_debug("cmp_a11y_rotor_destroy: Freeing nodes array\n");
     CMP_FREE(r->nodes);
   }
 
   CMP_FREE(r);
+  cmp_log_debug(
+      "cmp_a11y_rotor_destroy: Successfully destroyed a11y rotor context\n");
   return rc;
 }
 
@@ -99,32 +108,41 @@ int cmp_a11y_rotor_destroy(cmp_a11y_rotor_t *rotor) {
 int cmp_a11y_rotor_register_node(cmp_a11y_rotor_t *rotor, int node_id,
                                  cmp_a11y_rotor_category_t category) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_rotor *r = (struct cmp_a11y_rotor *)rotor;
   cmp_a11y_rotor_node_t *new_nodes = NULL;
   size_t new_capacity;
 
-  if (!r) {
+  if (r == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_rotor_register_node: Invalid argument "
-                    "(rotor=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_a11y_rotor_register_node: Invalid argument (rotor=NULL): %s\n",
+        err_str);
     return rc;
   }
 
   if (r->count >= r->capacity) {
     new_capacity = r->capacity == 0 ? 16 : r->capacity * 2;
+    cmp_log_debug("cmp_a11y_rotor_register_node: Growing capacity to %u\n",
+                  (unsigned int)new_capacity);
     rc = CMP_MALLOC(new_capacity * sizeof(cmp_a11y_rotor_node_t),
                     (void **)&new_nodes);
     if (rc != CMP_SUCCESS) {
-      {
-        const char *err_str;
-        cmp_strerror(rc, &err_str);
-        LOG_DEBUG("cmp_a11y_rotor_register_node: Out of memory : %s\n",
-                  err_str);
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
       }
+      cmp_log_debug("cmp_a11y_rotor_register_node: Out of memory : %s\n",
+                    err_str);
       return rc;
     }
 
-    if (r->nodes) {
+    if (r->nodes != NULL) {
       memcpy(new_nodes, r->nodes, r->count * sizeof(cmp_a11y_rotor_node_t));
       CMP_FREE(r->nodes);
     }
@@ -136,6 +154,9 @@ int cmp_a11y_rotor_register_node(cmp_a11y_rotor_t *rotor, int node_id,
   r->nodes[r->count].category = category;
   r->count++;
 
+  cmp_log_debug(
+      "cmp_a11y_rotor_register_node: Registered node %d with category %d\n",
+      node_id, (int)category);
   return rc;
 }
 
@@ -153,17 +174,19 @@ int cmp_a11y_rotor_get_nodes(cmp_a11y_rotor_t *rotor,
                              cmp_a11y_rotor_category_t category,
                              int *out_node_ids, int max_nodes, int *out_count) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_rotor *r = (struct cmp_a11y_rotor *)rotor;
   size_t i;
   int count = 0;
 
-  if (!r || !out_node_ids || !out_count || max_nodes < 0) {
+  if (r == NULL || out_node_ids == NULL || out_count == NULL || max_nodes < 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_a11y_rotor_get_nodes: Invalid argument: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_a11y_rotor_get_nodes: Invalid argument: %s\n", err_str);
     return rc;
   }
 
@@ -171,11 +194,15 @@ int cmp_a11y_rotor_get_nodes(cmp_a11y_rotor_t *rotor,
     if (r->nodes[i].category == category) {
       if (count < max_nodes) {
         out_node_ids[count] = r->nodes[i].node_id;
+        cmp_log_debug("cmp_a11y_rotor_get_nodes: Added node %d to output\n",
+                      r->nodes[i].node_id);
       }
       count++;
     }
   }
 
   *out_count = count;
+  cmp_log_debug("cmp_a11y_rotor_get_nodes: Found %d nodes for category %d\n",
+                count, (int)category);
   return rc;
 }

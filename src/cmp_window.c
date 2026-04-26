@@ -1333,7 +1333,11 @@ int cmp_window_create(const cmp_window_config_t *config,
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_window_create: %s\n", err_str);
     }
     return rc;
@@ -1345,7 +1349,11 @@ int cmp_window_create(const cmp_window_config_t *config,
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_window_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -1457,7 +1465,11 @@ int cmp_window_set_drop_callback(cmp_window_t *window,
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_window_set_drop_callback: %s\n", err_str);
     }
     return rc;
@@ -1483,7 +1495,11 @@ int cmp_window_set_resize_callback(cmp_window_t *window,
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_window_set_resize_callback: %s\n", err_str);
     }
     return rc;
@@ -1505,7 +1521,11 @@ int cmp_window_show(cmp_window_t *window) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_window_show: %s\n", err_str);
     }
     return rc;
@@ -1531,7 +1551,11 @@ int cmp_window_poll_events(cmp_window_t *window) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_window_poll_events: %s\n", err_str);
     }
     return rc;
@@ -2259,7 +2283,11 @@ int cmp_window_destroy(cmp_window_t *window) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_window_destroy: %s\n", err_str);
     }
     return rc;
@@ -3095,7 +3123,11 @@ int cmp_window_set_ui_tree(cmp_window_t *window, cmp_ui_node_t *tree) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_window_set_ui_tree: %s\n", err_str);
     }
     return rc;

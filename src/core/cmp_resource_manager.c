@@ -42,7 +42,10 @@ int cmp_resource_manager_destroy(cmp_resource_manager_t *rm_opaque) {
   int rc;
   if (!rm_opaque) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_resource_manager_destroy: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_resource_manager_destroy: %s\n", err_str);
  }    return rc;
   }
   CMP_FREE(rm_opaque);

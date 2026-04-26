@@ -31,14 +31,33 @@ TEST test_action_button(void) {
 TEST test_fab(void) {
   cmp_ui_fab_t *fab;
   cmp_ui_node_t *node;
+  cmp_a11y_tree_t *tree;
 
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_fab_create(NULL, "add_icon"),
+                "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_fab_create(&fab, "add_icon"), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_fab_get_node(NULL, &node), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_fab_get_node(fab, NULL), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_fab_get_node(fab, &node), "%d");
   ASSERT(node != NULL);
 
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_fab_set_icon(NULL, "edit_icon"),
+                "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_fab_set_icon(fab, "edit_icon"), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_fab_set_icon(fab, NULL), "%d");
 
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_a11y_tree_create(&tree), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_fab_bind_a11y(NULL, tree), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_fab_bind_a11y(fab, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_fab_bind_a11y(fab, tree), "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_a11y_tree_destroy(tree), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_fab_destroy(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_fab_destroy(fab), "%d");
+
+  /* Test NULL icon name */
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_fab_create(&fab, NULL), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_fab_destroy(fab), "%d");
 
   PASS();

@@ -1,17 +1,25 @@
+/* clang-format off */
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
 #include "cmp.h"
+#include "cmp_log.h"
 /**
  * @brief cmp_coroutine_system_init
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_coroutine_system_init(void) { return CMP_SUCCESS; }
+int cmp_coroutine_system_init(void) { 
+  cmp_log_debug("cmp_coroutine_system_init: Stub on DOS\n");
+  return CMP_SUCCESS; 
+}
 /**
  * @brief cmp_coroutine_system_shutdown
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_coroutine_system_shutdown(void) { return CMP_SUCCESS; }
+int cmp_coroutine_system_shutdown(void) { 
+  cmp_log_debug("cmp_coroutine_system_shutdown: Stub on DOS\n");
+  return CMP_SUCCESS; 
+}
 /**
  * @brief cmp_coroutine_create
  *
@@ -23,6 +31,11 @@ int cmp_coroutine_system_shutdown(void) { return CMP_SUCCESS; }
  */
 int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
                          cmp_coroutine_fn_t fn, void *arg) {
+  (void)out_co;
+  (void)stack_size;
+  (void)fn;
+  (void)arg;
+  cmp_log_debug("cmp_coroutine_create: Stub on DOS\n");
   return CMP_ERROR_NOT_FOUND;
 }
 /**
@@ -31,21 +44,33 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
  * @param co Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_coroutine_resume(cmp_coroutine_t *co) { return CMP_ERROR_NOT_FOUND; }
+int cmp_coroutine_resume(cmp_coroutine_t *co) { 
+  (void)co;
+  cmp_log_debug("cmp_coroutine_resume: Stub on DOS\n");
+  return CMP_ERROR_NOT_FOUND; 
+}
 /**
  * @brief cmp_coroutine_yield
  *
  * @param co Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_coroutine_yield(cmp_coroutine_t *co) { return CMP_ERROR_NOT_FOUND; }
+int cmp_coroutine_yield(cmp_coroutine_t *co) { 
+  (void)co;
+  cmp_log_debug("cmp_coroutine_yield: Stub on DOS\n");
+  return CMP_ERROR_NOT_FOUND; 
+}
 /**
  * @brief cmp_coroutine_destroy
  *
  * @param co Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_coroutine_destroy(cmp_coroutine_t *co) { return CMP_ERROR_NOT_FOUND; }
+int cmp_coroutine_destroy(cmp_coroutine_t *co) { 
+  (void)co;
+  cmp_log_debug("cmp_coroutine_destroy: Stub on DOS\n");
+  return CMP_ERROR_NOT_FOUND; 
+}
 
 #else
 /* clang-format off */
@@ -58,7 +83,8 @@ int cmp_coroutine_destroy(cmp_coroutine_t *co) { return CMP_ERROR_NOT_FOUND; }
 
 #if defined(_WIN32)
 __declspec(dllimport) void *__stdcall ConvertThreadToFiber(void *lpParameter);
-__declspec(dllimport) void *__stdcall CreateFiber(size_t dwStackSize, void (__stdcall *lpStartAddress)(void *), void *lpParameter);
+__declspec(dllimport) void *__stdcall CreateFiber(size_t dwStackSize, void (__stdcall *lpStartAddress)(void *), 
+void *lpParameter);
 __declspec(dllimport) void __stdcall SwitchToFiber(void *lpFiber);
 __declspec(dllimport) void __stdcall DeleteFiber(void *lpFiber);
 __declspec(dllimport) unsigned long __stdcall GetLastError(void);
@@ -117,7 +143,11 @@ static void __stdcall cmp_fiber_entry(void *arg) {
 
   /* Switch back to the caller fiber */
   if (co->caller != NULL) {
-    cmp_tls_set(g_coro_system_key, co->caller);
+    int rc;
+    rc = cmp_tls_set(g_coro_system_key, co->caller);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_fiber_entry: cmp_tls_set failed\n");
+    }
     SwitchToFiber(co->caller->context);
   }
 }
@@ -134,8 +164,7 @@ int cmp_coroutine_system_init(void) {
   if (!g_coro_system_initialized) {
     rc = cmp_tls_key_create(&g_coro_system_key);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG(
-          "Error in cmp_coroutine_system_init: Failed to create TLS key\n");
+      cmp_log_debug("cmp_coroutine_system_init: Failed to create TLS key\n");
       return CMP_ERROR_OOM;
     }
     g_coro_system_initialized = 1;
@@ -146,13 +175,24 @@ int cmp_coroutine_system_init(void) {
       (void *)0x1E00) { /* Magic value for non-fiber on some Windows */
     main_fiber = ConvertThreadToFiber(NULL);
     if (main_fiber == NULL && GetLastError() != 0) {
-      LOG_DEBUG(
-          "Error in cmp_coroutine_system_init: ConvertThreadToFiber failed\n");
+      cmp_log_debug("cmp_coroutine_system_init: ConvertThreadToFiber failed\n");
       return CMP_ERROR_INVALID_ARG;
     }
   }
 
+  cmp_log_debug("cmp_coroutine_system_init: Thread initialized as Fiber\n");
   return rc;
+}
+
+/**
+ * @brief cmp_coroutine_system_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_coroutine_system_shutdown(void) {
+  cmp_log_debug("cmp_coroutine_system_shutdown: Teardown skipped on Windows "
+                "Fiber mock\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -171,13 +211,13 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
 
   if (out_co == NULL || fn == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_coroutine_create: Invalid argument\n");
+    cmp_log_debug("cmp_coroutine_create: Invalid argument\n");
     return rc;
   }
 
   if (!g_coro_system_initialized) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_coroutine_create: System not initialized\n");
+    cmp_log_debug("cmp_coroutine_create: System not initialized\n");
     return rc; /* System not initialized on this thread */
   }
 
@@ -187,8 +227,7 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
 
   rc = CMP_MALLOC(sizeof(cmp_coroutine_t), (void **)&co);
   if (rc != CMP_SUCCESS || co == NULL) {
-    LOG_DEBUG(
-        "Error in cmp_coroutine_create: Out of memory allocating coroutine\n");
+    cmp_log_debug("cmp_coroutine_create: Out of memory allocating coroutine\n");
     return CMP_ERROR_OOM;
   }
 
@@ -201,13 +240,17 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
 
   co->context = CreateFiber(stack_size, cmp_fiber_entry, co);
   if (co->context == NULL) {
-    CMP_FREE(co);
+    rc = CMP_FREE(co);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_create: CMP_FREE failed during recovery\n");
+    }
     rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_coroutine_create: CreateFiber failed\n");
+    cmp_log_debug("cmp_coroutine_create: CreateFiber failed\n");
     return rc;
   }
 
   *out_co = co;
+  cmp_log_debug("cmp_coroutine_create: Successfully created fiber coroutine\n");
   return rc;
 }
 
@@ -223,7 +266,7 @@ int cmp_coroutine_resume(cmp_coroutine_t *co) {
 
   if (co == NULL || co->state == CMP_CORO_FINISHED) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_coroutine_resume: Invalid argument or finished\n");
+    cmp_log_debug("cmp_coroutine_resume: Invalid argument or finished\n");
     return rc;
   }
 
@@ -246,13 +289,21 @@ int cmp_coroutine_resume(cmp_coroutine_t *co) {
       co->caller = current_co;
     }
 
-    cmp_tls_set(g_coro_system_key, co);
+    rc = cmp_tls_set(g_coro_system_key, co);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_resume: cmp_tls_set failed\n");
+      return rc;
+    }
     SwitchToFiber(co->context);
 
     /* When we return here, we are back in the caller */
-    cmp_tls_set(g_coro_system_key, current_co);
+    rc = cmp_tls_set(g_coro_system_key, current_co);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_resume: cmp_tls_set restore failed\n");
+    }
   }
 
+  cmp_log_debug("cmp_coroutine_resume: Resumed execution cleanly\n");
   return rc;
 }
 
@@ -267,14 +318,19 @@ int cmp_coroutine_yield(cmp_coroutine_t *co) {
 
   if (co == NULL || co->caller == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_coroutine_yield: Invalid argument\n");
+    cmp_log_debug("cmp_coroutine_yield: Invalid argument\n");
     return rc;
   }
 
   co->state = CMP_CORO_SUSPENDED;
-  cmp_tls_set(g_coro_system_key, co->caller);
+  rc = cmp_tls_set(g_coro_system_key, co->caller);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_coroutine_yield: cmp_tls_set failed\n");
+    return rc;
+  }
   SwitchToFiber(co->caller->context);
 
+  cmp_log_debug("cmp_coroutine_yield: Yielded fiber cleanly\n");
   return rc;
 }
 
@@ -289,7 +345,7 @@ int cmp_coroutine_destroy(cmp_coroutine_t *co) {
 
   if (co == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_coroutine_destroy: Invalid argument (co=NULL)\n");
+    cmp_log_debug("cmp_coroutine_destroy: Invalid argument (co=NULL)\n");
     return rc;
   }
 
@@ -298,8 +354,13 @@ int cmp_coroutine_destroy(cmp_coroutine_t *co) {
     co->context = NULL;
   }
 
-  CMP_FREE(co);
-  return rc;
+  rc = CMP_FREE(co);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_coroutine_destroy: CMP_FREE failed\n");
+  }
+
+  cmp_log_debug("cmp_coroutine_destroy: Successfully destroyed fiber\n");
+  return CMP_SUCCESS;
 }
 
 #else
@@ -327,7 +388,11 @@ static void cmp_ucontext_entry(int arg_ptr_lo, int arg_ptr_hi) {
   co->state = CMP_CORO_FINISHED;
 
   if (co->caller != NULL) {
-    cmp_tls_set(g_coro_system_key, co->caller);
+    int rc;
+    rc = cmp_tls_set(g_coro_system_key, co->caller);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_ucontext_entry: cmp_tls_set failed\n");
+    }
     setcontext((ucontext_t *)co->caller->context);
   }
 }
@@ -343,13 +408,23 @@ int cmp_coroutine_system_init(void) {
   if (!g_coro_system_initialized) {
     rc = cmp_tls_key_create(&g_coro_system_key);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG(
-          "Error in cmp_coroutine_system_init: Failed to create TLS key\n");
+      cmp_log_debug("cmp_coroutine_system_init: Failed to create TLS key\n");
       return CMP_ERROR_OOM;
     }
     g_coro_system_initialized = 1;
   }
+  cmp_log_debug("cmp_coroutine_system_init: System init successful\n");
   return rc;
+}
+
+/**
+ * @brief cmp_coroutine_system_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_coroutine_system_shutdown(void) {
+  cmp_log_debug("cmp_coroutine_system_shutdown: System shutdown successful\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -370,13 +445,13 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
 
   if (out_co == NULL || fn == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_coroutine_create: Invalid argument\n");
+    cmp_log_debug("cmp_coroutine_create: Invalid argument\n");
     return rc;
   }
 
   if (!g_coro_system_initialized) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_coroutine_create: System not initialized\n");
+    cmp_log_debug("cmp_coroutine_create: System not initialized\n");
     return rc;
   }
 
@@ -386,25 +461,31 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
 
   rc = CMP_MALLOC(sizeof(cmp_coroutine_t), (void **)&co);
   if (rc != CMP_SUCCESS || co == NULL) {
-    LOG_DEBUG(
-        "Error in cmp_coroutine_create: Out of memory allocating coroutine\n");
+    cmp_log_debug("cmp_coroutine_create: Out of memory allocating coroutine\n");
     return CMP_ERROR_OOM;
   }
 
   rc = CMP_MALLOC(sizeof(ucontext_t), (void **)&co->context);
   if (rc != CMP_SUCCESS || co->context == NULL) {
-    CMP_FREE(co);
-    LOG_DEBUG(
-        "Error in cmp_coroutine_create: Out of memory allocating ucontext\n");
+    rc = CMP_FREE(co);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_create: CMP_FREE failed\n");
+    }
+    cmp_log_debug("cmp_coroutine_create: Out of memory allocating ucontext\n");
     return CMP_ERROR_OOM;
   }
 
   rc = CMP_MALLOC(stack_size, (void **)&co->stack);
   if (rc != CMP_SUCCESS || co->stack == NULL) {
-    CMP_FREE(co->context);
-    CMP_FREE(co);
-    LOG_DEBUG(
-        "Error in cmp_coroutine_create: Out of memory allocating stack\n");
+    rc = CMP_FREE(co->context);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_create: CMP_FREE ctx failed\n");
+    }
+    rc = CMP_FREE(co);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_create: CMP_FREE co failed\n");
+    }
+    cmp_log_debug("cmp_coroutine_create: Out of memory allocating stack\n");
     return CMP_ERROR_OOM;
   }
 
@@ -416,11 +497,20 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
 
   uc = (ucontext_t *)co->context;
   if (getcontext(uc) != 0) {
-    CMP_FREE(co->stack);
-    CMP_FREE(co->context);
-    CMP_FREE(co);
+    rc = CMP_FREE(co->stack);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_create: CMP_FREE stack failed\n");
+    }
+    rc = CMP_FREE(co->context);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_create: CMP_FREE ctx failed\n");
+    }
+    rc = CMP_FREE(co);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_create: CMP_FREE co failed\n");
+    }
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_coroutine_create: getcontext failed\n");
+    cmp_log_debug("cmp_coroutine_create: getcontext failed\n");
     return rc;
   }
 
@@ -435,7 +525,9 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
               (int)(uint32_t)(ptr_val >> 32));
 
   *out_co = co;
-  return rc;
+  cmp_log_debug(
+      "cmp_coroutine_create: Successfully created ucontext coroutine\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -451,7 +543,7 @@ int cmp_coroutine_resume(cmp_coroutine_t *co) {
 
   if (co == NULL || co->state == CMP_CORO_FINISHED) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_coroutine_resume: Invalid argument or finished\n");
+    cmp_log_debug("cmp_coroutine_resume: Invalid argument or finished\n");
     return rc;
   }
 
@@ -463,17 +555,32 @@ int cmp_coroutine_resume(cmp_coroutine_t *co) {
     cmp_coroutine_t main_co;
     main_co.context = &main_ctx;
     co->caller = &main_co;
-    cmp_tls_set(g_coro_system_key, co);
+    rc = cmp_tls_set(g_coro_system_key, co);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_resume: cmp_tls_set failed\n");
+      return rc;
+    }
     swapcontext(&main_ctx, (ucontext_t *)co->context);
-    cmp_tls_set(g_coro_system_key, NULL);
+    rc = cmp_tls_set(g_coro_system_key, NULL);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_resume: cmp_tls_set NULL failed\n");
+    }
   } else {
     co->caller = current_co;
-    cmp_tls_set(g_coro_system_key, co);
+    rc = cmp_tls_set(g_coro_system_key, co);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_resume: cmp_tls_set failed\n");
+      return rc;
+    }
     swapcontext((ucontext_t *)current_co->context, (ucontext_t *)co->context);
-    cmp_tls_set(g_coro_system_key, current_co);
+    rc = cmp_tls_set(g_coro_system_key, current_co);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_resume: cmp_tls_set restore failed\n");
+    }
   }
 
-  return rc;
+  cmp_log_debug("cmp_coroutine_resume: Successfully resumed execution\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -487,15 +594,20 @@ int cmp_coroutine_yield(cmp_coroutine_t *co) {
 
   if (co == NULL || co->caller == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_coroutine_yield: Invalid argument\n");
+    cmp_log_debug("cmp_coroutine_yield: Invalid argument\n");
     return rc;
   }
 
   co->state = CMP_CORO_SUSPENDED;
-  cmp_tls_set(g_coro_system_key, co->caller);
+  rc = cmp_tls_set(g_coro_system_key, co->caller);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_coroutine_yield: cmp_tls_set failed\n");
+    return rc;
+  }
   swapcontext((ucontext_t *)co->context, (ucontext_t *)co->caller->context);
 
-  return rc;
+  cmp_log_debug("cmp_coroutine_yield: Yielded ucontext cleanly\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -509,22 +621,33 @@ int cmp_coroutine_destroy(cmp_coroutine_t *co) {
 
   if (co == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_coroutine_destroy: Invalid argument (co=NULL)\n");
+    cmp_log_debug("cmp_coroutine_destroy: Invalid argument (co=NULL)\n");
     return rc;
   }
 
   if (co->stack != NULL) {
-    CMP_FREE(co->stack);
+    rc = CMP_FREE(co->stack);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_destroy: CMP_FREE stack failed\n");
+    }
     co->stack = NULL;
   }
 
   if (co->context != NULL) {
-    CMP_FREE(co->context);
+    rc = CMP_FREE(co->context);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_coroutine_destroy: CMP_FREE context failed\n");
+    }
     co->context = NULL;
   }
 
-  CMP_FREE(co);
-  return rc;
+  rc = CMP_FREE(co);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_coroutine_destroy: CMP_FREE co failed\n");
+  }
+
+  cmp_log_debug("cmp_coroutine_destroy: Successfully destroyed ucontext\n");
+  return CMP_SUCCESS;
 }
 
 #endif /* POSIX vs WIN32 */
@@ -538,9 +661,19 @@ int cmp_coroutine_destroy(cmp_coroutine_t *co) {
  */
 int cmp_coroutine_system_init(void) {
   int rc = CMP_ERROR_NOT_FOUND;
-  LOG_DEBUG("Error in cmp_coroutine_system_init: Coroutines not supported on "
-            "this platform\n");
+  cmp_log_debug("cmp_coroutine_system_init: Coroutines not supported on "
+                "this platform\n");
   return rc;
+}
+/**
+ * @brief cmp_coroutine_system_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_coroutine_system_shutdown(void) {
+  cmp_log_debug("cmp_coroutine_system_shutdown: Coroutines not supported on "
+                "this platform\n");
+  return CMP_SUCCESS;
 }
 /**
  * @brief cmp_coroutine_create
@@ -558,8 +691,8 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
   (void)stack_size;
   (void)fn;
   (void)arg;
-  LOG_DEBUG("Error in cmp_coroutine_create: Coroutines not supported on this "
-            "platform\n");
+  cmp_log_debug("cmp_coroutine_create: Coroutines not supported on this "
+                "platform\n");
   return rc;
 }
 /**
@@ -571,8 +704,8 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
 int cmp_coroutine_resume(cmp_coroutine_t *co) {
   int rc = CMP_ERROR_NOT_FOUND;
   (void)co;
-  LOG_DEBUG("Error in cmp_coroutine_resume: Coroutines not supported on this "
-            "platform\n");
+  cmp_log_debug("cmp_coroutine_resume: Coroutines not supported on this "
+                "platform\n");
   return rc;
 }
 /**
@@ -584,8 +717,8 @@ int cmp_coroutine_resume(cmp_coroutine_t *co) {
 int cmp_coroutine_yield(cmp_coroutine_t *co) {
   int rc = CMP_ERROR_NOT_FOUND;
   (void)co;
-  LOG_DEBUG("Error in cmp_coroutine_yield: Coroutines not supported on this "
-            "platform\n");
+  cmp_log_debug("cmp_coroutine_yield: Coroutines not supported on this "
+                "platform\n");
   return rc;
 }
 /**
@@ -597,8 +730,8 @@ int cmp_coroutine_yield(cmp_coroutine_t *co) {
 int cmp_coroutine_destroy(cmp_coroutine_t *co) {
   int rc = CMP_ERROR_NOT_FOUND;
   (void)co;
-  LOG_DEBUG("Error in cmp_coroutine_destroy: Coroutines not supported on this "
-            "platform\n");
+  cmp_log_debug("cmp_coroutine_destroy: Coroutines not supported on this "
+                "platform\n");
   return rc;
 }
 

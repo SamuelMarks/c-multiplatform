@@ -69,7 +69,9 @@ TEST test_log_debug(void) {
 
 TEST test_dump_stack_trace(void) {
   /* Call to ensure it doesn't crash on various platforms */
-  cmp_dump_stack_trace();
+  int rc;
+  rc = cmp_dump_stack_trace();
+  ASSERT_EQ(0, rc);
   PASS();
 }
 
@@ -105,6 +107,13 @@ SUITE(error_suite) {
 
 GREATEST_MAIN_DEFS();
 
+static void crash_assert_handler(const char *msg, const char *file, int line) {
+  (void)msg;
+  (void)file;
+  (void)line;
+  exit(1);
+}
+
 int main(int argc, char **argv) {
   int *p = NULL;
 
@@ -114,6 +123,7 @@ int main(int argc, char **argv) {
     return 0;
   }
   if (argc > 1 && strcmp(argv[1], "--assert") == 0) {
+    cmp_set_assert_handler(crash_assert_handler);
     CMP_ASSERT(0 == 1); /* Trigger assert fail */
     return 0;
   }

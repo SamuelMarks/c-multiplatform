@@ -30,7 +30,8 @@ TEST test_a11y_tree_null_args(void) {
   res = cmp_a11y_tree_add_node(NULL, 1, "button", "Submit");
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_tree_get_node_desc(NULL, 1, buf, 64);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
@@ -41,7 +42,8 @@ TEST test_a11y_tree_null_args(void) {
   res = cmp_a11y_tree_get_node_desc(tree, 1, buf, 0);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 
@@ -50,7 +52,8 @@ TEST test_a11y_tree_operations(void) {
   int res;
   char buf[128];
 
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_tree_add_node(tree, 10, "button", "Submit");
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -80,7 +83,8 @@ TEST test_a11y_tree_operations(void) {
   res = cmp_a11y_tree_get_node_desc(tree, 10, buf, 5);
   ASSERT_EQ(CMP_ERROR_BOUNDS, res);
 
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 
@@ -88,7 +92,8 @@ TEST test_a11y_tree_apple_compliance(void) {
   cmp_a11y_tree_t *tree = NULL;
   int res;
 
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_tree_add_node(tree, 42, "button", "Submit");
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -136,7 +141,8 @@ TEST test_a11y_tree_apple_compliance(void) {
   res = cmp_a11y_tree_set_node_label(tree, 42, NULL);
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 
@@ -144,7 +150,8 @@ TEST test_a11y_tree_grouping_focus_rotors_actions(void) {
   cmp_a11y_tree_t *tree = NULL;
   int res;
 
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_tree_add_node(tree, 55, "group", "Group Node");
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -195,7 +202,8 @@ TEST test_a11y_tree_grouping_focus_rotors_actions(void) {
   res = cmp_a11y_tree_set_node_grouped(tree, 999, 1);
   ASSERT_EQ(CMP_ERROR_NOT_FOUND, res);
 
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 
@@ -203,7 +211,8 @@ TEST test_a11y_tree_braille_audio_pronunciation_touch_announcement(void) {
   cmp_a11y_tree_t *tree = NULL;
   int res;
 
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_tree_add_node(tree, 66, "textfield", "Input");
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -256,7 +265,8 @@ TEST test_a11y_tree_braille_audio_pronunciation_touch_announcement(void) {
   res = cmp_a11y_tree_set_node_direct_touch(tree, 999, 1);
   ASSERT_EQ(CMP_ERROR_NOT_FOUND, res);
 
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 
@@ -264,7 +274,8 @@ TEST test_a11y_tree_cognitive_motion_sound(void) {
   cmp_a11y_tree_t *tree = NULL;
   int res;
 
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_tree_add_node(tree, 77, "button", "Submit");
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -316,12 +327,14 @@ TEST test_a11y_tree_cognitive_motion_sound(void) {
   res = cmp_a11y_tree_set_node_sound_caption(tree, 999, "Ding!");
   ASSERT_EQ(CMP_ERROR_NOT_FOUND, res);
 
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 TEST test_a11y_theme_semantic_equivalence(void) {
   cmp_a11y_tree_t *tree = NULL;
   cmp_ui_node_t *node = NULL;
+  int res;
   char buf1[256];
   char buf2[256];
 
@@ -343,7 +356,8 @@ TEST test_a11y_theme_semantic_equivalence(void) {
   ASSERT_STR_EQ(buf1, buf2);
 
   cmp_ui_node_destroy(node);
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 

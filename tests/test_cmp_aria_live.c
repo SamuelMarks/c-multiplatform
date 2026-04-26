@@ -8,7 +8,8 @@ TEST test_aria_live_lifecycle(void) {
   cmp_a11y_tree_t *tree = NULL;
   cmp_aria_live_t *live = NULL;
   int res;
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_aria_live_create(tree, &live);
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -17,7 +18,8 @@ TEST test_aria_live_lifecycle(void) {
   res = cmp_aria_live_destroy(live);
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 
@@ -25,7 +27,8 @@ TEST test_aria_live_null_args(void) {
   cmp_a11y_tree_t *tree = NULL;
   cmp_aria_live_t *live = NULL;
   int res;
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_aria_live_create(NULL, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
@@ -39,7 +42,8 @@ TEST test_aria_live_null_args(void) {
   res = cmp_aria_live_destroy(NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_aria_live_create(tree, &live);
+  res = cmp_aria_live_create(tree, &live);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_aria_live_set_mode(NULL, 1, CMP_ARIA_LIVE_POLITE);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
@@ -50,8 +54,10 @@ TEST test_aria_live_null_args(void) {
   res = cmp_aria_live_announce(live, 1, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_aria_live_destroy(live);
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_aria_live_destroy(live);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 
@@ -59,9 +65,11 @@ TEST test_aria_live_operations(void) {
   cmp_a11y_tree_t *tree = NULL;
   cmp_aria_live_t *live = NULL;
   int res;
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
-  cmp_aria_live_create(tree, &live);
+  res = cmp_aria_live_create(tree, &live);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_aria_live_set_mode(live, 10, CMP_ARIA_LIVE_POLITE);
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -82,8 +90,10 @@ TEST test_aria_live_operations(void) {
   res = cmp_aria_live_announce(live, 30, "Unknown Node");
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  cmp_aria_live_destroy(live);
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_aria_live_destroy(live);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 

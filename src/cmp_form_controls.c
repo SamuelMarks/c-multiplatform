@@ -18,25 +18,38 @@ struct cmp_form_controls {
  */
 int cmp_form_controls_create(cmp_form_controls_t **out_controls) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_form_controls *controls = NULL;
 
-  if (!out_controls) {
+  if (out_controls == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_form_controls_create: Invalid argument "
-              "(out_controls=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_form_controls_create: Invalid argument (out_controls=NULL): %s\n",
+        err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_form_controls), (void **)&controls);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_form_controls_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_form_controls_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
   memset(controls, 0, sizeof(struct cmp_form_controls));
 
   *out_controls = (cmp_form_controls_t *)controls;
-  return rc;
+  cmp_log_debug(
+      "cmp_form_controls_create: Successfully created form controls context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -47,16 +60,27 @@ int cmp_form_controls_create(cmp_form_controls_t **out_controls) {
  */
 int cmp_form_controls_destroy(cmp_form_controls_t *controls) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_form_controls *internal_controls =
       (struct cmp_form_controls *)controls;
 
-  if (!internal_controls) {
+  if (internal_controls == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_form_controls_destroy: Invalid argument "
-              "(controls=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_form_controls_destroy: Invalid argument: %s\n", err_str);
     return rc;
   }
 
-  CMP_FREE(internal_controls);
-  return rc;
+  rc = CMP_FREE(internal_controls);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_form_controls_destroy: CMP_FREE failed\n");
+  }
+
+  cmp_log_debug("cmp_form_controls_destroy: Successfully destroyed form "
+                "controls context\n");
+  return CMP_SUCCESS;
 }

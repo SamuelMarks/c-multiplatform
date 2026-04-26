@@ -17,28 +17,37 @@ struct cmp_carplay_features {
  */
 int cmp_carplay_features_create(cmp_carplay_features_t **out_features) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_carplay_features *ctx = NULL;
 
-  if (!out_features) {
+  if (out_features == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_carplay_features_create: Invalid argument "
-                    "(out_features=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_carplay_features_create: Invalid argument "
+                  "(out_features=NULL): %s\n",
+                  err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_carplay_features), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_carplay_features_create: Out of memory: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_carplay_features_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
   ctx->is_offline = 0;
 
   *out_features = (cmp_carplay_features_t *)ctx;
+  cmp_log_debug("cmp_carplay_features_create: Successfully created carplay "
+                "features context\n");
   return rc;
 }
 
@@ -50,9 +59,23 @@ int cmp_carplay_features_create(cmp_carplay_features_t **out_features) {
  */
 int cmp_carplay_features_destroy(cmp_carplay_features_t *features_opaque) {
   int rc = CMP_SUCCESS;
-  if (features_opaque) {
-    CMP_FREE(features_opaque);
+  int err_rc;
+  const char *err_str;
+
+  if (features_opaque == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_carplay_features_destroy: Invalid argument: %s\n",
+                  err_str);
+    return rc;
   }
+
+  CMP_FREE(features_opaque);
+  cmp_log_debug("cmp_carplay_features_destroy: Successfully destroyed carplay "
+                "features context\n");
   return rc;
 }
 
@@ -66,21 +89,24 @@ int cmp_carplay_features_destroy(cmp_carplay_features_t *features_opaque) {
 int cmp_carplay_apply_driving_focus(cmp_carplay_features_t *features_opaque,
                                     void *node) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_carplay_features *ctx =
       (struct cmp_carplay_features *)features_opaque;
 
-  if (!ctx || !node) {
+  if (ctx == NULL || node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_carplay_apply_driving_focus: Invalid argument: %s\n",
-                err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_carplay_apply_driving_focus: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   /* Applies high contrast and massive touch targets */
+  cmp_log_debug("cmp_carplay_apply_driving_focus: Applied driving focus\n");
   return rc;
 }
 
@@ -96,22 +122,25 @@ int cmp_carplay_export_template_data(cmp_carplay_features_t *features_opaque,
                                      const char *template_type,
                                      const char *json_data) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_carplay_features *ctx =
       (struct cmp_carplay_features *)features_opaque;
 
-  if (!ctx || !template_type || !json_data) {
+  if (ctx == NULL || template_type == NULL || json_data == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_carplay_export_template_data: Invalid argument: %s\n",
-                err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_carplay_export_template_data: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   /* Translates internal UI tree into standard CarPlay system templates (List,
    * Grid, Map) */
+  cmp_log_debug("cmp_carplay_export_template_data: Exported template data\n");
   return rc;
 }
 
@@ -125,21 +154,24 @@ int cmp_carplay_export_template_data(cmp_carplay_features_t *features_opaque,
 int cmp_carplay_handle_siri_intent(cmp_carplay_features_t *features_opaque,
                                    const char *intent_id) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_carplay_features *ctx =
       (struct cmp_carplay_features *)features_opaque;
 
-  if (!ctx || !intent_id) {
+  if (ctx == NULL || intent_id == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_carplay_handle_siri_intent: Invalid argument: %s\n",
-                err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_carplay_handle_siri_intent: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   /* Executes critical actions purely via voice */
+  cmp_log_debug("cmp_carplay_handle_siri_intent: Handled siri intent\n");
   return rc;
 }
 
@@ -153,21 +185,25 @@ int cmp_carplay_handle_siri_intent(cmp_carplay_features_t *features_opaque,
 int cmp_carplay_handle_knob_navigation(cmp_carplay_features_t *features_opaque,
                                        float delta) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_carplay_features *ctx =
       (struct cmp_carplay_features *)features_opaque;
 
-  if (!ctx || delta == 0.0f) {
+  if (ctx == NULL || delta == 0.0f) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_carplay_handle_knob_navigation: Invalid argument: %s\n",
-                err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_carplay_handle_knob_navigation: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   /* Translates rotary knob input to focus engine movement */
+  cmp_log_debug(
+      "cmp_carplay_handle_knob_navigation: Handled knob navigation\n");
   return rc;
 }
 
@@ -181,21 +217,25 @@ int cmp_carplay_handle_knob_navigation(cmp_carplay_features_t *features_opaque,
 int cmp_carplay_set_network_status(cmp_carplay_features_t *features_opaque,
                                    int is_online) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_carplay_features *ctx =
       (struct cmp_carplay_features *)features_opaque;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_carplay_set_network_status: Invalid argument: %s\n",
-                err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_carplay_set_network_status: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   ctx->is_offline = !is_online;
   /* Suppresses blocking alerts and degrades gracefully for tunnels */
+  cmp_log_debug("cmp_carplay_set_network_status: Set network status to %d\n",
+                is_online);
   return rc;
 }

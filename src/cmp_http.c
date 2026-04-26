@@ -10,556 +10,337 @@ extern int transport_factory_init_client(struct HttpClient *client);
 static int g_http_initialized = 0;
 
 /**
- * @brief cmp_http_init
+ * @brief Initialize global networking subsystem.
  *
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_init(void) {
-  int rc = CMP_SUCCESS;
+  int rc = 0;
   if (g_http_initialized) {
+    return 0;
+  }
+
+  rc = c_abstract_http_global_init();
+  if (rc != 0) {
+    LOG_DEBUG("Error in cmp_http_init: c_abstract_http_global_init failed\n");
     return rc;
   }
   g_http_initialized = 1;
-  return rc;
+  return 0;
 }
 
 /**
- * @brief cmp_http_shutdown
+ * @brief Shut down global networking subsystem.
  *
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_shutdown(void) {
-  int rc = CMP_SUCCESS;
   if (!g_http_initialized) {
-    return rc;
+    return 0;
   }
+  c_abstract_http_global_cleanup();
   g_http_initialized = 0;
-  return rc;
+  return 0;
 }
 
 /**
- * @brief cmp_http_client_create
+ * @brief Create an HTTP client configured for the provided modality.
  *
- * @param mod Parameter description.
- * @param out_client Parameter description.
+ * @param mod The execution modality to bind the client to.
+ * @param out_client Pointer to receive the allocated client handle.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_client_create(cmp_modality_t *mod,
                            struct HttpClient **out_client) {
-  int rc = CMP_SUCCESS;
+  int rc = 0; /* CMP_SUCCESS */
   struct HttpClient *client = NULL;
-  enum ExecutionModality http_mod;
 
-  if (mod == NULL || out_client == NULL || !g_http_initialized) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_client_create: Invalid argument or not "
-              "initialized\n");
-    return rc;
+  if (!out_client) {
+    LOG_DEBUG("cmp_http_client_create: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
   }
-
-  /* Map cmp_modality_t to enum ExecutionModality */
-  switch (mod->type) {
-  case CMP_MODALITY_SYNC_SINGLE:
-    http_mod = MODALITY_SYNC;
-    break;
-  case CMP_MODALITY_SYNC_MULTI:
-    http_mod = MODALITY_THREAD_POOL;
-    break;
-  case CMP_MODALITY_ASYNC_SINGLE:
-  case CMP_MODALITY_ASYNC_MULTI:
-    http_mod = MODALITY_ASYNC;
-    break;
-  default:
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_client_create: Unknown modality type\n");
-    return rc;
-  }
+  *out_client = NULL;
 
   rc = CMP_MALLOC(sizeof(struct HttpClient), (void **)&client);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_http_client_create: Out of memory\n");
-    return rc;
+  if (rc != 0 || !client) {
+    LOG_DEBUG("cmp_http_client_create: CMP_MALLOC failed\n");
+    return CMP_ERROR_OOM;
   }
 
-  if (http_client_init(client) != 0) {
-    CMP_FREE(client);
-    rc = CMP_ERROR_NOT_FOUND; /* No general error code available */
-    LOG_DEBUG("Error in cmp_http_client_create: http_client_init failed\n");
-    return rc;
-  }
+  c_abstract_http_client_init(client);
 
-  if (transport_factory_init_client(client) != 0) {
-    http_client_free(client);
+  /* Set up transport using factory */
+  rc = transport_factory_init_client(client);
+  if (rc != 0) {
     CMP_FREE(client);
-    rc = CMP_ERROR_NOT_FOUND;
     LOG_DEBUG("Error in cmp_http_client_create: transport_factory_init_client "
               "failed\n");
     return rc;
   }
 
-  client->config.modality = http_mod;
+  /* Optional: Store modality context in client's internal structures if needed
+   * for async event loops. For now, c-abstract-http handles transport. */
+  if (mod) {
+    /* If the modality has an event loop (e.g. epoll), map the transport's
+     * sockets. (Platform specific bridging goes here) */
+  }
 
   *out_client = client;
-  return rc;
+  return 0;
 }
 
 /**
- * @brief cmp_http_client_destroy
+ * @brief Destroy an HTTP client.
  *
- * @param client Parameter description.
+ * @param client The client to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_client_destroy(struct HttpClient *client) {
-  int rc = CMP_SUCCESS;
-
-  if (client == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_client_destroy: Invalid argument\n");
-    return rc;
+  int rc = 0;
+  if (!client) {
+    LOG_DEBUG("cmp_http_client_destroy: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
   }
-
-  http_client_free(client);
-  CMP_FREE(client);
+  c_abstract_http_client_cleanup(client);
+  rc = CMP_FREE(client);
+  if (rc != 0) {
+    LOG_DEBUG("cmp_http_client_destroy: CMP_FREE failed\n");
+  }
   return rc;
 }
 
 /**
- * @brief cmp_http_request_init
+ * @brief Initialize an HTTP request.
  *
- * @param req Parameter description.
+ * @param req The request to initialize.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_request_init(struct HttpRequest *req) {
-  int rc = CMP_SUCCESS;
-
-  if (req == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_request_init: Invalid argument\n");
-    return rc;
+  if (!req) {
+    LOG_DEBUG("cmp_http_request_init: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
   }
-
-  if (http_request_init(req) != 0) {
-    rc = CMP_ERROR_NOT_FOUND;
-    LOG_DEBUG("Error in cmp_http_request_init: http_request_init failed\n");
-    return rc;
-  }
-
-  return rc;
+  c_abstract_http_request_init(req);
+  return 0;
 }
 
 /**
- * @brief cmp_http_request_free
+ * @brief Free resources associated with an HTTP request.
  *
- * @param req Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param req The request to free.
  */
 void cmp_http_request_free(struct HttpRequest *req) {
-  if (req != NULL) {
-    http_request_free(req);
+  if (req) {
+    c_abstract_http_request_cleanup(req);
   }
 }
 
 /**
- * @brief cmp_http_send
+ * @brief Free resources associated with an HTTP response.
  *
- * @param client Parameter description.
- * @param req Parameter description.
- * @param out_res Parameter description.
+ * @param res The response to free.
+ */
+void cmp_http_response_free(struct HttpResponse *res) {
+  int rc;
+  if (res) {
+    c_abstract_http_response_cleanup(res);
+    rc = CMP_FREE(res);
+    if (rc != 0) {
+      LOG_DEBUG("cmp_http_response_free: CMP_FREE failed\n");
+    }
+  }
+}
+
+/**
+ * @brief Execute a single HTTP request.
+ *
+ * @param client The HTTP client.
+ * @param req The request to execute.
+ * @param out_res Pointer to receive the allocated HTTP response.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_send(struct HttpClient *client, const struct HttpRequest *req,
                   struct HttpResponse **out_res) {
-  int rc = CMP_SUCCESS;
+  int rc = 0; /* CMP_SUCCESS */
+  struct HttpResponse *res = NULL;
 
-  if (client == NULL || req == NULL || out_res == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_send: Invalid argument\n");
-    return rc;
+  if (!client || !req || !out_res) {
+    LOG_DEBUG("cmp_http_send: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+  
+  *out_res = NULL;
+
+  rc = CMP_MALLOC(sizeof(struct HttpResponse), (void **)&res);
+  if (rc != 0 || !res) {
+    LOG_DEBUG("cmp_http_send: CMP_MALLOC failed\n");
+    return CMP_ERROR_OOM;
+  }
+  c_abstract_http_response_init(res);
+
+  rc = c_abstract_http_client_send(client, req, res);
+  if (rc != 0) {
+    LOG_DEBUG("Error in cmp_http_send: c_abstract_http_client_send failed\n");
+    c_abstract_http_response_cleanup(res);
+    CMP_FREE(res);
+    return CMP_ERROR_IO;
   }
 
-  if (client->send == NULL) {
-    rc = CMP_ERROR_NOT_FOUND;
-    LOG_DEBUG("Error in cmp_http_send: client->send is NULL\n");
-    return rc;
-  }
-
-  if (client->send(client->transport, req, out_res) != 0) {
-    rc = CMP_ERROR_NOT_FOUND;
-    LOG_DEBUG("Error in cmp_http_send: client->send failed\n");
-    return rc;
-  }
-
-  return rc;
-}
-
-struct cmp_http_progress_ctx {
-  int (*progress_cb)(float percentage, void *user_data);
-  void *user_data;
-};
-
-/**
- * @brief internal_http_chunk_cb
- *
- * @param user_data Parameter description.
- * @param chunk Parameter description.
- * @param chunk_len Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-static int internal_http_chunk_cb(void *user_data, const void *chunk,
-                                  size_t chunk_len) {
-  /* For now we just return 0 to continue reading. True progress
-     would require c-abstract-http exposing total content length
-     to the chunk cb, which we will handle in the future via headers. */
-  struct cmp_http_progress_ctx *ctx = (struct cmp_http_progress_ctx *)user_data;
-  (void)chunk;
-  (void)chunk_len;
-  if (ctx && ctx->progress_cb) {
-    /* Dummy progress tick for now */
-    if (ctx->progress_cb(50.0f, ctx->user_data) != 0) {
-      return 1; /* abort */
-    }
-  }
+  *out_res = res;
   return 0;
 }
 
 /**
- * @brief cmp_http_send_with_progress
+ * @brief Internal callback for progress tracking
+ */
+struct progress_ctx {
+  int (*progress_cb)(float percentage, void *user_data);
+  void *user_data;
+};
+
+static void on_progress_chunk(const unsigned char *chunk, size_t length,
+                              size_t total_received, size_t total_expected,
+                              void *user_data) {
+  struct progress_ctx *ctx = (struct progress_ctx *)user_data;
+  float percentage;
+
+  /* Keep compiler happy if variables unused in non-verbose builds */
+  (void)chunk;
+  (void)length;
+
+  if (ctx && ctx->progress_cb && total_expected > 0) {
+    percentage = ((float)total_received / (float)total_expected) * 100.0f;
+    ctx->progress_cb(percentage, ctx->user_data);
+  }
+}
+
+/**
+ * @brief Execute an HTTP request with progress callbacks.
  *
- * @param client Parameter description.
- * @param req Parameter description.
- * @param percentage Parameter description.
- * @param user_data) Parameter description.
- * @param user_data Parameter description.
- * @param out_res Parameter description.
+ * @param client The HTTP client.
+ * @param req The request to execute.
+ * @param progress_cb Callback to receive progress updates (0 to 100).
+ * @param user_data Data passed to the progress callback.
+ * @param out_res Pointer to receive the allocated HTTP response.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_http_send_with_progress(
-    struct HttpClient *client, struct HttpRequest *req,
-    int (*progress_cb)(float percentage, void *user_data), void *user_data,
-    struct HttpResponse **out_res) {
-  int rc = CMP_SUCCESS;
-  struct cmp_http_progress_ctx ctx;
+int cmp_http_send_with_progress(struct HttpClient *client,
+                                struct HttpRequest *req,
+                                int (*progress_cb)(float percentage,
+                                                   void *user_data),
+                                void *user_data,
+                                struct HttpResponse **out_res) {
+  int rc = 0; /* CMP_SUCCESS */
+  struct HttpResponse *res = NULL;
+  struct progress_ctx p_ctx;
 
-  if (client == NULL || req == NULL || out_res == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_send_with_progress: Invalid argument\n");
-    return rc;
+  if (!client || !req || !out_res) {
+    LOG_DEBUG("cmp_http_send_with_progress: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  ctx.progress_cb = progress_cb;
-  ctx.user_data = user_data;
+  *out_res = NULL;
+  p_ctx.progress_cb = progress_cb;
+  p_ctx.user_data = user_data;
 
-  req->on_chunk = internal_http_chunk_cb;
-  req->on_chunk_user_data = &ctx;
+  /* Attach the streaming chunk callback to c-abstract-http */
+  req->on_chunk = on_progress_chunk;
+  req->chunk_user_data = &p_ctx;
 
-  if (client->send == NULL) {
-    rc = CMP_ERROR_NOT_FOUND;
-    LOG_DEBUG("Error in cmp_http_send_with_progress: client->send is NULL\n");
-    return rc;
+  rc = CMP_MALLOC(sizeof(struct HttpResponse), (void **)&res);
+  if (rc != 0 || !res) {
+    LOG_DEBUG("cmp_http_send_with_progress: CMP_MALLOC failed\n");
+    return CMP_ERROR_OOM;
+  }
+  c_abstract_http_response_init(res);
+
+  rc = c_abstract_http_client_send(client, req, res);
+  if (rc != 0) {
+    LOG_DEBUG("Error in cmp_http_send_with_progress: "
+              "c_abstract_http_client_send failed\n");
+    c_abstract_http_response_cleanup(res);
+    CMP_FREE(res);
+    return CMP_ERROR_IO;
   }
 
-  if (client->send(client->transport, req, out_res) != 0) {
-    rc = CMP_ERROR_NOT_FOUND;
-    LOG_DEBUG("Error in cmp_http_send_with_progress: client->send failed\n");
-    return rc;
-  }
-
-  /* Final progress */
+  /* Trigger final 100% callback */
   if (progress_cb) {
     progress_cb(100.0f, user_data);
   }
 
-  return rc;
-}
-
-struct cmp_http_multi_progress_ctx {
-  int (*progress_cb)(float percentage, void *user_data);
-  void *user_data;
-};
-
-/**
- * @brief internal_http_multi_progress_cb
- *
- * @param current_bytes Parameter description.
- * @param total_bytes Parameter description.
- * @param user_data Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-static int internal_http_multi_progress_cb(size_t current_bytes,
-                                           size_t total_bytes,
-                                           void *user_data) {
-  struct cmp_http_multi_progress_ctx *ctx =
-      (struct cmp_http_multi_progress_ctx *)user_data;
-  if (ctx && ctx->progress_cb) {
-    float percentage = 0.0f;
-    if (total_bytes > 0) {
-      percentage = ((float)current_bytes / (float)total_bytes) * 100.0f;
-    }
-    if (ctx->progress_cb(percentage, ctx->user_data) != 0) {
-      return 1; /* Abort */
-    }
-  }
+  *out_res = res;
   return 0;
 }
 
 /**
- * @brief cmp_http_send_multi_with_progress
+ * @brief Initialize a WebSocket connection request.
  *
- * @param client Parameter description.
- * @param requests Parameter description.
- * @param num_requests Parameter description.
- * @param percentage Parameter description.
- * @param user_data) Parameter description.
- * @param user_data Parameter description.
- * @param out_responses Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_http_send_multi_with_progress(
-    struct HttpClient *client, struct HttpRequest *const *requests,
-    size_t num_requests, int (*progress_cb)(float percentage, void *user_data),
-    void *user_data, struct HttpResponse **out_responses) {
-  int rc = CMP_SUCCESS;
-  struct cmp_http_multi_progress_ctx ctx;
-  struct HttpFuture **futures = NULL;
-  size_t i;
-
-  if (client == NULL || requests == NULL || num_requests == 0 ||
-      out_responses == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_send_multi_with_progress: Invalid argument\n");
-    return rc;
-  }
-
-  rc =
-      CMP_MALLOC(sizeof(struct HttpFuture *) * num_requests, (void **)&futures);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_http_send_multi_with_progress: Out of memory\n");
-    return rc;
-  }
-
-  for (i = 0; i < num_requests; i++) {
-    rc = CMP_MALLOC(sizeof(struct HttpFuture), (void **)&futures[i]);
-    if (rc != CMP_SUCCESS) {
-      size_t j;
-      for (j = 0; j < i; j++) {
-        CMP_FREE(futures[j]);
-      }
-      CMP_FREE(futures);
-      LOG_DEBUG("Error in cmp_http_send_multi_with_progress: Out of memory "
-                "allocating future\n");
-      return rc;
-    }
-    http_future_init(futures[i]);
-  }
-
-  ctx.progress_cb = progress_cb;
-  ctx.user_data = user_data;
-
-  if (http_client_send_multi(client, requests, num_requests, futures,
-                             internal_http_multi_progress_cb, &ctx, 0) != 0) {
-    rc = CMP_ERROR_NOT_FOUND;
-    LOG_DEBUG("Error in cmp_http_send_multi_with_progress: "
-              "http_client_send_multi failed\n");
-  } else {
-    for (i = 0; i < num_requests; i++) {
-      out_responses[i] = futures[i]->response;
-    }
-  }
-
-  for (i = 0; i < num_requests; i++) {
-    /* We extract the response pointer so we don't free it with the future */
-    futures[i]->response = NULL;
-    http_future_free(futures[i]);
-    CMP_FREE(futures[i]);
-  }
-  CMP_FREE(futures);
-
-  return rc;
-}
-
-struct cmp_http_download_ctx {
-  int (*progress_cb)(float percentage, void *user_data);
-  void *user_data;
-  FILE *f;
-};
-
-/**
- * @brief internal_http_download_chunk_cb
- *
- * @param user_data Parameter description.
- * @param chunk Parameter description.
- * @param chunk_len Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-static int internal_http_download_chunk_cb(void *user_data, const void *chunk,
-                                           size_t chunk_len) {
-  struct cmp_http_download_ctx *ctx = (struct cmp_http_download_ctx *)user_data;
-
-  if (ctx && ctx->f && chunk && chunk_len > 0) {
-    fwrite(chunk, 1, chunk_len, ctx->f);
-  }
-
-  if (ctx && ctx->progress_cb) {
-    /* Dummy progress tick for now */
-    if (ctx->progress_cb(50.0f, ctx->user_data) != 0) {
-      return 1; /* abort */
-    }
-  }
-  return 0;
-}
-
-/**
- * @brief cmp_http_download
- *
- * @param client Parameter description.
- * @param url Parameter description.
- * @param save_virtual_path Parameter description.
- * @param percentage Parameter description.
- * @param user_data) Parameter description.
- * @param user_data Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_http_download(struct HttpClient *client, const char *url,
-                      const char *save_virtual_path,
-                      int (*progress_cb)(float percentage, void *user_data),
-                      void *user_data) {
-  int rc = CMP_SUCCESS;
-  struct HttpRequest req;
-  struct HttpResponse *res = NULL;
-  struct cmp_http_download_ctx ctx;
-  cmp_string_t resolved_path;
-  const cfs_char_t *native_path;
-  cfs_path p;
-
-  if (client == NULL || url == NULL || save_virtual_path == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_download: Invalid argument\n");
-    return rc;
-  }
-
-  rc = cmp_vfs_resolve_path(save_virtual_path, &resolved_path);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_http_download: cmp_vfs_resolve_path failed\n");
-    return rc;
-  }
-
-  cfs_path_init(&p);
-#if defined(_WIN32)
-  {
-    wchar_t *wpath = NULL;
-    cfs_size_t req_len = 0;
-    cfs_utf8_to_utf16(resolved_path.data, NULL, 0, &req_len);
-    if (req_len <= 0) {
-      cfs_path_destroy(&p);
-      cmp_string_destroy(&resolved_path);
-      rc = CMP_ERROR_INVALID_ARG;
-      LOG_DEBUG("Error in cmp_http_download: UTF8 to UTF16 failed\n");
-      return rc;
-    }
-    rc = CMP_MALLOC((size_t)req_len * sizeof(wchar_t), (void **)&wpath);
-    if (rc != CMP_SUCCESS) {
-      cfs_path_destroy(&p);
-      cmp_string_destroy(&resolved_path);
-      LOG_DEBUG("Error in cmp_http_download: Out of memory\n");
-      return rc;
-    }
-    cfs_utf8_to_utf16(resolved_path.data, wpath, req_len, NULL);
-    cfs_path_assign(&p, wpath);
-    CMP_FREE(wpath);
-  }
-#else
-  cfs_path_assign(&p, resolved_path.data);
-#endif
-
-  cmp_string_destroy(&resolved_path);
-  cfs_path_c_str(&p, &native_path);
-
-#if defined(_WIN32)
-  ctx.f = _wfopen(native_path, L"wb");
-#else
-  ctx.f = fopen(native_path, "wb");
-#endif
-  cfs_path_destroy(&p);
-
-  if (ctx.f == NULL) {
-    rc = CMP_ERROR_NOT_FOUND;
-    LOG_DEBUG("Error in cmp_http_download: Failed to open file for writing\n");
-    return rc;
-  }
-
-  ctx.progress_cb = progress_cb;
-  ctx.user_data = user_data;
-
-  if (http_request_init(&req) != 0) {
-    fclose(ctx.f);
-    rc = CMP_ERROR_NOT_FOUND;
-    LOG_DEBUG("Error in cmp_http_download: http_request_init failed\n");
-    return rc;
-  }
-
-  req.method = HTTP_GET;
-  req.url = (char *)url;
-  req.on_chunk = internal_http_download_chunk_cb;
-  req.on_chunk_user_data = &ctx;
-
-  if (client->send == NULL ||
-      client->send(client->transport, &req, &res) != 0) {
-    rc = CMP_ERROR_NOT_FOUND;
-    LOG_DEBUG("Error in cmp_http_download: HTTP send failed\n");
-  }
-
-  if (res != NULL) {
-    http_response_free(res);
-  }
-
-  req.url = NULL; /* Not allocated by us */
-  http_request_free(&req);
-  fclose(ctx.f);
-
-  if (rc == CMP_SUCCESS && progress_cb) {
-    progress_cb(100.0f, user_data);
-  }
-
-  return rc;
-}
-
-/**
- * @brief cmp_http_response_free
- *
- * @param res Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-void cmp_http_response_free(struct HttpResponse *res) {
-  if (res != NULL) {
-    http_response_free(res);
-  }
-}
-
-/**
- * @brief cmp_http_ws_init
- *
- * @param req Parameter description.
- * @param config Parameter description.
+ * @param req The HTTP request.
+ * @param config Optional WS config.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_ws_init(struct HttpRequest *req,
                      const struct c_abstract_http_ws_config *config) {
-  int rc = CMP_SUCCESS;
-
-  if (req == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_ws_init: Invalid argument\n");
-    return rc;
+  int rc;
+  if (!req) {
+    LOG_DEBUG("cmp_http_ws_init: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
   }
-  if (c_abstract_http_ws_init(req, config) != 0) {
-    rc = CMP_ERROR_INVALID_ARG; /* Map c-abstract-http errors to cmp errors */
-    LOG_DEBUG("Error in cmp_http_ws_init: c_abstract_http_ws_init failed\n");
-    return rc;
+  rc = c_abstract_http_ws_request_init(req, config);
+  if (rc != 0) {
+    LOG_DEBUG("cmp_http_ws_init: c_abstract_http_ws_request_init failed\n");
+    return CMP_ERROR_GENERAL;
   }
-  return rc;
+  return 0;
 }
 
-typedef struct {
+/**
+ * @brief Send a WebSocket frame.
+ *
+ * @param req The HTTP request connection handle.
+ * @param opcode The WebSocket opcode.
+ * @param payload The payload to send.
+ * @param len The length of the payload.
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_http_ws_send(struct HttpRequest *req,
+                     enum c_abstract_http_ws_opcode opcode,
+                     const unsigned char *payload, size_t len) {
+  int rc;
+  if (!req) {
+    LOG_DEBUG("cmp_http_ws_send: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+  rc = c_abstract_http_ws_send_frame(req, opcode, payload, len);
+  if (rc != 0) {
+    LOG_DEBUG("cmp_http_ws_send: c_abstract_http_ws_send_frame failed\n");
+    return CMP_ERROR_IO;
+  }
+  return 0;
+}
+
+/**
+ * @brief Close a WebSocket connection.
+ *
+ * @param req The HTTP request connection handle.
+ * @param status_code The closure status code.
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_http_ws_close(struct HttpRequest *req, int status_code) {
+  int rc;
+  if (!req) {
+    LOG_DEBUG("cmp_http_ws_close: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+  rc = c_abstract_http_ws_send_close(req, status_code);
+  if (rc != 0) {
+    LOG_DEBUG("cmp_http_ws_close: c_abstract_http_ws_send_close failed\n");
+    return CMP_ERROR_IO;
+  }
+  return 0;
+}
+
+struct cmp_ws_task_ctx {
   struct HttpClient *client;
   struct HttpRequest *req;
   c_abstract_http_ws_on_message on_msg;
@@ -567,33 +348,38 @@ typedef struct {
   c_abstract_http_ws_on_close on_close;
   void *user_data;
   volatile int *exit_flag;
-} cmp_http_ws_task_ctx_t;
+};
 
-/**
- * @brief cmp_http_ws_task
- *
- * @param arg Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
 static void cmp_http_ws_task(void *arg) {
-  cmp_http_ws_task_ctx_t *ctx = (cmp_http_ws_task_ctx_t *)arg;
-  c_abstract_http_ws_sync_read_loop(ctx->client, ctx->req, ctx->on_msg,
-                                    ctx->on_err, ctx->on_close, ctx->user_data,
-                                    ctx->exit_flag);
-  CMP_FREE(ctx);
+  struct cmp_ws_task_ctx *ctx = (struct cmp_ws_task_ctx *)arg;
+  int rc;
+  if (!ctx) {
+    return;
+  }
+  rc = c_abstract_http_ws_run_loop(ctx->client, ctx->req, ctx->on_msg,
+                                   ctx->on_err, ctx->on_close, ctx->user_data,
+                                   ctx->exit_flag);
+  if (rc != 0) {
+    LOG_DEBUG("cmp_http_ws_task: c_abstract_http_ws_run_loop returned error\n");
+  }
+  rc = CMP_FREE(ctx);
+  if (rc != 0) {
+    LOG_DEBUG("cmp_http_ws_task: CMP_FREE failed\n");
+  }
 }
 
 /**
- * @brief cmp_http_ws_run
+ * @brief Read WebSocket events synchronously or queue to modality.
  *
- * @param mod Parameter description.
- * @param client Parameter description.
- * @param req Parameter description.
- * @param on_msg Parameter description.
- * @param on_err Parameter description.
- * @param on_close Parameter description.
- * @param user_data Parameter description.
- * @param exit_flag Parameter description.
+ * @param mod The modality to execute on (if CMP_MODALITY_ASYNC_SINGLE, it
+ * registers it).
+ * @param client The HTTP client.
+ * @param req The HTTP request.
+ * @param on_msg Message callback.
+ * @param on_err Error callback.
+ * @param on_close Close callback.
+ * @param user_data Data for callbacks.
+ * @param exit_flag Optional flag to exit the read loop.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
@@ -602,29 +388,29 @@ int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
                     c_abstract_http_ws_on_error on_err,
                     c_abstract_http_ws_on_close on_close, void *user_data,
                     volatile int *exit_flag) {
-  int rc = CMP_SUCCESS;
+  int rc = 0; /* CMP_SUCCESS */
 
-  if (client == NULL || req == NULL || mod == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_ws_run: Invalid argument\n");
-    return rc;
+  if (!client || !req) {
+    LOG_DEBUG("cmp_http_ws_run: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
-      mod->type == CMP_MODALITY_ASYNC_MULTI) {
-    if (c_abstract_http_ws_async_register(client, req, on_msg, on_err, on_close,
-                                          user_data) != 0) {
-      rc = CMP_ERROR_INVALID_ARG;
-      LOG_DEBUG("Error in cmp_http_ws_run: c_abstract_http_ws_async_register "
+  if (!mod || mod->type == 3 /* CMP_MODALITY_SYNC_SINGLE */) {
+    /* Blocking execution on current thread */
+    rc = c_abstract_http_ws_run_loop(client, req, on_msg, on_err, on_close,
+                                     user_data, exit_flag);
+    if (rc != 0) {
+      LOG_DEBUG("Error in cmp_http_ws_run: c_abstract_http_ws_run_loop "
                 "failed\n");
-      return rc;
+      return CMP_ERROR_IO;
     }
   } else {
-    cmp_http_ws_task_ctx_t *ctx = NULL;
-    rc = CMP_MALLOC(sizeof(cmp_http_ws_task_ctx_t), (void **)&ctx);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Error in cmp_http_ws_run: Out of memory\n");
-      return rc;
+    /* Offload to modality engine */
+    struct cmp_ws_task_ctx *ctx = NULL;
+    rc = CMP_MALLOC(sizeof(struct cmp_ws_task_ctx), (void **)&ctx);
+    if (rc != 0 || !ctx) {
+      LOG_DEBUG("cmp_http_ws_run: CMP_MALLOC failed\n");
+      return CMP_ERROR_OOM;
     }
     ctx->client = client;
     ctx->req = req;
@@ -635,97 +421,39 @@ int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
     ctx->exit_flag = exit_flag;
 
     rc = cmp_modality_queue_task(mod, cmp_http_ws_task, ctx);
-    if (rc != CMP_SUCCESS) {
+    if (rc != 0) {
       CMP_FREE(ctx);
       LOG_DEBUG("Error in cmp_http_ws_run: cmp_modality_queue_task failed\n");
       return rc;
     }
   }
 
-  return rc;
+  return 0;
 }
 
 /**
- * @brief cmp_http_ws_send
+ * @brief Initialize an SSE stream request.
  *
- * @param req Parameter description.
- * @param opcode Parameter description.
- * @param payload Parameter description.
- * @param len Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_http_ws_send(struct HttpRequest *req,
-                     enum c_abstract_http_ws_opcode opcode,
-                     const unsigned char *payload, size_t len) {
-  int rc = CMP_SUCCESS;
-
-  if (req == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_ws_send: Invalid argument\n");
-    return rc;
-  }
-  /* For synchronous environments or thread pools, c_abstract_http_ws_send
-     writes to socket. For async event loops, c_abstract_http_ws_async_send
-     enqueues it. We default to async_send which abstracts this logic depending
-     on transport if possible, otherwise fallback to standard send. */
-  if (c_abstract_http_ws_async_send(req, opcode, payload, len) != 0) {
-    if (c_abstract_http_ws_send(req, opcode, payload, len) != 0) {
-      rc = CMP_ERROR_INVALID_ARG;
-      LOG_DEBUG("Error in cmp_http_ws_send: Failed to send WS payload\n");
-      return rc;
-    }
-  }
-  return rc;
-}
-
-/**
- * @brief cmp_http_ws_close
- *
- * @param req Parameter description.
- * @param status_code Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_http_ws_close(struct HttpRequest *req, int status_code) {
-  int rc = CMP_SUCCESS;
-
-  if (req == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_ws_close: Invalid argument\n");
-    return rc;
-  }
-  if (c_abstract_http_ws_close(req, status_code) != 0) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_ws_close: c_abstract_http_ws_close failed\n");
-    return rc;
-  }
-  return rc;
-}
-
-/**
- * @brief cmp_http_sse_init
- *
- * @param req Parameter description.
- * @param config Parameter description.
+ * @param req The HTTP request.
+ * @param config Optional SSE config.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_sse_init(struct HttpRequest *req,
                       const struct c_abstract_http_sse_config *config) {
-  int rc = CMP_SUCCESS;
-
-  if (req == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_sse_init: Invalid argument\n");
-    return rc;
+  int rc;
+  if (!req) {
+    LOG_DEBUG("cmp_http_sse_init: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
   }
-  if (c_abstract_http_sse_init(req, config) != 0) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_sse_init: c_abstract_http_sse_init failed\n");
-    return rc;
+  rc = c_abstract_http_sse_request_init(req, config);
+  if (rc != 0) {
+    LOG_DEBUG("cmp_http_sse_init: c_abstract_http_sse_request_init failed\n");
+    return CMP_ERROR_GENERAL;
   }
-  return rc;
+  return 0;
 }
 
-typedef struct {
+struct cmp_sse_task_ctx {
   struct HttpClient *client;
   struct HttpRequest *req;
   c_abstract_http_sse_on_event on_evt;
@@ -733,33 +461,38 @@ typedef struct {
   c_abstract_http_sse_on_close on_close;
   void *user_data;
   volatile int *exit_flag;
-} cmp_http_sse_task_ctx_t;
+};
 
-/**
- * @brief cmp_http_sse_task
- *
- * @param arg Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
 static void cmp_http_sse_task(void *arg) {
-  cmp_http_sse_task_ctx_t *ctx = (cmp_http_sse_task_ctx_t *)arg;
-  c_abstract_http_sse_sync_read_loop(ctx->client, ctx->req, ctx->on_evt,
-                                     ctx->on_err, ctx->on_close, ctx->user_data,
-                                     ctx->exit_flag);
-  CMP_FREE(ctx);
+  struct cmp_sse_task_ctx *ctx = (struct cmp_sse_task_ctx *)arg;
+  int rc;
+  if (!ctx) {
+    return;
+  }
+  rc = c_abstract_http_sse_run_loop(ctx->client, ctx->req, ctx->on_evt,
+                                    ctx->on_err, ctx->on_close, ctx->user_data,
+                                    ctx->exit_flag);
+  if (rc != 0) {
+    LOG_DEBUG(
+        "cmp_http_sse_task: c_abstract_http_sse_run_loop returned error\n");
+  }
+  rc = CMP_FREE(ctx);
+  if (rc != 0) {
+    LOG_DEBUG("cmp_http_sse_task: CMP_FREE failed\n");
+  }
 }
 
 /**
- * @brief cmp_http_sse_run
+ * @brief Read SSE events synchronously or queue to modality.
  *
- * @param mod Parameter description.
- * @param client Parameter description.
- * @param req Parameter description.
- * @param on_evt Parameter description.
- * @param on_err Parameter description.
- * @param on_close Parameter description.
- * @param user_data Parameter description.
- * @param exit_flag Parameter description.
+ * @param mod The modality to execute on.
+ * @param client The HTTP client.
+ * @param req The HTTP request.
+ * @param on_evt Event callback.
+ * @param on_err Error callback.
+ * @param on_close Close callback.
+ * @param user_data Data for callbacks.
+ * @param exit_flag Optional flag to exit the read loop.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_sse_run(cmp_modality_t *mod, struct HttpClient *client,
@@ -768,29 +501,29 @@ int cmp_http_sse_run(cmp_modality_t *mod, struct HttpClient *client,
                      c_abstract_http_sse_on_error on_err,
                      c_abstract_http_sse_on_close on_close, void *user_data,
                      volatile int *exit_flag) {
-  int rc = CMP_SUCCESS;
+  int rc = 0; /* CMP_SUCCESS */
 
-  if (client == NULL || req == NULL || mod == NULL) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_http_sse_run: Invalid argument\n");
-    return rc;
+  if (!client || !req) {
+    LOG_DEBUG("cmp_http_sse_run: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  if (mod->type == CMP_MODALITY_ASYNC_SINGLE ||
-      mod->type == CMP_MODALITY_ASYNC_MULTI) {
-    if (c_abstract_http_sse_async_register(client, req, on_evt, on_err,
-                                           on_close, user_data) != 0) {
-      rc = CMP_ERROR_INVALID_ARG;
-      LOG_DEBUG("Error in cmp_http_sse_run: c_abstract_http_sse_async_register "
+  if (!mod || mod->type == 3 /* CMP_MODALITY_SYNC_SINGLE */) {
+    /* Blocking execution */
+    rc = c_abstract_http_sse_run_loop(client, req, on_evt, on_err, on_close,
+                                      user_data, exit_flag);
+    if (rc != 0) {
+      LOG_DEBUG("Error in cmp_http_sse_run: c_abstract_http_sse_run_loop "
                 "failed\n");
-      return rc;
+      return CMP_ERROR_IO;
     }
   } else {
-    cmp_http_sse_task_ctx_t *ctx = NULL;
-    rc = CMP_MALLOC(sizeof(cmp_http_sse_task_ctx_t), (void **)&ctx);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Error in cmp_http_sse_run: Out of memory\n");
-      return rc;
+    /* Async offload */
+    struct cmp_sse_task_ctx *ctx = NULL;
+    rc = CMP_MALLOC(sizeof(struct cmp_sse_task_ctx), (void **)&ctx);
+    if (rc != 0 || !ctx) {
+      LOG_DEBUG("cmp_http_sse_run: CMP_MALLOC failed\n");
+      return CMP_ERROR_OOM;
     }
     ctx->client = client;
     ctx->req = req;
@@ -801,12 +534,12 @@ int cmp_http_sse_run(cmp_modality_t *mod, struct HttpClient *client,
     ctx->exit_flag = exit_flag;
 
     rc = cmp_modality_queue_task(mod, cmp_http_sse_task, ctx);
-    if (rc != CMP_SUCCESS) {
+    if (rc != 0) {
       CMP_FREE(ctx);
       LOG_DEBUG("Error in cmp_http_sse_run: cmp_modality_queue_task failed\n");
       return rc;
     }
   }
 
-  return rc;
+  return 0;
 }

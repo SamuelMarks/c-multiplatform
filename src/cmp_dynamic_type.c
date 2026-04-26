@@ -16,23 +16,34 @@ struct cmp_dynamic_type {
  */
 int cmp_dynamic_type_create(cmp_dynamic_type_t **out_dynamic_type) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_dynamic_type *dt = NULL;
 
-  if (!out_dynamic_type) {
+  if (out_dynamic_type == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_dynamic_type_create: Invalid argument "
-              "(out_dynamic_type=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_dynamic_type_create: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_dynamic_type), (void **)&dt);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_dynamic_type_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_dynamic_type_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
   dt->category = CMP_A11Y_CONTENT_SIZE_LARGE; /* Default */
   *out_dynamic_type = (cmp_dynamic_type_t *)dt;
+  cmp_log_debug(
+      "cmp_dynamic_type_create: Successfully created dynamic type context\n");
   return rc;
 }
 
@@ -44,10 +55,27 @@ int cmp_dynamic_type_create(cmp_dynamic_type_t **out_dynamic_type) {
  */
 int cmp_dynamic_type_destroy(cmp_dynamic_type_t *dynamic_type) {
   int rc = CMP_SUCCESS;
-  if (dynamic_type) {
-    CMP_FREE(dynamic_type);
+  int err_rc;
+  const char *err_str;
+
+  if (dynamic_type == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_dynamic_type_destroy: Invalid argument: %s\n", err_str);
+    return rc;
   }
-  return rc;
+
+  rc = CMP_FREE(dynamic_type);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_dynamic_type_destroy: CMP_FREE failed\n");
+  }
+
+  cmp_log_debug("cmp_dynamic_type_destroy: Successfully destroyed dynamic type "
+                "context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -60,16 +88,23 @@ int cmp_dynamic_type_destroy(cmp_dynamic_type_t *dynamic_type) {
 int cmp_dynamic_type_set_category(cmp_dynamic_type_t *dynamic_type,
                                   cmp_a11y_content_size_category_t category) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_dynamic_type *dt = (struct cmp_dynamic_type *)dynamic_type;
 
-  if (!dt) {
+  if (dt == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_dynamic_type_set_category: Invalid argument "
-              "(dynamic_type=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_dynamic_type_set_category: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   dt->category = category;
+  cmp_log_debug("cmp_dynamic_type_set_category: Set category\n");
   return rc;
 }
 
@@ -84,12 +119,19 @@ int cmp_dynamic_type_set_category(cmp_dynamic_type_t *dynamic_type,
 int cmp_dynamic_type_apply_scale(cmp_dynamic_type_t *dynamic_type,
                                  float base_size, float *out_scaled_size) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_dynamic_type *dt = (struct cmp_dynamic_type *)dynamic_type;
   float scale_factor = 1.0f;
 
-  if (!dt || !out_scaled_size) {
+  if (dt == NULL || out_scaled_size == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_dynamic_type_apply_scale: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_dynamic_type_apply_scale: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -136,6 +178,7 @@ int cmp_dynamic_type_apply_scale(cmp_dynamic_type_t *dynamic_type,
   }
 
   *out_scaled_size = base_size * scale_factor;
+  cmp_log_debug("cmp_dynamic_type_apply_scale: Derived scale curve output\n");
   return rc;
 }
 
@@ -149,16 +192,24 @@ int cmp_dynamic_type_apply_scale(cmp_dynamic_type_t *dynamic_type,
 int cmp_dynamic_type_should_reflow(cmp_dynamic_type_t *dynamic_type,
                                    int *out_should_reflow) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_dynamic_type *dt = (struct cmp_dynamic_type *)dynamic_type;
 
-  if (!dt || !out_should_reflow) {
+  if (dt == NULL || out_should_reflow == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_dynamic_type_should_reflow: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_dynamic_type_should_reflow: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   *out_should_reflow =
       (dt->category >= CMP_A11Y_CONTENT_SIZE_ACCESSIBILITY_LARGE) ? 1 : 0;
+  cmp_log_debug("cmp_dynamic_type_should_reflow: Derived reflow status\n");
   return rc;
 }
 
@@ -174,17 +225,27 @@ struct cmp_a11y_bold_text {
  */
 int cmp_a11y_bold_text_create(cmp_a11y_bold_text_t **out_bold_text) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_bold_text *bt = NULL;
 
-  if (!out_bold_text) {
+  if (out_bold_text == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_bold_text_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_bold_text_create: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_a11y_bold_text), (void **)&bt);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_a11y_bold_text_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_bold_text_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
@@ -201,10 +262,13 @@ int cmp_a11y_bold_text_create(cmp_a11y_bold_text_t **out_bold_text) {
  */
 int cmp_a11y_bold_text_destroy(cmp_a11y_bold_text_t *bold_text) {
   int rc = CMP_SUCCESS;
-  if (bold_text) {
-    CMP_FREE(bold_text);
+  if (bold_text != NULL) {
+    rc = CMP_FREE(bold_text);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_a11y_bold_text_destroy: CMP_FREE failed\n");
+    }
   }
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -216,11 +280,17 @@ int cmp_a11y_bold_text_destroy(cmp_a11y_bold_text_t *bold_text) {
  */
 int cmp_a11y_bold_text_set(cmp_a11y_bold_text_t *bold_text, int enabled) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_bold_text *bt = (struct cmp_a11y_bold_text *)bold_text;
 
-  if (!bt) {
+  if (bt == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_bold_text_set: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_bold_text_set: Invalid argument: %s\n", err_str);
     return rc;
   }
 
@@ -239,11 +309,17 @@ int cmp_a11y_bold_text_set(cmp_a11y_bold_text_t *bold_text, int enabled) {
 int cmp_a11y_bold_text_apply(cmp_a11y_bold_text_t *bold_text, int base_weight,
                              int *out_weight) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_bold_text *bt = (struct cmp_a11y_bold_text *)bold_text;
 
-  if (!bt || !out_weight) {
+  if (bt == NULL || out_weight == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_bold_text_apply: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_bold_text_apply: Invalid argument: %s\n", err_str);
     return rc;
   }
 
@@ -270,17 +346,29 @@ struct cmp_a11y_button_shapes {
 int cmp_a11y_button_shapes_create(
     cmp_a11y_button_shapes_t **out_button_shapes) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_button_shapes *bs = NULL;
 
-  if (!out_button_shapes) {
+  if (out_button_shapes == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_button_shapes_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_button_shapes_create: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_a11y_button_shapes), (void **)&bs);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_a11y_button_shapes_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_button_shapes_create: Out of memory: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -297,10 +385,13 @@ int cmp_a11y_button_shapes_create(
  */
 int cmp_a11y_button_shapes_destroy(cmp_a11y_button_shapes_t *button_shapes) {
   int rc = CMP_SUCCESS;
-  if (button_shapes) {
-    CMP_FREE(button_shapes);
+  if (button_shapes != NULL) {
+    rc = CMP_FREE(button_shapes);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_a11y_button_shapes_destroy: CMP_FREE failed\n");
+    }
   }
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -313,12 +404,19 @@ int cmp_a11y_button_shapes_destroy(cmp_a11y_button_shapes_t *button_shapes) {
 int cmp_a11y_button_shapes_set(cmp_a11y_button_shapes_t *button_shapes,
                                int enabled) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_button_shapes *bs =
       (struct cmp_a11y_button_shapes *)button_shapes;
 
-  if (!bs) {
+  if (bs == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_button_shapes_set: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_button_shapes_set: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -336,13 +434,19 @@ int cmp_a11y_button_shapes_set(cmp_a11y_button_shapes_t *button_shapes,
 int cmp_a11y_button_shapes_should_draw(cmp_a11y_button_shapes_t *button_shapes,
                                        int *out_should_draw) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_button_shapes *bs =
       (struct cmp_a11y_button_shapes *)button_shapes;
 
-  if (!bs || !out_should_draw) {
+  if (bs == NULL || out_should_draw == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_a11y_button_shapes_should_draw: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_button_shapes_should_draw: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -363,17 +467,29 @@ struct cmp_a11y_increase_contrast {
 int cmp_a11y_increase_contrast_create(
     cmp_a11y_increase_contrast_t **out_increase_contrast) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_increase_contrast *ic = NULL;
 
-  if (!out_increase_contrast) {
+  if (out_increase_contrast == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_increase_contrast_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_increase_contrast_create: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_a11y_increase_contrast), (void **)&ic);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_a11y_increase_contrast_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_increase_contrast_create: Out of memory: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -391,10 +507,13 @@ int cmp_a11y_increase_contrast_create(
 int cmp_a11y_increase_contrast_destroy(
     cmp_a11y_increase_contrast_t *increase_contrast) {
   int rc = CMP_SUCCESS;
-  if (increase_contrast) {
-    CMP_FREE(increase_contrast);
+  if (increase_contrast != NULL) {
+    rc = CMP_FREE(increase_contrast);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_a11y_increase_contrast_destroy: CMP_FREE failed\n");
+    }
   }
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -407,12 +526,19 @@ int cmp_a11y_increase_contrast_destroy(
 int cmp_a11y_increase_contrast_set(
     cmp_a11y_increase_contrast_t *increase_contrast, int enabled) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_increase_contrast *ic =
       (struct cmp_a11y_increase_contrast *)increase_contrast;
 
-  if (!ic) {
+  if (ic == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_increase_contrast_set: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_increase_contrast_set: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -431,12 +557,19 @@ int cmp_a11y_increase_contrast_apply(
     cmp_a11y_increase_contrast_t *increase_contrast,
     float *out_opacity_factor) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_increase_contrast *ic =
       (struct cmp_a11y_increase_contrast *)increase_contrast;
 
-  if (!ic || !out_opacity_factor) {
+  if (ic == NULL || out_opacity_factor == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_increase_contrast_apply: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_increase_contrast_apply: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -457,17 +590,28 @@ struct cmp_a11y_hover_text {
  */
 int cmp_a11y_hover_text_create(cmp_a11y_hover_text_t **out_hover_text) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_hover_text *ht = NULL;
 
-  if (!out_hover_text) {
+  if (out_hover_text == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_hover_text_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_hover_text_create: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_a11y_hover_text), (void **)&ht);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_a11y_hover_text_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_hover_text_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
@@ -484,10 +628,13 @@ int cmp_a11y_hover_text_create(cmp_a11y_hover_text_t **out_hover_text) {
  */
 int cmp_a11y_hover_text_destroy(cmp_a11y_hover_text_t *hover_text) {
   int rc = CMP_SUCCESS;
-  if (hover_text) {
-    CMP_FREE(hover_text);
+  if (hover_text != NULL) {
+    rc = CMP_FREE(hover_text);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_a11y_hover_text_destroy: CMP_FREE failed\n");
+    }
   }
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -503,11 +650,18 @@ int cmp_a11y_hover_text_get_bubble(cmp_a11y_hover_text_t *hover_text,
                                    int node_id, char *out_text,
                                    size_t capacity) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_hover_text *ht = (struct cmp_a11y_hover_text *)hover_text;
 
-  if (!ht || !out_text) {
+  if (ht == NULL || out_text == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_hover_text_get_bubble: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_hover_text_get_bubble: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -515,7 +669,10 @@ int cmp_a11y_hover_text_get_bubble(cmp_a11y_hover_text_t *hover_text,
   /* Simulating fetching text from a separate mapped registry or tree hook for
    * hover texts. */
 #if defined(_MSC_VER)
-  strcpy_s(out_text, capacity, "");
+  if (strcpy_s(out_text, capacity, "") != 0) {
+    cmp_log_debug("cmp_a11y_hover_text_get_bubble: strcpy_s failed\n");
+    return CMP_ERROR_GENERAL;
+  }
 #else
   strcpy(out_text, "");
 #endif
@@ -530,7 +687,7 @@ int cmp_a11y_hover_text_get_bubble(cmp_a11y_hover_text_t *hover_text,
  * @param rgba Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-float get_luminance(uint32_t rgba) {
+static float get_luminance(uint32_t rgba) {
   float r = (float)((rgba >> 24) & 0xFF) / 255.0f;
   float g = (float)((rgba >> 16) & 0xFF) / 255.0f;
   float b = (float)((rgba >> 8) & 0xFF) / 255.0f;
@@ -553,13 +710,20 @@ int cmp_color_verify_contrast_ratio(uint32_t foreground_rgba,
                                     uint32_t background_rgba, int is_large_text,
                                     int *out_passes_wcag) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   float lum1 = get_luminance(foreground_rgba);
   float lum2 = get_luminance(background_rgba);
   float ratio;
 
-  if (!out_passes_wcag) {
+  if (out_passes_wcag == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_color_verify_contrast_ratio: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_color_verify_contrast_ratio: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -591,18 +755,29 @@ struct cmp_a11y_autoplay_avoidance {
 int cmp_a11y_autoplay_avoidance_create(
     cmp_a11y_autoplay_avoidance_t **out_ctx) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_autoplay_avoidance *ctx = NULL;
 
-  if (!out_ctx) {
+  if (out_ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_a11y_autoplay_avoidance_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_autoplay_avoidance_create: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_a11y_autoplay_avoidance), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_a11y_autoplay_avoidance_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_autoplay_avoidance_create: Out of memory: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -619,10 +794,13 @@ int cmp_a11y_autoplay_avoidance_create(
  */
 int cmp_a11y_autoplay_avoidance_destroy(cmp_a11y_autoplay_avoidance_t *ctx) {
   int rc = CMP_SUCCESS;
-  if (ctx) {
-    CMP_FREE(ctx);
+  if (ctx != NULL) {
+    rc = CMP_FREE(ctx);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_a11y_autoplay_avoidance_destroy: CMP_FREE failed\n");
+    }
   }
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -635,12 +813,19 @@ int cmp_a11y_autoplay_avoidance_destroy(cmp_a11y_autoplay_avoidance_t *ctx) {
 int cmp_a11y_autoplay_avoidance_set(cmp_a11y_autoplay_avoidance_t *ctx,
                                     int enabled) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_autoplay_avoidance *c =
       (struct cmp_a11y_autoplay_avoidance *)ctx;
 
-  if (!c) {
+  if (c == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_autoplay_avoidance_set: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_autoplay_avoidance_set: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -658,12 +843,19 @@ int cmp_a11y_autoplay_avoidance_set(cmp_a11y_autoplay_avoidance_t *ctx,
 int cmp_a11y_autoplay_should_play(cmp_a11y_autoplay_avoidance_t *ctx,
                                   int *out_should_play) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_autoplay_avoidance *c =
       (struct cmp_a11y_autoplay_avoidance *)ctx;
 
-  if (!c || !out_should_play) {
+  if (c == NULL || out_should_play == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_a11y_autoplay_should_play: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_autoplay_should_play: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 

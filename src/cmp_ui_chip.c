@@ -5,24 +5,30 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief Opaque internal structure for UI Chip widget.
+ */
 struct cmp_ui_chip {
+  /** @brief The root node of the chip */
   cmp_ui_node_t *node_root;
+  /** @brief The text node containing the chip label */
   cmp_ui_node_t *node_text;
+  /** @brief The raw string of the label */
   char *text;
 };
 
 /**
- * @brief cmp_ui_chip_create
+ * @brief Allocates and initializes a UI Chip widget.
  *
- * @param out_chip Parameter description.
- * @param text Parameter description.
- * @param bg_color Parameter description.
- * @param text_color Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param out_chip Pointer to store the created chip.
+ * @param text The text to display.
+ * @param bg_color Background color.
+ * @param text_color Text color.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
                        uint32_t bg_color, uint32_t text_color) {
-  cmp_ui_chip_t *chip;
+  cmp_ui_chip_t *chip = NULL;
   int rc;
   size_t len;
   cmp_string_t translated = {NULL, 0, 0};
@@ -36,7 +42,7 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
   rc = CMP_MALLOC(sizeof(cmp_ui_chip_t), (void **)&chip);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_chip_create: OOM\n");
-    return rc;
+    return CMP_ERROR_OOM;
   }
   memset(chip, 0, sizeof(cmp_ui_chip_t));
 
@@ -56,30 +62,18 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_chip_create: OOM for text\n");
       if (translated.data) {
-        rc = cmp_string_destroy(&translated);
-        if (rc != CMP_SUCCESS) {
+        int destroy_rc = cmp_string_destroy(&translated);
+        if (destroy_rc != CMP_SUCCESS) {
           LOG_DEBUG("cmp_ui_chip_create: cmp_string_destroy failed\n");
         }
       }
-      CMP_FREE(chip);
+      rc = CMP_FREE(chip);
+      if (rc != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_chip_create: CMP_FREE failed\n");
+      }
       return CMP_ERROR_OOM;
     }
-#if defined(_MSC_VER)
-    if (memcpy_s(chip->text, len + 1, final_text, len + 1) != 0) {
-      LOG_DEBUG("cmp_ui_chip_create: memcpy_s failed\n");
-      CMP_FREE(chip->text);
-      if (translated.data) {
-        rc = cmp_string_destroy(&translated);
-        if (rc != CMP_SUCCESS) {
-          LOG_DEBUG("cmp_ui_chip_create: cmp_string_destroy failed\n");
-        }
-      }
-      CMP_FREE(chip);
-      return CMP_ERROR_GENERAL;
-    }
-#else
     memcpy(chip->text, final_text, len + 1);
-#endif
   }
 
   if (translated.data) {
@@ -93,10 +87,14 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_chip_create: cmp_ui_box_create failed\n");
     if (chip->text) {
-      CMP_FREE(chip->text);
+      int free_rc = CMP_FREE(chip->text);
+      if (free_rc != CMP_SUCCESS)
+        LOG_DEBUG("cmp_ui_chip_create: CMP_FREE text failed\n");
     }
-    CMP_FREE(chip);
-    return rc;
+    rc = CMP_FREE(chip);
+    if (rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_chip_create: CMP_FREE chip failed\n");
+    return CMP_ERROR_GENERAL;
   }
 
   chip->node_root->bg_color = bg_color;
@@ -105,14 +103,18 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_chip_create: cmp_ui_text_create failed\n");
     if (chip->text) {
-      CMP_FREE(chip->text);
+      int free_rc = CMP_FREE(chip->text);
+      if (free_rc != CMP_SUCCESS)
+        LOG_DEBUG("cmp_ui_chip_create: CMP_FREE text failed\n");
     }
     rc = cmp_ui_node_destroy(chip->node_root);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_chip_create: cmp_ui_node_destroy failed\n");
     }
-    CMP_FREE(chip);
-    return rc; /* original error */
+    rc = CMP_FREE(chip);
+    if (rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_chip_create: CMP_FREE chip failed\n");
+    return CMP_ERROR_GENERAL;
   }
 
   chip->node_text->text_color = text_color;
@@ -120,7 +122,6 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
   rc = cmp_ui_node_add_child(chip->node_root, chip->node_text);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_chip_create: cmp_ui_node_add_child failed\n");
-    /* Assume node_destroy will cleanup */
   }
 
   *out_chip = chip;
@@ -128,10 +129,10 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
 }
 
 /**
- * @brief cmp_ui_chip_destroy
+ * @brief Destroys a UI Chip widget and frees its resources.
  *
- * @param chip Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param chip The chip component.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_ui_chip_destroy(cmp_ui_chip_t *chip) {
   int rc;
@@ -161,11 +162,11 @@ int cmp_ui_chip_destroy(cmp_ui_chip_t *chip) {
 }
 
 /**
- * @brief cmp_ui_chip_get_node
+ * @brief Retrieves the root UI node for the given chip.
  *
- * @param chip Parameter description.
- * @param out_node Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param chip The chip component.
+ * @param out_node Pointer to store the underlying UI node.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_ui_chip_get_node(cmp_ui_chip_t *chip, cmp_ui_node_t **out_node) {
   if (!chip || !out_node) {
@@ -177,11 +178,11 @@ int cmp_ui_chip_get_node(cmp_ui_chip_t *chip, cmp_ui_node_t **out_node) {
 }
 
 /**
- * @brief cmp_ui_chip_set_text
+ * @brief Updates the text displayed by the UI chip.
  *
- * @param chip Parameter description.
- * @param text Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param chip The chip component.
+ * @param text The new text to display.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_ui_chip_set_text(cmp_ui_chip_t *chip, const char *text) {
   int rc;
@@ -217,29 +218,42 @@ int cmp_ui_chip_set_text(cmp_ui_chip_t *chip, const char *text) {
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_chip_set_text: OOM\n");
       if (translated.data) {
-        rc = cmp_string_destroy(&translated);
-        if (rc != CMP_SUCCESS) {
+        int destroy_rc = cmp_string_destroy(&translated);
+        if (destroy_rc != CMP_SUCCESS) {
           LOG_DEBUG("cmp_ui_chip_set_text: cmp_string_destroy failed\n");
         }
       }
       return CMP_ERROR_OOM;
     }
-#if defined(_MSC_VER)
-    if (memcpy_s(chip->text, len + 1, final_text, len + 1) != 0) {
-      LOG_DEBUG("cmp_ui_chip_set_text: memcpy_s failed\n");
-      CMP_FREE(chip->text);
-      chip->text = NULL;
-      if (translated.data) {
-        rc = cmp_string_destroy(&translated);
-        if (rc != CMP_SUCCESS) {
-          LOG_DEBUG("cmp_ui_chip_set_text: cmp_string_destroy failed\n");
-        }
-      }
-      return CMP_ERROR_GENERAL;
-    }
-#else
     memcpy(chip->text, final_text, len + 1);
-#endif
+
+    if (chip->node_text && chip->node_text->properties) {
+      rc = CMP_FREE(chip->node_text->properties);
+      if (rc != CMP_SUCCESS)
+        LOG_DEBUG("cmp_ui_chip_set_text: CMP_FREE properties failed\n");
+    }
+    if (chip->node_text) {
+      rc = CMP_MALLOC(len + 1, (void **)&chip->node_text->properties);
+      if (rc == CMP_SUCCESS) {
+        memcpy(chip->node_text->properties, chip->text, len + 1);
+      } else {
+        LOG_DEBUG("cmp_ui_chip_set_text: OOM properties\n");
+      }
+    }
+  } else {
+    if (chip->node_text && chip->node_text->properties) {
+      rc = CMP_FREE(chip->node_text->properties);
+      if (rc != CMP_SUCCESS)
+        LOG_DEBUG("cmp_ui_chip_set_text: CMP_FREE properties failed\n");
+    }
+    if (chip->node_text) {
+      rc = CMP_MALLOC(1, (void **)&chip->node_text->properties);
+      if (rc == CMP_SUCCESS) {
+        ((char *)chip->node_text->properties)[0] = '\0';
+      } else {
+        LOG_DEBUG("cmp_ui_chip_set_text: OOM properties\n");
+      }
+    }
   }
 
   if (translated.data) {
@@ -247,15 +261,6 @@ int cmp_ui_chip_set_text(cmp_ui_chip_t *chip, const char *text) {
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_chip_set_text: cmp_string_destroy failed\n");
     }
-  }
-
-  if (chip->node_text) {
-    /* Since text property doesn't exist natively on node text, we would update
-     * it here using the proper setter, which we assume is handled elsewhere or
-     * using cmp_ui_text_set_content.
-     */
-    /* rc = cmp_ui_text_set_content(chip->node_text, chip->text ? chip->text :
-     * ""); ... etc */
   }
 
   return CMP_SUCCESS;

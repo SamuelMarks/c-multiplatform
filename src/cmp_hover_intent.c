@@ -10,9 +10,9 @@ struct cmp_hover_intent {
   float last_x;
   float last_y;
   float time_spent_in_bounds;
-  int is_active;
   float required_time_ms;
   float tolerance_radius;
+  int is_tracking;
 };
 
 /**
@@ -22,29 +22,27 @@ struct cmp_hover_intent {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
-  int rc = CMP_SUCCESS;
+  int rc = 0; /* CMP_SUCCESS */
   struct cmp_hover_intent *ctx = NULL;
 
   if (!out_intent) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_hover_intent_create: Invalid argument\n");
-    return rc;
+    LOG_DEBUG("cmp_hover_intent_create: invalid argument (out_intent is NULL)\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_hover_intent), (void **)&ctx);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_hover_intent_create: Out of memory\n");
+  if (rc != 0) {
+    LOG_DEBUG("cmp_hover_intent_create: Out of memory\n");
     return rc;
   }
 
   memset(ctx, 0, sizeof(struct cmp_hover_intent));
-  ctx->required_time_ms = 150.0f; /* Default 150ms hover delay */
-  ctx->tolerance_radius = 5.0f;   /* Default 5px wobble tolerance */
-  ctx->last_x = -1.0f;
-  ctx->last_y = -1.0f;
+  ctx->required_time_ms = 500.0f; /* default half a second */
+  ctx->tolerance_radius = 5.0f;   /* default 5px tolerance */
+  ctx->is_tracking = 0;
 
   *out_intent = (cmp_hover_intent_t *)ctx;
-  return rc;
+  return 0;
 }
 
 /**
@@ -54,68 +52,77 @@ int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hover_intent_destroy(cmp_hover_intent_t *intent) {
-  int rc = CMP_SUCCESS;
+  int rc = 0; /* CMP_SUCCESS */
   struct cmp_hover_intent *ctx = (struct cmp_hover_intent *)intent;
 
   if (!ctx) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_hover_intent_destroy: Invalid argument\n");
-    return rc;
+    LOG_DEBUG("cmp_hover_intent_destroy: invalid argument (intent is NULL)\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  CMP_FREE(ctx);
+  rc = CMP_FREE(ctx);
+  if (rc != 0) {
+    LOG_DEBUG("cmp_hover_intent_destroy: CMP_FREE failed\n");
+  }
   return rc;
 }
 
 /**
- * @brief cmp_hover_intent_process
+ * @brief Processes input to determine if a hover intent has been confirmed.
  *
- * @param intent Parameter description.
- * @param event Parameter description.
- * @param dt_ms Parameter description.
+ * @param intent Pointer to the hover intent context.
+ * @param event Pointer to the event to process.
+ * @param dt_ms Delta time in milliseconds since the last process call.
+ * @param out_confirmed Pointer to an integer which will receive 1 if hover intent is confirmed, 0 otherwise.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hover_intent_process(cmp_hover_intent_t *intent,
-                             const cmp_event_t *event, float dt_ms) {
-  int rc = 0; /* Returns boolean 0 or 1, or negative error */
+                             const cmp_event_t *event, float dt_ms, int *out_confirmed) {
+  int rc = 0; /* CMP_SUCCESS */
   struct cmp_hover_intent *ctx = (struct cmp_hover_intent *)intent;
-  float dx, dy, dist;
+  float dx;
+  float dy;
+  float dist_sq;
 
-  if (!ctx || !event) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_hover_intent_process: Invalid argument\n");
-    return rc;
+  if (!ctx || !event || !out_confirmed) {
+    LOG_DEBUG("cmp_hover_intent_process: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+  
+  *out_confirmed = 0;
+
+  if (event->type == CMP_EVENT_POINTER_DOWN ||
+      event->type == CMP_EVENT_POINTER_UP) {
+    /* Click or touch clears intent */
+    ctx->is_tracking = 0;
+    ctx->time_spent_in_bounds = 0.0f;
+    return 0;
   }
 
-  /* If it's a new interaction or pointer left bounding area entirely, reset */
-  if (event->action == CMP_ACTION_CANCEL) {
-    ctx->is_active = 0;
-    ctx->time_spent_in_bounds = 0.0f;
-    ctx->last_x = -1.0f;
-    ctx->last_y = -1.0f;
-    return rc; /* 0 */
+  if (event->type == CMP_EVENT_POINTER_MOVE) {
+    if (!ctx->is_tracking) {
+      ctx->is_tracking = 1;
+      ctx->last_x = event->pointer.x;
+      ctx->last_y = event->pointer.y;
+      ctx->time_spent_in_bounds = 0.0f;
+      return 0;
+    }
+
+    dx = event->pointer.x - ctx->last_x;
+    dy = event->pointer.y - ctx->last_y;
+    dist_sq = (dx * dx) + (dy * dy);
+
+    if (dist_sq > (ctx->tolerance_radius * ctx->tolerance_radius)) {
+      /* Moved outside tolerance, reset tracking origin and time */
+      ctx->last_x = event->pointer.x;
+      ctx->last_y = event->pointer.y;
+      ctx->time_spent_in_bounds = 0.0f;
+      return 0;
+    }
   }
 
-  if (ctx->last_x < 0.0f && ctx->last_y < 0.0f) {
-    /* Initialize tracking position */
-    ctx->last_x = (float)event->x;
-    ctx->last_y = (float)event->y;
-    ctx->time_spent_in_bounds = 0.0f;
-    ctx->is_active = 1;
-    return rc; /* 0 */
-  }
-
-  /* Calculate movement distance */
-  dx = (float)event->x - ctx->last_x;
-  dy = (float)event->y - ctx->last_y;
-  dist = (float)sqrt((double)(dx * dx + dy * dy));
-
-  /* If movement exceeded the hysteresis tolerance, reset timer */
-  if (dist > ctx->tolerance_radius) {
-    ctx->time_spent_in_bounds = 0.0f;
-    ctx->last_x = (float)event->x;
-    ctx->last_y = (float)event->y;
-    return rc; /* 0: Still deliberating */
+  if (!ctx->is_tracking) {
+    return 0;
   }
 
   /* Target is steady inside tolerance radius, accumulate time */
@@ -123,8 +130,8 @@ int cmp_hover_intent_process(cmp_hover_intent_t *intent,
 
   /* Confirmed hover intent! */
   if (ctx->time_spent_in_bounds >= ctx->required_time_ms) {
-    rc = 1;
+    *out_confirmed = 1;
   }
 
-  return rc;
+  return 0;
 }

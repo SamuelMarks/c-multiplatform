@@ -25,32 +25,34 @@ struct cmp_app_region {
  */
 int cmp_app_region_create(cmp_app_region_t **out_region) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   cmp_app_region_t *region = NULL;
 
-  if (!out_region) {
+  if (out_region == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_app_region_create: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_app_region_create: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_app_region_t), (void **)&region);
   if (rc != CMP_SUCCESS) {
-    if (rc == CMP_SUCCESS)
-      rc = CMP_ERROR_OOM;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_app_region_create CMP_MALLOC: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_app_region_create CMP_MALLOC: %s\n", err_str);
     return rc;
   }
 
   memset(region, 0, sizeof(cmp_app_region_t));
   *out_region = region;
+  cmp_log_debug(
+      "cmp_app_region_create: Successfully created app region manager\n");
   return rc;
 }
 
@@ -62,21 +64,25 @@ int cmp_app_region_create(cmp_app_region_t **out_region) {
  */
 int cmp_app_region_destroy(cmp_app_region_t *region) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!region) {
+  if (region == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_app_region_destroy: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_app_region_destroy: %s\n", err_str);
     return rc;
   }
 
-  if (region->rects) {
+  if (region->rects != NULL) {
     CMP_FREE(region->rects);
   }
   CMP_FREE(region);
+  cmp_log_debug(
+      "cmp_app_region_destroy: Successfully destroyed app region manager\n");
   return rc;
 }
 
@@ -95,35 +101,37 @@ int cmp_app_region_add_rect(cmp_app_region_t *region, float x, float y,
                             float width, float height,
                             cmp_app_region_type_t type) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   size_t new_capacity;
   cmp_app_region_rect_t *new_rects = NULL;
 
-  if (!region) {
+  if (region == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_app_region_add_rect: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_app_region_add_rect: %s\n", err_str);
     return rc;
   }
 
   if (region->count >= region->capacity) {
     new_capacity = region->capacity == 0 ? 8 : region->capacity * 2;
+    cmp_log_debug("cmp_app_region_add_rect: Growing capacity to %u\n",
+                  (unsigned int)new_capacity);
     rc = CMP_MALLOC(new_capacity * sizeof(cmp_app_region_rect_t),
                     (void **)&new_rects);
     if (rc != CMP_SUCCESS) {
-      if (rc == CMP_SUCCESS)
-        rc = CMP_ERROR_OOM;
-      {
-        const char *err_str;
-        cmp_strerror(rc, &err_str);
-        LOG_DEBUG("cmp_app_region_add_rect CMP_MALLOC: %s\n", err_str);
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
       }
+      cmp_log_debug("cmp_app_region_add_rect CMP_MALLOC: %s\n", err_str);
       return rc;
     }
 
-    if (region->rects) {
+    if (region->rects != NULL) {
       memcpy(new_rects, region->rects,
              region->count * sizeof(cmp_app_region_rect_t));
       CMP_FREE(region->rects);
@@ -139,6 +147,9 @@ int cmp_app_region_add_rect(cmp_app_region_t *region, float x, float y,
   region->rects[region->count].type = type;
   region->count++;
 
+  cmp_log_debug("cmp_app_region_add_rect: Added rect (%.2f, %.2f, %.2f, %.2f) "
+                "of type %d\n",
+                x, y, width, height, (int)type);
   return rc;
 }
 
@@ -150,17 +161,20 @@ int cmp_app_region_add_rect(cmp_app_region_t *region, float x, float y,
  */
 int cmp_app_region_clear(cmp_app_region_t *region) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!region) {
+  if (region == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_app_region_clear: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_app_region_clear: %s\n", err_str);
     return rc;
   }
   region->count = 0;
+  cmp_log_debug("cmp_app_region_clear: Cleared all rects\n");
   return rc;
 }
 
@@ -177,16 +191,18 @@ int cmp_app_region_clear(cmp_app_region_t *region) {
 int cmp_app_region_hit_test(const cmp_app_region_t *region, float x, float y,
                             cmp_app_region_type_t *out_type) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   size_t i;
   const cmp_app_region_rect_t *r;
 
-  if (!region || !out_type) {
+  if (region == NULL || out_type == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_app_region_hit_test: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_app_region_hit_test: %s\n", err_str);
     return rc;
   }
 
@@ -198,8 +214,16 @@ int cmp_app_region_hit_test(const cmp_app_region_t *region, float x, float y,
     if (x >= r->rect.x && x <= r->rect.x + r->rect.width && y >= r->rect.y &&
         y <= r->rect.y + r->rect.height) {
       *out_type = r->type;
+      cmp_log_debug(
+          "cmp_app_region_hit_test: Hit found of type %d at (%.2f, %.2f)\n",
+          (int)r->type, x, y);
       break;
     }
+  }
+
+  if (*out_type == CMP_APP_REGION_NONE) {
+    cmp_log_debug("cmp_app_region_hit_test: No hit found at (%.2f, %.2f)\n", x,
+                  y);
   }
 
   return rc;

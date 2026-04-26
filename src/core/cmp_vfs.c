@@ -107,14 +107,20 @@ int cmp_vfs_mount(const char *mount_point, const char *real_path) {
 
   if (mount_point == NULL || real_path == NULL || !g_vfs_initialized) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_vfs_mount: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_vfs_mount: %s\n", err_str);
  }    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_vfs_mount_entry_t), (void **)&entry);
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_vfs_mount CMP_MALLOC: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_vfs_mount CMP_MALLOC: %s\n", err_str);
  }    return rc;
   }
 
@@ -159,7 +165,10 @@ int cmp_vfs_resolve_path(const char *virtual_path, cmp_string_t *out_path) {
 
   if (virtual_path == NULL || out_path == NULL || !g_vfs_initialized) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_vfs_resolve_path: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_vfs_resolve_path: %s\n", err_str);
  }    return rc;
   }
 

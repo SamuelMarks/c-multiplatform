@@ -64,14 +64,24 @@ TEST test_chip(void) {
   cmp_ui_chip_t *chip;
   cmp_ui_node_t *node;
 
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_ui_chip_create(NULL, "Filter", 0xFF000000, 0xFFFFFFFF),
+                "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS,
                 cmp_ui_chip_create(&chip, "Filter", 0xFF000000, 0xFFFFFFFF),
                 "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_chip_get_node(NULL, &node), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_chip_get_node(chip, NULL), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_chip_get_node(chip, &node), "%d");
   ASSERT(node != NULL);
 
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_chip_set_text(NULL, "Updated"),
+                "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_chip_set_text(chip, "Updated"), "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_chip_set_text(chip, NULL), "%d");
 
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_chip_destroy(NULL), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_chip_destroy(chip), "%d");
   PASS();
 }

@@ -19,7 +19,11 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create: %s\n", err_str);
     }
     return rc;
@@ -31,7 +35,11 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -45,7 +53,11 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -74,7 +86,11 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_text_create: %s\n", err_str);
     }
     return rc;
@@ -86,7 +102,11 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_text_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -100,7 +120,11 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -140,7 +164,11 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_button_create: %s\n", err_str);
     }
     return rc;
@@ -152,7 +180,11 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_button_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -166,7 +198,11 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -201,7 +237,11 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_text_input_create: %s\n", err_str);
     }
     return rc;
@@ -213,7 +253,11 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_text_input_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -227,7 +271,11 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -253,7 +301,11 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_checkbox_create: %s\n", err_str);
     }
     return rc;
@@ -265,7 +317,11 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_checkbox_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -279,7 +335,11 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -321,7 +381,11 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_radio_create: %s\n", err_str);
     }
     return rc;
@@ -333,7 +397,11 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_radio_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -347,7 +415,11 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -385,7 +457,11 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_image_view_create: %s\n", err_str);
     }
     return rc;
@@ -397,7 +473,11 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_image_view_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -411,7 +491,11 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -486,7 +570,11 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_slider_create: %s\n", err_str);
     }
     return rc;
@@ -498,7 +586,11 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_slider_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -512,7 +604,11 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -546,7 +642,11 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_list_view_create: %s\n", err_str);
     }
     return rc;
@@ -558,7 +658,11 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_list_view_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -572,7 +676,11 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -598,7 +706,11 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_grid_view_create: %s\n", err_str);
     }
     return rc;
@@ -610,7 +722,11 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_grid_view_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -624,7 +740,11 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -657,7 +777,11 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_dropdown_create: %s\n", err_str);
     }
     return rc;
@@ -669,7 +793,11 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_dropdown_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -683,7 +811,11 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -707,7 +839,11 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_modal_create: %s\n", err_str);
     }
     return rc;
@@ -719,7 +855,11 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_modal_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -733,7 +873,11 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -757,7 +901,11 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_canvas_create: %s\n", err_str);
     }
     return rc;
@@ -769,7 +917,11 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_canvas_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -783,7 +935,11 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -807,7 +963,11 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_rich_text_create: %s\n", err_str);
     }
     return rc;
@@ -819,7 +979,11 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
       rc = CMP_ERROR_OOM;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_rich_text_create CMP_MALLOC: %s\n", err_str);
     }
     return rc;
@@ -833,7 +997,11 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
     CMP_FREE(node);
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
     return rc;
@@ -856,7 +1024,11 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_node_add_child: %s\n", err_str);
     }
     return rc;
@@ -873,7 +1045,11 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
         rc = CMP_ERROR_OOM;
       {
         const char *err_str;
-        cmp_strerror(rc, &err_str);
+        int rc2;
+        rc2 = cmp_strerror(rc, &err_str);
+        if (rc2 != CMP_SUCCESS) {
+          err_str = "Unknown";
+        }
         LOG_DEBUG("cmp_ui_node_add_child CMP_MALLOC: %s\n", err_str);
       }
       return rc;
@@ -1002,7 +1178,11 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
       LOG_DEBUG("cmp_ui_node_destroy: %s\n", err_str);
     }
     return rc;

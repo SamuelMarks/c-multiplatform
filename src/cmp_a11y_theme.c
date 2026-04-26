@@ -36,6 +36,7 @@ __declspec(dllimport) BOOL __stdcall SystemParametersInfoA(
 int cmp_a11y_theme_init(void) {
   int rc = CMP_SUCCESS;
   /* Initialize any underlying resources or OS hooks if needed */
+  cmp_log_debug("cmp_a11y_theme_init: initialized\n");
   return rc;
 }
 
@@ -47,6 +48,7 @@ int cmp_a11y_theme_init(void) {
 int cmp_a11y_theme_cleanup(void) {
   int rc = CMP_SUCCESS;
   /* Clean up */
+  cmp_log_debug("cmp_a11y_theme_cleanup: cleaned up\n");
   return rc;
 }
 
@@ -62,12 +64,14 @@ int cmp_a11y_detect_high_contrast(void) {
   if (SystemParametersInfoA(SPI_GETHIGHCONTRAST, sizeof(HIGHCONTRASTA), &hc,
                             0)) {
     if (hc.dwFlags & HCF_HIGHCONTRASTON) {
+      cmp_log_debug("cmp_a11y_detect_high_contrast: High contrast is ON\n");
       return 1;
     }
   }
 #else
   /* Future platform support goes here. */
 #endif
+  cmp_log_debug("cmp_a11y_detect_high_contrast: High contrast is OFF\n");
   return 0;
 }
 
@@ -129,15 +133,18 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
                          cmp_a11y_theme_t *out_theme) {
   int rc = CMP_SUCCESS;
   int is_hc;
+  int err_rc;
+  const char *err_str;
 
-  if (!out_theme) {
+  if (out_theme == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_a11y_build_theme: Invalid argument (out_theme=NULL): %s\n",
-                err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug(
+        "cmp_a11y_build_theme: Invalid argument (out_theme=NULL): %s\n",
+        err_str);
     return rc;
   }
 
@@ -182,5 +189,8 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
                           &out_theme->error_text);
   }
 
+  cmp_log_debug(
+      "cmp_a11y_build_theme: Built theme for color blind type %d, hc=%d\n",
+      (int)type, is_hc);
   return rc;
 }

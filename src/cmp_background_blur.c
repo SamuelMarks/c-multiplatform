@@ -15,32 +15,54 @@ struct cmp_background_blur {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_background_blur_create(cmp_background_blur_t **out_blur) {
-  cmp_background_blur_t *blur;
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
+  cmp_background_blur_t *blur = NULL;
   int err;
-  int rc;
 
-  if (!out_blur) {
-    LOG_DEBUG("cmp_background_blur_create: out_blur is NULL\n");
-    return CMP_ERROR_INVALID_ARG;
+  if (out_blur == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_background_blur_create: Invalid argument (out_blur=NULL): %s\n",
+        err_str);
+    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_background_blur_t), (void **)&blur);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_background_blur_create: OOM\n");
-    return CMP_ERROR_OOM;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_background_blur_create: Out of memory: %s\n", err_str);
+    return rc;
   }
 
   err = cmp_window_blur_create(&blur->impl);
   if (err != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_background_blur_create: cmp_window_blur_create failed\n");
+    err_rc = cmp_strerror(err, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_background_blur_create: cmp_window_blur_create failed: %s\n",
+        err_str);
     rc = CMP_FREE(blur);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_background_blur_create: CMP_FREE failed\n");
+      cmp_log_debug(
+          "cmp_background_blur_create: CMP_FREE failed during cleanup\n");
     }
     return err;
   }
 
   *out_blur = blur;
+  cmp_log_debug("cmp_background_blur_create: Successfully created background "
+                "blur context\n");
   return CMP_SUCCESS;
 }
 
@@ -51,28 +73,46 @@ int cmp_background_blur_create(cmp_background_blur_t **out_blur) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_background_blur_destroy(cmp_background_blur_t *blur) {
+  int rc = CMP_SUCCESS;
   int err = CMP_SUCCESS;
-  int rc;
+  int err_rc;
+  const char *err_str;
 
-  if (!blur) {
-    LOG_DEBUG("cmp_background_blur_destroy: blur is NULL\n");
-    return CMP_ERROR_INVALID_ARG;
+  if (blur == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_background_blur_destroy: Invalid argument (blur=NULL): %s\n",
+        err_str);
+    return rc;
   }
 
-  if (blur->impl) {
+  if (blur->impl != NULL) {
     err = cmp_window_blur_destroy(blur->impl);
     if (err != CMP_SUCCESS) {
-      LOG_DEBUG(
-          "cmp_background_blur_destroy: cmp_window_blur_destroy failed\n");
+      err_rc = cmp_strerror(err, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      cmp_log_debug(
+          "cmp_background_blur_destroy: cmp_window_blur_destroy failed: %s\n",
+          err_str);
     }
   }
 
   rc = CMP_FREE(blur);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_background_blur_destroy: CMP_FREE failed\n");
-    if (err == CMP_SUCCESS)
+    cmp_log_debug("cmp_background_blur_destroy: CMP_FREE failed\n");
+    if (err == CMP_SUCCESS) {
       err = rc;
+    }
   }
+
+  cmp_log_debug("cmp_background_blur_destroy: Successfully destroyed "
+                "background blur context\n");
   return err;
 }
 
@@ -86,10 +126,33 @@ int cmp_background_blur_destroy(cmp_background_blur_t *blur) {
  */
 int cmp_background_blur_set_enabled(cmp_background_blur_t *blur,
                                     cmp_window_t *window, int enabled) {
-  if (!blur || !window)
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  return cmp_window_blur_set_enabled(blur->impl, window, enabled);
+  if (blur == NULL || window == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_background_blur_set_enabled: Invalid argument: %s\n",
+                  err_str);
+    return rc;
+  }
+
+  rc = cmp_window_blur_set_enabled(blur->impl, window, enabled);
+  if (rc != CMP_SUCCESS) {
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_background_blur_set_enabled: Failed: %s\n", err_str);
+    return rc;
+  }
+
+  cmp_log_debug("cmp_background_blur_set_enabled: Enabled=%d\n", enabled);
+  return rc;
 }
 
 /**
@@ -103,11 +166,35 @@ int cmp_background_blur_set_enabled(cmp_background_blur_t *blur,
 int cmp_background_blur_is_enabled(const cmp_background_blur_t *blur,
                                    const cmp_window_t *window,
                                    int *out_enabled) {
-  if (!blur || !window || !out_enabled) {
-    if (out_enabled)
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
+
+  if (blur == NULL || window == NULL || out_enabled == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    if (out_enabled != NULL) {
       *out_enabled = 0;
-    return CMP_ERROR_INVALID_ARG;
+    }
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_background_blur_is_enabled: Invalid argument: %s\n",
+                  err_str);
+    return rc;
   }
 
-  return cmp_window_blur_is_enabled(blur->impl, window, out_enabled);
+  rc = cmp_window_blur_is_enabled(blur->impl, window, out_enabled);
+  if (rc != CMP_SUCCESS) {
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_background_blur_is_enabled: Failed: %s\n", err_str);
+    return rc;
+  }
+
+  cmp_log_debug("cmp_background_blur_is_enabled: Is enabled=%d\n",
+                *out_enabled);
+  return rc;
 }

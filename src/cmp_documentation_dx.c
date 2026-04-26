@@ -12,5 +12,7 @@
 int cmp_documentation_mock_init(void) {
   int rc = CMP_SUCCESS;
   /* Documentation is primarily an inline effort, no complex logic required */
+  cmp_log_debug(
+      "cmp_documentation_mock_init: Initialized documentation stubs\n");
   return rc;
 }

@@ -12,19 +12,44 @@ TEST test_app_bar(void) {
   cmp_ui_app_bar_t *bar;
   cmp_ui_node_t *node;
   cmp_ui_node_t *action_node;
+  cmp_a11y_tree_t *tree;
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_ui_app_bar_create(NULL, CMP_UI_APP_BAR_PLACEMENT_TOP),
+                "%d");
 
   ASSERT_EQ_FMT(CMP_SUCCESS,
                 cmp_ui_app_bar_create(&bar, CMP_UI_APP_BAR_PLACEMENT_TOP),
                 "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_app_bar_get_node(NULL, &node),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_app_bar_get_node(bar, NULL),
+                "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_app_bar_get_node(bar, &node), "%d");
   ASSERT(node != NULL);
 
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_ui_app_bar_set_title(NULL, "My Title"), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_app_bar_set_title(bar, "My Title"), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_app_bar_set_title(bar, NULL), "%d");
 
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_box_create(&action_node), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_ui_app_bar_add_action(NULL, action_node), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_app_bar_add_action(bar, NULL),
+                "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_app_bar_add_action(bar, action_node), "%d");
 
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_a11y_tree_create(&tree), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_app_bar_bind_a11y(NULL, tree),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_app_bar_bind_a11y(bar, NULL),
+                "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_app_bar_bind_a11y(bar, tree), "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_a11y_tree_destroy(tree), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_app_bar_destroy(NULL), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_app_bar_destroy(bar), "%d");
   PASS();
 }

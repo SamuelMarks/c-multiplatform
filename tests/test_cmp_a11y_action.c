@@ -9,7 +9,8 @@ TEST test_a11y_action_lifecycle(void) {
   cmp_a11y_action_t *action = NULL;
   int res;
 
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_action_create(tree, &action);
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -18,7 +19,8 @@ TEST test_a11y_action_lifecycle(void) {
   res = cmp_a11y_action_destroy(action);
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 
@@ -27,7 +29,8 @@ TEST test_a11y_action_null_args(void) {
   cmp_a11y_action_t *action = NULL;
   int res;
 
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_action_create(NULL, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
@@ -41,7 +44,8 @@ TEST test_a11y_action_null_args(void) {
   res = cmp_a11y_action_destroy(NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_a11y_action_create(tree, &action);
+  res = cmp_a11y_action_create(tree, &action);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_action_execute(NULL, 1, CMP_A11Y_ACTION_CLICK);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
@@ -52,8 +56,10 @@ TEST test_a11y_action_null_args(void) {
   res = cmp_a11y_action_execute(action, 1, 999);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_a11y_action_destroy(action);
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_action_destroy(action);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 
@@ -63,9 +69,12 @@ TEST test_a11y_action_execute_events(void) {
   cmp_event_t evt;
   int res;
 
-  cmp_event_system_init();
-  cmp_a11y_tree_create(&tree);
-  cmp_a11y_action_create(tree, &action);
+  res = cmp_event_system_init();
+  ASSERT_EQ(CMP_SUCCESS, res);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  res = cmp_a11y_action_create(tree, &action);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   /* Test Click routes into event queue */
   res = cmp_a11y_action_execute(action, 10, CMP_A11Y_ACTION_CLICK);
@@ -107,9 +116,12 @@ TEST test_a11y_action_execute_events(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(-1, cmp_event_get_focus());
 
-  cmp_a11y_action_destroy(action);
-  cmp_a11y_tree_destroy(tree);
-  cmp_event_system_shutdown();
+  res = cmp_a11y_action_destroy(action);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  res = cmp_event_system_shutdown();
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 

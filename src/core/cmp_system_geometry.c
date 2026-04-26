@@ -70,7 +70,10 @@ int cmp_system_geometry_destroy(cmp_system_geometry_t *geom) {
   int rc;
   if (!geom) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_system_geometry_destroy: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_system_geometry_destroy: %s\n", err_str);
  }    return rc;
   }
   CMP_FREE(geom);

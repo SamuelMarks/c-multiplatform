@@ -13,6 +13,7 @@
  */
 static int dummy_begin_frame(cmp_gpu_t *gpu) {
   (void)gpu;
+  cmp_log_debug("dummy_begin_frame: Executed mock begin_frame\n");
   return CMP_SUCCESS;
 }
 
@@ -24,6 +25,7 @@ static int dummy_begin_frame(cmp_gpu_t *gpu) {
  */
 static int dummy_end_frame(cmp_gpu_t *gpu) {
   (void)gpu;
+  cmp_log_debug("dummy_end_frame: Executed mock end_frame\n");
   return CMP_SUCCESS;
 }
 
@@ -35,6 +37,7 @@ static int dummy_end_frame(cmp_gpu_t *gpu) {
  */
 static int dummy_destroy(cmp_gpu_t *gpu) {
   (void)gpu;
+  cmp_log_debug("dummy_destroy: Executed mock destroy\n");
   return CMP_SUCCESS;
 }
 
@@ -51,17 +54,28 @@ static const cmp_gpu_vtable_t dummy_vtable = {dummy_begin_frame,
 int cmp_gpu_create(cmp_gpu_backend_type_t preferred_backend,
                    cmp_gpu_t **out_gpu) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   cmp_gpu_t *gpu = NULL;
 
-  if (!out_gpu) {
+  if (out_gpu == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_gpu_create: Invalid argument (out_gpu=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_gpu_create: Invalid argument (out_gpu=NULL): %s\n",
+                  err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_gpu_t), (void **)&gpu);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_gpu_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_gpu_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
@@ -69,7 +83,8 @@ int cmp_gpu_create(cmp_gpu_backend_type_t preferred_backend,
   gpu->backend = preferred_backend;
   gpu->vtable = &dummy_vtable;
   *out_gpu = gpu;
-  return rc;
+  cmp_log_debug("cmp_gpu_create: Successfully created GPU context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -80,21 +95,33 @@ int cmp_gpu_create(cmp_gpu_backend_type_t preferred_backend,
  */
 int cmp_gpu_destroy(cmp_gpu_t *gpu) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!gpu) {
+  if (gpu == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_gpu_destroy: Invalid argument (gpu=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_gpu_destroy: Invalid argument: %s\n", err_str);
     return rc;
   }
 
-  if (gpu->vtable && gpu->vtable->destroy) {
+  if (gpu->vtable != NULL && gpu->vtable->destroy != NULL) {
     rc = gpu->vtable->destroy(gpu);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Error in cmp_gpu_destroy: vtable->destroy failed\n");
+      cmp_log_debug("cmp_gpu_destroy: vtable->destroy failed\n");
     }
   }
-  CMP_FREE(gpu);
-  return rc;
+
+  rc = CMP_FREE(gpu);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_gpu_destroy: CMP_FREE failed\n");
+  }
+
+  cmp_log_debug("cmp_gpu_destroy: Successfully destroyed GPU context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -105,16 +132,22 @@ int cmp_gpu_destroy(cmp_gpu_t *gpu) {
  */
 int cmp_gpu_begin_frame(cmp_gpu_t *gpu) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!gpu || !gpu->vtable || !gpu->vtable->begin_frame) {
+  if (gpu == NULL || gpu->vtable == NULL || gpu->vtable->begin_frame == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_gpu_begin_frame: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_gpu_begin_frame: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = gpu->vtable->begin_frame(gpu);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_gpu_begin_frame: vtable->begin_frame failed\n");
+    cmp_log_debug("cmp_gpu_begin_frame: vtable->begin_frame failed\n");
   }
   return rc;
 }
@@ -127,16 +160,22 @@ int cmp_gpu_begin_frame(cmp_gpu_t *gpu) {
  */
 int cmp_gpu_end_frame(cmp_gpu_t *gpu) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!gpu || !gpu->vtable || !gpu->vtable->end_frame) {
+  if (gpu == NULL || gpu->vtable == NULL || gpu->vtable->end_frame == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_gpu_end_frame: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_gpu_end_frame: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = gpu->vtable->end_frame(gpu);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_gpu_end_frame: vtable->end_frame failed\n");
+    cmp_log_debug("cmp_gpu_end_frame: vtable->end_frame failed\n");
   }
   return rc;
 }
@@ -149,23 +188,35 @@ int cmp_gpu_end_frame(cmp_gpu_t *gpu) {
  */
 int cmp_vbo_create(cmp_vbo_t **out_vbo) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   cmp_vbo_t *vbo = NULL;
 
-  if (!out_vbo) {
+  if (out_vbo == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_vbo_create: Invalid argument (out_vbo=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_vbo_create: Invalid argument (out_vbo=NULL): %s\n",
+                  err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_vbo_t), (void **)&vbo);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_vbo_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_vbo_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
   memset(vbo, 0, sizeof(cmp_vbo_t));
   *out_vbo = vbo;
-  return rc;
+  cmp_log_debug("cmp_vbo_create: Successfully created VBO\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -178,29 +229,43 @@ int cmp_vbo_create(cmp_vbo_t **out_vbo) {
  */
 int cmp_vbo_append(cmp_vbo_t *vbo, const float *vertices, size_t count) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   size_t new_cap;
   float *new_data = NULL;
 
-  if (!vbo || !vertices || count == 0) {
+  if (vbo == NULL || vertices == NULL || count == 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_vbo_append: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_vbo_append: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   if (vbo->count + count > vbo->capacity) {
     new_cap = vbo->capacity == 0 ? 1024 : vbo->capacity * 2;
-    while (new_cap < vbo->count + count)
+    while (new_cap < vbo->count + count) {
       new_cap *= 2;
+    }
 
     rc = CMP_MALLOC(new_cap * sizeof(float), (void **)&new_data);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Error in cmp_vbo_append: Out of memory\n");
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      cmp_log_debug("cmp_vbo_append: Out of memory: %s\n", err_str);
       return rc;
     }
 
-    if (vbo->data) {
+    if (vbo->data != NULL) {
       memcpy(new_data, vbo->data, vbo->count * sizeof(float));
-      CMP_FREE(vbo->data);
+      rc = CMP_FREE(vbo->data);
+      if (rc != CMP_SUCCESS) {
+        cmp_log_debug("cmp_vbo_append: CMP_FREE old buffer failed\n");
+      }
     }
     vbo->data = new_data;
     vbo->capacity = new_cap;
@@ -208,7 +273,8 @@ int cmp_vbo_append(cmp_vbo_t *vbo, const float *vertices, size_t count) {
 
   memcpy(vbo->data + vbo->count, vertices, count * sizeof(float));
   vbo->count += count;
-  return rc;
+  cmp_log_debug("cmp_vbo_append: Appended to VBO\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -219,18 +285,32 @@ int cmp_vbo_append(cmp_vbo_t *vbo, const float *vertices, size_t count) {
  */
 int cmp_vbo_destroy(cmp_vbo_t *vbo) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!vbo) {
+  if (vbo == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_vbo_destroy: Invalid argument (vbo=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_vbo_destroy: Invalid argument: %s\n", err_str);
     return rc;
   }
 
-  if (vbo->data) {
-    CMP_FREE(vbo->data);
+  if (vbo->data != NULL) {
+    rc = CMP_FREE(vbo->data);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_vbo_destroy: CMP_FREE data failed\n");
+    }
   }
-  CMP_FREE(vbo);
-  return rc;
+  rc = CMP_FREE(vbo);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_vbo_destroy: CMP_FREE vbo failed\n");
+  }
+
+  cmp_log_debug("cmp_vbo_destroy: Successfully destroyed VBO\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -242,17 +322,27 @@ int cmp_vbo_destroy(cmp_vbo_t *vbo) {
  */
 int cmp_ubo_create(size_t size, cmp_ubo_t **out_ubo) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   cmp_ubo_t *ubo = NULL;
 
-  if (!out_ubo || size == 0) {
+  if (out_ubo == NULL || size == 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_ubo_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_ubo_create: Invalid argument\n");
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_ubo_t), (void **)&ubo);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_ubo_create: Out of memory for ubo\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_ubo_create: Out of memory for ubo: %s\n", err_str);
     return rc;
   }
 
@@ -260,15 +350,23 @@ int cmp_ubo_create(size_t size, cmp_ubo_t **out_ubo) {
 
   rc = CMP_MALLOC(size, &ubo->data);
   if (rc != CMP_SUCCESS) {
-    CMP_FREE(ubo);
-    LOG_DEBUG("Error in cmp_ubo_create: Out of memory for data\n");
-    return rc;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    rc = CMP_FREE(ubo);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_ubo_create: CMP_FREE ubo recovery failed\n");
+    }
+    cmp_log_debug("cmp_ubo_create: Out of memory for data: %s\n", err_str);
+    return CMP_ERROR_OOM;
   }
 
   memset(ubo->data, 0, size);
   ubo->size = size;
   *out_ubo = ubo;
-  return rc;
+  cmp_log_debug("cmp_ubo_create: Successfully created UBO\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -281,15 +379,22 @@ int cmp_ubo_create(size_t size, cmp_ubo_t **out_ubo) {
  */
 int cmp_ubo_update(cmp_ubo_t *ubo, const void *data, size_t size) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!ubo || !data || size == 0 || size > ubo->size) {
+  if (ubo == NULL || data == NULL || size == 0 || size > ubo->size) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_ubo_update: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_ubo_update: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   memcpy(ubo->data, data, size);
-  return rc;
+  cmp_log_debug("cmp_ubo_update: Updated UBO\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -300,19 +405,35 @@ int cmp_ubo_update(cmp_ubo_t *ubo, const void *data, size_t size) {
  */
 int cmp_ubo_destroy(cmp_ubo_t *ubo) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!ubo) {
+  if (ubo == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_ubo_destroy: Invalid argument (ubo=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_ubo_destroy: Invalid argument: %s\n", err_str);
     return rc;
   }
 
-  if (ubo->data) {
-    CMP_FREE(ubo->data);
+  if (ubo->data != NULL) {
+    rc = CMP_FREE(ubo->data);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_ubo_destroy: CMP_FREE data failed\n");
+    }
   }
-  CMP_FREE(ubo);
-  return rc;
+
+  rc = CMP_FREE(ubo);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_ubo_destroy: CMP_FREE ubo failed\n");
+  }
+
+  cmp_log_debug("cmp_ubo_destroy: Successfully destroyed UBO\n");
+  return CMP_SUCCESS;
 }
+
 /**
  * @brief cmp_draw_call_optimizer_create
  *
@@ -321,24 +442,37 @@ int cmp_ubo_destroy(cmp_ubo_t *ubo) {
  */
 int cmp_draw_call_optimizer_create(cmp_draw_call_optimizer_t **out_opt) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   cmp_draw_call_optimizer_t *opt = NULL;
 
-  if (!out_opt) {
+  if (out_opt == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_draw_call_optimizer_create: Invalid argument "
-              "(out_opt=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_draw_call_optimizer_create: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_draw_call_optimizer_t), (void **)&opt);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_draw_call_optimizer_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_draw_call_optimizer_create: Out of memory: %s\n",
+                  err_str);
     return rc;
   }
 
   memset(opt, 0, sizeof(cmp_draw_call_optimizer_t));
   *out_opt = opt;
-  return rc;
+  cmp_log_debug(
+      "cmp_draw_call_optimizer_create: Successfully created optimizer\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -351,12 +485,19 @@ int cmp_draw_call_optimizer_create(cmp_draw_call_optimizer_t **out_opt) {
 int cmp_draw_call_optimizer_add(cmp_draw_call_optimizer_t *opt,
                                 const cmp_draw_call_t *call) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   size_t new_cap;
   cmp_draw_call_t *new_calls = NULL;
 
-  if (!opt || !call) {
+  if (opt == NULL || call == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_draw_call_optimizer_add: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_draw_call_optimizer_add: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -364,19 +505,29 @@ int cmp_draw_call_optimizer_add(cmp_draw_call_optimizer_t *opt,
     new_cap = opt->capacity == 0 ? 32 : opt->capacity * 2;
     rc = CMP_MALLOC(new_cap * sizeof(cmp_draw_call_t), (void **)&new_calls);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Error in cmp_draw_call_optimizer_add: Out of memory\n");
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      cmp_log_debug("cmp_draw_call_optimizer_add: Out of memory: %s\n",
+                    err_str);
       return rc;
     }
-    if (opt->calls) {
+    if (opt->calls != NULL) {
       memcpy(new_calls, opt->calls, opt->count * sizeof(cmp_draw_call_t));
-      CMP_FREE(opt->calls);
+      rc = CMP_FREE(opt->calls);
+      if (rc != CMP_SUCCESS) {
+        cmp_log_debug(
+            "cmp_draw_call_optimizer_add: CMP_FREE old array failed\n");
+      }
     }
     opt->calls = new_calls;
     opt->capacity = new_cap;
   }
   memcpy(&opt->calls[opt->count], call, sizeof(cmp_draw_call_t));
   opt->count++;
-  return rc;
+  cmp_log_debug("cmp_draw_call_optimizer_add: Added draw call to optimizer\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -387,29 +538,44 @@ int cmp_draw_call_optimizer_add(cmp_draw_call_optimizer_t *opt,
  */
 int cmp_draw_call_optimizer_optimize(cmp_draw_call_optimizer_t *opt) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   cmp_draw_call_t *optimized = NULL;
   size_t optimized_count = 0, i;
+  cmp_draw_call_t *last;
+  cmp_draw_call_t *curr;
 
-  if (!opt) {
+  if (opt == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_draw_call_optimizer_optimize: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_draw_call_optimizer_optimize: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
-  if (opt->count <= 1)
-    return rc;
+  if (opt->count <= 1) {
+    return CMP_SUCCESS;
+  }
 
   rc = CMP_MALLOC(opt->count * sizeof(cmp_draw_call_t), (void **)&optimized);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_draw_call_optimizer_optimize: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_draw_call_optimizer_optimize: Out of memory: %s\n",
+                  err_str);
     return rc;
   }
 
   memcpy(&optimized[0], &opt->calls[0], sizeof(cmp_draw_call_t));
   optimized_count++;
   for (i = 1; i < opt->count; i++) {
-    cmp_draw_call_t *last = &optimized[optimized_count - 1];
-    cmp_draw_call_t *curr = &opt->calls[i];
+    last = &optimized[optimized_count - 1];
+    curr = &opt->calls[i];
     if (last->texture_id == curr->texture_id &&
         last->shader_id == curr->shader_id &&
         last->blend_mode == curr->blend_mode &&
@@ -426,11 +592,19 @@ int cmp_draw_call_optimizer_optimize(cmp_draw_call_optimizer_t *opt) {
       optimized_count++;
     }
   }
-  CMP_FREE(opt->calls);
+
+  rc = CMP_FREE(opt->calls);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_draw_call_optimizer_optimize: CMP_FREE old unoptimized "
+                  "array failed\n");
+  }
+
   opt->calls = optimized;
   opt->count = optimized_count;
   opt->capacity = opt->count;
-  return rc;
+  cmp_log_debug(
+      "cmp_draw_call_optimizer_optimize: Optimization loop complete\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -441,17 +615,35 @@ int cmp_draw_call_optimizer_optimize(cmp_draw_call_optimizer_t *opt) {
  */
 int cmp_draw_call_optimizer_destroy(cmp_draw_call_optimizer_t *opt) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!opt) {
+  if (opt == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_draw_call_optimizer_destroy: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_draw_call_optimizer_destroy: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
-  if (opt->calls)
-    CMP_FREE(opt->calls);
-  CMP_FREE(opt);
-  return rc;
+  if (opt->calls != NULL) {
+    rc = CMP_FREE(opt->calls);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_draw_call_optimizer_destroy: CMP_FREE array failed\n");
+    }
+  }
+
+  rc = CMP_FREE(opt);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_draw_call_optimizer_destroy: CMP_FREE opt failed\n");
+  }
+
+  cmp_log_debug(
+      "cmp_draw_call_optimizer_destroy: Successfully destroyed optimizer\n");
+  return CMP_SUCCESS;
 }
 
 struct cmp_command_buffer {
@@ -474,17 +666,28 @@ struct cmp_command_buffer {
 int cmp_command_buffer_create(cmp_gpu_t *gpu, int is_secondary,
                               cmp_command_buffer_t **out_cb) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_command_buffer *cb = NULL;
 
-  if (!gpu || !out_cb) {
+  if (gpu == NULL || out_cb == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_command_buffer_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_create: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_command_buffer), (void **)&cb);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_command_buffer_create: Out of memory for cb\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_create: Out of memory for cb: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -496,15 +699,24 @@ int cmp_command_buffer_create(cmp_gpu_t *gpu, int is_secondary,
   rc = CMP_MALLOC(sizeof(cmp_draw_call_t) * cb->command_capacity,
                   (void **)&cb->commands);
   if (rc != CMP_SUCCESS) {
-    CMP_FREE(cb);
-    LOG_DEBUG(
-        "Error in cmp_command_buffer_create: Out of memory for commands\n");
-    return rc;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    rc = CMP_FREE(cb);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_command_buffer_create: CMP_FREE recovery failed\n");
+    }
+    cmp_log_debug("cmp_command_buffer_create: Out of memory for commands: %s\n",
+                  err_str);
+    return CMP_ERROR_OOM;
   }
 
   memset(cb->commands, 0, sizeof(cmp_draw_call_t) * cb->command_capacity);
   *out_cb = (cmp_command_buffer_t *)cb;
-  return rc;
+  cmp_log_debug(
+      "cmp_command_buffer_create: Successfully created command buffer\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -515,18 +727,36 @@ int cmp_command_buffer_create(cmp_gpu_t *gpu, int is_secondary,
  */
 int cmp_command_buffer_destroy(cmp_command_buffer_t *cb) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_command_buffer *ctx = (struct cmp_command_buffer *)cb;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_command_buffer_destroy: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_destroy: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
-  if (ctx->commands)
-    CMP_FREE(ctx->commands);
-  CMP_FREE(ctx);
-  return rc;
+  if (ctx->commands != NULL) {
+    rc = CMP_FREE(ctx->commands);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_command_buffer_destroy: CMP_FREE commands failed\n");
+    }
+  }
+
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_command_buffer_destroy: CMP_FREE ctx failed\n");
+  }
+
+  cmp_log_debug(
+      "cmp_command_buffer_destroy: Successfully destroyed command buffer\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -537,17 +767,24 @@ int cmp_command_buffer_destroy(cmp_command_buffer_t *cb) {
  */
 int cmp_command_buffer_begin(cmp_command_buffer_t *cb) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_command_buffer *ctx = (struct cmp_command_buffer *)cb;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_command_buffer_begin: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_begin: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   ctx->command_count = 0;
   ctx->is_recording = 1;
-  return rc;
+  cmp_log_debug("cmp_command_buffer_begin: Command buffer begin recording\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -558,16 +795,23 @@ int cmp_command_buffer_begin(cmp_command_buffer_t *cb) {
  */
 int cmp_command_buffer_end(cmp_command_buffer_t *cb) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_command_buffer *ctx = (struct cmp_command_buffer *)cb;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_command_buffer_end: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_end: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   ctx->is_recording = 0;
-  return rc;
+  cmp_log_debug("cmp_command_buffer_end: Command buffer end recording\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -580,36 +824,58 @@ int cmp_command_buffer_end(cmp_command_buffer_t *cb) {
 int cmp_command_buffer_draw(cmp_command_buffer_t *cb,
                             const cmp_draw_call_t *call) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_command_buffer *ctx = (struct cmp_command_buffer *)cb;
+  cmp_draw_call_t *new_cmds = NULL;
+  int new_cap;
 
-  if (!ctx || !call) {
+  if (ctx == NULL || call == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_command_buffer_draw: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_draw: Invalid argument: %s\n", err_str);
     return rc;
   }
 
-  if (!ctx->is_recording) {
+  if (ctx->is_recording == 0) {
     rc = CMP_ERROR_INVALID_STATE;
-    LOG_DEBUG("Error in cmp_command_buffer_draw: Not recording\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_draw: Not recording: %s\n", err_str);
     return rc;
   }
 
   if (ctx->command_count >= ctx->command_capacity) {
-    cmp_draw_call_t *new_cmds = NULL;
-    int new_cap = ctx->command_capacity * 2;
+    new_cap = ctx->command_capacity * 2;
     rc = CMP_MALLOC(sizeof(cmp_draw_call_t) * new_cap, (void **)&new_cmds);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Error in cmp_command_buffer_draw: Out of memory\n");
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      cmp_log_debug("cmp_command_buffer_draw: Out of memory: %s\n", err_str);
       return rc;
     }
-    memcpy(new_cmds, ctx->commands,
-           sizeof(cmp_draw_call_t) * ctx->command_count);
-    CMP_FREE(ctx->commands);
+    if (ctx->commands != NULL) {
+      memcpy(new_cmds, ctx->commands,
+             sizeof(cmp_draw_call_t) * ctx->command_count);
+      rc = CMP_FREE(ctx->commands);
+      if (rc != CMP_SUCCESS) {
+        cmp_log_debug(
+            "cmp_command_buffer_draw: CMP_FREE old commands failed\n");
+      }
+    }
     ctx->commands = new_cmds;
     ctx->command_capacity = new_cap;
   }
   ctx->commands[ctx->command_count++] = *call;
-  return rc;
+  cmp_log_debug("cmp_command_buffer_draw: Tracked draw call\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -624,46 +890,72 @@ int cmp_command_buffer_execute_commands(cmp_command_buffer_t *primary,
                                         cmp_command_buffer_t **secondaries,
                                         int count) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_command_buffer *p_ctx = (struct cmp_command_buffer *)primary;
+  struct cmp_command_buffer *s_ctx;
   int i;
+  int j;
 
-  if (!p_ctx || !secondaries) {
+  if (p_ctx == NULL || secondaries == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_command_buffer_execute_commands: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_execute_commands: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
-  if (p_ctx->is_secondary) {
+  if (p_ctx->is_secondary != 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_command_buffer_execute_commands: Cannot execute "
-              "secondaries in a secondary\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_execute_commands: Cannot execute "
+                  "secondaries in a secondary: %s\n",
+                  err_str);
     return rc;
   }
 
-  if (!p_ctx->is_recording) {
+  if (p_ctx->is_recording == 0) {
     rc = CMP_ERROR_INVALID_STATE;
-    LOG_DEBUG("Error in cmp_command_buffer_execute_commands: Primary is not "
-              "recording\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_execute_commands: Primary is not "
+                  "recording: %s\n",
+                  err_str);
     return rc;
   }
 
   for (i = 0; i < count; i++) {
-    struct cmp_command_buffer *s_ctx =
-        (struct cmp_command_buffer *)secondaries[i];
-    int j;
+    s_ctx = (struct cmp_command_buffer *)secondaries[i];
 
-    if (!s_ctx || !s_ctx->is_secondary) {
+    if (s_ctx == NULL || s_ctx->is_secondary == 0) {
       rc = CMP_ERROR_INVALID_ARG;
-      LOG_DEBUG("Error in cmp_command_buffer_execute_commands: Invalid "
-                "secondary buffer\n");
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      cmp_log_debug("cmp_command_buffer_execute_commands: Invalid "
+                    "secondary buffer: %s\n",
+                    err_str);
       return rc;
     }
 
-    if (s_ctx->is_recording) {
+    if (s_ctx->is_recording != 0) {
       rc = CMP_ERROR_INVALID_STATE;
-      LOG_DEBUG("Error in cmp_command_buffer_execute_commands: Secondary is "
-                "still recording\n");
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      cmp_log_debug("cmp_command_buffer_execute_commands: Secondary is "
+                    "still recording: %s\n",
+                    err_str);
       return rc;
     }
 
@@ -671,13 +963,17 @@ int cmp_command_buffer_execute_commands(cmp_command_buffer_t *primary,
       rc = cmp_command_buffer_draw((cmp_command_buffer_t *)p_ctx,
                                    &s_ctx->commands[j]);
       if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("Error in cmp_command_buffer_execute_commands: "
-                  "cmp_command_buffer_draw failed\n");
+        cmp_log_debug("cmp_command_buffer_execute_commands: "
+                      "cmp_command_buffer_draw failed\n");
         return rc;
       }
     }
   }
-  return rc;
+
+  cmp_log_debug(
+      "cmp_command_buffer_execute_commands: Executed %d secondary buffers\n",
+      count);
+  return CMP_SUCCESS;
 }
 
 struct cmp_render_graph {
@@ -693,23 +989,34 @@ struct cmp_render_graph {
  */
 int cmp_render_graph_create(cmp_render_graph_t **out_graph) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_render_graph *graph = NULL;
 
-  if (!out_graph) {
+  if (out_graph == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_render_graph_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_render_graph_create: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_render_graph), (void **)&graph);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_render_graph_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_render_graph_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
   memset(graph, 0, sizeof(struct cmp_render_graph));
   *out_graph = (cmp_render_graph_t *)graph;
-  return rc;
+  cmp_log_debug("cmp_render_graph_create: Successfully created render graph\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -720,16 +1027,28 @@ int cmp_render_graph_create(cmp_render_graph_t **out_graph) {
  */
 int cmp_render_graph_destroy(cmp_render_graph_t *graph) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_render_graph *ctx = (struct cmp_render_graph *)graph;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_render_graph_destroy: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_render_graph_destroy: Invalid argument: %s\n", err_str);
     return rc;
   }
 
-  CMP_FREE(ctx);
-  return rc;
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_render_graph_destroy: CMP_FREE failed\n");
+  }
+
+  cmp_log_debug(
+      "cmp_render_graph_destroy: Successfully destroyed render graph\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -742,22 +1061,34 @@ int cmp_render_graph_destroy(cmp_render_graph_t *graph) {
 int cmp_render_graph_add_pass(cmp_render_graph_t *graph,
                               const cmp_render_pass_config_t *config) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_render_graph *ctx = (struct cmp_render_graph *)graph;
 
-  if (!ctx || !config) {
+  if (ctx == NULL || config == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_render_graph_add_pass: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_render_graph_add_pass: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   if (ctx->pass_count >= 64) {
     rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_render_graph_add_pass: Max passes reached\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_render_graph_add_pass: Max passes reached: %s\n",
+                  err_str);
     return rc;
   }
 
   ctx->passes[ctx->pass_count++] = *config;
-  return rc;
+  cmp_log_debug("cmp_render_graph_add_pass: Added render pass node\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -770,8 +1101,9 @@ int cmp_render_graph_add_pass(cmp_render_graph_t *graph,
 static int _cmp_render_graph_find_pass(struct cmp_render_graph *ctx, int id) {
   int i;
   for (i = 0; i < ctx->pass_count; ++i) {
-    if (ctx->passes[i].id == id)
+    if (ctx->passes[i].id == id) {
       return i;
+    }
   }
   return -1;
 }
@@ -786,16 +1118,24 @@ static int _cmp_render_graph_find_pass(struct cmp_render_graph *ctx, int id) {
 int cmp_render_graph_execute(cmp_render_graph_t *graph,
                              cmp_command_buffer_t *cb) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_render_graph *ctx = (struct cmp_render_graph *)graph;
   int executed[64];
   int executed_count = 0;
   int progress;
   int i, j;
   int all_deps_met;
+  int dep_id;
+  int dep_idx;
 
-  if (!ctx || !cb) {
+  if (ctx == NULL || cb == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_render_graph_execute: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_render_graph_execute: Invalid argument: %s\n", err_str);
     return rc;
   }
 
@@ -804,21 +1144,22 @@ int cmp_render_graph_execute(cmp_render_graph_t *graph,
   do {
     progress = 0;
     for (i = 0; i < ctx->pass_count; i++) {
-      if (executed[i])
+      if (executed[i] != 0) {
         continue;
+      }
 
       all_deps_met = 1;
       for (j = 0; j < ctx->passes[i].dependency_count; j++) {
-        int dep_id = ctx->passes[i].dependencies[j];
-        int dep_idx = _cmp_render_graph_find_pass(ctx, dep_id);
-        if (dep_idx == -1 || !executed[dep_idx]) {
+        dep_id = ctx->passes[i].dependencies[j];
+        dep_idx = _cmp_render_graph_find_pass(ctx, dep_id);
+        if (dep_idx == -1 || executed[dep_idx] == 0) {
           all_deps_met = 0;
           break;
         }
       }
 
-      if (all_deps_met) {
-        if (ctx->passes[i].execute_cb) {
+      if (all_deps_met != 0) {
+        if (ctx->passes[i].execute_cb != NULL) {
           ctx->passes[i].execute_cb(cb, ctx->passes[i].user_data);
         }
         executed[i] = 1;
@@ -826,16 +1167,23 @@ int cmp_render_graph_execute(cmp_render_graph_t *graph,
         progress = 1;
       }
     }
-  } while (progress && executed_count < ctx->pass_count);
+  } while (progress != 0 && executed_count < ctx->pass_count);
 
   if (executed_count < ctx->pass_count) {
     rc = CMP_ERROR_INVALID_STATE; /* Circular dependency or missing pass */
-    LOG_DEBUG("Error in cmp_render_graph_execute: Circular dependency or "
-              "missing pass\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_render_graph_execute: Circular dependency or "
+                  "missing pass: %s\n",
+                  err_str);
     return rc;
   }
 
-  return rc;
+  cmp_log_debug(
+      "cmp_render_graph_execute: Executed rendering graph topology\n");
+  return CMP_SUCCESS;
 }
 
 struct cmp_pso {
@@ -856,23 +1204,34 @@ struct cmp_pso_cache {
  */
 int cmp_pso_cache_create(cmp_pso_cache_t **out_cache) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_pso_cache *cache = NULL;
 
-  if (!out_cache) {
+  if (out_cache == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_pso_cache_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_pso_cache_create: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_pso_cache), (void **)&cache);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_pso_cache_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_pso_cache_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
   memset(cache, 0, sizeof(struct cmp_pso_cache));
   *out_cache = (cmp_pso_cache_t *)cache;
-  return rc;
+  cmp_log_debug("cmp_pso_cache_create: Successfully created PSO cache\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -883,20 +1242,34 @@ int cmp_pso_cache_create(cmp_pso_cache_t **out_cache) {
  */
 int cmp_pso_cache_destroy(cmp_pso_cache_t *cache) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_pso_cache *ctx = (struct cmp_pso_cache *)cache;
   int i;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_pso_cache_destroy: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_pso_cache_destroy: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   for (i = 0; i < ctx->count; i++) {
-    CMP_FREE(ctx->psos[i]);
+    rc = CMP_FREE(ctx->psos[i]);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_pso_cache_destroy: CMP_FREE cache item failed\n");
+    }
   }
-  CMP_FREE(ctx);
-  return rc;
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_pso_cache_destroy: CMP_FREE context failed\n");
+  }
+
+  cmp_log_debug("cmp_pso_cache_destroy: Successfully destroyed PSO cache\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -911,13 +1284,20 @@ int cmp_pso_cache_get_or_create(cmp_pso_cache_t *cache,
                                 const cmp_pipeline_state_t *state,
                                 cmp_pso_t **out_pso) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_pso_cache *ctx = (struct cmp_pso_cache *)cache;
   int i;
   struct cmp_pso *new_pso = NULL;
 
-  if (!ctx || !state || !out_pso) {
+  if (ctx == NULL || state == NULL || out_pso == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_pso_cache_get_or_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_pso_cache_get_or_create: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -925,19 +1305,28 @@ int cmp_pso_cache_get_or_create(cmp_pso_cache_t *cache,
     if (memcmp(&ctx->psos[i]->state, state, sizeof(cmp_pipeline_state_t)) ==
         0) {
       *out_pso = (cmp_pso_t *)ctx->psos[i];
-      return rc;
+      cmp_log_debug("cmp_pso_cache_get_or_create: Found PSO in cache\n");
+      return CMP_SUCCESS;
     }
   }
 
   if (ctx->count >= 256) {
     rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_pso_cache_get_or_create: Cache full\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_pso_cache_get_or_create: Cache full: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_pso), (void **)&new_pso);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_pso_cache_get_or_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_pso_cache_get_or_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
@@ -947,7 +1336,8 @@ int cmp_pso_cache_get_or_create(cmp_pso_cache_t *cache,
 
   ctx->psos[ctx->count++] = new_pso;
   *out_pso = (cmp_pso_t *)new_pso;
-  return rc;
+  cmp_log_debug("cmp_pso_cache_get_or_create: Cached new PSO\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -959,21 +1349,34 @@ int cmp_pso_cache_get_or_create(cmp_pso_cache_t *cache,
  */
 int cmp_command_buffer_bind_pso(cmp_command_buffer_t *cb, cmp_pso_t *pso) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_command_buffer *ctx = (struct cmp_command_buffer *)cb;
 
-  if (!ctx || !pso) {
+  if (ctx == NULL || pso == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_command_buffer_bind_pso: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_bind_pso: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
-  if (!ctx->is_recording) {
+  if (ctx->is_recording == 0) {
     rc = CMP_ERROR_INVALID_STATE;
-    LOG_DEBUG("Error in cmp_command_buffer_bind_pso: Not recording\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_buffer_bind_pso: Not recording: %s\n", err_str);
     return rc;
   }
 
-  return rc;
+  cmp_log_debug(
+      "cmp_command_buffer_bind_pso: Bound PSO state to command buffer\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -987,27 +1390,38 @@ int cmp_command_buffer_bind_pso(cmp_command_buffer_t *cb, cmp_pso_t *pso) {
 int cmp_shader_compile_spirv(const char *source, size_t size,
                              cmp_shader_t **out_shader) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_shader *shader = NULL;
 
   (void)source;
   (void)size;
 
-  if (!out_shader) {
+  if (out_shader == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_shader_compile_spirv: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_shader_compile_spirv: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_shader), (void **)&shader);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_shader_compile_spirv: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_shader_compile_spirv: Out of memory: %s\n", err_str);
     return rc;
   }
 
   memset(shader, 0, sizeof(struct cmp_shader));
   shader->internal_handle = (void *)0x5B1210;
   *out_shader = shader;
-  return rc;
+  cmp_log_debug("cmp_shader_compile_spirv: Mapped mocked SPIR-V generation\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -1022,7 +1436,7 @@ int cmp_shader_compile_msl(const char *source, size_t size,
                            cmp_shader_t **out_shader) {
   int rc = cmp_shader_compile_spirv(source, size, out_shader);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_shader_compile_msl: Fallback to spirv failed\n");
+    cmp_log_debug("cmp_shader_compile_msl: Fallback to spirv failed\n");
   }
   return rc;
 }
@@ -1045,17 +1459,27 @@ struct cmp_gpu_allocator {
 int cmp_gpu_allocator_create(cmp_gpu_t *gpu, size_t block_size,
                              cmp_gpu_allocator_t **out_allocator) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_gpu_allocator *alloc = NULL;
 
-  if (!gpu || !out_allocator) {
+  if (gpu == NULL || out_allocator == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_gpu_allocator_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_gpu_allocator_create: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_gpu_allocator), (void **)&alloc);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_gpu_allocator_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_gpu_allocator_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
@@ -1066,15 +1490,25 @@ int cmp_gpu_allocator_create(cmp_gpu_t *gpu, size_t block_size,
 
   rc = CMP_MALLOC(block_size, &alloc->base_mem);
   if (rc != CMP_SUCCESS) {
-    CMP_FREE(alloc);
-    LOG_DEBUG("Error in cmp_gpu_allocator_create: Out of memory allocating "
-              "base_mem\n");
-    return rc;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    rc = CMP_FREE(alloc);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_gpu_allocator_create: CMP_FREE recovery failed\n");
+    }
+    cmp_log_debug("cmp_gpu_allocator_create: Out of memory allocating "
+                  "base_mem: %s\n",
+                  err_str);
+    return CMP_ERROR_OOM;
   }
 
   memset(alloc->base_mem, 0, block_size);
   *out_allocator = (cmp_gpu_allocator_t *)alloc;
-  return rc;
+  cmp_log_debug("cmp_gpu_allocator_create: Configured global memory buffer "
+                "allocator map\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -1085,17 +1519,34 @@ int cmp_gpu_allocator_create(cmp_gpu_t *gpu, size_t block_size,
  */
 int cmp_gpu_allocator_destroy(cmp_gpu_allocator_t *allocator) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_gpu_allocator *alloc = (struct cmp_gpu_allocator *)allocator;
 
-  if (!alloc) {
+  if (alloc == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_gpu_allocator_destroy: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_gpu_allocator_destroy: Invalid argument: %s\n", err_str);
     return rc;
   }
 
-  CMP_FREE(alloc->base_mem);
-  CMP_FREE(alloc);
-  return rc;
+  if (alloc->base_mem != NULL) {
+    rc = CMP_FREE(alloc->base_mem);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_gpu_allocator_destroy: CMP_FREE base_mem failed\n");
+    }
+  }
+  rc = CMP_FREE(alloc);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_gpu_allocator_destroy: CMP_FREE alloc context failed\n");
+  }
+
+  cmp_log_debug("cmp_gpu_allocator_destroy: Successfully dismantled global "
+                "memory buffer\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -1112,19 +1563,29 @@ int cmp_gpu_allocator_alloc(cmp_gpu_allocator_t *allocator, size_t size,
                             size_t alignment, void **out_mem,
                             size_t *out_offset) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_gpu_allocator *alloc = (struct cmp_gpu_allocator *)allocator;
   size_t padding;
 
-  if (!alloc || !out_mem || !out_offset) {
+  if (alloc == NULL || out_mem == NULL || out_offset == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_gpu_allocator_alloc: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_gpu_allocator_alloc: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   padding = (alignment - (alloc->used % alignment)) % alignment;
   if (alloc->used + padding + size > alloc->block_size) {
     rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_gpu_allocator_alloc: Block full\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_gpu_allocator_alloc: Block full: %s\n", err_str);
     return rc;
   }
 
@@ -1132,7 +1593,10 @@ int cmp_gpu_allocator_alloc(cmp_gpu_allocator_t *allocator, size_t size,
   *out_offset = alloc->used;
   *out_mem = (void *)((char *)alloc->base_mem + alloc->used);
   alloc->used += size;
-  return rc;
+
+  cmp_log_debug(
+      "cmp_gpu_allocator_alloc: Provided managed suballocation map pointer\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -1146,6 +1610,8 @@ int cmp_gpu_allocator_free(cmp_gpu_allocator_t *allocator, void *mem) {
   int rc = CMP_SUCCESS;
   (void)allocator;
   (void)mem;
+  cmp_log_debug(
+      "cmp_gpu_allocator_free: Evaluated linear memory chunk freeing rules\n");
   return rc;
 }
 
@@ -1169,17 +1635,27 @@ struct cmp_atlas {
 int cmp_atlas_create(cmp_gpu_t *gpu, int width, int height,
                      cmp_atlas_t **out_atlas) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_atlas *atlas = NULL;
 
-  if (!gpu || !out_atlas || width <= 0 || height <= 0) {
+  if (gpu == NULL || out_atlas == NULL || width <= 0 || height <= 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_atlas_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_atlas_create: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_atlas), (void **)&atlas);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_atlas_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_atlas_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
@@ -1188,16 +1664,25 @@ int cmp_atlas_create(cmp_gpu_t *gpu, int width, int height,
   atlas->width = width;
   atlas->height = height;
 
-  rc = CMP_MALLOC(width * height * 4, &atlas->pixels);
+  rc = CMP_MALLOC((size_t)(width * height * 4), &atlas->pixels);
   if (rc != CMP_SUCCESS) {
-    CMP_FREE(atlas);
-    LOG_DEBUG("Error in cmp_atlas_create: Out of memory for pixels\n");
-    return rc;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    rc = CMP_FREE(atlas);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_atlas_create: CMP_FREE atlas recovery failed\n");
+    }
+    cmp_log_debug("cmp_atlas_create: Out of memory for pixels: %s\n", err_str);
+    return CMP_ERROR_OOM;
   }
 
-  memset(atlas->pixels, 0, width * height * 4);
+  memset(atlas->pixels, 0, (size_t)(width * height * 4));
   *out_atlas = (cmp_atlas_t *)atlas;
-  return rc;
+  cmp_log_debug(
+      "cmp_atlas_create: Instantiated linear pixel atlas dimensions\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -1208,17 +1693,35 @@ int cmp_atlas_create(cmp_gpu_t *gpu, int width, int height,
  */
 int cmp_atlas_destroy(cmp_atlas_t *atlas) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_atlas *ctx = (struct cmp_atlas *)atlas;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_atlas_destroy: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_atlas_destroy: Invalid argument: %s\n", err_str);
     return rc;
   }
 
-  CMP_FREE(ctx->pixels);
-  CMP_FREE(ctx);
-  return rc;
+  if (ctx->pixels != NULL) {
+    rc = CMP_FREE(ctx->pixels);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_atlas_destroy: CMP_FREE pixels failed\n");
+    }
+  }
+
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_atlas_destroy: CMP_FREE ctx failed\n");
+  }
+
+  cmp_log_debug(
+      "cmp_atlas_destroy: Flushed localized atlas memory constraints\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -1235,11 +1738,18 @@ int cmp_atlas_destroy(cmp_atlas_t *atlas) {
 int cmp_atlas_insert(cmp_atlas_t *atlas, int width, int height,
                      const void *pixels, int *out_x, int *out_y) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_atlas *ctx = (struct cmp_atlas *)atlas;
 
-  if (!ctx || !pixels || !out_x || !out_y || width <= 0 || height <= 0) {
+  if (ctx == NULL || pixels == NULL || out_x == NULL || out_y == NULL ||
+      width <= 0 || height <= 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_atlas_insert: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_atlas_insert: Invalid argument: %s\n", err_str);
     return rc;
   }
 
@@ -1251,7 +1761,11 @@ int cmp_atlas_insert(cmp_atlas_t *atlas, int width, int height,
 
   if (ctx->current_y + height > ctx->height) {
     rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_atlas_insert: Atlas full\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_atlas_insert: Atlas full: %s\n", err_str);
     return rc;
   }
 
@@ -1259,10 +1773,12 @@ int cmp_atlas_insert(cmp_atlas_t *atlas, int width, int height,
   *out_y = ctx->current_y;
 
   ctx->current_x += width;
-  if (height > ctx->current_row_height)
+  if (height > ctx->current_row_height) {
     ctx->current_row_height = height;
+  }
 
-  return rc;
+  cmp_log_debug("cmp_atlas_insert: Configured row boundary displacement\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -1273,19 +1789,26 @@ int cmp_atlas_insert(cmp_atlas_t *atlas, int width, int height,
  */
 int cmp_atlas_evict(cmp_atlas_t *atlas) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_atlas *ctx = (struct cmp_atlas *)atlas;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_atlas_evict: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_atlas_evict: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   ctx->current_x = 0;
   ctx->current_y = 0;
   ctx->current_row_height = 0;
-  memset(ctx->pixels, 0, ctx->width * ctx->height * 4);
-  return rc;
+  memset(ctx->pixels, 0, (size_t)(ctx->width * ctx->height * 4));
+  cmp_log_debug("cmp_atlas_evict: Cleared internal GPU texture allocations\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -1302,25 +1825,39 @@ int cmp_tex_compression_decode_astc(const void *data, size_t size,
                                     void **out_rgba, int *out_width,
                                     int *out_height) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   (void)data;
   (void)size;
 
-  if (!out_rgba || !out_width || !out_height) {
+  if (out_rgba == NULL || out_width == NULL || out_height == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_tex_compression_decode_astc: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_tex_compression_decode_astc: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
-  rc = CMP_MALLOC(64 * 64 * 4, out_rgba);
+  rc = CMP_MALLOC((size_t)(64 * 64 * 4), out_rgba);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_tex_compression_decode_astc: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_tex_compression_decode_astc: Out of memory: %s\n",
+                  err_str);
     return rc;
   }
 
-  memset(*out_rgba, 0, 64 * 64 * 4);
+  memset(*out_rgba, 0, (size_t)(64 * 64 * 4));
   *out_width = 64;
   *out_height = 64;
-  return rc;
+  cmp_log_debug(
+      "cmp_tex_compression_decode_astc: Emulated block decoding ASTC\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -1339,8 +1876,7 @@ int cmp_tex_compression_decode_bc7(const void *data, size_t size,
   int rc = cmp_tex_compression_decode_astc(data, size, out_rgba, out_width,
                                            out_height);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG(
-        "Error in cmp_tex_compression_decode_bc7: Fallback to astc failed\n");
+    cmp_log_debug("cmp_tex_compression_decode_bc7: Fallback to astc failed\n");
   }
   return rc;
 }
@@ -1357,10 +1893,16 @@ int cmp_frustum_culling_test(const cmp_rect_t *node_rect,
                              const cmp_rect_t *viewport_rect,
                              int *out_is_visible) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!node_rect || !viewport_rect || !out_is_visible) {
+  if (node_rect == NULL || viewport_rect == NULL || out_is_visible == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_frustum_culling_test: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_frustum_culling_test: Invalid argument: %s\n", err_str);
     return rc;
   }
 
@@ -1372,5 +1914,8 @@ int cmp_frustum_culling_test(const cmp_rect_t *node_rect,
   } else {
     *out_is_visible = 1;
   }
-  return rc;
+
+  cmp_log_debug("cmp_frustum_culling_test: Validated AABB boundaries %d\n",
+                *out_is_visible);
+  return CMP_SUCCESS;
 }

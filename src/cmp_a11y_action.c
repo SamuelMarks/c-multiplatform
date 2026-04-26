@@ -20,33 +20,35 @@ struct cmp_a11y_action {
 int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
                            cmp_a11y_action_t **out_action) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_action *action = NULL;
 
-  if (!tree || !out_action) {
+  if (tree == NULL || out_action == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_a11y_action_create: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_a11y_action_create: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_a11y_action), (void **)&action);
   if (rc != CMP_SUCCESS) {
-    if (rc == CMP_SUCCESS)
-      rc = CMP_ERROR_OOM;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_a11y_action_create CMP_MALLOC: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_a11y_action_create CMP_MALLOC: %s\n", err_str);
     return rc;
   }
 
   action->tree = tree;
 
   *out_action = (cmp_a11y_action_t *)action;
+  cmp_log_debug(
+      "cmp_a11y_action_create: Successfully created a11y action context\n");
   return rc;
 }
 
@@ -58,19 +60,23 @@ int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
  */
 int cmp_a11y_action_destroy(cmp_a11y_action_t *action) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_action *a = (struct cmp_a11y_action *)action;
 
-  if (!a) {
+  if (a == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_a11y_action_destroy: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_a11y_action_destroy: %s\n", err_str);
     return rc;
   }
 
   CMP_FREE(a);
+  cmp_log_debug(
+      "cmp_a11y_action_destroy: Successfully destroyed a11y action context\n");
   return rc;
 }
 
@@ -85,16 +91,18 @@ int cmp_a11y_action_destroy(cmp_a11y_action_t *action) {
 int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
                             cmp_a11y_action_type_t action_type) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_a11y_action *a = (struct cmp_a11y_action *)action;
   cmp_event_t simulated_event;
 
-  if (!a || node_id < 0) {
+  if (a == NULL || node_id < 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_a11y_action_execute: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_a11y_action_execute: %s\n", err_str);
     return rc;
   }
 
@@ -109,23 +117,25 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
     simulated_event.action = CMP_ACTION_DOWN;
     rc = cmp_event_push(&simulated_event);
     if (rc != CMP_SUCCESS) {
-      {
-        const char *err_str;
-        cmp_strerror(rc, &err_str);
-        LOG_DEBUG("cmp_a11y_action_execute click push down: %s\n", err_str);
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
       }
+      cmp_log_debug("cmp_a11y_action_execute click push down: %s\n", err_str);
       return rc;
     }
     simulated_event.action = CMP_ACTION_UP;
     rc = cmp_event_push(&simulated_event);
     if (rc != CMP_SUCCESS) {
-      {
-        const char *err_str;
-        cmp_strerror(rc, &err_str);
-        LOG_DEBUG("cmp_a11y_action_execute click push up: %s\n", err_str);
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
       }
+      cmp_log_debug("cmp_a11y_action_execute click push up: %s\n", err_str);
       return rc;
     }
+    cmp_log_debug("cmp_a11y_action_execute: Pushed CLICK events for node %d\n",
+                  node_id);
     break;
 
   case CMP_A11Y_ACTION_SCROLL_FORWARD:
@@ -134,13 +144,16 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
     simulated_event.y = -50; /* Arbitrary scroll tick */
     rc = cmp_event_push(&simulated_event);
     if (rc != CMP_SUCCESS) {
-      {
-        const char *err_str;
-        cmp_strerror(rc, &err_str);
-        LOG_DEBUG("cmp_a11y_action_execute scroll fwd: %s\n", err_str);
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
       }
+      cmp_log_debug("cmp_a11y_action_execute scroll fwd: %s\n", err_str);
       return rc;
     }
+    cmp_log_debug(
+        "cmp_a11y_action_execute: Pushed SCROLL_FORWARD event for node %d\n",
+        node_id);
     break;
 
   case CMP_A11Y_ACTION_SCROLL_BACKWARD:
@@ -149,48 +162,58 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
     simulated_event.y = 50; /* Arbitrary scroll tick */
     rc = cmp_event_push(&simulated_event);
     if (rc != CMP_SUCCESS) {
-      {
-        const char *err_str;
-        cmp_strerror(rc, &err_str);
-        LOG_DEBUG("cmp_a11y_action_execute scroll bwd: %s\n", err_str);
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
       }
+      cmp_log_debug("cmp_a11y_action_execute scroll bwd: %s\n", err_str);
       return rc;
     }
+    cmp_log_debug(
+        "cmp_a11y_action_execute: Pushed SCROLL_BACKWARD event for node %d\n",
+        node_id);
     break;
 
   case CMP_A11Y_ACTION_FOCUS:
     rc = cmp_event_set_focus(node_id);
     if (rc != CMP_SUCCESS) {
-      {
-        const char *err_str;
-        cmp_strerror(rc, &err_str);
-        LOG_DEBUG("cmp_a11y_action_execute focus: %s\n", err_str);
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
       }
+      cmp_log_debug("cmp_a11y_action_execute focus: %s\n", err_str);
       return rc;
     }
+    cmp_log_debug("cmp_a11y_action_execute: Set focus to node %d\n", node_id);
     break;
 
   case CMP_A11Y_ACTION_BLUR:
     if (cmp_event_get_focus() == node_id) {
       rc = cmp_event_clear_focus();
       if (rc != CMP_SUCCESS) {
-        {
-          const char *err_str;
-          cmp_strerror(rc, &err_str);
-          LOG_DEBUG("cmp_a11y_action_execute blur: %s\n", err_str);
+        err_rc = cmp_strerror(rc, &err_str);
+        if (err_rc != CMP_SUCCESS) {
+          err_str = "Unknown";
         }
+        cmp_log_debug("cmp_a11y_action_execute blur: %s\n", err_str);
         return rc;
       }
+      cmp_log_debug("cmp_a11y_action_execute: Cleared focus from node %d\n",
+                    node_id);
+    } else {
+      cmp_log_debug(
+          "cmp_a11y_action_execute: Node %d was not focused, ignoring BLUR\n",
+          node_id);
     }
     break;
 
   default:
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      cmp_strerror(rc, &err_str);
-      LOG_DEBUG("cmp_a11y_action_execute unhandled: %s\n", err_str);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
     }
+    cmp_log_debug("cmp_a11y_action_execute unhandled: %s\n", err_str);
     return rc;
   }
 

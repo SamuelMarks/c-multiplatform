@@ -4,17 +4,26 @@
 #include <stdio.h>
 
 #if defined(_WIN32)
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
+typedef unsigned char BYTE;
+typedef unsigned long DWORD;
+
+typedef struct _SYSTEM_POWER_STATUS {
+  BYTE  ACLineStatus;
+  BYTE  BatteryFlag;
+  BYTE  BatteryLifePercent;
+  BYTE  SystemStatusFlag;
+  DWORD BatteryLifeTime;
+  DWORD BatteryFullLifeTime;
+} SYSTEM_POWER_STATUS, *LPSYSTEM_POWER_STATUS;
+
+__declspec(dllimport) int __stdcall GetSystemPowerStatus(LPSYSTEM_POWER_STATUS lpSystemPowerStatus);
 #endif
 /* clang-format on */
 
 static cmp_resource_manager_t *g_resource_manager = NULL;
 
 /**
- * @brief cmp_power_awareness_init
+ * @brief Initializes the power awareness module.
  *
  * @return Returns 0 on success, or an error code on failure.
  */
@@ -31,7 +40,7 @@ int cmp_power_awareness_init(void) {
 }
 
 /**
- * @brief cmp_power_awareness_poll
+ * @brief Polls the system power status and updates the resource manager.
  *
  * @return Returns 0 on success, or an error code on failure.
  */

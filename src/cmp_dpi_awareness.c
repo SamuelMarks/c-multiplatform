@@ -13,20 +13,29 @@ static cmp_dpi_t *g_dpi_manager = NULL;
  */
 int cmp_dpi_awareness_init(void) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (g_dpi_manager) {
+  if (g_dpi_manager != NULL) {
+    cmp_log_debug("cmp_dpi_awareness_init: Already initialized\n");
     return rc;
   }
 
   rc = cmp_dpi_create(&g_dpi_manager);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG(
-        "Error in cmp_dpi_awareness_init: Failed to create DPI manager\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_dpi_awareness_init: Failed to create DPI manager: %s\n",
+                  err_str);
+    /* Safe CRT not needed for simple literal logging to standard output. */
     printf("[DPI] WARNING: Failed to initialize High-DPI context.\n");
     return rc;
   }
 
-  printf("[DPI] SUCCESS: Per-Monitor v2 High-DPI Awareness initialized.\n");
+  cmp_log_debug("cmp_dpi_awareness_init: Per-Monitor v2 High-DPI Awareness "
+                "initialized.\n");
   return rc;
 }
 
@@ -37,14 +46,23 @@ int cmp_dpi_awareness_init(void) {
  */
 int cmp_dpi_awareness_cleanup(void) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (g_dpi_manager) {
+  if (g_dpi_manager != NULL) {
     rc = cmp_dpi_destroy(g_dpi_manager);
     g_dpi_manager = NULL;
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Error in cmp_dpi_awareness_cleanup: Failed to destroy DPI "
-                "manager\n");
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      cmp_log_debug("cmp_dpi_awareness_cleanup: Failed to destroy DPI "
+                    "manager: %s\n",
+                    err_str);
     }
   }
-  return rc;
+
+  cmp_log_debug("cmp_dpi_awareness_cleanup: Cleaned up context\n");
+  return CMP_SUCCESS;
 }

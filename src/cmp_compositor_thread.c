@@ -19,24 +19,37 @@ struct cmp_compositor_thread {
  */
 int cmp_compositor_thread_create(cmp_compositor_thread_t **out_thread) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_compositor_thread *ctx = NULL;
 
-  if (!out_thread) {
+  if (out_thread == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_compositor_thread_create: Invalid argument "
-              "(out_thread=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_compositor_thread_create: Invalid argument "
+                  "(out_thread=NULL): %s\n",
+                  err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_compositor_thread), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_compositor_thread_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_compositor_thread_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
   memset(ctx, 0, sizeof(struct cmp_compositor_thread));
   ctx->is_running = 1;
   *out_thread = (cmp_compositor_thread_t *)ctx;
+  cmp_log_debug("cmp_compositor_thread_create: Successfully created compositor "
+                "thread context\n");
   return rc;
 }
 
@@ -48,18 +61,30 @@ int cmp_compositor_thread_create(cmp_compositor_thread_t **out_thread) {
  */
 int cmp_compositor_thread_destroy(cmp_compositor_thread_t *thread) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_compositor_thread *ctx = (struct cmp_compositor_thread *)thread;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_compositor_thread_destroy: Invalid argument "
-              "(thread=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_compositor_thread_destroy: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   ctx->is_running = 0;
-  CMP_FREE(ctx);
-  return rc;
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_compositor_thread_destroy: CMP_FREE failed\n");
+  }
+
+  cmp_log_debug("cmp_compositor_thread_destroy: Successfully destroyed "
+                "compositor thread context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -72,15 +97,23 @@ int cmp_compositor_thread_destroy(cmp_compositor_thread_t *thread) {
 int cmp_compositor_thread_push_tree(cmp_compositor_thread_t *thread,
                                     void *layer_tree_opaque) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_compositor_thread *ctx = (struct cmp_compositor_thread *)thread;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_compositor_thread_push_tree: Invalid argument "
-              "(thread=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_compositor_thread_push_tree: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   ctx->current_tree = layer_tree_opaque;
+  cmp_log_debug("cmp_compositor_thread_push_tree: Mock pushed layout tree onto "
+                "compositor thread\n");
   return rc;
 }

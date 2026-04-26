@@ -25,14 +25,20 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
 
   if (!tree || !target_node || !event) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_event_dispatch_run: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_dispatch_run: %s\n", err_str);
  }    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_ui_node_t *) * capacity, (void **)&ancestors);
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_event_dispatch_run CMP_MALLOC: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_dispatch_run CMP_MALLOC: %s\n", err_str);
  }    return rc;
   }
 
@@ -47,7 +53,10 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
                      (void **)&new_ancestors);
       if (rc != CMP_SUCCESS) {
         if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-        { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_event_dispatch_run (realloc) CMP_MALLOC: %s\n", err_str);
+        { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_dispatch_run (realloc) CMP_MALLOC: %s\n", err_str);
  }        CMP_FREE(ancestors);
         return rc;
       }

@@ -25,17 +25,30 @@ struct cmp_code_block {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_code_block_create(cmp_code_block_t **out_block) {
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   cmp_code_block_t *block = NULL;
-  int rc;
 
-  if (!out_block) {
-    LOG_DEBUG("cmp_code_block_create: out_block is NULL\n");
-    return CMP_ERROR_INVALID_ARG;
+  if (out_block == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_code_block_create: Invalid argument (out_block=NULL): %s\n",
+        err_str);
+    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_code_block_t), (void **)&block);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_code_block_create: OOM\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_code_block_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
@@ -45,7 +58,9 @@ int cmp_code_block_create(cmp_code_block_t **out_block) {
   block->refs = NULL;
 
   *out_block = block;
-  return CMP_SUCCESS;
+  cmp_log_debug(
+      "cmp_code_block_create: Successfully created code block context\n");
+  return rc;
 }
 
 /**
@@ -55,25 +70,35 @@ int cmp_code_block_create(cmp_code_block_t **out_block) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_code_block_destroy(cmp_code_block_t *block) {
-  int rc;
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!block) {
-    LOG_DEBUG("cmp_code_block_destroy: block is NULL\n");
-    return CMP_ERROR_INVALID_ARG;
+  if (block == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_code_block_destroy: Invalid argument: %s\n", err_str);
+    return rc;
   }
 
-  if (block->refs) {
+  if (block->refs != NULL) {
     rc = CMP_FREE(block->refs);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_code_block_destroy: CMP_FREE refs failed\n");
+      cmp_log_debug("cmp_code_block_destroy: CMP_FREE refs failed\n");
     }
   }
 
   rc = CMP_FREE(block);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_code_block_destroy: CMP_FREE block failed\n");
+    cmp_log_debug("cmp_code_block_destroy: CMP_FREE block failed\n");
     return rc;
   }
+
+  cmp_log_debug(
+      "cmp_code_block_destroy: Successfully destroyed code block context\n");
   return CMP_SUCCESS;
 }
 
@@ -84,12 +109,24 @@ int cmp_code_block_destroy(cmp_code_block_t *block) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_code_block_toggle_fold(cmp_code_block_t *block) {
-  if (!block) {
-    LOG_DEBUG("cmp_code_block_toggle_fold: block is NULL\n");
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
+
+  if (block == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_code_block_toggle_fold: Invalid argument: %s\n",
+                  err_str);
+    return rc;
   }
   block->is_expanded = block->is_expanded ? 0 : 1;
-  return CMP_SUCCESS;
+  cmp_log_debug("cmp_code_block_toggle_fold: Toggled fold state to %d\n",
+                block->is_expanded);
+  return rc;
 }
 
 /**
@@ -101,12 +138,24 @@ int cmp_code_block_toggle_fold(cmp_code_block_t *block) {
  */
 int cmp_code_block_is_expanded(const cmp_code_block_t *block,
                                int *out_is_expanded) {
-  if (!block || !out_is_expanded) {
-    LOG_DEBUG("cmp_code_block_is_expanded: Invalid args\n");
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
+
+  if (block == NULL || out_is_expanded == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_code_block_is_expanded: Invalid argument: %s\n",
+                  err_str);
+    return rc;
   }
   *out_is_expanded = block->is_expanded;
-  return CMP_SUCCESS;
+  cmp_log_debug("cmp_code_block_is_expanded: Is expanded=%d\n",
+                *out_is_expanded);
+  return rc;
 }
 
 /**
@@ -121,22 +170,38 @@ int cmp_code_block_is_expanded(const cmp_code_block_t *block,
 int cmp_code_block_add_reference_highlight(cmp_code_block_t *block,
                                            size_t offset, size_t length,
                                            const char *reference_id) {
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   cmp_code_ref_t *new_array = NULL;
-  int rc;
+  size_t new_cap;
 
-  if (!block || !reference_id) {
-    LOG_DEBUG("cmp_code_block_add_reference_highlight: Invalid args\n");
-    return CMP_ERROR_INVALID_ARG;
+  if (block == NULL || reference_id == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_code_block_add_reference_highlight: Invalid argument: %s\n",
+        err_str);
+    return rc;
   }
 
   if (block->ref_count == block->ref_capacity) {
-    size_t new_cap = block->ref_capacity == 0 ? 4 : block->ref_capacity * 2;
+    new_cap = block->ref_capacity == 0 ? 4 : block->ref_capacity * 2;
     rc = CMP_MALLOC(new_cap * sizeof(cmp_code_ref_t), (void **)&new_array);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_code_block_add_reference_highlight: OOM\n");
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      cmp_log_debug(
+          "cmp_code_block_add_reference_highlight: Out of memory: %s\n",
+          err_str);
       return rc;
     }
-    if (block->refs) {
+    if (block->refs != NULL) {
       memcpy(new_array, block->refs, block->ref_count * sizeof(cmp_code_ref_t));
       CMP_FREE(block->refs);
     }
@@ -149,7 +214,7 @@ int cmp_code_block_add_reference_highlight(cmp_code_block_t *block,
 #if defined(_MSC_VER)
   if (strncpy_s(block->refs[block->ref_count].id, 64, reference_id,
                 _TRUNCATE) != 0) {
-    LOG_DEBUG("cmp_code_block_add_reference_highlight: strncpy_s failed\n");
+    cmp_log_debug("cmp_code_block_add_reference_highlight: strncpy_s failed\n");
     return CMP_ERROR_GENERAL;
   }
 #else
@@ -158,5 +223,7 @@ int cmp_code_block_add_reference_highlight(cmp_code_block_t *block,
 #endif
   block->ref_count++;
 
-  return CMP_SUCCESS;
+  cmp_log_debug(
+      "cmp_code_block_add_reference_highlight: Added highlight ref\n");
+  return rc;
 }

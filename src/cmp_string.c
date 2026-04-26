@@ -4,6 +4,17 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#if defined(_MSC_VER)
+#define MEMCPY_S memcpy_s
+#define STRCPY_S strcpy_s
+#define STRTOK_S strtok_s
+#else
+#define MEMCPY_S(dest, dest_size, src, count) memcpy((dest), (src), (count))
+#define STRCPY_S(dest, dest_size, src) strcpy((dest), (src))
+#define STRTOK_S(str, delim, ctx) strtok_r((str), (delim), (ctx))
+#endif
+
 /* clang-format on */
 
 /**
@@ -18,7 +29,12 @@ int cmp_string_init(cmp_string_t *str) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+
       LOG_DEBUG("Error %d: %s (cmp_string_init)", rc, err_str);
     }
     return rc;
@@ -49,7 +65,12 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+
       LOG_DEBUG("Error %d: %s (cmp_string_append)", rc, err_str);
     }
     return rc;
@@ -65,7 +86,12 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
     rc = CMP_ERROR_BOUNDS;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+
       LOG_DEBUG("Error %d: %s (cmp_string_append length overflow)", rc,
                 err_str);
     }
@@ -88,7 +114,12 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
           rc = CMP_ERROR_BOUNDS;
           {
             const char *err_str;
-            cmp_strerror(rc, &err_str);
+            int rc2;
+            rc2 = cmp_strerror(rc, &err_str);
+            if (rc2 != CMP_SUCCESS) {
+              err_str = "Unknown";
+            }
+
             LOG_DEBUG("Error %d: %s (cmp_string_append bounds limit)", rc,
                       err_str);
           }
@@ -104,7 +135,12 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
       if (rc != CMP_SUCCESS) {
         {
           const char *err_str;
-          cmp_strerror(rc, &err_str);
+          int rc2;
+          rc2 = cmp_strerror(rc, &err_str);
+          if (rc2 != CMP_SUCCESS) {
+            err_str = "Unknown";
+          }
+
           LOG_DEBUG("Error %d: %s (cmp_string_append alloc failed)", rc,
                     err_str);
         }
@@ -115,17 +151,18 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
       if (rc != CMP_SUCCESS) {
         {
           const char *err_str;
-          cmp_strerror(rc, &err_str);
+          int rc2;
+          rc2 = cmp_strerror(rc, &err_str);
+          if (rc2 != CMP_SUCCESS) {
+            err_str = "Unknown";
+          }
+
           LOG_DEBUG("Error %d: %s (cmp_string_append realloc failed)", rc,
                     err_str);
         }
         return rc;
       }
-#if defined(_MSC_VER)
-      memcpy_s(new_data, new_capacity, str->data, str->length + 1);
-#else
-      memcpy(new_data, str->data, str->length + 1);
-#endif
+      MEMCPY_S(new_data, new_capacity, str->data, str->length + 1);
       CMP_FREE(str->data);
     }
 
@@ -133,11 +170,7 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
     str->capacity = new_capacity;
   }
 
-#if defined(_MSC_VER)
-  strcpy_s(str->data + str->length, str->capacity - str->length, append);
-#else
-  strcpy(str->data + str->length, append);
-#endif
+  STRCPY_S(str->data + str->length, str->capacity - str->length, append);
 
   str->length = new_len;
 
@@ -156,7 +189,12 @@ int cmp_string_destroy(cmp_string_t *str) {
     rc = CMP_ERROR_INVALID_ARG;
     {
       const char *err_str;
-      cmp_strerror(rc, &err_str);
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+
       LOG_DEBUG("Error %d: %s (cmp_string_destroy)", rc, err_str);
     }
     return rc;
@@ -184,13 +222,15 @@ int cmp_string_destroy(cmp_string_t *str) {
  * CMP_ERROR_NOT_FOUND when there are no more tokens.
  */
 int cmp_strtok_r(char *str, const char *delim, char **saveptr, char **out_tok) {
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+  char *end;
+#endif
   if (saveptr == NULL || out_tok == NULL || delim == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
 #if defined(_MSC_VER)
   *out_tok = strtok_s(str, delim, saveptr);
 #elif defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
-  char *end;
   if (str == NULL) {
     str = *saveptr;
   }

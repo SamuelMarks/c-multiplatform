@@ -5,16 +5,21 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief Opaque internal structure for UI Card widget.
+ */
 struct cmp_ui_card {
+  /** @brief The root node of the card */
   cmp_ui_node_t *node_root;
+  /** @brief The styling variant of the card */
   cmp_ui_card_style_t style;
 };
 
 /**
  * @brief cmp_ui_card_create
  *
- * @param out_card Parameter description.
- * @param style Parameter description.
+ * @param out_card Pointer to store the created card.
+ * @param style The styling variant of the card.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_card_create(cmp_ui_card_t **out_card, cmp_ui_card_style_t style) {
@@ -29,7 +34,7 @@ int cmp_ui_card_create(cmp_ui_card_t **out_card, cmp_ui_card_style_t style) {
   rc = CMP_MALLOC(sizeof(cmp_ui_card_t), (void **)&card);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_card_create: OOM\n");
-    return rc;
+    return CMP_ERROR_OOM;
   }
   memset(card, 0, sizeof(cmp_ui_card_t));
 
@@ -38,21 +43,26 @@ int cmp_ui_card_create(cmp_ui_card_t **out_card, cmp_ui_card_style_t style) {
   rc = cmp_ui_box_create(&card->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_card_create: cmp_ui_box_create failed\n");
-    CMP_FREE(card);
-    return rc;
+    rc = CMP_FREE(card);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_card_create: CMP_FREE failed\n");
+    }
+    return CMP_ERROR_GENERAL;
   }
 
-  card->node_root->layout->direction = CMP_FLEX_COLUMN;
-  /* Specific stylings like drop shadow or borders will be mapped via CSS logic
-   */
+  if (card->node_root && card->node_root->layout) {
+    card->node_root->layout->direction = CMP_FLEX_COLUMN;
+  }
+
   if (style == CMP_UI_CARD_STYLE_ELEVATED) {
-    /* Set elevation class/variables */
-    card->node_root->bg_color = 0xFFFFFFFF;
+    if (card->node_root)
+      card->node_root->bg_color = 0xFFFFFFFF;
   } else if (style == CMP_UI_CARD_STYLE_FILLED) {
-    card->node_root->bg_color = 0xFFE0E0E0;
+    if (card->node_root)
+      card->node_root->bg_color = 0xFFE0E0E0;
   } else if (style == CMP_UI_CARD_STYLE_OUTLINED) {
-    card->node_root->bg_color = 0x00000000;
-    /* would also have a border... */
+    if (card->node_root)
+      card->node_root->bg_color = 0x00000000;
   }
 
   *out_card = card;
@@ -62,7 +72,7 @@ int cmp_ui_card_create(cmp_ui_card_t **out_card, cmp_ui_card_style_t style) {
 /**
  * @brief cmp_ui_card_destroy
  *
- * @param card Parameter description.
+ * @param card The card component.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_card_destroy(cmp_ui_card_t *card) {
@@ -92,8 +102,8 @@ int cmp_ui_card_destroy(cmp_ui_card_t *card) {
 /**
  * @brief cmp_ui_card_get_node
  *
- * @param card Parameter description.
- * @param out_node Parameter description.
+ * @param card The card component.
+ * @param out_node Pointer to store the underlying UI node.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_card_get_node(cmp_ui_card_t *card, cmp_ui_node_t **out_node) {
@@ -108,8 +118,8 @@ int cmp_ui_card_get_node(cmp_ui_card_t *card, cmp_ui_node_t **out_node) {
 /**
  * @brief cmp_ui_card_add_child
  *
- * @param card Parameter description.
- * @param child Parameter description.
+ * @param card The card component.
+ * @param child The child node to add.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_card_add_child(cmp_ui_card_t *card, cmp_ui_node_t *child) {
@@ -132,8 +142,8 @@ int cmp_ui_card_add_child(cmp_ui_card_t *card, cmp_ui_node_t *child) {
 /**
  * @brief cmp_ui_card_bind_a11y
  *
- * @param widget Parameter description.
- * @param tree Parameter description.
+ * @param widget The component.
+ * @param tree The accessibility tree.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_card_bind_a11y(cmp_ui_card_t *widget, cmp_a11y_tree_t *tree) {

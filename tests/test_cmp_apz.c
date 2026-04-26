@@ -19,7 +19,24 @@ TEST test_apz_lifecycle(void) {
   PASS();
 }
 
-SUITE(suite_apz) { RUN_TEST(test_apz_lifecycle); }
+TEST test_apz_null_args(void) {
+  cmp_apz_t *apz = NULL;
+  float mat[16];
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_apz_create(NULL));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_apz_destroy(NULL));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_apz_inject_gesture(NULL, 10.0f, -5.0f, 1.2f));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_apz_get_transform(NULL, mat));
+  ASSERT_EQ(CMP_SUCCESS, cmp_apz_create(&apz));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_apz_get_transform(apz, NULL));
+  ASSERT_EQ(CMP_SUCCESS, cmp_apz_destroy(apz));
+  PASS();
+}
+
+SUITE(suite_apz) {
+  RUN_TEST(test_apz_null_args);
+  RUN_TEST(test_apz_lifecycle);
+}
 
 GREATEST_MAIN_DEFS();
 

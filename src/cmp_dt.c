@@ -12,10 +12,16 @@
  */
 int cmp_dt_update(cmp_dt_t *dt, double current_time_ms) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!dt) {
+  if (dt == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_dt_update: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_dt_update: Invalid argument (dt=NULL): %s\n", err_str);
     return rc;
   }
 
@@ -31,5 +37,6 @@ int cmp_dt_update(cmp_dt_t *dt, double current_time_ms) {
   dt->last_time_ms = current_time_ms;
   dt->current_time_ms = current_time_ms;
 
+  cmp_log_debug("cmp_dt_update: Updated tick dt=%.2fms\n", dt->delta_time_ms);
   return rc;
 }

@@ -922,7 +922,15 @@ add_executable(cmp_undo_redo_test tests/test_cmp_undo_redo.c)
 target_link_libraries(cmp_undo_redo_test PRIVATE cmp greatest)
 
 add_executable(cmp_a11y_tree_test tests/test_cmp_a11y_tree.c)
+add_executable(cmp_android_ndk_bridge_test tests/test_cmp_android_ndk_bridge.c)
+add_executable(cmp_android_scoped_storage_test tests/test_cmp_android_scoped_storage.c)
+add_executable(cmp_android_vulkan_gles_test tests/test_cmp_android_vulkan_gles.c)
+add_executable(cmp_apple_gestures_test tests/test_cmp_apple_gestures.c)
 target_link_libraries(cmp_a11y_tree_test PRIVATE cmp greatest)
+target_link_libraries(cmp_android_ndk_bridge_test PRIVATE cmp greatest c_cdd)
+target_link_libraries(cmp_android_scoped_storage_test PRIVATE cmp greatest c_cdd)
+target_link_libraries(cmp_android_vulkan_gles_test PRIVATE cmp greatest c_cdd)
+target_link_libraries(cmp_apple_gestures_test PRIVATE cmp greatest c_cdd)
 
 add_executable(cmp_a11y_theme_test tests/test_cmp_a11y_theme.c)
 target_link_libraries(cmp_a11y_theme_test PRIVATE cmp greatest)
@@ -1224,6 +1232,10 @@ add_test(NAME cmp_ime_test COMMAND cmp_ime_test)
 add_test(NAME cmp_spellcheck_test COMMAND cmp_spellcheck_test)
 add_test(NAME cmp_undo_redo_test COMMAND cmp_undo_redo_test)
 add_test(NAME cmp_a11y_tree_test COMMAND cmp_a11y_tree_test)
+add_test(NAME cmp_android_ndk_bridge_test COMMAND cmp_android_ndk_bridge_test)
+add_test(NAME cmp_android_scoped_storage_test COMMAND cmp_android_scoped_storage_test)
+add_test(NAME cmp_android_vulkan_gles_test COMMAND cmp_android_vulkan_gles_test)
+add_test(NAME cmp_apple_gestures_test COMMAND cmp_apple_gestures_test)
 add_test(NAME cmp_screen_reader_test COMMAND cmp_screen_reader_test)
 add_test(NAME cmp_aria_test COMMAND cmp_aria_test)
 add_test(NAME cmp_aria_relations_test COMMAND cmp_aria_relations_test)
@@ -1453,6 +1465,8 @@ if(TARGET cmp_compositor_thread_test)
     set_target_properties(cmp_ink_ripple_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
     set_target_properties(cmp_lottie_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
 endif()
+
+
 
 
 

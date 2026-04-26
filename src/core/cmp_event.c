@@ -25,7 +25,10 @@ int cmp_event_system_init(void) {
    * modal resize drag loops where PeekMessage is temporarily blocked. */
   rc = cmp_ring_buffer_init(&g_event_queue, 131072);
   if (rc != CMP_SUCCESS) {
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_event_system_init cmp_ring_buffer_init: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_system_init cmp_ring_buffer_init: %s\n", err_str);
  }    return CMP_ERROR_OOM;
   }
 
@@ -70,14 +73,20 @@ int cmp_event_push(const cmp_event_t *event) {
 
   if (event == NULL || !g_event_initialized) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_event_push: %s\n", err_str);    
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_push: %s\n", err_str);    
  }    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_event_t), (void **)&copy);
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_event_push CMP_MALLOC: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_push CMP_MALLOC: %s\n", err_str);
  }    return rc;
   }
 
@@ -86,7 +95,10 @@ int cmp_event_push(const cmp_event_t *event) {
   rc = cmp_ring_buffer_push(&g_event_queue, copy);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(copy);
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_event_push cmp_ring_buffer_push: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_push cmp_ring_buffer_push: %s\n", err_str);
  }    return rc;
   }
 
@@ -105,7 +117,10 @@ int cmp_event_pop(cmp_event_t *out_event) {
 
   if (out_event == NULL || !g_event_initialized) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_event_pop: %s\n", err_str);     
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_pop: %s\n", err_str);     
  }    return rc;
   }
 

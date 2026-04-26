@@ -9,7 +9,8 @@ TEST test_a11y_rotor_lifecycle(void) {
   cmp_a11y_rotor_t *rotor = NULL;
   int res;
 
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_rotor_create(tree, &rotor);
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -18,7 +19,8 @@ TEST test_a11y_rotor_lifecycle(void) {
   res = cmp_a11y_rotor_destroy(rotor);
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 
@@ -28,7 +30,8 @@ TEST test_a11y_rotor_null_args(void) {
   cmp_a11y_tree_t *tree = NULL;
   int count;
   int nodes[10];
-  cmp_a11y_tree_create(&tree);
+  int res2 = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res2);
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -41,7 +44,8 @@ TEST test_a11y_rotor_null_args(void) {
   res = cmp_a11y_rotor_destroy(NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_a11y_rotor_create(tree, &rotor);
+  res = cmp_a11y_rotor_create(tree, &rotor);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_rotor_register_node(NULL, 1, CMP_A11Y_ROTOR_HEADING);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
@@ -62,8 +66,10 @@ TEST test_a11y_rotor_null_args(void) {
                                  &count);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_a11y_rotor_destroy(rotor);
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_rotor_destroy(rotor);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 
@@ -73,9 +79,11 @@ TEST test_a11y_rotor_operations(void) {
   int res;
   int nodes[10];
   int count = 0;
-  cmp_a11y_tree_create(&tree);
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
-  cmp_a11y_rotor_create(tree, &rotor);
+  res = cmp_a11y_rotor_create(tree, &rotor);
+  ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_a11y_rotor_register_node(rotor, 10, CMP_A11Y_ROTOR_HEADING);
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -110,8 +118,10 @@ TEST test_a11y_rotor_operations(void) {
   ASSERT_EQ(2, count); /* total count */
   ASSERT_EQ(10, nodes[0]);
 
-  cmp_a11y_rotor_destroy(rotor);
-  cmp_a11y_tree_destroy(tree);
+  res = cmp_a11y_rotor_destroy(rotor);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
 

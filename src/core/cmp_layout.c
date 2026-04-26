@@ -17,14 +17,20 @@ int cmp_layout_node_create(cmp_layout_node_t **out_node) {
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_layout_node_create: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_layout_node_create: %s\n", err_str);
  }    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&node);
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_layout_node_create CMP_MALLOC: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_layout_node_create CMP_MALLOC: %s\n", err_str);
  }    return rc;
   }
 
@@ -58,7 +64,10 @@ int cmp_layout_node_destroy(cmp_layout_node_t *node) {
 
   if (node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_layout_node_destroy: %s\n", err_str);
+    { const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_layout_node_destroy: %s\n", err_str);
  }    return rc;
   }
 

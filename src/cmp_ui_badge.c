@@ -5,19 +5,25 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief Opaque internal structure for UI Badge widget.
+ */
 struct cmp_ui_badge {
+  /** @brief The root box node of the badge */
   cmp_ui_node_t *node_root;
+  /** @brief The text node containing the badge text */
   cmp_ui_node_t *node_text;
+  /** @brief The raw string of the badge text */
   char *text;
 };
 
 /**
  * @brief cmp_ui_badge_create
  *
- * @param out_badge Parameter description.
- * @param text Parameter description.
- * @param bg_color Parameter description.
- * @param text_color Parameter description.
+ * @param out_badge Pointer to output the newly created badge.
+ * @param text The badge text.
+ * @param bg_color The background color.
+ * @param text_color The text color.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
@@ -35,7 +41,7 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
 
   rc = CMP_MALLOC(sizeof(cmp_ui_badge_t), (void **)&(badge));
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("OOM\n");
+    LOG_DEBUG("cmp_ui_badge_create: OOM\n");
     return CMP_ERROR_OOM;
   }
 
@@ -45,9 +51,9 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
 
   if (text) {
     rc = cmp_i18n_translate(text, &translated);
-    if (rc == 0 && translated.data) {
+    if (rc == CMP_SUCCESS && translated.data) {
       final_text = translated.data;
-    } else if (rc != 0) {
+    } else if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_create: cmp_i18n_translate failed\n");
     }
   }
@@ -56,53 +62,42 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
     len = strlen(final_text);
     rc = CMP_MALLOC(len + 1, (void **)&(badge->text));
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("OOM\n");
-      return CMP_ERROR_OOM;
-    }
-
-#if defined(_MSC_VER)
-    if (memcpy_s(badge->text, len + 1, final_text, len + 1) != 0) {
-      LOG_DEBUG("cmp_ui_badge_create: memcpy_s failed\n");
-      rc = CMP_FREE(badge->text);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("Free failed\n");
-      }
+      LOG_DEBUG("cmp_ui_badge_create: OOM text\n");
       if (translated.data) {
         rc = cmp_string_destroy(&translated);
-        if (rc != 0) {
+        if (rc != CMP_SUCCESS) {
           LOG_DEBUG("cmp_ui_badge_create: cmp_string_destroy failed\n");
         }
       }
       rc = CMP_FREE(badge);
       if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("Free failed\n");
+        LOG_DEBUG("cmp_ui_badge_create: CMP_FREE badge failed\n");
       }
-      return CMP_ERROR_GENERAL;
+      return CMP_ERROR_OOM;
     }
-#else
+
     memcpy(badge->text, final_text, len + 1);
-#endif
   }
 
   if (translated.data) {
     rc = cmp_string_destroy(&translated);
-    if (rc != 0) {
+    if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_create: cmp_string_destroy failed\n");
     }
   }
 
   rc = cmp_ui_box_create(&badge->node_root);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_badge_create: cmp_ui_box_create failed\n");
     if (badge->text) {
       rc = CMP_FREE(badge->text);
       if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("Free failed\n");
+        LOG_DEBUG("cmp_ui_badge_create: CMP_FREE text failed\n");
       }
     }
     rc = CMP_FREE(badge);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+      LOG_DEBUG("cmp_ui_badge_create: CMP_FREE badge failed\n");
     }
     return rc;
   }
@@ -111,41 +106,40 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
 
   rc =
       cmp_ui_text_create(&badge->node_text, badge->text ? badge->text : "", -1);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_badge_create: cmp_ui_text_create failed\n");
     if (badge->text) {
       rc = CMP_FREE(badge->text);
       if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("Free failed\n");
+        LOG_DEBUG("cmp_ui_badge_create: CMP_FREE text failed\n");
       }
     }
     rc = cmp_ui_node_destroy(badge->node_root);
-    if (rc != 0) {
+    if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_create: cmp_ui_node_destroy failed\n");
     }
     rc = CMP_FREE(badge);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+      LOG_DEBUG("cmp_ui_badge_create: CMP_FREE badge failed\n");
     }
-    return rc; /* The original error */
+    return rc;
   }
 
   badge->node_text->text_color = text_color;
 
   rc = cmp_ui_node_add_child(badge->node_root, badge->node_text);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_badge_create: cmp_ui_node_add_child failed\n");
-    /* Assume cmp_ui_node_destroy frees memory */
   }
 
   *out_badge = badge;
-  return 0;
+  return CMP_SUCCESS;
 }
 
 /**
  * @brief cmp_ui_badge_destroy
  *
- * @param badge Parameter description.
+ * @param badge The badge component.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_badge_destroy(cmp_ui_badge_t *badge) {
@@ -157,27 +151,28 @@ int cmp_ui_badge_destroy(cmp_ui_badge_t *badge) {
   if (badge->text) {
     rc = CMP_FREE(badge->text);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+      LOG_DEBUG("cmp_ui_badge_destroy: CMP_FREE text failed\n");
     }
   }
   if (badge->node_root) {
     rc = cmp_ui_node_destroy(badge->node_root);
-    if (rc != 0) {
+    if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_destroy: cmp_ui_node_destroy failed\n");
     }
   }
   rc = CMP_FREE(badge);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Free failed\n");
+    LOG_DEBUG("cmp_ui_badge_destroy: CMP_FREE badge failed\n");
+    return rc;
   }
-  return 0;
+  return CMP_SUCCESS;
 }
 
 /**
  * @brief cmp_ui_badge_get_node
  *
- * @param badge Parameter description.
- * @param out_node Parameter description.
+ * @param badge The badge component.
+ * @param out_node Pointer to store the node.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_badge_get_node(cmp_ui_badge_t *badge, cmp_ui_node_t **out_node) {
@@ -186,14 +181,14 @@ int cmp_ui_badge_get_node(cmp_ui_badge_t *badge, cmp_ui_node_t **out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = badge->node_root;
-  return 0;
+  return CMP_SUCCESS;
 }
 
 /**
  * @brief cmp_ui_badge_set_text
  *
- * @param badge Parameter description.
- * @param text Parameter description.
+ * @param badge The badge component.
+ * @param text The new text for the badge.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text) {
@@ -210,16 +205,16 @@ int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text) {
   if (badge->text) {
     rc = CMP_FREE(badge->text);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+      LOG_DEBUG("cmp_ui_badge_set_text: CMP_FREE text failed\n");
     }
     badge->text = NULL;
   }
 
   if (text) {
     rc = cmp_i18n_translate(text, &translated);
-    if (rc == 0 && translated.data) {
+    if (rc == CMP_SUCCESS && translated.data) {
       final_text = translated.data;
-    } else if (rc != 0) {
+    } else if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_set_text: cmp_i18n_translate failed\n");
     }
   }
@@ -228,45 +223,33 @@ int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text) {
     len = strlen(final_text);
     rc = CMP_MALLOC(len + 1, (void **)&(badge->text));
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("OOM\n");
-      return CMP_ERROR_OOM;
-    }
-#if defined(_MSC_VER)
-    if (memcpy_s(badge->text, len + 1, final_text, len + 1) != 0) {
-      LOG_DEBUG("cmp_ui_badge_set_text: memcpy_s failed\n");
-      rc = CMP_FREE(badge->text);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("Free failed\n");
-      }
-      badge->text = NULL;
+      LOG_DEBUG("cmp_ui_badge_set_text: OOM\n");
       if (translated.data) {
         rc = cmp_string_destroy(&translated);
-        if (rc != 0) {
+        if (rc != CMP_SUCCESS) {
           LOG_DEBUG("cmp_ui_badge_set_text: cmp_string_destroy failed\n");
         }
       }
-      return CMP_ERROR_GENERAL;
+      return CMP_ERROR_OOM;
     }
-#else
     memcpy(badge->text, final_text, len + 1);
-#endif
   }
 
   if (translated.data) {
     rc = cmp_string_destroy(&translated);
-    if (rc != 0) {
+    if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_set_text: cmp_string_destroy failed\n");
     }
   }
 
-  return 0;
+  return CMP_SUCCESS;
 }
 
 /**
  * @brief cmp_ui_badge_bind_a11y
  *
- * @param widget Parameter description.
- * @param tree Parameter description.
+ * @param widget The widget.
+ * @param tree The accessibility tree.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_badge_bind_a11y(cmp_ui_badge_t *widget, cmp_a11y_tree_t *tree) {
@@ -281,9 +264,9 @@ int cmp_ui_badge_bind_a11y(cmp_ui_badge_t *widget, cmp_a11y_tree_t *tree) {
   }
   rc = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "status",
                               "Badge");
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_badge_bind_a11y: cmp_a11y_tree_add_node failed\n");
     return rc;
   }
-  return 0;
+  return CMP_SUCCESS;
 }

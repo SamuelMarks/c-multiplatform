@@ -2,8 +2,20 @@
 #include "cmp.h"
 #include "cmp_log.h"
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <signal.h>
+
+#if defined(_MSC_VER)
+#define FPRINTF fprintf_s
+#define VFPRINTF vfprintf_s
+#define SPRINTF sprintf_s
+#else
+#define FPRINTF fprintf
+#define VFPRINTF vfprintf
+#define SPRINTF sprintf
+#endif
+
 
 #if defined(_WIN32)
 
@@ -44,7 +56,7 @@ typedef struct _SYMBOL_INFO {
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-void cmp_dump_stack_trace(void) {
+int cmp_dump_stack_trace(void) {
     void *stack[100];
     unsigned short frames;
     void *process;
@@ -56,7 +68,7 @@ void cmp_dump_stack_trace(void) {
     SYMBOL_INFO *symbol;
     unsigned __int64 displacement;
 
-    fprintf(stderr, "--- Stack Trace ---\n");
+    FPRINTF(stderr, "--- Stack Trace ---\n");
 
     frames = RtlCaptureStackBackTrace(0, 100, stack, NULL);
     process = GetCurrentProcess();
@@ -64,9 +76,9 @@ void cmp_dump_stack_trace(void) {
     dbghelp = LoadLibraryA("Dbghelp.dll");
     if (dbghelp == NULL) {
         for (i = 0; i < frames; i++) {
-            fprintf(stderr, "[%d] %p\n", i, stack[i]);
+            FPRINTF(stderr, "[%d] %p\n", i, stack[i]);
         }
-        return;
+        return CMP_SUCCESS;
     }
 
     SymInitialize = (SymInitialize_t)GetProcAddress(dbghelp, "SymInitialize");
@@ -77,7 +89,7 @@ void cmp_dump_stack_trace(void) {
         SymSetOptions(SYMOPT_LOAD_LINES);
         SymInitialize(process, NULL, 1);
 
-        symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
+symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
         if (symbol) {
             symbol->MaxNameLen = 255;
             symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
@@ -85,18 +97,26 @@ void cmp_dump_stack_trace(void) {
             for (i = 0; i < frames; i++) {
                 displacement = 0;
                 if (SymFromAddr(process, (unsigned __int64)stack[i], &displacement, symbol)) {
-                    fprintf(stderr, "[%d] %s - %p\n", i, symbol->Name, stack[i]);
+                    FPRINTF(stderr, "[%d] %s - %p\n", i, symbol->Name, stack[i]);
                 } else {
-                    fprintf(stderr, "[%d] %p\n", i, stack[i]);
+                    FPRINTF(stderr, "[%d] %p\n", i, stack[i]);
                 }
             }
             free(symbol);
+        } else {
+            cmp_log_debug("OOM allocating SYMBOL_INFO");
+            for (i = 0; i < frames; i++) {
+                FPRINTF(stderr, "[%d] %p\n", i, stack[i]);
+            }
+            return CMP_ERROR_OOM;
         }
+        return CMP_SUCCESS;
     } else {
         for (i = 0; i < frames; i++) {
-            fprintf(stderr, "[%d] %p\n", i, stack[i]);
+            FPRINTF(stderr, "[%d] %p\n", i, stack[i]);
         }
     }
+    return CMP_SUCCESS;
 }
 
 #elif defined(__linux__) || defined(__APPLE__)
@@ -109,14 +129,17 @@ void cmp_dump_stack_trace(void) {
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-void cmp_dump_stack_trace(void) {
+int cmp_dump_stack_trace(void) {
     void *stack[100];
     int frames;
 
-    fprintf(stderr, "--- Stack Trace ---\n");
+FPRINTF(stderr, "--- Stack Trace ---
+");
     frames = backtrace(stack, 100);
     backtrace_symbols_fd(stack, frames, STDERR_FILENO);
+    return CMP_SUCCESS;
 }
+
 
 #else
 
@@ -125,9 +148,12 @@ void cmp_dump_stack_trace(void) {
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-void cmp_dump_stack_trace(void) {
-    fprintf(stderr, "Stack trace not supported on this platform.\n");
+int cmp_dump_stack_trace(void) {
+FPRINTF(stderr, "Stack trace not supported on this platform.
+");
+    return CMP_SUCCESS;
 }
+
 
 #endif
 /* clang-format on */
@@ -141,7 +167,7 @@ void cmp_dump_stack_trace(void) {
  */
 static void cmp_default_assert_handler(const char *msg, const char *file,
                                        int line) {
-  fprintf(stderr, "Assertion failed: %s at %s:%d\n", msg, file, line);
+  FPRINTF(stderr, "Assertion failed: %s at %s:%d\n", msg, file, line);
   cmp_dump_stack_trace();
   abort();
 }
@@ -169,7 +195,7 @@ int cmp_set_assert_handler(cmp_assert_handler_t handler) {
  * @return Returns 0 on success, or an error code on failure.
  */
 static void cmp_crash_handler(int sig) {
-  fprintf(stderr, "Caught signal %d\n", sig);
+  FPRINTF(stderr, "Caught signal %d\n", sig);
   cmp_dump_stack_trace();
   exit(1);
 }
@@ -204,7 +230,6 @@ void cmp_assert_fail(const char *condition, const char *file, int line) {
   }
 }
 
-#include <stdarg.h>
 /**
  * @brief cmp_log_debug
  *
@@ -213,9 +238,9 @@ void cmp_assert_fail(const char *condition, const char *file, int line) {
  */
 void cmp_log_debug(const char *fmt, ...) {
   va_list args;
-  fprintf(stderr, "[DEBUG] ");
+  FPRINTF(stderr, "[DEBUG] ");
   va_start(args, fmt);
-  vfprintf(stderr, fmt, args);
+  VFPRINTF(stderr, fmt, args);
   va_end(args);
 }
 

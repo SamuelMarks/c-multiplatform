@@ -14,15 +14,23 @@
  */
 int cmp_bfc_calculate(cmp_layout_node_t *node, float available_width) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!node) {
+  if (node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_bfc_calculate: Invalid argument (node=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_bfc_calculate: Invalid argument (node=NULL): %s\n",
+                  err_str);
     return rc;
   }
   /* Simplified BFC logic: block takes full available width */
   node->computed_rect.width = available_width;
-  return rc;
+  cmp_log_debug("cmp_bfc_calculate: Calculated layout bounds\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -34,17 +42,25 @@ int cmp_bfc_calculate(cmp_layout_node_t *node, float available_width) {
  */
 int cmp_ifc_calculate(cmp_layout_node_t *node, float available_width) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!node) {
+  if (node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_ifc_calculate: Invalid argument (node=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_ifc_calculate: Invalid argument (node=NULL): %s\n",
+                  err_str);
     return rc;
   }
   /* Inline shrinks to content, wrapped within available width */
   if (node->computed_rect.width > available_width) {
     node->computed_rect.width = available_width;
   }
-  return rc;
+  cmp_log_debug("cmp_ifc_calculate: Computed inline bounds\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -60,10 +76,16 @@ int cmp_ifc_calculate(cmp_layout_node_t *node, float available_width) {
 int cmp_float_evaluate(cmp_layout_node_t *node, int is_float, int clear,
                        float *out_x, float *out_y) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!node || !out_x || !out_y) {
+  if (node == NULL || out_x == NULL || out_y == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_float_evaluate: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_float_evaluate: Invalid argument: %s\n", err_str);
     return rc;
   }
 
@@ -76,7 +98,9 @@ int cmp_float_evaluate(cmp_layout_node_t *node, int is_float, int clear,
     *out_x = 0.0f;
     *out_y += node->computed_rect.height;
   }
-  return rc;
+
+  cmp_log_debug("cmp_float_evaluate: Evaluated float dynamics\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -91,22 +115,32 @@ int cmp_float_evaluate(cmp_layout_node_t *node, int is_float, int clear,
 int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
                                float shape_radius, float margin) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!node) {
+  if (node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_shape_outside_evaluate: Invalid argument (node=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_shape_outside_evaluate: Invalid argument (node=NULL): %s\n",
+        err_str);
     return rc;
   }
   /* Wrap content logic placeholder */
-  if (shape_radius > 0) {
+  if (shape_radius > 0.0f) {
     /* Circular wrapping adjustment */
     node->computed_rect.width -= (shape_radius + margin);
   } else {
     /* Rectangular wrapping */
     node->computed_rect.width -= (float_rect.width + margin);
   }
-  return rc;
+
+  cmp_log_debug(
+      "cmp_shape_outside_evaluate: Simulated dynamic wrapping constraints\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -119,25 +153,32 @@ int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
 int cmp_multicolumn_evaluate(cmp_layout_node_t *node,
                              cmp_column_fill_t fill_mode) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   float total_gap;
   float content_width;
 
-  if (!node) {
+  if (node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_multicolumn_evaluate: Invalid argument (node=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_multicolumn_evaluate: Invalid argument (node=NULL): %s\n",
+        err_str);
     return rc;
   }
 
   if (node->column_count <= 1) {
-    return rc;
+    return CMP_SUCCESS;
   }
 
-  total_gap = node->column_gap * (node->column_count - 1);
+  total_gap = node->column_gap * (float)(node->column_count - 1);
   content_width = node->computed_rect.width - total_gap;
 
-  if (content_width > 0) {
-    node->column_width = content_width / node->column_count;
+  if (content_width > 0.0f) {
+    node->column_width = content_width / (float)node->column_count;
   } else {
     node->column_width = 0.0f;
   }
@@ -146,7 +187,8 @@ int cmp_multicolumn_evaluate(cmp_layout_node_t *node,
     /* Balance content height evenly */
   }
 
-  return rc;
+  cmp_log_debug("cmp_multicolumn_evaluate: Assigned columns width\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -158,18 +200,28 @@ int cmp_multicolumn_evaluate(cmp_layout_node_t *node,
  */
 int cmp_table_evaluate(cmp_layout_node_t *node, int is_fixed) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!node) {
+  if (node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_table_evaluate: Invalid argument (node=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_table_evaluate: Invalid argument (node=NULL): %s\n",
+                  err_str);
     return rc;
   }
+
   if (is_fixed) {
     /* Fixed layout algorithm */
   } else {
     /* Auto layout algorithm */
   }
-  return rc;
+
+  cmp_log_debug("cmp_table_evaluate: Simulated table constraints\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -180,13 +232,22 @@ int cmp_table_evaluate(cmp_layout_node_t *node, int is_fixed) {
  */
 int cmp_table_border_collapse(cmp_layout_node_t *table) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
 
-  if (!table) {
+  if (table == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_table_border_collapse: Invalid argument (table=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_table_border_collapse: Invalid argument (table=NULL): %s\n",
+        err_str);
     return rc;
   }
   /* Conflict resolution logic */
-  return rc;
+
+  cmp_log_debug("cmp_table_border_collapse: Computed CSS collapse\n");
+  return CMP_SUCCESS;
 }

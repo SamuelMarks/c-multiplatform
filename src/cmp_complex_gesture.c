@@ -32,18 +32,29 @@ struct cmp_complex_gesture {
  */
 int cmp_complex_gesture_create(cmp_complex_gesture_t **out_gesture) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_complex_gesture *ctx = NULL;
 
-  if (!out_gesture) {
+  if (out_gesture == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_complex_gesture_create: Invalid argument "
-              "(out_gesture=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_complex_gesture_create: Invalid argument (out_gesture=NULL): %s\n",
+        err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_complex_gesture), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_complex_gesture_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_complex_gesture_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
@@ -51,7 +62,9 @@ int cmp_complex_gesture_create(cmp_complex_gesture_t **out_gesture) {
   ctx->state = CMP_GESTURE_STATE_POSSIBLE;
 
   *out_gesture = (cmp_complex_gesture_t *)ctx;
-  return rc;
+  cmp_log_debug("cmp_complex_gesture_create: Successfully created complex "
+                "gesture context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -62,17 +75,29 @@ int cmp_complex_gesture_create(cmp_complex_gesture_t **out_gesture) {
  */
 int cmp_complex_gesture_destroy(cmp_complex_gesture_t *gesture) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_complex_gesture *ctx = (struct cmp_complex_gesture *)gesture;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_complex_gesture_destroy: Invalid argument "
-              "(gesture=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_complex_gesture_destroy: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
-  CMP_FREE(ctx);
-  return rc;
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_complex_gesture_destroy: CMP_FREE failed\n");
+  }
+
+  cmp_log_debug("cmp_complex_gesture_destroy: Successfully destroyed complex "
+                "gesture context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -85,11 +110,18 @@ int cmp_complex_gesture_destroy(cmp_complex_gesture_t *gesture) {
 int cmp_complex_gesture_process_event(cmp_complex_gesture_t *gesture,
                                       const cmp_event_t *event) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_complex_gesture *ctx = (struct cmp_complex_gesture *)gesture;
 
-  if (!ctx || !event) {
+  if (ctx == NULL || event == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_complex_gesture_process_event: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_complex_gesture_process_event: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -103,7 +135,7 @@ int cmp_complex_gesture_process_event(cmp_complex_gesture_t *gesture,
       ctx->current_pan_y = ctx->start_pan_y;
 
       /* Trigger callback if bound */
-      if (ctx->callback) {
+      if (ctx->callback != NULL) {
         ctx->callback((cmp_gesture_t *)ctx, NULL, ctx->user_data);
       }
     }
@@ -115,7 +147,7 @@ int cmp_complex_gesture_process_event(cmp_complex_gesture_t *gesture,
       ctx->current_pan_y = (float)event->y;
 
       /* Trigger callback */
-      if (ctx->callback) {
+      if (ctx->callback != NULL) {
         ctx->callback((cmp_gesture_t *)ctx, NULL, ctx->user_data);
       }
     }
@@ -125,7 +157,7 @@ int cmp_complex_gesture_process_event(cmp_complex_gesture_t *gesture,
       ctx->state = CMP_GESTURE_STATE_ENDED;
 
       /* Trigger callback */
-      if (ctx->callback) {
+      if (ctx->callback != NULL) {
         ctx->callback((cmp_gesture_t *)ctx, NULL, ctx->user_data);
       }
 
@@ -134,13 +166,16 @@ int cmp_complex_gesture_process_event(cmp_complex_gesture_t *gesture,
     }
   } else if (event->action == CMP_ACTION_CANCEL) {
     ctx->state = CMP_GESTURE_STATE_CANCELLED;
-    if (ctx->callback) {
+    if (ctx->callback != NULL) {
       ctx->callback((cmp_gesture_t *)ctx, NULL, ctx->user_data);
     }
     ctx->state = CMP_GESTURE_STATE_POSSIBLE;
   }
 
-  return rc;
+  cmp_log_debug(
+      "cmp_complex_gesture_process_event: Processed event into state %d\n",
+      (int)ctx->state);
+  return CMP_SUCCESS;
 }
 
 /**
@@ -152,8 +187,9 @@ int cmp_complex_gesture_process_event(cmp_complex_gesture_t *gesture,
 int cmp_complex_gesture_get_state(const cmp_complex_gesture_t *gesture) {
   const struct cmp_complex_gesture *ctx =
       (const struct cmp_complex_gesture *)gesture;
-  if (!ctx)
+  if (ctx == NULL) {
     return (int)CMP_GESTURE_STATE_POSSIBLE;
+  }
 
   return (int)ctx->state;
 }
@@ -172,27 +208,39 @@ int cmp_complex_gesture_get_deltas(const cmp_complex_gesture_t *gesture,
                                    float *out_pan_x, float *out_pan_y,
                                    float *out_scale, float *out_rotation) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   const struct cmp_complex_gesture *ctx =
       (const struct cmp_complex_gesture *)gesture;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_complex_gesture_get_deltas: Invalid argument "
-              "(gesture=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_complex_gesture_get_deltas: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
-  if (out_pan_x)
+  if (out_pan_x != NULL) {
     *out_pan_x = ctx->current_pan_x - ctx->start_pan_x;
-  if (out_pan_y)
+  }
+  if (out_pan_y != NULL) {
     *out_pan_y = ctx->current_pan_y - ctx->start_pan_y;
+  }
 
   /* Return logical defaults for unmocked values to prevent uninitialized memory
    * reads */
-  if (out_scale)
+  if (out_scale != NULL) {
     *out_scale = 1.0f;
-  if (out_rotation)
+  }
+  if (out_rotation != NULL) {
     *out_rotation = 0.0f;
+  }
 
-  return rc;
+  cmp_log_debug(
+      "cmp_complex_gesture_get_deltas: Extracted gesture delta values\n");
+  return CMP_SUCCESS;
 }

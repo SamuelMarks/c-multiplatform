@@ -19,25 +19,38 @@ struct cmp_date_picker {
  */
 int cmp_date_picker_create(cmp_date_picker_t **out_picker) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_date_picker *picker = NULL;
 
-  if (!out_picker) {
+  if (out_picker == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_date_picker_create: Invalid argument "
-              "(out_picker=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_date_picker_create: Invalid argument (out_picker=NULL): %s\n",
+        err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_date_picker), (void **)&picker);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_date_picker_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_date_picker_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
   memset(picker, 0, sizeof(struct cmp_date_picker));
 
   *out_picker = (cmp_date_picker_t *)picker;
-  return rc;
+  cmp_log_debug(
+      "cmp_date_picker_create: Successfully created date picker context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -48,15 +61,26 @@ int cmp_date_picker_create(cmp_date_picker_t **out_picker) {
  */
 int cmp_date_picker_destroy(cmp_date_picker_t *picker) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_date_picker *internal_picker = (struct cmp_date_picker *)picker;
 
-  if (!internal_picker) {
+  if (internal_picker == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_date_picker_destroy: Invalid argument (picker=NULL)\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_date_picker_destroy: Invalid argument: %s\n", err_str);
     return rc;
   }
 
-  CMP_FREE(internal_picker);
-  return rc;
+  rc = CMP_FREE(internal_picker);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_date_picker_destroy: CMP_FREE failed\n");
+  }
+
+  cmp_log_debug(
+      "cmp_date_picker_destroy: Successfully destroyed date picker context\n");
+  return CMP_SUCCESS;
 }

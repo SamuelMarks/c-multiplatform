@@ -19,32 +19,58 @@ struct cmp_command_palette {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_command_palette_create(cmp_command_palette_t **out_palette) {
-  cmp_command_palette_t *palette;
-  int rc;
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
+  cmp_command_palette_t *palette = NULL;
 
-  if (!out_palette) {
-    LOG_DEBUG("cmp_command_palette_create: out_palette is NULL\n");
-    return CMP_ERROR_INVALID_ARG;
+  if (out_palette == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_command_palette_create: Invalid argument (out_palette=NULL): %s\n",
+        err_str);
+    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_command_palette_t), (void **)&palette);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_command_palette_create: OOM\n");
-    return CMP_ERROR_OOM;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_palette_create: Out of memory: %s\n", err_str);
+    return rc;
   }
 
   palette->capacity = 64;
   palette->count = 0;
+  palette->items = NULL;
 
   rc = CMP_MALLOC(palette->capacity * sizeof(cmp_command_item_t *),
                   (void **)&palette->items);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_command_palette_create: OOM items\n");
-    CMP_FREE(palette);
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_command_palette_create: Out of memory for items array: %s\n",
+        err_str);
+
+    rc = CMP_FREE(palette);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_command_palette_create: Failed cleanup on error\n");
+    }
     return CMP_ERROR_OOM;
   }
 
   *out_palette = palette;
+  cmp_log_debug(
+      "cmp_command_palette_create: Successfully created palette context\n");
   return CMP_SUCCESS;
 }
 
@@ -55,29 +81,48 @@ int cmp_command_palette_create(cmp_command_palette_t **out_palette) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_command_palette_destroy(cmp_command_palette_t *palette) {
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   size_t i;
-  int rc;
 
-  if (!palette) {
-    LOG_DEBUG("cmp_command_palette_destroy: palette is NULL\n");
-    return CMP_ERROR_INVALID_ARG;
+  if (palette == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_palette_destroy: Invalid argument: %s\n",
+                  err_str);
+    return rc;
   }
 
-  for (i = 0; i < palette->count; i++) {
-    rc = CMP_FREE(palette->items[i]);
-    if (rc != CMP_SUCCESS)
-      LOG_DEBUG("cmp_command_palette_destroy: CMP_FREE item failed\n");
+  if (palette->items != NULL) {
+    for (i = 0; i < palette->count; i++) {
+      if (palette->items[i] != NULL) {
+        rc = CMP_FREE(palette->items[i]);
+        if (rc != CMP_SUCCESS) {
+          cmp_log_debug(
+              "cmp_command_palette_destroy: CMP_FREE item failed at index %d\n",
+              (int)i);
+        }
+      }
+    }
+    rc = CMP_FREE(palette->items);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug(
+          "cmp_command_palette_destroy: CMP_FREE items array failed\n");
+    }
   }
-
-  rc = CMP_FREE(palette->items);
-  if (rc != CMP_SUCCESS)
-    LOG_DEBUG("cmp_command_palette_destroy: CMP_FREE items failed\n");
 
   rc = CMP_FREE(palette);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_command_palette_destroy: CMP_FREE failed\n");
+    cmp_log_debug("cmp_command_palette_destroy: CMP_FREE failed\n");
     return rc;
   }
+
+  cmp_log_debug(
+      "cmp_command_palette_destroy: Successfully destroyed palette context\n");
   return CMP_SUCCESS;
 }
 
@@ -93,49 +138,80 @@ int cmp_command_palette_destroy(cmp_command_palette_t *palette) {
 int cmp_command_palette_add_item(cmp_command_palette_t *palette, const char *id,
                                  const char *display_text,
                                  const char *subtext) {
-  cmp_command_item_t *item;
-  cmp_command_item_t **new_array;
-  int rc;
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
+  cmp_command_item_t *item = NULL;
+  cmp_command_item_t **new_array = NULL;
+  size_t new_cap;
 
-  if (!palette || !id || !display_text) {
-    LOG_DEBUG("cmp_command_palette_add_item: Invalid arg\n");
-    return CMP_ERROR_INVALID_ARG;
+  if (palette == NULL || id == NULL || display_text == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_palette_add_item: Invalid arg: %s\n", err_str);
+    return rc;
   }
 
   if (palette->count == palette->capacity) {
-    size_t new_cap = palette->capacity * 2;
+    new_cap = palette->capacity * 2;
     rc =
         CMP_MALLOC(new_cap * sizeof(cmp_command_item_t *), (void **)&new_array);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_command_palette_add_item: OOM items\n");
-      return CMP_ERROR_OOM;
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      cmp_log_debug("cmp_command_palette_add_item: Out of memory growing items "
+                    "array: %s\n",
+                    err_str);
+      return rc;
     }
-    memcpy(new_array, palette->items,
-           palette->count * sizeof(cmp_command_item_t *));
-    CMP_FREE(palette->items);
+    if (palette->items != NULL) {
+      memcpy(new_array, palette->items,
+             palette->count * sizeof(cmp_command_item_t *));
+      rc = CMP_FREE(palette->items);
+      if (rc != CMP_SUCCESS) {
+        cmp_log_debug(
+            "cmp_command_palette_add_item: Failed freeing old array\n");
+      }
+    }
     palette->items = new_array;
     palette->capacity = new_cap;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_command_item_t), (void **)&item);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_command_palette_add_item: OOM item\n");
-    return CMP_ERROR_OOM;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug(
+        "cmp_command_palette_add_item: Out of memory allocating item: %s\n",
+        err_str);
+    return rc;
   }
 
 #if defined(_MSC_VER)
   if (strncpy_s(item->id, sizeof(item->id), id, _TRUNCATE) != 0) {
+    cmp_log_debug("cmp_command_palette_add_item: strncpy_s (id) failed\n");
     CMP_FREE(item);
     return CMP_ERROR_GENERAL;
   }
   if (strncpy_s(item->display_text, sizeof(item->display_text), display_text,
                 _TRUNCATE) != 0) {
+    cmp_log_debug(
+        "cmp_command_palette_add_item: strncpy_s (display_text) failed\n");
     CMP_FREE(item);
     return CMP_ERROR_GENERAL;
   }
-  if (subtext) {
+  if (subtext != NULL) {
     if (strncpy_s(item->subtext, sizeof(item->subtext), subtext, _TRUNCATE) !=
         0) {
+      cmp_log_debug(
+          "cmp_command_palette_add_item: strncpy_s (subtext) failed\n");
       CMP_FREE(item);
       return CMP_ERROR_GENERAL;
     }
@@ -149,7 +225,7 @@ int cmp_command_palette_add_item(cmp_command_palette_t *palette, const char *id,
   strncpy(item->display_text, display_text, sizeof(item->display_text) - 1);
   item->display_text[sizeof(item->display_text) - 1] = '\0';
 
-  if (subtext) {
+  if (subtext != NULL) {
     strncpy(item->subtext, subtext, sizeof(item->subtext) - 1);
     item->subtext[sizeof(item->subtext) - 1] = '\0';
   } else {
@@ -160,6 +236,7 @@ int cmp_command_palette_add_item(cmp_command_palette_t *palette, const char *id,
   item->score = 0;
   palette->items[palette->count++] = item;
 
+  cmp_log_debug("cmp_command_palette_add_item: Added item id=%s\n", id);
   return CMP_SUCCESS;
 }
 
@@ -171,7 +248,7 @@ static int fuzzy_score(const char *text, const char *query) {
   int consecutive_matches = 0;
   char t_char, q_char;
 
-  if (!*q) {
+  if (*q == '\0') {
     return 1; /* Empty query matches everything but loosely */
   }
 
@@ -180,7 +257,7 @@ static int fuzzy_score(const char *text, const char *query) {
     return 1000;
   }
 
-  while (*t && *q) {
+  while (*t != '\0' && *q != '\0') {
     t_char = (char)tolower((unsigned char)*t);
     q_char = (char)tolower((unsigned char)*q);
 
@@ -201,12 +278,12 @@ static int fuzzy_score(const char *text, const char *query) {
   }
 
   /* Must match all chars in query to be a valid fuzzy hit */
-  if (*q) {
+  if (*q != '\0') {
     return 0;
   }
 
   /* Add a bonus if we matched the whole text string entirely (exact match) */
-  if (!*t) {
+  if (*t == '\0') {
     score += 50;
   } else {
     /* Penalize slightly for leftover characters to push shorter/exact matches
@@ -219,19 +296,23 @@ static int fuzzy_score(const char *text, const char *query) {
 
 /* Compare func for qsort descending */
 static int compare_items(const void *a, const void *b) {
-  const cmp_command_item_t *item_a = *(const cmp_command_item_t **)a;
-  const cmp_command_item_t *item_b = *(const cmp_command_item_t **)b;
+  const cmp_command_item_t *item_a = *(const cmp_command_item_t *const *)a;
+  const cmp_command_item_t *item_b = *(const cmp_command_item_t *const *)b;
 
-  if (item_a->score < item_b->score)
+  if (item_a->score < item_b->score) {
     return 1;
-  if (item_a->score > item_b->score)
+  }
+  if (item_a->score > item_b->score) {
     return -1;
+  }
 
   /* Fallback to length to favor shorter strings */
-  if (strlen(item_a->display_text) > strlen(item_b->display_text))
+  if (strlen(item_a->display_text) > strlen(item_b->display_text)) {
     return 1;
-  if (strlen(item_a->display_text) < strlen(item_b->display_text))
+  }
+  if (strlen(item_a->display_text) < strlen(item_b->display_text)) {
     return -1;
+  }
 
   return 0;
 }
@@ -250,11 +331,21 @@ int cmp_command_palette_search(cmp_command_palette_t *palette,
                                const char *query,
                                cmp_command_item_t **out_results,
                                size_t max_results, size_t *out_count) {
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   size_t i, hits;
 
-  if (!palette || !query || !out_results || !out_count) {
-    LOG_DEBUG("cmp_command_palette_search: Invalid arg\n");
-    return CMP_ERROR_INVALID_ARG;
+  if (palette == NULL || query == NULL || out_results == NULL ||
+      out_count == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_command_palette_search: Invalid argument: %s\n",
+                  err_str);
+    return rc;
   }
 
   hits = 0;
@@ -280,8 +371,12 @@ int cmp_command_palette_search(cmp_command_palette_t *palette,
   }
 
   /* Sort the results array descending */
-  qsort(out_results, hits, sizeof(cmp_command_item_t *), compare_items);
+  if (hits > 0) {
+    qsort(out_results, hits, sizeof(cmp_command_item_t *), compare_items);
+  }
 
   *out_count = hits;
+  cmp_log_debug("cmp_command_palette_search: Search returned %d items\n",
+                (int)hits);
   return CMP_SUCCESS;
 }

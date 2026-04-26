@@ -30,17 +30,27 @@ struct cmp_focus_manager {
 int cmp_focus_manager_create(cmp_a11y_tree_t *tree,
                              cmp_focus_manager_t **out_focus_manager) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_focus_manager *mgr = NULL;
 
-  if (!tree || !out_focus_manager) {
+  if (tree == NULL || out_focus_manager == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_focus_manager_create: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_focus_manager_create: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_focus_manager), (void **)&mgr);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_focus_manager_create: Out of memory\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_focus_manager_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
@@ -51,7 +61,9 @@ int cmp_focus_manager_create(cmp_a11y_tree_t *tree,
   mgr->currently_focused_id = -1;
 
   *out_focus_manager = (cmp_focus_manager_t *)mgr;
-  return rc;
+  cmp_log_debug(
+      "cmp_focus_manager_create: Successfully created focus manager context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -62,20 +74,35 @@ int cmp_focus_manager_create(cmp_a11y_tree_t *tree,
  */
 int cmp_focus_manager_destroy(cmp_focus_manager_t *focus_manager) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_focus_manager *mgr = (struct cmp_focus_manager *)focus_manager;
 
-  if (!mgr) {
+  if (mgr == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_focus_manager_destroy: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_focus_manager_destroy: Invalid argument: %s\n", err_str);
     return rc;
   }
 
-  if (mgr->nodes) {
-    CMP_FREE(mgr->nodes);
+  if (mgr->nodes != NULL) {
+    rc = CMP_FREE(mgr->nodes);
+    if (rc != CMP_SUCCESS) {
+      cmp_log_debug("cmp_focus_manager_destroy: CMP_FREE nodes failed\n");
+    }
   }
 
-  CMP_FREE(mgr);
-  return rc;
+  rc = CMP_FREE(mgr);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_focus_manager_destroy: CMP_FREE context failed\n");
+  }
+
+  cmp_log_debug("cmp_focus_manager_destroy: Successfully destroyed focus "
+                "manager context\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -89,14 +116,21 @@ int cmp_focus_manager_destroy(cmp_focus_manager_t *focus_manager) {
 int cmp_focus_manager_set_focus(cmp_focus_manager_t *focus_manager, int node_id,
                                 int has_focus) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_focus_manager *mgr = (struct cmp_focus_manager *)focus_manager;
   cmp_focus_node_t *new_nodes = NULL;
   size_t new_capacity;
   size_t i;
 
-  if (!mgr) {
+  if (mgr == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_focus_manager_set_focus: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_focus_manager_set_focus: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
@@ -109,7 +143,10 @@ int cmp_focus_manager_set_focus(cmp_focus_manager_t *focus_manager, int node_id,
       } else if (mgr->currently_focused_id == node_id) {
         mgr->currently_focused_id = -1;
       }
-      return rc;
+      cmp_log_debug(
+          "cmp_focus_manager_set_focus: Updated focus state for node %d\n",
+          node_id);
+      return CMP_SUCCESS;
     }
   }
 
@@ -119,13 +156,22 @@ int cmp_focus_manager_set_focus(cmp_focus_manager_t *focus_manager, int node_id,
     rc = CMP_MALLOC(new_capacity * sizeof(cmp_focus_node_t),
                     (void **)&new_nodes);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Error in cmp_focus_manager_set_focus: Out of memory\n");
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      cmp_log_debug("cmp_focus_manager_set_focus: Out of memory: %s\n",
+                    err_str);
       return rc;
     }
 
-    if (mgr->nodes) {
+    if (mgr->nodes != NULL) {
       memcpy(new_nodes, mgr->nodes, mgr->count * sizeof(cmp_focus_node_t));
-      CMP_FREE(mgr->nodes);
+      rc = CMP_FREE(mgr->nodes);
+      if (rc != CMP_SUCCESS) {
+        cmp_log_debug(
+            "cmp_focus_manager_set_focus: CMP_FREE old nodes failed\n");
+      }
     }
     mgr->nodes = new_nodes;
     mgr->capacity = new_capacity;
@@ -146,7 +192,9 @@ int cmp_focus_manager_set_focus(cmp_focus_manager_t *focus_manager, int node_id,
 
   mgr->count++;
 
-  return rc;
+  cmp_log_debug(
+      "cmp_focus_manager_set_focus: Registered new node into focus graph\n");
+  return CMP_SUCCESS;
 }
 
 /**
@@ -162,21 +210,32 @@ int cmp_focus_manager_navigate(cmp_focus_manager_t *focus_manager,
                                int current_node_id, int direction,
                                int *out_next_node_id) {
   int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
   struct cmp_focus_manager *mgr = (struct cmp_focus_manager *)focus_manager;
   size_t i;
   int target_id = -1;
   float min_distance = 9999999.0f;
   cmp_focus_node_t *current_node = NULL;
+  float dx;
+  float dy;
+  int is_valid_dir;
+  float distance;
 
-  if (!mgr || !out_next_node_id) {
+  if (mgr == NULL || out_next_node_id == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_focus_manager_navigate: Invalid argument\n");
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_focus_manager_navigate: Invalid argument: %s\n",
+                  err_str);
     return rc;
   }
 
   if (mgr->count == 0) {
     *out_next_node_id = -1;
-    return rc;
+    return CMP_SUCCESS;
   }
 
   /* Find current node */
@@ -187,18 +246,15 @@ int cmp_focus_manager_navigate(cmp_focus_manager_t *focus_manager,
     }
   }
 
-  if (!current_node) {
+  if (current_node == NULL) {
     /* Current not found, just pick the first one */
     *out_next_node_id = mgr->nodes[0].node_id;
-    return rc;
+    return CMP_SUCCESS;
   }
 
   /* Extremely simplified 2D spatial intersection heuristics for TV Remotes */
   for (i = 0; i < mgr->count; ++i) {
-    float dx;
-    float dy;
-    int is_valid_dir = 0;
-    float distance;
+    is_valid_dir = 0;
 
     if (mgr->nodes[i].node_id == current_node_id)
       continue;
@@ -232,5 +288,7 @@ int cmp_focus_manager_navigate(cmp_focus_manager_t *focus_manager,
     *out_next_node_id = target_id;
   }
 
-  return rc;
+  cmp_log_debug("cmp_focus_manager_navigate: Computed 2D spatial focus "
+                "navigation target\n");
+  return CMP_SUCCESS;
 }
