@@ -22,6 +22,7 @@ endif()
 
 add_subdirectory(common)
 add_subdirectory(multi-design-buttons)
+add_subdirectory(multi-design-toolbar)
 add_subdirectory(kotlin-multiplatform)
 add_subdirectory(google-material-android)
 add_subdirectory(apple-cupertino-ios)

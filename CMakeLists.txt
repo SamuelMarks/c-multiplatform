@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.14)
 project(c-multiplatform C)
 
+set(CMAKE_FIND_USE_PACKAGE_REGISTRY OFF)
+set(CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY OFF)
+set(CMAKE_EXPORT_NO_PACKAGE_REGISTRY ON)
+
 if(CYGWIN)
     add_compile_definitions(_vsnprintf=vsnprintf _snprintf=snprintf)
 endif()
@@ -41,6 +45,23 @@ if(PROJECT_IS_TOP_LEVEL)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin CACHE PATH "" FORCE)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib CACHE PATH "" FORCE)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib CACHE PATH "" FORCE)
+    
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Debug")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Release")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/MinSizeRel")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/RelWithDebInfo")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/lib/Debug")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/lib/Release")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/lib/MinSizeRel")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/lib/RelWithDebInfo")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Debug")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Release")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/cfs-build/Debug")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/cfs-build/Release")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/c89stringutils-build/Debug")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/c89stringutils-build/Release")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/c_str_span-build/Debug")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/c_str_span-build/Release")
 endif()
 
 
@@ -173,7 +194,7 @@ target_include_directories(greatest INTERFACE ${greatest_SOURCE_DIR})
 
 # cfs
 if(CDD_DEPS STREQUAL "SYSTEM")
-    find_package(cfs REQUIRED)
+    find_package(cfs REQUIRED NO_CMAKE_PACKAGE_REGISTRY NO_CMAKE_SYSTEM_PACKAGE_REGISTRY)
 else()
     FetchContent_Declare(cfs GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git GIT_TAG master
         UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master

@@ -98,16 +98,28 @@ TEST test_scroll_momentum_decay(void) {
 }
 
 TEST test_overscroll_chaining(void) {
+  int chained = 0;
   /* No boundary hit = 1 (bubbling) */
-  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_AUTO, 0));
-  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_CONTAIN, 0));
-  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_NONE, 0));
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_overscroll_evaluate(CMP_OVERSCROLL_AUTO, 0, &chained));
+  ASSERT_EQ(1, chained);
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_overscroll_evaluate(CMP_OVERSCROLL_CONTAIN, 0, &chained));
+  ASSERT_EQ(1, chained);
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_overscroll_evaluate(CMP_OVERSCROLL_NONE, 0, &chained));
+  ASSERT_EQ(1, chained);
 
   /* Boundary Hit */
-  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_AUTO, 1)); /* Chains */
-  ASSERT_EQ(0,
-            cmp_overscroll_evaluate(CMP_OVERSCROLL_CONTAIN, 1)); /* Trapped */
-  ASSERT_EQ(0, cmp_overscroll_evaluate(CMP_OVERSCROLL_NONE, 1)); /* Trapped */
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_overscroll_evaluate(CMP_OVERSCROLL_AUTO, 1, &chained));
+  ASSERT_EQ(1, chained); /* Chains */
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_overscroll_evaluate(CMP_OVERSCROLL_CONTAIN, 1, &chained));
+  ASSERT_EQ(0, chained); /* Trapped */
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_overscroll_evaluate(CMP_OVERSCROLL_NONE, 1, &chained));
+  ASSERT_EQ(0, chained); /* Trapped */
 
   PASS();
 }

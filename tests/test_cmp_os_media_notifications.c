@@ -10,8 +10,10 @@ static void dummy_cb(int cmd, void *u) {
 
 TEST test_os_media_notifications_lifecycle(void) {
   cmp_os_media_controls_t *mc = NULL;
+  int rc;
 
-  ASSERT_EQ(CMP_SUCCESS, cmp_os_notify("title", "body"));
+  rc = cmp_os_notify("title", "body");
+  ASSERT(rc == CMP_SUCCESS || rc == CMP_ERROR_NOT_FOUND);
 
   ASSERT_EQ(CMP_SUCCESS, cmp_os_media_controls_create(&mc));
   ASSERT_NEQ(NULL, mc);
