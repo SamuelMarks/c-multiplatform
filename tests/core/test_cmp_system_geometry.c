@@ -83,6 +83,8 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_system_geometry_get_readable_content_guide(ctx, 0.0f, NULL));
 
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_system_geometry_destroy(NULL));
+
   cmp_system_geometry_destroy(ctx);
   PASS();
 }

@@ -10,6 +10,13 @@ struct cmp_focus_nav {
   int current_focus_id;
 };
 
+/**
+ * @brief cmp_focus_nav_create
+ *
+ * @param tree Parameter description.
+ * @param out_nav Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
   int rc = CMP_SUCCESS;
   cmp_focus_nav_t *nav = NULL;
@@ -20,9 +27,8 @@ int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
     return rc;
   }
 
-  nav = (cmp_focus_nav_t *)malloc(sizeof(cmp_focus_nav_t));
-  if (!nav) {
-    rc = CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_focus_nav_t), (void **)&nav);
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_focus_nav_create: Out of memory\n");
     return rc;
   }
@@ -32,7 +38,7 @@ int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
 
   rc = cmp_focus_ring_create(tree, &nav->ring);
   if (rc != CMP_SUCCESS) {
-    free(nav);
+    CMP_FREE(nav);
     LOG_DEBUG("Error in cmp_focus_nav_create: Failed to create focus ring\n");
     return rc;
   }
@@ -41,8 +47,15 @@ int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
   return rc;
 }
 
+/**
+ * @brief cmp_focus_nav_destroy
+ *
+ * @param nav Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_focus_nav_destroy(cmp_focus_nav_t *nav) {
   int rc = CMP_SUCCESS;
+  int ret_rc = CMP_SUCCESS;
 
   if (!nav) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -54,13 +67,24 @@ int cmp_focus_nav_destroy(cmp_focus_nav_t *nav) {
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG(
           "Error in cmp_focus_nav_destroy: Failed to destroy focus ring\n");
+      ret_rc = rc;
     }
   }
-  free(nav);
-  return rc; /* Percolating the most recent rc, although typically we want to
-                destroy nav anyway */
+  rc = CMP_FREE(nav);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_focus_nav_destroy: Failed to free nav\n");
+    ret_rc = rc;
+  }
+  return ret_rc;
 }
 
+/**
+ * @brief cmp_focus_nav_handle_tab
+ *
+ * @param nav Parameter description.
+ * @param is_shift_pressed Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_focus_nav_handle_tab(cmp_focus_nav_t *nav, int is_shift_pressed) {
   int rc = CMP_SUCCESS;
 

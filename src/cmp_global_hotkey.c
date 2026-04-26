@@ -9,6 +9,12 @@ struct cmp_global_hotkey {
   int next_id;
 };
 
+/**
+ * @brief cmp_global_hotkey_create
+ *
+ * @param out_hotkey Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_global_hotkey_create(cmp_global_hotkey_t **out_hotkey) {
   int rc = CMP_SUCCESS;
   cmp_global_hotkey_t *hk = NULL;
@@ -20,9 +26,8 @@ int cmp_global_hotkey_create(cmp_global_hotkey_t **out_hotkey) {
     return rc;
   }
 
-  hk = (cmp_global_hotkey_t *)malloc(sizeof(cmp_global_hotkey_t));
-  if (!hk) {
-    rc = CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_global_hotkey_t), (void **)&hk);
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_global_hotkey_create: Out of memory\n");
     return rc;
   }
@@ -32,6 +37,12 @@ int cmp_global_hotkey_create(cmp_global_hotkey_t **out_hotkey) {
   return rc;
 }
 
+/**
+ * @brief cmp_global_hotkey_destroy
+ *
+ * @param hotkey Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_global_hotkey_destroy(cmp_global_hotkey_t *hotkey) {
   int rc = CMP_SUCCESS;
 
@@ -42,10 +53,24 @@ int cmp_global_hotkey_destroy(cmp_global_hotkey_t *hotkey) {
     return rc;
   }
 
-  free(hotkey);
-  return rc;
+  rc = CMP_FREE(hotkey);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_global_hotkey_destroy: CMP_FREE failed\n");
+    return rc;
+  }
+
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_global_hotkey_register
+ *
+ * @param hotkey Parameter description.
+ * @param key_code Parameter description.
+ * @param modifiers Parameter description.
+ * @param out_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_global_hotkey_register(cmp_global_hotkey_t *hotkey, int key_code,
                                int modifiers, int *out_id) {
   int rc = CMP_SUCCESS;
@@ -60,6 +85,13 @@ int cmp_global_hotkey_register(cmp_global_hotkey_t *hotkey, int key_code,
   return rc;
 }
 
+/**
+ * @brief cmp_global_hotkey_unregister
+ *
+ * @param hotkey Parameter description.
+ * @param id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_global_hotkey_unregister(cmp_global_hotkey_t *hotkey, int id) {
   int rc = CMP_SUCCESS;
 

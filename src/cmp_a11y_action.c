@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -9,6 +10,13 @@ struct cmp_a11y_action {
   cmp_a11y_tree_t *tree;
 };
 
+/**
+ * @brief Creates an accessibility action context.
+ *
+ * @param tree Pointer to the accessibility tree.
+ * @param out_action Pointer to store the new action context.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
                            cmp_a11y_action_t **out_action) {
   int rc = CMP_SUCCESS;
@@ -16,19 +24,23 @@ int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
 
   if (!tree || !out_action) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_action_create: Invalid argument (tree=%p, "
-            "out_action=%p)\n",
-            (void *)tree, (void *)out_action);
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_action_create: %s\n", err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_a11y_action), (void **)&action);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr,
-            "Error in cmp_a11y_action_create: Out of memory allocating "
-            "cmp_a11y_action (size=%u)\n",
-            (unsigned int)sizeof(struct cmp_a11y_action));
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_action_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -38,15 +50,23 @@ int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
   return rc;
 }
 
+/**
+ * @brief Destroys an accessibility action context.
+ *
+ * @param action Pointer to the action context.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_action_destroy(cmp_a11y_action_t *action) {
   int rc = CMP_SUCCESS;
   struct cmp_a11y_action *a = (struct cmp_a11y_action *)action;
 
   if (!a) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_a11y_action_destroy: Invalid argument (action=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_action_destroy: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -54,6 +74,14 @@ int cmp_a11y_action_destroy(cmp_a11y_action_t *action) {
   return rc;
 }
 
+/**
+ * @brief Executes an accessibility action on a given node.
+ *
+ * @param action Pointer to the action context.
+ * @param node_id The ID of the node to perform the action on.
+ * @param action_type The type of action to perform.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
                             cmp_a11y_action_type_t action_type) {
   int rc = CMP_SUCCESS;
@@ -62,10 +90,11 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
 
   if (!a || node_id < 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_action_execute: Invalid argument (action=%p, "
-            "node_id=%d)\n",
-            (void *)a, node_id);
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_action_execute: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -80,19 +109,21 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
     simulated_event.action = CMP_ACTION_DOWN;
     rc = cmp_event_push(&simulated_event);
     if (rc != CMP_SUCCESS) {
-      fprintf(stderr,
-              "Error in cmp_a11y_action_execute: Failed to push DOWN event "
-              "(rc=%d)\n",
-              rc);
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_a11y_action_execute click push down: %s\n", err_str);
+      }
       return rc;
     }
     simulated_event.action = CMP_ACTION_UP;
     rc = cmp_event_push(&simulated_event);
     if (rc != CMP_SUCCESS) {
-      fprintf(
-          stderr,
-          "Error in cmp_a11y_action_execute: Failed to push UP event (rc=%d)\n",
-          rc);
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_a11y_action_execute click push up: %s\n", err_str);
+      }
       return rc;
     }
     break;
@@ -103,10 +134,11 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
     simulated_event.y = -50; /* Arbitrary scroll tick */
     rc = cmp_event_push(&simulated_event);
     if (rc != CMP_SUCCESS) {
-      fprintf(stderr,
-              "Error in cmp_a11y_action_execute: Failed to push SCROLL_FORWARD "
-              "event (rc=%d)\n",
-              rc);
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_a11y_action_execute scroll fwd: %s\n", err_str);
+      }
       return rc;
     }
     break;
@@ -117,10 +149,11 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
     simulated_event.y = 50; /* Arbitrary scroll tick */
     rc = cmp_event_push(&simulated_event);
     if (rc != CMP_SUCCESS) {
-      fprintf(stderr,
-              "Error in cmp_a11y_action_execute: Failed to push "
-              "SCROLL_BACKWARD event (rc=%d)\n",
-              rc);
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_a11y_action_execute scroll bwd: %s\n", err_str);
+      }
       return rc;
     }
     break;
@@ -128,10 +161,11 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
   case CMP_A11Y_ACTION_FOCUS:
     rc = cmp_event_set_focus(node_id);
     if (rc != CMP_SUCCESS) {
-      fprintf(stderr,
-              "Error in cmp_a11y_action_execute: Failed to set focus on node "
-              "%d (rc=%d)\n",
-              node_id, rc);
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_a11y_action_execute focus: %s\n", err_str);
+      }
       return rc;
     }
     break;
@@ -140,10 +174,11 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
     if (cmp_event_get_focus() == node_id) {
       rc = cmp_event_clear_focus();
       if (rc != CMP_SUCCESS) {
-        fprintf(
-            stderr,
-            "Error in cmp_a11y_action_execute: Failed to clear focus (rc=%d)\n",
-            rc);
+        {
+          const char *err_str;
+          cmp_strerror(rc, &err_str);
+          LOG_DEBUG("cmp_a11y_action_execute blur: %s\n", err_str);
+        }
         return rc;
       }
     }
@@ -151,9 +186,11 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
 
   default:
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_action_execute: Unhandled action type %d\n",
-            (int)action_type);
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_action_execute unhandled: %s\n", err_str);
+    }
     return rc;
   }
 

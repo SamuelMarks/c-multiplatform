@@ -15,6 +15,12 @@ struct cmp_shader_cache {
   struct cmp_shader_cache_entry *head;
 };
 
+/**
+ * @brief cmp_shader_cache_create
+ *
+ * @param out_cache Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_cache_create(cmp_shader_cache_t **out_cache) {
   cmp_shader_cache_t *cache;
   if (!out_cache)
@@ -26,6 +32,12 @@ int cmp_shader_cache_create(cmp_shader_cache_t **out_cache) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_shader_cache_destroy
+ *
+ * @param cache Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_cache_destroy(cmp_shader_cache_t *cache) {
   struct cmp_shader_cache_entry *curr, *next;
   if (!cache)
@@ -47,6 +59,14 @@ int cmp_shader_cache_destroy(cmp_shader_cache_t *cache) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_shader_cache_store
+ *
+ * @param cache Parameter description.
+ * @param key Parameter description.
+ * @param shader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_cache_store(cmp_shader_cache_t *cache, const char *key,
                            cmp_shader_t *shader) {
   struct cmp_shader_cache_entry *entry;
@@ -84,6 +104,14 @@ int cmp_shader_cache_store(cmp_shader_cache_t *cache, const char *key,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_shader_cache_retrieve
+ *
+ * @param cache Parameter description.
+ * @param key Parameter description.
+ * @param out_shader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_cache_retrieve(cmp_shader_cache_t *cache, const char *key,
                               cmp_shader_t **out_shader) {
   struct cmp_shader_cache_entry *curr;
@@ -101,6 +129,13 @@ int cmp_shader_cache_retrieve(cmp_shader_cache_t *cache, const char *key,
   return CMP_ERROR_NOT_FOUND;
 }
 
+/**
+ * @brief cmp_shader_cache_save_to_disk
+ *
+ * @param cache Parameter description.
+ * @param filepath Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_cache_save_to_disk(cmp_shader_cache_t *cache,
                                   const char *filepath) {
   FILE *f;
@@ -145,6 +180,13 @@ int cmp_shader_cache_save_to_disk(cmp_shader_cache_t *cache,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_shader_cache_load_from_disk
+ *
+ * @param cache Parameter description.
+ * @param filepath Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_cache_load_from_disk(cmp_shader_cache_t *cache,
                                     const char *filepath) {
   FILE *f;

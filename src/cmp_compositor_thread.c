@@ -11,6 +11,12 @@ struct cmp_compositor_thread {
   void *current_tree;
 };
 
+/**
+ * @brief cmp_compositor_thread_create
+ *
+ * @param out_thread Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_compositor_thread_create(cmp_compositor_thread_t **out_thread) {
   int rc = CMP_SUCCESS;
   struct cmp_compositor_thread *ctx = NULL;
@@ -34,6 +40,12 @@ int cmp_compositor_thread_create(cmp_compositor_thread_t **out_thread) {
   return rc;
 }
 
+/**
+ * @brief cmp_compositor_thread_destroy
+ *
+ * @param thread Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_compositor_thread_destroy(cmp_compositor_thread_t *thread) {
   int rc = CMP_SUCCESS;
   struct cmp_compositor_thread *ctx = (struct cmp_compositor_thread *)thread;
@@ -50,6 +62,13 @@ int cmp_compositor_thread_destroy(cmp_compositor_thread_t *thread) {
   return rc;
 }
 
+/**
+ * @brief cmp_compositor_thread_push_tree
+ *
+ * @param thread Parameter description.
+ * @param layer_tree_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_compositor_thread_push_tree(cmp_compositor_thread_t *thread,
                                     void *layer_tree_opaque) {
   int rc = CMP_SUCCESS;

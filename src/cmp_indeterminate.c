@@ -9,6 +9,12 @@ struct cmp_indeterminate {
   int is_indeterminate;
 };
 
+/**
+ * @brief cmp_indeterminate_create
+ *
+ * @param out_state Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_indeterminate_create(cmp_indeterminate_t **out_state) {
   int rc = CMP_SUCCESS;
   struct cmp_indeterminate *state = NULL;
@@ -32,6 +38,12 @@ int cmp_indeterminate_create(cmp_indeterminate_t **out_state) {
   return rc;
 }
 
+/**
+ * @brief cmp_indeterminate_destroy
+ *
+ * @param state Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_indeterminate_destroy(cmp_indeterminate_t *state) {
   int rc = CMP_SUCCESS;
   struct cmp_indeterminate *internal_state = (struct cmp_indeterminate *)state;
@@ -47,6 +59,13 @@ int cmp_indeterminate_destroy(cmp_indeterminate_t *state) {
   return rc;
 }
 
+/**
+ * @brief cmp_indeterminate_set
+ *
+ * @param state Parameter description.
+ * @param is_indeterminate Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_indeterminate_set(cmp_indeterminate_t *state, int is_indeterminate) {
   int rc = CMP_SUCCESS;
   struct cmp_indeterminate *internal_state = (struct cmp_indeterminate *)state;

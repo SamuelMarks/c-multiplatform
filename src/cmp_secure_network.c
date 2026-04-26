@@ -12,6 +12,7 @@
 /* MSVC 2005 missing wincred.h */
 #else
 #include <wincred.h>
+#include "cmp_log.h"
 #pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "credui.lib")
 #endif
@@ -24,14 +25,23 @@ struct cmp_secure_network {
   int use_proxy;
 };
 
+/**
+ * @brief cmp_secure_network_create
+ *
+ * @param out_net Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_secure_network_create(cmp_secure_network_t **out_net) {
+  int rc = CMP_SUCCESS;
   cmp_secure_network_t *net;
   if (!out_net)
     return CMP_ERROR_INVALID_ARG;
 
-  net = (cmp_secure_network_t *)malloc(sizeof(cmp_secure_network_t));
-  if (!net)
+  rc = CMP_MALLOC(sizeof(cmp_secure_network_t), (void **)&(net));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
+  }
 
   net->use_proxy = 0;
   net->proxy_url[0] = '\0';
@@ -40,13 +50,31 @@ int cmp_secure_network_create(cmp_secure_network_t **out_net) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_secure_network_destroy
+ *
+ * @param net Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_secure_network_destroy(cmp_secure_network_t *net) {
+  int rc = CMP_SUCCESS;
   if (!net)
     return CMP_ERROR_INVALID_ARG;
-  free(net);
+  rc = CMP_FREE(net);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_secure_network_send_https
+ *
+ * @param net Parameter description.
+ * @param url Parameter description.
+ * @param out_status_code Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_secure_network_send_https(cmp_secure_network_t *net, const char *url,
                                   int *out_status_code) {
   if (!net || !url || !out_status_code)
@@ -58,6 +86,13 @@ int cmp_secure_network_send_https(cmp_secure_network_t *net, const char *url,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_secure_network_set_proxy
+ *
+ * @param net Parameter description.
+ * @param proxy_url Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_secure_network_set_proxy(cmp_secure_network_t *net,
                                  const char *proxy_url) {
   if (!net || !proxy_url)
@@ -70,6 +105,14 @@ int cmp_secure_network_set_proxy(cmp_secure_network_t *net,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_secure_network_retrieve_credential
+ *
+ * @param key_name Parameter description.
+ * @param out_secret Parameter description.
+ * @param max_len Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_secure_network_retrieve_credential(const char *key_name,
                                            char *out_secret, size_t max_len) {
   if (!key_name || !out_secret || max_len == 0)

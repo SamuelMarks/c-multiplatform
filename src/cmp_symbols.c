@@ -24,6 +24,12 @@ struct cmp_symbols {
   int is_initialized;
 };
 
+/**
+ * @brief cmp_symbols_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_symbols_create(cmp_symbols_t **out_ctx) {
   struct cmp_symbols *ctx;
   if (!out_ctx)
@@ -35,12 +41,28 @@ int cmp_symbols_create(cmp_symbols_t **out_ctx) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_symbols_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_symbols_destroy(cmp_symbols_t *ctx) {
   if (ctx)
     CMP_FREE(ctx);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_symbols_request
+ *
+ * @param ctx Parameter description.
+ * @param symbol_name Parameter description.
+ * @param weight Parameter description.
+ * @param scale Parameter description.
+ * @param out_symbol_handle Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_symbols_request(cmp_symbols_t *ctx, const char *symbol_name, int weight,
                         cmp_symbol_scale_t scale, void **out_symbol_handle) {
   cmp_symbol_node_t *node;
@@ -76,6 +98,16 @@ int cmp_symbols_request(cmp_symbols_t *ctx, const char *symbol_name, int weight,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_symbols_apply_style
+ *
+ * @param ctx Parameter description.
+ * @param symbol_handle Parameter description.
+ * @param mode Parameter description.
+ * @param colors Parameter description.
+ * @param color_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_symbols_apply_style(cmp_symbols_t *ctx, void *symbol_handle,
                             cmp_symbol_rendering_mode_t mode,
                             const uint32_t *colors, size_t color_count) {
@@ -101,6 +133,14 @@ int cmp_symbols_apply_style(cmp_symbols_t *ctx, void *symbol_handle,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_symbols_set_variable_value
+ *
+ * @param ctx Parameter description.
+ * @param symbol_handle Parameter description.
+ * @param percentage Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_symbols_set_variable_value(cmp_symbols_t *ctx, void *symbol_handle,
                                    float percentage) {
   cmp_symbol_node_t *node = (cmp_symbol_node_t *)symbol_handle;
@@ -116,6 +156,15 @@ int cmp_symbols_set_variable_value(cmp_symbols_t *ctx, void *symbol_handle,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_symbols_trigger_animation
+ *
+ * @param ctx Parameter description.
+ * @param symbol_handle Parameter description.
+ * @param animation Parameter description.
+ * @param looping Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_symbols_trigger_animation(cmp_symbols_t *ctx, void *symbol_handle,
                                   cmp_symbol_animation_t animation,
                                   int looping) {
@@ -128,6 +177,14 @@ int cmp_symbols_trigger_animation(cmp_symbols_t *ctx, void *symbol_handle,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_symbols_load_custom_template
+ *
+ * @param ctx Parameter description.
+ * @param svg_path Parameter description.
+ * @param out_symbol_handle Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_symbols_load_custom_template(cmp_symbols_t *ctx, const char *svg_path,
                                      void **out_symbol_handle) {
   if (!ctx || !svg_path || !out_symbol_handle)

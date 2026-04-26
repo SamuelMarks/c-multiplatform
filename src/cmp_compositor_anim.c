@@ -10,6 +10,13 @@ struct cmp_compositor_anim {
   double elapsed_ms;
 };
 
+/**
+ * @brief cmp_compositor_anim_create
+ *
+ * @param property Parameter description.
+ * @param out_anim Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_compositor_anim_create(cmp_compositor_prop_t property,
                                cmp_compositor_anim_t **out_anim) {
   int rc = CMP_SUCCESS;
@@ -45,6 +52,12 @@ int cmp_compositor_anim_create(cmp_compositor_prop_t property,
   return rc;
 }
 
+/**
+ * @brief cmp_compositor_anim_destroy
+ *
+ * @param anim Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_compositor_anim_destroy(cmp_compositor_anim_t *anim) {
   int rc = CMP_SUCCESS;
 
@@ -57,6 +70,14 @@ int cmp_compositor_anim_destroy(cmp_compositor_anim_t *anim) {
   return rc;
 }
 
+/**
+ * @brief cmp_compositor_anim_set_range
+ *
+ * @param anim Parameter description.
+ * @param start_val Parameter description.
+ * @param end_val Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_compositor_anim_set_range(cmp_compositor_anim_t *anim,
                                   const cmp_compositor_val_t *start_val,
                                   const cmp_compositor_val_t *end_val) {
@@ -73,6 +94,16 @@ int cmp_compositor_anim_set_range(cmp_compositor_anim_t *anim,
   return rc;
 }
 
+/**
+ * @brief cmp_compositor_anim_step
+ *
+ * @param anim Parameter description.
+ * @param dt_ms Parameter description.
+ * @param duration_ms Parameter description.
+ * @param out_val Parameter description.
+ * @param out_finished Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_compositor_anim_step(cmp_compositor_anim_t *anim, double dt_ms,
                              double duration_ms, cmp_compositor_val_t *out_val,
                              int *out_finished) {
@@ -130,6 +161,13 @@ struct cmp_framebuffer_capture {
   int height;
 };
 
+/**
+ * @brief cmp_compositor_capture_framebuffer
+ *
+ * @param window Parameter description.
+ * @param out_capture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_compositor_capture_framebuffer(
     cmp_window_t *window, cmp_framebuffer_capture_t **out_capture) {
   int rc = CMP_SUCCESS;
@@ -155,6 +193,12 @@ int cmp_compositor_capture_framebuffer(
   return rc;
 }
 
+/**
+ * @brief cmp_compositor_release_framebuffer
+ *
+ * @param capture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_compositor_release_framebuffer(cmp_framebuffer_capture_t *capture) {
   int rc = CMP_SUCCESS;
 
@@ -172,6 +216,15 @@ int cmp_compositor_release_framebuffer(cmp_framebuffer_capture_t *capture) {
   return rc;
 }
 
+/**
+ * @brief cmp_compositor_start_crossfade
+ *
+ * @param window Parameter description.
+ * @param old_buffer Parameter description.
+ * @param duration_ms Parameter description.
+ * @param easing_curve Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_compositor_start_crossfade(cmp_window_t *window,
                                    cmp_framebuffer_capture_t *old_buffer,
                                    double duration_ms,

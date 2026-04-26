@@ -15,6 +15,11 @@ struct cmp_multi_window {
 static cmp_multi_window_t *g_windows[MAX_WINDOWS] = {0};
 static int g_initialized = 0;
 
+/**
+ * @brief cmp_multi_window_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_multi_window_init(void) {
   int rc = CMP_SUCCESS;
   int i;
@@ -28,6 +33,11 @@ int cmp_multi_window_init(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_multi_window_cleanup
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_multi_window_cleanup(void) {
   int rc = CMP_SUCCESS;
   int i;
@@ -36,7 +46,10 @@ int cmp_multi_window_cleanup(void) {
   }
   for (i = 0; i < MAX_WINDOWS; ++i) {
     if (g_windows[i] != NULL) {
-      free(g_windows[i]);
+      rc = CMP_FREE(g_windows[i]);
+      if (rc != CMP_SUCCESS) {
+        LOG_DEBUG("Free failed\n");
+      }
       g_windows[i] = NULL;
     }
   }
@@ -44,6 +57,13 @@ int cmp_multi_window_cleanup(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_multi_window_tear_off
+ *
+ * @param tab_id Parameter description.
+ * @param out_window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_multi_window_tear_off(const char *tab_id,
                               cmp_multi_window_t **out_window) {
   int rc = CMP_SUCCESS;
@@ -57,7 +77,11 @@ int cmp_multi_window_tear_off(const char *tab_id,
     return rc;
   }
 
-  win = (cmp_multi_window_t *)malloc(sizeof(cmp_multi_window_t));
+  rc = CMP_MALLOC(sizeof(cmp_multi_window_t), (void **)&(win));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
+  }
   if (win == NULL) {
     rc = CMP_ERROR_OOM;
     LOG_DEBUG("Error in cmp_multi_window_tear_off: Out of memory\n");
@@ -80,12 +104,21 @@ int cmp_multi_window_tear_off(const char *tab_id,
     }
   }
 
-  free(win);
+  rc = CMP_FREE(win);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   rc = CMP_ERROR_BOUNDS;
   LOG_DEBUG("Error in cmp_multi_window_tear_off: Maximum windows reached\n");
   return rc;
 }
 
+/**
+ * @brief cmp_multi_window_merge_back
+ *
+ * @param window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_multi_window_merge_back(cmp_multi_window_t *window) {
   int rc = CMP_SUCCESS;
   int i;
@@ -98,7 +131,10 @@ int cmp_multi_window_merge_back(cmp_multi_window_t *window) {
 
   for (i = 0; i < MAX_WINDOWS; ++i) {
     if (g_windows[i] == window) {
-      free(g_windows[i]);
+      rc = CMP_FREE(g_windows[i]);
+      if (rc != CMP_SUCCESS) {
+        LOG_DEBUG("Free failed\n");
+      }
       g_windows[i] = NULL;
       return rc;
     }
@@ -109,6 +145,11 @@ int cmp_multi_window_merge_back(cmp_multi_window_t *window) {
   return rc;
 }
 
+/**
+ * @brief cmp_multi_window_update_all
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_multi_window_update_all(void) {
   int rc = CMP_SUCCESS;
   if (!g_initialized) {

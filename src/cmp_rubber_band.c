@@ -13,6 +13,12 @@ struct cmp_rubber_band {
   int is_resting;
 };
 
+/**
+ * @brief cmp_rubber_band_create
+ *
+ * @param out_band Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_rubber_band_create(cmp_rubber_band_t **out_band) {
   struct cmp_rubber_band *ctx;
 
@@ -31,6 +37,12 @@ int cmp_rubber_band_create(cmp_rubber_band_t **out_band) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_rubber_band_destroy
+ *
+ * @param band Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_rubber_band_destroy(cmp_rubber_band_t *band) {
   struct cmp_rubber_band *ctx = (struct cmp_rubber_band *)band;
   if (!ctx)
@@ -40,6 +52,14 @@ int cmp_rubber_band_destroy(cmp_rubber_band_t *band) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_rubber_band_start
+ *
+ * @param band Parameter description.
+ * @param initial_velocity Parameter description.
+ * @param current_position Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_rubber_band_start(cmp_rubber_band_t *band, float initial_velocity,
                           float current_position) {
   struct cmp_rubber_band *ctx = (struct cmp_rubber_band *)band;
@@ -53,6 +73,16 @@ int cmp_rubber_band_start(cmp_rubber_band_t *band, float initial_velocity,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_rubber_band_step
+ *
+ * @param band Parameter description.
+ * @param dt_ms Parameter description.
+ * @param target_rest_position Parameter description.
+ * @param out_current_position Parameter description.
+ * @param out_is_resting Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_rubber_band_step(cmp_rubber_band_t *band, float dt_ms,
                          float target_rest_position,
                          float *out_current_position, int *out_is_resting) {

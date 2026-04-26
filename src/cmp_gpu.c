@@ -5,16 +5,34 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief dummy_begin_frame
+ *
+ * @param gpu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int dummy_begin_frame(cmp_gpu_t *gpu) {
   (void)gpu;
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief dummy_end_frame
+ *
+ * @param gpu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int dummy_end_frame(cmp_gpu_t *gpu) {
   (void)gpu;
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief dummy_destroy
+ *
+ * @param gpu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int dummy_destroy(cmp_gpu_t *gpu) {
   (void)gpu;
   return CMP_SUCCESS;
@@ -23,6 +41,13 @@ static int dummy_destroy(cmp_gpu_t *gpu) {
 static const cmp_gpu_vtable_t dummy_vtable = {dummy_begin_frame,
                                               dummy_end_frame, dummy_destroy};
 
+/**
+ * @brief cmp_gpu_create
+ *
+ * @param preferred_backend Parameter description.
+ * @param out_gpu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gpu_create(cmp_gpu_backend_type_t preferred_backend,
                    cmp_gpu_t **out_gpu) {
   int rc = CMP_SUCCESS;
@@ -47,6 +72,12 @@ int cmp_gpu_create(cmp_gpu_backend_type_t preferred_backend,
   return rc;
 }
 
+/**
+ * @brief cmp_gpu_destroy
+ *
+ * @param gpu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gpu_destroy(cmp_gpu_t *gpu) {
   int rc = CMP_SUCCESS;
 
@@ -66,6 +97,12 @@ int cmp_gpu_destroy(cmp_gpu_t *gpu) {
   return rc;
 }
 
+/**
+ * @brief cmp_gpu_begin_frame
+ *
+ * @param gpu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gpu_begin_frame(cmp_gpu_t *gpu) {
   int rc = CMP_SUCCESS;
 
@@ -82,6 +119,12 @@ int cmp_gpu_begin_frame(cmp_gpu_t *gpu) {
   return rc;
 }
 
+/**
+ * @brief cmp_gpu_end_frame
+ *
+ * @param gpu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gpu_end_frame(cmp_gpu_t *gpu) {
   int rc = CMP_SUCCESS;
 
@@ -98,6 +141,12 @@ int cmp_gpu_end_frame(cmp_gpu_t *gpu) {
   return rc;
 }
 
+/**
+ * @brief cmp_vbo_create
+ *
+ * @param out_vbo Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_vbo_create(cmp_vbo_t **out_vbo) {
   int rc = CMP_SUCCESS;
   cmp_vbo_t *vbo = NULL;
@@ -119,6 +168,14 @@ int cmp_vbo_create(cmp_vbo_t **out_vbo) {
   return rc;
 }
 
+/**
+ * @brief cmp_vbo_append
+ *
+ * @param vbo Parameter description.
+ * @param vertices Parameter description.
+ * @param count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_vbo_append(cmp_vbo_t *vbo, const float *vertices, size_t count) {
   int rc = CMP_SUCCESS;
   size_t new_cap;
@@ -154,6 +211,12 @@ int cmp_vbo_append(cmp_vbo_t *vbo, const float *vertices, size_t count) {
   return rc;
 }
 
+/**
+ * @brief cmp_vbo_destroy
+ *
+ * @param vbo Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_vbo_destroy(cmp_vbo_t *vbo) {
   int rc = CMP_SUCCESS;
 
@@ -170,6 +233,13 @@ int cmp_vbo_destroy(cmp_vbo_t *vbo) {
   return rc;
 }
 
+/**
+ * @brief cmp_ubo_create
+ *
+ * @param size Parameter description.
+ * @param out_ubo Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ubo_create(size_t size, cmp_ubo_t **out_ubo) {
   int rc = CMP_SUCCESS;
   cmp_ubo_t *ubo = NULL;
@@ -201,6 +271,14 @@ int cmp_ubo_create(size_t size, cmp_ubo_t **out_ubo) {
   return rc;
 }
 
+/**
+ * @brief cmp_ubo_update
+ *
+ * @param ubo Parameter description.
+ * @param data Parameter description.
+ * @param size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ubo_update(cmp_ubo_t *ubo, const void *data, size_t size) {
   int rc = CMP_SUCCESS;
 
@@ -214,6 +292,12 @@ int cmp_ubo_update(cmp_ubo_t *ubo, const void *data, size_t size) {
   return rc;
 }
 
+/**
+ * @brief cmp_ubo_destroy
+ *
+ * @param ubo Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ubo_destroy(cmp_ubo_t *ubo) {
   int rc = CMP_SUCCESS;
 
@@ -229,6 +313,12 @@ int cmp_ubo_destroy(cmp_ubo_t *ubo) {
   CMP_FREE(ubo);
   return rc;
 }
+/**
+ * @brief cmp_draw_call_optimizer_create
+ *
+ * @param out_opt Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_draw_call_optimizer_create(cmp_draw_call_optimizer_t **out_opt) {
   int rc = CMP_SUCCESS;
   cmp_draw_call_optimizer_t *opt = NULL;
@@ -251,6 +341,13 @@ int cmp_draw_call_optimizer_create(cmp_draw_call_optimizer_t **out_opt) {
   return rc;
 }
 
+/**
+ * @brief cmp_draw_call_optimizer_add
+ *
+ * @param opt Parameter description.
+ * @param call Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_draw_call_optimizer_add(cmp_draw_call_optimizer_t *opt,
                                 const cmp_draw_call_t *call) {
   int rc = CMP_SUCCESS;
@@ -282,6 +379,12 @@ int cmp_draw_call_optimizer_add(cmp_draw_call_optimizer_t *opt,
   return rc;
 }
 
+/**
+ * @brief cmp_draw_call_optimizer_optimize
+ *
+ * @param opt Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_draw_call_optimizer_optimize(cmp_draw_call_optimizer_t *opt) {
   int rc = CMP_SUCCESS;
   cmp_draw_call_t *optimized = NULL;
@@ -330,6 +433,12 @@ int cmp_draw_call_optimizer_optimize(cmp_draw_call_optimizer_t *opt) {
   return rc;
 }
 
+/**
+ * @brief cmp_draw_call_optimizer_destroy
+ *
+ * @param opt Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_draw_call_optimizer_destroy(cmp_draw_call_optimizer_t *opt) {
   int rc = CMP_SUCCESS;
 
@@ -354,6 +463,14 @@ struct cmp_command_buffer {
   int is_recording;
 };
 
+/**
+ * @brief cmp_command_buffer_create
+ *
+ * @param gpu Parameter description.
+ * @param is_secondary Parameter description.
+ * @param out_cb Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_command_buffer_create(cmp_gpu_t *gpu, int is_secondary,
                               cmp_command_buffer_t **out_cb) {
   int rc = CMP_SUCCESS;
@@ -390,6 +507,12 @@ int cmp_command_buffer_create(cmp_gpu_t *gpu, int is_secondary,
   return rc;
 }
 
+/**
+ * @brief cmp_command_buffer_destroy
+ *
+ * @param cb Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_command_buffer_destroy(cmp_command_buffer_t *cb) {
   int rc = CMP_SUCCESS;
   struct cmp_command_buffer *ctx = (struct cmp_command_buffer *)cb;
@@ -406,6 +529,12 @@ int cmp_command_buffer_destroy(cmp_command_buffer_t *cb) {
   return rc;
 }
 
+/**
+ * @brief cmp_command_buffer_begin
+ *
+ * @param cb Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_command_buffer_begin(cmp_command_buffer_t *cb) {
   int rc = CMP_SUCCESS;
   struct cmp_command_buffer *ctx = (struct cmp_command_buffer *)cb;
@@ -421,6 +550,12 @@ int cmp_command_buffer_begin(cmp_command_buffer_t *cb) {
   return rc;
 }
 
+/**
+ * @brief cmp_command_buffer_end
+ *
+ * @param cb Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_command_buffer_end(cmp_command_buffer_t *cb) {
   int rc = CMP_SUCCESS;
   struct cmp_command_buffer *ctx = (struct cmp_command_buffer *)cb;
@@ -435,6 +570,13 @@ int cmp_command_buffer_end(cmp_command_buffer_t *cb) {
   return rc;
 }
 
+/**
+ * @brief cmp_command_buffer_draw
+ *
+ * @param cb Parameter description.
+ * @param call Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_command_buffer_draw(cmp_command_buffer_t *cb,
                             const cmp_draw_call_t *call) {
   int rc = CMP_SUCCESS;
@@ -470,6 +612,14 @@ int cmp_command_buffer_draw(cmp_command_buffer_t *cb,
   return rc;
 }
 
+/**
+ * @brief cmp_command_buffer_execute_commands
+ *
+ * @param primary Parameter description.
+ * @param secondaries Parameter description.
+ * @param count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_command_buffer_execute_commands(cmp_command_buffer_t *primary,
                                         cmp_command_buffer_t **secondaries,
                                         int count) {
@@ -535,6 +685,12 @@ struct cmp_render_graph {
   int pass_count;
 };
 
+/**
+ * @brief cmp_render_graph_create
+ *
+ * @param out_graph Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_render_graph_create(cmp_render_graph_t **out_graph) {
   int rc = CMP_SUCCESS;
   struct cmp_render_graph *graph = NULL;
@@ -556,6 +712,12 @@ int cmp_render_graph_create(cmp_render_graph_t **out_graph) {
   return rc;
 }
 
+/**
+ * @brief cmp_render_graph_destroy
+ *
+ * @param graph Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_render_graph_destroy(cmp_render_graph_t *graph) {
   int rc = CMP_SUCCESS;
   struct cmp_render_graph *ctx = (struct cmp_render_graph *)graph;
@@ -570,6 +732,13 @@ int cmp_render_graph_destroy(cmp_render_graph_t *graph) {
   return rc;
 }
 
+/**
+ * @brief cmp_render_graph_add_pass
+ *
+ * @param graph Parameter description.
+ * @param config Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_render_graph_add_pass(cmp_render_graph_t *graph,
                               const cmp_render_pass_config_t *config) {
   int rc = CMP_SUCCESS;
@@ -591,6 +760,13 @@ int cmp_render_graph_add_pass(cmp_render_graph_t *graph,
   return rc;
 }
 
+/**
+ * @brief _cmp_render_graph_find_pass
+ *
+ * @param ctx Parameter description.
+ * @param id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int _cmp_render_graph_find_pass(struct cmp_render_graph *ctx, int id) {
   int i;
   for (i = 0; i < ctx->pass_count; ++i) {
@@ -600,6 +776,13 @@ static int _cmp_render_graph_find_pass(struct cmp_render_graph *ctx, int id) {
   return -1;
 }
 
+/**
+ * @brief cmp_render_graph_execute
+ *
+ * @param graph Parameter description.
+ * @param cb Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_render_graph_execute(cmp_render_graph_t *graph,
                              cmp_command_buffer_t *cb) {
   int rc = CMP_SUCCESS;
@@ -665,6 +848,12 @@ struct cmp_pso_cache {
   int count;
 };
 
+/**
+ * @brief cmp_pso_cache_create
+ *
+ * @param out_cache Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pso_cache_create(cmp_pso_cache_t **out_cache) {
   int rc = CMP_SUCCESS;
   struct cmp_pso_cache *cache = NULL;
@@ -686,6 +875,12 @@ int cmp_pso_cache_create(cmp_pso_cache_t **out_cache) {
   return rc;
 }
 
+/**
+ * @brief cmp_pso_cache_destroy
+ *
+ * @param cache Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pso_cache_destroy(cmp_pso_cache_t *cache) {
   int rc = CMP_SUCCESS;
   struct cmp_pso_cache *ctx = (struct cmp_pso_cache *)cache;
@@ -704,6 +899,14 @@ int cmp_pso_cache_destroy(cmp_pso_cache_t *cache) {
   return rc;
 }
 
+/**
+ * @brief cmp_pso_cache_get_or_create
+ *
+ * @param cache Parameter description.
+ * @param state Parameter description.
+ * @param out_pso Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pso_cache_get_or_create(cmp_pso_cache_t *cache,
                                 const cmp_pipeline_state_t *state,
                                 cmp_pso_t **out_pso) {
@@ -747,6 +950,13 @@ int cmp_pso_cache_get_or_create(cmp_pso_cache_t *cache,
   return rc;
 }
 
+/**
+ * @brief cmp_command_buffer_bind_pso
+ *
+ * @param cb Parameter description.
+ * @param pso Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_command_buffer_bind_pso(cmp_command_buffer_t *cb, cmp_pso_t *pso) {
   int rc = CMP_SUCCESS;
   struct cmp_command_buffer *ctx = (struct cmp_command_buffer *)cb;
@@ -766,6 +976,14 @@ int cmp_command_buffer_bind_pso(cmp_command_buffer_t *cb, cmp_pso_t *pso) {
   return rc;
 }
 
+/**
+ * @brief cmp_shader_compile_spirv
+ *
+ * @param source Parameter description.
+ * @param size Parameter description.
+ * @param out_shader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_compile_spirv(const char *source, size_t size,
                              cmp_shader_t **out_shader) {
   int rc = CMP_SUCCESS;
@@ -792,6 +1010,14 @@ int cmp_shader_compile_spirv(const char *source, size_t size,
   return rc;
 }
 
+/**
+ * @brief cmp_shader_compile_msl
+ *
+ * @param source Parameter description.
+ * @param size Parameter description.
+ * @param out_shader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_compile_msl(const char *source, size_t size,
                            cmp_shader_t **out_shader) {
   int rc = cmp_shader_compile_spirv(source, size, out_shader);
@@ -808,6 +1034,14 @@ struct cmp_gpu_allocator {
   size_t used;
 };
 
+/**
+ * @brief cmp_gpu_allocator_create
+ *
+ * @param gpu Parameter description.
+ * @param block_size Parameter description.
+ * @param out_allocator Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gpu_allocator_create(cmp_gpu_t *gpu, size_t block_size,
                              cmp_gpu_allocator_t **out_allocator) {
   int rc = CMP_SUCCESS;
@@ -843,6 +1077,12 @@ int cmp_gpu_allocator_create(cmp_gpu_t *gpu, size_t block_size,
   return rc;
 }
 
+/**
+ * @brief cmp_gpu_allocator_destroy
+ *
+ * @param allocator Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gpu_allocator_destroy(cmp_gpu_allocator_t *allocator) {
   int rc = CMP_SUCCESS;
   struct cmp_gpu_allocator *alloc = (struct cmp_gpu_allocator *)allocator;
@@ -858,6 +1098,16 @@ int cmp_gpu_allocator_destroy(cmp_gpu_allocator_t *allocator) {
   return rc;
 }
 
+/**
+ * @brief cmp_gpu_allocator_alloc
+ *
+ * @param allocator Parameter description.
+ * @param size Parameter description.
+ * @param alignment Parameter description.
+ * @param out_mem Parameter description.
+ * @param out_offset Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gpu_allocator_alloc(cmp_gpu_allocator_t *allocator, size_t size,
                             size_t alignment, void **out_mem,
                             size_t *out_offset) {
@@ -885,6 +1135,13 @@ int cmp_gpu_allocator_alloc(cmp_gpu_allocator_t *allocator, size_t size,
   return rc;
 }
 
+/**
+ * @brief cmp_gpu_allocator_free
+ *
+ * @param allocator Parameter description.
+ * @param mem Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gpu_allocator_free(cmp_gpu_allocator_t *allocator, void *mem) {
   int rc = CMP_SUCCESS;
   (void)allocator;
@@ -900,6 +1157,15 @@ struct cmp_atlas {
   int current_row_height;
 };
 
+/**
+ * @brief cmp_atlas_create
+ *
+ * @param gpu Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param out_atlas Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_atlas_create(cmp_gpu_t *gpu, int width, int height,
                      cmp_atlas_t **out_atlas) {
   int rc = CMP_SUCCESS;
@@ -934,6 +1200,12 @@ int cmp_atlas_create(cmp_gpu_t *gpu, int width, int height,
   return rc;
 }
 
+/**
+ * @brief cmp_atlas_destroy
+ *
+ * @param atlas Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_atlas_destroy(cmp_atlas_t *atlas) {
   int rc = CMP_SUCCESS;
   struct cmp_atlas *ctx = (struct cmp_atlas *)atlas;
@@ -949,6 +1221,17 @@ int cmp_atlas_destroy(cmp_atlas_t *atlas) {
   return rc;
 }
 
+/**
+ * @brief cmp_atlas_insert
+ *
+ * @param atlas Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param pixels Parameter description.
+ * @param out_x Parameter description.
+ * @param out_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_atlas_insert(cmp_atlas_t *atlas, int width, int height,
                      const void *pixels, int *out_x, int *out_y) {
   int rc = CMP_SUCCESS;
@@ -982,6 +1265,12 @@ int cmp_atlas_insert(cmp_atlas_t *atlas, int width, int height,
   return rc;
 }
 
+/**
+ * @brief cmp_atlas_evict
+ *
+ * @param atlas Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_atlas_evict(cmp_atlas_t *atlas) {
   int rc = CMP_SUCCESS;
   struct cmp_atlas *ctx = (struct cmp_atlas *)atlas;
@@ -999,6 +1288,16 @@ int cmp_atlas_evict(cmp_atlas_t *atlas) {
   return rc;
 }
 
+/**
+ * @brief cmp_tex_compression_decode_astc
+ *
+ * @param data Parameter description.
+ * @param size Parameter description.
+ * @param out_rgba Parameter description.
+ * @param out_width Parameter description.
+ * @param out_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tex_compression_decode_astc(const void *data, size_t size,
                                     void **out_rgba, int *out_width,
                                     int *out_height) {
@@ -1024,6 +1323,16 @@ int cmp_tex_compression_decode_astc(const void *data, size_t size,
   return rc;
 }
 
+/**
+ * @brief cmp_tex_compression_decode_bc7
+ *
+ * @param data Parameter description.
+ * @param size Parameter description.
+ * @param out_rgba Parameter description.
+ * @param out_width Parameter description.
+ * @param out_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tex_compression_decode_bc7(const void *data, size_t size,
                                    void **out_rgba, int *out_width,
                                    int *out_height) {
@@ -1036,6 +1345,14 @@ int cmp_tex_compression_decode_bc7(const void *data, size_t size,
   return rc;
 }
 
+/**
+ * @brief cmp_frustum_culling_test
+ *
+ * @param node_rect Parameter description.
+ * @param viewport_rect Parameter description.
+ * @param out_is_visible Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_frustum_culling_test(const cmp_rect_t *node_rect,
                              const cmp_rect_t *viewport_rect,
                              int *out_is_visible) {

@@ -17,6 +17,12 @@ struct cmp_tab_bar {
   size_t capacity;
 };
 
+/**
+ * @brief cmp_tab_bar_create
+ *
+ * @param out_tab_bar Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tab_bar_create(cmp_tab_bar_t **out_tab_bar) {
   struct cmp_tab_bar *ctx;
   if (!out_tab_bar)
@@ -32,6 +38,12 @@ int cmp_tab_bar_create(cmp_tab_bar_t **out_tab_bar) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tab_bar_destroy
+ *
+ * @param tab_bar Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tab_bar_destroy(cmp_tab_bar_t *tab_bar) {
   struct cmp_tab_bar *ctx = (struct cmp_tab_bar *)tab_bar;
   size_t i;
@@ -53,6 +65,15 @@ int cmp_tab_bar_destroy(cmp_tab_bar_t *tab_bar) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tab_bar_add_tab
+ *
+ * @param tab_bar Parameter description.
+ * @param title Parameter description.
+ * @param symbol_icon Parameter description.
+ * @param route_uri Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tab_bar_add_tab(cmp_tab_bar_t *tab_bar, const char *title,
                         const char *symbol_icon, const char *route_uri) {
   struct cmp_tab_bar *ctx = (struct cmp_tab_bar *)tab_bar;
@@ -112,6 +133,14 @@ int cmp_tab_bar_add_tab(cmp_tab_bar_t *tab_bar, const char *title,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tab_bar_set_badge
+ *
+ * @param tab_bar Parameter description.
+ * @param tab_index Parameter description.
+ * @param badge_value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tab_bar_set_badge(cmp_tab_bar_t *tab_bar, size_t tab_index,
                           int badge_value) {
   struct cmp_tab_bar *ctx = (struct cmp_tab_bar *)tab_bar;
@@ -122,6 +151,15 @@ int cmp_tab_bar_set_badge(cmp_tab_bar_t *tab_bar, size_t tab_index,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tab_bar_resolve_layout
+ *
+ * @param tab_bar Parameter description.
+ * @param available_width Parameter description.
+ * @param out_placement Parameter description.
+ * @param out_material Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tab_bar_resolve_layout(cmp_tab_bar_t *tab_bar, float available_width,
                                cmp_tab_bar_placement_t *out_placement,
                                cmp_macos_material_t *out_material) {
@@ -142,6 +180,13 @@ int cmp_tab_bar_resolve_layout(cmp_tab_bar_t *tab_bar, float available_width,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_toolbar_resolve_placement
+ *
+ * @param available_width Parameter description.
+ * @param out_is_bottom_placed Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_toolbar_resolve_placement(float available_width,
                                   int *out_is_bottom_placed) {
   if (!out_is_bottom_placed)

@@ -64,7 +64,30 @@ TEST test_ring_buffer_lifecycle(void) {
   PASS();
 }
 
-SUITE(ring_buffer_suite) { RUN_TEST(test_ring_buffer_lifecycle); }
+TEST test_ring_buffer_null_args(void) {
+  cmp_ring_buffer_t rb;
+  void *out;
+  int dummy = 1;
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ring_buffer_init(NULL, 10), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ring_buffer_init(&rb, 0), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ring_buffer_push(NULL, &dummy),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ring_buffer_push(&rb, NULL), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ring_buffer_pop(NULL, &out), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ring_buffer_pop(&rb, NULL), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ring_buffer_destroy(NULL), "%d");
+
+  PASS();
+}
+
+SUITE(ring_buffer_suite) {
+  RUN_TEST(test_ring_buffer_lifecycle);
+  RUN_TEST(test_ring_buffer_null_args);
+}
 
 GREATEST_MAIN_DEFS();
 

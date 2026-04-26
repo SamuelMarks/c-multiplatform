@@ -9,6 +9,11 @@ extern int transport_factory_init_client(struct HttpClient *client);
 
 static int g_http_initialized = 0;
 
+/**
+ * @brief cmp_http_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_init(void) {
   int rc = CMP_SUCCESS;
   if (g_http_initialized) {
@@ -18,6 +23,11 @@ int cmp_http_init(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_http_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_shutdown(void) {
   int rc = CMP_SUCCESS;
   if (!g_http_initialized) {
@@ -27,6 +37,13 @@ int cmp_http_shutdown(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_http_client_create
+ *
+ * @param mod Parameter description.
+ * @param out_client Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_client_create(cmp_modality_t *mod,
                            struct HttpClient **out_client) {
   int rc = CMP_SUCCESS;
@@ -86,6 +103,12 @@ int cmp_http_client_create(cmp_modality_t *mod,
   return rc;
 }
 
+/**
+ * @brief cmp_http_client_destroy
+ *
+ * @param client Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_client_destroy(struct HttpClient *client) {
   int rc = CMP_SUCCESS;
 
@@ -100,6 +123,12 @@ int cmp_http_client_destroy(struct HttpClient *client) {
   return rc;
 }
 
+/**
+ * @brief cmp_http_request_init
+ *
+ * @param req Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_request_init(struct HttpRequest *req) {
   int rc = CMP_SUCCESS;
 
@@ -118,12 +147,26 @@ int cmp_http_request_init(struct HttpRequest *req) {
   return rc;
 }
 
+/**
+ * @brief cmp_http_request_free
+ *
+ * @param req Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 void cmp_http_request_free(struct HttpRequest *req) {
   if (req != NULL) {
     http_request_free(req);
   }
 }
 
+/**
+ * @brief cmp_http_send
+ *
+ * @param client Parameter description.
+ * @param req Parameter description.
+ * @param out_res Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_send(struct HttpClient *client, const struct HttpRequest *req,
                   struct HttpResponse **out_res) {
   int rc = CMP_SUCCESS;
@@ -154,6 +197,14 @@ struct cmp_http_progress_ctx {
   void *user_data;
 };
 
+/**
+ * @brief internal_http_chunk_cb
+ *
+ * @param user_data Parameter description.
+ * @param chunk Parameter description.
+ * @param chunk_len Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int internal_http_chunk_cb(void *user_data, const void *chunk,
                                   size_t chunk_len) {
   /* For now we just return 0 to continue reading. True progress
@@ -171,6 +222,17 @@ static int internal_http_chunk_cb(void *user_data, const void *chunk,
   return 0;
 }
 
+/**
+ * @brief cmp_http_send_with_progress
+ *
+ * @param client Parameter description.
+ * @param req Parameter description.
+ * @param percentage Parameter description.
+ * @param user_data) Parameter description.
+ * @param user_data Parameter description.
+ * @param out_res Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_send_with_progress(
     struct HttpClient *client, struct HttpRequest *req,
     int (*progress_cb)(float percentage, void *user_data), void *user_data,
@@ -215,6 +277,14 @@ struct cmp_http_multi_progress_ctx {
   void *user_data;
 };
 
+/**
+ * @brief internal_http_multi_progress_cb
+ *
+ * @param current_bytes Parameter description.
+ * @param total_bytes Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int internal_http_multi_progress_cb(size_t current_bytes,
                                            size_t total_bytes,
                                            void *user_data) {
@@ -232,6 +302,18 @@ static int internal_http_multi_progress_cb(size_t current_bytes,
   return 0;
 }
 
+/**
+ * @brief cmp_http_send_multi_with_progress
+ *
+ * @param client Parameter description.
+ * @param requests Parameter description.
+ * @param num_requests Parameter description.
+ * @param percentage Parameter description.
+ * @param user_data) Parameter description.
+ * @param user_data Parameter description.
+ * @param out_responses Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_send_multi_with_progress(
     struct HttpClient *client, struct HttpRequest *const *requests,
     size_t num_requests, int (*progress_cb)(float percentage, void *user_data),
@@ -301,6 +383,14 @@ struct cmp_http_download_ctx {
   FILE *f;
 };
 
+/**
+ * @brief internal_http_download_chunk_cb
+ *
+ * @param user_data Parameter description.
+ * @param chunk Parameter description.
+ * @param chunk_len Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int internal_http_download_chunk_cb(void *user_data, const void *chunk,
                                            size_t chunk_len) {
   struct cmp_http_download_ctx *ctx = (struct cmp_http_download_ctx *)user_data;
@@ -318,6 +408,17 @@ static int internal_http_download_chunk_cb(void *user_data, const void *chunk,
   return 0;
 }
 
+/**
+ * @brief cmp_http_download
+ *
+ * @param client Parameter description.
+ * @param url Parameter description.
+ * @param save_virtual_path Parameter description.
+ * @param percentage Parameter description.
+ * @param user_data) Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_download(struct HttpClient *client, const char *url,
                       const char *save_virtual_path,
                       int (*progress_cb)(float percentage, void *user_data),
@@ -422,12 +523,25 @@ int cmp_http_download(struct HttpClient *client, const char *url,
   return rc;
 }
 
+/**
+ * @brief cmp_http_response_free
+ *
+ * @param res Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 void cmp_http_response_free(struct HttpResponse *res) {
   if (res != NULL) {
     http_response_free(res);
   }
 }
 
+/**
+ * @brief cmp_http_ws_init
+ *
+ * @param req Parameter description.
+ * @param config Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_ws_init(struct HttpRequest *req,
                      const struct c_abstract_http_ws_config *config) {
   int rc = CMP_SUCCESS;
@@ -455,6 +569,12 @@ typedef struct {
   volatile int *exit_flag;
 } cmp_http_ws_task_ctx_t;
 
+/**
+ * @brief cmp_http_ws_task
+ *
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void cmp_http_ws_task(void *arg) {
   cmp_http_ws_task_ctx_t *ctx = (cmp_http_ws_task_ctx_t *)arg;
   c_abstract_http_ws_sync_read_loop(ctx->client, ctx->req, ctx->on_msg,
@@ -463,6 +583,19 @@ static void cmp_http_ws_task(void *arg) {
   CMP_FREE(ctx);
 }
 
+/**
+ * @brief cmp_http_ws_run
+ *
+ * @param mod Parameter description.
+ * @param client Parameter description.
+ * @param req Parameter description.
+ * @param on_msg Parameter description.
+ * @param on_err Parameter description.
+ * @param on_close Parameter description.
+ * @param user_data Parameter description.
+ * @param exit_flag Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
                     struct HttpRequest *req,
                     c_abstract_http_ws_on_message on_msg,
@@ -512,6 +645,15 @@ int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
   return rc;
 }
 
+/**
+ * @brief cmp_http_ws_send
+ *
+ * @param req Parameter description.
+ * @param opcode Parameter description.
+ * @param payload Parameter description.
+ * @param len Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_ws_send(struct HttpRequest *req,
                      enum c_abstract_http_ws_opcode opcode,
                      const unsigned char *payload, size_t len) {
@@ -536,6 +678,13 @@ int cmp_http_ws_send(struct HttpRequest *req,
   return rc;
 }
 
+/**
+ * @brief cmp_http_ws_close
+ *
+ * @param req Parameter description.
+ * @param status_code Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_ws_close(struct HttpRequest *req, int status_code) {
   int rc = CMP_SUCCESS;
 
@@ -552,6 +701,13 @@ int cmp_http_ws_close(struct HttpRequest *req, int status_code) {
   return rc;
 }
 
+/**
+ * @brief cmp_http_sse_init
+ *
+ * @param req Parameter description.
+ * @param config Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_sse_init(struct HttpRequest *req,
                       const struct c_abstract_http_sse_config *config) {
   int rc = CMP_SUCCESS;
@@ -579,6 +735,12 @@ typedef struct {
   volatile int *exit_flag;
 } cmp_http_sse_task_ctx_t;
 
+/**
+ * @brief cmp_http_sse_task
+ *
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void cmp_http_sse_task(void *arg) {
   cmp_http_sse_task_ctx_t *ctx = (cmp_http_sse_task_ctx_t *)arg;
   c_abstract_http_sse_sync_read_loop(ctx->client, ctx->req, ctx->on_evt,
@@ -587,6 +749,19 @@ static void cmp_http_sse_task(void *arg) {
   CMP_FREE(ctx);
 }
 
+/**
+ * @brief cmp_http_sse_run
+ *
+ * @param mod Parameter description.
+ * @param client Parameter description.
+ * @param req Parameter description.
+ * @param on_evt Parameter description.
+ * @param on_err Parameter description.
+ * @param on_close Parameter description.
+ * @param user_data Parameter description.
+ * @param exit_flag Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_http_sse_run(cmp_modality_t *mod, struct HttpClient *client,
                      struct HttpRequest *req,
                      c_abstract_http_sse_on_event on_evt,

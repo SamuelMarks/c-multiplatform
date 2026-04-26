@@ -3,6 +3,15 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_anim_compose_numerical
+ *
+ * @param base_value Parameter description.
+ * @param anim_value Parameter description.
+ * @param op Parameter description.
+ * @param out_value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_anim_compose_numerical(float base_value, float anim_value,
                                cmp_anim_compose_op_t op, float *out_value) {
   int rc = CMP_SUCCESS;

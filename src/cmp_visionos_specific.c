@@ -9,6 +9,12 @@ struct cmp_visionos_features {
   float current_z_depth;
 };
 
+/**
+ * @brief cmp_visionos_features_create
+ *
+ * @param out_features Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_visionos_features_create(cmp_visionos_features_t **out_features) {
   struct cmp_visionos_features *ctx;
   if (!out_features)
@@ -25,12 +31,25 @@ int cmp_visionos_features_create(cmp_visionos_features_t **out_features) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_visionos_features_destroy
+ *
+ * @param features_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_visionos_features_destroy(cmp_visionos_features_t *features_opaque) {
   if (features_opaque)
     CMP_FREE(features_opaque);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_visionos_apply_glass_material
+ *
+ * @param features_opaque Parameter description.
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_visionos_apply_glass_material(cmp_visionos_features_t *features_opaque,
                                       void *node) {
   struct cmp_visionos_features *ctx =
@@ -42,6 +61,14 @@ int cmp_visionos_apply_glass_material(cmp_visionos_features_t *features_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_visionos_handle_eye_tracking_hover
+ *
+ * @param features_opaque Parameter description.
+ * @param node Parameter description.
+ * @param is_looking Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_visionos_handle_eye_tracking_hover(
     cmp_visionos_features_t *features_opaque, void *node, int is_looking) {
   struct cmp_visionos_features *ctx =
@@ -53,6 +80,14 @@ int cmp_visionos_handle_eye_tracking_hover(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_visionos_set_modal_z_depth
+ *
+ * @param features_opaque Parameter description.
+ * @param modal_node Parameter description.
+ * @param depth_offset Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_visionos_set_modal_z_depth(cmp_visionos_features_t *features_opaque,
                                    void *modal_node, float depth_offset) {
   struct cmp_visionos_features *ctx =
@@ -65,6 +100,13 @@ int cmp_visionos_set_modal_z_depth(cmp_visionos_features_t *features_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_visionos_setup_ornament
+ *
+ * @param features_opaque Parameter description.
+ * @param toolbar_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_visionos_setup_ornament(cmp_visionos_features_t *features_opaque,
                                 void *toolbar_node) {
   struct cmp_visionos_features *ctx =
@@ -76,6 +118,13 @@ int cmp_visionos_setup_ornament(cmp_visionos_features_t *features_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_visionos_request_immersion_level
+ *
+ * @param features_opaque Parameter description.
+ * @param level Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_visionos_request_immersion_level(
     cmp_visionos_features_t *features_opaque, int level) {
   struct cmp_visionos_features *ctx =
@@ -88,6 +137,16 @@ int cmp_visionos_request_immersion_level(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_visionos_handle_touch_event
+ *
+ * @param features_opaque Parameter description.
+ * @param is_direct Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @param z Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_visionos_handle_touch_event(cmp_visionos_features_t *features_opaque,
                                     int is_direct, float x, float y, float z) {
   struct cmp_visionos_features *ctx =
@@ -103,6 +162,13 @@ int cmp_visionos_handle_touch_event(cmp_visionos_features_t *features_opaque,
 #include <stdlib.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_visionos_set_window_geometry
+ *
+ * @param features_opaque Parameter description.
+ * @param is_volume Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_visionos_set_window_geometry(cmp_visionos_features_t *features_opaque,
                                      int is_volume) {
   struct cmp_visionos_features *ctx =
@@ -114,6 +180,13 @@ int cmp_visionos_set_window_geometry(cmp_visionos_features_t *features_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_visionos_set_shared_space_behavior
+ *
+ * @param features_opaque Parameter description.
+ * @param allow_shared Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_visionos_set_shared_space_behavior(
     cmp_visionos_features_t *features_opaque, int allow_shared) {
   struct cmp_visionos_features *ctx =

@@ -20,6 +20,12 @@ struct cmp_audio_session {
   int is_active;
 };
 
+/**
+ * @brief cmp_media_player_create
+ *
+ * @param out_player Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_media_player_create(cmp_media_player_t **out_player) {
   int rc = CMP_SUCCESS;
   struct cmp_media_player *ctx = NULL;
@@ -48,6 +54,12 @@ int cmp_media_player_create(cmp_media_player_t **out_player) {
   return rc;
 }
 
+/**
+ * @brief cmp_media_player_destroy
+ *
+ * @param player_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_media_player_destroy(cmp_media_player_t *player_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_media_player *ctx = (struct cmp_media_player *)player_opaque;
@@ -64,6 +76,13 @@ int cmp_media_player_destroy(cmp_media_player_t *player_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_media_player_load_url
+ *
+ * @param player_opaque Parameter description.
+ * @param url Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_media_player_load_url(cmp_media_player_t *player_opaque,
                               const char *url) {
   int rc = CMP_SUCCESS;
@@ -77,6 +96,14 @@ int cmp_media_player_load_url(cmp_media_player_t *player_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_media_player_mount
+ *
+ * @param player_opaque Parameter description.
+ * @param node Parameter description.
+ * @param use_system_controls Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_media_player_mount(cmp_media_player_t *player_opaque,
                            cmp_ui_node_t *node, int use_system_controls) {
   int rc = CMP_SUCCESS;
@@ -93,6 +120,13 @@ int cmp_media_player_mount(cmp_media_player_t *player_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_media_player_set_pip_enabled
+ *
+ * @param player_opaque Parameter description.
+ * @param is_enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_media_player_set_pip_enabled(cmp_media_player_t *player_opaque,
                                      int is_enabled) {
   int rc = CMP_SUCCESS;
@@ -108,6 +142,16 @@ int cmp_media_player_set_pip_enabled(cmp_media_player_t *player_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_media_player_update_now_playing
+ *
+ * @param player_opaque Parameter description.
+ * @param title Parameter description.
+ * @param artist Parameter description.
+ * @param duration Parameter description.
+ * @param current_time Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_media_player_update_now_playing(cmp_media_player_t *player_opaque,
                                         const char *title, const char *artist,
                                         float duration, float current_time) {
@@ -163,6 +207,13 @@ int cmp_media_player_update_now_playing(cmp_media_player_t *player_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_media_player_set_spatial_audio_enabled
+ *
+ * @param player_opaque Parameter description.
+ * @param is_enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_media_player_set_spatial_audio_enabled(
     cmp_media_player_t *player_opaque, int is_enabled) {
   int rc = CMP_SUCCESS;
@@ -179,6 +230,14 @@ int cmp_media_player_set_spatial_audio_enabled(
   return rc;
 }
 
+/**
+ * @brief cmp_media_player_set_remote_command_handler
+ *
+ * @param player_opaque Parameter description.
+ * @param callback Parameter description.
+ * @param userdata Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_media_player_set_remote_command_handler(
     cmp_media_player_t *player_opaque, cmp_remote_command_cb callback,
     void *userdata) {
@@ -198,6 +257,12 @@ int cmp_media_player_set_remote_command_handler(
   return rc;
 }
 
+/**
+ * @brief cmp_audio_session_create
+ *
+ * @param out_session Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_session_create(cmp_audio_session_t **out_session) {
   int rc = CMP_SUCCESS;
   struct cmp_audio_session *ctx = NULL;
@@ -221,6 +286,12 @@ int cmp_audio_session_create(cmp_audio_session_t **out_session) {
   return rc;
 }
 
+/**
+ * @brief cmp_audio_session_destroy
+ *
+ * @param session_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_session_destroy(cmp_audio_session_t *session_opaque) {
   int rc = CMP_SUCCESS;
 
@@ -230,6 +301,13 @@ int cmp_audio_session_destroy(cmp_audio_session_t *session_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_audio_session_set_category
+ *
+ * @param session_opaque Parameter description.
+ * @param category Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_session_set_category(cmp_audio_session_t *session_opaque,
                                    cmp_audio_session_category_t category) {
   int rc = CMP_SUCCESS;
@@ -245,6 +323,12 @@ int cmp_audio_session_set_category(cmp_audio_session_t *session_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_audio_session_activate
+ *
+ * @param session_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_session_activate(cmp_audio_session_t *session_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_audio_session *ctx = (struct cmp_audio_session *)session_opaque;

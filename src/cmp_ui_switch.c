@@ -10,6 +10,12 @@ struct cmp_ui_switch {
   int is_on;
 };
 
+/**
+ * @brief cmp_ui_switch_create
+ *
+ * @param out_switch Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
   cmp_ui_switch_t *sw;
   int err;
@@ -51,6 +57,12 @@ int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_switch_destroy
+ *
+ * @param sw Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_switch_destroy(cmp_ui_switch_t *sw) {
   if (!sw) {
     return CMP_ERROR_INVALID_ARG;
@@ -59,6 +71,13 @@ int cmp_ui_switch_destroy(cmp_ui_switch_t *sw) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_switch_get_node
+ *
+ * @param sw Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_switch_get_node(cmp_ui_switch_t *sw, cmp_ui_node_t **out_node) {
   if (!sw || !out_node) {
     return CMP_ERROR_INVALID_ARG;
@@ -67,6 +86,13 @@ int cmp_ui_switch_get_node(cmp_ui_switch_t *sw, cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_switch_set_on
+ *
+ * @param sw Parameter description.
+ * @param is_on Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_switch_set_on(cmp_ui_switch_t *sw, int is_on) {
   if (!sw) {
     return CMP_ERROR_INVALID_ARG;
@@ -83,6 +109,13 @@ int cmp_ui_switch_set_on(cmp_ui_switch_t *sw, int is_on) {
 
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_ui_switch_bind_a11y
+ *
+ * @param widget Parameter description.
+ * @param tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_switch_bind_a11y(cmp_ui_switch_t *widget, cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;

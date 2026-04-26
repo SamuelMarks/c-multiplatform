@@ -8,6 +8,12 @@ struct cmp_select_ui {
   int is_open;
 };
 
+/**
+ * @brief cmp_select_ui_create
+ *
+ * @param out_select Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_select_ui_create(cmp_select_ui_t **out_select) {
   struct cmp_select_ui *select_ui;
 
@@ -24,6 +30,12 @@ int cmp_select_ui_create(cmp_select_ui_t **out_select) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_select_ui_destroy
+ *
+ * @param select Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_select_ui_destroy(cmp_select_ui_t *select) {
   struct cmp_select_ui *internal_select = (struct cmp_select_ui *)select;
   if (!internal_select)
@@ -33,6 +45,12 @@ int cmp_select_ui_destroy(cmp_select_ui_t *select) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_select_ui_open
+ *
+ * @param select Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_select_ui_open(cmp_select_ui_t *select) {
   struct cmp_select_ui *internal_select = (struct cmp_select_ui *)select;
 

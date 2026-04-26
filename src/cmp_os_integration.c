@@ -4,6 +4,13 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_os_copy_to_clipboard
+ *
+ * @param window Parameter description.
+ * @param text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_copy_to_clipboard(cmp_window_t *window, const char *text) {
   int rc = CMP_SUCCESS;
 
@@ -22,6 +29,13 @@ int cmp_os_copy_to_clipboard(cmp_window_t *window, const char *text) {
   return rc;
 }
 
+/**
+ * @brief on_file_dropped
+ *
+ * @param path Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void on_file_dropped(const char *path, void *user_data) {
   (void)user_data;
   /* Normally we'd push an event onto the UI thread queue to create an
@@ -30,6 +44,12 @@ static void on_file_dropped(const char *path, void *user_data) {
          path ? path : "NULL");
 }
 
+/**
+ * @brief cmp_os_enable_file_drag_drop
+ *
+ * @param window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_enable_file_drag_drop(cmp_window_t *window) {
   int rc = CMP_SUCCESS;
 
@@ -48,12 +68,22 @@ int cmp_os_enable_file_drag_drop(cmp_window_t *window) {
   return rc;
 }
 
+/**
+ * @brief cmp_os_is_voice_dictation_supported
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_is_voice_dictation_supported(void) {
   /* Return 1 indicating we hook into native Speech frameworks (e.g. SAPI on
    * Win, NSSpeechRecognizer on Mac) */
   return 1;
 }
 
+/**
+ * @brief cmp_os_start_voice_dictation
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_start_voice_dictation(void) {
   int rc = CMP_SUCCESS;
 

@@ -11,6 +11,12 @@ struct cmp_pip {
   void *active_target;
 };
 
+/**
+ * @brief cmp_pip_create
+ *
+ * @param out_pip Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pip_create(cmp_pip_t **out_pip) {
   int rc = CMP_SUCCESS;
   cmp_pip_t *pip = NULL;
@@ -32,6 +38,12 @@ int cmp_pip_create(cmp_pip_t **out_pip) {
   return rc;
 }
 
+/**
+ * @brief cmp_pip_destroy
+ *
+ * @param pip Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pip_destroy(cmp_pip_t *pip) {
   int rc = CMP_SUCCESS;
 
@@ -45,6 +57,13 @@ int cmp_pip_destroy(cmp_pip_t *pip) {
   return rc;
 }
 
+/**
+ * @brief cmp_pip_enable
+ *
+ * @param pip Parameter description.
+ * @param ui_node_or_video_stream Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pip_enable(cmp_pip_t *pip, void *ui_node_or_video_stream) {
   int rc = CMP_SUCCESS;
 
@@ -59,6 +78,12 @@ int cmp_pip_enable(cmp_pip_t *pip, void *ui_node_or_video_stream) {
   return rc;
 }
 
+/**
+ * @brief cmp_pip_disable
+ *
+ * @param pip Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pip_disable(cmp_pip_t *pip) {
   int rc = CMP_SUCCESS;
 
@@ -73,6 +98,13 @@ int cmp_pip_disable(cmp_pip_t *pip) {
   return rc;
 }
 
+/**
+ * @brief cmp_pip_is_active
+ *
+ * @param pip Parameter description.
+ * @param out_is_active Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pip_is_active(const cmp_pip_t *pip, int *out_is_active) {
   int rc = CMP_SUCCESS;
 

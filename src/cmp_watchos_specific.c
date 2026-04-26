@@ -7,6 +7,12 @@ struct cmp_watchos_features {
   int aod_enabled;
 };
 
+/**
+ * @brief cmp_watchos_features_create
+ *
+ * @param out_features Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_watchos_features_create(cmp_watchos_features_t **out_features) {
   struct cmp_watchos_features *ctx;
   if (!out_features)
@@ -21,12 +27,25 @@ int cmp_watchos_features_create(cmp_watchos_features_t **out_features) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_watchos_features_destroy
+ *
+ * @param features_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_watchos_features_destroy(cmp_watchos_features_t *features_opaque) {
   if (features_opaque)
     CMP_FREE(features_opaque);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_watchos_handle_digital_crown
+ *
+ * @param features_opaque Parameter description.
+ * @param delta Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_watchos_handle_digital_crown(cmp_watchos_features_t *features_opaque,
                                      float delta) {
   struct cmp_watchos_features *ctx =
@@ -39,6 +58,12 @@ int cmp_watchos_handle_digital_crown(cmp_watchos_features_t *features_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_watchos_handle_double_tap
+ *
+ * @param features_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_watchos_handle_double_tap(cmp_watchos_features_t *features_opaque) {
   struct cmp_watchos_features *ctx =
       (struct cmp_watchos_features *)features_opaque;
@@ -50,6 +75,13 @@ int cmp_watchos_handle_double_tap(cmp_watchos_features_t *features_opaque) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_watchos_set_aod_state
+ *
+ * @param features_opaque Parameter description.
+ * @param is_wrist_down Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_watchos_set_aod_state(cmp_watchos_features_t *features_opaque,
                               int is_wrist_down) {
   struct cmp_watchos_features *ctx =
@@ -62,6 +94,13 @@ int cmp_watchos_set_aod_state(cmp_watchos_features_t *features_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_watchos_export_complication_data
+ *
+ * @param features_opaque Parameter description.
+ * @param json_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_watchos_export_complication_data(
     cmp_watchos_features_t *features_opaque, const char *json_data) {
   struct cmp_watchos_features *ctx =
@@ -73,6 +112,13 @@ int cmp_watchos_export_complication_data(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_watchos_export_smart_stack
+ *
+ * @param features_opaque Parameter description.
+ * @param json_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_watchos_export_smart_stack(cmp_watchos_features_t *features_opaque,
                                    const char *json_data) {
   struct cmp_watchos_features *ctx =
@@ -84,6 +130,13 @@ int cmp_watchos_export_smart_stack(cmp_watchos_features_t *features_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_watchos_apply_edge_to_edge_styling
+ *
+ * @param features_opaque Parameter description.
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_watchos_apply_edge_to_edge_styling(
     cmp_watchos_features_t *features_opaque, void *node) {
   struct cmp_watchos_features *ctx =
@@ -95,6 +148,13 @@ int cmp_watchos_apply_edge_to_edge_styling(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_watchos_apply_pill_button_styling
+ *
+ * @param features_opaque Parameter description.
+ * @param button_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_watchos_apply_pill_button_styling(
     cmp_watchos_features_t *features_opaque, void *button_node) {
   struct cmp_watchos_features *ctx =
@@ -106,6 +166,13 @@ int cmp_watchos_apply_pill_button_styling(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_watchos_apply_hierarchical_pagination
+ *
+ * @param features_opaque Parameter description.
+ * @param view_controller Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_watchos_apply_hierarchical_pagination(
     cmp_watchos_features_t *features_opaque, void *view_controller) {
   struct cmp_watchos_features *ctx =

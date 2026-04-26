@@ -23,6 +23,12 @@ struct cmp_math_visual_tree {
   int is_inline;
 };
 
+/**
+ * @brief cmp_math_renderer_create
+ *
+ * @param out_renderer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_math_renderer_create(cmp_math_renderer_t **out_renderer) {
   int rc = CMP_SUCCESS;
   cmp_math_renderer_t *renderer = NULL;
@@ -44,6 +50,12 @@ int cmp_math_renderer_create(cmp_math_renderer_t **out_renderer) {
   return rc;
 }
 
+/**
+ * @brief cmp_math_renderer_destroy
+ *
+ * @param renderer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_math_renderer_destroy(cmp_math_renderer_t *renderer) {
   int rc = CMP_SUCCESS;
 
@@ -56,6 +68,15 @@ int cmp_math_renderer_destroy(cmp_math_renderer_t *renderer) {
   return rc;
 }
 
+/**
+ * @brief cmp_math_renderer_parse
+ *
+ * @param renderer Parameter description.
+ * @param latex_string Parameter description.
+ * @param is_inline Parameter description.
+ * @param out_visual_tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_math_renderer_parse(cmp_math_renderer_t *renderer,
                             const char *latex_string, int is_inline,
                             void **out_visual_tree) {
@@ -97,6 +118,12 @@ int cmp_math_renderer_parse(cmp_math_renderer_t *renderer,
   return rc;
 }
 
+/**
+ * @brief cmp_math_renderer_free_tree
+ *
+ * @param visual_tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_math_renderer_free_tree(void *visual_tree) {
   int rc = CMP_SUCCESS;
   struct cmp_math_visual_tree *tree =

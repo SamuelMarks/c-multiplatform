@@ -15,6 +15,12 @@ struct cmp_dpi {
   int monitor_count;
 };
 
+/**
+ * @brief cmp_dpi_create
+ *
+ * @param out_dpi Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dpi_create(cmp_dpi_t **out_dpi) {
   int rc = CMP_SUCCESS;
   cmp_dpi_t *dpi = NULL;
@@ -37,6 +43,12 @@ int cmp_dpi_create(cmp_dpi_t **out_dpi) {
   return rc;
 }
 
+/**
+ * @brief cmp_dpi_destroy
+ *
+ * @param dpi Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dpi_destroy(cmp_dpi_t *dpi) {
   int rc = CMP_SUCCESS;
 
@@ -50,6 +62,14 @@ int cmp_dpi_destroy(cmp_dpi_t *dpi) {
   return rc;
 }
 
+/**
+ * @brief cmp_dpi_set_monitor_scale
+ *
+ * @param dpi Parameter description.
+ * @param monitor_id Parameter description.
+ * @param scale Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dpi_set_monitor_scale(cmp_dpi_t *dpi, int monitor_id, float scale) {
   int rc = CMP_SUCCESS;
   int i;
@@ -81,6 +101,14 @@ int cmp_dpi_set_monitor_scale(cmp_dpi_t *dpi, int monitor_id, float scale) {
   return rc;
 }
 
+/**
+ * @brief cmp_dpi_get_monitor_scale
+ *
+ * @param dpi Parameter description.
+ * @param monitor_id Parameter description.
+ * @param out_scale Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dpi_get_monitor_scale(const cmp_dpi_t *dpi, int monitor_id,
                               float *out_scale) {
   int rc = CMP_SUCCESS;
@@ -106,6 +134,14 @@ int cmp_dpi_get_monitor_scale(const cmp_dpi_t *dpi, int monitor_id,
   return rc;
 }
 
+/**
+ * @brief cmp_dpi_update_window_scale
+ *
+ * @param dpi Parameter description.
+ * @param window Parameter description.
+ * @param monitor_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dpi_update_window_scale(cmp_dpi_t *dpi, cmp_window_t *window,
                                 int monitor_id) {
   int rc = CMP_SUCCESS;

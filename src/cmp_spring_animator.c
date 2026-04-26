@@ -18,6 +18,16 @@ struct cmp_spring_animator {
   float scrub_fraction;
 };
 
+/**
+ * @brief cmp_spring_animator_create
+ *
+ * @param mass Parameter description.
+ * @param stiffness Parameter description.
+ * @param damping Parameter description.
+ * @param initial_velocity Parameter description.
+ * @param out_animator Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spring_animator_create(float mass, float stiffness, float damping,
                                float initial_velocity,
                                cmp_spring_animator_t **out_animator) {
@@ -44,12 +54,25 @@ int cmp_spring_animator_create(float mass, float stiffness, float damping,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_spring_animator_destroy
+ *
+ * @param animator Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spring_animator_destroy(cmp_spring_animator_t *animator) {
   if (animator)
     CMP_FREE(animator);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_spring_animator_interrupt
+ *
+ * @param animator Parameter description.
+ * @param new_target_value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spring_animator_interrupt(cmp_spring_animator_t *animator,
                                   float new_target_value) {
   struct cmp_spring_animator *anim = (struct cmp_spring_animator *)animator;
@@ -63,6 +86,13 @@ int cmp_spring_animator_interrupt(cmp_spring_animator_t *animator,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_spring_animator_scrub
+ *
+ * @param animator Parameter description.
+ * @param fraction_complete Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spring_animator_scrub(cmp_spring_animator_t *animator,
                               float fraction_complete) {
   struct cmp_spring_animator *anim = (struct cmp_spring_animator *)animator;
@@ -82,6 +112,15 @@ int cmp_spring_animator_scrub(cmp_spring_animator_t *animator,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_spring_animator_evaluate
+ *
+ * @param animator Parameter description.
+ * @param dt_seconds Parameter description.
+ * @param out_current_value Parameter description.
+ * @param out_is_settled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spring_animator_evaluate(cmp_spring_animator_t *animator,
                                  float dt_seconds, float *out_current_value,
                                  int *out_is_settled) {
@@ -125,6 +164,16 @@ int cmp_spring_animator_evaluate(cmp_spring_animator_t *animator,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_spring_calculate_gesture_velocity
+ *
+ * @param delta_x Parameter description.
+ * @param delta_y Parameter description.
+ * @param dt_seconds Parameter description.
+ * @param out_velocity_x Parameter description.
+ * @param out_velocity_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spring_calculate_gesture_velocity(float delta_x, float delta_y,
                                           float dt_seconds,
                                           float *out_velocity_x,

@@ -10,6 +10,12 @@ struct cmp_prefers_color_scheme {
   cmp_color_scheme_t current_scheme;
 };
 
+/**
+ * @brief cmp_prefers_color_scheme_create
+ *
+ * @param out_scheme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_prefers_color_scheme_create(cmp_prefers_color_scheme_t **out_scheme) {
   int rc = CMP_SUCCESS;
   cmp_prefers_color_scheme_t *scheme = NULL;
@@ -32,6 +38,12 @@ int cmp_prefers_color_scheme_create(cmp_prefers_color_scheme_t **out_scheme) {
   return rc;
 }
 
+/**
+ * @brief cmp_prefers_color_scheme_destroy
+ *
+ * @param scheme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_prefers_color_scheme_destroy(cmp_prefers_color_scheme_t *scheme) {
   int rc = CMP_SUCCESS;
 
@@ -44,6 +56,13 @@ int cmp_prefers_color_scheme_destroy(cmp_prefers_color_scheme_t *scheme) {
   return rc;
 }
 
+/**
+ * @brief cmp_prefers_color_scheme_set
+ *
+ * @param scheme Parameter description.
+ * @param color_scheme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_prefers_color_scheme_set(cmp_prefers_color_scheme_t *scheme,
                                  cmp_color_scheme_t color_scheme) {
   int rc = CMP_SUCCESS;
@@ -65,6 +84,13 @@ int cmp_prefers_color_scheme_set(cmp_prefers_color_scheme_t *scheme,
   return rc;
 }
 
+/**
+ * @brief cmp_prefers_color_scheme_get
+ *
+ * @param scheme Parameter description.
+ * @param out_color_scheme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_prefers_color_scheme_get(const cmp_prefers_color_scheme_t *scheme,
                                  cmp_color_scheme_t *out_color_scheme) {
   int rc = CMP_SUCCESS;

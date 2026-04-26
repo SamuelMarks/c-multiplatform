@@ -23,6 +23,12 @@ struct cmp_rich_text_view {
   cmp_data_detector_types_t detectors;
 };
 
+/**
+ * @brief cmp_text_field_create
+ *
+ * @param out_field Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_create(cmp_text_field_t **out_field) {
   struct cmp_text_field *ctx;
   if (!out_field)
@@ -52,6 +58,12 @@ int cmp_text_field_create(cmp_text_field_t **out_field) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_destroy
+ *
+ * @param field_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_destroy(cmp_text_field_t *field_opaque) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
   if (!ctx)
@@ -66,6 +78,13 @@ int cmp_text_field_destroy(cmp_text_field_t *field_opaque) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_insert_text
+ *
+ * @param field_opaque Parameter description.
+ * @param text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_insert_text(cmp_text_field_t *field_opaque,
                                const char *text) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
@@ -106,6 +125,12 @@ int cmp_text_field_insert_text(cmp_text_field_t *field_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_delete_backward
+ *
+ * @param field_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_delete_backward(cmp_text_field_t *field_opaque) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
   if (!ctx)
@@ -124,6 +149,13 @@ int cmp_text_field_delete_backward(cmp_text_field_t *field_opaque) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_set_caret_position
+ *
+ * @param field_opaque Parameter description.
+ * @param pos Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_set_caret_position(cmp_text_field_t *field_opaque,
                                       size_t pos) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
@@ -135,6 +167,13 @@ int cmp_text_field_set_caret_position(cmp_text_field_t *field_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_get_caret_position
+ *
+ * @param field_opaque Parameter description.
+ * @param out_pos Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_get_caret_position(const cmp_text_field_t *field_opaque,
                                       size_t *out_pos) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
@@ -144,6 +183,13 @@ int cmp_text_field_get_caret_position(const cmp_text_field_t *field_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_get_text
+ *
+ * @param field_opaque Parameter description.
+ * @param out_text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_get_text(const cmp_text_field_t *field_opaque,
                             const char **out_text) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
@@ -153,6 +199,13 @@ int cmp_text_field_get_text(const cmp_text_field_t *field_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_handle_event
+ *
+ * @param field_opaque Parameter description.
+ * @param event Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_handle_event(cmp_text_field_t *field_opaque,
                                 const cmp_event_t *event) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
@@ -173,6 +226,13 @@ int cmp_text_field_handle_event(cmp_text_field_t *field_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_set_keyboard_type
+ *
+ * @param field_opaque Parameter description.
+ * @param type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_set_keyboard_type(cmp_text_field_t *field_opaque,
                                      cmp_keyboard_type_t type) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
@@ -182,6 +242,13 @@ int cmp_text_field_set_keyboard_type(cmp_text_field_t *field_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_set_return_key_type
+ *
+ * @param field_opaque Parameter description.
+ * @param type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_set_return_key_type(cmp_text_field_t *field_opaque,
                                        cmp_return_key_type_t type) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
@@ -191,6 +258,13 @@ int cmp_text_field_set_return_key_type(cmp_text_field_t *field_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_set_secure_text_entry
+ *
+ * @param field_opaque Parameter description.
+ * @param secure Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_set_secure_text_entry(cmp_text_field_t *field_opaque,
                                          int secure) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
@@ -207,6 +281,13 @@ int cmp_text_field_set_secure_text_entry(cmp_text_field_t *field_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_set_auto_capitalization
+ *
+ * @param field_opaque Parameter description.
+ * @param cap Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_set_auto_capitalization(cmp_text_field_t *field_opaque,
                                            cmp_auto_capitalization_t cap) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
@@ -216,6 +297,13 @@ int cmp_text_field_set_auto_capitalization(cmp_text_field_t *field_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_set_spellcheck_enabled
+ *
+ * @param field_opaque Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_set_spellcheck_enabled(cmp_text_field_t *field_opaque,
                                           int enabled) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
@@ -225,6 +313,13 @@ int cmp_text_field_set_spellcheck_enabled(cmp_text_field_t *field_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_field_set_input_accessory_view
+ *
+ * @param field_opaque Parameter description.
+ * @param accessory_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_field_set_input_accessory_view(cmp_text_field_t *field_opaque,
                                             cmp_ui_node_t *accessory_node) {
   struct cmp_text_field *ctx = (struct cmp_text_field *)field_opaque;
@@ -234,6 +329,12 @@ int cmp_text_field_set_input_accessory_view(cmp_text_field_t *field_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_rich_text_view_create
+ *
+ * @param out_view Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_rich_text_view_create(cmp_rich_text_view_t **out_view) {
   struct cmp_rich_text_view *ctx;
   if (!out_view)
@@ -248,12 +349,25 @@ int cmp_rich_text_view_create(cmp_rich_text_view_t **out_view) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_rich_text_view_destroy
+ *
+ * @param view_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_rich_text_view_destroy(cmp_rich_text_view_t *view_opaque) {
   if (view_opaque)
     CMP_FREE(view_opaque);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_rich_text_view_set_data_detectors
+ *
+ * @param view_opaque Parameter description.
+ * @param flags Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_rich_text_view_set_data_detectors(cmp_rich_text_view_t *view_opaque,
                                           cmp_data_detector_types_t flags) {
   struct cmp_rich_text_view *ctx = (struct cmp_rich_text_view *)view_opaque;

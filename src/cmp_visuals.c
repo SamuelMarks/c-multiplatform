@@ -6,6 +6,13 @@
 #include <math.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_gradient_create
+ *
+ * @param out_gradient Parameter description.
+ * @param type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gradient_create(cmp_gradient_t **out_gradient,
                         cmp_gradient_type_t type) {
   cmp_gradient_t *grad;
@@ -21,6 +28,12 @@ int cmp_gradient_create(cmp_gradient_t **out_gradient,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_gradient_destroy
+ *
+ * @param gradient Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gradient_destroy(cmp_gradient_t *gradient) {
   if (!gradient)
     return CMP_ERROR_INVALID_ARG;
@@ -30,6 +43,14 @@ int cmp_gradient_destroy(cmp_gradient_t *gradient) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_gradient_add_stop
+ *
+ * @param gradient Parameter description.
+ * @param color Parameter description.
+ * @param position Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gradient_add_stop(cmp_gradient_t *gradient, cmp_color_t color,
                           float position) {
   cmp_gradient_stop_t *new_stops;
@@ -54,6 +75,13 @@ int cmp_gradient_add_stop(cmp_gradient_t *gradient, cmp_color_t color,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_color_parse_p3
+ *
+ * @param color_str Parameter description.
+ * @param out_color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_parse_p3(const char *color_str, cmp_color_t *out_color) {
   float r = 0.0f, g = 0.0f, b = 0.0f, a = 1.0f;
   int parsed;
@@ -80,6 +108,13 @@ int cmp_color_parse_p3(const char *color_str, cmp_color_t *out_color) {
   return CMP_ERROR_INVALID_ARG;
 }
 
+/**
+ * @brief cmp_color_oklch_to_srgb
+ *
+ * @param in_color Parameter description.
+ * @param out_color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_oklch_to_srgb(const cmp_color_t *in_color,
                             cmp_color_t *out_color) {
   float l, c, h, a, b;
@@ -133,6 +168,16 @@ int cmp_color_oklch_to_srgb(const cmp_color_t *in_color,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_color_mix
+ *
+ * @param c1 Parameter description.
+ * @param c2 Parameter description.
+ * @param weight Parameter description.
+ * @param space Parameter description.
+ * @param out_color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_mix(const cmp_color_t *c1, const cmp_color_t *c2, float weight,
                   cmp_color_space_t space, cmp_color_t *out_color) {
   if (!c1 || !c2 || !out_color)
@@ -147,6 +192,13 @@ int cmp_color_mix(const cmp_color_t *c1, const cmp_color_t *c2, float weight,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_color_luminance
+ *
+ * @param color Parameter description.
+ * @param out_luminance Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_luminance(const cmp_color_t *color, float *out_luminance) {
   float r_lin, g_lin, b_lin;
   if (!color || !out_luminance)
@@ -171,6 +223,14 @@ int cmp_color_luminance(const cmp_color_t *color, float *out_luminance) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_color_contrast_ratio
+ *
+ * @param c1 Parameter description.
+ * @param c2 Parameter description.
+ * @param out_ratio Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_contrast_ratio(const cmp_color_t *c1, const cmp_color_t *c2,
                              float *out_ratio) {
   float l1, l2;
@@ -195,6 +255,14 @@ struct cmp_icc_profile {
   float color_matrix[9];
 };
 
+/**
+ * @brief cmp_icc_profile_parse
+ *
+ * @param image_buffer Parameter description.
+ * @param size Parameter description.
+ * @param out_profile Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_icc_profile_parse(const void *image_buffer, size_t size,
                           void **out_profile) {
   struct cmp_icc_profile *profile = NULL;
@@ -254,6 +322,12 @@ int cmp_icc_profile_parse(const void *image_buffer, size_t size,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_icc_profile_destroy
+ *
+ * @param profile Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_icc_profile_destroy(cmp_icc_profile_t *profile) {
   struct cmp_icc_profile *p = (struct cmp_icc_profile *)profile;
   if (!p)
@@ -264,6 +338,13 @@ int cmp_icc_profile_destroy(cmp_icc_profile_t *profile) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_icc_profile_get_matrix
+ *
+ * @param profile Parameter description.
+ * @param out_matrix3x3 Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile,
                                float *out_matrix3x3) {
   const struct cmp_icc_profile *p = (const struct cmp_icc_profile *)profile;
@@ -276,6 +357,13 @@ int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_icc_profile_is_wide_gamut
+ *
+ * @param profile Parameter description.
+ * @param out_is_wide Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_icc_profile_is_wide_gamut(const cmp_icc_profile_t *profile,
                                   int *out_is_wide) {
   const struct cmp_icc_profile *p = (const struct cmp_icc_profile *)profile;
@@ -289,6 +377,12 @@ struct cmp_semantic_colors {
   uint32_t tint_color;
 };
 
+/**
+ * @brief cmp_semantic_colors_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semantic_colors_create(cmp_semantic_colors_t **out_ctx) {
   struct cmp_semantic_colors *ctx;
   if (!out_ctx)
@@ -301,12 +395,25 @@ int cmp_semantic_colors_create(cmp_semantic_colors_t **out_ctx) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_semantic_colors_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semantic_colors_destroy(cmp_semantic_colors_t *ctx) {
   if (ctx)
     CMP_FREE(ctx);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_semantic_colors_set_tint_color
+ *
+ * @param ctx Parameter description.
+ * @param tint_rgba Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semantic_colors_set_tint_color(cmp_semantic_colors_t *ctx,
                                        uint32_t tint_rgba) {
   struct cmp_semantic_colors *c = (struct cmp_semantic_colors *)ctx;
@@ -316,6 +423,13 @@ int cmp_semantic_colors_set_tint_color(cmp_semantic_colors_t *ctx,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_semantic_colors_get_tint_color
+ *
+ * @param ctx Parameter description.
+ * @param out_tint_rgba Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semantic_colors_get_tint_color(cmp_semantic_colors_t *ctx,
                                        uint32_t *out_tint_rgba) {
   struct cmp_semantic_colors *c = (struct cmp_semantic_colors *)ctx;
@@ -325,6 +439,15 @@ int cmp_semantic_colors_get_tint_color(cmp_semantic_colors_t *ctx,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_semantic_colors_resolve
+ *
+ * @param ctx Parameter description.
+ * @param semantic_name Parameter description.
+ * @param is_dark_mode Parameter description.
+ * @param out_rgba Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semantic_colors_resolve(cmp_semantic_colors_t *ctx,
                                 const char *semantic_name, int is_dark_mode,
                                 uint32_t *out_rgba) {
@@ -348,6 +471,15 @@ int cmp_semantic_colors_resolve(cmp_semantic_colors_t *ctx,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_semantic_colors_resolve_elevation
+ *
+ * @param ctx Parameter description.
+ * @param elevation_level Parameter description.
+ * @param is_dark_mode Parameter description.
+ * @param out_rgba Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semantic_colors_resolve_elevation(cmp_semantic_colors_t *ctx,
                                           int elevation_level, int is_dark_mode,
                                           uint32_t *out_rgba) {
@@ -387,6 +519,12 @@ struct cmp_color_pipeline {
   int display_supports_edr;
 };
 
+/**
+ * @brief cmp_color_pipeline_create
+ *
+ * @param out_pipeline Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_pipeline_create(cmp_color_pipeline_t **out_pipeline) {
   struct cmp_color_pipeline *pl;
   if (!out_pipeline)
@@ -403,12 +541,25 @@ int cmp_color_pipeline_create(cmp_color_pipeline_t **out_pipeline) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_color_pipeline_destroy
+ *
+ * @param pipeline Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_pipeline_destroy(cmp_color_pipeline_t *pipeline) {
   if (pipeline)
     CMP_FREE(pipeline);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_color_pipeline_supports_p3
+ *
+ * @param pipeline Parameter description.
+ * @param out_supports_p3 Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_pipeline_supports_p3(cmp_color_pipeline_t *pipeline,
                                    int *out_supports_p3) {
   struct cmp_color_pipeline *pl = (struct cmp_color_pipeline *)pipeline;
@@ -418,6 +569,13 @@ int cmp_color_pipeline_supports_p3(cmp_color_pipeline_t *pipeline,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_color_pipeline_supports_edr
+ *
+ * @param pipeline Parameter description.
+ * @param out_supports_edr Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_pipeline_supports_edr(cmp_color_pipeline_t *pipeline,
                                     int *out_supports_edr) {
   struct cmp_color_pipeline *pl = (struct cmp_color_pipeline *)pipeline;
@@ -427,6 +585,18 @@ int cmp_color_pipeline_supports_edr(cmp_color_pipeline_t *pipeline,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_color_pipeline_srgb_to_p3
+ *
+ * @param pipeline Parameter description.
+ * @param r Parameter description.
+ * @param g Parameter description.
+ * @param b Parameter description.
+ * @param out_p3_r Parameter description.
+ * @param out_p3_g Parameter description.
+ * @param out_p3_b Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_pipeline_srgb_to_p3(cmp_color_pipeline_t *pipeline, float r,
                                   float g, float b, float *out_p3_r,
                                   float *out_p3_g, float *out_p3_b) {
@@ -443,6 +613,13 @@ int cmp_color_pipeline_srgb_to_p3(cmp_color_pipeline_t *pipeline, float r,
 
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_color_srgb_to_oklch
+ *
+ * @param in_color Parameter description.
+ * @param out_color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_srgb_to_oklch(const cmp_color_t *in_color,
                             cmp_color_t *out_color) {
   float lin_r, lin_g, lin_b;

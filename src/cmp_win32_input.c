@@ -8,6 +8,11 @@
 #include <windef.h>
 #include <winbase.h>
 
+/**
+ * @brief cmp_win32_init_touch_ink
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_win32_init_touch_ink(void) {
   /* EnableMouseInPointer ensures WM_POINTER messages are generated for mouse as well,
      unifying the input stack for touch, pen, and mouse (Windows 8+). */
@@ -25,6 +30,11 @@ int cmp_win32_init_touch_ink(void) {
 
 #else
 
+/**
+ * @brief cmp_win32_init_touch_ink
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_win32_init_touch_ink(void) {
   return 0;
 }

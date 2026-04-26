@@ -10,6 +10,12 @@ struct cmp_scroll_view {
   int is_paging_enabled;
 };
 
+/**
+ * @brief cmp_scroll_view_create
+ *
+ * @param out_scroll_view Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_view_create(cmp_scroll_view_t **out_scroll_view) {
   struct cmp_scroll_view *ctx;
   if (!out_scroll_view)
@@ -25,6 +31,12 @@ int cmp_scroll_view_create(cmp_scroll_view_t **out_scroll_view) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_view_destroy
+ *
+ * @param scroll_view_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_view_destroy(cmp_scroll_view_t *scroll_view_opaque) {
   struct cmp_scroll_view *ctx = (struct cmp_scroll_view *)scroll_view_opaque;
   if (!ctx)
@@ -34,6 +46,13 @@ int cmp_scroll_view_destroy(cmp_scroll_view_t *scroll_view_opaque) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_view_set_deceleration_rate
+ *
+ * @param scroll_view_opaque Parameter description.
+ * @param rate Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_view_set_deceleration_rate(cmp_scroll_view_t *scroll_view_opaque,
                                           cmp_scroll_deceleration_rate_t rate) {
   struct cmp_scroll_view *ctx = (struct cmp_scroll_view *)scroll_view_opaque;
@@ -43,6 +62,13 @@ int cmp_scroll_view_set_deceleration_rate(cmp_scroll_view_t *scroll_view_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_view_set_paging_enabled
+ *
+ * @param scroll_view_opaque Parameter description.
+ * @param is_paging_enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_view_set_paging_enabled(cmp_scroll_view_t *scroll_view_opaque,
                                        int is_paging_enabled) {
   struct cmp_scroll_view *ctx = (struct cmp_scroll_view *)scroll_view_opaque;
@@ -52,6 +78,15 @@ int cmp_scroll_view_set_paging_enabled(cmp_scroll_view_t *scroll_view_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_view_evaluate_scrollbar
+ *
+ * @param scroll_view_opaque Parameter description.
+ * @param is_scrolling Parameter description.
+ * @param time_since_last_scroll Parameter description.
+ * @param out_opacity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_view_evaluate_scrollbar(cmp_scroll_view_t *scroll_view_opaque,
                                        int is_scrolling,
                                        float time_since_last_scroll,
@@ -77,6 +112,16 @@ int cmp_scroll_view_evaluate_scrollbar(cmp_scroll_view_t *scroll_view_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_view_hit_test_scrollbar
+ *
+ * @param scroll_view_opaque Parameter description.
+ * @param pointer_x Parameter description.
+ * @param pointer_y Parameter description.
+ * @param view_width Parameter description.
+ * @param out_is_interactive Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_view_hit_test_scrollbar(cmp_scroll_view_t *scroll_view_opaque,
                                        float pointer_x, float pointer_y,
                                        float view_width,
@@ -96,6 +141,15 @@ int cmp_scroll_view_hit_test_scrollbar(cmp_scroll_view_t *scroll_view_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_view_calculate_rubber_band
+ *
+ * @param scroll_view_opaque Parameter description.
+ * @param overscroll_delta Parameter description.
+ * @param view_dimension Parameter description.
+ * @param out_visual_translation Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_view_calculate_rubber_band(cmp_scroll_view_t *scroll_view_opaque,
                                           float overscroll_delta,
                                           float view_dimension,
@@ -127,6 +181,13 @@ int cmp_scroll_view_calculate_rubber_band(cmp_scroll_view_t *scroll_view_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_view_set_keyboard_dismiss_mode
+ *
+ * @param scroll_view_opaque Parameter description.
+ * @param mode Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_view_set_keyboard_dismiss_mode(
     cmp_scroll_view_t *scroll_view_opaque, cmp_scroll_keyboard_dismiss_t mode) {
   struct cmp_scroll_view *ctx = (struct cmp_scroll_view *)scroll_view_opaque;

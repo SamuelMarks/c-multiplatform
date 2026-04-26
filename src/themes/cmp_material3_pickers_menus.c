@@ -5,6 +5,12 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_m3_menu_resolve
+ *
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_menu_resolve(cmp_m3_menu_metrics_t *out_metrics) {
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
@@ -13,6 +19,13 @@ int cmp_m3_menu_resolve(cmp_m3_menu_metrics_t *out_metrics) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_sheet_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_sheet_resolve(cmp_m3_sheet_variant_t variant,
                          cmp_m3_sheet_metrics_t *out_metrics) {
   if (!out_metrics)
@@ -55,6 +68,13 @@ int cmp_m3_sheet_resolve(cmp_m3_sheet_variant_t variant,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_date_picker_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_date_picker_resolve(cmp_m3_date_picker_variant_t variant,
                                cmp_m3_date_picker_metrics_t *out_metrics) {
   if (!out_metrics)
@@ -79,6 +99,13 @@ int cmp_m3_date_picker_resolve(cmp_m3_date_picker_variant_t variant,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_time_picker_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_time_picker_resolve(cmp_m3_time_picker_variant_t variant,
                                cmp_m3_time_picker_metrics_t *out_metrics) {
   if (!out_metrics)

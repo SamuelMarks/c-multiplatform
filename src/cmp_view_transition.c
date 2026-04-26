@@ -8,6 +8,12 @@ struct cmp_view_transition {
   int is_active;
 };
 
+/**
+ * @brief cmp_view_transition_create
+ *
+ * @param out_transition Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_view_transition_create(cmp_view_transition_t **out_transition) {
   struct cmp_view_transition *transition;
 
@@ -24,6 +30,12 @@ int cmp_view_transition_create(cmp_view_transition_t **out_transition) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_view_transition_destroy
+ *
+ * @param transition Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_view_transition_destroy(cmp_view_transition_t *transition) {
   struct cmp_view_transition *internal_transition =
       (struct cmp_view_transition *)transition;
@@ -34,6 +46,12 @@ int cmp_view_transition_destroy(cmp_view_transition_t *transition) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_view_transition_start
+ *
+ * @param transition Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_view_transition_start(cmp_view_transition_t *transition) {
   struct cmp_view_transition *internal_transition =
       (struct cmp_view_transition *)transition;

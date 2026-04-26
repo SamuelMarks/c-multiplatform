@@ -5,11 +5,25 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_passive_event_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_passive_event_init(void) {
   int rc = CMP_SUCCESS;
   return rc;
 }
 
+/**
+ * @brief cmp_ui_node_add_passive_listener
+ *
+ * @param node Parameter description.
+ * @param event_type Parameter description.
+ * @param ) Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_add_passive_listener(cmp_ui_node_t *node, uint32_t event_type,
                                      void (*callback)(cmp_event_t *,
                                                       cmp_ui_node_t *, void *),
@@ -30,6 +44,12 @@ int cmp_ui_node_add_passive_listener(cmp_ui_node_t *node, uint32_t event_type,
   return rc;
 }
 
+/**
+ * @brief cmp_event_prevent_default
+ *
+ * @param event Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_event_prevent_default(cmp_event_t *event) {
   int rc = CMP_SUCCESS;
 
@@ -57,6 +77,12 @@ int cmp_event_prevent_default(cmp_event_t *event) {
   return rc;
 }
 
+/**
+ * @brief cmp_event_is_default_prevented
+ *
+ * @param event Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_event_is_default_prevented(const cmp_event_t *event) {
   int rc = 0;
 

@@ -14,6 +14,12 @@ struct cmp_motion_path {
   float p3x, p3y;
 };
 
+/**
+ * @brief cmp_motion_path_create
+ *
+ * @param out_path Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_motion_path_create(cmp_motion_path_t **out_path) {
   int rc = CMP_SUCCESS;
   struct cmp_motion_path *path = NULL;
@@ -46,6 +52,12 @@ int cmp_motion_path_create(cmp_motion_path_t **out_path) {
   return rc;
 }
 
+/**
+ * @brief cmp_motion_path_destroy
+ *
+ * @param path Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_motion_path_destroy(cmp_motion_path_t *path) {
   int rc = CMP_SUCCESS;
   struct cmp_motion_path *internal_path = (struct cmp_motion_path *)path;
@@ -60,6 +72,16 @@ int cmp_motion_path_destroy(cmp_motion_path_t *path) {
   return rc;
 }
 
+/**
+ * @brief eval_bezier
+ *
+ * @param p0 Parameter description.
+ * @param p1 Parameter description.
+ * @param p2 Parameter description.
+ * @param p3 Parameter description.
+ * @param t Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static float eval_bezier(float p0, float p1, float p2, float p3, float t) {
   float u = 1.0f - t;
   float tt = t * t;
@@ -75,6 +97,16 @@ static float eval_bezier(float p0, float p1, float p2, float p3, float t) {
   return p;
 }
 
+/**
+ * @brief eval_bezier_derivative
+ *
+ * @param p0 Parameter description.
+ * @param p1 Parameter description.
+ * @param p2 Parameter description.
+ * @param p3 Parameter description.
+ * @param t Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static float eval_bezier_derivative(float p0, float p1, float p2, float p3,
                                     float t) {
   /* Derivative of cubic bezier */
@@ -84,6 +116,17 @@ static float eval_bezier_derivative(float p0, float p1, float p2, float p3,
   return d;
 }
 
+/**
+ * @brief cmp_motion_path_evaluate
+ *
+ * @param path Parameter description.
+ * @param distance Parameter description.
+ * @param offset_rotate Parameter description.
+ * @param out_x Parameter description.
+ * @param out_y Parameter description.
+ * @param out_angle Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
                              float offset_rotate, float *out_x, float *out_y,
                              float *out_angle) {

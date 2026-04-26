@@ -15,6 +15,12 @@ struct cmp_csp {
   size_t capacity;
 };
 
+/**
+ * @brief cmp_csp_create
+ *
+ * @param out_csp Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_csp_create(cmp_csp_t **out_csp) {
   int rc = CMP_SUCCESS;
   cmp_csp_t *csp = NULL;
@@ -36,6 +42,12 @@ int cmp_csp_create(cmp_csp_t **out_csp) {
   return rc;
 }
 
+/**
+ * @brief cmp_csp_destroy
+ *
+ * @param csp Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_csp_destroy(cmp_csp_t *csp) {
   int rc = CMP_SUCCESS;
   size_t i;
@@ -59,6 +71,13 @@ int cmp_csp_destroy(cmp_csp_t *csp) {
   return rc;
 }
 
+/**
+ * @brief str_duplicate
+ *
+ * @param src Parameter description.
+ * @param out_dst Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int str_duplicate(const char *src, char **out_dst) {
   int rc = CMP_SUCCESS;
   size_t len;
@@ -85,6 +104,13 @@ static int str_duplicate(const char *src, char **out_dst) {
   return rc;
 }
 
+/**
+ * @brief cmp_csp_add_domain
+ *
+ * @param csp Parameter description.
+ * @param domain Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_csp_add_domain(cmp_csp_t *csp, const char *domain) {
   int rc = CMP_SUCCESS;
   size_t new_cap;
@@ -123,6 +149,15 @@ int cmp_csp_add_domain(cmp_csp_t *csp, const char *domain) {
   return rc;
 }
 
+/**
+ * @brief cmp_csp_check_domain
+ *
+ * @param csp Parameter description.
+ * @param domain Parameter description.
+ * @param type Parameter description.
+ * @param out_allowed Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_csp_check_domain(const cmp_csp_t *csp, const char *domain,
                          cmp_csp_resource_type_t type, int *out_allowed) {
   int rc = CMP_SUCCESS;

@@ -4,6 +4,13 @@
 #include <stdlib.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_gamepad_evaluate_focus_navigation
+ *
+ * @param gamepad Parameter description.
+ * @param dt_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gamepad_evaluate_focus_navigation(const cmp_gamepad_t *gamepad,
                                           float dt_ms) {
   int rc = CMP_SUCCESS;
@@ -23,6 +30,13 @@ int cmp_gamepad_evaluate_focus_navigation(const cmp_gamepad_t *gamepad,
   return rc;
 }
 
+/**
+ * @brief cmp_gamepad_trigger_rumble
+ *
+ * @param index Parameter description.
+ * @param type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gamepad_trigger_rumble(int index, cmp_gamepad_rumble_type_t type) {
   int rc = CMP_SUCCESS;
   (void)type;
@@ -37,6 +51,14 @@ int cmp_gamepad_trigger_rumble(int index, cmp_gamepad_rumble_type_t type) {
   return rc;
 }
 
+/**
+ * @brief cmp_gamepad_set_adaptive_trigger
+ *
+ * @param index Parameter description.
+ * @param is_left Parameter description.
+ * @param config Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gamepad_set_adaptive_trigger(
     int index, int is_left, const cmp_adaptive_trigger_config_t *config) {
   int rc = CMP_SUCCESS;

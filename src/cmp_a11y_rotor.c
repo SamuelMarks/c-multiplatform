@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -17,20 +18,35 @@ struct cmp_a11y_rotor {
   size_t capacity;
 };
 
+/**
+ * @brief cmp_a11y_rotor_create
+ *
+ * @param tree Parameter description.
+ * @param out_rotor Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_rotor_create(cmp_a11y_tree_t *tree, cmp_a11y_rotor_t **out_rotor) {
   int rc = CMP_SUCCESS;
   struct cmp_a11y_rotor *rotor = NULL;
 
   if (!tree || !out_rotor) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_rotor_create: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_rotor_create: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_a11y_rotor), (void **)&rotor);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_a11y_rotor_create: Out of memory allocating "
-                    "cmp_a11y_rotor\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_rotor_create: Out of memory allocating : %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -43,14 +59,24 @@ int cmp_a11y_rotor_create(cmp_a11y_tree_t *tree, cmp_a11y_rotor_t **out_rotor) {
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_rotor_destroy
+ *
+ * @param rotor Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_rotor_destroy(cmp_a11y_rotor_t *rotor) {
   int rc = CMP_SUCCESS;
   struct cmp_a11y_rotor *r = (struct cmp_a11y_rotor *)rotor;
 
   if (!r) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_rotor_destroy: Invalid argument (rotor=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_rotor_destroy: Invalid argument (rotor=NULL): %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -62,6 +88,14 @@ int cmp_a11y_rotor_destroy(cmp_a11y_rotor_t *rotor) {
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_rotor_register_node
+ *
+ * @param rotor Parameter description.
+ * @param node_id Parameter description.
+ * @param category Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_rotor_register_node(cmp_a11y_rotor_t *rotor, int node_id,
                                  cmp_a11y_rotor_category_t category) {
   int rc = CMP_SUCCESS;
@@ -81,8 +115,12 @@ int cmp_a11y_rotor_register_node(cmp_a11y_rotor_t *rotor, int node_id,
     rc = CMP_MALLOC(new_capacity * sizeof(cmp_a11y_rotor_node_t),
                     (void **)&new_nodes);
     if (rc != CMP_SUCCESS) {
-      fprintf(stderr, "Error in cmp_a11y_rotor_register_node: Out of memory "
-                      "allocating nodes\n");
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_a11y_rotor_register_node: Out of memory : %s\n",
+                  err_str);
+      }
       return rc;
     }
 
@@ -101,6 +139,16 @@ int cmp_a11y_rotor_register_node(cmp_a11y_rotor_t *rotor, int node_id,
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_rotor_get_nodes
+ *
+ * @param rotor Parameter description.
+ * @param category Parameter description.
+ * @param out_node_ids Parameter description.
+ * @param max_nodes Parameter description.
+ * @param out_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_rotor_get_nodes(cmp_a11y_rotor_t *rotor,
                              cmp_a11y_rotor_category_t category,
                              int *out_node_ids, int max_nodes, int *out_count) {
@@ -111,7 +159,11 @@ int cmp_a11y_rotor_get_nodes(cmp_a11y_rotor_t *rotor,
 
   if (!r || !out_node_ids || !out_count || max_nodes < 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_rotor_get_nodes: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_rotor_get_nodes: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 

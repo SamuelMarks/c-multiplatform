@@ -1,6 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
-
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -17,21 +17,35 @@ struct cmp_app_region {
   size_t capacity;
 };
 
+/**
+ * @brief Creates an app region manager.
+ *
+ * @param out_region Pointer to the newly created region manager.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_app_region_create(cmp_app_region_t **out_region) {
   int rc = CMP_SUCCESS;
   cmp_app_region_t *region = NULL;
 
   if (!out_region) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_app_region_create: Invalid argument (out_region=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_app_region_create: %s\n", err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_app_region_t), (void **)&region);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_app_region_create: Out of memory\n");
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_app_region_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -40,14 +54,22 @@ int cmp_app_region_create(cmp_app_region_t **out_region) {
   return rc;
 }
 
+/**
+ * @brief Destroys an app region manager.
+ *
+ * @param region Pointer to the region manager.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_app_region_destroy(cmp_app_region_t *region) {
   int rc = CMP_SUCCESS;
 
   if (!region) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_app_region_destroy: Invalid argument (region=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_app_region_destroy: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -58,6 +80,17 @@ int cmp_app_region_destroy(cmp_app_region_t *region) {
   return rc;
 }
 
+/**
+ * @brief Adds a hit-testable rectangle to the app region.
+ *
+ * @param region Pointer to the region manager.
+ * @param x The x coordinate.
+ * @param y The y coordinate.
+ * @param width The width.
+ * @param height The height.
+ * @param type The region type.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_app_region_add_rect(cmp_app_region_t *region, float x, float y,
                             float width, float height,
                             cmp_app_region_type_t type) {
@@ -67,9 +100,11 @@ int cmp_app_region_add_rect(cmp_app_region_t *region, float x, float y,
 
   if (!region) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_app_region_add_rect: Invalid argument (region=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_app_region_add_rect: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -78,7 +113,13 @@ int cmp_app_region_add_rect(cmp_app_region_t *region, float x, float y,
     rc = CMP_MALLOC(new_capacity * sizeof(cmp_app_region_rect_t),
                     (void **)&new_rects);
     if (rc != CMP_SUCCESS) {
-      fprintf(stderr, "Error in cmp_app_region_add_rect: Out of memory\n");
+      if (rc == CMP_SUCCESS)
+        rc = CMP_ERROR_OOM;
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_app_region_add_rect CMP_MALLOC: %s\n", err_str);
+      }
       return rc;
     }
 
@@ -101,19 +142,38 @@ int cmp_app_region_add_rect(cmp_app_region_t *region, float x, float y,
   return rc;
 }
 
+/**
+ * @brief Clears all rectangles from the app region manager.
+ *
+ * @param region Pointer to the region manager.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_app_region_clear(cmp_app_region_t *region) {
   int rc = CMP_SUCCESS;
 
   if (!region) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_app_region_clear: Invalid argument (region=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_app_region_clear: %s\n", err_str);
+    }
     return rc;
   }
   region->count = 0;
   return rc;
 }
 
+/**
+ * @brief Performs a hit test to determine the region type at specific
+ * coordinates.
+ *
+ * @param region Pointer to the region manager.
+ * @param x The x coordinate.
+ * @param y The y coordinate.
+ * @param out_type Pointer to store the resulting region type.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_app_region_hit_test(const cmp_app_region_t *region, float x, float y,
                             cmp_app_region_type_t *out_type) {
   int rc = CMP_SUCCESS;
@@ -122,7 +182,11 @@ int cmp_app_region_hit_test(const cmp_app_region_t *region, float x, float y,
 
   if (!region || !out_type) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_app_region_hit_test: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_app_region_hit_test: %s\n", err_str);
+    }
     return rc;
   }
 

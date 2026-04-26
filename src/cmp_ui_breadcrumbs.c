@@ -2,6 +2,7 @@
 #include "cmp_ui_breadcrumbs.h"
 #include <stdlib.h>
 #include <string.h>
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_ui_breadcrumbs {
@@ -9,8 +10,16 @@ struct cmp_ui_breadcrumbs {
   int segment_count;
 };
 
+/**
+ * @brief cmp_ui_breadcrumbs_create
+ *
+ * @param out_breadcrumbs Parameter description.
+ * @param bg_color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_breadcrumbs_create(cmp_ui_breadcrumbs_t **out_breadcrumbs,
                               uint32_t bg_color) {
+  int rc = CMP_SUCCESS;
   cmp_ui_breadcrumbs_t *breadcrumbs;
   int err;
 
@@ -18,8 +27,9 @@ int cmp_ui_breadcrumbs_create(cmp_ui_breadcrumbs_t **out_breadcrumbs,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  breadcrumbs = (cmp_ui_breadcrumbs_t *)malloc(sizeof(cmp_ui_breadcrumbs_t));
-  if (!breadcrumbs) {
+  rc = CMP_MALLOC(sizeof(cmp_ui_breadcrumbs_t), (void **)&(breadcrumbs));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
 
@@ -27,7 +37,10 @@ int cmp_ui_breadcrumbs_create(cmp_ui_breadcrumbs_t **out_breadcrumbs,
 
   err = cmp_ui_box_create(&breadcrumbs->node_root);
   if (err != 0) {
-    free(breadcrumbs);
+    rc = CMP_FREE(breadcrumbs);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
     return err;
   }
 
@@ -37,14 +50,31 @@ int cmp_ui_breadcrumbs_create(cmp_ui_breadcrumbs_t **out_breadcrumbs,
   return 0;
 }
 
+/**
+ * @brief cmp_ui_breadcrumbs_destroy
+ *
+ * @param breadcrumbs Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_breadcrumbs_destroy(cmp_ui_breadcrumbs_t *breadcrumbs) {
+  int rc = CMP_SUCCESS;
   if (!breadcrumbs) {
     return CMP_ERROR_INVALID_ARG;
   }
-  free(breadcrumbs);
+  rc = CMP_FREE(breadcrumbs);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return 0;
 }
 
+/**
+ * @brief cmp_ui_breadcrumbs_get_node
+ *
+ * @param breadcrumbs Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_breadcrumbs_get_node(cmp_ui_breadcrumbs_t *breadcrumbs,
                                 cmp_ui_node_t **out_node) {
   if (!breadcrumbs || !out_node) {
@@ -54,6 +84,13 @@ int cmp_ui_breadcrumbs_get_node(cmp_ui_breadcrumbs_t *breadcrumbs,
   return 0;
 }
 
+/**
+ * @brief cmp_ui_breadcrumbs_add_segment
+ *
+ * @param breadcrumbs Parameter description.
+ * @param segment Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_breadcrumbs_add_segment(cmp_ui_breadcrumbs_t *breadcrumbs,
                                    const char *segment) {
   cmp_ui_node_t *node_text;

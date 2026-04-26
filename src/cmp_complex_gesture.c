@@ -24,6 +24,12 @@ struct cmp_complex_gesture {
   float current_angle;
 };
 
+/**
+ * @brief cmp_complex_gesture_create
+ *
+ * @param out_gesture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_complex_gesture_create(cmp_complex_gesture_t **out_gesture) {
   int rc = CMP_SUCCESS;
   struct cmp_complex_gesture *ctx = NULL;
@@ -48,6 +54,12 @@ int cmp_complex_gesture_create(cmp_complex_gesture_t **out_gesture) {
   return rc;
 }
 
+/**
+ * @brief cmp_complex_gesture_destroy
+ *
+ * @param gesture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_complex_gesture_destroy(cmp_complex_gesture_t *gesture) {
   int rc = CMP_SUCCESS;
   struct cmp_complex_gesture *ctx = (struct cmp_complex_gesture *)gesture;
@@ -63,6 +75,13 @@ int cmp_complex_gesture_destroy(cmp_complex_gesture_t *gesture) {
   return rc;
 }
 
+/**
+ * @brief cmp_complex_gesture_process_event
+ *
+ * @param gesture Parameter description.
+ * @param event Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_complex_gesture_process_event(cmp_complex_gesture_t *gesture,
                                       const cmp_event_t *event) {
   int rc = CMP_SUCCESS;
@@ -124,6 +143,12 @@ int cmp_complex_gesture_process_event(cmp_complex_gesture_t *gesture,
   return rc;
 }
 
+/**
+ * @brief cmp_complex_gesture_get_state
+ *
+ * @param gesture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_complex_gesture_get_state(const cmp_complex_gesture_t *gesture) {
   const struct cmp_complex_gesture *ctx =
       (const struct cmp_complex_gesture *)gesture;
@@ -133,6 +158,16 @@ int cmp_complex_gesture_get_state(const cmp_complex_gesture_t *gesture) {
   return (int)ctx->state;
 }
 
+/**
+ * @brief cmp_complex_gesture_get_deltas
+ *
+ * @param gesture Parameter description.
+ * @param out_pan_x Parameter description.
+ * @param out_pan_y Parameter description.
+ * @param out_scale Parameter description.
+ * @param out_rotation Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_complex_gesture_get_deltas(const cmp_complex_gesture_t *gesture,
                                    float *out_pan_x, float *out_pan_y,
                                    float *out_scale, float *out_rotation) {

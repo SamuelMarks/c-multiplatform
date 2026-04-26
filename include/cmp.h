@@ -308,6 +308,19 @@ void cmp_dump_stack_trace(void);
  * @param file File name where the assertion occurred
  * @param line Line number where the assertion occurred
  */
+/**
+ * @brief Function pointer type for custom assertion handlers.
+ */
+typedef void (*cmp_assert_handler_t)(const char *msg, const char *file,
+                                     int line);
+
+/**
+ * @brief Sets a custom assertion handler.
+ * @param handler The custom handler to use.
+ * @return Returns 0 on success.
+ */
+CMP_API int cmp_set_assert_handler(cmp_assert_handler_t handler);
+
 void cmp_assert_fail(const char *condition, const char *file, int line);
 
 /**
@@ -12528,8 +12541,27 @@ CMP_API int cmp_state_layer_trigger_fluent_reveal(cmp_state_layer_t *layer,
 CMP_API int cmp_state_layer_apply_vibrancy_mask(cmp_state_layer_t *layer,
                                                 cmp_vibrancy_style_t style);
 
-const char *cmp_strerror(int error);
-char *cmp_strtok_r(char *str, const char *delim, char **saveptr);
+/**
+ * @brief Get the string representation of an error code.
+ * @param error The error code
+ * @param out_str Pointer to a const char* where the string representation of
+ * the error will be stored.
+ * @return Returns 0 on success, or non-zero on failure.
+ */
+CMP_API int cmp_strerror(int error, const char **out_str);
+/**
+ * @brief Thread-safe string tokenization, similar to POSIX strtok_r or MSVC
+ * strtok_s.
+ * @param str The string to tokenize on the first call, or NULL for subsequent
+ * calls.
+ * @param delim A set of bytes that delimit the tokens.
+ * @param saveptr A pointer to a char * variable that is used internally.
+ * @param out_tok Pointer to a char* where the token pointer will be stored.
+ * @return Returns 0 on success, or an error code on failure. Returns
+ * CMP_ERROR_NOT_FOUND when there are no more tokens.
+ */
+CMP_API int cmp_strtok_r(char *str, const char *delim, char **saveptr,
+                         char **out_tok);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

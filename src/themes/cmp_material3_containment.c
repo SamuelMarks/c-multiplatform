@@ -4,6 +4,13 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_m3_card_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_card_resolve(cmp_m3_card_variant_t variant,
                         cmp_m3_card_metrics_t *out_metrics) {
   if (!out_metrics) {
@@ -31,6 +38,13 @@ int cmp_m3_card_resolve(cmp_m3_card_variant_t variant,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_dialog_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_dialog_resolve(cmp_m3_dialog_variant_t variant,
                           cmp_m3_dialog_metrics_t *out_metrics) {
   if (!out_metrics) {
@@ -55,6 +69,13 @@ int cmp_m3_dialog_resolve(cmp_m3_dialog_variant_t variant,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_divider_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_divider_resolve(cmp_m3_divider_variant_t variant,
                            cmp_m3_divider_metrics_t *out_metrics) {
   if (!out_metrics) {
@@ -83,6 +104,13 @@ int cmp_m3_divider_resolve(cmp_m3_divider_variant_t variant,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_tooltip_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_tooltip_resolve(cmp_m3_tooltip_variant_t variant,
                            cmp_m3_tooltip_metrics_t *out_metrics) {
   if (!out_metrics) {

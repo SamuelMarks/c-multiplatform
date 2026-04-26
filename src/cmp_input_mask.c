@@ -9,6 +9,13 @@ struct cmp_input_mask {
   char pattern[64];
 };
 
+/**
+ * @brief cmp_input_mask_create
+ *
+ * @param mask_pattern Parameter description.
+ * @param out_mask Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_input_mask_create(const char *mask_pattern,
                           cmp_input_mask_t **out_mask) {
   int rc = CMP_SUCCESS;
@@ -43,6 +50,12 @@ int cmp_input_mask_create(const char *mask_pattern,
   return rc;
 }
 
+/**
+ * @brief cmp_input_mask_destroy
+ *
+ * @param mask Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_input_mask_destroy(cmp_input_mask_t *mask) {
   int rc = CMP_SUCCESS;
   struct cmp_input_mask *internal_mask = (struct cmp_input_mask *)mask;
@@ -57,6 +70,15 @@ int cmp_input_mask_destroy(cmp_input_mask_t *mask) {
   return rc;
 }
 
+/**
+ * @brief cmp_input_mask_apply
+ *
+ * @param mask Parameter description.
+ * @param raw_input Parameter description.
+ * @param out_buffer Parameter description.
+ * @param out_capacity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_input_mask_apply(cmp_input_mask_t *mask, const char *raw_input,
                          char *out_buffer, size_t out_capacity) {
   int rc = CMP_SUCCESS;

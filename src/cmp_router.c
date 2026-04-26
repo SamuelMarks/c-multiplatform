@@ -34,6 +34,12 @@ struct cmp_router {
 
 static int g_router_initialized = 0;
 
+/**
+ * @brief cmp_router_create
+ *
+ * @param out_router Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_create(cmp_router_t **out_router) {
   cmp_router_t *router;
 
@@ -56,6 +62,12 @@ int cmp_router_create(cmp_router_t **out_router) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_router_destroy
+ *
+ * @param router Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_destroy(cmp_router_t *router) {
   cmp_route_entry_t *curr, *next;
   size_t i;
@@ -85,6 +97,16 @@ int cmp_router_destroy(cmp_router_t *router) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_router_register
+ *
+ * @param router Parameter description.
+ * @param path Parameter description.
+ * @param builder Parameter description.
+ * @param guard Parameter description.
+ * @param guard_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_register(cmp_router_t *router, const char *path,
                         cmp_route_builder_cb builder, cmp_route_guard_cb guard,
                         void *guard_data) {
@@ -123,6 +145,13 @@ int cmp_router_register(cmp_router_t *router, const char *path,
 
 /* C89 safe implementation of string tokenization with saved state */
 
+/**
+ * @brief internal_execute_route
+ *
+ * @param router Parameter description.
+ * @param uri Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int internal_execute_route(cmp_router_t *router, const char *uri) {
   cmp_route_entry_t *curr = router->routes;
   char *uri_mutable;
@@ -147,7 +176,7 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
     int match = 1;
     char *path_mutable;
     char *saveptr_path = NULL;
-    char *u_tok, *p_tok;
+    char *u_tok = NULL, *p_tok = NULL;
     size_t path_len = strlen(curr->path);
 
     /* Quick exact match optimization */
@@ -173,8 +202,10 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
     strcpy(uri_mutable, uri);
 #endif
 
-    u_tok = cmp_strtok_r(uri_mutable, "/", &saveptr_uri);
-    p_tok = cmp_strtok_r(path_mutable, "/", &saveptr_path);
+    u_tok = NULL;
+    p_tok = NULL;
+    cmp_strtok_r(uri_mutable, "/", &saveptr_uri, &u_tok);
+    cmp_strtok_r(path_mutable, "/", &saveptr_path, &p_tok);
 
     while (u_tok != NULL || p_tok != NULL) {
       if (u_tok == NULL || p_tok == NULL) {
@@ -192,8 +223,10 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
         break;
       }
 
-      u_tok = cmp_strtok_r(NULL, "/", &saveptr_uri);
-      p_tok = cmp_strtok_r(NULL, "/", &saveptr_path);
+      u_tok = NULL;
+      p_tok = NULL;
+      cmp_strtok_r(NULL, "/", &saveptr_uri, &u_tok);
+      cmp_strtok_r(NULL, "/", &saveptr_path, &p_tok);
     }
 
     CMP_FREE(path_mutable);
@@ -221,6 +254,13 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
   return CMP_ERROR_NOT_FOUND;
 }
 
+/**
+ * @brief cmp_router_push
+ *
+ * @param router Parameter description.
+ * @param uri Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_push(cmp_router_t *router, const char *uri) {
   size_t len;
   char *uri_copy;
@@ -267,6 +307,13 @@ int cmp_router_push(cmp_router_t *router, const char *uri) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_router_replace
+ *
+ * @param router Parameter description.
+ * @param uri Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_replace(cmp_router_t *router, const char *uri) {
   size_t len;
   char *uri_copy;
@@ -300,6 +347,12 @@ int cmp_router_replace(cmp_router_t *router, const char *uri) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_router_pop
+ *
+ * @param router Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_pop(cmp_router_t *router) {
   if (router == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -318,6 +371,13 @@ int cmp_router_pop(cmp_router_t *router) {
   return internal_execute_route(router, router->stack[router->stack_count - 1]);
 }
 
+/**
+ * @brief cmp_router_get_current
+ *
+ * @param router Parameter description.
+ * @param out_uri Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_get_current(cmp_router_t *router, cmp_string_t *out_uri) {
   if (router == NULL || out_uri == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -331,6 +391,13 @@ int cmp_router_get_current(cmp_router_t *router, cmp_string_t *out_uri) {
   return cmp_string_append(out_uri, router->stack[router->stack_count - 1]);
 }
 
+/**
+ * @brief cmp_router_set_transitions
+ *
+ * @param router Parameter description.
+ * @param enable Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_set_transitions(cmp_router_t *router, int enable) {
   if (router == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -340,6 +407,12 @@ int cmp_router_set_transitions(cmp_router_t *router, int enable) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_router_wasm_bind_history
+ *
+ * @param router Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_wasm_bind_history(cmp_router_t *router) {
   if (router == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -353,6 +426,12 @@ int cmp_router_wasm_bind_history(cmp_router_t *router) {
 #endif
 }
 
+/**
+ * @brief cmp_os_register_uri_scheme
+ *
+ * @param scheme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_register_uri_scheme(const char *scheme) {
   if (scheme == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -406,6 +485,14 @@ int cmp_os_register_uri_scheme(const char *scheme) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_router_push_with_style
+ *
+ * @param router Parameter description.
+ * @param uri Parameter description.
+ * @param style Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_push_with_style(cmp_router_t *router, const char *uri,
                                cmp_presentation_style_t style) {
   if (!router || !uri)
@@ -416,12 +503,26 @@ int cmp_router_push_with_style(cmp_router_t *router, const char *uri,
   return cmp_router_push(router, uri); /* Uses base logic for now */
 }
 
+/**
+ * @brief cmp_router_pop_with_style
+ *
+ * @param router Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_pop_with_style(cmp_router_t *router) {
   if (!router)
     return CMP_ERROR_INVALID_ARG;
   return cmp_router_pop(router);
 }
 
+/**
+ * @brief cmp_router_get_previous_title
+ *
+ * @param router Parameter description.
+ * @param out_title Parameter description.
+ * @param title_cap Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_get_previous_title(cmp_router_t *router, char *out_title,
                                   size_t title_cap) {
   struct cmp_router *r = (struct cmp_router *)router;
@@ -444,6 +545,13 @@ int cmp_router_get_previous_title(cmp_router_t *router, char *out_title,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_router_switch_tab
+ *
+ * @param router Parameter description.
+ * @param tab_uri Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_router_switch_tab(cmp_router_t *router, const char *tab_uri) {
   struct cmp_router *r = (struct cmp_router *)router;
   size_t i;
@@ -466,6 +574,12 @@ struct cmp_split_view {
   char *detail_route;
 };
 
+/**
+ * @brief cmp_split_view_create
+ *
+ * @param out_split_view Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_split_view_create(cmp_split_view_t **out_split_view) {
   struct cmp_split_view *ctx;
   if (!out_split_view)
@@ -480,6 +594,12 @@ int cmp_split_view_create(cmp_split_view_t **out_split_view) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_split_view_destroy
+ *
+ * @param split_view Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_split_view_destroy(cmp_split_view_t *split_view) {
   struct cmp_split_view *ctx = (struct cmp_split_view *)split_view;
   if (!ctx)
@@ -493,6 +613,14 @@ int cmp_split_view_destroy(cmp_split_view_t *split_view) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_split_view_set_routes
+ *
+ * @param split_view Parameter description.
+ * @param master_uri Parameter description.
+ * @param detail_uri Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_split_view_set_routes(cmp_split_view_t *split_view,
                               const char *master_uri, const char *detail_uri) {
   struct cmp_split_view *ctx = (struct cmp_split_view *)split_view;

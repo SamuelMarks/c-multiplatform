@@ -11,6 +11,12 @@ struct cmp_native_dialog {
   int is_showing;
 };
 
+/**
+ * @brief cmp_native_dialog_create
+ *
+ * @param out_dialog Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_native_dialog_create(cmp_native_dialog_t **out_dialog) {
   int rc = CMP_SUCCESS;
   cmp_native_dialog_t *dialog = NULL;
@@ -32,6 +38,12 @@ int cmp_native_dialog_create(cmp_native_dialog_t **out_dialog) {
   return rc;
 }
 
+/**
+ * @brief cmp_native_dialog_destroy
+ *
+ * @param dialog Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_native_dialog_destroy(cmp_native_dialog_t *dialog) {
   int rc = CMP_SUCCESS;
 
@@ -47,6 +59,13 @@ int cmp_native_dialog_destroy(cmp_native_dialog_t *dialog) {
   return rc;
 }
 
+/**
+ * @brief cmp_native_dialog_show
+ *
+ * @param dialog Parameter description.
+ * @param type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_native_dialog_show(cmp_native_dialog_t *dialog,
                            cmp_dialog_type_t type) {
   int rc = CMP_SUCCESS;
@@ -64,6 +83,13 @@ int cmp_native_dialog_show(cmp_native_dialog_t *dialog,
   return rc;
 }
 
+/**
+ * @brief cmp_native_dialog_get_result_string
+ *
+ * @param dialog Parameter description.
+ * @param out_result Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_native_dialog_get_result_string(const cmp_native_dialog_t *dialog,
                                         char **out_result) {
   int rc = CMP_SUCCESS;
@@ -96,6 +122,13 @@ int cmp_native_dialog_get_result_string(const cmp_native_dialog_t *dialog,
   return rc;
 }
 
+/**
+ * @brief cmp_native_dialog_set_result_string
+ *
+ * @param dialog Parameter description.
+ * @param result Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_native_dialog_set_result_string(cmp_native_dialog_t *dialog,
                                         const char *result) {
   int rc = CMP_SUCCESS;

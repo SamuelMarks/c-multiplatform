@@ -3,6 +3,15 @@
 #include <stdlib.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_scroll_padding_apply
+ *
+ * @param element_bounds Parameter description.
+ * @param padding Parameter description.
+ * @param margin Parameter description.
+ * @param out_target_scroll_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_padding_apply(const cmp_rect_t *element_bounds,
                              const cmp_scroll_padding_t *padding,
                              const cmp_scroll_padding_t *margin,

@@ -8,6 +8,12 @@ struct cmp_color_picker {
   float r, g, b, a;
 };
 
+/**
+ * @brief cmp_color_picker_create
+ *
+ * @param out_picker Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_picker_create(cmp_color_picker_t **out_picker) {
   struct cmp_color_picker *picker;
 
@@ -25,6 +31,12 @@ int cmp_color_picker_create(cmp_color_picker_t **out_picker) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_color_picker_destroy
+ *
+ * @param picker Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_picker_destroy(cmp_color_picker_t *picker) {
   struct cmp_color_picker *internal_picker = (struct cmp_color_picker *)picker;
   if (!internal_picker)

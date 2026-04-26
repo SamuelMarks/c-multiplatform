@@ -9,6 +9,12 @@ struct cmp_discrete_transition {
   int is_active;
 };
 
+/**
+ * @brief cmp_discrete_transition_create
+ *
+ * @param out_transition Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_discrete_transition_create(cmp_discrete_transition_t **out_transition) {
   int rc = CMP_SUCCESS;
   struct cmp_discrete_transition *transition = NULL;
@@ -31,6 +37,12 @@ int cmp_discrete_transition_create(cmp_discrete_transition_t **out_transition) {
   return rc;
 }
 
+/**
+ * @brief cmp_discrete_transition_destroy
+ *
+ * @param transition Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_discrete_transition_destroy(cmp_discrete_transition_t *transition) {
   int rc = CMP_SUCCESS;
   struct cmp_discrete_transition *internal_transition =
@@ -46,6 +58,14 @@ int cmp_discrete_transition_destroy(cmp_discrete_transition_t *transition) {
   return rc;
 }
 
+/**
+ * @brief cmp_discrete_transition_evaluate
+ *
+ * @param transition Parameter description.
+ * @param progress Parameter description.
+ * @param out_is_visible Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_discrete_transition_evaluate(cmp_discrete_transition_t *transition,
                                      float progress, int *out_is_visible) {
   int rc = CMP_SUCCESS;

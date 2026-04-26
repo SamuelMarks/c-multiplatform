@@ -9,6 +9,12 @@ struct cmp_ios_background_refresh {
   int current_task_id;
 };
 
+/**
+ * @brief cmp_ios_background_refresh_create
+ *
+ * @param out_refresh Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ios_background_refresh_create(
     cmp_ios_background_refresh_t **out_refresh) {
   int rc = CMP_SUCCESS;
@@ -33,6 +39,12 @@ int cmp_ios_background_refresh_create(
   return rc;
 }
 
+/**
+ * @brief cmp_ios_background_refresh_destroy
+ *
+ * @param refresh Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ios_background_refresh_destroy(cmp_ios_background_refresh_t *refresh) {
   int rc = CMP_SUCCESS;
 
@@ -46,6 +58,13 @@ int cmp_ios_background_refresh_destroy(cmp_ios_background_refresh_t *refresh) {
   return rc;
 }
 
+/**
+ * @brief cmp_ios_background_refresh_begin_task
+ *
+ * @param refresh Parameter description.
+ * @param out_task_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ios_background_refresh_begin_task(cmp_ios_background_refresh_t *refresh,
                                           int *out_task_id) {
   int rc = CMP_SUCCESS;
@@ -66,6 +85,13 @@ int cmp_ios_background_refresh_begin_task(cmp_ios_background_refresh_t *refresh,
   return rc;
 }
 
+/**
+ * @brief cmp_ios_background_refresh_end_task
+ *
+ * @param refresh Parameter description.
+ * @param task_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ios_background_refresh_end_task(cmp_ios_background_refresh_t *refresh,
                                         int task_id) {
   int rc = CMP_SUCCESS;

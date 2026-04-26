@@ -11,6 +11,14 @@ struct cmp_lottie {
   float total_duration_ms;
 };
 
+/**
+ * @brief cmp_lottie_create
+ *
+ * @param json_buffer Parameter description.
+ * @param size Parameter description.
+ * @param out_lottie Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_lottie_create(const char *json_buffer, size_t size,
                       cmp_lottie_t **out_lottie) {
   int rc = CMP_SUCCESS;
@@ -36,6 +44,12 @@ int cmp_lottie_create(const char *json_buffer, size_t size,
   return rc;
 }
 
+/**
+ * @brief cmp_lottie_destroy
+ *
+ * @param lottie Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_lottie_destroy(cmp_lottie_t *lottie) {
   int rc = CMP_SUCCESS;
   struct cmp_lottie *ctx = (struct cmp_lottie *)lottie;
@@ -50,6 +64,13 @@ int cmp_lottie_destroy(cmp_lottie_t *lottie) {
   return rc;
 }
 
+/**
+ * @brief cmp_lottie_step
+ *
+ * @param lottie Parameter description.
+ * @param dt_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_lottie_step(cmp_lottie_t *lottie, float dt_ms) {
   int rc = CMP_SUCCESS;
   struct cmp_lottie *ctx = (struct cmp_lottie *)lottie;

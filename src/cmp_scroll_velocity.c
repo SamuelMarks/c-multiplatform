@@ -16,6 +16,12 @@ struct cmp_scroll_velocity {
   float last_y;
 };
 
+/**
+ * @brief cmp_scroll_velocity_create
+ *
+ * @param out_tracker Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_velocity_create(cmp_scroll_velocity_t **out_tracker) {
   struct cmp_scroll_velocity *tracker;
 
@@ -34,6 +40,12 @@ int cmp_scroll_velocity_create(cmp_scroll_velocity_t **out_tracker) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_velocity_destroy
+ *
+ * @param tracker Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_velocity_destroy(cmp_scroll_velocity_t *tracker) {
   struct cmp_scroll_velocity *ctx = (struct cmp_scroll_velocity *)tracker;
 
@@ -44,6 +56,14 @@ int cmp_scroll_velocity_destroy(cmp_scroll_velocity_t *tracker) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_velocity_push
+ *
+ * @param tracker Parameter description.
+ * @param event Parameter description.
+ * @param dt_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_velocity_push(cmp_scroll_velocity_t *tracker,
                              const cmp_event_t *event, float dt_ms) {
   struct cmp_scroll_velocity *ctx = (struct cmp_scroll_velocity *)tracker;
@@ -91,6 +111,14 @@ int cmp_scroll_velocity_push(cmp_scroll_velocity_t *tracker,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_velocity_get
+ *
+ * @param tracker Parameter description.
+ * @param out_vx Parameter description.
+ * @param out_vy Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_velocity_get(const cmp_scroll_velocity_t *tracker, float *out_vx,
                             float *out_vy) {
   const struct cmp_scroll_velocity *ctx =

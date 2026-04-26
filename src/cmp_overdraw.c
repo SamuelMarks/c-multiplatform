@@ -9,6 +9,12 @@ struct cmp_overdraw {
   int is_active;
 };
 
+/**
+ * @brief cmp_overdraw_create
+ *
+ * @param out_overdraw Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_overdraw_create(cmp_overdraw_t **out_overdraw) {
   int rc = CMP_SUCCESS;
   struct cmp_overdraw *ctx = NULL;
@@ -32,6 +38,12 @@ int cmp_overdraw_create(cmp_overdraw_t **out_overdraw) {
   return rc;
 }
 
+/**
+ * @brief cmp_overdraw_destroy
+ *
+ * @param overdraw Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_overdraw_destroy(cmp_overdraw_t *overdraw) {
   int rc = CMP_SUCCESS;
   struct cmp_overdraw *ctx = (struct cmp_overdraw *)overdraw;
@@ -46,6 +58,14 @@ int cmp_overdraw_destroy(cmp_overdraw_t *overdraw) {
   return rc;
 }
 
+/**
+ * @brief cmp_overdraw_set_enabled
+ *
+ * @param overdraw Parameter description.
+ * @param renderer Parameter description.
+ * @param enable Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_overdraw_set_enabled(cmp_overdraw_t *overdraw, cmp_renderer_t *renderer,
                              int enable) {
   int rc = CMP_SUCCESS;

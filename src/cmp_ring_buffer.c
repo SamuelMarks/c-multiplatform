@@ -8,6 +8,13 @@ long _InterlockedCompareExchange(long volatile *Destination, long Exchange, long
 #endif
 /* clang-format on */
 
+/**
+ * @brief cmp_ring_buffer_init
+ *
+ * @param rb Parameter description.
+ * @param capacity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ring_buffer_init(cmp_ring_buffer_t *rb, size_t capacity) {
   if (rb == NULL || capacity == 0) {
     return CMP_ERROR_INVALID_ARG;
@@ -26,6 +33,13 @@ int cmp_ring_buffer_init(cmp_ring_buffer_t *rb, size_t capacity) {
 }
 
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+/**
+ * @brief cmp_ring_buffer_push
+ *
+ * @param rb Parameter description.
+ * @param item Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
   size_t current_tail = rb->tail;
   size_t current_head = rb->head;
@@ -38,6 +52,13 @@ int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
   return CMP_SUCCESS;
 }
 #else
+/**
+ * @brief cmp_ring_buffer_push
+ *
+ * @param rb Parameter description.
+ * @param item Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
   size_t current_tail;
   size_t next_tail;
@@ -83,6 +104,13 @@ int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
 #endif
 
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+/**
+ * @brief cmp_ring_buffer_pop
+ *
+ * @param rb Parameter description.
+ * @param out_item Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
   size_t current_tail = rb->tail;
   size_t current_head = rb->head;
@@ -94,6 +122,13 @@ int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
   return CMP_SUCCESS;
 }
 #else
+/**
+ * @brief cmp_ring_buffer_pop
+ *
+ * @param rb Parameter description.
+ * @param out_item Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
   size_t current_head;
   size_t next_head;
@@ -142,6 +177,12 @@ int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
 }
 #endif
 
+/**
+ * @brief cmp_ring_buffer_destroy
+ *
+ * @param rb Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ring_buffer_destroy(cmp_ring_buffer_t *rb) {
   if (rb == NULL) {
     return CMP_ERROR_INVALID_ARG;

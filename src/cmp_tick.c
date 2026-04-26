@@ -8,6 +8,12 @@ struct cmp_tick {
   double last_timestamp_ms;
 };
 
+/**
+ * @brief cmp_tick_create
+ *
+ * @param out_tick Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tick_create(cmp_tick_t **out_tick) {
   struct cmp_tick *tick;
 
@@ -23,6 +29,12 @@ int cmp_tick_create(cmp_tick_t **out_tick) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tick_destroy
+ *
+ * @param tick Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tick_destroy(cmp_tick_t *tick) {
   struct cmp_tick *internal_tick = (struct cmp_tick *)tick;
 
@@ -33,6 +45,14 @@ int cmp_tick_destroy(cmp_tick_t *tick) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tick_fire
+ *
+ * @param tick Parameter description.
+ * @param os_timestamp_ms Parameter description.
+ * @param out_dt_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tick_fire(cmp_tick_t *tick, double os_timestamp_ms, double *out_dt_ms) {
   struct cmp_tick *internal_tick = (struct cmp_tick *)tick;
 

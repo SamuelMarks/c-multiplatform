@@ -9,6 +9,11 @@
 
 static int g_theme_is_dark = 0;
 
+/**
+ * @brief cmp_system_theme_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_theme_init(void) {
   int is_dark = 0;
   cmp_system_theme_is_dark(&is_dark);
@@ -17,10 +22,21 @@ int cmp_system_theme_init(void) {
   return 0;
 }
 
+/**
+ * @brief cmp_system_theme_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_theme_shutdown(void) {
   return 0;
 }
 
+/**
+ * @brief cmp_system_theme_is_dark
+ *
+ * @param out_is_dark Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_theme_is_dark(int *out_is_dark) {
   HKEY hKey;
   LONG res;
@@ -43,6 +59,12 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
   return 0;
 }
 
+/**
+ * @brief cmp_system_theme_is_high_contrast
+ *
+ * @param out_is_high_contrast Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
   HIGHCONTRASTA hc = { sizeof(HIGHCONTRASTA) };
   if (!out_is_high_contrast) return -1;

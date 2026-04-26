@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -17,19 +18,34 @@ struct cmp_aria_live {
   size_t capacity;
 };
 
+/**
+ * @brief cmp_aria_live_create
+ *
+ * @param tree Parameter description.
+ * @param out_live Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_aria_live_create(cmp_a11y_tree_t *tree, cmp_aria_live_t **out_live) {
   int rc = CMP_SUCCESS;
   struct cmp_aria_live *live = NULL;
 
   if (!tree || !out_live) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_aria_live_create: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_aria_live_create: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_aria_live), (void **)&live);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_aria_live_create: Out of memory\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_aria_live_create: Out of memory: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -42,14 +58,24 @@ int cmp_aria_live_create(cmp_a11y_tree_t *tree, cmp_aria_live_t **out_live) {
   return rc;
 }
 
+/**
+ * @brief cmp_aria_live_destroy
+ *
+ * @param live Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_aria_live_destroy(cmp_aria_live_t *live) {
   int rc = CMP_SUCCESS;
   struct cmp_aria_live *l = (struct cmp_aria_live *)live;
 
   if (!l) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_aria_live_destroy: Invalid argument (live=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_aria_live_destroy: Invalid argument (live=NULL): %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -61,6 +87,14 @@ int cmp_aria_live_destroy(cmp_aria_live_t *live) {
   return rc;
 }
 
+/**
+ * @brief cmp_aria_live_set_mode
+ *
+ * @param live Parameter description.
+ * @param node_id Parameter description.
+ * @param mode Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_aria_live_set_mode(cmp_aria_live_t *live, int node_id,
                            cmp_aria_live_mode_t mode) {
   int rc = CMP_SUCCESS;
@@ -71,8 +105,12 @@ int cmp_aria_live_set_mode(cmp_aria_live_t *live, int node_id,
 
   if (!l) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_aria_live_set_mode: Invalid argument (live=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_aria_live_set_mode: Invalid argument (live=NULL): %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -90,7 +128,11 @@ int cmp_aria_live_set_mode(cmp_aria_live_t *live, int node_id,
     rc = CMP_MALLOC(new_capacity * sizeof(cmp_aria_live_node_t),
                     (void **)&new_nodes);
     if (rc != CMP_SUCCESS) {
-      fprintf(stderr, "Error in cmp_aria_live_set_mode: Out of memory\n");
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_aria_live_set_mode: Out of memory: %s\n", err_str);
+      }
       return rc;
     }
 
@@ -109,6 +151,14 @@ int cmp_aria_live_set_mode(cmp_aria_live_t *live, int node_id,
   return rc;
 }
 
+/**
+ * @brief cmp_aria_live_announce
+ *
+ * @param live Parameter description.
+ * @param node_id Parameter description.
+ * @param message Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_aria_live_announce(cmp_aria_live_t *live, int node_id,
                            const char *message) {
   int rc = CMP_SUCCESS;
@@ -118,7 +168,11 @@ int cmp_aria_live_announce(cmp_aria_live_t *live, int node_id,
 
   if (!l || !message) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_aria_live_announce: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_aria_live_announce: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 

@@ -11,6 +11,12 @@ struct cmp_docking_framework {
   size_t capacity;
 };
 
+/**
+ * @brief cmp_docking_framework_create
+ *
+ * @param out_docking Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_docking_framework_create(cmp_docking_framework_t **out_docking) {
   int rc = CMP_SUCCESS;
   cmp_docking_framework_t *dock = NULL;
@@ -21,20 +27,19 @@ int cmp_docking_framework_create(cmp_docking_framework_t **out_docking) {
     return rc;
   }
 
-  dock = (cmp_docking_framework_t *)malloc(sizeof(cmp_docking_framework_t));
-  if (!dock) {
-    rc = CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_docking_framework_t), (void **)&dock);
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_docking_framework_create: Out of memory\n");
     return rc;
   }
 
   dock->capacity = 16;
   dock->count = 0;
-  dock->panels =
-      (cmp_tool_panel_t **)malloc(dock->capacity * sizeof(cmp_tool_panel_t *));
-  if (!dock->panels) {
-    free(dock);
-    rc = CMP_ERROR_OOM;
+
+  rc = CMP_MALLOC(dock->capacity * sizeof(cmp_tool_panel_t *),
+                  (void **)&dock->panels);
+  if (rc != CMP_SUCCESS) {
+    CMP_FREE(dock);
     LOG_DEBUG("Error in cmp_docking_framework_create: Out of memory allocating "
               "panels\n");
     return rc;
@@ -44,6 +49,12 @@ int cmp_docking_framework_create(cmp_docking_framework_t **out_docking) {
   return rc;
 }
 
+/**
+ * @brief cmp_docking_framework_destroy
+ *
+ * @param docking Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_docking_framework_destroy(cmp_docking_framework_t *docking) {
   int rc = CMP_SUCCESS;
   size_t i;
@@ -55,14 +66,23 @@ int cmp_docking_framework_destroy(cmp_docking_framework_t *docking) {
   }
 
   for (i = 0; i < docking->count; i++) {
-    free(docking->panels[i]);
+    CMP_FREE(docking->panels[i]);
   }
-  free(docking->panels);
-  free(docking);
+  CMP_FREE(docking->panels);
+  CMP_FREE(docking);
 
   return rc;
 }
 
+/**
+ * @brief cmp_docking_framework_register_panel
+ *
+ * @param docking Parameter description.
+ * @param id Parameter description.
+ * @param title Parameter description.
+ * @param default_pane Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_docking_framework_register_panel(cmp_docking_framework_t *docking,
                                          const char *id, const char *title,
                                          cmp_pane_type_t default_pane) {
@@ -86,31 +106,43 @@ int cmp_docking_framework_register_panel(cmp_docking_framework_t *docking,
   }
 
   if (docking->count == docking->capacity) {
-    docking->capacity *= 2;
-    new_array = (cmp_tool_panel_t **)realloc(
-        docking->panels, docking->capacity * sizeof(cmp_tool_panel_t *));
-    if (!new_array) {
-      rc = CMP_ERROR_OOM;
+    size_t new_cap = docking->capacity * 2;
+    rc = CMP_MALLOC(new_cap * sizeof(cmp_tool_panel_t *), (void **)&new_array);
+    if (rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_docking_framework_register_panel: Out of memory "
                 "reallocating array\n");
       return rc;
     }
+    memcpy(new_array, docking->panels,
+           docking->count * sizeof(cmp_tool_panel_t *));
+    CMP_FREE(docking->panels);
     docking->panels = new_array;
+    docking->capacity = new_cap;
   }
 
-  panel = (cmp_tool_panel_t *)malloc(sizeof(cmp_tool_panel_t));
-  if (!panel) {
-    rc = CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_tool_panel_t), (void **)&panel);
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_docking_framework_register_panel: Out of memory "
               "allocating panel\n");
     return rc;
   }
 
+#if defined(_MSC_VER)
+  if (strncpy_s(panel->id, sizeof(panel->id), id, _TRUNCATE) != 0) {
+    CMP_FREE(panel);
+    return CMP_ERROR_GENERAL;
+  }
+  if (strncpy_s(panel->title, sizeof(panel->title), title, _TRUNCATE) != 0) {
+    CMP_FREE(panel);
+    return CMP_ERROR_GENERAL;
+  }
+#else
   strncpy(panel->id, id, sizeof(panel->id) - 1);
   panel->id[sizeof(panel->id) - 1] = '\0';
 
   strncpy(panel->title, title, sizeof(panel->title) - 1);
   panel->title[sizeof(panel->title) - 1] = '\0';
+#endif
 
   panel->state = CMP_PANEL_STATE_DOCKED;
   panel->floating_x = 0.0f;
@@ -123,6 +155,13 @@ int cmp_docking_framework_register_panel(cmp_docking_framework_t *docking,
   return rc;
 }
 
+/**
+ * @brief find_panel
+ *
+ * @param docking Parameter description.
+ * @param id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static cmp_tool_panel_t *find_panel(const cmp_docking_framework_t *docking,
                                     const char *id) {
   size_t i;
@@ -134,6 +173,15 @@ static cmp_tool_panel_t *find_panel(const cmp_docking_framework_t *docking,
   return NULL;
 }
 
+/**
+ * @brief cmp_docking_framework_float_panel
+ *
+ * @param docking Parameter description.
+ * @param id Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_docking_framework_float_panel(cmp_docking_framework_t *docking,
                                       const char *id, float x, float y) {
   int rc = CMP_SUCCESS;
@@ -159,6 +207,14 @@ int cmp_docking_framework_float_panel(cmp_docking_framework_t *docking,
   return rc;
 }
 
+/**
+ * @brief cmp_docking_framework_dock_panel
+ *
+ * @param docking Parameter description.
+ * @param id Parameter description.
+ * @param pane Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_docking_framework_dock_panel(cmp_docking_framework_t *docking,
                                      const char *id, cmp_pane_type_t pane) {
   int rc = CMP_SUCCESS;
@@ -183,6 +239,14 @@ int cmp_docking_framework_dock_panel(cmp_docking_framework_t *docking,
   return rc;
 }
 
+/**
+ * @brief cmp_docking_framework_get_panel
+ *
+ * @param docking Parameter description.
+ * @param id Parameter description.
+ * @param out_panel Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_docking_framework_get_panel(const cmp_docking_framework_t *docking,
                                     const char *id,
                                     cmp_tool_panel_t **out_panel) {

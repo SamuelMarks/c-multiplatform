@@ -4,6 +4,14 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_material3_measure_button
+ *
+ * @param node Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_measure_button(const cmp_ui_node_t *node, float *width,
                                      float *height) {
   float calc_width = 64.0f;  /* Min width for M3 button */
@@ -32,6 +40,14 @@ int32_t cmp_material3_measure_button(const cmp_ui_node_t *node, float *width,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_measure_text_input
+ *
+ * @param node Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_measure_text_input(const cmp_ui_node_t *node,
                                          float *width, float *height) {
   if (node == NULL)
@@ -43,6 +59,14 @@ int32_t cmp_material3_measure_text_input(const cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_measure_slider
+ *
+ * @param node Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_measure_slider(const cmp_ui_node_t *node, float *width,
                                      float *height) {
   if (node == NULL)
@@ -54,6 +78,14 @@ int32_t cmp_material3_measure_slider(const cmp_ui_node_t *node, float *width,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_measure_toggle
+ *
+ * @param node Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_measure_toggle(const cmp_ui_node_t *node, float *width,
                                      float *height) {
   if (node == NULL)
@@ -65,6 +97,14 @@ int32_t cmp_material3_measure_toggle(const cmp_ui_node_t *node, float *width,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_measure_checkbox
+ *
+ * @param node Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_measure_checkbox(const cmp_ui_node_t *node, float *width,
                                        float *height) {
   if (node == NULL)
@@ -76,6 +116,14 @@ int32_t cmp_material3_measure_checkbox(const cmp_ui_node_t *node, float *width,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_measure_radio
+ *
+ * @param node Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_measure_radio(const cmp_ui_node_t *node, float *width,
                                     float *height) {
   if (node == NULL)
@@ -87,6 +135,14 @@ int32_t cmp_material3_measure_radio(const cmp_ui_node_t *node, float *width,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_measure_progress
+ *
+ * @param node Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_measure_progress(const cmp_ui_node_t *node, float *width,
                                        float *height) {
   if (node == NULL)
@@ -98,6 +154,14 @@ int32_t cmp_material3_measure_progress(const cmp_ui_node_t *node, float *width,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_measure_dropdown
+ *
+ * @param node Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_measure_dropdown(const cmp_ui_node_t *node, float *width,
                                        float *height) {
   if (node == NULL)
@@ -109,6 +173,12 @@ int32_t cmp_material3_measure_dropdown(const cmp_ui_node_t *node, float *width,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_layout_nav_bar
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_layout_nav_bar(cmp_ui_node_t *node) {
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -119,6 +189,12 @@ int32_t cmp_material3_layout_nav_bar(cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_layout_tab_bar
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_layout_tab_bar(cmp_ui_node_t *node) {
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -129,6 +205,12 @@ int32_t cmp_material3_layout_tab_bar(cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_layout_dialog_content
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_layout_dialog_content(cmp_ui_node_t *node) {
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -140,6 +222,12 @@ int32_t cmp_material3_layout_dialog_content(cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_layout_sidebar
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_layout_sidebar(cmp_ui_node_t *node) {
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -151,6 +239,12 @@ int32_t cmp_material3_layout_sidebar(cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_draw_button
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_draw_button(const cmp_ui_node_t *node) {
   cmp_rect_t bounds;
   cmp_color_t color;
@@ -172,6 +266,12 @@ int32_t cmp_material3_draw_button(const cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_draw_card
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_draw_card(const cmp_ui_node_t *node) {
   cmp_rect_t bounds;
   cmp_color_t color;
@@ -193,6 +293,12 @@ int32_t cmp_material3_draw_card(const cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_draw_text_input
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_draw_text_input(const cmp_ui_node_t *node) {
   cmp_rect_t bounds;
   cmp_color_t color;
@@ -214,6 +320,12 @@ int32_t cmp_material3_draw_text_input(const cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_draw_slider
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_draw_slider(const cmp_ui_node_t *node) {
   cmp_rect_t bounds;
   cmp_color_t color;
@@ -235,6 +347,12 @@ int32_t cmp_material3_draw_slider(const cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_draw_toggle
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_draw_toggle(const cmp_ui_node_t *node) {
   cmp_rect_t bounds;
   cmp_color_t color;
@@ -256,6 +374,12 @@ int32_t cmp_material3_draw_toggle(const cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_draw_checkbox
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_draw_checkbox(const cmp_ui_node_t *node) {
   cmp_rect_t bounds;
   cmp_color_t color;
@@ -277,6 +401,12 @@ int32_t cmp_material3_draw_checkbox(const cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_draw_radio
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_draw_radio(const cmp_ui_node_t *node) {
   cmp_rect_t bounds;
   cmp_color_t color;
@@ -298,6 +428,12 @@ int32_t cmp_material3_draw_radio(const cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_draw_progress
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_draw_progress(const cmp_ui_node_t *node) {
   cmp_rect_t bounds;
   cmp_color_t color;
@@ -319,6 +455,12 @@ int32_t cmp_material3_draw_progress(const cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_draw_tooltip
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_draw_tooltip(const cmp_ui_node_t *node) {
   cmp_rect_t bounds;
   cmp_color_t color;
@@ -340,6 +482,12 @@ int32_t cmp_material3_draw_tooltip(const cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_draw_menu
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_draw_menu(const cmp_ui_node_t *node) {
   cmp_rect_t bounds;
   cmp_color_t color;
@@ -361,6 +509,12 @@ int32_t cmp_material3_draw_menu(const cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_draw_focus_ring
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_draw_focus_ring(const cmp_ui_node_t *node) {
   cmp_rect_t bounds;
   cmp_color_t color;
@@ -382,6 +536,15 @@ int32_t cmp_material3_draw_focus_ring(const cmp_ui_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_get_spring_config
+ *
+ * @param node Parameter description.
+ * @param mass Parameter description.
+ * @param stiffness Parameter description.
+ * @param damping Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_get_spring_config(const cmp_ui_node_t *node, float *mass,
                                         float *stiffness, float *damping) {
   if (node == NULL)
@@ -396,6 +559,14 @@ int32_t cmp_material3_get_spring_config(const cmp_ui_node_t *node, float *mass,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_get_ripple_config
+ *
+ * @param node Parameter description.
+ * @param duration Parameter description.
+ * @param opacity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_get_ripple_config(const cmp_ui_node_t *node,
                                         float *duration, float *opacity) {
   if (node == NULL)
@@ -407,6 +578,14 @@ int32_t cmp_material3_get_ripple_config(const cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_get_state_layer_opacity
+ *
+ * @param node Parameter description.
+ * @param state Parameter description.
+ * @param opacity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_get_state_layer_opacity(const cmp_ui_node_t *node,
                                               int32_t state, float *opacity) {
   if (node == NULL)
@@ -432,6 +611,13 @@ int32_t cmp_material3_get_state_layer_opacity(const cmp_ui_node_t *node,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_material3_get_transition_duration
+ *
+ * @param node Parameter description.
+ * @param duration Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int32_t cmp_material3_get_transition_duration(const cmp_ui_node_t *node,
                                               float *duration) {
   if (node == NULL)
@@ -473,6 +659,11 @@ const cmp_theme_vtable_t cmp_material3_vtable = {
     cmp_material3_get_state_layer_opacity,
     cmp_material3_get_transition_duration};
 
+/**
+ * @brief cmp_theme_get_material3_vtable
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API const cmp_theme_vtable_t *cmp_theme_get_material3_vtable(void) {
   return &cmp_material3_vtable;
 }

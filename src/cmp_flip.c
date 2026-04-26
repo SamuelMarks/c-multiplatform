@@ -10,6 +10,12 @@ struct cmp_flip {
   int has_first;
 };
 
+/**
+ * @brief cmp_flip_create
+ *
+ * @param out_flip Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_flip_create(cmp_flip_t **out_flip) {
   int rc = CMP_SUCCESS;
   struct cmp_flip *flip = NULL;
@@ -32,6 +38,12 @@ int cmp_flip_create(cmp_flip_t **out_flip) {
   return rc;
 }
 
+/**
+ * @brief cmp_flip_destroy
+ *
+ * @param flip Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_flip_destroy(cmp_flip_t *flip) {
   int rc = CMP_SUCCESS;
   struct cmp_flip *internal_flip = (struct cmp_flip *)flip;
@@ -46,6 +58,13 @@ int cmp_flip_destroy(cmp_flip_t *flip) {
   return rc;
 }
 
+/**
+ * @brief cmp_flip_first
+ *
+ * @param flip Parameter description.
+ * @param initial_bounds Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_flip_first(cmp_flip_t *flip, const cmp_rect_t *initial_bounds) {
   int rc = CMP_SUCCESS;
   struct cmp_flip *internal_flip = (struct cmp_flip *)flip;
@@ -62,6 +81,17 @@ int cmp_flip_first(cmp_flip_t *flip, const cmp_rect_t *initial_bounds) {
   return rc;
 }
 
+/**
+ * @brief cmp_flip_last_and_invert
+ *
+ * @param flip Parameter description.
+ * @param final_bounds Parameter description.
+ * @param out_translate_x Parameter description.
+ * @param out_translate_y Parameter description.
+ * @param out_scale_x Parameter description.
+ * @param out_scale_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_flip_last_and_invert(cmp_flip_t *flip, const cmp_rect_t *final_bounds,
                              float *out_translate_x, float *out_translate_y,
                              float *out_scale_x, float *out_scale_y) {

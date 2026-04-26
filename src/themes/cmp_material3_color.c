@@ -20,6 +20,12 @@ static float linearize(float channel) {
   }
 }
 
+/**
+ * @brief delinearize
+ *
+ * @param channel Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static float delinearize(float channel) {
   if (channel <= 0.0031308f) {
     return channel * 12.92f;
@@ -28,6 +34,17 @@ static float delinearize(float channel) {
   }
 }
 
+/**
+ * @brief srgb_to_xyz
+ *
+ * @param r Parameter description.
+ * @param g Parameter description.
+ * @param b Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @param z Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void srgb_to_xyz(float r, float g, float b, float *x, float *y,
                         float *z) {
   float rl = linearize(r);
@@ -39,6 +56,17 @@ static void srgb_to_xyz(float r, float g, float b, float *x, float *y,
   *z = rl * 0.0193f + gl * 0.1192f + bl * 0.9505f;
 }
 
+/**
+ * @brief xyz_to_srgb
+ *
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @param z Parameter description.
+ * @param r Parameter description.
+ * @param g Parameter description.
+ * @param b Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void xyz_to_srgb(float x, float y, float z, float *r, float *g,
                         float *b) {
   float rl = x * 3.2406f + y * -1.5372f + z * -0.4986f;
@@ -55,6 +83,12 @@ static void xyz_to_srgb(float x, float y, float z, float *r, float *g,
 #define WHITE_Y 1.00000f
 #define WHITE_Z 1.08883f
 
+/**
+ * @brief lab_f
+ *
+ * @param t Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static float lab_f(float t) {
   if (t > (216.0f / 24389.0f)) {
     return (float)pow(t, 1.0f / 3.0f);
@@ -63,6 +97,12 @@ static float lab_f(float t) {
   }
 }
 
+/**
+ * @brief lab_inv_f
+ *
+ * @param t Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static float lab_inv_f(float t) {
   if (t > (6.0f / 29.0f)) {
     return t * t * t;
@@ -71,6 +111,17 @@ static float lab_inv_f(float t) {
   }
 }
 
+/**
+ * @brief xyz_to_lab
+ *
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @param z Parameter description.
+ * @param l Parameter description.
+ * @param a Parameter description.
+ * @param b Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void xyz_to_lab(float x, float y, float z, float *l, float *a,
                        float *b) {
   float fx = lab_f(x / WHITE_X);
@@ -82,6 +133,17 @@ static void xyz_to_lab(float x, float y, float z, float *l, float *a,
   *b = 200.0f * (fy - fz);
 }
 
+/**
+ * @brief lab_to_xyz
+ *
+ * @param l Parameter description.
+ * @param a Parameter description.
+ * @param b Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @param z Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void lab_to_xyz(float l, float a, float b, float *x, float *y,
                        float *z) {
   float fy = (l + 16.0f) / 116.0f;
@@ -115,6 +177,15 @@ int cmp_m3_srgb_to_hct(const cmp_color_t *in_color, float *out_hue,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_hct_to_srgb
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param tone Parameter description.
+ * @param out_color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
                        cmp_color_t *out_color) {
   float l, a, b, x, y, z, r, g, bl;
@@ -169,12 +240,30 @@ int cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_p3_to_hct
+ *
+ * @param in_color Parameter description.
+ * @param out_hue Parameter description.
+ * @param out_chroma Parameter description.
+ * @param out_tone Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_p3_to_hct(const cmp_color_t *in_color, float *out_hue,
                      float *out_chroma, float *out_tone) {
   /* P3 -> XYZ -> LAB -> HCT (approx. sRGB for now) */
   return cmp_m3_srgb_to_hct(in_color, out_hue, out_chroma, out_tone);
 }
 
+/**
+ * @brief cmp_m3_linear_to_hct
+ *
+ * @param in_color Parameter description.
+ * @param out_hue Parameter description.
+ * @param out_chroma Parameter description.
+ * @param out_tone Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_linear_to_hct(const cmp_color_t *in_color, float *out_hue,
                          float *out_chroma, float *out_tone) {
   float x, y, z, l, a, b, chroma, hue;
@@ -199,6 +288,14 @@ int cmp_m3_linear_to_hct(const cmp_color_t *in_color, float *out_hue,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_generate_tonal_palette_hct
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_generate_tonal_palette_hct(float hue, float chroma,
                                       cmp_m3_tonal_palette_t *out_palette) {
   if (!out_palette)
@@ -221,6 +318,13 @@ int cmp_m3_generate_tonal_palette_hct(float hue, float chroma,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_palettes_generate
+ *
+ * @param seed Parameter description.
+ * @param out_palettes Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_palettes_generate(cmp_color_t seed,
                              cmp_m3_palettes_t *out_palettes) {
   float h, c, t;
@@ -243,6 +347,15 @@ int cmp_m3_palettes_generate(cmp_color_t seed,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_generate_tonal_palette
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param tone Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_generate_tonal_palette(float hue, float chroma, float tone,
                                   cmp_palette_t *out_palette) {
   if (!out_palette)
@@ -256,6 +369,16 @@ int cmp_m3_generate_tonal_palette(float hue, float chroma, float tone,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_scheme_tonal_spot
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param tone Parameter description.
+ * @param is_dark Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_scheme_tonal_spot(float hue, float chroma, float tone, int is_dark,
                              cmp_palette_t *out_palette) {
   float p_chroma = 36.0f;
@@ -273,6 +396,16 @@ int cmp_m3_scheme_tonal_spot(float hue, float chroma, float tone, int is_dark,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_scheme_spritz
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param tone Parameter description.
+ * @param is_dark Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_scheme_spritz(float hue, float chroma, float tone, int is_dark,
                          cmp_palette_t *out_palette) {
   if (!out_palette)
@@ -286,6 +419,16 @@ int cmp_m3_scheme_spritz(float hue, float chroma, float tone, int is_dark,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_scheme_vibrant
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param tone Parameter description.
+ * @param is_dark Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_scheme_vibrant(float hue, float chroma, float tone, int is_dark,
                           cmp_palette_t *out_palette) {
   if (!out_palette)
@@ -299,6 +442,16 @@ int cmp_m3_scheme_vibrant(float hue, float chroma, float tone, int is_dark,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_scheme_expressive
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param tone Parameter description.
+ * @param is_dark Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_scheme_expressive(float hue, float chroma, float tone, int is_dark,
                              cmp_palette_t *out_palette) {
   float shifted_hue;
@@ -314,6 +467,16 @@ int cmp_m3_scheme_expressive(float hue, float chroma, float tone, int is_dark,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_scheme_rainbow
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param tone Parameter description.
+ * @param is_dark Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_scheme_rainbow(float hue, float chroma, float tone, int is_dark,
                           cmp_palette_t *out_palette) {
   if (!out_palette)
@@ -326,6 +489,16 @@ int cmp_m3_scheme_rainbow(float hue, float chroma, float tone, int is_dark,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_scheme_fruit_salad
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param tone Parameter description.
+ * @param is_dark Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_scheme_fruit_salad(float hue, float chroma, float tone, int is_dark,
                               cmp_palette_t *out_palette) {
   float shifted_hue;
@@ -340,6 +513,16 @@ int cmp_m3_scheme_fruit_salad(float hue, float chroma, float tone, int is_dark,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_scheme_monochrome
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param tone Parameter description.
+ * @param is_dark Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_scheme_monochrome(float hue, float chroma, float tone, int is_dark,
                              cmp_palette_t *out_palette) {
   if (!out_palette)
@@ -352,6 +535,16 @@ int cmp_m3_scheme_monochrome(float hue, float chroma, float tone, int is_dark,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_scheme_fidelity
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param tone Parameter description.
+ * @param is_dark Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_scheme_fidelity(float hue, float chroma, float tone, int is_dark,
                            cmp_palette_t *out_palette) {
   if (!out_palette)
@@ -364,6 +557,16 @@ int cmp_m3_scheme_fidelity(float hue, float chroma, float tone, int is_dark,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_scheme_content
+ *
+ * @param hue Parameter description.
+ * @param chroma Parameter description.
+ * @param tone Parameter description.
+ * @param is_dark Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_scheme_content(float hue, float chroma, float tone, int is_dark,
                           cmp_palette_t *out_palette) {
   if (!out_palette)
@@ -376,6 +579,13 @@ int cmp_m3_scheme_content(float hue, float chroma, float tone, int is_dark,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_scheme_light
+ *
+ * @param palettes Parameter description.
+ * @param out_scheme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_scheme_light(const cmp_m3_palettes_t *palettes,
                         cmp_palette_t *out_scheme) {
   if (!palettes || !out_scheme)
@@ -414,6 +624,13 @@ int cmp_m3_scheme_light(const cmp_m3_palettes_t *palettes,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_scheme_dark
+ *
+ * @param palettes Parameter description.
+ * @param out_scheme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_scheme_dark(const cmp_m3_palettes_t *palettes,
                        cmp_palette_t *out_scheme) {
   if (!palettes || !out_scheme)

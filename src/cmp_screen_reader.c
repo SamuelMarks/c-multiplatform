@@ -17,6 +17,13 @@ struct cmp_screen_reader {
   size_t capacity;
 };
 
+/**
+ * @brief cmp_screen_reader_create
+ *
+ * @param tree Parameter description.
+ * @param out_reader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_screen_reader_create(cmp_a11y_tree_t *tree,
                              cmp_screen_reader_t **out_reader) {
   struct cmp_screen_reader *reader;
@@ -37,6 +44,12 @@ int cmp_screen_reader_create(cmp_a11y_tree_t *tree,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_screen_reader_destroy
+ *
+ * @param reader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_screen_reader_destroy(cmp_screen_reader_t *reader) {
   struct cmp_screen_reader *r = (struct cmp_screen_reader *)reader;
 
@@ -51,6 +64,13 @@ int cmp_screen_reader_destroy(cmp_screen_reader_t *reader) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_screen_reader_announce
+ *
+ * @param reader Parameter description.
+ * @param message Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_screen_reader_announce(cmp_screen_reader_t *reader,
                                const char *message) {
   if (!reader || !message)
@@ -61,6 +81,14 @@ int cmp_screen_reader_announce(cmp_screen_reader_t *reader,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_screen_reader_map_node
+ *
+ * @param reader Parameter description.
+ * @param node_id Parameter description.
+ * @param native_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_screen_reader_map_node(cmp_screen_reader_t *reader, int node_id,
                                void *native_node) {
   struct cmp_screen_reader *r = (struct cmp_screen_reader *)reader;

@@ -7,18 +7,35 @@
 
 static int g_capture_subsystem_initialized = 0;
 
+/**
+ * @brief cmp_pointer_capture_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pointer_capture_init(void) {
   int rc = CMP_SUCCESS;
   g_capture_subsystem_initialized = 1;
   return rc;
 }
 
+/**
+ * @brief cmp_pointer_capture_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pointer_capture_shutdown(void) {
   int rc = CMP_SUCCESS;
   g_capture_subsystem_initialized = 0;
   return rc;
 }
 
+/**
+ * @brief cmp_ui_node_set_pointer_capture
+ *
+ * @param node Parameter description.
+ * @param pointer_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_set_pointer_capture(cmp_ui_node_t *node, int pointer_id) {
   int rc = CMP_SUCCESS;
 
@@ -50,6 +67,13 @@ int cmp_ui_node_set_pointer_capture(cmp_ui_node_t *node, int pointer_id) {
   return rc;
 }
 
+/**
+ * @brief cmp_ui_node_release_pointer_capture
+ *
+ * @param node Parameter description.
+ * @param pointer_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_release_pointer_capture(cmp_ui_node_t *node, int pointer_id) {
   int rc = CMP_SUCCESS;
 
@@ -78,6 +102,13 @@ int cmp_ui_node_release_pointer_capture(cmp_ui_node_t *node, int pointer_id) {
   return rc;
 }
 
+/**
+ * @brief cmp_ui_node_has_pointer_capture
+ *
+ * @param node Parameter description.
+ * @param pointer_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_has_pointer_capture(const cmp_ui_node_t *node, int pointer_id) {
   int rc = 0;
 

@@ -12,6 +12,12 @@ struct cmp_titlebar_env {
   float height;
 };
 
+/**
+ * @brief cmp_titlebar_env_create
+ *
+ * @param out_env Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_titlebar_env_create(cmp_titlebar_env_t **out_env) {
   cmp_titlebar_env_t *env;
   if (!out_env) {
@@ -25,6 +31,12 @@ int cmp_titlebar_env_create(cmp_titlebar_env_t **out_env) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_titlebar_env_destroy
+ *
+ * @param env Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_titlebar_env_destroy(cmp_titlebar_env_t *env) {
   if (!env) {
     return CMP_ERROR_INVALID_ARG;
@@ -33,6 +45,16 @@ int cmp_titlebar_env_destroy(cmp_titlebar_env_t *env) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_titlebar_env_set_area
+ *
+ * @param env Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_titlebar_env_set_area(cmp_titlebar_env_t *env, float x, float y,
                               float width, float height) {
   if (!env) {
@@ -45,6 +67,16 @@ int cmp_titlebar_env_set_area(cmp_titlebar_env_t *env, float x, float y,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_titlebar_env_get_area
+ *
+ * @param env Parameter description.
+ * @param out_x Parameter description.
+ * @param out_y Parameter description.
+ * @param out_width Parameter description.
+ * @param out_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_titlebar_env_get_area(const cmp_titlebar_env_t *env, float *out_x,
                               float *out_y, float *out_width,
                               float *out_height) {

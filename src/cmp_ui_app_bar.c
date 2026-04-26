@@ -11,6 +11,13 @@ struct cmp_ui_app_bar {
   char *title;
 };
 
+/**
+ * @brief cmp_ui_app_bar_create
+ *
+ * @param out_bar Parameter description.
+ * @param placement Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
                           cmp_ui_app_bar_placement_t placement) {
   cmp_ui_app_bar_t *bar;
@@ -37,6 +44,10 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
   bar->node_root->layout->direction = CMP_FLEX_ROW;
   /* Specific styling (shadows, background color based on placement) */
   bar->node_root->bg_color = 0xFFF5F5F5;
+  bar->node_root->layout->width = -1.0f;
+  bar->node_root->layout->height = 64.0f;
+  bar->node_root->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+  bar->node_root->layout->justify_content = CMP_FLEX_ALIGN_SPACE_BETWEEN;
 
   err = cmp_ui_text_create(&bar->node_title, "", 0);
   if (err == CMP_SUCCESS) {
@@ -47,6 +58,12 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_app_bar_destroy
+ *
+ * @param bar Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar) {
   if (!bar) {
     return CMP_ERROR_INVALID_ARG;
@@ -58,6 +75,13 @@ int cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_app_bar_get_node
+ *
+ * @param bar Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_app_bar_get_node(cmp_ui_app_bar_t *bar, cmp_ui_node_t **out_node) {
   if (!bar || !out_node) {
     return CMP_ERROR_INVALID_ARG;
@@ -66,6 +90,13 @@ int cmp_ui_app_bar_get_node(cmp_ui_app_bar_t *bar, cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_app_bar_set_title
+ *
+ * @param bar Parameter description.
+ * @param title Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title) {
   size_t len;
   int err;
@@ -107,6 +138,13 @@ int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_app_bar_add_action
+ *
+ * @param bar Parameter description.
+ * @param action_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_app_bar_add_action(cmp_ui_app_bar_t *bar,
                               cmp_ui_node_t *action_node) {
   if (!bar || !action_node) {
@@ -114,6 +152,13 @@ int cmp_ui_app_bar_add_action(cmp_ui_app_bar_t *bar,
   }
   return cmp_ui_node_add_child(bar->node_root, action_node);
 }
+/**
+ * @brief cmp_ui_app_bar_bind_a11y
+ *
+ * @param widget Parameter description.
+ * @param tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_app_bar_bind_a11y(cmp_ui_app_bar_t *widget, cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;

@@ -11,6 +11,12 @@ struct cmp_gesture {
   void *user_data;
 };
 
+/**
+ * @brief cmp_gesture_create
+ *
+ * @param out_gesture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gesture_create(cmp_gesture_t **out_gesture) {
   int rc = CMP_SUCCESS;
   struct cmp_gesture *ctx = NULL;
@@ -35,6 +41,12 @@ int cmp_gesture_create(cmp_gesture_t **out_gesture) {
   return rc;
 }
 
+/**
+ * @brief cmp_gesture_destroy
+ *
+ * @param gesture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gesture_destroy(cmp_gesture_t *gesture) {
   int rc = CMP_SUCCESS;
   struct cmp_gesture *ctx = (struct cmp_gesture *)gesture;
@@ -50,6 +62,14 @@ int cmp_gesture_destroy(cmp_gesture_t *gesture) {
   return rc;
 }
 
+/**
+ * @brief cmp_gesture_set_callback
+ *
+ * @param gesture Parameter description.
+ * @param callback Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gesture_set_callback(cmp_gesture_t *gesture, cmp_gesture_cb_t callback,
                              void *user_data) {
   int rc = CMP_SUCCESS;
@@ -67,6 +87,12 @@ int cmp_gesture_set_callback(cmp_gesture_t *gesture, cmp_gesture_cb_t callback,
   return rc;
 }
 
+/**
+ * @brief cmp_gesture_get_state
+ *
+ * @param gesture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gesture_get_state(const cmp_gesture_t *gesture) {
   const struct cmp_gesture *ctx = (const struct cmp_gesture *)gesture;
   if (!ctx)
@@ -75,6 +101,13 @@ int cmp_gesture_get_state(const cmp_gesture_t *gesture) {
   return (int)ctx->state;
 }
 
+/**
+ * @brief cmp_gesture_process_event
+ *
+ * @param gesture Parameter description.
+ * @param event Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gesture_process_event(cmp_gesture_t *gesture,
                               const cmp_event_t *event) {
   int rc = CMP_SUCCESS;

@@ -5,13 +5,23 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_ui_box_create
+ *
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_box_create(cmp_ui_node_t **out_node) {
   int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_box_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -19,7 +29,11 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_box_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -29,8 +43,11 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -38,6 +55,14 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_text_create
+ *
+ * @param out_node Parameter description.
+ * @param text Parameter description.
+ * @param text_len Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
                        int text_len) {
   int rc;
@@ -47,7 +72,11 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
 
   if (out_node == NULL || text == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_text_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_text_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -55,7 +84,11 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_text_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_text_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -65,8 +98,11 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -85,6 +121,14 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_button_create
+ *
+ * @param out_node Parameter description.
+ * @param label Parameter description.
+ * @param label_len Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
                          int label_len) {
   int rc;
@@ -94,7 +138,11 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
 
   if (out_node == NULL || label == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_button_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_button_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -102,7 +150,11 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_button_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_button_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -112,8 +164,11 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -132,13 +187,23 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_text_input_create
+ *
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
   int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_text_input_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_text_input_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -146,7 +211,11 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_text_input_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_text_input_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -156,8 +225,11 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -165,14 +237,25 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_checkbox_create
+ *
+ * @param out_node Parameter description.
+ * @param label Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
   int rc;
   cmp_ui_node_t *node;
   char *label_copy = NULL;
 
-  if (out_node == NULL) {
+  if (out_node == NULL || label == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_checkbox_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_checkbox_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -180,7 +263,11 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_checkbox_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_checkbox_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -190,8 +277,11 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -215,6 +305,13 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_radio_create
+ *
+ * @param out_node Parameter description.
+ * @param group_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
   int rc;
   cmp_ui_node_t *node;
@@ -222,7 +319,11 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_radio_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_radio_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -230,7 +331,11 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_radio_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_radio_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -240,8 +345,11 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -258,6 +366,13 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_image_view_create
+ *
+ * @param out_node Parameter description.
+ * @param image_path Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
   int rc;
   cmp_ui_node_t *node;
@@ -268,7 +383,11 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
 
   if (out_node == NULL || image_path == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_image_view_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_image_view_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -276,7 +395,11 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_image_view_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_image_view_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -286,8 +409,11 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -343,6 +469,14 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_slider_create
+ *
+ * @param out_node Parameter description.
+ * @param min Parameter description.
+ * @param max Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
   int rc;
   cmp_ui_node_t *node;
@@ -350,7 +484,11 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_slider_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_slider_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -358,7 +496,11 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_slider_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_slider_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -368,8 +510,11 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -387,13 +532,23 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_list_view_create
+ *
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
   int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_list_view_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_list_view_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -401,7 +556,11 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_list_view_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_list_view_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -411,8 +570,11 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -420,6 +582,13 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_grid_view_create
+ *
+ * @param out_node Parameter description.
+ * @param columns Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
   int rc;
   cmp_ui_node_t *node;
@@ -427,7 +596,11 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_grid_view_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_grid_view_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -435,7 +608,11 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_grid_view_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_grid_view_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -445,8 +622,11 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -463,13 +643,23 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_dropdown_create
+ *
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
   int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_dropdown_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_dropdown_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -477,7 +667,11 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_dropdown_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_dropdown_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -487,8 +681,11 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -496,13 +693,23 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_modal_create
+ *
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
   int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_modal_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_modal_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -510,7 +717,11 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_modal_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_modal_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -520,8 +731,11 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -529,13 +743,23 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_canvas_create
+ *
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
   int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_canvas_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_canvas_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -543,7 +767,11 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_canvas_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_canvas_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -553,8 +781,11 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -562,13 +793,23 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_rich_text_create
+ *
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
   int rc;
   cmp_ui_node_t *node;
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_rich_text_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_rich_text_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -576,7 +817,11 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_ui_rich_text_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_rich_text_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -586,8 +831,11 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
     CMP_FREE(node);
-    LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -595,11 +843,22 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_node_add_child
+ *
+ * @param parent Parameter description.
+ * @param child Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
   int rc;
   if (parent == NULL || child == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_node_add_child: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_node_add_child: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -612,7 +871,11 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
     if (rc != CMP_SUCCESS) {
       if (rc == CMP_SUCCESS)
         rc = CMP_ERROR_OOM;
-      LOG_DEBUG("cmp_ui_node_add_child CMP_MALLOC: %s\n", cmp_strerror(rc));
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_ui_node_add_child CMP_MALLOC: %s\n", err_str);
+      }
       return rc;
     }
 
@@ -636,6 +899,14 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief disabled_cmp_event_dispatch_run
+ *
+ * @param tree Parameter description.
+ * @param target_node Parameter description.
+ * @param event Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int disabled_cmp_event_dispatch_run(cmp_ui_node_t *tree,
                                     cmp_ui_node_t *target_node,
                                     cmp_event_t *event) {
@@ -681,6 +952,15 @@ int disabled_cmp_event_dispatch_run(cmp_ui_node_t *tree,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief disabled_cmp_ui_node_add_event_listener
+ * @param node
+ * @param event_type
+ * @param capture
+ * @param callback
+ * @param user_data
+ * @return
+ */
 int disabled_cmp_ui_node_add_event_listener(
     cmp_ui_node_t *node, uint32_t event_type, int capture,
     void (*callback)(cmp_event_t *, cmp_ui_node_t *, void *), void *user_data) {
@@ -705,6 +985,12 @@ int disabled_cmp_ui_node_add_event_listener(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_node_destroy
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_destroy(cmp_ui_node_t *node) {
   int rc;
   size_t i;
@@ -714,7 +1000,11 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
 
   if (node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_ui_node_destroy: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_ui_node_destroy: %s\n", err_str);
+    }
     return rc;
   }
 

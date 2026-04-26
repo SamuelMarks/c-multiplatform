@@ -13,6 +13,12 @@ struct cmp_minimap {
   float scroll_ratio; /* Calculated ratio [0.0 - 1.0] */
 };
 
+/**
+ * @brief cmp_minimap_create
+ *
+ * @param out_minimap Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_minimap_create(cmp_minimap_t **out_minimap) {
   int rc = CMP_SUCCESS;
   cmp_minimap_t *minimap = NULL;
@@ -23,11 +29,10 @@ int cmp_minimap_create(cmp_minimap_t **out_minimap) {
     return rc;
   }
 
-  minimap = (cmp_minimap_t *)malloc(sizeof(cmp_minimap_t));
-  if (!minimap) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_minimap_create: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(sizeof(cmp_minimap_t), (void **)&(minimap));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 
   minimap->text = NULL;
@@ -40,6 +45,12 @@ int cmp_minimap_create(cmp_minimap_t **out_minimap) {
   return rc;
 }
 
+/**
+ * @brief cmp_minimap_destroy
+ *
+ * @param minimap Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_minimap_destroy(cmp_minimap_t *minimap) {
   int rc = CMP_SUCCESS;
 
@@ -50,12 +61,25 @@ int cmp_minimap_destroy(cmp_minimap_t *minimap) {
   }
 
   if (minimap->text) {
-    free(minimap->text);
+    rc = CMP_FREE(minimap->text);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
   }
-  free(minimap);
+  rc = CMP_FREE(minimap);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_minimap_set_text
+ *
+ * @param minimap Parameter description.
+ * @param text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_minimap_set_text(cmp_minimap_t *minimap, const char *text) {
   int rc = CMP_SUCCESS;
   size_t len;
@@ -67,16 +91,18 @@ int cmp_minimap_set_text(cmp_minimap_t *minimap, const char *text) {
   }
 
   if (minimap->text) {
-    free(minimap->text);
+    rc = CMP_FREE(minimap->text);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
     minimap->text = NULL;
   }
 
   len = strlen(text);
-  minimap->text = (char *)malloc(len + 1);
-  if (!minimap->text) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_minimap_set_text: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(len + 1, (void **)&(minimap->text));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 
 #if defined(_MSC_VER)
@@ -89,6 +115,15 @@ int cmp_minimap_set_text(cmp_minimap_t *minimap, const char *text) {
   return rc;
 }
 
+/**
+ * @brief cmp_minimap_update_viewport
+ *
+ * @param minimap Parameter description.
+ * @param viewport_y Parameter description.
+ * @param viewport_height Parameter description.
+ * @param total_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_minimap_update_viewport(cmp_minimap_t *minimap, float viewport_y,
                                 float viewport_height, float total_height) {
   int rc = CMP_SUCCESS;
@@ -117,6 +152,12 @@ int cmp_minimap_update_viewport(cmp_minimap_t *minimap, float viewport_y,
   return rc;
 }
 
+/**
+ * @brief cmp_minimap_compute_layout
+ *
+ * @param minimap Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_minimap_compute_layout(cmp_minimap_t *minimap) {
   int rc = CMP_SUCCESS;
 

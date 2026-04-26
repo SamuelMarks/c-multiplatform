@@ -61,6 +61,16 @@ CMP_API int cmp_ui_tooltip_get_node(cmp_ui_tooltip_t *tooltip,
 CMP_API int cmp_ui_tooltip_set_text(cmp_ui_tooltip_t *tooltip,
                                     const char *text);
 
+/**
+ * \brief Binds the tooltip widget to the accessibility tree.
+ *
+ * \param widget The tooltip component.
+ * \param tree The accessibility tree.
+ * \return 0 on success, or a non-zero error code on failure.
+ */
+CMP_API int cmp_ui_tooltip_bind_a11y(cmp_ui_tooltip_t *widget,
+                                     cmp_a11y_tree_t *tree);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

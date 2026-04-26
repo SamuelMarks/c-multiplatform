@@ -8,6 +8,12 @@ struct cmp_spellcheck {
   int enabled;
 };
 
+/**
+ * @brief cmp_spellcheck_create
+ *
+ * @param out_spellcheck Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spellcheck_create(cmp_spellcheck_t **out_spellcheck) {
   struct cmp_spellcheck *spellcheck;
 
@@ -25,6 +31,12 @@ int cmp_spellcheck_create(cmp_spellcheck_t **out_spellcheck) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_spellcheck_destroy
+ *
+ * @param spellcheck Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spellcheck_destroy(cmp_spellcheck_t *spellcheck) {
   struct cmp_spellcheck *internal_spellcheck =
       (struct cmp_spellcheck *)spellcheck;
@@ -35,6 +47,14 @@ int cmp_spellcheck_destroy(cmp_spellcheck_t *spellcheck) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_spellcheck_verify_word
+ *
+ * @param spellcheck Parameter description.
+ * @param word Parameter description.
+ * @param out_is_correct Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spellcheck_verify_word(cmp_spellcheck_t *spellcheck, const char *word,
                                int *out_is_correct) {
   struct cmp_spellcheck *internal_spellcheck =

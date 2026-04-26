@@ -63,6 +63,8 @@ TEST test_resource_manager_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resources_allocate_offscreen_bitmap(feat, 1.0f, 1.0f, NULL));
 
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_resource_manager_destroy(NULL));
+
   cmp_resource_manager_destroy(feat);
   PASS();
 }

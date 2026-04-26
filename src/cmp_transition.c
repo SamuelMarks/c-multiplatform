@@ -13,6 +13,15 @@ struct cmp_transition {
   int is_finished;
 };
 
+/**
+ * @brief cmp_transition_create
+ *
+ * @param duration_ms Parameter description.
+ * @param delay_ms Parameter description.
+ * @param behavior Parameter description.
+ * @param out_transition Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_transition_create(double duration_ms, double delay_ms,
                           cmp_transition_behavior_t behavior,
                           cmp_transition_t **out_transition) {
@@ -35,6 +44,12 @@ int cmp_transition_create(double duration_ms, double delay_ms,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_transition_destroy
+ *
+ * @param transition Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_transition_destroy(cmp_transition_t *transition) {
   struct cmp_transition *internal_transition =
       (struct cmp_transition *)transition;
@@ -46,6 +61,14 @@ int cmp_transition_destroy(cmp_transition_t *transition) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_transition_step
+ *
+ * @param transition Parameter description.
+ * @param dt_ms Parameter description.
+ * @param out_progress Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_transition_step(cmp_transition_t *transition, double dt_ms,
                         float *out_progress) {
   struct cmp_transition *internal_transition =

@@ -9,6 +9,12 @@ struct CddProcess {
   void *mock_queue;
 };
 
+/**
+ * @brief cmp_msg_create
+ *
+ * @param msg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_msg_create(cmp_msg_t **msg) {
   int rc = CMP_SUCCESS;
 
@@ -18,11 +24,10 @@ int cmp_msg_create(cmp_msg_t **msg) {
     return rc;
   }
 
-  *msg = (cmp_msg_t*)malloc(sizeof(cmp_msg_t));
-  if (!*msg) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_msg_create: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(sizeof(cmp_msg_t), (void **)&(*msg));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 
   (*msg)->type = 0;
@@ -31,6 +36,12 @@ int cmp_msg_create(cmp_msg_t **msg) {
   return rc;
 }
 
+/**
+ * @brief cmp_msg_destroy
+ *
+ * @param msg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_msg_destroy(cmp_msg_t *msg) {
   int rc = CMP_SUCCESS;
 
@@ -42,12 +53,26 @@ int cmp_msg_destroy(cmp_msg_t *msg) {
 
   /* Warning: if payload is managed elsewhere, this might be unsafe, but we assume it's owned here for serialization */
   if (msg->payload) {
-      free(msg->payload);
+      rc = CMP_FREE(msg->payload);
+      if (rc != CMP_SUCCESS) {
+        LOG_DEBUG("Free failed\n");
+      }
   }
-  free(msg);
+  rc = CMP_FREE(msg);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_msg_set_payload
+ *
+ * @param msg Parameter description.
+ * @param payload Parameter description.
+ * @param size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_msg_set_payload(cmp_msg_t *msg, const void *payload, size_t size) {
   int rc = CMP_SUCCESS;
 
@@ -58,15 +83,17 @@ int cmp_msg_set_payload(cmp_msg_t *msg, const void *payload, size_t size) {
   }
 
   if (msg->payload) {
-    free(msg->payload);
+    rc = CMP_FREE(msg->payload);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
   }
 
   /* Store size in first 4 bytes of payload to know its size, or assume string */
-  msg->payload = malloc(size + sizeof(size_t));
-  if (!msg->payload) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_msg_set_payload: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(size + sizeof(size_t), (void **)&(msg->payload));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 
   memcpy(msg->payload, &size, sizeof(size_t));
@@ -74,6 +101,14 @@ int cmp_msg_set_payload(cmp_msg_t *msg, const void *payload, size_t size) {
   return rc;
 }
 
+/**
+ * @brief cmp_msg_serialize
+ *
+ * @param msg Parameter description.
+ * @param buffer Parameter description.
+ * @param buffer_size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_msg_serialize(const cmp_msg_t *msg, uint8_t **buffer, size_t *buffer_size) {
   int rc = CMP_SUCCESS;
   size_t psize = 0;
@@ -90,11 +125,10 @@ int cmp_msg_serialize(const cmp_msg_t *msg, uint8_t **buffer, size_t *buffer_siz
   }
   
   *buffer_size = sizeof(int) + sizeof(size_t) + psize;
-  *buffer = (uint8_t*)malloc(*buffer_size);
-  if (!*buffer) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_msg_serialize: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(*buffer_size, (void **)&(*buffer));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
   
   p = *buffer;
@@ -109,6 +143,14 @@ int cmp_msg_serialize(const cmp_msg_t *msg, uint8_t **buffer, size_t *buffer_siz
   return rc;
 }
 
+/**
+ * @brief cmp_msg_deserialize
+ *
+ * @param buffer Parameter description.
+ * @param buffer_size Parameter description.
+ * @param msg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_msg_deserialize(const uint8_t *buffer, size_t buffer_size, cmp_msg_t **msg) {
   int rc = CMP_SUCCESS;
   int err;
@@ -155,6 +197,13 @@ int cmp_msg_deserialize(const uint8_t *buffer, size_t buffer_size, cmp_msg_t **m
   return rc;
 }
 
+/**
+ * @brief cmp_process_send
+ *
+ * @param proc Parameter description.
+ * @param msg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_process_send(cmp_process_t *proc, const cmp_msg_t *msg) {
   int rc = CMP_SUCCESS;
 
@@ -168,6 +217,13 @@ int cmp_process_send(cmp_process_t *proc, const cmp_msg_t *msg) {
   return rc;
 }
 
+/**
+ * @brief cmp_process_recv
+ *
+ * @param proc Parameter description.
+ * @param msg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_process_recv(cmp_process_t *proc, cmp_msg_t **msg) {
   int rc = CMP_SUCCESS;
 
@@ -179,6 +235,12 @@ int cmp_process_recv(cmp_process_t *proc, cmp_msg_t **msg) {
   return rc;
 }
 
+/**
+ * @brief cmp_process_destroy
+ *
+ * @param proc Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_process_destroy(cmp_process_t *proc) {
   int rc = CMP_SUCCESS;
 
@@ -187,10 +249,19 @@ int cmp_process_destroy(cmp_process_t *proc) {
     LOG_DEBUG("Error in cmp_process_destroy: Invalid argument\n");
     return rc;
   }
-  free(proc);
+  rc = CMP_FREE(proc);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_process_spawn
+ *
+ * @param proc Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_process_spawn(cmp_process_t **proc) {
   int rc = CMP_SUCCESS;
 
@@ -200,11 +271,10 @@ int cmp_process_spawn(cmp_process_t **proc) {
     return rc;
   }
 
-  *proc = (cmp_process_t *)malloc(sizeof(struct CddProcess));
-  if (!*proc) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_process_spawn: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(sizeof(struct CddProcess), (void **)&(*proc));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
   (*proc)->mock_queue = NULL;
   return rc;

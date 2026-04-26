@@ -23,6 +23,11 @@ struct cmp_timer {
 
 static int g_timer_system_initialized = 0;
 
+/**
+ * @brief cmp_timer_system_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_timer_system_init(void) {
   if (g_timer_system_initialized) {
     return CMP_SUCCESS;
@@ -31,6 +36,11 @@ int cmp_timer_system_init(void) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_timer_system_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_timer_system_shutdown(void) {
   if (!g_timer_system_initialized) {
     return CMP_SUCCESS;
@@ -40,8 +50,20 @@ int cmp_timer_system_shutdown(void) {
 }
 
 #if defined(_WIN32)
+/**
+ * @brief cmp_timer_thread_func
+ *
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static unsigned long __stdcall cmp_timer_thread_func(void *arg) {
 #else
+/**
+ * @brief cmp_timer_thread_func
+ *
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void *cmp_timer_thread_func(void *arg) {
 #endif
   cmp_timer_t *timer = (cmp_timer_t *)arg;
@@ -76,6 +98,16 @@ static void *cmp_timer_thread_func(void *arg) {
 #endif
 }
 
+/**
+ * @brief cmp_timer_start
+ *
+ * @param out_timer Parameter description.
+ * @param interval_ms Parameter description.
+ * @param repeat Parameter description.
+ * @param fn Parameter description.
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_timer_start(cmp_timer_t **out_timer, unsigned int interval_ms,
                     int repeat, cmp_task_fn_t fn, void *arg) {
   cmp_timer_t *timer;
@@ -117,6 +149,12 @@ int cmp_timer_start(cmp_timer_t **out_timer, unsigned int interval_ms,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_timer_stop
+ *
+ * @param timer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_timer_stop(cmp_timer_t *timer) {
   if (timer == NULL) {
     return CMP_ERROR_INVALID_ARG;

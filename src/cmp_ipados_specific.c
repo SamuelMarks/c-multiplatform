@@ -8,6 +8,12 @@ struct cmp_ipados_features {
   int center_stage_enabled;
 };
 
+/**
+ * @brief cmp_ipados_features_create
+ *
+ * @param out_features Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ipados_features_create(cmp_ipados_features_t **out_features) {
   int rc = CMP_SUCCESS;
   struct cmp_ipados_features *ctx = NULL;
@@ -30,6 +36,12 @@ int cmp_ipados_features_create(cmp_ipados_features_t **out_features) {
   return rc;
 }
 
+/**
+ * @brief cmp_ipados_features_destroy
+ *
+ * @param features_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ipados_features_destroy(cmp_ipados_features_t *features_opaque) {
   int rc = CMP_SUCCESS;
 
@@ -39,6 +51,15 @@ int cmp_ipados_features_destroy(cmp_ipados_features_t *features_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_ipados_resolve_size_classes
+ *
+ * @param window_width Parameter description.
+ * @param window_height Parameter description.
+ * @param out_horizontal Parameter description.
+ * @param out_vertical Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ipados_resolve_size_classes(float window_width, float window_height,
                                     cmp_size_class_t *out_horizontal,
                                     cmp_size_class_t *out_vertical) {
@@ -65,6 +86,13 @@ int cmp_ipados_resolve_size_classes(float window_width, float window_height,
   return rc;
 }
 
+/**
+ * @brief cmp_ipados_resolve_sidebar_state
+ *
+ * @param horizontal_class Parameter description.
+ * @param out_is_collapsed Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ipados_resolve_sidebar_state(cmp_size_class_t horizontal_class,
                                      int *out_is_collapsed) {
   int rc = CMP_SUCCESS;
@@ -81,6 +109,13 @@ int cmp_ipados_resolve_sidebar_state(cmp_size_class_t horizontal_class,
   return rc;
 }
 
+/**
+ * @brief cmp_ipados_request_scene_activation
+ *
+ * @param features_opaque Parameter description.
+ * @param activity_identifier Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ipados_request_scene_activation(cmp_ipados_features_t *features_opaque,
                                         const char *activity_identifier) {
   int rc = CMP_SUCCESS;
@@ -99,6 +134,13 @@ int cmp_ipados_request_scene_activation(cmp_ipados_features_t *features_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_ipados_set_center_stage_enabled
+ *
+ * @param features_opaque Parameter description.
+ * @param is_enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ipados_set_center_stage_enabled(cmp_ipados_features_t *features_opaque,
                                         int is_enabled) {
   int rc = CMP_SUCCESS;

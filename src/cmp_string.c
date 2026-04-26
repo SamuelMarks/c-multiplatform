@@ -1,15 +1,26 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * @brief Initializes a string object.
+ *
+ * @param str Pointer to the string object to initialize.
+ * @return int Returns 0 on success, or an error code on failure.
+ */
 int cmp_string_init(cmp_string_t *str) {
   int rc = CMP_SUCCESS;
   if (str == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error %d: %s (cmp_string_init)\n", rc, cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("Error %d: %s (cmp_string_init)", rc, err_str);
+    }
     return rc;
   }
 
@@ -20,17 +31,27 @@ int cmp_string_init(cmp_string_t *str) {
   return rc;
 }
 
+/**
+ * @brief Appends a C-string to the string object.
+ *
+ * @param str Pointer to the string object.
+ * @param append The null-terminated C-string to append.
+ * @return int Returns 0 on success, or an error code on failure.
+ */
 int cmp_string_append(cmp_string_t *str, const char *append) {
   int rc = CMP_SUCCESS;
   size_t append_len;
   size_t new_len;
   char *new_data;
-
   size_t new_capacity;
 
   if (str == NULL || append == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error %d: %s (cmp_string_append)\n", rc, cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("Error %d: %s (cmp_string_append)", rc, err_str);
+    }
     return rc;
   }
 
@@ -39,26 +60,65 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
     return rc;
   }
 
+  /* Detect overflow on length */
+  if (str->length > ((size_t)-1) - append_len) {
+    rc = CMP_ERROR_BOUNDS;
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("Error %d: %s (cmp_string_append length overflow)", rc,
+                err_str);
+    }
+    return rc;
+  }
+
   new_len = str->length + append_len;
 
   if (new_len + 1 > str->capacity) {
     new_capacity = str->capacity == 0 ? 32 : str->capacity * 2;
+    /* Handle overflow during capacity doubling */
+    if (new_capacity < str->capacity) {
+      new_capacity = ((size_t)-1);
+    }
+
     while (new_capacity < new_len + 1) {
+      if (new_capacity > ((size_t)-1) / 2) {
+        new_capacity = ((size_t)-1);
+        if (new_capacity < new_len + 1) {
+          rc = CMP_ERROR_BOUNDS;
+          {
+            const char *err_str;
+            cmp_strerror(rc, &err_str);
+            LOG_DEBUG("Error %d: %s (cmp_string_append bounds limit)", rc,
+                      err_str);
+          }
+          return rc;
+        }
+        break;
+      }
       new_capacity *= 2;
     }
 
     if (str->data == NULL) {
       rc = CMP_MALLOC(new_capacity, (void **)&new_data);
       if (rc != CMP_SUCCESS) {
-        fprintf(stderr, "Error %d: %s (cmp_string_append alloc failed)\n", rc,
-                cmp_strerror(rc));
+        {
+          const char *err_str;
+          cmp_strerror(rc, &err_str);
+          LOG_DEBUG("Error %d: %s (cmp_string_append alloc failed)", rc,
+                    err_str);
+        }
         return rc;
       }
     } else {
       rc = CMP_MALLOC(new_capacity, (void **)&new_data);
       if (rc != CMP_SUCCESS) {
-        fprintf(stderr, "Error %d: %s (cmp_string_append realloc failed)\n", rc,
-                cmp_strerror(rc));
+        {
+          const char *err_str;
+          cmp_strerror(rc, &err_str);
+          LOG_DEBUG("Error %d: %s (cmp_string_append realloc failed)", rc,
+                    err_str);
+        }
         return rc;
       }
 #if defined(_MSC_VER)
@@ -84,12 +144,21 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
   return rc;
 }
 
+/**
+ * @brief Destroys the string object and frees allocated memory.
+ *
+ * @param str Pointer to the string object to destroy.
+ * @return int Returns 0 on success, or an error code on failure.
+ */
 int cmp_string_destroy(cmp_string_t *str) {
   int rc = CMP_SUCCESS;
   if (str == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error %d: %s (cmp_string_destroy)\n", rc,
-            cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("Error %d: %s (cmp_string_destroy)", rc, err_str);
+    }
     return rc;
   }
 
@@ -104,21 +173,36 @@ int cmp_string_destroy(cmp_string_t *str) {
   return rc;
 }
 
-char *cmp_strtok_r(char *str, const char *delim, char **saveptr) {
+/**
+ * @brief Thread-safe string tokenization.
+ *
+ * @param str The string to tokenize, or NULL to continue previous tokenization.
+ * @param delim The delimiter characters.
+ * @param saveptr Pointer used to maintain state between calls.
+ * @param out_tok Pointer to a char* where the token pointer will be stored.
+ * @return int Returns 0 on success, or an error code on failure. Returns
+ * CMP_ERROR_NOT_FOUND when there are no more tokens.
+ */
+int cmp_strtok_r(char *str, const char *delim, char **saveptr, char **out_tok) {
+  if (saveptr == NULL || out_tok == NULL || delim == NULL) {
+    return CMP_ERROR_INVALID_ARG;
+  }
 #if defined(_MSC_VER)
-  return strtok_s(str, delim, saveptr);
+  *out_tok = strtok_s(str, delim, saveptr);
 #elif defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
   char *end;
   if (str == NULL) {
     str = *saveptr;
   }
   if (str == NULL) {
-    return NULL;
+    *out_tok = NULL;
+    return CMP_ERROR_NOT_FOUND;
   }
   str += strspn(str, delim);
   if (*str == '\0') {
     *saveptr = NULL;
-    return NULL;
+    *out_tok = NULL;
+    return CMP_ERROR_NOT_FOUND;
   }
   end = str + strcspn(str, delim);
   if (*end == '\0') {
@@ -127,8 +211,12 @@ char *cmp_strtok_r(char *str, const char *delim, char **saveptr) {
     *end = '\0';
     *saveptr = end + 1;
   }
-  return str;
+  *out_tok = str;
 #else
-  return strtok_r(str, delim, saveptr);
+  *out_tok = strtok_r(str, delim, saveptr);
 #endif
+  if (*out_tok == NULL) {
+    return CMP_ERROR_NOT_FOUND;
+  }
+  return CMP_SUCCESS;
 }

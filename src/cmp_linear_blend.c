@@ -11,6 +11,13 @@ struct cmp_linear_blend {
   float inv_gamma;
 };
 
+/**
+ * @brief cmp_linear_blend_create
+ *
+ * @param gamma Parameter description.
+ * @param out_blend Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_linear_blend_create(float gamma, cmp_linear_blend_t **out_blend) {
   int rc = CMP_SUCCESS;
   struct cmp_linear_blend *blend = NULL;
@@ -40,6 +47,12 @@ int cmp_linear_blend_create(float gamma, cmp_linear_blend_t **out_blend) {
   return rc;
 }
 
+/**
+ * @brief cmp_linear_blend_destroy
+ *
+ * @param blend Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_linear_blend_destroy(cmp_linear_blend_t *blend) {
   int rc = CMP_SUCCESS;
 
@@ -53,6 +66,14 @@ int cmp_linear_blend_destroy(cmp_linear_blend_t *blend) {
   return rc;
 }
 
+/**
+ * @brief cmp_linear_blend_srgb_to_linear
+ *
+ * @param blend Parameter description.
+ * @param srgb Parameter description.
+ * @param out_linear Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_linear_blend_srgb_to_linear(cmp_linear_blend_t *blend,
                                     const cmp_color_t *srgb,
                                     cmp_color_t *out_linear) {
@@ -75,6 +96,14 @@ int cmp_linear_blend_srgb_to_linear(cmp_linear_blend_t *blend,
   return rc;
 }
 
+/**
+ * @brief cmp_linear_blend_linear_to_srgb
+ *
+ * @param blend Parameter description.
+ * @param linear Parameter description.
+ * @param out_srgb Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_linear_blend_linear_to_srgb(cmp_linear_blend_t *blend,
                                     const cmp_color_t *linear,
                                     cmp_color_t *out_srgb) {
@@ -96,6 +125,16 @@ int cmp_linear_blend_linear_to_srgb(cmp_linear_blend_t *blend,
   return rc;
 }
 
+/**
+ * @brief cmp_linear_blend_mix
+ *
+ * @param blend Parameter description.
+ * @param bg Parameter description.
+ * @param fg Parameter description.
+ * @param alpha Parameter description.
+ * @param out_blended Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_linear_blend_mix(cmp_linear_blend_t *blend, const cmp_color_t *bg,
                          const cmp_color_t *fg, float alpha,
                          cmp_color_t *out_blended) {

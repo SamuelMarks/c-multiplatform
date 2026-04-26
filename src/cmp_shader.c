@@ -4,6 +4,12 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_shader_init_rounded_rect
+ *
+ * @param shader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_init_rounded_rect(cmp_shader_t *shader) {
   if (!shader)
     return CMP_ERROR_INVALID_ARG;
@@ -14,6 +20,12 @@ int cmp_shader_init_rounded_rect(cmp_shader_t *shader) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_shader_init_gradient
+ *
+ * @param shader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_init_gradient(cmp_shader_t *shader) {
   if (!shader)
     return CMP_ERROR_INVALID_ARG;
@@ -23,6 +35,12 @@ int cmp_shader_init_gradient(cmp_shader_t *shader) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_shader_init_sdf_text
+ *
+ * @param shader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_init_sdf_text(cmp_shader_t *shader) {
   if (!shader)
     return CMP_ERROR_INVALID_ARG;
@@ -32,6 +50,12 @@ int cmp_shader_init_sdf_text(cmp_shader_t *shader) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_shader_destroy
+ *
+ * @param shader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_destroy(cmp_shader_t *shader) {
   if (!shader)
     return CMP_ERROR_INVALID_ARG;
@@ -42,6 +66,12 @@ int cmp_shader_destroy(cmp_shader_t *shader) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_shader_get_rounded_rect_sdf_glsl
+ *
+ * @param out_source Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_get_rounded_rect_sdf_glsl(const char **out_source) {
   if (!out_source)
     return CMP_ERROR_INVALID_ARG;
@@ -51,6 +81,12 @@ int cmp_shader_get_rounded_rect_sdf_glsl(const char **out_source) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_shader_get_squircle_sdf_glsl
+ *
+ * @param out_source Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shader_get_squircle_sdf_glsl(const char **out_source) {
   if (!out_source)
     return CMP_ERROR_INVALID_ARG;

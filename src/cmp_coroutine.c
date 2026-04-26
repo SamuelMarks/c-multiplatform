@@ -1,13 +1,50 @@
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
 #include "cmp.h"
+/**
+ * @brief cmp_coroutine_system_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_system_init(void) { return CMP_SUCCESS; }
+/**
+ * @brief cmp_coroutine_system_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_system_shutdown(void) { return CMP_SUCCESS; }
+/**
+ * @brief cmp_coroutine_create
+ *
+ * @param out_co Parameter description.
+ * @param stack_size Parameter description.
+ * @param fn Parameter description.
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
                          cmp_coroutine_fn_t fn, void *arg) {
   return CMP_ERROR_NOT_FOUND;
 }
+/**
+ * @brief cmp_coroutine_resume
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_resume(cmp_coroutine_t *co) { return CMP_ERROR_NOT_FOUND; }
+/**
+ * @brief cmp_coroutine_yield
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_yield(cmp_coroutine_t *co) { return CMP_ERROR_NOT_FOUND; }
+/**
+ * @brief cmp_coroutine_destroy
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_destroy(cmp_coroutine_t *co) { return CMP_ERROR_NOT_FOUND; }
 
 #else
@@ -65,6 +102,12 @@ __declspec(dllimport) void *__stdcall GetCurrentFiber(void);
 static cmp_tls_key_t g_coro_system_key;
 static int g_coro_system_initialized = 0;
 
+/**
+ * @brief cmp_fiber_entry
+ *
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void __stdcall cmp_fiber_entry(void *arg) {
   cmp_coroutine_t *co = (cmp_coroutine_t *)arg;
 
@@ -79,6 +122,11 @@ static void __stdcall cmp_fiber_entry(void *arg) {
   }
 }
 
+/**
+ * @brief cmp_coroutine_system_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_system_init(void) {
   int rc = CMP_SUCCESS;
   void *main_fiber;
@@ -107,6 +155,15 @@ int cmp_coroutine_system_init(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_coroutine_create
+ *
+ * @param out_co Parameter description.
+ * @param stack_size Parameter description.
+ * @param fn Parameter description.
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
                          cmp_coroutine_fn_t fn, void *arg) {
   int rc = CMP_SUCCESS;
@@ -154,6 +211,12 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
   return rc;
 }
 
+/**
+ * @brief cmp_coroutine_resume
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_resume(cmp_coroutine_t *co) {
   int rc = CMP_SUCCESS;
   cmp_coroutine_t *current_co = NULL;
@@ -193,6 +256,12 @@ int cmp_coroutine_resume(cmp_coroutine_t *co) {
   return rc;
 }
 
+/**
+ * @brief cmp_coroutine_yield
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_yield(cmp_coroutine_t *co) {
   int rc = CMP_SUCCESS;
 
@@ -209,6 +278,12 @@ int cmp_coroutine_yield(cmp_coroutine_t *co) {
   return rc;
 }
 
+/**
+ * @brief cmp_coroutine_destroy
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_destroy(cmp_coroutine_t *co) {
   int rc = CMP_SUCCESS;
 
@@ -233,6 +308,13 @@ int cmp_coroutine_destroy(cmp_coroutine_t *co) {
 static cmp_tls_key_t g_coro_system_key;
 static int g_coro_system_initialized = 0;
 
+/**
+ * @brief cmp_ucontext_entry
+ *
+ * @param arg_ptr_lo Parameter description.
+ * @param arg_ptr_hi Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void cmp_ucontext_entry(int arg_ptr_lo, int arg_ptr_hi) {
   /* Reconstruct pointer from 32-bit ints to support 64-bit platforms cleanly
    * via makecontext */
@@ -250,6 +332,11 @@ static void cmp_ucontext_entry(int arg_ptr_lo, int arg_ptr_hi) {
   }
 }
 
+/**
+ * @brief cmp_coroutine_system_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_system_init(void) {
   int rc = CMP_SUCCESS;
 
@@ -265,6 +352,15 @@ int cmp_coroutine_system_init(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_coroutine_create
+ *
+ * @param out_co Parameter description.
+ * @param stack_size Parameter description.
+ * @param fn Parameter description.
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
                          cmp_coroutine_fn_t fn, void *arg) {
   int rc = CMP_SUCCESS;
@@ -342,6 +438,12 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
   return rc;
 }
 
+/**
+ * @brief cmp_coroutine_resume
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_resume(cmp_coroutine_t *co) {
   int rc = CMP_SUCCESS;
   cmp_coroutine_t *current_co = NULL;
@@ -374,6 +476,12 @@ int cmp_coroutine_resume(cmp_coroutine_t *co) {
   return rc;
 }
 
+/**
+ * @brief cmp_coroutine_yield
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_yield(cmp_coroutine_t *co) {
   int rc = CMP_SUCCESS;
 
@@ -390,6 +498,12 @@ int cmp_coroutine_yield(cmp_coroutine_t *co) {
   return rc;
 }
 
+/**
+ * @brief cmp_coroutine_destroy
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_destroy(cmp_coroutine_t *co) {
   int rc = CMP_SUCCESS;
 
@@ -417,12 +531,26 @@ int cmp_coroutine_destroy(cmp_coroutine_t *co) {
 
 #else /* CMP_CORO_SUPPORTED == 0 */
 
+/**
+ * @brief cmp_coroutine_system_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_system_init(void) {
   int rc = CMP_ERROR_NOT_FOUND;
   LOG_DEBUG("Error in cmp_coroutine_system_init: Coroutines not supported on "
             "this platform\n");
   return rc;
 }
+/**
+ * @brief cmp_coroutine_create
+ *
+ * @param out_co Parameter description.
+ * @param stack_size Parameter description.
+ * @param fn Parameter description.
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
                          cmp_coroutine_fn_t fn, void *arg) {
   int rc = CMP_ERROR_NOT_FOUND;
@@ -434,6 +562,12 @@ int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
             "platform\n");
   return rc;
 }
+/**
+ * @brief cmp_coroutine_resume
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_resume(cmp_coroutine_t *co) {
   int rc = CMP_ERROR_NOT_FOUND;
   (void)co;
@@ -441,6 +575,12 @@ int cmp_coroutine_resume(cmp_coroutine_t *co) {
             "platform\n");
   return rc;
 }
+/**
+ * @brief cmp_coroutine_yield
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_yield(cmp_coroutine_t *co) {
   int rc = CMP_ERROR_NOT_FOUND;
   (void)co;
@@ -448,6 +588,12 @@ int cmp_coroutine_yield(cmp_coroutine_t *co) {
             "platform\n");
   return rc;
 }
+/**
+ * @brief cmp_coroutine_destroy
+ *
+ * @param co Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_coroutine_destroy(cmp_coroutine_t *co) {
   int rc = CMP_ERROR_NOT_FOUND;
   (void)co;

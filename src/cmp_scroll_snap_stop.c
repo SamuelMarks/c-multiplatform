@@ -4,6 +4,13 @@
 #include <math.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_scroll_snap_stop_evaluate
+ *
+ * @param mode Parameter description.
+ * @param current_velocity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_snap_stop_evaluate(cmp_scroll_snap_stop_t mode,
                                   float current_velocity) {
   if (mode == CMP_SCROLL_SNAP_STOP_ALWAYS) {

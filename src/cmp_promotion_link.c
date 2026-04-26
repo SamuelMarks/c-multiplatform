@@ -9,6 +9,12 @@ struct cmp_promotion_link {
   int simulated_frame_drops;
 };
 
+/**
+ * @brief cmp_promotion_link_create
+ *
+ * @param out_link Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_promotion_link_create(cmp_promotion_link_t **out_link) {
   struct cmp_promotion_link *ctx;
   if (!out_link)
@@ -25,12 +31,25 @@ int cmp_promotion_link_create(cmp_promotion_link_t **out_link) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_promotion_link_destroy
+ *
+ * @param link Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_promotion_link_destroy(cmp_promotion_link_t *link) {
   if (link)
     CMP_FREE(link);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_promotion_link_sync
+ *
+ * @param link Parameter description.
+ * @param is_sync_enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_promotion_link_sync(cmp_promotion_link_t *link, int is_sync_enabled) {
   struct cmp_promotion_link *l = (struct cmp_promotion_link *)link;
   if (!l)
@@ -39,6 +58,13 @@ int cmp_promotion_link_sync(cmp_promotion_link_t *link, int is_sync_enabled) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_promotion_link_request_rate
+ *
+ * @param link Parameter description.
+ * @param requested_rate Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_promotion_link_request_rate(cmp_promotion_link_t *link,
                                     cmp_frame_rate_t requested_rate) {
   struct cmp_promotion_link *l = (struct cmp_promotion_link *)link;
@@ -48,6 +74,15 @@ int cmp_promotion_link_request_rate(cmp_promotion_link_t *link,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_promotion_link_evaluate_vrr
+ *
+ * @param link Parameter description.
+ * @param is_animating Parameter description.
+ * @param is_scrolling Parameter description.
+ * @param out_target_rate Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_promotion_link_evaluate_vrr(cmp_promotion_link_t *link,
                                     int is_animating, int is_scrolling,
                                     cmp_frame_rate_t *out_target_rate) {
@@ -68,6 +103,13 @@ int cmp_promotion_link_evaluate_vrr(cmp_promotion_link_t *link,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_promotion_link_validate_frame_drops
+ *
+ * @param link Parameter description.
+ * @param out_dropped_frames Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_promotion_link_validate_frame_drops(cmp_promotion_link_t *link,
                                             int *out_dropped_frames) {
   struct cmp_promotion_link *l = (struct cmp_promotion_link *)link;

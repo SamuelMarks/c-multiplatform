@@ -10,6 +10,12 @@ struct cmp_network {
   cmp_network_status_t current_status;
 };
 
+/**
+ * @brief cmp_network_create
+ *
+ * @param out_network Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_network_create(cmp_network_t **out_network) {
   int rc = CMP_SUCCESS;
   cmp_network_t *network = NULL;
@@ -32,6 +38,12 @@ int cmp_network_create(cmp_network_t **out_network) {
   return rc;
 }
 
+/**
+ * @brief cmp_network_destroy
+ *
+ * @param network Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_network_destroy(cmp_network_t *network) {
   int rc = CMP_SUCCESS;
 
@@ -44,6 +56,13 @@ int cmp_network_destroy(cmp_network_t *network) {
   return rc;
 }
 
+/**
+ * @brief cmp_network_get_status
+ *
+ * @param network Parameter description.
+ * @param out_status Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_network_get_status(const cmp_network_t *network,
                            cmp_network_status_t *out_status) {
   int rc = CMP_SUCCESS;
@@ -57,6 +76,13 @@ int cmp_network_get_status(const cmp_network_t *network,
   return rc;
 }
 
+/**
+ * @brief cmp_network_set_status
+ *
+ * @param network Parameter description.
+ * @param status Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_network_set_status(cmp_network_t *network,
                            cmp_network_status_t status) {
   int rc = CMP_SUCCESS;

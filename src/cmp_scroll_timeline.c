@@ -8,6 +8,12 @@ struct cmp_scroll_timeline {
   int is_active;
 };
 
+/**
+ * @brief cmp_scroll_timeline_create
+ *
+ * @param out_timeline Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_timeline_create(cmp_scroll_timeline_t **out_timeline) {
   struct cmp_scroll_timeline *timeline;
 
@@ -25,6 +31,12 @@ int cmp_scroll_timeline_create(cmp_scroll_timeline_t **out_timeline) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_timeline_destroy
+ *
+ * @param timeline Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_timeline_destroy(cmp_scroll_timeline_t *timeline) {
   struct cmp_scroll_timeline *internal_timeline =
       (struct cmp_scroll_timeline *)timeline;
@@ -35,6 +47,15 @@ int cmp_scroll_timeline_destroy(cmp_scroll_timeline_t *timeline) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_timeline_evaluate
+ *
+ * @param timeline Parameter description.
+ * @param scroll_offset Parameter description.
+ * @param max_scroll_offset Parameter description.
+ * @param out_progress Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_timeline_evaluate(cmp_scroll_timeline_t *timeline,
                                  float scroll_offset, float max_scroll_offset,
                                  float *out_progress) {

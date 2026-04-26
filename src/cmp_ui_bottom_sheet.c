@@ -9,6 +9,12 @@ struct cmp_ui_bottom_sheet {
   int is_visible;
 };
 
+/**
+ * @brief cmp_ui_bottom_sheet_create
+ *
+ * @param out_sheet Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_bottom_sheet_create(cmp_ui_bottom_sheet_t **out_sheet) {
   cmp_ui_bottom_sheet_t *sheet;
   int err;
@@ -39,6 +45,12 @@ int cmp_ui_bottom_sheet_create(cmp_ui_bottom_sheet_t **out_sheet) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_bottom_sheet_destroy
+ *
+ * @param sheet Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_bottom_sheet_destroy(cmp_ui_bottom_sheet_t *sheet) {
   if (!sheet) {
     return CMP_ERROR_INVALID_ARG;
@@ -47,6 +59,13 @@ int cmp_ui_bottom_sheet_destroy(cmp_ui_bottom_sheet_t *sheet) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_bottom_sheet_get_node
+ *
+ * @param sheet Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_bottom_sheet_get_node(cmp_ui_bottom_sheet_t *sheet,
                                  cmp_ui_node_t **out_node) {
   if (!sheet || !out_node) {
@@ -56,6 +75,13 @@ int cmp_ui_bottom_sheet_get_node(cmp_ui_bottom_sheet_t *sheet,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_bottom_sheet_set_visible
+ *
+ * @param sheet Parameter description.
+ * @param visible Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_bottom_sheet_set_visible(cmp_ui_bottom_sheet_t *sheet, int visible) {
   if (!sheet) {
     return CMP_ERROR_INVALID_ARG;
@@ -66,6 +92,13 @@ int cmp_ui_bottom_sheet_set_visible(cmp_ui_bottom_sheet_t *sheet, int visible) {
 
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_ui_bottom_sheet_bind_a11y
+ *
+ * @param widget Parameter description.
+ * @param tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_bottom_sheet_bind_a11y(cmp_ui_bottom_sheet_t *widget,
                                   cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {

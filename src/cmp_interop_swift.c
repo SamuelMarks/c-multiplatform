@@ -4,12 +4,23 @@
 #include <stdlib.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_interop_mock_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_interop_mock_init(void) {
   int rc = CMP_SUCCESS;
   /* Placeholder for C to Swift ABI stability hooks */
   return rc;
 }
 
+/**
+ * @brief cmp_interop_cfstring_bridge
+ *
+ * @param cf_string_ref Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_interop_cfstring_bridge(void *cf_string_ref) {
   int rc = CMP_SUCCESS;
   if (!cf_string_ref) {
@@ -22,6 +33,12 @@ int cmp_interop_cfstring_bridge(void *cf_string_ref) {
   return rc;
 }
 
+/**
+ * @brief cmp_interop_allocate_retained_object
+ *
+ * @param out_object Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_interop_allocate_retained_object(void **out_object)
     CMP_RETURNS_RETAINED {
   int rc = CMP_SUCCESS;
@@ -43,6 +60,12 @@ int cmp_interop_allocate_retained_object(void **out_object)
   return rc;
 }
 
+/**
+ * @brief cmp_interop_release_object
+ *
+ * @param object Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_interop_release_object(void *object) {
   int rc = CMP_SUCCESS;
   if (object) {

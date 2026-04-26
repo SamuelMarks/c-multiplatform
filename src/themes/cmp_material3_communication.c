@@ -4,6 +4,13 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_m3_badge_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_badge_resolve(cmp_m3_badge_variant_t variant,
                          cmp_m3_badge_metrics_t *out_metrics) {
   if (!out_metrics) {
@@ -30,6 +37,13 @@ int cmp_m3_badge_resolve(cmp_m3_badge_variant_t variant,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_progress_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_progress_resolve(cmp_m3_progress_variant_t variant,
                             cmp_m3_progress_metrics_t *out_metrics) {
   if (!out_metrics) {
@@ -53,6 +67,12 @@ int cmp_m3_progress_resolve(cmp_m3_progress_variant_t variant,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_snackbar_resolve
+ *
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_snackbar_resolve(cmp_m3_snackbar_metrics_t *out_metrics) {
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
@@ -65,6 +85,12 @@ int cmp_m3_snackbar_resolve(cmp_m3_snackbar_metrics_t *out_metrics) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_pull_to_refresh_resolve
+ *
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_pull_to_refresh_resolve(
     cmp_m3_pull_to_refresh_metrics_t *out_metrics) {
   if (!out_metrics) {

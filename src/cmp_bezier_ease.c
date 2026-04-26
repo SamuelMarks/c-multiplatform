@@ -11,6 +11,16 @@ struct cmp_bezier_ease {
   float y2;
 };
 
+/**
+ * @brief cmp_bezier_ease_create
+ *
+ * @param x1 Parameter description.
+ * @param y1 Parameter description.
+ * @param x2 Parameter description.
+ * @param y2 Parameter description.
+ * @param out_bezier Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_bezier_ease_create(float x1, float y1, float x2, float y2,
                            cmp_bezier_ease_t **out_bezier) {
   struct cmp_bezier_ease *bezier;
@@ -31,6 +41,12 @@ int cmp_bezier_ease_create(float x1, float y1, float x2, float y2,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_bezier_ease_destroy
+ *
+ * @param bezier Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_bezier_ease_destroy(cmp_bezier_ease_t *bezier) {
   struct cmp_bezier_ease *internal_bezier = (struct cmp_bezier_ease *)bezier;
   if (!internal_bezier)
@@ -66,6 +82,14 @@ static float cubic_bezier_derivative(float p0, float p1, float p2, float p3,
   return dt_p0 + dt_p1 + dt_p2;
 }
 
+/**
+ * @brief cmp_bezier_ease_evaluate
+ *
+ * @param bezier Parameter description.
+ * @param t Parameter description.
+ * @param out_value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_bezier_ease_evaluate(cmp_bezier_ease_t *bezier, float t,
                              float *out_value) {
   struct cmp_bezier_ease *b = (struct cmp_bezier_ease *)bezier;

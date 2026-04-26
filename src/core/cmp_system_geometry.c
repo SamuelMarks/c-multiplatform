@@ -4,6 +4,13 @@
 #include <stdlib.h>
 /* clang-format on */
 
+/**
+ * @brief Sets whether the corner curve of a layout node is continuous.
+ *
+ * @param node Pointer to the layout node.
+ * @param is_continuous 1 to enable continuous curves, 0 otherwise.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layout_set_corner_curve_continuous(cmp_layout_node_t *node,
                                            int is_continuous) {
   if (!node)
@@ -14,6 +21,13 @@ int cmp_layout_set_corner_curve_continuous(cmp_layout_node_t *node,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Enforces pixel alignment for a layout node.
+ *
+ * @param node Pointer to the layout node.
+ * @param is_aligned 1 to enforce alignment, 0 otherwise.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layout_enforce_pixel_alignment(cmp_layout_node_t *node,
                                        int is_aligned) {
   if (!node)
@@ -28,6 +42,12 @@ struct cmp_system_geometry {
   int is_initialized;
 };
 
+/**
+ * @brief Creates a system geometry context.
+ *
+ * @param out_geom Pointer to a variable where the context pointer will be stored.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_geometry_create(cmp_system_geometry_t **out_geom) {
   struct cmp_system_geometry *ctx;
   if (!out_geom)
@@ -40,17 +60,31 @@ int cmp_system_geometry_create(cmp_system_geometry_t **out_geom) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Destroys a system geometry context.
+ *
+ * @param geom Pointer to the context to destroy.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_geometry_destroy(cmp_system_geometry_t *geom) {
   int rc;
   if (!geom) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_system_geometry_destroy: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_system_geometry_destroy: %s\n", err_str);
+ }    return rc;
   }
   CMP_FREE(geom);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Retrieves the safe area insets for a specific platform.
+ *
+ * @param geom Pointer to the system geometry context.
+ * @param is_tvos 1 if querying for tvOS, 0 otherwise.
+ * @param out_safe_insets Pointer to a rectangle struct to store the insets.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_geometry_get_safe_area(cmp_system_geometry_t *geom, int is_tvos,
                                       cmp_rect_t *out_safe_insets) {
   if (!geom || !out_safe_insets)
@@ -72,6 +106,15 @@ int cmp_system_geometry_get_safe_area(cmp_system_geometry_t *geom, int is_tvos,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Retrieves the layout margins based on width classification.
+ *
+ * @param geom Pointer to the system geometry context.
+ * @param is_compact_width 1 if the width is compact, 0 for regular width.
+ * @param out_leading Pointer to a float to store the leading margin.
+ * @param out_trailing Pointer to a float to store the trailing margin.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_geometry_get_layout_margins(cmp_system_geometry_t *geom,
                                            int is_compact_width,
                                            float *out_leading,
@@ -86,6 +129,14 @@ int cmp_system_geometry_get_layout_margins(cmp_system_geometry_t *geom,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Computes the readable content guide width based on available width.
+ *
+ * @param geom Pointer to the system geometry context.
+ * @param available_width The available layout width.
+ * @param out_max_readable_width Pointer to a float to store the maximum readable width.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_geometry_get_readable_content_guide(
     cmp_system_geometry_t *geom, float available_width,
     float *out_max_readable_width) {

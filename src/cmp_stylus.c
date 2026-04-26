@@ -10,6 +10,12 @@ struct cmp_stylus_context {
 
 static int g_scribble_enabled = 1;
 
+/**
+ * @brief cmp_stylus_context_create
+ *
+ * @param out_context Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stylus_context_create(cmp_stylus_context_t **out_context) {
   struct cmp_stylus_context *ctx;
   if (!out_context)
@@ -25,12 +31,26 @@ int cmp_stylus_context_create(cmp_stylus_context_t **out_context) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_stylus_context_destroy
+ *
+ * @param context_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stylus_context_destroy(cmp_stylus_context_t *context_opaque) {
   if (context_opaque)
     CMP_FREE(context_opaque);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_stylus_context_set_event_callback
+ *
+ * @param context_opaque Parameter description.
+ * @param callback Parameter description.
+ * @param userdata Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stylus_context_set_event_callback(cmp_stylus_context_t *context_opaque,
                                           cmp_stylus_event_cb callback,
                                           void *userdata) {
@@ -42,6 +62,15 @@ int cmp_stylus_context_set_event_callback(cmp_stylus_context_t *context_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_stylus_resolve_ink_metrics
+ *
+ * @param event Parameter description.
+ * @param base_width Parameter description.
+ * @param out_brush_opacity Parameter description.
+ * @param out_brush_width Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stylus_resolve_ink_metrics(const cmp_event_t *event, float base_width,
                                    float *out_brush_opacity,
                                    float *out_brush_width) {
@@ -71,6 +100,14 @@ int cmp_stylus_resolve_ink_metrics(const cmp_event_t *event, float base_width,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_stylus_evaluate_hover
+ *
+ * @param event Parameter description.
+ * @param out_is_hovering Parameter description.
+ * @param out_distance Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stylus_evaluate_hover(const cmp_event_t *event, int *out_is_hovering,
                               float *out_distance) {
   if (!event || !out_is_hovering || !out_distance)
@@ -87,6 +124,12 @@ int cmp_stylus_evaluate_hover(const cmp_event_t *event, int *out_is_hovering,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_stylus_set_scribble_enabled
+ *
+ * @param is_enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stylus_set_scribble_enabled(int is_enabled) {
   g_scribble_enabled = is_enabled;
   return CMP_SUCCESS;

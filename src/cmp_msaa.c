@@ -12,6 +12,15 @@ struct cmp_msaa {
   void *internal_renderbuffer;
 };
 
+/**
+ * @brief cmp_msaa_create
+ *
+ * @param sample_count Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param out_msaa Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_msaa_create(uint8_t sample_count, uint32_t width, uint32_t height,
                     cmp_msaa_t **out_msaa) {
   int rc = CMP_SUCCESS;
@@ -56,6 +65,12 @@ int cmp_msaa_create(uint8_t sample_count, uint32_t width, uint32_t height,
   return rc;
 }
 
+/**
+ * @brief cmp_msaa_destroy
+ *
+ * @param msaa Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_msaa_destroy(cmp_msaa_t *msaa) {
   int rc = CMP_SUCCESS;
 
@@ -71,6 +86,13 @@ int cmp_msaa_destroy(cmp_msaa_t *msaa) {
   return rc;
 }
 
+/**
+ * @brief cmp_msaa_resolve
+ *
+ * @param msaa Parameter description.
+ * @param target_texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_msaa_resolve(cmp_msaa_t *msaa, cmp_texture_t *target_texture) {
   int rc = CMP_SUCCESS;
 

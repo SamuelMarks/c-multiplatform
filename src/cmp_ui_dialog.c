@@ -11,6 +11,14 @@ struct cmp_ui_dialog {
   int is_visible;
 };
 
+/**
+ * @brief cmp_ui_dialog_create
+ *
+ * @param out_dialog Parameter description.
+ * @param title Parameter description.
+ * @param content Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_dialog_create(cmp_ui_dialog_t **out_dialog, const char *title,
                          const char *content) {
   cmp_ui_dialog_t *dialog;
@@ -53,6 +61,12 @@ int cmp_ui_dialog_create(cmp_ui_dialog_t **out_dialog, const char *title,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_dialog_destroy
+ *
+ * @param dialog Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_dialog_destroy(cmp_ui_dialog_t *dialog) {
   if (!dialog) {
     return CMP_ERROR_INVALID_ARG;
@@ -61,6 +75,13 @@ int cmp_ui_dialog_destroy(cmp_ui_dialog_t *dialog) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_dialog_get_node
+ *
+ * @param dialog Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_dialog_get_node(cmp_ui_dialog_t *dialog, cmp_ui_node_t **out_node) {
   if (!dialog || !out_node) {
     return CMP_ERROR_INVALID_ARG;
@@ -69,6 +90,13 @@ int cmp_ui_dialog_get_node(cmp_ui_dialog_t *dialog, cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_dialog_set_visible
+ *
+ * @param dialog Parameter description.
+ * @param visible Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_dialog_set_visible(cmp_ui_dialog_t *dialog, int visible) {
   if (!dialog) {
     return CMP_ERROR_INVALID_ARG;
@@ -79,6 +107,13 @@ int cmp_ui_dialog_set_visible(cmp_ui_dialog_t *dialog, int visible) {
 
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_ui_dialog_bind_a11y
+ *
+ * @param widget Parameter description.
+ * @param tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_dialog_bind_a11y(cmp_ui_dialog_t *widget, cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;

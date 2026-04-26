@@ -5,21 +5,27 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_layout_node_create
+ *
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layout_node_create(cmp_layout_node_t **out_node) {
   int rc;
   cmp_layout_node_t *node;
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_layout_node_create: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_layout_node_create: %s\n", err_str);
+ }    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&node);
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_layout_node_create CMP_MALLOC: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_layout_node_create CMP_MALLOC: %s\n", err_str);
+ }    return rc;
   }
 
   memset(node, 0, sizeof(cmp_layout_node_t));
@@ -40,14 +46,20 @@ int cmp_layout_node_create(cmp_layout_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_layout_node_destroy
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layout_node_destroy(cmp_layout_node_t *node) {
   int rc;
   size_t i;
 
   if (node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_layout_node_destroy: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_layout_node_destroy: %s\n", err_str);
+ }    return rc;
   }
 
   for (i = 0; i < node->child_count; i++) {
@@ -62,6 +74,13 @@ int cmp_layout_node_destroy(cmp_layout_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_layout_node_add_child
+ *
+ * @param parent Parameter description.
+ * @param child Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layout_node_add_child(cmp_layout_node_t *parent,
                               cmp_layout_node_t *child) {
   if (parent == NULL || child == NULL) {
@@ -102,6 +121,16 @@ typedef struct {
   float total_flex_shrink;
 } cmp_layout_line_t;
 
+/**
+ * @brief calculate_node_pass
+ *
+ * @param node Parameter description.
+ * @param parent_x Parameter description.
+ * @param parent_y Parameter description.
+ * @param available_width Parameter description.
+ * @param available_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
                                 float parent_y, float available_width,
                                 float available_height) {
@@ -441,6 +470,13 @@ static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
   }
 }
 
+/**
+ * @brief translate_descendants
+ *
+ * @param node Parameter description.
+ * @param dx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void translate_descendants(cmp_layout_node_t *node, float dx) {
   size_t i;
   if (!node) return;
@@ -450,6 +486,12 @@ static void translate_descendants(cmp_layout_node_t *node, float dx) {
   }
 }
 
+/**
+ * @brief apply_rtl_mirroring
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void apply_rtl_mirroring(cmp_layout_node_t *node) {
   size_t i;
   if (!node) return;
@@ -474,6 +516,14 @@ static void apply_rtl_mirroring(cmp_layout_node_t *node) {
   }
 }
 
+/**
+ * @brief cmp_layout_calculate
+ *
+ * @param root Parameter description.
+ * @param available_width Parameter description.
+ * @param available_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
                          float available_height) {
   if (root == NULL) {

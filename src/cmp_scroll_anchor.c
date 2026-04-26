@@ -9,6 +9,12 @@ struct cmp_scroll_anchor {
   float saved_visual_offset_y;
 };
 
+/**
+ * @brief cmp_scroll_anchor_create
+ *
+ * @param out_anchor Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_anchor_create(cmp_scroll_anchor_t **out_anchor) {
   struct cmp_scroll_anchor *anchor;
 
@@ -25,6 +31,12 @@ int cmp_scroll_anchor_create(cmp_scroll_anchor_t **out_anchor) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_anchor_destroy
+ *
+ * @param anchor Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_anchor_destroy(cmp_scroll_anchor_t *anchor) {
   struct cmp_scroll_anchor *internal_anchor =
       (struct cmp_scroll_anchor *)anchor;
@@ -36,6 +48,14 @@ int cmp_scroll_anchor_destroy(cmp_scroll_anchor_t *anchor) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_anchor_save
+ *
+ * @param anchor Parameter description.
+ * @param element_id Parameter description.
+ * @param visual_offset_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_anchor_save(cmp_scroll_anchor_t *anchor, unsigned int element_id,
                            float visual_offset_y) {
   struct cmp_scroll_anchor *internal_anchor =
@@ -50,6 +70,15 @@ int cmp_scroll_anchor_save(cmp_scroll_anchor_t *anchor, unsigned int element_id,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_anchor_restore
+ *
+ * @param anchor Parameter description.
+ * @param element_id Parameter description.
+ * @param new_visual_offset_y Parameter description.
+ * @param out_scroll_delta_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_anchor_restore(const cmp_scroll_anchor_t *anchor,
                               unsigned int element_id,
                               float new_visual_offset_y,

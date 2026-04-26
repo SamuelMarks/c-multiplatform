@@ -4,6 +4,11 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_verify_hardware_acceleration
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_verify_hardware_acceleration(void) {
   int rc = CMP_SUCCESS;
   cmp_gpu_t *gpu = NULL;

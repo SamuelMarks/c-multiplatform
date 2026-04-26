@@ -4,6 +4,14 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_m3_button_resolve
+ *
+ * @param variant Parameter description.
+ * @param has_leading_icon Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_button_resolve(cmp_m3_button_variant_t variant, int has_leading_icon,
                           cmp_m3_button_metrics_t *out_metrics) {
   if (!out_metrics) {
@@ -89,6 +97,14 @@ int cmp_m3_button_resolve(cmp_m3_button_variant_t variant, int has_leading_icon,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_fab_resolve
+ *
+ * @param variant Parameter description.
+ * @param is_lowered Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_fab_resolve(cmp_m3_fab_variant_t variant, int is_lowered,
                        cmp_m3_fab_metrics_t *out_metrics) {
   if (!out_metrics) {
@@ -139,6 +155,13 @@ int cmp_m3_fab_resolve(cmp_m3_fab_variant_t variant, int is_lowered,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_icon_button_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_icon_button_resolve(cmp_m3_icon_button_variant_t variant,
                                cmp_m3_icon_button_metrics_t *out_metrics) {
   if (!out_metrics) {
@@ -168,6 +191,12 @@ int cmp_m3_icon_button_resolve(cmp_m3_icon_button_variant_t variant,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_segmented_button_resolve
+ *
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_segmented_button_resolve(
     cmp_m3_segmented_button_metrics_t *out_metrics) {
   if (!out_metrics) {

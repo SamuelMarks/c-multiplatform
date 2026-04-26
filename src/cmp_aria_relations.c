@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -18,6 +19,13 @@ struct cmp_aria_relations {
   size_t capacity;
 };
 
+/**
+ * @brief cmp_aria_relations_create
+ *
+ * @param tree Parameter description.
+ * @param out_rels Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_aria_relations_create(cmp_a11y_tree_t *tree,
                               cmp_aria_relations_t **out_rels) {
   int rc = CMP_SUCCESS;
@@ -25,13 +33,21 @@ int cmp_aria_relations_create(cmp_a11y_tree_t *tree,
 
   if (!tree || !out_rels) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_aria_relations_create: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_aria_relations_create: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_aria_relations), (void **)&rels);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_aria_relations_create: Out of memory\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_aria_relations_create: Out of memory: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -44,15 +60,25 @@ int cmp_aria_relations_create(cmp_a11y_tree_t *tree,
   return rc;
 }
 
+/**
+ * @brief cmp_aria_relations_destroy
+ *
+ * @param rels Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_aria_relations_destroy(cmp_aria_relations_t *rels) {
   int rc = CMP_SUCCESS;
   struct cmp_aria_relations *r = (struct cmp_aria_relations *)rels;
 
   if (!r) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_aria_relations_destroy: Invalid argument (rels=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG(
+          "cmp_aria_relations_destroy: Invalid argument (rels=NULL): %s\n",
+          err_str);
+    }
     return rc;
   }
 
@@ -64,6 +90,15 @@ int cmp_aria_relations_destroy(cmp_aria_relations_t *rels) {
   return rc;
 }
 
+/**
+ * @brief cmp_aria_relations_add
+ *
+ * @param rels Parameter description.
+ * @param source_id Parameter description.
+ * @param target_id Parameter description.
+ * @param rel_type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_aria_relations_add(cmp_aria_relations_t *rels, int source_id,
                            int target_id, cmp_aria_relation_type_t rel_type) {
   int rc = CMP_SUCCESS;
@@ -73,8 +108,12 @@ int cmp_aria_relations_add(cmp_aria_relations_t *rels, int source_id,
 
   if (!r) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_aria_relations_add: Invalid argument (rels=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_aria_relations_add: Invalid argument (rels=NULL): %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -83,7 +122,11 @@ int cmp_aria_relations_add(cmp_aria_relations_t *rels, int source_id,
     rc = CMP_MALLOC(new_capacity * sizeof(cmp_aria_relation_t),
                     (void **)&new_relations);
     if (rc != CMP_SUCCESS) {
-      fprintf(stderr, "Error in cmp_aria_relations_add: Out of memory\n");
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_aria_relations_add: Out of memory: %s\n", err_str);
+      }
       return rc;
     }
 
@@ -104,6 +147,12 @@ int cmp_aria_relations_add(cmp_aria_relations_t *rels, int source_id,
   return rc;
 }
 
+/**
+ * @brief cmp_aria_relations_sync
+ *
+ * @param rels Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_aria_relations_sync(cmp_aria_relations_t *rels) {
   int rc = CMP_SUCCESS;
   struct cmp_aria_relations *r = (struct cmp_aria_relations *)rels;
@@ -111,8 +160,12 @@ int cmp_aria_relations_sync(cmp_aria_relations_t *rels) {
 
   if (!r) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_aria_relations_sync: Invalid argument (rels=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_aria_relations_sync: Invalid argument (rels=NULL): %s\n",
+                err_str);
+    }
     return rc;
   }
 

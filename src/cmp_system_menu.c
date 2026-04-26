@@ -17,6 +17,12 @@ struct cmp_system_menu {
   int is_showing;
 };
 
+/**
+ * @brief cmp_system_menu_create
+ *
+ * @param out_menu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_menu_create(cmp_system_menu_t **out_menu) {
   cmp_system_menu_t *menu;
   if (!out_menu) {
@@ -30,6 +36,12 @@ int cmp_system_menu_create(cmp_system_menu_t **out_menu) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_system_menu_destroy
+ *
+ * @param menu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_menu_destroy(cmp_system_menu_t *menu) {
   size_t i;
   if (!menu) {
@@ -47,6 +59,14 @@ int cmp_system_menu_destroy(cmp_system_menu_t *menu) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_system_menu_add_item
+ *
+ * @param menu Parameter description.
+ * @param label Parameter description.
+ * @param id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_menu_add_item(cmp_system_menu_t *menu, const char *label,
                              int id) {
   size_t len;
@@ -85,6 +105,12 @@ int cmp_system_menu_add_item(cmp_system_menu_t *menu, const char *label,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_system_menu_show
+ *
+ * @param menu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_menu_show(cmp_system_menu_t *menu) {
   if (!menu) {
     return CMP_ERROR_INVALID_ARG;

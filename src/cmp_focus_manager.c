@@ -20,6 +20,13 @@ struct cmp_focus_manager {
   int currently_focused_id;
 };
 
+/**
+ * @brief cmp_focus_manager_create
+ *
+ * @param tree Parameter description.
+ * @param out_focus_manager Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_focus_manager_create(cmp_a11y_tree_t *tree,
                              cmp_focus_manager_t **out_focus_manager) {
   int rc = CMP_SUCCESS;
@@ -47,6 +54,12 @@ int cmp_focus_manager_create(cmp_a11y_tree_t *tree,
   return rc;
 }
 
+/**
+ * @brief cmp_focus_manager_destroy
+ *
+ * @param focus_manager Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_focus_manager_destroy(cmp_focus_manager_t *focus_manager) {
   int rc = CMP_SUCCESS;
   struct cmp_focus_manager *mgr = (struct cmp_focus_manager *)focus_manager;
@@ -65,6 +78,14 @@ int cmp_focus_manager_destroy(cmp_focus_manager_t *focus_manager) {
   return rc;
 }
 
+/**
+ * @brief cmp_focus_manager_set_focus
+ *
+ * @param focus_manager Parameter description.
+ * @param node_id Parameter description.
+ * @param has_focus Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_focus_manager_set_focus(cmp_focus_manager_t *focus_manager, int node_id,
                                 int has_focus) {
   int rc = CMP_SUCCESS;
@@ -128,6 +149,15 @@ int cmp_focus_manager_set_focus(cmp_focus_manager_t *focus_manager, int node_id,
   return rc;
 }
 
+/**
+ * @brief cmp_focus_manager_navigate
+ *
+ * @param focus_manager Parameter description.
+ * @param current_node_id Parameter description.
+ * @param direction Parameter description.
+ * @param out_next_node_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_focus_manager_navigate(cmp_focus_manager_t *focus_manager,
                                int current_node_id, int direction,
                                int *out_next_node_id) {

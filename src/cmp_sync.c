@@ -1,55 +1,135 @@
 #include "cmp.h"
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+/**
+ * @brief cmp_semaphore_init
+ *
+ * @param sem Parameter description.
+ * @param count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_init(cmp_semaphore_t *sem, int count) {
   (void)sem;
   (void)count;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_semaphore_wait
+ *
+ * @param sem Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_wait(cmp_semaphore_t *sem) {
   (void)sem;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_semaphore_post
+ *
+ * @param sem Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_post(cmp_semaphore_t *sem) {
   (void)sem;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_semaphore_destroy
+ *
+ * @param sem Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
   (void)sem;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_mutex_init
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_init(cmp_mutex_t *mutex) {
   (void)mutex;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_mutex_lock
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_lock(cmp_mutex_t *mutex) {
   (void)mutex;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_mutex_unlock
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_unlock(cmp_mutex_t *mutex) {
   (void)mutex;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_mutex_destroy
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_destroy(cmp_mutex_t *mutex) {
   (void)mutex;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_cond_init
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_init(cmp_cond_t *cond) {
   (void)cond;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_cond_wait
+ *
+ * @param cond Parameter description.
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
   (void)cond;
   (void)mutex;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_cond_signal
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_signal(cmp_cond_t *cond) {
   (void)cond;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_cond_broadcast
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_broadcast(cmp_cond_t *cond) {
   (void)cond;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_cond_destroy
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_destroy(cmp_cond_t *cond) {
   (void)cond;
   return CMP_SUCCESS;
@@ -57,18 +137,98 @@ int cmp_cond_destroy(cmp_cond_t *cond) {
 #else
 #include "cmp.h"
 #if 0 || defined(__WATCOMC__) || defined(__DOS__)
+/**
+ * @brief cmp_semaphore_init
+ *
+ * @param sem Parameter description.
+ * @param count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_init(cmp_semaphore_t *sem, int count) { (void)sem; (void)count; return CMP_SUCCESS; }
+/**
+ * @brief cmp_semaphore_wait
+ *
+ * @param sem Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_wait(cmp_semaphore_t *sem) { (void)sem; return CMP_SUCCESS; }
+/**
+ * @brief cmp_semaphore_post
+ *
+ * @param sem Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_post(cmp_semaphore_t *sem) { (void)sem; return CMP_SUCCESS; }
+/**
+ * @brief cmp_semaphore_destroy
+ *
+ * @param sem Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_destroy(cmp_semaphore_t *sem) { (void)sem; return CMP_SUCCESS; }
+/**
+ * @brief cmp_mutex_init
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_init(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+/**
+ * @brief cmp_mutex_lock
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_lock(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+/**
+ * @brief cmp_mutex_unlock
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_unlock(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+/**
+ * @brief cmp_mutex_destroy
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_destroy(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+/**
+ * @brief cmp_cond_init
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_init(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
+/**
+ * @brief cmp_cond_wait
+ *
+ * @param cond Parameter description.
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) { (void)cond; (void)mutex; return CMP_SUCCESS; }
+/**
+ * @brief cmp_cond_signal
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_signal(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
+/**
+ * @brief cmp_cond_broadcast
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_broadcast(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
+/**
+ * @brief cmp_cond_destroy
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_destroy(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
 #else
 #if 0 || defined(__WATCOMC__) || defined(__DOS__)
@@ -106,6 +266,12 @@ typedef struct {
 } cmp_apple_sem_t;
 #endif
 
+/**
+ * @brief cmp_mutex_init
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_init(cmp_mutex_t *mutex) {
   if (mutex == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -124,6 +290,12 @@ int cmp_mutex_init(cmp_mutex_t *mutex) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_mutex_lock
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_lock(cmp_mutex_t *mutex) {
   if (mutex == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -141,6 +313,12 @@ int cmp_mutex_lock(cmp_mutex_t *mutex) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_mutex_unlock
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_unlock(cmp_mutex_t *mutex) {
   if (mutex == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -158,6 +336,12 @@ int cmp_mutex_unlock(cmp_mutex_t *mutex) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_mutex_destroy
+ *
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mutex_destroy(cmp_mutex_t *mutex) {
   if (mutex == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -176,6 +360,13 @@ int cmp_mutex_destroy(cmp_mutex_t *mutex) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_semaphore_init
+ *
+ * @param sem Parameter description.
+ * @param initial_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_init(cmp_semaphore_t *sem, int initial_count) {
   if (sem == NULL || initial_count < 0) {
     return CMP_ERROR_INVALID_ARG;
@@ -218,6 +409,12 @@ int cmp_semaphore_init(cmp_semaphore_t *sem, int initial_count) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_semaphore_wait
+ *
+ * @param sem Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_wait(cmp_semaphore_t *sem) {
   if (sem == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -245,6 +442,12 @@ int cmp_semaphore_wait(cmp_semaphore_t *sem) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_semaphore_post
+ *
+ * @param sem Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_post(cmp_semaphore_t *sem) {
   if (sem == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -270,6 +473,12 @@ int cmp_semaphore_post(cmp_semaphore_t *sem) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_semaphore_destroy
+ *
+ * @param sem Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
   if (sem == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -296,6 +505,12 @@ int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_cond_init
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_init(cmp_cond_t *cond) {
   if (cond == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -338,6 +553,13 @@ int cmp_cond_init(cmp_cond_t *cond) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_cond_wait
+ *
+ * @param cond Parameter description.
+ * @param mutex Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;
@@ -378,6 +600,12 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_cond_signal
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_signal(cmp_cond_t *cond) {
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;
@@ -406,6 +634,12 @@ int cmp_cond_signal(cmp_cond_t *cond) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_cond_broadcast
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_broadcast(cmp_cond_t *cond) {
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;
@@ -434,6 +668,12 @@ int cmp_cond_broadcast(cmp_cond_t *cond) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_cond_destroy
+ *
+ * @param cond Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_cond_destroy(cmp_cond_t *cond) {
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;

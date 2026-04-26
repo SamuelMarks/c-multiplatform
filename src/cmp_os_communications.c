@@ -9,6 +9,12 @@ struct cmp_os_communications {
   int is_focus_mode_suppressed;
 };
 
+/**
+ * @brief cmp_os_communications_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_communications_create(cmp_os_communications_t **out_ctx) {
   int rc = CMP_SUCCESS;
   struct cmp_os_communications *ctx = NULL;
@@ -32,6 +38,12 @@ int cmp_os_communications_create(cmp_os_communications_t **out_ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_os_communications_destroy
+ *
+ * @param ctx_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_communications_destroy(cmp_os_communications_t *ctx_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_os_communications *ctx =
@@ -45,6 +57,14 @@ int cmp_os_communications_destroy(cmp_os_communications_t *ctx_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_os_communications_register_intent
+ *
+ * @param ctx_opaque Parameter description.
+ * @param intent_id Parameter description.
+ * @param title Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_communications_register_intent(cmp_os_communications_t *ctx_opaque,
                                           const char *intent_id,
                                           const char *title) {
@@ -62,6 +82,15 @@ int cmp_os_communications_register_intent(cmp_os_communications_t *ctx_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_os_communications_show_share_sheet
+ *
+ * @param ctx_opaque Parameter description.
+ * @param window Parameter description.
+ * @param url_to_share Parameter description.
+ * @param text_to_share Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_communications_show_share_sheet(cmp_os_communications_t *ctx_opaque,
                                            cmp_window_t *window,
                                            const char *url_to_share,
@@ -80,6 +109,14 @@ int cmp_os_communications_show_share_sheet(cmp_os_communications_t *ctx_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_os_communications_broadcast_handoff
+ *
+ * @param ctx_opaque Parameter description.
+ * @param activity_type Parameter description.
+ * @param payload Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_communications_broadcast_handoff(cmp_os_communications_t *ctx_opaque,
                                             const char *activity_type,
                                             const char *payload) {
@@ -97,6 +134,15 @@ int cmp_os_communications_broadcast_handoff(cmp_os_communications_t *ctx_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_os_communications_index_for_spotlight
+ *
+ * @param ctx_opaque Parameter description.
+ * @param item_id Parameter description.
+ * @param title Parameter description.
+ * @param description Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_communications_index_for_spotlight(
     cmp_os_communications_t *ctx_opaque, const char *item_id, const char *title,
     const char *description) {
@@ -114,6 +160,13 @@ int cmp_os_communications_index_for_spotlight(
   return rc;
 }
 
+/**
+ * @brief cmp_os_communications_evaluate_focus_mode
+ *
+ * @param ctx_opaque Parameter description.
+ * @param out_is_suppressed Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_communications_evaluate_focus_mode(
     cmp_os_communications_t *ctx_opaque, int *out_is_suppressed) {
   int rc = CMP_SUCCESS;
@@ -130,6 +183,13 @@ int cmp_os_communications_evaluate_focus_mode(
   return rc;
 }
 
+/**
+ * @brief cmp_os_communications_start_shareplay
+ *
+ * @param ctx_opaque Parameter description.
+ * @param activity_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_communications_start_shareplay(cmp_os_communications_t *ctx_opaque,
                                           const char *activity_id) {
   int rc = CMP_SUCCESS;

@@ -44,6 +44,12 @@ struct cmp_window {
   float scale_factor;
 };
 
+/**
+ * @brief cmp_window_get_native_handle
+ *
+ * @param window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 void *cmp_window_get_native_handle(cmp_window_t *window) {
   if (!window)
     return NULL;
@@ -85,6 +91,11 @@ typedef enum {
 typedef BOOL(WINAPI *SetProcessDpiAwarenessContext_fn)(DPI_AWARENESS_CONTEXT);
 typedef BOOL(WINAPI *SetProcessDPIAware_fn)(void);
 
+/**
+ * @brief enable_high_dpi_awareness
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void enable_high_dpi_awareness(void) {
   HMODULE user32 = LoadLibraryA("user32.dll");
   if (user32) {
@@ -117,6 +128,14 @@ typedef struct cmp_drop_target {
   cmp_window_t *window;
 } cmp_drop_target_t;
 
+/**
+ * @brief drop_target_query_interface
+ *
+ * @param This Parameter description.
+ * @param riid Parameter description.
+ * @param ppvObject Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static HRESULT STDMETHODCALLTYPE drop_target_query_interface(IDropTarget *This,
                                                              REFIID riid,
                                                              void **ppvObject) {
@@ -129,11 +148,23 @@ static HRESULT STDMETHODCALLTYPE drop_target_query_interface(IDropTarget *This,
   return E_NOINTERFACE;
 }
 
+/**
+ * @brief drop_target_add_ref
+ *
+ * @param This Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static ULONG STDMETHODCALLTYPE drop_target_add_ref(IDropTarget *This) {
   cmp_drop_target_t *dt = (cmp_drop_target_t *)This;
   return ++dt->ref_count;
 }
 
+/**
+ * @brief drop_target_release
+ *
+ * @param This Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static ULONG STDMETHODCALLTYPE drop_target_release(IDropTarget *This) {
   cmp_drop_target_t *dt = (cmp_drop_target_t *)This;
   ULONG count = --dt->ref_count;
@@ -144,6 +175,16 @@ static ULONG STDMETHODCALLTYPE drop_target_release(IDropTarget *This) {
   return count;
 }
 
+/**
+ * @brief drop_target_drag_enter
+ *
+ * @param This Parameter description.
+ * @param pDataObj Parameter description.
+ * @param grfKeyState Parameter description.
+ * @param pt Parameter description.
+ * @param pdwEffect Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static HRESULT STDMETHODCALLTYPE drop_target_drag_enter(IDropTarget *This,
                                                         IDataObject *pDataObj,
                                                         DWORD grfKeyState,
@@ -157,6 +198,15 @@ static HRESULT STDMETHODCALLTYPE drop_target_drag_enter(IDropTarget *This,
   return S_OK;
 }
 
+/**
+ * @brief drop_target_drag_over
+ *
+ * @param This Parameter description.
+ * @param grfKeyState Parameter description.
+ * @param pt Parameter description.
+ * @param pdwEffect Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static HRESULT STDMETHODCALLTYPE drop_target_drag_over(IDropTarget *This,
                                                        DWORD grfKeyState,
                                                        POINTL pt,
@@ -168,11 +218,27 @@ static HRESULT STDMETHODCALLTYPE drop_target_drag_over(IDropTarget *This,
   return S_OK;
 }
 
+/**
+ * @brief drop_target_drag_leave
+ *
+ * @param This Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static HRESULT STDMETHODCALLTYPE drop_target_drag_leave(IDropTarget *This) {
   (void)This;
   return S_OK;
 }
 
+/**
+ * @brief drop_target_drop
+ *
+ * @param This Parameter description.
+ * @param pDataObj Parameter description.
+ * @param grfKeyState Parameter description.
+ * @param pt Parameter description.
+ * @param pdwEffect Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static HRESULT STDMETHODCALLTYPE drop_target_drop(IDropTarget *This,
                                                   IDataObject *pDataObj,
                                                   DWORD grfKeyState, POINTL pt,
@@ -202,6 +268,13 @@ static HRESULT STDMETHODCALLTYPE drop_target_drop(IDropTarget *This,
   return S_OK;
 }
 
+/**
+ * @brief create_drop_target
+ *
+ * @param hwnd Parameter description.
+ * @param window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static cmp_drop_target_t *create_drop_target(HWND hwnd, cmp_window_t *window) {
   cmp_drop_target_t *dt;
   if (CMP_MALLOC(sizeof(cmp_drop_target_t), (void **)&dt) != CMP_SUCCESS) {
@@ -232,15 +305,28 @@ static cmp_drop_target_t *create_drop_target(HWND hwnd, cmp_window_t *window) {
 #endif
 
 #if defined(_WIN32)
+/**
+ * @brief win32_box_blur_alpha
+ *
+ * @param pixels Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param stride Parameter description.
+ * @param radius Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void win32_box_blur_alpha(uint8_t *pixels, int width, int height,
                                  int stride, int radius) {
   uint8_t *temp;
   int x, y, i;
+  int rc;
   if (radius < 1)
     return;
-  temp = (uint8_t *)malloc(width * height);
-  if (!temp)
+  rc = CMP_MALLOC(width * height, (void **)&temp);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("blur_alpha_channel: OOM\n");
     return;
+  }
   for (y = 0; y < height; y++) {
     for (x = 0; x < width; x++) {
       int sum = 0, count = 0;
@@ -270,6 +356,15 @@ static void win32_box_blur_alpha(uint8_t *pixels, int width, int height,
   free(temp);
 }
 
+/**
+ * @brief render_node_gdi
+ *
+ * @param hdc Parameter description.
+ * @param node Parameter description.
+ * @param scale_factor Parameter description.
+ * @param inherited_theme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
                             int inherited_theme) {
   int current_theme = node->design_language_override
@@ -415,16 +510,20 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
     if (ir > ih)
       ir = ih;
 
-    if (a > 0) {
-      if (a == 255) {
-        HBRUSH br = CreateSolidBrush(RGB(r, g, b));
+    if (a > 0 || node->border_width > 0.0f) {
+      if (1) {
+        HBRUSH br =
+            a > 0 ? CreateSolidBrush(r == 0 && g == 0 && b == 0 ? RGB(1, 1, 1)
+                                                                : RGB(r, g, b))
+                  : (HBRUSH)GetStockObject(NULL_BRUSH);
         HPEN pen = NULL;
         if (node->border_width > 0.0f) {
           uint8_t pr = (border_color_val >> 16) & 0xFF;
           uint8_t pg = (border_color_val >> 8) & 0xFF;
           uint8_t pb = border_color_val & 0xFF;
           pen = CreatePen(PS_SOLID, (int)(node->border_width * scale_factor),
-                          RGB(pr, pg, pb));
+                          pr == 0 && pg == 0 && pb == 0 ? RGB(1, 1, 1)
+                                                        : RGB(pr, pg, pb));
         } else {
           pen = CreatePen(PS_NULL, 0, RGB(0, 0, 0));
         }
@@ -439,8 +538,10 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
 
         SelectObject(hdc, old_br);
         SelectObject(hdc, old_pen);
-        DeleteObject(br);
-        DeleteObject(pen);
+        if (a > 0)
+          DeleteObject(br);
+        if (node->border_width > 0.0f)
+          DeleteObject(pen);
       } else {
         /* Alpha Blending */
         HDC memDC = CreateCompatibleDC(hdc);
@@ -678,8 +779,17 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
             size = (int)(24 * scale_factor);
         }
 
-        if (tc_a == 0) {
-          tc = RGB(240, 240, 240);
+        if (tc_a == 0 && tc_uint == 0) {
+          tc = bg_color_val == 0xFF141218 || bg_color_val == 0xFF2B2930
+                   ? RGB(255, 255, 255)
+                   : RGB(1, 1, 1);
+        } else if (tc_a == 0) {
+          tc = RGB((tc_uint >> 16) & 0xFF, (tc_uint >> 8) & 0xFF,
+                   tc_uint & 0xFF);
+        }
+
+        if (tc == RGB(0, 0, 0)) {
+          tc = RGB(1, 1, 1);
         }
 
         wlen = MultiByteToWideChar(CP_UTF8, 0, text, -1, NULL, 0);
@@ -694,19 +804,27 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
                                DEFAULT_PITCH | FF_DONTCARE,
                                current_theme == 1 ? L"Segoe UI" : L"Arial");
             old_font = (HFONT)SelectObject(hdc, font);
-            SetTextAlign(hdc, TA_CENTER | TA_TOP);
+            SetTextAlign(hdc, TA_LEFT | TA_TOP);
             SetTextColor(hdc, tc);
             SetBkMode(hdc, TRANSPARENT);
 
             if (node->type == 14) {
+              SetTextAlign(hdc, TA_CENTER | TA_TOP);
               TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
                        (int)(rect.y + (rect.height - size) / 2.0f), wtext,
                        wlen - 1);
             } else if (node->type == 3 || node->type == 4) {
+              SetTextAlign(hdc, TA_CENTER | TA_TOP);
+              TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
+                       (int)(rect.y + (rect.height - size) / 2.0f), wtext,
+                       wlen - 1);
+            } else if (node->type == 2) {
+              SetTextAlign(hdc, TA_CENTER | TA_TOP);
               TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
                        (int)(rect.y + (rect.height - size) / 2.0f), wtext,
                        wlen - 1);
             } else {
+              SetTextAlign(hdc, TA_CENTER | TA_TOP);
               TextOutW(hdc, (int)(rect.x + rect.width / 2.0f), (int)rect.y,
                        wtext, wlen - 1);
             }
@@ -759,8 +877,14 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
       off_y = rect.y + (rect.height - (max_y - min_y) * svg_scale) * 0.5f -
               min_y * svg_scale;
 
-      pts = (POINT *)malloc(sizeof(POINT) * (svg->vertex_count / 2));
-      counts = (int *)malloc(sizeof(int) * svg->num_subpaths);
+      if (CMP_MALLOC(sizeof(POINT) * (svg->vertex_count / 2), (void **)&pts) !=
+          CMP_SUCCESS) {
+        pts = NULL;
+      }
+      if (CMP_MALLOC(sizeof(int) * svg->num_subpaths, (void **)&counts) !=
+          CMP_SUCCESS) {
+        counts = NULL;
+      }
 
       if (pts && counts) {
         HBRUSH br = CreateSolidBrush(RGB(r, g, b));
@@ -860,6 +984,15 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
 }
 #endif
 
+/**
+ * @brief window_proc
+ *
+ * @param hwnd Parameter description.
+ * @param uMsg Parameter description.
+ * @param wParam Parameter description.
+ * @param lParam Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
                                     LPARAM lParam) {
   cmp_window_t *window = (cmp_window_t *)GetWindowLongPtrA(hwnd, GWLP_USERDATA);
@@ -1130,6 +1263,11 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
 }
 #endif
 
+/**
+ * @brief cmp_window_system_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_system_init(void) {
   if (g_window_initialized) {
     return CMP_SUCCESS;
@@ -1160,6 +1298,11 @@ int cmp_window_system_init(void) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_system_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_system_shutdown(void) {
   if (!g_window_initialized) {
     return CMP_SUCCESS;
@@ -1174,6 +1317,13 @@ int cmp_window_system_shutdown(void) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_create
+ *
+ * @param config Parameter description.
+ * @param out_window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_create(const cmp_window_config_t *config,
                       cmp_window_t **out_window) {
   int rc;
@@ -1181,7 +1331,11 @@ int cmp_window_create(const cmp_window_config_t *config,
 
   if (config == NULL || out_window == NULL || !g_window_initialized) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_window_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_window_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -1189,7 +1343,11 @@ int cmp_window_create(const cmp_window_config_t *config,
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_window_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_window_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -1283,13 +1441,25 @@ int cmp_window_create(const cmp_window_config_t *config,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_set_drop_callback
+ *
+ * @param window Parameter description.
+ * @param drop_cb Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_set_drop_callback(cmp_window_t *window,
                                  cmp_window_drop_cb_t drop_cb,
                                  void *user_data) {
   int rc;
   if (window == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_window_set_drop_callback: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_window_set_drop_callback: %s\n", err_str);
+    }
     return rc;
   }
   window->drop_cb = drop_cb;
@@ -1297,13 +1467,25 @@ int cmp_window_set_drop_callback(cmp_window_t *window,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_set_resize_callback
+ *
+ * @param window Parameter description.
+ * @param resize_cb Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_set_resize_callback(cmp_window_t *window,
                                    cmp_window_resize_cb_t resize_cb,
                                    void *user_data) {
   int rc;
   if (window == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_window_set_resize_callback: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_window_set_resize_callback: %s\n", err_str);
+    }
     return rc;
   }
   window->resize_cb = resize_cb;
@@ -1311,11 +1493,21 @@ int cmp_window_set_resize_callback(cmp_window_t *window,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_show
+ *
+ * @param window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_show(cmp_window_t *window) {
   int rc;
   if (window == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_window_show: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_window_show: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -1327,11 +1519,21 @@ int cmp_window_show(cmp_window_t *window) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_poll_events
+ *
+ * @param window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_poll_events(cmp_window_t *window) {
   int rc;
   if (window == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_window_poll_events: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_window_poll_events: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -1348,6 +1550,12 @@ int cmp_window_poll_events(cmp_window_t *window) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_should_close
+ *
+ * @param window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_should_close(cmp_window_t *window) {
   if (window == NULL) {
     return 1;
@@ -1386,6 +1594,11 @@ static xinput_get_state_fn g_xinput_get_state = NULL;
 static xinput_set_state_fn g_xinput_set_state = NULL;
 static int g_xinput_init_attempted = 0;
 
+/**
+ * @brief init_xinput
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void init_xinput(void) {
   if (g_xinput_init_attempted)
     return;
@@ -1405,6 +1618,13 @@ static void init_xinput(void) {
 }
 #endif
 
+/**
+ * @brief cmp_hardware_poll_gamepad
+ *
+ * @param index Parameter description.
+ * @param out_gamepad Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hardware_poll_gamepad(int index, cmp_gamepad_t *out_gamepad) {
   if (out_gamepad == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -1468,6 +1688,15 @@ int cmp_hardware_poll_gamepad(int index, cmp_gamepad_t *out_gamepad) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_hardware_trigger_haptic
+ *
+ * @param index Parameter description.
+ * @param low_frequency Parameter description.
+ * @param high_frequency Parameter description.
+ * @param duration_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hardware_trigger_haptic(int index, float low_frequency,
                                 float high_frequency, int duration_ms) {
 #if defined(_WIN32)
@@ -1498,6 +1727,13 @@ int cmp_hardware_trigger_haptic(int index, float low_frequency,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_hardware_camera_start
+ *
+ * @param device_index Parameter description.
+ * @param out_camera Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hardware_camera_start(int device_index, cmp_camera_t **out_camera) {
   cmp_camera_t *camera;
   if (out_camera == NULL)
@@ -1513,6 +1749,13 @@ int cmp_hardware_camera_start(int device_index, cmp_camera_t **out_camera) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_hardware_camera_read_frame
+ *
+ * @param camera Parameter description.
+ * @param target_texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hardware_camera_read_frame(cmp_camera_t *camera,
                                    cmp_texture_t *target_texture) {
   if (camera == NULL || target_texture == NULL)
@@ -1520,6 +1763,12 @@ int cmp_hardware_camera_read_frame(cmp_camera_t *camera,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_hardware_camera_stop
+ *
+ * @param camera Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hardware_camera_stop(cmp_camera_t *camera) {
   if (camera == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -1528,6 +1777,12 @@ int cmp_hardware_camera_stop(cmp_camera_t *camera) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_hardware_poll_sensors
+ *
+ * @param out_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hardware_poll_sensors(cmp_sensor_data_t *out_data) {
   if (out_data == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -1535,6 +1790,13 @@ int cmp_hardware_poll_sensors(cmp_sensor_data_t *out_data) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_hardware_poll_geolocation
+ *
+ * @param out_latitude Parameter description.
+ * @param out_longitude Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hardware_poll_geolocation(double *out_latitude, double *out_longitude) {
   if (out_latitude)
     *out_latitude = 0.0;
@@ -1543,6 +1805,13 @@ int cmp_hardware_poll_geolocation(double *out_latitude, double *out_longitude) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_set_pointer_lock
+ *
+ * @param window Parameter description.
+ * @param lock_mode Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_set_pointer_lock(cmp_window_t *window,
                                 cmp_pointer_lock_t lock_mode) {
   if (window == NULL) {
@@ -1576,6 +1845,12 @@ int cmp_window_set_pointer_lock(cmp_window_t *window,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_render_test_frame
+ *
+ * @param window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_render_test_frame(cmp_window_t *window) {
   if (window == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1589,6 +1864,11 @@ int cmp_window_render_test_frame(cmp_window_t *window) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_mac_init_menu_bar
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_mac_init_menu_bar(void) {
 #if defined(__APPLE__)
   /* Call out to objective-c NSMenu setup */
@@ -1598,6 +1878,14 @@ int cmp_window_mac_init_menu_bar(void) {
 #endif
 }
 
+/**
+ * @brief cmp_window_mac_add_menu_item
+ *
+ * @param title Parameter description.
+ * @param key_equiv Parameter description.
+ * @param (callback)(void) Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_mac_add_menu_item(const char *title, const char *key_equiv,
                                  void (*callback)(void)) {
   if (title == NULL || key_equiv == NULL) {
@@ -1613,6 +1901,13 @@ int cmp_window_mac_add_menu_item(const char *title, const char *key_equiv,
 #endif
 }
 
+/**
+ * @brief cmp_window_apple_init_display_link
+ *
+ * @param window Parameter description.
+ * @param refresh_rate Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_apple_init_display_link(cmp_window_t *window, int refresh_rate) {
   if (window == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1627,6 +1922,15 @@ int cmp_window_apple_init_display_link(cmp_window_t *window, int refresh_rate) {
 #endif
 }
 
+/**
+ * @brief cmp_window_apple_enable_gestures
+ *
+ * @param window Parameter description.
+ * @param enable_pinch Parameter description.
+ * @param enable_rotation Parameter description.
+ * @param enable_swipe Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_apple_enable_gestures(cmp_window_t *window, int enable_pinch,
                                      int enable_rotation, int enable_swipe) {
   if (window == NULL) {
@@ -1646,6 +1950,13 @@ int cmp_window_apple_enable_gestures(cmp_window_t *window, int enable_pinch,
 #endif
 }
 
+/**
+ * @brief cmp_window_os_notify
+ *
+ * @param title Parameter description.
+ * @param body Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_os_notify(const char *title, const char *body) {
   if (title == NULL || body == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1658,6 +1969,14 @@ int cmp_window_os_notify(const char *title, const char *body) {
 #endif
 }
 
+/**
+ * @brief cmp_window_set_clipboard_text
+ *
+ * @param window Parameter description.
+ * @param type Parameter description.
+ * @param text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_set_clipboard_text(cmp_window_t *window,
                                   cmp_clipboard_type_t type, const char *text) {
   if (window == NULL || text == NULL) {
@@ -1673,6 +1992,14 @@ int cmp_window_set_clipboard_text(cmp_window_t *window,
 #endif
 }
 
+/**
+ * @brief cmp_window_get_clipboard_text
+ *
+ * @param window Parameter description.
+ * @param type Parameter description.
+ * @param out_text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_get_clipboard_text(cmp_window_t *window,
                                   cmp_clipboard_type_t type,
                                   cmp_string_t *out_text) {
@@ -1689,6 +2016,12 @@ int cmp_window_get_clipboard_text(cmp_window_t *window,
 #endif
 }
 
+/**
+ * @brief cmp_window_linux_init_evdev
+ *
+ * @param event_device_path Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_linux_init_evdev(const char *event_device_path) {
   if (event_device_path == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1701,6 +2034,12 @@ int cmp_window_linux_init_evdev(const char *event_device_path) {
 #endif
 }
 
+/**
+ * @brief cmp_window_android_init_hooks
+ *
+ * @param app_state Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_android_init_hooks(void *app_state) {
   if (app_state == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1713,6 +2052,13 @@ int cmp_window_android_init_hooks(void *app_state) {
 #endif
 }
 
+/**
+ * @brief cmp_window_android_show_keyboard
+ *
+ * @param window Parameter description.
+ * @param show Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_android_show_keyboard(cmp_window_t *window, int show) {
   if (window == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1728,6 +2074,16 @@ int cmp_window_android_show_keyboard(cmp_window_t *window, int show) {
 #endif
 }
 
+/**
+ * @brief cmp_window_android_get_safe_area
+ *
+ * @param window Parameter description.
+ * @param out_top Parameter description.
+ * @param out_bottom Parameter description.
+ * @param out_left Parameter description.
+ * @param out_right Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_android_get_safe_area(cmp_window_t *window, int *out_top,
                                      int *out_bottom, int *out_left,
                                      int *out_right) {
@@ -1758,6 +2114,12 @@ int cmp_window_android_get_safe_area(cmp_window_t *window, int *out_top,
 #endif
 }
 
+/**
+ * @brief cmp_window_wasm_init
+ *
+ * @param canvas_selector Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_wasm_init(const char *canvas_selector) {
   if (canvas_selector == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1770,6 +2132,11 @@ int cmp_window_wasm_init(const char *canvas_selector) {
 #endif
 }
 
+/**
+ * @brief cmp_window_wasm_resume_audio
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_wasm_resume_audio(void) {
 #if defined(__EMSCRIPTEN__)
   /* Execute EM_ASM to resume AudioContext */
@@ -1779,6 +2146,14 @@ int cmp_window_wasm_resume_audio(void) {
 #endif
 }
 
+/**
+ * @brief cmp_window_wasm_set_main_loop
+ *
+ * @param mod Parameter description.
+ * @param ) Parameter description.
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_wasm_set_main_loop(cmp_modality_t *mod,
                                   void (*main_loop)(void *), void *arg) {
   if (mod == NULL || main_loop == NULL) {
@@ -1794,6 +2169,11 @@ int cmp_window_wasm_set_main_loop(cmp_modality_t *mod,
 #endif
 }
 
+/**
+ * @brief cmp_sdl3_fallback_init_subsystems
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_sdl3_fallback_init_subsystems(void) {
 #if defined(CMP_USE_SDL3)
   /* SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_AUDIO) */
@@ -1803,6 +2183,11 @@ int cmp_sdl3_fallback_init_subsystems(void) {
 #endif
 }
 
+/**
+ * @brief cmp_sdl3_fallback_bridge_audio
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_sdl3_fallback_bridge_audio(void) {
 #if defined(CMP_USE_SDL3)
   /* Open SDL_AudioDevice with mapping to cmp_audio_buffer formats */
@@ -1812,11 +2197,22 @@ int cmp_sdl3_fallback_bridge_audio(void) {
 #endif
 }
 
+/**
+ * @brief cmp_scripting_lua_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scripting_lua_init(void) {
   /* Initialize embedded Lua state and register CMP C functions */
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scripting_lua_execute_file
+ *
+ * @param script_path Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scripting_lua_execute_file(const char *script_path) {
   if (script_path == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -1824,6 +2220,13 @@ int cmp_scripting_lua_execute_file(const char *script_path) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scripting_napi_init
+ *
+ * @param env Parameter description.
+ * @param exports Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scripting_napi_init(void *env, void *exports) {
   if (env == NULL || exports == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -1831,6 +2234,12 @@ int cmp_scripting_napi_init(void *env, void *exports) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scripting_python_generate_bindings
+ *
+ * @param output_path Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scripting_python_generate_bindings(const char *output_path) {
   if (output_path == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -1838,11 +2247,21 @@ int cmp_scripting_python_generate_bindings(const char *output_path) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_destroy
+ *
+ * @param window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_destroy(cmp_window_t *window) {
   int rc;
   if (window == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_window_destroy: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_window_destroy: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -1862,6 +2281,14 @@ struct cmp_renderer {
   int initialized;
 };
 
+/**
+ * @brief cmp_renderer_create
+ *
+ * @param window Parameter description.
+ * @param backend Parameter description.
+ * @param out_renderer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_renderer_create(cmp_window_t *window, cmp_render_backend_t backend,
                         cmp_renderer_t **out_renderer) {
   cmp_renderer_t *renderer;
@@ -1881,6 +2308,12 @@ int cmp_renderer_create(cmp_window_t *window, cmp_render_backend_t backend,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_renderer_destroy
+ *
+ * @param renderer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_renderer_destroy(cmp_renderer_t *renderer) {
   if (renderer == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1891,6 +2324,13 @@ int cmp_renderer_destroy(cmp_renderer_t *renderer) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_renderer_begin_frame
+ *
+ * @param renderer Parameter description.
+ * @param clear_color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_renderer_begin_frame(cmp_renderer_t *renderer,
                              cmp_color_t clear_color) {
   if (renderer == NULL) {
@@ -1900,6 +2340,12 @@ int cmp_renderer_begin_frame(cmp_renderer_t *renderer,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_renderer_end_frame
+ *
+ * @param renderer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_renderer_end_frame(cmp_renderer_t *renderer) {
   if (renderer == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1907,6 +2353,16 @@ int cmp_renderer_end_frame(cmp_renderer_t *renderer) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_renderer_draw_sprite
+ *
+ * @param renderer Parameter description.
+ * @param texture Parameter description.
+ * @param dest Parameter description.
+ * @param src Parameter description.
+ * @param color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_renderer_draw_sprite(cmp_renderer_t *renderer, cmp_texture_t *texture,
                              cmp_rect_t dest, cmp_rect_t *src,
                              cmp_color_t color) {
@@ -1920,6 +2376,13 @@ int cmp_renderer_draw_sprite(cmp_renderer_t *renderer, cmp_texture_t *texture,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_renderer_set_shader
+ *
+ * @param renderer Parameter description.
+ * @param shader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_renderer_set_shader(cmp_renderer_t *renderer, cmp_shader_t *shader) {
   if (renderer == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1928,6 +2391,13 @@ int cmp_renderer_set_shader(cmp_renderer_t *renderer, cmp_shader_t *shader) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_renderer_set_render_target
+ *
+ * @param renderer Parameter description.
+ * @param texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_renderer_set_render_target(cmp_renderer_t *renderer,
                                    cmp_texture_t *texture) {
   if (renderer == NULL) {
@@ -1937,6 +2407,16 @@ int cmp_renderer_set_render_target(cmp_renderer_t *renderer,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_texture_create
+ *
+ * @param renderer Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param pixels Parameter description.
+ * @param out_texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_texture_create(cmp_renderer_t *renderer, int width, int height,
                        const void *pixels, cmp_texture_t **out_texture) {
   cmp_texture_t *texture;
@@ -1958,6 +2438,12 @@ int cmp_texture_create(cmp_renderer_t *renderer, int width, int height,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_texture_destroy
+ *
+ * @param texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_texture_destroy(cmp_texture_t *texture) {
   if (texture == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -1968,16 +2454,34 @@ int cmp_texture_destroy(cmp_texture_t *texture) {
 
 static int g_typography_initialized = 0;
 
+/**
+ * @brief cmp_typography_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_typography_init(void) {
   g_typography_initialized = 1;
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_typography_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_typography_shutdown(void) {
   g_typography_initialized = 0;
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_font_load
+ *
+ * @param virtual_path Parameter description.
+ * @param default_size Parameter description.
+ * @param out_font Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_font_load(const char *virtual_path, float default_size,
                   cmp_font_t **out_font) {
   cmp_font_t *font;
@@ -2009,6 +2513,15 @@ int cmp_font_load(const char *virtual_path, float default_size,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_font_load_memory
+ *
+ * @param buffer Parameter description.
+ * @param size Parameter description.
+ * @param default_size Parameter description.
+ * @param out_font Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_font_load_memory(const void *buffer, size_t size, float default_size,
                          cmp_font_t **out_font) {
   cmp_font_t *font;
@@ -2036,6 +2549,13 @@ int cmp_font_load_memory(const void *buffer, size_t size, float default_size,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_font_add_fallback
+ *
+ * @param primary Parameter description.
+ * @param fallback Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_font_add_fallback(cmp_font_t *primary, cmp_font_t *fallback) {
   if (primary == NULL || fallback == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2060,6 +2580,14 @@ int cmp_font_add_fallback(cmp_font_t *primary, cmp_font_t *fallback) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_font_generate_sdf
+ *
+ * @param font Parameter description.
+ * @param codepoint Parameter description.
+ * @param out_texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_font_generate_sdf(cmp_font_t *font, uint32_t codepoint,
                           cmp_texture_t **out_texture) {
   if (font == NULL || out_texture == NULL)
@@ -2068,6 +2596,12 @@ int cmp_font_generate_sdf(cmp_font_t *font, uint32_t codepoint,
   return cmp_texture_create(NULL, 64, 64, NULL, out_texture);
 }
 
+/**
+ * @brief cmp_font_destroy
+ *
+ * @param font Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_font_destroy(cmp_font_t *font) {
   if (font == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2083,6 +2617,15 @@ int cmp_font_destroy(cmp_font_t *font) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_text_shape
+ *
+ * @param font Parameter description.
+ * @param text Parameter description.
+ * @param out_width Parameter description.
+ * @param out_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_text_shape(cmp_font_t *font, const char *text, float *out_width,
                    float *out_height) {
   if (font == NULL || text == NULL)
@@ -2096,16 +2639,33 @@ int cmp_text_shape(cmp_font_t *font, const char *text, float *out_width,
 
 static int g_theme_initialized = 0;
 
+/**
+ * @brief cmp_theme_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_theme_init(void) {
   g_theme_initialized = 1;
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_theme_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_theme_shutdown(void) {
   g_theme_initialized = 0;
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_theme_generate_palette
+ *
+ * @param seed Parameter description.
+ * @param out_palette Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_theme_generate_palette(cmp_color_t seed, cmp_palette_t *out_palette) {
   if (out_palette == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2197,6 +2757,13 @@ int cmp_theme_generate_palette(cmp_color_t seed, cmp_palette_t *out_palette) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_set_theme
+ *
+ * @param window Parameter description.
+ * @param theme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_set_theme(cmp_window_t *window, const cmp_theme_t *theme) {
   if (window == NULL || theme == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2207,16 +2774,33 @@ int cmp_window_set_theme(cmp_window_t *window, const cmp_theme_t *theme) {
 
 static int g_audio_initialized = 0;
 
+/**
+ * @brief cmp_audio_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_init(void) {
   g_audio_initialized = 1;
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_audio_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_shutdown(void) {
   g_audio_initialized = 0;
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_audio_buffer_load
+ *
+ * @param virtual_path Parameter description.
+ * @param out_buffer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_buffer_load(const char *virtual_path,
                           cmp_audio_buffer_t **out_buffer) {
   cmp_audio_buffer_t *buffer;
@@ -2231,6 +2815,12 @@ int cmp_audio_buffer_load(const char *virtual_path,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_audio_buffer_destroy
+ *
+ * @param buffer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_buffer_destroy(cmp_audio_buffer_t *buffer) {
   if (buffer == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2238,6 +2828,13 @@ int cmp_audio_buffer_destroy(cmp_audio_buffer_t *buffer) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_audio_source_create
+ *
+ * @param buffer Parameter description.
+ * @param out_source Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_source_create(cmp_audio_buffer_t *buffer,
                             cmp_audio_source_t **out_source) {
   cmp_audio_source_t *source;
@@ -2256,6 +2853,12 @@ int cmp_audio_source_create(cmp_audio_buffer_t *buffer,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_audio_source_play
+ *
+ * @param source Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_source_play(cmp_audio_source_t *source) {
   if (source == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2263,6 +2866,15 @@ int cmp_audio_source_play(cmp_audio_source_t *source) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_audio_source_set_position
+ *
+ * @param source Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @param z Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_source_set_position(cmp_audio_source_t *source, float x, float y,
                                   float z) {
   if (source == NULL)
@@ -2273,6 +2885,12 @@ int cmp_audio_source_set_position(cmp_audio_source_t *source, float x, float y,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_audio_source_destroy
+ *
+ * @param source Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_audio_source_destroy(cmp_audio_source_t *source) {
   if (source == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2280,6 +2898,13 @@ int cmp_audio_source_destroy(cmp_audio_source_t *source) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_video_decoder_open
+ *
+ * @param virtual_path Parameter description.
+ * @param out_decoder Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_video_decoder_open(const char *virtual_path,
                            cmp_video_decoder_t **out_decoder) {
   cmp_video_decoder_t *decoder;
@@ -2296,6 +2921,13 @@ int cmp_video_decoder_open(const char *virtual_path,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_video_decoder_read_frame
+ *
+ * @param decoder Parameter description.
+ * @param target_texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_video_decoder_read_frame(cmp_video_decoder_t *decoder,
                                  cmp_texture_t *target_texture) {
   if (decoder == NULL || target_texture == NULL)
@@ -2303,6 +2935,12 @@ int cmp_video_decoder_read_frame(cmp_video_decoder_t *decoder,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_video_decoder_destroy
+ *
+ * @param decoder Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_video_decoder_destroy(cmp_video_decoder_t *decoder) {
   if (decoder == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2310,18 +2948,38 @@ int cmp_video_decoder_destroy(cmp_video_decoder_t *decoder) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_test_enable_headless
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_test_enable_headless(void) {
   /* Set a global flag that will make window creation skip opening an actual
    * HWND */
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_test_simulate_input
+ *
+ * @param event Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_test_simulate_input(const cmp_event_t *event) {
   if (event == NULL)
     return CMP_ERROR_INVALID_ARG;
   return cmp_event_push(event);
 }
 
+/**
+ * @brief cmp_test_capture_snapshot
+ *
+ * @param window Parameter description.
+ * @param out_pixels Parameter description.
+ * @param out_width Parameter description.
+ * @param out_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_test_capture_snapshot(cmp_window_t *window, void **out_pixels,
                               int *out_width, int *out_height) {
   if (window == NULL || out_pixels == NULL)
@@ -2410,6 +3068,13 @@ int cmp_test_capture_snapshot(cmp_window_t *window, void **out_pixels,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_devtools_set_enabled
+ *
+ * @param window Parameter description.
+ * @param enable Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_devtools_set_enabled(cmp_window_t *window, int enable) {
   if (window == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2417,11 +3082,22 @@ int cmp_devtools_set_enabled(cmp_window_t *window, int enable) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_window_set_ui_tree
+ *
+ * @param window Parameter description.
+ * @param tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_set_ui_tree(cmp_window_t *window, cmp_ui_node_t *tree) {
   int rc;
   if (window == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_window_set_ui_tree: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_window_set_ui_tree: %s\n", err_str);
+    }
     return rc;
   }
   window->ui_tree = tree;

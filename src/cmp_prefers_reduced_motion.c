@@ -9,6 +9,12 @@ struct cmp_prefers_reduced_motion {
   int is_enabled;
 };
 
+/**
+ * @brief cmp_prefers_reduced_motion_create
+ *
+ * @param out_rm Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_prefers_reduced_motion_create(cmp_prefers_reduced_motion_t **out_rm) {
   struct cmp_prefers_reduced_motion *rm;
 
@@ -25,6 +31,12 @@ int cmp_prefers_reduced_motion_create(cmp_prefers_reduced_motion_t **out_rm) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_prefers_reduced_motion_destroy
+ *
+ * @param rm Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_prefers_reduced_motion_destroy(cmp_prefers_reduced_motion_t *rm) {
   struct cmp_prefers_reduced_motion *r =
       (struct cmp_prefers_reduced_motion *)rm;
@@ -36,6 +48,13 @@ int cmp_prefers_reduced_motion_destroy(cmp_prefers_reduced_motion_t *rm) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_prefers_reduced_motion_set
+ *
+ * @param rm Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_prefers_reduced_motion_set(cmp_prefers_reduced_motion_t *rm,
                                    int enabled) {
   struct cmp_prefers_reduced_motion *r =
@@ -48,6 +67,13 @@ int cmp_prefers_reduced_motion_set(cmp_prefers_reduced_motion_t *rm,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_prefers_reduced_motion_apply
+ *
+ * @param rm Parameter description.
+ * @param duration_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_prefers_reduced_motion_apply(cmp_prefers_reduced_motion_t *rm,
                                      float *duration_ms) {
   struct cmp_prefers_reduced_motion *r =

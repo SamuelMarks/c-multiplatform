@@ -7,6 +7,12 @@ struct cmp_forced_colors {
   int active;
 };
 
+/**
+ * @brief cmp_forced_colors_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_forced_colors_create(cmp_forced_colors_t **out_ctx) {
   int rc = CMP_SUCCESS;
   cmp_forced_colors_t *ctx = NULL;
@@ -29,6 +35,12 @@ int cmp_forced_colors_create(cmp_forced_colors_t **out_ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_forced_colors_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_forced_colors_destroy(cmp_forced_colors_t *ctx) {
   int rc = CMP_SUCCESS;
 
@@ -42,6 +54,13 @@ int cmp_forced_colors_destroy(cmp_forced_colors_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_forced_colors_set
+ *
+ * @param ctx Parameter description.
+ * @param active Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_forced_colors_set(cmp_forced_colors_t *ctx, int active) {
   int rc = CMP_SUCCESS;
 
@@ -54,6 +73,13 @@ int cmp_forced_colors_set(cmp_forced_colors_t *ctx, int active) {
   return rc;
 }
 
+/**
+ * @brief cmp_forced_colors_strip_background
+ *
+ * @param ctx Parameter description.
+ * @param out_strip Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_forced_colors_strip_background(const cmp_forced_colors_t *ctx,
                                        int *out_strip) {
   int rc = CMP_SUCCESS;
@@ -69,6 +95,13 @@ int cmp_forced_colors_strip_background(const cmp_forced_colors_t *ctx,
   return rc;
 }
 
+/**
+ * @brief cmp_forced_colors_strip_box_shadow
+ *
+ * @param ctx Parameter description.
+ * @param out_strip Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_forced_colors_strip_box_shadow(const cmp_forced_colors_t *ctx,
                                        int *out_strip) {
   int rc = CMP_SUCCESS;

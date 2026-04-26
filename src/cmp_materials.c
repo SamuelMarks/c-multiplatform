@@ -8,6 +8,12 @@ struct cmp_materials {
   int is_initialized;
 };
 
+/**
+ * @brief cmp_materials_create
+ *
+ * @param out_materials Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_materials_create(cmp_materials_t **out_materials) {
   int rc = CMP_SUCCESS;
   struct cmp_materials *ctx = NULL;
@@ -29,6 +35,12 @@ int cmp_materials_create(cmp_materials_t **out_materials) {
   return rc;
 }
 
+/**
+ * @brief cmp_materials_destroy
+ *
+ * @param materials Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_materials_destroy(cmp_materials_t *materials) {
   int rc = CMP_SUCCESS;
 
@@ -38,6 +50,15 @@ int cmp_materials_destroy(cmp_materials_t *materials) {
   return rc;
 }
 
+/**
+ * @brief cmp_materials_resolve_blur_effect
+ *
+ * @param materials Parameter description.
+ * @param style Parameter description.
+ * @param out_radius_px Parameter description.
+ * @param out_saturation_multiplier Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_materials_resolve_blur_effect(cmp_materials_t *materials,
                                       cmp_blur_style_t style,
                                       float *out_radius_px,
@@ -81,6 +102,14 @@ int cmp_materials_resolve_blur_effect(cmp_materials_t *materials,
   return rc;
 }
 
+/**
+ * @brief cmp_materials_resolve_macos_material
+ *
+ * @param materials Parameter description.
+ * @param material Parameter description.
+ * @param out_mapped_style Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_materials_resolve_macos_material(cmp_materials_t *materials,
                                          cmp_macos_material_t material,
                                          cmp_blur_style_t *out_mapped_style) {
@@ -112,6 +141,15 @@ int cmp_materials_resolve_macos_material(cmp_materials_t *materials,
   return rc;
 }
 
+/**
+ * @brief cmp_materials_resolve_vibrancy
+ *
+ * @param materials Parameter description.
+ * @param style Parameter description.
+ * @param out_opacity Parameter description.
+ * @param out_requires_color_dodge Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_materials_resolve_vibrancy(cmp_materials_t *materials,
                                    cmp_vibrancy_style_t style,
                                    float *out_opacity,
@@ -159,6 +197,16 @@ int cmp_materials_resolve_vibrancy(cmp_materials_t *materials,
   return rc;
 }
 
+/**
+ * @brief cmp_materials_interpolate_blur_transition
+ *
+ * @param materials Parameter description.
+ * @param from_style Parameter description.
+ * @param to_style Parameter description.
+ * @param progress Parameter description.
+ * @param out_current_radius_px Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_materials_interpolate_blur_transition(cmp_materials_t *materials,
                                               cmp_blur_style_t from_style,
                                               cmp_blur_style_t to_style,

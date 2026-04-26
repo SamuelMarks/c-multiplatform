@@ -14,6 +14,12 @@ struct cmp_scroll_smooth {
   int is_complete;
 };
 
+/**
+ * @brief cmp_scroll_smooth_create
+ *
+ * @param out_smooth Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_smooth_create(cmp_scroll_smooth_t **out_smooth) {
   struct cmp_scroll_smooth *ctx;
 
@@ -32,6 +38,12 @@ int cmp_scroll_smooth_create(cmp_scroll_smooth_t **out_smooth) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_smooth_destroy
+ *
+ * @param smooth Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_smooth_destroy(cmp_scroll_smooth_t *smooth) {
   struct cmp_scroll_smooth *ctx = (struct cmp_scroll_smooth *)smooth;
   if (!ctx)
@@ -41,6 +53,14 @@ int cmp_scroll_smooth_destroy(cmp_scroll_smooth_t *smooth) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_smooth_start
+ *
+ * @param smooth Parameter description.
+ * @param current_pos Parameter description.
+ * @param target_pos Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_smooth_start(cmp_scroll_smooth_t *smooth, float current_pos,
                             float target_pos) {
   struct cmp_scroll_smooth *ctx = (struct cmp_scroll_smooth *)smooth;
@@ -66,6 +86,15 @@ static float ease_in_out_cubic(float t) {
   }
 }
 
+/**
+ * @brief cmp_scroll_smooth_step
+ *
+ * @param smooth Parameter description.
+ * @param dt_ms Parameter description.
+ * @param out_current_position Parameter description.
+ * @param out_is_complete Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_smooth_step(cmp_scroll_smooth_t *smooth, float dt_ms,
                            float *out_current_position, int *out_is_complete) {
   struct cmp_scroll_smooth *ctx = (struct cmp_scroll_smooth *)smooth;

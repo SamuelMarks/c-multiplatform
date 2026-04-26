@@ -11,6 +11,12 @@ struct cmp_fluent_reveal {
   float pointer_y;
 };
 
+/**
+ * @brief cmp_fluent_reveal_create
+ *
+ * @param out_reveal Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_fluent_reveal_create(cmp_fluent_reveal_t **out_reveal) {
   int rc = CMP_SUCCESS;
   struct cmp_fluent_reveal *ctx = NULL;
@@ -33,6 +39,12 @@ int cmp_fluent_reveal_create(cmp_fluent_reveal_t **out_reveal) {
   return rc;
 }
 
+/**
+ * @brief cmp_fluent_reveal_destroy
+ *
+ * @param reveal Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_fluent_reveal_destroy(cmp_fluent_reveal_t *reveal) {
   int rc = CMP_SUCCESS;
   struct cmp_fluent_reveal *ctx = (struct cmp_fluent_reveal *)reveal;
@@ -48,6 +60,14 @@ int cmp_fluent_reveal_destroy(cmp_fluent_reveal_t *reveal) {
   return rc;
 }
 
+/**
+ * @brief cmp_fluent_reveal_update_pointer
+ *
+ * @param reveal Parameter description.
+ * @param pointer_x Parameter description.
+ * @param pointer_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_fluent_reveal_update_pointer(cmp_fluent_reveal_t *reveal,
                                      float pointer_x, float pointer_y) {
   int rc = CMP_SUCCESS;
@@ -70,6 +90,14 @@ struct cmp_acrylic_noise {
   unsigned char *pixels;
 };
 
+/**
+ * @brief cmp_acrylic_noise_create
+ *
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param out_noise Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_acrylic_noise_create(int width, int height,
                              cmp_acrylic_noise_t **out_noise) {
   int rc = CMP_SUCCESS;
@@ -110,6 +138,12 @@ int cmp_acrylic_noise_create(int width, int height,
   return rc;
 }
 
+/**
+ * @brief cmp_acrylic_noise_destroy
+ *
+ * @param noise Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_acrylic_noise_destroy(cmp_acrylic_noise_t *noise) {
   int rc = CMP_SUCCESS;
   struct cmp_acrylic_noise *ctx = (struct cmp_acrylic_noise *)noise;

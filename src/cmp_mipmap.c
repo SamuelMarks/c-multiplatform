@@ -9,6 +9,12 @@ struct cmp_mipmap_generator {
   int max_levels;
 };
 
+/**
+ * @brief cmp_mipmap_generator_create
+ *
+ * @param out_gen Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mipmap_generator_create(cmp_mipmap_generator_t **out_gen) {
   int rc = CMP_SUCCESS;
   struct cmp_mipmap_generator *gen = NULL;
@@ -30,6 +36,12 @@ int cmp_mipmap_generator_create(cmp_mipmap_generator_t **out_gen) {
   return rc;
 }
 
+/**
+ * @brief cmp_mipmap_generator_destroy
+ *
+ * @param gen Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mipmap_generator_destroy(cmp_mipmap_generator_t *gen) {
   int rc = CMP_SUCCESS;
 
@@ -42,6 +54,17 @@ int cmp_mipmap_generator_destroy(cmp_mipmap_generator_t *gen) {
   return rc;
 }
 
+/**
+ * @brief cmp_mipmap_generator_generate
+ *
+ * @param gen Parameter description.
+ * @param image_data Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param out_mipmaps Parameter description.
+ * @param out_levels Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mipmap_generator_generate(cmp_mipmap_generator_t *gen,
                                   const void *image_data, size_t width,
                                   size_t height, void **out_mipmaps,

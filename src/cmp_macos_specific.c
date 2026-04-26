@@ -10,6 +10,12 @@ struct cmp_macos_features {
   int has_menu_bar_extra;
 };
 
+/**
+ * @brief cmp_macos_features_create
+ *
+ * @param out_features Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_macos_features_create(cmp_macos_features_t **out_features) {
   int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = NULL;
@@ -34,6 +40,12 @@ int cmp_macos_features_create(cmp_macos_features_t **out_features) {
   return rc;
 }
 
+/**
+ * @brief cmp_macos_features_destroy
+ *
+ * @param features_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_macos_features_destroy(cmp_macos_features_t *features_opaque) {
   int rc = CMP_SUCCESS;
 
@@ -43,6 +55,13 @@ int cmp_macos_features_destroy(cmp_macos_features_t *features_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_macos_set_window_controls_visible
+ *
+ * @param features_opaque Parameter description.
+ * @param visible Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_macos_set_window_controls_visible(cmp_macos_features_t *features_opaque,
                                           int visible) {
   int rc = CMP_SUCCESS;
@@ -60,6 +79,13 @@ int cmp_macos_set_window_controls_visible(cmp_macos_features_t *features_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_macos_set_document_proxy
+ *
+ * @param features_opaque Parameter description.
+ * @param file_url Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_macos_set_document_proxy(cmp_macos_features_t *features_opaque,
                                  const char *file_url) {
   int rc = CMP_SUCCESS;
@@ -80,6 +106,13 @@ int cmp_macos_set_document_proxy(cmp_macos_features_t *features_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_macos_set_menu_bar_extra
+ *
+ * @param features_opaque Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_macos_set_menu_bar_extra(cmp_macos_features_t *features_opaque,
                                  int enabled) {
   int rc = CMP_SUCCESS;
@@ -96,6 +129,12 @@ int cmp_macos_set_menu_bar_extra(cmp_macos_features_t *features_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_macos_invoke_print_panel
+ *
+ * @param features_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_macos_invoke_print_panel(cmp_macos_features_t *features_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = (struct cmp_macos_features *)features_opaque;
@@ -110,6 +149,12 @@ int cmp_macos_invoke_print_panel(cmp_macos_features_t *features_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_macos_setup_global_menu_bar
+ *
+ * @param features_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_macos_setup_global_menu_bar(cmp_macos_features_t *features_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = (struct cmp_macos_features *)features_opaque;
@@ -123,6 +168,13 @@ int cmp_macos_setup_global_menu_bar(cmp_macos_features_t *features_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_macos_setup_context_menu
+ *
+ * @param features_opaque Parameter description.
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_macos_setup_context_menu(cmp_macos_features_t *features_opaque,
                                  void *node) {
   int rc = CMP_SUCCESS;
@@ -137,6 +189,14 @@ int cmp_macos_setup_context_menu(cmp_macos_features_t *features_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_macos_set_hover_state
+ *
+ * @param features_opaque Parameter description.
+ * @param node Parameter description.
+ * @param is_hovered Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_macos_set_hover_state(cmp_macos_features_t *features_opaque, void *node,
                               int is_hovered) {
   int rc = CMP_SUCCESS;
@@ -151,6 +211,13 @@ int cmp_macos_set_hover_state(cmp_macos_features_t *features_opaque, void *node,
   return rc;
 }
 
+/**
+ * @brief cmp_macos_set_window_shadow
+ *
+ * @param features_opaque Parameter description.
+ * @param is_active Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_macos_set_window_shadow(cmp_macos_features_t *features_opaque,
                                 int is_active) {
   int rc = CMP_SUCCESS;
@@ -165,6 +232,12 @@ int cmp_macos_set_window_shadow(cmp_macos_features_t *features_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_macos_setup_toolbar_customization
+ *
+ * @param features_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_macos_setup_toolbar_customization(
     cmp_macos_features_t *features_opaque) {
   int rc = CMP_SUCCESS;

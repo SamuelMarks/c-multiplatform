@@ -11,6 +11,12 @@ struct cmp_plugin_loader {
   int active_plugin_id;
 };
 
+/**
+ * @brief cmp_plugin_loader_create
+ *
+ * @param out_loader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_plugin_loader_create(cmp_plugin_loader_t **out_loader) {
   int rc = CMP_SUCCESS;
   cmp_plugin_loader_t *loader = NULL;
@@ -21,11 +27,10 @@ int cmp_plugin_loader_create(cmp_plugin_loader_t **out_loader) {
     return rc;
   }
 
-  loader = (cmp_plugin_loader_t *)malloc(sizeof(cmp_plugin_loader_t));
-  if (!loader) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_plugin_loader_create: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(sizeof(cmp_plugin_loader_t), (void **)&(loader));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 
   loader->dummy = 0;
@@ -34,6 +39,12 @@ int cmp_plugin_loader_create(cmp_plugin_loader_t **out_loader) {
   return rc;
 }
 
+/**
+ * @brief cmp_plugin_loader_destroy
+ *
+ * @param loader Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_plugin_loader_destroy(cmp_plugin_loader_t *loader) {
   int rc = CMP_SUCCESS;
 
@@ -42,10 +53,21 @@ int cmp_plugin_loader_destroy(cmp_plugin_loader_t *loader) {
     LOG_DEBUG("Error in cmp_plugin_loader_destroy: Invalid argument\n");
     return rc;
   }
-  free(loader);
+  rc = CMP_FREE(loader);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_plugin_loader_load
+ *
+ * @param loader Parameter description.
+ * @param path Parameter description.
+ * @param out_plugin_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_plugin_loader_load(cmp_plugin_loader_t *loader, const char *path,
                            int *out_plugin_id) {
   int rc = CMP_SUCCESS;
@@ -62,6 +84,13 @@ int cmp_plugin_loader_load(cmp_plugin_loader_t *loader, const char *path,
   return rc;
 }
 
+/**
+ * @brief cmp_plugin_loader_unload
+ *
+ * @param loader Parameter description.
+ * @param plugin_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_plugin_loader_unload(cmp_plugin_loader_t *loader, int plugin_id) {
   int rc = CMP_SUCCESS;
 
@@ -79,6 +108,16 @@ int cmp_plugin_loader_unload(cmp_plugin_loader_t *loader, int plugin_id) {
   return rc;
 }
 
+/**
+ * @brief cmp_plugin_loader_execute
+ *
+ * @param loader Parameter description.
+ * @param plugin_id Parameter description.
+ * @param function_name Parameter description.
+ * @param payload Parameter description.
+ * @param out_response Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
                               const char *function_name, const char *payload,
                               char **out_response) {
@@ -95,11 +134,10 @@ int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
   (void)payload;
 
   len = strlen(dummy_resp);
-  *out_response = (char *)malloc(len + 1);
-  if (!*out_response) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_plugin_loader_execute: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(len + 1, (void **)&(*out_response));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 #if defined(_MSC_VER)
   strncpy_s(*out_response, len + 1, dummy_resp, _TRUNCATE);
@@ -111,11 +149,20 @@ int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
   return rc;
 }
 
+/**
+ * @brief cmp_plugin_loader_free_response
+ *
+ * @param response Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_plugin_loader_free_response(char *response) {
   int rc = CMP_SUCCESS;
 
   if (response) {
-    free(response);
+    rc = CMP_FREE(response);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
   }
   return rc;
 }

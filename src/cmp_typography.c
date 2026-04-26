@@ -2,6 +2,7 @@
 #include "cmp.h"
 #include <stdlib.h>
 #include <string.h>
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_typography {
@@ -12,7 +13,14 @@ struct cmp_typography {
   int is_rtl;
 };
 
+/**
+ * @brief cmp_typography_create
+ *
+ * @param out_typo Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_typography_create(cmp_typography_t **out_typo) {
+  int rc = CMP_SUCCESS;
   cmp_typography_t *typo;
   if (!out_typo) {
     return CMP_ERROR_INVALID_ARG;
@@ -20,18 +28,20 @@ int cmp_typography_create(cmp_typography_t **out_typo) {
 
   /* Note: Assumes cmp_typography_init() is called globally by application */
 
-  typo = (cmp_typography_t *)malloc(sizeof(cmp_typography_t));
-  if (!typo) {
+  rc = CMP_MALLOC(sizeof(cmp_typography_t), (void **)&(typo));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
 
   typo->primary_font = NULL;
   typo->fallback_capacity = 4;
   typo->fallback_count = 0;
-  typo->fallback_fonts =
-      (cmp_font_t **)malloc(typo->fallback_capacity * sizeof(cmp_font_t *));
-  if (!typo->fallback_fonts) {
-    free(typo);
+  rc = CMP_MALLOC(typo->fallback_capacity * sizeof(cmp_font_t *),
+                  (void **)&typo->fallback_fonts);
+  if (rc != CMP_SUCCESS) {
+    CMP_FREE(typo);
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
 
@@ -41,7 +51,14 @@ int cmp_typography_create(cmp_typography_t **out_typo) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_typography_destroy
+ *
+ * @param typo Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_typography_destroy(cmp_typography_t *typo) {
+  int rc = CMP_SUCCESS;
   size_t i;
   if (!typo) {
     return CMP_ERROR_INVALID_ARG;
@@ -54,13 +71,27 @@ int cmp_typography_destroy(cmp_typography_t *typo) {
   for (i = 0; i < typo->fallback_count; i++) {
     cmp_font_destroy(typo->fallback_fonts[i]);
   }
-  free(typo->fallback_fonts);
-  free(typo);
+  rc = CMP_FREE(typo->fallback_fonts);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
+  rc = CMP_FREE(typo);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
 
   /* Assumes cmp_typography_shutdown() is handled globally */
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_typography_set_primary_font
+ *
+ * @param typo Parameter description.
+ * @param font_path Parameter description.
+ * @param enable_ligatures Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_typography_set_primary_font(cmp_typography_t *typo,
                                     const char *font_path,
                                     int enable_ligatures) {
@@ -100,11 +131,19 @@ int cmp_typography_set_primary_font(cmp_typography_t *typo,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_typography_add_fallback_font
+ *
+ * @param typo Parameter description.
+ * @param font_path Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_typography_add_fallback_font(cmp_typography_t *typo,
                                      const char *font_path) {
   cmp_font_t *fallback = NULL;
   cmp_font_t **new_array;
   int result;
+  int rc;
 
   if (!typo || !font_path) {
     return CMP_ERROR_INVALID_ARG;
@@ -116,14 +155,17 @@ int cmp_typography_add_fallback_font(cmp_typography_t *typo,
   }
 
   if (typo->fallback_count == typo->fallback_capacity) {
-    typo->fallback_capacity *= 2;
-    new_array = (cmp_font_t **)realloc(
-        typo->fallback_fonts, typo->fallback_capacity * sizeof(cmp_font_t *));
-    if (!new_array) {
+    size_t new_cap = typo->fallback_capacity * 2;
+    rc = CMP_MALLOC(new_cap * sizeof(cmp_font_t *), (void **)&new_array);
+    if (rc != CMP_SUCCESS) {
       cmp_font_destroy(fallback);
       return CMP_ERROR_OOM;
     }
+    memcpy(new_array, typo->fallback_fonts,
+           typo->fallback_count * sizeof(cmp_font_t *));
+    CMP_FREE(typo->fallback_fonts);
     typo->fallback_fonts = new_array;
+    typo->fallback_capacity = new_cap;
   }
 
   typo->fallback_fonts[typo->fallback_count++] = fallback;
@@ -136,6 +178,13 @@ int cmp_typography_add_fallback_font(cmp_typography_t *typo,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_typography_set_bidi_direction
+ *
+ * @param typo Parameter description.
+ * @param is_rtl Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_typography_set_bidi_direction(cmp_typography_t *typo, int is_rtl) {
   if (!typo) {
     return CMP_ERROR_INVALID_ARG;
@@ -147,6 +196,15 @@ int cmp_typography_set_bidi_direction(cmp_typography_t *typo, int is_rtl) {
   return cmp_i18n_set_bidi_direction(is_rtl ? CMP_TEXT_DIR_RTL
                                             : CMP_TEXT_DIR_LTR);
 }
+/**
+ * @brief cmp_freetype_glyph_rasterize
+ *
+ * @param font_file_path Parameter description.
+ * @param glyph_index Parameter description.
+ * @param out_glyph_texture Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_freetype_glyph_rasterize(const char *font_file_path, int glyph_index,
                                  cmp_texture_t **out_glyph_texture,
                                  cmp_glyph_metrics_t *out_metrics) {
@@ -161,6 +219,15 @@ int cmp_freetype_glyph_rasterize(const char *font_file_path, int glyph_index,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_harfbuzz_text_shape
+ *
+ * @param font Parameter description.
+ * @param utf8_text Parameter description.
+ * @param is_rtl Parameter description.
+ * @param out_glyph_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_harfbuzz_text_shape(cmp_font_t *font, const char *utf8_text, int is_rtl,
                             int *out_glyph_count) {
   (void)is_rtl;
@@ -170,6 +237,14 @@ int cmp_harfbuzz_text_shape(cmp_font_t *font, const char *utf8_text, int is_rtl,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_arabic_indic_shape
+ *
+ * @param font Parameter description.
+ * @param utf8_text Parameter description.
+ * @param out_glyph_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_arabic_indic_shape(cmp_font_t *font, const char *utf8_text,
                            int *out_glyph_count) {
   if (!font || !utf8_text || !out_glyph_count)
@@ -178,6 +253,14 @@ int cmp_arabic_indic_shape(cmp_font_t *font, const char *utf8_text,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_bidi_run_split
+ *
+ * @param utf8_text Parameter description.
+ * @param out_run_count Parameter description.
+ * @param out_run_is_rtl Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_bidi_run_split(const char *utf8_text, int *out_run_count,
                        int **out_run_is_rtl) {
   if (!utf8_text || !out_run_count || !out_run_is_rtl)
@@ -187,6 +270,14 @@ int cmp_bidi_run_split(const char *utf8_text, int *out_run_count,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_font_render_sdf
+ *
+ * @param font Parameter description.
+ * @param glyph_index Parameter description.
+ * @param out_sdf_texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_font_render_sdf(cmp_font_t *font, int glyph_index,
                         cmp_texture_t **out_sdf_texture) {
   (void)glyph_index;
@@ -196,6 +287,14 @@ int cmp_font_render_sdf(cmp_font_t *font, int glyph_index,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_font_render_msdf
+ *
+ * @param font Parameter description.
+ * @param glyph_index Parameter description.
+ * @param out_msdf_texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_font_render_msdf(cmp_font_t *font, int glyph_index,
                          cmp_texture_t **out_msdf_texture) {
   (void)glyph_index;
@@ -205,6 +304,14 @@ int cmp_font_render_msdf(cmp_font_t *font, int glyph_index,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_font_render_subpixel_lcd
+ *
+ * @param font Parameter description.
+ * @param glyph_index Parameter description.
+ * @param out_lcd_texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_font_render_subpixel_lcd(cmp_font_t *font, int glyph_index,
                                  cmp_texture_t **out_lcd_texture) {
   (void)glyph_index;
@@ -214,6 +321,14 @@ int cmp_font_render_subpixel_lcd(cmp_font_t *font, int glyph_index,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_font_render_color_emoji
+ *
+ * @param font Parameter description.
+ * @param glyph_index Parameter description.
+ * @param out_emoji_texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_font_render_color_emoji(cmp_font_t *font, int glyph_index,
                                 cmp_texture_t **out_emoji_texture) {
   (void)glyph_index;
@@ -223,6 +338,15 @@ int cmp_font_render_color_emoji(cmp_font_t *font, int glyph_index,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_variable_font_axis_interpolate
+ *
+ * @param font Parameter description.
+ * @param axis_tag Parameter description.
+ * @param value Parameter description.
+ * @param out_interpolated_font Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_variable_font_axis_interpolate(cmp_font_t *font, const char *axis_tag,
                                        float value,
                                        cmp_font_t **out_interpolated_font) {

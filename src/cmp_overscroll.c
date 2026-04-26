@@ -4,6 +4,13 @@
 #include <stdlib.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_overscroll_evaluate
+ *
+ * @param mode Parameter description.
+ * @param boundary_hit Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_overscroll_evaluate(cmp_overscroll_t mode, int boundary_hit) {
   int rc = 1; /* Default to bubbling (true) */
 

@@ -8,6 +8,11 @@
 
 static int g_orm_initialized = 0;
 
+/**
+ * @brief cmp_orm_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_orm_init(void) {
   if (g_orm_initialized) {
     return CMP_SUCCESS;
@@ -16,6 +21,11 @@ int cmp_orm_init(void) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_orm_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_orm_shutdown(void) {
   if (!g_orm_initialized) {
     return CMP_SUCCESS;
@@ -24,6 +34,13 @@ int cmp_orm_shutdown(void) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_orm_connect
+ *
+ * @param virtual_path Parameter description.
+ * @param out_db Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_orm_connect(const char *virtual_path, c_orm_db_t **out_db) {
   cmp_string_t resolved_path;
   int err;
@@ -78,6 +95,12 @@ int cmp_orm_connect(const char *virtual_path, c_orm_db_t **out_db) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_orm_disconnect
+ *
+ * @param db Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_orm_disconnect(c_orm_db_t *db) {
   const c_orm_driver_vtable_t *vtable;
 
@@ -96,6 +119,13 @@ int cmp_orm_disconnect(c_orm_db_t *db) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_orm_execute
+ *
+ * @param db Parameter description.
+ * @param sql Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_orm_execute(c_orm_db_t *db, const char *sql) {
   if (db == NULL || sql == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -108,6 +138,13 @@ int cmp_orm_execute(c_orm_db_t *db, const char *sql) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_orm_migrate
+ *
+ * @param db Parameter description.
+ * @param migrations_dir Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
   cmp_string_t resolved_path;
   cfs_path cfs_dir_path;
@@ -192,6 +229,13 @@ int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_orm_set_encryption_key
+ *
+ * @param db Parameter description.
+ * @param key Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_orm_set_encryption_key(c_orm_db_t *db, const char *key) {
   char query[256];
   if (db == NULL || key == NULL) {
@@ -215,6 +259,14 @@ struct cmp_orm_observable {
   char *bound_property;
 };
 
+/**
+ * @brief cmp_orm_observable_create
+ *
+ * @param db Parameter description.
+ * @param query Parameter description.
+ * @param out_obs Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_orm_observable_create(c_orm_db_t *db, const char *query,
                               cmp_orm_observable_t **out_obs) {
   cmp_orm_observable_t *obs;
@@ -248,6 +300,14 @@ int cmp_orm_observable_create(c_orm_db_t *db, const char *query,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_node_bind
+ *
+ * @param node Parameter description.
+ * @param obs Parameter description.
+ * @param property_name Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_bind(cmp_ui_node_t *node, cmp_orm_observable_t *obs,
                      const char *property_name) {
   size_t len;
@@ -276,6 +336,12 @@ int cmp_ui_node_bind(cmp_ui_node_t *node, cmp_orm_observable_t *obs,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_orm_observable_destroy
+ *
+ * @param obs Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_orm_observable_destroy(cmp_orm_observable_t *obs) {
   if (obs == NULL) {
     return CMP_ERROR_INVALID_ARG;

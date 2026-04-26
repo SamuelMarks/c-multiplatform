@@ -10,6 +10,14 @@ struct cmp_step_ease {
   cmp_step_position_t position;
 };
 
+/**
+ * @brief cmp_step_ease_create
+ *
+ * @param steps Parameter description.
+ * @param position Parameter description.
+ * @param out_step Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_step_ease_create(int steps, cmp_step_position_t position,
                          cmp_step_ease_t **out_step) {
   struct cmp_step_ease *step_ease;
@@ -28,6 +36,12 @@ int cmp_step_ease_create(int steps, cmp_step_position_t position,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_step_ease_destroy
+ *
+ * @param step Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_step_ease_destroy(cmp_step_ease_t *step) {
   struct cmp_step_ease *internal_step = (struct cmp_step_ease *)step;
   if (!internal_step)
@@ -37,6 +51,14 @@ int cmp_step_ease_destroy(cmp_step_ease_t *step) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_step_ease_evaluate
+ *
+ * @param step Parameter description.
+ * @param t Parameter description.
+ * @param out_value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_step_ease_evaluate(cmp_step_ease_t *step, float t, float *out_value) {
   struct cmp_step_ease *s = (struct cmp_step_ease *)step;
   int current_step;

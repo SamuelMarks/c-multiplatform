@@ -12,6 +12,12 @@ struct cmp_permissions {
   cmp_permission_status_t tracking_status;
 };
 
+/**
+ * @brief cmp_permissions_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_permissions_create(cmp_permissions_t **out_ctx) {
   int rc = CMP_SUCCESS;
   struct cmp_permissions *ctx = NULL;
@@ -38,6 +44,12 @@ int cmp_permissions_create(cmp_permissions_t **out_ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_permissions_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_permissions_destroy(cmp_permissions_t *ctx) {
   int rc = CMP_SUCCESS;
 
@@ -47,6 +59,14 @@ int cmp_permissions_destroy(cmp_permissions_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_permissions_get_status
+ *
+ * @param ctx Parameter description.
+ * @param type Parameter description.
+ * @param out_status Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_permissions_get_status(cmp_permissions_t *ctx,
                                cmp_permission_type_t type,
                                cmp_permission_status_t *out_status) {
@@ -83,6 +103,13 @@ int cmp_permissions_get_status(cmp_permissions_t *ctx,
   return rc;
 }
 
+/**
+ * @brief cmp_permissions_request
+ *
+ * @param ctx Parameter description.
+ * @param type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_permissions_request(cmp_permissions_t *ctx,
                             cmp_permission_type_t type) {
   int rc = CMP_SUCCESS;
@@ -123,6 +150,14 @@ int cmp_permissions_request(cmp_permissions_t *ctx,
   return rc;
 }
 
+/**
+ * @brief cmp_tree_set_screen_recording_prevention
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tree_set_screen_recording_prevention(cmp_a11y_tree_t *tree, int node_id,
                                              int enabled) {
   int rc = CMP_SUCCESS;
@@ -146,6 +181,12 @@ struct cmp_privacy_indicators {
   cmp_rect_t system_indicator_bounds; /* Where OS draws the orange/green dots */
 };
 
+/**
+ * @brief cmp_privacy_indicators_create
+ *
+ * @param out_indicators Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_privacy_indicators_create(cmp_privacy_indicators_t **out_indicators) {
   int rc = CMP_SUCCESS;
   struct cmp_privacy_indicators *inds = NULL;
@@ -172,6 +213,12 @@ int cmp_privacy_indicators_create(cmp_privacy_indicators_t **out_indicators) {
   return rc;
 }
 
+/**
+ * @brief cmp_privacy_indicators_destroy
+ *
+ * @param indicators Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_privacy_indicators_destroy(cmp_privacy_indicators_t *indicators) {
   int rc = CMP_SUCCESS;
 
@@ -181,6 +228,14 @@ int cmp_privacy_indicators_destroy(cmp_privacy_indicators_t *indicators) {
   return rc;
 }
 
+/**
+ * @brief cmp_privacy_indicators_verify_layout
+ *
+ * @param indicators Parameter description.
+ * @param ui_bounds Parameter description.
+ * @param out_is_obscured Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_privacy_indicators_verify_layout(cmp_privacy_indicators_t *indicators,
                                          const cmp_rect_t *ui_bounds,
                                          int *out_is_obscured) {

@@ -5,6 +5,12 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_pointer_pressure_create
+ *
+ * @param out_pressure Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pointer_pressure_create(cmp_pointer_pressure_t **out_pressure) {
   int rc = CMP_SUCCESS;
   struct cmp_pointer_pressure *ctx = NULL;
@@ -27,6 +33,12 @@ int cmp_pointer_pressure_create(cmp_pointer_pressure_t **out_pressure) {
   return rc;
 }
 
+/**
+ * @brief cmp_pointer_pressure_destroy
+ *
+ * @param pressure Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pointer_pressure_destroy(cmp_pointer_pressure_t *pressure) {
   int rc = CMP_SUCCESS;
   struct cmp_pointer_pressure *ctx = (struct cmp_pointer_pressure *)pressure;
@@ -41,6 +53,13 @@ int cmp_pointer_pressure_destroy(cmp_pointer_pressure_t *pressure) {
   return rc;
 }
 
+/**
+ * @brief cmp_pointer_pressure_process_event
+ *
+ * @param pressure Parameter description.
+ * @param event Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pointer_pressure_process_event(cmp_pointer_pressure_t *pressure,
                                        const cmp_event_t *event) {
   int rc = CMP_SUCCESS;
@@ -67,6 +86,13 @@ int cmp_pointer_pressure_process_event(cmp_pointer_pressure_t *pressure,
   return rc;
 }
 
+/**
+ * @brief cmp_pointer_pressure_get_data
+ *
+ * @param pressure Parameter description.
+ * @param out_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pointer_pressure_get_data(const cmp_pointer_pressure_t *pressure,
                                   cmp_stylus_data_t *out_data) {
   int rc = CMP_SUCCESS;

@@ -2,6 +2,7 @@
 #include "cmp_ui_code_block.h"
 #include <stdlib.h>
 #include <string.h>
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_ui_code_block {
@@ -11,8 +12,17 @@ struct cmp_ui_code_block {
   char *language;
 };
 
+/**
+ * @brief cmp_ui_code_block_create
+ *
+ * @param out_block Parameter description.
+ * @param code Parameter description.
+ * @param language Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
                              const char *language) {
+  int rc = CMP_SUCCESS;
   cmp_ui_code_block_t *block;
   int err;
   size_t len;
@@ -21,15 +31,20 @@ int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  block = (cmp_ui_code_block_t *)malloc(sizeof(cmp_ui_code_block_t));
-  if (!block) {
+  rc = CMP_MALLOC(sizeof(cmp_ui_code_block_t), (void **)&(block));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
 
   block->code = NULL;
   if (code) {
     len = strlen(code);
-    block->code = (char *)malloc(len + 1);
+    rc = CMP_MALLOC(len + 1, (void **)&(block->code));
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("OOM\n");
+      return CMP_ERROR_OOM;
+    }
     if (block->code) {
       memcpy(block->code, code, len + 1);
     }
@@ -38,7 +53,11 @@ int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
   block->language = NULL;
   if (language) {
     len = strlen(language);
-    block->language = (char *)malloc(len + 1);
+    rc = CMP_MALLOC(len + 1, (void **)&(block->language));
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("OOM\n");
+      return CMP_ERROR_OOM;
+    }
     if (block->language) {
       memcpy(block->language, language, len + 1);
     }
@@ -46,18 +65,36 @@ int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
 
   err = cmp_ui_box_create(&block->node_root);
   if (err != 0) {
-    free(block->code);
-    free(block->language);
-    free(block);
+    rc = CMP_FREE(block->code);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
+    rc = CMP_FREE(block->language);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
+    rc = CMP_FREE(block);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
     return err;
   }
 
   err =
       cmp_ui_text_create(&block->node_text, block->code ? block->code : "", -1);
   if (err != 0) {
-    free(block->code);
-    free(block->language);
-    free(block);
+    rc = CMP_FREE(block->code);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
+    rc = CMP_FREE(block->language);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
+    rc = CMP_FREE(block);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
     return err;
   }
 
@@ -67,16 +104,39 @@ int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
   return 0;
 }
 
+/**
+ * @brief cmp_ui_code_block_destroy
+ *
+ * @param block Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_code_block_destroy(cmp_ui_code_block_t *block) {
+  int rc = CMP_SUCCESS;
   if (!block) {
     return CMP_ERROR_INVALID_ARG;
   }
-  free(block->code);
-  free(block->language);
-  free(block);
+  rc = CMP_FREE(block->code);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
+  rc = CMP_FREE(block->language);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
+  rc = CMP_FREE(block);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return 0;
 }
 
+/**
+ * @brief cmp_ui_code_block_get_node
+ *
+ * @param block Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_code_block_get_node(cmp_ui_code_block_t *block,
                                cmp_ui_node_t **out_node) {
   if (!block || !out_node) {
@@ -86,7 +146,15 @@ int cmp_ui_code_block_get_node(cmp_ui_code_block_t *block,
   return 0;
 }
 
+/**
+ * @brief cmp_ui_code_block_set_code
+ *
+ * @param block Parameter description.
+ * @param code Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_code_block_set_code(cmp_ui_code_block_t *block, const char *code) {
+  int rc = CMP_SUCCESS;
   size_t len;
 
   if (!block) {
@@ -94,14 +162,18 @@ int cmp_ui_code_block_set_code(cmp_ui_code_block_t *block, const char *code) {
   }
 
   if (block->code) {
-    free(block->code);
+    rc = CMP_FREE(block->code);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
     block->code = NULL;
   }
 
   if (code) {
     len = strlen(code);
-    block->code = (char *)malloc(len + 1);
-    if (!block->code) {
+    rc = CMP_MALLOC(len + 1, (void **)&(block->code));
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("OOM\n");
       return CMP_ERROR_OOM;
     }
     memcpy(block->code, code, len + 1);

@@ -27,6 +27,13 @@ struct cmp_list {
   size_t row_capacity;
 };
 
+/**
+ * @brief cmp_list_create
+ *
+ * @param out_list Parameter description.
+ * @param style Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_list_create(cmp_list_t **out_list, cmp_list_style_t style) {
   int rc = CMP_SUCCESS;
   struct cmp_list *ctx = NULL;
@@ -53,6 +60,12 @@ int cmp_list_create(cmp_list_t **out_list, cmp_list_style_t style) {
   return rc;
 }
 
+/**
+ * @brief cmp_list_destroy
+ *
+ * @param list_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_list_destroy(cmp_list_t *list_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_list *ctx = (struct cmp_list *)list_opaque;
@@ -77,6 +90,13 @@ int cmp_list_destroy(cmp_list_t *list_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_list_add_row
+ *
+ * @param list_opaque Parameter description.
+ * @param row_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_list_add_row(cmp_list_t *list_opaque, cmp_list_row_t *row_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_list *ctx = (struct cmp_list *)list_opaque;
@@ -109,6 +129,13 @@ int cmp_list_add_row(cmp_list_t *list_opaque, cmp_list_row_t *row_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_list_row_create
+ *
+ * @param out_row Parameter description.
+ * @param title Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_list_row_create(cmp_list_row_t **out_row, const char *title) {
   int rc = CMP_SUCCESS;
   struct cmp_list_row *ctx = NULL;
@@ -147,6 +174,12 @@ int cmp_list_row_create(cmp_list_row_t **out_row, const char *title) {
   return rc;
 }
 
+/**
+ * @brief cmp_list_row_destroy
+ *
+ * @param row_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_list_row_destroy(cmp_list_row_t *row_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_list_row *ctx = (struct cmp_list_row *)row_opaque;
@@ -169,6 +202,13 @@ int cmp_list_row_destroy(cmp_list_row_t *row_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_list_row_set_separator_inset
+ *
+ * @param row_opaque Parameter description.
+ * @param inset_left Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_list_row_set_separator_inset(cmp_list_row_t *row_opaque,
                                      float inset_left) {
   int rc = CMP_SUCCESS;
@@ -183,6 +223,16 @@ int cmp_list_row_set_separator_inset(cmp_list_row_t *row_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_list_row_add_swipe_action
+ *
+ * @param row_opaque Parameter description.
+ * @param is_leading Parameter description.
+ * @param title Parameter description.
+ * @param style Parameter description.
+ * @param allows_continuous Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_list_row_add_swipe_action(cmp_list_row_t *row_opaque, int is_leading,
                                   const char *title,
                                   cmp_swipe_action_style_t style,
@@ -233,6 +283,13 @@ int cmp_list_row_add_swipe_action(cmp_list_row_t *row_opaque, int is_leading,
   return rc;
 }
 
+/**
+ * @brief cmp_list_set_edit_mode
+ *
+ * @param list_opaque Parameter description.
+ * @param is_editing Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_list_set_edit_mode(cmp_list_t *list_opaque, int is_editing) {
   int rc = CMP_SUCCESS;
   struct cmp_list *ctx = (struct cmp_list *)list_opaque;
@@ -247,6 +304,15 @@ int cmp_list_set_edit_mode(cmp_list_t *list_opaque, int is_editing) {
   return rc;
 }
 
+/**
+ * @brief cmp_list_resolve_metrics
+ *
+ * @param list_opaque Parameter description.
+ * @param out_margin_horizontal Parameter description.
+ * @param out_corner_radius Parameter description.
+ * @param out_content_offset_x Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_list_resolve_metrics(cmp_list_t *list_opaque,
                              float *out_margin_horizontal,
                              float *out_corner_radius,

@@ -13,6 +13,11 @@
 
 static cmp_resource_manager_t *g_resource_manager = NULL;
 
+/**
+ * @brief cmp_power_awareness_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_power_awareness_init(void) {
   int rc = CMP_SUCCESS;
 
@@ -25,6 +30,11 @@ int cmp_power_awareness_init(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_power_awareness_poll
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_power_awareness_poll(void) {
   int rc = CMP_SUCCESS;
 

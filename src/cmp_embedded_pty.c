@@ -17,6 +17,12 @@ struct cmp_embedded_pty {
   size_t mock_pos;
 };
 
+/**
+ * @brief cmp_embedded_pty_create
+ *
+ * @param out_pty Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_embedded_pty_create(cmp_embedded_pty_t **out_pty) {
   int rc = CMP_SUCCESS;
   cmp_embedded_pty_t *pty = NULL;
@@ -42,6 +48,12 @@ int cmp_embedded_pty_create(cmp_embedded_pty_t **out_pty) {
   return rc;
 }
 
+/**
+ * @brief cmp_embedded_pty_destroy
+ *
+ * @param pty Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_embedded_pty_destroy(cmp_embedded_pty_t *pty) {
   int rc = CMP_SUCCESS;
 
@@ -56,6 +68,13 @@ int cmp_embedded_pty_destroy(cmp_embedded_pty_t *pty) {
   return rc;
 }
 
+/**
+ * @brief cmp_embedded_pty_spawn
+ *
+ * @param pty Parameter description.
+ * @param command Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_embedded_pty_spawn(cmp_embedded_pty_t *pty, const char *command) {
   int rc = CMP_SUCCESS;
   const char *welcome = "C:\\> ";
@@ -75,6 +94,14 @@ int cmp_embedded_pty_spawn(cmp_embedded_pty_t *pty, const char *command) {
   return rc;
 }
 
+/**
+ * @brief cmp_embedded_pty_write
+ *
+ * @param pty Parameter description.
+ * @param input Parameter description.
+ * @param length Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_embedded_pty_write(cmp_embedded_pty_t *pty, const char *input,
                            size_t length) {
   int rc = CMP_SUCCESS;
@@ -101,6 +128,15 @@ int cmp_embedded_pty_write(cmp_embedded_pty_t *pty, const char *input,
   return rc;
 }
 
+/**
+ * @brief cmp_embedded_pty_read
+ *
+ * @param pty Parameter description.
+ * @param out_buffer Parameter description.
+ * @param max_len Parameter description.
+ * @param out_read Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_embedded_pty_read(cmp_embedded_pty_t *pty, char *out_buffer,
                           size_t max_len, size_t *out_read) {
   int rc = CMP_SUCCESS;

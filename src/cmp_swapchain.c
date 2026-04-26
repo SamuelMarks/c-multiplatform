@@ -18,6 +18,14 @@ struct cmp_swapchain {
   void *os_surface_handle;
 };
 
+/**
+ * @brief cmp_swapchain_create
+ *
+ * @param window Parameter description.
+ * @param mode Parameter description.
+ * @param out_swapchain Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_swapchain_create(cmp_window_t *window, cmp_swapchain_mode_t mode,
                          cmp_swapchain_t **out_swapchain) {
   struct cmp_swapchain *ctx;
@@ -72,6 +80,12 @@ int cmp_swapchain_create(cmp_window_t *window, cmp_swapchain_mode_t mode,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_swapchain_destroy
+ *
+ * @param swapchain Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_swapchain_destroy(cmp_swapchain_t *swapchain) {
   struct cmp_swapchain *ctx = (struct cmp_swapchain *)swapchain;
   int i;
@@ -89,6 +103,13 @@ int cmp_swapchain_destroy(cmp_swapchain_t *swapchain) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_swapchain_acquire_next_image
+ *
+ * @param swapchain Parameter description.
+ * @param out_texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_swapchain_acquire_next_image(cmp_swapchain_t *swapchain,
                                      cmp_texture_t **out_texture) {
   struct cmp_swapchain *ctx = (struct cmp_swapchain *)swapchain;
@@ -109,6 +130,12 @@ int cmp_swapchain_acquire_next_image(cmp_swapchain_t *swapchain,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_swapchain_present
+ *
+ * @param swapchain Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_swapchain_present(cmp_swapchain_t *swapchain) {
   struct cmp_swapchain *ctx = (struct cmp_swapchain *)swapchain;
 
@@ -128,6 +155,12 @@ int cmp_swapchain_present(cmp_swapchain_t *swapchain) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_swapchain_get_os_surface_handle
+ *
+ * @param swapchain Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 void *cmp_swapchain_get_os_surface_handle(cmp_swapchain_t *swapchain) {
   struct cmp_swapchain *ctx = (struct cmp_swapchain *)swapchain;
   if (!ctx)
@@ -135,6 +168,13 @@ void *cmp_swapchain_get_os_surface_handle(cmp_swapchain_t *swapchain) {
   return ctx->os_surface_handle;
 }
 
+/**
+ * @brief cmp_swapchain_set_msaa
+ *
+ * @param swapchain Parameter description.
+ * @param sample_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_swapchain_set_msaa(cmp_swapchain_t *swapchain, int sample_count) {
   if (!swapchain || sample_count < 1)
     return CMP_ERROR_INVALID_ARG;

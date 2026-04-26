@@ -9,6 +9,12 @@ struct cmp_mermaid_renderer {
   int is_initialized;
 };
 
+/**
+ * @brief cmp_mermaid_renderer_create
+ *
+ * @param out_renderer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mermaid_renderer_create(cmp_mermaid_renderer_t **out_renderer) {
   int rc = CMP_SUCCESS;
   cmp_mermaid_renderer_t *renderer = NULL;
@@ -19,11 +25,10 @@ int cmp_mermaid_renderer_create(cmp_mermaid_renderer_t **out_renderer) {
     return rc;
   }
 
-  renderer = (cmp_mermaid_renderer_t *)malloc(sizeof(cmp_mermaid_renderer_t));
-  if (!renderer) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_mermaid_renderer_create: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(sizeof(cmp_mermaid_renderer_t), (void **)&(renderer));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 
   renderer->is_initialized = 1;
@@ -31,6 +36,12 @@ int cmp_mermaid_renderer_create(cmp_mermaid_renderer_t **out_renderer) {
   return rc;
 }
 
+/**
+ * @brief cmp_mermaid_renderer_destroy
+ *
+ * @param renderer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mermaid_renderer_destroy(cmp_mermaid_renderer_t *renderer) {
   int rc = CMP_SUCCESS;
 
@@ -39,10 +50,21 @@ int cmp_mermaid_renderer_destroy(cmp_mermaid_renderer_t *renderer) {
     LOG_DEBUG("Error in cmp_mermaid_renderer_destroy: Invalid argument\n");
     return rc;
   }
-  free(renderer);
+  rc = CMP_FREE(renderer);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_mermaid_renderer_generate_svg
+ *
+ * @param renderer Parameter description.
+ * @param mermaid_syntax Parameter description.
+ * @param out_svg_xml Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
                                       const char *mermaid_syntax,
                                       char **out_svg_xml) {
@@ -58,11 +80,10 @@ int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
   }
 
   len = strlen(dummy_svg);
-  svg_out = (char *)malloc(len + 1);
-  if (!svg_out) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_mermaid_renderer_generate_svg: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(len + 1, (void **)&(svg_out));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 
 #if defined(_MSC_VER)
@@ -76,11 +97,20 @@ int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
   return rc;
 }
 
+/**
+ * @brief cmp_mermaid_renderer_free_svg
+ *
+ * @param svg_xml Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mermaid_renderer_free_svg(char *svg_xml) {
   int rc = CMP_SUCCESS;
 
   if (svg_xml) {
-    free(svg_xml);
+    rc = CMP_FREE(svg_xml);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
   }
   return rc;
 }

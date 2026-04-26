@@ -9,6 +9,12 @@ struct cmp_markdown_parser {
   int flags;
 };
 
+/**
+ * @brief cmp_md_node_destroy
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_md_node_destroy(cmp_md_node_t *node) {
   int rc = CMP_SUCCESS;
   size_t i;
@@ -20,7 +26,10 @@ int cmp_md_node_destroy(cmp_md_node_t *node) {
   }
 
   if (node->content) {
-    free(node->content);
+    rc = CMP_FREE(node->content);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
   }
 
   for (i = 0; i < node->child_count; ++i) {
@@ -31,21 +40,42 @@ int cmp_md_node_destroy(cmp_md_node_t *node) {
   }
 
   if (node->children) {
-    free(node->children);
+    rc = CMP_FREE(node->children);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
   }
 
-  free(node);
+  rc = CMP_FREE(node);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return CMP_SUCCESS; /* Returning SUCCESS overall even if children fail to
                          align with typical free semantics */
 }
 
-static cmp_md_node_t *create_node(cmp_md_node_type_t type,
-                                  const char *content) {
-  cmp_md_node_t *node = (cmp_md_node_t *)malloc(sizeof(cmp_md_node_t));
+/**
+ * @brief create_node
+ *
+ * @param type Parameter description.
+ * @param content Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
+static int create_node(cmp_md_node_type_t type, const char *content,
+                       cmp_md_node_t **out_node) {
+  int rc = CMP_SUCCESS;
+  cmp_md_node_t *node;
   size_t len;
 
-  if (!node)
-    return NULL;
+  if (!out_node)
+    return CMP_ERROR_INVALID_ARG;
+
+  rc = CMP_MALLOC(sizeof(cmp_md_node_t), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
+  }
 
   node->type = type;
   node->level = 0;
@@ -55,21 +85,36 @@ static cmp_md_node_t *create_node(cmp_md_node_type_t type,
 
   if (content) {
     len = strlen(content);
-    node->content = (char *)malloc(len + 1);
-    if (node->content) {
-#if defined(_MSC_VER)
-      strncpy_s(node->content, len + 1, content, _TRUNCATE);
-#else
-      strncpy(node->content, content, len + 1);
-#endif
+    rc = CMP_MALLOC(len + 1, (void **)&(node->content));
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("OOM\n");
+      CMP_FREE(node);
+      return CMP_ERROR_OOM;
     }
+#if defined(_MSC_VER)
+    if (memcpy_s(node->content, len + 1, content, len + 1) != 0) {
+      CMP_FREE(node->content);
+      CMP_FREE(node);
+      return CMP_ERROR_GENERAL;
+    }
+#else
+    memcpy(node->content, content, len + 1);
+#endif
   } else {
     node->content = NULL;
   }
 
-  return node;
+  *out_node = node;
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief add_child
+ *
+ * @param parent Parameter description.
+ * @param child Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int add_child(cmp_md_node_t *parent, cmp_md_node_t *child) {
   int rc = CMP_SUCCESS;
   size_t new_cap;
@@ -83,12 +128,15 @@ static int add_child(cmp_md_node_t *parent, cmp_md_node_t *child) {
 
   if (parent->child_count == parent->child_capacity) {
     new_cap = parent->child_capacity == 0 ? 4 : parent->child_capacity * 2;
-    new_arr = (cmp_md_node_t **)realloc(parent->children,
-                                        new_cap * sizeof(cmp_md_node_t *));
-    if (!new_arr) {
-      rc = CMP_ERROR_OOM;
+    rc = CMP_MALLOC(new_cap * sizeof(cmp_md_node_t *), (void **)&new_arr);
+    if (rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in add_child: Out of memory\n");
       return rc;
+    }
+    if (parent->children) {
+      memcpy(new_arr, parent->children,
+             parent->child_count * sizeof(cmp_md_node_t *));
+      CMP_FREE(parent->children);
     }
     parent->children = new_arr;
     parent->child_capacity = new_cap;
@@ -98,6 +146,12 @@ static int add_child(cmp_md_node_t *parent, cmp_md_node_t *child) {
   return rc;
 }
 
+/**
+ * @brief cmp_markdown_parser_create
+ *
+ * @param out_parser Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_markdown_parser_create(cmp_markdown_parser_t **out_parser) {
   int rc = CMP_SUCCESS;
   cmp_markdown_parser_t *parser = NULL;
@@ -108,11 +162,10 @@ int cmp_markdown_parser_create(cmp_markdown_parser_t **out_parser) {
     return rc;
   }
 
-  parser = (cmp_markdown_parser_t *)malloc(sizeof(cmp_markdown_parser_t));
-  if (!parser) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_markdown_parser_create: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(sizeof(cmp_markdown_parser_t), (void **)&(parser));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 
   parser->flags = 0;
@@ -120,6 +173,12 @@ int cmp_markdown_parser_create(cmp_markdown_parser_t **out_parser) {
   return rc;
 }
 
+/**
+ * @brief cmp_markdown_parser_destroy
+ *
+ * @param parser Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_markdown_parser_destroy(cmp_markdown_parser_t *parser) {
   int rc = CMP_SUCCESS;
 
@@ -128,10 +187,21 @@ int cmp_markdown_parser_destroy(cmp_markdown_parser_t *parser) {
     LOG_DEBUG("Error in cmp_markdown_parser_destroy: Invalid argument\n");
     return rc;
   }
-  free(parser);
+  rc = CMP_FREE(parser);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_markdown_parser_parse
+ *
+ * @param parser Parameter description.
+ * @param markdown_text Parameter description.
+ * @param out_root Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_markdown_parser_parse(cmp_markdown_parser_t *parser,
                               const char *markdown_text,
                               cmp_md_node_t **out_root) {
@@ -147,46 +217,40 @@ int cmp_markdown_parser_parse(cmp_markdown_parser_t *parser,
 
   /* Basic naive parsing strategy returning a root document element.
      In full implementation, parses markdown into AST blocks and inlines. */
-  root = create_node(CMP_MD_NODE_PARAGRAPH, NULL);
-  if (!root) {
-    rc = CMP_ERROR_OOM;
+  rc = create_node(CMP_MD_NODE_PARAGRAPH, NULL, &root);
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_markdown_parser_parse: Out of memory\n");
     return rc;
   }
 
   /* Very naive parsing just to ensure symbols map and logic holds for test */
   if (markdown_text[0] == '#') {
-    p_node = create_node(CMP_MD_NODE_HEADER, markdown_text + 2);
-    if (p_node) {
+    rc = create_node(CMP_MD_NODE_HEADER, markdown_text + 2, &p_node);
+    if (rc == CMP_SUCCESS) {
       p_node->level = 1;
       rc = add_child(root, p_node);
-    } else {
-      rc = CMP_ERROR_OOM;
     }
   } else if (markdown_text[0] == '*') {
-    p_node = create_node(CMP_MD_NODE_LIST, NULL);
-    if (p_node) {
-      rc = add_child(p_node,
-                     create_node(CMP_MD_NODE_LIST_ITEM, markdown_text + 2));
+    rc = create_node(CMP_MD_NODE_LIST, NULL, &p_node);
+    if (rc == CMP_SUCCESS) {
+      cmp_md_node_t *li = NULL;
+      rc = create_node(CMP_MD_NODE_LIST_ITEM, markdown_text + 2, &li);
+      if (rc == CMP_SUCCESS) {
+        rc = add_child(p_node, li);
+      }
       if (rc == CMP_SUCCESS) {
         rc = add_child(root, p_node);
       }
-    } else {
-      rc = CMP_ERROR_OOM;
     }
   } else if (markdown_text[0] == '>') {
-    p_node = create_node(CMP_MD_NODE_BLOCKQUOTE, markdown_text + 2);
-    if (p_node) {
+    rc = create_node(CMP_MD_NODE_BLOCKQUOTE, markdown_text + 2, &p_node);
+    if (rc == CMP_SUCCESS) {
       rc = add_child(root, p_node);
-    } else {
-      rc = CMP_ERROR_OOM;
     }
   } else {
-    p_node = create_node(CMP_MD_NODE_TEXT, markdown_text);
-    if (p_node) {
+    rc = create_node(CMP_MD_NODE_TEXT, markdown_text, &p_node);
+    if (rc == CMP_SUCCESS) {
       rc = add_child(root, p_node);
-    } else {
-      rc = CMP_ERROR_OOM;
     }
   }
 

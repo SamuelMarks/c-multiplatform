@@ -15,7 +15,9 @@ else()
 endif()
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_C_EXTENSIONS OFF)
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+if(BUILD_SHARED_LIBS)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
 
 option(CMP_THEME_MODE_SINGLE_STATIC "Compile c-multiplatform with a single static theme (LTO zero overhead mode)" OFF)
 set(CMP_STATIC_THEME_PREFIX "cmp_cupertino" CACHE STRING "The name of the static theme to compile")
@@ -170,10 +172,14 @@ add_library(greatest INTERFACE)
 target_include_directories(greatest INTERFACE ${greatest_SOURCE_DIR})
 
 # cfs
-FetchContent_Declare(cfs GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git GIT_TAG master
-    UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
-)
-FetchContent_MakeAvailable(cfs)
+if(CDD_DEPS STREQUAL "SYSTEM")
+    find_package(cfs REQUIRED)
+else()
+    FetchContent_Declare(cfs GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git GIT_TAG master
+        UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
+    )
+    FetchContent_MakeAvailable(cfs)
+endif()
 
 # c89stringutils (Not from vcpkg to allow target_compile_definitions)
 set(C89STRINGUTILS_BUILD_TESTS OFF CACHE BOOL "" FORCE)

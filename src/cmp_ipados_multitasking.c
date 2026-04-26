@@ -8,6 +8,12 @@ struct cmp_ipados_multitasking {
   cmp_ipados_features_t *features;
 };
 
+/**
+ * @brief cmp_ipados_multitasking_create
+ *
+ * @param out_mt Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ipados_multitasking_create(cmp_ipados_multitasking_t **out_mt) {
   int rc = CMP_SUCCESS;
   cmp_ipados_multitasking_t *mt = NULL;
@@ -18,16 +24,18 @@ int cmp_ipados_multitasking_create(cmp_ipados_multitasking_t **out_mt) {
     return rc;
   }
 
-  mt = (cmp_ipados_multitasking_t *)malloc(sizeof(cmp_ipados_multitasking_t));
-  if (!mt) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_ipados_multitasking_create: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(sizeof(cmp_ipados_multitasking_t), (void **)&(mt));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 
   rc = cmp_ipados_features_create(&mt->features);
   if (rc != CMP_SUCCESS) {
-    free(mt);
+    rc = CMP_FREE(mt);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
     LOG_DEBUG("Error in cmp_ipados_multitasking_create: "
               "cmp_ipados_features_create failed\n");
     return rc;
@@ -37,6 +45,12 @@ int cmp_ipados_multitasking_create(cmp_ipados_multitasking_t **out_mt) {
   return rc;
 }
 
+/**
+ * @brief cmp_ipados_multitasking_destroy
+ *
+ * @param mt Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ipados_multitasking_destroy(cmp_ipados_multitasking_t *mt) {
   int rc = CMP_SUCCESS;
 
@@ -53,10 +67,20 @@ int cmp_ipados_multitasking_destroy(cmp_ipados_multitasking_t *mt) {
                 "cmp_ipados_features_destroy failed\n");
     }
   }
-  free(mt);
+  rc = CMP_FREE(mt);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_ipados_multitasking_request_scene
+ *
+ * @param mt Parameter description.
+ * @param activity_identifier Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ipados_multitasking_request_scene(cmp_ipados_multitasking_t *mt,
                                           const char *activity_identifier) {
   int rc = CMP_SUCCESS;
@@ -76,6 +100,16 @@ int cmp_ipados_multitasking_request_scene(cmp_ipados_multitasking_t *mt,
   return rc;
 }
 
+/**
+ * @brief cmp_ipados_multitasking_resolve_layout
+ *
+ * @param mt Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param out_horizontal Parameter description.
+ * @param out_vertical Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ipados_multitasking_resolve_layout(cmp_ipados_multitasking_t *mt,
                                            float width, float height,
                                            cmp_size_class_t *out_horizontal,

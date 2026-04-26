@@ -12,6 +12,12 @@ struct cmp_toggle {
   int is_on;
 };
 
+/**
+ * @brief cmp_button_create
+ *
+ * @param out_button Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_button_create(cmp_button_t **out_button) {
   struct cmp_button *ctx;
   if (!out_button)
@@ -26,12 +32,25 @@ int cmp_button_create(cmp_button_t **out_button) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_button_destroy
+ *
+ * @param button Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_button_destroy(cmp_button_t *button) {
   if (button)
     CMP_FREE(button);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_button_set_style
+ *
+ * @param button Parameter description.
+ * @param style Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_button_set_style(cmp_button_t *button, cmp_button_style_t style) {
   struct cmp_button *ctx = (struct cmp_button *)button;
   if (!ctx)
@@ -40,6 +59,13 @@ int cmp_button_set_style(cmp_button_t *button, cmp_button_style_t style) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_button_handle_event
+ *
+ * @param button Parameter description.
+ * @param event Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_button_handle_event(cmp_button_t *button, const cmp_event_t *event) {
   struct cmp_button *ctx = (struct cmp_button *)button;
   if (!ctx || !event)
@@ -55,6 +81,13 @@ int cmp_button_handle_event(cmp_button_t *button, const cmp_event_t *event) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_button_update
+ *
+ * @param button Parameter description.
+ * @param dt_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_button_update(cmp_button_t *button, float dt_ms) {
   struct cmp_button *ctx = (struct cmp_button *)button;
   if (!ctx)
@@ -65,6 +98,14 @@ int cmp_button_update(cmp_button_t *button, float dt_ms) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_button_get_state
+ *
+ * @param button Parameter description.
+ * @param out_style Parameter description.
+ * @param out_is_pressed Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_button_get_state(const cmp_button_t *button,
                          cmp_button_style_t *out_style, int *out_is_pressed) {
   struct cmp_button *ctx = (struct cmp_button *)button;
@@ -77,6 +118,12 @@ int cmp_button_get_state(const cmp_button_t *button,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_toggle_create
+ *
+ * @param out_toggle Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_toggle_create(cmp_toggle_t **out_toggle) {
   struct cmp_toggle *ctx;
   if (!out_toggle)
@@ -90,12 +137,25 @@ int cmp_toggle_create(cmp_toggle_t **out_toggle) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_toggle_destroy
+ *
+ * @param toggle Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_toggle_destroy(cmp_toggle_t *toggle) {
   if (toggle)
     CMP_FREE(toggle);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_toggle_set_state
+ *
+ * @param toggle Parameter description.
+ * @param is_on Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_toggle_set_state(cmp_toggle_t *toggle, int is_on) {
   struct cmp_toggle *ctx = (struct cmp_toggle *)toggle;
   if (!ctx)
@@ -104,6 +164,13 @@ int cmp_toggle_set_state(cmp_toggle_t *toggle, int is_on) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_toggle_handle_event
+ *
+ * @param toggle Parameter description.
+ * @param event Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_toggle_handle_event(cmp_toggle_t *toggle, const cmp_event_t *event) {
   struct cmp_toggle *ctx = (struct cmp_toggle *)toggle;
   if (!ctx || !event)
@@ -116,6 +183,13 @@ int cmp_toggle_handle_event(cmp_toggle_t *toggle, const cmp_event_t *event) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_toggle_update
+ *
+ * @param toggle Parameter description.
+ * @param dt_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_toggle_update(cmp_toggle_t *toggle, float dt_ms) {
   struct cmp_toggle *ctx = (struct cmp_toggle *)toggle;
   if (!ctx)
@@ -125,6 +199,13 @@ int cmp_toggle_update(cmp_toggle_t *toggle, float dt_ms) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_toggle_get_state
+ *
+ * @param toggle Parameter description.
+ * @param out_is_on Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_toggle_get_state(const cmp_toggle_t *toggle, int *out_is_on) {
   struct cmp_toggle *ctx = (struct cmp_toggle *)toggle;
   if (!ctx)

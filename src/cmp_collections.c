@@ -21,12 +21,22 @@ struct cmp_diffable_datasource {
   size_t count;
 };
 
+/**
+ * @brief cmp_collection_create
+ *
+ * @param out_collection Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_collection_create(cmp_collection_t **out_collection) {
   int rc;
   struct cmp_collection *ctx;
   if (!out_collection) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_collection_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_collection_create: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -34,7 +44,11 @@ int cmp_collection_create(cmp_collection_t **out_collection) {
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_collection_create CMP_MALLOC: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_collection_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -46,6 +60,12 @@ int cmp_collection_create(cmp_collection_t **out_collection) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_collection_destroy
+ *
+ * @param collection_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_collection_destroy(cmp_collection_t *collection_opaque) {
   struct cmp_collection *ctx = (struct cmp_collection *)collection_opaque;
   size_t i;
@@ -64,20 +84,33 @@ int cmp_collection_destroy(cmp_collection_t *collection_opaque) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_collection_section_create
+ *
+ * @param out_section Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_collection_section_create(cmp_collection_section_t **out_section) {
   int rc;
   struct cmp_collection_section *ctx;
   if (!out_section) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_collection_section_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_collection_section_create: %s\n", err_str);
+    }
     return rc;
   }
   rc = CMP_MALLOC(sizeof(struct cmp_collection_section), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_collection_section_create CMP_MALLOC: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_collection_section_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -88,12 +121,25 @@ int cmp_collection_section_create(cmp_collection_section_t **out_section) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_collection_section_destroy
+ *
+ * @param section_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_collection_section_destroy(cmp_collection_section_t *section_opaque) {
   if (section_opaque)
     CMP_FREE(section_opaque);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_collection_section_set_flow_layout
+ *
+ * @param section_opaque Parameter description.
+ * @param min_column_width Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_collection_section_set_flow_layout(
     cmp_collection_section_t *section_opaque, float min_column_width) {
   struct cmp_collection_section *ctx =
@@ -105,6 +151,13 @@ int cmp_collection_section_set_flow_layout(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_collection_section_set_orthogonal_behavior
+ *
+ * @param section_opaque Parameter description.
+ * @param behavior Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_collection_section_set_orthogonal_behavior(
     cmp_collection_section_t *section_opaque,
     cmp_orthogonal_behavior_t behavior) {
@@ -117,6 +170,13 @@ int cmp_collection_section_set_orthogonal_behavior(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_collection_add_section
+ *
+ * @param collection_opaque Parameter description.
+ * @param section_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_collection_add_section(cmp_collection_t *collection_opaque,
                                cmp_collection_section_t *section_opaque) {
   int rc;
@@ -128,7 +188,11 @@ int cmp_collection_add_section(cmp_collection_t *collection_opaque,
 
   if (!ctx || !sec) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_collection_add_section: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_collection_add_section: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -139,8 +203,11 @@ int cmp_collection_add_section(cmp_collection_t *collection_opaque,
     if (rc != CMP_SUCCESS) {
       if (rc == CMP_SUCCESS)
         rc = CMP_ERROR_OOM;
-      LOG_DEBUG("cmp_collection_add_section CMP_MALLOC: %s\n",
-                cmp_strerror(rc));
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_collection_add_section CMP_MALLOC: %s\n", err_str);
+      }
       return rc;
     }
     if (ctx->sections) {
@@ -156,20 +223,33 @@ int cmp_collection_add_section(cmp_collection_t *collection_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_diffable_datasource_create
+ *
+ * @param out_ds Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_diffable_datasource_create(cmp_diffable_datasource_t **out_ds) {
   int rc;
   struct cmp_diffable_datasource *ctx;
   if (!out_ds) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_diffable_datasource_create: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_diffable_datasource_create: %s\n", err_str);
+    }
     return rc;
   }
   rc = CMP_MALLOC(sizeof(struct cmp_diffable_datasource), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS)
       rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_diffable_datasource_create CMP_MALLOC: %s\n",
-              cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_diffable_datasource_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -180,6 +260,12 @@ int cmp_diffable_datasource_create(cmp_diffable_datasource_t **out_ds) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_diffable_datasource_destroy
+ *
+ * @param ds_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_diffable_datasource_destroy(cmp_diffable_datasource_t *ds_opaque) {
   struct cmp_diffable_datasource *ctx =
       (struct cmp_diffable_datasource *)ds_opaque;
@@ -192,6 +278,14 @@ int cmp_diffable_datasource_destroy(cmp_diffable_datasource_t *ds_opaque) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_diffable_datasource_apply_snapshot
+ *
+ * @param ds_opaque Parameter description.
+ * @param items Parameter description.
+ * @param count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_diffable_datasource_apply_snapshot(cmp_diffable_datasource_t *ds_opaque,
                                            const uint64_t *items,
                                            size_t count) {
@@ -202,7 +296,11 @@ int cmp_diffable_datasource_apply_snapshot(cmp_diffable_datasource_t *ds_opaque,
 
   if (!ctx || (!items && count > 0)) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_diffable_datasource_apply_snapshot: %s\n", cmp_strerror(rc));
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_diffable_datasource_apply_snapshot: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -211,8 +309,12 @@ int cmp_diffable_datasource_apply_snapshot(cmp_diffable_datasource_t *ds_opaque,
     if (rc != CMP_SUCCESS) {
       if (rc == CMP_SUCCESS)
         rc = CMP_ERROR_OOM;
-      LOG_DEBUG("cmp_diffable_datasource_apply_snapshot CMP_MALLOC: %s\n",
-                cmp_strerror(rc));
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_diffable_datasource_apply_snapshot CMP_MALLOC: %s\n",
+                  err_str);
+      }
       return rc;
     }
     memcpy(new_state, items, count * sizeof(uint64_t));
@@ -230,6 +332,14 @@ int cmp_diffable_datasource_apply_snapshot(cmp_diffable_datasource_t *ds_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_system_map_view_mount
+ *
+ * @param node Parameter description.
+ * @param latitude Parameter description.
+ * @param longitude Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_map_view_mount(cmp_ui_node_t *node, float latitude,
                               float longitude) {
   if (!node)
@@ -241,6 +351,13 @@ int cmp_system_map_view_mount(cmp_ui_node_t *node, float latitude,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_system_web_view_mount
+ *
+ * @param node Parameter description.
+ * @param url Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_web_view_mount(cmp_ui_node_t *node, const char *url) {
   if (!node || !url)
     return CMP_ERROR_INVALID_ARG;

@@ -5,6 +5,13 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_pos_absolute_relative
+ *
+ * @param node Parameter description.
+ * @param parent_rect Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pos_absolute_relative(cmp_layout_node_t *node,
                               const cmp_rect_t *parent_rect) {
   int rc = CMP_SUCCESS;
@@ -25,6 +32,13 @@ int cmp_pos_absolute_relative(cmp_layout_node_t *node,
   return rc;
 }
 
+/**
+ * @brief cmp_pos_fixed
+ *
+ * @param node Parameter description.
+ * @param viewport_rect Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pos_fixed(cmp_layout_node_t *node, const cmp_rect_t *viewport_rect) {
   int rc = CMP_SUCCESS;
 
@@ -39,6 +53,14 @@ int cmp_pos_fixed(cmp_layout_node_t *node, const cmp_rect_t *viewport_rect) {
   return rc;
 }
 
+/**
+ * @brief cmp_pos_sticky
+ *
+ * @param node Parameter description.
+ * @param scroll_offset Parameter description.
+ * @param container_rect Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pos_sticky(cmp_layout_node_t *node, float scroll_offset,
                    const cmp_rect_t *container_rect) {
   int rc = CMP_SUCCESS;
@@ -58,6 +80,13 @@ int cmp_pos_sticky(cmp_layout_node_t *node, float scroll_offset,
   return rc;
 }
 
+/**
+ * @brief cmp_anchor_position
+ *
+ * @param floating_node Parameter description.
+ * @param anchor_rect Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_anchor_position(cmp_layout_node_t *floating_node,
                         const cmp_rect_t *anchor_rect) {
   int rc = CMP_SUCCESS;
@@ -72,6 +101,14 @@ int cmp_anchor_position(cmp_layout_node_t *floating_node,
   return rc;
 }
 
+/**
+ * @brief cmp_anchor_fallback
+ *
+ * @param floating_node Parameter description.
+ * @param anchor_rect Parameter description.
+ * @param viewport_rect Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_anchor_fallback(cmp_layout_node_t *floating_node,
                         const cmp_rect_t *anchor_rect,
                         const cmp_rect_t *viewport_rect) {
@@ -94,6 +131,13 @@ int cmp_anchor_fallback(cmp_layout_node_t *floating_node,
   return rc;
 }
 
+/**
+ * @brief cmp_anchor_size
+ *
+ * @param floating_node Parameter description.
+ * @param anchor_rect Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_anchor_size(cmp_layout_node_t *floating_node,
                     const cmp_rect_t *anchor_rect) {
   int rc = CMP_SUCCESS;
@@ -107,6 +151,13 @@ int cmp_anchor_size(cmp_layout_node_t *floating_node,
   return rc;
 }
 
+/**
+ * @brief cmp_stack_ctx_create
+ *
+ * @param out_ctx Parameter description.
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stack_ctx_create(cmp_stack_ctx_t **out_ctx, cmp_layout_node_t *node) {
   int rc = CMP_SUCCESS;
   cmp_stack_ctx_t *ctx = NULL;
@@ -130,6 +181,12 @@ int cmp_stack_ctx_create(cmp_stack_ctx_t **out_ctx, cmp_layout_node_t *node) {
   return rc;
 }
 
+/**
+ * @brief cmp_stack_ctx_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stack_ctx_destroy(cmp_stack_ctx_t *ctx) {
   int rc = CMP_SUCCESS;
 
@@ -145,6 +202,13 @@ int cmp_stack_ctx_destroy(cmp_stack_ctx_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_stack_ctx_add_child
+ *
+ * @param parent Parameter description.
+ * @param child Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stack_ctx_add_child(cmp_stack_ctx_t *parent, cmp_stack_ctx_t *child) {
   int rc = CMP_SUCCESS;
   cmp_stack_ctx_t **new_children = NULL;
@@ -178,12 +242,25 @@ int cmp_stack_ctx_add_child(cmp_stack_ctx_t *parent, cmp_stack_ctx_t *child) {
   return rc;
 }
 
+/**
+ * @brief compare_z_index
+ *
+ * @param a Parameter description.
+ * @param b Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int compare_z_index(const void *a, const void *b) {
   cmp_stack_ctx_t *ctx_a = *(cmp_stack_ctx_t **)a;
   cmp_stack_ctx_t *ctx_b = *(cmp_stack_ctx_t **)b;
   return ctx_a->z_index - ctx_b->z_index;
 }
 
+/**
+ * @brief cmp_z_index_sort
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_z_index_sort(cmp_stack_ctx_t *ctx) {
   int rc = CMP_SUCCESS;
 
@@ -199,6 +276,13 @@ int cmp_z_index_sort(cmp_stack_ctx_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_transform_3d_evaluate
+ *
+ * @param node Parameter description.
+ * @param preserve_3d Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_transform_3d_evaluate(cmp_layout_node_t *node, int preserve_3d) {
   int rc = CMP_SUCCESS;
 
@@ -212,6 +296,15 @@ int cmp_transform_3d_evaluate(cmp_layout_node_t *node, int preserve_3d) {
   return rc;
 }
 
+/**
+ * @brief cmp_backface_visibility_evaluate
+ *
+ * @param node Parameter description.
+ * @param is_hidden Parameter description.
+ * @param rotation_y Parameter description.
+ * @param out_visible Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_backface_visibility_evaluate(cmp_layout_node_t *node, int is_hidden,
                                      float rotation_y, int *out_visible) {
   int rc = CMP_SUCCESS;
@@ -230,6 +323,12 @@ int cmp_backface_visibility_evaluate(cmp_layout_node_t *node, int is_hidden,
   return rc;
 }
 
+/**
+ * @brief cmp_top_layer_promote
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_top_layer_promote(cmp_layout_node_t *node) {
   int rc = CMP_SUCCESS;
 
@@ -242,6 +341,13 @@ int cmp_top_layer_promote(cmp_layout_node_t *node) {
   return rc;
 }
 
+/**
+ * @brief cmp_popover_toggle
+ *
+ * @param node Parameter description.
+ * @param state Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_popover_toggle(cmp_layout_node_t *node, cmp_popover_state_t state) {
   int rc = CMP_SUCCESS;
 
@@ -259,6 +365,13 @@ int cmp_popover_toggle(cmp_layout_node_t *node, cmp_popover_state_t state) {
   return rc;
 }
 
+/**
+ * @brief cmp_layer_tree_build
+ *
+ * @param root_node Parameter description.
+ * @param out_layer_root Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layer_tree_build(cmp_layout_node_t *root_node,
                          cmp_layer_t **out_layer_root) {
   int rc = CMP_SUCCESS;
@@ -282,6 +395,12 @@ int cmp_layer_tree_build(cmp_layout_node_t *root_node,
   return rc;
 }
 
+/**
+ * @brief cmp_layer_tree_destroy
+ *
+ * @param layer_root Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layer_tree_destroy(cmp_layer_t *layer_root) {
   int rc = CMP_SUCCESS;
 

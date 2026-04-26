@@ -5,6 +5,14 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief Dispatches an event through the UI tree using capture and bubbling phases.
+ *
+ * @param tree Pointer to the root UI node.
+ * @param target_node Pointer to the target UI node.
+ * @param event Pointer to the event to dispatch.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
                            cmp_event_t *event) {
   int rc;
@@ -17,15 +25,15 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
 
   if (!tree || !target_node || !event) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_event_dispatch_run: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_event_dispatch_run: %s\n", err_str);
+ }    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_ui_node_t *) * capacity, (void **)&ancestors);
   if (rc != CMP_SUCCESS) {
     if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_event_dispatch_run CMP_MALLOC: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_event_dispatch_run CMP_MALLOC: %s\n", err_str);
+ }    return rc;
   }
 
   /* 1. Build Ancestor Chain */
@@ -39,8 +47,8 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
                      (void **)&new_ancestors);
       if (rc != CMP_SUCCESS) {
         if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-        LOG_DEBUG("cmp_event_dispatch_run (realloc) CMP_MALLOC: %s\n", cmp_strerror(rc));
-        CMP_FREE(ancestors);
+        { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_event_dispatch_run (realloc) CMP_MALLOC: %s\n", err_str);
+ }        CMP_FREE(ancestors);
         return rc;
       }
       memcpy(new_ancestors, ancestors,
@@ -86,6 +94,16 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Adds an event listener to a UI node.
+ *
+ * @param node Pointer to the UI node.
+ * @param event_type The type of event to listen for.
+ * @param capture Set to 1 to capture events during the capture phase, 0 for bubble phase.
+ * @param callback The function to call when the event occurs.
+ * @param user_data Opaque pointer passed to the callback.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_add_event_listener(
     cmp_ui_node_t *node, uint32_t event_type, int capture,
     void (*callback)(cmp_event_t *, cmp_ui_node_t *, void *), void *user_data) {

@@ -4,6 +4,14 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_f2_stack_create
+ *
+ * @param out_node Parameter description.
+ * @param horizontal Parameter description.
+ * @param spacing_token Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
                                 float spacing_token) {
   int res;
@@ -25,6 +33,14 @@ CMP_API int cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_f2_wrap_create
+ *
+ * @param out_node Parameter description.
+ * @param horizontal_gap Parameter description.
+ * @param vertical_gap Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
                                float vertical_gap) {
   int res;
@@ -49,6 +65,15 @@ CMP_API int cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_f2_grid_create
+ *
+ * @param out_node Parameter description.
+ * @param columns Parameter description.
+ * @param column_gap Parameter description.
+ * @param row_gap Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_f2_grid_create(cmp_ui_node_t **out_node, int columns,
                                float column_gap, float row_gap) {
   int res;

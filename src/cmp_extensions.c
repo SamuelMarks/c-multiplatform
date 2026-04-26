@@ -17,6 +17,13 @@ struct cmp_live_activity_ctx {
   cmp_ui_node_t *expanded;
 };
 
+/**
+ * @brief cmp_widget_ctx_create
+ *
+ * @param out_ctx Parameter description.
+ * @param family Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_widget_ctx_create(cmp_widget_ctx_t **out_ctx,
                           cmp_widget_family_t family) {
   int rc = CMP_SUCCESS;
@@ -41,6 +48,12 @@ int cmp_widget_ctx_create(cmp_widget_ctx_t **out_ctx,
   return rc;
 }
 
+/**
+ * @brief cmp_widget_ctx_destroy
+ *
+ * @param ctx_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_widget_ctx_destroy(cmp_widget_ctx_t *ctx_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_widget_ctx *ctx = (struct cmp_widget_ctx *)ctx_opaque;
@@ -53,6 +66,13 @@ int cmp_widget_ctx_destroy(cmp_widget_ctx_t *ctx_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_widget_mount_snapshot
+ *
+ * @param ctx_opaque Parameter description.
+ * @param root_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_widget_mount_snapshot(cmp_widget_ctx_t *ctx_opaque,
                               cmp_ui_node_t *root_node) {
   int rc = CMP_SUCCESS;
@@ -70,6 +90,14 @@ int cmp_widget_mount_snapshot(cmp_widget_ctx_t *ctx_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_widget_bind_intent
+ *
+ * @param ctx_opaque Parameter description.
+ * @param button_node Parameter description.
+ * @param intent_identifier Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_widget_bind_intent(cmp_widget_ctx_t *ctx_opaque,
                            cmp_ui_node_t *button_node,
                            const char *intent_identifier) {
@@ -88,6 +116,12 @@ int cmp_widget_bind_intent(cmp_widget_ctx_t *ctx_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_live_activity_ctx_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_live_activity_ctx_create(cmp_live_activity_ctx_t **out_ctx) {
   int rc = CMP_SUCCESS;
   struct cmp_live_activity_ctx *ctx = NULL;
@@ -114,6 +148,12 @@ int cmp_live_activity_ctx_create(cmp_live_activity_ctx_t **out_ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_live_activity_ctx_destroy
+ *
+ * @param ctx_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_live_activity_ctx_destroy(cmp_live_activity_ctx_t *ctx_opaque) {
   int rc = CMP_SUCCESS;
 
@@ -123,6 +163,14 @@ int cmp_live_activity_ctx_destroy(cmp_live_activity_ctx_t *ctx_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_live_activity_mount_presentation
+ *
+ * @param ctx_opaque Parameter description.
+ * @param presentation Parameter description.
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_live_activity_mount_presentation(
     cmp_live_activity_ctx_t *ctx_opaque,
     cmp_live_activity_presentation_t presentation, cmp_ui_node_t *node) {
@@ -158,6 +206,12 @@ int cmp_live_activity_mount_presentation(
   return rc;
 }
 
+/**
+ * @brief cmp_extension_verify_footprint
+ *
+ * @param out_is_compliant Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_extension_verify_footprint(int *out_is_compliant) {
   int rc = CMP_SUCCESS;
 

@@ -34,6 +34,12 @@ struct cmp_slider {
 
 /* Wheel Picker */
 
+/**
+ * @brief cmp_wheel_picker_create
+ *
+ * @param out_picker Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_wheel_picker_create(cmp_wheel_picker_t **out_picker) {
   int rc = CMP_SUCCESS;
   struct cmp_wheel_picker *ctx = NULL;
@@ -59,6 +65,12 @@ int cmp_wheel_picker_create(cmp_wheel_picker_t **out_picker) {
   return rc;
 }
 
+/**
+ * @brief cmp_wheel_picker_destroy
+ *
+ * @param picker_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_wheel_picker_destroy(cmp_wheel_picker_t *picker_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_wheel_picker *ctx = (struct cmp_wheel_picker *)picker_opaque;
@@ -78,6 +90,14 @@ int cmp_wheel_picker_destroy(cmp_wheel_picker_t *picker_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_wheel_picker_set_items
+ *
+ * @param picker_opaque Parameter description.
+ * @param items Parameter description.
+ * @param count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_wheel_picker_set_items(cmp_wheel_picker_t *picker_opaque,
                                const char **items, size_t count) {
   int rc = CMP_SUCCESS;
@@ -126,6 +146,13 @@ int cmp_wheel_picker_set_items(cmp_wheel_picker_t *picker_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_wheel_picker_scroll
+ *
+ * @param picker_opaque Parameter description.
+ * @param delta_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_wheel_picker_scroll(cmp_wheel_picker_t *picker_opaque, float delta_y) {
   int rc = CMP_SUCCESS;
   struct cmp_wheel_picker *ctx = (struct cmp_wheel_picker *)picker_opaque;
@@ -151,6 +178,13 @@ int cmp_wheel_picker_scroll(cmp_wheel_picker_t *picker_opaque, float delta_y) {
   return rc;
 }
 
+/**
+ * @brief cmp_wheel_picker_get_selected
+ *
+ * @param picker_opaque Parameter description.
+ * @param out_index Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_wheel_picker_get_selected(cmp_wheel_picker_t *picker_opaque,
                                   size_t *out_index) {
   int rc = CMP_SUCCESS;
@@ -181,6 +215,12 @@ int cmp_wheel_picker_get_selected(cmp_wheel_picker_t *picker_opaque,
 
 /* Segmented Control */
 
+/**
+ * @brief cmp_segmented_control_create
+ *
+ * @param out_control Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_segmented_control_create(cmp_segmented_control_t **out_control) {
   int rc = CMP_SUCCESS;
   struct cmp_segmented_control *ctx = NULL;
@@ -205,6 +245,12 @@ int cmp_segmented_control_create(cmp_segmented_control_t **out_control) {
   return rc;
 }
 
+/**
+ * @brief cmp_segmented_control_destroy
+ *
+ * @param control_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_segmented_control_destroy(cmp_segmented_control_t *control_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_segmented_control *ctx =
@@ -224,6 +270,14 @@ int cmp_segmented_control_destroy(cmp_segmented_control_t *control_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_segmented_control_set_segments
+ *
+ * @param control_opaque Parameter description.
+ * @param segments Parameter description.
+ * @param count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_segmented_control_set_segments(cmp_segmented_control_t *control_opaque,
                                        const char **segments, size_t count) {
   int rc = CMP_SUCCESS;
@@ -275,6 +329,13 @@ int cmp_segmented_control_set_segments(cmp_segmented_control_t *control_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_segmented_control_select
+ *
+ * @param control_opaque Parameter description.
+ * @param index Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_segmented_control_select(cmp_segmented_control_t *control_opaque,
                                  size_t index) {
   int rc = CMP_SUCCESS;
@@ -298,6 +359,14 @@ int cmp_segmented_control_select(cmp_segmented_control_t *control_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_segmented_control_get_visuals
+ *
+ * @param control_opaque Parameter description.
+ * @param out_selected_idx Parameter description.
+ * @param out_slider_offset_x Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_segmented_control_get_visuals(cmp_segmented_control_t *control_opaque,
                                       size_t *out_selected_idx,
                                       float *out_slider_offset_x) {
@@ -320,6 +389,12 @@ int cmp_segmented_control_get_visuals(cmp_segmented_control_t *control_opaque,
 
 /* Stepper */
 
+/**
+ * @brief cmp_stepper_create
+ *
+ * @param out_stepper Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stepper_create(cmp_stepper_t **out_stepper) {
   int rc = CMP_SUCCESS;
   struct cmp_stepper *ctx = NULL;
@@ -345,6 +420,12 @@ int cmp_stepper_create(cmp_stepper_t **out_stepper) {
   return rc;
 }
 
+/**
+ * @brief cmp_stepper_destroy
+ *
+ * @param stepper_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stepper_destroy(cmp_stepper_t *stepper_opaque) {
   int rc = CMP_SUCCESS;
   if (stepper_opaque) {
@@ -353,6 +434,15 @@ int cmp_stepper_destroy(cmp_stepper_t *stepper_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_stepper_set_limits
+ *
+ * @param stepper_opaque Parameter description.
+ * @param min_val Parameter description.
+ * @param max_val Parameter description.
+ * @param step Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stepper_set_limits(cmp_stepper_t *stepper_opaque, int min_val,
                            int max_val, int step) {
   int rc = CMP_SUCCESS;
@@ -376,6 +466,13 @@ int cmp_stepper_set_limits(cmp_stepper_t *stepper_opaque, int min_val,
   return rc;
 }
 
+/**
+ * @brief cmp_stepper_get_value
+ *
+ * @param stepper_opaque Parameter description.
+ * @param out_val Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stepper_get_value(cmp_stepper_t *stepper_opaque, int *out_val) {
   int rc = CMP_SUCCESS;
   struct cmp_stepper *ctx = (struct cmp_stepper *)stepper_opaque;
@@ -390,6 +487,12 @@ int cmp_stepper_get_value(cmp_stepper_t *stepper_opaque, int *out_val) {
   return rc;
 }
 
+/**
+ * @brief cmp_stepper_increment
+ *
+ * @param stepper_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stepper_increment(cmp_stepper_t *stepper_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_stepper *ctx = (struct cmp_stepper *)stepper_opaque;
@@ -407,6 +510,12 @@ int cmp_stepper_increment(cmp_stepper_t *stepper_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_stepper_decrement
+ *
+ * @param stepper_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_stepper_decrement(cmp_stepper_t *stepper_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_stepper *ctx = (struct cmp_stepper *)stepper_opaque;
@@ -426,6 +535,12 @@ int cmp_stepper_decrement(cmp_stepper_t *stepper_opaque) {
 
 /* Slider */
 
+/**
+ * @brief cmp_slider_create
+ *
+ * @param out_slider Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_slider_create(cmp_slider_t **out_slider) {
   int rc = CMP_SUCCESS;
   struct cmp_slider *ctx = NULL;
@@ -450,6 +565,12 @@ int cmp_slider_create(cmp_slider_t **out_slider) {
   return rc;
 }
 
+/**
+ * @brief cmp_slider_destroy
+ *
+ * @param slider_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_slider_destroy(cmp_slider_t *slider_opaque) {
   int rc = CMP_SUCCESS;
   if (slider_opaque) {
@@ -458,6 +579,14 @@ int cmp_slider_destroy(cmp_slider_t *slider_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_slider_set_limits
+ *
+ * @param slider_opaque Parameter description.
+ * @param min_val Parameter description.
+ * @param max_val Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_slider_set_limits(cmp_slider_t *slider_opaque, float min_val,
                           float max_val) {
   int rc = CMP_SUCCESS;
@@ -480,6 +609,13 @@ int cmp_slider_set_limits(cmp_slider_t *slider_opaque, float min_val,
   return rc;
 }
 
+/**
+ * @brief cmp_slider_set_value
+ *
+ * @param slider_opaque Parameter description.
+ * @param val Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_slider_set_value(cmp_slider_t *slider_opaque, float val) {
   int rc = CMP_SUCCESS;
   struct cmp_slider *ctx = (struct cmp_slider *)slider_opaque;
@@ -499,6 +635,13 @@ int cmp_slider_set_value(cmp_slider_t *slider_opaque, float val) {
   return rc;
 }
 
+/**
+ * @brief cmp_slider_get_visuals
+ *
+ * @param slider_opaque Parameter description.
+ * @param out_thumb_x_percent Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_slider_get_visuals(cmp_slider_t *slider_opaque,
                            float *out_thumb_x_percent) {
   int rc = CMP_SUCCESS;
@@ -521,6 +664,14 @@ int cmp_slider_get_visuals(cmp_slider_t *slider_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_slider_update_from_drag
+ *
+ * @param slider_opaque Parameter description.
+ * @param track_width Parameter description.
+ * @param current_x Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_slider_update_from_drag(cmp_slider_t *slider_opaque, float track_width,
                                 float current_x) {
   int rc = CMP_SUCCESS;
@@ -546,6 +697,12 @@ int cmp_slider_update_from_drag(cmp_slider_t *slider_opaque, float track_width,
 /* System Dialog Wrappers (Platform-specific implementations to be added in
  * Phase 25) */
 
+/**
+ * @brief cmp_system_color_picker_show
+ *
+ * @param window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_color_picker_show(cmp_window_t *window) {
   int rc = CMP_SUCCESS;
 
@@ -559,6 +716,12 @@ int cmp_system_color_picker_show(cmp_window_t *window) {
   return rc;
 }
 
+/**
+ * @brief cmp_system_date_picker_show
+ *
+ * @param window Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_date_picker_show(cmp_window_t *window) {
   int rc = CMP_SUCCESS;
 

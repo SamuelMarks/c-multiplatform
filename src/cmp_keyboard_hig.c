@@ -20,6 +20,12 @@ struct cmp_ui_command {
   cmp_keyboard_shortcut_t *shortcut;
 };
 
+/**
+ * @brief cmp_pointer_region_create
+ *
+ * @param out_region Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pointer_region_create(cmp_pointer_region_t **out_region) {
   int rc = CMP_SUCCESS;
   struct cmp_pointer_region *ctx = NULL;
@@ -42,6 +48,12 @@ int cmp_pointer_region_create(cmp_pointer_region_t **out_region) {
   return rc;
 }
 
+/**
+ * @brief cmp_pointer_region_destroy
+ *
+ * @param region_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pointer_region_destroy(cmp_pointer_region_t *region_opaque) {
   int rc = CMP_SUCCESS;
 
@@ -51,6 +63,13 @@ int cmp_pointer_region_destroy(cmp_pointer_region_t *region_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_pointer_region_set_style
+ *
+ * @param region_opaque Parameter description.
+ * @param style Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pointer_region_set_style(cmp_pointer_region_t *region_opaque,
                                  cmp_pointer_interaction_style_t style) {
   int rc = CMP_SUCCESS;
@@ -65,6 +84,14 @@ int cmp_pointer_region_set_style(cmp_pointer_region_t *region_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_pointer_region_get_morph_scale
+ *
+ * @param region_opaque Parameter description.
+ * @param out_scale_x Parameter description.
+ * @param out_scale_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pointer_region_get_morph_scale(cmp_pointer_region_t *region_opaque,
                                        float *out_scale_x, float *out_scale_y) {
   int rc = CMP_SUCCESS;
@@ -98,6 +125,14 @@ int cmp_pointer_region_get_morph_scale(cmp_pointer_region_t *region_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_keyboard_shortcut_create
+ *
+ * @param out_shortcut Parameter description.
+ * @param key Parameter description.
+ * @param modifier_flags Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keyboard_shortcut_create(cmp_keyboard_shortcut_t **out_shortcut,
                                  char key, uint32_t modifier_flags) {
   int rc = CMP_SUCCESS;
@@ -122,6 +157,12 @@ int cmp_keyboard_shortcut_create(cmp_keyboard_shortcut_t **out_shortcut,
   return rc;
 }
 
+/**
+ * @brief cmp_keyboard_shortcut_destroy
+ *
+ * @param shortcut_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keyboard_shortcut_destroy(cmp_keyboard_shortcut_t *shortcut_opaque) {
   int rc = CMP_SUCCESS;
 
@@ -131,6 +172,14 @@ int cmp_keyboard_shortcut_destroy(cmp_keyboard_shortcut_t *shortcut_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_ui_command_create
+ *
+ * @param out_command Parameter description.
+ * @param title Parameter description.
+ * @param action_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_command_create(cmp_ui_command_t **out_command, const char *title,
                           const char *action_id) {
   int rc = CMP_SUCCESS;
@@ -184,6 +233,12 @@ int cmp_ui_command_create(cmp_ui_command_t **out_command, const char *title,
   return rc;
 }
 
+/**
+ * @brief cmp_ui_command_destroy
+ *
+ * @param command_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_command_destroy(cmp_ui_command_t *command_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_ui_command *ctx = (struct cmp_ui_command *)command_opaque;
@@ -203,6 +258,13 @@ int cmp_ui_command_destroy(cmp_ui_command_t *command_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_ui_command_set_shortcut
+ *
+ * @param command_opaque Parameter description.
+ * @param shortcut_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_command_set_shortcut(cmp_ui_command_t *command_opaque,
                                 cmp_keyboard_shortcut_t *shortcut_opaque) {
   int rc = CMP_SUCCESS;
@@ -222,6 +284,13 @@ int cmp_ui_command_set_shortcut(cmp_ui_command_t *command_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_keyboard_calculate_key_repeat
+ *
+ * @param time_held_ms Parameter description.
+ * @param out_repeat_interval_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keyboard_calculate_key_repeat(float time_held_ms,
                                       float *out_repeat_interval_ms) {
   int rc = CMP_SUCCESS;
@@ -252,6 +321,15 @@ int cmp_keyboard_calculate_key_repeat(float time_held_ms,
   return rc;
 }
 
+/**
+ * @brief cmp_trackpad_evaluate_gesture
+ *
+ * @param delta_x Parameter description.
+ * @param delta_y Parameter description.
+ * @param out_pan_x Parameter description.
+ * @param out_pan_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_trackpad_evaluate_gesture(float delta_x, float delta_y,
                                   float *out_pan_x, float *out_pan_y) {
   int rc = CMP_SUCCESS;

@@ -4,6 +4,12 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_m3_bottom_app_bar_resolve
+ *
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_bottom_app_bar_resolve(
     cmp_m3_bottom_app_bar_metrics_t *out_metrics) {
   if (!out_metrics)
@@ -14,6 +20,12 @@ int cmp_m3_bottom_app_bar_resolve(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_bottom_nav_resolve
+ *
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_bottom_nav_resolve(cmp_m3_bottom_nav_metrics_t *out_metrics) {
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
@@ -24,6 +36,13 @@ int cmp_m3_bottom_nav_resolve(cmp_m3_bottom_nav_metrics_t *out_metrics) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_drawer_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_drawer_resolve(cmp_m3_drawer_variant_t variant,
                           cmp_m3_drawer_metrics_t *out_metrics) {
   if (!out_metrics)
@@ -49,6 +68,12 @@ int cmp_m3_drawer_resolve(cmp_m3_drawer_variant_t variant,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_nav_rail_resolve
+ *
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_nav_rail_resolve(cmp_m3_nav_rail_metrics_t *out_metrics) {
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
@@ -57,6 +82,13 @@ int cmp_m3_nav_rail_resolve(cmp_m3_nav_rail_metrics_t *out_metrics) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_top_app_bar_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_top_app_bar_resolve(cmp_m3_top_app_bar_variant_t variant,
                                cmp_m3_top_app_bar_metrics_t *out_metrics) {
   if (!out_metrics)
@@ -83,6 +115,13 @@ int cmp_m3_top_app_bar_resolve(cmp_m3_top_app_bar_variant_t variant,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_tabs_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_tabs_resolve(cmp_m3_tabs_variant_t variant,
                         cmp_m3_tabs_metrics_t *out_metrics) {
   if (!out_metrics)

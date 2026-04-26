@@ -10,6 +10,12 @@ struct cmp_form_controls {
   int is_hovered;
 };
 
+/**
+ * @brief cmp_form_controls_create
+ *
+ * @param out_controls Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_form_controls_create(cmp_form_controls_t **out_controls) {
   int rc = CMP_SUCCESS;
   struct cmp_form_controls *controls = NULL;
@@ -33,6 +39,12 @@ int cmp_form_controls_create(cmp_form_controls_t **out_controls) {
   return rc;
 }
 
+/**
+ * @brief cmp_form_controls_destroy
+ *
+ * @param controls Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_form_controls_destroy(cmp_form_controls_t *controls) {
   int rc = CMP_SUCCESS;
   struct cmp_form_controls *internal_controls =

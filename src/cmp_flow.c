@@ -5,6 +5,13 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_bfc_calculate
+ *
+ * @param node Parameter description.
+ * @param available_width Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_bfc_calculate(cmp_layout_node_t *node, float available_width) {
   int rc = CMP_SUCCESS;
 
@@ -18,6 +25,13 @@ int cmp_bfc_calculate(cmp_layout_node_t *node, float available_width) {
   return rc;
 }
 
+/**
+ * @brief cmp_ifc_calculate
+ *
+ * @param node Parameter description.
+ * @param available_width Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ifc_calculate(cmp_layout_node_t *node, float available_width) {
   int rc = CMP_SUCCESS;
 
@@ -33,6 +47,16 @@ int cmp_ifc_calculate(cmp_layout_node_t *node, float available_width) {
   return rc;
 }
 
+/**
+ * @brief cmp_float_evaluate
+ *
+ * @param node Parameter description.
+ * @param is_float Parameter description.
+ * @param clear Parameter description.
+ * @param out_x Parameter description.
+ * @param out_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_float_evaluate(cmp_layout_node_t *node, int is_float, int clear,
                        float *out_x, float *out_y) {
   int rc = CMP_SUCCESS;
@@ -55,6 +79,15 @@ int cmp_float_evaluate(cmp_layout_node_t *node, int is_float, int clear,
   return rc;
 }
 
+/**
+ * @brief cmp_shape_outside_evaluate
+ *
+ * @param node Parameter description.
+ * @param float_rect Parameter description.
+ * @param shape_radius Parameter description.
+ * @param margin Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
                                float shape_radius, float margin) {
   int rc = CMP_SUCCESS;
@@ -76,6 +109,13 @@ int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
   return rc;
 }
 
+/**
+ * @brief cmp_multicolumn_evaluate
+ *
+ * @param node Parameter description.
+ * @param fill_mode Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_multicolumn_evaluate(cmp_layout_node_t *node,
                              cmp_column_fill_t fill_mode) {
   int rc = CMP_SUCCESS;
@@ -109,6 +149,13 @@ int cmp_multicolumn_evaluate(cmp_layout_node_t *node,
   return rc;
 }
 
+/**
+ * @brief cmp_table_evaluate
+ *
+ * @param node Parameter description.
+ * @param is_fixed Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_table_evaluate(cmp_layout_node_t *node, int is_fixed) {
   int rc = CMP_SUCCESS;
 
@@ -125,6 +172,12 @@ int cmp_table_evaluate(cmp_layout_node_t *node, int is_fixed) {
   return rc;
 }
 
+/**
+ * @brief cmp_table_border_collapse
+ *
+ * @param table Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_table_border_collapse(cmp_layout_node_t *table) {
   int rc = CMP_SUCCESS;
 

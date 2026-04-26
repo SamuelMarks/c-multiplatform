@@ -12,6 +12,16 @@ struct cmp_spring_ease {
   float initial_velocity;
 };
 
+/**
+ * @brief cmp_spring_ease_create
+ *
+ * @param mass Parameter description.
+ * @param stiffness Parameter description.
+ * @param damping Parameter description.
+ * @param initial_velocity Parameter description.
+ * @param out_spring Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spring_ease_create(float mass, float stiffness, float damping,
                            float initial_velocity,
                            cmp_spring_ease_t **out_spring) {
@@ -33,6 +43,12 @@ int cmp_spring_ease_create(float mass, float stiffness, float damping,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_spring_ease_destroy
+ *
+ * @param spring Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spring_ease_destroy(cmp_spring_ease_t *spring) {
   struct cmp_spring_ease *internal_spring = (struct cmp_spring_ease *)spring;
   if (!internal_spring)
@@ -42,6 +58,14 @@ int cmp_spring_ease_destroy(cmp_spring_ease_t *spring) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_spring_ease_evaluate
+ *
+ * @param spring Parameter description.
+ * @param t Parameter description.
+ * @param out_value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_spring_ease_evaluate(cmp_spring_ease_t *spring, double t,
                              float *out_value) {
   struct cmp_spring_ease *s = (struct cmp_spring_ease *)spring;

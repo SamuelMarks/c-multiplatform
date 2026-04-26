@@ -63,6 +63,14 @@ static void cmp_f2_generate_ramp(uint32_t base_color,
   out_ramp->step_160 = cmp_f2_mix(base_color, 0xFFFFFF, 0.90f);
 }
 
+/**
+ * @brief cmp_f2_theme_generate
+ *
+ * @param brand_color Parameter description.
+ * @param is_dark Parameter description.
+ * @param out_theme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
                                   cmp_f2_theme_t *out_theme) {
   (void)is_dark; /* To be used when mapping semantic tokens or when altering
@@ -587,6 +595,19 @@ CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_f2_theme_generate_hc
+ *
+ * @param window Parameter description.
+ * @param window_text Parameter description.
+ * @param highlight Parameter description.
+ * @param highlight_text Parameter description.
+ * @param button_face Parameter description.
+ * @param button_text Parameter description.
+ * @param gray_text Parameter description.
+ * @param out_theme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
                                      uint32_t highlight,
                                      uint32_t highlight_text,

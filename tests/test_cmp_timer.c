@@ -84,7 +84,26 @@ TEST test_timer_lifecycle(void) {
   PASS();
 }
 
-SUITE(timer_suite) { RUN_TEST(test_timer_lifecycle); }
+TEST test_timer_null_args(void) {
+  cmp_timer_t *timer = NULL;
+
+  /* Must init first before using */
+  cmp_timer_system_init();
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_timer_start(NULL, 10, 0, test_timer_func, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_timer_start(&timer, 10, 0, NULL, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_timer_stop(NULL), "%d");
+
+  cmp_timer_system_shutdown();
+  PASS();
+}
+
+SUITE(timer_suite) {
+  RUN_TEST(test_timer_lifecycle);
+  RUN_TEST(test_timer_null_args);
+}
 
 GREATEST_MAIN_DEFS();
 

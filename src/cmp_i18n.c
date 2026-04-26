@@ -24,6 +24,12 @@ static char **g_interned_strings = NULL;
 static size_t g_interned_count = 0;
 static size_t g_interned_capacity = 0;
 
+/**
+ * @brief intern_string
+ *
+ * @param str Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static const char *intern_string(const char *str) {
   int rc = CMP_SUCCESS;
   size_t i;
@@ -73,6 +79,11 @@ static const char *intern_string(const char *str) {
   return new_str;
 }
 
+/**
+ * @brief free_interned_strings
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void free_interned_strings(void) {
   size_t i;
   if (g_interned_strings) {
@@ -86,6 +97,12 @@ static void free_interned_strings(void) {
   }
 }
 
+/**
+ * @brief cmp_i18n_create
+ *
+ * @param out_i18n Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_create(cmp_i18n_t **out_i18n) {
   int rc = CMP_SUCCESS;
   cmp_i18n_t *i18n = NULL;
@@ -107,6 +124,12 @@ int cmp_i18n_create(cmp_i18n_t **out_i18n) {
   return rc;
 }
 
+/**
+ * @brief cmp_i18n_destroy
+ *
+ * @param i18n Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_destroy(cmp_i18n_t *i18n) {
   int rc = CMP_SUCCESS;
   size_t i;
@@ -129,6 +152,13 @@ int cmp_i18n_destroy(cmp_i18n_t *i18n) {
   return rc;
 }
 
+/**
+ * @brief str_duplicate
+ *
+ * @param src Parameter description.
+ * @param out_dst Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int str_duplicate(const char *src, char **out_dst) {
   int rc = CMP_SUCCESS;
   size_t len;
@@ -154,6 +184,15 @@ static int str_duplicate(const char *src, char **out_dst) {
   return rc;
 }
 
+/**
+ * @brief cmp_i18n_add_string
+ *
+ * @param i18n Parameter description.
+ * @param locale Parameter description.
+ * @param key Parameter description.
+ * @param value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_add_string(cmp_i18n_t *i18n, const char *locale, const char *key,
                         const char *value) {
   int rc = CMP_SUCCESS;
@@ -207,6 +246,15 @@ int cmp_i18n_add_string(cmp_i18n_t *i18n, const char *locale, const char *key,
   return rc;
 }
 
+/**
+ * @brief cmp_i18n_get_string
+ *
+ * @param i18n Parameter description.
+ * @param locale Parameter description.
+ * @param key Parameter description.
+ * @param out_value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_get_string(const cmp_i18n_t *i18n, const char *locale,
                         const char *key, char **out_value) {
   int rc = CMP_SUCCESS;
@@ -236,6 +284,11 @@ static int g_i18n_initialized = 0;
 static cmp_text_direction_t g_bidi_dir = CMP_TEXT_DIR_LTR;
 static char g_current_locale[32] = "en-US";
 
+/**
+ * @brief cmp_i18n_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_init(void) {
   int rc = CMP_SUCCESS;
 
@@ -252,6 +305,11 @@ int cmp_i18n_init(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_i18n_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_shutdown(void) {
   int rc = CMP_SUCCESS;
 
@@ -269,6 +327,12 @@ int cmp_i18n_shutdown(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_i18n_detect_os_locale
+ *
+ * @param out_locale Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_detect_os_locale(cmp_string_t *out_locale) {
   int rc = CMP_SUCCESS;
 
@@ -293,6 +357,13 @@ int cmp_i18n_detect_os_locale(cmp_string_t *out_locale) {
   return rc;
 }
 
+/**
+ * @brief cmp_i18n_load_catalog
+ *
+ * @param virtual_path Parameter description.
+ * @param locale Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_load_catalog(const char *virtual_path, const char *locale) {
   int rc = CMP_SUCCESS;
   void *buffer = NULL;
@@ -327,12 +398,11 @@ int cmp_i18n_load_catalog(const char *virtual_path, const char *locale) {
 
 #if defined(_MSC_VER)
   strcpy_s(g_current_locale, sizeof(g_current_locale), locale);
-  line = strtok_s(text, "\n", &saveptr);
 #else
   strncpy(g_current_locale, locale, sizeof(g_current_locale) - 1);
   g_current_locale[sizeof(g_current_locale) - 1] = '\0';
-  line = cmp_strtok_r(text, "\n", &saveptr);
 #endif
+  cmp_strtok_r(text, "\n", &saveptr, &line);
 
   while (line != NULL) {
     char *eq = strchr(line, '=');
@@ -350,16 +420,19 @@ int cmp_i18n_load_catalog(const char *virtual_path, const char *locale) {
         LOG_DEBUG("Error in cmp_i18n_load_catalog: Failed to add string\n");
       }
     }
-#if defined(_MSC_VER)
-    line = strtok_s(NULL, "\n", &saveptr);
-#else
-    line = cmp_strtok_r(NULL, "\n", &saveptr);
-#endif
+    cmp_strtok_r(NULL, "\n", &saveptr, &line);
   }
   CMP_FREE(text);
   return rc;
 }
 
+/**
+ * @brief cmp_i18n_translate
+ *
+ * @param key Parameter description.
+ * @param out_translated Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_translate(const char *key, cmp_string_t *out_translated) {
   int rc = CMP_SUCCESS;
   char *val = NULL;
@@ -391,6 +464,14 @@ int cmp_i18n_translate(const char *key, cmp_string_t *out_translated) {
   return rc;
 }
 
+/**
+ * @brief cmp_i18n_translate_plural
+ *
+ * @param key Parameter description.
+ * @param count Parameter description.
+ * @param out_translated Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_translate_plural(const char *key, int count,
                               cmp_string_t *out_translated) {
   int rc = CMP_SUCCESS;
@@ -416,6 +497,12 @@ int cmp_i18n_translate_plural(const char *key, int count,
   return rc;
 }
 
+/**
+ * @brief cmp_i18n_set_bidi_direction
+ *
+ * @param dir Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_set_bidi_direction(cmp_text_direction_t dir) {
   int rc = CMP_SUCCESS;
   g_bidi_dir = dir;
@@ -424,6 +511,11 @@ int cmp_i18n_set_bidi_direction(cmp_text_direction_t dir) {
 
 int cmp_i18n_get_bidi_direction(void) { return g_bidi_dir; }
 
+/**
+ * @brief cmp_i18n_is_rtl
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_is_rtl(void) {
   return cmp_i18n_get_bidi_direction() == CMP_TEXT_DIR_RTL;
 }
@@ -433,6 +525,13 @@ typedef union {
   int d;
 } cmp_fmt_arg_val_t;
 
+/**
+ * @brief cmp_i18n_format
+ *
+ * @param format_str Parameter description.
+ * @param out_str Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_i18n_format(const char *format_str, cmp_string_t *out_str, ...) {
   int rc = CMP_SUCCESS;
   va_list args;

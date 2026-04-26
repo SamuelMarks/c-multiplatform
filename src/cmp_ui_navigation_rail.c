@@ -17,6 +17,12 @@ struct cmp_ui_navigation_rail {
   int selected_index;
 };
 
+/**
+ * @brief cmp_ui_navigation_rail_create
+ *
+ * @param out_rail Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_navigation_rail_create(cmp_ui_navigation_rail_t **out_rail) {
   cmp_ui_navigation_rail_t *rail;
   int err;
@@ -54,6 +60,12 @@ int cmp_ui_navigation_rail_create(cmp_ui_navigation_rail_t **out_rail) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_navigation_rail_destroy
+ *
+ * @param rail Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_navigation_rail_destroy(cmp_ui_navigation_rail_t *rail) {
   if (!rail) {
     return CMP_ERROR_INVALID_ARG;
@@ -65,6 +77,13 @@ int cmp_ui_navigation_rail_destroy(cmp_ui_navigation_rail_t *rail) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_navigation_rail_get_node
+ *
+ * @param rail Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_navigation_rail_get_node(cmp_ui_navigation_rail_t *rail,
                                     cmp_ui_node_t **out_node) {
   if (!rail || !out_node) {
@@ -74,6 +93,15 @@ int cmp_ui_navigation_rail_get_node(cmp_ui_navigation_rail_t *rail,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_navigation_rail_add_destination
+ *
+ * @param rail Parameter description.
+ * @param icon_name Parameter description.
+ * @param label Parameter description.
+ * @param out_index Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_navigation_rail_add_destination(cmp_ui_navigation_rail_t *rail,
                                            const char *icon_name,
                                            const char *label, int *out_index) {
@@ -127,6 +155,13 @@ int cmp_ui_navigation_rail_add_destination(cmp_ui_navigation_rail_t *rail,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_navigation_rail_set_selected
+ *
+ * @param rail Parameter description.
+ * @param index Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_navigation_rail_set_selected(cmp_ui_navigation_rail_t *rail,
                                         int index) {
   int i;
@@ -142,6 +177,13 @@ int cmp_ui_navigation_rail_set_selected(cmp_ui_navigation_rail_t *rail,
   rail->selected_index = index;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_ui_navigation_rail_bind_a11y
+ *
+ * @param widget Parameter description.
+ * @param tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_navigation_rail_bind_a11y(cmp_ui_navigation_rail_t *widget,
                                      cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {

@@ -17,6 +17,12 @@ struct cmp_ui_tabs {
   int selected_index;
 };
 
+/**
+ * @brief cmp_ui_tabs_create
+ *
+ * @param out_tabs Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs) {
   cmp_ui_tabs_t *tabs;
   int err;
@@ -54,6 +60,12 @@ int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_tabs_destroy
+ *
+ * @param tabs Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_tabs_destroy(cmp_ui_tabs_t *tabs) {
   if (!tabs) {
     return CMP_ERROR_INVALID_ARG;
@@ -65,6 +77,13 @@ int cmp_ui_tabs_destroy(cmp_ui_tabs_t *tabs) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_tabs_get_node
+ *
+ * @param tabs Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_tabs_get_node(cmp_ui_tabs_t *tabs, cmp_ui_node_t **out_node) {
   if (!tabs || !out_node) {
     return CMP_ERROR_INVALID_ARG;
@@ -73,6 +92,14 @@ int cmp_ui_tabs_get_node(cmp_ui_tabs_t *tabs, cmp_ui_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_tabs_add_tab
+ *
+ * @param tabs Parameter description.
+ * @param title Parameter description.
+ * @param out_index Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
                         int *out_index) {
   cmp_ui_node_t *tab_node;
@@ -114,6 +141,13 @@ int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_tabs_set_selected
+ *
+ * @param tabs Parameter description.
+ * @param index Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_tabs_set_selected(cmp_ui_tabs_t *tabs, int index) {
   int i;
   if (!tabs || index < 0 || index >= tabs->tab_count) {
@@ -128,6 +162,13 @@ int cmp_ui_tabs_set_selected(cmp_ui_tabs_t *tabs, int index) {
   tabs->selected_index = index;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_ui_tabs_bind_a11y
+ *
+ * @param widget Parameter description.
+ * @param tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_tabs_bind_a11y(cmp_ui_tabs_t *widget, cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;

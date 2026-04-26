@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -49,21 +50,34 @@ struct cmp_a11y_tree {
   size_t capacity;
 };
 
+/**
+ * @brief cmp_a11y_tree_create
+ *
+ * @param out_tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_create(cmp_a11y_tree_t **out_tree) {
   int rc = CMP_SUCCESS;
   struct cmp_a11y_tree *tree = NULL;
 
   if (!out_tree) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_a11y_tree_create: Invalid argument (out_tree=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_create: Invalid argument (out_tree=NULL): %s\n",
+                err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_a11y_tree), (void **)&tree);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_a11y_tree_create: Out of memory\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_create: Out of memory: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -75,6 +89,12 @@ int cmp_a11y_tree_create(cmp_a11y_tree_t **out_tree) {
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_destroy
+ *
+ * @param tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_destroy(cmp_a11y_tree_t *tree) {
   int rc = CMP_SUCCESS;
   size_t i;
@@ -82,8 +102,12 @@ int cmp_a11y_tree_destroy(cmp_a11y_tree_t *tree) {
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_destroy: Invalid argument (tree=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_destroy: Invalid argument (tree=NULL): %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -141,6 +165,15 @@ int cmp_a11y_tree_destroy(cmp_a11y_tree_t *tree) {
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_add_node
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param role Parameter description.
+ * @param name Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
                            const char *name) {
   int rc = CMP_SUCCESS;
@@ -151,8 +184,12 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_add_node: Invalid argument (tree=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_add_node: Invalid argument (tree=NULL): %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -161,9 +198,13 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
     rc = CMP_MALLOC(new_capacity * sizeof(cmp_a11y_tree_node_t),
                     (void **)&new_nodes);
     if (rc != CMP_SUCCESS) {
-      fprintf(
-          stderr,
-          "Error in cmp_a11y_tree_add_node: Out of memory allocating nodes\n");
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG(
+            "cmp_a11y_tree_add_node: Out of memory allocating nodes: %s\n",
+            err_str);
+      }
       return rc;
     }
 
@@ -182,9 +223,12 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
     len = strlen(role);
     rc = CMP_MALLOC(len + 1, (void **)&t->nodes[t->count].role);
     if (rc != CMP_SUCCESS) {
-      fprintf(
-          stderr,
-          "Error in cmp_a11y_tree_add_node: Out of memory allocating role\n");
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_a11y_tree_add_node: Out of memory allocating role: %s\n",
+                  err_str);
+      }
       return rc;
     }
 #if defined(_MSC_VER)
@@ -199,9 +243,12 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
     len = strlen(name);
     rc = CMP_MALLOC(len + 1, (void **)&t->nodes[t->count].name);
     if (rc != CMP_SUCCESS) {
-      fprintf(
-          stderr,
-          "Error in cmp_a11y_tree_add_node: Out of memory allocating name\n");
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_a11y_tree_add_node: Out of memory allocating name: %s\n",
+                  err_str);
+      }
       return rc;
     }
 #if defined(_MSC_VER)
@@ -246,6 +293,15 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_get_node_desc
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param out_desc Parameter description.
+ * @param out_capacity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_get_node_desc(cmp_a11y_tree_t *tree, int node_id,
                                 char *out_desc, size_t out_capacity) {
   int rc = CMP_SUCCESS;
@@ -256,7 +312,11 @@ int cmp_a11y_tree_get_node_desc(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t || !out_desc || out_capacity == 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_tree_get_node_desc: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_get_node_desc: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -272,8 +332,12 @@ int cmp_a11y_tree_get_node_desc(cmp_a11y_tree_t *tree, int node_id,
       name_len = strlen(name_str);
       if (role_len + 2 + name_len + 1 > out_capacity) {
         rc = CMP_ERROR_BOUNDS;
-        fprintf(stderr,
-                "Error in cmp_a11y_tree_get_node_desc: Out of bounds\n");
+        {
+          const char *err_str;
+          cmp_strerror(rc, &err_str);
+          LOG_DEBUG("cmp_a11y_tree_get_node_desc: Out of bounds: %s\n",
+                    err_str);
+        }
         return rc;
       }
 
@@ -287,10 +351,22 @@ int cmp_a11y_tree_get_node_desc(cmp_a11y_tree_t *tree, int node_id,
   }
 
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr, "Error in cmp_a11y_tree_get_node_desc: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_get_node_desc: Node not found: %s\n", err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_label
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param label Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_label(cmp_a11y_tree_t *tree, int node_id,
                                  const char *label) {
   int rc = CMP_SUCCESS;
@@ -299,8 +375,12 @@ int cmp_a11y_tree_set_node_label(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_set_node_label: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_label: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -314,8 +394,12 @@ int cmp_a11y_tree_set_node_label(cmp_a11y_tree_t *tree, int node_id,
         len = strlen(label);
         rc = CMP_MALLOC(len + 1, (void **)&t->nodes[i].label);
         if (rc != CMP_SUCCESS) {
-          fprintf(stderr,
-                  "Error in cmp_a11y_tree_set_node_label: Out of memory\n");
+          {
+            const char *err_str;
+            cmp_strerror(rc, &err_str);
+            LOG_DEBUG("cmp_a11y_tree_set_node_label: Out of memory: %s\n",
+                      err_str);
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -328,10 +412,22 @@ int cmp_a11y_tree_set_node_label(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr, "Error in cmp_a11y_tree_set_node_label: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_label: Node not found: %s\n", err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_hint
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param hint Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_hint(cmp_a11y_tree_t *tree, int node_id,
                                 const char *hint) {
   int rc = CMP_SUCCESS;
@@ -340,7 +436,11 @@ int cmp_a11y_tree_set_node_hint(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_tree_set_node_hint: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_hint: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -354,8 +454,12 @@ int cmp_a11y_tree_set_node_hint(cmp_a11y_tree_t *tree, int node_id,
         len = strlen(hint);
         rc = CMP_MALLOC(len + 1, (void **)&t->nodes[i].hint);
         if (rc != CMP_SUCCESS) {
-          fprintf(stderr,
-                  "Error in cmp_a11y_tree_set_node_hint: Out of memory\n");
+          {
+            const char *err_str;
+            cmp_strerror(rc, &err_str);
+            LOG_DEBUG("cmp_a11y_tree_set_node_hint: Out of memory: %s\n",
+                      err_str);
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -368,10 +472,22 @@ int cmp_a11y_tree_set_node_hint(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr, "Error in cmp_a11y_tree_set_node_hint: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_hint: Node not found: %s\n", err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_value
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
                                  const char *value) {
   int rc = CMP_SUCCESS;
@@ -380,8 +496,12 @@ int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_set_node_value: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_value: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -395,8 +515,12 @@ int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
         len = strlen(value);
         rc = CMP_MALLOC(len + 1, (void **)&t->nodes[i].value);
         if (rc != CMP_SUCCESS) {
-          fprintf(stderr,
-                  "Error in cmp_a11y_tree_set_node_value: Out of memory\n");
+          {
+            const char *err_str;
+            cmp_strerror(rc, &err_str);
+            LOG_DEBUG("cmp_a11y_tree_set_node_value: Out of memory: %s\n",
+                      err_str);
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -409,10 +533,22 @@ int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr, "Error in cmp_a11y_tree_set_node_value: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_value: Node not found: %s\n", err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_get_node_traits
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param out_traits Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_get_node_traits(cmp_a11y_tree_t *tree, int node_id,
                                   uint32_t *out_traits) {
   int rc = CMP_SUCCESS;
@@ -421,8 +557,12 @@ int cmp_a11y_tree_get_node_traits(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t || !out_traits) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_get_node_traits: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_get_node_traits: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -433,10 +573,22 @@ int cmp_a11y_tree_get_node_traits(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr, "Error in cmp_a11y_tree_get_node_traits: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_get_node_traits: Node not found: %s\n", err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_traits
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param traits Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_traits(cmp_a11y_tree_t *tree, int node_id,
                                   uint32_t traits) {
   int rc = CMP_SUCCESS;
@@ -445,8 +597,12 @@ int cmp_a11y_tree_set_node_traits(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_set_node_traits: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_traits: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -457,10 +613,22 @@ int cmp_a11y_tree_set_node_traits(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr, "Error in cmp_a11y_tree_set_node_traits: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_traits: Node not found: %s\n", err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_grouped
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param is_grouped Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_grouped(cmp_a11y_tree_t *tree, int node_id,
                                    int is_grouped) {
   int rc = CMP_SUCCESS;
@@ -469,8 +637,12 @@ int cmp_a11y_tree_set_node_grouped(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_set_node_grouped: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_grouped: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -481,10 +653,22 @@ int cmp_a11y_tree_set_node_grouped(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr, "Error in cmp_a11y_tree_set_node_grouped: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_grouped: Node not found: %s\n", err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_add_node_custom_action
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param action_name Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
                                          const char *action_name) {
   int rc = CMP_SUCCESS;
@@ -495,9 +679,12 @@ int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t || !action_name) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_a11y_tree_add_node_custom_action: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_add_node_custom_action: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -509,9 +696,13 @@ int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
                       : t->nodes[i].action_capacity * 2;
         rc = CMP_MALLOC(new_cap * sizeof(char *), (void **)&new_actions);
         if (rc != CMP_SUCCESS) {
-          fprintf(
-              stderr,
-              "Error in cmp_a11y_tree_add_node_custom_action: Out of memory\n");
+          {
+            const char *err_str;
+            cmp_strerror(rc, &err_str);
+            LOG_DEBUG(
+                "cmp_a11y_tree_add_node_custom_action: Out of memory: %s\n",
+                err_str);
+          }
           return rc;
         }
         if (t->nodes[i].actions) {
@@ -527,9 +718,12 @@ int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
       rc = CMP_MALLOC(len + 1,
                       (void **)&t->nodes[i].actions[t->nodes[i].action_count]);
       if (rc != CMP_SUCCESS) {
-        fprintf(
-            stderr,
-            "Error in cmp_a11y_tree_add_node_custom_action: Out of memory\n");
+        {
+          const char *err_str;
+          cmp_strerror(rc, &err_str);
+          LOG_DEBUG("cmp_a11y_tree_add_node_custom_action: Out of memory: %s\n",
+                    err_str);
+        }
         return rc;
       }
 #if defined(_MSC_VER)
@@ -543,11 +737,23 @@ int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr,
-          "Error in cmp_a11y_tree_add_node_custom_action: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_add_node_custom_action: Node not found: %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_add_node_custom_rotor
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param rotor_name Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
                                         const char *rotor_name) {
   int rc = CMP_SUCCESS;
@@ -558,8 +764,12 @@ int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t || !rotor_name) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_add_node_custom_rotor: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_add_node_custom_rotor: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -571,9 +781,13 @@ int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
                       : t->nodes[i].rotor_capacity * 2;
         rc = CMP_MALLOC(new_cap * sizeof(char *), (void **)&new_rotors);
         if (rc != CMP_SUCCESS) {
-          fprintf(
-              stderr,
-              "Error in cmp_a11y_tree_add_node_custom_rotor: Out of memory\n");
+          {
+            const char *err_str;
+            cmp_strerror(rc, &err_str);
+            LOG_DEBUG(
+                "cmp_a11y_tree_add_node_custom_rotor: Out of memory: %s\n",
+                err_str);
+          }
           return rc;
         }
         if (t->nodes[i].rotors) {
@@ -589,9 +803,12 @@ int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
       rc = CMP_MALLOC(len + 1,
                       (void **)&t->nodes[i].rotors[t->nodes[i].rotor_count]);
       if (rc != CMP_SUCCESS) {
-        fprintf(
-            stderr,
-            "Error in cmp_a11y_tree_add_node_custom_rotor: Out of memory\n");
+        {
+          const char *err_str;
+          cmp_strerror(rc, &err_str);
+          LOG_DEBUG("cmp_a11y_tree_add_node_custom_rotor: Out of memory: %s\n",
+                    err_str);
+        }
         return rc;
       }
 #if defined(_MSC_VER)
@@ -605,11 +822,23 @@ int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr,
-          "Error in cmp_a11y_tree_add_node_custom_rotor: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_add_node_custom_rotor: Node not found: %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_focus_order
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param focus_order Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_focus_order(cmp_a11y_tree_t *tree, int node_id,
                                        int focus_order) {
   int rc = CMP_SUCCESS;
@@ -618,8 +847,12 @@ int cmp_a11y_tree_set_node_focus_order(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_set_node_focus_order: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_focus_order: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -630,11 +863,23 @@ int cmp_a11y_tree_set_node_focus_order(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr,
-          "Error in cmp_a11y_tree_set_node_focus_order: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_focus_order: Node not found: %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_braille_input
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_braille_input(cmp_a11y_tree_t *tree, int node_id,
                                          int enabled) {
   int rc = CMP_SUCCESS;
@@ -643,9 +888,12 @@ int cmp_a11y_tree_set_node_braille_input(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_a11y_tree_set_node_braille_input: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_braille_input: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -656,11 +904,23 @@ int cmp_a11y_tree_set_node_braille_input(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr,
-          "Error in cmp_a11y_tree_set_node_braille_input: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_braille_input: Node not found: %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_audio_description
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param description_url Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_audio_description(cmp_a11y_tree_t *tree, int node_id,
                                              const char *description_url) {
   int rc = CMP_SUCCESS;
@@ -669,8 +929,11 @@ int cmp_a11y_tree_set_node_audio_description(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_tree_set_node_audio_description: "
-                    "Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_audio_description: : %s\n", err_str);
+    }
     return rc;
   }
 
@@ -684,8 +947,12 @@ int cmp_a11y_tree_set_node_audio_description(cmp_a11y_tree_t *tree, int node_id,
         len = strlen(description_url);
         rc = CMP_MALLOC(len + 1, (void **)&t->nodes[i].audio_description_url);
         if (rc != CMP_SUCCESS) {
-          fprintf(stderr, "Error in cmp_a11y_tree_set_node_audio_description: "
-                          "Out of memory\n");
+          {
+            const char *err_str;
+            cmp_strerror(rc, &err_str);
+            LOG_DEBUG("cmp_a11y_tree_set_node_audio_description: : %s\n",
+                      err_str);
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -698,12 +965,23 @@ int cmp_a11y_tree_set_node_audio_description(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(
-      stderr,
-      "Error in cmp_a11y_tree_set_node_audio_description: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_audio_description: Node not found: %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_pronunciation
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param pronunciation Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_pronunciation(cmp_a11y_tree_t *tree, int node_id,
                                          const char *pronunciation) {
   int rc = CMP_SUCCESS;
@@ -712,9 +990,12 @@ int cmp_a11y_tree_set_node_pronunciation(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_a11y_tree_set_node_pronunciation: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_pronunciation: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -728,9 +1009,13 @@ int cmp_a11y_tree_set_node_pronunciation(cmp_a11y_tree_t *tree, int node_id,
         len = strlen(pronunciation);
         rc = CMP_MALLOC(len + 1, (void **)&t->nodes[i].pronunciation);
         if (rc != CMP_SUCCESS) {
-          fprintf(
-              stderr,
-              "Error in cmp_a11y_tree_set_node_pronunciation: Out of memory\n");
+          {
+            const char *err_str;
+            cmp_strerror(rc, &err_str);
+            LOG_DEBUG(
+                "cmp_a11y_tree_set_node_pronunciation: Out of memory: %s\n",
+                err_str);
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -743,11 +1028,23 @@ int cmp_a11y_tree_set_node_pronunciation(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr,
-          "Error in cmp_a11y_tree_set_node_pronunciation: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_pronunciation: Node not found: %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_direct_touch
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_direct_touch(cmp_a11y_tree_t *tree, int node_id,
                                         int enabled) {
   int rc = CMP_SUCCESS;
@@ -756,8 +1053,12 @@ int cmp_a11y_tree_set_node_direct_touch(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_set_node_direct_touch: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_direct_touch: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -768,11 +1069,22 @@ int cmp_a11y_tree_set_node_direct_touch(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr,
-          "Error in cmp_a11y_tree_set_node_direct_touch: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_direct_touch: Node not found: %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_post_announcement
+ *
+ * @param tree Parameter description.
+ * @param announcement Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_post_announcement(cmp_a11y_tree_t *tree,
                                const char *announcement) {
   int rc = CMP_SUCCESS;
@@ -781,12 +1093,24 @@ int cmp_a11y_post_announcement(cmp_a11y_tree_t *tree,
      and announcement are non-null */
   if (!tree || !announcement) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_post_announcement: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_post_announcement: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_ignores_invert
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param ignores_invert Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_ignores_invert(cmp_a11y_tree_t *tree, int node_id,
                                           int ignores_invert) {
   int rc = CMP_SUCCESS;
@@ -794,9 +1118,12 @@ int cmp_a11y_tree_set_node_ignores_invert(cmp_a11y_tree_t *tree, int node_id,
   size_t i;
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_a11y_tree_set_node_ignores_invert: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_ignores_invert: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
   for (i = 0; i < t->count; ++i) {
@@ -806,11 +1133,23 @@ int cmp_a11y_tree_set_node_ignores_invert(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr,
-          "Error in cmp_a11y_tree_set_node_ignores_invert: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_ignores_invert: Node not found: %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_differentiate_without_color
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_differentiate_without_color(cmp_a11y_tree_t *tree,
                                                        int node_id,
                                                        int enabled) {
@@ -819,9 +1158,12 @@ int cmp_a11y_tree_set_node_differentiate_without_color(cmp_a11y_tree_t *tree,
   size_t i;
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_set_node_differentiate_without_color: "
-            "Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_differentiate_without_color: : %s\n",
+                err_str);
+    }
     return rc;
   }
   for (i = 0; i < t->count; ++i) {
@@ -831,12 +1173,23 @@ int cmp_a11y_tree_set_node_differentiate_without_color(cmp_a11y_tree_t *tree,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr,
-          "Error in cmp_a11y_tree_set_node_differentiate_without_color: Node "
-          "not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_differentiate_without_color: Node : %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_hover_text
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param hover_text_string Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_hover_text(cmp_a11y_tree_t *tree, int node_id,
                                       const char *hover_text_string) {
   int rc = CMP_SUCCESS;
@@ -845,8 +1198,12 @@ int cmp_a11y_tree_set_node_hover_text(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_a11y_tree_set_node_hover_text: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_hover_text: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -860,9 +1217,12 @@ int cmp_a11y_tree_set_node_hover_text(cmp_a11y_tree_t *tree, int node_id,
         len = strlen(hover_text_string);
         rc = CMP_MALLOC(len + 1, (void **)&t->nodes[i].hover_text_string);
         if (rc != CMP_SUCCESS) {
-          fprintf(
-              stderr,
-              "Error in cmp_a11y_tree_set_node_hover_text: Out of memory\n");
+          {
+            const char *err_str;
+            cmp_strerror(rc, &err_str);
+            LOG_DEBUG("cmp_a11y_tree_set_node_hover_text: Out of memory: %s\n",
+                      err_str);
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -875,11 +1235,23 @@ int cmp_a11y_tree_set_node_hover_text(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr,
-          "Error in cmp_a11y_tree_set_node_hover_text: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_hover_text: Node not found: %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_switch_control_anchor
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param is_anchor Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_switch_control_anchor(cmp_a11y_tree_t *tree,
                                                  int node_id, int is_anchor) {
   int rc = CMP_SUCCESS;
@@ -887,8 +1259,12 @@ int cmp_a11y_tree_set_node_switch_control_anchor(cmp_a11y_tree_t *tree,
   size_t i;
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_tree_set_node_switch_control_anchor: "
-                    "Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_switch_control_anchor: : %s\n",
+                err_str);
+    }
     return rc;
   }
   for (i = 0; i < t->count; ++i) {
@@ -898,11 +1274,24 @@ int cmp_a11y_tree_set_node_switch_control_anchor(cmp_a11y_tree_t *tree,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr, "Error in cmp_a11y_tree_set_node_switch_control_anchor: Node "
-                  "not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_switch_control_anchor: Node : %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_voice_control_tag
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param phonetic_label Parameter description.
+ * @param numeric_grid_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_voice_control_tag(cmp_a11y_tree_t *tree, int node_id,
                                              const char *phonetic_label,
                                              int numeric_grid_id) {
@@ -912,8 +1301,11 @@ int cmp_a11y_tree_set_node_voice_control_tag(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_tree_set_node_voice_control_tag: "
-                    "Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_voice_control_tag: : %s\n", err_str);
+    }
     return rc;
   }
 
@@ -929,8 +1321,12 @@ int cmp_a11y_tree_set_node_voice_control_tag(cmp_a11y_tree_t *tree, int node_id,
         len = strlen(phonetic_label);
         rc = CMP_MALLOC(len + 1, (void **)&t->nodes[i].voice_phonetic_label);
         if (rc != CMP_SUCCESS) {
-          fprintf(stderr, "Error in cmp_a11y_tree_set_node_voice_control_tag: "
-                          "Out of memory\n");
+          {
+            const char *err_str;
+            cmp_strerror(rc, &err_str);
+            LOG_DEBUG("cmp_a11y_tree_set_node_voice_control_tag: : %s\n",
+                      err_str);
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -943,12 +1339,23 @@ int cmp_a11y_tree_set_node_voice_control_tag(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(
-      stderr,
-      "Error in cmp_a11y_tree_set_node_voice_control_tag: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_voice_control_tag: Node not found: %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_guided_access_disabled
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param disabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_guided_access_disabled(cmp_a11y_tree_t *tree,
                                                   int node_id, int disabled) {
   int rc = CMP_SUCCESS;
@@ -956,8 +1363,12 @@ int cmp_a11y_tree_set_node_guided_access_disabled(cmp_a11y_tree_t *tree,
   size_t i;
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_tree_set_node_guided_access_disabled: "
-                    "Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_guided_access_disabled: : %s\n",
+                err_str);
+    }
     return rc;
   }
   for (i = 0; i < t->count; ++i) {
@@ -967,11 +1378,22 @@ int cmp_a11y_tree_set_node_guided_access_disabled(cmp_a11y_tree_t *tree,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr, "Error in cmp_a11y_tree_set_node_guided_access_disabled: "
-                  "Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_guided_access_disabled: : %s\n", err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_cognitive_time_limit
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param time_extension_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_cognitive_time_limit(cmp_a11y_tree_t *tree,
                                                 int node_id,
                                                 float time_extension_ms) {
@@ -980,8 +1402,11 @@ int cmp_a11y_tree_set_node_cognitive_time_limit(cmp_a11y_tree_t *tree,
   size_t i;
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_tree_set_node_cognitive_time_limit: "
-                    "Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_cognitive_time_limit: : %s\n", err_str);
+    }
     return rc;
   }
   for (i = 0; i < t->count; ++i) {
@@ -991,12 +1416,24 @@ int cmp_a11y_tree_set_node_cognitive_time_limit(cmp_a11y_tree_t *tree,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(
-      stderr,
-      "Error in cmp_a11y_tree_set_node_cognitive_time_limit: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG(
+        "cmp_a11y_tree_set_node_cognitive_time_limit: Node not found: %s\n",
+        err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_sound_caption
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param caption Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
                                          const char *caption) {
   int rc = CMP_SUCCESS;
@@ -1005,9 +1442,12 @@ int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
 
   if (!t) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_a11y_tree_set_node_sound_caption: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_sound_caption: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -1021,9 +1461,13 @@ int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
         len = strlen(caption);
         rc = CMP_MALLOC(len + 1, (void **)&t->nodes[i].sound_caption);
         if (rc != CMP_SUCCESS) {
-          fprintf(
-              stderr,
-              "Error in cmp_a11y_tree_set_node_sound_caption: Out of memory\n");
+          {
+            const char *err_str;
+            cmp_strerror(rc, &err_str);
+            LOG_DEBUG(
+                "cmp_a11y_tree_set_node_sound_caption: Out of memory: %s\n",
+                err_str);
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -1036,18 +1480,35 @@ int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
     }
   }
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr,
-          "Error in cmp_a11y_tree_set_node_sound_caption: Node not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_a11y_tree_set_node_sound_caption: Node not found: %s\n",
+              err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_serialize
+ *
+ * @param tree Parameter description.
+ * @param node Parameter description.
+ * @param out_buffer Parameter description.
+ * @param buffer_size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
                             char *out_buffer, size_t buffer_size) {
   int rc = CMP_SUCCESS;
   size_t i;
   if (!tree || !node) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_tree_serialize: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_serialize: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -1058,14 +1519,22 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
     /* Button */
     rc = cmp_a11y_tree_add_node(tree, node->layout->id, "button", "UIA Button");
     if (rc != CMP_SUCCESS) {
-      fprintf(stderr, "Error in cmp_a11y_tree_serialize: Failed to add node\n");
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_a11y_tree_serialize: Failed to add node: %s\n", err_str);
+      }
       return rc;
     }
     rc = cmp_a11y_tree_set_node_traits(tree, node->layout->id,
                                        CMP_A11Y_TRAIT_BUTTON);
     if (rc != CMP_SUCCESS) {
-      fprintf(stderr,
-              "Error in cmp_a11y_tree_serialize: Failed to set node traits\n");
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_a11y_tree_serialize: Failed to set node traits: %s\n",
+                  err_str);
+      }
       return rc;
     }
     if (out_buffer && buffer_size > 0) {
@@ -1081,8 +1550,12 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
   } else {
     rc = cmp_a11y_tree_add_node(tree, node->layout->id, "generic", "generic");
     if (rc != CMP_SUCCESS) {
-      fprintf(stderr,
-              "Error in cmp_a11y_tree_serialize: Failed to add generic node\n");
+      {
+        const char *err_str;
+        cmp_strerror(rc, &err_str);
+        LOG_DEBUG("cmp_a11y_tree_serialize: Failed to add generic node: %s\n",
+                  err_str);
+      }
       return rc;
     }
     if (out_buffer && buffer_size > 0) {
@@ -1099,8 +1572,12 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
     if (node->children[i]) {
       rc = cmp_a11y_tree_serialize(tree, node->children[i], NULL, 0);
       if (rc != CMP_SUCCESS) {
-        fprintf(stderr, "Error in cmp_a11y_tree_serialize: Failed to serialize "
-                        "child node\n");
+        {
+          const char *err_str;
+          cmp_strerror(rc, &err_str);
+          LOG_DEBUG("cmp_a11y_tree_serialize: Failed to serialize : %s\n",
+                    err_str);
+        }
         return rc;
       }
     }

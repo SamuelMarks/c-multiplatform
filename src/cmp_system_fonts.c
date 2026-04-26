@@ -13,6 +13,12 @@ struct cmp_system_fonts {
   cmp_font_t *cached_ny;
 };
 
+/**
+ * @brief cmp_system_fonts_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_fonts_create(cmp_system_fonts_t **out_ctx) {
   struct cmp_system_fonts *ctx;
   if (!out_ctx)
@@ -46,6 +52,12 @@ int cmp_system_fonts_create(cmp_system_fonts_t **out_ctx) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_system_fonts_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_fonts_destroy(cmp_system_fonts_t *ctx) {
   if (!ctx)
     return CMP_SUCCESS;
@@ -63,6 +75,16 @@ int cmp_system_fonts_destroy(cmp_system_fonts_t *ctx) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_system_fonts_request
+ *
+ * @param ctx Parameter description.
+ * @param type Parameter description.
+ * @param style Parameter description.
+ * @param weight Parameter description.
+ * @param out_font Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_fonts_request(cmp_system_fonts_t *ctx,
                              cmp_system_font_type_t type,
                              cmp_semantic_text_style_t style, int weight,
@@ -94,6 +116,15 @@ int cmp_system_fonts_request(cmp_system_fonts_t *ctx,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_system_fonts_get_tracking_and_optical
+ *
+ * @param ctx Parameter description.
+ * @param point_size Parameter description.
+ * @param out_is_display_variant Parameter description.
+ * @param out_tracking Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_fonts_get_tracking_and_optical(cmp_system_fonts_t *ctx,
                                               float point_size,
                                               int *out_is_display_variant,
@@ -115,6 +146,15 @@ int cmp_system_fonts_get_tracking_and_optical(cmp_system_fonts_t *ctx,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_font_set_opentype_features
+ *
+ * @param font Parameter description.
+ * @param enable_kerning Parameter description.
+ * @param enable_ligatures Parameter description.
+ * @param enable_tabular_figures Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_font_set_opentype_features(cmp_font_t *font, int enable_kerning,
                                    int enable_ligatures,
                                    int enable_tabular_figures) {
@@ -127,6 +167,14 @@ int cmp_font_set_opentype_features(cmp_font_t *font, int enable_kerning,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_font_set_variable_axes
+ *
+ * @param font Parameter description.
+ * @param weight Parameter description.
+ * @param width Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_font_set_variable_axes(cmp_font_t *font, float weight, float width) {
   if (!font)
     return CMP_ERROR_INVALID_ARG;
@@ -136,6 +184,16 @@ int cmp_font_set_variable_axes(cmp_font_t *font, float weight, float width) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_system_fonts_get_metrics
+ *
+ * @param ctx Parameter description.
+ * @param style Parameter description.
+ * @param out_line_height Parameter description.
+ * @param out_leading Parameter description.
+ * @param out_baseline_offset Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_fonts_get_metrics(cmp_system_fonts_t *ctx,
                                  cmp_semantic_text_style_t style,
                                  float *out_line_height, float *out_leading,

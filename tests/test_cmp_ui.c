@@ -135,12 +135,57 @@ TEST test_ui_phase17_components(void) {
   PASS();
 }
 
+TEST test_ui_null_args(void) {
+  cmp_ui_node_t *node = NULL;
+  cmp_ui_node_t *parent = NULL;
+  cmp_ui_box_create(&parent);
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_node_destroy(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_node_add_child(NULL, parent),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_node_add_child(parent, NULL),
+                "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_box_create(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_text_create(NULL, "a", -1), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_text_create(&node, NULL, -1),
+                "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_button_create(NULL, "a", -1),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_button_create(&node, NULL, -1),
+                "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_text_input_create(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_checkbox_create(NULL, "a"), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_checkbox_create(&node, NULL),
+                "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_radio_create(NULL, 1), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_image_view_create(NULL, "a"),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_image_view_create(&node, NULL),
+                "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_slider_create(NULL, 0, 1), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_list_view_create(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_grid_view_create(NULL, 1), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_dropdown_create(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_modal_create(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_canvas_create(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_rich_text_create(NULL), "%d");
+
+  cmp_ui_node_destroy(parent);
+  PASS();
+}
+
 SUITE(ui_suite) {
   RUN_TEST(test_ui_box);
   RUN_TEST(test_ui_text);
   RUN_TEST(test_ui_hierarchy);
   RUN_TEST(test_ui_advanced_primitives);
   RUN_TEST(test_ui_phase17_components);
+  RUN_TEST(test_ui_null_args);
 }
 
 GREATEST_MAIN_DEFS();

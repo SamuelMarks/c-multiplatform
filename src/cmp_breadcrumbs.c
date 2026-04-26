@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -12,6 +13,12 @@ struct cmp_breadcrumbs {
   size_t count;
 };
 
+/**
+ * @brief cmp_breadcrumbs_create
+ *
+ * @param out_crumbs Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_breadcrumbs_create(cmp_breadcrumbs_t **out_crumbs) {
   int rc = CMP_SUCCESS;
   cmp_breadcrumbs_t *crumbs = NULL;
@@ -23,33 +30,54 @@ int cmp_breadcrumbs_create(cmp_breadcrumbs_t **out_crumbs) {
     return rc;
   }
 
-  crumbs = (cmp_breadcrumbs_t *)malloc(sizeof(cmp_breadcrumbs_t));
-  if (!crumbs) {
-    rc = CMP_ERROR_OOM;
-    fprintf(stderr, "Error in cmp_breadcrumbs_create: Out of memory\n");
+  rc = CMP_MALLOC(sizeof(cmp_breadcrumbs_t), (void **)&crumbs);
+  if (rc != CMP_SUCCESS) {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_breadcrumbs_create: Out of memory: %s\n", err_str);
     return rc;
   }
 
   crumbs->count = 0;
 
   *out_crumbs = crumbs;
-  return rc;
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_breadcrumbs_destroy
+ *
+ * @param crumbs Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_breadcrumbs_destroy(cmp_breadcrumbs_t *crumbs) {
   int rc = CMP_SUCCESS;
 
   if (!crumbs) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_breadcrumbs_destroy: Invalid argument (crumbs=NULL)\n");
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_breadcrumbs_destroy: Invalid argument (crumbs=NULL): %s\n",
+              err_str);
     return rc;
   }
-  free(crumbs);
-  return rc;
+
+  rc = CMP_FREE(crumbs);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_breadcrumbs_destroy: CMP_FREE failed\n");
+    return rc;
+  }
+
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_breadcrumbs_set_path
+ *
+ * @param crumbs Parameter description.
+ * @param full_path Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
   int rc = CMP_SUCCESS;
   const char *start;
@@ -58,7 +86,9 @@ int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
 
   if (!crumbs || !full_path) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_breadcrumbs_set_path: Invalid argument\n");
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_breadcrumbs_set_path: Invalid argument: %s\n", err_str);
     return rc;
   }
 
@@ -86,8 +116,16 @@ int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
       if (len >= sizeof(crumbs->segments[0].label)) {
         len = sizeof(crumbs->segments[0].label) - 1;
       }
+#if defined(_MSC_VER)
+      if (strncpy_s(crumbs->segments[crumbs->count].label,
+                    sizeof(crumbs->segments[0].label), start, len) != 0) {
+        LOG_DEBUG("cmp_breadcrumbs_set_path: strncpy_s failed\n");
+        return CMP_ERROR_GENERAL;
+      }
+#else
       strncpy(crumbs->segments[crumbs->count].label, start, len);
       crumbs->segments[crumbs->count].label[len] = '\0';
+#endif
       crumbs->segments[crumbs->count].is_active = (*p == '\0') ? 1 : 0;
       crumbs->count++;
     }
@@ -95,34 +133,53 @@ int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
     start = p;
   }
 
-  return rc;
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_breadcrumbs_get_count
+ *
+ * @param crumbs Parameter description.
+ * @param out_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_breadcrumbs_get_count(const cmp_breadcrumbs_t *crumbs,
                               size_t *out_count) {
   int rc = CMP_SUCCESS;
 
   if (!crumbs || !out_count) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_breadcrumbs_get_count: Invalid argument\n");
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_breadcrumbs_get_count: Invalid argument: %s\n", err_str);
     return rc;
   }
 
   *out_count = crumbs->count;
-  return rc;
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_breadcrumbs_get_segment
+ *
+ * @param crumbs Parameter description.
+ * @param index Parameter description.
+ * @param out_segment Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_breadcrumbs_get_segment(const cmp_breadcrumbs_t *crumbs, size_t index,
                                 cmp_breadcrumb_t **out_segment) {
   int rc = CMP_SUCCESS;
 
   if (!crumbs || !out_segment || index >= crumbs->count) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_breadcrumbs_get_segment: Invalid argument or "
-                    "index out of bounds\n");
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_breadcrumbs_get_segment: Invalid argument or : %s\n",
+              err_str);
     return rc;
   }
 
   *out_segment = (cmp_breadcrumb_t *)&crumbs->segments[index];
-  return rc;
+  return CMP_SUCCESS;
 }

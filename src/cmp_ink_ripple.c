@@ -36,6 +36,12 @@ static float cubic_bezier_accelerate(float t) {
   return t * t; /* Simple quadratic ease-in for alpha fade out */
 }
 
+/**
+ * @brief cmp_ink_ripple_create
+ *
+ * @param out_ripple Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ink_ripple_create(cmp_ink_ripple_t **out_ripple) {
   int rc = CMP_SUCCESS;
   struct cmp_ink_ripple *ctx = NULL;
@@ -58,6 +64,12 @@ int cmp_ink_ripple_create(cmp_ink_ripple_t **out_ripple) {
   return rc;
 }
 
+/**
+ * @brief cmp_ink_ripple_destroy
+ *
+ * @param ripple Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ink_ripple_destroy(cmp_ink_ripple_t *ripple) {
   int rc = CMP_SUCCESS;
   struct cmp_ink_ripple *ctx = (struct cmp_ink_ripple *)ripple;
@@ -73,6 +85,13 @@ int cmp_ink_ripple_destroy(cmp_ink_ripple_t *ripple) {
   return rc;
 }
 
+/**
+ * @brief cmp_ink_ripple_update
+ *
+ * @param ripple Parameter description.
+ * @param dt_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ink_ripple_update(cmp_ink_ripple_t *ripple, float dt_ms) {
   int rc = CMP_SUCCESS;
   struct cmp_ink_ripple *ctx = (struct cmp_ink_ripple *)ripple;
@@ -105,6 +124,16 @@ int cmp_ink_ripple_update(cmp_ink_ripple_t *ripple, float dt_ms) {
   return rc;
 }
 
+/**
+ * @brief cmp_ink_ripple_trigger
+ *
+ * @param ripple Parameter description.
+ * @param start_x Parameter description.
+ * @param start_y Parameter description.
+ * @param box_width Parameter description.
+ * @param box_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ink_ripple_trigger(cmp_ink_ripple_t *ripple, float start_x,
                            float start_y, float box_width, float box_height) {
   int rc = CMP_SUCCESS;
@@ -136,6 +165,12 @@ int cmp_ink_ripple_trigger(cmp_ink_ripple_t *ripple, float start_x,
   return rc;
 }
 
+/**
+ * @brief cmp_ink_ripple_release
+ *
+ * @param ripple Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ink_ripple_release(cmp_ink_ripple_t *ripple) {
   int rc = CMP_SUCCESS;
   struct cmp_ink_ripple *ctx = (struct cmp_ink_ripple *)ripple;
@@ -152,6 +187,16 @@ int cmp_ink_ripple_release(cmp_ink_ripple_t *ripple) {
   return rc;
 }
 
+/**
+ * @brief cmp_ink_ripple_get_state
+ *
+ * @param ripple Parameter description.
+ * @param out_radius Parameter description.
+ * @param out_opacity Parameter description.
+ * @param out_x Parameter description.
+ * @param out_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ink_ripple_get_state(cmp_ink_ripple_t *ripple, float *out_radius,
                              float *out_opacity, float *out_x, float *out_y) {
   int rc = CMP_SUCCESS;

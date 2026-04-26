@@ -7,6 +7,12 @@ typedef struct cmp_subpixel_aa {
   int enabled;
 } cmp_subpixel_aa_t;
 
+/**
+ * @brief cmp_subpixel_aa_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_subpixel_aa_create(cmp_subpixel_aa_t **out_ctx) {
   cmp_subpixel_aa_t *ctx;
 
@@ -22,6 +28,12 @@ int cmp_subpixel_aa_create(cmp_subpixel_aa_t **out_ctx) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_subpixel_aa_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_subpixel_aa_destroy(cmp_subpixel_aa_t *ctx) {
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -29,6 +41,13 @@ int cmp_subpixel_aa_destroy(cmp_subpixel_aa_t *ctx) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_subpixel_aa_enable
+ *
+ * @param ctx Parameter description.
+ * @param enable Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_subpixel_aa_enable(cmp_subpixel_aa_t *ctx, int enable) {
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -36,6 +55,13 @@ int cmp_subpixel_aa_enable(cmp_subpixel_aa_t *ctx, int enable) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_subpixel_aa_is_enabled
+ *
+ * @param ctx Parameter description.
+ * @param out_enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_subpixel_aa_is_enabled(cmp_subpixel_aa_t *ctx, int *out_enabled) {
   if (!ctx || !out_enabled)
     return CMP_ERROR_INVALID_ARG;

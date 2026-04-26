@@ -5,6 +5,12 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_grid_ctx_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_ctx_create(cmp_grid_ctx_t **out_ctx) {
   int rc = CMP_SUCCESS;
   cmp_grid_ctx_t *ctx = NULL;
@@ -26,6 +32,12 @@ int cmp_grid_ctx_create(cmp_grid_ctx_t **out_ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_grid_ctx_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_ctx_destroy(cmp_grid_ctx_t *ctx) {
   int rc = CMP_SUCCESS;
 
@@ -55,6 +67,14 @@ int cmp_grid_ctx_destroy(cmp_grid_ctx_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_grid_ctx_add_item
+ *
+ * @param ctx Parameter description.
+ * @param node Parameter description.
+ * @param out_item Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_ctx_add_item(cmp_grid_ctx_t *ctx, cmp_layout_node_t *node,
                           cmp_grid_item_t **out_item) {
   int rc = CMP_SUCCESS;
@@ -96,6 +116,14 @@ int cmp_grid_ctx_add_item(cmp_grid_ctx_t *ctx, cmp_layout_node_t *node,
   return rc;
 }
 
+/**
+ * @brief cmp_grid_track_evaluate
+ *
+ * @param track Parameter description.
+ * @param container_size Parameter description.
+ * @param out_size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_track_evaluate(cmp_grid_track_size_t *track, float container_size,
                             float *out_size) {
   int rc = CMP_SUCCESS;
@@ -130,6 +158,14 @@ int cmp_grid_track_evaluate(cmp_grid_track_size_t *track, float container_size,
   return rc;
 }
 
+/**
+ * @brief cmp_grid_fr_distribute
+ *
+ * @param ctx Parameter description.
+ * @param available_width Parameter description.
+ * @param available_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
                            float available_height) {
   int rc = CMP_SUCCESS;
@@ -200,6 +236,14 @@ int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
   return rc;
 }
 
+/**
+ * @brief cmp_grid_minmax_resolve
+ *
+ * @param track Parameter description.
+ * @param container_size Parameter description.
+ * @param out_size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_minmax_resolve(cmp_grid_track_size_t *track, float container_size,
                             float *out_size) {
   int rc = CMP_SUCCESS;
@@ -219,6 +263,15 @@ int cmp_grid_minmax_resolve(cmp_grid_track_size_t *track, float container_size,
   return rc;
 }
 
+/**
+ * @brief cmp_grid_repeat_expand
+ *
+ * @param track Parameter description.
+ * @param auto_fit Parameter description.
+ * @param container_size Parameter description.
+ * @param out_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_repeat_expand(cmp_grid_track_size_t *track, int auto_fit,
                            float container_size, int *out_count) {
   int rc = CMP_SUCCESS;
@@ -241,6 +294,16 @@ int cmp_grid_repeat_expand(cmp_grid_track_size_t *track, int auto_fit,
   return rc;
 }
 
+/**
+ * @brief cmp_grid_placement_resolve
+ *
+ * @param start Parameter description.
+ * @param end Parameter description.
+ * @param track_count Parameter description.
+ * @param out_start Parameter description.
+ * @param out_end Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_placement_resolve(cmp_grid_placement_t *start,
                                cmp_grid_placement_t *end, int track_count,
                                int *out_start, int *out_end) {
@@ -264,6 +327,17 @@ int cmp_grid_placement_resolve(cmp_grid_placement_t *start,
   return rc;
 }
 
+/**
+ * @brief cmp_grid_area_resolve
+ *
+ * @param ctx Parameter description.
+ * @param name Parameter description.
+ * @param out_row_start Parameter description.
+ * @param out_col_start Parameter description.
+ * @param out_row_end Parameter description.
+ * @param out_col_end Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_area_resolve(cmp_grid_ctx_t *ctx, const char *name,
                           int *out_row_start, int *out_col_start,
                           int *out_row_end, int *out_col_end) {
@@ -293,6 +367,12 @@ int cmp_grid_area_resolve(cmp_grid_ctx_t *ctx, const char *name,
   return rc;
 }
 
+/**
+ * @brief cmp_grid_auto_dense_place
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_auto_dense_place(cmp_grid_ctx_t *ctx) {
   int rc = CMP_SUCCESS;
   size_t i;
@@ -315,6 +395,12 @@ int cmp_grid_auto_dense_place(cmp_grid_ctx_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_grid_auto_sparse_place
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_auto_sparse_place(cmp_grid_ctx_t *ctx) {
   int rc = CMP_SUCCESS;
   size_t i;
@@ -345,6 +431,12 @@ int cmp_grid_auto_sparse_place(cmp_grid_ctx_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_grid_implicit_tracks_generate
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_implicit_tracks_generate(cmp_grid_ctx_t *ctx) {
   int rc = CMP_SUCCESS;
   size_t i;
@@ -394,6 +486,13 @@ int cmp_grid_implicit_tracks_generate(cmp_grid_ctx_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_subgrid_sync
+ *
+ * @param parent Parameter description.
+ * @param child Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_subgrid_sync(cmp_grid_ctx_t *parent, cmp_grid_ctx_t *child) {
   int rc = CMP_SUCCESS;
 
@@ -409,6 +508,15 @@ int cmp_subgrid_sync(cmp_grid_ctx_t *parent, cmp_grid_ctx_t *child) {
   return rc;
 }
 
+/**
+ * @brief cmp_grid_align_evaluate
+ *
+ * @param align Parameter description.
+ * @param track_size Parameter description.
+ * @param item_size Parameter description.
+ * @param out_offset Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_align_evaluate(cmp_grid_align_t align, float track_size,
                             float item_size, float *out_offset) {
   int rc = CMP_SUCCESS;
@@ -438,6 +546,12 @@ int cmp_grid_align_evaluate(cmp_grid_align_t align, float track_size,
   return rc;
 }
 
+/**
+ * @brief cmp_masonry_layout
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_masonry_layout(cmp_grid_ctx_t *ctx) {
   int rc = CMP_SUCCESS;
 
@@ -451,6 +565,14 @@ int cmp_masonry_layout(cmp_grid_ctx_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_grid_gap_apply
+ *
+ * @param ctx Parameter description.
+ * @param out_row_gaps Parameter description.
+ * @param out_col_gaps Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_grid_gap_apply(cmp_grid_ctx_t *ctx, float *out_row_gaps,
                        float *out_col_gaps) {
   int rc = CMP_SUCCESS;

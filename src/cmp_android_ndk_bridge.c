@@ -8,14 +8,21 @@ struct cmp_android_ndk_bridge {
   float total_time;
 };
 
+/**
+ * @brief cmp_android_ndk_bridge_create
+ *
+ * @param out_bridge Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_android_ndk_bridge_create(cmp_android_ndk_bridge_t **out_bridge) {
   cmp_android_ndk_bridge_t *br;
 
+  int rc;
   if (!out_bridge)
     return CMP_ERROR_INVALID_ARG;
 
-  br = (cmp_android_ndk_bridge_t *)malloc(sizeof(cmp_android_ndk_bridge_t));
-  if (!br)
+  rc = CMP_MALLOC(sizeof(cmp_android_ndk_bridge_t), (void **)&br);
+  if (rc != CMP_SUCCESS)
     return CMP_ERROR_OOM;
 
   br->is_running = 1;
@@ -25,13 +32,26 @@ int cmp_android_ndk_bridge_create(cmp_android_ndk_bridge_t **out_bridge) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_android_ndk_bridge_destroy
+ *
+ * @param bridge Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_android_ndk_bridge_destroy(cmp_android_ndk_bridge_t *bridge) {
   if (!bridge)
     return CMP_ERROR_INVALID_ARG;
-  free(bridge);
+  CMP_FREE(bridge);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_android_ndk_bridge_tick
+ *
+ * @param bridge Parameter description.
+ * @param delta_time Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_android_ndk_bridge_tick(cmp_android_ndk_bridge_t *bridge,
                                 float delta_time) {
   if (!bridge)

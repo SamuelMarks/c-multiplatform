@@ -57,22 +57,34 @@ static void update_title_binding(void) {
   }
 
   switch (g_design_lang) {
-  case APP_DESIGN_INHERIT: design_str = "Inherit"; break;
-  case APP_DESIGN_MATERIAL3: design_str = "Material 3"; break;
-  case APP_DESIGN_FLUENT2: design_str = "Fluent 2"; break;
-  case APP_DESIGN_CUPERTINO: design_str = "Cupertino"; break;
-  case APP_DESIGN_UNSTYLED: design_str = "Unstyled"; break;
+  case APP_DESIGN_INHERIT:
+    design_str = "Inherit";
+    break;
+  case APP_DESIGN_MATERIAL3:
+    design_str = "Material 3";
+    break;
+  case APP_DESIGN_FLUENT2:
+    design_str = "Fluent 2";
+    break;
+  case APP_DESIGN_CUPERTINO:
+    design_str = "Cupertino";
+    break;
+  case APP_DESIGN_UNSTYLED:
+    design_str = "Unstyled";
+    break;
   }
 
   if (g_lang == APP_LANG_HE) {
 #if defined(_MSC_VER)
-    sprintf_s(buf, sizeof(buf), "\xD7\xA2\xD7\x99\xD7\xA6\xD7\x95\xD7\x91 %s", design_str);
+    sprintf_s(buf, sizeof(buf), "\xD7\xA2\xD7\x99\xD7\xA6\xD7\x95\xD7\x91 %s",
+              design_str);
 #else
     sprintf(buf, "\xD7\xA2\xD7\x99\xD7\xA6\xD7\x95\xD7\x91 %s", design_str);
 #endif
   } else if (g_lang == APP_LANG_AR) {
 #if defined(_MSC_VER)
-    sprintf_s(buf, sizeof(buf), "\xD8\xAA\xD8\xB5\xD9\x85\xD9\x8A\xD9\x85 %s", design_str);
+    sprintf_s(buf, sizeof(buf), "\xD8\xAA\xD8\xB5\xD9\x85\xD9\x8A\xD9\x85 %s",
+              design_str);
 #else
     sprintf(buf, "\xD8\xAA\xD8\xB5\xD9\x85\xD9\x8A\xD9\x85 %s", design_str);
 #endif

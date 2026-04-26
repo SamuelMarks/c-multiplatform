@@ -4,6 +4,14 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_m3_chip_resolve
+ *
+ * @param variant Parameter description.
+ * @param is_elevated Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_chip_resolve(cmp_m3_chip_variant_t variant, int is_elevated,
                         cmp_m3_chip_metrics_t *out_metrics) {
   if (!out_metrics)
@@ -35,6 +43,13 @@ int cmp_m3_chip_resolve(cmp_m3_chip_variant_t variant, int is_elevated,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_list_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_list_resolve(cmp_m3_list_variant_t variant,
                         cmp_m3_list_metrics_t *out_metrics) {
   if (!out_metrics)
@@ -60,6 +75,13 @@ int cmp_m3_list_resolve(cmp_m3_list_variant_t variant,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_carousel_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_carousel_resolve(cmp_m3_carousel_variant_t variant,
                             cmp_m3_carousel_metrics_t *out_metrics) {
   if (!out_metrics)

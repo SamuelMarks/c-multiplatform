@@ -10,6 +10,13 @@ struct cmp_edge_swipe {
   float pop_progress;
 };
 
+/**
+ * @brief cmp_gesture_require_failure
+ *
+ * @param primary_gesture Parameter description.
+ * @param other_gesture_to_fail Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gesture_require_failure(cmp_gesture_t *primary_gesture,
                                 cmp_gesture_t *other_gesture_to_fail) {
   int rc = CMP_SUCCESS;
@@ -25,6 +32,14 @@ int cmp_gesture_require_failure(cmp_gesture_t *primary_gesture,
   return rc;
 }
 
+/**
+ * @brief cmp_complex_gesture_set_zoom_limits
+ *
+ * @param gesture_opaque Parameter description.
+ * @param min_scale Parameter description.
+ * @param max_scale Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_complex_gesture_set_zoom_limits(cmp_complex_gesture_t *gesture_opaque,
                                         float min_scale, float max_scale) {
   int rc = CMP_SUCCESS;
@@ -39,6 +54,15 @@ int cmp_complex_gesture_set_zoom_limits(cmp_complex_gesture_t *gesture_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_complex_gesture_get_zoom
+ *
+ * @param gesture_opaque Parameter description.
+ * @param out_centroid_x Parameter description.
+ * @param out_centroid_y Parameter description.
+ * @param out_scale Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_complex_gesture_get_zoom(const cmp_complex_gesture_t *gesture_opaque,
                                  float *out_centroid_x, float *out_centroid_y,
                                  float *out_scale) {
@@ -57,6 +81,13 @@ int cmp_complex_gesture_get_zoom(const cmp_complex_gesture_t *gesture_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_complex_gesture_set_rotation_snapping
+ *
+ * @param gesture_opaque Parameter description.
+ * @param enable_snapping Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_complex_gesture_set_rotation_snapping(
     cmp_complex_gesture_t *gesture_opaque, int enable_snapping) {
   int rc = CMP_SUCCESS;
@@ -71,6 +102,13 @@ int cmp_complex_gesture_set_rotation_snapping(
   return rc;
 }
 
+/**
+ * @brief cmp_complex_gesture_get_rotation
+ *
+ * @param gesture_opaque Parameter description.
+ * @param out_radians Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_complex_gesture_get_rotation(
     const cmp_complex_gesture_t *gesture_opaque, float *out_radians) {
   int rc = CMP_SUCCESS;
@@ -84,6 +122,13 @@ int cmp_complex_gesture_get_rotation(
   return rc;
 }
 
+/**
+ * @brief cmp_edge_swipe_create
+ *
+ * @param out_swipe Parameter description.
+ * @param router Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_edge_swipe_create(cmp_edge_swipe_t **out_swipe, cmp_router_t *router) {
   int rc = CMP_SUCCESS;
   struct cmp_edge_swipe *ctx = NULL;
@@ -107,6 +152,12 @@ int cmp_edge_swipe_create(cmp_edge_swipe_t **out_swipe, cmp_router_t *router) {
   return rc;
 }
 
+/**
+ * @brief cmp_edge_swipe_destroy
+ *
+ * @param swipe_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_edge_swipe_destroy(cmp_edge_swipe_t *swipe_opaque) {
   int rc = CMP_SUCCESS;
 
@@ -116,6 +167,15 @@ int cmp_edge_swipe_destroy(cmp_edge_swipe_t *swipe_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_edge_swipe_process
+ *
+ * @param swipe_opaque Parameter description.
+ * @param touch_x Parameter description.
+ * @param screen_width Parameter description.
+ * @param state Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_edge_swipe_process(cmp_edge_swipe_t *swipe_opaque, float touch_x,
                            float screen_width, cmp_gesture_state_t state) {
   int rc = CMP_SUCCESS;
@@ -153,6 +213,13 @@ int cmp_edge_swipe_process(cmp_edge_swipe_t *swipe_opaque, float touch_x,
   return rc;
 }
 
+/**
+ * @brief cmp_gesture_cancel_on_system_override
+ *
+ * @param gesture_opaque Parameter description.
+ * @param active_touches_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_gesture_cancel_on_system_override(cmp_gesture_t *gesture_opaque,
                                           int active_touches_count) {
   int rc = CMP_SUCCESS;

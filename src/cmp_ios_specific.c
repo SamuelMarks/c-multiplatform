@@ -8,6 +8,12 @@ struct cmp_ios_features {
   int is_ready;
 };
 
+/**
+ * @brief cmp_ios_features_create
+ *
+ * @param out_features Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ios_features_create(cmp_ios_features_t **out_features) {
   int rc = CMP_SUCCESS;
   struct cmp_ios_features *ctx = NULL;
@@ -29,6 +35,12 @@ int cmp_ios_features_create(cmp_ios_features_t **out_features) {
   return rc;
 }
 
+/**
+ * @brief cmp_ios_features_destroy
+ *
+ * @param features_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ios_features_destroy(cmp_ios_features_t *features_opaque) {
   int rc = CMP_SUCCESS;
 
@@ -38,6 +50,15 @@ int cmp_ios_features_destroy(cmp_ios_features_t *features_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_ios_calculate_keyboard_avoidance
+ *
+ * @param keyboard_height Parameter description.
+ * @param input_y Parameter description.
+ * @param view_height Parameter description.
+ * @param out_scroll_adjustment Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ios_calculate_keyboard_avoidance(float keyboard_height, float input_y,
                                          float view_height,
                                          float *out_scroll_adjustment) {
@@ -66,6 +87,14 @@ int cmp_ios_calculate_keyboard_avoidance(float keyboard_height, float input_y,
   return rc;
 }
 
+/**
+ * @brief cmp_ios_evaluate_pull_to_refresh
+ *
+ * @param current_overscroll_y Parameter description.
+ * @param out_spinner_opacity Parameter description.
+ * @param out_should_trigger Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ios_evaluate_pull_to_refresh(float current_overscroll_y,
                                      float *out_spinner_opacity,
                                      int *out_should_trigger) {
@@ -96,6 +125,14 @@ int cmp_ios_evaluate_pull_to_refresh(float current_overscroll_y,
   return rc;
 }
 
+/**
+ * @brief cmp_ios_evaluate_sheet_detent_snap
+ *
+ * @param current_y Parameter description.
+ * @param screen_height Parameter description.
+ * @param out_snapped_detent Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ios_evaluate_sheet_detent_snap(float current_y, float screen_height,
                                        cmp_sheet_detent_t *out_snapped_detent) {
   int rc = CMP_SUCCESS;
@@ -125,6 +162,13 @@ int cmp_ios_evaluate_sheet_detent_snap(float current_y, float screen_height,
   return rc;
 }
 
+/**
+ * @brief cmp_ios_mitigate_reachability_offset
+ *
+ * @param io_touch_y Parameter description.
+ * @param reachability_offset Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ios_mitigate_reachability_offset(float *io_touch_y,
                                          float reachability_offset) {
   int rc = CMP_SUCCESS;
@@ -144,6 +188,13 @@ int cmp_ios_mitigate_reachability_offset(float *io_touch_y,
   return rc;
 }
 
+/**
+ * @brief cmp_ios_evaluate_context_menu_peek
+ *
+ * @param pressure Parameter description.
+ * @param out_preview_scale Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ios_evaluate_context_menu_peek(float pressure,
                                        float *out_preview_scale) {
   int rc = CMP_SUCCESS;

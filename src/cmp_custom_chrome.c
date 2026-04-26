@@ -5,6 +5,11 @@
 
 static cmp_app_region_t *g_chrome_region = NULL;
 
+/**
+ * @brief cmp_custom_chrome_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_custom_chrome_init(void) {
   int rc = CMP_SUCCESS;
 
@@ -31,6 +36,11 @@ int cmp_custom_chrome_init(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_custom_chrome_cleanup
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_custom_chrome_cleanup(void) {
   int rc = CMP_SUCCESS;
 

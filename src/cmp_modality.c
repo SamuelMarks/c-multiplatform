@@ -34,8 +34,20 @@ typedef struct cmp_modality_threaded_state {
 } cmp_modality_sync_multi_state_t;
 
 #if defined(_WIN32)
+/**
+ * @brief cmp_worker_thread_func
+ *
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static unsigned long __stdcall cmp_worker_thread_func(void *arg) {
 #else
+/**
+ * @brief cmp_worker_thread_func
+ *
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void *cmp_worker_thread_func(void *arg) {
 #endif
   cmp_modality_sync_multi_state_t *state =
@@ -64,6 +76,13 @@ static void *cmp_worker_thread_func(void *arg) {
 #endif
 }
 
+/**
+ * @brief cmp_modality_sync_multi_init
+ *
+ * @param mod Parameter description.
+ * @param num_workers Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_modality_sync_multi_init(cmp_modality_t *mod, int num_workers) {
   cmp_modality_sync_multi_state_t *state;
   int res;
@@ -112,6 +131,12 @@ int cmp_modality_sync_multi_init(cmp_modality_t *mod, int num_workers) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_modality_async_single_init
+ *
+ * @param mod Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_modality_async_single_init(cmp_modality_t *mod) {
   if (mod == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -119,6 +144,12 @@ int cmp_modality_async_single_init(cmp_modality_t *mod) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_modality_async_multi_init
+ *
+ * @param mod Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_modality_async_multi_init(cmp_modality_t *mod) {
   if (mod == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -126,6 +157,12 @@ int cmp_modality_async_multi_init(cmp_modality_t *mod) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_modality_sync_single_init
+ *
+ * @param mod Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_modality_sync_single_init(cmp_modality_t *mod) {
   cmp_modality_single_state_t *state;
   int res;
@@ -149,6 +186,14 @@ int cmp_modality_sync_single_init(cmp_modality_t *mod) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_modality_queue_task
+ *
+ * @param mod Parameter description.
+ * @param task Parameter description.
+ * @param arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_modality_queue_task(cmp_modality_t *mod, cmp_task_fn_t task,
                             void *arg) {
   cmp_modality_single_state_t *state;
@@ -203,6 +248,12 @@ int cmp_modality_queue_task(cmp_modality_t *mod, cmp_task_fn_t task,
   return CMP_ERROR_INVALID_ARG;
 }
 
+/**
+ * @brief cmp_modality_run
+ *
+ * @param mod Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_modality_run(cmp_modality_t *mod) {
   int rc = CMP_SUCCESS;
   cmp_modality_single_state_t *state = NULL;
@@ -264,6 +315,12 @@ int cmp_modality_run(cmp_modality_t *mod) {
   return rc;
 }
 
+/**
+ * @brief cmp_modality_stop
+ *
+ * @param mod Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_modality_stop(cmp_modality_t *mod) {
   int rc = CMP_SUCCESS;
   if (mod == NULL) {
@@ -276,6 +333,12 @@ int cmp_modality_stop(cmp_modality_t *mod) {
   return rc;
 }
 
+/**
+ * @brief cmp_modality_destroy
+ *
+ * @param mod Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_modality_destroy(cmp_modality_t *mod) {
   int rc = CMP_SUCCESS;
   if (mod == NULL || mod->internal_state == NULL) {
@@ -348,6 +411,12 @@ int cmp_modality_destroy(cmp_modality_t *mod) {
   return rc;
 }
 
+/**
+ * @brief cmp_app_init
+ *
+ * @param config Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_app_init(cmp_app_config_t *config) {
   int rc = CMP_SUCCESS;
   if (config == NULL) {
@@ -358,12 +427,27 @@ int cmp_app_init(cmp_app_config_t *config) {
   return rc;
 }
 
+/**
+ * @brief cmp_run_loop
+ *
+ * @param user_tick Parameter description.
+ * @param user_arg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 void cmp_run_loop(cmp_run_loop_fn user_tick, void *user_arg) {
   if (user_tick) {
     user_tick(user_arg);
   }
 }
 
+/**
+ * @brief cmp_msg_subscribe
+ *
+ * @param bus Parameter description.
+ * @param channel Parameter description.
+ * @param callback Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_msg_subscribe(cmp_msg_bus_t *bus, const char *channel, void *callback) {
   int rc = CMP_SUCCESS;
   if (!bus || !channel || !callback) {
@@ -375,6 +459,14 @@ int cmp_msg_subscribe(cmp_msg_bus_t *bus, const char *channel, void *callback) {
   return rc;
 }
 
+/**
+ * @brief cmp_msg_publish
+ *
+ * @param bus Parameter description.
+ * @param channel Parameter description.
+ * @param msg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_msg_publish(cmp_msg_bus_t *bus, const char *channel,
                     const cmp_msg_t *msg) {
   int rc = CMP_SUCCESS;
@@ -387,6 +479,16 @@ int cmp_msg_publish(cmp_msg_bus_t *bus, const char *channel,
   return rc;
 }
 
+/**
+ * @brief cmp_actor_spawn
+ *
+ * @param bus Parameter description.
+ * @param name Parameter description.
+ * @param handler Parameter description.
+ * @param state Parameter description.
+ * @param actor Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_actor_spawn(cmp_msg_bus_t *bus, const char *name, void *handler,
                     void *state, cmp_actor_t **actor) {
   int rc = CMP_SUCCESS;
@@ -400,6 +502,12 @@ int cmp_actor_spawn(cmp_msg_bus_t *bus, const char *name, void *handler,
   return rc;
 }
 
+/**
+ * @brief cmp_actor_supervise
+ *
+ * @param actor Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_actor_supervise(cmp_actor_t *actor) {
   int rc = CMP_SUCCESS;
   if (!actor) {
@@ -410,6 +518,12 @@ int cmp_actor_supervise(cmp_actor_t *actor) {
   return rc;
 }
 
+/**
+ * @brief cmp_modality_greenthreads_init
+ *
+ * @param mod Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_modality_greenthreads_init(cmp_modality_t *mod) {
   int rc = CMP_SUCCESS;
   if (mod == NULL) {
@@ -424,6 +538,12 @@ int cmp_modality_greenthreads_init(cmp_modality_t *mod) {
   return rc;
 }
 
+/**
+ * @brief cmp_modality_multiprocess_init
+ *
+ * @param mod Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_modality_multiprocess_init(cmp_modality_t *mod) {
   int rc = CMP_SUCCESS;
   if (mod == NULL) {

@@ -9,6 +9,12 @@ struct cmp_selection {
   int end_index;
 };
 
+/**
+ * @brief cmp_selection_create
+ *
+ * @param out_selection Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_selection_create(cmp_selection_t **out_selection) {
   struct cmp_selection *selection;
 
@@ -25,6 +31,12 @@ int cmp_selection_create(cmp_selection_t **out_selection) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_selection_destroy
+ *
+ * @param selection Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_selection_destroy(cmp_selection_t *selection) {
   struct cmp_selection *internal_selection = (struct cmp_selection *)selection;
   if (!internal_selection)

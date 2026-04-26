@@ -10,6 +10,12 @@ struct cmp_context_menu {
   void *user_data;
 };
 
+/**
+ * @brief cmp_context_menu_create
+ *
+ * @param out_menu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_context_menu_create(cmp_context_menu_t **out_menu) {
   int rc = CMP_SUCCESS;
   struct cmp_context_menu *ctx = NULL;
@@ -33,6 +39,12 @@ int cmp_context_menu_create(cmp_context_menu_t **out_menu) {
   return rc;
 }
 
+/**
+ * @brief cmp_context_menu_destroy
+ *
+ * @param menu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_context_menu_destroy(cmp_context_menu_t *menu) {
   int rc = CMP_SUCCESS;
   struct cmp_context_menu *ctx = (struct cmp_context_menu *)menu;
@@ -48,6 +60,14 @@ int cmp_context_menu_destroy(cmp_context_menu_t *menu) {
   return rc;
 }
 
+/**
+ * @brief cmp_context_menu_set_callback
+ *
+ * @param menu Parameter description.
+ * @param callback Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_context_menu_set_callback(cmp_context_menu_t *menu,
                                   cmp_context_menu_cb_t callback,
                                   void *user_data) {
@@ -71,6 +91,13 @@ int cmp_context_menu_set_callback(cmp_context_menu_t *menu,
   return rc;
 }
 
+/**
+ * @brief cmp_context_menu_process_event
+ *
+ * @param menu Parameter description.
+ * @param event Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_context_menu_process_event(cmp_context_menu_t *menu,
                                    const cmp_event_t *event) {
   int rc = CMP_SUCCESS;

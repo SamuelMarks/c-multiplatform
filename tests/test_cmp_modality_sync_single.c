@@ -46,7 +46,34 @@ TEST test_modality_single_lifecycle(void) {
   PASS();
 }
 
-SUITE(modality_suite) { RUN_TEST(test_modality_single_lifecycle); }
+TEST test_modality_null_args(void) {
+  cmp_modality_t mod;
+  cmp_modality_sync_single_init(&mod);
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_sync_single_init(NULL),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_sync_multi_init(NULL, 1),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_async_single_init(NULL),
+                "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_destroy(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_run(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_stop(NULL), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_modality_queue_task(NULL, test_task_increment, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_modality_queue_task(&mod, NULL, NULL), "%d");
+
+  cmp_modality_destroy(&mod);
+  PASS();
+}
+
+SUITE(modality_suite) {
+  RUN_TEST(test_modality_single_lifecycle);
+  RUN_TEST(test_modality_null_args);
+}
 
 GREATEST_MAIN_DEFS();
 

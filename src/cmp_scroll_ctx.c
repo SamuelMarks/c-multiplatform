@@ -9,6 +9,12 @@ struct cmp_scroll_ctx {
   float scroll_left;
 };
 
+/**
+ * @brief cmp_scroll_ctx_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_ctx_create(cmp_scroll_ctx_t **out_ctx) {
   struct cmp_scroll_ctx *ctx;
 
@@ -24,6 +30,12 @@ int cmp_scroll_ctx_create(cmp_scroll_ctx_t **out_ctx) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_ctx_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_ctx_destroy(cmp_scroll_ctx_t *ctx) {
   struct cmp_scroll_ctx *internal_ctx = (struct cmp_scroll_ctx *)ctx;
 
@@ -34,6 +46,14 @@ int cmp_scroll_ctx_destroy(cmp_scroll_ctx_t *ctx) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_ctx_get_offset
+ *
+ * @param ctx Parameter description.
+ * @param out_x Parameter description.
+ * @param out_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_ctx_get_offset(const cmp_scroll_ctx_t *ctx, float *out_x,
                               float *out_y) {
   const struct cmp_scroll_ctx *internal_ctx =
@@ -51,6 +71,14 @@ int cmp_scroll_ctx_get_offset(const cmp_scroll_ctx_t *ctx, float *out_x,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_ctx_set_offset
+ *
+ * @param ctx Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_ctx_set_offset(cmp_scroll_ctx_t *ctx, float x, float y) {
   struct cmp_scroll_ctx *internal_ctx = (struct cmp_scroll_ctx *)ctx;
 
@@ -63,6 +91,13 @@ int cmp_scroll_ctx_set_offset(cmp_scroll_ctx_t *ctx, float x, float y) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_scroll_ctx_inject_to_gpu
+ *
+ * @param ctx Parameter description.
+ * @param ubo Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_ctx_inject_to_gpu(const cmp_scroll_ctx_t *ctx, cmp_ubo_t *ubo) {
   const struct cmp_scroll_ctx *internal_ctx =
       (const struct cmp_scroll_ctx *)ctx;

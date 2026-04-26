@@ -12,6 +12,13 @@ struct cmp_ui_progress_indicator {
   float progress;
 };
 
+/**
+ * @brief cmp_ui_progress_indicator_create
+ *
+ * @param out_indicator Parameter description.
+ * @param type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_progress_indicator_create(
     cmp_ui_progress_indicator_t **out_indicator,
     cmp_ui_progress_indicator_type_t type) {
@@ -57,6 +64,12 @@ int cmp_ui_progress_indicator_create(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_progress_indicator_destroy
+ *
+ * @param indicator Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_progress_indicator_destroy(cmp_ui_progress_indicator_t *indicator) {
   if (!indicator) {
     return CMP_ERROR_INVALID_ARG;
@@ -65,6 +78,13 @@ int cmp_ui_progress_indicator_destroy(cmp_ui_progress_indicator_t *indicator) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_progress_indicator_get_node
+ *
+ * @param indicator Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_progress_indicator_get_node(cmp_ui_progress_indicator_t *indicator,
                                        cmp_ui_node_t **out_node) {
   if (!indicator || !out_node) {
@@ -74,6 +94,13 @@ int cmp_ui_progress_indicator_get_node(cmp_ui_progress_indicator_t *indicator,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_progress_indicator_set_progress
+ *
+ * @param indicator Parameter description.
+ * @param progress Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_progress_indicator_set_progress(
     cmp_ui_progress_indicator_t *indicator, float progress) {
   if (!indicator) {
@@ -93,6 +120,13 @@ int cmp_ui_progress_indicator_set_progress(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_progress_indicator_set_type
+ *
+ * @param indicator Parameter description.
+ * @param new_type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_progress_indicator_set_type(
     cmp_ui_progress_indicator_t *indicator,
     cmp_ui_progress_indicator_type_t new_type) {
@@ -108,6 +142,13 @@ int cmp_ui_progress_indicator_set_type(
 
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_ui_progress_indicator_bind_a11y
+ *
+ * @param widget Parameter description.
+ * @param tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_progress_indicator_bind_a11y(cmp_ui_progress_indicator_t *widget,
                                         cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {

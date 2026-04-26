@@ -3,6 +3,13 @@
 #include "cmp_log.h"
 /* clang-format on */
 
+/**
+ * @brief cmp_dt_update
+ *
+ * @param dt Parameter description.
+ * @param current_time_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dt_update(cmp_dt_t *dt, double current_time_ms) {
   int rc = CMP_SUCCESS;
 

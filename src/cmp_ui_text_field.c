@@ -12,6 +12,13 @@ struct cmp_ui_text_field {
   char *value;
 };
 
+/**
+ * @brief cmp_ui_text_field_create
+ *
+ * @param out_field Parameter description.
+ * @param label Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_text_field_create(cmp_ui_text_field_t **out_field,
                              const char *label) {
   cmp_ui_text_field_t *field;
@@ -61,6 +68,12 @@ int cmp_ui_text_field_create(cmp_ui_text_field_t **out_field,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_text_field_destroy
+ *
+ * @param field Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_text_field_destroy(cmp_ui_text_field_t *field) {
   if (!field) {
     return CMP_ERROR_INVALID_ARG;
@@ -73,6 +86,13 @@ int cmp_ui_text_field_destroy(cmp_ui_text_field_t *field) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_text_field_get_node
+ *
+ * @param field Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_text_field_get_node(cmp_ui_text_field_t *field,
                                cmp_ui_node_t **out_node) {
   if (!field || !out_node) {
@@ -82,6 +102,13 @@ int cmp_ui_text_field_get_node(cmp_ui_text_field_t *field,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_text_field_set_value
+ *
+ * @param field Parameter description.
+ * @param value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_text_field_set_value(cmp_ui_text_field_t *field, const char *value) {
   size_t len;
   int err;
@@ -110,6 +137,13 @@ int cmp_ui_text_field_set_value(cmp_ui_text_field_t *field, const char *value) {
 
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_ui_text_field_bind_a11y
+ *
+ * @param widget Parameter description.
+ * @param tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_text_field_bind_a11y(cmp_ui_text_field_t *widget,
                                 cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {

@@ -4,6 +4,13 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_m3_text_field_resolve
+ *
+ * @param variant Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_text_field_resolve(cmp_m3_text_field_variant_t variant,
                               cmp_m3_text_field_metrics_t *out_metrics) {
   if (!out_metrics)

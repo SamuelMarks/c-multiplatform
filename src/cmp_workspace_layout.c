@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 /* clang-format on */
 
@@ -11,15 +12,24 @@ struct cmp_workspace_layout {
   int sidebar_glass_enabled;
 };
 
+/**
+ * @brief cmp_workspace_layout_create
+ *
+ * @param out_layout Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_workspace_layout_create(cmp_workspace_layout_t **out_layout) {
   cmp_workspace_layout_t *layout;
+  int rc;
 
   if (!out_layout) {
+    LOG_DEBUG("cmp_workspace_layout_create: out_layout is NULL\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
-  layout = (cmp_workspace_layout_t *)malloc(sizeof(cmp_workspace_layout_t));
-  if (!layout) {
+  rc = CMP_MALLOC(sizeof(cmp_workspace_layout_t), (void **)&layout);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_workspace_layout_create: OOM\n");
     return CMP_ERROR_OOM;
   }
 
@@ -34,18 +44,40 @@ int cmp_workspace_layout_create(cmp_workspace_layout_t **out_layout) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_workspace_layout_destroy
+ *
+ * @param layout Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_workspace_layout_destroy(cmp_workspace_layout_t *layout) {
+  int rc;
+
   if (!layout) {
+    LOG_DEBUG("cmp_workspace_layout_destroy: layout is NULL\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
-  free(layout);
+  rc = CMP_FREE(layout);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_workspace_layout_destroy: CMP_FREE failed\n");
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_workspace_layout_set_pane_width
+ *
+ * @param layout Parameter description.
+ * @param pane Parameter description.
+ * @param width Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_workspace_layout_set_pane_width(cmp_workspace_layout_t *layout,
                                         cmp_pane_type_t pane, float width) {
   if (!layout || pane >= CMP_PANE_COUNT) {
+    LOG_DEBUG("cmp_workspace_layout_set_pane_width: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
@@ -57,10 +89,19 @@ int cmp_workspace_layout_set_pane_width(cmp_workspace_layout_t *layout,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_workspace_layout_get_pane_width
+ *
+ * @param layout Parameter description.
+ * @param pane Parameter description.
+ * @param out_width Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_workspace_layout_get_pane_width(const cmp_workspace_layout_t *layout,
                                         cmp_pane_type_t pane,
                                         float *out_width) {
   if (!layout || pane >= CMP_PANE_COUNT || !out_width) {
+    LOG_DEBUG("cmp_workspace_layout_get_pane_width: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
@@ -68,9 +109,17 @@ int cmp_workspace_layout_get_pane_width(const cmp_workspace_layout_t *layout,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_workspace_layout_set_sidebar_glass
+ *
+ * @param layout Parameter description.
+ * @param enable_glass Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_workspace_layout_set_sidebar_glass(cmp_workspace_layout_t *layout,
                                            int enable_glass) {
   if (!layout) {
+    LOG_DEBUG("cmp_workspace_layout_set_sidebar_glass: layout is NULL\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
@@ -78,12 +127,22 @@ int cmp_workspace_layout_set_sidebar_glass(cmp_workspace_layout_t *layout,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_workspace_layout_hit_test_splitters
+ *
+ * @param layout Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @param out_is_over_splitter Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_workspace_layout_hit_test_splitters(
     const cmp_workspace_layout_t *layout, float x, float y,
     int *out_is_over_splitter) {
   float s1_x, s2_x;
 
   if (!layout || !out_is_over_splitter) {
+    LOG_DEBUG("cmp_workspace_layout_hit_test_splitters: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
 

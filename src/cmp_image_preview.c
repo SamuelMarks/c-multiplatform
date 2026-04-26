@@ -9,6 +9,12 @@ struct cmp_image_preview {
   int flags;
 };
 
+/**
+ * @brief cmp_image_preview_create
+ *
+ * @param out_preview Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_image_preview_create(cmp_image_preview_t **out_preview) {
   int rc = CMP_SUCCESS;
   cmp_image_preview_t *preview = NULL;
@@ -30,6 +36,12 @@ int cmp_image_preview_create(cmp_image_preview_t **out_preview) {
   return rc;
 }
 
+/**
+ * @brief cmp_image_preview_destroy
+ *
+ * @param preview Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_image_preview_destroy(cmp_image_preview_t *preview) {
   int rc = CMP_SUCCESS;
 
@@ -42,6 +54,12 @@ int cmp_image_preview_destroy(cmp_image_preview_t *preview) {
   return rc;
 }
 
+/**
+ * @brief get_base64_val
+ *
+ * @param c Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static int get_base64_val(char c) {
   if (c >= 'A' && c <= 'Z')
     return c - 'A';
@@ -56,6 +74,16 @@ static int get_base64_val(char c) {
   return -1;
 }
 
+/**
+ * @brief cmp_image_preview_load_base64
+ *
+ * @param preview Parameter description.
+ * @param base64_data Parameter description.
+ * @param out_raw_pixels Parameter description.
+ * @param out_width Parameter description.
+ * @param out_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
                                   const char *base64_data,
                                   unsigned char **out_raw_pixels,
@@ -130,6 +158,12 @@ int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
   return rc;
 }
 
+/**
+ * @brief cmp_image_preview_free_pixels
+ *
+ * @param pixels Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_image_preview_free_pixels(unsigned char *pixels) {
   int rc = CMP_SUCCESS;
   if (pixels) {

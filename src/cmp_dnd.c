@@ -12,6 +12,12 @@ struct cmp_dnd {
   cmp_dnd_op_t operation;
 };
 
+/**
+ * @brief cmp_dnd_create
+ *
+ * @param out_dnd Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dnd_create(cmp_dnd_t **out_dnd) {
   int rc = CMP_SUCCESS;
   cmp_dnd_t *dnd = NULL;
@@ -34,6 +40,12 @@ int cmp_dnd_create(cmp_dnd_t **out_dnd) {
   return rc;
 }
 
+/**
+ * @brief cmp_dnd_destroy
+ *
+ * @param dnd_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dnd_destroy(cmp_dnd_t *dnd_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_dnd *dnd = (struct cmp_dnd *)dnd_opaque;
@@ -57,6 +69,13 @@ int cmp_dnd_destroy(cmp_dnd_t *dnd_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_dnd_set_payload_text
+ *
+ * @param dnd_opaque Parameter description.
+ * @param text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dnd_set_payload_text(cmp_dnd_t *dnd_opaque, const char *text) {
   int rc = CMP_SUCCESS;
   struct cmp_dnd *dnd = (struct cmp_dnd *)dnd_opaque;
@@ -104,6 +123,13 @@ int cmp_dnd_set_payload_text(cmp_dnd_t *dnd_opaque, const char *text) {
   return rc;
 }
 
+/**
+ * @brief cmp_dnd_get_payload_text
+ *
+ * @param dnd_opaque Parameter description.
+ * @param out_text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dnd_get_payload_text(const cmp_dnd_t *dnd_opaque, char **out_text) {
   int rc = CMP_SUCCESS;
   const struct cmp_dnd *dnd = (const struct cmp_dnd *)dnd_opaque;
@@ -135,6 +161,13 @@ int cmp_dnd_get_payload_text(const cmp_dnd_t *dnd_opaque, char **out_text) {
   return rc;
 }
 
+/**
+ * @brief cmp_dnd_set_operation
+ *
+ * @param dnd_opaque Parameter description.
+ * @param op Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dnd_set_operation(cmp_dnd_t *dnd_opaque, cmp_dnd_op_t op) {
   int rc = CMP_SUCCESS;
   struct cmp_dnd *dnd = (struct cmp_dnd *)dnd_opaque;
@@ -149,6 +182,13 @@ int cmp_dnd_set_operation(cmp_dnd_t *dnd_opaque, cmp_dnd_op_t op) {
   return rc;
 }
 
+/**
+ * @brief cmp_dnd_get_operation
+ *
+ * @param dnd_opaque Parameter description.
+ * @param out_op Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dnd_get_operation(const cmp_dnd_t *dnd_opaque, cmp_dnd_op_t *out_op) {
   int rc = CMP_SUCCESS;
   const struct cmp_dnd *dnd = (const struct cmp_dnd *)dnd_opaque;
@@ -163,6 +203,14 @@ int cmp_dnd_get_operation(const cmp_dnd_t *dnd_opaque, cmp_dnd_op_t *out_op) {
   return rc;
 }
 
+/**
+ * @brief cmp_dnd_evaluate_lift_animation
+ *
+ * @param progress Parameter description.
+ * @param out_scale Parameter description.
+ * @param out_shadow_opacity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dnd_evaluate_lift_animation(float progress, float *out_scale,
                                     float *out_shadow_opacity) {
   int rc = CMP_SUCCESS;
@@ -186,6 +234,13 @@ int cmp_dnd_evaluate_lift_animation(float progress, float *out_scale,
   return rc;
 }
 
+/**
+ * @brief cmp_dnd_add_item_to_stack
+ *
+ * @param dnd_opaque Parameter description.
+ * @param additional_payload_text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dnd_add_item_to_stack(cmp_dnd_t *dnd_opaque,
                               const char *additional_payload_text) {
   int rc = CMP_SUCCESS;
@@ -235,6 +290,13 @@ int cmp_dnd_add_item_to_stack(cmp_dnd_t *dnd_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_dnd_get_stack_count
+ *
+ * @param dnd_opaque Parameter description.
+ * @param out_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dnd_get_stack_count(const cmp_dnd_t *dnd_opaque, size_t *out_count) {
   int rc = CMP_SUCCESS;
   const struct cmp_dnd *dnd = (const struct cmp_dnd *)dnd_opaque;
@@ -249,6 +311,14 @@ int cmp_dnd_get_stack_count(const cmp_dnd_t *dnd_opaque, size_t *out_count) {
   return rc;
 }
 
+/**
+ * @brief cmp_dnd_evaluate_drop_target_highlight
+ *
+ * @param is_hovered Parameter description.
+ * @param out_expansion_scale Parameter description.
+ * @param out_bg_overlay_opacity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dnd_evaluate_drop_target_highlight(int is_hovered,
                                            float *out_expansion_scale,
                                            float *out_bg_overlay_opacity) {
@@ -272,6 +342,13 @@ int cmp_dnd_evaluate_drop_target_highlight(int is_hovered,
   return rc;
 }
 
+/**
+ * @brief cmp_dnd_evaluate_spring_loading
+ *
+ * @param hover_duration_ms Parameter description.
+ * @param out_should_trigger Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dnd_evaluate_spring_loading(float hover_duration_ms,
                                     int *out_should_trigger) {
   int rc = CMP_SUCCESS;

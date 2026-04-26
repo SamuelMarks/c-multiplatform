@@ -7,6 +7,12 @@ struct cmp_resilience {
   int is_offline;
 };
 
+/**
+ * @brief cmp_resilience_create
+ *
+ * @param out_res Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resilience_create(cmp_resilience_t **out_res) {
   struct cmp_resilience *ctx;
   if (!out_res)
@@ -20,12 +26,25 @@ int cmp_resilience_create(cmp_resilience_t **out_res) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_resilience_destroy
+ *
+ * @param res_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resilience_destroy(cmp_resilience_t *res_opaque) {
   if (res_opaque)
     CMP_FREE(res_opaque);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_resilience_show_empty_state
+ *
+ * @param res_opaque Parameter description.
+ * @param container_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resilience_show_empty_state(cmp_resilience_t *res_opaque,
                                     void *container_node) {
   struct cmp_resilience *ctx = (struct cmp_resilience *)res_opaque;
@@ -36,6 +55,13 @@ int cmp_resilience_show_empty_state(cmp_resilience_t *res_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_resilience_show_loading_skeleton
+ *
+ * @param res_opaque Parameter description.
+ * @param container_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resilience_show_loading_skeleton(cmp_resilience_t *res_opaque,
                                          void *container_node) {
   struct cmp_resilience *ctx = (struct cmp_resilience *)res_opaque;
@@ -47,6 +73,14 @@ int cmp_resilience_show_loading_skeleton(cmp_resilience_t *res_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_resilience_show_non_blocking_error
+ *
+ * @param res_opaque Parameter description.
+ * @param container_node Parameter description.
+ * @param msg Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resilience_show_non_blocking_error(cmp_resilience_t *res_opaque,
                                            void *container_node,
                                            const char *msg) {
@@ -58,6 +92,13 @@ int cmp_resilience_show_non_blocking_error(cmp_resilience_t *res_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_resilience_handle_discard_changes_prompt
+ *
+ * @param res_opaque Parameter description.
+ * @param sheet_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resilience_handle_discard_changes_prompt(cmp_resilience_t *res_opaque,
                                                  void *sheet_node) {
   struct cmp_resilience *ctx = (struct cmp_resilience *)res_opaque;
@@ -68,6 +109,13 @@ int cmp_resilience_handle_discard_changes_prompt(cmp_resilience_t *res_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_resilience_graceful_degradation
+ *
+ * @param res_opaque Parameter description.
+ * @param feature_name Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resilience_graceful_degradation(cmp_resilience_t *res_opaque,
                                         const char *feature_name) {
   struct cmp_resilience *ctx = (struct cmp_resilience *)res_opaque;

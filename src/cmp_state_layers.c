@@ -5,6 +5,13 @@
 #include <math.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_state_layer_update
+ *
+ * @param layer Parameter description.
+ * @param dt_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_state_layer_update(cmp_state_layer_t *layer, float dt_ms) {
   if (!layer)
     return CMP_ERROR_INVALID_ARG;
@@ -31,6 +38,15 @@ CMP_API int cmp_state_layer_update(cmp_state_layer_t *layer, float dt_ms) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_state_layer_trigger_ripple
+ *
+ * @param layer Parameter description.
+ * @param start_x Parameter description.
+ * @param start_y Parameter description.
+ * @param max_radius Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_state_layer_trigger_ripple(cmp_state_layer_t *layer,
                                            float start_x, float start_y,
                                            float max_radius) {
@@ -47,6 +63,14 @@ CMP_API int cmp_state_layer_trigger_ripple(cmp_state_layer_t *layer,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_state_layer_trigger_fluent_reveal
+ *
+ * @param layer Parameter description.
+ * @param pointer_x Parameter description.
+ * @param pointer_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_state_layer_trigger_fluent_reveal(cmp_state_layer_t *layer,
                                                   float pointer_x,
                                                   float pointer_y) {
@@ -62,6 +86,13 @@ CMP_API int cmp_state_layer_trigger_fluent_reveal(cmp_state_layer_t *layer,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_state_layer_apply_vibrancy_mask
+ *
+ * @param layer Parameter description.
+ * @param style Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_state_layer_apply_vibrancy_mask(cmp_state_layer_t *layer,
                                                 cmp_vibrancy_style_t style) {
   if (!layer)

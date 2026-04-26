@@ -8,6 +8,12 @@ struct cmp_developer_experience {
   int debug_hierarchy_active;
 };
 
+/**
+ * @brief cmp_developer_experience_create
+ *
+ * @param out_dx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_developer_experience_create(cmp_developer_experience_t **out_dx) {
   int rc = CMP_SUCCESS;
   struct cmp_developer_experience *ctx = NULL;
@@ -30,6 +36,12 @@ int cmp_developer_experience_create(cmp_developer_experience_t **out_dx) {
   return rc;
 }
 
+/**
+ * @brief cmp_developer_experience_destroy
+ *
+ * @param dx_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_developer_experience_destroy(cmp_developer_experience_t *dx_opaque) {
   int rc = CMP_SUCCESS;
   if (dx_opaque) {
@@ -38,6 +50,14 @@ int cmp_developer_experience_destroy(cmp_developer_experience_t *dx_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_dx_build_declarative_node
+ *
+ * @param dx_opaque Parameter description.
+ * @param type Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dx_build_declarative_node(cmp_developer_experience_t *dx_opaque,
                                   const char *type, void **out_node) {
   int rc = CMP_SUCCESS;
@@ -55,6 +75,14 @@ int cmp_dx_build_declarative_node(cmp_developer_experience_t *dx_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_dx_apply_typed_color
+ *
+ * @param dx_opaque Parameter description.
+ * @param node Parameter description.
+ * @param color_enum_val Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dx_apply_typed_color(cmp_developer_experience_t *dx_opaque, void *node,
                              int color_enum_val) {
   int rc = CMP_SUCCESS;
@@ -71,6 +99,13 @@ int cmp_dx_apply_typed_color(cmp_developer_experience_t *dx_opaque, void *node,
   return rc;
 }
 
+/**
+ * @brief cmp_dx_enable_live_preview
+ *
+ * @param dx_opaque Parameter description.
+ * @param root_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dx_enable_live_preview(cmp_developer_experience_t *dx_opaque,
                                void *root_node) {
   int rc = CMP_SUCCESS;
@@ -87,6 +122,15 @@ int cmp_dx_enable_live_preview(cmp_developer_experience_t *dx_opaque,
   return rc;
 }
 
+/**
+ * @brief cmp_dx_export_debug_hierarchy
+ *
+ * @param dx_opaque Parameter description.
+ * @param root_node Parameter description.
+ * @param out_json Parameter description.
+ * @param max_len Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dx_export_debug_hierarchy(cmp_developer_experience_t *dx_opaque,
                                   void *root_node, char *out_json,
                                   size_t max_len) {

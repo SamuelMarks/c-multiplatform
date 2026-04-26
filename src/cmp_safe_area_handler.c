@@ -1,23 +1,36 @@
 /* clang-format off */
 #include "cmp.h"
 #include <stdlib.h>
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_safe_area_handler {
   cmp_safe_areas_t *areas;
 };
 
+/**
+ * @brief cmp_safe_area_handler_create
+ *
+ * @param out_handler Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_safe_area_handler_create(cmp_safe_area_handler_t **out_handler) {
+  int rc = CMP_SUCCESS;
   cmp_safe_area_handler_t *handler;
   if (!out_handler)
     return CMP_ERROR_INVALID_ARG;
 
-  handler = (cmp_safe_area_handler_t *)malloc(sizeof(cmp_safe_area_handler_t));
-  if (!handler)
+  rc = CMP_MALLOC(sizeof(cmp_safe_area_handler_t), (void **)&(handler));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
+  }
 
   if (cmp_safe_areas_create(&handler->areas) != CMP_SUCCESS) {
-    free(handler);
+    rc = CMP_FREE(handler);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
     return CMP_ERROR_GENERAL;
   }
 
@@ -25,17 +38,38 @@ int cmp_safe_area_handler_create(cmp_safe_area_handler_t **out_handler) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_safe_area_handler_destroy
+ *
+ * @param handler Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_safe_area_handler_destroy(cmp_safe_area_handler_t *handler) {
+  int rc = CMP_SUCCESS;
   if (!handler)
     return CMP_ERROR_INVALID_ARG;
 
   if (handler->areas) {
     cmp_safe_areas_destroy(handler->areas);
   }
-  free(handler);
+  rc = CMP_FREE(handler);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_safe_area_handler_query_insets
+ *
+ * @param handler Parameter description.
+ * @param window Parameter description.
+ * @param out_top Parameter description.
+ * @param out_bottom Parameter description.
+ * @param out_left Parameter description.
+ * @param out_right Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_safe_area_handler_query_insets(cmp_safe_area_handler_t *handler,
                                        cmp_window_t *window, int *out_top,
                                        int *out_bottom, int *out_left,

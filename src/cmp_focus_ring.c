@@ -12,6 +12,13 @@ struct cmp_focus_ring {
   int currently_focused_id;
 };
 
+/**
+ * @brief cmp_focus_ring_create
+ *
+ * @param tree Parameter description.
+ * @param out_ring Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_focus_ring_create(cmp_a11y_tree_t *tree, cmp_focus_ring_t **out_ring) {
   int rc = CMP_SUCCESS;
   struct cmp_focus_ring *ring = NULL;
@@ -36,6 +43,12 @@ int cmp_focus_ring_create(cmp_a11y_tree_t *tree, cmp_focus_ring_t **out_ring) {
   return rc;
 }
 
+/**
+ * @brief cmp_focus_ring_destroy
+ *
+ * @param ring Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_focus_ring_destroy(cmp_focus_ring_t *ring) {
   int rc = CMP_SUCCESS;
   struct cmp_focus_ring *r = (struct cmp_focus_ring *)ring;
@@ -50,6 +63,13 @@ int cmp_focus_ring_destroy(cmp_focus_ring_t *ring) {
   return rc;
 }
 
+/**
+ * @brief cmp_focus_ring_set_keyboard_mode
+ *
+ * @param ring Parameter description.
+ * @param is_keyboard Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_focus_ring_set_keyboard_mode(cmp_focus_ring_t *ring, int is_keyboard) {
   int rc = CMP_SUCCESS;
   struct cmp_focus_ring *r = (struct cmp_focus_ring *)ring;
@@ -73,6 +93,13 @@ int cmp_focus_ring_set_keyboard_mode(cmp_focus_ring_t *ring, int is_keyboard) {
   return rc;
 }
 
+/**
+ * @brief cmp_focus_ring_node_focused
+ *
+ * @param ring Parameter description.
+ * @param node_id Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_focus_ring_node_focused(cmp_focus_ring_t *ring, int node_id) {
   int rc = CMP_SUCCESS;
   struct cmp_focus_ring *r = (struct cmp_focus_ring *)ring;

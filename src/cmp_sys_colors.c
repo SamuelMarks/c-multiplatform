@@ -8,6 +8,12 @@ struct cmp_sys_colors {
   int is_set[CMP_SYS_COLOR_MAX];
 };
 
+/**
+ * @brief cmp_sys_colors_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_sys_colors_create(cmp_sys_colors_t **out_ctx) {
   cmp_sys_colors_t *ctx;
 
@@ -26,6 +32,12 @@ int cmp_sys_colors_create(cmp_sys_colors_t **out_ctx) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_sys_colors_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_sys_colors_destroy(cmp_sys_colors_t *ctx) {
   if (!ctx) {
     return CMP_ERROR_INVALID_ARG;
@@ -34,6 +46,14 @@ int cmp_sys_colors_destroy(cmp_sys_colors_t *ctx) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_sys_colors_set
+ *
+ * @param ctx Parameter description.
+ * @param keyword Parameter description.
+ * @param color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_sys_colors_set(cmp_sys_colors_t *ctx, cmp_sys_color_keyword_t keyword,
                        const cmp_color_t *color) {
   if (!ctx || !color || keyword < 0 || keyword >= CMP_SYS_COLOR_MAX) {
@@ -46,6 +66,14 @@ int cmp_sys_colors_set(cmp_sys_colors_t *ctx, cmp_sys_color_keyword_t keyword,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_sys_colors_resolve
+ *
+ * @param ctx Parameter description.
+ * @param keyword Parameter description.
+ * @param out_color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_sys_colors_resolve(const cmp_sys_colors_t *ctx,
                            cmp_sys_color_keyword_t keyword,
                            cmp_color_t *out_color) {

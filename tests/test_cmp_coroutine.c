@@ -71,7 +71,29 @@ TEST test_coroutine_lifecycle(void) {
   PASS();
 }
 
-SUITE(coroutine_suite) { RUN_TEST(test_coroutine_lifecycle); }
+TEST test_coroutine_null_args(void) {
+  cmp_coroutine_t *co = NULL;
+
+  if (cmp_coroutine_system_init() == CMP_ERROR_NOT_FOUND) {
+    SKIP();
+  }
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_coroutine_create(NULL, 0, test_coroutine_func, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_coroutine_create(&co, 0, NULL, NULL),
+                "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_coroutine_resume(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_coroutine_yield(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_coroutine_destroy(NULL), "%d");
+
+  PASS();
+}
+
+SUITE(coroutine_suite) {
+  RUN_TEST(test_coroutine_lifecycle);
+  RUN_TEST(test_coroutine_null_args);
+}
 
 GREATEST_MAIN_DEFS();
 

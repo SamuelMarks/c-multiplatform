@@ -2,6 +2,7 @@
 #include "cmp.h"
 #include <stdlib.h>
 #include <string.h>
+#include "cmp_log.h"
 /* clang-format on */
 
 #define STATUS_TEXT_MAX 128
@@ -14,15 +15,23 @@ struct cmp_status_bar {
   float vram_used_mb;
 };
 
+/**
+ * @brief cmp_status_bar_create
+ *
+ * @param out_bar Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_status_bar_create(cmp_status_bar_t **out_bar) {
+  int rc = CMP_SUCCESS;
   cmp_status_bar_t *bar;
 
   if (!out_bar) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  bar = (cmp_status_bar_t *)malloc(sizeof(cmp_status_bar_t));
-  if (!bar) {
+  rc = CMP_MALLOC(sizeof(cmp_status_bar_t), (void **)&(bar));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
 
@@ -36,14 +45,31 @@ int cmp_status_bar_create(cmp_status_bar_t **out_bar) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_status_bar_destroy
+ *
+ * @param bar Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_status_bar_destroy(cmp_status_bar_t *bar) {
+  int rc = CMP_SUCCESS;
   if (!bar) {
     return CMP_ERROR_INVALID_ARG;
   }
-  free(bar);
+  rc = CMP_FREE(bar);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_status_bar_set_backend_status
+ *
+ * @param bar Parameter description.
+ * @param status Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_status_bar_set_backend_status(cmp_status_bar_t *bar,
                                       const char *status) {
   if (!bar || !status) {
@@ -54,6 +80,14 @@ int cmp_status_bar_set_backend_status(cmp_status_bar_t *bar,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_status_bar_update_token_usage
+ *
+ * @param bar Parameter description.
+ * @param prompt_tokens Parameter description.
+ * @param completion_tokens Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_status_bar_update_token_usage(cmp_status_bar_t *bar, int prompt_tokens,
                                       int completion_tokens) {
   if (!bar) {
@@ -64,6 +98,14 @@ int cmp_status_bar_update_token_usage(cmp_status_bar_t *bar, int prompt_tokens,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_status_bar_update_memory_metrics
+ *
+ * @param bar Parameter description.
+ * @param system_memory_mb Parameter description.
+ * @param vram_used_mb Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_status_bar_update_memory_metrics(cmp_status_bar_t *bar,
                                          float system_memory_mb,
                                          float vram_used_mb) {

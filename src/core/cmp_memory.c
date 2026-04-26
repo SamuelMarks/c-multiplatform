@@ -39,6 +39,15 @@ static volatile long g_mem_lock = 0;
 static volatile char g_mem_lock = 0;
 #endif
 
+/**
+ * @brief cmp_mem_alloc_tracked
+ *
+ * @param size Parameter description.
+ * @param file Parameter description.
+ * @param line Parameter description.
+ * @param out_ptr Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mem_alloc_tracked(size_t size, const char *file, int line,
                           void **out_ptr) {
   cmp_mem_record_t *record;
@@ -50,6 +59,11 @@ int cmp_mem_alloc_tracked(size_t size, const char *file, int line,
   if (size == 0) {
     *out_ptr = NULL;
     return CMP_SUCCESS;
+  }
+
+  /* Check for overflow before allocating */
+  if (size > ((size_t)-1) - sizeof(cmp_mem_record_t)) {
+    return CMP_ERROR_OOM;
   }
 
   record = (cmp_mem_record_t *)malloc(sizeof(cmp_mem_record_t) + size);
@@ -71,6 +85,14 @@ int cmp_mem_alloc_tracked(size_t size, const char *file, int line,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_mem_free_tracked
+ *
+ * @param ptr Parameter description.
+ * @param file Parameter description.
+ * @param line Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mem_free_tracked(void *ptr, const char *file, int line) {
   cmp_mem_record_t *curr;
   cmp_mem_record_t *prev = NULL;
@@ -102,6 +124,11 @@ int cmp_mem_free_tracked(void *ptr, const char *file, int line) {
   return CMP_ERROR_NOT_FOUND;
 }
 
+/**
+ * @brief cmp_mem_check_leaks
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mem_check_leaks(void) {
   cmp_mem_record_t *curr = g_mem_head;
   int leak_count = 0;
@@ -122,13 +149,20 @@ int cmp_mem_check_leaks(void) {
   return leak_count;
 }
 
+/**
+ * @brief cmp_arena_init
+ *
+ * @param arena Parameter description.
+ * @param size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_arena_init(cmp_arena_t *arena, size_t size) {
   int rc;
 
   if (arena == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_arena_init: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_arena_init: %s\n", err_str);
+ }    return rc;
   }
 
   if (size == 0) {
@@ -141,8 +175,8 @@ int cmp_arena_init(cmp_arena_t *arena, size_t size) {
   rc = CMP_MALLOC(size, (void **)&arena->buffer);
   if (rc != CMP_SUCCESS || arena->buffer == NULL) {
     if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_arena_init CMP_MALLOC: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_arena_init CMP_MALLOC: %s\n", err_str);
+ }    return rc;
   }
 
   arena->capacity = size;
@@ -151,13 +185,21 @@ int cmp_arena_init(cmp_arena_t *arena, size_t size) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_arena_alloc
+ *
+ * @param arena Parameter description.
+ * @param size Parameter description.
+ * @param out_ptr Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_arena_alloc(cmp_arena_t *arena, size_t size, void **out_ptr) {
   int rc;
 
   if (arena == NULL || out_ptr == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_arena_alloc: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_arena_alloc: %s\n", err_str);
+ }    return rc;
   }
 
   if (size == 0) {
@@ -167,8 +209,8 @@ int cmp_arena_alloc(cmp_arena_t *arena, size_t size, void **out_ptr) {
 
   if (arena->offset + size > arena->capacity) {
     rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_arena_alloc (capacity exceeded): %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_arena_alloc (capacity exceeded): %s\n", err_str);
+ }    return rc;
   }
 
   *out_ptr = arena->buffer + arena->offset;
@@ -177,13 +219,19 @@ int cmp_arena_alloc(cmp_arena_t *arena, size_t size, void **out_ptr) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_arena_free
+ *
+ * @param arena Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_arena_free(cmp_arena_t *arena) {
   int rc;
 
   if (arena == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_arena_free: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_arena_free: %s\n", err_str);
+ }    return rc;
   }
 
   if (arena->buffer != NULL) {
@@ -197,6 +245,14 @@ int cmp_arena_free(cmp_arena_t *arena) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_pool_init
+ *
+ * @param pool Parameter description.
+ * @param block_size Parameter description.
+ * @param block_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
   int rc;
   size_t i;
@@ -205,8 +261,8 @@ int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
 
   if (pool == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_pool_init: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_pool_init: %s\n", err_str);
+ }    return rc;
   }
 
   if (block_size < sizeof(cmp_pool_block_t)) {
@@ -230,8 +286,8 @@ int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
   rc = CMP_MALLOC(total_size, (void **)&pool->buffer);
   if (rc != CMP_SUCCESS || pool->buffer == NULL) {
     if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_pool_init CMP_MALLOC: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_pool_init CMP_MALLOC: %s\n", err_str);
+ }    return rc;
   }
 
   pool->capacity = block_count;
@@ -248,14 +304,21 @@ int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_pool_alloc
+ *
+ * @param pool Parameter description.
+ * @param out_ptr Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pool_alloc(cmp_pool_t *pool, void **out_ptr) {
   int rc;
   cmp_pool_block_t *block;
 
   if (pool == NULL || out_ptr == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_pool_alloc: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_pool_alloc: %s\n", err_str);
+ }    return rc;
   }
 
   if (pool->capacity == 0) {
@@ -265,8 +328,8 @@ int cmp_pool_alloc(cmp_pool_t *pool, void **out_ptr) {
 
   if (pool->free_list == NULL) {
     rc = CMP_ERROR_OOM;
-    LOG_DEBUG("cmp_pool_alloc (no free blocks): %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_pool_alloc (no free blocks): %s\n", err_str);
+ }    return rc;
   }
 
   block = pool->free_list;
@@ -276,29 +339,36 @@ int cmp_pool_alloc(cmp_pool_t *pool, void **out_ptr) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_pool_free
+ *
+ * @param pool Parameter description.
+ * @param ptr Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pool_free(cmp_pool_t *pool, void *ptr) {
   int rc;
   cmp_pool_block_t *block;
 
   if (pool == NULL || ptr == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_pool_free: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_pool_free: %s\n", err_str);
+ }    return rc;
   }
 
   /* check if pointer is within the buffer bounds */
   if ((uint8_t *)ptr < pool->buffer ||
       (uint8_t *)ptr >= pool->buffer + (pool->capacity * pool->block_size)) {
     rc = CMP_ERROR_BOUNDS;
-    LOG_DEBUG("cmp_pool_free (out of bounds): %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_pool_free (out of bounds): %s\n", err_str);
+ }    return rc;
   }
 
   /* check alignment */
   if (((uint8_t *)ptr - pool->buffer) % pool->block_size != 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_pool_free (misaligned): %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_pool_free (misaligned): %s\n", err_str);
+ }    return rc;
   }
 
   block = (cmp_pool_block_t *)ptr;
@@ -308,13 +378,19 @@ int cmp_pool_free(cmp_pool_t *pool, void *ptr) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_pool_destroy
+ *
+ * @param pool Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pool_destroy(cmp_pool_t *pool) {
   int rc;
 
   if (pool == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_pool_destroy: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_pool_destroy: %s\n", err_str);
+ }    return rc;
   }
 
   if (pool->buffer != NULL) {

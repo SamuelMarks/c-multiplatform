@@ -5,6 +5,13 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_ui_node_set_pointer_events
+ *
+ * @param node Parameter description.
+ * @param state Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_set_pointer_events(cmp_ui_node_t *node,
                                    cmp_pointer_events_t state) {
   int rc = CMP_SUCCESS;
@@ -30,6 +37,12 @@ int cmp_ui_node_set_pointer_events(cmp_ui_node_t *node,
   return rc;
 }
 
+/**
+ * @brief cmp_ui_node_get_pointer_events
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_get_pointer_events(cmp_ui_node_t *node) {
   int rc = (int)CMP_POINTER_EVENTS_AUTO; /* Safe default fallback */
 

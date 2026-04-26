@@ -8,6 +8,12 @@ struct cmp_indexeddb_vfs {
   int is_mounted;
 };
 
+/**
+ * @brief cmp_indexeddb_vfs_create
+ *
+ * @param out_vfs Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_indexeddb_vfs_create(cmp_indexeddb_vfs_t **out_vfs) {
   int rc = CMP_SUCCESS;
   cmp_indexeddb_vfs_t *v = NULL;
@@ -19,18 +25,23 @@ int cmp_indexeddb_vfs_create(cmp_indexeddb_vfs_t **out_vfs) {
     return rc;
   }
 
-  v = (cmp_indexeddb_vfs_t *)malloc(sizeof(cmp_indexeddb_vfs_t));
-  if (!v) {
-    rc = CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_indexeddb_vfs_t), (void **)&v);
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_indexeddb_vfs_create: Out of memory\n");
     return rc;
   }
 
   v->is_mounted = 0;
   *out_vfs = v;
-  return rc;
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_indexeddb_vfs_destroy
+ *
+ * @param vfs Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_indexeddb_vfs_destroy(cmp_indexeddb_vfs_t *vfs) {
   int rc = CMP_SUCCESS;
 
@@ -41,10 +52,23 @@ int cmp_indexeddb_vfs_destroy(cmp_indexeddb_vfs_t *vfs) {
     return rc;
   }
 
-  free(vfs);
-  return rc;
+  rc = CMP_FREE(vfs);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_indexeddb_vfs_destroy: CMP_FREE failed\n");
+    return rc;
+  }
+
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_indexeddb_vfs_mount
+ *
+ * @param vfs Parameter description.
+ * @param mount_path Parameter description.
+ * @param db_name Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_indexeddb_vfs_mount(cmp_indexeddb_vfs_t *vfs, const char *mount_path,
                             const char *db_name) {
   int rc = CMP_SUCCESS;
@@ -60,6 +84,12 @@ int cmp_indexeddb_vfs_mount(cmp_indexeddb_vfs_t *vfs, const char *mount_path,
   return rc;
 }
 
+/**
+ * @brief cmp_indexeddb_vfs_sync
+ *
+ * @param vfs Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_indexeddb_vfs_sync(cmp_indexeddb_vfs_t *vfs) {
   int rc = CMP_SUCCESS;
 

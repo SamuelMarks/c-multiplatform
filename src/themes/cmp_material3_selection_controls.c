@@ -4,6 +4,12 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_m3_checkbox_resolve
+ *
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_checkbox_resolve(cmp_m3_checkbox_metrics_t *out_metrics) {
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
@@ -15,6 +21,12 @@ int cmp_m3_checkbox_resolve(cmp_m3_checkbox_metrics_t *out_metrics) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_radio_resolve
+ *
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_radio_resolve(cmp_m3_radio_metrics_t *out_metrics) {
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
@@ -26,6 +38,12 @@ int cmp_m3_radio_resolve(cmp_m3_radio_metrics_t *out_metrics) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_switch_resolve
+ *
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_switch_resolve(cmp_m3_switch_metrics_t *out_metrics) {
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
@@ -40,6 +58,12 @@ int cmp_m3_switch_resolve(cmp_m3_switch_metrics_t *out_metrics) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_slider_resolve
+ *
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_slider_resolve(cmp_m3_slider_metrics_t *out_metrics) {
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;

@@ -11,6 +11,12 @@ struct cmp_date_picker {
   int day;
 };
 
+/**
+ * @brief cmp_date_picker_create
+ *
+ * @param out_picker Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_date_picker_create(cmp_date_picker_t **out_picker) {
   int rc = CMP_SUCCESS;
   struct cmp_date_picker *picker = NULL;
@@ -34,6 +40,12 @@ int cmp_date_picker_create(cmp_date_picker_t **out_picker) {
   return rc;
 }
 
+/**
+ * @brief cmp_date_picker_destroy
+ *
+ * @param picker Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_date_picker_destroy(cmp_date_picker_t *picker) {
   int rc = CMP_SUCCESS;
   struct cmp_date_picker *internal_picker = (struct cmp_date_picker *)picker;

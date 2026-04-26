@@ -8,6 +8,12 @@ struct cmp_vt_shared {
   int dummy;
 };
 
+/**
+ * @brief cmp_vt_shared_create
+ *
+ * @param out_shared Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_vt_shared_create(cmp_vt_shared_t **out_shared) {
   struct cmp_vt_shared *shared;
 
@@ -23,6 +29,12 @@ int cmp_vt_shared_create(cmp_vt_shared_t **out_shared) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_vt_shared_destroy
+ *
+ * @param shared Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_vt_shared_destroy(cmp_vt_shared_t *shared) {
   struct cmp_vt_shared *internal_shared = (struct cmp_vt_shared *)shared;
   if (!internal_shared)
@@ -32,6 +44,16 @@ int cmp_vt_shared_destroy(cmp_vt_shared_t *shared) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_vt_shared_calculate_morph
+ *
+ * @param shared Parameter description.
+ * @param old_rect Parameter description.
+ * @param new_rect Parameter description.
+ * @param progress Parameter description.
+ * @param out_rect Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_vt_shared_calculate_morph(cmp_vt_shared_t *shared,
                                   const cmp_rect_t *old_rect,
                                   const cmp_rect_t *new_rect, float progress,

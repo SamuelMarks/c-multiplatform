@@ -10,6 +10,12 @@ struct cmp_resource_manager {
   int thermal_state; /* 0=nominal, 1=fair, 2=serious, 3=critical */
 };
 
+/**
+ * @brief Creates a resource manager context.
+ *
+ * @param out_rm Pointer to a variable where the context pointer will be stored.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resource_manager_create(cmp_resource_manager_t **out_rm) {
   struct cmp_resource_manager *ctx;
   if (!out_rm)
@@ -26,17 +32,30 @@ int cmp_resource_manager_create(cmp_resource_manager_t **out_rm) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Destroys a resource manager context.
+ *
+ * @param rm_opaque Pointer to the context to destroy.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resource_manager_destroy(cmp_resource_manager_t *rm_opaque) {
   int rc;
   if (!rm_opaque) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_resource_manager_destroy: %s\n", cmp_strerror(rc));
-    return rc;
+    { const char *err_str; cmp_strerror(rc, &err_str); LOG_DEBUG("cmp_resource_manager_destroy: %s\n", err_str);
+ }    return rc;
   }
   CMP_FREE(rm_opaque);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Sets the thermal state of the device.
+ *
+ * @param rm_opaque Pointer to the resource manager context.
+ * @param state The thermal state (0=nominal, 1=fair, 2=serious, 3=critical).
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resources_set_thermal_state(cmp_resource_manager_t *rm_opaque,
                                     int state) {
   struct cmp_resource_manager *ctx = (struct cmp_resource_manager *)rm_opaque;
@@ -48,6 +67,13 @@ int cmp_resources_set_thermal_state(cmp_resource_manager_t *rm_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Sets the background state of the application.
+ *
+ * @param rm_opaque Pointer to the resource manager context.
+ * @param is_backgrounded 1 if the application is in the background, 0 otherwise.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resources_set_background_state(cmp_resource_manager_t *rm_opaque,
                                        int is_backgrounded) {
   struct cmp_resource_manager *ctx = (struct cmp_resource_manager *)rm_opaque;
@@ -59,6 +85,14 @@ int cmp_resources_set_background_state(cmp_resource_manager_t *rm_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Marks a UI node as opaque to avoid costly blending.
+ *
+ * @param rm_opaque Pointer to the resource manager context.
+ * @param node Pointer to the UI node.
+ * @param is_opaque 1 to mark as opaque, 0 otherwise.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resources_mark_node_opaque(cmp_resource_manager_t *rm_opaque,
                                    void *node, int is_opaque) {
   struct cmp_resource_manager *ctx = (struct cmp_resource_manager *)rm_opaque;
@@ -69,6 +103,13 @@ int cmp_resources_mark_node_opaque(cmp_resource_manager_t *rm_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Sets whether the device is in low data mode.
+ *
+ * @param rm_opaque Pointer to the resource manager context.
+ * @param is_low_data 1 if in low data mode, 0 otherwise.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resources_set_low_data_mode(cmp_resource_manager_t *rm_opaque,
                                     int is_low_data) {
   struct cmp_resource_manager *ctx = (struct cmp_resource_manager *)rm_opaque;
@@ -80,6 +121,15 @@ int cmp_resources_set_low_data_mode(cmp_resource_manager_t *rm_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Caches a remote image.
+ *
+ * @param rm_opaque Pointer to the resource manager context.
+ * @param url The URL of the image to cache.
+ * @param target_width The target width of the image.
+ * @param target_height The target height of the image.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resources_cache_remote_image(cmp_resource_manager_t *rm_opaque,
                                      const char *url, float target_width,
                                      float target_height) {
@@ -91,6 +141,15 @@ int cmp_resources_cache_remote_image(cmp_resource_manager_t *rm_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief Allocates an offscreen bitmap.
+ *
+ * @param rm_opaque Pointer to the resource manager context.
+ * @param width The width of the bitmap.
+ * @param height The height of the bitmap.
+ * @param out_bitmap Pointer to a variable where the bitmap pointer will be stored.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resources_allocate_offscreen_bitmap(cmp_resource_manager_t *rm_opaque,
                                             float width, float height,
                                             void **out_bitmap) {

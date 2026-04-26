@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -9,19 +10,33 @@ struct cmp_siwa_ctx {
   int is_supported;
 };
 
+/**
+ * @brief cmp_siwa_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_siwa_create(cmp_siwa_ctx_t **out_ctx) {
   int rc = CMP_SUCCESS;
   struct cmp_siwa_ctx *ctx = NULL;
 
   if (!out_ctx) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_siwa_create: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_siwa_create: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_siwa_ctx), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_siwa_create: Out of memory\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_siwa_create: Out of memory: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -30,6 +45,12 @@ int cmp_siwa_create(cmp_siwa_ctx_t **out_ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_siwa_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_siwa_destroy(cmp_siwa_ctx_t *ctx) {
   int rc = CMP_SUCCESS;
   if (ctx) {
@@ -38,6 +59,15 @@ int cmp_siwa_destroy(cmp_siwa_ctx_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_siwa_request
+ *
+ * @param ctx Parameter description.
+ * @param req_hidden_email Parameter description.
+ * @param out_token_buf Parameter description.
+ * @param token_cap Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_siwa_request(cmp_siwa_ctx_t *ctx, int req_hidden_email,
                      char *out_token_buf, size_t token_cap) {
   int rc = CMP_SUCCESS;
@@ -45,7 +75,11 @@ int cmp_siwa_request(cmp_siwa_ctx_t *ctx, int req_hidden_email,
 
   if (!c || !out_token_buf) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_siwa_request: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_siwa_request: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -59,6 +93,14 @@ int cmp_siwa_request(cmp_siwa_ctx_t *ctx, int req_hidden_email,
   return rc;
 }
 
+/**
+ * @brief cmp_tree_validate_siwa_branding
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param out_is_valid Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tree_validate_siwa_branding(cmp_a11y_tree_t *tree, int node_id,
                                     int *out_is_valid) {
   int rc = CMP_SUCCESS;
@@ -67,8 +109,12 @@ int cmp_tree_validate_siwa_branding(cmp_a11y_tree_t *tree, int node_id,
 
   if (!tree || !out_is_valid) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_tree_validate_siwa_branding: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_tree_validate_siwa_branding: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -82,19 +128,33 @@ struct cmp_local_auth {
   int is_supported;
 };
 
+/**
+ * @brief cmp_local_auth_create
+ *
+ * @param out_auth Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_local_auth_create(cmp_local_auth_t **out_auth) {
   int rc = CMP_SUCCESS;
   struct cmp_local_auth *ctx = NULL;
 
   if (!out_auth) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_local_auth_create: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_local_auth_create: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_local_auth), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_local_auth_create: Out of memory\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_local_auth_create: Out of memory: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -103,6 +163,12 @@ int cmp_local_auth_create(cmp_local_auth_t **out_auth) {
   return rc;
 }
 
+/**
+ * @brief cmp_local_auth_destroy
+ *
+ * @param auth Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_local_auth_destroy(cmp_local_auth_t *auth) {
   int rc = CMP_SUCCESS;
   if (auth) {
@@ -111,6 +177,14 @@ int cmp_local_auth_destroy(cmp_local_auth_t *auth) {
   return rc;
 }
 
+/**
+ * @brief cmp_local_auth_request
+ *
+ * @param auth Parameter description.
+ * @param reason Parameter description.
+ * @param out_success Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_local_auth_request(cmp_local_auth_t *auth, const char *reason,
                            int *out_success) {
   int rc = CMP_SUCCESS;
@@ -118,7 +192,11 @@ int cmp_local_auth_request(cmp_local_auth_t *auth, const char *reason,
 
   if (!c || !reason || !out_success) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_local_auth_request: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_local_auth_request: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -131,19 +209,33 @@ struct cmp_keychain {
   char temp_val[128];
 };
 
+/**
+ * @brief cmp_keychain_create
+ *
+ * @param out_keychain Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keychain_create(cmp_keychain_t **out_keychain) {
   int rc = CMP_SUCCESS;
   struct cmp_keychain *ctx = NULL;
 
   if (!out_keychain) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_keychain_create: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_keychain_create: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_keychain), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_keychain_create: Out of memory\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_keychain_create: Out of memory: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -153,6 +245,12 @@ int cmp_keychain_create(cmp_keychain_t **out_keychain) {
   return rc;
 }
 
+/**
+ * @brief cmp_keychain_destroy
+ *
+ * @param keychain Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keychain_destroy(cmp_keychain_t *keychain) {
   int rc = CMP_SUCCESS;
   if (keychain) {
@@ -161,6 +259,14 @@ int cmp_keychain_destroy(cmp_keychain_t *keychain) {
   return rc;
 }
 
+/**
+ * @brief cmp_keychain_save
+ *
+ * @param keychain Parameter description.
+ * @param key Parameter description.
+ * @param secret Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keychain_save(cmp_keychain_t *keychain, const char *key,
                       const char *secret) {
   int rc = CMP_SUCCESS;
@@ -168,7 +274,11 @@ int cmp_keychain_save(cmp_keychain_t *keychain, const char *key,
 
   if (!k || !key || !secret) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_keychain_save: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_keychain_save: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -182,6 +292,15 @@ int cmp_keychain_save(cmp_keychain_t *keychain, const char *key,
   return rc;
 }
 
+/**
+ * @brief cmp_keychain_load
+ *
+ * @param keychain Parameter description.
+ * @param key Parameter description.
+ * @param out_secret Parameter description.
+ * @param secret_cap Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keychain_load(cmp_keychain_t *keychain, const char *key,
                       char *out_secret, size_t secret_cap) {
   int rc = CMP_SUCCESS;
@@ -189,7 +308,11 @@ int cmp_keychain_load(cmp_keychain_t *keychain, const char *key,
 
   if (!k || !key || !out_secret) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_keychain_load: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_keychain_load: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -203,10 +326,22 @@ int cmp_keychain_load(cmp_keychain_t *keychain, const char *key,
   }
 
   rc = CMP_ERROR_NOT_FOUND;
-  fprintf(stderr, "Error in cmp_keychain_load: Key not found\n");
+  {
+    const char *err_str;
+    cmp_strerror(rc, &err_str);
+    LOG_DEBUG("cmp_keychain_load: Key not found: %s\n", err_str);
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_tree_set_node_text_content_type
+ *
+ * @param tree Parameter description.
+ * @param node_id Parameter description.
+ * @param type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_tree_set_node_text_content_type(cmp_a11y_tree_t *tree, int node_id,
                                              cmp_text_content_type_t type) {
   int rc = CMP_SUCCESS;
@@ -216,8 +351,11 @@ int cmp_a11y_tree_set_node_text_content_type(cmp_a11y_tree_t *tree, int node_id,
 
   if (!tree) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_a11y_tree_set_node_text_content_type: "
-                    "Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_tree_set_node_text_content_type: : %s\n", err_str);
+    }
     return rc;
   }
 
@@ -225,6 +363,13 @@ int cmp_a11y_tree_set_node_text_content_type(cmp_a11y_tree_t *tree, int node_id,
   return rc;
 }
 
+/**
+ * @brief cmp_window_set_secure_background_obscure
+ *
+ * @param window Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_window_set_secure_background_obscure(struct cmp_window *window,
                                              int enabled) {
   int rc = CMP_SUCCESS;
@@ -233,14 +378,25 @@ int cmp_window_set_secure_background_obscure(struct cmp_window *window,
 
   if (!window) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_window_set_secure_background_obscure: "
-                    "Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_window_set_secure_background_obscure: : %s\n", err_str);
+    }
     return rc;
   }
 
   return rc;
 }
 
+/**
+ * @brief cmp_visuals_check_sensitive_content
+ *
+ * @param payload Parameter description.
+ * @param size Parameter description.
+ * @param out_is_sensitive Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_visuals_check_sensitive_content(const void *payload, size_t size,
                                         int *out_is_sensitive) {
   int rc = CMP_SUCCESS;
@@ -249,8 +405,12 @@ int cmp_visuals_check_sensitive_content(const void *payload, size_t size,
 
   if (!payload || !out_is_sensitive) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_visuals_check_sensitive_content: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_visuals_check_sensitive_content: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 

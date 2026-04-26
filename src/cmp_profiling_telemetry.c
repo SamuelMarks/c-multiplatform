@@ -7,6 +7,12 @@ struct cmp_profiling_telemetry {
   int telemetry_enabled;
 };
 
+/**
+ * @brief cmp_profiling_telemetry_create
+ *
+ * @param out_telemetry Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_profiling_telemetry_create(cmp_profiling_telemetry_t **out_telemetry) {
   struct cmp_profiling_telemetry *ctx;
   if (!out_telemetry)
@@ -21,6 +27,12 @@ int cmp_profiling_telemetry_create(cmp_profiling_telemetry_t **out_telemetry) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_profiling_telemetry_destroy
+ *
+ * @param telemetry_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_profiling_telemetry_destroy(
     cmp_profiling_telemetry_t *telemetry_opaque) {
   if (telemetry_opaque)
@@ -28,6 +40,14 @@ int cmp_profiling_telemetry_destroy(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_profiling_emit_os_signpost
+ *
+ * @param telemetry_opaque Parameter description.
+ * @param event_name Parameter description.
+ * @param is_begin Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_profiling_emit_os_signpost(cmp_profiling_telemetry_t *telemetry_opaque,
                                    const char *event_name, int is_begin) {
   struct cmp_profiling_telemetry *ctx =
@@ -39,6 +59,12 @@ int cmp_profiling_emit_os_signpost(cmp_profiling_telemetry_t *telemetry_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_profiling_enforce_main_thread
+ *
+ * @param telemetry_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_profiling_enforce_main_thread(
     cmp_profiling_telemetry_t *telemetry_opaque) {
   struct cmp_profiling_telemetry *ctx =
@@ -50,6 +76,14 @@ int cmp_profiling_enforce_main_thread(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_profiling_offload_heavy_task
+ *
+ * @param telemetry_opaque Parameter description.
+ * @param ) Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_profiling_offload_heavy_task(
     cmp_profiling_telemetry_t *telemetry_opaque, void (*task)(void *),
     void *user_data) {
@@ -62,6 +96,13 @@ int cmp_profiling_offload_heavy_task(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_profiling_detect_retain_cycles
+ *
+ * @param telemetry_opaque Parameter description.
+ * @param root_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_profiling_detect_retain_cycles(
     cmp_profiling_telemetry_t *telemetry_opaque, void *root_node) {
   struct cmp_profiling_telemetry *ctx =
@@ -73,6 +114,13 @@ int cmp_profiling_detect_retain_cycles(
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_profiling_safe_destroy_node
+ *
+ * @param telemetry_opaque Parameter description.
+ * @param node_ptr Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_profiling_safe_destroy_node(cmp_profiling_telemetry_t *telemetry_opaque,
                                     void **node_ptr) {
   struct cmp_profiling_telemetry *ctx =

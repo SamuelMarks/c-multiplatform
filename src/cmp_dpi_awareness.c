@@ -6,6 +6,11 @@
 
 static cmp_dpi_t *g_dpi_manager = NULL;
 
+/**
+ * @brief cmp_dpi_awareness_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dpi_awareness_init(void) {
   int rc = CMP_SUCCESS;
 
@@ -25,6 +30,11 @@ int cmp_dpi_awareness_init(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_dpi_awareness_cleanup
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dpi_awareness_cleanup(void) {
   int rc = CMP_SUCCESS;
 

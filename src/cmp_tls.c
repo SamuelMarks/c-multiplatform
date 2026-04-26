@@ -1,18 +1,44 @@
 #include "cmp.h"
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
+/**
+ * @brief cmp_tls_key_create
+ *
+ * @param out_key Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_key_create(cmp_tls_key_t *out_key) {
   *out_key = 0;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_tls_key_delete
+ *
+ * @param key Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_key_delete(cmp_tls_key_t key) {
   (void)key;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_tls_set
+ *
+ * @param key Parameter description.
+ * @param value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_set(cmp_tls_key_t key, void *value) {
   (void)key;
   (void)value;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_tls_get
+ *
+ * @param key Parameter description.
+ * @param out_value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_get(cmp_tls_key_t key, void **out_value) {
   (void)key;
   *out_value = NULL;
@@ -21,9 +47,35 @@ int cmp_tls_get(cmp_tls_key_t key, void **out_value) {
 #else
 #include "cmp.h"
 #if 0 || defined(__WATCOMC__) || defined(__DOS__)
+/**
+ * @brief cmp_tls_key_create
+ *
+ * @param out_key Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_key_create(cmp_tls_key_t *out_key) { *out_key = 0; return CMP_SUCCESS; }
+/**
+ * @brief cmp_tls_key_delete
+ *
+ * @param key Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_key_delete(cmp_tls_key_t key) { (void)key; return CMP_SUCCESS; }
+/**
+ * @brief cmp_tls_set
+ *
+ * @param key Parameter description.
+ * @param value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_set(cmp_tls_key_t key, void *value) { (void)key; (void)value; return CMP_SUCCESS; }
+/**
+ * @brief cmp_tls_get
+ *
+ * @param key Parameter description.
+ * @param out_value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_get(cmp_tls_key_t key, void **out_value) { (void)key; *out_value = NULL; return CMP_SUCCESS; }
 #else
 #if 0 || defined(__WATCOMC__) || defined(__DOS__)
@@ -43,6 +95,12 @@ __declspec(dllimport) unsigned long __stdcall GetLastError(void);
 
 #define TLS_OUT_OF_INDEXES ((unsigned long)0xFFFFFFFF)
 
+/**
+ * @brief cmp_tls_key_create
+ *
+ * @param out_key Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_key_create(cmp_tls_key_t *out_key) {
     if (out_key == NULL) {
         return CMP_ERROR_INVALID_ARG;
@@ -56,6 +114,12 @@ int cmp_tls_key_create(cmp_tls_key_t *out_key) {
     return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tls_key_delete
+ *
+ * @param key Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_key_delete(cmp_tls_key_t key) {
     if (TlsFree(key) == 0) {
         return CMP_ERROR_INVALID_ARG;
@@ -63,6 +127,13 @@ int cmp_tls_key_delete(cmp_tls_key_t key) {
     return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tls_set
+ *
+ * @param key Parameter description.
+ * @param value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_set(cmp_tls_key_t key, void *value) {
     if (TlsSetValue(key, value) == 0) {
         return CMP_ERROR_INVALID_ARG;
@@ -70,6 +141,13 @@ int cmp_tls_set(cmp_tls_key_t key, void *value) {
     return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tls_get
+ *
+ * @param key Parameter description.
+ * @param out_value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_get(cmp_tls_key_t key, void **out_value) {
     void *val;
 
@@ -89,6 +167,12 @@ int cmp_tls_get(cmp_tls_key_t key, void **out_value) {
 
 #else
 
+/**
+ * @brief cmp_tls_key_create
+ *
+ * @param out_key Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_key_create(cmp_tls_key_t *out_key) {
     if (out_key == NULL) {
         return CMP_ERROR_INVALID_ARG;
@@ -101,6 +185,12 @@ int cmp_tls_key_create(cmp_tls_key_t *out_key) {
     return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tls_key_delete
+ *
+ * @param key Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_key_delete(cmp_tls_key_t key) {
     if (pthread_key_delete(key) != 0) {
         return CMP_ERROR_INVALID_ARG;
@@ -108,6 +198,13 @@ int cmp_tls_key_delete(cmp_tls_key_t key) {
     return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tls_set
+ *
+ * @param key Parameter description.
+ * @param value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_set(cmp_tls_key_t key, void *value) {
     if (pthread_setspecific(key, value) != 0) {
         return CMP_ERROR_INVALID_ARG;
@@ -115,6 +212,13 @@ int cmp_tls_set(cmp_tls_key_t key, void *value) {
     return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tls_get
+ *
+ * @param key Parameter description.
+ * @param out_value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tls_get(cmp_tls_key_t key, void **out_value) {
     if (out_value == NULL) {
         return CMP_ERROR_INVALID_ARG;

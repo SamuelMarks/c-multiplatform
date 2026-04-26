@@ -5,6 +5,18 @@
 #include <math.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_svg_viewbox_evaluate
+ *
+ * @param viewbox Parameter description.
+ * @param layout_width Parameter description.
+ * @param layout_height Parameter description.
+ * @param out_offset_x Parameter description.
+ * @param out_offset_y Parameter description.
+ * @param out_scale_x Parameter description.
+ * @param out_scale_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_viewbox_evaluate(const cmp_svg_viewbox_t *viewbox,
                              float layout_width, float layout_height,
                              float *out_offset_x, float *out_offset_y,
@@ -118,6 +130,13 @@ static int renderer_append_vertex(cmp_svg_renderer_t *r, float x, float y) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_renderer_create
+ *
+ * @param out_renderer Parameter description.
+ * @param tolerance Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_renderer_create(cmp_svg_renderer_t **out_renderer,
                             float tolerance) {
   cmp_svg_renderer_t *r;
@@ -131,6 +150,12 @@ int cmp_svg_renderer_create(cmp_svg_renderer_t **out_renderer,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_renderer_destroy
+ *
+ * @param renderer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_renderer_destroy(cmp_svg_renderer_t *renderer) {
   if (!renderer)
     return CMP_ERROR_INVALID_ARG;
@@ -142,6 +167,14 @@ int cmp_svg_renderer_destroy(cmp_svg_renderer_t *renderer) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_renderer_move_to
+ *
+ * @param renderer Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_renderer_move_to(cmp_svg_renderer_t *renderer, float x, float y) {
   if (!renderer)
     return CMP_ERROR_INVALID_ARG;
@@ -169,6 +202,14 @@ int cmp_svg_renderer_move_to(cmp_svg_renderer_t *renderer, float x, float y) {
   return renderer_append_vertex(renderer, x, y);
 }
 
+/**
+ * @brief cmp_svg_renderer_line_to
+ *
+ * @param renderer Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_renderer_line_to(cmp_svg_renderer_t *renderer, float x, float y) {
   if (!renderer)
     return CMP_ERROR_INVALID_ARG;
@@ -177,6 +218,16 @@ int cmp_svg_renderer_line_to(cmp_svg_renderer_t *renderer, float x, float y) {
   return renderer_append_vertex(renderer, x, y);
 }
 
+/**
+ * @brief cmp_svg_renderer_quad_to
+ *
+ * @param renderer Parameter description.
+ * @param cx Parameter description.
+ * @param cy Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_renderer_quad_to(cmp_svg_renderer_t *renderer, float cx, float cy,
                              float x, float y) {
   int i, steps;
@@ -211,6 +262,18 @@ int cmp_svg_renderer_quad_to(cmp_svg_renderer_t *renderer, float cx, float cy,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_renderer_cubic_to
+ *
+ * @param renderer Parameter description.
+ * @param cx1 Parameter description.
+ * @param cy1 Parameter description.
+ * @param cx2 Parameter description.
+ * @param cy2 Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_renderer_cubic_to(cmp_svg_renderer_t *renderer, float cx1,
                               float cy1, float cx2, float cy2, float x,
                               float y) {
@@ -247,6 +310,24 @@ int cmp_svg_renderer_cubic_to(cmp_svg_renderer_t *renderer, float cx1,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief arc_to_center_param
+ *
+ * @param x1 Parameter description.
+ * @param y1 Parameter description.
+ * @param rx Parameter description.
+ * @param ry Parameter description.
+ * @param angle Parameter description.
+ * @param large_arc Parameter description.
+ * @param sweep Parameter description.
+ * @param x2 Parameter description.
+ * @param y2 Parameter description.
+ * @param cx Parameter description.
+ * @param cy Parameter description.
+ * @param theta1 Parameter description.
+ * @param dtheta Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void arc_to_center_param(float x1, float y1, float rx, float ry,
                                 float angle, int large_arc, int sweep, float x2,
                                 float y2, float *cx, float *cy, float *theta1,
@@ -289,6 +370,19 @@ static void arc_to_center_param(float x1, float y1, float rx, float ry,
   }
 }
 
+/**
+ * @brief cmp_svg_renderer_arc_to
+ *
+ * @param renderer Parameter description.
+ * @param rx Parameter description.
+ * @param ry Parameter description.
+ * @param x_axis_rotation Parameter description.
+ * @param large_arc_flag Parameter description.
+ * @param sweep_flag Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_renderer_arc_to(cmp_svg_renderer_t *renderer, float rx, float ry,
                             float x_axis_rotation, int large_arc_flag,
                             int sweep_flag, float x, float y) {
@@ -326,6 +420,12 @@ int cmp_svg_renderer_arc_to(cmp_svg_renderer_t *renderer, float rx, float ry,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_renderer_close
+ *
+ * @param renderer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_renderer_close(cmp_svg_renderer_t *renderer) {
   if (!renderer)
     return CMP_ERROR_INVALID_ARG;
@@ -333,6 +433,16 @@ int cmp_svg_renderer_close(cmp_svg_renderer_t *renderer) {
                                   renderer->start_y);
 }
 
+/**
+ * @brief cmp_svg_path_tessellate
+ *
+ * @param path_type Parameter description.
+ * @param data Parameter description.
+ * @param data_len Parameter description.
+ * @param out_vertices Parameter description.
+ * @param out_vertex_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_path_tessellate(cmp_svg_path_type_t path_type, const float *data,
                             size_t data_len, float **out_vertices,
                             size_t *out_vertex_count) {
@@ -386,6 +496,13 @@ int cmp_svg_path_tessellate(cmp_svg_path_type_t path_type, const float *data,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief normalize2
+ *
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void normalize2(float *x, float *y) {
   float len = (float)sqrt((double)((*x) * (*x) + (*y) * (*y)));
   if (len > 0.0f) {
@@ -394,6 +511,17 @@ static void normalize2(float *x, float *y) {
   }
 }
 
+/**
+ * @brief cmp_svg_dash_evaluate
+ *
+ * @param dash Parameter description.
+ * @param in_vertices Parameter description.
+ * @param in_count Parameter description.
+ * @param out_subpaths Parameter description.
+ * @param out_subpath_counts Parameter description.
+ * @param out_subpath_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_dash_evaluate(const cmp_svg_dash_t *dash, const float *in_vertices,
                           size_t in_count, float ***out_subpaths,
                           size_t **out_subpath_counts,
@@ -442,6 +570,16 @@ int cmp_svg_dash_evaluate(const cmp_svg_dash_t *dash, const float *in_vertices,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_stroke_evaluate
+ *
+ * @param stroke Parameter description.
+ * @param in_vertices Parameter description.
+ * @param in_count Parameter description.
+ * @param out_stroke_vertices Parameter description.
+ * @param out_stroke_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_stroke_evaluate(const cmp_svg_stroke_t *stroke,
                             const float *in_vertices, size_t in_count,
                             float **out_stroke_vertices,
@@ -534,6 +672,13 @@ int cmp_svg_stroke_evaluate(const cmp_svg_stroke_t *stroke,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_css_bind
+ *
+ * @param svg_node Parameter description.
+ * @param css_style Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_css_bind(cmp_svg_node_t *svg_node, void *css_style) {
   cmp_svg_css_t *css;
   if (!svg_node)
@@ -551,6 +696,13 @@ int cmp_svg_css_bind(cmp_svg_node_t *svg_node, void *css_style) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_use_instantiate
+ *
+ * @param source_node Parameter description.
+ * @param out_cloned_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_use_instantiate(cmp_svg_node_t *source_node,
                             cmp_svg_node_t **out_cloned_node) {
   cmp_svg_node_t *clone;
@@ -591,6 +743,13 @@ int cmp_svg_use_instantiate(cmp_svg_node_t *source_node,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_smil_tick
+ *
+ * @param node Parameter description.
+ * @param dt_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_smil_tick(cmp_svg_node_t *node, float dt_ms) {
   cmp_svg_smil_t *anim;
   size_t i;
@@ -629,6 +788,13 @@ int cmp_svg_smil_tick(cmp_svg_node_t *node, float dt_ms) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_foreign_bind
+ *
+ * @param svg_node Parameter description.
+ * @param dom_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_foreign_bind(cmp_svg_node_t *svg_node,
                          cmp_layout_node_t *dom_node) {
   if (!svg_node || !dom_node)
@@ -640,6 +806,16 @@ int cmp_svg_foreign_bind(cmp_svg_node_t *svg_node,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_filter_evaluate
+ *
+ * @param filter Parameter description.
+ * @param in_pixels Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param out_pixels Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_filter_evaluate(const cmp_svg_filter_node_t *filter,
                             const unsigned char *in_pixels, int width,
                             int height, unsigned char **out_pixels) {
@@ -677,6 +853,12 @@ int cmp_svg_filter_evaluate(const cmp_svg_filter_node_t *filter,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_node_create
+ *
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_node_create(cmp_svg_node_t **out_node) {
   cmp_svg_node_t *node;
   if (!out_node)
@@ -688,6 +870,12 @@ int cmp_svg_node_create(cmp_svg_node_t **out_node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_node_destroy
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_node_destroy(cmp_svg_node_t *node) {
   if (!node)
     return CMP_ERROR_INVALID_ARG;
@@ -705,6 +893,13 @@ int cmp_svg_node_destroy(cmp_svg_node_t *node) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_node_add_child
+ *
+ * @param parent Parameter description.
+ * @param child Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_node_add_child(cmp_svg_node_t *parent, cmp_svg_node_t *child) {
   cmp_svg_node_t **new_children;
   size_t new_cap;
@@ -729,6 +924,16 @@ int cmp_svg_node_add_child(cmp_svg_node_t *parent, cmp_svg_node_t *child) {
   child->parent = parent;
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_svg_fill_evaluate
+ *
+ * @param fill Parameter description.
+ * @param in_vertices Parameter description.
+ * @param in_count Parameter description.
+ * @param out_fill_vertices Parameter description.
+ * @param out_fill_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_fill_evaluate(const cmp_svg_fill_t *fill, const float *in_vertices,
                           size_t in_count, float **out_fill_vertices,
                           size_t *out_fill_count) {
@@ -761,6 +966,12 @@ int cmp_svg_fill_evaluate(const cmp_svg_fill_t *fill, const float *in_vertices,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief parse_float_safe
+ *
+ * @param p Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static float parse_float_safe(const char **p) {
   char *next;
   float val = (float)strtod(*p, &next);
@@ -772,6 +983,13 @@ static float parse_float_safe(const char **p) {
   return val;
 }
 
+/**
+ * @brief cmp_svg_parse_path_str
+ *
+ * @param path_str Parameter description.
+ * @param renderer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
   const char *p = path_str;
   char cmd = 0;
@@ -906,6 +1124,15 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_path_tessellate_ear_clipping
+ *
+ * @param polygon_data Parameter description.
+ * @param data_len Parameter description.
+ * @param out_vertices Parameter description.
+ * @param out_vertex_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_path_tessellate_ear_clipping(const float *polygon_data,
                                          size_t data_len, float **out_vertices,
                                          size_t *out_vertex_count) {
@@ -919,6 +1146,19 @@ int cmp_svg_path_tessellate_ear_clipping(const float *polygon_data,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_renderer_bezier_subdivide
+ *
+ * @param renderer Parameter description.
+ * @param cx1 Parameter description.
+ * @param cy1 Parameter description.
+ * @param cx2 Parameter description.
+ * @param cy2 Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @param screen_space_error Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_renderer_bezier_subdivide(cmp_svg_renderer_t *renderer, float cx1,
                                       float cy1, float cx2, float cy2, float x,
                                       float y, float screen_space_error) {
@@ -927,6 +1167,18 @@ int cmp_svg_renderer_bezier_subdivide(cmp_svg_renderer_t *renderer, float cx1,
   return cmp_svg_renderer_cubic_to(renderer, cx1, cy1, cx2, cy2, x, y);
 }
 
+/**
+ * @brief cmp_svg_stroke_expand
+ *
+ * @param path_data Parameter description.
+ * @param data_len Parameter description.
+ * @param stroke_width Parameter description.
+ * @param line_join Parameter description.
+ * @param line_cap Parameter description.
+ * @param out_vertices Parameter description.
+ * @param out_vertex_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_stroke_expand(const float *path_data, size_t data_len,
                           float stroke_width, int line_join, int line_cap,
                           float **out_vertices, size_t *out_vertex_count) {
@@ -945,6 +1197,14 @@ int cmp_svg_stroke_expand(const float *path_data, size_t data_len,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_fill_even_odd
+ *
+ * @param cb Parameter description.
+ * @param path_data Parameter description.
+ * @param data_len Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_fill_even_odd(cmp_command_buffer_t *cb, const float *path_data,
                           size_t data_len) {
   if (!cb || !path_data || data_len == 0)
@@ -952,6 +1212,16 @@ int cmp_svg_fill_even_odd(cmp_command_buffer_t *cb, const float *path_data,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_svg_path_morph
+ *
+ * @param path_data_a Parameter description.
+ * @param path_data_b Parameter description.
+ * @param data_len Parameter description.
+ * @param t Parameter description.
+ * @param out_path_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_path_morph(const float *path_data_a, const float *path_data_b,
                        size_t data_len, float t, float **out_path_data) {
   size_t i;

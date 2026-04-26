@@ -19,6 +19,12 @@ struct cmp_input_layout {
   size_t attachment_count;
 };
 
+/**
+ * @brief cmp_input_layout_create
+ *
+ * @param out_layout Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_input_layout_create(cmp_input_layout_t **out_layout) {
   int rc = CMP_SUCCESS;
   cmp_input_layout_t *layout = NULL;
@@ -43,6 +49,12 @@ int cmp_input_layout_create(cmp_input_layout_t **out_layout) {
   return rc;
 }
 
+/**
+ * @brief cmp_input_layout_destroy
+ *
+ * @param layout Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_input_layout_destroy(cmp_input_layout_t *layout) {
   int rc = CMP_SUCCESS;
 
@@ -55,6 +67,14 @@ int cmp_input_layout_destroy(cmp_input_layout_t *layout) {
   return rc;
 }
 
+/**
+ * @brief cmp_input_layout_update_text
+ *
+ * @param layout Parameter description.
+ * @param new_text Parameter description.
+ * @param out_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_input_layout_update_text(cmp_input_layout_t *layout,
                                  const char *new_text, float *out_height) {
   int rc = CMP_SUCCESS;
@@ -89,6 +109,13 @@ int cmp_input_layout_update_text(cmp_input_layout_t *layout,
   return rc;
 }
 
+/**
+ * @brief cmp_input_layout_add_attachment
+ *
+ * @param layout Parameter description.
+ * @param filename Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_input_layout_add_attachment(cmp_input_layout_t *layout,
                                     const char *filename) {
   int rc = CMP_SUCCESS;
@@ -114,6 +141,13 @@ int cmp_input_layout_add_attachment(cmp_input_layout_t *layout,
   return rc;
 }
 
+/**
+ * @brief cmp_input_layout_get_attachment_count
+ *
+ * @param layout Parameter description.
+ * @param out_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_input_layout_get_attachment_count(const cmp_input_layout_t *layout,
                                           size_t *out_count) {
   int rc = CMP_SUCCESS;

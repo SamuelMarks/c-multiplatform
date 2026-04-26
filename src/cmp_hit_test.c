@@ -10,14 +10,25 @@ struct cmp_hit_test {
   cmp_ui_node_t *mock_hit_result; /* Used for testing purposes */
 };
 
+/**
+ * @brief Creates a hit test context.
+ *
+ * @param tree Pointer to the root UI node of the tree to hit test against.
+ * @param out_hit_test Pointer to a variable where the new hit test context will
+ * be stored.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hit_test_create(cmp_ui_node_t *tree, cmp_hit_test_t **out_hit_test) {
   int rc = CMP_SUCCESS;
   struct cmp_hit_test *ctx = NULL;
 
   if (!out_hit_test) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_hit_test_create: Invalid argument (out_hit_test=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_hit_test_create: %s\n", err_str);
+    }
     return rc;
   }
   /* We allow a null tree for edge case testing, but ideally it should not be
@@ -25,7 +36,13 @@ int cmp_hit_test_create(cmp_ui_node_t *tree, cmp_hit_test_t **out_hit_test) {
 
   rc = CMP_MALLOC(sizeof(struct cmp_hit_test), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_hit_test_create: Out of memory\n");
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_hit_test_create CMP_MALLOC: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -37,14 +54,23 @@ int cmp_hit_test_create(cmp_ui_node_t *tree, cmp_hit_test_t **out_hit_test) {
   return rc;
 }
 
+/**
+ * @brief Destroys a hit test context.
+ *
+ * @param hit_test Pointer to the hit test context to destroy.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hit_test_destroy(cmp_hit_test_t *hit_test) {
   int rc = CMP_SUCCESS;
   struct cmp_hit_test *ctx = (struct cmp_hit_test *)hit_test;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_hit_test_destroy: Invalid argument (hit_test=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_hit_test_destroy: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -52,6 +78,14 @@ int cmp_hit_test_destroy(cmp_hit_test_t *hit_test) {
   return rc;
 }
 
+/**
+ * @brief hit_test_recursive
+ *
+ * @param node Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static cmp_ui_node_t *hit_test_recursive(cmp_ui_node_t *node, float x,
                                          float y) {
   size_t i;
@@ -87,6 +121,16 @@ static cmp_ui_node_t *hit_test_recursive(cmp_ui_node_t *node, float x,
   return hit;
 }
 
+/**
+ * @brief Queries the hit test context for the node at the given coordinates.
+ *
+ * @param hit_test Pointer to the hit test context.
+ * @param x The x-coordinate to test.
+ * @param y The y-coordinate to test.
+ * @param out_node Pointer to a variable where the hit node will be stored.
+ * @return Returns 0 on success, or an error code on failure (e.g.
+ * CMP_ERROR_NOT_FOUND).
+ */
 int cmp_hit_test_query(cmp_hit_test_t *hit_test, float x, float y,
                        cmp_ui_node_t **out_node) {
   int rc = CMP_SUCCESS;
@@ -94,7 +138,11 @@ int cmp_hit_test_query(cmp_hit_test_t *hit_test, float x, float y,
 
   if (!ctx || !out_node) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_hit_test_query: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_hit_test_query: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -102,7 +150,11 @@ int cmp_hit_test_query(cmp_hit_test_t *hit_test, float x, float y,
   if (x < 0.0f || y < 0.0f) {
     *out_node = NULL;
     rc = CMP_ERROR_NOT_FOUND;
-    LOG_DEBUG("Error in cmp_hit_test_query: Coordinates out of bounds\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_hit_test_query out of bounds: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -117,7 +169,11 @@ int cmp_hit_test_query(cmp_hit_test_t *hit_test, float x, float y,
 
   if (!*out_node) {
     rc = CMP_ERROR_NOT_FOUND;
-    LOG_DEBUG("Error in cmp_hit_test_query: No node found at coordinates\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_hit_test_query miss: %s\n", err_str);
+    }
   }
 
   return rc;

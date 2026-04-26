@@ -5,6 +5,15 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_m3_sys_colors_generate
+ *
+ * @param seed Parameter description.
+ * @param is_dark Parameter description.
+ * @param contrast Parameter description.
+ * @param out_sys_colors Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_sys_colors_generate(cmp_color_t seed, int is_dark,
                                cmp_m3_contrast_profile_t contrast,
                                cmp_m3_sys_colors_t *out_sys_colors) {
@@ -177,6 +186,17 @@ int cmp_m3_sys_colors_generate(cmp_color_t seed, int is_dark,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_shape_resolve
+ *
+ * @param shape Parameter description.
+ * @param modifiers Parameter description.
+ * @param out_tl Parameter description.
+ * @param out_tr Parameter description.
+ * @param out_bl Parameter description.
+ * @param out_br Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_shape_resolve(cmp_m3_shape_family_t shape,
                          const cmp_m3_shape_modifiers_t *modifiers,
                          float *out_tl, float *out_tr, float *out_bl,
@@ -232,6 +252,17 @@ int cmp_m3_shape_resolve(cmp_m3_shape_family_t shape,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_elevation_resolve
+ *
+ * @param level Parameter description.
+ * @param out_tonal_opacity Parameter description.
+ * @param out_shadow_y_offset Parameter description.
+ * @param out_shadow_blur Parameter description.
+ * @param out_ambient_alpha Parameter description.
+ * @param out_spot_alpha Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_elevation_resolve(cmp_m3_elevation_level_t level,
                              float *out_tonal_opacity,
                              float *out_shadow_y_offset, float *out_shadow_blur,
@@ -291,6 +322,13 @@ int cmp_m3_elevation_resolve(cmp_m3_elevation_level_t level,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_state_layer_resolve
+ *
+ * @param state Parameter description.
+ * @param out_opacity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_state_layer_resolve(cmp_m3_state_layer_t state, float *out_opacity) {
   if (!out_opacity) {
     return CMP_ERROR_INVALID_ARG;

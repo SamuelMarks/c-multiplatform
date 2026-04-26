@@ -9,6 +9,12 @@ struct cmp_nav_bar {
   cmp_nav_bar_appearance_t appearance;
 };
 
+/**
+ * @brief cmp_nav_bar_create
+ *
+ * @param out_nav_bar Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_nav_bar_create(cmp_nav_bar_t **out_nav_bar) {
   struct cmp_nav_bar *ctx;
   if (!out_nav_bar)
@@ -23,12 +29,25 @@ int cmp_nav_bar_create(cmp_nav_bar_t **out_nav_bar) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_nav_bar_destroy
+ *
+ * @param nav_bar Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_nav_bar_destroy(cmp_nav_bar_t *nav_bar) {
   if (nav_bar)
     CMP_FREE(nav_bar);
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_nav_bar_set_prefers_large_titles
+ *
+ * @param nav_bar Parameter description.
+ * @param prefers_large_titles Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_nav_bar_set_prefers_large_titles(cmp_nav_bar_t *nav_bar,
                                          int prefers_large_titles) {
   struct cmp_nav_bar *ctx = (struct cmp_nav_bar *)nav_bar;
@@ -38,6 +57,15 @@ int cmp_nav_bar_set_prefers_large_titles(cmp_nav_bar_t *nav_bar,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_nav_bar_calculate_scroll_collapse
+ *
+ * @param nav_bar Parameter description.
+ * @param scroll_y Parameter description.
+ * @param out_title_scale Parameter description.
+ * @param out_title_y_offset Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_nav_bar_calculate_scroll_collapse(cmp_nav_bar_t *nav_bar,
                                           float scroll_y,
                                           float *out_title_scale,
@@ -69,6 +97,13 @@ int cmp_nav_bar_calculate_scroll_collapse(cmp_nav_bar_t *nav_bar,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_nav_bar_set_appearance
+ *
+ * @param nav_bar Parameter description.
+ * @param appearance Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_nav_bar_set_appearance(cmp_nav_bar_t *nav_bar,
                                cmp_nav_bar_appearance_t appearance) {
   struct cmp_nav_bar *ctx = (struct cmp_nav_bar *)nav_bar;
@@ -78,6 +113,16 @@ int cmp_nav_bar_set_appearance(cmp_nav_bar_t *nav_bar,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_nav_bar_resolve_back_button_label
+ *
+ * @param nav_bar Parameter description.
+ * @param previous_title Parameter description.
+ * @param available_width Parameter description.
+ * @param out_label Parameter description.
+ * @param label_cap Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_nav_bar_resolve_back_button_label(cmp_nav_bar_t *nav_bar,
                                           const char *previous_title,
                                           float available_width,
@@ -117,6 +162,14 @@ int cmp_nav_bar_resolve_back_button_label(cmp_nav_bar_t *nav_bar,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_nav_bar_get_chevron_metrics
+ *
+ * @param nav_bar Parameter description.
+ * @param out_weight Parameter description.
+ * @param out_leading_padding Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_nav_bar_get_chevron_metrics(cmp_nav_bar_t *nav_bar, float *out_weight,
                                     float *out_leading_padding) {
   if (!nav_bar || !out_weight || !out_leading_padding)

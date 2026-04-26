@@ -10,6 +10,12 @@ struct cmp_os_scrollbar {
   float springiness; /* For overscroll bouncing (macOS) */
 };
 
+/**
+ * @brief cmp_os_scrollbar_create
+ *
+ * @param out_scrollbar Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar) {
   int rc = CMP_SUCCESS;
   cmp_os_scrollbar_t *scrollbar = NULL;
@@ -20,11 +26,10 @@ int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar) {
     return rc;
   }
 
-  scrollbar = (cmp_os_scrollbar_t *)malloc(sizeof(cmp_os_scrollbar_t));
-  if (!scrollbar) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_os_scrollbar_create: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(sizeof(cmp_os_scrollbar_t), (void **)&(scrollbar));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 
   scrollbar->current_velocity = 0.0f;
@@ -41,6 +46,12 @@ int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar) {
   return rc;
 }
 
+/**
+ * @brief cmp_os_scrollbar_destroy
+ *
+ * @param scrollbar Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar) {
   int rc = CMP_SUCCESS;
 
@@ -50,10 +61,22 @@ int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar) {
     return rc;
   }
 
-  free(scrollbar);
+  rc = CMP_FREE(scrollbar);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_os_scrollbar_step
+ *
+ * @param scrollbar Parameter description.
+ * @param raw_delta_y Parameter description.
+ * @param delta_time_ms Parameter description.
+ * @param out_smoothed_y Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar, float raw_delta_y,
                           unsigned int delta_time_ms, float *out_smoothed_y) {
   int rc = CMP_SUCCESS;

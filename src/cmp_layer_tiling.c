@@ -9,6 +9,13 @@ struct cmp_layer_tiling {
   uint32_t tile_size;
 };
 
+/**
+ * @brief cmp_layer_tiling_create
+ *
+ * @param tile_size Parameter description.
+ * @param out_tiling Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layer_tiling_create(uint32_t tile_size,
                             cmp_layer_tiling_t **out_tiling) {
   int rc = CMP_SUCCESS;
@@ -39,6 +46,12 @@ int cmp_layer_tiling_create(uint32_t tile_size,
   return rc;
 }
 
+/**
+ * @brief cmp_layer_tiling_destroy
+ *
+ * @param tiling Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layer_tiling_destroy(cmp_layer_tiling_t *tiling) {
   int rc = CMP_SUCCESS;
   struct cmp_layer_tiling *ctx = (struct cmp_layer_tiling *)tiling;
@@ -53,6 +66,15 @@ int cmp_layer_tiling_destroy(cmp_layer_tiling_t *tiling) {
   return rc;
 }
 
+/**
+ * @brief cmp_layer_tiling_calculate
+ *
+ * @param tiling Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param out_tile_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layer_tiling_calculate(cmp_layer_tiling_t *tiling, uint32_t width,
                                uint32_t height, uint32_t *out_tile_count) {
   int rc = CMP_SUCCESS;
@@ -77,6 +99,14 @@ int cmp_layer_tiling_calculate(cmp_layer_tiling_t *tiling, uint32_t width,
   return rc;
 }
 
+/**
+ * @brief cmp_layer_tiling_get_bounds
+ *
+ * @param tiling Parameter description.
+ * @param tile_index Parameter description.
+ * @param out_rect Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_layer_tiling_get_bounds(cmp_layer_tiling_t *tiling, uint32_t tile_index,
                                 cmp_rect_t *out_rect) {
   int rc = CMP_SUCCESS;

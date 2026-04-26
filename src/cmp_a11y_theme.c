@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdio.h>
 
 #if defined(_WIN32)
@@ -27,18 +28,33 @@ __declspec(dllimport) BOOL __stdcall SystemParametersInfoA(
 #endif
 /* clang-format on */
 
+/**
+ * @brief cmp_a11y_theme_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_theme_init(void) {
   int rc = CMP_SUCCESS;
   /* Initialize any underlying resources or OS hooks if needed */
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_theme_cleanup
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_theme_cleanup(void) {
   int rc = CMP_SUCCESS;
   /* Clean up */
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_detect_high_contrast
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_detect_high_contrast(void) {
 #if defined(_WIN32)
   HIGHCONTRASTA hc;
@@ -102,6 +118,13 @@ static void apply_color_blindness(cmp_color_blind_type_t type,
   }
 }
 
+/**
+ * @brief cmp_a11y_build_theme
+ *
+ * @param type Parameter description.
+ * @param out_theme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_build_theme(cmp_color_blind_type_t type,
                          cmp_a11y_theme_t *out_theme) {
   int rc = CMP_SUCCESS;
@@ -109,9 +132,12 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
 
   if (!out_theme) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(
-        stderr,
-        "Error in cmp_a11y_build_theme: Invalid argument (out_theme=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_a11y_build_theme: Invalid argument (out_theme=NULL): %s\n",
+                err_str);
+    }
     return rc;
   }
 

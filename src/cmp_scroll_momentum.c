@@ -4,6 +4,16 @@
 #include <math.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_scroll_momentum_calculate
+ *
+ * @param initial_velocity Parameter description.
+ * @param elapsed_time_ms Parameter description.
+ * @param platform_decay_rate Parameter description.
+ * @param out_offset Parameter description.
+ * @param out_current_velocity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scroll_momentum_calculate(float initial_velocity, float elapsed_time_ms,
                                   float platform_decay_rate, float *out_offset,
                                   float *out_current_velocity) {

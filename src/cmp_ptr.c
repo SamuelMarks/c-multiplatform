@@ -8,6 +8,12 @@ struct cmp_ptr {
   cmp_ptr_state_t state;
 };
 
+/**
+ * @brief cmp_ptr_create
+ *
+ * @param out_ptr Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ptr_create(cmp_ptr_t **out_ptr) {
   struct cmp_ptr *ptr;
 
@@ -24,6 +30,12 @@ int cmp_ptr_create(cmp_ptr_t **out_ptr) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ptr_destroy
+ *
+ * @param ptr Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ptr_destroy(cmp_ptr_t *ptr) {
   struct cmp_ptr *internal_ptr = (struct cmp_ptr *)ptr;
 
@@ -34,6 +46,16 @@ int cmp_ptr_destroy(cmp_ptr_t *ptr) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ptr_update
+ *
+ * @param ptr Parameter description.
+ * @param overscroll_y Parameter description.
+ * @param threshold_y Parameter description.
+ * @param out_state Parameter description.
+ * @param out_progress Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ptr_update(cmp_ptr_t *ptr, float overscroll_y, float threshold_y,
                    cmp_ptr_state_t *out_state, float *out_progress) {
   struct cmp_ptr *internal_ptr = (struct cmp_ptr *)ptr;
@@ -69,6 +91,13 @@ int cmp_ptr_update(cmp_ptr_t *ptr, float overscroll_y, float threshold_y,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ptr_set_refreshing
+ *
+ * @param ptr Parameter description.
+ * @param is_refreshing Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ptr_set_refreshing(cmp_ptr_t *ptr, int is_refreshing) {
   struct cmp_ptr *internal_ptr = (struct cmp_ptr *)ptr;
 

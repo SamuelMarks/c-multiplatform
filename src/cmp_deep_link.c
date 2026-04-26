@@ -9,6 +9,12 @@ struct cmp_state_restoration_ctx {
   char *scene_id;
 };
 
+/**
+ * @brief cmp_state_restoration_ctx_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_state_restoration_ctx_create(cmp_state_restoration_ctx_t **out_ctx) {
   int rc = CMP_SUCCESS;
   struct cmp_state_restoration_ctx *ctx = NULL;
@@ -30,6 +36,12 @@ int cmp_state_restoration_ctx_create(cmp_state_restoration_ctx_t **out_ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_state_restoration_ctx_destroy
+ *
+ * @param ctx_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_state_restoration_ctx_destroy(cmp_state_restoration_ctx_t *ctx_opaque) {
   int rc = CMP_SUCCESS;
   struct cmp_state_restoration_ctx *ctx =
@@ -46,6 +58,14 @@ int cmp_state_restoration_ctx_destroy(cmp_state_restoration_ctx_t *ctx_opaque) {
   return rc;
 }
 
+/**
+ * @brief cmp_deep_link_handle_universal_link
+ *
+ * @param ctx Parameter description.
+ * @param url_string Parameter description.
+ * @param router Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_deep_link_handle_universal_link(cmp_state_restoration_ctx_t *ctx,
                                         const char *url_string,
                                         cmp_router_t *router) {
@@ -70,6 +90,15 @@ int cmp_deep_link_handle_universal_link(cmp_state_restoration_ctx_t *ctx,
   return rc;
 }
 
+/**
+ * @brief cmp_state_restoration_encode
+ *
+ * @param ctx Parameter description.
+ * @param router Parameter description.
+ * @param out_buffer Parameter description.
+ * @param out_size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_state_restoration_encode(cmp_state_restoration_ctx_t *ctx,
                                  cmp_router_t *router, void **out_buffer,
                                  size_t *out_size) {
@@ -118,6 +147,15 @@ int cmp_state_restoration_encode(cmp_state_restoration_ctx_t *ctx,
   return rc;
 }
 
+/**
+ * @brief cmp_state_restoration_decode
+ *
+ * @param ctx Parameter description.
+ * @param router Parameter description.
+ * @param buffer Parameter description.
+ * @param size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_state_restoration_decode(cmp_state_restoration_ctx_t *ctx,
                                  cmp_router_t *router, const void *buffer,
                                  size_t size) {
@@ -138,6 +176,13 @@ int cmp_state_restoration_decode(cmp_state_restoration_ctx_t *ctx,
   return rc;
 }
 
+/**
+ * @brief cmp_state_restoration_set_scene_id
+ *
+ * @param ctx_opaque Parameter description.
+ * @param scene_identifier Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_state_restoration_set_scene_id(cmp_state_restoration_ctx_t *ctx_opaque,
                                        const char *scene_identifier) {
   int rc = CMP_SUCCESS;

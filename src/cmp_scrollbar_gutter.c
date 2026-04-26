@@ -3,6 +3,16 @@
 #include <stdlib.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_scrollbar_gutter_calculate
+ *
+ * @param mode Parameter description.
+ * @param is_overflowing Parameter description.
+ * @param scrollbar_thickness Parameter description.
+ * @param out_reserved_left Parameter description.
+ * @param out_reserved_right Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_scrollbar_gutter_calculate(cmp_scrollbar_gutter_t mode,
                                    int is_overflowing,
                                    float scrollbar_thickness,

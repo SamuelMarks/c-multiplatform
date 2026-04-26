@@ -14,11 +14,23 @@
  */
 static const cmp_theme_vtable_t *g_default_theme_vtable = NULL;
 
+/**
+ * @brief cmp_theme_set_default_vtable
+ *
+ * @param vtable Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API void cmp_theme_set_default_vtable(const cmp_theme_vtable_t *vtable) {
   g_default_theme_vtable = vtable;
 }
 
 #ifndef CMP_THEME_MODE_SINGLE_STATIC
+/**
+ * @brief cmp_resolve_vtable
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node) {
   if (!node) {
     if (g_default_theme_vtable)
@@ -69,6 +81,12 @@ const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node) {
   return cmp_theme_get_unstyled_vtable();
 }
 
+/**
+ * @brief cmp_theme_create
+ *
+ * @param out_theme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_theme_create(cmp_theme_t **out_theme) {
   cmp_theme_t *theme;
   if (!out_theme)
@@ -82,6 +100,12 @@ CMP_API int cmp_theme_create(cmp_theme_t **out_theme) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_theme_destroy
+ *
+ * @param theme Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_theme_destroy(cmp_theme_t *theme) {
   if (!theme)
     return CMP_ERROR_INVALID_ARG;
@@ -89,18 +113,38 @@ CMP_API int cmp_theme_destroy(cmp_theme_t *theme) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ffi_get_material3_vtable
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API const cmp_theme_vtable_t *cmp_ffi_get_material3_vtable(void) {
   return cmp_theme_get_material3_vtable();
 }
 
+/**
+ * @brief cmp_ffi_get_fluent2_vtable
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API const cmp_theme_vtable_t *cmp_ffi_get_fluent2_vtable(void) {
   return cmp_theme_get_fluent2_vtable();
 }
 
+/**
+ * @brief cmp_ffi_get_cupertino_vtable
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API const cmp_theme_vtable_t *cmp_ffi_get_cupertino_vtable(void) {
   return cmp_theme_get_cupertino_vtable();
 }
 
+/**
+ * @brief cmp_ffi_get_unstyled_vtable
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API const cmp_theme_vtable_t *cmp_ffi_get_unstyled_vtable(void) {
   return cmp_theme_get_unstyled_vtable();
 }

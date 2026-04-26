@@ -9,6 +9,12 @@ struct cmp_keyboard_avoidance {
   float current_offset;
 };
 
+/**
+ * @brief cmp_keyboard_avoidance_create
+ *
+ * @param out_avoider Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keyboard_avoidance_create(cmp_keyboard_avoidance_t **out_avoider) {
   int rc = CMP_SUCCESS;
   cmp_keyboard_avoidance_t *avoider = NULL;
@@ -32,6 +38,12 @@ int cmp_keyboard_avoidance_create(cmp_keyboard_avoidance_t **out_avoider) {
   return rc;
 }
 
+/**
+ * @brief cmp_keyboard_avoidance_destroy
+ *
+ * @param avoider Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keyboard_avoidance_destroy(cmp_keyboard_avoidance_t *avoider) {
   int rc = CMP_SUCCESS;
 
@@ -45,6 +57,16 @@ int cmp_keyboard_avoidance_destroy(cmp_keyboard_avoidance_t *avoider) {
   return rc;
 }
 
+/**
+ * @brief cmp_keyboard_avoidance_compute_offset
+ *
+ * @param avoider Parameter description.
+ * @param keyboard_height Parameter description.
+ * @param input_bottom_y Parameter description.
+ * @param screen_height Parameter description.
+ * @param out_y_offset Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keyboard_avoidance_compute_offset(cmp_keyboard_avoidance_t *avoider,
                                           float keyboard_height,
                                           float input_bottom_y,

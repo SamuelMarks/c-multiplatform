@@ -12,6 +12,17 @@ struct cmp_tex_compression {
   size_t data_size;
 };
 
+/**
+ * @brief cmp_tex_compression_create
+ *
+ * @param type Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param data Parameter description.
+ * @param data_size Parameter description.
+ * @param out_tex_comp Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tex_compression_create(cmp_tex_compression_type_t type, uint32_t width,
                                uint32_t height, const void *data,
                                size_t data_size,
@@ -42,6 +53,12 @@ int cmp_tex_compression_create(cmp_tex_compression_type_t type, uint32_t width,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tex_compression_destroy
+ *
+ * @param tex_comp Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tex_compression_destroy(cmp_tex_compression_t *tex_comp) {
   struct cmp_tex_compression *ctx = (struct cmp_tex_compression *)tex_comp;
   if (!ctx)
@@ -54,6 +71,13 @@ int cmp_tex_compression_destroy(cmp_tex_compression_t *tex_comp) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_tex_compression_mount
+ *
+ * @param tex_comp Parameter description.
+ * @param target_texture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_tex_compression_mount(cmp_tex_compression_t *tex_comp,
                               cmp_texture_t *target_texture) {
   struct cmp_tex_compression *ctx = (struct cmp_tex_compression *)tex_comp;

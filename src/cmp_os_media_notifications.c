@@ -4,6 +4,13 @@
 #include <stdlib.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_os_notify
+ *
+ * @param title Parameter description.
+ * @param body Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_notify(const char *title, const char *body) {
   int rc = CMP_SUCCESS;
   if (!title || !body) {
@@ -22,6 +29,12 @@ struct cmp_os_media_controls {
   cmp_media_player_t *player;
 };
 
+/**
+ * @brief cmp_os_media_controls_create
+ *
+ * @param out_controls Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_media_controls_create(cmp_os_media_controls_t **out_controls) {
   int rc = CMP_SUCCESS;
   cmp_os_media_controls_t *mc = NULL;
@@ -32,18 +45,20 @@ int cmp_os_media_controls_create(cmp_os_media_controls_t **out_controls) {
     return rc;
   }
 
-  mc = (cmp_os_media_controls_t *)malloc(sizeof(cmp_os_media_controls_t));
-  if (!mc) {
-    rc = CMP_ERROR_OOM;
-    LOG_DEBUG("Error in cmp_os_media_controls_create: Out of memory\n");
-    return rc;
+  rc = CMP_MALLOC(sizeof(cmp_os_media_controls_t), (void **)&(mc));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
+    return CMP_ERROR_OOM;
   }
 
   rc = cmp_media_player_create(&mc->player);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_os_media_controls_create: cmp_media_player_create "
               "failed\n");
-    free(mc);
+    rc = CMP_FREE(mc);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
     return rc;
   }
 
@@ -51,6 +66,12 @@ int cmp_os_media_controls_create(cmp_os_media_controls_t **out_controls) {
   return rc;
 }
 
+/**
+ * @brief cmp_os_media_controls_destroy
+ *
+ * @param controls Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_media_controls_destroy(cmp_os_media_controls_t *controls) {
   int rc = CMP_SUCCESS;
 
@@ -67,10 +88,23 @@ int cmp_os_media_controls_destroy(cmp_os_media_controls_t *controls) {
                 "cmp_media_player_destroy failed\n");
     }
   }
-  free(controls);
+  rc = CMP_FREE(controls);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return rc;
 }
 
+/**
+ * @brief cmp_os_media_controls_update
+ *
+ * @param controls Parameter description.
+ * @param title Parameter description.
+ * @param artist Parameter description.
+ * @param duration Parameter description.
+ * @param current_time Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_media_controls_update(cmp_os_media_controls_t *controls,
                                  const char *title, const char *artist,
                                  float duration, float current_time) {
@@ -91,6 +125,14 @@ int cmp_os_media_controls_update(cmp_os_media_controls_t *controls,
   return rc;
 }
 
+/**
+ * @brief cmp_os_media_controls_set_handler
+ *
+ * @param controls Parameter description.
+ * @param callback Parameter description.
+ * @param userdata Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_os_media_controls_set_handler(cmp_os_media_controls_t *controls,
                                       cmp_media_command_cb callback,
                                       void *userdata) {

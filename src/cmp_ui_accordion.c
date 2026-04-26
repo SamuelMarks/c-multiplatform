@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp_ui_accordion.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
@@ -11,88 +12,179 @@ struct cmp_ui_accordion {
   int is_expanded;
 };
 
+/**
+ * @brief cmp_ui_accordion_create
+ *
+ * @param out_accordion Parameter description.
+ * @param title Parameter description.
+ * @param bg_color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
                             const char *title, uint32_t bg_color) {
   cmp_ui_accordion_t *accordion;
-  int err;
+  int rc;
   size_t len;
   cmp_string_t translated = {NULL, 0, 0};
   const char *final_title = title;
 
   if (!out_accordion) {
+    LOG_DEBUG("cmp_ui_accordion_create: out_accordion is NULL\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
-  accordion = (cmp_ui_accordion_t *)malloc(sizeof(cmp_ui_accordion_t));
-  if (!accordion) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_ui_accordion_t), (void **)&accordion);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_accordion_create: OOM\n");
+    return rc;
   }
+  memset(accordion, 0, sizeof(cmp_ui_accordion_t));
 
-  if (title && cmp_i18n_translate(title, &translated) == 0 && translated.data) {
-    final_title = translated.data;
+  if (title) {
+    rc = cmp_i18n_translate(title, &translated);
+    if (rc == CMP_SUCCESS && translated.data) {
+      final_title = translated.data;
+    } else if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_accordion_create: cmp_i18n_translate failed\n");
+    }
   }
 
   accordion->title = NULL;
   if (final_title) {
     len = strlen(final_title);
-    accordion->title = (char *)malloc(len + 1);
-    if (accordion->title) {
+    rc = CMP_MALLOC(len + 1, (void **)&accordion->title);
+    if (rc == CMP_SUCCESS) {
+#if defined(_MSC_VER)
+      if (memcpy_s(accordion->title, len + 1, final_title, len + 1) != 0) {
+        LOG_DEBUG("cmp_ui_accordion_create: memcpy_s failed\n");
+        CMP_FREE(accordion->title);
+        CMP_FREE(accordion);
+        if (translated.data) {
+          rc = cmp_string_destroy(&translated);
+          if (rc != CMP_SUCCESS)
+            LOG_DEBUG("cmp_ui_accordion_create: cmp_string_destroy failed\n");
+        }
+        return CMP_ERROR_GENERAL;
+      }
+#else
       memcpy(accordion->title, final_title, len + 1);
+#endif
+    } else {
+      LOG_DEBUG("cmp_ui_accordion_create: OOM title\n");
+      CMP_FREE(accordion);
+      if (translated.data) {
+        rc = cmp_string_destroy(&translated);
+        if (rc != CMP_SUCCESS)
+          LOG_DEBUG("cmp_ui_accordion_create: cmp_string_destroy failed\n");
+      }
+      return rc;
     }
   }
 
   if (translated.data) {
-    cmp_string_destroy(&translated);
+    rc = cmp_string_destroy(&translated);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_accordion_create: cmp_string_destroy failed\n");
+    }
   }
 
   accordion->is_expanded = 0;
 
-  err = cmp_ui_box_create(&accordion->node_root);
-  if (err != 0) {
-    free(accordion->title);
-    free(accordion);
-    return err;
+  rc = cmp_ui_box_create(&accordion->node_root);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_accordion_create: cmp_ui_box_create failed\n");
+    if (accordion->title)
+      CMP_FREE(accordion->title);
+    CMP_FREE(accordion);
+    return rc;
   }
 
   accordion->node_root->bg_color = bg_color;
 
-  err = cmp_ui_text_create(&accordion->node_title,
-                           accordion->title ? accordion->title : "", -1);
-  if (err != 0) {
-    free(accordion->title);
-    free(accordion);
-    return err;
+  rc = cmp_ui_text_create(&accordion->node_title,
+                          accordion->title ? accordion->title : "", -1);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_accordion_create: cmp_ui_text_create failed\n");
+    rc = cmp_ui_node_destroy(accordion->node_root);
+    if (rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_accordion_create: cmp_ui_node_destroy failed\n");
+    if (accordion->title)
+      CMP_FREE(accordion->title);
+    CMP_FREE(accordion);
+    return rc;
   }
 
-  cmp_ui_node_add_child(accordion->node_root, accordion->node_title);
+  rc = cmp_ui_node_add_child(accordion->node_root, accordion->node_title);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_accordion_create: cmp_ui_node_add_child failed\n");
+  }
 
   *out_accordion = accordion;
-  return 0;
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_accordion_destroy
+ *
+ * @param accordion Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_accordion_destroy(cmp_ui_accordion_t *accordion) {
+  int rc;
+
   if (!accordion) {
+    LOG_DEBUG("cmp_ui_accordion_destroy: accordion is NULL\n");
     return CMP_ERROR_INVALID_ARG;
   }
-  free(accordion->title);
-  free(accordion);
-  return 0;
+  if (accordion->title) {
+    rc = CMP_FREE(accordion->title);
+    if (rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_accordion_destroy: CMP_FREE title failed\n");
+  }
+  if (accordion->node_root) {
+    rc = cmp_ui_node_destroy(accordion->node_root);
+    if (rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_accordion_destroy: cmp_ui_node_destroy failed\n");
+  }
+
+  rc = CMP_FREE(accordion);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_accordion_destroy: CMP_FREE failed\n");
+    return rc;
+  }
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_accordion_get_node
+ *
+ * @param accordion Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_accordion_get_node(cmp_ui_accordion_t *accordion,
                               cmp_ui_node_t **out_node) {
   if (!accordion || !out_node) {
+    LOG_DEBUG("cmp_ui_accordion_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = accordion->node_root;
-  return 0;
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_accordion_set_expanded
+ *
+ * @param accordion Parameter description.
+ * @param is_expanded Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_accordion_set_expanded(cmp_ui_accordion_t *accordion,
                                   int is_expanded) {
   if (!accordion) {
+    LOG_DEBUG("cmp_ui_accordion_set_expanded: accordion is NULL\n");
     return CMP_ERROR_INVALID_ARG;
   }
   accordion->is_expanded = is_expanded;
-  return 0;
+  return CMP_SUCCESS;
 }

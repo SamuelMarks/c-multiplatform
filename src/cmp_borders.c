@@ -1,16 +1,27 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_radius_init
+ *
+ * @param out_radius Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_radius_init(cmp_radius_t *out_radius) {
   int rc = CMP_SUCCESS;
   if (!out_radius) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_radius_init: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_radius_init: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
   memset(out_radius, 0, sizeof(cmp_radius_t));
@@ -18,11 +29,22 @@ int cmp_radius_init(cmp_radius_t *out_radius) {
   return rc;
 }
 
+/**
+ * @brief cmp_radius_set_uniform
+ *
+ * @param radius Parameter description.
+ * @param r Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_radius_set_uniform(cmp_radius_t *radius, float r) {
   int rc = CMP_SUCCESS;
   if (!radius) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_radius_set_uniform: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_radius_set_uniform: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
   radius->top_left_x = r;
@@ -36,6 +58,17 @@ int cmp_radius_set_uniform(cmp_radius_t *radius, float r) {
   return rc;
 }
 
+/**
+ * @brief cmp_radius_hit_test
+ *
+ * @param radius Parameter description.
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param x Parameter description.
+ * @param y Parameter description.
+ * @param out_inside Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
                         float x, float y, int *out_inside) {
   int rc = CMP_SUCCESS;
@@ -43,7 +76,11 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
 
   if (!radius || !out_inside) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_radius_hit_test: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_radius_hit_test: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -187,19 +224,33 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
   return rc;
 }
 
+/**
+ * @brief cmp_box_shadow_create
+ *
+ * @param out_shadow Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_box_shadow_create(cmp_box_shadow_t **out_shadow) {
   int rc = CMP_SUCCESS;
   cmp_box_shadow_t *shadow = NULL;
 
   if (!out_shadow) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_box_shadow_create: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_box_shadow_create: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_box_shadow_t), (void **)&shadow);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_box_shadow_create: Out of memory\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_box_shadow_create: Out of memory: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -208,6 +259,12 @@ int cmp_box_shadow_create(cmp_box_shadow_t **out_shadow) {
   return rc;
 }
 
+/**
+ * @brief cmp_box_shadow_destroy
+ *
+ * @param shadow Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_box_shadow_destroy(cmp_box_shadow_t *shadow) {
   int rc = CMP_SUCCESS;
   cmp_box_shadow_t *current = shadow;
@@ -221,13 +278,24 @@ int cmp_box_shadow_destroy(cmp_box_shadow_t *shadow) {
   return rc;
 }
 
+/**
+ * @brief cmp_box_shadow_append
+ *
+ * @param root Parameter description.
+ * @param next Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_box_shadow_append(cmp_box_shadow_t *root, cmp_box_shadow_t *next) {
   int rc = CMP_SUCCESS;
   cmp_box_shadow_t *current;
 
   if (!root || !next) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_box_shadow_append: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_box_shadow_append: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -239,6 +307,13 @@ int cmp_box_shadow_append(cmp_box_shadow_t *root, cmp_box_shadow_t *next) {
   return rc;
 }
 
+/**
+ * @brief cmp_shadow_9patch_generate
+ *
+ * @param elevation Parameter description.
+ * @param out_shadow Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shadow_9patch_generate(float elevation,
                                cmp_shadow_9patch_t *out_shadow) {
   int rc = CMP_SUCCESS;
@@ -246,7 +321,11 @@ int cmp_shadow_9patch_generate(float elevation,
 
   if (!out_shadow || elevation < 0.0f) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_shadow_9patch_generate: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_shadow_9patch_generate: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -254,7 +333,11 @@ int cmp_shadow_9patch_generate(float elevation,
 
   rc = CMP_MALLOC(sizeof(cmp_texture_t), (void **)&tex);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_shadow_9patch_generate: Out of memory\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_shadow_9patch_generate: Out of memory: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -267,6 +350,14 @@ int cmp_shadow_9patch_generate(float elevation,
   return rc;
 }
 
+/**
+ * @brief cmp_filter_create
+ *
+ * @param out_filter Parameter description.
+ * @param op Parameter description.
+ * @param amount Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_filter_create(cmp_filter_t **out_filter, cmp_filter_op_t op,
                       float amount) {
   int rc = CMP_SUCCESS;
@@ -274,13 +365,21 @@ int cmp_filter_create(cmp_filter_t **out_filter, cmp_filter_op_t op,
 
   if (!out_filter) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_filter_create: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_filter_create: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_filter_t), (void **)&filter);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_filter_create: Out of memory\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_filter_create: Out of memory: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -291,6 +390,12 @@ int cmp_filter_create(cmp_filter_t **out_filter, cmp_filter_op_t op,
   return rc;
 }
 
+/**
+ * @brief cmp_filter_destroy
+ *
+ * @param filter Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_filter_destroy(cmp_filter_t *filter) {
   int rc = CMP_SUCCESS;
   cmp_filter_t *current = filter;
@@ -304,13 +409,24 @@ int cmp_filter_destroy(cmp_filter_t *filter) {
   return rc;
 }
 
+/**
+ * @brief cmp_filter_append
+ *
+ * @param root Parameter description.
+ * @param next Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_filter_append(cmp_filter_t *root, cmp_filter_t *next) {
   int rc = CMP_SUCCESS;
   cmp_filter_t *current;
 
   if (!root || !next) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_filter_append: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_filter_append: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -322,12 +438,24 @@ int cmp_filter_append(cmp_filter_t *root, cmp_filter_t *next) {
   return rc;
 }
 
+/**
+ * @brief cmp_backdrop_edge_mirror
+ *
+ * @param image_width Parameter description.
+ * @param x Parameter description.
+ * @param out_clamped_x Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_backdrop_edge_mirror(int image_width, int x, int *out_clamped_x) {
   int rc = CMP_SUCCESS;
 
   if (!out_clamped_x) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_backdrop_edge_mirror: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_backdrop_edge_mirror: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -341,14 +469,25 @@ int cmp_backdrop_edge_mirror(int image_width, int x, int *out_clamped_x) {
   return rc;
 }
 
+/**
+ * @brief cmp_shadow_9patch_generate_blur
+ *
+ * @param shadow Parameter description.
+ * @param gpu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shadow_9patch_generate_blur(cmp_shadow_9patch_t *shadow,
                                     cmp_gpu_t *gpu) {
   int rc = CMP_SUCCESS;
 
   if (!shadow || !gpu) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_shadow_9patch_generate_blur: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_shadow_9patch_generate_blur: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -356,6 +495,14 @@ int cmp_shadow_9patch_generate_blur(cmp_shadow_9patch_t *shadow,
   return rc;
 }
 
+/**
+ * @brief cmp_shadow_atlas_create
+ *
+ * @param width Parameter description.
+ * @param height Parameter description.
+ * @param out_atlas Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shadow_atlas_create(int width, int height,
                             cmp_shadow_atlas_t **out_atlas) {
   int rc = CMP_SUCCESS;
@@ -363,13 +510,21 @@ int cmp_shadow_atlas_create(int width, int height,
 
   if (!out_atlas || width <= 0 || height <= 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_shadow_atlas_create: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_shadow_atlas_create: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_shadow_atlas_t), (void **)&atlas);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_shadow_atlas_create: Out of memory\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_shadow_atlas_create: Out of memory: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -380,6 +535,12 @@ int cmp_shadow_atlas_create(int width, int height,
   return rc;
 }
 
+/**
+ * @brief cmp_shadow_atlas_destroy
+ *
+ * @param atlas Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_shadow_atlas_destroy(cmp_shadow_atlas_t *atlas) {
   int rc = CMP_SUCCESS;
 
@@ -393,6 +554,14 @@ int cmp_shadow_atlas_destroy(cmp_shadow_atlas_t *atlas) {
   return rc;
 }
 
+/**
+ * @brief cmp_backdrop_kawase_blur
+ *
+ * @param bg_texture Parameter description.
+ * @param radius Parameter description.
+ * @param out_blurred Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_backdrop_kawase_blur(cmp_texture_t *bg_texture, float radius,
                              cmp_texture_t **out_blurred) {
   int rc = CMP_SUCCESS;
@@ -400,7 +569,11 @@ int cmp_backdrop_kawase_blur(cmp_texture_t *bg_texture, float radius,
 
   if (!bg_texture || !out_blurred) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_backdrop_kawase_blur: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_backdrop_kawase_blur: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -408,13 +581,24 @@ int cmp_backdrop_kawase_blur(cmp_texture_t *bg_texture, float radius,
   return rc;
 }
 
+/**
+ * @brief cmp_blend_mode_resolve
+ *
+ * @param mode Parameter description.
+ * @param out_gpu_blend_state Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_blend_mode_resolve(cmp_mix_blend_mode_t mode,
                            int *out_gpu_blend_state) {
   int rc = CMP_SUCCESS;
 
   if (!out_gpu_blend_state) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_blend_mode_resolve: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_blend_mode_resolve: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -422,12 +606,22 @@ int cmp_blend_mode_resolve(cmp_mix_blend_mode_t mode,
   return rc;
 }
 
+/**
+ * @brief cmp_isolation_context_begin
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_isolation_context_begin(cmp_isolation_context_t *ctx) {
   int rc = CMP_SUCCESS;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_isolation_context_begin: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_isolation_context_begin: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -435,12 +629,22 @@ int cmp_isolation_context_begin(cmp_isolation_context_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_isolation_context_end
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_isolation_context_end(cmp_isolation_context_t *ctx) {
   int rc = CMP_SUCCESS;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_isolation_context_end: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_isolation_context_end: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -448,13 +652,25 @@ int cmp_isolation_context_end(cmp_isolation_context_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_mask_image_apply
+ *
+ * @param source Parameter description.
+ * @param mask Parameter description.
+ * @param out_result Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_mask_image_apply(cmp_texture_t *source, cmp_mask_image_t *mask,
                          cmp_texture_t **out_result) {
   int rc = CMP_SUCCESS;
 
   if (!source || !mask || !out_result) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_mask_image_apply: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_mask_image_apply: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -462,6 +678,14 @@ int cmp_mask_image_apply(cmp_texture_t *source, cmp_mask_image_t *mask,
   return rc;
 }
 
+/**
+ * @brief cmp_svg_filter_fe_color_matrix
+ *
+ * @param source Parameter description.
+ * @param matrix Parameter description.
+ * @param out_result Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_filter_fe_color_matrix(cmp_texture_t *source,
                                    cmp_svg_fe_color_matrix_t *matrix,
                                    cmp_texture_t **out_result) {
@@ -469,8 +693,12 @@ int cmp_svg_filter_fe_color_matrix(cmp_texture_t *source,
 
   if (!source || !matrix || !out_result) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_svg_filter_fe_color_matrix: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_svg_filter_fe_color_matrix: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -478,6 +706,14 @@ int cmp_svg_filter_fe_color_matrix(cmp_texture_t *source,
   return rc;
 }
 
+/**
+ * @brief cmp_svg_filter_fe_displacement_map
+ *
+ * @param source Parameter description.
+ * @param map Parameter description.
+ * @param out_result Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_svg_filter_fe_displacement_map(cmp_texture_t *source,
                                        cmp_svg_fe_displacement_map_t *map,
                                        cmp_texture_t **out_result) {
@@ -485,8 +721,12 @@ int cmp_svg_filter_fe_displacement_map(cmp_texture_t *source,
 
   if (!source || !map || !out_result) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_svg_filter_fe_displacement_map: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_svg_filter_fe_displacement_map: Invalid argument: %s\n",
+                err_str);
+    }
     return rc;
   }
 

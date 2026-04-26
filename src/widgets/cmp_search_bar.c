@@ -13,6 +13,12 @@ struct cmp_search_controller {
   size_t suggestion_count;
 };
 
+/**
+ * @brief cmp_search_controller_create
+ *
+ * @param out_controller Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_search_controller_create(cmp_search_controller_t **out_controller) {
   struct cmp_search_controller *ctx;
   if (!out_controller)
@@ -32,6 +38,12 @@ int cmp_search_controller_create(cmp_search_controller_t **out_controller) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_search_controller_destroy
+ *
+ * @param controller Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_search_controller_destroy(cmp_search_controller_t *controller) {
   struct cmp_search_controller *ctx =
       (struct cmp_search_controller *)controller;
@@ -60,6 +72,13 @@ int cmp_search_controller_destroy(cmp_search_controller_t *controller) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_search_controller_set_text
+ *
+ * @param controller Parameter description.
+ * @param text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_search_controller_set_text(cmp_search_controller_t *controller,
                                    const char *text) {
   struct cmp_search_controller *ctx =
@@ -87,6 +106,13 @@ int cmp_search_controller_set_text(cmp_search_controller_t *controller,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_search_controller_add_scope
+ *
+ * @param controller Parameter description.
+ * @param scope_title Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_search_controller_add_scope(cmp_search_controller_t *controller,
                                     const char *scope_title) {
   struct cmp_search_controller *ctx =
@@ -121,6 +147,13 @@ int cmp_search_controller_add_scope(cmp_search_controller_t *controller,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_search_controller_set_active
+ *
+ * @param controller Parameter description.
+ * @param active Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_search_controller_set_active(cmp_search_controller_t *controller,
                                      int active) {
   struct cmp_search_controller *ctx =
@@ -132,6 +165,16 @@ int cmp_search_controller_set_active(cmp_search_controller_t *controller,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_search_controller_resolve_metrics
+ *
+ * @param controller Parameter description.
+ * @param available_width Parameter description.
+ * @param out_show_clear Parameter description.
+ * @param out_show_cancel Parameter description.
+ * @param out_placeholder_offset Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_search_controller_resolve_metrics(cmp_search_controller_t *controller,
                                           float available_width,
                                           int *out_show_clear,
@@ -163,6 +206,14 @@ int cmp_search_controller_resolve_metrics(cmp_search_controller_t *controller,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_search_controller_set_suggestions
+ *
+ * @param controller Parameter description.
+ * @param suggestions Parameter description.
+ * @param count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_search_controller_set_suggestions(cmp_search_controller_t *controller,
                                           const char **suggestions,
                                           size_t count) {

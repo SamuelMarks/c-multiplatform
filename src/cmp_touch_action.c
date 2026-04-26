@@ -4,6 +4,13 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_ui_node_set_touch_action
+ *
+ * @param node Parameter description.
+ * @param action Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_set_touch_action(cmp_ui_node_t *node, uint32_t action) {
   if (!node)
     return CMP_ERROR_INVALID_ARG;
@@ -14,6 +21,12 @@ int cmp_ui_node_set_touch_action(cmp_ui_node_t *node, uint32_t action) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_node_get_touch_action
+ *
+ * @param node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_get_touch_action(const cmp_ui_node_t *node) {
   if (!node)
     return (int)CMP_TOUCH_ACTION_AUTO;

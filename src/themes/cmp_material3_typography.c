@@ -4,6 +4,13 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_m3_typography_resolve
+ *
+ * @param category Parameter description.
+ * @param out_metrics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_typography_resolve(cmp_m3_typescale_category_t category,
                               cmp_m3_type_metrics_t *out_metrics) {
   if (!out_metrics) {
@@ -108,6 +115,13 @@ int cmp_m3_typography_resolve(cmp_m3_typescale_category_t category,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_typography_get_family
+ *
+ * @param is_brand Parameter description.
+ * @param out_font_family Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_typography_get_family(int is_brand, const char **out_font_family) {
   if (!out_font_family) {
     return CMP_ERROR_INVALID_ARG;

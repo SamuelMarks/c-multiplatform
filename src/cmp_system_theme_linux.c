@@ -6,14 +6,30 @@
 
 #if defined(__linux__) && !defined(__ANDROID__)
 
+/**
+ * @brief cmp_system_theme_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_theme_init(void) {
   return 0;
 }
 
+/**
+ * @brief cmp_system_theme_shutdown
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_theme_shutdown(void) {
   return 0;
 }
 
+/**
+ * @brief cmp_system_theme_is_dark
+ *
+ * @param out_is_dark Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_theme_is_dark(int *out_is_dark) {
   FILE *fp;
   char buffer[128];
@@ -44,6 +60,12 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
   return 0;
 }
 
+/**
+ * @brief cmp_system_theme_is_high_contrast
+ *
+ * @param out_is_high_contrast Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
   FILE *fp;
   char buffer[128];

@@ -18,6 +18,13 @@ struct cmp_databinding_s {
   size_t listener_capacity;
 };
 
+/**
+ * @brief cmp_databinding_create
+ *
+ * @param out_binding Parameter description.
+ * @param type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_databinding_create(cmp_databinding_t **out_binding,
                            cmp_data_type_t type) {
   int rc;
@@ -39,6 +46,12 @@ int cmp_databinding_create(cmp_databinding_t **out_binding,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_databinding_destroy
+ *
+ * @param binding Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_databinding_destroy(cmp_databinding_t *binding) {
   if (binding == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -59,6 +72,12 @@ int cmp_databinding_destroy(cmp_databinding_t *binding) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief notify_listeners
+ *
+ * @param binding Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void notify_listeners(cmp_databinding_t *binding) {
   size_t i;
   for (i = 0; i < binding->listener_count; ++i) {
@@ -68,6 +87,13 @@ static void notify_listeners(cmp_databinding_t *binding) {
   }
 }
 
+/**
+ * @brief cmp_databinding_set_string
+ *
+ * @param binding Parameter description.
+ * @param val Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_databinding_set_string(cmp_databinding_t *binding, const char *val) {
   size_t len;
   char *new_str;
@@ -104,6 +130,13 @@ int cmp_databinding_set_string(cmp_databinding_t *binding, const char *val) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_databinding_get_string
+ *
+ * @param binding Parameter description.
+ * @param out_val Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_databinding_get_string(cmp_databinding_t *binding,
                                const char **out_val) {
   if (binding == NULL || binding->type != CMP_DATA_TYPE_STRING ||
@@ -114,6 +147,13 @@ int cmp_databinding_get_string(cmp_databinding_t *binding,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_databinding_set_int
+ *
+ * @param binding Parameter description.
+ * @param val Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_databinding_set_int(cmp_databinding_t *binding, int val) {
   if (binding == NULL || binding->type != CMP_DATA_TYPE_INT) {
     return CMP_ERROR_INVALID_ARG;
@@ -123,6 +163,13 @@ int cmp_databinding_set_int(cmp_databinding_t *binding, int val) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_databinding_get_int
+ *
+ * @param binding Parameter description.
+ * @param out_val Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_databinding_get_int(cmp_databinding_t *binding, int *out_val) {
   if (binding == NULL || binding->type != CMP_DATA_TYPE_INT ||
       out_val == NULL) {
@@ -132,6 +179,14 @@ int cmp_databinding_get_int(cmp_databinding_t *binding, int *out_val) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_databinding_add_listener
+ *
+ * @param binding Parameter description.
+ * @param cb Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_databinding_add_listener(cmp_databinding_t *binding,
                                  cmp_databinding_cb_t cb, void *user_data) {
   size_t new_cap;
@@ -184,6 +239,13 @@ typedef struct {
   char property_name[32];
 } cmp_node_binding_ctx_t;
 
+/**
+ * @brief node_binding_cb
+ *
+ * @param binding Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void node_binding_cb(cmp_databinding_t *binding, void *user_data) {
   cmp_node_binding_ctx_t *ctx = (cmp_node_binding_ctx_t *)user_data;
   if (ctx && ctx->node && ctx->property_name) {
@@ -210,6 +272,14 @@ static void node_binding_cb(cmp_databinding_t *binding, void *user_data) {
   }
 }
 
+/**
+ * @brief cmp_ui_node_bind_generic
+ *
+ * @param node Parameter description.
+ * @param binding Parameter description.
+ * @param property_name Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_node_bind_generic(cmp_ui_node_t *node, cmp_databinding_t *binding,
                              const char *property_name) {
   cmp_node_binding_ctx_t *ctx;

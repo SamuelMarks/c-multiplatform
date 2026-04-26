@@ -494,6 +494,24 @@ TEST test_pointer_lock(void) {
   PASS();
 }
 
+TEST test_window_null_args(void) {
+  cmp_window_t *window = NULL;
+  cmp_window_config_t config;
+
+  cmp_window_system_init();
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_window_create(NULL, &window), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_window_create(&config, NULL), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_window_show(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_window_destroy(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_window_render_test_frame(NULL),
+                "%d");
+
+  cmp_window_system_shutdown();
+  PASS();
+}
+
 SUITE(window_suite) {
   RUN_TEST(test_window_lifecycle);
   RUN_TEST(test_window_drop_callback);
@@ -507,6 +525,7 @@ SUITE(window_suite) {
   RUN_TEST(test_scripting_apis);
   RUN_TEST(test_theme_and_visual_regression_apis);
   RUN_TEST(test_pointer_lock);
+  RUN_TEST(test_window_null_args);
 }
 GREATEST_MAIN_DEFS();
 

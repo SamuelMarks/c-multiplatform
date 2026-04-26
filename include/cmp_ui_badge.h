@@ -59,6 +59,16 @@ CMP_API int cmp_ui_badge_get_node(cmp_ui_badge_t *badge,
  */
 CMP_API int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text);
 
+/**
+ * \brief Binds the badge widget to the accessibility tree.
+ *
+ * \param widget The badge component.
+ * \param tree The accessibility tree.
+ * \return 0 on success, or a non-zero error code on failure.
+ */
+CMP_API int cmp_ui_badge_bind_a11y(cmp_ui_badge_t *widget,
+                                   cmp_a11y_tree_t *tree);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

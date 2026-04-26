@@ -8,6 +8,12 @@ struct cmp_range_slider {
   float values[2];
 };
 
+/**
+ * @brief cmp_range_slider_create
+ *
+ * @param out_slider Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_range_slider_create(cmp_range_slider_t **out_slider) {
   struct cmp_range_slider *slider;
 
@@ -24,6 +30,12 @@ int cmp_range_slider_create(cmp_range_slider_t **out_slider) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_range_slider_destroy
+ *
+ * @param slider Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_range_slider_destroy(cmp_range_slider_t *slider) {
   struct cmp_range_slider *internal_slider = (struct cmp_range_slider *)slider;
   if (!internal_slider)
@@ -33,6 +45,14 @@ int cmp_range_slider_destroy(cmp_range_slider_t *slider) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_range_slider_set_value
+ *
+ * @param slider Parameter description.
+ * @param thumb_index Parameter description.
+ * @param value Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_range_slider_set_value(cmp_range_slider_t *slider, int thumb_index,
                                float value) {
   struct cmp_range_slider *internal_slider = (struct cmp_range_slider *)slider;

@@ -9,6 +9,12 @@ struct cmp_haptics {
   int last_triggered_type;
 };
 
+/**
+ * @brief cmp_haptics_create
+ *
+ * @param out_haptics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_haptics_create(cmp_haptics_t **out_haptics) {
   int rc = CMP_SUCCESS;
   cmp_haptics_t *haptics = NULL;
@@ -32,6 +38,12 @@ int cmp_haptics_create(cmp_haptics_t **out_haptics) {
   return rc;
 }
 
+/**
+ * @brief cmp_haptics_destroy
+ *
+ * @param haptics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_haptics_destroy(cmp_haptics_t *haptics) {
   int rc = CMP_SUCCESS;
 
@@ -44,6 +56,13 @@ int cmp_haptics_destroy(cmp_haptics_t *haptics) {
   return rc;
 }
 
+/**
+ * @brief cmp_haptics_trigger
+ *
+ * @param haptics Parameter description.
+ * @param type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_haptics_trigger(cmp_haptics_t *haptics, cmp_haptics_type_t type) {
   int rc = CMP_SUCCESS;
 
@@ -58,6 +77,12 @@ int cmp_haptics_trigger(cmp_haptics_t *haptics, cmp_haptics_type_t type) {
   return rc;
 }
 
+/**
+ * @brief cmp_haptics_prepare
+ *
+ * @param haptics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_haptics_prepare(cmp_haptics_t *haptics) {
   int rc = CMP_SUCCESS;
 
@@ -71,6 +96,14 @@ int cmp_haptics_prepare(cmp_haptics_t *haptics) {
   return rc;
 }
 
+/**
+ * @brief cmp_haptics_trigger_with_audio_sync
+ *
+ * @param haptics Parameter description.
+ * @param type Parameter description.
+ * @param audio_file_path Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_haptics_trigger_with_audio_sync(cmp_haptics_t *haptics,
                                         cmp_haptics_type_t type,
                                         const char *audio_file_path) {
@@ -88,6 +121,12 @@ int cmp_haptics_trigger_with_audio_sync(cmp_haptics_t *haptics,
   return rc;
 }
 
+/**
+ * @brief cmp_haptics_trigger_rigid
+ *
+ * @param haptics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_haptics_trigger_rigid(cmp_haptics_t *haptics) {
   int rc = CMP_SUCCESS;
 
@@ -99,6 +138,12 @@ int cmp_haptics_trigger_rigid(cmp_haptics_t *haptics) {
   return rc;
 }
 
+/**
+ * @brief cmp_haptics_trigger_soft
+ *
+ * @param haptics Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_haptics_trigger_soft(cmp_haptics_t *haptics) {
   int rc = CMP_SUCCESS;
 

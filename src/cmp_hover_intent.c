@@ -15,6 +15,12 @@ struct cmp_hover_intent {
   float tolerance_radius;
 };
 
+/**
+ * @brief cmp_hover_intent_create
+ *
+ * @param out_intent Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
   int rc = CMP_SUCCESS;
   struct cmp_hover_intent *ctx = NULL;
@@ -41,6 +47,12 @@ int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
   return rc;
 }
 
+/**
+ * @brief cmp_hover_intent_destroy
+ *
+ * @param intent Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hover_intent_destroy(cmp_hover_intent_t *intent) {
   int rc = CMP_SUCCESS;
   struct cmp_hover_intent *ctx = (struct cmp_hover_intent *)intent;
@@ -55,6 +67,14 @@ int cmp_hover_intent_destroy(cmp_hover_intent_t *intent) {
   return rc;
 }
 
+/**
+ * @brief cmp_hover_intent_process
+ *
+ * @param intent Parameter description.
+ * @param event Parameter description.
+ * @param dt_ms Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hover_intent_process(cmp_hover_intent_t *intent,
                              const cmp_event_t *event, float dt_ms) {
   int rc = 0; /* Returns boolean 0 or 1, or negative error */

@@ -10,6 +10,14 @@ struct cmp_file_watcher {
   void *user_data;
 };
 
+/**
+ * @brief vfs_watch_proxy
+ *
+ * @param path Parameter description.
+ * @param event_type Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void vfs_watch_proxy(const char *path, int event_type, void *user_data) {
   cmp_file_watcher_t *w = (cmp_file_watcher_t *)user_data;
   if (w && w->user_cb) {
@@ -17,6 +25,12 @@ static void vfs_watch_proxy(const char *path, int event_type, void *user_data) {
   }
 }
 
+/**
+ * @brief cmp_file_watcher_create
+ *
+ * @param out_watcher Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_file_watcher_create(cmp_file_watcher_t **out_watcher) {
   int rc = CMP_SUCCESS;
   cmp_file_watcher_t *w = NULL;
@@ -28,9 +42,8 @@ int cmp_file_watcher_create(cmp_file_watcher_t **out_watcher) {
     return rc;
   }
 
-  w = (cmp_file_watcher_t *)malloc(sizeof(cmp_file_watcher_t));
-  if (!w) {
-    rc = CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_file_watcher_t), (void **)&w);
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_file_watcher_create: Out of memory\n");
     return rc;
   }
@@ -43,6 +56,12 @@ int cmp_file_watcher_create(cmp_file_watcher_t **out_watcher) {
   return rc;
 }
 
+/**
+ * @brief cmp_file_watcher_destroy
+ *
+ * @param watcher Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_file_watcher_destroy(cmp_file_watcher_t *watcher) {
   int rc = CMP_SUCCESS;
 
@@ -58,10 +77,23 @@ int cmp_file_watcher_destroy(cmp_file_watcher_t *watcher) {
     LOG_DEBUG("Error in cmp_file_watcher_destroy: Failed to stop watcher\n");
   }
 
-  free(watcher);
-  return rc;
+  rc = CMP_FREE(watcher);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_file_watcher_destroy: CMP_FREE failed\n");
+    return rc;
+  }
+  return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_file_watcher_start
+ *
+ * @param watcher Parameter description.
+ * @param dir_path Parameter description.
+ * @param cb Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_file_watcher_start(cmp_file_watcher_t *watcher, const char *dir_path,
                            cmp_file_watch_cb_t cb, void *user_data) {
   int rc = CMP_SUCCESS;
@@ -92,6 +124,12 @@ int cmp_file_watcher_start(cmp_file_watcher_t *watcher, const char *dir_path,
   return rc;
 }
 
+/**
+ * @brief cmp_file_watcher_stop
+ *
+ * @param watcher Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_file_watcher_stop(cmp_file_watcher_t *watcher) {
   int rc = CMP_SUCCESS;
 

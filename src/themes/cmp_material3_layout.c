@@ -4,6 +4,13 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_m3_window_size_class_resolve
+ *
+ * @param width_dp Parameter description.
+ * @param out_class Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_window_size_class_resolve(float width_dp,
                                      cmp_m3_window_size_class_t *out_class) {
   if (!out_class || width_dp < 0.0f) {
@@ -23,6 +30,13 @@ int cmp_m3_window_size_class_resolve(float width_dp,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_window_layout_config_get
+ *
+ * @param size_class Parameter description.
+ * @param out_config Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_window_layout_config_get(cmp_m3_window_size_class_t size_class,
                                     cmp_m3_window_layout_config_t *out_config) {
   if (!out_config) {
@@ -58,6 +72,15 @@ int cmp_m3_window_layout_config_get(cmp_m3_window_size_class_t size_class,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_layout_pattern_resolve
+ *
+ * @param size_class Parameter description.
+ * @param is_feed Parameter description.
+ * @param has_supporting_pane Parameter description.
+ * @param out_pattern Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_layout_pattern_resolve(cmp_m3_window_size_class_t size_class,
                                   int is_feed, int has_supporting_pane,
                                   cmp_m3_layout_pattern_t *out_pattern) {
@@ -86,6 +109,15 @@ int cmp_m3_layout_pattern_resolve(cmp_m3_window_size_class_t size_class,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_m3_foldable_posture_resolve
+ *
+ * @param has_hinge Parameter description.
+ * @param hinge_angle_degrees Parameter description.
+ * @param is_vertical_hinge Parameter description.
+ * @param out_posture Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_m3_foldable_posture_resolve(int has_hinge, float hinge_angle_degrees,
                                     int is_vertical_hinge,
                                     cmp_m3_posture_t *out_posture) {

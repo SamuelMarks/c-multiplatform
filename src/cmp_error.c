@@ -39,6 +39,11 @@ typedef struct _SYMBOL_INFO {
 
 #define SYMOPT_LOAD_LINES 0x00000010
 
+/**
+ * @brief cmp_dump_stack_trace
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 void cmp_dump_stack_trace(void) {
     void *stack[100];
     unsigned short frames;
@@ -99,6 +104,11 @@ void cmp_dump_stack_trace(void) {
 #include <execinfo.h>
 #include <unistd.h>
 
+/**
+ * @brief cmp_dump_stack_trace
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 void cmp_dump_stack_trace(void) {
     void *stack[100];
     int frames;
@@ -110,6 +120,11 @@ void cmp_dump_stack_trace(void) {
 
 #else
 
+/**
+ * @brief cmp_dump_stack_trace
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 void cmp_dump_stack_trace(void) {
     fprintf(stderr, "Stack trace not supported on this platform.\n");
 }
@@ -117,12 +132,53 @@ void cmp_dump_stack_trace(void) {
 #endif
 /* clang-format on */
 
+/**
+ * @brief Default callback for handling assertions.
+ *
+ * @param msg The message describing the assertion failure.
+ * @param file The source file where the assertion failed.
+ * @param line The line number where the assertion failed.
+ */
+static void cmp_default_assert_handler(const char *msg, const char *file,
+                                       int line) {
+  fprintf(stderr, "Assertion failed: %s at %s:%d\n", msg, file, line);
+  cmp_dump_stack_trace();
+  abort();
+}
+
+/**
+ * @brief Global pointer to the current assertion handler.
+ */
+static cmp_assert_handler_t g_assert_handler = cmp_default_assert_handler;
+
+/**
+ * @brief Sets a custom assertion handler.
+ *
+ * @param handler The custom handler to use.
+ * @return int Returns 0 on success.
+ */
+int cmp_set_assert_handler(cmp_assert_handler_t handler) {
+  g_assert_handler = handler;
+  return 0;
+}
+
+/**
+ * @brief cmp_crash_handler
+ *
+ * @param sig Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 static void cmp_crash_handler(int sig) {
   fprintf(stderr, "Caught signal %d\n", sig);
   cmp_dump_stack_trace();
   exit(1);
 }
 
+/**
+ * @brief cmp_crash_handler_init
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_crash_handler_init(void) {
   int rc = CMP_SUCCESS;
   signal(SIGSEGV, cmp_crash_handler);
@@ -132,14 +188,29 @@ int cmp_crash_handler_init(void) {
   return rc;
 }
 
+/**
+ * @brief cmp_assert_fail
+ *
+ * @param condition Parameter description.
+ * @param file Parameter description.
+ * @param line Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 void cmp_assert_fail(const char *condition, const char *file, int line) {
-  fprintf(stderr, "Assertion failed: %s, file %s, line %d\n", condition, file,
-          line);
-  cmp_dump_stack_trace();
-  exit(1);
+  if (g_assert_handler) {
+    g_assert_handler(condition, file, line);
+  } else {
+    cmp_default_assert_handler(condition, file, line);
+  }
 }
 
 #include <stdarg.h>
+/**
+ * @brief cmp_log_debug
+ *
+ * @param fmt Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 void cmp_log_debug(const char *fmt, ...) {
   va_list args;
   fprintf(stderr, "[DEBUG] ");
@@ -148,25 +219,45 @@ void cmp_log_debug(const char *fmt, ...) {
   va_end(args);
 }
 
-const char *cmp_strerror(int error) {
+/**
+ * @brief cmp_strerror
+ *
+ * @param error Parameter description.
+ * @param out_str Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_strerror(int error, const char **out_str) {
+  if (out_str == NULL) {
+    return CMP_ERROR_INVALID_ARG;
+  }
   switch (error) {
   case 0:
-    return "Success"; /* CMP_SUCCESS */
+    *out_str = "Success";
+    break;
   case CMP_ERROR_OOM:
-    return "Out of memory";
+    *out_str = "Out of memory";
+    break;
   case CMP_ERROR_INVALID_ARG:
-    return "Invalid argument provided";
+    *out_str = "Invalid argument provided";
+    break;
   case CMP_ERROR_NOT_FOUND:
-    return "Resource not found";
+    *out_str = "Resource not found";
+    break;
   case CMP_ERROR_BOUNDS:
-    return "Out of bounds access";
+    *out_str = "Out of bounds access";
+    break;
   case CMP_ERROR_IO:
-    return "I/O error";
+    *out_str = "I/O error";
+    break;
   case CMP_ERROR_INVALID_STATE:
-    return "Object in invalid state";
+    *out_str = "Object in invalid state";
+    break;
   case CMP_ERROR_GENERAL:
-    return "General/Unknown error";
+    *out_str = "General/Unknown error";
+    break;
   default:
-    return "Unknown error code";
+    *out_str = "Unknown error code";
+    break;
   }
+  return 0;
 }

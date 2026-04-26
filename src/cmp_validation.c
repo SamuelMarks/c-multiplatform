@@ -8,6 +8,12 @@ struct cmp_validation {
   int is_dirty;
 };
 
+/**
+ * @brief cmp_validation_create
+ *
+ * @param out_validation Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_validation_create(cmp_validation_t **out_validation) {
   struct cmp_validation *validation;
 
@@ -24,6 +30,12 @@ int cmp_validation_create(cmp_validation_t **out_validation) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_validation_destroy
+ *
+ * @param validation Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_validation_destroy(cmp_validation_t *validation) {
   struct cmp_validation *internal_validation =
       (struct cmp_validation *)validation;
@@ -34,6 +46,14 @@ int cmp_validation_destroy(cmp_validation_t *validation) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_validation_check
+ *
+ * @param validation Parameter description.
+ * @param input_value Parameter description.
+ * @param out_is_valid Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_validation_check(cmp_validation_t *validation, const char *input_value,
                          int *out_is_valid) {
   struct cmp_validation *internal_validation =

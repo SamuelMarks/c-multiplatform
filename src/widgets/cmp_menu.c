@@ -26,6 +26,13 @@ struct cmp_menu {
   size_t capacity;
 };
 
+/**
+ * @brief cmp_menu_create
+ *
+ * @param out_menu Parameter description.
+ * @param presentation Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_menu_create(cmp_menu_t **out_menu,
                     cmp_menu_presentation_t presentation) {
   struct cmp_menu *ctx;
@@ -43,6 +50,12 @@ int cmp_menu_create(cmp_menu_t **out_menu,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_menu_destroy
+ *
+ * @param menu_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_menu_destroy(cmp_menu_t *menu_opaque) {
   struct cmp_menu *menu = (struct cmp_menu *)menu_opaque;
   size_t i;
@@ -67,6 +80,15 @@ int cmp_menu_destroy(cmp_menu_t *menu_opaque) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_menu_item_create
+ *
+ * @param out_item Parameter description.
+ * @param title Parameter description.
+ * @param symbol Parameter description.
+ * @param role Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_menu_item_create(cmp_menu_item_t **out_item, const char *title,
                          const char *symbol, cmp_menu_item_role_t role) {
   struct cmp_menu_item *item;
@@ -107,6 +129,13 @@ int cmp_menu_item_create(cmp_menu_item_t **out_item, const char *title,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_menu_add_item
+ *
+ * @param menu_opaque Parameter description.
+ * @param item_opaque Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_menu_add_item(cmp_menu_t *menu_opaque, cmp_menu_item_t *item_opaque) {
   struct cmp_menu *menu = (struct cmp_menu *)menu_opaque;
   struct cmp_menu_item *item = (struct cmp_menu_item *)item_opaque;
@@ -133,6 +162,15 @@ int cmp_menu_add_item(cmp_menu_t *menu_opaque, cmp_menu_item_t *item_opaque) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_menu_item_create_submenu
+ *
+ * @param out_item Parameter description.
+ * @param title Parameter description.
+ * @param symbol Parameter description.
+ * @param child_menu Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_menu_item_create_submenu(cmp_menu_item_t **out_item, const char *title,
                                  const char *symbol, cmp_menu_t *child_menu) {
   int err;
@@ -153,6 +191,13 @@ int cmp_menu_item_create_submenu(cmp_menu_item_t **out_item, const char *title,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_menu_item_create_deferred
+ *
+ * @param out_item Parameter description.
+ * @param title Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_menu_item_create_deferred(cmp_menu_item_t **out_item,
                                   const char *title) {
   int err;
@@ -169,6 +214,13 @@ int cmp_menu_item_create_deferred(cmp_menu_item_t **out_item,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_menu_item_set_state
+ *
+ * @param item_opaque Parameter description.
+ * @param state Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_menu_item_set_state(cmp_menu_item_t *item_opaque,
                             cmp_menu_item_state_t state) {
   struct cmp_menu_item *item = (struct cmp_menu_item *)item_opaque;
@@ -178,6 +230,15 @@ int cmp_menu_item_set_state(cmp_menu_item_t *item_opaque,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_menu_resolve_presentation
+ *
+ * @param menu_opaque Parameter description.
+ * @param out_bg_blur Parameter description.
+ * @param out_lift_target Parameter description.
+ * @param out_has_arrow Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_menu_resolve_presentation(cmp_menu_t *menu_opaque, int *out_bg_blur,
                                   int *out_lift_target, int *out_has_arrow) {
   struct cmp_menu *menu = (struct cmp_menu *)menu_opaque;
@@ -205,6 +266,14 @@ int cmp_menu_resolve_presentation(cmp_menu_t *menu_opaque, int *out_bg_blur,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_menu_item_resolve_visuals
+ *
+ * @param item_opaque Parameter description.
+ * @param out_is_red Parameter description.
+ * @param out_state_icon Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_menu_item_resolve_visuals(cmp_menu_item_t *item_opaque, int *out_is_red,
                                   const char **out_state_icon) {
   struct cmp_menu_item *item = (struct cmp_menu_item *)item_opaque;

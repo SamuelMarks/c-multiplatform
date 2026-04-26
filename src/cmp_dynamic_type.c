@@ -8,6 +8,12 @@ struct cmp_dynamic_type {
   cmp_a11y_content_size_category_t category;
 };
 
+/**
+ * @brief cmp_dynamic_type_create
+ *
+ * @param out_dynamic_type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dynamic_type_create(cmp_dynamic_type_t **out_dynamic_type) {
   int rc = CMP_SUCCESS;
   struct cmp_dynamic_type *dt = NULL;
@@ -30,6 +36,12 @@ int cmp_dynamic_type_create(cmp_dynamic_type_t **out_dynamic_type) {
   return rc;
 }
 
+/**
+ * @brief cmp_dynamic_type_destroy
+ *
+ * @param dynamic_type Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dynamic_type_destroy(cmp_dynamic_type_t *dynamic_type) {
   int rc = CMP_SUCCESS;
   if (dynamic_type) {
@@ -38,6 +50,13 @@ int cmp_dynamic_type_destroy(cmp_dynamic_type_t *dynamic_type) {
   return rc;
 }
 
+/**
+ * @brief cmp_dynamic_type_set_category
+ *
+ * @param dynamic_type Parameter description.
+ * @param category Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dynamic_type_set_category(cmp_dynamic_type_t *dynamic_type,
                                   cmp_a11y_content_size_category_t category) {
   int rc = CMP_SUCCESS;
@@ -54,6 +73,14 @@ int cmp_dynamic_type_set_category(cmp_dynamic_type_t *dynamic_type,
   return rc;
 }
 
+/**
+ * @brief cmp_dynamic_type_apply_scale
+ *
+ * @param dynamic_type Parameter description.
+ * @param base_size Parameter description.
+ * @param out_scaled_size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dynamic_type_apply_scale(cmp_dynamic_type_t *dynamic_type,
                                  float base_size, float *out_scaled_size) {
   int rc = CMP_SUCCESS;
@@ -112,6 +139,13 @@ int cmp_dynamic_type_apply_scale(cmp_dynamic_type_t *dynamic_type,
   return rc;
 }
 
+/**
+ * @brief cmp_dynamic_type_should_reflow
+ *
+ * @param dynamic_type Parameter description.
+ * @param out_should_reflow Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_dynamic_type_should_reflow(cmp_dynamic_type_t *dynamic_type,
                                    int *out_should_reflow) {
   int rc = CMP_SUCCESS;
@@ -132,6 +166,12 @@ struct cmp_a11y_bold_text {
   int enabled;
 };
 
+/**
+ * @brief cmp_a11y_bold_text_create
+ *
+ * @param out_bold_text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_bold_text_create(cmp_a11y_bold_text_t **out_bold_text) {
   int rc = CMP_SUCCESS;
   struct cmp_a11y_bold_text *bt = NULL;
@@ -153,6 +193,12 @@ int cmp_a11y_bold_text_create(cmp_a11y_bold_text_t **out_bold_text) {
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_bold_text_destroy
+ *
+ * @param bold_text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_bold_text_destroy(cmp_a11y_bold_text_t *bold_text) {
   int rc = CMP_SUCCESS;
   if (bold_text) {
@@ -161,6 +207,13 @@ int cmp_a11y_bold_text_destroy(cmp_a11y_bold_text_t *bold_text) {
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_bold_text_set
+ *
+ * @param bold_text Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_bold_text_set(cmp_a11y_bold_text_t *bold_text, int enabled) {
   int rc = CMP_SUCCESS;
   struct cmp_a11y_bold_text *bt = (struct cmp_a11y_bold_text *)bold_text;
@@ -175,6 +228,14 @@ int cmp_a11y_bold_text_set(cmp_a11y_bold_text_t *bold_text, int enabled) {
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_bold_text_apply
+ *
+ * @param bold_text Parameter description.
+ * @param base_weight Parameter description.
+ * @param out_weight Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_bold_text_apply(cmp_a11y_bold_text_t *bold_text, int base_weight,
                              int *out_weight) {
   int rc = CMP_SUCCESS;
@@ -200,6 +261,12 @@ struct cmp_a11y_button_shapes {
   int enabled;
 };
 
+/**
+ * @brief cmp_a11y_button_shapes_create
+ *
+ * @param out_button_shapes Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_button_shapes_create(
     cmp_a11y_button_shapes_t **out_button_shapes) {
   int rc = CMP_SUCCESS;
@@ -222,6 +289,12 @@ int cmp_a11y_button_shapes_create(
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_button_shapes_destroy
+ *
+ * @param button_shapes Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_button_shapes_destroy(cmp_a11y_button_shapes_t *button_shapes) {
   int rc = CMP_SUCCESS;
   if (button_shapes) {
@@ -230,6 +303,13 @@ int cmp_a11y_button_shapes_destroy(cmp_a11y_button_shapes_t *button_shapes) {
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_button_shapes_set
+ *
+ * @param button_shapes Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_button_shapes_set(cmp_a11y_button_shapes_t *button_shapes,
                                int enabled) {
   int rc = CMP_SUCCESS;
@@ -246,6 +326,13 @@ int cmp_a11y_button_shapes_set(cmp_a11y_button_shapes_t *button_shapes,
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_button_shapes_should_draw
+ *
+ * @param button_shapes Parameter description.
+ * @param out_should_draw Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_button_shapes_should_draw(cmp_a11y_button_shapes_t *button_shapes,
                                        int *out_should_draw) {
   int rc = CMP_SUCCESS;
@@ -267,6 +354,12 @@ struct cmp_a11y_increase_contrast {
   int enabled;
 };
 
+/**
+ * @brief cmp_a11y_increase_contrast_create
+ *
+ * @param out_increase_contrast Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_increase_contrast_create(
     cmp_a11y_increase_contrast_t **out_increase_contrast) {
   int rc = CMP_SUCCESS;
@@ -289,6 +382,12 @@ int cmp_a11y_increase_contrast_create(
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_increase_contrast_destroy
+ *
+ * @param increase_contrast Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_increase_contrast_destroy(
     cmp_a11y_increase_contrast_t *increase_contrast) {
   int rc = CMP_SUCCESS;
@@ -298,6 +397,13 @@ int cmp_a11y_increase_contrast_destroy(
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_increase_contrast_set
+ *
+ * @param increase_contrast Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_increase_contrast_set(
     cmp_a11y_increase_contrast_t *increase_contrast, int enabled) {
   int rc = CMP_SUCCESS;
@@ -314,6 +420,13 @@ int cmp_a11y_increase_contrast_set(
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_increase_contrast_apply
+ *
+ * @param increase_contrast Parameter description.
+ * @param out_opacity_factor Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_increase_contrast_apply(
     cmp_a11y_increase_contrast_t *increase_contrast,
     float *out_opacity_factor) {
@@ -336,6 +449,12 @@ struct cmp_a11y_hover_text {
   int enabled;
 };
 
+/**
+ * @brief cmp_a11y_hover_text_create
+ *
+ * @param out_hover_text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_hover_text_create(cmp_a11y_hover_text_t **out_hover_text) {
   int rc = CMP_SUCCESS;
   struct cmp_a11y_hover_text *ht = NULL;
@@ -357,6 +476,12 @@ int cmp_a11y_hover_text_create(cmp_a11y_hover_text_t **out_hover_text) {
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_hover_text_destroy
+ *
+ * @param hover_text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_hover_text_destroy(cmp_a11y_hover_text_t *hover_text) {
   int rc = CMP_SUCCESS;
   if (hover_text) {
@@ -365,6 +490,15 @@ int cmp_a11y_hover_text_destroy(cmp_a11y_hover_text_t *hover_text) {
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_hover_text_get_bubble
+ *
+ * @param hover_text Parameter description.
+ * @param node_id Parameter description.
+ * @param out_text Parameter description.
+ * @param capacity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_hover_text_get_bubble(cmp_a11y_hover_text_t *hover_text,
                                    int node_id, char *out_text,
                                    size_t capacity) {
@@ -390,6 +524,12 @@ int cmp_a11y_hover_text_get_bubble(cmp_a11y_hover_text_t *hover_text,
 
 #include <math.h>
 
+/**
+ * @brief get_luminance
+ *
+ * @param rgba Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 float get_luminance(uint32_t rgba) {
   float r = (float)((rgba >> 24) & 0xFF) / 255.0f;
   float g = (float)((rgba >> 16) & 0xFF) / 255.0f;
@@ -400,6 +540,15 @@ float get_luminance(uint32_t rgba) {
   return 0.2126f * r + 0.7152f * g + 0.0722f * b;
 }
 
+/**
+ * @brief cmp_color_verify_contrast_ratio
+ *
+ * @param foreground_rgba Parameter description.
+ * @param background_rgba Parameter description.
+ * @param is_large_text Parameter description.
+ * @param out_passes_wcag Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_color_verify_contrast_ratio(uint32_t foreground_rgba,
                                     uint32_t background_rgba, int is_large_text,
                                     int *out_passes_wcag) {
@@ -433,6 +582,12 @@ struct cmp_a11y_autoplay_avoidance {
   int enabled;
 };
 
+/**
+ * @brief cmp_a11y_autoplay_avoidance_create
+ *
+ * @param out_ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_autoplay_avoidance_create(
     cmp_a11y_autoplay_avoidance_t **out_ctx) {
   int rc = CMP_SUCCESS;
@@ -456,6 +611,12 @@ int cmp_a11y_autoplay_avoidance_create(
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_autoplay_avoidance_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_autoplay_avoidance_destroy(cmp_a11y_autoplay_avoidance_t *ctx) {
   int rc = CMP_SUCCESS;
   if (ctx) {
@@ -464,6 +625,13 @@ int cmp_a11y_autoplay_avoidance_destroy(cmp_a11y_autoplay_avoidance_t *ctx) {
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_autoplay_avoidance_set
+ *
+ * @param ctx Parameter description.
+ * @param enabled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_autoplay_avoidance_set(cmp_a11y_autoplay_avoidance_t *ctx,
                                     int enabled) {
   int rc = CMP_SUCCESS;
@@ -480,6 +648,13 @@ int cmp_a11y_autoplay_avoidance_set(cmp_a11y_autoplay_avoidance_t *ctx,
   return rc;
 }
 
+/**
+ * @brief cmp_a11y_autoplay_should_play
+ *
+ * @param ctx Parameter description.
+ * @param out_should_play Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_a11y_autoplay_should_play(cmp_a11y_autoplay_avoidance_t *ctx,
                                   int *out_should_play) {
   int rc = CMP_SUCCESS;

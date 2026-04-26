@@ -13,6 +13,12 @@ struct cmp_keyframe {
   cmp_animation_fill_mode_t fill_mode;
 };
 
+/**
+ * @brief cmp_keyframe_create
+ *
+ * @param out_keyframe Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keyframe_create(cmp_keyframe_t **out_keyframe) {
   int rc = CMP_SUCCESS;
   struct cmp_keyframe *keyframe = NULL;
@@ -35,6 +41,12 @@ int cmp_keyframe_create(cmp_keyframe_t **out_keyframe) {
   return rc;
 }
 
+/**
+ * @brief cmp_keyframe_destroy
+ *
+ * @param keyframe Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keyframe_destroy(cmp_keyframe_t *keyframe) {
   int rc = CMP_SUCCESS;
   struct cmp_keyframe *internal_keyframe = (struct cmp_keyframe *)keyframe;
@@ -49,6 +61,13 @@ int cmp_keyframe_destroy(cmp_keyframe_t *keyframe) {
   return rc;
 }
 
+/**
+ * @brief cmp_keyframe_add_stop
+ *
+ * @param keyframe Parameter description.
+ * @param percentage Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keyframe_add_stop(cmp_keyframe_t *keyframe, float percentage) {
   int rc = CMP_SUCCESS;
   struct cmp_keyframe *internal_keyframe = (struct cmp_keyframe *)keyframe;
@@ -69,6 +88,15 @@ int cmp_keyframe_add_stop(cmp_keyframe_t *keyframe, float percentage) {
   return rc;
 }
 
+/**
+ * @brief cmp_keyframe_step
+ *
+ * @param keyframe Parameter description.
+ * @param dt_ms Parameter description.
+ * @param play_state Parameter description.
+ * @param out_current_percentage Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_keyframe_step(cmp_keyframe_t *keyframe, double dt_ms,
                       cmp_animation_play_state_t play_state,
                       float *out_current_percentage) {

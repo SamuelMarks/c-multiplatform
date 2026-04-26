@@ -3,21 +3,30 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_syntax_highlighter {
   int is_initialized;
 };
 
+/**
+ * @brief cmp_syntax_highlighter_create
+ *
+ * @param out_hl Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_syntax_highlighter_create(cmp_syntax_highlighter_t **out_hl) {
+  int rc = CMP_SUCCESS;
   cmp_syntax_highlighter_t *hl;
 
   if (!out_hl) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  hl = (cmp_syntax_highlighter_t *)malloc(sizeof(cmp_syntax_highlighter_t));
-  if (!hl) {
+  rc = CMP_MALLOC(sizeof(cmp_syntax_highlighter_t), (void **)&(hl));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
 
@@ -27,18 +36,39 @@ int cmp_syntax_highlighter_create(cmp_syntax_highlighter_t **out_hl) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_syntax_highlighter_destroy
+ *
+ * @param hl Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_syntax_highlighter_destroy(cmp_syntax_highlighter_t *hl) {
+  int rc = CMP_SUCCESS;
   if (!hl) {
     return CMP_ERROR_INVALID_ARG;
   }
-  free(hl);
+  rc = CMP_FREE(hl);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_syntax_highlighter_parse
+ *
+ * @param hl Parameter description.
+ * @param source_code Parameter description.
+ * @param language Parameter description.
+ * @param out_spans Parameter description.
+ * @param out_count Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_syntax_highlighter_parse(cmp_syntax_highlighter_t *hl,
                                  const char *source_code, const char *language,
                                  cmp_highlight_span_t **out_spans,
                                  size_t *out_count) {
+  int rc = CMP_SUCCESS;
   cmp_highlight_span_t *spans;
   size_t capacity;
   size_t count;
@@ -55,21 +85,28 @@ int cmp_syntax_highlighter_parse(cmp_syntax_highlighter_t *hl,
   len = strlen(source_code);
   capacity = 16;
   count = 0;
-  spans =
-      (cmp_highlight_span_t *)malloc(capacity * sizeof(cmp_highlight_span_t));
-
-  if (!spans) {
+  rc = CMP_MALLOC(capacity * sizeof(cmp_highlight_span_t), (void **)&spans);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
 
   /* Basic fallback lexer. A real integration bridges to Tree-sitter here. */
   for (i = 0; i < len; i++) {
     if (capacity - count < 4) {
-      capacity *= 2;
-      spans = (cmp_highlight_span_t *)realloc(
-          spans, capacity * sizeof(cmp_highlight_span_t));
-      if (!spans)
+      cmp_highlight_span_t *new_spans;
+      size_t new_capacity = capacity * 2;
+      rc = CMP_MALLOC(new_capacity * sizeof(cmp_highlight_span_t),
+                      (void **)&new_spans);
+      if (rc != CMP_SUCCESS) {
+        LOG_DEBUG("OOM\n");
+        CMP_FREE(spans);
         return CMP_ERROR_OOM;
+      }
+      memcpy(new_spans, spans, count * sizeof(cmp_highlight_span_t));
+      CMP_FREE(spans);
+      spans = new_spans;
+      capacity = new_capacity;
     }
 
     if (source_code[i] == '/' && i + 1 < len && source_code[i + 1] == '*') {
@@ -181,9 +218,19 @@ int cmp_syntax_highlighter_parse(cmp_syntax_highlighter_t *hl,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_syntax_highlighter_free_spans
+ *
+ * @param spans Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_syntax_highlighter_free_spans(cmp_highlight_span_t *spans) {
+  int rc = CMP_SUCCESS;
   if (spans) {
-    free(spans);
+    rc = CMP_FREE(spans);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
   }
   return CMP_SUCCESS;
 }

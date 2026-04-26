@@ -8,6 +8,12 @@ struct cmp_hw_video_decoder {
   int active;
 };
 
+/**
+ * @brief cmp_hw_video_decoder_create
+ *
+ * @param out_decoder Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hw_video_decoder_create(cmp_hw_video_decoder_t **out_decoder) {
   struct cmp_hw_video_decoder *decoder;
   if (!out_decoder)
@@ -20,6 +26,12 @@ int cmp_hw_video_decoder_create(cmp_hw_video_decoder_t **out_decoder) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_hw_video_decoder_destroy
+ *
+ * @param decoder Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hw_video_decoder_destroy(cmp_hw_video_decoder_t *decoder) {
   if (!decoder)
     return CMP_ERROR_INVALID_ARG;
@@ -27,6 +39,15 @@ int cmp_hw_video_decoder_destroy(cmp_hw_video_decoder_t *decoder) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_hw_video_decoder_decode_frame
+ *
+ * @param decoder Parameter description.
+ * @param data Parameter description.
+ * @param size Parameter description.
+ * @param out_nv12_buffer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_hw_video_decoder_decode_frame(cmp_hw_video_decoder_t *decoder,
                                       const void *data, size_t size,
                                       void *out_nv12_buffer) {

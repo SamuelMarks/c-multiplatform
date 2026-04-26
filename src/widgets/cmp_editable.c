@@ -10,6 +10,12 @@ struct cmp_editable {
   size_t length;
 };
 
+/**
+ * @brief cmp_editable_create
+ *
+ * @param out_editable Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_editable_create(cmp_editable_t **out_editable) {
   struct cmp_editable *editable;
 
@@ -34,6 +40,12 @@ int cmp_editable_create(cmp_editable_t **out_editable) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_editable_destroy
+ *
+ * @param editable Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_editable_destroy(cmp_editable_t *editable) {
   struct cmp_editable *internal_editable = (struct cmp_editable *)editable;
   if (!internal_editable)
@@ -46,6 +58,13 @@ int cmp_editable_destroy(cmp_editable_t *editable) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_editable_insert_text
+ *
+ * @param editable Parameter description.
+ * @param text Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_editable_insert_text(cmp_editable_t *editable, const char *text) {
   struct cmp_editable *internal_editable = (struct cmp_editable *)editable;
   size_t text_len;

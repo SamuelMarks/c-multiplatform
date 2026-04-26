@@ -91,6 +91,14 @@ typedef BOOL(WINAPI *pfnSetWindowCompositionAttribute)(
 #define DWMSBT_TABBEDWINDOW 4
 #endif
 
+/**
+ * @brief cmp_win32_request_windows_material
+ *
+ * @param materials Parameter description.
+ * @param window Parameter description.
+ * @param material Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_win32_request_windows_material(cmp_materials_t *materials,
                                            cmp_window_t *window,
                                            cmp_windows_material_t material) {

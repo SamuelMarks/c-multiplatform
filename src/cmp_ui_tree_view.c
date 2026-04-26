@@ -2,6 +2,7 @@
 #include "cmp_ui_tree_view.h"
 #include <stdlib.h>
 #include <string.h>
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_ui_tree_view {
@@ -9,8 +10,16 @@ struct cmp_ui_tree_view {
   int item_count;
 };
 
+/**
+ * @brief cmp_ui_tree_view_create
+ *
+ * @param out_tree_view Parameter description.
+ * @param bg_color Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,
                             uint32_t bg_color) {
+  int rc = CMP_SUCCESS;
   cmp_ui_tree_view_t *tree_view;
   int err;
 
@@ -18,8 +27,9 @@ int cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  tree_view = (cmp_ui_tree_view_t *)malloc(sizeof(cmp_ui_tree_view_t));
-  if (!tree_view) {
+  rc = CMP_MALLOC(sizeof(cmp_ui_tree_view_t), (void **)&(tree_view));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
 
@@ -27,7 +37,10 @@ int cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,
 
   err = cmp_ui_box_create(&tree_view->node_root);
   if (err != 0) {
-    free(tree_view);
+    rc = CMP_FREE(tree_view);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
     return err;
   }
 
@@ -37,14 +50,31 @@ int cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,
   return 0;
 }
 
+/**
+ * @brief cmp_ui_tree_view_destroy
+ *
+ * @param tree_view Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_tree_view_destroy(cmp_ui_tree_view_t *tree_view) {
+  int rc = CMP_SUCCESS;
   if (!tree_view) {
     return CMP_ERROR_INVALID_ARG;
   }
-  free(tree_view);
+  rc = CMP_FREE(tree_view);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+  }
   return 0;
 }
 
+/**
+ * @brief cmp_ui_tree_view_get_node
+ *
+ * @param tree_view Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_tree_view_get_node(cmp_ui_tree_view_t *tree_view,
                               cmp_ui_node_t **out_node) {
   if (!tree_view || !out_node) {
@@ -54,6 +84,14 @@ int cmp_ui_tree_view_get_node(cmp_ui_tree_view_t *tree_view,
   return 0;
 }
 
+/**
+ * @brief cmp_ui_tree_view_add_item
+ *
+ * @param tree_view Parameter description.
+ * @param label Parameter description.
+ * @param depth Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_tree_view_add_item(cmp_ui_tree_view_t *tree_view, const char *label,
                               int depth) {
   cmp_ui_node_t *node_text;

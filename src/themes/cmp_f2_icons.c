@@ -1,11 +1,21 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include "themes/cmp_f2_icons.h"
 #include <stddef.h>
 #include <string.h>
 #include <stdlib.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_f2_icon_create
+ *
+ * @param out_node Parameter description.
+ * @param codepoint_regular Parameter description.
+ * @param codepoint_filled Parameter description.
+ * @param size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node,
                                uint32_t codepoint_regular,
                                uint32_t codepoint_filled, float size) {
@@ -14,6 +24,7 @@ CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node,
   char codepoint_str[8];
 
   if (!out_node) {
+    LOG_DEBUG("cmp_f2_icon_create: out_node is NULL\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
@@ -24,11 +35,13 @@ CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node,
 
   res = cmp_ui_text_create(out_node, codepoint_str, -1);
   if (res != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_f2_icon_create: cmp_ui_text_create failed\n");
     return res;
   }
 
-  icon_data = (cmp_f2_icon_t *)malloc(sizeof(cmp_f2_icon_t));
-  if (!icon_data) {
+  res = CMP_MALLOC(sizeof(cmp_f2_icon_t), (void **)&icon_data);
+  if (res != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_f2_icon_create: OOM\n");
     cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
@@ -48,11 +61,19 @@ CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_f2_icon_set_filled
+ *
+ * @param icon_node Parameter description.
+ * @param is_filled Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 CMP_API int cmp_f2_icon_set_filled(cmp_ui_node_t *icon_node, int is_filled) {
   cmp_f2_icon_t *icon_data;
   char codepoint_str[8];
 
   if (!icon_node || !icon_node->properties) {
+    LOG_DEBUG("cmp_f2_icon_set_filled: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
 

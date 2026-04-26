@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "cmp_apz.h"
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -12,20 +13,34 @@ struct cmp_apz {
   float current_scale;
 };
 
+/**
+ * @brief cmp_apz_create
+ *
+ * @param out_apz Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_apz_create(cmp_apz_t **out_apz) {
   int rc = CMP_SUCCESS;
   struct cmp_apz *ctx = NULL;
 
   if (!out_apz) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_apz_create: Invalid argument (out_apz=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_apz_create: Invalid argument (out_apz=NULL): %s\n",
+                err_str);
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_apz), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    fprintf(stderr, "Error in cmp_apz_create: Out of memory\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_apz_create: Out of memory: %s\n", err_str);
+    }
     return rc;
   }
 
@@ -35,13 +50,23 @@ int cmp_apz_create(cmp_apz_t **out_apz) {
   return rc;
 }
 
+/**
+ * @brief cmp_apz_destroy
+ *
+ * @param apz Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_apz_destroy(cmp_apz_t *apz) {
   int rc = CMP_SUCCESS;
   struct cmp_apz *ctx = (struct cmp_apz *)apz;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_apz_destroy: Invalid argument (apz=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_apz_destroy: Invalid argument (apz=NULL): %s\n", err_str);
+    }
     return rc;
   }
 
@@ -49,6 +74,15 @@ int cmp_apz_destroy(cmp_apz_t *apz) {
   return rc;
 }
 
+/**
+ * @brief cmp_apz_inject_gesture
+ *
+ * @param apz Parameter description.
+ * @param delta_x Parameter description.
+ * @param delta_y Parameter description.
+ * @param scale Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_apz_inject_gesture(cmp_apz_t *apz, float delta_x, float delta_y,
                            float scale) {
   int rc = CMP_SUCCESS;
@@ -56,8 +90,12 @@ int cmp_apz_inject_gesture(cmp_apz_t *apz, float delta_x, float delta_y,
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr,
-            "Error in cmp_apz_inject_gesture: Invalid argument (apz=NULL)\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_apz_inject_gesture: Invalid argument (apz=NULL): %s\n",
+                err_str);
+    }
     return rc;
   }
 
@@ -67,6 +105,13 @@ int cmp_apz_inject_gesture(cmp_apz_t *apz, float delta_x, float delta_y,
   return rc;
 }
 
+/**
+ * @brief cmp_apz_get_transform
+ *
+ * @param apz Parameter description.
+ * @param out_matrix Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_apz_get_transform(const cmp_apz_t *apz, float *out_matrix) {
   int rc = CMP_SUCCESS;
   const struct cmp_apz *ctx = (const struct cmp_apz *)apz;
@@ -74,7 +119,11 @@ int cmp_apz_get_transform(const cmp_apz_t *apz, float *out_matrix) {
 
   if (!ctx || !out_matrix) {
     rc = CMP_ERROR_INVALID_ARG;
-    fprintf(stderr, "Error in cmp_apz_get_transform: Invalid argument\n");
+    {
+      const char *err_str;
+      cmp_strerror(rc, &err_str);
+      LOG_DEBUG("cmp_apz_get_transform: Invalid argument: %s\n", err_str);
+    }
     return rc;
   }
 

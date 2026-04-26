@@ -5,6 +5,14 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief cmp_media_query_evaluate
+ *
+ * @param query Parameter description.
+ * @param env Parameter description.
+ * @param out_matches Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_media_query_evaluate(const cmp_media_query_t *query,
                              const cmp_media_query_env_t *env,
                              int *out_matches) {
@@ -42,6 +50,14 @@ int cmp_media_query_evaluate(const cmp_media_query_t *query,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_pointer_media_evaluate
+ *
+ * @param query Parameter description.
+ * @param env Parameter description.
+ * @param out_matches Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_pointer_media_evaluate(const cmp_media_query_t *query,
                                const cmp_media_query_env_t *env,
                                int *out_matches) {
@@ -58,6 +74,14 @@ int cmp_pointer_media_evaluate(const cmp_media_query_t *query,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_update_media_evaluate
+ *
+ * @param query Parameter description.
+ * @param env Parameter description.
+ * @param out_matches Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_update_media_evaluate(const cmp_media_query_t *query,
                               const cmp_media_query_env_t *env,
                               int *out_matches) {
@@ -71,6 +95,14 @@ int cmp_update_media_evaluate(const cmp_media_query_t *query,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_light_level_evaluate
+ *
+ * @param query Parameter description.
+ * @param env Parameter description.
+ * @param out_matches Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_light_level_evaluate(const cmp_media_query_t *query,
                              const cmp_media_query_env_t *env,
                              int *out_matches) {
@@ -84,6 +116,14 @@ int cmp_light_level_evaluate(const cmp_media_query_t *query,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_container_ctx_create
+ *
+ * @param out_ctx Parameter description.
+ * @param type Parameter description.
+ * @param name Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_container_ctx_create(cmp_container_ctx_t **out_ctx,
                              cmp_container_type_t type, const char *name) {
   cmp_container_ctx_t *ctx;
@@ -104,6 +144,12 @@ int cmp_container_ctx_create(cmp_container_ctx_t **out_ctx,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_container_ctx_destroy
+ *
+ * @param ctx Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_container_ctx_destroy(cmp_container_ctx_t *ctx) {
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -111,6 +157,14 @@ int cmp_container_ctx_destroy(cmp_container_ctx_t *ctx) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_container_query_evaluate
+ *
+ * @param query Parameter description.
+ * @param ctx Parameter description.
+ * @param out_matches Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_container_query_evaluate(const cmp_container_query_t *query,
                                  const cmp_container_ctx_t *ctx,
                                  int *out_matches) {
@@ -136,6 +190,15 @@ int cmp_container_query_evaluate(const cmp_container_query_t *query,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_style_query_evaluate
+ *
+ * @param query Parameter description.
+ * @param container_styles Parameter description.
+ * @param num_styles Parameter description.
+ * @param out_matches Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_style_query_evaluate(const cmp_style_query_t *query,
                              const cmp_style_query_t *container_styles,
                              int num_styles, int *out_matches) {
@@ -168,6 +231,15 @@ int cmp_style_query_evaluate(const cmp_style_query_t *query,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_content_visibility_evaluate
+ *
+ * @param visibility Parameter description.
+ * @param viewport Parameter description.
+ * @param node_rect Parameter description.
+ * @param out_is_visible Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_content_visibility_evaluate(cmp_content_visibility_t visibility,
                                     const cmp_rect_t *viewport,
                                     const cmp_rect_t *node_rect,
@@ -197,6 +269,14 @@ int cmp_content_visibility_evaluate(cmp_content_visibility_t visibility,
   return rc;
 }
 
+/**
+ * @brief cmp_contain_evaluate
+ *
+ * @param contain Parameter description.
+ * @param out_isolates_layout Parameter description.
+ * @param out_isolates_paint Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_contain_evaluate(cmp_contain_t contain, int *out_isolates_layout,
                          int *out_isolates_paint) {
   int rc = CMP_SUCCESS;
@@ -232,6 +312,15 @@ int cmp_contain_evaluate(cmp_contain_t contain, int *out_isolates_layout,
   return rc;
 }
 
+/**
+ * @brief cmp_resize_observer_create
+ *
+ * @param out_observer Parameter description.
+ * @param float Parameter description.
+ * @param float) Parameter description.
+ * @param user_data Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resize_observer_create(cmp_resize_observer_t **out_observer,
                                void (*on_resize)(struct cmp_resize_observer *,
                                                  cmp_layout_node_t *, float,
@@ -260,6 +349,12 @@ int cmp_resize_observer_create(cmp_resize_observer_t **out_observer,
   return rc;
 }
 
+/**
+ * @brief cmp_resize_observer_destroy
+ *
+ * @param observer Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resize_observer_destroy(cmp_resize_observer_t *observer) {
   int rc = CMP_SUCCESS;
 
@@ -272,6 +367,15 @@ int cmp_resize_observer_destroy(cmp_resize_observer_t *observer) {
   return rc;
 }
 
+/**
+ * @brief cmp_resize_observer_notify
+ *
+ * @param observer Parameter description.
+ * @param node Parameter description.
+ * @param new_width Parameter description.
+ * @param new_height Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_resize_observer_notify(cmp_resize_observer_t *observer,
                                cmp_layout_node_t *node, float new_width,
                                float new_height) {

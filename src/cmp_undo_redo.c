@@ -10,6 +10,12 @@ struct cmp_undo_redo {
   int position;
 };
 
+/**
+ * @brief cmp_undo_redo_create
+ *
+ * @param out_stack Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_undo_redo_create(cmp_undo_redo_t **out_stack) {
   struct cmp_undo_redo *stack;
 
@@ -25,6 +31,12 @@ int cmp_undo_redo_create(cmp_undo_redo_t **out_stack) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_undo_redo_destroy
+ *
+ * @param stack Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_undo_redo_destroy(cmp_undo_redo_t *stack) {
   struct cmp_undo_redo *internal_stack = (struct cmp_undo_redo *)stack;
   int i;
@@ -41,6 +53,13 @@ int cmp_undo_redo_destroy(cmp_undo_redo_t *stack) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_undo_redo_push
+ *
+ * @param stack Parameter description.
+ * @param state Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_undo_redo_push(cmp_undo_redo_t *stack, const char *state) {
   struct cmp_undo_redo *internal_stack = (struct cmp_undo_redo *)stack;
   size_t len;
@@ -84,6 +103,14 @@ int cmp_undo_redo_push(cmp_undo_redo_t *stack, const char *state) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_undo_redo_undo
+ *
+ * @param stack Parameter description.
+ * @param out_buffer Parameter description.
+ * @param out_capacity Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_undo_redo_undo(cmp_undo_redo_t *stack, char *out_buffer,
                        size_t out_capacity) {
   struct cmp_undo_redo *internal_stack = (struct cmp_undo_redo *)stack;

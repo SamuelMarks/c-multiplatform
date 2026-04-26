@@ -11,6 +11,14 @@ struct cmp_ui_action_button {
   cmp_ui_action_button_style_t style;
 };
 
+/**
+ * @brief cmp_ui_action_button_create
+ *
+ * @param out_btn Parameter description.
+ * @param label Parameter description.
+ * @param style Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
                                 const char *label,
                                 cmp_ui_action_button_style_t style) {
@@ -61,6 +69,12 @@ int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_action_button_destroy
+ *
+ * @param btn Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_action_button_destroy(cmp_ui_action_button_t *btn) {
   if (!btn) {
     return CMP_ERROR_INVALID_ARG;
@@ -70,6 +84,13 @@ int cmp_ui_action_button_destroy(cmp_ui_action_button_t *btn) {
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_action_button_get_node
+ *
+ * @param btn Parameter description.
+ * @param out_node Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_action_button_get_node(cmp_ui_action_button_t *btn,
                                   cmp_ui_node_t **out_node) {
   if (!btn || !out_node) {
@@ -79,6 +100,13 @@ int cmp_ui_action_button_get_node(cmp_ui_action_button_t *btn,
   return CMP_SUCCESS;
 }
 
+/**
+ * @brief cmp_ui_action_button_set_label
+ *
+ * @param btn Parameter description.
+ * @param label Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_action_button_set_label(cmp_ui_action_button_t *btn,
                                    const char *label) {
   size_t len;
@@ -119,6 +147,13 @@ int cmp_ui_action_button_set_label(cmp_ui_action_button_t *btn,
 
   return CMP_SUCCESS;
 }
+/**
+ * @brief cmp_ui_action_button_bind_a11y
+ *
+ * @param widget Parameter description.
+ * @param tree Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ui_action_button_bind_a11y(cmp_ui_action_button_t *widget,
                                    cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {

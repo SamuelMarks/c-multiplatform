@@ -9,6 +9,12 @@ struct cmp_ime {
   char composition_buffer[128];
 };
 
+/**
+ * @brief cmp_ime_create
+ *
+ * @param out_ime Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ime_create(cmp_ime_t **out_ime) {
   int rc = CMP_SUCCESS;
   struct cmp_ime *ime = NULL;
@@ -31,6 +37,12 @@ int cmp_ime_create(cmp_ime_t **out_ime) {
   return rc;
 }
 
+/**
+ * @brief cmp_ime_destroy
+ *
+ * @param ime Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ime_destroy(cmp_ime_t *ime) {
   int rc = CMP_SUCCESS;
   struct cmp_ime *internal_ime = (struct cmp_ime *)ime;
@@ -45,6 +57,13 @@ int cmp_ime_destroy(cmp_ime_t *ime) {
   return rc;
 }
 
+/**
+ * @brief cmp_ime_update_composition
+ *
+ * @param ime Parameter description.
+ * @param composition_string Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_ime_update_composition(cmp_ime_t *ime, const char *composition_string) {
   int rc = CMP_SUCCESS;
   struct cmp_ime *internal_ime = (struct cmp_ime *)ime;

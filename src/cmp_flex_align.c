@@ -3,6 +3,18 @@
 #include "cmp_log.h"
 /* clang-format on */
 
+/**
+ * @brief cmp_flex_align_evaluate
+ *
+ * @param align_val Parameter description.
+ * @param cross_size Parameter description.
+ * @param item_cross_size Parameter description.
+ * @param item_baseline Parameter description.
+ * @param max_baseline Parameter description.
+ * @param out_position Parameter description.
+ * @param out_cross_size Parameter description.
+ * @return Returns 0 on success, or an error code on failure.
+ */
 int cmp_flex_align_evaluate(cmp_flex_align_t align_val, float cross_size,
                             float item_cross_size, float item_baseline,
                             float max_baseline, float *out_position,
