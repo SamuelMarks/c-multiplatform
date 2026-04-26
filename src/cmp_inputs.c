@@ -73,6 +73,7 @@ int cmp_wheel_picker_create(cmp_wheel_picker_t **out_picker) {
  */
 int cmp_wheel_picker_destroy(cmp_wheel_picker_t *picker_opaque) {
   int rc = CMP_SUCCESS;
+  int free_rc;
   struct cmp_wheel_picker *ctx = (struct cmp_wheel_picker *)picker_opaque;
   size_t i;
 
@@ -82,11 +83,17 @@ int cmp_wheel_picker_destroy(cmp_wheel_picker_t *picker_opaque) {
 
   if (ctx->items) {
     for (i = 0; i < ctx->count; ++i) {
-      CMP_FREE(ctx->items[i]);
+      free_rc = CMP_FREE(ctx->items[i]);
+      if (free_rc != CMP_SUCCESS)
+        rc = free_rc;
     }
-    CMP_FREE(ctx->items);
+    free_rc = CMP_FREE(ctx->items);
+    if (free_rc != CMP_SUCCESS)
+      rc = free_rc;
   }
-  CMP_FREE(ctx);
+  free_rc = CMP_FREE(ctx);
+  if (free_rc != CMP_SUCCESS)
+    rc = free_rc;
   return rc;
 }
 

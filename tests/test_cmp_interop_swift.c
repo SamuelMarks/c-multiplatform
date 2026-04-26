@@ -34,6 +34,7 @@ TEST test_interop_cfstring_and_arc(void) {
 TEST test_interop_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_interop_cfstring_bridge(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_interop_allocate_retained_object(NULL));
+  ASSERT_EQ(CMP_SUCCESS, cmp_interop_release_object(NULL));
   PASS();
 }
 

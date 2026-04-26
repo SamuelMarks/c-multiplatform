@@ -16,17 +16,18 @@ struct cmp_hover_intent {
 };
 
 /**
- * @brief cmp_hover_intent_create
+ * @brief Creates a hover intent context.
  *
- * @param out_intent Parameter description.
+ * @param out_intent Pointer to a variable where the new context will be stored.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
   int rc = 0; /* CMP_SUCCESS */
   struct cmp_hover_intent *ctx = NULL;
 
-  if (!out_intent) {
-    LOG_DEBUG("cmp_hover_intent_create: invalid argument (out_intent is NULL)\n");
+  if (out_intent == NULL) {
+    LOG_DEBUG(
+        "cmp_hover_intent_create: invalid argument (out_intent is NULL)\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
@@ -34,6 +35,9 @@ int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
   if (rc != 0) {
     LOG_DEBUG("cmp_hover_intent_create: Out of memory\n");
     return rc;
+  }
+  if (ctx == NULL) {
+    return CMP_ERROR_GENERAL;
   }
 
   memset(ctx, 0, sizeof(struct cmp_hover_intent));
@@ -46,16 +50,16 @@ int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
 }
 
 /**
- * @brief cmp_hover_intent_destroy
+ * @brief Destroys a hover intent context.
  *
- * @param intent Parameter description.
+ * @param intent Hover intent context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hover_intent_destroy(cmp_hover_intent_t *intent) {
   int rc = 0; /* CMP_SUCCESS */
   struct cmp_hover_intent *ctx = (struct cmp_hover_intent *)intent;
 
-  if (!ctx) {
+  if (ctx == NULL) {
     LOG_DEBUG("cmp_hover_intent_destroy: invalid argument (intent is NULL)\n");
     return CMP_ERROR_INVALID_ARG;
   }
@@ -73,49 +77,49 @@ int cmp_hover_intent_destroy(cmp_hover_intent_t *intent) {
  * @param intent Pointer to the hover intent context.
  * @param event Pointer to the event to process.
  * @param dt_ms Delta time in milliseconds since the last process call.
- * @param out_confirmed Pointer to an integer which will receive 1 if hover intent is confirmed, 0 otherwise.
+ * @param out_confirmed Pointer to an integer which will receive 1 if hover
+ * intent is confirmed, 0 otherwise.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hover_intent_process(cmp_hover_intent_t *intent,
-                             const cmp_event_t *event, float dt_ms, int *out_confirmed) {
-  int rc = 0; /* CMP_SUCCESS */
+                             const cmp_event_t *event, float dt_ms,
+                             int *out_confirmed) {
   struct cmp_hover_intent *ctx = (struct cmp_hover_intent *)intent;
   float dx;
   float dy;
   float dist_sq;
 
-  if (!ctx || !event || !out_confirmed) {
+  if (ctx == NULL || event == NULL || out_confirmed == NULL) {
     LOG_DEBUG("cmp_hover_intent_process: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
-  
+
   *out_confirmed = 0;
 
-  if (event->type == CMP_EVENT_POINTER_DOWN ||
-      event->type == CMP_EVENT_POINTER_UP) {
+  if (event->action == CMP_ACTION_DOWN || event->action == CMP_ACTION_UP) {
     /* Click or touch clears intent */
     ctx->is_tracking = 0;
     ctx->time_spent_in_bounds = 0.0f;
     return 0;
   }
 
-  if (event->type == CMP_EVENT_POINTER_MOVE) {
+  if (event->action == CMP_ACTION_MOVE) {
     if (!ctx->is_tracking) {
       ctx->is_tracking = 1;
-      ctx->last_x = event->pointer.x;
-      ctx->last_y = event->pointer.y;
+      ctx->last_x = (float)event->x;
+      ctx->last_y = (float)event->y;
       ctx->time_spent_in_bounds = 0.0f;
       return 0;
     }
 
-    dx = event->pointer.x - ctx->last_x;
-    dy = event->pointer.y - ctx->last_y;
+    dx = (float)event->x - ctx->last_x;
+    dy = (float)event->y - ctx->last_y;
     dist_sq = (dx * dx) + (dy * dy);
 
     if (dist_sq > (ctx->tolerance_radius * ctx->tolerance_radius)) {
       /* Moved outside tolerance, reset tracking origin and time */
-      ctx->last_x = event->pointer.x;
-      ctx->last_y = event->pointer.y;
+      ctx->last_x = (float)event->x;
+      ctx->last_y = (float)event->y;
       ctx->time_spent_in_bounds = 0.0f;
       return 0;
     }

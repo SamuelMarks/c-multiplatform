@@ -62,7 +62,10 @@ int cmp_layer_tiling_destroy(cmp_layer_tiling_t *tiling) {
     return rc;
   }
 
-  CMP_FREE(ctx);
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_layer_tiling_destroy: CMP_FREE failed\n");
+  }
   return rc;
 }
 

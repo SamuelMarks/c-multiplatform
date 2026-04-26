@@ -538,17 +538,17 @@ typedef pthread_t cmp_thread_t;
  * @param mod Pointer to modality struct
  * @return 0 on success, or an error code.
  */
-int cmp_modality_async_single_init(cmp_modality_t *mod);
+CMP_API int cmp_modality_async_single_init(cmp_modality_t *mod);
 
 /**
  * @brief Initialize an eventloop integration modality (Node.js/Qt)
  * @param mod Pointer to modality struct
  * @return 0 on success, or an error code.
  */
-int cmp_modality_async_multi_init(cmp_modality_t *mod);
+CMP_API int cmp_modality_async_multi_init(cmp_modality_t *mod);
 
-int cmp_modality_greenthreads_init(cmp_modality_t *mod);
-int cmp_modality_multiprocess_init(cmp_modality_t *mod);
+CMP_API int cmp_modality_greenthreads_init(cmp_modality_t *mod);
+CMP_API int cmp_modality_multiprocess_init(cmp_modality_t *mod);
 
 int cmp_process_spawn(cmp_process_t **proc);
 
@@ -557,7 +557,7 @@ int cmp_process_spawn(cmp_process_t **proc);
  * @param mod Pointer to modality struct
  * @return 0 on success, or an error code.
  */
-int cmp_modality_sync_single_init(cmp_modality_t *mod);
+CMP_API int cmp_modality_sync_single_init(cmp_modality_t *mod);
 
 /**
  * @brief Initialize a multi-threaded worker pool modality
@@ -565,7 +565,7 @@ int cmp_modality_sync_single_init(cmp_modality_t *mod);
  * @param num_workers Number of background worker threads to spawn
  * @return 0 on success, or an error code.
  */
-int cmp_modality_sync_multi_init(cmp_modality_t *mod, int num_workers);
+CMP_API int cmp_modality_sync_multi_init(cmp_modality_t *mod, int num_workers);
 
 /**
  * @brief Queue a task into the modality execution loop
@@ -574,28 +574,29 @@ int cmp_modality_sync_multi_init(cmp_modality_t *mod, int num_workers);
  * @param arg Argument for the function
  * @return 0 on success, or an error code.
  */
-int cmp_modality_queue_task(cmp_modality_t *mod, cmp_task_fn_t task, void *arg);
+CMP_API int cmp_modality_queue_task(cmp_modality_t *mod, cmp_task_fn_t task,
+                                    void *arg);
 
 /**
  * @brief Run the modality loop until stopped
  * @param mod Pointer to modality struct
  * @return 0 on success, or an error code.
  */
-int cmp_modality_run(cmp_modality_t *mod);
+CMP_API int cmp_modality_run(cmp_modality_t *mod);
 
 /**
  * @brief Signal the modality loop to stop
  * @param mod Pointer to modality struct
  * @return 0 on success, or an error code.
  */
-int cmp_modality_stop(cmp_modality_t *mod);
+CMP_API int cmp_modality_stop(cmp_modality_t *mod);
 
 /**
  * @brief Destroy a modality context
  * @param mod Pointer to modality struct
  * @return 0 on success, or an error code.
  */
-int cmp_modality_destroy(cmp_modality_t *mod);
+CMP_API int cmp_modality_destroy(cmp_modality_t *mod);
 
 /**
  * @brief OS Mutex Handle
@@ -1002,7 +1003,7 @@ int cmp_http_request_init(struct HttpRequest *req);
  * @brief Free resources associated with an HTTP request.
  * @param req The request to free.
  */
-void cmp_http_request_free(struct HttpRequest *req);
+int cmp_http_request_free(struct HttpRequest *req);
 
 /**
  * @brief Execute a single HTTP request.
@@ -1072,7 +1073,7 @@ int cmp_http_download(struct HttpClient *client, const char *url,
  * @brief Free an HTTP response.
  * @param res The response to free.
  */
-void cmp_http_response_free(struct HttpResponse *res);
+int cmp_http_response_free(struct HttpResponse *res);
 
 /**
  * @brief Initialize a WebSocket connection request.
@@ -1812,7 +1813,8 @@ int cmp_hover_intent_destroy(cmp_hover_intent_t *intent);
  * an error code.
  */
 int cmp_hover_intent_process(cmp_hover_intent_t *intent,
-                             const cmp_event_t *event, float dt_ms, int *out_confirmed);
+                             const cmp_event_t *event, float dt_ms,
+                             int *out_confirmed);
 
 /**
  * @brief Independent Scroll Context decoupled from Layout step
@@ -1936,7 +1938,8 @@ typedef enum cmp_overscroll {
  * @param boundary_hit 1 if a scroll boundary was hit, 0 otherwise
  * @return 1 if scroll chaining is allowed (event should bubble), 0 if trapped
  */
-int cmp_overscroll_evaluate(cmp_overscroll_t mode, int boundary_hit);
+CMP_API int cmp_overscroll_evaluate(cmp_overscroll_t mode, int boundary_hit,
+                                    int *out_chains);
 
 /**
  * @brief Opaque Rubber Band Physics State
@@ -2549,12 +2552,12 @@ typedef struct cmp_motion_path cmp_motion_path_t;
 /**
  * @brief Create a motion path context
  */
-int cmp_motion_path_create(cmp_motion_path_t **out_path);
+CMP_API int cmp_motion_path_create(cmp_motion_path_t **out_path);
 
 /**
  * @brief Destroy a motion path context
  */
-int cmp_motion_path_destroy(cmp_motion_path_t *path);
+CMP_API int cmp_motion_path_destroy(cmp_motion_path_t *path);
 
 /**
  * @brief Evaluate position and rotation along the motion path
@@ -2566,9 +2569,9 @@ int cmp_motion_path_destroy(cmp_motion_path_t *path);
  * @param out_y Evaluated Y position
  * @param out_angle Evaluated rotation angle
  */
-int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
-                             float offset_rotate, float *out_x, float *out_y,
-                             float *out_angle);
+CMP_API int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
+                                     float offset_rotate, float *out_x,
+                                     float *out_y, float *out_angle);
 
 /**
  * @brief Opaque Scroll-Driven Animation Timeline Context
@@ -4285,15 +4288,15 @@ typedef struct cmp_msaa cmp_msaa_t;
  * @param out_msaa Pointer to receive the MSAA context
  * @return 0 on success, or an error code.
  */
-int cmp_msaa_create(uint8_t sample_count, uint32_t width, uint32_t height,
-                    cmp_msaa_t **out_msaa);
+CMP_API int cmp_msaa_create(uint8_t sample_count, uint32_t width,
+                            uint32_t height, cmp_msaa_t **out_msaa);
 
 /**
  * @brief Destroy an MSAA context
  * @param msaa The MSAA context to destroy
  * @return 0 on success, or an error code.
  */
-int cmp_msaa_destroy(cmp_msaa_t *msaa);
+CMP_API int cmp_msaa_destroy(cmp_msaa_t *msaa);
 
 /**
  * @brief Resolve the multisampled buffer into a standard single-sampled texture
@@ -4301,7 +4304,7 @@ int cmp_msaa_destroy(cmp_msaa_t *msaa);
  * @param target_texture The destination texture to receive the resolved pixels
  * @return 0 on success, or an error code.
  */
-int cmp_msaa_resolve(cmp_msaa_t *msaa, cmp_texture_t *target_texture);
+CMP_API int cmp_msaa_resolve(cmp_msaa_t *msaa, cmp_texture_t *target_texture);
 
 /**
  * @brief Opaque Linear sRGB Blending Context
@@ -4507,14 +4510,14 @@ typedef struct cmp_overdraw cmp_overdraw_t;
  * @param out_overdraw Pointer to receive the visualizer context
  * @return 0 on success, or an error code.
  */
-int cmp_overdraw_create(cmp_overdraw_t **out_overdraw);
+CMP_API int cmp_overdraw_create(cmp_overdraw_t **out_overdraw);
 
 /**
  * @brief Destroy an overdraw visualizer
  * @param overdraw The visualizer context
  * @return 0 on success, or an error code.
  */
-int cmp_overdraw_destroy(cmp_overdraw_t *overdraw);
+CMP_API int cmp_overdraw_destroy(cmp_overdraw_t *overdraw);
 
 /**
  * @brief Opaque Renderer Context
@@ -4528,8 +4531,8 @@ typedef struct cmp_renderer cmp_renderer_t;
  * @param enable Non-zero to enable, 0 to disable
  * @return 0 on success, or an error code.
  */
-int cmp_overdraw_set_enabled(cmp_overdraw_t *overdraw, cmp_renderer_t *renderer,
-                             int enable);
+CMP_API int cmp_overdraw_set_enabled(cmp_overdraw_t *overdraw,
+                                     cmp_renderer_t *renderer, int enable);
 
 /**
  * @brief Opaque hardware layer tiling engine
@@ -5416,8 +5419,9 @@ typedef enum cmp_contain {
  * @param out_isolates_paint Pointer to receive if paint is isolated.
  * @return 0 on success, or an error code.
  */
-int cmp_contain_evaluate(cmp_contain_t contain, int *out_isolates_layout,
-                         int *out_isolates_paint);
+CMP_API int cmp_contain_evaluate(cmp_contain_t contain,
+                                 int *out_isolates_layout,
+                                 int *out_isolates_paint);
 
 typedef enum cmp_gradient_type {
   CMP_GRADIENT_LINEAR = 0,
@@ -5631,9 +5635,9 @@ typedef struct cmp_media_query {
  * for no match).
  * @return 0 on success, or an error code.
  */
-int cmp_media_query_evaluate(const cmp_media_query_t *query,
-                             const cmp_media_query_env_t *env,
-                             int *out_matches);
+CMP_API int cmp_media_query_evaluate(const cmp_media_query_t *query,
+                                     const cmp_media_query_env_t *env,
+                                     int *out_matches);
 
 /**
  * @brief Evaluate the update frequency media feature.
@@ -5642,9 +5646,9 @@ int cmp_media_query_evaluate(const cmp_media_query_t *query,
  * @param out_matches Pointer to receive the evaluation result.
  * @return 0 on success, or an error code.
  */
-int cmp_update_media_evaluate(const cmp_media_query_t *query,
-                              const cmp_media_query_env_t *env,
-                              int *out_matches);
+CMP_API int cmp_update_media_evaluate(const cmp_media_query_t *query,
+                                      const cmp_media_query_env_t *env,
+                                      int *out_matches);
 
 /**
  * @brief Evaluate the light-level media feature.
@@ -5653,9 +5657,9 @@ int cmp_update_media_evaluate(const cmp_media_query_t *query,
  * @param out_matches Pointer to receive the evaluation result.
  * @return 0 on success, or an error code.
  */
-int cmp_light_level_evaluate(const cmp_media_query_t *query,
-                             const cmp_media_query_env_t *env,
-                             int *out_matches);
+CMP_API int cmp_light_level_evaluate(const cmp_media_query_t *query,
+                                     const cmp_media_query_env_t *env,
+                                     int *out_matches);
 
 typedef struct cmp_container_ctx {
   const char *name;
@@ -5671,15 +5675,16 @@ typedef struct cmp_container_ctx {
  * @param name Optional name for the container.
  * @return 0 on success, or an error code.
  */
-int cmp_container_ctx_create(cmp_container_ctx_t **out_ctx,
-                             cmp_container_type_t type, const char *name);
+CMP_API int cmp_container_ctx_create(cmp_container_ctx_t **out_ctx,
+                                     cmp_container_type_t type,
+                                     const char *name);
 
 /**
  * @brief Destroy a container context.
  * @param ctx The container context to destroy.
  * @return 0 on success, or an error code.
  */
-int cmp_container_ctx_destroy(cmp_container_ctx_t *ctx);
+CMP_API int cmp_container_ctx_destroy(cmp_container_ctx_t *ctx);
 
 typedef struct cmp_container_query {
   const char *name;
@@ -5707,9 +5712,9 @@ typedef struct cmp_style_query {
  * @param out_matches Pointer to receive the evaluation result.
  * @return 0 on success, or an error code.
  */
-int cmp_style_query_evaluate(const cmp_style_query_t *query,
-                             const cmp_style_query_t *container_styles,
-                             int num_styles, int *out_matches);
+CMP_API int cmp_style_query_evaluate(const cmp_style_query_t *query,
+                                     const cmp_style_query_t *container_styles,
+                                     int num_styles, int *out_matches);
 
 typedef enum cmp_content_visibility {
   CMP_CONTENT_VISIBILITY_VISIBLE = 0,
@@ -7551,9 +7556,9 @@ int cmp_grid_align_evaluate(cmp_grid_align_t align, float track_size,
 /**
  * @brief Container query evaluation
  */
-int cmp_container_query_evaluate(const cmp_container_query_t *query,
-                                 const cmp_container_ctx_t *ctx,
-                                 int *out_matches);
+CMP_API int cmp_container_query_evaluate(const cmp_container_query_t *query,
+                                         const cmp_container_ctx_t *ctx,
+                                         int *out_matches);
 
 /**
  * @brief Create a new resize observer.
@@ -7567,7 +7572,7 @@ int cmp_resize_observer_create(cmp_resize_observer_t **out_observer,
 /**
  * @brief Destroy a resize observer.
  */
-int cmp_resize_observer_destroy(cmp_resize_observer_t *observer);
+CMP_API int cmp_resize_observer_destroy(cmp_resize_observer_t *observer);
 
 /**
  * @brief Notify a resize observer of a change.
@@ -7587,9 +7592,9 @@ int cmp_flex_align_evaluate(cmp_flex_align_t align_val, float cross_size,
 /**
  * @brief Pointer media query evaluation
  */
-int cmp_pointer_media_evaluate(const cmp_media_query_t *query,
-                               const cmp_media_query_env_t *env,
-                               int *out_matches);
+CMP_API int cmp_pointer_media_evaluate(const cmp_media_query_t *query,
+                                       const cmp_media_query_env_t *env,
+                                       int *out_matches);
 
 /* Phase 23: Privacy, Security & Permissions */
 
@@ -9739,34 +9744,38 @@ typedef struct cmp_media_player cmp_media_player_t;
  */
 typedef struct cmp_audio_session cmp_audio_session_t;
 
-int cmp_media_player_create(cmp_media_player_t **out_player);
-int cmp_media_player_destroy(cmp_media_player_t *player);
+CMP_API int cmp_media_player_create(cmp_media_player_t **out_player);
+CMP_API int cmp_media_player_destroy(cmp_media_player_t *player);
 
 /**
  * @brief Load a media URL
  */
-int cmp_media_player_load_url(cmp_media_player_t *player, const char *url);
+CMP_API int cmp_media_player_load_url(cmp_media_player_t *player,
+                                      const char *url);
 
 /**
  * @brief Mount the media player into the layout tree (uses OS native controls
  * if requested)
  */
-int cmp_media_player_mount(cmp_media_player_t *player, cmp_ui_node_t *node,
-                           int use_system_controls);
+CMP_API int cmp_media_player_mount(cmp_media_player_t *player,
+                                   cmp_ui_node_t *node,
+                                   int use_system_controls);
 
 /**
  * @brief Set Picture-in-Picture capability
  */
-int cmp_media_player_set_pip_enabled(cmp_media_player_t *player,
-                                     int is_enabled);
+CMP_API int cmp_media_player_set_pip_enabled(cmp_media_player_t *player,
+                                             int is_enabled);
 
 /**
  * @brief Configure the OS Now Playing Info Center (Lock Screen / Watch
  * metadata)
  */
-int cmp_media_player_update_now_playing(cmp_media_player_t *player,
-                                        const char *title, const char *artist,
-                                        float duration, float current_time);
+CMP_API int cmp_media_player_update_now_playing(cmp_media_player_t *player,
+                                                const char *title,
+                                                const char *artist,
+                                                float duration,
+                                                float current_time);
 
 /**
  * @brief Enable Spatial Audio processing capabilities
@@ -9782,20 +9791,21 @@ int cmp_media_player_set_remote_command_handler(cmp_media_player_t *player,
                                                 cmp_remote_command_cb callback,
                                                 void *userdata);
 
-int cmp_audio_session_create(cmp_audio_session_t **out_session);
-int cmp_audio_session_destroy(cmp_audio_session_t *session);
+CMP_API int cmp_audio_session_create(cmp_audio_session_t **out_session);
+CMP_API int cmp_audio_session_destroy(cmp_audio_session_t *session);
 
 /**
  * @brief Set the global application audio session category
  */
-int cmp_audio_session_set_category(cmp_audio_session_t *session,
-                                   cmp_audio_session_category_t category);
+CMP_API int
+cmp_audio_session_set_category(cmp_audio_session_t *session,
+                               cmp_audio_session_category_t category);
 
 /**
  * @brief Activate the audio session (may pause background music depending on
  * category)
  */
-int cmp_audio_session_activate(cmp_audio_session_t *session);
+CMP_API int cmp_audio_session_activate(cmp_audio_session_t *session);
 
 /* Phase 9.4: Transactions, Files & Cloud (Apple HIG specific) */
 
@@ -11717,27 +11727,27 @@ typedef struct cmp_mermaid_renderer cmp_mermaid_renderer_t;
  * \brief Create a new mermaid diagram renderer.
  * \return 0 on success.
  */
-int cmp_mermaid_renderer_create(cmp_mermaid_renderer_t **out_renderer);
+CMP_API int cmp_mermaid_renderer_create(cmp_mermaid_renderer_t **out_renderer);
 
 /**
  * \brief Destroy a mermaid renderer context.
  * \return 0 on success.
  */
-int cmp_mermaid_renderer_destroy(cmp_mermaid_renderer_t *renderer);
+CMP_API int cmp_mermaid_renderer_destroy(cmp_mermaid_renderer_t *renderer);
 
 /**
  * \brief Generate SVG path data from Mermaid markdown syntax.
  * \return 0 on success.
  */
-int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
-                                      const char *mermaid_syntax,
-                                      char **out_svg_xml);
+CMP_API int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
+                                              const char *mermaid_syntax,
+                                              char **out_svg_xml);
 
 /**
  * \brief Free an SVG XML string allocated by generate_svg.
  * \return 0 on success.
  */
-int cmp_mermaid_renderer_free_svg(char *svg_xml);
+CMP_API int cmp_mermaid_renderer_free_svg(char *svg_xml);
 
 /* --- From minimap.h --- */
 /**
@@ -11749,19 +11759,19 @@ typedef struct cmp_minimap cmp_minimap_t;
  * \brief Create an editor minimap context.
  * \return 0 on success.
  */
-int cmp_minimap_create(cmp_minimap_t **out_minimap);
+CMP_API int cmp_minimap_create(cmp_minimap_t **out_minimap);
 
 /**
  * \brief Destroy an editor minimap context.
  * \return 0 on success.
  */
-int cmp_minimap_destroy(cmp_minimap_t *minimap);
+CMP_API int cmp_minimap_destroy(cmp_minimap_t *minimap);
 
 /**
  * \brief Set the raw text buffer that the minimap will mirror.
  * \return 0 on success.
  */
-int cmp_minimap_set_text(cmp_minimap_t *minimap, const char *text);
+CMP_API int cmp_minimap_set_text(cmp_minimap_t *minimap, const char *text);
 
 /**
  * \brief Update the viewport scroll ratio to map the active minimap highlight.
@@ -11771,14 +11781,15 @@ int cmp_minimap_set_text(cmp_minimap_t *minimap, const char *text);
  * \param total_height The total scrollable height of the document.
  * \return 0 on success.
  */
-int cmp_minimap_update_viewport(cmp_minimap_t *minimap, float viewport_y,
-                                float viewport_height, float total_height);
+CMP_API int cmp_minimap_update_viewport(cmp_minimap_t *minimap,
+                                        float viewport_y, float viewport_height,
+                                        float total_height);
 
 /**
  * \brief Generate/Calculate the rendering geometry or layout for the minimap.
  * \return 0 on success.
  */
-int cmp_minimap_compute_layout(cmp_minimap_t *minimap);
+CMP_API int cmp_minimap_compute_layout(cmp_minimap_t *minimap);
 
 /* --- From multi_window.h --- */
 /**
@@ -11790,13 +11801,13 @@ typedef struct cmp_multi_window cmp_multi_window_t;
  * @brief Initialize the multi-window manager.
  * @return 0 on success, non-zero on error.
  */
-int cmp_multi_window_init(void);
+CMP_API int cmp_multi_window_init(void);
 
 /**
  * @brief Cleanup the multi-window manager.
  * @return 0 on success, non-zero on error.
  */
-int cmp_multi_window_cleanup(void);
+CMP_API int cmp_multi_window_cleanup(void);
 
 /**
  * @brief Tear off a tab into a new independent OS window.
@@ -11804,8 +11815,8 @@ int cmp_multi_window_cleanup(void);
  * @param out_window Pointer to store the created window handle.
  * @return 0 on success, non-zero on error.
  */
-int cmp_multi_window_tear_off(const char *tab_id,
-                              cmp_multi_window_t **out_window);
+CMP_API int cmp_multi_window_tear_off(const char *tab_id,
+                                      cmp_multi_window_t **out_window);
 
 /**
  * @brief Merge an independent window back into the main application window as a
@@ -11813,14 +11824,14 @@ int cmp_multi_window_tear_off(const char *tab_id,
  * @param window The window to merge back.
  * @return 0 on success, non-zero on error.
  */
-int cmp_multi_window_merge_back(cmp_multi_window_t *window);
+CMP_API int cmp_multi_window_merge_back(cmp_multi_window_t *window);
 
 /**
  * @brief Update all active independent OS windows (e.g., event loop
  * processing).
  * @return 0 on success, non-zero on error.
  */
-int cmp_multi_window_update_all(void);
+CMP_API int cmp_multi_window_update_all(void);
 
 /* --- From os_integration.h --- */
 /**
@@ -11829,26 +11840,26 @@ int cmp_multi_window_update_all(void);
  * \param text The null-terminated UTF-8 text to copy.
  * \return 0 on success.
  */
-int cmp_os_copy_to_clipboard(cmp_window_t *window, const char *text);
+CMP_API int cmp_os_copy_to_clipboard(cmp_window_t *window, const char *text);
 
 /**
  * \brief Attach OS file drop handling to the input box logic.
  * \param window The main application window context.
  * \return 0 on success.
  */
-int cmp_os_enable_file_drag_drop(cmp_window_t *window);
+CMP_API int cmp_os_enable_file_drag_drop(cmp_window_t *window);
 
 /**
  * \brief Verify Voice-to-Text OS dictation readiness.
  * \return 1 if supported, 0 otherwise.
  */
-int cmp_os_is_voice_dictation_supported(void);
+CMP_API int cmp_os_is_voice_dictation_supported(int *out_is_supported);
 
 /**
  * \brief Start an OS native voice dictation capture.
  * \return 0 on success.
  */
-int cmp_os_start_voice_dictation(void);
+CMP_API int cmp_os_start_voice_dictation(void);
 
 /* --- From os_media_notifications.h --- */
 /**
@@ -11857,7 +11868,7 @@ int cmp_os_start_voice_dictation(void);
  * @param body The body text of the notification.
  * @return 0 on success.
  */
-int cmp_os_notify(const char *title, const char *body);
+CMP_API int cmp_os_notify(const char *title, const char *body);
 
 /**
  * @brief Context for managing OS-level media controls (e.g., MPRIS via DBus).
@@ -11869,14 +11880,15 @@ typedef struct cmp_os_media_controls cmp_os_media_controls_t;
  * @param out_controls Pointer to receive the manager.
  * @return 0 on success.
  */
-int cmp_os_media_controls_create(cmp_os_media_controls_t **out_controls);
+CMP_API int
+cmp_os_media_controls_create(cmp_os_media_controls_t **out_controls);
 
 /**
  * @brief Destroys the OS media controls manager.
  * @param controls The manager.
  * @return 0 on success.
  */
-int cmp_os_media_controls_destroy(cmp_os_media_controls_t *controls);
+CMP_API int cmp_os_media_controls_destroy(cmp_os_media_controls_t *controls);
 
 /**
  * @brief Updates the OS "Now Playing" information metadata.
@@ -11887,9 +11899,9 @@ int cmp_os_media_controls_destroy(cmp_os_media_controls_t *controls);
  * @param current_time Current playback time in seconds.
  * @return 0 on success.
  */
-int cmp_os_media_controls_update(cmp_os_media_controls_t *controls,
-                                 const char *title, const char *artist,
-                                 float duration, float current_time);
+CMP_API int cmp_os_media_controls_update(cmp_os_media_controls_t *controls,
+                                         const char *title, const char *artist,
+                                         float duration, float current_time);
 
 /**
  * @brief Callback signature for OS media remote commands (Play, Pause, Next,
@@ -11904,9 +11916,9 @@ typedef void (*cmp_media_command_cb)(int command_id, void *userdata);
  * @param userdata Opaque pointer passed back to the callback.
  * @return 0 on success.
  */
-int cmp_os_media_controls_set_handler(cmp_os_media_controls_t *controls,
-                                      cmp_media_command_cb callback,
-                                      void *userdata);
+CMP_API int cmp_os_media_controls_set_handler(cmp_os_media_controls_t *controls,
+                                              cmp_media_command_cb callback,
+                                              void *userdata);
 
 /* --- From os_scrollbars.h --- */
 /**
@@ -11918,13 +11930,13 @@ typedef struct cmp_os_scrollbar cmp_os_scrollbar_t;
  * \brief Create a new scrollbar physics context.
  * \return 0 on success.
  */
-int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar);
+CMP_API int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar);
 
 /**
  * \brief Destroy scrollbar context.
  * \return 0 on success.
  */
-int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar);
+CMP_API int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar);
 
 /**
  * \brief Process mouse wheel / trackpad scroll input and apply OS-specific
@@ -11936,8 +11948,9 @@ int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar);
  * frame.
  * \return 0 on success.
  */
-int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar, float raw_delta_y,
-                          unsigned int delta_time_ms, float *out_smoothed_y);
+CMP_API int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar,
+                                  float raw_delta_y, unsigned int delta_time_ms,
+                                  float *out_smoothed_y);
 
 /* --- From power_awareness.h --- */
 /**

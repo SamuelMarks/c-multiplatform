@@ -129,7 +129,22 @@ TEST test_ios_null_args(void) {
   PASS();
 }
 
+TEST test_ios_features_lifecycle(void) {
+  cmp_ios_features_t *features = NULL;
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_ios_features_create(&features));
+  ASSERT_NEQ(NULL, features);
+  ASSERT_EQ(CMP_SUCCESS, cmp_ios_features_destroy(features));
+
+  /* Null args */
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ios_features_create(NULL));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ios_features_destroy(NULL));
+
+  PASS();
+}
+
 SUITE(ios_specific_suite) {
+  RUN_TEST(test_ios_features_lifecycle);
   RUN_TEST(test_ios_keyboard_avoidance);
   RUN_TEST(test_ios_pull_to_refresh);
   RUN_TEST(test_ios_sheet_detents);

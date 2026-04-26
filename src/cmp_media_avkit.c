@@ -21,25 +21,27 @@ struct cmp_audio_session {
 };
 
 /**
- * @brief cmp_media_player_create
+ * @brief Create a media player instance.
  *
- * @param out_player Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param out_player Pointer to store the created media player.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_media_player_create(cmp_media_player_t **out_player) {
-  int rc = CMP_SUCCESS;
-  struct cmp_media_player *ctx = NULL;
+  int rc;
+  struct cmp_media_player *ctx;
 
-  if (!out_player) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_media_player_create: Invalid argument\n");
-    return rc;
+  rc = CMP_SUCCESS;
+  ctx = NULL;
+
+  if (out_player == NULL) {
+    LOG_DEBUG("Error in cmp_media_player_create: out_player is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_media_player), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_media_player_create: Out of memory\n");
-    return rc;
+    LOG_DEBUG("Error in cmp_media_player_create: CMP_MALLOC failed (OOM)\n");
+    return CMP_ERROR_OOM;
   }
 
   ctx->is_pip_enabled = 0;
@@ -51,295 +53,373 @@ int cmp_media_player_create(cmp_media_player_t **out_player) {
   ctx->now_playing_artist = NULL;
 
   *out_player = (cmp_media_player_t *)ctx;
-  return rc;
+  LOG_DEBUG("cmp_media_player_create: Success\n");
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_media_player_destroy
+ * @brief Destroy a media player instance.
  *
- * @param player_opaque Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param player_opaque The media player to destroy.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_media_player_destroy(cmp_media_player_t *player_opaque) {
-  int rc = CMP_SUCCESS;
-  struct cmp_media_player *ctx = (struct cmp_media_player *)player_opaque;
+  int rc;
+  struct cmp_media_player *ctx;
 
-  if (!ctx) {
+  rc = CMP_SUCCESS;
+  ctx = (struct cmp_media_player *)player_opaque;
+
+  if (ctx == NULL) {
+    LOG_DEBUG(
+        "cmp_media_player_destroy: player_opaque is NULL, doing nothing\n");
+    return CMP_SUCCESS;
+  }
+
+  if (ctx->now_playing_title != NULL) {
+    rc = CMP_FREE(ctx->now_playing_title);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_media_player_destroy: CMP_FREE failed for "
+                "now_playing_title\n");
+    }
+  }
+
+  if (ctx->now_playing_artist != NULL) {
+    rc = CMP_FREE(ctx->now_playing_artist);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_media_player_destroy: CMP_FREE failed for "
+                "now_playing_artist\n");
+    }
+  }
+
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_media_player_destroy: CMP_FREE failed for ctx\n");
     return rc;
   }
 
-  if (ctx->now_playing_title)
-    CMP_FREE(ctx->now_playing_title);
-  if (ctx->now_playing_artist)
-    CMP_FREE(ctx->now_playing_artist);
-  CMP_FREE(ctx);
-  return rc;
+  LOG_DEBUG("cmp_media_player_destroy: Success\n");
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_media_player_load_url
+ * @brief Load a URL into the media player.
  *
- * @param player_opaque Parameter description.
- * @param url Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param player_opaque The media player.
+ * @param url The URL to load.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_media_player_load_url(cmp_media_player_t *player_opaque,
                               const char *url) {
-  int rc = CMP_SUCCESS;
-
-  if (!player_opaque || !url) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_media_player_load_url: Invalid argument\n");
-    return rc;
+  if (player_opaque == NULL) {
+    LOG_DEBUG("Error in cmp_media_player_load_url: player_opaque is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
+  if (url == NULL) {
+    LOG_DEBUG("Error in cmp_media_player_load_url: url is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+
   /* Triggers AVPlayerItem instantiation */
-  return rc;
+  LOG_DEBUG("cmp_media_player_load_url: Success\n");
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_media_player_mount
+ * @brief Mount the media player to a UI node.
  *
- * @param player_opaque Parameter description.
- * @param node Parameter description.
- * @param use_system_controls Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param player_opaque The media player.
+ * @param node The UI node.
+ * @param use_system_controls Whether to use system controls.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_media_player_mount(cmp_media_player_t *player_opaque,
                            cmp_ui_node_t *node, int use_system_controls) {
-  int rc = CMP_SUCCESS;
-  struct cmp_media_player *ctx = (struct cmp_media_player *)player_opaque;
+  struct cmp_media_player *ctx;
 
-  if (!ctx || !node) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_media_player_mount: Invalid argument\n");
-    return rc;
+  ctx = (struct cmp_media_player *)player_opaque;
+
+  if (ctx == NULL) {
+    LOG_DEBUG("Error in cmp_media_player_mount: player_opaque is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+  if (node == NULL) {
+    LOG_DEBUG("Error in cmp_media_player_mount: node is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   ctx->use_system_controls = use_system_controls;
   /* Mounts AVPlayerViewController or custom player bounds */
-  return rc;
+  LOG_DEBUG("cmp_media_player_mount: Success\n");
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_media_player_set_pip_enabled
+ * @brief Enable or disable Picture-in-Picture.
  *
- * @param player_opaque Parameter description.
- * @param is_enabled Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param player_opaque The media player.
+ * @param is_enabled 1 to enable, 0 to disable.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_media_player_set_pip_enabled(cmp_media_player_t *player_opaque,
                                      int is_enabled) {
-  int rc = CMP_SUCCESS;
-  struct cmp_media_player *ctx = (struct cmp_media_player *)player_opaque;
+  struct cmp_media_player *ctx;
 
-  if (!ctx) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_media_player_set_pip_enabled: Invalid argument\n");
-    return rc;
+  ctx = (struct cmp_media_player *)player_opaque;
+
+  if (ctx == NULL) {
+    LOG_DEBUG(
+        "Error in cmp_media_player_set_pip_enabled: player_opaque is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   ctx->is_pip_enabled = is_enabled;
-  return rc;
+  LOG_DEBUG("cmp_media_player_set_pip_enabled: Success\n");
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_media_player_update_now_playing
+ * @brief Update the "now playing" information.
  *
- * @param player_opaque Parameter description.
- * @param title Parameter description.
- * @param artist Parameter description.
- * @param duration Parameter description.
- * @param current_time Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param player_opaque The media player.
+ * @param title The title of the track.
+ * @param artist The artist of the track.
+ * @param duration The total duration.
+ * @param current_time The current playback time.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_media_player_update_now_playing(cmp_media_player_t *player_opaque,
                                         const char *title, const char *artist,
                                         float duration, float current_time) {
-  int rc = CMP_SUCCESS;
-  struct cmp_media_player *ctx = (struct cmp_media_player *)player_opaque;
+  int rc;
+  struct cmp_media_player *ctx;
   size_t len;
+
+  rc = CMP_SUCCESS;
+  ctx = (struct cmp_media_player *)player_opaque;
   (void)duration;
   (void)current_time;
 
-  if (!ctx || !title || !artist) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG(
-        "Error in cmp_media_player_update_now_playing: Invalid argument\n");
-    return rc;
+  if (ctx == NULL) {
+    LOG_DEBUG("Error in cmp_media_player_update_now_playing: player_opaque is "
+              "NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+  if (title == NULL) {
+    LOG_DEBUG("Error in cmp_media_player_update_now_playing: title is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+  if (artist == NULL) {
+    LOG_DEBUG("Error in cmp_media_player_update_now_playing: artist is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  if (ctx->now_playing_title) {
-    CMP_FREE(ctx->now_playing_title);
+  if (ctx->now_playing_title != NULL) {
+    rc = CMP_FREE(ctx->now_playing_title);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_media_player_update_now_playing: CMP_FREE failed "
+                "for title\n");
+    }
   }
 
   len = strlen(title);
   rc = CMP_MALLOC(len + 1, (void **)&ctx->now_playing_title);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_media_player_update_now_playing: Out of memory for "
-              "title\n");
-    return rc;
+    LOG_DEBUG("Error in cmp_media_player_update_now_playing: CMP_MALLOC failed "
+              "for title (OOM)\n");
+    return CMP_ERROR_OOM;
   }
 #if defined(_MSC_VER)
-  strcpy_s(ctx->now_playing_title, len + 1, title);
+  rc = strcpy_s(ctx->now_playing_title, len + 1, title);
+  if (rc != 0) {
+    LOG_DEBUG("Error in cmp_media_player_update_now_playing: strcpy_s failed "
+              "for title\n");
+    return CMP_ERROR_GENERAL;
+  }
 #else
   strcpy(ctx->now_playing_title, title);
 #endif
 
-  if (ctx->now_playing_artist) {
-    CMP_FREE(ctx->now_playing_artist);
+  if (ctx->now_playing_artist != NULL) {
+    rc = CMP_FREE(ctx->now_playing_artist);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_media_player_update_now_playing: CMP_FREE failed "
+                "for artist\n");
+    }
   }
 
   len = strlen(artist);
   rc = CMP_MALLOC(len + 1, (void **)&ctx->now_playing_artist);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_media_player_update_now_playing: Out of memory for "
-              "artist\n");
-    return rc;
+    LOG_DEBUG("Error in cmp_media_player_update_now_playing: CMP_MALLOC failed "
+              "for artist (OOM)\n");
+    return CMP_ERROR_OOM;
   }
 #if defined(_MSC_VER)
-  strcpy_s(ctx->now_playing_artist, len + 1, artist);
+  rc = strcpy_s(ctx->now_playing_artist, len + 1, artist);
+  if (rc != 0) {
+    LOG_DEBUG("Error in cmp_media_player_update_now_playing: strcpy_s failed "
+              "for artist\n");
+    return CMP_ERROR_GENERAL;
+  }
 #else
   strcpy(ctx->now_playing_artist, artist);
 #endif
 
   /* Communicates to MPNowPlayingInfoCenter */
-
-  return rc;
+  LOG_DEBUG("cmp_media_player_update_now_playing: Success\n");
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_media_player_set_spatial_audio_enabled
+ * @brief Enable or disable spatial audio.
  *
- * @param player_opaque Parameter description.
- * @param is_enabled Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param player_opaque The media player.
+ * @param is_enabled 1 to enable, 0 to disable.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_media_player_set_spatial_audio_enabled(
     cmp_media_player_t *player_opaque, int is_enabled) {
-  int rc = CMP_SUCCESS;
-  struct cmp_media_player *ctx = (struct cmp_media_player *)player_opaque;
+  struct cmp_media_player *ctx;
 
-  if (!ctx) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_media_player_set_spatial_audio_enabled: Invalid "
-              "argument\n");
-    return rc;
+  ctx = (struct cmp_media_player *)player_opaque;
+
+  if (ctx == NULL) {
+    LOG_DEBUG("Error in cmp_media_player_set_spatial_audio_enabled: "
+              "player_opaque is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   ctx->is_spatial_audio_enabled = is_enabled;
-  return rc;
+  LOG_DEBUG("cmp_media_player_set_spatial_audio_enabled: Success\n");
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_media_player_set_remote_command_handler
+ * @brief Set the remote command handler.
  *
- * @param player_opaque Parameter description.
- * @param callback Parameter description.
- * @param userdata Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param player_opaque The media player.
+ * @param callback The callback function.
+ * @param userdata The userdata to pass to the callback.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_media_player_set_remote_command_handler(
     cmp_media_player_t *player_opaque, cmp_remote_command_cb callback,
     void *userdata) {
-  int rc = CMP_SUCCESS;
-  struct cmp_media_player *ctx = (struct cmp_media_player *)player_opaque;
+  struct cmp_media_player *ctx;
 
-  if (!ctx) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_media_player_set_remote_command_handler: Invalid "
-              "argument\n");
-    return rc;
+  ctx = (struct cmp_media_player *)player_opaque;
+
+  if (ctx == NULL) {
+    LOG_DEBUG("Error in cmp_media_player_set_remote_command_handler: "
+              "player_opaque is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   ctx->remote_cb = callback;
   ctx->remote_userdata = userdata;
   /* Binds MPRemoteCommandCenter */
-  return rc;
+  LOG_DEBUG("cmp_media_player_set_remote_command_handler: Success\n");
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_audio_session_create
+ * @brief Create an audio session.
  *
- * @param out_session Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param out_session Pointer to store the created audio session.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_audio_session_create(cmp_audio_session_t **out_session) {
-  int rc = CMP_SUCCESS;
-  struct cmp_audio_session *ctx = NULL;
+  int rc;
+  struct cmp_audio_session *ctx;
 
-  if (!out_session) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_audio_session_create: Invalid argument\n");
-    return rc;
+  rc = CMP_SUCCESS;
+  ctx = NULL;
+
+  if (out_session == NULL) {
+    LOG_DEBUG("Error in cmp_audio_session_create: out_session is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_audio_session), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_audio_session_create: Out of memory\n");
-    return rc;
+    LOG_DEBUG("Error in cmp_audio_session_create: CMP_MALLOC failed (OOM)\n");
+    return CMP_ERROR_OOM;
   }
 
   ctx->category = CMP_AUDIO_SESSION_AMBIENT; /* Default */
   ctx->is_active = 0;
 
   *out_session = (cmp_audio_session_t *)ctx;
-  return rc;
+  LOG_DEBUG("cmp_audio_session_create: Success\n");
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_audio_session_destroy
+ * @brief Destroy an audio session.
  *
- * @param session_opaque Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param session_opaque The audio session to destroy.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_audio_session_destroy(cmp_audio_session_t *session_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
 
-  if (session_opaque) {
-    CMP_FREE(session_opaque);
+  rc = CMP_SUCCESS;
+
+  if (session_opaque != NULL) {
+    rc = CMP_FREE(session_opaque);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_audio_session_destroy: CMP_FREE failed\n");
+      return rc;
+    }
   }
-  return rc;
+
+  LOG_DEBUG("cmp_audio_session_destroy: Success\n");
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_audio_session_set_category
+ * @brief Set the category of an audio session.
  *
- * @param session_opaque Parameter description.
- * @param category Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param session_opaque The audio session.
+ * @param category The category to set.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_audio_session_set_category(cmp_audio_session_t *session_opaque,
                                    cmp_audio_session_category_t category) {
-  int rc = CMP_SUCCESS;
-  struct cmp_audio_session *ctx = (struct cmp_audio_session *)session_opaque;
+  struct cmp_audio_session *ctx;
 
-  if (!ctx) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_audio_session_set_category: Invalid argument\n");
-    return rc;
+  ctx = (struct cmp_audio_session *)session_opaque;
+
+  if (ctx == NULL) {
+    LOG_DEBUG(
+        "Error in cmp_audio_session_set_category: session_opaque is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   ctx->category = category;
-  return rc;
+  LOG_DEBUG("cmp_audio_session_set_category: Success\n");
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_audio_session_activate
+ * @brief Activate an audio session.
  *
- * @param session_opaque Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param session_opaque The audio session.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_audio_session_activate(cmp_audio_session_t *session_opaque) {
-  int rc = CMP_SUCCESS;
-  struct cmp_audio_session *ctx = (struct cmp_audio_session *)session_opaque;
+  struct cmp_audio_session *ctx;
 
-  if (!ctx) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_audio_session_activate: Invalid argument\n");
-    return rc;
+  ctx = (struct cmp_audio_session *)session_opaque;
+
+  if (ctx == NULL) {
+    LOG_DEBUG("Error in cmp_audio_session_activate: session_opaque is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   ctx->is_active = 1;
   /* Triggers AVAudioSession setActive:YES error handling */
-  return rc;
+  LOG_DEBUG("cmp_audio_session_activate: Success\n");
+  return CMP_SUCCESS;
 }

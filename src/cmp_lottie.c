@@ -60,7 +60,10 @@ int cmp_lottie_destroy(cmp_lottie_t *lottie) {
     return rc;
   }
 
-  CMP_FREE(ctx);
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_lottie_destroy: CMP_FREE failed\n");
+  }
   return rc;
 }
 

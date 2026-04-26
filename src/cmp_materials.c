@@ -45,7 +45,10 @@ int cmp_materials_destroy(cmp_materials_t *materials) {
   int rc = CMP_SUCCESS;
 
   if (materials) {
-    CMP_FREE(materials);
+    rc = CMP_FREE(materials);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_materials_destroy: CMP_FREE failed\n");
+    }
   }
   return rc;
 }

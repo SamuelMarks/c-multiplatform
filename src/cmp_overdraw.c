@@ -10,76 +10,85 @@ struct cmp_overdraw {
 };
 
 /**
- * @brief cmp_overdraw_create
+ * @brief Create an overdraw context.
  *
- * @param out_overdraw Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param out_overdraw Pointer to store the created context.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_overdraw_create(cmp_overdraw_t **out_overdraw) {
-  int rc = CMP_SUCCESS;
-  struct cmp_overdraw *ctx = NULL;
+  int rc;
+  struct cmp_overdraw *ctx;
 
-  if (!out_overdraw) {
-    rc = CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
+  ctx = NULL;
+
+  if (out_overdraw == NULL) {
     LOG_DEBUG("Error in cmp_overdraw_create: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_overdraw), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_overdraw_create: Out of memory\n");
-    return rc;
+    LOG_DEBUG("Error in cmp_overdraw_create: CMP_MALLOC failed (OOM)\n");
+    return CMP_ERROR_OOM;
   }
 
   memset(ctx, 0, sizeof(struct cmp_overdraw));
   ctx->is_active = 0;
 
   *out_overdraw = (cmp_overdraw_t *)ctx;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_overdraw_destroy
+ * @brief Destroy an overdraw context.
  *
- * @param overdraw Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param overdraw The context to destroy.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_overdraw_destroy(cmp_overdraw_t *overdraw) {
-  int rc = CMP_SUCCESS;
-  struct cmp_overdraw *ctx = (struct cmp_overdraw *)overdraw;
+  int rc;
+  struct cmp_overdraw *ctx;
 
-  if (!ctx) {
-    rc = CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
+
+  if (overdraw == NULL) {
     LOG_DEBUG("Error in cmp_overdraw_destroy: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  CMP_FREE(ctx);
-  return rc;
+  ctx = (struct cmp_overdraw *)overdraw;
+
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_overdraw_destroy: CMP_FREE failed\n");
+    return rc;
+  }
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_overdraw_set_enabled
+ * @brief Set the overdraw visualization enabled state.
  *
- * @param overdraw Parameter description.
- * @param renderer Parameter description.
- * @param enable Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param overdraw The overdraw context.
+ * @param renderer The renderer context.
+ * @param enable 1 to enable overdraw visualization, 0 to disable.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_overdraw_set_enabled(cmp_overdraw_t *overdraw, cmp_renderer_t *renderer,
                              int enable) {
-  int rc = CMP_SUCCESS;
-  struct cmp_overdraw *ctx = (struct cmp_overdraw *)overdraw;
+  struct cmp_overdraw *ctx;
 
-  if (!ctx || !renderer) {
-    rc = CMP_ERROR_INVALID_ARG;
+  if (overdraw == NULL || renderer == NULL) {
     LOG_DEBUG("Error in cmp_overdraw_set_enabled: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
+
+  ctx = (struct cmp_overdraw *)overdraw;
 
   /* In a real implementation this would swap the active fragment shader
      on the renderer to an additive blending heat-map shader */
   ctx->is_active = enable ? 1 : 0;
 
-  return rc;
+  return CMP_SUCCESS;
 }

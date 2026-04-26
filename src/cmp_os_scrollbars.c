@@ -11,24 +11,26 @@ struct cmp_os_scrollbar {
 };
 
 /**
- * @brief cmp_os_scrollbar_create
+ * @brief Create an OS scrollbar context.
  *
- * @param out_scrollbar Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param out_scrollbar Pointer to store the created context.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar) {
-  int rc = CMP_SUCCESS;
-  cmp_os_scrollbar_t *scrollbar = NULL;
+  int rc;
+  cmp_os_scrollbar_t *scrollbar;
 
-  if (!out_scrollbar) {
-    rc = CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
+  scrollbar = NULL;
+
+  if (out_scrollbar == NULL) {
     LOG_DEBUG("Error in cmp_os_scrollbar_create: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  rc = CMP_MALLOC(sizeof(cmp_os_scrollbar_t), (void **)&(scrollbar));
+  rc = CMP_MALLOC(sizeof(cmp_os_scrollbar_t), (void **)&scrollbar);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("OOM\n");
+    LOG_DEBUG("Error in cmp_os_scrollbar_create: CMP_MALLOC failed (OOM)\n");
     return CMP_ERROR_OOM;
   }
 
@@ -43,55 +45,55 @@ int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar) {
 #endif
 
   *out_scrollbar = scrollbar;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_os_scrollbar_destroy
+ * @brief Destroy an OS scrollbar context.
  *
- * @param scrollbar Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param scrollbar The scrollbar to destroy.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar) {
-  int rc = CMP_SUCCESS;
+  int rc;
 
-  if (!scrollbar) {
-    rc = CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
+
+  if (scrollbar == NULL) {
     LOG_DEBUG("Error in cmp_os_scrollbar_destroy: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
 
   rc = CMP_FREE(scrollbar);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Free failed\n");
+    LOG_DEBUG("Error in cmp_os_scrollbar_destroy: CMP_FREE failed\n");
+    return rc;
   }
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_os_scrollbar_step
+ * @brief Step the OS scrollbar physics simulation.
  *
- * @param scrollbar Parameter description.
- * @param raw_delta_y Parameter description.
- * @param delta_time_ms Parameter description.
- * @param out_smoothed_y Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param scrollbar The scrollbar context.
+ * @param raw_delta_y The raw scroll delta input.
+ * @param delta_time_ms The delta time in milliseconds.
+ * @param out_smoothed_y Pointer to store the smoothed scroll delta.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar, float raw_delta_y,
                           unsigned int delta_time_ms, float *out_smoothed_y) {
-  int rc = CMP_SUCCESS;
   float dt_seconds;
 
-  if (!scrollbar || !out_smoothed_y) {
-    rc = CMP_ERROR_INVALID_ARG;
+  if (scrollbar == NULL || out_smoothed_y == NULL) {
     LOG_DEBUG("Error in cmp_os_scrollbar_step: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
 
   dt_seconds = delta_time_ms / 1000.0f;
   if (dt_seconds <= 0.0f) {
     *out_smoothed_y = 0.0f;
-    return rc;
+    return CMP_SUCCESS;
   }
 
   /* Add incoming impulse */
@@ -111,5 +113,5 @@ int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar, float raw_delta_y,
   }
 
   *out_smoothed_y = scrollbar->current_velocity * dt_seconds;
-  return rc;
+  return CMP_SUCCESS;
 }

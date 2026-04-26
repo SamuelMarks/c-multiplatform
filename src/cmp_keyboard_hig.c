@@ -58,7 +58,10 @@ int cmp_pointer_region_destroy(cmp_pointer_region_t *region_opaque) {
   int rc = CMP_SUCCESS;
 
   if (region_opaque) {
-    CMP_FREE(region_opaque);
+    rc = CMP_FREE(region_opaque);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_pointer_region_destroy: CMP_FREE failed\n");
+    }
   }
   return rc;
 }
@@ -167,7 +170,10 @@ int cmp_keyboard_shortcut_destroy(cmp_keyboard_shortcut_t *shortcut_opaque) {
   int rc = CMP_SUCCESS;
 
   if (shortcut_opaque) {
-    CMP_FREE(shortcut_opaque);
+    rc = CMP_FREE(shortcut_opaque);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_keyboard_shortcut_destroy: CMP_FREE failed\n");
+    }
   }
   return rc;
 }
@@ -241,20 +247,37 @@ int cmp_ui_command_create(cmp_ui_command_t **out_command, const char *title,
  */
 int cmp_ui_command_destroy(cmp_ui_command_t *command_opaque) {
   int rc = CMP_SUCCESS;
+  int free_rc;
   struct cmp_ui_command *ctx = (struct cmp_ui_command *)command_opaque;
 
   if (!ctx) {
     return rc;
   }
 
-  if (ctx->title)
-    CMP_FREE(ctx->title);
-  if (ctx->action_id)
-    CMP_FREE(ctx->action_id);
-  if (ctx->shortcut)
-    cmp_keyboard_shortcut_destroy((cmp_keyboard_shortcut_t *)ctx->shortcut);
+  if (ctx->title) {
+    free_rc = CMP_FREE(ctx->title);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_ui_command_destroy: CMP_FREE failed\n");
+      rc = free_rc;
+    }
+  }
+  if (ctx->action_id) {
+    free_rc = CMP_FREE(ctx->action_id);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_ui_command_destroy: CMP_FREE failed\n");
+      rc = free_rc;
+    }
+  }
+  if (ctx->shortcut) {
+    free_rc =
+        cmp_keyboard_shortcut_destroy((cmp_keyboard_shortcut_t *)ctx->shortcut);
+    if (free_rc != CMP_SUCCESS)
+      rc = free_rc;
+  }
 
-  CMP_FREE(ctx);
+  free_rc = CMP_FREE(ctx);
+  if (free_rc != CMP_SUCCESS)
+    rc = free_rc;
   return rc;
 }
 

@@ -133,8 +133,7 @@ int cmp_dump_stack_trace(void) {
     void *stack[100];
     int frames;
 
-FPRINTF(stderr, "--- Stack Trace ---
-");
+FPRINTF(stderr, "--- Stack Trace ---\n");
     frames = backtrace(stack, 100);
     backtrace_symbols_fd(stack, frames, STDERR_FILENO);
     return CMP_SUCCESS;
@@ -149,8 +148,7 @@ FPRINTF(stderr, "--- Stack Trace ---
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dump_stack_trace(void) {
-FPRINTF(stderr, "Stack trace not supported on this platform.
-");
+FPRINTF(stderr, "Stack trace not supported on this platform.\n");
     return CMP_SUCCESS;
 }
 

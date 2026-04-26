@@ -44,8 +44,15 @@ int cmp_ios_features_create(cmp_ios_features_t **out_features) {
 int cmp_ios_features_destroy(cmp_ios_features_t *features_opaque) {
   int rc = CMP_SUCCESS;
 
-  if (features_opaque) {
-    CMP_FREE(features_opaque);
+  if (!features_opaque) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_ios_features_destroy: Invalid argument\n");
+    return rc;
+  }
+
+  rc = CMP_FREE(features_opaque);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_ios_features_destroy: CMP_FREE failed\n");
   }
   return rc;
 }

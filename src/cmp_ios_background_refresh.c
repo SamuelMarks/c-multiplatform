@@ -54,7 +54,10 @@ int cmp_ios_background_refresh_destroy(cmp_ios_background_refresh_t *refresh) {
         "Error in cmp_ios_background_refresh_destroy: Invalid argument\n");
     return rc;
   }
-  free(refresh);
+  rc = CMP_FREE(refresh);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_ios_background_refresh_destroy: CMP_FREE failed\n");
+  }
   return rc;
 }
 

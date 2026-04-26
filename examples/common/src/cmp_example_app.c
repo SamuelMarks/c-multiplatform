@@ -138,12 +138,12 @@ static void on_window_resize(int width, int height, void *ctx) {
 
 static void dump_layout(cmp_ui_node_t *node, int depth, FILE *f) {
   int i;
+  const char *props = "";
   if (!node)
     return;
   for (i = 0; i < depth; i++)
     fprintf(f, "  ");
 
-  const char *props = "";
   if ((node->type == 4 || node->type == 3 || node->type == 2) &&
       node->properties) {
     props = (const char *)node->properties;
@@ -161,6 +161,7 @@ static void dump_layout(cmp_ui_node_t *node, int depth, FILE *f) {
 
 static int build_ui(void) {
   int rc;
+  size_t c;
   cmp_ui_app_bar_t *app_bar_cmp = NULL;
   cmp_ui_node_t *app_bar_node = NULL;
   cmp_ui_icon_button_t *btn_lang = NULL;
@@ -169,6 +170,7 @@ static int build_ui(void) {
   cmp_ui_node_t *btn_theme_node = NULL;
   cmp_ui_icon_button_t *btn_design = NULL;
   cmp_ui_node_t *btn_design_node = NULL;
+  cmp_ui_node_t *actions_row = NULL;
 
   if (g_a11y_tree) {
     cmp_a11y_tree_destroy(g_a11y_tree);
@@ -241,7 +243,6 @@ static int build_ui(void) {
   }
 
   /* Actions */
-  cmp_ui_node_t *actions_row = NULL;
   cmp_ui_box_create(&actions_row);
   actions_row->layout->direction = CMP_FLEX_ROW;
   actions_row->layout->flex_shrink = 0.0f;
@@ -257,7 +258,7 @@ static int build_ui(void) {
       btn_lang_node->text_color = g_is_dark ? 0xFFFFFFFF : 0xFF000000;
       btn_lang_node->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
       btn_lang_node->text_color = 0xFFFFFFFF;
-      for (int c = 0; c < btn_lang_node->child_count; c++) {
+      for (c = 0; c < btn_lang_node->child_count; c++) {
         btn_lang_node->children[c]->text_color = 0xFFFFFFFF;
         btn_lang_node->children[c]->font_size = 14.0f;
         btn_lang_node->children[c]->layout->flex_shrink = 0.0f;
@@ -292,7 +293,7 @@ static int build_ui(void) {
       btn_theme_node->layout->margin[3] = 4.0f;
       btn_theme_node->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
       btn_theme_node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
-      for (int c = 0; c < btn_theme_node->child_count; c++) {
+      for (c = 0; c < btn_theme_node->child_count; c++) {
         btn_theme_node->children[c]->text_color = 0xFFFFFFFF;
         btn_theme_node->children[c]->font_size = 14.0f;
         btn_theme_node->children[c]->layout->flex_shrink = 0.0f;
@@ -320,7 +321,7 @@ static int build_ui(void) {
       btn_palette_node->border_radius = 8.0f;
       btn_palette_node->layout->margin[1] = 4.0f;
       btn_palette_node->layout->margin[3] = 4.0f;
-      for (int c = 0; c < btn_palette_node->child_count; c++) {
+      for (c = 0; c < btn_palette_node->child_count; c++) {
         btn_palette_node->children[c]->text_color = 0xFFFFFFFF;
         btn_palette_node->children[c]->font_size = 14.0f;
         btn_palette_node->children[c]->layout->flex_shrink = 0.0f;
@@ -348,7 +349,7 @@ static int build_ui(void) {
       btn_design_node->border_radius = 8.0f;
       btn_design_node->layout->margin[1] = 4.0f;
       btn_design_node->layout->margin[3] = 4.0f;
-      for (int c = 0; c < btn_design_node->child_count; c++) {
+      for (c = 0; c < btn_design_node->child_count; c++) {
         btn_design_node->children[c]->text_color = 0xFFFFFFFF;
         btn_design_node->children[c]->font_size = 14.0f;
         btn_design_node->children[c]->layout->flex_shrink = 0.0f;

@@ -581,7 +581,10 @@ int app_run(void) {
 
         if (hn == ID_LOGIN_BTN) {
           if (!g_is_hovering_btn) {
-            if (cmp_hover_intent_process(g_hover_intent, &evt, 16.0f)) {
+            int confirmed = 0;
+            if (cmp_hover_intent_process(g_hover_intent, &evt, 16.0f,
+                                         &confirmed) == CMP_SUCCESS &&
+                confirmed) {
               cmp_compositor_val_t s = {0}, e = {0};
               g_is_hovering_btn = 1;
               s.opacity = g_btn_opacity;
@@ -590,6 +593,7 @@ int app_run(void) {
             }
           }
         } else {
+          int confirmed = 0;
           if (g_is_hovering_btn) {
             cmp_compositor_val_t s = {0}, e = {0};
             g_is_hovering_btn = 0;
@@ -598,7 +602,7 @@ int app_run(void) {
             cmp_compositor_anim_set_range(g_btn_opacity_anim, &s, &e);
           }
           evt.action = CMP_ACTION_CANCEL;
-          cmp_hover_intent_process(g_hover_intent, &evt, 0.0f);
+          cmp_hover_intent_process(g_hover_intent, &evt, 0.0f, &confirmed);
         }
       }
 

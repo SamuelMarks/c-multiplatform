@@ -81,6 +81,7 @@ TEST test_scroll_smooth_interpolation(void) {
 }
 
 TEST test_kinematics_edge_cases(void) {
+  int dummy_chains;
   cmp_rubber_band_t *band = NULL;
   cmp_scroll_smooth_t *smooth = NULL;
   float pos;
@@ -165,12 +166,14 @@ TEST test_scroll_padding(void) {
 }
 
 TEST test_overscroll(void) {
-  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_AUTO, 0));
-  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_AUTO, 1));
-  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_CONTAIN, 0));
-  ASSERT_EQ(0, cmp_overscroll_evaluate(CMP_OVERSCROLL_CONTAIN, 1));
-  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_NONE, 0));
-  ASSERT_EQ(0, cmp_overscroll_evaluate(CMP_OVERSCROLL_NONE, 1));
+  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_AUTO, 0, &dummy_chains));
+  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_AUTO, 1, &dummy_chains));
+  ASSERT_EQ(1,
+            cmp_overscroll_evaluate(CMP_OVERSCROLL_CONTAIN, 0, &dummy_chains));
+  ASSERT_EQ(0,
+            cmp_overscroll_evaluate(CMP_OVERSCROLL_CONTAIN, 1, &dummy_chains));
+  ASSERT_EQ(1, cmp_overscroll_evaluate(CMP_OVERSCROLL_NONE, 0, &dummy_chains));
+  ASSERT_EQ(0, cmp_overscroll_evaluate(CMP_OVERSCROLL_NONE, 1, &dummy_chains));
   PASS();
 }
 

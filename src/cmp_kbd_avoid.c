@@ -53,7 +53,10 @@ int cmp_keyboard_avoidance_destroy(cmp_keyboard_avoidance_t *avoider) {
     return rc;
   }
 
-  CMP_FREE(avoider);
+  rc = CMP_FREE(avoider);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_keyboard_avoidance_destroy: CMP_FREE failed\n");
+  }
   return rc;
 }
 

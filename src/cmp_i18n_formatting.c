@@ -51,7 +51,10 @@ int cmp_i18n_formatting_create(cmp_i18n_formatting_t **out_format) {
 int cmp_i18n_formatting_destroy(cmp_i18n_formatting_t *format_opaque) {
   int rc = CMP_SUCCESS;
   if (format_opaque) {
-    CMP_FREE(format_opaque);
+    rc = CMP_FREE(format_opaque);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_i18n_formatting_destroy: CMP_FREE failed\n");
+    }
   }
   return rc;
 }

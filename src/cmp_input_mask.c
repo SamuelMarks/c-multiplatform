@@ -66,7 +66,10 @@ int cmp_input_mask_destroy(cmp_input_mask_t *mask) {
     return rc;
   }
 
-  CMP_FREE(internal_mask);
+  rc = CMP_FREE(internal_mask);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_input_mask_destroy: CMP_FREE failed\n");
+  }
   return rc;
 }
 

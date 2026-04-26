@@ -58,6 +58,7 @@ TEST test_ipados_null_args(void) {
   cmp_size_class_t c;
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ipados_features_create(NULL));
+  ASSERT_EQ(CMP_SUCCESS, cmp_ipados_features_destroy(NULL));
   cmp_ipados_features_create(&feat);
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,

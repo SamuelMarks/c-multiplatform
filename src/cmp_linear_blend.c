@@ -62,7 +62,10 @@ int cmp_linear_blend_destroy(cmp_linear_blend_t *blend) {
     return rc;
   }
 
-  CMP_FREE(blend);
+  rc = CMP_FREE(blend);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_linear_blend_destroy: CMP_FREE failed\n");
+  }
   return rc;
 }
 

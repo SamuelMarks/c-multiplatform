@@ -37,10 +37,21 @@ TEST test_ime_null_args(void) {
 TEST test_ime_update(void) {
   cmp_ime_t *ime = NULL;
   int res;
+  char long_str[256];
+  int i;
+
+  for (i = 0; i < 255; i++) {
+    long_str[i] = 'A';
+  }
+  long_str[255] = '\0';
+
   cmp_ime_create(&ime);
 
   res = cmp_ime_update_composition(ime, "test string");
   ASSERT_EQ(CMP_SUCCESS, res);
+
+  res = cmp_ime_update_composition(ime, long_str);
+  ASSERT_EQ(CMP_ERROR_BOUNDS, res);
 
   cmp_ime_destroy(ime);
   PASS();

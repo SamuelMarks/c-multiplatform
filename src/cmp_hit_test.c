@@ -22,25 +22,21 @@ int cmp_hit_test_create(cmp_ui_node_t *tree, cmp_hit_test_t **out_hit_test) {
   int rc = 0; /* CMP_SUCCESS */
   struct cmp_hit_test *ctx = NULL;
 
-  if (!out_hit_test) {
-    rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != 0) {
-        err_str = "Unknown";
-      }
-      LOG_DEBUG("cmp_hit_test_create: %s\n", err_str);
-    }
-    return rc;
+  if (out_hit_test == NULL) {
+    LOG_DEBUG("cmp_hit_test_create: out_hit_test is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
+
   /* We allow a null tree for edge case testing, but ideally it should not be
      null. In the actual framework it would fail, but for the mock it's fine. */
 
   rc = CMP_MALLOC(sizeof(struct cmp_hit_test), (void **)&ctx);
   if (rc != 0) {
+    LOG_DEBUG("cmp_hit_test_create: CMP_MALLOC failed\n");
     return rc;
+  }
+  if (ctx == NULL) {
+    return CMP_ERROR_GENERAL;
   }
 
   memset(ctx, 0, sizeof(struct cmp_hit_test));
@@ -61,18 +57,9 @@ int cmp_hit_test_destroy(cmp_hit_test_t *hit_test) {
   int rc = 0; /* CMP_SUCCESS */
   struct cmp_hit_test *ctx = (struct cmp_hit_test *)hit_test;
 
-  if (!ctx) {
-    rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != 0) {
-        err_str = "Unknown";
-      }
-      LOG_DEBUG("cmp_hit_test_destroy: %s\n", err_str);
-    }
-    return rc;
+  if (ctx == NULL) {
+    LOG_DEBUG("cmp_hit_test_destroy: hit_test is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   rc = CMP_FREE(ctx);
@@ -83,42 +70,46 @@ int cmp_hit_test_destroy(cmp_hit_test_t *hit_test) {
 }
 
 /**
- * @brief hit_test_recursive
+ * @brief Recursive helper to find hit node.
  *
- * @param node Parameter description.
- * @param x Parameter description.
- * @param y Parameter description.
- * @param out_hit Parameter description.
+ * @param node UI node to test.
+ * @param x x coordinate.
+ * @param y y coordinate.
+ * @param out_hit Pointer to store hit node.
  * @return Returns 0 on success, or an error code on failure.
  */
-static int hit_test_recursive(cmp_ui_node_t *node, float x, float y, cmp_ui_node_t **out_hit) {
+static int hit_test_recursive(cmp_ui_node_t *node, float x, float y,
+                              cmp_ui_node_t **out_hit) {
   size_t i;
   cmp_ui_node_t *child_hit = NULL;
   int rc = 0;
 
-  if (!out_hit) {
+  if (out_hit == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-  
+
   *out_hit = NULL;
 
-  if (!node || !node->layout) {
+  if (node == NULL || node->layout == NULL) {
     return 0;
   }
 
   /* Check if point is inside this node's bounds */
   if (x >= node->layout->computed_rect.x &&
-      x <= (node->layout->computed_rect.x + node->layout->computed_rect.width) &&
+      x <=
+          (node->layout->computed_rect.x + node->layout->computed_rect.width) &&
       y >= node->layout->computed_rect.y &&
-      y <= (node->layout->computed_rect.y + node->layout->computed_rect.height)) {
+      y <= (node->layout->computed_rect.y +
+            node->layout->computed_rect.height)) {
 
-    /* It's a potential hit. Now check children in reverse order (top z-index first) */
+    /* It's a potential hit. Now check children in reverse order (top z-index
+     * first) */
     for (i = node->child_count; i > 0; i--) {
       rc = hit_test_recursive(node->children[i - 1], x, y, &child_hit);
       if (rc != 0) {
         return rc;
       }
-      if (child_hit) {
+      if (child_hit != NULL) {
         *out_hit = child_hit;
         return 0;
       }
@@ -146,38 +137,20 @@ int cmp_hit_test_query(cmp_hit_test_t *hit_test, float x, float y,
   int rc = 0; /* CMP_SUCCESS */
   struct cmp_hit_test *ctx = (struct cmp_hit_test *)hit_test;
 
-  if (!ctx || !out_node) {
-    rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != 0) {
-        err_str = "Unknown";
-      }
-      LOG_DEBUG("cmp_hit_test_query: %s\n", err_str);
-    }
-    return rc;
+  if (ctx == NULL || out_node == NULL) {
+    LOG_DEBUG("cmp_hit_test_query: invalid argument\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   /* If a coordinate is negative, simulate a miss (offscreen) */
   if (x < 0.0f || y < 0.0f) {
     *out_node = NULL;
-    rc = CMP_ERROR_NOT_FOUND;
-    {
-      const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != 0) {
-        err_str = "Unknown";
-      }
-      LOG_DEBUG("cmp_hit_test_query out of bounds: %s\n", err_str);
-    }
-    return rc;
+    LOG_DEBUG("cmp_hit_test_query out of bounds\n");
+    return CMP_ERROR_NOT_FOUND;
   }
 
   /* Simulate finding a hit using the mock bypass if set */
-  if (ctx->mock_hit_result) {
+  if (ctx->mock_hit_result != NULL) {
     *out_node = ctx->mock_hit_result;
     return 0;
   }
@@ -189,17 +162,9 @@ int cmp_hit_test_query(cmp_hit_test_t *hit_test, float x, float y,
     return rc;
   }
 
-  if (!*out_node) {
-    rc = CMP_ERROR_NOT_FOUND;
-    {
-      const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != 0) {
-        err_str = "Unknown";
-      }
-      LOG_DEBUG("cmp_hit_test_query miss: %s\n", err_str);
-    }
+  if (*out_node == NULL) {
+    LOG_DEBUG("cmp_hit_test_query miss\n");
+    return CMP_ERROR_NOT_FOUND;
   }
 
   return rc;

@@ -17,6 +17,7 @@ TEST test_hover_intent_create_destroy(void) {
 TEST test_hover_intent_process_success(void) {
   cmp_hover_intent_t *intent = NULL;
   cmp_event_t event_move = {0};
+  int confirmed = 0;
 
   ASSERT_EQ(CMP_SUCCESS, cmp_hover_intent_create(&intent));
 
@@ -25,18 +26,24 @@ TEST test_hover_intent_process_success(void) {
   event_move.y = 100;
 
   /* Initial registration (not hovered yet) */
-  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event_move, 0.0f));
+  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event_move, 0.0f, &confirmed));
+  ASSERT_EQ(0, confirmed);
 
   /* Move slightly within tolerance over time */
   event_move.x = 102;
-  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event_move, 50.0f));
+  ASSERT_EQ(0,
+            cmp_hover_intent_process(intent, &event_move, 50.0f, &confirmed));
+  ASSERT_EQ(0, confirmed);
 
   event_move.y = 102;
-  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event_move, 50.0f));
+  ASSERT_EQ(0,
+            cmp_hover_intent_process(intent, &event_move, 50.0f, &confirmed));
+  ASSERT_EQ(0, confirmed);
 
   /* Exceed the time threshold! */
-  ASSERT_EQ(1, cmp_hover_intent_process(intent, &event_move,
-                                        60.0f)); /* 160ms total */
+  ASSERT_EQ(0,
+            cmp_hover_intent_process(intent, &event_move, 500.0f, &confirmed));
+  ASSERT_EQ(1, confirmed);
 
   ASSERT_EQ(CMP_SUCCESS, cmp_hover_intent_destroy(intent));
   PASS();
@@ -45,6 +52,7 @@ TEST test_hover_intent_process_success(void) {
 TEST test_hover_intent_process_reset(void) {
   cmp_hover_intent_t *intent = NULL;
   cmp_event_t event = {0};
+  int confirmed = 0;
 
   ASSERT_EQ(CMP_SUCCESS, cmp_hover_intent_create(&intent));
 
@@ -52,21 +60,23 @@ TEST test_hover_intent_process_reset(void) {
   event.x = 100;
   event.y = 100;
 
-  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event, 0.0f));
-  ASSERT_EQ(
-      0, cmp_hover_intent_process(intent, &event, 100.0f)); /* Almost there */
+  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event, 0.0f, &confirmed));
+  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event, 100.0f,
+                                        &confirmed)); /* Almost there */
 
   /* Large movement resets timer (x jumps out of tolerance radius 5px) */
   event.x = 150;
-  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event, 50.0f));
+  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event, 50.0f, &confirmed));
+  ASSERT_EQ(0, confirmed);
 
   /* Validate it didn't trigger because of the reset */
   event.x = 151;
-  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event, 10.0f));
+  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event, 10.0f, &confirmed));
+  ASSERT_EQ(0, confirmed);
 
   /* Explicit cancel */
   event.action = CMP_ACTION_CANCEL;
-  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event, 0.0f));
+  ASSERT_EQ(0, cmp_hover_intent_process(intent, &event, 0.0f, &confirmed));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_hover_intent_destroy(intent));
   PASS();
@@ -75,6 +85,7 @@ TEST test_hover_intent_process_reset(void) {
 TEST test_hover_intent_edge_cases(void) {
   cmp_hover_intent_t *intent = NULL;
   cmp_event_t event = {0};
+  int confirmed = 0;
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_hover_intent_create(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_hover_intent_destroy(NULL));
@@ -82,9 +93,11 @@ TEST test_hover_intent_edge_cases(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_hover_intent_create(&intent));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
-            cmp_hover_intent_process(NULL, &event, 0.0f));
+            cmp_hover_intent_process(NULL, &event, 0.0f, &confirmed));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
-            cmp_hover_intent_process(intent, NULL, 0.0f));
+            cmp_hover_intent_process(intent, NULL, 0.0f, &confirmed));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_hover_intent_process(intent, &event, 0.0f, NULL));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_hover_intent_destroy(intent));
   PASS();

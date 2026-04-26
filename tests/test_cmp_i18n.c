@@ -117,14 +117,17 @@ TEST test_cmp_i18n_format(void) {
 }
 
 TEST test_cmp_i18n_bidi(void) {
+  int is_rtl = -1;
   /* Test RTL string handling and BIDI direction states */
   cmp_i18n_set_bidi_direction(CMP_TEXT_DIR_LTR);
   ASSERT_EQ(CMP_TEXT_DIR_LTR, cmp_i18n_get_bidi_direction());
-  ASSERT_EQ(0, cmp_i18n_is_rtl());
+  ASSERT_EQ(CMP_SUCCESS, cmp_i18n_is_rtl(&is_rtl));
+  ASSERT_EQ(0, is_rtl);
 
   cmp_i18n_set_bidi_direction(CMP_TEXT_DIR_RTL);
   ASSERT_EQ(CMP_TEXT_DIR_RTL, cmp_i18n_get_bidi_direction());
-  ASSERT_EQ(1, cmp_i18n_is_rtl());
+  ASSERT_EQ(CMP_SUCCESS, cmp_i18n_is_rtl(&is_rtl));
+  ASSERT_EQ(1, is_rtl);
 
   cmp_i18n_set_bidi_direction(CMP_TEXT_DIR_LTR);
 

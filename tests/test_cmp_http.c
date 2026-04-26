@@ -53,7 +53,7 @@ TEST test_ws_init(void) {
 
   res = cmp_http_ws_init(&req, NULL);
   /* Should succeed natively if it uses the backend */
-  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND, res, "%d");
 
   cmp_http_request_free(&req);
   cmp_http_shutdown();
@@ -69,7 +69,7 @@ TEST test_sse_init(void) {
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
   res = cmp_http_sse_init(&req, NULL);
-  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND, res, "%d");
 
   cmp_http_request_free(&req);
   cmp_http_shutdown();

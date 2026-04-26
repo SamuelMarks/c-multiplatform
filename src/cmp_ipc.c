@@ -44,6 +44,7 @@ int cmp_msg_create(cmp_msg_t **msg) {
  */
 int cmp_msg_destroy(cmp_msg_t *msg) {
   int rc = CMP_SUCCESS;
+  int free_rc;
 
   if (!msg) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -53,14 +54,16 @@ int cmp_msg_destroy(cmp_msg_t *msg) {
 
   /* Warning: if payload is managed elsewhere, this might be unsafe, but we assume it's owned here for serialization */
   if (msg->payload) {
-      rc = CMP_FREE(msg->payload);
-      if (rc != CMP_SUCCESS) {
+      free_rc = CMP_FREE(msg->payload);
+      if (free_rc != CMP_SUCCESS) {
         LOG_DEBUG("Free failed\n");
+        rc = free_rc;
       }
   }
-  rc = CMP_FREE(msg);
-  if (rc != CMP_SUCCESS) {
+  free_rc = CMP_FREE(msg);
+  if (free_rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
+    rc = free_rc;
   }
   return rc;
 }
@@ -75,6 +78,7 @@ int cmp_msg_destroy(cmp_msg_t *msg) {
  */
 int cmp_msg_set_payload(cmp_msg_t *msg, const void *payload, size_t size) {
   int rc = CMP_SUCCESS;
+  int free_rc;
 
   if (!msg || !payload) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -83,9 +87,10 @@ int cmp_msg_set_payload(cmp_msg_t *msg, const void *payload, size_t size) {
   }
 
   if (msg->payload) {
-    rc = CMP_FREE(msg->payload);
-    if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(msg->payload);
+    if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG("Free failed\n");
+      rc = free_rc;
     }
   }
 

@@ -5,24 +5,28 @@
 /* clang-format on */
 
 /**
- * @brief cmp_os_notify
+ * @brief Show an OS notification.
  *
- * @param title Parameter description.
- * @param body Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param title The title of the notification.
+ * @param body The body of the notification.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_notify(const char *title, const char *body) {
-  int rc = CMP_SUCCESS;
-  if (!title || !body) {
-    rc = CMP_ERROR_INVALID_ARG;
+  int rc;
+
+  rc = CMP_SUCCESS;
+
+  if (title == NULL || body == NULL) {
     LOG_DEBUG("Error in cmp_os_notify: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
+
   rc = cmp_window_os_notify(title, body);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_os_notify: cmp_window_os_notify failed\n");
+    return rc;
   }
-  return rc;
+  return CMP_SUCCESS;
 }
 
 struct cmp_os_media_controls {
@@ -30,24 +34,27 @@ struct cmp_os_media_controls {
 };
 
 /**
- * @brief cmp_os_media_controls_create
+ * @brief Create OS media controls.
  *
- * @param out_controls Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param out_controls Pointer to store the created context.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_media_controls_create(cmp_os_media_controls_t **out_controls) {
-  int rc = CMP_SUCCESS;
-  cmp_os_media_controls_t *mc = NULL;
+  int rc;
+  cmp_os_media_controls_t *mc;
 
-  if (!out_controls) {
-    rc = CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
+  mc = NULL;
+
+  if (out_controls == NULL) {
     LOG_DEBUG("Error in cmp_os_media_controls_create: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  rc = CMP_MALLOC(sizeof(cmp_os_media_controls_t), (void **)&(mc));
+  rc = CMP_MALLOC(sizeof(cmp_os_media_controls_t), (void **)&mc);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("OOM\n");
+    LOG_DEBUG(
+        "Error in cmp_os_media_controls_create: CMP_MALLOC failed (OOM)\n");
     return CMP_ERROR_OOM;
   }
 
@@ -57,63 +64,69 @@ int cmp_os_media_controls_create(cmp_os_media_controls_t **out_controls) {
               "failed\n");
     rc = CMP_FREE(mc);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+      LOG_DEBUG("Error in cmp_os_media_controls_create: CMP_FREE failed during "
+                "cleanup\n");
     }
-    return rc;
+    return CMP_ERROR_GENERAL;
   }
 
   *out_controls = mc;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_os_media_controls_destroy
+ * @brief Destroy OS media controls.
  *
- * @param controls Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param controls The context to destroy.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_media_controls_destroy(cmp_os_media_controls_t *controls) {
-  int rc = CMP_SUCCESS;
+  int rc;
 
-  if (!controls) {
-    rc = CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
+
+  if (controls == NULL) {
     LOG_DEBUG("Error in cmp_os_media_controls_destroy: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  if (controls->player) {
+  if (controls->player != NULL) {
     rc = cmp_media_player_destroy(controls->player);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_os_media_controls_destroy: "
                 "cmp_media_player_destroy failed\n");
     }
   }
+
   rc = CMP_FREE(controls);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Free failed\n");
+    LOG_DEBUG("Error in cmp_os_media_controls_destroy: CMP_FREE failed\n");
+    return rc;
   }
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_os_media_controls_update
+ * @brief Update the now playing information in OS media controls.
  *
- * @param controls Parameter description.
- * @param title Parameter description.
- * @param artist Parameter description.
- * @param duration Parameter description.
- * @param current_time Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param controls The controls context.
+ * @param title The track title.
+ * @param artist The track artist.
+ * @param duration Total duration in seconds.
+ * @param current_time Current playback time in seconds.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_media_controls_update(cmp_os_media_controls_t *controls,
                                  const char *title, const char *artist,
                                  float duration, float current_time) {
-  int rc = CMP_SUCCESS;
+  int rc;
 
-  if (!controls || !controls->player) {
-    rc = CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
+
+  if (controls == NULL || controls->player == NULL || title == NULL ||
+      artist == NULL) {
     LOG_DEBUG("Error in cmp_os_media_controls_update: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
 
   rc = cmp_media_player_update_now_playing(controls->player, title, artist,
@@ -121,37 +134,37 @@ int cmp_os_media_controls_update(cmp_os_media_controls_t *controls,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_os_media_controls_update: "
               "cmp_media_player_update_now_playing failed\n");
+    return rc;
   }
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_os_media_controls_set_handler
+ * @brief Set the remote command handler for OS media controls.
  *
- * @param controls Parameter description.
- * @param callback Parameter description.
- * @param userdata Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param controls The controls context.
+ * @param callback The callback function.
+ * @param userdata User data for the callback.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_media_controls_set_handler(cmp_os_media_controls_t *controls,
                                       cmp_media_command_cb callback,
                                       void *userdata) {
-  int rc = CMP_SUCCESS;
+  int rc;
 
-  if (!controls || !controls->player) {
-    rc = CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
+
+  if (controls == NULL || controls->player == NULL || callback == NULL) {
     LOG_DEBUG("Error in cmp_os_media_controls_set_handler: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  /* Assuming cmp_media_player_set_remote_command_handler takes a generic
-     callback. If the type signature is exactly the same, we can cast it safely.
-   */
   rc = cmp_media_player_set_remote_command_handler(
       controls->player, (cmp_remote_command_cb)callback, userdata);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_os_media_controls_set_handler: "
               "cmp_media_player_set_remote_command_handler failed\n");
+    return rc;
   }
-  return rc;
+  return CMP_SUCCESS;
 }

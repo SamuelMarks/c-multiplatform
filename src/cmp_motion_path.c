@@ -15,25 +15,27 @@ struct cmp_motion_path {
 };
 
 /**
- * @brief cmp_motion_path_create
+ * @brief Create a motion path.
  *
- * @param out_path Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param out_path Pointer to store the created path.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_motion_path_create(cmp_motion_path_t **out_path) {
-  int rc = CMP_SUCCESS;
-  struct cmp_motion_path *path = NULL;
+  int rc;
+  struct cmp_motion_path *path;
 
-  if (!out_path) {
-    rc = CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
+  path = NULL;
+
+  if (out_path == NULL) {
     LOG_DEBUG("Error in cmp_motion_path_create: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_motion_path), (void **)&path);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_motion_path_create: Out of memory\n");
-    return rc;
+    LOG_DEBUG("Error in cmp_motion_path_create: CMP_MALLOC failed (OOM)\n");
+    return CMP_ERROR_OOM;
   }
 
   memset(path, 0, sizeof(struct cmp_motion_path));
@@ -49,38 +51,45 @@ int cmp_motion_path_create(cmp_motion_path_t **out_path) {
   path->p3y = 0.0f;
 
   *out_path = (cmp_motion_path_t *)path;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_motion_path_destroy
+ * @brief Destroy a motion path.
  *
- * @param path Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param path The path to destroy.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_motion_path_destroy(cmp_motion_path_t *path) {
-  int rc = CMP_SUCCESS;
-  struct cmp_motion_path *internal_path = (struct cmp_motion_path *)path;
+  int rc;
+  struct cmp_motion_path *internal_path;
 
-  if (!internal_path) {
-    rc = CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
+
+  if (path == NULL) {
     LOG_DEBUG("Error in cmp_motion_path_destroy: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  CMP_FREE(internal_path);
-  return rc;
+  internal_path = (struct cmp_motion_path *)path;
+
+  rc = CMP_FREE(internal_path);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_motion_path_destroy: CMP_FREE failed\n");
+    return rc;
+  }
+  return CMP_SUCCESS;
 }
 
 /**
- * @brief eval_bezier
+ * @brief Evaluate cubic bezier at parameter t.
  *
- * @param p0 Parameter description.
- * @param p1 Parameter description.
- * @param p2 Parameter description.
- * @param p3 Parameter description.
- * @param t Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param p0 Point 0.
+ * @param p1 Point 1.
+ * @param p2 Point 2.
+ * @param p3 Point 3.
+ * @param t Parameter t in [0.0, 1.0].
+ * @return Returns the evaluated value.
  */
 static float eval_bezier(float p0, float p1, float p2, float p3, float t) {
   float u = 1.0f - t;
@@ -88,8 +97,9 @@ static float eval_bezier(float p0, float p1, float p2, float p3, float t) {
   float uu = u * u;
   float uuu = uu * u;
   float ttt = tt * t;
+  float p;
 
-  float p = uuu * p0;
+  p = uuu * p0;
   p += 3 * uu * t * p1;
   p += 3 * u * tt * p2;
   p += ttt * p3;
@@ -98,14 +108,14 @@ static float eval_bezier(float p0, float p1, float p2, float p3, float t) {
 }
 
 /**
- * @brief eval_bezier_derivative
+ * @brief Evaluate derivative of cubic bezier at parameter t.
  *
- * @param p0 Parameter description.
- * @param p1 Parameter description.
- * @param p2 Parameter description.
- * @param p3 Parameter description.
- * @param t Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param p0 Point 0.
+ * @param p1 Point 1.
+ * @param p2 Point 2.
+ * @param p3 Point 3.
+ * @param t Parameter t in [0.0, 1.0].
+ * @return Returns the evaluated derivative.
  */
 static float eval_bezier_derivative(float p0, float p1, float p2, float p3,
                                     float t) {
@@ -117,31 +127,31 @@ static float eval_bezier_derivative(float p0, float p1, float p2, float p3,
 }
 
 /**
- * @brief cmp_motion_path_evaluate
+ * @brief Evaluate the position and rotation along the path.
  *
- * @param path Parameter description.
- * @param distance Parameter description.
- * @param offset_rotate Parameter description.
- * @param out_x Parameter description.
- * @param out_y Parameter description.
- * @param out_angle Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param path The path to evaluate.
+ * @param distance Normalized distance [0.0, 1.0].
+ * @param offset_rotate Rotation offset in degrees.
+ * @param out_x Pointer to store X coordinate.
+ * @param out_y Pointer to store Y coordinate.
+ * @param out_angle Pointer to store angle in degrees.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
                              float offset_rotate, float *out_x, float *out_y,
                              float *out_angle) {
-  int rc = CMP_SUCCESS;
-  struct cmp_motion_path *p = (struct cmp_motion_path *)path;
+  struct cmp_motion_path *p;
   float dx;
   float dy;
   float angle_rad;
 
-  if (!p || !out_x || !out_y || !out_angle || distance < 0.0f ||
-      distance > 1.0f) {
-    rc = CMP_ERROR_INVALID_ARG;
+  if (path == NULL || out_x == NULL || out_y == NULL || out_angle == NULL ||
+      distance < 0.0f || distance > 1.0f) {
     LOG_DEBUG("Error in cmp_motion_path_evaluate: Invalid argument\n");
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
+
+  p = (struct cmp_motion_path *)path;
 
   *out_x = eval_bezier(p->p0x, p->p1x, p->p2x, p->p3x, distance);
   *out_y = eval_bezier(p->p0y, p->p1y, p->p2y, p->p3y, distance);
@@ -152,5 +162,5 @@ int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
   angle_rad = (float)atan2(dy, dx);
   *out_angle = angle_rad * (180.0f / 3.14159265f) + offset_rotate;
 
-  return rc;
+  return CMP_SUCCESS;
 }

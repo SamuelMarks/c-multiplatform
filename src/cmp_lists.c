@@ -68,6 +68,7 @@ int cmp_list_create(cmp_list_t **out_list, cmp_list_style_t style) {
  */
 int cmp_list_destroy(cmp_list_t *list_opaque) {
   int rc = CMP_SUCCESS;
+  int free_rc;
   struct cmp_list *ctx = (struct cmp_list *)list_opaque;
   size_t i;
 
@@ -84,9 +85,13 @@ int cmp_list_destroy(cmp_list_t *list_opaque) {
         }
       }
     }
-    CMP_FREE(ctx->rows);
+    free_rc = CMP_FREE(ctx->rows);
+    if (free_rc != CMP_SUCCESS)
+      rc = free_rc;
   }
-  CMP_FREE(ctx);
+  free_rc = CMP_FREE(ctx);
+  if (free_rc != CMP_SUCCESS)
+    rc = free_rc;
   return rc;
 }
 
@@ -99,6 +104,7 @@ int cmp_list_destroy(cmp_list_t *list_opaque) {
  */
 int cmp_list_add_row(cmp_list_t *list_opaque, cmp_list_row_t *row_opaque) {
   int rc = CMP_SUCCESS;
+  int free_rc;
   struct cmp_list *ctx = (struct cmp_list *)list_opaque;
   struct cmp_list_row *row = (struct cmp_list_row *)row_opaque;
   cmp_list_row_t **new_rows = NULL;
@@ -119,7 +125,9 @@ int cmp_list_add_row(cmp_list_t *list_opaque, cmp_list_row_t *row_opaque) {
     }
     if (ctx->rows) {
       memcpy(new_rows, ctx->rows, ctx->row_count * sizeof(cmp_list_row_t *));
-      CMP_FREE(ctx->rows);
+      free_rc = CMP_FREE(ctx->rows);
+      if (free_rc != CMP_SUCCESS)
+        rc = free_rc;
     }
     ctx->rows = new_rows;
     ctx->row_capacity = new_cap;
@@ -182,6 +190,7 @@ int cmp_list_row_create(cmp_list_row_t **out_row, const char *title) {
  */
 int cmp_list_row_destroy(cmp_list_row_t *row_opaque) {
   int rc = CMP_SUCCESS;
+  int free_rc;
   struct cmp_list_row *ctx = (struct cmp_list_row *)row_opaque;
   size_t i;
 
@@ -189,16 +198,26 @@ int cmp_list_row_destroy(cmp_list_row_t *row_opaque) {
     return rc;
   }
 
-  if (ctx->title)
-    CMP_FREE(ctx->title);
+  if (ctx->title) {
+    free_rc = CMP_FREE(ctx->title);
+    if (free_rc != CMP_SUCCESS)
+      rc = free_rc;
+  }
   if (ctx->actions) {
     for (i = 0; i < ctx->action_count; ++i) {
-      if (ctx->actions[i].title)
-        CMP_FREE(ctx->actions[i].title);
+      if (ctx->actions[i].title) {
+        free_rc = CMP_FREE(ctx->actions[i].title);
+        if (free_rc != CMP_SUCCESS)
+          rc = free_rc;
+      }
     }
-    CMP_FREE(ctx->actions);
+    free_rc = CMP_FREE(ctx->actions);
+    if (free_rc != CMP_SUCCESS)
+      rc = free_rc;
   }
-  CMP_FREE(ctx);
+  free_rc = CMP_FREE(ctx);
+  if (free_rc != CMP_SUCCESS)
+    rc = free_rc;
   return rc;
 }
 
@@ -238,6 +257,7 @@ int cmp_list_row_add_swipe_action(cmp_list_row_t *row_opaque, int is_leading,
                                   cmp_swipe_action_style_t style,
                                   int allows_continuous) {
   int rc = CMP_SUCCESS;
+  int free_rc;
   struct cmp_list_row *ctx = (struct cmp_list_row *)row_opaque;
   cmp_swipe_action_t *new_actions = NULL;
   size_t len;
@@ -259,7 +279,9 @@ int cmp_list_row_add_swipe_action(cmp_list_row_t *row_opaque, int is_leading,
   if (ctx->actions) {
     memcpy(new_actions, ctx->actions,
            ctx->action_count * sizeof(cmp_swipe_action_t));
-    CMP_FREE(ctx->actions);
+    free_rc = CMP_FREE(ctx->actions);
+    if (free_rc != CMP_SUCCESS)
+      rc = free_rc;
   }
   ctx->actions = new_actions;
 

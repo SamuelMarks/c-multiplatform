@@ -69,7 +69,10 @@ int cmp_interop_allocate_retained_object(void **out_object)
 int cmp_interop_release_object(void *object) {
   int rc = CMP_SUCCESS;
   if (object) {
-    CMP_FREE(object);
+    rc = CMP_FREE(object);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_interop_release_object: CMP_FREE failed\n");
+    }
   }
   /* CFRelease / ARC boundary mock */
   return rc;

@@ -535,12 +535,15 @@ static void apply_rtl_mirroring(cmp_layout_node_t *node) {
  */
 int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
                          float available_height) {
+  int is_rtl = 0;
+
   if (root == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
   calculate_node_pass(root, 0.0f, 0.0f, available_width, available_height);
 
-  if (cmp_i18n_is_rtl()) {
+  cmp_i18n_is_rtl(&is_rtl);
+  if (is_rtl) {
     apply_rtl_mirroring(root);
   }
 

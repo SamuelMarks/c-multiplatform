@@ -64,7 +64,10 @@ int cmp_math_renderer_destroy(cmp_math_renderer_t *renderer) {
     LOG_DEBUG("Error in cmp_math_renderer_destroy: Invalid argument\n");
     return rc;
   }
-  CMP_FREE(renderer);
+  rc = CMP_FREE(renderer);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_math_renderer_destroy: CMP_FREE failed\n");
+  }
   return rc;
 }
 
@@ -81,6 +84,7 @@ int cmp_math_renderer_parse(cmp_math_renderer_t *renderer,
                             const char *latex_string, int is_inline,
                             void **out_visual_tree) {
   int rc = CMP_SUCCESS;
+  int free_rc;
   struct cmp_math_visual_tree *tree = NULL;
   size_t len;
 
@@ -100,7 +104,9 @@ int cmp_math_renderer_parse(cmp_math_renderer_t *renderer,
   len = strlen(latex_string);
   rc = CMP_MALLOC(len + 1, (void **)&tree->raw_latex);
   if (rc != CMP_SUCCESS) {
-    CMP_FREE(tree);
+    free_rc = CMP_FREE(tree);
+    if (free_rc != CMP_SUCCESS)
+      rc = free_rc;
     LOG_DEBUG(
         "Error in cmp_math_renderer_parse: Out of memory for raw_latex\n");
     return rc;
@@ -126,6 +132,7 @@ int cmp_math_renderer_parse(cmp_math_renderer_t *renderer,
  */
 int cmp_math_renderer_free_tree(void *visual_tree) {
   int rc = CMP_SUCCESS;
+  int free_rc;
   struct cmp_math_visual_tree *tree =
       (struct cmp_math_visual_tree *)visual_tree;
 
@@ -136,9 +143,13 @@ int cmp_math_renderer_free_tree(void *visual_tree) {
   }
 
   if (tree->raw_latex) {
-    CMP_FREE(tree->raw_latex);
+    free_rc = CMP_FREE(tree->raw_latex);
+    if (free_rc != CMP_SUCCESS)
+      rc = free_rc;
   }
-  CMP_FREE(tree);
+  free_rc = CMP_FREE(tree);
+  if (free_rc != CMP_SUCCESS)
+    rc = free_rc;
 
   return rc;
 }

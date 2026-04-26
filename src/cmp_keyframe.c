@@ -57,7 +57,10 @@ int cmp_keyframe_destroy(cmp_keyframe_t *keyframe) {
     return rc;
   }
 
-  CMP_FREE(internal_keyframe);
+  rc = CMP_FREE(internal_keyframe);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_keyframe_destroy: CMP_FREE failed\n");
+  }
   return rc;
 }
 
