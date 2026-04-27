@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "cmp.h"
 #include <stdlib.h>
+#include <string.h>
 
 #if defined(_WIN32)
 long _InterlockedCompareExchange(long volatile *Destination, long Exchange, long Comperand);
@@ -16,22 +17,23 @@ long _InterlockedCompareExchange(long volatile *Destination, long Exchange, long
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_init(cmp_ring_buffer_t *rb, size_t capacity) {
+  int rc;
+  rc = 0;
   if (rb == NULL || capacity == 0) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  rb->buffer = (void **)calloc(capacity, sizeof(void *));
-  if (rb->buffer == NULL) {
+  rc = CMP_MALLOC(capacity * sizeof(void *), (void **)&rb->buffer);
+  if (rc != CMP_SUCCESS) {
     return CMP_ERROR_OOM;
   }
+  memset(rb->buffer, 0, capacity * sizeof(void *));
 
   rb->capacity = capacity;
   rb->head = 0;
   rb->tail = 0;
-
   return CMP_SUCCESS;
 }
-
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
 /**
  * @brief cmp_ring_buffer_push
@@ -41,6 +43,8 @@ int cmp_ring_buffer_init(cmp_ring_buffer_t *rb, size_t capacity) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
+  int rc;
+  rc = 0;
   size_t current_tail = rb->tail;
   size_t current_head = rb->head;
   size_t next_head = (current_head + 1) % rb->capacity;
@@ -60,6 +64,8 @@ int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
+  int rc;
+  rc = 0;
   size_t current_tail;
   size_t next_tail;
   size_t current_head;
@@ -85,7 +91,6 @@ int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
 
     /* Set the item BEFORE publishing the tail update */
     rb->buffer[current_tail] = item;
-
 #if defined(_WIN32)
     if (_InterlockedCompareExchange(&rb->tail, (long)next_tail,
                                     (long)current_tail) == (long)current_tail) {
@@ -98,7 +103,6 @@ int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
     }
 #endif
   } while (1);
-
   return CMP_SUCCESS;
 }
 #endif
@@ -112,6 +116,8 @@ int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
+  int rc;
+  rc = 0;
   size_t current_tail = rb->tail;
   size_t current_head = rb->head;
   if (current_head == current_tail) {
@@ -130,6 +136,8 @@ int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
+  int rc;
+  rc = 0;
   size_t current_head;
   size_t next_head;
   size_t current_tail;
@@ -157,7 +165,6 @@ int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
 
     /* Read the item BEFORE publishing the head update */
     item = rb->buffer[current_head];
-
 #if defined(_WIN32)
     if (_InterlockedCompareExchange(&rb->head, (long)next_head,
                                     (long)current_head) == (long)current_head) {
@@ -172,7 +179,6 @@ int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
   } while (1);
 
   *out_item = item;
-
   return CMP_SUCCESS;
 }
 #endif
@@ -184,18 +190,22 @@ int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_destroy(cmp_ring_buffer_t *rb) {
+  int rc;
+  rc = 0;
   if (rb == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
 
   if (rb->buffer != NULL) {
-    free(rb->buffer);
+    rc = CMP_FREE(rb->buffer);
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
     rb->buffer = NULL;
   }
 
   rb->capacity = 0;
   rb->head = 0;
   rb->tail = 0;
-
   return CMP_SUCCESS;
 }

@@ -1,7 +1,10 @@
 /* clang-format off */
 #include "cmp.h"
+
 #include <stdlib.h>
 #include <string.h>
+
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_scroll_timeline {
@@ -9,20 +12,27 @@ struct cmp_scroll_timeline {
 };
 
 /**
- * @brief cmp_scroll_timeline_create
+ * @brief Create a scroll timeline.
  *
  * @param out_timeline Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_timeline_create(cmp_scroll_timeline_t **out_timeline) {
+  int rc;
   struct cmp_scroll_timeline *timeline;
 
-  if (!out_timeline)
-    return CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
 
-  if (CMP_MALLOC(sizeof(struct cmp_scroll_timeline), (void **)&timeline) !=
-      CMP_SUCCESS)
+  if (out_timeline == NULL) {
+    LOG_DEBUG("Invalid argument: out_timeline is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_scroll_timeline), (void **)&timeline);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
+  }
 
   memset(timeline, 0, sizeof(struct cmp_scroll_timeline));
   timeline->is_active = 1;
@@ -32,23 +42,34 @@ int cmp_scroll_timeline_create(cmp_scroll_timeline_t **out_timeline) {
 }
 
 /**
- * @brief cmp_scroll_timeline_destroy
+ * @brief Destroy a scroll timeline.
  *
  * @param timeline Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_timeline_destroy(cmp_scroll_timeline_t *timeline) {
-  struct cmp_scroll_timeline *internal_timeline =
-      (struct cmp_scroll_timeline *)timeline;
-  if (!internal_timeline)
-    return CMP_ERROR_INVALID_ARG;
+  int rc;
+  struct cmp_scroll_timeline *internal_timeline;
 
-  CMP_FREE(internal_timeline);
+  rc = CMP_SUCCESS;
+  internal_timeline = (struct cmp_scroll_timeline *)timeline;
+
+  if (internal_timeline == NULL) {
+    LOG_DEBUG("Invalid argument: timeline is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  rc = CMP_FREE(internal_timeline);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+    return rc;
+  }
+
   return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_scroll_timeline_evaluate
+ * @brief Evaluate the scroll timeline progress.
  *
  * @param timeline Parameter description.
  * @param scroll_offset Parameter description.
@@ -59,11 +80,15 @@ int cmp_scroll_timeline_destroy(cmp_scroll_timeline_t *timeline) {
 int cmp_scroll_timeline_evaluate(cmp_scroll_timeline_t *timeline,
                                  float scroll_offset, float max_scroll_offset,
                                  float *out_progress) {
-  struct cmp_scroll_timeline *t = (struct cmp_scroll_timeline *)timeline;
+  struct cmp_scroll_timeline *t;
   float progress;
 
-  if (!t || !out_progress)
+  t = (struct cmp_scroll_timeline *)timeline;
+
+  if (t == NULL || out_progress == NULL) {
+    LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   if (max_scroll_offset <= 0.0f) {
     *out_progress = 0.0f;
@@ -78,5 +103,6 @@ int cmp_scroll_timeline_evaluate(cmp_scroll_timeline_t *timeline,
   }
 
   *out_progress = progress;
+
   return CMP_SUCCESS;
 }

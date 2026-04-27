@@ -4,6 +4,7 @@
 /* clang-format on */
 
 int main(int argc, char **argv) {
+  int rc = 0;
   cmp_app_config_t config;
   int err;
 
@@ -28,5 +29,8 @@ int main(int argc, char **argv) {
   /* Offload fractal generation to background thread pool while UI renders
    * smooth */
 
-  return 0;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

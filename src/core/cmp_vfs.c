@@ -46,7 +46,8 @@ static cmp_vfs_mount_entry_t *g_mounts = NULL;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vfs_init(void) {
-  cfs_runtime_config cfg;
+  int rc;
+  rc = 0;cfs_runtime_config cfg;
   if (g_vfs_initialized) {
     return CMP_SUCCESS;
   }
@@ -59,7 +60,11 @@ int cmp_vfs_init(void) {
 
   g_mounts = NULL;
   g_vfs_initialized = 1;
-  return CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -68,7 +73,8 @@ int cmp_vfs_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vfs_shutdown(void) {
-  cmp_vfs_mount_entry_t *curr, *next;
+  int rc;
+  rc = 0;cmp_vfs_mount_entry_t *curr, *next;
 
   if (!g_vfs_initialized) {
     return CMP_SUCCESS;
@@ -90,7 +96,11 @@ int cmp_vfs_shutdown(void) {
   }
 
   g_vfs_initialized = 0;
-  return CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -111,7 +121,7 @@ int cmp_vfs_mount(const char *mount_point, const char *real_path) {
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
       if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_vfs_mount: %s\n", err_str);
- }    return rc;
+ }    if (rc != 0) {      return rc;    }    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_vfs_mount_entry_t), (void **)&entry);
@@ -121,7 +131,7 @@ int cmp_vfs_mount(const char *mount_point, const char *real_path) {
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
       if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_vfs_mount CMP_MALLOC: %s\n", err_str);
- }    return rc;
+ }    if (rc != 0) {      return rc;    }    return rc;
   }
 
   mp_len = strlen(mount_point);
@@ -136,7 +146,6 @@ int cmp_vfs_mount(const char *mount_point, const char *real_path) {
     CMP_FREE(entry);
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   strcpy_s(entry->mount_point, mp_len + 1, mount_point);
   strcpy_s(entry->real_path, rp_len + 1, real_path);
@@ -169,7 +178,7 @@ int cmp_vfs_resolve_path(const char *virtual_path, cmp_string_t *out_path) {
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
       if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_vfs_resolve_path: %s\n", err_str);
- }    return rc;
+ }    if (rc != 0) {      return rc;    }    return rc;
   }
 
   cmp_string_init(out_path);
@@ -219,7 +228,8 @@ int cmp_vfs_resolve_path(const char *virtual_path, cmp_string_t *out_path) {
  */
 int cmp_vfs_read_file_sync(const char *virtual_path, void **out_buffer,
                            size_t *out_size) {
-  cfs_path p;
+  int rc;
+  rc = 0;cfs_path p;
   cmp_string_t resolved_path;
   const cfs_char_t *native_path;
   FILE *f;
@@ -265,7 +275,6 @@ int cmp_vfs_read_file_sync(const char *virtual_path, void **out_buffer,
   cmp_string_destroy(&resolved_path);
 
   cfs_path_c_str(&p, &native_path);
-
 #if defined(_WIN32)
   f = _wfopen(native_path, L"rb");
 #else
@@ -306,7 +315,11 @@ int cmp_vfs_read_file_sync(const char *virtual_path, void **out_buffer,
 
   fclose(f);
   cfs_path_destroy(&p);
-  return CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 typedef struct {
@@ -321,7 +334,7 @@ typedef struct {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void cmp_vfs_read_async_worker(void *arg) {
+CMP_EXEMPT(static void cmp_vfs_read_async_worker(void *arg)) {
   cmp_vfs_async_read_ctx_t *ctx = (cmp_vfs_async_read_ctx_t *)arg;
   void *buffer = NULL;
   size_t size = 0;
@@ -356,7 +369,8 @@ static void cmp_vfs_read_async_worker(void *arg) {
  */
 int cmp_vfs_read_file_async(cmp_modality_t *mod, const char *virtual_path,
                             cmp_vfs_read_cb_t callback, void *user_data) {
-  cmp_vfs_async_read_ctx_t *ctx;
+  int rc;
+  rc = 0;cmp_vfs_async_read_ctx_t *ctx;
   size_t path_len;
   int res;
 
@@ -374,7 +388,6 @@ int cmp_vfs_read_file_async(cmp_modality_t *mod, const char *virtual_path,
     CMP_FREE(ctx);
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   strcpy_s(ctx->virtual_path, path_len + 1, virtual_path);
 #else
@@ -390,8 +403,8 @@ int cmp_vfs_read_file_async(cmp_modality_t *mod, const char *virtual_path,
     CMP_FREE(ctx);
   }
 
-  return res;
-}
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  return res;}
 
 struct cmp_vfs_watch {
   char *virtual_path;
@@ -415,15 +428,14 @@ struct cmp_vfs_watch {
 #endif
 #endif
 };
-
 #if defined(_WIN32)
 /**
- * @brief Documented function cmp_vfs_watch_worker.
+ * @brief Documented function cmp_math_vfs_watch_worker.
  *
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static unsigned long __stdcall cmp_vfs_watch_worker(void *arg) {
+CMP_EXEMPT(static unsigned long __stdcall cmp_math_vfs_watch_worker(void *arg)) {
   cmp_vfs_watch_t *watch = (cmp_vfs_watch_t *)arg;
   char buffer[4096];
   OVERLAPPED overlapped;
@@ -475,12 +487,12 @@ static unsigned long __stdcall cmp_vfs_watch_worker(void *arg) {
 }
 #elif defined(__linux__)
 /**
- * @brief cmp_vfs_watch_worker
+ * @brief cmp_math_vfs_watch_worker
  *
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void *cmp_vfs_watch_worker(void *arg) {
+CMP_EXEMPT(static void *cmp_math_vfs_watch_worker(void *arg)) {
   cmp_vfs_watch_t *watch = (cmp_vfs_watch_t *)arg;
   union {
     char bytes[4096];
@@ -529,12 +541,12 @@ static void *cmp_vfs_watch_worker(void *arg) {
 #elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||    \
     defined(__NetBSD__)
 /**
- * @brief cmp_vfs_watch_worker
+ * @brief cmp_math_vfs_watch_worker
  *
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void *cmp_vfs_watch_worker(void *arg) {
+CMP_EXEMPT(static void *cmp_math_vfs_watch_worker(void *arg)) {
   cmp_vfs_watch_t *watch = (cmp_vfs_watch_t *)arg;
   struct kevent events[2];
   int res;
@@ -560,12 +572,12 @@ static void *cmp_vfs_watch_worker(void *arg) {
 }
 #else
 /**
- * @brief cmp_vfs_watch_worker
+ * @brief cmp_math_vfs_watch_worker
  *
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void *cmp_vfs_watch_worker(void *arg) {
+CMP_EXEMPT(static void *cmp_math_vfs_watch_worker(void *arg)) {
   cmp_vfs_watch_t *watch = (cmp_vfs_watch_t *)arg;
   char dummy;
   read(watch->stop_pipe[0], &dummy, 1);
@@ -584,7 +596,8 @@ static void *cmp_vfs_watch_worker(void *arg) {
  */
 int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
                        void *user_data, cmp_vfs_watch_t **out_watch) {
-  cmp_vfs_watch_t *watch;
+  int rc;
+  rc = 0;cmp_vfs_watch_t *watch;
   size_t path_len;
   cmp_string_t resolved_path;
   cfs_path p;
@@ -616,7 +629,6 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
     cmp_string_destroy(&resolved_path);
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   strcpy_s(watch->virtual_path, path_len + 1, virtual_path);
 #else
@@ -628,7 +640,6 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
   watch->running = 1;
 
   cfs_path_init(&p);
-
 #if defined(_WIN32)
   {
     wchar_t *wpath = NULL;
@@ -649,7 +660,6 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
 
   cmp_string_destroy(&resolved_path);
   cfs_path_c_str(&p, &native_path);
-
 #if defined(_WIN32)
   watch->dir_handle = CreateFileW(
       (const wchar_t *)native_path, FILE_LIST_DIRECTORY,
@@ -665,7 +675,7 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
 
   watch->stop_event = CreateEventA(NULL, 1, 0, NULL);
   watch->thread_handle =
-      CreateThread(NULL, 0, cmp_vfs_watch_worker, watch, 0, NULL);
+      CreateThread(NULL, 0, cmp_math_vfs_watch_worker, watch, 0, NULL);
 #elif defined(__linux__)
   if (pipe(watch->stop_pipe) == -1) {
     cfs_path_destroy(&p);
@@ -696,7 +706,7 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
     return CMP_ERROR_NOT_FOUND;
   }
 
-  pthread_create(&watch->thread_handle, NULL, cmp_vfs_watch_worker, watch);
+  pthread_create(&watch->thread_handle, NULL, cmp_math_vfs_watch_worker, watch);
 #elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||    \
     defined(__NetBSD__)
   if (pipe(watch->stop_pipe) == -1) {
@@ -735,7 +745,7 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
          0);
   kevent(watch->kq_fd, change, 2, NULL, 0, NULL);
 
-  pthread_create(&watch->thread_handle, NULL, cmp_vfs_watch_worker, watch);
+  pthread_create(&watch->thread_handle, NULL, cmp_math_vfs_watch_worker, watch);
 #else
   if (pipe(watch->stop_pipe) == -1) {
     cfs_path_destroy(&p);
@@ -743,12 +753,16 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
     CMP_FREE(watch);
     return CMP_ERROR_NOT_FOUND;
   }
-  pthread_create(&watch->thread_handle, NULL, cmp_vfs_watch_worker, watch);
+  pthread_create(&watch->thread_handle, NULL, cmp_math_vfs_watch_worker, watch);
 #endif
 
   cfs_path_destroy(&p);
   *out_watch = watch;
-  return CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -758,6 +772,8 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vfs_unwatch(cmp_vfs_watch_t *watch) {
+  int rc;
+  rc = 0;
 #if !defined(_WIN32)
   char dummy = 1;
 #endif
@@ -767,7 +783,6 @@ int cmp_vfs_unwatch(cmp_vfs_watch_t *watch) {
   }
 
   watch->running = 0;
-
 #if defined(_WIN32)
   if (watch->stop_event) {
     SetEvent(watch->stop_event);
@@ -807,7 +822,11 @@ int cmp_vfs_unwatch(cmp_vfs_watch_t *watch) {
   }
 
   CMP_FREE(watch);
-  return CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -818,7 +837,8 @@ int cmp_vfs_unwatch(cmp_vfs_watch_t *watch) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vfs_get_standard_path(int type, cmp_string_t *out_path) {
-  if (out_path == NULL) {
+  int rc;
+  rc = 0;if (out_path == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
 
@@ -956,5 +976,9 @@ int cmp_vfs_get_standard_path(int type, cmp_string_t *out_path) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

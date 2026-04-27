@@ -42,7 +42,6 @@ int cmp_apz_inject_gesture(cmp_apz_t *apz, float delta_x, float delta_y, float s
  * @return 0 on success
  */
 int cmp_apz_get_transform(const cmp_apz_t *apz, float *out_matrix);
-
 #ifdef __cplusplus
 }
 #endif

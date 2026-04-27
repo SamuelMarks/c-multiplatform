@@ -57,7 +57,8 @@ struct cmp_a11y_tree {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_tree_create(cmp_a11y_tree_t **out_tree) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *tree = NULL;
 
   if (!out_tree) {
@@ -71,6 +72,9 @@ int cmp_a11y_tree_create(cmp_a11y_tree_t **out_tree) {
       }
       LOG_DEBUG("cmp_a11y_tree_create: Invalid argument (out_tree=NULL): %s\n",
                 err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -86,6 +90,9 @@ int cmp_a11y_tree_create(cmp_a11y_tree_t **out_tree) {
       }
       LOG_DEBUG("cmp_a11y_tree_create: Out of memory: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -94,6 +101,9 @@ int cmp_a11y_tree_create(cmp_a11y_tree_t **out_tree) {
   tree->capacity = 0;
 
   *out_tree = (cmp_a11y_tree_t *)tree;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -104,7 +114,8 @@ int cmp_a11y_tree_create(cmp_a11y_tree_t **out_tree) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_tree_destroy(cmp_a11y_tree_t *tree) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   size_t i;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
 
@@ -119,6 +130,9 @@ int cmp_a11y_tree_destroy(cmp_a11y_tree_t *tree) {
       }
       LOG_DEBUG("cmp_a11y_tree_destroy: Invalid argument (tree=NULL): %s\n",
                 err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -174,6 +188,9 @@ int cmp_a11y_tree_destroy(cmp_a11y_tree_t *tree) {
   }
 
   CMP_FREE(t);
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -188,7 +205,8 @@ int cmp_a11y_tree_destroy(cmp_a11y_tree_t *tree) {
  */
 int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
                            const char *name) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   cmp_a11y_tree_node_t *new_nodes = NULL;
   size_t new_capacity;
@@ -205,6 +223,9 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
       }
       LOG_DEBUG("cmp_a11y_tree_add_node: Invalid argument (tree=NULL): %s\n",
                 err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -224,6 +245,9 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
         LOG_DEBUG(
             "cmp_a11y_tree_add_node: Out of memory allocating nodes: %s\n",
             err_str);
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -253,6 +277,9 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
         LOG_DEBUG("cmp_a11y_tree_add_node: Out of memory allocating role: %s\n",
                   err_str);
       }
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
 #if defined(_MSC_VER)
@@ -276,6 +303,9 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
         }
         LOG_DEBUG("cmp_a11y_tree_add_node: Out of memory allocating name: %s\n",
                   err_str);
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -318,6 +348,9 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
   t->nodes[t->count].sound_caption = NULL;
 
   t->count++;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -332,7 +365,8 @@ int cmp_a11y_tree_add_node(cmp_a11y_tree_t *tree, int node_id, const char *role,
  */
 int cmp_a11y_tree_get_node_desc(cmp_a11y_tree_t *tree, int node_id,
                                 char *out_desc, size_t out_capacity) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
   const char *role_str;
@@ -348,6 +382,9 @@ int cmp_a11y_tree_get_node_desc(cmp_a11y_tree_t *tree, int node_id,
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_a11y_tree_get_node_desc: Invalid argument: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -374,14 +411,19 @@ int cmp_a11y_tree_get_node_desc(cmp_a11y_tree_t *tree, int node_id,
           LOG_DEBUG("cmp_a11y_tree_get_node_desc: Out of bounds: %s\n",
                     err_str);
         }
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
-
 #if defined(_MSC_VER)
       sprintf_s(out_desc, out_capacity, "%s: %s", role_str, name_str);
 #else
       sprintf(out_desc, "%s: %s", role_str, name_str);
 #endif
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -396,6 +438,9 @@ int cmp_a11y_tree_get_node_desc(cmp_a11y_tree_t *tree, int node_id,
     }
     LOG_DEBUG("cmp_a11y_tree_get_node_desc: Node not found: %s\n", err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -409,7 +454,8 @@ int cmp_a11y_tree_get_node_desc(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_label(cmp_a11y_tree_t *tree, int node_id,
                                  const char *label) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i, len;
 
@@ -424,6 +470,9 @@ int cmp_a11y_tree_set_node_label(cmp_a11y_tree_t *tree, int node_id,
       }
       LOG_DEBUG("cmp_a11y_tree_set_node_label: Invalid argument: %s\n",
                 err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -448,6 +497,9 @@ int cmp_a11y_tree_set_node_label(cmp_a11y_tree_t *tree, int node_id,
             LOG_DEBUG("cmp_a11y_tree_set_node_label: Out of memory: %s\n",
                       err_str);
           }
+          if (rc != 0) {
+            return rc;
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -455,6 +507,9 @@ int cmp_a11y_tree_set_node_label(cmp_a11y_tree_t *tree, int node_id,
 #else
         strcpy(t->nodes[i].label, label);
 #endif
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -469,6 +524,9 @@ int cmp_a11y_tree_set_node_label(cmp_a11y_tree_t *tree, int node_id,
     }
     LOG_DEBUG("cmp_a11y_tree_set_node_label: Node not found: %s\n", err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -482,7 +540,8 @@ int cmp_a11y_tree_set_node_label(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_hint(cmp_a11y_tree_t *tree, int node_id,
                                 const char *hint) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i, len;
 
@@ -496,6 +555,9 @@ int cmp_a11y_tree_set_node_hint(cmp_a11y_tree_t *tree, int node_id,
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_a11y_tree_set_node_hint: Invalid argument: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -520,6 +582,9 @@ int cmp_a11y_tree_set_node_hint(cmp_a11y_tree_t *tree, int node_id,
             LOG_DEBUG("cmp_a11y_tree_set_node_hint: Out of memory: %s\n",
                       err_str);
           }
+          if (rc != 0) {
+            return rc;
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -527,6 +592,9 @@ int cmp_a11y_tree_set_node_hint(cmp_a11y_tree_t *tree, int node_id,
 #else
         strcpy(t->nodes[i].hint, hint);
 #endif
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -541,6 +609,9 @@ int cmp_a11y_tree_set_node_hint(cmp_a11y_tree_t *tree, int node_id,
     }
     LOG_DEBUG("cmp_a11y_tree_set_node_hint: Node not found: %s\n", err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -554,7 +625,8 @@ int cmp_a11y_tree_set_node_hint(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
                                  const char *value) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i, len;
 
@@ -569,6 +641,9 @@ int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
       }
       LOG_DEBUG("cmp_a11y_tree_set_node_value: Invalid argument: %s\n",
                 err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -593,6 +668,9 @@ int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
             LOG_DEBUG("cmp_a11y_tree_set_node_value: Out of memory: %s\n",
                       err_str);
           }
+          if (rc != 0) {
+            return rc;
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -600,6 +678,9 @@ int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
 #else
         strcpy(t->nodes[i].value, value);
 #endif
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -614,6 +695,9 @@ int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
     }
     LOG_DEBUG("cmp_a11y_tree_set_node_value: Node not found: %s\n", err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -627,7 +711,8 @@ int cmp_a11y_tree_set_node_value(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_get_node_traits(cmp_a11y_tree_t *tree, int node_id,
                                   uint32_t *out_traits) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
 
@@ -643,12 +728,18 @@ int cmp_a11y_tree_get_node_traits(cmp_a11y_tree_t *tree, int node_id,
       LOG_DEBUG("cmp_a11y_tree_get_node_traits: Invalid argument: %s\n",
                 err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   for (i = 0; i < t->count; ++i) {
     if (t->nodes[i].id == node_id) {
       *out_traits = t->nodes[i].traits;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -661,6 +752,9 @@ int cmp_a11y_tree_get_node_traits(cmp_a11y_tree_t *tree, int node_id,
       err_str = "Unknown";
     }
     LOG_DEBUG("cmp_a11y_tree_get_node_traits: Node not found: %s\n", err_str);
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -675,7 +769,8 @@ int cmp_a11y_tree_get_node_traits(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_traits(cmp_a11y_tree_t *tree, int node_id,
                                   uint32_t traits) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
 
@@ -691,12 +786,18 @@ int cmp_a11y_tree_set_node_traits(cmp_a11y_tree_t *tree, int node_id,
       LOG_DEBUG("cmp_a11y_tree_set_node_traits: Invalid argument: %s\n",
                 err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   for (i = 0; i < t->count; ++i) {
     if (t->nodes[i].id == node_id) {
       t->nodes[i].traits = traits;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -709,6 +810,9 @@ int cmp_a11y_tree_set_node_traits(cmp_a11y_tree_t *tree, int node_id,
       err_str = "Unknown";
     }
     LOG_DEBUG("cmp_a11y_tree_set_node_traits: Node not found: %s\n", err_str);
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -723,7 +827,8 @@ int cmp_a11y_tree_set_node_traits(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_grouped(cmp_a11y_tree_t *tree, int node_id,
                                    int is_grouped) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
 
@@ -739,12 +844,18 @@ int cmp_a11y_tree_set_node_grouped(cmp_a11y_tree_t *tree, int node_id,
       LOG_DEBUG("cmp_a11y_tree_set_node_grouped: Invalid argument: %s\n",
                 err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   for (i = 0; i < t->count; ++i) {
     if (t->nodes[i].id == node_id) {
       t->nodes[i].is_grouped = is_grouped;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -757,6 +868,9 @@ int cmp_a11y_tree_set_node_grouped(cmp_a11y_tree_t *tree, int node_id,
       err_str = "Unknown";
     }
     LOG_DEBUG("cmp_a11y_tree_set_node_grouped: Node not found: %s\n", err_str);
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -771,7 +885,8 @@ int cmp_a11y_tree_set_node_grouped(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
                                          const char *action_name) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i, len;
   char **new_actions = NULL;
@@ -788,6 +903,9 @@ int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
       }
       LOG_DEBUG("cmp_a11y_tree_add_node_custom_action: Invalid argument: %s\n",
                 err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -810,6 +928,9 @@ int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
             LOG_DEBUG(
                 "cmp_a11y_tree_add_node_custom_action: Out of memory: %s\n",
                 err_str);
+          }
+          if (rc != 0) {
+            return rc;
           }
           return rc;
         }
@@ -836,6 +957,9 @@ int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
           LOG_DEBUG("cmp_a11y_tree_add_node_custom_action: Out of memory: %s\n",
                     err_str);
         }
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
 #if defined(_MSC_VER)
@@ -845,6 +969,9 @@ int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
       strcpy(t->nodes[i].actions[t->nodes[i].action_count], action_name);
 #endif
       t->nodes[i].action_count++;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -859,6 +986,9 @@ int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
     LOG_DEBUG("cmp_a11y_tree_add_node_custom_action: Node not found: %s\n",
               err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -872,7 +1002,8 @@ int cmp_a11y_tree_add_node_custom_action(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
                                         const char *rotor_name) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i, len;
   char **new_rotors = NULL;
@@ -889,6 +1020,9 @@ int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
       }
       LOG_DEBUG("cmp_a11y_tree_add_node_custom_rotor: Invalid argument: %s\n",
                 err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -911,6 +1045,9 @@ int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
             LOG_DEBUG(
                 "cmp_a11y_tree_add_node_custom_rotor: Out of memory: %s\n",
                 err_str);
+          }
+          if (rc != 0) {
+            return rc;
           }
           return rc;
         }
@@ -937,6 +1074,9 @@ int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
           LOG_DEBUG("cmp_a11y_tree_add_node_custom_rotor: Out of memory: %s\n",
                     err_str);
         }
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
 #if defined(_MSC_VER)
@@ -946,6 +1086,9 @@ int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
       strcpy(t->nodes[i].rotors[t->nodes[i].rotor_count], rotor_name);
 #endif
       t->nodes[i].rotor_count++;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -960,6 +1103,9 @@ int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
     LOG_DEBUG("cmp_a11y_tree_add_node_custom_rotor: Node not found: %s\n",
               err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -973,7 +1119,8 @@ int cmp_a11y_tree_add_node_custom_rotor(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_focus_order(cmp_a11y_tree_t *tree, int node_id,
                                        int focus_order) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
 
@@ -989,12 +1136,18 @@ int cmp_a11y_tree_set_node_focus_order(cmp_a11y_tree_t *tree, int node_id,
       LOG_DEBUG("cmp_a11y_tree_set_node_focus_order: Invalid argument: %s\n",
                 err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   for (i = 0; i < t->count; ++i) {
     if (t->nodes[i].id == node_id) {
       t->nodes[i].focus_order = focus_order;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -1009,6 +1162,9 @@ int cmp_a11y_tree_set_node_focus_order(cmp_a11y_tree_t *tree, int node_id,
     LOG_DEBUG("cmp_a11y_tree_set_node_focus_order: Node not found: %s\n",
               err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -1022,7 +1178,8 @@ int cmp_a11y_tree_set_node_focus_order(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_braille_input(cmp_a11y_tree_t *tree, int node_id,
                                          int enabled) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
 
@@ -1038,12 +1195,18 @@ int cmp_a11y_tree_set_node_braille_input(cmp_a11y_tree_t *tree, int node_id,
       LOG_DEBUG("cmp_a11y_tree_set_node_braille_input: Invalid argument: %s\n",
                 err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   for (i = 0; i < t->count; ++i) {
     if (t->nodes[i].id == node_id) {
       t->nodes[i].braille_input = enabled;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -1058,6 +1221,9 @@ int cmp_a11y_tree_set_node_braille_input(cmp_a11y_tree_t *tree, int node_id,
     LOG_DEBUG("cmp_a11y_tree_set_node_braille_input: Node not found: %s\n",
               err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -1071,7 +1237,8 @@ int cmp_a11y_tree_set_node_braille_input(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_audio_description(cmp_a11y_tree_t *tree, int node_id,
                                              const char *description_url) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i, len;
 
@@ -1085,6 +1252,9 @@ int cmp_a11y_tree_set_node_audio_description(cmp_a11y_tree_t *tree, int node_id,
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_a11y_tree_set_node_audio_description: : %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -1109,6 +1279,9 @@ int cmp_a11y_tree_set_node_audio_description(cmp_a11y_tree_t *tree, int node_id,
             LOG_DEBUG("cmp_a11y_tree_set_node_audio_description: : %s\n",
                       err_str);
           }
+          if (rc != 0) {
+            return rc;
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -1116,6 +1289,9 @@ int cmp_a11y_tree_set_node_audio_description(cmp_a11y_tree_t *tree, int node_id,
 #else
         strcpy(t->nodes[i].audio_description_url, description_url);
 #endif
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -1131,6 +1307,9 @@ int cmp_a11y_tree_set_node_audio_description(cmp_a11y_tree_t *tree, int node_id,
     LOG_DEBUG("cmp_a11y_tree_set_node_audio_description: Node not found: %s\n",
               err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -1144,7 +1323,8 @@ int cmp_a11y_tree_set_node_audio_description(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_pronunciation(cmp_a11y_tree_t *tree, int node_id,
                                          const char *pronunciation) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i, len;
 
@@ -1159,6 +1339,9 @@ int cmp_a11y_tree_set_node_pronunciation(cmp_a11y_tree_t *tree, int node_id,
       }
       LOG_DEBUG("cmp_a11y_tree_set_node_pronunciation: Invalid argument: %s\n",
                 err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -1184,6 +1367,9 @@ int cmp_a11y_tree_set_node_pronunciation(cmp_a11y_tree_t *tree, int node_id,
                 "cmp_a11y_tree_set_node_pronunciation: Out of memory: %s\n",
                 err_str);
           }
+          if (rc != 0) {
+            return rc;
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -1191,6 +1377,9 @@ int cmp_a11y_tree_set_node_pronunciation(cmp_a11y_tree_t *tree, int node_id,
 #else
         strcpy(t->nodes[i].pronunciation, pronunciation);
 #endif
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -1206,6 +1395,9 @@ int cmp_a11y_tree_set_node_pronunciation(cmp_a11y_tree_t *tree, int node_id,
     LOG_DEBUG("cmp_a11y_tree_set_node_pronunciation: Node not found: %s\n",
               err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -1219,7 +1411,8 @@ int cmp_a11y_tree_set_node_pronunciation(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_direct_touch(cmp_a11y_tree_t *tree, int node_id,
                                         int enabled) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
 
@@ -1235,12 +1428,18 @@ int cmp_a11y_tree_set_node_direct_touch(cmp_a11y_tree_t *tree, int node_id,
       LOG_DEBUG("cmp_a11y_tree_set_node_direct_touch: Invalid argument: %s\n",
                 err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   for (i = 0; i < t->count; ++i) {
     if (t->nodes[i].id == node_id) {
       t->nodes[i].direct_touch = enabled;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -1255,6 +1454,9 @@ int cmp_a11y_tree_set_node_direct_touch(cmp_a11y_tree_t *tree, int node_id,
     LOG_DEBUG("cmp_a11y_tree_set_node_direct_touch: Node not found: %s\n",
               err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -1267,7 +1469,8 @@ int cmp_a11y_tree_set_node_direct_touch(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_post_announcement(cmp_a11y_tree_t *tree,
                                const char *announcement) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   /* In a real framework, this would pipe into the specific screen_reader
      integration, or event loop. For now, we simulate success if tree
      and announcement are non-null */
@@ -1282,6 +1485,12 @@ int cmp_a11y_post_announcement(cmp_a11y_tree_t *tree,
       }
       LOG_DEBUG("cmp_a11y_post_announcement: Invalid argument: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
     return rc;
   }
   return rc;
@@ -1297,7 +1506,8 @@ int cmp_a11y_post_announcement(cmp_a11y_tree_t *tree,
  */
 int cmp_a11y_tree_set_node_ignores_invert(cmp_a11y_tree_t *tree, int node_id,
                                           int ignores_invert) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
   if (!t) {
@@ -1312,11 +1522,17 @@ int cmp_a11y_tree_set_node_ignores_invert(cmp_a11y_tree_t *tree, int node_id,
       LOG_DEBUG("cmp_a11y_tree_set_node_ignores_invert: Invalid argument: %s\n",
                 err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   for (i = 0; i < t->count; ++i) {
     if (t->nodes[i].id == node_id) {
       t->nodes[i].ignores_invert = ignores_invert;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -1330,6 +1546,9 @@ int cmp_a11y_tree_set_node_ignores_invert(cmp_a11y_tree_t *tree, int node_id,
     }
     LOG_DEBUG("cmp_a11y_tree_set_node_ignores_invert: Node not found: %s\n",
               err_str);
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -1345,7 +1564,8 @@ int cmp_a11y_tree_set_node_ignores_invert(cmp_a11y_tree_t *tree, int node_id,
 int cmp_a11y_tree_set_node_differentiate_without_color(cmp_a11y_tree_t *tree,
                                                        int node_id,
                                                        int enabled) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
   if (!t) {
@@ -1360,11 +1580,17 @@ int cmp_a11y_tree_set_node_differentiate_without_color(cmp_a11y_tree_t *tree,
       LOG_DEBUG("cmp_a11y_tree_set_node_differentiate_without_color: : %s\n",
                 err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   for (i = 0; i < t->count; ++i) {
     if (t->nodes[i].id == node_id) {
       t->nodes[i].differentiate_without_color = enabled;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -1379,6 +1605,9 @@ int cmp_a11y_tree_set_node_differentiate_without_color(cmp_a11y_tree_t *tree,
     LOG_DEBUG("cmp_a11y_tree_set_node_differentiate_without_color: Node : %s\n",
               err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -1392,7 +1621,8 @@ int cmp_a11y_tree_set_node_differentiate_without_color(cmp_a11y_tree_t *tree,
  */
 int cmp_a11y_tree_set_node_hover_text(cmp_a11y_tree_t *tree, int node_id,
                                       const char *hover_text_string) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i, len;
 
@@ -1407,6 +1637,9 @@ int cmp_a11y_tree_set_node_hover_text(cmp_a11y_tree_t *tree, int node_id,
       }
       LOG_DEBUG("cmp_a11y_tree_set_node_hover_text: Invalid argument: %s\n",
                 err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -1431,6 +1664,9 @@ int cmp_a11y_tree_set_node_hover_text(cmp_a11y_tree_t *tree, int node_id,
             LOG_DEBUG("cmp_a11y_tree_set_node_hover_text: Out of memory: %s\n",
                       err_str);
           }
+          if (rc != 0) {
+            return rc;
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -1438,6 +1674,9 @@ int cmp_a11y_tree_set_node_hover_text(cmp_a11y_tree_t *tree, int node_id,
 #else
         strcpy(t->nodes[i].hover_text_string, hover_text_string);
 #endif
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -1453,6 +1692,9 @@ int cmp_a11y_tree_set_node_hover_text(cmp_a11y_tree_t *tree, int node_id,
     LOG_DEBUG("cmp_a11y_tree_set_node_hover_text: Node not found: %s\n",
               err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -1466,7 +1708,8 @@ int cmp_a11y_tree_set_node_hover_text(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_switch_control_anchor(cmp_a11y_tree_t *tree,
                                                  int node_id, int is_anchor) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
   if (!t) {
@@ -1481,11 +1724,17 @@ int cmp_a11y_tree_set_node_switch_control_anchor(cmp_a11y_tree_t *tree,
       LOG_DEBUG("cmp_a11y_tree_set_node_switch_control_anchor: : %s\n",
                 err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   for (i = 0; i < t->count; ++i) {
     if (t->nodes[i].id == node_id) {
       t->nodes[i].is_switch_anchor = is_anchor;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -1499,6 +1748,9 @@ int cmp_a11y_tree_set_node_switch_control_anchor(cmp_a11y_tree_t *tree,
     }
     LOG_DEBUG("cmp_a11y_tree_set_node_switch_control_anchor: Node : %s\n",
               err_str);
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -1515,7 +1767,8 @@ int cmp_a11y_tree_set_node_switch_control_anchor(cmp_a11y_tree_t *tree,
 int cmp_a11y_tree_set_node_voice_control_tag(cmp_a11y_tree_t *tree, int node_id,
                                              const char *phonetic_label,
                                              int numeric_grid_id) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i, len;
 
@@ -1529,6 +1782,9 @@ int cmp_a11y_tree_set_node_voice_control_tag(cmp_a11y_tree_t *tree, int node_id,
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_a11y_tree_set_node_voice_control_tag: : %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -1555,6 +1811,9 @@ int cmp_a11y_tree_set_node_voice_control_tag(cmp_a11y_tree_t *tree, int node_id,
             LOG_DEBUG("cmp_a11y_tree_set_node_voice_control_tag: : %s\n",
                       err_str);
           }
+          if (rc != 0) {
+            return rc;
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -1562,6 +1821,9 @@ int cmp_a11y_tree_set_node_voice_control_tag(cmp_a11y_tree_t *tree, int node_id,
 #else
         strcpy(t->nodes[i].voice_phonetic_label, phonetic_label);
 #endif
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -1577,6 +1839,9 @@ int cmp_a11y_tree_set_node_voice_control_tag(cmp_a11y_tree_t *tree, int node_id,
     LOG_DEBUG("cmp_a11y_tree_set_node_voice_control_tag: Node not found: %s\n",
               err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -1590,7 +1855,8 @@ int cmp_a11y_tree_set_node_voice_control_tag(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_set_node_guided_access_disabled(cmp_a11y_tree_t *tree,
                                                   int node_id, int disabled) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
   if (!t) {
@@ -1605,11 +1871,17 @@ int cmp_a11y_tree_set_node_guided_access_disabled(cmp_a11y_tree_t *tree,
       LOG_DEBUG("cmp_a11y_tree_set_node_guided_access_disabled: : %s\n",
                 err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   for (i = 0; i < t->count; ++i) {
     if (t->nodes[i].id == node_id) {
       t->nodes[i].is_guided_access_disabled = disabled;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -1622,6 +1894,9 @@ int cmp_a11y_tree_set_node_guided_access_disabled(cmp_a11y_tree_t *tree,
       err_str = "Unknown";
     }
     LOG_DEBUG("cmp_a11y_tree_set_node_guided_access_disabled: : %s\n", err_str);
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -1637,7 +1912,8 @@ int cmp_a11y_tree_set_node_guided_access_disabled(cmp_a11y_tree_t *tree,
 int cmp_a11y_tree_set_node_cognitive_time_limit(cmp_a11y_tree_t *tree,
                                                 int node_id,
                                                 float time_extension_ms) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i;
   if (!t) {
@@ -1651,11 +1927,17 @@ int cmp_a11y_tree_set_node_cognitive_time_limit(cmp_a11y_tree_t *tree,
       }
       LOG_DEBUG("cmp_a11y_tree_set_node_cognitive_time_limit: : %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   for (i = 0; i < t->count; ++i) {
     if (t->nodes[i].id == node_id) {
       t->nodes[i].cognitive_time_extension_ms = time_extension_ms;
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -1671,6 +1953,9 @@ int cmp_a11y_tree_set_node_cognitive_time_limit(cmp_a11y_tree_t *tree,
         "cmp_a11y_tree_set_node_cognitive_time_limit: Node not found: %s\n",
         err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -1684,7 +1969,8 @@ int cmp_a11y_tree_set_node_cognitive_time_limit(cmp_a11y_tree_t *tree,
  */
 int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
                                          const char *caption) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_a11y_tree *t = (struct cmp_a11y_tree *)tree;
   size_t i, len;
 
@@ -1699,6 +1985,9 @@ int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
       }
       LOG_DEBUG("cmp_a11y_tree_set_node_sound_caption: Invalid argument: %s\n",
                 err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -1724,6 +2013,9 @@ int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
                 "cmp_a11y_tree_set_node_sound_caption: Out of memory: %s\n",
                 err_str);
           }
+          if (rc != 0) {
+            return rc;
+          }
           return rc;
         }
 #if defined(_MSC_VER)
@@ -1731,6 +2023,9 @@ int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
 #else
         strcpy(t->nodes[i].sound_caption, caption);
 #endif
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -1746,6 +2041,9 @@ int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
     LOG_DEBUG("cmp_a11y_tree_set_node_sound_caption: Node not found: %s\n",
               err_str);
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -1760,7 +2058,8 @@ int cmp_a11y_tree_set_node_sound_caption(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
                             char *out_buffer, size_t buffer_size) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   size_t i;
   if (!tree || !node) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -1772,6 +2071,9 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_a11y_tree_serialize: Invalid argument: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -1792,6 +2094,9 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
         }
         LOG_DEBUG("cmp_a11y_tree_serialize: Failed to add node: %s\n", err_str);
       }
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     rc = cmp_a11y_tree_set_node_traits(tree, node->layout->id,
@@ -1806,6 +2111,9 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
         }
         LOG_DEBUG("cmp_a11y_tree_serialize: Failed to set node traits: %s\n",
                   err_str);
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -1831,6 +2139,9 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
         }
         LOG_DEBUG("cmp_a11y_tree_serialize: Failed to add generic node: %s\n",
                   err_str);
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -1858,9 +2169,17 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
           LOG_DEBUG("cmp_a11y_tree_serialize: Failed to serialize : %s\n",
                     err_str);
         }
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     }
+  }
+
+  if (rc != 0) {
+
+    return rc;
   }
 
   return rc;

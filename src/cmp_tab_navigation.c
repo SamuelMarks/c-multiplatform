@@ -19,7 +19,8 @@ struct cmp_tab_nav {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_nav_create(cmp_tab_nav_t **out_nav) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_tab_nav_t *nav;
   if (!out_nav) {
     return CMP_ERROR_INVALID_ARG;
@@ -53,7 +54,8 @@ int cmp_tab_nav_create(cmp_tab_nav_t **out_nav) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_nav_destroy(cmp_tab_nav_t *nav) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   size_t i;
   if (!nav) {
     return CMP_ERROR_INVALID_ARG;
@@ -87,7 +89,8 @@ int cmp_tab_nav_destroy(cmp_tab_nav_t *nav) {
  */
 int cmp_tab_nav_add_tab(cmp_tab_nav_t *nav, const char *title,
                         const char *file_path) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_editor_tab_t *tab;
   cmp_editor_tab_t **new_tabs;
   size_t i;
@@ -144,7 +147,8 @@ int cmp_tab_nav_add_tab(cmp_tab_nav_t *nav, const char *title,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_nav_close_tab(cmp_tab_nav_t *nav, size_t index) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   size_t i;
   if (!nav || index >= nav->count) {
     return CMP_ERROR_INVALID_ARG;
@@ -185,6 +189,8 @@ int cmp_tab_nav_close_tab(cmp_tab_nav_t *nav, size_t index) {
  */
 int cmp_tab_nav_move_tab(cmp_tab_nav_t *nav, size_t from_index,
                          size_t to_index) {
+  int rc;
+  rc = 0;
   cmp_editor_tab_t *tmp;
   size_t i;
 
@@ -220,7 +226,16 @@ int cmp_tab_nav_move_tab(cmp_tab_nav_t *nav, size_t from_index,
     }
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -231,11 +246,22 @@ int cmp_tab_nav_move_tab(cmp_tab_nav_t *nav, size_t from_index,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_nav_get_count(const cmp_tab_nav_t *nav, size_t *out_count) {
+  int rc;
+  rc = 0;
   if (!nav || !out_count) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_count = nav->count;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -248,9 +274,20 @@ int cmp_tab_nav_get_count(const cmp_tab_nav_t *nav, size_t *out_count) {
  */
 int cmp_tab_nav_get_tab(const cmp_tab_nav_t *nav, size_t index,
                         cmp_editor_tab_t **out_tab) {
+  int rc;
+  rc = 0;
   if (!nav || !out_tab || index >= nav->count) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_tab = nav->tabs[index];
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

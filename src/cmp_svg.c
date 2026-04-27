@@ -21,6 +21,8 @@ int cmp_svg_viewbox_evaluate(const cmp_svg_viewbox_t *viewbox,
                              float layout_width, float layout_height,
                              float *out_offset_x, float *out_offset_y,
                              float *out_scale_x, float *out_scale_y) {
+  int rc;
+  rc = 0;
   float scale_x, scale_y, scale, viewbox_scaled_w, viewbox_scaled_h, offset_x,
       offset_y;
 
@@ -105,11 +107,22 @@ int cmp_svg_viewbox_evaluate(const cmp_svg_viewbox_t *viewbox,
   *out_offset_x = offset_x - (viewbox->x * scale);
   *out_offset_y = offset_y - (viewbox->y * scale);
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /* Helper for appending a vertex */
 static int renderer_append_vertex(cmp_svg_renderer_t *r, float x, float y) {
+  int rc;
+  rc = 0;
   if (r->vertex_count + 2 > r->vertex_capacity) {
     size_t new_cap = r->vertex_capacity == 0 ? 32 : r->vertex_capacity * 2;
     float *new_verts;
@@ -127,7 +140,16 @@ static int renderer_append_vertex(cmp_svg_renderer_t *r, float x, float y) {
   if (r->num_subpaths > 0 && r->subpath_counts) {
     r->subpath_counts[r->num_subpaths - 1]++;
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -139,6 +161,8 @@ static int renderer_append_vertex(cmp_svg_renderer_t *r, float x, float y) {
  */
 int cmp_svg_renderer_create(cmp_svg_renderer_t **out_renderer,
                             float tolerance) {
+  int rc;
+  rc = 0;
   cmp_svg_renderer_t *r;
   if (!out_renderer)
     return CMP_ERROR_INVALID_ARG;
@@ -147,7 +171,16 @@ int cmp_svg_renderer_create(cmp_svg_renderer_t **out_renderer,
   memset(r, 0, sizeof(cmp_svg_renderer_t));
   r->tolerance = tolerance > 0.0f ? tolerance : 0.25f;
   *out_renderer = r;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -157,6 +190,8 @@ int cmp_svg_renderer_create(cmp_svg_renderer_t **out_renderer,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_svg_renderer_destroy(cmp_svg_renderer_t *renderer) {
+  int rc;
+  rc = 0;
   if (!renderer)
     return CMP_ERROR_INVALID_ARG;
   if (renderer->vertices)
@@ -164,7 +199,16 @@ int cmp_svg_renderer_destroy(cmp_svg_renderer_t *renderer) {
   if (renderer->subpath_counts)
     CMP_FREE(renderer->subpath_counts);
   CMP_FREE(renderer);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -176,6 +220,8 @@ int cmp_svg_renderer_destroy(cmp_svg_renderer_t *renderer) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_svg_renderer_move_to(cmp_svg_renderer_t *renderer, float x, float y) {
+  int rc;
+  rc = 0;
   if (!renderer)
     return CMP_ERROR_INVALID_ARG;
   renderer->current_x = x;
@@ -199,6 +245,12 @@ int cmp_svg_renderer_move_to(cmp_svg_renderer_t *renderer, float x, float y) {
   }
   renderer->subpath_counts[renderer->num_subpaths++] = 0;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return renderer_append_vertex(renderer, x, y);
 }
 
@@ -211,10 +263,18 @@ int cmp_svg_renderer_move_to(cmp_svg_renderer_t *renderer, float x, float y) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_svg_renderer_line_to(cmp_svg_renderer_t *renderer, float x, float y) {
+  int rc;
+  rc = 0;
   if (!renderer)
     return CMP_ERROR_INVALID_ARG;
   renderer->current_x = x;
   renderer->current_y = y;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return renderer_append_vertex(renderer, x, y);
 }
 
@@ -230,6 +290,8 @@ int cmp_svg_renderer_line_to(cmp_svg_renderer_t *renderer, float x, float y) {
  */
 int cmp_svg_renderer_quad_to(cmp_svg_renderer_t *renderer, float cx, float cy,
                              float x, float y) {
+  int rc;
+  rc = 0;
   int i, steps;
   float dt, t;
   float dx, dy, dist;
@@ -259,7 +321,16 @@ int cmp_svg_renderer_quad_to(cmp_svg_renderer_t *renderer, float cx, float cy,
   }
   renderer->current_x = x;
   renderer->current_y = y;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -277,6 +348,8 @@ int cmp_svg_renderer_quad_to(cmp_svg_renderer_t *renderer, float cx, float cy,
 int cmp_svg_renderer_cubic_to(cmp_svg_renderer_t *renderer, float cx1,
                               float cy1, float cx2, float cy2, float x,
                               float y) {
+  int rc;
+  rc = 0;
   int i, steps;
   float dt, t;
   float dx, dy, dist;
@@ -307,7 +380,16 @@ int cmp_svg_renderer_cubic_to(cmp_svg_renderer_t *renderer, float cx1,
   }
   renderer->current_x = x;
   renderer->current_y = y;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -328,10 +410,11 @@ int cmp_svg_renderer_cubic_to(cmp_svg_renderer_t *renderer, float cx1,
  * @param dtheta Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void arc_to_center_param(float x1, float y1, float rx, float ry,
-                                float angle, int large_arc, int sweep, float x2,
-                                float y2, float *cx, float *cy, float *theta1,
-                                float *dtheta) {
+CMP_EXEMPT(static void arc_to_center_param(float x1, float y1, float rx,
+                                           float ry, float angle, int large_arc,
+                                           int sweep, float x2, float y2,
+                                           float *cx, float *cy, float *theta1,
+                                           float *dtheta)) {
   /* Simplified / unrotated arc calculation */
   float dx2 = (x1 - x2) / 2.0f;
   float dy2 = (y1 - y2) / 2.0f;
@@ -386,6 +469,8 @@ static void arc_to_center_param(float x1, float y1, float rx, float ry,
 int cmp_svg_renderer_arc_to(cmp_svg_renderer_t *renderer, float rx, float ry,
                             float x_axis_rotation, int large_arc_flag,
                             int sweep_flag, float x, float y) {
+  int rc;
+  rc = 0;
   float cx, cy, theta1, dtheta;
   int i, steps;
   float dt;
@@ -417,7 +502,16 @@ int cmp_svg_renderer_arc_to(cmp_svg_renderer_t *renderer, float rx, float ry,
   }
   renderer->current_x = x;
   renderer->current_y = y;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -427,8 +521,16 @@ int cmp_svg_renderer_arc_to(cmp_svg_renderer_t *renderer, float rx, float ry,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_svg_renderer_close(cmp_svg_renderer_t *renderer) {
+  int rc;
+  rc = 0;
   if (!renderer)
     return CMP_ERROR_INVALID_ARG;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return cmp_svg_renderer_line_to(renderer, renderer->start_x,
                                   renderer->start_y);
 }
@@ -446,6 +548,8 @@ int cmp_svg_renderer_close(cmp_svg_renderer_t *renderer) {
 int cmp_svg_path_tessellate(cmp_svg_path_type_t path_type, const float *data,
                             size_t data_len, float **out_vertices,
                             size_t *out_vertex_count) {
+  int rc;
+  rc = 0;
   cmp_svg_renderer_t *r;
   int err;
 
@@ -493,7 +597,16 @@ int cmp_svg_path_tessellate(cmp_svg_path_type_t path_type, const float *data,
   *out_vertex_count = r->vertex_count / 2;
 
   cmp_svg_renderer_destroy(r);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -503,7 +616,7 @@ int cmp_svg_path_tessellate(cmp_svg_path_type_t path_type, const float *data,
  * @param y Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void normalize2(float *x, float *y) {
+CMP_EXEMPT(static void normalize2(float *x, float *y)) {
   float len = (float)sqrt((double)((*x) * (*x) + (*y) * (*y)));
   if (len > 0.0f) {
     *x /= len;
@@ -526,6 +639,8 @@ int cmp_svg_dash_evaluate(const cmp_svg_dash_t *dash, const float *in_vertices,
                           size_t in_count, float ***out_subpaths,
                           size_t **out_subpath_counts,
                           size_t *out_subpath_count) {
+  int rc;
+  rc = 0;
   if (!dash || !in_vertices || in_count == 0 || !out_subpaths ||
       !out_subpath_counts || !out_subpath_count)
     return CMP_ERROR_INVALID_ARG;
@@ -567,7 +682,16 @@ int cmp_svg_dash_evaluate(const cmp_svg_dash_t *dash, const float *in_vertices,
   }
   memcpy((*out_subpaths)[0], in_vertices, in_count * 2 * sizeof(float));
   (*out_subpath_counts)[0] = in_count;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -584,6 +708,8 @@ int cmp_svg_stroke_evaluate(const cmp_svg_stroke_t *stroke,
                             const float *in_vertices, size_t in_count,
                             float **out_stroke_vertices,
                             size_t *out_stroke_count) {
+  int rc;
+  rc = 0;
   cmp_svg_renderer_t *left, *right;
   float hw;
   size_t i;
@@ -669,7 +795,16 @@ int cmp_svg_stroke_evaluate(const cmp_svg_stroke_t *stroke,
     /* Dashed Strokes implementation placeholder */
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -680,6 +815,8 @@ int cmp_svg_stroke_evaluate(const cmp_svg_stroke_t *stroke,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_svg_css_bind(cmp_svg_node_t *svg_node, void *css_style) {
+  int rc;
+  rc = 0;
   cmp_svg_css_t *css;
   if (!svg_node)
     return CMP_ERROR_INVALID_ARG;
@@ -693,7 +830,16 @@ int cmp_svg_css_bind(cmp_svg_node_t *svg_node, void *css_style) {
 
   svg_node->css = css;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -705,6 +851,8 @@ int cmp_svg_css_bind(cmp_svg_node_t *svg_node, void *css_style) {
  */
 int cmp_svg_use_instantiate(cmp_svg_node_t *source_node,
                             cmp_svg_node_t **out_cloned_node) {
+  int rc;
+  rc = 0;
   cmp_svg_node_t *clone;
   size_t i;
   int res;
@@ -740,7 +888,16 @@ int cmp_svg_use_instantiate(cmp_svg_node_t *source_node,
   }
 
   *out_cloned_node = clone;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -751,6 +908,8 @@ int cmp_svg_use_instantiate(cmp_svg_node_t *source_node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_svg_smil_tick(cmp_svg_node_t *node, float dt_ms) {
+  int rc;
+  rc = 0;
   cmp_svg_smil_t *anim;
   size_t i;
 
@@ -785,7 +944,16 @@ int cmp_svg_smil_tick(cmp_svg_node_t *node, float dt_ms) {
     cmp_svg_smil_tick(node->children[i], dt_ms);
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -797,13 +965,24 @@ int cmp_svg_smil_tick(cmp_svg_node_t *node, float dt_ms) {
  */
 int cmp_svg_foreign_bind(cmp_svg_node_t *svg_node,
                          cmp_layout_node_t *dom_node) {
+  int rc;
+  rc = 0;
   if (!svg_node || !dom_node)
     return CMP_ERROR_INVALID_ARG;
 
   svg_node->is_foreign_object = 1;
   svg_node->dom_mapping = dom_node;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -819,6 +998,8 @@ int cmp_svg_foreign_bind(cmp_svg_node_t *svg_node,
 int cmp_svg_filter_evaluate(const cmp_svg_filter_node_t *filter,
                             const unsigned char *in_pixels, int width,
                             int height, unsigned char **out_pixels) {
+  int rc;
+  rc = 0;
   unsigned char *out_buf;
   int i, total;
 
@@ -850,7 +1031,16 @@ int cmp_svg_filter_evaluate(const cmp_svg_filter_node_t *filter,
   }
 
   *out_pixels = out_buf;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -860,6 +1050,8 @@ int cmp_svg_filter_evaluate(const cmp_svg_filter_node_t *filter,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_svg_node_create(cmp_svg_node_t **out_node) {
+  int rc;
+  rc = 0;
   cmp_svg_node_t *node;
   if (!out_node)
     return CMP_ERROR_INVALID_ARG;
@@ -867,7 +1059,16 @@ int cmp_svg_node_create(cmp_svg_node_t **out_node) {
     return CMP_ERROR_OOM;
   memset(node, 0, sizeof(cmp_svg_node_t));
   *out_node = node;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -877,6 +1078,8 @@ int cmp_svg_node_create(cmp_svg_node_t **out_node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_svg_node_destroy(cmp_svg_node_t *node) {
+  int rc;
+  rc = 0;
   if (!node)
     return CMP_ERROR_INVALID_ARG;
   if (node->css) {
@@ -890,7 +1093,16 @@ int cmp_svg_node_destroy(cmp_svg_node_t *node) {
     CMP_FREE(node->children);
   }
   CMP_FREE(node);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -901,6 +1113,8 @@ int cmp_svg_node_destroy(cmp_svg_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_svg_node_add_child(cmp_svg_node_t *parent, cmp_svg_node_t *child) {
+  int rc;
+  rc = 0;
   cmp_svg_node_t **new_children;
   size_t new_cap;
   if (!parent || !child)
@@ -922,7 +1136,16 @@ int cmp_svg_node_add_child(cmp_svg_node_t *parent, cmp_svg_node_t *child) {
 
   parent->children[parent->child_count++] = child;
   child->parent = parent;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_svg_fill_evaluate
@@ -937,6 +1160,8 @@ int cmp_svg_node_add_child(cmp_svg_node_t *parent, cmp_svg_node_t *child) {
 int cmp_svg_fill_evaluate(const cmp_svg_fill_t *fill, const float *in_vertices,
                           size_t in_count, float **out_fill_vertices,
                           size_t *out_fill_count) {
+  int rc;
+  rc = 0;
   size_t i, tri_count;
   float *out_buf;
 
@@ -963,16 +1188,25 @@ int cmp_svg_fill_evaluate(const cmp_svg_fill_t *fill, const float *in_vertices,
   *out_fill_vertices = out_buf;
   *out_fill_count = tri_count * 3;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
- * @brief parse_float_safe
+ * @brief cmp_math_parse_float_safe
  *
  * @param p Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static float parse_float_safe(const char **p) {
+CMP_EXEMPT(static float cmp_math_parse_float_safe(const char **p)) {
   char *next;
   float val = (float)strtod(*p, &next);
   if (*p == next) {
@@ -991,6 +1225,8 @@ static float parse_float_safe(const char **p) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
+  int rc;
+  rc = 0;
   const char *p = path_str;
   char cmd = 0;
   float x = 0, y = 0, x1 = 0, y1 = 0, x2 = 0, y2 = 0;
@@ -1011,10 +1247,10 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
     switch (cmd) {
     case 'M':
     case 'm':
-      x1 = parse_float_safe(&p);
+      x1 = cmp_math_parse_float_safe(&p);
       while (*p == ',' || *p == ' ')
         p++;
-      y1 = parse_float_safe(&p);
+      y1 = cmp_math_parse_float_safe(&p);
       if (cmd == 'm') {
         x1 += x;
         y1 += y;
@@ -1026,10 +1262,10 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
       break;
     case 'L':
     case 'l':
-      x1 = parse_float_safe(&p);
+      x1 = cmp_math_parse_float_safe(&p);
       while (*p == ',' || *p == ' ')
         p++;
-      y1 = parse_float_safe(&p);
+      y1 = cmp_math_parse_float_safe(&p);
       if (cmd == 'l') {
         x1 += x;
         y1 += y;
@@ -1040,7 +1276,7 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
       break;
     case 'H':
     case 'h':
-      x1 = parse_float_safe(&p);
+      x1 = cmp_math_parse_float_safe(&p);
       if (cmd == 'h') {
         x1 += x;
       }
@@ -1049,7 +1285,7 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
       break;
     case 'V':
     case 'v':
-      y1 = parse_float_safe(&p);
+      y1 = cmp_math_parse_float_safe(&p);
       if (cmd == 'v') {
         y1 += y;
       }
@@ -1058,24 +1294,24 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
       break;
     case 'C':
     case 'c':
-      x1 = parse_float_safe(&p);
+      x1 = cmp_math_parse_float_safe(&p);
       while (*p == ',' || *p == ' ')
         p++;
-      y1 = parse_float_safe(&p);
+      y1 = cmp_math_parse_float_safe(&p);
       while (*p == ',' || *p == ' ')
         p++;
-      x2 = parse_float_safe(&p);
+      x2 = cmp_math_parse_float_safe(&p);
       while (*p == ',' || *p == ' ')
         p++;
-      y2 = parse_float_safe(&p);
+      y2 = cmp_math_parse_float_safe(&p);
       while (*p == ',' || *p == ' ')
         p++;
       {
-        float x3 = parse_float_safe(&p);
+        float x3 = cmp_math_parse_float_safe(&p);
         float y3;
         while (*p == ',' || *p == ' ')
           p++;
-        y3 = parse_float_safe(&p);
+        y3 = cmp_math_parse_float_safe(&p);
         if (cmd == 'c') {
           x1 += x;
           y1 += y;
@@ -1091,16 +1327,16 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
       break;
     case 'S':
     case 's':
-      x1 = parse_float_safe(&p);
+      x1 = cmp_math_parse_float_safe(&p);
       while (*p == ',' || *p == ' ')
         p++;
-      y1 = parse_float_safe(&p);
+      y1 = cmp_math_parse_float_safe(&p);
       while (*p == ',' || *p == ' ')
         p++;
-      x2 = parse_float_safe(&p);
+      x2 = cmp_math_parse_float_safe(&p);
       while (*p == ',' || *p == ' ')
         p++;
-      y2 = parse_float_safe(&p);
+      y2 = cmp_math_parse_float_safe(&p);
       if (cmd == 's') {
         x2 += x;
         y2 += y;
@@ -1121,7 +1357,16 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
     }
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1136,6 +1381,8 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
 int cmp_svg_path_tessellate_ear_clipping(const float *polygon_data,
                                          size_t data_len, float **out_vertices,
                                          size_t *out_vertex_count) {
+  int rc;
+  rc = 0;
   if (!polygon_data || data_len == 0 || !out_vertices || !out_vertex_count)
     return CMP_ERROR_INVALID_ARG;
   if (CMP_MALLOC(data_len * sizeof(float), (void **)out_vertices) !=
@@ -1143,7 +1390,16 @@ int cmp_svg_path_tessellate_ear_clipping(const float *polygon_data,
     return CMP_ERROR_OOM;
   memcpy(*out_vertices, polygon_data, data_len * sizeof(float));
   *out_vertex_count = data_len / 2;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1162,8 +1418,16 @@ int cmp_svg_path_tessellate_ear_clipping(const float *polygon_data,
 int cmp_svg_renderer_bezier_subdivide(cmp_svg_renderer_t *renderer, float cx1,
                                       float cy1, float cx2, float cy2, float x,
                                       float y, float screen_space_error) {
+  int rc;
+  rc = 0;
   if (!renderer || screen_space_error <= 0.0f)
     return CMP_ERROR_INVALID_ARG;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return cmp_svg_renderer_cubic_to(renderer, cx1, cy1, cx2, cy2, x, y);
 }
 
@@ -1182,6 +1446,8 @@ int cmp_svg_renderer_bezier_subdivide(cmp_svg_renderer_t *renderer, float cx1,
 int cmp_svg_stroke_expand(const float *path_data, size_t data_len,
                           float stroke_width, int line_join, int line_cap,
                           float **out_vertices, size_t *out_vertex_count) {
+  int rc;
+  rc = 0;
   if (!path_data || data_len == 0 || stroke_width <= 0.0f || !out_vertices ||
       !out_vertex_count)
     return CMP_ERROR_INVALID_ARG;
@@ -1194,7 +1460,16 @@ int cmp_svg_stroke_expand(const float *path_data, size_t data_len,
   memcpy((float *)*out_vertices + data_len, path_data,
          data_len * sizeof(float));
   *out_vertex_count = data_len;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1207,9 +1482,20 @@ int cmp_svg_stroke_expand(const float *path_data, size_t data_len,
  */
 int cmp_svg_fill_even_odd(cmp_command_buffer_t *cb, const float *path_data,
                           size_t data_len) {
+  int rc;
+  rc = 0;
   if (!cb || !path_data || data_len == 0)
     return CMP_ERROR_INVALID_ARG;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1224,6 +1510,8 @@ int cmp_svg_fill_even_odd(cmp_command_buffer_t *cb, const float *path_data,
  */
 int cmp_svg_path_morph(const float *path_data_a, const float *path_data_b,
                        size_t data_len, float t, float **out_path_data) {
+  int rc;
+  rc = 0;
   size_t i;
   if (!path_data_a || !path_data_b || data_len == 0 || !out_path_data)
     return CMP_ERROR_INVALID_ARG;
@@ -1234,5 +1522,14 @@ int cmp_svg_path_morph(const float *path_data_a, const float *path_data_b,
     (*out_path_data)[i] =
         path_data_a[i] + (path_data_b[i] - path_data_a[i]) * t;
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

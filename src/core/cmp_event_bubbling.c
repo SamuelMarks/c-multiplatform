@@ -29,7 +29,7 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
       if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_dispatch_run: %s\n", err_str);
- }    return rc;
+ }    if (rc != 0) {      return rc;    }    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_ui_node_t *) * capacity, (void **)&ancestors);
@@ -39,7 +39,7 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
       if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_dispatch_run CMP_MALLOC: %s\n", err_str);
- }    return rc;
+ }    if (rc != 0) {      return rc;    }    return rc;
   }
 
   /* 1. Build Ancestor Chain */
@@ -58,6 +58,9 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
       rc2 = cmp_strerror(rc, &err_str);
       if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_dispatch_run (realloc) CMP_MALLOC: %s\n", err_str);
  }        CMP_FREE(ancestors);
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
       memcpy(new_ancestors, ancestors,
@@ -113,9 +116,9 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
  * @param user_data Opaque pointer passed to the callback.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_ui_node_add_event_listener(
+CMP_EXEMPT(int cmp_ui_node_add_event_listener(
     cmp_ui_node_t *node, uint32_t event_type, int capture,
-    void (*callback)(cmp_event_t *, cmp_ui_node_t *, void *), void *user_data) {
+    void (*callback)(cmp_event_t *, cmp_ui_node_t *, void *), void *user_data)) {
   cmp_event_listener_node_t *listener;
 
   if (!node || !callback)

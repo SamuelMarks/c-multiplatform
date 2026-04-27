@@ -72,6 +72,9 @@ int cmp_ui_avatar_create(cmp_ui_avatar_t **out_avatar, const char *initials,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE avatar failed\n");
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -94,6 +97,9 @@ int cmp_ui_avatar_create(cmp_ui_avatar_t **out_avatar, const char *initials,
     rc = CMP_FREE(avatar);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE avatar failed\n");
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -136,6 +142,9 @@ int cmp_ui_avatar_destroy(cmp_ui_avatar_t *avatar) {
   rc = CMP_FREE(avatar);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_avatar_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -149,12 +158,23 @@ int cmp_ui_avatar_destroy(cmp_ui_avatar_t *avatar) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_avatar_get_node(cmp_ui_avatar_t *avatar, cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!avatar || !out_node) {
     LOG_DEBUG("cmp_ui_avatar_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = avatar->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**

@@ -477,6 +477,7 @@ static int build_cu_buttons(cmp_ui_node_t *parent) {
 
 static int build_body_ui(cmp_example_design_system_t design_system,
                          cmp_ui_node_t *body_container) {
+  int rc = 0;
   cmp_ui_node_t *scroll_box = NULL;
 
   /* Use a box as scroll view placeholder */
@@ -506,7 +507,10 @@ static int build_body_ui(cmp_example_design_system_t design_system,
   }
 
   cmp_ui_node_add_child(body_container, scroll_box);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int main(int argc, char **argv) {

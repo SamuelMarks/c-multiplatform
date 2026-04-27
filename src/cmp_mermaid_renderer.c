@@ -94,7 +94,6 @@ int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
               "(OOM)\n");
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   rc = strncpy_s(svg_out, len + 1, dummy_svg, _TRUNCATE);
   if (rc != 0) {

@@ -15,6 +15,8 @@ struct cmp_vt_shared {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vt_shared_create(cmp_vt_shared_t **out_shared) {
+  int rc;
+  rc = 0;
   struct cmp_vt_shared *shared;
 
   if (!out_shared)
@@ -26,7 +28,16 @@ int cmp_vt_shared_create(cmp_vt_shared_t **out_shared) {
   memset(shared, 0, sizeof(struct cmp_vt_shared));
 
   *out_shared = (cmp_vt_shared_t *)shared;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -36,12 +47,23 @@ int cmp_vt_shared_create(cmp_vt_shared_t **out_shared) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vt_shared_destroy(cmp_vt_shared_t *shared) {
+  int rc;
+  rc = 0;
   struct cmp_vt_shared *internal_shared = (struct cmp_vt_shared *)shared;
   if (!internal_shared)
     return CMP_ERROR_INVALID_ARG;
 
   CMP_FREE(internal_shared);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -58,6 +80,8 @@ int cmp_vt_shared_calculate_morph(cmp_vt_shared_t *shared,
                                   const cmp_rect_t *old_rect,
                                   const cmp_rect_t *new_rect, float progress,
                                   cmp_rect_t *out_rect) {
+  int rc;
+  rc = 0;
   struct cmp_vt_shared *internal_shared = (struct cmp_vt_shared *)shared;
 
   if (!internal_shared || !old_rect || !new_rect || !out_rect ||
@@ -71,5 +95,14 @@ int cmp_vt_shared_calculate_morph(cmp_vt_shared_t *shared,
   out_rect->height =
       old_rect->height + (new_rect->height - old_rect->height) * progress;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

@@ -61,7 +61,6 @@ int cmp_ink_ripple_release(cmp_ink_ripple_t *ripple);
  * @return 0 on success, or an error code.
  */
 int cmp_ink_ripple_get_state(cmp_ink_ripple_t *ripple, float *out_radius, float *out_opacity, float *out_x, float *out_y);
-
 #ifdef __cplusplus
 }
 #endif

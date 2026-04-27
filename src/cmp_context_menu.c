@@ -17,7 +17,8 @@ struct cmp_context_menu {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_context_menu_create(cmp_context_menu_t **out_menu) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_context_menu *ctx = NULL;
@@ -31,6 +32,9 @@ int cmp_context_menu_create(cmp_context_menu_t **out_menu) {
     cmp_log_debug(
         "cmp_context_menu_create: Invalid argument (out_menu=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -41,6 +45,9 @@ int cmp_context_menu_create(cmp_context_menu_t **out_menu) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_context_menu_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -49,6 +56,9 @@ int cmp_context_menu_create(cmp_context_menu_t **out_menu) {
   *out_menu = (cmp_context_menu_t *)ctx;
   cmp_log_debug(
       "cmp_context_menu_create: Successfully created context menu context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -59,7 +69,8 @@ int cmp_context_menu_create(cmp_context_menu_t **out_menu) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_context_menu_destroy(cmp_context_menu_t *menu) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_context_menu *ctx = (struct cmp_context_menu *)menu;
@@ -71,6 +82,9 @@ int cmp_context_menu_destroy(cmp_context_menu_t *menu) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_context_menu_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -95,7 +109,8 @@ int cmp_context_menu_destroy(cmp_context_menu_t *menu) {
 int cmp_context_menu_set_callback(cmp_context_menu_t *menu,
                                   cmp_context_menu_cb_t callback,
                                   void *user_data) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_context_menu *ctx = (struct cmp_context_menu *)menu;
@@ -108,6 +123,9 @@ int cmp_context_menu_set_callback(cmp_context_menu_t *menu,
     }
     cmp_log_debug("cmp_context_menu_set_callback: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -115,6 +133,15 @@ int cmp_context_menu_set_callback(cmp_context_menu_t *menu,
   ctx->user_data = user_data;
 
   cmp_log_debug("cmp_context_menu_set_callback: Callback configured\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -127,7 +154,8 @@ int cmp_context_menu_set_callback(cmp_context_menu_t *menu,
  */
 int cmp_context_menu_process_event(cmp_context_menu_t *menu,
                                    const cmp_event_t *event) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_context_menu *ctx = (struct cmp_context_menu *)menu;
@@ -141,6 +169,9 @@ int cmp_context_menu_process_event(cmp_context_menu_t *menu,
     }
     cmp_log_debug("cmp_context_menu_process_event: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -166,5 +197,14 @@ int cmp_context_menu_process_event(cmp_context_menu_t *menu,
   }
 
   cmp_log_debug("cmp_context_menu_process_event: Menu not triggered\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

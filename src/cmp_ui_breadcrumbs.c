@@ -24,7 +24,8 @@ struct cmp_ui_breadcrumbs {
  */
 int cmp_ui_breadcrumbs_create(cmp_ui_breadcrumbs_t **out_breadcrumbs,
                               uint32_t bg_color) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_ui_breadcrumbs_t *breadcrumbs = NULL;
 
   if (!out_breadcrumbs) {
@@ -63,7 +64,8 @@ int cmp_ui_breadcrumbs_create(cmp_ui_breadcrumbs_t **out_breadcrumbs,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_breadcrumbs_destroy(cmp_ui_breadcrumbs_t *breadcrumbs) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (!breadcrumbs) {
     LOG_DEBUG("cmp_ui_breadcrumbs_destroy: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
@@ -77,6 +79,9 @@ int cmp_ui_breadcrumbs_destroy(cmp_ui_breadcrumbs_t *breadcrumbs) {
   rc = CMP_FREE(breadcrumbs);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_breadcrumbs_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -91,12 +96,23 @@ int cmp_ui_breadcrumbs_destroy(cmp_ui_breadcrumbs_t *breadcrumbs) {
  */
 int cmp_ui_breadcrumbs_get_node(cmp_ui_breadcrumbs_t *breadcrumbs,
                                 cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!breadcrumbs || !out_node) {
     LOG_DEBUG("cmp_ui_breadcrumbs_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = breadcrumbs->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -110,7 +126,8 @@ int cmp_ui_breadcrumbs_add_segment(cmp_ui_breadcrumbs_t *breadcrumbs,
                                    const char *segment) {
   cmp_ui_node_t *node_text = NULL;
   cmp_ui_node_t *node_sep = NULL;
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_string_t translated = {NULL, 0, 0};
   const char *final_segment = segment;
 
@@ -151,6 +168,9 @@ int cmp_ui_breadcrumbs_add_segment(cmp_ui_breadcrumbs_t *breadcrumbs,
 
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_breadcrumbs_add_segment: cmp_ui_text_create failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 

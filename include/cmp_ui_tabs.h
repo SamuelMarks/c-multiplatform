@@ -26,7 +26,7 @@ typedef struct cmp_ui_tabs cmp_ui_tabs_t;
  * \param out_tabs Pointer to store the created handle.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs);
+int CMP_API cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs);
 
 /**
  * \brief Destroys a Tabs component.
@@ -34,7 +34,7 @@ CMP_API int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs);
  * \param tabs The component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tabs_destroy(cmp_ui_tabs_t *tabs);
+int CMP_API cmp_ui_tabs_destroy(cmp_ui_tabs_t *tabs);
 
 /**
  * \brief Retrieves the underlying UI node for the Tabs component.
@@ -43,7 +43,7 @@ CMP_API int cmp_ui_tabs_destroy(cmp_ui_tabs_t *tabs);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tabs_get_node(cmp_ui_tabs_t *tabs, cmp_ui_node_t **out_node);
+int CMP_API cmp_ui_tabs_get_node(cmp_ui_tabs_t *tabs, cmp_ui_node_t **out_node);
 
 /**
  * \brief Adds a tab to the component.
@@ -53,7 +53,7 @@ CMP_API int cmp_ui_tabs_get_node(cmp_ui_tabs_t *tabs, cmp_ui_node_t **out_node);
  * \param out_index Receives the index of the newly added tab.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
+int CMP_API cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
                                 int *out_index);
 
 /**
@@ -63,7 +63,7 @@ CMP_API int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
  * \param index The index to select.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tabs_set_selected(cmp_ui_tabs_t *tabs, int index);
+int CMP_API cmp_ui_tabs_set_selected(cmp_ui_tabs_t *tabs, int index);
 
 /**
  * \brief Binds the widget to the accessibility tree.
@@ -72,8 +72,7 @@ CMP_API int cmp_ui_tabs_set_selected(cmp_ui_tabs_t *tabs, int index);
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tabs_bind_a11y(cmp_ui_tabs_t *widget, cmp_a11y_tree_t *tree);
-
+int CMP_API cmp_ui_tabs_bind_a11y(cmp_ui_tabs_t *widget, cmp_a11y_tree_t *tree);
 #ifdef __cplusplus
 
 #endif /* __cplusplus */

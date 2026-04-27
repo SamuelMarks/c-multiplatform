@@ -18,7 +18,8 @@ struct cmp_date_picker {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_date_picker_create(cmp_date_picker_t **out_picker) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_date_picker *picker = NULL;
@@ -32,6 +33,9 @@ int cmp_date_picker_create(cmp_date_picker_t **out_picker) {
     cmp_log_debug(
         "cmp_date_picker_create: Invalid argument (out_picker=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -42,6 +46,9 @@ int cmp_date_picker_create(cmp_date_picker_t **out_picker) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_date_picker_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -60,7 +67,8 @@ int cmp_date_picker_create(cmp_date_picker_t **out_picker) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_date_picker_destroy(cmp_date_picker_t *picker) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_date_picker *internal_picker = (struct cmp_date_picker *)picker;
@@ -72,6 +80,9 @@ int cmp_date_picker_destroy(cmp_date_picker_t *picker) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_date_picker_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 

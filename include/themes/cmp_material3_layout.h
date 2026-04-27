@@ -31,14 +31,13 @@ typedef struct cmp_m3_window_layout_config {
 /**
  * @brief Resolve Window Size Class from width
  */
-CMP_API int
-cmp_m3_window_size_class_resolve(float width_dp,
-                                 cmp_m3_window_size_class_t *out_class);
+int CMP_API cmp_m3_window_size_class_resolve(
+    float width_dp, cmp_m3_window_size_class_t *out_class);
 
 /**
  * @brief Get grid configuration for a size class
  */
-CMP_API int
+int CMP_API
 cmp_m3_window_layout_config_get(cmp_m3_window_size_class_t size_class,
                                 cmp_m3_window_layout_config_t *out_config);
 
@@ -55,7 +54,7 @@ typedef enum cmp_m3_layout_pattern {
 /**
  * @brief Evaluates best layout pattern based on size class
  */
-CMP_API int cmp_m3_layout_pattern_resolve(cmp_m3_window_size_class_t size_class,
+int CMP_API cmp_m3_layout_pattern_resolve(cmp_m3_window_size_class_t size_class,
                                           int is_feed, int has_supporting_pane,
                                           cmp_m3_layout_pattern_t *out_pattern);
 
@@ -71,11 +70,10 @@ typedef enum cmp_m3_posture {
 /**
  * @brief Evaluate Foldable/Hinge adaptation logic
  */
-CMP_API int cmp_m3_foldable_posture_resolve(int has_hinge,
+int CMP_API cmp_m3_foldable_posture_resolve(int has_hinge,
                                             float hinge_angle_degrees,
                                             int is_vertical_hinge,
                                             cmp_m3_posture_t *out_posture);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

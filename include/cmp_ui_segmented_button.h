@@ -27,7 +27,7 @@ typedef struct cmp_ui_segmented_button cmp_ui_segmented_button_t;
  * \param multi_select 1 to allow multiple selections, 0 for single selection.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
+int CMP_API cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
                                            int multi_select);
 
 /**
@@ -36,7 +36,7 @@ CMP_API int cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
  * \param btn The component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_segmented_button_destroy(cmp_ui_segmented_button_t *btn);
+int CMP_API cmp_ui_segmented_button_destroy(cmp_ui_segmented_button_t *btn);
 
 /**
  * \brief Retrieves the underlying UI node for the segmented button group.
@@ -45,7 +45,7 @@ CMP_API int cmp_ui_segmented_button_destroy(cmp_ui_segmented_button_t *btn);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_segmented_button_get_node(cmp_ui_segmented_button_t *btn,
+int CMP_API cmp_ui_segmented_button_get_node(cmp_ui_segmented_button_t *btn,
                                              cmp_ui_node_t **out_node);
 
 /**
@@ -57,7 +57,7 @@ CMP_API int cmp_ui_segmented_button_get_node(cmp_ui_segmented_button_t *btn,
  * \param out_segment_index Receives the index of the newly added segment.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_segmented_button_add_segment(cmp_ui_segmented_button_t *btn,
+int CMP_API cmp_ui_segmented_button_add_segment(cmp_ui_segmented_button_t *btn,
                                                 const char *label,
                                                 const char *icon_name,
                                                 int *out_segment_index);
@@ -69,7 +69,7 @@ CMP_API int cmp_ui_segmented_button_add_segment(cmp_ui_segmented_button_t *btn,
  * \param index The index of the segment to select.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_segmented_button_set_selected(cmp_ui_segmented_button_t *btn,
+int CMP_API cmp_ui_segmented_button_set_selected(cmp_ui_segmented_button_t *btn,
                                                  int index);
 
 /**
@@ -79,9 +79,8 @@ CMP_API int cmp_ui_segmented_button_set_selected(cmp_ui_segmented_button_t *btn,
  * \param index The index of the segment to deselect.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int
-cmp_ui_segmented_button_set_deselected(cmp_ui_segmented_button_t *btn,
-                                       int index);
+int CMP_API cmp_ui_segmented_button_set_deselected(
+    cmp_ui_segmented_button_t *btn, int index);
 
 /**
  * \brief Binds the widget to the accessibility tree.
@@ -90,9 +89,8 @@ cmp_ui_segmented_button_set_deselected(cmp_ui_segmented_button_t *btn,
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_segmented_button_bind_a11y(cmp_ui_segmented_button_t *widget,
+int CMP_API cmp_ui_segmented_button_bind_a11y(cmp_ui_segmented_button_t *widget,
                                               cmp_a11y_tree_t *tree);
-
 #ifdef __cplusplus
 
 #endif /* __cplusplus */

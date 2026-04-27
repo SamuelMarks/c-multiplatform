@@ -29,7 +29,7 @@ typedef struct cmp_ui_progress_bar cmp_ui_progress_bar_t;
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_progress_bar_create(cmp_ui_progress_bar_t **out_bar,
+int CMP_API cmp_ui_progress_bar_create(cmp_ui_progress_bar_t **out_bar,
                                        uint32_t track_color,
                                        uint32_t fill_color);
 
@@ -40,7 +40,7 @@ CMP_API int cmp_ui_progress_bar_create(cmp_ui_progress_bar_t **out_bar,
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_progress_bar_destroy(cmp_ui_progress_bar_t *bar);
+int CMP_API cmp_ui_progress_bar_destroy(cmp_ui_progress_bar_t *bar);
 
 /**
  * rief Retrieves the underlying UI node for the progress bar.
@@ -50,7 +50,7 @@ CMP_API int cmp_ui_progress_bar_destroy(cmp_ui_progress_bar_t *bar);
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_progress_bar_get_node(cmp_ui_progress_bar_t *bar,
+int CMP_API cmp_ui_progress_bar_get_node(cmp_ui_progress_bar_t *bar,
                                          cmp_ui_node_t **out_node);
 
 /**
@@ -61,9 +61,8 @@ CMP_API int cmp_ui_progress_bar_get_node(cmp_ui_progress_bar_t *bar,
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_progress_bar_set_progress(cmp_ui_progress_bar_t *bar,
+int CMP_API cmp_ui_progress_bar_set_progress(cmp_ui_progress_bar_t *bar,
                                              float progress);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -96,6 +96,9 @@ int cmp_ui_card_destroy(cmp_ui_card_t *card) {
   rc = CMP_FREE(card);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_card_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -110,12 +113,23 @@ int cmp_ui_card_destroy(cmp_ui_card_t *card) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_card_get_node(cmp_ui_card_t *card, cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!card || !out_node) {
     LOG_DEBUG("cmp_ui_card_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = card->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -136,6 +150,9 @@ int cmp_ui_card_add_child(cmp_ui_card_t *card, cmp_ui_node_t *child) {
   rc = cmp_ui_node_add_child(card->node_root, child);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_card_add_child: cmp_ui_node_add_child failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -166,6 +183,9 @@ int cmp_ui_card_bind_a11y(cmp_ui_card_t *widget, cmp_a11y_tree_t *tree) {
                               "Card");
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_card_bind_a11y: cmp_a11y_tree_add_node failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 

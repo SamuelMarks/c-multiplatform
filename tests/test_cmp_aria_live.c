@@ -102,7 +102,6 @@ SUITE(aria_live_suite) {
   RUN_TEST(test_aria_live_null_args);
   RUN_TEST(test_aria_live_operations);
 }
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -14,7 +14,8 @@
  */
 int cmp_ui_node_set_pointer_events(cmp_ui_node_t *node,
                                    cmp_pointer_events_t state) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!node) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -33,8 +34,7 @@ int cmp_ui_node_set_pointer_events(cmp_ui_node_t *node,
   } else {
     node->properties = (void *)(size_t)CMP_POINTER_EVENTS_AUTO;
   }
-
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -43,18 +43,17 @@ int cmp_ui_node_set_pointer_events(cmp_ui_node_t *node,
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_ui_node_get_pointer_events(cmp_ui_node_t *node) {
-  int rc = (int)CMP_POINTER_EVENTS_AUTO; /* Safe default fallback */
-
+int cmp_ui_node_get_pointer_events(cmp_ui_node_t *node,
+                                   cmp_pointer_events_t *out_events) {
+  if (!out_events) {
+    return CMP_ERROR_INVALID_ARG;
+  }
+  *out_events = CMP_POINTER_EVENTS_AUTO;
   if (!node) {
-    return rc;
+    return CMP_ERROR_INVALID_ARG;
   }
-
-  /* Mock retrieval */
   if (node->properties == (void *)(size_t)CMP_POINTER_EVENTS_NONE) {
-    rc = (int)CMP_POINTER_EVENTS_NONE;
-    return rc;
+    *out_events = CMP_POINTER_EVENTS_NONE;
   }
-
-  return rc;
+  return CMP_SUCCESS;
 }

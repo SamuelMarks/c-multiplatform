@@ -16,6 +16,8 @@
 int cmp_media_query_evaluate(const cmp_media_query_t *query,
                              const cmp_media_query_env_t *env,
                              int *out_matches) {
+  int rc;
+  rc = 0;
   float current_aspect;
 
   if (query == NULL || env == NULL || out_matches == NULL) {
@@ -62,7 +64,6 @@ int cmp_media_query_evaluate(const cmp_media_query_t *query,
   if (query->orientation != -1 && query->orientation != env->is_landscape) {
     *out_matches = 0;
   }
-
   return CMP_SUCCESS;
 }
 
@@ -77,6 +78,8 @@ int cmp_media_query_evaluate(const cmp_media_query_t *query,
 int cmp_pointer_media_evaluate(const cmp_media_query_t *query,
                                const cmp_media_query_env_t *env,
                                int *out_matches) {
+  int rc;
+  rc = 0;
   if (query == NULL || env == NULL || out_matches == NULL) {
     LOG_DEBUG("Error in cmp_pointer_media_evaluate: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -90,7 +93,6 @@ int cmp_pointer_media_evaluate(const cmp_media_query_t *query,
   if (query->pointer != -1 && query->pointer != env->is_pointer_coarse) {
     *out_matches = 0;
   }
-
   return CMP_SUCCESS;
 }
 
@@ -105,6 +107,8 @@ int cmp_pointer_media_evaluate(const cmp_media_query_t *query,
 int cmp_update_media_evaluate(const cmp_media_query_t *query,
                               const cmp_media_query_env_t *env,
                               int *out_matches) {
+  int rc;
+  rc = 0;
   if (query == NULL || env == NULL || out_matches == NULL) {
     LOG_DEBUG("Error in cmp_update_media_evaluate: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -114,7 +118,6 @@ int cmp_update_media_evaluate(const cmp_media_query_t *query,
   if (query->update != -1 && query->update != env->update_frequency) {
     *out_matches = 0;
   }
-
   return CMP_SUCCESS;
 }
 
@@ -129,6 +132,8 @@ int cmp_update_media_evaluate(const cmp_media_query_t *query,
 int cmp_light_level_evaluate(const cmp_media_query_t *query,
                              const cmp_media_query_env_t *env,
                              int *out_matches) {
+  int rc;
+  rc = 0;
   if (query == NULL || env == NULL || out_matches == NULL) {
     LOG_DEBUG("Error in cmp_light_level_evaluate: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -138,7 +143,6 @@ int cmp_light_level_evaluate(const cmp_media_query_t *query,
   if (query->light_level != -1 && query->light_level != env->light_level) {
     *out_matches = 0;
   }
-
   return CMP_SUCCESS;
 }
 
@@ -214,6 +218,8 @@ int cmp_container_ctx_destroy(cmp_container_ctx_t *ctx) {
 int cmp_container_query_evaluate(const cmp_container_query_t *query,
                                  const cmp_container_ctx_t *ctx,
                                  int *out_matches) {
+  int rc;
+  rc = 0;
   if (query == NULL || ctx == NULL || out_matches == NULL) {
     LOG_DEBUG("Error in cmp_container_query_evaluate: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -239,7 +245,6 @@ int cmp_container_query_evaluate(const cmp_container_query_t *query,
   if (query->max_height > 0 && ctx->block_size > query->max_height) {
     *out_matches = 0;
   }
-
   return CMP_SUCCESS;
 }
 
@@ -255,6 +260,8 @@ int cmp_container_query_evaluate(const cmp_container_query_t *query,
 int cmp_style_query_evaluate(const cmp_style_query_t *query,
                              const cmp_style_query_t *container_styles,
                              int num_styles, int *out_matches) {
+  int rc;
+  rc = 0;
   int i;
 
   if (query == NULL || out_matches == NULL) {
@@ -285,7 +292,6 @@ int cmp_style_query_evaluate(const cmp_style_query_t *query,
       }
     }
   }
-
   return CMP_SUCCESS;
 }
 
@@ -302,6 +308,8 @@ int cmp_content_visibility_evaluate(cmp_content_visibility_t visibility,
                                     const cmp_rect_t *viewport,
                                     const cmp_rect_t *node_rect,
                                     int *out_is_visible) {
+  int rc;
+  rc = 0;
   int x_overlap;
   int y_overlap;
 
@@ -322,7 +330,6 @@ int cmp_content_visibility_evaluate(cmp_content_visibility_t visibility,
                 (node_rect->y + node_rect->height > viewport->y);
     *out_is_visible = x_overlap && y_overlap;
   }
-
   return CMP_SUCCESS;
 }
 
@@ -336,6 +343,8 @@ int cmp_content_visibility_evaluate(cmp_content_visibility_t visibility,
  */
 int cmp_contain_evaluate(cmp_contain_t contain, int *out_isolates_layout,
                          int *out_isolates_paint) {
+  int rc;
+  rc = 0;
   if (out_isolates_layout == NULL || out_isolates_paint == NULL) {
     LOG_DEBUG("Error in cmp_contain_evaluate: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -365,7 +374,6 @@ int cmp_contain_evaluate(cmp_contain_t contain, int *out_isolates_layout,
   if (contain & CMP_CONTAIN_PAINT) {
     *out_isolates_paint = 1;
   }
-
   return CMP_SUCCESS;
 }
 
@@ -442,6 +450,8 @@ int cmp_resize_observer_destroy(cmp_resize_observer_t *observer) {
 int cmp_resize_observer_notify(cmp_resize_observer_t *observer,
                                cmp_layout_node_t *node, float new_width,
                                float new_height) {
+  int rc;
+  rc = 0;
   if (observer == NULL || node == NULL) {
     LOG_DEBUG("Error in cmp_resize_observer_notify: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;

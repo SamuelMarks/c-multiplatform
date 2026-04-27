@@ -137,6 +137,9 @@ int cmp_ui_diff_destroy(cmp_ui_diff_t *diff) {
   rc = CMP_FREE(diff);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_diff_destroy: CMP_FREE diff failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -150,10 +153,21 @@ int cmp_ui_diff_destroy(cmp_ui_diff_t *diff) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_diff_get_node(cmp_ui_diff_t *diff, cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!diff || !out_node) {
     LOG_DEBUG("cmp_ui_diff_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = diff->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

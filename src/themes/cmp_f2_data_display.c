@@ -14,9 +14,11 @@
  * @param shape Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_avatar_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_avatar_create(cmp_ui_node_t **out_node,
                                  cmp_f2_avatar_size_t size,
                                  cmp_f2_avatar_shape_t shape) {
+  int rc;
+  rc = 0;
   cmp_f2_avatar_t *data;
   int res;
 
@@ -50,7 +52,16 @@ CMP_API int cmp_f2_avatar_create(cmp_ui_node_t **out_node,
   (*out_node)->layout->height = (float)size;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -60,8 +71,10 @@ CMP_API int cmp_f2_avatar_create(cmp_ui_node_t **out_node,
  * @param initials Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_avatar_set_initials(cmp_ui_node_t *node,
+int CMP_API cmp_f2_avatar_set_initials(cmp_ui_node_t *node,
                                        const char *initials) {
+  int rc;
+  rc = 0;
   cmp_f2_avatar_t *data;
   int res;
 
@@ -82,7 +95,16 @@ CMP_API int cmp_f2_avatar_set_initials(cmp_ui_node_t *node,
     }
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -93,9 +115,11 @@ CMP_API int cmp_f2_avatar_set_initials(cmp_ui_node_t *node,
  * @param max_count Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_avatar_group_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_avatar_group_create(cmp_ui_node_t **out_node,
                                        cmp_f2_avatar_group_layout_t layout,
                                        int max_count) {
+  int rc;
+  rc = 0;
   cmp_f2_avatar_group_t *data;
   int res;
 
@@ -129,7 +153,16 @@ CMP_API int cmp_f2_avatar_group_create(cmp_ui_node_t **out_node,
   }
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -139,8 +172,10 @@ CMP_API int cmp_f2_avatar_group_create(cmp_ui_node_t **out_node,
  * @param status Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_presence_badge_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_presence_badge_create(cmp_ui_node_t **out_node,
                                          cmp_f2_presence_status_t status) {
+  int rc;
+  rc = 0;
   cmp_f2_presence_badge_t *data;
   int res;
 
@@ -166,7 +201,16 @@ CMP_API int cmp_f2_presence_badge_create(cmp_ui_node_t **out_node,
   data->status = status;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -176,7 +220,9 @@ CMP_API int cmp_f2_presence_badge_create(cmp_ui_node_t **out_node,
  * @param label Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_badge_create(cmp_ui_node_t **out_node, const char *label) {
+int CMP_API cmp_f2_badge_create(cmp_ui_node_t **out_node, const char *label) {
+  int rc;
+  rc = 0;
   cmp_f2_badge_t *data;
   int res;
 
@@ -215,7 +261,16 @@ CMP_API int cmp_f2_badge_create(cmp_ui_node_t **out_node, const char *label) {
   }
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -225,8 +280,10 @@ CMP_API int cmp_f2_badge_create(cmp_ui_node_t **out_node, const char *label) {
  * @param variant Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_badge_set_variant(cmp_ui_node_t *node,
+int CMP_API cmp_f2_badge_set_variant(cmp_ui_node_t *node,
                                      cmp_f2_badge_variant_t variant) {
+  int rc;
+  rc = 0;
   cmp_f2_badge_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_badge_set_variant: Invalid arg\n");
@@ -234,7 +291,16 @@ CMP_API int cmp_f2_badge_set_variant(cmp_ui_node_t *node,
   }
   data = (cmp_f2_badge_t *)node->properties;
   data->variant = variant;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -244,8 +310,10 @@ CMP_API int cmp_f2_badge_set_variant(cmp_ui_node_t *node,
  * @param shape Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_badge_set_shape(cmp_ui_node_t *node,
+int CMP_API cmp_f2_badge_set_shape(cmp_ui_node_t *node,
                                    cmp_f2_badge_shape_t shape) {
+  int rc;
+  rc = 0;
   cmp_f2_badge_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_badge_set_shape: Invalid arg\n");
@@ -253,7 +321,16 @@ CMP_API int cmp_f2_badge_set_shape(cmp_ui_node_t *node,
   }
   data = (cmp_f2_badge_t *)node->properties;
   data->shape = shape;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -264,8 +341,10 @@ CMP_API int cmp_f2_badge_set_shape(cmp_ui_node_t *node,
  * @param is_dismissible Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tag_create(cmp_ui_node_t **out_node, const char *label,
+int CMP_API cmp_f2_tag_create(cmp_ui_node_t **out_node, const char *label,
                               int is_dismissible) {
+  int rc;
+  rc = 0;
   cmp_f2_tag_t *data;
   int res;
 
@@ -305,7 +384,16 @@ CMP_API int cmp_f2_tag_create(cmp_ui_node_t **out_node, const char *label,
   }
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -315,7 +403,9 @@ CMP_API int cmp_f2_tag_create(cmp_ui_node_t **out_node, const char *label,
  * @param is_selected Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tag_set_selected(cmp_ui_node_t *node, int is_selected) {
+int CMP_API cmp_f2_tag_set_selected(cmp_ui_node_t *node, int is_selected) {
+  int rc;
+  rc = 0;
   cmp_f2_tag_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_tag_set_selected: Invalid arg\n");
@@ -323,7 +413,16 @@ CMP_API int cmp_f2_tag_set_selected(cmp_ui_node_t *node, int is_selected) {
   }
   data = (cmp_f2_tag_t *)node->properties;
   data->is_selected = is_selected ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -332,7 +431,9 @@ CMP_API int cmp_f2_tag_set_selected(cmp_ui_node_t *node, int is_selected) {
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_datagrid_create(cmp_ui_node_t **out_node) {
+int CMP_API cmp_f2_datagrid_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   cmp_f2_datagrid_t *data;
   int res;
 
@@ -359,7 +460,16 @@ CMP_API int cmp_f2_datagrid_create(cmp_ui_node_t **out_node) {
   data->rows_container_node = NULL;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -369,8 +479,10 @@ CMP_API int cmp_f2_datagrid_create(cmp_ui_node_t **out_node) {
  * @param is_header Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_datagrid_row_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_datagrid_row_create(cmp_ui_node_t **out_node,
                                        int is_header) {
+  int rc;
+  rc = 0;
   int res;
   if (!out_node) {
     LOG_DEBUG("cmp_f2_datagrid_row_create: out_node is NULL\n");
@@ -385,6 +497,12 @@ CMP_API int cmp_f2_datagrid_row_create(cmp_ui_node_t **out_node,
   } else {
     LOG_DEBUG("cmp_f2_datagrid_row_create: cmp_ui_box_create failed\n");
   }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return res;
 }
 
@@ -394,7 +512,9 @@ CMP_API int cmp_f2_datagrid_row_create(cmp_ui_node_t **out_node,
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tree_create(cmp_ui_node_t **out_node) {
+int CMP_API cmp_f2_tree_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   int res;
   if (!out_node) {
     LOG_DEBUG("cmp_f2_tree_create: out_node is NULL\n");
@@ -407,6 +527,12 @@ CMP_API int cmp_f2_tree_create(cmp_ui_node_t **out_node) {
   } else {
     LOG_DEBUG("cmp_f2_tree_create: cmp_ui_box_create failed\n");
   }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return res;
 }
 
@@ -417,8 +543,10 @@ CMP_API int cmp_f2_tree_create(cmp_ui_node_t **out_node) {
  * @param label Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tree_item_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_tree_item_create(cmp_ui_node_t **out_node,
                                     const char *label) {
+  int rc;
+  rc = 0;
   cmp_f2_tree_item_t *data;
   int res;
 
@@ -459,7 +587,16 @@ CMP_API int cmp_f2_tree_item_create(cmp_ui_node_t **out_node,
   }
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -469,8 +606,10 @@ CMP_API int cmp_f2_tree_item_create(cmp_ui_node_t **out_node,
  * @param is_expanded Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tree_item_set_expanded(cmp_ui_node_t *node,
+int CMP_API cmp_f2_tree_item_set_expanded(cmp_ui_node_t *node,
                                           int is_expanded) {
+  int rc;
+  rc = 0;
   cmp_f2_tree_item_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_tree_item_set_expanded: Invalid arg\n");
@@ -478,7 +617,16 @@ CMP_API int cmp_f2_tree_item_set_expanded(cmp_ui_node_t *node,
   }
   data = (cmp_f2_tree_item_t *)node->properties;
   data->is_expanded = is_expanded ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -488,8 +636,10 @@ CMP_API int cmp_f2_tree_item_set_expanded(cmp_ui_node_t *node,
  * @param is_selected Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tree_item_set_selected(cmp_ui_node_t *node,
+int CMP_API cmp_f2_tree_item_set_selected(cmp_ui_node_t *node,
                                           int is_selected) {
+  int rc;
+  rc = 0;
   cmp_f2_tree_item_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_tree_item_set_selected: Invalid arg\n");
@@ -497,5 +647,14 @@ CMP_API int cmp_f2_tree_item_set_selected(cmp_ui_node_t *node,
   }
   data = (cmp_f2_tree_item_t *)node->properties;
   data->is_selected = is_selected ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

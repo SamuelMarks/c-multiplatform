@@ -13,14 +13,18 @@ TEST test_pointer_capture_init_shutdown(void) {
 TEST test_set_and_has_capture(void) {
   cmp_ui_node_t node = {0};
   int pointer_id = 42;
+  int out_val = 0;
 
   ASSERT_EQ(CMP_SUCCESS, cmp_pointer_capture_init());
 
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_node_set_pointer_capture(&node, pointer_id));
-  ASSERT_EQ(1, cmp_ui_node_has_pointer_capture(&node, pointer_id));
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_ui_node_has_pointer_capture(&node, pointer_id, &out_val));
+  ASSERT_EQ(1, out_val);
 
   /* Should fail for different ID */
-  ASSERT_EQ(0, cmp_ui_node_has_pointer_capture(&node, 99));
+  ASSERT_EQ(CMP_SUCCESS, cmp_ui_node_has_pointer_capture(&node, 99, &out_val));
+  ASSERT_EQ(0, out_val);
 
   ASSERT_EQ(CMP_SUCCESS, cmp_pointer_capture_shutdown());
   PASS();
@@ -29,15 +33,20 @@ TEST test_set_and_has_capture(void) {
 TEST test_release_capture(void) {
   cmp_ui_node_t node = {0};
   int pointer_id = 15;
+  int out_val = 0;
 
   ASSERT_EQ(CMP_SUCCESS, cmp_pointer_capture_init());
 
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_node_set_pointer_capture(&node, pointer_id));
-  ASSERT_EQ(1, cmp_ui_node_has_pointer_capture(&node, pointer_id));
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_ui_node_has_pointer_capture(&node, pointer_id, &out_val));
+  ASSERT_EQ(1, out_val);
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_ui_node_release_pointer_capture(&node, pointer_id));
-  ASSERT_EQ(0, cmp_ui_node_has_pointer_capture(&node, pointer_id));
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_ui_node_has_pointer_capture(&node, pointer_id, &out_val));
+  ASSERT_EQ(0, out_val);
 
   /* Releasing already released or unknown pointer */
   ASSERT_EQ(CMP_ERROR_NOT_FOUND,
@@ -49,11 +58,13 @@ TEST test_release_capture(void) {
 
 TEST test_capture_edge_cases(void) {
   cmp_ui_node_t node = {0};
+  int out_val = 0;
 
   /* Operations before initialization */
   ASSERT_EQ(CMP_ERROR_IO, cmp_ui_node_set_pointer_capture(&node, 1));
   ASSERT_EQ(CMP_ERROR_IO, cmp_ui_node_release_pointer_capture(&node, 1));
-  ASSERT_EQ(0, cmp_ui_node_has_pointer_capture(&node, 1));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_ui_node_has_pointer_capture(&node, 1, &out_val));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_pointer_capture_init());
 
@@ -66,8 +77,10 @@ TEST test_capture_edge_cases(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ui_node_release_pointer_capture(&node, -1));
 
-  ASSERT_EQ(0, cmp_ui_node_has_pointer_capture(NULL, 1));
-  ASSERT_EQ(0, cmp_ui_node_has_pointer_capture(&node, -1));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_ui_node_has_pointer_capture(NULL, 1, &out_val));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_ui_node_has_pointer_capture(&node, -1, &out_val));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_pointer_capture_shutdown());
   PASS();

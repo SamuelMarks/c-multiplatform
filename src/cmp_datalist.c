@@ -16,7 +16,8 @@ struct cmp_datalist {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_datalist_create(cmp_datalist_t **out_datalist) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_datalist *datalist = NULL;
@@ -30,6 +31,9 @@ int cmp_datalist_create(cmp_datalist_t **out_datalist) {
     cmp_log_debug(
         "cmp_datalist_create: Invalid argument (out_datalist=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -40,6 +44,9 @@ int cmp_datalist_create(cmp_datalist_t **out_datalist) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_datalist_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -57,7 +64,8 @@ int cmp_datalist_create(cmp_datalist_t **out_datalist) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_datalist_destroy(cmp_datalist_t *datalist) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_datalist *internal_datalist = (struct cmp_datalist *)datalist;
@@ -69,6 +77,9 @@ int cmp_datalist_destroy(cmp_datalist_t *datalist) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_datalist_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -90,7 +101,8 @@ int cmp_datalist_destroy(cmp_datalist_t *datalist) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_datalist_filter(cmp_datalist_t *datalist, const char *input_string) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_datalist *internal_datalist = (struct cmp_datalist *)datalist;
@@ -102,10 +114,22 @@ int cmp_datalist_filter(cmp_datalist_t *datalist, const char *input_string) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_datalist_filter: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   /* Filter logic placeholder */
   cmp_log_debug("cmp_datalist_filter: Mocked datalist filter\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

@@ -70,7 +70,6 @@ TEST test_modality_threaded_lifecycle(void) {
 
   res = cmp_modality_stop(&mod);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
-
 #if defined(_WIN32)
   Sleep(50);
 #else
@@ -131,7 +130,6 @@ TEST test_modality_threaded_massive_queue(void) {
 
   res = cmp_modality_stop(&mod);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
-
 #if defined(_WIN32)
   Sleep(100);
 #else

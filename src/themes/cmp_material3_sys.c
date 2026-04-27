@@ -17,6 +17,8 @@
 int cmp_m3_sys_colors_generate(cmp_color_t seed, int is_dark,
                                cmp_m3_contrast_profile_t contrast,
                                cmp_m3_sys_colors_t *out_sys_colors) {
+  int rc;
+  rc = 0;
   float h, c, t;
   if (!out_sys_colors) {
     return CMP_ERROR_INVALID_ARG;
@@ -183,7 +185,16 @@ int cmp_m3_sys_colors_generate(cmp_color_t seed, int is_dark,
                        &out_sys_colors->on_tertiary_fixed_variant);
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -201,6 +212,8 @@ int cmp_m3_shape_resolve(cmp_m3_shape_family_t shape,
                          const cmp_m3_shape_modifiers_t *modifiers,
                          float *out_tl, float *out_tr, float *out_bl,
                          float *out_br) {
+  int rc;
+  rc = 0;
   float base_radius = 0.0f;
 
   if (!out_tl || !out_tr || !out_bl || !out_br) {
@@ -249,7 +262,16 @@ int cmp_m3_shape_resolve(cmp_m3_shape_family_t shape,
       *out_br = (float)modifiers->bottom_right_override;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -267,6 +289,8 @@ int cmp_m3_elevation_resolve(cmp_m3_elevation_level_t level,
                              float *out_tonal_opacity,
                              float *out_shadow_y_offset, float *out_shadow_blur,
                              float *out_ambient_alpha, float *out_spot_alpha) {
+  int rc;
+  rc = 0;
   if (!out_tonal_opacity || !out_shadow_y_offset || !out_shadow_blur ||
       !out_ambient_alpha || !out_spot_alpha) {
     return CMP_ERROR_INVALID_ARG;
@@ -319,7 +343,16 @@ int cmp_m3_elevation_resolve(cmp_m3_elevation_level_t level,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -330,6 +363,8 @@ int cmp_m3_elevation_resolve(cmp_m3_elevation_level_t level,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_m3_state_layer_resolve(cmp_m3_state_layer_t state, float *out_opacity) {
+  int rc;
+  rc = 0;
   if (!out_opacity) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -357,5 +392,14 @@ int cmp_m3_state_layer_resolve(cmp_m3_state_layer_t state, float *out_opacity) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

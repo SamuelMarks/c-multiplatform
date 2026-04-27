@@ -31,6 +31,8 @@ struct cmp_symbols {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_symbols_create(cmp_symbols_t **out_ctx) {
+  int rc;
+  rc = 0;
   struct cmp_symbols *ctx;
   if (!out_ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -38,7 +40,16 @@ int cmp_symbols_create(cmp_symbols_t **out_ctx) {
     return CMP_ERROR_OOM;
   ctx->is_initialized = 1;
   *out_ctx = (cmp_symbols_t *)ctx;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -48,9 +59,20 @@ int cmp_symbols_create(cmp_symbols_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_symbols_destroy(cmp_symbols_t *ctx) {
+  int rc;
+  rc = 0;
   if (ctx)
     CMP_FREE(ctx);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -65,6 +87,8 @@ int cmp_symbols_destroy(cmp_symbols_t *ctx) {
  */
 int cmp_symbols_request(cmp_symbols_t *ctx, const char *symbol_name, int weight,
                         cmp_symbol_scale_t scale, void **out_symbol_handle) {
+  int rc;
+  rc = 0;
   cmp_symbol_node_t *node;
   size_t len;
 
@@ -95,7 +119,16 @@ int cmp_symbols_request(cmp_symbols_t *ctx, const char *symbol_name, int weight,
   node->is_looping = 0;
 
   *out_symbol_handle = (void *)node;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -111,6 +144,8 @@ int cmp_symbols_request(cmp_symbols_t *ctx, const char *symbol_name, int weight,
 int cmp_symbols_apply_style(cmp_symbols_t *ctx, void *symbol_handle,
                             cmp_symbol_rendering_mode_t mode,
                             const uint32_t *colors, size_t color_count) {
+  int rc;
+  rc = 0;
   cmp_symbol_node_t *node = (cmp_symbol_node_t *)symbol_handle;
   if (!ctx || !node || (color_count > 0 && !colors))
     return CMP_ERROR_INVALID_ARG;
@@ -130,7 +165,16 @@ int cmp_symbols_apply_style(cmp_symbols_t *ctx, void *symbol_handle,
   }
   node->color_count = color_count;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -143,6 +187,8 @@ int cmp_symbols_apply_style(cmp_symbols_t *ctx, void *symbol_handle,
  */
 int cmp_symbols_set_variable_value(cmp_symbols_t *ctx, void *symbol_handle,
                                    float percentage) {
+  int rc;
+  rc = 0;
   cmp_symbol_node_t *node = (cmp_symbol_node_t *)symbol_handle;
   if (!ctx || !node)
     return CMP_ERROR_INVALID_ARG;
@@ -153,7 +199,16 @@ int cmp_symbols_set_variable_value(cmp_symbols_t *ctx, void *symbol_handle,
     percentage = 1.0f;
 
   node->variable_fill = percentage;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -168,13 +223,24 @@ int cmp_symbols_set_variable_value(cmp_symbols_t *ctx, void *symbol_handle,
 int cmp_symbols_trigger_animation(cmp_symbols_t *ctx, void *symbol_handle,
                                   cmp_symbol_animation_t animation,
                                   int looping) {
+  int rc;
+  rc = 0;
   cmp_symbol_node_t *node = (cmp_symbol_node_t *)symbol_handle;
   if (!ctx || !node)
     return CMP_ERROR_INVALID_ARG;
 
   node->active_animation = animation;
   node->is_looping = looping;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -187,6 +253,14 @@ int cmp_symbols_trigger_animation(cmp_symbols_t *ctx, void *symbol_handle,
  */
 int cmp_symbols_load_custom_template(cmp_symbols_t *ctx, const char *svg_path,
                                      void **out_symbol_handle) {
+  int rc;
+  rc = 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   if (!ctx || !svg_path || !out_symbol_handle)
     return CMP_ERROR_INVALID_ARG;
   /* Simulating loading an external SVG template matching weight boundaries.

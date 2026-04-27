@@ -83,6 +83,8 @@ int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar) {
  */
 int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar, float raw_delta_y,
                           unsigned int delta_time_ms, float *out_smoothed_y) {
+  int rc;
+  rc = 0;
   float dt_seconds;
 
   if (scrollbar == NULL || out_smoothed_y == NULL) {

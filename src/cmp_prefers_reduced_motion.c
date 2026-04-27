@@ -16,13 +16,15 @@ struct cmp_prefers_reduced_motion {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_prefers_reduced_motion_create(cmp_prefers_reduced_motion_t **out_rm) {
+  int rc;
+  rc = 0;
   struct cmp_prefers_reduced_motion *rm;
 
   if (!out_rm)
     return CMP_ERROR_INVALID_ARG;
 
-  if (CMP_MALLOC(sizeof(struct cmp_prefers_reduced_motion), (void **)&rm) !=
-      CMP_SUCCESS)
+  rc = CMP_MALLOC(sizeof(struct cmp_prefers_reduced_motion), (void **)&rm);
+  if (rc != CMP_SUCCESS)
     return CMP_ERROR_OOM;
 
   rm->is_enabled = 0; /* Default to off (full motion) */
@@ -38,13 +40,18 @@ int cmp_prefers_reduced_motion_create(cmp_prefers_reduced_motion_t **out_rm) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_prefers_reduced_motion_destroy(cmp_prefers_reduced_motion_t *rm) {
+  int rc;
+  rc = 0;
   struct cmp_prefers_reduced_motion *r =
       (struct cmp_prefers_reduced_motion *)rm;
 
   if (!r)
     return CMP_ERROR_INVALID_ARG;
 
-  CMP_FREE(r);
+  rc = CMP_FREE(r);
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -57,6 +64,8 @@ int cmp_prefers_reduced_motion_destroy(cmp_prefers_reduced_motion_t *rm) {
  */
 int cmp_prefers_reduced_motion_set(cmp_prefers_reduced_motion_t *rm,
                                    int enabled) {
+  int rc;
+  rc = 0;
   struct cmp_prefers_reduced_motion *r =
       (struct cmp_prefers_reduced_motion *)rm;
 
@@ -76,6 +85,8 @@ int cmp_prefers_reduced_motion_set(cmp_prefers_reduced_motion_t *rm,
  */
 int cmp_prefers_reduced_motion_apply(cmp_prefers_reduced_motion_t *rm,
                                      float *duration_ms) {
+  int rc;
+  rc = 0;
   struct cmp_prefers_reduced_motion *r =
       (struct cmp_prefers_reduced_motion *)rm;
 
@@ -85,6 +96,5 @@ int cmp_prefers_reduced_motion_apply(cmp_prefers_reduced_motion_t *rm,
   if (r->is_enabled) {
     *duration_ms = 0.0f; /* Instantly complete animations */
   }
-
   return CMP_SUCCESS;
 }

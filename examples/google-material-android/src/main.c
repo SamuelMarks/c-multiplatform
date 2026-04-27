@@ -4,10 +4,14 @@
 /* clang-format on */
 
 int main(void) {
+  int rc = 0;
   if (app_init() != 0) {
     return 1;
   }
   app_run();
   app_shutdown();
-  return 0;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

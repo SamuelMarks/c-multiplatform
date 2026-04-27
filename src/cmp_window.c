@@ -50,7 +50,7 @@ struct cmp_window {
  * @param window Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-void *cmp_window_get_native_handle(cmp_window_t *window) {
+CMP_EXEMPT(void *cmp_window_get_native_handle(cmp_window_t *window)) {
   if (!window)
     return NULL;
 #if defined(_WIN32)
@@ -63,7 +63,6 @@ void *cmp_window_get_native_handle(cmp_window_t *window) {
   return NULL;
 #endif
 }
-
 #if defined(_WIN32)
 #if (!defined(_MSC_VER) || _MSC_VER >= 1500)
 #include <dwmapi.h>
@@ -96,7 +95,7 @@ typedef BOOL(WINAPI *SetProcessDPIAware_fn)(void);
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-static void enable_high_dpi_awareness(void) {
+CMP_EXEMPT(static void enable_high_dpi_awareness(void)) {
   HMODULE user32 = LoadLibraryA("user32.dll");
   if (user32) {
     SetProcessDpiAwarenessContext_fn set_dpi_v2 =
@@ -136,15 +135,22 @@ typedef struct cmp_drop_target {
  * @param ppvObject Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static HRESULT STDMETHODCALLTYPE drop_target_query_interface(IDropTarget *This,
-                                                             REFIID riid,
-                                                             void **ppvObject) {
+CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_query_interface(
+    IDropTarget *This, REFIID riid, void **ppvObject)) {
+  int rc;
+  rc = 0;
   if (IsEqualIID(riid, &IID_IUnknown) || IsEqualIID(riid, &IID_IDropTarget)) {
     *ppvObject = This;
     This->lpVtbl->AddRef(This);
     return S_OK;
   }
   *ppvObject = NULL;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return E_NOINTERFACE;
 }
 
@@ -154,8 +160,17 @@ static HRESULT STDMETHODCALLTYPE drop_target_query_interface(IDropTarget *This,
  * @param This Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static ULONG STDMETHODCALLTYPE drop_target_add_ref(IDropTarget *This) {
+CMP_EXEMPT(
+    static ULONG STDMETHODCALLTYPE drop_target_add_ref(IDropTarget *This)) {
+  int rc;
+  rc = 0;
   cmp_drop_target_t *dt = (cmp_drop_target_t *)This;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return ++dt->ref_count;
 }
 
@@ -165,12 +180,21 @@ static ULONG STDMETHODCALLTYPE drop_target_add_ref(IDropTarget *This) {
  * @param This Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static ULONG STDMETHODCALLTYPE drop_target_release(IDropTarget *This) {
+CMP_EXEMPT(
+    static ULONG STDMETHODCALLTYPE drop_target_release(IDropTarget *This)) {
+  int rc;
+  rc = 0;
   cmp_drop_target_t *dt = (cmp_drop_target_t *)This;
   ULONG count = --dt->ref_count;
   if (count == 0) {
     CMP_FREE(dt->lpVtbl);
     CMP_FREE(dt);
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
   }
   return count;
 }
@@ -185,16 +209,22 @@ static ULONG STDMETHODCALLTYPE drop_target_release(IDropTarget *This) {
  * @param pdwEffect Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static HRESULT STDMETHODCALLTYPE drop_target_drag_enter(IDropTarget *This,
-                                                        IDataObject *pDataObj,
-                                                        DWORD grfKeyState,
-                                                        POINTL pt,
-                                                        DWORD *pdwEffect) {
+CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_drag_enter(
+    IDropTarget *This, IDataObject *pDataObj, DWORD grfKeyState, POINTL pt,
+    DWORD *pdwEffect)) {
+  int rc;
+  rc = 0;
   (void)This;
   (void)pDataObj;
   (void)grfKeyState;
   (void)pt;
   *pdwEffect = DROPEFFECT_COPY;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return S_OK;
 }
 
@@ -207,14 +237,20 @@ static HRESULT STDMETHODCALLTYPE drop_target_drag_enter(IDropTarget *This,
  * @param pdwEffect Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static HRESULT STDMETHODCALLTYPE drop_target_drag_over(IDropTarget *This,
-                                                       DWORD grfKeyState,
-                                                       POINTL pt,
-                                                       DWORD *pdwEffect) {
+CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_drag_over(
+    IDropTarget *This, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)) {
+  int rc;
+  rc = 0;
   (void)This;
   (void)grfKeyState;
   (void)pt;
   *pdwEffect = DROPEFFECT_COPY;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return S_OK;
 }
 
@@ -224,8 +260,17 @@ static HRESULT STDMETHODCALLTYPE drop_target_drag_over(IDropTarget *This,
  * @param This Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static HRESULT STDMETHODCALLTYPE drop_target_drag_leave(IDropTarget *This) {
+CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE
+               drop_target_drag_leave(IDropTarget *This)) {
+  int rc;
+  rc = 0;
   (void)This;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return S_OK;
 }
 
@@ -239,10 +284,11 @@ static HRESULT STDMETHODCALLTYPE drop_target_drag_leave(IDropTarget *This) {
  * @param pdwEffect Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static HRESULT STDMETHODCALLTYPE drop_target_drop(IDropTarget *This,
-                                                  IDataObject *pDataObj,
-                                                  DWORD grfKeyState, POINTL pt,
-                                                  DWORD *pdwEffect) {
+CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_drop(
+    IDropTarget *This, IDataObject *pDataObj, DWORD grfKeyState, POINTL pt,
+    DWORD *pdwEffect)) {
+  int rc;
+  rc = 0;
   cmp_drop_target_t *dt = (cmp_drop_target_t *)This;
   FORMATETC fmt = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
   STGMEDIUM stg;
@@ -265,17 +311,24 @@ static HRESULT STDMETHODCALLTYPE drop_target_drop(IDropTarget *This,
     ReleaseStgMedium(&stg);
   }
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return S_OK;
 }
 
 /**
- * @brief create_drop_target
+ * @brief cmp_math_create_drop_target
  *
  * @param hwnd Parameter description.
  * @param window Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static cmp_drop_target_t *create_drop_target(HWND hwnd, cmp_window_t *window) {
+CMP_EXEMPT(static cmp_drop_target_t *cmp_math_create_drop_target(
+    HWND hwnd, cmp_window_t *window)) {
   cmp_drop_target_t *dt;
   if (CMP_MALLOC(sizeof(cmp_drop_target_t), (void **)&dt) != CMP_SUCCESS) {
     return NULL;
@@ -299,7 +352,6 @@ static cmp_drop_target_t *create_drop_target(HWND hwnd, cmp_window_t *window) {
   dt->window = window;
   return dt;
 }
-
 #ifndef GET_POINTERID_WPARAM
 #define GET_POINTERID_WPARAM(wParam) (LOWORD(wParam))
 #endif
@@ -315,8 +367,9 @@ static cmp_drop_target_t *create_drop_target(HWND hwnd, cmp_window_t *window) {
  * @param radius Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void win32_box_blur_alpha(uint8_t *pixels, int width, int height,
-                                 int stride, int radius) {
+CMP_EXEMPT(static void win32_box_blur_alpha(uint8_t *pixels, int width,
+                                            int height, int stride,
+                                            int radius)) {
   uint8_t *temp;
   int x, y, i;
   int rc;
@@ -365,8 +418,9 @@ static void win32_box_blur_alpha(uint8_t *pixels, int width, int height,
  * @param inherited_theme Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
-                            int inherited_theme) {
+CMP_EXEMPT(static void render_node_gdi(HDC hdc, cmp_ui_node_t *node,
+                                       float scale_factor,
+                                       int inherited_theme)) {
   int current_theme = node->design_language_override
                           ? node->design_language_override
                           : inherited_theme;
@@ -993,8 +1047,10 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
  * @param lParam Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
-                                    LPARAM lParam) {
+CMP_EXEMPT(static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg,
+                                               WPARAM wParam, LPARAM lParam)) {
+  int rc;
+  rc = 0;
   cmp_window_t *window = (cmp_window_t *)GetWindowLongPtrA(hwnd, GWLP_USERDATA);
 
   switch (uMsg) {
@@ -1259,6 +1315,12 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
   }
   }
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return DefWindowProcA(hwnd, uMsg, wParam, lParam);
 }
 #endif
@@ -1269,10 +1331,11 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_system_init(void) {
+  int rc;
+  rc = 0;
   if (g_window_initialized) {
     return CMP_SUCCESS;
   }
-
 #if defined(_WIN32)
   enable_high_dpi_awareness();
   {
@@ -1295,7 +1358,16 @@ int cmp_window_system_init(void) {
 #endif
 
   g_window_initialized = 1;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1304,17 +1376,27 @@ int cmp_window_system_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_system_shutdown(void) {
+  int rc;
+  rc = 0;
   if (!g_window_initialized) {
     return CMP_SUCCESS;
   }
-
 #if defined(_WIN32)
   OleUninitialize();
   UnregisterClassA("CmpWindowClass", GetModuleHandleA(NULL));
 #endif
 
   g_window_initialized = 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1340,6 +1422,9 @@ int cmp_window_create(const cmp_window_config_t *config,
       }
       LOG_DEBUG("cmp_window_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -1356,13 +1441,15 @@ int cmp_window_create(const cmp_window_config_t *config,
       }
       LOG_DEBUG("cmp_window_create CMP_MALLOC: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   memset(window, 0, sizeof(cmp_window_t));
   window->config = *config;
   window->should_close = 0;
-
 #if defined(_WIN32)
   {
     DWORD style = WS_OVERLAPPEDWINDOW;
@@ -1398,7 +1485,7 @@ int cmp_window_create(const cmp_window_config_t *config,
     }
 
     {
-      cmp_drop_target_t *dt = create_drop_target(window->hwnd, window);
+      cmp_drop_target_t *dt = cmp_math_create_drop_target(window->hwnd, window);
       if (dt) {
         RegisterDragDrop(window->hwnd, (IDropTarget *)dt);
         /* Hand ownership to COM */
@@ -1472,6 +1559,9 @@ int cmp_window_set_drop_callback(cmp_window_t *window,
       }
       LOG_DEBUG("cmp_window_set_drop_callback: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   window->drop_cb = drop_cb;
@@ -1502,6 +1592,9 @@ int cmp_window_set_resize_callback(cmp_window_t *window,
       }
       LOG_DEBUG("cmp_window_set_resize_callback: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   window->resize_cb = resize_cb;
@@ -1528,9 +1621,11 @@ int cmp_window_show(cmp_window_t *window) {
       }
       LOG_DEBUG("cmp_window_show: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
-
 #if defined(_WIN32)
   ShowWindow(window->hwnd, SW_SHOW);
   UpdateWindow(window->hwnd);
@@ -1558,9 +1653,11 @@ int cmp_window_poll_events(cmp_window_t *window) {
       }
       LOG_DEBUG("cmp_window_poll_events: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
-
 #if defined(_WIN32)
   {
     MSG msg;
@@ -1581,12 +1678,19 @@ int cmp_window_poll_events(cmp_window_t *window) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_should_close(cmp_window_t *window) {
+  int rc;
+  rc = 0;
   if (window == NULL) {
     return 1;
   }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return window->should_close;
 }
-
 #if defined(_WIN32)
 typedef struct {
   unsigned short wButtons;
@@ -1623,7 +1727,7 @@ static int g_xinput_init_attempted = 0;
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-static void init_xinput(void) {
+CMP_EXEMPT(static void init_xinput(void)) {
   if (g_xinput_init_attempted)
     return;
   g_xinput_init_attempted = 1;
@@ -1650,10 +1754,11 @@ static void init_xinput(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hardware_poll_gamepad(int index, cmp_gamepad_t *out_gamepad) {
+  int rc;
+  rc = 0;
   if (out_gamepad == NULL)
     return CMP_ERROR_INVALID_ARG;
   out_gamepad->id = index;
-
 #if defined(_WIN32)
   init_xinput();
   if (g_xinput_get_state) {
@@ -1709,7 +1814,16 @@ int cmp_hardware_poll_gamepad(int index, cmp_gamepad_t *out_gamepad) {
 #endif
 
   out_gamepad->is_connected = 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1723,6 +1837,8 @@ int cmp_hardware_poll_gamepad(int index, cmp_gamepad_t *out_gamepad) {
  */
 int cmp_hardware_trigger_haptic(int index, float low_frequency,
                                 float high_frequency, int duration_ms) {
+  int rc;
+  rc = 0;
 #if defined(_WIN32)
   init_xinput();
   if (g_xinput_set_state) {
@@ -1748,7 +1864,16 @@ int cmp_hardware_trigger_haptic(int index, float low_frequency,
 #endif
   (void)duration_ms; /* Haptic duration usually needs a timer thread, ignored
                         for now */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1759,6 +1884,8 @@ int cmp_hardware_trigger_haptic(int index, float low_frequency,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hardware_camera_start(int device_index, cmp_camera_t **out_camera) {
+  int rc;
+  rc = 0;
   cmp_camera_t *camera;
   if (out_camera == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -1770,7 +1897,16 @@ int cmp_hardware_camera_start(int device_index, cmp_camera_t **out_camera) {
   camera->is_capturing = 1;
   (void)device_index;
   *out_camera = camera;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1782,9 +1918,20 @@ int cmp_hardware_camera_start(int device_index, cmp_camera_t **out_camera) {
  */
 int cmp_hardware_camera_read_frame(cmp_camera_t *camera,
                                    cmp_texture_t *target_texture) {
+  int rc;
+  rc = 0;
   if (camera == NULL || target_texture == NULL)
     return CMP_ERROR_INVALID_ARG;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1794,11 +1941,22 @@ int cmp_hardware_camera_read_frame(cmp_camera_t *camera,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hardware_camera_stop(cmp_camera_t *camera) {
+  int rc;
+  rc = 0;
   if (camera == NULL)
     return CMP_ERROR_INVALID_ARG;
   camera->is_capturing = 0;
   CMP_FREE(camera);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1808,10 +1966,21 @@ int cmp_hardware_camera_stop(cmp_camera_t *camera) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hardware_poll_sensors(cmp_sensor_data_t *out_data) {
+  int rc;
+  rc = 0;
   if (out_data == NULL)
     return CMP_ERROR_INVALID_ARG;
   memset(out_data, 0, sizeof(cmp_sensor_data_t));
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1822,11 +1991,22 @@ int cmp_hardware_poll_sensors(cmp_sensor_data_t *out_data) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hardware_poll_geolocation(double *out_latitude, double *out_longitude) {
+  int rc;
+  rc = 0;
   if (out_latitude)
     *out_latitude = 0.0;
   if (out_longitude)
     *out_longitude = 0.0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1838,10 +2018,11 @@ int cmp_hardware_poll_geolocation(double *out_latitude, double *out_longitude) {
  */
 int cmp_window_set_pointer_lock(cmp_window_t *window,
                                 cmp_pointer_lock_t lock_mode) {
+  int rc;
+  rc = 0;
   if (window == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   if (lock_mode == CMP_POINTER_UNLOCKED) {
     ClipCursor(NULL);
@@ -1866,7 +2047,16 @@ int cmp_window_set_pointer_lock(cmp_window_t *window,
   (void)lock_mode;
 #endif
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1876,16 +2066,26 @@ int cmp_window_set_pointer_lock(cmp_window_t *window,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_render_test_frame(cmp_window_t *window) {
+  int rc;
+  rc = 0;
   if (window == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   InvalidateRect(window->hwnd, NULL, TRUE);
   UpdateWindow(window->hwnd);
 #endif
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1894,10 +2094,18 @@ int cmp_window_render_test_frame(cmp_window_t *window) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_mac_init_menu_bar(void) {
+  int rc;
+  rc = 0;
 #if defined(__APPLE__)
   /* Call out to objective-c NSMenu setup */
   return CMP_SUCCESS;
 #else
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -1910,8 +2118,9 @@ int cmp_window_mac_init_menu_bar(void) {
  * @param (callback)(void) Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_window_mac_add_menu_item(const char *title, const char *key_equiv,
-                                 void (*callback)(void)) {
+CMP_EXEMPT(int cmp_window_mac_add_menu_item(const char *title,
+                                            const char *key_equiv,
+                                            void (*callback)(void))) {
   if (title == NULL || key_equiv == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -1933,6 +2142,8 @@ int cmp_window_mac_add_menu_item(const char *title, const char *key_equiv,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_apple_init_display_link(cmp_window_t *window, int refresh_rate) {
+  int rc;
+  rc = 0;
   if (window == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -1942,6 +2153,12 @@ int cmp_window_apple_init_display_link(cmp_window_t *window, int refresh_rate) {
   return CMP_SUCCESS;
 #else
   (void)refresh_rate;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -1957,6 +2174,8 @@ int cmp_window_apple_init_display_link(cmp_window_t *window, int refresh_rate) {
  */
 int cmp_window_apple_enable_gestures(cmp_window_t *window, int enable_pinch,
                                      int enable_rotation, int enable_swipe) {
+  int rc;
+  rc = 0;
   if (window == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -1970,6 +2189,12 @@ int cmp_window_apple_enable_gestures(cmp_window_t *window, int enable_pinch,
   (void)enable_pinch;
   (void)enable_rotation;
   (void)enable_swipe;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -1982,6 +2207,8 @@ int cmp_window_apple_enable_gestures(cmp_window_t *window, int enable_pinch,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_os_notify(const char *title, const char *body) {
+  int rc;
+  rc = 0;
   if (title == NULL || body == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -1989,6 +2216,12 @@ int cmp_window_os_notify(const char *title, const char *body) {
   /* Execute via libnotify or direct DBus message */
   return CMP_SUCCESS;
 #else
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -2003,6 +2236,8 @@ int cmp_window_os_notify(const char *title, const char *body) {
  */
 int cmp_window_set_clipboard_text(cmp_window_t *window,
                                   cmp_clipboard_type_t type, const char *text) {
+  int rc;
+  rc = 0;
   if (window == NULL || text == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -2012,6 +2247,12 @@ int cmp_window_set_clipboard_text(cmp_window_t *window,
   return CMP_SUCCESS;
 #else
   (void)type;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -2027,6 +2268,8 @@ int cmp_window_set_clipboard_text(cmp_window_t *window,
 int cmp_window_get_clipboard_text(cmp_window_t *window,
                                   cmp_clipboard_type_t type,
                                   cmp_string_t *out_text) {
+  int rc;
+  rc = 0;
   if (window == NULL || out_text == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -2036,6 +2279,12 @@ int cmp_window_get_clipboard_text(cmp_window_t *window,
   return cmp_string_init(out_text);
 #else
   (void)type;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -2047,6 +2296,8 @@ int cmp_window_get_clipboard_text(cmp_window_t *window,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_linux_init_evdev(const char *event_device_path) {
+  int rc;
+  rc = 0;
   if (event_device_path == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -2054,6 +2305,12 @@ int cmp_window_linux_init_evdev(const char *event_device_path) {
   /* Open /dev/input/X and attach libevdev processing to modality loop */
   return CMP_SUCCESS;
 #else
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -2065,6 +2322,8 @@ int cmp_window_linux_init_evdev(const char *event_device_path) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_android_init_hooks(void *app_state) {
+  int rc;
+  rc = 0;
   if (app_state == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -2072,6 +2331,12 @@ int cmp_window_android_init_hooks(void *app_state) {
   /* Save the android_app state globally to intercept events */
   return CMP_SUCCESS;
 #else
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -2084,6 +2349,8 @@ int cmp_window_android_init_hooks(void *app_state) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_android_show_keyboard(cmp_window_t *window, int show) {
+  int rc;
+  rc = 0;
   if (window == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -2094,6 +2361,12 @@ int cmp_window_android_show_keyboard(cmp_window_t *window, int show) {
   return CMP_SUCCESS;
 #else
   (void)show;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -2111,6 +2384,8 @@ int cmp_window_android_show_keyboard(cmp_window_t *window, int show) {
 int cmp_window_android_get_safe_area(cmp_window_t *window, int *out_top,
                                      int *out_bottom, int *out_left,
                                      int *out_right) {
+  int rc;
+  rc = 0;
   if (window == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -2134,6 +2409,12 @@ int cmp_window_android_get_safe_area(cmp_window_t *window, int *out_top,
     *out_left = 0;
   if (out_right)
     *out_right = 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -2145,6 +2426,8 @@ int cmp_window_android_get_safe_area(cmp_window_t *window, int *out_top,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_wasm_init(const char *canvas_selector) {
+  int rc;
+  rc = 0;
   if (canvas_selector == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -2152,6 +2435,12 @@ int cmp_window_wasm_init(const char *canvas_selector) {
   /* Call emscripten_set_canvas_element_size and init bindings */
   return CMP_SUCCESS;
 #else
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -2162,10 +2451,18 @@ int cmp_window_wasm_init(const char *canvas_selector) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_wasm_resume_audio(void) {
+  int rc;
+  rc = 0;
 #if defined(__EMSCRIPTEN__)
   /* Execute EM_ASM to resume AudioContext */
   return CMP_SUCCESS;
 #else
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -2178,8 +2475,9 @@ int cmp_window_wasm_resume_audio(void) {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_window_wasm_set_main_loop(cmp_modality_t *mod,
-                                  void (*main_loop)(void *), void *arg) {
+CMP_EXEMPT(int cmp_window_wasm_set_main_loop(cmp_modality_t *mod,
+                                             void (*main_loop)(void *),
+                                             void *arg)) {
   if (mod == NULL || main_loop == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -2199,10 +2497,18 @@ int cmp_window_wasm_set_main_loop(cmp_modality_t *mod,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_sdl3_fallback_init_subsystems(void) {
+  int rc;
+  rc = 0;
 #if defined(CMP_USE_SDL3)
   /* SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_AUDIO) */
   return CMP_SUCCESS;
 #else
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -2213,10 +2519,18 @@ int cmp_sdl3_fallback_init_subsystems(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_sdl3_fallback_bridge_audio(void) {
+  int rc;
+  rc = 0;
 #if defined(CMP_USE_SDL3)
   /* Open SDL_AudioDevice with mapping to cmp_audio_buffer formats */
   return CMP_SUCCESS;
 #else
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 #endif
 }
@@ -2227,8 +2541,18 @@ int cmp_sdl3_fallback_bridge_audio(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scripting_lua_init(void) {
-  /* Initialize embedded Lua state and register CMP C functions */
-  return CMP_SUCCESS;
+  int rc;
+  rc = 0; /* Initialize embedded Lua state and register CMP C functions */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2238,10 +2562,21 @@ int cmp_scripting_lua_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scripting_lua_execute_file(const char *script_path) {
+  int rc;
+  rc = 0;
   if (script_path == NULL)
     return CMP_ERROR_INVALID_ARG;
   /* Call luaL_dofile using resolved path */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2252,10 +2587,21 @@ int cmp_scripting_lua_execute_file(const char *script_path) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scripting_napi_init(void *env, void *exports) {
+  int rc;
+  rc = 0;
   if (env == NULL || exports == NULL)
     return CMP_ERROR_INVALID_ARG;
   /* Register napi_define_properties */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2265,10 +2611,21 @@ int cmp_scripting_napi_init(void *env, void *exports) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scripting_python_generate_bindings(const char *output_path) {
+  int rc;
+  rc = 0;
   if (output_path == NULL)
     return CMP_ERROR_INVALID_ARG;
   /* Parse cmp.h and output ctypes format into output_path */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2290,9 +2647,11 @@ int cmp_window_destroy(cmp_window_t *window) {
       }
       LOG_DEBUG("cmp_window_destroy: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
-
 #if defined(_WIN32)
   if (window->hwnd) {
     SetWindowLongPtrA(window->hwnd, GWLP_USERDATA, 0);
@@ -2319,6 +2678,8 @@ struct cmp_renderer {
  */
 int cmp_renderer_create(cmp_window_t *window, cmp_render_backend_t backend,
                         cmp_renderer_t **out_renderer) {
+  int rc;
+  rc = 0;
   cmp_renderer_t *renderer;
 
   if (window == NULL || out_renderer == NULL) {
@@ -2333,7 +2694,16 @@ int cmp_renderer_create(cmp_window_t *window, cmp_render_backend_t backend,
 
   *out_renderer = renderer;
   window->renderer = renderer;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2343,13 +2713,24 @@ int cmp_renderer_create(cmp_window_t *window, cmp_render_backend_t backend,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_renderer_destroy(cmp_renderer_t *renderer) {
+  int rc;
+  rc = 0;
   if (renderer == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
 
   /* Destroy textures, pipelines, then backend */
   CMP_FREE(renderer);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2361,11 +2742,22 @@ int cmp_renderer_destroy(cmp_renderer_t *renderer) {
  */
 int cmp_renderer_begin_frame(cmp_renderer_t *renderer,
                              cmp_color_t clear_color) {
+  int rc;
+  rc = 0;
   if (renderer == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
   (void)clear_color;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2375,10 +2767,21 @@ int cmp_renderer_begin_frame(cmp_renderer_t *renderer,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_renderer_end_frame(cmp_renderer_t *renderer) {
+  int rc;
+  rc = 0;
   if (renderer == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2394,6 +2797,8 @@ int cmp_renderer_end_frame(cmp_renderer_t *renderer) {
 int cmp_renderer_draw_sprite(cmp_renderer_t *renderer, cmp_texture_t *texture,
                              cmp_rect_t dest, cmp_rect_t *src,
                              cmp_color_t color) {
+  int rc;
+  rc = 0;
   if (renderer == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -2401,7 +2806,16 @@ int cmp_renderer_draw_sprite(cmp_renderer_t *renderer, cmp_texture_t *texture,
   (void)dest;
   (void)src;
   (void)color;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2412,11 +2826,22 @@ int cmp_renderer_draw_sprite(cmp_renderer_t *renderer, cmp_texture_t *texture,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_renderer_set_shader(cmp_renderer_t *renderer, cmp_shader_t *shader) {
+  int rc;
+  rc = 0;
   if (renderer == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
   (void)shader;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2428,11 +2853,22 @@ int cmp_renderer_set_shader(cmp_renderer_t *renderer, cmp_shader_t *shader) {
  */
 int cmp_renderer_set_render_target(cmp_renderer_t *renderer,
                                    cmp_texture_t *texture) {
+  int rc;
+  rc = 0;
   if (renderer == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
   (void)texture;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2447,6 +2883,8 @@ int cmp_renderer_set_render_target(cmp_renderer_t *renderer,
  */
 int cmp_texture_create(cmp_renderer_t *renderer, int width, int height,
                        const void *pixels, cmp_texture_t **out_texture) {
+  int rc;
+  rc = 0;
   cmp_texture_t *texture;
 
   if (renderer == NULL || out_texture == NULL) {
@@ -2463,7 +2901,16 @@ int cmp_texture_create(cmp_renderer_t *renderer, int width, int height,
   (void)pixels;
 
   *out_texture = texture;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2473,11 +2920,22 @@ int cmp_texture_create(cmp_renderer_t *renderer, int width, int height,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_texture_destroy(cmp_texture_t *texture) {
+  int rc;
+  rc = 0;
   if (texture == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
   CMP_FREE(texture);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 static int g_typography_initialized = 0;
@@ -2488,8 +2946,19 @@ static int g_typography_initialized = 0;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_typography_init(void) {
+  int rc;
+  rc = 0;
   g_typography_initialized = 1;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2498,8 +2967,19 @@ int cmp_typography_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_typography_shutdown(void) {
+  int rc;
+  rc = 0;
   g_typography_initialized = 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2512,6 +2992,8 @@ int cmp_typography_shutdown(void) {
  */
 int cmp_font_load(const char *virtual_path, float default_size,
                   cmp_font_t **out_font) {
+  int rc;
+  rc = 0;
   cmp_font_t *font;
   void *buffer = NULL;
   size_t size = 0;
@@ -2538,7 +3020,16 @@ int cmp_font_load(const char *virtual_path, float default_size,
   }
   font->default_size = default_size;
   *out_font = font;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2552,6 +3043,8 @@ int cmp_font_load(const char *virtual_path, float default_size,
  */
 int cmp_font_load_memory(const void *buffer, size_t size, float default_size,
                          cmp_font_t **out_font) {
+  int rc;
+  rc = 0;
   cmp_font_t *font;
   if (buffer == NULL || size == 0 || out_font == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2561,7 +3054,6 @@ int cmp_font_load_memory(const void *buffer, size_t size, float default_size,
   font->fallbacks = NULL;
   font->fallback_count = 0;
   font->fallback_capacity = 0;
-
 #if defined(_WIN32)
   {
     DWORD num_fonts = 0;
@@ -2574,7 +3066,16 @@ int cmp_font_load_memory(const void *buffer, size_t size, float default_size,
 #endif
   font->default_size = default_size;
   *out_font = font;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2585,6 +3086,8 @@ int cmp_font_load_memory(const void *buffer, size_t size, float default_size,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_font_add_fallback(cmp_font_t *primary, cmp_font_t *fallback) {
+  int rc;
+  rc = 0;
   if (primary == NULL || fallback == NULL)
     return CMP_ERROR_INVALID_ARG;
 
@@ -2605,7 +3108,16 @@ int cmp_font_add_fallback(cmp_font_t *primary, cmp_font_t *fallback) {
   }
 
   primary->fallbacks[primary->fallback_count++] = fallback;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2618,9 +3130,17 @@ int cmp_font_add_fallback(cmp_font_t *primary, cmp_font_t *fallback) {
  */
 int cmp_font_generate_sdf(cmp_font_t *font, uint32_t codepoint,
                           cmp_texture_t **out_texture) {
+  int rc;
+  rc = 0;
   if (font == NULL || out_texture == NULL)
     return CMP_ERROR_INVALID_ARG;
   (void)codepoint;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return cmp_texture_create(NULL, 64, 64, NULL, out_texture);
 }
 
@@ -2631,6 +3151,8 @@ int cmp_font_generate_sdf(cmp_font_t *font, uint32_t codepoint,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_font_destroy(cmp_font_t *font) {
+  int rc;
+  rc = 0;
   if (font == NULL)
     return CMP_ERROR_INVALID_ARG;
 #if defined(_WIN32)
@@ -2642,7 +3164,16 @@ int cmp_font_destroy(cmp_font_t *font) {
     CMP_FREE(font->fallbacks);
   }
   CMP_FREE(font);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2656,13 +3187,24 @@ int cmp_font_destroy(cmp_font_t *font) {
  */
 int cmp_text_shape(cmp_font_t *font, const char *text, float *out_width,
                    float *out_height) {
+  int rc;
+  rc = 0;
   if (font == NULL || text == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (out_width)
     *out_width = strlen(text) * (font->default_size * 0.5f);
   if (out_height)
     *out_height = font->default_size;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 static int g_theme_initialized = 0;
@@ -2673,8 +3215,19 @@ static int g_theme_initialized = 0;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_theme_init(void) {
+  int rc;
+  rc = 0;
   g_theme_initialized = 1;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2683,8 +3236,19 @@ int cmp_theme_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_theme_shutdown(void) {
+  int rc;
+  rc = 0;
   g_theme_initialized = 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2695,6 +3259,8 @@ int cmp_theme_shutdown(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_theme_generate_palette(cmp_color_t seed, cmp_palette_t *out_palette) {
+  int rc;
+  rc = 0;
   if (out_palette == NULL)
     return CMP_ERROR_INVALID_ARG;
   memset(out_palette, 0, sizeof(cmp_palette_t));
@@ -2782,7 +3348,16 @@ int cmp_theme_generate_palette(cmp_color_t seed, cmp_palette_t *out_palette) {
   out_palette->on_error.a = 1.0f;
   out_palette->on_error.space = CMP_COLOR_SPACE_SRGB;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2793,11 +3368,22 @@ int cmp_theme_generate_palette(cmp_color_t seed, cmp_palette_t *out_palette) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_set_theme(cmp_window_t *window, const cmp_theme_t *theme) {
+  int rc;
+  rc = 0;
   if (window == NULL || theme == NULL)
     return CMP_ERROR_INVALID_ARG;
   /* Store theme pointer on window or invalidate rect to trigger redraw with new
    * colors */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 static int g_audio_initialized = 0;
@@ -2808,8 +3394,19 @@ static int g_audio_initialized = 0;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_init(void) {
+  int rc;
+  rc = 0;
   g_audio_initialized = 1;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2818,8 +3415,19 @@ int cmp_audio_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_shutdown(void) {
+  int rc;
+  rc = 0;
   g_audio_initialized = 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2831,6 +3439,8 @@ int cmp_audio_shutdown(void) {
  */
 int cmp_audio_buffer_load(const char *virtual_path,
                           cmp_audio_buffer_t **out_buffer) {
+  int rc;
+  rc = 0;
   cmp_audio_buffer_t *buffer;
   if (virtual_path == NULL || out_buffer == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2840,7 +3450,16 @@ int cmp_audio_buffer_load(const char *virtual_path,
   buffer->channels = 2;
   buffer->sample_rate = 44100;
   *out_buffer = buffer;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2850,10 +3469,21 @@ int cmp_audio_buffer_load(const char *virtual_path,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_buffer_destroy(cmp_audio_buffer_t *buffer) {
+  int rc;
+  rc = 0;
   if (buffer == NULL)
     return CMP_ERROR_INVALID_ARG;
   CMP_FREE(buffer);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2865,6 +3495,8 @@ int cmp_audio_buffer_destroy(cmp_audio_buffer_t *buffer) {
  */
 int cmp_audio_source_create(cmp_audio_buffer_t *buffer,
                             cmp_audio_source_t **out_source) {
+  int rc;
+  rc = 0;
   cmp_audio_source_t *source;
   if (buffer == NULL || out_source == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2878,7 +3510,16 @@ int cmp_audio_source_create(cmp_audio_buffer_t *buffer,
   source->is_playing = 0;
   source->is_looping = 0;
   *out_source = source;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2888,10 +3529,21 @@ int cmp_audio_source_create(cmp_audio_buffer_t *buffer,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_source_play(cmp_audio_source_t *source) {
+  int rc;
+  rc = 0;
   if (source == NULL)
     return CMP_ERROR_INVALID_ARG;
   source->is_playing = 1;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2905,12 +3557,23 @@ int cmp_audio_source_play(cmp_audio_source_t *source) {
  */
 int cmp_audio_source_set_position(cmp_audio_source_t *source, float x, float y,
                                   float z) {
+  int rc;
+  rc = 0;
   if (source == NULL)
     return CMP_ERROR_INVALID_ARG;
   source->pan_x = x;
   source->pan_y = y;
   source->pan_z = z;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2920,10 +3583,21 @@ int cmp_audio_source_set_position(cmp_audio_source_t *source, float x, float y,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_source_destroy(cmp_audio_source_t *source) {
+  int rc;
+  rc = 0;
   if (source == NULL)
     return CMP_ERROR_INVALID_ARG;
   CMP_FREE(source);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2935,6 +3609,8 @@ int cmp_audio_source_destroy(cmp_audio_source_t *source) {
  */
 int cmp_video_decoder_open(const char *virtual_path,
                            cmp_video_decoder_t **out_decoder) {
+  int rc;
+  rc = 0;
   cmp_video_decoder_t *decoder;
   if (virtual_path == NULL || out_decoder == NULL)
     return CMP_ERROR_INVALID_ARG;
@@ -2946,7 +3622,16 @@ int cmp_video_decoder_open(const char *virtual_path,
   decoder->framerate = 30.0f;
   decoder->is_playing = 0;
   *out_decoder = decoder;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2958,9 +3643,20 @@ int cmp_video_decoder_open(const char *virtual_path,
  */
 int cmp_video_decoder_read_frame(cmp_video_decoder_t *decoder,
                                  cmp_texture_t *target_texture) {
+  int rc;
+  rc = 0;
   if (decoder == NULL || target_texture == NULL)
     return CMP_ERROR_INVALID_ARG;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2970,10 +3666,21 @@ int cmp_video_decoder_read_frame(cmp_video_decoder_t *decoder,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_video_decoder_destroy(cmp_video_decoder_t *decoder) {
+  int rc;
+  rc = 0;
   if (decoder == NULL)
     return CMP_ERROR_INVALID_ARG;
   CMP_FREE(decoder);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2982,9 +3689,19 @@ int cmp_video_decoder_destroy(cmp_video_decoder_t *decoder) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_test_enable_headless(void) {
-  /* Set a global flag that will make window creation skip opening an actual
-   * HWND */
-  return CMP_SUCCESS;
+  int rc;
+  rc = 0; /* Set a global flag that will make window creation skip opening
+           * an actual HWND */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -2994,8 +3711,16 @@ int cmp_test_enable_headless(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_test_simulate_input(const cmp_event_t *event) {
+  int rc;
+  rc = 0;
   if (event == NULL)
     return CMP_ERROR_INVALID_ARG;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return cmp_event_push(event);
 }
 
@@ -3010,9 +3735,10 @@ int cmp_test_simulate_input(const cmp_event_t *event) {
  */
 int cmp_test_capture_snapshot(cmp_window_t *window, void **out_pixels,
                               int *out_width, int *out_height) {
+  int rc;
+  rc = 0;
   if (window == NULL || out_pixels == NULL)
     return CMP_ERROR_INVALID_ARG;
-
 #if defined(_WIN32)
   if (window->hwnd) {
     HDC hScreenDC = GetDC(window->hwnd);
@@ -3093,7 +3819,16 @@ int cmp_test_capture_snapshot(cmp_window_t *window, void **out_pixels,
     *out_width = window->config.width;
   if (out_height)
     *out_height = window->config.height;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -3104,10 +3839,21 @@ int cmp_test_capture_snapshot(cmp_window_t *window, void **out_pixels,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_devtools_set_enabled(cmp_window_t *window, int enable) {
+  int rc;
+  rc = 0;
   if (window == NULL)
     return CMP_ERROR_INVALID_ARG;
   (void)enable; /* Toggle a flag in window struct later */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -3129,6 +3875,9 @@ int cmp_window_set_ui_tree(cmp_window_t *window, cmp_ui_node_t *tree) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_window_set_ui_tree: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }

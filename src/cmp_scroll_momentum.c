@@ -1,11 +1,14 @@
 /* clang-format off */
 #include "cmp.h"
+
 #include <stdlib.h>
 #include <math.h>
+
+#include "cmp_log.h"
 /* clang-format on */
 
 /**
- * @brief cmp_scroll_momentum_calculate
+ * @brief Calculate scroll momentum.
  *
  * @param initial_velocity Parameter description.
  * @param elapsed_time_ms Parameter description.
@@ -21,8 +24,10 @@ int cmp_scroll_momentum_calculate(float initial_velocity, float elapsed_time_ms,
   float frames_elapsed;
   float current_velocity;
 
-  if (!out_offset || !out_current_velocity)
+  if (out_offset == NULL || out_current_velocity == NULL) {
+    LOG_DEBUG("Invalid argument: out_offset or out_current_velocity is NULL\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   /* Standard exponential decay: v(t) = v0 * decay^(t/ms_per_frame) */
   /* Assuming standard 16.6ms frame duration for delta calculations */

@@ -24,13 +24,35 @@ struct cmp_i18n {
 static cmp_text_direction_t g_bidi_dir = CMP_TEXT_DIR_LTR;
 
 int cmp_i18n_init(void) {
+  int rc;
+  rc = 0;
   LOG_DEBUG("cmp_i18n_init called\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int cmp_i18n_shutdown(void) {
+  int rc;
+  rc = 0;
   LOG_DEBUG("cmp_i18n_shutdown called\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int cmp_i18n_detect_os_locale(cmp_string_t *out_locale) {
@@ -43,7 +65,6 @@ int cmp_i18n_detect_os_locale(cmp_string_t *out_locale) {
   rc = CMP_MALLOC(3, (void **)&data);
   if (rc != CMP_SUCCESS)
     return CMP_ERROR_OOM;
-
 #if defined(_MSC_VER)
   strcpy_s(data, 3, "en");
 #else
@@ -56,11 +77,22 @@ int cmp_i18n_detect_os_locale(cmp_string_t *out_locale) {
 }
 
 int cmp_i18n_load_catalog(const char *virtual_path, const char *locale) {
+  int rc;
+  rc = 0;
   if (!virtual_path || !locale) {
     LOG_DEBUG("cmp_i18n_load_catalog: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int cmp_i18n_translate(const char *key, cmp_string_t *out_translated) {
@@ -75,7 +107,6 @@ int cmp_i18n_translate(const char *key, cmp_string_t *out_translated) {
   rc = CMP_MALLOC(len + 1, (void **)&data);
   if (rc != CMP_SUCCESS)
     return CMP_ERROR_OOM;
-
 #if defined(_MSC_VER)
   strcpy_s(data, len + 1, key);
 #else
@@ -103,7 +134,6 @@ int cmp_i18n_translate_plural(const char *key, int count,
   rc = CMP_MALLOC(len + 1, (void **)&data);
   if (rc != CMP_SUCCESS)
     return CMP_ERROR_OOM;
-
 #if defined(_MSC_VER)
   sprintf_s(data, len + 1, "%s_plural", key);
 #else
@@ -116,13 +146,20 @@ int cmp_i18n_translate_plural(const char *key, int count,
 }
 
 int cmp_i18n_format(const char *format_str, cmp_string_t *out_str, ...) {
+  int rc;
+  rc = 0;
   va_list args;
   char buffer[1024];
   size_t len;
   char *data = NULL;
   int written = 0;
-  int rc;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   if (!format_str || !out_str) {
     LOG_DEBUG("cmp_i18n_format: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -167,7 +204,6 @@ int cmp_i18n_format(const char *format_str, cmp_string_t *out_str, ...) {
   rc = CMP_MALLOC(len + 1, (void **)&data);
   if (rc != CMP_SUCCESS)
     return CMP_ERROR_OOM;
-
 #if defined(_MSC_VER)
   strcpy_s(data, len + 1, buffer);
 #else
@@ -182,19 +218,51 @@ int cmp_i18n_format(const char *format_str, cmp_string_t *out_str, ...) {
 }
 
 int cmp_i18n_set_bidi_direction(cmp_text_direction_t dir) {
+  int rc;
+  rc = 0;
   g_bidi_dir = dir;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
-int cmp_i18n_get_bidi_direction(void) { return g_bidi_dir; }
+int cmp_i18n_get_bidi_direction(void) {
+  int rc;
+  rc = 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  return g_bidi_dir;
+}
 
 int cmp_i18n_is_rtl(int *out_is_rtl) {
+  int rc;
+  rc = 0;
   if (!out_is_rtl) {
     LOG_DEBUG("cmp_i18n_is_rtl: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_is_rtl = (g_bidi_dir == CMP_TEXT_DIR_RTL) ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int cmp_i18n_create(cmp_i18n_t **out_i18n) {
@@ -213,16 +281,29 @@ int cmp_i18n_create(cmp_i18n_t **out_i18n) {
 }
 
 int cmp_i18n_destroy(cmp_i18n_t *i18n) {
+  int rc;
+  rc = 0;
   if (!i18n) {
     LOG_DEBUG("cmp_i18n_destroy: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
   CMP_FREE(i18n);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int cmp_i18n_add_string(cmp_i18n_t *i18n, const char *locale, const char *key,
                         const char *value) {
+  int rc;
+  rc = 0;
   cmp_i18n_string_t *entry;
   if (!i18n || !locale || !key || !value) {
     LOG_DEBUG("cmp_i18n_add_string: invalid argument\n");
@@ -245,7 +326,16 @@ int cmp_i18n_add_string(cmp_i18n_t *i18n, const char *locale, const char *key,
   strncpy(entry->value, value, sizeof(entry->value) - 1);
   entry->value[sizeof(entry->value) - 1] = '\0';
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int cmp_i18n_get_string(const cmp_i18n_t *i18n, const char *locale,

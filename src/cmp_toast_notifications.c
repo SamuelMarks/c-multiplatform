@@ -27,7 +27,8 @@ struct cmp_toast_manager {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toast_manager_create(cmp_toast_manager_t **out_manager) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_toast_manager_t *manager;
 
   if (!out_manager) {
@@ -61,7 +62,8 @@ int cmp_toast_manager_create(cmp_toast_manager_t **out_manager) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toast_manager_destroy(cmp_toast_manager_t *manager) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   size_t i;
   if (!manager) {
     return CMP_ERROR_INVALID_ARG;
@@ -97,7 +99,8 @@ int cmp_toast_manager_destroy(cmp_toast_manager_t *manager) {
 int cmp_toast_manager_push(cmp_toast_manager_t *manager,
                            cmp_toast_level_t level, const char *message,
                            unsigned int duration_ms) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_toast_t *toast;
   cmp_toast_t **new_array;
 
@@ -145,7 +148,8 @@ int cmp_toast_manager_push(cmp_toast_manager_t *manager,
  */
 int cmp_toast_manager_tick(cmp_toast_manager_t *manager,
                            unsigned int delta_time_ms) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   size_t i, j;
 
   if (!manager) {
@@ -186,10 +190,21 @@ int cmp_toast_manager_tick(cmp_toast_manager_t *manager,
  */
 int cmp_toast_manager_get_active_count(const cmp_toast_manager_t *manager,
                                        size_t *out_count) {
+  int rc;
+  rc = 0;
   if (!manager || !out_count) {
     return CMP_ERROR_INVALID_ARG;
   }
 
   *out_count = manager->count;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

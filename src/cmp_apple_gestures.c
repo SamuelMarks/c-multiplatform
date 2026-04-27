@@ -18,7 +18,8 @@ struct cmp_apple_gestures {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_apple_gestures_create(cmp_apple_gestures_t **out_gestures) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_apple_gestures_t *gest = NULL;
@@ -32,6 +33,9 @@ int cmp_apple_gestures_create(cmp_apple_gestures_t **out_gestures) {
     cmp_log_debug(
         "cmp_apple_gestures_create: Invalid argument (out_gestures=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -42,6 +46,9 @@ int cmp_apple_gestures_create(cmp_apple_gestures_t **out_gestures) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_apple_gestures_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -52,6 +59,9 @@ int cmp_apple_gestures_create(cmp_apple_gestures_t **out_gestures) {
   *out_gestures = gest;
   cmp_log_debug(
       "cmp_apple_gestures_create: Successfully created gestures context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -62,7 +72,8 @@ int cmp_apple_gestures_create(cmp_apple_gestures_t **out_gestures) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_apple_gestures_destroy(cmp_apple_gestures_t *gestures) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -75,12 +86,24 @@ int cmp_apple_gestures_destroy(cmp_apple_gestures_t *gestures) {
     cmp_log_debug(
         "cmp_apple_gestures_destroy: Invalid argument (gestures=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   CMP_FREE(gestures);
   cmp_log_debug(
       "cmp_apple_gestures_destroy: Successfully destroyed gestures context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -97,7 +120,8 @@ int cmp_apple_gestures_destroy(cmp_apple_gestures_t *gestures) {
 int cmp_apple_gestures_enable(cmp_apple_gestures_t *gestures,
                               cmp_window_t *window, int enable_pinch,
                               int enable_rotation, int enable_swipe) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -108,6 +132,9 @@ int cmp_apple_gestures_enable(cmp_apple_gestures_t *gestures,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_apple_gestures_enable: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -121,6 +148,9 @@ int cmp_apple_gestures_enable(cmp_apple_gestures_t *gestures,
     cmp_log_debug(
         "cmp_apple_gestures_enable: Failed to enable window gestures: %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -131,5 +161,8 @@ int cmp_apple_gestures_enable(cmp_apple_gestures_t *gestures,
   cmp_log_debug("cmp_apple_gestures_enable: Enabled gestures (pinch=%d, "
                 "rotation=%d, swipe=%d)\n",
                 enable_pinch, enable_rotation, enable_swipe);
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

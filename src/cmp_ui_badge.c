@@ -28,7 +28,8 @@ struct cmp_ui_badge {
  */
 int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
                         uint32_t bg_color, uint32_t text_color) {
-  int rc = 0;
+  int rc;
+  rc = 0;
   cmp_ui_badge_t *badge = NULL;
   size_t len = 0;
   cmp_string_t translated = {NULL, 0, 0};
@@ -99,6 +100,9 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_create: CMP_FREE badge failed\n");
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -122,6 +126,9 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_create: CMP_FREE badge failed\n");
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -143,7 +150,8 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_badge_destroy(cmp_ui_badge_t *badge) {
-  int rc = 0;
+  int rc;
+  rc = 0;
   if (!badge) {
     LOG_DEBUG("cmp_ui_badge_destroy: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -163,6 +171,9 @@ int cmp_ui_badge_destroy(cmp_ui_badge_t *badge) {
   rc = CMP_FREE(badge);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_badge_destroy: CMP_FREE badge failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -176,12 +187,23 @@ int cmp_ui_badge_destroy(cmp_ui_badge_t *badge) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_badge_get_node(cmp_ui_badge_t *badge, cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!badge || !out_node) {
     LOG_DEBUG("cmp_ui_badge_get_node: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = badge->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -192,7 +214,8 @@ int cmp_ui_badge_get_node(cmp_ui_badge_t *badge, cmp_ui_node_t **out_node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text) {
-  int rc = 0;
+  int rc;
+  rc = 0;
   size_t len = 0;
   cmp_string_t translated = {NULL, 0, 0};
   const char *final_text = text;
@@ -253,7 +276,8 @@ int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_badge_bind_a11y(cmp_ui_badge_t *widget, cmp_a11y_tree_t *tree) {
-  int rc = 0;
+  int rc;
+  rc = 0;
   if (!widget || !tree) {
     LOG_DEBUG("cmp_ui_badge_bind_a11y: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -266,6 +290,9 @@ int cmp_ui_badge_bind_a11y(cmp_ui_badge_t *widget, cmp_a11y_tree_t *tree) {
                               "Badge");
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_badge_bind_a11y: cmp_a11y_tree_add_node failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;

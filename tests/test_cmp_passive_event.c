@@ -27,21 +27,26 @@ TEST test_add_passive_listener(void) {
 TEST test_prevent_default(void) {
   cmp_event_t evt = {0};
   cmp_event_t passive_evt = {0};
+  int out_val = 0;
 
   /* Normal prevent default */
   ASSERT_EQ(CMP_SUCCESS, cmp_event_prevent_default(&evt));
-  ASSERT_EQ(1, cmp_event_is_default_prevented(&evt));
+  ASSERT_EQ(CMP_SUCCESS, cmp_event_is_default_prevented(&evt, &out_val));
+  ASSERT_EQ(1, out_val);
 
   /* Passive prevent default (failure) */
   passive_evt.modifiers = 0x80000000; /* Mock passive context */
   ASSERT_EQ(CMP_ERROR_BOUNDS, cmp_event_prevent_default(&passive_evt));
-  ASSERT_EQ(0, cmp_event_is_default_prevented(&passive_evt));
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_event_is_default_prevented(&passive_evt, &out_val));
+  ASSERT_EQ(0, out_val);
 
   PASS();
 }
 
 TEST test_passive_event_edge_cases(void) {
   cmp_ui_node_t node = {0};
+  int out_val = 0;
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ui_node_add_passive_listener(
                                        NULL, 1, mock_passive_callback, NULL));
@@ -49,7 +54,8 @@ TEST test_passive_event_edge_cases(void) {
             cmp_ui_node_add_passive_listener(&node, 1, NULL, NULL));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_event_prevent_default(NULL));
-  ASSERT_EQ(0, cmp_event_is_default_prevented(NULL));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_event_is_default_prevented(NULL, &out_val));
 
   PASS();
 }

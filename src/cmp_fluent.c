@@ -18,7 +18,8 @@ struct cmp_fluent_reveal {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent_reveal_create(cmp_fluent_reveal_t **out_reveal) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_fluent_reveal *ctx = NULL;
@@ -32,6 +33,9 @@ int cmp_fluent_reveal_create(cmp_fluent_reveal_t **out_reveal) {
     cmp_log_debug(
         "cmp_fluent_reveal_create: Invalid argument (out_reveal=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -42,6 +46,9 @@ int cmp_fluent_reveal_create(cmp_fluent_reveal_t **out_reveal) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_fluent_reveal_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -59,7 +66,8 @@ int cmp_fluent_reveal_create(cmp_fluent_reveal_t **out_reveal) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent_reveal_destroy(cmp_fluent_reveal_t *reveal) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_fluent_reveal *ctx = (struct cmp_fluent_reveal *)reveal;
@@ -71,6 +79,9 @@ int cmp_fluent_reveal_destroy(cmp_fluent_reveal_t *reveal) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_fluent_reveal_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -94,7 +105,8 @@ int cmp_fluent_reveal_destroy(cmp_fluent_reveal_t *reveal) {
  */
 int cmp_fluent_reveal_update_pointer(cmp_fluent_reveal_t *reveal,
                                      float pointer_x, float pointer_y) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_fluent_reveal *ctx = (struct cmp_fluent_reveal *)reveal;
@@ -107,13 +119,25 @@ int cmp_fluent_reveal_update_pointer(cmp_fluent_reveal_t *reveal,
     }
     cmp_log_debug("cmp_fluent_reveal_update_pointer: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   ctx->pointer_x = pointer_x;
   ctx->pointer_y = pointer_y;
   cmp_log_debug("cmp_fluent_reveal_update_pointer: Tracked pointer location\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 struct cmp_acrylic_noise {
@@ -132,7 +156,8 @@ struct cmp_acrylic_noise {
  */
 int cmp_acrylic_noise_create(int width, int height,
                              cmp_acrylic_noise_t **out_noise) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_acrylic_noise *ctx = NULL;
@@ -144,6 +169,9 @@ int cmp_acrylic_noise_create(int width, int height,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_acrylic_noise_create: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -155,6 +183,9 @@ int cmp_acrylic_noise_create(int width, int height,
     }
     cmp_log_debug("cmp_acrylic_noise_create: Out of memory for context: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -198,7 +229,8 @@ int cmp_acrylic_noise_create(int width, int height,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_acrylic_noise_destroy(cmp_acrylic_noise_t *noise) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_acrylic_noise *ctx = (struct cmp_acrylic_noise *)noise;
@@ -210,6 +242,9 @@ int cmp_acrylic_noise_destroy(cmp_acrylic_noise_t *noise) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_acrylic_noise_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 

@@ -26,7 +26,7 @@ typedef struct cmp_ui_switch cmp_ui_switch_t;
  * \param out_switch Pointer to store the created handle.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_switch_create(cmp_ui_switch_t **out_switch);
+int CMP_API cmp_ui_switch_create(cmp_ui_switch_t **out_switch);
 
 /**
  * \brief Destroys a Switch component.
@@ -34,7 +34,7 @@ CMP_API int cmp_ui_switch_create(cmp_ui_switch_t **out_switch);
  * \param sw The component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_switch_destroy(cmp_ui_switch_t *sw);
+int CMP_API cmp_ui_switch_destroy(cmp_ui_switch_t *sw);
 
 /**
  * \brief Retrieves the underlying UI node for the Switch.
@@ -43,7 +43,7 @@ CMP_API int cmp_ui_switch_destroy(cmp_ui_switch_t *sw);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_switch_get_node(cmp_ui_switch_t *sw,
+int CMP_API cmp_ui_switch_get_node(cmp_ui_switch_t *sw,
                                    cmp_ui_node_t **out_node);
 
 /**
@@ -53,7 +53,7 @@ CMP_API int cmp_ui_switch_get_node(cmp_ui_switch_t *sw,
  * \param is_on 1 for ON, 0 for OFF.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_switch_set_on(cmp_ui_switch_t *sw, int is_on);
+int CMP_API cmp_ui_switch_set_on(cmp_ui_switch_t *sw, int is_on);
 
 /**
  * \brief Binds the widget to the accessibility tree.
@@ -62,9 +62,8 @@ CMP_API int cmp_ui_switch_set_on(cmp_ui_switch_t *sw, int is_on);
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_switch_bind_a11y(cmp_ui_switch_t *widget,
+int CMP_API cmp_ui_switch_bind_a11y(cmp_ui_switch_t *widget,
                                     cmp_a11y_tree_t *tree);
-
 #ifdef __cplusplus
 
 #endif /* __cplusplus */

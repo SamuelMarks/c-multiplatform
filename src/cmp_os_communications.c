@@ -79,6 +79,8 @@ int cmp_os_communications_destroy(cmp_os_communications_t *ctx_opaque) {
 int cmp_os_communications_register_intent(cmp_os_communications_t *ctx_opaque,
                                           const char *intent_id,
                                           const char *title) {
+  int rc;
+  rc = 0;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || intent_id == NULL || title == NULL) {
@@ -107,6 +109,8 @@ int cmp_os_communications_show_share_sheet(cmp_os_communications_t *ctx_opaque,
                                            cmp_window_t *window,
                                            const char *url_to_share,
                                            const char *text_to_share) {
+  int rc;
+  rc = 0;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || window == NULL ||
@@ -134,6 +138,8 @@ int cmp_os_communications_show_share_sheet(cmp_os_communications_t *ctx_opaque,
 int cmp_os_communications_broadcast_handoff(cmp_os_communications_t *ctx_opaque,
                                             const char *activity_type,
                                             const char *payload) {
+  int rc;
+  rc = 0;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || activity_type == NULL || payload == NULL) {
@@ -161,6 +167,8 @@ int cmp_os_communications_broadcast_handoff(cmp_os_communications_t *ctx_opaque,
 int cmp_os_communications_index_for_spotlight(
     cmp_os_communications_t *ctx_opaque, const char *item_id, const char *title,
     const char *description) {
+  int rc;
+  rc = 0;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || item_id == NULL || title == NULL ||
@@ -187,6 +195,8 @@ int cmp_os_communications_index_for_spotlight(
  */
 int cmp_os_communications_evaluate_focus_mode(
     cmp_os_communications_t *ctx_opaque, int *out_is_suppressed) {
+  int rc;
+  rc = 0;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || out_is_suppressed == NULL) {
@@ -197,7 +207,6 @@ int cmp_os_communications_evaluate_focus_mode(
 
   ctx = (struct cmp_os_communications *)ctx_opaque;
   *out_is_suppressed = ctx->is_focus_mode_suppressed;
-
   return CMP_SUCCESS;
 }
 
@@ -210,6 +219,8 @@ int cmp_os_communications_evaluate_focus_mode(
  */
 int cmp_os_communications_start_shareplay(cmp_os_communications_t *ctx_opaque,
                                           const char *activity_id) {
+  int rc;
+  rc = 0;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || activity_id == NULL) {

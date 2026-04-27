@@ -26,7 +26,7 @@ typedef struct cmp_ui_divider cmp_ui_divider_t;
  * \param out_divider Pointer to store the created handle.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_divider_create(cmp_ui_divider_t **out_divider);
+int CMP_API cmp_ui_divider_create(cmp_ui_divider_t **out_divider);
 
 /**
  * \brief Destroys a Divider component.
@@ -34,7 +34,7 @@ CMP_API int cmp_ui_divider_create(cmp_ui_divider_t **out_divider);
  * \param divider The component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_divider_destroy(cmp_ui_divider_t *divider);
+int CMP_API cmp_ui_divider_destroy(cmp_ui_divider_t *divider);
 
 /**
  * \brief Retrieves the underlying UI node for the Divider.
@@ -43,7 +43,7 @@ CMP_API int cmp_ui_divider_destroy(cmp_ui_divider_t *divider);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_divider_get_node(cmp_ui_divider_t *divider,
+int CMP_API cmp_ui_divider_get_node(cmp_ui_divider_t *divider,
                                     cmp_ui_node_t **out_node);
 
 /**
@@ -53,9 +53,8 @@ CMP_API int cmp_ui_divider_get_node(cmp_ui_divider_t *divider,
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_divider_bind_a11y(cmp_ui_divider_t *widget,
+int CMP_API cmp_ui_divider_bind_a11y(cmp_ui_divider_t *widget,
                                      cmp_a11y_tree_t *tree);
-
 #ifdef __cplusplus
 
 #endif /* __cplusplus */

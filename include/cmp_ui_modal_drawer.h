@@ -26,7 +26,7 @@ typedef struct cmp_ui_modal_drawer cmp_ui_modal_drawer_t;
  * \param out_drawer Pointer to store the created handle.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer);
+int CMP_API cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer);
 
 /**
  * \brief Destroys a Modal Drawer component.
@@ -34,7 +34,7 @@ CMP_API int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer);
  * \param drawer The component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_modal_drawer_destroy(cmp_ui_modal_drawer_t *drawer);
+int CMP_API cmp_ui_modal_drawer_destroy(cmp_ui_modal_drawer_t *drawer);
 
 /**
  * \brief Retrieves the underlying UI node for the Modal Drawer.
@@ -43,7 +43,7 @@ CMP_API int cmp_ui_modal_drawer_destroy(cmp_ui_modal_drawer_t *drawer);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_modal_drawer_get_node(cmp_ui_modal_drawer_t *drawer,
+int CMP_API cmp_ui_modal_drawer_get_node(cmp_ui_modal_drawer_t *drawer,
                                          cmp_ui_node_t **out_node);
 
 /**
@@ -53,7 +53,7 @@ CMP_API int cmp_ui_modal_drawer_get_node(cmp_ui_modal_drawer_t *drawer,
  * \param open 1 to open, 0 to close.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_modal_drawer_set_open(cmp_ui_modal_drawer_t *drawer,
+int CMP_API cmp_ui_modal_drawer_set_open(cmp_ui_modal_drawer_t *drawer,
                                          int open);
 
 /**
@@ -65,7 +65,7 @@ CMP_API int cmp_ui_modal_drawer_set_open(cmp_ui_modal_drawer_t *drawer,
  * \param out_index Receives the index of the newly added item.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_modal_drawer_add_item(cmp_ui_modal_drawer_t *drawer,
+int CMP_API cmp_ui_modal_drawer_add_item(cmp_ui_modal_drawer_t *drawer,
                                          const char *icon_name,
                                          const char *label, int *out_index);
 
@@ -76,7 +76,7 @@ CMP_API int cmp_ui_modal_drawer_add_item(cmp_ui_modal_drawer_t *drawer,
  * \param index The item index to select.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_modal_drawer_set_selected(cmp_ui_modal_drawer_t *drawer,
+int CMP_API cmp_ui_modal_drawer_set_selected(cmp_ui_modal_drawer_t *drawer,
                                              int index);
 
 /**
@@ -86,9 +86,8 @@ CMP_API int cmp_ui_modal_drawer_set_selected(cmp_ui_modal_drawer_t *drawer,
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_modal_drawer_bind_a11y(cmp_ui_modal_drawer_t *widget,
+int CMP_API cmp_ui_modal_drawer_bind_a11y(cmp_ui_modal_drawer_t *widget,
                                           cmp_a11y_tree_t *tree);
-
 #ifdef __cplusplus
 
 #endif /* __cplusplus */

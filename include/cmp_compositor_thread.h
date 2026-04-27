@@ -32,7 +32,6 @@ int cmp_compositor_thread_destroy(cmp_compositor_thread_t *thread);
  * @return 0 on success
  */
 int cmp_compositor_thread_push_tree(cmp_compositor_thread_t *thread, void *layer_tree_opaque);
-
 #ifdef __cplusplus
 }
 #endif

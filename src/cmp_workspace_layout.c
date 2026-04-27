@@ -61,6 +61,9 @@ int cmp_workspace_layout_destroy(cmp_workspace_layout_t *layout) {
   rc = CMP_FREE(layout);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_workspace_layout_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -76,6 +79,8 @@ int cmp_workspace_layout_destroy(cmp_workspace_layout_t *layout) {
  */
 int cmp_workspace_layout_set_pane_width(cmp_workspace_layout_t *layout,
                                         cmp_pane_type_t pane, float width) {
+  int rc;
+  rc = 0;
   if (!layout || pane >= CMP_PANE_COUNT) {
     LOG_DEBUG("cmp_workspace_layout_set_pane_width: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
@@ -86,7 +91,16 @@ int cmp_workspace_layout_set_pane_width(cmp_workspace_layout_t *layout,
   }
 
   layout->pane_widths[pane] = width;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -100,13 +114,24 @@ int cmp_workspace_layout_set_pane_width(cmp_workspace_layout_t *layout,
 int cmp_workspace_layout_get_pane_width(const cmp_workspace_layout_t *layout,
                                         cmp_pane_type_t pane,
                                         float *out_width) {
+  int rc;
+  rc = 0;
   if (!layout || pane >= CMP_PANE_COUNT || !out_width) {
     LOG_DEBUG("cmp_workspace_layout_get_pane_width: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
   *out_width = layout->pane_widths[pane];
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -118,13 +143,24 @@ int cmp_workspace_layout_get_pane_width(const cmp_workspace_layout_t *layout,
  */
 int cmp_workspace_layout_set_sidebar_glass(cmp_workspace_layout_t *layout,
                                            int enable_glass) {
+  int rc;
+  rc = 0;
   if (!layout) {
     LOG_DEBUG("cmp_workspace_layout_set_sidebar_glass: layout is NULL\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
   layout->sidebar_glass_enabled = enable_glass ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -139,6 +175,8 @@ int cmp_workspace_layout_set_sidebar_glass(cmp_workspace_layout_t *layout,
 int cmp_workspace_layout_hit_test_splitters(
     const cmp_workspace_layout_t *layout, float x, float y,
     int *out_is_over_splitter) {
+  int rc;
+  rc = 0;
   float s1_x, s2_x;
 
   if (!layout || !out_is_over_splitter) {
@@ -158,5 +196,14 @@ int cmp_workspace_layout_hit_test_splitters(
     *out_is_over_splitter = 0;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

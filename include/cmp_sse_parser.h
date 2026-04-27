@@ -32,7 +32,7 @@ typedef void (*cmp_sse_event_cb)(const char *event_name, const char *data,
  * @param user_data User pointer to pass to the callback.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_sse_parser_create(cmp_sse_parser_t **out_parser,
+int CMP_API cmp_sse_parser_create(cmp_sse_parser_t **out_parser,
                                   cmp_sse_event_cb callback, void *user_data);
 
 /**
@@ -40,7 +40,7 @@ CMP_API int cmp_sse_parser_create(cmp_sse_parser_t **out_parser,
  * @param parser The instance to destroy.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_sse_parser_destroy(cmp_sse_parser_t *parser);
+int CMP_API cmp_sse_parser_destroy(cmp_sse_parser_t *parser);
 
 /**
  * @brief Feeds a chunk of data into the parser.
@@ -49,9 +49,8 @@ CMP_API int cmp_sse_parser_destroy(cmp_sse_parser_t *parser);
  * @param len The length of the chunk.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_sse_parser_feed(cmp_sse_parser_t *parser, const char *chunk,
+int CMP_API cmp_sse_parser_feed(cmp_sse_parser_t *parser, const char *chunk,
                                 unsigned int len);
-
 #ifdef __cplusplus
 }
 #endif

@@ -39,6 +39,9 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
   rc = CMP_MALLOC(sizeof(cmp_ui_app_bar_t), (void **)&bar);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_create: OOM\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   memset(bar, 0, sizeof(cmp_ui_app_bar_t));
@@ -51,6 +54,9 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
     rc = CMP_FREE(bar);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_app_bar_create: CMP_FREE failed\n");
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -117,6 +123,9 @@ int cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar) {
   rc = CMP_FREE(bar);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -130,12 +139,23 @@ int cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_app_bar_get_node(cmp_ui_app_bar_t *bar, cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!bar || !out_node) {
     LOG_DEBUG("cmp_ui_app_bar_get_node: Invalid args\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = bar->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -167,6 +187,9 @@ int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title) {
     rc = CMP_MALLOC(len + 1, (void **)&bar->title);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_app_bar_set_title: OOM\n");
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     memcpy(bar->title, title, len + 1);
@@ -226,6 +249,9 @@ int cmp_ui_app_bar_add_action(cmp_ui_app_bar_t *bar,
   rc = cmp_ui_node_add_child(bar->node_root, action_node);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_add_action: cmp_ui_node_add_child failed\n");
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }

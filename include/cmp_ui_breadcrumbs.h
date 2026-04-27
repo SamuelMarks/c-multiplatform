@@ -27,7 +27,7 @@ typedef struct cmp_ui_breadcrumbs cmp_ui_breadcrumbs_t;
  * \param bg_color Background color of the breadcrumbs (ARGB).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_breadcrumbs_create(cmp_ui_breadcrumbs_t **out_breadcrumbs,
+int CMP_API cmp_ui_breadcrumbs_create(cmp_ui_breadcrumbs_t **out_breadcrumbs,
                                       uint32_t bg_color);
 
 /**
@@ -36,7 +36,7 @@ CMP_API int cmp_ui_breadcrumbs_create(cmp_ui_breadcrumbs_t **out_breadcrumbs,
  * \param breadcrumbs The breadcrumbs component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_breadcrumbs_destroy(cmp_ui_breadcrumbs_t *breadcrumbs);
+int CMP_API cmp_ui_breadcrumbs_destroy(cmp_ui_breadcrumbs_t *breadcrumbs);
 
 /**
  * \brief Retrieves the underlying UI node for the breadcrumbs.
@@ -45,7 +45,7 @@ CMP_API int cmp_ui_breadcrumbs_destroy(cmp_ui_breadcrumbs_t *breadcrumbs);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_breadcrumbs_get_node(cmp_ui_breadcrumbs_t *breadcrumbs,
+int CMP_API cmp_ui_breadcrumbs_get_node(cmp_ui_breadcrumbs_t *breadcrumbs,
                                         cmp_ui_node_t **out_node);
 
 /**
@@ -55,9 +55,8 @@ CMP_API int cmp_ui_breadcrumbs_get_node(cmp_ui_breadcrumbs_t *breadcrumbs,
  * \param segment The segment label text.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_breadcrumbs_add_segment(cmp_ui_breadcrumbs_t *breadcrumbs,
+int CMP_API cmp_ui_breadcrumbs_add_segment(cmp_ui_breadcrumbs_t *breadcrumbs,
                                            const char *segment);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

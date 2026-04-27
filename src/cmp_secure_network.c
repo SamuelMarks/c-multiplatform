@@ -1,13 +1,15 @@
 /* clang-format off */
 #include "cmp.h"
+
 #include <stdlib.h>
 #include <string.h>
+
+#include "cmp_log.h"
 
 #if defined(_WIN32)
 #if defined(_MSC_VER) && _MSC_VER <= 1400
 /* MSVC 2005 missing wincred.h */
 #else
-#include "cmp_log.h"
 #pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "credui.lib")
 
@@ -35,7 +37,6 @@ typedef struct _CREDENTIALA {
 
 __declspec(dllimport) int __stdcall CredReadA(const char* TargetName, DWORD Type, DWORD Flags, PCREDENTIALA* Credential);
 __declspec(dllimport) void __stdcall CredFree(PVOID Buffer);
-
 #define CRED_TYPE_GENERIC 1
 #endif
 #endif
@@ -55,14 +56,17 @@ struct cmp_secure_network {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_secure_network_create(cmp_secure_network_t **out_net) {
-  int rc = CMP_SUCCESS;
+  int rc;
   cmp_secure_network_t *net;
-  if (!out_net) {
+
+  rc = CMP_SUCCESS;
+
+  if (out_net == NULL) {
     LOG_DEBUG("cmp_secure_network_create: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
-  rc = CMP_MALLOC(sizeof(cmp_secure_network_t), (void **)&(net));
+  rc = CMP_MALLOC(sizeof(cmp_secure_network_t), (void **)&net);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_secure_network_create: OOM\n");
     return CMP_ERROR_OOM;
@@ -82,16 +86,21 @@ int cmp_secure_network_create(cmp_secure_network_t **out_net) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_secure_network_destroy(cmp_secure_network_t *net) {
-  int rc = CMP_SUCCESS;
-  if (!net) {
+  int rc;
+
+  rc = CMP_SUCCESS;
+
+  if (net == NULL) {
     LOG_DEBUG("cmp_secure_network_destroy: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
+
   rc = CMP_FREE(net);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_secure_network_destroy: Free failed with code %d\n", rc);
     return rc;
   }
+
   return CMP_SUCCESS;
 }
 
@@ -106,14 +115,14 @@ int cmp_secure_network_destroy(cmp_secure_network_t *net) {
  */
 int cmp_secure_network_send_https(cmp_secure_network_t *net, const char *url,
                                   int *out_status_code) {
-  if (!net || !url || !out_status_code) {
+  if (net == NULL || url == NULL || out_status_code == NULL) {
     LOG_DEBUG("cmp_secure_network_send_https: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
   /* Real integration uses c_abstract_http logic to negotiate TLS 1.3 socket */
-
   *out_status_code = 200;
+
   return CMP_SUCCESS;
 }
 
@@ -126,13 +135,21 @@ int cmp_secure_network_send_https(cmp_secure_network_t *net, const char *url,
  */
 int cmp_secure_network_set_proxy(cmp_secure_network_t *net,
                                  const char *proxy_url) {
-  if (!net || !proxy_url) {
+  if (net == NULL || proxy_url == NULL) {
     LOG_DEBUG("cmp_secure_network_set_proxy: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
+#if defined(_MSC_VER)
+  if (strncpy_s(net->proxy_url, 256, proxy_url, 255) != 0) {
+    LOG_DEBUG("strncpy_s failed\n");
+    return CMP_ERROR_GENERAL;
+  }
+#else
   strncpy(net->proxy_url, proxy_url, 255);
   net->proxy_url[255] = '\0';
+#endif
+
   net->use_proxy = 1;
 
   return CMP_SUCCESS;
@@ -148,7 +165,7 @@ int cmp_secure_network_set_proxy(cmp_secure_network_t *net,
  */
 int cmp_secure_network_retrieve_credential(const char *key_name,
                                            char *out_secret, size_t max_len) {
-  if (!key_name || !out_secret || max_len == 0) {
+  if (key_name == NULL || out_secret == NULL || max_len == 0) {
     LOG_DEBUG("cmp_secure_network_retrieve_credential: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
@@ -160,7 +177,9 @@ int cmp_secure_network_retrieve_credential(const char *key_name,
   {
     PCREDENTIALA pcred;
     if (CredReadA(key_name, CRED_TYPE_GENERIC, 0, &pcred)) {
-      size_t secret_len = pcred->CredentialBlobSize;
+      size_t secret_len;
+      secret_len = pcred->CredentialBlobSize;
+
       if (secret_len >= max_len) {
         secret_len = max_len - 1;
       }

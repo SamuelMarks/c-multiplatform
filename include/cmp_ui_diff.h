@@ -28,7 +28,7 @@ typedef struct cmp_ui_diff cmp_ui_diff_t;
  * \param new_text The updated text.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_diff_create(cmp_ui_diff_t **out_diff, const char *old_text,
+int CMP_API cmp_ui_diff_create(cmp_ui_diff_t **out_diff, const char *old_text,
                                const char *new_text);
 
 /**
@@ -37,7 +37,7 @@ CMP_API int cmp_ui_diff_create(cmp_ui_diff_t **out_diff, const char *old_text,
  * \param diff The component to destroy.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_diff_destroy(cmp_ui_diff_t *diff);
+int CMP_API cmp_ui_diff_destroy(cmp_ui_diff_t *diff);
 
 /**
  * \brief Retrieves the underlying UI node.
@@ -46,8 +46,7 @@ CMP_API int cmp_ui_diff_destroy(cmp_ui_diff_t *diff);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_diff_get_node(cmp_ui_diff_t *diff, cmp_ui_node_t **out_node);
-
+int CMP_API cmp_ui_diff_get_node(cmp_ui_diff_t *diff, cmp_ui_node_t **out_node);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

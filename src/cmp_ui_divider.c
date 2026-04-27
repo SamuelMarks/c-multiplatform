@@ -84,6 +84,9 @@ int cmp_ui_divider_destroy(cmp_ui_divider_t *divider) {
   rc = CMP_FREE(divider);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_divider_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -99,12 +102,23 @@ int cmp_ui_divider_destroy(cmp_ui_divider_t *divider) {
  */
 int cmp_ui_divider_get_node(cmp_ui_divider_t *divider,
                             cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!divider || !out_node) {
     LOG_DEBUG("cmp_ui_divider_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = divider->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -131,6 +145,9 @@ int cmp_ui_divider_bind_a11y(cmp_ui_divider_t *widget, cmp_a11y_tree_t *tree) {
                               "Divider");
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_divider_bind_a11y: cmp_a11y_tree_add_node failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 

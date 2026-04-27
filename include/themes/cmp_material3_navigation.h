@@ -19,7 +19,7 @@ typedef struct cmp_m3_bottom_app_bar_metrics {
   int max_action_items;
 } cmp_m3_bottom_app_bar_metrics_t;
 
-CMP_API int
+int CMP_API
 cmp_m3_bottom_app_bar_resolve(cmp_m3_bottom_app_bar_metrics_t *out_metrics);
 
 /**
@@ -32,7 +32,7 @@ typedef struct cmp_m3_bottom_nav_metrics {
   cmp_m3_shape_family_t active_indicator_shape;
 } cmp_m3_bottom_nav_metrics_t;
 
-CMP_API int cmp_m3_bottom_nav_resolve(cmp_m3_bottom_nav_metrics_t *out_metrics);
+int CMP_API cmp_m3_bottom_nav_resolve(cmp_m3_bottom_nav_metrics_t *out_metrics);
 
 /**
  * @brief Material 3 Navigation Drawer Variants
@@ -50,7 +50,7 @@ typedef struct cmp_m3_drawer_metrics {
   cmp_m3_shape_family_t active_item_shape;
 } cmp_m3_drawer_metrics_t;
 
-CMP_API int cmp_m3_drawer_resolve(cmp_m3_drawer_variant_t variant,
+int CMP_API cmp_m3_drawer_resolve(cmp_m3_drawer_variant_t variant,
                                   cmp_m3_drawer_metrics_t *out_metrics);
 
 /**
@@ -61,7 +61,7 @@ typedef struct cmp_m3_nav_rail_metrics {
   cmp_m3_shape_family_t active_indicator_shape;
 } cmp_m3_nav_rail_metrics_t;
 
-CMP_API int cmp_m3_nav_rail_resolve(cmp_m3_nav_rail_metrics_t *out_metrics);
+int CMP_API cmp_m3_nav_rail_resolve(cmp_m3_nav_rail_metrics_t *out_metrics);
 
 /**
  * @brief Material 3 Top App Bar Variants
@@ -79,7 +79,7 @@ typedef struct cmp_m3_top_app_bar_metrics {
   cmp_m3_elevation_level_t elevation_scrolled;
 } cmp_m3_top_app_bar_metrics_t;
 
-CMP_API int
+int CMP_API
 cmp_m3_top_app_bar_resolve(cmp_m3_top_app_bar_variant_t variant,
                            cmp_m3_top_app_bar_metrics_t *out_metrics);
 
@@ -97,9 +97,8 @@ typedef struct cmp_m3_tabs_metrics {
   float active_indicator_thickness; /* Valid for secondary */
 } cmp_m3_tabs_metrics_t;
 
-CMP_API int cmp_m3_tabs_resolve(cmp_m3_tabs_variant_t variant,
+int CMP_API cmp_m3_tabs_resolve(cmp_m3_tabs_variant_t variant,
                                 cmp_m3_tabs_metrics_t *out_metrics);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

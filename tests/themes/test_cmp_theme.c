@@ -21,7 +21,7 @@ TEST test_fuzz_dispatcher(void) {
     const cmp_theme_vtable_t *vt;
     node->design_language_override =
         (uint8_t)(rand() % 6); /* Include invalid high overrides > 4 */
-    vt = cmp_resolve_vtable(node);
+    cmp_resolve_vtable(node, &vt);
     ASSERT_NEQ(NULL, (void *)vt);
   }
 
@@ -39,51 +39,51 @@ TEST test_theme_resolve(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_node_add_child(node, child));
 
   /* Test NULL */
-  vt = cmp_resolve_vtable(NULL);
+  cmp_resolve_vtable(NULL, &vt);
   ASSERT_NEQ(NULL, (void *)vt); /* Unstyled */
 
   /* Test default inherit (falls back to unstyled) */
-  vt = cmp_resolve_vtable(child);
+  cmp_resolve_vtable(child, &vt);
   ASSERT_NEQ(NULL, (void *)vt);
 
   /* Test local override */
   child->design_language_override = 1; /* Material 3 */
-  vt = cmp_resolve_vtable(child);
+  cmp_resolve_vtable(child, &vt);
   ASSERT_NEQ(NULL, (void *)vt);
 
   child->design_language_override = 2; /* Fluent 2 */
-  vt = cmp_resolve_vtable(child);
+  cmp_resolve_vtable(child, &vt);
   ASSERT_NEQ(NULL, (void *)vt);
 
   child->design_language_override = 3; /* Cupertino */
-  vt = cmp_resolve_vtable(child);
+  cmp_resolve_vtable(child, &vt);
   ASSERT_NEQ(NULL, (void *)vt);
 
   child->design_language_override = 4; /* Unstyled */
-  vt = cmp_resolve_vtable(child);
+  cmp_resolve_vtable(child, &vt);
   ASSERT_NEQ(NULL, (void *)vt);
 
   /* Test parent override inheritance */
   child->design_language_override = 0; /* Inherit */
   node->design_language_override = 1;  /* Parent Material 3 */
-  vt = cmp_resolve_vtable(child);
+  cmp_resolve_vtable(child, &vt);
   ASSERT_NEQ(NULL, (void *)vt);
 
   node->design_language_override = 2; /* Parent Fluent 2 */
-  vt = cmp_resolve_vtable(child);
+  cmp_resolve_vtable(child, &vt);
   ASSERT_NEQ(NULL, (void *)vt);
 
   node->design_language_override = 3; /* Parent Cupertino */
-  vt = cmp_resolve_vtable(child);
+  cmp_resolve_vtable(child, &vt);
   ASSERT_NEQ(NULL, (void *)vt);
 
   node->design_language_override = 4; /* Parent Unstyled */
-  vt = cmp_resolve_vtable(child);
+  cmp_resolve_vtable(child, &vt);
   ASSERT_NEQ(NULL, (void *)vt);
 
   /* Default path through inherit */
   node->design_language_override = 0;
-  vt = cmp_resolve_vtable(child);
+  cmp_resolve_vtable(child, &vt);
   ASSERT_NEQ(NULL, (void *)vt);
 
   cmp_ui_node_destroy(node); /* Destroys child too */
@@ -114,9 +114,24 @@ TEST test_per_widget_override_scene(void) {
 
   /* Validate that runtime dispatch accurately provides 3 unique pointers for
    * the siblings */
-  ASSERT_EQ(cmp_resolve_vtable(btn_cuper), cmp_ffi_get_cupertino_vtable());
-  ASSERT_EQ(cmp_resolve_vtable(btn_fluent), cmp_ffi_get_fluent2_vtable());
-  ASSERT_EQ(cmp_resolve_vtable(btn_material), cmp_ffi_get_material3_vtable());
+  {
+    const cmp_theme_vtable_t *vt_res = NULL, *vt_ffi = NULL;
+    cmp_resolve_vtable(btn_cuper, &vt_res);
+    cmp_ffi_get_cupertino_vtable(&vt_ffi);
+    ASSERT_EQ(vt_res, vt_ffi);
+  }
+  {
+    const cmp_theme_vtable_t *vt_res = NULL, *vt_ffi = NULL;
+    cmp_resolve_vtable(btn_fluent, &vt_res);
+    cmp_ffi_get_fluent2_vtable(&vt_ffi);
+    ASSERT_EQ(vt_res, vt_ffi);
+  }
+  {
+    const cmp_theme_vtable_t *vt_res = NULL, *vt_ffi = NULL;
+    cmp_resolve_vtable(btn_material, &vt_res);
+    cmp_ffi_get_material3_vtable(&vt_ffi);
+    ASSERT_EQ(vt_res, vt_ffi);
+  }
 
   cmp_ui_node_destroy(root);
   PASS();

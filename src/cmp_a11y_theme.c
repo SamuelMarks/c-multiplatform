@@ -9,7 +9,6 @@ typedef unsigned long DWORD;
 typedef int BOOL;
 typedef char *LPSTR;
 typedef void *PVOID;
-
 #define SPI_GETHIGHCONTRAST 66
 #define HCF_HIGHCONTRASTON  0x00000001
 
@@ -34,9 +33,19 @@ __declspec(dllimport) BOOL __stdcall SystemParametersInfoA(
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_theme_init(void) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   /* Initialize any underlying resources or OS hooks if needed */
   cmp_log_debug("cmp_a11y_theme_init: initialized\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -46,9 +55,19 @@ int cmp_a11y_theme_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_theme_cleanup(void) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   /* Clean up */
   cmp_log_debug("cmp_a11y_theme_cleanup: cleaned up\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -60,7 +79,8 @@ int cmp_a11y_theme_cleanup(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_detect_high_contrast(int *out_is_hc) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -72,9 +92,11 @@ int cmp_a11y_detect_high_contrast(int *out_is_hc) {
     }
     cmp_log_debug("cmp_a11y_detect_high_contrast: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
-
 #if defined(_WIN32)
   {
     HIGHCONTRASTA hc;
@@ -84,6 +106,9 @@ int cmp_a11y_detect_high_contrast(int *out_is_hc) {
       if (hc.dwFlags & HCF_HIGHCONTRASTON) {
         cmp_log_debug("cmp_a11y_detect_high_contrast: High contrast is ON\n");
         *out_is_hc = 1;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     }
@@ -93,13 +118,40 @@ int cmp_a11y_detect_high_contrast(int *out_is_hc) {
 #endif
   cmp_log_debug("cmp_a11y_detect_high_contrast: High contrast is OFF\n");
   *out_is_hc = 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
 /* Helper to map standard colors based on color blindness types */
-static void apply_color_blindness(cmp_color_blind_type_t type,
-                                  cmp_color_t *out_accent,
-                                  cmp_color_t *out_error) {
+static int apply_color_blindness(cmp_color_blind_type_t type,
+                                 cmp_color_t *out_accent,
+                                 cmp_color_t *out_error) {
+  int rc;
+  rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
+
+  if (out_accent == NULL || out_error == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("apply_color_blindness: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+
   /* Default palettes for regular vision */
   /* Blue-ish primary */
   out_accent->r = 0.0f;
@@ -141,6 +193,10 @@ static void apply_color_blindness(cmp_color_blind_type_t type,
   default:
     break; /* Use defaults */
   }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -152,7 +208,8 @@ static void apply_color_blindness(cmp_color_blind_type_t type,
  */
 int cmp_a11y_build_theme(cmp_color_blind_type_t type,
                          cmp_a11y_theme_t *out_theme) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int is_hc;
   int err_rc;
   const char *err_str;
@@ -166,6 +223,9 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
     cmp_log_debug(
         "cmp_a11y_build_theme: Invalid argument (out_theme=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -177,6 +237,9 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
     }
     cmp_log_debug("cmp_a11y_build_theme: failed to detect high contrast: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   out_theme->is_high_contrast = is_hc;
@@ -215,12 +278,27 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
     out_theme->foreground.b = 0.9f;
     out_theme->foreground.a = 1.0f;
 
-    apply_color_blindness(type, &out_theme->primary_accent,
-                          &out_theme->error_text);
+    rc = apply_color_blindness(type, &out_theme->primary_accent,
+                               &out_theme->error_text);
+    if (rc != CMP_SUCCESS) {
+      err_rc = cmp_strerror(rc, &err_str);
+      if (err_rc != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      cmp_log_debug("cmp_a11y_build_theme: apply_color_blindness failed: %s\n",
+                    err_str);
+      if (rc != 0) {
+        return rc;
+      }
+      return rc;
+    }
   }
 
   cmp_log_debug(
       "cmp_a11y_build_theme: Built theme for color blind type %d, hc=%d\n",
       (int)type, is_hc);
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

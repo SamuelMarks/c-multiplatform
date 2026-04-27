@@ -26,6 +26,9 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
       }
       LOG_DEBUG("cmp_ui_box_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -41,6 +44,9 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -59,6 +65,9 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -93,6 +102,9 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
       }
       LOG_DEBUG("cmp_ui_text_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -108,6 +120,9 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_text_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -126,6 +141,9 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -171,6 +189,9 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
       }
       LOG_DEBUG("cmp_ui_button_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -186,6 +207,9 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_button_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -204,6 +228,9 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -244,6 +271,9 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
       }
       LOG_DEBUG("cmp_ui_text_input_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -259,6 +289,9 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_text_input_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -277,6 +310,9 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -308,6 +344,9 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
       }
       LOG_DEBUG("cmp_ui_checkbox_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -323,6 +362,9 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_checkbox_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -342,6 +384,9 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -352,7 +397,6 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
       CMP_FREE(node);
       return CMP_ERROR_OOM;
     }
-
 #if defined(_MSC_VER)
     strcpy_s(label_copy, len + 1, label);
 #else
@@ -388,6 +432,9 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
       }
       LOG_DEBUG("cmp_ui_radio_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -403,6 +450,9 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_radio_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -421,6 +471,9 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -464,6 +517,9 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
       }
       LOG_DEBUG("cmp_ui_image_view_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -479,6 +535,9 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_image_view_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -497,6 +556,9 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -577,6 +639,9 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
       }
       LOG_DEBUG("cmp_ui_slider_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -592,6 +657,9 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_slider_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -610,6 +678,9 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -649,6 +720,9 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
       }
       LOG_DEBUG("cmp_ui_list_view_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -664,6 +738,9 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_list_view_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -682,6 +759,9 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -713,6 +793,9 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
       }
       LOG_DEBUG("cmp_ui_grid_view_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -728,6 +811,9 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_grid_view_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -746,6 +832,9 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -784,6 +873,9 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
       }
       LOG_DEBUG("cmp_ui_dropdown_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -799,6 +891,9 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_dropdown_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -817,6 +912,9 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -846,6 +944,9 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
       }
       LOG_DEBUG("cmp_ui_modal_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -861,6 +962,9 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_modal_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -879,6 +983,9 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -908,6 +1015,9 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
       }
       LOG_DEBUG("cmp_ui_canvas_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -923,6 +1033,9 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_canvas_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -941,6 +1054,9 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -970,6 +1086,9 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
       }
       LOG_DEBUG("cmp_ui_rich_text_create: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -985,6 +1104,9 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_rich_text_create CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -1003,6 +1125,9 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -1031,6 +1156,9 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
       }
       LOG_DEBUG("cmp_ui_node_add_child: %s\n", err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -1051,6 +1179,9 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
           err_str = "Unknown";
         }
         LOG_DEBUG("cmp_ui_node_add_child CMP_MALLOC: %s\n", err_str);
+      }
+      if (rc != 0) {
+        return rc;
       }
       return rc;
     }
@@ -1086,6 +1217,8 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
 int disabled_cmp_event_dispatch_run(cmp_ui_node_t *tree,
                                     cmp_ui_node_t *target_node,
                                     cmp_event_t *event) {
+  int rc;
+  rc = 0;
   cmp_ui_node_t *path[64];
   int path_len = 0;
   int i;
@@ -1125,7 +1258,16 @@ int disabled_cmp_event_dispatch_run(cmp_ui_node_t *tree,
     }
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -1137,9 +1279,10 @@ int disabled_cmp_event_dispatch_run(cmp_ui_node_t *tree,
  * @param user_data
  * @return
  */
-int disabled_cmp_ui_node_add_event_listener(
+CMP_EXEMPT(int disabled_cmp_ui_node_add_event_listener(
     cmp_ui_node_t *node, uint32_t event_type, int capture,
-    void (*callback)(cmp_event_t *, cmp_ui_node_t *, void *), void *user_data) {
+    void (*callback)(cmp_event_t *, cmp_ui_node_t *, void *),
+    void *user_data)) {
   cmp_event_listener_node_t *listener;
 
   if (node == NULL || callback == NULL) {
@@ -1184,6 +1327,9 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
         err_str = "Unknown";
       }
       LOG_DEBUG("cmp_ui_node_destroy: %s\n", err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }

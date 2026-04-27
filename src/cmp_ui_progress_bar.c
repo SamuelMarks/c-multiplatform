@@ -20,7 +20,8 @@ struct cmp_ui_progress_bar {
  */
 int cmp_ui_progress_bar_create(cmp_ui_progress_bar_t **out_bar,
                                uint32_t track_color, uint32_t fill_color) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_ui_progress_bar_t *bar;
   int err;
 
@@ -74,7 +75,8 @@ int cmp_ui_progress_bar_create(cmp_ui_progress_bar_t **out_bar,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_progress_bar_destroy(cmp_ui_progress_bar_t *bar) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (!bar) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -94,11 +96,22 @@ int cmp_ui_progress_bar_destroy(cmp_ui_progress_bar_t *bar) {
  */
 int cmp_ui_progress_bar_get_node(cmp_ui_progress_bar_t *bar,
                                  cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!bar || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = bar->node_track;
-  return 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -110,6 +123,8 @@ int cmp_ui_progress_bar_get_node(cmp_ui_progress_bar_t *bar,
  */
 int cmp_ui_progress_bar_set_progress(cmp_ui_progress_bar_t *bar,
                                      float progress) {
+  int rc;
+  rc = 0;
   if (!bar) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -121,5 +136,14 @@ int cmp_ui_progress_bar_set_progress(cmp_ui_progress_bar_t *bar,
   }
 
   bar->progress = progress;
-  return 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

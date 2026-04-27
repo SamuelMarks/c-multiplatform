@@ -17,7 +17,8 @@ struct cmp_syntax_highlighter {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_syntax_highlighter_create(cmp_syntax_highlighter_t **out_hl) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_syntax_highlighter_t *hl;
 
   if (!out_hl) {
@@ -43,7 +44,8 @@ int cmp_syntax_highlighter_create(cmp_syntax_highlighter_t **out_hl) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_syntax_highlighter_destroy(cmp_syntax_highlighter_t *hl) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (!hl) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -68,7 +70,8 @@ int cmp_syntax_highlighter_parse(cmp_syntax_highlighter_t *hl,
                                  const char *source_code, const char *language,
                                  cmp_highlight_span_t **out_spans,
                                  size_t *out_count) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_highlight_span_t *spans;
   size_t capacity;
   size_t count;
@@ -225,7 +228,8 @@ int cmp_syntax_highlighter_parse(cmp_syntax_highlighter_t *hl,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_syntax_highlighter_free_spans(cmp_highlight_span_t *spans) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (spans) {
     rc = CMP_FREE(spans);
     if (rc != CMP_SUCCESS) {

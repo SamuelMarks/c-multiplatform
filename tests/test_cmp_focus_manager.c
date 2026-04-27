@@ -100,7 +100,6 @@ SUITE(focus_manager_suite) {
   RUN_TEST(test_focus_manager_null_args);
   RUN_TEST(test_focus_manager_operations);
 }
-
 #ifdef __cplusplus
 extern "C" {
 #endif

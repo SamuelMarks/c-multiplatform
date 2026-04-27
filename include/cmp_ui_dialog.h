@@ -28,7 +28,7 @@ typedef struct cmp_ui_dialog cmp_ui_dialog_t;
  * \param content Optional text content. Can be NULL.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_dialog_create(cmp_ui_dialog_t **out_dialog,
+int CMP_API cmp_ui_dialog_create(cmp_ui_dialog_t **out_dialog,
                                  const char *title, const char *content);
 
 /**
@@ -37,7 +37,7 @@ CMP_API int cmp_ui_dialog_create(cmp_ui_dialog_t **out_dialog,
  * \param dialog The component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_dialog_destroy(cmp_ui_dialog_t *dialog);
+int CMP_API cmp_ui_dialog_destroy(cmp_ui_dialog_t *dialog);
 
 /**
  * \brief Retrieves the underlying UI node for the Dialog.
@@ -46,7 +46,7 @@ CMP_API int cmp_ui_dialog_destroy(cmp_ui_dialog_t *dialog);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_dialog_get_node(cmp_ui_dialog_t *dialog,
+int CMP_API cmp_ui_dialog_get_node(cmp_ui_dialog_t *dialog,
                                    cmp_ui_node_t **out_node);
 
 /**
@@ -56,7 +56,7 @@ CMP_API int cmp_ui_dialog_get_node(cmp_ui_dialog_t *dialog,
  * \param visible 1 to show, 0 to hide.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_dialog_set_visible(cmp_ui_dialog_t *dialog, int visible);
+int CMP_API cmp_ui_dialog_set_visible(cmp_ui_dialog_t *dialog, int visible);
 
 /**
  * \brief Binds the widget to the accessibility tree.
@@ -65,9 +65,8 @@ CMP_API int cmp_ui_dialog_set_visible(cmp_ui_dialog_t *dialog, int visible);
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_dialog_bind_a11y(cmp_ui_dialog_t *widget,
+int CMP_API cmp_ui_dialog_bind_a11y(cmp_ui_dialog_t *widget,
                                     cmp_a11y_tree_t *tree);
-
 #ifdef __cplusplus
 
 #endif /* __cplusplus */

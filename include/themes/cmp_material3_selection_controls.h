@@ -21,7 +21,7 @@ typedef struct cmp_m3_checkbox_metrics {
   cmp_m3_shape_family_t shape;
 } cmp_m3_checkbox_metrics_t;
 
-CMP_API int cmp_m3_checkbox_resolve(cmp_m3_checkbox_metrics_t *out_metrics);
+int CMP_API cmp_m3_checkbox_resolve(cmp_m3_checkbox_metrics_t *out_metrics);
 
 /**
  * @brief Material 3 Radio Button Metrics
@@ -34,7 +34,7 @@ typedef struct cmp_m3_radio_metrics {
   cmp_m3_shape_family_t shape;
 } cmp_m3_radio_metrics_t;
 
-CMP_API int cmp_m3_radio_resolve(cmp_m3_radio_metrics_t *out_metrics);
+int CMP_API cmp_m3_radio_resolve(cmp_m3_radio_metrics_t *out_metrics);
 
 /**
  * @brief Material 3 Switch Metrics
@@ -50,7 +50,7 @@ typedef struct cmp_m3_switch_metrics {
   cmp_m3_shape_family_t shape;
 } cmp_m3_switch_metrics_t;
 
-CMP_API int cmp_m3_switch_resolve(cmp_m3_switch_metrics_t *out_metrics);
+int CMP_API cmp_m3_switch_resolve(cmp_m3_switch_metrics_t *out_metrics);
 
 /**
  * @brief Material 3 Slider Metrics
@@ -63,8 +63,7 @@ typedef struct cmp_m3_slider_metrics {
   cmp_m3_shape_family_t shape;
 } cmp_m3_slider_metrics_t;
 
-CMP_API int cmp_m3_slider_resolve(cmp_m3_slider_metrics_t *out_metrics);
-
+int CMP_API cmp_m3_slider_resolve(cmp_m3_slider_metrics_t *out_metrics);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -29,11 +29,22 @@ static int g_timer_system_initialized = 0;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_timer_system_init(void) {
+  int rc;
+  rc = 0;
   if (g_timer_system_initialized) {
     return CMP_SUCCESS;
   }
   g_timer_system_initialized = 1;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -42,13 +53,23 @@ int cmp_timer_system_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_timer_system_shutdown(void) {
+  int rc;
+  rc = 0;
   if (!g_timer_system_initialized) {
     return CMP_SUCCESS;
   }
   g_timer_system_initialized = 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
-
 #if defined(_WIN32)
 /**
  * @brief cmp_timer_thread_func
@@ -56,7 +77,7 @@ int cmp_timer_system_shutdown(void) {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static unsigned long __stdcall cmp_timer_thread_func(void *arg) {
+CMP_EXEMPT(static unsigned long __stdcall cmp_timer_thread_func(void *arg)) {
 #else
 /**
  * @brief cmp_timer_thread_func
@@ -64,7 +85,7 @@ static unsigned long __stdcall cmp_timer_thread_func(void *arg) {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void *cmp_timer_thread_func(void *arg) {
+CMP_EXEMPT(static void *cmp_timer_thread_func(void *arg)) {
 #endif
   cmp_timer_t *timer = (cmp_timer_t *)arg;
 
@@ -90,7 +111,6 @@ static void *cmp_timer_thread_func(void *arg) {
       break;
     }
   }
-
 #if defined(_WIN32)
   return 0;
 #else
@@ -110,6 +130,8 @@ static void *cmp_timer_thread_func(void *arg) {
  */
 int cmp_timer_start(cmp_timer_t **out_timer, unsigned int interval_ms,
                     int repeat, cmp_task_fn_t fn, void *arg) {
+  int rc;
+  rc = 0;
   cmp_timer_t *timer;
   int res;
 
@@ -131,7 +153,6 @@ int cmp_timer_start(cmp_timer_t **out_timer, unsigned int interval_ms,
   timer->fn = fn;
   timer->arg = arg;
   timer->is_running = 1;
-
 #if defined(_WIN32)
   timer->thread = CreateThread(NULL, 0, cmp_timer_thread_func, timer, 0, NULL);
   if (timer->thread == NULL) {
@@ -146,7 +167,16 @@ int cmp_timer_start(cmp_timer_t **out_timer, unsigned int interval_ms,
 #endif
 
   *out_timer = timer;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -156,12 +186,13 @@ int cmp_timer_start(cmp_timer_t **out_timer, unsigned int interval_ms,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_timer_stop(cmp_timer_t *timer) {
+  int rc;
+  rc = 0;
   if (timer == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
 
   timer->is_running = 0;
-
 #if defined(_WIN32)
   WaitForSingleObject(timer->thread, 0xFFFFFFFF);
   CloseHandle(timer->thread);
@@ -171,5 +202,14 @@ int cmp_timer_stop(cmp_timer_t *timer) {
 
   CMP_FREE(timer);
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

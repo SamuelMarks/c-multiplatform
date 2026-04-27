@@ -12,7 +12,9 @@
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_menu_create(cmp_ui_node_t **out_node) {
+int CMP_API cmp_f2_menu_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   int res;
   if (!out_node) {
     LOG_DEBUG("cmp_f2_menu_create: out_node is NULL\n");
@@ -24,6 +26,12 @@ CMP_API int cmp_f2_menu_create(cmp_ui_node_t **out_node) {
   } else {
     LOG_DEBUG("cmp_f2_menu_create: cmp_ui_box_create failed\n");
   }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return res;
 }
 
@@ -34,8 +42,10 @@ CMP_API int cmp_f2_menu_create(cmp_ui_node_t **out_node) {
  * @param label Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_menu_item_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_menu_item_create(cmp_ui_node_t **out_node,
                                     const char *label) {
+  int rc;
+  rc = 0;
   cmp_f2_menu_item_t *data;
   int res;
 
@@ -76,7 +86,16 @@ CMP_API int cmp_f2_menu_item_create(cmp_ui_node_t **out_node,
   }
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -86,8 +105,10 @@ CMP_API int cmp_f2_menu_item_create(cmp_ui_node_t **out_node,
  * @param shortcut Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_menu_item_set_shortcut(cmp_ui_node_t *node,
+int CMP_API cmp_f2_menu_item_set_shortcut(cmp_ui_node_t *node,
                                           const char *shortcut) {
+  int rc;
+  rc = 0;
   cmp_f2_menu_item_t *data;
   int res;
 
@@ -109,7 +130,16 @@ CMP_API int cmp_f2_menu_item_set_shortcut(cmp_ui_node_t *node,
     }
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -119,8 +149,10 @@ CMP_API int cmp_f2_menu_item_set_shortcut(cmp_ui_node_t *node,
  * @param is_disabled Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_menu_item_set_disabled(cmp_ui_node_t *node,
+int CMP_API cmp_f2_menu_item_set_disabled(cmp_ui_node_t *node,
                                           int is_disabled) {
+  int rc;
+  rc = 0;
   cmp_f2_menu_item_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_menu_item_set_disabled: Invalid arg\n");
@@ -128,7 +160,16 @@ CMP_API int cmp_f2_menu_item_set_disabled(cmp_ui_node_t *node,
   }
   data = (cmp_f2_menu_item_t *)node->properties;
   data->is_disabled = is_disabled ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -137,7 +178,9 @@ CMP_API int cmp_f2_menu_item_set_disabled(cmp_ui_node_t *node,
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_nav_view_create(cmp_ui_node_t **out_node) {
+int CMP_API cmp_f2_nav_view_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   cmp_f2_nav_view_t *data;
   int res;
 
@@ -166,7 +209,16 @@ CMP_API int cmp_f2_nav_view_create(cmp_ui_node_t **out_node) {
   data->footer_node = NULL;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -176,8 +228,10 @@ CMP_API int cmp_f2_nav_view_create(cmp_ui_node_t **out_node) {
  * @param state Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_nav_view_set_state(cmp_ui_node_t *node,
+int CMP_API cmp_f2_nav_view_set_state(cmp_ui_node_t *node,
                                       cmp_f2_nav_state_t state) {
+  int rc;
+  rc = 0;
   cmp_f2_nav_view_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_nav_view_set_state: Invalid arg\n");
@@ -185,7 +239,16 @@ CMP_API int cmp_f2_nav_view_set_state(cmp_ui_node_t *node,
   }
   data = (cmp_f2_nav_view_t *)node->properties;
   data->state = state;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -195,8 +258,10 @@ CMP_API int cmp_f2_nav_view_set_state(cmp_ui_node_t *node,
  * @param label Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_nav_item_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_nav_item_create(cmp_ui_node_t **out_node,
                                    const char *label) {
+  int rc;
+  rc = 0;
   cmp_f2_nav_item_t *data;
   int res;
 
@@ -236,7 +301,16 @@ CMP_API int cmp_f2_nav_item_create(cmp_ui_node_t **out_node,
   }
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -246,7 +320,9 @@ CMP_API int cmp_f2_nav_item_create(cmp_ui_node_t **out_node,
  * @param is_active Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_nav_item_set_active(cmp_ui_node_t *node, int is_active) {
+int CMP_API cmp_f2_nav_item_set_active(cmp_ui_node_t *node, int is_active) {
+  int rc;
+  rc = 0;
   cmp_f2_nav_item_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_nav_item_set_active: Invalid arg\n");
@@ -254,7 +330,16 @@ CMP_API int cmp_f2_nav_item_set_active(cmp_ui_node_t *node, int is_active) {
   }
   data = (cmp_f2_nav_item_t *)node->properties;
   data->is_active = is_active ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -264,8 +349,10 @@ CMP_API int cmp_f2_nav_item_set_active(cmp_ui_node_t *node, int is_active) {
  * @param is_vertical Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tab_container_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_tab_container_create(cmp_ui_node_t **out_node,
                                         int is_vertical) {
+  int rc;
+  rc = 0;
   cmp_f2_tab_t *data;
   int res;
 
@@ -296,7 +383,16 @@ CMP_API int cmp_f2_tab_container_create(cmp_ui_node_t **out_node,
   data->active_indicator_node = NULL;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -306,8 +402,10 @@ CMP_API int cmp_f2_tab_container_create(cmp_ui_node_t **out_node,
  * @param variant Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tab_container_set_variant(cmp_ui_node_t *node,
+int CMP_API cmp_f2_tab_container_set_variant(cmp_ui_node_t *node,
                                              cmp_f2_tab_variant_t variant) {
+  int rc;
+  rc = 0;
   cmp_f2_tab_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_tab_container_set_variant: Invalid arg\n");
@@ -315,7 +413,16 @@ CMP_API int cmp_f2_tab_container_set_variant(cmp_ui_node_t *node,
   }
   data = (cmp_f2_tab_t *)node->properties;
   data->variant = variant;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -325,8 +432,10 @@ CMP_API int cmp_f2_tab_container_set_variant(cmp_ui_node_t *node,
  * @param size Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tab_container_set_size(cmp_ui_node_t *node,
+int CMP_API cmp_f2_tab_container_set_size(cmp_ui_node_t *node,
                                           cmp_f2_tab_size_t size) {
+  int rc;
+  rc = 0;
   cmp_f2_tab_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_tab_container_set_size: Invalid arg\n");
@@ -334,7 +443,16 @@ CMP_API int cmp_f2_tab_container_set_size(cmp_ui_node_t *node,
   }
   data = (cmp_f2_tab_t *)node->properties;
   data->size = size;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -344,10 +462,11 @@ CMP_API int cmp_f2_tab_container_set_size(cmp_ui_node_t *node,
  * @param label Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tab_item_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_tab_item_create(cmp_ui_node_t **out_node,
                                    const char *label) {
-  /* Essentially acts as a styled UI box or button within the tab container
-   * context */
+  int rc;
+  rc = 0; /* Essentially acts as a styled UI box or button within the tab
+           * container context */
   int res;
 
   if (!out_node) {
@@ -373,7 +492,16 @@ CMP_API int cmp_f2_tab_item_create(cmp_ui_node_t **out_node,
     }
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -382,7 +510,9 @@ CMP_API int cmp_f2_tab_item_create(cmp_ui_node_t **out_node,
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_breadcrumb_create(cmp_ui_node_t **out_node) {
+int CMP_API cmp_f2_breadcrumb_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   int res;
   if (!out_node) {
     LOG_DEBUG("cmp_f2_breadcrumb_create: out_node is NULL\n");
@@ -393,6 +523,12 @@ CMP_API int cmp_f2_breadcrumb_create(cmp_ui_node_t **out_node) {
     (*out_node)->layout->direction = CMP_FLEX_ROW;
   } else {
     LOG_DEBUG("cmp_f2_breadcrumb_create: cmp_ui_box_create failed\n");
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
   }
   return res;
 }
@@ -405,8 +541,10 @@ CMP_API int cmp_f2_breadcrumb_create(cmp_ui_node_t **out_node) {
  * @param is_last Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_breadcrumb_item_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_breadcrumb_item_create(cmp_ui_node_t **out_node,
                                           const char *label, int is_last) {
+  int rc;
+  rc = 0;
   int res;
   cmp_ui_node_t *text_node = NULL;
 
@@ -447,7 +585,16 @@ CMP_API int cmp_f2_breadcrumb_item_create(cmp_ui_node_t **out_node,
     }
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -456,7 +603,9 @@ CMP_API int cmp_f2_breadcrumb_item_create(cmp_ui_node_t **out_node,
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_toolbar_create(cmp_ui_node_t **out_node) {
+int CMP_API cmp_f2_toolbar_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   cmp_f2_toolbar_t *data;
   int res;
 
@@ -484,7 +633,16 @@ CMP_API int cmp_f2_toolbar_create(cmp_ui_node_t **out_node) {
   data->overflow_menu_node = NULL;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -495,8 +653,10 @@ CMP_API int cmp_f2_toolbar_create(cmp_ui_node_t **out_node) {
  * @param variant Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_link_create(cmp_ui_node_t **out_node, const char *label,
+int CMP_API cmp_f2_link_create(cmp_ui_node_t **out_node, const char *label,
                                cmp_f2_link_variant_t variant) {
+  int rc;
+  rc = 0;
   cmp_f2_link_t *data;
   int res;
 
@@ -537,7 +697,16 @@ CMP_API int cmp_f2_link_create(cmp_ui_node_t **out_node, const char *label,
   }
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -547,7 +716,9 @@ CMP_API int cmp_f2_link_create(cmp_ui_node_t **out_node, const char *label,
  * @param is_disabled Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_link_set_disabled(cmp_ui_node_t *node, int is_disabled) {
+int CMP_API cmp_f2_link_set_disabled(cmp_ui_node_t *node, int is_disabled) {
+  int rc;
+  rc = 0;
   cmp_f2_link_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_link_set_disabled: Invalid arg\n");
@@ -555,7 +726,16 @@ CMP_API int cmp_f2_link_set_disabled(cmp_ui_node_t *node, int is_disabled) {
   }
   data = (cmp_f2_link_t *)node->properties;
   data->is_disabled = is_disabled ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -564,7 +744,9 @@ CMP_API int cmp_f2_link_set_disabled(cmp_ui_node_t *node, int is_disabled) {
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_stepper_create(cmp_ui_node_t **out_node) {
+int CMP_API cmp_f2_stepper_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   int res;
   if (!out_node) {
     LOG_DEBUG("cmp_f2_stepper_create: out_node is NULL\n");
@@ -576,6 +758,12 @@ CMP_API int cmp_f2_stepper_create(cmp_ui_node_t **out_node) {
   } else {
     LOG_DEBUG("cmp_f2_stepper_create: cmp_ui_box_create failed\n");
   }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return res;
 }
 
@@ -586,8 +774,10 @@ CMP_API int cmp_f2_stepper_create(cmp_ui_node_t **out_node) {
  * @param label Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_stepper_item_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_stepper_item_create(cmp_ui_node_t **out_node,
                                        const char *label) {
+  int rc;
+  rc = 0;
   cmp_f2_stepper_item_t *data;
   int res;
 
@@ -626,7 +816,16 @@ CMP_API int cmp_f2_stepper_item_create(cmp_ui_node_t **out_node,
   }
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -636,8 +835,10 @@ CMP_API int cmp_f2_stepper_item_create(cmp_ui_node_t **out_node,
  * @param state Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_stepper_item_set_state(cmp_ui_node_t *node,
+int CMP_API cmp_f2_stepper_item_set_state(cmp_ui_node_t *node,
                                           cmp_f2_stepper_state_t state) {
+  int rc;
+  rc = 0;
   cmp_f2_stepper_item_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_stepper_item_set_state: Invalid arg\n");
@@ -645,5 +846,14 @@ CMP_API int cmp_f2_stepper_item_set_state(cmp_ui_node_t *node,
   }
   data = (cmp_f2_stepper_item_t *)node->properties;
   data->state = state;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

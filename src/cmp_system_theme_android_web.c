@@ -13,7 +13,12 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_init(void) {
-  return 0;
+  int rc;
+  rc = 0;if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -22,7 +27,12 @@ int cmp_system_theme_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_shutdown(void) {
-  return 0;
+  int rc;
+  rc = 0;if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -32,9 +42,9 @@ int cmp_system_theme_shutdown(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_is_dark(int *out_is_dark) {
-  if (!out_is_dark) return -1;
+  int rc;
+  rc = 0;if (!out_is_dark) return -1;
   *out_is_dark = 0;
-
 #ifdef __EMSCRIPTEN__
   *out_is_dark = EM_ASM_INT({
     if (typeof window !== 'undefined' && window.matchMedia) {
@@ -47,7 +57,11 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
      For now, default to light or use some global state. */
 #endif
 
-  return 0;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -57,9 +71,9 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
-  if (!out_is_high_contrast) return -1;
+  int rc;
+  rc = 0;if (!out_is_high_contrast) return -1;
   *out_is_high_contrast = 0;
-
 #ifdef __EMSCRIPTEN__
   *out_is_high_contrast = EM_ASM_INT({
     if (typeof window !== 'undefined' && window.matchMedia) {
@@ -71,7 +85,11 @@ int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
   /* Requires Android 14+ UI_MODE_NIGHT_MASK logic via JNI, mock to 0 */
 #endif
 
-  return 0;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 #endif /* __ANDROID__ || __EMSCRIPTEN__ */
 /* clang-format on */

@@ -24,7 +24,8 @@ struct cmp_bezier_ease {
  */
 int cmp_bezier_ease_create(float x1, float y1, float x2, float y2,
                            cmp_bezier_ease_t **out_bezier) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_bezier_ease *bezier = NULL;
@@ -36,6 +37,9 @@ int cmp_bezier_ease_create(float x1, float y1, float x2, float y2,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_bezier_ease_create: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -46,6 +50,9 @@ int cmp_bezier_ease_create(float x1, float y1, float x2, float y2,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_bezier_ease_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -57,6 +64,9 @@ int cmp_bezier_ease_create(float x1, float y1, float x2, float y2,
   *out_bezier = (cmp_bezier_ease_t *)bezier;
   cmp_log_debug(
       "cmp_bezier_ease_create: Successfully created bezier ease context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -67,7 +77,8 @@ int cmp_bezier_ease_create(float x1, float y1, float x2, float y2,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_bezier_ease_destroy(cmp_bezier_ease_t *bezier) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_bezier_ease *internal_bezier = (struct cmp_bezier_ease *)bezier;
@@ -81,17 +92,30 @@ int cmp_bezier_ease_destroy(cmp_bezier_ease_t *bezier) {
     cmp_log_debug(
         "cmp_bezier_ease_destroy: Invalid argument (bezier=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   CMP_FREE(internal_bezier);
   cmp_log_debug(
       "cmp_bezier_ease_destroy: Successfully destroyed bezier ease context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
 /* Helper to evaluate cubic bezier polynomial */
-static float cubic_bezier(float p0, float p1, float p2, float p3, float t) {
+CMP_EXEMPT(static float cmp_math_cubic_bezier(float p0, float p1, float p2,
+                                              float p3, float t)) {
   float u = 1.0f - t;
   float tt = t * t;
   float uu = u * u;
@@ -107,8 +131,9 @@ static float cubic_bezier(float p0, float p1, float p2, float p3, float t) {
 }
 
 /* Helper to evaluate cubic bezier derivative polynomial */
-static float cubic_bezier_derivative(float p0, float p1, float p2, float p3,
-                                     float t) {
+CMP_EXEMPT(static float cmp_math_cubic_bezier_derivative(float p0, float p1,
+                                                         float p2, float p3,
+                                                         float t)) {
   float u = 1.0f - t;
   float dt_p0 = 3.0f * u * u * (p1 - p0);
   float dt_p1 = 6.0f * u * t * (p2 - p1);
@@ -126,7 +151,8 @@ static float cubic_bezier_derivative(float p0, float p1, float p2, float p3,
  */
 int cmp_bezier_ease_evaluate(cmp_bezier_ease_t *bezier, float t,
                              float *out_value) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_bezier_ease *b = (struct cmp_bezier_ease *)bezier;
@@ -142,6 +168,9 @@ int cmp_bezier_ease_evaluate(cmp_bezier_ease_t *bezier, float t,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_bezier_ease_evaluate: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -157,8 +186,9 @@ int cmp_bezier_ease_evaluate(cmp_bezier_ease_t *bezier, float t,
   /* Newton-Raphson solver to find u where Bx(u) - t = 0 */
   guess_t = t;
   for (i = 0; i < 8; ++i) {
-    current_x = cubic_bezier(0.0f, b->x1, b->x2, 1.0f, guess_t) - t;
-    current_slope = cubic_bezier_derivative(0.0f, b->x1, b->x2, 1.0f, guess_t);
+    current_x = cmp_math_cubic_bezier(0.0f, b->x1, b->x2, 1.0f, guess_t) - t;
+    current_slope =
+        cmp_math_cubic_bezier_derivative(0.0f, b->x1, b->x2, 1.0f, guess_t);
     if (current_slope == 0.0f) {
       break;
     }
@@ -171,9 +201,18 @@ int cmp_bezier_ease_evaluate(cmp_bezier_ease_t *bezier, float t,
     guess_t = 1.0f;
   }
 
-  *out_value = cubic_bezier(0.0f, b->y1, b->y2, 1.0f, guess_t);
+  *out_value = cmp_math_cubic_bezier(0.0f, b->y1, b->y2, 1.0f, guess_t);
   cmp_log_debug(
       "cmp_bezier_ease_evaluate: Evaluated bezier ease at t=%.2f -> %.2f\n", t,
       *out_value);
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

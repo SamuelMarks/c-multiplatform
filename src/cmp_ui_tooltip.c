@@ -22,7 +22,8 @@ struct cmp_ui_tooltip {
  */
 int cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip, const char *text,
                           uint32_t bg_color, uint32_t text_color) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_ui_tooltip_t *tooltip;
   int err;
   size_t len;
@@ -119,7 +120,8 @@ int cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip, const char *text,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tooltip_destroy(cmp_ui_tooltip_t *tooltip) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (!tooltip) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -143,11 +145,22 @@ int cmp_ui_tooltip_destroy(cmp_ui_tooltip_t *tooltip) {
  */
 int cmp_ui_tooltip_get_node(cmp_ui_tooltip_t *tooltip,
                             cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!tooltip || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = tooltip->node_root;
-  return 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -158,7 +171,8 @@ int cmp_ui_tooltip_get_node(cmp_ui_tooltip_t *tooltip,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tooltip_set_text(cmp_ui_tooltip_t *tooltip, const char *text) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   size_t len;
   cmp_string_t translated = {NULL, 0, 0};
   const char *final_text = text;
@@ -204,6 +218,8 @@ int cmp_ui_tooltip_set_text(cmp_ui_tooltip_t *tooltip, const char *text) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tooltip_bind_a11y(cmp_ui_tooltip_t *widget, cmp_a11y_tree_t *tree) {
+  int rc;
+  rc = 0;
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -211,6 +227,12 @@ int cmp_ui_tooltip_bind_a11y(cmp_ui_tooltip_t *widget, cmp_a11y_tree_t *tree) {
                                    "tooltip", "Tooltip");
   if (err != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_tooltip_bind_a11y: cmp_a11y_tree_add_node failed\n");
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
   }
   return err;
 }

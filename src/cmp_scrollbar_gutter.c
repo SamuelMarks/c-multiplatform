@@ -1,10 +1,13 @@
 /* clang-format off */
 #include "cmp.h"
+
 #include <stdlib.h>
+
+#include "cmp_log.h"
 /* clang-format on */
 
 /**
- * @brief cmp_scrollbar_gutter_calculate
+ * @brief Calculate reserved layout space for a scrollbar gutter.
  *
  * @param mode Parameter description.
  * @param is_overflowing Parameter description.
@@ -18,7 +21,9 @@ int cmp_scrollbar_gutter_calculate(cmp_scrollbar_gutter_t mode,
                                    float scrollbar_thickness,
                                    float *out_reserved_left,
                                    float *out_reserved_right) {
-  if (!out_reserved_left || !out_reserved_right) {
+  if (out_reserved_left == NULL || out_reserved_right == NULL) {
+    LOG_DEBUG(
+        "Invalid argument: out_reserved_left or out_reserved_right is NULL\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
@@ -35,6 +40,7 @@ int cmp_scrollbar_gutter_calculate(cmp_scrollbar_gutter_t mode,
     *out_reserved_left = scrollbar_thickness;
     *out_reserved_right = scrollbar_thickness;
   } else {
+    LOG_DEBUG("Invalid argument: unrecognized mode\n");
     return CMP_ERROR_INVALID_ARG;
   }
 

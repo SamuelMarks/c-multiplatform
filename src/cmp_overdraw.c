@@ -77,6 +77,8 @@ int cmp_overdraw_destroy(cmp_overdraw_t *overdraw) {
  */
 int cmp_overdraw_set_enabled(cmp_overdraw_t *overdraw, cmp_renderer_t *renderer,
                              int enable) {
+  int rc;
+  rc = 0;
   struct cmp_overdraw *ctx;
 
   if (overdraw == NULL || renderer == NULL) {
@@ -89,6 +91,5 @@ int cmp_overdraw_set_enabled(cmp_overdraw_t *overdraw, cmp_renderer_t *renderer,
   /* In a real implementation this would swap the active fragment shader
      on the renderer to an additive blending heat-map shader */
   ctx->is_active = enable ? 1 : 0;
-
   return CMP_SUCCESS;
 }

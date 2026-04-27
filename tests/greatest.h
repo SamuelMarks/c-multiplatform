@@ -88,7 +88,6 @@ int main(int argc, char **argv) {
     RUN_SUITE(suite);
     GREATEST_MAIN_END();        /* display results */
 }
-
 #endif
 /*********************************************************************/
 
@@ -162,7 +161,6 @@ typedef struct greatest_suite_info {
   unsigned int passed;
   unsigned int failed;
   unsigned int skipped;
-
 #if GREATEST_USE_TIME
   /* timers, pre/post running suite and individual tests */
   clock_t pre_suite;
@@ -653,7 +651,6 @@ typedef enum greatest_test_res {
     GREATEST_FPRINTF(GREATEST_STDOUT, "clock error: %s\n", #NAME);             \
     exit(EXIT_FAILURE);                                                        \
   }
-
 #define GREATEST_CLOCK_DIFF(C1, C2)                                            \
   GREATEST_FPRINTF(GREATEST_STDOUT, " (%lu ticks, %.3f sec)",                  \
                    (long unsigned int)(C2) - (long unsigned int)(C1),          \

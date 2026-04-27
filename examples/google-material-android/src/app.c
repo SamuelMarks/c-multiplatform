@@ -18,6 +18,7 @@ static int g_is_dark = 0;
 static app_screen_t g_current_screen = SCREEN_HOME;
 
 static int manual_hit_test(cmp_ui_node_t *node, float x, float y) {
+  int rc = 0;
   size_t i;
   if (!node || !node->layout) {
     return -1;
@@ -40,10 +41,14 @@ static int manual_hit_test(cmp_ui_node_t *node, float x, float y) {
       return node->layout->id;
     }
   }
+  if (rc != 0) {
+    return rc;
+  }
   return -1;
 }
 
 static int build_header(cmp_ui_node_t *parent, const char *title) {
+  int rc = 0;
   cmp_ui_node_t *header = NULL, *btn_back = NULL, *btn_theme = NULL,
                 *title_node = NULL;
   (void)title;
@@ -75,10 +80,14 @@ static int build_header(cmp_ui_node_t *parent, const char *title) {
   cmp_ui_node_add_child(header, btn_theme);
 
   cmp_ui_node_add_child(parent, header);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 static int build_home_screen(cmp_ui_node_t *main_box) {
+  int rc = 0;
   cmp_ui_node_t *grid = NULL;
   cmp_ui_node_t *card1 = NULL, *card2 = NULL, *card3 = NULL;
 
@@ -118,10 +127,14 @@ static int build_home_screen(cmp_ui_node_t *main_box) {
   cmp_ui_node_add_child(grid, card3);
 
   cmp_ui_node_add_child(main_box, grid);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 static int build_buttons_screen(cmp_ui_node_t *main_box) {
+  int rc = 0;
   cmp_ui_node_t *btn1 = NULL, *btn2 = NULL;
   cmp_ui_box_create(&btn1);
   btn1->type = 3;
@@ -137,10 +150,14 @@ static int build_buttons_screen(cmp_ui_node_t *main_box) {
 
   cmp_ui_node_add_child(main_box, btn1);
   cmp_ui_node_add_child(main_box, btn2);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 static int build_inputs_screen(cmp_ui_node_t *main_box) {
+  int rc = 0;
   cmp_ui_node_t *cb = NULL, *tg = NULL, *sl = NULL, *ti = NULL;
 
   cmp_ui_box_create(&cb);
@@ -171,10 +188,14 @@ static int build_inputs_screen(cmp_ui_node_t *main_box) {
   cmp_ui_node_add_child(main_box, tg);
   cmp_ui_node_add_child(main_box, sl);
   cmp_ui_node_add_child(main_box, ti);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 static int build_data_display_screen(cmp_ui_node_t *main_box) {
+  int rc = 0;
   cmp_ui_node_t *card = NULL;
   cmp_ui_box_create(&card);
   card->type = 1;
@@ -182,10 +203,14 @@ static int build_data_display_screen(cmp_ui_node_t *main_box) {
   card->layout->height = 200.0f;
   card->layout->margin[2] = 16.0f;
   cmp_ui_node_add_child(main_box, card);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 static int build_ui(void) {
+  int rc = 0;
   cmp_ui_node_t *main_box = NULL;
 
   if (g_ui_tree != NULL) {
@@ -224,10 +249,14 @@ static int build_ui(void) {
   }
 
   cmp_ui_node_add_child(g_ui_tree, main_box);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int app_init(void) {
+  int rc = 0;
   cmp_window_config_t config;
 
   cmp_event_system_init();
@@ -254,10 +283,14 @@ int app_init(void) {
   cmp_window_set_ui_tree(g_window, g_ui_tree);
   cmp_window_show(g_window);
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int app_run(void) {
+  int rc = 0;
   cmp_event_t evt;
   int running = 1;
 
@@ -301,10 +334,14 @@ int app_run(void) {
     }
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int app_shutdown(void) {
+  int rc = 0;
   if (g_ui_tree) {
     cmp_ui_node_destroy(g_ui_tree);
     g_ui_tree = NULL;
@@ -319,5 +356,8 @@ int app_shutdown(void) {
   cmp_vfs_shutdown();
   cmp_event_system_shutdown();
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

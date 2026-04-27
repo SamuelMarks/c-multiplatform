@@ -15,6 +15,8 @@ static int g_orm_initialized = 0;
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_init(void) {
+  int rc;
+  rc = 0;
   if (g_orm_initialized) {
     return CMP_SUCCESS;
   }
@@ -28,6 +30,8 @@ int cmp_orm_init(void) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_shutdown(void) {
+  int rc;
+  rc = 0;
   if (!g_orm_initialized) {
     return CMP_SUCCESS;
   }
@@ -78,7 +82,6 @@ int cmp_orm_connect(const char *virtual_path, c_orm_db_t **out_db) {
       return CMP_ERROR_INVALID_ARG;
     }
   }
-
 #if defined(__EMSCRIPTEN__)
   /* Shim for WebAssembly: Append IndexedDB VFS parameters if requested or
      intercept connection to use browser-native shim */
@@ -99,7 +102,6 @@ int cmp_orm_connect(const char *virtual_path, c_orm_db_t **out_db) {
     LOG_DEBUG("Error in cmp_orm_connect: c_orm_sqlite_connect failed\n");
     return CMP_ERROR_NOT_FOUND;
   }
-
   return CMP_SUCCESS;
 }
 
@@ -110,6 +112,8 @@ int cmp_orm_connect(const char *virtual_path, c_orm_db_t **out_db) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_disconnect(c_orm_db_t *db) {
+  int rc;
+  rc = 0;
   const c_orm_driver_vtable_t *vtable;
 
   if (db == NULL) {
@@ -126,7 +130,6 @@ int cmp_orm_disconnect(c_orm_db_t *db) {
     LOG_DEBUG("Error in cmp_orm_disconnect: vtable->disconnect failed\n");
     return CMP_ERROR_NOT_FOUND;
   }
-
   return CMP_SUCCESS;
 }
 
@@ -138,6 +141,8 @@ int cmp_orm_disconnect(c_orm_db_t *db) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_execute(c_orm_db_t *db, const char *sql) {
+  int rc;
+  rc = 0;
   if (db == NULL || sql == NULL) {
     LOG_DEBUG("Error in cmp_orm_execute: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -147,7 +152,6 @@ int cmp_orm_execute(c_orm_db_t *db, const char *sql) {
     LOG_DEBUG("Error in cmp_orm_execute: c_orm_execute_raw failed\n");
     return CMP_ERROR_NOT_FOUND;
   }
-
   return CMP_SUCCESS;
 }
 
@@ -160,6 +164,8 @@ int cmp_orm_execute(c_orm_db_t *db, const char *sql) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
+  int rc;
+  rc = 0;
   cmp_string_t resolved_path;
   cfs_path cfs_dir_path;
   cfs_directory_iterator *it;
@@ -167,6 +173,10 @@ int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
   cfs_error_code ec;
 
   it = NULL;
+
+  if (rc != 0) {
+    return rc;
+  }
   entry = NULL;
 
   if (db == NULL || migrations_dir == NULL) {
@@ -196,7 +206,6 @@ int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
       char aname[1024];
       size_t len;
       size_t i;
-      int rc;
 #if defined(CFS_UNICODE)
       const wchar_t *wname;
 
@@ -343,7 +352,6 @@ int cmp_orm_observable_create(c_orm_db_t *db, const char *query,
     }
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   rc = strcpy_s(obs->query, len + 1, query);
   if (rc != 0) {
@@ -407,7 +415,6 @@ int cmp_ui_node_bind(cmp_ui_node_t *node, cmp_orm_observable_t *obs,
     LOG_DEBUG("Error in cmp_ui_node_bind: CMP_MALLOC failed (OOM)\n");
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   rc = strcpy_s(obs->bound_property, len + 1, property_name);
   if (rc != 0) {

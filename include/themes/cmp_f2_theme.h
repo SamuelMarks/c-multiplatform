@@ -543,7 +543,7 @@ typedef struct cmp_f2_theme_s {
  * @param out_theme Pointer to store the generated tokens.
  * @return CMP_SUCCESS on success, or an error code.
  */
-CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
+int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
                                   cmp_f2_theme_t *out_theme);
 
 /**
@@ -559,13 +559,12 @@ CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
  * @param out_theme Pointer to store the generated high-contrast tokens.
  * @return CMP_SUCCESS on success, or an error code.
  */
-CMP_API int cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
+int CMP_API cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
                                      uint32_t highlight,
                                      uint32_t highlight_text,
                                      uint32_t button_face, uint32_t button_text,
                                      uint32_t gray_text,
                                      cmp_f2_theme_t *out_theme);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

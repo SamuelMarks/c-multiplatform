@@ -15,12 +15,15 @@ struct cmp_ptr {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ptr_create(cmp_ptr_t **out_ptr) {
+  int rc;
+  rc = 0;
   struct cmp_ptr *ptr;
 
   if (!out_ptr)
     return CMP_ERROR_INVALID_ARG;
 
-  if (CMP_MALLOC(sizeof(struct cmp_ptr), (void **)&ptr) != CMP_SUCCESS)
+  rc = CMP_MALLOC(sizeof(struct cmp_ptr), (void **)&ptr);
+  if (rc != CMP_SUCCESS)
     return CMP_ERROR_OOM;
 
   memset(ptr, 0, sizeof(struct cmp_ptr));
@@ -37,12 +40,17 @@ int cmp_ptr_create(cmp_ptr_t **out_ptr) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ptr_destroy(cmp_ptr_t *ptr) {
+  int rc;
+  rc = 0;
   struct cmp_ptr *internal_ptr = (struct cmp_ptr *)ptr;
 
   if (!internal_ptr)
     return CMP_ERROR_INVALID_ARG;
 
-  CMP_FREE(internal_ptr);
+  rc = CMP_FREE(internal_ptr);
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -58,6 +66,8 @@ int cmp_ptr_destroy(cmp_ptr_t *ptr) {
  */
 int cmp_ptr_update(cmp_ptr_t *ptr, float overscroll_y, float threshold_y,
                    cmp_ptr_state_t *out_state, float *out_progress) {
+  int rc;
+  rc = 0;
   struct cmp_ptr *internal_ptr = (struct cmp_ptr *)ptr;
 
   if (!internal_ptr || !out_state || !out_progress)
@@ -99,6 +109,8 @@ int cmp_ptr_update(cmp_ptr_t *ptr, float overscroll_y, float threshold_y,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ptr_set_refreshing(cmp_ptr_t *ptr, int is_refreshing) {
+  int rc;
+  rc = 0;
   struct cmp_ptr *internal_ptr = (struct cmp_ptr *)ptr;
 
   if (!internal_ptr)
@@ -109,6 +121,5 @@ int cmp_ptr_set_refreshing(cmp_ptr_t *ptr, int is_refreshing) {
   } else {
     internal_ptr->state = CMP_PTR_STATE_IDLE;
   }
-
   return CMP_SUCCESS;
 }

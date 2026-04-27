@@ -41,13 +41,16 @@ static int g_router_initialized = 0;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_create(cmp_router_t **out_router) {
+  int rc;
+  rc = 0;
   cmp_router_t *router;
 
   if (out_router == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_router_t), (void **)&router) != CMP_SUCCESS) {
+  rc = CMP_MALLOC(sizeof(cmp_router_t), (void **)&router);
+  if (rc != CMP_SUCCESS) {
     return CMP_ERROR_OOM;
   }
 
@@ -69,6 +72,8 @@ int cmp_router_create(cmp_router_t **out_router) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_destroy(cmp_router_t *router) {
+  int rc;
+  rc = 0;
   cmp_route_entry_t *curr, *next;
   size_t i;
 
@@ -80,20 +85,36 @@ int cmp_router_destroy(cmp_router_t *router) {
   curr = router->routes;
   while (curr != NULL) {
     next = curr->next;
-    CMP_FREE(curr->path);
-    CMP_FREE(curr);
+    rc = CMP_FREE(curr->path);
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
+    rc = CMP_FREE(curr);
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
     curr = next;
   }
 
   /* Free stack */
   for (i = 0; i < router->stack_count; i++) {
-    CMP_FREE(router->stack[i]);
+    rc = CMP_FREE(router->stack[i]);
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
   }
   if (router->stack) {
-    CMP_FREE(router->stack);
+
+    rc = CMP_FREE(router->stack);
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
   }
 
-  CMP_FREE(router);
+  rc = CMP_FREE(router);
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -110,6 +131,8 @@ int cmp_router_destroy(cmp_router_t *router) {
 int cmp_router_register(cmp_router_t *router, const char *path,
                         cmp_route_builder_cb builder, cmp_route_guard_cb guard,
                         void *guard_data) {
+  int rc;
+  rc = 0;
   cmp_route_entry_t *entry;
   size_t len;
 
@@ -117,16 +140,17 @@ int cmp_router_register(cmp_router_t *router, const char *path,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_route_entry_t), (void **)&entry) != CMP_SUCCESS) {
+  rc = CMP_MALLOC(sizeof(cmp_route_entry_t), (void **)&entry);
+  if (rc != CMP_SUCCESS) {
     return CMP_ERROR_OOM;
   }
 
   len = strlen(path);
-  if (CMP_MALLOC(len + 1, (void **)&entry->path) != CMP_SUCCESS) {
+  rc = CMP_MALLOC(len + 1, (void **)&entry->path);
+  if (rc != CMP_SUCCESS) {
     CMP_FREE(entry);
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   strcpy_s(entry->path, len + 1, path);
 #else
@@ -139,7 +163,6 @@ int cmp_router_register(cmp_router_t *router, const char *path,
 
   entry->next = router->routes;
   router->routes = entry;
-
   return CMP_SUCCESS;
 }
 
@@ -153,6 +176,8 @@ int cmp_router_register(cmp_router_t *router, const char *path,
  * @return Returns 0 on success, or an error code on failure.
  */
 static int internal_execute_route(cmp_router_t *router, const char *uri) {
+  int rc;
+  rc = 0;
   cmp_route_entry_t *curr = router->routes;
   char *uri_mutable;
   char *saveptr_uri = NULL;
@@ -163,7 +188,8 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
   }
 
   uri_len = strlen(uri);
-  if (CMP_MALLOC(uri_len + 1, (void **)&uri_mutable) != CMP_SUCCESS) {
+  rc = CMP_MALLOC(uri_len + 1, (void **)&uri_mutable);
+  if (rc != CMP_SUCCESS) {
     return CMP_ERROR_OOM;
   }
 #if defined(_MSC_VER)
@@ -185,7 +211,8 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
       goto check_guard;
     }
 
-    if (CMP_MALLOC(path_len + 1, (void **)&path_mutable) != CMP_SUCCESS) {
+    rc = CMP_MALLOC(path_len + 1, (void **)&path_mutable);
+    if (rc != CMP_SUCCESS) {
       CMP_FREE(uri_mutable);
       return CMP_ERROR_OOM;
     }
@@ -229,28 +256,40 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
       cmp_strtok_r(NULL, "/", &saveptr_path, &p_tok);
     }
 
-    CMP_FREE(path_mutable);
+    rc = CMP_FREE(path_mutable);
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
 
   check_guard:
     if (match) {
       /* Check guard first */
       if (curr->guard != NULL) {
         if (!curr->guard(uri, curr->guard_data)) {
-          CMP_FREE(uri_mutable);
+          rc = CMP_FREE(uri_mutable);
+          if (rc != CMP_SUCCESS) {
+            return rc;
+          }
           return CMP_ERROR_NOT_FOUND; /* Guard blocked navigation */
         }
       }
 
       /* Build view */
       router->active_view = curr->builder(uri);
-      CMP_FREE(uri_mutable);
+      rc = CMP_FREE(uri_mutable);
+      if (rc != CMP_SUCCESS) {
+        return rc;
+      }
       return CMP_SUCCESS;
     }
 
     curr = curr->next;
   }
 
-  CMP_FREE(uri_mutable);
+  rc = CMP_FREE(uri_mutable);
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 }
 
@@ -262,6 +301,8 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_push(cmp_router_t *router, const char *uri) {
+  int rc;
+  rc = 0;
   size_t len;
   char *uri_copy;
 
@@ -279,24 +320,27 @@ int cmp_router_push(cmp_router_t *router, const char *uri) {
         router->stack_capacity == 0 ? 4 : router->stack_capacity * 2;
     char **new_stack;
 
-    if (CMP_MALLOC(sizeof(char *) * new_cap, (void **)&new_stack) !=
-        CMP_SUCCESS) {
+    rc = CMP_MALLOC(sizeof(char *) * new_cap, (void **)&new_stack);
+    if (rc != CMP_SUCCESS) {
       return CMP_ERROR_OOM;
     }
 
     if (router->stack) {
       memcpy(new_stack, router->stack, sizeof(char *) * router->stack_count);
-      CMP_FREE(router->stack);
+      rc = CMP_FREE(router->stack);
+      if (rc != CMP_SUCCESS) {
+        return rc;
+      }
     }
     router->stack = new_stack;
     router->stack_capacity = new_cap;
   }
 
   len = strlen(uri);
-  if (CMP_MALLOC(len + 1, (void **)&uri_copy) != CMP_SUCCESS) {
+  rc = CMP_MALLOC(len + 1, (void **)&uri_copy);
+  if (rc != CMP_SUCCESS) {
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   strcpy_s(uri_copy, len + 1, uri);
 #else
@@ -315,6 +359,8 @@ int cmp_router_push(cmp_router_t *router, const char *uri) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_replace(cmp_router_t *router, const char *uri) {
+  int rc;
+  rc = 0;
   size_t len;
   char *uri_copy;
 
@@ -331,19 +377,21 @@ int cmp_router_replace(cmp_router_t *router, const char *uri) {
   }
 
   len = strlen(uri);
-  if (CMP_MALLOC(len + 1, (void **)&uri_copy) != CMP_SUCCESS) {
+  rc = CMP_MALLOC(len + 1, (void **)&uri_copy);
+  if (rc != CMP_SUCCESS) {
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   strcpy_s(uri_copy, len + 1, uri);
 #else
   strcpy(uri_copy, uri);
 #endif
 
-  CMP_FREE(router->stack[router->stack_count - 1]);
+  rc = CMP_FREE(router->stack[router->stack_count - 1]);
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
   router->stack[router->stack_count - 1] = uri_copy;
-
   return CMP_SUCCESS;
 }
 
@@ -354,6 +402,8 @@ int cmp_router_replace(cmp_router_t *router, const char *uri) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_pop(cmp_router_t *router) {
+  int rc;
+  rc = 0;
   if (router == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -364,7 +414,10 @@ int cmp_router_pop(cmp_router_t *router) {
   }
 
   /* Remove top */
-  CMP_FREE(router->stack[router->stack_count - 1]);
+  rc = CMP_FREE(router->stack[router->stack_count - 1]);
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
   router->stack_count--;
 
   /* Re-execute the new top */
@@ -379,6 +432,8 @@ int cmp_router_pop(cmp_router_t *router) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_get_current(cmp_router_t *router, cmp_string_t *out_uri) {
+  int rc;
+  rc = 0;
   if (router == NULL || out_uri == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -399,6 +454,8 @@ int cmp_router_get_current(cmp_router_t *router, cmp_string_t *out_uri) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_set_transitions(cmp_router_t *router, int enable) {
+  int rc;
+  rc = 0;
   if (router == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -414,6 +471,8 @@ int cmp_router_set_transitions(cmp_router_t *router, int enable) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_wasm_bind_history(cmp_router_t *router) {
+  int rc;
+  rc = 0;
   if (router == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -433,10 +492,11 @@ int cmp_router_wasm_bind_history(cmp_router_t *router) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_os_register_uri_scheme(const char *scheme) {
+  int rc;
+  rc = 0;
   if (scheme == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   {
     /* Register deep linking URI scheme mapping to current executable in Windows
@@ -481,7 +541,6 @@ int cmp_os_register_uri_scheme(const char *scheme) {
 #elif defined(__EMSCRIPTEN__)
   /* Hook browser History API via emscripten natively */
 #endif
-
   return CMP_SUCCESS;
 }
 
@@ -495,6 +554,8 @@ int cmp_os_register_uri_scheme(const char *scheme) {
  */
 int cmp_router_push_with_style(cmp_router_t *router, const char *uri,
                                cmp_presentation_style_t style) {
+  int rc;
+  rc = 0;
   if (!router || !uri)
     return CMP_ERROR_INVALID_ARG;
   /* Modifies internal vdom root mounting transitions (slide-left, slide-up
@@ -510,6 +571,8 @@ int cmp_router_push_with_style(cmp_router_t *router, const char *uri,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_pop_with_style(cmp_router_t *router) {
+  int rc;
+  rc = 0;
   if (!router)
     return CMP_ERROR_INVALID_ARG;
   return cmp_router_pop(router);
@@ -525,6 +588,8 @@ int cmp_router_pop_with_style(cmp_router_t *router) {
  */
 int cmp_router_get_previous_title(cmp_router_t *router, char *out_title,
                                   size_t title_cap) {
+  int rc;
+  rc = 0;
   struct cmp_router *r = (struct cmp_router *)router;
   if (!r || !out_title)
     return CMP_ERROR_INVALID_ARG;
@@ -541,7 +606,6 @@ int cmp_router_get_previous_title(cmp_router_t *router, char *out_title,
 #else
   strcpy(out_title, r->stack[r->stack_count - 2]);
 #endif
-
   return CMP_SUCCESS;
 }
 
@@ -553,6 +617,8 @@ int cmp_router_get_previous_title(cmp_router_t *router, char *out_title,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_switch_tab(cmp_router_t *router, const char *tab_uri) {
+  int rc;
+  rc = 0;
   struct cmp_router *r = (struct cmp_router *)router;
   size_t i;
   if (!r || !tab_uri)
@@ -562,7 +628,10 @@ int cmp_router_switch_tab(cmp_router_t *router, const char *tab_uri) {
      In a real tab layout, each tab has its own stack. For mock, just truncate
      to root. */
   for (i = 1; i < r->stack_count; ++i) {
-    CMP_FREE(r->stack[i]);
+    rc = CMP_FREE(r->stack[i]);
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
   }
   r->stack_count = 0; /* Flush all */
 
@@ -581,10 +650,13 @@ struct cmp_split_view {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_split_view_create(cmp_split_view_t **out_split_view) {
+  int rc;
+  rc = 0;
   struct cmp_split_view *ctx;
   if (!out_split_view)
     return CMP_ERROR_INVALID_ARG;
-  if (CMP_MALLOC(sizeof(struct cmp_split_view), (void **)&ctx) != CMP_SUCCESS)
+  rc = CMP_MALLOC(sizeof(struct cmp_split_view), (void **)&ctx);
+  if (rc != CMP_SUCCESS)
     return CMP_ERROR_OOM;
 
   ctx->master_route = NULL;
@@ -601,15 +673,26 @@ int cmp_split_view_create(cmp_split_view_t **out_split_view) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_split_view_destroy(cmp_split_view_t *split_view) {
+  int rc;
+  rc = 0;
   struct cmp_split_view *ctx = (struct cmp_split_view *)split_view;
   if (!ctx)
     return CMP_SUCCESS;
 
   if (ctx->master_route)
-    CMP_FREE(ctx->master_route);
+    rc = CMP_FREE(ctx->master_route);
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
   if (ctx->detail_route)
-    CMP_FREE(ctx->detail_route);
-  CMP_FREE(ctx);
+    rc = CMP_FREE(ctx->detail_route);
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -623,6 +706,8 @@ int cmp_split_view_destroy(cmp_split_view_t *split_view) {
  */
 int cmp_split_view_set_routes(cmp_split_view_t *split_view,
                               const char *master_uri, const char *detail_uri) {
+  int rc;
+  rc = 0;
   struct cmp_split_view *ctx = (struct cmp_split_view *)split_view;
   size_t len;
 
@@ -631,9 +716,13 @@ int cmp_split_view_set_routes(cmp_split_view_t *split_view,
 
   if (master_uri) {
     if (ctx->master_route)
-      CMP_FREE(ctx->master_route);
+      rc = CMP_FREE(ctx->master_route);
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
     len = strlen(master_uri);
-    if (CMP_MALLOC(len + 1, (void **)&ctx->master_route) != CMP_SUCCESS)
+    rc = CMP_MALLOC(len + 1, (void **)&ctx->master_route);
+    if (rc != CMP_SUCCESS)
       return CMP_ERROR_OOM;
 #if defined(_MSC_VER)
     strcpy_s(ctx->master_route, len + 1, master_uri);
@@ -644,9 +733,13 @@ int cmp_split_view_set_routes(cmp_split_view_t *split_view,
 
   if (detail_uri) {
     if (ctx->detail_route)
-      CMP_FREE(ctx->detail_route);
+      rc = CMP_FREE(ctx->detail_route);
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
     len = strlen(detail_uri);
-    if (CMP_MALLOC(len + 1, (void **)&ctx->detail_route) != CMP_SUCCESS)
+    rc = CMP_MALLOC(len + 1, (void **)&ctx->detail_route);
+    if (rc != CMP_SUCCESS)
       return CMP_ERROR_OOM;
 #if defined(_MSC_VER)
     strcpy_s(ctx->detail_route, len + 1, detail_uri);
@@ -654,6 +747,5 @@ int cmp_split_view_set_routes(cmp_split_view_t *split_view,
     strcpy(ctx->detail_route, detail_uri);
 #endif
   }
-
   return CMP_SUCCESS;
 }

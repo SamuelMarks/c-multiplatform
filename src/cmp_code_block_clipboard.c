@@ -15,7 +15,8 @@ struct cmp_clipboard_overlay {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_clipboard_overlay_create(cmp_clipboard_overlay_t **out_overlay) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_clipboard_overlay_t *overlay = NULL;
@@ -29,6 +30,9 @@ int cmp_clipboard_overlay_create(cmp_clipboard_overlay_t **out_overlay) {
     cmp_log_debug("cmp_clipboard_overlay_create: Invalid argument "
                   "(out_overlay=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -39,6 +43,9 @@ int cmp_clipboard_overlay_create(cmp_clipboard_overlay_t **out_overlay) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_clipboard_overlay_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -47,6 +54,9 @@ int cmp_clipboard_overlay_create(cmp_clipboard_overlay_t **out_overlay) {
   *out_overlay = overlay;
   cmp_log_debug("cmp_clipboard_overlay_create: Successfully created clipboard "
                 "overlay context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -57,7 +67,8 @@ int cmp_clipboard_overlay_create(cmp_clipboard_overlay_t **out_overlay) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_clipboard_overlay_destroy(cmp_clipboard_overlay_t *overlay) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -69,12 +80,18 @@ int cmp_clipboard_overlay_destroy(cmp_clipboard_overlay_t *overlay) {
     }
     cmp_log_debug("cmp_clipboard_overlay_destroy: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_FREE(overlay);
   if (rc != CMP_SUCCESS) {
     cmp_log_debug("cmp_clipboard_overlay_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -94,7 +111,8 @@ int cmp_clipboard_overlay_destroy(cmp_clipboard_overlay_t *overlay) {
 int cmp_clipboard_overlay_render(cmp_clipboard_overlay_t *overlay,
                                  cmp_code_block_t *block,
                                  cmp_clipboard_state_t state) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -106,6 +124,9 @@ int cmp_clipboard_overlay_render(cmp_clipboard_overlay_t *overlay,
     }
     cmp_log_debug("cmp_clipboard_overlay_render: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -114,6 +135,15 @@ int cmp_clipboard_overlay_render(cmp_clipboard_overlay_t *overlay,
   cmp_log_debug(
       "cmp_clipboard_overlay_render: Rendered clipboard overlay in state %d\n",
       (int)state);
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -127,7 +157,8 @@ int cmp_clipboard_overlay_render(cmp_clipboard_overlay_t *overlay,
  */
 int cmp_clipboard_overlay_copy(cmp_clipboard_overlay_t *overlay,
                                cmp_window_t *window, const char *raw_code) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -139,6 +170,9 @@ int cmp_clipboard_overlay_copy(cmp_clipboard_overlay_t *overlay,
     }
     cmp_log_debug("cmp_clipboard_overlay_copy: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -156,6 +190,11 @@ int cmp_clipboard_overlay_copy(cmp_clipboard_overlay_t *overlay,
     cmp_log_debug("cmp_clipboard_overlay_copy: cmp_window_set_clipboard_text "
                   "failed: %s\n",
                   err_str);
+  }
+
+  if (rc != 0) {
+
+    return rc;
   }
 
   return rc;

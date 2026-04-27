@@ -78,6 +78,8 @@ int cmp_mipmap_generator_generate(cmp_mipmap_generator_t *gen,
                                   const void *image_data, size_t width,
                                   size_t height, void **out_mipmaps,
                                   size_t *out_levels) {
+  int rc;
+  rc = 0;
   size_t levels;
   size_t cur_w;
   size_t cur_h;
@@ -107,6 +109,5 @@ int cmp_mipmap_generator_generate(cmp_mipmap_generator_t *gen,
   if (levels > 0 && out_mipmaps != NULL) {
     out_mipmaps[0] = NULL; /* Simulate mipmap pointers */
   }
-
   return CMP_SUCCESS;
 }

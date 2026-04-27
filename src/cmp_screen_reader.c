@@ -1,8 +1,10 @@
 /* clang-format off */
 #include "cmp.h"
+
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+
+#include "cmp_log.h"
 /* clang-format on */
 
 typedef struct cmp_screen_reader_mapping {
@@ -18,22 +20,29 @@ struct cmp_screen_reader {
 };
 
 /**
- * @brief cmp_screen_reader_create
+ * @brief Create a screen reader integration context.
  *
- * @param tree Parameter description.
- * @param out_reader Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param tree The a11y tree context.
+ * @param out_reader Pointer to receive the created reader instance.
+ * @return 0 on success, or an error code on failure.
  */
 int cmp_screen_reader_create(cmp_a11y_tree_t *tree,
                              cmp_screen_reader_t **out_reader) {
+  int rc;
   struct cmp_screen_reader *reader;
 
-  if (!tree || !out_reader)
-    return CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
 
-  if (CMP_MALLOC(sizeof(struct cmp_screen_reader), (void **)&reader) !=
-      CMP_SUCCESS)
+  if (tree == NULL || out_reader == NULL) {
+    LOG_DEBUG("Invalid argument: tree or out_reader is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_screen_reader), (void **)&reader);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
+  }
 
   reader->tree = tree;
   reader->mappings = NULL;
@@ -45,36 +54,53 @@ int cmp_screen_reader_create(cmp_a11y_tree_t *tree,
 }
 
 /**
- * @brief cmp_screen_reader_destroy
+ * @brief Destroy a screen reader integration context.
  *
- * @param reader Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param reader The screen reader instance.
+ * @return 0 on success, or an error code on failure.
  */
 int cmp_screen_reader_destroy(cmp_screen_reader_t *reader) {
-  struct cmp_screen_reader *r = (struct cmp_screen_reader *)reader;
+  int rc;
+  struct cmp_screen_reader *r;
 
-  if (!r)
+  rc = CMP_SUCCESS;
+  r = (struct cmp_screen_reader *)reader;
+
+  if (r == NULL) {
+    LOG_DEBUG("Invalid argument: reader is NULL\n");
     return CMP_ERROR_INVALID_ARG;
-
-  if (r->mappings) {
-    CMP_FREE(r->mappings);
   }
 
-  CMP_FREE(r);
+  if (r->mappings != NULL) {
+    rc = CMP_FREE(r->mappings);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free mappings failed\n");
+      return rc;
+    }
+  }
+
+  rc = CMP_FREE(r);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free reader failed\n");
+    return rc;
+  }
+
   return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_screen_reader_announce
+ * @brief Announce a message to the screen reader.
  *
- * @param reader Parameter description.
- * @param message Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param reader The screen reader instance.
+ * @param message The message to announce.
+ * @return 0 on success, or an error code on failure.
  */
 int cmp_screen_reader_announce(cmp_screen_reader_t *reader,
                                const char *message) {
-  if (!reader || !message)
+  if (reader == NULL || message == NULL) {
+    LOG_DEBUG("Invalid argument: reader or message is NULL\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   /* In a real implementation, this would trigger OS-specific TTS APIs */
   /* For now, we simulate success */
@@ -82,22 +108,28 @@ int cmp_screen_reader_announce(cmp_screen_reader_t *reader,
 }
 
 /**
- * @brief cmp_screen_reader_map_node
+ * @brief Map a specific a11y tree node to a native screen reader node.
  *
- * @param reader Parameter description.
- * @param node_id Parameter description.
- * @param native_node Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param reader The screen reader instance.
+ * @param node_id The ID of the a11y node.
+ * @param native_node The native node instance.
+ * @return 0 on success, or an error code on failure.
  */
 int cmp_screen_reader_map_node(cmp_screen_reader_t *reader, int node_id,
                                void *native_node) {
-  struct cmp_screen_reader *r = (struct cmp_screen_reader *)reader;
+  int rc;
+  struct cmp_screen_reader *r;
   cmp_screen_reader_mapping_t *new_mappings;
   size_t new_capacity;
   size_t i;
 
-  if (!r)
+  rc = CMP_SUCCESS;
+  r = (struct cmp_screen_reader *)reader;
+
+  if (r == NULL) {
+    LOG_DEBUG("Invalid argument: reader is NULL\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   /* Check if it already exists */
   for (i = 0; i < r->count; ++i) {
@@ -109,14 +141,20 @@ int cmp_screen_reader_map_node(cmp_screen_reader_t *reader, int node_id,
 
   if (r->count >= r->capacity) {
     new_capacity = r->capacity == 0 ? 16 : r->capacity * 2;
-    if (CMP_MALLOC(new_capacity * sizeof(cmp_screen_reader_mapping_t),
-                   (void **)&new_mappings) != CMP_SUCCESS)
+    rc = CMP_MALLOC(new_capacity * sizeof(cmp_screen_reader_mapping_t),
+                    (void **)&new_mappings);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("OOM mapping buffer\n");
       return CMP_ERROR_OOM;
+    }
 
-    if (r->mappings) {
+    if (r->mappings != NULL) {
       memcpy(new_mappings, r->mappings,
              r->count * sizeof(cmp_screen_reader_mapping_t));
-      CMP_FREE(r->mappings);
+      rc = CMP_FREE(r->mappings);
+      if (rc != CMP_SUCCESS) {
+        LOG_DEBUG("Free failed during resize\n");
+      }
     }
     r->mappings = new_mappings;
     r->capacity = new_capacity;

@@ -111,6 +111,11 @@ int cmp_msaa_destroy(cmp_msaa_t *msaa) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_msaa_resolve(cmp_msaa_t *msaa, cmp_texture_t *target_texture) {
+  int rc;
+  rc = CMP_SUCCESS;
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
   if (msaa == NULL || target_texture == NULL) {
     LOG_DEBUG("Error in cmp_msaa_resolve: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;

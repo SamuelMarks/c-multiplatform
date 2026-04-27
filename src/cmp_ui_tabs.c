@@ -24,6 +24,8 @@ struct cmp_ui_tabs {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs) {
+  int rc;
+  rc = 0;
   cmp_ui_tabs_t *tabs;
   int err;
 
@@ -57,7 +59,16 @@ int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs) {
   tabs->selected_index = -1;
 
   *out_tabs = tabs;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -67,6 +78,8 @@ int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_destroy(cmp_ui_tabs_t *tabs) {
+  int rc;
+  rc = 0;
   if (!tabs) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -74,7 +87,16 @@ int cmp_ui_tabs_destroy(cmp_ui_tabs_t *tabs) {
     CMP_FREE(tabs->tabs);
   }
   CMP_FREE(tabs);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -85,11 +107,22 @@ int cmp_ui_tabs_destroy(cmp_ui_tabs_t *tabs) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_get_node(cmp_ui_tabs_t *tabs, cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!tabs || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = tabs->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -102,6 +135,8 @@ int cmp_ui_tabs_get_node(cmp_ui_tabs_t *tabs, cmp_ui_node_t **out_node) {
  */
 int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
                         int *out_index) {
+  int rc;
+  rc = 0;
   cmp_ui_node_t *tab_node;
   int err;
 
@@ -138,7 +173,16 @@ int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
   }
 
   tabs->tab_count++;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -149,6 +193,8 @@ int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_set_selected(cmp_ui_tabs_t *tabs, int index) {
+  int rc;
+  rc = 0;
   int i;
   if (!tabs || index < 0 || index >= tabs->tab_count) {
     return CMP_ERROR_INVALID_ARG;
@@ -160,7 +206,16 @@ int cmp_ui_tabs_set_selected(cmp_ui_tabs_t *tabs, int index) {
   }
 
   tabs->selected_index = index;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_ui_tabs_bind_a11y
@@ -170,10 +225,21 @@ int cmp_ui_tabs_set_selected(cmp_ui_tabs_t *tabs, int index) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_bind_a11y(cmp_ui_tabs_t *widget, cmp_a11y_tree_t *tree) {
+  int rc;
+  rc = 0;
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
   cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "tablist",
                          "Tabs");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

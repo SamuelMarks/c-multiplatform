@@ -13,6 +13,8 @@
  */
 int cmp_m3_typography_resolve(cmp_m3_typescale_category_t category,
                               cmp_m3_type_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -112,7 +114,16 @@ int cmp_m3_typography_resolve(cmp_m3_typescale_category_t category,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -123,6 +134,8 @@ int cmp_m3_typography_resolve(cmp_m3_typescale_category_t category,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_m3_typography_get_family(int is_brand, const char **out_font_family) {
+  int rc;
+  rc = 0;
   if (!out_font_family) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -133,5 +146,14 @@ int cmp_m3_typography_get_family(int is_brand, const char **out_font_family) {
     *out_font_family = "Roboto";
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

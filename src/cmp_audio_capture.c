@@ -19,7 +19,8 @@ struct cmp_audio_capture {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_capture_create(cmp_audio_capture_t **out_capture) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_audio_capture_t *cap = NULL;
@@ -33,6 +34,9 @@ int cmp_audio_capture_create(cmp_audio_capture_t **out_capture) {
     cmp_log_debug(
         "cmp_audio_capture_create: Invalid argument (out_capture=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -43,6 +47,9 @@ int cmp_audio_capture_create(cmp_audio_capture_t **out_capture) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_audio_capture_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -51,6 +58,9 @@ int cmp_audio_capture_create(cmp_audio_capture_t **out_capture) {
   *out_capture = cap;
   cmp_log_debug(
       "cmp_audio_capture_create: Successfully created audio capture context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -61,7 +71,8 @@ int cmp_audio_capture_create(cmp_audio_capture_t **out_capture) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_capture_destroy(cmp_audio_capture_t *capture) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -74,12 +85,24 @@ int cmp_audio_capture_destroy(cmp_audio_capture_t *capture) {
     cmp_log_debug(
         "cmp_audio_capture_destroy: Invalid argument (capture=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   CMP_FREE(capture);
   cmp_log_debug("cmp_audio_capture_destroy: Successfully destroyed audio "
                 "capture context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -90,7 +113,8 @@ int cmp_audio_capture_destroy(cmp_audio_capture_t *capture) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_capture_start(cmp_audio_capture_t *capture) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -103,6 +127,9 @@ int cmp_audio_capture_start(cmp_audio_capture_t *capture) {
     cmp_log_debug(
         "cmp_audio_capture_start: Invalid argument (capture=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -113,12 +140,24 @@ int cmp_audio_capture_start(cmp_audio_capture_t *capture) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_audio_capture_start: Already recording: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   capture->is_recording = 1;
   capture->dummy_pcm_size = 44100; /* Mock 1 second of audio */
   cmp_log_debug("cmp_audio_capture_start: Started audio capture\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -129,7 +168,8 @@ int cmp_audio_capture_start(cmp_audio_capture_t *capture) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_capture_stop(cmp_audio_capture_t *capture) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -142,6 +182,9 @@ int cmp_audio_capture_stop(cmp_audio_capture_t *capture) {
     cmp_log_debug(
         "cmp_audio_capture_stop: Invalid argument (capture=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -152,11 +195,23 @@ int cmp_audio_capture_stop(cmp_audio_capture_t *capture) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_audio_capture_stop: Not recording: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   capture->is_recording = 0;
   cmp_log_debug("cmp_audio_capture_stop: Stopped audio capture\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -171,7 +226,8 @@ int cmp_audio_capture_stop(cmp_audio_capture_t *capture) {
 int cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
                               unsigned char **out_wav_data,
                               unsigned int *out_size) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   unsigned char *wav = NULL;
@@ -184,6 +240,9 @@ int cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_audio_capture_get_wav: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -195,6 +254,9 @@ int cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
     }
     cmp_log_debug("cmp_audio_capture_get_wav: Must stop recording: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc; /* Must stop before getting */
   }
 
@@ -207,6 +269,9 @@ int cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_audio_capture_get_wav: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -225,6 +290,9 @@ int cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
   *out_size = total_size;
   cmp_log_debug("cmp_audio_capture_get_wav: Retrieved WAV data of size %u\n",
                 total_size);
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -235,12 +303,22 @@ int cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_capture_free_wav(unsigned char *wav_data) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (wav_data != NULL) {
     CMP_FREE(wav_data);
     cmp_log_debug("cmp_audio_capture_free_wav: Freed WAV data\n");
   } else {
     cmp_log_debug("cmp_audio_capture_free_wav: Null wav_data ignored\n");
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }

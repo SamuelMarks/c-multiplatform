@@ -16,24 +16,36 @@ struct cmp_keyboard_avoidance {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_keyboard_avoidance_create(cmp_keyboard_avoidance_t **out_avoider) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_keyboard_avoidance_t *avoider = NULL;
 
   if (!out_avoider) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_keyboard_avoidance_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_keyboard_avoidance_t), (void **)&avoider);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_keyboard_avoidance_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   avoider->is_active = 0;
   avoider->current_offset = 0.0f;
   *out_avoider = avoider;
+
+  if (rc != 0) {
+
+    return rc;
+  }
 
   return rc;
 }
@@ -45,17 +57,24 @@ int cmp_keyboard_avoidance_create(cmp_keyboard_avoidance_t **out_avoider) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_keyboard_avoidance_destroy(cmp_keyboard_avoidance_t *avoider) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!avoider) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_keyboard_avoidance_destroy: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_FREE(avoider);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_keyboard_avoidance_destroy: CMP_FREE failed\n");
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -75,12 +94,16 @@ int cmp_keyboard_avoidance_compute_offset(cmp_keyboard_avoidance_t *avoider,
                                           float input_bottom_y,
                                           float screen_height,
                                           float *out_y_offset) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!avoider || !out_y_offset) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_keyboard_avoidance_compute_offset: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -89,6 +112,9 @@ int cmp_keyboard_avoidance_compute_offset(cmp_keyboard_avoidance_t *avoider,
     *out_y_offset = 0.0f;
     avoider->is_active = 0;
     avoider->current_offset = 0.0f;
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -97,11 +123,19 @@ int cmp_keyboard_avoidance_compute_offset(cmp_keyboard_avoidance_t *avoider,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_keyboard_avoidance_compute_offset: "
               "cmp_ios_calculate_keyboard_avoidance failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   avoider->is_active = (*out_y_offset != 0.0f) ? 1 : 0;
   avoider->current_offset = *out_y_offset;
+
+  if (rc != 0) {
+
+    return rc;
+  }
 
   return rc;
 }

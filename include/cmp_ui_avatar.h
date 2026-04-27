@@ -30,7 +30,7 @@ typedef struct cmp_ui_avatar cmp_ui_avatar_t;
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_avatar_create(cmp_ui_avatar_t **out_avatar,
+int CMP_API cmp_ui_avatar_create(cmp_ui_avatar_t **out_avatar,
                                  const char *initials, uint32_t bg_color,
                                  uint32_t text_color);
 
@@ -41,7 +41,7 @@ CMP_API int cmp_ui_avatar_create(cmp_ui_avatar_t **out_avatar,
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_avatar_destroy(cmp_ui_avatar_t *avatar);
+int CMP_API cmp_ui_avatar_destroy(cmp_ui_avatar_t *avatar);
 
 /**
  * rief Retrieves the underlying UI node for the avatar.
@@ -51,7 +51,7 @@ CMP_API int cmp_ui_avatar_destroy(cmp_ui_avatar_t *avatar);
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_avatar_get_node(cmp_ui_avatar_t *avatar,
+int CMP_API cmp_ui_avatar_get_node(cmp_ui_avatar_t *avatar,
                                    cmp_ui_node_t **out_node);
 
 /**
@@ -62,9 +62,8 @@ CMP_API int cmp_ui_avatar_get_node(cmp_ui_avatar_t *avatar,
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_avatar_set_initials(cmp_ui_avatar_t *avatar,
+int CMP_API cmp_ui_avatar_set_initials(cmp_ui_avatar_t *avatar,
                                        const char *initials);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

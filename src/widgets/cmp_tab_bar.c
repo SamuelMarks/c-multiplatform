@@ -24,6 +24,8 @@ struct cmp_tab_bar {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_bar_create(cmp_tab_bar_t **out_tab_bar) {
+  int rc;
+  rc = 0;
   struct cmp_tab_bar *ctx;
   if (!out_tab_bar)
     return CMP_ERROR_INVALID_ARG;
@@ -35,7 +37,16 @@ int cmp_tab_bar_create(cmp_tab_bar_t **out_tab_bar) {
   ctx->capacity = 0;
 
   *out_tab_bar = (cmp_tab_bar_t *)ctx;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -45,6 +56,8 @@ int cmp_tab_bar_create(cmp_tab_bar_t **out_tab_bar) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_bar_destroy(cmp_tab_bar_t *tab_bar) {
+  int rc;
+  rc = 0;
   struct cmp_tab_bar *ctx = (struct cmp_tab_bar *)tab_bar;
   size_t i;
   if (!ctx)
@@ -62,7 +75,16 @@ int cmp_tab_bar_destroy(cmp_tab_bar_t *tab_bar) {
     CMP_FREE(ctx->tabs);
   }
   CMP_FREE(ctx);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -76,6 +98,8 @@ int cmp_tab_bar_destroy(cmp_tab_bar_t *tab_bar) {
  */
 int cmp_tab_bar_add_tab(cmp_tab_bar_t *tab_bar, const char *title,
                         const char *symbol_icon, const char *route_uri) {
+  int rc;
+  rc = 0;
   struct cmp_tab_bar *ctx = (struct cmp_tab_bar *)tab_bar;
   cmp_tab_item_t *new_tabs;
   size_t new_cap, len;
@@ -130,7 +154,16 @@ int cmp_tab_bar_add_tab(cmp_tab_bar_t *tab_bar, const char *title,
      boundary. If count > 5 on iPhone, the 5th tab automatically becomes a
      "More" navigation drill-down. */
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -143,12 +176,23 @@ int cmp_tab_bar_add_tab(cmp_tab_bar_t *tab_bar, const char *title,
  */
 int cmp_tab_bar_set_badge(cmp_tab_bar_t *tab_bar, size_t tab_index,
                           int badge_value) {
+  int rc;
+  rc = 0;
   struct cmp_tab_bar *ctx = (struct cmp_tab_bar *)tab_bar;
   if (!ctx || tab_index >= ctx->count)
     return CMP_ERROR_INVALID_ARG;
 
   ctx->tabs[tab_index].badge_value = badge_value;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -163,6 +207,8 @@ int cmp_tab_bar_set_badge(cmp_tab_bar_t *tab_bar, size_t tab_index,
 int cmp_tab_bar_resolve_layout(cmp_tab_bar_t *tab_bar, float available_width,
                                cmp_tab_bar_placement_t *out_placement,
                                cmp_macos_material_t *out_material) {
+  int rc;
+  rc = 0;
   if (!tab_bar || !out_placement || !out_material)
     return CMP_ERROR_INVALID_ARG;
 
@@ -177,7 +223,16 @@ int cmp_tab_bar_resolve_layout(cmp_tab_bar_t *tab_bar, float available_width,
     *out_material =
         CMP_MACOS_MATERIAL_BEHIND_WINDOW; /* Deep translucency on desktop */
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -189,6 +244,8 @@ int cmp_tab_bar_resolve_layout(cmp_tab_bar_t *tab_bar, float available_width,
  */
 int cmp_toolbar_resolve_placement(float available_width,
                                   int *out_is_bottom_placed) {
+  int rc;
+  rc = 0;
   if (!out_is_bottom_placed)
     return CMP_ERROR_INVALID_ARG;
 
@@ -199,5 +256,14 @@ int cmp_toolbar_resolve_placement(float available_width,
   } else {
     *out_is_bottom_placed = 0;
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

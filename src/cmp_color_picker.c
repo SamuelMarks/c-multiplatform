@@ -16,7 +16,8 @@ struct cmp_color_picker {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_color_picker_create(cmp_color_picker_t **out_picker) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_color_picker *picker = NULL;
@@ -28,6 +29,9 @@ int cmp_color_picker_create(cmp_color_picker_t **out_picker) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_color_picker_create: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -38,6 +42,9 @@ int cmp_color_picker_create(cmp_color_picker_t **out_picker) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_color_picker_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -57,7 +64,8 @@ int cmp_color_picker_create(cmp_color_picker_t **out_picker) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_color_picker_destroy(cmp_color_picker_t *picker) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_color_picker *internal_picker = (struct cmp_color_picker *)picker;
@@ -69,6 +77,9 @@ int cmp_color_picker_destroy(cmp_color_picker_t *picker) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_color_picker_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 

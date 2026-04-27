@@ -17,6 +17,8 @@ static int g_scribble_enabled = 1;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_stylus_context_create(cmp_stylus_context_t **out_context) {
+  int rc;
+  rc = 0;
   struct cmp_stylus_context *ctx;
   if (!out_context)
     return CMP_ERROR_INVALID_ARG;
@@ -28,7 +30,16 @@ int cmp_stylus_context_create(cmp_stylus_context_t **out_context) {
   ctx->userdata = NULL;
 
   *out_context = (cmp_stylus_context_t *)ctx;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -38,9 +49,20 @@ int cmp_stylus_context_create(cmp_stylus_context_t **out_context) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_stylus_context_destroy(cmp_stylus_context_t *context_opaque) {
+  int rc;
+  rc = 0;
   if (context_opaque)
     CMP_FREE(context_opaque);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -54,12 +76,23 @@ int cmp_stylus_context_destroy(cmp_stylus_context_t *context_opaque) {
 int cmp_stylus_context_set_event_callback(cmp_stylus_context_t *context_opaque,
                                           cmp_stylus_event_cb callback,
                                           void *userdata) {
+  int rc;
+  rc = 0;
   struct cmp_stylus_context *ctx = (struct cmp_stylus_context *)context_opaque;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
   ctx->event_cb = callback;
   ctx->userdata = userdata;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -74,6 +107,8 @@ int cmp_stylus_context_set_event_callback(cmp_stylus_context_t *context_opaque,
 int cmp_stylus_resolve_ink_metrics(const cmp_event_t *event, float base_width,
                                    float *out_brush_opacity,
                                    float *out_brush_width) {
+  int rc;
+  rc = 0;
   if (!event || !out_brush_opacity || !out_brush_width)
     return CMP_ERROR_INVALID_ARG;
 
@@ -97,7 +132,16 @@ int cmp_stylus_resolve_ink_metrics(const cmp_event_t *event, float base_width,
     *out_brush_width = base_width;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -110,6 +154,8 @@ int cmp_stylus_resolve_ink_metrics(const cmp_event_t *event, float base_width,
  */
 int cmp_stylus_evaluate_hover(const cmp_event_t *event, int *out_is_hovering,
                               float *out_distance) {
+  int rc;
+  rc = 0;
   if (!event || !out_is_hovering || !out_distance)
     return CMP_ERROR_INVALID_ARG;
 
@@ -121,7 +167,16 @@ int cmp_stylus_evaluate_hover(const cmp_event_t *event, int *out_is_hovering,
     *out_is_hovering = 0;
     *out_distance = 0.0f;
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -131,6 +186,17 @@ int cmp_stylus_evaluate_hover(const cmp_event_t *event, int *out_is_hovering,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_stylus_set_scribble_enabled(int is_enabled) {
+  int rc;
+  rc = 0;
   g_scribble_enabled = is_enabled;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

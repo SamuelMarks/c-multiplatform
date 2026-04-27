@@ -22,6 +22,8 @@ struct cmp_ui_progress_indicator {
 int cmp_ui_progress_indicator_create(
     cmp_ui_progress_indicator_t **out_indicator,
     cmp_ui_progress_indicator_type_t type) {
+  int rc;
+  rc = 0;
   cmp_ui_progress_indicator_t *ind;
   int err;
 
@@ -75,7 +77,16 @@ int cmp_ui_progress_indicator_create(
    * morphing. */
 
   *out_indicator = ind;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -85,12 +96,20 @@ int cmp_ui_progress_indicator_create(
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_progress_indicator_destroy(cmp_ui_progress_indicator_t *indicator) {
+  int rc;
+  rc = 0;
   if (!indicator) {
     return CMP_ERROR_INVALID_ARG;
   }
   int err = CMP_FREE(indicator);
   if (err != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_progress_indicator_destroy: CMP_FREE failed\n");
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
   }
   return err;
 }
@@ -104,11 +123,22 @@ int cmp_ui_progress_indicator_destroy(cmp_ui_progress_indicator_t *indicator) {
  */
 int cmp_ui_progress_indicator_get_node(cmp_ui_progress_indicator_t *indicator,
                                        cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!indicator || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = indicator->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -120,6 +150,8 @@ int cmp_ui_progress_indicator_get_node(cmp_ui_progress_indicator_t *indicator,
  */
 int cmp_ui_progress_indicator_set_progress(
     cmp_ui_progress_indicator_t *indicator, float progress) {
+  int rc;
+  rc = 0;
   if (!indicator) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -134,7 +166,16 @@ int cmp_ui_progress_indicator_set_progress(
   /* Here we would update the layout or vector properties (width% for linear,
    * dashoffset for circular) */
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -147,6 +188,8 @@ int cmp_ui_progress_indicator_set_progress(
 int cmp_ui_progress_indicator_set_type(
     cmp_ui_progress_indicator_t *indicator,
     cmp_ui_progress_indicator_type_t new_type) {
+  int rc;
+  rc = 0;
   if (!indicator) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -157,7 +200,16 @@ int cmp_ui_progress_indicator_set_type(
      * shapes */
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_ui_progress_indicator_bind_a11y
@@ -168,6 +220,8 @@ int cmp_ui_progress_indicator_set_type(
  */
 int cmp_ui_progress_indicator_bind_a11y(cmp_ui_progress_indicator_t *widget,
                                         cmp_a11y_tree_t *tree) {
+  int rc;
+  rc = 0;
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -176,6 +230,12 @@ int cmp_ui_progress_indicator_bind_a11y(cmp_ui_progress_indicator_t *widget,
   if (err != CMP_SUCCESS) {
     LOG_DEBUG(
         "cmp_ui_progress_indicator_bind_a11y: cmp_a11y_tree_add_node failed\n");
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
   }
   return err;
 }

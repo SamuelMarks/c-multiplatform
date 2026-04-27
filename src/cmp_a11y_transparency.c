@@ -15,7 +15,8 @@ struct cmp_a11y_transparency {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_transparency_create(cmp_a11y_transparency_t **out_trans) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_a11y_transparency_t *trans = NULL;
@@ -29,6 +30,9 @@ int cmp_a11y_transparency_create(cmp_a11y_transparency_t **out_trans) {
     cmp_log_debug(
         "cmp_a11y_transparency_create: Invalid argument (out_trans=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -39,6 +43,9 @@ int cmp_a11y_transparency_create(cmp_a11y_transparency_t **out_trans) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_transparency_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -46,6 +53,9 @@ int cmp_a11y_transparency_create(cmp_a11y_transparency_t **out_trans) {
   *out_trans = trans;
   cmp_log_debug("cmp_a11y_transparency_create: Successfully created "
                 "transparency context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -56,7 +66,8 @@ int cmp_a11y_transparency_create(cmp_a11y_transparency_t **out_trans) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_transparency_destroy(cmp_a11y_transparency_t *trans) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -69,11 +80,23 @@ int cmp_a11y_transparency_destroy(cmp_a11y_transparency_t *trans) {
     cmp_log_debug(
         "cmp_a11y_transparency_destroy: Invalid argument (trans=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   CMP_FREE(trans);
   cmp_log_debug("cmp_a11y_transparency_destroy: Successfully destroyed "
                 "transparency context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -85,7 +108,8 @@ int cmp_a11y_transparency_destroy(cmp_a11y_transparency_t *trans) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_transparency_set(cmp_a11y_transparency_t *trans, int enabled) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -98,11 +122,23 @@ int cmp_a11y_transparency_set(cmp_a11y_transparency_t *trans, int enabled) {
     cmp_log_debug(
         "cmp_a11y_transparency_set: Invalid argument (trans=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   trans->reduced_transparency_enabled = enabled != 0 ? 1 : 0;
   cmp_log_debug("cmp_a11y_transparency_set: Set reduced transparency to %d\n",
                 trans->reduced_transparency_enabled);
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -116,7 +152,8 @@ int cmp_a11y_transparency_set(cmp_a11y_transparency_t *trans, int enabled) {
  */
 int cmp_a11y_transparency_apply(cmp_a11y_transparency_t *trans,
                                 float *out_opacity, float fallback_opacity) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -128,6 +165,9 @@ int cmp_a11y_transparency_apply(cmp_a11y_transparency_t *trans,
     }
     cmp_log_debug("cmp_a11y_transparency_apply: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -139,6 +179,15 @@ int cmp_a11y_transparency_apply(cmp_a11y_transparency_t *trans,
   } else {
     cmp_log_debug("cmp_a11y_transparency_apply: Reduced transparency not "
                   "enabled, opacity unchanged\n");
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }

@@ -29,7 +29,7 @@ typedef struct cmp_ui_badge cmp_ui_badge_t;
  * \param text_color Text color of the badge (ARGB).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
+int CMP_API cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
                                 uint32_t bg_color, uint32_t text_color);
 
 /**
@@ -38,7 +38,7 @@ CMP_API int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
  * \param badge The badge component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_badge_destroy(cmp_ui_badge_t *badge);
+int CMP_API cmp_ui_badge_destroy(cmp_ui_badge_t *badge);
 
 /**
  * \brief Retrieves the underlying UI node for the badge.
@@ -47,7 +47,7 @@ CMP_API int cmp_ui_badge_destroy(cmp_ui_badge_t *badge);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_badge_get_node(cmp_ui_badge_t *badge,
+int CMP_API cmp_ui_badge_get_node(cmp_ui_badge_t *badge,
                                   cmp_ui_node_t **out_node);
 
 /**
@@ -57,7 +57,7 @@ CMP_API int cmp_ui_badge_get_node(cmp_ui_badge_t *badge,
  * \param text The new text to display.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text);
+int CMP_API cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text);
 
 /**
  * \brief Binds the badge widget to the accessibility tree.
@@ -66,9 +66,8 @@ CMP_API int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text);
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_badge_bind_a11y(cmp_ui_badge_t *widget,
+int CMP_API cmp_ui_badge_bind_a11y(cmp_ui_badge_t *widget,
                                    cmp_a11y_tree_t *tree);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

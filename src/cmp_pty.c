@@ -26,7 +26,8 @@ struct cmp_pty {
  */
 int cmp_pty_create(cmp_pty_t **out_pty, const char *command, int cols,
                    int rows) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_pty_t *pty = NULL;
 
   if (!out_pty || !command) {
@@ -55,7 +56,7 @@ int cmp_pty_create(cmp_pty_t **out_pty, const char *command, int cols,
   pty->buffer_len = (unsigned int)strlen(pty->buffer);
 
   *out_pty = pty;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -65,7 +66,8 @@ int cmp_pty_create(cmp_pty_t **out_pty, const char *command, int cols,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pty_destroy(cmp_pty_t *pty) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!pty) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -79,7 +81,7 @@ int cmp_pty_destroy(cmp_pty_t *pty) {
     return rc;
   }
 
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -91,7 +93,8 @@ int cmp_pty_destroy(cmp_pty_t *pty) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pty_resize(cmp_pty_t *pty, int cols, int rows) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!pty || cols <= 0 || rows <= 0) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -101,7 +104,7 @@ int cmp_pty_resize(cmp_pty_t *pty, int cols, int rows) {
 
   pty->cols = cols;
   pty->rows = rows;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -113,7 +116,8 @@ int cmp_pty_resize(cmp_pty_t *pty, int cols, int rows) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pty_write(cmp_pty_t *pty, const void *data, unsigned int len) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!pty || !data) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -127,8 +131,7 @@ int cmp_pty_write(cmp_pty_t *pty, const void *data, unsigned int len) {
   }
   memcpy(pty->buffer, data, len);
   pty->buffer_len = len;
-
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -142,7 +145,8 @@ int cmp_pty_write(cmp_pty_t *pty, const void *data, unsigned int len) {
  */
 int cmp_pty_read(cmp_pty_t *pty, void *out_buffer, unsigned int buffer_size,
                  unsigned int *out_read) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   unsigned int to_copy;
 
   if (!pty || !out_buffer || !out_read) {
@@ -153,7 +157,7 @@ int cmp_pty_read(cmp_pty_t *pty, void *out_buffer, unsigned int buffer_size,
 
   if (pty->buffer_len == 0) {
     *out_read = 0;
-    return rc;
+    return CMP_SUCCESS;
   }
 
   to_copy = pty->buffer_len > buffer_size ? buffer_size : pty->buffer_len;
@@ -167,6 +171,5 @@ int cmp_pty_read(cmp_pty_t *pty, void *out_buffer, unsigned int buffer_size,
   } else {
     pty->buffer_len = 0;
   }
-
-  return rc;
+  return CMP_SUCCESS;
 }

@@ -20,7 +20,8 @@ struct cmp_apz {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_apz_create(cmp_apz_t **out_apz) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_apz *ctx = NULL;
@@ -33,6 +34,9 @@ int cmp_apz_create(cmp_apz_t **out_apz) {
     }
     cmp_log_debug("cmp_apz_create: Invalid argument (out_apz=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -43,6 +47,9 @@ int cmp_apz_create(cmp_apz_t **out_apz) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_apz_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -50,6 +57,9 @@ int cmp_apz_create(cmp_apz_t **out_apz) {
   ctx->current_scale = 1.0f;
   *out_apz = (cmp_apz_t *)ctx;
   cmp_log_debug("cmp_apz_create: Successfully created APZ context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -60,7 +70,8 @@ int cmp_apz_create(cmp_apz_t **out_apz) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_apz_destroy(cmp_apz_t *apz) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_apz *ctx = (struct cmp_apz *)apz;
@@ -73,6 +84,9 @@ int cmp_apz_destroy(cmp_apz_t *apz) {
     }
     cmp_log_debug("cmp_apz_destroy: Invalid argument (apz=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -81,6 +95,9 @@ int cmp_apz_destroy(cmp_apz_t *apz) {
     cmp_log_debug("cmp_apz_destroy: CMP_FREE failed\n");
   }
   cmp_log_debug("cmp_apz_destroy: Successfully destroyed APZ context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -95,7 +112,8 @@ int cmp_apz_destroy(cmp_apz_t *apz) {
  */
 int cmp_apz_inject_gesture(cmp_apz_t *apz, float delta_x, float delta_y,
                            float scale) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_apz *ctx = (struct cmp_apz *)apz;
@@ -108,6 +126,9 @@ int cmp_apz_inject_gesture(cmp_apz_t *apz, float delta_x, float delta_y,
     }
     cmp_log_debug("cmp_apz_inject_gesture: Invalid argument (apz=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -117,6 +138,15 @@ int cmp_apz_inject_gesture(cmp_apz_t *apz, float delta_x, float delta_y,
   cmp_log_debug("cmp_apz_inject_gesture: APZ updated state (x=%.2f, y=%.2f, "
                 "scale=%.2f)\n",
                 ctx->current_x, ctx->current_y, ctx->current_scale);
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -128,7 +158,8 @@ int cmp_apz_inject_gesture(cmp_apz_t *apz, float delta_x, float delta_y,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_apz_get_transform(const cmp_apz_t *apz, float *out_matrix) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   const struct cmp_apz *ctx = (const struct cmp_apz *)apz;
@@ -141,6 +172,9 @@ int cmp_apz_get_transform(const cmp_apz_t *apz, float *out_matrix) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_apz_get_transform: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -152,5 +186,14 @@ int cmp_apz_get_transform(const cmp_apz_t *apz, float *out_matrix) {
   out_matrix[12] = ctx->current_x;
   out_matrix[13] = ctx->current_y;
   cmp_log_debug("cmp_apz_get_transform: APZ retrieved transform matrix\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

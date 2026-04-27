@@ -28,7 +28,7 @@ typedef struct cmp_ui_virtual_list cmp_ui_virtual_list_t;
  * \param item_height The uniform height of each item.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_virtual_list_create(cmp_ui_virtual_list_t **out_list,
+int CMP_API cmp_ui_virtual_list_create(cmp_ui_virtual_list_t **out_list,
                                        size_t item_count, float item_height);
 
 /**
@@ -37,7 +37,7 @@ CMP_API int cmp_ui_virtual_list_create(cmp_ui_virtual_list_t **out_list,
  * \param list The component to destroy.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_virtual_list_destroy(cmp_ui_virtual_list_t *list);
+int CMP_API cmp_ui_virtual_list_destroy(cmp_ui_virtual_list_t *list);
 
 /**
  * \brief Retrieves the underlying UI node.
@@ -46,7 +46,7 @@ CMP_API int cmp_ui_virtual_list_destroy(cmp_ui_virtual_list_t *list);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_virtual_list_get_node(cmp_ui_virtual_list_t *list,
+int CMP_API cmp_ui_virtual_list_get_node(cmp_ui_virtual_list_t *list,
                                          cmp_ui_node_t **out_node);
 
 /**
@@ -56,9 +56,8 @@ CMP_API int cmp_ui_virtual_list_get_node(cmp_ui_virtual_list_t *list,
  * \param item_count The new total item count.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_virtual_list_set_item_count(cmp_ui_virtual_list_t *list,
+int CMP_API cmp_ui_virtual_list_set_item_count(cmp_ui_virtual_list_t *list,
                                                size_t item_count);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

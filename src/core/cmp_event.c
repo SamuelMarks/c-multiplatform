@@ -77,7 +77,7 @@ int cmp_event_push(const cmp_event_t *event) {
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
       if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_push: %s\n", err_str);    
- }    return rc;
+ }    if (rc != 0) {      return rc;    }    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_event_t), (void **)&copy);
@@ -87,7 +87,7 @@ int cmp_event_push(const cmp_event_t *event) {
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
       if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_push CMP_MALLOC: %s\n", err_str);
- }    return rc;
+ }    if (rc != 0) {      return rc;    }    return rc;
   }
 
   memcpy(copy, event, sizeof(cmp_event_t));
@@ -99,7 +99,7 @@ int cmp_event_push(const cmp_event_t *event) {
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
       if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_push cmp_ring_buffer_push: %s\n", err_str);
- }    return rc;
+ }    if (rc != 0) {      return rc;    }    return rc;
   }
 
   return CMP_SUCCESS;
@@ -121,11 +121,14 @@ int cmp_event_pop(cmp_event_t *out_event) {
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
       if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_pop: %s\n", err_str);     
- }    return rc;
+ }    if (rc != 0) {      return rc;    }    return rc;
   }
 
   rc = cmp_ring_buffer_pop(&g_event_queue, (void **)&ptr);
   if (rc != CMP_SUCCESS) {
+    if (rc != 0) {
+      return rc;
+    }
     return rc; /* Usually NOT_FOUND, no need to log excessively here on idle */
   }
 
@@ -142,12 +145,15 @@ int cmp_event_pop(cmp_event_t *out_event) {
  * @param y The y-coordinate.
  * @return Returns the ID of the hit element.
  */
-int cmp_event_hit_test(int x, int y) {
-  int rc;
+int cmp_event_hit_test(int x, int y) {int rc;
   /* Mapping coordinates to UI tree nodes (Full implementation deferred to Phase 25) */
   (void)x;
   (void)y;
   rc = 1;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -160,13 +166,16 @@ static int g_focus_ring_visible = 0;
  * @param element_id The ID of the element to focus.
  * @return Returns 0 on success.
  */
-int cmp_event_set_focus(int element_id) {
-  int rc;
+int cmp_event_set_focus(int element_id) {int rc;
   g_focused_element_id = element_id;
   /* Automatically show focus ring when programmatic or keyboard focus happens
    */
   g_focus_ring_visible = 1;
   rc = CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -175,9 +184,12 @@ int cmp_event_set_focus(int element_id) {
  *
  * @return Returns the focused element ID, or -1 if none.
  */
-int cmp_event_get_focus(void) {
-  int rc;
+int cmp_event_get_focus(void) {int rc;
   rc = g_focused_element_id;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -186,9 +198,12 @@ int cmp_event_get_focus(void) {
  *
  * @return Returns 1 if visible, 0 otherwise.
  */
-int cmp_event_is_focus_ring_visible(void) {
-  int rc;
+int cmp_event_is_focus_ring_visible(void) {int rc;
   rc = g_focus_ring_visible;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -197,11 +212,14 @@ int cmp_event_is_focus_ring_visible(void) {
  *
  * @return Returns 0 on success.
  */
-int cmp_event_clear_focus(void) {
-  int rc;
+int cmp_event_clear_focus(void) {int rc;
   g_focused_element_id = -1;
   g_focus_ring_visible = 0;
   rc = CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -211,8 +229,7 @@ int cmp_event_clear_focus(void) {
  * @param reverse 1 to navigate backward, 0 to navigate forward.
  * @return Returns 0 on success.
  */
-int cmp_event_handle_tab_targeting(int reverse) {
-  int rc;
+int cmp_event_handle_tab_targeting(int reverse) {int rc;
   if (g_focused_element_id < 0) {
     g_focused_element_id = 1;
   } else {
@@ -224,5 +241,9 @@ int cmp_event_handle_tab_targeting(int reverse) {
   }
   g_focus_ring_visible = 1; /* Keyboard-initiated focus shows the ring */
   rc = CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

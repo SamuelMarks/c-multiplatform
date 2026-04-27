@@ -20,6 +20,8 @@ struct cmp_system_fonts {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_fonts_create(cmp_system_fonts_t **out_ctx) {
+  int rc;
+  rc = 0;
   struct cmp_system_fonts *ctx;
   if (!out_ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -49,7 +51,16 @@ int cmp_system_fonts_create(cmp_system_fonts_t **out_ctx) {
   ctx->cached_ny->default_size = 17.0f;
 
   *out_ctx = (cmp_system_fonts_t *)ctx;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -59,6 +70,8 @@ int cmp_system_fonts_create(cmp_system_fonts_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_fonts_destroy(cmp_system_fonts_t *ctx) {
+  int rc;
+  rc = 0;
   if (!ctx)
     return CMP_SUCCESS;
   if (ctx->cached_sf_text)
@@ -72,7 +85,16 @@ int cmp_system_fonts_destroy(cmp_system_fonts_t *ctx) {
   if (ctx->cached_ny)
     CMP_FREE(ctx->cached_ny);
   CMP_FREE(ctx);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -89,6 +111,8 @@ int cmp_system_fonts_request(cmp_system_fonts_t *ctx,
                              cmp_system_font_type_t type,
                              cmp_semantic_text_style_t style, int weight,
                              cmp_font_t **out_font) {
+  int rc;
+  rc = 0;
   struct cmp_system_fonts *c = (struct cmp_system_fonts *)ctx;
   (void)style;
   (void)weight;
@@ -113,7 +137,16 @@ int cmp_system_fonts_request(cmp_system_fonts_t *ctx,
     *out_font = c->cached_sf_text;
     break;
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -129,6 +162,8 @@ int cmp_system_fonts_get_tracking_and_optical(cmp_system_fonts_t *ctx,
                                               float point_size,
                                               int *out_is_display_variant,
                                               float *out_tracking) {
+  int rc;
+  rc = 0;
   (void)ctx;
   if (!out_is_display_variant || !out_tracking)
     return CMP_ERROR_INVALID_ARG;
@@ -143,7 +178,16 @@ int cmp_system_fonts_get_tracking_and_optical(cmp_system_fonts_t *ctx,
     *out_tracking =
         0.04f + (0.12f / point_size); /* loosens as it gets smaller */
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -158,13 +202,24 @@ int cmp_system_fonts_get_tracking_and_optical(cmp_system_fonts_t *ctx,
 int cmp_font_set_opentype_features(cmp_font_t *font, int enable_kerning,
                                    int enable_ligatures,
                                    int enable_tabular_figures) {
+  int rc;
+  rc = 0;
   if (!font)
     return CMP_ERROR_INVALID_ARG;
   /* Simulated internal font-face HarfBuzz feature bitmask application */
   (void)enable_kerning;
   (void)enable_ligatures;
   (void)enable_tabular_figures;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -176,12 +231,23 @@ int cmp_font_set_opentype_features(cmp_font_t *font, int enable_kerning,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_font_set_variable_axes(cmp_font_t *font, float weight, float width) {
+  int rc;
+  rc = 0;
   if (!font)
     return CMP_ERROR_INVALID_ARG;
   /* Simulated OpenType Variable Font configuration */
   (void)weight;
   (void)width;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -198,6 +264,8 @@ int cmp_system_fonts_get_metrics(cmp_system_fonts_t *ctx,
                                  cmp_semantic_text_style_t style,
                                  float *out_line_height, float *out_leading,
                                  float *out_baseline_offset) {
+  int rc;
+  rc = 0;
   (void)ctx;
   if (!out_line_height || !out_leading || !out_baseline_offset)
     return CMP_ERROR_INVALID_ARG;
@@ -225,5 +293,14 @@ int cmp_system_fonts_get_metrics(cmp_system_fonts_t *ctx,
     *out_baseline_offset = 17.0f;
     break;
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

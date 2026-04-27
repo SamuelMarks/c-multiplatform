@@ -41,18 +41,25 @@ struct cmp_slider {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_wheel_picker_create(cmp_wheel_picker_t **out_picker) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_wheel_picker *ctx = NULL;
 
   if (!out_picker) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_wheel_picker_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_wheel_picker), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_wheel_picker_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -62,6 +69,9 @@ int cmp_wheel_picker_create(cmp_wheel_picker_t **out_picker) {
   ctx->item_height = 44.0f; /* Standard HIG row height */
 
   *out_picker = (cmp_wheel_picker_t *)ctx;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -72,12 +82,16 @@ int cmp_wheel_picker_create(cmp_wheel_picker_t **out_picker) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_wheel_picker_destroy(cmp_wheel_picker_t *picker_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int free_rc;
   struct cmp_wheel_picker *ctx = (struct cmp_wheel_picker *)picker_opaque;
   size_t i;
 
   if (!ctx) {
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -94,6 +108,15 @@ int cmp_wheel_picker_destroy(cmp_wheel_picker_t *picker_opaque) {
   free_rc = CMP_FREE(ctx);
   if (free_rc != CMP_SUCCESS)
     rc = free_rc;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -107,7 +130,8 @@ int cmp_wheel_picker_destroy(cmp_wheel_picker_t *picker_opaque) {
  */
 int cmp_wheel_picker_set_items(cmp_wheel_picker_t *picker_opaque,
                                const char **items, size_t count) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_wheel_picker *ctx = (struct cmp_wheel_picker *)picker_opaque;
   size_t i, len;
   char **new_items = NULL;
@@ -115,6 +139,9 @@ int cmp_wheel_picker_set_items(cmp_wheel_picker_t *picker_opaque,
   if (!ctx || !items) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_wheel_picker_set_items: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -131,6 +158,9 @@ int cmp_wheel_picker_set_items(cmp_wheel_picker_t *picker_opaque,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_wheel_picker_set_items: Out of memory allocating "
                 "pointers\n");
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
 
@@ -140,6 +170,9 @@ int cmp_wheel_picker_set_items(cmp_wheel_picker_t *picker_opaque,
       if (rc != CMP_SUCCESS) {
         LOG_DEBUG("Error in cmp_wheel_picker_set_items: Out of memory "
                   "allocating string\n");
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
 #if defined(_MSC_VER)
@@ -149,6 +182,9 @@ int cmp_wheel_picker_set_items(cmp_wheel_picker_t *picker_opaque,
 #endif
     }
     ctx->items = new_items;
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -161,13 +197,17 @@ int cmp_wheel_picker_set_items(cmp_wheel_picker_t *picker_opaque,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_wheel_picker_scroll(cmp_wheel_picker_t *picker_opaque, float delta_y) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_wheel_picker *ctx = (struct cmp_wheel_picker *)picker_opaque;
   float max_scroll;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_wheel_picker_scroll: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -182,6 +222,15 @@ int cmp_wheel_picker_scroll(cmp_wheel_picker_t *picker_opaque, float delta_y) {
     if (ctx->scroll_y > max_scroll)
       ctx->scroll_y = max_scroll;
   }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -194,18 +243,25 @@ int cmp_wheel_picker_scroll(cmp_wheel_picker_t *picker_opaque, float delta_y) {
  */
 int cmp_wheel_picker_get_selected(cmp_wheel_picker_t *picker_opaque,
                                   size_t *out_index) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_wheel_picker *ctx = (struct cmp_wheel_picker *)picker_opaque;
   float idx;
 
   if (!ctx || !out_index) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_wheel_picker_get_selected: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   if (ctx->count == 0) {
     *out_index = 0;
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -217,6 +273,15 @@ int cmp_wheel_picker_get_selected(cmp_wheel_picker_t *picker_opaque,
     idx = (float)(ctx->count - 1);
 
   *out_index = (size_t)idx;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -229,18 +294,25 @@ int cmp_wheel_picker_get_selected(cmp_wheel_picker_t *picker_opaque,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_segmented_control_create(cmp_segmented_control_t **out_control) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_segmented_control *ctx = NULL;
 
   if (!out_control) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_segmented_control_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_segmented_control), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_segmented_control_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -249,6 +321,9 @@ int cmp_segmented_control_create(cmp_segmented_control_t **out_control) {
   ctx->selected_idx = 0;
 
   *out_control = (cmp_segmented_control_t *)ctx;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -259,12 +334,16 @@ int cmp_segmented_control_create(cmp_segmented_control_t **out_control) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_segmented_control_destroy(cmp_segmented_control_t *control_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_segmented_control *ctx =
       (struct cmp_segmented_control *)control_opaque;
   size_t i;
 
   if (!ctx) {
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -274,6 +353,15 @@ int cmp_segmented_control_destroy(cmp_segmented_control_t *control_opaque) {
     CMP_FREE(ctx->segments);
   }
   CMP_FREE(ctx);
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -287,7 +375,8 @@ int cmp_segmented_control_destroy(cmp_segmented_control_t *control_opaque) {
  */
 int cmp_segmented_control_set_segments(cmp_segmented_control_t *control_opaque,
                                        const char **segments, size_t count) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_segmented_control *ctx =
       (struct cmp_segmented_control *)control_opaque;
   size_t i, len;
@@ -297,6 +386,9 @@ int cmp_segmented_control_set_segments(cmp_segmented_control_t *control_opaque,
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_segmented_control_set_segments: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -314,6 +406,9 @@ int cmp_segmented_control_set_segments(cmp_segmented_control_t *control_opaque,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_segmented_control_set_segments: Out of memory "
                 "allocating pointers\n");
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     for (i = 0; i < count; ++i) {
@@ -322,6 +417,9 @@ int cmp_segmented_control_set_segments(cmp_segmented_control_t *control_opaque,
       if (rc != CMP_SUCCESS) {
         LOG_DEBUG("Error in cmp_segmented_control_set_segments: Out of memory "
                   "allocating string\n");
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
 #if defined(_MSC_VER)
@@ -331,6 +429,11 @@ int cmp_segmented_control_set_segments(cmp_segmented_control_t *control_opaque,
 #endif
     }
     ctx->segments = new_segs;
+  }
+
+  if (rc != 0) {
+
+    return rc;
   }
 
   return rc;
@@ -345,7 +448,8 @@ int cmp_segmented_control_set_segments(cmp_segmented_control_t *control_opaque,
  */
 int cmp_segmented_control_select(cmp_segmented_control_t *control_opaque,
                                  size_t index) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_segmented_control *ctx =
       (struct cmp_segmented_control *)control_opaque;
 
@@ -353,16 +457,31 @@ int cmp_segmented_control_select(cmp_segmented_control_t *control_opaque,
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_segmented_control_select: Invalid argument (ctx=NULL)\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   if (index >= ctx->count) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_segmented_control_select: Index out of bounds\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   ctx->selected_idx = index;
   /* cmp_haptics_trigger(CMP_HAPTIC_SELECTION); */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -377,13 +496,17 @@ int cmp_segmented_control_select(cmp_segmented_control_t *control_opaque,
 int cmp_segmented_control_get_visuals(cmp_segmented_control_t *control_opaque,
                                       size_t *out_selected_idx,
                                       float *out_slider_offset_x) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_segmented_control *ctx =
       (struct cmp_segmented_control *)control_opaque;
 
   if (!ctx || !out_selected_idx || !out_slider_offset_x) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_segmented_control_get_visuals: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -391,6 +514,15 @@ int cmp_segmented_control_get_visuals(cmp_segmented_control_t *control_opaque,
   /* Assuming standard 100px segments for mock */
   *out_slider_offset_x = (float)ctx->selected_idx * 100.0f;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -403,18 +535,25 @@ int cmp_segmented_control_get_visuals(cmp_segmented_control_t *control_opaque,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_stepper_create(cmp_stepper_t **out_stepper) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_stepper *ctx = NULL;
 
   if (!out_stepper) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_stepper_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_stepper), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_stepper_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -424,6 +563,9 @@ int cmp_stepper_create(cmp_stepper_t **out_stepper) {
   ctx->step = 1;
 
   *out_stepper = (cmp_stepper_t *)ctx;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -434,9 +576,19 @@ int cmp_stepper_create(cmp_stepper_t **out_stepper) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_stepper_destroy(cmp_stepper_t *stepper_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (stepper_opaque) {
     CMP_FREE(stepper_opaque);
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -452,12 +604,16 @@ int cmp_stepper_destroy(cmp_stepper_t *stepper_opaque) {
  */
 int cmp_stepper_set_limits(cmp_stepper_t *stepper_opaque, int min_val,
                            int max_val, int step) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_stepper *ctx = (struct cmp_stepper *)stepper_opaque;
 
   if (!ctx || max_val < min_val || step <= 0) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_stepper_set_limits: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -470,6 +626,15 @@ int cmp_stepper_set_limits(cmp_stepper_t *stepper_opaque, int min_val,
   if (ctx->value > max_val)
     ctx->value = max_val;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -481,16 +646,29 @@ int cmp_stepper_set_limits(cmp_stepper_t *stepper_opaque, int min_val,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_stepper_get_value(cmp_stepper_t *stepper_opaque, int *out_val) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_stepper *ctx = (struct cmp_stepper *)stepper_opaque;
 
   if (!ctx || !out_val) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_stepper_get_value: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_val = ctx->value;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -501,12 +679,16 @@ int cmp_stepper_get_value(cmp_stepper_t *stepper_opaque, int *out_val) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_stepper_increment(cmp_stepper_t *stepper_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_stepper *ctx = (struct cmp_stepper *)stepper_opaque;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_stepper_increment: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -514,6 +696,15 @@ int cmp_stepper_increment(cmp_stepper_t *stepper_opaque) {
   if (ctx->value > ctx->max_val)
     ctx->value = ctx->max_val;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -524,12 +715,16 @@ int cmp_stepper_increment(cmp_stepper_t *stepper_opaque) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_stepper_decrement(cmp_stepper_t *stepper_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_stepper *ctx = (struct cmp_stepper *)stepper_opaque;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_stepper_decrement: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -537,6 +732,15 @@ int cmp_stepper_decrement(cmp_stepper_t *stepper_opaque) {
   if (ctx->value < ctx->min_val)
     ctx->value = ctx->min_val;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -549,18 +753,25 @@ int cmp_stepper_decrement(cmp_stepper_t *stepper_opaque) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_slider_create(cmp_slider_t **out_slider) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_slider *ctx = NULL;
 
   if (!out_slider) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_slider_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_slider), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_slider_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -569,6 +780,9 @@ int cmp_slider_create(cmp_slider_t **out_slider) {
   ctx->max_val = 1.0f;
 
   *out_slider = (cmp_slider_t *)ctx;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -579,9 +793,19 @@ int cmp_slider_create(cmp_slider_t **out_slider) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_slider_destroy(cmp_slider_t *slider_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (slider_opaque) {
     CMP_FREE(slider_opaque);
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -596,12 +820,16 @@ int cmp_slider_destroy(cmp_slider_t *slider_opaque) {
  */
 int cmp_slider_set_limits(cmp_slider_t *slider_opaque, float min_val,
                           float max_val) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_slider *ctx = (struct cmp_slider *)slider_opaque;
 
   if (!ctx || max_val < min_val) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_slider_set_limits: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -613,6 +841,15 @@ int cmp_slider_set_limits(cmp_slider_t *slider_opaque, float min_val,
   if (ctx->value > max_val)
     ctx->value = max_val;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -624,12 +861,16 @@ int cmp_slider_set_limits(cmp_slider_t *slider_opaque, float min_val,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_slider_set_value(cmp_slider_t *slider_opaque, float val) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_slider *ctx = (struct cmp_slider *)slider_opaque;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_slider_set_value: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -639,6 +880,15 @@ int cmp_slider_set_value(cmp_slider_t *slider_opaque, float val) {
   if (ctx->value > ctx->max_val)
     ctx->value = ctx->max_val;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -651,13 +901,17 @@ int cmp_slider_set_value(cmp_slider_t *slider_opaque, float val) {
  */
 int cmp_slider_get_visuals(cmp_slider_t *slider_opaque,
                            float *out_thumb_x_percent) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_slider *ctx = (struct cmp_slider *)slider_opaque;
   float range;
 
   if (!ctx || !out_thumb_x_percent) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_slider_get_visuals: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -668,6 +922,15 @@ int cmp_slider_get_visuals(cmp_slider_t *slider_opaque,
     *out_thumb_x_percent = (ctx->value - ctx->min_val) / range;
   }
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -681,13 +944,17 @@ int cmp_slider_get_visuals(cmp_slider_t *slider_opaque,
  */
 int cmp_slider_update_from_drag(cmp_slider_t *slider_opaque, float track_width,
                                 float current_x) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_slider *ctx = (struct cmp_slider *)slider_opaque;
   float ratio;
 
   if (!ctx || track_width <= 0.0f) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_slider_update_from_drag: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -698,6 +965,15 @@ int cmp_slider_update_from_drag(cmp_slider_t *slider_opaque, float track_width,
     ratio = 1.0f;
 
   ctx->value = ctx->min_val + (ratio * (ctx->max_val - ctx->min_val));
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -711,15 +987,28 @@ int cmp_slider_update_from_drag(cmp_slider_t *slider_opaque, float track_width,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_color_picker_show(cmp_window_t *window) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!window) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_system_color_picker_show: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   /* Maps to UIColorPickerViewController or NSColorPanel */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -730,14 +1019,27 @@ int cmp_system_color_picker_show(cmp_window_t *window) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_date_picker_show(cmp_window_t *window) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!window) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_system_date_picker_show: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   /* UIDatePicker preferredStyle: .compact */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

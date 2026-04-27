@@ -58,7 +58,6 @@ int cmp_example_app_run(const char *title,
  * \return 0 on success, non-zero error code otherwise.
  */
 int cmp_example_app_recalculate_layout(void);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

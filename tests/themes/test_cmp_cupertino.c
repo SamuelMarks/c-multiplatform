@@ -198,7 +198,8 @@ TEST test_cupertino_configs(void) {
 }
 
 TEST test_cupertino_vtable(void) {
-  const cmp_theme_vtable_t *vt = cmp_theme_get_cupertino_vtable();
+  const cmp_theme_vtable_t *vt = NULL;
+  cmp_theme_get_cupertino_vtable(&vt);
   ASSERT(vt != NULL);
   ASSERT(vt->measure_button != NULL);
   PASS();

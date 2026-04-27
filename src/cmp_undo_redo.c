@@ -17,6 +17,8 @@ struct cmp_undo_redo {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_undo_redo_create(cmp_undo_redo_t **out_stack) {
+  int rc;
+  rc = 0;
   struct cmp_undo_redo *stack;
 
   if (!out_stack)
@@ -28,7 +30,16 @@ int cmp_undo_redo_create(cmp_undo_redo_t **out_stack) {
   memset(stack, 0, sizeof(struct cmp_undo_redo));
 
   *out_stack = (cmp_undo_redo_t *)stack;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -38,6 +49,8 @@ int cmp_undo_redo_create(cmp_undo_redo_t **out_stack) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_undo_redo_destroy(cmp_undo_redo_t *stack) {
+  int rc;
+  rc = 0;
   struct cmp_undo_redo *internal_stack = (struct cmp_undo_redo *)stack;
   int i;
   if (!internal_stack)
@@ -50,7 +63,16 @@ int cmp_undo_redo_destroy(cmp_undo_redo_t *stack) {
   }
 
   CMP_FREE(internal_stack);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -61,6 +83,8 @@ int cmp_undo_redo_destroy(cmp_undo_redo_t *stack) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_undo_redo_push(cmp_undo_redo_t *stack, const char *state) {
+  int rc;
+  rc = 0;
   struct cmp_undo_redo *internal_stack = (struct cmp_undo_redo *)stack;
   size_t len;
   char *new_state = NULL;
@@ -100,7 +124,16 @@ int cmp_undo_redo_push(cmp_undo_redo_t *stack, const char *state) {
   internal_stack->stack[internal_stack->count++] = new_state;
   internal_stack->position = internal_stack->count;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -113,6 +146,8 @@ int cmp_undo_redo_push(cmp_undo_redo_t *stack, const char *state) {
  */
 int cmp_undo_redo_undo(cmp_undo_redo_t *stack, char *out_buffer,
                        size_t out_capacity) {
+  int rc;
+  rc = 0;
   struct cmp_undo_redo *internal_stack = (struct cmp_undo_redo *)stack;
 
   if (!internal_stack || !out_buffer || out_capacity == 0)
@@ -132,5 +167,14 @@ int cmp_undo_redo_undo(cmp_undo_redo_t *stack, char *out_buffer,
     out_buffer[0] = '\0';
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

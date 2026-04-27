@@ -36,7 +36,7 @@ typedef struct cmp_ui_progress_indicator cmp_ui_progress_indicator_t;
  * \param type The initial type (Linear or Circular).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int
+int CMP_API
 cmp_ui_progress_indicator_create(cmp_ui_progress_indicator_t **out_indicator,
                                  cmp_ui_progress_indicator_type_t type);
 
@@ -46,7 +46,7 @@ cmp_ui_progress_indicator_create(cmp_ui_progress_indicator_t **out_indicator,
  * \param indicator The component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int
+int CMP_API
 cmp_ui_progress_indicator_destroy(cmp_ui_progress_indicator_t *indicator);
 
 /**
@@ -56,9 +56,8 @@ cmp_ui_progress_indicator_destroy(cmp_ui_progress_indicator_t *indicator);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int
-cmp_ui_progress_indicator_get_node(cmp_ui_progress_indicator_t *indicator,
-                                   cmp_ui_node_t **out_node);
+int CMP_API cmp_ui_progress_indicator_get_node(
+    cmp_ui_progress_indicator_t *indicator, cmp_ui_node_t **out_node);
 
 /**
  * \brief Updates the progress value.
@@ -67,9 +66,8 @@ cmp_ui_progress_indicator_get_node(cmp_ui_progress_indicator_t *indicator,
  * \param progress The current progress (0.0f to 1.0f).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int
-cmp_ui_progress_indicator_set_progress(cmp_ui_progress_indicator_t *indicator,
-                                       float progress);
+int CMP_API cmp_ui_progress_indicator_set_progress(
+    cmp_ui_progress_indicator_t *indicator, float progress);
 
 /**
  * \brief Morphs the progress indicator to a new type.
@@ -78,7 +76,7 @@ cmp_ui_progress_indicator_set_progress(cmp_ui_progress_indicator_t *indicator,
  * \param new_type The new type to morph to.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int
+int CMP_API
 cmp_ui_progress_indicator_set_type(cmp_ui_progress_indicator_t *indicator,
                                    cmp_ui_progress_indicator_type_t new_type);
 
@@ -89,10 +87,8 @@ cmp_ui_progress_indicator_set_type(cmp_ui_progress_indicator_t *indicator,
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int
-cmp_ui_progress_indicator_bind_a11y(cmp_ui_progress_indicator_t *widget,
-                                    cmp_a11y_tree_t *tree);
-
+int CMP_API cmp_ui_progress_indicator_bind_a11y(
+    cmp_ui_progress_indicator_t *widget, cmp_a11y_tree_t *tree);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -16,7 +16,6 @@
 __declspec(dllimport) LONG __stdcall RegOpenKeyExA(HKEY hKey, const char* lpSubKey, DWORD ulOptions, DWORD samDesired, HKEY* phkResult);
 __declspec(dllimport) LONG __stdcall RegQueryValueExA(HKEY hKey, const char* lpValueName, DWORD* lpReserved, DWORD* lpType, BYTE* lpData, DWORD* lpcbData);
 __declspec(dllimport) LONG __stdcall RegCloseKey(HKEY hKey);
-
 #pragma comment(lib, "advapi32.lib")
 
 #ifndef SPI_GETHIGHCONTRAST
@@ -46,7 +45,6 @@ typedef struct tagHIGHCONTRASTA {
 } HIGHCONTRASTA, *LPHIGHCONTRASTA;
 
 __declspec(dllimport) BOOL __stdcall SystemParametersInfoA(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni);
-
 #pragma comment(lib, "user32.lib")
 
 static int g_theme_is_dark = 0;
@@ -57,11 +55,16 @@ static int g_theme_is_dark = 0;
  * @return Returns CMP_SUCCESS on success.
  */
 int cmp_system_theme_init(void) {
-  int is_dark = 0;
+  int rc;
+  rc = 0;int is_dark = 0;
   cmp_system_theme_is_dark(&is_dark);
   g_theme_is_dark = is_dark;
   /* In a real implementation we would listen to WM_SETTINGCHANGE here. */
-  return CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -70,7 +73,12 @@ int cmp_system_theme_init(void) {
  * @return Returns CMP_SUCCESS on success.
  */
 int cmp_system_theme_shutdown(void) {
-  return CMP_SUCCESS;
+  int rc;
+  rc = 0;if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -80,7 +88,8 @@ int cmp_system_theme_shutdown(void) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_system_theme_is_dark(int *out_is_dark) {
-  HKEY hKey;
+  int rc;
+  rc = 0;HKEY hKey;
   LONG res;
   DWORD value = 1; /* Default to Light */
   DWORD dataSize = sizeof(value);
@@ -101,7 +110,11 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
 
   /* AppsUseLightTheme = 0 means Dark, 1 means Light */
   *out_is_dark = (value == 0) ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -111,7 +124,8 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
-  HIGHCONTRASTA hc = { sizeof(HIGHCONTRASTA), 0, 0 };
+  int rc;
+  rc = 0;HIGHCONTRASTA hc = { sizeof(HIGHCONTRASTA), 0, 0 };
   if (!out_is_high_contrast) {
     LOG_DEBUG("cmp_system_theme_is_high_contrast: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -124,8 +138,7 @@ int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
 
   *out_is_high_contrast = 0;
   LOG_DEBUG("cmp_system_theme_is_high_contrast: SystemParametersInfoA failed\n");
-  return CMP_ERROR_GENERAL;
-}
-
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  return CMP_ERROR_GENERAL;}
 #endif /* _WIN32 */
 /* clang-format on */

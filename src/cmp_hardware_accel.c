@@ -12,7 +12,8 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_verify_hardware_acceleration(int *out_is_cpu_fallback) {
-  int rc = 0; /* CMP_SUCCESS */
+  int rc;
+  rc = 0; /* CMP_SUCCESS */
   cmp_gpu_t *gpu = NULL;
 
   if (out_is_cpu_fallback == NULL) {
@@ -30,6 +31,9 @@ int cmp_verify_hardware_acceleration(int *out_is_cpu_fallback) {
     LOG_DEBUG("cmp_verify_hardware_acceleration: Failed to initialize any "
               "rendering backend\n");
     printf("[Hardware] FATAL: Failed to initialize any rendering backend.\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   if (gpu == NULL) {
@@ -54,6 +58,9 @@ int cmp_verify_hardware_acceleration(int *out_is_cpu_fallback) {
   if (rc != 0) {
     LOG_DEBUG(
         "cmp_verify_hardware_acceleration: Failed to destroy gpu context\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 

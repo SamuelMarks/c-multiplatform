@@ -42,7 +42,7 @@ typedef struct cmp_m3_button_metrics {
 /**
  * @brief Resolve metrics for a Material 3 Button variant
  */
-CMP_API int cmp_m3_button_resolve(cmp_m3_button_variant_t variant,
+int CMP_API cmp_m3_button_resolve(cmp_m3_button_variant_t variant,
                                   int has_leading_icon,
                                   cmp_m3_button_metrics_t *out_metrics);
 
@@ -74,7 +74,7 @@ typedef struct cmp_m3_fab_metrics {
 /**
  * @brief Resolve metrics for a Material 3 FAB variant
  */
-CMP_API int cmp_m3_fab_resolve(cmp_m3_fab_variant_t variant, int is_lowered,
+int CMP_API cmp_m3_fab_resolve(cmp_m3_fab_variant_t variant, int is_lowered,
                                cmp_m3_fab_metrics_t *out_metrics);
 
 /**
@@ -101,7 +101,7 @@ typedef struct cmp_m3_icon_button_metrics {
 /**
  * @brief Resolve metrics for a Material 3 Icon Button
  */
-CMP_API int
+int CMP_API
 cmp_m3_icon_button_resolve(cmp_m3_icon_button_variant_t variant,
                            cmp_m3_icon_button_metrics_t *out_metrics);
 
@@ -118,9 +118,8 @@ typedef struct cmp_m3_segmented_button_metrics {
 /**
  * @brief Resolve metrics for a Material 3 Segmented Button container
  */
-CMP_API int
+int CMP_API
 cmp_m3_segmented_button_resolve(cmp_m3_segmented_button_metrics_t *out_metrics);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

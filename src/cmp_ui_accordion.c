@@ -43,6 +43,9 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
   rc = CMP_MALLOC(sizeof(cmp_ui_accordion_t), (void **)&accordion);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_accordion_create: OOM\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -124,6 +127,9 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -146,6 +152,9 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
     rc = CMP_FREE(accordion);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -189,6 +198,9 @@ int cmp_ui_accordion_destroy(cmp_ui_accordion_t *accordion) {
   rc = CMP_FREE(accordion);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_accordion_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -203,12 +215,23 @@ int cmp_ui_accordion_destroy(cmp_ui_accordion_t *accordion) {
  */
 int cmp_ui_accordion_get_node(cmp_ui_accordion_t *accordion,
                               cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!accordion || !out_node) {
     LOG_DEBUG("cmp_ui_accordion_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = accordion->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -220,10 +243,21 @@ int cmp_ui_accordion_get_node(cmp_ui_accordion_t *accordion,
  */
 int cmp_ui_accordion_set_expanded(cmp_ui_accordion_t *accordion,
                                   int is_expanded) {
+  int rc;
+  rc = 0;
   if (!accordion) {
     LOG_DEBUG("cmp_ui_accordion_set_expanded: accordion is NULL\n");
     return CMP_ERROR_INVALID_ARG;
   }
   accordion->is_expanded = is_expanded;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

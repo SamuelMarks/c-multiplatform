@@ -54,7 +54,6 @@ int cmp_acrylic_noise_create(int width, int height, cmp_acrylic_noise_t **out_no
  * @return 0 on success
  */
 int cmp_acrylic_noise_destroy(cmp_acrylic_noise_t *noise);
-
 #ifdef __cplusplus
 }
 #endif

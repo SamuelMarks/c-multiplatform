@@ -14,10 +14,12 @@ TEST test_credential_manager_lifecycle(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_NEQ(NULL, manager);
 
-  res = cmp_credential_manager_set_secret(manager, "test_svc", "test_acc", "my_secret");
+  res = cmp_credential_manager_set_secret(manager, "test_svc", "test_acc",
+                                          "my_secret");
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  res = cmp_credential_manager_get_secret(manager, "test_svc", "test_acc", &secret);
+  res = cmp_credential_manager_get_secret(manager, "test_svc", "test_acc",
+                                          &secret);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_NEQ(NULL, secret);
   ASSERT_STR_EQ("my_secret", secret);
@@ -29,7 +31,8 @@ TEST test_credential_manager_lifecycle(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
 
   /* Get after delete should fail */
-  res = cmp_credential_manager_get_secret(manager, "test_svc", "test_acc", &secret);
+  res = cmp_credential_manager_get_secret(manager, "test_svc", "test_acc",
+                                          &secret);
   ASSERT_EQ(CMP_ERROR_NOT_FOUND, res);
 
   res = cmp_credential_manager_destroy(manager);

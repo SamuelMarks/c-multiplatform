@@ -14,7 +14,8 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_radius_init(cmp_radius_t *out_radius) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -26,11 +27,23 @@ int cmp_radius_init(cmp_radius_t *out_radius) {
     }
     cmp_log_debug("cmp_radius_init: Invalid argument (out_radius=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   memset(out_radius, 0, sizeof(cmp_radius_t));
   out_radius->corner_shape = CMP_CORNER_ROUND;
   cmp_log_debug("cmp_radius_init: Initialized radius context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -42,7 +55,8 @@ int cmp_radius_init(cmp_radius_t *out_radius) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_radius_set_uniform(cmp_radius_t *radius, float r) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -53,6 +67,9 @@ int cmp_radius_set_uniform(cmp_radius_t *radius, float r) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_radius_set_uniform: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   radius->top_left_x = r;
@@ -64,6 +81,15 @@ int cmp_radius_set_uniform(cmp_radius_t *radius, float r) {
   radius->bottom_left_x = r;
   radius->bottom_left_y = r;
   cmp_log_debug("cmp_radius_set_uniform: Set uniform radius to %.2f\n", r);
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -80,7 +106,8 @@ int cmp_radius_set_uniform(cmp_radius_t *radius, float r) {
  */
 int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
                         float x, float y, int *out_inside) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   float cx, cy;
@@ -92,11 +119,17 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_radius_hit_test: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   if (x < 0 || y < 0 || x > width || y > height) {
     *out_inside = 0;
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -112,6 +145,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
                          3.0f) >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     } else if (radius->corner_shape == CMP_CORNER_CUT) {
@@ -119,6 +155,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
               (radius->top_left_y - y) / radius->top_left_y >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     } else {
@@ -128,6 +167,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
                   (float)pow((double)radius->top_left_y, 2.0f) >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     }
@@ -144,6 +186,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
                          3.0f) >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     } else if (radius->corner_shape == CMP_CORNER_CUT) {
@@ -151,6 +196,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
               (radius->top_right_y - y) / radius->top_right_y >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     } else {
@@ -160,6 +208,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
                   (float)pow((double)radius->top_right_y, 2.0f) >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     }
@@ -177,6 +228,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
                          3.0f) >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     } else if (radius->corner_shape == CMP_CORNER_CUT) {
@@ -184,6 +238,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
               (y - cy) / radius->bottom_left_y >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     } else {
@@ -193,6 +250,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
                   (float)pow((double)radius->bottom_left_y, 2.0f) >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     }
@@ -210,6 +270,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
                          3.0f) >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     } else if (radius->corner_shape == CMP_CORNER_CUT) {
@@ -217,6 +280,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
               (y - cy) / radius->bottom_right_y >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     } else {
@@ -226,6 +292,9 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
                   (float)pow((double)radius->bottom_right_y, 2.0f) >
           1.0f) {
         *out_inside = 0;
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     }
@@ -233,6 +302,15 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
 
   *out_inside = 1;
   cmp_log_debug("cmp_radius_hit_test: Checked bounds\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -243,7 +321,8 @@ int cmp_radius_hit_test(const cmp_radius_t *radius, float width, float height,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_box_shadow_create(cmp_box_shadow_t **out_shadow) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_box_shadow_t *shadow = NULL;
@@ -255,6 +334,9 @@ int cmp_box_shadow_create(cmp_box_shadow_t **out_shadow) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_box_shadow_create: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -265,6 +347,9 @@ int cmp_box_shadow_create(cmp_box_shadow_t **out_shadow) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_box_shadow_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -272,6 +357,9 @@ int cmp_box_shadow_create(cmp_box_shadow_t **out_shadow) {
   *out_shadow = shadow;
   cmp_log_debug(
       "cmp_box_shadow_create: Successfully created box shadow context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -282,7 +370,8 @@ int cmp_box_shadow_create(cmp_box_shadow_t **out_shadow) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_box_shadow_destroy(cmp_box_shadow_t *shadow) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_box_shadow_t *current = shadow;
   cmp_box_shadow_t *next;
 
@@ -293,6 +382,15 @@ int cmp_box_shadow_destroy(cmp_box_shadow_t *shadow) {
   }
   cmp_log_debug(
       "cmp_box_shadow_destroy: Successfully destroyed box shadow context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -304,7 +402,8 @@ int cmp_box_shadow_destroy(cmp_box_shadow_t *shadow) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_box_shadow_append(cmp_box_shadow_t *root, cmp_box_shadow_t *next) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_box_shadow_t *current;
@@ -316,6 +415,9 @@ int cmp_box_shadow_append(cmp_box_shadow_t *root, cmp_box_shadow_t *next) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_box_shadow_append: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -325,6 +427,15 @@ int cmp_box_shadow_append(cmp_box_shadow_t *root, cmp_box_shadow_t *next) {
   }
   current->next = next;
   cmp_log_debug("cmp_box_shadow_append: Appended next shadow node\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -337,7 +448,8 @@ int cmp_box_shadow_append(cmp_box_shadow_t *root, cmp_box_shadow_t *next) {
  */
 int cmp_shadow_9patch_generate(float elevation,
                                cmp_shadow_9patch_t *out_shadow) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_texture_t *tex = NULL;
@@ -350,6 +462,9 @@ int cmp_shadow_9patch_generate(float elevation,
     }
     cmp_log_debug("cmp_shadow_9patch_generate: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -362,6 +477,9 @@ int cmp_shadow_9patch_generate(float elevation,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_shadow_9patch_generate: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -372,6 +490,9 @@ int cmp_shadow_9patch_generate(float elevation,
 
   out_shadow->base_texture = tex;
   cmp_log_debug("cmp_shadow_9patch_generate: Generated 9patch shadow map\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -385,7 +506,8 @@ int cmp_shadow_9patch_generate(float elevation,
  */
 int cmp_filter_create(cmp_filter_t **out_filter, cmp_filter_op_t op,
                       float amount) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_filter_t *filter = NULL;
@@ -397,6 +519,9 @@ int cmp_filter_create(cmp_filter_t **out_filter, cmp_filter_op_t op,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_filter_create: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -407,6 +532,9 @@ int cmp_filter_create(cmp_filter_t **out_filter, cmp_filter_op_t op,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_filter_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -415,6 +543,9 @@ int cmp_filter_create(cmp_filter_t **out_filter, cmp_filter_op_t op,
   filter->amount = amount;
   *out_filter = filter;
   cmp_log_debug("cmp_filter_create: Successfully created filter context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -425,7 +556,8 @@ int cmp_filter_create(cmp_filter_t **out_filter, cmp_filter_op_t op,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_filter_destroy(cmp_filter_t *filter) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_filter_t *current = filter;
   cmp_filter_t *next;
 
@@ -435,6 +567,15 @@ int cmp_filter_destroy(cmp_filter_t *filter) {
     current = next;
   }
   cmp_log_debug("cmp_filter_destroy: Successfully destroyed filter context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -446,7 +587,8 @@ int cmp_filter_destroy(cmp_filter_t *filter) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_filter_append(cmp_filter_t *root, cmp_filter_t *next) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_filter_t *current;
@@ -458,6 +600,9 @@ int cmp_filter_append(cmp_filter_t *root, cmp_filter_t *next) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_filter_append: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -467,6 +612,15 @@ int cmp_filter_append(cmp_filter_t *root, cmp_filter_t *next) {
   }
   current->next = next;
   cmp_log_debug("cmp_filter_append: Appended next filter node\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -479,7 +633,8 @@ int cmp_filter_append(cmp_filter_t *root, cmp_filter_t *next) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_backdrop_edge_mirror(int image_width, int x, int *out_clamped_x) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -490,6 +645,9 @@ int cmp_backdrop_edge_mirror(int image_width, int x, int *out_clamped_x) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_backdrop_edge_mirror: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -503,6 +661,15 @@ int cmp_backdrop_edge_mirror(int image_width, int x, int *out_clamped_x) {
   cmp_log_debug(
       "cmp_backdrop_edge_mirror: Evaluated edge mirror (x=%d -> %d)\n", x,
       *out_clamped_x);
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -515,7 +682,8 @@ int cmp_backdrop_edge_mirror(int image_width, int x, int *out_clamped_x) {
  */
 int cmp_shadow_9patch_generate_blur(cmp_shadow_9patch_t *shadow,
                                     cmp_gpu_t *gpu) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -527,11 +695,23 @@ int cmp_shadow_9patch_generate_blur(cmp_shadow_9patch_t *shadow,
     }
     cmp_log_debug("cmp_shadow_9patch_generate_blur: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   /* STUB: Implement multi-pass separable Gaussian blur */
   cmp_log_debug("cmp_shadow_9patch_generate_blur: Completed mocked STUB\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -545,7 +725,8 @@ int cmp_shadow_9patch_generate_blur(cmp_shadow_9patch_t *shadow,
  */
 int cmp_shadow_atlas_create(int width, int height,
                             cmp_shadow_atlas_t **out_atlas) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_shadow_atlas_t *atlas = NULL;
@@ -557,6 +738,9 @@ int cmp_shadow_atlas_create(int width, int height,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_shadow_atlas_create: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -567,6 +751,9 @@ int cmp_shadow_atlas_create(int width, int height,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_shadow_atlas_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -576,6 +763,9 @@ int cmp_shadow_atlas_create(int width, int height,
   *out_atlas = atlas;
   cmp_log_debug(
       "cmp_shadow_atlas_create: Successfully created shadow atlas context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -586,9 +776,13 @@ int cmp_shadow_atlas_create(int width, int height,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_shadow_atlas_destroy(cmp_shadow_atlas_t *atlas) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (atlas == NULL) {
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -603,6 +797,9 @@ int cmp_shadow_atlas_destroy(cmp_shadow_atlas_t *atlas) {
   CMP_FREE(atlas);
   cmp_log_debug("cmp_shadow_atlas_destroy: Successfully destroyed shadow atlas "
                 "context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -616,7 +813,8 @@ int cmp_shadow_atlas_destroy(cmp_shadow_atlas_t *atlas) {
  */
 int cmp_backdrop_kawase_blur(cmp_texture_t *bg_texture, float radius,
                              cmp_texture_t **out_blurred) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -629,12 +827,24 @@ int cmp_backdrop_kawase_blur(cmp_texture_t *bg_texture, float radius,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_backdrop_kawase_blur: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_blurred = bg_texture; /* STUB */
   cmp_log_debug(
       "cmp_backdrop_kawase_blur: Completed mocked kawase blur mapping\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -647,7 +857,8 @@ int cmp_backdrop_kawase_blur(cmp_texture_t *bg_texture, float radius,
  */
 int cmp_blend_mode_resolve(cmp_mix_blend_mode_t mode,
                            int *out_gpu_blend_state) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -658,11 +869,23 @@ int cmp_blend_mode_resolve(cmp_mix_blend_mode_t mode,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_blend_mode_resolve: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_gpu_blend_state = (int)mode; /* STUB */
   cmp_log_debug("cmp_blend_mode_resolve: Mocked blend state mapping\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -673,7 +896,8 @@ int cmp_blend_mode_resolve(cmp_mix_blend_mode_t mode,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_isolation_context_begin(cmp_isolation_context_t *ctx) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -685,11 +909,23 @@ int cmp_isolation_context_begin(cmp_isolation_context_t *ctx) {
     }
     cmp_log_debug("cmp_isolation_context_begin: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   ctx->is_isolated = 1;
   cmp_log_debug("cmp_isolation_context_begin: Initiated isolation context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -700,7 +936,8 @@ int cmp_isolation_context_begin(cmp_isolation_context_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_isolation_context_end(cmp_isolation_context_t *ctx) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -711,11 +948,23 @@ int cmp_isolation_context_end(cmp_isolation_context_t *ctx) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_isolation_context_end: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   ctx->is_isolated = 0;
   cmp_log_debug("cmp_isolation_context_end: Ended isolation context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -729,7 +978,8 @@ int cmp_isolation_context_end(cmp_isolation_context_t *ctx) {
  */
 int cmp_mask_image_apply(cmp_texture_t *source, cmp_mask_image_t *mask,
                          cmp_texture_t **out_result) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -740,11 +990,23 @@ int cmp_mask_image_apply(cmp_texture_t *source, cmp_mask_image_t *mask,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_mask_image_apply: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_result = source; /* STUB */
   cmp_log_debug("cmp_mask_image_apply: Mock mapped mask_image_apply\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -759,7 +1021,8 @@ int cmp_mask_image_apply(cmp_texture_t *source, cmp_mask_image_t *mask,
 int cmp_svg_filter_fe_color_matrix(cmp_texture_t *source,
                                    cmp_svg_fe_color_matrix_t *matrix,
                                    cmp_texture_t **out_result) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -771,12 +1034,24 @@ int cmp_svg_filter_fe_color_matrix(cmp_texture_t *source,
     }
     cmp_log_debug("cmp_svg_filter_fe_color_matrix: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_result = source; /* STUB */
   cmp_log_debug(
       "cmp_svg_filter_fe_color_matrix: Mock mapped fe_color_matrix\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -791,7 +1066,8 @@ int cmp_svg_filter_fe_color_matrix(cmp_texture_t *source,
 int cmp_svg_filter_fe_displacement_map(cmp_texture_t *source,
                                        cmp_svg_fe_displacement_map_t *map,
                                        cmp_texture_t **out_result) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -803,11 +1079,23 @@ int cmp_svg_filter_fe_displacement_map(cmp_texture_t *source,
     }
     cmp_log_debug("cmp_svg_filter_fe_displacement_map: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_result = source; /* STUB */
   cmp_log_debug(
       "cmp_svg_filter_fe_displacement_map: Mock mapped fe_displacement_map\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

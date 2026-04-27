@@ -18,7 +18,7 @@ typedef struct cmp_m3_menu_metrics {
   cmp_m3_shape_family_t shape;
 } cmp_m3_menu_metrics_t;
 
-CMP_API int cmp_m3_menu_resolve(cmp_m3_menu_metrics_t *out_metrics);
+int CMP_API cmp_m3_menu_resolve(cmp_m3_menu_metrics_t *out_metrics);
 
 /**
  * @brief Material 3 Sheet Variants
@@ -41,9 +41,8 @@ typedef struct cmp_m3_sheet_metrics {
   int has_drag_handle;
 } cmp_m3_sheet_metrics_t;
 
-CMP_API int cmp_m3_sheet_resolve(cmp_m3_sheet_variant_t variant,
+int CMP_API cmp_m3_sheet_resolve(cmp_m3_sheet_variant_t variant,
                                  cmp_m3_sheet_metrics_t *out_metrics);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

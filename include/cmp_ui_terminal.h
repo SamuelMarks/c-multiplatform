@@ -28,7 +28,7 @@ typedef struct cmp_ui_terminal cmp_ui_terminal_t;
  * \param fg_color Default foreground text color (ARGB).
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal,
+int CMP_API cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal,
                                    uint32_t bg_color, uint32_t fg_color);
 
 /**
@@ -37,7 +37,7 @@ CMP_API int cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal,
  * \param terminal The component to destroy.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_terminal_destroy(cmp_ui_terminal_t *terminal);
+int CMP_API cmp_ui_terminal_destroy(cmp_ui_terminal_t *terminal);
 
 /**
  * \brief Retrieves the underlying UI node.
@@ -46,7 +46,7 @@ CMP_API int cmp_ui_terminal_destroy(cmp_ui_terminal_t *terminal);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_terminal_get_node(cmp_ui_terminal_t *terminal,
+int CMP_API cmp_ui_terminal_get_node(cmp_ui_terminal_t *terminal,
                                      cmp_ui_node_t **out_node);
 
 /**
@@ -56,9 +56,8 @@ CMP_API int cmp_ui_terminal_get_node(cmp_ui_terminal_t *terminal,
  * \param output The string to append.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_terminal_append_output(cmp_ui_terminal_t *terminal,
+int CMP_API cmp_ui_terminal_append_output(cmp_ui_terminal_t *terminal,
                                           const char *output);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

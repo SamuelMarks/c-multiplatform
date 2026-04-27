@@ -20,10 +20,10 @@ static const cmp_theme_vtable_t *g_default_theme_vtable = NULL;
  * @param vtable Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API void cmp_theme_set_default_vtable(const cmp_theme_vtable_t *vtable) {
+CMP_EXEMPT(CMP_API void cmp_theme_set_default_vtable(
+    const cmp_theme_vtable_t *vtable)) {
   g_default_theme_vtable = vtable;
 }
-
 #ifndef CMP_THEME_MODE_SINGLE_STATIC
 /**
  * @brief cmp_resolve_vtable
@@ -31,23 +31,35 @@ CMP_API void cmp_theme_set_default_vtable(const cmp_theme_vtable_t *vtable) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node) {
+int cmp_resolve_vtable(const cmp_ui_node_t *node,
+                       const cmp_theme_vtable_t **out_vtable) {
+  int rc;
+  rc = 0;
+  if (!out_vtable)
+    return CMP_ERROR_INVALID_ARG;
+
   if (!node) {
-    if (g_default_theme_vtable)
-      return g_default_theme_vtable;
-    return cmp_theme_get_unstyled_vtable(); /* Fallback */
+    if (g_default_theme_vtable) {
+      *out_vtable = g_default_theme_vtable;
+      return 0;
+    }
+    rc = cmp_theme_get_unstyled_vtable(out_vtable); /* Fallback */
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
   }
 
   /* Check local widget override first */
   switch (node->design_language_override) {
   case 1:
-    return cmp_theme_get_material3_vtable();
+    return cmp_theme_get_material3_vtable(out_vtable);
   case 2:
-    return cmp_theme_get_fluent2_vtable();
+    return cmp_theme_get_fluent2_vtable(out_vtable);
   case 3:
-    return cmp_theme_get_cupertino_vtable();
+    return cmp_theme_get_cupertino_vtable(out_vtable);
   case 4:
-    return cmp_theme_get_unstyled_vtable();
+    return cmp_theme_get_unstyled_vtable(out_vtable);
   case 0: /* Inherit: traverse up the tree or check global context */
   default:
     break;
@@ -59,13 +71,13 @@ const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node) {
     while (current) {
       switch (current->design_language_override) {
       case 1:
-        return cmp_theme_get_material3_vtable();
+        return cmp_theme_get_material3_vtable(out_vtable);
       case 2:
-        return cmp_theme_get_fluent2_vtable();
+        return cmp_theme_get_fluent2_vtable(out_vtable);
       case 3:
-        return cmp_theme_get_cupertino_vtable();
+        return cmp_theme_get_cupertino_vtable(out_vtable);
       case 4:
-        return cmp_theme_get_unstyled_vtable();
+        return cmp_theme_get_unstyled_vtable(out_vtable);
       case 0:
       default:
         current = current->parent;
@@ -75,10 +87,17 @@ const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node) {
   }
 
   if (g_default_theme_vtable) {
-    return g_default_theme_vtable;
+    *out_vtable = g_default_theme_vtable;
+    return 0;
   }
 
-  return cmp_theme_get_unstyled_vtable();
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  return cmp_theme_get_unstyled_vtable(out_vtable);
 }
 
 /**
@@ -87,7 +106,9 @@ const cmp_theme_vtable_t *cmp_resolve_vtable(const cmp_ui_node_t *node) {
  * @param out_theme Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_theme_create(cmp_theme_t **out_theme) {
+int CMP_API cmp_theme_create(cmp_theme_t **out_theme) {
+  int rc;
+  rc = 0;
   cmp_theme_t *theme;
   if (!out_theme)
     return CMP_ERROR_INVALID_ARG;
@@ -97,7 +118,16 @@ CMP_API int cmp_theme_create(cmp_theme_t **out_theme) {
 
   memset(theme, 0, sizeof(cmp_theme_t));
   *out_theme = theme;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -106,11 +136,22 @@ CMP_API int cmp_theme_create(cmp_theme_t **out_theme) {
  * @param theme Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_theme_destroy(cmp_theme_t *theme) {
+int CMP_API cmp_theme_destroy(cmp_theme_t *theme) {
+  int rc;
+  rc = 0;
   if (!theme)
     return CMP_ERROR_INVALID_ARG;
   CMP_FREE(theme);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -118,8 +159,17 @@ CMP_API int cmp_theme_destroy(cmp_theme_t *theme) {
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API const cmp_theme_vtable_t *cmp_ffi_get_material3_vtable(void) {
-  return cmp_theme_get_material3_vtable();
+int CMP_API
+cmp_ffi_get_material3_vtable(const cmp_theme_vtable_t **out_vtable) {
+  int rc;
+  rc = 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  return cmp_theme_get_material3_vtable(out_vtable);
 }
 
 /**
@@ -127,8 +177,16 @@ CMP_API const cmp_theme_vtable_t *cmp_ffi_get_material3_vtable(void) {
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API const cmp_theme_vtable_t *cmp_ffi_get_fluent2_vtable(void) {
-  return cmp_theme_get_fluent2_vtable();
+int CMP_API cmp_ffi_get_fluent2_vtable(const cmp_theme_vtable_t **out_vtable) {
+  int rc;
+  rc = 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  return cmp_theme_get_fluent2_vtable(out_vtable);
 }
 
 /**
@@ -136,8 +194,17 @@ CMP_API const cmp_theme_vtable_t *cmp_ffi_get_fluent2_vtable(void) {
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API const cmp_theme_vtable_t *cmp_ffi_get_cupertino_vtable(void) {
-  return cmp_theme_get_cupertino_vtable();
+int CMP_API
+cmp_ffi_get_cupertino_vtable(const cmp_theme_vtable_t **out_vtable) {
+  int rc;
+  rc = 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  return cmp_theme_get_cupertino_vtable(out_vtable);
 }
 
 /**
@@ -145,7 +212,15 @@ CMP_API const cmp_theme_vtable_t *cmp_ffi_get_cupertino_vtable(void) {
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API const cmp_theme_vtable_t *cmp_ffi_get_unstyled_vtable(void) {
-  return cmp_theme_get_unstyled_vtable();
+int CMP_API cmp_ffi_get_unstyled_vtable(const cmp_theme_vtable_t **out_vtable) {
+  int rc;
+  rc = 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  return cmp_theme_get_unstyled_vtable(out_vtable);
 }
 #endif /* CMP_THEME_MODE_SINGLE_STATIC */

@@ -111,6 +111,8 @@ int cmp_media_player_destroy(cmp_media_player_t *player_opaque) {
  */
 int cmp_media_player_load_url(cmp_media_player_t *player_opaque,
                               const char *url) {
+  int rc;
+  rc = 0;
   if (player_opaque == NULL) {
     LOG_DEBUG("Error in cmp_media_player_load_url: player_opaque is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -135,6 +137,8 @@ int cmp_media_player_load_url(cmp_media_player_t *player_opaque,
  */
 int cmp_media_player_mount(cmp_media_player_t *player_opaque,
                            cmp_ui_node_t *node, int use_system_controls) {
+  int rc;
+  rc = 0;
   struct cmp_media_player *ctx;
 
   ctx = (struct cmp_media_player *)player_opaque;
@@ -163,6 +167,8 @@ int cmp_media_player_mount(cmp_media_player_t *player_opaque,
  */
 int cmp_media_player_set_pip_enabled(cmp_media_player_t *player_opaque,
                                      int is_enabled) {
+  int rc;
+  rc = 0;
   struct cmp_media_player *ctx;
 
   ctx = (struct cmp_media_player *)player_opaque;
@@ -280,6 +286,8 @@ int cmp_media_player_update_now_playing(cmp_media_player_t *player_opaque,
  */
 int cmp_media_player_set_spatial_audio_enabled(
     cmp_media_player_t *player_opaque, int is_enabled) {
+  int rc;
+  rc = 0;
   struct cmp_media_player *ctx;
 
   ctx = (struct cmp_media_player *)player_opaque;
@@ -306,6 +314,8 @@ int cmp_media_player_set_spatial_audio_enabled(
 int cmp_media_player_set_remote_command_handler(
     cmp_media_player_t *player_opaque, cmp_remote_command_cb callback,
     void *userdata) {
+  int rc;
+  rc = 0;
   struct cmp_media_player *ctx;
 
   ctx = (struct cmp_media_player *)player_opaque;
@@ -387,6 +397,8 @@ int cmp_audio_session_destroy(cmp_audio_session_t *session_opaque) {
  */
 int cmp_audio_session_set_category(cmp_audio_session_t *session_opaque,
                                    cmp_audio_session_category_t category) {
+  int rc;
+  rc = 0;
   struct cmp_audio_session *ctx;
 
   ctx = (struct cmp_audio_session *)session_opaque;
@@ -409,6 +421,8 @@ int cmp_audio_session_set_category(cmp_audio_session_t *session_opaque,
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_audio_session_activate(cmp_audio_session_t *session_opaque) {
+  int rc;
+  rc = 0;
   struct cmp_audio_session *ctx;
 
   ctx = (struct cmp_audio_session *)session_opaque;

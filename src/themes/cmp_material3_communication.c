@@ -13,6 +13,8 @@
  */
 int cmp_m3_badge_resolve(cmp_m3_badge_variant_t variant,
                          cmp_m3_badge_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -34,7 +36,16 @@ int cmp_m3_badge_resolve(cmp_m3_badge_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -46,6 +57,8 @@ int cmp_m3_badge_resolve(cmp_m3_badge_variant_t variant,
  */
 int cmp_m3_progress_resolve(cmp_m3_progress_variant_t variant,
                             cmp_m3_progress_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -64,7 +77,16 @@ int cmp_m3_progress_resolve(cmp_m3_progress_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -74,6 +96,8 @@ int cmp_m3_progress_resolve(cmp_m3_progress_variant_t variant,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_m3_snackbar_resolve(cmp_m3_snackbar_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -82,7 +106,16 @@ int cmp_m3_snackbar_resolve(cmp_m3_snackbar_metrics_t *out_metrics) {
   out_metrics->elevation = CMP_M3_ELEVATION_LEVEL_3;
   out_metrics->shape = CMP_M3_SHAPE_EXTRA_SMALL;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -93,6 +126,8 @@ int cmp_m3_snackbar_resolve(cmp_m3_snackbar_metrics_t *out_metrics) {
  */
 int cmp_m3_pull_to_refresh_resolve(
     cmp_m3_pull_to_refresh_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -100,5 +135,14 @@ int cmp_m3_pull_to_refresh_resolve(
   out_metrics->container_size = 48.0f;
   out_metrics->indicator_size = 24.0f;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

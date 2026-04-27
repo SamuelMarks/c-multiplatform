@@ -72,7 +72,6 @@ static void update_title_binding(void) {
   default:
     break;
   }
-
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%s Examples", design_str);
 #else

@@ -15,6 +15,8 @@ struct cmp_tick {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tick_create(cmp_tick_t **out_tick) {
+  int rc;
+  rc = 0;
   struct cmp_tick *tick;
 
   if (!out_tick)
@@ -26,7 +28,16 @@ int cmp_tick_create(cmp_tick_t **out_tick) {
   memset(tick, 0, sizeof(struct cmp_tick));
 
   *out_tick = (cmp_tick_t *)tick;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -36,13 +47,24 @@ int cmp_tick_create(cmp_tick_t **out_tick) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tick_destroy(cmp_tick_t *tick) {
+  int rc;
+  rc = 0;
   struct cmp_tick *internal_tick = (struct cmp_tick *)tick;
 
   if (!internal_tick)
     return CMP_ERROR_INVALID_ARG;
 
   CMP_FREE(internal_tick);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -54,6 +76,8 @@ int cmp_tick_destroy(cmp_tick_t *tick) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tick_fire(cmp_tick_t *tick, double os_timestamp_ms, double *out_dt_ms) {
+  int rc;
+  rc = 0;
   struct cmp_tick *internal_tick = (struct cmp_tick *)tick;
 
   if (!internal_tick || !out_dt_ms)
@@ -69,5 +93,14 @@ int cmp_tick_fire(cmp_tick_t *tick, double os_timestamp_ms, double *out_dt_ms) {
   }
 
   internal_tick->last_timestamp_ms = os_timestamp_ms;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

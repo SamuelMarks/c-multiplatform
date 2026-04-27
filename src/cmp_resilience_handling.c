@@ -14,10 +14,13 @@ struct cmp_resilience {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_resilience_create(cmp_resilience_t **out_res) {
+  int rc;
+  rc = 0;
   struct cmp_resilience *ctx;
   if (!out_res)
     return CMP_ERROR_INVALID_ARG;
-  if (CMP_MALLOC(sizeof(struct cmp_resilience), (void **)&ctx) != CMP_SUCCESS)
+  rc = CMP_MALLOC(sizeof(struct cmp_resilience), (void **)&ctx);
+  if (rc != CMP_SUCCESS)
     return CMP_ERROR_OOM;
 
   ctx->is_offline = 0;
@@ -33,8 +36,14 @@ int cmp_resilience_create(cmp_resilience_t **out_res) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_resilience_destroy(cmp_resilience_t *res_opaque) {
-  if (res_opaque)
-    CMP_FREE(res_opaque);
+  int rc;
+  rc = 0;
+  if (res_opaque) {
+    rc = CMP_FREE(res_opaque);
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
+  }
   return CMP_SUCCESS;
 }
 
@@ -47,6 +56,8 @@ int cmp_resilience_destroy(cmp_resilience_t *res_opaque) {
  */
 int cmp_resilience_show_empty_state(cmp_resilience_t *res_opaque,
                                     void *container_node) {
+  int rc;
+  rc = 0;
   struct cmp_resilience *ctx = (struct cmp_resilience *)res_opaque;
   if (!ctx || !container_node)
     return CMP_ERROR_INVALID_ARG;
@@ -64,6 +75,8 @@ int cmp_resilience_show_empty_state(cmp_resilience_t *res_opaque,
  */
 int cmp_resilience_show_loading_skeleton(cmp_resilience_t *res_opaque,
                                          void *container_node) {
+  int rc;
+  rc = 0;
   struct cmp_resilience *ctx = (struct cmp_resilience *)res_opaque;
   if (!ctx || !container_node)
     return CMP_ERROR_INVALID_ARG;
@@ -84,6 +97,8 @@ int cmp_resilience_show_loading_skeleton(cmp_resilience_t *res_opaque,
 int cmp_resilience_show_non_blocking_error(cmp_resilience_t *res_opaque,
                                            void *container_node,
                                            const char *msg) {
+  int rc;
+  rc = 0;
   struct cmp_resilience *ctx = (struct cmp_resilience *)res_opaque;
   if (!ctx || !container_node || !msg)
     return CMP_ERROR_INVALID_ARG;
@@ -101,6 +116,8 @@ int cmp_resilience_show_non_blocking_error(cmp_resilience_t *res_opaque,
  */
 int cmp_resilience_handle_discard_changes_prompt(cmp_resilience_t *res_opaque,
                                                  void *sheet_node) {
+  int rc;
+  rc = 0;
   struct cmp_resilience *ctx = (struct cmp_resilience *)res_opaque;
   if (!ctx || !sheet_node)
     return CMP_ERROR_INVALID_ARG;
@@ -118,6 +135,8 @@ int cmp_resilience_handle_discard_changes_prompt(cmp_resilience_t *res_opaque,
  */
 int cmp_resilience_graceful_degradation(cmp_resilience_t *res_opaque,
                                         const char *feature_name) {
+  int rc;
+  rc = 0;
   struct cmp_resilience *ctx = (struct cmp_resilience *)res_opaque;
   if (!ctx || !feature_name)
     return CMP_ERROR_INVALID_ARG;

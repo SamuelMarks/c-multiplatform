@@ -92,7 +92,6 @@ SUITE(aria_relations_suite) {
   RUN_TEST(test_aria_relations_null_args);
   RUN_TEST(test_aria_relations_operations);
 }
-
 #ifdef __cplusplus
 extern "C" {
 #endif

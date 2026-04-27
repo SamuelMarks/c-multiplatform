@@ -22,7 +22,7 @@ typedef struct cmp_regex cmp_regex_t;
  * @param pattern The regex pattern string.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_regex_compile(cmp_regex_t **out_regex, const char *pattern);
+int CMP_API cmp_regex_compile(cmp_regex_t **out_regex, const char *pattern);
 
 /**
  * @brief Tests if a string matches the compiled regex.
@@ -31,7 +31,7 @@ CMP_API int cmp_regex_compile(cmp_regex_t **out_regex, const char *pattern);
  * @param out_matched Pointer to receive 1 if matched, 0 otherwise.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_regex_match(cmp_regex_t *regex, const char *string,
+int CMP_API cmp_regex_match(cmp_regex_t *regex, const char *string,
                             int *out_matched);
 
 /**
@@ -39,8 +39,7 @@ CMP_API int cmp_regex_match(cmp_regex_t *regex, const char *string,
  * @param regex The object to free.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_regex_free(cmp_regex_t *regex);
-
+int CMP_API cmp_regex_free(cmp_regex_t *regex);
 #ifdef __cplusplus
 }
 #endif

@@ -26,7 +26,8 @@ struct cmp_a11y_rotor {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_rotor_create(cmp_a11y_tree_t *tree, cmp_a11y_rotor_t **out_rotor) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_a11y_rotor *rotor = NULL;
@@ -38,6 +39,9 @@ int cmp_a11y_rotor_create(cmp_a11y_tree_t *tree, cmp_a11y_rotor_t **out_rotor) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_rotor_create: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -49,6 +53,9 @@ int cmp_a11y_rotor_create(cmp_a11y_tree_t *tree, cmp_a11y_rotor_t **out_rotor) {
     }
     cmp_log_debug("cmp_a11y_rotor_create: Out of memory allocating : %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -60,6 +67,9 @@ int cmp_a11y_rotor_create(cmp_a11y_tree_t *tree, cmp_a11y_rotor_t **out_rotor) {
   *out_rotor = (cmp_a11y_rotor_t *)rotor;
   cmp_log_debug(
       "cmp_a11y_rotor_create: Successfully created a11y rotor context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -70,7 +80,8 @@ int cmp_a11y_rotor_create(cmp_a11y_tree_t *tree, cmp_a11y_rotor_t **out_rotor) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_rotor_destroy(cmp_a11y_rotor_t *rotor) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_a11y_rotor *r = (struct cmp_a11y_rotor *)rotor;
@@ -83,6 +94,9 @@ int cmp_a11y_rotor_destroy(cmp_a11y_rotor_t *rotor) {
     }
     cmp_log_debug("cmp_a11y_rotor_destroy: Invalid argument (rotor=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -94,6 +108,15 @@ int cmp_a11y_rotor_destroy(cmp_a11y_rotor_t *rotor) {
   CMP_FREE(r);
   cmp_log_debug(
       "cmp_a11y_rotor_destroy: Successfully destroyed a11y rotor context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -107,7 +130,8 @@ int cmp_a11y_rotor_destroy(cmp_a11y_rotor_t *rotor) {
  */
 int cmp_a11y_rotor_register_node(cmp_a11y_rotor_t *rotor, int node_id,
                                  cmp_a11y_rotor_category_t category) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_a11y_rotor *r = (struct cmp_a11y_rotor *)rotor;
@@ -123,6 +147,9 @@ int cmp_a11y_rotor_register_node(cmp_a11y_rotor_t *rotor, int node_id,
     cmp_log_debug(
         "cmp_a11y_rotor_register_node: Invalid argument (rotor=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -139,6 +166,9 @@ int cmp_a11y_rotor_register_node(cmp_a11y_rotor_t *rotor, int node_id,
       }
       cmp_log_debug("cmp_a11y_rotor_register_node: Out of memory : %s\n",
                     err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
 
@@ -157,6 +187,9 @@ int cmp_a11y_rotor_register_node(cmp_a11y_rotor_t *rotor, int node_id,
   cmp_log_debug(
       "cmp_a11y_rotor_register_node: Registered node %d with category %d\n",
       node_id, (int)category);
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -173,7 +206,8 @@ int cmp_a11y_rotor_register_node(cmp_a11y_rotor_t *rotor, int node_id,
 int cmp_a11y_rotor_get_nodes(cmp_a11y_rotor_t *rotor,
                              cmp_a11y_rotor_category_t category,
                              int *out_node_ids, int max_nodes, int *out_count) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_a11y_rotor *r = (struct cmp_a11y_rotor *)rotor;
@@ -187,6 +221,9 @@ int cmp_a11y_rotor_get_nodes(cmp_a11y_rotor_t *rotor,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_rotor_get_nodes: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -204,5 +241,14 @@ int cmp_a11y_rotor_get_nodes(cmp_a11y_rotor_t *rotor,
   *out_count = count;
   cmp_log_debug("cmp_a11y_rotor_get_nodes: Found %d nodes for category %d\n",
                 count, (int)category);
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

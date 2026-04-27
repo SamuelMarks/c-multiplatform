@@ -117,25 +117,24 @@ typedef enum cmp_m3_state_layer {
   CMP_M3_STATE_DISABLED_CONTENT
 } cmp_m3_state_layer_t;
 
-CMP_API int cmp_m3_sys_colors_generate(cmp_color_t seed, int is_dark,
+int CMP_API cmp_m3_sys_colors_generate(cmp_color_t seed, int is_dark,
                                        cmp_m3_contrast_profile_t contrast,
                                        cmp_m3_sys_colors_t *out_sys_colors);
 
-CMP_API int cmp_m3_shape_resolve(cmp_m3_shape_family_t shape,
+int CMP_API cmp_m3_shape_resolve(cmp_m3_shape_family_t shape,
                                  const cmp_m3_shape_modifiers_t *modifiers,
                                  float *out_tl, float *out_tr, float *out_bl,
                                  float *out_br);
 
-CMP_API int cmp_m3_elevation_resolve(cmp_m3_elevation_level_t level,
+int CMP_API cmp_m3_elevation_resolve(cmp_m3_elevation_level_t level,
                                      float *out_tonal_opacity,
                                      float *out_shadow_y_offset,
                                      float *out_shadow_blur,
                                      float *out_ambient_alpha,
                                      float *out_spot_alpha);
 
-CMP_API int cmp_m3_state_layer_resolve(cmp_m3_state_layer_t state,
+int CMP_API cmp_m3_state_layer_resolve(cmp_m3_state_layer_t state,
                                        float *out_opacity);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

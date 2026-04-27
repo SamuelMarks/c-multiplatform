@@ -28,7 +28,8 @@ struct cmp_databinding_s {
  */
 int cmp_databinding_create(cmp_databinding_t **out_binding,
                            cmp_data_type_t type) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_databinding_t *binding = NULL;
@@ -40,6 +41,9 @@ int cmp_databinding_create(cmp_databinding_t **out_binding,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_databinding_create: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -50,6 +54,9 @@ int cmp_databinding_create(cmp_databinding_t **out_binding,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_databinding_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -68,7 +75,8 @@ int cmp_databinding_create(cmp_databinding_t **out_binding,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_databinding_destroy(cmp_databinding_t *binding) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -79,6 +87,9 @@ int cmp_databinding_destroy(cmp_databinding_t *binding) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_databinding_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -118,7 +129,7 @@ int cmp_databinding_destroy(cmp_databinding_t *binding) {
  * @param binding Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void notify_listeners(cmp_databinding_t *binding) {
+CMP_EXEMPT(static void notify_listeners(cmp_databinding_t *binding)) {
   size_t i;
   for (i = 0; i < binding->listener_count; ++i) {
     if (binding->listeners[i]) {
@@ -137,7 +148,8 @@ static void notify_listeners(cmp_databinding_t *binding) {
 int cmp_databinding_set_string(cmp_databinding_t *binding, const char *val) {
   size_t len;
   char *new_str = NULL;
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -149,6 +161,9 @@ int cmp_databinding_set_string(cmp_databinding_t *binding, const char *val) {
     }
     cmp_log_debug("cmp_databinding_set_string: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -173,9 +188,11 @@ int cmp_databinding_set_string(cmp_databinding_t *binding, const char *val) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_databinding_set_string: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
-
 #if defined(_MSC_VER)
   if (strcpy_s(new_str, len + 1, val) != 0) {
     CMP_FREE(new_str);
@@ -210,7 +227,8 @@ int cmp_databinding_set_string(cmp_databinding_t *binding, const char *val) {
  */
 int cmp_databinding_get_string(cmp_databinding_t *binding,
                                const char **out_val) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -223,10 +241,22 @@ int cmp_databinding_get_string(cmp_databinding_t *binding,
     }
     cmp_log_debug("cmp_databinding_get_string: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   *out_val = binding->data.str_val;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -237,7 +267,8 @@ int cmp_databinding_get_string(cmp_databinding_t *binding,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_databinding_set_int(cmp_databinding_t *binding, int val) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -248,12 +279,24 @@ int cmp_databinding_set_int(cmp_databinding_t *binding, int val) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_databinding_set_int: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   binding->data.int_val = val;
   notify_listeners(binding);
   cmp_log_debug("cmp_databinding_set_int: Int binding updated\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -264,7 +307,8 @@ int cmp_databinding_set_int(cmp_databinding_t *binding, int val) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_databinding_get_int(cmp_databinding_t *binding, int *out_val) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -276,10 +320,22 @@ int cmp_databinding_get_int(cmp_databinding_t *binding, int *out_val) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_databinding_get_int: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   *out_val = binding->data.int_val;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -295,7 +351,8 @@ int cmp_databinding_add_listener(cmp_databinding_t *binding,
   size_t new_cap;
   cmp_databinding_cb_t *new_listeners = NULL;
   void **new_ctxs = NULL;
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -307,6 +364,9 @@ int cmp_databinding_add_listener(cmp_databinding_t *binding,
     }
     cmp_log_debug("cmp_databinding_add_listener: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -318,6 +378,9 @@ int cmp_databinding_add_listener(cmp_databinding_t *binding,
                     (void **)&new_listeners);
     if (rc != CMP_SUCCESS) {
       cmp_log_debug("cmp_databinding_add_listener: Out of memory\n");
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
 
@@ -325,6 +388,9 @@ int cmp_databinding_add_listener(cmp_databinding_t *binding,
     if (rc != CMP_SUCCESS) {
       CMP_FREE(new_listeners);
       cmp_log_debug("cmp_databinding_add_listener: Out of memory (ctxs)\n");
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
 
@@ -362,7 +428,8 @@ typedef struct {
  * @param user_data Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void node_binding_cb(cmp_databinding_t *binding, void *user_data) {
+CMP_EXEMPT(static void node_binding_cb(cmp_databinding_t *binding,
+                                       void *user_data)) {
   cmp_node_binding_ctx_t *ctx = (cmp_node_binding_ctx_t *)user_data;
   if (ctx && ctx->node && ctx->property_name) {
     if (strcmp(ctx->property_name, "text") == 0 &&
@@ -407,7 +474,8 @@ static void node_binding_cb(cmp_databinding_t *binding, void *user_data) {
 int cmp_ui_node_bind_generic(cmp_ui_node_t *node, cmp_databinding_t *binding,
                              const char *property_name) {
   cmp_node_binding_ctx_t *ctx = NULL;
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -418,12 +486,18 @@ int cmp_ui_node_bind_generic(cmp_ui_node_t *node, cmp_databinding_t *binding,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_ui_node_bind_generic: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_node_binding_ctx_t), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     cmp_log_debug("cmp_ui_node_bind_generic: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -444,6 +518,9 @@ int cmp_ui_node_bind_generic(cmp_ui_node_t *node, cmp_databinding_t *binding,
   if (rc != CMP_SUCCESS) {
     CMP_FREE(ctx);
     cmp_log_debug("cmp_ui_node_bind_generic: Failed adding listener\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 

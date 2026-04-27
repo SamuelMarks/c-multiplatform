@@ -16,9 +16,11 @@
  * @param size Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_icon_create(cmp_ui_node_t **out_node,
                                uint32_t codepoint_regular,
                                uint32_t codepoint_filled, float size) {
+  int rc;
+  rc = 0;
   cmp_f2_icon_t *icon_data;
   int res;
   char codepoint_str[8];
@@ -58,7 +60,16 @@ CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node,
   (*out_node)->layout->width = size;
   (*out_node)->layout->height = size;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -68,7 +79,9 @@ CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node,
  * @param is_filled Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_icon_set_filled(cmp_ui_node_t *icon_node, int is_filled) {
+int CMP_API cmp_f2_icon_set_filled(cmp_ui_node_t *icon_node, int is_filled) {
+  int rc;
+  rc = 0;
   cmp_f2_icon_t *icon_data;
   char codepoint_str[8];
 
@@ -89,5 +102,14 @@ CMP_API int cmp_f2_icon_set_filled(cmp_ui_node_t *icon_node, int is_filled) {
 
   /* Internal component update mapping not yet fully implemented in generic tree
    */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

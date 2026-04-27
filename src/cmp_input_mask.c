@@ -18,24 +18,34 @@ struct cmp_input_mask {
  */
 int cmp_input_mask_create(const char *mask_pattern,
                           cmp_input_mask_t **out_mask) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_input_mask *mask = NULL;
 
   if (!mask_pattern || !out_mask) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_input_mask_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   if (strlen(mask_pattern) >= sizeof(mask->pattern)) {
     rc = CMP_ERROR_BOUNDS;
     LOG_DEBUG("Error in cmp_input_mask_create: Mask pattern too long\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_input_mask), (void **)&mask);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_input_mask_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -47,6 +57,9 @@ int cmp_input_mask_create(const char *mask_pattern,
 #endif
 
   *out_mask = (cmp_input_mask_t *)mask;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -57,18 +70,25 @@ int cmp_input_mask_create(const char *mask_pattern,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_input_mask_destroy(cmp_input_mask_t *mask) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_input_mask *internal_mask = (struct cmp_input_mask *)mask;
 
   if (!internal_mask) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_input_mask_destroy: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_FREE(internal_mask);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_input_mask_destroy: CMP_FREE failed\n");
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -84,13 +104,17 @@ int cmp_input_mask_destroy(cmp_input_mask_t *mask) {
  */
 int cmp_input_mask_apply(cmp_input_mask_t *mask, const char *raw_input,
                          char *out_buffer, size_t out_capacity) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_input_mask *internal_mask = (struct cmp_input_mask *)mask;
   size_t pattern_len, input_len, p, i, o;
 
   if (!internal_mask || !raw_input || !out_buffer || out_capacity == 0) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_input_mask_apply: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -139,5 +163,14 @@ int cmp_input_mask_apply(cmp_input_mask_t *mask, const char *raw_input,
 
   out_buffer[o] = '\0';
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

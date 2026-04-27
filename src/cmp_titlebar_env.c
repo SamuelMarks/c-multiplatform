@@ -19,6 +19,8 @@ struct cmp_titlebar_env {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_titlebar_env_create(cmp_titlebar_env_t **out_env) {
+  int rc;
+  rc = 0;
   cmp_titlebar_env_t *env;
   if (!out_env) {
     return CMP_ERROR_INVALID_ARG;
@@ -28,7 +30,16 @@ int cmp_titlebar_env_create(cmp_titlebar_env_t **out_env) {
   }
   memset(env, 0, sizeof(cmp_titlebar_env_t));
   *out_env = env;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -38,11 +49,22 @@ int cmp_titlebar_env_create(cmp_titlebar_env_t **out_env) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_titlebar_env_destroy(cmp_titlebar_env_t *env) {
+  int rc;
+  rc = 0;
   if (!env) {
     return CMP_ERROR_INVALID_ARG;
   }
   CMP_FREE(env);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -57,6 +79,8 @@ int cmp_titlebar_env_destroy(cmp_titlebar_env_t *env) {
  */
 int cmp_titlebar_env_set_area(cmp_titlebar_env_t *env, float x, float y,
                               float width, float height) {
+  int rc;
+  rc = 0;
   if (!env) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -64,7 +88,16 @@ int cmp_titlebar_env_set_area(cmp_titlebar_env_t *env, float x, float y,
   env->y = y;
   env->width = width;
   env->height = height;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -80,6 +113,8 @@ int cmp_titlebar_env_set_area(cmp_titlebar_env_t *env, float x, float y,
 int cmp_titlebar_env_get_area(const cmp_titlebar_env_t *env, float *out_x,
                               float *out_y, float *out_width,
                               float *out_height) {
+  int rc;
+  rc = 0;
   if (!env || !out_x || !out_y || !out_width || !out_height) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -87,5 +122,14 @@ int cmp_titlebar_env_get_area(const cmp_titlebar_env_t *env, float *out_x,
   *out_y = env->y;
   *out_width = env->width;
   *out_height = env->height;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

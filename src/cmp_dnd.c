@@ -19,7 +19,8 @@ struct cmp_dnd {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dnd_create(cmp_dnd_t **out_dnd) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_dnd_t *dnd = NULL;
@@ -32,6 +33,9 @@ int cmp_dnd_create(cmp_dnd_t **out_dnd) {
     }
     cmp_log_debug("cmp_dnd_create: Invalid argument (out_dnd=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -42,6 +46,9 @@ int cmp_dnd_create(cmp_dnd_t **out_dnd) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_dnd_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -59,7 +66,8 @@ int cmp_dnd_create(cmp_dnd_t **out_dnd) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dnd_destroy(cmp_dnd_t *dnd_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_dnd *dnd = (struct cmp_dnd *)dnd_opaque;
@@ -72,6 +80,9 @@ int cmp_dnd_destroy(cmp_dnd_t *dnd_opaque) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_dnd_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -107,7 +118,8 @@ int cmp_dnd_destroy(cmp_dnd_t *dnd_opaque) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dnd_set_payload_text(cmp_dnd_t *dnd_opaque, const char *text) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_dnd *dnd = (struct cmp_dnd *)dnd_opaque;
@@ -121,6 +133,9 @@ int cmp_dnd_set_payload_text(cmp_dnd_t *dnd_opaque, const char *text) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_dnd_set_payload_text: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -147,6 +162,9 @@ int cmp_dnd_set_payload_text(cmp_dnd_t *dnd_opaque, const char *text) {
       cmp_log_debug("cmp_dnd_set_payload_text: Out of memory allocating "
                     "payloads array: %s\n",
                     err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -161,9 +179,11 @@ int cmp_dnd_set_payload_text(cmp_dnd_t *dnd_opaque, const char *text) {
     cmp_log_debug(
         "cmp_dnd_set_payload_text: Out of memory allocating string: %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
-
 #if defined(_MSC_VER)
   if (strcpy_s(dnd->payloads[0], len + 1, text) != 0) {
     CMP_FREE(dnd->payloads[0]);
@@ -188,7 +208,8 @@ int cmp_dnd_set_payload_text(cmp_dnd_t *dnd_opaque, const char *text) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dnd_get_payload_text(const cmp_dnd_t *dnd_opaque, char **out_text) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   const struct cmp_dnd *dnd = (const struct cmp_dnd *)dnd_opaque;
@@ -201,6 +222,9 @@ int cmp_dnd_get_payload_text(const cmp_dnd_t *dnd_opaque, char **out_text) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_dnd_get_payload_text: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -217,9 +241,11 @@ int cmp_dnd_get_payload_text(const cmp_dnd_t *dnd_opaque, char **out_text) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_dnd_get_payload_text: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
-
 #if defined(_MSC_VER)
   if (strcpy_s(*out_text, len + 1, dnd->payloads[0]) != 0) {
     CMP_FREE(*out_text);
@@ -243,7 +269,8 @@ int cmp_dnd_get_payload_text(const cmp_dnd_t *dnd_opaque, char **out_text) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dnd_set_operation(cmp_dnd_t *dnd_opaque, cmp_dnd_op_t op) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_dnd *dnd = (struct cmp_dnd *)dnd_opaque;
@@ -255,12 +282,24 @@ int cmp_dnd_set_operation(cmp_dnd_t *dnd_opaque, cmp_dnd_op_t op) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_dnd_set_operation: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   dnd->operation = op;
   cmp_log_debug("cmp_dnd_set_operation: Op set to %d\n", (int)op);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -271,7 +310,8 @@ int cmp_dnd_set_operation(cmp_dnd_t *dnd_opaque, cmp_dnd_op_t op) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dnd_get_operation(const cmp_dnd_t *dnd_opaque, cmp_dnd_op_t *out_op) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   const struct cmp_dnd *dnd = (const struct cmp_dnd *)dnd_opaque;
@@ -283,12 +323,24 @@ int cmp_dnd_get_operation(const cmp_dnd_t *dnd_opaque, cmp_dnd_op_t *out_op) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_dnd_get_operation: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_op = dnd->operation;
   cmp_log_debug("cmp_dnd_get_operation: Read op\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -301,7 +353,8 @@ int cmp_dnd_get_operation(const cmp_dnd_t *dnd_opaque, cmp_dnd_op_t *out_op) {
  */
 int cmp_dnd_evaluate_lift_animation(float progress, float *out_scale,
                                     float *out_shadow_opacity) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -313,6 +366,9 @@ int cmp_dnd_evaluate_lift_animation(float progress, float *out_scale,
     }
     cmp_log_debug("cmp_dnd_evaluate_lift_animation: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -327,7 +383,16 @@ int cmp_dnd_evaluate_lift_animation(float progress, float *out_scale,
   *out_shadow_opacity = 0.4f * progress;
 
   cmp_log_debug("cmp_dnd_evaluate_lift_animation: Evaluated lift curves\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -339,7 +404,8 @@ int cmp_dnd_evaluate_lift_animation(float progress, float *out_scale,
  */
 int cmp_dnd_add_item_to_stack(cmp_dnd_t *dnd_opaque,
                               const char *additional_payload_text) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_dnd *dnd = (struct cmp_dnd *)dnd_opaque;
@@ -354,6 +420,9 @@ int cmp_dnd_add_item_to_stack(cmp_dnd_t *dnd_opaque,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_dnd_add_item_to_stack: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -368,6 +437,9 @@ int cmp_dnd_add_item_to_stack(cmp_dnd_t *dnd_opaque,
       cmp_log_debug("cmp_dnd_add_item_to_stack: Out of memory allocating "
                     "payloads array: %s\n",
                     err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     if (dnd->payloads != NULL) {
@@ -391,9 +463,11 @@ int cmp_dnd_add_item_to_stack(cmp_dnd_t *dnd_opaque,
     cmp_log_debug(
         "cmp_dnd_add_item_to_stack: Out of memory allocating string: %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
-
 #if defined(_MSC_VER)
   if (strcpy_s(dnd->payloads[dnd->payload_count], len + 1,
                additional_payload_text) != 0) {
@@ -418,7 +492,8 @@ int cmp_dnd_add_item_to_stack(cmp_dnd_t *dnd_opaque,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dnd_get_stack_count(const cmp_dnd_t *dnd_opaque, size_t *out_count) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   const struct cmp_dnd *dnd = (const struct cmp_dnd *)dnd_opaque;
@@ -430,11 +505,23 @@ int cmp_dnd_get_stack_count(const cmp_dnd_t *dnd_opaque, size_t *out_count) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_dnd_get_stack_count: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_count = dnd->payload_count;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -448,7 +535,8 @@ int cmp_dnd_get_stack_count(const cmp_dnd_t *dnd_opaque, size_t *out_count) {
 int cmp_dnd_evaluate_drop_target_highlight(int is_hovered,
                                            float *out_expansion_scale,
                                            float *out_bg_overlay_opacity) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -461,6 +549,9 @@ int cmp_dnd_evaluate_drop_target_highlight(int is_hovered,
     cmp_log_debug(
         "cmp_dnd_evaluate_drop_target_highlight: Invalid argument: %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -474,7 +565,16 @@ int cmp_dnd_evaluate_drop_target_highlight(int is_hovered,
 
   cmp_log_debug("cmp_dnd_evaluate_drop_target_highlight: Evaluated target "
                 "highlight curves\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -486,7 +586,8 @@ int cmp_dnd_evaluate_drop_target_highlight(int is_hovered,
  */
 int cmp_dnd_evaluate_spring_loading(float hover_duration_ms,
                                     int *out_should_trigger) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -498,6 +599,9 @@ int cmp_dnd_evaluate_spring_loading(float hover_duration_ms,
     }
     cmp_log_debug("cmp_dnd_evaluate_spring_loading: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -510,5 +614,14 @@ int cmp_dnd_evaluate_spring_loading(float hover_duration_ms,
 
   cmp_log_debug(
       "cmp_dnd_evaluate_spring_loading: Evaluated spring-load timing\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

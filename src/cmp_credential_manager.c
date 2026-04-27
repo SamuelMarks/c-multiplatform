@@ -23,7 +23,8 @@ static char *g_mock_account = NULL;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_credential_manager_create(cmp_credential_manager_t **out_manager) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_credential_manager_t *manager = NULL;
@@ -37,6 +38,9 @@ int cmp_credential_manager_create(cmp_credential_manager_t **out_manager) {
     cmp_log_debug("cmp_credential_manager_create: Invalid argument "
                   "(out_manager=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -48,6 +52,9 @@ int cmp_credential_manager_create(cmp_credential_manager_t **out_manager) {
     }
     cmp_log_debug("cmp_credential_manager_create: Out of memory: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -65,7 +72,8 @@ int cmp_credential_manager_create(cmp_credential_manager_t **out_manager) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_credential_manager_destroy(cmp_credential_manager_t *manager) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -77,6 +85,9 @@ int cmp_credential_manager_destroy(cmp_credential_manager_t *manager) {
     }
     cmp_log_debug("cmp_credential_manager_destroy: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -129,7 +140,8 @@ int cmp_credential_manager_destroy(cmp_credential_manager_t *manager) {
 int cmp_credential_manager_set_secret(cmp_credential_manager_t *manager,
                                       const char *service, const char *account,
                                       const char *secret) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   size_t len;
@@ -142,6 +154,9 @@ int cmp_credential_manager_set_secret(cmp_credential_manager_t *manager,
     }
     cmp_log_debug("cmp_credential_manager_set_secret: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -182,6 +197,9 @@ int cmp_credential_manager_set_secret(cmp_credential_manager_t *manager,
     cmp_log_debug("cmp_credential_manager_set_secret: Out of memory allocating "
                   "secret: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 #if defined(_MSC_VER)
@@ -297,7 +315,8 @@ int cmp_credential_manager_set_secret(cmp_credential_manager_t *manager,
 int cmp_credential_manager_get_secret(cmp_credential_manager_t *manager,
                                       const char *service, const char *account,
                                       char **out_secret) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   size_t len;
@@ -310,6 +329,9 @@ int cmp_credential_manager_get_secret(cmp_credential_manager_t *manager,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_credential_manager_get_secret: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -324,6 +346,9 @@ int cmp_credential_manager_get_secret(cmp_credential_manager_t *manager,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_credential_manager_get_secret: Out of memory\n");
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
 #if defined(_MSC_VER)
@@ -351,6 +376,9 @@ int cmp_credential_manager_get_secret(cmp_credential_manager_t *manager,
     err_str = "Unknown";
   }
   cmp_log_debug("cmp_credential_manager_get_secret: Secret not found\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc; /* Not found */
 }
 
@@ -365,7 +393,8 @@ int cmp_credential_manager_get_secret(cmp_credential_manager_t *manager,
 int cmp_credential_manager_delete_secret(cmp_credential_manager_t *manager,
                                          const char *service,
                                          const char *account) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -376,6 +405,9 @@ int cmp_credential_manager_delete_secret(cmp_credential_manager_t *manager,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_credential_manager_delete_secret: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -417,6 +449,9 @@ int cmp_credential_manager_delete_secret(cmp_credential_manager_t *manager,
     err_str = "Unknown";
   }
   cmp_log_debug("cmp_credential_manager_delete_secret: Secret not found\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc; /* Not found */
 }
 
@@ -427,7 +462,8 @@ int cmp_credential_manager_delete_secret(cmp_credential_manager_t *manager,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_credential_manager_free_secret(char *secret) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (secret != NULL) {
     memset(secret, 0, strlen(secret));

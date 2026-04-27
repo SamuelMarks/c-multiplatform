@@ -41,7 +41,6 @@ typedef struct cmp_theme cmp_theme_t;
 typedef struct cmp_theme_vtable_s cmp_theme_vtable_t;
 typedef struct cmp_palette cmp_palette_t;
 typedef struct cmp_dynamic_type cmp_dynamic_type_t;
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -13,8 +13,18 @@ extern int transport_factory_init_client(struct HttpClient *client);
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_init(void) {
-  /* No longer needed by c-abstract-http */
-  return 0;
+  int rc;
+  rc = 0; /* No longer needed by c-abstract-http */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -23,8 +33,18 @@ int cmp_http_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_shutdown(void) {
-  /* No longer needed by c-abstract-http */
-  return 0;
+  int rc;
+  rc = 0; /* No longer needed by c-abstract-http */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -36,7 +56,8 @@ int cmp_http_shutdown(void) {
  */
 int cmp_http_client_create(cmp_modality_t *mod,
                            struct HttpClient **out_client) {
-  int rc = 0; /* CMP_SUCCESS */
+  int rc;
+  rc = 0; /* CMP_SUCCESS */
   struct HttpClient *client = NULL;
   (void)mod;
 
@@ -59,6 +80,9 @@ int cmp_http_client_create(cmp_modality_t *mod,
     CMP_FREE(client);
     LOG_DEBUG("Error in cmp_http_client_create: transport_factory_init_client "
               "failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -73,7 +97,8 @@ int cmp_http_client_create(cmp_modality_t *mod,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_client_destroy(struct HttpClient *client) {
-  int rc = 0;
+  int rc;
+  rc = 0;
   if (client == NULL) {
     LOG_DEBUG("cmp_http_client_destroy: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -82,6 +107,9 @@ int cmp_http_client_destroy(struct HttpClient *client) {
   rc = CMP_FREE(client);
   if (rc != 0) {
     LOG_DEBUG("cmp_http_client_destroy: CMP_FREE failed\n");
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -93,12 +121,23 @@ int cmp_http_client_destroy(struct HttpClient *client) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_http_request_init(struct HttpRequest *req) {
+  int rc;
+  rc = 0;
   if (req == NULL) {
     LOG_DEBUG("cmp_http_request_init: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
   http_request_init(req);
-  return 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -107,10 +146,21 @@ int cmp_http_request_init(struct HttpRequest *req) {
  * @param req The request to free.
  */
 int cmp_http_request_free(struct HttpRequest *req) {
+  int rc;
+  rc = 0;
   if (req != NULL) {
     http_request_free(req);
   }
-  return 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -125,6 +175,9 @@ int cmp_http_response_free(struct HttpResponse *res) {
     rc = CMP_FREE(res);
     if (rc != 0) {
       LOG_DEBUG("cmp_http_response_free: CMP_FREE failed\n");
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -141,7 +194,8 @@ int cmp_http_response_free(struct HttpResponse *res) {
  */
 int cmp_http_send(struct HttpClient *client, const struct HttpRequest *req,
                   struct HttpResponse **out_res) {
-  int rc = 0; /* CMP_SUCCESS */
+  int rc;
+  rc = 0; /* CMP_SUCCESS */
   struct HttpFuture *future = NULL;
   struct HttpRequest *req_arr[1];
   struct HttpFuture *futures_arr[1];
@@ -193,9 +247,10 @@ struct progress_ctx {
   void *user_data;
 };
 
-static void on_progress_chunk(const unsigned char *chunk, size_t length,
-                              size_t total_received, size_t total_expected,
-                              void *user_data) {
+CMP_EXEMPT(static void on_progress_chunk(const unsigned char *chunk,
+                                         size_t length, size_t total_received,
+                                         size_t total_expected,
+                                         void *user_data)) {
   struct progress_ctx *ctx = (struct progress_ctx *)user_data;
   float percentage;
 
@@ -223,7 +278,8 @@ int cmp_http_send_with_progress(
     struct HttpClient *client, struct HttpRequest *req,
     int (*progress_cb)(float percentage, void *user_data), void *user_data,
     struct HttpResponse **out_res) {
-  int rc = 0; /* CMP_SUCCESS */
+  int rc;
+  rc = 0; /* CMP_SUCCESS */
   struct HttpFuture *future = NULL;
   struct HttpRequest *req_arr[1];
   struct HttpFuture *futures_arr[1];
@@ -279,10 +335,18 @@ int cmp_http_send_with_progress(
  */
 int cmp_http_ws_init(struct HttpRequest *req,
                      const struct c_abstract_http_ws_config *config) {
+  int rc;
+  rc = 0;
   (void)req;
   (void)config;
   LOG_DEBUG("cmp_http_ws_init: Websockets not supported by current "
             "c-abstract-http\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 }
 
@@ -292,11 +356,19 @@ int cmp_http_ws_init(struct HttpRequest *req,
 int cmp_http_ws_send(struct HttpRequest *req,
                      enum c_abstract_http_ws_opcode opcode,
                      const unsigned char *payload, size_t len) {
+  int rc;
+  rc = 0;
   (void)req;
   (void)opcode;
   (void)payload;
   (void)len;
   LOG_DEBUG("cmp_http_ws_send: Websockets not supported\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 }
 
@@ -304,9 +376,17 @@ int cmp_http_ws_send(struct HttpRequest *req,
  * @brief Close a WebSocket connection.
  */
 int cmp_http_ws_close(struct HttpRequest *req, int status_code) {
+  int rc;
+  rc = 0;
   (void)req;
   (void)status_code;
   LOG_DEBUG("cmp_http_ws_close: Websockets not supported\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 }
 
@@ -319,6 +399,8 @@ int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
                     c_abstract_http_ws_on_error on_err,
                     c_abstract_http_ws_on_close on_close, void *user_data,
                     volatile int *exit_flag) {
+  int rc;
+  rc = 0;
   (void)mod;
   (void)client;
   (void)req;
@@ -328,6 +410,12 @@ int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
   (void)user_data;
   (void)exit_flag;
   LOG_DEBUG("cmp_http_ws_run: Websockets not supported\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 }
 
@@ -336,9 +424,17 @@ int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
  */
 int cmp_http_sse_init(struct HttpRequest *req,
                       const struct c_abstract_http_sse_config *config) {
+  int rc;
+  rc = 0;
   (void)req;
   (void)config;
   LOG_DEBUG("cmp_http_sse_init: SSE not supported\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 }
 
@@ -351,6 +447,8 @@ int cmp_http_sse_run(cmp_modality_t *mod, struct HttpClient *client,
                      c_abstract_http_sse_on_error on_err,
                      c_abstract_http_sse_on_close on_close, void *user_data,
                      volatile int *exit_flag) {
+  int rc;
+  rc = 0;
   (void)mod;
   (void)client;
   (void)req;
@@ -360,5 +458,11 @@ int cmp_http_sse_run(cmp_modality_t *mod, struct HttpClient *client,
   (void)user_data;
   (void)exit_flag;
   LOG_DEBUG("cmp_http_sse_run: SSE not supported\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 }

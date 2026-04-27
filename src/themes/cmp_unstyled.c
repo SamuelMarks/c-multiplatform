@@ -12,8 +12,10 @@
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_measure_button(const cmp_ui_node_t *node, float *width,
-                                    float *height) {
+int cmp_unstyled_measure_button(const cmp_ui_node_t *node, float *width,
+                                float *height) {
+  int rc;
+  rc = 0;
   float calc_width = 30.0f;
   float calc_height = 20.0f;
   float font_size;
@@ -36,6 +38,12 @@ int32_t cmp_unstyled_measure_button(const cmp_ui_node_t *node, float *width,
     *width = calc_width;
   if (height)
     *height = calc_height;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -47,14 +55,22 @@ int32_t cmp_unstyled_measure_button(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_measure_text_input(const cmp_ui_node_t *node, float *width,
-                                        float *height) {
+int cmp_unstyled_measure_text_input(const cmp_ui_node_t *node, float *width,
+                                    float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 150.0f;
   if (height)
     *height = 24.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -66,14 +82,22 @@ int32_t cmp_unstyled_measure_text_input(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_measure_slider(const cmp_ui_node_t *node, float *width,
-                                    float *height) {
+int cmp_unstyled_measure_slider(const cmp_ui_node_t *node, float *width,
+                                float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 100.0f;
   if (height)
     *height = 10.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -85,14 +109,22 @@ int32_t cmp_unstyled_measure_slider(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_measure_toggle(const cmp_ui_node_t *node, float *width,
-                                    float *height) {
+int cmp_unstyled_measure_toggle(const cmp_ui_node_t *node, float *width,
+                                float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 30.0f;
   if (height)
     *height = 15.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -104,14 +136,22 @@ int32_t cmp_unstyled_measure_toggle(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_measure_checkbox(const cmp_ui_node_t *node, float *width,
-                                      float *height) {
+int cmp_unstyled_measure_checkbox(const cmp_ui_node_t *node, float *width,
+                                  float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 12.0f;
   if (height)
     *height = 12.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -123,14 +163,22 @@ int32_t cmp_unstyled_measure_checkbox(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_measure_radio(const cmp_ui_node_t *node, float *width,
-                                   float *height) {
+int cmp_unstyled_measure_radio(const cmp_ui_node_t *node, float *width,
+                               float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 12.0f;
   if (height)
     *height = 12.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -142,14 +190,22 @@ int32_t cmp_unstyled_measure_radio(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_measure_progress(const cmp_ui_node_t *node, float *width,
-                                      float *height) {
+int cmp_unstyled_measure_progress(const cmp_ui_node_t *node, float *width,
+                                  float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 100.0f;
   if (height)
     *height = 10.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -161,14 +217,22 @@ int32_t cmp_unstyled_measure_progress(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_measure_dropdown(const cmp_ui_node_t *node, float *width,
-                                      float *height) {
+int cmp_unstyled_measure_dropdown(const cmp_ui_node_t *node, float *width,
+                                  float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 100.0f;
   if (height)
     *height = 24.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -178,13 +242,21 @@ int32_t cmp_unstyled_measure_dropdown(const cmp_ui_node_t *node, float *width,
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_layout_nav_bar(cmp_ui_node_t *node) {
+int cmp_unstyled_layout_nav_bar(cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_ROW;
   node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_height = 30.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -194,13 +266,21 @@ int32_t cmp_unstyled_layout_nav_bar(cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_layout_tab_bar(cmp_ui_node_t *node) {
+int cmp_unstyled_layout_tab_bar(cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_ROW;
   node->layout->align_items = CMP_FLEX_ALIGN_START;
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_height = 24.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -210,13 +290,21 @@ int32_t cmp_unstyled_layout_tab_bar(cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_layout_dialog_content(cmp_ui_node_t *node) {
+int cmp_unstyled_layout_dialog_content(cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_COLUMN;
   node->layout->align_items = CMP_FLEX_ALIGN_START;
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_width = 100.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -226,13 +314,21 @@ int32_t cmp_unstyled_layout_dialog_content(cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_layout_sidebar(cmp_ui_node_t *node) {
+int cmp_unstyled_layout_sidebar(cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_COLUMN;
   node->layout->align_items = CMP_FLEX_ALIGN_STRETCH;
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_width = 150.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -242,7 +338,9 @@ int32_t cmp_unstyled_layout_sidebar(cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_draw_button(const cmp_ui_node_t *node) {
+int cmp_unstyled_draw_button(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -260,6 +358,12 @@ int32_t cmp_unstyled_draw_button(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -269,7 +373,9 @@ int32_t cmp_unstyled_draw_button(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_draw_text_input(const cmp_ui_node_t *node) {
+int cmp_unstyled_draw_text_input(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -287,6 +393,12 @@ int32_t cmp_unstyled_draw_text_input(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -296,7 +408,9 @@ int32_t cmp_unstyled_draw_text_input(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_draw_slider(const cmp_ui_node_t *node) {
+int cmp_unstyled_draw_slider(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -314,6 +428,12 @@ int32_t cmp_unstyled_draw_slider(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -323,7 +443,9 @@ int32_t cmp_unstyled_draw_slider(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_draw_toggle(const cmp_ui_node_t *node) {
+int cmp_unstyled_draw_toggle(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -341,6 +463,12 @@ int32_t cmp_unstyled_draw_toggle(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -350,7 +478,9 @@ int32_t cmp_unstyled_draw_toggle(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_draw_checkbox(const cmp_ui_node_t *node) {
+int cmp_unstyled_draw_checkbox(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -368,6 +498,12 @@ int32_t cmp_unstyled_draw_checkbox(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -377,7 +513,9 @@ int32_t cmp_unstyled_draw_checkbox(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_draw_radio(const cmp_ui_node_t *node) {
+int cmp_unstyled_draw_radio(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -395,6 +533,12 @@ int32_t cmp_unstyled_draw_radio(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -404,7 +548,9 @@ int32_t cmp_unstyled_draw_radio(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_draw_progress(const cmp_ui_node_t *node) {
+int cmp_unstyled_draw_progress(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -422,6 +568,12 @@ int32_t cmp_unstyled_draw_progress(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -431,7 +583,9 @@ int32_t cmp_unstyled_draw_progress(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_draw_card(const cmp_ui_node_t *node) {
+int cmp_unstyled_draw_card(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -449,6 +603,12 @@ int32_t cmp_unstyled_draw_card(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -458,7 +618,9 @@ int32_t cmp_unstyled_draw_card(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_draw_tooltip(const cmp_ui_node_t *node) {
+int cmp_unstyled_draw_tooltip(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -476,6 +638,12 @@ int32_t cmp_unstyled_draw_tooltip(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -485,7 +653,9 @@ int32_t cmp_unstyled_draw_tooltip(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_draw_menu(const cmp_ui_node_t *node) {
+int cmp_unstyled_draw_menu(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -503,6 +673,12 @@ int32_t cmp_unstyled_draw_menu(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -512,7 +688,9 @@ int32_t cmp_unstyled_draw_menu(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_draw_focus_ring(const cmp_ui_node_t *node) {
+int cmp_unstyled_draw_focus_ring(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -530,6 +708,12 @@ int32_t cmp_unstyled_draw_focus_ring(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -542,8 +726,10 @@ int32_t cmp_unstyled_draw_focus_ring(const cmp_ui_node_t *node) {
  * @param damping Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_get_spring_config(const cmp_ui_node_t *node, float *mass,
-                                       float *stiffness, float *damping) {
+int cmp_unstyled_get_spring_config(const cmp_ui_node_t *node, float *mass,
+                                   float *stiffness, float *damping) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (mass)
@@ -552,6 +738,12 @@ int32_t cmp_unstyled_get_spring_config(const cmp_ui_node_t *node, float *mass,
     *stiffness = 100.0f;
   if (damping)
     *damping = 10.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -563,14 +755,22 @@ int32_t cmp_unstyled_get_spring_config(const cmp_ui_node_t *node, float *mass,
  * @param b Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_get_ripple_config(const cmp_ui_node_t *node, float *a,
-                                       float *b) {
+int cmp_unstyled_get_ripple_config(const cmp_ui_node_t *node, float *a,
+                                   float *b) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (a)
     *a = 0.0f;
   if (b)
     *b = 0.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -582,13 +782,21 @@ int32_t cmp_unstyled_get_ripple_config(const cmp_ui_node_t *node, float *a,
  * @param opacity Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_get_state_layer_opacity(const cmp_ui_node_t *node,
-                                             int32_t state, float *opacity) {
+int cmp_unstyled_get_state_layer_opacity(const cmp_ui_node_t *node, int state,
+                                         float *opacity) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   (void)state;
   if (opacity)
     *opacity = 1.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -599,15 +807,22 @@ int32_t cmp_unstyled_get_state_layer_opacity(const cmp_ui_node_t *node,
  * @param duration Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_unstyled_get_transition_duration(const cmp_ui_node_t *node,
-                                             float *duration) {
+int cmp_unstyled_get_transition_duration(const cmp_ui_node_t *node,
+                                         float *duration) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (duration)
     *duration = 0.0f; /* No transition for unstyled fallback */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
-
 #ifndef CMP_THEME_MODE_SINGLE_STATIC
 const cmp_theme_vtable_t cmp_unstyled_vtable = {
     cmp_unstyled_measure_button,
@@ -643,7 +858,22 @@ const cmp_theme_vtable_t cmp_unstyled_vtable = {
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API const cmp_theme_vtable_t *cmp_theme_get_unstyled_vtable(void) {
-  return &cmp_unstyled_vtable;
+int CMP_API
+cmp_theme_get_unstyled_vtable(const cmp_theme_vtable_t **out_vtable) {
+  int rc;
+  rc = 0;
+  if (out_vtable) {
+    *out_vtable = &cmp_unstyled_vtable;
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 #endif /* CMP_THEME_MODE_SINGLE_STATIC */

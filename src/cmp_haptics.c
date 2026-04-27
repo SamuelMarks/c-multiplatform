@@ -16,7 +16,8 @@ struct cmp_haptics {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_haptics_create(cmp_haptics_t **out_haptics) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_haptics_t *haptics = NULL;
@@ -30,6 +31,9 @@ int cmp_haptics_create(cmp_haptics_t **out_haptics) {
     cmp_log_debug(
         "cmp_haptics_create: Invalid argument (out_haptics=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -40,6 +44,9 @@ int cmp_haptics_create(cmp_haptics_t **out_haptics) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_haptics_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -58,7 +65,8 @@ int cmp_haptics_create(cmp_haptics_t **out_haptics) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_haptics_destroy(cmp_haptics_t *haptics) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -69,6 +77,9 @@ int cmp_haptics_destroy(cmp_haptics_t *haptics) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_haptics_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -90,7 +101,8 @@ int cmp_haptics_destroy(cmp_haptics_t *haptics) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_haptics_trigger(cmp_haptics_t *haptics, cmp_haptics_type_t type) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -101,6 +113,9 @@ int cmp_haptics_trigger(cmp_haptics_t *haptics, cmp_haptics_type_t type) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_haptics_trigger: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -108,7 +123,16 @@ int cmp_haptics_trigger(cmp_haptics_t *haptics, cmp_haptics_type_t type) {
   /* Actual OS-specific haptic API calls would go here */
   cmp_log_debug("cmp_haptics_trigger: Simulated logical Taptic Engine "
                 "engagement pulse\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -118,7 +142,8 @@ int cmp_haptics_trigger(cmp_haptics_t *haptics, cmp_haptics_type_t type) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_haptics_prepare(cmp_haptics_t *haptics) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -129,13 +154,25 @@ int cmp_haptics_prepare(cmp_haptics_t *haptics) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_haptics_prepare: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   /* Simulating OS-level prepare() to wake the Taptic Engine */
   cmp_log_debug(
       "cmp_haptics_prepare: Synchronized execution boundary states cleanly\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -149,7 +186,8 @@ int cmp_haptics_prepare(cmp_haptics_t *haptics) {
 int cmp_haptics_trigger_with_audio_sync(cmp_haptics_t *haptics,
                                         cmp_haptics_type_t type,
                                         const char *audio_file_path) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -161,6 +199,9 @@ int cmp_haptics_trigger_with_audio_sync(cmp_haptics_t *haptics,
     }
     cmp_log_debug("cmp_haptics_trigger_with_audio_sync: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -168,7 +209,16 @@ int cmp_haptics_trigger_with_audio_sync(cmp_haptics_t *haptics,
   /* Simulating audio-haptic dispatch syncing */
   cmp_log_debug("cmp_haptics_trigger_with_audio_sync: Simulated AV-sync "
                 "pipeline tracking logic\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -178,7 +228,8 @@ int cmp_haptics_trigger_with_audio_sync(cmp_haptics_t *haptics,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_haptics_trigger_rigid(cmp_haptics_t *haptics) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -189,12 +240,24 @@ int cmp_haptics_trigger_rigid(cmp_haptics_t *haptics) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_haptics_trigger_rigid: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   cmp_log_debug("cmp_haptics_trigger_rigid: Emitted physical feedback trace "
                 "variables safely\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -204,7 +267,8 @@ int cmp_haptics_trigger_rigid(cmp_haptics_t *haptics) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_haptics_trigger_soft(cmp_haptics_t *haptics) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -215,10 +279,22 @@ int cmp_haptics_trigger_soft(cmp_haptics_t *haptics) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_haptics_trigger_soft: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   cmp_log_debug(
       "cmp_haptics_trigger_soft: Softened interaction sequence bound\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

@@ -25,6 +25,7 @@ static int g_show_content = 0;
  * @return 0 on success, error code otherwise.
  */
 static int get_platform_string(const char **out_str) {
+  int rc = 0;
   if (!out_str) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -79,10 +80,14 @@ static int get_platform_string(const char **out_str) {
 #else
   *out_str = "Unknown";
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 static int manual_hit_test(cmp_ui_node_t *node, float x, float y) {
+  int rc = 0;
   size_t i;
   if (!node || !node->layout) {
     return -1;
@@ -105,6 +110,9 @@ static int manual_hit_test(cmp_ui_node_t *node, float x, float y) {
       return node->layout->id;
     }
   }
+  if (rc != 0) {
+    return rc;
+  }
   return -1;
 }
 
@@ -113,6 +121,7 @@ static int manual_hit_test(cmp_ui_node_t *node, float x, float y) {
  * @return 0 on success, error code otherwise.
  */
 static int build_ui(void) {
+  int rc = 0;
   cmp_ui_node_t *btn;
   int res;
 
@@ -170,7 +179,6 @@ static int build_ui(void) {
     if (res != CMP_SUCCESS) {
       platform_str = "Unknown";
     }
-
 #if defined(_MSC_VER)
     sprintf_s(text_buf, sizeof(text_buf), "Compose: %s!", platform_str);
 #else
@@ -186,10 +194,14 @@ static int build_ui(void) {
     }
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int app_init(void) {
+  int rc = 0;
   cmp_window_config_t config;
 
   cmp_event_system_init();
@@ -219,10 +231,14 @@ int app_init(void) {
   cmp_window_set_ui_tree(g_window, g_ui_tree);
 
   cmp_window_show(g_window);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int app_run(void) {
+  int rc = 0;
   cmp_event_t evt;
   int running = 1;
 
@@ -251,10 +267,14 @@ int app_run(void) {
     /* Sleep equivalent or yield */
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int app_shutdown(void) {
+  int rc = 0;
   if (g_ui_tree) {
     cmp_ui_node_destroy(g_ui_tree);
     g_ui_tree = NULL;
@@ -269,5 +289,8 @@ int app_shutdown(void) {
   cmp_vfs_shutdown();
   cmp_event_system_shutdown();
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

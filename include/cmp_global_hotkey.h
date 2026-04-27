@@ -21,14 +21,14 @@ typedef struct cmp_global_hotkey cmp_global_hotkey_t;
  * @param out_hotkey Pointer to receive the created instance.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_global_hotkey_create(cmp_global_hotkey_t **out_hotkey);
+int CMP_API cmp_global_hotkey_create(cmp_global_hotkey_t **out_hotkey);
 
 /**
  * @brief Destroys a global hotkey manager instance.
  * @param hotkey The instance to destroy.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_global_hotkey_destroy(cmp_global_hotkey_t *hotkey);
+int CMP_API cmp_global_hotkey_destroy(cmp_global_hotkey_t *hotkey);
 
 /**
  * @brief Registers a global hotkey.
@@ -38,7 +38,7 @@ CMP_API int cmp_global_hotkey_destroy(cmp_global_hotkey_t *hotkey);
  * @param out_id Pointer to receive a hotkey ID.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_global_hotkey_register(cmp_global_hotkey_t *hotkey,
+int CMP_API cmp_global_hotkey_register(cmp_global_hotkey_t *hotkey,
                                        int key_code, int modifiers,
                                        int *out_id);
 
@@ -48,8 +48,7 @@ CMP_API int cmp_global_hotkey_register(cmp_global_hotkey_t *hotkey,
  * @param id The hotkey ID.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_global_hotkey_unregister(cmp_global_hotkey_t *hotkey, int id);
-
+int CMP_API cmp_global_hotkey_unregister(cmp_global_hotkey_t *hotkey, int id);
 #ifdef __cplusplus
 }
 #endif

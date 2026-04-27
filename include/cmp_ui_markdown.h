@@ -29,7 +29,7 @@ typedef struct cmp_ui_markdown cmp_ui_markdown_t;
  * \param text_color Default text color (ARGB).
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
+int CMP_API cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
                                    uint32_t bg_color, uint32_t text_color);
 
 /**
@@ -38,7 +38,7 @@ CMP_API int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
  * \param md The component to destroy.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_markdown_destroy(cmp_ui_markdown_t *md);
+int CMP_API cmp_ui_markdown_destroy(cmp_ui_markdown_t *md);
 
 /**
  * \brief Retrieves the underlying UI node.
@@ -47,7 +47,7 @@ CMP_API int cmp_ui_markdown_destroy(cmp_ui_markdown_t *md);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_markdown_get_node(cmp_ui_markdown_t *md,
+int CMP_API cmp_ui_markdown_get_node(cmp_ui_markdown_t *md,
                                      cmp_ui_node_t **out_node);
 
 /**
@@ -57,8 +57,7 @@ CMP_API int cmp_ui_markdown_get_node(cmp_ui_markdown_t *md,
  * \param text The new markdown text.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_markdown_set_text(cmp_ui_markdown_t *md, const char *text);
-
+int CMP_API cmp_ui_markdown_set_text(cmp_ui_markdown_t *md, const char *text);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

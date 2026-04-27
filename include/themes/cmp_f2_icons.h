@@ -40,7 +40,7 @@ typedef struct cmp_f2_icon_s {
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_icon_create(cmp_ui_node_t **out_node,
                                uint32_t codepoint_regular,
                                uint32_t codepoint_filled, float size);
 
@@ -50,8 +50,7 @@ CMP_API int cmp_f2_icon_create(cmp_ui_node_t **out_node,
  * @param is_filled 0 to show regular, 1 to show filled.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_f2_icon_set_filled(cmp_ui_node_t *icon_node, int is_filled);
-
+int CMP_API cmp_f2_icon_set_filled(cmp_ui_node_t *icon_node, int is_filled);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

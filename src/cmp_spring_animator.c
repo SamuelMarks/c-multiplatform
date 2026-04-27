@@ -1,7 +1,10 @@
 /* clang-format off */
 #include "cmp.h"
+
 #include <stdlib.h>
 #include <math.h>
+
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_spring_animator {
@@ -19,7 +22,7 @@ struct cmp_spring_animator {
 };
 
 /**
- * @brief cmp_spring_animator_create
+ * @brief Create a spring animator.
  *
  * @param mass Parameter description.
  * @param stiffness Parameter description.
@@ -31,12 +34,21 @@ struct cmp_spring_animator {
 int cmp_spring_animator_create(float mass, float stiffness, float damping,
                                float initial_velocity,
                                cmp_spring_animator_t **out_animator) {
+  int rc;
   struct cmp_spring_animator *anim;
-  if (!out_animator)
+
+  rc = CMP_SUCCESS;
+
+  if (out_animator == NULL) {
+    LOG_DEBUG("Invalid argument: out_animator is NULL\n");
     return CMP_ERROR_INVALID_ARG;
-  if (CMP_MALLOC(sizeof(struct cmp_spring_animator), (void **)&anim) !=
-      CMP_SUCCESS)
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_spring_animator), (void **)&anim);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
+  }
 
   anim->mass = mass > 0.0f ? mass : 1.0f;
   anim->stiffness = stiffness > 0.0f ? stiffness : 100.0f;
@@ -55,19 +67,34 @@ int cmp_spring_animator_create(float mass, float stiffness, float damping,
 }
 
 /**
- * @brief cmp_spring_animator_destroy
+ * @brief Destroy a spring animator.
  *
  * @param animator Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_spring_animator_destroy(cmp_spring_animator_t *animator) {
-  if (animator)
-    CMP_FREE(animator);
+  int rc;
+  struct cmp_spring_animator *anim;
+
+  rc = CMP_SUCCESS;
+  anim = (struct cmp_spring_animator *)animator;
+
+  if (anim == NULL) {
+    LOG_DEBUG("Invalid argument: animator is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  rc = CMP_FREE(anim);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+    return rc;
+  }
+
   return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_spring_animator_interrupt
+ * @brief Interrupt a spring animator.
  *
  * @param animator Parameter description.
  * @param new_target_value Parameter description.
@@ -75,19 +102,25 @@ int cmp_spring_animator_destroy(cmp_spring_animator_t *animator) {
  */
 int cmp_spring_animator_interrupt(cmp_spring_animator_t *animator,
                                   float new_target_value) {
-  struct cmp_spring_animator *anim = (struct cmp_spring_animator *)animator;
-  if (!anim)
+  struct cmp_spring_animator *anim;
+
+  anim = (struct cmp_spring_animator *)animator;
+
+  if (anim == NULL) {
+    LOG_DEBUG("Invalid argument: animator is NULL\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   /* Hand-off: we don't reset current_value or current_velocity, just the target
    */
   anim->target_value = new_target_value;
   anim->is_scrubbing = 0;
+
   return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_spring_animator_scrub
+ * @brief Scrub a spring animator.
  *
  * @param animator Parameter description.
  * @param fraction_complete Parameter description.
@@ -95,17 +128,24 @@ int cmp_spring_animator_interrupt(cmp_spring_animator_t *animator,
  */
 int cmp_spring_animator_scrub(cmp_spring_animator_t *animator,
                               float fraction_complete) {
-  struct cmp_spring_animator *anim = (struct cmp_spring_animator *)animator;
-  if (!anim)
+  struct cmp_spring_animator *anim;
+
+  anim = (struct cmp_spring_animator *)animator;
+
+  if (anim == NULL) {
+    LOG_DEBUG("Invalid argument: animator is NULL\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   anim->is_scrubbing = 1;
   anim->scrub_fraction = fraction_complete;
 
-  if (anim->scrub_fraction < 0.0f)
+  if (anim->scrub_fraction < 0.0f) {
     anim->scrub_fraction = 0.0f;
-  if (anim->scrub_fraction > 1.0f)
+  }
+  if (anim->scrub_fraction > 1.0f) {
     anim->scrub_fraction = 1.0f;
+  }
 
   /* In scrub mode, velocity is artificially clamped or tracked separately,
      but for this equivalency we just freeze the time step evaluation. */
@@ -113,7 +153,7 @@ int cmp_spring_animator_scrub(cmp_spring_animator_t *animator,
 }
 
 /**
- * @brief cmp_spring_animator_evaluate
+ * @brief Evaluate a spring animator.
  *
  * @param animator Parameter description.
  * @param dt_seconds Parameter description.
@@ -124,11 +164,15 @@ int cmp_spring_animator_scrub(cmp_spring_animator_t *animator,
 int cmp_spring_animator_evaluate(cmp_spring_animator_t *animator,
                                  float dt_seconds, float *out_current_value,
                                  int *out_is_settled) {
-  struct cmp_spring_animator *anim = (struct cmp_spring_animator *)animator;
+  struct cmp_spring_animator *anim;
   float displacement, spring_force, damping_force, acceleration;
 
-  if (!anim || !out_current_value || !out_is_settled)
+  anim = (struct cmp_spring_animator *)animator;
+
+  if (anim == NULL || out_current_value == NULL || out_is_settled == NULL) {
+    LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   if (anim->is_scrubbing) {
     /* If scrubbed, value is linearly forced, it is never "settled" physically
@@ -153,8 +197,8 @@ int cmp_spring_animator_evaluate(cmp_spring_animator_t *animator,
   *out_current_value = anim->current_value;
 
   /* Settled if velocity is near zero AND displacement is near zero */
-  if (fabs(anim->current_velocity) < 0.001f &&
-      fabs(anim->current_value - anim->target_value) < 0.001f) {
+  if (fabs((double)anim->current_velocity) < 0.001 &&
+      fabs((double)(anim->current_value - anim->target_value)) < 0.001) {
     *out_is_settled = 1;
     anim->current_value = anim->target_value; /* Snap to perfect 1.0/target */
   } else {
@@ -165,7 +209,7 @@ int cmp_spring_animator_evaluate(cmp_spring_animator_t *animator,
 }
 
 /**
- * @brief cmp_spring_calculate_gesture_velocity
+ * @brief Calculate gesture velocity.
  *
  * @param delta_x Parameter description.
  * @param delta_y Parameter description.
@@ -178,9 +222,13 @@ int cmp_spring_calculate_gesture_velocity(float delta_x, float delta_y,
                                           float dt_seconds,
                                           float *out_velocity_x,
                                           float *out_velocity_y) {
-  if (!out_velocity_x || !out_velocity_y || dt_seconds <= 0.0f)
+  if (out_velocity_x == NULL || out_velocity_y == NULL || dt_seconds <= 0.0f) {
+    LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
+
   *out_velocity_x = delta_x / dt_seconds;
   *out_velocity_y = delta_y / dt_seconds;
+
   return CMP_SUCCESS;
 }

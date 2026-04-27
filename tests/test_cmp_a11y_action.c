@@ -135,7 +135,6 @@ SUITE(a11y_action_suite) {
   RUN_TEST(test_a11y_action_null_args);
   RUN_TEST(test_a11y_action_execute_events);
 }
-
 #ifdef __cplusplus
 extern "C" {
 #endif

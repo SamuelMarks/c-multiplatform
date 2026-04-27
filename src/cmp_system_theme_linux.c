@@ -12,7 +12,12 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_init(void) {
-  return 0;
+  int rc;
+  rc = 0;if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -21,7 +26,12 @@ int cmp_system_theme_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_shutdown(void) {
-  return 0;
+  int rc;
+  rc = 0;if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -31,7 +41,8 @@ int cmp_system_theme_shutdown(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_is_dark(int *out_is_dark) {
-  FILE *fp;
+  int rc;
+  rc = 0;FILE *fp;
   char buffer[128];
   
   if (!out_is_dark) return -1;
@@ -57,7 +68,11 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
     }
   }
 
-  return 0;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -67,7 +82,8 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
-  FILE *fp;
+  int rc;
+  rc = 0;FILE *fp;
   char buffer[128];
 
   if (!out_is_high_contrast) return -1;
@@ -83,8 +99,11 @@ int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
     pclose(fp);
   }
 
-  return 0;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
-
 #endif /* __linux__ */
 /* clang-format on */

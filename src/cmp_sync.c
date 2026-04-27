@@ -8,9 +8,20 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_init(cmp_semaphore_t *sem, int count) {
+  int rc;
+  rc = 0;
   (void)sem;
   (void)count;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_semaphore_wait
@@ -19,8 +30,19 @@ int cmp_semaphore_init(cmp_semaphore_t *sem, int count) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_wait(cmp_semaphore_t *sem) {
+  int rc;
+  rc = 0;
   (void)sem;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_semaphore_post
@@ -29,8 +51,19 @@ int cmp_semaphore_wait(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_post(cmp_semaphore_t *sem) {
+  int rc;
+  rc = 0;
   (void)sem;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_semaphore_destroy
@@ -39,8 +72,19 @@ int cmp_semaphore_post(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
+  int rc;
+  rc = 0;
   (void)sem;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_mutex_init
@@ -49,8 +93,19 @@ int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_init(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;
   (void)mutex;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_mutex_lock
@@ -59,8 +114,19 @@ int cmp_mutex_init(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_lock(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;
   (void)mutex;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_mutex_unlock
@@ -69,8 +135,19 @@ int cmp_mutex_lock(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_unlock(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;
   (void)mutex;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_mutex_destroy
@@ -79,8 +156,19 @@ int cmp_mutex_unlock(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_destroy(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;
   (void)mutex;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_cond_init
@@ -89,8 +177,19 @@ int cmp_mutex_destroy(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_init(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;
   (void)cond;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_cond_wait
@@ -100,9 +199,20 @@ int cmp_cond_init(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;
   (void)cond;
   (void)mutex;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_cond_signal
@@ -111,8 +221,19 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_signal(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;
   (void)cond;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_cond_broadcast
@@ -121,8 +242,19 @@ int cmp_cond_signal(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_broadcast(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;
   (void)cond;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_cond_destroy
@@ -131,8 +263,19 @@ int cmp_cond_broadcast(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_destroy(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;
   (void)cond;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 #else
 #include "cmp.h"
@@ -144,63 +287,126 @@ int cmp_cond_destroy(cmp_cond_t *cond) {
  * @param count Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_semaphore_init(cmp_semaphore_t *sem, int count) { (void)sem; (void)count; return CMP_SUCCESS; }
+int cmp_semaphore_init(cmp_semaphore_t *sem, int count) {
+  int rc;
+  rc = 0;(void)sem; (void)count; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_semaphore_wait
  *
  * @param sem Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_semaphore_wait(cmp_semaphore_t *sem) { (void)sem; return CMP_SUCCESS; }
+int cmp_semaphore_wait(cmp_semaphore_t *sem) {
+  int rc;
+  rc = 0;(void)sem; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_semaphore_post
  *
  * @param sem Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_semaphore_post(cmp_semaphore_t *sem) { (void)sem; return CMP_SUCCESS; }
+int cmp_semaphore_post(cmp_semaphore_t *sem) {
+  int rc;
+  rc = 0;(void)sem; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_semaphore_destroy
  *
  * @param sem Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_semaphore_destroy(cmp_semaphore_t *sem) { (void)sem; return CMP_SUCCESS; }
+int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
+  int rc;
+  rc = 0;(void)sem; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_mutex_init
  *
  * @param mutex Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_mutex_init(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+int cmp_mutex_init(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;(void)mutex; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_mutex_lock
  *
  * @param mutex Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_mutex_lock(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+int cmp_mutex_lock(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;(void)mutex; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_mutex_unlock
  *
  * @param mutex Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_mutex_unlock(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+int cmp_mutex_unlock(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;(void)mutex; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_mutex_destroy
  *
  * @param mutex Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_mutex_destroy(cmp_mutex_t *mutex) { (void)mutex; return CMP_SUCCESS; }
+int cmp_mutex_destroy(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;(void)mutex; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_cond_init
  *
  * @param cond Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_cond_init(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
+int cmp_cond_init(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;(void)cond; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_cond_wait
  *
@@ -208,28 +414,56 @@ int cmp_cond_init(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
  * @param mutex Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) { (void)cond; (void)mutex; return CMP_SUCCESS; }
+int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;(void)cond; (void)mutex; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_cond_signal
  *
  * @param cond Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_cond_signal(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
+int cmp_cond_signal(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;(void)cond; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_cond_broadcast
  *
  * @param cond Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_cond_broadcast(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
+int cmp_cond_broadcast(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;(void)cond; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 /**
  * @brief cmp_cond_destroy
  *
  * @param cond Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_cond_destroy(cmp_cond_t *cond) { (void)cond; return CMP_SUCCESS; }
+int cmp_cond_destroy(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;(void)cond; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
+}
 #else
 #if 0 || defined(__WATCOMC__) || defined(__DOS__)
 #include "cmp.h"
@@ -254,7 +488,6 @@ typedef struct cmp_win32_cond {
     unsigned int waiters_count;
     HANDLE waiters_count_lock;
 } cmp_win32_cond_t;
-
 #endif
 /* clang-format on */
 
@@ -273,10 +506,11 @@ typedef struct {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_init(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;
   if (mutex == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   *mutex = CreateMutexA(NULL, 0, NULL);
   if (*mutex == NULL) {
@@ -287,7 +521,16 @@ int cmp_mutex_init(cmp_mutex_t *mutex) {
     return CMP_ERROR_OOM;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -297,10 +540,11 @@ int cmp_mutex_init(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_lock(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;
   if (mutex == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   if (WaitForSingleObject(*mutex, 0xFFFFFFFF) != 0) {
     return CMP_ERROR_INVALID_ARG;
@@ -310,7 +554,16 @@ int cmp_mutex_lock(cmp_mutex_t *mutex) {
     return CMP_ERROR_INVALID_ARG;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -320,10 +573,11 @@ int cmp_mutex_lock(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_unlock(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;
   if (mutex == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   if (ReleaseMutex(*mutex) == 0) {
     return CMP_ERROR_INVALID_ARG;
@@ -333,7 +587,16 @@ int cmp_mutex_unlock(cmp_mutex_t *mutex) {
     return CMP_ERROR_INVALID_ARG;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -343,10 +606,11 @@ int cmp_mutex_unlock(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_destroy(cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;
   if (mutex == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   if (CloseHandle(*mutex) == 0) {
     return CMP_ERROR_INVALID_ARG;
@@ -357,7 +621,16 @@ int cmp_mutex_destroy(cmp_mutex_t *mutex) {
     return CMP_ERROR_INVALID_ARG;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -368,10 +641,11 @@ int cmp_mutex_destroy(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_init(cmp_semaphore_t *sem, int initial_count) {
+  int rc;
+  rc = 0;
   if (sem == NULL || initial_count < 0) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   *sem = CreateSemaphoreA(NULL, initial_count, 2147483647, NULL);
   if (*sem == NULL) {
@@ -406,7 +680,16 @@ int cmp_semaphore_init(cmp_semaphore_t *sem, int initial_count) {
     return CMP_ERROR_OOM;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -416,10 +699,11 @@ int cmp_semaphore_init(cmp_semaphore_t *sem, int initial_count) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_wait(cmp_semaphore_t *sem) {
+  int rc;
+  rc = 0;
   if (sem == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   if (WaitForSingleObject(*sem, 0xFFFFFFFF) != 0) {
     return CMP_ERROR_INVALID_ARG;
@@ -439,7 +723,16 @@ int cmp_semaphore_wait(cmp_semaphore_t *sem) {
     /* Retry on EINTR */
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -449,10 +742,11 @@ int cmp_semaphore_wait(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_post(cmp_semaphore_t *sem) {
+  int rc;
+  rc = 0;
   if (sem == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   if (ReleaseSemaphore(*sem, 1, NULL) == 0) {
     return CMP_ERROR_INVALID_ARG;
@@ -470,7 +764,16 @@ int cmp_semaphore_post(cmp_semaphore_t *sem) {
     return CMP_ERROR_INVALID_ARG;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -480,10 +783,11 @@ int cmp_semaphore_post(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
+  int rc;
+  rc = 0;
   if (sem == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   if (CloseHandle(*sem) == 0) {
     return CMP_ERROR_INVALID_ARG;
@@ -502,7 +806,16 @@ int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
     return CMP_ERROR_INVALID_ARG;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -512,10 +825,11 @@ int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_init(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;
   if (cond == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   {
     cmp_win32_cond_t *cv;
@@ -550,7 +864,16 @@ int cmp_cond_init(cmp_cond_t *cond) {
     return CMP_ERROR_OOM;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -561,6 +884,8 @@ int cmp_cond_init(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
+  int rc;
+  rc = 0;
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;
   int result;
@@ -570,7 +895,6 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
   if (cond == NULL || mutex == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   cv = (cmp_win32_cond_t *)(*cond);
 
@@ -597,7 +921,16 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
     return CMP_ERROR_INVALID_ARG;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -607,6 +940,8 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_signal(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;
   int have_waiters;
@@ -615,7 +950,6 @@ int cmp_cond_signal(cmp_cond_t *cond) {
   if (cond == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   cv = (cmp_win32_cond_t *)(*cond);
 
@@ -631,7 +965,16 @@ int cmp_cond_signal(cmp_cond_t *cond) {
     return CMP_ERROR_INVALID_ARG;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -641,6 +984,8 @@ int cmp_cond_signal(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_broadcast(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;
   int have_waiters;
@@ -649,7 +994,6 @@ int cmp_cond_broadcast(cmp_cond_t *cond) {
   if (cond == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   cv = (cmp_win32_cond_t *)(*cond);
 
@@ -665,7 +1009,16 @@ int cmp_cond_broadcast(cmp_cond_t *cond) {
     return CMP_ERROR_INVALID_ARG;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -675,6 +1028,8 @@ int cmp_cond_broadcast(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_destroy(cmp_cond_t *cond) {
+  int rc;
+  rc = 0;
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;
 #endif
@@ -682,7 +1037,6 @@ int cmp_cond_destroy(cmp_cond_t *cond) {
   if (cond == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(_WIN32)
   cv = (cmp_win32_cond_t *)(*cond);
 
@@ -697,9 +1051,17 @@ int cmp_cond_destroy(cmp_cond_t *cond) {
     return CMP_ERROR_INVALID_ARG;
   }
 #endif
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
-
 #endif
 
 #endif

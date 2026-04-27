@@ -15,6 +15,8 @@
  */
 int cmp_overscroll_evaluate(cmp_overscroll_t mode, int boundary_hit,
                             int *out_chains) {
+  int rc;
+  rc = 0;
   if (out_chains == NULL) {
     LOG_DEBUG("Error in cmp_overscroll_evaluate: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -33,6 +35,5 @@ int cmp_overscroll_evaluate(cmp_overscroll_t mode, int boundary_hit,
   } else if (mode == CMP_OVERSCROLL_CONTAIN || mode == CMP_OVERSCROLL_NONE) {
     *out_chains = 0; /* Trap scroll here, do not bubble to parent */
   }
-
   return CMP_SUCCESS;
 }

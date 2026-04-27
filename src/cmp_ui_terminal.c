@@ -101,11 +101,22 @@ int cmp_ui_terminal_destroy(cmp_ui_terminal_t *terminal) {
  */
 int cmp_ui_terminal_get_node(cmp_ui_terminal_t *terminal,
                              cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!terminal || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = terminal->node_root;
-  return 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**

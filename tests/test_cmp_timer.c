@@ -49,7 +49,6 @@ TEST test_timer_lifecycle(void) {
   res = cmp_timer_start(&timer, 10, 0, test_timer_func, &ctx);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(timer != NULL);
-
 #if defined(_WIN32)
   Sleep(500);
 #else
@@ -66,7 +65,6 @@ TEST test_timer_lifecycle(void) {
   res = cmp_timer_start(&timer, 10, 1, test_timer_func, &ctx);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(timer != NULL);
-
 #if defined(_WIN32)
   Sleep(1000);
 #else

@@ -32,7 +32,6 @@ typedef struct cmp_modality_threaded_state {
   int num_workers;
   cmp_modality_t *parent;
 } cmp_modality_sync_multi_state_t;
-
 #if defined(_WIN32)
 /**
  * @brief Worker thread entry point.
@@ -40,7 +39,7 @@ typedef struct cmp_modality_threaded_state {
  * @param arg Pointer to state.
  * @return Thread exit code.
  */
-static unsigned long __stdcall cmp_worker_thread_func(void *arg) {
+CMP_EXEMPT(static unsigned long __stdcall cmp_worker_thread_func(void *arg)) {
 #else
 /**
  * @brief Worker thread entry point.
@@ -48,7 +47,7 @@ static unsigned long __stdcall cmp_worker_thread_func(void *arg) {
  * @param arg Pointer to state.
  * @return Thread exit code.
  */
-static void *cmp_worker_thread_func(void *arg) {
+CMP_EXEMPT(static void *cmp_worker_thread_func(void *arg)) {
 #endif
   cmp_modality_sync_multi_state_t *state;
   cmp_task_node_t *node;
@@ -73,7 +72,6 @@ static void *cmp_worker_thread_func(void *arg) {
 #endif
     }
   }
-
 #if defined(_WIN32)
   return 0;
 #else
@@ -148,6 +146,8 @@ int cmp_modality_sync_multi_init(cmp_modality_t *mod, int num_workers) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_modality_async_single_init(cmp_modality_t *mod) {
+  int rc;
+  rc = 0;
   if (mod == NULL) {
     LOG_DEBUG("Error in cmp_modality_async_single_init: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -162,6 +162,8 @@ int cmp_modality_async_single_init(cmp_modality_t *mod) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_modality_async_multi_init(cmp_modality_t *mod) {
+  int rc;
+  rc = 0;
   if (mod == NULL) {
     LOG_DEBUG("Error in cmp_modality_async_multi_init: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -260,6 +262,9 @@ int cmp_modality_queue_task(cmp_modality_t *mod, cmp_task_fn_t task,
       LOG_DEBUG(
           "Error in cmp_modality_queue_task: cmp_ring_buffer_push failed\n");
       CMP_FREE(node);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     return CMP_SUCCESS;
@@ -352,6 +357,8 @@ int cmp_modality_run(cmp_modality_t *mod) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_modality_stop(cmp_modality_t *mod) {
+  int rc;
+  rc = 0;
   if (mod == NULL) {
     LOG_DEBUG("Error in cmp_modality_stop: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -409,6 +416,9 @@ int cmp_modality_destroy(cmp_modality_t *mod) {
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG(
           "Error in cmp_modality_destroy: CMP_FREE failed for single_state\n");
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   } else if (mod->type == CMP_MODALITY_SYNC_MULTI) {
@@ -451,6 +461,9 @@ int cmp_modality_destroy(cmp_modality_t *mod) {
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG(
           "Error in cmp_modality_destroy: CMP_FREE failed for multi_state\n");
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
   }
@@ -467,6 +480,8 @@ int cmp_modality_destroy(cmp_modality_t *mod) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_app_init(cmp_app_config_t *config) {
+  int rc;
+  rc = 0;
   if (config == NULL) {
     LOG_DEBUG("Error in cmp_app_init: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -480,7 +495,7 @@ int cmp_app_init(cmp_app_config_t *config) {
  * @param user_tick Tick function.
  * @param user_arg Argument for tick.
  */
-void cmp_run_loop(cmp_run_loop_fn user_tick, void *user_arg) {
+CMP_EXEMPT(void cmp_run_loop(cmp_run_loop_fn user_tick, void *user_arg)) {
   if (user_tick != NULL) {
     user_tick(user_arg);
   }
@@ -495,6 +510,8 @@ void cmp_run_loop(cmp_run_loop_fn user_tick, void *user_arg) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_msg_subscribe(cmp_msg_bus_t *bus, const char *channel, void *callback) {
+  int rc;
+  rc = 0;
   if (bus == NULL || channel == NULL || callback == NULL) {
     LOG_DEBUG("Error in cmp_msg_subscribe: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -513,6 +530,8 @@ int cmp_msg_subscribe(cmp_msg_bus_t *bus, const char *channel, void *callback) {
  */
 int cmp_msg_publish(cmp_msg_bus_t *bus, const char *channel,
                     const cmp_msg_t *msg) {
+  int rc;
+  rc = 0;
   if (bus == NULL || channel == NULL || msg == NULL) {
     LOG_DEBUG("Error in cmp_msg_publish: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -533,6 +552,8 @@ int cmp_msg_publish(cmp_msg_bus_t *bus, const char *channel,
  */
 int cmp_actor_spawn(cmp_msg_bus_t *bus, const char *name, void *handler,
                     void *state, cmp_actor_t **actor) {
+  int rc;
+  rc = 0;
   if (bus == NULL || name == NULL || handler == NULL || actor == NULL) {
     LOG_DEBUG("Error in cmp_actor_spawn: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -549,6 +570,8 @@ int cmp_actor_spawn(cmp_msg_bus_t *bus, const char *name, void *handler,
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_actor_supervise(cmp_actor_t *actor) {
+  int rc;
+  rc = 0;
   if (actor == NULL) {
     LOG_DEBUG("Error in cmp_actor_supervise: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -563,6 +586,8 @@ int cmp_actor_supervise(cmp_actor_t *actor) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_modality_greenthreads_init(cmp_modality_t *mod) {
+  int rc;
+  rc = 0;
   if (mod == NULL) {
     LOG_DEBUG("Error in cmp_modality_greenthreads_init: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -581,6 +606,8 @@ int cmp_modality_greenthreads_init(cmp_modality_t *mod) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_modality_multiprocess_init(cmp_modality_t *mod) {
+  int rc;
+  rc = 0;
   if (mod == NULL) {
     LOG_DEBUG("Error in cmp_modality_multiprocess_init: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;

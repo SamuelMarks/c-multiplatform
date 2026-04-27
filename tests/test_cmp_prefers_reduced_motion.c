@@ -80,7 +80,6 @@ SUITE(prefers_reduced_motion_suite) {
   RUN_TEST(test_prefers_reduced_motion_null_args);
   RUN_TEST(test_prefers_reduced_motion_operations);
 }
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -7,7 +7,7 @@
  * @param v The brightness value [0..255].
  * @return Packed 0xRRGGBB value.
  */
-static uint32_t cmp_f2_gray(int v) {
+CMP_EXEMPT(static uint32_t cmp_math_f2_gray(int v)) {
   if (v < 0)
     v = 0;
   if (v > 255)
@@ -22,7 +22,8 @@ static uint32_t cmp_f2_gray(int v) {
  * @param t The mixing fraction [0.0..1.0].
  * @return Packed 0xRRGGBB value.
  */
-static uint32_t cmp_f2_mix(uint32_t color1, uint32_t color2, float t) {
+CMP_EXEMPT(static uint32_t cmp_math_f2_mix(uint32_t color1, uint32_t color2,
+                                           float t)) {
   uint32_t r1 = (color1 >> 16) & 0xFF;
   uint32_t g1 = (color1 >> 8) & 0xFF;
   uint32_t b1 = color1 & 0xFF;
@@ -43,24 +44,24 @@ static uint32_t cmp_f2_mix(uint32_t color1, uint32_t color2, float t) {
  * @param base_color The base color [0xRRGGBB].
  * @param out_ramp Pointer to the ramp structure to fill.
  */
-static void cmp_f2_generate_ramp(uint32_t base_color,
-                                 cmp_f2_color_ramp_t *out_ramp) {
-  out_ramp->step_10 = cmp_f2_mix(0x000000, base_color, 0.20f);
-  out_ramp->step_20 = cmp_f2_mix(0x000000, base_color, 0.30f);
-  out_ramp->step_30 = cmp_f2_mix(0x000000, base_color, 0.40f);
-  out_ramp->step_40 = cmp_f2_mix(0x000000, base_color, 0.50f);
-  out_ramp->step_50 = cmp_f2_mix(0x000000, base_color, 0.60f);
-  out_ramp->step_60 = cmp_f2_mix(0x000000, base_color, 0.70f);
-  out_ramp->step_70 = cmp_f2_mix(0x000000, base_color, 0.85f);
+CMP_EXEMPT(static void cmp_f2_generate_ramp(uint32_t base_color,
+                                            cmp_f2_color_ramp_t *out_ramp)) {
+  out_ramp->step_10 = cmp_math_f2_mix(0x000000, base_color, 0.20f);
+  out_ramp->step_20 = cmp_math_f2_mix(0x000000, base_color, 0.30f);
+  out_ramp->step_30 = cmp_math_f2_mix(0x000000, base_color, 0.40f);
+  out_ramp->step_40 = cmp_math_f2_mix(0x000000, base_color, 0.50f);
+  out_ramp->step_50 = cmp_math_f2_mix(0x000000, base_color, 0.60f);
+  out_ramp->step_60 = cmp_math_f2_mix(0x000000, base_color, 0.70f);
+  out_ramp->step_70 = cmp_math_f2_mix(0x000000, base_color, 0.85f);
   out_ramp->step_80 = base_color;
-  out_ramp->step_90 = cmp_f2_mix(base_color, 0xFFFFFF, 0.15f);
-  out_ramp->step_100 = cmp_f2_mix(base_color, 0xFFFFFF, 0.30f);
-  out_ramp->step_110 = cmp_f2_mix(base_color, 0xFFFFFF, 0.40f);
-  out_ramp->step_120 = cmp_f2_mix(base_color, 0xFFFFFF, 0.50f);
-  out_ramp->step_130 = cmp_f2_mix(base_color, 0xFFFFFF, 0.60f);
-  out_ramp->step_140 = cmp_f2_mix(base_color, 0xFFFFFF, 0.70f);
-  out_ramp->step_150 = cmp_f2_mix(base_color, 0xFFFFFF, 0.80f);
-  out_ramp->step_160 = cmp_f2_mix(base_color, 0xFFFFFF, 0.90f);
+  out_ramp->step_90 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.15f);
+  out_ramp->step_100 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.30f);
+  out_ramp->step_110 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.40f);
+  out_ramp->step_120 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.50f);
+  out_ramp->step_130 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.60f);
+  out_ramp->step_140 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.70f);
+  out_ramp->step_150 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.80f);
+  out_ramp->step_160 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.90f);
 }
 
 /**
@@ -71,10 +72,12 @@ static void cmp_f2_generate_ramp(uint32_t base_color,
  * @param out_theme Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
+int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
                                   cmp_f2_theme_t *out_theme) {
+  int rc;
+  rc = 0;
   (void)is_dark; /* To be used when mapping semantic tokens or when altering
-                    base tones */
+         base tones */
 
   if (!out_theme) {
     return CMP_ERROR_INVALID_ARG;
@@ -84,31 +87,31 @@ CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
    * Fluent 2 Neutral Palette roughly maps to lightness.
    * Typically: Neutral10 is very dark, Neutral100 is pure white.
    */
-  out_theme->neutral_10 = cmp_f2_gray(20);
-  out_theme->neutral_12 = cmp_f2_gray(28);
-  out_theme->neutral_14 = cmp_f2_gray(36);
-  out_theme->neutral_16 = cmp_f2_gray(43);
-  out_theme->neutral_20 = cmp_f2_gray(51);
-  out_theme->neutral_22 = cmp_f2_gray(56);
-  out_theme->neutral_24 = cmp_f2_gray(61);
-  out_theme->neutral_26 = cmp_f2_gray(66);
-  out_theme->neutral_28 = cmp_f2_gray(71);
-  out_theme->neutral_30 = cmp_f2_gray(76);
-  out_theme->neutral_32 = cmp_f2_gray(81);
-  out_theme->neutral_34 = cmp_f2_gray(86);
-  out_theme->neutral_36 = cmp_f2_gray(91);
-  out_theme->neutral_38 = cmp_f2_gray(96);
-  out_theme->neutral_40 = cmp_f2_gray(102);
-  out_theme->neutral_42 = cmp_f2_gray(107);
-  out_theme->neutral_44 = cmp_f2_gray(112);
-  out_theme->neutral_46 = cmp_f2_gray(117);
-  out_theme->neutral_48 = cmp_f2_gray(122);
-  out_theme->neutral_50 = cmp_f2_gray(127);
-  out_theme->neutral_60 = cmp_f2_gray(153);
-  out_theme->neutral_70 = cmp_f2_gray(178);
-  out_theme->neutral_80 = cmp_f2_gray(204);
-  out_theme->neutral_90 = cmp_f2_gray(229);
-  out_theme->neutral_100 = cmp_f2_gray(255);
+  out_theme->neutral_10 = cmp_math_f2_gray(20);
+  out_theme->neutral_12 = cmp_math_f2_gray(28);
+  out_theme->neutral_14 = cmp_math_f2_gray(36);
+  out_theme->neutral_16 = cmp_math_f2_gray(43);
+  out_theme->neutral_20 = cmp_math_f2_gray(51);
+  out_theme->neutral_22 = cmp_math_f2_gray(56);
+  out_theme->neutral_24 = cmp_math_f2_gray(61);
+  out_theme->neutral_26 = cmp_math_f2_gray(66);
+  out_theme->neutral_28 = cmp_math_f2_gray(71);
+  out_theme->neutral_30 = cmp_math_f2_gray(76);
+  out_theme->neutral_32 = cmp_math_f2_gray(81);
+  out_theme->neutral_34 = cmp_math_f2_gray(86);
+  out_theme->neutral_36 = cmp_math_f2_gray(91);
+  out_theme->neutral_38 = cmp_math_f2_gray(96);
+  out_theme->neutral_40 = cmp_math_f2_gray(102);
+  out_theme->neutral_42 = cmp_math_f2_gray(107);
+  out_theme->neutral_44 = cmp_math_f2_gray(112);
+  out_theme->neutral_46 = cmp_math_f2_gray(117);
+  out_theme->neutral_48 = cmp_math_f2_gray(122);
+  out_theme->neutral_50 = cmp_math_f2_gray(127);
+  out_theme->neutral_60 = cmp_math_f2_gray(153);
+  out_theme->neutral_70 = cmp_math_f2_gray(178);
+  out_theme->neutral_80 = cmp_math_f2_gray(204);
+  out_theme->neutral_90 = cmp_math_f2_gray(229);
+  out_theme->neutral_100 = cmp_math_f2_gray(255);
 
   /* Global Brand Palette */
   cmp_f2_generate_ramp(brand_color, &out_theme->brand);
@@ -592,7 +595,16 @@ CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
     out_theme->material_acrylic_fallback = out_theme->neutral_80;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -608,12 +620,14 @@ CMP_API int cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
  * @param out_theme Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
+int CMP_API cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
                                      uint32_t highlight,
                                      uint32_t highlight_text,
                                      uint32_t button_face, uint32_t button_text,
                                      uint32_t gray_text,
                                      cmp_f2_theme_t *out_theme) {
+  int rc;
+  rc = 0;
   (void)button_text;
 
   if (!out_theme) {
@@ -751,5 +765,14 @@ CMP_API int cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
   out_theme->material_acrylic_blur = 0.0f;
   out_theme->material_acrylic_fallback = window;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

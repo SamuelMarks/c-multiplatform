@@ -12,12 +12,23 @@
  */
 int cmp_m3_bottom_app_bar_resolve(
     cmp_m3_bottom_app_bar_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
   out_metrics->height = 80.0f;
   out_metrics->elevation = CMP_M3_ELEVATION_LEVEL_2;
   out_metrics->max_action_items = 4;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -27,13 +38,24 @@ int cmp_m3_bottom_app_bar_resolve(
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_m3_bottom_nav_resolve(cmp_m3_bottom_nav_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
   out_metrics->height = 80.0f;
   out_metrics->active_indicator_width = 64.0f;
   out_metrics->active_indicator_height = 32.0f;
   out_metrics->active_indicator_shape = CMP_M3_SHAPE_FULL;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -45,6 +67,8 @@ int cmp_m3_bottom_nav_resolve(cmp_m3_bottom_nav_metrics_t *out_metrics) {
  */
 int cmp_m3_drawer_resolve(cmp_m3_drawer_variant_t variant,
                           cmp_m3_drawer_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
 
@@ -65,7 +89,16 @@ int cmp_m3_drawer_resolve(cmp_m3_drawer_variant_t variant,
   default:
     return CMP_ERROR_INVALID_ARG;
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -75,11 +108,22 @@ int cmp_m3_drawer_resolve(cmp_m3_drawer_variant_t variant,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_m3_nav_rail_resolve(cmp_m3_nav_rail_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
   out_metrics->width = 80.0f;
   out_metrics->active_indicator_shape = CMP_M3_SHAPE_FULL;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -91,6 +135,8 @@ int cmp_m3_nav_rail_resolve(cmp_m3_nav_rail_metrics_t *out_metrics) {
  */
 int cmp_m3_top_app_bar_resolve(cmp_m3_top_app_bar_variant_t variant,
                                cmp_m3_top_app_bar_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
   out_metrics->elevation_scrolled = CMP_M3_ELEVATION_LEVEL_2;
@@ -112,7 +158,16 @@ int cmp_m3_top_app_bar_resolve(cmp_m3_top_app_bar_variant_t variant,
   default:
     return CMP_ERROR_INVALID_ARG;
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -124,6 +179,8 @@ int cmp_m3_top_app_bar_resolve(cmp_m3_top_app_bar_variant_t variant,
  */
 int cmp_m3_tabs_resolve(cmp_m3_tabs_variant_t variant,
                         cmp_m3_tabs_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
 
@@ -143,5 +200,14 @@ int cmp_m3_tabs_resolve(cmp_m3_tabs_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

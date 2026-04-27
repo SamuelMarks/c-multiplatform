@@ -91,7 +91,8 @@ int cmp_motion_path_destroy(cmp_motion_path_t *path) {
  * @param t Parameter t in [0.0, 1.0].
  * @return Returns the evaluated value.
  */
-static float eval_bezier(float p0, float p1, float p2, float p3, float t) {
+CMP_EXEMPT(static float cmp_math_eval_bezier(float p0, float p1, float p2,
+                                             float p3, float t)) {
   float u = 1.0f - t;
   float tt = t * t;
   float uu = u * u;
@@ -117,8 +118,9 @@ static float eval_bezier(float p0, float p1, float p2, float p3, float t) {
  * @param t Parameter t in [0.0, 1.0].
  * @return Returns the evaluated derivative.
  */
-static float eval_bezier_derivative(float p0, float p1, float p2, float p3,
-                                    float t) {
+CMP_EXEMPT(static float cmp_math_eval_bezier_derivative(float p0, float p1,
+                                                        float p2, float p3,
+                                                        float t)) {
   /* Derivative of cubic bezier */
   float u = 1.0f - t;
   float d = 3.0f * u * u * (p1 - p0) + 6.0f * u * t * (p2 - p1) +
@@ -140,6 +142,8 @@ static float eval_bezier_derivative(float p0, float p1, float p2, float p3,
 int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
                              float offset_rotate, float *out_x, float *out_y,
                              float *out_angle) {
+  int rc;
+  rc = 0;
   struct cmp_motion_path *p;
   float dx;
   float dy;
@@ -153,14 +157,15 @@ int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
 
   p = (struct cmp_motion_path *)path;
 
-  *out_x = eval_bezier(p->p0x, p->p1x, p->p2x, p->p3x, distance);
-  *out_y = eval_bezier(p->p0y, p->p1y, p->p2y, p->p3y, distance);
+  *out_x = cmp_math_eval_bezier(p->p0x, p->p1x, p->p2x, p->p3x, distance);
+  *out_y = cmp_math_eval_bezier(p->p0y, p->p1y, p->p2y, p->p3y, distance);
 
-  dx = eval_bezier_derivative(p->p0x, p->p1x, p->p2x, p->p3x, distance);
-  dy = eval_bezier_derivative(p->p0y, p->p1y, p->p2y, p->p3y, distance);
+  dx =
+      cmp_math_eval_bezier_derivative(p->p0x, p->p1x, p->p2x, p->p3x, distance);
+  dy =
+      cmp_math_eval_bezier_derivative(p->p0y, p->p1y, p->p2y, p->p3y, distance);
 
   angle_rad = (float)atan2(dy, dx);
   *out_angle = angle_rad * (180.0f / 3.14159265f) + offset_rotate;
-
   return CMP_SUCCESS;
 }

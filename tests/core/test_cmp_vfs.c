@@ -207,7 +207,6 @@ TEST test_vfs_watch(void) {
     fputs("hello", f);
     fclose(f);
   }
-
 #if defined(_WIN32)
   Sleep(100);
 #else

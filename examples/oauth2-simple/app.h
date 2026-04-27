@@ -27,7 +27,6 @@ int app_run(void);
  * @return 0 on success.
  */
 int app_shutdown(void);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

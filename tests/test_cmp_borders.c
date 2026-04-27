@@ -4,7 +4,6 @@
 struct cmp_mask_image { int dummy; };
 struct cmp_svg_fe_color_matrix { int dummy; };
 struct cmp_svg_fe_displacement_map { int dummy; };
-
 #include "greatest.h"
 #include <stdlib.h>
 /* clang-format on */

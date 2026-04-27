@@ -31,6 +31,9 @@ int cmp_ui_spinner_create(cmp_ui_spinner_t **out_spinner, float size,
   rc = CMP_MALLOC(sizeof(cmp_ui_spinner_t), (void **)&spinner);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_spinner_create: OOM\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -43,6 +46,9 @@ int cmp_ui_spinner_create(cmp_ui_spinner_t **out_spinner, float size,
     int free_rc = CMP_FREE(spinner);
     if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_spinner_create: CMP_FREE failed\n");
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -76,6 +82,9 @@ int cmp_ui_spinner_destroy(cmp_ui_spinner_t *spinner) {
   rc = CMP_FREE(spinner);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_spinner_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -90,12 +99,23 @@ int cmp_ui_spinner_destroy(cmp_ui_spinner_t *spinner) {
  */
 int cmp_ui_spinner_get_node(cmp_ui_spinner_t *spinner,
                             cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!spinner || !out_node) {
     LOG_DEBUG("cmp_ui_spinner_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = spinner->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -106,6 +126,8 @@ int cmp_ui_spinner_get_node(cmp_ui_spinner_t *spinner,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_spinner_update(cmp_ui_spinner_t *spinner, float dt_ms) {
+  int rc;
+  rc = 0;
   if (!spinner) {
     LOG_DEBUG("cmp_ui_spinner_update: spinner is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -116,5 +138,14 @@ int cmp_ui_spinner_update(cmp_ui_spinner_t *spinner, float dt_ms) {
     spinner->rotation_angle -= 360.0f;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

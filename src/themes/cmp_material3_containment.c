@@ -13,6 +13,8 @@
  */
 int cmp_m3_card_resolve(cmp_m3_card_variant_t variant,
                         cmp_m3_card_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -35,7 +37,16 @@ int cmp_m3_card_resolve(cmp_m3_card_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -47,6 +58,8 @@ int cmp_m3_card_resolve(cmp_m3_card_variant_t variant,
  */
 int cmp_m3_dialog_resolve(cmp_m3_dialog_variant_t variant,
                           cmp_m3_dialog_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -66,7 +79,16 @@ int cmp_m3_dialog_resolve(cmp_m3_dialog_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -78,6 +100,8 @@ int cmp_m3_dialog_resolve(cmp_m3_dialog_variant_t variant,
  */
 int cmp_m3_divider_resolve(cmp_m3_divider_variant_t variant,
                            cmp_m3_divider_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -101,7 +125,16 @@ int cmp_m3_divider_resolve(cmp_m3_divider_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -113,6 +146,8 @@ int cmp_m3_divider_resolve(cmp_m3_divider_variant_t variant,
  */
 int cmp_m3_tooltip_resolve(cmp_m3_tooltip_variant_t variant,
                            cmp_m3_tooltip_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -135,5 +170,14 @@ int cmp_m3_tooltip_resolve(cmp_m3_tooltip_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

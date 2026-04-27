@@ -27,6 +27,8 @@ struct cmp_ui_modal_drawer {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
+  int rc;
+  rc = 0;
   cmp_ui_modal_drawer_t *drawer;
   int err;
 
@@ -111,7 +113,16 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
   drawer->is_open = 0;
 
   *out_drawer = drawer;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -121,6 +132,8 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_modal_drawer_destroy(cmp_ui_modal_drawer_t *drawer) {
+  int rc;
+  rc = 0;
   if (!drawer) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -134,7 +147,16 @@ int cmp_ui_modal_drawer_destroy(cmp_ui_modal_drawer_t *drawer) {
   if (free_rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_modal_drawer_destroy: CMP_FREE drawer failed\n");
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -146,11 +168,22 @@ int cmp_ui_modal_drawer_destroy(cmp_ui_modal_drawer_t *drawer) {
  */
 int cmp_ui_modal_drawer_get_node(cmp_ui_modal_drawer_t *drawer,
                                  cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!drawer || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = drawer->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -161,13 +194,24 @@ int cmp_ui_modal_drawer_get_node(cmp_ui_modal_drawer_t *drawer,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_modal_drawer_set_open(cmp_ui_modal_drawer_t *drawer, int open) {
+  int rc;
+  rc = 0;
   if (!drawer) {
     return CMP_ERROR_INVALID_ARG;
   }
 
   drawer->is_open = open;
   /* Apply layout or CSS classes to animate sliding in/out */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -182,6 +226,8 @@ int cmp_ui_modal_drawer_set_open(cmp_ui_modal_drawer_t *drawer, int open) {
 int cmp_ui_modal_drawer_add_item(cmp_ui_modal_drawer_t *drawer,
                                  const char *icon_name, const char *label,
                                  int *out_index) {
+  int rc;
+  rc = 0;
   cmp_ui_node_t *item_node;
   int err;
 
@@ -225,7 +271,16 @@ int cmp_ui_modal_drawer_add_item(cmp_ui_modal_drawer_t *drawer,
   }
 
   drawer->item_count++;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -236,6 +291,8 @@ int cmp_ui_modal_drawer_add_item(cmp_ui_modal_drawer_t *drawer,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_modal_drawer_set_selected(cmp_ui_modal_drawer_t *drawer, int index) {
+  int rc;
+  rc = 0;
   int i;
   if (!drawer || index < 0 || index >= drawer->item_count) {
     return CMP_ERROR_INVALID_ARG;
@@ -247,7 +304,16 @@ int cmp_ui_modal_drawer_set_selected(cmp_ui_modal_drawer_t *drawer, int index) {
   }
 
   drawer->selected_index = index;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 /**
  * @brief cmp_ui_modal_drawer_bind_a11y
@@ -258,10 +324,21 @@ int cmp_ui_modal_drawer_set_selected(cmp_ui_modal_drawer_t *drawer, int index) {
  */
 int cmp_ui_modal_drawer_bind_a11y(cmp_ui_modal_drawer_t *widget,
                                   cmp_a11y_tree_t *tree) {
+  int rc;
+  rc = 0;
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
   cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "dialog",
                          "Modal Drawer");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

@@ -55,6 +55,9 @@ int cmp_window_blur_destroy(cmp_window_blur_t *blur) {
   rc = CMP_FREE(blur);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_window_blur_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -70,6 +73,8 @@ int cmp_window_blur_destroy(cmp_window_blur_t *blur) {
  */
 int cmp_window_blur_set_enabled(cmp_window_blur_t *blur, cmp_window_t *window,
                                 int enabled) {
+  int rc;
+  rc = 0;
   int i;
   int found = 0;
 
@@ -98,7 +103,16 @@ int cmp_window_blur_set_enabled(cmp_window_blur_t *blur, cmp_window_t *window,
     blur->blurred_windows[blur->count++] = window;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -111,6 +125,8 @@ int cmp_window_blur_set_enabled(cmp_window_blur_t *blur, cmp_window_t *window,
  */
 int cmp_window_blur_is_enabled(const cmp_window_blur_t *blur,
                                const cmp_window_t *window, int *out_enabled) {
+  int rc;
+  rc = 0;
   int i;
 
   if (!blur || !window || !out_enabled) {
@@ -126,5 +142,14 @@ int cmp_window_blur_is_enabled(const cmp_window_blur_t *blur,
     }
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

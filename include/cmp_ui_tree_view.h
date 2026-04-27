@@ -27,7 +27,7 @@ typedef struct cmp_ui_tree_view cmp_ui_tree_view_t;
  * \param bg_color Background color of the tree view (ARGB).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,
+int CMP_API cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,
                                     uint32_t bg_color);
 
 /**
@@ -36,7 +36,7 @@ CMP_API int cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,
  * \param tree_view The tree view component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tree_view_destroy(cmp_ui_tree_view_t *tree_view);
+int CMP_API cmp_ui_tree_view_destroy(cmp_ui_tree_view_t *tree_view);
 
 /**
  * \brief Retrieves the underlying UI node for the tree view.
@@ -45,7 +45,7 @@ CMP_API int cmp_ui_tree_view_destroy(cmp_ui_tree_view_t *tree_view);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tree_view_get_node(cmp_ui_tree_view_t *tree_view,
+int CMP_API cmp_ui_tree_view_get_node(cmp_ui_tree_view_t *tree_view,
                                       cmp_ui_node_t **out_node);
 
 /**
@@ -56,9 +56,8 @@ CMP_API int cmp_ui_tree_view_get_node(cmp_ui_tree_view_t *tree_view,
  * \param depth The hierarchical depth (0 for root).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tree_view_add_item(cmp_ui_tree_view_t *tree_view,
+int CMP_API cmp_ui_tree_view_add_item(cmp_ui_tree_view_t *tree_view,
                                       const char *label, int depth);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

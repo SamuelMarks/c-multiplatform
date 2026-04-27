@@ -14,6 +14,8 @@
  */
 int cmp_m3_button_resolve(cmp_m3_button_variant_t variant, int has_leading_icon,
                           cmp_m3_button_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -94,7 +96,16 @@ int cmp_m3_button_resolve(cmp_m3_button_variant_t variant, int has_leading_icon,
   /* Helper field if people just want the total left padding */
   out_metrics->padding_leading_with_icon = out_metrics->padding_left;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -107,6 +118,8 @@ int cmp_m3_button_resolve(cmp_m3_button_variant_t variant, int has_leading_icon,
  */
 int cmp_m3_fab_resolve(cmp_m3_fab_variant_t variant, int is_lowered,
                        cmp_m3_fab_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -152,7 +165,16 @@ int cmp_m3_fab_resolve(cmp_m3_fab_variant_t variant, int is_lowered,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -164,6 +186,8 @@ int cmp_m3_fab_resolve(cmp_m3_fab_variant_t variant, int is_lowered,
  */
 int cmp_m3_icon_button_resolve(cmp_m3_icon_button_variant_t variant,
                                cmp_m3_icon_button_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -188,7 +212,16 @@ int cmp_m3_icon_button_resolve(cmp_m3_icon_button_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -199,6 +232,8 @@ int cmp_m3_icon_button_resolve(cmp_m3_icon_button_variant_t variant,
  */
 int cmp_m3_segmented_button_resolve(
     cmp_m3_segmented_button_metrics_t *out_metrics) {
+  int rc;
+  rc = 0;
   if (!out_metrics) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -208,5 +243,14 @@ int cmp_m3_segmented_button_resolve(
   out_metrics->checkmark_size = 18.0f;
   out_metrics->icon_size = 18.0f;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

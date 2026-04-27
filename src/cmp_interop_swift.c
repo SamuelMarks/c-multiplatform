@@ -10,8 +10,18 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_interop_mock_init(void) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   /* Placeholder for C to Swift ABI stability hooks */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -22,14 +32,27 @@ int cmp_interop_mock_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_interop_cfstring_bridge(void *cf_string_ref) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (!cf_string_ref) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_interop_cfstring_bridge: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   /* Placeholder for CFStringRef -> NSString -> Swift String bridge validation
    */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -41,22 +64,32 @@ int cmp_interop_cfstring_bridge(void *cf_string_ref) {
  */
 int cmp_interop_allocate_retained_object(void **out_object)
     CMP_RETURNS_RETAINED {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!out_object) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_interop_allocate_retained_object: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(int), out_object);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_interop_allocate_retained_object: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   /* ARC memory management mock: object is returned retained (+1) */
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -67,7 +100,8 @@ int cmp_interop_allocate_retained_object(void **out_object)
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_interop_release_object(void *object) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (object) {
     rc = CMP_FREE(object);
     if (rc != CMP_SUCCESS) {
@@ -75,5 +109,8 @@ int cmp_interop_release_object(void *object) {
     }
   }
   /* CFRelease / ARC boundary mock */
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

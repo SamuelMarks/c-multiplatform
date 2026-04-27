@@ -29,7 +29,7 @@ typedef struct cmp_ui_skeleton cmp_ui_skeleton_t;
  * \param base_color Base background color (ARGB).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_skeleton_create(cmp_ui_skeleton_t **out_skeleton,
+int CMP_API cmp_ui_skeleton_create(cmp_ui_skeleton_t **out_skeleton,
                                    float width, float height,
                                    uint32_t base_color);
 
@@ -39,7 +39,7 @@ CMP_API int cmp_ui_skeleton_create(cmp_ui_skeleton_t **out_skeleton,
  * \param skeleton The skeleton component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_skeleton_destroy(cmp_ui_skeleton_t *skeleton);
+int CMP_API cmp_ui_skeleton_destroy(cmp_ui_skeleton_t *skeleton);
 
 /**
  * \brief Retrieves the underlying UI node for the skeleton.
@@ -48,7 +48,7 @@ CMP_API int cmp_ui_skeleton_destroy(cmp_ui_skeleton_t *skeleton);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_skeleton_get_node(cmp_ui_skeleton_t *skeleton,
+int CMP_API cmp_ui_skeleton_get_node(cmp_ui_skeleton_t *skeleton,
                                      cmp_ui_node_t **out_node);
 
 /**
@@ -58,8 +58,7 @@ CMP_API int cmp_ui_skeleton_get_node(cmp_ui_skeleton_t *skeleton,
  * \param dt_ms The time delta in milliseconds since the last update.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_skeleton_update(cmp_ui_skeleton_t *skeleton, float dt_ms);
-
+int CMP_API cmp_ui_skeleton_update(cmp_ui_skeleton_t *skeleton, float dt_ms);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

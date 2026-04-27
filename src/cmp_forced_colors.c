@@ -15,7 +15,8 @@ struct cmp_forced_colors {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_forced_colors_create(cmp_forced_colors_t **out_ctx) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_forced_colors_t *ctx = NULL;
@@ -29,6 +30,9 @@ int cmp_forced_colors_create(cmp_forced_colors_t **out_ctx) {
     cmp_log_debug(
         "cmp_forced_colors_create: Invalid argument (out_ctx=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -39,6 +43,9 @@ int cmp_forced_colors_create(cmp_forced_colors_t **out_ctx) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_forced_colors_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -56,7 +63,8 @@ int cmp_forced_colors_create(cmp_forced_colors_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_forced_colors_destroy(cmp_forced_colors_t *ctx) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -67,6 +75,9 @@ int cmp_forced_colors_destroy(cmp_forced_colors_t *ctx) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_forced_colors_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -88,7 +99,8 @@ int cmp_forced_colors_destroy(cmp_forced_colors_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_forced_colors_set(cmp_forced_colors_t *ctx, int active) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -99,13 +111,25 @@ int cmp_forced_colors_set(cmp_forced_colors_t *ctx, int active) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_forced_colors_set: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   ctx->active = active ? 1 : 0;
   cmp_log_debug("cmp_forced_colors_set: Set forced colors active=%d\n",
                 ctx->active);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -117,7 +141,8 @@ int cmp_forced_colors_set(cmp_forced_colors_t *ctx, int active) {
  */
 int cmp_forced_colors_strip_background(const cmp_forced_colors_t *ctx,
                                        int *out_strip) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -129,11 +154,23 @@ int cmp_forced_colors_strip_background(const cmp_forced_colors_t *ctx,
     }
     cmp_log_debug("cmp_forced_colors_strip_background: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_strip = ctx->active;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -145,7 +182,8 @@ int cmp_forced_colors_strip_background(const cmp_forced_colors_t *ctx,
  */
 int cmp_forced_colors_strip_box_shadow(const cmp_forced_colors_t *ctx,
                                        int *out_strip) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -157,9 +195,21 @@ int cmp_forced_colors_strip_box_shadow(const cmp_forced_colors_t *ctx,
     }
     cmp_log_debug("cmp_forced_colors_strip_box_shadow: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_strip = ctx->active;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

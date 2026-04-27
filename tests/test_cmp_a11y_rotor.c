@@ -130,7 +130,6 @@ SUITE(a11y_rotor_suite) {
   RUN_TEST(test_a11y_rotor_null_args);
   RUN_TEST(test_a11y_rotor_operations);
 }
-
 #ifdef __cplusplus
 extern "C" {
 #endif

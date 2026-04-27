@@ -12,7 +12,9 @@
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_text_input_create(cmp_ui_node_t **out_node) {
+int CMP_API cmp_f2_text_input_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   cmp_f2_text_input_t *data;
   int res;
 
@@ -44,7 +46,16 @@ CMP_API int cmp_f2_text_input_create(cmp_ui_node_t **out_node) {
   data->clear_button_node = NULL;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -54,8 +65,10 @@ CMP_API int cmp_f2_text_input_create(cmp_ui_node_t **out_node) {
  * @param variant Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_text_input_set_variant(cmp_ui_node_t *node,
+int CMP_API cmp_f2_text_input_set_variant(cmp_ui_node_t *node,
                                           cmp_f2_text_input_variant_t variant) {
+  int rc;
+  rc = 0;
   cmp_f2_text_input_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_text_input_set_variant: Invalid arg\n");
@@ -63,7 +76,16 @@ CMP_API int cmp_f2_text_input_set_variant(cmp_ui_node_t *node,
   }
   data = (cmp_f2_text_input_t *)node->properties;
   data->variant = variant;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -73,8 +95,10 @@ CMP_API int cmp_f2_text_input_set_variant(cmp_ui_node_t *node,
  * @param size Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_text_input_set_size(cmp_ui_node_t *node,
+int CMP_API cmp_f2_text_input_set_size(cmp_ui_node_t *node,
                                        cmp_f2_text_input_size_t size) {
+  int rc;
+  rc = 0;
   cmp_f2_text_input_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_text_input_set_size: Invalid arg\n");
@@ -82,7 +106,16 @@ CMP_API int cmp_f2_text_input_set_size(cmp_ui_node_t *node,
   }
   data = (cmp_f2_text_input_t *)node->properties;
   data->size = size;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -92,8 +125,10 @@ CMP_API int cmp_f2_text_input_set_size(cmp_ui_node_t *node,
  * @param state Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_text_input_set_state(cmp_ui_node_t *node,
+int CMP_API cmp_f2_text_input_set_state(cmp_ui_node_t *node,
                                         cmp_f2_text_input_state_t state) {
+  int rc;
+  rc = 0;
   cmp_f2_text_input_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_text_input_set_state: Invalid arg\n");
@@ -101,7 +136,16 @@ CMP_API int cmp_f2_text_input_set_state(cmp_ui_node_t *node,
   }
   data = (cmp_f2_text_input_t *)node->properties;
   data->state = state;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -111,8 +155,10 @@ CMP_API int cmp_f2_text_input_set_state(cmp_ui_node_t *node,
  * @param is_password Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_text_input_set_password_mode(cmp_ui_node_t *node,
+int CMP_API cmp_f2_text_input_set_password_mode(cmp_ui_node_t *node,
                                                 int is_password) {
+  int rc;
+  rc = 0;
   cmp_f2_text_input_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_text_input_set_password_mode: Invalid arg\n");
@@ -121,7 +167,16 @@ CMP_API int cmp_f2_text_input_set_password_mode(cmp_ui_node_t *node,
   data = (cmp_f2_text_input_t *)node->properties;
   data->is_password = is_password ? 1 : 0;
   /* Further mapping onto actual generic text input attributes happens here */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -130,7 +185,9 @@ CMP_API int cmp_f2_text_input_set_password_mode(cmp_ui_node_t *node,
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_textarea_create(cmp_ui_node_t **out_node) {
+int CMP_API cmp_f2_textarea_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   cmp_f2_textarea_t *data;
   int res;
 
@@ -162,7 +219,16 @@ CMP_API int cmp_f2_textarea_create(cmp_ui_node_t **out_node) {
   data->max_height = 0.0f;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -172,8 +238,10 @@ CMP_API int cmp_f2_textarea_create(cmp_ui_node_t **out_node) {
  * @param size Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_textarea_set_size(cmp_ui_node_t *node,
+int CMP_API cmp_f2_textarea_set_size(cmp_ui_node_t *node,
                                      cmp_f2_text_input_size_t size) {
+  int rc;
+  rc = 0;
   cmp_f2_textarea_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_textarea_set_size: Invalid arg\n");
@@ -181,7 +249,16 @@ CMP_API int cmp_f2_textarea_set_size(cmp_ui_node_t *node,
   }
   data = (cmp_f2_textarea_t *)node->properties;
   data->size = size;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -191,8 +268,10 @@ CMP_API int cmp_f2_textarea_set_size(cmp_ui_node_t *node,
  * @param state Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_textarea_set_state(cmp_ui_node_t *node,
+int CMP_API cmp_f2_textarea_set_state(cmp_ui_node_t *node,
                                       cmp_f2_text_input_state_t state) {
+  int rc;
+  rc = 0;
   cmp_f2_textarea_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_textarea_set_state: Invalid arg\n");
@@ -200,12 +279,22 @@ CMP_API int cmp_f2_textarea_set_state(cmp_ui_node_t *node,
   }
   data = (cmp_f2_textarea_t *)node->properties;
   data->state = state;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
-CMP_API int
-cmp_f2_textarea_set_resize_mode(cmp_ui_node_t *node,
-                                cmp_f2_textarea_resize_t resize_mode) {
+int CMP_API cmp_f2_textarea_set_resize_mode(
+    cmp_ui_node_t *node, cmp_f2_textarea_resize_t resize_mode) {
+  int rc;
+  rc = 0;
   cmp_f2_textarea_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_textarea_set_resize_mode: Invalid arg\n");
@@ -213,7 +302,16 @@ cmp_f2_textarea_set_resize_mode(cmp_ui_node_t *node,
   }
   data = (cmp_f2_textarea_t *)node->properties;
   data->resize_mode = resize_mode;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -224,8 +322,10 @@ cmp_f2_textarea_set_resize_mode(cmp_ui_node_t *node,
  * @param max_height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_textarea_set_auto_grow(cmp_ui_node_t *node, int auto_grow,
+int CMP_API cmp_f2_textarea_set_auto_grow(cmp_ui_node_t *node, int auto_grow,
                                           float max_height) {
+  int rc;
+  rc = 0;
   cmp_f2_textarea_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_textarea_set_auto_grow: Invalid arg\n");
@@ -234,7 +334,16 @@ CMP_API int cmp_f2_textarea_set_auto_grow(cmp_ui_node_t *node, int auto_grow,
   data = (cmp_f2_textarea_t *)node->properties;
   data->auto_grow = auto_grow ? 1 : 0;
   data->max_height = max_height;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -245,8 +354,10 @@ CMP_API int cmp_f2_textarea_set_auto_grow(cmp_ui_node_t *node, int auto_grow,
  * @param label Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_field_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_field_create(cmp_ui_node_t **out_node,
                                 cmp_ui_node_t *input_node, const char *label) {
+  int rc;
+  rc = 0;
   cmp_f2_field_t *data;
   int res;
 
@@ -294,7 +405,16 @@ CMP_API int cmp_f2_field_create(cmp_ui_node_t **out_node,
     LOG_DEBUG("cmp_f2_field_create: cmp_ui_node_add_child (input) failed\n");
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -304,8 +424,10 @@ CMP_API int cmp_f2_field_create(cmp_ui_node_t **out_node,
  * @param pos Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_field_set_label_position(cmp_ui_node_t *node,
+int CMP_API cmp_f2_field_set_label_position(cmp_ui_node_t *node,
                                             cmp_f2_field_label_position_t pos) {
+  int rc;
+  rc = 0;
   cmp_f2_field_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_field_set_label_position: Invalid arg\n");
@@ -313,7 +435,16 @@ CMP_API int cmp_f2_field_set_label_position(cmp_ui_node_t *node,
   }
   data = (cmp_f2_field_t *)node->properties;
   data->label_position = pos;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -323,7 +454,9 @@ CMP_API int cmp_f2_field_set_label_position(cmp_ui_node_t *node,
  * @param is_required Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_field_set_required(cmp_ui_node_t *node, int is_required) {
+int CMP_API cmp_f2_field_set_required(cmp_ui_node_t *node, int is_required) {
+  int rc;
+  rc = 0;
   cmp_f2_field_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_field_set_required: Invalid arg\n");
@@ -331,7 +464,16 @@ CMP_API int cmp_f2_field_set_required(cmp_ui_node_t *node, int is_required) {
   }
   data = (cmp_f2_field_t *)node->properties;
   data->is_required = is_required ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -341,8 +483,10 @@ CMP_API int cmp_f2_field_set_required(cmp_ui_node_t *node, int is_required) {
  * @param help_text Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_field_set_help_text(cmp_ui_node_t *node,
+int CMP_API cmp_f2_field_set_help_text(cmp_ui_node_t *node,
                                        const char *help_text) {
+  int rc;
+  rc = 0;
   cmp_f2_field_t *data;
   int res;
   if (!node || !node->properties) {
@@ -363,12 +507,22 @@ CMP_API int cmp_f2_field_set_help_text(cmp_ui_node_t *node,
       LOG_DEBUG("cmp_f2_field_set_help_text: cmp_ui_text_create failed\n");
     }
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
-CMP_API int
-cmp_f2_field_set_validation_message(cmp_ui_node_t *node, const char *message,
-                                    cmp_f2_text_input_state_t state) {
+int CMP_API cmp_f2_field_set_validation_message(
+    cmp_ui_node_t *node, const char *message, cmp_f2_text_input_state_t state) {
+  int rc;
+  rc = 0;
   cmp_f2_field_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_field_set_validation_message: Invalid arg\n");
@@ -378,7 +532,16 @@ cmp_f2_field_set_validation_message(cmp_ui_node_t *node, const char *message,
   data->validation_state = state;
   /* Map message to child node similar to help_text */
   (void)message;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -387,7 +550,9 @@ cmp_f2_field_set_validation_message(cmp_ui_node_t *node, const char *message,
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_searchbox_create(cmp_ui_node_t **out_node) {
+int CMP_API cmp_f2_searchbox_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   cmp_f2_searchbox_t *data;
   int res;
 
@@ -415,7 +580,16 @@ CMP_API int cmp_f2_searchbox_create(cmp_ui_node_t **out_node) {
   data->is_collapsed = 0;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -425,8 +599,10 @@ CMP_API int cmp_f2_searchbox_create(cmp_ui_node_t **out_node) {
  * @param size Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_searchbox_set_size(cmp_ui_node_t *node,
+int CMP_API cmp_f2_searchbox_set_size(cmp_ui_node_t *node,
                                       cmp_f2_text_input_size_t size) {
+  int rc;
+  rc = 0;
   cmp_f2_searchbox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_searchbox_set_size: Invalid arg\n");
@@ -434,7 +610,16 @@ CMP_API int cmp_f2_searchbox_set_size(cmp_ui_node_t *node,
   }
   data = (cmp_f2_searchbox_t *)node->properties;
   data->size = size;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -444,8 +629,10 @@ CMP_API int cmp_f2_searchbox_set_size(cmp_ui_node_t *node,
  * @param state Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_searchbox_set_state(cmp_ui_node_t *node,
+int CMP_API cmp_f2_searchbox_set_state(cmp_ui_node_t *node,
                                        cmp_f2_text_input_state_t state) {
+  int rc;
+  rc = 0;
   cmp_f2_searchbox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_searchbox_set_state: Invalid arg\n");
@@ -453,7 +640,16 @@ CMP_API int cmp_f2_searchbox_set_state(cmp_ui_node_t *node,
   }
   data = (cmp_f2_searchbox_t *)node->properties;
   data->state = state;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -463,8 +659,10 @@ CMP_API int cmp_f2_searchbox_set_state(cmp_ui_node_t *node,
  * @param is_collapsed Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_searchbox_set_collapsed_mode(cmp_ui_node_t *node,
+int CMP_API cmp_f2_searchbox_set_collapsed_mode(cmp_ui_node_t *node,
                                                 int is_collapsed) {
+  int rc;
+  rc = 0;
   cmp_f2_searchbox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_searchbox_set_collapsed_mode: Invalid arg\n");
@@ -472,5 +670,14 @@ CMP_API int cmp_f2_searchbox_set_collapsed_mode(cmp_ui_node_t *node,
   }
   data = (cmp_f2_searchbox_t *)node->properties;
   data->is_collapsed = is_collapsed ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

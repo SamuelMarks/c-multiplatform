@@ -15,12 +15,16 @@ struct cmp_ipados_multitasking {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ipados_multitasking_create(cmp_ipados_multitasking_t **out_mt) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_ipados_multitasking_t *mt = NULL;
 
   if (!out_mt) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ipados_multitasking_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -38,10 +42,16 @@ int cmp_ipados_multitasking_create(cmp_ipados_multitasking_t **out_mt) {
     }
     LOG_DEBUG("Error in cmp_ipados_multitasking_create: "
               "cmp_ipados_features_create failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_mt = mt;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -52,11 +62,15 @@ int cmp_ipados_multitasking_create(cmp_ipados_multitasking_t **out_mt) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ipados_multitasking_destroy(cmp_ipados_multitasking_t *mt) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!mt) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ipados_multitasking_destroy: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -71,6 +85,9 @@ int cmp_ipados_multitasking_destroy(cmp_ipados_multitasking_t *mt) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -83,12 +100,16 @@ int cmp_ipados_multitasking_destroy(cmp_ipados_multitasking_t *mt) {
  */
 int cmp_ipados_multitasking_request_scene(cmp_ipados_multitasking_t *mt,
                                           const char *activity_identifier) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!mt || !activity_identifier) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_ipados_multitasking_request_scene: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -96,6 +117,9 @@ int cmp_ipados_multitasking_request_scene(cmp_ipados_multitasking_t *mt,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_ipados_multitasking_request_scene: "
               "cmp_ipados_request_scene_activation failed\n");
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -114,12 +138,16 @@ int cmp_ipados_multitasking_resolve_layout(cmp_ipados_multitasking_t *mt,
                                            float width, float height,
                                            cmp_size_class_t *out_horizontal,
                                            cmp_size_class_t *out_vertical) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!mt || !out_horizontal || !out_vertical) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_ipados_multitasking_resolve_layout: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -128,6 +156,9 @@ int cmp_ipados_multitasking_resolve_layout(cmp_ipados_multitasking_t *mt,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_ipados_multitasking_resolve_layout: "
               "cmp_ipados_resolve_size_classes failed\n");
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }

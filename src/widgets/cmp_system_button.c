@@ -19,6 +19,8 @@ struct cmp_toggle {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_button_create(cmp_button_t **out_button) {
+  int rc;
+  rc = 0;
   struct cmp_button *ctx;
   if (!out_button)
     return CMP_ERROR_INVALID_ARG;
@@ -29,7 +31,16 @@ int cmp_button_create(cmp_button_t **out_button) {
   ctx->is_pressed = 0;
 
   *out_button = (cmp_button_t *)ctx;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -39,9 +50,20 @@ int cmp_button_create(cmp_button_t **out_button) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_button_destroy(cmp_button_t *button) {
+  int rc;
+  rc = 0;
   if (button)
     CMP_FREE(button);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -52,11 +74,22 @@ int cmp_button_destroy(cmp_button_t *button) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_button_set_style(cmp_button_t *button, cmp_button_style_t style) {
+  int rc;
+  rc = 0;
   struct cmp_button *ctx = (struct cmp_button *)button;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
   ctx->style = style;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -67,6 +100,8 @@ int cmp_button_set_style(cmp_button_t *button, cmp_button_style_t style) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_button_handle_event(cmp_button_t *button, const cmp_event_t *event) {
+  int rc;
+  rc = 0;
   struct cmp_button *ctx = (struct cmp_button *)button;
   if (!ctx || !event)
     return CMP_ERROR_INVALID_ARG;
@@ -78,7 +113,16 @@ int cmp_button_handle_event(cmp_button_t *button, const cmp_event_t *event) {
     ctx->is_pressed = 0;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -89,13 +133,24 @@ int cmp_button_handle_event(cmp_button_t *button, const cmp_event_t *event) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_button_update(cmp_button_t *button, float dt_ms) {
+  int rc;
+  rc = 0;
   struct cmp_button *ctx = (struct cmp_button *)button;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
   /* State machine updates (e.g. hover intent timeouts, long-press) would go
    * here */
   (void)dt_ms;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -108,6 +163,8 @@ int cmp_button_update(cmp_button_t *button, float dt_ms) {
  */
 int cmp_button_get_state(const cmp_button_t *button,
                          cmp_button_style_t *out_style, int *out_is_pressed) {
+  int rc;
+  rc = 0;
   struct cmp_button *ctx = (struct cmp_button *)button;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -115,7 +172,16 @@ int cmp_button_get_state(const cmp_button_t *button,
     *out_style = ctx->style;
   if (out_is_pressed)
     *out_is_pressed = ctx->is_pressed;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -125,6 +191,8 @@ int cmp_button_get_state(const cmp_button_t *button,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toggle_create(cmp_toggle_t **out_toggle) {
+  int rc;
+  rc = 0;
   struct cmp_toggle *ctx;
   if (!out_toggle)
     return CMP_ERROR_INVALID_ARG;
@@ -134,7 +202,16 @@ int cmp_toggle_create(cmp_toggle_t **out_toggle) {
   ctx->is_on = 0;
 
   *out_toggle = (cmp_toggle_t *)ctx;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -144,9 +221,20 @@ int cmp_toggle_create(cmp_toggle_t **out_toggle) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toggle_destroy(cmp_toggle_t *toggle) {
+  int rc;
+  rc = 0;
   if (toggle)
     CMP_FREE(toggle);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -157,11 +245,22 @@ int cmp_toggle_destroy(cmp_toggle_t *toggle) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toggle_set_state(cmp_toggle_t *toggle, int is_on) {
+  int rc;
+  rc = 0;
   struct cmp_toggle *ctx = (struct cmp_toggle *)toggle;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
   ctx->is_on = is_on;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -172,6 +271,8 @@ int cmp_toggle_set_state(cmp_toggle_t *toggle, int is_on) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toggle_handle_event(cmp_toggle_t *toggle, const cmp_event_t *event) {
+  int rc;
+  rc = 0;
   struct cmp_toggle *ctx = (struct cmp_toggle *)toggle;
   if (!ctx || !event)
     return CMP_ERROR_INVALID_ARG;
@@ -180,7 +281,16 @@ int cmp_toggle_handle_event(cmp_toggle_t *toggle, const cmp_event_t *event) {
     ctx->is_on = !ctx->is_on;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -191,12 +301,23 @@ int cmp_toggle_handle_event(cmp_toggle_t *toggle, const cmp_event_t *event) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toggle_update(cmp_toggle_t *toggle, float dt_ms) {
+  int rc;
+  rc = 0;
   struct cmp_toggle *ctx = (struct cmp_toggle *)toggle;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
   /* Animation states (e.g. spring progress) could be ticked here */
   (void)dt_ms;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -207,10 +328,21 @@ int cmp_toggle_update(cmp_toggle_t *toggle, float dt_ms) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toggle_get_state(const cmp_toggle_t *toggle, int *out_is_on) {
+  int rc;
+  rc = 0;
   struct cmp_toggle *ctx = (struct cmp_toggle *)toggle;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
   if (out_is_on)
     *out_is_on = ctx->is_on;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

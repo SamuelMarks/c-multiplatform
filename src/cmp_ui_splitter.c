@@ -31,6 +31,9 @@ int cmp_ui_splitter_create(cmp_ui_splitter_t **out_splitter, int is_vertical,
   rc = CMP_MALLOC(sizeof(cmp_ui_splitter_t), (void **)&splitter);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_splitter_create: OOM\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -43,6 +46,9 @@ int cmp_ui_splitter_create(cmp_ui_splitter_t **out_splitter, int is_vertical,
     int free_rc = CMP_FREE(splitter);
     if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_splitter_create: CMP_FREE failed\n");
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -76,6 +82,9 @@ int cmp_ui_splitter_destroy(cmp_ui_splitter_t *splitter) {
   rc = CMP_FREE(splitter);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_splitter_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -91,12 +100,23 @@ int cmp_ui_splitter_destroy(cmp_ui_splitter_t *splitter) {
  */
 int cmp_ui_splitter_get_node(cmp_ui_splitter_t *splitter,
                              cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!splitter || !out_node) {
     LOG_DEBUG("cmp_ui_splitter_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = splitter->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -107,6 +127,8 @@ int cmp_ui_splitter_get_node(cmp_ui_splitter_t *splitter,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_splitter_set_position(cmp_ui_splitter_t *splitter, float position) {
+  int rc;
+  rc = 0;
   if (!splitter) {
     LOG_DEBUG("cmp_ui_splitter_set_position: splitter is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -119,5 +141,14 @@ int cmp_ui_splitter_set_position(cmp_ui_splitter_t *splitter, float position) {
   }
 
   splitter->position = position;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

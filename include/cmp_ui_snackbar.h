@@ -28,7 +28,7 @@ typedef struct cmp_ui_snackbar cmp_ui_snackbar_t;
  * \param action_label Optional action label (e.g. "Undo"). Can be NULL.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
+int CMP_API cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
                                    const char *message,
                                    const char *action_label);
 
@@ -38,7 +38,7 @@ CMP_API int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
  * \param snackbar The Snackbar component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_snackbar_destroy(cmp_ui_snackbar_t *snackbar);
+int CMP_API cmp_ui_snackbar_destroy(cmp_ui_snackbar_t *snackbar);
 
 /**
  * \brief Retrieves the underlying UI node for the Snackbar.
@@ -47,7 +47,7 @@ CMP_API int cmp_ui_snackbar_destroy(cmp_ui_snackbar_t *snackbar);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_snackbar_get_node(cmp_ui_snackbar_t *snackbar,
+int CMP_API cmp_ui_snackbar_get_node(cmp_ui_snackbar_t *snackbar,
                                      cmp_ui_node_t **out_node);
 
 /**
@@ -57,7 +57,7 @@ CMP_API int cmp_ui_snackbar_get_node(cmp_ui_snackbar_t *snackbar,
  * \param message The new message.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_snackbar_set_message(cmp_ui_snackbar_t *snackbar,
+int CMP_API cmp_ui_snackbar_set_message(cmp_ui_snackbar_t *snackbar,
                                         const char *message);
 
 /**
@@ -67,7 +67,7 @@ CMP_API int cmp_ui_snackbar_set_message(cmp_ui_snackbar_t *snackbar,
  * \param action_label The new action label. Can be NULL to remove.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_snackbar_set_action(cmp_ui_snackbar_t *snackbar,
+int CMP_API cmp_ui_snackbar_set_action(cmp_ui_snackbar_t *snackbar,
                                        const char *action_label);
 
 /**
@@ -77,9 +77,8 @@ CMP_API int cmp_ui_snackbar_set_action(cmp_ui_snackbar_t *snackbar,
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_snackbar_bind_a11y(cmp_ui_snackbar_t *widget,
+int CMP_API cmp_ui_snackbar_bind_a11y(cmp_ui_snackbar_t *widget,
                                       cmp_a11y_tree_t *tree);
-
 #ifdef __cplusplus
 
 #endif /* __cplusplus */

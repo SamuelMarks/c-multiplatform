@@ -95,6 +95,8 @@ int cmp_mmap_close(cmp_mmap_t *mmap) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_mmap_get_data(cmp_mmap_t *mmap, void **out_data, size_t *out_size) {
+  int rc;
+  rc = 0;
   if (mmap == NULL || out_data == NULL || out_size == NULL) {
     LOG_DEBUG("Error in cmp_mmap_get_data: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -102,6 +104,5 @@ int cmp_mmap_get_data(cmp_mmap_t *mmap, void **out_data, size_t *out_size) {
 
   *out_data = mmap->dummy_data;
   *out_size = mmap->size;
-
   return CMP_SUCCESS;
 }

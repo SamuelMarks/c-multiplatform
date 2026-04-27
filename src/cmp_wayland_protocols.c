@@ -27,6 +27,9 @@ int cmp_wayland_protocols_create(cmp_wayland_protocols_t **out_protocols) {
   rc = CMP_MALLOC(sizeof(cmp_wayland_protocols_t), (void **)&p);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_wayland_protocols_create: OOM\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -54,6 +57,9 @@ int cmp_wayland_protocols_destroy(cmp_wayland_protocols_t *protocols) {
   rc = CMP_FREE(protocols);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_wayland_protocols_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -68,6 +74,8 @@ int cmp_wayland_protocols_destroy(cmp_wayland_protocols_t *protocols) {
  */
 int cmp_wayland_protocols_bind(cmp_wayland_protocols_t *protocols,
                                cmp_window_t *window) {
+  int rc;
+  rc = 0;
   if (!protocols || !window) {
     LOG_DEBUG("cmp_wayland_protocols_bind: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
@@ -77,5 +85,14 @@ int cmp_wayland_protocols_bind(cmp_wayland_protocols_t *protocols,
   protocols->fractional_scale_bound = 1;
   protocols->xdg_decoration_bound = 1;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

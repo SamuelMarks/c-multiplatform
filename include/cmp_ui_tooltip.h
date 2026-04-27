@@ -29,7 +29,7 @@ typedef struct cmp_ui_tooltip cmp_ui_tooltip_t;
  * \param text_color Text color of the tooltip (ARGB).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip,
+int CMP_API cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip,
                                   const char *text, uint32_t bg_color,
                                   uint32_t text_color);
 
@@ -39,7 +39,7 @@ CMP_API int cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip,
  * \param tooltip The tooltip component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tooltip_destroy(cmp_ui_tooltip_t *tooltip);
+int CMP_API cmp_ui_tooltip_destroy(cmp_ui_tooltip_t *tooltip);
 
 /**
  * \brief Retrieves the underlying UI node for the tooltip.
@@ -48,7 +48,7 @@ CMP_API int cmp_ui_tooltip_destroy(cmp_ui_tooltip_t *tooltip);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tooltip_get_node(cmp_ui_tooltip_t *tooltip,
+int CMP_API cmp_ui_tooltip_get_node(cmp_ui_tooltip_t *tooltip,
                                     cmp_ui_node_t **out_node);
 
 /**
@@ -58,7 +58,7 @@ CMP_API int cmp_ui_tooltip_get_node(cmp_ui_tooltip_t *tooltip,
  * \param text The new text to display.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tooltip_set_text(cmp_ui_tooltip_t *tooltip,
+int CMP_API cmp_ui_tooltip_set_text(cmp_ui_tooltip_t *tooltip,
                                     const char *text);
 
 /**
@@ -68,9 +68,8 @@ CMP_API int cmp_ui_tooltip_set_text(cmp_ui_tooltip_t *tooltip,
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_tooltip_bind_a11y(cmp_ui_tooltip_t *widget,
+int CMP_API cmp_ui_tooltip_bind_a11y(cmp_ui_tooltip_t *widget,
                                      cmp_a11y_tree_t *tree);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -39,7 +39,6 @@ int cmp_lottie_destroy(cmp_lottie_t *lottie);
  * @return 0 on success
  */
 int cmp_lottie_step(cmp_lottie_t *lottie, float dt_ms);
-
 #ifdef __cplusplus
 }
 #endif

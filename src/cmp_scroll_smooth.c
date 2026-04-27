@@ -1,8 +1,11 @@
 /* clang-format off */
 #include "cmp.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_scroll_smooth {
@@ -15,20 +18,27 @@ struct cmp_scroll_smooth {
 };
 
 /**
- * @brief cmp_scroll_smooth_create
+ * @brief Create a smooth scrolling context.
  *
  * @param out_smooth Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_smooth_create(cmp_scroll_smooth_t **out_smooth) {
+  int rc;
   struct cmp_scroll_smooth *ctx;
 
-  if (!out_smooth)
-    return CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
 
-  if (CMP_MALLOC(sizeof(struct cmp_scroll_smooth), (void **)&ctx) !=
-      CMP_SUCCESS)
+  if (out_smooth == NULL) {
+    LOG_DEBUG("Invalid argument: out_smooth is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_scroll_smooth), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
+  }
 
   memset(ctx, 0, sizeof(struct cmp_scroll_smooth));
   ctx->duration_ms = 300.0f; /* Default CSS scroll-behavior: smooth duration */
@@ -39,22 +49,34 @@ int cmp_scroll_smooth_create(cmp_scroll_smooth_t **out_smooth) {
 }
 
 /**
- * @brief cmp_scroll_smooth_destroy
+ * @brief Destroy a smooth scrolling context.
  *
  * @param smooth Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_smooth_destroy(cmp_scroll_smooth_t *smooth) {
-  struct cmp_scroll_smooth *ctx = (struct cmp_scroll_smooth *)smooth;
-  if (!ctx)
-    return CMP_ERROR_INVALID_ARG;
+  int rc;
+  struct cmp_scroll_smooth *ctx;
 
-  CMP_FREE(ctx);
+  rc = CMP_SUCCESS;
+  ctx = (struct cmp_scroll_smooth *)smooth;
+
+  if (ctx == NULL) {
+    LOG_DEBUG("Invalid argument: smooth is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+    return rc;
+  }
+
   return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_scroll_smooth_start
+ * @brief Start a smooth scroll animation.
  *
  * @param smooth Parameter description.
  * @param current_pos Parameter description.
@@ -63,9 +85,14 @@ int cmp_scroll_smooth_destroy(cmp_scroll_smooth_t *smooth) {
  */
 int cmp_scroll_smooth_start(cmp_scroll_smooth_t *smooth, float current_pos,
                             float target_pos) {
-  struct cmp_scroll_smooth *ctx = (struct cmp_scroll_smooth *)smooth;
-  if (!ctx)
+  struct cmp_scroll_smooth *ctx;
+
+  ctx = (struct cmp_scroll_smooth *)smooth;
+
+  if (ctx == NULL) {
+    LOG_DEBUG("Invalid argument: smooth is NULL\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   ctx->start_position = current_pos;
   ctx->current_position = current_pos;
@@ -77,7 +104,7 @@ int cmp_scroll_smooth_start(cmp_scroll_smooth_t *smooth, float current_pos,
 }
 
 /* Simple cubic bezier ease-in-out mapping for progress 0..1 */
-static float ease_in_out_cubic(float t) {
+CMP_EXEMPT(static float cmp_math_ease_in_out_cubic(float t)) {
   if (t < 0.5f) {
     return 4.0f * t * t * t;
   } else {
@@ -87,7 +114,7 @@ static float ease_in_out_cubic(float t) {
 }
 
 /**
- * @brief cmp_scroll_smooth_step
+ * @brief Step a smooth scroll animation.
  *
  * @param smooth Parameter description.
  * @param dt_ms Parameter description.
@@ -97,11 +124,15 @@ static float ease_in_out_cubic(float t) {
  */
 int cmp_scroll_smooth_step(cmp_scroll_smooth_t *smooth, float dt_ms,
                            float *out_current_position, int *out_is_complete) {
-  struct cmp_scroll_smooth *ctx = (struct cmp_scroll_smooth *)smooth;
+  struct cmp_scroll_smooth *ctx;
   float progress, eased_progress;
 
-  if (!ctx || !out_current_position || !out_is_complete)
+  ctx = (struct cmp_scroll_smooth *)smooth;
+
+  if (ctx == NULL || out_current_position == NULL || out_is_complete == NULL) {
+    LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   if (ctx->is_complete) {
     *out_current_position = ctx->current_position;
@@ -120,7 +151,7 @@ int cmp_scroll_smooth_step(cmp_scroll_smooth_t *smooth, float dt_ms,
   }
 
   progress = ctx->elapsed_time_ms / ctx->duration_ms;
-  eased_progress = ease_in_out_cubic(progress);
+  eased_progress = cmp_math_ease_in_out_cubic(progress);
 
   ctx->current_position =
       ctx->start_position +

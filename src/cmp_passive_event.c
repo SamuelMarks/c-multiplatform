@@ -8,11 +8,12 @@
 /**
  * @brief cmp_passive_event_init
  *
- * @return Returns 0 on success, or an error code on failure.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_passive_event_init(void) {
-  int rc = CMP_SUCCESS;
-  return rc;
+  int rc;
+  rc = CMP_SUCCESS;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -20,15 +21,16 @@ int cmp_passive_event_init(void) {
  *
  * @param node Parameter description.
  * @param event_type Parameter description.
- * @param ) Parameter description.
+ * @param callback Parameter description.
  * @param user_data Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_ui_node_add_passive_listener(cmp_ui_node_t *node, uint32_t event_type,
                                      void (*callback)(cmp_event_t *,
                                                       cmp_ui_node_t *, void *),
                                      void *user_data) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!node || !callback) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -41,17 +43,18 @@ int cmp_ui_node_add_passive_listener(cmp_ui_node_t *node, uint32_t event_type,
   (void)event_type;
   (void)user_data;
 
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
  * @brief cmp_event_prevent_default
  *
  * @param event Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_event_prevent_default(cmp_event_t *event) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!event) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -73,23 +76,24 @@ int cmp_event_prevent_default(cmp_event_t *event) {
 
   /* Otherwise, successfully mark it as prevented using a different bit */
   event->modifiers |= 0x40000000;
-
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
  * @brief cmp_event_is_default_prevented
  *
  * @param event Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
-int cmp_event_is_default_prevented(const cmp_event_t *event) {
-  int rc = 0;
+int cmp_event_is_default_prevented(const cmp_event_t *event,
+                                   int *out_is_prevented) {
+  int rc;
+  rc = 0;
 
-  if (!event) {
-    return rc;
+  if (!event || !out_is_prevented) {
+    return CMP_ERROR_INVALID_ARG;
   }
 
-  rc = (event->modifiers & 0x40000000) ? 1 : 0;
-  return rc;
+  *out_is_prevented = (event->modifiers & 0x40000000) ? 1 : 0;
+  return CMP_SUCCESS;
 }

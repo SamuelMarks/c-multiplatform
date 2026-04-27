@@ -19,7 +19,6 @@ extern "C" {
  * @param ... Variable arguments matching the format string.
  */
 void cmp_log_debug(const char *fmt, ...);
-
 #ifndef LOG_DEBUG
 #ifdef DEBUG
 /** @brief Debug log macro mapped to cmp_log_debug. */

@@ -23,14 +23,14 @@ typedef struct cmp_mmap cmp_mmap_t;
  * @param filepath Path to the file.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_mmap_open(cmp_mmap_t **out_mmap, const char *filepath);
+int CMP_API cmp_mmap_open(cmp_mmap_t **out_mmap, const char *filepath);
 
 /**
  * @brief Closes and unmaps a memory-mapped file.
  * @param mmap The instance to close.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_mmap_close(cmp_mmap_t *mmap);
+int CMP_API cmp_mmap_close(cmp_mmap_t *mmap);
 
 /**
  * @brief Retrieves the pointer to the mapped data and its size.
@@ -39,9 +39,8 @@ CMP_API int cmp_mmap_close(cmp_mmap_t *mmap);
  * @param out_size Pointer to receive the size of the mapping in bytes.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_mmap_get_data(cmp_mmap_t *mmap, void **out_data,
+int CMP_API cmp_mmap_get_data(cmp_mmap_t *mmap, void **out_data,
                               size_t *out_size);
-
 #ifdef __cplusplus
 }
 #endif

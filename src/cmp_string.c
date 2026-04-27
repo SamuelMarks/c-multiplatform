@@ -24,7 +24,8 @@
  * @return int Returns 0 on success, or an error code on failure.
  */
 int cmp_string_init(cmp_string_t *str) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (str == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
     {
@@ -37,12 +38,20 @@ int cmp_string_init(cmp_string_t *str) {
 
       LOG_DEBUG("Error %d: %s (cmp_string_init)", rc, err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   str->data = NULL;
   str->length = 0;
   str->capacity = 0;
+
+  if (rc != 0) {
+
+    return rc;
+  }
 
   return rc;
 }
@@ -55,7 +64,8 @@ int cmp_string_init(cmp_string_t *str) {
  * @return int Returns 0 on success, or an error code on failure.
  */
 int cmp_string_append(cmp_string_t *str, const char *append) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   size_t append_len;
   size_t new_len;
   char *new_data;
@@ -73,11 +83,17 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
 
       LOG_DEBUG("Error %d: %s (cmp_string_append)", rc, err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   append_len = strlen(append);
   if (append_len == 0) {
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -94,6 +110,9 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
 
       LOG_DEBUG("Error %d: %s (cmp_string_append length overflow)", rc,
                 err_str);
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -123,6 +142,9 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
             LOG_DEBUG("Error %d: %s (cmp_string_append bounds limit)", rc,
                       err_str);
           }
+          if (rc != 0) {
+            return rc;
+          }
           return rc;
         }
         break;
@@ -144,6 +166,9 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
           LOG_DEBUG("Error %d: %s (cmp_string_append alloc failed)", rc,
                     err_str);
         }
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
     } else {
@@ -160,6 +185,9 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
           LOG_DEBUG("Error %d: %s (cmp_string_append realloc failed)", rc,
                     err_str);
         }
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
       MEMCPY_S(new_data, new_capacity, str->data, str->length + 1);
@@ -174,6 +202,11 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
 
   str->length = new_len;
 
+  if (rc != 0) {
+
+    return rc;
+  }
+
   return rc;
 }
 
@@ -184,7 +217,8 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
  * @return int Returns 0 on success, or an error code on failure.
  */
 int cmp_string_destroy(cmp_string_t *str) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   if (str == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
     {
@@ -197,6 +231,9 @@ int cmp_string_destroy(cmp_string_t *str) {
 
       LOG_DEBUG("Error %d: %s (cmp_string_destroy)", rc, err_str);
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -207,6 +244,11 @@ int cmp_string_destroy(cmp_string_t *str) {
 
   str->length = 0;
   str->capacity = 0;
+
+  if (rc != 0) {
+
+    return rc;
+  }
 
   return rc;
 }
@@ -222,6 +264,8 @@ int cmp_string_destroy(cmp_string_t *str) {
  * CMP_ERROR_NOT_FOUND when there are no more tokens.
  */
 int cmp_strtok_r(char *str, const char *delim, char **saveptr, char **out_tok) {
+  int rc;
+  rc = 0;
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
   char *end;
 #endif
@@ -258,5 +302,14 @@ int cmp_strtok_r(char *str, const char *delim, char **saveptr, char **out_tok) {
   if (*out_tok == NULL) {
     return CMP_ERROR_NOT_FOUND;
   }
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

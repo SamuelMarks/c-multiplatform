@@ -36,7 +36,7 @@ typedef struct cmp_ui_card cmp_ui_card_t;
  * \param style The style of the Card.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_card_create(cmp_ui_card_t **out_card,
+int CMP_API cmp_ui_card_create(cmp_ui_card_t **out_card,
                                cmp_ui_card_style_t style);
 
 /**
@@ -45,7 +45,7 @@ CMP_API int cmp_ui_card_create(cmp_ui_card_t **out_card,
  * \param card The component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_card_destroy(cmp_ui_card_t *card);
+int CMP_API cmp_ui_card_destroy(cmp_ui_card_t *card);
 
 /**
  * \brief Retrieves the underlying UI node for the Card.
@@ -54,7 +54,7 @@ CMP_API int cmp_ui_card_destroy(cmp_ui_card_t *card);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_card_get_node(cmp_ui_card_t *card, cmp_ui_node_t **out_node);
+int CMP_API cmp_ui_card_get_node(cmp_ui_card_t *card, cmp_ui_node_t **out_node);
 
 /**
  * \brief Adds a child node to the Card's content area.
@@ -63,7 +63,7 @@ CMP_API int cmp_ui_card_get_node(cmp_ui_card_t *card, cmp_ui_node_t **out_node);
  * \param child The child node to add.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_card_add_child(cmp_ui_card_t *card, cmp_ui_node_t *child);
+int CMP_API cmp_ui_card_add_child(cmp_ui_card_t *card, cmp_ui_node_t *child);
 
 /**
  * \brief Binds the widget to the accessibility tree.
@@ -72,8 +72,7 @@ CMP_API int cmp_ui_card_add_child(cmp_ui_card_t *card, cmp_ui_node_t *child);
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_card_bind_a11y(cmp_ui_card_t *widget, cmp_a11y_tree_t *tree);
-
+int CMP_API cmp_ui_card_bind_a11y(cmp_ui_card_t *widget, cmp_a11y_tree_t *tree);
 #ifdef __cplusplus
 
 #endif /* __cplusplus */

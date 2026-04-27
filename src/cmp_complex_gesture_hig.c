@@ -19,7 +19,8 @@ struct cmp_edge_swipe {
  */
 int cmp_gesture_require_failure(cmp_gesture_t *primary_gesture,
                                 cmp_gesture_t *other_gesture_to_fail) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -31,6 +32,9 @@ int cmp_gesture_require_failure(cmp_gesture_t *primary_gesture,
     }
     cmp_log_debug("cmp_gesture_require_failure: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -39,7 +43,16 @@ int cmp_gesture_require_failure(cmp_gesture_t *primary_gesture,
      CANCELLED. */
   cmp_log_debug(
       "cmp_gesture_require_failure: Associated gesture failure dependency\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -52,7 +65,8 @@ int cmp_gesture_require_failure(cmp_gesture_t *primary_gesture,
  */
 int cmp_complex_gesture_set_zoom_limits(cmp_complex_gesture_t *gesture_opaque,
                                         float min_scale, float max_scale) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -64,6 +78,9 @@ int cmp_complex_gesture_set_zoom_limits(cmp_complex_gesture_t *gesture_opaque,
     }
     cmp_log_debug("cmp_complex_gesture_set_zoom_limits: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -71,7 +88,16 @@ int cmp_complex_gesture_set_zoom_limits(cmp_complex_gesture_t *gesture_opaque,
   cmp_log_debug(
       "cmp_complex_gesture_set_zoom_limits: Set zoom limits to %.2f-%.2f\n",
       min_scale, max_scale);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -86,7 +112,8 @@ int cmp_complex_gesture_set_zoom_limits(cmp_complex_gesture_t *gesture_opaque,
 int cmp_complex_gesture_get_zoom(const cmp_complex_gesture_t *gesture_opaque,
                                  float *out_centroid_x, float *out_centroid_y,
                                  float *out_scale) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -99,6 +126,9 @@ int cmp_complex_gesture_get_zoom(const cmp_complex_gesture_t *gesture_opaque,
     }
     cmp_log_debug("cmp_complex_gesture_get_zoom: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -109,7 +139,16 @@ int cmp_complex_gesture_get_zoom(const cmp_complex_gesture_t *gesture_opaque,
   *out_scale = 1.0f;
 
   cmp_log_debug("cmp_complex_gesture_get_zoom: Got zoom data\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -121,7 +160,8 @@ int cmp_complex_gesture_get_zoom(const cmp_complex_gesture_t *gesture_opaque,
  */
 int cmp_complex_gesture_set_rotation_snapping(
     cmp_complex_gesture_t *gesture_opaque, int enable_snapping) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -136,12 +176,24 @@ int cmp_complex_gesture_set_rotation_snapping(
     cmp_log_debug(
         "cmp_complex_gesture_set_rotation_snapping: Invalid argument: %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   cmp_log_debug(
       "cmp_complex_gesture_set_rotation_snapping: Configured snapping\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -153,7 +205,8 @@ int cmp_complex_gesture_set_rotation_snapping(
  */
 int cmp_complex_gesture_get_rotation(
     const cmp_complex_gesture_t *gesture_opaque, float *out_radians) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -165,12 +218,24 @@ int cmp_complex_gesture_get_rotation(
     }
     cmp_log_debug("cmp_complex_gesture_get_rotation: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_radians = 0.0f;
   cmp_log_debug("cmp_complex_gesture_get_rotation: Got rotation data\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -181,7 +246,8 @@ int cmp_complex_gesture_get_rotation(
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_edge_swipe_create(cmp_edge_swipe_t **out_swipe, cmp_router_t *router) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_edge_swipe *ctx = NULL;
@@ -193,6 +259,9 @@ int cmp_edge_swipe_create(cmp_edge_swipe_t **out_swipe, cmp_router_t *router) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_edge_swipe_create: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -203,6 +272,9 @@ int cmp_edge_swipe_create(cmp_edge_swipe_t **out_swipe, cmp_router_t *router) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_edge_swipe_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -222,7 +294,8 @@ int cmp_edge_swipe_create(cmp_edge_swipe_t **out_swipe, cmp_router_t *router) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_edge_swipe_destroy(cmp_edge_swipe_t *swipe_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -233,6 +306,9 @@ int cmp_edge_swipe_destroy(cmp_edge_swipe_t *swipe_opaque) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_edge_swipe_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -257,7 +333,8 @@ int cmp_edge_swipe_destroy(cmp_edge_swipe_t *swipe_opaque) {
  */
 int cmp_edge_swipe_process(cmp_edge_swipe_t *swipe_opaque, float touch_x,
                            float screen_width, cmp_gesture_state_t state) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_edge_swipe *ctx = (struct cmp_edge_swipe *)swipe_opaque;
@@ -270,6 +347,9 @@ int cmp_edge_swipe_process(cmp_edge_swipe_t *swipe_opaque, float touch_x,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_edge_swipe_process: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -295,6 +375,9 @@ int cmp_edge_swipe_process(cmp_edge_swipe_t *swipe_opaque, float touch_x,
         cmp_log_debug("cmp_edge_swipe_process: Router pop failed: %s\n",
                       err_str);
       }
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     } else {
       /* Rollback pop animation */
@@ -315,7 +398,8 @@ int cmp_edge_swipe_process(cmp_edge_swipe_t *swipe_opaque, float touch_x,
  */
 int cmp_gesture_cancel_on_system_override(cmp_gesture_t *gesture_opaque,
                                           int active_touches_count) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -328,6 +412,9 @@ int cmp_gesture_cancel_on_system_override(cmp_gesture_t *gesture_opaque,
     cmp_log_debug(
         "cmp_gesture_cancel_on_system_override: Invalid argument: %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -343,5 +430,14 @@ int cmp_gesture_cancel_on_system_override(cmp_gesture_t *gesture_opaque,
 
   cmp_log_debug(
       "cmp_gesture_cancel_on_system_override: No override required\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

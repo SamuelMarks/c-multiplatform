@@ -17,11 +17,14 @@ struct cmp_print_ctx {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_print_ctx_create(cmp_print_ctx_t **out_ctx) {
+  int rc;
+  rc = 0;
   cmp_print_ctx_t *ctx;
   if (!out_ctx) {
     return CMP_ERROR_INVALID_ARG;
   }
-  if (CMP_MALLOC(sizeof(cmp_print_ctx_t), (void **)&ctx) != CMP_SUCCESS) {
+  rc = CMP_MALLOC(sizeof(cmp_print_ctx_t), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
     return CMP_ERROR_OOM;
   }
   memset(ctx, 0, sizeof(cmp_print_ctx_t));
@@ -36,10 +39,15 @@ int cmp_print_ctx_create(cmp_print_ctx_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_print_ctx_destroy(cmp_print_ctx_t *ctx) {
+  int rc;
+  rc = 0;
   if (!ctx) {
     return CMP_ERROR_INVALID_ARG;
   }
-  CMP_FREE(ctx);
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -50,6 +58,8 @@ int cmp_print_ctx_destroy(cmp_print_ctx_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_print_ctx_begin_page(cmp_print_ctx_t *ctx) {
+  int rc;
+  rc = 0;
   if (!ctx) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -68,6 +78,8 @@ int cmp_print_ctx_begin_page(cmp_print_ctx_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_print_ctx_end_page(cmp_print_ctx_t *ctx) {
+  int rc;
+  rc = 0;
   if (!ctx) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -86,6 +98,8 @@ int cmp_print_ctx_end_page(cmp_print_ctx_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_print_ctx_save_pdf(cmp_print_ctx_t *ctx, const char *file_path) {
+  int rc;
+  rc = 0;
   if (!ctx || !file_path) {
     return CMP_ERROR_INVALID_ARG;
   }

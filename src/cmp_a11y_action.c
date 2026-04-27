@@ -19,7 +19,8 @@ struct cmp_a11y_action {
  */
 int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
                            cmp_a11y_action_t **out_action) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_a11y_action *action = NULL;
@@ -31,6 +32,9 @@ int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_action_create: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -41,6 +45,9 @@ int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_action_create CMP_MALLOC: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -49,6 +56,9 @@ int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
   *out_action = (cmp_a11y_action_t *)action;
   cmp_log_debug(
       "cmp_a11y_action_create: Successfully created a11y action context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -59,7 +69,8 @@ int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_action_destroy(cmp_a11y_action_t *action) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_a11y_action *a = (struct cmp_a11y_action *)action;
@@ -71,12 +82,24 @@ int cmp_a11y_action_destroy(cmp_a11y_action_t *action) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_action_destroy: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   CMP_FREE(a);
   cmp_log_debug(
       "cmp_a11y_action_destroy: Successfully destroyed a11y action context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -90,7 +113,8 @@ int cmp_a11y_action_destroy(cmp_a11y_action_t *action) {
  */
 int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
                             cmp_a11y_action_type_t action_type) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_a11y_action *a = (struct cmp_a11y_action *)action;
@@ -103,6 +127,9 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_action_execute: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -122,6 +149,9 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_a11y_action_execute click push down: %s\n", err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     simulated_event.action = CMP_ACTION_UP;
@@ -132,6 +162,9 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_a11y_action_execute click push up: %s\n", err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     cmp_log_debug("cmp_a11y_action_execute: Pushed CLICK events for node %d\n",
@@ -149,6 +182,9 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_a11y_action_execute scroll fwd: %s\n", err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     cmp_log_debug(
@@ -167,6 +203,9 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_a11y_action_execute scroll bwd: %s\n", err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     cmp_log_debug(
@@ -182,6 +221,9 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_a11y_action_execute focus: %s\n", err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     cmp_log_debug("cmp_a11y_action_execute: Set focus to node %d\n", node_id);
@@ -196,6 +238,9 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
           err_str = "Unknown";
         }
         cmp_log_debug("cmp_a11y_action_execute blur: %s\n", err_str);
+        if (rc != 0) {
+          return rc;
+        }
         return rc;
       }
       cmp_log_debug("cmp_a11y_action_execute: Cleared focus from node %d\n",
@@ -214,6 +259,14 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_action_execute unhandled: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+
+  if (rc != 0) {
+
     return rc;
   }
 

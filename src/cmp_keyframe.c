@@ -20,24 +20,34 @@ struct cmp_keyframe {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_keyframe_create(cmp_keyframe_t **out_keyframe) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_keyframe *keyframe = NULL;
 
   if (!out_keyframe) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_keyframe_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_keyframe), (void **)&keyframe);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_keyframe_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   memset(keyframe, 0, sizeof(struct cmp_keyframe));
 
   *out_keyframe = (cmp_keyframe_t *)keyframe;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -48,18 +58,25 @@ int cmp_keyframe_create(cmp_keyframe_t **out_keyframe) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_keyframe_destroy(cmp_keyframe_t *keyframe) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_keyframe *internal_keyframe = (struct cmp_keyframe *)keyframe;
 
   if (!internal_keyframe) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_keyframe_destroy: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_FREE(internal_keyframe);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_keyframe_destroy: CMP_FREE failed\n");
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -72,22 +89,38 @@ int cmp_keyframe_destroy(cmp_keyframe_t *keyframe) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_keyframe_add_stop(cmp_keyframe_t *keyframe, float percentage) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_keyframe *internal_keyframe = (struct cmp_keyframe *)keyframe;
 
   if (!internal_keyframe || percentage < 0.0f || percentage > 1.0f) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_keyframe_add_stop: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   if (internal_keyframe->count >= 100) {
     rc = CMP_ERROR_OOM;
     LOG_DEBUG("Error in cmp_keyframe_add_stop: Maximum stops reached\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   internal_keyframe->stops[internal_keyframe->count++] = percentage;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -103,18 +136,25 @@ int cmp_keyframe_add_stop(cmp_keyframe_t *keyframe, float percentage) {
 int cmp_keyframe_step(cmp_keyframe_t *keyframe, double dt_ms,
                       cmp_animation_play_state_t play_state,
                       float *out_current_percentage) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_keyframe *internal_keyframe = (struct cmp_keyframe *)keyframe;
   float progress;
 
   if (!internal_keyframe || !out_current_percentage || dt_ms < 0.0) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_keyframe_step: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   if (internal_keyframe->duration_ms <= 0.0) {
     *out_current_percentage = 1.0f;
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -144,5 +184,14 @@ int cmp_keyframe_step(cmp_keyframe_t *keyframe, double dt_ms,
     *out_current_percentage = progress;
   }
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

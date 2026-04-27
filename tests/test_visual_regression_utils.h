@@ -99,5 +99,4 @@ static int cmp_test_compare_golden(const char *golden_path,
 
   return 0; /* Pass */
 }
-
 #endif /* TEST_VISUAL_REGRESSION_UTILS_H */

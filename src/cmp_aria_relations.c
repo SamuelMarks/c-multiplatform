@@ -28,7 +28,8 @@ struct cmp_aria_relations {
  */
 int cmp_aria_relations_create(cmp_a11y_tree_t *tree,
                               cmp_aria_relations_t **out_rels) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria_relations *rels = NULL;
@@ -40,6 +41,9 @@ int cmp_aria_relations_create(cmp_a11y_tree_t *tree,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_aria_relations_create: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -50,6 +54,9 @@ int cmp_aria_relations_create(cmp_a11y_tree_t *tree,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_aria_relations_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -61,6 +68,9 @@ int cmp_aria_relations_create(cmp_a11y_tree_t *tree,
   *out_rels = (cmp_aria_relations_t *)rels;
   cmp_log_debug("cmp_aria_relations_create: Successfully created aria "
                 "relations context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -71,7 +81,8 @@ int cmp_aria_relations_create(cmp_a11y_tree_t *tree,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_relations_destroy(cmp_aria_relations_t *rels) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria_relations *r = (struct cmp_aria_relations *)rels;
@@ -85,6 +96,9 @@ int cmp_aria_relations_destroy(cmp_aria_relations_t *rels) {
     cmp_log_debug(
         "cmp_aria_relations_destroy: Invalid argument (rels=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -96,6 +110,15 @@ int cmp_aria_relations_destroy(cmp_aria_relations_t *rels) {
   CMP_FREE(r);
   cmp_log_debug("cmp_aria_relations_destroy: Successfully destroyed aria "
                 "relations context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -110,7 +133,8 @@ int cmp_aria_relations_destroy(cmp_aria_relations_t *rels) {
  */
 int cmp_aria_relations_add(cmp_aria_relations_t *rels, int source_id,
                            int target_id, cmp_aria_relation_type_t rel_type) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria_relations *r = (struct cmp_aria_relations *)rels;
@@ -125,6 +149,9 @@ int cmp_aria_relations_add(cmp_aria_relations_t *rels, int source_id,
     }
     cmp_log_debug("cmp_aria_relations_add: Invalid argument (rels=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -140,6 +167,9 @@ int cmp_aria_relations_add(cmp_aria_relations_t *rels, int source_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_aria_relations_add: Out of memory: %s\n", err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
 
@@ -160,6 +190,9 @@ int cmp_aria_relations_add(cmp_aria_relations_t *rels, int source_id,
   cmp_log_debug(
       "cmp_aria_relations_add: Added relation source %d, target %d, type %d\n",
       source_id, target_id, (int)rel_type);
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -170,7 +203,8 @@ int cmp_aria_relations_add(cmp_aria_relations_t *rels, int source_id,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_relations_sync(cmp_aria_relations_t *rels) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria_relations *r = (struct cmp_aria_relations *)rels;
@@ -184,6 +218,9 @@ int cmp_aria_relations_sync(cmp_aria_relations_t *rels) {
     }
     cmp_log_debug("cmp_aria_relations_sync: Invalid argument (rels=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -216,5 +253,14 @@ int cmp_aria_relations_sync(cmp_aria_relations_t *rels) {
   }
 
   cmp_log_debug("cmp_aria_relations_sync: Sync completed successfully\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

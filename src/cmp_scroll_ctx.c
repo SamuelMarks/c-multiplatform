@@ -1,7 +1,10 @@
 /* clang-format off */
 #include "cmp.h"
+
 #include <stdlib.h>
 #include <string.h>
+
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_scroll_ctx {
@@ -10,19 +13,27 @@ struct cmp_scroll_ctx {
 };
 
 /**
- * @brief cmp_scroll_ctx_create
+ * @brief Create a scroll context.
  *
  * @param out_ctx Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_ctx_create(cmp_scroll_ctx_t **out_ctx) {
+  int rc;
   struct cmp_scroll_ctx *ctx;
 
-  if (!out_ctx)
-    return CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
 
-  if (CMP_MALLOC(sizeof(struct cmp_scroll_ctx), (void **)&ctx) != CMP_SUCCESS)
+  if (out_ctx == NULL) {
+    LOG_DEBUG("Invalid argument: out_ctx is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_scroll_ctx), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
+  }
 
   memset(ctx, 0, sizeof(struct cmp_scroll_ctx));
 
@@ -31,23 +42,34 @@ int cmp_scroll_ctx_create(cmp_scroll_ctx_t **out_ctx) {
 }
 
 /**
- * @brief cmp_scroll_ctx_destroy
+ * @brief Destroy a scroll context.
  *
  * @param ctx Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_ctx_destroy(cmp_scroll_ctx_t *ctx) {
-  struct cmp_scroll_ctx *internal_ctx = (struct cmp_scroll_ctx *)ctx;
+  int rc;
+  struct cmp_scroll_ctx *internal_ctx;
 
-  if (!internal_ctx)
+  rc = CMP_SUCCESS;
+  internal_ctx = (struct cmp_scroll_ctx *)ctx;
+
+  if (internal_ctx == NULL) {
+    LOG_DEBUG("Invalid argument: ctx is NULL\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
-  CMP_FREE(internal_ctx);
+  rc = CMP_FREE(internal_ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+    return rc;
+  }
+
   return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_scroll_ctx_get_offset
+ * @brief Get the current scroll offset.
  *
  * @param ctx Parameter description.
  * @param out_x Parameter description.
@@ -56,23 +78,28 @@ int cmp_scroll_ctx_destroy(cmp_scroll_ctx_t *ctx) {
  */
 int cmp_scroll_ctx_get_offset(const cmp_scroll_ctx_t *ctx, float *out_x,
                               float *out_y) {
-  const struct cmp_scroll_ctx *internal_ctx =
-      (const struct cmp_scroll_ctx *)ctx;
+  const struct cmp_scroll_ctx *internal_ctx;
 
-  if (!internal_ctx)
+  internal_ctx = (const struct cmp_scroll_ctx *)ctx;
+
+  if (internal_ctx == NULL) {
+    LOG_DEBUG("Invalid argument: ctx is NULL\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
-  if (out_x)
+  if (out_x != NULL) {
     *out_x = internal_ctx->scroll_left;
+  }
 
-  if (out_y)
+  if (out_y != NULL) {
     *out_y = internal_ctx->scroll_top;
+  }
 
   return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_scroll_ctx_set_offset
+ * @brief Set the scroll offset.
  *
  * @param ctx Parameter description.
  * @param x Parameter description.
@@ -80,10 +107,14 @@ int cmp_scroll_ctx_get_offset(const cmp_scroll_ctx_t *ctx, float *out_x,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_ctx_set_offset(cmp_scroll_ctx_t *ctx, float x, float y) {
-  struct cmp_scroll_ctx *internal_ctx = (struct cmp_scroll_ctx *)ctx;
+  struct cmp_scroll_ctx *internal_ctx;
 
-  if (!internal_ctx)
+  internal_ctx = (struct cmp_scroll_ctx *)ctx;
+
+  if (internal_ctx == NULL) {
+    LOG_DEBUG("Invalid argument: ctx is NULL\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   internal_ctx->scroll_left = x;
   internal_ctx->scroll_top = y;
@@ -92,22 +123,33 @@ int cmp_scroll_ctx_set_offset(cmp_scroll_ctx_t *ctx, float x, float y) {
 }
 
 /**
- * @brief cmp_scroll_ctx_inject_to_gpu
+ * @brief Inject scroll offset directly to the GPU via UBO.
  *
  * @param ctx Parameter description.
  * @param ubo Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_ctx_inject_to_gpu(const cmp_scroll_ctx_t *ctx, cmp_ubo_t *ubo) {
-  const struct cmp_scroll_ctx *internal_ctx =
-      (const struct cmp_scroll_ctx *)ctx;
+  int rc;
+  const struct cmp_scroll_ctx *internal_ctx;
   float data[2];
 
-  if (!internal_ctx || !ubo)
+  rc = CMP_SUCCESS;
+  internal_ctx = (const struct cmp_scroll_ctx *)ctx;
+
+  if (internal_ctx == NULL || ubo == NULL) {
+    LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   data[0] = internal_ctx->scroll_left;
   data[1] = internal_ctx->scroll_top;
 
-  return cmp_ubo_update(ubo, data, sizeof(data));
+  rc = cmp_ubo_update(ubo, data, sizeof(data));
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Failed to update UBO\n");
+    return rc;
+  }
+
+  return CMP_SUCCESS;
 }

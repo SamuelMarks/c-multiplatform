@@ -29,7 +29,7 @@ typedef struct cmp_ui_code_block cmp_ui_code_block_t;
  * NULL).
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block,
+int CMP_API cmp_ui_code_block_create(cmp_ui_code_block_t **out_block,
                                      const char *code, const char *language);
 
 /**
@@ -38,7 +38,7 @@ CMP_API int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block,
  * \param block The component to destroy.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_code_block_destroy(cmp_ui_code_block_t *block);
+int CMP_API cmp_ui_code_block_destroy(cmp_ui_code_block_t *block);
 
 /**
  * \brief Retrieves the underlying UI node.
@@ -47,7 +47,7 @@ CMP_API int cmp_ui_code_block_destroy(cmp_ui_code_block_t *block);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_code_block_get_node(cmp_ui_code_block_t *block,
+int CMP_API cmp_ui_code_block_get_node(cmp_ui_code_block_t *block,
                                        cmp_ui_node_t **out_node);
 
 /**
@@ -57,9 +57,8 @@ CMP_API int cmp_ui_code_block_get_node(cmp_ui_code_block_t *block,
  * \param code The new source code text.
  * \return 0 on success, or a non-zero error code.
  */
-CMP_API int cmp_ui_code_block_set_code(cmp_ui_code_block_t *block,
+int CMP_API cmp_ui_code_block_set_code(cmp_ui_code_block_t *block,
                                        const char *code);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

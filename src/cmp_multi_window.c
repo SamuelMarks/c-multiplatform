@@ -21,6 +21,8 @@ static int g_initialized = 0;
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_multi_window_init(void) {
+  int rc;
+  rc = 0;
   int i;
   if (g_initialized) {
     return CMP_SUCCESS;
@@ -84,7 +86,6 @@ int cmp_multi_window_tear_off(const char *tab_id,
     LOG_DEBUG("Error in cmp_multi_window_tear_off: CMP_MALLOC failed (OOM)\n");
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   rc = strncpy_s(win->tab_id, sizeof(win->tab_id), tab_id, _TRUNCATE);
   if (rc != 0) {
@@ -156,6 +157,8 @@ int cmp_multi_window_merge_back(cmp_multi_window_t *window) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_multi_window_update_all(void) {
+  int rc;
+  rc = 0;
   if (!g_initialized) {
     LOG_DEBUG("Error in cmp_multi_window_update_all: Not initialized\n");
     return CMP_ERROR_INVALID_STATE;

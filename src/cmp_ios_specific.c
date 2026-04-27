@@ -15,23 +15,33 @@ struct cmp_ios_features {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ios_features_create(cmp_ios_features_t **out_features) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_ios_features *ctx = NULL;
 
   if (!out_features) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ios_features_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_ios_features), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_ios_features_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   ctx->is_ready = 1;
   *out_features = (cmp_ios_features_t *)ctx;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -42,17 +52,24 @@ int cmp_ios_features_create(cmp_ios_features_t **out_features) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ios_features_destroy(cmp_ios_features_t *features_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!features_opaque) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ios_features_destroy: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_FREE(features_opaque);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_ios_features_destroy: CMP_FREE failed\n");
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -69,7 +86,8 @@ int cmp_ios_features_destroy(cmp_ios_features_t *features_opaque) {
 int cmp_ios_calculate_keyboard_avoidance(float keyboard_height, float input_y,
                                          float view_height,
                                          float *out_scroll_adjustment) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   float visible_height, overlap;
 
   if (!out_scroll_adjustment || keyboard_height < 0.0f || input_y < 0.0f ||
@@ -77,6 +95,9 @@ int cmp_ios_calculate_keyboard_avoidance(float keyboard_height, float input_y,
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_ios_calculate_keyboard_avoidance: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -90,6 +111,15 @@ int cmp_ios_calculate_keyboard_avoidance(float keyboard_height, float input_y,
     *out_scroll_adjustment = overlap;
   } else {
     *out_scroll_adjustment = 0.0f;
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -105,12 +135,16 @@ int cmp_ios_calculate_keyboard_avoidance(float keyboard_height, float input_y,
 int cmp_ios_evaluate_pull_to_refresh(float current_overscroll_y,
                                      float *out_spinner_opacity,
                                      int *out_should_trigger) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   float progress;
 
   if (!out_spinner_opacity || !out_should_trigger) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ios_evaluate_pull_to_refresh: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -118,6 +152,9 @@ int cmp_ios_evaluate_pull_to_refresh(float current_overscroll_y,
   if (current_overscroll_y >= 0.0f) {
     *out_spinner_opacity = 0.0f;
     *out_should_trigger = 0;
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -129,6 +166,15 @@ int cmp_ios_evaluate_pull_to_refresh(float current_overscroll_y,
   *out_spinner_opacity = progress;
   *out_should_trigger = (current_overscroll_y <= -100.0f) ? 1 : 0;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -142,13 +188,17 @@ int cmp_ios_evaluate_pull_to_refresh(float current_overscroll_y,
  */
 int cmp_ios_evaluate_sheet_detent_snap(float current_y, float screen_height,
                                        cmp_sheet_detent_t *out_snapped_detent) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   float half, full, dist_half, dist_full;
 
   if (screen_height <= 0.0f || !out_snapped_detent) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_ios_evaluate_sheet_detent_snap: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -166,6 +216,15 @@ int cmp_ios_evaluate_sheet_detent_snap(float current_y, float screen_height,
     *out_snapped_detent = CMP_SHEET_DETENT_MEDIUM;
   }
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -178,12 +237,16 @@ int cmp_ios_evaluate_sheet_detent_snap(float current_y, float screen_height,
  */
 int cmp_ios_mitigate_reachability_offset(float *io_touch_y,
                                          float reachability_offset) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!io_touch_y || reachability_offset < 0.0f) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_ios_mitigate_reachability_offset: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -192,6 +255,15 @@ int cmp_ios_mitigate_reachability_offset(float *io_touch_y,
      hit the correct elements. */
   *io_touch_y -= reachability_offset;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -204,12 +276,16 @@ int cmp_ios_mitigate_reachability_offset(float *io_touch_y,
  */
 int cmp_ios_evaluate_context_menu_peek(float pressure,
                                        float *out_preview_scale) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!out_preview_scale || pressure < 0.0f || pressure > 1.0f) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_ios_evaluate_context_menu_peek: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -217,5 +293,14 @@ int cmp_ios_evaluate_context_menu_peek(float pressure,
    * navigation if pressure hits max (not handled here) */
   *out_preview_scale = 0.6f + (pressure * 0.2f);
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

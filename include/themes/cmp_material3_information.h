@@ -31,7 +31,7 @@ typedef struct cmp_m3_chip_metrics {
   cmp_m3_elevation_level_t elevation;
 } cmp_m3_chip_metrics_t;
 
-CMP_API int cmp_m3_chip_resolve(cmp_m3_chip_variant_t variant, int is_elevated,
+int CMP_API cmp_m3_chip_resolve(cmp_m3_chip_variant_t variant, int is_elevated,
                                 cmp_m3_chip_metrics_t *out_metrics);
 
 /**
@@ -49,7 +49,7 @@ typedef struct cmp_m3_list_metrics {
   float padding_right;
 } cmp_m3_list_metrics_t;
 
-CMP_API int cmp_m3_list_resolve(cmp_m3_list_variant_t variant,
+int CMP_API cmp_m3_list_resolve(cmp_m3_list_variant_t variant,
                                 cmp_m3_list_metrics_t *out_metrics);
 
 /**
@@ -66,9 +66,8 @@ typedef struct cmp_m3_carousel_metrics {
   cmp_m3_shape_family_t contained_shape;
 } cmp_m3_carousel_metrics_t;
 
-CMP_API int cmp_m3_carousel_resolve(cmp_m3_carousel_variant_t variant,
+int CMP_API cmp_m3_carousel_resolve(cmp_m3_carousel_variant_t variant,
                                     cmp_m3_carousel_metrics_t *out_metrics);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

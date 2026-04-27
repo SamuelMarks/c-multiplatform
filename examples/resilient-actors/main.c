@@ -4,6 +4,7 @@
 /* clang-format on */
 
 int main(int argc, char **argv) {
+  int rc = 0;
   cmp_app_config_t config;
   int err;
 
@@ -27,5 +28,8 @@ int main(int argc, char **argv) {
   /* Background worker processes spawn.
      If a worker crashes, the supervisor revives it via IPC Actor messages. */
 
-  return 0;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

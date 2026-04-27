@@ -24,7 +24,7 @@ typedef struct cmp_pty cmp_pty_t;
  * @param rows The initial number of rows.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_pty_create(cmp_pty_t **out_pty, const char *command, int cols,
+int CMP_API cmp_pty_create(cmp_pty_t **out_pty, const char *command, int cols,
                            int rows);
 
 /**
@@ -32,7 +32,7 @@ CMP_API int cmp_pty_create(cmp_pty_t **out_pty, const char *command, int cols,
  * @param pty The instance to destroy.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_pty_destroy(cmp_pty_t *pty);
+int CMP_API cmp_pty_destroy(cmp_pty_t *pty);
 
 /**
  * @brief Resizes the pseudo-terminal.
@@ -41,7 +41,7 @@ CMP_API int cmp_pty_destroy(cmp_pty_t *pty);
  * @param rows The new number of rows.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_pty_resize(cmp_pty_t *pty, int cols, int rows);
+int CMP_API cmp_pty_resize(cmp_pty_t *pty, int cols, int rows);
 
 /**
  * @brief Writes data to the pseudo-terminal.
@@ -50,7 +50,7 @@ CMP_API int cmp_pty_resize(cmp_pty_t *pty, int cols, int rows);
  * @param len The number of bytes to write.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_pty_write(cmp_pty_t *pty, const void *data, unsigned int len);
+int CMP_API cmp_pty_write(cmp_pty_t *pty, const void *data, unsigned int len);
 
 /**
  * @brief Reads data from the pseudo-terminal.
@@ -60,9 +60,8 @@ CMP_API int cmp_pty_write(cmp_pty_t *pty, const void *data, unsigned int len);
  * @param out_read Pointer to receive the number of bytes read.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_pty_read(cmp_pty_t *pty, void *out_buffer,
+int CMP_API cmp_pty_read(cmp_pty_t *pty, void *out_buffer,
                          unsigned int buffer_size, unsigned int *out_read);
-
 #ifdef __cplusplus
 }
 #endif

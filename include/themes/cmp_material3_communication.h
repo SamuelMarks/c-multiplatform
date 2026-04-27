@@ -28,7 +28,7 @@ typedef struct cmp_m3_badge_metrics {
   cmp_m3_shape_family_t shape;
 } cmp_m3_badge_metrics_t;
 
-CMP_API int cmp_m3_badge_resolve(cmp_m3_badge_variant_t variant,
+int CMP_API cmp_m3_badge_resolve(cmp_m3_badge_variant_t variant,
                                  cmp_m3_badge_metrics_t *out_metrics);
 
 /**
@@ -47,7 +47,7 @@ typedef struct cmp_m3_progress_metrics {
   float default_size; /* Width for linear, diameter for circular */
 } cmp_m3_progress_metrics_t;
 
-CMP_API int cmp_m3_progress_resolve(cmp_m3_progress_variant_t variant,
+int CMP_API cmp_m3_progress_resolve(cmp_m3_progress_variant_t variant,
                                     cmp_m3_progress_metrics_t *out_metrics);
 
 /**
@@ -59,7 +59,7 @@ typedef struct cmp_m3_snackbar_metrics {
   cmp_m3_shape_family_t shape;
 } cmp_m3_snackbar_metrics_t;
 
-CMP_API int cmp_m3_snackbar_resolve(cmp_m3_snackbar_metrics_t *out_metrics);
+int CMP_API cmp_m3_snackbar_resolve(cmp_m3_snackbar_metrics_t *out_metrics);
 
 /**
  * @brief Evaluated constraints for a Material 3 Pull to Refresh
@@ -69,9 +69,8 @@ typedef struct cmp_m3_pull_to_refresh_metrics {
   float indicator_size;
 } cmp_m3_pull_to_refresh_metrics_t;
 
-CMP_API int
+int CMP_API
 cmp_m3_pull_to_refresh_resolve(cmp_m3_pull_to_refresh_metrics_t *out_metrics);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

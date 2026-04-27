@@ -22,7 +22,7 @@ extern "C" {
  * @param out_color Pointer to the resulting sRGB cmp_color_t struct.
  * @return CMP_SUCCESS on success, or CMP_ERROR_INVALID_ARG.
  */
-CMP_API int cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
+int CMP_API cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
                                cmp_color_t *out_color);
 
 /**
@@ -38,19 +38,19 @@ CMP_API int cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
  * @return CMP_SUCCESS on success, or CMP_ERROR_INVALID_ARG if pointers are
  * null.
  */
-CMP_API int cmp_m3_srgb_to_hct(const cmp_color_t *in_color, float *out_hue,
+int CMP_API cmp_m3_srgb_to_hct(const cmp_color_t *in_color, float *out_hue,
                                float *out_chroma, float *out_tone);
 
 /**
  * @brief Convert Display P3 to HCT
  */
-CMP_API int cmp_m3_p3_to_hct(const cmp_color_t *in_color, float *out_hue,
+int CMP_API cmp_m3_p3_to_hct(const cmp_color_t *in_color, float *out_hue,
                              float *out_chroma, float *out_tone);
 
 /**
  * @brief Convert Linear RGB to HCT
  */
-CMP_API int cmp_m3_linear_to_hct(const cmp_color_t *in_color, float *out_hue,
+int CMP_API cmp_m3_linear_to_hct(const cmp_color_t *in_color, float *out_hue,
                                  float *out_chroma, float *out_tone);
 
 /**
@@ -87,56 +87,54 @@ typedef struct cmp_m3_palettes {
 /**
  * @brief Generate a single Tonal Palette from hue and chroma
  */
-CMP_API int
-cmp_m3_generate_tonal_palette_hct(float hue, float chroma,
-                                  cmp_m3_tonal_palette_t *out_palette);
+int CMP_API cmp_m3_generate_tonal_palette_hct(
+    float hue, float chroma, cmp_m3_tonal_palette_t *out_palette);
 
 /**
  * @brief Generate all Core Palettes from a seed color
  */
-CMP_API int cmp_m3_palettes_generate(cmp_color_t seed,
+int CMP_API cmp_m3_palettes_generate(cmp_color_t seed,
                                      cmp_m3_palettes_t *out_palettes);
 
 /**
  * @brief Generate Tonal Palette (tones 0-100)
  */
-CMP_API int cmp_m3_generate_tonal_palette(float hue, float chroma, float tone,
+int CMP_API cmp_m3_generate_tonal_palette(float hue, float chroma, float tone,
                                           cmp_palette_t *out_palette);
 
 /**
  * @brief MCU Scheme Variants
  */
-CMP_API int cmp_m3_scheme_tonal_spot(float hue, float chroma, float tone,
+int CMP_API cmp_m3_scheme_tonal_spot(float hue, float chroma, float tone,
                                      int is_dark, cmp_palette_t *out_palette);
-CMP_API int cmp_m3_scheme_spritz(float hue, float chroma, float tone,
+int CMP_API cmp_m3_scheme_spritz(float hue, float chroma, float tone,
                                  int is_dark, cmp_palette_t *out_palette);
-CMP_API int cmp_m3_scheme_vibrant(float hue, float chroma, float tone,
+int CMP_API cmp_m3_scheme_vibrant(float hue, float chroma, float tone,
                                   int is_dark, cmp_palette_t *out_palette);
-CMP_API int cmp_m3_scheme_expressive(float hue, float chroma, float tone,
+int CMP_API cmp_m3_scheme_expressive(float hue, float chroma, float tone,
                                      int is_dark, cmp_palette_t *out_palette);
-CMP_API int cmp_m3_scheme_rainbow(float hue, float chroma, float tone,
+int CMP_API cmp_m3_scheme_rainbow(float hue, float chroma, float tone,
                                   int is_dark, cmp_palette_t *out_palette);
-CMP_API int cmp_m3_scheme_fruit_salad(float hue, float chroma, float tone,
+int CMP_API cmp_m3_scheme_fruit_salad(float hue, float chroma, float tone,
                                       int is_dark, cmp_palette_t *out_palette);
-CMP_API int cmp_m3_scheme_monochrome(float hue, float chroma, float tone,
+int CMP_API cmp_m3_scheme_monochrome(float hue, float chroma, float tone,
                                      int is_dark, cmp_palette_t *out_palette);
-CMP_API int cmp_m3_scheme_fidelity(float hue, float chroma, float tone,
+int CMP_API cmp_m3_scheme_fidelity(float hue, float chroma, float tone,
                                    int is_dark, cmp_palette_t *out_palette);
-CMP_API int cmp_m3_scheme_content(float hue, float chroma, float tone,
+int CMP_API cmp_m3_scheme_content(float hue, float chroma, float tone,
                                   int is_dark, cmp_palette_t *out_palette);
 
 /**
  * @brief Map core palettes to Light scheme semantic roles
  */
-CMP_API int cmp_m3_scheme_light(const cmp_m3_palettes_t *palettes,
+int CMP_API cmp_m3_scheme_light(const cmp_m3_palettes_t *palettes,
                                 cmp_palette_t *out_scheme);
 
 /**
  * @brief Map core palettes to Dark scheme semantic roles
  */
-CMP_API int cmp_m3_scheme_dark(const cmp_m3_palettes_t *palettes,
+int CMP_API cmp_m3_scheme_dark(const cmp_m3_palettes_t *palettes,
                                cmp_palette_t *out_scheme);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

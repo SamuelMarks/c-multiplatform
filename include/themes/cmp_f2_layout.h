@@ -26,7 +26,7 @@ extern "C" {
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
+int CMP_API cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
                                 float spacing_token);
 
 /**
@@ -45,7 +45,7 @@ CMP_API int cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
+int CMP_API cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
                                float vertical_gap);
 
 /**
@@ -65,9 +65,8 @@ CMP_API int cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_grid_create(cmp_ui_node_t **out_node, int columns,
+int CMP_API cmp_f2_grid_create(cmp_ui_node_t **out_node, int columns,
                                float column_gap, float row_gap);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

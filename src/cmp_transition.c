@@ -25,6 +25,8 @@ struct cmp_transition {
 int cmp_transition_create(double duration_ms, double delay_ms,
                           cmp_transition_behavior_t behavior,
                           cmp_transition_t **out_transition) {
+  int rc;
+  rc = 0;
   struct cmp_transition *transition;
 
   if (!out_transition || duration_ms < 0.0 || delay_ms < 0.0)
@@ -41,7 +43,16 @@ int cmp_transition_create(double duration_ms, double delay_ms,
   transition->is_active = 1;
 
   *out_transition = (cmp_transition_t *)transition;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -51,6 +62,8 @@ int cmp_transition_create(double duration_ms, double delay_ms,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_transition_destroy(cmp_transition_t *transition) {
+  int rc;
+  rc = 0;
   struct cmp_transition *internal_transition =
       (struct cmp_transition *)transition;
 
@@ -58,7 +71,16 @@ int cmp_transition_destroy(cmp_transition_t *transition) {
     return CMP_ERROR_INVALID_ARG;
 
   CMP_FREE(internal_transition);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -71,6 +93,8 @@ int cmp_transition_destroy(cmp_transition_t *transition) {
  */
 int cmp_transition_step(cmp_transition_t *transition, double dt_ms,
                         float *out_progress) {
+  int rc;
+  rc = 0;
   struct cmp_transition *internal_transition =
       (struct cmp_transition *)transition;
   double active_time;
@@ -115,5 +139,14 @@ int cmp_transition_step(cmp_transition_t *transition, double dt_ms,
     *out_progress = progress;
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

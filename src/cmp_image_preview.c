@@ -16,12 +16,16 @@ struct cmp_image_preview {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_image_preview_create(cmp_image_preview_t **out_preview) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_image_preview_t *preview = NULL;
 
   if (!out_preview) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_image_preview_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -33,6 +37,9 @@ int cmp_image_preview_create(cmp_image_preview_t **out_preview) {
 
   preview->flags = 0;
   *out_preview = preview;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -43,16 +50,26 @@ int cmp_image_preview_create(cmp_image_preview_t **out_preview) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_image_preview_destroy(cmp_image_preview_t *preview) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!preview) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_image_preview_destroy: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   rc = CMP_FREE(preview);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_image_preview_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
     return rc;
   }
   return rc;
@@ -65,6 +82,8 @@ int cmp_image_preview_destroy(cmp_image_preview_t *preview) {
  * @return Returns 0 on success, or an error code on failure.
  */
 static int get_base64_val(char c) {
+  int rc;
+  rc = 0;
   if (c >= 'A' && c <= 'Z')
     return c - 'A';
   if (c >= 'a' && c <= 'z')
@@ -75,6 +94,12 @@ static int get_base64_val(char c) {
     return 62;
   if (c == '/')
     return 63;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return -1;
 }
 
@@ -92,7 +117,8 @@ int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
                                   const char *base64_data,
                                   unsigned char **out_raw_pixels,
                                   int *out_width, int *out_height) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   unsigned char *pixels = NULL;
   size_t len, i, j;
   size_t out_len;
@@ -102,6 +128,9 @@ int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
       !out_height) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_image_preview_load_base64: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -110,6 +139,9 @@ int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_image_preview_load_base64: Base64 data length not "
               "multiple of 4\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -148,6 +180,9 @@ int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
       rc = CMP_ERROR_INVALID_ARG;
       LOG_DEBUG(
           "Error in cmp_image_preview_load_base64: Invalid base64 character\n");
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
 
@@ -162,6 +197,9 @@ int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
   }
 
   *out_raw_pixels = pixels;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -172,17 +210,27 @@ int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_image_preview_free_pixels(unsigned char *pixels) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!pixels) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_image_preview_free_pixels: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_FREE(pixels);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_image_preview_free_pixels: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
     return rc;
   }
   return rc;

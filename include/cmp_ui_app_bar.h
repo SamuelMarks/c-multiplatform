@@ -35,7 +35,7 @@ typedef struct cmp_ui_app_bar cmp_ui_app_bar_t;
  * \param placement Top or Bottom placement.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
+int CMP_API cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
                                   cmp_ui_app_bar_placement_t placement);
 
 /**
@@ -44,7 +44,7 @@ CMP_API int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
  * \param bar The component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar);
+int CMP_API cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar);
 
 /**
  * \brief Retrieves the underlying UI node for the App Bar.
@@ -53,7 +53,7 @@ CMP_API int cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_app_bar_get_node(cmp_ui_app_bar_t *bar,
+int CMP_API cmp_ui_app_bar_get_node(cmp_ui_app_bar_t *bar,
                                     cmp_ui_node_t **out_node);
 
 /**
@@ -63,7 +63,7 @@ CMP_API int cmp_ui_app_bar_get_node(cmp_ui_app_bar_t *bar,
  * \param title The title text.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title);
+int CMP_API cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title);
 
 /**
  * \brief Adds an action node (e.g. icon button) to the App Bar.
@@ -72,7 +72,7 @@ CMP_API int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title);
  * \param action_node The UI node representing the action.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_app_bar_add_action(cmp_ui_app_bar_t *bar,
+int CMP_API cmp_ui_app_bar_add_action(cmp_ui_app_bar_t *bar,
                                       cmp_ui_node_t *action_node);
 
 /**
@@ -82,9 +82,8 @@ CMP_API int cmp_ui_app_bar_add_action(cmp_ui_app_bar_t *bar,
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_app_bar_bind_a11y(cmp_ui_app_bar_t *widget,
+int CMP_API cmp_ui_app_bar_bind_a11y(cmp_ui_app_bar_t *widget,
                                      cmp_a11y_tree_t *tree);
-
 #ifdef __cplusplus
 
 #endif /* __cplusplus */

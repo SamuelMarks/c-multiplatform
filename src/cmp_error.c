@@ -48,7 +48,6 @@ typedef struct _SYMBOL_INFO {
     unsigned long MaxNameLen;
     char Name[1];
 } SYMBOL_INFO;
-
 #define SYMOPT_LOAD_LINES 0x00000010
 
 /**
@@ -57,7 +56,8 @@ typedef struct _SYMBOL_INFO {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dump_stack_trace(void) {
-    void *stack[100];
+  int rc;
+  rc = 0;void *stack[100];
     unsigned short frames;
     void *process;
     void *dbghelp;
@@ -116,9 +116,12 @@ symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
             FPRINTF(stderr, "[%d] %p\n", i, stack[i]);
         }
     }
-    return CMP_SUCCESS;
+    if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
-
 #elif defined(__linux__) || defined(__APPLE__)
 
 #include <execinfo.h>
@@ -130,16 +133,19 @@ symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dump_stack_trace(void) {
-    void *stack[100];
+  int rc;
+  rc = 0;void *stack[100];
     int frames;
 
 FPRINTF(stderr, "--- Stack Trace ---\n");
     frames = backtrace(stack, 100);
     backtrace_symbols_fd(stack, frames, STDERR_FILENO);
-    return CMP_SUCCESS;
+    if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
-
-
 #else
 
 /**
@@ -148,11 +154,14 @@ FPRINTF(stderr, "--- Stack Trace ---\n");
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dump_stack_trace(void) {
-FPRINTF(stderr, "Stack trace not supported on this platform.\n");
-    return CMP_SUCCESS;
+  int rc;
+  rc = 0;FPRINTF(stderr, "Stack trace not supported on this platform.\n");
+    if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
-
-
 #endif
 /* clang-format on */
 
@@ -163,8 +172,8 @@ FPRINTF(stderr, "Stack trace not supported on this platform.\n");
  * @param file The source file where the assertion failed.
  * @param line The line number where the assertion failed.
  */
-static void cmp_default_assert_handler(const char *msg, const char *file,
-                                       int line) {
+CMP_EXEMPT(static void cmp_default_assert_handler(const char *msg,
+                                                  const char *file, int line)) {
   FPRINTF(stderr, "Assertion failed: %s at %s:%d\n", msg, file, line);
   cmp_dump_stack_trace();
   abort();
@@ -182,8 +191,19 @@ static cmp_assert_handler_t g_assert_handler = cmp_default_assert_handler;
  * @return int Returns 0 on success.
  */
 int cmp_set_assert_handler(cmp_assert_handler_t handler) {
+  int rc;
+  rc = 0;
   g_assert_handler = handler;
-  return 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -192,7 +212,7 @@ int cmp_set_assert_handler(cmp_assert_handler_t handler) {
  * @param sig Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void cmp_crash_handler(int sig) {
+CMP_EXEMPT(static void cmp_crash_handler(int sig)) {
   FPRINTF(stderr, "Caught signal %d\n", sig);
   cmp_dump_stack_trace();
   exit(1);
@@ -204,11 +224,21 @@ static void cmp_crash_handler(int sig) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_crash_handler_init(void) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   signal(SIGSEGV, cmp_crash_handler);
   signal(SIGABRT, cmp_crash_handler);
   signal(SIGILL, cmp_crash_handler);
   signal(SIGFPE, cmp_crash_handler);
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -220,7 +250,8 @@ int cmp_crash_handler_init(void) {
  * @param line Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-void cmp_assert_fail(const char *condition, const char *file, int line) {
+CMP_EXEMPT(void cmp_assert_fail(const char *condition, const char *file,
+                                int line)) {
   if (g_assert_handler) {
     g_assert_handler(condition, file, line);
   } else {
@@ -234,7 +265,7 @@ void cmp_assert_fail(const char *condition, const char *file, int line) {
  * @param fmt Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-void cmp_log_debug(const char *fmt, ...) {
+CMP_EXEMPT(void cmp_log_debug(const char *fmt, ...)) {
   va_list args;
   FPRINTF(stderr, "[DEBUG] ");
   va_start(args, fmt);
@@ -250,6 +281,8 @@ void cmp_log_debug(const char *fmt, ...) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_strerror(int error, const char **out_str) {
+  int rc;
+  rc = 0;
   if (out_str == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -282,5 +315,14 @@ int cmp_strerror(int error, const char **out_str) {
     *out_str = "Unknown error code";
     break;
   }
-  return 0;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

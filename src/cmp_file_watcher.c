@@ -18,7 +18,8 @@ struct cmp_file_watcher {
  * @param user_data Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-static void vfs_watch_proxy(const char *path, int event_type, void *user_data) {
+CMP_EXEMPT(static void vfs_watch_proxy(const char *path, int event_type,
+                                       void *user_data)) {
   cmp_file_watcher_t *w = (cmp_file_watcher_t *)user_data;
   if (w && w->user_cb) {
     w->user_cb(path, event_type, w->user_data);
@@ -32,19 +33,26 @@ static void vfs_watch_proxy(const char *path, int event_type, void *user_data) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_file_watcher_create(cmp_file_watcher_t **out_watcher) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_file_watcher_t *w = NULL;
 
   if (!out_watcher) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_file_watcher_create: Invalid argument "
               "(out_watcher=NULL)\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_file_watcher_t), (void **)&w);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_file_watcher_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -53,6 +61,9 @@ int cmp_file_watcher_create(cmp_file_watcher_t **out_watcher) {
   w->user_data = NULL;
 
   *out_watcher = w;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -63,12 +74,16 @@ int cmp_file_watcher_create(cmp_file_watcher_t **out_watcher) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_file_watcher_destroy(cmp_file_watcher_t *watcher) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!watcher) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_file_watcher_destroy: Invalid argument (watcher=NULL)\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -80,6 +95,9 @@ int cmp_file_watcher_destroy(cmp_file_watcher_t *watcher) {
   rc = CMP_FREE(watcher);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_file_watcher_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -96,11 +114,15 @@ int cmp_file_watcher_destroy(cmp_file_watcher_t *watcher) {
  */
 int cmp_file_watcher_start(cmp_file_watcher_t *watcher, const char *dir_path,
                            cmp_file_watch_cb_t cb, void *user_data) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!watcher || !dir_path || !cb) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_file_watcher_start: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -109,6 +131,9 @@ int cmp_file_watcher_start(cmp_file_watcher_t *watcher, const char *dir_path,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG(
         "Error in cmp_file_watcher_start: Failed to stop existing watcher\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -121,6 +146,11 @@ int cmp_file_watcher_start(cmp_file_watcher_t *watcher, const char *dir_path,
     LOG_DEBUG("Error in cmp_file_watcher_start: Failed to watch path\n");
   }
 
+  if (rc != 0) {
+
+    return rc;
+  }
+
   return rc;
 }
 
@@ -131,12 +161,16 @@ int cmp_file_watcher_start(cmp_file_watcher_t *watcher, const char *dir_path,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_file_watcher_stop(cmp_file_watcher_t *watcher) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!watcher) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_file_watcher_stop: Invalid argument (watcher=NULL)\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -146,6 +180,9 @@ int cmp_file_watcher_stop(cmp_file_watcher_t *watcher) {
       LOG_DEBUG("Error in cmp_file_watcher_stop: Failed to unwatch VFS\n");
     }
     watcher->vfs_watch = NULL;
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }

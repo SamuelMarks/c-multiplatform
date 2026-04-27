@@ -15,6 +15,8 @@ struct cmp_sys_colors {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_sys_colors_create(cmp_sys_colors_t **out_ctx) {
+  int rc;
+  rc = 0;
   cmp_sys_colors_t *ctx;
 
   if (!out_ctx) {
@@ -29,7 +31,16 @@ int cmp_sys_colors_create(cmp_sys_colors_t **out_ctx) {
   memset(ctx->is_set, 0, sizeof(ctx->is_set));
 
   *out_ctx = ctx;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -39,11 +50,22 @@ int cmp_sys_colors_create(cmp_sys_colors_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_sys_colors_destroy(cmp_sys_colors_t *ctx) {
+  int rc;
+  rc = 0;
   if (!ctx) {
     return CMP_ERROR_INVALID_ARG;
   }
   CMP_FREE(ctx);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -56,6 +78,8 @@ int cmp_sys_colors_destroy(cmp_sys_colors_t *ctx) {
  */
 int cmp_sys_colors_set(cmp_sys_colors_t *ctx, cmp_sys_color_keyword_t keyword,
                        const cmp_color_t *color) {
+  int rc;
+  rc = 0;
   if (!ctx || !color || keyword < 0 || keyword >= CMP_SYS_COLOR_MAX) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -63,7 +87,16 @@ int cmp_sys_colors_set(cmp_sys_colors_t *ctx, cmp_sys_color_keyword_t keyword,
   ctx->colors[keyword] = *color;
   ctx->is_set[keyword] = 1;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -77,6 +110,8 @@ int cmp_sys_colors_set(cmp_sys_colors_t *ctx, cmp_sys_color_keyword_t keyword,
 int cmp_sys_colors_resolve(const cmp_sys_colors_t *ctx,
                            cmp_sys_color_keyword_t keyword,
                            cmp_color_t *out_color) {
+  int rc;
+  rc = 0;
   if (!ctx || !out_color || keyword < 0 || keyword >= CMP_SYS_COLOR_MAX) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -86,5 +121,14 @@ int cmp_sys_colors_resolve(const cmp_sys_colors_t *ctx,
   }
 
   *out_color = ctx->colors[keyword];
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

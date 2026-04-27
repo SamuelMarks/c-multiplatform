@@ -12,8 +12,10 @@
  * @param spacing_token Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
+int CMP_API cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
                                 float spacing_token) {
+  int rc;
+  rc = 0;
   int res;
   if (!out_node) {
     return CMP_ERROR_INVALID_ARG;
@@ -30,7 +32,16 @@ CMP_API int cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
   /* Use column_gap as a generic spacing applicator */
   (*out_node)->layout->column_gap = spacing_token;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -41,8 +52,10 @@ CMP_API int cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
  * @param vertical_gap Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
+int CMP_API cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
                                float vertical_gap) {
+  int rc;
+  rc = 0;
   int res;
   if (!out_node) {
     return CMP_ERROR_INVALID_ARG;
@@ -62,7 +75,16 @@ CMP_API int cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
   /* If there were a row_gap on layout node, we would set it to vertical_gap */
   (void)vertical_gap;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -74,8 +96,10 @@ CMP_API int cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
  * @param row_gap Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_grid_create(cmp_ui_node_t **out_node, int columns,
+int CMP_API cmp_f2_grid_create(cmp_ui_node_t **out_node, int columns,
                                float column_gap, float row_gap) {
+  int rc;
+  rc = 0;
   int res;
   if (!out_node) {
     return CMP_ERROR_INVALID_ARG;
@@ -89,5 +113,14 @@ CMP_API int cmp_f2_grid_create(cmp_ui_node_t **out_node, int columns,
   (*out_node)->layout->column_gap = column_gap;
   (void)row_gap;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

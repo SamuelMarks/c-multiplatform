@@ -33,9 +33,8 @@ typedef struct cmp_m3_text_field_metrics {
   int has_floating_label;
 } cmp_m3_text_field_metrics_t;
 
-CMP_API int cmp_m3_text_field_resolve(cmp_m3_text_field_variant_t variant,
+int CMP_API cmp_m3_text_field_resolve(cmp_m3_text_field_variant_t variant,
                                       cmp_m3_text_field_metrics_t *out_metrics);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

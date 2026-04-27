@@ -13,8 +13,10 @@
  * @param variant Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_dialog_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_dialog_create(cmp_ui_node_t **out_node,
                                  cmp_f2_dialog_variant_t variant) {
+  int rc;
+  rc = 0;
   cmp_f2_dialog_t *data;
   int res;
 
@@ -47,7 +49,16 @@ CMP_API int cmp_f2_dialog_create(cmp_ui_node_t **out_node,
   data->footer_node = NULL;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -57,7 +68,9 @@ CMP_API int cmp_f2_dialog_create(cmp_ui_node_t **out_node,
  * @param is_open Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_dialog_set_open(cmp_ui_node_t *node, int is_open) {
+int CMP_API cmp_f2_dialog_set_open(cmp_ui_node_t *node, int is_open) {
+  int rc;
+  rc = 0;
   cmp_f2_dialog_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_dialog_set_open: Invalid arg\n");
@@ -65,7 +78,16 @@ CMP_API int cmp_f2_dialog_set_open(cmp_ui_node_t *node, int is_open) {
   }
   data = (cmp_f2_dialog_t *)node->properties;
   data->is_open = is_open ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -75,8 +97,10 @@ CMP_API int cmp_f2_dialog_set_open(cmp_ui_node_t *node, int is_open) {
  * @param anchor Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_flyout_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_flyout_create(cmp_ui_node_t **out_node,
                                  cmp_ui_node_t *anchor) {
+  int rc;
+  rc = 0;
   cmp_f2_flyout_t *data;
   int res;
 
@@ -105,7 +129,16 @@ CMP_API int cmp_f2_flyout_create(cmp_ui_node_t **out_node,
   data->container_node = NULL;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -115,8 +148,10 @@ CMP_API int cmp_f2_flyout_create(cmp_ui_node_t **out_node,
  * @param placement Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_flyout_set_placement(cmp_ui_node_t *node,
+int CMP_API cmp_f2_flyout_set_placement(cmp_ui_node_t *node,
                                         cmp_f2_flyout_placement_t placement) {
+  int rc;
+  rc = 0;
   cmp_f2_flyout_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_flyout_set_placement: Invalid arg\n");
@@ -124,7 +159,16 @@ CMP_API int cmp_f2_flyout_set_placement(cmp_ui_node_t *node,
   }
   data = (cmp_f2_flyout_t *)node->properties;
   data->placement = placement;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -134,7 +178,9 @@ CMP_API int cmp_f2_flyout_set_placement(cmp_ui_node_t *node,
  * @param is_open Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_flyout_set_open(cmp_ui_node_t *node, int is_open) {
+int CMP_API cmp_f2_flyout_set_open(cmp_ui_node_t *node, int is_open) {
+  int rc;
+  rc = 0;
   cmp_f2_flyout_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_flyout_set_open: Invalid arg\n");
@@ -142,7 +188,16 @@ CMP_API int cmp_f2_flyout_set_open(cmp_ui_node_t *node, int is_open) {
   }
   data = (cmp_f2_flyout_t *)node->properties;
   data->is_open = is_open ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -153,8 +208,10 @@ CMP_API int cmp_f2_flyout_set_open(cmp_ui_node_t *node, int is_open) {
  * @param label Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tooltip_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_tooltip_create(cmp_ui_node_t **out_node,
                                   cmp_ui_node_t *anchor, const char *label) {
+  int rc;
+  rc = 0;
   cmp_f2_tooltip_t *data;
   int res;
 
@@ -193,7 +250,16 @@ CMP_API int cmp_f2_tooltip_create(cmp_ui_node_t **out_node,
   }
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -203,7 +269,9 @@ CMP_API int cmp_f2_tooltip_create(cmp_ui_node_t **out_node,
  * @param is_visible Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_tooltip_set_visible(cmp_ui_node_t *node, int is_visible) {
+int CMP_API cmp_f2_tooltip_set_visible(cmp_ui_node_t *node, int is_visible) {
+  int rc;
+  rc = 0;
   cmp_f2_tooltip_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_tooltip_set_visible: Invalid arg\n");
@@ -211,7 +279,16 @@ CMP_API int cmp_f2_tooltip_set_visible(cmp_ui_node_t *node, int is_visible) {
   }
   data = (cmp_f2_tooltip_t *)node->properties;
   data->is_visible = is_visible ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -221,8 +298,10 @@ CMP_API int cmp_f2_tooltip_set_visible(cmp_ui_node_t *node, int is_visible) {
  * @param intent Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_toast_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_toast_create(cmp_ui_node_t **out_node,
                                 cmp_f2_toast_intent_t intent) {
+  int rc;
+  rc = 0;
   cmp_f2_toast_t *data;
   int res;
 
@@ -255,7 +334,16 @@ CMP_API int cmp_f2_toast_create(cmp_ui_node_t **out_node,
   data->close_button_node = NULL;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -265,7 +353,9 @@ CMP_API int cmp_f2_toast_create(cmp_ui_node_t **out_node,
  * @param is_visible Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_toast_set_visible(cmp_ui_node_t *node, int is_visible) {
+int CMP_API cmp_f2_toast_set_visible(cmp_ui_node_t *node, int is_visible) {
+  int rc;
+  rc = 0;
   cmp_f2_toast_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_toast_set_visible: Invalid arg\n");
@@ -273,7 +363,16 @@ CMP_API int cmp_f2_toast_set_visible(cmp_ui_node_t *node, int is_visible) {
   }
   data = (cmp_f2_toast_t *)node->properties;
   data->is_visible = is_visible ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -283,8 +382,10 @@ CMP_API int cmp_f2_toast_set_visible(cmp_ui_node_t *node, int is_visible) {
  * @param intent Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_messagebar_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_messagebar_create(cmp_ui_node_t **out_node,
                                      cmp_f2_toast_intent_t intent) {
+  int rc;
+  rc = 0;
   cmp_f2_messagebar_t *data;
   int res;
 
@@ -311,7 +412,16 @@ CMP_API int cmp_f2_messagebar_create(cmp_ui_node_t **out_node,
   data->intent = intent;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -321,8 +431,10 @@ CMP_API int cmp_f2_messagebar_create(cmp_ui_node_t **out_node,
  * @param variant Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_messagebar_set_variant(cmp_ui_node_t *node,
+int CMP_API cmp_f2_messagebar_set_variant(cmp_ui_node_t *node,
                                           cmp_f2_messagebar_variant_t variant) {
+  int rc;
+  rc = 0;
   cmp_f2_messagebar_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_messagebar_set_variant: Invalid arg\n");
@@ -330,7 +442,16 @@ CMP_API int cmp_f2_messagebar_set_variant(cmp_ui_node_t *node,
   }
   data = (cmp_f2_messagebar_t *)node->properties;
   data->variant = variant;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -339,7 +460,9 @@ CMP_API int cmp_f2_messagebar_set_variant(cmp_ui_node_t *node,
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_progress_bar_create(cmp_ui_node_t **out_node) {
+int CMP_API cmp_f2_progress_bar_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   cmp_f2_progress_t *data;
   int res;
 
@@ -368,7 +491,16 @@ CMP_API int cmp_f2_progress_bar_create(cmp_ui_node_t **out_node) {
   data->value = 0.0f;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -377,14 +509,21 @@ CMP_API int cmp_f2_progress_bar_create(cmp_ui_node_t **out_node) {
  * @param out_node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_progress_ring_create(cmp_ui_node_t **out_node) {
-  /* Shares data structure with progress bar internally for this mock */
+int CMP_API cmp_f2_progress_ring_create(cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0; /* Shares data structure with progress bar internally for this mock */
   int res = cmp_f2_progress_bar_create(out_node);
   if (res == CMP_SUCCESS) {
     /* Adjust implicit geometry representation later in rendering */
   } else {
     LOG_DEBUG(
         "cmp_f2_progress_ring_create: cmp_f2_progress_bar_create failed\n");
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
   }
   return res;
 }
@@ -396,8 +535,10 @@ CMP_API int cmp_f2_progress_ring_create(cmp_ui_node_t **out_node) {
  * @param variant Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_progress_set_variant(cmp_ui_node_t *node,
+int CMP_API cmp_f2_progress_set_variant(cmp_ui_node_t *node,
                                         cmp_f2_progress_variant_t variant) {
+  int rc;
+  rc = 0;
   cmp_f2_progress_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_progress_set_variant: Invalid arg\n");
@@ -405,7 +546,16 @@ CMP_API int cmp_f2_progress_set_variant(cmp_ui_node_t *node,
   }
   data = (cmp_f2_progress_t *)node->properties;
   data->variant = variant;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -415,8 +565,10 @@ CMP_API int cmp_f2_progress_set_variant(cmp_ui_node_t *node,
  * @param state Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_progress_set_state(cmp_ui_node_t *node,
+int CMP_API cmp_f2_progress_set_state(cmp_ui_node_t *node,
                                       cmp_f2_progress_state_t state) {
+  int rc;
+  rc = 0;
   cmp_f2_progress_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_progress_set_state: Invalid arg\n");
@@ -424,7 +576,16 @@ CMP_API int cmp_f2_progress_set_state(cmp_ui_node_t *node,
   }
   data = (cmp_f2_progress_t *)node->properties;
   data->state = state;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -434,7 +595,9 @@ CMP_API int cmp_f2_progress_set_state(cmp_ui_node_t *node,
  * @param value Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_progress_set_value(cmp_ui_node_t *node, float value) {
+int CMP_API cmp_f2_progress_set_value(cmp_ui_node_t *node, float value) {
+  int rc;
+  rc = 0;
   cmp_f2_progress_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_progress_set_value: Invalid arg\n");
@@ -442,7 +605,16 @@ CMP_API int cmp_f2_progress_set_value(cmp_ui_node_t *node, float value) {
   }
   data = (cmp_f2_progress_t *)node->properties;
   data->value = value;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -452,8 +624,10 @@ CMP_API int cmp_f2_progress_set_value(cmp_ui_node_t *node, float value) {
  * @param shape Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_skeleton_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_skeleton_create(cmp_ui_node_t **out_node,
                                    cmp_f2_skeleton_shape_t shape) {
+  int rc;
+  rc = 0;
   cmp_f2_skeleton_t *data;
   int res;
 
@@ -480,7 +654,16 @@ CMP_API int cmp_f2_skeleton_create(cmp_ui_node_t **out_node,
   data->is_animated = 1;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -490,7 +673,9 @@ CMP_API int cmp_f2_skeleton_create(cmp_ui_node_t **out_node,
  * @param is_animated Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_skeleton_set_animated(cmp_ui_node_t *node, int is_animated) {
+int CMP_API cmp_f2_skeleton_set_animated(cmp_ui_node_t *node, int is_animated) {
+  int rc;
+  rc = 0;
   cmp_f2_skeleton_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_skeleton_set_animated: Invalid arg\n");
@@ -498,5 +683,14 @@ CMP_API int cmp_f2_skeleton_set_animated(cmp_ui_node_t *node, int is_animated) {
   }
   data = (cmp_f2_skeleton_t *)node->properties;
   data->is_animated = is_animated ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

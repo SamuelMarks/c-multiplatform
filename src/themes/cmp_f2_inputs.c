@@ -13,8 +13,10 @@
  * @param label Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_checkbox_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_checkbox_create(cmp_ui_node_t **out_node,
                                    const char *label) {
+  int rc;
+  rc = 0;
   cmp_f2_checkbox_t *data;
   int res;
 
@@ -44,7 +46,16 @@ CMP_API int cmp_f2_checkbox_create(cmp_ui_node_t **out_node,
 
   (*out_node)->properties = (void *)data;
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -54,8 +65,10 @@ CMP_API int cmp_f2_checkbox_create(cmp_ui_node_t **out_node,
  * @param size Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_checkbox_set_size(cmp_ui_node_t *node,
+int CMP_API cmp_f2_checkbox_set_size(cmp_ui_node_t *node,
                                      cmp_f2_checkbox_size_t size) {
+  int rc;
+  rc = 0;
   cmp_f2_checkbox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_checkbox_set_size: Invalid arg\n");
@@ -63,7 +76,16 @@ CMP_API int cmp_f2_checkbox_set_size(cmp_ui_node_t *node,
   }
   data = (cmp_f2_checkbox_t *)node->properties;
   data->size = size;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -73,8 +95,10 @@ CMP_API int cmp_f2_checkbox_set_size(cmp_ui_node_t *node,
  * @param state Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_checkbox_set_state(cmp_ui_node_t *node,
+int CMP_API cmp_f2_checkbox_set_state(cmp_ui_node_t *node,
                                       cmp_f2_checkbox_state_t state) {
+  int rc;
+  rc = 0;
   cmp_f2_checkbox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_checkbox_set_state: Invalid arg\n");
@@ -82,7 +106,16 @@ CMP_API int cmp_f2_checkbox_set_state(cmp_ui_node_t *node,
   }
   data = (cmp_f2_checkbox_t *)node->properties;
   data->state = state;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -92,8 +125,10 @@ CMP_API int cmp_f2_checkbox_set_state(cmp_ui_node_t *node,
  * @param pos Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_checkbox_set_label_position(cmp_ui_node_t *node,
+int CMP_API cmp_f2_checkbox_set_label_position(cmp_ui_node_t *node,
                                                cmp_f2_label_position_t pos) {
+  int rc;
+  rc = 0;
   cmp_f2_checkbox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_checkbox_set_label_position: Invalid arg\n");
@@ -101,7 +136,16 @@ CMP_API int cmp_f2_checkbox_set_label_position(cmp_ui_node_t *node,
   }
   data = (cmp_f2_checkbox_t *)node->properties;
   data->label_position = pos;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -111,7 +155,9 @@ CMP_API int cmp_f2_checkbox_set_label_position(cmp_ui_node_t *node,
  * @param disabled Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_checkbox_set_disabled(cmp_ui_node_t *node, int disabled) {
+int CMP_API cmp_f2_checkbox_set_disabled(cmp_ui_node_t *node, int disabled) {
+  int rc;
+  rc = 0;
   cmp_f2_checkbox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_checkbox_set_disabled: Invalid arg\n");
@@ -119,7 +165,16 @@ CMP_API int cmp_f2_checkbox_set_disabled(cmp_ui_node_t *node, int disabled) {
   }
   data = (cmp_f2_checkbox_t *)node->properties;
   data->is_disabled = disabled ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -129,7 +184,9 @@ CMP_API int cmp_f2_checkbox_set_disabled(cmp_ui_node_t *node, int disabled) {
  * @param label Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_radio_create(cmp_ui_node_t **out_node, const char *label) {
+int CMP_API cmp_f2_radio_create(cmp_ui_node_t **out_node, const char *label) {
+  int rc;
+  rc = 0;
   cmp_f2_radio_t *data;
   int res;
 
@@ -162,7 +219,16 @@ CMP_API int cmp_f2_radio_create(cmp_ui_node_t **out_node, const char *label) {
   data->is_disabled = 0;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -172,8 +238,10 @@ CMP_API int cmp_f2_radio_create(cmp_ui_node_t **out_node, const char *label) {
  * @param size Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_radio_set_size(cmp_ui_node_t *node,
+int CMP_API cmp_f2_radio_set_size(cmp_ui_node_t *node,
                                   cmp_f2_radio_size_t size) {
+  int rc;
+  rc = 0;
   cmp_f2_radio_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_radio_set_size: Invalid arg\n");
@@ -181,7 +249,16 @@ CMP_API int cmp_f2_radio_set_size(cmp_ui_node_t *node,
   }
   data = (cmp_f2_radio_t *)node->properties;
   data->size = size;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -191,7 +268,9 @@ CMP_API int cmp_f2_radio_set_size(cmp_ui_node_t *node,
  * @param selected Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_radio_set_selected(cmp_ui_node_t *node, int selected) {
+int CMP_API cmp_f2_radio_set_selected(cmp_ui_node_t *node, int selected) {
+  int rc;
+  rc = 0;
   cmp_f2_radio_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_radio_set_selected: Invalid arg\n");
@@ -199,7 +278,16 @@ CMP_API int cmp_f2_radio_set_selected(cmp_ui_node_t *node, int selected) {
   }
   data = (cmp_f2_radio_t *)node->properties;
   data->is_selected = selected ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -209,7 +297,9 @@ CMP_API int cmp_f2_radio_set_selected(cmp_ui_node_t *node, int selected) {
  * @param disabled Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_radio_set_disabled(cmp_ui_node_t *node, int disabled) {
+int CMP_API cmp_f2_radio_set_disabled(cmp_ui_node_t *node, int disabled) {
+  int rc;
+  rc = 0;
   cmp_f2_radio_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_radio_set_disabled: Invalid arg\n");
@@ -217,7 +307,16 @@ CMP_API int cmp_f2_radio_set_disabled(cmp_ui_node_t *node, int disabled) {
   }
   data = (cmp_f2_radio_t *)node->properties;
   data->is_disabled = disabled ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -227,8 +326,10 @@ CMP_API int cmp_f2_radio_set_disabled(cmp_ui_node_t *node, int disabled) {
  * @param horizontal Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_radio_group_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_radio_group_create(cmp_ui_node_t **out_node,
                                       int horizontal) {
+  int rc;
+  rc = 0;
   int res;
   if (!out_node) {
     LOG_DEBUG("cmp_f2_radio_group_create: out_node is NULL\n");
@@ -241,6 +342,12 @@ CMP_API int cmp_f2_radio_group_create(cmp_ui_node_t **out_node,
   } else {
     LOG_DEBUG("cmp_f2_radio_group_create: cmp_ui_box_create failed\n");
   }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return res;
 }
 
@@ -251,7 +358,9 @@ CMP_API int cmp_f2_radio_group_create(cmp_ui_node_t **out_node,
  * @param label Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_toggle_create(cmp_ui_node_t **out_node, const char *label) {
+int CMP_API cmp_f2_toggle_create(cmp_ui_node_t **out_node, const char *label) {
+  int rc;
+  rc = 0;
   cmp_f2_toggle_t *data;
   int res;
 
@@ -282,7 +391,16 @@ CMP_API int cmp_f2_toggle_create(cmp_ui_node_t **out_node, const char *label) {
   data->label_position = CMP_F2_LABEL_POSITION_AFTER;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -292,7 +410,9 @@ CMP_API int cmp_f2_toggle_create(cmp_ui_node_t **out_node, const char *label) {
  * @param is_on Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_toggle_set_on(cmp_ui_node_t *node, int is_on) {
+int CMP_API cmp_f2_toggle_set_on(cmp_ui_node_t *node, int is_on) {
+  int rc;
+  rc = 0;
   cmp_f2_toggle_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_toggle_set_on: Invalid arg\n");
@@ -300,7 +420,16 @@ CMP_API int cmp_f2_toggle_set_on(cmp_ui_node_t *node, int is_on) {
   }
   data = (cmp_f2_toggle_t *)node->properties;
   data->is_on = is_on ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -310,7 +439,9 @@ CMP_API int cmp_f2_toggle_set_on(cmp_ui_node_t *node, int is_on) {
  * @param disabled Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_toggle_set_disabled(cmp_ui_node_t *node, int disabled) {
+int CMP_API cmp_f2_toggle_set_disabled(cmp_ui_node_t *node, int disabled) {
+  int rc;
+  rc = 0;
   cmp_f2_toggle_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_toggle_set_disabled: Invalid arg\n");
@@ -318,7 +449,16 @@ CMP_API int cmp_f2_toggle_set_disabled(cmp_ui_node_t *node, int disabled) {
   }
   data = (cmp_f2_toggle_t *)node->properties;
   data->is_disabled = disabled ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -328,8 +468,10 @@ CMP_API int cmp_f2_toggle_set_disabled(cmp_ui_node_t *node, int disabled) {
  * @param orientation Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_slider_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_slider_create(cmp_ui_node_t **out_node,
                                  cmp_f2_slider_orientation_t orientation) {
+  int rc;
+  rc = 0;
   cmp_f2_slider_t *data;
   int res;
 
@@ -363,7 +505,16 @@ CMP_API int cmp_f2_slider_create(cmp_ui_node_t **out_node,
   data->is_disabled = 0;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -373,7 +524,9 @@ CMP_API int cmp_f2_slider_create(cmp_ui_node_t **out_node,
  * @param is_range Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_slider_set_range_mode(cmp_ui_node_t *node, int is_range) {
+int CMP_API cmp_f2_slider_set_range_mode(cmp_ui_node_t *node, int is_range) {
+  int rc;
+  rc = 0;
   cmp_f2_slider_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_slider_set_range_mode: Invalid arg\n");
@@ -381,7 +534,16 @@ CMP_API int cmp_f2_slider_set_range_mode(cmp_ui_node_t *node, int is_range) {
   }
   data = (cmp_f2_slider_t *)node->properties;
   data->is_range = is_range ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -393,8 +555,10 @@ CMP_API int cmp_f2_slider_set_range_mode(cmp_ui_node_t *node, int is_range) {
  * @param step_val Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_slider_set_bounds(cmp_ui_node_t *node, float min_val,
+int CMP_API cmp_f2_slider_set_bounds(cmp_ui_node_t *node, float min_val,
                                      float max_val, float step_val) {
+  int rc;
+  rc = 0;
   cmp_f2_slider_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_slider_set_bounds: Invalid arg\n");
@@ -405,7 +569,16 @@ CMP_API int cmp_f2_slider_set_bounds(cmp_ui_node_t *node, float min_val,
   data->max_val = max_val;
   data->step_val = step_val;
   data->is_stepped = (step_val > 0.0f) ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -416,8 +589,10 @@ CMP_API int cmp_f2_slider_set_bounds(cmp_ui_node_t *node, float min_val,
  * @param val2 Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_slider_set_value(cmp_ui_node_t *node, float val1,
+int CMP_API cmp_f2_slider_set_value(cmp_ui_node_t *node, float val1,
                                     float val2) {
+  int rc;
+  rc = 0;
   cmp_f2_slider_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_slider_set_value: Invalid arg\n");
@@ -426,7 +601,16 @@ CMP_API int cmp_f2_slider_set_value(cmp_ui_node_t *node, float val1,
   data = (cmp_f2_slider_t *)node->properties;
   data->value1 = val1;
   data->value2 = val2;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -436,7 +620,9 @@ CMP_API int cmp_f2_slider_set_value(cmp_ui_node_t *node, float val1,
  * @param disabled Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_slider_set_disabled(cmp_ui_node_t *node, int disabled) {
+int CMP_API cmp_f2_slider_set_disabled(cmp_ui_node_t *node, int disabled) {
+  int rc;
+  rc = 0;
   cmp_f2_slider_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_slider_set_disabled: Invalid arg\n");
@@ -444,7 +630,16 @@ CMP_API int cmp_f2_slider_set_disabled(cmp_ui_node_t *node, int disabled) {
   }
   data = (cmp_f2_slider_t *)node->properties;
   data->is_disabled = disabled ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -454,8 +649,10 @@ CMP_API int cmp_f2_slider_set_disabled(cmp_ui_node_t *node, int disabled) {
  * @param initial_val Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_spin_button_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_spin_button_create(cmp_ui_node_t **out_node,
                                       float initial_val) {
+  int rc;
+  rc = 0;
   cmp_f2_spin_button_t *data;
   int res;
 
@@ -485,7 +682,16 @@ CMP_API int cmp_f2_spin_button_create(cmp_ui_node_t **out_node,
   data->is_disabled = 0;
 
   (*out_node)->properties = (void *)data;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -497,8 +703,10 @@ CMP_API int cmp_f2_spin_button_create(cmp_ui_node_t **out_node,
  * @param step_val Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_spin_button_set_bounds(cmp_ui_node_t *node, float min_val,
+int CMP_API cmp_f2_spin_button_set_bounds(cmp_ui_node_t *node, float min_val,
                                           float max_val, float step_val) {
+  int rc;
+  rc = 0;
   cmp_f2_spin_button_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_spin_button_set_bounds: Invalid arg\n");
@@ -508,7 +716,16 @@ CMP_API int cmp_f2_spin_button_set_bounds(cmp_ui_node_t *node, float min_val,
   data->min_val = min_val;
   data->max_val = max_val;
   data->step_val = step_val;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -518,7 +735,9 @@ CMP_API int cmp_f2_spin_button_set_bounds(cmp_ui_node_t *node, float min_val,
  * @param val Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_spin_button_set_value(cmp_ui_node_t *node, float val) {
+int CMP_API cmp_f2_spin_button_set_value(cmp_ui_node_t *node, float val) {
+  int rc;
+  rc = 0;
   cmp_f2_spin_button_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_spin_button_set_value: Invalid arg\n");
@@ -526,7 +745,16 @@ CMP_API int cmp_f2_spin_button_set_value(cmp_ui_node_t *node, float val) {
   }
   data = (cmp_f2_spin_button_t *)node->properties;
   data->value = val;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -536,7 +764,9 @@ CMP_API int cmp_f2_spin_button_set_value(cmp_ui_node_t *node, float val) {
  * @param disabled Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API int cmp_f2_spin_button_set_disabled(cmp_ui_node_t *node, int disabled) {
+int CMP_API cmp_f2_spin_button_set_disabled(cmp_ui_node_t *node, int disabled) {
+  int rc;
+  rc = 0;
   cmp_f2_spin_button_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_spin_button_set_disabled: Invalid arg\n");
@@ -544,5 +774,14 @@ CMP_API int cmp_f2_spin_button_set_disabled(cmp_ui_node_t *node, int disabled) {
   }
   data = (cmp_f2_spin_button_t *)node->properties;
   data->is_disabled = disabled ? 1 : 0;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

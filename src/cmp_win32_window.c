@@ -79,7 +79,6 @@ typedef struct _WINDOWCOMPOSITIONATTRIBDATA {
 
 typedef BOOL(WINAPI *pfnSetWindowCompositionAttribute)(
     HWND, WINDOWCOMPOSITIONATTRIBDATA *);
-
 #ifndef DWMWA_MICA_EFFECT
 #define DWMWA_MICA_EFFECT 1029
 #endif
@@ -107,7 +106,8 @@ typedef BOOL(WINAPI *pfnSetWindowCompositionAttribute)(
 int cmp_win32_request_windows_material(cmp_materials_t *materials,
                                        cmp_window_t *window,
                                        cmp_windows_material_t material) {
-  HWND hwnd;
+  int rc;
+  rc = 0;HWND hwnd;
   HMODULE hUser, hDwm;
   pfnSetWindowCompositionAttribute setWindowCompositionAttribute;
   pfnDwmSetWindowAttribute dwmSetWindowAttribute = NULL;
@@ -235,7 +235,11 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
 
   if (hDwm)
     FreeLibrary(hDwm);
-  return CMP_SUCCESS;
+  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 #endif
 /* clang-format on */

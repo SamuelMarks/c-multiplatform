@@ -21,14 +21,14 @@ typedef struct cmp_plugin_loader cmp_plugin_loader_t;
  * @param out_loader Pointer to receive the created instance.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_plugin_loader_create(cmp_plugin_loader_t **out_loader);
+int CMP_API cmp_plugin_loader_create(cmp_plugin_loader_t **out_loader);
 
 /**
  * @brief Destroys a plugin loader instance.
  * @param loader The instance to destroy.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_plugin_loader_destroy(cmp_plugin_loader_t *loader);
+int CMP_API cmp_plugin_loader_destroy(cmp_plugin_loader_t *loader);
 
 /**
  * @brief Loads a plugin shared library (.dll, .so, .dylib).
@@ -37,7 +37,7 @@ CMP_API int cmp_plugin_loader_destroy(cmp_plugin_loader_t *loader);
  * @param out_plugin_id Pointer to receive the plugin ID.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_plugin_loader_load(cmp_plugin_loader_t *loader,
+int CMP_API cmp_plugin_loader_load(cmp_plugin_loader_t *loader,
                                    const char *path, int *out_plugin_id);
 
 /**
@@ -46,7 +46,7 @@ CMP_API int cmp_plugin_loader_load(cmp_plugin_loader_t *loader,
  * @param plugin_id The plugin ID to unload.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_plugin_loader_unload(cmp_plugin_loader_t *loader,
+int CMP_API cmp_plugin_loader_unload(cmp_plugin_loader_t *loader,
                                      int plugin_id);
 
 /**
@@ -59,7 +59,7 @@ CMP_API int cmp_plugin_loader_unload(cmp_plugin_loader_t *loader,
  * @param out_response Pointer to receive the response. Must be freed.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader,
+int CMP_API cmp_plugin_loader_execute(cmp_plugin_loader_t *loader,
                                       int plugin_id, const char *function_name,
                                       const char *payload, char **out_response);
 
@@ -68,8 +68,7 @@ CMP_API int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader,
  * @param response The string to free.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_plugin_loader_free_response(char *response);
-
+int CMP_API cmp_plugin_loader_free_response(char *response);
 #ifdef __cplusplus
 }
 #endif

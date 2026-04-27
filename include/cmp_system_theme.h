@@ -14,13 +14,13 @@ extern "C" {
  * @brief Initialize the system theme listener
  * @return 0 on success.
  */
-CMP_API int cmp_system_theme_init(void);
+int CMP_API cmp_system_theme_init(void);
 
 /**
  * @brief Cleanup the system theme listener
  * @return 0 on success.
  */
-CMP_API int cmp_system_theme_shutdown(void);
+int CMP_API cmp_system_theme_shutdown(void);
 
 /**
  * @brief Get the current system color scheme preference
@@ -28,7 +28,7 @@ CMP_API int cmp_system_theme_shutdown(void);
  * light.
  * @return 0 on success.
  */
-CMP_API int cmp_system_theme_is_dark(int *out_is_dark);
+int CMP_API cmp_system_theme_is_dark(int *out_is_dark);
 
 /**
  * @brief Get the current system high contrast mode preference
@@ -36,8 +36,7 @@ CMP_API int cmp_system_theme_is_dark(int *out_is_dark);
  * 0 otherwise.
  * @return 0 on success.
  */
-CMP_API int cmp_system_theme_is_high_contrast(int *out_is_high_contrast);
-
+int CMP_API cmp_system_theme_is_high_contrast(int *out_is_high_contrast);
 #ifdef __cplusplus
 }
 #endif

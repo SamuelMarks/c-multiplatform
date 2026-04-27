@@ -23,7 +23,8 @@ struct cmp_csp {
  * @return Returns 0 on success, or an error code on failure.
  */
 static int str_duplicate(const char *src, char **out_dst) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   size_t len;
@@ -35,6 +36,9 @@ static int str_duplicate(const char *src, char **out_dst) {
       err_str = "Unknown";
     }
     cmp_log_debug("str_duplicate: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -46,9 +50,11 @@ static int str_duplicate(const char *src, char **out_dst) {
       err_str = "Unknown";
     }
     cmp_log_debug("str_duplicate: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
-
 #if defined(_MSC_VER)
   if (strcpy_s(*out_dst, len + 1, src) != 0) {
     cmp_log_debug("str_duplicate: strcpy_s failed\n");
@@ -57,6 +63,11 @@ static int str_duplicate(const char *src, char **out_dst) {
 #else
   strcpy(*out_dst, src);
 #endif
+
+  if (rc != 0) {
+
+    return rc;
+  }
 
   return rc;
 }
@@ -68,7 +79,8 @@ static int str_duplicate(const char *src, char **out_dst) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_csp_create(cmp_csp_t **out_csp) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_csp_t *csp = NULL;
@@ -81,6 +93,9 @@ int cmp_csp_create(cmp_csp_t **out_csp) {
     }
     cmp_log_debug("cmp_csp_create: Invalid argument (out_csp=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -91,12 +106,18 @@ int cmp_csp_create(cmp_csp_t **out_csp) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_csp_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   memset(csp, 0, sizeof(cmp_csp_t));
   *out_csp = csp;
   cmp_log_debug("cmp_csp_create: Successfully created CSP context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -107,7 +128,8 @@ int cmp_csp_create(cmp_csp_t **out_csp) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_csp_destroy(cmp_csp_t *csp) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   size_t i;
@@ -119,6 +141,9 @@ int cmp_csp_destroy(cmp_csp_t *csp) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_csp_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -154,7 +179,8 @@ int cmp_csp_destroy(cmp_csp_t *csp) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_csp_add_domain(cmp_csp_t *csp, const char *domain) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   size_t new_cap;
@@ -167,6 +193,9 @@ int cmp_csp_add_domain(cmp_csp_t *csp, const char *domain) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_csp_add_domain: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -181,6 +210,9 @@ int cmp_csp_add_domain(cmp_csp_t *csp, const char *domain) {
       cmp_log_debug(
           "cmp_csp_add_domain: Out of memory allocating domains: %s\n",
           err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
 
@@ -198,6 +230,9 @@ int cmp_csp_add_domain(cmp_csp_t *csp, const char *domain) {
   rc = str_duplicate(domain, &csp->domains[csp->count].domain);
   if (rc != CMP_SUCCESS) {
     cmp_log_debug("cmp_csp_add_domain: str_duplicate failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -217,7 +252,8 @@ int cmp_csp_add_domain(cmp_csp_t *csp, const char *domain) {
  */
 int cmp_csp_check_domain(const cmp_csp_t *csp, const char *domain,
                          cmp_csp_resource_type_t type, int *out_allowed) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   size_t i;
@@ -230,6 +266,9 @@ int cmp_csp_check_domain(const cmp_csp_t *csp, const char *domain,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_csp_check_domain: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -244,5 +283,14 @@ int cmp_csp_check_domain(const cmp_csp_t *csp, const char *domain,
   }
 
   cmp_log_debug("cmp_csp_check_domain: Rejected domain %s\n", domain);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

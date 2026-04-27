@@ -25,7 +25,7 @@ typedef struct cmp_m3_card_metrics {
   float border_thickness;
 } cmp_m3_card_metrics_t;
 
-CMP_API int cmp_m3_card_resolve(cmp_m3_card_variant_t variant,
+int CMP_API cmp_m3_card_resolve(cmp_m3_card_variant_t variant,
                                 cmp_m3_card_metrics_t *out_metrics);
 
 /**
@@ -42,7 +42,7 @@ typedef struct cmp_m3_dialog_metrics {
   float padding_all;
 } cmp_m3_dialog_metrics_t;
 
-CMP_API int cmp_m3_dialog_resolve(cmp_m3_dialog_variant_t variant,
+int CMP_API cmp_m3_dialog_resolve(cmp_m3_dialog_variant_t variant,
                                   cmp_m3_dialog_metrics_t *out_metrics);
 
 /**
@@ -60,7 +60,7 @@ typedef struct cmp_m3_divider_metrics {
   float inset_end;
 } cmp_m3_divider_metrics_t;
 
-CMP_API int cmp_m3_divider_resolve(cmp_m3_divider_variant_t variant,
+int CMP_API cmp_m3_divider_resolve(cmp_m3_divider_variant_t variant,
                                    cmp_m3_divider_metrics_t *out_metrics);
 
 /**
@@ -78,9 +78,8 @@ typedef struct cmp_m3_tooltip_metrics {
   cmp_m3_shape_family_t shape;
 } cmp_m3_tooltip_metrics_t;
 
-CMP_API int cmp_m3_tooltip_resolve(cmp_m3_tooltip_variant_t variant,
+int CMP_API cmp_m3_tooltip_resolve(cmp_m3_tooltip_variant_t variant,
                                    cmp_m3_tooltip_metrics_t *out_metrics);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

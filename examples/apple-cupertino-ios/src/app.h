@@ -8,7 +8,6 @@ extern "C" {
 int app_init(void);
 int app_run(void);
 int app_shutdown(void);
-
 #ifdef __cplusplus
 }
 #endif

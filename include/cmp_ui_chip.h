@@ -30,7 +30,7 @@ typedef struct cmp_ui_chip cmp_ui_chip_t;
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
+int CMP_API cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
                                uint32_t bg_color, uint32_t text_color);
 
 /**
@@ -40,7 +40,7 @@ CMP_API int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_chip_destroy(cmp_ui_chip_t *chip);
+int CMP_API cmp_ui_chip_destroy(cmp_ui_chip_t *chip);
 
 /**
  * rief Retrieves the underlying UI node for the chip.
@@ -50,7 +50,7 @@ CMP_API int cmp_ui_chip_destroy(cmp_ui_chip_t *chip);
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_chip_get_node(cmp_ui_chip_t *chip, cmp_ui_node_t **out_node);
+int CMP_API cmp_ui_chip_get_node(cmp_ui_chip_t *chip, cmp_ui_node_t **out_node);
 
 /**
  * rief Updates the text displayed in the chip.
@@ -60,8 +60,7 @@ CMP_API int cmp_ui_chip_get_node(cmp_ui_chip_t *chip, cmp_ui_node_t **out_node);
  *
 eturn 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_chip_set_text(cmp_ui_chip_t *chip, const char *text);
-
+int CMP_API cmp_ui_chip_set_text(cmp_ui_chip_t *chip, const char *text);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -416,7 +416,6 @@ SUITE(a11y_tree_suite) {
   RUN_TEST(test_a11y_tree_cognitive_motion_sound);
   RUN_TEST(test_a11y_tree_ignores_invert_color_hover);
 }
-
 #endif
 
 GREATEST_MAIN_DEFS();

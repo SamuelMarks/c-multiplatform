@@ -43,9 +43,9 @@ typedef struct cmp_f2_dialog_s {
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_dialog_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_dialog_create(cmp_ui_node_t **out_node,
                                  cmp_f2_dialog_variant_t variant);
-CMP_API int cmp_f2_dialog_set_open(cmp_ui_node_t *node, int is_open);
+int CMP_API cmp_f2_dialog_set_open(cmp_ui_node_t *node, int is_open);
 
 /* 7.2 Flyout / Popover */
 typedef enum cmp_f2_flyout_placement {
@@ -75,11 +75,11 @@ typedef struct cmp_f2_flyout_s {
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_flyout_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_flyout_create(cmp_ui_node_t **out_node,
                                  cmp_ui_node_t *anchor);
-CMP_API int cmp_f2_flyout_set_placement(cmp_ui_node_t *node,
+int CMP_API cmp_f2_flyout_set_placement(cmp_ui_node_t *node,
                                         cmp_f2_flyout_placement_t placement);
-CMP_API int cmp_f2_flyout_set_open(cmp_ui_node_t *node, int is_open);
+int CMP_API cmp_f2_flyout_set_open(cmp_ui_node_t *node, int is_open);
 
 /* 7.3 Tooltip */
 /** \brief Documented */
@@ -99,9 +99,9 @@ typedef struct cmp_f2_tooltip_s {
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_tooltip_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_tooltip_create(cmp_ui_node_t **out_node,
                                   cmp_ui_node_t *anchor, const char *label);
-CMP_API int cmp_f2_tooltip_set_visible(cmp_ui_node_t *node, int is_visible);
+int CMP_API cmp_f2_tooltip_set_visible(cmp_ui_node_t *node, int is_visible);
 
 /* 7.4 Toast / Notification */
 typedef enum cmp_f2_toast_intent {
@@ -137,9 +137,9 @@ typedef struct cmp_f2_toast_s {
  * @return 0 on success, or an error
  * code.
  */
-CMP_API int cmp_f2_toast_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_toast_create(cmp_ui_node_t **out_node,
                                 cmp_f2_toast_intent_t intent);
-CMP_API int cmp_f2_toast_set_visible(cmp_ui_node_t *node, int is_visible);
+int CMP_API cmp_f2_toast_set_visible(cmp_ui_node_t *node, int is_visible);
 
 /* 7.5 MessageBar (Inline Alert) */
 typedef enum cmp_f2_messagebar_variant {
@@ -162,9 +162,9 @@ typedef struct cmp_f2_messagebar_s {
  * @return 0 on success, or
  * an error code.
  */
-CMP_API int cmp_f2_messagebar_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_messagebar_create(cmp_ui_node_t **out_node,
                                      cmp_f2_toast_intent_t intent);
-CMP_API int cmp_f2_messagebar_set_variant(cmp_ui_node_t *node,
+int CMP_API cmp_f2_messagebar_set_variant(cmp_ui_node_t *node,
                                           cmp_f2_messagebar_variant_t variant);
 
 /* 7.6 ProgressBar & ProgressRing */
@@ -198,7 +198,7 @@ typedef struct cmp_f2_progress_s {
  * @return 0 on success, or
  * an error code.
  */
-CMP_API int cmp_f2_progress_bar_create(cmp_ui_node_t **out_node);
+int CMP_API cmp_f2_progress_bar_create(cmp_ui_node_t **out_node);
 /**
  * @brief Initialize a Fluent 2 progress_ring_create component.
  * @param
@@ -206,12 +206,12 @@ CMP_API int cmp_f2_progress_bar_create(cmp_ui_node_t **out_node);
  * @return 0 on success, or
  * an error code.
  */
-CMP_API int cmp_f2_progress_ring_create(cmp_ui_node_t **out_node);
-CMP_API int cmp_f2_progress_set_variant(cmp_ui_node_t *node,
+int CMP_API cmp_f2_progress_ring_create(cmp_ui_node_t **out_node);
+int CMP_API cmp_f2_progress_set_variant(cmp_ui_node_t *node,
                                         cmp_f2_progress_variant_t variant);
-CMP_API int cmp_f2_progress_set_state(cmp_ui_node_t *node,
+int CMP_API cmp_f2_progress_set_state(cmp_ui_node_t *node,
                                       cmp_f2_progress_state_t state);
-CMP_API int cmp_f2_progress_set_value(cmp_ui_node_t *node, float value);
+int CMP_API cmp_f2_progress_set_value(cmp_ui_node_t *node, float value);
 
 /* 7.7 Skeleton / Shimmer */
 typedef enum cmp_f2_skeleton_shape {
@@ -235,10 +235,9 @@ typedef struct cmp_f2_skeleton_s {
  * @return 0 on success, or
  * an error code.
  */
-CMP_API int cmp_f2_skeleton_create(cmp_ui_node_t **out_node,
+int CMP_API cmp_f2_skeleton_create(cmp_ui_node_t **out_node,
                                    cmp_f2_skeleton_shape_t shape);
-CMP_API int cmp_f2_skeleton_set_animated(cmp_ui_node_t *node, int is_animated);
-
+int CMP_API cmp_f2_skeleton_set_animated(cmp_ui_node_t *node, int is_animated);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

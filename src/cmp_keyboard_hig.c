@@ -27,24 +27,34 @@ struct cmp_ui_command {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pointer_region_create(cmp_pointer_region_t **out_region) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_pointer_region *ctx = NULL;
 
   if (!out_region) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_pointer_region_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_pointer_region), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_pointer_region_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   ctx->style = CMP_POINTER_INTERACTION_AUTOMATIC;
 
   *out_region = (cmp_pointer_region_t *)ctx;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -55,13 +65,17 @@ int cmp_pointer_region_create(cmp_pointer_region_t **out_region) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pointer_region_destroy(cmp_pointer_region_t *region_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (region_opaque) {
     rc = CMP_FREE(region_opaque);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_pointer_region_destroy: CMP_FREE failed\n");
     }
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -75,15 +89,28 @@ int cmp_pointer_region_destroy(cmp_pointer_region_t *region_opaque) {
  */
 int cmp_pointer_region_set_style(cmp_pointer_region_t *region_opaque,
                                  cmp_pointer_interaction_style_t style) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_pointer_region *ctx = (struct cmp_pointer_region *)region_opaque;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_pointer_region_set_style: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   ctx->style = style;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -97,13 +124,17 @@ int cmp_pointer_region_set_style(cmp_pointer_region_t *region_opaque,
  */
 int cmp_pointer_region_get_morph_scale(cmp_pointer_region_t *region_opaque,
                                        float *out_scale_x, float *out_scale_y) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_pointer_region *ctx = (struct cmp_pointer_region *)region_opaque;
 
   if (!ctx || !out_scale_x || !out_scale_y) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_pointer_region_get_morph_scale: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -125,6 +156,15 @@ int cmp_pointer_region_get_morph_scale(cmp_pointer_region_t *region_opaque,
     *out_scale_y = 1.0f;
     break;
   }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -138,18 +178,25 @@ int cmp_pointer_region_get_morph_scale(cmp_pointer_region_t *region_opaque,
  */
 int cmp_keyboard_shortcut_create(cmp_keyboard_shortcut_t **out_shortcut,
                                  char key, uint32_t modifier_flags) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_keyboard_shortcut *ctx = NULL;
 
   if (!out_shortcut) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_keyboard_shortcut_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_keyboard_shortcut), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_keyboard_shortcut_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -157,6 +204,9 @@ int cmp_keyboard_shortcut_create(cmp_keyboard_shortcut_t **out_shortcut,
   ctx->modifiers = modifier_flags;
 
   *out_shortcut = (cmp_keyboard_shortcut_t *)ctx;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -167,13 +217,17 @@ int cmp_keyboard_shortcut_create(cmp_keyboard_shortcut_t **out_shortcut,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_keyboard_shortcut_destroy(cmp_keyboard_shortcut_t *shortcut_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (shortcut_opaque) {
     rc = CMP_FREE(shortcut_opaque);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_keyboard_shortcut_destroy: CMP_FREE failed\n");
     }
+  }
+  if (rc != 0) {
+    return rc;
   }
   return rc;
 }
@@ -188,19 +242,26 @@ int cmp_keyboard_shortcut_destroy(cmp_keyboard_shortcut_t *shortcut_opaque) {
  */
 int cmp_ui_command_create(cmp_ui_command_t **out_command, const char *title,
                           const char *action_id) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_ui_command *ctx = NULL;
   size_t len;
 
   if (!out_command || !title || !action_id) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ui_command_create: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_ui_command), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_ui_command_create: Out of memory\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -212,6 +273,9 @@ int cmp_ui_command_create(cmp_ui_command_t **out_command, const char *title,
     CMP_FREE(ctx);
     LOG_DEBUG(
         "Error in cmp_ui_command_create: Out of memory allocating title\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 #if defined(_MSC_VER)
@@ -227,6 +291,9 @@ int cmp_ui_command_create(cmp_ui_command_t **out_command, const char *title,
     CMP_FREE(ctx);
     LOG_DEBUG(
         "Error in cmp_ui_command_create: Out of memory allocating action_id\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 #if defined(_MSC_VER)
@@ -236,6 +303,9 @@ int cmp_ui_command_create(cmp_ui_command_t **out_command, const char *title,
 #endif
 
   *out_command = (cmp_ui_command_t *)ctx;
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -246,11 +316,15 @@ int cmp_ui_command_create(cmp_ui_command_t **out_command, const char *title,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_command_destroy(cmp_ui_command_t *command_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int free_rc;
   struct cmp_ui_command *ctx = (struct cmp_ui_command *)command_opaque;
 
   if (!ctx) {
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -278,6 +352,15 @@ int cmp_ui_command_destroy(cmp_ui_command_t *command_opaque) {
   free_rc = CMP_FREE(ctx);
   if (free_rc != CMP_SUCCESS)
     rc = free_rc;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -290,12 +373,16 @@ int cmp_ui_command_destroy(cmp_ui_command_t *command_opaque) {
  */
 int cmp_ui_command_set_shortcut(cmp_ui_command_t *command_opaque,
                                 cmp_keyboard_shortcut_t *shortcut_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   struct cmp_ui_command *ctx = (struct cmp_ui_command *)command_opaque;
 
   if (!ctx || !shortcut_opaque) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ui_command_set_shortcut: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -304,6 +391,15 @@ int cmp_ui_command_set_shortcut(cmp_ui_command_t *command_opaque,
   }
   ctx->shortcut = (struct cmp_keyboard_shortcut *)shortcut_opaque;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -316,18 +412,25 @@ int cmp_ui_command_set_shortcut(cmp_ui_command_t *command_opaque,
  */
 int cmp_keyboard_calculate_key_repeat(float time_held_ms,
                                       float *out_repeat_interval_ms) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   float scale;
 
   if (!out_repeat_interval_ms) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_keyboard_calculate_key_repeat: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   /* Initial delay before repeat starts (typical OS default: ~500ms) */
   if (time_held_ms < 500.0f) {
     *out_repeat_interval_ms = 0.0f; /* Do not repeat yet */
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -341,6 +444,15 @@ int cmp_keyboard_calculate_key_repeat(float time_held_ms,
   if (*out_repeat_interval_ms < 20.0f)
     *out_repeat_interval_ms = 20.0f;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -355,11 +467,15 @@ int cmp_keyboard_calculate_key_repeat(float time_held_ms,
  */
 int cmp_trackpad_evaluate_gesture(float delta_x, float delta_y,
                                   float *out_pan_x, float *out_pan_y) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!out_pan_x || !out_pan_y) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_trackpad_evaluate_gesture: Invalid argument\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -368,5 +484,14 @@ int cmp_trackpad_evaluate_gesture(float delta_x, float delta_y,
   *out_pan_x = delta_x;
   *out_pan_y = delta_y;
 
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

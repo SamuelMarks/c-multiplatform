@@ -18,7 +18,8 @@ struct cmp_plugin_loader {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_plugin_loader_create(cmp_plugin_loader_t **out_loader) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_plugin_loader_t *loader = NULL;
 
   if (!out_loader) {
@@ -46,7 +47,8 @@ int cmp_plugin_loader_create(cmp_plugin_loader_t **out_loader) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_plugin_loader_destroy(cmp_plugin_loader_t *loader) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!loader) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -72,7 +74,8 @@ int cmp_plugin_loader_destroy(cmp_plugin_loader_t *loader) {
  */
 int cmp_plugin_loader_load(cmp_plugin_loader_t *loader, const char *path,
                            int *out_plugin_id) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!loader || !path || !out_plugin_id) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -83,7 +86,7 @@ int cmp_plugin_loader_load(cmp_plugin_loader_t *loader, const char *path,
   /* Mock load */
   loader->active_plugin_id++;
   *out_plugin_id = loader->active_plugin_id;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -94,7 +97,8 @@ int cmp_plugin_loader_load(cmp_plugin_loader_t *loader, const char *path,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_plugin_loader_unload(cmp_plugin_loader_t *loader, int plugin_id) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!loader || plugin_id <= 0) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -106,8 +110,7 @@ int cmp_plugin_loader_unload(cmp_plugin_loader_t *loader, int plugin_id) {
   if (plugin_id == loader->active_plugin_id) {
     loader->active_plugin_id--;
   }
-
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -123,7 +126,8 @@ int cmp_plugin_loader_unload(cmp_plugin_loader_t *loader, int plugin_id) {
 int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
                               const char *function_name, const char *payload,
                               char **out_response) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   const char *dummy_resp = "{\"status\":\"ok\"}";
   size_t len;
 
@@ -148,6 +152,11 @@ int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
 #endif
   (*out_response)[len] = '\0';
 
+  if (rc != 0) {
+
+    return rc;
+  }
+
   return rc;
 }
 
@@ -158,7 +167,8 @@ int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_plugin_loader_free_response(char *response) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!response) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -169,6 +179,11 @@ int cmp_plugin_loader_free_response(char *response) {
   rc = CMP_FREE(response);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_plugin_loader_free_response: CMP_FREE failed\n");
+    return rc;
+  }
+
+  if (rc != 0) {
+
     return rc;
   }
 

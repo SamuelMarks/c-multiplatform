@@ -28,7 +28,7 @@ typedef struct cmp_ui_spinner cmp_ui_spinner_t;
  * \param color The color of the spinner (ARGB).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_spinner_create(cmp_ui_spinner_t **out_spinner, float size,
+int CMP_API cmp_ui_spinner_create(cmp_ui_spinner_t **out_spinner, float size,
                                   uint32_t color);
 
 /**
@@ -37,7 +37,7 @@ CMP_API int cmp_ui_spinner_create(cmp_ui_spinner_t **out_spinner, float size,
  * \param spinner The spinner component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_spinner_destroy(cmp_ui_spinner_t *spinner);
+int CMP_API cmp_ui_spinner_destroy(cmp_ui_spinner_t *spinner);
 
 /**
  * \brief Retrieves the underlying UI node for the spinner.
@@ -46,7 +46,7 @@ CMP_API int cmp_ui_spinner_destroy(cmp_ui_spinner_t *spinner);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_spinner_get_node(cmp_ui_spinner_t *spinner,
+int CMP_API cmp_ui_spinner_get_node(cmp_ui_spinner_t *spinner,
                                     cmp_ui_node_t **out_node);
 
 /**
@@ -56,8 +56,7 @@ CMP_API int cmp_ui_spinner_get_node(cmp_ui_spinner_t *spinner,
  * \param dt_ms The time delta in milliseconds since the last update.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_spinner_update(cmp_ui_spinner_t *spinner, float dt_ms);
-
+int CMP_API cmp_ui_spinner_update(cmp_ui_spinner_t *spinner, float dt_ms);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -17,7 +17,8 @@ struct cmp_form_controls {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_form_controls_create(cmp_form_controls_t **out_controls) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_form_controls *controls = NULL;
@@ -31,6 +32,9 @@ int cmp_form_controls_create(cmp_form_controls_t **out_controls) {
     cmp_log_debug(
         "cmp_form_controls_create: Invalid argument (out_controls=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -41,6 +45,9 @@ int cmp_form_controls_create(cmp_form_controls_t **out_controls) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_form_controls_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -59,7 +66,8 @@ int cmp_form_controls_create(cmp_form_controls_t **out_controls) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_form_controls_destroy(cmp_form_controls_t *controls) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_form_controls *internal_controls =
@@ -72,6 +80,9 @@ int cmp_form_controls_destroy(cmp_form_controls_t *controls) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_form_controls_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 

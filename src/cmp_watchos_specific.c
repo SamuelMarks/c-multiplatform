@@ -14,6 +14,8 @@ struct cmp_watchos_features {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_watchos_features_create(cmp_watchos_features_t **out_features) {
+  int rc;
+  rc = 0;
   struct cmp_watchos_features *ctx;
   if (!out_features)
     return CMP_ERROR_INVALID_ARG;
@@ -24,7 +26,16 @@ int cmp_watchos_features_create(cmp_watchos_features_t **out_features) {
   ctx->aod_enabled = 0;
 
   *out_features = (cmp_watchos_features_t *)ctx;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -34,9 +45,20 @@ int cmp_watchos_features_create(cmp_watchos_features_t **out_features) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_watchos_features_destroy(cmp_watchos_features_t *features_opaque) {
+  int rc;
+  rc = 0;
   if (features_opaque)
     CMP_FREE(features_opaque);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -48,6 +70,8 @@ int cmp_watchos_features_destroy(cmp_watchos_features_t *features_opaque) {
  */
 int cmp_watchos_handle_digital_crown(cmp_watchos_features_t *features_opaque,
                                      float delta) {
+  int rc;
+  rc = 0;
   struct cmp_watchos_features *ctx =
       (struct cmp_watchos_features *)features_opaque;
   if (!ctx || delta == 0.0f)
@@ -55,7 +79,16 @@ int cmp_watchos_handle_digital_crown(cmp_watchos_features_t *features_opaque,
 
   /* Translates crown rotation delta to scroll offsets and fires haptics for
    * pagination boundaries */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -65,6 +98,8 @@ int cmp_watchos_handle_digital_crown(cmp_watchos_features_t *features_opaque,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_watchos_handle_double_tap(cmp_watchos_features_t *features_opaque) {
+  int rc;
+  rc = 0;
   struct cmp_watchos_features *ctx =
       (struct cmp_watchos_features *)features_opaque;
   if (!ctx)
@@ -72,7 +107,16 @@ int cmp_watchos_handle_double_tap(cmp_watchos_features_t *features_opaque) {
 
   /* Triggers the primary view action defined for the Series 9 / Ultra 2 double
    * tap */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -84,6 +128,8 @@ int cmp_watchos_handle_double_tap(cmp_watchos_features_t *features_opaque) {
  */
 int cmp_watchos_set_aod_state(cmp_watchos_features_t *features_opaque,
                               int is_wrist_down) {
+  int rc;
+  rc = 0;
   struct cmp_watchos_features *ctx =
       (struct cmp_watchos_features *)features_opaque;
   if (!ctx)
@@ -91,7 +137,16 @@ int cmp_watchos_set_aod_state(cmp_watchos_features_t *features_opaque,
 
   ctx->aod_enabled = is_wrist_down;
   /* Dims visual components, hides sensitive data, reduces render loop to 1Hz */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -103,13 +158,24 @@ int cmp_watchos_set_aod_state(cmp_watchos_features_t *features_opaque,
  */
 int cmp_watchos_export_complication_data(
     cmp_watchos_features_t *features_opaque, const char *json_data) {
+  int rc;
+  rc = 0;
   struct cmp_watchos_features *ctx =
       (struct cmp_watchos_features *)features_opaque;
   if (!ctx || !json_data)
     return CMP_ERROR_INVALID_ARG;
 
   /* Exports data formatted for CLKComplicationTemplate */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -121,13 +187,24 @@ int cmp_watchos_export_complication_data(
  */
 int cmp_watchos_export_smart_stack(cmp_watchos_features_t *features_opaque,
                                    const char *json_data) {
+  int rc;
+  rc = 0;
   struct cmp_watchos_features *ctx =
       (struct cmp_watchos_features *)features_opaque;
   if (!ctx || !json_data)
     return CMP_ERROR_INVALID_ARG;
 
   /* App provides relevant UI snippets to the watchOS 10+ Smart Stack */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -139,13 +216,24 @@ int cmp_watchos_export_smart_stack(cmp_watchos_features_t *features_opaque,
  */
 int cmp_watchos_apply_edge_to_edge_styling(
     cmp_watchos_features_t *features_opaque, void *node) {
+  int rc;
+  rc = 0;
   struct cmp_watchos_features *ctx =
       (struct cmp_watchos_features *)features_opaque;
   if (!ctx || !node)
     return CMP_ERROR_INVALID_ARG;
 
   /* Forces pure black background, strips cards/borders/side-insets */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -157,13 +245,24 @@ int cmp_watchos_apply_edge_to_edge_styling(
  */
 int cmp_watchos_apply_pill_button_styling(
     cmp_watchos_features_t *features_opaque, void *button_node) {
+  int rc;
+  rc = 0;
   struct cmp_watchos_features *ctx =
       (struct cmp_watchos_features *)features_opaque;
   if (!ctx || !button_node)
     return CMP_ERROR_INVALID_ARG;
 
   /* Forces full-width, pill-shape for primary actions */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -175,11 +274,22 @@ int cmp_watchos_apply_pill_button_styling(
  */
 int cmp_watchos_apply_hierarchical_pagination(
     cmp_watchos_features_t *features_opaque, void *view_controller) {
+  int rc;
+  rc = 0;
   struct cmp_watchos_features *ctx =
       (struct cmp_watchos_features *)features_opaque;
   if (!ctx || !view_controller)
     return CMP_ERROR_INVALID_ARG;
 
   /* Limits navigation to 1-deep push or vertical pagination */
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

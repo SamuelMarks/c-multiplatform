@@ -86,7 +86,6 @@ SUITE(focus_ring_suite) {
   RUN_TEST(test_focus_ring_null_args);
   RUN_TEST(test_focus_ring_operations);
 }
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -42,6 +42,9 @@ int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
   rc = CMP_MALLOC(sizeof(cmp_ui_action_button_t), (void **)&btn);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_action_button_create: OOM\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   memset(btn, 0, sizeof(cmp_ui_action_button_t));
@@ -76,6 +79,9 @@ int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE failed\n");
     }
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -103,6 +109,9 @@ int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
     rc = CMP_FREE(btn);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE failed\n");
+    }
+    if (rc != 0) {
+      return rc;
     }
     return rc;
   }
@@ -144,6 +153,9 @@ int cmp_ui_action_button_destroy(cmp_ui_action_button_t *btn) {
   rc = CMP_FREE(btn);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_action_button_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -158,12 +170,23 @@ int cmp_ui_action_button_destroy(cmp_ui_action_button_t *btn) {
  */
 int cmp_ui_action_button_get_node(cmp_ui_action_button_t *btn,
                                   cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!btn || !out_node) {
     LOG_DEBUG("cmp_ui_action_button_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = btn->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -196,6 +219,9 @@ int cmp_ui_action_button_set_label(cmp_ui_action_button_t *btn,
     rc = CMP_MALLOC(len + 1, (void **)&btn->label);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_action_button_set_label: OOM\n");
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     memcpy(btn->label, label, len + 1);

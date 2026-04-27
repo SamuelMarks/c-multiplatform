@@ -21,14 +21,14 @@ typedef struct cmp_screen_capture cmp_screen_capture_t;
  * @param out_capture Pointer to receive the created instance.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_screen_capture_create(cmp_screen_capture_t **out_capture);
+int CMP_API cmp_screen_capture_create(cmp_screen_capture_t **out_capture);
 
 /**
  * @brief Destroys a screen capture instance.
  * @param capture The instance to destroy.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_screen_capture_destroy(cmp_screen_capture_t *capture);
+int CMP_API cmp_screen_capture_destroy(cmp_screen_capture_t *capture);
 
 /**
  * @brief Captures the active window's visual state.
@@ -38,7 +38,7 @@ CMP_API int cmp_screen_capture_destroy(cmp_screen_capture_t *capture);
  * @param out_height Pointer to receive image height.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_screen_capture_active_window(cmp_screen_capture_t *capture,
+int CMP_API cmp_screen_capture_active_window(cmp_screen_capture_t *capture,
                                              unsigned char **out_pixels,
                                              int *out_width, int *out_height);
 
@@ -52,7 +52,7 @@ CMP_API int cmp_screen_capture_active_window(cmp_screen_capture_t *capture,
  * @param out_pixels Pointer to receive the RGBA pixel array. Must be freed.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_screen_capture_region(cmp_screen_capture_t *capture, int x,
+int CMP_API cmp_screen_capture_region(cmp_screen_capture_t *capture, int x,
                                       int y, int width, int height,
                                       unsigned char **out_pixels);
 
@@ -61,8 +61,7 @@ CMP_API int cmp_screen_capture_region(cmp_screen_capture_t *capture, int x,
  * @param pixels The pixel array to free.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_screen_capture_free_pixels(unsigned char *pixels);
-
+int CMP_API cmp_screen_capture_free_pixels(unsigned char *pixels);
 #ifdef __cplusplus
 }
 #endif

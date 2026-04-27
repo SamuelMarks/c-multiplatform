@@ -136,6 +136,9 @@ int cmp_ui_fab_destroy(cmp_ui_fab_t *fab) {
   rc = CMP_FREE(fab);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_fab_destroy: CMP_FREE fab failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -150,12 +153,23 @@ int cmp_ui_fab_destroy(cmp_ui_fab_t *fab) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_fab_get_node(cmp_ui_fab_t *fab, cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!fab || !out_node) {
     LOG_DEBUG("cmp_ui_fab_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = fab->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -248,6 +262,9 @@ int cmp_ui_fab_bind_a11y(cmp_ui_fab_t *widget, cmp_a11y_tree_t *tree) {
                               "Floating Action Button");
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_fab_bind_a11y: cmp_a11y_tree_add_node failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -255,6 +272,9 @@ int cmp_ui_fab_bind_a11y(cmp_ui_fab_t *widget, cmp_a11y_tree_t *tree) {
                                      CMP_A11Y_TRAIT_BUTTON);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_fab_bind_a11y: cmp_a11y_tree_set_node_traits failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 

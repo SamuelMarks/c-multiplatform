@@ -12,8 +12,10 @@
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_measure_button(const cmp_ui_node_t *node, float *width,
-                                     float *height) {
+int cmp_material3_measure_button(const cmp_ui_node_t *node, float *width,
+                                 float *height) {
+  int rc;
+  rc = 0;
   float calc_width = 64.0f;  /* Min width for M3 button */
   float calc_height = 40.0f; /* Standard M3 button height */
   float font_size;
@@ -37,6 +39,12 @@ int32_t cmp_material3_measure_button(const cmp_ui_node_t *node, float *width,
     *width = calc_width < 64.0f ? 64.0f : calc_width;
   if (height)
     *height = calc_height;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -48,14 +56,22 @@ int32_t cmp_material3_measure_button(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_measure_text_input(const cmp_ui_node_t *node,
-                                         float *width, float *height) {
+int cmp_material3_measure_text_input(const cmp_ui_node_t *node, float *width,
+                                     float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 210.0f;
   if (height)
     *height = 56.0f; /* M3 text field height */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -67,14 +83,22 @@ int32_t cmp_material3_measure_text_input(const cmp_ui_node_t *node,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_measure_slider(const cmp_ui_node_t *node, float *width,
-                                     float *height) {
+int cmp_material3_measure_slider(const cmp_ui_node_t *node, float *width,
+                                 float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 200.0f;
   if (height)
     *height = 44.0f; /* M3 slider touch target */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -86,14 +110,22 @@ int32_t cmp_material3_measure_slider(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_measure_toggle(const cmp_ui_node_t *node, float *width,
-                                     float *height) {
+int cmp_material3_measure_toggle(const cmp_ui_node_t *node, float *width,
+                                 float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 52.0f; /* M3 switch width */
   if (height)
     *height = 32.0f; /* M3 switch height */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -105,14 +137,22 @@ int32_t cmp_material3_measure_toggle(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_measure_checkbox(const cmp_ui_node_t *node, float *width,
-                                       float *height) {
+int cmp_material3_measure_checkbox(const cmp_ui_node_t *node, float *width,
+                                   float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 18.0f; /* M3 checkbox visual size */
   if (height)
     *height = 18.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -124,14 +164,22 @@ int32_t cmp_material3_measure_checkbox(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_measure_radio(const cmp_ui_node_t *node, float *width,
-                                    float *height) {
+int cmp_material3_measure_radio(const cmp_ui_node_t *node, float *width,
+                                float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 20.0f; /* M3 radio visual size */
   if (height)
     *height = 20.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -143,14 +191,22 @@ int32_t cmp_material3_measure_radio(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_measure_progress(const cmp_ui_node_t *node, float *width,
-                                       float *height) {
+int cmp_material3_measure_progress(const cmp_ui_node_t *node, float *width,
+                                   float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 200.0f;
   if (height)
     *height = 4.0f; /* M3 linear progress indicator thickness */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -162,14 +218,22 @@ int32_t cmp_material3_measure_progress(const cmp_ui_node_t *node, float *width,
  * @param height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_measure_dropdown(const cmp_ui_node_t *node, float *width,
-                                       float *height) {
+int cmp_material3_measure_dropdown(const cmp_ui_node_t *node, float *width,
+                                   float *height) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 210.0f; /* Matches text_input */
   if (height)
     *height = 56.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -179,13 +243,21 @@ int32_t cmp_material3_measure_dropdown(const cmp_ui_node_t *node, float *width,
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_layout_nav_bar(cmp_ui_node_t *node) {
+int cmp_material3_layout_nav_bar(cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_ROW;
   node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
   node->layout->justify_content = CMP_FLEX_ALIGN_SPACE_BETWEEN;
   node->layout->min_height = 64.0f; /* M3 top app bar medium/small */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -195,13 +267,21 @@ int32_t cmp_material3_layout_nav_bar(cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_layout_tab_bar(cmp_ui_node_t *node) {
+int cmp_material3_layout_tab_bar(cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_ROW;
   node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_height = 48.0f; /* M3 primary tabs */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -211,7 +291,9 @@ int32_t cmp_material3_layout_tab_bar(cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_layout_dialog_content(cmp_ui_node_t *node) {
+int cmp_material3_layout_dialog_content(cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_COLUMN;
@@ -219,6 +301,12 @@ int32_t cmp_material3_layout_dialog_content(cmp_ui_node_t *node) {
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_width = 280.0f; /* M3 basic dialog */
   node->layout->max_width = 560.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -228,7 +316,9 @@ int32_t cmp_material3_layout_dialog_content(cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_layout_sidebar(cmp_ui_node_t *node) {
+int cmp_material3_layout_sidebar(cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_COLUMN;
@@ -236,6 +326,12 @@ int32_t cmp_material3_layout_sidebar(cmp_ui_node_t *node) {
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_width = 256.0f; /* M3 standard navigation drawer */
   node->layout->max_width = 360.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -245,7 +341,9 @@ int32_t cmp_material3_layout_sidebar(cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_draw_button(const cmp_ui_node_t *node) {
+int cmp_material3_draw_button(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -263,6 +361,12 @@ int32_t cmp_material3_draw_button(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -272,7 +376,9 @@ int32_t cmp_material3_draw_button(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_draw_card(const cmp_ui_node_t *node) {
+int cmp_material3_draw_card(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -290,6 +396,12 @@ int32_t cmp_material3_draw_card(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -299,7 +411,9 @@ int32_t cmp_material3_draw_card(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_draw_text_input(const cmp_ui_node_t *node) {
+int cmp_material3_draw_text_input(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -317,6 +431,12 @@ int32_t cmp_material3_draw_text_input(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -326,7 +446,9 @@ int32_t cmp_material3_draw_text_input(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_draw_slider(const cmp_ui_node_t *node) {
+int cmp_material3_draw_slider(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -344,6 +466,12 @@ int32_t cmp_material3_draw_slider(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -353,7 +481,9 @@ int32_t cmp_material3_draw_slider(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_draw_toggle(const cmp_ui_node_t *node) {
+int cmp_material3_draw_toggle(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -371,6 +501,12 @@ int32_t cmp_material3_draw_toggle(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -380,7 +516,9 @@ int32_t cmp_material3_draw_toggle(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_draw_checkbox(const cmp_ui_node_t *node) {
+int cmp_material3_draw_checkbox(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -398,6 +536,12 @@ int32_t cmp_material3_draw_checkbox(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -407,7 +551,9 @@ int32_t cmp_material3_draw_checkbox(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_draw_radio(const cmp_ui_node_t *node) {
+int cmp_material3_draw_radio(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -425,6 +571,12 @@ int32_t cmp_material3_draw_radio(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -434,7 +586,9 @@ int32_t cmp_material3_draw_radio(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_draw_progress(const cmp_ui_node_t *node) {
+int cmp_material3_draw_progress(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -452,6 +606,12 @@ int32_t cmp_material3_draw_progress(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -461,7 +621,9 @@ int32_t cmp_material3_draw_progress(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_draw_tooltip(const cmp_ui_node_t *node) {
+int cmp_material3_draw_tooltip(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -479,6 +641,12 @@ int32_t cmp_material3_draw_tooltip(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -488,7 +656,9 @@ int32_t cmp_material3_draw_tooltip(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_draw_menu(const cmp_ui_node_t *node) {
+int cmp_material3_draw_menu(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -506,6 +676,12 @@ int32_t cmp_material3_draw_menu(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -515,7 +691,9 @@ int32_t cmp_material3_draw_menu(const cmp_ui_node_t *node) {
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_draw_focus_ring(const cmp_ui_node_t *node) {
+int cmp_material3_draw_focus_ring(const cmp_ui_node_t *node) {
+  int rc;
+  rc = 0;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -533,6 +711,12 @@ int32_t cmp_material3_draw_focus_ring(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -545,8 +729,10 @@ int32_t cmp_material3_draw_focus_ring(const cmp_ui_node_t *node) {
  * @param damping Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_get_spring_config(const cmp_ui_node_t *node, float *mass,
-                                        float *stiffness, float *damping) {
+int cmp_material3_get_spring_config(const cmp_ui_node_t *node, float *mass,
+                                    float *stiffness, float *damping) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   /* Material standard emphasized easing mapping approximated to spring */
@@ -556,6 +742,12 @@ int32_t cmp_material3_get_spring_config(const cmp_ui_node_t *node, float *mass,
     *stiffness = 200.0f;
   if (damping)
     *damping = 20.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -567,14 +759,22 @@ int32_t cmp_material3_get_spring_config(const cmp_ui_node_t *node, float *mass,
  * @param opacity Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_get_ripple_config(const cmp_ui_node_t *node,
-                                        float *duration, float *opacity) {
+int cmp_material3_get_ripple_config(const cmp_ui_node_t *node, float *duration,
+                                    float *opacity) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (duration)
     *duration = 200.0f; /* Standard ripple expansion duration */
   if (opacity)
     *opacity = 0.12f; /* Standard ripple opacity */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -586,8 +786,10 @@ int32_t cmp_material3_get_ripple_config(const cmp_ui_node_t *node,
  * @param opacity Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_get_state_layer_opacity(const cmp_ui_node_t *node,
-                                              int32_t state, float *opacity) {
+int cmp_material3_get_state_layer_opacity(const cmp_ui_node_t *node, int state,
+                                          float *opacity) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (!opacity)
@@ -608,6 +810,12 @@ int32_t cmp_material3_get_state_layer_opacity(const cmp_ui_node_t *node,
     *opacity = 0.0f;
     break;
   }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
 
@@ -618,17 +826,24 @@ int32_t cmp_material3_get_state_layer_opacity(const cmp_ui_node_t *node,
  * @param duration Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int32_t cmp_material3_get_transition_duration(const cmp_ui_node_t *node,
-                                              float *duration) {
+int cmp_material3_get_transition_duration(const cmp_ui_node_t *node,
+                                          float *duration) {
+  int rc;
+  rc = 0;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   /* Material standard transitions range from 150ms to 500ms based on emphasis
    */
   if (duration)
     *duration = 300.0f;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_SUCCESS;
 }
-
 #ifndef CMP_THEME_MODE_SINGLE_STATIC
 const cmp_theme_vtable_t cmp_material3_vtable = {
     cmp_material3_measure_button,
@@ -664,7 +879,22 @@ const cmp_theme_vtable_t cmp_material3_vtable = {
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_API const cmp_theme_vtable_t *cmp_theme_get_material3_vtable(void) {
-  return &cmp_material3_vtable;
+int CMP_API
+cmp_theme_get_material3_vtable(const cmp_theme_vtable_t **out_vtable) {
+  int rc;
+  rc = 0;
+  if (out_vtable) {
+    *out_vtable = &cmp_material3_vtable;
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 #endif /* CMP_THEME_MODE_SINGLE_STATIC */

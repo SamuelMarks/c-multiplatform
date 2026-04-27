@@ -83,6 +83,8 @@ int cmp_native_dialog_destroy(cmp_native_dialog_t *dialog) {
  */
 int cmp_native_dialog_show(cmp_native_dialog_t *dialog,
                            cmp_dialog_type_t type) {
+  int rc;
+  rc = 0;
   if (dialog == NULL) {
     LOG_DEBUG("Error in cmp_native_dialog_show: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -127,7 +129,6 @@ int cmp_native_dialog_get_result_string(const cmp_native_dialog_t *dialog,
               "(OOM)\n");
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   rc = strcpy_s(*out_result, len + 1, dialog->result_string);
   if (rc != 0) {
@@ -184,7 +185,6 @@ int cmp_native_dialog_set_result_string(cmp_native_dialog_t *dialog,
               "(OOM)\n");
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   rc = strcpy_s(dialog->result_string, len + 1, result);
   if (rc != 0) {

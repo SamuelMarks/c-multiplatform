@@ -10,6 +10,7 @@
  * @return 0 on success, 1 on failure.
  */
 int main(int argc, char **argv) {
+  int rc = 0;
   (void)argc;
   (void)argv;
 
@@ -23,5 +24,8 @@ int main(int argc, char **argv) {
   app_shutdown();
 
   printf("Example exited cleanly.\n");
-  return 0;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

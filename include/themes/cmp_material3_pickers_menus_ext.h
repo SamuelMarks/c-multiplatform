@@ -24,7 +24,7 @@ typedef struct cmp_m3_date_picker_metrics {
   float day_selection_size;
 } cmp_m3_date_picker_metrics_t;
 
-CMP_API int
+int CMP_API
 cmp_m3_date_picker_resolve(cmp_m3_date_picker_variant_t variant,
                            cmp_m3_date_picker_metrics_t *out_metrics);
 
@@ -42,10 +42,9 @@ typedef struct cmp_m3_time_picker_metrics {
   float am_pm_segment_height;
 } cmp_m3_time_picker_metrics_t;
 
-CMP_API int
+int CMP_API
 cmp_m3_time_picker_resolve(cmp_m3_time_picker_variant_t variant,
                            cmp_m3_time_picker_metrics_t *out_metrics);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

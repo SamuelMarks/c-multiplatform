@@ -16,11 +16,13 @@ struct cmp_promotion_link {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_promotion_link_create(cmp_promotion_link_t **out_link) {
+  int rc;
+  rc = 0;
   struct cmp_promotion_link *ctx;
   if (!out_link)
     return CMP_ERROR_INVALID_ARG;
-  if (CMP_MALLOC(sizeof(struct cmp_promotion_link), (void **)&ctx) !=
-      CMP_SUCCESS)
+  rc = CMP_MALLOC(sizeof(struct cmp_promotion_link), (void **)&ctx);
+  if (rc != CMP_SUCCESS)
     return CMP_ERROR_OOM;
 
   ctx->is_sync_enabled = 0;
@@ -38,8 +40,14 @@ int cmp_promotion_link_create(cmp_promotion_link_t **out_link) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_promotion_link_destroy(cmp_promotion_link_t *link) {
-  if (link)
-    CMP_FREE(link);
+  int rc;
+  rc = 0;
+  if (link) {
+    rc = CMP_FREE(link);
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
+  }
   return CMP_SUCCESS;
 }
 
@@ -51,6 +59,8 @@ int cmp_promotion_link_destroy(cmp_promotion_link_t *link) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_promotion_link_sync(cmp_promotion_link_t *link, int is_sync_enabled) {
+  int rc;
+  rc = 0;
   struct cmp_promotion_link *l = (struct cmp_promotion_link *)link;
   if (!l)
     return CMP_ERROR_INVALID_ARG;
@@ -67,6 +77,8 @@ int cmp_promotion_link_sync(cmp_promotion_link_t *link, int is_sync_enabled) {
  */
 int cmp_promotion_link_request_rate(cmp_promotion_link_t *link,
                                     cmp_frame_rate_t requested_rate) {
+  int rc;
+  rc = 0;
   struct cmp_promotion_link *l = (struct cmp_promotion_link *)link;
   if (!l)
     return CMP_ERROR_INVALID_ARG;
@@ -86,6 +98,8 @@ int cmp_promotion_link_request_rate(cmp_promotion_link_t *link,
 int cmp_promotion_link_evaluate_vrr(cmp_promotion_link_t *link,
                                     int is_animating, int is_scrolling,
                                     cmp_frame_rate_t *out_target_rate) {
+  int rc;
+  rc = 0;
   struct cmp_promotion_link *l = (struct cmp_promotion_link *)link;
   if (!l || !out_target_rate)
     return CMP_ERROR_INVALID_ARG;
@@ -112,6 +126,8 @@ int cmp_promotion_link_evaluate_vrr(cmp_promotion_link_t *link,
  */
 int cmp_promotion_link_validate_frame_drops(cmp_promotion_link_t *link,
                                             int *out_dropped_frames) {
+  int rc;
+  rc = 0;
   struct cmp_promotion_link *l = (struct cmp_promotion_link *)link;
   if (!l || !out_dropped_frames)
     return CMP_ERROR_INVALID_ARG;

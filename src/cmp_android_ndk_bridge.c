@@ -16,7 +16,8 @@ struct cmp_android_ndk_bridge {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_android_ndk_bridge_create(cmp_android_ndk_bridge_t **out_bridge) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_android_ndk_bridge_t *br = NULL;
@@ -30,6 +31,9 @@ int cmp_android_ndk_bridge_create(cmp_android_ndk_bridge_t **out_bridge) {
     cmp_log_debug("cmp_android_ndk_bridge_create: Invalid argument "
                   "(out_bridge=NULL): %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -41,6 +45,9 @@ int cmp_android_ndk_bridge_create(cmp_android_ndk_bridge_t **out_bridge) {
     }
     cmp_log_debug("cmp_android_ndk_bridge_create: Out of memory: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -50,6 +57,9 @@ int cmp_android_ndk_bridge_create(cmp_android_ndk_bridge_t **out_bridge) {
 
   cmp_log_debug("cmp_android_ndk_bridge_create: Successfully created ndk "
                 "bridge context\n");
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -60,7 +70,8 @@ int cmp_android_ndk_bridge_create(cmp_android_ndk_bridge_t **out_bridge) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_android_ndk_bridge_destroy(cmp_android_ndk_bridge_t *bridge) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -73,12 +84,24 @@ int cmp_android_ndk_bridge_destroy(cmp_android_ndk_bridge_t *bridge) {
     cmp_log_debug(
         "cmp_android_ndk_bridge_destroy: Invalid argument (bridge=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   CMP_FREE(bridge);
   cmp_log_debug("cmp_android_ndk_bridge_destroy: Successfully destroyed ndk "
                 "bridge context\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }
 
@@ -91,7 +114,8 @@ int cmp_android_ndk_bridge_destroy(cmp_android_ndk_bridge_t *bridge) {
  */
 int cmp_android_ndk_bridge_tick(cmp_android_ndk_bridge_t *bridge,
                                 float delta_time) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -104,6 +128,9 @@ int cmp_android_ndk_bridge_tick(cmp_android_ndk_bridge_t *bridge,
     cmp_log_debug(
         "cmp_android_ndk_bridge_tick: Invalid argument (bridge=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -113,5 +140,14 @@ int cmp_android_ndk_bridge_tick(cmp_android_ndk_bridge_t *bridge,
                 delta_time, bridge->total_time);
 
   /* Mock: In the real Android application, this would call ALooper_pollAll */
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
   return rc;
 }

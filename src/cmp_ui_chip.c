@@ -163,6 +163,9 @@ int cmp_ui_chip_destroy(cmp_ui_chip_t *chip) {
   rc = CMP_FREE(chip);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_chip_destroy: CMP_FREE chip failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -176,12 +179,23 @@ int cmp_ui_chip_destroy(cmp_ui_chip_t *chip) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_ui_chip_get_node(cmp_ui_chip_t *chip, cmp_ui_node_t **out_node) {
+  int rc;
+  rc = 0;
   if (!chip || !out_node) {
     LOG_DEBUG("cmp_ui_chip_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = chip->node_root;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**

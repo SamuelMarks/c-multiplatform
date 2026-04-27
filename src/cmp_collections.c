@@ -28,7 +28,8 @@ struct cmp_diffable_datasource {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_collection_create(cmp_collection_t **out_collection) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_collection *ctx = NULL;
@@ -40,6 +41,9 @@ int cmp_collection_create(cmp_collection_t **out_collection) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_collection_create: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -50,6 +54,9 @@ int cmp_collection_create(cmp_collection_t **out_collection) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_collection_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -70,7 +77,8 @@ int cmp_collection_create(cmp_collection_t **out_collection) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_collection_destroy(cmp_collection_t *collection_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_collection *ctx = (struct cmp_collection *)collection_opaque;
@@ -83,6 +91,9 @@ int cmp_collection_destroy(cmp_collection_t *collection_opaque) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_collection_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -122,7 +133,8 @@ int cmp_collection_destroy(cmp_collection_t *collection_opaque) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_collection_section_create(cmp_collection_section_t **out_section) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_collection_section *ctx = NULL;
@@ -135,6 +147,9 @@ int cmp_collection_section_create(cmp_collection_section_t **out_section) {
     }
     cmp_log_debug("cmp_collection_section_create: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -146,6 +161,9 @@ int cmp_collection_section_create(cmp_collection_section_t **out_section) {
     }
     cmp_log_debug("cmp_collection_section_create: Out of memory: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -165,7 +183,8 @@ int cmp_collection_section_create(cmp_collection_section_t **out_section) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_collection_section_destroy(cmp_collection_section_t *section_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -177,6 +196,9 @@ int cmp_collection_section_destroy(cmp_collection_section_t *section_opaque) {
     }
     cmp_log_debug("cmp_collection_section_destroy: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -199,7 +221,8 @@ int cmp_collection_section_destroy(cmp_collection_section_t *section_opaque) {
  */
 int cmp_collection_section_set_flow_layout(
     cmp_collection_section_t *section_opaque, float min_column_width) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_collection_section *ctx =
@@ -214,6 +237,9 @@ int cmp_collection_section_set_flow_layout(
     cmp_log_debug(
         "cmp_collection_section_set_flow_layout: Invalid argument: %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -221,7 +247,16 @@ int cmp_collection_section_set_flow_layout(
   cmp_log_debug(
       "cmp_collection_section_set_flow_layout: Set min width to %.2f\n",
       min_column_width);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -234,7 +269,8 @@ int cmp_collection_section_set_flow_layout(
 int cmp_collection_section_set_orthogonal_behavior(
     cmp_collection_section_t *section_opaque,
     cmp_orthogonal_behavior_t behavior) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_collection_section *ctx =
@@ -249,6 +285,9 @@ int cmp_collection_section_set_orthogonal_behavior(
     cmp_log_debug("cmp_collection_section_set_orthogonal_behavior: Invalid "
                   "argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -256,7 +295,16 @@ int cmp_collection_section_set_orthogonal_behavior(
   cmp_log_debug(
       "cmp_collection_section_set_orthogonal_behavior: Set behavior to %d\n",
       (int)behavior);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -268,7 +316,8 @@ int cmp_collection_section_set_orthogonal_behavior(
  */
 int cmp_collection_add_section(cmp_collection_t *collection_opaque,
                                cmp_collection_section_t *section_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_collection *ctx = (struct cmp_collection *)collection_opaque;
@@ -285,6 +334,9 @@ int cmp_collection_add_section(cmp_collection_t *collection_opaque,
     }
     cmp_log_debug("cmp_collection_add_section: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -298,6 +350,9 @@ int cmp_collection_add_section(cmp_collection_t *collection_opaque,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_collection_add_section: Out of memory: %s\n", err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     if (ctx->sections != NULL) {
@@ -326,7 +381,8 @@ int cmp_collection_add_section(cmp_collection_t *collection_opaque,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_diffable_datasource_create(cmp_diffable_datasource_t **out_ds) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_diffable_datasource *ctx = NULL;
@@ -339,6 +395,9 @@ int cmp_diffable_datasource_create(cmp_diffable_datasource_t **out_ds) {
     }
     cmp_log_debug("cmp_diffable_datasource_create: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -350,6 +409,9 @@ int cmp_diffable_datasource_create(cmp_diffable_datasource_t **out_ds) {
     }
     cmp_log_debug("cmp_diffable_datasource_create: Out of memory: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -369,7 +431,8 @@ int cmp_diffable_datasource_create(cmp_diffable_datasource_t **out_ds) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_diffable_datasource_destroy(cmp_diffable_datasource_t *ds_opaque) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_diffable_datasource *ctx =
@@ -383,6 +446,9 @@ int cmp_diffable_datasource_destroy(cmp_diffable_datasource_t *ds_opaque) {
     }
     cmp_log_debug("cmp_diffable_datasource_destroy: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -416,7 +482,8 @@ int cmp_diffable_datasource_destroy(cmp_diffable_datasource_t *ds_opaque) {
 int cmp_diffable_datasource_apply_snapshot(cmp_diffable_datasource_t *ds_opaque,
                                            const uint64_t *items,
                                            size_t count) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_diffable_datasource *ctx =
@@ -432,6 +499,9 @@ int cmp_diffable_datasource_apply_snapshot(cmp_diffable_datasource_t *ds_opaque,
     cmp_log_debug(
         "cmp_diffable_datasource_apply_snapshot: Invalid argument: %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -445,6 +515,9 @@ int cmp_diffable_datasource_apply_snapshot(cmp_diffable_datasource_t *ds_opaque,
       cmp_log_debug(
           "cmp_diffable_datasource_apply_snapshot: Out of memory: %s\n",
           err_str);
+      if (rc != 0) {
+        return rc;
+      }
       return rc;
     }
     memcpy(new_state, items, count * sizeof(uint64_t));
@@ -480,7 +553,8 @@ int cmp_diffable_datasource_apply_snapshot(cmp_diffable_datasource_t *ds_opaque,
  */
 int cmp_system_map_view_mount(cmp_ui_node_t *node, float latitude,
                               float longitude) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -491,6 +565,9 @@ int cmp_system_map_view_mount(cmp_ui_node_t *node, float latitude,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_system_map_view_mount: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -500,7 +577,16 @@ int cmp_system_map_view_mount(cmp_ui_node_t *node, float latitude,
   (void)longitude;
 
   cmp_log_debug("cmp_system_map_view_mount: Mock mounted map view\n");
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -511,7 +597,8 @@ int cmp_system_map_view_mount(cmp_ui_node_t *node, float latitude,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_web_view_mount(cmp_ui_node_t *node, const char *url) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -522,11 +609,23 @@ int cmp_system_web_view_mount(cmp_ui_node_t *node, const char *url) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_system_web_view_mount: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   /* Mounts platform-specific WKWebView/EdgeWebView2 */
   cmp_log_debug("cmp_system_web_view_mount: Mock mounted web view for %s\n",
                 url);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

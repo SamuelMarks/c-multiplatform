@@ -48,7 +48,6 @@ static float g_btn_opacity = 1.0f;
 #define ID_TITLE 100
 
 static char g_pass_display[256] = "";
-
 #define ID_THEME_BTN 101
 #define ID_LOGIN_BTN 102
 #define ID_LOGOUT_BTN 103
@@ -119,6 +118,7 @@ static void set_i18n_button(cmp_ui_node_t **btn, const char *key) {
 }
 
 static int build_ui(void) {
+  int rc = 0;
   cmp_ui_node_t *top_bar = NULL;
   cmp_ui_node_t *theme_btn = NULL;
   cmp_ui_node_t *dark_btn = NULL;
@@ -477,9 +477,13 @@ static int build_ui(void) {
     cmp_ui_node_add_child(g_ui_tree, content_box);
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 int app_init(void) {
+  int rc = 0;
   cmp_window_config_t config;
   cmp_dpi_t *dpi = NULL;
 
@@ -498,7 +502,6 @@ int app_init(void) {
 
   g_window_width = 1024.0f;
   g_window_height = 768.0f;
-
 #ifdef _WIN32
   g_window_width = (float)GetSystemMetrics(SM_CXSCREEN) / (3.0f * g_dpi_scale);
   g_window_height = (float)GetSystemMetrics(SM_CYSCREEN) / (3.0f * g_dpi_scale);
@@ -536,10 +539,14 @@ int app_init(void) {
   cmp_window_set_ui_tree(g_window, g_ui_tree);
   cmp_window_show(g_window);
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int app_run(void) {
+  int rc = 0;
   cmp_event_t evt;
   int running = 1;
 
@@ -725,10 +732,14 @@ int app_run(void) {
     }
   }
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 int app_shutdown(void) {
+  int rc = 0;
   if (g_ui_tree) {
     cmp_ui_node_destroy(g_ui_tree);
     g_ui_tree = NULL;
@@ -748,5 +759,8 @@ int app_shutdown(void) {
   cmp_vfs_shutdown();
   cmp_event_system_shutdown();
 
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

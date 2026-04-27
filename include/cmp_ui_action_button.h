@@ -39,7 +39,7 @@ typedef struct cmp_ui_action_button cmp_ui_action_button_t;
  * \param style The specific M3 style (elevated, filled, etc).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
+int CMP_API cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
                                         const char *label,
                                         cmp_ui_action_button_style_t style);
 
@@ -49,7 +49,7 @@ CMP_API int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
  * \param btn The button component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_action_button_destroy(cmp_ui_action_button_t *btn);
+int CMP_API cmp_ui_action_button_destroy(cmp_ui_action_button_t *btn);
 
 /**
  * \brief Retrieves the underlying UI node for the action button.
@@ -58,7 +58,7 @@ CMP_API int cmp_ui_action_button_destroy(cmp_ui_action_button_t *btn);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_action_button_get_node(cmp_ui_action_button_t *btn,
+int CMP_API cmp_ui_action_button_get_node(cmp_ui_action_button_t *btn,
                                           cmp_ui_node_t **out_node);
 
 /**
@@ -68,7 +68,7 @@ CMP_API int cmp_ui_action_button_get_node(cmp_ui_action_button_t *btn,
  * \param label The new label.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_action_button_set_label(cmp_ui_action_button_t *btn,
+int CMP_API cmp_ui_action_button_set_label(cmp_ui_action_button_t *btn,
                                            const char *label);
 
 /**
@@ -78,9 +78,8 @@ CMP_API int cmp_ui_action_button_set_label(cmp_ui_action_button_t *btn,
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_action_button_bind_a11y(cmp_ui_action_button_t *widget,
+int CMP_API cmp_ui_action_button_bind_a11y(cmp_ui_action_button_t *widget,
                                            cmp_a11y_tree_t *tree);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

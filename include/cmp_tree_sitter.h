@@ -22,14 +22,14 @@ typedef struct cmp_tree_node cmp_tree_node_t;
  * @param out_ts Pointer to receive the instance.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_tree_sitter_create(cmp_tree_sitter_t **out_ts);
+int CMP_API cmp_tree_sitter_create(cmp_tree_sitter_t **out_ts);
 
 /**
  * @brief Destroys a Tree-sitter parser instance.
  * @param ts The instance to destroy.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_tree_sitter_destroy(cmp_tree_sitter_t *ts);
+int CMP_API cmp_tree_sitter_destroy(cmp_tree_sitter_t *ts);
 
 /**
  * @brief Parses source code into a syntax tree representation.
@@ -39,7 +39,7 @@ CMP_API int cmp_tree_sitter_destroy(cmp_tree_sitter_t *ts);
  * @param out_root Pointer to receive the root node.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_tree_sitter_parse(cmp_tree_sitter_t *ts, const char *language,
+int CMP_API cmp_tree_sitter_parse(cmp_tree_sitter_t *ts, const char *language,
                                   const char *source_code,
                                   cmp_tree_node_t **out_root);
 
@@ -49,7 +49,7 @@ CMP_API int cmp_tree_sitter_parse(cmp_tree_sitter_t *ts, const char *language,
  * @param out_type Pointer to receive the type string. Must be freed.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_tree_sitter_node_get_type(cmp_tree_node_t *node,
+int CMP_API cmp_tree_sitter_node_get_type(cmp_tree_node_t *node,
                                           char **out_type);
 
 /**
@@ -57,15 +57,14 @@ CMP_API int cmp_tree_sitter_node_get_type(cmp_tree_node_t *node,
  * @param node The node to free.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_tree_sitter_free_node(cmp_tree_node_t *node);
+int CMP_API cmp_tree_sitter_free_node(cmp_tree_node_t *node);
 
 /**
  * @brief Frees a string returned by the Tree-sitter wrapper.
  * @param str The string to free.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_tree_sitter_free_string(char *str);
-
+int CMP_API cmp_tree_sitter_free_string(char *str);
 #ifdef __cplusplus
 }
 #endif

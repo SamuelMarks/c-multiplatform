@@ -16,7 +16,8 @@ struct cmp_global_hotkey {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_global_hotkey_create(cmp_global_hotkey_t **out_hotkey) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_global_hotkey_t *hk = NULL;
@@ -30,6 +31,9 @@ int cmp_global_hotkey_create(cmp_global_hotkey_t **out_hotkey) {
     cmp_log_debug(
         "cmp_global_hotkey_create: Invalid argument (out_hotkey=NULL): %s\n",
         err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -40,6 +44,9 @@ int cmp_global_hotkey_create(cmp_global_hotkey_t **out_hotkey) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_global_hotkey_create: Out of memory: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -57,7 +64,8 @@ int cmp_global_hotkey_create(cmp_global_hotkey_t **out_hotkey) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_global_hotkey_destroy(cmp_global_hotkey_t *hotkey) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -68,6 +76,9 @@ int cmp_global_hotkey_destroy(cmp_global_hotkey_t *hotkey) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_global_hotkey_destroy: Invalid argument: %s\n", err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -92,7 +103,8 @@ int cmp_global_hotkey_destroy(cmp_global_hotkey_t *hotkey) {
  */
 int cmp_global_hotkey_register(cmp_global_hotkey_t *hotkey, int key_code,
                                int modifiers, int *out_id) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -104,13 +116,25 @@ int cmp_global_hotkey_register(cmp_global_hotkey_t *hotkey, int key_code,
     }
     cmp_log_debug("cmp_global_hotkey_register: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   *out_id = hotkey->next_id++;
   cmp_log_debug("cmp_global_hotkey_register: Registered hotkey id=%d\n",
                 *out_id);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -121,7 +145,8 @@ int cmp_global_hotkey_register(cmp_global_hotkey_t *hotkey, int key_code,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_global_hotkey_unregister(cmp_global_hotkey_t *hotkey, int id) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -133,10 +158,22 @@ int cmp_global_hotkey_unregister(cmp_global_hotkey_t *hotkey, int id) {
     }
     cmp_log_debug("cmp_global_hotkey_unregister: Invalid argument: %s\n",
                   err_str);
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
   cmp_log_debug("cmp_global_hotkey_unregister: Unregistered hotkey id=%d\n",
                 id);
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

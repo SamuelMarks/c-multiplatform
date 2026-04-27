@@ -194,7 +194,8 @@ TEST test_material3_configs(void) {
 }
 
 TEST test_material3_vtable(void) {
-  const cmp_theme_vtable_t *vt = cmp_theme_get_material3_vtable();
+  const cmp_theme_vtable_t *vt = NULL;
+  cmp_theme_get_material3_vtable(&vt);
   ASSERT(vt != NULL);
   ASSERT(vt->measure_button != NULL);
   PASS();

@@ -26,6 +26,9 @@ int cmp_webgl_canvas_create(cmp_webgl_canvas_t **out_canvas) {
   rc = CMP_MALLOC(sizeof(cmp_webgl_canvas_t), (void **)&c);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_webgl_canvas_create: OOM\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
 
@@ -52,6 +55,9 @@ int cmp_webgl_canvas_destroy(cmp_webgl_canvas_t *canvas) {
   rc = CMP_FREE(canvas);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_webgl_canvas_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -66,11 +72,12 @@ int cmp_webgl_canvas_destroy(cmp_webgl_canvas_t *canvas) {
  */
 int cmp_webgl_canvas_bind(cmp_webgl_canvas_t *canvas,
                           const char *dom_selector) {
+  int rc;
+  rc = 0;
   if (!canvas || !dom_selector) {
     LOG_DEBUG("cmp_webgl_canvas_bind: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
-
 #if defined(__EMSCRIPTEN__)
   /* Call the c-multiplatform wasm binding hook */
   if (cmp_window_wasm_init(dom_selector) != CMP_SUCCESS) {
@@ -79,5 +86,14 @@ int cmp_webgl_canvas_bind(cmp_webgl_canvas_t *canvas,
 #endif
 
   canvas->is_bound = 1;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }

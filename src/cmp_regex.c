@@ -18,7 +18,8 @@ struct cmp_regex {
  * @return Returns 0 on success, or an error code on failure.
  */
 static int codex_strdup(const char *s, char **out_str) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   size_t len;
   char *d = NULL;
 
@@ -34,7 +35,6 @@ static int codex_strdup(const char *s, char **out_str) {
     LOG_DEBUG("Error in codex_strdup: Out of memory\n");
     return CMP_ERROR_OOM;
   }
-
 #if defined(_MSC_VER)
   strcpy_s(d, len + 1, s);
 #else
@@ -42,7 +42,7 @@ static int codex_strdup(const char *s, char **out_str) {
 #endif
 
   *out_str = d;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -53,7 +53,8 @@ static int codex_strdup(const char *s, char **out_str) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_regex_compile(cmp_regex_t **out_regex, const char *pattern) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
   cmp_regex_t *r = NULL;
 
   if (!out_regex || !pattern) {
@@ -79,7 +80,7 @@ int cmp_regex_compile(cmp_regex_t **out_regex, const char *pattern) {
   }
 
   *out_regex = r;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -91,7 +92,8 @@ int cmp_regex_compile(cmp_regex_t **out_regex, const char *pattern) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_regex_match(cmp_regex_t *regex, const char *string, int *out_matched) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!regex || !string || !out_matched) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -105,8 +107,7 @@ int cmp_regex_match(cmp_regex_t *regex, const char *string, int *out_matched) {
   } else {
     *out_matched = 0;
   }
-
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -116,7 +117,8 @@ int cmp_regex_match(cmp_regex_t *regex, const char *string, int *out_matched) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_regex_free(cmp_regex_t *regex) {
-  int rc = CMP_SUCCESS;
+  int rc;
+  rc = CMP_SUCCESS;
 
   if (!regex) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -139,5 +141,5 @@ int cmp_regex_free(cmp_regex_t *regex) {
     return rc;
   }
 
-  return rc;
+  return CMP_SUCCESS;
 }

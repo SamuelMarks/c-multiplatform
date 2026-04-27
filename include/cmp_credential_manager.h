@@ -25,7 +25,7 @@ typedef struct cmp_credential_manager cmp_credential_manager_t;
  * @param out_manager Pointer to receive the created instance.
  * @return 0 on success, or an error code.
  */
-CMP_API int
+int CMP_API
 cmp_credential_manager_create(cmp_credential_manager_t **out_manager);
 
 /**
@@ -33,7 +33,7 @@ cmp_credential_manager_create(cmp_credential_manager_t **out_manager);
  * @param manager The instance to destroy.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_credential_manager_destroy(cmp_credential_manager_t *manager);
+int CMP_API cmp_credential_manager_destroy(cmp_credential_manager_t *manager);
 
 /**
  * @brief Stores a secret securely in the OS credential manager.
@@ -43,7 +43,7 @@ CMP_API int cmp_credential_manager_destroy(cmp_credential_manager_t *manager);
  * @param secret The secret data.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_credential_manager_set_secret(cmp_credential_manager_t *manager,
+int CMP_API cmp_credential_manager_set_secret(cmp_credential_manager_t *manager,
                                               const char *service,
                                               const char *account,
                                               const char *secret);
@@ -57,7 +57,7 @@ CMP_API int cmp_credential_manager_set_secret(cmp_credential_manager_t *manager,
  * caller.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_credential_manager_get_secret(cmp_credential_manager_t *manager,
+int CMP_API cmp_credential_manager_get_secret(cmp_credential_manager_t *manager,
                                               const char *service,
                                               const char *account,
                                               char **out_secret);
@@ -69,7 +69,7 @@ CMP_API int cmp_credential_manager_get_secret(cmp_credential_manager_t *manager,
  * @param account The account or username.
  * @return 0 on success, or an error code.
  */
-CMP_API int
+int CMP_API
 cmp_credential_manager_delete_secret(cmp_credential_manager_t *manager,
                                      const char *service, const char *account);
 
@@ -78,8 +78,7 @@ cmp_credential_manager_delete_secret(cmp_credential_manager_t *manager,
  * @param secret The secret string to free.
  * @return 0 on success, or an error code.
  */
-CMP_API int cmp_credential_manager_free_secret(char *secret);
-
+int CMP_API cmp_credential_manager_free_secret(char *secret);
 #ifdef __cplusplus
 }
 #endif

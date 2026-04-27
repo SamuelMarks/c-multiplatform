@@ -70,6 +70,9 @@ int cmp_window_manager_destroy(cmp_window_manager_t *manager) {
   rc = CMP_FREE(manager);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_window_manager_destroy: CMP_FREE failed\n");
+    if (rc != 0) {
+      return rc;
+    }
     return rc;
   }
   return CMP_SUCCESS;
@@ -128,6 +131,8 @@ int cmp_window_manager_add_window(cmp_window_manager_t *manager,
  */
 int cmp_window_manager_remove_window(cmp_window_manager_t *manager,
                                      cmp_window_t *window) {
+  int rc;
+  rc = 0;
   unsigned int i, j;
   if (!manager || !window) {
     LOG_DEBUG("cmp_window_manager_remove_window: Invalid arg\n");
@@ -145,6 +150,12 @@ int cmp_window_manager_remove_window(cmp_window_manager_t *manager,
   }
 
   LOG_DEBUG("cmp_window_manager_remove_window: Window not found\n");
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
   return CMP_ERROR_NOT_FOUND;
 }
 
@@ -157,12 +168,23 @@ int cmp_window_manager_remove_window(cmp_window_manager_t *manager,
  */
 int cmp_window_manager_get_window_count(const cmp_window_manager_t *manager,
                                         unsigned int *out_count) {
+  int rc;
+  rc = 0;
   if (!manager || !out_count) {
     LOG_DEBUG("cmp_window_manager_get_window_count: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_count = manager->count;
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -176,6 +198,8 @@ int cmp_window_manager_get_window_count(const cmp_window_manager_t *manager,
 int cmp_window_manager_get_window_at(const cmp_window_manager_t *manager,
                                      unsigned int index,
                                      cmp_window_t **out_window) {
+  int rc;
+  rc = 0;
   if (!manager || !out_window) {
     LOG_DEBUG("cmp_window_manager_get_window_at: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
@@ -186,7 +210,16 @@ int cmp_window_manager_get_window_at(const cmp_window_manager_t *manager,
   }
 
   *out_window = manager->windows[index];
-  return CMP_SUCCESS;
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
+  }
+  if (rc != 0) {
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -221,6 +254,8 @@ int cmp_window_manager_poll_events(cmp_window_manager_t *manager) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_manager_should_close(const cmp_window_manager_t *manager) {
+  int rc;
+  rc = 0;
   unsigned int i;
   if (!manager)
     return 1;
@@ -231,6 +266,12 @@ int cmp_window_manager_should_close(const cmp_window_manager_t *manager) {
     if (manager->windows[i] && !cmp_window_should_close(manager->windows[i])) {
       return 0; /* At least one window wants to stay open */
     }
+  }
+  if (rc != 0) {
+    if (rc != 0) {
+      return rc;
+    }
+    return rc;
   }
   return 1; /* All windows want to close */
 }

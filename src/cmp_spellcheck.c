@@ -1,7 +1,10 @@
 /* clang-format off */
 #include "cmp.h"
+
 #include <stdlib.h>
 #include <string.h>
+
+#include "cmp_log.h"
 /* clang-format on */
 
 struct cmp_spellcheck {
@@ -9,20 +12,27 @@ struct cmp_spellcheck {
 };
 
 /**
- * @brief cmp_spellcheck_create
+ * @brief Create a spellcheck context.
  *
  * @param out_spellcheck Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_spellcheck_create(cmp_spellcheck_t **out_spellcheck) {
+  int rc;
   struct cmp_spellcheck *spellcheck;
 
-  if (!out_spellcheck)
-    return CMP_ERROR_INVALID_ARG;
+  rc = CMP_SUCCESS;
 
-  if (CMP_MALLOC(sizeof(struct cmp_spellcheck), (void **)&spellcheck) !=
-      CMP_SUCCESS)
+  if (out_spellcheck == NULL) {
+    LOG_DEBUG("Invalid argument: out_spellcheck is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct cmp_spellcheck), (void **)&spellcheck);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
+  }
 
   memset(spellcheck, 0, sizeof(struct cmp_spellcheck));
   spellcheck->enabled = 1;
@@ -32,23 +42,34 @@ int cmp_spellcheck_create(cmp_spellcheck_t **out_spellcheck) {
 }
 
 /**
- * @brief cmp_spellcheck_destroy
+ * @brief Destroy a spellcheck context.
  *
  * @param spellcheck Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_spellcheck_destroy(cmp_spellcheck_t *spellcheck) {
-  struct cmp_spellcheck *internal_spellcheck =
-      (struct cmp_spellcheck *)spellcheck;
-  if (!internal_spellcheck)
-    return CMP_ERROR_INVALID_ARG;
+  int rc;
+  struct cmp_spellcheck *internal_spellcheck;
 
-  CMP_FREE(internal_spellcheck);
+  rc = CMP_SUCCESS;
+  internal_spellcheck = (struct cmp_spellcheck *)spellcheck;
+
+  if (internal_spellcheck == NULL) {
+    LOG_DEBUG("Invalid argument: spellcheck is NULL\n");
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  rc = CMP_FREE(internal_spellcheck);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Free failed\n");
+    return rc;
+  }
+
   return CMP_SUCCESS;
 }
 
 /**
- * @brief cmp_spellcheck_verify_word
+ * @brief Verify if a word is spelled correctly.
  *
  * @param spellcheck Parameter description.
  * @param word Parameter description.
@@ -57,11 +78,14 @@ int cmp_spellcheck_destroy(cmp_spellcheck_t *spellcheck) {
  */
 int cmp_spellcheck_verify_word(cmp_spellcheck_t *spellcheck, const char *word,
                                int *out_is_correct) {
-  struct cmp_spellcheck *internal_spellcheck =
-      (struct cmp_spellcheck *)spellcheck;
+  struct cmp_spellcheck *internal_spellcheck;
 
-  if (!internal_spellcheck || !word || !out_is_correct)
+  internal_spellcheck = (struct cmp_spellcheck *)spellcheck;
+
+  if (internal_spellcheck == NULL || word == NULL || out_is_correct == NULL) {
+    LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
+  }
 
   if (!internal_spellcheck->enabled) {
     *out_is_correct = 1;

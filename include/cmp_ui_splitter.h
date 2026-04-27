@@ -28,7 +28,7 @@ typedef struct cmp_ui_splitter cmp_ui_splitter_t;
  * \param color Background color of the splitter divider (ARGB).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_splitter_create(cmp_ui_splitter_t **out_splitter,
+int CMP_API cmp_ui_splitter_create(cmp_ui_splitter_t **out_splitter,
                                    int is_vertical, uint32_t color);
 
 /**
@@ -37,7 +37,7 @@ CMP_API int cmp_ui_splitter_create(cmp_ui_splitter_t **out_splitter,
  * \param splitter The splitter component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_splitter_destroy(cmp_ui_splitter_t *splitter);
+int CMP_API cmp_ui_splitter_destroy(cmp_ui_splitter_t *splitter);
 
 /**
  * \brief Retrieves the underlying UI node for the splitter.
@@ -46,7 +46,7 @@ CMP_API int cmp_ui_splitter_destroy(cmp_ui_splitter_t *splitter);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_splitter_get_node(cmp_ui_splitter_t *splitter,
+int CMP_API cmp_ui_splitter_get_node(cmp_ui_splitter_t *splitter,
                                      cmp_ui_node_t **out_node);
 
 /**
@@ -56,9 +56,8 @@ CMP_API int cmp_ui_splitter_get_node(cmp_ui_splitter_t *splitter,
  * \param position The new position (0.0f to 1.0f).
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_splitter_set_position(cmp_ui_splitter_t *splitter,
+int CMP_API cmp_ui_splitter_set_position(cmp_ui_splitter_t *splitter,
                                          float position);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -27,7 +27,7 @@ typedef struct cmp_ui_fab cmp_ui_fab_t;
  * \param icon_name The name or path of the icon to display.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_fab_create(cmp_ui_fab_t **out_fab, const char *icon_name);
+int CMP_API cmp_ui_fab_create(cmp_ui_fab_t **out_fab, const char *icon_name);
 
 /**
  * \brief Destroys a FAB component.
@@ -35,7 +35,7 @@ CMP_API int cmp_ui_fab_create(cmp_ui_fab_t **out_fab, const char *icon_name);
  * \param fab The FAB component to destroy.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_fab_destroy(cmp_ui_fab_t *fab);
+int CMP_API cmp_ui_fab_destroy(cmp_ui_fab_t *fab);
 
 /**
  * \brief Retrieves the underlying UI node for the FAB.
@@ -44,7 +44,7 @@ CMP_API int cmp_ui_fab_destroy(cmp_ui_fab_t *fab);
  * \param out_node Pointer to store the UI node.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_fab_get_node(cmp_ui_fab_t *fab, cmp_ui_node_t **out_node);
+int CMP_API cmp_ui_fab_get_node(cmp_ui_fab_t *fab, cmp_ui_node_t **out_node);
 
 /**
  * \brief Updates the icon displayed in the FAB.
@@ -53,7 +53,7 @@ CMP_API int cmp_ui_fab_get_node(cmp_ui_fab_t *fab, cmp_ui_node_t **out_node);
  * \param icon_name The new icon name or path to display.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_fab_set_icon(cmp_ui_fab_t *fab, const char *icon_name);
+int CMP_API cmp_ui_fab_set_icon(cmp_ui_fab_t *fab, const char *icon_name);
 
 /**
  * \brief Binds the widget to the accessibility tree.
@@ -62,8 +62,7 @@ CMP_API int cmp_ui_fab_set_icon(cmp_ui_fab_t *fab, const char *icon_name);
  * \param tree The accessibility tree.
  * \return 0 on success, or a non-zero error code on failure.
  */
-CMP_API int cmp_ui_fab_bind_a11y(cmp_ui_fab_t *widget, cmp_a11y_tree_t *tree);
-
+int CMP_API cmp_ui_fab_bind_a11y(cmp_ui_fab_t *widget, cmp_a11y_tree_t *tree);
 #ifdef __cplusplus
 
 #endif /* __cplusplus */

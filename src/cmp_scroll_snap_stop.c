@@ -1,11 +1,14 @@
 /* clang-format off */
 #include "cmp.h"
-#include <stdlib.h>
+
 #include <math.h>
+#include <stdlib.h>
+
+#include "cmp_log.h"
 /* clang-format on */
 
 /**
- * @brief cmp_scroll_snap_stop_evaluate
+ * @brief Evaluate scroll snap stop condition.
  *
  * @param mode Parameter description.
  * @param current_velocity Parameter description.
@@ -15,6 +18,11 @@ int cmp_scroll_snap_stop_evaluate(cmp_scroll_snap_stop_t mode,
                                   float current_velocity) {
   if (mode == CMP_SCROLL_SNAP_STOP_ALWAYS) {
     return 1; /* Always stop */
+  }
+
+  if (mode != CMP_SCROLL_SNAP_STOP_NORMAL) {
+    LOG_DEBUG("Invalid argument: unrecognized mode\n");
+    return CMP_ERROR_INVALID_ARG;
   }
 
   /* CMP_SCROLL_SNAP_STOP_NORMAL:

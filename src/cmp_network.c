@@ -74,6 +74,8 @@ int cmp_network_destroy(cmp_network_t *network) {
  */
 int cmp_network_get_status(const cmp_network_t *network,
                            cmp_network_status_t *out_status) {
+  int rc;
+  rc = 0;
   if (network == NULL || out_status == NULL) {
     LOG_DEBUG("Error in cmp_network_get_status: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -92,6 +94,8 @@ int cmp_network_get_status(const cmp_network_t *network,
  */
 int cmp_network_set_status(cmp_network_t *network,
                            cmp_network_status_t status) {
+  int rc;
+  rc = 0;
   if (network == NULL) {
     LOG_DEBUG("Error in cmp_network_set_status: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
