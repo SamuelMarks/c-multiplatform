@@ -33,25 +33,40 @@ int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
   /* Create the track background */
   err = cmp_ui_box_create(&sw->node_root);
   if (err != CMP_SUCCESS) {
-    CMP_FREE(sw);
+    int free_rc = CMP_FREE(sw);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_switch_create: CMP_FREE sw failed\n");
+    }
     return err;
+  }
+
+  err = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&sw->node_root->layout);
+  if (err == CMP_SUCCESS) {
+    memset(sw->node_root->layout, 0, sizeof(cmp_layout_node_t));
+    sw->node_root->layout->id = 1;
+    sw->node_root->layout->direction = CMP_FLEX_ROW;
   }
 
   /* Create the thumb */
   err = cmp_ui_box_create(&sw->node_thumb);
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(sw->node_root);
-    CMP_FREE(sw);
+    int free_rc = CMP_FREE(sw);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_switch_create: CMP_FREE sw failed\n");
+    }
     return err;
   }
 
   sw->is_on = 0; /* Default OFF */
 
-  sw->node_root->layout->direction = CMP_FLEX_ROW;
   sw->node_root->bg_color = 0xFFCCCCCC;  /* Track off color */
   sw->node_thumb->bg_color = 0xFFFFFFFF; /* Thumb color */
 
-  cmp_ui_node_add_child(sw->node_root, sw->node_thumb);
+  err = cmp_ui_node_add_child(sw->node_root, sw->node_thumb);
+  if (err != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_switch_create: cmp_ui_node_add_child failed\n");
+  }
 
   *out_switch = sw;
   return CMP_SUCCESS;
@@ -67,8 +82,11 @@ int cmp_ui_switch_destroy(cmp_ui_switch_t *sw) {
   if (!sw) {
     return CMP_ERROR_INVALID_ARG;
   }
-  CMP_FREE(sw);
-  return CMP_SUCCESS;
+  int free_rc = CMP_FREE(sw);
+  if (free_rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_switch_destroy: CMP_FREE sw failed\n");
+  }
+  return free_rc;
 }
 
 /**
@@ -120,7 +138,10 @@ int cmp_ui_switch_bind_a11y(cmp_ui_switch_t *widget, cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
-  cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "switch",
-                         "Switch");
-  return CMP_SUCCESS;
+  int err = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id,
+                                   "switch", "Switch");
+  if (err != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_switch_bind_a11y: cmp_a11y_tree_add_node failed\n");
+  }
+  return err;
 }

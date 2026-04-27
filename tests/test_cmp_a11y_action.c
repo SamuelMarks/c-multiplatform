@@ -116,6 +116,11 @@ TEST test_a11y_action_execute_events(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(-1, cmp_event_get_focus());
 
+  /* Test Blur when NOT focused */
+  res = cmp_a11y_action_execute(action, 99, CMP_A11Y_ACTION_BLUR);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(-1, cmp_event_get_focus());
+
   res = cmp_a11y_action_destroy(action);
   ASSERT_EQ(CMP_SUCCESS, res);
   res = cmp_a11y_tree_destroy(tree);

@@ -40,18 +40,32 @@ int cmp_ui_progress_indicator_create(
 
   err = cmp_ui_box_create(&ind->node_root);
   if (err != CMP_SUCCESS) {
-    CMP_FREE(ind);
+    int free_rc = CMP_FREE(ind);
+    if (free_rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_progress_indicator_create: CMP_FREE ind failed\n");
     return err;
   }
 
   err = cmp_ui_box_create(&ind->node_fill);
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(ind->node_root);
-    CMP_FREE(ind);
+    int free_rc = CMP_FREE(ind);
+    if (free_rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_progress_indicator_create: CMP_FREE ind failed\n");
     return err;
   }
 
-  cmp_ui_node_add_child(ind->node_root, ind->node_fill);
+  err = cmp_ui_node_add_child(ind->node_root, ind->node_fill);
+  if (err != CMP_SUCCESS) {
+    LOG_DEBUG(
+        "cmp_ui_progress_indicator_create: cmp_ui_node_add_child failed\n");
+  }
+
+  err = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&ind->node_root->layout);
+  if (err == CMP_SUCCESS) {
+    memset(ind->node_root->layout, 0, sizeof(cmp_layout_node_t));
+    ind->node_root->layout->id = 1;
+  }
 
   /* Configure root and fill style properties */
   ind->node_root->bg_color = 0xFFE0E0E0; /* Default track color */
@@ -74,8 +88,11 @@ int cmp_ui_progress_indicator_destroy(cmp_ui_progress_indicator_t *indicator) {
   if (!indicator) {
     return CMP_ERROR_INVALID_ARG;
   }
-  CMP_FREE(indicator);
-  return CMP_SUCCESS;
+  int err = CMP_FREE(indicator);
+  if (err != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_progress_indicator_destroy: CMP_FREE failed\n");
+  }
+  return err;
 }
 
 /**
@@ -154,7 +171,11 @@ int cmp_ui_progress_indicator_bind_a11y(cmp_ui_progress_indicator_t *widget,
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
-  cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "progressbar",
-                         "Progress Indicator");
-  return CMP_SUCCESS;
+  int err = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id,
+                                   "progressbar", "Progress Indicator");
+  if (err != CMP_SUCCESS) {
+    LOG_DEBUG(
+        "cmp_ui_progress_indicator_bind_a11y: cmp_a11y_tree_add_node failed\n");
+  }
+  return err;
 }

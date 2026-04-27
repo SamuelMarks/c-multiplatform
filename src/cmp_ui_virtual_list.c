@@ -38,10 +38,10 @@ int cmp_ui_virtual_list_create(cmp_ui_virtual_list_t **out_list,
   list->item_height = item_height;
 
   err = cmp_ui_box_create(&list->node_root);
-  if (err != 0) {
-    rc = CMP_FREE(list);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+  if (err != CMP_SUCCESS) {
+    int free_rc = CMP_FREE(list);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_virtual_list_create: CMP_FREE failed\n");
     }
     return err;
   }

@@ -467,9 +467,11 @@ typedef enum CmpModality cmp_modality_type_t;
 
 typedef struct CmpAppConfig cmp_app_config_t;
 
-int cmp_app_init(cmp_app_config_t *config);
+CMP_API int cmp_app_init(cmp_app_config_t *config);
 
 typedef void (*cmp_run_loop_fn)(void *);
+
+CMP_API void cmp_run_loop(cmp_run_loop_fn user_tick, void *user_arg);
 
 typedef struct CddMessage cmp_msg_t;
 typedef struct CddMessageBus cmp_msg_bus_t;
@@ -6491,27 +6493,43 @@ typedef enum {
 
 /**
  * @brief Create an ARIA mapping context
+ * @param tree Pointer to the accessibility tree.
+ * @param out_aria Pointer to store the new ARIA context.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_create(cmp_a11y_tree_t *tree, cmp_aria_t **out_aria);
 
 /**
  * @brief Destroy an ARIA mapping context
+ * @param aria The ARIA context.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_destroy(cmp_aria_t *aria);
 
 /**
  * @brief Assign an ARIA role to an a11y node
+ * @param aria The ARIA context.
+ * @param node_id The ID of the node.
+ * @param role The role to assign.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_set_role(cmp_aria_t *aria, int node_id, cmp_aria_role_t role);
 
 /**
  * @brief Set a boolean ARIA state (e.g. aria-expanded, aria-checked)
+ * @param aria The ARIA context.
+ * @param node_id The ID of the node.
+ * @param state_name The name of the state (e.g. "aria-expanded").
+ * @param value The boolean value (1 for true, 0 for false).
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_set_state_bool(cmp_aria_t *aria, int node_id,
                             const char *state_name, int value);
 
 /**
  * @brief Sync ARIA roles and states to the underlying a11y tree
+ * @param aria The ARIA context.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_sync(cmp_aria_t *aria);
 
@@ -6568,22 +6586,35 @@ typedef enum {
 
 /**
  * @brief Create an ARIA Live regions context
+ * @param tree Pointer to the accessibility tree.
+ * @param out_live Pointer to store the new ARIA Live context.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_live_create(cmp_a11y_tree_t *tree, cmp_aria_live_t **out_live);
 
 /**
  * @brief Destroy an ARIA Live regions context
+ * @param live The ARIA Live context.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_live_destroy(cmp_aria_live_t *live);
 
 /**
  * @brief Set the live region mode for a specific node
+ * @param live The ARIA Live context.
+ * @param node_id The ID of the node.
+ * @param mode The live region mode (OFF, POLITE, ASSERTIVE).
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_live_set_mode(cmp_aria_live_t *live, int node_id,
                            cmp_aria_live_mode_t mode);
 
 /**
  * @brief Proactively announce a dynamic UI change (e.g. toast notification)
+ * @param live The ARIA Live context.
+ * @param node_id The ID of the node originating the announcement.
+ * @param message The message to announce.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_live_announce(cmp_aria_live_t *live, int node_id,
                            const char *message);
@@ -6666,16 +6697,25 @@ typedef enum {
 
 /**
  * @brief Create a rotor context
+ * @param tree The accessibility tree context.
+ * @param out_rotor Pointer to store the created rotor context.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_rotor_create(cmp_a11y_tree_t *tree, cmp_a11y_rotor_t **out_rotor);
 
 /**
  * @brief Destroy a rotor context
+ * @param rotor The rotor context to destroy.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_rotor_destroy(cmp_a11y_rotor_t *rotor);
 
 /**
  * @brief Register a node into a specific rotor category for fast scanning
+ * @param rotor The rotor context.
+ * @param node_id The ID of the node to register.
+ * @param category The rotor category.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_rotor_register_node(cmp_a11y_rotor_t *rotor, int node_id,
                                  cmp_a11y_rotor_category_t category);
@@ -6711,17 +6751,26 @@ typedef enum {
 
 /**
  * @brief Create an accessibility action context
+ * @param tree Pointer to the accessibility tree.
+ * @param out_action Pointer to store the new action context.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
                            cmp_a11y_action_t **out_action);
 
 /**
  * @brief Destroy an accessibility action context
+ * @param action Pointer to the action context.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_action_destroy(cmp_a11y_action_t *action);
 
 /**
  * @brief Execute a screen reader action on a specific node
+ * @param action Pointer to the action context.
+ * @param node_id The ID of the node to perform the action on.
+ * @param action_type The type of action to perform.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
                             cmp_a11y_action_type_t action_type);
@@ -6847,22 +6896,33 @@ typedef struct cmp_a11y_transparency cmp_a11y_transparency_t;
 
 /**
  * @brief Create an accessibility transparency context
+ * @param out_trans Pointer to store the created context
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_transparency_create(cmp_a11y_transparency_t **out_trans);
 
 /**
  * @brief Destroy an accessibility transparency context
+ * @param trans The context to destroy
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_transparency_destroy(cmp_a11y_transparency_t *trans);
 
 /**
  * @brief Enable or disable reduced transparency preference
+ * @param trans The transparency context
+ * @param enabled Non-zero to enable, 0 to disable
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_transparency_set(cmp_a11y_transparency_t *trans, int enabled);
 
 /**
  * @brief Apply reduced transparency preferences (override opacity with
  * fallback)
+ * @param trans The transparency context
+ * @param out_opacity Pointer to the opacity value to potentially override
+ * @param fallback_opacity The opacity value to use if reduced transparency is enabled
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_transparency_apply(cmp_a11y_transparency_t *trans,
                                 float *out_opacity, float fallback_opacity);
@@ -10677,28 +10737,30 @@ typedef struct {
 
 /**
  * \brief Initializes A11Y theme context.
- * \return 0 on success.
+ * \return 0 on success, or an error code on failure.
  */
 int cmp_a11y_theme_init(void);
 
 /**
  * \brief Cleans up A11Y theme context.
- * \return 0 on success.
+ * \return 0 on success, or an error code on failure.
  */
 int cmp_a11y_theme_cleanup(void);
 
 /**
  * \brief Triggers an OS query to detect if High Contrast Mode is enabled.
- * \return 1 if enabled, 0 if disabled or undetected.
+ * \param out_is_hc Pointer to store the result (1 if high contrast is ON, 0
+ * otherwise).
+ * \return Returns 0 on success, or an error code on failure.
  */
-int cmp_a11y_detect_high_contrast(void);
+int cmp_a11y_detect_high_contrast(int *out_is_hc);
 
 /**
  * \brief Updates the application theme palette, applying High Contrast
  * overrides and selected Color Blindness shifts if active.
  * \param type The color blindness simulation target.
  * \param out_theme Pointer to receive the adjusted theme.
- * \return 0 on success.
+ * \return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_build_theme(cmp_color_blind_type_t type,
                          cmp_a11y_theme_t *out_theme);

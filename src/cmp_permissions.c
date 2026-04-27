@@ -53,8 +53,16 @@ int cmp_permissions_create(cmp_permissions_t **out_ctx) {
 int cmp_permissions_destroy(cmp_permissions_t *ctx) {
   int rc = CMP_SUCCESS;
 
-  if (ctx) {
-    CMP_FREE(ctx);
+  if (!ctx) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_permissions_destroy: Invalid argument\n");
+    return rc;
+  }
+
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_permissions_destroy: CMP_FREE failed\n");
+    return rc;
   }
   return rc;
 }
@@ -222,8 +230,16 @@ int cmp_privacy_indicators_create(cmp_privacy_indicators_t **out_indicators) {
 int cmp_privacy_indicators_destroy(cmp_privacy_indicators_t *indicators) {
   int rc = CMP_SUCCESS;
 
-  if (indicators) {
-    CMP_FREE(indicators);
+  if (!indicators) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_privacy_indicators_destroy: Invalid argument\n");
+    return rc;
+  }
+
+  rc = CMP_FREE(indicators);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_privacy_indicators_destroy: CMP_FREE failed\n");
+    return rc;
   }
   return rc;
 }

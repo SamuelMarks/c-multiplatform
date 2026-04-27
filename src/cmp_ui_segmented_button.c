@@ -51,12 +51,21 @@ int cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
   /* Create a container box for the segments */
   err = cmp_ui_box_create(&btn->node_root);
   if (err != CMP_SUCCESS) {
-    CMP_FREE(btn->segments);
-    CMP_FREE(btn);
+    int free_rc = CMP_FREE(btn->segments);
+    if (free_rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_segmented_button_create: CMP_FREE failed\n");
+    free_rc = CMP_FREE(btn);
+    if (free_rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_segmented_button_create: CMP_FREE failed\n");
     return err;
   }
 
-  btn->node_root->layout->direction = CMP_FLEX_ROW;
+  err = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&btn->node_root->layout);
+  if (err == CMP_SUCCESS) {
+    memset(btn->node_root->layout, 0, sizeof(cmp_layout_node_t));
+    btn->node_root->layout->id = 1;
+    btn->node_root->layout->direction = CMP_FLEX_ROW;
+  }
 
   *out_btn = btn;
   return CMP_SUCCESS;
@@ -74,9 +83,15 @@ int cmp_ui_segmented_button_destroy(cmp_ui_segmented_button_t *btn) {
   }
 
   if (btn->segments) {
-    CMP_FREE(btn->segments);
+    int free_rc = CMP_FREE(btn->segments);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_segmented_button_destroy: CMP_FREE segments failed\n");
+    }
   }
-  CMP_FREE(btn);
+  int free_rc = CMP_FREE(btn);
+  if (free_rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_segmented_button_destroy: CMP_FREE btn failed\n");
+  }
   return CMP_SUCCESS;
 }
 
@@ -125,7 +140,10 @@ int cmp_ui_segmented_button_add_segment(cmp_ui_segmented_button_t *btn,
     }
     memcpy(new_segs, btn->segments,
            sizeof(cmp_ui_segment_t) * btn->segment_count);
-    CMP_FREE(btn->segments);
+    int free_rc = CMP_FREE(btn->segments);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_segmented_button_add_segment: CMP_FREE failed\n");
+    }
     btn->segments = new_segs;
     btn->segment_capacity = new_cap;
   }

@@ -331,6 +331,50 @@ TEST test_a11y_tree_cognitive_motion_sound(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
 }
+TEST test_a11y_tree_ignores_invert_color_hover(void) {
+  cmp_a11y_tree_t *tree = NULL;
+  int res;
+
+  res = cmp_a11y_tree_create(&tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
+
+  res = cmp_a11y_tree_add_node(tree, 88, "image", "Logo");
+  ASSERT_EQ(CMP_SUCCESS, res);
+
+  res = cmp_a11y_tree_set_node_ignores_invert(tree, 88, 1);
+  ASSERT_EQ(CMP_SUCCESS, res);
+
+  res = cmp_a11y_tree_set_node_differentiate_without_color(tree, 88, 1);
+  ASSERT_EQ(CMP_SUCCESS, res);
+
+  res = cmp_a11y_tree_set_node_hover_text(tree, 88, "This is a logo");
+  ASSERT_EQ(CMP_SUCCESS, res);
+
+  /* Edge cases */
+  res = cmp_a11y_tree_set_node_ignores_invert(NULL, 88, 1);
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
+
+  res = cmp_a11y_tree_set_node_differentiate_without_color(NULL, 88, 1);
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
+
+  res = cmp_a11y_tree_set_node_hover_text(NULL, 88, "text");
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
+
+  /* Not found */
+  res = cmp_a11y_tree_set_node_ignores_invert(tree, 999, 1);
+  ASSERT_EQ(CMP_ERROR_NOT_FOUND, res);
+
+  res = cmp_a11y_tree_set_node_differentiate_without_color(tree, 999, 1);
+  ASSERT_EQ(CMP_ERROR_NOT_FOUND, res);
+
+  res = cmp_a11y_tree_set_node_hover_text(tree, 999, "text");
+  ASSERT_EQ(CMP_ERROR_NOT_FOUND, res);
+
+  res = cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  PASS();
+}
+
 TEST test_a11y_theme_semantic_equivalence(void) {
   cmp_a11y_tree_t *tree = NULL;
   cmp_ui_node_t *node = NULL;
@@ -370,6 +414,7 @@ SUITE(a11y_tree_suite) {
   RUN_TEST(test_a11y_tree_grouping_focus_rotors_actions);
   RUN_TEST(test_a11y_tree_braille_audio_pronunciation_touch_announcement);
   RUN_TEST(test_a11y_tree_cognitive_motion_sound);
+  RUN_TEST(test_a11y_tree_ignores_invert_color_hover);
 }
 
 #endif

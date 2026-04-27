@@ -45,6 +45,13 @@ int cmp_ui_divider_create(cmp_ui_divider_t **out_divider) {
     return CMP_ERROR_GENERAL;
   }
 
+  rc = CMP_MALLOC(sizeof(cmp_layout_node_t),
+                  (void **)&divider->node_root->layout);
+  if (rc == CMP_SUCCESS) {
+    memset(divider->node_root->layout, 0, sizeof(cmp_layout_node_t));
+    divider->node_root->layout->id = 1;
+  }
+
   if (divider->node_root) {
     divider->node_root->bg_color = 0xFFCCCCCC;
   }

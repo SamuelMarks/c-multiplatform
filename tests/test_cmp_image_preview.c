@@ -23,7 +23,7 @@ TEST test_image_preview_load_base64(void) {
   /* "A" base64 encoded is "QQ==" */
   const char *base64 = "QQ==";
 
-  cmp_image_preview_create(&preview);
+  ASSERT_EQ(CMP_SUCCESS, cmp_image_preview_create(&preview));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_image_preview_load_base64(NULL, base64, &pixels, &w, &h));
@@ -43,7 +43,8 @@ TEST test_image_preview_load_base64(void) {
                       simple integer division */
   ASSERT_EQ('A', pixels[0]);
 
-  cmp_image_preview_free_pixels(pixels);
+  ASSERT_EQ(CMP_SUCCESS, cmp_image_preview_free_pixels(pixels));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_image_preview_free_pixels(NULL));
 
   /* Test invalid length */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -53,7 +54,7 @@ TEST test_image_preview_load_base64(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_image_preview_load_base64(preview, "Q@==", &pixels, &w, &h));
 
-  cmp_image_preview_destroy(preview);
+  ASSERT_EQ(CMP_SUCCESS, cmp_image_preview_destroy(preview));
   PASS();
 }
 

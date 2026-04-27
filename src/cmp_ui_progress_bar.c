@@ -58,7 +58,10 @@ int cmp_ui_progress_bar_create(cmp_ui_progress_bar_t **out_bar,
 
   bar->node_fill->bg_color = fill_color;
 
-  cmp_ui_node_add_child(bar->node_track, bar->node_fill);
+  err = cmp_ui_node_add_child(bar->node_track, bar->node_fill);
+  if (err != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_progress_bar_create: cmp_ui_node_add_child failed\n");
+  }
 
   *out_bar = bar;
   return 0;

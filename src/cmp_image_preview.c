@@ -28,7 +28,7 @@ int cmp_image_preview_create(cmp_image_preview_t **out_preview) {
   rc = CMP_MALLOC(sizeof(cmp_image_preview_t), (void **)&preview);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_image_preview_create: Out of memory\n");
-    return rc;
+    return CMP_ERROR_OOM;
   }
 
   preview->flags = 0;
@@ -50,7 +50,11 @@ int cmp_image_preview_destroy(cmp_image_preview_t *preview) {
     LOG_DEBUG("Error in cmp_image_preview_destroy: Invalid argument\n");
     return rc;
   }
-  CMP_FREE(preview);
+  rc = CMP_FREE(preview);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_image_preview_destroy: CMP_FREE failed\n");
+    return rc;
+  }
   return rc;
 }
 
@@ -127,7 +131,7 @@ int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
   rc = CMP_MALLOC(out_len, (void **)&pixels);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_image_preview_load_base64: Out of memory\n");
-    return rc;
+    return CMP_ERROR_OOM;
   }
 
   for (i = 0, j = 0; i < len; i += 4, j += 3) {
@@ -137,7 +141,10 @@ int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
     n[3] = base64_data[i + 3] == '=' ? 0 : get_base64_val(base64_data[i + 3]);
 
     if (n[0] == -1 || n[1] == -1 || n[2] == -1 || n[3] == -1) {
-      CMP_FREE(pixels);
+      int free_rc = CMP_FREE(pixels);
+      if (free_rc != CMP_SUCCESS) {
+        LOG_DEBUG("Error in cmp_image_preview_load_base64: CMP_FREE failed\n");
+      }
       rc = CMP_ERROR_INVALID_ARG;
       LOG_DEBUG(
           "Error in cmp_image_preview_load_base64: Invalid base64 character\n");
@@ -166,8 +173,17 @@ int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
  */
 int cmp_image_preview_free_pixels(unsigned char *pixels) {
   int rc = CMP_SUCCESS;
-  if (pixels) {
-    CMP_FREE(pixels);
+
+  if (!pixels) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_image_preview_free_pixels: Invalid argument\n");
+    return rc;
+  }
+
+  rc = CMP_FREE(pixels);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_image_preview_free_pixels: CMP_FREE failed\n");
+    return rc;
   }
   return rc;
 }

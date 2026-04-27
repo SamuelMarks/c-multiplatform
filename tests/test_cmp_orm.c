@@ -137,11 +137,56 @@ TEST test_orm_features(void) {
   PASS();
 }
 
+TEST test_orm_null_args(void) {
+  c_orm_db_t *db = (c_orm_db_t *)1;
+  cmp_orm_observable_t *obs = (cmp_orm_observable_t *)1;
+  cmp_ui_node_t *node = (cmp_ui_node_t *)1;
+  int res;
+
+  /* Before init, it should fail */
+  res = cmp_orm_connect("virt:/test", &db);
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
+
+  cmp_vfs_init();
+  cmp_orm_init();
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_orm_connect(NULL, &db), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_orm_connect("virt:/test", NULL),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_orm_disconnect(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_orm_execute(NULL, "SELECT 1"), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_orm_execute(db, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_orm_migrate(NULL, "virt:/migrations"), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_orm_migrate(db, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_orm_set_encryption_key(NULL, "key"),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_orm_set_encryption_key(db, NULL),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_orm_observable_create(NULL, "query", &obs), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_orm_observable_create(db, NULL, &obs), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_orm_observable_create(db, "query", NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_node_bind(NULL, obs, "prop"),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_node_bind(node, NULL, "prop"),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_node_bind(node, obs, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_orm_observable_destroy(NULL), "%d");
+
+  cmp_orm_shutdown();
+  cmp_vfs_shutdown();
+  PASS();
+}
+
 SUITE(orm_suite) {
   RUN_TEST(test_orm_lifecycle);
   RUN_TEST(test_orm_db_connection);
   RUN_TEST(test_orm_default_path);
   RUN_TEST(test_orm_features);
+  RUN_TEST(test_orm_null_args);
 }
 
 GREATEST_MAIN_DEFS();

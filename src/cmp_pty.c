@@ -27,15 +27,17 @@ struct cmp_pty {
 int cmp_pty_create(cmp_pty_t **out_pty, const char *command, int cols,
                    int rows) {
   int rc = CMP_SUCCESS;
-  cmp_pty_t *pty;
+  cmp_pty_t *pty = NULL;
 
   if (!out_pty || !command) {
-    return -1;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_pty_create: Invalid argument\n");
+    return rc;
   }
 
-  rc = CMP_MALLOC(sizeof(cmp_pty_t), (void **)&(pty));
+  rc = CMP_MALLOC(sizeof(cmp_pty_t), (void **)&pty);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("OOM\n");
+    LOG_DEBUG("Error in cmp_pty_create: Out of memory\n");
     return CMP_ERROR_OOM;
   }
 
@@ -44,12 +46,16 @@ int cmp_pty_create(cmp_pty_t **out_pty, const char *command, int cols,
   pty->buffer_len = 0;
 
   /* Mock initial output */
+#if defined(_MSC_VER)
+  strncpy_s(pty->buffer, sizeof(pty->buffer), "Simulated PTY start", _TRUNCATE);
+#else
   strncpy(pty->buffer, "Simulated PTY start", 1023);
+#endif
   pty->buffer[1023] = '\0';
   pty->buffer_len = (unsigned int)strlen(pty->buffer);
 
   *out_pty = pty;
-  return 0;
+  return rc;
 }
 
 /**
@@ -60,14 +66,20 @@ int cmp_pty_create(cmp_pty_t **out_pty, const char *command, int cols,
  */
 int cmp_pty_destroy(cmp_pty_t *pty) {
   int rc = CMP_SUCCESS;
+
   if (!pty) {
-    return -1;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_pty_destroy: Invalid argument\n");
+    return rc;
   }
+
   rc = CMP_FREE(pty);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Free failed\n");
+    LOG_DEBUG("Error in cmp_pty_destroy: CMP_FREE failed\n");
+    return rc;
   }
-  return 0;
+
+  return rc;
 }
 
 /**
@@ -79,12 +91,17 @@ int cmp_pty_destroy(cmp_pty_t *pty) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pty_resize(cmp_pty_t *pty, int cols, int rows) {
+  int rc = CMP_SUCCESS;
+
   if (!pty || cols <= 0 || rows <= 0) {
-    return -1;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_pty_resize: Invalid argument\n");
+    return rc;
   }
+
   pty->cols = cols;
   pty->rows = rows;
-  return 0;
+  return rc;
 }
 
 /**
@@ -96,16 +113,22 @@ int cmp_pty_resize(cmp_pty_t *pty, int cols, int rows) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pty_write(cmp_pty_t *pty, const void *data, unsigned int len) {
+  int rc = CMP_SUCCESS;
+
   if (!pty || !data) {
-    return -1;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_pty_write: Invalid argument\n");
+    return rc;
   }
+
   /* Mock echo behavior */
   if (len > 1023) {
     len = 1023;
   }
   memcpy(pty->buffer, data, len);
   pty->buffer_len = len;
-  return 0;
+
+  return rc;
 }
 
 /**
@@ -119,15 +142,18 @@ int cmp_pty_write(cmp_pty_t *pty, const void *data, unsigned int len) {
  */
 int cmp_pty_read(cmp_pty_t *pty, void *out_buffer, unsigned int buffer_size,
                  unsigned int *out_read) {
+  int rc = CMP_SUCCESS;
   unsigned int to_copy;
 
   if (!pty || !out_buffer || !out_read) {
-    return -1;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_pty_read: Invalid argument\n");
+    return rc;
   }
 
   if (pty->buffer_len == 0) {
     *out_read = 0;
-    return 0;
+    return rc;
   }
 
   to_copy = pty->buffer_len > buffer_size ? buffer_size : pty->buffer_len;
@@ -142,5 +168,5 @@ int cmp_pty_read(cmp_pty_t *pty, void *out_buffer, unsigned int buffer_size,
     pty->buffer_len = 0;
   }
 
-  return 0;
+  return rc;
 }

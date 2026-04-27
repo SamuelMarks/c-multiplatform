@@ -40,7 +40,10 @@ int cmp_ui_spinner_create(cmp_ui_spinner_t **out_spinner, float size,
   rc = cmp_ui_box_create(&spinner->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_spinner_create: cmp_ui_box_create failed\n");
-    CMP_FREE(spinner);
+    int free_rc = CMP_FREE(spinner);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_spinner_create: CMP_FREE failed\n");
+    }
     return rc;
   }
 

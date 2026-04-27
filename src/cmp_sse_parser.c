@@ -24,15 +24,17 @@ struct cmp_sse_parser {
 int cmp_sse_parser_create(cmp_sse_parser_t **out_parser,
                           cmp_sse_event_cb callback, void *user_data) {
   int rc = CMP_SUCCESS;
-  cmp_sse_parser_t *parser;
+  cmp_sse_parser_t *parser = NULL;
 
   if (!out_parser) {
-    return -1;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_sse_parser_create: Invalid argument\n");
+    return rc;
   }
 
-  rc = CMP_MALLOC(sizeof(cmp_sse_parser_t), (void **)&(parser));
+  rc = CMP_MALLOC(sizeof(cmp_sse_parser_t), (void **)&parser);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("OOM\n");
+    LOG_DEBUG("Error in cmp_sse_parser_create: Out of memory\n");
     return CMP_ERROR_OOM;
   }
 
@@ -42,7 +44,7 @@ int cmp_sse_parser_create(cmp_sse_parser_t **out_parser,
   memset(parser->buffer, 0, sizeof(parser->buffer));
 
   *out_parser = parser;
-  return 0;
+  return rc;
 }
 
 /**
@@ -53,14 +55,20 @@ int cmp_sse_parser_create(cmp_sse_parser_t **out_parser,
  */
 int cmp_sse_parser_destroy(cmp_sse_parser_t *parser) {
   int rc = CMP_SUCCESS;
+
   if (!parser) {
-    return -1;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_sse_parser_destroy: Invalid argument\n");
+    return rc;
   }
+
   rc = CMP_FREE(parser);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Free failed\n");
+    LOG_DEBUG("Error in cmp_sse_parser_destroy: CMP_FREE failed\n");
+    return rc;
   }
-  return 0;
+
+  return rc;
 }
 
 /**
@@ -73,13 +81,16 @@ int cmp_sse_parser_destroy(cmp_sse_parser_t *parser) {
  */
 int cmp_sse_parser_feed(cmp_sse_parser_t *parser, const char *chunk,
                         unsigned int len) {
+  int rc = CMP_SUCCESS;
   unsigned int space;
 
   if (!parser || !chunk) {
-    return -1;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_sse_parser_feed: Invalid argument\n");
+    return rc;
   }
 
-  space = sizeof(parser->buffer) - parser->buffer_len - 1;
+  space = (unsigned int)(sizeof(parser->buffer) - parser->buffer_len - 1);
   if (len > space) {
     len = space; /* Truncate if overflowing buffer for this mock */
   }
@@ -97,5 +108,5 @@ int cmp_sse_parser_feed(cmp_sse_parser_t *parser, const char *chunk,
     parser->buffer[0] = '\0';
   }
 
-  return 0;
+  return rc;
 }

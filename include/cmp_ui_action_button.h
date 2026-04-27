@@ -82,7 +82,7 @@ CMP_API int cmp_ui_action_button_bind_a11y(cmp_ui_action_button_t *widget,
                                            cmp_a11y_tree_t *tree);
 
 #ifdef __cplusplus
-
+}
 #endif /* __cplusplus */
 
 #endif /* CMP_UI_ACTION_BUTTON_H */

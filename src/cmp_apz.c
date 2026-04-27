@@ -76,7 +76,10 @@ int cmp_apz_destroy(cmp_apz_t *apz) {
     return rc;
   }
 
-  CMP_FREE(ctx);
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    cmp_log_debug("cmp_apz_destroy: CMP_FREE failed\n");
+  }
   cmp_log_debug("cmp_apz_destroy: Successfully destroyed APZ context\n");
   return rc;
 }

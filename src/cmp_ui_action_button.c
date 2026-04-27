@@ -79,6 +79,12 @@ int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
     return rc;
   }
 
+  rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&btn->node_root->layout);
+  if (rc == CMP_SUCCESS) {
+    memset(btn->node_root->layout, 0, sizeof(cmp_layout_node_t));
+    btn->node_root->layout->id = 1;
+  }
+
   btn->node_root->type = 3; /* Button */
 
   rc = cmp_ui_text_create(&btn->node_text, btn->label ? btn->label : "", -1);

@@ -47,12 +47,23 @@ int cmp_ui_navigation_rail_create(cmp_ui_navigation_rail_t **out_rail) {
 
   err = cmp_ui_box_create(&rail->node_root);
   if (err != CMP_SUCCESS) {
-    CMP_FREE(rail->destinations);
-    CMP_FREE(rail);
+    int free_rc = CMP_FREE(rail->destinations);
+    if (free_rc != CMP_SUCCESS)
+      LOG_DEBUG(
+          "cmp_ui_navigation_rail_create: CMP_FREE destinations failed\n");
+    free_rc = CMP_FREE(rail);
+    if (free_rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_navigation_rail_create: CMP_FREE rail failed\n");
     return err;
   }
 
-  rail->node_root->layout->direction = CMP_FLEX_COLUMN;
+  err =
+      CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&rail->node_root->layout);
+  if (err == CMP_SUCCESS) {
+    memset(rail->node_root->layout, 0, sizeof(cmp_layout_node_t));
+    rail->node_root->layout->id = 1;
+    rail->node_root->layout->direction = CMP_FLEX_COLUMN;
+  }
   rail->node_root->bg_color = 0xFFF5F5F5;
   rail->selected_index = -1;
 
@@ -71,9 +82,16 @@ int cmp_ui_navigation_rail_destroy(cmp_ui_navigation_rail_t *rail) {
     return CMP_ERROR_INVALID_ARG;
   }
   if (rail->destinations) {
-    CMP_FREE(rail->destinations);
+    int free_rc = CMP_FREE(rail->destinations);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG(
+          "cmp_ui_navigation_rail_destroy: CMP_FREE destinations failed\n");
+    }
   }
-  CMP_FREE(rail);
+  int free_rc = CMP_FREE(rail);
+  if (free_rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_navigation_rail_destroy: CMP_FREE rail failed\n");
+  }
   return CMP_SUCCESS;
 }
 
@@ -122,7 +140,11 @@ int cmp_ui_navigation_rail_add_destination(cmp_ui_navigation_rail_t *rail,
     }
     memcpy(new_dests, rail->destinations,
            sizeof(cmp_ui_navigation_rail_dest_t) * rail->dest_count);
-    CMP_FREE(rail->destinations);
+    int free_rc = CMP_FREE(rail->destinations);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_navigation_rail_add_destination: CMP_FREE old "
+                "destinations failed\n");
+    }
     rail->destinations = new_dests;
     rail->dest_capacity = new_cap;
   }

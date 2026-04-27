@@ -53,7 +53,11 @@ int cmp_pip_destroy(cmp_pip_t *pip) {
     return rc;
   }
 
-  CMP_FREE(pip);
+  rc = CMP_FREE(pip);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_pip_destroy: CMP_FREE failed\n");
+    return rc;
+  }
   return rc;
 }
 

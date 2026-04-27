@@ -29,7 +29,7 @@ int cmp_plugin_loader_create(cmp_plugin_loader_t **out_loader) {
 
   rc = CMP_MALLOC(sizeof(cmp_plugin_loader_t), (void **)&(loader));
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("OOM\n");
+    LOG_DEBUG("Error in cmp_plugin_loader_create: Out of memory\n");
     return CMP_ERROR_OOM;
   }
 
@@ -53,9 +53,11 @@ int cmp_plugin_loader_destroy(cmp_plugin_loader_t *loader) {
     LOG_DEBUG("Error in cmp_plugin_loader_destroy: Invalid argument\n");
     return rc;
   }
+
   rc = CMP_FREE(loader);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Free failed\n");
+    LOG_DEBUG("Error in cmp_plugin_loader_destroy: CMP_FREE failed\n");
+    return rc;
   }
   return rc;
 }
@@ -136,7 +138,7 @@ int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
   len = strlen(dummy_resp);
   rc = CMP_MALLOC(len + 1, (void **)&(*out_response));
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("OOM\n");
+    LOG_DEBUG("Error in cmp_plugin_loader_execute: Out of memory\n");
     return CMP_ERROR_OOM;
   }
 #if defined(_MSC_VER)
@@ -158,11 +160,17 @@ int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
 int cmp_plugin_loader_free_response(char *response) {
   int rc = CMP_SUCCESS;
 
-  if (response) {
-    rc = CMP_FREE(response);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
-    }
+  if (!response) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("Error in cmp_plugin_loader_free_response: Invalid argument\n");
+    return rc;
   }
+
+  rc = CMP_FREE(response);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_plugin_loader_free_response: CMP_FREE failed\n");
+    return rc;
+  }
+
   return rc;
 }

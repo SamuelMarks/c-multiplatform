@@ -40,7 +40,10 @@ int cmp_ui_splitter_create(cmp_ui_splitter_t **out_splitter, int is_vertical,
   rc = cmp_ui_box_create(&splitter->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_splitter_create: cmp_ui_box_create failed\n");
-    CMP_FREE(splitter);
+    int free_rc = CMP_FREE(splitter);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_splitter_create: CMP_FREE failed\n");
+    }
     return rc;
   }
 

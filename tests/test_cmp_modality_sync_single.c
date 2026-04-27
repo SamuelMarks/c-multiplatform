@@ -48,13 +48,25 @@ TEST test_modality_single_lifecycle(void) {
 
 TEST test_modality_null_args(void) {
   cmp_modality_t mod;
+  cmp_actor_t *actor = NULL;
+  cmp_msg_t *msg = (cmp_msg_t *)0x1234;
+  cmp_msg_bus_t *bus = (cmp_msg_bus_t *)0x1234;
+
   cmp_modality_sync_single_init(&mod);
 
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_sync_single_init(NULL),
                 "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_sync_multi_init(NULL, 1),
                 "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_sync_multi_init(&mod, 0),
+                "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_async_single_init(NULL),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_async_multi_init(NULL),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_greenthreads_init(NULL),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_multiprocess_init(NULL),
                 "%d");
 
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_destroy(NULL), "%d");
@@ -67,6 +79,50 @@ TEST test_modality_null_args(void) {
                 cmp_modality_queue_task(&mod, NULL, NULL), "%d");
 
   cmp_modality_destroy(&mod);
+
+  /* Stubs */
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_app_init(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_app_init((cmp_app_config_t *)1), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_msg_subscribe(NULL, "chan", (void *)1), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_msg_subscribe(bus, NULL, (void *)1),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_msg_subscribe(bus, "chan", NULL),
+                "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_msg_subscribe(bus, "chan", (void *)1), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_msg_publish(NULL, "chan", msg),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_msg_publish(bus, NULL, msg), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_msg_publish(bus, "chan", NULL),
+                "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_msg_publish(bus, "chan", msg), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_actor_spawn(NULL, "name", (void *)1, NULL, &actor), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_actor_spawn(bus, NULL, (void *)1, NULL, &actor), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_actor_spawn(bus, "name", NULL, NULL, &actor), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_actor_spawn(bus, "name", (void *)1, NULL, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS,
+                cmp_actor_spawn(bus, "name", (void *)1, NULL, &actor), "%d");
+
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_actor_supervise(NULL), "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_actor_supervise((cmp_actor_t *)1), "%d");
+
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_modality_async_multi_init(&mod), "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_modality_greenthreads_init(&mod), "%d");
+  ASSERT_EQ_FMT(CMP_SUCCESS, cmp_modality_multiprocess_init(&mod), "%d");
+
+  {
+    int run_loop_called = 0;
+    cmp_run_loop(NULL, NULL);
+    ASSERT_EQ_FMT(0, run_loop_called, "%d");
+  }
+
   PASS();
 }
 

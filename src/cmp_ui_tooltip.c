@@ -62,15 +62,24 @@ int cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip, const char *text,
 
   err = cmp_ui_box_create(&tooltip->node_root);
   if (err != 0) {
-    rc = CMP_FREE(tooltip->text);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+    if (tooltip->text) {
+      rc = CMP_FREE(tooltip->text);
+      if (rc != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_tooltip_create: Free failed\n");
+      }
     }
     rc = CMP_FREE(tooltip);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+      LOG_DEBUG("cmp_ui_tooltip_create: Free failed\n");
     }
     return err;
+  }
+
+  err = CMP_MALLOC(sizeof(cmp_layout_node_t),
+                   (void **)&tooltip->node_root->layout);
+  if (err == CMP_SUCCESS) {
+    memset(tooltip->node_root->layout, 0, sizeof(cmp_layout_node_t));
+    tooltip->node_root->layout->id = 1;
   }
 
   tooltip->node_root->bg_color = bg_color;
@@ -78,20 +87,26 @@ int cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip, const char *text,
   err = cmp_ui_text_create(&tooltip->node_text,
                            tooltip->text ? tooltip->text : "", -1);
   if (err != 0) {
-    rc = CMP_FREE(tooltip->text);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+    cmp_ui_node_destroy(tooltip->node_root);
+    if (tooltip->text) {
+      rc = CMP_FREE(tooltip->text);
+      if (rc != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_tooltip_create: Free failed\n");
+      }
     }
     rc = CMP_FREE(tooltip);
     if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+      LOG_DEBUG("cmp_ui_tooltip_create: Free failed\n");
     }
     return err;
   }
 
   tooltip->node_text->text_color = text_color;
 
-  cmp_ui_node_add_child(tooltip->node_root, tooltip->node_text);
+  err = cmp_ui_node_add_child(tooltip->node_root, tooltip->node_text);
+  if (err != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_tooltip_create: cmp_ui_node_add_child failed\n");
+  }
 
   *out_tooltip = tooltip;
   return 0;
@@ -192,7 +207,10 @@ int cmp_ui_tooltip_bind_a11y(cmp_ui_tooltip_t *widget, cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
-  cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "tooltip",
-                         "Tooltip");
-  return 0;
+  int err = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id,
+                                   "tooltip", "Tooltip");
+  if (err != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_tooltip_bind_a11y: cmp_a11y_tree_add_node failed\n");
+  }
+  return err;
 }

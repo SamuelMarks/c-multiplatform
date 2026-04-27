@@ -94,7 +94,7 @@ cmp_ui_progress_indicator_bind_a11y(cmp_ui_progress_indicator_t *widget,
                                     cmp_a11y_tree_t *tree);
 
 #ifdef __cplusplus
-
+}
 #endif /* __cplusplus */
 
 #endif /* CMP_UI_PROGRESS_INDICATOR_H */

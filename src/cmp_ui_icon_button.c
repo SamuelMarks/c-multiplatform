@@ -66,10 +66,20 @@ int cmp_ui_icon_button_create(cmp_ui_icon_button_t **out_btn,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_icon_button_create: cmp_ui_button_create failed\n");
     if (btn->icon_name) {
-      CMP_FREE(btn->icon_name);
+      int free_rc = CMP_FREE(btn->icon_name);
+      if (free_rc != CMP_SUCCESS)
+        LOG_DEBUG("cmp_ui_icon_button_create: CMP_FREE icon_name failed\n");
     }
-    CMP_FREE(btn);
-    return rc;
+    rc = CMP_FREE(btn);
+    if (rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_icon_button_create: CMP_FREE btn failed\n");
+    return CMP_ERROR_GENERAL;
+  }
+
+  rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&btn->node_root->layout);
+  if (rc == CMP_SUCCESS) {
+    memset(btn->node_root->layout, 0, sizeof(cmp_layout_node_t));
+    btn->node_root->layout->id = 1;
   }
 
   btn->node_root->type = 3; /* Button */
@@ -82,10 +92,14 @@ int cmp_ui_icon_button_create(cmp_ui_icon_button_t **out_btn,
     if (rc != CMP_SUCCESS)
       LOG_DEBUG("cmp_ui_icon_button_create: cmp_ui_node_destroy failed\n");
     if (btn->icon_name) {
-      CMP_FREE(btn->icon_name);
+      int free_rc = CMP_FREE(btn->icon_name);
+      if (free_rc != CMP_SUCCESS)
+        LOG_DEBUG("cmp_ui_icon_button_create: CMP_FREE icon_name failed\n");
     }
-    CMP_FREE(btn);
-    return rc;
+    rc = CMP_FREE(btn);
+    if (rc != CMP_SUCCESS)
+      LOG_DEBUG("cmp_ui_icon_button_create: CMP_FREE btn failed\n");
+    return CMP_ERROR_GENERAL;
   }
 
   rc = cmp_ui_node_add_child(btn->node_root, btn->node_icon);

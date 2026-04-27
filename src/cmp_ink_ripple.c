@@ -81,7 +81,10 @@ int cmp_ink_ripple_destroy(cmp_ink_ripple_t *ripple) {
     return rc;
   }
 
-  CMP_FREE(ctx);
+  rc = CMP_FREE(ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_ink_ripple_destroy: CMP_FREE failed\n");
+  }
   return rc;
 }
 

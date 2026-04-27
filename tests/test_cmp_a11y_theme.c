@@ -11,9 +11,20 @@ TEST test_cmp_a11y_theme_init_cleanup(void) {
 }
 
 TEST test_cmp_a11y_detect_high_contrast(void) {
-  int is_hc = cmp_a11y_detect_high_contrast();
+  int is_hc = -1;
+  int rc;
+
+  rc = cmp_a11y_detect_high_contrast(&is_hc);
+  ASSERT_EQ(CMP_SUCCESS, rc);
   /* It can be 0 or 1 depending on the host machine. We just ensure it runs. */
   ASSERT(is_hc == 0 || is_hc == 1);
+  PASS();
+}
+
+TEST test_cmp_a11y_detect_high_contrast_null(void) {
+  int rc;
+  rc = cmp_a11y_detect_high_contrast(NULL);
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, rc);
   PASS();
 }
 
@@ -63,6 +74,19 @@ TEST test_cmp_a11y_build_theme_protanopia(void) {
   PASS();
 }
 
+TEST test_cmp_a11y_build_theme_deuteranopia(void) {
+  cmp_a11y_theme_t theme;
+  memset(&theme, 0, sizeof(theme));
+  ASSERT_EQ(0, cmp_a11y_build_theme(CMP_COLOR_BLIND_DEUTERANOPIA, &theme));
+
+  if (!theme.is_high_contrast) {
+    ASSERT_EQ_FMT(0.0f, theme.primary_accent.r, "%f");
+    ASSERT_EQ_FMT(0.33f, theme.primary_accent.g, "%f");
+    ASSERT_EQ_FMT(0.88f, theme.primary_accent.b, "%f");
+  }
+  PASS();
+}
+
 TEST test_cmp_a11y_build_theme_tritanopia(void) {
   cmp_a11y_theme_t theme;
   memset(&theme, 0, sizeof(theme));
@@ -80,9 +104,11 @@ TEST test_cmp_a11y_build_theme_tritanopia(void) {
 SUITE(cmp_a11y_theme_suite) {
   RUN_TEST(test_cmp_a11y_theme_init_cleanup);
   RUN_TEST(test_cmp_a11y_detect_high_contrast);
+  RUN_TEST(test_cmp_a11y_detect_high_contrast_null);
   RUN_TEST(test_cmp_a11y_build_theme_null);
   RUN_TEST(test_cmp_a11y_build_theme_regular);
   RUN_TEST(test_cmp_a11y_build_theme_protanopia);
+  RUN_TEST(test_cmp_a11y_build_theme_deuteranopia);
   RUN_TEST(test_cmp_a11y_build_theme_tritanopia);
 }
 

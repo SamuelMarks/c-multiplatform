@@ -224,6 +224,96 @@ TEST test_resize_observer(void) {
   PASS();
 }
 
+TEST test_null_args(void) {
+  cmp_media_query_t query;
+  cmp_media_query_env_t env;
+  int matches;
+  cmp_container_ctx_t *ctx = NULL;
+  cmp_container_query_t cq;
+  cmp_style_query_t sq;
+  cmp_rect_t rect;
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_media_query_evaluate(NULL, &env, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_media_query_evaluate(&query, NULL, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_media_query_evaluate(&query, &env, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_pointer_media_evaluate(NULL, &env, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_pointer_media_evaluate(&query, NULL, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_pointer_media_evaluate(&query, &env, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_update_media_evaluate(NULL, &env, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_update_media_evaluate(&query, NULL, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_update_media_evaluate(&query, &env, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_light_level_evaluate(NULL, &env, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_light_level_evaluate(&query, NULL, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_light_level_evaluate(&query, &env, NULL));
+
+  ASSERT_EQ(
+      CMP_ERROR_INVALID_ARG,
+      cmp_container_ctx_create(NULL, CMP_CONTAINER_TYPE_INLINE_SIZE, "name"));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_container_ctx_destroy(NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_container_query_evaluate(NULL, ctx, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_container_query_evaluate(&cq, NULL, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_container_query_evaluate(&cq, ctx, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_style_query_evaluate(NULL, &sq, 1, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_style_query_evaluate(&sq, &sq, 1, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_content_visibility_evaluate(CMP_CONTENT_VISIBILITY_AUTO, NULL,
+                                            &rect, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_content_visibility_evaluate(CMP_CONTENT_VISIBILITY_AUTO, &rect,
+                                            NULL, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_content_visibility_evaluate(CMP_CONTENT_VISIBILITY_AUTO, &rect,
+                                            &rect, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_contain_evaluate(CMP_CONTAIN_NONE, NULL, &matches));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_contain_evaluate(CMP_CONTAIN_NONE, &matches, NULL));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_resize_observer_create(NULL, NULL, NULL));
+
+  {
+    cmp_resize_observer_t *obs;
+    ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+              cmp_resize_observer_create(&obs, NULL, NULL));
+  }
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_resize_observer_destroy(NULL));
+
+  {
+    cmp_layout_node_t *node = NULL;
+    cmp_layout_node_create(&node);
+    ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+              cmp_resize_observer_notify(NULL, node, 0.0f, 0.0f));
+    cmp_layout_node_destroy(node);
+  }
+
+  PASS();
+}
+
 SUITE(cmp_media_query_suite) {
   RUN_TEST(test_media_query_evaluate);
   RUN_TEST(test_pointer_media_evaluate);
@@ -234,6 +324,7 @@ SUITE(cmp_media_query_suite) {
   RUN_TEST(test_content_visibility_evaluate);
   RUN_TEST(test_contain_evaluate);
   RUN_TEST(test_resize_observer);
+  RUN_TEST(test_null_args);
 }
 
 GREATEST_MAIN_DEFS();

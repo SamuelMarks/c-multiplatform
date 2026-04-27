@@ -55,7 +55,10 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
     return rc;
   }
 
-  if (bar->node_root && bar->node_root->layout) {
+  rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&bar->node_root->layout);
+  if (rc == CMP_SUCCESS) {
+    memset(bar->node_root->layout, 0, sizeof(cmp_layout_node_t));
+    bar->node_root->layout->id = 1;
     bar->node_root->layout->direction = CMP_FLEX_ROW;
     bar->node_root->bg_color = 0xFFF5F5F5;
     bar->node_root->layout->width = -1.0f;

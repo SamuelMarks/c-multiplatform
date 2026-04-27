@@ -8,11 +8,17 @@
 TEST test_compositor_thread_lifecycle(void) {
   cmp_compositor_thread_t *thread = NULL;
   void *dummy_tree = (void *)(size_t)0xDEADBEEF;
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_compositor_thread_create(NULL));
+
   ASSERT_EQ(CMP_SUCCESS, cmp_compositor_thread_create(&thread));
   ASSERT_NEQ(NULL, thread);
 
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_compositor_thread_push_tree(NULL, dummy_tree));
   ASSERT_EQ(CMP_SUCCESS, cmp_compositor_thread_push_tree(thread, dummy_tree));
 
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_compositor_thread_destroy(NULL));
   ASSERT_EQ(CMP_SUCCESS, cmp_compositor_thread_destroy(thread));
   PASS();
 }

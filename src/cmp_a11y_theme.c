@@ -55,24 +55,45 @@ int cmp_a11y_theme_cleanup(void) {
 /**
  * @brief cmp_a11y_detect_high_contrast
  *
+ * @param out_is_hc Pointer to store the result (1 if high contrast is ON, 0
+ * otherwise).
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_a11y_detect_high_contrast(void) {
+int cmp_a11y_detect_high_contrast(int *out_is_hc) {
+  int rc = CMP_SUCCESS;
+  int err_rc;
+  const char *err_str;
+
+  if (out_is_hc == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_detect_high_contrast: Invalid argument: %s\n",
+                  err_str);
+    return rc;
+  }
+
 #if defined(_WIN32)
-  HIGHCONTRASTA hc;
-  hc.cbSize = sizeof(HIGHCONTRASTA);
-  if (SystemParametersInfoA(SPI_GETHIGHCONTRAST, sizeof(HIGHCONTRASTA), &hc,
-                            0)) {
-    if (hc.dwFlags & HCF_HIGHCONTRASTON) {
-      cmp_log_debug("cmp_a11y_detect_high_contrast: High contrast is ON\n");
-      return 1;
+  {
+    HIGHCONTRASTA hc;
+    hc.cbSize = sizeof(HIGHCONTRASTA);
+    if (SystemParametersInfoA(SPI_GETHIGHCONTRAST, sizeof(HIGHCONTRASTA), &hc,
+                              0)) {
+      if (hc.dwFlags & HCF_HIGHCONTRASTON) {
+        cmp_log_debug("cmp_a11y_detect_high_contrast: High contrast is ON\n");
+        *out_is_hc = 1;
+        return rc;
+      }
     }
   }
 #else
   /* Future platform support goes here. */
 #endif
   cmp_log_debug("cmp_a11y_detect_high_contrast: High contrast is OFF\n");
-  return 0;
+  *out_is_hc = 0;
+  return rc;
 }
 
 /* Helper to map standard colors based on color blindness types */
@@ -148,7 +169,16 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
     return rc;
   }
 
-  is_hc = cmp_a11y_detect_high_contrast();
+  rc = cmp_a11y_detect_high_contrast(&is_hc);
+  if (rc != CMP_SUCCESS) {
+    err_rc = cmp_strerror(rc, &err_str);
+    if (err_rc != CMP_SUCCESS) {
+      err_str = "Unknown";
+    }
+    cmp_log_debug("cmp_a11y_build_theme: failed to detect high contrast: %s\n",
+                  err_str);
+    return rc;
+  }
   out_theme->is_high_contrast = is_hc;
 
   if (is_hc) {
