@@ -37,7 +37,7 @@ int cmp_os_copy_to_clipboard(cmp_window_t *window, const char *text) {
  * @param path The dropped file path.
  * @param user_data User data.
  */
-CMP_EXEMPT(static void on_file_dropped(const char *path, void *user_data)) {
+static void on_file_dropped(const char *path, void *user_data) {
   (void)user_data;
   /* Normally we'd push an event onto the UI thread queue to create an
    * attachment pill. */

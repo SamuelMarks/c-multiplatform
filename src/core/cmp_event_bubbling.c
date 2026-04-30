@@ -142,10 +142,9 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
  * @param user_data Opaque pointer passed to the callback.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(int cmp_ui_node_add_event_listener(
+int cmp_ui_node_add_event_listener(
     cmp_ui_node_t *node, uint32_t event_type, int capture,
-    void (*callback)(cmp_event_t *, cmp_ui_node_t *, void *),
-    void *user_data)) {
+    void (*callback)(cmp_event_t *, cmp_ui_node_t *, void *), void *user_data) {
   int rc = CMP_SUCCESS;
   cmp_event_listener_node_t *listener;
 

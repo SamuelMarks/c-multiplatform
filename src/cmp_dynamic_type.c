@@ -722,7 +722,7 @@ int cmp_a11y_hover_text_get_bubble(cmp_a11y_hover_text_t *hover_text,
  * @param rgba Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static float cmp_math_get_luminance(uint32_t rgba)) {
+static float cmp_math_get_luminance(uint32_t rgba) {
   float r = (float)((rgba >> 24) & 0xFF) / 255.0f;
   float g = (float)((rgba >> 16) & 0xFF) / 255.0f;
   float b = (float)((rgba >> 8) & 0xFF) / 255.0f;

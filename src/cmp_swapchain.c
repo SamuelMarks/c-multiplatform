@@ -167,8 +167,8 @@ int cmp_swapchain_present(cmp_swapchain_t *swapchain) {
  * @param swapchain Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(
-    void *cmp_swapchain_get_os_surface_handle(cmp_swapchain_t *swapchain)) {
+
+void *cmp_swapchain_get_os_surface_handle(cmp_swapchain_t *swapchain) {
   struct cmp_swapchain *ctx = (struct cmp_swapchain *)swapchain;
   if (!ctx)
     return NULL;

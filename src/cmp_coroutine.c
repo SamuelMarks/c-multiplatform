@@ -136,7 +136,7 @@ static int g_coro_system_initialized = 0;
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void __stdcall cmp_fiber_entry(void *arg)) {
+static void __stdcall cmp_fiber_entry(void *arg) {
   cmp_coroutine_t *co = (cmp_coroutine_t *)arg;
   int rc;
 
@@ -387,7 +387,7 @@ static int g_coro_system_initialized = 0;
  * @param arg_ptr_hi Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void cmp_ucontext_entry(int arg_ptr_lo, int arg_ptr_hi)) {
+static void cmp_ucontext_entry(int arg_ptr_lo, int arg_ptr_hi) {
   /* Reconstruct pointer from 32-bit ints to support 64-bit platforms cleanly
    * via makecontext */
   uint64_t ptr_val =

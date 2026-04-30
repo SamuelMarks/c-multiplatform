@@ -39,7 +39,7 @@ typedef struct cmp_modality_threaded_state {
  * @param arg Pointer to state.
  * @return Thread exit code.
  */
-CMP_EXEMPT(static unsigned long __stdcall cmp_worker_thread_func(void *arg)) {
+static unsigned long __stdcall cmp_worker_thread_func(void *arg) {
 #else
 /**
  * @brief Worker thread entry point.
@@ -47,7 +47,7 @@ CMP_EXEMPT(static unsigned long __stdcall cmp_worker_thread_func(void *arg)) {
  * @param arg Pointer to state.
  * @return Thread exit code.
  */
-CMP_EXEMPT(static void *cmp_worker_thread_func(void *arg)) {
+static void *cmp_worker_thread_func(void *arg) {
 #endif
   cmp_modality_sync_multi_state_t *state;
   cmp_task_node_t *node;
@@ -498,7 +498,7 @@ int cmp_app_init(cmp_app_config_t *config) {
  * @param user_tick Tick function.
  * @param user_arg Argument for tick.
  */
-CMP_EXEMPT(void cmp_run_loop(cmp_run_loop_fn user_tick, void *user_arg)) {
+void cmp_run_loop(cmp_run_loop_fn user_tick, void *user_arg) {
   if (user_tick != NULL) {
     user_tick(user_arg);
   }

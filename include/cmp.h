@@ -1,8 +1,6 @@
 #ifndef CMP_H
 #define CMP_H
 
-#define CMP_EXEMPT(...) __VA_ARGS__
-
 /* Restoring wiped missing types from previous agents */
 typedef struct cmp_icc_profile cmp_icc_profile_t;
 typedef struct cmp_hw_video_decoder cmp_hw_video_decoder_t;

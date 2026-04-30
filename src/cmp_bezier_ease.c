@@ -96,8 +96,8 @@ int cmp_bezier_ease_destroy(cmp_bezier_ease_t *bezier) {
 }
 
 /* Helper to evaluate cubic bezier polynomial */
-CMP_EXEMPT(static float cmp_math_cubic_bezier(float p0, float p1, float p2,
-                                              float p3, float t)) {
+static float cmp_math_cubic_bezier(float p0, float p1, float p2, float p3,
+                                   float t) {
   float u = 1.0f - t;
   float tt = t * t;
   float uu = u * u;
@@ -113,9 +113,8 @@ CMP_EXEMPT(static float cmp_math_cubic_bezier(float p0, float p1, float p2,
 }
 
 /* Helper to evaluate cubic bezier derivative polynomial */
-CMP_EXEMPT(static float cmp_math_cubic_bezier_derivative(float p0, float p1,
-                                                         float p2, float p3,
-                                                         float t)) {
+static float cmp_math_cubic_bezier_derivative(float p0, float p1, float p2,
+                                              float p3, float t) {
   float u = 1.0f - t;
   float dt_p0 = 3.0f * u * u * (p1 - p0);
   float dt_p1 = 6.0f * u * t * (p2 - p1);

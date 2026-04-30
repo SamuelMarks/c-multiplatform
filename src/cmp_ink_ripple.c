@@ -22,7 +22,7 @@ struct cmp_ink_ripple {
 };
 
 /* Helper: Cubic Bezier (0, 0, 0, 1) - Standard Decelerate */
-CMP_EXEMPT(static float cmp_math_cubic_bezier_decelerate(float t)) {
+static float cmp_math_cubic_bezier_decelerate(float t) {
   float tt = t * t;
   float ttt = tt * t;
   float p = ttt * 1.0f;
@@ -30,7 +30,7 @@ CMP_EXEMPT(static float cmp_math_cubic_bezier_decelerate(float t)) {
 }
 
 /* Helper: Cubic Bezier (0.3, 0, 1, 1) - Standard Accelerate */
-CMP_EXEMPT(static float cmp_math_cubic_bezier_accelerate(float t)) {
+static float cmp_math_cubic_bezier_accelerate(float t) {
   /* For standard accelerate, p0=0, p1=0, p2=1, p3=1 */
   /* This is just an approximation for ease-in */
   return t * t; /* Simple quadratic ease-in for alpha fade out */

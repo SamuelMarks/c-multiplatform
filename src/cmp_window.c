@@ -50,7 +50,7 @@ struct cmp_window {
  * @param window Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(void *cmp_window_get_native_handle(cmp_window_t *window)) {
+void *cmp_window_get_native_handle(cmp_window_t *window) {
   if (!window)
     return NULL;
 #if defined(_WIN32)
@@ -95,7 +95,7 @@ typedef BOOL(WINAPI *SetProcessDPIAware_fn)(void);
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void enable_high_dpi_awareness(void)) {
+static void enable_high_dpi_awareness(void) {
   HMODULE user32 = LoadLibraryA("user32.dll");
   if (user32) {
     SetProcessDpiAwarenessContext_fn set_dpi_v2 =
@@ -135,8 +135,9 @@ typedef struct cmp_drop_target {
  * @param ppvObject Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_query_interface(
-    IDropTarget *This, REFIID riid, void **ppvObject)) {
+static HRESULT STDMETHODCALLTYPE drop_target_query_interface(IDropTarget *This,
+                                                             REFIID riid,
+                                                             void **ppvObject) {
   int rc = CMP_SUCCESS;
   (void)rc;
   if (IsEqualIID(riid, &IID_IUnknown) || IsEqualIID(riid, &IID_IDropTarget)) {
@@ -155,8 +156,8 @@ CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_query_interface(
  * @param This Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(
-    static ULONG STDMETHODCALLTYPE drop_target_add_ref(IDropTarget *This)) {
+
+static ULONG STDMETHODCALLTYPE drop_target_add_ref(IDropTarget *This) {
   int rc = CMP_SUCCESS;
   (void)rc;
   cmp_drop_target_t *dt = (cmp_drop_target_t *)This;
@@ -170,8 +171,8 @@ CMP_EXEMPT(
  * @param This Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(
-    static ULONG STDMETHODCALLTYPE drop_target_release(IDropTarget *This)) {
+
+static ULONG STDMETHODCALLTYPE drop_target_release(IDropTarget *This) {
   int rc = CMP_SUCCESS;
   (void)rc;
   cmp_drop_target_t *dt = (cmp_drop_target_t *)This;
@@ -194,9 +195,11 @@ CMP_EXEMPT(
  * @param pdwEffect Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_drag_enter(
-    IDropTarget *This, IDataObject *pDataObj, DWORD grfKeyState, POINTL pt,
-    DWORD *pdwEffect)) {
+static HRESULT STDMETHODCALLTYPE drop_target_drag_enter(IDropTarget *This,
+                                                        IDataObject *pDataObj,
+                                                        DWORD grfKeyState,
+                                                        POINTL pt,
+                                                        DWORD *pdwEffect) {
   int rc = CMP_SUCCESS;
   (void)rc;
   (void)This;
@@ -217,8 +220,10 @@ CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_drag_enter(
  * @param pdwEffect Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_drag_over(
-    IDropTarget *This, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)) {
+static HRESULT STDMETHODCALLTYPE drop_target_drag_over(IDropTarget *This,
+                                                       DWORD grfKeyState,
+                                                       POINTL pt,
+                                                       DWORD *pdwEffect) {
   int rc = CMP_SUCCESS;
   (void)rc;
   (void)This;
@@ -235,8 +240,7 @@ CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_drag_over(
  * @param This Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE
-               drop_target_drag_leave(IDropTarget *This)) {
+static HRESULT STDMETHODCALLTYPE drop_target_drag_leave(IDropTarget *This) {
   int rc = CMP_SUCCESS;
   (void)rc;
   (void)This;
@@ -254,9 +258,10 @@ CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE
  * @param pdwEffect Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_drop(
-    IDropTarget *This, IDataObject *pDataObj, DWORD grfKeyState, POINTL pt,
-    DWORD *pdwEffect)) {
+static HRESULT STDMETHODCALLTYPE drop_target_drop(IDropTarget *This,
+                                                  IDataObject *pDataObj,
+                                                  DWORD grfKeyState, POINTL pt,
+                                                  DWORD *pdwEffect) {
   int rc = CMP_SUCCESS;
   (void)rc;
   cmp_drop_target_t *dt = (cmp_drop_target_t *)This;
@@ -291,8 +296,8 @@ CMP_EXEMPT(static HRESULT STDMETHODCALLTYPE drop_target_drop(
  * @param window Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static cmp_drop_target_t *cmp_math_create_drop_target(
-    HWND hwnd, cmp_window_t *window)) {
+static cmp_drop_target_t *cmp_math_create_drop_target(HWND hwnd,
+                                                      cmp_window_t *window) {
   cmp_drop_target_t *dt;
   if (CMP_MALLOC(sizeof(cmp_drop_target_t), (void **)&dt) != CMP_SUCCESS) {
     return NULL;
@@ -331,9 +336,8 @@ CMP_EXEMPT(static cmp_drop_target_t *cmp_math_create_drop_target(
  * @param radius Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void win32_box_blur_alpha(uint8_t *pixels, int width,
-                                            int height, int stride,
-                                            int radius)) {
+static void win32_box_blur_alpha(uint8_t *pixels, int width, int height,
+                                 int stride, int radius) {
   uint8_t *temp;
   int x, y, i;
   int rc = CMP_SUCCESS;
@@ -383,9 +387,8 @@ CMP_EXEMPT(static void win32_box_blur_alpha(uint8_t *pixels, int width,
  * @param inherited_theme Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void render_node_gdi(HDC hdc, cmp_ui_node_t *node,
-                                       float scale_factor,
-                                       int inherited_theme)) {
+static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
+                            int inherited_theme) {
   int current_theme = node->design_language_override
                           ? node->design_language_override
                           : inherited_theme;
@@ -1016,8 +1019,8 @@ CMP_EXEMPT(static void render_node_gdi(HDC hdc, cmp_ui_node_t *node,
  * @param lParam Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg,
-                                               WPARAM wParam, LPARAM lParam)) {
+static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
+                                    LPARAM lParam) {
   int rc = CMP_SUCCESS;
   (void)rc;
   cmp_window_t *window = (cmp_window_t *)GetWindowLongPtrA(hwnd, GWLP_USERDATA);
@@ -1609,7 +1612,7 @@ static int g_xinput_init_attempted = 0;
  *
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void init_xinput(void)) {
+static void init_xinput(void) {
   if (g_xinput_init_attempted)
     return;
   g_xinput_init_attempted = 1;
@@ -1922,9 +1925,8 @@ int cmp_window_mac_init_menu_bar(void) {
  * @param (callback)(void) Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(int cmp_window_mac_add_menu_item(const char *title,
-                                            const char *key_equiv,
-                                            void (*callback)(void))) {
+int cmp_window_mac_add_menu_item(const char *title, const char *key_equiv,
+                                 void (*callback)(void)) {
   if (title == NULL || key_equiv == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -2236,9 +2238,8 @@ int cmp_window_wasm_resume_audio(void) {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(int cmp_window_wasm_set_main_loop(cmp_modality_t *mod,
-                                             void (*main_loop)(void *),
-                                             void *arg)) {
+int cmp_window_wasm_set_main_loop(cmp_modality_t *mod,
+                                  void (*main_loop)(void *), void *arg) {
   if (mod == NULL || main_loop == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }

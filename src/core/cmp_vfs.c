@@ -393,7 +393,7 @@ typedef struct {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void cmp_vfs_read_async_worker(void *arg)) {
+static void cmp_vfs_read_async_worker(void *arg) {
   cmp_vfs_async_read_ctx_t *ctx = (cmp_vfs_async_read_ctx_t *)arg;
   void *buffer = NULL;
   size_t size = 0;
@@ -522,8 +522,8 @@ struct cmp_vfs_watch {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(
-    static unsigned long __stdcall cmp_math_vfs_watch_worker(void *arg)) {
+
+static unsigned long __stdcall cmp_math_vfs_watch_worker(void *arg) {
   cmp_vfs_watch_t *watch = (cmp_vfs_watch_t *)arg;
   char buffer[4096];
   OVERLAPPED overlapped;
@@ -580,7 +580,7 @@ CMP_EXEMPT(
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void *cmp_math_vfs_watch_worker(void *arg)) {
+static void *cmp_math_vfs_watch_worker(void *arg) {
   cmp_vfs_watch_t *watch = (cmp_vfs_watch_t *)arg;
   union {
     char bytes[4096];
@@ -634,7 +634,7 @@ CMP_EXEMPT(static void *cmp_math_vfs_watch_worker(void *arg)) {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void *cmp_math_vfs_watch_worker(void *arg)) {
+static void *cmp_math_vfs_watch_worker(void *arg) {
   cmp_vfs_watch_t *watch = (cmp_vfs_watch_t *)arg;
   struct kevent events[2];
   int res;
@@ -665,7 +665,7 @@ CMP_EXEMPT(static void *cmp_math_vfs_watch_worker(void *arg)) {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void *cmp_math_vfs_watch_worker(void *arg)) {
+static void *cmp_math_vfs_watch_worker(void *arg) {
   cmp_vfs_watch_t *watch = (cmp_vfs_watch_t *)arg;
   char dummy;
   read(watch->stop_pipe[0], &dummy, 1);

@@ -12,7 +12,7 @@
 #endif
 
 /* Utility mathematical functions for color conversion */
-CMP_EXEMPT(static float cmp_math_linearize(float channel)) {
+static float cmp_math_linearize(float channel) {
   if (channel <= 0.04045f) {
     return channel / 12.92f;
   } else {
@@ -26,7 +26,7 @@ CMP_EXEMPT(static float cmp_math_linearize(float channel)) {
  * @param channel Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static float decmp_math_linearize(float channel)) {
+static float decmp_math_linearize(float channel) {
   if (channel <= 0.0031308f) {
     return channel * 12.92f;
   } else {
@@ -45,8 +45,8 @@ CMP_EXEMPT(static float decmp_math_linearize(float channel)) {
  * @param z Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void srgb_to_xyz(float r, float g, float b, float *x,
-                                   float *y, float *z)) {
+static void srgb_to_xyz(float r, float g, float b, float *x, float *y,
+                        float *z) {
   float rl = cmp_math_linearize(r);
   float gl = cmp_math_linearize(g);
   float bl = cmp_math_linearize(b);
@@ -67,8 +67,8 @@ CMP_EXEMPT(static void srgb_to_xyz(float r, float g, float b, float *x,
  * @param b Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void xyz_to_srgb(float x, float y, float z, float *r,
-                                   float *g, float *b)) {
+static void xyz_to_srgb(float x, float y, float z, float *r, float *g,
+                        float *b) {
   float rl = x * 3.2406f + y * -1.5372f + z * -0.4986f;
   float gl = x * -0.9689f + y * 1.8758f + z * 0.0415f;
   float bl = x * 0.0557f + y * -0.2040f + z * 1.0570f;
@@ -89,7 +89,7 @@ CMP_EXEMPT(static void xyz_to_srgb(float x, float y, float z, float *r,
  * @param t Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static float cmp_math_lab_f(float t)) {
+static float cmp_math_lab_f(float t) {
   if (t > (216.0f / 24389.0f)) {
     return (float)pow(t, 1.0f / 3.0f);
   } else {
@@ -103,7 +103,7 @@ CMP_EXEMPT(static float cmp_math_lab_f(float t)) {
  * @param t Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static float cmp_math_lab_inv_f(float t)) {
+static float cmp_math_lab_inv_f(float t) {
   if (t > (6.0f / 29.0f)) {
     return t * t * t;
   } else {
@@ -122,8 +122,8 @@ CMP_EXEMPT(static float cmp_math_lab_inv_f(float t)) {
  * @param b Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void xyz_to_lab(float x, float y, float z, float *l, float *a,
-                                  float *b)) {
+static void xyz_to_lab(float x, float y, float z, float *l, float *a,
+                       float *b) {
   float fx = cmp_math_lab_f(x / WHITE_X);
   float fy = cmp_math_lab_f(y / WHITE_Y);
   float fz = cmp_math_lab_f(z / WHITE_Z);
@@ -144,8 +144,8 @@ CMP_EXEMPT(static void xyz_to_lab(float x, float y, float z, float *l, float *a,
  * @param z Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void lab_to_xyz(float l, float a, float b, float *x, float *y,
-                                  float *z)) {
+static void lab_to_xyz(float l, float a, float b, float *x, float *y,
+                       float *z) {
   float fy = (l + 16.0f) / 116.0f;
   float fx = (a / 500.0f) + fy;
   float fz = fy - (b / 200.0f);

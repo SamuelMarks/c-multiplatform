@@ -344,11 +344,10 @@ int cmp_svg_renderer_cubic_to(cmp_svg_renderer_t *renderer, float cx1,
  * @param dtheta Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void arc_to_center_param(float x1, float y1, float rx,
-                                           float ry, float angle, int large_arc,
-                                           int sweep, float x2, float y2,
-                                           float *cx, float *cy, float *theta1,
-                                           float *dtheta)) {
+static void arc_to_center_param(float x1, float y1, float rx, float ry,
+                                float angle, int large_arc, int sweep, float x2,
+                                float y2, float *cx, float *cy, float *theta1,
+                                float *dtheta) {
   /* Simplified / unrotated arc calculation */
   float dx2 = (x1 - x2) / 2.0f;
   float dy2 = (y1 - y2) / 2.0f;
@@ -526,7 +525,7 @@ int cmp_svg_path_tessellate(cmp_svg_path_type_t path_type, const float *data,
  * @param y Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void normalize2(float *x, float *y)) {
+static void normalize2(float *x, float *y) {
   float len = (float)sqrt((double)((*x) * (*x) + (*y) * (*y)));
   if (len > 0.0f) {
     *x /= len;
@@ -1012,7 +1011,7 @@ int cmp_svg_fill_evaluate(const cmp_svg_fill_t *fill, const float *in_vertices,
  * @param p Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static float cmp_math_parse_float_safe(const char **p)) {
+static float cmp_math_parse_float_safe(const char **p) {
   char *next;
   float val = (float)strtod(*p, &next);
   if (*p == next) {

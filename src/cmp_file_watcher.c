@@ -18,8 +18,7 @@ struct cmp_file_watcher {
  * @param user_data Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void vfs_watch_proxy(const char *path, int event_type,
-                                       void *user_data)) {
+static void vfs_watch_proxy(const char *path, int event_type, void *user_data) {
   cmp_file_watcher_t *w = (cmp_file_watcher_t *)user_data;
   if (w && w->user_cb) {
     w->user_cb(path, event_type, w->user_data);

@@ -91,8 +91,8 @@ int cmp_motion_path_destroy(cmp_motion_path_t *path) {
  * @param t Parameter t in [0.0, 1.0].
  * @return Returns the evaluated value.
  */
-CMP_EXEMPT(static float cmp_math_eval_bezier(float p0, float p1, float p2,
-                                             float p3, float t)) {
+static float cmp_math_eval_bezier(float p0, float p1, float p2, float p3,
+                                  float t) {
   float u = 1.0f - t;
   float tt = t * t;
   float uu = u * u;
@@ -118,9 +118,8 @@ CMP_EXEMPT(static float cmp_math_eval_bezier(float p0, float p1, float p2,
  * @param t Parameter t in [0.0, 1.0].
  * @return Returns the evaluated derivative.
  */
-CMP_EXEMPT(static float cmp_math_eval_bezier_derivative(float p0, float p1,
-                                                        float p2, float p3,
-                                                        float t)) {
+static float cmp_math_eval_bezier_derivative(float p0, float p1, float p2,
+                                             float p3, float t) {
   /* Derivative of cubic bezier */
   float u = 1.0f - t;
   float d = 3.0f * u * u * (p1 - p0) + 6.0f * u * t * (p2 - p1) +

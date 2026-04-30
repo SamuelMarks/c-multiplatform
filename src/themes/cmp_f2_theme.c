@@ -7,7 +7,7 @@
  * @param v The brightness value [0..255].
  * @return Packed 0xRRGGBB value.
  */
-CMP_EXEMPT(static uint32_t cmp_math_f2_gray(int v)) {
+static uint32_t cmp_math_f2_gray(int v) {
   if (v < 0)
     v = 0;
   if (v > 255)
@@ -22,8 +22,7 @@ CMP_EXEMPT(static uint32_t cmp_math_f2_gray(int v)) {
  * @param t The mixing fraction [0.0..1.0].
  * @return Packed 0xRRGGBB value.
  */
-CMP_EXEMPT(static uint32_t cmp_math_f2_mix(uint32_t color1, uint32_t color2,
-                                           float t)) {
+static uint32_t cmp_math_f2_mix(uint32_t color1, uint32_t color2, float t) {
   uint32_t r1 = (color1 >> 16) & 0xFF;
   uint32_t g1 = (color1 >> 8) & 0xFF;
   uint32_t b1 = color1 & 0xFF;
@@ -44,8 +43,8 @@ CMP_EXEMPT(static uint32_t cmp_math_f2_mix(uint32_t color1, uint32_t color2,
  * @param base_color The base color [0xRRGGBB].
  * @param out_ramp Pointer to the ramp structure to fill.
  */
-CMP_EXEMPT(static void cmp_f2_generate_ramp(uint32_t base_color,
-                                            cmp_f2_color_ramp_t *out_ramp)) {
+static void cmp_f2_generate_ramp(uint32_t base_color,
+                                 cmp_f2_color_ramp_t *out_ramp) {
   out_ramp->step_10 = cmp_math_f2_mix(0x000000, base_color, 0.20f);
   out_ramp->step_20 = cmp_math_f2_mix(0x000000, base_color, 0.30f);
   out_ramp->step_30 = cmp_math_f2_mix(0x000000, base_color, 0.40f);

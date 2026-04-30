@@ -59,7 +59,7 @@ int cmp_timer_system_shutdown(void) {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static unsigned long __stdcall cmp_timer_thread_func(void *arg)) {
+static unsigned long __stdcall cmp_timer_thread_func(void *arg) {
 #else
 /**
  * @brief cmp_timer_thread_func
@@ -67,7 +67,7 @@ CMP_EXEMPT(static unsigned long __stdcall cmp_timer_thread_func(void *arg)) {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void *cmp_timer_thread_func(void *arg)) {
+static void *cmp_timer_thread_func(void *arg) {
 #endif
   cmp_timer_t *timer = (cmp_timer_t *)arg;
 

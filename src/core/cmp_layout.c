@@ -158,10 +158,9 @@ typedef struct {
  * @param available_height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void calculate_node_pass(cmp_layout_node_t *node,
-                                           float parent_x, float parent_y,
-                                           float available_width,
-                                           float available_height)) {
+static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
+                                float parent_y, float available_width,
+                                float available_height) {
   size_t i, j;
   float current_x = parent_x + node->margin[3];
   float current_y = parent_y + node->margin[0];
@@ -511,8 +510,7 @@ CMP_EXEMPT(static void calculate_node_pass(cmp_layout_node_t *node,
  * @param dx Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void translate_descendants(cmp_layout_node_t *node,
-                                             float dx)) {
+static void translate_descendants(cmp_layout_node_t *node, float dx) {
   size_t i;
   if (!node)
     return;
@@ -528,7 +526,7 @@ CMP_EXEMPT(static void translate_descendants(cmp_layout_node_t *node,
  * @param node Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void apply_rtl_mirroring(cmp_layout_node_t *node)) {
+static void apply_rtl_mirroring(cmp_layout_node_t *node) {
   size_t i;
   if (!node)
     return;

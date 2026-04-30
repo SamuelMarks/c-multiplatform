@@ -60,8 +60,8 @@ int rc = CMP_SUCCESS;
  * @param file The source file where the assertion failed.
  * @param line The line number where the assertion failed.
  */
-CMP_EXEMPT(static void cmp_default_assert_handler(const char *msg,
-                                                  const char *file, int line)) {
+static void cmp_default_assert_handler(const char *msg, const char *file,
+                                       int line) {
   int rc = CMP_SUCCESS;
   FPRINTF(stderr, "Assertion failed: %s at %s:%d\n", msg, file, line);
   rc = cmp_dump_stack_trace();
@@ -93,7 +93,7 @@ int cmp_set_assert_handler(cmp_assert_handler_t handler) {
  *
  * @param sig Parameter description.
  */
-CMP_EXEMPT(static void cmp_crash_handler(int sig)) {
+static void cmp_crash_handler(int sig) {
   int rc = CMP_SUCCESS;
   FPRINTF(stderr, "Caught signal %d\n", sig);
   rc = cmp_dump_stack_trace();
@@ -124,8 +124,7 @@ int cmp_crash_handler_init(void) {
  * @param file Parameter description.
  * @param line Parameter description.
  */
-CMP_EXEMPT(void cmp_assert_fail(const char *condition, const char *file,
-                                int line)) {
+void cmp_assert_fail(const char *condition, const char *file, int line) {
   if (g_assert_handler) {
     g_assert_handler(condition, file, line);
   } else {
@@ -138,7 +137,7 @@ CMP_EXEMPT(void cmp_assert_fail(const char *condition, const char *file,
  *
  * @param fmt Parameter description.
  */
-CMP_EXEMPT(void cmp_log_debug(const char *fmt, ...)) {
+void cmp_log_debug(const char *fmt, ...) {
   va_list args;
   FPRINTF(stderr, "[DEBUG] ");
   va_start(args, fmt);

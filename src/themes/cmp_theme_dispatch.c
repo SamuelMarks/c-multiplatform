@@ -20,8 +20,7 @@ static const cmp_theme_vtable_t *g_default_theme_vtable = NULL;
  * @param vtable Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(CMP_API void cmp_theme_set_default_vtable(
-    const cmp_theme_vtable_t *vtable)) {
+CMP_API void cmp_theme_set_default_vtable(const cmp_theme_vtable_t *vtable) {
   g_default_theme_vtable = vtable;
 }
 #ifndef CMP_THEME_MODE_SINGLE_STATIC

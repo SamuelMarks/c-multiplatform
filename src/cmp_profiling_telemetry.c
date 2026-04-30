@@ -92,9 +92,9 @@ int cmp_profiling_enforce_main_thread(
  * @param user_data Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(int cmp_profiling_offload_heavy_task(
+int cmp_profiling_offload_heavy_task(
     cmp_profiling_telemetry_t *telemetry_opaque, void (*task)(void *),
-    void *user_data)) {
+    void *user_data) {
   int rc = CMP_SUCCESS;
   struct cmp_profiling_telemetry *ctx =
       (struct cmp_profiling_telemetry *)telemetry_opaque;

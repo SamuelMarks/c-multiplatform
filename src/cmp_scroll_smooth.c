@@ -105,7 +105,7 @@ int cmp_scroll_smooth_start(cmp_scroll_smooth_t *smooth, float current_pos,
 }
 
 /* Simple cubic bezier ease-in-out mapping for progress 0..1 */
-CMP_EXEMPT(static float cmp_math_ease_in_out_cubic(float t)) {
+static float cmp_math_ease_in_out_cubic(float t) {
   if (t < 0.5f) {
     return 4.0f * t * t * t;
   } else {

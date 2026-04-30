@@ -225,10 +225,9 @@ struct progress_ctx {
   void *user_data;
 };
 
-CMP_EXEMPT(static void on_progress_chunk(const unsigned char *chunk,
-                                         size_t length, size_t total_received,
-                                         size_t total_expected,
-                                         void *user_data)) {
+static void on_progress_chunk(const unsigned char *chunk, size_t length,
+                              size_t total_received, size_t total_expected,
+                              void *user_data) {
   struct progress_ctx *ctx = (struct progress_ctx *)user_data;
   float percentage;
 

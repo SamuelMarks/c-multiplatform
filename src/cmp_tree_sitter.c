@@ -12,7 +12,7 @@
  * @param s Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static char *cmp_math_codex_strdup(const char *s)) {
+static char *cmp_math_codex_strdup(const char *s) {
   int rc;
   rc = CMP_SUCCESS;
   size_t len;

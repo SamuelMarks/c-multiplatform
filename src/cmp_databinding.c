@@ -127,7 +127,7 @@ int cmp_databinding_destroy(cmp_databinding_t *binding) {
  * @param binding Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void notify_listeners(cmp_databinding_t *binding)) {
+static void notify_listeners(cmp_databinding_t *binding) {
   size_t i;
   for (i = 0; i < binding->listener_count; ++i) {
     if (binding->listeners[i]) {
@@ -368,8 +368,7 @@ typedef struct {
  * @param user_data Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void node_binding_cb(cmp_databinding_t *binding,
-                                       void *user_data)) {
+static void node_binding_cb(cmp_databinding_t *binding, void *user_data) {
   int rc = CMP_SUCCESS;
   cmp_node_binding_ctx_t *ctx = (cmp_node_binding_ctx_t *)user_data;
   if (ctx && ctx->node && ctx->property_name) {

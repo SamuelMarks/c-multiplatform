@@ -173,10 +173,6 @@ int cmp_visionos_handle_touch_event(cmp_visionos_features_t *features_opaque,
 
   return rc;
 }
-/* clang-format off */
-#include "cmp.h"
-#include <stdlib.h>
-/* clang-format on */
 
 /**
  * @brief cmp_visionos_set_window_geometry
