@@ -23,7 +23,7 @@ struct cmp_ui_bottom_sheet {
  */
 int cmp_ui_bottom_sheet_create(cmp_ui_bottom_sheet_t **out_sheet) {
   cmp_ui_bottom_sheet_t *sheet;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!out_sheet) {
     LOG_DEBUG("cmp_ui_bottom_sheet_create: Invalid arg\n");
@@ -43,9 +43,7 @@ int cmp_ui_bottom_sheet_create(cmp_ui_bottom_sheet_t **out_sheet) {
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_bottom_sheet_create: CMP_FREE failed\n");
     }
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -60,7 +58,7 @@ int cmp_ui_bottom_sheet_create(cmp_ui_bottom_sheet_t **out_sheet) {
   sheet->is_visible = 0; /* Initially hidden */
 
   *out_sheet = sheet;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -70,7 +68,7 @@ int cmp_ui_bottom_sheet_create(cmp_ui_bottom_sheet_t **out_sheet) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_bottom_sheet_destroy(cmp_ui_bottom_sheet_t *sheet) {
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!sheet) {
     LOG_DEBUG("cmp_ui_bottom_sheet_destroy: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
@@ -84,12 +82,10 @@ int cmp_ui_bottom_sheet_destroy(cmp_ui_bottom_sheet_t *sheet) {
   rc = CMP_FREE(sheet);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_bottom_sheet_destroy: CMP_FREE failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -101,22 +97,13 @@ int cmp_ui_bottom_sheet_destroy(cmp_ui_bottom_sheet_t *sheet) {
  */
 int cmp_ui_bottom_sheet_get_node(cmp_ui_bottom_sheet_t *sheet,
                                  cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!sheet || !out_node) {
     LOG_DEBUG("cmp_ui_bottom_sheet_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = sheet->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -128,8 +115,7 @@ int cmp_ui_bottom_sheet_get_node(cmp_ui_bottom_sheet_t *sheet,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_bottom_sheet_set_visible(cmp_ui_bottom_sheet_t *sheet, int visible) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!sheet) {
     LOG_DEBUG("cmp_ui_bottom_sheet_set_visible: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
@@ -137,15 +123,6 @@ int cmp_ui_bottom_sheet_set_visible(cmp_ui_bottom_sheet_t *sheet, int visible) {
 
   sheet->is_visible = visible;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -158,7 +135,7 @@ int cmp_ui_bottom_sheet_set_visible(cmp_ui_bottom_sheet_t *sheet, int visible) {
  */
 int cmp_ui_bottom_sheet_bind_a11y(cmp_ui_bottom_sheet_t *widget,
                                   cmp_a11y_tree_t *tree) {
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!widget || !tree) {
     LOG_DEBUG("cmp_ui_bottom_sheet_bind_a11y: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
@@ -171,10 +148,8 @@ int cmp_ui_bottom_sheet_bind_a11y(cmp_ui_bottom_sheet_t *widget,
                               "Bottom Sheet");
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_bottom_sheet_bind_a11y: cmp_a11y_tree_add_node failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }

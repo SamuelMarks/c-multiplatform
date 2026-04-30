@@ -12,8 +12,7 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pointer_pressure_create(cmp_pointer_pressure_t **out_pressure) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_pointer_pressure *ctx = NULL;
 
   if (!out_pressure) {
@@ -31,7 +30,7 @@ int cmp_pointer_pressure_create(cmp_pointer_pressure_t **out_pressure) {
   memset(ctx, 0, sizeof(cmp_stylus_data_t));
 
   *out_pressure = (cmp_pointer_pressure_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -41,8 +40,7 @@ int cmp_pointer_pressure_create(cmp_pointer_pressure_t **out_pressure) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pointer_pressure_destroy(cmp_pointer_pressure_t *pressure) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_pointer_pressure *ctx = (struct cmp_pointer_pressure *)pressure;
 
   if (!ctx) {
@@ -55,7 +53,7 @@ int cmp_pointer_pressure_destroy(cmp_pointer_pressure_t *pressure) {
   if (rc != CMP_SUCCESS) {
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -67,8 +65,7 @@ int cmp_pointer_pressure_destroy(cmp_pointer_pressure_t *pressure) {
  */
 int cmp_pointer_pressure_process_event(cmp_pointer_pressure_t *pressure,
                                        const cmp_event_t *event) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_stylus_data_t *ctx = (cmp_stylus_data_t *)pressure;
 
   if (!ctx || !event) {
@@ -88,7 +85,7 @@ int cmp_pointer_pressure_process_event(cmp_pointer_pressure_t *pressure,
 
   /* Mock mapping tilt */
   ctx->tilt_x = (float)(event->modifiers >> 16);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -100,8 +97,7 @@ int cmp_pointer_pressure_process_event(cmp_pointer_pressure_t *pressure,
  */
 int cmp_pointer_pressure_get_data(const cmp_pointer_pressure_t *pressure,
                                   cmp_stylus_data_t *out_data) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   const cmp_stylus_data_t *ctx = (const cmp_stylus_data_t *)pressure;
 
   if (!ctx || !out_data) {
@@ -111,5 +107,5 @@ int cmp_pointer_pressure_get_data(const cmp_pointer_pressure_t *pressure,
   }
 
   memcpy(out_data, ctx, sizeof(cmp_stylus_data_t));
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -20,8 +20,7 @@ struct cmp_rubber_band {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_rubber_band_create(cmp_rubber_band_t **out_band) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_rubber_band *ctx;
 
   if (!out_band)
@@ -37,7 +36,7 @@ int cmp_rubber_band_create(cmp_rubber_band_t **out_band) {
   ctx->is_resting = 1;
 
   *out_band = (cmp_rubber_band_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -47,8 +46,7 @@ int cmp_rubber_band_create(cmp_rubber_band_t **out_band) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_rubber_band_destroy(cmp_rubber_band_t *band) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_rubber_band *ctx = (struct cmp_rubber_band *)band;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -57,7 +55,7 @@ int cmp_rubber_band_destroy(cmp_rubber_band_t *band) {
   if (rc != CMP_SUCCESS) {
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -70,8 +68,7 @@ int cmp_rubber_band_destroy(cmp_rubber_band_t *band) {
  */
 int cmp_rubber_band_start(cmp_rubber_band_t *band, float initial_velocity,
                           float current_position) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_rubber_band *ctx = (struct cmp_rubber_band *)band;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -79,7 +76,7 @@ int cmp_rubber_band_start(cmp_rubber_band_t *band, float initial_velocity,
   ctx->velocity = initial_velocity;
   ctx->current_position = current_position;
   ctx->is_resting = 0;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -95,8 +92,7 @@ int cmp_rubber_band_start(cmp_rubber_band_t *band, float initial_velocity,
 int cmp_rubber_band_step(cmp_rubber_band_t *band, float dt_ms,
                          float target_rest_position,
                          float *out_current_position, int *out_is_resting) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_rubber_band *ctx = (struct cmp_rubber_band *)band;
   float dt_sec, spring_force, damping_force, acceleration;
 
@@ -106,7 +102,7 @@ int cmp_rubber_band_step(cmp_rubber_band_t *band, float dt_ms,
   if (ctx->is_resting) {
     *out_current_position = ctx->current_position;
     *out_is_resting = 1;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   dt_sec = dt_ms / 1000.0f;
@@ -134,5 +130,5 @@ int cmp_rubber_band_step(cmp_rubber_band_t *band, float dt_ms,
 
   *out_current_position = ctx->current_position;
   *out_is_resting = ctx->is_resting;
-  return CMP_SUCCESS;
+  return rc;
 }

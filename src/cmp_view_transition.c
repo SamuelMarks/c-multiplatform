@@ -15,8 +15,7 @@ struct cmp_view_transition {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_view_transition_create(cmp_view_transition_t **out_transition) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_view_transition *transition;
 
   if (!out_transition)
@@ -29,15 +28,7 @@ int cmp_view_transition_create(cmp_view_transition_t **out_transition) {
   memset(transition, 0, sizeof(struct cmp_view_transition));
 
   *out_transition = (cmp_view_transition_t *)transition;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -48,23 +39,14 @@ int cmp_view_transition_create(cmp_view_transition_t **out_transition) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_view_transition_destroy(cmp_view_transition_t *transition) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_view_transition *internal_transition =
       (struct cmp_view_transition *)transition;
   if (!internal_transition)
     return CMP_ERROR_INVALID_ARG;
 
   CMP_FREE(internal_transition);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -75,8 +57,7 @@ int cmp_view_transition_destroy(cmp_view_transition_t *transition) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_view_transition_start(cmp_view_transition_t *transition) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_view_transition *internal_transition =
       (struct cmp_view_transition *)transition;
 
@@ -84,14 +65,6 @@ int cmp_view_transition_start(cmp_view_transition_t *transition) {
     return CMP_ERROR_INVALID_ARG;
 
   internal_transition->is_active = 1;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

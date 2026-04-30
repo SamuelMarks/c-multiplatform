@@ -32,7 +32,7 @@ int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_action_create: %s\n", err_str);
-    if (rc != 0) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;
@@ -45,7 +45,7 @@ int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_action_create CMP_MALLOC: %s\n", err_str);
-    if (rc != 0) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;
@@ -56,7 +56,7 @@ int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
   *out_action = (cmp_a11y_action_t *)action;
   cmp_log_debug(
       "cmp_a11y_action_create: Successfully created a11y action context\n");
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     return rc;
   }
   return rc;
@@ -82,7 +82,7 @@ int cmp_a11y_action_destroy(cmp_a11y_action_t *action) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_action_destroy: %s\n", err_str);
-    if (rc != 0) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;
@@ -91,13 +91,13 @@ int cmp_a11y_action_destroy(cmp_a11y_action_t *action) {
   CMP_FREE(a);
   cmp_log_debug(
       "cmp_a11y_action_destroy: Successfully destroyed a11y action context\n");
-  if (rc != 0) {
-    if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;
   }
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     return rc;
   }
   return rc;
@@ -127,7 +127,7 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_action_execute: %s\n", err_str);
-    if (rc != 0) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;
@@ -149,7 +149,7 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_a11y_action_execute click push down: %s\n", err_str);
-      if (rc != 0) {
+      if (rc != CMP_SUCCESS) {
         return rc;
       }
       return rc;
@@ -162,7 +162,7 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_a11y_action_execute click push up: %s\n", err_str);
-      if (rc != 0) {
+      if (rc != CMP_SUCCESS) {
         return rc;
       }
       return rc;
@@ -182,7 +182,7 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_a11y_action_execute scroll fwd: %s\n", err_str);
-      if (rc != 0) {
+      if (rc != CMP_SUCCESS) {
         return rc;
       }
       return rc;
@@ -203,7 +203,7 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_a11y_action_execute scroll bwd: %s\n", err_str);
-      if (rc != 0) {
+      if (rc != CMP_SUCCESS) {
         return rc;
       }
       return rc;
@@ -221,7 +221,7 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_a11y_action_execute focus: %s\n", err_str);
-      if (rc != 0) {
+      if (rc != CMP_SUCCESS) {
         return rc;
       }
       return rc;
@@ -238,7 +238,7 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
           err_str = "Unknown";
         }
         cmp_log_debug("cmp_a11y_action_execute blur: %s\n", err_str);
-        if (rc != 0) {
+        if (rc != CMP_SUCCESS) {
           return rc;
         }
         return rc;
@@ -259,13 +259,13 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_a11y_action_execute unhandled: %s\n", err_str);
-    if (rc != 0) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;
   }
 
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
 
     return rc;
   }

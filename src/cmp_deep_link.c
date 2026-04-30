@@ -16,8 +16,7 @@ struct cmp_state_restoration_ctx {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_state_restoration_ctx_create(cmp_state_restoration_ctx_t **out_ctx) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_state_restoration_ctx *ctx = NULL;
@@ -31,9 +30,7 @@ int cmp_state_restoration_ctx_create(cmp_state_restoration_ctx_t **out_ctx) {
     cmp_log_debug("cmp_state_restoration_ctx_create: Invalid argument "
                   "(out_ctx=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -45,9 +42,7 @@ int cmp_state_restoration_ctx_create(cmp_state_restoration_ctx_t **out_ctx) {
     }
     cmp_log_debug("cmp_state_restoration_ctx_create: Out of memory: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -55,7 +50,7 @@ int cmp_state_restoration_ctx_create(cmp_state_restoration_ctx_t **out_ctx) {
   *out_ctx = (cmp_state_restoration_ctx_t *)ctx;
   cmp_log_debug("cmp_state_restoration_ctx_create: Successfully created "
                 "restoration context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -65,8 +60,7 @@ int cmp_state_restoration_ctx_create(cmp_state_restoration_ctx_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_state_restoration_ctx_destroy(cmp_state_restoration_ctx_t *ctx_opaque) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_state_restoration_ctx *ctx =
@@ -80,9 +74,7 @@ int cmp_state_restoration_ctx_destroy(cmp_state_restoration_ctx_t *ctx_opaque) {
     }
     cmp_log_debug("cmp_state_restoration_ctx_destroy: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -101,7 +93,7 @@ int cmp_state_restoration_ctx_destroy(cmp_state_restoration_ctx_t *ctx_opaque) {
 
   cmp_log_debug("cmp_state_restoration_ctx_destroy: Successfully destroyed "
                 "restoration context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -115,8 +107,7 @@ int cmp_state_restoration_ctx_destroy(cmp_state_restoration_ctx_t *ctx_opaque) {
 int cmp_deep_link_handle_universal_link(cmp_state_restoration_ctx_t *ctx,
                                         const char *url_string,
                                         cmp_router_t *router) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -128,9 +119,7 @@ int cmp_deep_link_handle_universal_link(cmp_state_restoration_ctx_t *ctx,
     }
     cmp_log_debug("cmp_deep_link_handle_universal_link: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -150,9 +139,7 @@ int cmp_deep_link_handle_universal_link(cmp_state_restoration_ctx_t *ctx,
   }
 
   cmp_log_debug("cmp_deep_link_handle_universal_link: Handled deep link\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -168,8 +155,7 @@ int cmp_deep_link_handle_universal_link(cmp_state_restoration_ctx_t *ctx,
 int cmp_state_restoration_encode(cmp_state_restoration_ctx_t *ctx,
                                  cmp_router_t *router, void **out_buffer,
                                  size_t *out_size) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_string_t uri;
@@ -184,9 +170,7 @@ int cmp_state_restoration_encode(cmp_state_restoration_ctx_t *ctx,
     }
     cmp_log_debug("cmp_state_restoration_encode: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -242,7 +226,7 @@ int cmp_state_restoration_encode(cmp_state_restoration_ctx_t *ctx,
   if (rc != CMP_SUCCESS) {
     cmp_log_debug("cmp_state_restoration_encode: cmp_string_destroy failed\n");
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -257,8 +241,7 @@ int cmp_state_restoration_encode(cmp_state_restoration_ctx_t *ctx,
 int cmp_state_restoration_decode(cmp_state_restoration_ctx_t *ctx,
                                  cmp_router_t *router, const void *buffer,
                                  size_t size) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -270,9 +253,7 @@ int cmp_state_restoration_decode(cmp_state_restoration_ctx_t *ctx,
     }
     cmp_log_debug("cmp_state_restoration_decode: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -289,9 +270,7 @@ int cmp_state_restoration_decode(cmp_state_restoration_ctx_t *ctx,
   }
 
   cmp_log_debug("cmp_state_restoration_decode: Decoded state completely\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -304,8 +283,7 @@ int cmp_state_restoration_decode(cmp_state_restoration_ctx_t *ctx,
  */
 int cmp_state_restoration_set_scene_id(cmp_state_restoration_ctx_t *ctx_opaque,
                                        const char *scene_identifier) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_state_restoration_ctx *ctx =
@@ -320,9 +298,7 @@ int cmp_state_restoration_set_scene_id(cmp_state_restoration_ctx_t *ctx_opaque,
     }
     cmp_log_debug("cmp_state_restoration_set_scene_id: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -357,5 +333,5 @@ int cmp_state_restoration_set_scene_id(cmp_state_restoration_ctx_t *ctx_opaque,
 #endif
 
   cmp_log_debug("cmp_state_restoration_set_scene_id: Set scene identifier\n");
-  return CMP_SUCCESS;
+  return rc;
 }

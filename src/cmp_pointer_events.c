@@ -14,8 +14,7 @@
  */
 int cmp_ui_node_set_pointer_events(cmp_ui_node_t *node,
                                    cmp_pointer_events_t state) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   if (!node) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -34,7 +33,7 @@ int cmp_ui_node_set_pointer_events(cmp_ui_node_t *node,
   } else {
     node->properties = (void *)(size_t)CMP_POINTER_EVENTS_AUTO;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -45,6 +44,7 @@ int cmp_ui_node_set_pointer_events(cmp_ui_node_t *node,
  */
 int cmp_ui_node_get_pointer_events(cmp_ui_node_t *node,
                                    cmp_pointer_events_t *out_events) {
+  int rc = CMP_SUCCESS;
   if (!out_events) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -55,5 +55,5 @@ int cmp_ui_node_get_pointer_events(cmp_ui_node_t *node,
   if (node->properties == (void *)(size_t)CMP_POINTER_EVENTS_NONE) {
     *out_events = CMP_POINTER_EVENTS_NONE;
   }
-  return CMP_SUCCESS;
+  return rc;
 }

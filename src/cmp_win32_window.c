@@ -106,8 +106,7 @@ typedef BOOL(WINAPI *pfnSetWindowCompositionAttribute)(
 int cmp_win32_request_windows_material(cmp_materials_t *materials,
                                        cmp_window_t *window,
                                        cmp_windows_material_t material) {
-  int rc;
-  rc = 0;HWND hwnd;
+int rc = CMP_SUCCESS;HWND hwnd;
   HMODULE hUser, hDwm;
   pfnSetWindowCompositionAttribute setWindowCompositionAttribute;
   pfnDwmSetWindowAttribute dwmSetWindowAttribute = NULL;
@@ -156,7 +155,7 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
     }
     if (hDwm)
       FreeLibrary(hDwm);
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (material == CMP_WINDOWS_MATERIAL_MICA ||
@@ -178,7 +177,7 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
                                 sizeof(mica_type)) == S_OK) {
         if (hDwm)
           FreeLibrary(hDwm);
-        return CMP_SUCCESS;
+        return rc;
       }
 
       /* Fallback to older Windows 11 API (Mica Effect boolean) */
@@ -186,7 +185,7 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
                                 sizeof(true_val)) == S_OK) {
         if (hDwm)
           FreeLibrary(hDwm);
-        return CMP_SUCCESS;
+        return rc;
       }
     }
   }
@@ -218,7 +217,7 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
       if (setWindowCompositionAttribute(hwnd, &data)) {
         if (hDwm)
           FreeLibrary(hDwm);
-        return CMP_SUCCESS;
+        return rc;
       }
     }
   }
@@ -235,10 +234,8 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
 
   if (hDwm)
     FreeLibrary(hDwm);
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+  
+  
   return rc;
 }
 #endif

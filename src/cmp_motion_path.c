@@ -21,7 +21,7 @@ struct cmp_motion_path {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_motion_path_create(cmp_motion_path_t **out_path) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_motion_path *path;
 
   rc = CMP_SUCCESS;
@@ -51,7 +51,7 @@ int cmp_motion_path_create(cmp_motion_path_t **out_path) {
   path->p3y = 0.0f;
 
   *out_path = (cmp_motion_path_t *)path;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -61,7 +61,7 @@ int cmp_motion_path_create(cmp_motion_path_t **out_path) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_motion_path_destroy(cmp_motion_path_t *path) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_motion_path *internal_path;
 
   rc = CMP_SUCCESS;
@@ -78,7 +78,7 @@ int cmp_motion_path_destroy(cmp_motion_path_t *path) {
     LOG_DEBUG("Error in cmp_motion_path_destroy: CMP_FREE failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -142,8 +142,7 @@ CMP_EXEMPT(static float cmp_math_eval_bezier_derivative(float p0, float p1,
 int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
                              float offset_rotate, float *out_x, float *out_y,
                              float *out_angle) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_motion_path *p;
   float dx;
   float dy;
@@ -167,5 +166,5 @@ int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
 
   angle_rad = (float)atan2(dy, dx);
   *out_angle = angle_rad * (180.0f / 3.14159265f) + offset_rotate;
-  return CMP_SUCCESS;
+  return rc;
 }

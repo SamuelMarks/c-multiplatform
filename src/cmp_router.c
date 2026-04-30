@@ -41,8 +41,7 @@ static int g_router_initialized = 0;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_create(cmp_router_t **out_router) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_router_t *router;
 
   if (out_router == NULL) {
@@ -62,7 +61,7 @@ int cmp_router_create(cmp_router_t **out_router) {
 
   *out_router = router;
   g_router_initialized = 1;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -72,8 +71,7 @@ int cmp_router_create(cmp_router_t **out_router) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_destroy(cmp_router_t *router) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_route_entry_t *curr, *next;
   size_t i;
 
@@ -115,7 +113,7 @@ int cmp_router_destroy(cmp_router_t *router) {
   if (rc != CMP_SUCCESS) {
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -131,8 +129,7 @@ int cmp_router_destroy(cmp_router_t *router) {
 int cmp_router_register(cmp_router_t *router, const char *path,
                         cmp_route_builder_cb builder, cmp_route_guard_cb guard,
                         void *guard_data) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_route_entry_t *entry;
   size_t len;
 
@@ -163,7 +160,7 @@ int cmp_router_register(cmp_router_t *router, const char *path,
 
   entry->next = router->routes;
   router->routes = entry;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /* C89 safe implementation of string tokenization with saved state */
@@ -176,8 +173,7 @@ int cmp_router_register(cmp_router_t *router, const char *path,
  * @return Returns 0 on success, or an error code on failure.
  */
 static int internal_execute_route(cmp_router_t *router, const char *uri) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_route_entry_t *curr = router->routes;
   char *uri_mutable;
   char *saveptr_uri = NULL;
@@ -280,7 +276,7 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
       if (rc != CMP_SUCCESS) {
         return rc;
       }
-      return CMP_SUCCESS;
+      return rc;
     }
 
     curr = curr->next;
@@ -290,7 +286,8 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
   if (rc != CMP_SUCCESS) {
     return rc;
   }
-  return CMP_ERROR_NOT_FOUND;
+  rc = CMP_ERROR_NOT_FOUND;
+  return rc;
 }
 
 /**
@@ -301,8 +298,7 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_push(cmp_router_t *router, const char *uri) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   size_t len;
   char *uri_copy;
 
@@ -348,7 +344,7 @@ int cmp_router_push(cmp_router_t *router, const char *uri) {
 #endif
 
   router->stack[router->stack_count++] = uri_copy;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -359,8 +355,7 @@ int cmp_router_push(cmp_router_t *router, const char *uri) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_replace(cmp_router_t *router, const char *uri) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   size_t len;
   char *uri_copy;
 
@@ -392,7 +387,7 @@ int cmp_router_replace(cmp_router_t *router, const char *uri) {
     return rc;
   }
   router->stack[router->stack_count - 1] = uri_copy;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -402,8 +397,7 @@ int cmp_router_replace(cmp_router_t *router, const char *uri) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_pop(cmp_router_t *router) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (router == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -421,7 +415,8 @@ int cmp_router_pop(cmp_router_t *router) {
   router->stack_count--;
 
   /* Re-execute the new top */
-  return internal_execute_route(router, router->stack[router->stack_count - 1]);
+  rc = internal_execute_route(router, router->stack[router->stack_count - 1]);
+  return rc;
 }
 
 /**
@@ -432,8 +427,7 @@ int cmp_router_pop(cmp_router_t *router) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_get_current(cmp_router_t *router, cmp_string_t *out_uri) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (router == NULL || out_uri == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -443,7 +437,8 @@ int cmp_router_get_current(cmp_router_t *router, cmp_string_t *out_uri) {
   }
 
   cmp_string_init(out_uri);
-  return cmp_string_append(out_uri, router->stack[router->stack_count - 1]);
+  rc = cmp_string_append(out_uri, router->stack[router->stack_count - 1]);
+  return rc;
 }
 
 /**
@@ -454,14 +449,13 @@ int cmp_router_get_current(cmp_router_t *router, cmp_string_t *out_uri) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_set_transitions(cmp_router_t *router, int enable) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (router == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
   /* Store transition flag, evaluated during build process */
   (void)enable;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -471,18 +465,18 @@ int cmp_router_set_transitions(cmp_router_t *router, int enable) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_wasm_bind_history(cmp_router_t *router) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (router == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
 #if defined(__EMSCRIPTEN__)
   /* Call JS EM_ASM to hook window.addEventListener('popstate') back into
    * cmp_router_replace */
-  return CMP_SUCCESS;
+  return rc;
 #else
-  return CMP_ERROR_NOT_FOUND;
+  rc = CMP_ERROR_NOT_FOUND;
 #endif
+  return rc;
 }
 
 /**
@@ -492,8 +486,7 @@ int cmp_router_wasm_bind_history(cmp_router_t *router) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_os_register_uri_scheme(const char *scheme) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (scheme == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -541,7 +534,7 @@ int cmp_os_register_uri_scheme(const char *scheme) {
 #elif defined(__EMSCRIPTEN__)
   /* Hook browser History API via emscripten natively */
 #endif
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -554,14 +547,14 @@ int cmp_os_register_uri_scheme(const char *scheme) {
  */
 int cmp_router_push_with_style(cmp_router_t *router, const char *uri,
                                cmp_presentation_style_t style) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!router || !uri)
     return CMP_ERROR_INVALID_ARG;
   /* Modifies internal vdom root mounting transitions (slide-left, slide-up
    * sheet, crossfade) */
   (void)style;
-  return cmp_router_push(router, uri); /* Uses base logic for now */
+  rc = cmp_router_push(router, uri); /* Uses base logic for now */
+  return rc;
 }
 
 /**
@@ -571,11 +564,11 @@ int cmp_router_push_with_style(cmp_router_t *router, const char *uri,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_pop_with_style(cmp_router_t *router) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!router)
     return CMP_ERROR_INVALID_ARG;
-  return cmp_router_pop(router);
+  rc = cmp_router_pop(router);
+  return rc;
 }
 
 /**
@@ -588,8 +581,7 @@ int cmp_router_pop_with_style(cmp_router_t *router) {
  */
 int cmp_router_get_previous_title(cmp_router_t *router, char *out_title,
                                   size_t title_cap) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_router *r = (struct cmp_router *)router;
   if (!r || !out_title)
     return CMP_ERROR_INVALID_ARG;
@@ -606,7 +598,7 @@ int cmp_router_get_previous_title(cmp_router_t *router, char *out_title,
 #else
   strcpy(out_title, r->stack[r->stack_count - 2]);
 #endif
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -617,8 +609,7 @@ int cmp_router_get_previous_title(cmp_router_t *router, char *out_title,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_router_switch_tab(cmp_router_t *router, const char *tab_uri) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_router *r = (struct cmp_router *)router;
   size_t i;
   if (!r || !tab_uri)
@@ -635,7 +626,8 @@ int cmp_router_switch_tab(cmp_router_t *router, const char *tab_uri) {
   }
   r->stack_count = 0; /* Flush all */
 
-  return cmp_router_push(router, tab_uri);
+  rc = cmp_router_push(router, tab_uri);
+  return rc;
 }
 
 struct cmp_split_view {
@@ -650,8 +642,7 @@ struct cmp_split_view {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_split_view_create(cmp_split_view_t **out_split_view) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_split_view *ctx;
   if (!out_split_view)
     return CMP_ERROR_INVALID_ARG;
@@ -663,7 +654,7 @@ int cmp_split_view_create(cmp_split_view_t **out_split_view) {
   ctx->detail_route = NULL;
 
   *out_split_view = (cmp_split_view_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -673,11 +664,10 @@ int cmp_split_view_create(cmp_split_view_t **out_split_view) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_split_view_destroy(cmp_split_view_t *split_view) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_split_view *ctx = (struct cmp_split_view *)split_view;
   if (!ctx)
-    return CMP_SUCCESS;
+    return rc;
 
   if (ctx->master_route)
     rc = CMP_FREE(ctx->master_route);
@@ -693,7 +683,7 @@ int cmp_split_view_destroy(cmp_split_view_t *split_view) {
   if (rc != CMP_SUCCESS) {
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -706,8 +696,7 @@ int cmp_split_view_destroy(cmp_split_view_t *split_view) {
  */
 int cmp_split_view_set_routes(cmp_split_view_t *split_view,
                               const char *master_uri, const char *detail_uri) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_split_view *ctx = (struct cmp_split_view *)split_view;
   size_t len;
 
@@ -747,5 +736,5 @@ int cmp_split_view_set_routes(cmp_split_view_t *split_view,
     strcpy(ctx->detail_route, detail_uri);
 #endif
   }
-  return CMP_SUCCESS;
+  return rc;
 }

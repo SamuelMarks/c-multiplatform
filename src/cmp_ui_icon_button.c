@@ -24,7 +24,7 @@ int cmp_ui_icon_button_create(cmp_ui_icon_button_t **out_btn,
                               const char *icon_name,
                               cmp_ui_icon_button_style_t style) {
   cmp_ui_icon_button_t *btn;
-  int rc;
+  int rc = CMP_SUCCESS;
   size_t len;
 
   if (!out_btn) {
@@ -35,9 +35,7 @@ int cmp_ui_icon_button_create(cmp_ui_icon_button_t **out_btn,
   rc = CMP_MALLOC(sizeof(cmp_ui_icon_button_t), (void **)&btn);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_icon_button_create: OOM\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   memset(btn, 0, sizeof(cmp_ui_icon_button_t));
@@ -61,9 +59,7 @@ int cmp_ui_icon_button_create(cmp_ui_icon_button_t **out_btn,
     } else {
       LOG_DEBUG("cmp_ui_icon_button_create: OOM icon_name\n");
       CMP_FREE(btn);
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
   }
@@ -114,7 +110,7 @@ int cmp_ui_icon_button_create(cmp_ui_icon_button_t **out_btn,
   }
 
   *out_btn = btn;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -124,7 +120,7 @@ int cmp_ui_icon_button_create(cmp_ui_icon_button_t **out_btn,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_icon_button_destroy(cmp_ui_icon_button_t *btn) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!btn) {
     LOG_DEBUG("cmp_ui_icon_button_destroy: btn is NULL\n");
@@ -144,12 +140,10 @@ int cmp_ui_icon_button_destroy(cmp_ui_icon_button_t *btn) {
   rc = CMP_FREE(btn);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_icon_button_destroy: CMP_FREE btn failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -161,22 +155,13 @@ int cmp_ui_icon_button_destroy(cmp_ui_icon_button_t *btn) {
  */
 int cmp_ui_icon_button_get_node(cmp_ui_icon_button_t *btn,
                                 cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!btn || !out_node) {
     LOG_DEBUG("cmp_ui_icon_button_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = btn->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -190,7 +175,7 @@ int cmp_ui_icon_button_get_node(cmp_ui_icon_button_t *btn,
 int cmp_ui_icon_button_set_icon(cmp_ui_icon_button_t *btn,
                                 const char *icon_name) {
   size_t len;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!btn) {
     LOG_DEBUG("cmp_ui_icon_button_set_icon: btn is NULL\n");
@@ -209,9 +194,7 @@ int cmp_ui_icon_button_set_icon(cmp_ui_icon_button_t *btn,
     rc = CMP_MALLOC(len + 1, (void **)&btn->icon_name);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_icon_button_set_icon: OOM\n");
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
 #if defined(_MSC_VER)
@@ -226,7 +209,7 @@ int cmp_ui_icon_button_set_icon(cmp_ui_icon_button_t *btn,
 #endif
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -238,7 +221,7 @@ int cmp_ui_icon_button_set_icon(cmp_ui_icon_button_t *btn,
  */
 int cmp_ui_icon_button_bind_a11y(cmp_ui_icon_button_t *widget,
                                  cmp_a11y_tree_t *tree) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!widget || !tree) {
     LOG_DEBUG("cmp_ui_icon_button_bind_a11y: Invalid arg\n");
@@ -254,9 +237,7 @@ int cmp_ui_icon_button_bind_a11y(cmp_ui_icon_button_t *widget,
                               "Icon Button");
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_icon_button_bind_a11y: cmp_a11y_tree_add_node failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -265,11 +246,9 @@ int cmp_ui_icon_button_bind_a11y(cmp_ui_icon_button_t *widget,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG(
         "cmp_ui_icon_button_bind_a11y: cmp_a11y_tree_set_node_traits failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

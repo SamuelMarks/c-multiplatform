@@ -17,7 +17,7 @@ struct cmp_wayland_protocols {
  */
 int cmp_wayland_protocols_create(cmp_wayland_protocols_t **out_protocols) {
   cmp_wayland_protocols_t *p = NULL;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!out_protocols) {
     LOG_DEBUG("cmp_wayland_protocols_create: out_protocols is NULL\n");
@@ -27,9 +27,7 @@ int cmp_wayland_protocols_create(cmp_wayland_protocols_t **out_protocols) {
   rc = CMP_MALLOC(sizeof(cmp_wayland_protocols_t), (void **)&p);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_wayland_protocols_create: OOM\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -37,7 +35,7 @@ int cmp_wayland_protocols_create(cmp_wayland_protocols_t **out_protocols) {
   p->xdg_decoration_bound = 0;
   *out_protocols = p;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -47,7 +45,7 @@ int cmp_wayland_protocols_create(cmp_wayland_protocols_t **out_protocols) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_wayland_protocols_destroy(cmp_wayland_protocols_t *protocols) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!protocols) {
     LOG_DEBUG("cmp_wayland_protocols_destroy: protocols is NULL\n");
@@ -57,12 +55,10 @@ int cmp_wayland_protocols_destroy(cmp_wayland_protocols_t *protocols) {
   rc = CMP_FREE(protocols);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_wayland_protocols_destroy: CMP_FREE failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -74,8 +70,7 @@ int cmp_wayland_protocols_destroy(cmp_wayland_protocols_t *protocols) {
  */
 int cmp_wayland_protocols_bind(cmp_wayland_protocols_t *protocols,
                                cmp_window_t *window) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!protocols || !window) {
     LOG_DEBUG("cmp_wayland_protocols_bind: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
@@ -85,14 +80,5 @@ int cmp_wayland_protocols_bind(cmp_wayland_protocols_t *protocols,
   protocols->fractional_scale_bound = 1;
   protocols->xdg_decoration_bound = 1;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

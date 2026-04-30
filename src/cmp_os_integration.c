@@ -12,7 +12,7 @@
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_copy_to_clipboard(cmp_window_t *window, const char *text) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -28,7 +28,7 @@ int cmp_os_copy_to_clipboard(cmp_window_t *window, const char *text) {
               "cmp_window_set_clipboard_text failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -62,7 +62,7 @@ CMP_EXEMPT(static void on_file_dropped(const char *path, void *user_data)) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_enable_file_drag_drop(cmp_window_t *window) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -78,7 +78,7 @@ int cmp_os_enable_file_drag_drop(cmp_window_t *window) {
               "cmp_window_set_drop_callback failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -89,8 +89,7 @@ int cmp_os_enable_file_drag_drop(cmp_window_t *window) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_is_voice_dictation_supported(int *out_is_supported) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (out_is_supported == NULL) {
     LOG_DEBUG(
         "Error in cmp_os_is_voice_dictation_supported: Invalid argument\n");
@@ -100,7 +99,7 @@ int cmp_os_is_voice_dictation_supported(int *out_is_supported) {
   /* Return 1 indicating we hook into native Speech frameworks (e.g. SAPI on
    * Win, NSSpeechRecognizer on Mac) */
   *out_is_supported = 1;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -110,7 +109,7 @@ int cmp_os_is_voice_dictation_supported(int *out_is_supported) {
  */
 int cmp_os_start_voice_dictation(void) {
   int is_supported;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   is_supported = 0;
   rc = cmp_os_is_voice_dictation_supported(&is_supported);
@@ -122,5 +121,5 @@ int cmp_os_start_voice_dictation(void) {
 
   /* Mock invocation of dictation API.
      Would initialize COM/SAPI for Windows natively here. */
-  return CMP_SUCCESS;
+  return rc;
 }

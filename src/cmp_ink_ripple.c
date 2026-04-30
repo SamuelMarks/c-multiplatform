@@ -43,34 +43,27 @@ CMP_EXEMPT(static float cmp_math_cubic_bezier_accelerate(float t)) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ink_ripple_create(cmp_ink_ripple_t **out_ripple) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_ink_ripple *ctx = NULL;
 
   if (!out_ripple) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_ink_ripple_create: Invalid argument (out_ripple=NULL)\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_ink_ripple), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_ink_ripple_create: Out of memory\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   memset(ctx, 0, sizeof(struct cmp_ink_ripple));
   *out_ripple = (cmp_ink_ripple_t *)ctx;
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -81,17 +74,14 @@ int cmp_ink_ripple_create(cmp_ink_ripple_t **out_ripple) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ink_ripple_destroy(cmp_ink_ripple_t *ripple) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_ink_ripple *ctx = (struct cmp_ink_ripple *)ripple;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_ink_ripple_destroy: Invalid argument (ripple=NULL)\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -99,9 +89,7 @@ int cmp_ink_ripple_destroy(cmp_ink_ripple_t *ripple) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_ink_ripple_destroy: CMP_FREE failed\n");
   }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -113,16 +101,13 @@ int cmp_ink_ripple_destroy(cmp_ink_ripple_t *ripple) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ink_ripple_update(cmp_ink_ripple_t *ripple, float dt_ms) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_ink_ripple *ctx = (struct cmp_ink_ripple *)ripple;
 
   if (!ctx || dt_ms < 0.0f) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ink_ripple_update: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -145,15 +130,6 @@ int cmp_ink_ripple_update(cmp_ink_ripple_t *ripple, float dt_ms) {
                                        ctx->t_fade)); /* Base ripple opacity */
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -169,17 +145,14 @@ int cmp_ink_ripple_update(cmp_ink_ripple_t *ripple, float dt_ms) {
  */
 int cmp_ink_ripple_trigger(cmp_ink_ripple_t *ripple, float start_x,
                            float start_y, float box_width, float box_height) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_ink_ripple *ctx = (struct cmp_ink_ripple *)ripple;
   float dx, dy, dx2, dy2, max_dist;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ink_ripple_trigger: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -199,15 +172,7 @@ int cmp_ink_ripple_trigger(cmp_ink_ripple_t *ripple, float start_x,
   ctx->t_fade = 0.0f;
   ctx->active = 1;
   ctx->fading = 0;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -218,31 +183,20 @@ int cmp_ink_ripple_trigger(cmp_ink_ripple_t *ripple, float start_x,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ink_ripple_release(cmp_ink_ripple_t *ripple) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_ink_ripple *ctx = (struct cmp_ink_ripple *)ripple;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ink_ripple_release: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   if (ctx->active) {
     ctx->fading = 1;
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -258,16 +212,13 @@ int cmp_ink_ripple_release(cmp_ink_ripple_t *ripple) {
  */
 int cmp_ink_ripple_get_state(cmp_ink_ripple_t *ripple, float *out_radius,
                              float *out_opacity, float *out_x, float *out_y) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_ink_ripple *ctx = (struct cmp_ink_ripple *)ripple;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ink_ripple_get_state: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -279,14 +230,6 @@ int cmp_ink_ripple_get_state(cmp_ink_ripple_t *ripple, float *out_radius,
     *out_x = ctx->origin_x;
   if (out_y)
     *out_y = ctx->origin_y;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

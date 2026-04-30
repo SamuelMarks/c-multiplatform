@@ -12,11 +12,8 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_init(void) {
-  int rc;
-  rc = 0;if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+int rc = CMP_SUCCESS;
+  
   return rc;
 }
 
@@ -26,11 +23,8 @@ int cmp_system_theme_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_shutdown(void) {
-  int rc;
-  rc = 0;if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+int rc = CMP_SUCCESS;
+  
   return rc;
 }
 
@@ -41,8 +35,7 @@ int cmp_system_theme_shutdown(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_is_dark(int *out_is_dark) {
-  int rc;
-  rc = 0;FILE *fp;
+int rc = CMP_SUCCESS;FILE *fp;
   char buffer[128];
   
   if (!out_is_dark) return -1;
@@ -57,7 +50,7 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
       }
     }
     pclose(fp);
-    return 0;
+    return rc;
   }
   
   /* Fallback to checking GTK_THEME env var */
@@ -68,10 +61,8 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
     }
   }
 
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+  
+  
   return rc;
 }
 
@@ -82,8 +73,7 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
-  int rc;
-  rc = 0;FILE *fp;
+int rc = CMP_SUCCESS;FILE *fp;
   char buffer[128];
 
   if (!out_is_high_contrast) return -1;
@@ -99,10 +89,8 @@ int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
     pclose(fp);
   }
 
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+  
+  
   return rc;
 }
 #endif /* __linux__ */

@@ -20,7 +20,7 @@ struct cmp_window_blur {
  */
 int cmp_window_blur_create(cmp_window_blur_t **out_blur) {
   cmp_window_blur_t *blur;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!out_blur) {
     LOG_DEBUG("cmp_window_blur_create: out_blur is NULL\n");
@@ -36,7 +36,7 @@ int cmp_window_blur_create(cmp_window_blur_t **out_blur) {
   memset(blur, 0, sizeof(cmp_window_blur_t));
 
   *out_blur = blur;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -46,7 +46,7 @@ int cmp_window_blur_create(cmp_window_blur_t **out_blur) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_blur_destroy(cmp_window_blur_t *blur) {
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!blur) {
     LOG_DEBUG("cmp_window_blur_destroy: blur is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -55,12 +55,10 @@ int cmp_window_blur_destroy(cmp_window_blur_t *blur) {
   rc = CMP_FREE(blur);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_window_blur_destroy: CMP_FREE failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -73,8 +71,7 @@ int cmp_window_blur_destroy(cmp_window_blur_t *blur) {
  */
 int cmp_window_blur_set_enabled(cmp_window_blur_t *blur, cmp_window_t *window,
                                 int enabled) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   int i;
   int found = 0;
 
@@ -89,7 +86,7 @@ int cmp_window_blur_set_enabled(cmp_window_blur_t *blur, cmp_window_t *window,
       if (!enabled) {
         blur->blurred_windows[i] = blur->blurred_windows[blur->count - 1];
         blur->count--;
-        return CMP_SUCCESS;
+        return rc;
       }
       break;
     }
@@ -103,15 +100,6 @@ int cmp_window_blur_set_enabled(cmp_window_blur_t *blur, cmp_window_t *window,
     blur->blurred_windows[blur->count++] = window;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -125,8 +113,7 @@ int cmp_window_blur_set_enabled(cmp_window_blur_t *blur, cmp_window_t *window,
  */
 int cmp_window_blur_is_enabled(const cmp_window_blur_t *blur,
                                const cmp_window_t *window, int *out_enabled) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   int i;
 
   if (!blur || !window || !out_enabled) {
@@ -142,14 +129,5 @@ int cmp_window_blur_is_enabled(const cmp_window_blur_t *blur,
     }
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

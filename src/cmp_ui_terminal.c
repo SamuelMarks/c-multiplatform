@@ -25,7 +25,7 @@ int cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal, uint32_t bg_color,
                            uint32_t fg_color) {
   cmp_ui_terminal_t *terminal;
   int err;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!out_terminal) {
     return CMP_ERROR_INVALID_ARG;
@@ -62,7 +62,7 @@ int cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal, uint32_t bg_color,
   }
 
   *out_terminal = terminal;
-  return 0;
+  return rc;
 }
 
 /**
@@ -72,7 +72,7 @@ int cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal, uint32_t bg_color,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_terminal_destroy(cmp_ui_terminal_t *terminal) {
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!terminal) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -89,7 +89,7 @@ int cmp_ui_terminal_destroy(cmp_ui_terminal_t *terminal) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
-  return 0;
+  return rc;
 }
 
 /**
@@ -101,21 +101,12 @@ int cmp_ui_terminal_destroy(cmp_ui_terminal_t *terminal) {
  */
 int cmp_ui_terminal_get_node(cmp_ui_terminal_t *terminal,
                              cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!terminal || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = terminal->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -130,7 +121,7 @@ int cmp_ui_terminal_append_output(cmp_ui_terminal_t *terminal,
                                   const char *output) {
   size_t len;
   char *new_buf;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!terminal || !output) {
     return CMP_ERROR_INVALID_ARG;
@@ -159,5 +150,5 @@ int cmp_ui_terminal_append_output(cmp_ui_terminal_t *terminal,
   terminal->buffer = new_buf;
   terminal->buffer_size += len;
 
-  return 0;
+  return rc;
 }

@@ -28,7 +28,7 @@ struct cmp_ui_diff {
 int cmp_ui_diff_create(cmp_ui_diff_t **out_diff, const char *old_text,
                        const char *new_text) {
   cmp_ui_diff_t *diff = NULL;
-  int rc;
+  int rc = CMP_SUCCESS;
   size_t len;
 
   if (!out_diff) {
@@ -99,7 +99,7 @@ int cmp_ui_diff_create(cmp_ui_diff_t **out_diff, const char *old_text,
   }
 
   *out_diff = diff;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -109,7 +109,7 @@ int cmp_ui_diff_create(cmp_ui_diff_t **out_diff, const char *old_text,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_diff_destroy(cmp_ui_diff_t *diff) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!diff) {
     LOG_DEBUG("cmp_ui_diff_destroy: diff is NULL\n");
@@ -137,12 +137,10 @@ int cmp_ui_diff_destroy(cmp_ui_diff_t *diff) {
   rc = CMP_FREE(diff);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_diff_destroy: CMP_FREE diff failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -153,21 +151,12 @@ int cmp_ui_diff_destroy(cmp_ui_diff_t *diff) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_diff_get_node(cmp_ui_diff_t *diff, cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!diff || !out_node) {
     LOG_DEBUG("cmp_ui_diff_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = diff->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

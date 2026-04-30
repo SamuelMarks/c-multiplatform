@@ -17,112 +17,7 @@
 #endif
 
 
-#if defined(_WIN32)
-
-/* Forward declare Windows APIs to avoid <windows.h> */
-__declspec(dllimport) void *__stdcall LoadLibraryA(const char *lpLibFileName);
-typedef int (__stdcall *FARPROC_t)(void);
-__declspec(dllimport) FARPROC_t __stdcall GetProcAddress(void *hModule, const char *lpProcName);
-__declspec(dllimport) unsigned short __stdcall RtlCaptureStackBackTrace(unsigned long FramesToSkip, unsigned long FramesToCapture, void **BackTrace, unsigned long *BackTraceHash);
-__declspec(dllimport) void *__stdcall GetCurrentProcess(void);
-
-typedef int (__stdcall *SymInitialize_t)(void *hProcess, const char *UserSearchPath, int fInvadeProcess);
-typedef unsigned long (__stdcall *SymSetOptions_t)(unsigned long SymOptions);
-typedef int (__stdcall *SymFromAddr_t)(void *hProcess, unsigned __int64 Address, unsigned __int64 *Displacement, void *Symbol);
-
-/* SYMBOL_INFO structure matching DbgHelp.h */
-typedef struct _SYMBOL_INFO {
-    unsigned long SizeOfStruct;
-    unsigned long TypeIndex;
-    unsigned __int64 Reserved[2];
-    unsigned long Index;
-    unsigned long Size;
-    unsigned __int64 ModBase;
-    unsigned long Flags;
-    unsigned __int64 Value;
-    unsigned __int64 Address;
-    unsigned long Register;
-    unsigned long Scope;
-    unsigned long Tag;
-    unsigned long NameLen;
-    unsigned long MaxNameLen;
-    char Name[1];
-} SYMBOL_INFO;
-#define SYMOPT_LOAD_LINES 0x00000010
-
-/**
- * @brief cmp_dump_stack_trace
- *
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_dump_stack_trace(void) {
-  int rc;
-  rc = 0;void *stack[100];
-    unsigned short frames;
-    void *process;
-    void *dbghelp;
-    SymInitialize_t SymInitialize;
-    SymSetOptions_t SymSetOptions;
-    SymFromAddr_t SymFromAddr;
-    unsigned short i;
-    SYMBOL_INFO *symbol;
-    unsigned __int64 displacement;
-
-    FPRINTF(stderr, "--- Stack Trace ---\n");
-
-    frames = RtlCaptureStackBackTrace(0, 100, stack, NULL);
-    process = GetCurrentProcess();
-
-    dbghelp = LoadLibraryA("Dbghelp.dll");
-    if (dbghelp == NULL) {
-        for (i = 0; i < frames; i++) {
-            FPRINTF(stderr, "[%d] %p\n", i, stack[i]);
-        }
-        return CMP_SUCCESS;
-    }
-
-    SymInitialize = (SymInitialize_t)GetProcAddress(dbghelp, "SymInitialize");
-    SymSetOptions = (SymSetOptions_t)GetProcAddress(dbghelp, "SymSetOptions");
-    SymFromAddr = (SymFromAddr_t)GetProcAddress(dbghelp, "SymFromAddr");
-
-    if (SymInitialize && SymSetOptions && SymFromAddr) {
-        SymSetOptions(SYMOPT_LOAD_LINES);
-        SymInitialize(process, NULL, 1);
-
-symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
-        if (symbol) {
-            symbol->MaxNameLen = 255;
-            symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-
-            for (i = 0; i < frames; i++) {
-                displacement = 0;
-                if (SymFromAddr(process, (unsigned __int64)stack[i], &displacement, symbol)) {
-                    FPRINTF(stderr, "[%d] %s - %p\n", i, symbol->Name, stack[i]);
-                } else {
-                    FPRINTF(stderr, "[%d] %p\n", i, stack[i]);
-                }
-            }
-            free(symbol);
-        } else {
-            cmp_log_debug("OOM allocating SYMBOL_INFO");
-            for (i = 0; i < frames; i++) {
-                FPRINTF(stderr, "[%d] %p\n", i, stack[i]);
-            }
-            return CMP_ERROR_OOM;
-        }
-        return CMP_SUCCESS;
-    } else {
-        for (i = 0; i < frames; i++) {
-            FPRINTF(stderr, "[%d] %p\n", i, stack[i]);
-        }
-    }
-    if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-#elif defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__)
 
 #include <execinfo.h>
 #include <unistd.h>
@@ -133,18 +28,15 @@ symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dump_stack_trace(void) {
-  int rc;
-  rc = 0;void *stack[100];
+int rc = CMP_SUCCESS;
+    void *stack[100];
     int frames;
 
-FPRINTF(stderr, "--- Stack Trace ---\n");
+    FPRINTF(stderr, "--- Stack Trace ---\n");
     frames = backtrace(stack, 100);
     backtrace_symbols_fd(stack, frames, STDERR_FILENO);
-    if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
+
     return rc;
-  }
-  return rc;
 }
 #else
 
@@ -154,13 +46,9 @@ FPRINTF(stderr, "--- Stack Trace ---\n");
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dump_stack_trace(void) {
-  int rc;
-  rc = 0;FPRINTF(stderr, "Stack trace not supported on this platform.\n");
-    if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
+int rc = CMP_SUCCESS;
+    FPRINTF(stderr, "Stack trace not supported on this platform.\n");
     return rc;
-  }
-  return rc;
 }
 #endif
 /* clang-format on */
@@ -174,8 +62,12 @@ int cmp_dump_stack_trace(void) {
  */
 CMP_EXEMPT(static void cmp_default_assert_handler(const char *msg,
                                                   const char *file, int line)) {
+  int rc = CMP_SUCCESS;
   FPRINTF(stderr, "Assertion failed: %s at %s:%d\n", msg, file, line);
-  cmp_dump_stack_trace();
+  rc = cmp_dump_stack_trace();
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Failed to dump stack trace during assert\n");
+  }
   abort();
 }
 
@@ -191,18 +83,8 @@ static cmp_assert_handler_t g_assert_handler = cmp_default_assert_handler;
  * @return int Returns 0 on success.
  */
 int cmp_set_assert_handler(cmp_assert_handler_t handler) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   g_assert_handler = handler;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -210,11 +92,14 @@ int cmp_set_assert_handler(cmp_assert_handler_t handler) {
  * @brief cmp_crash_handler
  *
  * @param sig Parameter description.
- * @return Returns 0 on success, or an error code on failure.
  */
 CMP_EXEMPT(static void cmp_crash_handler(int sig)) {
+  int rc = CMP_SUCCESS;
   FPRINTF(stderr, "Caught signal %d\n", sig);
-  cmp_dump_stack_trace();
+  rc = cmp_dump_stack_trace();
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Failed to dump stack trace during crash\n");
+  }
   exit(1);
 }
 
@@ -224,21 +109,11 @@ CMP_EXEMPT(static void cmp_crash_handler(int sig)) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_crash_handler_init(void) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   signal(SIGSEGV, cmp_crash_handler);
   signal(SIGABRT, cmp_crash_handler);
   signal(SIGILL, cmp_crash_handler);
   signal(SIGFPE, cmp_crash_handler);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -248,7 +123,6 @@ int cmp_crash_handler_init(void) {
  * @param condition Parameter description.
  * @param file Parameter description.
  * @param line Parameter description.
- * @return Returns 0 on success, or an error code on failure.
  */
 CMP_EXEMPT(void cmp_assert_fail(const char *condition, const char *file,
                                 int line)) {
@@ -263,7 +137,6 @@ CMP_EXEMPT(void cmp_assert_fail(const char *condition, const char *file,
  * @brief cmp_log_debug
  *
  * @param fmt Parameter description.
- * @return Returns 0 on success, or an error code on failure.
  */
 CMP_EXEMPT(void cmp_log_debug(const char *fmt, ...)) {
   va_list args;
@@ -281,11 +154,14 @@ CMP_EXEMPT(void cmp_log_debug(const char *fmt, ...)) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_strerror(int error, const char **out_str) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
+
   if (out_str == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("out_str pointer is NULL\n");
+    rc = CMP_ERROR_INVALID_ARG;
+    return rc;
   }
+
   switch (error) {
   case 0:
     *out_str = "Success";
@@ -315,14 +191,6 @@ int cmp_strerror(int error, const char **out_str) {
     *out_str = "Unknown error code";
     break;
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

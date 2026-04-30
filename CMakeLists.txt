@@ -194,8 +194,9 @@ target_include_directories(greatest INTERFACE ${greatest_SOURCE_DIR})
 
 # cfs
 if(CDD_DEPS STREQUAL "SYSTEM")
-    find_package(cfs REQUIRED NO_CMAKE_PACKAGE_REGISTRY NO_CMAKE_SYSTEM_PACKAGE_REGISTRY)
-else()
+    find_package(cfs QUIET NO_CMAKE_PACKAGE_REGISTRY NO_CMAKE_SYSTEM_PACKAGE_REGISTRY)
+endif()
+if(NOT TARGET cfs)
     FetchContent_Declare(cfs GIT_REPOSITORY https://github.com/SamuelMarks/c-fs.git GIT_TAG master
         UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
     )
@@ -335,11 +336,29 @@ if(CMAKE_SYSTEM_NAME STREQUAL "DOS")
     add_compile_definitions(CMP_OS_DOS=1)
     set(HTTP_ONLY ON CACHE BOOL "" FORCE)
 endif()
-FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG master
+FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG cc4fe6a0df010411ee85e13d9435b6de2c1ab209
     UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
 )
 FetchContent_MakeAvailable(cdd_c)
+if(TARGET c_cdd)
+  target_compile_options(c_cdd PRIVATE /wd4013 /wd4189 /wd4715 /wd4702)
+endif()
+if(TARGET c_cdd)
+  target_compile_options(c_cdd PRIVATE /wd4013 /wd4189 /wd4715 /wd4702)
+endif()
 FetchContent_MakeAvailable(c_abstract_http)
+
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/cdd_dummy.c" "void LOG_DEBUG(const char* fmt, ...) { (void)fmt; }\n")
+
+if(TARGET c_cdd)
+  target_sources(c_cdd PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/cdd_dummy.c")
+endif()
+if(TARGET c_orm)
+  target_sources(c_orm PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/cdd_dummy.c")
+endif()
+if(TARGET cdd-c)
+  target_sources(cdd-c PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/cdd_dummy.c")
+endif()
 
 if(TARGET c_cdd)
     target_compile_definitions(c_cdd PRIVATE CDD_TOKEN_KEYWORD_CHAR=CDD_TOKEN_CHAR CDD_TOKEN_KEYWORD_FLOAT=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_DOUBLE=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_VOID=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_UNION=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_ENUM=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_UNSIGNED=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_SIGNED=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_LONG=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_SHORT=CDD_TOKEN_OTHER CDD_TOKEN_STRING_LITERAL=CDD_TOKEN_STRING CDD_TOKEN_KEYWORD_CONST=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_VOLATILE=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_RESTRICT=CDD_TOKEN_OTHER)
@@ -348,7 +367,10 @@ if(TARGET c_cdd)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mh")
         target_compile_options(c_cdd PRIVATE -za99)
     elseif(MSVC)
-        target_compile_options(c_cdd PRIVATE /WX- /wd4101 /wd4456 /wd4267 /wd4047 /wd4024)
+        target_compile_options(c_cdd PRIVATE /WX- /wd4101 /wd4456 /wd4267 /wd4047 /wd4024 /wd4701 /wd4703 /wd4189 /wd4715 /wd4702)
+if(TARGET cdd-c)
+  target_compile_options(cdd-c PRIVATE /WX- /wd4101 /wd4456 /wd4267 /wd4047 /wd4024 /wd4701 /wd4703 /wd4189 /wd4715 /wd4702)
+endif()
     endif()
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "DOS" AND TARGET c-abstract-http AND TARGET c_cdd)
@@ -358,10 +380,16 @@ endif()
 
 
 # cdd-c
-FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG master
+FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG cc4fe6a0df010411ee85e13d9435b6de2c1ab209
     UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
 )
 FetchContent_MakeAvailable(cdd_c)
+if(TARGET c_cdd)
+  target_compile_options(c_cdd PRIVATE /wd4013 /wd4189 /wd4715 /wd4702)
+endif()
+if(TARGET c_cdd)
+  target_compile_options(c_cdd PRIVATE /wd4013 /wd4189 /wd4715 /wd4702)
+endif()
 
 # c-orm
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "DOS")

@@ -17,8 +17,7 @@ struct cmp_print_ctx {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_print_ctx_create(cmp_print_ctx_t **out_ctx) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_print_ctx_t *ctx;
   if (!out_ctx) {
     return CMP_ERROR_INVALID_ARG;
@@ -29,7 +28,7 @@ int cmp_print_ctx_create(cmp_print_ctx_t **out_ctx) {
   }
   memset(ctx, 0, sizeof(cmp_print_ctx_t));
   *out_ctx = ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -39,8 +38,7 @@ int cmp_print_ctx_create(cmp_print_ctx_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_print_ctx_destroy(cmp_print_ctx_t *ctx) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!ctx) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -48,7 +46,7 @@ int cmp_print_ctx_destroy(cmp_print_ctx_t *ctx) {
   if (rc != CMP_SUCCESS) {
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -58,8 +56,7 @@ int cmp_print_ctx_destroy(cmp_print_ctx_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_print_ctx_begin_page(cmp_print_ctx_t *ctx) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!ctx) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -68,7 +65,7 @@ int cmp_print_ctx_begin_page(cmp_print_ctx_t *ctx) {
   }
   ctx->is_printing = 1;
   ctx->current_page++;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -78,8 +75,7 @@ int cmp_print_ctx_begin_page(cmp_print_ctx_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_print_ctx_end_page(cmp_print_ctx_t *ctx) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!ctx) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -87,7 +83,7 @@ int cmp_print_ctx_end_page(cmp_print_ctx_t *ctx) {
     return CMP_ERROR_INVALID_STATE; /* Not currently in a page */
   }
   ctx->is_printing = 0;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -98,8 +94,7 @@ int cmp_print_ctx_end_page(cmp_print_ctx_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_print_ctx_save_pdf(cmp_print_ctx_t *ctx, const char *file_path) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!ctx || !file_path) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -110,5 +105,5 @@ int cmp_print_ctx_save_pdf(cmp_print_ctx_t *ctx, const char *file_path) {
     return CMP_ERROR_INVALID_STATE; /* Cannot save empty document */
   }
   /* Native PDF generation OS APIs would go here */
-  return CMP_SUCCESS;
+  return rc;
 }

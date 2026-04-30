@@ -26,8 +26,7 @@ struct cmp_aria_live {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_live_create(cmp_a11y_tree_t *tree, cmp_aria_live_t **out_live) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria_live *live = NULL;
@@ -39,9 +38,7 @@ int cmp_aria_live_create(cmp_a11y_tree_t *tree, cmp_aria_live_t **out_live) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_aria_live_create: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -52,9 +49,7 @@ int cmp_aria_live_create(cmp_a11y_tree_t *tree, cmp_aria_live_t **out_live) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_aria_live_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -66,9 +61,7 @@ int cmp_aria_live_create(cmp_a11y_tree_t *tree, cmp_aria_live_t **out_live) {
   *out_live = (cmp_aria_live_t *)live;
   cmp_log_debug(
       "cmp_aria_live_create: Successfully created aria live context\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -79,8 +72,7 @@ int cmp_aria_live_create(cmp_a11y_tree_t *tree, cmp_aria_live_t **out_live) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_live_destroy(cmp_aria_live_t *live) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria_live *l = (struct cmp_aria_live *)live;
@@ -93,9 +85,7 @@ int cmp_aria_live_destroy(cmp_aria_live_t *live) {
     }
     cmp_log_debug("cmp_aria_live_destroy: Invalid argument (live=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -107,15 +97,7 @@ int cmp_aria_live_destroy(cmp_aria_live_t *live) {
   CMP_FREE(l);
   cmp_log_debug(
       "cmp_aria_live_destroy: Successfully destroyed aria live context\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -129,8 +111,7 @@ int cmp_aria_live_destroy(cmp_aria_live_t *live) {
  */
 int cmp_aria_live_set_mode(cmp_aria_live_t *live, int node_id,
                            cmp_aria_live_mode_t mode) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria_live *l = (struct cmp_aria_live *)live;
@@ -146,9 +127,7 @@ int cmp_aria_live_set_mode(cmp_aria_live_t *live, int node_id,
     }
     cmp_log_debug("cmp_aria_live_set_mode: Invalid argument (live=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -159,9 +138,7 @@ int cmp_aria_live_set_mode(cmp_aria_live_t *live, int node_id,
       cmp_log_debug(
           "cmp_aria_live_set_mode: Updated existing node %d mode to %d\n",
           node_id, (int)mode);
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
   }
@@ -179,9 +156,7 @@ int cmp_aria_live_set_mode(cmp_aria_live_t *live, int node_id,
         err_str = "Unknown";
       }
       cmp_log_debug("cmp_aria_live_set_mode: Out of memory: %s\n", err_str);
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
 
@@ -200,9 +175,7 @@ int cmp_aria_live_set_mode(cmp_aria_live_t *live, int node_id,
 
   cmp_log_debug("cmp_aria_live_set_mode: Added new node %d with mode %d\n",
                 node_id, (int)mode);
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -216,8 +189,7 @@ int cmp_aria_live_set_mode(cmp_aria_live_t *live, int node_id,
  */
 int cmp_aria_live_announce(cmp_aria_live_t *live, int node_id,
                            const char *message) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria_live *l = (struct cmp_aria_live *)live;
@@ -231,9 +203,7 @@ int cmp_aria_live_announce(cmp_aria_live_t *live, int node_id,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_aria_live_announce: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -250,9 +220,7 @@ int cmp_aria_live_announce(cmp_aria_live_t *live, int node_id,
   if (mode == CMP_ARIA_LIVE_OFF) {
     cmp_log_debug("cmp_aria_live_announce: Node %d mode is OFF, skipping\n",
                   node_id);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc; /* No announcement needed */
   }
 
@@ -267,14 +235,5 @@ int cmp_aria_live_announce(cmp_aria_live_t *live, int node_id,
     /* Interrupt screen reader for assertive announcement */
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

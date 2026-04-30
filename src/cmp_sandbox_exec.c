@@ -18,7 +18,7 @@ struct cmp_sandbox_exec {
  * @return 0 on success, or an error code on failure.
  */
 int cmp_sandbox_exec_create(cmp_sandbox_exec_t **out_sandbox) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_sandbox_exec_t *sandbox;
 
   rc = CMP_SUCCESS;
@@ -36,7 +36,7 @@ int cmp_sandbox_exec_create(cmp_sandbox_exec_t **out_sandbox) {
 
   sandbox->is_initialized = 1;
   *out_sandbox = sandbox;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -46,7 +46,7 @@ int cmp_sandbox_exec_create(cmp_sandbox_exec_t **out_sandbox) {
  * @return 0 on success, or an error code on failure.
  */
 int cmp_sandbox_exec_destroy(cmp_sandbox_exec_t *sandbox) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -61,7 +61,7 @@ int cmp_sandbox_exec_destroy(cmp_sandbox_exec_t *sandbox) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -75,7 +75,7 @@ int cmp_sandbox_exec_destroy(cmp_sandbox_exec_t *sandbox) {
  */
 int cmp_sandbox_exec_run(cmp_sandbox_exec_t *sandbox, const char *language,
                          const char *code, char **out_output) {
-  int rc;
+  int rc = CMP_SUCCESS;
   const char *dummy_output = "Hello world (mocked output)\n";
   char *res;
   size_t len;
@@ -111,7 +111,7 @@ int cmp_sandbox_exec_run(cmp_sandbox_exec_t *sandbox, const char *language,
 #endif
 
   *out_output = res;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -121,7 +121,7 @@ int cmp_sandbox_exec_run(cmp_sandbox_exec_t *sandbox, const char *language,
  * @return 0 on success, or an error code on failure.
  */
 int cmp_sandbox_exec_free_output(char *output) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -133,5 +133,5 @@ int cmp_sandbox_exec_free_output(char *output) {
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

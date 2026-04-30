@@ -12,7 +12,7 @@
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_notify(const char *title, const char *body) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -26,7 +26,7 @@ int cmp_os_notify(const char *title, const char *body) {
     LOG_DEBUG("Error in cmp_os_notify: cmp_window_os_notify failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 struct cmp_os_media_controls {
@@ -40,7 +40,7 @@ struct cmp_os_media_controls {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_media_controls_create(cmp_os_media_controls_t **out_controls) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_os_media_controls_t *mc;
 
   rc = CMP_SUCCESS;
@@ -71,7 +71,7 @@ int cmp_os_media_controls_create(cmp_os_media_controls_t **out_controls) {
   }
 
   *out_controls = mc;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -81,7 +81,7 @@ int cmp_os_media_controls_create(cmp_os_media_controls_t **out_controls) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_media_controls_destroy(cmp_os_media_controls_t *controls) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -103,7 +103,7 @@ int cmp_os_media_controls_destroy(cmp_os_media_controls_t *controls) {
     LOG_DEBUG("Error in cmp_os_media_controls_destroy: CMP_FREE failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -119,7 +119,7 @@ int cmp_os_media_controls_destroy(cmp_os_media_controls_t *controls) {
 int cmp_os_media_controls_update(cmp_os_media_controls_t *controls,
                                  const char *title, const char *artist,
                                  float duration, float current_time) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -136,7 +136,7 @@ int cmp_os_media_controls_update(cmp_os_media_controls_t *controls,
               "cmp_media_player_update_now_playing failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -150,7 +150,7 @@ int cmp_os_media_controls_update(cmp_os_media_controls_t *controls,
 int cmp_os_media_controls_set_handler(cmp_os_media_controls_t *controls,
                                       cmp_media_command_cb callback,
                                       void *userdata) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -166,5 +166,5 @@ int cmp_os_media_controls_set_handler(cmp_os_media_controls_t *controls,
               "cmp_media_player_set_remote_command_handler failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }

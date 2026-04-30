@@ -19,21 +19,12 @@ int cmp_flex_align_evaluate(cmp_flex_align_t align_val, float cross_size,
                             float item_cross_size, float item_baseline,
                             float max_baseline, float *out_position,
                             float *out_cross_size) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
 
   if (out_position == NULL || out_cross_size == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_flex_align_evaluate: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_flex_align_evaluate: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -59,14 +50,6 @@ int cmp_flex_align_evaluate(cmp_flex_align_t align_val, float cross_size,
   }
 
   cmp_log_debug("cmp_flex_align_evaluate: Evaluated cross position\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

@@ -24,7 +24,7 @@ struct cmp_scroll_smooth {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_smooth_create(cmp_scroll_smooth_t **out_smooth) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_smooth *ctx;
 
   rc = CMP_SUCCESS;
@@ -45,7 +45,7 @@ int cmp_scroll_smooth_create(cmp_scroll_smooth_t **out_smooth) {
   ctx->is_complete = 1;
 
   *out_smooth = (cmp_scroll_smooth_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -55,7 +55,7 @@ int cmp_scroll_smooth_create(cmp_scroll_smooth_t **out_smooth) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_smooth_destroy(cmp_scroll_smooth_t *smooth) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_smooth *ctx;
 
   rc = CMP_SUCCESS;
@@ -72,7 +72,7 @@ int cmp_scroll_smooth_destroy(cmp_scroll_smooth_t *smooth) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -85,6 +85,7 @@ int cmp_scroll_smooth_destroy(cmp_scroll_smooth_t *smooth) {
  */
 int cmp_scroll_smooth_start(cmp_scroll_smooth_t *smooth, float current_pos,
                             float target_pos) {
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_smooth *ctx;
 
   ctx = (struct cmp_scroll_smooth *)smooth;
@@ -100,7 +101,7 @@ int cmp_scroll_smooth_start(cmp_scroll_smooth_t *smooth, float current_pos,
   ctx->elapsed_time_ms = 0.0f;
   ctx->is_complete = 0;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /* Simple cubic bezier ease-in-out mapping for progress 0..1 */
@@ -124,6 +125,7 @@ CMP_EXEMPT(static float cmp_math_ease_in_out_cubic(float t)) {
  */
 int cmp_scroll_smooth_step(cmp_scroll_smooth_t *smooth, float dt_ms,
                            float *out_current_position, int *out_is_complete) {
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_smooth *ctx;
   float progress, eased_progress;
 
@@ -137,7 +139,7 @@ int cmp_scroll_smooth_step(cmp_scroll_smooth_t *smooth, float dt_ms,
   if (ctx->is_complete) {
     *out_current_position = ctx->current_position;
     *out_is_complete = 1;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   ctx->elapsed_time_ms += dt_ms;
@@ -147,7 +149,7 @@ int cmp_scroll_smooth_step(cmp_scroll_smooth_t *smooth, float dt_ms,
     ctx->is_complete = 1;
     *out_current_position = ctx->current_position;
     *out_is_complete = 1;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   progress = ctx->elapsed_time_ms / ctx->duration_ms;
@@ -160,5 +162,5 @@ int cmp_scroll_smooth_step(cmp_scroll_smooth_t *smooth, float dt_ms,
   *out_current_position = ctx->current_position;
   *out_is_complete = ctx->is_complete;
 
-  return CMP_SUCCESS;
+  return rc;
 }

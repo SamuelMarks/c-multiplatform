@@ -25,7 +25,7 @@ struct cmp_shader_cache {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_shader_cache_create(cmp_shader_cache_t **out_cache) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_shader_cache_t *cache;
 
   rc = CMP_SUCCESS;
@@ -44,7 +44,7 @@ int cmp_shader_cache_create(cmp_shader_cache_t **out_cache) {
   cache->head = NULL;
   *out_cache = cache;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -54,7 +54,7 @@ int cmp_shader_cache_create(cmp_shader_cache_t **out_cache) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_shader_cache_destroy(cmp_shader_cache_t *cache) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_shader_cache_entry *curr;
   struct cmp_shader_cache_entry *next;
 
@@ -97,7 +97,7 @@ int cmp_shader_cache_destroy(cmp_shader_cache_t *cache) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -110,7 +110,7 @@ int cmp_shader_cache_destroy(cmp_shader_cache_t *cache) {
  */
 int cmp_shader_cache_store(cmp_shader_cache_t *cache, const char *key,
                            cmp_shader_t *shader) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_shader_cache_entry *entry;
   size_t key_len;
 
@@ -170,7 +170,7 @@ int cmp_shader_cache_store(cmp_shader_cache_t *cache, const char *key,
   entry->next = cache->head;
   cache->head = entry;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -183,6 +183,7 @@ int cmp_shader_cache_store(cmp_shader_cache_t *cache, const char *key,
  */
 int cmp_shader_cache_retrieve(cmp_shader_cache_t *cache, const char *key,
                               cmp_shader_t **out_shader) {
+  int rc = CMP_SUCCESS;
   struct cmp_shader_cache_entry *curr;
 
   if (cache == NULL || key == NULL || out_shader == NULL) {
@@ -194,12 +195,13 @@ int cmp_shader_cache_retrieve(cmp_shader_cache_t *cache, const char *key,
   while (curr != NULL) {
     if (strcmp(curr->key, key) == 0) {
       *out_shader = curr->shader;
-      return CMP_SUCCESS;
+      return rc;
     }
     curr = curr->next;
   }
 
-  return CMP_ERROR_NOT_FOUND;
+  rc = CMP_ERROR_NOT_FOUND;
+  return rc;
 }
 
 /**
@@ -211,6 +213,7 @@ int cmp_shader_cache_retrieve(cmp_shader_cache_t *cache, const char *key,
  */
 int cmp_shader_cache_save_to_disk(cmp_shader_cache_t *cache,
                                   const char *filepath) {
+  int rc = CMP_SUCCESS;
   FILE *f;
   struct cmp_shader_cache_entry *curr;
 
@@ -260,7 +263,7 @@ int cmp_shader_cache_save_to_disk(cmp_shader_cache_t *cache,
   }
 
   fclose(f);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -272,7 +275,7 @@ int cmp_shader_cache_save_to_disk(cmp_shader_cache_t *cache,
  */
 int cmp_shader_cache_load_from_disk(cmp_shader_cache_t *cache,
                                     const char *filepath) {
-  int rc;
+  int rc = CMP_SUCCESS;
   FILE *f;
 
   rc = CMP_SUCCESS;
@@ -364,5 +367,5 @@ int cmp_shader_cache_load_from_disk(cmp_shader_cache_t *cache,
   }
 
   fclose(f);
-  return CMP_SUCCESS;
+  return rc;
 }

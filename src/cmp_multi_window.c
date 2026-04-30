@@ -21,17 +21,16 @@ static int g_initialized = 0;
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_multi_window_init(void) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   int i;
   if (g_initialized) {
-    return CMP_SUCCESS;
+    return rc;
   }
   for (i = 0; i < MAX_WINDOWS; ++i) {
     g_windows[i] = NULL;
   }
   g_initialized = 1;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -40,11 +39,11 @@ int cmp_multi_window_init(void) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_multi_window_cleanup(void) {
-  int rc;
+  int rc = CMP_SUCCESS;
   int i;
 
   if (!g_initialized) {
-    return CMP_SUCCESS;
+    return rc;
   }
   for (i = 0; i < MAX_WINDOWS; ++i) {
     if (g_windows[i] != NULL) {
@@ -56,7 +55,7 @@ int cmp_multi_window_cleanup(void) {
     }
   }
   g_initialized = 0;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -68,7 +67,7 @@ int cmp_multi_window_cleanup(void) {
  */
 int cmp_multi_window_tear_off(const char *tab_id,
                               cmp_multi_window_t **out_window) {
-  int rc;
+  int rc = CMP_SUCCESS;
   int i;
   cmp_multi_window_t *win;
 
@@ -107,7 +106,7 @@ int cmp_multi_window_tear_off(const char *tab_id,
     if (g_windows[i] == NULL) {
       g_windows[i] = win;
       *out_window = win;
-      return CMP_SUCCESS;
+      return rc;
     }
   }
 
@@ -116,7 +115,8 @@ int cmp_multi_window_tear_off(const char *tab_id,
     LOG_DEBUG("Error in cmp_multi_window_tear_off: CMP_FREE failed\n");
   }
   LOG_DEBUG("Error in cmp_multi_window_tear_off: Maximum windows reached\n");
-  return CMP_ERROR_BOUNDS;
+  rc = CMP_ERROR_BOUNDS;
+  return rc;
 }
 
 /**
@@ -127,7 +127,7 @@ int cmp_multi_window_tear_off(const char *tab_id,
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_multi_window_merge_back(cmp_multi_window_t *window) {
-  int rc;
+  int rc = CMP_SUCCESS;
   int i;
 
   if (!g_initialized || window == NULL) {
@@ -143,12 +143,13 @@ int cmp_multi_window_merge_back(cmp_multi_window_t *window) {
         LOG_DEBUG("Error in cmp_multi_window_merge_back: CMP_FREE failed\n");
       }
       g_windows[i] = NULL;
-      return CMP_SUCCESS;
+      return rc;
     }
   }
 
   LOG_DEBUG("Error in cmp_multi_window_merge_back: Window not found\n");
-  return CMP_ERROR_NOT_FOUND;
+  rc = CMP_ERROR_NOT_FOUND;
+  return rc;
 }
 
 /**
@@ -157,12 +158,11 @@ int cmp_multi_window_merge_back(cmp_multi_window_t *window) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_multi_window_update_all(void) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!g_initialized) {
     LOG_DEBUG("Error in cmp_multi_window_update_all: Not initialized\n");
     return CMP_ERROR_INVALID_STATE;
   }
   /* In a real implementation, this would poll OS events for each window */
-  return CMP_SUCCESS;
+  return rc;
 }

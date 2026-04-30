@@ -15,8 +15,7 @@ struct cmp_developer_experience {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_developer_experience_create(cmp_developer_experience_t **out_dx) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_developer_experience *ctx = NULL;
@@ -30,9 +29,7 @@ int cmp_developer_experience_create(cmp_developer_experience_t **out_dx) {
     cmp_log_debug(
         "cmp_developer_experience_create: Invalid argument (out_dx=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -44,9 +41,7 @@ int cmp_developer_experience_create(cmp_developer_experience_t **out_dx) {
     }
     cmp_log_debug("cmp_developer_experience_create: Out of memory: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -55,7 +50,7 @@ int cmp_developer_experience_create(cmp_developer_experience_t **out_dx) {
   *out_dx = (cmp_developer_experience_t *)ctx;
   cmp_log_debug("cmp_developer_experience_create: Successfully created dev "
                 "experience context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -65,8 +60,7 @@ int cmp_developer_experience_create(cmp_developer_experience_t **out_dx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_developer_experience_destroy(cmp_developer_experience_t *dx_opaque) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -78,9 +72,7 @@ int cmp_developer_experience_destroy(cmp_developer_experience_t *dx_opaque) {
     }
     cmp_log_debug("cmp_developer_experience_destroy: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -91,7 +83,7 @@ int cmp_developer_experience_destroy(cmp_developer_experience_t *dx_opaque) {
 
   cmp_log_debug("cmp_developer_experience_destroy: Successfully destroyed dev "
                 "experience context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -104,8 +96,7 @@ int cmp_developer_experience_destroy(cmp_developer_experience_t *dx_opaque) {
  */
 int cmp_dx_build_declarative_node(cmp_developer_experience_t *dx_opaque,
                                   const char *type, void **out_node) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_developer_experience *ctx =
@@ -119,9 +110,7 @@ int cmp_dx_build_declarative_node(cmp_developer_experience_t *dx_opaque,
     }
     cmp_log_debug("cmp_dx_build_declarative_node: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -129,15 +118,7 @@ int cmp_dx_build_declarative_node(cmp_developer_experience_t *dx_opaque,
   *out_node = (void *)1;
   cmp_log_debug(
       "cmp_dx_build_declarative_node: Created declarative node wrapper\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -151,8 +132,7 @@ int cmp_dx_build_declarative_node(cmp_developer_experience_t *dx_opaque,
  */
 int cmp_dx_apply_typed_color(cmp_developer_experience_t *dx_opaque, void *node,
                              int color_enum_val) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_developer_experience *ctx =
@@ -165,24 +145,14 @@ int cmp_dx_apply_typed_color(cmp_developer_experience_t *dx_opaque, void *node,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_dx_apply_typed_color: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   /* Type Safety: strongly typed structs rather than strings */
   cmp_log_debug(
       "cmp_dx_apply_typed_color: Applied strongly typed color mapping\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -195,8 +165,7 @@ int cmp_dx_apply_typed_color(cmp_developer_experience_t *dx_opaque, void *node,
  */
 int cmp_dx_enable_live_preview(cmp_developer_experience_t *dx_opaque,
                                void *root_node) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_developer_experience *ctx =
@@ -210,24 +179,14 @@ int cmp_dx_enable_live_preview(cmp_developer_experience_t *dx_opaque,
     }
     cmp_log_debug("cmp_dx_enable_live_preview: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   /* Hooks into hot-reloading pipeline for Xcode Canvas-style iteration */
   cmp_log_debug(
       "cmp_dx_enable_live_preview: Initialized live preview bindings\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -243,8 +202,7 @@ int cmp_dx_enable_live_preview(cmp_developer_experience_t *dx_opaque,
 int cmp_dx_export_debug_hierarchy(cmp_developer_experience_t *dx_opaque,
                                   void *root_node, char *out_json,
                                   size_t max_len) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_developer_experience *ctx =
@@ -258,9 +216,7 @@ int cmp_dx_export_debug_hierarchy(cmp_developer_experience_t *dx_opaque,
     }
     cmp_log_debug("cmp_dx_export_debug_hierarchy: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -271,14 +227,6 @@ int cmp_dx_export_debug_hierarchy(cmp_developer_experience_t *dx_opaque,
   ctx->debug_hierarchy_active = 1;
   cmp_log_debug(
       "cmp_dx_export_debug_hierarchy: Exported debug hierarchy state\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

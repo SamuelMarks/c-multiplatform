@@ -10,18 +10,9 @@
  * @return Returns 0 on success.
  */
 int cmp_app_store_mock_init(void) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   /* No code required. This section is purely architectural policy (no easter
    * eggs, no Android ripples). */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

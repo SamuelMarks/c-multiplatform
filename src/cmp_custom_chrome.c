@@ -11,17 +11,14 @@ static cmp_app_region_t *g_chrome_region = NULL;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_custom_chrome_init(void) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
   if (g_chrome_region != NULL) {
     /* Already initialized */
     cmp_log_debug("cmp_custom_chrome_init: Already initialized\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -33,9 +30,7 @@ int cmp_custom_chrome_init(void) {
     }
     cmp_log_debug("cmp_custom_chrome_init: Failed to create app region: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -50,16 +45,12 @@ int cmp_custom_chrome_init(void) {
     cmp_log_debug(
         "cmp_custom_chrome_init: Failed to add rect to app region: %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   cmp_log_debug("cmp_custom_chrome_init: Initialized custom chrome\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -69,8 +60,7 @@ int cmp_custom_chrome_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_custom_chrome_cleanup(void) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -89,8 +79,6 @@ int cmp_custom_chrome_cleanup(void) {
   }
 
   cmp_log_debug("cmp_custom_chrome_cleanup: Cleanup completed\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

@@ -18,8 +18,7 @@ struct cmp_pip {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pip_create(cmp_pip_t **out_pip) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_pip_t *pip = NULL;
 
   if (!out_pip) {
@@ -46,8 +45,7 @@ int cmp_pip_create(cmp_pip_t **out_pip) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pip_destroy(cmp_pip_t *pip) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   if (!pip) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -71,8 +69,7 @@ int cmp_pip_destroy(cmp_pip_t *pip) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pip_enable(cmp_pip_t *pip, void *ui_node_or_video_stream) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   if (!pip || !ui_node_or_video_stream) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -82,7 +79,7 @@ int cmp_pip_enable(cmp_pip_t *pip, void *ui_node_or_video_stream) {
 
   pip->is_active = 1;
   pip->active_target = ui_node_or_video_stream;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -92,8 +89,7 @@ int cmp_pip_enable(cmp_pip_t *pip, void *ui_node_or_video_stream) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pip_disable(cmp_pip_t *pip) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   if (!pip) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -103,7 +99,7 @@ int cmp_pip_disable(cmp_pip_t *pip) {
 
   pip->is_active = 0;
   pip->active_target = NULL;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -114,8 +110,7 @@ int cmp_pip_disable(cmp_pip_t *pip) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pip_is_active(const cmp_pip_t *pip, int *out_is_active) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   if (!pip || !out_is_active) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -124,5 +119,5 @@ int cmp_pip_is_active(const cmp_pip_t *pip, int *out_is_active) {
   }
 
   *out_is_active = pip->is_active;
-  return CMP_SUCCESS;
+  return rc;
 }

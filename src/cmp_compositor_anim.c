@@ -20,8 +20,7 @@ struct cmp_compositor_anim {
  */
 int cmp_compositor_anim_create(cmp_compositor_prop_t property,
                                cmp_compositor_anim_t **out_anim) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_compositor_anim_t *anim = NULL;
@@ -35,9 +34,7 @@ int cmp_compositor_anim_create(cmp_compositor_prop_t property,
     cmp_log_debug(
         "cmp_compositor_anim_create: Invalid argument (out_anim=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -48,9 +45,7 @@ int cmp_compositor_anim_create(cmp_compositor_prop_t property,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_compositor_anim_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -71,9 +66,7 @@ int cmp_compositor_anim_create(cmp_compositor_prop_t property,
   *out_anim = anim;
   cmp_log_debug("cmp_compositor_anim_create: Successfully created compositor "
                 "anim context\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -84,8 +77,7 @@ int cmp_compositor_anim_create(cmp_compositor_prop_t property,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_compositor_anim_destroy(cmp_compositor_anim_t *anim) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -97,9 +89,7 @@ int cmp_compositor_anim_destroy(cmp_compositor_anim_t *anim) {
     }
     cmp_log_debug("cmp_compositor_anim_destroy: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -110,7 +100,7 @@ int cmp_compositor_anim_destroy(cmp_compositor_anim_t *anim) {
 
   cmp_log_debug("cmp_compositor_anim_destroy: Successfully destroyed "
                 "compositor anim context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -124,8 +114,7 @@ int cmp_compositor_anim_destroy(cmp_compositor_anim_t *anim) {
 int cmp_compositor_anim_set_range(cmp_compositor_anim_t *anim,
                                   const cmp_compositor_val_t *start_val,
                                   const cmp_compositor_val_t *end_val) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -137,24 +126,14 @@ int cmp_compositor_anim_set_range(cmp_compositor_anim_t *anim,
     }
     cmp_log_debug("cmp_compositor_anim_set_range: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   anim->start_val = *start_val;
   anim->end_val = *end_val;
   cmp_log_debug("cmp_compositor_anim_set_range: Successfully set anim range\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -171,8 +150,7 @@ int cmp_compositor_anim_set_range(cmp_compositor_anim_t *anim,
 int cmp_compositor_anim_step(cmp_compositor_anim_t *anim, double dt_ms,
                              double duration_ms, cmp_compositor_val_t *out_val,
                              int *out_finished) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   double progress;
@@ -184,9 +162,7 @@ int cmp_compositor_anim_step(cmp_compositor_anim_t *anim, double dt_ms,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_compositor_anim_step: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -226,15 +202,7 @@ int cmp_compositor_anim_step(cmp_compositor_anim_t *anim, double dt_ms,
 
   cmp_log_debug("cmp_compositor_anim_step: Stepped animation progress=%.2f\n",
                 progress);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -255,8 +223,7 @@ struct cmp_framebuffer_capture {
  */
 int cmp_compositor_capture_framebuffer(
     cmp_window_t *window, cmp_framebuffer_capture_t **out_capture) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_framebuffer_capture_t *capture = NULL;
@@ -269,9 +236,7 @@ int cmp_compositor_capture_framebuffer(
     }
     cmp_log_debug("cmp_compositor_capture_framebuffer: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -283,9 +248,7 @@ int cmp_compositor_capture_framebuffer(
     }
     cmp_log_debug("cmp_compositor_capture_framebuffer: Out of memory: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -295,9 +258,7 @@ int cmp_compositor_capture_framebuffer(
   *out_capture = capture;
   cmp_log_debug("cmp_compositor_capture_framebuffer: Successfully created mock "
                 "framebuffer capture\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -308,8 +269,7 @@ int cmp_compositor_capture_framebuffer(
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_compositor_release_framebuffer(cmp_framebuffer_capture_t *capture) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -321,9 +281,7 @@ int cmp_compositor_release_framebuffer(cmp_framebuffer_capture_t *capture) {
     }
     cmp_log_debug("cmp_compositor_release_framebuffer: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -342,7 +300,7 @@ int cmp_compositor_release_framebuffer(cmp_framebuffer_capture_t *capture) {
 
   cmp_log_debug("cmp_compositor_release_framebuffer: Successfully released "
                 "framebuffer capture\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -358,8 +316,7 @@ int cmp_compositor_start_crossfade(cmp_window_t *window,
                                    cmp_framebuffer_capture_t *old_buffer,
                                    double duration_ms,
                                    const float *easing_curve) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -371,9 +328,7 @@ int cmp_compositor_start_crossfade(cmp_window_t *window,
     }
     cmp_log_debug("cmp_compositor_start_crossfade: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -383,14 +338,6 @@ int cmp_compositor_start_crossfade(cmp_window_t *window,
   (void)duration_ms;
   (void)easing_curve;
   cmp_log_debug("cmp_compositor_start_crossfade: Mock scheduled crossfade\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

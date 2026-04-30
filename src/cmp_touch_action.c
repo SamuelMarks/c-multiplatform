@@ -12,23 +12,13 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_node_set_touch_action(cmp_ui_node_t *node, uint32_t action) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!node)
     return CMP_ERROR_INVALID_ARG;
 
   /* Mock storing the bitfield value in the node's properties ptr */
   node->properties = (void *)(size_t)(action);
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -39,8 +29,7 @@ int cmp_ui_node_set_touch_action(cmp_ui_node_t *node, uint32_t action) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_node_get_touch_action(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!node)
     return (int)CMP_TOUCH_ACTION_AUTO;
 
@@ -48,11 +37,6 @@ int cmp_ui_node_get_touch_action(const cmp_ui_node_t *node) {
     return (int)(size_t)node->properties;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return (int)CMP_TOUCH_ACTION_AUTO;
+  rc = (int)CMP_TOUCH_ACTION_AUTO;
+  return rc;
 }

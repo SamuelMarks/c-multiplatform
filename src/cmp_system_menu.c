@@ -24,8 +24,7 @@ struct cmp_system_menu {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_menu_create(cmp_system_menu_t **out_menu) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_system_menu_t *menu;
   if (!out_menu) {
     return CMP_ERROR_INVALID_ARG;
@@ -35,15 +34,7 @@ int cmp_system_menu_create(cmp_system_menu_t **out_menu) {
   }
   memset(menu, 0, sizeof(cmp_system_menu_t));
   *out_menu = menu;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -54,8 +45,7 @@ int cmp_system_menu_create(cmp_system_menu_t **out_menu) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_menu_destroy(cmp_system_menu_t *menu) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   size_t i;
   if (!menu) {
     return CMP_ERROR_INVALID_ARG;
@@ -69,15 +59,7 @@ int cmp_system_menu_destroy(cmp_system_menu_t *menu) {
     CMP_FREE(menu->items);
   }
   CMP_FREE(menu);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -91,8 +73,7 @@ int cmp_system_menu_destroy(cmp_system_menu_t *menu) {
  */
 int cmp_system_menu_add_item(cmp_system_menu_t *menu, const char *label,
                              int id) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   size_t len;
   if (!menu || !label) {
     return CMP_ERROR_INVALID_ARG;
@@ -126,15 +107,6 @@ int cmp_system_menu_add_item(cmp_system_menu_t *menu, const char *label,
   menu->items[menu->count].id = id;
   menu->count++;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -145,20 +117,11 @@ int cmp_system_menu_add_item(cmp_system_menu_t *menu, const char *label,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_menu_show(cmp_system_menu_t *menu) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!menu) {
     return CMP_ERROR_INVALID_ARG;
   }
   menu->is_showing = 1;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

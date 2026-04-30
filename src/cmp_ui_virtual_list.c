@@ -20,8 +20,7 @@ struct cmp_ui_virtual_list {
  */
 int cmp_ui_virtual_list_create(cmp_ui_virtual_list_t **out_list,
                                size_t item_count, float item_height) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_ui_virtual_list_t *list;
   int err;
 
@@ -48,7 +47,7 @@ int cmp_ui_virtual_list_create(cmp_ui_virtual_list_t **out_list,
   }
 
   *out_list = list;
-  return 0;
+  return rc;
 }
 
 /**
@@ -58,8 +57,7 @@ int cmp_ui_virtual_list_create(cmp_ui_virtual_list_t **out_list,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_virtual_list_destroy(cmp_ui_virtual_list_t *list) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   if (!list) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -67,7 +65,7 @@ int cmp_ui_virtual_list_destroy(cmp_ui_virtual_list_t *list) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
-  return 0;
+  return rc;
 }
 
 /**
@@ -79,21 +77,12 @@ int cmp_ui_virtual_list_destroy(cmp_ui_virtual_list_t *list) {
  */
 int cmp_ui_virtual_list_get_node(cmp_ui_virtual_list_t *list,
                                  cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!list || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = list->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -106,20 +95,11 @@ int cmp_ui_virtual_list_get_node(cmp_ui_virtual_list_t *list,
  */
 int cmp_ui_virtual_list_set_item_count(cmp_ui_virtual_list_t *list,
                                        size_t item_count) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!list) {
     return CMP_ERROR_INVALID_ARG;
   }
   list->item_count = item_count;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

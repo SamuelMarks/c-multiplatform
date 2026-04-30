@@ -15,8 +15,7 @@
  */
 int cmp_anim_compose_numerical(float base_value, float anim_value,
                                cmp_anim_compose_op_t op, float *out_value) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -28,9 +27,7 @@ int cmp_anim_compose_numerical(float base_value, float anim_value,
     }
     cmp_log_debug("cmp_anim_compose_numerical: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -60,20 +57,9 @@ int cmp_anim_compose_numerical(float base_value, float anim_value,
     }
     cmp_log_debug("cmp_anim_compose_numerical: Unknown operation %d: %s\n",
                   (int)op, err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

@@ -20,8 +20,7 @@ struct cmp_step_ease {
  */
 int cmp_step_ease_create(int steps, cmp_step_position_t position,
                          cmp_step_ease_t **out_step) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_step_ease *step_ease;
 
   if (!out_step || steps <= 0)
@@ -35,15 +34,7 @@ int cmp_step_ease_create(int steps, cmp_step_position_t position,
   step_ease->position = position;
 
   *out_step = (cmp_step_ease_t *)step_ease;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -54,22 +45,13 @@ int cmp_step_ease_create(int steps, cmp_step_position_t position,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_step_ease_destroy(cmp_step_ease_t *step) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_step_ease *internal_step = (struct cmp_step_ease *)step;
   if (!internal_step)
     return CMP_ERROR_INVALID_ARG;
 
   CMP_FREE(internal_step);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -82,8 +64,7 @@ int cmp_step_ease_destroy(cmp_step_ease_t *step) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_step_ease_evaluate(cmp_step_ease_t *step, float t, float *out_value) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_step_ease *s = (struct cmp_step_ease *)step;
   int current_step;
 
@@ -92,7 +73,7 @@ int cmp_step_ease_evaluate(cmp_step_ease_t *step, float t, float *out_value) {
 
   if (t == 1.0f) {
     *out_value = 1.0f;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   current_step = (int)(t * s->steps);
@@ -107,14 +88,5 @@ int cmp_step_ease_evaluate(cmp_step_ease_t *step, float t, float *out_value) {
 
   *out_value = (float)current_step / (float)s->steps;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

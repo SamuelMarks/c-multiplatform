@@ -28,8 +28,7 @@ static cmp_resource_manager_t *g_resource_manager = NULL;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_power_awareness_init(void) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   rc = cmp_resource_manager_create(&g_resource_manager);
   if (rc != CMP_SUCCESS) {
@@ -37,7 +36,7 @@ int cmp_power_awareness_init(void) {
               "failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -46,8 +45,7 @@ int cmp_power_awareness_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_power_awareness_poll(void) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   if (!g_resource_manager) {
     rc = CMP_ERROR_INVALID_STATE;
@@ -83,5 +81,5 @@ int cmp_power_awareness_poll(void) {
   /* On non-Windows platforms we assume normal power, or defer to other
      platform specific calls in the future. */
 #endif
-  return CMP_SUCCESS;
+  return rc;
 }

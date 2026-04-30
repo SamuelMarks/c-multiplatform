@@ -138,7 +138,7 @@ TEST test_pool_init_small_block(void) {
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(pool.buffer != NULL);
   /* The block size should be aligned and at least sizeof(cmp_pool_block_t) */
-  ASSERT(pool.block_size >= sizeof(void*));
+  ASSERT(pool.block_size >= sizeof(void *));
   cmp_pool_destroy(&pool);
   PASS();
 }
@@ -193,7 +193,7 @@ TEST test_pool_alloc_null(void) {
 
 TEST test_pool_alloc_zero_capacity(void) {
   cmp_pool_t pool;
-  void *ptr = (void*)1;
+  void *ptr = (void *)1;
   int res;
 
   cmp_pool_init(&pool, 16, 0);
@@ -209,10 +209,10 @@ TEST test_pool_alloc_zero_capacity(void) {
 TEST test_pool_free_null(void) {
   cmp_pool_t pool;
   int res;
-  
+
   cmp_pool_init(&pool, 16, 2);
 
-  res = cmp_pool_free(NULL, (void*)1);
+  res = cmp_pool_free(NULL, (void *)1);
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
 
   res = cmp_pool_free(&pool, NULL);
@@ -290,10 +290,10 @@ TEST test_mem_tracking_null(void) {
   int res;
   res = CMP_FREE(NULL);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
-  
+
   res = cmp_mem_alloc_tracked(10, "file", 1, NULL);
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
-  
+
   PASS();
 }
 
@@ -306,7 +306,7 @@ TEST test_mem_tracking_not_found(void) {
 }
 
 TEST test_mem_tracking_zero(void) {
-  void *ptr = (void*)1;
+  void *ptr = (void *)1;
   int res;
   res = cmp_mem_alloc_tracked(0, "file", 1, &ptr);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");

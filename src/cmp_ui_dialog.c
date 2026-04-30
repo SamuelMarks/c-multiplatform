@@ -29,7 +29,7 @@ struct cmp_ui_dialog {
  */
 int cmp_ui_dialog_create(cmp_ui_dialog_t **out_dialog, const char *title,
                          const char *content) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_ui_dialog_t *dialog = NULL;
 
   if (!out_dialog) {
@@ -86,7 +86,7 @@ int cmp_ui_dialog_create(cmp_ui_dialog_t **out_dialog, const char *title,
   }
 
   *out_dialog = dialog;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -96,7 +96,7 @@ int cmp_ui_dialog_create(cmp_ui_dialog_t **out_dialog, const char *title,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_dialog_destroy(cmp_ui_dialog_t *dialog) {
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!dialog) {
     LOG_DEBUG("cmp_ui_dialog_destroy: dialog is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -110,12 +110,10 @@ int cmp_ui_dialog_destroy(cmp_ui_dialog_t *dialog) {
   rc = CMP_FREE(dialog);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_dialog_destroy: CMP_FREE failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -126,22 +124,13 @@ int cmp_ui_dialog_destroy(cmp_ui_dialog_t *dialog) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_dialog_get_node(cmp_ui_dialog_t *dialog, cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!dialog || !out_node) {
     LOG_DEBUG("cmp_ui_dialog_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = dialog->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -153,8 +142,7 @@ int cmp_ui_dialog_get_node(cmp_ui_dialog_t *dialog, cmp_ui_node_t **out_node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_dialog_set_visible(cmp_ui_dialog_t *dialog, int visible) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!dialog) {
     LOG_DEBUG("cmp_ui_dialog_set_visible: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
@@ -162,15 +150,6 @@ int cmp_ui_dialog_set_visible(cmp_ui_dialog_t *dialog, int visible) {
 
   dialog->is_visible = visible;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -182,7 +161,7 @@ int cmp_ui_dialog_set_visible(cmp_ui_dialog_t *dialog, int visible) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_dialog_bind_a11y(cmp_ui_dialog_t *widget, cmp_a11y_tree_t *tree) {
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!widget || !tree) {
     LOG_DEBUG("cmp_ui_dialog_bind_a11y: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
@@ -195,10 +174,8 @@ int cmp_ui_dialog_bind_a11y(cmp_ui_dialog_t *widget, cmp_a11y_tree_t *tree) {
                               "Dialog");
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_dialog_bind_a11y: cmp_a11y_tree_add_node failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }

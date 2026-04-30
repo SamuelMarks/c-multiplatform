@@ -18,7 +18,7 @@ struct cmp_safe_areas {
  * @return 0 on success, or an error code on failure.
  */
 int cmp_safe_areas_create(cmp_safe_areas_t **out_safe_areas) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_safe_areas_t *safe_areas;
 
   rc = CMP_SUCCESS;
@@ -37,7 +37,7 @@ int cmp_safe_areas_create(cmp_safe_areas_t **out_safe_areas) {
   memset(safe_areas, 0, sizeof(cmp_safe_areas_t));
 
   *out_safe_areas = safe_areas;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -47,7 +47,7 @@ int cmp_safe_areas_create(cmp_safe_areas_t **out_safe_areas) {
  * @return 0 on success, or an error code on failure.
  */
 int cmp_safe_areas_destroy(cmp_safe_areas_t *safe_areas) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -62,7 +62,7 @@ int cmp_safe_areas_destroy(cmp_safe_areas_t *safe_areas) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -75,6 +75,7 @@ int cmp_safe_areas_destroy(cmp_safe_areas_t *safe_areas) {
  */
 int cmp_safe_areas_set_inset(cmp_safe_areas_t *safe_areas, int edge,
                              float inset) {
+  int rc = CMP_SUCCESS;
   if (safe_areas == NULL) {
     LOG_DEBUG("Invalid argument: safe_areas is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -86,7 +87,7 @@ int cmp_safe_areas_set_inset(cmp_safe_areas_t *safe_areas, int edge,
   }
 
   safe_areas->insets[edge] = inset;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -99,6 +100,7 @@ int cmp_safe_areas_set_inset(cmp_safe_areas_t *safe_areas, int edge,
  */
 int cmp_safe_areas_get_inset(const cmp_safe_areas_t *safe_areas, int edge,
                              float *out_inset) {
+  int rc = CMP_SUCCESS;
   if (safe_areas == NULL) {
     LOG_DEBUG("Invalid argument: safe_areas is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -115,5 +117,5 @@ int cmp_safe_areas_get_inset(const cmp_safe_areas_t *safe_areas, int edge,
   }
 
   *out_inset = safe_areas->insets[edge];
-  return CMP_SUCCESS;
+  return rc;
 }

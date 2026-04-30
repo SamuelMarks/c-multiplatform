@@ -16,6 +16,7 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_state_layer_update(cmp_state_layer_t *layer, float dt_ms) {
+  int rc = CMP_SUCCESS;
   if (layer == NULL) {
     LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -37,7 +38,7 @@ int CMP_API cmp_state_layer_update(cmp_state_layer_t *layer, float dt_ms) {
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -52,6 +53,7 @@ int CMP_API cmp_state_layer_update(cmp_state_layer_t *layer, float dt_ms) {
 int CMP_API cmp_state_layer_trigger_ripple(cmp_state_layer_t *layer,
                                            float start_x, float start_y,
                                            float max_radius) {
+  int rc = CMP_SUCCESS;
   if (layer == NULL) {
     LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -64,7 +66,7 @@ int CMP_API cmp_state_layer_trigger_ripple(cmp_state_layer_t *layer,
   layer->current_opacity = 0.12f;
   layer->is_active = 1;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -78,6 +80,7 @@ int CMP_API cmp_state_layer_trigger_ripple(cmp_state_layer_t *layer,
 int CMP_API cmp_state_layer_trigger_fluent_reveal(cmp_state_layer_t *layer,
                                                   float pointer_x,
                                                   float pointer_y) {
+  int rc = CMP_SUCCESS;
   if (layer == NULL) {
     LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -87,7 +90,7 @@ int CMP_API cmp_state_layer_trigger_fluent_reveal(cmp_state_layer_t *layer,
   layer->origin_y = pointer_y;
   layer->current_opacity = 1.0f;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -99,6 +102,7 @@ int CMP_API cmp_state_layer_trigger_fluent_reveal(cmp_state_layer_t *layer,
  */
 int CMP_API cmp_state_layer_apply_vibrancy_mask(cmp_state_layer_t *layer,
                                                 cmp_vibrancy_style_t style) {
+  int rc = CMP_SUCCESS;
   if (layer == NULL) {
     LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -125,5 +129,5 @@ int CMP_API cmp_state_layer_apply_vibrancy_mask(cmp_state_layer_t *layer,
     break;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

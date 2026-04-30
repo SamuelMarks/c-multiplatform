@@ -8,7 +8,7 @@ TEST test_event_lifecycle(void) {
 
   res = cmp_event_system_init();
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
-  
+
   /* Double init */
   res = cmp_event_system_init();
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");

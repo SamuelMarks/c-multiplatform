@@ -15,13 +15,12 @@ static int g_orm_initialized = 0;
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_init(void) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (g_orm_initialized) {
-    return CMP_SUCCESS;
+    return rc;
   }
   g_orm_initialized = 1;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -30,13 +29,12 @@ int cmp_orm_init(void) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_shutdown(void) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!g_orm_initialized) {
-    return CMP_SUCCESS;
+    return rc;
   }
   g_orm_initialized = 0;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -47,16 +45,16 @@ int cmp_orm_shutdown(void) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_connect(const char *virtual_path, c_orm_db_t **out_db) {
+  int rc = CMP_SUCCESS;
   cmp_string_t resolved_path;
   int err;
-  int rc;
   cmp_string_t exe_path;
-
-  rc = CMP_SUCCESS;
+  int free_rc;
 
   if (virtual_path == NULL || out_db == NULL || !g_orm_initialized) {
+    rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_orm_connect: Invalid argument or uninitialized\n");
-    return CMP_ERROR_INVALID_ARG;
+    return rc;
   }
 
   /* Automatically default plain filenames (e.g. "db.sqlite") to the executable
@@ -64,22 +62,72 @@ int cmp_orm_connect(const char *virtual_path, c_orm_db_t **out_db) {
      directory which can drift. */
   if (strncmp(virtual_path, "virt:/", 6) != 0 &&
       strchr(virtual_path, '/') == NULL && strchr(virtual_path, '\\') == NULL) {
-    if (cmp_vfs_get_standard_path(5, &exe_path) == CMP_SUCCESS) {
-      cmp_string_init(&resolved_path);
-      cmp_string_append(&resolved_path, exe_path.data);
-      cmp_string_append(&resolved_path, "/");
-      cmp_string_append(&resolved_path, virtual_path);
-      cmp_string_destroy(&exe_path);
+    rc = cmp_vfs_get_standard_path(5, &exe_path);
+    if (rc == CMP_SUCCESS) {
+      rc = cmp_string_init(&resolved_path);
+      if (rc != CMP_SUCCESS) {
+        free_rc = cmp_string_destroy(&exe_path);
+        if (free_rc != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_string_destroy exe_path failed\n");
+        }
+        LOG_DEBUG("cmp_orm_connect: cmp_string_init failed\n");
+        return rc;
+      }
+      rc = cmp_string_append(&resolved_path, exe_path.data);
+      if (rc != CMP_SUCCESS) {
+        free_rc = cmp_string_destroy(&exe_path);
+        if (free_rc != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_string_destroy exe_path failed\n");
+        }
+        free_rc = cmp_string_destroy(&resolved_path);
+        if (free_rc != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_string_destroy resolved_path failed\n");
+        }
+        LOG_DEBUG("cmp_orm_connect: cmp_string_append failed\n");
+        return rc;
+      }
+      rc = cmp_string_append(&resolved_path, "/");
+      if (rc != CMP_SUCCESS) {
+        free_rc = cmp_string_destroy(&exe_path);
+        if (free_rc != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_string_destroy exe_path failed\n");
+        }
+        free_rc = cmp_string_destroy(&resolved_path);
+        if (free_rc != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_string_destroy resolved_path failed\n");
+        }
+        LOG_DEBUG("cmp_orm_connect: cmp_string_append failed\n");
+        return rc;
+      }
+      rc = cmp_string_append(&resolved_path, virtual_path);
+      if (rc != CMP_SUCCESS) {
+        free_rc = cmp_string_destroy(&exe_path);
+        if (free_rc != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_string_destroy exe_path failed\n");
+        }
+        free_rc = cmp_string_destroy(&resolved_path);
+        if (free_rc != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_string_destroy resolved_path failed\n");
+        }
+        LOG_DEBUG("cmp_orm_connect: cmp_string_append failed\n");
+        return rc;
+      }
+      free_rc = cmp_string_destroy(&exe_path);
+      if (free_rc != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_string_destroy exe_path failed\n");
+      }
     } else {
-      if (cmp_vfs_resolve_path(virtual_path, &resolved_path) != CMP_SUCCESS) {
+      rc = cmp_vfs_resolve_path(virtual_path, &resolved_path);
+      if (rc != CMP_SUCCESS) {
         LOG_DEBUG("Error in cmp_orm_connect: cmp_vfs_resolve_path failed\n");
-        return CMP_ERROR_INVALID_ARG;
+        return rc;
       }
     }
   } else {
-    if (cmp_vfs_resolve_path(virtual_path, &resolved_path) != CMP_SUCCESS) {
+    rc = cmp_vfs_resolve_path(virtual_path, &resolved_path);
+    if (rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_orm_connect: cmp_vfs_resolve_path failed\n");
-      return CMP_ERROR_INVALID_ARG;
+      return rc;
     }
   }
 #if defined(__EMSCRIPTEN__)
@@ -88,21 +136,33 @@ int cmp_orm_connect(const char *virtual_path, c_orm_db_t **out_db) {
   {
     /* If the URL doesn't already contain a ? we format it to force IndexedDB */
     if (strchr(resolved_path.data, '?') == NULL) {
-      cmp_string_append(&resolved_path,
-                        "?vfs=opfs"); /* Modern alternative to indexeddb */
+      rc = cmp_string_append(&resolved_path,
+                             "?vfs=opfs"); /* Modern alternative to indexeddb */
+      if (rc != CMP_SUCCESS) {
+        free_rc = cmp_string_destroy(&resolved_path);
+        if (free_rc != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_string_destroy failed\n");
+        }
+        LOG_DEBUG("cmp_orm_connect: cmp_string_append opfs failed\n");
+        return rc;
+      }
     }
   }
 #endif
 
   err = c_orm_sqlite_connect(resolved_path.data, out_db);
 
-  cmp_string_destroy(&resolved_path);
+  free_rc = cmp_string_destroy(&resolved_path);
+  if (free_rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_orm_connect: cmp_string_destroy failed\n");
+  }
 
   if (err != C_ORM_OK) {
+    rc = CMP_ERROR_NOT_FOUND;
     LOG_DEBUG("Error in cmp_orm_connect: c_orm_sqlite_connect failed\n");
-    return CMP_ERROR_NOT_FOUND;
+    return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -112,25 +172,27 @@ int cmp_orm_connect(const char *virtual_path, c_orm_db_t **out_db) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_disconnect(c_orm_db_t *db) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   const c_orm_driver_vtable_t *vtable;
 
   if (db == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_orm_disconnect: Invalid argument\n");
-    return CMP_ERROR_INVALID_ARG;
+    return rc;
   }
 
   if (c_orm_sqlite_get_vtable(&vtable) != C_ORM_OK) {
+    rc = CMP_ERROR_NOT_FOUND;
     LOG_DEBUG("Error in cmp_orm_disconnect: c_orm_sqlite_get_vtable failed\n");
-    return CMP_ERROR_NOT_FOUND;
+    return rc;
   }
 
   if (vtable->disconnect(db) != C_ORM_OK) {
+    rc = CMP_ERROR_NOT_FOUND;
     LOG_DEBUG("Error in cmp_orm_disconnect: vtable->disconnect failed\n");
-    return CMP_ERROR_NOT_FOUND;
+    return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -141,18 +203,19 @@ int cmp_orm_disconnect(c_orm_db_t *db) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_execute(c_orm_db_t *db, const char *sql) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (db == NULL || sql == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_orm_execute: Invalid argument\n");
-    return CMP_ERROR_INVALID_ARG;
+    return rc;
   }
 
   if (c_orm_execute_raw(db, sql) != C_ORM_OK) {
+    rc = CMP_ERROR_NOT_FOUND;
     LOG_DEBUG("Error in cmp_orm_execute: c_orm_execute_raw failed\n");
-    return CMP_ERROR_NOT_FOUND;
+    return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -164,29 +227,27 @@ int cmp_orm_execute(c_orm_db_t *db, const char *sql) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_string_t resolved_path;
   cfs_path cfs_dir_path;
   cfs_directory_iterator *it;
   const cfs_directory_entry *entry;
   cfs_error_code ec;
+  int free_rc;
 
   it = NULL;
-
-  if (rc != 0) {
-    return rc;
-  }
   entry = NULL;
 
   if (db == NULL || migrations_dir == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_orm_migrate: Invalid argument\n");
-    return CMP_ERROR_INVALID_ARG;
+    return rc;
   }
 
-  if (cmp_vfs_resolve_path(migrations_dir, &resolved_path) != CMP_SUCCESS) {
+  rc = cmp_vfs_resolve_path(migrations_dir, &resolved_path);
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_orm_migrate: cmp_vfs_resolve_path failed\n");
-    return CMP_ERROR_NOT_FOUND;
+    return rc;
   }
 
   cfs_path_init(&cfs_dir_path);
@@ -195,8 +256,11 @@ int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
   if (cfs_dir_itr_init(&cfs_dir_path, &it, &ec) != 0 || !it) {
     LOG_DEBUG("Error in cmp_orm_migrate: cfs_dir_itr_init failed\n");
     cfs_path_clear(&cfs_dir_path);
-    cmp_string_destroy(&resolved_path);
-    return CMP_SUCCESS;
+    free_rc = cmp_string_destroy(&resolved_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_orm_migrate: cmp_string_destroy failed\n");
+    }
+    return rc; /* Tolerated if migrations dir missing */
   }
 
   /* Note: A production implementation would sort by version number.
@@ -221,8 +285,7 @@ int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
 
       cname = (const char *)entry->path.str;
 #if defined(_MSC_VER)
-      rc = strcpy_s(aname, sizeof(aname), cname);
-      if (rc != 0) {
+      if (strcpy_s(aname, sizeof(aname), cname) != 0) {
         LOG_DEBUG("Error in cmp_orm_migrate: strcpy_s failed\n");
         continue;
       }
@@ -239,8 +302,7 @@ int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
         {
           FILE *f;
 #if defined(_MSC_VER)
-          rc = fopen_s(&f, aname, "rb");
-          if (rc != 0) {
+          if (fopen_s(&f, aname, "rb") != 0) {
             f = NULL;
           }
 #else
@@ -257,8 +319,8 @@ int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
               bytes_read = fread(sql_str, 1, file_len, f);
               sql_str[bytes_read] = '\0';
               c_orm_execute_raw(db, sql_str);
-              rc = CMP_FREE(sql_str);
-              if (rc != CMP_SUCCESS) {
+              free_rc = CMP_FREE(sql_str);
+              if (free_rc != CMP_SUCCESS) {
                 LOG_DEBUG("Error in cmp_orm_migrate: CMP_FREE failed\n");
               }
             }
@@ -270,8 +332,11 @@ int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
   }
   cfs_dir_itr_close(it);
   cfs_path_clear(&cfs_dir_path);
-  cmp_string_destroy(&resolved_path);
-  return CMP_SUCCESS;
+  free_rc = cmp_string_destroy(&resolved_path);
+  if (free_rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_orm_migrate: cmp_string_destroy failed\n");
+  }
+  return rc;
 }
 
 /**
@@ -282,30 +347,34 @@ int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_set_encryption_key(c_orm_db_t *db, const char *key) {
+  int rc = CMP_SUCCESS;
   char query[256];
 #if defined(_MSC_VER)
-  int rc;
+  int print_rc;
 #endif
 
   if (db == NULL || key == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_orm_set_encryption_key: Invalid argument\n");
-    return CMP_ERROR_INVALID_ARG;
+    return rc;
   }
 #if defined(_MSC_VER)
-  rc = sprintf_s(query, sizeof(query), "PRAGMA key = '%s';", key);
-  if (rc < 0) {
+  print_rc = sprintf_s(query, sizeof(query), "PRAGMA key = '%s';", key);
+  if (print_rc < 0) {
+    rc = CMP_ERROR_GENERAL;
     LOG_DEBUG("Error in cmp_orm_set_encryption_key: sprintf_s failed\n");
-    return CMP_ERROR_GENERAL;
+    return rc;
   }
 #else
   snprintf(query, sizeof(query), "PRAGMA key = '%s';", key);
 #endif
   if (c_orm_execute_raw(db, query) != C_ORM_OK) {
+    rc = CMP_ERROR_GENERAL;
     LOG_DEBUG(
         "Error in cmp_orm_set_encryption_key: c_orm_execute_raw failed\n");
-    return CMP_ERROR_GENERAL;
+    return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 struct cmp_orm_observable {
@@ -325,48 +394,52 @@ struct cmp_orm_observable {
  */
 int cmp_orm_observable_create(c_orm_db_t *db, const char *query,
                               cmp_orm_observable_t **out_obs) {
+  int rc = CMP_SUCCESS;
   cmp_orm_observable_t *obs;
   size_t len;
-  int rc;
+  int free_rc;
 
   if (db == NULL || query == NULL || out_obs == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_orm_observable_create: Invalid argument\n");
-    return CMP_ERROR_INVALID_ARG;
+    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_orm_observable_t), (void **)&obs);
   if (rc != CMP_SUCCESS) {
+    rc = CMP_ERROR_OOM;
     LOG_DEBUG("Error in cmp_orm_observable_create: CMP_MALLOC failed (OOM)\n");
-    return CMP_ERROR_OOM;
+    return rc;
   }
 
   len = strlen(query);
   rc = CMP_MALLOC(len + 1, (void **)&obs->query);
   if (rc != CMP_SUCCESS) {
+    rc = CMP_ERROR_OOM;
     LOG_DEBUG("Error in cmp_orm_observable_create: CMP_MALLOC failed for query "
               "(OOM)\n");
-    rc = CMP_FREE(obs);
-    if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(obs);
+    if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_orm_observable_create: CMP_FREE failed during "
                 "cleanup\n");
     }
-    return CMP_ERROR_OOM;
+    return rc;
   }
 #if defined(_MSC_VER)
-  rc = strcpy_s(obs->query, len + 1, query);
-  if (rc != 0) {
+  if (strcpy_s(obs->query, len + 1, query) != 0) {
+    rc = CMP_ERROR_GENERAL;
     LOG_DEBUG("Error in cmp_orm_observable_create: strcpy_s failed\n");
-    rc = CMP_FREE(obs->query);
-    if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(obs->query);
+    if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_orm_observable_create: CMP_FREE failed during "
                 "cleanup\n");
     }
-    rc = CMP_FREE(obs);
-    if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(obs);
+    if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_orm_observable_create: CMP_FREE failed during "
                 "cleanup\n");
     }
-    return CMP_ERROR_GENERAL;
+    return rc;
   }
 #else
   strcpy(obs->query, query);
@@ -377,7 +450,7 @@ int cmp_orm_observable_create(c_orm_db_t *db, const char *query,
   obs->bound_property = NULL;
 
   *out_obs = obs;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -390,19 +463,21 @@ int cmp_orm_observable_create(c_orm_db_t *db, const char *query,
  */
 int cmp_ui_node_bind(cmp_ui_node_t *node, cmp_orm_observable_t *obs,
                      const char *property_name) {
+  int rc = CMP_SUCCESS;
   size_t len;
-  int rc;
+  int free_rc;
 
   if (node == NULL || obs == NULL || property_name == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ui_node_bind: Invalid argument\n");
-    return CMP_ERROR_INVALID_ARG;
+    return rc;
   }
 
   obs->bound_node = node;
 
   if (obs->bound_property != NULL) {
-    rc = CMP_FREE(obs->bound_property);
-    if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(obs->bound_property);
+    if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG(
           "Error in cmp_ui_node_bind: CMP_FREE failed for bound_property\n");
     }
@@ -412,25 +487,26 @@ int cmp_ui_node_bind(cmp_ui_node_t *node, cmp_orm_observable_t *obs,
   len = strlen(property_name);
   rc = CMP_MALLOC(len + 1, (void **)&obs->bound_property);
   if (rc != CMP_SUCCESS) {
+    rc = CMP_ERROR_OOM;
     LOG_DEBUG("Error in cmp_ui_node_bind: CMP_MALLOC failed (OOM)\n");
-    return CMP_ERROR_OOM;
+    return rc;
   }
 #if defined(_MSC_VER)
-  rc = strcpy_s(obs->bound_property, len + 1, property_name);
-  if (rc != 0) {
+  if (strcpy_s(obs->bound_property, len + 1, property_name) != 0) {
+    rc = CMP_ERROR_GENERAL;
     LOG_DEBUG("Error in cmp_ui_node_bind: strcpy_s failed\n");
-    rc = CMP_FREE(obs->bound_property);
-    if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(obs->bound_property);
+    if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_ui_node_bind: CMP_FREE failed during cleanup\n");
     }
     obs->bound_property = NULL;
-    return CMP_ERROR_GENERAL;
+    return rc;
   }
 #else
   strcpy(obs->bound_property, property_name);
 #endif
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -440,24 +516,26 @@ int cmp_ui_node_bind(cmp_ui_node_t *node, cmp_orm_observable_t *obs,
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_orm_observable_destroy(cmp_orm_observable_t *obs) {
-  int rc;
+  int rc = CMP_SUCCESS;
+  int free_rc;
 
   if (obs == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_orm_observable_destroy: Invalid argument\n");
-    return CMP_ERROR_INVALID_ARG;
+    return rc;
   }
 
   if (obs->query != NULL) {
-    rc = CMP_FREE(obs->query);
-    if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(obs->query);
+    if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG(
           "Error in cmp_orm_observable_destroy: CMP_FREE failed for query\n");
     }
   }
 
   if (obs->bound_property != NULL) {
-    rc = CMP_FREE(obs->bound_property);
-    if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(obs->bound_property);
+    if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_orm_observable_destroy: CMP_FREE failed for "
                 "bound_property\n");
     }
@@ -468,5 +546,5 @@ int cmp_orm_observable_destroy(cmp_orm_observable_t *obs) {
     LOG_DEBUG("Error in cmp_orm_observable_destroy: CMP_FREE failed for obs\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }

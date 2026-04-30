@@ -16,15 +16,12 @@ struct CddProcess {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_msg_create(cmp_msg_t **msg) {
-  int rc;
-  rc = CMP_SUCCESS;
+int rc = CMP_SUCCESS;
 
   if (!msg) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_msg_create: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+    
     return rc;
   }
 
@@ -37,9 +34,7 @@ int cmp_msg_create(cmp_msg_t **msg) {
   (*msg)->type = 0;
   (*msg)->payload = NULL;
   (*msg)->sender = NULL;
-  if (rc != 0) {
-    return rc;
-  }
+  
   return rc;
 }
 
@@ -49,16 +44,14 @@ int cmp_msg_create(cmp_msg_t **msg) {
  * @param msg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_msg_destroy(cmp_msg_t *msg) {int rc;
-  rc = CMP_SUCCESS;
+int cmp_msg_destroy(cmp_msg_t *msg) {
+int rc = CMP_SUCCESS;
   int free_rc;
 
   if (!msg) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_msg_destroy: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+    
     return rc;
   }
 
@@ -75,10 +68,8 @@ int cmp_msg_destroy(cmp_msg_t *msg) {int rc;
     LOG_DEBUG("Free failed\n");
     rc = free_rc;
   }
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+  
+  
   return rc;
 }
 
@@ -91,16 +82,13 @@ int cmp_msg_destroy(cmp_msg_t *msg) {int rc;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_msg_set_payload(cmp_msg_t *msg, const void *payload, size_t size) {
-  int rc;
-  rc = CMP_SUCCESS;
+int rc = CMP_SUCCESS;
   int free_rc;
 
   if (!msg || !payload) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_msg_set_payload: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+    
     return rc;
   }
 
@@ -121,9 +109,7 @@ int cmp_msg_set_payload(cmp_msg_t *msg, const void *payload, size_t size) {
 
   memcpy(msg->payload, &size, sizeof(size_t));
   memcpy((uint8_t*)msg->payload + sizeof(size_t), payload, size);
-  if (rc != 0) {
-    return rc;
-  }
+  
   return rc;
 }
 
@@ -136,17 +122,14 @@ int cmp_msg_set_payload(cmp_msg_t *msg, const void *payload, size_t size) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_msg_serialize(const cmp_msg_t *msg, uint8_t **buffer, size_t *buffer_size) {
-  int rc;
-  rc = CMP_SUCCESS;
+int rc = CMP_SUCCESS;
   size_t psize = 0;
   uint8_t *p = NULL;
 
   if (!msg || !buffer || !buffer_size) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_msg_serialize: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+    
     return rc;
   }
   
@@ -170,11 +153,7 @@ int cmp_msg_serialize(const cmp_msg_t *msg, uint8_t **buffer, size_t *buffer_siz
       memcpy(p, (uint8_t*)msg->payload + sizeof(size_t), psize);
   }
   
-  if (rc != 0) {
   
-    return rc;
-  
-  }
   
   return rc;
 }
@@ -187,8 +166,8 @@ int cmp_msg_serialize(const cmp_msg_t *msg, uint8_t **buffer, size_t *buffer_siz
  * @param msg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_msg_deserialize(const uint8_t *buffer, size_t buffer_size, cmp_msg_t **msg) {int rc;
-  rc = CMP_SUCCESS;
+int cmp_msg_deserialize(const uint8_t *buffer, size_t buffer_size, cmp_msg_t **msg) {
+int rc = CMP_SUCCESS;
   int err;
   const uint8_t *p = NULL;
   size_t psize;
@@ -196,9 +175,7 @@ int cmp_msg_deserialize(const uint8_t *buffer, size_t buffer_size, cmp_msg_t **m
   if (!buffer || !msg || buffer_size < sizeof(int) + sizeof(size_t)) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_msg_deserialize: Invalid argument or bounds\n");
-    if (rc != 0) {
-      return rc;
-    }
+    
     return rc;
   }
   
@@ -220,9 +197,7 @@ int cmp_msg_deserialize(const uint8_t *buffer, size_t buffer_size, cmp_msg_t **m
       *msg = NULL;
       rc = CMP_ERROR_BOUNDS;
       LOG_DEBUG("Error in cmp_msg_deserialize: Buffer too small for payload\n");
-      if (rc != 0) {
-        return rc;
-      }
+      
       return rc;
   }
   
@@ -236,10 +211,8 @@ int cmp_msg_deserialize(const uint8_t *buffer, size_t buffer_size, cmp_msg_t **m
       }
   }
   
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+  
+  
   return rc;
 }
 
@@ -250,23 +223,19 @@ int cmp_msg_deserialize(const uint8_t *buffer, size_t buffer_size, cmp_msg_t **m
  * @param msg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_process_send(cmp_process_t *proc, const cmp_msg_t *msg) {int rc;
-  rc = CMP_SUCCESS;
+int cmp_process_send(cmp_process_t *proc, const cmp_msg_t *msg) {
+int rc = CMP_SUCCESS;
 
   if (!proc || !msg) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_process_send: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+    
     return rc;
   }
   /* Mock implementation for IPC pipes, assuming write to cdd pipe */
   /* This is just a stub for tests since cdd_process_send doesn't exist out of the box in process.h */
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+  
+  
   return rc;
 }
 
@@ -277,21 +246,17 @@ int cmp_process_send(cmp_process_t *proc, const cmp_msg_t *msg) {int rc;
  * @param msg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_process_recv(cmp_process_t *proc, cmp_msg_t **msg) {int rc;
-  rc = CMP_SUCCESS;
+int cmp_process_recv(cmp_process_t *proc, cmp_msg_t **msg) {
+int rc = CMP_SUCCESS;
 
   if (!proc || !msg) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_process_recv: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+    
     return rc;
   }
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+  
+  
   return rc;
 }
 
@@ -302,24 +267,19 @@ int cmp_process_recv(cmp_process_t *proc, cmp_msg_t **msg) {int rc;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_process_destroy(cmp_process_t *proc) {
-  int rc;
-  rc = CMP_SUCCESS;
+int rc = CMP_SUCCESS;
 
   if (!proc) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_process_destroy: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+    
     return rc;
   }
   rc = CMP_FREE(proc);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
-  if (rc != 0) {
-    return rc;
-  }
+  
   return rc;
 }
 
@@ -330,15 +290,12 @@ int cmp_process_destroy(cmp_process_t *proc) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_process_spawn(cmp_process_t **proc) {
-  int rc;
-  rc = CMP_SUCCESS;
+int rc = CMP_SUCCESS;
 
   if (!proc) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_process_spawn: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+    
     return rc;
   }
 
@@ -348,9 +305,7 @@ int cmp_process_spawn(cmp_process_t **proc) {
     return CMP_ERROR_OOM;
   }
   (*proc)->mock_queue = NULL;
-  if (rc != 0) {
-    return rc;
-  }
+  
   return rc;
 }
 

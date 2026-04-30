@@ -19,48 +19,26 @@ struct cmp_audio_capture {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_capture_create(cmp_audio_capture_t **out_capture) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
   cmp_audio_capture_t *cap = NULL;
 
   if (out_capture == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug(
-        "cmp_audio_capture_create: Invalid argument (out_capture=NULL): %s\n",
-        err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG(
+        "cmp_audio_capture_create: Invalid argument (out_capture=NULL)\n");
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_audio_capture_t), (void **)&cap);
-  if (rc != CMP_SUCCESS) {
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_audio_capture_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+  if (rc != CMP_SUCCESS || cap == NULL) {
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_audio_capture_create: Out of memory\n");
     return rc;
   }
 
   cap->is_recording = 0;
   cap->dummy_pcm_size = 0;
   *out_capture = cap;
-  cmp_log_debug(
-      "cmp_audio_capture_create: Successfully created audio capture context\n");
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -71,37 +49,17 @@ int cmp_audio_capture_create(cmp_audio_capture_t **out_capture) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_capture_destroy(cmp_audio_capture_t *capture) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
 
   if (capture == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug(
-        "cmp_audio_capture_destroy: Invalid argument (capture=NULL): %s\n",
-        err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_audio_capture_destroy: Invalid argument (capture=NULL)\n");
     return rc;
   }
 
-  CMP_FREE(capture);
-  cmp_log_debug("cmp_audio_capture_destroy: Successfully destroyed audio "
-                "capture context\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
+  rc = CMP_FREE(capture);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_audio_capture_destroy: CMP_FREE failed\n");
   }
   return rc;
 }
@@ -113,51 +71,22 @@ int cmp_audio_capture_destroy(cmp_audio_capture_t *capture) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_capture_start(cmp_audio_capture_t *capture) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
 
   if (capture == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug(
-        "cmp_audio_capture_start: Invalid argument (capture=NULL): %s\n",
-        err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_audio_capture_start: Invalid argument (capture=NULL)\n");
     return rc;
   }
 
   if (capture->is_recording) {
     rc = CMP_ERROR_INVALID_STATE;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_audio_capture_start: Already recording: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_audio_capture_start: Already recording\n");
     return rc;
   }
 
   capture->is_recording = 1;
   capture->dummy_pcm_size = 44100; /* Mock 1 second of audio */
-  cmp_log_debug("cmp_audio_capture_start: Started audio capture\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -168,50 +97,21 @@ int cmp_audio_capture_start(cmp_audio_capture_t *capture) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_capture_stop(cmp_audio_capture_t *capture) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
 
   if (capture == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug(
-        "cmp_audio_capture_stop: Invalid argument (capture=NULL): %s\n",
-        err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_audio_capture_stop: Invalid argument (capture=NULL)\n");
     return rc;
   }
 
   if (!capture->is_recording) {
     rc = CMP_ERROR_INVALID_STATE;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_audio_capture_stop: Not recording: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_audio_capture_stop: Not recording\n");
     return rc;
   }
 
   capture->is_recording = 0;
-  cmp_log_debug("cmp_audio_capture_stop: Stopped audio capture\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -226,73 +126,39 @@ int cmp_audio_capture_stop(cmp_audio_capture_t *capture) {
 int cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
                               unsigned char **out_wav_data,
                               unsigned int *out_size) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
   unsigned char *wav = NULL;
   unsigned int total_size;
 
   if (capture == NULL || out_wav_data == NULL || out_size == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_audio_capture_get_wav: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_audio_capture_get_wav: Invalid argument\n");
     return rc;
   }
 
   if (capture->is_recording) {
     rc = CMP_ERROR_INVALID_STATE;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_audio_capture_get_wav: Must stop recording: %s\n",
-                  err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_audio_capture_get_wav: Must stop recording\n");
     return rc; /* Must stop before getting */
   }
 
   /* Mock WAV encoding */
   total_size = capture->dummy_pcm_size + 44; /* 44 bytes for WAV header */
   rc = CMP_MALLOC(total_size, (void **)&wav);
-  if (rc != CMP_SUCCESS) {
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_audio_capture_get_wav: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+  if (rc != CMP_SUCCESS || wav == NULL) {
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_audio_capture_get_wav: Out of memory\n");
     return rc;
   }
 
-  memset(wav, 0, total_size);
-  /* Mock RIFF header bytes */
-  wav[0] = 'R';
-  wav[1] = 'I';
-  wav[2] = 'F';
-  wav[3] = 'F';
-  wav[8] = 'W';
-  wav[9] = 'A';
-  wav[10] = 'V';
-  wav[11] = 'E';
+  /* Generate a fake WAV header */
+  memset(wav, 0, 44);
+  memcpy(wav, "RIFF", 4);
+  /* ... skipping actual accurate header creation for mock ... */
 
   *out_wav_data = wav;
   *out_size = total_size;
-  cmp_log_debug("cmp_audio_capture_get_wav: Retrieved WAV data of size %u\n",
-                total_size);
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -303,22 +169,17 @@ int cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_audio_capture_free_wav(unsigned char *wav_data) {
-  int rc;
-  rc = CMP_SUCCESS;
-  if (wav_data != NULL) {
-    CMP_FREE(wav_data);
-    cmp_log_debug("cmp_audio_capture_free_wav: Freed WAV data\n");
-  } else {
-    cmp_log_debug("cmp_audio_capture_free_wav: Null wav_data ignored\n");
-  }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
+  int rc = CMP_SUCCESS;
+
+  if (wav_data == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_audio_capture_free_wav: Invalid argument (wav_data=NULL)\n");
     return rc;
   }
-  if (rc != 0) {
-    return rc;
+
+  rc = CMP_FREE(wav_data);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_audio_capture_free_wav: CMP_FREE failed\n");
   }
   return rc;
 }

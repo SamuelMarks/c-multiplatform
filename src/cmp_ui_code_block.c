@@ -29,8 +29,7 @@ struct cmp_ui_code_block {
  */
 int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
                              const char *language) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_ui_code_block_t *block = NULL;
   size_t len;
 
@@ -130,7 +129,7 @@ int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
   }
 
   *out_block = block;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -140,8 +139,7 @@ int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_code_block_destroy(cmp_ui_code_block_t *block) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   if (!block) {
     LOG_DEBUG("cmp_ui_code_block_destroy: block is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -167,12 +165,10 @@ int cmp_ui_code_block_destroy(cmp_ui_code_block_t *block) {
   rc = CMP_FREE(block);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_code_block_destroy: CMP_FREE block failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -184,22 +180,13 @@ int cmp_ui_code_block_destroy(cmp_ui_code_block_t *block) {
  */
 int cmp_ui_code_block_get_node(cmp_ui_code_block_t *block,
                                cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!block || !out_node) {
     LOG_DEBUG("cmp_ui_code_block_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = block->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -211,8 +198,7 @@ int cmp_ui_code_block_get_node(cmp_ui_code_block_t *block,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_code_block_set_code(cmp_ui_code_block_t *block, const char *code) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   size_t len;
 
   if (!block) {
@@ -267,5 +253,5 @@ int cmp_ui_code_block_set_code(cmp_ui_code_block_t *block, const char *code) {
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

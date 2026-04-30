@@ -12,26 +12,37 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_layout_node_create(cmp_layout_node_t **out_node) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_layout_node_t *node;
 
   if (out_node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
+    {
+      const char *err_str;
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_layout_node_create: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      LOG_DEBUG("cmp_layout_node_create: %s\n", err_str);
+    }
+    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&node);
   if (rc != CMP_SUCCESS) {
-    if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    { const char *err_str;
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    {
+      const char *err_str;
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_layout_node_create CMP_MALLOC: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      LOG_DEBUG("cmp_layout_node_create CMP_MALLOC: %s\n", err_str);
+    }
+    return rc;
   }
 
   memset(node, 0, sizeof(cmp_layout_node_t));
@@ -49,7 +60,7 @@ int cmp_layout_node_create(cmp_layout_node_t **out_node) {
   node->flex_shrink = 1.0f;
 
   *out_node = node;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -59,16 +70,21 @@ int cmp_layout_node_create(cmp_layout_node_t **out_node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_layout_node_destroy(cmp_layout_node_t *node) {
-  int rc;
+  int rc = CMP_SUCCESS;
   size_t i;
 
   if (node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
+    {
+      const char *err_str;
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_layout_node_destroy: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      LOG_DEBUG("cmp_layout_node_destroy: %s\n", err_str);
+    }
+    return rc;
   }
 
   for (i = 0; i < node->child_count; i++) {
@@ -80,7 +96,7 @@ int cmp_layout_node_destroy(cmp_layout_node_t *node) {
   }
 
   CMP_FREE(node);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -92,8 +108,8 @@ int cmp_layout_node_destroy(cmp_layout_node_t *node) {
  */
 int cmp_layout_node_add_child(cmp_layout_node_t *parent,
                               cmp_layout_node_t *child) {
-  int rc;
-  rc = 0;if (parent == NULL || child == NULL) {
+  int rc = CMP_SUCCESS;
+  if (parent == NULL || child == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
 
@@ -119,10 +135,7 @@ int cmp_layout_node_add_child(cmp_layout_node_t *parent,
 
   parent->children[parent->child_count++] = child;
   child->parent = parent;
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -145,9 +158,10 @@ typedef struct {
  * @param available_height Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void calculate_node_pass(cmp_layout_node_t *node, float parent_x,
-                                float parent_y, float available_width,
-                                float available_height)) {
+CMP_EXEMPT(static void calculate_node_pass(cmp_layout_node_t *node,
+                                           float parent_x, float parent_y,
+                                           float available_width,
+                                           float available_height)) {
   size_t i, j;
   float current_x = parent_x + node->margin[3];
   float current_y = parent_y + node->margin[0];
@@ -271,7 +285,8 @@ CMP_EXEMPT(static void calculate_node_pass(cmp_layout_node_t *node, float parent
       cur_line->start = i;
     }
 
-    if (cur_line->count > 0) cur_line->main_size += (is_row ? node->column_gap : node->row_gap);
+    if (cur_line->count > 0)
+      cur_line->main_size += (is_row ? node->column_gap : node->row_gap);
     cur_line->count++;
     cur_line->main_size += child_main + child_main_margin;
     cur_line->total_flex_grow += child->flex_grow;
@@ -408,7 +423,8 @@ CMP_EXEMPT(static void calculate_node_pass(cmp_layout_node_t *node, float parent
       child->height = original_height;
 
       main_pos += final_main + child_main_margin + spacing;
-      if (processed < line->count) main_pos += (is_row ? node->column_gap : node->row_gap);
+      if (processed < line->count)
+        main_pos += (is_row ? node->column_gap : node->row_gap);
     }
 
     if (main_pos - (is_row ? (current_x + node->padding[3])
@@ -436,7 +452,11 @@ CMP_EXEMPT(static void calculate_node_pass(cmp_layout_node_t *node, float parent
 
     cross_pos += line->cross_size;
     global_cross_max += line->cross_size;
-    if (i < line_count - 1) { float cross_gap = is_row ? node->row_gap : node->column_gap; cross_pos += cross_gap; global_cross_max += cross_gap; }
+    if (i < line_count - 1) {
+      float cross_gap = is_row ? node->row_gap : node->column_gap;
+      cross_pos += cross_gap;
+      global_cross_max += cross_gap;
+    }
   }
 
   for (i = 0; i < node->child_count; i++) {
@@ -491,9 +511,11 @@ CMP_EXEMPT(static void calculate_node_pass(cmp_layout_node_t *node, float parent
  * @param dx Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static void translate_descendants(cmp_layout_node_t *node, float dx)) {
+CMP_EXEMPT(static void translate_descendants(cmp_layout_node_t *node,
+                                             float dx)) {
   size_t i;
-  if (!node) return;
+  if (!node)
+    return;
   for (i = 0; i < node->child_count; i++) {
     node->children[i]->computed_rect.x += dx;
     translate_descendants(node->children[i], dx);
@@ -508,14 +530,16 @@ CMP_EXEMPT(static void translate_descendants(cmp_layout_node_t *node, float dx))
  */
 CMP_EXEMPT(static void apply_rtl_mirroring(cmp_layout_node_t *node)) {
   size_t i;
-  if (!node) return;
+  if (!node)
+    return;
 
   if (node->direction == CMP_FLEX_ROW) {
     for (i = 0; i < node->child_count; i++) {
       cmp_layout_node_t *child = node->children[i];
       if (child->position_type != CMP_POSITION_ABSOLUTE) {
         float local_x = child->computed_rect.x - node->computed_rect.x;
-        float new_x = node->computed_rect.x + node->computed_rect.width - local_x - child->computed_rect.width;
+        float new_x = node->computed_rect.x + node->computed_rect.width -
+                      local_x - child->computed_rect.width;
         float dx = new_x - child->computed_rect.x;
         if (dx != 0.0f) {
           child->computed_rect.x = new_x;
@@ -540,8 +564,8 @@ CMP_EXEMPT(static void apply_rtl_mirroring(cmp_layout_node_t *node)) {
  */
 int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
                          float available_height) {
-  int rc;
-  rc = 0;int is_rtl = 0;
+  int rc = CMP_SUCCESS;
+  int is_rtl = 0;
 
   if (root == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -553,9 +577,5 @@ int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
     apply_rtl_mirroring(root);
   }
 
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

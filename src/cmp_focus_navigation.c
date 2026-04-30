@@ -18,8 +18,7 @@ struct cmp_focus_nav {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_focus_nav_t *nav = NULL;
@@ -31,9 +30,7 @@ int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_focus_nav_create: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -44,9 +41,7 @@ int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_focus_nav_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -62,16 +57,14 @@ int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
     cmp_log_debug("cmp_focus_nav_create: Failed to create focus ring: %s\n",
                   err_str);
     CMP_FREE(nav);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   *out_nav = nav;
   cmp_log_debug(
       "cmp_focus_nav_create: Successfully created focus nav context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -81,8 +74,7 @@ int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_focus_nav_destroy(cmp_focus_nav_t *nav) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -93,9 +85,7 @@ int cmp_focus_nav_destroy(cmp_focus_nav_t *nav) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_focus_nav_destroy: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -109,15 +99,13 @@ int cmp_focus_nav_destroy(cmp_focus_nav_t *nav) {
   rc = CMP_FREE(nav);
   if (rc != CMP_SUCCESS) {
     cmp_log_debug("cmp_focus_nav_destroy: Failed to free nav\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   cmp_log_debug(
       "cmp_focus_nav_destroy: Successfully destroyed focus nav context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -128,8 +116,7 @@ int cmp_focus_nav_destroy(cmp_focus_nav_t *nav) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_focus_nav_handle_tab(cmp_focus_nav_t *nav, int is_shift_pressed) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -140,9 +127,7 @@ int cmp_focus_nav_handle_tab(cmp_focus_nav_t *nav, int is_shift_pressed) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_focus_nav_handle_tab: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -161,9 +146,7 @@ int cmp_focus_nav_handle_tab(cmp_focus_nav_t *nav, int is_shift_pressed) {
     }
     cmp_log_debug("cmp_focus_nav_handle_tab: Failed to set keyboard mode: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -180,12 +163,10 @@ int cmp_focus_nav_handle_tab(cmp_focus_nav_t *nav, int is_shift_pressed) {
     cmp_log_debug(
         "cmp_focus_nav_handle_tab: Failed to focus node on ring: %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   cmp_log_debug("cmp_focus_nav_handle_tab: Handled TAB spatial advance\n");
-  return CMP_SUCCESS;
+  return rc;
 }

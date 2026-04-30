@@ -14,8 +14,7 @@
  */
 int cmp_cupertino_measure_button(const cmp_ui_node_t *node, float *width,
                                  float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float calc_width = 44.0f;
   float calc_height = 44.0f; /* HIG standard tap target */
   float font_size;
@@ -39,13 +38,8 @@ int cmp_cupertino_measure_button(const cmp_ui_node_t *node, float *width,
     *width = calc_width;
   if (height)
     *height = calc_height;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -58,21 +52,15 @@ int cmp_cupertino_measure_button(const cmp_ui_node_t *node, float *width,
  */
 int cmp_cupertino_measure_text_input(const cmp_ui_node_t *node, float *width,
                                      float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 200.0f; /* Default reasonable width */
   if (height)
     *height = 44.0f; /* Standard tap target */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -85,21 +73,15 @@ int cmp_cupertino_measure_text_input(const cmp_ui_node_t *node, float *width,
  */
 int cmp_cupertino_measure_slider(const cmp_ui_node_t *node, float *width,
                                  float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 150.0f;
   if (height)
     *height = 32.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -112,21 +94,15 @@ int cmp_cupertino_measure_slider(const cmp_ui_node_t *node, float *width,
  */
 int cmp_cupertino_measure_toggle(const cmp_ui_node_t *node, float *width,
                                  float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 51.0f; /* Standard iOS switch width */
   if (height)
     *height = 31.0f; /* Standard iOS switch height */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -139,21 +115,15 @@ int cmp_cupertino_measure_toggle(const cmp_ui_node_t *node, float *width,
  */
 int cmp_cupertino_measure_checkbox(const cmp_ui_node_t *node, float *width,
                                    float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 20.0f;
   if (height)
     *height = 20.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -166,21 +136,15 @@ int cmp_cupertino_measure_checkbox(const cmp_ui_node_t *node, float *width,
  */
 int cmp_cupertino_measure_radio(const cmp_ui_node_t *node, float *width,
                                 float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 20.0f;
   if (height)
     *height = 20.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -193,21 +157,15 @@ int cmp_cupertino_measure_radio(const cmp_ui_node_t *node, float *width,
  */
 int cmp_cupertino_measure_progress(const cmp_ui_node_t *node, float *width,
                                    float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 150.0f;
   if (height)
     *height = 4.0f; /* Standard iOS progress bar thickness */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -220,21 +178,15 @@ int cmp_cupertino_measure_progress(const cmp_ui_node_t *node, float *width,
  */
 int cmp_cupertino_measure_dropdown(const cmp_ui_node_t *node, float *width,
                                    float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 120.0f;
   if (height)
     *height = 32.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -244,21 +196,15 @@ int cmp_cupertino_measure_dropdown(const cmp_ui_node_t *node, float *width,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_layout_nav_bar(cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_ROW;
   node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
   node->layout->justify_content = CMP_FLEX_ALIGN_SPACE_BETWEEN;
   node->layout->min_height = 44.0f; /* iOS standard HIG nav bar height */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -268,21 +214,15 @@ int cmp_cupertino_layout_nav_bar(cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_layout_tab_bar(cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_ROW;
   node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
   node->layout->justify_content = CMP_FLEX_ALIGN_SPACE_AROUND;
   node->layout->min_height = 49.0f; /* iOS standard HIG tab bar height */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -292,21 +232,15 @@ int cmp_cupertino_layout_tab_bar(cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_layout_dialog_content(cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_COLUMN;
   node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_width = 270.0f; /* iOS standard alert width */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -316,8 +250,7 @@ int cmp_cupertino_layout_dialog_content(cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_layout_sidebar(cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_COLUMN;
@@ -325,13 +258,8 @@ int cmp_cupertino_layout_sidebar(cmp_ui_node_t *node) {
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_width = 200.0f; /* macOS HIG standard sidebar */
   node->layout->max_width = 320.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -341,8 +269,7 @@ int cmp_cupertino_layout_sidebar(cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_draw_button(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer;
@@ -363,13 +290,8 @@ int cmp_cupertino_draw_button(const cmp_ui_node_t *node) {
 
   /* Assuming context or global renderer is accessible */
   (void)renderer;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -379,8 +301,7 @@ int cmp_cupertino_draw_button(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_draw_text_input(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -399,13 +320,8 @@ int cmp_cupertino_draw_text_input(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -415,8 +331,7 @@ int cmp_cupertino_draw_text_input(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_draw_slider(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -435,13 +350,8 @@ int cmp_cupertino_draw_slider(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -451,8 +361,7 @@ int cmp_cupertino_draw_slider(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_draw_toggle(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -471,13 +380,8 @@ int cmp_cupertino_draw_toggle(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -487,8 +391,7 @@ int cmp_cupertino_draw_toggle(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_draw_checkbox(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -507,13 +410,8 @@ int cmp_cupertino_draw_checkbox(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -523,8 +421,7 @@ int cmp_cupertino_draw_checkbox(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_draw_radio(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -543,13 +440,8 @@ int cmp_cupertino_draw_radio(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -559,8 +451,7 @@ int cmp_cupertino_draw_radio(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_draw_progress(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -579,13 +470,8 @@ int cmp_cupertino_draw_progress(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -595,8 +481,7 @@ int cmp_cupertino_draw_progress(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_draw_card(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -615,13 +500,8 @@ int cmp_cupertino_draw_card(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -631,8 +511,7 @@ int cmp_cupertino_draw_card(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_draw_tooltip(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -651,13 +530,8 @@ int cmp_cupertino_draw_tooltip(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -667,8 +541,7 @@ int cmp_cupertino_draw_tooltip(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_draw_menu(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -687,13 +560,8 @@ int cmp_cupertino_draw_menu(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -703,8 +571,7 @@ int cmp_cupertino_draw_menu(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cupertino_draw_focus_ring(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -723,13 +590,8 @@ int cmp_cupertino_draw_focus_ring(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -743,8 +605,7 @@ int cmp_cupertino_draw_focus_ring(const cmp_ui_node_t *node) {
  */
 int cmp_cupertino_get_spring_config(const cmp_ui_node_t *node, float *mass,
                                     float *stiffness, float *damping) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   /* Equivalent to CASpringAnimation defaults */
@@ -754,13 +615,8 @@ int cmp_cupertino_get_spring_config(const cmp_ui_node_t *node, float *mass,
     *stiffness = 100.0f;
   if (damping)
     *damping = 10.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -773,21 +629,15 @@ int cmp_cupertino_get_spring_config(const cmp_ui_node_t *node, float *mass,
  */
 int cmp_cupertino_get_ripple_config(const cmp_ui_node_t *node, float *a,
                                     float *b) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (a)
     *a = 0.5f;
   if (b)
     *b = 0.5f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -800,8 +650,7 @@ int cmp_cupertino_get_ripple_config(const cmp_ui_node_t *node, float *a,
  */
 int cmp_cupertino_get_state_layer_opacity(const cmp_ui_node_t *node, int state,
                                           float *opacity) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
 
@@ -812,13 +661,8 @@ int cmp_cupertino_get_state_layer_opacity(const cmp_ui_node_t *node, int state,
     else
       *opacity = 1.0f;
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -830,19 +674,13 @@ int cmp_cupertino_get_state_layer_opacity(const cmp_ui_node_t *node, int state,
  */
 int cmp_cupertino_get_transition_duration(const cmp_ui_node_t *node,
                                           float *duration) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (duration)
     *duration = 250.0f; /* Standard quarter-second default */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 #ifndef CMP_THEME_MODE_SINGLE_STATIC
 const cmp_theme_vtable_t cmp_cupertino_vtable = {

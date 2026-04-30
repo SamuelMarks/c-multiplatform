@@ -18,7 +18,7 @@ struct cmp_spellcheck {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_spellcheck_create(cmp_spellcheck_t **out_spellcheck) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_spellcheck *spellcheck;
 
   rc = CMP_SUCCESS;
@@ -38,7 +38,7 @@ int cmp_spellcheck_create(cmp_spellcheck_t **out_spellcheck) {
   spellcheck->enabled = 1;
 
   *out_spellcheck = (cmp_spellcheck_t *)spellcheck;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -48,7 +48,7 @@ int cmp_spellcheck_create(cmp_spellcheck_t **out_spellcheck) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_spellcheck_destroy(cmp_spellcheck_t *spellcheck) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_spellcheck *internal_spellcheck;
 
   rc = CMP_SUCCESS;
@@ -65,7 +65,7 @@ int cmp_spellcheck_destroy(cmp_spellcheck_t *spellcheck) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -78,6 +78,7 @@ int cmp_spellcheck_destroy(cmp_spellcheck_t *spellcheck) {
  */
 int cmp_spellcheck_verify_word(cmp_spellcheck_t *spellcheck, const char *word,
                                int *out_is_correct) {
+  int rc = CMP_SUCCESS;
   struct cmp_spellcheck *internal_spellcheck;
 
   internal_spellcheck = (struct cmp_spellcheck *)spellcheck;
@@ -89,7 +90,7 @@ int cmp_spellcheck_verify_word(cmp_spellcheck_t *spellcheck, const char *word,
 
   if (!internal_spellcheck->enabled) {
     *out_is_correct = 1;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   /* Dummy logic: anything with 'x' is misspelled */
@@ -99,5 +100,5 @@ int cmp_spellcheck_verify_word(cmp_spellcheck_t *spellcheck, const char *word,
     *out_is_correct = 1;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

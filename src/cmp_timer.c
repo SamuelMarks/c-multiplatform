@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 
 #if defined(_WIN32)
@@ -29,21 +30,11 @@ static int g_timer_system_initialized = 0;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_timer_system_init(void) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (g_timer_system_initialized) {
-    return CMP_SUCCESS;
+    return rc;
   }
   g_timer_system_initialized = 1;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -53,23 +44,14 @@ int cmp_timer_system_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_timer_system_shutdown(void) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!g_timer_system_initialized) {
-    return CMP_SUCCESS;
+    return rc;
   }
   g_timer_system_initialized = 0;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
+
 #if defined(_WIN32)
 /**
  * @brief cmp_timer_thread_func
@@ -130,22 +112,27 @@ CMP_EXEMPT(static void *cmp_timer_thread_func(void *arg)) {
  */
 int cmp_timer_start(cmp_timer_t **out_timer, unsigned int interval_ms,
                     int repeat, cmp_task_fn_t fn, void *arg) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_timer_t *timer;
   int res;
 
   if (out_timer == NULL || fn == NULL || interval_ms == 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_timer_start: invalid arguments\n");
+    return rc;
   }
 
   if (!g_timer_system_initialized) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_STATE;
+    LOG_DEBUG("cmp_timer_start: system not initialized\n");
+    return rc;
   }
 
-  res = CMP_MALLOC(sizeof(struct cmp_timer), (void **)&timer);
-  if (res != CMP_SUCCESS || timer == NULL) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(struct cmp_timer), (void **)&timer);
+  if (rc != CMP_SUCCESS || timer == NULL) {
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_timer_start: CMP_MALLOC failed\n");
+    return rc;
   }
 
   timer->interval_ms = interval_ms;
@@ -156,26 +143,28 @@ int cmp_timer_start(cmp_timer_t **out_timer, unsigned int interval_ms,
 #if defined(_WIN32)
   timer->thread = CreateThread(NULL, 0, cmp_timer_thread_func, timer, 0, NULL);
   if (timer->thread == NULL) {
-    CMP_FREE(timer);
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_GENERAL;
+    LOG_DEBUG("cmp_timer_start: CreateThread failed\n");
+    res = CMP_FREE(timer);
+    if (res != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_timer_start: CMP_FREE failed during cleanup\n");
+    }
+    return rc;
   }
 #else
-  if (pthread_create(&timer->thread, NULL, cmp_timer_thread_func, timer) != 0) {
-    CMP_FREE(timer);
-    return CMP_ERROR_OOM;
+  res = pthread_create(&timer->thread, NULL, cmp_timer_thread_func, timer);
+  if (res != 0) {
+    rc = CMP_ERROR_GENERAL;
+    LOG_DEBUG("cmp_timer_start: pthread_create failed\n");
+    res = CMP_FREE(timer);
+    if (res != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_timer_start: CMP_FREE failed during cleanup\n");
+    }
+    return rc;
   }
 #endif
 
   *out_timer = timer;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -186,10 +175,12 @@ int cmp_timer_start(cmp_timer_t **out_timer, unsigned int interval_ms,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_timer_stop(cmp_timer_t *timer) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
+
   if (timer == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_timer_stop: timer is NULL\n");
+    return rc;
   }
 
   timer->is_running = 0;
@@ -200,16 +191,11 @@ int cmp_timer_stop(cmp_timer_t *timer) {
   pthread_join(timer->thread, NULL);
 #endif
 
-  CMP_FREE(timer);
+  rc = CMP_FREE(timer);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_timer_stop: CMP_FREE failed\n");
+    return rc;
+  }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

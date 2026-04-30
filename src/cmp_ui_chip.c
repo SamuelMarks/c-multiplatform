@@ -29,7 +29,7 @@ struct cmp_ui_chip {
 int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
                        uint32_t bg_color, uint32_t text_color) {
   cmp_ui_chip_t *chip = NULL;
-  int rc;
+  int rc = CMP_SUCCESS;
   size_t len;
   cmp_string_t translated = {NULL, 0, 0};
   const char *final_text = text;
@@ -132,7 +132,7 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
   }
 
   *out_chip = chip;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -142,7 +142,7 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_ui_chip_destroy(cmp_ui_chip_t *chip) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!chip) {
     LOG_DEBUG("cmp_ui_chip_destroy: chip is NULL\n");
@@ -163,12 +163,10 @@ int cmp_ui_chip_destroy(cmp_ui_chip_t *chip) {
   rc = CMP_FREE(chip);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_chip_destroy: CMP_FREE chip failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -179,22 +177,13 @@ int cmp_ui_chip_destroy(cmp_ui_chip_t *chip) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_ui_chip_get_node(cmp_ui_chip_t *chip, cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!chip || !out_node) {
     LOG_DEBUG("cmp_ui_chip_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = chip->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -206,7 +195,7 @@ int cmp_ui_chip_get_node(cmp_ui_chip_t *chip, cmp_ui_node_t **out_node) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_ui_chip_set_text(cmp_ui_chip_t *chip, const char *text) {
-  int rc;
+  int rc = CMP_SUCCESS;
   size_t len;
   cmp_string_t translated = {NULL, 0, 0};
   const char *final_text = text;
@@ -284,5 +273,5 @@ int cmp_ui_chip_set_text(cmp_ui_chip_t *chip, const char *text) {
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -12,16 +12,13 @@ static cmp_dpi_t *g_dpi_manager = NULL;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dpi_awareness_init(void) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
   if (g_dpi_manager != NULL) {
     cmp_log_debug("cmp_dpi_awareness_init: Already initialized\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -35,17 +32,13 @@ int cmp_dpi_awareness_init(void) {
                   err_str);
     /* Safe CRT not needed for simple literal logging to standard output. */
     printf("[DPI] WARNING: Failed to initialize High-DPI context.\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   cmp_log_debug("cmp_dpi_awareness_init: Per-Monitor v2 High-DPI Awareness "
                 "initialized.\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -55,8 +48,7 @@ int cmp_dpi_awareness_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dpi_awareness_cleanup(void) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -75,5 +67,5 @@ int cmp_dpi_awareness_cleanup(void) {
   }
 
   cmp_log_debug("cmp_dpi_awareness_cleanup: Cleaned up context\n");
-  return CMP_SUCCESS;
+  return rc;
 }

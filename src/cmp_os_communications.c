@@ -16,7 +16,7 @@ struct cmp_os_communications {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_communications_create(cmp_os_communications_t **out_ctx) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_os_communications *ctx;
 
   rc = CMP_SUCCESS;
@@ -38,7 +38,7 @@ int cmp_os_communications_create(cmp_os_communications_t **out_ctx) {
   ctx->is_focus_mode_suppressed = 0; /* Default open */
 
   *out_ctx = (cmp_os_communications_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -48,7 +48,7 @@ int cmp_os_communications_create(cmp_os_communications_t **out_ctx) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_communications_destroy(cmp_os_communications_t *ctx_opaque) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_os_communications *ctx;
 
   rc = CMP_SUCCESS;
@@ -65,7 +65,7 @@ int cmp_os_communications_destroy(cmp_os_communications_t *ctx_opaque) {
     LOG_DEBUG("Error in cmp_os_communications_destroy: CMP_FREE failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -79,8 +79,7 @@ int cmp_os_communications_destroy(cmp_os_communications_t *ctx_opaque) {
 int cmp_os_communications_register_intent(cmp_os_communications_t *ctx_opaque,
                                           const char *intent_id,
                                           const char *title) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || intent_id == NULL || title == NULL) {
@@ -93,7 +92,7 @@ int cmp_os_communications_register_intent(cmp_os_communications_t *ctx_opaque,
   (void)ctx;
 
   /* Instructs OS to parse and map intent structures */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -109,8 +108,7 @@ int cmp_os_communications_show_share_sheet(cmp_os_communications_t *ctx_opaque,
                                            cmp_window_t *window,
                                            const char *url_to_share,
                                            const char *text_to_share) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || window == NULL ||
@@ -124,7 +122,7 @@ int cmp_os_communications_show_share_sheet(cmp_os_communications_t *ctx_opaque,
   (void)ctx;
 
   /* Triggers UIActivityViewController / NSSharingServicePicker */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -138,8 +136,7 @@ int cmp_os_communications_show_share_sheet(cmp_os_communications_t *ctx_opaque,
 int cmp_os_communications_broadcast_handoff(cmp_os_communications_t *ctx_opaque,
                                             const char *activity_type,
                                             const char *payload) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || activity_type == NULL || payload == NULL) {
@@ -152,7 +149,7 @@ int cmp_os_communications_broadcast_handoff(cmp_os_communications_t *ctx_opaque,
   (void)ctx;
 
   /* Sets current NSUserActivity */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -167,8 +164,7 @@ int cmp_os_communications_broadcast_handoff(cmp_os_communications_t *ctx_opaque,
 int cmp_os_communications_index_for_spotlight(
     cmp_os_communications_t *ctx_opaque, const char *item_id, const char *title,
     const char *description) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || item_id == NULL || title == NULL ||
@@ -182,7 +178,7 @@ int cmp_os_communications_index_for_spotlight(
   (void)ctx;
 
   /* CSSearchableItemAttributeSet */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -195,8 +191,7 @@ int cmp_os_communications_index_for_spotlight(
  */
 int cmp_os_communications_evaluate_focus_mode(
     cmp_os_communications_t *ctx_opaque, int *out_is_suppressed) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || out_is_suppressed == NULL) {
@@ -207,7 +202,7 @@ int cmp_os_communications_evaluate_focus_mode(
 
   ctx = (struct cmp_os_communications *)ctx_opaque;
   *out_is_suppressed = ctx->is_focus_mode_suppressed;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -219,8 +214,7 @@ int cmp_os_communications_evaluate_focus_mode(
  */
 int cmp_os_communications_start_shareplay(cmp_os_communications_t *ctx_opaque,
                                           const char *activity_id) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_os_communications *ctx;
 
   if (ctx_opaque == NULL || activity_id == NULL) {
@@ -233,5 +227,5 @@ int cmp_os_communications_start_shareplay(cmp_os_communications_t *ctx_opaque,
   (void)ctx;
 
   /* GroupActivities framework binding */
-  return CMP_SUCCESS;
+  return rc;
 }

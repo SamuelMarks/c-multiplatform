@@ -10,19 +10,10 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_documentation_mock_init(void) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   /* Documentation is primarily an inline effort, no complex logic required */
   cmp_log_debug(
       "cmp_documentation_mock_init: Initialized documentation stubs\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

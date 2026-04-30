@@ -24,7 +24,7 @@ struct cmp_ui_snackbar {
 int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
                            const char *message, const char *action_label) {
   cmp_ui_snackbar_t *snackbar;
-  int rc;
+  int rc = CMP_SUCCESS;
   size_t len;
 
   if (!out_snackbar) {
@@ -35,9 +35,7 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
   rc = CMP_MALLOC(sizeof(cmp_ui_snackbar_t), (void **)&snackbar);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_snackbar_create: OOM\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   memset(snackbar, 0, sizeof(cmp_ui_snackbar_t));
@@ -59,9 +57,7 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
     } else {
       LOG_DEBUG("cmp_ui_snackbar_create: OOM message\n");
       CMP_FREE(snackbar);
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
   }
@@ -88,9 +84,7 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
       if (snackbar->message)
         CMP_FREE(snackbar->message);
       CMP_FREE(snackbar);
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
   }
@@ -103,9 +97,7 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
     if (snackbar->action_label)
       CMP_FREE(snackbar->action_label);
     CMP_FREE(snackbar);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -124,9 +116,7 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
     if (snackbar->action_label)
       CMP_FREE(snackbar->action_label);
     CMP_FREE(snackbar);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -157,7 +147,7 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
   }
 
   *out_snackbar = snackbar;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -167,7 +157,7 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_snackbar_destroy(cmp_ui_snackbar_t *snackbar) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!snackbar) {
     LOG_DEBUG("cmp_ui_snackbar_destroy: snackbar is NULL\n");
@@ -192,12 +182,10 @@ int cmp_ui_snackbar_destroy(cmp_ui_snackbar_t *snackbar) {
   rc = CMP_FREE(snackbar);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_snackbar_destroy: CMP_FREE failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -209,22 +197,13 @@ int cmp_ui_snackbar_destroy(cmp_ui_snackbar_t *snackbar) {
  */
 int cmp_ui_snackbar_get_node(cmp_ui_snackbar_t *snackbar,
                              cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!snackbar || !out_node) {
     LOG_DEBUG("cmp_ui_snackbar_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = snackbar->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -238,7 +217,7 @@ int cmp_ui_snackbar_get_node(cmp_ui_snackbar_t *snackbar,
 int cmp_ui_snackbar_set_message(cmp_ui_snackbar_t *snackbar,
                                 const char *message) {
   size_t len;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!snackbar) {
     LOG_DEBUG("cmp_ui_snackbar_set_message: snackbar is NULL\n");
@@ -257,9 +236,7 @@ int cmp_ui_snackbar_set_message(cmp_ui_snackbar_t *snackbar,
     rc = CMP_MALLOC(len + 1, (void **)&snackbar->message);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_snackbar_set_message: OOM message\n");
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
 #if defined(_MSC_VER)
@@ -314,7 +291,7 @@ int cmp_ui_snackbar_set_message(cmp_ui_snackbar_t *snackbar,
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -327,7 +304,7 @@ int cmp_ui_snackbar_set_message(cmp_ui_snackbar_t *snackbar,
 int cmp_ui_snackbar_set_action(cmp_ui_snackbar_t *snackbar,
                                const char *action_label) {
   size_t len;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!snackbar) {
     LOG_DEBUG("cmp_ui_snackbar_set_action: snackbar is NULL\n");
@@ -351,9 +328,7 @@ int cmp_ui_snackbar_set_action(cmp_ui_snackbar_t *snackbar,
     rc = CMP_MALLOC(len + 1, (void **)&snackbar->action_label);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_snackbar_set_action: OOM\n");
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
 #if defined(_MSC_VER)
@@ -368,7 +343,7 @@ int cmp_ui_snackbar_set_action(cmp_ui_snackbar_t *snackbar,
 #endif
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 /**
  * @brief cmp_ui_snackbar_bind_a11y
@@ -379,7 +354,7 @@ int cmp_ui_snackbar_set_action(cmp_ui_snackbar_t *snackbar,
  */
 int cmp_ui_snackbar_bind_a11y(cmp_ui_snackbar_t *widget,
                               cmp_a11y_tree_t *tree) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!widget || !tree) {
     LOG_DEBUG("cmp_ui_snackbar_bind_a11y: Invalid arg\n");
@@ -395,11 +370,9 @@ int cmp_ui_snackbar_bind_a11y(cmp_ui_snackbar_t *widget,
                               "Snackbar");
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_snackbar_bind_a11y: cmp_a11y_tree_add_node failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

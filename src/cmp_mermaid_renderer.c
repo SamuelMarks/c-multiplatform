@@ -16,7 +16,7 @@ struct cmp_mermaid_renderer {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_mermaid_renderer_create(cmp_mermaid_renderer_t **out_renderer) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_mermaid_renderer_t *renderer;
 
   rc = CMP_SUCCESS;
@@ -36,7 +36,7 @@ int cmp_mermaid_renderer_create(cmp_mermaid_renderer_t **out_renderer) {
 
   renderer->is_initialized = 1;
   *out_renderer = renderer;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -46,7 +46,7 @@ int cmp_mermaid_renderer_create(cmp_mermaid_renderer_t **out_renderer) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_mermaid_renderer_destroy(cmp_mermaid_renderer_t *renderer) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -60,7 +60,7 @@ int cmp_mermaid_renderer_destroy(cmp_mermaid_renderer_t *renderer) {
     LOG_DEBUG("Error in cmp_mermaid_renderer_destroy: CMP_FREE failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -74,7 +74,7 @@ int cmp_mermaid_renderer_destroy(cmp_mermaid_renderer_t *renderer) {
 int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
                                       const char *mermaid_syntax,
                                       char **out_svg_xml) {
-  int rc;
+  int rc = CMP_SUCCESS;
   const char *dummy_svg = "<svg><rect width=\"10\" height=\"10\"/></svg>";
   char *svg_out;
   size_t len;
@@ -96,7 +96,7 @@ int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
   }
 #if defined(_MSC_VER)
   rc = strncpy_s(svg_out, len + 1, dummy_svg, _TRUNCATE);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_mermaid_renderer_generate_svg: strncpy_s failed\n");
     return CMP_ERROR_GENERAL;
   }
@@ -106,7 +106,7 @@ int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
   svg_out[len] = '\0';
   *out_svg_xml = svg_out;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -116,7 +116,7 @@ int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_mermaid_renderer_free_svg(char *svg_xml) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -127,5 +127,5 @@ int cmp_mermaid_renderer_free_svg(char *svg_xml) {
       return rc;
     }
   }
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -51,8 +51,7 @@ struct cmp_tree_node {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tree_sitter_create(cmp_tree_sitter_t **out_ts) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_tree_sitter_t *ts;
   if (!out_ts) {
     return -1;
@@ -64,7 +63,7 @@ int cmp_tree_sitter_create(cmp_tree_sitter_t **out_ts) {
   }
   ts->dummy = 0;
   *out_ts = ts;
-  return 0;
+  return rc;
 }
 
 /**
@@ -74,8 +73,7 @@ int cmp_tree_sitter_create(cmp_tree_sitter_t **out_ts) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tree_sitter_destroy(cmp_tree_sitter_t *ts) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   if (!ts) {
     return -1;
   }
@@ -83,7 +81,7 @@ int cmp_tree_sitter_destroy(cmp_tree_sitter_t *ts) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
-  return 0;
+  return rc;
 }
 
 /**
@@ -97,8 +95,7 @@ int cmp_tree_sitter_destroy(cmp_tree_sitter_t *ts) {
  */
 int cmp_tree_sitter_parse(cmp_tree_sitter_t *ts, const char *language,
                           const char *source_code, cmp_tree_node_t **out_root) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_tree_node_t *root;
   if (!ts || !language || !source_code || !out_root) {
     return -1;
@@ -114,7 +111,7 @@ int cmp_tree_sitter_parse(cmp_tree_sitter_t *ts, const char *language,
   root->child_count = 0;
 
   *out_root = root;
-  return 0;
+  return rc;
 }
 
 /**
@@ -125,28 +122,19 @@ int cmp_tree_sitter_parse(cmp_tree_sitter_t *ts, const char *language,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tree_sitter_node_get_type(cmp_tree_node_t *node, char **out_type) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!node || !out_type) {
     return -1;
   }
   if (!node->type) {
     *out_type = NULL;
-    return 0;
+    return rc;
   }
   *out_type = strdup(node->type);
   if (!*out_type) {
     return -2;
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -157,11 +145,10 @@ int cmp_tree_sitter_node_get_type(cmp_tree_node_t *node, char **out_type) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tree_sitter_free_node(cmp_tree_node_t *node) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   size_t i;
   if (!node) {
-    return 0;
+    return rc;
   }
   if (node->type) {
     rc = CMP_FREE(node->type);
@@ -182,7 +169,7 @@ int cmp_tree_sitter_free_node(cmp_tree_node_t *node) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
-  return 0;
+  return rc;
 }
 
 /**
@@ -192,13 +179,12 @@ int cmp_tree_sitter_free_node(cmp_tree_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tree_sitter_free_string(char *str) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   if (str) {
     rc = CMP_FREE(str);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("Free failed\n");
     }
   }
-  return 0;
+  return rc;
 }

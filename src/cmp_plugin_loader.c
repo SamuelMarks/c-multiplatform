@@ -18,20 +18,20 @@ struct cmp_plugin_loader {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_plugin_loader_create(cmp_plugin_loader_t **out_loader) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_plugin_loader_t *loader = NULL;
 
-  if (!out_loader) {
+  if (out_loader == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_plugin_loader_create: Invalid argument\n");
     return rc;
   }
 
-  rc = CMP_MALLOC(sizeof(cmp_plugin_loader_t), (void **)&(loader));
-  if (rc != CMP_SUCCESS) {
+  rc = CMP_MALLOC(sizeof(cmp_plugin_loader_t), (void **)&loader);
+  if (rc != CMP_SUCCESS || loader == NULL) {
+    rc = CMP_ERROR_OOM;
     LOG_DEBUG("Error in cmp_plugin_loader_create: Out of memory\n");
-    return CMP_ERROR_OOM;
+    return rc;
   }
 
   loader->dummy = 0;
@@ -47,10 +47,9 @@ int cmp_plugin_loader_create(cmp_plugin_loader_t **out_loader) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_plugin_loader_destroy(cmp_plugin_loader_t *loader) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
-  if (!loader) {
+  if (loader == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_plugin_loader_destroy: Invalid argument\n");
     return rc;
@@ -74,10 +73,9 @@ int cmp_plugin_loader_destroy(cmp_plugin_loader_t *loader) {
  */
 int cmp_plugin_loader_load(cmp_plugin_loader_t *loader, const char *path,
                            int *out_plugin_id) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
-  if (!loader || !path || !out_plugin_id) {
+  if (loader == NULL || path == NULL || out_plugin_id == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_plugin_loader_load: Invalid argument\n");
     return rc;
@@ -86,7 +84,7 @@ int cmp_plugin_loader_load(cmp_plugin_loader_t *loader, const char *path,
   /* Mock load */
   loader->active_plugin_id++;
   *out_plugin_id = loader->active_plugin_id;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -97,10 +95,9 @@ int cmp_plugin_loader_load(cmp_plugin_loader_t *loader, const char *path,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_plugin_loader_unload(cmp_plugin_loader_t *loader, int plugin_id) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
-  if (!loader || plugin_id <= 0) {
+  if (loader == NULL || plugin_id <= 0) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_plugin_loader_unload: Invalid argument\n");
     return rc;
@@ -110,7 +107,7 @@ int cmp_plugin_loader_unload(cmp_plugin_loader_t *loader, int plugin_id) {
   if (plugin_id == loader->active_plugin_id) {
     loader->active_plugin_id--;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -126,12 +123,12 @@ int cmp_plugin_loader_unload(cmp_plugin_loader_t *loader, int plugin_id) {
 int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
                               const char *function_name, const char *payload,
                               char **out_response) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   const char *dummy_resp = "{\"status\":\"ok\"}";
   size_t len;
 
-  if (!loader || plugin_id <= 0 || !function_name || !out_response) {
+  if (loader == NULL || plugin_id <= 0 || function_name == NULL ||
+      out_response == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_plugin_loader_execute: Invalid argument\n");
     return rc;
@@ -140,22 +137,26 @@ int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
   (void)payload;
 
   len = strlen(dummy_resp);
-  rc = CMP_MALLOC(len + 1, (void **)&(*out_response));
+  rc = CMP_MALLOC(len + 1, (void **)out_response);
   if (rc != CMP_SUCCESS) {
+    rc = CMP_ERROR_OOM;
     LOG_DEBUG("Error in cmp_plugin_loader_execute: Out of memory\n");
-    return CMP_ERROR_OOM;
-  }
-#if defined(_MSC_VER)
-  strncpy_s(*out_response, len + 1, dummy_resp, _TRUNCATE);
-#else
-  strncpy(*out_response, dummy_resp, len);
-#endif
-  (*out_response)[len] = '\0';
-
-  if (rc != 0) {
-
     return rc;
   }
+#if defined(_MSC_VER)
+  if (strcpy_s(*out_response, len + 1, dummy_resp) != 0) {
+    int free_rc = CMP_FREE(*out_response);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_plugin_loader_execute: CMP_FREE failed during "
+                "recovery\n");
+    }
+    rc = CMP_ERROR_GENERAL;
+    LOG_DEBUG("Error in cmp_plugin_loader_execute: strcpy_s failed\n");
+    return rc;
+  }
+#else
+  strcpy(*out_response, dummy_resp);
+#endif
 
   return rc;
 }
@@ -167,10 +168,9 @@ int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_plugin_loader_free_response(char *response) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
-  if (!response) {
+  if (response == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_plugin_loader_free_response: Invalid argument\n");
     return rc;
@@ -179,11 +179,6 @@ int cmp_plugin_loader_free_response(char *response) {
   rc = CMP_FREE(response);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_plugin_loader_free_response: CMP_FREE failed\n");
-    return rc;
-  }
-
-  if (rc != 0) {
-
     return rc;
   }
 

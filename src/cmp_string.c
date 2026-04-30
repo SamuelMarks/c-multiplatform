@@ -24,34 +24,16 @@
  * @return int Returns 0 on success, or an error code on failure.
  */
 int cmp_string_init(cmp_string_t *str) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   if (str == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) {
-        err_str = "Unknown";
-      }
-
-      LOG_DEBUG("Error %d: %s (cmp_string_init)", rc, err_str);
-    }
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_string_init: str is NULL\n");
     return rc;
   }
 
   str->data = NULL;
   str->length = 0;
   str->capacity = 0;
-
-  if (rc != 0) {
-
-    return rc;
-  }
 
   return rc;
 }
@@ -64,8 +46,7 @@ int cmp_string_init(cmp_string_t *str) {
  * @return int Returns 0 on success, or an error code on failure.
  */
 int cmp_string_append(cmp_string_t *str, const char *append) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   size_t append_len;
   size_t new_len;
   char *new_data;
@@ -73,47 +54,19 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
 
   if (str == NULL || append == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) {
-        err_str = "Unknown";
-      }
-
-      LOG_DEBUG("Error %d: %s (cmp_string_append)", rc, err_str);
-    }
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_string_append: str or append is NULL\n");
     return rc;
   }
 
   append_len = strlen(append);
   if (append_len == 0) {
-    if (rc != 0) {
-      return rc;
-    }
     return rc;
   }
 
   /* Detect overflow on length */
   if (str->length > ((size_t)-1) - append_len) {
     rc = CMP_ERROR_BOUNDS;
-    {
-      const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) {
-        err_str = "Unknown";
-      }
-
-      LOG_DEBUG("Error %d: %s (cmp_string_append length overflow)", rc,
-                err_str);
-    }
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_string_append: length overflow\n");
     return rc;
   }
 
@@ -131,20 +84,7 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
         new_capacity = ((size_t)-1);
         if (new_capacity < new_len + 1) {
           rc = CMP_ERROR_BOUNDS;
-          {
-            const char *err_str;
-            int rc2;
-            rc2 = cmp_strerror(rc, &err_str);
-            if (rc2 != CMP_SUCCESS) {
-              err_str = "Unknown";
-            }
-
-            LOG_DEBUG("Error %d: %s (cmp_string_append bounds limit)", rc,
-                      err_str);
-          }
-          if (rc != 0) {
-            return rc;
-          }
+          LOG_DEBUG("cmp_string_append: capacity bounds limit\n");
           return rc;
         }
         break;
@@ -152,46 +92,20 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
       new_capacity *= 2;
     }
 
-    if (str->data == NULL) {
-      rc = CMP_MALLOC(new_capacity, (void **)&new_data);
-      if (rc != CMP_SUCCESS) {
-        {
-          const char *err_str;
-          int rc2;
-          rc2 = cmp_strerror(rc, &err_str);
-          if (rc2 != CMP_SUCCESS) {
-            err_str = "Unknown";
-          }
+    rc = CMP_MALLOC(new_capacity, (void **)&new_data);
+    if (rc != CMP_SUCCESS || new_data == NULL) {
+      rc = CMP_ERROR_OOM;
+      LOG_DEBUG("cmp_string_append: CMP_MALLOC failed\n");
+      return rc;
+    }
 
-          LOG_DEBUG("Error %d: %s (cmp_string_append alloc failed)", rc,
-                    err_str);
-        }
-        if (rc != 0) {
-          return rc;
-        }
-        return rc;
-      }
-    } else {
-      rc = CMP_MALLOC(new_capacity, (void **)&new_data);
-      if (rc != CMP_SUCCESS) {
-        {
-          const char *err_str;
-          int rc2;
-          rc2 = cmp_strerror(rc, &err_str);
-          if (rc2 != CMP_SUCCESS) {
-            err_str = "Unknown";
-          }
-
-          LOG_DEBUG("Error %d: %s (cmp_string_append realloc failed)", rc,
-                    err_str);
-        }
-        if (rc != 0) {
-          return rc;
-        }
-        return rc;
-      }
+    if (str->data != NULL) {
       MEMCPY_S(new_data, new_capacity, str->data, str->length + 1);
-      CMP_FREE(str->data);
+      rc = CMP_FREE(str->data);
+      if (rc != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_string_append: CMP_FREE failed\n");
+        return rc;
+      }
     }
 
     str->data = new_data;
@@ -199,13 +113,7 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
   }
 
   STRCPY_S(str->data + str->length, str->capacity - str->length, append);
-
   str->length = new_len;
-
-  if (rc != 0) {
-
-    return rc;
-  }
 
   return rc;
 }
@@ -217,38 +125,24 @@ int cmp_string_append(cmp_string_t *str, const char *append) {
  * @return int Returns 0 on success, or an error code on failure.
  */
 int cmp_string_destroy(cmp_string_t *str) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   if (str == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    {
-      const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) {
-        err_str = "Unknown";
-      }
-
-      LOG_DEBUG("Error %d: %s (cmp_string_destroy)", rc, err_str);
-    }
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_string_destroy: str is NULL\n");
     return rc;
   }
 
   if (str->data != NULL) {
-    CMP_FREE(str->data);
+    rc = CMP_FREE(str->data);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_string_destroy: CMP_FREE failed\n");
+      return rc;
+    }
     str->data = NULL;
   }
 
   str->length = 0;
   str->capacity = 0;
-
-  if (rc != 0) {
-
-    return rc;
-  }
 
   return rc;
 }
@@ -264,14 +158,17 @@ int cmp_string_destroy(cmp_string_t *str) {
  * CMP_ERROR_NOT_FOUND when there are no more tokens.
  */
 int cmp_strtok_r(char *str, const char *delim, char **saveptr, char **out_tok) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
   char *end;
 #endif
+
   if (saveptr == NULL || out_tok == NULL || delim == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_strtok_r: null arguments provided\n");
+    return rc;
   }
+
 #if defined(_MSC_VER)
   *out_tok = strtok_s(str, delim, saveptr);
 #elif defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
@@ -280,13 +177,15 @@ int cmp_strtok_r(char *str, const char *delim, char **saveptr, char **out_tok) {
   }
   if (str == NULL) {
     *out_tok = NULL;
-    return CMP_ERROR_NOT_FOUND;
+    rc = CMP_ERROR_NOT_FOUND;
+    return rc;
   }
   str += strspn(str, delim);
   if (*str == '\0') {
     *saveptr = NULL;
     *out_tok = NULL;
-    return CMP_ERROR_NOT_FOUND;
+    rc = CMP_ERROR_NOT_FOUND;
+    return rc;
   }
   end = str + strcspn(str, delim);
   if (*end == '\0') {
@@ -299,17 +198,11 @@ int cmp_strtok_r(char *str, const char *delim, char **saveptr, char **out_tok) {
 #else
   *out_tok = strtok_r(str, delim, saveptr);
 #endif
+
   if (*out_tok == NULL) {
-    return CMP_ERROR_NOT_FOUND;
-  }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
+    rc = CMP_ERROR_NOT_FOUND;
     return rc;
   }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

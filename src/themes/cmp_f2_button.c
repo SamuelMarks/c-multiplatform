@@ -18,8 +18,7 @@
 static int cmp_f2_button_init_internal(cmp_ui_node_t **out_node,
                                        cmp_f2_button_type_t type,
                                        const char *label, cmp_ui_node_t *icon) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_f2_button_t *btn_data;
   int res;
 
@@ -77,15 +76,6 @@ static int cmp_f2_button_init_internal(cmp_ui_node_t **out_node,
   if (res != CMP_SUCCESS)
     LOG_DEBUG("cmp_f2_button_init_internal: cmp_f2_button_set_shape failed\n");
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 

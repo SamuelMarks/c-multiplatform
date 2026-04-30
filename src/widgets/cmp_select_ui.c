@@ -15,8 +15,7 @@ struct cmp_select_ui {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_select_ui_create(cmp_select_ui_t **out_select) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_select_ui *select_ui;
 
   if (!out_select)
@@ -29,15 +28,7 @@ int cmp_select_ui_create(cmp_select_ui_t **out_select) {
   memset(select_ui, 0, sizeof(struct cmp_select_ui));
 
   *out_select = (cmp_select_ui_t *)select_ui;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -48,22 +39,13 @@ int cmp_select_ui_create(cmp_select_ui_t **out_select) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_select_ui_destroy(cmp_select_ui_t *select) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_select_ui *internal_select = (struct cmp_select_ui *)select;
   if (!internal_select)
     return CMP_ERROR_INVALID_ARG;
 
   CMP_FREE(internal_select);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -74,8 +56,7 @@ int cmp_select_ui_destroy(cmp_select_ui_t *select) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_select_ui_open(cmp_select_ui_t *select) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_select_ui *internal_select = (struct cmp_select_ui *)select;
 
   if (!internal_select)
@@ -83,14 +64,5 @@ int cmp_select_ui_open(cmp_select_ui_t *select) {
 
   internal_select->is_open = 1;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

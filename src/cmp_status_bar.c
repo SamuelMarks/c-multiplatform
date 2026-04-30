@@ -24,7 +24,7 @@ struct cmp_status_bar {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_status_bar_create(cmp_status_bar_t **out_bar) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_status_bar_t *bar;
 
   rc = CMP_SUCCESS;
@@ -47,7 +47,7 @@ int cmp_status_bar_create(cmp_status_bar_t **out_bar) {
   bar->vram_used_mb = 0.0f;
 
   *out_bar = bar;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -57,7 +57,7 @@ int cmp_status_bar_create(cmp_status_bar_t **out_bar) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_status_bar_destroy(cmp_status_bar_t *bar) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -72,7 +72,7 @@ int cmp_status_bar_destroy(cmp_status_bar_t *bar) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -84,22 +84,24 @@ int cmp_status_bar_destroy(cmp_status_bar_t *bar) {
  */
 int cmp_status_bar_set_backend_status(cmp_status_bar_t *bar,
                                       const char *status) {
+  int rc = CMP_SUCCESS;
   if (bar == NULL || status == NULL) {
     LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
 #if defined(_MSC_VER)
-  if (strncpy_s(bar->backend_status, STATUS_TEXT_MAX, status, STATUS_TEXT_MAX - 1) != 0) {
-      LOG_DEBUG("strncpy_s failed\n");
-      return CMP_ERROR_GENERAL;
+  if (strncpy_s(bar->backend_status, STATUS_TEXT_MAX, status,
+                STATUS_TEXT_MAX - 1) != 0) {
+    LOG_DEBUG("strncpy_s failed\n");
+    return CMP_ERROR_GENERAL;
   }
 #else
   strncpy(bar->backend_status, status, STATUS_TEXT_MAX - 1);
   bar->backend_status[STATUS_TEXT_MAX - 1] = '\0';
 #endif
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -112,6 +114,7 @@ int cmp_status_bar_set_backend_status(cmp_status_bar_t *bar,
  */
 int cmp_status_bar_update_token_usage(cmp_status_bar_t *bar, int prompt_tokens,
                                       int completion_tokens) {
+  int rc = CMP_SUCCESS;
   if (bar == NULL) {
     LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -120,7 +123,7 @@ int cmp_status_bar_update_token_usage(cmp_status_bar_t *bar, int prompt_tokens,
   bar->prompt_tokens = prompt_tokens;
   bar->completion_tokens = completion_tokens;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -134,6 +137,7 @@ int cmp_status_bar_update_token_usage(cmp_status_bar_t *bar, int prompt_tokens,
 int cmp_status_bar_update_memory_metrics(cmp_status_bar_t *bar,
                                          float system_memory_mb,
                                          float vram_used_mb) {
+  int rc = CMP_SUCCESS;
   if (bar == NULL) {
     LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -142,5 +146,5 @@ int cmp_status_bar_update_memory_metrics(cmp_status_bar_t *bar,
   bar->system_memory_mb = system_memory_mb;
   bar->vram_used_mb = vram_used_mb;
 
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -19,39 +19,40 @@ struct cmp_mmap {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_mmap_open(cmp_mmap_t **out_mmap, const char *filepath) {
-  int rc;
-  cmp_mmap_t *m;
-
-  rc = CMP_SUCCESS;
-  m = NULL;
+  int rc = CMP_SUCCESS;
+  cmp_mmap_t *m = NULL;
+  int free_rc;
 
   if (out_mmap == NULL || filepath == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_mmap_open: Invalid argument\n");
-    return CMP_ERROR_INVALID_ARG;
+    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_mmap_t), (void **)&m);
-  if (rc != CMP_SUCCESS) {
+  if (rc != CMP_SUCCESS || m == NULL) {
+    rc = CMP_ERROR_OOM;
     LOG_DEBUG("Error in cmp_mmap_open: CMP_MALLOC failed (OOM)\n");
-    return CMP_ERROR_OOM;
+    return rc;
   }
 
   m->size = 1024;
   rc = CMP_MALLOC(1024, (void **)&m->dummy_data);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_mmap_open: CMP_MALLOC failed for data (OOM)\n");
-    rc = CMP_FREE(m);
-    if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(m);
+    if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_mmap_open: CMP_FREE failed during cleanup\n");
     }
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    return rc;
   }
 
   /* Mock filling the mapped file with a recognizable byte */
   memset(m->dummy_data, 42, 1024);
 
   *out_mmap = m;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -61,18 +62,18 @@ int cmp_mmap_open(cmp_mmap_t **out_mmap, const char *filepath) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_mmap_close(cmp_mmap_t *mmap) {
-  int rc;
-
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
+  int free_rc;
 
   if (mmap == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_mmap_close: Invalid argument\n");
-    return CMP_ERROR_INVALID_ARG;
+    return rc;
   }
 
   if (mmap->dummy_data != NULL) {
-    rc = CMP_FREE(mmap->dummy_data);
-    if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(mmap->dummy_data);
+    if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_mmap_close: CMP_FREE failed for dummy_data\n");
     }
   }
@@ -83,7 +84,7 @@ int cmp_mmap_close(cmp_mmap_t *mmap) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -95,14 +96,15 @@ int cmp_mmap_close(cmp_mmap_t *mmap) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_mmap_get_data(cmp_mmap_t *mmap, void **out_data, size_t *out_size) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
+
   if (mmap == NULL || out_data == NULL || out_size == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_mmap_get_data: Invalid argument\n");
-    return CMP_ERROR_INVALID_ARG;
+    return rc;
   }
 
   *out_data = mmap->dummy_data;
   *out_size = mmap->size;
-  return CMP_SUCCESS;
+  return rc;
 }

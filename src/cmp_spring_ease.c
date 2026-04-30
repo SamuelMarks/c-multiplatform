@@ -28,12 +28,13 @@ struct cmp_spring_ease {
 int cmp_spring_ease_create(float mass, float stiffness, float damping,
                            float initial_velocity,
                            cmp_spring_ease_t **out_spring) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_spring_ease *spring;
 
   rc = CMP_SUCCESS;
 
-  if (out_spring == NULL || mass <= 0.0f || stiffness <= 0.0f || damping < 0.0f) {
+  if (out_spring == NULL || mass <= 0.0f || stiffness <= 0.0f ||
+      damping < 0.0f) {
     LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
@@ -50,7 +51,7 @@ int cmp_spring_ease_create(float mass, float stiffness, float damping,
   spring->initial_velocity = initial_velocity;
 
   *out_spring = (cmp_spring_ease_t *)spring;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -60,7 +61,7 @@ int cmp_spring_ease_create(float mass, float stiffness, float damping,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_spring_ease_destroy(cmp_spring_ease_t *spring) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_spring_ease *internal_spring;
 
   rc = CMP_SUCCESS;
@@ -77,7 +78,7 @@ int cmp_spring_ease_destroy(cmp_spring_ease_t *spring) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -90,6 +91,7 @@ int cmp_spring_ease_destroy(cmp_spring_ease_t *spring) {
  */
 int cmp_spring_ease_evaluate(cmp_spring_ease_t *spring, double t,
                              float *out_value) {
+  int rc = CMP_SUCCESS;
   struct cmp_spring_ease *s;
   float w0;
   float zeta;
@@ -112,7 +114,8 @@ int cmp_spring_ease_evaluate(cmp_spring_ease_t *spring, double t,
     float A = 1.0f;
     float B = (zeta * w0 + s->initial_velocity) / wd;
     envelope = (float)exp((double)(-zeta * w0 * (float)t)) *
-               (A * (float)cos((double)(wd * (float)t)) + B * (float)sin((double)(wd * (float)t)));
+               (A * (float)cos((double)(wd * (float)t)) +
+                B * (float)sin((double)(wd * (float)t)));
   } else {
     /* Critically or over-damped approximation */
     float A = 1.0f;
@@ -121,6 +124,6 @@ int cmp_spring_ease_evaluate(cmp_spring_ease_t *spring, double t,
   }
 
   *out_value = 1.0f - envelope;
-  
-  return CMP_SUCCESS;
+
+  return rc;
 }

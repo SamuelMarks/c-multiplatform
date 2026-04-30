@@ -14,7 +14,7 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_shader_init_rounded_rect(cmp_shader_t *shader) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -32,7 +32,7 @@ int cmp_shader_init_rounded_rect(cmp_shader_t *shader) {
 
   *((int *)shader->internal_handle) = 1; /* Type 1: Rounded Rect */
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -42,7 +42,7 @@ int cmp_shader_init_rounded_rect(cmp_shader_t *shader) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_shader_init_gradient(cmp_shader_t *shader) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -59,7 +59,7 @@ int cmp_shader_init_gradient(cmp_shader_t *shader) {
 
   *((int *)shader->internal_handle) = 2; /* Type 2: Gradient */
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -69,7 +69,7 @@ int cmp_shader_init_gradient(cmp_shader_t *shader) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_shader_init_sdf_text(cmp_shader_t *shader) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -86,7 +86,7 @@ int cmp_shader_init_sdf_text(cmp_shader_t *shader) {
 
   *((int *)shader->internal_handle) = 3; /* Type 3: SDF Text */
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -96,7 +96,7 @@ int cmp_shader_init_sdf_text(cmp_shader_t *shader) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_shader_destroy(cmp_shader_t *shader) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -114,7 +114,7 @@ int cmp_shader_destroy(cmp_shader_t *shader) {
     shader->internal_handle = NULL;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -124,6 +124,7 @@ int cmp_shader_destroy(cmp_shader_t *shader) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_shader_get_rounded_rect_sdf_glsl(const char **out_source) {
+  int rc = CMP_SUCCESS;
   if (out_source == NULL) {
     LOG_DEBUG("Invalid argument: out_source is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -133,7 +134,7 @@ int cmp_shader_get_rounded_rect_sdf_glsl(const char **out_source) {
       "void main() { float d = length(max(abs(pos) - size + radius, 0.0)) - "
       "radius; gl_FragColor = vec4(1.0, 1.0, 1.0, step(d, 0.0)); }";
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -143,6 +144,7 @@ int cmp_shader_get_rounded_rect_sdf_glsl(const char **out_source) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_shader_get_squircle_sdf_glsl(const char **out_source) {
+  int rc = CMP_SUCCESS;
   if (out_source == NULL) {
     LOG_DEBUG("Invalid argument: out_source is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -152,5 +154,5 @@ int cmp_shader_get_squircle_sdf_glsl(const char **out_source) {
       "void main() { float d = pow(abs(pos.x), 3.0) + pow(abs(pos.y), 3.0) - "
       "pow(radius, 3.0); gl_FragColor = vec4(1.0, 1.0, 1.0, step(d, 0.0)); }";
 
-  return CMP_SUCCESS;
+  return rc;
 }

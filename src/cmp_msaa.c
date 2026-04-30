@@ -23,7 +23,7 @@ struct cmp_msaa {
  */
 int cmp_msaa_create(uint8_t sample_count, uint32_t width, uint32_t height,
                     cmp_msaa_t **out_msaa) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_msaa_t *msaa;
 
   rc = CMP_SUCCESS;
@@ -67,7 +67,7 @@ int cmp_msaa_create(uint8_t sample_count, uint32_t width, uint32_t height,
   memset(msaa->internal_renderbuffer, 0, width * height * 4 * sample_count);
 
   *out_msaa = msaa;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -77,7 +77,7 @@ int cmp_msaa_create(uint8_t sample_count, uint32_t width, uint32_t height,
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_msaa_destroy(cmp_msaa_t *msaa) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -100,7 +100,7 @@ int cmp_msaa_destroy(cmp_msaa_t *msaa) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -111,8 +111,7 @@ int cmp_msaa_destroy(cmp_msaa_t *msaa) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_msaa_resolve(cmp_msaa_t *msaa, cmp_texture_t *target_texture) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   if (rc != CMP_SUCCESS) {
     return rc;
   }
@@ -141,5 +140,5 @@ int cmp_msaa_resolve(cmp_msaa_t *msaa, cmp_texture_t *target_texture) {
      * for the abstraction. */
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -19,7 +19,7 @@ struct cmp_scroll_anchor {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_anchor_create(cmp_scroll_anchor_t **out_anchor) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_anchor *anchor;
 
   rc = CMP_SUCCESS;
@@ -38,7 +38,7 @@ int cmp_scroll_anchor_create(cmp_scroll_anchor_t **out_anchor) {
   memset(anchor, 0, sizeof(struct cmp_scroll_anchor));
 
   *out_anchor = (cmp_scroll_anchor_t *)anchor;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -48,7 +48,7 @@ int cmp_scroll_anchor_create(cmp_scroll_anchor_t **out_anchor) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_anchor_destroy(cmp_scroll_anchor_t *anchor) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_anchor *internal_anchor;
 
   rc = CMP_SUCCESS;
@@ -65,7 +65,7 @@ int cmp_scroll_anchor_destroy(cmp_scroll_anchor_t *anchor) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -78,6 +78,7 @@ int cmp_scroll_anchor_destroy(cmp_scroll_anchor_t *anchor) {
  */
 int cmp_scroll_anchor_save(cmp_scroll_anchor_t *anchor, unsigned int element_id,
                            float visual_offset_y) {
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_anchor *internal_anchor;
 
   internal_anchor = (struct cmp_scroll_anchor *)anchor;
@@ -90,7 +91,7 @@ int cmp_scroll_anchor_save(cmp_scroll_anchor_t *anchor, unsigned int element_id,
   internal_anchor->active_element_id = element_id;
   internal_anchor->saved_visual_offset_y = visual_offset_y;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -106,6 +107,7 @@ int cmp_scroll_anchor_restore(const cmp_scroll_anchor_t *anchor,
                               unsigned int element_id,
                               float new_visual_offset_y,
                               float *out_scroll_delta_y) {
+  int rc = CMP_SUCCESS;
   const struct cmp_scroll_anchor *internal_anchor;
 
   internal_anchor = (const struct cmp_scroll_anchor *)anchor;
@@ -117,11 +119,11 @@ int cmp_scroll_anchor_restore(const cmp_scroll_anchor_t *anchor,
 
   if (internal_anchor->active_element_id != element_id) {
     *out_scroll_delta_y = 0.0f;
-    return CMP_SUCCESS; /* Element is not the active anchor, no delta */
+    return rc; /* Element is not the active anchor, no delta */
   }
 
   *out_scroll_delta_y =
       new_visual_offset_y - internal_anchor->saved_visual_offset_y;
 
-  return CMP_SUCCESS;
+  return rc;
 }

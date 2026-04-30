@@ -55,15 +55,12 @@ static int g_theme_is_dark = 0;
  * @return Returns CMP_SUCCESS on success.
  */
 int cmp_system_theme_init(void) {
-  int rc;
-  rc = 0;int is_dark = 0;
+int rc = CMP_SUCCESS;int is_dark = 0;
   cmp_system_theme_is_dark(&is_dark);
   g_theme_is_dark = is_dark;
   /* In a real implementation we would listen to WM_SETTINGCHANGE here. */
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+  
+  
   return rc;
 }
 
@@ -73,11 +70,8 @@ int cmp_system_theme_init(void) {
  * @return Returns CMP_SUCCESS on success.
  */
 int cmp_system_theme_shutdown(void) {
-  int rc;
-  rc = 0;if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+int rc = CMP_SUCCESS;
+  
   return rc;
 }
 
@@ -88,8 +82,7 @@ int cmp_system_theme_shutdown(void) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_system_theme_is_dark(int *out_is_dark) {
-  int rc;
-  rc = 0;HKEY hKey;
+int rc = CMP_SUCCESS;HKEY hKey;
   LONG res;
   DWORD value = 1; /* Default to Light */
   DWORD dataSize = sizeof(value);
@@ -110,10 +103,8 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
 
   /* AppsUseLightTheme = 0 means Dark, 1 means Light */
   *out_is_dark = (value == 0) ? 1 : 0;
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+  
+  
   return rc;
 }
 
@@ -124,8 +115,7 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
-  int rc;
-  rc = 0;HIGHCONTRASTA hc = { sizeof(HIGHCONTRASTA), 0, 0 };
+  int rc = CMP_SUCCESS;HIGHCONTRASTA hc = { sizeof(HIGHCONTRASTA), 0, 0 };
   if (!out_is_high_contrast) {
     LOG_DEBUG("cmp_system_theme_is_high_contrast: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -133,12 +123,13 @@ int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
 
   if (SystemParametersInfoA(SPI_GETHIGHCONTRAST, sizeof(HIGHCONTRASTA), &hc, 0)) {
     *out_is_high_contrast = (hc.dwFlags & HCF_HIGHCONTRASTON) ? 1 : 0;
-    return CMP_SUCCESS;
+    rc = CMP_SUCCESS;
+    return rc;
   }
 
   *out_is_high_contrast = 0;
   LOG_DEBUG("cmp_system_theme_is_high_contrast: SystemParametersInfoA failed\n");
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
+  if (rc != CMP_SUCCESS) { if (rc != CMP_SUCCESS) {   return rc; } return rc; }
   return CMP_ERROR_GENERAL;}
 #endif /* _WIN32 */
 /* clang-format on */

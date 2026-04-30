@@ -11,8 +11,7 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_m3_checkbox_resolve(cmp_m3_checkbox_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
   out_metrics->box_size = 18.0f;
@@ -20,15 +19,7 @@ int cmp_m3_checkbox_resolve(cmp_m3_checkbox_metrics_t *out_metrics) {
   out_metrics->border_thickness_unchecked = 2.0f;
   out_metrics->border_thickness_checked = 0.0f;  /* Usually filled */
   out_metrics->shape = CMP_M3_SHAPE_EXTRA_SMALL; /* 4dp */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -39,8 +30,7 @@ int cmp_m3_checkbox_resolve(cmp_m3_checkbox_metrics_t *out_metrics) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_m3_radio_resolve(cmp_m3_radio_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
   out_metrics->outer_ring_size = 20.0f;
@@ -48,15 +38,7 @@ int cmp_m3_radio_resolve(cmp_m3_radio_metrics_t *out_metrics) {
   out_metrics->touch_target_size = 48.0f;
   out_metrics->border_thickness = 2.0f;
   out_metrics->shape = CMP_M3_SHAPE_FULL; /* Circular */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -67,8 +49,7 @@ int cmp_m3_radio_resolve(cmp_m3_radio_metrics_t *out_metrics) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_m3_switch_resolve(cmp_m3_switch_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
   out_metrics->track_width = 52.0f;
@@ -79,15 +60,7 @@ int cmp_m3_switch_resolve(cmp_m3_switch_metrics_t *out_metrics) {
   out_metrics->thumb_selected_size = 24.0f;
   out_metrics->thumb_pressed_size = 28.0f;
   out_metrics->shape = CMP_M3_SHAPE_FULL; /* Pill */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -98,8 +71,7 @@ int cmp_m3_switch_resolve(cmp_m3_switch_metrics_t *out_metrics) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_m3_slider_resolve(cmp_m3_slider_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
   out_metrics->track_height_inactive = 4.0f;
@@ -108,14 +80,6 @@ int cmp_m3_slider_resolve(cmp_m3_slider_metrics_t *out_metrics) {
   out_metrics->handle_size = 20.0f;
   out_metrics->touch_target_size = 48.0f;
   out_metrics->shape = CMP_M3_SHAPE_FULL; /* Pill/Circular */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

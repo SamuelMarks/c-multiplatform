@@ -15,8 +15,7 @@ struct cmp_ptr {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ptr_create(cmp_ptr_t **out_ptr) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_ptr *ptr;
 
   if (!out_ptr)
@@ -30,7 +29,7 @@ int cmp_ptr_create(cmp_ptr_t **out_ptr) {
   ptr->state = CMP_PTR_STATE_IDLE;
 
   *out_ptr = (cmp_ptr_t *)ptr;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -40,8 +39,7 @@ int cmp_ptr_create(cmp_ptr_t **out_ptr) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ptr_destroy(cmp_ptr_t *ptr) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_ptr *internal_ptr = (struct cmp_ptr *)ptr;
 
   if (!internal_ptr)
@@ -51,7 +49,7 @@ int cmp_ptr_destroy(cmp_ptr_t *ptr) {
   if (rc != CMP_SUCCESS) {
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -66,8 +64,7 @@ int cmp_ptr_destroy(cmp_ptr_t *ptr) {
  */
 int cmp_ptr_update(cmp_ptr_t *ptr, float overscroll_y, float threshold_y,
                    cmp_ptr_state_t *out_state, float *out_progress) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_ptr *internal_ptr = (struct cmp_ptr *)ptr;
 
   if (!internal_ptr || !out_state || !out_progress)
@@ -76,14 +73,14 @@ int cmp_ptr_update(cmp_ptr_t *ptr, float overscroll_y, float threshold_y,
   if (internal_ptr->state == CMP_PTR_STATE_REFRESHING) {
     *out_state = CMP_PTR_STATE_REFRESHING;
     *out_progress = 1.0f;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (overscroll_y <= 0.0f) {
     internal_ptr->state = CMP_PTR_STATE_IDLE;
     *out_state = CMP_PTR_STATE_IDLE;
     *out_progress = 0.0f;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   *out_progress = overscroll_y / threshold_y;
@@ -98,7 +95,7 @@ int cmp_ptr_update(cmp_ptr_t *ptr, float overscroll_y, float threshold_y,
   }
 
   *out_state = internal_ptr->state;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -109,8 +106,7 @@ int cmp_ptr_update(cmp_ptr_t *ptr, float overscroll_y, float threshold_y,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ptr_set_refreshing(cmp_ptr_t *ptr, int is_refreshing) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_ptr *internal_ptr = (struct cmp_ptr *)ptr;
 
   if (!internal_ptr)
@@ -121,5 +117,5 @@ int cmp_ptr_set_refreshing(cmp_ptr_t *ptr, int is_refreshing) {
   } else {
     internal_ptr->state = CMP_PTR_STATE_IDLE;
   }
-  return CMP_SUCCESS;
+  return rc;
 }

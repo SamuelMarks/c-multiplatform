@@ -13,8 +13,7 @@
  */
 int cmp_m3_window_size_class_resolve(float width_dp,
                                      cmp_m3_window_size_class_t *out_class) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_class || width_dp < 0.0f) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -29,15 +28,6 @@ int cmp_m3_window_size_class_resolve(float width_dp,
     *out_class = CMP_M3_WINDOW_CLASS_LARGE;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -50,8 +40,7 @@ int cmp_m3_window_size_class_resolve(float width_dp,
  */
 int cmp_m3_window_layout_config_get(cmp_m3_window_size_class_t size_class,
                                     cmp_m3_window_layout_config_t *out_config) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_config) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -82,15 +71,6 @@ int cmp_m3_window_layout_config_get(cmp_m3_window_size_class_t size_class,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -106,20 +86,19 @@ int cmp_m3_window_layout_config_get(cmp_m3_window_size_class_t size_class,
 int cmp_m3_layout_pattern_resolve(cmp_m3_window_size_class_t size_class,
                                   int is_feed, int has_supporting_pane,
                                   cmp_m3_layout_pattern_t *out_pattern) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_pattern) {
     return CMP_ERROR_INVALID_ARG;
   }
 
   if (is_feed) {
     *out_pattern = CMP_M3_PATTERN_FEED;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (has_supporting_pane) {
     *out_pattern = CMP_M3_PATTERN_SUPPORTING_PANE;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   /* Default list detail logic */
@@ -130,15 +109,6 @@ int cmp_m3_layout_pattern_resolve(cmp_m3_window_size_class_t size_class,
     *out_pattern = CMP_M3_PATTERN_LIST_DETAIL_SIDE_BY_SIDE;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -154,22 +124,21 @@ int cmp_m3_layout_pattern_resolve(cmp_m3_window_size_class_t size_class,
 int cmp_m3_foldable_posture_resolve(int has_hinge, float hinge_angle_degrees,
                                     int is_vertical_hinge,
                                     cmp_m3_posture_t *out_posture) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_posture) {
     return CMP_ERROR_INVALID_ARG;
   }
 
   if (!has_hinge) {
     *out_posture = CMP_M3_POSTURE_FLAT;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   /* Fully open or closed doesn't create a special posture typically, assuming
    * 180 is flat */
   if (hinge_angle_degrees > 170.0f || hinge_angle_degrees < 10.0f) {
     *out_posture = CMP_M3_POSTURE_FLAT;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   /* Half-folded postures */
@@ -179,14 +148,5 @@ int cmp_m3_foldable_posture_resolve(int has_hinge, float hinge_angle_degrees,
     *out_posture = CMP_M3_POSTURE_TABLETOP;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

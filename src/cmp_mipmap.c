@@ -16,7 +16,7 @@ struct cmp_mipmap_generator {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_mipmap_generator_create(cmp_mipmap_generator_t **out_gen) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_mipmap_generator *gen;
 
   rc = CMP_SUCCESS;
@@ -36,7 +36,7 @@ int cmp_mipmap_generator_create(cmp_mipmap_generator_t **out_gen) {
 
   gen->max_levels = 8;
   *out_gen = (cmp_mipmap_generator_t *)gen;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -46,7 +46,7 @@ int cmp_mipmap_generator_create(cmp_mipmap_generator_t **out_gen) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_mipmap_generator_destroy(cmp_mipmap_generator_t *gen) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -60,7 +60,7 @@ int cmp_mipmap_generator_destroy(cmp_mipmap_generator_t *gen) {
     LOG_DEBUG("Error in cmp_mipmap_generator_destroy: CMP_FREE failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -78,8 +78,7 @@ int cmp_mipmap_generator_generate(cmp_mipmap_generator_t *gen,
                                   const void *image_data, size_t width,
                                   size_t height, void **out_mipmaps,
                                   size_t *out_levels) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   size_t levels;
   size_t cur_w;
   size_t cur_h;
@@ -109,5 +108,5 @@ int cmp_mipmap_generator_generate(cmp_mipmap_generator_t *gen,
   if (levels > 0 && out_mipmaps != NULL) {
     out_mipmaps[0] = NULL; /* Simulate mipmap pointers */
   }
-  return CMP_SUCCESS;
+  return rc;
 }

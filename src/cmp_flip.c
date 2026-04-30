@@ -17,8 +17,7 @@ struct cmp_flip {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_flip_create(cmp_flip_t **out_flip) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_flip *flip = NULL;
@@ -31,9 +30,7 @@ int cmp_flip_create(cmp_flip_t **out_flip) {
     }
     cmp_log_debug("cmp_flip_create: Invalid argument (out_flip=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -44,9 +41,7 @@ int cmp_flip_create(cmp_flip_t **out_flip) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_flip_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -54,7 +49,7 @@ int cmp_flip_create(cmp_flip_t **out_flip) {
 
   *out_flip = (cmp_flip_t *)flip;
   cmp_log_debug("cmp_flip_create: Successfully created FLIP context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -64,8 +59,7 @@ int cmp_flip_create(cmp_flip_t **out_flip) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_flip_destroy(cmp_flip_t *flip) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_flip *internal_flip = (struct cmp_flip *)flip;
@@ -78,9 +72,7 @@ int cmp_flip_destroy(cmp_flip_t *flip) {
     }
     cmp_log_debug("cmp_flip_destroy: Invalid argument (flip=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -90,7 +82,7 @@ int cmp_flip_destroy(cmp_flip_t *flip) {
   }
 
   cmp_log_debug("cmp_flip_destroy: Successfully destroyed FLIP context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -101,8 +93,7 @@ int cmp_flip_destroy(cmp_flip_t *flip) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_flip_first(cmp_flip_t *flip, const cmp_rect_t *initial_bounds) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_flip *internal_flip = (struct cmp_flip *)flip;
@@ -114,9 +105,7 @@ int cmp_flip_first(cmp_flip_t *flip, const cmp_rect_t *initial_bounds) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_flip_first: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -124,15 +113,7 @@ int cmp_flip_first(cmp_flip_t *flip, const cmp_rect_t *initial_bounds) {
   internal_flip->has_first = 1;
 
   cmp_log_debug("cmp_flip_first: Cached initial rect\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -150,8 +131,7 @@ int cmp_flip_first(cmp_flip_t *flip, const cmp_rect_t *initial_bounds) {
 int cmp_flip_last_and_invert(cmp_flip_t *flip, const cmp_rect_t *final_bounds,
                              float *out_translate_x, float *out_translate_y,
                              float *out_scale_x, float *out_scale_y) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_flip *internal_flip = (struct cmp_flip *)flip;
@@ -165,9 +145,7 @@ int cmp_flip_last_and_invert(cmp_flip_t *flip, const cmp_rect_t *final_bounds,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_flip_last_and_invert: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -179,9 +157,7 @@ int cmp_flip_last_and_invert(cmp_flip_t *flip, const cmp_rect_t *final_bounds,
     }
     cmp_log_debug("cmp_flip_last_and_invert: First bounds not set: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -202,14 +178,6 @@ int cmp_flip_last_and_invert(cmp_flip_t *flip, const cmp_rect_t *final_bounds,
   }
 
   cmp_log_debug("cmp_flip_last_and_invert: Computed delta inversions\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

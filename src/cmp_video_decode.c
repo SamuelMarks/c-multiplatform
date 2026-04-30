@@ -15,8 +15,7 @@ struct cmp_hw_video_decoder {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hw_video_decoder_create(cmp_hw_video_decoder_t **out_decoder) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_hw_video_decoder *decoder;
   if (!out_decoder)
     return CMP_ERROR_INVALID_ARG;
@@ -25,15 +24,7 @@ int cmp_hw_video_decoder_create(cmp_hw_video_decoder_t **out_decoder) {
     return CMP_ERROR_OOM;
   decoder->active = 1;
   *out_decoder = (cmp_hw_video_decoder_t *)decoder;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -44,20 +35,11 @@ int cmp_hw_video_decoder_create(cmp_hw_video_decoder_t **out_decoder) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hw_video_decoder_destroy(cmp_hw_video_decoder_t *decoder) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!decoder)
     return CMP_ERROR_INVALID_ARG;
   CMP_FREE(decoder);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -73,19 +55,10 @@ int cmp_hw_video_decoder_destroy(cmp_hw_video_decoder_t *decoder) {
 int cmp_hw_video_decoder_decode_frame(cmp_hw_video_decoder_t *decoder,
                                       const void *data, size_t size,
                                       void *out_nv12_buffer) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!decoder || !data || !size || !out_nv12_buffer)
     return CMP_ERROR_INVALID_ARG;
   memset(out_nv12_buffer, 0, size);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

@@ -22,8 +22,7 @@ struct cmp_hover_intent {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
-  int rc;
-  rc = 0; /* CMP_SUCCESS */
+  int rc = CMP_SUCCESS; /* CMP_SUCCESS */
   struct cmp_hover_intent *ctx = NULL;
 
   if (out_intent == NULL) {
@@ -33,11 +32,9 @@ int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_hover_intent), (void **)&ctx);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_hover_intent_create: Out of memory\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   if (ctx == NULL) {
@@ -50,7 +47,7 @@ int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
   ctx->is_tracking = 0;
 
   *out_intent = (cmp_hover_intent_t *)ctx;
-  return 0;
+  return rc;
 }
 
 /**
@@ -60,8 +57,7 @@ int cmp_hover_intent_create(cmp_hover_intent_t **out_intent) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hover_intent_destroy(cmp_hover_intent_t *intent) {
-  int rc;
-  rc = 0; /* CMP_SUCCESS */
+  int rc = CMP_SUCCESS; /* CMP_SUCCESS */
   struct cmp_hover_intent *ctx = (struct cmp_hover_intent *)intent;
 
   if (ctx == NULL) {
@@ -70,12 +66,10 @@ int cmp_hover_intent_destroy(cmp_hover_intent_t *intent) {
   }
 
   rc = CMP_FREE(ctx);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_hover_intent_destroy: CMP_FREE failed\n");
   }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -92,8 +86,7 @@ int cmp_hover_intent_destroy(cmp_hover_intent_t *intent) {
 int cmp_hover_intent_process(cmp_hover_intent_t *intent,
                              const cmp_event_t *event, float dt_ms,
                              int *out_confirmed) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_hover_intent *ctx = (struct cmp_hover_intent *)intent;
   float dx;
   float dy;
@@ -110,7 +103,7 @@ int cmp_hover_intent_process(cmp_hover_intent_t *intent,
     /* Click or touch clears intent */
     ctx->is_tracking = 0;
     ctx->time_spent_in_bounds = 0.0f;
-    return 0;
+    return rc;
   }
 
   if (event->action == CMP_ACTION_MOVE) {
@@ -119,7 +112,7 @@ int cmp_hover_intent_process(cmp_hover_intent_t *intent,
       ctx->last_x = (float)event->x;
       ctx->last_y = (float)event->y;
       ctx->time_spent_in_bounds = 0.0f;
-      return 0;
+      return rc;
     }
 
     dx = (float)event->x - ctx->last_x;
@@ -131,12 +124,12 @@ int cmp_hover_intent_process(cmp_hover_intent_t *intent,
       ctx->last_x = (float)event->x;
       ctx->last_y = (float)event->y;
       ctx->time_spent_in_bounds = 0.0f;
-      return 0;
+      return rc;
     }
   }
 
   if (!ctx->is_tracking) {
-    return 0;
+    return rc;
   }
 
   /* Target is steady inside tolerance radius, accumulate time */
@@ -147,14 +140,5 @@ int cmp_hover_intent_process(cmp_hover_intent_t *intent,
     *out_confirmed = 1;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

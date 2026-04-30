@@ -15,8 +15,7 @@ struct cmp_range_slider {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_range_slider_create(cmp_range_slider_t **out_slider) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_range_slider *slider;
 
   if (!out_slider)
@@ -29,15 +28,7 @@ int cmp_range_slider_create(cmp_range_slider_t **out_slider) {
   memset(slider, 0, sizeof(struct cmp_range_slider));
 
   *out_slider = (cmp_range_slider_t *)slider;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -48,22 +39,13 @@ int cmp_range_slider_create(cmp_range_slider_t **out_slider) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_range_slider_destroy(cmp_range_slider_t *slider) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_range_slider *internal_slider = (struct cmp_range_slider *)slider;
   if (!internal_slider)
     return CMP_ERROR_INVALID_ARG;
 
   CMP_FREE(internal_slider);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -77,8 +59,7 @@ int cmp_range_slider_destroy(cmp_range_slider_t *slider) {
  */
 int cmp_range_slider_set_value(cmp_range_slider_t *slider, int thumb_index,
                                float value) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_range_slider *internal_slider = (struct cmp_range_slider *)slider;
 
   if (!internal_slider || thumb_index < 0 || thumb_index >= 2)
@@ -86,14 +67,5 @@ int cmp_range_slider_set_value(cmp_range_slider_t *slider, int thumb_index,
 
   internal_slider->values[thumb_index] = value;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

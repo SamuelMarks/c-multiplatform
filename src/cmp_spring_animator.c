@@ -34,7 +34,7 @@ struct cmp_spring_animator {
 int cmp_spring_animator_create(float mass, float stiffness, float damping,
                                float initial_velocity,
                                cmp_spring_animator_t **out_animator) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_spring_animator *anim;
 
   rc = CMP_SUCCESS;
@@ -63,7 +63,7 @@ int cmp_spring_animator_create(float mass, float stiffness, float damping,
   anim->scrub_fraction = 0.0f;
 
   *out_animator = (cmp_spring_animator_t *)anim;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -73,7 +73,7 @@ int cmp_spring_animator_create(float mass, float stiffness, float damping,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_spring_animator_destroy(cmp_spring_animator_t *animator) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_spring_animator *anim;
 
   rc = CMP_SUCCESS;
@@ -90,7 +90,7 @@ int cmp_spring_animator_destroy(cmp_spring_animator_t *animator) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -102,6 +102,7 @@ int cmp_spring_animator_destroy(cmp_spring_animator_t *animator) {
  */
 int cmp_spring_animator_interrupt(cmp_spring_animator_t *animator,
                                   float new_target_value) {
+  int rc = CMP_SUCCESS;
   struct cmp_spring_animator *anim;
 
   anim = (struct cmp_spring_animator *)animator;
@@ -116,7 +117,7 @@ int cmp_spring_animator_interrupt(cmp_spring_animator_t *animator,
   anim->target_value = new_target_value;
   anim->is_scrubbing = 0;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -128,6 +129,7 @@ int cmp_spring_animator_interrupt(cmp_spring_animator_t *animator,
  */
 int cmp_spring_animator_scrub(cmp_spring_animator_t *animator,
                               float fraction_complete) {
+  int rc = CMP_SUCCESS;
   struct cmp_spring_animator *anim;
 
   anim = (struct cmp_spring_animator *)animator;
@@ -149,7 +151,7 @@ int cmp_spring_animator_scrub(cmp_spring_animator_t *animator,
 
   /* In scrub mode, velocity is artificially clamped or tracked separately,
      but for this equivalency we just freeze the time step evaluation. */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -164,6 +166,7 @@ int cmp_spring_animator_scrub(cmp_spring_animator_t *animator,
 int cmp_spring_animator_evaluate(cmp_spring_animator_t *animator,
                                  float dt_seconds, float *out_current_value,
                                  int *out_is_settled) {
+  int rc = CMP_SUCCESS;
   struct cmp_spring_animator *anim;
   float displacement, spring_force, damping_force, acceleration;
 
@@ -180,7 +183,7 @@ int cmp_spring_animator_evaluate(cmp_spring_animator_t *animator,
     anim->current_value = anim->scrub_fraction * anim->target_value;
     *out_current_value = anim->current_value;
     *out_is_settled = 0;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   /* Hooke's Law: F = -k*x - c*v */
@@ -205,7 +208,7 @@ int cmp_spring_animator_evaluate(cmp_spring_animator_t *animator,
     *out_is_settled = 0;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -222,6 +225,7 @@ int cmp_spring_calculate_gesture_velocity(float delta_x, float delta_y,
                                           float dt_seconds,
                                           float *out_velocity_x,
                                           float *out_velocity_y) {
+  int rc = CMP_SUCCESS;
   if (out_velocity_x == NULL || out_velocity_y == NULL || dt_seconds <= 0.0f) {
     LOG_DEBUG("Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -230,5 +234,5 @@ int cmp_spring_calculate_gesture_velocity(float delta_x, float delta_y,
   *out_velocity_x = delta_x / dt_seconds;
   *out_velocity_y = delta_y / dt_seconds;
 
-  return CMP_SUCCESS;
+  return rc;
 }

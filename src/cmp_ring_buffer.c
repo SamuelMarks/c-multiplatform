@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,23 +18,28 @@ long _InterlockedCompareExchange(long volatile *Destination, long Exchange, long
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_init(cmp_ring_buffer_t *rb, size_t capacity) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
+
   if (rb == NULL || capacity == 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ring_buffer_init: invalid argument\n");
+    return rc;
   }
 
   rc = CMP_MALLOC(capacity * sizeof(void *), (void **)&rb->buffer);
   if (rc != CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_ring_buffer_init: CMP_MALLOC failed\n");
+    return rc;
   }
   memset(rb->buffer, 0, capacity * sizeof(void *));
 
   rb->capacity = capacity;
   rb->head = 0;
   rb->tail = 0;
-  return CMP_SUCCESS;
+  return rc;
 }
+
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
 /**
  * @brief cmp_ring_buffer_push
@@ -43,17 +49,31 @@ int cmp_ring_buffer_init(cmp_ring_buffer_t *rb, size_t capacity) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
-  int rc;
-  rc = 0;
-  size_t current_tail = rb->tail;
-  size_t current_head = rb->head;
-  size_t next_head = (current_head + 1) % rb->capacity;
-  if (next_head == current_tail) {
-    return CMP_ERROR_BOUNDS;
+  int rc = CMP_SUCCESS;
+  size_t current_tail;
+  size_t current_head;
+  size_t next_head;
+
+  if (rb == NULL || item == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ring_buffer_push: invalid argument\n");
+    return rc;
   }
+
+  current_tail = rb->tail;
+  current_head = rb->head;
+  next_head = (current_head + 1) % rb->capacity;
+
+  if (next_head == current_tail) {
+    rc = CMP_ERROR_BOUNDS;
+    LOG_DEBUG("cmp_ring_buffer_push: buffer full\n");
+    return rc;
+  }
+
   rb->buffer[current_head] = item;
   rb->head = next_head;
-  return CMP_SUCCESS;
+
+  return rc;
 }
 #else
 /**
@@ -64,14 +84,15 @@ int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   size_t current_tail;
   size_t next_tail;
   size_t current_head;
 
   if (rb == NULL || item == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ring_buffer_push: invalid argument\n");
+    return rc;
   }
 
   do {
@@ -86,7 +107,9 @@ int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
 
     if (next_tail == current_head) {
       /* Buffer is full */
-      return CMP_ERROR_BOUNDS;
+      rc = CMP_ERROR_BOUNDS;
+      LOG_DEBUG("cmp_ring_buffer_push: buffer full\n");
+      return rc;
     }
 
     /* Set the item BEFORE publishing the tail update */
@@ -103,7 +126,8 @@ int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
     }
 #endif
   } while (1);
-  return CMP_SUCCESS;
+
+  return rc;
 }
 #endif
 
@@ -116,16 +140,29 @@ int cmp_ring_buffer_push(cmp_ring_buffer_t *rb, void *item) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
-  int rc;
-  rc = 0;
-  size_t current_tail = rb->tail;
-  size_t current_head = rb->head;
-  if (current_head == current_tail) {
-    return CMP_ERROR_NOT_FOUND;
+  int rc = CMP_SUCCESS;
+  size_t current_tail;
+  size_t current_head;
+
+  if (rb == NULL || out_item == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ring_buffer_pop: invalid argument\n");
+    return rc;
   }
+
+  current_tail = rb->tail;
+  current_head = rb->head;
+
+  if (current_head == current_tail) {
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("cmp_ring_buffer_pop: buffer empty\n");
+    return rc;
+  }
+
   *out_item = rb->buffer[current_tail];
   rb->tail = (current_tail + 1) % rb->capacity;
-  return CMP_SUCCESS;
+
+  return rc;
 }
 #else
 /**
@@ -136,15 +173,16 @@ int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   size_t current_head;
   size_t next_head;
   size_t current_tail;
   void *item;
 
   if (rb == NULL || out_item == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ring_buffer_pop: invalid argument\n");
+    return rc;
   }
 
   do {
@@ -158,7 +196,9 @@ int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
 
     if (current_head == current_tail) {
       /* Buffer is empty */
-      return CMP_ERROR_NOT_FOUND;
+      rc = CMP_ERROR_NOT_FOUND;
+      LOG_DEBUG("cmp_ring_buffer_pop: buffer empty\n");
+      return rc;
     }
 
     next_head = (current_head + 1) % rb->capacity;
@@ -179,7 +219,7 @@ int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
   } while (1);
 
   *out_item = item;
-  return CMP_SUCCESS;
+  return rc;
 }
 #endif
 
@@ -190,15 +230,18 @@ int cmp_ring_buffer_pop(cmp_ring_buffer_t *rb, void **out_item) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ring_buffer_destroy(cmp_ring_buffer_t *rb) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
+
   if (rb == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_ring_buffer_destroy: invalid argument\n");
+    return rc;
   }
 
   if (rb->buffer != NULL) {
     rc = CMP_FREE(rb->buffer);
     if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ring_buffer_destroy: CMP_FREE failed\n");
       return rc;
     }
     rb->buffer = NULL;
@@ -207,5 +250,5 @@ int cmp_ring_buffer_destroy(cmp_ring_buffer_t *rb) {
   rb->capacity = 0;
   rb->head = 0;
   rb->tail = 0;
-  return CMP_SUCCESS;
+  return rc;
 }

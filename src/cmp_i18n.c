@@ -24,40 +24,22 @@ struct cmp_i18n {
 static cmp_text_direction_t g_bidi_dir = CMP_TEXT_DIR_LTR;
 
 int cmp_i18n_init(void) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   LOG_DEBUG("cmp_i18n_init called\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
 int cmp_i18n_shutdown(void) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   LOG_DEBUG("cmp_i18n_shutdown called\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
 int cmp_i18n_detect_os_locale(cmp_string_t *out_locale) {
   char *data = NULL;
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!out_locale) {
     LOG_DEBUG("cmp_i18n_detect_os_locale: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -73,32 +55,23 @@ int cmp_i18n_detect_os_locale(cmp_string_t *out_locale) {
   out_locale->data = data;
   out_locale->length = 2;
   out_locale->capacity = 3;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_i18n_load_catalog(const char *virtual_path, const char *locale) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!virtual_path || !locale) {
     LOG_DEBUG("cmp_i18n_load_catalog: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
 int cmp_i18n_translate(const char *key, cmp_string_t *out_translated) {
   size_t len;
   char *data = NULL;
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!key || !out_translated) {
     LOG_DEBUG("cmp_i18n_translate: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -115,14 +88,14 @@ int cmp_i18n_translate(const char *key, cmp_string_t *out_translated) {
   out_translated->data = data;
   out_translated->length = len;
   out_translated->capacity = len + 1;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_i18n_translate_plural(const char *key, int count,
                               cmp_string_t *out_translated) {
   size_t len;
   char *data = NULL;
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!key || !out_translated) {
     LOG_DEBUG("cmp_i18n_translate_plural: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -142,24 +115,17 @@ int cmp_i18n_translate_plural(const char *key, int count,
   out_translated->data = data;
   out_translated->length = len;
   out_translated->capacity = len + 1;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_i18n_format(const char *format_str, cmp_string_t *out_str, ...) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   va_list args;
   char buffer[1024];
   size_t len;
   char *data = NULL;
   int written = 0;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
   if (!format_str || !out_str) {
     LOG_DEBUG("cmp_i18n_format: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -214,60 +180,37 @@ int cmp_i18n_format(const char *format_str, cmp_string_t *out_str, ...) {
   out_str->length = len;
   out_str->capacity = len + 1;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_i18n_set_bidi_direction(cmp_text_direction_t dir) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   g_bidi_dir = dir;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
 int cmp_i18n_get_bidi_direction(void) {
-  int rc;
-  rc = 0;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return g_bidi_dir;
+  int rc = CMP_SUCCESS;
+
+  rc = g_bidi_dir;
+  return rc;
 }
 
 int cmp_i18n_is_rtl(int *out_is_rtl) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_is_rtl) {
     LOG_DEBUG("cmp_i18n_is_rtl: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_is_rtl = (g_bidi_dir == CMP_TEXT_DIR_RTL) ? 1 : 0;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
 int cmp_i18n_create(cmp_i18n_t **out_i18n) {
   cmp_i18n_t *i18n = NULL;
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!out_i18n) {
     LOG_DEBUG("cmp_i18n_create: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -277,33 +220,23 @@ int cmp_i18n_create(cmp_i18n_t **out_i18n) {
     return CMP_ERROR_OOM;
   memset(i18n, 0, sizeof(cmp_i18n_t));
   *out_i18n = i18n;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_i18n_destroy(cmp_i18n_t *i18n) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!i18n) {
     LOG_DEBUG("cmp_i18n_destroy: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
   CMP_FREE(i18n);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
 int cmp_i18n_add_string(cmp_i18n_t *i18n, const char *locale, const char *key,
                         const char *value) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_i18n_string_t *entry;
   if (!i18n || !locale || !key || !value) {
     LOG_DEBUG("cmp_i18n_add_string: invalid argument\n");
@@ -326,15 +259,7 @@ int cmp_i18n_add_string(cmp_i18n_t *i18n, const char *locale, const char *key,
   strncpy(entry->value, value, sizeof(entry->value) - 1);
   entry->value[sizeof(entry->value) - 1] = '\0';
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -343,7 +268,7 @@ int cmp_i18n_get_string(const cmp_i18n_t *i18n, const char *locale,
   int i;
   size_t len;
   char *val = NULL;
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!i18n || !locale || !key || !out_value) {
     LOG_DEBUG("cmp_i18n_get_string: invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -361,9 +286,10 @@ int cmp_i18n_get_string(const cmp_i18n_t *i18n, const char *locale,
       strcpy(val, entry->value);
 #endif
       *out_value = val;
-      return CMP_SUCCESS;
+      return rc;
     }
   }
   LOG_DEBUG("cmp_i18n_get_string: not found\n");
-  return CMP_ERROR_NOT_FOUND;
+  rc = CMP_ERROR_NOT_FOUND;
+  return rc;
 }

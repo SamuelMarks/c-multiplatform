@@ -18,7 +18,7 @@ struct cmp_native_dialog {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_native_dialog_create(cmp_native_dialog_t **out_dialog) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_native_dialog_t *dialog;
 
   rc = CMP_SUCCESS;
@@ -37,7 +37,7 @@ int cmp_native_dialog_create(cmp_native_dialog_t **out_dialog) {
 
   memset(dialog, 0, sizeof(cmp_native_dialog_t));
   *out_dialog = dialog;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -47,7 +47,7 @@ int cmp_native_dialog_create(cmp_native_dialog_t **out_dialog) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_native_dialog_destroy(cmp_native_dialog_t *dialog) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -71,7 +71,7 @@ int cmp_native_dialog_destroy(cmp_native_dialog_t *dialog) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -83,8 +83,7 @@ int cmp_native_dialog_destroy(cmp_native_dialog_t *dialog) {
  */
 int cmp_native_dialog_show(cmp_native_dialog_t *dialog,
                            cmp_dialog_type_t type) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (dialog == NULL) {
     LOG_DEBUG("Error in cmp_native_dialog_show: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -94,7 +93,7 @@ int cmp_native_dialog_show(cmp_native_dialog_t *dialog,
   /* In a fully implemented renderer, this invokes the OS-specific native dialog
    * UI */
   dialog->is_showing = 1;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -106,7 +105,7 @@ int cmp_native_dialog_show(cmp_native_dialog_t *dialog,
  */
 int cmp_native_dialog_get_result_string(const cmp_native_dialog_t *dialog,
                                         char **out_result) {
-  int rc;
+  int rc = CMP_SUCCESS;
   size_t len;
 
   rc = CMP_SUCCESS;
@@ -119,7 +118,7 @@ int cmp_native_dialog_get_result_string(const cmp_native_dialog_t *dialog,
 
   if (dialog->result_string == NULL) {
     *out_result = NULL;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   len = strlen(dialog->result_string);
@@ -131,7 +130,7 @@ int cmp_native_dialog_get_result_string(const cmp_native_dialog_t *dialog,
   }
 #if defined(_MSC_VER)
   rc = strcpy_s(*out_result, len + 1, dialog->result_string);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG(
         "Error in cmp_native_dialog_get_result_string: strcpy_s failed\n");
     rc = CMP_FREE(*out_result);
@@ -146,7 +145,7 @@ int cmp_native_dialog_get_result_string(const cmp_native_dialog_t *dialog,
   strcpy(*out_result, dialog->result_string);
 #endif
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -158,7 +157,7 @@ int cmp_native_dialog_get_result_string(const cmp_native_dialog_t *dialog,
  */
 int cmp_native_dialog_set_result_string(cmp_native_dialog_t *dialog,
                                         const char *result) {
-  int rc;
+  int rc = CMP_SUCCESS;
   size_t len;
 
   rc = CMP_SUCCESS;
@@ -187,7 +186,7 @@ int cmp_native_dialog_set_result_string(cmp_native_dialog_t *dialog,
   }
 #if defined(_MSC_VER)
   rc = strcpy_s(dialog->result_string, len + 1, result);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG(
         "Error in cmp_native_dialog_set_result_string: strcpy_s failed\n");
     rc = CMP_FREE(dialog->result_string);
@@ -202,5 +201,5 @@ int cmp_native_dialog_set_result_string(cmp_native_dialog_t *dialog,
   strcpy(dialog->result_string, result);
 #endif
 
-  return CMP_SUCCESS;
+  return rc;
 }

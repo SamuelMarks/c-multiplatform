@@ -158,8 +158,7 @@ CMP_EXEMPT(static void lab_to_xyz(float l, float a, float b, float *x, float *y,
 /* Actual HCT Approximation via CAM16 equivalent mapping to LCH */
 int cmp_m3_srgb_to_hct(const cmp_color_t *in_color, float *out_hue,
                        float *out_chroma, float *out_tone) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float x, y, z, l, a, b, chroma, hue;
   if (!in_color || !out_hue || !out_chroma || !out_tone)
     return CMP_ERROR_INVALID_ARG;
@@ -176,15 +175,6 @@ int cmp_m3_srgb_to_hct(const cmp_color_t *in_color, float *out_hue,
   *out_chroma = chroma;
   *out_tone = l; /* Tone is rigorously defined as L* in HCT */
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -199,8 +189,7 @@ int cmp_m3_srgb_to_hct(const cmp_color_t *in_color, float *out_hue,
  */
 int cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
                        cmp_color_t *out_color) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float l, a, b, x, y, z, r, g, bl;
   if (!out_color)
     return CMP_ERROR_INVALID_ARG;
@@ -211,7 +200,7 @@ int cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
     out_color->b = 0.0f;
     out_color->a = 1.0f;
     out_color->space = CMP_COLOR_SPACE_SRGB;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (tone >= 99.99f) {
@@ -220,7 +209,7 @@ int cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
     out_color->b = 1.0f;
     out_color->a = 1.0f;
     out_color->space = CMP_COLOR_SPACE_SRGB;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   l = tone;
@@ -250,15 +239,6 @@ int cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
   out_color->a = 1.0f;
   out_color->space = CMP_COLOR_SPACE_SRGB;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -273,15 +253,10 @@ int cmp_m3_hct_to_srgb(float hue, float chroma, float tone,
  */
 int cmp_m3_p3_to_hct(const cmp_color_t *in_color, float *out_hue,
                      float *out_chroma, float *out_tone) {
-  int rc;
-  rc = 0; /* P3 -> XYZ -> LAB -> HCT (approx. sRGB for now) */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return cmp_m3_srgb_to_hct(in_color, out_hue, out_chroma, out_tone);
+  int rc = CMP_SUCCESS; /* P3 -> XYZ -> LAB -> HCT (approx. sRGB for now) */
+
+  rc = cmp_m3_srgb_to_hct(in_color, out_hue, out_chroma, out_tone);
+  return rc;
 }
 
 /**
@@ -295,8 +270,7 @@ int cmp_m3_p3_to_hct(const cmp_color_t *in_color, float *out_hue,
  */
 int cmp_m3_linear_to_hct(const cmp_color_t *in_color, float *out_hue,
                          float *out_chroma, float *out_tone) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float x, y, z, l, a, b, chroma, hue;
   if (!in_color || !out_hue || !out_chroma || !out_tone)
     return CMP_ERROR_INVALID_ARG;
@@ -316,15 +290,6 @@ int cmp_m3_linear_to_hct(const cmp_color_t *in_color, float *out_hue,
   *out_chroma = chroma;
   *out_tone = l;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -338,8 +303,7 @@ int cmp_m3_linear_to_hct(const cmp_color_t *in_color, float *out_hue,
  */
 int cmp_m3_generate_tonal_palette_hct(float hue, float chroma,
                                       cmp_m3_tonal_palette_t *out_palette) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
 
@@ -357,15 +321,6 @@ int cmp_m3_generate_tonal_palette_hct(float hue, float chroma,
   cmp_m3_hct_to_srgb(hue, chroma, 99.0f, &out_palette->tone99);
   cmp_m3_hct_to_srgb(hue, chroma, 100.0f, &out_palette->tone100);
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -378,8 +333,7 @@ int cmp_m3_generate_tonal_palette_hct(float hue, float chroma,
  */
 int cmp_m3_palettes_generate(cmp_color_t seed,
                              cmp_m3_palettes_t *out_palettes) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float h, c, t;
   if (!out_palettes)
     return CMP_ERROR_INVALID_ARG;
@@ -397,15 +351,6 @@ int cmp_m3_palettes_generate(cmp_color_t seed,
   cmp_m3_generate_tonal_palette_hct(h, 4.0f, &out_palettes->neutral);
   cmp_m3_generate_tonal_palette_hct(h, 8.0f, &out_palettes->neutral_variant);
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -420,8 +365,7 @@ int cmp_m3_palettes_generate(cmp_color_t seed,
  */
 int cmp_m3_generate_tonal_palette(float hue, float chroma, float tone,
                                   cmp_palette_t *out_palette) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
   (void)tone; /* We ignore original tone to generate a full spectrum */
@@ -430,15 +374,6 @@ int cmp_m3_generate_tonal_palette(float hue, float chroma, float tone,
   cmp_m3_hct_to_srgb(hue, chroma, 40.0f, &out_palette->primary);
   cmp_m3_hct_to_srgb(hue, chroma, 100.0f, &out_palette->on_primary);
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -454,8 +389,7 @@ int cmp_m3_generate_tonal_palette(float hue, float chroma, float tone,
  */
 int cmp_m3_scheme_tonal_spot(float hue, float chroma, float tone, int is_dark,
                              cmp_palette_t *out_palette) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float p_chroma = 36.0f;
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
@@ -468,15 +402,6 @@ int cmp_m3_scheme_tonal_spot(float hue, float chroma, float tone, int is_dark,
   cmp_m3_hct_to_srgb(hue, p_chroma, is_dark ? 20.0f : 100.0f,
                      &out_palette->on_primary);
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -492,8 +417,7 @@ int cmp_m3_scheme_tonal_spot(float hue, float chroma, float tone, int is_dark,
  */
 int cmp_m3_scheme_spritz(float hue, float chroma, float tone, int is_dark,
                          cmp_palette_t *out_palette) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
   (void)tone;
@@ -502,15 +426,7 @@ int cmp_m3_scheme_spritz(float hue, float chroma, float tone, int is_dark,
   /* Spritz: Chroma 12 */
   cmp_m3_hct_to_srgb(hue, 12.0f, is_dark ? 80.0f : 40.0f,
                      &out_palette->primary);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -526,8 +442,7 @@ int cmp_m3_scheme_spritz(float hue, float chroma, float tone, int is_dark,
  */
 int cmp_m3_scheme_vibrant(float hue, float chroma, float tone, int is_dark,
                           cmp_palette_t *out_palette) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
   (void)tone;
@@ -536,15 +451,7 @@ int cmp_m3_scheme_vibrant(float hue, float chroma, float tone, int is_dark,
   /* Vibrant: Chroma 130 (max) */
   cmp_m3_hct_to_srgb(hue, 130.0f, is_dark ? 80.0f : 40.0f,
                      &out_palette->primary);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -560,8 +467,7 @@ int cmp_m3_scheme_vibrant(float hue, float chroma, float tone, int is_dark,
  */
 int cmp_m3_scheme_expressive(float hue, float chroma, float tone, int is_dark,
                              cmp_palette_t *out_palette) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float shifted_hue;
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
@@ -572,15 +478,7 @@ int cmp_m3_scheme_expressive(float hue, float chroma, float tone, int is_dark,
   shifted_hue = fmodf(hue + 120.0f, 360.0f);
   cmp_m3_hct_to_srgb(shifted_hue, 40.0f, is_dark ? 80.0f : 40.0f,
                      &out_palette->primary);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -596,8 +494,7 @@ int cmp_m3_scheme_expressive(float hue, float chroma, float tone, int is_dark,
  */
 int cmp_m3_scheme_rainbow(float hue, float chroma, float tone, int is_dark,
                           cmp_palette_t *out_palette) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
   (void)tone;
@@ -605,15 +502,7 @@ int cmp_m3_scheme_rainbow(float hue, float chroma, float tone, int is_dark,
 
   cmp_m3_hct_to_srgb(hue, 48.0f, is_dark ? 80.0f : 40.0f,
                      &out_palette->primary);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -629,8 +518,7 @@ int cmp_m3_scheme_rainbow(float hue, float chroma, float tone, int is_dark,
  */
 int cmp_m3_scheme_fruit_salad(float hue, float chroma, float tone, int is_dark,
                               cmp_palette_t *out_palette) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float shifted_hue;
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
@@ -640,15 +528,7 @@ int cmp_m3_scheme_fruit_salad(float hue, float chroma, float tone, int is_dark,
   shifted_hue = fmodf(hue - 50.0f + 360.0f, 360.0f);
   cmp_m3_hct_to_srgb(shifted_hue, 48.0f, is_dark ? 80.0f : 40.0f,
                      &out_palette->primary);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -664,8 +544,7 @@ int cmp_m3_scheme_fruit_salad(float hue, float chroma, float tone, int is_dark,
  */
 int cmp_m3_scheme_monochrome(float hue, float chroma, float tone, int is_dark,
                              cmp_palette_t *out_palette) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
   (void)tone;
@@ -673,15 +552,7 @@ int cmp_m3_scheme_monochrome(float hue, float chroma, float tone, int is_dark,
 
   /* Monochrome: 0 Chroma */
   cmp_m3_hct_to_srgb(hue, 0.0f, is_dark ? 80.0f : 40.0f, &out_palette->primary);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -697,8 +568,7 @@ int cmp_m3_scheme_monochrome(float hue, float chroma, float tone, int is_dark,
  */
 int cmp_m3_scheme_fidelity(float hue, float chroma, float tone, int is_dark,
                            cmp_palette_t *out_palette) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
   (void)tone;
@@ -706,15 +576,7 @@ int cmp_m3_scheme_fidelity(float hue, float chroma, float tone, int is_dark,
   /* Fidelity: Exact match */
   cmp_m3_hct_to_srgb(hue, chroma, is_dark ? 80.0f : 40.0f,
                      &out_palette->primary);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -730,8 +592,7 @@ int cmp_m3_scheme_fidelity(float hue, float chroma, float tone, int is_dark,
  */
 int cmp_m3_scheme_content(float hue, float chroma, float tone, int is_dark,
                           cmp_palette_t *out_palette) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
   (void)tone;
@@ -739,15 +600,7 @@ int cmp_m3_scheme_content(float hue, float chroma, float tone, int is_dark,
   /* Content: Uses extracted */
   cmp_m3_hct_to_srgb(hue, chroma, is_dark ? 80.0f : 40.0f,
                      &out_palette->primary);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -760,8 +613,7 @@ int cmp_m3_scheme_content(float hue, float chroma, float tone, int is_dark,
  */
 int cmp_m3_scheme_light(const cmp_m3_palettes_t *palettes,
                         cmp_palette_t *out_scheme) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!palettes || !out_scheme)
     return CMP_ERROR_INVALID_ARG;
 
@@ -795,15 +647,6 @@ int cmp_m3_scheme_light(const cmp_m3_palettes_t *palettes,
   out_scheme->inverse_on_surface = palettes->neutral.tone95;
   out_scheme->inverse_primary = palettes->primary.tone80;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -816,8 +659,7 @@ int cmp_m3_scheme_light(const cmp_m3_palettes_t *palettes,
  */
 int cmp_m3_scheme_dark(const cmp_m3_palettes_t *palettes,
                        cmp_palette_t *out_scheme) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!palettes || !out_scheme)
     return CMP_ERROR_INVALID_ARG;
 
@@ -851,14 +693,5 @@ int cmp_m3_scheme_dark(const cmp_m3_palettes_t *palettes,
   out_scheme->inverse_on_surface = palettes->neutral.tone20;
   out_scheme->inverse_primary = palettes->primary.tone40;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

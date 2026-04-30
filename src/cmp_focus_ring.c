@@ -20,8 +20,7 @@ struct cmp_focus_ring {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_focus_ring_create(cmp_a11y_tree_t *tree, cmp_focus_ring_t **out_ring) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_focus_ring *ring = NULL;
@@ -33,9 +32,7 @@ int cmp_focus_ring_create(cmp_a11y_tree_t *tree, cmp_focus_ring_t **out_ring) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_focus_ring_create: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -46,9 +43,7 @@ int cmp_focus_ring_create(cmp_a11y_tree_t *tree, cmp_focus_ring_t **out_ring) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_focus_ring_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -59,7 +54,7 @@ int cmp_focus_ring_create(cmp_a11y_tree_t *tree, cmp_focus_ring_t **out_ring) {
   *out_ring = (cmp_focus_ring_t *)ring;
   cmp_log_debug(
       "cmp_focus_ring_create: Successfully created focus ring context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -69,8 +64,7 @@ int cmp_focus_ring_create(cmp_a11y_tree_t *tree, cmp_focus_ring_t **out_ring) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_focus_ring_destroy(cmp_focus_ring_t *ring) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_focus_ring *r = (struct cmp_focus_ring *)ring;
@@ -82,9 +76,7 @@ int cmp_focus_ring_destroy(cmp_focus_ring_t *ring) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_focus_ring_destroy: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -95,7 +87,7 @@ int cmp_focus_ring_destroy(cmp_focus_ring_t *ring) {
 
   cmp_log_debug(
       "cmp_focus_ring_destroy: Successfully destroyed focus ring context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -106,8 +98,7 @@ int cmp_focus_ring_destroy(cmp_focus_ring_t *ring) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_focus_ring_set_keyboard_mode(cmp_focus_ring_t *ring, int is_keyboard) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_focus_ring *r = (struct cmp_focus_ring *)ring;
@@ -120,9 +111,7 @@ int cmp_focus_ring_set_keyboard_mode(cmp_focus_ring_t *ring, int is_keyboard) {
     }
     cmp_log_debug("cmp_focus_ring_set_keyboard_mode: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -138,15 +127,7 @@ int cmp_focus_ring_set_keyboard_mode(cmp_focus_ring_t *ring, int is_keyboard) {
 
   cmp_log_debug("cmp_focus_ring_set_keyboard_mode: Applied keyboard state %d\n",
                 is_keyboard);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -158,8 +139,7 @@ int cmp_focus_ring_set_keyboard_mode(cmp_focus_ring_t *ring, int is_keyboard) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_focus_ring_node_focused(cmp_focus_ring_t *ring, int node_id) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_focus_ring *r = (struct cmp_focus_ring *)ring;
@@ -172,9 +152,7 @@ int cmp_focus_ring_node_focused(cmp_focus_ring_t *ring, int node_id) {
     }
     cmp_log_debug("cmp_focus_ring_node_focused: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -187,14 +165,6 @@ int cmp_focus_ring_node_focused(cmp_focus_ring_t *ring, int node_id) {
 
   cmp_log_debug(
       "cmp_focus_ring_node_focused: Highlighted node via ring logic\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

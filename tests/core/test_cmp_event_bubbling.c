@@ -82,10 +82,10 @@ TEST test_event_dispatch_phases(void) {
   cmp_ui_node_t child = {0};
   cmp_ui_node_t target = {0};
   cmp_event_t evt = {0};
-  tracking_data_t tracker = { {0}, 0 };
+  tracking_data_t tracker = {{0}, 0};
 
   evt.type = 1;
-  
+
   root.type = 1;
   child.type = 2;
   target.type = 3;
@@ -97,18 +97,19 @@ TEST test_event_dispatch_phases(void) {
   cmp_ui_node_add_event_listener(&root, 1, 1, ordered_mock_callback, &tracker);
   /* Root bubbling */
   cmp_ui_node_add_event_listener(&root, 1, 0, ordered_mock_callback, &tracker);
-  
+
   /* Child capturing */
   cmp_ui_node_add_event_listener(&child, 1, 1, ordered_mock_callback, &tracker);
   /* Child bubbling */
   cmp_ui_node_add_event_listener(&child, 1, 0, ordered_mock_callback, &tracker);
-  
+
   /* Target */
-  cmp_ui_node_add_event_listener(&target, 1, 0, ordered_mock_callback, &tracker);
+  cmp_ui_node_add_event_listener(&target, 1, 0, ordered_mock_callback,
+                                 &tracker);
 
   ASSERT_EQ(CMP_SUCCESS, cmp_event_dispatch_run(&root, &target, &evt));
 
-  /* Expected order: 
+  /* Expected order:
      Capture phase: root (1) -> child (2)
      Target phase: target (3)
      Bubble phase: child (2) -> root (1)
@@ -128,7 +129,7 @@ TEST test_event_dispatch_deep_tree_realloc(void) {
   cmp_ui_node_t nodes[20];
   cmp_event_t evt = {0};
   int i;
-  tracking_data_t tracker = { {0}, 0 };
+  tracking_data_t tracker = {{0}, 0};
 
   evt.type = 1;
 
@@ -140,10 +141,11 @@ TEST test_event_dispatch_deep_tree_realloc(void) {
     }
   }
 
-  cmp_ui_node_add_event_listener(&nodes[19], 1, 0, ordered_mock_callback, &tracker);
+  cmp_ui_node_add_event_listener(&nodes[19], 1, 0, ordered_mock_callback,
+                                 &tracker);
 
   ASSERT_EQ(CMP_SUCCESS, cmp_event_dispatch_run(&nodes[0], &nodes[19], &evt));
-  
+
   ASSERT_EQ(1, tracker.count);
   ASSERT_EQ(20, tracker.call_order[0]);
 

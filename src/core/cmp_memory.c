@@ -6,8 +6,7 @@
 #if defined(_WIN32)
 long _InterlockedCompareExchange(long volatile *Destination, long Exchange, long Comperand);
 #pragma intrinsic(_InterlockedCompareExchange)
-__declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
-#define CMP_MEM_LOCK() do { while (_InterlockedCompareExchange(&g_mem_lock, 1, 0) != 0) Sleep(0); } while (0)
+#define CMP_MEM_LOCK() do { while (_InterlockedCompareExchange(&g_mem_lock, 1, 0) != 0) { } } while (0)   
 #define CMP_MEM_UNLOCK() do { g_mem_lock = 0; } while (0)
 #else
 #include <unistd.h>
@@ -50,26 +49,32 @@ static volatile char g_mem_lock = 0;
  */
 int cmp_mem_alloc_tracked(size_t size, const char *file, int line,
                           void **out_ptr) {
-  int rc;
-  rc = 0;cmp_mem_record_t *record;
+  int rc = CMP_SUCCESS;
+  cmp_mem_record_t *record;
 
   if (out_ptr == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_mem_alloc_tracked: out_ptr is NULL\n");
+    return rc;
   }
 
   if (size == 0) {
     *out_ptr = NULL;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   /* Check for overflow before allocating */
   if (size > ((size_t)-1) - sizeof(cmp_mem_record_t)) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_mem_alloc_tracked: size overflow\n");
+    return rc;
   }
 
   record = (cmp_mem_record_t *)malloc(sizeof(cmp_mem_record_t) + size);
   if (record == NULL) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_mem_alloc_tracked: malloc failed\n");
+    return rc;
   }
 
   record->ptr = (void *)(record + 1);
@@ -83,10 +88,6 @@ int cmp_mem_alloc_tracked(size_t size, const char *file, int line,
   CMP_MEM_UNLOCK();
 
   *out_ptr = record->ptr;
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -99,14 +100,14 @@ int cmp_mem_alloc_tracked(size_t size, const char *file, int line,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mem_free_tracked(void *ptr, const char *file, int line) {
-  int rc;
-  rc = 0;cmp_mem_record_t *curr;
+  int rc = CMP_SUCCESS;
+  cmp_mem_record_t *curr;
   cmp_mem_record_t *prev = NULL;
   (void)file; /* unused in non-debug mode, useful if we expand */
   (void)line;
 
   if (ptr == NULL) {
-    return CMP_SUCCESS;
+    return rc;
   }
 
   CMP_MEM_LOCK();
@@ -120,25 +121,28 @@ int cmp_mem_free_tracked(void *ptr, const char *file, int line) {
       }
       CMP_MEM_UNLOCK();
       free(curr);
-      return CMP_SUCCESS;
+      return rc;
     }
     prev = curr;
     curr = curr->next;
   }
   CMP_MEM_UNLOCK();
 
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  return CMP_ERROR_NOT_FOUND;}
+  rc = CMP_ERROR_NOT_FOUND;
+  LOG_DEBUG("cmp_mem_free_tracked: ptr not found in tracked allocations\n");
+  return rc;
+}
 
 /**
  * @brief cmp_mem_check_leaks
  *
- * @return Returns 0 on success, or an error code on failure.
+ * @return Returns leak count (which is an int, not an error code)
  */
 int cmp_mem_check_leaks(void) {
-  int rc;
-  rc = 0;cmp_mem_record_t *curr = g_mem_head;
+  int rc = CMP_SUCCESS;
+  cmp_mem_record_t *curr = g_mem_head;
   int leak_count = 0;
+  (void)rc;
 
   while (curr != NULL) {
     fprintf(stderr, "CMP Memory Leak: %u bytes at %p (allocated in %s:%d)\n",
@@ -153,8 +157,11 @@ int cmp_mem_check_leaks(void) {
     fprintf(stderr, "CMP Memory Check: %d leaks detected.\n", leak_count);
   }
 
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  return leak_count;}
+  /* This function returns the leak count, which diverges from the "return rc"
+     rule for errors, but it returns an int representing the count */
+  rc = leak_count;
+  return rc;
+}
 
 /**
  * @brief cmp_arena_init
@@ -164,38 +171,32 @@ int cmp_mem_check_leaks(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_arena_init(cmp_arena_t *arena, size_t size) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (arena == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_arena_init: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_arena_init: arena is NULL\n");
+    return rc;
   }
 
   if (size == 0) {
     arena->buffer = NULL;
     arena->capacity = 0;
     arena->offset = 0;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   rc = CMP_MALLOC(size, (void **)&arena->buffer);
   if (rc != CMP_SUCCESS || arena->buffer == NULL) {
-    if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_arena_init CMP_MALLOC: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_arena_init CMP_MALLOC: out of memory\n");
+    return rc;
   }
 
   arena->capacity = size;
   arena->offset = 0;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -207,35 +208,29 @@ int cmp_arena_init(cmp_arena_t *arena, size_t size) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_arena_alloc(cmp_arena_t *arena, size_t size, void **out_ptr) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (arena == NULL || out_ptr == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_arena_alloc: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_arena_alloc: arena or out_ptr is NULL\n");
+    return rc;
   }
 
   if (size == 0) {
     *out_ptr = NULL;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (arena->offset + size > arena->capacity) {
     rc = CMP_ERROR_OOM;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_arena_alloc (capacity exceeded): %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_arena_alloc (capacity exceeded)\n");
+    return rc;
   }
 
   *out_ptr = arena->buffer + arena->offset;
   arena->offset += size;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -245,26 +240,27 @@ int cmp_arena_alloc(cmp_arena_t *arena, size_t size, void **out_ptr) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_arena_free(cmp_arena_t *arena) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (arena == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_arena_free: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_arena_free: arena is NULL\n");
+    return rc;
   }
 
   if (arena->buffer != NULL) {
-    CMP_FREE(arena->buffer);
+    rc = CMP_FREE(arena->buffer);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_arena_free: CMP_FREE failed\n");
+      return rc;
+    }
     arena->buffer = NULL;
   }
 
   arena->capacity = 0;
   arena->offset = 0;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -276,18 +272,15 @@ int cmp_arena_free(cmp_arena_t *arena) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
-  int rc;
+  int rc = CMP_SUCCESS;
   size_t i;
   size_t total_size;
   cmp_pool_block_t *block;
 
   if (pool == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_pool_init: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_pool_init: pool is NULL\n");
+    return rc;
   }
 
   if (block_size < sizeof(cmp_pool_block_t)) {
@@ -304,18 +297,15 @@ int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
     pool->free_list = NULL;
     pool->capacity = 0;
     pool->block_size = 0;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   total_size = block_size * block_count;
   rc = CMP_MALLOC(total_size, (void **)&pool->buffer);
   if (rc != CMP_SUCCESS || pool->buffer == NULL) {
-    if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_pool_init CMP_MALLOC: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_pool_init CMP_MALLOC: out of memory\n");
+    return rc;
   }
 
   pool->capacity = block_count;
@@ -329,7 +319,7 @@ int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
     pool->free_list = block;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -340,37 +330,31 @@ int cmp_pool_init(cmp_pool_t *pool, size_t block_size, size_t block_count) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pool_alloc(cmp_pool_t *pool, void **out_ptr) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_pool_block_t *block;
 
   if (pool == NULL || out_ptr == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_pool_alloc: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_pool_alloc: pool or out_ptr is NULL\n");
+    return rc;
   }
 
   if (pool->capacity == 0) {
     *out_ptr = NULL;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (pool->free_list == NULL) {
     rc = CMP_ERROR_OOM;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_pool_alloc (no free blocks): %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_pool_alloc: no free blocks\n");
+    return rc;
   }
 
   block = pool->free_list;
   pool->free_list = block->next;
 
   *out_ptr = (void *)block;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -381,44 +365,35 @@ int cmp_pool_alloc(cmp_pool_t *pool, void **out_ptr) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pool_free(cmp_pool_t *pool, void *ptr) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_pool_block_t *block;
 
   if (pool == NULL || ptr == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_pool_free: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_pool_free: pool or ptr is NULL\n");
+    return rc;
   }
 
   /* check if pointer is within the buffer bounds */
   if ((uint8_t *)ptr < pool->buffer ||
       (uint8_t *)ptr >= pool->buffer + (pool->capacity * pool->block_size)) {
     rc = CMP_ERROR_BOUNDS;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_pool_free (out of bounds): %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_pool_free: pointer out of bounds\n");
+    return rc;
   }
 
   /* check alignment */
   if (((uint8_t *)ptr - pool->buffer) % pool->block_size != 0) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_pool_free (misaligned): %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_pool_free: pointer misaligned\n");
+    return rc;
   }
 
   block = (cmp_pool_block_t *)ptr;
   block->next = pool->free_list;
   pool->free_list = block;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -428,19 +403,20 @@ int cmp_pool_free(cmp_pool_t *pool, void *ptr) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pool_destroy(cmp_pool_t *pool) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (pool == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_pool_destroy: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_pool_destroy: pool is NULL\n");
+    return rc;
   }
 
   if (pool->buffer != NULL) {
-    CMP_FREE(pool->buffer);
+    rc = CMP_FREE(pool->buffer);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_pool_destroy: CMP_FREE failed\n");
+      return rc;
+    }
     pool->buffer = NULL;
   }
 
@@ -448,5 +424,5 @@ int cmp_pool_destroy(cmp_pool_t *pool) {
   pool->capacity = 0;
   pool->block_size = 0;
 
-  return CMP_SUCCESS;
+  return rc;
 }

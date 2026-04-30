@@ -28,8 +28,7 @@ struct cmp_swapchain {
  */
 int cmp_swapchain_create(cmp_window_t *window, cmp_swapchain_mode_t mode,
                          cmp_swapchain_t **out_swapchain) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_swapchain *ctx;
   int i;
 
@@ -79,15 +78,7 @@ int cmp_swapchain_create(cmp_window_t *window, cmp_swapchain_mode_t mode,
   ctx->current_image_index = 0;
 
   *out_swapchain = (cmp_swapchain_t *)ctx;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -98,8 +89,7 @@ int cmp_swapchain_create(cmp_window_t *window, cmp_swapchain_mode_t mode,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_swapchain_destroy(cmp_swapchain_t *swapchain) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_swapchain *ctx = (struct cmp_swapchain *)swapchain;
   int i;
   if (!ctx)
@@ -113,15 +103,7 @@ int cmp_swapchain_destroy(cmp_swapchain_t *swapchain) {
   }
 
   CMP_FREE(ctx);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -134,8 +116,7 @@ int cmp_swapchain_destroy(cmp_swapchain_t *swapchain) {
  */
 int cmp_swapchain_acquire_next_image(cmp_swapchain_t *swapchain,
                                      cmp_texture_t **out_texture) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_swapchain *ctx = (struct cmp_swapchain *)swapchain;
   if (!ctx || !out_texture)
     return CMP_ERROR_INVALID_ARG;
@@ -151,15 +132,6 @@ int cmp_swapchain_acquire_next_image(cmp_swapchain_t *swapchain,
   ctx->current_image_index = (ctx->current_image_index + 1) % ctx->buffer_count;
   *out_texture = ctx->buffers[ctx->current_image_index];
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -170,8 +142,7 @@ int cmp_swapchain_acquire_next_image(cmp_swapchain_t *swapchain,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_swapchain_present(cmp_swapchain_t *swapchain) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_swapchain *ctx = (struct cmp_swapchain *)swapchain;
 
   if (!ctx)
@@ -187,15 +158,6 @@ int cmp_swapchain_present(cmp_swapchain_t *swapchain) {
   ctx->current_frame_index =
       (ctx->current_frame_index + 1) % ctx->frames_in_flight;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -221,19 +183,10 @@ CMP_EXEMPT(
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_swapchain_set_msaa(cmp_swapchain_t *swapchain, int sample_count) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!swapchain || sample_count < 1)
     return CMP_ERROR_INVALID_ARG;
   /* Mock implementation */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

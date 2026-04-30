@@ -30,7 +30,7 @@ struct cmp_ui_accordion {
 int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
                             const char *title, uint32_t bg_color) {
   cmp_ui_accordion_t *accordion;
-  int rc;
+  int rc = CMP_SUCCESS;
   size_t len;
   cmp_string_t translated = {NULL, 0, 0};
   const char *final_title;
@@ -43,9 +43,7 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
   rc = CMP_MALLOC(sizeof(cmp_ui_accordion_t), (void **)&accordion);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_accordion_create: OOM\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -127,9 +125,7 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
     }
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -153,9 +149,7 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
     }
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -166,7 +160,7 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
   }
 
   *out_accordion = accordion;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -176,7 +170,7 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_accordion_destroy(cmp_ui_accordion_t *accordion) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!accordion) {
     LOG_DEBUG("cmp_ui_accordion_destroy: accordion is NULL\n");
@@ -198,12 +192,10 @@ int cmp_ui_accordion_destroy(cmp_ui_accordion_t *accordion) {
   rc = CMP_FREE(accordion);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_accordion_destroy: CMP_FREE failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -215,22 +207,13 @@ int cmp_ui_accordion_destroy(cmp_ui_accordion_t *accordion) {
  */
 int cmp_ui_accordion_get_node(cmp_ui_accordion_t *accordion,
                               cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!accordion || !out_node) {
     LOG_DEBUG("cmp_ui_accordion_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = accordion->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -243,21 +226,12 @@ int cmp_ui_accordion_get_node(cmp_ui_accordion_t *accordion,
  */
 int cmp_ui_accordion_set_expanded(cmp_ui_accordion_t *accordion,
                                   int is_expanded) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!accordion) {
     LOG_DEBUG("cmp_ui_accordion_set_expanded: accordion is NULL\n");
     return CMP_ERROR_INVALID_ARG;
   }
   accordion->is_expanded = is_expanded;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

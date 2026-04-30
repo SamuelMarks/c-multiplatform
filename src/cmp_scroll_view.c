@@ -20,7 +20,7 @@ struct cmp_scroll_view {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_view_create(cmp_scroll_view_t **out_scroll_view) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_view *ctx;
 
   rc = CMP_SUCCESS;
@@ -41,7 +41,7 @@ int cmp_scroll_view_create(cmp_scroll_view_t **out_scroll_view) {
   ctx->is_paging_enabled = 0;
 
   *out_scroll_view = (cmp_scroll_view_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -51,14 +51,14 @@ int cmp_scroll_view_create(cmp_scroll_view_t **out_scroll_view) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_view_destroy(cmp_scroll_view_t *scroll_view_opaque) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_view *ctx;
 
   rc = CMP_SUCCESS;
   ctx = (struct cmp_scroll_view *)scroll_view_opaque;
 
   if (ctx == NULL) {
-    return CMP_SUCCESS;
+    return rc;
   }
 
   rc = CMP_FREE(ctx);
@@ -67,7 +67,7 @@ int cmp_scroll_view_destroy(cmp_scroll_view_t *scroll_view_opaque) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -79,6 +79,7 @@ int cmp_scroll_view_destroy(cmp_scroll_view_t *scroll_view_opaque) {
  */
 int cmp_scroll_view_set_deceleration_rate(cmp_scroll_view_t *scroll_view_opaque,
                                           cmp_scroll_deceleration_rate_t rate) {
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_view *ctx;
 
   ctx = (struct cmp_scroll_view *)scroll_view_opaque;
@@ -90,7 +91,7 @@ int cmp_scroll_view_set_deceleration_rate(cmp_scroll_view_t *scroll_view_opaque,
 
   ctx->deceleration_rate = rate;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -102,6 +103,7 @@ int cmp_scroll_view_set_deceleration_rate(cmp_scroll_view_t *scroll_view_opaque,
  */
 int cmp_scroll_view_set_paging_enabled(cmp_scroll_view_t *scroll_view_opaque,
                                        int is_paging_enabled) {
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_view *ctx;
 
   ctx = (struct cmp_scroll_view *)scroll_view_opaque;
@@ -113,7 +115,7 @@ int cmp_scroll_view_set_paging_enabled(cmp_scroll_view_t *scroll_view_opaque,
 
   ctx->is_paging_enabled = is_paging_enabled;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -129,6 +131,7 @@ int cmp_scroll_view_evaluate_scrollbar(cmp_scroll_view_t *scroll_view_opaque,
                                        int is_scrolling,
                                        float time_since_last_scroll,
                                        float *out_opacity) {
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_view *ctx;
 
   ctx = (struct cmp_scroll_view *)scroll_view_opaque;
@@ -152,7 +155,7 @@ int cmp_scroll_view_evaluate_scrollbar(cmp_scroll_view_t *scroll_view_opaque,
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -169,6 +172,7 @@ int cmp_scroll_view_hit_test_scrollbar(cmp_scroll_view_t *scroll_view_opaque,
                                        float pointer_x, float pointer_y,
                                        float view_width,
                                        int *out_is_interactive) {
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_view *ctx;
 
   ctx = (struct cmp_scroll_view *)scroll_view_opaque;
@@ -186,7 +190,7 @@ int cmp_scroll_view_hit_test_scrollbar(cmp_scroll_view_t *scroll_view_opaque,
     *out_is_interactive = 0;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -202,6 +206,7 @@ int cmp_scroll_view_calculate_rubber_band(cmp_scroll_view_t *scroll_view_opaque,
                                           float overscroll_delta,
                                           float view_dimension,
                                           float *out_visual_translation) {
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_view *ctx;
   float c;
   float val;
@@ -216,7 +221,7 @@ int cmp_scroll_view_calculate_rubber_band(cmp_scroll_view_t *scroll_view_opaque,
 
   if (view_dimension <= 0.0f) {
     *out_visual_translation = overscroll_delta;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   /* Formula: (1.0 - (1.0 / ((overscroll * c / dimension) + 1.0))) * dimension
@@ -232,7 +237,7 @@ int cmp_scroll_view_calculate_rubber_band(cmp_scroll_view_t *scroll_view_opaque,
     *out_visual_translation = -((1.0f - (1.0f / val)) * view_dimension);
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -244,6 +249,7 @@ int cmp_scroll_view_calculate_rubber_band(cmp_scroll_view_t *scroll_view_opaque,
  */
 int cmp_scroll_view_set_keyboard_dismiss_mode(
     cmp_scroll_view_t *scroll_view_opaque, cmp_scroll_keyboard_dismiss_t mode) {
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_view *ctx;
 
   ctx = (struct cmp_scroll_view *)scroll_view_opaque;
@@ -255,5 +261,5 @@ int cmp_scroll_view_set_keyboard_dismiss_mode(
 
   ctx->keyboard_dismiss_mode = mode;
 
-  return CMP_SUCCESS;
+  return rc;
 }

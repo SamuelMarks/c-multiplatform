@@ -21,6 +21,7 @@ int cmp_scrollbar_gutter_calculate(cmp_scrollbar_gutter_t mode,
                                    float scrollbar_thickness,
                                    float *out_reserved_left,
                                    float *out_reserved_right) {
+  int rc = CMP_SUCCESS;
   if (out_reserved_left == NULL || out_reserved_right == NULL) {
     LOG_DEBUG(
         "Invalid argument: out_reserved_left or out_reserved_right is NULL\n");
@@ -44,5 +45,5 @@ int cmp_scrollbar_gutter_calculate(cmp_scrollbar_gutter_t mode,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

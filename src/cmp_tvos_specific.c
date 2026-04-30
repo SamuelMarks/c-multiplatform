@@ -14,8 +14,7 @@ struct cmp_tvos_features {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tvos_features_create(cmp_tvos_features_t **out_features) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_tvos_features *ctx;
   if (!out_features)
     return CMP_ERROR_INVALID_ARG;
@@ -26,15 +25,7 @@ int cmp_tvos_features_create(cmp_tvos_features_t **out_features) {
   ctx->top_shelf_mode = 0;
 
   *out_features = (cmp_tvos_features_t *)ctx;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -45,19 +36,10 @@ int cmp_tvos_features_create(cmp_tvos_features_t **out_features) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tvos_features_destroy(cmp_tvos_features_t *features_opaque) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (features_opaque)
     CMP_FREE(features_opaque);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -74,8 +56,7 @@ int cmp_tvos_features_destroy(cmp_tvos_features_t *features_opaque) {
 int cmp_tvos_handle_focus_engine_update(cmp_tvos_features_t *features_opaque,
                                         void *focused_node, float *out_scale,
                                         float *out_tilt_x, float *out_tilt_y) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_tvos_features *ctx = (struct cmp_tvos_features *)features_opaque;
   if (!ctx || !focused_node)
     return CMP_ERROR_INVALID_ARG;
@@ -88,15 +69,6 @@ int cmp_tvos_handle_focus_engine_update(cmp_tvos_features_t *features_opaque,
   if (out_tilt_y)
     *out_tilt_y = 0.05f;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -115,8 +87,7 @@ int cmp_tvos_set_overscan_margins(cmp_tvos_features_t *features_opaque,
                                   float *out_margin_bottom,
                                   float *out_margin_left,
                                   float *out_margin_right) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_tvos_features *ctx = (struct cmp_tvos_features *)features_opaque;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -131,15 +102,6 @@ int cmp_tvos_set_overscan_margins(cmp_tvos_features_t *features_opaque,
   if (out_margin_right)
     *out_margin_right = 90.0f;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -153,23 +115,14 @@ int cmp_tvos_set_overscan_margins(cmp_tvos_features_t *features_opaque,
  */
 int cmp_tvos_export_top_shelf(cmp_tvos_features_t *features_opaque,
                               int is_inset, const char *json_data) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_tvos_features *ctx = (struct cmp_tvos_features *)features_opaque;
   if (!ctx || !json_data)
     return CMP_ERROR_INVALID_ARG;
 
   ctx->top_shelf_mode = is_inset ? 1 : 0;
   /* Format for TVTopShelfCarouselContent or TVTopShelfInsetContent */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -180,22 +133,13 @@ int cmp_tvos_export_top_shelf(cmp_tvos_features_t *features_opaque,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tvos_handle_hardware_play_pause(cmp_tvos_features_t *features_opaque) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_tvos_features *ctx = (struct cmp_tvos_features *)features_opaque;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
 
   /* Broadcast global media play/pause regardless of focus */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -206,21 +150,12 @@ int cmp_tvos_handle_hardware_play_pause(cmp_tvos_features_t *features_opaque) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tvos_handle_hardware_menu_button(cmp_tvos_features_t *features_opaque) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_tvos_features *ctx = (struct cmp_tvos_features *)features_opaque;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
 
   /* Strictly pops navigation stack or exits */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

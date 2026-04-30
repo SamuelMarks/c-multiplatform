@@ -26,7 +26,7 @@ struct cmp_scroll_velocity {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_velocity_create(cmp_scroll_velocity_t **out_tracker) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_velocity *tracker;
 
   rc = CMP_SUCCESS;
@@ -47,7 +47,7 @@ int cmp_scroll_velocity_create(cmp_scroll_velocity_t **out_tracker) {
   tracker->last_y = -1.0f;
 
   *out_tracker = (cmp_scroll_velocity_t *)tracker;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -57,7 +57,7 @@ int cmp_scroll_velocity_create(cmp_scroll_velocity_t **out_tracker) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_velocity_destroy(cmp_scroll_velocity_t *tracker) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_velocity *ctx;
 
   rc = CMP_SUCCESS;
@@ -74,7 +74,7 @@ int cmp_scroll_velocity_destroy(cmp_scroll_velocity_t *tracker) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -87,6 +87,7 @@ int cmp_scroll_velocity_destroy(cmp_scroll_velocity_t *tracker) {
  */
 int cmp_scroll_velocity_push(cmp_scroll_velocity_t *tracker,
                              const cmp_event_t *event, float dt_ms) {
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_velocity *ctx;
   float dx, dy;
 
@@ -102,14 +103,14 @@ int cmp_scroll_velocity_push(cmp_scroll_velocity_t *tracker,
     ctx->count = 0;
     ctx->last_x = (float)event->x;
     ctx->last_y = (float)event->y;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (event->action == CMP_ACTION_MOVE && dt_ms > 0.0f) {
     if (ctx->last_x < 0.0f) {
       ctx->last_x = (float)event->x;
       ctx->last_y = (float)event->y;
-      return CMP_SUCCESS;
+      return rc;
     }
 
     dx = (float)event->x - ctx->last_x;
@@ -133,7 +134,7 @@ int cmp_scroll_velocity_push(cmp_scroll_velocity_t *tracker,
     ctx->last_y = -1.0f;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -146,6 +147,7 @@ int cmp_scroll_velocity_push(cmp_scroll_velocity_t *tracker,
  */
 int cmp_scroll_velocity_get(const cmp_scroll_velocity_t *tracker, float *out_vx,
                             float *out_vy) {
+  int rc = CMP_SUCCESS;
   const struct cmp_scroll_velocity *ctx;
   int i;
   float total_dx;
@@ -170,7 +172,7 @@ int cmp_scroll_velocity_get(const cmp_scroll_velocity_t *tracker, float *out_vx,
   }
 
   if (ctx->count == 0) {
-    return CMP_SUCCESS;
+    return rc;
   }
 
   for (i = 0; i < ctx->count; i++) {
@@ -189,5 +191,5 @@ int cmp_scroll_velocity_get(const cmp_scroll_velocity_t *tracker, float *out_vx,
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

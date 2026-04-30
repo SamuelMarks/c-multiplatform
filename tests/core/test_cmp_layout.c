@@ -213,8 +213,13 @@ TEST test_layout_rtl_calculation(void) {
      Second child (child2) is to the left of child1: X = 60 - 40 = 20.
   */
 
-  ASSERT_EQ_FMT(50.0f, child1->computed_rect.x, "%f"); /* Wait, apply_rtl_mirroring currently does LTR-LEFT padding mirrored to right. So right space = LTR-LEFT space = 20! So right edge = 80. child1 X = 80 - 30 = 50. */
-  ASSERT_EQ_FMT(10.0f, child2->computed_rect.x, "%f"); /* child2 X = 50 - 40 = 10. */
+  ASSERT_EQ_FMT(
+      50.0f, child1->computed_rect.x,
+      "%f"); /* Wait, apply_rtl_mirroring currently does LTR-LEFT padding
+                mirrored to right. So right space = LTR-LEFT space = 20! So
+                right edge = 80. child1 X = 80 - 30 = 50. */
+  ASSERT_EQ_FMT(10.0f, child2->computed_rect.x,
+                "%f"); /* child2 X = 50 - 40 = 10. */
 
   cmp_i18n_set_bidi_direction(CMP_TEXT_DIR_LTR);
 
@@ -224,7 +229,8 @@ TEST test_layout_rtl_calculation(void) {
 
 static void my_click_cb(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
   (void)ctx;
-  printf("CLICK CALLBACK FIRED! node=%p, action=%d\n", (void*)node, evt->action);
+  printf("CLICK CALLBACK FIRED! node=%p, action=%d\n", (void *)node,
+         evt->action);
 }
 
 TEST test_layout_debug_print(void) {
@@ -245,7 +251,7 @@ TEST test_layout_debug_print(void) {
   btn->layout->height = 100;
   btn->layout->margin[0] = 50;
   btn->layout->margin[3] = 50;
-  
+
   cmp_ui_node_add_event_listener(btn, 1, 0, my_click_cb, NULL);
 
   cmp_ui_box_create(&label);
@@ -257,15 +263,16 @@ TEST test_layout_debug_print(void) {
   cmp_layout_calculate(root->layout, 400, 300);
 
   cmp_hit_test_create(root, &ht);
-  
+
   res = cmp_hit_test_query(ht, 60.0f, 60.0f, &target);
-  printf("Hit query result: %d. Target: %p (label=%p, btn=%p)\n", res, (void*)target, (void*)label, (void*)btn);
-  
+  printf("Hit query result: %d. Target: %p (label=%p, btn=%p)\n", res,
+         (void *)target, (void *)label, (void *)btn);
+
   evt.type = 1;
   evt.action = 2; /* UP */
   evt.x = 60;
   evt.y = 60;
-  
+
   printf("Dispatching event...\n");
   cmp_event_dispatch_run(root, target, &evt);
   printf("Dispatch done.\n");

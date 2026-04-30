@@ -12,35 +12,20 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_grid_ctx_create(cmp_grid_ctx_t **out_ctx) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
   cmp_grid_ctx_t *ctx = NULL;
 
   if (out_ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_ctx_create: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_ctx_create: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_grid_ctx_t), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_ctx_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_ctx_create: Out of memory: %d\n", rc);
+
     return rc;
   }
 
@@ -48,7 +33,7 @@ int cmp_grid_ctx_create(cmp_grid_ctx_t **out_ctx) {
   *out_ctx = ctx;
   cmp_log_debug("cmp_grid_ctx_create: Successfully created generic grid matrix "
                 "context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -58,28 +43,21 @@ int cmp_grid_ctx_create(cmp_grid_ctx_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_grid_ctx_destroy(cmp_grid_ctx_t *ctx) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
 
   if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_ctx_destroy: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_ctx_destroy: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
   if (ctx->template_rows != NULL) {
     rc = CMP_FREE(ctx->template_rows);
     if (rc != CMP_SUCCESS) {
-      cmp_log_debug("cmp_grid_ctx_destroy: CMP_FREE failed (template_rows)\n");
+      LOG_DEBUG("cmp_grid_ctx_destroy: CMP_FREE failed (template_rows)\n: %d\n",
+                rc);
+      return rc;
     }
   }
   if (ctx->template_columns != NULL) {
@@ -92,25 +70,32 @@ int cmp_grid_ctx_destroy(cmp_grid_ctx_t *ctx) {
   if (ctx->auto_rows != NULL) {
     rc = CMP_FREE(ctx->auto_rows);
     if (rc != CMP_SUCCESS) {
-      cmp_log_debug("cmp_grid_ctx_destroy: CMP_FREE failed (auto_rows)\n");
+      LOG_DEBUG("cmp_grid_ctx_destroy: CMP_FREE failed (auto_rows)\n: %d\n",
+                rc);
+      return rc;
     }
   }
   if (ctx->auto_columns != NULL) {
     rc = CMP_FREE(ctx->auto_columns);
     if (rc != CMP_SUCCESS) {
-      cmp_log_debug("cmp_grid_ctx_destroy: CMP_FREE failed (auto_columns)\n");
+      LOG_DEBUG("cmp_grid_ctx_destroy: CMP_FREE failed (auto_columns)\n: %d\n",
+                rc);
+      return rc;
     }
   }
   if (ctx->template_areas != NULL) {
     rc = CMP_FREE(ctx->template_areas);
     if (rc != CMP_SUCCESS) {
-      cmp_log_debug("cmp_grid_ctx_destroy: CMP_FREE failed (template_areas)\n");
+      LOG_DEBUG(
+          "cmp_grid_ctx_destroy: CMP_FREE failed (template_areas)\n: %d\n", rc);
+      return rc;
     }
   }
   if (ctx->items != NULL) {
     rc = CMP_FREE(ctx->items);
     if (rc != CMP_SUCCESS) {
-      cmp_log_debug("cmp_grid_ctx_destroy: CMP_FREE failed (items)\n");
+      LOG_DEBUG("cmp_grid_ctx_destroy: CMP_FREE failed (items)\n: %d\n", rc);
+      return rc;
     }
   }
   if (ctx->computed_row_sizes != NULL) {
@@ -130,12 +115,13 @@ int cmp_grid_ctx_destroy(cmp_grid_ctx_t *ctx) {
 
   rc = CMP_FREE(ctx);
   if (rc != CMP_SUCCESS) {
-    cmp_log_debug("cmp_grid_ctx_destroy: CMP_FREE failed (ctx)\n");
+    LOG_DEBUG("cmp_grid_ctx_destroy: CMP_FREE failed (ctx)\n: %d\n", rc);
+    return rc;
   }
 
   cmp_log_debug("cmp_grid_ctx_destroy: Dispatched GC memory block cleanups "
                 "successfully\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -148,23 +134,14 @@ int cmp_grid_ctx_destroy(cmp_grid_ctx_t *ctx) {
  */
 int cmp_grid_ctx_add_item(cmp_grid_ctx_t *ctx, cmp_layout_node_t *node,
                           cmp_grid_item_t **out_item) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
   size_t new_cap;
   cmp_grid_item_t *new_items = NULL;
 
   if (ctx == NULL || node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_ctx_add_item: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_ctx_add_item: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -172,14 +149,8 @@ int cmp_grid_ctx_add_item(cmp_grid_ctx_t *ctx, cmp_layout_node_t *node,
     new_cap = ctx->item_capacity == 0 ? 16 : ctx->item_capacity * 2;
     rc = CMP_MALLOC(new_cap * sizeof(cmp_grid_item_t), (void **)&new_items);
     if (rc != CMP_SUCCESS) {
-      err_rc = cmp_strerror(rc, &err_str);
-      if (err_rc != CMP_SUCCESS) {
-        err_str = "Unknown";
-      }
-      cmp_log_debug("cmp_grid_ctx_add_item: Out of memory: %s\n", err_str);
-      if (rc != 0) {
-        return rc;
-      }
+      LOG_DEBUG("cmp_grid_ctx_add_item: Out of memory: %d\n", rc);
+
       return rc;
     }
     if (ctx->items != NULL) {
@@ -208,7 +179,7 @@ int cmp_grid_ctx_add_item(cmp_grid_ctx_t *ctx, cmp_layout_node_t *node,
   ctx->item_count++;
   cmp_log_debug(
       "cmp_grid_ctx_add_item: Included element bound variables dynamically\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -221,21 +192,12 @@ int cmp_grid_ctx_add_item(cmp_grid_ctx_t *ctx, cmp_layout_node_t *node,
  */
 int cmp_grid_track_evaluate(cmp_grid_track_size_t *track, float container_size,
                             float *out_size) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
 
   if (track == NULL || out_size == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_track_evaluate: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_track_evaluate: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -262,15 +224,7 @@ int cmp_grid_track_evaluate(cmp_grid_track_size_t *track, float container_size,
 
   cmp_log_debug(
       "cmp_grid_track_evaluate: Evaluated CSS layout bounds matrix\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -284,10 +238,7 @@ int cmp_grid_track_evaluate(cmp_grid_track_size_t *track, float container_size,
  */
 int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
                            float available_height) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
   float total_fr_cols = 0.0f;
   float total_fr_rows = 0.0f;
   float free_width = available_width;
@@ -299,14 +250,8 @@ int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
 
   if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_fr_distribute: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_fr_distribute: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -319,9 +264,7 @@ int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
                                    &sz);
       if (rc != CMP_SUCCESS) {
         cmp_log_debug("cmp_grid_fr_distribute: track col evaluate failed\n");
-        if (rc != 0) {
-          return rc;
-        }
+
         return rc;
       }
       free_width -= sz;
@@ -337,9 +280,7 @@ int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
                                    &sz);
       if (rc != CMP_SUCCESS) {
         cmp_log_debug("cmp_grid_fr_distribute: track row evaluate failed\n");
-        if (rc != 0) {
-          return rc;
-        }
+
         return rc;
       }
       free_height -= sz;
@@ -366,7 +307,7 @@ int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
 
   cmp_log_debug(
       "cmp_grid_fr_distribute: Executed FR distribution successfully\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -379,22 +320,13 @@ int cmp_grid_fr_distribute(cmp_grid_ctx_t *ctx, float available_width,
  */
 int cmp_grid_minmax_resolve(cmp_grid_track_size_t *track, float container_size,
                             float *out_size) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
   (void)container_size;
 
   if (track == NULL || out_size == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_minmax_resolve: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_minmax_resolve: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -405,15 +337,7 @@ int cmp_grid_minmax_resolve(cmp_grid_track_size_t *track, float container_size,
 
   cmp_log_debug(
       "cmp_grid_minmax_resolve: Computed MINMAX constraints successfully\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -428,22 +352,13 @@ int cmp_grid_minmax_resolve(cmp_grid_track_size_t *track, float container_size,
  */
 int cmp_grid_repeat_expand(cmp_grid_track_size_t *track, int auto_fit,
                            float container_size, int *out_count) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
   (void)auto_fit;
 
   if (track == NULL || out_count == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_repeat_expand: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_repeat_expand: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -458,15 +373,7 @@ int cmp_grid_repeat_expand(cmp_grid_track_size_t *track, int auto_fit,
 
   cmp_log_debug(
       "cmp_grid_repeat_expand: Calculated repeat constraints safely\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -483,22 +390,12 @@ int cmp_grid_repeat_expand(cmp_grid_track_size_t *track, int auto_fit,
 int cmp_grid_placement_resolve(cmp_grid_placement_t *start,
                                cmp_grid_placement_t *end, int track_count,
                                int *out_start, int *out_end) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
 
   if (start == NULL || end == NULL || out_start == NULL || out_end == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_placement_resolve: Invalid argument: %s\n",
-                  err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_placement_resolve: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -515,15 +412,7 @@ int cmp_grid_placement_resolve(cmp_grid_placement_t *start,
 
   cmp_log_debug(
       "cmp_grid_placement_resolve: Resolved logical block bindings\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -541,23 +430,14 @@ int cmp_grid_placement_resolve(cmp_grid_placement_t *start,
 int cmp_grid_area_resolve(cmp_grid_ctx_t *ctx, const char *name,
                           int *out_row_start, int *out_col_start,
                           int *out_row_end, int *out_col_end) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
   size_t i;
 
   if (ctx == NULL || name == NULL || out_row_start == NULL ||
       out_col_start == NULL || out_row_end == NULL || out_col_end == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_area_resolve: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_area_resolve: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -569,25 +449,13 @@ int cmp_grid_area_resolve(cmp_grid_ctx_t *ctx, const char *name,
       *out_row_end = ctx->template_areas[i].row_end;
       *out_col_end = ctx->template_areas[i].col_end;
       cmp_log_debug("cmp_grid_area_resolve: Match generated effectively\n");
-      return CMP_SUCCESS;
+      return rc;
     }
   }
 
   rc = CMP_ERROR_NOT_FOUND;
-  err_rc = cmp_strerror(rc, &err_str);
-  if (err_rc != CMP_SUCCESS) {
-    err_str = "Unknown";
-  }
-  cmp_log_debug("cmp_grid_area_resolve: Area not found: %s\n", err_str);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+  LOG_DEBUG("cmp_grid_area_resolve: Area not found: %d\n", rc);
+
   return rc;
 }
 
@@ -598,22 +466,13 @@ int cmp_grid_area_resolve(cmp_grid_ctx_t *ctx, const char *name,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_grid_auto_dense_place(cmp_grid_ctx_t *ctx) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
   size_t i;
 
   if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_auto_dense_place: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_auto_dense_place: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -629,15 +488,7 @@ int cmp_grid_auto_dense_place(cmp_grid_ctx_t *ctx) {
 
   cmp_log_debug("cmp_grid_auto_dense_place: Configured density parameters "
                 "successfully\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -648,25 +499,15 @@ int cmp_grid_auto_dense_place(cmp_grid_ctx_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_grid_auto_sparse_place(cmp_grid_ctx_t *ctx) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
   size_t i;
   int current_row = 1;
   int current_col = 1;
 
   if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_auto_sparse_place: Invalid argument: %s\n",
-                  err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_auto_sparse_place: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -688,15 +529,7 @@ int cmp_grid_auto_sparse_place(cmp_grid_ctx_t *ctx) {
 
   cmp_log_debug(
       "cmp_grid_auto_sparse_place: Mapped empty grid elements successfully\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -707,25 +540,15 @@ int cmp_grid_auto_sparse_place(cmp_grid_ctx_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_grid_implicit_tracks_generate(cmp_grid_ctx_t *ctx) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
   size_t i;
   int max_row = 0;
   int max_col = 0;
 
   if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_implicit_tracks_generate: Invalid argument: %s\n",
-                  err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_implicit_tracks_generate: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -749,15 +572,8 @@ int cmp_grid_implicit_tracks_generate(cmp_grid_ctx_t *ctx) {
     rc = CMP_MALLOC(ctx->computed_row_count * sizeof(float),
                     (void **)&ctx->computed_row_sizes);
     if (rc != CMP_SUCCESS) {
-      err_rc = cmp_strerror(rc, &err_str);
-      if (err_rc != CMP_SUCCESS) {
-        err_str = "Unknown";
-      }
-      cmp_log_debug("cmp_grid_implicit_tracks_generate: Out of memory: %s\n",
-                    err_str);
-      if (rc != 0) {
-        return rc;
-      }
+      LOG_DEBUG("cmp_grid_implicit_tracks_generate: Out of memory: %d\n", rc);
+
       return rc;
     }
     memset(ctx->computed_row_sizes, 0, ctx->computed_row_count * sizeof(float));
@@ -767,15 +583,8 @@ int cmp_grid_implicit_tracks_generate(cmp_grid_ctx_t *ctx) {
     rc = CMP_MALLOC(ctx->computed_col_count * sizeof(float),
                     (void **)&ctx->computed_col_sizes);
     if (rc != CMP_SUCCESS) {
-      err_rc = cmp_strerror(rc, &err_str);
-      if (err_rc != CMP_SUCCESS) {
-        err_str = "Unknown";
-      }
-      cmp_log_debug("cmp_grid_implicit_tracks_generate: Out of memory: %s\n",
-                    err_str);
-      if (rc != 0) {
-        return rc;
-      }
+      LOG_DEBUG("cmp_grid_implicit_tracks_generate: Out of memory: %d\n", rc);
+
       return rc;
     }
     memset(ctx->computed_col_sizes, 0, ctx->computed_col_count * sizeof(float));
@@ -783,7 +592,7 @@ int cmp_grid_implicit_tracks_generate(cmp_grid_ctx_t *ctx) {
 
   cmp_log_debug(
       "cmp_grid_implicit_tracks_generate: Mapped boundaries cleanly\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -794,21 +603,12 @@ int cmp_grid_implicit_tracks_generate(cmp_grid_ctx_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_subgrid_sync(cmp_grid_ctx_t *parent, cmp_grid_ctx_t *child) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
 
   if (parent == NULL || child == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_subgrid_sync: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_subgrid_sync: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -817,15 +617,7 @@ int cmp_subgrid_sync(cmp_grid_ctx_t *parent, cmp_grid_ctx_t *child) {
   /* Sync tracks from parent to child */
   cmp_log_debug(
       "cmp_subgrid_sync: Track boundaries updated and synchronized safely\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -840,21 +632,12 @@ int cmp_subgrid_sync(cmp_grid_ctx_t *parent, cmp_grid_ctx_t *child) {
  */
 int cmp_grid_align_evaluate(cmp_grid_align_t align, float track_size,
                             float item_size, float *out_offset) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
 
   if (out_offset == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_align_evaluate: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_align_evaluate: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -877,15 +660,7 @@ int cmp_grid_align_evaluate(cmp_grid_align_t align, float track_size,
 
   cmp_log_debug(
       "cmp_grid_align_evaluate: Passed offset resolution logic correctly\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -896,36 +671,19 @@ int cmp_grid_align_evaluate(cmp_grid_align_t align, float track_size,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_masonry_layout(cmp_grid_ctx_t *ctx) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
 
   if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_masonry_layout: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_masonry_layout: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
   /* Simplified masonry layout placeholder */
   cmp_log_debug("cmp_masonry_layout: Instantiated structural layout "
                 "dependencies cleanly\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -939,21 +697,12 @@ int cmp_masonry_layout(cmp_grid_ctx_t *ctx) {
  */
 int cmp_grid_gap_apply(cmp_grid_ctx_t *ctx, float *out_row_gaps,
                        float *out_col_gaps) {
-  int rc;
-  rc = CMP_SUCCESS;
-  int err_rc;
-  const char *err_str;
+  int rc = CMP_SUCCESS;
 
   if (ctx == NULL || out_row_gaps == NULL || out_col_gaps == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
-    err_rc = cmp_strerror(rc, &err_str);
-    if (err_rc != CMP_SUCCESS) {
-      err_str = "Unknown";
-    }
-    cmp_log_debug("cmp_grid_gap_apply: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+    LOG_DEBUG("cmp_grid_gap_apply: Invalid argument: %d\n", rc);
+
     return rc;
   }
 
@@ -962,14 +711,6 @@ int cmp_grid_gap_apply(cmp_grid_ctx_t *ctx, float *out_row_gaps,
 
   cmp_log_debug(
       "cmp_grid_gap_apply: Completed distribution logic metrics validation\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

@@ -17,7 +17,7 @@ struct cmp_os_scrollbar {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_os_scrollbar_t *scrollbar;
 
   rc = CMP_SUCCESS;
@@ -45,7 +45,7 @@ int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar) {
 #endif
 
   *out_scrollbar = scrollbar;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -55,7 +55,7 @@ int cmp_os_scrollbar_create(cmp_os_scrollbar_t **out_scrollbar) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -69,7 +69,7 @@ int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar) {
     LOG_DEBUG("Error in cmp_os_scrollbar_destroy: CMP_FREE failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -83,8 +83,7 @@ int cmp_os_scrollbar_destroy(cmp_os_scrollbar_t *scrollbar) {
  */
 int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar, float raw_delta_y,
                           unsigned int delta_time_ms, float *out_smoothed_y) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float dt_seconds;
 
   if (scrollbar == NULL || out_smoothed_y == NULL) {
@@ -95,7 +94,7 @@ int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar, float raw_delta_y,
   dt_seconds = delta_time_ms / 1000.0f;
   if (dt_seconds <= 0.0f) {
     *out_smoothed_y = 0.0f;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   /* Add incoming impulse */
@@ -115,5 +114,5 @@ int cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar, float raw_delta_y,
   }
 
   *out_smoothed_y = scrollbar->current_velocity * dt_seconds;
-  return CMP_SUCCESS;
+  return rc;
 }

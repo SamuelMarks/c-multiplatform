@@ -20,8 +20,7 @@ struct cmp_search_controller {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_search_controller_create(cmp_search_controller_t **out_controller) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_search_controller *ctx;
   if (!out_controller)
     return CMP_ERROR_INVALID_ARG;
@@ -37,15 +36,7 @@ int cmp_search_controller_create(cmp_search_controller_t **out_controller) {
   ctx->suggestion_count = 0;
 
   *out_controller = (cmp_search_controller_t *)ctx;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -56,13 +47,12 @@ int cmp_search_controller_create(cmp_search_controller_t **out_controller) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_search_controller_destroy(cmp_search_controller_t *controller) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_search_controller *ctx =
       (struct cmp_search_controller *)controller;
   size_t i;
   if (!ctx)
-    return CMP_SUCCESS;
+    return rc;
 
   if (ctx->text)
     CMP_FREE(ctx->text);
@@ -82,15 +72,7 @@ int cmp_search_controller_destroy(cmp_search_controller_t *controller) {
   }
 
   CMP_FREE(ctx);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -103,8 +85,7 @@ int cmp_search_controller_destroy(cmp_search_controller_t *controller) {
  */
 int cmp_search_controller_set_text(cmp_search_controller_t *controller,
                                    const char *text) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_search_controller *ctx =
       (struct cmp_search_controller *)controller;
   size_t len;
@@ -127,15 +108,6 @@ int cmp_search_controller_set_text(cmp_search_controller_t *controller,
 #endif
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -148,8 +120,7 @@ int cmp_search_controller_set_text(cmp_search_controller_t *controller,
  */
 int cmp_search_controller_add_scope(cmp_search_controller_t *controller,
                                     const char *scope_title) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_search_controller *ctx =
       (struct cmp_search_controller *)controller;
   char **new_scopes;
@@ -179,15 +150,7 @@ int cmp_search_controller_add_scope(cmp_search_controller_t *controller,
 #endif
 
   ctx->scope_count++;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -200,23 +163,14 @@ int cmp_search_controller_add_scope(cmp_search_controller_t *controller,
  */
 int cmp_search_controller_set_active(cmp_search_controller_t *controller,
                                      int active) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_search_controller *ctx =
       (struct cmp_search_controller *)controller;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
 
   ctx->state = active ? CMP_SEARCH_BAR_ACTIVE : CMP_SEARCH_BAR_INACTIVE;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -235,8 +189,7 @@ int cmp_search_controller_resolve_metrics(cmp_search_controller_t *controller,
                                           int *out_show_clear,
                                           int *out_show_cancel,
                                           float *out_placeholder_offset) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_search_controller *ctx =
       (struct cmp_search_controller *)controller;
   float content_w;
@@ -260,15 +213,6 @@ int cmp_search_controller_resolve_metrics(cmp_search_controller_t *controller,
     *out_placeholder_offset = 16.0f; /* Standard leading margin */
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -283,8 +227,7 @@ int cmp_search_controller_resolve_metrics(cmp_search_controller_t *controller,
 int cmp_search_controller_set_suggestions(cmp_search_controller_t *controller,
                                           const char **suggestions,
                                           size_t count) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_search_controller *ctx =
       (struct cmp_search_controller *)controller;
   char **new_sug;
@@ -319,14 +262,5 @@ int cmp_search_controller_set_suggestions(cmp_search_controller_t *controller,
     ctx->suggestion_count = count;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

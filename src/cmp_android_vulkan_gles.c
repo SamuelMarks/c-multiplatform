@@ -15,8 +15,7 @@ struct cmp_android_renderer {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_android_renderer_create(cmp_android_renderer_t **out_renderer) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_android_renderer_t *r = NULL;
@@ -30,9 +29,7 @@ int cmp_android_renderer_create(cmp_android_renderer_t **out_renderer) {
     cmp_log_debug("cmp_android_renderer_create: Invalid argument "
                   "(out_renderer=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -43,9 +40,7 @@ int cmp_android_renderer_create(cmp_android_renderer_t **out_renderer) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_android_renderer_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -54,9 +49,7 @@ int cmp_android_renderer_create(cmp_android_renderer_t **out_renderer) {
 
   cmp_log_debug("cmp_android_renderer_create: Successfully created android "
                 "renderer context\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -67,8 +60,7 @@ int cmp_android_renderer_create(cmp_android_renderer_t **out_renderer) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_android_renderer_destroy(cmp_android_renderer_t *renderer) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -81,24 +73,14 @@ int cmp_android_renderer_destroy(cmp_android_renderer_t *renderer) {
     cmp_log_debug(
         "cmp_android_renderer_destroy: Invalid argument (renderer=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   CMP_FREE(renderer);
   cmp_log_debug("cmp_android_renderer_destroy: Successfully destroyed android "
                 "renderer context\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -113,8 +95,7 @@ int cmp_android_renderer_destroy(cmp_android_renderer_t *renderer) {
 int cmp_android_renderer_initialize_fallback(cmp_android_renderer_t *renderer,
                                              cmp_window_t *window,
                                              int *out_backend) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -127,9 +108,7 @@ int cmp_android_renderer_initialize_fallback(cmp_android_renderer_t *renderer,
     cmp_log_debug(
         "cmp_android_renderer_initialize_fallback: Invalid argument: %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -143,14 +122,6 @@ int cmp_android_renderer_initialize_fallback(cmp_android_renderer_t *renderer,
   cmp_log_debug("cmp_android_renderer_initialize_fallback: Initialized "
                 "fallback to backend %d\n",
                 renderer->active_backend);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

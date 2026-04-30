@@ -17,8 +17,7 @@ struct cmp_siwa_ctx {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_siwa_create(cmp_siwa_ctx_t **out_ctx) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_siwa_ctx *ctx = NULL;
@@ -31,9 +30,7 @@ int cmp_siwa_create(cmp_siwa_ctx_t **out_ctx) {
     }
     cmp_log_debug("cmp_siwa_create: Invalid argument (out_ctx=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -44,18 +41,14 @@ int cmp_siwa_create(cmp_siwa_ctx_t **out_ctx) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_siwa_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   ctx->is_supported = 1;
   *out_ctx = (cmp_siwa_ctx_t *)ctx;
   cmp_log_debug("cmp_siwa_create: Successfully created siwa context\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -66,8 +59,7 @@ int cmp_siwa_create(cmp_siwa_ctx_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_siwa_destroy(cmp_siwa_ctx_t *ctx) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -79,23 +71,13 @@ int cmp_siwa_destroy(cmp_siwa_ctx_t *ctx) {
     }
     cmp_log_debug("cmp_siwa_destroy: Invalid argument (ctx=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   CMP_FREE(ctx);
   cmp_log_debug("cmp_siwa_destroy: Successfully destroyed siwa context\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -110,8 +92,7 @@ int cmp_siwa_destroy(cmp_siwa_ctx_t *ctx) {
  */
 int cmp_siwa_request(cmp_siwa_ctx_t *ctx, int req_hidden_email,
                      char *out_token_buf, size_t token_cap) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_siwa_ctx *c = (struct cmp_siwa_ctx *)ctx;
@@ -123,9 +104,7 @@ int cmp_siwa_request(cmp_siwa_ctx_t *ctx, int req_hidden_email,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_siwa_request: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -137,15 +116,7 @@ int cmp_siwa_request(cmp_siwa_ctx_t *ctx, int req_hidden_email,
   strcpy(out_token_buf, "apple_jwt_fake_token");
 #endif
   cmp_log_debug("cmp_siwa_request: SIWA request mock fulfilled\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -159,8 +130,7 @@ int cmp_siwa_request(cmp_siwa_ctx_t *ctx, int req_hidden_email,
  */
 int cmp_tree_validate_siwa_branding(cmp_a11y_tree_t *tree, int node_id,
                                     int *out_is_valid) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -175,9 +145,7 @@ int cmp_tree_validate_siwa_branding(cmp_a11y_tree_t *tree, int node_id,
     }
     cmp_log_debug("cmp_tree_validate_siwa_branding: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -185,15 +153,7 @@ int cmp_tree_validate_siwa_branding(cmp_a11y_tree_t *tree, int node_id,
    */
   *out_is_valid = 1;
   cmp_log_debug("cmp_tree_validate_siwa_branding: SIWA branding validated\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -208,8 +168,7 @@ struct cmp_local_auth {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_local_auth_create(cmp_local_auth_t **out_auth) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_local_auth *ctx = NULL;
@@ -223,9 +182,7 @@ int cmp_local_auth_create(cmp_local_auth_t **out_auth) {
     cmp_log_debug(
         "cmp_local_auth_create: Invalid argument (out_auth=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -236,9 +193,7 @@ int cmp_local_auth_create(cmp_local_auth_t **out_auth) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_local_auth_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -246,9 +201,7 @@ int cmp_local_auth_create(cmp_local_auth_t **out_auth) {
   *out_auth = (cmp_local_auth_t *)ctx;
   cmp_log_debug(
       "cmp_local_auth_create: Successfully created local auth context\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -259,8 +212,7 @@ int cmp_local_auth_create(cmp_local_auth_t **out_auth) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_local_auth_destroy(cmp_local_auth_t *auth) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -272,24 +224,14 @@ int cmp_local_auth_destroy(cmp_local_auth_t *auth) {
     }
     cmp_log_debug("cmp_local_auth_destroy: Invalid argument (auth=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   CMP_FREE(auth);
   cmp_log_debug(
       "cmp_local_auth_destroy: Successfully destroyed local auth context\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -303,8 +245,7 @@ int cmp_local_auth_destroy(cmp_local_auth_t *auth) {
  */
 int cmp_local_auth_request(cmp_local_auth_t *auth, const char *reason,
                            int *out_success) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_local_auth *c = (struct cmp_local_auth *)auth;
@@ -316,23 +257,13 @@ int cmp_local_auth_request(cmp_local_auth_t *auth, const char *reason,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_local_auth_request: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   *out_success = 1;
   cmp_log_debug("cmp_local_auth_request: Local auth request mocked success\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -348,8 +279,7 @@ struct cmp_keychain {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_keychain_create(cmp_keychain_t **out_keychain) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_keychain *ctx = NULL;
@@ -363,9 +293,7 @@ int cmp_keychain_create(cmp_keychain_t **out_keychain) {
     cmp_log_debug(
         "cmp_keychain_create: Invalid argument (out_keychain=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -376,9 +304,7 @@ int cmp_keychain_create(cmp_keychain_t **out_keychain) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_keychain_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -386,9 +312,7 @@ int cmp_keychain_create(cmp_keychain_t **out_keychain) {
   memset(ctx->temp_val, 0, 128);
   *out_keychain = (cmp_keychain_t *)ctx;
   cmp_log_debug("cmp_keychain_create: Successfully created keychain context\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -399,8 +323,7 @@ int cmp_keychain_create(cmp_keychain_t **out_keychain) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_keychain_destroy(cmp_keychain_t *keychain) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -413,24 +336,14 @@ int cmp_keychain_destroy(cmp_keychain_t *keychain) {
     cmp_log_debug(
         "cmp_keychain_destroy: Invalid argument (keychain=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   CMP_FREE(keychain);
   cmp_log_debug(
       "cmp_keychain_destroy: Successfully destroyed keychain context\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -444,8 +357,7 @@ int cmp_keychain_destroy(cmp_keychain_t *keychain) {
  */
 int cmp_keychain_save(cmp_keychain_t *keychain, const char *key,
                       const char *secret) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_keychain *k = (struct cmp_keychain *)keychain;
@@ -457,9 +369,7 @@ int cmp_keychain_save(cmp_keychain_t *keychain, const char *key,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_keychain_save: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 #if defined(_MSC_VER)
@@ -472,15 +382,7 @@ int cmp_keychain_save(cmp_keychain_t *keychain, const char *key,
   k->temp_val[127] = '\0';
 #endif
   cmp_log_debug("cmp_keychain_save: Keychain save mocked successfully\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -495,8 +397,7 @@ int cmp_keychain_save(cmp_keychain_t *keychain, const char *key,
  */
 int cmp_keychain_load(cmp_keychain_t *keychain, const char *key,
                       char *out_secret, size_t secret_cap) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_keychain *k = (struct cmp_keychain *)keychain;
@@ -508,9 +409,7 @@ int cmp_keychain_load(cmp_keychain_t *keychain, const char *key,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_keychain_load: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -522,9 +421,7 @@ int cmp_keychain_load(cmp_keychain_t *keychain, const char *key,
     out_secret[secret_cap - 1] = '\0';
 #endif
     cmp_log_debug("cmp_keychain_load: Successfully loaded key\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -534,15 +431,7 @@ int cmp_keychain_load(cmp_keychain_t *keychain, const char *key,
     err_str = "Unknown";
   }
   cmp_log_debug("cmp_keychain_load: Key not found: %s\n", err_str);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -556,8 +445,7 @@ int cmp_keychain_load(cmp_keychain_t *keychain, const char *key,
  */
 int cmp_a11y_tree_set_node_text_content_type(cmp_a11y_tree_t *tree, int node_id,
                                              cmp_text_content_type_t type) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   (void)tree;
@@ -573,24 +461,14 @@ int cmp_a11y_tree_set_node_text_content_type(cmp_a11y_tree_t *tree, int node_id,
     cmp_log_debug("cmp_a11y_tree_set_node_text_content_type: Invalid argument "
                   "(tree=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   /* Modifies internal vdom trait for input type mapping */
   cmp_log_debug(
       "cmp_a11y_tree_set_node_text_content_type: Set text content type\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -603,8 +481,7 @@ int cmp_a11y_tree_set_node_text_content_type(cmp_a11y_tree_t *tree, int node_id,
  */
 int cmp_window_set_secure_background_obscure(struct cmp_window *window,
                                              int enabled) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   (void)window;
@@ -619,23 +496,13 @@ int cmp_window_set_secure_background_obscure(struct cmp_window *window,
     cmp_log_debug("cmp_window_set_secure_background_obscure: Invalid argument "
                   "(window=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   cmp_log_debug(
       "cmp_window_set_secure_background_obscure: Set obscure background\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -649,8 +516,7 @@ int cmp_window_set_secure_background_obscure(struct cmp_window *window,
  */
 int cmp_visuals_check_sensitive_content(const void *payload, size_t size,
                                         int *out_is_sensitive) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   (void)payload;
@@ -664,9 +530,7 @@ int cmp_visuals_check_sensitive_content(const void *payload, size_t size,
     }
     cmp_log_debug("cmp_visuals_check_sensitive_content: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -674,14 +538,6 @@ int cmp_visuals_check_sensitive_content(const void *payload, size_t size,
   *out_is_sensitive = 0; /* Default clean */
   cmp_log_debug(
       "cmp_visuals_check_sensitive_content: Mock sensitive check completed\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

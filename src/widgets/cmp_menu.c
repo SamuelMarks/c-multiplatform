@@ -35,8 +35,7 @@ struct cmp_menu {
  */
 int cmp_menu_create(cmp_menu_t **out_menu,
                     cmp_menu_presentation_t presentation) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_menu *ctx;
   if (!out_menu)
     return CMP_ERROR_INVALID_ARG;
@@ -49,15 +48,7 @@ int cmp_menu_create(cmp_menu_t **out_menu,
   ctx->capacity = 0;
 
   *out_menu = (cmp_menu_t *)ctx;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -68,12 +59,11 @@ int cmp_menu_create(cmp_menu_t **out_menu,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_menu_destroy(cmp_menu_t *menu_opaque) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_menu *menu = (struct cmp_menu *)menu_opaque;
   size_t i;
   if (!menu)
-    return CMP_SUCCESS;
+    return rc;
 
   if (menu->items) {
     for (i = 0; i < menu->count; ++i) {
@@ -90,15 +80,7 @@ int cmp_menu_destroy(cmp_menu_t *menu_opaque) {
     CMP_FREE(menu->items);
   }
   CMP_FREE(menu);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -113,8 +95,7 @@ int cmp_menu_destroy(cmp_menu_t *menu_opaque) {
  */
 int cmp_menu_item_create(cmp_menu_item_t **out_item, const char *title,
                          const char *symbol, cmp_menu_item_role_t role) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_menu_item *item;
   size_t len;
 
@@ -150,15 +131,7 @@ int cmp_menu_item_create(cmp_menu_item_t **out_item, const char *title,
   }
 
   *out_item = (cmp_menu_item_t *)item;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -170,8 +143,7 @@ int cmp_menu_item_create(cmp_menu_item_t **out_item, const char *title,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_menu_add_item(cmp_menu_t *menu_opaque, cmp_menu_item_t *item_opaque) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_menu *menu = (struct cmp_menu *)menu_opaque;
   struct cmp_menu_item *item = (struct cmp_menu_item *)item_opaque;
   cmp_menu_item_t **new_items;
@@ -194,15 +166,7 @@ int cmp_menu_add_item(cmp_menu_t *menu_opaque, cmp_menu_item_t *item_opaque) {
   }
 
   menu->items[menu->count++] = item;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -217,8 +181,7 @@ int cmp_menu_add_item(cmp_menu_t *menu_opaque, cmp_menu_item_t *item_opaque) {
  */
 int cmp_menu_item_create_submenu(cmp_menu_item_t **out_item, const char *title,
                                  const char *symbol, cmp_menu_t *child_menu) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   int err;
   struct cmp_menu_item *item;
 
@@ -234,15 +197,6 @@ int cmp_menu_item_create_submenu(cmp_menu_item_t **out_item, const char *title,
   item->type = ITEM_TYPE_SUBMENU;
   item->child_menu = child_menu; /* Assumes ownership */
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -255,8 +209,7 @@ int cmp_menu_item_create_submenu(cmp_menu_item_t **out_item, const char *title,
  */
 int cmp_menu_item_create_deferred(cmp_menu_item_t **out_item,
                                   const char *title) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   int err;
   struct cmp_menu_item *item;
 
@@ -268,15 +221,6 @@ int cmp_menu_item_create_deferred(cmp_menu_item_t **out_item,
   item = (struct cmp_menu_item *)*out_item;
   item->type = ITEM_TYPE_DEFERRED;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -289,21 +233,12 @@ int cmp_menu_item_create_deferred(cmp_menu_item_t **out_item,
  */
 int cmp_menu_item_set_state(cmp_menu_item_t *item_opaque,
                             cmp_menu_item_state_t state) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_menu_item *item = (struct cmp_menu_item *)item_opaque;
   if (!item)
     return CMP_ERROR_INVALID_ARG;
   item->state = state;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -318,8 +253,7 @@ int cmp_menu_item_set_state(cmp_menu_item_t *item_opaque,
  */
 int cmp_menu_resolve_presentation(cmp_menu_t *menu_opaque, int *out_bg_blur,
                                   int *out_lift_target, int *out_has_arrow) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_menu *menu = (struct cmp_menu *)menu_opaque;
   if (!menu || !out_bg_blur || !out_lift_target || !out_has_arrow)
     return CMP_ERROR_INVALID_ARG;
@@ -342,15 +276,6 @@ int cmp_menu_resolve_presentation(cmp_menu_t *menu_opaque, int *out_bg_blur,
     break;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -364,8 +289,7 @@ int cmp_menu_resolve_presentation(cmp_menu_t *menu_opaque, int *out_bg_blur,
  */
 int cmp_menu_item_resolve_visuals(cmp_menu_item_t *item_opaque, int *out_is_red,
                                   const char **out_state_icon) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_menu_item *item = (struct cmp_menu_item *)item_opaque;
   if (!item || !out_is_red || !out_state_icon)
     return CMP_ERROR_INVALID_ARG;
@@ -383,14 +307,5 @@ int cmp_menu_item_resolve_visuals(cmp_menu_item_t *item_opaque, int *out_is_red,
     *out_state_icon = "chevron.right"; /* Nested indicator */
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

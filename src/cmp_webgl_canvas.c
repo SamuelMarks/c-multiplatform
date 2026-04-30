@@ -16,7 +16,7 @@ struct cmp_webgl_canvas {
  */
 int cmp_webgl_canvas_create(cmp_webgl_canvas_t **out_canvas) {
   cmp_webgl_canvas_t *c = NULL;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!out_canvas) {
     LOG_DEBUG("cmp_webgl_canvas_create: out_canvas is NULL\n");
@@ -26,16 +26,14 @@ int cmp_webgl_canvas_create(cmp_webgl_canvas_t **out_canvas) {
   rc = CMP_MALLOC(sizeof(cmp_webgl_canvas_t), (void **)&c);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_webgl_canvas_create: OOM\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   c->is_bound = 0;
   *out_canvas = c;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -45,7 +43,7 @@ int cmp_webgl_canvas_create(cmp_webgl_canvas_t **out_canvas) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_webgl_canvas_destroy(cmp_webgl_canvas_t *canvas) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!canvas) {
     LOG_DEBUG("cmp_webgl_canvas_destroy: canvas is NULL\n");
@@ -55,12 +53,10 @@ int cmp_webgl_canvas_destroy(cmp_webgl_canvas_t *canvas) {
   rc = CMP_FREE(canvas);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_webgl_canvas_destroy: CMP_FREE failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -72,8 +68,7 @@ int cmp_webgl_canvas_destroy(cmp_webgl_canvas_t *canvas) {
  */
 int cmp_webgl_canvas_bind(cmp_webgl_canvas_t *canvas,
                           const char *dom_selector) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!canvas || !dom_selector) {
     LOG_DEBUG("cmp_webgl_canvas_bind: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
@@ -86,14 +81,6 @@ int cmp_webgl_canvas_bind(cmp_webgl_canvas_t *canvas,
 #endif
 
   canvas->is_bound = 1;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

@@ -1,4 +1,8 @@
+/* clang-format off */
 #include "cmp.h"
+#include "cmp_log.h"
+#include <stdlib.h>
+
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
 /**
  * @brief cmp_semaphore_init
@@ -8,19 +12,9 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_init(cmp_semaphore_t *sem, int count) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)sem;
   (void)count;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -30,18 +24,8 @@ int cmp_semaphore_init(cmp_semaphore_t *sem, int count) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_wait(cmp_semaphore_t *sem) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)sem;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -51,18 +35,8 @@ int cmp_semaphore_wait(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_post(cmp_semaphore_t *sem) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)sem;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -72,18 +46,8 @@ int cmp_semaphore_post(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)sem;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -93,18 +57,8 @@ int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_init(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)mutex;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -114,18 +68,8 @@ int cmp_mutex_init(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_lock(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)mutex;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -135,18 +79,8 @@ int cmp_mutex_lock(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_unlock(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)mutex;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -156,18 +90,8 @@ int cmp_mutex_unlock(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_destroy(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)mutex;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -177,18 +101,8 @@ int cmp_mutex_destroy(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_init(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)cond;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -199,19 +113,9 @@ int cmp_cond_init(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)cond;
   (void)mutex;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -221,18 +125,8 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_signal(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)cond;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -242,18 +136,8 @@ int cmp_cond_signal(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_broadcast(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)cond;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -263,220 +147,30 @@ int cmp_cond_broadcast(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_destroy(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;
+int rc = CMP_SUCCESS;
   (void)cond;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 #else
-#include "cmp.h"
-#if 0 || defined(__WATCOMC__) || defined(__DOS__)
-/**
- * @brief cmp_semaphore_init
- *
- * @param sem Parameter description.
- * @param count Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_semaphore_init(cmp_semaphore_t *sem, int count) {
-  int rc;
-  rc = 0;(void)sem; (void)count; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_semaphore_wait
- *
- * @param sem Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_semaphore_wait(cmp_semaphore_t *sem) {
-  int rc;
-  rc = 0;(void)sem; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_semaphore_post
- *
- * @param sem Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_semaphore_post(cmp_semaphore_t *sem) {
-  int rc;
-  rc = 0;(void)sem; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_semaphore_destroy
- *
- * @param sem Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
-  int rc;
-  rc = 0;(void)sem; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_mutex_init
- *
- * @param mutex Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_mutex_init(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;(void)mutex; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_mutex_lock
- *
- * @param mutex Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_mutex_lock(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;(void)mutex; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_mutex_unlock
- *
- * @param mutex Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_mutex_unlock(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;(void)mutex; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_mutex_destroy
- *
- * @param mutex Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_mutex_destroy(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;(void)mutex; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_cond_init
- *
- * @param cond Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_cond_init(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;(void)cond; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_cond_wait
- *
- * @param cond Parameter description.
- * @param mutex Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;(void)cond; (void)mutex; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_cond_signal
- *
- * @param cond Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_cond_signal(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;(void)cond; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_cond_broadcast
- *
- * @param cond Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_cond_broadcast(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;(void)cond; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-/**
- * @brief cmp_cond_destroy
- *
- * @param cond Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-int cmp_cond_destroy(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;(void)cond; if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
-  return rc;
-}
-#else
-#if 0 || defined(__WATCOMC__) || defined(__DOS__)
-#include "cmp.h"
-#else
-/* clang-format off */
-#include "cmp.h"
-#include <stdlib.h>
-
 #if defined(_WIN32)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <winsock2.h>
+
+#if !defined(__MINGW32__) && !defined(__MINGW64__)
+/* Forward declare Windows APIs to avoid <windows.h> */
+__declspec(dllimport) void *__stdcall CreateMutexA(void *lpMutexAttributes, int bInitialOwner, const char *lpName);
+__declspec(dllimport) unsigned long __stdcall WaitForSingleObject(void *hHandle, unsigned long dwMilliseconds);
+__declspec(dllimport) int __stdcall ReleaseMutex(void *hMutex);
+__declspec(dllimport) int __stdcall CloseHandle(void *hObject);
+__declspec(dllimport) void *__stdcall CreateSemaphoreA(void *lpSemaphoreAttributes, long lInitialCount, long lMaximumCount, const char *lpName);
+__declspec(dllimport) int __stdcall ReleaseSemaphore(void *hSemaphore, long lReleaseCount, long *lpPreviousCount);
+__declspec(dllimport) void *__stdcall CreateEventA(void *lpEventAttributes, int bManualReset, int bInitialState, const char *lpName);
+__declspec(dllimport) unsigned long __stdcall WaitForMultipleObjects(unsigned long nCount, const void *lpHandles, int bWaitAll, unsigned long dwMilliseconds);
+__declspec(dllimport) int __stdcall ResetEvent(void *hEvent);
+__declspec(dllimport) int __stdcall SetEvent(void *hEvent);
+#endif
 
 /*
  * NOTE: For full compatibility, we will use a naive auto-reset event + semaphore approach
@@ -484,19 +178,24 @@ int cmp_cond_destroy(cmp_cond_t *cond) {
  * we will use CreateEvent/SetEvent for now to keep it safe on older targets.
  */
 typedef struct cmp_win32_cond {
-    HANDLE events[2]; /* 0: signal, 1: broadcast */
+    void *events[2]; /* 0: signal, 1: broadcast */
     unsigned int waiters_count;
-    HANDLE waiters_count_lock;
+    void *waiters_count_lock;
 } cmp_win32_cond_t;
+
 #endif
 /* clang-format on */
 
 #if defined(__APPLE__)
+#include <pthread.h>
 typedef struct {
   pthread_mutex_t mutex;
   pthread_cond_t cond;
   int count;
 } cmp_apple_sem_t;
+#elif !defined(_WIN32)
+#include <pthread.h>
+#include <semaphore.h>
 #endif
 
 /**
@@ -506,30 +205,26 @@ typedef struct {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_init(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (mutex == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_mutex_init: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   *mutex = CreateMutexA(NULL, 0, NULL);
   if (*mutex == NULL) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_mutex_init: CreateMutexA failed\n");
+    return rc;
   }
 #else
   if (pthread_mutex_init(mutex, NULL) != 0) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_mutex_init: pthread_mutex_init failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -540,29 +235,25 @@ int cmp_mutex_init(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_lock(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (mutex == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_mutex_lock: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   if (WaitForSingleObject(*mutex, 0xFFFFFFFF) != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_mutex_lock: WaitForSingleObject failed\n");
+    return rc;
   }
 #else
   if (pthread_mutex_lock(mutex) != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_mutex_lock: pthread_mutex_lock failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -573,29 +264,25 @@ int cmp_mutex_lock(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_unlock(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (mutex == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_mutex_unlock: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   if (ReleaseMutex(*mutex) == 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_mutex_unlock: ReleaseMutex failed\n");
+    return rc;
   }
 #else
   if (pthread_mutex_unlock(mutex) != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_mutex_unlock: pthread_mutex_unlock failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -606,30 +293,26 @@ int cmp_mutex_unlock(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_mutex_destroy(cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (mutex == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_mutex_destroy: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   if (CloseHandle(*mutex) == 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_mutex_destroy: CloseHandle failed\n");
+    return rc;
   }
   *mutex = NULL;
 #else
   if (pthread_mutex_destroy(mutex) != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_mutex_destroy: pthread_mutex_destroy failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -641,15 +324,18 @@ int cmp_mutex_destroy(cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_init(cmp_semaphore_t *sem, int initial_count) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (sem == NULL || initial_count < 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_semaphore_init: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   *sem = CreateSemaphoreA(NULL, initial_count, 2147483647, NULL);
   if (*sem == NULL) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_semaphore_init: CreateSemaphoreA failed\n");
+    return rc;
   }
 #elif defined(__APPLE__)
   {
@@ -658,18 +344,30 @@ int cmp_semaphore_init(cmp_semaphore_t *sem, int initial_count) {
 
     res = CMP_MALLOC(sizeof(cmp_apple_sem_t), (void **)&as);
     if (res != CMP_SUCCESS || as == NULL) {
-      return CMP_ERROR_OOM;
+      rc = CMP_ERROR_OOM;
+      LOG_DEBUG("cmp_semaphore_init: CMP_MALLOC failed\n");
+      return rc;
     }
 
     if (pthread_mutex_init(&as->mutex, NULL) != 0) {
-      CMP_FREE(as);
-      return CMP_ERROR_OOM;
+      rc = CMP_ERROR_OOM;
+      LOG_DEBUG("cmp_semaphore_init: pthread_mutex_init failed\n");
+      res = CMP_FREE(as);
+      if (res != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_semaphore_init: CMP_FREE failed\n");
+      }
+      return rc;
     }
 
     if (pthread_cond_init(&as->cond, NULL) != 0) {
+      rc = CMP_ERROR_OOM;
+      LOG_DEBUG("cmp_semaphore_init: pthread_cond_init failed\n");
       pthread_mutex_destroy(&as->mutex);
-      CMP_FREE(as);
-      return CMP_ERROR_OOM;
+      res = CMP_FREE(as);
+      if (res != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_semaphore_init: CMP_FREE failed\n");
+      }
+      return rc;
     }
 
     as->count = initial_count;
@@ -677,18 +375,11 @@ int cmp_semaphore_init(cmp_semaphore_t *sem, int initial_count) {
   }
 #else
   if (sem_init(sem, 0, initial_count) != 0) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_semaphore_init: sem_init failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -699,14 +390,17 @@ int cmp_semaphore_init(cmp_semaphore_t *sem, int initial_count) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_wait(cmp_semaphore_t *sem) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (sem == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_semaphore_wait: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   if (WaitForSingleObject(*sem, 0xFFFFFFFF) != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_semaphore_wait: WaitForSingleObject failed\n");
+    return rc;
   }
 #elif defined(__APPLE__)
   {
@@ -723,15 +417,6 @@ int cmp_semaphore_wait(cmp_semaphore_t *sem) {
     /* Retry on EINTR */
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -742,14 +427,17 @@ int cmp_semaphore_wait(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_post(cmp_semaphore_t *sem) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (sem == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_semaphore_post: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   if (ReleaseSemaphore(*sem, 1, NULL) == 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_semaphore_post: ReleaseSemaphore failed\n");
+    return rc;
   }
 #elif defined(__APPLE__)
   {
@@ -761,18 +449,11 @@ int cmp_semaphore_post(cmp_semaphore_t *sem) {
   }
 #else
   if (sem_post(sem) != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_semaphore_post: sem_post failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -783,38 +464,39 @@ int cmp_semaphore_post(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (sem == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_semaphore_destroy: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   if (CloseHandle(*sem) == 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_semaphore_destroy: CloseHandle failed\n");
+    return rc;
   }
   *sem = NULL;
 #elif defined(__APPLE__)
   {
     cmp_apple_sem_t *as = (cmp_apple_sem_t *)(*sem);
+    int res;
     pthread_mutex_destroy(&as->mutex);
     pthread_cond_destroy(&as->cond);
-    CMP_FREE(as);
+    res = CMP_FREE(as);
+    if (res != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_semaphore_destroy: CMP_FREE failed\n");
+      rc = res;
+    }
     *sem = NULL;
   }
 #else
   if (sem_destroy(sem) != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_semaphore_destroy: sem_destroy failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -825,10 +507,11 @@ int cmp_semaphore_destroy(cmp_semaphore_t *sem) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_init(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (cond == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_cond_init: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   {
@@ -837,7 +520,9 @@ int cmp_cond_init(cmp_cond_t *cond) {
 
     res = CMP_MALLOC(sizeof(cmp_win32_cond_t), (void **)&cv);
     if (res != CMP_SUCCESS || cv == NULL) {
-      return CMP_ERROR_OOM;
+      rc = CMP_ERROR_OOM;
+      LOG_DEBUG("cmp_cond_init: CMP_MALLOC failed\n");
+      return rc;
     }
 
     cv->waiters_count = 0;
@@ -853,26 +538,24 @@ int cmp_cond_init(cmp_cond_t *cond) {
         CloseHandle(cv->events[1]);
       if (cv->waiters_count_lock)
         CloseHandle(cv->waiters_count_lock);
-      CMP_FREE(cv);
-      return CMP_ERROR_OOM;
+      res = CMP_FREE(cv);
+      if (res != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_cond_init: CMP_FREE failed during cleanup\n");
+      }
+      rc = CMP_ERROR_OOM;
+      LOG_DEBUG("cmp_cond_init: CreateEventA or CreateMutexA failed\n");
+      return rc;
     }
 
     *cond = (cmp_cond_t)cv;
   }
 #else
   if (pthread_cond_init(cond, NULL) != 0) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_cond_init: pthread_cond_init failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -884,8 +567,7 @@ int cmp_cond_init(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;
   int result;
@@ -893,7 +575,9 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
 #endif
 
   if (cond == NULL || mutex == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_cond_wait: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   cv = (cmp_win32_cond_t *)(*cond);
@@ -904,7 +588,7 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
 
   cmp_mutex_unlock(mutex);
 
-  result = WaitForMultipleObjects(2, (const HANDLE *)cv->events, 0, 0xFFFFFFFF);
+  result = WaitForMultipleObjects(2, (const void **)cv->events, 0, 0xFFFFFFFF);
 
   WaitForSingleObject(cv->waiters_count_lock, 0xFFFFFFFF);
   cv->waiters_count--;
@@ -918,18 +602,11 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
   cmp_mutex_lock(mutex);
 #else
   if (pthread_cond_wait(cond, mutex) != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_cond_wait: pthread_cond_wait failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -940,15 +617,16 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_signal(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;
   int have_waiters;
 #endif
 
   if (cond == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_cond_signal: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   cv = (cmp_win32_cond_t *)(*cond);
@@ -962,18 +640,11 @@ int cmp_cond_signal(cmp_cond_t *cond) {
   }
 #else
   if (pthread_cond_signal(cond) != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_cond_signal: pthread_cond_signal failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -984,15 +655,16 @@ int cmp_cond_signal(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_broadcast(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;
   int have_waiters;
 #endif
 
   if (cond == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_cond_broadcast: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   cv = (cmp_win32_cond_t *)(*cond);
@@ -1006,18 +678,11 @@ int cmp_cond_broadcast(cmp_cond_t *cond) {
   }
 #else
   if (pthread_cond_broadcast(cond) != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_cond_broadcast: pthread_cond_broadcast failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -1028,14 +693,16 @@ int cmp_cond_broadcast(cmp_cond_t *cond) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_cond_destroy(cmp_cond_t *cond) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
 #if defined(_WIN32)
   cmp_win32_cond_t *cv;
+  int res;
 #endif
 
   if (cond == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_cond_destroy: invalid argument\n");
+    return rc;
   }
 #if defined(_WIN32)
   cv = (cmp_win32_cond_t *)(*cond);
@@ -1044,26 +711,19 @@ int cmp_cond_destroy(cmp_cond_t *cond) {
   CloseHandle(cv->events[1]);
   CloseHandle(cv->waiters_count_lock);
 
-  CMP_FREE(cv);
+  res = CMP_FREE(cv);
+  if (res != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_cond_destroy: CMP_FREE failed\n");
+    rc = res;
+  }
   *cond = NULL;
 #else
   if (pthread_cond_destroy(cond) != 0) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_cond_destroy: pthread_cond_destroy failed\n");
+    return rc;
   }
 #endif
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
-#endif
-
-#endif
-
 #endif

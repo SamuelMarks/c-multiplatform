@@ -56,7 +56,7 @@ struct cmp_secure_network {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_secure_network_create(cmp_secure_network_t **out_net) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_secure_network_t *net;
 
   rc = CMP_SUCCESS;
@@ -76,7 +76,7 @@ int cmp_secure_network_create(cmp_secure_network_t **out_net) {
   net->proxy_url[0] = '\0';
 
   *out_net = net;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -86,7 +86,7 @@ int cmp_secure_network_create(cmp_secure_network_t **out_net) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_secure_network_destroy(cmp_secure_network_t *net) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -101,7 +101,7 @@ int cmp_secure_network_destroy(cmp_secure_network_t *net) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -115,6 +115,7 @@ int cmp_secure_network_destroy(cmp_secure_network_t *net) {
  */
 int cmp_secure_network_send_https(cmp_secure_network_t *net, const char *url,
                                   int *out_status_code) {
+  int rc = CMP_SUCCESS;
   if (net == NULL || url == NULL || out_status_code == NULL) {
     LOG_DEBUG("cmp_secure_network_send_https: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -123,7 +124,7 @@ int cmp_secure_network_send_https(cmp_secure_network_t *net, const char *url,
   /* Real integration uses c_abstract_http logic to negotiate TLS 1.3 socket */
   *out_status_code = 200;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -135,6 +136,7 @@ int cmp_secure_network_send_https(cmp_secure_network_t *net, const char *url,
  */
 int cmp_secure_network_set_proxy(cmp_secure_network_t *net,
                                  const char *proxy_url) {
+  int rc = CMP_SUCCESS;
   if (net == NULL || proxy_url == NULL) {
     LOG_DEBUG("cmp_secure_network_set_proxy: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -152,7 +154,7 @@ int cmp_secure_network_set_proxy(cmp_secure_network_t *net,
 
   net->use_proxy = 1;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -165,6 +167,7 @@ int cmp_secure_network_set_proxy(cmp_secure_network_t *net,
  */
 int cmp_secure_network_retrieve_credential(const char *key_name,
                                            char *out_secret, size_t max_len) {
+  int rc = CMP_SUCCESS;
   if (key_name == NULL || out_secret == NULL || max_len == 0) {
     LOG_DEBUG("cmp_secure_network_retrieve_credential: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -186,12 +189,13 @@ int cmp_secure_network_retrieve_credential(const char *key_name,
       memcpy(out_secret, pcred->CredentialBlob, secret_len);
       out_secret[secret_len] = '\0';
       CredFree(pcred);
-      return CMP_SUCCESS;
+      return rc;
     }
   }
 #endif
 #endif
 
   LOG_DEBUG("cmp_secure_network_retrieve_credential: Not found\n");
-  return CMP_ERROR_NOT_FOUND;
+  rc = CMP_ERROR_NOT_FOUND;
+  return rc;
 }

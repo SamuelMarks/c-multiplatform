@@ -6,7 +6,8 @@
 /* clang-format on */
 
 /**
- * @brief Dispatches an event through the UI tree using capture and bubbling phases.
+ * @brief Dispatches an event through the UI tree using capture and bubbling
+ * phases.
  *
  * @param tree Pointer to the root UI node.
  * @param target_node Pointer to the target UI node.
@@ -25,21 +26,38 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
 
   if (!tree || !target_node || !event) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
+    {
+      const char *err_str;
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_dispatch_run: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      LOG_DEBUG("cmp_event_dispatch_run: %s\n", err_str);
+    }
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
+    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_ui_node_t *) * capacity, (void **)&ancestors);
   if (rc != CMP_SUCCESS) {
-    if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    { const char *err_str;
+    if (rc == CMP_SUCCESS)
+      rc = CMP_ERROR_OOM;
+    {
+      const char *err_str;
       int rc2;
       rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_dispatch_run CMP_MALLOC: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      LOG_DEBUG("cmp_event_dispatch_run CMP_MALLOC: %s\n", err_str);
+    }
+    if (rc != CMP_SUCCESS) {
+      return rc;
+    }
+    return rc;
   }
 
   /* 1. Build Ancestor Chain */
@@ -50,15 +68,22 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
       capacity *= 2;
       /* In a pure C89 system without realloc, we allocate new and copy */
       rc = CMP_MALLOC(sizeof(cmp_ui_node_t *) * capacity,
-                     (void **)&new_ancestors);
+                      (void **)&new_ancestors);
       if (rc != CMP_SUCCESS) {
-        if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-        { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_event_dispatch_run (realloc) CMP_MALLOC: %s\n", err_str);
- }        CMP_FREE(ancestors);
-        if (rc != 0) {
+        if (rc == CMP_SUCCESS)
+          rc = CMP_ERROR_OOM;
+        {
+          const char *err_str;
+          int rc2;
+          rc2 = cmp_strerror(rc, &err_str);
+          if (rc2 != CMP_SUCCESS) {
+            err_str = "Unknown";
+          }
+          LOG_DEBUG("cmp_event_dispatch_run (realloc) CMP_MALLOC: %s\n",
+                    err_str);
+        }
+        CMP_FREE(ancestors);
+        if (rc != CMP_SUCCESS) {
           return rc;
         }
         return rc;
@@ -103,7 +128,7 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
   }
 
   CMP_FREE(ancestors);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -111,14 +136,17 @@ int cmp_event_dispatch_run(cmp_ui_node_t *tree, cmp_ui_node_t *target_node,
  *
  * @param node Pointer to the UI node.
  * @param event_type The type of event to listen for.
- * @param capture Set to 1 to capture events during the capture phase, 0 for bubble phase.
+ * @param capture Set to 1 to capture events during the capture phase, 0 for
+ * bubble phase.
  * @param callback The function to call when the event occurs.
  * @param user_data Opaque pointer passed to the callback.
  * @return Returns 0 on success, or an error code on failure.
  */
 CMP_EXEMPT(int cmp_ui_node_add_event_listener(
     cmp_ui_node_t *node, uint32_t event_type, int capture,
-    void (*callback)(cmp_event_t *, cmp_ui_node_t *, void *), void *user_data)) {
+    void (*callback)(cmp_event_t *, cmp_ui_node_t *, void *),
+    void *user_data)) {
+  int rc = CMP_SUCCESS;
   cmp_event_listener_node_t *listener;
 
   if (!node || !callback)
@@ -136,6 +164,5 @@ CMP_EXEMPT(int cmp_ui_node_add_event_listener(
   listener->next = node->event_listeners;
   node->event_listeners = listener;
 
-  return CMP_SUCCESS;
+  return rc;
 }
-

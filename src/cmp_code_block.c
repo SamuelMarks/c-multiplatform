@@ -25,8 +25,7 @@ struct cmp_code_block {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_code_block_create(cmp_code_block_t **out_block) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_code_block_t *block = NULL;
@@ -40,9 +39,7 @@ int cmp_code_block_create(cmp_code_block_t **out_block) {
     cmp_log_debug(
         "cmp_code_block_create: Invalid argument (out_block=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -53,9 +50,7 @@ int cmp_code_block_create(cmp_code_block_t **out_block) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_code_block_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -67,9 +62,7 @@ int cmp_code_block_create(cmp_code_block_t **out_block) {
   *out_block = block;
   cmp_log_debug(
       "cmp_code_block_create: Successfully created code block context\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -80,8 +73,7 @@ int cmp_code_block_create(cmp_code_block_t **out_block) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_code_block_destroy(cmp_code_block_t *block) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -92,9 +84,7 @@ int cmp_code_block_destroy(cmp_code_block_t *block) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_code_block_destroy: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -108,15 +98,13 @@ int cmp_code_block_destroy(cmp_code_block_t *block) {
   rc = CMP_FREE(block);
   if (rc != CMP_SUCCESS) {
     cmp_log_debug("cmp_code_block_destroy: CMP_FREE block failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   cmp_log_debug(
       "cmp_code_block_destroy: Successfully destroyed code block context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -126,8 +114,7 @@ int cmp_code_block_destroy(cmp_code_block_t *block) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_code_block_toggle_fold(cmp_code_block_t *block) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -139,23 +126,13 @@ int cmp_code_block_toggle_fold(cmp_code_block_t *block) {
     }
     cmp_log_debug("cmp_code_block_toggle_fold: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   block->is_expanded = block->is_expanded ? 0 : 1;
   cmp_log_debug("cmp_code_block_toggle_fold: Toggled fold state to %d\n",
                 block->is_expanded);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -168,8 +145,7 @@ int cmp_code_block_toggle_fold(cmp_code_block_t *block) {
  */
 int cmp_code_block_is_expanded(const cmp_code_block_t *block,
                                int *out_is_expanded) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -181,23 +157,13 @@ int cmp_code_block_is_expanded(const cmp_code_block_t *block,
     }
     cmp_log_debug("cmp_code_block_is_expanded: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   *out_is_expanded = block->is_expanded;
   cmp_log_debug("cmp_code_block_is_expanded: Is expanded=%d\n",
                 *out_is_expanded);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -213,8 +179,7 @@ int cmp_code_block_is_expanded(const cmp_code_block_t *block,
 int cmp_code_block_add_reference_highlight(cmp_code_block_t *block,
                                            size_t offset, size_t length,
                                            const char *reference_id) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_code_ref_t *new_array = NULL;
@@ -229,9 +194,7 @@ int cmp_code_block_add_reference_highlight(cmp_code_block_t *block,
     cmp_log_debug(
         "cmp_code_block_add_reference_highlight: Invalid argument: %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -246,9 +209,7 @@ int cmp_code_block_add_reference_highlight(cmp_code_block_t *block,
       cmp_log_debug(
           "cmp_code_block_add_reference_highlight: Out of memory: %s\n",
           err_str);
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
     if (block->refs != NULL) {
@@ -275,8 +236,6 @@ int cmp_code_block_add_reference_highlight(cmp_code_block_t *block,
 
   cmp_log_debug(
       "cmp_code_block_add_reference_highlight: Added highlight ref\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

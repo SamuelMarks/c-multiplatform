@@ -26,7 +26,7 @@ struct cmp_sse_parser {
  */
 int cmp_sse_parser_create(cmp_sse_parser_t **out_parser,
                           cmp_sse_event_cb callback, void *user_data) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_sse_parser_t *parser;
 
   rc = CMP_SUCCESS;
@@ -48,7 +48,7 @@ int cmp_sse_parser_create(cmp_sse_parser_t **out_parser,
   memset(parser->buffer, 0, sizeof(parser->buffer));
 
   *out_parser = parser;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -58,7 +58,7 @@ int cmp_sse_parser_create(cmp_sse_parser_t **out_parser,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_sse_parser_destroy(cmp_sse_parser_t *parser) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -73,7 +73,7 @@ int cmp_sse_parser_destroy(cmp_sse_parser_t *parser) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -86,6 +86,7 @@ int cmp_sse_parser_destroy(cmp_sse_parser_t *parser) {
  */
 int cmp_sse_parser_feed(cmp_sse_parser_t *parser, const char *chunk,
                         unsigned int len) {
+  int rc = CMP_SUCCESS;
   unsigned int space;
 
   if (parser == NULL || chunk == NULL) {
@@ -110,5 +111,5 @@ int cmp_sse_parser_feed(cmp_sse_parser_t *parser, const char *chunk,
     parser->buffer[0] = '\0';
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

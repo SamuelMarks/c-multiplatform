@@ -19,7 +19,7 @@ struct cmp_selection {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_selection_create(cmp_selection_t **out_selection) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_selection *selection;
 
   rc = CMP_SUCCESS;
@@ -38,7 +38,7 @@ int cmp_selection_create(cmp_selection_t **out_selection) {
   memset(selection, 0, sizeof(struct cmp_selection));
 
   *out_selection = (cmp_selection_t *)selection;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -48,7 +48,7 @@ int cmp_selection_create(cmp_selection_t **out_selection) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_selection_destroy(cmp_selection_t *selection) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_selection *internal_selection;
 
   rc = CMP_SUCCESS;
@@ -65,5 +65,5 @@ int cmp_selection_destroy(cmp_selection_t *selection) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

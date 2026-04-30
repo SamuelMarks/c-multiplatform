@@ -16,8 +16,7 @@ struct cmp_android_storage {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_android_storage_create(cmp_android_storage_t **out_storage) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_android_storage_t *st = NULL;
@@ -31,9 +30,7 @@ int cmp_android_storage_create(cmp_android_storage_t **out_storage) {
     cmp_log_debug(
         "cmp_android_storage_create: Invalid argument (out_storage=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -44,9 +41,7 @@ int cmp_android_storage_create(cmp_android_storage_t **out_storage) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_android_storage_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -55,9 +50,7 @@ int cmp_android_storage_create(cmp_android_storage_t **out_storage) {
 
   cmp_log_debug("cmp_android_storage_create: Successfully created android "
                 "storage context\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -68,8 +61,7 @@ int cmp_android_storage_create(cmp_android_storage_t **out_storage) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_android_storage_destroy(cmp_android_storage_t *storage) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -82,24 +74,14 @@ int cmp_android_storage_destroy(cmp_android_storage_t *storage) {
     cmp_log_debug(
         "cmp_android_storage_destroy: Invalid argument (storage=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   CMP_FREE(storage);
   cmp_log_debug("cmp_android_storage_destroy: Successfully destroyed android "
                 "storage context\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -112,8 +94,7 @@ int cmp_android_storage_destroy(cmp_android_storage_t *storage) {
  */
 int cmp_android_storage_request_tree_access(cmp_android_storage_t *storage,
                                             char **out_uri_string) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   char *uri = NULL;
@@ -130,9 +111,7 @@ int cmp_android_storage_request_tree_access(cmp_android_storage_t *storage,
     cmp_log_debug(
         "cmp_android_storage_request_tree_access: Invalid argument: %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -148,9 +127,7 @@ int cmp_android_storage_request_tree_access(cmp_android_storage_t *storage,
     cmp_log_debug(
         "cmp_android_storage_request_tree_access: Out of memory: %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 #if defined(_MSC_VER)
@@ -163,9 +140,7 @@ int cmp_android_storage_request_tree_access(cmp_android_storage_t *storage,
   cmp_log_debug(
       "cmp_android_storage_request_tree_access: Granted tree access to: %s\n",
       mock_uri);
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -180,15 +155,12 @@ int cmp_android_storage_request_tree_access(cmp_android_storage_t *storage,
 int cmp_android_storage_check_access(cmp_android_storage_t *storage,
                                      const char *uri_string,
                                      int *out_can_write) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
   if (rc != CMP_SUCCESS) {
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -200,9 +172,7 @@ int cmp_android_storage_check_access(cmp_android_storage_t *storage,
     }
     cmp_log_debug("cmp_android_storage_check_access: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -216,14 +186,5 @@ int cmp_android_storage_check_access(cmp_android_storage_t *storage,
         "cmp_android_storage_check_access: Does not have access to uri\n");
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

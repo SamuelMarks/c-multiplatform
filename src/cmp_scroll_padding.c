@@ -19,6 +19,7 @@ int cmp_scroll_padding_apply(const cmp_rect_t *element_bounds,
                              const cmp_scroll_padding_t *padding,
                              const cmp_scroll_padding_t *margin,
                              float *out_target_scroll_y) {
+  int rc = CMP_SUCCESS;
   float base_y;
 
   if (element_bounds == NULL || out_target_scroll_y == NULL) {
@@ -41,5 +42,5 @@ int cmp_scroll_padding_apply(const cmp_rect_t *element_bounds,
 
   *out_target_scroll_y = base_y;
 
-  return CMP_SUCCESS;
+  return rc;
 }

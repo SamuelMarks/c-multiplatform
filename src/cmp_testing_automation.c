@@ -14,6 +14,7 @@ struct cmp_testing_automation {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_testing_automation_create(cmp_testing_automation_t **out_automation) {
+  int rc = CMP_SUCCESS;
   struct cmp_testing_automation *ctx;
   if (!out_automation)
     return CMP_ERROR_INVALID_ARG;
@@ -24,7 +25,7 @@ int cmp_testing_automation_create(cmp_testing_automation_t **out_automation) {
   ctx->animations_enabled = 1;
 
   *out_automation = (cmp_testing_automation_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -35,9 +36,10 @@ int cmp_testing_automation_create(cmp_testing_automation_t **out_automation) {
  */
 int cmp_testing_automation_destroy(
     cmp_testing_automation_t *automation_opaque) {
+  int rc = CMP_SUCCESS;
   if (automation_opaque)
     CMP_FREE(automation_opaque);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -49,13 +51,14 @@ int cmp_testing_automation_destroy(
  */
 int cmp_testing_set_animations_enabled(
     cmp_testing_automation_t *automation_opaque, int enabled) {
+  int rc = CMP_SUCCESS;
   struct cmp_testing_automation *ctx =
       (struct cmp_testing_automation *)automation_opaque;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
 
   ctx->animations_enabled = enabled;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -67,13 +70,14 @@ int cmp_testing_set_animations_enabled(
  */
 int cmp_testing_tap_by_accessibility_label(
     cmp_testing_automation_t *automation_opaque, const char *label) {
+  int rc = CMP_SUCCESS;
   struct cmp_testing_automation *ctx =
       (struct cmp_testing_automation *)automation_opaque;
   if (!ctx || !label)
     return CMP_ERROR_INVALID_ARG;
 
   /* XCTest UI Equivalency */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -86,13 +90,14 @@ int cmp_testing_tap_by_accessibility_label(
  */
 int cmp_testing_snapshot_verify(cmp_testing_automation_t *automation_opaque,
                                 void *node, const char *snapshot_name) {
+  int rc = CMP_SUCCESS;
   struct cmp_testing_automation *ctx =
       (struct cmp_testing_automation *)automation_opaque;
   if (!ctx || !node || !snapshot_name)
     return CMP_ERROR_INVALID_ARG;
 
   /* Evaluates Light/Dark, Dynamic Type, RTL variants */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -104,11 +109,12 @@ int cmp_testing_snapshot_verify(cmp_testing_automation_t *automation_opaque,
  */
 int cmp_testing_audit_accessibility(cmp_testing_automation_t *automation_opaque,
                                     void *node) {
+  int rc = CMP_SUCCESS;
   struct cmp_testing_automation *ctx =
       (struct cmp_testing_automation *)automation_opaque;
   if (!ctx || !node)
     return CMP_ERROR_INVALID_ARG;
 
   /* Accessibility Inspector Validation & VoiceOver logic checks */
-  return CMP_SUCCESS;
+  return rc;
 }

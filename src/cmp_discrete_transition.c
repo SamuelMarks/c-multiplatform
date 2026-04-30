@@ -16,8 +16,7 @@ struct cmp_discrete_transition {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_discrete_transition_create(cmp_discrete_transition_t **out_transition) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_discrete_transition *transition = NULL;
@@ -31,9 +30,7 @@ int cmp_discrete_transition_create(cmp_discrete_transition_t **out_transition) {
     cmp_log_debug("cmp_discrete_transition_create: Invalid argument "
                   "(out_transition=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -45,9 +42,7 @@ int cmp_discrete_transition_create(cmp_discrete_transition_t **out_transition) {
     }
     cmp_log_debug("cmp_discrete_transition_create: Out of memory: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -56,7 +51,7 @@ int cmp_discrete_transition_create(cmp_discrete_transition_t **out_transition) {
   *out_transition = (cmp_discrete_transition_t *)transition;
   cmp_log_debug("cmp_discrete_transition_create: Successfully created "
                 "transition context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -66,8 +61,7 @@ int cmp_discrete_transition_create(cmp_discrete_transition_t **out_transition) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_discrete_transition_destroy(cmp_discrete_transition_t *transition) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_discrete_transition *internal_transition =
@@ -81,9 +75,7 @@ int cmp_discrete_transition_destroy(cmp_discrete_transition_t *transition) {
     }
     cmp_log_debug("cmp_discrete_transition_destroy: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -94,7 +86,7 @@ int cmp_discrete_transition_destroy(cmp_discrete_transition_t *transition) {
 
   cmp_log_debug("cmp_discrete_transition_destroy: Successfully destroyed "
                 "transition context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -107,8 +99,7 @@ int cmp_discrete_transition_destroy(cmp_discrete_transition_t *transition) {
  */
 int cmp_discrete_transition_evaluate(cmp_discrete_transition_t *transition,
                                      float progress, int *out_is_visible) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_discrete_transition *internal_transition =
@@ -123,9 +114,7 @@ int cmp_discrete_transition_evaluate(cmp_discrete_transition_t *transition,
     }
     cmp_log_debug("cmp_discrete_transition_evaluate: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -138,14 +127,6 @@ int cmp_discrete_transition_evaluate(cmp_discrete_transition_t *transition,
   cmp_log_debug("cmp_discrete_transition_evaluate: Evaluated step %.2f to "
                 "visibility=%d\n",
                 progress, *out_is_visible);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

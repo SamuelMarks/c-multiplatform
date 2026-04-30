@@ -19,7 +19,7 @@ struct cmp_screen_capture {
  * @return 0 on success, or an error code on failure.
  */
 int cmp_screen_capture_create(cmp_screen_capture_t **out_capture) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_screen_capture_t *cap;
 
   rc = CMP_SUCCESS;
@@ -37,7 +37,7 @@ int cmp_screen_capture_create(cmp_screen_capture_t **out_capture) {
 
   cap->dummy = 0;
   *out_capture = cap;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -47,7 +47,7 @@ int cmp_screen_capture_create(cmp_screen_capture_t **out_capture) {
  * @return 0 on success, or an error code on failure.
  */
 int cmp_screen_capture_destroy(cmp_screen_capture_t *capture) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -62,7 +62,7 @@ int cmp_screen_capture_destroy(cmp_screen_capture_t *capture) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -77,7 +77,7 @@ int cmp_screen_capture_destroy(cmp_screen_capture_t *capture) {
 int cmp_screen_capture_active_window(cmp_screen_capture_t *capture,
                                      unsigned char **out_pixels, int *out_width,
                                      int *out_height) {
-  int rc;
+  int rc = CMP_SUCCESS;
   int size;
   unsigned char *pixels;
 
@@ -103,7 +103,7 @@ int cmp_screen_capture_active_window(cmp_screen_capture_t *capture,
 
   memset(pixels, 255, size); /* White background mock */
   *out_pixels = pixels;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -120,7 +120,7 @@ int cmp_screen_capture_active_window(cmp_screen_capture_t *capture,
 int cmp_screen_capture_region(cmp_screen_capture_t *capture, int x, int y,
                               int width, int height,
                               unsigned char **out_pixels) {
-  int rc;
+  int rc = CMP_SUCCESS;
   int size;
   unsigned char *pixels;
 
@@ -150,7 +150,7 @@ int cmp_screen_capture_region(cmp_screen_capture_t *capture, int x, int y,
 
   memset(pixels, 128, size); /* Gray background mock */
   *out_pixels = pixels;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -160,7 +160,7 @@ int cmp_screen_capture_region(cmp_screen_capture_t *capture, int x, int y,
  * @return 0 on success, or an error code on failure.
  */
 int cmp_screen_capture_free_pixels(unsigned char *pixels) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -172,5 +172,5 @@ int cmp_screen_capture_free_pixels(unsigned char *pixels) {
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

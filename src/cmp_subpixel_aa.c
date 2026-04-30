@@ -14,8 +14,7 @@ typedef struct cmp_subpixel_aa {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_subpixel_aa_create(cmp_subpixel_aa_t **out_ctx) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_subpixel_aa_t *ctx;
 
   if (!out_ctx)
@@ -27,15 +26,7 @@ int cmp_subpixel_aa_create(cmp_subpixel_aa_t **out_ctx) {
 
   ctx->enabled = 0;
   *out_ctx = ctx;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -46,20 +37,11 @@ int cmp_subpixel_aa_create(cmp_subpixel_aa_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_subpixel_aa_destroy(cmp_subpixel_aa_t *ctx) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
   CMP_FREE(ctx);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -71,20 +53,11 @@ int cmp_subpixel_aa_destroy(cmp_subpixel_aa_t *ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_subpixel_aa_enable(cmp_subpixel_aa_t *ctx, int enable) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
   ctx->enabled = enable;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -96,19 +69,10 @@ int cmp_subpixel_aa_enable(cmp_subpixel_aa_t *ctx, int enable) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_subpixel_aa_is_enabled(cmp_subpixel_aa_t *ctx, int *out_enabled) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!ctx || !out_enabled)
     return CMP_ERROR_INVALID_ARG;
   *out_enabled = ctx->enabled;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

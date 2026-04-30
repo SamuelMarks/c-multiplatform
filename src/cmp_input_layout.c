@@ -26,25 +26,20 @@ struct cmp_input_layout {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_input_layout_create(cmp_input_layout_t **out_layout) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_input_layout *layout = NULL;
 
   if (!out_layout) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_input_layout_create: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_input_layout), (void **)&layout);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_input_layout_create: Out of memory\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -53,9 +48,7 @@ int cmp_input_layout_create(cmp_input_layout_t **out_layout) {
   layout->attachment_count = 0;
 
   *out_layout = (cmp_input_layout_t *)layout;
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -66,25 +59,20 @@ int cmp_input_layout_create(cmp_input_layout_t **out_layout) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_input_layout_destroy(cmp_input_layout_t *layout_opaque) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_input_layout *layout = (struct cmp_input_layout *)layout_opaque;
 
   if (!layout) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_input_layout_destroy: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   rc = CMP_FREE(layout);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_input_layout_destroy: CMP_FREE failed\n");
   }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -98,8 +86,7 @@ int cmp_input_layout_destroy(cmp_input_layout_t *layout_opaque) {
  */
 int cmp_input_layout_update_text(cmp_input_layout_t *layout_opaque,
                                  const char *new_text, float *out_height) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_input_layout *layout = (struct cmp_input_layout *)layout_opaque;
   int num_lines = 1;
   const char *p;
@@ -107,9 +94,7 @@ int cmp_input_layout_update_text(cmp_input_layout_t *layout_opaque,
   if (!layout || !new_text || !out_height) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_input_layout_update_text: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -132,15 +117,6 @@ int cmp_input_layout_update_text(cmp_input_layout_t *layout_opaque,
     *out_height += 30.0f;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -153,16 +129,13 @@ int cmp_input_layout_update_text(cmp_input_layout_t *layout_opaque,
  */
 int cmp_input_layout_add_attachment(cmp_input_layout_t *layout_opaque,
                                     const char *filename) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_input_layout *layout = (struct cmp_input_layout *)layout_opaque;
 
   if (!layout || !filename) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_input_layout_add_attachment: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -170,9 +143,7 @@ int cmp_input_layout_add_attachment(cmp_input_layout_t *layout_opaque,
     rc = CMP_ERROR_BOUNDS;
     LOG_DEBUG(
         "Error in cmp_input_layout_add_attachment: Max attachments reached\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 #if defined(_MSC_VER)
@@ -185,15 +156,6 @@ int cmp_input_layout_add_attachment(cmp_input_layout_t *layout_opaque,
 #endif
   layout->attachment_count++;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -206,8 +168,7 @@ int cmp_input_layout_add_attachment(cmp_input_layout_t *layout_opaque,
  */
 int cmp_input_layout_get_attachment_count(
     const cmp_input_layout_t *layout_opaque, size_t *out_count) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   const struct cmp_input_layout *layout =
       (const struct cmp_input_layout *)layout_opaque;
 
@@ -215,21 +176,11 @@ int cmp_input_layout_get_attachment_count(
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_input_layout_get_attachment_count: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   *out_count = layout->attachment_count;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

@@ -11,8 +11,7 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_dt_update(cmp_dt_t *dt, double current_time_ms) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -23,9 +22,7 @@ int cmp_dt_update(cmp_dt_t *dt, double current_time_ms) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_dt_update: Invalid argument (dt=NULL): %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -42,14 +39,6 @@ int cmp_dt_update(cmp_dt_t *dt, double current_time_ms) {
   dt->current_time_ms = current_time_ms;
 
   cmp_log_debug("cmp_dt_update: Updated tick dt=%.2fms\n", dt->delta_time_ms);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

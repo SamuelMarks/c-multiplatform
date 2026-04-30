@@ -20,6 +20,7 @@
 int cmp_scroll_momentum_calculate(float initial_velocity, float elapsed_time_ms,
                                   float platform_decay_rate, float *out_offset,
                                   float *out_current_velocity) {
+  int rc = CMP_SUCCESS;
   const float frame_duration = 16.666f;
   float frames_elapsed;
   float current_velocity;
@@ -40,5 +41,5 @@ int cmp_scroll_momentum_calculate(float initial_velocity, float elapsed_time_ms,
   /* Integration of decay to get total offset: Delta = v(t) * dt */
   *out_offset = (current_velocity / 1000.0f) * elapsed_time_ms;
 
-  return CMP_SUCCESS;
+  return rc;
 }

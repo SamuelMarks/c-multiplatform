@@ -17,8 +17,7 @@ struct cmp_editable {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_editable_create(cmp_editable_t **out_editable) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_editable *editable;
 
   if (!out_editable)
@@ -39,15 +38,7 @@ int cmp_editable_create(cmp_editable_t **out_editable) {
   editable->text_buffer[0] = '\0';
 
   *out_editable = (cmp_editable_t *)editable;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -58,8 +49,7 @@ int cmp_editable_create(cmp_editable_t **out_editable) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_editable_destroy(cmp_editable_t *editable) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_editable *internal_editable = (struct cmp_editable *)editable;
   if (!internal_editable)
     return CMP_ERROR_INVALID_ARG;
@@ -68,15 +58,7 @@ int cmp_editable_destroy(cmp_editable_t *editable) {
     CMP_FREE(internal_editable->text_buffer);
   }
   CMP_FREE(internal_editable);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -88,8 +70,7 @@ int cmp_editable_destroy(cmp_editable_t *editable) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_editable_insert_text(cmp_editable_t *editable, const char *text) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_editable *internal_editable = (struct cmp_editable *)editable;
   size_t text_len;
 
@@ -98,7 +79,7 @@ int cmp_editable_insert_text(cmp_editable_t *editable, const char *text) {
 
   text_len = strlen(text);
   if (text_len == 0)
-    return CMP_SUCCESS;
+    return rc;
 
   if (internal_editable->length + text_len >= internal_editable->capacity) {
     /* Reallocate */
@@ -123,14 +104,5 @@ int cmp_editable_insert_text(cmp_editable_t *editable, const char *text) {
   strcpy(internal_editable->text_buffer + internal_editable->length, text);
   internal_editable->length += text_len;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

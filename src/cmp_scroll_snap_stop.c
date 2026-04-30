@@ -16,6 +16,7 @@
  */
 int cmp_scroll_snap_stop_evaluate(cmp_scroll_snap_stop_t mode,
                                   float current_velocity) {
+  int rc = CMP_SUCCESS;
   if (mode == CMP_SCROLL_SNAP_STOP_ALWAYS) {
     return 1; /* Always stop */
   }
@@ -32,5 +33,5 @@ int cmp_scroll_snap_stop_evaluate(cmp_scroll_snap_stop_t mode,
     return 1;
   }
 
-  return 0; /* Let it coast past */
+  return rc; /* Let it coast past */
 }

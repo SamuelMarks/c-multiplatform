@@ -237,34 +237,49 @@ TEST test_vfs_edge_cases(void) {
   cmp_string_t path;
   cmp_vfs_watch_t *watch;
 
-  /* Try using without init - should fail or be safe, but let's test invalid args first. */
+  /* Try using without init - should fail or be safe, but let's test invalid
+   * args first. */
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_mount(NULL, "."), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_mount("virt:/", NULL), "%d");
 
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_resolve_path(NULL, &path), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_resolve_path("a", NULL), "%d");
 
-  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_read_file_sync(NULL, &buf, &size), "%d");
-  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_read_file_sync("a", NULL, &size), "%d");
-  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_read_file_sync("a", &buf, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_vfs_read_file_sync(NULL, &buf, &size), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_read_file_sync("a", NULL, &size),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_read_file_sync("a", &buf, NULL),
+                "%d");
 
   cmp_vfs_init();
 
   /* Missing file */
-  ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND, cmp_vfs_read_file_sync("nonexistent.file", &buf, &size), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND,
+                cmp_vfs_read_file_sync("nonexistent.file", &buf, &size), "%d");
 
-  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_read_file_async(NULL, "a", test_vfs_read_cb, NULL), "%d");
-  /* Cannot pass invalid pointer for mod, so we test missing virtual_path with a dummy valid-ish or NULL mod */
-  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_read_file_async(NULL, NULL, test_vfs_read_cb, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_vfs_read_file_async(NULL, "a", test_vfs_read_cb, NULL),
+                "%d");
+  /* Cannot pass invalid pointer for mod, so we test missing virtual_path with a
+   * dummy valid-ish or NULL mod */
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_vfs_read_file_async(NULL, NULL, test_vfs_read_cb, NULL),
+                "%d");
 
-  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_watch_path(NULL, test_watch_cb, NULL, &watch), "%d");
-  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_watch_path(".", NULL, NULL, &watch), "%d");
-  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_watch_path(".", test_watch_cb, NULL, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_vfs_watch_path(NULL, test_watch_cb, NULL, &watch), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_vfs_watch_path(".", NULL, NULL, &watch), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                cmp_vfs_watch_path(".", test_watch_cb, NULL, NULL), "%d");
 
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_unwatch(NULL), "%d");
 
-  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_get_standard_path(1, NULL), "%d");
-  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_get_standard_path(999, &path), "%d"); /* Invalid type */
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_get_standard_path(1, NULL),
+                "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_get_standard_path(999, &path),
+                "%d"); /* Invalid type */
 
   cmp_vfs_shutdown();
   PASS();

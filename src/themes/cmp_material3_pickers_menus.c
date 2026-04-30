@@ -12,21 +12,12 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_m3_menu_resolve(cmp_m3_menu_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
   out_metrics->elevation = CMP_M3_ELEVATION_LEVEL_2;
   out_metrics->shape = CMP_M3_SHAPE_EXTRA_SMALL; /* 4dp */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -39,8 +30,7 @@ int cmp_m3_menu_resolve(cmp_m3_menu_metrics_t *out_metrics) {
  */
 int cmp_m3_sheet_resolve(cmp_m3_sheet_variant_t variant,
                          cmp_m3_sheet_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
 
@@ -78,15 +68,6 @@ int cmp_m3_sheet_resolve(cmp_m3_sheet_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -99,8 +80,7 @@ int cmp_m3_sheet_resolve(cmp_m3_sheet_variant_t variant,
  */
 int cmp_m3_date_picker_resolve(cmp_m3_date_picker_variant_t variant,
                                cmp_m3_date_picker_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
 
@@ -120,15 +100,6 @@ int cmp_m3_date_picker_resolve(cmp_m3_date_picker_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -141,8 +112,7 @@ int cmp_m3_date_picker_resolve(cmp_m3_date_picker_variant_t variant,
  */
 int cmp_m3_time_picker_resolve(cmp_m3_time_picker_variant_t variant,
                                cmp_m3_time_picker_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
 
@@ -161,14 +131,5 @@ int cmp_m3_time_picker_resolve(cmp_m3_time_picker_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

@@ -46,24 +46,22 @@ static cmp_vfs_mount_entry_t *g_mounts = NULL;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vfs_init(void) {
-  int rc;
-  rc = 0;cfs_runtime_config cfg;
+  int rc = CMP_SUCCESS;
+  cfs_runtime_config cfg;
   if (g_vfs_initialized) {
-    return CMP_SUCCESS;
+    return rc;
   }
 
   memset(&cfg, 0, sizeof(cfg));
   cfg.mode = cfs_modality_singlethread;
   if (cfs_runtime_init(&cfg, &g_cfs_rt, NULL) != 0) {
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_vfs_init: cfs_runtime_init failed\n");
+    return rc;
   }
 
   g_mounts = NULL;
   g_vfs_initialized = 1;
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -73,19 +71,29 @@ int cmp_vfs_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vfs_shutdown(void) {
-  int rc;
-  rc = 0;cmp_vfs_mount_entry_t *curr, *next;
+  int rc = CMP_SUCCESS;
+  cmp_vfs_mount_entry_t *curr, *next;
+  int free_rc;
 
   if (!g_vfs_initialized) {
-    return CMP_SUCCESS;
+    return rc;
   }
 
   curr = g_mounts;
   while (curr != NULL) {
     next = curr->next;
-    CMP_FREE(curr->mount_point);
-    CMP_FREE(curr->real_path);
-    CMP_FREE(curr);
+    free_rc = CMP_FREE(curr->mount_point);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_shutdown: CMP_FREE mount_point failed\n");
+    }
+    free_rc = CMP_FREE(curr->real_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_shutdown: CMP_FREE real_path failed\n");
+    }
+    free_rc = CMP_FREE(curr);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_shutdown: CMP_FREE curr failed\n");
+    }
     curr = next;
   }
   g_mounts = NULL;
@@ -96,10 +104,6 @@ int cmp_vfs_shutdown(void) {
   }
 
   g_vfs_initialized = 0;
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -111,40 +115,51 @@ int cmp_vfs_shutdown(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vfs_mount(const char *mount_point, const char *real_path) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_vfs_mount_entry_t *entry;
   size_t mp_len, rp_len;
+  int free_rc;
 
   if (mount_point == NULL || real_path == NULL || !g_vfs_initialized) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_vfs_mount: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_vfs_mount: Invalid argument\n");
+    return rc;
   }
 
   rc = CMP_MALLOC(sizeof(cmp_vfs_mount_entry_t), (void **)&entry);
   if (rc != CMP_SUCCESS) {
-    if (rc == CMP_SUCCESS) rc = CMP_ERROR_OOM;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_vfs_mount CMP_MALLOC: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_vfs_mount: CMP_MALLOC entry failed\n");
+    return rc;
   }
 
   mp_len = strlen(mount_point);
   rp_len = strlen(real_path);
 
-  if (CMP_MALLOC(mp_len + 1, (void **)&entry->mount_point) != CMP_SUCCESS) {
-    CMP_FREE(entry);
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(mp_len + 1, (void **)&entry->mount_point);
+  if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(entry);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_mount: CMP_FREE entry failed\n");
+    }
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_vfs_mount: CMP_MALLOC mount_point failed\n");
+    return rc;
   }
-  if (CMP_MALLOC(rp_len + 1, (void **)&entry->real_path) != CMP_SUCCESS) {
-    CMP_FREE(entry->mount_point);
-    CMP_FREE(entry);
-    return CMP_ERROR_OOM;
+
+  rc = CMP_MALLOC(rp_len + 1, (void **)&entry->real_path);
+  if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(entry->mount_point);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_mount: CMP_FREE mount_point failed\n");
+    }
+    free_rc = CMP_FREE(entry);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_mount: CMP_FREE entry failed\n");
+    }
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_vfs_mount: CMP_MALLOC real_path failed\n");
+    return rc;
   }
 #if defined(_MSC_VER)
   strcpy_s(entry->mount_point, mp_len + 1, mount_point);
@@ -157,7 +172,7 @@ int cmp_vfs_mount(const char *mount_point, const char *real_path) {
   entry->next = g_mounts;
   g_mounts = entry;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -168,26 +183,31 @@ int cmp_vfs_mount(const char *mount_point, const char *real_path) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vfs_resolve_path(const char *virtual_path, cmp_string_t *out_path) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_vfs_mount_entry_t *curr;
   size_t mp_len;
 
   if (virtual_path == NULL || out_path == NULL || !g_vfs_initialized) {
     rc = CMP_ERROR_INVALID_ARG;
-    { const char *err_str;
-      int rc2;
-      rc2 = cmp_strerror(rc, &err_str);
-      if (rc2 != CMP_SUCCESS) { err_str = "Unknown"; } LOG_DEBUG("cmp_vfs_resolve_path: %s\n", err_str);
- }    if (rc != 0) {      return rc;    }    return rc;
+    LOG_DEBUG("cmp_vfs_resolve_path: Invalid argument\n");
+    return rc;
   }
 
-  cmp_string_init(out_path);
+  rc = cmp_string_init(out_path);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_vfs_resolve_path: cmp_string_init failed\n");
+    return rc;
+  }
 
   curr = g_mounts;
   while (curr != NULL) {
     mp_len = strlen(curr->mount_point);
     if (strncmp(virtual_path, curr->mount_point, mp_len) == 0) {
-      cmp_string_append(out_path, curr->real_path);
+      rc = cmp_string_append(out_path, curr->real_path);
+      if (rc != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_vfs_resolve_path: cmp_string_append failed\n");
+        return rc;
+      }
       /* If virtual path continues after mount point, append it */
       if (virtual_path[mp_len] != '\0') {
         /* Add a slash only if real_path doesn't end with one and virtual_path
@@ -200,22 +220,38 @@ int cmp_vfs_resolve_path(const char *virtual_path, cmp_string_t *out_path) {
             (virtual_path[mp_len] == '/' || virtual_path[mp_len] == '\\');
 
         if (!rp_has_slash && !vp_has_slash) {
-          cmp_string_append(out_path, "/");
+          rc = cmp_string_append(out_path, "/");
+          if (rc != CMP_SUCCESS) {
+            LOG_DEBUG("cmp_vfs_resolve_path: cmp_string_append failed\n");
+            return rc;
+          }
         } else if (rp_has_slash && vp_has_slash) {
           /* Skip the extra slash in virtual_path */
-          cmp_string_append(out_path, virtual_path + mp_len + 1);
-          return CMP_SUCCESS;
+          rc = cmp_string_append(out_path, virtual_path + mp_len + 1);
+          if (rc != CMP_SUCCESS) {
+            LOG_DEBUG("cmp_vfs_resolve_path: cmp_string_append failed\n");
+            return rc;
+          }
+          return rc;
         }
-        cmp_string_append(out_path, virtual_path + mp_len);
+        rc = cmp_string_append(out_path, virtual_path + mp_len);
+        if (rc != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_vfs_resolve_path: cmp_string_append failed\n");
+          return rc;
+        }
       }
-      return CMP_SUCCESS;
+      return rc;
     }
     curr = curr->next;
   }
 
   /* Fallback: treat virtual path as physical path */
-  cmp_string_append(out_path, virtual_path);
-  return CMP_SUCCESS;
+  rc = cmp_string_append(out_path, virtual_path);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_vfs_resolve_path: cmp_string_append failed\n");
+    return rc;
+  }
+  return rc;
 }
 
 /**
@@ -228,8 +264,8 @@ int cmp_vfs_resolve_path(const char *virtual_path, cmp_string_t *out_path) {
  */
 int cmp_vfs_read_file_sync(const char *virtual_path, void **out_buffer,
                            size_t *out_size) {
-  int rc;
-  rc = 0;cfs_path p;
+  int rc = CMP_SUCCESS;
+  cfs_path p;
   cmp_string_t resolved_path;
   const cfs_char_t *native_path;
   FILE *f;
@@ -237,14 +273,19 @@ int cmp_vfs_read_file_sync(const char *virtual_path, void **out_buffer,
   void *buf = NULL;
   int res;
   size_t read_bytes;
+  int free_rc;
 
   if (virtual_path == NULL || out_buffer == NULL || out_size == NULL ||
       !g_vfs_initialized) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_vfs_read_file_sync: Invalid argument\n");
+    return rc;
   }
 
-  if (cmp_vfs_resolve_path(virtual_path, &resolved_path) != CMP_SUCCESS) {
-    return CMP_ERROR_INVALID_ARG;
+  rc = cmp_vfs_resolve_path(virtual_path, &resolved_path);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_vfs_read_file_sync: cmp_vfs_resolve_path failed\n");
+    return rc;
   }
 
   cfs_path_init(&p);
@@ -256,56 +297,78 @@ int cmp_vfs_read_file_sync(const char *virtual_path, void **out_buffer,
     if (req_len <= 0) {
       cfs_path_destroy(&p);
       cmp_string_destroy(&resolved_path);
-      return CMP_ERROR_INVALID_ARG;
+      rc = CMP_ERROR_INVALID_ARG;
+      LOG_DEBUG("cmp_vfs_read_file_sync: cfs_utf8_to_utf16 failed\n");
+      return rc;
     }
-    if (CMP_MALLOC((size_t)req_len * sizeof(wchar_t), (void **)&wpath) !=
-        CMP_SUCCESS) {
+    rc = CMP_MALLOC((size_t)req_len * sizeof(wchar_t), (void **)&wpath);
+    if (rc != CMP_SUCCESS) {
       cfs_path_destroy(&p);
       cmp_string_destroy(&resolved_path);
-      return CMP_ERROR_OOM;
+      rc = CMP_ERROR_OOM;
+      LOG_DEBUG("cmp_vfs_read_file_sync: CMP_MALLOC wpath failed\n");
+      return rc;
     }
     cfs_utf8_to_utf16(resolved_path.data, wpath, req_len, NULL);
     cfs_path_assign(&p, wpath);
-    CMP_FREE(wpath);
+    free_rc = CMP_FREE(wpath);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_read_file_sync: CMP_FREE wpath failed\n");
+    }
   }
 #else
   cfs_path_assign(&p, resolved_path.data);
 #endif
 
-  cmp_string_destroy(&resolved_path);
+  rc = cmp_string_destroy(&resolved_path);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_vfs_read_file_sync: cmp_string_destroy failed\n");
+  }
 
   cfs_path_c_str(&p, &native_path);
 #if defined(_WIN32)
-  f = _wfopen(native_path, L"rb");
+  f = _wfopen((const wchar_t *)native_path, L"rb");
 #else
   f = fopen(native_path, "rb");
 #endif
 
   if (!f) {
     cfs_path_destroy(&p);
-    return CMP_ERROR_NOT_FOUND;
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("cmp_vfs_read_file_sync: file not found\n");
+    return rc;
   }
 
   res = cfs_file_size(&p, &file_size, NULL);
   if (res != 0) {
     fclose(f);
     cfs_path_destroy(&p);
-    return CMP_ERROR_NOT_FOUND;
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("cmp_vfs_read_file_sync: cfs_file_size failed\n");
+    return rc;
   }
 
-  if (CMP_MALLOC((size_t)file_size + 1, &buf) != CMP_SUCCESS) {
+  rc = CMP_MALLOC((size_t)file_size + 1, &buf);
+  if (rc != CMP_SUCCESS) {
     fclose(f);
     cfs_path_destroy(&p);
-    return CMP_ERROR_OOM;
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_vfs_read_file_sync: CMP_MALLOC buf failed\n");
+    return rc;
   }
 
   if (file_size > 0) {
     read_bytes = fread(buf, 1, (size_t)file_size, f);
     if (read_bytes != (size_t)file_size) {
-      CMP_FREE(buf);
+      free_rc = CMP_FREE(buf);
+      if (free_rc != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_vfs_read_file_sync: CMP_FREE buf failed\n");
+      }
       fclose(f);
       cfs_path_destroy(&p);
-      return CMP_ERROR_NOT_FOUND;
+      rc = CMP_ERROR_NOT_FOUND;
+      LOG_DEBUG("cmp_vfs_read_file_sync: fread failed\n");
+      return rc;
     }
   }
   ((char *)buf)[file_size] = '\0';
@@ -315,10 +378,6 @@ int cmp_vfs_read_file_sync(const char *virtual_path, void **out_buffer,
 
   fclose(f);
   cfs_path_destroy(&p);
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -339,6 +398,7 @@ CMP_EXEMPT(static void cmp_vfs_read_async_worker(void *arg)) {
   void *buffer = NULL;
   size_t size = 0;
   int res;
+  int free_rc;
 
   if (ctx == NULL) {
     return;
@@ -349,13 +409,22 @@ CMP_EXEMPT(static void cmp_vfs_read_async_worker(void *arg)) {
   if (ctx->callback) {
     ctx->callback(res, buffer, size, ctx->user_data);
   } else if (res == CMP_SUCCESS && buffer != NULL) {
-    CMP_FREE(buffer);
+    free_rc = CMP_FREE(buffer);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_read_async_worker: CMP_FREE buffer failed\n");
+    }
   }
 
   if (ctx->virtual_path != NULL) {
-    CMP_FREE(ctx->virtual_path);
+    free_rc = CMP_FREE(ctx->virtual_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_read_async_worker: CMP_FREE virtual_path failed\n");
+    }
   }
-  CMP_FREE(ctx);
+  free_rc = CMP_FREE(ctx);
+  if (free_rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_vfs_read_async_worker: CMP_FREE ctx failed\n");
+  }
 }
 
 /**
@@ -369,24 +438,34 @@ CMP_EXEMPT(static void cmp_vfs_read_async_worker(void *arg)) {
  */
 int cmp_vfs_read_file_async(cmp_modality_t *mod, const char *virtual_path,
                             cmp_vfs_read_cb_t callback, void *user_data) {
-  int rc;
-  rc = 0;cmp_vfs_async_read_ctx_t *ctx;
+  int rc = CMP_SUCCESS;
+  cmp_vfs_async_read_ctx_t *ctx;
   size_t path_len;
-  int res;
+  int free_rc;
 
   if (mod == NULL || virtual_path == NULL || !g_vfs_initialized) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_vfs_read_file_async: Invalid argument\n");
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_vfs_async_read_ctx_t), (void **)&ctx) !=
-      CMP_SUCCESS) {
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_vfs_async_read_ctx_t), (void **)&ctx);
+  if (rc != CMP_SUCCESS) {
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_vfs_read_file_async: CMP_MALLOC ctx failed\n");
+    return rc;
   }
 
   path_len = strlen(virtual_path);
-  if (CMP_MALLOC(path_len + 1, (void **)&ctx->virtual_path) != CMP_SUCCESS) {
-    CMP_FREE(ctx);
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(path_len + 1, (void **)&ctx->virtual_path);
+  if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(ctx);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_read_file_async: CMP_FREE ctx failed\n");
+    }
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_vfs_read_file_async: CMP_MALLOC virtual_path failed\n");
+    return rc;
   }
 #if defined(_MSC_VER)
   strcpy_s(ctx->virtual_path, path_len + 1, virtual_path);
@@ -397,14 +476,22 @@ int cmp_vfs_read_file_async(cmp_modality_t *mod, const char *virtual_path,
   ctx->callback = callback;
   ctx->user_data = user_data;
 
-  res = cmp_modality_queue_task(mod, cmp_vfs_read_async_worker, ctx);
-  if (res != CMP_SUCCESS) {
-    CMP_FREE(ctx->virtual_path);
-    CMP_FREE(ctx);
+  rc = cmp_modality_queue_task(mod, cmp_vfs_read_async_worker, ctx);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_vfs_read_file_async: cmp_modality_queue_task failed\n");
+    free_rc = CMP_FREE(ctx->virtual_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_read_file_async: CMP_FREE virtual_path failed\n");
+    }
+    free_rc = CMP_FREE(ctx);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_read_file_async: CMP_FREE ctx failed\n");
+    }
+    return rc;
   }
 
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  return res;}
+  return rc;
+}
 
 struct cmp_vfs_watch {
   char *virtual_path;
@@ -435,7 +522,8 @@ struct cmp_vfs_watch {
  * @param arg Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-CMP_EXEMPT(static unsigned long __stdcall cmp_math_vfs_watch_worker(void *arg)) {
+CMP_EXEMPT(
+    static unsigned long __stdcall cmp_math_vfs_watch_worker(void *arg)) {
   cmp_vfs_watch_t *watch = (cmp_vfs_watch_t *)arg;
   char buffer[4096];
   OVERLAPPED overlapped;
@@ -596,12 +684,13 @@ CMP_EXEMPT(static void *cmp_math_vfs_watch_worker(void *arg)) {
  */
 int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
                        void *user_data, cmp_vfs_watch_t **out_watch) {
-  int rc;
-  rc = 0;cmp_vfs_watch_t *watch;
+  int rc = CMP_SUCCESS;
+  cmp_vfs_watch_t *watch;
   size_t path_len;
   cmp_string_t resolved_path;
   cfs_path p;
   const cfs_char_t *native_path;
+  int free_rc;
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
     defined(__NetBSD__)
   struct kevent change[2];
@@ -609,25 +698,44 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
 
   if (virtual_path == NULL || callback == NULL || out_watch == NULL ||
       !g_vfs_initialized) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_vfs_watch_path: Invalid argument\n");
+    return rc;
   }
 
-  if (cmp_vfs_resolve_path(virtual_path, &resolved_path) != CMP_SUCCESS) {
-    return CMP_ERROR_INVALID_ARG;
+  rc = cmp_vfs_resolve_path(virtual_path, &resolved_path);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_vfs_watch_path: cmp_vfs_resolve_path failed\n");
+    return rc;
   }
 
-  if (CMP_MALLOC(sizeof(cmp_vfs_watch_t), (void **)&watch) != CMP_SUCCESS) {
-    cmp_string_destroy(&resolved_path);
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(sizeof(cmp_vfs_watch_t), (void **)&watch);
+  if (rc != CMP_SUCCESS) {
+    rc = cmp_string_destroy(&resolved_path);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: cmp_string_destroy failed\n");
+    }
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_vfs_watch_path: CMP_MALLOC watch failed\n");
+    return rc;
   }
 
   memset(watch, 0, sizeof(*watch));
 
   path_len = strlen(virtual_path);
-  if (CMP_MALLOC(path_len + 1, (void **)&watch->virtual_path) != CMP_SUCCESS) {
-    CMP_FREE(watch);
-    cmp_string_destroy(&resolved_path);
-    return CMP_ERROR_OOM;
+  rc = CMP_MALLOC(path_len + 1, (void **)&watch->virtual_path);
+  if (rc != CMP_SUCCESS) {
+    free_rc = CMP_FREE(watch);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE watch failed\n");
+    }
+    free_rc = cmp_string_destroy(&resolved_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: cmp_string_destroy failed\n");
+    }
+    rc = CMP_ERROR_OOM;
+    LOG_DEBUG("cmp_vfs_watch_path: CMP_MALLOC virtual_path failed\n");
+    return rc;
   }
 #if defined(_MSC_VER)
   strcpy_s(watch->virtual_path, path_len + 1, virtual_path);
@@ -650,7 +758,10 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
           CMP_SUCCESS) {
         cfs_utf8_to_utf16(resolved_path.data, wpath, req_len, NULL);
         cfs_path_assign(&p, wpath);
-        CMP_FREE(wpath);
+        free_rc = CMP_FREE(wpath);
+        if (free_rc != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE wpath failed\n");
+        }
       }
     }
   }
@@ -658,7 +769,10 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
   cfs_path_assign(&p, resolved_path.data);
 #endif
 
-  cmp_string_destroy(&resolved_path);
+  free_rc = cmp_string_destroy(&resolved_path);
+  if (free_rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_vfs_watch_path: cmp_string_destroy failed\n");
+  }
   cfs_path_c_str(&p, &native_path);
 #if defined(_WIN32)
   watch->dir_handle = CreateFileW(
@@ -668,9 +782,17 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
 
   if (watch->dir_handle == (void *)-1) {
     cfs_path_destroy(&p);
-    CMP_FREE(watch->virtual_path);
-    CMP_FREE(watch);
-    return CMP_ERROR_NOT_FOUND;
+    free_rc = CMP_FREE(watch->virtual_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE virtual_path failed\n");
+    }
+    free_rc = CMP_FREE(watch);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE watch failed\n");
+    }
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("cmp_vfs_watch_path: CreateFileW failed\n");
+    return rc;
   }
 
   watch->stop_event = CreateEventA(NULL, 1, 0, NULL);
@@ -679,9 +801,17 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
 #elif defined(__linux__)
   if (pipe(watch->stop_pipe) == -1) {
     cfs_path_destroy(&p);
-    CMP_FREE(watch->virtual_path);
-    CMP_FREE(watch);
-    return CMP_ERROR_NOT_FOUND;
+    free_rc = CMP_FREE(watch->virtual_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE virtual_path failed\n");
+    }
+    free_rc = CMP_FREE(watch);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE watch failed\n");
+    }
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("cmp_vfs_watch_path: pipe failed\n");
+    return rc;
   }
 
   watch->inotify_fd = inotify_init();
@@ -689,9 +819,17 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
     close(watch->stop_pipe[0]);
     close(watch->stop_pipe[1]);
     cfs_path_destroy(&p);
-    CMP_FREE(watch->virtual_path);
-    CMP_FREE(watch);
-    return CMP_ERROR_NOT_FOUND;
+    free_rc = CMP_FREE(watch->virtual_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE virtual_path failed\n");
+    }
+    free_rc = CMP_FREE(watch);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE watch failed\n");
+    }
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("cmp_vfs_watch_path: inotify_init failed\n");
+    return rc;
   }
 
   watch->watch_wd = inotify_add_watch(watch->inotify_fd, native_path,
@@ -701,9 +839,17 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
     close(watch->stop_pipe[0]);
     close(watch->stop_pipe[1]);
     cfs_path_destroy(&p);
-    CMP_FREE(watch->virtual_path);
-    CMP_FREE(watch);
-    return CMP_ERROR_NOT_FOUND;
+    free_rc = CMP_FREE(watch->virtual_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE virtual_path failed\n");
+    }
+    free_rc = CMP_FREE(watch);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE watch failed\n");
+    }
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("cmp_vfs_watch_path: inotify_add_watch failed\n");
+    return rc;
   }
 
   pthread_create(&watch->thread_handle, NULL, cmp_math_vfs_watch_worker, watch);
@@ -711,9 +857,17 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
     defined(__NetBSD__)
   if (pipe(watch->stop_pipe) == -1) {
     cfs_path_destroy(&p);
-    CMP_FREE(watch->virtual_path);
-    CMP_FREE(watch);
-    return CMP_ERROR_NOT_FOUND;
+    free_rc = CMP_FREE(watch->virtual_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE virtual_path failed\n");
+    }
+    free_rc = CMP_FREE(watch);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE watch failed\n");
+    }
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("cmp_vfs_watch_path: pipe failed\n");
+    return rc;
   }
 
   watch->kq_fd = kqueue();
@@ -721,9 +875,17 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
     close(watch->stop_pipe[0]);
     close(watch->stop_pipe[1]);
     cfs_path_destroy(&p);
-    CMP_FREE(watch->virtual_path);
-    CMP_FREE(watch);
-    return CMP_ERROR_NOT_FOUND;
+    free_rc = CMP_FREE(watch->virtual_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE virtual_path failed\n");
+    }
+    free_rc = CMP_FREE(watch);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE watch failed\n");
+    }
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("cmp_vfs_watch_path: kqueue failed\n");
+    return rc;
   }
 
   watch->fd = open(native_path, O_EVTONLY);
@@ -732,9 +894,17 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
     close(watch->stop_pipe[0]);
     close(watch->stop_pipe[1]);
     cfs_path_destroy(&p);
-    CMP_FREE(watch->virtual_path);
-    CMP_FREE(watch);
-    return CMP_ERROR_NOT_FOUND;
+    free_rc = CMP_FREE(watch->virtual_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE virtual_path failed\n");
+    }
+    free_rc = CMP_FREE(watch);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE watch failed\n");
+    }
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("cmp_vfs_watch_path: open failed\n");
+    return rc;
   }
 
   EV_SET(&change[0], watch->fd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR,
@@ -749,19 +919,23 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
 #else
   if (pipe(watch->stop_pipe) == -1) {
     cfs_path_destroy(&p);
-    CMP_FREE(watch->virtual_path);
-    CMP_FREE(watch);
-    return CMP_ERROR_NOT_FOUND;
+    free_rc = CMP_FREE(watch->virtual_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE virtual_path failed\n");
+    }
+    free_rc = CMP_FREE(watch);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_watch_path: CMP_FREE watch failed\n");
+    }
+    rc = CMP_ERROR_NOT_FOUND;
+    LOG_DEBUG("cmp_vfs_watch_path: pipe failed\n");
+    return rc;
   }
   pthread_create(&watch->thread_handle, NULL, cmp_math_vfs_watch_worker, watch);
 #endif
 
   cfs_path_destroy(&p);
   *out_watch = watch;
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -772,14 +946,16 @@ int cmp_vfs_watch_path(const char *virtual_path, cmp_vfs_watch_cb_t callback,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vfs_unwatch(cmp_vfs_watch_t *watch) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
+  int free_rc;
 #if !defined(_WIN32)
   char dummy = 1;
 #endif
 
   if (watch == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_vfs_unwatch: Invalid argument\n");
+    return rc;
   }
 
   watch->running = 0;
@@ -818,13 +994,15 @@ int cmp_vfs_unwatch(cmp_vfs_watch_t *watch) {
 #endif
 
   if (watch->virtual_path != NULL) {
-    CMP_FREE(watch->virtual_path);
+    free_rc = CMP_FREE(watch->virtual_path);
+    if (free_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_vfs_unwatch: CMP_FREE virtual_path failed\n");
+    }
   }
 
-  CMP_FREE(watch);
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
+  free_rc = CMP_FREE(watch);
+  if (free_rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_vfs_unwatch: CMP_FREE watch failed\n");
   }
   return rc;
 }
@@ -837,12 +1015,18 @@ int cmp_vfs_unwatch(cmp_vfs_watch_t *watch) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vfs_get_standard_path(int type, cmp_string_t *out_path) {
-  int rc;
-  rc = 0;if (out_path == NULL) {
-    return CMP_ERROR_INVALID_ARG;
+  int rc = CMP_SUCCESS;
+  if (out_path == NULL) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_vfs_get_standard_path: Invalid argument\n");
+    return rc;
   }
 
-  cmp_string_init(out_path);
+  rc = cmp_string_init(out_path);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_vfs_get_standard_path: cmp_string_init failed\n");
+    return rc;
+  }
 
   switch (type) {
   case 1: /* AppData */
@@ -850,23 +1034,25 @@ int cmp_vfs_get_standard_path(int type, cmp_string_t *out_path) {
   {
     char env_buf[512];
     if (GetEnvironmentVariableA("APPDATA", env_buf, sizeof(env_buf)) > 0) {
-      cmp_string_append(out_path, env_buf);
+      rc = cmp_string_append(out_path, env_buf);
     } else {
-      cmp_string_append(out_path, "."); /* Fallback */
+      rc = cmp_string_append(out_path, "."); /* Fallback */
     }
   }
 #else
   {
     const char *home = getenv("HOME");
     if (home != NULL) {
-      cmp_string_append(out_path, home);
+      rc = cmp_string_append(out_path, home);
+      if (rc == CMP_SUCCESS) {
 #if defined(__APPLE__)
-      cmp_string_append(out_path, "/Library/Application Support");
+        rc = cmp_string_append(out_path, "/Library/Application Support");
 #else
-      cmp_string_append(out_path, "/.config");
+        rc = cmp_string_append(out_path, "/.config");
 #endif
+      }
     } else {
-      cmp_string_append(out_path, "."); /* Fallback */
+      rc = cmp_string_append(out_path, "."); /* Fallback */
     }
   }
 #endif
@@ -876,13 +1062,13 @@ int cmp_vfs_get_standard_path(int type, cmp_string_t *out_path) {
   {
     char env_buf[512];
     if (GetEnvironmentVariableA("TEMP", env_buf, sizeof(env_buf)) > 0) {
-      cmp_string_append(out_path, env_buf);
+      rc = cmp_string_append(out_path, env_buf);
     } else {
-      cmp_string_append(out_path, "C:\\Temp"); /* Fallback */
+      rc = cmp_string_append(out_path, "C:\\Temp"); /* Fallback */
     }
   }
 #else
-    cmp_string_append(out_path, "/tmp");
+    rc = cmp_string_append(out_path, "/tmp");
 #endif
   break;
   case 3: /* Cache */
@@ -890,23 +1076,25 @@ int cmp_vfs_get_standard_path(int type, cmp_string_t *out_path) {
   {
     char env_buf[512];
     if (GetEnvironmentVariableA("LOCALAPPDATA", env_buf, sizeof(env_buf)) > 0) {
-      cmp_string_append(out_path, env_buf);
+      rc = cmp_string_append(out_path, env_buf);
     } else {
-      cmp_string_append(out_path, "."); /* Fallback */
+      rc = cmp_string_append(out_path, "."); /* Fallback */
     }
   }
 #else
   {
     const char *home = getenv("HOME");
     if (home != NULL) {
-      cmp_string_append(out_path, home);
+      rc = cmp_string_append(out_path, home);
+      if (rc == CMP_SUCCESS) {
 #if defined(__APPLE__)
-      cmp_string_append(out_path, "/Library/Caches");
+        rc = cmp_string_append(out_path, "/Library/Caches");
 #else
-      cmp_string_append(out_path, "/.cache");
+        rc = cmp_string_append(out_path, "/.cache");
 #endif
+      }
     } else {
-      cmp_string_append(out_path, "/tmp"); /* Fallback */
+      rc = cmp_string_append(out_path, "/tmp"); /* Fallback */
     }
   }
 #endif
@@ -916,20 +1104,24 @@ int cmp_vfs_get_standard_path(int type, cmp_string_t *out_path) {
   {
     char env_buf[512];
     if (GetEnvironmentVariableA("USERPROFILE", env_buf, sizeof(env_buf)) > 0) {
-      cmp_string_append(out_path, env_buf);
-      cmp_string_append(out_path, "\\Documents");
+      rc = cmp_string_append(out_path, env_buf);
+      if (rc == CMP_SUCCESS) {
+        rc = cmp_string_append(out_path, "\\Documents");
+      }
     } else {
-      cmp_string_append(out_path, "."); /* Fallback */
+      rc = cmp_string_append(out_path, "."); /* Fallback */
     }
   }
 #else
   {
     const char *home = getenv("HOME");
     if (home != NULL) {
-      cmp_string_append(out_path, home);
-      cmp_string_append(out_path, "/Documents");
+      rc = cmp_string_append(out_path, home);
+      if (rc == CMP_SUCCESS) {
+        rc = cmp_string_append(out_path, "/Documents");
+      }
     } else {
-      cmp_string_append(out_path, "."); /* Fallback */
+      rc = cmp_string_append(out_path, "."); /* Fallback */
     }
   }
 #endif
@@ -945,9 +1137,9 @@ int cmp_vfs_get_standard_path(int type, cmp_string_t *out_path) {
       if (last_slash) {
         *last_slash = '\0';
       }
-      cmp_string_append(out_path, exe_buf);
+      rc = cmp_string_append(out_path, exe_buf);
     } else {
-      cmp_string_append(out_path, "."); /* Fallback */
+      rc = cmp_string_append(out_path, "."); /* Fallback */
     }
   }
 #elif defined(__linux__) || defined(__CYGWIN__)
@@ -961,24 +1153,25 @@ int cmp_vfs_get_standard_path(int type, cmp_string_t *out_path) {
       if (last_slash) {
         *last_slash = '\0';
       }
-      cmp_string_append(out_path, exe_buf);
+      rc = cmp_string_append(out_path, exe_buf);
     } else {
-      cmp_string_append(out_path, "."); /* Fallback */
+      rc = cmp_string_append(out_path, "."); /* Fallback */
     }
   }
 #else
   {
-    cmp_string_append(out_path, "."); /* Fallback */
+    rc = cmp_string_append(out_path, "."); /* Fallback */
   }
 #endif
   break;
   default:
-    return CMP_ERROR_INVALID_ARG;
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_vfs_get_standard_path: Unsupported type\n");
+    return rc;
   }
 
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_vfs_get_standard_path: cmp_string_append failed\n");
   }
   return rc;
 }

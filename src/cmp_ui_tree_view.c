@@ -19,8 +19,7 @@ struct cmp_ui_tree_view {
  */
 int cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,
                             uint32_t bg_color) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_ui_tree_view_t *tree_view;
   int err;
 
@@ -48,7 +47,7 @@ int cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,
   tree_view->node_root->bg_color = bg_color;
 
   *out_tree_view = tree_view;
-  return 0;
+  return rc;
 }
 
 /**
@@ -58,8 +57,7 @@ int cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tree_view_destroy(cmp_ui_tree_view_t *tree_view) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   if (!tree_view) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -67,7 +65,7 @@ int cmp_ui_tree_view_destroy(cmp_ui_tree_view_t *tree_view) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
-  return 0;
+  return rc;
 }
 
 /**
@@ -79,21 +77,12 @@ int cmp_ui_tree_view_destroy(cmp_ui_tree_view_t *tree_view) {
  */
 int cmp_ui_tree_view_get_node(cmp_ui_tree_view_t *tree_view,
                               cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!tree_view || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = tree_view->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -107,8 +96,7 @@ int cmp_ui_tree_view_get_node(cmp_ui_tree_view_t *tree_view,
  */
 int cmp_ui_tree_view_add_item(cmp_ui_tree_view_t *tree_view, const char *label,
                               int depth) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_ui_node_t *node_text;
   int err;
   cmp_string_t translated = {NULL, 0, 0};
@@ -135,14 +123,5 @@ int cmp_ui_tree_view_add_item(cmp_ui_tree_view_t *tree_view, const char *label,
   cmp_ui_node_add_child(tree_view->node_root, node_text);
   tree_view->item_count++;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

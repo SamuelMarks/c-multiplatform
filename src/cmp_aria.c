@@ -31,8 +31,7 @@ struct cmp_aria {
  */
 static int _cmp_aria_find_or_add_node(struct cmp_aria *a, int node_id,
                                       cmp_aria_node_t **out_node) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   size_t i;
   cmp_aria_node_t *new_nodes = NULL;
   size_t new_capacity;
@@ -47,7 +46,7 @@ static int _cmp_aria_find_or_add_node(struct cmp_aria *a, int node_id,
       *out_node = &a->nodes[i];
       cmp_log_debug("_cmp_aria_find_or_add_node: Found existing node %d\n",
                     node_id);
-      return CMP_SUCCESS;
+      return rc;
     }
   }
 
@@ -59,9 +58,7 @@ static int _cmp_aria_find_or_add_node(struct cmp_aria *a, int node_id,
         CMP_MALLOC(new_capacity * sizeof(cmp_aria_node_t), (void **)&new_nodes);
     if (rc != CMP_SUCCESS) {
       cmp_log_debug("_cmp_aria_find_or_add_node: Out of memory\n");
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
 
@@ -82,7 +79,7 @@ static int _cmp_aria_find_or_add_node(struct cmp_aria *a, int node_id,
   a->count++;
 
   cmp_log_debug("_cmp_aria_find_or_add_node: Added new node %d\n", node_id);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -93,8 +90,7 @@ static int _cmp_aria_find_or_add_node(struct cmp_aria *a, int node_id,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_create(cmp_a11y_tree_t *tree, cmp_aria_t **out_aria) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   struct cmp_aria *aria = NULL;
   const char *err_str;
@@ -106,9 +102,7 @@ int cmp_aria_create(cmp_a11y_tree_t *tree, cmp_aria_t **out_aria) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_aria_create: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -119,9 +113,7 @@ int cmp_aria_create(cmp_a11y_tree_t *tree, cmp_aria_t **out_aria) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_aria_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -132,9 +124,7 @@ int cmp_aria_create(cmp_a11y_tree_t *tree, cmp_aria_t **out_aria) {
 
   *out_aria = (cmp_aria_t *)aria;
   cmp_log_debug("cmp_aria_create: Successfully created aria context\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -145,8 +135,7 @@ int cmp_aria_create(cmp_a11y_tree_t *tree, cmp_aria_t **out_aria) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_destroy(cmp_aria_t *aria) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria *a = (struct cmp_aria *)aria;
@@ -159,9 +148,7 @@ int cmp_aria_destroy(cmp_aria_t *aria) {
     }
     cmp_log_debug("cmp_aria_destroy: Invalid argument (aria=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -172,15 +159,7 @@ int cmp_aria_destroy(cmp_aria_t *aria) {
 
   CMP_FREE(a);
   cmp_log_debug("cmp_aria_destroy: Successfully destroyed aria context\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -193,8 +172,7 @@ int cmp_aria_destroy(cmp_aria_t *aria) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_set_role(cmp_aria_t *aria, int node_id, cmp_aria_role_t role) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria *a = (struct cmp_aria *)aria;
@@ -208,9 +186,7 @@ int cmp_aria_set_role(cmp_aria_t *aria, int node_id, cmp_aria_role_t role) {
     }
     cmp_log_debug("cmp_aria_set_role: Invalid argument (aria=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -222,16 +198,14 @@ int cmp_aria_set_role(cmp_aria_t *aria, int node_id, cmp_aria_role_t role) {
     }
     cmp_log_debug("cmp_aria_set_role: Failed to find or add node: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   node->role = role;
   cmp_log_debug("cmp_aria_set_role: Set role %d for node %d\n", (int)role,
                 node_id);
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -245,8 +219,7 @@ int cmp_aria_set_role(cmp_aria_t *aria, int node_id, cmp_aria_role_t role) {
  */
 int cmp_aria_set_state_bool(cmp_aria_t *aria, int node_id,
                             const char *state_name, int value) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria *a = (struct cmp_aria *)aria;
@@ -259,9 +232,7 @@ int cmp_aria_set_state_bool(cmp_aria_t *aria, int node_id,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_aria_set_state_bool: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -273,9 +244,7 @@ int cmp_aria_set_state_bool(cmp_aria_t *aria, int node_id,
     }
     cmp_log_debug("cmp_aria_set_state_bool: Failed to find or add node: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -291,7 +260,7 @@ int cmp_aria_set_state_bool(cmp_aria_t *aria, int node_id,
     cmp_log_debug("cmp_aria_set_state_bool: Unknown state %s\n", state_name);
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -301,8 +270,7 @@ int cmp_aria_set_state_bool(cmp_aria_t *aria, int node_id,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_aria_sync(cmp_aria_t *aria) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_aria *a = (struct cmp_aria *)aria;
@@ -316,9 +284,7 @@ int cmp_aria_sync(cmp_aria_t *aria) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_aria_sync: Invalid argument (aria=NULL): %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -365,9 +331,7 @@ int cmp_aria_sync(cmp_aria_t *aria) {
         }
         cmp_log_debug("cmp_aria_sync: Failed to add node %d to a11y tree: %s\n",
                       a->nodes[i].node_id, err_str);
-        if (rc != 0) {
-          return rc;
-        }
+
         return rc;
       }
       cmp_log_debug("cmp_aria_sync: Synced node %d with role %s\n",
@@ -376,5 +340,5 @@ int cmp_aria_sync(cmp_aria_t *aria) {
   }
 
   cmp_log_debug("cmp_aria_sync: Sync completed successfully\n");
-  return CMP_SUCCESS;
+  return rc;
 }

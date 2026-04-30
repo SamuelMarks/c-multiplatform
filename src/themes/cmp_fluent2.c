@@ -14,8 +14,7 @@
  */
 int cmp_fluent2_measure_button(const cmp_ui_node_t *node, float *width,
                                float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float calc_width = 32.0f;
   float calc_height = 32.0f; /* Standard Fluent 2 Button Height */
   float font_size;
@@ -39,13 +38,8 @@ int cmp_fluent2_measure_button(const cmp_ui_node_t *node, float *width,
     *width = calc_width;
   if (height)
     *height = calc_height;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -58,21 +52,15 @@ int cmp_fluent2_measure_button(const cmp_ui_node_t *node, float *width,
  */
 int cmp_fluent2_measure_text_input(const cmp_ui_node_t *node, float *width,
                                    float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 200.0f;
   if (height)
     *height = 32.0f; /* Standard Fluent 2 Input Height */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -85,21 +73,15 @@ int cmp_fluent2_measure_text_input(const cmp_ui_node_t *node, float *width,
  */
 int cmp_fluent2_measure_slider(const cmp_ui_node_t *node, float *width,
                                float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 200.0f;
   if (height)
     *height = 32.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -112,21 +94,15 @@ int cmp_fluent2_measure_slider(const cmp_ui_node_t *node, float *width,
  */
 int cmp_fluent2_measure_toggle(const cmp_ui_node_t *node, float *width,
                                float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 40.0f; /* Standard Fluent 2 Toggle Width */
   if (height)
     *height = 20.0f; /* Standard Fluent 2 Toggle Height */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -139,21 +115,15 @@ int cmp_fluent2_measure_toggle(const cmp_ui_node_t *node, float *width,
  */
 int cmp_fluent2_measure_checkbox(const cmp_ui_node_t *node, float *width,
                                  float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 16.0f; /* Standard Fluent 2 Checkbox */
   if (height)
     *height = 16.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -166,21 +136,15 @@ int cmp_fluent2_measure_checkbox(const cmp_ui_node_t *node, float *width,
  */
 int cmp_fluent2_measure_radio(const cmp_ui_node_t *node, float *width,
                               float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 16.0f; /* Standard Fluent 2 Radio */
   if (height)
     *height = 16.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -193,21 +157,15 @@ int cmp_fluent2_measure_radio(const cmp_ui_node_t *node, float *width,
  */
 int cmp_fluent2_measure_progress(const cmp_ui_node_t *node, float *width,
                                  float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 200.0f;
   if (height)
     *height = 2.0f; /* Standard Fluent 2 Progress Bar Thickness */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -220,21 +178,15 @@ int cmp_fluent2_measure_progress(const cmp_ui_node_t *node, float *width,
  */
 int cmp_fluent2_measure_dropdown(const cmp_ui_node_t *node, float *width,
                                  float *height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (width)
     *width = 150.0f;
   if (height)
     *height = 32.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -244,21 +196,15 @@ int cmp_fluent2_measure_dropdown(const cmp_ui_node_t *node, float *width,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_layout_nav_bar(cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_ROW;
   node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
   node->layout->justify_content = CMP_FLEX_ALIGN_SPACE_BETWEEN;
   node->layout->min_height = 48.0f; /* Standard Fluent 2 Nav Height */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -268,21 +214,15 @@ int cmp_fluent2_layout_nav_bar(cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_layout_tab_bar(cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_ROW;
   node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_height = 36.0f; /* Standard Fluent 2 Tab Height */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -292,8 +232,7 @@ int cmp_fluent2_layout_tab_bar(cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_layout_dialog_content(cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_COLUMN;
@@ -301,13 +240,8 @@ int cmp_fluent2_layout_dialog_content(cmp_ui_node_t *node) {
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_width = 288.0f; /* Standard Fluent 2 Dialog Min Width */
   node->layout->max_width = 480.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -317,8 +251,7 @@ int cmp_fluent2_layout_dialog_content(cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_layout_sidebar(cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL || node->layout == NULL)
     return CMP_ERROR_INVALID_ARG;
   node->layout->direction = CMP_FLEX_COLUMN;
@@ -326,13 +259,8 @@ int cmp_fluent2_layout_sidebar(cmp_ui_node_t *node) {
   node->layout->justify_content = CMP_FLEX_ALIGN_START;
   node->layout->min_width = 260.0f; /* Standard Fluent 2 Sidebar */
   node->layout->max_width = 320.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -342,8 +270,7 @@ int cmp_fluent2_layout_sidebar(cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_draw_button(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -361,13 +288,8 @@ int cmp_fluent2_draw_button(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -377,8 +299,7 @@ int cmp_fluent2_draw_button(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_draw_text_input(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -396,13 +317,8 @@ int cmp_fluent2_draw_text_input(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -412,8 +328,7 @@ int cmp_fluent2_draw_text_input(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_draw_slider(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -431,13 +346,8 @@ int cmp_fluent2_draw_slider(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -447,8 +357,7 @@ int cmp_fluent2_draw_slider(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_draw_toggle(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -466,13 +375,8 @@ int cmp_fluent2_draw_toggle(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -482,8 +386,7 @@ int cmp_fluent2_draw_toggle(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_draw_checkbox(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -501,13 +404,8 @@ int cmp_fluent2_draw_checkbox(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -517,8 +415,7 @@ int cmp_fluent2_draw_checkbox(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_draw_radio(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -536,13 +433,8 @@ int cmp_fluent2_draw_radio(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -552,8 +444,7 @@ int cmp_fluent2_draw_radio(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_draw_progress(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -571,13 +462,8 @@ int cmp_fluent2_draw_progress(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -587,8 +473,7 @@ int cmp_fluent2_draw_progress(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_draw_card(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -606,13 +491,8 @@ int cmp_fluent2_draw_card(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -622,8 +502,7 @@ int cmp_fluent2_draw_card(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_draw_tooltip(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -641,13 +520,8 @@ int cmp_fluent2_draw_tooltip(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -657,8 +531,7 @@ int cmp_fluent2_draw_tooltip(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_draw_menu(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
@@ -676,13 +549,8 @@ int cmp_fluent2_draw_menu(const cmp_ui_node_t *node) {
   /* Assuming context or global renderer is accessible */
   (void)renderer;
   /* GPU Draw calls handled by compositor layer */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -692,8 +560,7 @@ int cmp_fluent2_draw_menu(const cmp_ui_node_t *node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_fluent2_draw_focus_ring(const cmp_ui_node_t *node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_rect_t bounds;
   cmp_rect_t outer_focus_bounds;
   cmp_color_t color;
@@ -720,13 +587,7 @@ int cmp_fluent2_draw_focus_ring(const cmp_ui_node_t *node) {
   color.a = 1.0f;
   color.space = CMP_COLOR_SPACE_SRGB;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -740,8 +601,7 @@ int cmp_fluent2_draw_focus_ring(const cmp_ui_node_t *node) {
  */
 int cmp_fluent2_get_spring_config(const cmp_ui_node_t *node, float *mass,
                                   float *stiffness, float *damping) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return 2;
   if (mass)
@@ -750,13 +610,8 @@ int cmp_fluent2_get_spring_config(const cmp_ui_node_t *node, float *mass,
     *stiffness = 100.0f;
   if (damping)
     *damping = 10.0f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return 0;
+
+  return rc;
 }
 
 /**
@@ -769,21 +624,15 @@ int cmp_fluent2_get_spring_config(const cmp_ui_node_t *node, float *mass,
  */
 int cmp_fluent2_get_ripple_config(const cmp_ui_node_t *node, float *a,
                                   float *b) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return 2;
   if (a)
     *a = 0.5f;
   if (b)
     *b = 0.5f;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return 0;
+
+  return rc;
 }
 
 /**
@@ -796,8 +645,7 @@ int cmp_fluent2_get_ripple_config(const cmp_ui_node_t *node, float *a,
  */
 int cmp_fluent2_get_state_layer_opacity(const cmp_ui_node_t *node, int state,
                                         float *opacity) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (node == NULL)
     return CMP_ERROR_INVALID_ARG;
 
@@ -808,13 +656,8 @@ int cmp_fluent2_get_state_layer_opacity(const cmp_ui_node_t *node, int state,
     else
       *opacity = 0.0f;
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 
 /**
@@ -826,18 +669,12 @@ int cmp_fluent2_get_state_layer_opacity(const cmp_ui_node_t *node, int state,
  */
 int cmp_fluent2_get_transition_duration(const cmp_ui_node_t *node,
                                         float *duration) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   (void)node;
   if (duration)
     *duration = 167.0f; /* Standard fast duration in milliseconds for Fluent */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return CMP_SUCCESS;
+
+  return rc;
 }
 #ifndef CMP_THEME_MODE_SINGLE_STATIC
 const cmp_theme_vtable_t cmp_fluent2_vtable = {

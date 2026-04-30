@@ -27,8 +27,7 @@ int cmp_tex_compression_create(cmp_tex_compression_type_t type, uint32_t width,
                                uint32_t height, const void *data,
                                size_t data_size,
                                cmp_tex_compression_t **out_tex_comp) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_tex_compression *ctx;
 
   if (!out_tex_comp)
@@ -52,15 +51,7 @@ int cmp_tex_compression_create(cmp_tex_compression_type_t type, uint32_t width,
   ctx->data_size = data_size;
 
   *out_tex_comp = (cmp_tex_compression_t *)ctx;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -71,8 +62,7 @@ int cmp_tex_compression_create(cmp_tex_compression_type_t type, uint32_t width,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tex_compression_destroy(cmp_tex_compression_t *tex_comp) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_tex_compression *ctx = (struct cmp_tex_compression *)tex_comp;
   if (!ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -81,15 +71,6 @@ int cmp_tex_compression_destroy(cmp_tex_compression_t *tex_comp) {
     CMP_FREE(ctx->compressed_data);
   CMP_FREE(ctx);
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -102,8 +83,7 @@ int cmp_tex_compression_destroy(cmp_tex_compression_t *tex_comp) {
  */
 int cmp_tex_compression_mount(cmp_tex_compression_t *tex_comp,
                               cmp_texture_t *target_texture) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_tex_compression *ctx = (struct cmp_tex_compression *)tex_comp;
   if (!ctx || !target_texture)
     return CMP_ERROR_INVALID_ARG;
@@ -131,14 +111,5 @@ int cmp_tex_compression_mount(cmp_tex_compression_t *tex_comp,
     target_texture->internal_handle = (void *)(size_t)0xCAFEBABE;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

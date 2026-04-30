@@ -16,16 +16,13 @@ struct cmp_markdown_parser {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_md_node_destroy(cmp_md_node_t *node) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   size_t i;
 
   if (!node) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_md_node_destroy: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -54,8 +51,10 @@ int cmp_md_node_destroy(cmp_md_node_t *node) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
-  return CMP_SUCCESS; /* Returning SUCCESS overall even if children fail to
+  rc = rc;
+  /* Returning SUCCESS overall even if children fail to
                          align with typical free semantics */
+  return rc;
 }
 
 /**
@@ -68,8 +67,7 @@ int cmp_md_node_destroy(cmp_md_node_t *node) {
  */
 static int create_node(cmp_md_node_type_t type, const char *content,
                        cmp_md_node_t **out_node) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_md_node_t *node;
   size_t len;
 
@@ -110,7 +108,7 @@ static int create_node(cmp_md_node_type_t type, const char *content,
   }
 
   *out_node = node;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -121,17 +119,14 @@ static int create_node(cmp_md_node_type_t type, const char *content,
  * @return Returns 0 on success, or an error code on failure.
  */
 static int add_child(cmp_md_node_t *parent, cmp_md_node_t *child) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   size_t new_cap;
   cmp_md_node_t **new_arr;
 
   if (!parent || !child) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in add_child: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -140,9 +135,7 @@ static int add_child(cmp_md_node_t *parent, cmp_md_node_t *child) {
     rc = CMP_MALLOC(new_cap * sizeof(cmp_md_node_t *), (void **)&new_arr);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("Error in add_child: Out of memory\n");
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
     if (parent->children) {
@@ -155,9 +148,7 @@ static int add_child(cmp_md_node_t *parent, cmp_md_node_t *child) {
   }
 
   parent->children[parent->child_count++] = child;
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -168,16 +159,13 @@ static int add_child(cmp_md_node_t *parent, cmp_md_node_t *child) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_markdown_parser_create(cmp_markdown_parser_t **out_parser) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_markdown_parser_t *parser = NULL;
 
   if (!out_parser) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_markdown_parser_create: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -189,9 +177,7 @@ int cmp_markdown_parser_create(cmp_markdown_parser_t **out_parser) {
 
   parser->flags = 0;
   *out_parser = parser;
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -202,24 +188,19 @@ int cmp_markdown_parser_create(cmp_markdown_parser_t **out_parser) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_markdown_parser_destroy(cmp_markdown_parser_t *parser) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   if (!parser) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_markdown_parser_destroy: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   rc = CMP_FREE(parser);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -234,17 +215,14 @@ int cmp_markdown_parser_destroy(cmp_markdown_parser_t *parser) {
 int cmp_markdown_parser_parse(cmp_markdown_parser_t *parser,
                               const char *markdown_text,
                               cmp_md_node_t **out_root) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_md_node_t *root = NULL;
   cmp_md_node_t *p_node = NULL;
 
   if (!parser || !markdown_text || !out_root) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_markdown_parser_parse: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -253,9 +231,7 @@ int cmp_markdown_parser_parse(cmp_markdown_parser_t *parser,
   rc = create_node(CMP_MD_NODE_PARAGRAPH, NULL, &root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_markdown_parser_parse: Out of memory\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -293,15 +269,11 @@ int cmp_markdown_parser_parse(cmp_markdown_parser_t *parser,
   if (rc != CMP_SUCCESS) {
     cmp_md_node_destroy(root);
     LOG_DEBUG("Error in cmp_markdown_parser_parse: Failed to parse\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   *out_root = root;
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

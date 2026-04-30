@@ -17,8 +17,7 @@ struct cmp_ui_switch {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_ui_switch_t *sw;
   int err;
 
@@ -71,15 +70,7 @@ int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
   }
 
   *out_switch = sw;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -90,8 +81,7 @@ int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_switch_destroy(cmp_ui_switch_t *sw) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!sw) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -99,13 +89,9 @@ int cmp_ui_switch_destroy(cmp_ui_switch_t *sw) {
   if (free_rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_switch_destroy: CMP_FREE sw failed\n");
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return free_rc;
+
+  rc = free_rc;
+  return rc;
 }
 
 /**
@@ -116,21 +102,12 @@ int cmp_ui_switch_destroy(cmp_ui_switch_t *sw) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_switch_get_node(cmp_ui_switch_t *sw, cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!sw || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = sw->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -142,8 +119,7 @@ int cmp_ui_switch_get_node(cmp_ui_switch_t *sw, cmp_ui_node_t **out_node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_switch_set_on(cmp_ui_switch_t *sw, int is_on) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!sw) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -157,15 +133,6 @@ int cmp_ui_switch_set_on(cmp_ui_switch_t *sw, int is_on) {
     sw->node_root->bg_color = 0xFFCCCCCC; /* Inactive track color */
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -176,8 +143,7 @@ int cmp_ui_switch_set_on(cmp_ui_switch_t *sw, int is_on) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_switch_bind_a11y(cmp_ui_switch_t *widget, cmp_a11y_tree_t *tree) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -186,11 +152,7 @@ int cmp_ui_switch_bind_a11y(cmp_ui_switch_t *widget, cmp_a11y_tree_t *tree) {
   if (err != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_switch_bind_a11y: cmp_a11y_tree_add_node failed\n");
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return err;
+
+  rc = err;
+  return rc;
 }

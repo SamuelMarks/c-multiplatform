@@ -15,8 +15,7 @@
  */
 int cmp_gradient_create(cmp_gradient_t **out_gradient,
                         cmp_gradient_type_t type) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_gradient_t *grad;
   if (!out_gradient)
     return CMP_ERROR_INVALID_ARG;
@@ -27,15 +26,7 @@ int cmp_gradient_create(cmp_gradient_t **out_gradient,
   memset(grad, 0, sizeof(cmp_gradient_t));
   grad->type = type;
   *out_gradient = grad;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -46,22 +37,13 @@ int cmp_gradient_create(cmp_gradient_t **out_gradient,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_gradient_destroy(cmp_gradient_t *gradient) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!gradient)
     return CMP_ERROR_INVALID_ARG;
   if (gradient->stops)
     CMP_FREE(gradient->stops);
   CMP_FREE(gradient);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -75,8 +57,7 @@ int cmp_gradient_destroy(cmp_gradient_t *gradient) {
  */
 int cmp_gradient_add_stop(cmp_gradient_t *gradient, cmp_color_t color,
                           float position) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_gradient_stop_t *new_stops;
   if (!gradient)
     return CMP_ERROR_INVALID_ARG;
@@ -96,15 +77,7 @@ int cmp_gradient_add_stop(cmp_gradient_t *gradient, cmp_color_t color,
 
   gradient->stops = new_stops;
   gradient->stop_count++;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -116,8 +89,7 @@ int cmp_gradient_add_stop(cmp_gradient_t *gradient, cmp_color_t color,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_color_parse_p3(const char *color_str, cmp_color_t *out_color) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float r = 0.0f, g = 0.0f, b = 0.0f, a = 1.0f;
   int parsed;
 
@@ -137,16 +109,12 @@ int cmp_color_parse_p3(const char *color_str, cmp_color_t *out_color) {
       out_color->g = g;
       out_color->b = b;
       out_color->a = a;
-      return CMP_SUCCESS;
-    }
-  }
-  if (rc != 0) {
-    if (rc != 0) {
       return rc;
     }
-    return rc;
   }
-  return CMP_ERROR_INVALID_ARG;
+
+  rc = CMP_ERROR_INVALID_ARG;
+  return rc;
 }
 
 /**
@@ -158,8 +126,7 @@ int cmp_color_parse_p3(const char *color_str, cmp_color_t *out_color) {
  */
 int cmp_color_oklch_to_srgb(const cmp_color_t *in_color,
                             cmp_color_t *out_color) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float l, c, h, a, b;
   float l_, m_, s_;
   float r_lin, g_lin, b_lin;
@@ -208,15 +175,7 @@ int cmp_color_oklch_to_srgb(const cmp_color_t *in_color,
     out_color->b = b_lin;
     out_color->a = in_color->a;
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -232,8 +191,7 @@ int cmp_color_oklch_to_srgb(const cmp_color_t *in_color,
  */
 int cmp_color_mix(const cmp_color_t *c1, const cmp_color_t *c2, float weight,
                   cmp_color_space_t space, cmp_color_t *out_color) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!c1 || !c2 || !out_color)
     return CMP_ERROR_INVALID_ARG;
 
@@ -243,15 +201,7 @@ int cmp_color_mix(const cmp_color_t *c1, const cmp_color_t *c2, float weight,
   out_color->g = c1->g * weight + c2->g * (1.0f - weight);
   out_color->b = c1->b * weight + c2->b * (1.0f - weight);
   out_color->a = c1->a * weight + c2->a * (1.0f - weight);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -263,8 +213,7 @@ int cmp_color_mix(const cmp_color_t *c1, const cmp_color_t *c2, float weight,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_color_luminance(const cmp_color_t *color, float *out_luminance) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float r_lin, g_lin, b_lin;
   if (!color || !out_luminance)
     return CMP_ERROR_INVALID_ARG;
@@ -285,15 +234,7 @@ int cmp_color_luminance(const cmp_color_t *color, float *out_luminance) {
     b_lin = (float)pow((color->b + 0.055f) / 1.055f, 2.4f);
 
   *out_luminance = 0.2126f * r_lin + 0.7152f * g_lin + 0.0722f * b_lin;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -307,8 +248,7 @@ int cmp_color_luminance(const cmp_color_t *color, float *out_luminance) {
  */
 int cmp_color_contrast_ratio(const cmp_color_t *c1, const cmp_color_t *c2,
                              float *out_ratio) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float l1, l2;
   if (!c1 || !c2 || !out_ratio)
     return CMP_ERROR_INVALID_ARG;
@@ -321,15 +261,7 @@ int cmp_color_contrast_ratio(const cmp_color_t *c1, const cmp_color_t *c2,
   } else {
     *out_ratio = (l2 + 0.05f) / (l1 + 0.05f);
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -350,8 +282,7 @@ struct cmp_icc_profile {
  */
 int cmp_icc_profile_parse(const void *image_buffer, size_t size,
                           void **out_profile) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_icc_profile *profile = NULL;
   const unsigned char *buf = (const unsigned char *)image_buffer;
   int found_icc = 0;
@@ -406,15 +337,7 @@ int cmp_icc_profile_parse(const void *image_buffer, size_t size,
   }
 
   *out_profile = (cmp_icc_profile_t *)profile;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -425,23 +348,14 @@ int cmp_icc_profile_parse(const void *image_buffer, size_t size,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_icc_profile_destroy(cmp_icc_profile_t *profile) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_icc_profile *p = (struct cmp_icc_profile *)profile;
   if (!p)
     return CMP_ERROR_INVALID_ARG;
   if (p->data)
     CMP_FREE(p->data);
   CMP_FREE(p);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -454,8 +368,7 @@ int cmp_icc_profile_destroy(cmp_icc_profile_t *profile) {
  */
 int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile,
                                float *out_matrix3x3) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   const struct cmp_icc_profile *p = (const struct cmp_icc_profile *)profile;
   int i;
   if (!p || !out_matrix3x3)
@@ -463,15 +376,7 @@ int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile,
   for (i = 0; i < 9; i++) {
     out_matrix3x3[i] = p->color_matrix[i];
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -484,21 +389,12 @@ int cmp_icc_profile_get_matrix(const cmp_icc_profile_t *profile,
  */
 int cmp_icc_profile_is_wide_gamut(const cmp_icc_profile_t *profile,
                                   int *out_is_wide) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   const struct cmp_icc_profile *p = (const struct cmp_icc_profile *)profile;
   if (!p || !out_is_wide)
     return CMP_ERROR_INVALID_ARG;
   *out_is_wide = p->is_wide_gamut;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -513,8 +409,7 @@ struct cmp_semantic_colors {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semantic_colors_create(cmp_semantic_colors_t **out_ctx) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_semantic_colors *ctx;
   if (!out_ctx)
     return CMP_ERROR_INVALID_ARG;
@@ -523,15 +418,7 @@ int cmp_semantic_colors_create(cmp_semantic_colors_t **out_ctx) {
     return CMP_ERROR_OOM;
   ctx->tint_color = 0x007AFFFF; /* Default Apple systemBlue */
   *out_ctx = (cmp_semantic_colors_t *)ctx;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -542,19 +429,10 @@ int cmp_semantic_colors_create(cmp_semantic_colors_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_semantic_colors_destroy(cmp_semantic_colors_t *ctx) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (ctx)
     CMP_FREE(ctx);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -567,21 +445,12 @@ int cmp_semantic_colors_destroy(cmp_semantic_colors_t *ctx) {
  */
 int cmp_semantic_colors_set_tint_color(cmp_semantic_colors_t *ctx,
                                        uint32_t tint_rgba) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_semantic_colors *c = (struct cmp_semantic_colors *)ctx;
   if (!c)
     return CMP_ERROR_INVALID_ARG;
   c->tint_color = tint_rgba;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -594,21 +463,12 @@ int cmp_semantic_colors_set_tint_color(cmp_semantic_colors_t *ctx,
  */
 int cmp_semantic_colors_get_tint_color(cmp_semantic_colors_t *ctx,
                                        uint32_t *out_tint_rgba) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_semantic_colors *c = (struct cmp_semantic_colors *)ctx;
   if (!c || !out_tint_rgba)
     return CMP_ERROR_INVALID_ARG;
   *out_tint_rgba = c->tint_color;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -624,8 +484,7 @@ int cmp_semantic_colors_get_tint_color(cmp_semantic_colors_t *ctx,
 int cmp_semantic_colors_resolve(cmp_semantic_colors_t *ctx,
                                 const char *semantic_name, int is_dark_mode,
                                 uint32_t *out_rgba) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_semantic_colors *c = (struct cmp_semantic_colors *)ctx;
   if (!c || !semantic_name || !out_rgba)
     return CMP_ERROR_INVALID_ARG;
@@ -643,15 +502,7 @@ int cmp_semantic_colors_resolve(cmp_semantic_colors_t *ctx,
   } else {
     return CMP_ERROR_NOT_FOUND;
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -667,8 +518,7 @@ int cmp_semantic_colors_resolve(cmp_semantic_colors_t *ctx,
 int cmp_semantic_colors_resolve_elevation(cmp_semantic_colors_t *ctx,
                                           int elevation_level, int is_dark_mode,
                                           uint32_t *out_rgba) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_semantic_colors *c = (struct cmp_semantic_colors *)ctx;
   if (!c || !out_rgba)
     return CMP_ERROR_INVALID_ARG;
@@ -677,7 +527,7 @@ int cmp_semantic_colors_resolve_elevation(cmp_semantic_colors_t *ctx,
     /* Light mode always uses the standard background, shadow casting handles
      * depth */
     *out_rgba = 0xFFFFFFFF;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   /* Dark Mode pure black base, elevated levels are incrementally lighter grays
@@ -697,15 +547,6 @@ int cmp_semantic_colors_resolve_elevation(cmp_semantic_colors_t *ctx,
     break;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -721,8 +562,7 @@ struct cmp_color_pipeline {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_color_pipeline_create(cmp_color_pipeline_t **out_pipeline) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_color_pipeline *pl;
   if (!out_pipeline)
     return CMP_ERROR_INVALID_ARG;
@@ -735,15 +575,7 @@ int cmp_color_pipeline_create(cmp_color_pipeline_t **out_pipeline) {
   pl->display_supports_edr = 1;
 
   *out_pipeline = (cmp_color_pipeline_t *)pl;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -754,19 +586,10 @@ int cmp_color_pipeline_create(cmp_color_pipeline_t **out_pipeline) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_color_pipeline_destroy(cmp_color_pipeline_t *pipeline) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (pipeline)
     CMP_FREE(pipeline);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -779,21 +602,12 @@ int cmp_color_pipeline_destroy(cmp_color_pipeline_t *pipeline) {
  */
 int cmp_color_pipeline_supports_p3(cmp_color_pipeline_t *pipeline,
                                    int *out_supports_p3) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_color_pipeline *pl = (struct cmp_color_pipeline *)pipeline;
   if (!pl || !out_supports_p3)
     return CMP_ERROR_INVALID_ARG;
   *out_supports_p3 = pl->display_supports_p3;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -806,21 +620,12 @@ int cmp_color_pipeline_supports_p3(cmp_color_pipeline_t *pipeline,
  */
 int cmp_color_pipeline_supports_edr(cmp_color_pipeline_t *pipeline,
                                     int *out_supports_edr) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_color_pipeline *pl = (struct cmp_color_pipeline *)pipeline;
   if (!pl || !out_supports_edr)
     return CMP_ERROR_INVALID_ARG;
   *out_supports_edr = pl->display_supports_edr;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -839,8 +644,7 @@ int cmp_color_pipeline_supports_edr(cmp_color_pipeline_t *pipeline,
 int cmp_color_pipeline_srgb_to_p3(cmp_color_pipeline_t *pipeline, float r,
                                   float g, float b, float *out_p3_r,
                                   float *out_p3_g, float *out_p3_b) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_color_pipeline *pl = (struct cmp_color_pipeline *)pipeline;
   if (!pl || !out_p3_r || !out_p3_g || !out_p3_b)
     return CMP_ERROR_INVALID_ARG;
@@ -852,15 +656,6 @@ int cmp_color_pipeline_srgb_to_p3(cmp_color_pipeline_t *pipeline, float r,
   *out_p3_g = g * 0.95f;
   *out_p3_b = b * 0.95f;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -872,8 +667,7 @@ int cmp_color_pipeline_srgb_to_p3(cmp_color_pipeline_t *pipeline, float r,
  */
 int cmp_color_srgb_to_oklch(const cmp_color_t *in_color,
                             cmp_color_t *out_color) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   float lin_r, lin_g, lin_b;
   float l, m, s;
   float l_, m_, s_;
@@ -917,14 +711,5 @@ int cmp_color_srgb_to_oklch(const cmp_color_t *in_color,
   out_color->a = in_color->a;
   out_color->space = CMP_COLOR_SPACE_OKLCH;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

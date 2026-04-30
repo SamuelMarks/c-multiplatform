@@ -14,8 +14,7 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_win32_init_touch_ink(void) {
-  int rc;
-  rc = 0;/* EnableMouseInPointer ensures WM_POINTER messages are generated for mouse as well,
+int rc = CMP_SUCCESS;/* EnableMouseInPointer ensures WM_POINTER messages are generated for mouse as well,
      unifying the input stack for touch, pen, and mouse (Windows 8+). */
   void* user32 = GetModuleHandleA("user32.dll");
   if (user32) {
@@ -26,8 +25,8 @@ int cmp_win32_init_touch_ink(void) {
       enable_mouse_in_pointer(1); /* TRUE */
     }
   }
-  if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  return 0; /* CMP_SUCCESS */}
+  
+  return rc; /* CMP_SUCCESS */}
 #else
 
 /**
@@ -36,11 +35,8 @@ int cmp_win32_init_touch_ink(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_win32_init_touch_ink(void) {
-  int rc;
-  rc = 0;if (rc != 0) { if (rc != 0) {   return rc; } return rc; }
-  if (rc != 0) {
-    return rc;
-  }
+  int rc = CMP_SUCCESS;
+  
   return rc;
 }
 #endif

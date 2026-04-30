@@ -20,7 +20,7 @@ struct cmp_minimap {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_minimap_create(cmp_minimap_t **out_minimap) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_minimap_t *minimap;
 
   rc = CMP_SUCCESS;
@@ -44,7 +44,7 @@ int cmp_minimap_create(cmp_minimap_t **out_minimap) {
   minimap->scroll_ratio = 0.0f;
 
   *out_minimap = minimap;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -54,7 +54,7 @@ int cmp_minimap_create(cmp_minimap_t **out_minimap) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_minimap_destroy(cmp_minimap_t *minimap) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -75,7 +75,7 @@ int cmp_minimap_destroy(cmp_minimap_t *minimap) {
     LOG_DEBUG("Error in cmp_minimap_destroy: CMP_FREE failed for minimap\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -86,7 +86,7 @@ int cmp_minimap_destroy(cmp_minimap_t *minimap) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_minimap_set_text(cmp_minimap_t *minimap, const char *text) {
-  int rc;
+  int rc = CMP_SUCCESS;
   size_t len;
 
   rc = CMP_SUCCESS;
@@ -121,7 +121,7 @@ int cmp_minimap_set_text(cmp_minimap_t *minimap, const char *text) {
 #endif
   minimap->text[len] = '\0';
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -135,8 +135,7 @@ int cmp_minimap_set_text(cmp_minimap_t *minimap, const char *text) {
  */
 int cmp_minimap_update_viewport(cmp_minimap_t *minimap, float viewport_y,
                                 float viewport_height, float total_height) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (minimap == NULL || total_height <= 0.0f || viewport_height <= 0.0f) {
     LOG_DEBUG("Error in cmp_minimap_update_viewport: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -158,7 +157,7 @@ int cmp_minimap_update_viewport(cmp_minimap_t *minimap, float viewport_y,
   } else {
     minimap->scroll_ratio = 0.0f;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -168,8 +167,7 @@ int cmp_minimap_update_viewport(cmp_minimap_t *minimap, float viewport_y,
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_minimap_compute_layout(cmp_minimap_t *minimap) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (minimap == NULL) {
     LOG_DEBUG("Error in cmp_minimap_compute_layout: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -177,5 +175,5 @@ int cmp_minimap_compute_layout(cmp_minimap_t *minimap) {
   /* In a full implementation, this parses minimap->text, mapping line lengths
      to 2-pixel wide dense blocks, and calculates the highlighted region via
      scroll_ratio. */
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -17,7 +17,7 @@ struct cmp_safe_area_handler {
  * @return 0 on success, or an error code on failure.
  */
 int cmp_safe_area_handler_create(cmp_safe_area_handler_t **out_handler) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_safe_area_handler_t *handler;
 
   rc = CMP_SUCCESS;
@@ -43,7 +43,7 @@ int cmp_safe_area_handler_create(cmp_safe_area_handler_t **out_handler) {
   }
 
   *out_handler = handler;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -53,7 +53,7 @@ int cmp_safe_area_handler_create(cmp_safe_area_handler_t **out_handler) {
  * @return 0 on success, or an error code on failure.
  */
 int cmp_safe_area_handler_destroy(cmp_safe_area_handler_t *handler) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -76,7 +76,7 @@ int cmp_safe_area_handler_destroy(cmp_safe_area_handler_t *handler) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -94,7 +94,7 @@ int cmp_safe_area_handler_query_insets(cmp_safe_area_handler_t *handler,
                                        cmp_window_t *window, int *out_top,
                                        int *out_bottom, int *out_left,
                                        int *out_right) {
-  int rc;
+  int rc = CMP_SUCCESS;
   float top;
   float bottom;
   float left;
@@ -152,5 +152,5 @@ int cmp_safe_area_handler_query_insets(cmp_safe_area_handler_t *handler,
   if (out_right != NULL)
     *out_right = (int)right;
 
-  return CMP_SUCCESS;
+  return rc;
 }

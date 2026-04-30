@@ -25,8 +25,7 @@ struct cmp_transition {
 int cmp_transition_create(double duration_ms, double delay_ms,
                           cmp_transition_behavior_t behavior,
                           cmp_transition_t **out_transition) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_transition *transition;
 
   if (!out_transition || duration_ms < 0.0 || delay_ms < 0.0)
@@ -43,15 +42,7 @@ int cmp_transition_create(double duration_ms, double delay_ms,
   transition->is_active = 1;
 
   *out_transition = (cmp_transition_t *)transition;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -62,8 +53,7 @@ int cmp_transition_create(double duration_ms, double delay_ms,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_transition_destroy(cmp_transition_t *transition) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_transition *internal_transition =
       (struct cmp_transition *)transition;
 
@@ -71,15 +61,7 @@ int cmp_transition_destroy(cmp_transition_t *transition) {
     return CMP_ERROR_INVALID_ARG;
 
   CMP_FREE(internal_transition);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -93,8 +75,7 @@ int cmp_transition_destroy(cmp_transition_t *transition) {
  */
 int cmp_transition_step(cmp_transition_t *transition, double dt_ms,
                         float *out_progress) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_transition *internal_transition =
       (struct cmp_transition *)transition;
   double active_time;
@@ -105,20 +86,20 @@ int cmp_transition_step(cmp_transition_t *transition, double dt_ms,
 
   if (!internal_transition->is_active || internal_transition->is_finished) {
     *out_progress = 1.0f;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   internal_transition->elapsed_ms += dt_ms;
 
   if (internal_transition->elapsed_ms < internal_transition->delay_ms) {
     *out_progress = 0.0f;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (internal_transition->duration_ms == 0.0) {
     internal_transition->is_finished = 1;
     *out_progress = 1.0f;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   active_time = internal_transition->elapsed_ms - internal_transition->delay_ms;
@@ -139,14 +120,5 @@ int cmp_transition_step(cmp_transition_t *transition, double dt_ms,
     *out_progress = progress;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

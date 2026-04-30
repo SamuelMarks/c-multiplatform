@@ -11,9 +11,8 @@
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_passive_event_init(void) {
-  int rc;
-  rc = CMP_SUCCESS;
-  return CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -43,7 +42,7 @@ int cmp_ui_node_add_passive_listener(cmp_ui_node_t *node, uint32_t event_type,
   (void)event_type;
   (void)user_data;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -53,8 +52,7 @@ int cmp_ui_node_add_passive_listener(cmp_ui_node_t *node, uint32_t event_type,
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_event_prevent_default(cmp_event_t *event) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   if (!event) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -76,7 +74,7 @@ int cmp_event_prevent_default(cmp_event_t *event) {
 
   /* Otherwise, successfully mark it as prevented using a different bit */
   event->modifiers |= 0x40000000;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -87,13 +85,12 @@ int cmp_event_prevent_default(cmp_event_t *event) {
  */
 int cmp_event_is_default_prevented(const cmp_event_t *event,
                                    int *out_is_prevented) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
 
   if (!event || !out_is_prevented) {
     return CMP_ERROR_INVALID_ARG;
   }
 
   *out_is_prevented = (event->modifiers & 0x40000000) ? 1 : 0;
-  return CMP_SUCCESS;
+  return rc;
 }

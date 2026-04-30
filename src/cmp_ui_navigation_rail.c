@@ -24,8 +24,7 @@ struct cmp_ui_navigation_rail {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_navigation_rail_create(cmp_ui_navigation_rail_t **out_rail) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_ui_navigation_rail_t *rail;
   int err;
 
@@ -70,15 +69,7 @@ int cmp_ui_navigation_rail_create(cmp_ui_navigation_rail_t **out_rail) {
   rail->selected_index = -1;
 
   *out_rail = rail;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -89,8 +80,7 @@ int cmp_ui_navigation_rail_create(cmp_ui_navigation_rail_t **out_rail) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_navigation_rail_destroy(cmp_ui_navigation_rail_t *rail) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!rail) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -105,15 +95,7 @@ int cmp_ui_navigation_rail_destroy(cmp_ui_navigation_rail_t *rail) {
   if (free_rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_navigation_rail_destroy: CMP_FREE rail failed\n");
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -126,21 +108,12 @@ int cmp_ui_navigation_rail_destroy(cmp_ui_navigation_rail_t *rail) {
  */
 int cmp_ui_navigation_rail_get_node(cmp_ui_navigation_rail_t *rail,
                                     cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!rail || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = rail->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -156,8 +129,7 @@ int cmp_ui_navigation_rail_get_node(cmp_ui_navigation_rail_t *rail,
 int cmp_ui_navigation_rail_add_destination(cmp_ui_navigation_rail_t *rail,
                                            const char *icon_name,
                                            const char *label, int *out_index) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_ui_node_t *dest_node;
   int err;
 
@@ -209,15 +181,7 @@ int cmp_ui_navigation_rail_add_destination(cmp_ui_navigation_rail_t *rail,
   }
 
   rail->dest_count++;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -230,8 +194,7 @@ int cmp_ui_navigation_rail_add_destination(cmp_ui_navigation_rail_t *rail,
  */
 int cmp_ui_navigation_rail_set_selected(cmp_ui_navigation_rail_t *rail,
                                         int index) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   int i;
   if (!rail || index < 0 || index >= rail->dest_count) {
     return CMP_ERROR_INVALID_ARG;
@@ -243,15 +206,7 @@ int cmp_ui_navigation_rail_set_selected(cmp_ui_navigation_rail_t *rail,
   }
 
   rail->selected_index = index;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 /**
@@ -263,21 +218,12 @@ int cmp_ui_navigation_rail_set_selected(cmp_ui_navigation_rail_t *rail,
  */
 int cmp_ui_navigation_rail_bind_a11y(cmp_ui_navigation_rail_t *widget,
                                      cmp_a11y_tree_t *tree) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
   cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "navigation",
                          "Navigation Rail");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

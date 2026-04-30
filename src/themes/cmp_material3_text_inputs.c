@@ -13,8 +13,7 @@
  */
 int cmp_m3_text_field_resolve(cmp_m3_text_field_variant_t variant,
                               cmp_m3_text_field_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
 
@@ -47,14 +46,5 @@ int cmp_m3_text_field_resolve(cmp_m3_text_field_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

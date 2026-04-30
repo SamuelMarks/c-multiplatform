@@ -13,8 +13,7 @@
  */
 int cmp_gamepad_evaluate_focus_navigation(const cmp_gamepad_t *gamepad,
                                           float dt_ms) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -29,9 +28,7 @@ int cmp_gamepad_evaluate_focus_navigation(const cmp_gamepad_t *gamepad,
     cmp_log_debug("cmp_gamepad_evaluate_focus_navigation: Invalid argument "
                   "(gamepad=NULL): %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -41,15 +38,7 @@ int cmp_gamepad_evaluate_focus_navigation(const cmp_gamepad_t *gamepad,
 
   cmp_log_debug(
       "cmp_gamepad_evaluate_focus_navigation: Evaluated gamepad UI controls\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -61,8 +50,7 @@ int cmp_gamepad_evaluate_focus_navigation(const cmp_gamepad_t *gamepad,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_gamepad_trigger_rumble(int index, cmp_gamepad_rumble_type_t type) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -76,23 +64,13 @@ int cmp_gamepad_trigger_rumble(int index, cmp_gamepad_rumble_type_t type) {
     }
     cmp_log_debug("cmp_gamepad_trigger_rumble: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   /* Issues commands to OS GameController.framework or SDL_Haptic */
   cmp_log_debug("cmp_gamepad_trigger_rumble: Triggered device rumble\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -106,8 +84,7 @@ int cmp_gamepad_trigger_rumble(int index, cmp_gamepad_rumble_type_t type) {
  */
 int cmp_gamepad_set_adaptive_trigger(
     int index, int is_left, const cmp_adaptive_trigger_config_t *config) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -121,23 +98,13 @@ int cmp_gamepad_set_adaptive_trigger(
     }
     cmp_log_debug("cmp_gamepad_set_adaptive_trigger: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   /* Maps to DualSense haptic APIs */
   cmp_log_debug(
       "cmp_gamepad_set_adaptive_trigger: Set haptic trigger config\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

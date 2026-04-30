@@ -33,19 +33,10 @@ __declspec(dllimport) BOOL __stdcall SystemParametersInfoA(
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_theme_init(void) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   /* Initialize any underlying resources or OS hooks if needed */
   cmp_log_debug("cmp_a11y_theme_init: initialized\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -55,19 +46,10 @@ int cmp_a11y_theme_init(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_theme_cleanup(void) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   /* Clean up */
   cmp_log_debug("cmp_a11y_theme_cleanup: cleaned up\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -79,8 +61,7 @@ int cmp_a11y_theme_cleanup(void) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_detect_high_contrast(int *out_is_hc) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -92,9 +73,7 @@ int cmp_a11y_detect_high_contrast(int *out_is_hc) {
     }
     cmp_log_debug("cmp_a11y_detect_high_contrast: Invalid argument: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 #if defined(_WIN32)
@@ -106,9 +85,7 @@ int cmp_a11y_detect_high_contrast(int *out_is_hc) {
       if (hc.dwFlags & HCF_HIGHCONTRASTON) {
         cmp_log_debug("cmp_a11y_detect_high_contrast: High contrast is ON\n");
         *out_is_hc = 1;
-        if (rc != 0) {
-          return rc;
-        }
+
         return rc;
       }
     }
@@ -118,15 +95,7 @@ int cmp_a11y_detect_high_contrast(int *out_is_hc) {
 #endif
   cmp_log_debug("cmp_a11y_detect_high_contrast: High contrast is OFF\n");
   *out_is_hc = 0;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -134,8 +103,7 @@ int cmp_a11y_detect_high_contrast(int *out_is_hc) {
 static int apply_color_blindness(cmp_color_blind_type_t type,
                                  cmp_color_t *out_accent,
                                  cmp_color_t *out_error) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -146,9 +114,7 @@ static int apply_color_blindness(cmp_color_blind_type_t type,
       err_str = "Unknown";
     }
     cmp_log_debug("apply_color_blindness: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -193,9 +159,7 @@ static int apply_color_blindness(cmp_color_blind_type_t type,
   default:
     break; /* Use defaults */
   }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -208,8 +172,7 @@ static int apply_color_blindness(cmp_color_blind_type_t type,
  */
 int cmp_a11y_build_theme(cmp_color_blind_type_t type,
                          cmp_a11y_theme_t *out_theme) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int is_hc;
   int err_rc;
   const char *err_str;
@@ -223,9 +186,7 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
     cmp_log_debug(
         "cmp_a11y_build_theme: Invalid argument (out_theme=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -237,9 +198,7 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
     }
     cmp_log_debug("cmp_a11y_build_theme: failed to detect high contrast: %s\n",
                   err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   out_theme->is_high_contrast = is_hc;
@@ -287,9 +246,7 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
       }
       cmp_log_debug("cmp_a11y_build_theme: apply_color_blindness failed: %s\n",
                     err_str);
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
   }
@@ -297,8 +254,6 @@ int cmp_a11y_build_theme(cmp_color_blind_type_t type,
   cmp_log_debug(
       "cmp_a11y_build_theme: Built theme for color blind type %d, hc=%d\n",
       (int)type, is_hc);
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

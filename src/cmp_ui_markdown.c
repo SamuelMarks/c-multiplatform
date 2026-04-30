@@ -22,8 +22,7 @@ struct cmp_ui_markdown {
  */
 int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
                            uint32_t bg_color, uint32_t text_color) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   cmp_ui_markdown_t *md;
   int err;
   size_t len;
@@ -84,7 +83,7 @@ int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
   cmp_ui_node_add_child(md->node_root, md->node_text);
 
   *out_md = md;
-  return 0;
+  return rc;
 }
 
 /**
@@ -94,8 +93,7 @@ int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_markdown_destroy(cmp_ui_markdown_t *md) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   if (!md) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -107,7 +105,7 @@ int cmp_ui_markdown_destroy(cmp_ui_markdown_t *md) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
-  return 0;
+  return rc;
 }
 
 /**
@@ -118,21 +116,12 @@ int cmp_ui_markdown_destroy(cmp_ui_markdown_t *md) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_markdown_get_node(cmp_ui_markdown_t *md, cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!md || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = md->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -144,8 +133,7 @@ int cmp_ui_markdown_get_node(cmp_ui_markdown_t *md, cmp_ui_node_t **out_node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_markdown_set_text(cmp_ui_markdown_t *md, const char *text) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   size_t len;
 
   if (!md) {
@@ -170,5 +158,5 @@ int cmp_ui_markdown_set_text(cmp_ui_markdown_t *md, const char *text) {
     memcpy(md->text, text, len + 1);
   }
 
-  return 0;
+  return rc;
 }

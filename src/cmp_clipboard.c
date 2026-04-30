@@ -17,8 +17,7 @@ struct cmp_clipboard {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_clipboard_create(cmp_clipboard_t **out_clipboard) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_clipboard_t *clipboard = NULL;
@@ -32,9 +31,7 @@ int cmp_clipboard_create(cmp_clipboard_t **out_clipboard) {
     cmp_log_debug(
         "cmp_clipboard_create: Invalid argument (out_clipboard=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -45,9 +42,7 @@ int cmp_clipboard_create(cmp_clipboard_t **out_clipboard) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_clipboard_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -55,9 +50,7 @@ int cmp_clipboard_create(cmp_clipboard_t **out_clipboard) {
   *out_clipboard = clipboard;
   cmp_log_debug(
       "cmp_clipboard_create: Successfully created clipboard context\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -68,8 +61,7 @@ int cmp_clipboard_create(cmp_clipboard_t **out_clipboard) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_clipboard_destroy(cmp_clipboard_t *clipboard) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -80,9 +72,7 @@ int cmp_clipboard_destroy(cmp_clipboard_t *clipboard) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_clipboard_destroy: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -100,7 +90,7 @@ int cmp_clipboard_destroy(cmp_clipboard_t *clipboard) {
 
   cmp_log_debug(
       "cmp_clipboard_destroy: Successfully destroyed clipboard context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -111,8 +101,7 @@ int cmp_clipboard_destroy(cmp_clipboard_t *clipboard) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_clipboard_set_text(cmp_clipboard_t *clipboard, const char *text) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   size_t len;
@@ -124,9 +113,7 @@ int cmp_clipboard_set_text(cmp_clipboard_t *clipboard, const char *text) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_clipboard_set_text: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -147,9 +134,7 @@ int cmp_clipboard_set_text(cmp_clipboard_t *clipboard, const char *text) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_clipboard_set_text: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 #if defined(_MSC_VER)
@@ -163,7 +148,7 @@ int cmp_clipboard_set_text(cmp_clipboard_t *clipboard, const char *text) {
 
   cmp_log_debug(
       "cmp_clipboard_set_text: Successfully copied text to internal buffer\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -174,8 +159,7 @@ int cmp_clipboard_set_text(cmp_clipboard_t *clipboard, const char *text) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_clipboard_get_text(const cmp_clipboard_t *clipboard, char **out_text) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   size_t len;
@@ -187,16 +171,14 @@ int cmp_clipboard_get_text(const cmp_clipboard_t *clipboard, char **out_text) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_clipboard_get_text: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   if (clipboard->text_data == NULL) {
     *out_text = NULL;
     cmp_log_debug("cmp_clipboard_get_text: Clipboard is empty\n");
-    return CMP_SUCCESS;
+    return rc;
   }
 
   len = strlen(clipboard->text_data);
@@ -207,9 +189,7 @@ int cmp_clipboard_get_text(const cmp_clipboard_t *clipboard, char **out_text) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_clipboard_get_text: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 #if defined(_MSC_VER)
@@ -223,7 +203,7 @@ int cmp_clipboard_get_text(const cmp_clipboard_t *clipboard, char **out_text) {
 
   cmp_log_debug(
       "cmp_clipboard_get_text: Retrieved text from internal buffer\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -233,8 +213,7 @@ int cmp_clipboard_get_text(const cmp_clipboard_t *clipboard, char **out_text) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_clipboard_clear(cmp_clipboard_t *clipboard) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -245,9 +224,7 @@ int cmp_clipboard_clear(cmp_clipboard_t *clipboard) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_clipboard_clear: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -260,5 +237,5 @@ int cmp_clipboard_clear(cmp_clipboard_t *clipboard) {
   }
 
   cmp_log_debug("cmp_clipboard_clear: Cleared clipboard buffer\n");
-  return CMP_SUCCESS;
+  return rc;
 }

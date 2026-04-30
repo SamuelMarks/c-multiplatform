@@ -19,8 +19,7 @@ struct cmp_permissions {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_permissions_create(cmp_permissions_t **out_ctx) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_permissions *ctx = NULL;
 
   if (!out_ctx) {
@@ -52,8 +51,7 @@ int cmp_permissions_create(cmp_permissions_t **out_ctx) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_permissions_destroy(cmp_permissions_t *ctx) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -80,8 +78,7 @@ int cmp_permissions_destroy(cmp_permissions_t *ctx) {
 int cmp_permissions_get_status(cmp_permissions_t *ctx,
                                cmp_permission_type_t type,
                                cmp_permission_status_t *out_status) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_permissions *p = (struct cmp_permissions *)ctx;
 
   if (!p || !out_status) {
@@ -111,7 +108,7 @@ int cmp_permissions_get_status(cmp_permissions_t *ctx,
     LOG_DEBUG("Error in cmp_permissions_get_status: Unknown permission type\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -123,8 +120,7 @@ int cmp_permissions_get_status(cmp_permissions_t *ctx,
  */
 int cmp_permissions_request(cmp_permissions_t *ctx,
                             cmp_permission_type_t type) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_permissions *p = (struct cmp_permissions *)ctx;
 
   if (!p) {
@@ -159,7 +155,7 @@ int cmp_permissions_request(cmp_permissions_t *ctx,
     LOG_DEBUG("Error in cmp_permissions_request: Unknown permission type\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -172,8 +168,7 @@ int cmp_permissions_request(cmp_permissions_t *ctx,
  */
 int cmp_tree_set_screen_recording_prevention(cmp_a11y_tree_t *tree, int node_id,
                                              int enabled) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   (void)node_id;
   (void)enabled;
@@ -187,7 +182,7 @@ int cmp_tree_set_screen_recording_prevention(cmp_a11y_tree_t *tree, int node_id,
   /* In a real engine, this sets an internal flag on the specific vdom node
      that triggers a hardware layer black-box over the surface during
      compositing. */
-  return CMP_SUCCESS;
+  return rc;
 }
 
 struct cmp_privacy_indicators {
@@ -201,8 +196,7 @@ struct cmp_privacy_indicators {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_privacy_indicators_create(cmp_privacy_indicators_t **out_indicators) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_privacy_indicators *inds = NULL;
 
   if (!out_indicators) {
@@ -234,8 +228,7 @@ int cmp_privacy_indicators_create(cmp_privacy_indicators_t **out_indicators) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_privacy_indicators_destroy(cmp_privacy_indicators_t *indicators) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   if (!indicators) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -262,8 +255,7 @@ int cmp_privacy_indicators_destroy(cmp_privacy_indicators_t *indicators) {
 int cmp_privacy_indicators_verify_layout(cmp_privacy_indicators_t *indicators,
                                          const cmp_rect_t *ui_bounds,
                                          int *out_is_obscured) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_privacy_indicators *inds =
       (struct cmp_privacy_indicators *)indicators;
 
@@ -285,5 +277,5 @@ int cmp_privacy_indicators_verify_layout(cmp_privacy_indicators_t *indicators,
   } else {
     *out_is_obscured = 0;
   }
-  return CMP_SUCCESS;
+  return rc;
 }

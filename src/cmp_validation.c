@@ -15,8 +15,7 @@ struct cmp_validation {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_validation_create(cmp_validation_t **out_validation) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_validation *validation;
 
   if (!out_validation)
@@ -29,15 +28,7 @@ int cmp_validation_create(cmp_validation_t **out_validation) {
   memset(validation, 0, sizeof(struct cmp_validation));
 
   *out_validation = (cmp_validation_t *)validation;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -48,23 +39,14 @@ int cmp_validation_create(cmp_validation_t **out_validation) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_validation_destroy(cmp_validation_t *validation) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_validation *internal_validation =
       (struct cmp_validation *)validation;
   if (!internal_validation)
     return CMP_ERROR_INVALID_ARG;
 
   CMP_FREE(internal_validation);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -78,8 +60,7 @@ int cmp_validation_destroy(cmp_validation_t *validation) {
  */
 int cmp_validation_check(cmp_validation_t *validation, const char *input_value,
                          int *out_is_valid) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_validation *internal_validation =
       (struct cmp_validation *)validation;
 
@@ -93,14 +74,5 @@ int cmp_validation_check(cmp_validation_t *validation, const char *input_value,
     *out_is_valid = 1;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

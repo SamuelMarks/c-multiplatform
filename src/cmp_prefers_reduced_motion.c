@@ -16,8 +16,7 @@ struct cmp_prefers_reduced_motion {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_prefers_reduced_motion_create(cmp_prefers_reduced_motion_t **out_rm) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_prefers_reduced_motion *rm;
 
   if (!out_rm)
@@ -30,7 +29,7 @@ int cmp_prefers_reduced_motion_create(cmp_prefers_reduced_motion_t **out_rm) {
   rm->is_enabled = 0; /* Default to off (full motion) */
 
   *out_rm = (cmp_prefers_reduced_motion_t *)rm;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -40,8 +39,7 @@ int cmp_prefers_reduced_motion_create(cmp_prefers_reduced_motion_t **out_rm) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_prefers_reduced_motion_destroy(cmp_prefers_reduced_motion_t *rm) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_prefers_reduced_motion *r =
       (struct cmp_prefers_reduced_motion *)rm;
 
@@ -52,7 +50,7 @@ int cmp_prefers_reduced_motion_destroy(cmp_prefers_reduced_motion_t *rm) {
   if (rc != CMP_SUCCESS) {
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -64,8 +62,7 @@ int cmp_prefers_reduced_motion_destroy(cmp_prefers_reduced_motion_t *rm) {
  */
 int cmp_prefers_reduced_motion_set(cmp_prefers_reduced_motion_t *rm,
                                    int enabled) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_prefers_reduced_motion *r =
       (struct cmp_prefers_reduced_motion *)rm;
 
@@ -73,7 +70,7 @@ int cmp_prefers_reduced_motion_set(cmp_prefers_reduced_motion_t *rm,
     return CMP_ERROR_INVALID_ARG;
 
   r->is_enabled = enabled;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -85,8 +82,7 @@ int cmp_prefers_reduced_motion_set(cmp_prefers_reduced_motion_t *rm,
  */
 int cmp_prefers_reduced_motion_apply(cmp_prefers_reduced_motion_t *rm,
                                      float *duration_ms) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_prefers_reduced_motion *r =
       (struct cmp_prefers_reduced_motion *)rm;
 
@@ -96,5 +92,5 @@ int cmp_prefers_reduced_motion_apply(cmp_prefers_reduced_motion_t *rm,
   if (r->is_enabled) {
     *duration_ms = 0.0f; /* Instantly complete animations */
   }
-  return CMP_SUCCESS;
+  return rc;
 }

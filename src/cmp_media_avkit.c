@@ -27,7 +27,7 @@ struct cmp_audio_session {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_media_player_create(cmp_media_player_t **out_player) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_media_player *ctx;
 
   rc = CMP_SUCCESS;
@@ -54,7 +54,7 @@ int cmp_media_player_create(cmp_media_player_t **out_player) {
 
   *out_player = (cmp_media_player_t *)ctx;
   LOG_DEBUG("cmp_media_player_create: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -64,7 +64,7 @@ int cmp_media_player_create(cmp_media_player_t **out_player) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_media_player_destroy(cmp_media_player_t *player_opaque) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_media_player *ctx;
 
   rc = CMP_SUCCESS;
@@ -73,7 +73,7 @@ int cmp_media_player_destroy(cmp_media_player_t *player_opaque) {
   if (ctx == NULL) {
     LOG_DEBUG(
         "cmp_media_player_destroy: player_opaque is NULL, doing nothing\n");
-    return CMP_SUCCESS;
+    return rc;
   }
 
   if (ctx->now_playing_title != NULL) {
@@ -99,7 +99,7 @@ int cmp_media_player_destroy(cmp_media_player_t *player_opaque) {
   }
 
   LOG_DEBUG("cmp_media_player_destroy: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -111,8 +111,7 @@ int cmp_media_player_destroy(cmp_media_player_t *player_opaque) {
  */
 int cmp_media_player_load_url(cmp_media_player_t *player_opaque,
                               const char *url) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (player_opaque == NULL) {
     LOG_DEBUG("Error in cmp_media_player_load_url: player_opaque is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -124,7 +123,7 @@ int cmp_media_player_load_url(cmp_media_player_t *player_opaque,
 
   /* Triggers AVPlayerItem instantiation */
   LOG_DEBUG("cmp_media_player_load_url: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -137,8 +136,7 @@ int cmp_media_player_load_url(cmp_media_player_t *player_opaque,
  */
 int cmp_media_player_mount(cmp_media_player_t *player_opaque,
                            cmp_ui_node_t *node, int use_system_controls) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_media_player *ctx;
 
   ctx = (struct cmp_media_player *)player_opaque;
@@ -155,7 +153,7 @@ int cmp_media_player_mount(cmp_media_player_t *player_opaque,
   ctx->use_system_controls = use_system_controls;
   /* Mounts AVPlayerViewController or custom player bounds */
   LOG_DEBUG("cmp_media_player_mount: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -167,8 +165,7 @@ int cmp_media_player_mount(cmp_media_player_t *player_opaque,
  */
 int cmp_media_player_set_pip_enabled(cmp_media_player_t *player_opaque,
                                      int is_enabled) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_media_player *ctx;
 
   ctx = (struct cmp_media_player *)player_opaque;
@@ -181,7 +178,7 @@ int cmp_media_player_set_pip_enabled(cmp_media_player_t *player_opaque,
 
   ctx->is_pip_enabled = is_enabled;
   LOG_DEBUG("cmp_media_player_set_pip_enabled: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -197,7 +194,7 @@ int cmp_media_player_set_pip_enabled(cmp_media_player_t *player_opaque,
 int cmp_media_player_update_now_playing(cmp_media_player_t *player_opaque,
                                         const char *title, const char *artist,
                                         float duration, float current_time) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_media_player *ctx;
   size_t len;
 
@@ -237,7 +234,7 @@ int cmp_media_player_update_now_playing(cmp_media_player_t *player_opaque,
   }
 #if defined(_MSC_VER)
   rc = strcpy_s(ctx->now_playing_title, len + 1, title);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_media_player_update_now_playing: strcpy_s failed "
               "for title\n");
     return CMP_ERROR_GENERAL;
@@ -263,7 +260,7 @@ int cmp_media_player_update_now_playing(cmp_media_player_t *player_opaque,
   }
 #if defined(_MSC_VER)
   rc = strcpy_s(ctx->now_playing_artist, len + 1, artist);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_media_player_update_now_playing: strcpy_s failed "
               "for artist\n");
     return CMP_ERROR_GENERAL;
@@ -274,7 +271,7 @@ int cmp_media_player_update_now_playing(cmp_media_player_t *player_opaque,
 
   /* Communicates to MPNowPlayingInfoCenter */
   LOG_DEBUG("cmp_media_player_update_now_playing: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -286,8 +283,7 @@ int cmp_media_player_update_now_playing(cmp_media_player_t *player_opaque,
  */
 int cmp_media_player_set_spatial_audio_enabled(
     cmp_media_player_t *player_opaque, int is_enabled) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_media_player *ctx;
 
   ctx = (struct cmp_media_player *)player_opaque;
@@ -300,7 +296,7 @@ int cmp_media_player_set_spatial_audio_enabled(
 
   ctx->is_spatial_audio_enabled = is_enabled;
   LOG_DEBUG("cmp_media_player_set_spatial_audio_enabled: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -314,8 +310,7 @@ int cmp_media_player_set_spatial_audio_enabled(
 int cmp_media_player_set_remote_command_handler(
     cmp_media_player_t *player_opaque, cmp_remote_command_cb callback,
     void *userdata) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_media_player *ctx;
 
   ctx = (struct cmp_media_player *)player_opaque;
@@ -330,7 +325,7 @@ int cmp_media_player_set_remote_command_handler(
   ctx->remote_userdata = userdata;
   /* Binds MPRemoteCommandCenter */
   LOG_DEBUG("cmp_media_player_set_remote_command_handler: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -340,7 +335,7 @@ int cmp_media_player_set_remote_command_handler(
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_audio_session_create(cmp_audio_session_t **out_session) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_audio_session *ctx;
 
   rc = CMP_SUCCESS;
@@ -362,7 +357,7 @@ int cmp_audio_session_create(cmp_audio_session_t **out_session) {
 
   *out_session = (cmp_audio_session_t *)ctx;
   LOG_DEBUG("cmp_audio_session_create: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -372,7 +367,7 @@ int cmp_audio_session_create(cmp_audio_session_t **out_session) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_audio_session_destroy(cmp_audio_session_t *session_opaque) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -385,7 +380,7 @@ int cmp_audio_session_destroy(cmp_audio_session_t *session_opaque) {
   }
 
   LOG_DEBUG("cmp_audio_session_destroy: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -397,8 +392,7 @@ int cmp_audio_session_destroy(cmp_audio_session_t *session_opaque) {
  */
 int cmp_audio_session_set_category(cmp_audio_session_t *session_opaque,
                                    cmp_audio_session_category_t category) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_audio_session *ctx;
 
   ctx = (struct cmp_audio_session *)session_opaque;
@@ -411,7 +405,7 @@ int cmp_audio_session_set_category(cmp_audio_session_t *session_opaque,
 
   ctx->category = category;
   LOG_DEBUG("cmp_audio_session_set_category: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -421,8 +415,7 @@ int cmp_audio_session_set_category(cmp_audio_session_t *session_opaque,
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_audio_session_activate(cmp_audio_session_t *session_opaque) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_audio_session *ctx;
 
   ctx = (struct cmp_audio_session *)session_opaque;
@@ -435,5 +428,5 @@ int cmp_audio_session_activate(cmp_audio_session_t *session_opaque) {
   ctx->is_active = 1;
   /* Triggers AVAudioSession setActive:YES error handling */
   LOG_DEBUG("cmp_audio_session_activate: Success\n");
-  return CMP_SUCCESS;
+  return rc;
 }

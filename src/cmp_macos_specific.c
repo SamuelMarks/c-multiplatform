@@ -17,25 +17,20 @@ struct cmp_macos_features {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_macos_features_create(cmp_macos_features_t **out_features) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = NULL;
 
   if (!out_features) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_macos_features_create: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   rc = CMP_MALLOC(sizeof(struct cmp_macos_features), (void **)&ctx);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_macos_features_create: Out of memory\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -44,9 +39,7 @@ int cmp_macos_features_create(cmp_macos_features_t **out_features) {
   ctx->has_menu_bar_extra = 0;
 
   *out_features = (cmp_macos_features_t *)ctx;
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -57,8 +50,7 @@ int cmp_macos_features_create(cmp_macos_features_t **out_features) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_macos_features_destroy(cmp_macos_features_t *features_opaque) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
 
   if (features_opaque) {
     rc = CMP_FREE(features_opaque);
@@ -66,9 +58,7 @@ int cmp_macos_features_destroy(cmp_macos_features_t *features_opaque) {
       LOG_DEBUG("Error in cmp_macos_features_destroy: CMP_FREE failed\n");
     }
   }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -81,31 +71,20 @@ int cmp_macos_features_destroy(cmp_macos_features_t *features_opaque) {
  */
 int cmp_macos_set_window_controls_visible(cmp_macos_features_t *features_opaque,
                                           int visible) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = (struct cmp_macos_features *)features_opaque;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_macos_set_window_controls_visible: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   ctx->window_controls_visible = visible;
   /* NSWindow.standardWindowButton */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -118,16 +97,13 @@ int cmp_macos_set_window_controls_visible(cmp_macos_features_t *features_opaque,
  */
 int cmp_macos_set_document_proxy(cmp_macos_features_t *features_opaque,
                                  const char *file_url) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = (struct cmp_macos_features *)features_opaque;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_macos_set_document_proxy: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -137,15 +113,7 @@ int cmp_macos_set_document_proxy(cmp_macos_features_t *features_opaque,
     ctx->has_document_proxy = 0;
   }
   /* NSWindow.representedURL */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -158,30 +126,19 @@ int cmp_macos_set_document_proxy(cmp_macos_features_t *features_opaque,
  */
 int cmp_macos_set_menu_bar_extra(cmp_macos_features_t *features_opaque,
                                  int enabled) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = (struct cmp_macos_features *)features_opaque;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_macos_set_menu_bar_extra: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   ctx->has_menu_bar_extra = enabled;
   /* NSStatusBar.systemStatusBar.statusItemWithLength */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -192,29 +149,18 @@ int cmp_macos_set_menu_bar_extra(cmp_macos_features_t *features_opaque,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_macos_invoke_print_panel(cmp_macos_features_t *features_opaque) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = (struct cmp_macos_features *)features_opaque;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_macos_invoke_print_panel: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   /* NSPrintOperation */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -225,28 +171,17 @@ int cmp_macos_invoke_print_panel(cmp_macos_features_t *features_opaque) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_macos_setup_global_menu_bar(cmp_macos_features_t *features_opaque) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = (struct cmp_macos_features *)features_opaque;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_macos_setup_global_menu_bar: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   /* NSApplication.sharedApplication.mainMenu */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -259,28 +194,17 @@ int cmp_macos_setup_global_menu_bar(cmp_macos_features_t *features_opaque) {
  */
 int cmp_macos_setup_context_menu(cmp_macos_features_t *features_opaque,
                                  void *node) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = (struct cmp_macos_features *)features_opaque;
 
   if (!ctx || !node) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_macos_setup_context_menu: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   /* NSMenu, popUpMenuPositioningItem */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -294,28 +218,17 @@ int cmp_macos_setup_context_menu(cmp_macos_features_t *features_opaque,
  */
 int cmp_macos_set_hover_state(cmp_macos_features_t *features_opaque, void *node,
                               int is_hovered) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = (struct cmp_macos_features *)features_opaque;
 
   if (!ctx || !node || is_hovered < 0) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_macos_set_hover_state: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   /* Visual highlight changes specific to macOS precision */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -328,28 +241,17 @@ int cmp_macos_set_hover_state(cmp_macos_features_t *features_opaque, void *node,
  */
 int cmp_macos_set_window_shadow(cmp_macos_features_t *features_opaque,
                                 int is_active) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = (struct cmp_macos_features *)features_opaque;
 
   if (!ctx || is_active < 0) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_macos_set_window_shadow: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   /* NSWindow.hasShadow */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -361,28 +263,17 @@ int cmp_macos_set_window_shadow(cmp_macos_features_t *features_opaque,
  */
 int cmp_macos_setup_toolbar_customization(
     cmp_macos_features_t *features_opaque) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   struct cmp_macos_features *ctx = (struct cmp_macos_features *)features_opaque;
 
   if (!ctx) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(
         "Error in cmp_macos_setup_toolbar_customization: Invalid argument\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   /* NSToolbar, allowsUserCustomization */
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

@@ -29,7 +29,7 @@ struct cmp_ui_app_bar {
 int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
                           cmp_ui_app_bar_placement_t placement) {
   cmp_ui_app_bar_t *bar;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!out_bar) {
     LOG_DEBUG("cmp_ui_app_bar_create: out_bar is NULL\n");
@@ -39,9 +39,7 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
   rc = CMP_MALLOC(sizeof(cmp_ui_app_bar_t), (void **)&bar);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_create: OOM\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
   memset(bar, 0, sizeof(cmp_ui_app_bar_t));
@@ -55,9 +53,7 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_app_bar_create: CMP_FREE failed\n");
     }
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -93,7 +89,7 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
   }
 
   *out_bar = bar;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -103,7 +99,7 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar) {
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!bar) {
     LOG_DEBUG("cmp_ui_app_bar_destroy: bar is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -123,12 +119,10 @@ int cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar) {
   rc = CMP_FREE(bar);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_destroy: CMP_FREE failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -139,22 +133,13 @@ int cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_app_bar_get_node(cmp_ui_app_bar_t *bar, cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!bar || !out_node) {
     LOG_DEBUG("cmp_ui_app_bar_get_node: Invalid args\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = bar->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -167,7 +152,7 @@ int cmp_ui_app_bar_get_node(cmp_ui_app_bar_t *bar, cmp_ui_node_t **out_node) {
  */
 int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title) {
   size_t len;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!bar) {
     LOG_DEBUG("cmp_ui_app_bar_set_title: bar is NULL\n");
@@ -187,9 +172,7 @@ int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title) {
     rc = CMP_MALLOC(len + 1, (void **)&bar->title);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_app_bar_set_title: OOM\n");
-      if (rc != 0) {
-        return rc;
-      }
+
       return rc;
     }
     memcpy(bar->title, title, len + 1);
@@ -229,7 +212,7 @@ int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title) {
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -241,7 +224,7 @@ int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title) {
  */
 int cmp_ui_app_bar_add_action(cmp_ui_app_bar_t *bar,
                               cmp_ui_node_t *action_node) {
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!bar || !action_node) {
     LOG_DEBUG("cmp_ui_app_bar_add_action: Invalid args\n");
     return CMP_ERROR_INVALID_ARG;
@@ -250,9 +233,7 @@ int cmp_ui_app_bar_add_action(cmp_ui_app_bar_t *bar,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_add_action: cmp_ui_node_add_child failed\n");
   }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -264,7 +245,7 @@ int cmp_ui_app_bar_add_action(cmp_ui_app_bar_t *bar,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_app_bar_bind_a11y(cmp_ui_app_bar_t *widget, cmp_a11y_tree_t *tree) {
-  int rc;
+  int rc = CMP_SUCCESS;
   if (!widget || !tree || !widget->node_root || !widget->node_root->layout) {
     LOG_DEBUG("cmp_ui_app_bar_bind_a11y: Invalid args\n");
     return CMP_ERROR_INVALID_ARG;
@@ -274,5 +255,5 @@ int cmp_ui_app_bar_bind_a11y(cmp_ui_app_bar_t *widget, cmp_a11y_tree_t *tree) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_bind_a11y: cmp_a11y_tree_add_node failed\n");
   }
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -16,7 +16,7 @@ struct cmp_overdraw {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_overdraw_create(cmp_overdraw_t **out_overdraw) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_overdraw *ctx;
 
   rc = CMP_SUCCESS;
@@ -37,7 +37,7 @@ int cmp_overdraw_create(cmp_overdraw_t **out_overdraw) {
   ctx->is_active = 0;
 
   *out_overdraw = (cmp_overdraw_t *)ctx;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -47,7 +47,7 @@ int cmp_overdraw_create(cmp_overdraw_t **out_overdraw) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_overdraw_destroy(cmp_overdraw_t *overdraw) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_overdraw *ctx;
 
   rc = CMP_SUCCESS;
@@ -64,7 +64,7 @@ int cmp_overdraw_destroy(cmp_overdraw_t *overdraw) {
     LOG_DEBUG("Error in cmp_overdraw_destroy: CMP_FREE failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -77,8 +77,7 @@ int cmp_overdraw_destroy(cmp_overdraw_t *overdraw) {
  */
 int cmp_overdraw_set_enabled(cmp_overdraw_t *overdraw, cmp_renderer_t *renderer,
                              int enable) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   struct cmp_overdraw *ctx;
 
   if (overdraw == NULL || renderer == NULL) {
@@ -91,5 +90,5 @@ int cmp_overdraw_set_enabled(cmp_overdraw_t *overdraw, cmp_renderer_t *renderer,
   /* In a real implementation this would swap the active fragment shader
      on the renderer to an additive blending heat-map shader */
   ctx->is_active = enable ? 1 : 0;
-  return CMP_SUCCESS;
+  return rc;
 }

@@ -33,20 +33,17 @@ CMP_EXEMPT(CMP_API void cmp_theme_set_default_vtable(
  */
 int cmp_resolve_vtable(const cmp_ui_node_t *node,
                        const cmp_theme_vtable_t **out_vtable) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_vtable)
     return CMP_ERROR_INVALID_ARG;
 
   if (!node) {
     if (g_default_theme_vtable) {
       *out_vtable = g_default_theme_vtable;
-      return 0;
-    }
-    rc = cmp_theme_get_unstyled_vtable(out_vtable); /* Fallback */
-    if (rc != 0) {
       return rc;
     }
+    rc = cmp_theme_get_unstyled_vtable(out_vtable); /* Fallback */
+
     return rc;
   }
 
@@ -88,16 +85,11 @@ int cmp_resolve_vtable(const cmp_ui_node_t *node,
 
   if (g_default_theme_vtable) {
     *out_vtable = g_default_theme_vtable;
-    return 0;
-  }
-
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
     return rc;
   }
-  return cmp_theme_get_unstyled_vtable(out_vtable);
+
+  rc = cmp_theme_get_unstyled_vtable(out_vtable);
+  return rc;
 }
 
 /**
@@ -107,8 +99,7 @@ int cmp_resolve_vtable(const cmp_ui_node_t *node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_theme_create(cmp_theme_t **out_theme) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_theme_t *theme;
   if (!out_theme)
     return CMP_ERROR_INVALID_ARG;
@@ -118,13 +109,13 @@ int CMP_API cmp_theme_create(cmp_theme_t **out_theme) {
 
   memset(theme, 0, sizeof(cmp_theme_t));
   *out_theme = theme;
-  if (rc != 0) {
-    if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;
   }
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     return rc;
   }
   return rc;
@@ -137,18 +128,17 @@ int CMP_API cmp_theme_create(cmp_theme_t **out_theme) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_theme_destroy(cmp_theme_t *theme) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!theme)
     return CMP_ERROR_INVALID_ARG;
   CMP_FREE(theme);
-  if (rc != 0) {
-    if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;
   }
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     return rc;
   }
   return rc;
@@ -161,10 +151,9 @@ int CMP_API cmp_theme_destroy(cmp_theme_t *theme) {
  */
 int CMP_API
 cmp_ffi_get_material3_vtable(const cmp_theme_vtable_t **out_vtable) {
-  int rc;
-  rc = 0;
-  if (rc != 0) {
-    if (rc != 0) {
+  int rc = CMP_SUCCESS;
+  if (rc != CMP_SUCCESS) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;
@@ -178,10 +167,9 @@ cmp_ffi_get_material3_vtable(const cmp_theme_vtable_t **out_vtable) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_ffi_get_fluent2_vtable(const cmp_theme_vtable_t **out_vtable) {
-  int rc;
-  rc = 0;
-  if (rc != 0) {
-    if (rc != 0) {
+  int rc = CMP_SUCCESS;
+  if (rc != CMP_SUCCESS) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;
@@ -196,10 +184,9 @@ int CMP_API cmp_ffi_get_fluent2_vtable(const cmp_theme_vtable_t **out_vtable) {
  */
 int CMP_API
 cmp_ffi_get_cupertino_vtable(const cmp_theme_vtable_t **out_vtable) {
-  int rc;
-  rc = 0;
-  if (rc != 0) {
-    if (rc != 0) {
+  int rc = CMP_SUCCESS;
+  if (rc != CMP_SUCCESS) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;
@@ -213,10 +200,9 @@ cmp_ffi_get_cupertino_vtable(const cmp_theme_vtable_t **out_vtable) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_ffi_get_unstyled_vtable(const cmp_theme_vtable_t **out_vtable) {
-  int rc;
-  rc = 0;
-  if (rc != 0) {
-    if (rc != 0) {
+  int rc = CMP_SUCCESS;
+  if (rc != CMP_SUCCESS) {
+    if (rc != CMP_SUCCESS) {
       return rc;
     }
     return rc;

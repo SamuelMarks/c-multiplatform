@@ -21,7 +21,7 @@ struct cmp_ui_splitter {
 int cmp_ui_splitter_create(cmp_ui_splitter_t **out_splitter, int is_vertical,
                            uint32_t color) {
   cmp_ui_splitter_t *splitter;
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!out_splitter) {
     LOG_DEBUG("cmp_ui_splitter_create: out_splitter is NULL\n");
@@ -31,9 +31,7 @@ int cmp_ui_splitter_create(cmp_ui_splitter_t **out_splitter, int is_vertical,
   rc = CMP_MALLOC(sizeof(cmp_ui_splitter_t), (void **)&splitter);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_splitter_create: OOM\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -47,16 +45,14 @@ int cmp_ui_splitter_create(cmp_ui_splitter_t **out_splitter, int is_vertical,
     if (free_rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_splitter_create: CMP_FREE failed\n");
     }
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   splitter->node_root->bg_color = color;
 
   *out_splitter = splitter;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -66,7 +62,7 @@ int cmp_ui_splitter_create(cmp_ui_splitter_t **out_splitter, int is_vertical,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_splitter_destroy(cmp_ui_splitter_t *splitter) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   if (!splitter) {
     LOG_DEBUG("cmp_ui_splitter_destroy: splitter is NULL\n");
@@ -82,13 +78,11 @@ int cmp_ui_splitter_destroy(cmp_ui_splitter_t *splitter) {
   rc = CMP_FREE(splitter);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_splitter_destroy: CMP_FREE failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -100,22 +94,13 @@ int cmp_ui_splitter_destroy(cmp_ui_splitter_t *splitter) {
  */
 int cmp_ui_splitter_get_node(cmp_ui_splitter_t *splitter,
                              cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!splitter || !out_node) {
     LOG_DEBUG("cmp_ui_splitter_get_node: Invalid arg\n");
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = splitter->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -127,8 +112,7 @@ int cmp_ui_splitter_get_node(cmp_ui_splitter_t *splitter,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_splitter_set_position(cmp_ui_splitter_t *splitter, float position) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!splitter) {
     LOG_DEBUG("cmp_ui_splitter_set_position: splitter is NULL\n");
     return CMP_ERROR_INVALID_ARG;
@@ -141,14 +125,6 @@ int cmp_ui_splitter_set_position(cmp_ui_splitter_t *splitter, float position) {
   }
 
   splitter->position = position;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

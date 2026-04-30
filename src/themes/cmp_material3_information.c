@@ -14,8 +14,7 @@
  */
 int cmp_m3_chip_resolve(cmp_m3_chip_variant_t variant, int is_elevated,
                         cmp_m3_chip_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
 
@@ -42,15 +41,6 @@ int cmp_m3_chip_resolve(cmp_m3_chip_variant_t variant, int is_elevated,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -63,8 +53,7 @@ int cmp_m3_chip_resolve(cmp_m3_chip_variant_t variant, int is_elevated,
  */
 int cmp_m3_list_resolve(cmp_m3_list_variant_t variant,
                         cmp_m3_list_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
 
@@ -85,15 +74,6 @@ int cmp_m3_list_resolve(cmp_m3_list_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -106,8 +86,7 @@ int cmp_m3_list_resolve(cmp_m3_list_variant_t variant,
  */
 int cmp_m3_carousel_resolve(cmp_m3_carousel_variant_t variant,
                             cmp_m3_carousel_metrics_t *out_metrics) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!out_metrics)
     return CMP_ERROR_INVALID_ARG;
 
@@ -125,14 +104,5 @@ int cmp_m3_carousel_resolve(cmp_m3_carousel_variant_t variant,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }

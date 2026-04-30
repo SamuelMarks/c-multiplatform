@@ -18,7 +18,7 @@ struct cmp_scroll_timeline {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_timeline_create(cmp_scroll_timeline_t **out_timeline) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_timeline *timeline;
 
   rc = CMP_SUCCESS;
@@ -38,7 +38,7 @@ int cmp_scroll_timeline_create(cmp_scroll_timeline_t **out_timeline) {
   timeline->is_active = 1;
 
   *out_timeline = (cmp_scroll_timeline_t *)timeline;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -48,7 +48,7 @@ int cmp_scroll_timeline_create(cmp_scroll_timeline_t **out_timeline) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_scroll_timeline_destroy(cmp_scroll_timeline_t *timeline) {
-  int rc;
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_timeline *internal_timeline;
 
   rc = CMP_SUCCESS;
@@ -65,7 +65,7 @@ int cmp_scroll_timeline_destroy(cmp_scroll_timeline_t *timeline) {
     return rc;
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -80,6 +80,7 @@ int cmp_scroll_timeline_destroy(cmp_scroll_timeline_t *timeline) {
 int cmp_scroll_timeline_evaluate(cmp_scroll_timeline_t *timeline,
                                  float scroll_offset, float max_scroll_offset,
                                  float *out_progress) {
+  int rc = CMP_SUCCESS;
   struct cmp_scroll_timeline *t;
   float progress;
 
@@ -92,7 +93,7 @@ int cmp_scroll_timeline_evaluate(cmp_scroll_timeline_t *timeline,
 
   if (max_scroll_offset <= 0.0f) {
     *out_progress = 0.0f;
-    return CMP_SUCCESS;
+    return rc;
   }
 
   progress = scroll_offset / max_scroll_offset;
@@ -104,5 +105,5 @@ int cmp_scroll_timeline_evaluate(cmp_scroll_timeline_t *timeline,
 
   *out_progress = progress;
 
-  return CMP_SUCCESS;
+  return rc;
 }

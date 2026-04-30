@@ -18,8 +18,7 @@ struct cmp_gesture {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_gesture_create(cmp_gesture_t **out_gesture) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_gesture *ctx = NULL;
@@ -33,9 +32,7 @@ int cmp_gesture_create(cmp_gesture_t **out_gesture) {
     cmp_log_debug(
         "cmp_gesture_create: Invalid argument (out_gesture=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -46,9 +43,7 @@ int cmp_gesture_create(cmp_gesture_t **out_gesture) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_gesture_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -57,7 +52,7 @@ int cmp_gesture_create(cmp_gesture_t **out_gesture) {
 
   *out_gesture = (cmp_gesture_t *)ctx;
   cmp_log_debug("cmp_gesture_create: Successfully created gesture context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -67,8 +62,7 @@ int cmp_gesture_create(cmp_gesture_t **out_gesture) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_gesture_destroy(cmp_gesture_t *gesture) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_gesture *ctx = (struct cmp_gesture *)gesture;
@@ -80,9 +74,7 @@ int cmp_gesture_destroy(cmp_gesture_t *gesture) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_gesture_destroy: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -93,7 +85,7 @@ int cmp_gesture_destroy(cmp_gesture_t *gesture) {
 
   cmp_log_debug(
       "cmp_gesture_destroy: Successfully destroyed gesture context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -106,8 +98,7 @@ int cmp_gesture_destroy(cmp_gesture_t *gesture) {
  */
 int cmp_gesture_set_callback(cmp_gesture_t *gesture, cmp_gesture_cb_t callback,
                              void *user_data) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_gesture *ctx = (struct cmp_gesture *)gesture;
@@ -119,9 +110,7 @@ int cmp_gesture_set_callback(cmp_gesture_t *gesture, cmp_gesture_cb_t callback,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_gesture_set_callback: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -129,15 +118,7 @@ int cmp_gesture_set_callback(cmp_gesture_t *gesture, cmp_gesture_cb_t callback,
   ctx->user_data = user_data;
 
   cmp_log_debug("cmp_gesture_set_callback: Registered callback\n");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -148,20 +129,14 @@ int cmp_gesture_set_callback(cmp_gesture_t *gesture, cmp_gesture_cb_t callback,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_gesture_get_state(const cmp_gesture_t *gesture) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   const struct cmp_gesture *ctx = (const struct cmp_gesture *)gesture;
   if (ctx == NULL) {
     return (int)CMP_GESTURE_STATE_POSSIBLE;
   }
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  return (int)ctx->state;
+  rc = (int)ctx->state;
+  return rc;
 }
 
 /**
@@ -173,8 +148,7 @@ int cmp_gesture_get_state(const cmp_gesture_t *gesture) {
  */
 int cmp_gesture_process_event(cmp_gesture_t *gesture,
                               const cmp_event_t *event) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_gesture *ctx = (struct cmp_gesture *)gesture;
@@ -186,9 +160,7 @@ int cmp_gesture_process_event(cmp_gesture_t *gesture,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_gesture_process_event: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -227,14 +199,6 @@ int cmp_gesture_process_event(cmp_gesture_t *gesture,
 
   cmp_log_debug("cmp_gesture_process_event: Processed event into state %d\n",
                 (int)ctx->state);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

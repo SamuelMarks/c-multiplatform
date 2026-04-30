@@ -19,7 +19,7 @@ struct cmp_hit_test {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hit_test_create(cmp_ui_node_t *tree, cmp_hit_test_t **out_hit_test) {
-  int rc = 0; /* CMP_SUCCESS */
+  int rc = CMP_SUCCESS; /* CMP_SUCCESS */
   struct cmp_hit_test *ctx = NULL;
 
   if (out_hit_test == NULL) {
@@ -31,7 +31,7 @@ int cmp_hit_test_create(cmp_ui_node_t *tree, cmp_hit_test_t **out_hit_test) {
      null. In the actual framework it would fail, but for the mock it's fine. */
 
   rc = CMP_MALLOC(sizeof(struct cmp_hit_test), (void **)&ctx);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_hit_test_create: CMP_MALLOC failed\n");
     return rc;
   }
@@ -44,7 +44,7 @@ int cmp_hit_test_create(cmp_ui_node_t *tree, cmp_hit_test_t **out_hit_test) {
   ctx->mock_hit_result = NULL;
 
   *out_hit_test = (cmp_hit_test_t *)ctx;
-  return 0;
+  return rc;
 }
 
 /**
@@ -54,7 +54,7 @@ int cmp_hit_test_create(cmp_ui_node_t *tree, cmp_hit_test_t **out_hit_test) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_hit_test_destroy(cmp_hit_test_t *hit_test) {
-  int rc = 0; /* CMP_SUCCESS */
+  int rc = CMP_SUCCESS; /* CMP_SUCCESS */
   struct cmp_hit_test *ctx = (struct cmp_hit_test *)hit_test;
 
   if (ctx == NULL) {
@@ -63,7 +63,7 @@ int cmp_hit_test_destroy(cmp_hit_test_t *hit_test) {
   }
 
   rc = CMP_FREE(ctx);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_hit_test_destroy: CMP_FREE failed\n");
   }
   return rc;
@@ -82,7 +82,7 @@ static int hit_test_recursive(cmp_ui_node_t *node, float x, float y,
                               cmp_ui_node_t **out_hit) {
   size_t i;
   cmp_ui_node_t *child_hit = NULL;
-  int rc = 0;
+  int rc = CMP_SUCCESS;
 
   if (out_hit == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -91,7 +91,7 @@ static int hit_test_recursive(cmp_ui_node_t *node, float x, float y,
   *out_hit = NULL;
 
   if (node == NULL || node->layout == NULL) {
-    return 0;
+    return rc;
   }
 
   /* Check if point is inside this node's bounds */
@@ -106,12 +106,10 @@ static int hit_test_recursive(cmp_ui_node_t *node, float x, float y,
      * first) */
     for (i = node->child_count; i > 0; i--) {
       rc = hit_test_recursive(node->children[i - 1], x, y, &child_hit);
-      if (rc != 0) {
-        return rc;
-      }
+
       if (child_hit != NULL) {
         *out_hit = child_hit;
-        return 0;
+        return rc;
       }
     }
 
@@ -119,7 +117,7 @@ static int hit_test_recursive(cmp_ui_node_t *node, float x, float y,
     *out_hit = node;
   }
 
-  return 0;
+  return rc;
 }
 
 /**
@@ -134,7 +132,7 @@ static int hit_test_recursive(cmp_ui_node_t *node, float x, float y,
  */
 int cmp_hit_test_query(cmp_hit_test_t *hit_test, float x, float y,
                        cmp_ui_node_t **out_node) {
-  int rc = 0; /* CMP_SUCCESS */
+  int rc = CMP_SUCCESS; /* CMP_SUCCESS */
   struct cmp_hit_test *ctx = (struct cmp_hit_test *)hit_test;
 
   if (ctx == NULL || out_node == NULL) {
@@ -152,12 +150,12 @@ int cmp_hit_test_query(cmp_hit_test_t *hit_test, float x, float y,
   /* Simulate finding a hit using the mock bypass if set */
   if (ctx->mock_hit_result != NULL) {
     *out_node = ctx->mock_hit_result;
-    return 0;
+    return rc;
   }
 
   /* Actual recursive hit testing */
   rc = hit_test_recursive(ctx->tree, x, y, out_node);
-  if (rc != 0) {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_hit_test_query hit_test_recursive failed\n");
     return rc;
   }

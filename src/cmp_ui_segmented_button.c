@@ -26,8 +26,7 @@ struct cmp_ui_segmented_button {
  */
 int cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
                                    int multi_select) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_ui_segmented_button_t *btn;
   int err;
 
@@ -70,15 +69,7 @@ int cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
   }
 
   *out_btn = btn;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -89,8 +80,7 @@ int cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_segmented_button_destroy(cmp_ui_segmented_button_t *btn) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!btn) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -105,15 +95,7 @@ int cmp_ui_segmented_button_destroy(cmp_ui_segmented_button_t *btn) {
   if (free_rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_segmented_button_destroy: CMP_FREE btn failed\n");
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -126,21 +108,12 @@ int cmp_ui_segmented_button_destroy(cmp_ui_segmented_button_t *btn) {
  */
 int cmp_ui_segmented_button_get_node(cmp_ui_segmented_button_t *btn,
                                      cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!btn || !out_node) {
     return CMP_ERROR_INVALID_ARG;
   }
   *out_node = btn->node_root;
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -157,8 +130,7 @@ int cmp_ui_segmented_button_add_segment(cmp_ui_segmented_button_t *btn,
                                         const char *label,
                                         const char *icon_name,
                                         int *out_segment_index) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   cmp_ui_node_t *seg_node;
   int err;
 
@@ -205,15 +177,6 @@ int cmp_ui_segmented_button_add_segment(cmp_ui_segmented_button_t *btn,
 
   btn->segment_count++;
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -226,8 +189,7 @@ int cmp_ui_segmented_button_add_segment(cmp_ui_segmented_button_t *btn,
  */
 int cmp_ui_segmented_button_set_selected(cmp_ui_segmented_button_t *btn,
                                          int index) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!btn || index < 0 || index >= btn->segment_count) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -243,15 +205,6 @@ int cmp_ui_segmented_button_set_selected(cmp_ui_segmented_button_t *btn,
   btn->segments[index].is_selected = 1;
   /* Here we would update visual state to selected */
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 
@@ -264,8 +217,7 @@ int cmp_ui_segmented_button_set_selected(cmp_ui_segmented_button_t *btn,
  */
 int cmp_ui_segmented_button_set_deselected(cmp_ui_segmented_button_t *btn,
                                            int index) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!btn || index < 0 || index >= btn->segment_count) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -273,15 +225,6 @@ int cmp_ui_segmented_button_set_deselected(cmp_ui_segmented_button_t *btn,
   btn->segments[index].is_selected = 0;
   /* Here we would update visual state to deselected */
 
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
   return rc;
 }
 /**
@@ -293,21 +236,12 @@ int cmp_ui_segmented_button_set_deselected(cmp_ui_segmented_button_t *btn,
  */
 int cmp_ui_segmented_button_bind_a11y(cmp_ui_segmented_button_t *widget,
                                       cmp_a11y_tree_t *tree) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
   cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "group",
                          "Segmented Button");
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

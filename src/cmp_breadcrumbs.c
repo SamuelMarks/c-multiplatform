@@ -20,8 +20,7 @@ struct cmp_breadcrumbs {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_breadcrumbs_create(cmp_breadcrumbs_t **out_crumbs) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   cmp_breadcrumbs_t *crumbs = NULL;
@@ -35,9 +34,7 @@ int cmp_breadcrumbs_create(cmp_breadcrumbs_t **out_crumbs) {
     cmp_log_debug(
         "cmp_breadcrumbs_create: Invalid argument (out_crumbs=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -48,9 +45,7 @@ int cmp_breadcrumbs_create(cmp_breadcrumbs_t **out_crumbs) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_breadcrumbs_create: Out of memory: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -59,9 +54,7 @@ int cmp_breadcrumbs_create(cmp_breadcrumbs_t **out_crumbs) {
   *out_crumbs = crumbs;
   cmp_log_debug(
       "cmp_breadcrumbs_create: Successfully created breadcrumbs context\n");
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -72,8 +65,7 @@ int cmp_breadcrumbs_create(cmp_breadcrumbs_t **out_crumbs) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_breadcrumbs_destroy(cmp_breadcrumbs_t *crumbs) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -86,24 +78,20 @@ int cmp_breadcrumbs_destroy(cmp_breadcrumbs_t *crumbs) {
     cmp_log_debug(
         "cmp_breadcrumbs_destroy: Invalid argument (crumbs=NULL): %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   rc = CMP_FREE(crumbs);
   if (rc != CMP_SUCCESS) {
     cmp_log_debug("cmp_breadcrumbs_destroy: CMP_FREE failed\n");
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   cmp_log_debug(
       "cmp_breadcrumbs_destroy: Successfully destroyed breadcrumbs context\n");
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -114,8 +102,7 @@ int cmp_breadcrumbs_destroy(cmp_breadcrumbs_t *crumbs) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   const char *start;
@@ -129,9 +116,7 @@ int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_breadcrumbs_set_path: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
@@ -178,15 +163,7 @@ int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
 
   cmp_log_debug("cmp_breadcrumbs_set_path: Parsed path to %d segments\n",
                 (int)crumbs->count);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -199,8 +176,7 @@ int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
  */
 int cmp_breadcrumbs_get_count(const cmp_breadcrumbs_t *crumbs,
                               size_t *out_count) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -211,23 +187,13 @@ int cmp_breadcrumbs_get_count(const cmp_breadcrumbs_t *crumbs,
       err_str = "Unknown";
     }
     cmp_log_debug("cmp_breadcrumbs_get_count: Invalid argument: %s\n", err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   *out_count = crumbs->count;
   cmp_log_debug("cmp_breadcrumbs_get_count: Count is %d\n", (int)crumbs->count);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 
@@ -241,8 +207,7 @@ int cmp_breadcrumbs_get_count(const cmp_breadcrumbs_t *crumbs,
  */
 int cmp_breadcrumbs_get_segment(const cmp_breadcrumbs_t *crumbs, size_t index,
                                 cmp_breadcrumb_t **out_segment) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
 
@@ -255,23 +220,13 @@ int cmp_breadcrumbs_get_segment(const cmp_breadcrumbs_t *crumbs, size_t index,
     cmp_log_debug(
         "cmp_breadcrumbs_get_segment: Invalid argument or bounds: %s\n",
         err_str);
-    if (rc != 0) {
-      return rc;
-    }
+
     return rc;
   }
 
   *out_segment = (cmp_breadcrumb_t *)&crumbs->segments[index];
   cmp_log_debug("cmp_breadcrumbs_get_segment: Fetched segment at index %d\n",
                 (int)index);
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
-    }
-    return rc;
-  }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }

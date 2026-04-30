@@ -17,7 +17,7 @@ struct cmp_network {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_network_create(cmp_network_t **out_network) {
-  int rc;
+  int rc = CMP_SUCCESS;
   cmp_network_t *network;
 
   rc = CMP_SUCCESS;
@@ -38,7 +38,7 @@ int cmp_network_create(cmp_network_t **out_network) {
   network->current_status = CMP_NETWORK_STATUS_ONLINE;
 
   *out_network = network;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -48,7 +48,7 @@ int cmp_network_create(cmp_network_t **out_network) {
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_network_destroy(cmp_network_t *network) {
-  int rc;
+  int rc = CMP_SUCCESS;
 
   rc = CMP_SUCCESS;
 
@@ -62,7 +62,7 @@ int cmp_network_destroy(cmp_network_t *network) {
     LOG_DEBUG("Error in cmp_network_destroy: CMP_FREE failed\n");
     return rc;
   }
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -74,15 +74,14 @@ int cmp_network_destroy(cmp_network_t *network) {
  */
 int cmp_network_get_status(const cmp_network_t *network,
                            cmp_network_status_t *out_status) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (network == NULL || out_status == NULL) {
     LOG_DEBUG("Error in cmp_network_get_status: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
   }
 
   *out_status = network->current_status;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -94,8 +93,7 @@ int cmp_network_get_status(const cmp_network_t *network,
  */
 int cmp_network_set_status(cmp_network_t *network,
                            cmp_network_status_t status) {
-  int rc;
-  rc = 0;
+  int rc = CMP_SUCCESS;
   if (network == NULL) {
     LOG_DEBUG("Error in cmp_network_set_status: Invalid argument\n");
     return CMP_ERROR_INVALID_ARG;
@@ -110,5 +108,5 @@ int cmp_network_set_status(cmp_network_t *network,
 
   network->current_status = status;
   /* Additional OS hook triggers would execute here */
-  return CMP_SUCCESS;
+  return rc;
 }
