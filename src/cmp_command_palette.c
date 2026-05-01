@@ -13,9 +13,10 @@ struct cmp_command_palette {
 };
 
 /**
- * @brief cmp_command_palette_create
+ * @brief Creates a command palette context.
  *
- * @param out_palette Parameter description.
+ * @param out_palette Pointer to store the newly allocated command palette
+ * context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_command_palette_create(cmp_command_palette_t **out_palette) {
@@ -77,9 +78,9 @@ int cmp_command_palette_create(cmp_command_palette_t **out_palette) {
 }
 
 /**
- * @brief cmp_command_palette_destroy
+ * @brief Destroys a command palette context.
  *
- * @param palette Parameter description.
+ * @param palette Pointer to the command palette context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_command_palette_destroy(cmp_command_palette_t *palette) {
@@ -131,12 +132,12 @@ int cmp_command_palette_destroy(cmp_command_palette_t *palette) {
 }
 
 /**
- * @brief cmp_command_palette_add_item
+ * @brief Adds an item to the command palette.
  *
- * @param palette Parameter description.
- * @param id Parameter description.
- * @param display_text Parameter description.
- * @param subtext Parameter description.
+ * @param palette Pointer to the command palette context.
+ * @param id Unique string identifier for the command.
+ * @param display_text The primary text to display for the command.
+ * @param subtext Optional secondary text to display (or NULL).
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_command_palette_add_item(cmp_command_palette_t *palette, const char *id,
@@ -327,13 +328,14 @@ static int compare_items(const void *a, const void *b) {
 }
 
 /**
- * @brief cmp_command_palette_search
+ * @brief Searches the command palette for items matching the query using fuzzy
+ * matching.
  *
- * @param palette Parameter description.
- * @param query Parameter description.
- * @param out_results Parameter description.
- * @param max_results Parameter description.
- * @param out_count Parameter description.
+ * @param palette Pointer to the command palette context.
+ * @param query The search query string.
+ * @param out_results Array of pointers to store the matching command items.
+ * @param max_results Maximum number of results to return.
+ * @param out_count Pointer to store the number of matching items found.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_command_palette_search(cmp_command_palette_t *palette,

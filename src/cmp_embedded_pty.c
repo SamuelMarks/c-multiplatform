@@ -18,9 +18,9 @@ struct cmp_embedded_pty {
 };
 
 /**
- * @brief cmp_embedded_pty_create
+ * @brief Creates a new embedded PTY context.
  *
- * @param out_pty Parameter description.
+ * @param out_pty Pointer to store the newly created PTY context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_embedded_pty_create(cmp_embedded_pty_t **out_pty) {
@@ -52,9 +52,9 @@ int cmp_embedded_pty_create(cmp_embedded_pty_t **out_pty) {
 }
 
 /**
- * @brief cmp_embedded_pty_destroy
+ * @brief Destroys an embedded PTY context and frees its resources.
  *
- * @param pty Parameter description.
+ * @param pty Pointer to the PTY context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_embedded_pty_destroy(cmp_embedded_pty_t *pty) {
@@ -74,10 +74,10 @@ int cmp_embedded_pty_destroy(cmp_embedded_pty_t *pty) {
 }
 
 /**
- * @brief cmp_embedded_pty_spawn
+ * @brief Spawns a shell command inside the embedded PTY.
  *
- * @param pty Parameter description.
- * @param command Parameter description.
+ * @param pty Pointer to the PTY context.
+ * @param command The shell command string to execute.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_embedded_pty_spawn(cmp_embedded_pty_t *pty, const char *command) {
@@ -101,11 +101,11 @@ int cmp_embedded_pty_spawn(cmp_embedded_pty_t *pty, const char *command) {
 }
 
 /**
- * @brief cmp_embedded_pty_write
+ * @brief Writes input data directly to the embedded PTY process.
  *
- * @param pty Parameter description.
- * @param input Parameter description.
- * @param length Parameter description.
+ * @param pty Pointer to the PTY context.
+ * @param input Pointer to the input buffer.
+ * @param length Number of bytes to write.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_embedded_pty_write(cmp_embedded_pty_t *pty, const char *input,
@@ -137,12 +137,12 @@ int cmp_embedded_pty_write(cmp_embedded_pty_t *pty, const char *input,
 }
 
 /**
- * @brief cmp_embedded_pty_read
+ * @brief Reads available output data from the embedded PTY process.
  *
- * @param pty Parameter description.
- * @param out_buffer Parameter description.
- * @param max_len Parameter description.
- * @param out_read Parameter description.
+ * @param pty Pointer to the PTY context.
+ * @param out_buffer Pointer to the buffer to receive the read data.
+ * @param max_len The maximum number of bytes the buffer can hold.
+ * @param out_read Pointer to store the actual number of bytes read.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_embedded_pty_read(cmp_embedded_pty_t *pty, char *out_buffer,

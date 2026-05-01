@@ -13,9 +13,9 @@ struct cmp_tab_nav {
 };
 
 /**
- * @brief cmp_tab_nav_create
+ * @brief Creates a new tab navigation context.
  *
- * @param out_nav Parameter description.
+ * @param out_nav Pointer to store the newly created tab navigation context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_nav_create(cmp_tab_nav_t **out_nav) {
@@ -47,9 +47,9 @@ int cmp_tab_nav_create(cmp_tab_nav_t **out_nav) {
 }
 
 /**
- * @brief cmp_tab_nav_destroy
+ * @brief Destroys a tab navigation context and frees its resources.
  *
- * @param nav Parameter description.
+ * @param nav Pointer to the tab navigation context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_nav_destroy(cmp_tab_nav_t *nav) {
@@ -78,11 +78,11 @@ int cmp_tab_nav_destroy(cmp_tab_nav_t *nav) {
 }
 
 /**
- * @brief cmp_tab_nav_add_tab
+ * @brief Adds a new tab to the tab navigation context.
  *
- * @param nav Parameter description.
- * @param title Parameter description.
- * @param file_path Parameter description.
+ * @param nav Pointer to the tab navigation context.
+ * @param title The display title for the tab.
+ * @param file_path The file path associated with the tab.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_nav_add_tab(cmp_tab_nav_t *nav, const char *title,
@@ -137,10 +137,10 @@ int cmp_tab_nav_add_tab(cmp_tab_nav_t *nav, const char *title,
 }
 
 /**
- * @brief cmp_tab_nav_close_tab
+ * @brief Closes a tab at the specified index.
  *
- * @param nav Parameter description.
- * @param index Parameter description.
+ * @param nav Pointer to the tab navigation context.
+ * @param index The index of the tab to close.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_nav_close_tab(cmp_tab_nav_t *nav, size_t index) {
@@ -176,11 +176,11 @@ int cmp_tab_nav_close_tab(cmp_tab_nav_t *nav, size_t index) {
 }
 
 /**
- * @brief cmp_tab_nav_move_tab
+ * @brief Moves a tab from one index to another.
  *
- * @param nav Parameter description.
- * @param from_index Parameter description.
- * @param to_index Parameter description.
+ * @param nav Pointer to the tab navigation context.
+ * @param from_index The current index of the tab to move.
+ * @param to_index The new index for the tab.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_nav_move_tab(cmp_tab_nav_t *nav, size_t from_index,
@@ -225,10 +225,10 @@ int cmp_tab_nav_move_tab(cmp_tab_nav_t *nav, size_t from_index,
 }
 
 /**
- * @brief cmp_tab_nav_get_count
+ * @brief Gets the number of open tabs.
  *
- * @param nav Parameter description.
- * @param out_count Parameter description.
+ * @param nav Pointer to the tab navigation context.
+ * @param out_count Pointer to store the count.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_nav_get_count(const cmp_tab_nav_t *nav, size_t *out_count) {
@@ -242,11 +242,11 @@ int cmp_tab_nav_get_count(const cmp_tab_nav_t *nav, size_t *out_count) {
 }
 
 /**
- * @brief cmp_tab_nav_get_tab
+ * @brief Gets a tab at the specified index.
  *
- * @param nav Parameter description.
- * @param index Parameter description.
- * @param out_tab Parameter description.
+ * @param nav Pointer to the tab navigation context.
+ * @param index The index of the tab to retrieve.
+ * @param out_tab Pointer to store the retrieved tab pointer.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tab_nav_get_tab(const cmp_tab_nav_t *nav, size_t index,

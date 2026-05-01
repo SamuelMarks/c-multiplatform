@@ -11,12 +11,11 @@ struct cmp_file_watcher {
 };
 
 /**
- * @brief vfs_watch_proxy
+ * @brief Internal callback proxy for VFS watch events.
  *
- * @param path Parameter description.
- * @param event_type Parameter description.
- * @param user_data Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param path The path of the file that triggered the event.
+ * @param event_type The type of the file system event.
+ * @param user_data Pointer to the file watcher context.
  */
 static void vfs_watch_proxy(const char *path, int event_type, void *user_data) {
   cmp_file_watcher_t *w = (cmp_file_watcher_t *)user_data;
@@ -26,9 +25,9 @@ static void vfs_watch_proxy(const char *path, int event_type, void *user_data) {
 }
 
 /**
- * @brief cmp_file_watcher_create
+ * @brief Creates a new file watcher context.
  *
- * @param out_watcher Parameter description.
+ * @param out_watcher Pointer to store the newly created file watcher context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_file_watcher_create(cmp_file_watcher_t **out_watcher) {
@@ -60,9 +59,9 @@ int cmp_file_watcher_create(cmp_file_watcher_t **out_watcher) {
 }
 
 /**
- * @brief cmp_file_watcher_destroy
+ * @brief Destroys a file watcher context and frees its resources.
  *
- * @param watcher Parameter description.
+ * @param watcher Pointer to the file watcher context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_file_watcher_destroy(cmp_file_watcher_t *watcher) {
@@ -91,12 +90,12 @@ int cmp_file_watcher_destroy(cmp_file_watcher_t *watcher) {
 }
 
 /**
- * @brief cmp_file_watcher_start
+ * @brief Starts watching a directory for file system changes.
  *
- * @param watcher Parameter description.
- * @param dir_path Parameter description.
- * @param cb Parameter description.
- * @param user_data Parameter description.
+ * @param watcher Pointer to the file watcher context.
+ * @param dir_path The path to the directory to watch.
+ * @param cb The callback function to invoke upon a file change.
+ * @param user_data Optional user context to pass to the callback.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_file_watcher_start(cmp_file_watcher_t *watcher, const char *dir_path,
@@ -132,9 +131,9 @@ int cmp_file_watcher_start(cmp_file_watcher_t *watcher, const char *dir_path,
 }
 
 /**
- * @brief cmp_file_watcher_stop
+ * @brief Stops an active file watcher.
  *
- * @param watcher Parameter description.
+ * @param watcher Pointer to the file watcher context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_file_watcher_stop(cmp_file_watcher_t *watcher) {

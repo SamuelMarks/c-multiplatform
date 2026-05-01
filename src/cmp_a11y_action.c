@@ -19,8 +19,7 @@ struct cmp_a11y_action {
  */
 int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
                            cmp_a11y_action_t **out_action) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_a11y_action *action = NULL;
@@ -69,8 +68,7 @@ int cmp_a11y_action_create(cmp_a11y_tree_t *tree,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_a11y_action_destroy(cmp_a11y_action_t *action) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_a11y_action *a = (struct cmp_a11y_action *)action;
@@ -113,8 +111,7 @@ int cmp_a11y_action_destroy(cmp_a11y_action_t *action) {
  */
 int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
                             cmp_a11y_action_type_t action_type) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
   struct cmp_a11y_action *a = (struct cmp_a11y_action *)action;

@@ -13,13 +13,13 @@ struct cmp_workspace_layout {
 };
 
 /**
- * @brief cmp_workspace_layout_create
+ * @brief Create a new workspace layout engine.
  *
- * @param out_layout Parameter description.
+ * @param out_layout Pointer to store the created layout engine handle.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_workspace_layout_create(cmp_workspace_layout_t **out_layout) {
-  cmp_workspace_layout_t *layout;
+  cmp_workspace_layout_t *layout = NULL;
   int rc = CMP_SUCCESS;
 
   if (!out_layout) {
@@ -45,9 +45,9 @@ int cmp_workspace_layout_create(cmp_workspace_layout_t **out_layout) {
 }
 
 /**
- * @brief cmp_workspace_layout_destroy
+ * @brief Destroy the layout engine.
  *
- * @param layout Parameter description.
+ * @param layout The layout engine to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_workspace_layout_destroy(cmp_workspace_layout_t *layout) {
@@ -61,18 +61,18 @@ int cmp_workspace_layout_destroy(cmp_workspace_layout_t *layout) {
   rc = CMP_FREE(layout);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_workspace_layout_destroy: CMP_FREE failed\n");
-
     return rc;
   }
   return rc;
 }
 
 /**
- * @brief cmp_workspace_layout_set_pane_width
+ * @brief Set the width of a specific pane. Automatically handles splitter
+ * constraints.
  *
- * @param layout Parameter description.
- * @param pane Parameter description.
- * @param width Parameter description.
+ * @param layout The layout engine component.
+ * @param pane The pane identifier.
+ * @param width The target width to set for the pane.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_workspace_layout_set_pane_width(cmp_workspace_layout_t *layout,
@@ -93,11 +93,11 @@ int cmp_workspace_layout_set_pane_width(cmp_workspace_layout_t *layout,
 }
 
 /**
- * @brief cmp_workspace_layout_get_pane_width
+ * @brief Get the width of a specific pane.
  *
- * @param layout Parameter description.
- * @param pane Parameter description.
- * @param out_width Parameter description.
+ * @param layout The layout engine component.
+ * @param pane The pane identifier.
+ * @param out_width Pointer to store the result width.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_workspace_layout_get_pane_width(const cmp_workspace_layout_t *layout,
@@ -115,10 +115,10 @@ int cmp_workspace_layout_get_pane_width(const cmp_workspace_layout_t *layout,
 }
 
 /**
- * @brief cmp_workspace_layout_set_sidebar_glass
+ * @brief Enable or disable the glassy material effect on the sidebar.
  *
- * @param layout Parameter description.
- * @param enable_glass Parameter description.
+ * @param layout The layout engine component.
+ * @param enable_glass 1 to enable, 0 to disable.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_workspace_layout_set_sidebar_glass(cmp_workspace_layout_t *layout,
@@ -135,12 +135,13 @@ int cmp_workspace_layout_set_sidebar_glass(cmp_workspace_layout_t *layout,
 }
 
 /**
- * @brief cmp_workspace_layout_hit_test_splitters
+ * @brief Perform hit-testing against the frameless splitters to allow resizing.
  *
- * @param layout Parameter description.
- * @param x Parameter description.
- * @param y Parameter description.
- * @param out_is_over_splitter Parameter description.
+ * @param layout The layout engine component.
+ * @param x Mouse X coordinate.
+ * @param y Mouse Y coordinate.
+ * @param out_is_over_splitter Pointer to store boolean result (1 if over
+ * splitter, 0 otherwise).
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_workspace_layout_hit_test_splitters(

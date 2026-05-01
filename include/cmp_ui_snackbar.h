@@ -80,7 +80,7 @@ int CMP_API cmp_ui_snackbar_set_action(cmp_ui_snackbar_t *snackbar,
 int CMP_API cmp_ui_snackbar_bind_a11y(cmp_ui_snackbar_t *widget,
                                       cmp_a11y_tree_t *tree);
 #ifdef __cplusplus
-
+}
 #endif /* __cplusplus */
 
 #endif /* CMP_UI_SNACKBAR_H */

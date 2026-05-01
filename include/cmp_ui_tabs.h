@@ -74,7 +74,7 @@ int CMP_API cmp_ui_tabs_set_selected(cmp_ui_tabs_t *tabs, int index);
  */
 int CMP_API cmp_ui_tabs_bind_a11y(cmp_ui_tabs_t *widget, cmp_a11y_tree_t *tree);
 #ifdef __cplusplus
-
+}
 #endif /* __cplusplus */
 
 #endif /* CMP_UI_TABS_H */

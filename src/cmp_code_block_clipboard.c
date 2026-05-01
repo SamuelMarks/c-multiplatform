@@ -9,9 +9,10 @@ struct cmp_clipboard_overlay {
 };
 
 /**
- * @brief cmp_clipboard_overlay_create
+ * @brief Creates a code block clipboard overlay context.
  *
- * @param out_overlay Parameter description.
+ * @param out_overlay Pointer to store the newly allocated clipboard overlay
+ * context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_clipboard_overlay_create(cmp_clipboard_overlay_t **out_overlay) {
@@ -54,9 +55,9 @@ int cmp_clipboard_overlay_create(cmp_clipboard_overlay_t **out_overlay) {
 }
 
 /**
- * @brief cmp_clipboard_overlay_destroy
+ * @brief Destroys a clipboard overlay context.
  *
- * @param overlay Parameter description.
+ * @param overlay Pointer to the clipboard overlay context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_clipboard_overlay_destroy(cmp_clipboard_overlay_t *overlay) {
@@ -89,11 +90,11 @@ int cmp_clipboard_overlay_destroy(cmp_clipboard_overlay_t *overlay) {
 }
 
 /**
- * @brief cmp_clipboard_overlay_render
+ * @brief Updates the rendering state of the clipboard overlay.
  *
- * @param overlay Parameter description.
- * @param block Parameter description.
- * @param state Parameter description.
+ * @param overlay Pointer to the clipboard overlay context.
+ * @param block Pointer to the associated code block context.
+ * @param state The new state to render (e.g., IDLE, COPIED).
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_clipboard_overlay_render(cmp_clipboard_overlay_t *overlay,
@@ -125,11 +126,12 @@ int cmp_clipboard_overlay_render(cmp_clipboard_overlay_t *overlay,
 }
 
 /**
- * @brief cmp_clipboard_overlay_copy
+ * @brief Copies the raw code to the system clipboard and updates the overlay
+ * state.
  *
- * @param overlay Parameter description.
- * @param window Parameter description.
- * @param raw_code Parameter description.
+ * @param overlay Pointer to the clipboard overlay context.
+ * @param window Pointer to the window context (for accessing OS clipboard).
+ * @param raw_code The raw text/code to copy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_clipboard_overlay_copy(cmp_clipboard_overlay_t *overlay,

@@ -14,9 +14,9 @@ struct cmp_breadcrumbs {
 };
 
 /**
- * @brief cmp_breadcrumbs_create
+ * @brief Creates a new breadcrumbs context.
  *
- * @param out_crumbs Parameter description.
+ * @param out_crumbs Pointer to store the newly allocated breadcrumbs context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_breadcrumbs_create(cmp_breadcrumbs_t **out_crumbs) {
@@ -59,9 +59,9 @@ int cmp_breadcrumbs_create(cmp_breadcrumbs_t **out_crumbs) {
 }
 
 /**
- * @brief cmp_breadcrumbs_destroy
+ * @brief Destroys a breadcrumbs context.
  *
- * @param crumbs Parameter description.
+ * @param crumbs Pointer to the breadcrumbs context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_breadcrumbs_destroy(cmp_breadcrumbs_t *crumbs) {
@@ -95,10 +95,10 @@ int cmp_breadcrumbs_destroy(cmp_breadcrumbs_t *crumbs) {
 }
 
 /**
- * @brief cmp_breadcrumbs_set_path
+ * @brief Parses a path string and populates the breadcrumbs.
  *
- * @param crumbs Parameter description.
- * @param full_path Parameter description.
+ * @param crumbs Pointer to the breadcrumbs context.
+ * @param full_path The path string to parse (e.g., "/usr/local/bin").
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
@@ -168,10 +168,10 @@ int cmp_breadcrumbs_set_path(cmp_breadcrumbs_t *crumbs, const char *full_path) {
 }
 
 /**
- * @brief cmp_breadcrumbs_get_count
+ * @brief Gets the number of parsed breadcrumb segments.
  *
- * @param crumbs Parameter description.
- * @param out_count Parameter description.
+ * @param crumbs Pointer to the breadcrumbs context.
+ * @param out_count Pointer to store the count.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_breadcrumbs_get_count(const cmp_breadcrumbs_t *crumbs,
@@ -198,11 +198,11 @@ int cmp_breadcrumbs_get_count(const cmp_breadcrumbs_t *crumbs,
 }
 
 /**
- * @brief cmp_breadcrumbs_get_segment
+ * @brief Gets a specific breadcrumb segment by index.
  *
- * @param crumbs Parameter description.
- * @param index Parameter description.
- * @param out_segment Parameter description.
+ * @param crumbs Pointer to the breadcrumbs context.
+ * @param index The 0-based index of the segment.
+ * @param out_segment Pointer to store the segment pointer.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_breadcrumbs_get_segment(const cmp_breadcrumbs_t *crumbs, size_t index,

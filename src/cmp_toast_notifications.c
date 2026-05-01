@@ -21,9 +21,9 @@ struct cmp_toast_manager {
 };
 
 /**
- * @brief cmp_toast_manager_create
+ * @brief Creates a new toast notification manager.
  *
- * @param out_manager Parameter description.
+ * @param out_manager Pointer to store the newly created toast manager context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toast_manager_create(cmp_toast_manager_t **out_manager) {
@@ -55,9 +55,9 @@ int cmp_toast_manager_create(cmp_toast_manager_t **out_manager) {
 }
 
 /**
- * @brief cmp_toast_manager_destroy
+ * @brief Destroys a toast notification manager and frees its resources.
  *
- * @param manager Parameter description.
+ * @param manager Pointer to the toast manager context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toast_manager_destroy(cmp_toast_manager_t *manager) {
@@ -86,12 +86,12 @@ int cmp_toast_manager_destroy(cmp_toast_manager_t *manager) {
 }
 
 /**
- * @brief cmp_toast_manager_push
+ * @brief Pushes a new toast notification onto the screen.
  *
- * @param manager Parameter description.
- * @param level Parameter description.
- * @param message Parameter description.
- * @param duration_ms Parameter description.
+ * @param manager Pointer to the toast manager context.
+ * @param level The severity level of the toast (info, warning, error, etc.).
+ * @param message The text message to display in the toast.
+ * @param duration_ms How long the toast should remain visible in milliseconds.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toast_manager_push(cmp_toast_manager_t *manager,
@@ -137,10 +137,11 @@ int cmp_toast_manager_push(cmp_toast_manager_t *manager,
 }
 
 /**
- * @brief cmp_toast_manager_tick
+ * @brief Updates the internal timers of all active toasts, removing expired
+ * ones.
  *
- * @param manager Parameter description.
- * @param delta_time_ms Parameter description.
+ * @param manager Pointer to the toast manager context.
+ * @param delta_time_ms Delta time in milliseconds since the last tick.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toast_manager_tick(cmp_toast_manager_t *manager,
@@ -178,10 +179,10 @@ int cmp_toast_manager_tick(cmp_toast_manager_t *manager,
 }
 
 /**
- * @brief cmp_toast_manager_get_active_count
+ * @brief Retrieves the total number of currently active toasts.
  *
- * @param manager Parameter description.
- * @param out_count Parameter description.
+ * @param manager Pointer to the toast manager context.
+ * @param out_count Pointer to store the returned count.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_toast_manager_get_active_count(const cmp_toast_manager_t *manager,

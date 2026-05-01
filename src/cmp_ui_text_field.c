@@ -145,10 +145,10 @@ int cmp_ui_text_field_set_value(cmp_ui_text_field_t *field, const char *value) {
   return rc;
 }
 /**
- * @brief cmp_ui_text_field_bind_a11y
+ * @brief Binds the widget to the accessibility tree.
  *
- * @param widget Parameter description.
- * @param tree Parameter description.
+ * @param widget The component.
+ * @param tree The accessibility tree.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_text_field_bind_a11y(cmp_ui_text_field_t *widget,

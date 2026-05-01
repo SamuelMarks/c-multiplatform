@@ -18,9 +18,9 @@ struct cmp_ui_tabs {
 };
 
 /**
- * @brief cmp_ui_tabs_create
+ * @brief Creates a new UI tabs component.
  *
- * @param out_tabs Parameter description.
+ * @param out_tabs Pointer to store the newly created tabs context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs) {
@@ -63,9 +63,9 @@ int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs) {
 }
 
 /**
- * @brief cmp_ui_tabs_destroy
+ * @brief Destroys a UI tabs component and frees its resources.
  *
- * @param tabs Parameter description.
+ * @param tabs Pointer to the tabs context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_destroy(cmp_ui_tabs_t *tabs) {
@@ -82,10 +82,10 @@ int cmp_ui_tabs_destroy(cmp_ui_tabs_t *tabs) {
 }
 
 /**
- * @brief cmp_ui_tabs_get_node
+ * @brief Retrieves the root UI node of the tabs component.
  *
- * @param tabs Parameter description.
- * @param out_node Parameter description.
+ * @param tabs Pointer to the tabs context.
+ * @param out_node Pointer to store the root UI node pointer.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_get_node(cmp_ui_tabs_t *tabs, cmp_ui_node_t **out_node) {
@@ -99,11 +99,11 @@ int cmp_ui_tabs_get_node(cmp_ui_tabs_t *tabs, cmp_ui_node_t **out_node) {
 }
 
 /**
- * @brief cmp_ui_tabs_add_tab
+ * @brief Adds a new tab to the component.
  *
- * @param tabs Parameter description.
- * @param title Parameter description.
- * @param out_index Parameter description.
+ * @param tabs Pointer to the tabs context.
+ * @param title The display title for the new tab.
+ * @param out_index Pointer to store the index of the newly added tab.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
@@ -150,10 +150,10 @@ int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
 }
 
 /**
- * @brief cmp_ui_tabs_set_selected
+ * @brief Sets the currently active tab by index.
  *
- * @param tabs Parameter description.
- * @param index Parameter description.
+ * @param tabs Pointer to the tabs context.
+ * @param index The index of the tab to make active.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_set_selected(cmp_ui_tabs_t *tabs, int index) {
@@ -173,10 +173,10 @@ int cmp_ui_tabs_set_selected(cmp_ui_tabs_t *tabs, int index) {
   return rc;
 }
 /**
- * @brief cmp_ui_tabs_bind_a11y
+ * @brief Binds the tabs component to an accessibility tree as a tablist.
  *
- * @param widget Parameter description.
- * @param tree Parameter description.
+ * @param widget Pointer to the tabs context.
+ * @param tree Pointer to the accessibility tree.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_bind_a11y(cmp_ui_tabs_t *widget, cmp_a11y_tree_t *tree) {

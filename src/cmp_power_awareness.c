@@ -30,11 +30,33 @@ static cmp_resource_manager_t *g_resource_manager = NULL;
 int cmp_power_awareness_init(void) {
   int rc = CMP_SUCCESS;
 
+  if (g_resource_manager != NULL) {
+    return CMP_SUCCESS;
+  }
+
   rc = cmp_resource_manager_create(&g_resource_manager);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_power_awareness_init: cmp_resource_manager_create "
               "failed\n");
     return rc;
+  }
+  return rc;
+}
+
+/**
+ * @brief Cleans up the power awareness module.
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_power_awareness_cleanup(void) {
+  int rc = CMP_SUCCESS;
+  if (g_resource_manager) {
+    rc = cmp_resource_manager_destroy(g_resource_manager);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("Error in cmp_power_awareness_cleanup: Failed to destroy "
+                "resource manager\n");
+    }
+    g_resource_manager = NULL;
   }
   return rc;
 }

@@ -1358,6 +1358,43 @@ int cmp_databinding_get_string(cmp_databinding_t *binding,
  * @param user_data User context to pass to the callback.
  * @return 0 on success, or an error code.
  */
+
+/**
+ * @brief Sets the integer value of a databinding and notifies listeners.
+ *
+ * @param binding Pointer to the databinding context.
+ * @param val The new integer value.
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_databinding_set_int(cmp_databinding_t *binding, int val);
+
+/**
+ * @brief Gets the current integer value of a databinding.
+ *
+ * @param binding Pointer to the databinding context.
+ * @param out_val Pointer to store the returned integer value.
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_databinding_get_int(cmp_databinding_t *binding, int *out_val);
+
+/**
+ * @brief Sets the integer value of a databinding and notifies listeners.
+ *
+ * @param binding Pointer to the databinding context.
+ * @param val The new integer value.
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_databinding_set_int(cmp_databinding_t *binding, int val);
+
+/**
+ * @brief Gets the current integer value of a databinding.
+ *
+ * @param binding Pointer to the databinding context.
+ * @param out_val Pointer to store the returned integer value.
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_databinding_get_int(cmp_databinding_t *binding, int *out_val);
+
 int cmp_databinding_add_listener(cmp_databinding_t *binding,
                                  cmp_databinding_cb_t cb, void *user_data);
 
@@ -12052,16 +12089,23 @@ int CMP_API cmp_os_scrollbar_step(cmp_os_scrollbar_t *scrollbar,
 
 /* --- From power_awareness.h --- */
 /**
- * \brief Initialize system power and thermal awareness.
- *        Registers OS callbacks (e.g. WM_POWERBROADCAST on Windows)
- *        to dynamically throttle animations and background tasks.
- * \return 0 on success, or an error code.
+ * @brief Initializes the power awareness module.
+ *
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_power_awareness_init(void);
 
 /**
- * \brief Poll current power status and apply throttling if necessary.
- * \return 0 on success.
+ * @brief Cleans up the power awareness module.
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_power_awareness_cleanup(void);
+
+/**
+ * @brief Polls the system power status and updates the resource manager.
+ *
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_power_awareness_poll(void);
 

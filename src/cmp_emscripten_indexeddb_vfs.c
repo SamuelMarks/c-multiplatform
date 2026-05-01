@@ -9,9 +9,9 @@ struct cmp_indexeddb_vfs {
 };
 
 /**
- * @brief cmp_indexeddb_vfs_create
+ * @brief Creates a new IndexedDB VFS context for Emscripten.
  *
- * @param out_vfs Parameter description.
+ * @param out_vfs Pointer to store the newly created VFS context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_indexeddb_vfs_create(cmp_indexeddb_vfs_t **out_vfs) {
@@ -39,9 +39,9 @@ int cmp_indexeddb_vfs_create(cmp_indexeddb_vfs_t **out_vfs) {
 }
 
 /**
- * @brief cmp_indexeddb_vfs_destroy
+ * @brief Destroys an IndexedDB VFS context and frees its resources.
  *
- * @param vfs Parameter description.
+ * @param vfs Pointer to the VFS context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_indexeddb_vfs_destroy(cmp_indexeddb_vfs_t *vfs) {
@@ -66,11 +66,11 @@ int cmp_indexeddb_vfs_destroy(cmp_indexeddb_vfs_t *vfs) {
 }
 
 /**
- * @brief cmp_indexeddb_vfs_mount
+ * @brief Mounts an IndexedDB database to a specific path in the Emscripten VFS.
  *
- * @param vfs Parameter description.
- * @param mount_path Parameter description.
- * @param db_name Parameter description.
+ * @param vfs Pointer to the VFS context.
+ * @param mount_path The path in the virtual file system to mount the database.
+ * @param db_name The name of the IndexedDB database to mount.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_indexeddb_vfs_mount(cmp_indexeddb_vfs_t *vfs, const char *mount_path,
@@ -91,9 +91,10 @@ int cmp_indexeddb_vfs_mount(cmp_indexeddb_vfs_t *vfs, const char *mount_path,
 }
 
 /**
- * @brief cmp_indexeddb_vfs_sync
+ * @brief Synchronizes the Emscripten VFS memory representation with the
+ * persistent IndexedDB storage.
  *
- * @param vfs Parameter description.
+ * @param vfs Pointer to the VFS context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_indexeddb_vfs_sync(cmp_indexeddb_vfs_t *vfs) {

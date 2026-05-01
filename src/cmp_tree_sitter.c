@@ -7,14 +7,13 @@
 /* clang-format on */
 
 /**
- * @brief cmp_math_codex_strdup
+ * @brief Internal string duplication utility using CMP memory allocators.
  *
- * @param s Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param s The string to duplicate.
+ * @return Pointer to the duplicated string, or NULL on memory failure.
  */
 static char *cmp_math_codex_strdup(const char *s) {
-  int rc;
-  rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
   size_t len;
   char *d;
   if (!s)
@@ -45,16 +44,16 @@ struct cmp_tree_node {
 };
 
 /**
- * @brief cmp_tree_sitter_create
+ * @brief Creates a new Tree-Sitter parser context.
  *
- * @param out_ts Parameter description.
+ * @param out_ts Pointer to store the newly created Tree-Sitter context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tree_sitter_create(cmp_tree_sitter_t **out_ts) {
   int rc = CMP_SUCCESS;
   cmp_tree_sitter_t *ts;
   if (!out_ts) {
-    return -1;
+    return CMP_ERROR_INVALID_ARG;
   }
   rc = CMP_MALLOC(sizeof(cmp_tree_sitter_t), (void **)&(ts));
   if (rc != CMP_SUCCESS) {
@@ -67,15 +66,15 @@ int cmp_tree_sitter_create(cmp_tree_sitter_t **out_ts) {
 }
 
 /**
- * @brief cmp_tree_sitter_destroy
+ * @brief Destroys a Tree-Sitter parser context and frees its resources.
  *
- * @param ts Parameter description.
+ * @param ts Pointer to the Tree-Sitter context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tree_sitter_destroy(cmp_tree_sitter_t *ts) {
   int rc = CMP_SUCCESS;
   if (!ts) {
-    return -1;
+    return CMP_ERROR_INVALID_ARG;
   }
   rc = CMP_FREE(ts);
   if (rc != CMP_SUCCESS) {
@@ -85,12 +84,12 @@ int cmp_tree_sitter_destroy(cmp_tree_sitter_t *ts) {
 }
 
 /**
- * @brief cmp_tree_sitter_parse
+ * @brief Parses source code using the specified language grammar.
  *
- * @param ts Parameter description.
- * @param language Parameter description.
- * @param source_code Parameter description.
- * @param out_root Parameter description.
+ * @param ts Pointer to the Tree-Sitter context.
+ * @param language The name of the language.
+ * @param source_code The source code to parse.
+ * @param out_root Pointer to store the root AST node.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tree_sitter_parse(cmp_tree_sitter_t *ts, const char *language,
@@ -98,7 +97,7 @@ int cmp_tree_sitter_parse(cmp_tree_sitter_t *ts, const char *language,
   int rc = CMP_SUCCESS;
   cmp_tree_node_t *root;
   if (!ts || !language || !source_code || !out_root) {
-    return -1;
+    return CMP_ERROR_INVALID_ARG;
   }
   rc = CMP_MALLOC(sizeof(cmp_tree_node_t), (void **)&(root));
   if (rc != CMP_SUCCESS) {
@@ -115,16 +114,16 @@ int cmp_tree_sitter_parse(cmp_tree_sitter_t *ts, const char *language,
 }
 
 /**
- * @brief cmp_tree_sitter_node_get_type
+ * @brief Retrieves the string type name of an AST node.
  *
- * @param node Parameter description.
- * @param out_type Parameter description.
+ * @param node Pointer to the AST node.
+ * @param out_type Pointer to store the returned type string.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tree_sitter_node_get_type(cmp_tree_node_t *node, char **out_type) {
   int rc = CMP_SUCCESS;
   if (!node || !out_type) {
-    return -1;
+    return CMP_ERROR_INVALID_ARG;
   }
   if (!node->type) {
     *out_type = NULL;
@@ -132,16 +131,16 @@ int cmp_tree_sitter_node_get_type(cmp_tree_node_t *node, char **out_type) {
   }
   *out_type = strdup(node->type);
   if (!*out_type) {
-    return -2;
+    return CMP_ERROR_OOM;
   }
 
   return rc;
 }
 
 /**
- * @brief cmp_tree_sitter_free_node
+ * @brief Recursively frees an AST node and its children.
  *
- * @param node Parameter description.
+ * @param node Pointer to the AST node to free.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tree_sitter_free_node(cmp_tree_node_t *node) {
@@ -173,9 +172,9 @@ int cmp_tree_sitter_free_node(cmp_tree_node_t *node) {
 }
 
 /**
- * @brief cmp_tree_sitter_free_string
+ * @brief Frees a string returned by the Tree-Sitter module.
  *
- * @param str Parameter description.
+ * @param str The string pointer to free.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_tree_sitter_free_string(char *str) {

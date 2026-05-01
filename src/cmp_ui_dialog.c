@@ -20,7 +20,7 @@ struct cmp_ui_dialog {
 };
 
 /**
- * @brief cmp_ui_dialog_create
+ * @brief Creates a new UI dialog component.
  *
  * @param out_dialog Pointer to store the created dialog.
  * @param title The title string.
@@ -90,7 +90,7 @@ int cmp_ui_dialog_create(cmp_ui_dialog_t **out_dialog, const char *title,
 }
 
 /**
- * @brief cmp_ui_dialog_destroy
+ * @brief Destroys a UI dialog component and frees its resources.
  *
  * @param dialog The dialog component.
  * @return Returns 0 on success, or an error code on failure.
@@ -117,7 +117,7 @@ int cmp_ui_dialog_destroy(cmp_ui_dialog_t *dialog) {
 }
 
 /**
- * @brief cmp_ui_dialog_get_node
+ * @brief Retrieves the root UI node of the dialog component.
  *
  * @param dialog The dialog component.
  * @param out_node Pointer to store the underlying UI node.
@@ -135,7 +135,7 @@ int cmp_ui_dialog_get_node(cmp_ui_dialog_t *dialog, cmp_ui_node_t **out_node) {
 }
 
 /**
- * @brief cmp_ui_dialog_set_visible
+ * @brief Sets the visibility state of the UI dialog.
  *
  * @param dialog The dialog component.
  * @param visible 1 to show, 0 to hide.
@@ -154,7 +154,7 @@ int cmp_ui_dialog_set_visible(cmp_ui_dialog_t *dialog, int visible) {
 }
 
 /**
- * @brief cmp_ui_dialog_bind_a11y
+ * @brief Binds the dialog to an accessibility tree.
  *
  * @param widget The component.
  * @param tree The accessibility tree.

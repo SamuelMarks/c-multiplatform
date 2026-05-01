@@ -6,7 +6,8 @@
 static cmp_app_region_t *g_chrome_region = NULL;
 
 /**
- * @brief cmp_custom_chrome_init
+ * @brief Initializes the custom chrome module and its global application
+ * region.
  *
  * @return Returns 0 on success, or an error code on failure.
  */
@@ -55,7 +56,7 @@ int cmp_custom_chrome_init(void) {
 }
 
 /**
- * @brief cmp_custom_chrome_cleanup
+ * @brief Cleans up and destroys the global custom chrome region.
  *
  * @return Returns 0 on success, or an error code on failure.
  */

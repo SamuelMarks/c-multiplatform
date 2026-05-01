@@ -14,11 +14,11 @@ struct cmp_ui_terminal {
 };
 
 /**
- * @brief cmp_ui_terminal_create
+ * @brief Creates a new terminal component.
  *
- * @param out_terminal Parameter description.
- * @param bg_color Parameter description.
- * @param fg_color Parameter description.
+ * @param out_terminal Pointer to store the created terminal handle.
+ * @param bg_color Background color of the terminal (ARGB).
+ * @param fg_color Default foreground text color (ARGB).
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal, uint32_t bg_color,
@@ -66,37 +66,47 @@ int cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal, uint32_t bg_color,
 }
 
 /**
- * @brief cmp_ui_terminal_destroy
+ * @brief Destroys a terminal component.
  *
- * @param terminal Parameter description.
+ * @param terminal The component to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_terminal_destroy(cmp_ui_terminal_t *terminal) {
   int rc = CMP_SUCCESS;
+  int temp_rc;
   if (!terminal) {
     return CMP_ERROR_INVALID_ARG;
   }
   if (terminal->pty) {
     cmp_pty_destroy(terminal->pty);
   }
-  if (terminal->buffer) {
-    rc = CMP_FREE(terminal->buffer);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+  if (terminal->node_root) {
+    temp_rc = cmp_ui_node_destroy(terminal->node_root);
+    if (temp_rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_terminal_destroy: cmp_ui_node_destroy failed\n");
+      rc = temp_rc;
     }
   }
-  rc = CMP_FREE(terminal);
-  if (rc != CMP_SUCCESS) {
+  if (terminal->buffer) {
+    temp_rc = CMP_FREE(terminal->buffer);
+    if (temp_rc != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+      rc = temp_rc;
+    }
+  }
+  temp_rc = CMP_FREE(terminal);
+  if (temp_rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
+    rc = temp_rc;
   }
   return rc;
 }
 
 /**
- * @brief cmp_ui_terminal_get_node
+ * @brief Retrieves the underlying UI node.
  *
- * @param terminal Parameter description.
- * @param out_node Parameter description.
+ * @param terminal The terminal component.
+ * @param out_node Pointer to store the UI node.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_terminal_get_node(cmp_ui_terminal_t *terminal,
@@ -111,10 +121,10 @@ int cmp_ui_terminal_get_node(cmp_ui_terminal_t *terminal,
 }
 
 /**
- * @brief cmp_ui_terminal_append_output
+ * @brief Appends output text to the terminal.
  *
- * @param terminal Parameter description.
- * @param output Parameter description.
+ * @param terminal The terminal component.
+ * @param output The string to append.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_terminal_append_output(cmp_ui_terminal_t *terminal,

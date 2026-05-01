@@ -60,10 +60,11 @@ int cmp_webgl_canvas_destroy(cmp_webgl_canvas_t *canvas) {
 }
 
 /**
- * @brief cmp_webgl_canvas_bind
+ * @brief Initializes the Emscripten rendering bindings to the target DOM
+ * element.
  *
- * @param canvas Parameter description.
- * @param dom_selector Parameter description.
+ * @param canvas The manager.
+ * @param dom_selector The HTML ID selector (e.g., "#canvas").
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_webgl_canvas_bind(cmp_webgl_canvas_t *canvas,

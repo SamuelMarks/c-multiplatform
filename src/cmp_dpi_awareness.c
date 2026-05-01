@@ -7,7 +7,7 @@
 static cmp_dpi_t *g_dpi_manager = NULL;
 
 /**
- * @brief cmp_dpi_awareness_init
+ * @brief Initializes the global DPI awareness context for the application.
  *
  * @return Returns 0 on success, or an error code on failure.
  */
@@ -43,7 +43,7 @@ int cmp_dpi_awareness_init(void) {
 }
 
 /**
- * @brief cmp_dpi_awareness_cleanup
+ * @brief Cleans up and destroys the global DPI awareness context.
  *
  * @return Returns 0 on success, or an error code on failure.
  */

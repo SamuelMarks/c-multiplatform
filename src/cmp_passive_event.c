@@ -28,9 +28,7 @@ int cmp_ui_node_add_passive_listener(cmp_ui_node_t *node, uint32_t event_type,
                                      void (*callback)(cmp_event_t *,
                                                       cmp_ui_node_t *, void *),
                                      void *user_data) {
-  int rc;
-  rc = CMP_SUCCESS;
-
+  int rc = CMP_SUCCESS;
   if (!node || !callback) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_ui_node_add_passive_listener: Invalid argument\n");

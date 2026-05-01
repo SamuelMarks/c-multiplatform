@@ -14,11 +14,11 @@ struct cmp_ui_snackbar {
 };
 
 /**
- * @brief cmp_ui_snackbar_create
+ * @brief Creates a new UI snackbar alert component.
  *
- * @param out_snackbar Parameter description.
- * @param message Parameter description.
- * @param action_label Parameter description.
+ * @param out_snackbar Pointer to store the newly created snackbar context.
+ * @param message The alert text to display.
+ * @param action_label Optional action button label (or NULL for no button).
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
@@ -151,9 +151,9 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
 }
 
 /**
- * @brief cmp_ui_snackbar_destroy
+ * @brief Destroys a UI snackbar component and frees its resources.
  *
- * @param snackbar Parameter description.
+ * @param snackbar Pointer to the snackbar context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_snackbar_destroy(cmp_ui_snackbar_t *snackbar) {
@@ -189,10 +189,10 @@ int cmp_ui_snackbar_destroy(cmp_ui_snackbar_t *snackbar) {
 }
 
 /**
- * @brief cmp_ui_snackbar_get_node
+ * @brief Retrieves the root UI node of the snackbar component.
  *
- * @param snackbar Parameter description.
- * @param out_node Parameter description.
+ * @param snackbar Pointer to the snackbar context.
+ * @param out_node Pointer to store the root UI node pointer.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_snackbar_get_node(cmp_ui_snackbar_t *snackbar,
@@ -208,10 +208,10 @@ int cmp_ui_snackbar_get_node(cmp_ui_snackbar_t *snackbar,
 }
 
 /**
- * @brief cmp_ui_snackbar_set_message
+ * @brief Updates the text message displayed by the snackbar.
  *
- * @param snackbar Parameter description.
- * @param message Parameter description.
+ * @param snackbar Pointer to the snackbar context.
+ * @param message The new text message.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_snackbar_set_message(cmp_ui_snackbar_t *snackbar,
@@ -295,10 +295,10 @@ int cmp_ui_snackbar_set_message(cmp_ui_snackbar_t *snackbar,
 }
 
 /**
- * @brief cmp_ui_snackbar_set_action
+ * @brief Updates the action button label on the snackbar.
  *
- * @param snackbar Parameter description.
- * @param action_label Parameter description.
+ * @param snackbar Pointer to the snackbar context.
+ * @param action_label The new action button label.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_snackbar_set_action(cmp_ui_snackbar_t *snackbar,
@@ -346,10 +346,10 @@ int cmp_ui_snackbar_set_action(cmp_ui_snackbar_t *snackbar,
   return rc;
 }
 /**
- * @brief cmp_ui_snackbar_bind_a11y
+ * @brief Binds the snackbar to an accessibility tree as an alert.
  *
- * @param widget Parameter description.
- * @param tree Parameter description.
+ * @param widget Pointer to the snackbar context.
+ * @param tree Pointer to the accessibility tree.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_snackbar_bind_a11y(cmp_ui_snackbar_t *widget,

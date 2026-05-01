@@ -96,17 +96,18 @@ typedef BOOL(WINAPI *pfnSetWindowCompositionAttribute)(
 #endif
 
 /**
- * @brief Requests a specific Windows material effect for a window.
+ * @brief Request an OS-level window material composition (Mica/Acrylic) on Windows.
  *
  * @param materials The materials context.
  * @param window The window to apply the material to.
  * @param material The desired material effect.
- * @return Returns CMP_SUCCESS on success, or an error code on failure.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_win32_request_windows_material(cmp_materials_t *materials,
                                        cmp_window_t *window,
                                        cmp_windows_material_t material) {
-int rc = CMP_SUCCESS;HWND hwnd;
+  int rc = CMP_SUCCESS;
+  HWND hwnd;
   HMODULE hUser, hDwm;
   pfnSetWindowCompositionAttribute setWindowCompositionAttribute;
   pfnDwmSetWindowAttribute dwmSetWindowAttribute = NULL;
@@ -130,17 +131,19 @@ int rc = CMP_SUCCESS;HWND hwnd;
 
   hDwm = LoadLibraryA("dwmapi.dll");
   if (hDwm) {
-    dwmSetWindowAttribute = (pfnDwmSetWindowAttribute)GetProcAddress(
+    dwmSetWindowAttribute = (pfnDwmSetWindowAttribute)(void*)GetProcAddress(
         hDwm, "DwmSetWindowAttribute");
-    dwmEnableBlurBehindWindow = (pfnDwmEnableBlurBehindWindow)GetProcAddress(
+    dwmEnableBlurBehindWindow = (pfnDwmEnableBlurBehindWindow)(void*)GetProcAddress(
         hDwm, "DwmEnableBlurBehindWindow");
-    dwmExtendFrameIntoClientArea = (pfnDwmExtendFrameIntoClientArea)GetProcAddress(
+    dwmExtendFrameIntoClientArea = (pfnDwmExtendFrameIntoClientArea)(void*)GetProcAddress(
         hDwm, "DwmExtendFrameIntoClientArea");
   }
 
   if (dwmExtendFrameIntoClientArea && material != CMP_WINDOWS_MATERIAL_NONE) {
     MARGINS_DWM margins = {-1, -1, -1, -1};
-    dwmExtendFrameIntoClientArea(hwnd, &margins);
+    if (dwmExtendFrameIntoClientArea(hwnd, &margins) != S_OK) {
+        LOG_DEBUG("cmp_win32_request_windows_material: DwmExtendFrameIntoClientArea failed\n");
+    }
   }
 
   if (material == CMP_WINDOWS_MATERIAL_NONE) {
@@ -151,10 +154,13 @@ int rc = CMP_SUCCESS;HWND hwnd;
       bb.fEnable = FALSE;
       bb.hRgnBlur = NULL;
       bb.fTransitionOnMaximized = FALSE;
-      dwmEnableBlurBehindWindow(hwnd, &bb);
+      if (dwmEnableBlurBehindWindow(hwnd, &bb) != S_OK) {
+        LOG_DEBUG("cmp_win32_request_windows_material: DwmEnableBlurBehindWindow failed\n");
+      }
     }
-    if (hDwm)
+    if (hDwm) {
       FreeLibrary(hDwm);
+    }
     return rc;
   }
 
@@ -175,16 +181,18 @@ int rc = CMP_SUCCESS;HWND hwnd;
       /* First try newer Windows 11 API (System Backdrop Type) */
       if (dwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, &mica_type,
                                 sizeof(mica_type)) == S_OK) {
-        if (hDwm)
+        if (hDwm) {
           FreeLibrary(hDwm);
+        }
         return rc;
       }
 
       /* Fallback to older Windows 11 API (Mica Effect boolean) */
       if (dwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &true_val,
                                 sizeof(true_val)) == S_OK) {
-        if (hDwm)
+        if (hDwm) {
           FreeLibrary(hDwm);
+        }
         return rc;
       }
     }
@@ -194,7 +202,7 @@ int rc = CMP_SUCCESS;HWND hwnd;
   hUser = GetModuleHandleA("user32.dll");
   if (hUser) {
     setWindowCompositionAttribute =
-        (pfnSetWindowCompositionAttribute)GetProcAddress(
+        (pfnSetWindowCompositionAttribute)(void*)GetProcAddress(
             hUser, "SetWindowCompositionAttribute");
     if (setWindowCompositionAttribute) {
       ACCENT_POLICY policy;
@@ -215,8 +223,9 @@ int rc = CMP_SUCCESS;HWND hwnd;
       data.cbData = sizeof(policy);
 
       if (setWindowCompositionAttribute(hwnd, &data)) {
-        if (hDwm)
+        if (hDwm) {
           FreeLibrary(hDwm);
+        }
         return rc;
       }
     }
@@ -229,13 +238,33 @@ int rc = CMP_SUCCESS;HWND hwnd;
     bb.fEnable = TRUE;
     bb.hRgnBlur = NULL;
     bb.fTransitionOnMaximized = FALSE;
-    dwmEnableBlurBehindWindow(hwnd, &bb);
+    if (dwmEnableBlurBehindWindow(hwnd, &bb) != S_OK) {
+        LOG_DEBUG("cmp_win32_request_windows_material: DwmEnableBlurBehindWindow fallback failed\n");
+    }
   }
 
-  if (hDwm)
+  if (hDwm) {
     FreeLibrary(hDwm);
+  }
   
-  
+  return rc;
+}
+#else
+/**
+ * @brief Request an OS-level window material composition (Mica/Acrylic) on Windows (Stub).
+ *
+ * @param materials The materials context.
+ * @param window The window to apply the material to.
+ * @param material The desired material effect.
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_win32_request_windows_material(cmp_materials_t *materials,
+                                       cmp_window_t *window,
+                                       cmp_windows_material_t material) {
+  int rc = CMP_SUCCESS;
+  (void)materials;
+  (void)window;
+  (void)material;
   return rc;
 }
 #endif

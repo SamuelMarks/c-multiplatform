@@ -44,9 +44,7 @@ int cmp_interop_cfstring_bridge(void *cf_string_ref) {
  */
 int cmp_interop_allocate_retained_object(void **out_object)
     CMP_RETURNS_RETAINED {
-  int rc;
-  rc = CMP_SUCCESS;
-
+  int rc = CMP_SUCCESS;
   if (!out_object) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG(

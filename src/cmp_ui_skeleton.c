@@ -12,12 +12,12 @@ struct cmp_ui_skeleton {
 };
 
 /**
- * @brief cmp_ui_skeleton_create
+ * @brief Creates a new UI skeleton loading component.
  *
- * @param out_skeleton Parameter description.
- * @param width Parameter description.
- * @param height Parameter description.
- * @param base_color Parameter description.
+ * @param out_skeleton Pointer to store the newly created skeleton context.
+ * @param width The layout width of the skeleton.
+ * @param height The layout height of the skeleton.
+ * @param base_color The background base color (ARGB).
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_skeleton_create(cmp_ui_skeleton_t **out_skeleton, float width,
@@ -56,9 +56,9 @@ int cmp_ui_skeleton_create(cmp_ui_skeleton_t **out_skeleton, float width,
 }
 
 /**
- * @brief cmp_ui_skeleton_destroy
+ * @brief Destroys a UI skeleton component and frees its resources.
  *
- * @param skeleton Parameter description.
+ * @param skeleton Pointer to the skeleton context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_skeleton_destroy(cmp_ui_skeleton_t *skeleton) {
@@ -87,10 +87,10 @@ int cmp_ui_skeleton_destroy(cmp_ui_skeleton_t *skeleton) {
 }
 
 /**
- * @brief cmp_ui_skeleton_get_node
+ * @brief Retrieves the root UI node of the skeleton component.
  *
- * @param skeleton Parameter description.
- * @param out_node Parameter description.
+ * @param skeleton Pointer to the skeleton context.
+ * @param out_node Pointer to store the root UI node pointer.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_skeleton_get_node(cmp_ui_skeleton_t *skeleton,
@@ -106,10 +106,10 @@ int cmp_ui_skeleton_get_node(cmp_ui_skeleton_t *skeleton,
 }
 
 /**
- * @brief cmp_ui_skeleton_update
+ * @brief Updates the shimmer animation phase of the skeleton.
  *
- * @param skeleton Parameter description.
- * @param dt_ms Parameter description.
+ * @param skeleton Pointer to the skeleton context.
+ * @param dt_ms Delta time in milliseconds since the last update.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_skeleton_update(cmp_ui_skeleton_t *skeleton, float dt_ms) {

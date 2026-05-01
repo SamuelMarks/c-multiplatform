@@ -19,9 +19,9 @@ struct cmp_code_block {
 };
 
 /**
- * @brief cmp_code_block_create
+ * @brief Creates a new code block context.
  *
- * @param out_block Parameter description.
+ * @param out_block Pointer to store the newly allocated code block context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_code_block_create(cmp_code_block_t **out_block) {
@@ -67,9 +67,9 @@ int cmp_code_block_create(cmp_code_block_t **out_block) {
 }
 
 /**
- * @brief cmp_code_block_destroy
+ * @brief Destroys a code block context.
  *
- * @param block Parameter description.
+ * @param block Pointer to the code block context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_code_block_destroy(cmp_code_block_t *block) {
@@ -108,9 +108,9 @@ int cmp_code_block_destroy(cmp_code_block_t *block) {
 }
 
 /**
- * @brief cmp_code_block_toggle_fold
+ * @brief Toggles the folded state of a code block.
  *
- * @param block Parameter description.
+ * @param block Pointer to the code block context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_code_block_toggle_fold(cmp_code_block_t *block) {
@@ -137,10 +137,11 @@ int cmp_code_block_toggle_fold(cmp_code_block_t *block) {
 }
 
 /**
- * @brief cmp_code_block_is_expanded
+ * @brief Retrieves the expanded state of a code block.
  *
- * @param block Parameter description.
- * @param out_is_expanded Parameter description.
+ * @param block Pointer to the code block context.
+ * @param out_is_expanded Pointer to store the expansion state (1 if expanded, 0
+ * if folded).
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_code_block_is_expanded(const cmp_code_block_t *block,
@@ -168,12 +169,12 @@ int cmp_code_block_is_expanded(const cmp_code_block_t *block,
 }
 
 /**
- * @brief cmp_code_block_add_reference_highlight
+ * @brief Adds a highlight reference to a specific portion of the code block.
  *
- * @param block Parameter description.
- * @param offset Parameter description.
- * @param length Parameter description.
- * @param reference_id Parameter description.
+ * @param block Pointer to the code block context.
+ * @param offset Character offset where the highlight begins.
+ * @param length Length of the highlight in characters.
+ * @param reference_id The string identifier of the reference.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_code_block_add_reference_highlight(cmp_code_block_t *block,

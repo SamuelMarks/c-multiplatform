@@ -10,9 +10,9 @@ struct cmp_wayland_protocols {
 };
 
 /**
- * @brief cmp_wayland_protocols_create
+ * @brief Creates the Wayland protocols manager.
  *
- * @param out_protocols Parameter description.
+ * @param out_protocols Pointer to receive the manager.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_wayland_protocols_create(cmp_wayland_protocols_t **out_protocols) {
@@ -27,7 +27,6 @@ int cmp_wayland_protocols_create(cmp_wayland_protocols_t **out_protocols) {
   rc = CMP_MALLOC(sizeof(cmp_wayland_protocols_t), (void **)&p);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_wayland_protocols_create: OOM\n");
-
     return rc;
   }
 
@@ -39,9 +38,9 @@ int cmp_wayland_protocols_create(cmp_wayland_protocols_t **out_protocols) {
 }
 
 /**
- * @brief cmp_wayland_protocols_destroy
+ * @brief Destroys the Wayland protocols manager.
  *
- * @param protocols Parameter description.
+ * @param protocols The manager.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_wayland_protocols_destroy(cmp_wayland_protocols_t *protocols) {
@@ -55,17 +54,17 @@ int cmp_wayland_protocols_destroy(cmp_wayland_protocols_t *protocols) {
   rc = CMP_FREE(protocols);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_wayland_protocols_destroy: CMP_FREE failed\n");
-
     return rc;
   }
   return rc;
 }
 
 /**
- * @brief cmp_wayland_protocols_bind
+ * @brief Binds required protocols like wp_fractional_scale_v1 and
+ * xdg_decoration.
  *
- * @param protocols Parameter description.
- * @param window Parameter description.
+ * @param protocols The manager.
+ * @param window The window context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_wayland_protocols_bind(cmp_wayland_protocols_t *protocols,

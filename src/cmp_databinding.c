@@ -20,10 +20,10 @@ struct cmp_databinding_s {
 };
 
 /**
- * @brief cmp_databinding_create
+ * @brief Creates a new databinding context.
  *
- * @param out_binding Parameter description.
- * @param type Parameter description.
+ * @param out_binding Pointer to store the newly created databinding context.
+ * @param type The type of data this binding will hold.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_databinding_create(cmp_databinding_t **out_binding,
@@ -54,9 +54,9 @@ int cmp_databinding_create(cmp_databinding_t **out_binding,
 }
 
 /**
- * @brief cmp_databinding_destroy
+ * @brief Destroys a databinding context and frees its resources.
  *
- * @param binding Parameter description.
+ * @param binding Pointer to the databinding context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_databinding_destroy(cmp_databinding_t *binding) {
@@ -122,10 +122,9 @@ int cmp_databinding_destroy(cmp_databinding_t *binding) {
 }
 
 /**
- * @brief notify_listeners
+ * @brief Internal helper to notify all registered listeners of a value change.
  *
- * @param binding Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param binding Pointer to the databinding context.
  */
 static void notify_listeners(cmp_databinding_t *binding) {
   size_t i;
@@ -137,10 +136,10 @@ static void notify_listeners(cmp_databinding_t *binding) {
 }
 
 /**
- * @brief cmp_databinding_set_string
+ * @brief Sets the string value of a databinding and notifies listeners.
  *
- * @param binding Parameter description.
- * @param val Parameter description.
+ * @param binding Pointer to the databinding context.
+ * @param val The new string value to set, or NULL to clear.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_databinding_set_string(cmp_databinding_t *binding, const char *val) {
@@ -213,10 +212,10 @@ int cmp_databinding_set_string(cmp_databinding_t *binding, const char *val) {
 }
 
 /**
- * @brief cmp_databinding_get_string
+ * @brief Gets the current string value of a databinding.
  *
- * @param binding Parameter description.
- * @param out_val Parameter description.
+ * @param binding Pointer to the databinding context.
+ * @param out_val Pointer to store the returned string pointer.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_databinding_get_string(cmp_databinding_t *binding,
@@ -236,10 +235,10 @@ int cmp_databinding_get_string(cmp_databinding_t *binding,
 }
 
 /**
- * @brief cmp_databinding_set_int
+ * @brief Sets the integer value of a databinding and notifies listeners.
  *
- * @param binding Parameter description.
- * @param val Parameter description.
+ * @param binding Pointer to the databinding context.
+ * @param val The new integer value.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_databinding_set_int(cmp_databinding_t *binding, int val) {
@@ -259,10 +258,10 @@ int cmp_databinding_set_int(cmp_databinding_t *binding, int val) {
 }
 
 /**
- * @brief cmp_databinding_get_int
+ * @brief Gets the current integer value of a databinding.
  *
- * @param binding Parameter description.
- * @param out_val Parameter description.
+ * @param binding Pointer to the databinding context.
+ * @param out_val Pointer to store the returned integer value.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_databinding_get_int(cmp_databinding_t *binding, int *out_val) {
@@ -281,11 +280,12 @@ int cmp_databinding_get_int(cmp_databinding_t *binding, int *out_val) {
 }
 
 /**
- * @brief cmp_databinding_add_listener
+ * @brief Registers a callback listener to be invoked on databinding value
+ * changes.
  *
- * @param binding Parameter description.
- * @param cb Parameter description.
- * @param user_data Parameter description.
+ * @param binding Pointer to the databinding context.
+ * @param cb The callback function to invoke.
+ * @param user_data Optional user context to pass to the callback.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_databinding_add_listener(cmp_databinding_t *binding,
@@ -362,11 +362,11 @@ typedef struct {
 } cmp_node_binding_ctx_t;
 
 /**
- * @brief node_binding_cb
+ * @brief Internal callback to handle updating a UI node property when a binding
+ * changes.
  *
- * @param binding Parameter description.
- * @param user_data Parameter description.
- * @return Returns 0 on success, or an error code on failure.
+ * @param binding Pointer to the databinding context that triggered the event.
+ * @param user_data The context containing the node and property mappings.
  */
 static void node_binding_cb(cmp_databinding_t *binding, void *user_data) {
   int rc = CMP_SUCCESS;
@@ -412,11 +412,12 @@ static void node_binding_cb(cmp_databinding_t *binding, void *user_data) {
 }
 
 /**
- * @brief cmp_ui_node_bind_generic
+ * @brief Binds a specific property of a generic UI node to a databinding
+ * context.
  *
- * @param node Parameter description.
- * @param binding Parameter description.
- * @param property_name Parameter description.
+ * @param node Pointer to the target UI node.
+ * @param binding Pointer to the databinding context to observe.
+ * @param property_name The name of the property being bound.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_node_bind_generic(cmp_ui_node_t *node, cmp_databinding_t *binding,

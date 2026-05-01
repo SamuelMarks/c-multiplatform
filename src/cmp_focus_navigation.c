@@ -11,10 +11,11 @@ struct cmp_focus_nav {
 };
 
 /**
- * @brief cmp_focus_nav_create
+ * @brief Creates a focus navigation context, binding it to an accessibility
+ * tree.
  *
- * @param tree Parameter description.
- * @param out_nav Parameter description.
+ * @param tree Pointer to the accessibility tree.
+ * @param out_nav Pointer to store the newly created focus navigation context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
@@ -68,9 +69,10 @@ int cmp_focus_nav_create(cmp_a11y_tree_t *tree, cmp_focus_nav_t **out_nav) {
 }
 
 /**
- * @brief cmp_focus_nav_destroy
+ * @brief Destroys a focus navigation context and frees its associated
+ * resources.
  *
- * @param nav Parameter description.
+ * @param nav Pointer to the focus navigation context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_focus_nav_destroy(cmp_focus_nav_t *nav) {
@@ -109,10 +111,11 @@ int cmp_focus_nav_destroy(cmp_focus_nav_t *nav) {
 }
 
 /**
- * @brief cmp_focus_nav_handle_tab
+ * @brief Handles spatial advancement triggered by the TAB key.
  *
- * @param nav Parameter description.
- * @param is_shift_pressed Parameter description.
+ * @param nav Pointer to the focus navigation context.
+ * @param is_shift_pressed 1 if the Shift key was pressed (for reverse tab), 0
+ * otherwise.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_focus_nav_handle_tab(cmp_focus_nav_t *nav, int is_shift_pressed) {

@@ -11,10 +11,10 @@ struct cmp_ui_tree_view {
 };
 
 /**
- * @brief cmp_ui_tree_view_create
+ * @brief Creates a new tree view component.
  *
- * @param out_tree_view Parameter description.
- * @param bg_color Parameter description.
+ * @param out_tree_view Pointer to store the created tree view handle.
+ * @param bg_color Background color of the tree view (ARGB).
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,

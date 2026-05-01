@@ -12,9 +12,9 @@ struct cmp_docking_framework {
 };
 
 /**
- * @brief cmp_docking_framework_create
+ * @brief Creates a new docking framework context.
  *
- * @param out_docking Parameter description.
+ * @param out_docking Pointer to store the newly created docking context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_docking_framework_create(cmp_docking_framework_t **out_docking) {
@@ -75,9 +75,9 @@ int cmp_docking_framework_create(cmp_docking_framework_t **out_docking) {
 }
 
 /**
- * @brief cmp_docking_framework_destroy
+ * @brief Destroys a docking framework context and frees its resources.
  *
- * @param docking Parameter description.
+ * @param docking Pointer to the docking framework context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_docking_framework_destroy(cmp_docking_framework_t *docking) {
@@ -126,12 +126,12 @@ int cmp_docking_framework_destroy(cmp_docking_framework_t *docking) {
 }
 
 /**
- * @brief cmp_docking_framework_register_panel
+ * @brief Registers a new tool panel with the docking framework.
  *
- * @param docking Parameter description.
- * @param id Parameter description.
- * @param title Parameter description.
- * @param default_pane Parameter description.
+ * @param docking Pointer to the docking framework context.
+ * @param id Unique identifier string for the panel.
+ * @param title The display title for the panel.
+ * @param default_pane The default pane to dock the panel into.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_docking_framework_register_panel(cmp_docking_framework_t *docking,
@@ -241,11 +241,11 @@ int cmp_docking_framework_register_panel(cmp_docking_framework_t *docking,
 }
 
 /**
- * @brief find_panel
+ * @brief Internal helper to locate a registered panel by its ID.
  *
- * @param docking Parameter description.
- * @param id Parameter description.
- * @param out_panel Parameter description.
+ * @param docking Pointer to the docking framework context.
+ * @param id The unique identifier string of the panel.
+ * @param out_panel Pointer to store the found panel pointer.
  * @return Returns 0 on success, or an error code on failure.
  */
 static int find_panel(const cmp_docking_framework_t *docking, const char *id,
@@ -263,7 +263,7 @@ static int find_panel(const cmp_docking_framework_t *docking, const char *id,
   for (i = 0; i < docking->count; i++) {
     if (docking->panels[i] != NULL && strcmp(docking->panels[i]->id, id) == 0) {
       *out_panel = docking->panels[i];
-      return rc;
+      return CMP_SUCCESS;
     }
   }
 
@@ -271,12 +271,12 @@ static int find_panel(const cmp_docking_framework_t *docking, const char *id,
 }
 
 /**
- * @brief cmp_docking_framework_float_panel
+ * @brief Floats a panel at specific coordinates on the screen.
  *
- * @param docking Parameter description.
- * @param id Parameter description.
- * @param x Parameter description.
- * @param y Parameter description.
+ * @param docking Pointer to the docking framework context.
+ * @param id The unique identifier string of the panel to float.
+ * @param x The target X coordinate for the floated panel.
+ * @param y The target Y coordinate for the floated panel.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_docking_framework_float_panel(cmp_docking_framework_t *docking,
@@ -319,11 +319,11 @@ int cmp_docking_framework_float_panel(cmp_docking_framework_t *docking,
 }
 
 /**
- * @brief cmp_docking_framework_dock_panel
+ * @brief Docks a panel into a specified pane.
  *
- * @param docking Parameter description.
- * @param id Parameter description.
- * @param pane Parameter description.
+ * @param docking Pointer to the docking framework context.
+ * @param id The unique identifier string of the panel to dock.
+ * @param pane The target pane to dock the panel into.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_docking_framework_dock_panel(cmp_docking_framework_t *docking,
@@ -365,11 +365,11 @@ int cmp_docking_framework_dock_panel(cmp_docking_framework_t *docking,
 }
 
 /**
- * @brief cmp_docking_framework_get_panel
+ * @brief Retrieves a pointer to a registered panel by its ID.
  *
- * @param docking Parameter description.
- * @param id Parameter description.
- * @param out_panel Parameter description.
+ * @param docking Pointer to the docking framework context.
+ * @param id The unique identifier string of the panel to retrieve.
+ * @param out_panel Pointer to store the retrieved panel pointer.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_docking_framework_get_panel(const cmp_docking_framework_t *docking,

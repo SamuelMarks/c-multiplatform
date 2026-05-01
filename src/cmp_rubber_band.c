@@ -14,9 +14,9 @@ struct cmp_rubber_band {
 };
 
 /**
- * @brief cmp_rubber_band_create
+ * @brief Creates a new rubber band spring physics context.
  *
- * @param out_band Parameter description.
+ * @param out_band Pointer to store the newly created context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_rubber_band_create(cmp_rubber_band_t **out_band) {
@@ -40,9 +40,9 @@ int cmp_rubber_band_create(cmp_rubber_band_t **out_band) {
 }
 
 /**
- * @brief cmp_rubber_band_destroy
+ * @brief Destroys a rubber band context and frees its resources.
  *
- * @param band Parameter description.
+ * @param band Pointer to the rubber band context.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_rubber_band_destroy(cmp_rubber_band_t *band) {
@@ -59,11 +59,12 @@ int cmp_rubber_band_destroy(cmp_rubber_band_t *band) {
 }
 
 /**
- * @brief cmp_rubber_band_start
+ * @brief Initializes the rubber band physics state with an initial velocity and
+ * position.
  *
- * @param band Parameter description.
- * @param initial_velocity Parameter description.
- * @param current_position Parameter description.
+ * @param band Pointer to the rubber band context.
+ * @param initial_velocity The starting velocity (e.g., from a flick gesture).
+ * @param current_position The starting position.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_rubber_band_start(cmp_rubber_band_t *band, float initial_velocity,
@@ -80,13 +81,15 @@ int cmp_rubber_band_start(cmp_rubber_band_t *band, float initial_velocity,
 }
 
 /**
- * @brief cmp_rubber_band_step
+ * @brief Steps the rubber band physics simulation forward by a delta time.
  *
- * @param band Parameter description.
- * @param dt_ms Parameter description.
- * @param target_rest_position Parameter description.
- * @param out_current_position Parameter description.
- * @param out_is_resting Parameter description.
+ * @param band Pointer to the rubber band context.
+ * @param dt_ms Delta time in milliseconds since the last step.
+ * @param target_rest_position The target position the spring is pulling
+ * towards.
+ * @param out_current_position Pointer to store the new calculated position.
+ * @param out_is_resting Pointer to store a boolean indicating if the spring has
+ * come to rest (1) or is still moving (0).
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_rubber_band_step(cmp_rubber_band_t *band, float dt_ms,

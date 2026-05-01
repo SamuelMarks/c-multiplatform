@@ -12,12 +12,12 @@ struct cmp_ui_markdown {
 };
 
 /**
- * @brief cmp_ui_markdown_create
+ * @brief Creates a new UI markdown component.
  *
- * @param out_md Parameter description.
- * @param text Parameter description.
- * @param bg_color Parameter description.
- * @param text_color Parameter description.
+ * @param out_md Pointer to store the newly created markdown context.
+ * @param text The markdown source text to render.
+ * @param bg_color The background color.
+ * @param text_color The foreground text color.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
@@ -87,9 +87,9 @@ int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
 }
 
 /**
- * @brief cmp_ui_markdown_destroy
+ * @brief Destroys a UI markdown component and frees its resources.
  *
- * @param md Parameter description.
+ * @param md Pointer to the markdown context to destroy.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_markdown_destroy(cmp_ui_markdown_t *md) {
@@ -109,10 +109,10 @@ int cmp_ui_markdown_destroy(cmp_ui_markdown_t *md) {
 }
 
 /**
- * @brief cmp_ui_markdown_get_node
+ * @brief Retrieves the root UI node of the markdown component.
  *
- * @param md Parameter description.
- * @param out_node Parameter description.
+ * @param md Pointer to the markdown context.
+ * @param out_node Pointer to store the root UI node pointer.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_markdown_get_node(cmp_ui_markdown_t *md, cmp_ui_node_t **out_node) {
@@ -126,10 +126,10 @@ int cmp_ui_markdown_get_node(cmp_ui_markdown_t *md, cmp_ui_node_t **out_node) {
 }
 
 /**
- * @brief cmp_ui_markdown_set_text
+ * @brief Updates the markdown text for the component.
  *
- * @param md Parameter description.
- * @param text Parameter description.
+ * @param md Pointer to the markdown context.
+ * @param text The new markdown source text.
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_markdown_set_text(cmp_ui_markdown_t *md, const char *text) {
