@@ -114,6 +114,7 @@ TEST test_undo_redo_overflow(void) {
   }
 
   res = cmp_undo_redo_undo(stack, buf, 32);
+  ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_STR_EQ("state11", buf);
 
   /* Undo all the way back */

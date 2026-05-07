@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(__linux__) && !defined(__ANDROID__)
+#if !defined(_WIN32) && !defined(__APPLE__) && !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
 
 /**
  * @brief cmp_system_theme_init
@@ -38,7 +38,7 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
 int rc = CMP_SUCCESS;FILE *fp;
   char buffer[128];
   
-  if (!out_is_dark) return -1;
+  if (!out_is_dark) return CMP_ERROR_INVALID_ARG;
   *out_is_dark = 0; /* Default to light */
   
   /* Try gsettings first, which is common on GNOME/GTK environments */
@@ -76,7 +76,7 @@ int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
 int rc = CMP_SUCCESS;FILE *fp;
   char buffer[128];
 
-  if (!out_is_high_contrast) return -1;
+  if (!out_is_high_contrast) return CMP_ERROR_INVALID_ARG;
   *out_is_high_contrast = 0; /* Default to off */
 
   fp = popen("gsettings get org.gnome.desktop.a11y.interface high-contrast 2>/dev/null", "r");
@@ -93,5 +93,5 @@ int rc = CMP_SUCCESS;FILE *fp;
   
   return rc;
 }
-#endif /* __linux__ */
+#endif /* !defined(_WIN32) && !defined(__APPLE__) && !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) */
 /* clang-format on */

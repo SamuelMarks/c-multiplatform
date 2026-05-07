@@ -392,6 +392,11 @@ SUITE(cmp_svg_suite) {
   RUN_TEST(test_svg_smil_tick);
   RUN_TEST(test_svg_foreign_bind);
   RUN_TEST(test_svg_filter_evaluate);
+  RUN_TEST(test_cmp_svg_path_tessellate_ear_clipping);
+  RUN_TEST(test_cmp_svg_renderer_bezier_subdivide);
+  RUN_TEST(test_cmp_svg_stroke_expand);
+  RUN_TEST(test_cmp_svg_fill_even_odd);
+  RUN_TEST(test_cmp_svg_path_morph);
 }
 
 GREATEST_MAIN_DEFS();

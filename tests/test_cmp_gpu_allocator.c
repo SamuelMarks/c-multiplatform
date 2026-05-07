@@ -63,7 +63,7 @@ TEST test_dynamic_atlas(void) {
 TEST test_texture_compression(void) {
   void *rgba = NULL;
   int w, h;
-  char mock_data[1024];
+  char mock_data[1024] = {0};
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_tex_compression_decode_astc(mock_data, 1024, &rgba, &w, &h));

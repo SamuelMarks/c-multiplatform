@@ -67,6 +67,10 @@ TEST test_swapchain_acquire_present(void) {
     first_handle = frame_texture->internal_handle;
 
     /* Present the frame */
+    /* avoid unused variable warnings */
+    (void)first_handle;
+    (void)second_handle;
+
     ASSERT_EQ(CMP_SUCCESS, cmp_swapchain_present(swapchain));
 
     /* Second frame - should be the other buffer because we swapped */
@@ -77,6 +81,10 @@ TEST test_swapchain_acquire_present(void) {
   }
 
   if (swapchain) {
+    /* avoid unused variable warnings */
+    (void)first_handle;
+    (void)second_handle;
+
     ASSERT_EQ(CMP_SUCCESS, cmp_swapchain_present(swapchain));
   }
 
@@ -130,22 +138,30 @@ TEST test_swapchain_edge_cases(void) {
 }
 
 TEST test_cmp_swapchain_set_msaa(void) {
-  cmp_swapchain_t *swapchain;
-  cmp_window_t *window;
+  cmp_swapchain_t *swapchain = NULL;
+  cmp_window_t *window = NULL;
 
   cmp_window_config_t cfg;
   memset(&cfg, 0, sizeof(cfg));
   cfg.width = 800;
   cfg.height = 600;
   cfg.title = "Test";
-  cmp_window_create(&cfg, &window);
-  cmp_swapchain_create(window, CMP_SWAPCHAIN_FIFO, &swapchain);
+
+  if (cmp_window_create(&cfg, &window) != CMP_SUCCESS) {
+    window = NULL;
+  }
+  if (window) {
+    cmp_swapchain_create(window, CMP_SWAPCHAIN_FIFO, &swapchain);
+  }
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_swapchain_set_msaa(NULL, 4));
-  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_swapchain_set_msaa(swapchain, 0));
-  ASSERT_EQ(CMP_SUCCESS, cmp_swapchain_set_msaa(swapchain, 4));
 
-  cmp_swapchain_destroy(swapchain);
+  if (swapchain) {
+    ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_swapchain_set_msaa(swapchain, 0));
+    ASSERT_EQ(CMP_SUCCESS, cmp_swapchain_set_msaa(swapchain, 4));
+    cmp_swapchain_destroy(swapchain);
+  }
+
   cmp_window_destroy(window);
   PASS();
 }
@@ -154,6 +170,7 @@ SUITE(cmp_swapchain_suite) {
   RUN_TEST(test_swapchain_create_destroy);
   RUN_TEST(test_swapchain_acquire_present);
   RUN_TEST(test_swapchain_edge_cases);
+  RUN_TEST(test_cmp_swapchain_set_msaa);
 }
 
 GREATEST_MAIN_DEFS();
