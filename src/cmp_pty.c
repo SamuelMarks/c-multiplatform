@@ -50,8 +50,7 @@ int cmp_pty_create(cmp_pty_t **out_pty, const char *command, int cols,
 #if defined(_MSC_VER)
   if (strncpy_s(pty->buffer, sizeof(pty->buffer), "Simulated PTY start",
                 _TRUNCATE) != 0) {
-    int free_rc = CMP_FREE(pty);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(pty) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_pty_create: CMP_FREE failed during recovery\n");
     }
     rc = CMP_ERROR_GENERAL;

@@ -207,11 +207,12 @@ int cmp_ui_tooltip_set_text(cmp_ui_tooltip_t *tooltip, const char *text) {
  */
 int cmp_ui_tooltip_bind_a11y(cmp_ui_tooltip_t *widget, cmp_a11y_tree_t *tree) {
   int rc = CMP_SUCCESS;
+  int err;
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
-  int err = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id,
-                                   "tooltip", "Tooltip");
+  err = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "tooltip",
+                               "Tooltip");
   if (err != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_tooltip_bind_a11y: cmp_a11y_tree_add_node failed\n");
   }

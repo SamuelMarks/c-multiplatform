@@ -7,6 +7,7 @@ int main(int argc, char **argv) {
   int rc = 0;
   cmp_app_config_t config;
   int err;
+  cmp_modality_t mod;
 
   (void)argc;
   (void)argv;
@@ -22,7 +23,6 @@ int main(int argc, char **argv) {
   }
 
   /* Set the Modality to SYNC_MULTI */
-  cmp_modality_t mod;
   cmp_modality_sync_multi_init(&mod, 4); /* 4 background threads */
 
   printf("Starting UI in SYNC_MULTI modality with 4 worker threads...\n");

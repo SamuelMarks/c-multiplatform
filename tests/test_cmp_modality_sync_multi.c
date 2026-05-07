@@ -10,7 +10,9 @@ __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 long _InterlockedIncrement(long volatile *Addend);
 #pragma intrinsic(_InterlockedIncrement)
 #else
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #endif
 /* clang-format on */
 

@@ -52,11 +52,9 @@ int cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
   /* Create a container box for the segments */
   err = cmp_ui_box_create(&btn->node_root);
   if (err != CMP_SUCCESS) {
-    int free_rc = CMP_FREE(btn->segments);
-    if (free_rc != CMP_SUCCESS)
+    if (CMP_FREE(btn->segments) != CMP_SUCCESS)
       LOG_DEBUG("cmp_ui_segmented_button_create: CMP_FREE failed\n");
-    free_rc = CMP_FREE(btn);
-    if (free_rc != CMP_SUCCESS)
+    if (CMP_FREE(btn) != CMP_SUCCESS)
       LOG_DEBUG("cmp_ui_segmented_button_create: CMP_FREE failed\n");
     return err;
   }
@@ -86,13 +84,11 @@ int cmp_ui_segmented_button_destroy(cmp_ui_segmented_button_t *btn) {
   }
 
   if (btn->segments) {
-    int free_rc = CMP_FREE(btn->segments);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(btn->segments) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_segmented_button_destroy: CMP_FREE segments failed\n");
     }
   }
-  int free_rc = CMP_FREE(btn);
-  if (free_rc != CMP_SUCCESS) {
+  if (CMP_FREE(btn) != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_segmented_button_destroy: CMP_FREE btn failed\n");
   }
 
@@ -147,8 +143,7 @@ int cmp_ui_segmented_button_add_segment(cmp_ui_segmented_button_t *btn,
     }
     memcpy(new_segs, btn->segments,
            sizeof(cmp_ui_segment_t) * btn->segment_count);
-    int free_rc = CMP_FREE(btn->segments);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(btn->segments) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_segmented_button_add_segment: CMP_FREE failed\n");
     }
     btn->segments = new_segs;

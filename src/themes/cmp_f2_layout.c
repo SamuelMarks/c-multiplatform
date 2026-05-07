@@ -14,8 +14,7 @@
  */
 int CMP_API cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
                                 float spacing_token) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   int res;
   if (!out_node) {
     return CMP_ERROR_INVALID_ARG;
@@ -54,8 +53,7 @@ int CMP_API cmp_f2_stack_create(cmp_ui_node_t **out_node, int horizontal,
  */
 int CMP_API cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
                                float vertical_gap) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   int res;
   if (!out_node) {
     return CMP_ERROR_INVALID_ARG;
@@ -98,8 +96,7 @@ int CMP_API cmp_f2_wrap_create(cmp_ui_node_t **out_node, float horizontal_gap,
  */
 int CMP_API cmp_f2_grid_create(cmp_ui_node_t **out_node, int columns,
                                float column_gap, float row_gap) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   int res;
   if (!out_node) {
     return CMP_ERROR_INVALID_ARG;

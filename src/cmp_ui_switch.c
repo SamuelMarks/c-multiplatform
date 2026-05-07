@@ -34,8 +34,7 @@ int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
   /* Create the track background */
   err = cmp_ui_box_create(&sw->node_root);
   if (err != CMP_SUCCESS) {
-    int free_rc = CMP_FREE(sw);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(sw) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_switch_create: CMP_FREE sw failed\n");
     }
     return err;
@@ -52,8 +51,7 @@ int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
   err = cmp_ui_box_create(&sw->node_thumb);
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(sw->node_root);
-    int free_rc = CMP_FREE(sw);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(sw) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_switch_create: CMP_FREE sw failed\n");
     }
     return err;
@@ -85,12 +83,10 @@ int cmp_ui_switch_destroy(cmp_ui_switch_t *sw) {
   if (!sw) {
     return CMP_ERROR_INVALID_ARG;
   }
-  int free_rc = CMP_FREE(sw);
-  if (free_rc != CMP_SUCCESS) {
+  if (CMP_FREE(sw) != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_switch_destroy: CMP_FREE sw failed\n");
   }
 
-  rc = free_rc;
   return rc;
 }
 
@@ -144,11 +140,12 @@ int cmp_ui_switch_set_on(cmp_ui_switch_t *sw, int is_on) {
  */
 int cmp_ui_switch_bind_a11y(cmp_ui_switch_t *widget, cmp_a11y_tree_t *tree) {
   int rc = CMP_SUCCESS;
+  int err;
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
-  int err = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id,
-                                   "switch", "Switch");
+  err = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "switch",
+                               "Switch");
   if (err != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_switch_bind_a11y: cmp_a11y_tree_add_node failed\n");
   }

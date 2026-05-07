@@ -720,8 +720,9 @@ static __inline int cmp_atomic_load(cmp_atomic_int_t *obj) {
 #elif defined(_MSC_VER) && !defined(__clang__)
 static __inline int cmp_atomic_load(cmp_atomic_int_t *obj) {
   int rc;
+  long res;
   rc = 0;
-  long res = _InterlockedExchangeAdd(&obj->val, 0);
+  res = _InterlockedExchangeAdd(&obj->val, 0);
   if (rc != 0) {
     if (rc != 0) {
       return rc;

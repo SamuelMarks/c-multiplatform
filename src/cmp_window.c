@@ -159,9 +159,9 @@ static HRESULT STDMETHODCALLTYPE drop_target_query_interface(IDropTarget *This,
 
 static ULONG STDMETHODCALLTYPE drop_target_add_ref(IDropTarget *This) {
   int rc = CMP_SUCCESS;
+  cmp_drop_target_t *dt;
   (void)rc;
-  cmp_drop_target_t *dt = (cmp_drop_target_t *)This;
-
+  dt = (cmp_drop_target_t *)This;
   return ++dt->ref_count;
 }
 
@@ -174,9 +174,11 @@ static ULONG STDMETHODCALLTYPE drop_target_add_ref(IDropTarget *This) {
 
 static ULONG STDMETHODCALLTYPE drop_target_release(IDropTarget *This) {
   int rc = CMP_SUCCESS;
+  cmp_drop_target_t *dt;
+  ULONG count;
   (void)rc;
-  cmp_drop_target_t *dt = (cmp_drop_target_t *)This;
-  ULONG count = --dt->ref_count;
+  dt = (cmp_drop_target_t *)This;
+  count = --dt->ref_count;
   if (count == 0) {
     CMP_FREE(dt->lpVtbl);
     CMP_FREE(dt);
@@ -263,10 +265,16 @@ static HRESULT STDMETHODCALLTYPE drop_target_drop(IDropTarget *This,
                                                   DWORD grfKeyState, POINTL pt,
                                                   DWORD *pdwEffect) {
   int rc = CMP_SUCCESS;
-  (void)rc;
-  cmp_drop_target_t *dt = (cmp_drop_target_t *)This;
-  FORMATETC fmt = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+  cmp_drop_target_t *dt;
+  FORMATETC fmt;
   STGMEDIUM stg;
+  (void)rc;
+  dt = (cmp_drop_target_t *)This;
+  fmt.cfFormat = CF_HDROP;
+  fmt.ptd = NULL;
+  fmt.dwAspect = DVASPECT_CONTENT;
+  fmt.lindex = -1;
+  fmt.tymed = TYMED_HGLOBAL;
 
   (void)grfKeyState;
   (void)pt;
@@ -275,8 +283,9 @@ static HRESULT STDMETHODCALLTYPE drop_target_drop(IDropTarget *This,
   if (dt->window && dt->window->drop_cb &&
       pDataObj->lpVtbl->GetData(pDataObj, &fmt, &stg) == S_OK) {
     HDROP hDrop = (HDROP)stg.hGlobal;
-    UINT count = DragQueryFileA(hDrop, 0xFFFFFFFF, NULL, 0);
+    UINT count;
     UINT i;
+    count = DragQueryFileA(hDrop, 0xFFFFFFFF, NULL, 0);
     for (i = 0; i < count; i++) {
       char path[MAX_PATH];
       if (DragQueryFileA(hDrop, i, path, MAX_PATH)) {
@@ -543,6 +552,8 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
                                                                 : RGB(r, g, b))
                   : (HBRUSH)GetStockObject(NULL_BRUSH);
         HPEN pen = NULL;
+        HBRUSH old_br;
+        HPEN old_pen;
         if (node->border_width > 0.0f) {
           uint8_t pr = (border_color_val >> 16) & 0xFF;
           uint8_t pg = (border_color_val >> 8) & 0xFF;
@@ -553,8 +564,8 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         } else {
           pen = CreatePen(PS_NULL, 0, RGB(0, 0, 0));
         }
-        HBRUSH old_br = (HBRUSH)SelectObject(hdc, br);
-        HPEN old_pen = (HPEN)SelectObject(hdc, pen);
+        old_br = (HBRUSH)SelectObject(hdc, br);
+        old_pen = (HPEN)SelectObject(hdc, pen);
         if (node->border_radius > 0.0f || node->type == 8) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
           RoundRect(hdc, ix, iy, ix + iw + 1, iy + ih + 1, radius, radius);
@@ -1022,8 +1033,9 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
 static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
                                     LPARAM lParam) {
   int rc = CMP_SUCCESS;
+  cmp_window_t *window;
   (void)rc;
-  cmp_window_t *window = (cmp_window_t *)GetWindowLongPtrA(hwnd, GWLP_USERDATA);
+  window = (cmp_window_t *)GetWindowLongPtrA(hwnd, GWLP_USERDATA);
 
   switch (uMsg) {
   case WM_CREATE: {
@@ -1359,8 +1371,8 @@ int cmp_window_system_shutdown(void) {
 int cmp_window_create(const cmp_window_config_t *config,
                       cmp_window_t **out_window) {
   int rc = CMP_SUCCESS;
-  (void)rc;
   cmp_window_t *window;
+  (void)rc;
 
   if (config == NULL || out_window == NULL || !g_window_initialized) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -1754,8 +1766,8 @@ int cmp_hardware_trigger_haptic(int index, float low_frequency,
  */
 int cmp_hardware_camera_start(int device_index, cmp_camera_t **out_camera) {
   int rc = CMP_SUCCESS;
-  (void)rc;
   cmp_camera_t *camera;
+  (void)rc;
   if (out_camera == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (CMP_MALLOC(sizeof(cmp_camera_t), (void **)&camera) != CMP_SUCCESS)
@@ -2393,8 +2405,8 @@ struct cmp_renderer {
 int cmp_renderer_create(cmp_window_t *window, cmp_render_backend_t backend,
                         cmp_renderer_t **out_renderer) {
   int rc = CMP_SUCCESS;
-  (void)rc;
   cmp_renderer_t *renderer;
+  (void)rc;
 
   if (window == NULL || out_renderer == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -2542,8 +2554,8 @@ int cmp_renderer_set_render_target(cmp_renderer_t *renderer,
 int cmp_texture_create(cmp_renderer_t *renderer, int width, int height,
                        const void *pixels, cmp_texture_t **out_texture) {
   int rc = CMP_SUCCESS;
-  (void)rc;
   cmp_texture_t *texture;
+  (void)rc;
 
   if (renderer == NULL || out_texture == NULL) {
     return CMP_ERROR_INVALID_ARG;
@@ -2619,10 +2631,10 @@ int cmp_typography_shutdown(void) {
 int cmp_font_load(const char *virtual_path, float default_size,
                   cmp_font_t **out_font) {
   int rc = CMP_SUCCESS;
-  (void)rc;
   cmp_font_t *font;
   void *buffer = NULL;
   size_t size = 0;
+  (void)rc;
   if (virtual_path == NULL || out_font == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (CMP_MALLOC(sizeof(cmp_font_t), (void **)&font) != CMP_SUCCESS)
@@ -2662,8 +2674,8 @@ int cmp_font_load(const char *virtual_path, float default_size,
 int cmp_font_load_memory(const void *buffer, size_t size, float default_size,
                          cmp_font_t **out_font) {
   int rc = CMP_SUCCESS;
-  (void)rc;
   cmp_font_t *font;
+  (void)rc;
   if (buffer == NULL || size == 0 || out_font == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (CMP_MALLOC(sizeof(cmp_font_t), (void **)&font) != CMP_SUCCESS)
@@ -2973,8 +2985,8 @@ int cmp_audio_shutdown(void) {
 int cmp_audio_buffer_load(const char *virtual_path,
                           cmp_audio_buffer_t **out_buffer) {
   int rc = CMP_SUCCESS;
-  (void)rc;
   cmp_audio_buffer_t *buffer;
+  (void)rc;
   if (virtual_path == NULL || out_buffer == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (CMP_MALLOC(sizeof(cmp_audio_buffer_t), (void **)&buffer) != CMP_SUCCESS)
@@ -3013,8 +3025,8 @@ int cmp_audio_buffer_destroy(cmp_audio_buffer_t *buffer) {
 int cmp_audio_source_create(cmp_audio_buffer_t *buffer,
                             cmp_audio_source_t **out_source) {
   int rc = CMP_SUCCESS;
-  (void)rc;
   cmp_audio_source_t *source;
+  (void)rc;
   if (buffer == NULL || out_source == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (CMP_MALLOC(sizeof(cmp_audio_source_t), (void **)&source) != CMP_SUCCESS)
@@ -3095,8 +3107,8 @@ int cmp_audio_source_destroy(cmp_audio_source_t *source) {
 int cmp_video_decoder_open(const char *virtual_path,
                            cmp_video_decoder_t **out_decoder) {
   int rc = CMP_SUCCESS;
-  (void)rc;
   cmp_video_decoder_t *decoder;
+  (void)rc;
   if (virtual_path == NULL || out_decoder == NULL)
     return CMP_ERROR_INVALID_ARG;
   if (CMP_MALLOC(sizeof(cmp_video_decoder_t), (void **)&decoder) != CMP_SUCCESS)

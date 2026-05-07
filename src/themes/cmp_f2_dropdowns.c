@@ -15,8 +15,7 @@
  */
 int CMP_API cmp_f2_dropdown_create(cmp_ui_node_t **out_node,
                                    cmp_f2_dropdown_selection_mode_t mode) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_dropdown_t *data;
   int res;
 
@@ -90,8 +89,7 @@ int CMP_API cmp_f2_dropdown_create(cmp_ui_node_t **out_node,
  */
 int CMP_API cmp_f2_dropdown_set_variant(cmp_ui_node_t *node,
                                         cmp_f2_text_input_variant_t variant) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_dropdown_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_dropdown_set_variant: Invalid arg\n");
@@ -119,8 +117,7 @@ int CMP_API cmp_f2_dropdown_set_variant(cmp_ui_node_t *node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_dropdown_set_open(cmp_ui_node_t *node, int is_open) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_dropdown_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_dropdown_set_open: Invalid arg\n");
@@ -149,8 +146,7 @@ int CMP_API cmp_f2_dropdown_set_open(cmp_ui_node_t *node, int is_open) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_dropdown_set_disabled(cmp_ui_node_t *node, int is_disabled) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_dropdown_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_dropdown_set_disabled: Invalid arg\n");
@@ -178,8 +174,7 @@ int CMP_API cmp_f2_dropdown_set_disabled(cmp_ui_node_t *node, int is_disabled) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_combobox_create(cmp_ui_node_t **out_node, int is_freeform) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_combobox_t *data;
   int res;
 
@@ -240,8 +235,7 @@ int CMP_API cmp_f2_combobox_create(cmp_ui_node_t **out_node, int is_freeform) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_combobox_set_open(cmp_ui_node_t *node, int is_open) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_combobox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_combobox_set_open: Invalid arg\n");
@@ -269,8 +263,7 @@ int CMP_API cmp_f2_combobox_set_open(cmp_ui_node_t *node, int is_open) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_combobox_set_disabled(cmp_ui_node_t *node, int is_disabled) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_combobox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_combobox_set_disabled: Invalid arg\n");
@@ -297,8 +290,7 @@ int CMP_API cmp_f2_combobox_set_disabled(cmp_ui_node_t *node, int is_disabled) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_listbox_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   int res;
   if (!out_node) {
     LOG_DEBUG("cmp_f2_listbox_create: out_node is NULL\n");
@@ -329,8 +321,7 @@ int CMP_API cmp_f2_listbox_create(cmp_ui_node_t **out_node) {
  */
 int CMP_API cmp_f2_listbox_option_create(cmp_ui_node_t **out_node,
                                          const char *label) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_listbox_option_t *data;
   int res;
 
@@ -392,8 +383,7 @@ int CMP_API cmp_f2_listbox_option_create(cmp_ui_node_t **out_node,
  */
 int CMP_API cmp_f2_listbox_option_set_selected(cmp_ui_node_t *node,
                                                int is_selected) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_listbox_option_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_listbox_option_set_selected: Invalid arg\n");
@@ -422,8 +412,7 @@ int CMP_API cmp_f2_listbox_option_set_selected(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_listbox_option_set_disabled(cmp_ui_node_t *node,
                                                int is_disabled) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_listbox_option_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_listbox_option_set_disabled: Invalid arg\n");
@@ -452,8 +441,7 @@ int CMP_API cmp_f2_listbox_option_set_disabled(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_listbox_group_create(cmp_ui_node_t **out_node,
                                         const char *header_label) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   int res;
   cmp_ui_node_t *header_node = NULL;
 
@@ -501,8 +489,7 @@ int CMP_API cmp_f2_listbox_group_create(cmp_ui_node_t **out_node,
  */
 int CMP_API cmp_f2_color_picker_create(cmp_ui_node_t **out_node,
                                        uint32_t initial_color) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_color_picker_t *data;
   int res;
 
@@ -552,8 +539,7 @@ int CMP_API cmp_f2_color_picker_create(cmp_ui_node_t **out_node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_color_picker_set_color(cmp_ui_node_t *node, uint32_t color) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_color_picker_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_color_picker_set_color: Invalid arg\n");
@@ -580,8 +566,7 @@ int CMP_API cmp_f2_color_picker_set_color(cmp_ui_node_t *node, uint32_t color) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_calendar_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_calendar_t *data;
   int res;
 
@@ -634,8 +619,7 @@ int CMP_API cmp_f2_calendar_create(cmp_ui_node_t **out_node) {
  */
 int CMP_API cmp_f2_calendar_set_view(cmp_ui_node_t *node,
                                      cmp_f2_calendar_view_t view) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_calendar_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_calendar_set_view: Invalid arg\n");
@@ -666,8 +650,7 @@ int CMP_API cmp_f2_calendar_set_view(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_calendar_set_date(cmp_ui_node_t *node, int year, int month,
                                      int day) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_calendar_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_calendar_set_date: Invalid arg\n");
@@ -696,8 +679,7 @@ int CMP_API cmp_f2_calendar_set_date(cmp_ui_node_t *node, int year, int month,
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_date_picker_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_date_picker_t *data;
   int res;
 
@@ -756,8 +738,7 @@ int CMP_API cmp_f2_date_picker_create(cmp_ui_node_t **out_node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_date_picker_set_open(cmp_ui_node_t *node, int is_open) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_date_picker_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_date_picker_set_open: Invalid arg\n");
@@ -784,8 +765,7 @@ int CMP_API cmp_f2_date_picker_set_open(cmp_ui_node_t *node, int is_open) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_time_picker_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_time_picker_t *data;
   int res;
 
@@ -840,8 +820,7 @@ int CMP_API cmp_f2_time_picker_create(cmp_ui_node_t **out_node) {
  */
 int CMP_API cmp_f2_time_picker_set_time(cmp_ui_node_t *node, int hour,
                                         int minute, int is_pm) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_time_picker_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_time_picker_set_time: Invalid arg\n");

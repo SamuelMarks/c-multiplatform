@@ -26,7 +26,7 @@ int cmp_win32_init_touch_ink(void) {
   user32 = (void *)GetModuleHandleA("user32.dll");
   if (user32) {
     enable_mouse_in_pointer =
-        (EnableMouseInPointer_fn)GetProcAddress((HMODULE)user32, "EnableMouseInPointer");
+        (EnableMouseInPointer_fn)(INT_PTR)GetProcAddress((HMODULE)user32, "EnableMouseInPointer");
     if (enable_mouse_in_pointer) {
       if (!enable_mouse_in_pointer(1)) {
         LOG_DEBUG("cmp_win32_init_touch_ink: EnableMouseInPointer failed\n");

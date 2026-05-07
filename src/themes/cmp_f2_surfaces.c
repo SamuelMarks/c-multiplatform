@@ -13,8 +13,7 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_card_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_card_t *data;
   int res;
 
@@ -68,8 +67,7 @@ int CMP_API cmp_f2_card_create(cmp_ui_node_t **out_node) {
  */
 int CMP_API cmp_f2_card_set_variant(cmp_ui_node_t *node,
                                     cmp_f2_card_variant_t variant) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_card_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_card_set_variant: Invalid arg\n");
@@ -98,8 +96,7 @@ int CMP_API cmp_f2_card_set_variant(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_card_set_orientation(cmp_ui_node_t *node,
                                         cmp_f2_card_orientation_t orientation) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_card_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_card_set_orientation: Invalid arg\n");
@@ -134,8 +131,7 @@ int CMP_API cmp_f2_card_set_orientation(cmp_ui_node_t *node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_card_set_clickable(cmp_ui_node_t *node, int is_clickable) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_card_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_card_set_clickable: Invalid arg\n");
@@ -162,8 +158,7 @@ int CMP_API cmp_f2_card_set_clickable(cmp_ui_node_t *node, int is_clickable) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_accordion_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_accordion_t *data;
   int res;
 
@@ -211,8 +206,7 @@ int CMP_API cmp_f2_accordion_create(cmp_ui_node_t **out_node) {
  */
 int CMP_API cmp_f2_accordion_set_variant(cmp_ui_node_t *node,
                                          cmp_f2_accordion_variant_t variant) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_accordion_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_accordion_set_variant: Invalid arg\n");
@@ -241,8 +235,7 @@ int CMP_API cmp_f2_accordion_set_variant(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_accordion_set_multi_expand(cmp_ui_node_t *node,
                                               int multi_expand) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_accordion_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_accordion_set_multi_expand: Invalid arg\n");
@@ -271,8 +264,7 @@ int CMP_API cmp_f2_accordion_set_multi_expand(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_accordion_panel_create(cmp_ui_node_t **out_node,
                                           const char *header_label) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_accordion_panel_t *data;
   int res;
 
@@ -334,8 +326,7 @@ int CMP_API cmp_f2_accordion_panel_create(cmp_ui_node_t **out_node,
  */
 int CMP_API cmp_f2_accordion_panel_set_expanded(cmp_ui_node_t *node,
                                                 int is_expanded) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_accordion_panel_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_accordion_panel_set_expanded: Invalid arg\n");
@@ -362,8 +353,7 @@ int CMP_API cmp_f2_accordion_panel_set_expanded(cmp_ui_node_t *node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_divider_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_divider_t *data;
   int res;
 
@@ -408,8 +398,7 @@ int CMP_API cmp_f2_divider_create(cmp_ui_node_t **out_node) {
 
 int CMP_API cmp_f2_divider_set_orientation(
     cmp_ui_node_t *node, cmp_f2_divider_orientation_t orientation) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_divider_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_divider_set_orientation: Invalid arg\n");
@@ -439,8 +428,7 @@ int CMP_API cmp_f2_divider_set_orientation(
 
 int CMP_API cmp_f2_divider_set_appearance(
     cmp_ui_node_t *node, cmp_f2_divider_appearance_t appearance) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_divider_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_divider_set_appearance: Invalid arg\n");
@@ -468,8 +456,7 @@ int CMP_API cmp_f2_divider_set_appearance(
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_divider_set_inset(cmp_ui_node_t *node, int is_inset) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_divider_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_divider_set_inset: Invalid arg\n");
@@ -496,8 +483,7 @@ int CMP_API cmp_f2_divider_set_inset(cmp_ui_node_t *node, int is_inset) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_split_view_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_split_view_t *data;
   int res;
 
@@ -547,8 +533,7 @@ int CMP_API cmp_f2_split_view_create(cmp_ui_node_t **out_node) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_scroll_view_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_scroll_view_t *data;
   int res;
 
@@ -594,8 +579,7 @@ int CMP_API cmp_f2_scroll_view_create(cmp_ui_node_t **out_node) {
 
 int CMP_API cmp_f2_scroll_view_set_behavior(
     cmp_ui_node_t *node, cmp_f2_scrollbar_behavior_t behavior) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_scroll_view_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_scroll_view_set_behavior: Invalid arg\n");
@@ -624,8 +608,7 @@ int CMP_API cmp_f2_scroll_view_set_behavior(
  */
 int CMP_API cmp_f2_scroll_view_set_overlay_mode(cmp_ui_node_t *node,
                                                 int is_overlay) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_scroll_view_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_scroll_view_set_overlay_mode: Invalid arg\n");

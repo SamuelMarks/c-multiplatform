@@ -131,11 +131,11 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
 
   hDwm = LoadLibraryA("dwmapi.dll");
   if (hDwm) {
-    dwmSetWindowAttribute = (pfnDwmSetWindowAttribute)(void*)GetProcAddress(
+    dwmSetWindowAttribute = (pfnDwmSetWindowAttribute)(INT_PTR)GetProcAddress(
         hDwm, "DwmSetWindowAttribute");
-    dwmEnableBlurBehindWindow = (pfnDwmEnableBlurBehindWindow)(void*)GetProcAddress(
+    dwmEnableBlurBehindWindow = (pfnDwmEnableBlurBehindWindow)(INT_PTR)GetProcAddress(
         hDwm, "DwmEnableBlurBehindWindow");
-    dwmExtendFrameIntoClientArea = (pfnDwmExtendFrameIntoClientArea)(void*)GetProcAddress(
+    dwmExtendFrameIntoClientArea = (pfnDwmExtendFrameIntoClientArea)(INT_PTR)GetProcAddress(
         hDwm, "DwmExtendFrameIntoClientArea");
   }
 
@@ -202,7 +202,7 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
   hUser = GetModuleHandleA("user32.dll");
   if (hUser) {
     setWindowCompositionAttribute =
-        (pfnSetWindowCompositionAttribute)(void*)GetProcAddress(
+        (pfnSetWindowCompositionAttribute)(INT_PTR)GetProcAddress(
             hUser, "SetWindowCompositionAttribute");
     if (setWindowCompositionAttribute) {
       ACCENT_POLICY policy;

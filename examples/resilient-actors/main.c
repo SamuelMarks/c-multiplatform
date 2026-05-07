@@ -7,6 +7,7 @@ int main(int argc, char **argv) {
   int rc = 0;
   cmp_app_config_t config;
   int err;
+  cmp_modality_t mod;
 
   (void)argc;
   (void)argv;
@@ -21,7 +22,6 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  cmp_modality_t mod;
   cmp_modality_multiprocess_init(&mod);
 
   printf("Starting UI in MULTIPROCESS_ACTOR modality...\n");

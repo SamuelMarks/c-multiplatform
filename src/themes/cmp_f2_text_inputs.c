@@ -13,8 +13,7 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_text_input_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_text_input_t *data;
   int res;
 
@@ -67,8 +66,7 @@ int CMP_API cmp_f2_text_input_create(cmp_ui_node_t **out_node) {
  */
 int CMP_API cmp_f2_text_input_set_variant(cmp_ui_node_t *node,
                                           cmp_f2_text_input_variant_t variant) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_text_input_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_text_input_set_variant: Invalid arg\n");
@@ -97,8 +95,7 @@ int CMP_API cmp_f2_text_input_set_variant(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_text_input_set_size(cmp_ui_node_t *node,
                                        cmp_f2_text_input_size_t size) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_text_input_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_text_input_set_size: Invalid arg\n");
@@ -127,8 +124,7 @@ int CMP_API cmp_f2_text_input_set_size(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_text_input_set_state(cmp_ui_node_t *node,
                                         cmp_f2_text_input_state_t state) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_text_input_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_text_input_set_state: Invalid arg\n");
@@ -157,8 +153,7 @@ int CMP_API cmp_f2_text_input_set_state(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_text_input_set_password_mode(cmp_ui_node_t *node,
                                                 int is_password) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_text_input_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_text_input_set_password_mode: Invalid arg\n");
@@ -186,8 +181,7 @@ int CMP_API cmp_f2_text_input_set_password_mode(cmp_ui_node_t *node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_textarea_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_textarea_t *data;
   int res;
 
@@ -240,8 +234,7 @@ int CMP_API cmp_f2_textarea_create(cmp_ui_node_t **out_node) {
  */
 int CMP_API cmp_f2_textarea_set_size(cmp_ui_node_t *node,
                                      cmp_f2_text_input_size_t size) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_textarea_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_textarea_set_size: Invalid arg\n");
@@ -270,8 +263,7 @@ int CMP_API cmp_f2_textarea_set_size(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_textarea_set_state(cmp_ui_node_t *node,
                                       cmp_f2_text_input_state_t state) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_textarea_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_textarea_set_state: Invalid arg\n");
@@ -293,8 +285,7 @@ int CMP_API cmp_f2_textarea_set_state(cmp_ui_node_t *node,
 
 int CMP_API cmp_f2_textarea_set_resize_mode(
     cmp_ui_node_t *node, cmp_f2_textarea_resize_t resize_mode) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_textarea_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_textarea_set_resize_mode: Invalid arg\n");
@@ -324,8 +315,7 @@ int CMP_API cmp_f2_textarea_set_resize_mode(
  */
 int CMP_API cmp_f2_textarea_set_auto_grow(cmp_ui_node_t *node, int auto_grow,
                                           float max_height) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_textarea_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_textarea_set_auto_grow: Invalid arg\n");
@@ -356,8 +346,7 @@ int CMP_API cmp_f2_textarea_set_auto_grow(cmp_ui_node_t *node, int auto_grow,
  */
 int CMP_API cmp_f2_field_create(cmp_ui_node_t **out_node,
                                 cmp_ui_node_t *input_node, const char *label) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_field_t *data;
   int res;
 
@@ -426,8 +415,7 @@ int CMP_API cmp_f2_field_create(cmp_ui_node_t **out_node,
  */
 int CMP_API cmp_f2_field_set_label_position(cmp_ui_node_t *node,
                                             cmp_f2_field_label_position_t pos) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_field_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_field_set_label_position: Invalid arg\n");
@@ -455,8 +443,7 @@ int CMP_API cmp_f2_field_set_label_position(cmp_ui_node_t *node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_field_set_required(cmp_ui_node_t *node, int is_required) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_field_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_field_set_required: Invalid arg\n");
@@ -485,8 +472,7 @@ int CMP_API cmp_f2_field_set_required(cmp_ui_node_t *node, int is_required) {
  */
 int CMP_API cmp_f2_field_set_help_text(cmp_ui_node_t *node,
                                        const char *help_text) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_field_t *data;
   int res;
   if (!node || !node->properties) {
@@ -521,8 +507,7 @@ int CMP_API cmp_f2_field_set_help_text(cmp_ui_node_t *node,
 
 int CMP_API cmp_f2_field_set_validation_message(
     cmp_ui_node_t *node, const char *message, cmp_f2_text_input_state_t state) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_field_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_field_set_validation_message: Invalid arg\n");
@@ -551,8 +536,7 @@ int CMP_API cmp_f2_field_set_validation_message(
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_searchbox_create(cmp_ui_node_t **out_node) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_searchbox_t *data;
   int res;
 
@@ -601,8 +585,7 @@ int CMP_API cmp_f2_searchbox_create(cmp_ui_node_t **out_node) {
  */
 int CMP_API cmp_f2_searchbox_set_size(cmp_ui_node_t *node,
                                       cmp_f2_text_input_size_t size) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_searchbox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_searchbox_set_size: Invalid arg\n");
@@ -631,8 +614,7 @@ int CMP_API cmp_f2_searchbox_set_size(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_searchbox_set_state(cmp_ui_node_t *node,
                                        cmp_f2_text_input_state_t state) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_searchbox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_searchbox_set_state: Invalid arg\n");
@@ -661,8 +643,7 @@ int CMP_API cmp_f2_searchbox_set_state(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_searchbox_set_collapsed_mode(cmp_ui_node_t *node,
                                                 int is_collapsed) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_searchbox_t *data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_searchbox_set_collapsed_mode: Invalid arg\n");

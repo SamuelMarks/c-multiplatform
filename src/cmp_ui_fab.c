@@ -60,8 +60,7 @@ int cmp_ui_fab_create(cmp_ui_fab_t **out_fab, const char *icon_name) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_fab_create: cmp_ui_button_create failed\n");
     if (fab->icon_name) {
-      int free_rc = CMP_FREE(fab->icon_name);
-      if (free_rc != CMP_SUCCESS)
+      if (CMP_FREE(fab->icon_name) != CMP_SUCCESS)
         LOG_DEBUG("cmp_ui_fab_create: CMP_FREE icon_name failed\n");
     }
     rc = CMP_FREE(fab);
@@ -88,8 +87,7 @@ int cmp_ui_fab_create(cmp_ui_fab_t **out_fab, const char *icon_name) {
     if (rc != CMP_SUCCESS)
       LOG_DEBUG("cmp_ui_fab_create: cmp_ui_node_destroy failed\n");
     if (fab->icon_name) {
-      int free_rc = CMP_FREE(fab->icon_name);
-      if (free_rc != CMP_SUCCESS)
+      if (CMP_FREE(fab->icon_name) != CMP_SUCCESS)
         LOG_DEBUG("cmp_ui_fab_create: CMP_FREE icon_name failed\n");
     }
     rc = CMP_FREE(fab);

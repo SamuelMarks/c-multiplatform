@@ -145,8 +145,7 @@ int cmp_plugin_loader_execute(cmp_plugin_loader_t *loader, int plugin_id,
   }
 #if defined(_MSC_VER)
   if (strcpy_s(*out_response, len + 1, dummy_resp) != 0) {
-    int free_rc = CMP_FREE(*out_response);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(*out_response) != CMP_SUCCESS) {
       LOG_DEBUG("Error in cmp_plugin_loader_execute: CMP_FREE failed during "
                 "recovery\n");
     }

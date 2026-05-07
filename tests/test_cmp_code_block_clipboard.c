@@ -21,6 +21,7 @@ TEST test_code_block_clipboard_null_args(void) {
   cmp_clipboard_overlay_t *overlay = NULL;
   cmp_code_block_t *block = NULL;
   cmp_window_t *window = NULL;
+  cmp_window_config_t config;
   int res;
 
   res = cmp_clipboard_overlay_create(NULL);
@@ -35,7 +36,6 @@ TEST test_code_block_clipboard_null_args(void) {
   res = cmp_code_block_create(&block);
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  cmp_window_config_t config;
   memset(&config, 0, sizeof(config));
   config.title = "Test";
   config.width = 100;
@@ -74,6 +74,7 @@ TEST test_code_block_clipboard_operations(void) {
   cmp_clipboard_overlay_t *overlay = NULL;
   cmp_code_block_t *block = NULL;
   cmp_window_t *window = NULL;
+  cmp_window_config_t config;
   int res;
 
   res = cmp_clipboard_overlay_create(&overlay);
@@ -82,7 +83,6 @@ TEST test_code_block_clipboard_operations(void) {
   res = cmp_code_block_create(&block);
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  cmp_window_config_t config;
   memset(&config, 0, sizeof(config));
   config.title = "Test";
   config.width = 100;

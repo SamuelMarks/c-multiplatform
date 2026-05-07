@@ -151,8 +151,7 @@ int cmp_image_preview_load_base64(cmp_image_preview_t *preview,
     n[3] = base64_data[i + 3] == '=' ? 0 : get_base64_val(base64_data[i + 3]);
 
     if (n[0] == -1 || n[1] == -1 || n[2] == -1 || n[3] == -1) {
-      int free_rc = CMP_FREE(pixels);
-      if (free_rc != CMP_SUCCESS) {
+      if (CMP_FREE(pixels) != CMP_SUCCESS) {
         LOG_DEBUG("Error in cmp_image_preview_load_base64: CMP_FREE failed\n");
       }
       rc = CMP_ERROR_INVALID_ARG;

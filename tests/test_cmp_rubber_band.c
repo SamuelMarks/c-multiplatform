@@ -53,6 +53,8 @@ TEST test_rubber_band_physics(void) {
   cmp_rubber_band_t *band = NULL;
   float pos = 0.0f;
   int is_resting = 0;
+  int max_frames = 1000;
+  int i;
   int res;
 
   res = cmp_rubber_band_create(&band);
@@ -69,8 +71,6 @@ TEST test_rubber_band_physics(void) {
   /* Expect velocity to pull it back down towards 0 */
 
   /* Simulate until it rests (might take many frames) */
-  int max_frames = 1000;
-  int i;
   for (i = 0; i < max_frames; i++) {
     res = cmp_rubber_band_step(band, 16.0f, 0.0f, &pos, &is_resting);
     ASSERT_EQ(CMP_SUCCESS, res);

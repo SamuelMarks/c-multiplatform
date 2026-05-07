@@ -114,8 +114,7 @@ int CMP_API cmp_f2_compound_button_create(cmp_ui_node_t **out_node,
                                           const char *primary_text,
                                           const char *secondary_text,
                                           cmp_ui_node_t *icon) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   int res;
   cmp_f2_button_t *btn_data;
 
@@ -164,8 +163,7 @@ int CMP_API cmp_f2_compound_button_create(cmp_ui_node_t **out_node,
  */
 int CMP_API cmp_f2_menu_button_create(cmp_ui_node_t **out_node,
                                       const char *label, cmp_ui_node_t *icon) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   int res;
   cmp_f2_button_t *btn_data;
 
@@ -211,8 +209,7 @@ int CMP_API cmp_f2_menu_button_create(cmp_ui_node_t **out_node,
  */
 int CMP_API cmp_f2_split_button_create(cmp_ui_node_t **out_node,
                                        const char *label, cmp_ui_node_t *icon) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   int res;
   cmp_f2_button_t *btn_data;
 
@@ -291,8 +288,7 @@ int CMP_API cmp_f2_toggle_button_create(cmp_ui_node_t **out_node,
  */
 int CMP_API cmp_f2_button_set_variant(cmp_ui_node_t *node,
                                       cmp_f2_button_variant_t variant) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_button_t *btn_data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_button_set_variant: Invalid arg\n");
@@ -321,8 +317,7 @@ int CMP_API cmp_f2_button_set_variant(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_button_set_size(cmp_ui_node_t *node,
                                    cmp_f2_button_size_t size) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_button_t *btn_data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_button_set_size: Invalid arg\n");
@@ -360,8 +355,7 @@ int CMP_API cmp_f2_button_set_size(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_button_set_shape(cmp_ui_node_t *node,
                                     cmp_f2_button_shape_t shape) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_button_t *btn_data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_button_set_shape: Invalid arg\n");
@@ -391,8 +385,7 @@ int CMP_API cmp_f2_button_set_shape(cmp_ui_node_t *node,
  */
 int CMP_API cmp_f2_button_set_state(cmp_ui_node_t *node,
                                     cmp_f2_button_state_t state) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_button_t *btn_data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_button_set_state: Invalid arg\n");
@@ -420,8 +413,7 @@ int CMP_API cmp_f2_button_set_state(cmp_ui_node_t *node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_button_set_toggled(cmp_ui_node_t *node, int is_toggled) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_button_t *btn_data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_button_set_toggled: Invalid arg\n");
@@ -453,8 +445,7 @@ int CMP_API cmp_f2_button_set_toggled(cmp_ui_node_t *node, int is_toggled) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_button_set_menu_open(cmp_ui_node_t *node, int is_open) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_button_t *btn_data;
   if (!node || !node->properties) {
     LOG_DEBUG("cmp_f2_button_set_menu_open: Invalid arg\n");

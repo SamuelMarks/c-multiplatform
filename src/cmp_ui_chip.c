@@ -87,8 +87,7 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_chip_create: cmp_ui_box_create failed\n");
     if (chip->text) {
-      int free_rc = CMP_FREE(chip->text);
-      if (free_rc != CMP_SUCCESS)
+      if (CMP_FREE(chip->text) != CMP_SUCCESS)
         LOG_DEBUG("cmp_ui_chip_create: CMP_FREE text failed\n");
     }
     rc = CMP_FREE(chip);
@@ -110,8 +109,7 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_chip_create: cmp_ui_text_create failed\n");
     if (chip->text) {
-      int free_rc = CMP_FREE(chip->text);
-      if (free_rc != CMP_SUCCESS)
+      if (CMP_FREE(chip->text) != CMP_SUCCESS)
         LOG_DEBUG("cmp_ui_chip_create: CMP_FREE text failed\n");
     }
     rc = cmp_ui_node_destroy(chip->node_root);

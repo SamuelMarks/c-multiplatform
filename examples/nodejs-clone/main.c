@@ -7,6 +7,7 @@ int main(int argc, char **argv) {
   int rc = 0;
   cmp_app_config_t config;
   int err;
+  cmp_modality_t mod;
 
   (void)argc;
   (void)argv;
@@ -22,7 +23,6 @@ int main(int argc, char **argv) {
   }
 
   /* Set the Modality to ASYNC_SINGLE_SINGLE */
-  cmp_modality_t mod;
   cmp_modality_async_single_init(&mod);
 
   /* Here we would setup a HTTP server socket using c-abstract-http via

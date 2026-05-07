@@ -251,8 +251,8 @@ int cmp_docking_framework_register_panel(cmp_docking_framework_t *docking,
 static int find_panel(const cmp_docking_framework_t *docking, const char *id,
                       cmp_tool_panel_t **out_panel) {
   int rc = CMP_SUCCESS;
-  rc = CMP_ERROR_NOT_FOUND;
   size_t i;
+  rc = CMP_ERROR_NOT_FOUND;
 
   if (out_panel == NULL) {
     return CMP_ERROR_INVALID_ARG;

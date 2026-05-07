@@ -9,7 +9,9 @@
 #if defined(_WIN32)
 __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #else
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #endif
 /* clang-format on */
 

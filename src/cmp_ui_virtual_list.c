@@ -39,8 +39,7 @@ int cmp_ui_virtual_list_create(cmp_ui_virtual_list_t **out_list,
 
   err = cmp_ui_box_create(&list->node_root);
   if (err != CMP_SUCCESS) {
-    int free_rc = CMP_FREE(list);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(list) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_virtual_list_create: CMP_FREE failed\n");
     }
     return err;

@@ -41,8 +41,7 @@ int cmp_ui_progress_indicator_create(
 
   err = cmp_ui_box_create(&ind->node_root);
   if (err != CMP_SUCCESS) {
-    int free_rc = CMP_FREE(ind);
-    if (free_rc != CMP_SUCCESS)
+    if (CMP_FREE(ind) != CMP_SUCCESS)
       LOG_DEBUG("cmp_ui_progress_indicator_create: CMP_FREE ind failed\n");
     return err;
   }
@@ -50,8 +49,7 @@ int cmp_ui_progress_indicator_create(
   err = cmp_ui_box_create(&ind->node_fill);
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(ind->node_root);
-    int free_rc = CMP_FREE(ind);
-    if (free_rc != CMP_SUCCESS)
+    if (CMP_FREE(ind) != CMP_SUCCESS)
       LOG_DEBUG("cmp_ui_progress_indicator_create: CMP_FREE ind failed\n");
     return err;
   }
@@ -88,10 +86,11 @@ int cmp_ui_progress_indicator_create(
  */
 int cmp_ui_progress_indicator_destroy(cmp_ui_progress_indicator_t *indicator) {
   int rc = CMP_SUCCESS;
+  int err;
   if (!indicator) {
     return CMP_ERROR_INVALID_ARG;
   }
-  int err = CMP_FREE(indicator);
+  err = CMP_FREE(indicator);
   if (err != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_progress_indicator_destroy: CMP_FREE failed\n");
   }
@@ -178,11 +177,12 @@ int cmp_ui_progress_indicator_set_type(
 int cmp_ui_progress_indicator_bind_a11y(cmp_ui_progress_indicator_t *widget,
                                         cmp_a11y_tree_t *tree) {
   int rc = CMP_SUCCESS;
+  int err;
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
-  int err = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id,
-                                   "progressbar", "Progress Indicator");
+  err = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id,
+                               "progressbar", "Progress Indicator");
   if (err != CMP_SUCCESS) {
     LOG_DEBUG(
         "cmp_ui_progress_indicator_bind_a11y: cmp_a11y_tree_add_node failed\n");

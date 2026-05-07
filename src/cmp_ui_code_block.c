@@ -67,8 +67,7 @@ int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_code_block_create: OOM language\n");
       if (block->code) {
-        int free_rc = CMP_FREE(block->code);
-        if (free_rc != CMP_SUCCESS)
+        if (CMP_FREE(block->code) != CMP_SUCCESS)
           LOG_DEBUG("cmp_ui_code_block_create: CMP_FREE code failed\n");
       }
       rc = CMP_FREE(block);
@@ -84,13 +83,11 @@ int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_code_block_create: cmp_ui_box_create failed\n");
     if (block->code) {
-      int free_rc = CMP_FREE(block->code);
-      if (free_rc != CMP_SUCCESS)
+      if (CMP_FREE(block->code) != CMP_SUCCESS)
         LOG_DEBUG("cmp_ui_code_block_create: CMP_FREE code failed\n");
     }
     if (block->language) {
-      int free_rc = CMP_FREE(block->language);
-      if (free_rc != CMP_SUCCESS)
+      if (CMP_FREE(block->language) != CMP_SUCCESS)
         LOG_DEBUG("cmp_ui_code_block_create: CMP_FREE language failed\n");
     }
     rc = CMP_FREE(block);
@@ -104,13 +101,11 @@ int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_code_block_create: cmp_ui_text_create failed\n");
     if (block->code) {
-      int free_rc = CMP_FREE(block->code);
-      if (free_rc != CMP_SUCCESS)
+      if (CMP_FREE(block->code) != CMP_SUCCESS)
         LOG_DEBUG("cmp_ui_code_block_create: CMP_FREE code failed\n");
     }
     if (block->language) {
-      int free_rc = CMP_FREE(block->language);
-      if (free_rc != CMP_SUCCESS)
+      if (CMP_FREE(block->language) != CMP_SUCCESS)
         LOG_DEBUG("cmp_ui_code_block_create: CMP_FREE language failed\n");
     }
     rc = cmp_ui_node_destroy(block->node_root);

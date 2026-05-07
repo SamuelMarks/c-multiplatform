@@ -19,8 +19,7 @@
 int CMP_API cmp_f2_icon_create(cmp_ui_node_t **out_node,
                                uint32_t codepoint_regular,
                                uint32_t codepoint_filled, float size) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_icon_t *icon_data;
   int res;
   char codepoint_str[8];
@@ -80,8 +79,7 @@ int CMP_API cmp_f2_icon_create(cmp_ui_node_t **out_node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int CMP_API cmp_f2_icon_set_filled(cmp_ui_node_t *icon_node, int is_filled) {
-  int rc;
-  rc = 0;
+  int rc = 0;
   cmp_f2_icon_t *icon_data;
   char codepoint_str[8];
 

@@ -45,8 +45,7 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
   err = CMP_MALLOC(sizeof(cmp_ui_modal_drawer_item_t) * drawer->item_capacity,
                    (void **)&drawer->items);
   if (err != CMP_SUCCESS) {
-    int free_rc = CMP_FREE(drawer);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(drawer) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE drawer failed\n");
     }
     return err;
@@ -54,12 +53,10 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
 
   err = cmp_ui_box_create(&drawer->node_root);
   if (err != CMP_SUCCESS) {
-    int free_rc = CMP_FREE(drawer->items);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(drawer->items) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE items failed\n");
     }
-    free_rc = CMP_FREE(drawer);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(drawer) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE drawer failed\n");
     }
     return err;
@@ -68,12 +65,10 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
   err = cmp_ui_box_create(&drawer->node_drawer);
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(drawer->node_root);
-    int free_rc = CMP_FREE(drawer->items);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(drawer->items) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE items failed\n");
     }
-    free_rc = CMP_FREE(drawer);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(drawer) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE drawer failed\n");
     }
     return err;
@@ -83,12 +78,10 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(drawer->node_drawer);
     cmp_ui_node_destroy(drawer->node_root);
-    int free_rc = CMP_FREE(drawer->items);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(drawer->items) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE items failed\n");
     }
-    free_rc = CMP_FREE(drawer);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(drawer) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE drawer failed\n");
     }
     return err;
@@ -128,13 +121,11 @@ int cmp_ui_modal_drawer_destroy(cmp_ui_modal_drawer_t *drawer) {
     return CMP_ERROR_INVALID_ARG;
   }
   if (drawer->items) {
-    int free_rc = CMP_FREE(drawer->items);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(drawer->items) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_modal_drawer_destroy: CMP_FREE items failed\n");
     }
   }
-  int free_rc = CMP_FREE(drawer);
-  if (free_rc != CMP_SUCCESS) {
+  if (CMP_FREE(drawer) != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_modal_drawer_destroy: CMP_FREE drawer failed\n");
   }
 
@@ -208,8 +199,7 @@ int cmp_ui_modal_drawer_add_item(cmp_ui_modal_drawer_t *drawer,
     }
     memcpy(new_items, drawer->items,
            sizeof(cmp_ui_modal_drawer_item_t) * drawer->item_count);
-    int free_rc = CMP_FREE(drawer->items);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(drawer->items) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_modal_drawer_add_item: CMP_FREE old items failed\n");
     }
     drawer->items = new_items;

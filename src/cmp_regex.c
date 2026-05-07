@@ -37,8 +37,7 @@ static int codex_strdup(const char *s, char **out_str) {
   }
 #if defined(_MSC_VER)
   if (strcpy_s(d, len + 1, s) != 0) {
-    int free_rc = CMP_FREE(d);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(d) != CMP_SUCCESS) {
       LOG_DEBUG("Error in codex_strdup: CMP_FREE failed during recovery\n");
     }
     rc = CMP_ERROR_GENERAL;

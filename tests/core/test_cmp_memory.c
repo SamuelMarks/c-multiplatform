@@ -1,7 +1,7 @@
 /* clang-format off */
 #include "cmp.h"
 #include "greatest.h"
-#include <stdint.h>
+
 /* clang-format on */
 
 TEST test_arena_init_success(void) {

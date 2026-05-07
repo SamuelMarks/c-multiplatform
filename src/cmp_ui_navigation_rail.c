@@ -48,12 +48,10 @@ int cmp_ui_navigation_rail_create(cmp_ui_navigation_rail_t **out_rail) {
 
   err = cmp_ui_box_create(&rail->node_root);
   if (err != CMP_SUCCESS) {
-    int free_rc = CMP_FREE(rail->destinations);
-    if (free_rc != CMP_SUCCESS)
+    if (CMP_FREE(rail->destinations) != CMP_SUCCESS)
       LOG_DEBUG(
           "cmp_ui_navigation_rail_create: CMP_FREE destinations failed\n");
-    free_rc = CMP_FREE(rail);
-    if (free_rc != CMP_SUCCESS)
+    if (CMP_FREE(rail) != CMP_SUCCESS)
       LOG_DEBUG("cmp_ui_navigation_rail_create: CMP_FREE rail failed\n");
     return err;
   }
@@ -85,14 +83,12 @@ int cmp_ui_navigation_rail_destroy(cmp_ui_navigation_rail_t *rail) {
     return CMP_ERROR_INVALID_ARG;
   }
   if (rail->destinations) {
-    int free_rc = CMP_FREE(rail->destinations);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(rail->destinations) != CMP_SUCCESS) {
       LOG_DEBUG(
           "cmp_ui_navigation_rail_destroy: CMP_FREE destinations failed\n");
     }
   }
-  int free_rc = CMP_FREE(rail);
-  if (free_rc != CMP_SUCCESS) {
+  if (CMP_FREE(rail) != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_navigation_rail_destroy: CMP_FREE rail failed\n");
   }
 
@@ -147,8 +143,7 @@ int cmp_ui_navigation_rail_add_destination(cmp_ui_navigation_rail_t *rail,
     }
     memcpy(new_dests, rail->destinations,
            sizeof(cmp_ui_navigation_rail_dest_t) * rail->dest_count);
-    int free_rc = CMP_FREE(rail->destinations);
-    if (free_rc != CMP_SUCCESS) {
+    if (CMP_FREE(rail->destinations) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_navigation_rail_add_destination: CMP_FREE old "
                 "destinations failed\n");
     }
