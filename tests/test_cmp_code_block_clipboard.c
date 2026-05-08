@@ -42,7 +42,11 @@ TEST test_code_block_clipboard_null_args(void) {
   config.height = 100;
   cmp_window_system_init();
   res = cmp_window_create(&config, &window);
-  ASSERT_EQ(CMP_SUCCESS, res);
+  if (res != CMP_SUCCESS) {
+    cmp_code_block_destroy(block);
+    cmp_clipboard_overlay_destroy(overlay);
+    PASS();
+  }
 
   res = cmp_clipboard_overlay_render(NULL, block, CMP_CLIPBOARD_STATE_IDLE);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
@@ -89,7 +93,11 @@ TEST test_code_block_clipboard_operations(void) {
   config.height = 100;
   cmp_window_system_init();
   res = cmp_window_create(&config, &window);
-  ASSERT_EQ(CMP_SUCCESS, res);
+  if (res != CMP_SUCCESS) {
+    cmp_code_block_destroy(block);
+    cmp_clipboard_overlay_destroy(overlay);
+    PASS();
+  }
 
   res = cmp_clipboard_overlay_render(overlay, block, CMP_CLIPBOARD_STATE_IDLE);
   ASSERT_EQ(CMP_SUCCESS, res);

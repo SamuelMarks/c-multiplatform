@@ -1,4 +1,7 @@
 /* clang-format off */
+#if !defined(_POSIX_C_SOURCE) && !defined(_WIN32)
+#define _POSIX_C_SOURCE 200809L
+#endif
 #include "cmp.h"
 #include "cmp_log.h"
 #include <string.h>
@@ -201,6 +204,11 @@ int cmp_strtok_r(char *str, const char *delim, char **saveptr, char **out_tok) {
   }
   *out_tok = str;
 #else
+  if (str == NULL && (saveptr == NULL || *saveptr == NULL)) {
+    *out_tok = NULL;
+    rc = CMP_ERROR_NOT_FOUND;
+    return rc;
+  }
   *out_tok = strtok_r(str, delim, saveptr);
 #endif
 
