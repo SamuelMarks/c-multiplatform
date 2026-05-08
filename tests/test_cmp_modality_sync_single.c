@@ -114,7 +114,12 @@ TEST test_modality_null_args(void) {
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_actor_supervise((cmp_actor_t *)1), "%d");
 
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_modality_async_multi_init(&mod), "%d");
+#if defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_modality_greenthreads_init(&mod), "%d");
+#else
+  ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND, cmp_modality_greenthreads_init(&mod),
+                "%d");
+#endif
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_modality_multiprocess_init(&mod), "%d");
 
   {

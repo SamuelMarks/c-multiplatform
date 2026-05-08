@@ -169,18 +169,20 @@ int cmp_coroutine_system_init(void) {
       LOG_DEBUG("cmp_coroutine_system_init: Failed to create TLS key\n");
       return rc;
     }
-    g_coro_system_initialized = 1;
-  }
 
-  /* Convert current thread to a fiber if it isn't one already */
-  if (GetCurrentFiber() ==
-      (void *)0x1E00) { /* Magic value for non-fiber on some Windows */
-    main_fiber = ConvertThreadToFiber(NULL);
-    if (main_fiber == NULL && GetLastError() != 0) {
-      rc = CMP_ERROR_INVALID_ARG;
-      LOG_DEBUG("cmp_coroutine_system_init: ConvertThreadToFiber failed\n");
-      return rc;
+    /* Convert current thread to a fiber if it isn't one already */
+    if (GetCurrentFiber() ==
+        (void *)0x1E00) { /* Magic value for non-fiber on some Windows */
+      main_fiber = ConvertThreadToFiber(NULL);
+      if (main_fiber == NULL && GetLastError() != 0 &&
+          GetLastError() != 1300 /* ERROR_ALREADY_FIBER */) {
+        rc = CMP_ERROR_INVALID_ARG;
+        LOG_DEBUG("cmp_coroutine_system_init: ConvertThreadToFiber failed\n");
+        return rc;
+      }
     }
+
+    g_coro_system_initialized = 1;
   }
 
   LOG_DEBUG("cmp_coroutine_system_init: Thread initialized as Fiber\n");

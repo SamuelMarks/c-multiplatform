@@ -80,4 +80,4 @@ int rc = CMP_SUCCESS;if (!out_is_high_contrast) return 2; /* CMP_ERROR_INVALID_A
   return rc;
 }
 #endif /* __ANDROID__ || __EMSCRIPTEN__ */
-/* clang-format on */int cmp_dummy_var_android = 0;
+/* clang-format on */ int cmp_dummy_var_android = 0;

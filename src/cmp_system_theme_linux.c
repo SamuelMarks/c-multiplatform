@@ -94,4 +94,4 @@ int rc = CMP_SUCCESS;FILE *fp;
   return rc;
 }
 #endif /* !defined(_WIN32) && !defined(__APPLE__) && !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) */
-/* clang-format on */int cmp_dummy_var_linux = 0;
+/* clang-format on */ int cmp_dummy_var_linux = 0;

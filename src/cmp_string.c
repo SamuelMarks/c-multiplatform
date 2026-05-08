@@ -170,6 +170,11 @@ int cmp_strtok_r(char *str, const char *delim, char **saveptr, char **out_tok) {
   }
 
 #if defined(_MSC_VER)
+  if (str == NULL && (saveptr == NULL || *saveptr == NULL)) {
+    *out_tok = NULL;
+    rc = CMP_ERROR_NOT_FOUND;
+    return rc;
+  }
   *out_tok = strtok_s(str, delim, saveptr);
 #elif defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
   if (str == NULL) {

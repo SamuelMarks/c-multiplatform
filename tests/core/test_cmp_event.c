@@ -6,8 +6,6 @@
 TEST test_event_lifecycle(void) {
   int res;
 
-
-
   res = cmp_event_system_init();
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
@@ -42,8 +40,6 @@ TEST test_event_uninitialized(void) {
 
 TEST test_event_null_args(void) {
   int res;
-
-
 
   cmp_event_system_init();
 
@@ -92,8 +88,6 @@ TEST test_event_push_pop(void) {
 
 TEST test_event_focus(void) {
   int res;
-
-
 
   res = cmp_event_clear_focus();
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");

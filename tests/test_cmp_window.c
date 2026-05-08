@@ -11,6 +11,13 @@ TEST test_window_lifecycle(void) {
   int top, bottom, left, right;
   cmp_theme_t theme;
   cmp_palette_t palette;
+  (void)top;
+  (void)bottom;
+  (void)left;
+  (void)right;
+  (void)theme;
+  (void)palette;
+  (void)triggered;
   memset(&config, 0, sizeof(config));
 
   res = cmp_window_system_init();
@@ -69,8 +76,14 @@ TEST test_window_drop_callback(void) {
   int top, bottom, left, right;
   cmp_theme_t theme;
   cmp_palette_t palette;
+  (void)top;
+  (void)bottom;
+  (void)left;
+  (void)right;
+  (void)theme;
+  (void)palette;
+  (void)triggered;
   memset(&config, 0, sizeof(config));
-
 
   res = cmp_window_system_init();
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -130,6 +143,13 @@ TEST test_apple_display_link(void) {
   int top, bottom, left, right;
   cmp_theme_t theme;
   cmp_palette_t palette;
+  (void)top;
+  (void)bottom;
+  (void)left;
+  (void)right;
+  (void)theme;
+  (void)palette;
+  (void)triggered;
   memset(&config, 0, sizeof(config));
 
   cmp_window_system_init();
@@ -178,6 +198,13 @@ TEST test_apple_gestures(void) {
   int top, bottom, left, right;
   cmp_theme_t theme;
   cmp_palette_t palette;
+  (void)top;
+  (void)bottom;
+  (void)left;
+  (void)right;
+  (void)theme;
+  (void)palette;
+  (void)triggered;
   memset(&config, 0, sizeof(config));
 
   cmp_window_system_init();
@@ -217,6 +244,13 @@ TEST test_linux_apis(void) {
   int top, bottom, left, right;
   cmp_theme_t theme;
   cmp_palette_t palette;
+  (void)top;
+  (void)bottom;
+  (void)left;
+  (void)right;
+  (void)theme;
+  (void)palette;
+  (void)triggered;
   memset(&config, 0, sizeof(config));
 
   cmp_window_system_init();
@@ -281,8 +315,14 @@ TEST test_android_apis(void) {
   int top, bottom, left, right;
   cmp_theme_t theme;
   cmp_palette_t palette;
+  (void)top;
+  (void)bottom;
+  (void)left;
+  (void)right;
+  (void)theme;
+  (void)palette;
+  (void)triggered;
   memset(&config, 0, sizeof(config));
-
 
   cmp_window_system_init();
   config.title = "Test";
@@ -400,9 +440,14 @@ TEST test_theme_and_visual_regression_apis(void) {
   int top, bottom, left, right;
   cmp_theme_t theme;
   cmp_palette_t palette;
+  (void)top;
+  (void)bottom;
+  (void)left;
+  (void)right;
+  (void)theme;
+  (void)palette;
+  (void)triggered;
   memset(&config, 0, sizeof(config));
-
-
 
   res = cmp_window_system_init();
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -461,6 +506,13 @@ TEST test_pointer_lock(void) {
   int top, bottom, left, right;
   cmp_theme_t theme;
   cmp_palette_t palette;
+  (void)top;
+  (void)bottom;
+  (void)left;
+  (void)right;
+  (void)theme;
+  (void)palette;
+  (void)triggered;
   memset(&config, 0, sizeof(config));
 
   res = cmp_window_system_init();
@@ -540,6 +592,13 @@ TEST test_window_null_args(void) {
   int top, bottom, left, right;
   cmp_theme_t theme;
   cmp_palette_t palette;
+  (void)top;
+  (void)bottom;
+  (void)left;
+  (void)right;
+  (void)theme;
+  (void)palette;
+  (void)triggered;
   memset(&config, 0, sizeof(config));
 
   cmp_window_system_init();
