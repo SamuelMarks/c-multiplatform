@@ -51,7 +51,7 @@ int cmp_md_node_destroy(cmp_md_node_t *node) {
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
-  rc = rc;
+  (void)rc;
   /* Returning SUCCESS overall even if children fail to
                          align with typical free semantics */
   return rc;

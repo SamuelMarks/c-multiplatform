@@ -273,7 +273,7 @@ int cmp_orm_migrate(c_orm_db_t *db, const char *migrations_dir) {
 #if defined(CFS_UNICODE)
       const wchar_t *wname;
 
-      wname = (const wchar_t *)entry->path.str;
+      wname = (const wchar_t *)(const void *)entry->path.str;
       i = 0;
       while (wname[i] && i < 1023) {
         aname[i] = (char)wname[i];

@@ -7,6 +7,11 @@ TEST test_window_lifecycle(void) {
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
+  int triggered = 0;
+  int top, bottom, left, right;
+  cmp_theme_t theme;
+  cmp_palette_t palette;
+  memset(&config, 0, sizeof(config));
 
   res = cmp_window_system_init();
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -20,7 +25,7 @@ TEST test_window_lifecycle(void) {
   config.frameless = 0;
   config.use_legacy_backend = 0;
 
-  res = res = cmp_window_create(&config, &window);
+  res = cmp_window_create(&config, &window);
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -61,6 +66,11 @@ TEST test_window_drop_callback(void) {
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
   int triggered = 0;
+  int top, bottom, left, right;
+  cmp_theme_t theme;
+  cmp_palette_t palette;
+  memset(&config, 0, sizeof(config));
+
 
   res = cmp_window_system_init();
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -74,7 +84,7 @@ TEST test_window_drop_callback(void) {
   config.frameless = 0;
   config.use_legacy_backend = 0;
 
-  res = res = cmp_window_create(&config, &window);
+  res = cmp_window_create(&config, &window);
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -116,6 +126,11 @@ TEST test_apple_display_link(void) {
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
+  int triggered = 0;
+  int top, bottom, left, right;
+  cmp_theme_t theme;
+  cmp_palette_t palette;
+  memset(&config, 0, sizeof(config));
 
   cmp_window_system_init();
   config.title = "Test";
@@ -126,7 +141,7 @@ TEST test_apple_display_link(void) {
   config.hidden = 1;
   config.frameless = 0;
   config.use_legacy_backend = 0;
-  res = res = cmp_window_create(&config, &window);
+  res = cmp_window_create(&config, &window);
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -159,6 +174,11 @@ TEST test_apple_gestures(void) {
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
+  int triggered = 0;
+  int top, bottom, left, right;
+  cmp_theme_t theme;
+  cmp_palette_t palette;
+  memset(&config, 0, sizeof(config));
 
   cmp_window_system_init();
   config.title = "Test";
@@ -193,6 +213,11 @@ TEST test_linux_apis(void) {
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
+  int triggered = 0;
+  int top, bottom, left, right;
+  cmp_theme_t theme;
+  cmp_palette_t palette;
+  memset(&config, 0, sizeof(config));
 
   cmp_window_system_init();
   config.title = "Test";
@@ -252,7 +277,12 @@ TEST test_android_apis(void) {
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
+  int triggered = 0;
   int top, bottom, left, right;
+  cmp_theme_t theme;
+  cmp_palette_t palette;
+  memset(&config, 0, sizeof(config));
+
 
   cmp_window_system_init();
   config.title = "Test";
@@ -366,8 +396,13 @@ TEST test_theme_and_visual_regression_apis(void) {
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
+  int triggered = 0;
+  int top, bottom, left, right;
   cmp_theme_t theme;
   cmp_palette_t palette;
+  memset(&config, 0, sizeof(config));
+
+
 
   res = cmp_window_system_init();
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -381,7 +416,7 @@ TEST test_theme_and_visual_regression_apis(void) {
   config.frameless = 0;
   config.use_legacy_backend = 0;
 
-  res = res = cmp_window_create(&config, &window);
+  res = cmp_window_create(&config, &window);
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -422,6 +457,11 @@ TEST test_pointer_lock(void) {
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
+  int triggered = 0;
+  int top, bottom, left, right;
+  cmp_theme_t theme;
+  cmp_palette_t palette;
+  memset(&config, 0, sizeof(config));
 
   res = cmp_window_system_init();
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -496,6 +536,11 @@ TEST test_pointer_lock(void) {
 TEST test_window_null_args(void) {
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
+  int triggered = 0;
+  int top, bottom, left, right;
+  cmp_theme_t theme;
+  cmp_palette_t palette;
+  memset(&config, 0, sizeof(config));
 
   cmp_window_system_init();
 

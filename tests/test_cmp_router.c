@@ -144,7 +144,7 @@ TEST test_router_dynamic_params(void) {
   PASS();
 }
 
-void *dummy_builder(const char *route_params) {
+static void *dummy_builder(const char *route_params) {
   (void)route_params;
   return NULL;
 }

@@ -96,6 +96,7 @@ int cmp_siwa_request(cmp_siwa_ctx_t *ctx, int req_hidden_email,
   int err_rc;
   const char *err_str;
   struct cmp_siwa_ctx *c = (struct cmp_siwa_ctx *)ctx;
+  (void)token_cap;
 
   if (c == NULL || out_token_buf == NULL) {
     rc = CMP_ERROR_INVALID_ARG;

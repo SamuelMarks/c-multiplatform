@@ -18,7 +18,11 @@ extern "C" {
  * @param fmt The format string.
  * @param ... Variable arguments matching the format string.
  */
+#if defined(__GNUC__) || defined(__clang__)
+void cmp_log_debug(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+#else
 void cmp_log_debug(const char *fmt, ...);
+#endif
 #ifndef LOG_DEBUG
 #ifdef DEBUG
 /** @brief Debug log macro mapped to cmp_log_debug. */

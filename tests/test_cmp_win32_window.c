@@ -1,4 +1,6 @@
 /* clang-format off */
+#include <string.h>
+
 #include "cmp.h"
 #include <stdio.h>
 /* clang-format on */

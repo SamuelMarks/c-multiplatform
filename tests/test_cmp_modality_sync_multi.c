@@ -65,7 +65,7 @@ TEST test_modality_threaded_lifecycle(void) {
 #if defined(_WIN32)
     Sleep(10);
 #else
-    /* usleep */ (void)(10000);
+    usleep(10000);
 #endif
     wait_cycles++;
   }
@@ -75,7 +75,7 @@ TEST test_modality_threaded_lifecycle(void) {
 #if defined(_WIN32)
   Sleep(50);
 #else
-  /* usleep */ (void)(50000);
+  usleep(50000);
 #endif
 
   res = cmp_modality_destroy(&mod);
@@ -112,7 +112,7 @@ TEST test_modality_threaded_massive_queue(void) {
 #if defined(_WIN32)
         Sleep(1);
 #else
-        /* usleep */ (void)(1000);
+        usleep(1000);
 #endif
       }
     } while (res == CMP_ERROR_BOUNDS);
@@ -125,7 +125,7 @@ TEST test_modality_threaded_massive_queue(void) {
 #if defined(_WIN32)
     Sleep(10);
 #else
-    /* usleep */ (void)(10000);
+    usleep(10000);
 #endif
     wait_cycles++;
   }
@@ -135,7 +135,7 @@ TEST test_modality_threaded_massive_queue(void) {
 #if defined(_WIN32)
   Sleep(100);
 #else
-  /* usleep */ (void)(100000);
+  usleep(100000);
 #endif
 
   res = cmp_modality_destroy(&mod);

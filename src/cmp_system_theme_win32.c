@@ -132,4 +132,4 @@ int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
   if (rc != CMP_SUCCESS) { if (rc != CMP_SUCCESS) {   return rc; } return rc; }
   return CMP_ERROR_GENERAL;}
 #endif /* _WIN32 */
-/* clang-format on */
+/* clang-format on */int cmp_dummy_var_win32 = 0;

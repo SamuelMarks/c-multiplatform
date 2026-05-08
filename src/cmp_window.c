@@ -1878,14 +1878,8 @@ int cmp_window_set_pointer_lock(cmp_window_t *window,
     }
   }
 #else
-#if !defined(__APPLE__) && !(defined(__linux__) && !defined(__ANDROID__)) &&   \
-    !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) &&                       \
-    !defined(CMP_USE_SDL3)
   (void)lock_mode;
   return CMP_ERROR_NOT_FOUND;
-#else
-  (void)lock_mode;
-#endif
 #endif
 
   return rc;
@@ -1945,8 +1939,7 @@ int cmp_window_mac_add_menu_item(const char *title, const char *key_equiv,
 #if defined(__APPLE__)
   /* Call out to objective-c NSMenuItem allocation */
   (void)callback;
-  rc = CMP_SUCCESS;
-  return rc;
+  return CMP_SUCCESS;
 #else
   (void)callback;
   return CMP_ERROR_NOT_FOUND;

@@ -371,7 +371,7 @@ typedef struct {
 static void node_binding_cb(cmp_databinding_t *binding, void *user_data) {
   int rc = CMP_SUCCESS;
   cmp_node_binding_ctx_t *ctx = (cmp_node_binding_ctx_t *)user_data;
-  if (ctx && ctx->node && ctx->property_name) {
+  if (ctx && ctx->node) {
     if (strcmp(ctx->property_name, "text") == 0 &&
         binding->type == CMP_DATA_TYPE_STRING) {
       const char *val;

@@ -721,7 +721,7 @@ int cmp_slider_get_visuals(cmp_slider_t *slider_opaque,
  * @param current_x Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_slider_update_from_drag(cmp_slider_t *slider_opaque, float track_width,
+static int cmp_slider_update_from_drag(cmp_slider_t *slider_opaque, float track_width,
                                 float current_x) {
   int rc = CMP_SUCCESS;
   struct cmp_slider *ctx = (struct cmp_slider *)slider_opaque;

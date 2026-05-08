@@ -225,20 +225,18 @@ struct progress_ctx {
   void *user_data;
 };
 
-static void on_progress_chunk(const unsigned char *chunk, size_t length,
-                              size_t total_received, size_t total_expected,
-                              void *user_data) {
+static int on_progress_chunk(void *user_data, const void *chunk,
+                             size_t length) {
   struct progress_ctx *ctx = (struct progress_ctx *)user_data;
-  float percentage;
 
   /* Keep compiler happy if variables unused in non-verbose builds */
   (void)chunk;
   (void)length;
 
-  if (ctx != NULL && ctx->progress_cb != NULL && total_expected > 0) {
-    percentage = ((float)total_received / (float)total_expected) * 100.0f;
-    ctx->progress_cb(percentage, ctx->user_data);
+  if (ctx != NULL && ctx->progress_cb != NULL) {
+    ctx->progress_cb(0.0f, ctx->user_data);
   }
+  return 0;
 }
 
 /**
@@ -272,7 +270,7 @@ int cmp_http_send_with_progress(
   p_ctx.progress_cb = progress_cb;
   p_ctx.user_data = user_data;
 
-  req->on_chunk = (http_on_chunk_fn)on_progress_chunk;
+  req->on_chunk = on_progress_chunk;
   req->on_chunk_user_data = &p_ctx;
 
   rc = CMP_MALLOC(sizeof(struct HttpFuture), (void **)&future);

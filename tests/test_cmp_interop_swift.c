@@ -8,7 +8,7 @@ TEST test_swift_interop_macros_compilation(void) {
    * C89/MSVC syntax */
 
   CMP_ASSUME_NONNULL_BEGIN
-  int test_ptr CMP_NONNULL = 1;
+  void * CMP_NONNULL test_ptr = (void *)1;
   int *CMP_NULLABLE opt_ptr = NULL;
   (void)test_ptr;
   (void)opt_ptr;

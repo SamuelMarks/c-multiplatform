@@ -212,7 +212,7 @@ TEST test_vfs_watch(void) {
 #if defined(_WIN32)
   Sleep(100);
 #else
-  /* usleep */ (void)(100000);
+  usleep(100000);
 #endif
 
   /*

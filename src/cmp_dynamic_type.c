@@ -2,6 +2,7 @@
 #include "cmp.h"
 #include "cmp_log.h"
 #include <stdlib.h>
+#include <string.h>
 /* clang-format on */
 
 struct cmp_dynamic_type {

@@ -583,6 +583,7 @@ int cmp_router_get_previous_title(cmp_router_t *router, char *out_title,
                                   size_t title_cap) {
   int rc = CMP_SUCCESS;
   struct cmp_router *r = (struct cmp_router *)router;
+  (void)title_cap;
   if (!r || !out_title)
     return CMP_ERROR_INVALID_ARG;
 

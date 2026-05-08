@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <string.h>
 #include "cmp.h"
 #include "themes/cmp_theme_core.h"
 #include "themes/cmp_cupertino.h"

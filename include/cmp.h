@@ -82,7 +82,7 @@ int cmp_freetype_glyph_rasterize(const char *font_file_path, int glyph_index,
 #define CMP_REFINED_FOR_SWIFT
 #endif
 
-#if __has_attribute(ns_returns_retained)
+#if defined(__OBJC__) && __has_attribute(ns_returns_retained)
 #define CMP_RETURNS_RETAINED __attribute__((ns_returns_retained))
 #else
 #define CMP_RETURNS_RETAINED
@@ -850,6 +850,13 @@ struct cmp_coroutine {
  * @return 0 on success, or an error code.
  */
 int cmp_coroutine_system_init(void);
+
+/**
+ * @brief cmp_coroutine_system_shutdown
+ *
+ * @return 0 on success, or an error code.
+ */
+int cmp_coroutine_system_shutdown(void);
 
 /**
  * @brief Create a new coroutine
@@ -10528,8 +10535,7 @@ int cmp_interop_cfstring_bridge(void *cf_string_ref);
  * @brief Allocates an object utilizing
 s_returns_retained to seamlessly transfer ownership to ARC (+1 retain count)
  */
-int cmp_interop_allocate_retained_object(void **out_object)
-    CMP_RETURNS_RETAINED;
+int cmp_interop_allocate_retained_object(void **out_object);
 
 /**
  * @brief Safely releases a bridged object at the C boundary (-1 retain count)

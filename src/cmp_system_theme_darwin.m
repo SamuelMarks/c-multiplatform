@@ -6,7 +6,11 @@
 #include <TargetConditionals.h>
 
 #if TARGET_OS_OSX
+#define HTTP_VERSION_1_0 CUPS_HTTP_VERSION_1_0
+#define HTTP_VERSION_1_1 CUPS_HTTP_VERSION_1_1
 #import <Cocoa/Cocoa.h>
+#undef HTTP_VERSION_1_0
+#undef HTTP_VERSION_1_1
 #else
 #import <UIKit/UIKit.h>
 #endif
@@ -20,10 +24,14 @@ int cmp_system_theme_shutdown(void) {
 }
 
 int cmp_system_theme_is_dark(int *out_is_dark) {
-  if (!out_is_dark) return -1;
+#if TARGET_OS_OSX
+  NSAppearance *appearance;
+#endif
+
+  if (!out_is_dark) return CMP_ERROR_INVALID_ARG;
 
 #if TARGET_OS_OSX
-  NSAppearance *appearance = [NSApp effectiveAppearance];
+  appearance = [NSApp effectiveAppearance];
   if ([appearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameDarkAqua, NSAppearanceNameAqua]] == NSAppearanceNameDarkAqua) {
       *out_is_dark = 1;
   } else {
@@ -42,7 +50,7 @@ int cmp_system_theme_is_dark(int *out_is_dark) {
 }
 
 int cmp_system_theme_is_high_contrast(int *out_is_high_contrast) {
-  if (!out_is_high_contrast) return -1;
+  if (!out_is_high_contrast) return CMP_ERROR_INVALID_ARG;
 #if TARGET_OS_OSX
   *out_is_high_contrast = NSWorkspace.sharedWorkspace.accessibilityDisplayShouldIncreaseContrast ? 1 : 0;
 #else

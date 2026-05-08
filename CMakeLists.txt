@@ -385,6 +385,15 @@ if(TARGET sqlite3 AND CMAKE_SYSTEM_NAME STREQUAL "DOS")
     target_compile_definitions(sqlite3 PRIVATE SQLITE_THREADSAFE=0 SQLITE_OS_OTHER=1)
 endif()
 
+foreach(tgt c_str_span c89stringutils parson cfs c_cdd c-abstract-http c-orm c-orm-async sqlite3)
+  if(TARGET ${tgt})
+    target_compile_options(${tgt} PRIVATE -w)
+  endif()
+endforeach()
+
+if(TARGET c-abstract-http)
+  target_compile_definitions(c-abstract-http PUBLIC CDD_STRDUP=c_cdd_strdup)
+endif()
 
 set(CMP_SOURCES
     src/core/cmp_memory.c
@@ -657,6 +666,12 @@ if(WIN32)
         target_link_libraries(cmp PRIVATE msimg32)
     else()
         target_link_libraries(cmp PRIVATE dwmapi msimg32)
+    endif()
+endif()
+if(APPLE)
+    find_library(APPKIT AppKit)
+    if(APPKIT)
+        target_link_libraries(cmp PRIVATE ${APPKIT})
     endif()
 endif()
 

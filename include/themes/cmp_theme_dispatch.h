@@ -11,6 +11,8 @@ extern "C" {
 #include "cmp_fluent2.h"
 #include "cmp_material3.h"
 #include "cmp_unstyled.h"
+
+CMP_API void cmp_theme_set_default_vtable(const cmp_theme_vtable_t *vtable);
 /* clang-format on */
 
 #ifdef CMP_THEME_MODE_SINGLE_STATIC

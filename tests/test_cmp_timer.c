@@ -54,7 +54,7 @@ TEST test_timer_lifecycle(void) {
 #if defined(_WIN32)
   Sleep(500);
 #else
-  /* usleep */ (void)(500000);
+  usleep(500000);
 #endif
 
   ASSERT_EQ_FMT(1, (int)ctx.count, "%d");
@@ -70,7 +70,7 @@ TEST test_timer_lifecycle(void) {
 #if defined(_WIN32)
   Sleep(1000);
 #else
-  /* usleep */ (void)(1000000);
+  usleep(1000000);
 #endif
 
   res = cmp_timer_stop(timer);
