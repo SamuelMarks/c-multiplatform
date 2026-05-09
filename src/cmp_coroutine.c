@@ -101,7 +101,7 @@ __declspec(dllimport) void *__stdcall GetCurrentFiber(void);
 
 #define CMP_CORO_SUPPORTED 1
 
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || (defined(__APPLE__) && !defined(__arm64__) && !defined(__aarch64__))
 
 /* MacOS deprecated ucontext in 10.6, but we need it for portable C89 coroutines.
  * Ignoring deprecation warnings for this specific file.
