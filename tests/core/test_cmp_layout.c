@@ -31,7 +31,7 @@ TEST test_layout_tree_building(void) {
   res = cmp_layout_node_add_child(root, child2);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
-  ASSERT_EQ_FMT((size_t)2, root->child_count, "%zd");
+  ASSERT_EQ_FMT((unsigned long)2, (unsigned long)(root->child_count), "%lu");
   ASSERT(child1->parent == root);
   ASSERT(child2->parent == root);
 

@@ -9,8 +9,8 @@ TEST test_arena_init_success(void) {
   int res = cmp_arena_init(&arena, 1024);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(arena.buffer != NULL);
-  ASSERT_EQ_FMT((size_t)1024, arena.capacity, "%zd");
-  ASSERT_EQ_FMT((size_t)0, arena.offset, "%zd");
+  ASSERT_EQ_FMT((unsigned long)1024, (unsigned long)(arena.capacity), "%lu");
+  ASSERT_EQ_FMT((unsigned long)0, (unsigned long)(arena.offset), "%lu");
   cmp_arena_free(&arena);
   PASS();
 }
@@ -20,8 +20,8 @@ TEST test_arena_init_zero_size(void) {
   int res = cmp_arena_init(&arena, 0);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(arena.buffer == NULL);
-  ASSERT_EQ_FMT((size_t)0, arena.capacity, "%zd");
-  ASSERT_EQ_FMT((size_t)0, arena.offset, "%zd");
+  ASSERT_EQ_FMT((unsigned long)0, (unsigned long)(arena.capacity), "%lu");
+  ASSERT_EQ_FMT((unsigned long)0, (unsigned long)(arena.offset), "%lu");
   PASS();
 }
 
@@ -42,12 +42,12 @@ TEST test_arena_alloc_success(void) {
   res = cmp_arena_alloc(&arena, 100, &ptr1);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(ptr1 != NULL);
-  ASSERT_EQ_FMT((size_t)100, arena.offset, "%zd");
+  ASSERT_EQ_FMT((unsigned long)100, (unsigned long)(arena.offset), "%lu");
 
   res = cmp_arena_alloc(&arena, 50, &ptr2);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(ptr2 != NULL);
-  ASSERT_EQ_FMT((size_t)150, arena.offset, "%zd");
+  ASSERT_EQ_FMT((unsigned long)150, (unsigned long)(arena.offset), "%lu");
 
   cmp_arena_free(&arena);
   PASS();
@@ -111,8 +111,8 @@ TEST test_pool_init_success(void) {
   int res = cmp_pool_init(&pool, 32, 10);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(pool.buffer != NULL);
-  ASSERT_EQ_FMT((size_t)10, pool.capacity, "%zd");
-  ASSERT_EQ_FMT((size_t)32, pool.block_size, "%zd");
+  ASSERT_EQ_FMT((unsigned long)10, (unsigned long)(pool.capacity), "%lu");
+  ASSERT_EQ_FMT((unsigned long)32, (unsigned long)(pool.block_size), "%lu");
   cmp_pool_destroy(&pool);
   PASS();
 }

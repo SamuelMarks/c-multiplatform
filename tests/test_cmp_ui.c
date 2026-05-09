@@ -51,12 +51,13 @@ TEST test_ui_hierarchy(void) {
   res = cmp_ui_node_add_child(box, text2);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
-  ASSERT_EQ_FMT((size_t)2, box->child_count, "%zd");
+  ASSERT_EQ_FMT((unsigned long)2, (unsigned long)(box->child_count), "%lu");
   ASSERT(text1->parent == box);
   ASSERT(text2->parent == box);
 
   /* Verify layout tree mirroring */
-  ASSERT_EQ_FMT((size_t)2, box->layout->child_count, "%zd");
+  ASSERT_EQ_FMT((unsigned long)2, (unsigned long)(box->layout->child_count),
+                "%lu");
   ASSERT(text1->layout->parent == box->layout);
 
   /* Recursively destroy everything */

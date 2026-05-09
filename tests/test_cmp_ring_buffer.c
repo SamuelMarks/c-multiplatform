@@ -14,7 +14,7 @@ TEST test_ring_buffer_lifecycle(void) {
   /* Init */
   res = cmp_ring_buffer_init(&rb, 3);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
-  ASSERT_EQ_FMT((size_t)3, rb.capacity, "%zd");
+  ASSERT_EQ_FMT((unsigned long)3, (unsigned long)(rb.capacity), "%lu");
 
   /* Empty Pop */
   res = cmp_ring_buffer_pop(&rb, &out);

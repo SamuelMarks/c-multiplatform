@@ -43,7 +43,7 @@ TEST test_vfs_read_sync(void) {
 
   res = cmp_vfs_read_file_sync("dummy.txt", &buf, &read_size);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
-  ASSERT_EQ_FMT((size_t)9, read_size, "%zd");
+  ASSERT_EQ_FMT((unsigned long)9, (unsigned long)(read_size), "%lu");
   ASSERT_STRN_EQ("Hello VFS", (const char *)buf, 9);
 
   if (buf != NULL) {
@@ -105,7 +105,7 @@ TEST test_vfs_read_async(void) {
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
   ASSERT_EQ_FMT(CMP_SUCCESS, ctx.error, "%d");
-  ASSERT_EQ_FMT((size_t)9, ctx.size, "%zd");
+  ASSERT_EQ_FMT((unsigned long)9, (unsigned long)(ctx.size), "%lu");
   ASSERT_STRN_EQ("Async VFS", ctx.buf, 9);
 
   remove("dummy_async.txt");
@@ -173,7 +173,7 @@ TEST test_vfs_mount(void) {
 
   res = cmp_vfs_read_file_sync("virt:/dummy_mount.txt", &buf, &read_size);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
-  ASSERT_EQ_FMT((size_t)9, read_size, "%zd");
+  ASSERT_EQ_FMT((unsigned long)9, (unsigned long)(read_size), "%lu");
   ASSERT_STRN_EQ("Mount VFS", (const char *)buf, 9);
 
   if (buf != NULL) {

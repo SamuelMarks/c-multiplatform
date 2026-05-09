@@ -9,8 +9,8 @@ TEST test_string_init(void) {
   int res = cmp_string_init(&str);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(str.data == NULL);
-  ASSERT_EQ_FMT((size_t)0, str.length, "%zd");
-  ASSERT_EQ_FMT((size_t)0, str.capacity, "%zd");
+  ASSERT_EQ_FMT((unsigned long)0, (unsigned long)(str.length), "%lu");
+  ASSERT_EQ_FMT((unsigned long)0, (unsigned long)(str.capacity), "%lu");
   PASS();
 }
 
@@ -29,13 +29,13 @@ TEST test_string_append(void) {
   res = cmp_string_append(&str, "Hello ");
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(str.data != NULL);
-  ASSERT_EQ_FMT((size_t)6, str.length, "%zd");
+  ASSERT_EQ_FMT((unsigned long)6, (unsigned long)(str.length), "%lu");
   ASSERT(str.capacity >= 7); /* 6 chars + null terminator */
   ASSERT_STR_EQ("Hello ", str.data);
 
   res = cmp_string_append(&str, "World!");
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
-  ASSERT_EQ_FMT((size_t)12, str.length, "%zd");
+  ASSERT_EQ_FMT((unsigned long)12, (unsigned long)(str.length), "%lu");
   ASSERT_STR_EQ("Hello World!", str.data);
 
   cmp_string_destroy(&str);
@@ -84,7 +84,7 @@ TEST test_string_append_invalid(void) {
   /* Appending empty string should succeed but do nothing */
   res = cmp_string_append(&str, "");
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
-  ASSERT_EQ_FMT((size_t)0, str.length, "%zd");
+  ASSERT_EQ_FMT((unsigned long)0, (unsigned long)(str.length), "%lu");
 
   cmp_string_destroy(&str);
   PASS();
@@ -136,8 +136,8 @@ TEST test_string_destroy(void) {
   res = cmp_string_destroy(&str);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(str.data == NULL);
-  ASSERT_EQ_FMT((size_t)0, str.length, "%zd");
-  ASSERT_EQ_FMT((size_t)0, str.capacity, "%zd");
+  ASSERT_EQ_FMT((unsigned long)0, (unsigned long)(str.length), "%lu");
+  ASSERT_EQ_FMT((unsigned long)0, (unsigned long)(str.capacity), "%lu");
 
   PASS();
 }
