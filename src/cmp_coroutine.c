@@ -3,7 +3,7 @@
 #include "cmp_log.h"
 #include <stdlib.h>
 
-#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__) || defined(__APPLE__)
+#if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
 /**
  * @brief cmp_coroutine_system_init
  *
