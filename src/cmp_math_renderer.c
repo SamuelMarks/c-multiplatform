@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(_MSC_VER) && _MSC_VER <= 1400
+#if defined(_MSC_VER) && _MSC_VER < 1600
 #ifndef _UINTPTR_T_DEFINED
 #define _UINTPTR_T_DEFINED
 typedef unsigned long uintptr_t;

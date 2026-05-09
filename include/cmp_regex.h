@@ -7,7 +7,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @file cmp_regex.h
@@ -42,6 +42,6 @@ int CMP_API cmp_regex_match(cmp_regex_t *regex, const char *string,
 int CMP_API cmp_regex_free(cmp_regex_t *regex);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_REGEX_H */

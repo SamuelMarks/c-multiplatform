@@ -7,7 +7,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @file cmp_sse_parser.h
@@ -53,6 +53,6 @@ int CMP_API cmp_sse_parser_feed(cmp_sse_parser_t *parser, const char *chunk,
                                 unsigned int len);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_SSE_PARSER_H */

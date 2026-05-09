@@ -44,7 +44,7 @@ int cmp_swapchain_create(cmp_window_t *window, cmp_swapchain_mode_t mode,
   ctx->window = window;
   ctx->mode = mode;
   ctx->is_active = 1;
-  ctx->os_surface_handle = cmp_window_get_native_handle(window);
+  cmp_window_get_native_handle(window, &ctx->os_surface_handle);
 
   /* Configure buffers based on presentation mode */
   if (mode == CMP_SWAPCHAIN_MAILBOX) {
@@ -165,14 +165,17 @@ int cmp_swapchain_present(cmp_swapchain_t *swapchain) {
  * @brief cmp_swapchain_get_os_surface_handle
  *
  * @param swapchain Parameter description.
+ * @param out_handle Pointer to receive the handle.
  * @return Returns 0 on success, or an error code on failure.
  */
-
-void *cmp_swapchain_get_os_surface_handle(cmp_swapchain_t *swapchain) {
+int cmp_swapchain_get_os_surface_handle(cmp_swapchain_t *swapchain,
+                                        void **out_handle) {
   struct cmp_swapchain *ctx = (struct cmp_swapchain *)swapchain;
-  if (!ctx)
-    return NULL;
-  return ctx->os_surface_handle;
+  if (!ctx || !out_handle)
+    return CMP_ERROR_INVALID_ARG;
+
+  *out_handle = ctx->os_surface_handle;
+  return 0;
 }
 
 /**

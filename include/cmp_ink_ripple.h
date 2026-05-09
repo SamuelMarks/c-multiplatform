@@ -4,7 +4,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @brief Opaque handle for an ink ripple effect.
@@ -63,6 +63,6 @@ int cmp_ink_ripple_release(cmp_ink_ripple_t *ripple);
 int cmp_ink_ripple_get_state(cmp_ink_ripple_t *ripple, float *out_radius, float *out_opacity, float *out_x, float *out_y);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 #endif /* CMP_INK_RIPPLE_H */
 /* clang-format on */

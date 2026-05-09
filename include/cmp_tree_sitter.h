@@ -7,7 +7,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @file cmp_tree_sitter.h
@@ -67,6 +67,6 @@ int CMP_API cmp_tree_sitter_free_node(cmp_tree_node_t *node);
 int CMP_API cmp_tree_sitter_free_string(char *str);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_TREE_SITTER_H */

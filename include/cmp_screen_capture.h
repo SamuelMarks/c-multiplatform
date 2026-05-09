@@ -7,7 +7,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @file cmp_screen_capture.h
@@ -64,6 +64,6 @@ int CMP_API cmp_screen_capture_region(cmp_screen_capture_t *capture, int x,
 int CMP_API cmp_screen_capture_free_pixels(unsigned char *pixels);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_SCREEN_CAPTURE_H */

@@ -25,11 +25,12 @@ TEST test_swapchain_create_destroy(void) {
               cmp_swapchain_create(win, CMP_SWAPCHAIN_FIFO, &swapchain));
   }
   if (win) {
-    void *os_handle = cmp_swapchain_get_os_surface_handle(swapchain);
+    void *os_handle = NULL;
+    int rc = cmp_swapchain_get_os_surface_handle(swapchain, &os_handle);
+    ASSERT_EQ(0, rc);
     (void)os_handle;
     ASSERT_NEQ(NULL, swapchain);
   }
-
   if (swapchain) {
     ASSERT_EQ(CMP_SUCCESS, cmp_swapchain_destroy(swapchain));
   }

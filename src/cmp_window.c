@@ -48,20 +48,22 @@ struct cmp_window {
  * @brief cmp_window_get_native_handle
  *
  * @param window Parameter description.
+ * @param out_handle Pointer to receive the handle.
  * @return Returns 0 on success, or an error code on failure.
  */
-void *cmp_window_get_native_handle(cmp_window_t *window) {
-  if (!window)
-    return NULL;
+int cmp_window_get_native_handle(cmp_window_t *window, void **out_handle) {
+  if (!window || !out_handle)
+    return CMP_ERROR_INVALID_ARG;
 #if defined(_WIN32)
-  return (void *)window->hwnd;
+  *out_handle = (void *)window->hwnd;
 #elif defined(__APPLE__)
-  return window->apple_view;
+  *out_handle = window->apple_view;
 #elif defined(__linux__) && !defined(__ANDROID__)
-  return window->xdg_surface;
+  *out_handle = window->xdg_surface;
 #else
-  return NULL;
+  *out_handle = NULL;
 #endif
+  return CMP_SUCCESS;
 }
 #if defined(_WIN32)
 #if (!defined(_MSC_VER) || _MSC_VER >= 1500)

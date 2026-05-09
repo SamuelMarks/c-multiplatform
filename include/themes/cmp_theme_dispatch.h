@@ -3,7 +3,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* clang-format off */
 #include "cmp_theme_core.h"
@@ -473,6 +473,6 @@ static int cmp_theme_get_transition_duration(const cmp_ui_node_t *node,
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_THEME_DISPATCH_H */

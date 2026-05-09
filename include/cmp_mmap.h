@@ -5,7 +5,7 @@
 #include "cmp_ffi.h"
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 #include <stddef.h> /* For size_t */
 /* clang-format on */
@@ -43,6 +43,6 @@ int CMP_API cmp_mmap_get_data(cmp_mmap_t *mmap, void **out_data,
                               size_t *out_size);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_MMAP_H */

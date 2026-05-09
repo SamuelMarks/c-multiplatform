@@ -7,7 +7,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @file cmp_plugin_loader.h
@@ -71,6 +71,6 @@ int CMP_API cmp_plugin_loader_execute(cmp_plugin_loader_t *loader,
 int CMP_API cmp_plugin_loader_free_response(char *response);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_PLUGIN_LOADER_H */

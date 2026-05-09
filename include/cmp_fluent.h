@@ -4,7 +4,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @brief Opaque Fluent 2 Reveal Highlight Context
@@ -56,6 +56,6 @@ int cmp_acrylic_noise_create(int width, int height, cmp_acrylic_noise_t **out_no
 int cmp_acrylic_noise_destroy(cmp_acrylic_noise_t *noise);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 #endif /* CMP_FLUENT_H */
 /* clang-format on */

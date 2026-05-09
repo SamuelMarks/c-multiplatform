@@ -4,7 +4,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* clang-format off */
 #include "cmp.h"
@@ -39,6 +39,6 @@ int CMP_API cmp_system_theme_is_dark(int *out_is_dark);
 int CMP_API cmp_system_theme_is_high_contrast(int *out_is_high_contrast);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_SYSTEM_THEME_H */

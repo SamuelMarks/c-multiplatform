@@ -4,7 +4,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @brief Opaque Asynchronous Pan/Zoom (APZ) Context
@@ -44,6 +44,6 @@ int cmp_apz_inject_gesture(cmp_apz_t *apz, float delta_x, float delta_y, float s
 int cmp_apz_get_transform(const cmp_apz_t *apz, float *out_matrix);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 #endif /* CMP_APZ_H */
 /* clang-format on */

@@ -7,7 +7,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @file cmp_credential_manager.h
@@ -81,6 +81,6 @@ cmp_credential_manager_delete_secret(cmp_credential_manager_t *manager,
 int CMP_API cmp_credential_manager_free_secret(char *secret);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_CREDENTIAL_MANAGER_H */

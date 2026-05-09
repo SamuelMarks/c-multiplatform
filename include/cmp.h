@@ -4586,9 +4586,12 @@ int cmp_swapchain_present(cmp_swapchain_t *swapchain);
 /**
  * @brief Get the native OS surface handle for the swapchain
  * @param swapchain The swapchain context
- * @return The native OS surface handle bound to the swapchain, or NULL.
+ * @param out_handle Pointer to receive the native OS surface handle bound to
+ * the swapchain
+ * @return Returns 0 on success, or an error code on failure.
  */
-void *cmp_swapchain_get_os_surface_handle(cmp_swapchain_t *swapchain);
+int cmp_swapchain_get_os_surface_handle(cmp_swapchain_t *swapchain,
+                                        void **out_handle);
 
 /**
  * @brief Opaque Overdraw Visualizer Context
@@ -5095,9 +5098,10 @@ int cmp_window_destroy(cmp_window_t *window);
  * @brief Get the native OS surface handle for the window (HWND, NSView,
  * xdg_surface, etc.)
  * @param window The window context
- * @return The native handle or NULL if unsupported.
+ * @param out_handle Pointer to receive the native handle
+ * @return Returns 0 on success, or an error code on failure.
  */
-void *cmp_window_get_native_handle(cmp_window_t *window);
+int cmp_window_get_native_handle(cmp_window_t *window, void **out_handle);
 
 /**
  * @brief Missing types from previous implementation

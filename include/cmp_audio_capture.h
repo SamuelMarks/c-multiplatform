@@ -7,7 +7,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @file cmp_audio_capture.h
@@ -63,6 +63,6 @@ int CMP_API cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
 int CMP_API cmp_audio_capture_free_wav(unsigned char *wav_data);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_AUDIO_CAPTURE_H */

@@ -4,7 +4,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @brief Opaque Compositor Thread Context
@@ -34,6 +34,6 @@ int cmp_compositor_thread_destroy(cmp_compositor_thread_t *thread);
 int cmp_compositor_thread_push_tree(cmp_compositor_thread_t *thread, void *layer_tree_opaque);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 #endif /* CMP_COMPOSITOR_THREAD_H */
 /* clang-format on */

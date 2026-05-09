@@ -8,7 +8,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @brief Opaque Lottie/Rive Animation Context
@@ -41,5 +41,5 @@ int cmp_lottie_destroy(cmp_lottie_t *lottie);
 int cmp_lottie_step(cmp_lottie_t *lottie, float dt_ms);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 #endif /* CMP_LOTTIE_H */

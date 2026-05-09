@@ -7,7 +7,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @file cmp_pty.h
@@ -64,6 +64,6 @@ int CMP_API cmp_pty_read(cmp_pty_t *pty, void *out_buffer,
                          unsigned int buffer_size, unsigned int *out_read);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_PTY_H */

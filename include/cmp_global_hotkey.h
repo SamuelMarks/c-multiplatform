@@ -7,7 +7,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @file cmp_global_hotkey.h
@@ -51,6 +51,6 @@ int CMP_API cmp_global_hotkey_register(cmp_global_hotkey_t *hotkey,
 int CMP_API cmp_global_hotkey_unregister(cmp_global_hotkey_t *hotkey, int id);
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CMP_GLOBAL_HOTKEY_H */
