@@ -19,7 +19,7 @@ TEST test_syntax_highlighter_parse(void) {
   cmp_syntax_highlighter_t *hl = NULL;
   cmp_highlight_span_t *spans = NULL;
   size_t count = 0;
-  const char *code = "int main() { /* comment */ return 0; } // line\n";
+  const char *code = "int main() { /* comment */ return 0; } /* line */\n";
 
   ASSERT_EQ(CMP_SUCCESS, cmp_syntax_highlighter_create(&hl));
 

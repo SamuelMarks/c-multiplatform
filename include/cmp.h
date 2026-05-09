@@ -10674,7 +10674,7 @@ int cmp_dx_export_debug_hierarchy(cmp_developer_experience_t *dx,
  * > matching Apple's standard DocC syntax expectations.
  *
  * @code
- * // Example:
+ * Example:
  * cmp_documentation_mock_init();
  * @endcode
  */
