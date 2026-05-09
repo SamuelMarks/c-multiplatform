@@ -5,7 +5,7 @@ set(CMAKE_FIND_USE_PACKAGE_REGISTRY OFF)
 set(CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY OFF)
 set(CMAKE_EXPORT_NO_PACKAGE_REGISTRY ON)
 
-if(CYGWIN)
+if(NOT MSVC AND NOT MINGW)
     add_compile_definitions(_vsnprintf=vsnprintf _snprintf=snprintf)
 endif()
 
