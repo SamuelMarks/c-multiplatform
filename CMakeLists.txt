@@ -338,6 +338,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "DOS")
     add_compile_definitions(CMP_OS_DOS=1)
     set(HTTP_ONLY ON CACHE BOOL "" FORCE)
 endif()
+if(CYGWIN)
+    set(OPENSSL_ROOT_DIR "/usr")
+endif()
 FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG master
     UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
 )
