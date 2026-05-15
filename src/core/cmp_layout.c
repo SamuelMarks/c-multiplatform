@@ -541,7 +541,10 @@ static void apply_rtl_mirroring(cmp_layout_node_t *node) {
         float dx = new_x - child->computed_rect.x;
         if (dx != 0.0f) {
           child->computed_rect.x = new_x;
-          translate_descendants(child, dx);
+          for (size_t k = 0; k < child->child_count; k++) {
+              child->children[k]->computed_rect.x += dx;
+              translate_descendants(child->children[k], dx);
+          }
         }
       }
     }
