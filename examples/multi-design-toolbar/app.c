@@ -185,7 +185,6 @@ static int create_simple_button(cmp_ui_node_t **out_btn, const char *text,
                                            void *)) {
   int rc;
   cmp_ui_node_t *btn_node = NULL;
-  cmp_ui_action_button_t *action_btn = NULL;
   cmp_a11y_tree_t *tree = NULL;
 
   if (!out_btn) {
@@ -193,26 +192,36 @@ static int create_simple_button(cmp_ui_node_t **out_btn, const char *text,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  rc = cmp_ui_action_button_create(&action_btn, text, CMP_UI_ACTION_BUTTON_STYLE_TONAL);
+  rc = cmp_ui_button_create(&btn_node, text, -1);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_action_button_create failed: %d\n", rc);
+    LOG_DEBUG("cmp_ui_button_create failed: %d\n", rc);
     return rc;
   }
 
-  rc = cmp_ui_action_button_get_node(action_btn, &btn_node);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_action_button_get_node failed: %d\n", rc);
-    return rc;
-  }
-
+  /* Set reasonable dimensions for a toolbar button */
+  btn_node->layout->width = 64.0f;
+  btn_node->layout->height = 40.0f;
   btn_node->layout->margin[3] = 0.0f;
+  btn_node->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
+  btn_node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+
+  /* Explicit theming values to ensure the generic button looks like a button
+     with proper contrast against the app bar in both light and dark modes. */
+  btn_node->text_color = g_is_dark ? 0xFFFFFFFF : 0xFF1D1B20;
+  btn_node->bg_color = g_is_dark ? 0x1AFFFFFF : 0x0D000000; /* Subtle fill */
+  btn_node->border_width = 1.0f;
+  btn_node->border_color = g_is_dark ? 0x4DFFFFFF : 0x4D000000; /* Visible border */
+  btn_node->border_radius = 6.0f;
+  btn_node->hover_opacity = 0.08f;
+  btn_node->press_opacity = 0.12f;
 
   if (aria_label) {
     rc = cmp_a11y_tree_create(&tree);
     if (rc == CMP_SUCCESS) {
-      rc = cmp_ui_action_button_bind_a11y(action_btn, tree);
+      rc = cmp_a11y_tree_add_node(tree, btn_node->layout->id, "button",
+                                  aria_label);
       if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_action_button_bind_a11y failed: %d\n", rc);
+        LOG_DEBUG("cmp_a11y_tree_add_node failed: %d\n", rc);
       }
     } else {
       LOG_DEBUG("cmp_a11y_tree_create failed: %d\n", rc);
