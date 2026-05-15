@@ -198,11 +198,23 @@ static int create_simple_button(cmp_ui_node_t **out_btn, const char *text,
     return rc;
   }
 
-  /* Force the button to render natively in all design languages.
-     Fluent 2 specifically requires the "type" parameter to be exactly 3.
-     Rely completely on the inherited design language override for 
-     colors, contrast, and borders. */
+  /* Set reasonable dimensions for a toolbar button */
+  btn_node->layout->width = 64.0f;
+  btn_node->layout->height = 40.0f;
   btn_node->layout->margin[3] = 0.0f;
+  btn_node->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
+  btn_node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+
+  /* Explicitly use fully opaque (alpha=255) colors to ensure borders are 
+     always drawn correctly by the GDI rendering backend, resolving contrast 
+     issues against the app bar in light/dark modes. */
+  btn_node->bg_color = g_is_dark ? 0xFF333333 : 0xFFE0E0E0;
+  btn_node->text_color = g_is_dark ? 0xFFFFFFFF : 0xFF000000;
+  btn_node->border_width = 1.0f;
+  btn_node->border_color = g_is_dark ? 0xFF555555 : 0xFFBDBDBD;
+  btn_node->border_radius = 6.0f;
+  btn_node->hover_opacity = 0.08f;
+  btn_node->press_opacity = 0.12f;
 
   if (aria_label) {
     rc = cmp_a11y_tree_create(&tree);
