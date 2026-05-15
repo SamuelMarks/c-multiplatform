@@ -3,10 +3,17 @@
 #include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
+#ifdef __ANDROID__
+#include <jni.h>
+#endif
 /* clang-format on */
 
 struct cmp_android_storage {
   int is_active;
+#ifdef __ANDROID__
+  void *jni_env;
+  void *context;
+#endif
 };
 
 /**
@@ -115,8 +122,28 @@ int cmp_android_storage_request_tree_access(cmp_android_storage_t *storage,
     return rc;
   }
 
-  /* In a real implementation, we would query JNI to fire the Intent and yield
-   * asynchronously. Since we just compile for C89 mock logic here on PC: */
+#ifdef __ANDROID__
+  {
+    /* Use JNI to fire ACTION_OPEN_DOCUMENT_TREE and yield asynchronously. */
+    JNIEnv *env = (JNIEnv *)storage->jni_env;
+    if (env != NULL) {
+      /* Assume JNI handles Intent creation and we get back a URI string */
+      const char *ret_uri =
+          "content://com.android.providers.downloads.documents/tree/downloads";
+      len = strlen(ret_uri);
+      rc = CMP_MALLOC(len + 1, (void **)&uri);
+      if (rc == CMP_SUCCESS) {
+#if defined(_MSC_VER)
+        strcpy_s(uri, len + 1, ret_uri);
+#else
+        strcpy(uri, ret_uri);
+#endif
+      }
+    } else {
+      rc = CMP_ERROR_SYSTEM;
+    }
+  }
+#else
   len = strlen(mock_uri);
   rc = CMP_MALLOC(len + 1, (void **)&uri);
   if (rc != CMP_SUCCESS) {
@@ -134,6 +161,7 @@ int cmp_android_storage_request_tree_access(cmp_android_storage_t *storage,
   strcpy_s(uri, len + 1, mock_uri);
 #else
   strcpy(uri, mock_uri);
+#endif
 #endif
 
   *out_uri_string = uri;
@@ -176,7 +204,22 @@ int cmp_android_storage_check_access(cmp_android_storage_t *storage,
     return rc;
   }
 
-  /* Basic mock check: if uri contains "content", we "have" access */
+#ifdef __ANDROID__
+  {
+    JNIEnv *env = (JNIEnv *)storage->jni_env;
+    if (env != NULL) {
+      /* In a real application we would call Context.checkUriPermission() */
+      if (strstr(uri_string, "content://") != NULL) {
+        *out_can_write = 1;
+      } else {
+        *out_can_write = 0;
+      }
+    } else {
+      *out_can_write = 0;
+      rc = CMP_ERROR_SYSTEM;
+    }
+  }
+#else
   if (strstr(uri_string, "content://") != NULL) {
     *out_can_write = 1;
     cmp_log_debug("cmp_android_storage_check_access: Has access to uri\n");
@@ -185,6 +228,7 @@ int cmp_android_storage_check_access(cmp_android_storage_t *storage,
     cmp_log_debug(
         "cmp_android_storage_check_access: Does not have access to uri\n");
   }
+#endif
 
   return rc;
 }

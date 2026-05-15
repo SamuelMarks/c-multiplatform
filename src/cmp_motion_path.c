@@ -81,6 +81,24 @@ int cmp_motion_path_destroy(cmp_motion_path_t *path) {
   return rc;
 }
 
+int CMP_API cmp_motion_path_set_curve(cmp_motion_path_t *path, float p0x,
+                                      float p0y, float p1x, float p1y,
+                                      float p2x, float p2y, float p3x,
+                                      float p3y) {
+  struct cmp_motion_path *p = (struct cmp_motion_path *)path;
+  if (!p)
+    return CMP_ERROR_INVALID_ARG;
+  p->p0x = p0x;
+  p->p0y = p0y;
+  p->p1x = p1x;
+  p->p1y = p1y;
+  p->p2x = p2x;
+  p->p2y = p2y;
+  p->p3x = p3x;
+  p->p3y = p3y;
+  return CMP_SUCCESS;
+}
+
 /**
  * @brief Evaluate cubic bezier at parameter t.
  *

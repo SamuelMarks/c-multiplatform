@@ -48,6 +48,26 @@ TEST test_regex_match(void) {
 
   ASSERT_EQ(CMP_SUCCESS, cmp_regex_free(regex));
 
+  /* Test advanced patterns */
+  ASSERT_EQ(CMP_SUCCESS, cmp_regex_compile(&regex, "^hello"));
+  ASSERT_EQ(CMP_SUCCESS, cmp_regex_match(regex, "hello world", &matched));
+  ASSERT_EQ(1, matched);
+  ASSERT_EQ(CMP_SUCCESS, cmp_regex_match(regex, "world hello", &matched));
+  ASSERT_EQ(0, matched);
+  ASSERT_EQ(CMP_SUCCESS, cmp_regex_free(regex));
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_regex_compile(&regex, "world$"));
+  ASSERT_EQ(CMP_SUCCESS, cmp_regex_match(regex, "hello world", &matched));
+  ASSERT_EQ(1, matched);
+  ASSERT_EQ(CMP_SUCCESS, cmp_regex_match(regex, "world hello", &matched));
+  ASSERT_EQ(0, matched);
+  ASSERT_EQ(CMP_SUCCESS, cmp_regex_free(regex));
+
+  ASSERT_EQ(CMP_SUCCESS, cmp_regex_compile(&regex, "h.*o"));
+  ASSERT_EQ(CMP_SUCCESS, cmp_regex_match(regex, "hello", &matched));
+  ASSERT_EQ(1, matched);
+  ASSERT_EQ(CMP_SUCCESS, cmp_regex_free(regex));
+
   PASS();
 }
 

@@ -2,6 +2,9 @@
 #include "cmp.h"
 #include "cmp_log.h"
 #include <stdlib.h>
+#ifdef __ANDROID__
+#include <android/looper.h>
+#endif
 /* clang-format on */
 
 struct cmp_android_ndk_bridge {
@@ -118,7 +121,17 @@ int cmp_android_ndk_bridge_tick(cmp_android_ndk_bridge_t *bridge,
                 "total=%.2f)\n",
                 delta_time, bridge->total_time);
 
-  /* Mock: In the real Android application, this would call ALooper_pollAll */
+#ifdef __ANDROID__
+  {
+    int ident;
+    int events;
+    void *data;
+    /* Process all pending events without blocking */
+    while ((ident = ALooper_pollAll(0, NULL, &events, &data)) >= 0) {
+      /* We could handle sensor/input events here */
+    }
+  }
+#endif
 
   return rc;
 }

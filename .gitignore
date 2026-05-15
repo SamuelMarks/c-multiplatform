@@ -60,11 +60,20 @@ vcpkg_installed/
 *.bak
 *.swp
 *~
+*.txt
+*.ps1
+*.bat
+*.cmd
 result*.txt
 NEW_PROMPT.md
 avatar.txt
 ui.txt
 dummy.c
+
+# Prevent ignoring root required txt files
+!CMakeLists.txt
+!README.md
+!LICENSE-*
 
 # Python
 *.py

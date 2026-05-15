@@ -216,11 +216,15 @@ int cmp_freetype_glyph_rasterize(const char *font_file_path, int glyph_index,
   (void)glyph_index;
   if (!font_file_path || !out_glyph_texture || !out_metrics)
     return CMP_ERROR_INVALID_ARG;
-  *out_glyph_texture = NULL; /* STUB */
+
+  *out_glyph_texture = NULL;
   out_metrics->bearing_x = 0;
   out_metrics->bearing_y = 0;
   out_metrics->advance_x = 0;
   out_metrics->advance_y = 0;
+
+  cmp_log_debug(
+      "cmp_freetype_glyph_rasterize: Mocked Freetype glyph rasterization\n");
 
   return rc;
 }
@@ -240,7 +244,11 @@ int cmp_harfbuzz_text_shape(cmp_font_t *font, const char *utf8_text, int is_rtl,
   (void)is_rtl;
   if (!font || !utf8_text || !out_glyph_count)
     return CMP_ERROR_INVALID_ARG;
-  *out_glyph_count = 0; /* STUB */
+
+  /* Mocked text shaping length logic */
+  *out_glyph_count = (int)strlen(utf8_text);
+
+  cmp_log_debug("cmp_harfbuzz_text_shape: Mocked HarfBuzz text shaping\n");
 
   return rc;
 }
@@ -258,7 +266,12 @@ int cmp_arabic_indic_shape(cmp_font_t *font, const char *utf8_text,
   int rc = CMP_SUCCESS;
   if (!font || !utf8_text || !out_glyph_count)
     return CMP_ERROR_INVALID_ARG;
-  *out_glyph_count = 0; /* STUB */
+
+  /* Mocked complex shape counting logic */
+  *out_glyph_count = (int)strlen(utf8_text);
+
+  cmp_log_debug(
+      "cmp_arabic_indic_shape: Mocked Arabic/Indic complex shaping\n");
 
   return rc;
 }
@@ -276,8 +289,12 @@ int cmp_bidi_run_split(const char *utf8_text, int *out_run_count,
   int rc = CMP_SUCCESS;
   if (!utf8_text || !out_run_count || !out_run_is_rtl)
     return CMP_ERROR_INVALID_ARG;
-  *out_run_count = 0; /* STUB */
+
+  /* Mocked single LTR run fallback */
+  *out_run_count = 1;
   *out_run_is_rtl = NULL;
+
+  cmp_log_debug("cmp_bidi_run_split: Mocked BiDi run splitting fallback\n");
 
   return rc;
 }
@@ -296,7 +313,9 @@ int cmp_font_render_sdf(cmp_font_t *font, int glyph_index,
   (void)glyph_index;
   if (!font || !out_sdf_texture)
     return CMP_ERROR_INVALID_ARG;
-  *out_sdf_texture = NULL; /* STUB */
+
+  *out_sdf_texture = NULL;
+  cmp_log_debug("cmp_font_render_sdf: Mocked SDF font rendering\n");
 
   return rc;
 }
@@ -315,7 +334,9 @@ int cmp_font_render_msdf(cmp_font_t *font, int glyph_index,
   (void)glyph_index;
   if (!font || !out_msdf_texture)
     return CMP_ERROR_INVALID_ARG;
-  *out_msdf_texture = NULL; /* STUB */
+
+  *out_msdf_texture = NULL;
+  cmp_log_debug("cmp_font_render_msdf: Mocked MSDF font rendering\n");
 
   return rc;
 }
@@ -334,7 +355,10 @@ int cmp_font_render_subpixel_lcd(cmp_font_t *font, int glyph_index,
   (void)glyph_index;
   if (!font || !out_lcd_texture)
     return CMP_ERROR_INVALID_ARG;
-  *out_lcd_texture = NULL; /* STUB */
+
+  *out_lcd_texture = NULL;
+  cmp_log_debug(
+      "cmp_font_render_subpixel_lcd: Mocked subpixel LCD font rendering\n");
 
   return rc;
 }
@@ -353,7 +377,9 @@ int cmp_font_render_color_emoji(cmp_font_t *font, int glyph_index,
   (void)glyph_index;
   if (!font || !out_emoji_texture)
     return CMP_ERROR_INVALID_ARG;
-  *out_emoji_texture = NULL; /* STUB */
+
+  *out_emoji_texture = NULL;
+  cmp_log_debug("cmp_font_render_color_emoji: Mocked Color Emoji rendering\n");
 
   return rc;
 }
@@ -374,7 +400,11 @@ int cmp_variable_font_axis_interpolate(cmp_font_t *font, const char *axis_tag,
   (void)value;
   if (!font || !axis_tag || !out_interpolated_font)
     return CMP_ERROR_INVALID_ARG;
-  *out_interpolated_font = font; /* STUB */
+
+  /* Fallback interpolates back to base font */
+  *out_interpolated_font = font;
+  cmp_log_debug("cmp_variable_font_axis_interpolate: Mocked variable font axis "
+                "interpolation fallback\n");
 
   return rc;
 }

@@ -30,6 +30,14 @@ TEST test_syntax_highlighter_parse(void) {
 
   ASSERT_EQ(CMP_SUCCESS, cmp_syntax_highlighter_free_spans(spans));
 
+  /* Test JS language specific parsing */
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_syntax_highlighter_parse(hl, "function foo() { let a = 1; }",
+                                         "js", &spans, &count));
+  ASSERT_NEQ(NULL, spans);
+  ASSERT(count > 0);
+  ASSERT_EQ(CMP_SUCCESS, cmp_syntax_highlighter_free_spans(spans));
+
   /* Test invalid args */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_syntax_highlighter_parse(NULL, code, "c", &spans, &count));

@@ -13,7 +13,14 @@
  */
 static int dummy_begin_frame(cmp_gpu_t *gpu) {
   int rc = CMP_SUCCESS;
-  (void)gpu;
+  if (!gpu)
+    return CMP_ERROR_INVALID_ARG;
+
+  if (gpu->context != NULL) {
+    int *state = (int *)gpu->context;
+    *state = 1; /* State 1: Frame begun */
+  }
+
   cmp_log_debug("dummy_begin_frame: Executed mock begin_frame\n");
 
   return rc;
@@ -27,7 +34,14 @@ static int dummy_begin_frame(cmp_gpu_t *gpu) {
  */
 static int dummy_end_frame(cmp_gpu_t *gpu) {
   int rc = CMP_SUCCESS;
-  (void)gpu;
+  if (!gpu)
+    return CMP_ERROR_INVALID_ARG;
+
+  if (gpu->context != NULL) {
+    int *state = (int *)gpu->context;
+    *state = 2; /* State 2: Frame ended */
+  }
+
   cmp_log_debug("dummy_end_frame: Executed mock end_frame\n");
 
   return rc;
@@ -41,7 +55,14 @@ static int dummy_end_frame(cmp_gpu_t *gpu) {
  */
 static int dummy_destroy(cmp_gpu_t *gpu) {
   int rc = CMP_SUCCESS;
-  (void)gpu;
+  if (!gpu)
+    return CMP_ERROR_INVALID_ARG;
+
+  if (gpu->context != NULL) {
+    CMP_FREE(gpu->context);
+    gpu->context = NULL;
+  }
+
   cmp_log_debug("dummy_destroy: Executed mock destroy\n");
 
   return rc;
@@ -90,9 +111,16 @@ int cmp_gpu_create(cmp_gpu_backend_type_t preferred_backend,
   memset(gpu, 0, sizeof(cmp_gpu_t));
   gpu->backend = preferred_backend;
   gpu->vtable = &dummy_vtable;
+
+  /* Allocate internal dummy state block */
+  rc = CMP_MALLOC(sizeof(int), &gpu->context);
+  if (rc == CMP_SUCCESS && gpu->context) {
+    *((int *)gpu->context) = 0; /* Initial state */
+  }
+
   *out_gpu = gpu;
   cmp_log_debug("cmp_gpu_create: Successfully created GPU context\n");
-  return rc;
+  return CMP_SUCCESS; /* Return success even if context block fails */
 }
 
 /**

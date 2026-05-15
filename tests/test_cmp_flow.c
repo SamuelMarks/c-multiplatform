@@ -57,16 +57,31 @@ TEST test_shape_outside_evaluate(void) {
   cmp_rect_t float_rect = {0.0f, 0.0f, 50.0f, 50.0f};
   cmp_layout_node_create(&node);
 
+  /* Test 1: Rectangular wrapping */
+  node->computed_rect.y = 10.0f;
+  node->computed_rect.height = 10.0f;
   node->computed_rect.width = 200.0f;
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_shape_outside_evaluate(node, float_rect, 0.0f, 10.0f));
   ASSERT_EQ(140.0f, node->computed_rect.width); /* 200 - (50 + 10) */
 
+  /* Test 2: Circular wrapping (intersects exactly at center y) */
+  node->computed_rect.y = 25.0f;
+  node->computed_rect.height = 0.0f;
   node->computed_rect.width = 200.0f;
   ASSERT_EQ(CMP_SUCCESS,
             cmp_shape_outside_evaluate(node, float_rect, 25.0f, 5.0f));
-  ASSERT_EQ(170.0f, node->computed_rect.width); /* 200 - (25 + 5) */
+  ASSERT_EQ(170.0f, node->computed_rect.width); /* 200 - (25 + 5) since y_dist =
+                                                   0 -> x_dist = 25 - 0 = 25 */
+
+  /* Test 3: Outside boundaries */
+  node->computed_rect.y = 100.0f;
+  node->computed_rect.height = 10.0f;
+  node->computed_rect.width = 200.0f;
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_shape_outside_evaluate(node, float_rect, 0.0f, 10.0f));
+  ASSERT_EQ(200.0f, node->computed_rect.width); /* No intersection */
 
   cmp_layout_node_destroy(node);
   PASS();

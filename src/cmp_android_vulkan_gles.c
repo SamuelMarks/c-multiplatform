@@ -2,6 +2,9 @@
 #include "cmp.h"
 #include "cmp_log.h"
 #include <stdlib.h>
+#ifdef __ANDROID__
+#include <dlfcn.h>
+#endif
 /* clang-format on */
 
 struct cmp_android_renderer {
@@ -112,11 +115,21 @@ int cmp_android_renderer_initialize_fallback(cmp_android_renderer_t *renderer,
     return rc;
   }
 
-  /* Mock: Try Vulkan first */
-  /* In a real implementation, we would query
-   * vkEnumerateInstanceExtensionProperties */
-  /* For this cross-platform mock, we just select a fallback explicitly */
-  renderer->active_backend = 1; /* e.g., CMP_BACKEND_VULKAN */
+#ifdef __ANDROID__
+  {
+    /* Dynamically check if Vulkan library is available on the device */
+    void *vulkan_lib = dlopen("libvulkan.so", RTLD_NOW);
+    if (vulkan_lib != NULL) {
+      renderer->active_backend = 1; /* Vulkan */
+      dlclose(vulkan_lib);
+    } else {
+      renderer->active_backend = 2; /* Fallback to GLES */
+    }
+  }
+#else
+  /* For non-Android targets, default to Vulkan/Primary backend */
+  renderer->active_backend = 1;
+#endif
   *out_backend = renderer->active_backend;
 
   cmp_log_debug("cmp_android_renderer_initialize_fallback: Initialized "

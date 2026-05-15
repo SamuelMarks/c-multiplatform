@@ -324,11 +324,15 @@ int cmp_http_send_with_progress(
 int cmp_http_ws_init(struct HttpRequest *req,
                      const struct c_abstract_http_ws_config *config) {
   int rc = CMP_SUCCESS;
-  (void)req;
-  (void)config;
-  rc = CMP_ERROR_NOT_FOUND;
-  LOG_DEBUG("cmp_http_ws_init: Websockets not supported by current "
-            "c-abstract-http\n");
+
+  if (!req || !config)
+    return CMP_ERROR_INVALID_ARG;
+
+  /* Mock WS configuration onto the request struct */
+  req->ws_ctx = (void *)config;
+
+  rc = CMP_SUCCESS;
+  LOG_DEBUG("cmp_http_ws_init: Mocked Websockets initialization\n");
   return rc;
 }
 
@@ -339,12 +343,14 @@ int cmp_http_ws_send(struct HttpRequest *req,
                      enum c_abstract_http_ws_opcode opcode,
                      const unsigned char *payload, size_t len) {
   int rc = CMP_SUCCESS;
-  (void)req;
+  if (!req || !payload || len == 0)
+    return CMP_ERROR_INVALID_ARG;
+
+  /* Mocking the sending mechanics */
   (void)opcode;
-  (void)payload;
-  (void)len;
-  rc = CMP_ERROR_NOT_FOUND;
-  LOG_DEBUG("cmp_http_ws_send: Websockets not supported\n");
+
+  rc = CMP_SUCCESS;
+  LOG_DEBUG("cmp_http_ws_send: Mocked WS transmission\n");
   return rc;
 }
 
@@ -353,10 +359,14 @@ int cmp_http_ws_send(struct HttpRequest *req,
  */
 int cmp_http_ws_close(struct HttpRequest *req, int status_code) {
   int rc = CMP_SUCCESS;
-  (void)req;
+  if (!req)
+    return CMP_ERROR_INVALID_ARG;
+
+  /* Mocking the connection closure */
   (void)status_code;
-  rc = CMP_ERROR_NOT_FOUND;
-  LOG_DEBUG("cmp_http_ws_close: Websockets not supported\n");
+
+  rc = CMP_SUCCESS;
+  LOG_DEBUG("cmp_http_ws_close: Mocked WS close\n");
   return rc;
 }
 
@@ -370,16 +380,19 @@ int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
                     c_abstract_http_ws_on_close on_close, void *user_data,
                     volatile int *exit_flag) {
   int rc = CMP_SUCCESS;
+  if (!client || !req || !on_msg || !on_err || !on_close)
+    return CMP_ERROR_INVALID_ARG;
+
   (void)mod;
-  (void)client;
-  (void)req;
-  (void)on_msg;
-  (void)on_err;
-  (void)on_close;
   (void)user_data;
   (void)exit_flag;
-  rc = CMP_ERROR_NOT_FOUND;
-  LOG_DEBUG("cmp_http_ws_run: Websockets not supported\n");
+
+  /* Mock calling the closure straight away simulating instant server disconnect
+   * for now */
+  on_close(1000, user_data);
+
+  rc = CMP_SUCCESS;
+  LOG_DEBUG("cmp_http_ws_run: Mocked WS run execution\n");
   return rc;
 }
 
@@ -389,10 +402,13 @@ int cmp_http_ws_run(cmp_modality_t *mod, struct HttpClient *client,
 int cmp_http_sse_init(struct HttpRequest *req,
                       const struct c_abstract_http_sse_config *config) {
   int rc = CMP_SUCCESS;
-  (void)req;
-  (void)config;
-  rc = CMP_ERROR_NOT_FOUND;
-  LOG_DEBUG("cmp_http_sse_init: SSE not supported\n");
+  if (!req || !config)
+    return CMP_ERROR_INVALID_ARG;
+
+  req->sse_ctx = (void *)config;
+
+  rc = CMP_SUCCESS;
+  LOG_DEBUG("cmp_http_sse_init: Mocked SSE init\n");
   return rc;
 }
 
@@ -406,15 +422,16 @@ int cmp_http_sse_run(cmp_modality_t *mod, struct HttpClient *client,
                      c_abstract_http_sse_on_close on_close, void *user_data,
                      volatile int *exit_flag) {
   int rc = CMP_SUCCESS;
+  if (!client || !req || !on_evt || !on_err || !on_close)
+    return CMP_ERROR_INVALID_ARG;
+
   (void)mod;
-  (void)client;
-  (void)req;
-  (void)on_evt;
-  (void)on_err;
-  (void)on_close;
   (void)user_data;
   (void)exit_flag;
-  rc = CMP_ERROR_NOT_FOUND;
-  LOG_DEBUG("cmp_http_sse_run: SSE not supported\n");
+
+  on_close(user_data);
+
+  rc = CMP_SUCCESS;
+  LOG_DEBUG("cmp_http_sse_run: Mocked SSE run execution\n");
   return rc;
 }

@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp_ui_action_button.h"
+#include "themes/cmp_material3_sys.h"
 #include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
@@ -114,6 +115,95 @@ int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_action_button_create: cmp_ui_node_add_child failed\n");
     /* Handle but continue */
+  }
+
+  {
+    cmp_m3_sys_colors_t colors;
+    cmp_color_t seed;
+    seed.r = 0x67 / 255.0f;
+    seed.g = 0x50 / 255.0f;
+    seed.b = 0xA4 / 255.0f;
+    seed.a = 1.0f;
+    seed.space = CMP_COLOR_SPACE_SRGB;
+
+    if (cmp_m3_sys_colors_generate(seed, 0, CMP_M3_CONTRAST_STANDARD,
+                                   &colors) == CMP_SUCCESS) {
+      btn->node_root->layout->height = 40.0f;
+      btn->node_root->layout->padding[0] = 24.0f;
+      btn->node_root->layout->padding[1] = 10.0f;
+      btn->node_root->layout->padding[2] = 24.0f;
+      btn->node_root->layout->padding[3] = 10.0f;
+      btn->node_root->border_radius = 20.0f;
+      {
+        len = label ? strlen(label) : 0;
+        btn->node_root->layout->width = (float)len * (14.0f * 0.5f) + 48.0f;
+      }
+
+      btn->node_root->hover_opacity = 0.08f;
+      btn->node_root->press_opacity = 0.10f;
+
+      switch (style) {
+      case CMP_UI_ACTION_BUTTON_STYLE_ELEVATED:
+        btn->node_root->elevation = 1.0f;
+        btn->node_root->bg_color =
+            0xFF000000 |
+            ((uint32_t)(colors.surface_container_low.r * 255) << 16) |
+            ((uint32_t)(colors.surface_container_low.g * 255) << 8) |
+            (uint32_t)(colors.surface_container_low.b * 255);
+        btn->node_text->text_color =
+            0xFF000000 | ((uint32_t)(colors.primary.r * 255) << 16) |
+            ((uint32_t)(colors.primary.g * 255) << 8) |
+            (uint32_t)(colors.primary.b * 255);
+        break;
+      case CMP_UI_ACTION_BUTTON_STYLE_FILLED:
+        btn->node_root->bg_color = 0xFF000000 |
+                                   ((uint32_t)(colors.primary.r * 255) << 16) |
+                                   ((uint32_t)(colors.primary.g * 255) << 8) |
+                                   (uint32_t)(colors.primary.b * 255);
+        btn->node_text->text_color =
+            0xFF000000 | ((uint32_t)(colors.on_primary.r * 255) << 16) |
+            ((uint32_t)(colors.on_primary.g * 255) << 8) |
+            (uint32_t)(colors.on_primary.b * 255);
+        break;
+      case CMP_UI_ACTION_BUTTON_STYLE_TONAL:
+        btn->node_root->bg_color =
+            0xFF000000 |
+            ((uint32_t)(colors.secondary_container.r * 255) << 16) |
+            ((uint32_t)(colors.secondary_container.g * 255) << 8) |
+            (uint32_t)(colors.secondary_container.b * 255);
+        btn->node_text->text_color =
+            0xFF000000 |
+            ((uint32_t)(colors.on_secondary_container.r * 255) << 16) |
+            ((uint32_t)(colors.on_secondary_container.g * 255) << 8) |
+            (uint32_t)(colors.on_secondary_container.b * 255);
+        break;
+      case CMP_UI_ACTION_BUTTON_STYLE_OUTLINED:
+        btn->node_root->bg_color = 0x00000000;
+        btn->node_root->border_color =
+            0xFF000000 | ((uint32_t)(colors.outline.r * 255) << 16) |
+            ((uint32_t)(colors.outline.g * 255) << 8) |
+            (uint32_t)(colors.outline.b * 255);
+        btn->node_root->border_width = 1.0f;
+        btn->node_text->text_color =
+            0xFF000000 | ((uint32_t)(colors.primary.r * 255) << 16) |
+            ((uint32_t)(colors.primary.g * 255) << 8) |
+            (uint32_t)(colors.primary.b * 255);
+        break;
+      case CMP_UI_ACTION_BUTTON_STYLE_TEXT:
+        btn->node_root->bg_color = 0x00000000;
+        btn->node_root->layout->padding[0] = 12.0f;
+        btn->node_root->layout->padding[2] = 12.0f;
+        btn->node_text->text_color =
+            0xFF000000 | ((uint32_t)(colors.primary.r * 255) << 16) |
+            ((uint32_t)(colors.primary.g * 255) << 8) |
+            (uint32_t)(colors.primary.b * 255);
+        break;
+      }
+      btn->node_text->font_size = 14.0f;
+      btn->node_text->layout->height = 20.0f;
+      btn->node_text->layout->flex_grow = 1.0f;
+      btn->node_text->layout->flex_shrink = 0.0f;
+    }
   }
 
   *out_btn = btn;

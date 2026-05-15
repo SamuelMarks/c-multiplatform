@@ -148,12 +148,46 @@ TEST test_compositor_anim_zero_duration(void) {
   PASS();
 }
 
+TEST test_compositor_crossfade_mock(void) {
+  cmp_window_t *win = (cmp_window_t *)0x1234; /* Dummy window pointer */
+  cmp_framebuffer_capture_t *capture = NULL;
+  float easing[4] = {0.0f, 0.0f, 1.0f, 1.0f};
+  int res;
+
+  /* Test capture */
+  res = cmp_compositor_capture_framebuffer(win, &capture);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_NEQ(NULL, capture);
+
+  /* Test crossfade */
+  res = cmp_compositor_start_crossfade(win, capture, 300.0, easing);
+  ASSERT_EQ(CMP_SUCCESS, res);
+
+  /* Test release */
+  res = cmp_compositor_release_framebuffer(capture);
+  ASSERT_EQ(CMP_SUCCESS, res);
+
+  /* Null args */
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_compositor_capture_framebuffer(NULL, &capture));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_compositor_capture_framebuffer(win, NULL));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_compositor_start_crossfade(NULL, capture, 300.0, easing));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG,
+            cmp_compositor_start_crossfade(win, NULL, 300.0, easing));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_compositor_release_framebuffer(NULL));
+
+  PASS();
+}
+
 SUITE(compositor_anim_suite) {
   RUN_TEST(test_compositor_anim_lifecycle);
   RUN_TEST(test_compositor_anim_null_args);
   RUN_TEST(test_compositor_anim_opacity_step);
   RUN_TEST(test_compositor_anim_transform_step);
   RUN_TEST(test_compositor_anim_zero_duration);
+  RUN_TEST(test_compositor_crossfade_mock);
 }
 
 GREATEST_MAIN_DEFS();

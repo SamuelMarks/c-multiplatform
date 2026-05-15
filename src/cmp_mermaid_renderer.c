@@ -75,9 +75,13 @@ int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
                                       const char *mermaid_syntax,
                                       char **out_svg_xml) {
   int rc = CMP_SUCCESS;
-  const char *dummy_svg = "<svg><rect width=\"10\" height=\"10\"/></svg>";
+  const char *svg_prefix =
+      "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" "
+      "height=\"100\"><text x=\"10\" y=\"20\">";
+  const char *svg_suffix = "</text></svg>";
   char *svg_out;
   size_t len;
+  size_t syn_len;
 
   rc = CMP_SUCCESS;
   svg_out = NULL;
@@ -87,22 +91,40 @@ int cmp_mermaid_renderer_generate_svg(cmp_mermaid_renderer_t *renderer,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  len = strlen(dummy_svg);
+  if (strstr(mermaid_syntax, "graph") == NULL &&
+      strstr(mermaid_syntax, "sequenceDiagram") == NULL) {
+    /* Simple mocked syntax validation for stubs */
+    return CMP_ERROR_INVALID_ARG;
+  }
+
+  syn_len = strlen(mermaid_syntax);
+  len = strlen(svg_prefix) + syn_len + strlen(svg_suffix);
   rc = CMP_MALLOC(len + 1, (void **)&svg_out);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Error in cmp_mermaid_renderer_generate_svg: CMP_MALLOC failed "
               "(OOM)\n");
     return CMP_ERROR_OOM;
   }
+
 #if defined(_MSC_VER)
-  rc = strncpy_s(svg_out, len + 1, dummy_svg, _TRUNCATE);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Error in cmp_mermaid_renderer_generate_svg: strncpy_s failed\n");
+  if (strcpy_s(svg_out, len + 1, svg_prefix) != 0) {
+    CMP_FREE(svg_out);
+    return CMP_ERROR_GENERAL;
+  }
+  if (strcat_s(svg_out, len + 1, mermaid_syntax) != 0) {
+    CMP_FREE(svg_out);
+    return CMP_ERROR_GENERAL;
+  }
+  if (strcat_s(svg_out, len + 1, svg_suffix) != 0) {
+    CMP_FREE(svg_out);
     return CMP_ERROR_GENERAL;
   }
 #else
-  strncpy(svg_out, dummy_svg, len);
+  strcpy(svg_out, svg_prefix);
+  strcat(svg_out, mermaid_syntax);
+  strcat(svg_out, svg_suffix);
 #endif
+
   svg_out[len] = '\0';
   *out_svg_xml = svg_out;
 

@@ -74,13 +74,21 @@ int cmp_syntax_highlighter_parse(cmp_syntax_highlighter_t *hl,
   size_t count;
   size_t i;
   size_t len;
+  int is_c = 0;
+  int is_js = 0;
 
   if (!hl || !source_code || !out_spans || !out_count) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  /* Dummy language ignore */
-  (void)language;
+  if (language != NULL) {
+    if (strcmp(language, "c") == 0 || strcmp(language, "cpp") == 0) {
+      is_c = 1;
+    } else if (strcmp(language, "js") == 0 ||
+               strcmp(language, "javascript") == 0) {
+      is_js = 1;
+    }
+  }
 
   len = strlen(source_code);
   capacity = 16;
@@ -174,20 +182,40 @@ int cmp_syntax_highlighter_parse(cmp_syntax_highlighter_t *hl,
       }
       ident_len = i - start;
 
-      if (ident_len == 2 && strncmp(source_code + start, "if", 2) == 0)
-        is_keyword = 1;
-      else if (ident_len == 4 && strncmp(source_code + start, "else", 4) == 0)
-        is_keyword = 1;
-      else if (ident_len == 6 && strncmp(source_code + start, "return", 6) == 0)
-        is_keyword = 1;
-      else if (ident_len == 5 && strncmp(source_code + start, "while", 5) == 0)
-        is_keyword = 1;
-      else if (ident_len == 3 && strncmp(source_code + start, "for", 3) == 0)
-        is_keyword = 1;
-      else if (ident_len == 3 && strncmp(source_code + start, "int", 3) == 0)
-        is_keyword = 1;
-      else if (ident_len == 4 && strncmp(source_code + start, "void", 4) == 0)
-        is_keyword = 1;
+      if (is_c || is_js) {
+        if (ident_len == 2 && strncmp(source_code + start, "if", 2) == 0)
+          is_keyword = 1;
+        else if (ident_len == 4 && strncmp(source_code + start, "else", 4) == 0)
+          is_keyword = 1;
+        else if (ident_len == 6 &&
+                 strncmp(source_code + start, "return", 6) == 0)
+          is_keyword = 1;
+        else if (ident_len == 5 &&
+                 strncmp(source_code + start, "while", 5) == 0)
+          is_keyword = 1;
+        else if (ident_len == 3 && strncmp(source_code + start, "for", 3) == 0)
+          is_keyword = 1;
+      }
+
+      if (is_c) {
+        if (ident_len == 3 && strncmp(source_code + start, "int", 3) == 0)
+          is_keyword = 1;
+        else if (ident_len == 4 && strncmp(source_code + start, "void", 4) == 0)
+          is_keyword = 1;
+        else if (ident_len == 4 && strncmp(source_code + start, "char", 4) == 0)
+          is_keyword = 1;
+      } else if (is_js) {
+        if (ident_len == 3 && strncmp(source_code + start, "var", 3) == 0)
+          is_keyword = 1;
+        else if (ident_len == 3 && strncmp(source_code + start, "let", 3) == 0)
+          is_keyword = 1;
+        else if (ident_len == 5 &&
+                 strncmp(source_code + start, "const", 5) == 0)
+          is_keyword = 1;
+        else if (ident_len == 8 &&
+                 strncmp(source_code + start, "function", 8) == 0)
+          is_keyword = 1;
+      }
 
       /* Lookahead for function */
       if (!is_keyword) {

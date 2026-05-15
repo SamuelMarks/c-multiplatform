@@ -1852,6 +1852,10 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
                             char *out_buffer, size_t buffer_size) {
   int rc = CMP_SUCCESS;
   size_t i;
+  const char *role_str = "generic";
+  const char *name_str = "generic";
+  uint32_t traits = 0;
+
   if (!tree || !node) {
     rc = CMP_ERROR_INVALID_ARG;
     {
@@ -1867,27 +1871,60 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
     return rc;
   }
 
-  /* Basic mock logic that maps the node's intrinsic traits based on type.
-     Crucially, it bypasses `design_language_override` checking to assert pure
-     UI equivalence. */
-  if (node->type == 3) {
-    /* Button */
-    rc = cmp_a11y_tree_add_node(tree, node->layout->id, "button", "UIA Button");
-    if (rc != CMP_SUCCESS) {
-      {
-        const char *err_str;
-        int rc2;
-        rc2 = cmp_strerror(rc, &err_str);
-        if (rc2 != CMP_SUCCESS) {
-          err_str = "Unknown";
-        }
-        LOG_DEBUG("cmp_a11y_tree_serialize: Failed to add node: %s\n", err_str);
-      }
+  switch (node->type) {
+  case 1: /* Box */
+    role_str = "group";
+    name_str = "group";
+    break;
+  case 2: /* Text */
+    role_str = "text";
+    name_str = "text";
+    break;
+  case 3: /* Button */
+    role_str = "button";
+    name_str = "UIA Button";
+    traits = CMP_A11Y_TRAIT_BUTTON;
+    break;
+  case 4: /* TextInput */
+    role_str = "textbox";
+    name_str = "textbox";
+    traits = CMP_A11Y_TRAIT_SEARCH_FIELD;
+    break;
+  case 5: /* Checkbox */
+    role_str = "checkbox";
+    name_str = "checkbox";
+    traits = CMP_A11Y_TRAIT_BUTTON | CMP_A11Y_TRAIT_SELECTED;
+    break;
+  case 6: /* ImageView */
+    role_str = "image";
+    name_str = "image";
+    traits = CMP_A11Y_TRAIT_IMAGE;
+    break;
+  case 7: /* Slider */
+    role_str = "slider";
+    name_str = "slider";
+    break;
+  default:
+    break;
+  }
 
-      return rc;
+  rc = cmp_a11y_tree_add_node(tree, node->layout->id, role_str, name_str);
+  if (rc != CMP_SUCCESS) {
+    {
+      const char *err_str;
+      int rc2;
+      rc2 = cmp_strerror(rc, &err_str);
+      if (rc2 != CMP_SUCCESS) {
+        err_str = "Unknown";
+      }
+      LOG_DEBUG("cmp_a11y_tree_serialize: Failed to add node: %s\n", err_str);
     }
-    rc = cmp_a11y_tree_set_node_traits(tree, node->layout->id,
-                                       CMP_A11Y_TRAIT_BUTTON);
+
+    return rc;
+  }
+
+  if (traits != 0) {
+    rc = cmp_a11y_tree_set_node_traits(tree, node->layout->id, traits);
     if (rc != CMP_SUCCESS) {
       {
         const char *err_str;
@@ -1902,40 +1939,20 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
 
       return rc;
     }
-    if (out_buffer && buffer_size > 0) {
-#if defined(_MSC_VER)
-      strncpy_s(out_buffer, buffer_size, "{role: 'button', interactable: true}",
-                _TRUNCATE);
-#else
-      strncpy(out_buffer, "{role: 'button', interactable: true}",
-              buffer_size - 1);
-      out_buffer[buffer_size - 1] = '\0';
-#endif
-    }
-  } else {
-    rc = cmp_a11y_tree_add_node(tree, node->layout->id, "generic", "generic");
-    if (rc != CMP_SUCCESS) {
-      {
-        const char *err_str;
-        int rc2;
-        rc2 = cmp_strerror(rc, &err_str);
-        if (rc2 != CMP_SUCCESS) {
-          err_str = "Unknown";
-        }
-        LOG_DEBUG("cmp_a11y_tree_serialize: Failed to add generic node: %s\n",
-                  err_str);
-      }
+  }
 
-      return rc;
-    }
-    if (out_buffer && buffer_size > 0) {
+  if (out_buffer && buffer_size > 0) {
+    char temp_buf[128];
 #if defined(_MSC_VER)
-      strncpy_s(out_buffer, buffer_size, "{role: 'generic'}", _TRUNCATE);
+    sprintf_s(temp_buf, sizeof(temp_buf), "{role: '%s'%s}", role_str,
+              (traits != 0) ? ", interactable: true" : "");
+    strncpy_s(out_buffer, buffer_size, temp_buf, _TRUNCATE);
 #else
-      strncpy(out_buffer, "{role: 'generic'}", buffer_size - 1);
-      out_buffer[buffer_size - 1] = '\0';
+    snprintf(temp_buf, sizeof(temp_buf), "{role: '%s'%s}", role_str,
+             (traits != 0) ? ", interactable: true" : "");
+    strncpy(out_buffer, temp_buf, buffer_size - 1);
+    out_buffer[buffer_size - 1] = '\0';
 #endif
-    }
   }
 
   for (i = 0; i < node->child_count; ++i) {

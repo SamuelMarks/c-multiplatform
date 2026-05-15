@@ -38,6 +38,49 @@ int rc = CMP_SUCCESS;
 
     return rc;
 }
+#elif defined(_MSC_VER)
+#include <windows.h>
+#include <dbghelp.h>
+/* Prevent C4091 */
+#pragma comment(lib, "dbghelp.lib")
+
+/**
+ * @brief cmp_dump_stack_trace
+ *
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int cmp_dump_stack_trace(void) {
+  int rc = CMP_SUCCESS;
+#if _MSC_VER >= 1600 /* Only safely rely on CaptureStackBackTrace directly in newer MSVC */
+  void *stack[100];
+  WORD frames;
+  HANDLE process;
+  SYMBOL_INFO *symbol;
+  WORD i;
+
+  process = GetCurrentProcess();
+  SymInitialize(process, NULL, TRUE);
+
+  frames = CaptureStackBackTrace(0, 100, stack, NULL);
+  symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
+  if (!symbol) return CMP_ERROR_OOM;
+  
+  symbol->MaxNameLen = 255;
+  symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+  FPRINTF(stderr, "--- Stack Trace ---\n");
+  for (i = 0; i < frames; i++) {
+    SymFromAddr(process, (DWORD64)(stack[i]), 0, symbol);
+    FPRINTF(stderr, "%i: %s - 0x%p\n", frames - i - 1, symbol->Name, stack[i]);
+  }
+
+  free(symbol);
+#else
+  FPRINTF(stderr, "--- Stack Trace ---\n");
+  FPRINTF(stderr, "Stack trace not natively supported on this older MSVC version.\n");
+#endif
+  return rc;
+}
 #else
 
 /**

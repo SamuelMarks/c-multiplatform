@@ -295,7 +295,84 @@ int CMP_API cmp_f2_button_set_variant(cmp_ui_node_t *node,
     return CMP_ERROR_INVALID_ARG;
   }
   btn_data = (cmp_f2_button_t *)node->properties;
+
   btn_data->variant = variant;
+
+  {
+    cmp_f2_theme_t theme;
+    if (cmp_f2_theme_generate(0x0078D4, 0, &theme) == CMP_SUCCESS) {
+      if (node->child_count > 0 && node->children[0]) {
+        node->children[0]->font_size = theme.font_size_body_1;
+        node->children[0]->layout->height = 20.0f;
+        node->children[0]->layout->flex_shrink = 0.0f;
+        node->children[0]->layout->flex_grow = 1.0f;
+      }
+
+      node->hover_opacity = 0.04f;
+      node->press_opacity = 0.08f;
+
+      switch (variant) {
+
+      case CMP_F2_BUTTON_VARIANT_SECONDARY:
+        node->bg_color = theme.color_neutral_background_1
+                             ? (0xFF000000 | theme.color_neutral_background_1)
+                             : 0;
+        node->border_radius = theme.radius_medium;
+        node->border_color = theme.color_neutral_stroke_1
+                                 ? (0xFF000000 | theme.color_neutral_stroke_1)
+                                 : 0;
+        node->border_width = theme.stroke_width_thin;
+        if (node->child_count > 0 && node->children[0]) {
+          node->children[0]->text_color =
+              0xFF000000 | theme.color_neutral_foreground_1;
+        }
+        break;
+      case CMP_F2_BUTTON_VARIANT_PRIMARY:
+        node->bg_color = theme.color_brand_background
+                             ? (0xFF000000 | theme.color_brand_background)
+                             : 0;
+        node->border_radius = theme.radius_medium;
+        node->border_color = theme.color_transparent_background;
+        node->border_width = 0.0f;
+        if (node->child_count > 0 && node->children[0]) {
+          node->children[0]->text_color =
+              0xFF000000 | theme.color_neutral_foreground_static_inverted;
+        }
+        break;
+      case CMP_F2_BUTTON_VARIANT_SUBTLE:
+        node->bg_color = theme.color_transparent_background;
+        node->border_radius = theme.radius_medium;
+        node->border_width = 0.0f;
+        if (node->child_count > 0 && node->children[0]) {
+          node->children[0]->text_color =
+              0xFF000000 | theme.color_neutral_foreground_1;
+        }
+        break;
+      case CMP_F2_BUTTON_VARIANT_OUTLINE:
+        node->bg_color = theme.color_transparent_background;
+        node->border_width = theme.stroke_width_thin;
+        node->border_color = theme.color_neutral_stroke_1
+                                 ? (0xFF000000 | theme.color_neutral_stroke_1)
+                                 : 0;
+        node->border_radius = theme.radius_medium;
+        if (node->child_count > 0 && node->children[0]) {
+          node->children[0]->text_color =
+              0xFF000000 | theme.color_neutral_foreground_1;
+        }
+        break;
+      case CMP_F2_BUTTON_VARIANT_TRANSPARENT:
+        node->bg_color = theme.color_transparent_background;
+        node->border_width = 0.0f;
+        node->border_radius = theme.radius_medium;
+        if (node->child_count > 0 && node->children[0]) {
+          node->children[0]->text_color =
+              0xFF000000 | theme.color_neutral_foreground_1;
+        }
+        break;
+      }
+    }
+  }
+
   if (rc != 0) {
     if (rc != 0) {
       return rc;
@@ -319,30 +396,50 @@ int CMP_API cmp_f2_button_set_size(cmp_ui_node_t *node,
                                    cmp_f2_button_size_t size) {
   int rc = 0;
   cmp_f2_button_t *btn_data;
-  if (!node || !node->properties) {
-    LOG_DEBUG("cmp_f2_button_set_size: Invalid arg\n");
+  if (!node || !node->properties)
     return CMP_ERROR_INVALID_ARG;
-  }
   btn_data = (cmp_f2_button_t *)node->properties;
   btn_data->size = size;
 
-  /* Fluent 2 Button Sizes */
   if (size == CMP_F2_BUTTON_SIZE_SMALL) {
     node->layout->height = 24.0f;
+    node->layout->padding[0] = 8.0f;
+    node->layout->padding[1] = 2.0f;
+    node->layout->padding[2] = 8.0f;
+    node->layout->padding[3] = 2.0f;
   } else if (size == CMP_F2_BUTTON_SIZE_LARGE) {
     node->layout->height = 40.0f;
+    node->layout->padding[0] = 20.0f;
+    node->layout->padding[1] = 10.0f;
+    node->layout->padding[2] = 20.0f;
+    node->layout->padding[3] = 10.0f;
   } else {
-    node->layout->height = 32.0f; /* Medium default */
+    node->layout->height = 32.0f;
+    node->layout->padding[0] = 16.0f;
+    node->layout->padding[1] = 6.0f;
+    node->layout->padding[2] = 16.0f;
+    node->layout->padding[3] = 6.0f;
   }
-  if (rc != 0) {
-    if (rc != 0) {
-      return rc;
+  {
+    float content_width = 64.0f;
+    if (node->child_count > 0 && node->children[0] &&
+        node->children[0]->properties) {
+      size_t len = strlen((const char *)node->children[0]->properties);
+      float font_size = node->children[0]->font_size > 0
+                            ? node->children[0]->font_size
+                            : 14.0f;
+      content_width = (float)len * (font_size * 0.5f);
     }
-    return rc;
+
+    if (size == CMP_F2_BUTTON_SIZE_SMALL) {
+      node->layout->width = content_width + 16.0f;
+    } else if (size == CMP_F2_BUTTON_SIZE_LARGE) {
+      node->layout->width = content_width + 40.0f;
+    } else {
+      node->layout->width = content_width + 32.0f;
+    }
   }
-  if (rc != 0) {
-    return rc;
-  }
+
   return rc;
 }
 

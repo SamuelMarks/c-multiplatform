@@ -2667,6 +2667,24 @@ int CMP_API cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
                                      float *out_y, float *out_angle);
 
 /**
+ * @brief Set Bezier curve coordinates for the motion path
+ *
+ * @param path The motion path context
+ * @param p0x Point 0 X
+ * @param p0y Point 0 Y
+ * @param p1x Point 1 X
+ * @param p1y Point 1 Y
+ * @param p2x Point 2 X
+ * @param p2y Point 2 Y
+ * @param p3x Point 3 X
+ * @param p3y Point 3 Y
+ */
+int CMP_API cmp_motion_path_set_curve(cmp_motion_path_t *path, float p0x,
+                                      float p0y, float p1x, float p1y,
+                                      float p2x, float p2y, float p3x,
+                                      float p3y);
+
+/**
  * @brief Opaque Scroll-Driven Animation Timeline Context
  */
 typedef struct cmp_scroll_timeline cmp_scroll_timeline_t;
@@ -2818,6 +2836,26 @@ int cmp_validation_create(cmp_validation_t **out_validation);
  * @brief Destroy a validation context
  */
 int cmp_validation_destroy(cmp_validation_t *validation);
+
+/**
+ * @brief Set a validation regex pattern
+ */
+int cmp_validation_set_regex(cmp_validation_t *validation, const char *pattern);
+
+/**
+ * @brief Set a validation minimum length
+ */
+int cmp_validation_set_min_length(cmp_validation_t *validation, size_t min_len);
+
+/**
+ * @brief Set a validation maximum length
+ */
+int cmp_validation_set_max_length(cmp_validation_t *validation, size_t max_len);
+
+/**
+ * @brief Set a validation required flag
+ */
+int cmp_validation_set_required(cmp_validation_t *validation, int is_required);
 
 /**
  * @brief Validate an input string against HTML5 constraints
@@ -10785,8 +10823,7 @@ int cmp_resilience_graceful_degradation(cmp_resilience_t *res,
  * @brief Placeholder indicating that the framework restricts hidden features,
  * Easter eggs, and non-native platform paradigms
  */
-int cmp_app_store_mock_init(void);
-
+int cmp_app_store_compliance_init(void);
 /**
  * @brief Resolves the appropriate VTable for a given UI node.
  * @param node The UI node to evaluate.

@@ -59,6 +59,9 @@ TEST test_audio_capture_null_args(void) {
   res = cmp_audio_capture_get_wav(NULL, &wav, &size);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
+  res = cmp_audio_capture_free_wav(NULL);
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
+
   res = cmp_audio_capture_create(&capture);
   ASSERT_EQ(CMP_SUCCESS, res);
 

@@ -198,10 +198,60 @@ TEST test_grid_align(void) {
 
 TEST test_grid_masonry(void) {
   cmp_grid_ctx_t *ctx = NULL;
+  cmp_layout_node_t *node1 = NULL;
+  cmp_layout_node_t *node2 = NULL;
+  cmp_layout_node_t *node3 = NULL;
+  cmp_layout_node_t *node4 = NULL;
+  cmp_grid_item_t *item1 = NULL;
+  cmp_grid_item_t *item2 = NULL;
+  cmp_grid_item_t *item3 = NULL;
+  cmp_grid_item_t *item4 = NULL;
+
   cmp_grid_ctx_create(&ctx);
   ctx->computed_col_count = 3;
+  ctx->row_gap = 10.0f;
+
+  cmp_layout_node_create(&node1);
+  node1->computed_rect.height = 200.0f;
+  cmp_grid_ctx_add_item(ctx, node1, &item1);
+
+  cmp_layout_node_create(&node2);
+  node2->computed_rect.height = 100.0f;
+  cmp_grid_ctx_add_item(ctx, node2, &item2);
+
+  cmp_layout_node_create(&node3);
+  node3->computed_rect.height = 150.0f;
+  cmp_grid_ctx_add_item(ctx, node3, &item3);
+
+  cmp_layout_node_create(&node4);
+  node4->computed_rect.height = 80.0f;
+  cmp_grid_ctx_add_item(ctx, node4, &item4);
+
   ASSERT_EQ(CMP_SUCCESS, cmp_masonry_layout(ctx));
+
+  /* Assert Column Allocations */
+  /* Item 1 goes to col 1 (idx 0), height becomes 200 + 10 */
+  ASSERT_EQ(1, item1->resolved_col_start);
+  ASSERT_EQ(0, item1->resolved_row_start);
+
+  /* Item 2 goes to col 2 (idx 1), height becomes 100 + 10 */
+  ASSERT_EQ(2, item2->resolved_col_start);
+  ASSERT_EQ(0, item2->resolved_row_start);
+
+  /* Item 3 goes to col 3 (idx 2), height becomes 150 + 10 */
+  ASSERT_EQ(3, item3->resolved_col_start);
+  ASSERT_EQ(0, item3->resolved_row_start);
+
+  /* Item 4 evaluates mins: Col 1 is 210, Col 2 is 110, Col 3 is 160.
+     Smallest is Col 2. Item 4 goes to Col 2. */
+  ASSERT_EQ(2, item4->resolved_col_start);
+  ASSERT_EQ(110, item4->resolved_row_start);
+
   cmp_grid_ctx_destroy(ctx);
+  cmp_layout_node_destroy(node1);
+  cmp_layout_node_destroy(node2);
+  cmp_layout_node_destroy(node3);
+  cmp_layout_node_destroy(node4);
   PASS();
 }
 

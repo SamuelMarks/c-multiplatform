@@ -13,6 +13,7 @@ struct cmp_ui_app_bar {
   cmp_ui_node_t *node_root;
   /** @brief The text node containing the app bar title */
   cmp_ui_node_t *node_title;
+  cmp_ui_node_t *node_actions;
   /** @brief The placement of the app bar (Top or Bottom) */
   cmp_ui_app_bar_placement_t placement;
   /** @brief The raw string of the title */
@@ -57,23 +58,35 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
     return rc;
   }
 
-  rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&bar->node_root->layout);
-  if (rc == CMP_SUCCESS) {
-    memset(bar->node_root->layout, 0, sizeof(cmp_layout_node_t));
+  if (bar->node_root->layout) {
     bar->node_root->layout->id = 1;
     bar->node_root->layout->direction = CMP_FLEX_ROW;
     bar->node_root->bg_color = 0xFFF5F5F5;
     bar->node_root->layout->width = -1.0f;
     bar->node_root->layout->height = 64.0f;
+    bar->node_root->layout->padding[1] = 16.0f;
+    bar->node_root->layout->padding[3] = 16.0f;
     bar->node_root->layout->align_items = CMP_FLEX_ALIGN_CENTER;
     bar->node_root->layout->justify_content = CMP_FLEX_ALIGN_SPACE_BETWEEN;
   }
 
   rc = cmp_ui_text_create(&bar->node_title, "", 0);
   if (rc == CMP_SUCCESS) {
+    bar->node_title->layout->flex_shrink = 1.0f;
     rc = cmp_ui_node_add_child(bar->node_root, bar->node_title);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_node_add_child failed\n");
+  }
+
+  if (rc == CMP_SUCCESS) {
+    rc = cmp_ui_box_create(&bar->node_actions);
+    if (rc == CMP_SUCCESS) {
+      bar->node_actions->layout->direction = CMP_FLEX_ROW;
+      bar->node_actions->layout->justify_content = CMP_FLEX_ALIGN_END;
+      bar->node_actions->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+      bar->node_actions->layout->height = 64.0f;
+      bar->node_actions->layout->width = -1.0f;
+      bar->node_actions->layout->flex_shrink = 0.0f;
+      bar->node_actions->layout->flex_grow = 1.0f;
+      rc = cmp_ui_node_add_child(bar->node_root, bar->node_actions);
     }
   } else {
     LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_text_create failed\n");
@@ -229,7 +242,7 @@ int cmp_ui_app_bar_add_action(cmp_ui_app_bar_t *bar,
     LOG_DEBUG("cmp_ui_app_bar_add_action: Invalid args\n");
     return CMP_ERROR_INVALID_ARG;
   }
-  rc = cmp_ui_node_add_child(bar->node_root, action_node);
+  rc = cmp_ui_node_add_child(bar->node_actions, action_node);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_add_action: cmp_ui_node_add_child failed\n");
   }

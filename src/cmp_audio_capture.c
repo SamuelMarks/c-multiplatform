@@ -5,12 +5,39 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 /* clang-format on */
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 struct cmp_audio_capture {
   int is_recording;
   unsigned int dummy_pcm_size;
 };
+
+/**
+ * @brief Writes a 32-bit little-endian value to a byte buffer.
+ * @param ptr The buffer.
+ * @param val The 32-bit value.
+ */
+static void write_le32(unsigned char *ptr, unsigned int val) {
+  ptr[0] = (unsigned char)(val & 0xFF);
+  ptr[1] = (unsigned char)((val >> 8) & 0xFF);
+  ptr[2] = (unsigned char)((val >> 16) & 0xFF);
+  ptr[3] = (unsigned char)((val >> 24) & 0xFF);
+}
+
+/**
+ * @brief Writes a 16-bit little-endian value to a byte buffer.
+ * @param ptr The buffer.
+ * @param val The 16-bit value.
+ */
+static void write_le16(unsigned char *ptr, unsigned short val) {
+  ptr[0] = (unsigned char)(val & 0xFF);
+  ptr[1] = (unsigned char)((val >> 8) & 0xFF);
+}
 
 /**
  * @brief cmp_audio_capture_create
@@ -86,7 +113,7 @@ int cmp_audio_capture_start(cmp_audio_capture_t *capture) {
   }
 
   capture->is_recording = 1;
-  capture->dummy_pcm_size = 44100; /* Mock 1 second of audio */
+  capture->dummy_pcm_size = 44100 * 2; /* Mock 1 second of 16-bit mono audio */
   return rc;
 }
 
@@ -129,6 +156,11 @@ int cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
   int rc = CMP_SUCCESS;
   unsigned char *wav = NULL;
   unsigned int total_size;
+  unsigned int data_size;
+  unsigned int sample_rate = 44100;
+  unsigned short num_channels = 1;
+  unsigned short bits_per_sample = 16;
+  unsigned int i;
 
   if (capture == NULL || out_wav_data == NULL || out_size == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -142,8 +174,9 @@ int cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
     return rc; /* Must stop before getting */
   }
 
-  /* Mock WAV encoding */
-  total_size = capture->dummy_pcm_size + 44; /* 44 bytes for WAV header */
+  data_size = capture->dummy_pcm_size;
+  total_size = data_size + 44; /* 44 bytes for WAV header */
+
   rc = CMP_MALLOC(total_size, (void **)&wav);
   if (rc != CMP_SUCCESS || wav == NULL) {
     rc = CMP_ERROR_OOM;
@@ -151,10 +184,31 @@ int cmp_audio_capture_get_wav(cmp_audio_capture_t *capture,
     return rc;
   }
 
-  /* Generate a fake WAV header */
-  memset(wav, 0, 44);
+  memset(wav, 0, total_size);
+
+  /* Generate valid WAV header */
   memcpy(wav, "RIFF", 4);
-  /* ... skipping actual accurate header creation for mock ... */
+  write_le32(wav + 4, total_size - 8);
+  memcpy(wav + 8, "WAVE", 4);
+  memcpy(wav + 12, "fmt ", 4);
+  write_le32(wav + 16, 16); /* fmt chunk size */
+  write_le16(wav + 20, 1);  /* audio format (PCM) */
+  write_le16(wav + 22, num_channels);
+  write_le32(wav + 24, sample_rate);
+  write_le32(wav + 28, sample_rate * num_channels *
+                           (bits_per_sample / 8));            /* byte rate */
+  write_le16(wav + 32, num_channels * (bits_per_sample / 8)); /* block align */
+  write_le16(wav + 34, bits_per_sample);
+  memcpy(wav + 36, "data", 4);
+  write_le32(wav + 40, data_size);
+
+  /* Generate 440 Hz sine wave */
+  for (i = 0; i < data_size / 2; i++) {
+    double time = (double)i / sample_rate;
+    double val = sin(2.0 * M_PI * 440.0 * time) * 32767.0;
+    short sample = (short)val;
+    write_le16(wav + 44 + (i * 2), sample);
+  }
 
   *out_wav_data = wav;
   *out_size = total_size;

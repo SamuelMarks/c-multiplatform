@@ -45,15 +45,21 @@ TEST test_http_client_creation(void) {
 
 TEST test_ws_init(void) {
   struct HttpRequest req;
+  struct c_abstract_http_ws_config conf = {0};
   int res;
 
   cmp_http_init();
   res = cmp_http_request_init(&req);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
+  res = cmp_http_ws_init(&req, &conf);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  res = cmp_http_ws_init(NULL, &conf);
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
+
   res = cmp_http_ws_init(&req, NULL);
-  /* Should succeed natively if it uses the backend */
-  ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND, res, "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
 
   cmp_http_request_free(&req);
   cmp_http_shutdown();
@@ -62,14 +68,21 @@ TEST test_ws_init(void) {
 
 TEST test_sse_init(void) {
   struct HttpRequest req;
+  struct c_abstract_http_sse_config conf = {0};
   int res;
 
   cmp_http_init();
   res = cmp_http_request_init(&req);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
+  res = cmp_http_sse_init(&req, &conf);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  res = cmp_http_sse_init(NULL, &conf);
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
+
   res = cmp_http_sse_init(&req, NULL);
-  ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND, res, "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
 
   cmp_http_request_free(&req);
   cmp_http_shutdown();

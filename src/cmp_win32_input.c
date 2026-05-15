@@ -50,8 +50,11 @@ int cmp_win32_init_touch_ink(void) {
  */
 int cmp_win32_init_touch_ink(void) {
   int rc = CMP_SUCCESS;
-  
+
+  LOG_DEBUG("cmp_win32_init_touch_ink: Mocked Win32 Touch/Ink initialization\n");
+
   return rc;
 }
+
 #endif
 /* clang-format on */

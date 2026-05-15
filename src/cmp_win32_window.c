@@ -265,6 +265,9 @@ int cmp_win32_request_windows_material(cmp_materials_t *materials,
   (void)materials;
   (void)window;
   (void)material;
+  
+  LOG_DEBUG("cmp_win32_request_windows_material: Mocked Windows material request\n");
+  
   return rc;
 }
 #endif

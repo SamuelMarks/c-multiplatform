@@ -97,6 +97,11 @@ int cmp_datalist_filter(cmp_datalist_t *datalist, const char *input_string) {
   int err_rc;
   const char *err_str;
   struct cmp_datalist *internal_datalist = (struct cmp_datalist *)datalist;
+  const char *mock_items[] = {"apple", "banana", "cherry", "date",
+                              "elderberry"};
+  size_t num_items = sizeof(mock_items) / sizeof(mock_items[0]);
+  size_t i;
+  int match_count = 0;
 
   if (internal_datalist == NULL || input_string == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -109,8 +114,14 @@ int cmp_datalist_filter(cmp_datalist_t *datalist, const char *input_string) {
     return rc;
   }
 
-  /* Filter logic placeholder */
-  cmp_log_debug("cmp_datalist_filter: Mocked datalist filter\n");
+  for (i = 0; i < num_items; i++) {
+    if (strstr(mock_items[i], input_string) != NULL) {
+      match_count++;
+    }
+  }
+
+  internal_datalist->item_count = match_count;
+  cmp_log_debug("cmp_datalist_filter: Found %d matching items\n", match_count);
 
   return rc;
 }

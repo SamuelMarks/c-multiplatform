@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "app.h"
 #include "cmp.h"
+#include "cmp_ui_app_bar.h"
 #include "cmp_log.h"
 #include <stdio.h>
 /* clang-format on */
@@ -195,17 +196,22 @@ static int create_simple_button(cmp_ui_node_t **out_btn, const char *text,
     LOG_DEBUG("cmp_ui_button_create failed: %d\n", rc);
     return rc;
   }
+  btn_node->type = 1; /* Turn into BOX so bg_color renders natively */
 
   btn_node->layout->width = 64.0f;
   btn_node->layout->height = 40.0f;
-  btn_node->layout->margin[3] = 0.0f; /* Relies on actions_row column_gap now */
+  btn_node->layout->margin[3] = 0.0f;
   btn_node->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
   btn_node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
   btn_node->bg_color = g_is_dark ? 0xFF4A4458 : 0xFFE8DEF8;
-  btn_node->text_color = g_is_dark ? 0xFFE8DEF8 : 0xFF1D192B;
-  btn_node->font_size = 14.0f;
+  btn_node->border_radius = 20.0f;
   btn_node->hover_opacity = 0.08f;
   btn_node->press_opacity = 0.12f;
+
+  if (btn_node->child_count > 0 && btn_node->children[0]) {
+    btn_node->children[0]->text_color = g_is_dark ? 0xFFE8DEF8 : 0xFF1D192B;
+    btn_node->children[0]->font_size = 14.0f;
+  }
 
   if (aria_label) {
     rc = cmp_a11y_tree_create(&tree);
@@ -258,13 +264,12 @@ static void on_window_resize(int width, int height, void *user_data) {
 static int build_ui(void) {
   int rc;
   cmp_ui_node_t *app_bar = NULL;
+  cmp_ui_app_bar_t *app_bar_obj = NULL;
   cmp_ui_node_t *title = NULL;
-  cmp_ui_node_t *actions_row = NULL;
   cmp_ui_node_t *btn_lang = NULL;
   cmp_ui_node_t *btn_theme = NULL;
   cmp_ui_node_t *btn_palette = NULL;
   cmp_ui_node_t *btn_design = NULL;
-  cmp_ui_node_t *divider = NULL;
   const char *title_text = "Multi-Design System Toolbar Example";
 
   if (g_ui_tree != NULL) {
@@ -290,23 +295,18 @@ static int build_ui(void) {
 
   g_ui_tree->design_language_override = g_design_lang;
 
-  rc = cmp_ui_box_create(&app_bar);
+  rc = cmp_ui_app_bar_create(&app_bar_obj, CMP_UI_APP_BAR_PLACEMENT_TOP);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_box_create app_bar failed: %d\n", rc);
+    LOG_DEBUG("cmp_ui_app_bar_create failed: %d\n", rc);
     return rc;
   }
 
-  app_bar->layout->direction = CMP_FLEX_ROW;
-  app_bar->layout->width =
-      -1.0f; /* Let it stretch via parent's align_items = STRETCH */
-  app_bar->layout->height = 64.0f;
-  app_bar->layout->flex_shrink = 0.0f;
-  app_bar->layout->justify_content = CMP_FLEX_ALIGN_SPACE_BETWEEN;
-  app_bar->layout->align_items = CMP_FLEX_ALIGN_CENTER;
-  app_bar->layout->padding[0] = 0.0f;
-  app_bar->layout->padding[1] = 4.0f; /* Natively mirrors on RTL */
-  app_bar->layout->padding[2] = 0.0f;
-  app_bar->layout->padding[3] = 16.0f; /* Natively mirrors on RTL */
+  rc = cmp_ui_app_bar_get_node(app_bar_obj, &app_bar);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_app_bar_get_node failed: %d\n", rc);
+    return rc;
+  }
+
   app_bar->bg_color =
       g_is_dark ? surface_dark[g_palette_idx] : surface_light[g_palette_idx];
   app_bar->elevation = 2.0f;
@@ -318,45 +318,26 @@ static int build_ui(void) {
     title_text = "\xD9\x85\xD8\xB1\xD8\xAD\xD8\xA8\xD8\xA7 navbar";
   }
 
-  rc = cmp_ui_text_create(&title, title_text, -1);
-  if (rc == CMP_SUCCESS) {
+  cmp_ui_app_bar_set_title(app_bar_obj, title_text);
+
+  if (app_bar->child_count > 0) {
+    title = app_bar->children[0];
     if (g_title_binding) {
       cmp_ui_node_bind_generic(title, g_title_binding, "text");
     }
     title->text_color = g_is_dark ? 0xFFE6E0E9 : 0xFF1D1B20;
     title->font_size = 22.0f;
-    title->layout->width = 400.0f;
-    title->layout->height =
-        -1.0f; /* Auto-height for perfect vertical centering */
-    title->layout->flex_shrink = 1.0f;
-  } else {
-    LOG_DEBUG("cmp_ui_text_create title failed: %d\n", rc);
+    title->layout->width = 300.0f;
   }
 
   rc = create_simple_button(&btn_lang, "EN", "Switch Language", on_lang_click);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("create_simple_button lang failed: %d\n", rc);
-  }
-
   rc = create_simple_button(&btn_theme, g_is_dark ? "D/L" : "L/D",
                             "Toggle dark mode", on_theme_click);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("create_simple_button theme failed: %d\n", rc);
-  }
-
   rc = create_simple_button(&btn_palette, "CLR", "Change theme color",
                             on_palette_click);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("create_simple_button palette failed: %d\n", rc);
-  }
-
   rc = create_simple_button(&btn_design, "DSG", "Change design system",
                             on_design_click);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("create_simple_button design failed: %d\n", rc);
-  }
 
-  /* Add margins to buttons for spacing */
   if (btn_theme)
     btn_theme->layout->margin[3] = 16.0f;
   if (btn_palette)
@@ -364,70 +345,16 @@ static int build_ui(void) {
   if (btn_design)
     btn_design->layout->margin[3] = 16.0f;
 
-  rc = cmp_ui_box_create(&actions_row);
-  if (rc == CMP_SUCCESS) {
-    actions_row->layout->direction = CMP_FLEX_ROW;
-    actions_row->layout->width =
-        320.0f; /* Fixed width prevents off-screen layout math bugs */
-    actions_row->layout->height = 40.0f;
-    actions_row->layout->align_items = CMP_FLEX_ALIGN_CENTER;
-    actions_row->layout->justify_content = CMP_FLEX_ALIGN_END;
-    actions_row->layout->flex_shrink = 0.0f;
-
-    if (btn_lang) {
-      rc = cmp_ui_node_add_child(actions_row, btn_lang);
-      if (rc != CMP_SUCCESS)
-        LOG_DEBUG("cmp_ui_node_add_child failed: %d\n", rc);
-    }
-    if (btn_theme) {
-      rc = cmp_ui_node_add_child(actions_row, btn_theme);
-      if (rc != CMP_SUCCESS)
-        LOG_DEBUG("cmp_ui_node_add_child failed: %d\n", rc);
-    }
-    if (btn_palette) {
-      rc = cmp_ui_node_add_child(actions_row, btn_palette);
-      if (rc != CMP_SUCCESS)
-        LOG_DEBUG("cmp_ui_node_add_child failed: %d\n", rc);
-    }
-    if (btn_design) {
-      rc = cmp_ui_node_add_child(actions_row, btn_design);
-      if (rc != CMP_SUCCESS)
-        LOG_DEBUG("cmp_ui_node_add_child failed: %d\n", rc);
-    }
-  } else {
-    LOG_DEBUG("cmp_ui_box_create actions_row failed: %d\n", rc);
-  }
-
-  /* Add children to app_bar (Natively mirrored by layout engine in RTL) */
-  if (title) {
-    rc = cmp_ui_node_add_child(app_bar, title);
-    if (rc != CMP_SUCCESS)
-      LOG_DEBUG("cmp_ui_node_add_child failed: %d\n", rc);
-  }
-  if (actions_row) {
-    rc = cmp_ui_node_add_child(app_bar, actions_row);
-    if (rc != CMP_SUCCESS)
-      LOG_DEBUG("cmp_ui_node_add_child failed: %d\n", rc);
-  }
+  if (btn_lang)
+    cmp_ui_app_bar_add_action(app_bar_obj, btn_lang);
+  if (btn_theme)
+    cmp_ui_app_bar_add_action(app_bar_obj, btn_theme);
+  if (btn_palette)
+    cmp_ui_app_bar_add_action(app_bar_obj, btn_palette);
+  if (btn_design)
+    cmp_ui_app_bar_add_action(app_bar_obj, btn_design);
 
   rc = cmp_ui_node_add_child(g_ui_tree, app_bar);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_node_add_child app_bar failed: %d\n", rc);
-  }
-
-  rc = cmp_ui_box_create(&divider);
-  if (rc == CMP_SUCCESS) {
-    divider->layout->width = -1.0f;
-    divider->layout->height = 1.0f;
-    divider->layout->flex_shrink = 0.0f;
-    divider->bg_color = g_is_dark ? 0xFF49454F : 0xFFCAC4D0;
-    rc = cmp_ui_node_add_child(g_ui_tree, divider);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_node_add_child divider failed: %d\n", rc);
-    }
-  } else {
-    LOG_DEBUG("cmp_ui_box_create divider failed: %d\n", rc);
-  }
 
   return CMP_SUCCESS;
 }

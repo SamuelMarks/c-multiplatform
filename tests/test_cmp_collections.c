@@ -42,6 +42,17 @@ TEST test_diffable_datasource(void) {
   PASS();
 }
 
+TEST test_system_views_mount(void) {
+  cmp_ui_node_t dummy;
+  memset(&dummy, 0, sizeof(dummy));
+
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_system_map_view_mount(&dummy, 37.7749f, -122.4194f));
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_system_web_view_mount(&dummy, "https://example.com"));
+  PASS();
+}
+
 TEST test_null_args(void) {
   cmp_collection_t *c = NULL;
   cmp_collection_section_t *s = NULL;
@@ -86,6 +97,7 @@ TEST test_null_args(void) {
 SUITE(collections_suite) {
   RUN_TEST(test_compositional_layout);
   RUN_TEST(test_diffable_datasource);
+  RUN_TEST(test_system_views_mount);
   RUN_TEST(test_null_args);
 }
 

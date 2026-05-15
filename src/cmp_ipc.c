@@ -9,6 +9,11 @@ struct CddProcess {
   void *mock_queue;
 };
 
+struct mock_msg_node {
+  cmp_msg_t *msg;
+  struct mock_msg_node *next;
+};
+
 /**
  * @brief cmp_msg_create
  *
@@ -224,18 +229,53 @@ int rc = CMP_SUCCESS;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_process_send(cmp_process_t *proc, const cmp_msg_t *msg) {
-int rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
+  struct mock_msg_node *node = NULL;
+  cmp_msg_t *msg_copy = NULL;
+  uint8_t *buffer = NULL;
+  size_t buffer_size = 0;
 
   if (!proc || !msg) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_process_send: Invalid argument\n");
-    
+
     return rc;
   }
-  /* Mock implementation for IPC pipes, assuming write to cdd pipe */
-  /* This is just a stub for tests since cdd_process_send doesn't exist out of the box in process.h */
-  
-  
+
+  /* Mock implementation for IPC pipes: Serialize and deserialize to create a deep copy */
+  rc = cmp_msg_serialize(msg, &buffer, &buffer_size);
+  if (rc == CMP_SUCCESS) {
+    rc = cmp_msg_deserialize(buffer, buffer_size, &msg_copy);
+    CMP_FREE(buffer);
+  }
+
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("Error in cmp_process_send: Failed to simulate IPC serialization\n");
+    return rc;
+  }
+
+  rc = CMP_MALLOC(sizeof(struct mock_msg_node), (void **)&node);
+  if (rc != CMP_SUCCESS) {
+    cmp_msg_destroy(msg_copy);
+    LOG_DEBUG("Error in cmp_process_send: OOM allocating queue node\n");
+    return CMP_ERROR_OOM;
+  }
+
+  node->msg = msg_copy;
+  node->next = NULL;
+
+  if (proc->mock_queue == NULL) {
+    proc->mock_queue = node;
+  } else {
+    struct mock_msg_node *curr = (struct mock_msg_node *)proc->mock_queue;
+    while (curr->next != NULL) {
+      curr = curr->next;
+    }
+    curr->next = node;
+  }
+
+  LOG_DEBUG("cmp_process_send: Appended message to mock queue\n");
+
   return rc;
 }
 
@@ -247,16 +287,27 @@ int rc = CMP_SUCCESS;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_process_recv(cmp_process_t *proc, cmp_msg_t **msg) {
-int rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
+  struct mock_msg_node *node;
 
   if (!proc || !msg) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_process_recv: Invalid argument\n");
-    
+
     return rc;
   }
-  
-  
+
+  if (proc->mock_queue) {
+    node = (struct mock_msg_node *)proc->mock_queue;
+    *msg = node->msg;
+    proc->mock_queue = node->next;
+    CMP_FREE(node);
+    LOG_DEBUG("cmp_process_recv: Received message from mock queue\n");
+  } else {
+    *msg = NULL; /* No message */
+    LOG_DEBUG("cmp_process_recv: Queue empty\n");
+  }
+
   return rc;
 }
 
@@ -267,22 +318,35 @@ int rc = CMP_SUCCESS;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_process_destroy(cmp_process_t *proc) {
-int rc = CMP_SUCCESS;
+  int rc = CMP_SUCCESS;
+  struct mock_msg_node *curr;
+  struct mock_msg_node *next;
 
   if (!proc) {
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("Error in cmp_process_destroy: Invalid argument\n");
-    
+
     return rc;
   }
+
+  curr = (struct mock_msg_node *)proc->mock_queue;
+  while (curr != NULL) {
+    next = curr->next;
+    if (curr->msg != NULL) {
+      cmp_msg_destroy(curr->msg);
+    }
+    CMP_FREE(curr);
+    curr = next;
+  }
+  proc->mock_queue = NULL;
+
   rc = CMP_FREE(proc);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("Free failed\n");
   }
-  
+
   return rc;
 }
-
 /**
  * @brief cmp_process_spawn
  *

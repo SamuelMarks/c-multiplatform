@@ -12,11 +12,24 @@ TEST test_gpu_create(void) {
 }
 TEST test_gpu_begin_end_frame(void) {
   cmp_gpu_t *gpu = NULL;
+  int *state = NULL;
+
   ASSERT_EQ(CMP_SUCCESS, cmp_gpu_create(CMP_BACKEND_CPU_SOFTWARE, &gpu));
+
+  /* Validate initialization state */
+  state = (int *)gpu->context;
+  ASSERT_NEQ(NULL, state);
+  ASSERT_EQ(0, *state);
+
   ASSERT_EQ(CMP_SUCCESS, cmp_gpu_begin_frame(gpu));
+  ASSERT_EQ(1, *state); /* Validates vtable mapping logic executed */
+
   ASSERT_EQ(CMP_SUCCESS, cmp_gpu_end_frame(gpu));
+  ASSERT_EQ(2, *state); /* Validates vtable mapping logic executed */
+
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_gpu_begin_frame(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_gpu_end_frame(NULL));
+
   ASSERT_EQ(CMP_SUCCESS, cmp_gpu_destroy(gpu));
   PASS();
 }

@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "cmp_log.h"
 /* clang-format on */
@@ -68,6 +69,13 @@ int cmp_spellcheck_destroy(cmp_spellcheck_t *spellcheck) {
   return rc;
 }
 
+static const char *cmp_spellcheck_dict[] = {"apple", "banana", "hello",
+                                            "orange", "world"};
+
+static int cmp_spellcheck_compare(const void *a, const void *b) {
+  return strcmp(*(const char **)a, *(const char **)b);
+}
+
 /**
  * @brief Verify if a word is spelled correctly.
  *
@@ -80,6 +88,10 @@ int cmp_spellcheck_verify_word(cmp_spellcheck_t *spellcheck, const char *word,
                                int *out_is_correct) {
   int rc = CMP_SUCCESS;
   struct cmp_spellcheck *internal_spellcheck;
+  char lowercase_word[256];
+  size_t len, i;
+  const char *word_ptr = lowercase_word;
+  void *found;
 
   internal_spellcheck = (struct cmp_spellcheck *)spellcheck;
 
@@ -93,11 +105,25 @@ int cmp_spellcheck_verify_word(cmp_spellcheck_t *spellcheck, const char *word,
     return rc;
   }
 
-  /* Dummy logic: anything with 'x' is misspelled */
-  if (strchr(word, 'x') != NULL || strchr(word, 'X') != NULL) {
+  len = strlen(word);
+  if (len >= sizeof(lowercase_word)) {
     *out_is_correct = 0;
-  } else {
+    return rc;
+  }
+
+  for (i = 0; i < len; i++) {
+    lowercase_word[i] = (char)tolower((unsigned char)word[i]);
+  }
+  lowercase_word[len] = '\0';
+
+  found = bsearch(&word_ptr, cmp_spellcheck_dict,
+                  sizeof(cmp_spellcheck_dict) / sizeof(cmp_spellcheck_dict[0]),
+                  sizeof(const char *), cmp_spellcheck_compare);
+
+  if (found != NULL) {
     *out_is_correct = 1;
+  } else {
+    *out_is_correct = 0;
   }
 
   return rc;

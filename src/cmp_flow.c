@@ -101,6 +101,12 @@ int cmp_float_evaluate(cmp_layout_node_t *node, int is_float, int clear,
 int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
                                float shape_radius, float margin) {
   int rc = CMP_SUCCESS;
+  float content_top;
+  float content_bottom;
+  float circle_center_y;
+  float circle_center_x;
+  float y_dist;
+  float x_dist;
 
   if (node == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -109,13 +115,41 @@ int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
 
     return rc;
   }
-  /* Wrap content logic placeholder */
+
+  content_top = node->computed_rect.y;
+  content_bottom = node->computed_rect.y + node->computed_rect.height;
+
   if (shape_radius > 0.0f) {
     /* Circular wrapping adjustment */
-    node->computed_rect.width -= (shape_radius + margin);
+    circle_center_y = float_rect.y + float_rect.height / 2.0f;
+    circle_center_x = float_rect.x + float_rect.width / 2.0f;
+
+    /* Check if current text line intersects the circle's vertical bounds */
+    if (content_bottom >= float_rect.y &&
+        content_top <= float_rect.y + float_rect.height) {
+      /* Calculate horizontal intrusion of the circle at the current line's Y */
+      y_dist = content_top - circle_center_y;
+      if (y_dist < 0) {
+        y_dist = -y_dist;
+      }
+
+      /* Pythagorean theorem: x^2 + y^2 = r^2 -> x = sqrt(r^2 - y^2) */
+      if (y_dist < shape_radius) {
+        /* Approximate sqrt to avoid linking heavy math libs unnecessarilly if
+           we can avoid it. But since we don't have a fast sqrt here, we'll use
+           a linear approximation for the stub */
+        x_dist = shape_radius - (y_dist * y_dist / shape_radius);
+        if (x_dist > 0) {
+          node->computed_rect.width -= (x_dist + margin);
+        }
+      }
+    }
   } else {
     /* Rectangular wrapping */
-    node->computed_rect.width -= (float_rect.width + margin);
+    if (content_bottom >= float_rect.y &&
+        content_top <= float_rect.y + float_rect.height) {
+      node->computed_rect.width -= (float_rect.width + margin);
+    }
   }
 
   cmp_log_debug(

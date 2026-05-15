@@ -92,64 +92,18 @@ static int build_m3_buttons(cmp_ui_node_t *parent) {
   cmp_ui_action_button_create(&ab, "Elevated",
                               CMP_UI_ACTION_BUTTON_STYLE_ELEVATED);
   cmp_ui_action_button_get_node(ab, &ab_node);
-  ab_node->layout->padding[0] = 24.0f;
-  ab_node->layout->padding[1] = 10.0f;
-  ab_node->layout->padding[2] = 24.0f;
-  ab_node->layout->padding[3] = 10.0f;
-  ab_node->bg_color = 0xFF2B2930;
-  ab_node->border_radius = 20.0f;
-  ab_node->layout->width = 160.0f;
-  ab_node->layout->height = 40.0f;
-  if (ab_node->child_count > 0 && ab_node->children[0]) {
-    ab_node->children[0]->font_size = 14.0f;
-    ab_node->children[0]->text_color = 0xFFFFFFFF;
-    ab_node->children[0]->layout->height = 20.0f;
-    ab_node->children[0]->layout->flex_shrink = 0.0f;
-    ab_node->children[0]->layout->flex_grow = 1.0f;
-    ab_node->children[0]->layout->width = -1.0f;
-  }
   cmp_ui_node_add_event_listener(ab_node, CMP_EVENT_TYPE_MOUSE, 0, on_btn_click,
                                  "M3 Elevated Clicked");
   cmp_ui_node_add_child(row, ab_node);
 
   cmp_ui_action_button_create(&ab, "Filled", CMP_UI_ACTION_BUTTON_STYLE_FILLED);
   cmp_ui_action_button_get_node(ab, &ab_node);
-  ab_node->layout->padding[0] = 24.0f;
-  ab_node->layout->padding[1] = 10.0f;
-  ab_node->layout->padding[2] = 24.0f;
-  ab_node->layout->padding[3] = 10.0f;
-  ab_node->bg_color = 0xFFD0BCFF;
-  ab_node->border_radius = 20.0f;
-  ab_node->layout->width = 160.0f;
-  ab_node->layout->height = 40.0f;
-  if (ab_node->child_count > 0 && ab_node->children[0]) {
-    ab_node->children[0]->font_size = 14.0f;
-    ab_node->children[0]->text_color = 0xFF000000;
-    ab_node->children[0]->layout->height = 20.0f;
-    ab_node->children[0]->layout->width = 120.0f;
-    ab_node->children[0]->layout->flex_shrink = 0.0f;
-  }
   cmp_ui_node_add_event_listener(ab_node, CMP_EVENT_TYPE_MOUSE, 0, on_btn_click,
                                  "M3 Filled Clicked");
   cmp_ui_node_add_child(row, ab_node);
 
   cmp_ui_action_button_create(&ab, "Tonal", CMP_UI_ACTION_BUTTON_STYLE_TONAL);
   cmp_ui_action_button_get_node(ab, &ab_node);
-  ab_node->layout->padding[0] = 24.0f;
-  ab_node->layout->padding[1] = 10.0f;
-  ab_node->layout->padding[2] = 24.0f;
-  ab_node->layout->padding[3] = 10.0f;
-  ab_node->bg_color = 0xFF4A4458;
-  ab_node->border_radius = 20.0f;
-  ab_node->layout->width = 160.0f;
-  ab_node->layout->height = 40.0f;
-  if (ab_node->child_count > 0 && ab_node->children[0]) {
-    ab_node->children[0]->font_size = 14.0f;
-    ab_node->children[0]->text_color = 0xFFFFFFFF;
-    ab_node->children[0]->layout->height = 20.0f;
-    ab_node->children[0]->layout->width = 120.0f;
-    ab_node->children[0]->layout->flex_shrink = 0.0f;
-  }
   cmp_ui_node_add_event_listener(ab_node, CMP_EVENT_TYPE_MOUSE, 0, on_btn_click,
                                  "M3 Tonal Clicked");
   cmp_ui_node_add_child(row, ab_node);
@@ -175,43 +129,12 @@ static int build_m3_buttons(cmp_ui_node_t *parent) {
   cmp_ui_action_button_create(&ab, "Outlined",
                               CMP_UI_ACTION_BUTTON_STYLE_OUTLINED);
   cmp_ui_action_button_get_node(ab, &ab_node);
-  ab_node->layout->padding[0] = 24.0f;
-  ab_node->layout->padding[1] = 10.0f;
-  ab_node->layout->padding[2] = 24.0f;
-  ab_node->layout->padding[3] = 10.0f;
-  ab_node->border_color = 0xFF000000;
-  ab_node->border_width = 1.0f;
-  ab_node->border_radius = 20.0f;
-  ab_node->layout->width = 160.0f;
-  ab_node->layout->height = 40.0f;
-  if (ab_node->child_count > 0 && ab_node->children[0]) {
-    ab_node->children[0]->font_size = 14.0f;
-    ab_node->children[0]->text_color = 0xFF000000;
-    ab_node->children[0]->layout->height = 20.0f;
-    ab_node->children[0]->layout->flex_shrink = 0.0f;
-    ab_node->children[0]->layout->flex_grow = 1.0f;
-    ab_node->children[0]->layout->width = -1.0f;
-  }
   cmp_ui_node_add_event_listener(ab_node, CMP_EVENT_TYPE_MOUSE, 0, on_btn_click,
                                  "M3 Outlined Clicked");
   cmp_ui_node_add_child(row, ab_node);
 
   cmp_ui_action_button_create(&ab, "Text", CMP_UI_ACTION_BUTTON_STYLE_TEXT);
   cmp_ui_action_button_get_node(ab, &ab_node);
-  ab_node->layout->padding[0] = 24.0f;
-  ab_node->layout->padding[1] = 10.0f;
-  ab_node->layout->padding[2] = 24.0f;
-  ab_node->layout->padding[3] = 10.0f;
-  ab_node->layout->width = 160.0f;
-  ab_node->layout->height = 40.0f;
-  if (ab_node->child_count > 0 && ab_node->children[0]) {
-    ab_node->children[0]->font_size = 14.0f;
-    ab_node->children[0]->text_color = 0xFF000000;
-    ab_node->children[0]->layout->height = 20.0f;
-    ab_node->children[0]->layout->flex_shrink = 0.0f;
-    ab_node->children[0]->layout->flex_grow = 1.0f;
-    ab_node->children[0]->layout->width = -1.0f;
-  }
   cmp_ui_node_add_event_listener(ab_node, CMP_EVENT_TYPE_MOUSE, 0, on_btn_click,
                                  "M3 Text Clicked");
   cmp_ui_node_add_child(row, ab_node);
@@ -273,72 +196,18 @@ static int build_f2_buttons(cmp_ui_node_t *parent) {
   cmp_ui_node_add_child(card_box, row);
 
   cmp_f2_button_create(&btn_node, "Secondary", NULL);
-  btn_node->layout->padding[0] = 16.0f;
-  btn_node->layout->padding[1] = 8.0f;
-  btn_node->layout->padding[2] = 16.0f;
-  btn_node->layout->padding[3] = 8.0f;
-  btn_node->font_size = 14.0f;
-  btn_node->text_color = 0xFF000000;
-  btn_node->bg_color = 0xFFFFFFFF;
-  btn_node->border_radius = 4.0f;
-  btn_node->layout->width = 160.0f;
-  btn_node->layout->height = 40.0f;
-  if (btn_node->child_count > 0 && btn_node->children[0]) {
-    btn_node->children[0]->font_size = 14.0f;
-    btn_node->children[0]->text_color = 0xFF000000;
-    btn_node->children[0]->layout->height = 20.0f;
-    btn_node->children[0]->layout->flex_shrink = 0.0f;
-    btn_node->children[0]->layout->flex_grow = 1.0f;
-    btn_node->children[0]->layout->width = -1.0f;
-  }
   cmp_f2_button_set_variant(btn_node, CMP_F2_BUTTON_VARIANT_SECONDARY);
   cmp_ui_node_add_event_listener(btn_node, CMP_EVENT_TYPE_MOUSE, 0,
                                  on_btn_click, "F2 Secondary Clicked");
   cmp_ui_node_add_child(row, btn_node);
 
   cmp_f2_button_create(&btn_node, "Primary", NULL);
-  btn_node->layout->padding[0] = 16.0f;
-  btn_node->layout->padding[1] = 8.0f;
-  btn_node->layout->padding[2] = 16.0f;
-  btn_node->layout->padding[3] = 8.0f;
-  btn_node->font_size = 14.0f;
-  btn_node->text_color = 0xFFFFFFFF;
-  btn_node->bg_color = 0xFF0078D4;
-  btn_node->border_radius = 4.0f;
-  btn_node->layout->width = 160.0f;
-  btn_node->layout->height = 40.0f;
-  if (btn_node->child_count > 0 && btn_node->children[0]) {
-    btn_node->children[0]->font_size = 14.0f;
-    btn_node->children[0]->text_color = 0xFFFFFFFF;
-    btn_node->children[0]->layout->height = 20.0f;
-    btn_node->children[0]->layout->flex_shrink = 0.0f;
-    btn_node->children[0]->layout->flex_grow = 1.0f;
-    btn_node->children[0]->layout->width = -1.0f;
-  }
   cmp_f2_button_set_variant(btn_node, CMP_F2_BUTTON_VARIANT_PRIMARY);
   cmp_ui_node_add_event_listener(btn_node, CMP_EVENT_TYPE_MOUSE, 0,
                                  on_btn_click, "F2 Primary Clicked");
   cmp_ui_node_add_child(row, btn_node);
 
   cmp_f2_button_create(&btn_node, "Subtle", NULL);
-  btn_node->layout->padding[0] = 16.0f;
-  btn_node->layout->padding[1] = 8.0f;
-  btn_node->layout->padding[2] = 16.0f;
-  btn_node->layout->padding[3] = 8.0f;
-  btn_node->font_size = 14.0f;
-  btn_node->text_color = 0xFF000000;
-  btn_node->bg_color = 0x00000000;
-  btn_node->border_radius = 4.0f;
-  btn_node->layout->width = 160.0f;
-  btn_node->layout->height = 40.0f;
-  if (btn_node->child_count > 0 && btn_node->children[0]) {
-    btn_node->children[0]->font_size = 14.0f;
-    btn_node->children[0]->text_color = 0xFF000000;
-    btn_node->children[0]->layout->height = 20.0f;
-    btn_node->children[0]->layout->flex_shrink = 0.0f;
-    btn_node->children[0]->layout->flex_grow = 1.0f;
-    btn_node->children[0]->layout->width = -1.0f;
-  }
   cmp_f2_button_set_variant(btn_node, CMP_F2_BUTTON_VARIANT_SUBTLE);
   cmp_ui_node_add_event_listener(btn_node, CMP_EVENT_TYPE_MOUSE, 0,
                                  on_btn_click, "F2 Subtle Clicked");
@@ -354,34 +223,12 @@ static int build_f2_buttons(cmp_ui_node_t *parent) {
   cmp_ui_node_add_child(card_box, row);
 
   cmp_f2_button_create(&btn_node, "Outline", NULL);
-  btn_node->layout->padding[0] = 16.0f;
-  btn_node->layout->padding[1] = 8.0f;
-  btn_node->layout->padding[2] = 16.0f;
-  btn_node->layout->padding[3] = 8.0f;
-  btn_node->font_size = 14.0f;
-  btn_node->text_color = 0xFF000000;
-  btn_node->bg_color = 0x00000000;
-  btn_node->border_width = 1.0f;
-  btn_node->border_color = 0xFFCCCCCC;
-  btn_node->border_radius = 4.0f;
-  btn_node->layout->width = 160.0f;
-  btn_node->layout->height = 40.0f;
   cmp_f2_button_set_variant(btn_node, CMP_F2_BUTTON_VARIANT_OUTLINE);
   cmp_ui_node_add_event_listener(btn_node, CMP_EVENT_TYPE_MOUSE, 0,
                                  on_btn_click, "F2 Outline Clicked");
   cmp_ui_node_add_child(row, btn_node);
 
   cmp_f2_button_create(&btn_node, "Transparent", NULL);
-  btn_node->layout->padding[0] = 16.0f;
-  btn_node->layout->padding[1] = 8.0f;
-  btn_node->layout->padding[2] = 16.0f;
-  btn_node->layout->padding[3] = 8.0f;
-  btn_node->font_size = 14.0f;
-  btn_node->text_color = 0xFF000000;
-  btn_node->bg_color = 0x00000000;
-  btn_node->border_radius = 4.0f;
-  btn_node->layout->width = 160.0f;
-  btn_node->layout->height = 40.0f;
   cmp_f2_button_set_variant(btn_node, CMP_F2_BUTTON_VARIANT_TRANSPARENT);
   cmp_ui_node_add_event_listener(btn_node, CMP_EVENT_TYPE_MOUSE, 0,
                                  on_btn_click, "F2 Transparent Clicked");
@@ -444,29 +291,33 @@ static int build_cu_buttons(cmp_ui_node_t *parent) {
   cmp_ui_node_add_child(card_box, row);
 
   cmp_ui_button_create(&btn_node, "Plain Button", 0);
-  btn_node->layout->padding[0] = 16.0f;
-  btn_node->layout->padding[1] = 8.0f;
-  btn_node->layout->padding[2] = 16.0f;
-  btn_node->layout->padding[3] = 8.0f;
-  btn_node->font_size = 14.0f;
-  btn_node->layout->width = 160.0f;
-  btn_node->layout->height = 40.0f;
-  btn_node->text_color = 0xFF007AFF;
+  {
+    size_t len = strlen("Plain Button");
+    btn_node->layout->width = (float)len * 7.0f + 32.0f;
+    btn_node->layout->height = 40.0f;
+    btn_node->bg_color = 0x00000000;
+    btn_node->text_color = 0xFF007AFF;
+    btn_node->border_radius = 8.0f;
+    btn_node->design_language_override = 3;
+    btn_node->hover_opacity = 1.0f;
+    btn_node->press_opacity = 0.3f;
+  }
   cmp_ui_node_add_event_listener(btn_node, CMP_EVENT_TYPE_MOUSE, 0,
                                  on_btn_click, "Cupertino Plain Clicked");
   cmp_ui_node_add_child(row, btn_node);
 
   cmp_ui_button_create(&btn_node, "Tinted Button", 0);
-  btn_node->layout->padding[0] = 16.0f;
-  btn_node->layout->padding[1] = 8.0f;
-  btn_node->layout->padding[2] = 16.0f;
-  btn_node->layout->padding[3] = 8.0f;
-  btn_node->font_size = 14.0f;
-  btn_node->layout->width = 160.0f;
-  btn_node->layout->height = 40.0f;
-  btn_node->text_color = 0xFF007AFF;
-  btn_node->bg_color = 0xFFE5F1FF;
-  btn_node->border_radius = 8.0f;
+  {
+    size_t len = strlen("Tinted Button");
+    btn_node->layout->width = (float)len * 7.0f + 32.0f;
+    btn_node->layout->height = 40.0f;
+    btn_node->bg_color = 0x33007AFF;
+    btn_node->text_color = 0xFF007AFF;
+    btn_node->border_radius = 8.0f;
+    btn_node->design_language_override = 3;
+    btn_node->hover_opacity = 0.8f;
+    btn_node->press_opacity = 0.6f;
+  }
   cmp_ui_node_add_event_listener(btn_node, CMP_EVENT_TYPE_MOUSE, 0,
                                  on_btn_click, "Cupertino Tinted Clicked");
   cmp_ui_node_add_child(row, btn_node);

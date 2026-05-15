@@ -167,6 +167,7 @@ int cmp_grid_ctx_add_item(cmp_grid_ctx_t *ctx, cmp_layout_node_t *node,
 
   ctx->items[ctx->item_count].node = node;
   memset(&ctx->items[ctx->item_count], 0, sizeof(cmp_grid_item_t));
+  ctx->items[ctx->item_count].node = node; /* Must re-assign after memset */
   ctx->items[ctx->item_count].row_start.is_auto = 1;
   ctx->items[ctx->item_count].row_end.is_auto = 1;
   ctx->items[ctx->item_count].col_start.is_auto = 1;
@@ -672,6 +673,12 @@ int cmp_grid_align_evaluate(cmp_grid_align_t align, float track_size,
  */
 int cmp_masonry_layout(cmp_grid_ctx_t *ctx) {
   int rc = CMP_SUCCESS;
+  size_t i, j;
+  float *column_heights = NULL;
+  size_t col_count;
+  float min_height;
+  size_t min_col;
+  float item_height;
 
   if (ctx == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
@@ -680,7 +687,61 @@ int cmp_masonry_layout(cmp_grid_ctx_t *ctx) {
     return rc;
   }
 
-  /* Simplified masonry layout placeholder */
+  col_count = ctx->computed_col_count;
+  if (col_count == 0) {
+    return rc;
+  }
+
+  rc = CMP_MALLOC(col_count * sizeof(float), (void **)&column_heights);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_masonry_layout: Out of memory\n");
+    return rc;
+  }
+
+  for (j = 0; j < col_count; j++) {
+    column_heights[j] = 0.0f;
+  }
+
+  for (i = 0; i < ctx->item_count; i++) {
+    min_height = column_heights[0];
+    min_col = 0;
+
+    for (j = 1; j < col_count; j++) {
+      if (column_heights[j] < min_height) {
+        min_height = column_heights[j];
+        min_col = j;
+      }
+    }
+
+    /* Assign to the shortest column */
+    ctx->items[i].resolved_col_start = (int)min_col + 1;
+    ctx->items[i].resolved_col_end = (int)min_col + 2;
+
+    /* In a real engine, we'd get the actual height. We'll use a mocked height
+     * if none provided */
+    item_height = 100.0f;
+    if (ctx->items[i].node && ctx->items[i].node->computed_rect.height > 0.0f) {
+      item_height = ctx->items[i].node->computed_rect.height;
+    }
+
+    /* Assign row start as an abstract y-offset marker for masonry */
+    ctx->items[i].resolved_row_start = (int)min_height;
+
+    column_heights[min_col] += item_height + ctx->row_gap;
+  }
+  if (ctx->computed_row_sizes) {
+    CMP_FREE(ctx->computed_row_sizes);
+  }
+
+  rc = CMP_MALLOC(col_count * sizeof(float), (void **)&ctx->computed_row_sizes);
+  if (rc == CMP_SUCCESS) {
+    memcpy(ctx->computed_row_sizes, column_heights, col_count * sizeof(float));
+  }
+
+  CMP_FREE(column_heights);
+
+  ctx->computed_row_count = col_count;
+
   cmp_log_debug("cmp_masonry_layout: Instantiated structural layout "
                 "dependencies cleanly\n");
 

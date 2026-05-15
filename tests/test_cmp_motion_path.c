@@ -55,6 +55,15 @@ TEST test_motion_path_evaluate(void) {
   ASSERT_IN_RANGE(100.0f, x, 0.001f);
   ASSERT_IN_RANGE(0.0f, y, 0.001f);
 
+  /* Update curve to go completely diagonal: 0,0 to 100,100 directly */
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_motion_path_set_curve(path, 0.0f, 0.0f, 33.3f, 33.3f, 66.6f,
+                                      66.6f, 100.0f, 100.0f));
+  res = cmp_motion_path_evaluate(path, 0.5f, 0.0f, &x, &y, &a);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_IN_RANGE(50.0f, x, 0.1f);
+  ASSERT_IN_RANGE(50.0f, y, 0.1f);
+
   cmp_motion_path_destroy(path);
   PASS();
 }

@@ -34,6 +34,12 @@ TEST test_validation_null_args(void) {
   res = cmp_validation_check(validation, "test", NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
+  /* Setters null args */
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_validation_set_regex(NULL, ".*"));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_validation_set_min_length(NULL, 1));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_validation_set_max_length(NULL, 1));
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_validation_set_required(NULL, 1));
+
   cmp_validation_destroy(validation);
   PASS();
 }
@@ -49,7 +55,58 @@ TEST test_validation_check(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(1, is_valid);
 
+  /* No constraints applied yet, empty should be valid since not required */
   res = cmp_validation_check(validation, "", &is_valid);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(1, is_valid);
+
+  /* Required */
+  cmp_validation_set_required(validation, 1);
+  res = cmp_validation_check(validation, "", &is_valid);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(0, is_valid);
+
+  res = cmp_validation_check(validation, "a", &is_valid);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(1, is_valid);
+
+  /* Min Length */
+  cmp_validation_set_min_length(validation, 3);
+  res = cmp_validation_check(validation, "ab", &is_valid);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(0, is_valid);
+
+  res = cmp_validation_check(validation, "abc", &is_valid);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(1, is_valid);
+
+  /* Max Length */
+  cmp_validation_set_max_length(validation, 5);
+  res = cmp_validation_check(validation, "abcdef", &is_valid);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(0, is_valid);
+
+  res = cmp_validation_check(validation, "abcde", &is_valid);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(1, is_valid);
+
+  /* Regex */
+  cmp_validation_set_regex(validation, "^a.*c$");
+  res = cmp_validation_check(validation, "abc", &is_valid);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(1, is_valid);
+
+  res = cmp_validation_check(validation, "ab1", &is_valid);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(0, is_valid); /* 1 doesn't match regex logic */
+
+  /* Change Regex to match our simple rob pike subset: ^hello */
+  cmp_validation_set_regex(validation, "^hello");
+  res = cmp_validation_check(validation, "hello", &is_valid);
+  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(1, is_valid);
+
+  res = cmp_validation_check(validation, "world", &is_valid);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(0, is_valid);
 

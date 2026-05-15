@@ -1,6 +1,11 @@
 #ifndef CMP_THEME_DISPATCH_H
 #define CMP_THEME_DISPATCH_H
 
+/**
+ * @file cmp_theme_dispatch.h
+ * @brief Dispatch macros and static inline functions for theme vtables.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

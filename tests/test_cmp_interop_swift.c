@@ -20,11 +20,20 @@ TEST test_swift_interop_macros_compilation(void) {
 TEST test_interop_cfstring_and_arc(void) {
   void *retained_obj = NULL;
 
+  /* Mock an aligned pointer */
+  void *aligned_ptr = (void *)(sizeof(void *) * 2);
+  /* Mock an unaligned pointer */
+  void *unaligned_ptr = (void *)((char *)aligned_ptr + 1);
+
   ASSERT_EQ(CMP_SUCCESS, cmp_interop_mock_init());
-  ASSERT_EQ(CMP_SUCCESS, cmp_interop_cfstring_bridge((void *)1));
+  ASSERT_EQ(CMP_SUCCESS, cmp_interop_cfstring_bridge(aligned_ptr));
+
+  ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_interop_cfstring_bridge(unaligned_ptr));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_interop_allocate_retained_object(&retained_obj));
   ASSERT_NEQ(NULL, retained_obj);
+  /* Validate reference count initialization */
+  ASSERT_EQ(1, ((size_t *)retained_obj)[0]);
 
   ASSERT_EQ(CMP_SUCCESS, cmp_interop_release_object(retained_obj));
 

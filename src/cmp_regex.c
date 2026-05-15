@@ -91,6 +91,38 @@ int cmp_regex_compile(cmp_regex_t **out_regex, const char *pattern) {
   return rc;
 }
 
+static int matchhere(const char *regexp, const char *text);
+
+static int matchstar(int c, const char *regexp, const char *text) {
+  do {
+    if (matchhere(regexp, text))
+      return 1;
+  } while (*text != '\0' && (*text++ == c || c == '.'));
+  return 0;
+}
+
+static int matchhere(const char *regexp, const char *text) {
+  if (regexp[0] == '\0')
+    return 1;
+  if (regexp[1] == '*')
+    return matchstar(regexp[0], regexp + 2, text);
+  if (regexp[0] == '$' && regexp[1] == '\0')
+    return *text == '\0';
+  if (*text != '\0' && (regexp[0] == '.' || regexp[0] == *text))
+    return matchhere(regexp + 1, text + 1);
+  return 0;
+}
+
+static int internal_match(const char *regexp, const char *text) {
+  if (regexp[0] == '^')
+    return matchhere(regexp + 1, text);
+  do {
+    if (matchhere(regexp, text))
+      return 1;
+  } while (*text++ != '\0');
+  return 0;
+}
+
 /**
  * @brief cmp_regex_match
  *
@@ -108,12 +140,7 @@ int cmp_regex_match(cmp_regex_t *regex, const char *string, int *out_matched) {
     return rc;
   }
 
-  /* Mock regex logic for tests: Basic substring search */
-  if (strstr(string, regex->pattern) != NULL) {
-    *out_matched = 1;
-  } else {
-    *out_matched = 0;
-  }
+  *out_matched = internal_match(regex->pattern, string);
   return rc;
 }
 

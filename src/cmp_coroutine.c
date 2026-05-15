@@ -10,8 +10,9 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_coroutine_system_init(void) {
-int rc = CMP_SUCCESS;
-  LOG_DEBUG("cmp_coroutine_system_init: Stub on DOS\n");
+  int rc = CMP_ERROR_NOT_FOUND;
+  LOG_DEBUG(
+      "cmp_coroutine_system_init: DOS fallback - Coroutines not supported\n");
   return rc;
 }
 /**
@@ -20,8 +21,9 @@ int rc = CMP_SUCCESS;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_coroutine_system_shutdown(void) {
-int rc = CMP_SUCCESS;
-  LOG_DEBUG("cmp_coroutine_system_shutdown: Stub on DOS\n");
+  int rc = CMP_SUCCESS;
+  LOG_DEBUG(
+      "cmp_coroutine_system_shutdown: DOS fallback - Coroutines not supported\n");
   return rc;
 }
 /**
@@ -35,12 +37,13 @@ int rc = CMP_SUCCESS;
  */
 int cmp_coroutine_create(cmp_coroutine_t **out_co, size_t stack_size,
                          cmp_coroutine_fn_t fn, void *arg) {
-int rc = CMP_ERROR_NOT_FOUND;
+  int rc = CMP_ERROR_NOT_FOUND;
   (void)out_co;
   (void)stack_size;
   (void)fn;
   (void)arg;
-  LOG_DEBUG("cmp_coroutine_create: Stub on DOS\n");
+  LOG_DEBUG(
+      "cmp_coroutine_create: DOS fallback - Coroutines not supported\n");
   return rc;
 }
 /**
@@ -50,9 +53,10 @@ int rc = CMP_ERROR_NOT_FOUND;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_coroutine_resume(cmp_coroutine_t *co) {
-int rc = CMP_ERROR_NOT_FOUND;
+  int rc = CMP_ERROR_NOT_FOUND;
   (void)co;
-  LOG_DEBUG("cmp_coroutine_resume: Stub on DOS\n");
+  LOG_DEBUG(
+      "cmp_coroutine_resume: DOS fallback - Coroutines not supported\n");
   return rc;
 }
 /**
@@ -62,9 +66,10 @@ int rc = CMP_ERROR_NOT_FOUND;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_coroutine_yield(cmp_coroutine_t *co) {
-int rc = CMP_ERROR_NOT_FOUND;
+  int rc = CMP_ERROR_NOT_FOUND;
   (void)co;
-  LOG_DEBUG("cmp_coroutine_yield: Stub on DOS\n");
+  LOG_DEBUG(
+      "cmp_coroutine_yield: DOS fallback - Coroutines not supported\n");
   return rc;
 }
 /**
@@ -74,9 +79,10 @@ int rc = CMP_ERROR_NOT_FOUND;
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_coroutine_destroy(cmp_coroutine_t *co) {
-int rc = CMP_ERROR_NOT_FOUND;
+  int rc = CMP_ERROR_NOT_FOUND;
   (void)co;
-  LOG_DEBUG("cmp_coroutine_destroy: Stub on DOS\n");
+  LOG_DEBUG(
+      "cmp_coroutine_destroy: DOS fallback - Coroutines not supported\n");
   return rc;
 }
 #else
