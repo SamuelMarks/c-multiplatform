@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "app.h"
 #include "cmp.h"
+#include "cmp_ui_action_button.h"
 #include "cmp_ui_app_bar.h"
 #include "cmp_log.h"
 #include <stdio.h>
@@ -184,6 +185,7 @@ static int create_simple_button(cmp_ui_node_t **out_btn, const char *text,
                                            void *)) {
   int rc;
   cmp_ui_node_t *btn_node = NULL;
+  cmp_ui_action_button_t *action_btn = NULL;
   cmp_a11y_tree_t *tree = NULL;
 
   if (!out_btn) {
@@ -191,35 +193,26 @@ static int create_simple_button(cmp_ui_node_t **out_btn, const char *text,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  rc = cmp_ui_button_create(&btn_node, text, -1);
+  rc = cmp_ui_action_button_create(&action_btn, text, CMP_UI_ACTION_BUTTON_STYLE_TONAL);
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_button_create failed: %d\n", rc);
+    LOG_DEBUG("cmp_ui_action_button_create failed: %d\n", rc);
     return rc;
   }
-  btn_node->type = 1; /* Turn into BOX so bg_color renders natively */
 
-  btn_node->layout->width = 64.0f;
-  btn_node->layout->height = 40.0f;
-  btn_node->layout->margin[3] = 0.0f;
-  btn_node->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
-  btn_node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
-  btn_node->bg_color = g_is_dark ? 0xFF4A4458 : 0xFFE8DEF8;
-  btn_node->border_radius = 20.0f;
-  btn_node->hover_opacity = 0.08f;
-  btn_node->press_opacity = 0.12f;
-
-  if (btn_node->child_count > 0 && btn_node->children[0]) {
-    btn_node->children[0]->text_color = g_is_dark ? 0xFFE8DEF8 : 0xFF1D192B;
-    btn_node->children[0]->font_size = 14.0f;
+  rc = cmp_ui_action_button_get_node(action_btn, &btn_node);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_action_button_get_node failed: %d\n", rc);
+    return rc;
   }
+
+  btn_node->layout->margin[3] = 0.0f;
 
   if (aria_label) {
     rc = cmp_a11y_tree_create(&tree);
     if (rc == CMP_SUCCESS) {
-      rc = cmp_a11y_tree_add_node(tree, btn_node->layout->id, "button",
-                                  aria_label);
+      rc = cmp_ui_action_button_bind_a11y(action_btn, tree);
       if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_a11y_tree_add_node failed: %d\n", rc);
+        LOG_DEBUG("cmp_ui_action_button_bind_a11y failed: %d\n", rc);
       }
     } else {
       LOG_DEBUG("cmp_a11y_tree_create failed: %d\n", rc);
