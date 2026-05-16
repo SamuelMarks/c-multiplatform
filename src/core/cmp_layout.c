@@ -531,18 +531,17 @@ static void apply_rtl_mirroring(cmp_layout_node_t *node) {
   if (!node)
     return;
 
-  if (node->direction == CMP_FLEX_ROW) {
-    for (i = 0; i < node->child_count; i++) {
-      cmp_layout_node_t *child = node->children[i];
-      if (child->position_type != CMP_POSITION_ABSOLUTE) {
-        float local_x = child->computed_rect.x - node->computed_rect.x;
-        float new_x = node->computed_rect.x + node->computed_rect.width -
-                      local_x - child->computed_rect.width;
-        float dx = new_x - child->computed_rect.x;
-        if (dx != 0.0f) {
-          child->computed_rect.x = new_x;
-          translate_descendants(child, dx);
-        }
+  /* Mirror X coordinates for all children regardless of flex direction */
+  for (i = 0; i < node->child_count; i++) {
+    cmp_layout_node_t *child = node->children[i];
+    if (child->position_type != CMP_POSITION_ABSOLUTE) {
+      float local_x = child->computed_rect.x - node->computed_rect.x;
+      float new_x = node->computed_rect.x + node->computed_rect.width -
+                    local_x - child->computed_rect.width;
+      float dx = new_x - child->computed_rect.x;
+      if (dx != 0.0f) {
+        child->computed_rect.x = new_x;
+        translate_descendants(child, dx);
       }
     }
   }
