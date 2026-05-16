@@ -858,21 +858,14 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
                        (int)(rect.y + (rect.height - size) / 2.0f), wtext,
                        wlen - 1);
             } else if (node->type == 2) {
-              if (cmp_i18n_get_bidi_direction() == 1) {
-                SetTextAlign(hdc, TA_RIGHT | TA_TOP);
-                TextOutW(hdc, (int)(rect.x + rect.width), (int)(rect.y + (rect.height - size) / 2.0f), wtext, wlen - 1);
-              } else {
-                SetTextAlign(hdc, TA_LEFT | TA_TOP);
-                TextOutW(hdc, (int)rect.x, (int)(rect.y + (rect.height - size) / 2.0f), wtext, wlen - 1);
-              }
+              SetTextAlign(hdc, TA_CENTER | TA_TOP);
+              TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
+                       (int)(rect.y + (rect.height - size) / 2.0f), wtext,
+                       wlen - 1);
             } else {
-              if (cmp_i18n_get_bidi_direction() == 1) {
-                SetTextAlign(hdc, TA_RIGHT | TA_TOP);
-                TextOutW(hdc, (int)(rect.x + rect.width), (int)rect.y, wtext, wlen - 1);
-              } else {
-                SetTextAlign(hdc, TA_LEFT | TA_TOP);
-                TextOutW(hdc, (int)rect.x, (int)rect.y, wtext, wlen - 1);
-              }
+              SetTextAlign(hdc, TA_CENTER | TA_TOP);
+              TextOutW(hdc, (int)(rect.x + rect.width / 2.0f), (int)rect.y,
+                       wtext, wlen - 1);
             }
             SelectObject(hdc, old_font);
             DeleteObject(font);
