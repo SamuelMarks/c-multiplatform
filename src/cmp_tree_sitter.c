@@ -76,9 +76,13 @@ int cmp_tree_sitter_destroy(cmp_tree_sitter_t *ts) {
   if (!ts) {
     return CMP_ERROR_INVALID_ARG;
   }
-  rc = CMP_FREE(ts);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Free failed\n");
+  {
+
+    int free_rc_1 = CMP_FREE(ts);
+
+    if (free_rc_1 != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
   }
   return rc;
 }
@@ -150,23 +154,35 @@ int cmp_tree_sitter_free_node(cmp_tree_node_t *node) {
     return rc;
   }
   if (node->type) {
-    rc = CMP_FREE(node->type);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+    {
+
+      int free_rc_2 = CMP_FREE(node->type);
+
+      if (free_rc_2 != CMP_SUCCESS) {
+        LOG_DEBUG("Free failed\n");
+      }
     }
   }
   if (node->children) {
     for (i = 0; i < node->child_count; i++) {
       cmp_tree_sitter_free_node(node->children[i]);
     }
-    rc = CMP_FREE(node->children);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+    {
+
+      int free_rc_3 = CMP_FREE(node->children);
+
+      if (free_rc_3 != CMP_SUCCESS) {
+        LOG_DEBUG("Free failed\n");
+      }
     }
   }
-  rc = CMP_FREE(node);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Free failed\n");
+  {
+
+    int free_rc_4 = CMP_FREE(node);
+
+    if (free_rc_4 != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
   }
   return rc;
 }
@@ -180,9 +196,13 @@ int cmp_tree_sitter_free_node(cmp_tree_node_t *node) {
 int cmp_tree_sitter_free_string(char *str) {
   int rc = CMP_SUCCESS;
   if (str) {
-    rc = CMP_FREE(str);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
+    {
+
+      int free_rc_5 = CMP_FREE(str);
+
+      if (free_rc_5 != CMP_SUCCESS) {
+        LOG_DEBUG("Free failed\n");
+      }
     }
   }
   return rc;

@@ -71,13 +71,21 @@ int cmp_typography_destroy(cmp_typography_t *typo) {
   for (i = 0; i < typo->fallback_count; i++) {
     cmp_font_destroy(typo->fallback_fonts[i]);
   }
-  rc = CMP_FREE(typo->fallback_fonts);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Free failed\n");
+  {
+
+    int free_rc_1 = CMP_FREE(typo->fallback_fonts);
+
+    if (free_rc_1 != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
   }
-  rc = CMP_FREE(typo);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("Free failed\n");
+  {
+
+    int free_rc_2 = CMP_FREE(typo);
+
+    if (free_rc_2 != CMP_SUCCESS) {
+      LOG_DEBUG("Free failed\n");
+    }
   }
 
   /* Assumes cmp_typography_shutdown() is handled globally */

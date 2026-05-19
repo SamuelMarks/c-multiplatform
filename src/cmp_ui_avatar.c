@@ -51,9 +51,13 @@ int cmp_ui_avatar_create(cmp_ui_avatar_t **out_avatar, const char *initials,
       memcpy(avatar->initials, initials, len + 1);
     } else {
       LOG_DEBUG("cmp_ui_avatar_create: OOM initials\n");
-      rc = CMP_FREE(avatar);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE failed\n");
+      {
+
+        int free_rc_1 = CMP_FREE(avatar);
+
+        if (free_rc_1 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE failed\n");
+        }
       }
       return CMP_ERROR_OOM;
     }
@@ -63,14 +67,22 @@ int cmp_ui_avatar_create(cmp_ui_avatar_t **out_avatar, const char *initials,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_avatar_create: cmp_ui_box_create failed\n");
     if (avatar->initials) {
-      rc = CMP_FREE(avatar->initials);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE initials failed\n");
+      {
+
+        int free_rc_2 = CMP_FREE(avatar->initials);
+
+        if (free_rc_2 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE initials failed\n");
+        }
       }
     }
-    rc = CMP_FREE(avatar);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE avatar failed\n");
+    {
+
+      int free_rc_3 = CMP_FREE(avatar);
+
+      if (free_rc_3 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE avatar failed\n");
+      }
     }
 
     return rc;
@@ -87,14 +99,22 @@ int cmp_ui_avatar_create(cmp_ui_avatar_t **out_avatar, const char *initials,
       LOG_DEBUG("cmp_ui_avatar_create: cmp_ui_node_destroy failed\n");
     }
     if (avatar->initials) {
-      rc = CMP_FREE(avatar->initials);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE initials failed\n");
+      {
+
+        int free_rc_4 = CMP_FREE(avatar->initials);
+
+        if (free_rc_4 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE initials failed\n");
+        }
       }
     }
-    rc = CMP_FREE(avatar);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE avatar failed\n");
+    {
+
+      int free_rc_5 = CMP_FREE(avatar);
+
+      if (free_rc_5 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_avatar_create: CMP_FREE avatar failed\n");
+      }
     }
 
     return rc;
@@ -124,9 +144,13 @@ int cmp_ui_avatar_destroy(cmp_ui_avatar_t *avatar) {
     return CMP_ERROR_INVALID_ARG;
   }
   if (avatar->initials) {
-    rc = CMP_FREE(avatar->initials);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_avatar_destroy: CMP_FREE initials failed\n");
+    {
+
+      int free_rc_6 = CMP_FREE(avatar->initials);
+
+      if (free_rc_6 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_avatar_destroy: CMP_FREE initials failed\n");
+      }
     }
   }
   if (avatar->node_root) {
@@ -135,11 +159,15 @@ int cmp_ui_avatar_destroy(cmp_ui_avatar_t *avatar) {
       LOG_DEBUG("cmp_ui_avatar_destroy: cmp_ui_node_destroy failed\n");
     }
   }
-  rc = CMP_FREE(avatar);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_avatar_destroy: CMP_FREE failed\n");
+  {
 
-    return rc;
+    int free_rc_7 = CMP_FREE(avatar);
+
+    if (free_rc_7 != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_avatar_destroy: CMP_FREE failed\n");
+
+      return rc;
+    }
   }
   return rc;
 }
@@ -179,9 +207,13 @@ int cmp_ui_avatar_set_initials(cmp_ui_avatar_t *avatar, const char *initials) {
   }
 
   if (avatar->initials) {
-    rc = CMP_FREE(avatar->initials);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_avatar_set_initials: CMP_FREE initials failed\n");
+    {
+
+      int free_rc_8 = CMP_FREE(avatar->initials);
+
+      if (free_rc_8 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_avatar_set_initials: CMP_FREE initials failed\n");
+      }
     }
     avatar->initials = NULL;
   }

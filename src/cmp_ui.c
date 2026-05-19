@@ -35,10 +35,14 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_1 = CMP_FREE(node);
+
+      if (free_rc_1 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -84,10 +88,14 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_2 = CMP_FREE(node);
+
+      if (free_rc_2 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -97,10 +105,14 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
   len = (text_len < 0) ? strlen(text) : (size_t)text_len;
   if (CMP_MALLOC(len + 1, (void **)&text_copy) != CMP_SUCCESS) {
     cmp_layout_node_destroy(node->layout);
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_3 = CMP_FREE(node);
+
+      if (free_rc_3 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     return CMP_ERROR_OOM;
   }
@@ -148,10 +160,14 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_4 = CMP_FREE(node);
+
+      if (free_rc_4 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -161,10 +177,14 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
   len = (label_len < 0) ? strlen(label) : (size_t)label_len;
   if (CMP_MALLOC(len + 1, (void **)&label_copy) != CMP_SUCCESS) {
     cmp_layout_node_destroy(node->layout);
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_5 = CMP_FREE(node);
+
+      if (free_rc_5 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     return CMP_ERROR_OOM;
   }
@@ -207,10 +227,14 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_6 = CMP_FREE(node);
+
+      if (free_rc_6 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -253,10 +277,14 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_7 = CMP_FREE(node);
+
+      if (free_rc_7 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -267,10 +295,14 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
     size_t len = strlen(label);
     if (CMP_MALLOC(len + 1, (void **)&label_copy) != CMP_SUCCESS) {
       cmp_layout_node_destroy(node->layout);
-      rc = CMP_FREE(node);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("CMP_FREE: %d\n", rc);
-        return rc;
+      {
+
+        int free_rc_8 = CMP_FREE(node);
+
+        if (free_rc_8 != CMP_SUCCESS) {
+          LOG_DEBUG("CMP_FREE: %d\n", rc);
+          return rc;
+        }
       }
       return CMP_ERROR_OOM;
     }
@@ -318,10 +350,14 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_9 = CMP_FREE(node);
+
+      if (free_rc_9 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -330,10 +366,14 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
 
   if (CMP_MALLOC(sizeof(int), (void **)&group_prop) != CMP_SUCCESS) {
     cmp_layout_node_destroy(node->layout);
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_10 = CMP_FREE(node);
+
+      if (free_rc_10 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     return CMP_ERROR_OOM;
   }
@@ -380,10 +420,14 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_11 = CMP_FREE(node);
+
+      if (free_rc_11 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -420,16 +464,24 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
               cmp_svg_parse_path_str(start, renderer);
             }
           }
-          rc = CMP_FREE(svg_str);
-          if (rc != CMP_SUCCESS) {
+          {
+
+            int free_rc_12 = CMP_FREE(svg_str);
+
+            if (free_rc_12 != CMP_SUCCESS) {
+              LOG_DEBUG("CMP_FREE: %d\n", rc);
+              return rc;
+            }
+          }
+        }
+        {
+
+          int free_rc_13 = CMP_FREE(buffer);
+
+          if (free_rc_13 != CMP_SUCCESS) {
             LOG_DEBUG("CMP_FREE: %d\n", rc);
             return rc;
           }
-        }
-        rc = CMP_FREE(buffer);
-        if (rc != CMP_SUCCESS) {
-          LOG_DEBUG("CMP_FREE: %d\n", rc);
-          return rc;
         }
       }
     }
@@ -440,11 +492,14 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
     props[1] = renderer;
     node->properties = props;
   } else {
-    if (path_copy)
-      rc = CMP_FREE(path_copy);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    if (path_copy) {
+
+      int free_rc_14 = CMP_FREE(path_copy);
+
+      if (free_rc_14 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     if (renderer)
       cmp_svg_renderer_destroy(renderer);
@@ -487,10 +542,14 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_15 = CMP_FREE(node);
+
+      if (free_rc_15 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -499,10 +558,14 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
 
   if (CMP_MALLOC(sizeof(float) * 2, (void **)&bounds) != CMP_SUCCESS) {
     cmp_layout_node_destroy(node->layout);
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_16 = CMP_FREE(node);
+
+      if (free_rc_16 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     return CMP_ERROR_OOM;
   }
@@ -545,10 +608,14 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_17 = CMP_FREE(node);
+
+      if (free_rc_17 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -591,10 +658,14 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_18 = CMP_FREE(node);
+
+      if (free_rc_18 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -603,10 +674,14 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
 
   if (CMP_MALLOC(sizeof(int), (void **)&cols_prop) != CMP_SUCCESS) {
     cmp_layout_node_destroy(node->layout);
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_19 = CMP_FREE(node);
+
+      if (free_rc_19 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     return CMP_ERROR_OOM;
   }
@@ -648,10 +723,14 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_20 = CMP_FREE(node);
+
+      if (free_rc_20 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -692,10 +771,14 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_21 = CMP_FREE(node);
+
+      if (free_rc_21 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -736,10 +819,14 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_22 = CMP_FREE(node);
+
+      if (free_rc_22 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -780,10 +867,14 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
-    rc = CMP_FREE(node);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_23 = CMP_FREE(node);
+
+      if (free_rc_23 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     LOG_DEBUG("cmp_ui_box_create cmp_layout_node_create: %d\n", rc);
 
@@ -826,10 +917,14 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
     if (parent->children != NULL) {
       memcpy(new_children, parent->children,
              sizeof(cmp_ui_node_t *) * parent->child_count);
-      rc = CMP_FREE(parent->children);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("CMP_FREE: %d\n", rc);
-        return rc;
+      {
+
+        int free_rc_24 = CMP_FREE(parent->children);
+
+        if (free_rc_24 != CMP_SUCCESS) {
+          LOG_DEBUG("CMP_FREE: %d\n", rc);
+          return rc;
+        }
       }
     }
 
@@ -963,10 +1058,14 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
   listener = node->event_listeners;
   while (listener) {
     next_listener = listener->next;
-    rc = CMP_FREE(listener);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_25 = CMP_FREE(listener);
+
+      if (free_rc_25 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     listener = next_listener;
   }
@@ -976,10 +1075,14 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
   }
 
   if (node->children != NULL) {
-    rc = CMP_FREE(node->children);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_26 = CMP_FREE(node->children);
+
+      if (free_rc_26 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
   }
 
@@ -994,32 +1097,47 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
 
   if (node->type == 2 && node->properties != NULL) {
     /* Free text string */
-    rc = CMP_FREE(node->properties);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_27 = CMP_FREE(node->properties);
+
+      if (free_rc_27 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
   } else if (node->type == 7 && node->properties != NULL) {
     void **props = (void **)node->properties;
-    if (props[0])
-      rc = CMP_FREE(props[0]);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    if (props[0]) {
+
+      int free_rc_28 = CMP_FREE(props[0]);
+
+      if (free_rc_28 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
     if (props[1])
       cmp_svg_renderer_destroy((cmp_svg_renderer_t *)props[1]);
-    rc = CMP_FREE(node->properties);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("CMP_FREE: %d\n", rc);
-      return rc;
+    {
+
+      int free_rc_29 = CMP_FREE(node->properties);
+
+      if (free_rc_29 != CMP_SUCCESS) {
+        LOG_DEBUG("CMP_FREE: %d\n", rc);
+        return rc;
+      }
     }
   }
 
-  rc = CMP_FREE(node);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("CMP_FREE: %d\n", rc);
-    return rc;
+  {
+
+    int free_rc_30 = CMP_FREE(node);
+
+    if (free_rc_30 != CMP_SUCCESS) {
+      LOG_DEBUG("CMP_FREE: %d\n", rc);
+      return rc;
+    }
   }
   return rc;
 }

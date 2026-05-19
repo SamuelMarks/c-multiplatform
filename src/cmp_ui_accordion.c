@@ -68,13 +68,21 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
 #if defined(_MSC_VER)
       if (memcpy_s(accordion->title, len + 1, final_title, len + 1) != 0) {
         LOG_DEBUG("cmp_ui_accordion_create: memcpy_s failed\n");
-        rc = CMP_FREE(accordion->title);
-        if (rc != CMP_SUCCESS) {
-          LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
+        {
+
+          int free_rc_1 = CMP_FREE(accordion->title);
+
+          if (free_rc_1 != CMP_SUCCESS) {
+            LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
+          }
         }
-        rc = CMP_FREE(accordion);
-        if (rc != CMP_SUCCESS) {
-          LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
+        {
+
+          int free_rc_2 = CMP_FREE(accordion);
+
+          if (free_rc_2 != CMP_SUCCESS) {
+            LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
+          }
         }
         if (translated.data) {
           rc = cmp_string_destroy(&translated);
@@ -89,9 +97,13 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
 #endif
     } else {
       LOG_DEBUG("cmp_ui_accordion_create: OOM title\n");
-      rc = CMP_FREE(accordion);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
+      {
+
+        int free_rc_3 = CMP_FREE(accordion);
+
+        if (free_rc_3 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
+        }
       }
       if (translated.data) {
         rc = cmp_string_destroy(&translated);
@@ -116,14 +128,22 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_accordion_create: cmp_ui_box_create failed\n");
     if (accordion->title) {
-      rc = CMP_FREE(accordion->title);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE title failed\n");
+      {
+
+        int free_rc_4 = CMP_FREE(accordion->title);
+
+        if (free_rc_4 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE title failed\n");
+        }
       }
     }
-    rc = CMP_FREE(accordion);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
+    {
+
+      int free_rc_5 = CMP_FREE(accordion);
+
+      if (free_rc_5 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
+      }
     }
 
     return rc;
@@ -140,14 +160,22 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
       LOG_DEBUG("cmp_ui_accordion_create: cmp_ui_node_destroy failed\n");
     }
     if (accordion->title) {
-      rc = CMP_FREE(accordion->title);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE title failed\n");
+      {
+
+        int free_rc_6 = CMP_FREE(accordion->title);
+
+        if (free_rc_6 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE title failed\n");
+        }
       }
     }
-    rc = CMP_FREE(accordion);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
+    {
+
+      int free_rc_7 = CMP_FREE(accordion);
+
+      if (free_rc_7 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_accordion_create: CMP_FREE failed\n");
+      }
     }
 
     return rc;
@@ -177,9 +205,13 @@ int cmp_ui_accordion_destroy(cmp_ui_accordion_t *accordion) {
     return CMP_ERROR_INVALID_ARG;
   }
   if (accordion->title) {
-    rc = CMP_FREE(accordion->title);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_accordion_destroy: CMP_FREE title failed\n");
+    {
+
+      int free_rc_8 = CMP_FREE(accordion->title);
+
+      if (free_rc_8 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_accordion_destroy: CMP_FREE title failed\n");
+      }
     }
   }
   if (accordion->node_root) {
@@ -189,11 +221,15 @@ int cmp_ui_accordion_destroy(cmp_ui_accordion_t *accordion) {
     }
   }
 
-  rc = CMP_FREE(accordion);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_accordion_destroy: CMP_FREE failed\n");
+  {
 
-    return rc;
+    int free_rc_9 = CMP_FREE(accordion);
+
+    if (free_rc_9 != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_accordion_destroy: CMP_FREE failed\n");
+
+      return rc;
+    }
   }
   return rc;
 }

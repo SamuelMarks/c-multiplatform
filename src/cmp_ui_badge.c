@@ -69,9 +69,13 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
           LOG_DEBUG("cmp_ui_badge_create: cmp_string_destroy failed\n");
         }
       }
-      rc = CMP_FREE(badge);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_badge_create: CMP_FREE badge failed\n");
+      {
+
+        int free_rc_1 = CMP_FREE(badge);
+
+        if (free_rc_1 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_badge_create: CMP_FREE badge failed\n");
+        }
       }
       return CMP_ERROR_OOM;
     }
@@ -90,14 +94,22 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_badge_create: cmp_ui_box_create failed\n");
     if (badge->text) {
-      rc = CMP_FREE(badge->text);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_badge_create: CMP_FREE text failed\n");
+      {
+
+        int free_rc_2 = CMP_FREE(badge->text);
+
+        if (free_rc_2 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_badge_create: CMP_FREE text failed\n");
+        }
       }
     }
-    rc = CMP_FREE(badge);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_badge_create: CMP_FREE badge failed\n");
+    {
+
+      int free_rc_3 = CMP_FREE(badge);
+
+      if (free_rc_3 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_badge_create: CMP_FREE badge failed\n");
+      }
     }
 
     return rc;
@@ -110,18 +122,26 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_badge_create: cmp_ui_text_create failed\n");
     if (badge->text) {
-      rc = CMP_FREE(badge->text);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_badge_create: CMP_FREE text failed\n");
+      {
+
+        int free_rc_4 = CMP_FREE(badge->text);
+
+        if (free_rc_4 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_badge_create: CMP_FREE text failed\n");
+        }
       }
     }
     rc = cmp_ui_node_destroy(badge->node_root);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_create: cmp_ui_node_destroy failed\n");
     }
-    rc = CMP_FREE(badge);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_badge_create: CMP_FREE badge failed\n");
+    {
+
+      int free_rc_5 = CMP_FREE(badge);
+
+      if (free_rc_5 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_badge_create: CMP_FREE badge failed\n");
+      }
     }
 
     return rc;
@@ -151,9 +171,13 @@ int cmp_ui_badge_destroy(cmp_ui_badge_t *badge) {
     return CMP_ERROR_INVALID_ARG;
   }
   if (badge->text) {
-    rc = CMP_FREE(badge->text);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_badge_destroy: CMP_FREE text failed\n");
+    {
+
+      int free_rc_6 = CMP_FREE(badge->text);
+
+      if (free_rc_6 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_badge_destroy: CMP_FREE text failed\n");
+      }
     }
   }
   if (badge->node_root) {
@@ -162,11 +186,15 @@ int cmp_ui_badge_destroy(cmp_ui_badge_t *badge) {
       LOG_DEBUG("cmp_ui_badge_destroy: cmp_ui_node_destroy failed\n");
     }
   }
-  rc = CMP_FREE(badge);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_badge_destroy: CMP_FREE badge failed\n");
+  {
 
-    return rc;
+    int free_rc_7 = CMP_FREE(badge);
+
+    if (free_rc_7 != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_badge_destroy: CMP_FREE badge failed\n");
+
+      return rc;
+    }
   }
   return rc;
 }
@@ -208,9 +236,13 @@ int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text) {
   }
 
   if (badge->text) {
-    rc = CMP_FREE(badge->text);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_badge_set_text: CMP_FREE text failed\n");
+    {
+
+      int free_rc_8 = CMP_FREE(badge->text);
+
+      if (free_rc_8 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_badge_set_text: CMP_FREE text failed\n");
+      }
     }
     badge->text = NULL;
   }

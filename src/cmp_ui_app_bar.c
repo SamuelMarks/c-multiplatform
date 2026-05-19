@@ -50,9 +50,13 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
   rc = cmp_ui_box_create(&bar->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_box_create failed\n");
-    rc = CMP_FREE(bar);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_app_bar_create: CMP_FREE failed\n");
+    {
+
+      int free_rc_1 = CMP_FREE(bar);
+
+      if (free_rc_1 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_app_bar_create: CMP_FREE failed\n");
+      }
     }
 
     return rc;
@@ -94,9 +98,13 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_node_destroy failed\n");
     }
-    rc = CMP_FREE(bar);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_app_bar_create: CMP_FREE failed\n");
+    {
+
+      int free_rc_2 = CMP_FREE(bar);
+
+      if (free_rc_2 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_app_bar_create: CMP_FREE failed\n");
+      }
     }
     return CMP_ERROR_GENERAL;
   }
@@ -118,9 +126,13 @@ int cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar) {
     return CMP_ERROR_INVALID_ARG;
   }
   if (bar->title) {
-    rc = CMP_FREE(bar->title);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_app_bar_destroy: CMP_FREE title failed\n");
+    {
+
+      int free_rc_3 = CMP_FREE(bar->title);
+
+      if (free_rc_3 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_app_bar_destroy: CMP_FREE title failed\n");
+      }
     }
   }
   if (bar->node_root) {
@@ -129,11 +141,15 @@ int cmp_ui_app_bar_destroy(cmp_ui_app_bar_t *bar) {
       LOG_DEBUG("cmp_ui_app_bar_destroy: cmp_ui_node_destroy failed\n");
     }
   }
-  rc = CMP_FREE(bar);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_app_bar_destroy: CMP_FREE failed\n");
+  {
 
-    return rc;
+    int free_rc_4 = CMP_FREE(bar);
+
+    if (free_rc_4 != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_app_bar_destroy: CMP_FREE failed\n");
+
+      return rc;
+    }
   }
   return rc;
 }
@@ -173,9 +189,13 @@ int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title) {
   }
 
   if (bar->title) {
-    rc = CMP_FREE(bar->title);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_app_bar_set_title: CMP_FREE title failed\n");
+    {
+
+      int free_rc_5 = CMP_FREE(bar->title);
+
+      if (free_rc_5 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_app_bar_set_title: CMP_FREE title failed\n");
+      }
     }
     bar->title = NULL;
   }
@@ -191,10 +211,14 @@ int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title) {
     memcpy(bar->title, title, len + 1);
 
     if (bar->node_title && bar->node_title->properties) {
-      rc = CMP_FREE(bar->node_title->properties);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_app_bar_set_title: CMP_FREE node_title properties "
-                  "failed\n");
+      {
+
+        int free_rc_6 = CMP_FREE(bar->node_title->properties);
+
+        if (free_rc_6 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_app_bar_set_title: CMP_FREE node_title properties "
+                    "failed\n");
+        }
       }
     }
     if (bar->node_title) {
@@ -208,10 +232,14 @@ int cmp_ui_app_bar_set_title(cmp_ui_app_bar_t *bar, const char *title) {
     }
   } else {
     if (bar->node_title && bar->node_title->properties) {
-      rc = CMP_FREE(bar->node_title->properties);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_app_bar_set_title: CMP_FREE node_title properties "
-                  "failed\n");
+      {
+
+        int free_rc_7 = CMP_FREE(bar->node_title->properties);
+
+        if (free_rc_7 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_app_bar_set_title: CMP_FREE node_title properties "
+                    "failed\n");
+        }
       }
     }
     if (bar->node_title) {

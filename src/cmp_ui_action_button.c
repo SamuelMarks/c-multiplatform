@@ -57,9 +57,13 @@ int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
       memcpy(btn->label, label, len + 1);
     } else {
       LOG_DEBUG("cmp_ui_action_button_create: OOM label\n");
-      rc = CMP_FREE(btn);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE failed\n");
+      {
+
+        int free_rc_1 = CMP_FREE(btn);
+
+        if (free_rc_1 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE failed\n");
+        }
       }
       return CMP_ERROR_OOM;
     }
@@ -69,14 +73,22 @@ int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_action_button_create: cmp_ui_button_create failed\n");
     if (btn->label) {
-      rc = CMP_FREE(btn->label);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE label failed\n");
+      {
+
+        int free_rc_2 = CMP_FREE(btn->label);
+
+        if (free_rc_2 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE label failed\n");
+        }
       }
     }
-    rc = CMP_FREE(btn);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE failed\n");
+    {
+
+      int free_rc_3 = CMP_FREE(btn);
+
+      if (free_rc_3 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE failed\n");
+      }
     }
 
     return rc;
@@ -98,14 +110,22 @@ int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
       LOG_DEBUG("cmp_ui_action_button_create: cmp_ui_node_destroy failed\n");
     }
     if (btn->label) {
-      rc = CMP_FREE(btn->label);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE label failed\n");
+      {
+
+        int free_rc_4 = CMP_FREE(btn->label);
+
+        if (free_rc_4 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE label failed\n");
+        }
       }
     }
-    rc = CMP_FREE(btn);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE failed\n");
+    {
+
+      int free_rc_5 = CMP_FREE(btn);
+
+      if (free_rc_5 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_action_button_create: CMP_FREE failed\n");
+      }
     }
 
     return rc;
@@ -223,9 +243,13 @@ int cmp_ui_action_button_destroy(cmp_ui_action_button_t *btn) {
     return CMP_ERROR_INVALID_ARG;
   }
   if (btn->label) {
-    rc = CMP_FREE(btn->label);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_action_button_destroy: CMP_FREE label failed\n");
+    {
+
+      int free_rc_6 = CMP_FREE(btn->label);
+
+      if (free_rc_6 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_action_button_destroy: CMP_FREE label failed\n");
+      }
     }
   }
   if (btn->node_root) {
@@ -234,11 +258,15 @@ int cmp_ui_action_button_destroy(cmp_ui_action_button_t *btn) {
       LOG_DEBUG("cmp_ui_action_button_destroy: cmp_ui_node_destroy failed\n");
     }
   }
-  rc = CMP_FREE(btn);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_action_button_destroy: CMP_FREE failed\n");
+  {
 
-    return rc;
+    int free_rc_7 = CMP_FREE(btn);
+
+    if (free_rc_7 != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_action_button_destroy: CMP_FREE failed\n");
+
+      return rc;
+    }
   }
   return rc;
 }
@@ -280,9 +308,13 @@ int cmp_ui_action_button_set_label(cmp_ui_action_button_t *btn,
   }
 
   if (btn->label) {
-    rc = CMP_FREE(btn->label);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_action_button_set_label: CMP_FREE label failed\n");
+    {
+
+      int free_rc_8 = CMP_FREE(btn->label);
+
+      if (free_rc_8 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_action_button_set_label: CMP_FREE label failed\n");
+      }
     }
     btn->label = NULL;
   }
@@ -297,10 +329,14 @@ int cmp_ui_action_button_set_label(cmp_ui_action_button_t *btn,
     }
     memcpy(btn->label, label, len + 1);
     if (btn->node_text->properties) {
-      rc = CMP_FREE(btn->node_text->properties);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_action_button_set_label: CMP_FREE text properties "
-                  "failed\n");
+      {
+
+        int free_rc_9 = CMP_FREE(btn->node_text->properties);
+
+        if (free_rc_9 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_action_button_set_label: CMP_FREE text properties "
+                    "failed\n");
+        }
       }
     }
     rc = CMP_MALLOC(len + 1, (void **)&btn->node_text->properties);
@@ -312,10 +348,14 @@ int cmp_ui_action_button_set_label(cmp_ui_action_button_t *btn,
     }
   } else {
     if (btn->node_text->properties) {
-      rc = CMP_FREE(btn->node_text->properties);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_action_button_set_label: CMP_FREE text properties "
-                  "failed\n");
+      {
+
+        int free_rc_10 = CMP_FREE(btn->node_text->properties);
+
+        if (free_rc_10 != CMP_SUCCESS) {
+          LOG_DEBUG("cmp_ui_action_button_set_label: CMP_FREE text properties "
+                    "failed\n");
+        }
       }
     }
     rc = CMP_MALLOC(1, (void **)&btn->node_text->properties);

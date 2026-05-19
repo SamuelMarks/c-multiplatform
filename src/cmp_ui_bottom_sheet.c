@@ -39,9 +39,13 @@ int cmp_ui_bottom_sheet_create(cmp_ui_bottom_sheet_t **out_sheet) {
   rc = cmp_ui_box_create(&sheet->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_bottom_sheet_create: cmp_ui_box_create failed\n");
-    rc = CMP_FREE(sheet);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_bottom_sheet_create: CMP_FREE failed\n");
+    {
+
+      int free_rc_1 = CMP_FREE(sheet);
+
+      if (free_rc_1 != CMP_SUCCESS) {
+        LOG_DEBUG("cmp_ui_bottom_sheet_create: CMP_FREE failed\n");
+      }
     }
 
     return rc;
@@ -79,11 +83,15 @@ int cmp_ui_bottom_sheet_destroy(cmp_ui_bottom_sheet_t *sheet) {
       LOG_DEBUG("cmp_ui_bottom_sheet_destroy: cmp_ui_node_destroy failed\n");
     }
   }
-  rc = CMP_FREE(sheet);
-  if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_bottom_sheet_destroy: CMP_FREE failed\n");
+  {
 
-    return rc;
+    int free_rc_2 = CMP_FREE(sheet);
+
+    if (free_rc_2 != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_bottom_sheet_destroy: CMP_FREE failed\n");
+
+      return rc;
+    }
   }
   return rc;
 }
