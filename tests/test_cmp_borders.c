@@ -27,7 +27,7 @@ TEST test_radius_hit_test(void) {
   cmp_radius_t r;
   int inside;
 
-  cmp_radius_init(&r);
+  ASSERT_EQ(CMP_SUCCESS, cmp_radius_init(&r));
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_radius_hit_test(&r, 100.0f, 100.0f, 50.0f, 50.0f, &inside));
@@ -65,7 +65,7 @@ TEST test_shadow_9patch(void) {
   ASSERT_EQ(32, shadow.base_texture->height);
 
   /* Clean up the texture pointer allocated by the generation */
-  cmp_texture_destroy(shadow.base_texture);
+  ASSERT_EQ(CMP_SUCCESS, cmp_texture_destroy(shadow.base_texture));
 
   /* Test null args / invalid elevation */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_shadow_9patch_generate(-1.0f, &shadow));

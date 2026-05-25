@@ -16,13 +16,13 @@ TEST test_auth_siwa(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_siwa_destroy(siwa));
 
   /* Test branding validation */
-  cmp_a11y_tree_create(&tree);
-  cmp_a11y_tree_add_node(tree, 5, "button", "Sign In");
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_tree_create(&tree));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_tree_add_node(tree, 5, "button", "Sign In"));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_tree_validate_siwa_branding(tree, 5, &valid));
   ASSERT_EQ(1, valid);
 
-  cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_tree_destroy(tree));
 
   PASS();
 }
@@ -65,8 +65,8 @@ TEST test_auth_ui_security(void) {
   int is_sensitive;
   cmp_window_t *win = (cmp_window_t *)1; /* Fake window handle */
 
-  cmp_a11y_tree_create(&tree);
-  cmp_a11y_tree_add_node(tree, 10, "textfield", "Code");
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_tree_create(&tree));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_tree_add_node(tree, 10, "textfield", "Code"));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_a11y_tree_set_node_text_content_type(
                              tree, 10, CMP_TEXT_CONTENT_TYPE_ONE_TIME_CODE));
@@ -74,7 +74,7 @@ TEST test_auth_ui_security(void) {
   /* Simulated blurred bg */
   ASSERT_EQ(CMP_SUCCESS, cmp_window_set_secure_background_obscure(win, 1));
 
-  cmp_a11y_tree_destroy(tree);
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_tree_destroy(tree));
 
   /* Sensitive content filtering */
   ASSERT_EQ(CMP_SUCCESS,
@@ -93,9 +93,9 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_local_auth_create(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_keychain_create(NULL));
 
-  cmp_siwa_create(&siwa);
-  cmp_local_auth_create(&auth);
-  cmp_keychain_create(&kc);
+  ASSERT_EQ(CMP_SUCCESS, cmp_siwa_create(&siwa));
+  ASSERT_EQ(CMP_SUCCESS, cmp_local_auth_create(&auth));
+  ASSERT_EQ(CMP_SUCCESS, cmp_keychain_create(&kc));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_siwa_request(NULL, 1, NULL, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -113,9 +113,9 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_visuals_check_sensitive_content(NULL, 0, NULL));
 
-  cmp_siwa_destroy(siwa);
-  cmp_local_auth_destroy(auth);
-  cmp_keychain_destroy(kc);
+  ASSERT_EQ(CMP_SUCCESS, cmp_siwa_destroy(siwa));
+  ASSERT_EQ(CMP_SUCCESS, cmp_local_auth_destroy(auth));
+  ASSERT_EQ(CMP_SUCCESS, cmp_keychain_destroy(kc));
 
   PASS();
 }

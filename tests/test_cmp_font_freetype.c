@@ -75,6 +75,7 @@ TEST test_cmp_font_fallback_chain(void) {
 TEST test_cmp_font_invalid_args(void) {
   cmp_font_t *font = NULL;
   cmp_texture_t *tex;
+  int supports_color;
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_font_load(NULL, 16.0f, &font));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_font_load("somepath", 16.0f, NULL));
@@ -87,7 +88,6 @@ TEST test_cmp_font_invalid_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_font_destroy(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_font_add_fallback(NULL, NULL));
 
-  int supports_color;
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_font_supports_color(NULL, &supports_color));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_font_supports_color(font, NULL));

@@ -27,14 +27,14 @@ TEST test_caret_null_args(void) {
   res = cmp_caret_update_blink(NULL, 16.6, &v);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_caret_create(&caret);
+  ASSERT_EQ(CMP_SUCCESS, cmp_caret_create(&caret));
   res = cmp_caret_update_blink(caret, 16.6, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
   res = cmp_caret_update_blink(caret, -1.0, &v);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_caret_destroy(caret);
+  ASSERT_EQ(CMP_SUCCESS, cmp_caret_destroy(caret));
   PASS();
 }
 
@@ -43,7 +43,7 @@ TEST test_caret_blink(void) {
   int v;
   int res;
 
-  cmp_caret_create(&caret);
+  ASSERT_EQ(CMP_SUCCESS, cmp_caret_create(&caret));
 
   /* Initial state is visible */
   res = cmp_caret_update_blink(caret, 0.0, &v);
@@ -60,7 +60,7 @@ TEST test_caret_blink(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(1, v);
 
-  cmp_caret_destroy(caret);
+  ASSERT_EQ(CMP_SUCCESS, cmp_caret_destroy(caret));
   PASS();
 }
 

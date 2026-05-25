@@ -59,11 +59,12 @@ TEST test_null_args(void) {
   cmp_live_activity_ctx_t *la = NULL;
   cmp_ui_node_t *node = NULL;
 
-  cmp_ui_box_create(&node);
+  ASSERT_EQ(CMP_SUCCESS, cmp_ui_box_create(&node));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_widget_ctx_create(NULL, CMP_WIDGET_FAMILY_SYSTEM_SMALL));
-  cmp_widget_ctx_create(&w, CMP_WIDGET_FAMILY_SYSTEM_SMALL);
+  ASSERT_EQ(CMP_SUCCESS,
+            cmp_widget_ctx_create(&w, CMP_WIDGET_FAMILY_SYSTEM_SMALL));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_widget_mount_snapshot(NULL, node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_widget_mount_snapshot(w, NULL));
@@ -74,7 +75,7 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_widget_bind_intent(w, node, NULL));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_live_activity_ctx_create(NULL));
-  cmp_live_activity_ctx_create(&la);
+  ASSERT_EQ(CMP_SUCCESS, cmp_live_activity_ctx_create(&la));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_live_activity_mount_presentation(
@@ -85,9 +86,9 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_extension_verify_footprint(NULL));
 
-  cmp_ui_node_destroy(node);
-  cmp_widget_ctx_destroy(w);
-  cmp_live_activity_ctx_destroy(la);
+  ASSERT_EQ(CMP_SUCCESS, cmp_ui_node_destroy(node));
+  ASSERT_EQ(CMP_SUCCESS, cmp_widget_ctx_destroy(w));
+  ASSERT_EQ(CMP_SUCCESS, cmp_live_activity_ctx_destroy(la));
   PASS();
 }
 

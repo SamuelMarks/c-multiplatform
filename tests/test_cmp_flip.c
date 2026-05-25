@@ -28,7 +28,7 @@ TEST test_flip_null_args(void) {
   res = cmp_flip_first(NULL, &rect);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_flip_create(&flip);
+  ASSERT_EQ(CMP_SUCCESS, cmp_flip_create(&flip));
   res = cmp_flip_first(flip, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -38,7 +38,7 @@ TEST test_flip_null_args(void) {
   res = cmp_flip_last_and_invert(flip, NULL, &tx, &ty, &sx, &sy);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_flip_destroy(flip);
+  ASSERT_EQ(CMP_SUCCESS, cmp_flip_destroy(flip));
   PASS();
 }
 
@@ -48,13 +48,13 @@ TEST test_flip_uninitialized(void) {
   float tx, ty, sx, sy;
   int res;
 
-  cmp_flip_create(&flip);
+  ASSERT_EQ(CMP_SUCCESS, cmp_flip_create(&flip));
 
   /* Missing first */
   res = cmp_flip_last_and_invert(flip, &rect, &tx, &ty, &sx, &sy);
   ASSERT_EQ(CMP_ERROR_INVALID_STATE, res);
 
-  cmp_flip_destroy(flip);
+  ASSERT_EQ(CMP_SUCCESS, cmp_flip_destroy(flip));
   PASS();
 }
 
@@ -65,7 +65,7 @@ TEST test_flip_calculate(void) {
   float tx, ty, sx, sy;
   int res;
 
-  cmp_flip_create(&flip);
+  ASSERT_EQ(CMP_SUCCESS, cmp_flip_create(&flip));
 
   res = cmp_flip_first(flip, &first_rect);
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -81,7 +81,7 @@ TEST test_flip_calculate(void) {
   ASSERT_IN_RANGE(0.5f, sx, 0.001f); /* 100 / 200 */
   ASSERT_IN_RANGE(2.0f, sy, 0.001f); /* 100 / 50 */
 
-  cmp_flip_destroy(flip);
+  ASSERT_EQ(CMP_SUCCESS, cmp_flip_destroy(flip));
   PASS();
 }
 

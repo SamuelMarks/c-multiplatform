@@ -7,7 +7,7 @@ TEST test_custom_chrome_lifecycle(void) {
   int res;
 
   /* Cleanup first just in case */
-  cmp_custom_chrome_cleanup();
+  ASSERT_EQ(CMP_SUCCESS, cmp_custom_chrome_cleanup());
 
   res = cmp_custom_chrome_init();
   ASSERT_EQ(CMP_SUCCESS, res);

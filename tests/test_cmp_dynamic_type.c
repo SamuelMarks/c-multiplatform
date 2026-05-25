@@ -139,12 +139,12 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_a11y_hover_text_create(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_a11y_autoplay_avoidance_create(NULL));
 
-  cmp_dynamic_type_create(&dt);
-  cmp_a11y_bold_text_create(&bt);
-  cmp_a11y_button_shapes_create(&bs);
-  cmp_a11y_increase_contrast_create(&ic);
-  cmp_a11y_hover_text_create(&ht);
-  cmp_a11y_autoplay_avoidance_create(&ap);
+  ASSERT_EQ(CMP_SUCCESS, cmp_dynamic_type_create(&dt));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_bold_text_create(&bt));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_button_shapes_create(&bs));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_increase_contrast_create(&ic));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_hover_text_create(&ht));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_autoplay_avoidance_create(&ap));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_dynamic_type_apply_scale(NULL, 10, NULL));
@@ -171,12 +171,12 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_a11y_autoplay_avoidance_set(NULL, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_a11y_autoplay_should_play(NULL, NULL));
 
-  cmp_dynamic_type_destroy(dt);
-  cmp_a11y_bold_text_destroy(bt);
-  cmp_a11y_button_shapes_destroy(bs);
-  cmp_a11y_increase_contrast_destroy(ic);
-  cmp_a11y_hover_text_destroy(ht);
-  cmp_a11y_autoplay_avoidance_destroy(ap);
+  ASSERT_EQ(CMP_SUCCESS, cmp_dynamic_type_destroy(dt));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_bold_text_destroy(bt));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_button_shapes_destroy(bs));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_increase_contrast_destroy(ic));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_hover_text_destroy(ht));
+  ASSERT_EQ(CMP_SUCCESS, cmp_a11y_autoplay_avoidance_destroy(ap));
 
   PASS();
 }

@@ -135,7 +135,7 @@ TEST test_dnd_hig_null_args(void) {
   float f;
   size_t count;
 
-  cmp_dnd_create(&dnd);
+  ASSERT_EQ(CMP_SUCCESS, cmp_dnd_create(&dnd));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_dnd_evaluate_lift_animation(1.0f, NULL, &f));
@@ -151,7 +151,7 @@ TEST test_dnd_hig_null_args(void) {
             cmp_dnd_evaluate_drop_target_highlight(1, &f, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_dnd_evaluate_spring_loading(1.0f, NULL));
 
-  cmp_dnd_destroy(dnd);
+  ASSERT_EQ(CMP_SUCCESS, cmp_dnd_destroy(dnd));
   PASS();
 }
 

@@ -67,8 +67,8 @@ TEST test_gesture_overrides(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_gesture_cancel_on_system_override(
                              dummy1, 4)); /* Would cancel internally */
 
-  cmp_gesture_destroy(dummy1);
-  cmp_gesture_destroy(dummy2);
+  ASSERT_EQ(CMP_SUCCESS, cmp_gesture_destroy(dummy1));
+  ASSERT_EQ(CMP_SUCCESS, cmp_gesture_destroy(dummy2));
 
   PASS();
 }
@@ -81,10 +81,10 @@ TEST test_null_args(void) {
   float f;
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_edge_swipe_create(NULL, NULL));
-  cmp_router_create(&rt);
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_create(&rt));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_edge_swipe_create(&es, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_edge_swipe_create(NULL, rt));
-  cmp_edge_swipe_create(&es, rt);
+  ASSERT_EQ(CMP_SUCCESS, cmp_edge_swipe_create(&es, rt));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_edge_swipe_process(NULL, 1.0f, 1.0f, CMP_GESTURE_STATE_BEGAN));
@@ -122,8 +122,8 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_gesture_cancel_on_system_override(NULL, 3));
 
-  cmp_edge_swipe_destroy(es);
-  cmp_router_destroy(rt);
+  ASSERT_EQ(CMP_SUCCESS, cmp_edge_swipe_destroy(es));
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_destroy(rt));
   PASS();
 }
 

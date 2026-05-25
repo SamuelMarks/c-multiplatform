@@ -34,7 +34,7 @@ TEST test_state_restoration_lifecycle(void) {
   ASSERT_GT(size, 0);
 
   /* Reset router state as if app was killed */
-  cmp_router_destroy(router);
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_destroy(router));
   ASSERT_EQ(CMP_SUCCESS, cmp_router_create(&router));
   ASSERT_EQ(CMP_SUCCESS, cmp_router_register(router, "/app/item/123",
                                              dummy_route_handler, NULL, NULL));
@@ -85,8 +85,8 @@ TEST test_null_args(void) {
   size_t size = 0;
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_state_restoration_ctx_create(NULL));
-  cmp_state_restoration_ctx_create(&ctx);
-  cmp_router_create(&router);
+  ASSERT_EQ(CMP_SUCCESS, cmp_state_restoration_ctx_create(&ctx));
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_create(&router));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_deep_link_handle_universal_link(NULL, "/a", router));
@@ -118,8 +118,8 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_state_restoration_set_scene_id(ctx, NULL));
 
-  cmp_state_restoration_ctx_destroy(ctx);
-  cmp_router_destroy(router);
+  ASSERT_EQ(CMP_SUCCESS, cmp_state_restoration_ctx_destroy(ctx));
+  ASSERT_EQ(CMP_SUCCESS, cmp_router_destroy(router));
   PASS();
 }
 

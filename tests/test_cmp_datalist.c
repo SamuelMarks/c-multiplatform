@@ -26,23 +26,23 @@ TEST test_datalist_null_args(void) {
   res = cmp_datalist_filter(NULL, "test");
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_datalist_create(&datalist);
+  ASSERT_EQ(CMP_SUCCESS, cmp_datalist_create(&datalist));
   res = cmp_datalist_filter(datalist, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_datalist_destroy(datalist);
+  ASSERT_EQ(CMP_SUCCESS, cmp_datalist_destroy(datalist));
   PASS();
 }
 
 TEST test_datalist_filter(void) {
   cmp_datalist_t *datalist = NULL;
   int res;
-  cmp_datalist_create(&datalist);
+  ASSERT_EQ(CMP_SUCCESS, cmp_datalist_create(&datalist));
 
   res = cmp_datalist_filter(datalist, "apple");
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  cmp_datalist_destroy(datalist);
+  ASSERT_EQ(CMP_SUCCESS, cmp_datalist_destroy(datalist));
   PASS();
 }
 

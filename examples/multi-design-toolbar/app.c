@@ -200,7 +200,7 @@ static int create_simple_button(cmp_ui_node_t **out_btn, const char *text,
 
   /* Force the button to render natively in all design languages.
      Fluent 2 specifically requires the "type" parameter to be exactly 3.
-     Rely completely on the inherited design language override for 
+     Rely completely on the inherited design language override for
      colors, contrast, and borders. */
   btn_node->layout->margin[3] = 0.0f;
 

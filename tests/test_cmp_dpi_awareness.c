@@ -7,7 +7,7 @@ TEST test_dpi_awareness_lifecycle(void) {
   int res;
 
   /* Cleanup first just in case */
-  cmp_dpi_awareness_cleanup();
+  ASSERT_EQ(CMP_SUCCESS, cmp_dpi_awareness_cleanup());
 
   /* Initialize */
   res = cmp_dpi_awareness_init();

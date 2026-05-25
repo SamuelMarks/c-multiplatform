@@ -27,14 +27,14 @@ TEST test_discrete_transition_null_args(void) {
   res = cmp_discrete_transition_evaluate(NULL, 0.5f, &v);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_discrete_transition_create(&transition);
+  ASSERT_EQ(CMP_SUCCESS, cmp_discrete_transition_create(&transition));
   res = cmp_discrete_transition_evaluate(transition, 0.5f, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
   res = cmp_discrete_transition_evaluate(transition, -0.1f, &v);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  cmp_discrete_transition_destroy(transition);
+  ASSERT_EQ(CMP_SUCCESS, cmp_discrete_transition_destroy(transition));
   PASS();
 }
 
@@ -43,7 +43,7 @@ TEST test_discrete_transition_evaluate(void) {
   int v;
   int res;
 
-  cmp_discrete_transition_create(&transition);
+  ASSERT_EQ(CMP_SUCCESS, cmp_discrete_transition_create(&transition));
 
   /* 0% progress */
   res = cmp_discrete_transition_evaluate(transition, 0.0f, &v);
@@ -65,7 +65,7 @@ TEST test_discrete_transition_evaluate(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(1, v);
 
-  cmp_discrete_transition_destroy(transition);
+  ASSERT_EQ(CMP_SUCCESS, cmp_discrete_transition_destroy(transition));
   PASS();
 }
 

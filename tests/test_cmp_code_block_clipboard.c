@@ -40,11 +40,11 @@ TEST test_code_block_clipboard_null_args(void) {
   config.title = "Test";
   config.width = 100;
   config.height = 100;
-  cmp_window_system_init();
+  ASSERT_EQ(CMP_SUCCESS, cmp_window_system_init());
   res = cmp_window_create(&config, &window);
   if (res != CMP_SUCCESS) {
-    cmp_code_block_destroy(block);
-    cmp_clipboard_overlay_destroy(overlay);
+    ASSERT_EQ(CMP_SUCCESS, cmp_code_block_destroy(block));
+    ASSERT_EQ(CMP_SUCCESS, cmp_clipboard_overlay_destroy(overlay));
     PASS();
   }
 
@@ -91,11 +91,11 @@ TEST test_code_block_clipboard_operations(void) {
   config.title = "Test";
   config.width = 100;
   config.height = 100;
-  cmp_window_system_init();
+  ASSERT_EQ(CMP_SUCCESS, cmp_window_system_init());
   res = cmp_window_create(&config, &window);
   if (res != CMP_SUCCESS) {
-    cmp_code_block_destroy(block);
-    cmp_clipboard_overlay_destroy(overlay);
+    ASSERT_EQ(CMP_SUCCESS, cmp_code_block_destroy(block));
+    ASSERT_EQ(CMP_SUCCESS, cmp_clipboard_overlay_destroy(overlay));
     PASS();
   }
 

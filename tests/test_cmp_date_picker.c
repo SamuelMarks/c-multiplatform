@@ -5,12 +5,10 @@
 
 TEST test_date_picker_lifecycle(void) {
   cmp_date_picker_t *picker = NULL;
-  int res = cmp_date_picker_create(&picker);
-  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(CMP_SUCCESS, cmp_date_picker_create(&picker));
   ASSERT_NEQ(NULL, picker);
 
-  res = cmp_date_picker_destroy(picker);
-  ASSERT_EQ(CMP_SUCCESS, res);
+  ASSERT_EQ(CMP_SUCCESS, cmp_date_picker_destroy(picker));
   PASS();
 }
 

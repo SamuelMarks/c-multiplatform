@@ -95,6 +95,9 @@ SUITE(code_block_suite) {
   RUN_TEST(test_code_block_set_code);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
@@ -102,3 +105,6 @@ int main(int argc, char **argv) {
   RUN_SUITE(code_block_suite);
   GREATEST_MAIN_END();
 }
+#ifdef __cplusplus
+}
+#endif

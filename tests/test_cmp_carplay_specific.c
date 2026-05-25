@@ -25,7 +25,7 @@ TEST test_carplay_null_args(void) {
   int node = 0;
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_carplay_features_create(NULL));
-  cmp_carplay_features_create(&feat);
+  ASSERT_EQ(CMP_SUCCESS, cmp_carplay_features_create(&feat));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_carplay_apply_driving_focus(NULL, &node));
@@ -45,7 +45,7 @@ TEST test_carplay_null_args(void) {
             cmp_carplay_handle_knob_navigation(NULL, 1.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_carplay_set_network_status(NULL, 1));
 
-  cmp_carplay_features_destroy(feat);
+  ASSERT_EQ(CMP_SUCCESS, cmp_carplay_features_destroy(feat));
   PASS();
 }
 

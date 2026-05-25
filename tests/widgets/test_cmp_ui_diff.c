@@ -72,6 +72,9 @@ SUITE(diff_suite) {
   RUN_TEST(test_diff_get_node);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
@@ -79,3 +82,6 @@ int main(int argc, char **argv) {
   RUN_SUITE(diff_suite);
   GREATEST_MAIN_END();
 }
+#ifdef __cplusplus
+}
+#endif

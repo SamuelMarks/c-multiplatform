@@ -85,8 +85,8 @@ fix_*.py
 
 # Gemini CLI and specific ignored directories
 .gemini/
-test_cdd/
-test_cfs/
-test_corm/
-test_http/
+# test_cdd/
+# test_cfs/
+# test_corm/
+# test_http/
 ...

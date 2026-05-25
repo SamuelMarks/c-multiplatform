@@ -60,10 +60,10 @@ TEST test_null_args(void) {
   cmp_ui_node_t dummy;
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_collection_create(NULL));
-  cmp_collection_create(&c);
+  ASSERT_EQ(CMP_SUCCESS, cmp_collection_create(&c));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_collection_section_create(NULL));
-  cmp_collection_section_create(&s);
+  ASSERT_EQ(CMP_SUCCESS, cmp_collection_section_create(&s));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_collection_section_set_flow_layout(NULL, 100.0f));
@@ -77,7 +77,7 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_collection_add_section(c, NULL));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_diffable_datasource_create(NULL));
-  cmp_diffable_datasource_create(&ds);
+  ASSERT_EQ(CMP_SUCCESS, cmp_diffable_datasource_create(&ds));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_diffable_datasource_apply_snapshot(NULL, NULL, 0));
@@ -88,9 +88,9 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_system_web_view_mount(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_system_web_view_mount(&dummy, NULL));
 
-  cmp_collection_add_section(c, s);
-  cmp_collection_destroy(c);
-  cmp_diffable_datasource_destroy(ds);
+  ASSERT_EQ(CMP_SUCCESS, cmp_collection_add_section(c, s));
+  ASSERT_EQ(CMP_SUCCESS, cmp_collection_destroy(c));
+  ASSERT_EQ(CMP_SUCCESS, cmp_diffable_datasource_destroy(ds));
   PASS();
 }
 

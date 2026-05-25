@@ -8,6 +8,8 @@ TEST test_swapchain_create_destroy(void) {
   cmp_swapchain_t *swapchain = NULL;
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 1};
   cmp_window_t *win = NULL;
+  void *os_handle = NULL;
+  int rc = 0;
 
   cmp_window_system_init();
 
@@ -25,8 +27,7 @@ TEST test_swapchain_create_destroy(void) {
               cmp_swapchain_create(win, CMP_SWAPCHAIN_FIFO, &swapchain));
   }
   if (win) {
-    void *os_handle = NULL;
-    int rc = cmp_swapchain_get_os_surface_handle(swapchain, &os_handle);
+    rc = cmp_swapchain_get_os_surface_handle(swapchain, &os_handle);
     ASSERT_EQ(0, rc);
     (void)os_handle;
     ASSERT_NEQ(NULL, swapchain);

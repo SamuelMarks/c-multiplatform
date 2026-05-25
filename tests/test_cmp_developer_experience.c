@@ -26,7 +26,7 @@ TEST test_dx_null_args(void) {
   char buf[256];
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_developer_experience_create(NULL));
-  cmp_developer_experience_create(&feat);
+  ASSERT_EQ(CMP_SUCCESS, cmp_developer_experience_create(&feat));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_dx_build_declarative_node(NULL, "a", &node));
@@ -50,7 +50,7 @@ TEST test_dx_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_dx_export_debug_hierarchy(feat, node, buf, 0));
 
-  cmp_developer_experience_destroy(feat);
+  ASSERT_EQ(CMP_SUCCESS, cmp_developer_experience_destroy(feat));
   PASS();
 }
 
