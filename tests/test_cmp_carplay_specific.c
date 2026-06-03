@@ -37,7 +37,6 @@ TEST test_carplay_null_args(void) {
             cmp_carplay_export_template_data(feat, NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_carplay_export_template_data(feat, "List", NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_carplay_handle_siri_intent(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_carplay_handle_siri_intent(feat, NULL));
 

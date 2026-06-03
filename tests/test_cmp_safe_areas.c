@@ -52,7 +52,6 @@ TEST test_cmp_safe_areas_get_set(void) {
             cmp_safe_areas_get_inset(safe_areas, 4, &inset));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_safe_areas_get_inset(safe_areas, -1, &inset));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_safe_areas_destroy(safe_areas));
 
   PASS();

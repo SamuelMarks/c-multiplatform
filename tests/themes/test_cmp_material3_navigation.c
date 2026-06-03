@@ -36,7 +36,6 @@ TEST test_m3_drawer_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_drawer_resolve(CMP_M3_DRAWER_MODAL, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_drawer_resolve(CMP_M3_DRAWER_MODAL, &m));
   ASSERT_EQ(360.0f, m.max_width);
   ASSERT_EQ(16.0f, m.active_item_padding);
@@ -50,7 +49,6 @@ TEST test_m3_drawer_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_drawer_resolve((cmp_m3_drawer_variant_t)999, &m));
-
   PASS();
 }
 
@@ -72,7 +70,6 @@ TEST test_m3_top_app_bar_resolve(void) {
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
       cmp_m3_top_app_bar_resolve(CMP_M3_TOP_APP_BAR_CENTER_ALIGNED, NULL));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_top_app_bar_resolve(CMP_M3_TOP_APP_BAR_CENTER_ALIGNED, &m));
   ASSERT_EQ(CMP_M3_ELEVATION_LEVEL_2, m.elevation_scrolled);
@@ -96,7 +93,6 @@ TEST test_m3_top_app_bar_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_top_app_bar_resolve((cmp_m3_top_app_bar_variant_t)999, &m));
-
   PASS();
 }
 
@@ -105,7 +101,6 @@ TEST test_m3_tabs_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_tabs_resolve(CMP_M3_TABS_PRIMARY, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_tabs_resolve(CMP_M3_TABS_PRIMARY, &m));
   ASSERT_EQ(48.0f, m.height);
   ASSERT_EQ(CMP_M3_SHAPE_FULL, m.active_indicator_shape);
@@ -118,7 +113,6 @@ TEST test_m3_tabs_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_tabs_resolve((cmp_m3_tabs_variant_t)999, &m));
-
   PASS();
 }
 

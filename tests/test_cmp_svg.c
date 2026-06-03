@@ -321,7 +321,6 @@ TEST test_cmp_svg_path_tessellate_ear_clipping(void) {
             cmp_svg_path_tessellate_ear_clipping(data, 8, NULL, &count));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_svg_path_tessellate_ear_clipping(data, 8, &out, NULL));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_svg_path_tessellate_ear_clipping(data, 8, &out, &count));
   ASSERT_EQ(4, count);

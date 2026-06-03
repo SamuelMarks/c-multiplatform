@@ -57,7 +57,7 @@ int cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip, const char *text,
   }
 
   if (translated.data) {
-    cmp_string_destroy(&translated);
+    (void)cmp_string_destroy(&translated);
   }
 
   err = cmp_ui_box_create(&tooltip->node_root);
@@ -87,7 +87,7 @@ int cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip, const char *text,
   err = cmp_ui_text_create(&tooltip->node_text,
                            tooltip->text ? tooltip->text : "", -1);
   if (err != 0) {
-    cmp_ui_node_destroy(tooltip->node_root);
+    (void)cmp_ui_node_destroy(tooltip->node_root);
     if (tooltip->text) {
       rc = CMP_FREE(tooltip->text);
       if (rc != CMP_SUCCESS) {
@@ -192,7 +192,7 @@ int cmp_ui_tooltip_set_text(cmp_ui_tooltip_t *tooltip, const char *text) {
   }
 
   if (translated.data) {
-    cmp_string_destroy(&translated);
+    (void)cmp_string_destroy(&translated);
   }
 
   return rc;

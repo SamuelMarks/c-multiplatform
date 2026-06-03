@@ -31,7 +31,6 @@ TEST test_resource_manager_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_resource_manager_create(NULL));
   cmp_resource_manager_create(&feat);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_resources_set_thermal_state(NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_resources_set_thermal_state(feat, -1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_resources_set_thermal_state(feat, 4));
@@ -42,7 +41,6 @@ TEST test_resource_manager_null_args(void) {
             cmp_resources_mark_node_opaque(NULL, node, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resources_mark_node_opaque(feat, NULL, 1));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_resources_set_low_data_mode(NULL, 1));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -53,7 +51,6 @@ TEST test_resource_manager_null_args(void) {
             cmp_resources_cache_remote_image(feat, "a", 0.0f, 1.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resources_cache_remote_image(feat, "a", 1.0f, -1.0f));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resources_allocate_offscreen_bitmap(NULL, 1.0f, 1.0f, &bitmap));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -62,7 +59,6 @@ TEST test_resource_manager_null_args(void) {
                                        feat, 1.0f, -1.0f, &bitmap));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resources_allocate_offscreen_bitmap(feat, 1.0f, 1.0f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_resource_manager_destroy(NULL));
 
   cmp_resource_manager_destroy(feat);

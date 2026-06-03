@@ -53,7 +53,6 @@ TEST test_modality_null_args(void) {
   cmp_msg_bus_t *bus = (cmp_msg_bus_t *)0x1234;
 
   cmp_modality_sync_single_init(&mod);
-
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_sync_single_init(NULL),
                 "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_modality_sync_multi_init(NULL, 1),
@@ -77,9 +76,7 @@ TEST test_modality_null_args(void) {
                 cmp_modality_queue_task(NULL, test_task_increment, NULL), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
                 cmp_modality_queue_task(&mod, NULL, NULL), "%d");
-
   cmp_modality_destroy(&mod);
-
   /* Stubs */
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_app_init(NULL), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_app_init((cmp_app_config_t *)1), "%d");
@@ -109,7 +106,6 @@ TEST test_modality_null_args(void) {
                 cmp_actor_spawn(bus, "name", (void *)1, NULL, NULL), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS,
                 cmp_actor_spawn(bus, "name", (void *)1, NULL, &actor), "%d");
-
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_actor_supervise(NULL), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_actor_supervise((cmp_actor_t *)1), "%d");
 

@@ -64,7 +64,7 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
 
   err = cmp_ui_box_create(&drawer->node_drawer);
   if (err != CMP_SUCCESS) {
-    cmp_ui_node_destroy(drawer->node_root);
+    (void)cmp_ui_node_destroy(drawer->node_root);
     if (CMP_FREE(drawer->items) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE items failed\n");
     }
@@ -76,8 +76,8 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
 
   err = cmp_ui_box_create(&drawer->node_items);
   if (err != CMP_SUCCESS) {
-    cmp_ui_node_destroy(drawer->node_drawer);
-    cmp_ui_node_destroy(drawer->node_root);
+    (void)cmp_ui_node_destroy(drawer->node_drawer);
+    (void)cmp_ui_node_destroy(drawer->node_root);
     if (CMP_FREE(drawer->items) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE items failed\n");
     }
@@ -98,9 +98,8 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
 
   drawer->node_items->layout->direction = CMP_FLEX_COLUMN;
 
-  cmp_ui_node_add_child(drawer->node_drawer, drawer->node_items);
-  cmp_ui_node_add_child(drawer->node_root, drawer->node_drawer);
-
+  (void)cmp_ui_node_add_child(drawer->node_drawer, drawer->node_items);
+  (void)cmp_ui_node_add_child(drawer->node_root, drawer->node_drawer);
   drawer->selected_index = -1;
   drawer->is_open = 0;
 
@@ -214,8 +213,7 @@ int cmp_ui_modal_drawer_add_item(cmp_ui_modal_drawer_t *drawer,
   item_node->type = 3; /* Button / List Item */
   (void)icon_name;
 
-  cmp_ui_node_add_child(drawer->node_items, item_node);
-
+  (void)cmp_ui_node_add_child(drawer->node_items, item_node);
   drawer->items[drawer->item_count].node = item_node;
   drawer->items[drawer->item_count].is_selected = 0;
 

@@ -38,7 +38,6 @@ TEST test_editable_insert(void) {
   cmp_editable_t *editable = NULL;
   int res;
   cmp_editable_create(&editable);
-
   res = cmp_editable_insert_text(editable, "hello ");
   ASSERT_EQ(CMP_SUCCESS, res);
 

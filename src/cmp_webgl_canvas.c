@@ -76,7 +76,8 @@ int cmp_webgl_canvas_bind(cmp_webgl_canvas_t *canvas,
   }
 #if defined(__EMSCRIPTEN__)
   /* Call the c-multiplatform wasm binding hook */
-  if (cmp_window_wasm_init(dom_selector) != CMP_SUCCESS) {
+  int rc = cmp_window_wasm_init(dom_selector);
+  if (rc != CMP_SUCCESS) {
     return CMP_ERROR_GENERAL;
   }
 #endif

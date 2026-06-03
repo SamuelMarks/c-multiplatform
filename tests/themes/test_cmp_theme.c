@@ -141,16 +141,16 @@ TEST test_global_enum_switch(void) {
   cmp_theme_t *theme_material = NULL;
   cmp_theme_t *theme_fluent = NULL;
   cmp_window_config_t config;
+  int rc;
 
   memset(&config, 0, sizeof(cmp_window_config_t));
   config.width = 100;
   config.height = 100;
   config.title = "Test";
-
   cmp_window_system_init();
-
   /* Mock window and themes */
-  if (cmp_window_create(&config, &window) != CMP_SUCCESS) {
+  rc = cmp_window_create(&config, &window);
+  if (rc != CMP_SUCCESS) {
     window = NULL;
   }
   ASSERT_EQ(CMP_SUCCESS, cmp_theme_create(&theme_material));
@@ -171,9 +171,7 @@ TEST test_global_enum_switch(void) {
   cmp_theme_destroy(theme_material);
   cmp_theme_destroy(theme_fluent);
   cmp_window_destroy(window);
-
   cmp_window_system_shutdown();
-
   PASS();
 }
 #endif /* CMP_THEME_MODE_SINGLE_STATIC */

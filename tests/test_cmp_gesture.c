@@ -81,7 +81,6 @@ TEST test_gesture_edge_cases(void) {
             cmp_gesture_set_callback(NULL, gesture_callback, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_gesture_set_callback(gesture, NULL, NULL));
-
   ASSERT_EQ(CMP_GESTURE_STATE_POSSIBLE, cmp_gesture_get_state(NULL));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_gesture_process_event(NULL, &event));

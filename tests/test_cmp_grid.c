@@ -39,7 +39,6 @@ TEST test_grid_add_item(void) {
 
   cmp_layout_node_create(&node);
   cmp_grid_ctx_create(&ctx);
-
   ASSERT_EQ(CMP_SUCCESS, cmp_grid_ctx_add_item(ctx, node, &item));
   ASSERT_EQ(1, ctx->item_count);
   ASSERT_NEQ(NULL, item);
@@ -89,6 +88,8 @@ TEST test_grid_area_resolve(void) {
 
   cmp_grid_ctx_create(&ctx);
   areas = (cmp_grid_area_t *)malloc(sizeof(cmp_grid_area_t));
+  if (!areas)
+    FAIL();
   areas[0].name = "header";
   areas[0].row_start = 1;
   areas[0].col_start = 1;
@@ -108,7 +109,6 @@ TEST test_grid_area_resolve(void) {
   ASSERT_EQ(
       CMP_ERROR_NOT_FOUND,
       cmp_grid_area_resolve(ctx, "footer", &r_start, &c_start, &r_end, &c_end));
-
   ctx->template_areas = NULL;
   ctx->template_areas_count = 0;
   free(areas);
@@ -149,7 +149,6 @@ TEST test_grid_implicit_tracks(void) {
   cmp_layout_node_create(&node);
   cmp_grid_ctx_create(&ctx);
   cmp_grid_ctx_add_item(ctx, node, &item);
-
   item->resolved_row_start = 4;
   item->resolved_row_end = 5;
   item->resolved_col_start = 4;
@@ -173,7 +172,6 @@ TEST test_grid_subgrid_sync(void) {
 
   cmp_grid_ctx_create(&parent);
   cmp_grid_ctx_create(&child);
-
   parent->computed_col_count = 4;
   ASSERT_EQ(CMP_SUCCESS, cmp_subgrid_sync(parent, child));
   ASSERT_EQ(4, child->computed_col_count);
@@ -214,19 +212,15 @@ TEST test_grid_masonry(void) {
   cmp_layout_node_create(&node1);
   node1->computed_rect.height = 200.0f;
   cmp_grid_ctx_add_item(ctx, node1, &item1);
-
   cmp_layout_node_create(&node2);
   node2->computed_rect.height = 100.0f;
   cmp_grid_ctx_add_item(ctx, node2, &item2);
-
   cmp_layout_node_create(&node3);
   node3->computed_rect.height = 150.0f;
   cmp_grid_ctx_add_item(ctx, node3, &item3);
-
   cmp_layout_node_create(&node4);
   node4->computed_rect.height = 80.0f;
   cmp_grid_ctx_add_item(ctx, node4, &item4);
-
   ASSERT_EQ(CMP_SUCCESS, cmp_masonry_layout(ctx));
 
   /* Assert Column Allocations */

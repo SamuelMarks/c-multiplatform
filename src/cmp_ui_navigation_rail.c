@@ -161,13 +161,13 @@ int cmp_ui_navigation_rail_add_destination(cmp_ui_navigation_rail_t *rail,
   (void)icon_name;
   if (label) {
     cmp_ui_node_t *lbl_node;
-    if (cmp_ui_text_create(&lbl_node, label, -1) == CMP_SUCCESS) {
-      cmp_ui_node_add_child(dest_node, lbl_node);
+    rc = cmp_ui_text_create(&lbl_node, label, -1);
+    if (rc == CMP_SUCCESS) {
+      (void)cmp_ui_node_add_child(dest_node, lbl_node);
     }
   }
 
-  cmp_ui_node_add_child(rail->node_root, dest_node);
-
+  (void)cmp_ui_node_add_child(rail->node_root, dest_node);
   rail->destinations[rail->dest_count].node = dest_node;
   rail->destinations[rail->dest_count].is_selected = 0;
 

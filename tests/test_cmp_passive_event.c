@@ -52,11 +52,9 @@ TEST test_passive_event_edge_cases(void) {
                                        NULL, 1, mock_passive_callback, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ui_node_add_passive_listener(&node, 1, NULL, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_event_prevent_default(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_event_is_default_prevented(NULL, &out_val));
-
   PASS();
 }
 

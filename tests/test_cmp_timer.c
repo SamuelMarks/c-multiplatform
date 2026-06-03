@@ -89,7 +89,6 @@ TEST test_timer_null_args(void) {
 
   /* Must init first before using */
   cmp_timer_system_init();
-
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
                 cmp_timer_start(NULL, 10, 0, test_timer_func, NULL), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,

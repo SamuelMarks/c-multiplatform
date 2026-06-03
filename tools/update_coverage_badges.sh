@@ -1,4 +1,15 @@
 #!/bin/sh
+# -----------------------------------------------------------------------------
+# update_coverage_badges.sh
+#
+# Generates simulated SVG badges for Test Coverage and Documentation Coverage.
+# It places the generated SVG files in the `docs/badges` directory and
+# automatically updates the main `README.md` file to reference them if they
+# are not already present.
+# 
+# Usage:
+#   ./tools/update_coverage_badges.sh
+# -----------------------------------------------------------------------------
 set -eu
 
 root_dir=$(git rev-parse --show-toplevel)

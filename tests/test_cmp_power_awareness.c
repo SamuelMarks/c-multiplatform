@@ -8,7 +8,6 @@ TEST test_power_awareness_lifecycle(void) {
 
   /* Just in case, clean it up before we test */
   cmp_power_awareness_cleanup();
-
   res = cmp_power_awareness_init();
   ASSERT_EQ(CMP_SUCCESS, res);
 

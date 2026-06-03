@@ -31,7 +31,6 @@ TEST test_cmp_titlebar_env_get_set(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_titlebar_env_set_area(env, 10.0f, 20.0f, 100.0f, 50.0f));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_titlebar_env_get_area(env, &x, &y, &width, &height));
   ASSERT_EQ_FMT(10.0f, x, "%f");
@@ -52,7 +51,6 @@ TEST test_cmp_titlebar_env_get_set(void) {
             cmp_titlebar_env_get_area(env, &x, &y, NULL, &height));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_titlebar_env_get_area(env, &x, &y, &width, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_titlebar_env_destroy(env));
   PASS();
 }

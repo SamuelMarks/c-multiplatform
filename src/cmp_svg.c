@@ -411,9 +411,12 @@ int cmp_svg_renderer_arc_to(cmp_svg_renderer_t *renderer, float rx, float ry,
 
   rx = (float)fabs((double)rx);
   ry = (float)fabs((double)ry);
-  if (rx == 0.0f || ry == 0.0f)
-    return cmp_svg_renderer_line_to(renderer, x, y);
-
+  if (rx == 0.0f || ry == 0.0f) {
+    rc = cmp_svg_renderer_line_to(renderer, x, y);
+    if (rc != CMP_SUCCESS)
+      return rc;
+    return rc;
+  }
   arc_to_center_param(renderer->current_x, renderer->current_y, rx, ry,
                       x_axis_rotation, large_arc_flag, sweep_flag, x, y, &cx,
                       &cy, &theta1, &dtheta);
@@ -450,6 +453,8 @@ int cmp_svg_renderer_close(cmp_svg_renderer_t *renderer) {
     return CMP_ERROR_INVALID_ARG;
 
   rc = cmp_svg_renderer_line_to(renderer, renderer->start_x, renderer->start_y);
+  if (rc != CMP_SUCCESS)
+    return rc;
   return rc;
 }
 
@@ -480,41 +485,40 @@ int cmp_svg_path_tessellate(cmp_svg_path_type_t path_type, const float *data,
     size_t i;
     for (i = 0; i < data_len; i += 2) {
       if (i == 0) {
-        cmp_svg_renderer_move_to(r, data[i], data[i + 1]);
+        (void)cmp_svg_renderer_move_to(r, data[i], data[i + 1]);
       } else {
-        cmp_svg_renderer_line_to(r, data[i], data[i + 1]);
+        (void)cmp_svg_renderer_line_to(r, data[i], data[i + 1]);
       }
     }
   } else if (path_type == CMP_SVG_PATH_BEZIER) {
     if (data_len >= 8) {
-      cmp_svg_renderer_move_to(r, data[0], data[1]);
+      (void)cmp_svg_renderer_move_to(r, data[0], data[1]);
       cmp_svg_renderer_cubic_to(r, data[2], data[3], data[4], data[5], data[6],
                                 data[7]);
     }
   } else if (path_type == CMP_SVG_PATH_ARC) {
     if (data_len >= 9) {
-      cmp_svg_renderer_move_to(r, data[0], data[1]);
+      (void)cmp_svg_renderer_move_to(r, data[0], data[1]);
       cmp_svg_renderer_arc_to(r, data[2], data[3], data[4], (int)data[5],
                               (int)data[6], data[7], data[8]);
     }
   }
 
   if (r->vertex_count == 0) {
-    cmp_svg_renderer_destroy(r);
+    (void)cmp_svg_renderer_destroy(r);
     return CMP_ERROR_INVALID_ARG;
   }
 
   if (CMP_MALLOC(r->vertex_count * sizeof(float), (void **)out_vertices) !=
       CMP_SUCCESS) {
-    cmp_svg_renderer_destroy(r);
+    (void)cmp_svg_renderer_destroy(r);
     return CMP_ERROR_OOM;
   }
 
   memcpy(*out_vertices, r->vertices, r->vertex_count * sizeof(float));
   *out_vertex_count = r->vertex_count / 2;
 
-  cmp_svg_renderer_destroy(r);
-
+  (void)cmp_svg_renderer_destroy(r);
   return rc;
 }
 
@@ -623,7 +627,7 @@ int cmp_svg_stroke_evaluate(const cmp_svg_stroke_t *stroke,
   if ((err = cmp_svg_renderer_create(&left, 0.5f)) != CMP_SUCCESS)
     return err;
   if ((err = cmp_svg_renderer_create(&right, 0.5f)) != CMP_SUCCESS) {
-    cmp_svg_renderer_destroy(left);
+    (void)cmp_svg_renderer_destroy(left);
     return err;
   }
 
@@ -662,19 +666,19 @@ int cmp_svg_stroke_evaluate(const cmp_svg_stroke_t *stroke,
     }
 
     if (i == 0) {
-      cmp_svg_renderer_move_to(left, x + nx * hw, y + ny * hw);
-      cmp_svg_renderer_move_to(right, x - nx * hw, y - ny * hw);
+      (void)cmp_svg_renderer_move_to(left, x + nx * hw, y + ny * hw);
+      (void)cmp_svg_renderer_move_to(right, x - nx * hw, y - ny * hw);
     } else {
-      cmp_svg_renderer_line_to(left, x + nx * hw, y + ny * hw);
-      cmp_svg_renderer_line_to(right, x - nx * hw, y - ny * hw);
+      (void)cmp_svg_renderer_line_to(left, x + nx * hw, y + ny * hw);
+      (void)cmp_svg_renderer_line_to(right, x - nx * hw, y - ny * hw);
     }
   }
 
   *out_stroke_count = (left->vertex_count + right->vertex_count) / 2;
   if (CMP_MALLOC(*out_stroke_count * 2 * sizeof(float),
                  (void **)out_stroke_vertices) != CMP_SUCCESS) {
-    cmp_svg_renderer_destroy(left);
-    cmp_svg_renderer_destroy(right);
+    (void)cmp_svg_renderer_destroy(left);
+    (void)cmp_svg_renderer_destroy(right);
     return CMP_ERROR_OOM;
   }
 
@@ -687,9 +691,8 @@ int cmp_svg_stroke_evaluate(const cmp_svg_stroke_t *stroke,
         right->vertices[rev_i + 1];
   }
 
-  cmp_svg_renderer_destroy(left);
-  cmp_svg_renderer_destroy(right);
-
+  (void)cmp_svg_renderer_destroy(left);
+  (void)cmp_svg_renderer_destroy(right);
   if (stroke->dash.count > 0 && stroke->dash.array) {
     /* Dashed Strokes implementation placeholder */
   }
@@ -762,7 +765,7 @@ int cmp_svg_use_instantiate(cmp_svg_node_t *source_node,
     cmp_svg_node_t *child_clone = NULL;
     res = cmp_svg_use_instantiate(source_node->children[i], &child_clone);
     if (res == CMP_SUCCESS && child_clone != NULL) {
-      cmp_svg_node_add_child(clone, child_clone);
+      (void)cmp_svg_node_add_child(clone, child_clone);
     }
   }
 
@@ -811,7 +814,7 @@ int cmp_svg_smil_tick(cmp_svg_node_t *node, float dt_ms) {
   }
 
   for (i = 0; i < node->child_count; i++) {
-    cmp_svg_smil_tick(node->children[i], dt_ms);
+    (void)cmp_svg_smil_tick(node->children[i], dt_ms);
   }
 
   return rc;
@@ -920,7 +923,7 @@ int cmp_svg_node_destroy(cmp_svg_node_t *node) {
   if (node->children) {
     size_t i;
     for (i = 0; i < node->child_count; i++) {
-      cmp_svg_node_destroy(node->children[i]);
+      (void)cmp_svg_node_destroy(node->children[i]);
     }
     CMP_FREE(node->children);
   }
@@ -1061,7 +1064,7 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
       }
       x = x1;
       y = y1;
-      cmp_svg_renderer_move_to(renderer, x, y);
+      (void)cmp_svg_renderer_move_to(renderer, x, y);
       cmd = (cmd == 'M') ? 'L' : 'l';
       break;
     case 'L':
@@ -1076,7 +1079,7 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
       }
       x = x1;
       y = y1;
-      cmp_svg_renderer_line_to(renderer, x, y);
+      (void)cmp_svg_renderer_line_to(renderer, x, y);
       break;
     case 'H':
     case 'h':
@@ -1085,7 +1088,7 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
         x1 += x;
       }
       x = x1;
-      cmp_svg_renderer_line_to(renderer, x, y);
+      (void)cmp_svg_renderer_line_to(renderer, x, y);
       break;
     case 'V':
     case 'v':
@@ -1094,7 +1097,7 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
         y1 += y;
       }
       y = y1;
-      cmp_svg_renderer_line_to(renderer, x, y);
+      (void)cmp_svg_renderer_line_to(renderer, x, y);
       break;
     case 'C':
     case 'c':
@@ -1124,7 +1127,7 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
           x3 += x;
           y3 += y;
         }
-        cmp_svg_renderer_cubic_to(renderer, x1, y1, x2, y2, x3, y3);
+        (void)cmp_svg_renderer_cubic_to(renderer, x1, y1, x2, y2, x3, y3);
         x = x3;
         y = y3;
       }
@@ -1147,11 +1150,11 @@ int cmp_svg_parse_path_str(const char *path_str, cmp_svg_renderer_t *renderer) {
       }
       x = x2;
       y = y2;
-      cmp_svg_renderer_line_to(renderer, x, y);
+      (void)cmp_svg_renderer_line_to(renderer, x, y);
       break;
     case 'Z':
     case 'z':
-      cmp_svg_renderer_close(renderer);
+      (void)cmp_svg_renderer_close(renderer);
       x = renderer->start_x;
       y = renderer->start_y;
       break;

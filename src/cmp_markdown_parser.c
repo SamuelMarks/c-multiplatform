@@ -267,7 +267,7 @@ int cmp_markdown_parser_parse(cmp_markdown_parser_t *parser,
   }
 
   if (rc != CMP_SUCCESS) {
-    cmp_md_node_destroy(root);
+    (void)cmp_md_node_destroy(root);
     LOG_DEBUG("Error in cmp_markdown_parser_parse: Failed to parse\n");
 
     return rc;

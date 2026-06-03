@@ -126,7 +126,7 @@ static int build_ui(void) {
   int res;
 
   if (g_ui_tree != NULL) {
-    cmp_ui_node_destroy(g_ui_tree);
+    (void)cmp_ui_node_destroy(g_ui_tree);
     g_ui_tree = NULL;
   }
 
@@ -145,9 +145,10 @@ static int build_ui(void) {
 
   {
     cmp_ui_node_t *spacer_top;
-    if (cmp_ui_box_create(&spacer_top) == CMP_SUCCESS) {
+    rc = cmp_ui_box_create(&spacer_top);
+    if (rc == CMP_SUCCESS) {
       spacer_top->layout->flex_grow = 1.0f;
-      cmp_ui_node_add_child(g_ui_tree, spacer_top);
+      (void)cmp_ui_node_add_child(g_ui_tree, spacer_top);
     }
   }
 
@@ -159,8 +160,7 @@ static int build_ui(void) {
   btn->layout->id = 100;
   btn->layout->width = 320.0f;
   btn->layout->height = 80.0f;
-  cmp_ui_node_add_child(g_ui_tree, btn);
-
+  (void)cmp_ui_node_add_child(g_ui_tree, btn);
   if (g_show_content) {
     cmp_ui_node_t *img;
     cmp_ui_node_t *txt;
@@ -172,7 +172,7 @@ static int build_ui(void) {
       img->layout->margin[0] = 60.0f; /* top margin */
       img->layout->width = 240.0f;
       img->layout->height = 240.0f;
-      cmp_ui_node_add_child(g_ui_tree, img);
+      (void)cmp_ui_node_add_child(g_ui_tree, img);
     }
 
     res = get_platform_string(&platform_str);
@@ -190,7 +190,7 @@ static int build_ui(void) {
       txt->layout->margin[0] = 60.0f; /* top margin */
       txt->layout->width = 600.0f;
       txt->layout->height = 80.0f;
-      cmp_ui_node_add_child(g_ui_tree, txt);
+      (void)cmp_ui_node_add_child(g_ui_tree, txt);
     }
   }
 
@@ -204,10 +204,9 @@ int app_init(void) {
   int rc = 0;
   cmp_window_config_t config;
 
-  cmp_event_system_init();
-  cmp_vfs_init();
-  cmp_window_system_init();
-
+  (void)cmp_event_system_init();
+  (void)cmp_vfs_init();
+  (void)cmp_window_system_init();
   config.title = "Compose Multiplatform Starter";
   config.width = 1024;
   config.height = 1024;
@@ -217,7 +216,8 @@ int app_init(void) {
   config.frameless = 0;
   config.use_legacy_backend = 0;
 
-  if (cmp_window_create(&config, &g_window) != CMP_SUCCESS) {
+  rc = cmp_window_create(&config, &g_window);
+  if (rc != CMP_SUCCESS) {
     return CMP_ERROR_NOT_FOUND;
   }
 
@@ -226,11 +226,10 @@ int app_init(void) {
   }
 
   if (g_ui_tree) {
-    cmp_layout_calculate(g_ui_tree->layout, 1024.0f, 1024.0f);
+    (void)cmp_layout_calculate(g_ui_tree->layout, 1024.0f, 1024.0f);
   }
-  cmp_window_set_ui_tree(g_window, g_ui_tree);
-
-  cmp_window_show(g_window);
+  (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
+  (void)cmp_window_show(g_window);
   if (rc != 0) {
     return rc;
   }
@@ -243,8 +242,7 @@ int app_run(void) {
   int running = 1;
 
   while (running) {
-    cmp_window_poll_events(g_window);
-
+    (void)cmp_window_poll_events(g_window);
     while (cmp_event_pop(&evt) == CMP_SUCCESS) {
       if (evt.action == CMP_ACTION_DOWN && (evt.type == 1 || evt.type == 2)) {
         int hit_node = manual_hit_test(g_ui_tree, (float)evt.x, (float)evt.y);
@@ -252,14 +250,15 @@ int app_run(void) {
           g_show_content = !g_show_content;
           build_ui();
           if (g_ui_tree) {
-            cmp_layout_calculate(g_ui_tree->layout, 1024.0f, 1024.0f);
+            (void)cmp_layout_calculate(g_ui_tree->layout, 1024.0f, 1024.0f);
           }
-          cmp_window_set_ui_tree(g_window, g_ui_tree);
+          (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
         }
       }
     }
 
-    if (cmp_window_should_close(g_window)) {
+    rc = cmp_window_should_close(g_window);
+    if (rc) {
       running = 0;
     }
 
@@ -276,19 +275,18 @@ int app_run(void) {
 int app_shutdown(void) {
   int rc = 0;
   if (g_ui_tree) {
-    cmp_ui_node_destroy(g_ui_tree);
+    (void)cmp_ui_node_destroy(g_ui_tree);
     g_ui_tree = NULL;
   }
 
   if (g_window) {
-    cmp_window_destroy(g_window);
+    (void)cmp_window_destroy(g_window);
     g_window = NULL;
   }
 
-  cmp_window_system_shutdown();
-  cmp_vfs_shutdown();
-  cmp_event_system_shutdown();
-
+  (void)cmp_window_system_shutdown();
+  (void)cmp_vfs_shutdown();
+  (void)cmp_event_system_shutdown();
   if (rc != 0) {
     return rc;
   }

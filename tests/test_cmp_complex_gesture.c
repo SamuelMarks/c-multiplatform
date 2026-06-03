@@ -75,14 +75,11 @@ TEST test_complex_gesture_edge_cases(void) {
             cmp_complex_gesture_process_event(NULL, &event));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_complex_gesture_process_event(gesture, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_complex_gesture_get_deltas(NULL, &pan_x, &pan_y, &scale, &rot));
-
   /* NULL output pointers should not crash */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_complex_gesture_get_deltas(gesture, NULL, NULL, NULL, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_complex_gesture_destroy(gesture));
   PASS();
 }

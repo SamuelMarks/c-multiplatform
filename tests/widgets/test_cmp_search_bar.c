@@ -61,7 +61,6 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_search_controller_create(NULL));
   cmp_search_controller_create(&ctx);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_search_controller_set_text(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_search_controller_add_scope(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_search_controller_add_scope(ctx, NULL));
@@ -75,10 +74,8 @@ TEST test_null_args(void) {
             cmp_search_controller_resolve_metrics(ctx, 100.0f, &i, NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_search_controller_resolve_metrics(ctx, 100.0f, &i, &i, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_search_controller_set_suggestions(NULL, NULL, 0));
-
   cmp_search_controller_destroy(ctx);
   PASS();
 }

@@ -73,7 +73,9 @@ static const char *cmp_spellcheck_dict[] = {"apple", "banana", "hello",
                                             "orange", "world"};
 
 static int cmp_spellcheck_compare(const void *a, const void *b) {
-  return strcmp(*(const char **)a, *(const char **)b);
+  int rc = 0;
+  rc = strcmp(*(const char **)a, *(const char **)b);
+  return rc;
 }
 
 /**

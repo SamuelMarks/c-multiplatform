@@ -154,6 +154,7 @@ int cmp_scroll_smooth_step(cmp_scroll_smooth_t *smooth, float dt_ms,
 
   progress = ctx->elapsed_time_ms / ctx->duration_ms;
   eased_progress = cmp_math_ease_in_out_cubic(progress);
+  (void)eased_progress;
 
   ctx->current_position =
       ctx->start_position +

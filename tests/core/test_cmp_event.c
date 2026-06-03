@@ -42,7 +42,6 @@ TEST test_event_null_args(void) {
   int res;
 
   cmp_event_system_init();
-
   res = cmp_event_push(NULL);
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
 
@@ -59,7 +58,6 @@ TEST test_event_push_pop(void) {
   cmp_event_t out;
 
   cmp_event_system_init();
-
   evt.type = 1;
   evt.action = CMP_ACTION_DOWN;
   evt.x = 100;
@@ -105,7 +103,6 @@ TEST test_event_focus(void) {
 
 TEST test_event_tab_targeting(void) {
   cmp_event_clear_focus();
-
   /* Initially no focus, tab targeting forward sets to 1 */
   cmp_event_handle_tab_targeting(0);
   ASSERT_EQ_FMT(1, cmp_event_get_focus(), "%d");

@@ -31,7 +31,6 @@ TEST test_indeterminate_set(void) {
   cmp_indeterminate_t *state = NULL;
   int res;
   cmp_indeterminate_create(&state);
-
   res = cmp_indeterminate_set(state, 1);
   ASSERT_EQ(CMP_SUCCESS, res);
 

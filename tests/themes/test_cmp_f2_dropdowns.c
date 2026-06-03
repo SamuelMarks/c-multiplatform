@@ -93,7 +93,6 @@ TEST test_f2_listbox(void) {
 
   cmp_ui_node_add_child(listbox, option);
   cmp_ui_node_add_child(listbox, group);
-
   cmp_ui_node_destroy(listbox);
   PASS();
 }
@@ -139,7 +138,6 @@ TEST test_f2_calendar_and_datepicker(void) {
   ASSERT_EQ(4, cal_data->selected_month);
   ASSERT_EQ(2, cal_data->selected_day);
   cmp_ui_node_destroy(cal_node);
-
   res = cmp_f2_date_picker_create(&dp_node);
   ASSERT_EQ(CMP_SUCCESS, res);
   dp_data = (cmp_f2_date_picker_t *)dp_node->properties;
@@ -150,7 +148,6 @@ TEST test_f2_calendar_and_datepicker(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(1, dp_data->is_open);
   cmp_ui_node_destroy(dp_node);
-
   PASS();
 }
 

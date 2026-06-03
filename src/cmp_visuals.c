@@ -253,9 +253,8 @@ int cmp_color_contrast_ratio(const cmp_color_t *c1, const cmp_color_t *c2,
   if (!c1 || !c2 || !out_ratio)
     return CMP_ERROR_INVALID_ARG;
 
-  cmp_color_luminance(c1, &l1);
-  cmp_color_luminance(c2, &l2);
-
+  (void)cmp_color_luminance(c1, &l1);
+  (void)cmp_color_luminance(c2, &l2);
   if (l1 > l2) {
     *out_ratio = (l1 + 0.05f) / (l2 + 0.05f);
   } else {

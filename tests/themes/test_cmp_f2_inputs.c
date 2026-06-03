@@ -64,13 +64,11 @@ TEST test_f2_radio(void) {
   ASSERT_EQ(1, data->is_disabled);
 
   cmp_ui_node_destroy(node);
-
   /* Test group creation */
   res = cmp_f2_radio_group_create(&group, 1); /* horizontal */
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(CMP_FLEX_ROW, group->layout->direction);
   cmp_ui_node_destroy(group);
-
   PASS();
 }
 

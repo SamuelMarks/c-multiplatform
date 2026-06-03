@@ -80,8 +80,7 @@ int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
 
   md->node_text->text_color = text_color;
 
-  cmp_ui_node_add_child(md->node_root, md->node_text);
-
+  (void)cmp_ui_node_add_child(md->node_root, md->node_text);
   *out_md = md;
   return rc;
 }

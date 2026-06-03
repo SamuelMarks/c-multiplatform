@@ -49,7 +49,6 @@ TEST test_android_storage_access(void) {
             cmp_android_storage_check_access(st, NULL, &can_write));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_android_storage_check_access(st, "content://test", NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_android_storage_destroy(st));
   PASS();
 }

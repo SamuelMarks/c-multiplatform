@@ -31,7 +31,6 @@ TEST test_view_transition_start(void) {
   cmp_view_transition_t *transition = NULL;
   int res;
   cmp_view_transition_create(&transition);
-
   res = cmp_view_transition_start(transition);
   ASSERT_EQ(CMP_SUCCESS, res);
 

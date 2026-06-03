@@ -70,7 +70,6 @@ TEST test_markdown_parser_null_args(void) {
             cmp_markdown_parser_parse(parser, NULL, &root));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_markdown_parser_parse(parser, "Text", NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_markdown_parser_destroy(parser));
   PASS();
 }

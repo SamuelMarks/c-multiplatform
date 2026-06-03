@@ -34,7 +34,6 @@ TEST test_vfs_read_sync(void) {
   FILE *f;
 
   cmp_vfs_init();
-
   /* Create dummy file */
   f = fopen("dummy.txt", "wb");
   ASSERT(f != NULL);
@@ -85,7 +84,6 @@ TEST test_vfs_read_async(void) {
 
   cmp_vfs_init();
   cmp_modality_sync_single_init(&mod);
-
   /* Create dummy file */
   f = fopen("dummy_async.txt", "wb");
   ASSERT(f != NULL);
@@ -119,37 +117,31 @@ TEST test_vfs_standard_paths(void) {
   int res;
 
   cmp_vfs_init();
-
   /* Test AppData */
   res = cmp_vfs_get_standard_path(1, &path);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(path.length > 0);
   cmp_string_destroy(&path);
-
   /* Test Temp */
   res = cmp_vfs_get_standard_path(2, &path);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(path.length > 0);
   cmp_string_destroy(&path);
-
   /* Test Cache */
   res = cmp_vfs_get_standard_path(3, &path);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(path.length > 0);
   cmp_string_destroy(&path);
-
   /* Test Documents */
   res = cmp_vfs_get_standard_path(4, &path);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(path.length > 0);
   cmp_string_destroy(&path);
-
   /* Test Executable Directory */
   res = cmp_vfs_get_standard_path(5, &path);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(path.length > 0);
   cmp_string_destroy(&path);
-
   cmp_vfs_shutdown();
   PASS();
 }
@@ -161,7 +153,6 @@ TEST test_vfs_mount(void) {
   FILE *f;
 
   cmp_vfs_init();
-
   /* Create dummy file */
   f = fopen("dummy_mount.txt", "wb");
   ASSERT(f != NULL);
@@ -199,7 +190,6 @@ TEST test_vfs_watch(void) {
   FILE *f;
 
   cmp_vfs_init();
-
   res = cmp_vfs_watch_path(".", test_watch_cb, &triggered, &watch);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(watch != NULL);
@@ -255,11 +245,9 @@ TEST test_vfs_edge_cases(void) {
                 "%d");
 
   cmp_vfs_init();
-
   /* Missing file */
   ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND,
                 cmp_vfs_read_file_sync("nonexistent.file", &buf, &size), "%d");
-
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
                 cmp_vfs_read_file_async(NULL, "a", test_vfs_read_cb, NULL),
                 "%d");
@@ -275,7 +263,6 @@ TEST test_vfs_edge_cases(void) {
                 cmp_vfs_watch_path(".", NULL, NULL, &watch), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
                 cmp_vfs_watch_path(".", test_watch_cb, NULL, NULL), "%d");
-
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_unwatch(NULL), "%d");
 
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_vfs_get_standard_path(1, NULL),

@@ -27,7 +27,6 @@ TEST test_a11y_transparency_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
   cmp_a11y_transparency_create(&trans);
-
   res = cmp_a11y_transparency_apply(NULL, &opacity, 1.0f);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -44,7 +43,6 @@ TEST test_a11y_transparency_apply(void) {
   int res;
 
   cmp_a11y_transparency_create(&trans);
-
   /* By default, not enabled */
   res = cmp_a11y_transparency_apply(trans, &opacity, 1.0f);
   ASSERT_EQ(CMP_SUCCESS, res);

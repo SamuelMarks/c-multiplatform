@@ -73,7 +73,7 @@ int cmp_menu_destroy(cmp_menu_t *menu_opaque) {
         if (menu->items[i]->symbol)
           CMP_FREE(menu->items[i]->symbol);
         if (menu->items[i]->child_menu)
-          cmp_menu_destroy(menu->items[i]->child_menu);
+          (void)cmp_menu_destroy(menu->items[i]->child_menu);
         CMP_FREE(menu->items[i]);
       }
     }

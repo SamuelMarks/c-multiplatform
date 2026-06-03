@@ -32,7 +32,6 @@ TEST test_tls_lifecycle(void) {
 TEST test_tls_null(void) {
   cmp_tls_key_t key;
   cmp_tls_key_create(&key);
-
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_tls_key_create(NULL), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_tls_get(key, NULL), "%d");
 

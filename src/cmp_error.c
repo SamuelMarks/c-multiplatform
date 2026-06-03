@@ -171,7 +171,7 @@ void cmp_assert_fail(const char *condition, const char *file, int line) {
   if (g_assert_handler) {
     g_assert_handler(condition, file, line);
   } else {
-    cmp_default_assert_handler(condition, file, line);
+    (void)cmp_default_assert_handler(condition, file, line);
   }
 }
 

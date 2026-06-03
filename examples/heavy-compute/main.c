@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
   }
 
   /* Set the Modality to SYNC_MULTI */
-  cmp_modality_sync_multi_init(&mod, 4); /* 4 background threads */
+  (void)cmp_modality_sync_multi_init(&mod, 4); /* 4 background threads */
 
   printf("Starting UI in SYNC_MULTI modality with 4 worker threads...\n");
   /* Offload fractal generation to background thread pool while UI renders

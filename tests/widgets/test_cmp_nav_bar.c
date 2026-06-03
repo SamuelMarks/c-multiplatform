@@ -84,19 +84,16 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_nav_bar_create(NULL));
   cmp_nav_bar_create(&ctx);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_nav_bar_set_prefers_large_titles(NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_nav_bar_set_appearance(NULL, CMP_NAV_BAR_APPEARANCE_STANDARD));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_nav_bar_calculate_scroll_collapse(NULL, 0.0f, &f, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_nav_bar_calculate_scroll_collapse(ctx, 0.0f, NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_nav_bar_calculate_scroll_collapse(ctx, 0.0f, &f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_nav_bar_resolve_back_button_label(
                                        ctx, "Title", 100.0f, NULL, 32));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_nav_bar_resolve_back_button_label(
@@ -108,7 +105,6 @@ TEST test_null_args(void) {
             cmp_nav_bar_get_chevron_metrics(ctx, NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_nav_bar_get_chevron_metrics(ctx, &f, NULL));
-
   cmp_nav_bar_destroy(ctx);
   PASS();
 }

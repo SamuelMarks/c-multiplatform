@@ -47,7 +47,6 @@ TEST test_syntax_highlighter_parse(void) {
             cmp_syntax_highlighter_parse(hl, code, "c", NULL, &count));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_syntax_highlighter_parse(hl, code, "c", &spans, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_syntax_highlighter_destroy(hl));
   PASS();
 }

@@ -92,13 +92,11 @@ TEST test_kinematics_edge_cases(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_rubber_band_start(NULL, 0, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_rubber_band_step(NULL, 16, 0, &pos, &state));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_scroll_smooth_create(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_scroll_smooth_destroy(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_scroll_smooth_start(NULL, 0, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_scroll_smooth_step(NULL, 16, &pos, &state));
-
   /* Valid pointers, invalid output arg pointers */
   ASSERT_EQ(CMP_SUCCESS, cmp_rubber_band_create(&band));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -160,7 +158,6 @@ TEST test_scroll_padding(void) {
             cmp_scroll_padding_apply(NULL, &pad, &mar, &out_y));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_scroll_padding_apply(&el, &pad, &mar, NULL));
-
   PASS();
 }
 

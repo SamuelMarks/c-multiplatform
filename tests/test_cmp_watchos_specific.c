@@ -23,7 +23,6 @@ TEST test_watchos_features(void) {
             cmp_watchos_apply_pill_button_styling(ctx, &dummy_node));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_watchos_apply_hierarchical_pagination(ctx, &dummy_node));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_watchos_features_destroy(ctx));
   PASS();
 }
@@ -34,7 +33,6 @@ TEST test_watchos_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_watchos_features_create(NULL));
   cmp_watchos_features_create(&feat);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_watchos_handle_digital_crown(NULL, 1.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_watchos_handle_double_tap(NULL));
@@ -51,17 +49,14 @@ TEST test_watchos_null_args(void) {
             cmp_watchos_apply_edge_to_edge_styling(NULL, &node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_watchos_apply_edge_to_edge_styling(feat, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_watchos_apply_pill_button_styling(NULL, &node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_watchos_apply_pill_button_styling(feat, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_watchos_apply_hierarchical_pagination(NULL, &node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_watchos_apply_hierarchical_pagination(feat, NULL));
-
   cmp_watchos_features_destroy(feat);
   PASS();
 }

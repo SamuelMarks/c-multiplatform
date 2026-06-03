@@ -48,13 +48,11 @@ TEST test_auth_keychain(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_keychain_save(keychain, "user_token", "super_secret_payload"));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_keychain_load(keychain, "user_token", buf, 128));
   ASSERT_STR_EQ("super_secret_payload", buf);
 
   ASSERT_EQ(CMP_ERROR_NOT_FOUND,
             cmp_keychain_load(keychain, "invalid_key", buf, 128));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_keychain_destroy(keychain));
 
   PASS();
@@ -100,7 +98,6 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_siwa_request(NULL, 1, NULL, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_tree_validate_siwa_branding(NULL, 0, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_local_auth_request(NULL, NULL, NULL));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_keychain_save(NULL, NULL, NULL));
@@ -112,7 +109,6 @@ TEST test_null_args(void) {
             cmp_window_set_secure_background_obscure(NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_visuals_check_sensitive_content(NULL, 0, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_siwa_destroy(siwa));
   ASSERT_EQ(CMP_SUCCESS, cmp_local_auth_destroy(auth));
   ASSERT_EQ(CMP_SUCCESS, cmp_keychain_destroy(kc));

@@ -65,7 +65,6 @@ TEST test_f2_icon_invalid_args(void) {
    * structure mapped */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
   cmp_ui_node_destroy(node);
-
   PASS();
 }
 

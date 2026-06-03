@@ -15,7 +15,6 @@ TEST test_dx_features(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_dx_enable_live_preview(ctx, node));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_dx_export_debug_hierarchy(ctx, node, buf, sizeof(buf)));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_developer_experience_destroy(ctx));
   PASS();
 }
@@ -34,7 +33,6 @@ TEST test_dx_null_args(void) {
             cmp_dx_build_declarative_node(feat, NULL, &node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_dx_build_declarative_node(feat, "a", NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_dx_apply_typed_color(NULL, node, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_dx_apply_typed_color(feat, NULL, 0));
 
@@ -49,7 +47,6 @@ TEST test_dx_null_args(void) {
             cmp_dx_export_debug_hierarchy(feat, node, NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_dx_export_debug_hierarchy(feat, node, buf, 0));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_developer_experience_destroy(feat));
   PASS();
 }

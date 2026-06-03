@@ -55,17 +55,14 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_stylus_context_create(NULL));
   cmp_stylus_context_create(&ctx);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_stylus_context_set_event_callback(NULL, dummy_cb, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_stylus_resolve_ink_metrics(NULL, 1.0f, &f, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_stylus_resolve_ink_metrics(&ev, 1.0f, NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_stylus_resolve_ink_metrics(&ev, 1.0f, &f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_stylus_evaluate_hover(NULL, &i, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_stylus_evaluate_hover(&ev, NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_stylus_evaluate_hover(&ev, &i, NULL));

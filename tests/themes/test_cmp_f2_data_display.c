@@ -139,7 +139,6 @@ TEST test_f2_datagrid(void) {
 
   cmp_ui_node_add_child(grid, header_row);
   cmp_ui_node_add_child(grid, data_row);
-
   cmp_ui_node_destroy(grid);
   PASS();
 }

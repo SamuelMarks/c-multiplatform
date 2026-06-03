@@ -98,7 +98,7 @@ static void update_title_binding(void) {
 #endif
   }
 
-  cmp_databinding_set_string(g_title_binding, buf);
+  (void)cmp_databinding_set_string(g_title_binding, buf);
 }
 
 static void on_lang_click(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
@@ -226,7 +226,7 @@ static int create_simple_button(cmp_ui_node_t **out_btn, const char *text,
   }
 
   *out_btn = btn_node;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 static void on_window_resize(int width, int height, void *user_data) {
@@ -309,12 +309,11 @@ static int build_ui(void) {
     title_text = "\xD9\x85\xD8\xB1\xD8\xAD\xD8\xA8\xD8\xA7 navbar";
   }
 
-  cmp_ui_app_bar_set_title(app_bar_obj, title_text);
-
+  (void)cmp_ui_app_bar_set_title(app_bar_obj, title_text);
   if (app_bar->child_count > 0) {
     title = app_bar->children[0];
     if (g_title_binding) {
-      cmp_ui_node_bind_generic(title, g_title_binding, "text");
+      (void)cmp_ui_node_bind_generic(title, g_title_binding, "text");
     }
     title->text_color = g_is_dark ? 0xFFE6E0E9 : 0xFF1D1B20;
     title->font_size = 22.0f;
@@ -337,27 +336,28 @@ static int build_ui(void) {
     btn_design->layout->margin[3] = 16.0f;
 
   if (btn_lang)
-    cmp_ui_app_bar_add_action(app_bar_obj, btn_lang);
+    (void)cmp_ui_app_bar_add_action(app_bar_obj, btn_lang);
   if (btn_theme)
-    cmp_ui_app_bar_add_action(app_bar_obj, btn_theme);
+    (void)cmp_ui_app_bar_add_action(app_bar_obj, btn_theme);
   if (btn_palette)
-    cmp_ui_app_bar_add_action(app_bar_obj, btn_palette);
+    (void)cmp_ui_app_bar_add_action(app_bar_obj, btn_palette);
   if (btn_design)
-    cmp_ui_app_bar_add_action(app_bar_obj, btn_design);
-
+    (void)cmp_ui_app_bar_add_action(app_bar_obj, btn_design);
   rc = cmp_ui_node_add_child(g_ui_tree, app_bar);
+  if (rc != CMP_SUCCESS)
+    return rc;
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int app_init(void) {
-  int rc;
+  int rc = 0;
   cmp_window_config_t config;
   cmp_dpi_t *dpi = NULL;
 
   rc = cmp_databinding_create(&g_title_binding, CMP_DATA_TYPE_STRING);
   if (rc == CMP_SUCCESS) {
-    cmp_databinding_set_string(g_title_binding, "Inherit");
+    (void)cmp_databinding_set_string(g_title_binding, "Inherit");
   }
 
   rc = cmp_event_system_init();
@@ -432,11 +432,11 @@ int app_init(void) {
     LOG_DEBUG("cmp_window_show failed: %d\n", rc);
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int app_run(void) {
-  int rc;
+  int rc = 0;
   cmp_event_t evt;
   int running = 1;
 
@@ -514,14 +514,15 @@ int app_run(void) {
     }
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int app_shutdown(void) {
-  int rc;
+  int rc = 0;
+  rc = 0;
 
   if (g_title_binding) {
-    cmp_databinding_destroy(g_title_binding);
+    (void)cmp_databinding_destroy(g_title_binding);
     g_title_binding = NULL;
   }
 
@@ -556,5 +557,5 @@ int app_shutdown(void) {
     LOG_DEBUG("cmp_event_system_shutdown failed: %d\n", rc);
   }
 
-  return CMP_SUCCESS;
+  return rc;
 }

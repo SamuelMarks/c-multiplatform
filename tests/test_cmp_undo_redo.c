@@ -51,7 +51,6 @@ TEST test_undo_redo_push_undo(void) {
   char buf[32];
 
   cmp_undo_redo_create(&stack);
-
   res = cmp_undo_redo_push(stack, "state1");
   ASSERT_EQ(CMP_SUCCESS, res);
 
@@ -78,11 +77,9 @@ TEST test_undo_redo_discard_on_push(void) {
   char buf[32];
 
   cmp_undo_redo_create(&stack);
-
   cmp_undo_redo_push(stack, "1");
   cmp_undo_redo_push(stack, "2");
   cmp_undo_redo_push(stack, "3");
-
   cmp_undo_redo_undo(stack, buf, 32); /* back to 2 */
   cmp_undo_redo_undo(stack, buf, 32); /* back to 1 */
 
@@ -102,7 +99,6 @@ TEST test_undo_redo_overflow(void) {
   int i;
 
   cmp_undo_redo_create(&stack);
-
   for (i = 1; i <= 12; i++) {
     char state[32];
 #if defined(_MSC_VER)

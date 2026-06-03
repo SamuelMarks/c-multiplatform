@@ -86,7 +86,6 @@ TEST test_cond_null(void) {
 
   cmp_mutex_init(&mtx);
   cmp_cond_init(&cond);
-
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_cond_init(NULL), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_cond_wait(NULL, &mtx), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_cond_wait(&cond, NULL), "%d");
@@ -96,7 +95,6 @@ TEST test_cond_null(void) {
 
   cmp_cond_destroy(&cond);
   cmp_mutex_destroy(&mtx);
-
   PASS();
 }
 

@@ -68,7 +68,6 @@ TEST test_universal_link_handler(void) {
   /* Simulate NSUserActivity continuation from Safari universal link */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_deep_link_handle_universal_link(ctx, "/product/456", router));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_router_get_current(router, &result));
   ASSERT_STR_EQ("/product/456", result.data);
 
@@ -94,7 +93,6 @@ TEST test_null_args(void) {
             cmp_deep_link_handle_universal_link(ctx, NULL, router));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_deep_link_handle_universal_link(ctx, "/a", NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_state_restoration_encode(NULL, router, &blob, &size));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -103,7 +101,6 @@ TEST test_null_args(void) {
             cmp_state_restoration_encode(ctx, router, NULL, &size));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_state_restoration_encode(ctx, router, &blob, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_state_restoration_decode(NULL, router, "a", 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -112,12 +109,10 @@ TEST test_null_args(void) {
             cmp_state_restoration_decode(ctx, router, NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_state_restoration_decode(ctx, router, "a", 0));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_state_restoration_set_scene_id(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_state_restoration_set_scene_id(ctx, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_state_restoration_ctx_destroy(ctx));
   ASSERT_EQ(CMP_SUCCESS, cmp_router_destroy(router));
   PASS();

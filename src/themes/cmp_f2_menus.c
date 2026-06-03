@@ -61,7 +61,7 @@ int CMP_API cmp_f2_menu_item_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_menu_item_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_menu_item_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -193,7 +193,7 @@ int CMP_API cmp_f2_nav_view_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_nav_view_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_nav_view_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -272,7 +272,7 @@ int CMP_API cmp_f2_nav_item_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_nav_item_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_nav_item_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -361,7 +361,7 @@ int CMP_API cmp_f2_tab_container_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_tab_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_tab_container_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -608,7 +608,7 @@ int CMP_API cmp_f2_toolbar_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_toolbar_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_toolbar_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -658,7 +658,7 @@ int CMP_API cmp_f2_link_create(cmp_ui_node_t **out_node, const char *label,
   res = CMP_MALLOC(sizeof(cmp_f2_link_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_link_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -776,7 +776,7 @@ int CMP_API cmp_f2_stepper_item_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_stepper_item_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_stepper_item_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }

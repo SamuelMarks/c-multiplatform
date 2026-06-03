@@ -46,8 +46,9 @@ TEST test_cmp_font_fallback_chain(void) {
 
   /* In cmp_window.c, cmp_font_load_memory always returns CMP_SUCCESS for any
    * buffer. Let's assume it succeeds. */
-  if (cmp_font_load_memory(dummy_ttf, sizeof(dummy_ttf), 16.0f, &font_main) ==
-      CMP_SUCCESS) {
+  int rc =
+      cmp_font_load_memory(dummy_ttf, sizeof(dummy_ttf), 16.0f, &font_main);
+  if (rc == CMP_SUCCESS) {
     if (cmp_font_load_memory(dummy_ttf, sizeof(dummy_ttf), 16.0f,
                              &font_fallback_1) == CMP_SUCCESS) {
       if (cmp_font_load_memory(dummy_ttf, sizeof(dummy_ttf), 16.0f,
@@ -56,7 +57,6 @@ TEST test_cmp_font_fallback_chain(void) {
                   cmp_font_add_fallback(font_main, font_fallback_1));
         ASSERT_EQ(CMP_SUCCESS,
                   cmp_font_add_fallback(font_main, font_fallback_2));
-
         ASSERT_EQ(2, (int)font_main->fallback_count);
         ASSERT(font_main->fallback_capacity >= 2);
         ASSERT_EQ(font_fallback_1, font_main->fallbacks[0]);

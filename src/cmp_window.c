@@ -52,6 +52,7 @@ struct cmp_window {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_window_get_native_handle(cmp_window_t *window, void **out_handle) {
+  int rc = CMP_SUCCESS;
   if (!window || !out_handle)
     return CMP_ERROR_INVALID_ARG;
 #if defined(_WIN32)
@@ -63,7 +64,7 @@ int cmp_window_get_native_handle(cmp_window_t *window, void **out_handle) {
 #else
   *out_handle = NULL;
 #endif
-  return CMP_SUCCESS;
+  return rc;
 }
 #if defined(_WIN32)
 #if (!defined(_MSC_VER) || _MSC_VER >= 1500)
@@ -1089,7 +1090,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
                         window->scale_factor);
       evt.y = (int32_t)((prcNewWindow->bottom - prcNewWindow->top) /
                         window->scale_factor);
-      cmp_event_push(&evt);
+      (void)cmp_event_push(&evt);
     }
     return 0;
   }
@@ -1122,7 +1123,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
                           window->resize_user_data);
       }
 
-      cmp_event_push(&evt);
+      (void)cmp_event_push(&evt);
     }
     return 0;
   }
@@ -1151,7 +1152,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
       evt.y = window ? (int)(pt.y / window->scale_factor) : pt.y;
     }
 
-    cmp_event_push(&evt);
+    (void)cmp_event_push(&evt);
     return 0; /* Handled */
   }
   case WM_LBUTTONDOWN:
@@ -1172,7 +1173,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
       evt.y = (int)(GET_Y_LPARAM(lParam) / window->scale_factor);
       evt.source_id = 0; /* Primary mouse */
 
-      cmp_event_push(&evt);
+      (void)cmp_event_push(&evt);
       return 0;
     }
     return DefWindowProcA(hwnd, uMsg, wParam, lParam);
@@ -1193,7 +1194,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
           CMP_ACTION_MOVE; /* Hacky representation for CHAR mapping for now */
 
     evt.source_id = (int)wParam;
-    cmp_event_push(&evt);
+    (void)cmp_event_push(&evt);
     return 0;
   }
   case WM_IME_SETCONTEXT:
@@ -1935,16 +1936,18 @@ int cmp_window_mac_init_menu_bar(void) {
  */
 int cmp_window_mac_add_menu_item(const char *title, const char *key_equiv,
                                  void (*callback)(void)) {
+  int rc = 0;
   if (title == NULL || key_equiv == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
 #if defined(__APPLE__)
   /* Call out to objective-c NSMenuItem allocation */
   (void)callback;
-  return CMP_SUCCESS;
+  return rc;
 #else
   (void)callback;
-  return CMP_ERROR_NOT_FOUND;
+  rc = CMP_ERROR_NOT_FOUND;
+  return rc;
 #endif
 }
 
@@ -2074,7 +2077,8 @@ int cmp_window_get_clipboard_text(cmp_window_t *window,
 #if defined(__linux__) && !defined(__ANDROID__)
   /* XConvertSelection or Wayland data offer receive */
   (void)type;
-  return cmp_string_init(out_text);
+  int rc = cmp_string_init(out_text);
+  return rc;
 #else
   (void)type;
 
@@ -2247,6 +2251,8 @@ int cmp_window_wasm_resume_audio(void) {
  */
 int cmp_window_wasm_set_main_loop(cmp_modality_t *mod,
                                   void (*main_loop)(void *), void *arg) {
+  int rc = CMP_SUCCESS;
+  (void)rc;
   if (mod == NULL || main_loop == NULL) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -2639,7 +2645,8 @@ int cmp_font_load(const char *virtual_path, float default_size,
   font->fallback_count = 0;
   font->fallback_capacity = 0;
 
-  if (cmp_vfs_read_file_sync(virtual_path, &buffer, &size) == CMP_SUCCESS) {
+  rc = cmp_vfs_read_file_sync(virtual_path, &buffer, &size);
+  if (rc == CMP_SUCCESS) {
 #if defined(_WIN32)
     DWORD num_fonts = 0;
     HANDLE handle = AddFontMemResourceEx(buffer, (DWORD)size, NULL, &num_fonts);

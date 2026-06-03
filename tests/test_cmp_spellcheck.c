@@ -44,7 +44,6 @@ TEST test_spellcheck_verify(void) {
   int res;
 
   cmp_spellcheck_create(&spellcheck);
-
   res = cmp_spellcheck_verify_word(spellcheck, "hello", &v);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(1, v);

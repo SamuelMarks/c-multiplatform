@@ -25,21 +25,18 @@ TEST test_testing_automation_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_testing_automation_create(NULL));
   cmp_testing_automation_create(&feat);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_testing_set_animations_enabled(NULL, 1));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_testing_tap_by_accessibility_label(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_testing_tap_by_accessibility_label(feat, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_testing_snapshot_verify(NULL, &node, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_testing_snapshot_verify(feat, NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_testing_snapshot_verify(feat, &node, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_testing_audit_accessibility(NULL, &node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_testing_audit_accessibility(feat, NULL));

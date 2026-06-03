@@ -43,7 +43,6 @@ TEST test_keyframe_add_stop(void) {
   cmp_keyframe_t *kf = NULL;
   int res;
   cmp_keyframe_create(&kf);
-
   res = cmp_keyframe_add_stop(kf, 0.0f);
   ASSERT_EQ(CMP_SUCCESS, res);
 

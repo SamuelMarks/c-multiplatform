@@ -47,7 +47,6 @@ TEST test_input_mask_apply(void) {
   char buf[32];
   int res;
   cmp_input_mask_create("(XXX) XXX-XXXX", &mask);
-
   /* Partial input */
   res = cmp_input_mask_apply(mask, "123", buf, 32);
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -59,21 +58,18 @@ TEST test_input_mask_apply(void) {
   ASSERT_STR_EQ("(123) 456-7890", buf);
 
   cmp_input_mask_destroy(mask);
-
   /* Number mask */
   cmp_input_mask_create("999-99", &mask);
   res = cmp_input_mask_apply(mask, "12a3b4", buf, 32);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_STR_EQ("123-4", buf);
   cmp_input_mask_destroy(mask);
-
   /* Alpha mask */
   cmp_input_mask_create("AA-99", &mask);
   res = cmp_input_mask_apply(mask, "1aB23", buf, 32);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_STR_EQ("aB-23", buf);
   cmp_input_mask_destroy(mask);
-
   PASS();
 }
 

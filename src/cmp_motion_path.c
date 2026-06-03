@@ -85,6 +85,7 @@ int CMP_API cmp_motion_path_set_curve(cmp_motion_path_t *path, float p0x,
                                       float p0y, float p1x, float p1y,
                                       float p2x, float p2y, float p3x,
                                       float p3y) {
+  int rc = 0;
   struct cmp_motion_path *p = (struct cmp_motion_path *)path;
   if (!p)
     return CMP_ERROR_INVALID_ARG;
@@ -96,7 +97,7 @@ int CMP_API cmp_motion_path_set_curve(cmp_motion_path_t *path, float p0x,
   p->p2y = p2y;
   p->p3x = p3x;
   p->p3y = p3y;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**
@@ -180,7 +181,6 @@ int cmp_motion_path_evaluate(cmp_motion_path_t *path, float distance,
       cmp_math_eval_bezier_derivative(p->p0x, p->p1x, p->p2x, p->p3x, distance);
   dy =
       cmp_math_eval_bezier_derivative(p->p0y, p->p1y, p->p2y, p->p3y, distance);
-
   angle_rad = (float)atan2(dy, dx);
   *out_angle = angle_rad * (180.0f / 3.14159265f) + offset_rotate;
   return rc;

@@ -11,7 +11,6 @@ TEST test_spring_animator(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_spring_animator_create(1.0f, 100.0f, 10.0f, 0.0f, &anim));
-
   /* Initial state */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_spring_animator_evaluate(anim, 0.0f, &val, &settled));
@@ -48,7 +47,6 @@ TEST test_scrubbing(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_spring_animator_create(1.0f, 100.0f, 10.0f, 0.0f, &anim));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_spring_animator_scrub(anim, 0.5f));
 
   ASSERT_EQ(CMP_SUCCESS,
@@ -86,9 +84,7 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_spring_animator_create(1.0f, 100.0f, 10.0f, 0.0f, NULL));
-
   cmp_spring_animator_create(1.0f, 100.0f, 10.0f, 0.0f, &anim);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_spring_animator_interrupt(NULL, 1.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_spring_animator_scrub(NULL, 1.0f));
 
@@ -98,12 +94,10 @@ TEST test_null_args(void) {
             cmp_spring_animator_evaluate(anim, 0.1f, NULL, &i));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_spring_animator_evaluate(anim, 0.1f, &f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_spring_calculate_gesture_velocity(1.0f, 1.0f, 0.1f, NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_spring_calculate_gesture_velocity(1.0f, 1.0f, 0.1f, &f, NULL));
-
   cmp_spring_animator_destroy(anim);
   PASS();
 }

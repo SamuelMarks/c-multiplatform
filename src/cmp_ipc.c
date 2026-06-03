@@ -198,7 +198,7 @@ int rc = CMP_SUCCESS;
   p += sizeof(size_t);
   
   if (buffer_size < sizeof(int) + sizeof(size_t) + psize) {
-      cmp_msg_destroy(*msg);
+      (void)cmp_msg_destroy(*msg);
       *msg = NULL;
       rc = CMP_ERROR_BOUNDS;
       LOG_DEBUG("Error in cmp_msg_deserialize: Buffer too small for payload\n");
@@ -209,7 +209,7 @@ int rc = CMP_SUCCESS;
   if (psize > 0) {
       err = cmp_msg_set_payload(*msg, p, psize);
       if (err != CMP_SUCCESS) {
-          cmp_msg_destroy(*msg);
+          (void)cmp_msg_destroy(*msg);
           *msg = NULL;
           LOG_DEBUG("Error in cmp_msg_deserialize: cmp_msg_set_payload failed\n");
           return err;
@@ -246,6 +246,7 @@ int cmp_process_send(cmp_process_t *proc, const cmp_msg_t *msg) {
   rc = cmp_msg_serialize(msg, &buffer, &buffer_size);
   if (rc == CMP_SUCCESS) {
     rc = cmp_msg_deserialize(buffer, buffer_size, &msg_copy);
+  if (rc != CMP_SUCCESS) return rc;
     CMP_FREE(buffer);
   }
 
@@ -256,7 +257,7 @@ int cmp_process_send(cmp_process_t *proc, const cmp_msg_t *msg) {
 
   rc = CMP_MALLOC(sizeof(struct mock_msg_node), (void **)&node);
   if (rc != CMP_SUCCESS) {
-    cmp_msg_destroy(msg_copy);
+    (void)cmp_msg_destroy(msg_copy);
     LOG_DEBUG("Error in cmp_process_send: OOM allocating queue node\n");
     return CMP_ERROR_OOM;
   }
@@ -333,7 +334,7 @@ int cmp_process_destroy(cmp_process_t *proc) {
   while (curr != NULL) {
     next = curr->next;
     if (curr->msg != NULL) {
-      cmp_msg_destroy(curr->msg);
+      (void)cmp_msg_destroy(curr->msg);
     }
     CMP_FREE(curr);
     curr = next;

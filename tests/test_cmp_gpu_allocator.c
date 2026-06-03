@@ -25,7 +25,6 @@ TEST test_gpu_allocator(void) {
   /* Over allocate */
   ASSERT_EQ(CMP_ERROR_OOM,
             cmp_gpu_allocator_alloc(alloc, 512, 16, &mem1, &offset1));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_gpu_allocator_destroy(alloc));
   ASSERT_EQ(CMP_SUCCESS, cmp_gpu_destroy(gpu));
   PASS();

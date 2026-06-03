@@ -33,7 +33,7 @@ int CMP_API cmp_f2_dropdown_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_dropdown_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_dropdown_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -192,7 +192,7 @@ int CMP_API cmp_f2_combobox_create(cmp_ui_node_t **out_node, int is_freeform) {
   res = CMP_MALLOC(sizeof(cmp_f2_combobox_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_combobox_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -339,7 +339,7 @@ int CMP_API cmp_f2_listbox_option_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_listbox_option_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_listbox_option_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -507,7 +507,7 @@ int CMP_API cmp_f2_color_picker_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_color_picker_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_color_picker_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -584,7 +584,7 @@ int CMP_API cmp_f2_calendar_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_calendar_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_calendar_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -697,7 +697,7 @@ int CMP_API cmp_f2_date_picker_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_date_picker_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_date_picker_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -783,7 +783,7 @@ int CMP_API cmp_f2_time_picker_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_time_picker_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_time_picker_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }

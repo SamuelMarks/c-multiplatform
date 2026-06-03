@@ -104,7 +104,6 @@ TEST test_materials_null(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_materials_create(NULL));
   cmp_materials_create(&ctx);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_materials_resolve_blur_effect(
                                        NULL, CMP_BLUR_STYLE_REGULAR, &f, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_materials_resolve_blur_effect(
@@ -127,7 +126,6 @@ TEST test_materials_null(void) {
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
       cmp_materials_resolve_vibrancy(ctx, CMP_VIBRANCY_STYLE_LABEL, &f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_materials_interpolate_blur_transition(
                 NULL, CMP_BLUR_STYLE_THIN, CMP_BLUR_STYLE_THICK, 0.5f, &f));

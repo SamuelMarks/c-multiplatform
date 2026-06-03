@@ -56,7 +56,6 @@ TEST test_checkbox_radio_slider(void) {
   cmp_ui_node_destroy(checkbox);
   cmp_ui_node_destroy(radio);
   cmp_ui_node_destroy(slider);
-
   PASS();
 }
 

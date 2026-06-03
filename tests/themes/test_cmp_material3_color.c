@@ -59,7 +59,6 @@ TEST test_m3_tonal_palette(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_generate_tonal_palette_hct(hue, chroma, &palette));
-
   /* Verify tones correctly correspond to their luminosity/tone value */
   cmp_m3_srgb_to_hct(&palette.tone0, &out_h, &out_c, &out_t);
   ASSERT(out_t < 1.0f); /* Tone 0 is black */

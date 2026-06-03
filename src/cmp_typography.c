@@ -65,11 +65,11 @@ int cmp_typography_destroy(cmp_typography_t *typo) {
   }
 
   if (typo->primary_font) {
-    cmp_font_destroy(typo->primary_font);
+    (void)cmp_font_destroy(typo->primary_font);
   }
 
   for (i = 0; i < typo->fallback_count; i++) {
-    cmp_font_destroy(typo->fallback_fonts[i]);
+    (void)cmp_font_destroy(typo->fallback_fonts[i]);
   }
   {
 
@@ -124,7 +124,7 @@ int cmp_typography_set_primary_font(cmp_typography_t *typo,
   }
 
   if (typo->primary_font) {
-    cmp_font_destroy(typo->primary_font);
+    (void)cmp_font_destroy(typo->primary_font);
   }
 
   typo->primary_font = new_font;
@@ -133,7 +133,7 @@ int cmp_typography_set_primary_font(cmp_typography_t *typo,
   if (typo->fallback_count > 0) {
     size_t i;
     for (i = 0; i < typo->fallback_count; i++) {
-      cmp_font_add_fallback(typo->primary_font, typo->fallback_fonts[i]);
+      (void)cmp_font_add_fallback(typo->primary_font, typo->fallback_fonts[i]);
     }
   }
 
@@ -167,7 +167,7 @@ int cmp_typography_add_fallback_font(cmp_typography_t *typo,
     size_t new_cap = typo->fallback_capacity * 2;
     rc = CMP_MALLOC(new_cap * sizeof(cmp_font_t *), (void **)&new_array);
     if (rc != CMP_SUCCESS) {
-      cmp_font_destroy(fallback);
+      (void)cmp_font_destroy(fallback);
       return CMP_ERROR_OOM;
     }
     memcpy(new_array, typo->fallback_fonts,
@@ -181,7 +181,7 @@ int cmp_typography_add_fallback_font(cmp_typography_t *typo,
 
   /* Bind immediately to primary if it exists */
   if (typo->primary_font) {
-    cmp_font_add_fallback(typo->primary_font, fallback);
+    (void)cmp_font_add_fallback(typo->primary_font, fallback);
   }
 
   return rc;

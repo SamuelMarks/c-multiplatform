@@ -101,7 +101,10 @@ int cmp_i18n_translate_plural(const char *key, int count,
     return CMP_ERROR_INVALID_ARG;
   }
   if (count == 1) {
-    return cmp_i18n_translate(key, out_translated);
+    rc = cmp_i18n_translate(key, out_translated);
+    if (rc != CMP_SUCCESS)
+      return rc;
+    return rc;
   }
   len = strlen(key) + 7;
   rc = CMP_MALLOC(len + 1, (void **)&data);

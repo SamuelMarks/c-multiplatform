@@ -68,7 +68,6 @@ TEST test_f2_accordion(void) {
   ASSERT_EQ(1, panel_data->is_expanded);
 
   cmp_ui_node_add_child(node, panel);
-
   cmp_ui_node_destroy(node);
   PASS();
 }

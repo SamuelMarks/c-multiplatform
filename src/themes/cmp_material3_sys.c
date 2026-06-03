@@ -23,28 +23,28 @@ int cmp_m3_sys_colors_generate(cmp_color_t seed, int is_dark,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  cmp_m3_srgb_to_hct(&seed, &h, &c, &t);
-
+  (void)cmp_m3_srgb_to_hct(&seed, &h, &c, &t);
   if (is_dark) {
     if (contrast == CMP_M3_CONTRAST_HIGH) {
-      cmp_m3_hct_to_srgb(h, c, 100.0f, &out_sys_colors->primary);
+      (void)cmp_m3_hct_to_srgb(h, c, 100.0f, &out_sys_colors->primary);
     } else if (contrast == CMP_M3_CONTRAST_MEDIUM) {
-      cmp_m3_hct_to_srgb(h, c, 90.0f, &out_sys_colors->primary);
+      (void)cmp_m3_hct_to_srgb(h, c, 90.0f, &out_sys_colors->primary);
     } else {
-      cmp_m3_hct_to_srgb(h, c, 80.0f, &out_sys_colors->primary);
+      (void)cmp_m3_hct_to_srgb(h, c, 80.0f, &out_sys_colors->primary);
     }
-    cmp_m3_hct_to_srgb(h, c, 20.0f, &out_sys_colors->on_primary);
-    cmp_m3_hct_to_srgb(h, c, 30.0f, &out_sys_colors->primary_container);
-    cmp_m3_hct_to_srgb(h, c, 90.0f, &out_sys_colors->on_primary_container);
-
-    cmp_m3_hct_to_srgb(h, c / 3.0f, 80.0f, &out_sys_colors->secondary);
-    cmp_m3_hct_to_srgb(h, c / 3.0f, 20.0f, &out_sys_colors->on_secondary);
+    (void)cmp_m3_hct_to_srgb(h, c, 20.0f, &out_sys_colors->on_primary);
+    (void)cmp_m3_hct_to_srgb(h, c, 30.0f, &out_sys_colors->primary_container);
+    (void)cmp_m3_hct_to_srgb(h, c, 90.0f,
+                             &out_sys_colors->on_primary_container);
+    (void)cmp_m3_hct_to_srgb(h, c / 3.0f, 80.0f, &out_sys_colors->secondary);
+    (void)cmp_m3_hct_to_srgb(h, c / 3.0f, 20.0f, &out_sys_colors->on_secondary);
     cmp_m3_hct_to_srgb(h, c / 3.0f, 30.0f,
                        &out_sys_colors->secondary_container);
     cmp_m3_hct_to_srgb(h, c / 3.0f, 90.0f,
                        &out_sys_colors->on_secondary_container);
 
-    cmp_m3_hct_to_srgb(h + 60.0f, c / 2.0f, 80.0f, &out_sys_colors->tertiary);
+    (void)cmp_m3_hct_to_srgb(h + 60.0f, c / 2.0f, 80.0f,
+                             &out_sys_colors->tertiary);
     cmp_m3_hct_to_srgb(h + 60.0f, c / 2.0f, 20.0f,
                        &out_sys_colors->on_tertiary);
     cmp_m3_hct_to_srgb(h + 60.0f, c / 2.0f, 30.0f,
@@ -52,46 +52,50 @@ int cmp_m3_sys_colors_generate(cmp_color_t seed, int is_dark,
     cmp_m3_hct_to_srgb(h + 60.0f, c / 2.0f, 90.0f,
                        &out_sys_colors->on_tertiary_container);
 
-    cmp_m3_hct_to_srgb(25.0f, 84.0f, 80.0f, &out_sys_colors->error);
-    cmp_m3_hct_to_srgb(25.0f, 84.0f, 20.0f, &out_sys_colors->on_error);
-    cmp_m3_hct_to_srgb(25.0f, 84.0f, 30.0f, &out_sys_colors->error_container);
+    (void)cmp_m3_hct_to_srgb(25.0f, 84.0f, 80.0f, &out_sys_colors->error);
+    (void)cmp_m3_hct_to_srgb(25.0f, 84.0f, 20.0f, &out_sys_colors->on_error);
+    (void)cmp_m3_hct_to_srgb(25.0f, 84.0f, 30.0f,
+                             &out_sys_colors->error_container);
     cmp_m3_hct_to_srgb(25.0f, 84.0f, 90.0f,
                        &out_sys_colors->on_error_container);
 
-    cmp_m3_hct_to_srgb(h, 4.0f, 6.0f, &out_sys_colors->surface_dim);
-    cmp_m3_hct_to_srgb(h, 4.0f, 6.0f, &out_sys_colors->surface);
-    cmp_m3_hct_to_srgb(h, 4.0f, 24.0f, &out_sys_colors->surface_bright);
-
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 6.0f, &out_sys_colors->surface_dim);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 6.0f, &out_sys_colors->surface);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 24.0f, &out_sys_colors->surface_bright);
     cmp_m3_hct_to_srgb(h, 4.0f, 4.0f,
                        &out_sys_colors->surface_container_lowest);
-    cmp_m3_hct_to_srgb(h, 4.0f, 10.0f, &out_sys_colors->surface_container_low);
-    cmp_m3_hct_to_srgb(h, 4.0f, 12.0f, &out_sys_colors->surface_container);
-    cmp_m3_hct_to_srgb(h, 4.0f, 17.0f, &out_sys_colors->surface_container_high);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 10.0f,
+                             &out_sys_colors->surface_container_low);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 12.0f,
+                             &out_sys_colors->surface_container);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 17.0f,
+                             &out_sys_colors->surface_container_high);
     cmp_m3_hct_to_srgb(h, 4.0f, 22.0f,
                        &out_sys_colors->surface_container_highest);
 
-    cmp_m3_hct_to_srgb(h, 4.0f, 90.0f, &out_sys_colors->on_surface);
-    cmp_m3_hct_to_srgb(h, 8.0f, 80.0f, &out_sys_colors->on_surface_variant);
-    cmp_m3_hct_to_srgb(h, 8.0f, 60.0f, &out_sys_colors->outline);
-    cmp_m3_hct_to_srgb(h, 8.0f, 30.0f, &out_sys_colors->outline_variant);
-
-    cmp_m3_hct_to_srgb(h, 4.0f, 90.0f, &out_sys_colors->inverse_surface);
-    cmp_m3_hct_to_srgb(h, 4.0f, 20.0f, &out_sys_colors->inverse_on_surface);
-    cmp_m3_hct_to_srgb(h, c, 40.0f, &out_sys_colors->inverse_primary);
-
-    cmp_m3_hct_to_srgb(h, 4.0f, 0.0f, &out_sys_colors->scrim);
-    cmp_m3_hct_to_srgb(h, 4.0f, 0.0f, &out_sys_colors->shadow);
-    cmp_m3_hct_to_srgb(h, c, 80.0f, &out_sys_colors->surface_tint);
-
-    cmp_m3_hct_to_srgb(h, c, 90.0f, &out_sys_colors->primary_fixed);
-    cmp_m3_hct_to_srgb(h, c, 80.0f, &out_sys_colors->primary_fixed_dim);
-    cmp_m3_hct_to_srgb(h, c, 10.0f, &out_sys_colors->on_primary_fixed);
-    cmp_m3_hct_to_srgb(h, c, 30.0f, &out_sys_colors->on_primary_fixed_variant);
-
-    cmp_m3_hct_to_srgb(h, c / 3.0f, 90.0f, &out_sys_colors->secondary_fixed);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 90.0f, &out_sys_colors->on_surface);
+    (void)cmp_m3_hct_to_srgb(h, 8.0f, 80.0f,
+                             &out_sys_colors->on_surface_variant);
+    (void)cmp_m3_hct_to_srgb(h, 8.0f, 60.0f, &out_sys_colors->outline);
+    (void)cmp_m3_hct_to_srgb(h, 8.0f, 30.0f, &out_sys_colors->outline_variant);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 90.0f, &out_sys_colors->inverse_surface);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 20.0f,
+                             &out_sys_colors->inverse_on_surface);
+    (void)cmp_m3_hct_to_srgb(h, c, 40.0f, &out_sys_colors->inverse_primary);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 0.0f, &out_sys_colors->scrim);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 0.0f, &out_sys_colors->shadow);
+    (void)cmp_m3_hct_to_srgb(h, c, 80.0f, &out_sys_colors->surface_tint);
+    (void)cmp_m3_hct_to_srgb(h, c, 90.0f, &out_sys_colors->primary_fixed);
+    (void)cmp_m3_hct_to_srgb(h, c, 80.0f, &out_sys_colors->primary_fixed_dim);
+    (void)cmp_m3_hct_to_srgb(h, c, 10.0f, &out_sys_colors->on_primary_fixed);
+    (void)cmp_m3_hct_to_srgb(h, c, 30.0f,
+                             &out_sys_colors->on_primary_fixed_variant);
+    (void)cmp_m3_hct_to_srgb(h, c / 3.0f, 90.0f,
+                             &out_sys_colors->secondary_fixed);
     cmp_m3_hct_to_srgb(h, c / 3.0f, 80.0f,
                        &out_sys_colors->secondary_fixed_dim);
-    cmp_m3_hct_to_srgb(h, c / 3.0f, 10.0f, &out_sys_colors->on_secondary_fixed);
+    (void)cmp_m3_hct_to_srgb(h, c / 3.0f, 10.0f,
+                             &out_sys_colors->on_secondary_fixed);
     cmp_m3_hct_to_srgb(h, c / 3.0f, 30.0f,
                        &out_sys_colors->on_secondary_fixed_variant);
 
@@ -106,24 +110,26 @@ int cmp_m3_sys_colors_generate(cmp_color_t seed, int is_dark,
 
   } else {
     if (contrast == CMP_M3_CONTRAST_HIGH) {
-      cmp_m3_hct_to_srgb(h, c, 20.0f, &out_sys_colors->primary);
+      (void)cmp_m3_hct_to_srgb(h, c, 20.0f, &out_sys_colors->primary);
     } else if (contrast == CMP_M3_CONTRAST_MEDIUM) {
-      cmp_m3_hct_to_srgb(h, c, 30.0f, &out_sys_colors->primary);
+      (void)cmp_m3_hct_to_srgb(h, c, 30.0f, &out_sys_colors->primary);
     } else {
-      cmp_m3_hct_to_srgb(h, c, 40.0f, &out_sys_colors->primary);
+      (void)cmp_m3_hct_to_srgb(h, c, 40.0f, &out_sys_colors->primary);
     }
-    cmp_m3_hct_to_srgb(h, c, 100.0f, &out_sys_colors->on_primary);
-    cmp_m3_hct_to_srgb(h, c, 90.0f, &out_sys_colors->primary_container);
-    cmp_m3_hct_to_srgb(h, c, 10.0f, &out_sys_colors->on_primary_container);
-
-    cmp_m3_hct_to_srgb(h, c / 3.0f, 40.0f, &out_sys_colors->secondary);
-    cmp_m3_hct_to_srgb(h, c / 3.0f, 100.0f, &out_sys_colors->on_secondary);
+    (void)cmp_m3_hct_to_srgb(h, c, 100.0f, &out_sys_colors->on_primary);
+    (void)cmp_m3_hct_to_srgb(h, c, 90.0f, &out_sys_colors->primary_container);
+    (void)cmp_m3_hct_to_srgb(h, c, 10.0f,
+                             &out_sys_colors->on_primary_container);
+    (void)cmp_m3_hct_to_srgb(h, c / 3.0f, 40.0f, &out_sys_colors->secondary);
+    (void)cmp_m3_hct_to_srgb(h, c / 3.0f, 100.0f,
+                             &out_sys_colors->on_secondary);
     cmp_m3_hct_to_srgb(h, c / 3.0f, 90.0f,
                        &out_sys_colors->secondary_container);
     cmp_m3_hct_to_srgb(h, c / 3.0f, 10.0f,
                        &out_sys_colors->on_secondary_container);
 
-    cmp_m3_hct_to_srgb(h + 60.0f, c / 2.0f, 40.0f, &out_sys_colors->tertiary);
+    (void)cmp_m3_hct_to_srgb(h + 60.0f, c / 2.0f, 40.0f,
+                             &out_sys_colors->tertiary);
     cmp_m3_hct_to_srgb(h + 60.0f, c / 2.0f, 100.0f,
                        &out_sys_colors->on_tertiary);
     cmp_m3_hct_to_srgb(h + 60.0f, c / 2.0f, 90.0f,
@@ -131,46 +137,50 @@ int cmp_m3_sys_colors_generate(cmp_color_t seed, int is_dark,
     cmp_m3_hct_to_srgb(h + 60.0f, c / 2.0f, 10.0f,
                        &out_sys_colors->on_tertiary_container);
 
-    cmp_m3_hct_to_srgb(25.0f, 84.0f, 40.0f, &out_sys_colors->error);
-    cmp_m3_hct_to_srgb(25.0f, 84.0f, 100.0f, &out_sys_colors->on_error);
-    cmp_m3_hct_to_srgb(25.0f, 84.0f, 90.0f, &out_sys_colors->error_container);
+    (void)cmp_m3_hct_to_srgb(25.0f, 84.0f, 40.0f, &out_sys_colors->error);
+    (void)cmp_m3_hct_to_srgb(25.0f, 84.0f, 100.0f, &out_sys_colors->on_error);
+    (void)cmp_m3_hct_to_srgb(25.0f, 84.0f, 90.0f,
+                             &out_sys_colors->error_container);
     cmp_m3_hct_to_srgb(25.0f, 84.0f, 10.0f,
                        &out_sys_colors->on_error_container);
 
-    cmp_m3_hct_to_srgb(h, 4.0f, 87.0f, &out_sys_colors->surface_dim);
-    cmp_m3_hct_to_srgb(h, 4.0f, 98.0f, &out_sys_colors->surface);
-    cmp_m3_hct_to_srgb(h, 4.0f, 98.0f, &out_sys_colors->surface_bright);
-
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 87.0f, &out_sys_colors->surface_dim);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 98.0f, &out_sys_colors->surface);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 98.0f, &out_sys_colors->surface_bright);
     cmp_m3_hct_to_srgb(h, 4.0f, 100.0f,
                        &out_sys_colors->surface_container_lowest);
-    cmp_m3_hct_to_srgb(h, 4.0f, 96.0f, &out_sys_colors->surface_container_low);
-    cmp_m3_hct_to_srgb(h, 4.0f, 94.0f, &out_sys_colors->surface_container);
-    cmp_m3_hct_to_srgb(h, 4.0f, 92.0f, &out_sys_colors->surface_container_high);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 96.0f,
+                             &out_sys_colors->surface_container_low);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 94.0f,
+                             &out_sys_colors->surface_container);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 92.0f,
+                             &out_sys_colors->surface_container_high);
     cmp_m3_hct_to_srgb(h, 4.0f, 90.0f,
                        &out_sys_colors->surface_container_highest);
 
-    cmp_m3_hct_to_srgb(h, 4.0f, 10.0f, &out_sys_colors->on_surface);
-    cmp_m3_hct_to_srgb(h, 8.0f, 30.0f, &out_sys_colors->on_surface_variant);
-    cmp_m3_hct_to_srgb(h, 8.0f, 50.0f, &out_sys_colors->outline);
-    cmp_m3_hct_to_srgb(h, 8.0f, 80.0f, &out_sys_colors->outline_variant);
-
-    cmp_m3_hct_to_srgb(h, 4.0f, 20.0f, &out_sys_colors->inverse_surface);
-    cmp_m3_hct_to_srgb(h, 4.0f, 95.0f, &out_sys_colors->inverse_on_surface);
-    cmp_m3_hct_to_srgb(h, c, 80.0f, &out_sys_colors->inverse_primary);
-
-    cmp_m3_hct_to_srgb(h, 4.0f, 0.0f, &out_sys_colors->scrim);
-    cmp_m3_hct_to_srgb(h, 4.0f, 0.0f, &out_sys_colors->shadow);
-    cmp_m3_hct_to_srgb(h, c, 40.0f, &out_sys_colors->surface_tint);
-
-    cmp_m3_hct_to_srgb(h, c, 90.0f, &out_sys_colors->primary_fixed);
-    cmp_m3_hct_to_srgb(h, c, 80.0f, &out_sys_colors->primary_fixed_dim);
-    cmp_m3_hct_to_srgb(h, c, 10.0f, &out_sys_colors->on_primary_fixed);
-    cmp_m3_hct_to_srgb(h, c, 30.0f, &out_sys_colors->on_primary_fixed_variant);
-
-    cmp_m3_hct_to_srgb(h, c / 3.0f, 90.0f, &out_sys_colors->secondary_fixed);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 10.0f, &out_sys_colors->on_surface);
+    (void)cmp_m3_hct_to_srgb(h, 8.0f, 30.0f,
+                             &out_sys_colors->on_surface_variant);
+    (void)cmp_m3_hct_to_srgb(h, 8.0f, 50.0f, &out_sys_colors->outline);
+    (void)cmp_m3_hct_to_srgb(h, 8.0f, 80.0f, &out_sys_colors->outline_variant);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 20.0f, &out_sys_colors->inverse_surface);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 95.0f,
+                             &out_sys_colors->inverse_on_surface);
+    (void)cmp_m3_hct_to_srgb(h, c, 80.0f, &out_sys_colors->inverse_primary);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 0.0f, &out_sys_colors->scrim);
+    (void)cmp_m3_hct_to_srgb(h, 4.0f, 0.0f, &out_sys_colors->shadow);
+    (void)cmp_m3_hct_to_srgb(h, c, 40.0f, &out_sys_colors->surface_tint);
+    (void)cmp_m3_hct_to_srgb(h, c, 90.0f, &out_sys_colors->primary_fixed);
+    (void)cmp_m3_hct_to_srgb(h, c, 80.0f, &out_sys_colors->primary_fixed_dim);
+    (void)cmp_m3_hct_to_srgb(h, c, 10.0f, &out_sys_colors->on_primary_fixed);
+    (void)cmp_m3_hct_to_srgb(h, c, 30.0f,
+                             &out_sys_colors->on_primary_fixed_variant);
+    (void)cmp_m3_hct_to_srgb(h, c / 3.0f, 90.0f,
+                             &out_sys_colors->secondary_fixed);
     cmp_m3_hct_to_srgb(h, c / 3.0f, 80.0f,
                        &out_sys_colors->secondary_fixed_dim);
-    cmp_m3_hct_to_srgb(h, c / 3.0f, 10.0f, &out_sys_colors->on_secondary_fixed);
+    (void)cmp_m3_hct_to_srgb(h, c / 3.0f, 10.0f,
+                             &out_sys_colors->on_secondary_fixed);
     cmp_m3_hct_to_srgb(h, c / 3.0f, 30.0f,
                        &out_sys_colors->on_secondary_fixed_variant);
 

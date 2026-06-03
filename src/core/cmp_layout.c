@@ -88,7 +88,7 @@ int cmp_layout_node_destroy(cmp_layout_node_t *node) {
   }
 
   for (i = 0; i < node->child_count; i++) {
-    cmp_layout_node_destroy(node->children[i]);
+    (void)cmp_layout_node_destroy(node->children[i]);
   }
 
   if (node->children != NULL) {
@@ -570,7 +570,7 @@ int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
   }
   calculate_node_pass(root, 0.0f, 0.0f, available_width, available_height);
 
-  cmp_i18n_is_rtl(&is_rtl);
+  (void)cmp_i18n_is_rtl(&is_rtl);
   if (is_rtl) {
     apply_rtl_mirroring(root);
   }

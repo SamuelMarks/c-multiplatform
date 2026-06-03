@@ -88,7 +88,6 @@ TEST test_f2_platform_windowing(void) {
 
   cmp_event_system_init();
   cmp_window_system_init();
-
   config.title = "F2 Platform Integration";
   config.width = 1920;
   config.height = 1080;
@@ -102,7 +101,6 @@ TEST test_f2_platform_windowing(void) {
   if (res == CMP_SUCCESS) {
     /* Verify creation triggers layout correctly */
     cmp_window_poll_events(win);
-
     cmp_window_destroy(win);
   }
 

@@ -17,7 +17,6 @@ TEST test_ui_progress_bar_lifecycle(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ui_progress_bar_get_node(NULL, &node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ui_progress_bar_set_progress(NULL, 0.5f));
-
   /* Successful creation */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_ui_progress_bar_create(&bar, 0xFF000000, 0xFFFFFFFF));

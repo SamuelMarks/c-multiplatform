@@ -19,7 +19,6 @@ TEST test_secure_network_set_proxy(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_secure_network_create(&net));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_secure_network_set_proxy(net, "http://localhost:8080"));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_secure_network_destroy(net));
   PASS();
 }
@@ -71,14 +70,12 @@ TEST test_secure_network_null_args(void) {
             cmp_secure_network_send_https(net, NULL, &status));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_secure_network_send_https(net, "url", NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_secure_network_retrieve_credential(NULL, secret, 256));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_secure_network_retrieve_credential("key", NULL, 256));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_secure_network_retrieve_credential("key", secret, 0));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_secure_network_destroy(net));
   PASS();
 }

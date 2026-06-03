@@ -24,7 +24,6 @@ TEST test_sse_parser_lifecycle(void) {
   /* Null arguments */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_sse_parser_create(NULL, test_sse_cb, &calls));
-
   /* Successful creation */
   ASSERT_EQ(CMP_SUCCESS, cmp_sse_parser_create(&parser, test_sse_cb, &calls));
   ASSERT_NEQ(NULL, parser);
@@ -51,7 +50,6 @@ TEST test_sse_parser_feed(void) {
             cmp_sse_parser_feed(NULL, chunk1, (unsigned int)strlen(chunk1)));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_sse_parser_feed(parser, NULL, (unsigned int)strlen(chunk1)));
-
   /* Feed partial */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_sse_parser_feed(parser, chunk1, (unsigned int)strlen(chunk1)));

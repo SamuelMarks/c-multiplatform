@@ -24,7 +24,6 @@ TEST test_layout_tree_building(void) {
   cmp_layout_node_create(&root);
   cmp_layout_node_create(&child1);
   cmp_layout_node_create(&child2);
-
   res = cmp_layout_node_add_child(root, child1);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
@@ -57,7 +56,6 @@ TEST test_layout_column_calculation(void) {
 
   cmp_layout_node_add_child(root, child1);
   cmp_layout_node_add_child(root, child2);
-
   res = cmp_layout_calculate(root, 100.0f, 100.0f);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
@@ -96,7 +94,6 @@ TEST test_layout_row_calculation(void) {
 
   cmp_layout_node_add_child(root, child1);
   cmp_layout_node_add_child(root, child2);
-
   res = cmp_layout_calculate(root, 200.0f, 100.0f);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
@@ -154,7 +151,6 @@ TEST test_layout_advanced_features(void) {
   cmp_layout_node_add_child(root, absolute_child);
   cmp_layout_node_add_child(root, aspect_child);
   cmp_layout_node_add_child(root, scroll_child);
-
   res = cmp_layout_calculate(root, 200.0f, 200.0f);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
@@ -178,7 +174,6 @@ TEST test_layout_rtl_calculation(void) {
   int res;
 
   cmp_i18n_set_bidi_direction(CMP_TEXT_DIR_RTL);
-
   cmp_layout_node_create(&root);
   root->direction = CMP_FLEX_ROW;
   root->width = 100.0f;
@@ -196,7 +191,6 @@ TEST test_layout_rtl_calculation(void) {
 
   cmp_layout_node_add_child(root, child1);
   cmp_layout_node_add_child(root, child2);
-
   res = cmp_layout_calculate(root, 100.0f, 100.0f);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
@@ -222,7 +216,6 @@ TEST test_layout_rtl_calculation(void) {
                 "%f"); /* child2 X = 50 - 40 = 10. */
 
   cmp_i18n_set_bidi_direction(CMP_TEXT_DIR_LTR);
-
   cmp_layout_node_destroy(root);
   PASS();
 }
@@ -253,17 +246,13 @@ TEST test_layout_debug_print(void) {
   btn->layout->margin[3] = 50;
 
   cmp_ui_node_add_event_listener(btn, 1, 0, my_click_cb, NULL);
-
   cmp_ui_box_create(&label);
   label->layout->width = 50;
   label->layout->height = 50;
   cmp_ui_node_add_child(btn, label);
-
   cmp_ui_node_add_child(root, btn);
   cmp_layout_calculate(root->layout, 400, 300);
-
   cmp_hit_test_create(root, &ht);
-
   res = cmp_hit_test_query(ht, 60.0f, 60.0f, &target);
   printf("Hit query result: %d. Target: %p (label=%p, btn=%p)\n", res,
          (void *)target, (void *)label, (void *)btn);
@@ -278,7 +267,6 @@ TEST test_layout_debug_print(void) {
   printf("Dispatch done.\n");
 
   cmp_hit_test_destroy(ht);
-
   PASS();
 }
 

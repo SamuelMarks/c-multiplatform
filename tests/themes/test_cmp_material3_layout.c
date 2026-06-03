@@ -11,7 +11,6 @@ TEST test_m3_window_size_class_resolve(void) {
             cmp_m3_window_size_class_resolve(-1.0f, &size_class));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_window_size_class_resolve(500.0f, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_window_size_class_resolve(0.0f, &size_class));
   ASSERT_EQ(CMP_M3_WINDOW_CLASS_COMPACT, size_class);
 
@@ -47,7 +46,6 @@ TEST test_m3_window_layout_config_get(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_window_layout_config_get(CMP_M3_WINDOW_CLASS_COMPACT, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_window_layout_config_get(
                              CMP_M3_WINDOW_CLASS_COMPACT, &config));
   ASSERT_EQ(4, config.columns);
@@ -85,7 +83,6 @@ TEST test_m3_layout_pattern_resolve(void) {
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
       cmp_m3_layout_pattern_resolve(CMP_M3_WINDOW_CLASS_COMPACT, 0, 0, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_layout_pattern_resolve(
                              CMP_M3_WINDOW_CLASS_COMPACT, 1, 0, &pattern));
   ASSERT_EQ(CMP_M3_PATTERN_FEED, pattern);
@@ -118,7 +115,6 @@ TEST test_m3_foldable_posture_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_foldable_posture_resolve(0, 0.0f, 0, NULL));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_foldable_posture_resolve(0, 90.0f, 0, &posture));
   ASSERT_EQ(CMP_M3_POSTURE_FLAT, posture);

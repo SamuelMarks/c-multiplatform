@@ -26,7 +26,6 @@ TEST test_prefers_reduced_motion_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
   cmp_prefers_reduced_motion_create(&rm);
-
   res = cmp_prefers_reduced_motion_set(NULL, 1);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -46,7 +45,6 @@ TEST test_prefers_reduced_motion_operations(void) {
   float duration;
 
   cmp_prefers_reduced_motion_create(&rm);
-
   /* By default it should be full motion */
   duration = 100.0f;
   res = cmp_prefers_reduced_motion_apply(rm, &duration);

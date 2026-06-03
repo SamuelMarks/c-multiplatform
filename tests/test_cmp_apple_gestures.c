@@ -34,7 +34,6 @@ TEST test_apple_gestures_enable(void) {
             cmp_apple_gestures_enable(NULL, NULL, 1, 1, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_apple_gestures_enable(gestures, NULL, 1, 1, 1));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_apple_gestures_destroy(gestures));
   PASS();
 }

@@ -71,40 +71,44 @@ static char g_pass_display[256] = "";
 static void add_i18n_text(cmp_ui_node_t *parent, const char *key,
                           cmp_ui_node_t **out_node) {
   cmp_string_t localized = {0};
-  if (cmp_i18n_translate(key, &localized) == CMP_SUCCESS && localized.data) {
-    cmp_ui_text_create(out_node, localized.data, -1);
-    cmp_string_destroy(&localized);
+  int rc = cmp_i18n_translate(key, &localized);
+  if (rc == CMP_SUCCESS && localized.data) {
+    (void)cmp_ui_text_create(out_node, localized.data, -1);
+    (void)cmp_string_destroy(&localized);
   } else {
-    cmp_ui_text_create(out_node, key, -1);
+    (void)cmp_ui_text_create(out_node, key, -1);
   }
   if (parent && out_node && *out_node) {
-    cmp_ui_node_add_child(parent, *out_node);
+    (void)cmp_ui_node_add_child(parent, *out_node);
   }
 }
 
 static void set_i18n_button(cmp_ui_node_t **btn, const char *key) {
   cmp_string_t localized = {0};
   const char *text = key;
-  if (cmp_i18n_translate(key, &localized) == CMP_SUCCESS && localized.data) {
+  int rc = cmp_i18n_translate(key, &localized);
+  if (rc == CMP_SUCCESS && localized.data) {
     text = localized.data;
   }
   if (g_current_theme == 2) {
-    cmp_f2_button_create(btn, text, NULL);
+    (void)cmp_f2_button_create(btn, text, NULL);
     if (*btn) {
-      cmp_f2_button_set_variant(*btn, CMP_F2_BUTTON_VARIANT_PRIMARY);
+      (void)cmp_f2_button_set_variant(*btn, CMP_F2_BUTTON_VARIANT_PRIMARY);
       {
         cmp_ui_node_t *t = NULL;
-        if (cmp_ui_text_create(&t, text, -1) == CMP_SUCCESS) {
+        rc = cmp_ui_text_create(&t, text, -1);
+        if (rc == CMP_SUCCESS) {
           t->text_color = 0xFFFFFFFF;
-          cmp_ui_node_add_child(*btn, t);
+          (void)cmp_ui_node_add_child(*btn, t);
         }
       }
     }
   } else {
-    cmp_ui_button_create(btn, text, -1);
+    (void)cmp_ui_button_create(btn, text, -1);
     if (*btn && g_current_theme == 1) {
       cmp_m3_button_metrics_t m3b;
-      if (cmp_m3_button_resolve(CMP_M3_BUTTON_FILLED, 0, &m3b) == CMP_SUCCESS) {
+      rc = cmp_m3_button_resolve(CMP_M3_BUTTON_FILLED, 0, &m3b);
+      if (rc == CMP_SUCCESS) {
         (*btn)->layout->padding[3] = m3b.padding_left;
         (*btn)->layout->padding[1] = m3b.padding_right;
         (*btn)->layout->height = m3b.height;
@@ -114,7 +118,7 @@ static void set_i18n_button(cmp_ui_node_t **btn, const char *key) {
     }
   }
   if (localized.data)
-    cmp_string_destroy(&localized);
+    (void)cmp_string_destroy(&localized);
 }
 
 static int build_ui(void) {
@@ -139,7 +143,7 @@ static int build_ui(void) {
   int pass_active = is_pass_focused || has_pass_text;
 
   if (g_ui_tree != NULL) {
-    cmp_ui_node_destroy(g_ui_tree);
+    (void)cmp_ui_node_destroy(g_ui_tree);
     g_ui_tree = NULL;
   }
 
@@ -199,7 +203,8 @@ static int build_ui(void) {
   g_ui_tree->layout->padding[3] = 16.0f;
 
   /* Top Bar */
-  if (cmp_ui_box_create(&top_bar) == CMP_SUCCESS) {
+  rc = cmp_ui_box_create(&top_bar);
+  if (rc == CMP_SUCCESS) {
     cmp_ui_node_t *spacer = NULL;
 
     top_bar->layout->direction = CMP_FLEX_ROW;
@@ -216,13 +221,14 @@ static int build_ui(void) {
         logout_btn->layout->height = btn_h;
         logout_btn->bg_color = g_is_dark ? 0xFF880000 : 0xFFCC0000;
         logout_btn->text_color = 0xFFFFFFFF;
-        cmp_ui_node_add_child(top_bar, logout_btn);
+        (void)cmp_ui_node_add_child(top_bar, logout_btn);
       }
     }
 
-    if (cmp_ui_box_create(&spacer) == CMP_SUCCESS) {
+    rc = cmp_ui_box_create(&spacer);
+    if (rc == CMP_SUCCESS) {
       spacer->layout->flex_grow = 1.0f;
-      cmp_ui_node_add_child(top_bar, spacer);
+      (void)cmp_ui_node_add_child(top_bar, spacer);
     }
 
     switch (g_current_theme) {
@@ -248,7 +254,7 @@ static int build_ui(void) {
       theme_btn->layout->margin[1] = 8.0f;
       theme_btn->bg_color = input_bg;
       theme_btn->text_color = input_text;
-      cmp_ui_node_add_child(top_bar, theme_btn);
+      (void)cmp_ui_node_add_child(top_bar, theme_btn);
     }
 
     if (cmp_ui_button_create(&dark_btn, g_is_dark ? "Light Mode" : "Dark Mode",
@@ -258,14 +264,15 @@ static int build_ui(void) {
       dark_btn->layout->height = btn_h;
       dark_btn->bg_color = input_bg;
       dark_btn->text_color = input_text;
-      cmp_ui_node_add_child(top_bar, dark_btn);
+      (void)cmp_ui_node_add_child(top_bar, dark_btn);
     }
 
-    cmp_ui_node_add_child(g_ui_tree, top_bar);
+    (void)cmp_ui_node_add_child(g_ui_tree, top_bar);
   }
 
   /* Content */
-  if (cmp_ui_box_create(&content_box) == CMP_SUCCESS) {
+  rc = cmp_ui_box_create(&content_box);
+  if (rc == CMP_SUCCESS) {
     content_box->layout->width = g_window_width - 32.0f;
     content_box->layout->direction = CMP_FLEX_COLUMN;
     content_box->layout->align_items = 1;     /* CMP_FLEX_ALIGN_CENTER */
@@ -285,24 +292,24 @@ static int build_ui(void) {
       cmp_ui_node_t *pass_border = NULL;
       cmp_ui_node_t *login_btn = NULL;
 
-      if (cmp_ui_text_create(&title, "Login to OAuth2 Simple", -1) ==
-          CMP_SUCCESS) {
+      rc = cmp_ui_text_create(&title, "Login to OAuth2 Simple", -1);
+      if (rc == CMP_SUCCESS) {
         title->layout->width = g_window_width - 64.0f;
         title->layout->height = 36.0f;
         title->layout->margin[2] = 24.0f;
         title->layout->align_self = 1; /* CMP_FLEX_ALIGN_CENTER */
         title->text_color = text_main;
-        cmp_ui_node_add_child(content_box, title);
+        (void)cmp_ui_node_add_child(content_box, title);
       }
 
       /* Username Field */
 
       if (g_current_theme == 2) {
-        cmp_f2_text_input_create(&user_container);
+        (void)cmp_f2_text_input_create(&user_container);
         cmp_f2_text_input_set_variant(user_container,
                                       CMP_F2_TEXT_INPUT_VARIANT_OUTLINE);
       } else {
-        cmp_ui_text_input_create(&user_container);
+        (void)cmp_ui_text_input_create(&user_container);
       }
       if (user_container) {
 
@@ -322,26 +329,25 @@ static int build_ui(void) {
           user_lbl->layout->height = 24.0f;
           user_lbl->layout->padding[3] = input_pad;
           user_lbl->layout->padding[0] = 6.0f;
-          cmp_ui_node_add_child(user_container, user_lbl);
-
-          cmp_ui_text_create(&user_val, g_user_text, -1);
+          (void)cmp_ui_node_add_child(user_container, user_lbl);
+          (void)cmp_ui_text_create(&user_val, g_user_text, -1);
           user_val->font_size = 16.0f;
           user_val->text_color = input_text;
           user_val->bg_color = 0;
           user_val->layout->height = 30.0f;
           user_val->layout->padding[3] = input_pad;
 
-          cmp_ui_node_add_child(user_container, user_val);
+          (void)cmp_ui_node_add_child(user_container, user_val);
           if (g_caret && is_user_focused) {
             int is_visible = 0;
-            cmp_caret_update_blink(g_caret, 16.0, &is_visible);
+            (void)cmp_caret_update_blink(g_caret, 16.0, &is_visible);
             if (is_visible) {
               cmp_ui_node_t *caret_node = NULL;
-              cmp_ui_box_create(&caret_node);
+              (void)cmp_ui_box_create(&caret_node);
               caret_node->layout->width = 2.0f;
               caret_node->layout->height = 20.0f;
               caret_node->bg_color = btn_bg;
-              cmp_ui_node_add_child(user_container, caret_node);
+              (void)cmp_ui_node_add_child(user_container, caret_node);
             }
           }
 
@@ -350,26 +356,26 @@ static int build_ui(void) {
           user_lbl->text_color = lbl_color;
           user_lbl->layout->height = input_h - 2.0f;
           user_lbl->layout->padding[3] = input_pad;
-          cmp_ui_node_add_child(user_container, user_lbl);
+          (void)cmp_ui_node_add_child(user_container, user_lbl);
         }
 
         if (g_current_theme == 1 || g_current_theme == 2) {
-          cmp_ui_box_create(&user_border);
+          (void)cmp_ui_box_create(&user_border);
           user_border->layout->width = g_window_width - 64.0f;
           user_border->layout->height = is_user_focused ? 2.0f : 1.0f;
           user_border->bg_color = is_user_focused ? btn_bg : lbl_color;
-          cmp_ui_node_add_child(user_container, user_border);
+          (void)cmp_ui_node_add_child(user_container, user_border);
         }
-        cmp_ui_node_add_child(content_box, user_container);
+        (void)cmp_ui_node_add_child(content_box, user_container);
       }
 
       /* Password Field */
 
       if (g_current_theme == 2) {
-        cmp_f2_text_input_create(&pass_container);
-        cmp_f2_text_input_set_password_mode(pass_container, 1);
+        (void)cmp_f2_text_input_create(&pass_container);
+        (void)cmp_f2_text_input_set_password_mode(pass_container, 1);
       } else {
-        cmp_ui_text_input_create(&pass_container);
+        (void)cmp_ui_text_input_create(&pass_container);
       }
       if (pass_container) {
 
@@ -395,26 +401,25 @@ static int build_ui(void) {
           pass_lbl->layout->height = 24.0f;
           pass_lbl->layout->padding[3] = input_pad;
           pass_lbl->layout->padding[0] = 6.0f;
-          cmp_ui_node_add_child(pass_container, pass_lbl);
-
-          cmp_ui_text_create(&pass_val, g_pass_display, -1);
+          (void)cmp_ui_node_add_child(pass_container, pass_lbl);
+          (void)cmp_ui_text_create(&pass_val, g_pass_display, -1);
           pass_val->font_size = 16.0f;
           pass_val->text_color = input_text;
           pass_val->bg_color = 0;
           pass_val->layout->height = 30.0f;
           pass_val->layout->padding[3] = input_pad;
 
-          cmp_ui_node_add_child(pass_container, pass_val);
+          (void)cmp_ui_node_add_child(pass_container, pass_val);
           if (g_caret && is_pass_focused) {
             int is_visible = 0;
-            cmp_caret_update_blink(g_caret, 16.0, &is_visible);
+            (void)cmp_caret_update_blink(g_caret, 16.0, &is_visible);
             if (is_visible) {
               cmp_ui_node_t *caret_node = NULL;
-              cmp_ui_box_create(&caret_node);
+              (void)cmp_ui_box_create(&caret_node);
               caret_node->layout->width = 2.0f;
               caret_node->layout->height = 20.0f;
               caret_node->bg_color = btn_bg;
-              cmp_ui_node_add_child(pass_container, caret_node);
+              (void)cmp_ui_node_add_child(pass_container, caret_node);
             }
           }
 
@@ -423,17 +428,17 @@ static int build_ui(void) {
           pass_lbl->text_color = lbl_color;
           pass_lbl->layout->height = input_h - 2.0f;
           pass_lbl->layout->padding[3] = input_pad;
-          cmp_ui_node_add_child(pass_container, pass_lbl);
+          (void)cmp_ui_node_add_child(pass_container, pass_lbl);
         }
 
         if (g_current_theme == 1 || g_current_theme == 2) {
-          cmp_ui_box_create(&pass_border);
+          (void)cmp_ui_box_create(&pass_border);
           pass_border->layout->width = g_window_width - 64.0f;
           pass_border->layout->height = is_pass_focused ? 2.0f : 1.0f;
           pass_border->bg_color = is_pass_focused ? btn_bg : lbl_color;
-          cmp_ui_node_add_child(pass_container, pass_border);
+          (void)cmp_ui_node_add_child(pass_container, pass_border);
         }
-        cmp_ui_node_add_child(content_box, pass_container);
+        (void)cmp_ui_node_add_child(content_box, pass_container);
       }
 
       set_i18n_button(&login_btn, "Login");
@@ -446,7 +451,7 @@ static int build_ui(void) {
         login_btn->bg_color =
             (btn_bg & 0x00FFFFFF) | ((uint32_t)(255.0f * g_btn_opacity) << 24);
         login_btn->text_color = btn_text;
-        cmp_ui_node_add_child(content_box, login_btn);
+        (void)cmp_ui_node_add_child(content_box, login_btn);
       }
 
     } else {
@@ -454,13 +459,14 @@ static int build_ui(void) {
       cmp_ui_node_t *title = NULL;
       cmp_ui_node_t *secret_txt = NULL;
 
-      if (cmp_ui_text_create(&title, "Secrets Page", -1) == CMP_SUCCESS) {
+      rc = cmp_ui_text_create(&title, "Secrets Page", -1);
+      if (rc == CMP_SUCCESS) {
         title->layout->width = g_window_width - 64.0f;
         title->layout->height = 36.0f;
         title->layout->margin[2] = 24.0f;
         title->layout->align_self = 1; /* CMP_FLEX_ALIGN_CENTER */
         title->text_color = text_main;
-        cmp_ui_node_add_child(content_box, title);
+        (void)cmp_ui_node_add_child(content_box, title);
       }
 
       if (cmp_ui_text_create(&secret_txt,
@@ -470,11 +476,11 @@ static int build_ui(void) {
         secret_txt->layout->height = 36.0f;
         secret_txt->layout->align_self = 1; /* CMP_FLEX_ALIGN_CENTER */
         secret_txt->text_color = g_is_dark ? 0xFF00FF00 : 0xFF008000;
-        cmp_ui_node_add_child(content_box, secret_txt);
+        (void)cmp_ui_node_add_child(content_box, secret_txt);
       }
     }
 
-    cmp_ui_node_add_child(g_ui_tree, content_box);
+    (void)cmp_ui_node_add_child(g_ui_tree, content_box);
   }
 
   if (rc != 0) {
@@ -487,16 +493,18 @@ int app_init(void) {
   cmp_window_config_t config;
   cmp_dpi_t *dpi = NULL;
 
-  cmp_event_system_init();
-  cmp_vfs_init();
-  cmp_window_system_init();
-
-  if (cmp_dpi_awareness_init() == CMP_SUCCESS) {
-    if (cmp_dpi_create(&dpi) == CMP_SUCCESS) {
-      if (cmp_dpi_get_monitor_scale(dpi, 0, &g_dpi_scale) != CMP_SUCCESS) {
+  (void)cmp_event_system_init();
+  (void)cmp_vfs_init();
+  (void)cmp_window_system_init();
+  rc = cmp_dpi_awareness_init();
+  if (rc == CMP_SUCCESS) {
+    rc = cmp_dpi_create(&dpi);
+    if (rc == CMP_SUCCESS) {
+      rc = cmp_dpi_get_monitor_scale(dpi, 0, &g_dpi_scale);
+      if (rc != CMP_SUCCESS) {
         g_dpi_scale = 1.0f;
       }
-      cmp_dpi_destroy(dpi);
+      (void)cmp_dpi_destroy(dpi);
     }
   }
 
@@ -507,7 +515,8 @@ int app_init(void) {
   g_window_height = (float)GetSystemMetrics(SM_CYSCREEN) / (3.0f * g_dpi_scale);
 #endif
 
-  if (cmp_theme_create(&g_theme) == CMP_SUCCESS) {
+  rc = cmp_theme_create(&g_theme);
+  if (rc == CMP_SUCCESS) {
     g_theme->language = g_current_theme;
     g_theme->is_dark_mode = g_is_dark;
   }
@@ -521,12 +530,13 @@ int app_init(void) {
   config.frameless = 0;
   config.use_legacy_backend = 0;
 
-  if (cmp_window_create(&config, &g_window) != CMP_SUCCESS) {
+  rc = cmp_window_create(&config, &g_window);
+  if (rc != CMP_SUCCESS) {
     return CMP_ERROR_NOT_FOUND;
   }
 
   if (g_theme) {
-    cmp_window_set_theme(g_window, g_theme);
+    (void)cmp_window_set_theme(g_window, g_theme);
   }
 
   if (build_ui() != CMP_SUCCESS) {
@@ -534,11 +544,11 @@ int app_init(void) {
   }
 
   if (g_ui_tree) {
-    cmp_layout_calculate(g_ui_tree->layout, g_window_width, g_window_height);
+    (void)cmp_layout_calculate(g_ui_tree->layout, g_window_width,
+                               g_window_height);
   }
-  cmp_window_set_ui_tree(g_window, g_ui_tree);
-  cmp_window_show(g_window);
-
+  (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
+  (void)cmp_window_show(g_window);
   if (rc != 0) {
     return rc;
   }
@@ -551,8 +561,7 @@ int app_run(void) {
   int running = 1;
 
   while (running) {
-    cmp_window_poll_events(g_window);
-
+    (void)cmp_window_poll_events(g_window);
     while (cmp_event_pop(&evt) == CMP_SUCCESS) {
       if (evt.type == 4) { /* CMP_EVENT_TYPE_RESIZE */
         g_window_width = (float)evt.x;
@@ -561,7 +570,7 @@ int app_run(void) {
         if (g_ui_tree) {
           cmp_layout_calculate(g_ui_tree->layout, g_window_width,
                                g_window_height);
-          cmp_window_set_ui_tree(g_window, g_ui_tree);
+          (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
         }
         continue;
       }
@@ -570,7 +579,8 @@ int app_run(void) {
         int hn = -1;
         cmp_hit_test_t *ht = NULL;
         cmp_ui_node_t *hnode = NULL;
-        if (cmp_hit_test_create(g_ui_tree, &ht) == CMP_SUCCESS) {
+        rc = cmp_hit_test_create(g_ui_tree, &ht);
+        if (rc == CMP_SUCCESS) {
           if (cmp_hit_test_query(ht, (float)evt.x, (float)evt.y, &hnode) ==
                   CMP_SUCCESS &&
               hnode) {
@@ -583,7 +593,7 @@ int app_run(void) {
               curr = curr->parent;
             }
           }
-          cmp_hit_test_destroy(ht);
+          (void)cmp_hit_test_destroy(ht);
         }
 
         if (hn == ID_LOGIN_BTN) {
@@ -596,7 +606,7 @@ int app_run(void) {
               g_is_hovering_btn = 1;
               s.opacity = g_btn_opacity;
               e.opacity = 0.8f;
-              cmp_compositor_anim_set_range(g_btn_opacity_anim, &s, &e);
+              (void)cmp_compositor_anim_set_range(g_btn_opacity_anim, &s, &e);
             }
           }
         } else {
@@ -606,10 +616,11 @@ int app_run(void) {
             g_is_hovering_btn = 0;
             s.opacity = g_btn_opacity;
             e.opacity = 1.0f;
-            cmp_compositor_anim_set_range(g_btn_opacity_anim, &s, &e);
+            (void)cmp_compositor_anim_set_range(g_btn_opacity_anim, &s, &e);
           }
           evt.action = CMP_ACTION_CANCEL;
-          cmp_hover_intent_process(g_hover_intent, &evt, 0.0f, &confirmed);
+          (void)cmp_hover_intent_process(g_hover_intent, &evt, 0.0f,
+                                         &confirmed);
         }
       }
 
@@ -617,7 +628,8 @@ int app_run(void) {
         int hit_node = -1;
         cmp_hit_test_t *ht = NULL;
         cmp_ui_node_t *hn = NULL;
-        if (cmp_hit_test_create(g_ui_tree, &ht) == CMP_SUCCESS) {
+        rc = cmp_hit_test_create(g_ui_tree, &ht);
+        if (rc == CMP_SUCCESS) {
           if (cmp_hit_test_query(ht, (float)evt.x, (float)evt.y, &hn) ==
                   CMP_SUCCESS &&
               hn) {
@@ -629,7 +641,7 @@ int app_run(void) {
               hn = hn->parent;
             }
           }
-          cmp_hit_test_destroy(ht);
+          (void)cmp_hit_test_destroy(ht);
         }
 
         if (hit_node == ID_USER_IN || hit_node == ID_PASS_IN) {
@@ -639,7 +651,7 @@ int app_run(void) {
             cmp_layout_calculate(g_ui_tree->layout, g_window_width,
                                  g_window_height);
           }
-          cmp_window_set_ui_tree(g_window, g_ui_tree);
+          (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
         } else if (hit_node != ID_THEME_BTN && hit_node != ID_DARK_BTN &&
                    hit_node != ID_LOGIN_BTN && hit_node != ID_LOGOUT_BTN) {
           g_focused_input = 0;
@@ -648,7 +660,7 @@ int app_run(void) {
             cmp_layout_calculate(g_ui_tree->layout, g_window_width,
                                  g_window_height);
           }
-          cmp_window_set_ui_tree(g_window, g_ui_tree);
+          (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
         }
 
         if (hit_node == ID_THEME_BTN) {
@@ -657,26 +669,26 @@ int app_run(void) {
             g_current_theme = 1;
           if (g_theme) {
             g_theme->language = g_current_theme;
-            cmp_window_set_theme(g_window, g_theme);
+            (void)cmp_window_set_theme(g_window, g_theme);
           }
           build_ui();
           if (g_ui_tree) {
             cmp_layout_calculate(g_ui_tree->layout, g_window_width,
                                  g_window_height);
           }
-          cmp_window_set_ui_tree(g_window, g_ui_tree);
+          (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
         } else if (hit_node == ID_DARK_BTN) {
           g_is_dark = !g_is_dark;
           if (g_theme) {
             g_theme->is_dark_mode = g_is_dark;
-            cmp_window_set_theme(g_window, g_theme);
+            (void)cmp_window_set_theme(g_window, g_theme);
           }
           build_ui();
           if (g_ui_tree) {
             cmp_layout_calculate(g_ui_tree->layout, g_window_width,
                                  g_window_height);
           }
-          cmp_window_set_ui_tree(g_window, g_ui_tree);
+          (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
         } else if (hit_node == ID_LOGIN_BTN) {
           g_current_route = 1;
           build_ui();
@@ -684,7 +696,7 @@ int app_run(void) {
             cmp_layout_calculate(g_ui_tree->layout, g_window_width,
                                  g_window_height);
           }
-          cmp_window_set_ui_tree(g_window, g_ui_tree);
+          (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
         } else if (hit_node == ID_LOGOUT_BTN) {
           g_current_route = 0;
           build_ui();
@@ -692,7 +704,7 @@ int app_run(void) {
             cmp_layout_calculate(g_ui_tree->layout, g_window_width,
                                  g_window_height);
           }
-          cmp_window_set_ui_tree(g_window, g_ui_tree);
+          (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
         }
       }
 
@@ -721,13 +733,14 @@ int app_run(void) {
               cmp_layout_calculate(g_ui_tree->layout, g_window_width,
                                    g_window_height);
             }
-            cmp_window_set_ui_tree(g_window, g_ui_tree);
+            (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
           }
         }
       }
     }
 
-    if (cmp_window_should_close(g_window)) {
+    rc = cmp_window_should_close(g_window);
+    if (rc) {
       running = 0;
     }
   }
@@ -741,24 +754,23 @@ int app_run(void) {
 int app_shutdown(void) {
   int rc = 0;
   if (g_ui_tree) {
-    cmp_ui_node_destroy(g_ui_tree);
+    (void)cmp_ui_node_destroy(g_ui_tree);
     g_ui_tree = NULL;
   }
 
   if (g_window) {
-    cmp_window_destroy(g_window);
+    (void)cmp_window_destroy(g_window);
     g_window = NULL;
   }
 
   if (g_theme) {
-    cmp_theme_destroy(g_theme);
+    (void)cmp_theme_destroy(g_theme);
     g_theme = NULL;
   }
 
-  cmp_window_system_shutdown();
-  cmp_vfs_shutdown();
-  cmp_event_system_shutdown();
-
+  (void)cmp_window_system_shutdown();
+  (void)cmp_vfs_shutdown();
+  (void)cmp_event_system_shutdown();
   if (rc != 0) {
     return rc;
   }

@@ -47,7 +47,6 @@ TEST test_step_ease_evaluate_end(void) {
   float val;
 
   cmp_step_ease_create(4, CMP_STEP_POSITION_END, &step);
-
   cmp_step_ease_evaluate(step, 0.0f, &val);
   ASSERT_IN_RANGE(0.0f, val, 0.001f);
 
@@ -71,7 +70,6 @@ TEST test_step_ease_evaluate_start(void) {
   cmp_step_ease_t *step = NULL;
   float val;
   cmp_step_ease_create(4, CMP_STEP_POSITION_START, &step);
-
   cmp_step_ease_evaluate(step, 0.0f, &val);
   ASSERT_IN_RANGE(0.25f, val, 0.001f);
 

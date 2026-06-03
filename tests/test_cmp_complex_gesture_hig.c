@@ -29,14 +29,12 @@ TEST test_edge_swipe_pop(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_router_get_current(router, &uri));
   ASSERT_STR_EQ("/detail", uri.data); /* Still on detail page */
   cmp_string_destroy(&uri);
-
   /* Release before threshold (cancel pop) */
   ASSERT_EQ(CMP_SUCCESS, cmp_edge_swipe_process(ctx, 120.0f, 400.0f,
                                                 CMP_GESTURE_STATE_ENDED));
   ASSERT_EQ(CMP_SUCCESS, cmp_router_get_current(router, &uri));
   ASSERT_STR_EQ("/detail", uri.data); /* Not popped */
   cmp_string_destroy(&uri);
-
   /* Full drag past threshold and release */
   ASSERT_EQ(CMP_SUCCESS, cmp_edge_swipe_process(ctx, 200.0f, 400.0f,
                                                 CMP_GESTURE_STATE_CHANGED));
@@ -46,7 +44,6 @@ TEST test_edge_swipe_pop(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_router_get_current(router, &uri));
   ASSERT_STR_EQ("/home", uri.data); /* Successfully popped back to home */
   cmp_string_destroy(&uri);
-
   ASSERT_EQ(CMP_SUCCESS, cmp_edge_swipe_destroy(ctx));
   ASSERT_EQ(CMP_SUCCESS, cmp_router_destroy(router));
   PASS();
@@ -90,11 +87,9 @@ TEST test_null_args(void) {
             cmp_edge_swipe_process(NULL, 1.0f, 1.0f, CMP_GESTURE_STATE_BEGAN));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_edge_swipe_process(es, 1.0f, -1.0f, CMP_GESTURE_STATE_BEGAN));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_gesture_require_failure(NULL, g));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_gesture_require_failure((cmp_gesture_t *)1, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_complex_gesture_set_zoom_limits(NULL, 0.5f, 2.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -112,16 +107,13 @@ TEST test_null_args(void) {
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
       cmp_complex_gesture_get_zoom((cmp_complex_gesture_t *)1, &f, &f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_complex_gesture_set_rotation_snapping(NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_complex_gesture_get_rotation(NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_complex_gesture_get_rotation((cmp_complex_gesture_t *)1, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_gesture_cancel_on_system_override(NULL, 3));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_edge_swipe_destroy(es));
   ASSERT_EQ(CMP_SUCCESS, cmp_router_destroy(rt));
   PASS();

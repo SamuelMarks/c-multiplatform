@@ -33,7 +33,7 @@ int CMP_API cmp_f2_checkbox_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_checkbox_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_checkbox_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -202,7 +202,7 @@ int CMP_API cmp_f2_radio_create(cmp_ui_node_t **out_node, const char *label) {
   res = CMP_MALLOC(sizeof(cmp_f2_radio_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_radio_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -370,7 +370,7 @@ int CMP_API cmp_f2_toggle_create(cmp_ui_node_t **out_node, const char *label) {
   res = CMP_MALLOC(sizeof(cmp_f2_toggle_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_toggle_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -475,7 +475,7 @@ int CMP_API cmp_f2_slider_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_slider_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_slider_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -651,7 +651,7 @@ int CMP_API cmp_f2_spin_button_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_spin_button_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_spin_button_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }

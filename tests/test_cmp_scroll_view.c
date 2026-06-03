@@ -93,7 +93,6 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_scroll_view_create(NULL));
   cmp_scroll_view_create(&sv);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_scroll_view_set_deceleration_rate(
                                        NULL, CMP_SCROLL_DECELERATION_FAST));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_scroll_view_set_paging_enabled(NULL, 1));
@@ -104,17 +103,14 @@ TEST test_null_args(void) {
             cmp_scroll_view_evaluate_scrollbar(NULL, 1, 0.0f, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_scroll_view_evaluate_scrollbar(sv, 1, 0.0f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_scroll_view_hit_test_scrollbar(NULL, 10.0f, 10.0f, 100.0f, &i));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_scroll_view_hit_test_scrollbar(sv, 10.0f, 10.0f, 100.0f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_scroll_view_calculate_rubber_band(NULL, 100.0f, 1000.0f, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_scroll_view_calculate_rubber_band(sv, 100.0f, 1000.0f, NULL));
-
   cmp_scroll_view_destroy(sv);
   PASS();
 }

@@ -45,7 +45,6 @@ TEST test_ipados_multiwindow_and_camera(void) {
   /* Multi-window */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_ipados_request_scene_activation(ctx, "com.app.doc.123"));
-
   /* Center Stage */
   ASSERT_EQ(CMP_SUCCESS, cmp_ipados_set_center_stage_enabled(ctx, 1));
 
@@ -60,7 +59,6 @@ TEST test_ipados_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ipados_features_create(NULL));
   ASSERT_EQ(CMP_SUCCESS, cmp_ipados_features_destroy(NULL));
   cmp_ipados_features_create(&feat);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ipados_resolve_size_classes(-1.0f, 100.0f, &c, &c));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -69,18 +67,14 @@ TEST test_ipados_null_args(void) {
             cmp_ipados_resolve_size_classes(100.0f, 100.0f, NULL, &c));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ipados_resolve_size_classes(100.0f, 100.0f, &c, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ipados_resolve_sidebar_state(CMP_SIZE_CLASS_COMPACT, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ipados_request_scene_activation(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ipados_request_scene_activation(feat, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ipados_set_center_stage_enabled(NULL, 1));
-
   cmp_ipados_features_destroy(feat);
   PASS();
 }

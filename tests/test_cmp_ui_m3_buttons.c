@@ -98,7 +98,6 @@ TEST test_segmented_button(void) {
   ASSERT_EQ_FMT(
       CMP_SUCCESS,
       cmp_ui_segmented_button_add_segment(btn, "Seg 2", "icon", &idx2), "%d");
-
   ASSERT_EQ(0, idx1);
   ASSERT_EQ(1, idx2);
 

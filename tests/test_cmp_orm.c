@@ -23,9 +23,7 @@ TEST test_orm_db_connection(void) {
 
   cmp_vfs_init();
   cmp_orm_init();
-
   cmp_vfs_mount("virt:/test_db", ".");
-
   res = cmp_orm_connect("virt:/test_db/test.sqlite", &db);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(db != NULL);
@@ -55,7 +53,6 @@ TEST test_orm_default_path(void) {
 
   cmp_vfs_init();
   cmp_orm_init();
-
   /* A plain filename should resolve to executable directory */
   res = cmp_orm_connect("auto_default.sqlite", &db);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -71,12 +68,10 @@ TEST test_orm_default_path(void) {
   cmp_string_init(&expected_path);
   cmp_string_append(&expected_path, exe_dir.data);
   cmp_string_append(&expected_path, "/auto_default.sqlite");
-
   remove(expected_path.data);
 
   cmp_string_destroy(&expected_path);
   cmp_string_destroy(&exe_dir);
-
   cmp_orm_shutdown();
   cmp_vfs_shutdown();
   PASS();
@@ -90,10 +85,8 @@ TEST test_orm_features(void) {
 
   cmp_vfs_init();
   cmp_orm_init();
-
   cmp_vfs_mount("virt:/test_db", ".");
   cmp_vfs_mount("virt:/migrations", ".");
-
   res = cmp_orm_connect("virt:/test_db/test_features.sqlite", &db);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
@@ -149,7 +142,6 @@ TEST test_orm_null_args(void) {
 
   cmp_vfs_init();
   cmp_orm_init();
-
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_orm_connect(NULL, &db), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_orm_connect("virt:/test", NULL),
                 "%d");

@@ -51,7 +51,6 @@ TEST test_event_dispatch_edge_cases(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_event_dispatch_run(tree, NULL, &evt));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_event_dispatch_run(tree, &target_node, NULL));
-
   PASS();
 }
 
@@ -73,7 +72,6 @@ TEST test_add_event_listener_edge_cases(void) {
                                        NULL, 1, 0, mock_event_callback, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ui_node_add_event_listener(&node, 1, 0, NULL, NULL));
-
   PASS();
 }
 
@@ -97,12 +95,10 @@ TEST test_event_dispatch_phases(void) {
   cmp_ui_node_add_event_listener(&root, 1, 1, ordered_mock_callback, &tracker);
   /* Root bubbling */
   cmp_ui_node_add_event_listener(&root, 1, 0, ordered_mock_callback, &tracker);
-
   /* Child capturing */
   cmp_ui_node_add_event_listener(&child, 1, 1, ordered_mock_callback, &tracker);
   /* Child bubbling */
   cmp_ui_node_add_event_listener(&child, 1, 0, ordered_mock_callback, &tracker);
-
   /* Target */
   cmp_ui_node_add_event_listener(&target, 1, 0, ordered_mock_callback,
                                  &tracker);

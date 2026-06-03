@@ -9,7 +9,6 @@ TEST test_m3_badge_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_badge_resolve(CMP_M3_BADGE_SMALL, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_badge_resolve(CMP_M3_BADGE_SMALL, &m));
   ASSERT_EQ(6.0f, m.width);
   ASSERT_EQ(6.0f, m.height);
@@ -32,7 +31,6 @@ TEST test_m3_progress_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_progress_resolve(CMP_M3_PROGRESS_LINEAR, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_progress_resolve(CMP_M3_PROGRESS_LINEAR, &m));
   ASSERT_EQ(4.0f, m.track_thickness);
   ASSERT_EQ(0.0f, m.default_size);

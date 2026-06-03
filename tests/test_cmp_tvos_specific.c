@@ -34,15 +34,12 @@ TEST test_tvos_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_tvos_features_create(NULL));
   cmp_tvos_features_create(&feat);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_tvos_handle_focus_engine_update(NULL, &node, NULL, NULL, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_tvos_handle_focus_engine_update(feat, NULL, NULL, NULL, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_tvos_set_overscan_margins(NULL, NULL, NULL, NULL, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_tvos_export_top_shelf(NULL, 1, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_tvos_export_top_shelf(feat, 1, NULL));
 

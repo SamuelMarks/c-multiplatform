@@ -10,7 +10,6 @@ TEST test_absolute_relative(void) {
   cmp_layout_node_t *node = NULL;
   cmp_rect_t parent = {10.0f, 20.0f, 100.0f, 100.0f};
   cmp_layout_node_create(&node);
-
   node->position_type = CMP_POSITION_ABSOLUTE;
   node->position[0] = 5.0f;  /* Top */
   node->position[3] = 15.0f; /* Left */
@@ -35,7 +34,6 @@ TEST test_fixed_sticky(void) {
   cmp_rect_t viewport = {0.0f, 0.0f, 1920.0f, 1080.0f};
   cmp_rect_t container = {0.0f, 0.0f, 500.0f, 500.0f};
   cmp_layout_node_create(&node);
-
   node->position_type = CMP_POSITION_FIXED;
   node->position[0] = 100.0f; /* Top */
   node->position[3] = 200.0f; /* Left */
@@ -65,7 +63,6 @@ TEST test_anchor_positioning(void) {
   cmp_rect_t anchor = {100.0f, 100.0f, 200.0f, 50.0f};
   cmp_rect_t viewport = {0.0f, 0.0f, 1920.0f, 1080.0f};
   cmp_layout_node_create(&node);
-
   /* Default drop below */
   ASSERT_EQ(CMP_SUCCESS, cmp_anchor_position(node, &anchor));
   ASSERT_EQ(100.0f, node->computed_rect.x);
@@ -102,7 +99,6 @@ TEST test_stack_context(void) {
   cmp_stack_ctx_create(&child_ctx1, node);
   node->z_index = 2;
   cmp_stack_ctx_create(&child_ctx2, node);
-
   ASSERT_EQ(CMP_SUCCESS, cmp_stack_ctx_add_child(parent_ctx, child_ctx1));
   ASSERT_EQ(CMP_SUCCESS, cmp_stack_ctx_add_child(parent_ctx, child_ctx2));
 
@@ -125,7 +121,6 @@ TEST test_3d_transform_and_backface(void) {
   cmp_layout_node_t *node = NULL;
   int is_visible;
   cmp_layout_node_create(&node);
-
   ASSERT_EQ(CMP_SUCCESS, cmp_transform_3d_evaluate(node, 1));
 
   /* Visible because rotation < 90 */
@@ -151,7 +146,6 @@ TEST test_popover_and_layers(void) {
   cmp_layout_node_t *node = NULL;
   cmp_layer_t *layer_root = NULL;
   cmp_layout_node_create(&node);
-
   ASSERT_EQ(CMP_SUCCESS, cmp_top_layer_promote(node));
   ASSERT_EQ(CMP_SUCCESS, cmp_popover_toggle(node, CMP_POPOVER_SHOWING));
 

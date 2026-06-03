@@ -57,12 +57,12 @@ int cmp_ui_text_field_create(cmp_ui_text_field_t **out_field,
   err = cmp_ui_text_create(&field->node_label, field->label ? field->label : "",
                            -1);
   if (err == CMP_SUCCESS) {
-    cmp_ui_node_add_child(field->node_root, field->node_label);
+    (void)cmp_ui_node_add_child(field->node_root, field->node_label);
   }
 
   err = cmp_ui_text_input_create(&field->node_input);
   if (err == CMP_SUCCESS) {
-    cmp_ui_node_add_child(field->node_root, field->node_input);
+    (void)cmp_ui_node_add_child(field->node_root, field->node_input);
   }
 
   *out_field = field;

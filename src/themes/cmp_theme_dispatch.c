@@ -50,13 +50,17 @@ int cmp_resolve_vtable(const cmp_ui_node_t *node,
   /* Check local widget override first */
   switch (node->design_language_override) {
   case 1:
-    return cmp_theme_get_material3_vtable(out_vtable);
+    rc = cmp_theme_get_material3_vtable(out_vtable);
+    return rc;
   case 2:
-    return cmp_theme_get_fluent2_vtable(out_vtable);
+    rc = cmp_theme_get_fluent2_vtable(out_vtable);
+    return rc;
   case 3:
-    return cmp_theme_get_cupertino_vtable(out_vtable);
+    rc = cmp_theme_get_cupertino_vtable(out_vtable);
+    return rc;
   case 4:
-    return cmp_theme_get_unstyled_vtable(out_vtable);
+    rc = cmp_theme_get_unstyled_vtable(out_vtable);
+    return rc;
   case 0: /* Inherit: traverse up the tree or check global context */
   default:
     break;
@@ -68,13 +72,17 @@ int cmp_resolve_vtable(const cmp_ui_node_t *node,
     while (current) {
       switch (current->design_language_override) {
       case 1:
-        return cmp_theme_get_material3_vtable(out_vtable);
+        rc = cmp_theme_get_material3_vtable(out_vtable);
+        return rc;
       case 2:
-        return cmp_theme_get_fluent2_vtable(out_vtable);
+        rc = cmp_theme_get_fluent2_vtable(out_vtable);
+        return rc;
       case 3:
-        return cmp_theme_get_cupertino_vtable(out_vtable);
+        rc = cmp_theme_get_cupertino_vtable(out_vtable);
+        return rc;
       case 4:
-        return cmp_theme_get_unstyled_vtable(out_vtable);
+        rc = cmp_theme_get_unstyled_vtable(out_vtable);
+        return rc;
       case 0:
       default:
         current = current->parent;
@@ -158,7 +166,8 @@ cmp_ffi_get_material3_vtable(const cmp_theme_vtable_t **out_vtable) {
     }
     return rc;
   }
-  return cmp_theme_get_material3_vtable(out_vtable);
+  rc = cmp_theme_get_material3_vtable(out_vtable);
+  return rc;
 }
 
 /**
@@ -174,7 +183,8 @@ int CMP_API cmp_ffi_get_fluent2_vtable(const cmp_theme_vtable_t **out_vtable) {
     }
     return rc;
   }
-  return cmp_theme_get_fluent2_vtable(out_vtable);
+  rc = cmp_theme_get_fluent2_vtable(out_vtable);
+  return rc;
 }
 
 /**
@@ -191,7 +201,8 @@ cmp_ffi_get_cupertino_vtable(const cmp_theme_vtable_t **out_vtable) {
     }
     return rc;
   }
-  return cmp_theme_get_cupertino_vtable(out_vtable);
+  rc = cmp_theme_get_cupertino_vtable(out_vtable);
+  return rc;
 }
 
 /**
@@ -207,6 +218,7 @@ int CMP_API cmp_ffi_get_unstyled_vtable(const cmp_theme_vtable_t **out_vtable) {
     }
     return rc;
   }
-  return cmp_theme_get_unstyled_vtable(out_vtable);
+  rc = cmp_theme_get_unstyled_vtable(out_vtable);
+  return rc;
 }
 #endif /* CMP_THEME_MODE_SINGLE_STATIC */

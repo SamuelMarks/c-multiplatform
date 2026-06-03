@@ -27,7 +27,6 @@ TEST test_ui_segmented_button_lifecycle(void) {
             cmp_ui_segmented_button_set_deselected(NULL, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ui_segmented_button_bind_a11y(NULL, tree));
-
   /* Successful creation */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_ui_segmented_button_create(&btn, 0)); /* single select */
@@ -46,7 +45,6 @@ TEST test_ui_segmented_button_lifecycle(void) {
   ASSERT_EQ(1, seg_index);
   ASSERT_EQ(CMP_SUCCESS,
             cmp_ui_segmented_button_add_segment(btn, NULL, "icon_c", NULL));
-
   /* Trigger reallocation capacity limit (defaults to 4) */
   for (i = 0; i < 5; i++) {
     ASSERT_EQ(CMP_SUCCESS, cmp_ui_segmented_button_add_segment(
@@ -58,7 +56,6 @@ TEST test_ui_segmented_button_lifecycle(void) {
             cmp_ui_segmented_button_set_selected(btn, -1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ui_segmented_button_set_selected(btn, 100));
-
   /* Set selection (valid) */
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_segmented_button_set_selected(btn, 1));
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_segmented_button_set_selected(
@@ -69,7 +66,6 @@ TEST test_ui_segmented_button_lifecycle(void) {
             cmp_ui_segmented_button_set_deselected(btn, -1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ui_segmented_button_set_deselected(btn, 100));
-
   /* Set deselection (valid) */
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_segmented_button_set_deselected(btn, 2));
 
@@ -94,7 +90,6 @@ TEST test_ui_segmented_button_multi_select(void) {
             cmp_ui_segmented_button_add_segment(btn, "A", NULL, NULL));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_ui_segmented_button_add_segment(btn, "B", NULL, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_segmented_button_set_selected(btn, 0));
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_segmented_button_set_selected(
                              btn, 1)); /* 0 should stay selected */

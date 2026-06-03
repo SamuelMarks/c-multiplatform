@@ -9,7 +9,6 @@ TEST test_m3_button_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_button_resolve(CMP_M3_BUTTON_ELEVATED, 0, NULL));
-
   /* Elevated, no icon */
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_button_resolve(CMP_M3_BUTTON_ELEVATED, 0, &m));
   ASSERT_EQ(40.0f, m.height);
@@ -65,7 +64,6 @@ TEST test_m3_fab_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_fab_resolve(CMP_M3_FAB_STANDARD, 0, NULL));
-
   /* Standard */
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_fab_resolve(CMP_M3_FAB_STANDARD, 0, &m));
   ASSERT_EQ(56.0f, m.container_width);
@@ -103,7 +101,6 @@ TEST test_m3_fab_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_fab_resolve((cmp_m3_fab_variant_t)999, 0, &m));
-
   PASS();
 }
 
@@ -112,7 +109,6 @@ TEST test_m3_icon_button_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_icon_button_resolve(CMP_M3_ICON_BUTTON_STANDARD, NULL));
-
   /* Standard */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_icon_button_resolve(CMP_M3_ICON_BUTTON_STANDARD, &m));
@@ -132,10 +128,8 @@ TEST test_m3_icon_button_resolve(void) {
             cmp_m3_icon_button_resolve(CMP_M3_ICON_BUTTON_FILLED, &m));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_icon_button_resolve(CMP_M3_ICON_BUTTON_FILLED_TONAL, &m));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_icon_button_resolve((cmp_m3_icon_button_variant_t)999, &m));
-
   PASS();
 }
 

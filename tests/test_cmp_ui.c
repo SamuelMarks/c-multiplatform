@@ -44,7 +44,6 @@ TEST test_ui_hierarchy(void) {
   cmp_ui_box_create(&box);
   cmp_ui_text_create(&text1, "Item 1", -1);
   cmp_ui_text_create(&text2, "Item 2", -1);
-
   res = cmp_ui_node_add_child(box, text1);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
@@ -75,32 +74,26 @@ TEST test_ui_advanced_primitives(void) {
   ASSERT_EQ_FMT(3, btn->type, "%d");
   ASSERT_STR_EQ("Click Me", (char *)btn->properties);
   cmp_ui_node_destroy(btn);
-
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_text_input_create(&input), "%d");
   ASSERT_EQ_FMT(4, input->type, "%d");
   cmp_ui_node_destroy(input);
-
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_checkbox_create(&chk, "Option"), "%d");
   ASSERT_EQ_FMT(5, chk->type, "%d");
   ASSERT_STR_EQ("Option", (char *)chk->properties);
   cmp_ui_node_destroy(chk);
-
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_radio_create(&rad, 42), "%d");
   ASSERT_EQ_FMT(6, rad->type, "%d");
   ASSERT_EQ_FMT(42, *(int *)rad->properties, "%d");
   cmp_ui_node_destroy(rad);
-
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_image_view_create(&img, "test.png"), "%d");
   ASSERT_EQ(7, img->type);
   ASSERT_STR_EQ("test.png", (char *)(((void **)img->properties)[0]));
   cmp_ui_node_destroy(img);
-
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_slider_create(&slider, 10.0f, 50.0f), "%d");
   ASSERT_EQ_FMT(8, slider->type, "%d");
   ASSERT_EQ_FMT(10.0f, ((float *)slider->properties)[0], "%f");
   ASSERT_EQ_FMT(50.0f, ((float *)slider->properties)[1], "%f");
   cmp_ui_node_destroy(slider);
-
   PASS();
 }
 
@@ -111,28 +104,22 @@ TEST test_ui_phase17_components(void) {
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_list_view_create(&lv), "%d");
   ASSERT_EQ_FMT(9, lv->type, "%d");
   cmp_ui_node_destroy(lv);
-
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_grid_view_create(&gv, 3), "%d");
   ASSERT_EQ_FMT(10, gv->type, "%d");
   ASSERT_EQ_FMT(3, *(int *)gv->properties, "%d");
   cmp_ui_node_destroy(gv);
-
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_dropdown_create(&drop), "%d");
   ASSERT_EQ_FMT(11, drop->type, "%d");
   cmp_ui_node_destroy(drop);
-
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_modal_create(&mod), "%d");
   ASSERT_EQ_FMT(12, mod->type, "%d");
   cmp_ui_node_destroy(mod);
-
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_canvas_create(&cvs), "%d");
   ASSERT_EQ_FMT(13, cvs->type, "%d");
   cmp_ui_node_destroy(cvs);
-
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_rich_text_create(&rt), "%d");
   ASSERT_EQ_FMT(14, rt->type, "%d");
   cmp_ui_node_destroy(rt);
-
   PASS();
 }
 
@@ -140,7 +127,6 @@ TEST test_ui_null_args(void) {
   cmp_ui_node_t *node = NULL;
   cmp_ui_node_t *parent = NULL;
   cmp_ui_box_create(&parent);
-
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_node_destroy(NULL), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_node_add_child(NULL, parent),
                 "%d");

@@ -62,7 +62,7 @@ int cmp_event_system_shutdown(void) {
     CMP_FREE(item);
   }
 
-  cmp_ring_buffer_destroy(&g_event_queue);
+  (void)cmp_ring_buffer_destroy(&g_event_queue);
   g_event_initialized = 0;
   rc = CMP_SUCCESS;
   return rc;

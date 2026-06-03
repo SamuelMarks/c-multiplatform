@@ -32,14 +32,12 @@ TEST test_linear_blend_edge_cases(void) {
             cmp_linear_blend_srgb_to_linear(blend, NULL, &color));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_linear_blend_srgb_to_linear(blend, &color, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_linear_blend_linear_to_srgb(NULL, &color, &color));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_linear_blend_linear_to_srgb(blend, NULL, &color));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_linear_blend_linear_to_srgb(blend, &color, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_linear_blend_mix(NULL, &color, &color, 1.0f, &color));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -48,7 +46,6 @@ TEST test_linear_blend_edge_cases(void) {
             cmp_linear_blend_mix(blend, &color, NULL, 1.0f, &color));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_linear_blend_mix(blend, &color, &color, 1.0f, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_linear_blend_destroy(blend));
   PASS();
 }
@@ -62,7 +59,6 @@ TEST test_linear_blend_srgb_to_linear(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_linear_blend_srgb_to_linear(blend, &srgb, &linear));
-
   /* 0.5 ^ 2.2 is roughly 0.2176376 */
   ASSERT(linear.r > 0.21f && linear.r < 0.22f);
   ASSERT(linear.g > 0.21f && linear.g < 0.22f);
@@ -83,7 +79,6 @@ TEST test_linear_blend_linear_to_srgb(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_linear_blend_linear_to_srgb(blend, &linear, &srgb));
-
   /* Should be roughly 0.5 */
   ASSERT(srgb.r > 0.49f && srgb.r < 0.51f);
   ASSERT(srgb.g > 0.49f && srgb.g < 0.51f);
@@ -120,7 +115,6 @@ TEST test_linear_blend_mix(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_linear_blend_mix(blend, &bg, &fg, 1.5f, &blended));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_linear_blend_mix(blend, &bg, &fg, -0.5f, &blended));
-
   /* Testing zero alpha mix */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_linear_blend_mix(blend, &trans_bg, &trans_fg, 1.0f, &blended));

@@ -44,7 +44,6 @@ TEST test_motion_path_evaluate(void) {
   int res;
 
   cmp_motion_path_create(&path);
-
   res = cmp_motion_path_evaluate(path, 0.0f, 0.0f, &x, &y, &a);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_IN_RANGE(0.0f, x, 0.001f);

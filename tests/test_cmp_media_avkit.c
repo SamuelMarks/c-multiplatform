@@ -17,7 +17,6 @@ TEST test_media_player_features(void) {
   /* Source */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_media_player_load_url(ctx, "https://example.com/stream.m3u8"));
-
   /* HIG: Prefers AVPlayerViewController */
   ASSERT_EQ(CMP_SUCCESS, cmp_media_player_mount(ctx, &dummy_node, 1));
 
@@ -59,7 +58,6 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_media_player_create(NULL));
   cmp_media_player_create(&mp);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_media_player_load_url(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_media_player_load_url(mp, NULL));
 
@@ -69,20 +67,17 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_media_player_set_pip_enabled(NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_media_player_set_spatial_audio_enabled(NULL, 1));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_media_player_update_now_playing(NULL, "t", "a", 0.0f, 0.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_media_player_update_now_playing(mp, NULL, "a", 0.0f, 0.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_media_player_update_now_playing(mp, "t", NULL, 0.0f, 0.0f));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_media_player_set_remote_command_handler(
                                        NULL, dummy_remote_cb, NULL));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_audio_session_create(NULL));
   cmp_audio_session_create(&as);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_audio_session_set_category(NULL, CMP_AUDIO_SESSION_AMBIENT));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_audio_session_activate(NULL));

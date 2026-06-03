@@ -50,7 +50,7 @@ int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
   /* Create the thumb */
   err = cmp_ui_box_create(&sw->node_thumb);
   if (err != CMP_SUCCESS) {
-    cmp_ui_node_destroy(sw->node_root);
+    (void)cmp_ui_node_destroy(sw->node_root);
     if (CMP_FREE(sw) != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_switch_create: CMP_FREE sw failed\n");
     }

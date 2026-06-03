@@ -31,7 +31,6 @@ TEST test_select_ui_open(void) {
   cmp_select_ui_t *select = NULL;
   int res;
   cmp_select_ui_create(&select);
-
   res = cmp_select_ui_open(select);
   ASSERT_EQ(CMP_SUCCESS, res);
 

@@ -110,7 +110,6 @@ TEST test_f2_menu_split_button(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(1, btn_data->is_menu_open);
   cmp_ui_node_destroy(menu_node);
-
   res = cmp_f2_split_button_create(&split_node, "Split", NULL);
   ASSERT_EQ(CMP_SUCCESS, res);
   btn_data = (cmp_f2_button_t *)split_node->properties;
@@ -118,7 +117,6 @@ TEST test_f2_menu_split_button(void) {
   ASSERT(btn_data->divider_node != NULL);
   ASSERT(btn_data->chevron_node != NULL);
   cmp_ui_node_destroy(split_node);
-
   PASS();
 }
 
@@ -157,14 +155,12 @@ TEST test_f2_button_invalid_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
   cmp_ui_node_destroy(node);
-
   /* Test setting toggled on a standard button */
   res = cmp_f2_button_create(&node, "Standard", NULL);
   ASSERT_EQ(CMP_SUCCESS, res);
   res = cmp_f2_button_set_toggled(node, 1);
   ASSERT_EQ(CMP_ERROR_INVALID_STATE, res);
   cmp_ui_node_destroy(node);
-
   PASS();
 }
 

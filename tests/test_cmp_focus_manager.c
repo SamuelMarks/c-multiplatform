@@ -9,7 +9,6 @@ TEST test_focus_manager_lifecycle(void) {
   cmp_focus_manager_t *mgr = NULL;
   int res;
   cmp_a11y_tree_create(&tree);
-
   res = cmp_focus_manager_create(tree, &mgr);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_NEQ(NULL, mgr);
@@ -27,7 +26,6 @@ TEST test_focus_manager_null_args(void) {
   int res;
   int next_id = -1;
   cmp_a11y_tree_create(&tree);
-
   res = cmp_focus_manager_create(NULL, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -41,7 +39,6 @@ TEST test_focus_manager_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
   cmp_focus_manager_create(tree, &mgr);
-
   res = cmp_focus_manager_set_focus(NULL, 1, 1);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -62,9 +59,7 @@ TEST test_focus_manager_operations(void) {
   int next_id = -1;
   int res;
   cmp_a11y_tree_create(&tree);
-
   cmp_focus_manager_create(tree, &mgr);
-
   res = cmp_focus_manager_navigate(mgr, 10, 0, &next_id);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(-1, next_id); /* No nodes yet */

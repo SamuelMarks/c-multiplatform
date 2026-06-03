@@ -50,14 +50,12 @@ TEST test_tiling_edge_cases(void) {
             cmp_layer_tiling_calculate(tiling, 100, 100, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_layer_tiling_get_bounds(NULL, 0, &bounds));
-
   /* Zero tile size */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_layer_tiling_create(0, &tiling));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_layer_tiling_create(512, &tiling));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_layer_tiling_get_bounds(tiling, 0, NULL));
-
   /* Zero dimensions should return 0 tiles successfully */
   ASSERT_EQ(CMP_SUCCESS, cmp_layer_tiling_calculate(tiling, 0, 100, &count));
   ASSERT_EQ(0, count);

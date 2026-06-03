@@ -30,24 +30,20 @@ TEST test_profiling_telemetry_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_profiling_telemetry_create(NULL));
   cmp_profiling_telemetry_create(&feat);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_profiling_emit_os_signpost(NULL, "a", 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_profiling_emit_os_signpost(feat, NULL, 1));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_profiling_enforce_main_thread(NULL));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_profiling_offload_heavy_task(NULL, test_task, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_profiling_offload_heavy_task(feat, NULL, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_profiling_detect_retain_cycles(NULL, node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_profiling_detect_retain_cycles(feat, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_profiling_safe_destroy_node(NULL, &node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_profiling_safe_destroy_node(feat, NULL));

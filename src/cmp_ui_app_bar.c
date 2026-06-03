@@ -91,6 +91,8 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
       bar->node_actions->layout->flex_shrink = 0.0f;
       bar->node_actions->layout->flex_grow = 1.0f;
       rc = cmp_ui_node_add_child(bar->node_root, bar->node_actions);
+      if (rc != CMP_SUCCESS)
+        return rc;
     }
   } else {
     LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_text_create failed\n");

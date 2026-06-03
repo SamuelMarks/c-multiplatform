@@ -66,7 +66,6 @@ TEST test_cmp_window_blur_enable_disable(void) {
             cmp_window_blur_is_enabled(blur, NULL, &enabled));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_window_blur_is_enabled(blur, window1, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_window_blur_destroy(blur));
 
   PASS();

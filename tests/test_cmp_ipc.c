@@ -49,7 +49,6 @@ TEST test_multiprocess_communication(void) {
   /* Send and receive message */
   cmp_msg_create(&msg);
   cmp_msg_set_payload(msg, "ping", 5);
-
   err = cmp_process_send(proc, msg);
   ASSERT_EQ(CMP_SUCCESS, err);
 
@@ -63,7 +62,6 @@ TEST test_multiprocess_communication(void) {
 
   cmp_msg_destroy(msg);
   cmp_process_destroy(proc);
-
   PASS();
 }
 

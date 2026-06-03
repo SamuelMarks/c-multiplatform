@@ -53,7 +53,6 @@ TEST test_f2_dom_aria_validation(void) {
   ASSERT_EQ(CMP_SUCCESS, res);
 
   cmp_a11y_tree_serialize(tree, btn, NULL, 0);
-
   /* Check ARIA roles sync logic */
   res = cmp_aria_sync(aria);
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -84,13 +83,10 @@ TEST test_f2_keyboard_flow(void) {
   res = cmp_f2_button_create(&btn1, "Btn1", NULL);
   ASSERT_EQ(CMP_SUCCESS, res);
   cmp_ui_node_add_child(box, btn1);
-
   res = cmp_f2_button_create(&btn2, "Btn2", NULL);
   ASSERT_EQ(CMP_SUCCESS, res);
   cmp_ui_node_add_child(box, btn2);
-
   cmp_a11y_tree_serialize(tree, box, NULL, 0);
-
   /* Simulate TAB key pressing to move focus down the DOM tree */
   {
     int next_node = -1;

@@ -18,7 +18,6 @@ TEST test_m3_sheet_resolve(void) {
   cmp_m3_sheet_metrics_t m;
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_sheet_resolve(CMP_M3_SHEET_BOTTOM_STANDARD, NULL));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_sheet_resolve(CMP_M3_SHEET_BOTTOM_STANDARD, &m));
   ASSERT_EQ(0, m.has_scrim);
@@ -52,7 +51,6 @@ TEST test_m3_date_picker_resolve(void) {
   cmp_m3_date_picker_metrics_t m;
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_date_picker_resolve(CMP_M3_DATE_PICKER_MODAL, NULL));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_date_picker_resolve(CMP_M3_DATE_PICKER_MODAL, &m));
   ASSERT_EQ(40.0f, m.day_selection_size);
@@ -72,7 +70,6 @@ TEST test_m3_time_picker_resolve(void) {
   cmp_m3_time_picker_metrics_t m;
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_time_picker_resolve(CMP_M3_TIME_PICKER_DIAL, NULL));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_time_picker_resolve(CMP_M3_TIME_PICKER_DIAL, &m));
   ASSERT_EQ(40.0f, m.am_pm_segment_height);

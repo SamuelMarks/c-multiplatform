@@ -70,7 +70,6 @@ TEST test_context_menu_edge_cases(void) {
             cmp_context_menu_set_callback(NULL, mock_context_menu_cb, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_context_menu_set_callback(menu, NULL, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_context_menu_process_event(NULL, &event));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_context_menu_process_event(menu, NULL));

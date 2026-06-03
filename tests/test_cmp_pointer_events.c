@@ -33,7 +33,6 @@ TEST test_pointer_events_edge_cases(void) {
             cmp_ui_node_set_pointer_events(NULL, CMP_POINTER_EVENTS_NONE));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ui_node_get_pointer_events(NULL, &out_events));
-
   PASS();
 }
 

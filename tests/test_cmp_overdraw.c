@@ -15,17 +15,18 @@ TEST test_overdraw_create_destroy(void) {
 }
 
 TEST test_overdraw_set_enabled(void) {
+  int rc;
   cmp_overdraw_t *overdraw = NULL;
   cmp_renderer_t *renderer = NULL;
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 1};
   cmp_window_t *win = NULL;
 
   cmp_window_system_init();
-  if (cmp_window_create(&cfg, &win) != CMP_SUCCESS) {
+  rc = cmp_window_create(&cfg, &win);
+  if (rc != CMP_SUCCESS) {
     win = NULL;
   }
   cmp_renderer_create(win, CMP_RENDER_BACKEND_DEFAULT, &renderer);
-
   ASSERT_EQ(CMP_SUCCESS, cmp_overdraw_create(&overdraw));
 
   /* Enable */
@@ -46,17 +47,18 @@ TEST test_overdraw_set_enabled(void) {
 }
 
 TEST test_overdraw_edge_cases(void) {
+  int rc;
   cmp_overdraw_t *overdraw = NULL;
   cmp_renderer_t *renderer = NULL;
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 1};
   cmp_window_t *win = NULL;
 
   cmp_window_system_init();
-  if (cmp_window_create(&cfg, &win) != CMP_SUCCESS) {
+  rc = cmp_window_create(&cfg, &win);
+  if (rc != CMP_SUCCESS) {
     win = NULL;
   }
   cmp_renderer_create(win, CMP_RENDER_BACKEND_DEFAULT, &renderer);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_overdraw_create(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_overdraw_destroy(NULL));
 

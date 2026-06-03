@@ -3,6 +3,12 @@ set -eu
 
 root_dir=$(git rev-parse --show-toplevel)
 
+echo "Running error-handling lint..."
+staged_c_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(c|cpp|h)$' || true)
+if [ -n "$staged_c_files" ]; then
+    python "${root_dir}/tools/lint_errors.py" $staged_c_files
+fi
+
 echo "Running precommit build & test..."
 build_dir="${root_dir}/build-precommit"
 cmake -S "${root_dir}" -B "${build_dir}"

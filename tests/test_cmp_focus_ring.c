@@ -9,7 +9,6 @@ TEST test_focus_ring_lifecycle(void) {
   cmp_focus_ring_t *ring = NULL;
   int res;
   cmp_a11y_tree_create(&tree);
-
   res = cmp_focus_ring_create(tree, &ring);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_NEQ(NULL, ring);
@@ -26,7 +25,6 @@ TEST test_focus_ring_null_args(void) {
   cmp_focus_ring_t *ring = NULL;
   int res;
   cmp_a11y_tree_create(&tree);
-
   res = cmp_focus_ring_create(NULL, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -40,7 +38,6 @@ TEST test_focus_ring_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
   cmp_focus_ring_create(tree, &ring);
-
   res = cmp_focus_ring_set_keyboard_mode(NULL, 1);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -57,9 +54,7 @@ TEST test_focus_ring_operations(void) {
   cmp_focus_ring_t *ring = NULL;
   int res;
   cmp_a11y_tree_create(&tree);
-
   cmp_focus_ring_create(tree, &ring);
-
   /* Start in pointer mode by default */
   res = cmp_focus_ring_node_focused(ring, 10);
   ASSERT_EQ(CMP_SUCCESS, res);

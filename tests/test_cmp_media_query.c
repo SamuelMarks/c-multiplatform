@@ -210,7 +210,6 @@ TEST test_resize_observer(void) {
   cmp_layout_node_t *node = NULL;
 
   cmp_layout_node_create(&node);
-
   resize_count = 0;
   ASSERT_EQ(CMP_SUCCESS,
             cmp_resize_observer_create(&obs, on_resize_callback, NULL));
@@ -239,28 +238,24 @@ TEST test_null_args(void) {
             cmp_media_query_evaluate(&query, NULL, &matches));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_media_query_evaluate(&query, &env, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_pointer_media_evaluate(NULL, &env, &matches));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_pointer_media_evaluate(&query, NULL, &matches));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_pointer_media_evaluate(&query, &env, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_update_media_evaluate(NULL, &env, &matches));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_update_media_evaluate(&query, NULL, &matches));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_update_media_evaluate(&query, &env, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_light_level_evaluate(NULL, &env, &matches));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_light_level_evaluate(&query, NULL, &matches));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_light_level_evaluate(&query, &env, NULL));
-
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
       cmp_container_ctx_create(NULL, CMP_CONTAINER_TYPE_INLINE_SIZE, "name"));
@@ -272,7 +267,6 @@ TEST test_null_args(void) {
             cmp_container_query_evaluate(&cq, NULL, &matches));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_container_query_evaluate(&cq, ctx, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_style_query_evaluate(NULL, &sq, 1, &matches));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_style_query_evaluate(&sq, &sq, 1, NULL));
@@ -291,10 +285,8 @@ TEST test_null_args(void) {
             cmp_contain_evaluate(CMP_CONTAIN_NONE, NULL, &matches));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_contain_evaluate(CMP_CONTAIN_NONE, &matches, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resize_observer_create(NULL, NULL, NULL));
-
   {
     cmp_resize_observer_t *obs;
     ASSERT_EQ(CMP_ERROR_INVALID_ARG,

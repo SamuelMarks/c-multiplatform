@@ -45,7 +45,10 @@ int cmp_example_app_recalculate_layout(void) {
   if (rc != CMP_SUCCESS) {
     return rc;
   }
-  return cmp_window_set_ui_tree(g_window, g_ui_tree);
+  rc = cmp_window_set_ui_tree(g_window, g_ui_tree);
+  if (rc != CMP_SUCCESS)
+    return rc;
+  return rc;
 }
 
 static void update_title_binding(void) {
@@ -78,7 +81,7 @@ static void update_title_binding(void) {
   sprintf(buf, "%s Examples", design_str);
 #endif
 
-  cmp_databinding_set_string(g_title_binding, buf);
+  (void)cmp_databinding_set_string(g_title_binding, buf);
 }
 
 static void on_lang_click(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
@@ -172,7 +175,7 @@ static int build_ui(void) {
   cmp_ui_node_t *actions_row = NULL;
 
   if (g_a11y_tree) {
-    cmp_a11y_tree_destroy(g_a11y_tree);
+    (void)cmp_a11y_tree_destroy(g_a11y_tree);
     g_a11y_tree = NULL;
   }
   rc = cmp_a11y_tree_create(&g_a11y_tree);
@@ -219,11 +222,13 @@ static int build_ui(void) {
       app_bar_node->bg_color = 0xFF4A4458;
       app_bar_node->text_color = 0xFFFFFFFF;
       rc = cmp_ui_node_add_child(g_ui_tree, app_bar_node);
+      if (rc != CMP_SUCCESS)
+        return rc;
     }
   }
 
   if (app_bar_cmp) {
-    cmp_ui_app_bar_set_title(app_bar_cmp, "Example App");
+    (void)cmp_ui_app_bar_set_title(app_bar_cmp, "Example App");
     app_bar_node->text_color = 0xFFFFFFFF;
     if (app_bar_node->children && app_bar_node->child_count > 0) {
       app_bar_node->children[0]->text_color = 0xFFFFFFFF;
@@ -238,11 +243,11 @@ static int build_ui(void) {
       }
     }
     if (g_a11y_tree)
-      cmp_ui_app_bar_bind_a11y(app_bar_cmp, g_a11y_tree);
+      (void)cmp_ui_app_bar_bind_a11y(app_bar_cmp, g_a11y_tree);
   }
 
   /* Actions */
-  cmp_ui_box_create(&actions_row);
+  (void)cmp_ui_box_create(&actions_row);
   actions_row->layout->direction = CMP_FLEX_ROW;
   actions_row->layout->flex_shrink = 0.0f;
   actions_row->layout->width = 300.0f;
@@ -253,7 +258,7 @@ static int build_ui(void) {
     rc = cmp_ui_icon_button_create(&btn_lang, "LNG",
                                    CMP_UI_ICON_BUTTON_STYLE_STANDARD);
     if (rc == CMP_SUCCESS) {
-      cmp_ui_icon_button_get_node(btn_lang, &btn_lang_node);
+      (void)cmp_ui_icon_button_get_node(btn_lang, &btn_lang_node);
       btn_lang_node->text_color = g_is_dark ? 0xFFFFFFFF : 0xFF000000;
       btn_lang_node->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
       btn_lang_node->text_color = 0xFFFFFFFF;
@@ -274,9 +279,9 @@ static int build_ui(void) {
       btn_lang_node->layout->margin[3] = 4.0f;
       cmp_ui_node_add_event_listener(btn_lang_node, CMP_EVENT_TYPE_MOUSE, 0,
                                      on_lang_click, NULL);
-      cmp_ui_node_add_child(actions_row, btn_lang_node);
+      (void)cmp_ui_node_add_child(actions_row, btn_lang_node);
       if (g_a11y_tree)
-        cmp_ui_icon_button_bind_a11y(btn_lang, g_a11y_tree);
+        (void)cmp_ui_icon_button_bind_a11y(btn_lang, g_a11y_tree);
     }
   }
 
@@ -284,7 +289,7 @@ static int build_ui(void) {
     rc = cmp_ui_icon_button_create(&btn_theme, g_is_dark ? "LGT" : "DRK",
                                    CMP_UI_ICON_BUTTON_STYLE_STANDARD);
     if (rc == CMP_SUCCESS) {
-      cmp_ui_icon_button_get_node(btn_theme, &btn_theme_node);
+      (void)cmp_ui_icon_button_get_node(btn_theme, &btn_theme_node);
       btn_theme_node->text_color = 0xFFFFFFFF;
       btn_theme_node->bg_color = 0xFF2B2930;
       btn_theme_node->border_radius = 8.0f;
@@ -302,9 +307,9 @@ static int build_ui(void) {
       btn_theme_node->layout->flex_shrink = 0.0f;
       cmp_ui_node_add_event_listener(btn_theme_node, CMP_EVENT_TYPE_MOUSE, 0,
                                      on_theme_click, NULL);
-      cmp_ui_node_add_child(actions_row, btn_theme_node);
+      (void)cmp_ui_node_add_child(actions_row, btn_theme_node);
       if (g_a11y_tree)
-        cmp_ui_icon_button_bind_a11y(btn_theme, g_a11y_tree);
+        (void)cmp_ui_icon_button_bind_a11y(btn_theme, g_a11y_tree);
     }
   }
 
@@ -314,7 +319,7 @@ static int build_ui(void) {
     rc = cmp_ui_icon_button_create(&btn_palette, "CLR",
                                    CMP_UI_ICON_BUTTON_STYLE_STANDARD);
     if (rc == CMP_SUCCESS) {
-      cmp_ui_icon_button_get_node(btn_palette, &btn_palette_node);
+      (void)cmp_ui_icon_button_get_node(btn_palette, &btn_palette_node);
       btn_palette_node->text_color = 0xFFFFFFFF;
       btn_palette_node->bg_color = 0xFF2B2930;
       btn_palette_node->border_radius = 8.0f;
@@ -330,9 +335,9 @@ static int build_ui(void) {
       btn_palette_node->layout->flex_shrink = 0.0f;
       cmp_ui_node_add_event_listener(btn_palette_node, CMP_EVENT_TYPE_MOUSE, 0,
                                      on_palette_click, NULL);
-      cmp_ui_node_add_child(actions_row, btn_palette_node);
+      (void)cmp_ui_node_add_child(actions_row, btn_palette_node);
       if (g_a11y_tree)
-        cmp_ui_icon_button_bind_a11y(btn_palette, g_a11y_tree);
+        (void)cmp_ui_icon_button_bind_a11y(btn_palette, g_a11y_tree);
     }
   }
 
@@ -342,7 +347,7 @@ static int build_ui(void) {
     rc = cmp_ui_icon_button_create(&btn_design, "SYS",
                                    CMP_UI_ICON_BUTTON_STYLE_STANDARD);
     if (rc == CMP_SUCCESS) {
-      cmp_ui_icon_button_get_node(btn_design, &btn_design_node);
+      (void)cmp_ui_icon_button_get_node(btn_design, &btn_design_node);
       btn_design_node->text_color = 0xFFFFFFFF;
       btn_design_node->bg_color = 0xFF2B2930;
       btn_design_node->border_radius = 8.0f;
@@ -359,21 +364,19 @@ static int build_ui(void) {
       cmp_ui_node_add_event_listener(btn_design_node, CMP_EVENT_TYPE_MOUSE, 0,
                                      on_design_click, NULL);
 
-      cmp_ui_badge_create(&badge_design, "DS", 0xFFFF0000, 0xFFFFFFFF);
-      cmp_ui_badge_get_node(badge_design, &badge_node);
-      cmp_ui_node_add_child(btn_design_node, badge_node);
-
-      cmp_ui_node_add_child(actions_row, btn_design_node);
-
+      (void)cmp_ui_badge_create(&badge_design, "DS", 0xFFFF0000, 0xFFFFFFFF);
+      (void)cmp_ui_badge_get_node(badge_design, &badge_node);
+      (void)cmp_ui_node_add_child(btn_design_node, badge_node);
+      (void)cmp_ui_node_add_child(actions_row, btn_design_node);
       if (g_a11y_tree)
-        cmp_ui_icon_button_bind_a11y(btn_design, g_a11y_tree);
+        (void)cmp_ui_icon_button_bind_a11y(btn_design, g_a11y_tree);
       if (g_a11y_tree)
-        cmp_ui_badge_bind_a11y(badge_design, g_a11y_tree);
+        (void)cmp_ui_badge_bind_a11y(badge_design, g_a11y_tree);
     }
   }
 
   if (app_bar_cmp) {
-    cmp_ui_app_bar_add_action(app_bar_cmp, actions_row);
+    (void)cmp_ui_app_bar_add_action(app_bar_cmp, actions_row);
   }
 
   /* Body container */
@@ -456,7 +459,7 @@ int cmp_example_app_run(const char *title,
     if (rc == CMP_SUCCESS) {
       /* Assume scale worked */
     }
-    cmp_dpi_destroy(dpi);
+    (void)cmp_dpi_destroy(dpi);
   }
 
   if (g_ui_tree) {
@@ -511,7 +514,7 @@ int cmp_example_app_run(const char *title,
             /* error */
           }
         }
-        cmp_hit_test_destroy(ht);
+        (void)cmp_hit_test_destroy(ht);
       }
     }
 
@@ -521,7 +524,7 @@ int cmp_example_app_run(const char *title,
       if (rc == CMP_SUCCESS && g_ui_tree && g_window) {
         cmp_layout_calculate(g_ui_tree->layout, g_window_width,
                              g_window_height);
-        cmp_window_set_ui_tree(g_window, g_ui_tree);
+        (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
       }
     }
 
@@ -532,14 +535,13 @@ int cmp_example_app_run(const char *title,
   }
 
   if (g_ui_tree) {
-    cmp_ui_node_destroy(g_ui_tree);
+    (void)cmp_ui_node_destroy(g_ui_tree);
     g_ui_tree = NULL;
   }
 
-  cmp_window_destroy(g_window);
-  cmp_window_system_shutdown();
-  cmp_vfs_shutdown();
-  cmp_event_system_shutdown();
-
+  (void)cmp_window_destroy(g_window);
+  (void)cmp_window_system_shutdown();
+  (void)cmp_vfs_shutdown();
+  (void)cmp_event_system_shutdown();
   return CMP_SUCCESS;
 }

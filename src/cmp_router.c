@@ -227,9 +227,8 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
 
     u_tok = NULL;
     p_tok = NULL;
-    cmp_strtok_r(uri_mutable, "/", &saveptr_uri, &u_tok);
-    cmp_strtok_r(path_mutable, "/", &saveptr_path, &p_tok);
-
+    (void)cmp_strtok_r(uri_mutable, "/", &saveptr_uri, &u_tok);
+    (void)cmp_strtok_r(path_mutable, "/", &saveptr_path, &p_tok);
     while (u_tok != NULL || p_tok != NULL) {
       if (u_tok == NULL || p_tok == NULL) {
         match = 0; /* Different number of segments */
@@ -248,8 +247,8 @@ static int internal_execute_route(cmp_router_t *router, const char *uri) {
 
       u_tok = NULL;
       p_tok = NULL;
-      cmp_strtok_r(NULL, "/", &saveptr_uri, &u_tok);
-      cmp_strtok_r(NULL, "/", &saveptr_path, &p_tok);
+      (void)cmp_strtok_r(NULL, "/", &saveptr_uri, &u_tok);
+      (void)cmp_strtok_r(NULL, "/", &saveptr_path, &p_tok);
     }
 
     rc = CMP_FREE(path_mutable);
@@ -364,7 +363,12 @@ int cmp_router_replace(cmp_router_t *router, const char *uri) {
   }
 
   if (router->stack_count == 0) {
-    return cmp_router_push(router, uri);
+    rc = cmp_router_push(router, uri);
+    if (rc != CMP_SUCCESS)
+      return rc;
+    if (rc != CMP_SUCCESS)
+      return rc;
+    return rc;
   }
 
   if (internal_execute_route(router, uri) != CMP_SUCCESS) {
@@ -436,7 +440,7 @@ int cmp_router_get_current(cmp_router_t *router, cmp_string_t *out_uri) {
     return CMP_ERROR_NOT_FOUND;
   }
 
-  cmp_string_init(out_uri);
+  (void)cmp_string_init(out_uri);
   rc = cmp_string_append(out_uri, router->stack[router->stack_count - 1]);
   return rc;
 }
@@ -553,7 +557,9 @@ int cmp_router_push_with_style(cmp_router_t *router, const char *uri,
   /* Modifies internal vdom root mounting transitions (slide-left, slide-up
    * sheet, crossfade) */
   (void)style;
-  rc = cmp_router_push(router, uri); /* Uses base logic for now */
+  rc = cmp_router_push(router, uri);
+  if (rc != CMP_SUCCESS)
+    return rc; /* Uses base logic for now */
   return rc;
 }
 
@@ -568,6 +574,8 @@ int cmp_router_pop_with_style(cmp_router_t *router) {
   if (!router)
     return CMP_ERROR_INVALID_ARG;
   rc = cmp_router_pop(router);
+  if (rc != CMP_SUCCESS)
+    return rc;
   return rc;
 }
 
@@ -628,6 +636,8 @@ int cmp_router_switch_tab(cmp_router_t *router, const char *tab_uri) {
   r->stack_count = 0; /* Flush all */
 
   rc = cmp_router_push(router, tab_uri);
+  if (rc != CMP_SUCCESS)
+    return rc;
   return rc;
 }
 

@@ -54,7 +54,6 @@ TEST test_vt_shared_calculate_morph(void) {
   int res;
 
   cmp_vt_shared_create(&shared);
-
   /* 0% progress */
   res = cmp_vt_shared_calculate_morph(shared, &o, &n, 0.0f, &r);
   ASSERT_EQ(CMP_SUCCESS, res);

@@ -25,7 +25,6 @@ TEST test_string_append(void) {
   int res;
 
   cmp_string_init(&str);
-
   res = cmp_string_append(&str, "Hello ");
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(str.data != NULL);
@@ -49,7 +48,6 @@ TEST test_string_append_realloc(void) {
   char buf[16];
 
   cmp_string_init(&str);
-
   /* Force multiple reallocations */
   for (i = 0; i < 100; i++) {
 #if defined(_MSC_VER)
@@ -74,7 +72,6 @@ TEST test_string_append_invalid(void) {
   int res;
 
   cmp_string_init(&str);
-
   res = cmp_string_append(NULL, "Test");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
 
@@ -109,7 +106,6 @@ TEST test_string_append_oom_simulation(void) {
   int res;
 
   cmp_string_init(&str);
-
   /* Setting capacity to SIZE_MAX/2 to simulate enormous malloc */
   str.capacity = ((size_t)-1) / 2;
   str.length = str.capacity - 1;
@@ -132,7 +128,6 @@ TEST test_string_destroy(void) {
 
   cmp_string_init(&str);
   cmp_string_append(&str, "Test");
-
   res = cmp_string_destroy(&str);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(str.data == NULL);

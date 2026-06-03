@@ -89,15 +89,12 @@ TEST test_null_args(void) {
             cmp_pointer_region_get_morph_scale(pr, NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_pointer_region_get_morph_scale(pr, &f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_keyboard_shortcut_create(NULL, 'a', 0));
   cmp_keyboard_shortcut_create(&ks, 'a', 0);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ui_command_create(NULL, "T", "I"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ui_command_create(&cmd, NULL, "I"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ui_command_create(&cmd, "T", NULL));
   cmp_ui_command_create(&cmd, "T", "I");
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ui_command_set_shortcut(NULL, ks));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ui_command_set_shortcut(cmd, NULL));
 
@@ -107,7 +104,6 @@ TEST test_null_args(void) {
             cmp_trackpad_evaluate_gesture(1.0f, 1.0f, NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_trackpad_evaluate_gesture(1.0f, 1.0f, &f, NULL));
-
   cmp_pointer_region_destroy(pr);
   cmp_ui_command_destroy(cmd);
   cmp_keyboard_shortcut_destroy(ks);

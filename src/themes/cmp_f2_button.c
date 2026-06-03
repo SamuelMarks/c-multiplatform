@@ -36,7 +36,7 @@ static int cmp_f2_button_init_internal(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_button_t), (void **)&btn_data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_button_init_internal: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -300,7 +300,8 @@ int CMP_API cmp_f2_button_set_variant(cmp_ui_node_t *node,
 
   {
     cmp_f2_theme_t theme;
-    if (cmp_f2_theme_generate(0x0078D4, 0, &theme) == CMP_SUCCESS) {
+    rc = cmp_f2_theme_generate(0x0078D4, 0, &theme);
+    if (rc == CMP_SUCCESS) {
       if (node->child_count > 0 && node->children[0]) {
         node->children[0]->font_size = theme.font_size_body_1;
         node->children[0]->layout->height = 20.0f;

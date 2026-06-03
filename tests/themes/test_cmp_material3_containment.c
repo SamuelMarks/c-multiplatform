@@ -9,7 +9,6 @@ TEST test_m3_card_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_card_resolve(CMP_M3_CARD_ELEVATED, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_card_resolve(CMP_M3_CARD_ELEVATED, &m));
   ASSERT_EQ(CMP_M3_ELEVATION_LEVEL_1, m.elevation);
   ASSERT_EQ(CMP_M3_SHAPE_MEDIUM, m.shape);
@@ -27,7 +26,6 @@ TEST test_m3_card_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_card_resolve((cmp_m3_card_variant_t)999, &m));
-
   PASS();
 }
 
@@ -36,7 +34,6 @@ TEST test_m3_dialog_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_dialog_resolve(CMP_M3_DIALOG_BASIC, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_dialog_resolve(CMP_M3_DIALOG_BASIC, &m));
   ASSERT_EQ(CMP_M3_ELEVATION_LEVEL_3, m.elevation);
   ASSERT_EQ(CMP_M3_SHAPE_EXTRA_LARGE, m.shape);
@@ -48,7 +45,6 @@ TEST test_m3_dialog_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_dialog_resolve((cmp_m3_dialog_variant_t)999, &m));
-
   PASS();
 }
 
@@ -57,7 +53,6 @@ TEST test_m3_divider_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_divider_resolve(CMP_M3_DIVIDER_FULL_BLEED, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_divider_resolve(CMP_M3_DIVIDER_FULL_BLEED, &m));
   ASSERT_EQ(1.0f, m.thickness);
   ASSERT_EQ(0.0f, m.inset_start);
@@ -76,7 +71,6 @@ TEST test_m3_divider_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_divider_resolve((cmp_m3_divider_variant_t)999, &m));
-
   PASS();
 }
 
@@ -85,7 +79,6 @@ TEST test_m3_tooltip_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_tooltip_resolve(CMP_M3_TOOLTIP_PLAIN, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_tooltip_resolve(CMP_M3_TOOLTIP_PLAIN, &m));
   ASSERT_EQ(24.0f, m.height);
   ASSERT_EQ(8.0f, m.padding_all);
@@ -100,7 +93,6 @@ TEST test_m3_tooltip_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_tooltip_resolve((cmp_m3_tooltip_variant_t)999, &m));
-
   PASS();
 }
 

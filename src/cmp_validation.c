@@ -51,7 +51,7 @@ int cmp_validation_destroy(cmp_validation_t *validation) {
     return CMP_ERROR_INVALID_ARG;
 
   if (internal_validation->regex) {
-    cmp_regex_free(internal_validation->regex);
+    (void)cmp_regex_free(internal_validation->regex);
   }
 
   CMP_FREE(internal_validation);
@@ -67,46 +67,52 @@ int cmp_validation_set_regex(cmp_validation_t *validation,
     return CMP_ERROR_INVALID_ARG;
 
   if (internal_validation->regex) {
-    cmp_regex_free(internal_validation->regex);
+    (void)cmp_regex_free(internal_validation->regex);
     internal_validation->regex = NULL;
   }
 
   if (pattern) {
-    return cmp_regex_compile(&internal_validation->regex, pattern);
+    int rc = cmp_regex_compile(&internal_validation->regex, pattern);
+    if (rc != CMP_SUCCESS)
+      return rc;
+    return rc;
   }
   return CMP_SUCCESS;
 }
 
 int cmp_validation_set_min_length(cmp_validation_t *validation,
                                   size_t min_len) {
+  int rc = CMP_SUCCESS;
   struct cmp_validation *internal_validation =
       (struct cmp_validation *)validation;
   if (!internal_validation)
     return CMP_ERROR_INVALID_ARG;
 
   internal_validation->min_length = min_len;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_validation_set_max_length(cmp_validation_t *validation,
                                   size_t max_len) {
+  int rc = CMP_SUCCESS;
   struct cmp_validation *internal_validation =
       (struct cmp_validation *)validation;
   if (!internal_validation)
     return CMP_ERROR_INVALID_ARG;
 
   internal_validation->max_length = max_len;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 int cmp_validation_set_required(cmp_validation_t *validation, int is_required) {
+  int rc = CMP_SUCCESS;
   struct cmp_validation *internal_validation =
       (struct cmp_validation *)validation;
   if (!internal_validation)
     return CMP_ERROR_INVALID_ARG;
 
   internal_validation->is_required = is_required;
-  return CMP_SUCCESS;
+  return rc;
 }
 
 /**

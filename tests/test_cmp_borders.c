@@ -131,12 +131,10 @@ TEST test_phase5_shadows_compositing(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_backdrop_kawase_blur(&tex, 5.0f, &out_tex));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_backdrop_kawase_blur(NULL, 5.0f, &out_tex));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_blend_mode_resolve(CMP_BLEND_MODE_MULTIPLY, &blend_state));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_blend_mode_resolve(CMP_BLEND_MODE_MULTIPLY, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_isolation_context_begin(&iso_ctx));
   ASSERT_EQ(1, iso_ctx.is_isolated);
   ASSERT_EQ(CMP_SUCCESS, cmp_isolation_context_end(&iso_ctx));
@@ -145,17 +143,14 @@ TEST test_phase5_shadows_compositing(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_mask_image_apply(&tex, &mask_img, &out_tex));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_mask_image_apply(NULL, &mask_img, &out_tex));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_svg_filter_fe_color_matrix(&tex, &color_mat, &out_tex));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_svg_filter_fe_color_matrix(NULL, &color_mat, &out_tex));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_svg_filter_fe_displacement_map(&tex, &disp_map, &out_tex));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_svg_filter_fe_displacement_map(NULL, &disp_map, &out_tex));
-
   PASS();
 }
 

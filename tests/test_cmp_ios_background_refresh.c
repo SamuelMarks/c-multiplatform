@@ -33,10 +33,8 @@ TEST test_ios_background_refresh_null_args(void) {
             cmp_ios_background_refresh_begin_task(NULL, &task_id));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_background_refresh_begin_task(refresh, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_background_refresh_end_task(NULL, task_id));
-
   cmp_ios_background_refresh_destroy(refresh);
   PASS();
 }

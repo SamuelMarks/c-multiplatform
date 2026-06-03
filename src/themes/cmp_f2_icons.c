@@ -43,7 +43,7 @@ int CMP_API cmp_f2_icon_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_icon_t), (void **)&icon_data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_icon_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }

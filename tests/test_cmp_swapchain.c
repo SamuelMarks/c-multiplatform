@@ -5,17 +5,18 @@
 /* clang-format on */
 
 TEST test_swapchain_create_destroy(void) {
+  int rc;
   cmp_swapchain_t *swapchain = NULL;
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 1};
   cmp_window_t *win = NULL;
   void *os_handle = NULL;
-  int rc = 0;
+  rc = 0;
 
   cmp_window_system_init();
-
   /* Since the window abstraction exists, we can mock it here for the parameter
    */
-  if (cmp_window_create(&cfg, &win) != CMP_SUCCESS) {
+  rc = cmp_window_create(&cfg, &win);
+  if (rc != CMP_SUCCESS) {
     win = NULL;
   }
 
@@ -42,6 +43,7 @@ TEST test_swapchain_create_destroy(void) {
 }
 
 TEST test_swapchain_acquire_present(void) {
+  int rc;
   cmp_swapchain_t *swapchain = NULL;
   cmp_texture_t *frame_texture = NULL;
   void *first_handle;
@@ -50,7 +52,8 @@ TEST test_swapchain_acquire_present(void) {
   cmp_window_t *win = NULL;
 
   cmp_window_system_init();
-  if (cmp_window_create(&cfg, &win) != CMP_SUCCESS) {
+  rc = cmp_window_create(&cfg, &win);
+  if (rc != CMP_SUCCESS) {
     win = NULL;
   }
   if (win) {
@@ -99,13 +102,15 @@ TEST test_swapchain_acquire_present(void) {
 }
 
 TEST test_swapchain_edge_cases(void) {
+  int rc;
   cmp_swapchain_t *swapchain = NULL;
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 1};
   cmp_window_t *win = NULL;
   cmp_texture_t *tex = NULL;
 
   cmp_window_system_init();
-  if (cmp_window_create(&cfg, &win) != CMP_SUCCESS) {
+  rc = cmp_window_create(&cfg, &win);
+  if (rc != CMP_SUCCESS) {
     win = NULL;
   }
 
@@ -128,7 +133,6 @@ TEST test_swapchain_edge_cases(void) {
             cmp_swapchain_acquire_next_image(NULL, &tex));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_swapchain_acquire_next_image(swapchain, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_swapchain_present(NULL));
 
   if (swapchain) {
@@ -140,6 +144,7 @@ TEST test_swapchain_edge_cases(void) {
 }
 
 TEST test_cmp_swapchain_set_msaa(void) {
+  int rc;
   cmp_swapchain_t *swapchain = NULL;
   cmp_window_t *window = NULL;
 
@@ -149,7 +154,8 @@ TEST test_cmp_swapchain_set_msaa(void) {
   cfg.height = 600;
   cfg.title = "Test";
 
-  if (cmp_window_create(&cfg, &window) != CMP_SUCCESS) {
+  rc = cmp_window_create(&cfg, &window);
+  if (rc != CMP_SUCCESS) {
     window = NULL;
   }
   if (window) {

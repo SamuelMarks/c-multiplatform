@@ -31,7 +31,7 @@ int CMP_API cmp_f2_text_input_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_text_input_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_text_input_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -201,7 +201,7 @@ int CMP_API cmp_f2_textarea_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_textarea_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_textarea_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -364,7 +364,7 @@ int CMP_API cmp_f2_field_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_field_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_field_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -554,7 +554,7 @@ int CMP_API cmp_f2_searchbox_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_searchbox_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_searchbox_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }

@@ -37,7 +37,6 @@ TEST test_diffable_datasource(void) {
             cmp_diffable_datasource_apply_snapshot(ds, state_v1, 3));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_diffable_datasource_apply_snapshot(ds, state_v2, 3));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_diffable_datasource_destroy(ds));
   PASS();
 }
@@ -83,7 +82,6 @@ TEST test_null_args(void) {
             cmp_diffable_datasource_apply_snapshot(NULL, NULL, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_diffable_datasource_apply_snapshot(ds, NULL, 5));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_system_map_view_mount(NULL, 0.0f, 0.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_system_web_view_mount(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_system_web_view_mount(&dummy, NULL));

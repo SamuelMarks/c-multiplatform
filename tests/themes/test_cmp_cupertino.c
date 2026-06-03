@@ -192,7 +192,6 @@ TEST test_cupertino_configs(void) {
             cmp_cupertino_get_state_layer_opacity(NULL, 0, &a));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_cupertino_get_transition_duration(NULL, &a));
-
   cmp_ui_node_destroy(node);
   PASS();
 }

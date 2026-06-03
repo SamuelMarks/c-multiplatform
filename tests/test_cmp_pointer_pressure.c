@@ -48,11 +48,9 @@ TEST test_pointer_pressure_edge_cases(void) {
             cmp_pointer_pressure_process_event(NULL, &event));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_pointer_pressure_process_event(pressure, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_pointer_pressure_get_data(NULL, &data));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_pointer_pressure_get_data(pressure, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_pointer_pressure_destroy(pressure));
   PASS();
 }

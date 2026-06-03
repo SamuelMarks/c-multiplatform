@@ -18,7 +18,6 @@ TEST test_f2_stack_create(void) {
   ASSERT_EQ(CMP_FLEX_NOWRAP, node->layout->flex_wrap);
   ASSERT_EQ(8.0f, node->layout->column_gap);
   cmp_ui_node_destroy(node);
-
   /* Vertical Stack */
   res = cmp_f2_stack_create(&node, 0, 16.0f);
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -27,7 +26,6 @@ TEST test_f2_stack_create(void) {
   ASSERT_EQ(CMP_FLEX_NOWRAP, node->layout->flex_wrap);
   ASSERT_EQ(16.0f, node->layout->column_gap);
   cmp_ui_node_destroy(node);
-
   PASS();
 }
 
@@ -43,7 +41,6 @@ TEST test_f2_wrap_create(void) {
   ASSERT_EQ(CMP_FLEX_WRAP, node->layout->flex_wrap);
   ASSERT_EQ(4.0f, node->layout->column_gap);
   cmp_ui_node_destroy(node);
-
   PASS();
 }
 
@@ -58,7 +55,6 @@ TEST test_f2_grid_create(void) {
   ASSERT_EQ(12.0f, node->layout->column_gap);
   /* The underlying cmp_ui_grid_view_create handles the track count logic */
   cmp_ui_node_destroy(node);
-
   PASS();
 }
 

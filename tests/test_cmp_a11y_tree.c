@@ -389,12 +389,10 @@ TEST test_a11y_theme_semantic_equivalence(void) {
   node->design_language_override = 1;
   ASSERT_EQ(CMP_SUCCESS,
             cmp_a11y_tree_serialize(tree, node, buf1, sizeof(buf1)));
-
   /* Mock Cupertino generation */
   node->design_language_override = 3;
   ASSERT_EQ(CMP_SUCCESS,
             cmp_a11y_tree_serialize(tree, node, buf2, sizeof(buf2)));
-
   /* The layout theme should NEVER change the fundamental A11y roles and traits
    * announced to the OS */
   ASSERT_STR_EQ(buf1, buf2);

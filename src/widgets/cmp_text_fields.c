@@ -229,12 +229,12 @@ int cmp_text_field_handle_event(cmp_text_field_t *field_opaque,
   if (event->type == 2 /* KEYBOARD */ && event->action == CMP_ACTION_DOWN) {
     /* Backspace key code assumed 8 for example */
     if (event->source_id == 8) {
-      cmp_text_field_delete_backward(field_opaque);
+      (void)cmp_text_field_delete_backward(field_opaque);
     } else if (event->source_id >= 32 && event->source_id <= 126) {
       char buf[2];
       buf[0] = (char)event->source_id;
       buf[1] = '\0';
-      cmp_text_field_insert_text(field_opaque, buf);
+      (void)cmp_text_field_insert_text(field_opaque, buf);
     }
   }
 

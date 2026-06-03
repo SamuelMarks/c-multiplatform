@@ -50,7 +50,6 @@ TEST test_validation_check(void) {
   int res;
 
   cmp_validation_create(&validation);
-
   res = cmp_validation_check(validation, "hello", &is_valid);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_EQ(1, is_valid);

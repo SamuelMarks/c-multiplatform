@@ -43,12 +43,10 @@ TEST test_os_media_notifications_null(void) {
             cmp_os_media_controls_update(mc, NULL, "Artist", 120.0f, 10.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_media_controls_update(mc, "Title", NULL, 120.0f, 10.0f));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_media_controls_set_handler(NULL, dummy_cb, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_media_controls_set_handler(mc, NULL, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_os_media_controls_destroy(mc));
   PASS();
 }

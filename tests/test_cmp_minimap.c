@@ -34,7 +34,6 @@ TEST test_minimap_null_args(void) {
             cmp_minimap_update_viewport(ctx, 10.0f, 0.0f, 500.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_minimap_update_viewport(ctx, 10.0f, 100.0f, -1.0f));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_minimap_compute_layout(NULL));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_minimap_destroy(ctx));

@@ -33,7 +33,6 @@ TEST test_plugin_loader_load_unload(void) {
             cmp_plugin_loader_load(loader, NULL, &plugin_id));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_plugin_loader_load(loader, "path", NULL));
-
   /* Null arguments for unload */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_plugin_loader_unload(NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_plugin_loader_unload(loader, 0));
@@ -59,7 +58,6 @@ TEST test_plugin_loader_execute(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_plugin_loader_create(&loader));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_plugin_loader_load(loader, "dummy_plugin", &plugin_id));
-
   /* Null arguments for execute */
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
@@ -72,7 +70,6 @@ TEST test_plugin_loader_execute(void) {
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
       cmp_plugin_loader_execute(loader, plugin_id, "func", "payload", NULL));
-
   /* Payload can be NULL depending on the API but typically it's tested if valid
    */
 

@@ -55,7 +55,8 @@ static void *cmp_worker_thread_func(void *arg) {
   state = (cmp_modality_sync_multi_state_t *)arg;
 
   while (state->parent != NULL && state->parent->is_running) {
-    if (cmp_ring_buffer_pop(&state->queue, (void **)&node) == CMP_SUCCESS) {
+    int rc = cmp_ring_buffer_pop(&state->queue, (void **)&node);
+    if (rc == CMP_SUCCESS) {
       if (node != NULL && node->fn != NULL) {
         node->fn(node->arg);
       }
@@ -118,7 +119,7 @@ int cmp_modality_sync_multi_init(cmp_modality_t *mod, int num_workers) {
     rc = CMP_ERROR_OOM;
     LOG_DEBUG("Error in cmp_modality_sync_multi_init: CMP_MALLOC failed for "
               "workers (OOM)\n");
-    cmp_ring_buffer_destroy(&state->queue);
+    (void)cmp_ring_buffer_destroy(&state->queue);
     CMP_FREE(state);
     return rc;
   }

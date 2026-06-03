@@ -113,37 +113,35 @@ int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
   out_theme->neutral_100 = cmp_math_f2_gray(255);
 
   /* Global Brand Palette */
-  cmp_f2_generate_ramp(brand_color, &out_theme->brand);
-
+  (void)cmp_f2_generate_ramp(brand_color, &out_theme->brand);
   /* Global Shared Palettes */
-  cmp_f2_generate_ramp(0xD13438, &out_theme->red);
-  cmp_f2_generate_ramp(0x59000B, &out_theme->dark_red);
-  cmp_f2_generate_ramp(0xC50F1F, &out_theme->cranberry);
-  cmp_f2_generate_ramp(0xCA5010, &out_theme->pumpkin);
-  cmp_f2_generate_ramp(0xFF8C00, &out_theme->peach);
-  cmp_f2_generate_ramp(0xEAA300, &out_theme->marigold);
-  cmp_f2_generate_ramp(0xFFE000, &out_theme->yellow);
-  cmp_f2_generate_ramp(0xFFB900, &out_theme->gold);
-  cmp_f2_generate_ramp(0x986F0B, &out_theme->brass);
-  cmp_f2_generate_ramp(0x8E562E, &out_theme->brown);
-  cmp_f2_generate_ramp(0x498205, &out_theme->forest);
-  cmp_f2_generate_ramp(0x00CC6A, &out_theme->seafoam);
-  cmp_f2_generate_ramp(0x0B6A0B, &out_theme->dark_green);
-  cmp_f2_generate_ramp(0x00B7C3, &out_theme->light_teal);
-  cmp_f2_generate_ramp(0x038387, &out_theme->teal);
-  cmp_f2_generate_ramp(0x005B70, &out_theme->steel);
-  cmp_f2_generate_ramp(0x0078D4, &out_theme->blue);
-  cmp_f2_generate_ramp(0x004E8C, &out_theme->royal_blue);
-  cmp_f2_generate_ramp(0x4F6BED, &out_theme->cornflower);
-  cmp_f2_generate_ramp(0x00275B, &out_theme->navy);
-  cmp_f2_generate_ramp(0x7160E8, &out_theme->lavender);
-  cmp_f2_generate_ramp(0x5C2E91, &out_theme->purple);
-  cmp_f2_generate_ramp(0x881798, &out_theme->grape);
-  cmp_f2_generate_ramp(0xC239B3, &out_theme->berry);
-  cmp_f2_generate_ramp(0xE43BA6, &out_theme->pink);
-  cmp_f2_generate_ramp(0xBF0077, &out_theme->magenta);
-  cmp_f2_generate_ramp(0x770039, &out_theme->plum);
-
+  (void)cmp_f2_generate_ramp(0xD13438, &out_theme->red);
+  (void)cmp_f2_generate_ramp(0x59000B, &out_theme->dark_red);
+  (void)cmp_f2_generate_ramp(0xC50F1F, &out_theme->cranberry);
+  (void)cmp_f2_generate_ramp(0xCA5010, &out_theme->pumpkin);
+  (void)cmp_f2_generate_ramp(0xFF8C00, &out_theme->peach);
+  (void)cmp_f2_generate_ramp(0xEAA300, &out_theme->marigold);
+  (void)cmp_f2_generate_ramp(0xFFE000, &out_theme->yellow);
+  (void)cmp_f2_generate_ramp(0xFFB900, &out_theme->gold);
+  (void)cmp_f2_generate_ramp(0x986F0B, &out_theme->brass);
+  (void)cmp_f2_generate_ramp(0x8E562E, &out_theme->brown);
+  (void)cmp_f2_generate_ramp(0x498205, &out_theme->forest);
+  (void)cmp_f2_generate_ramp(0x00CC6A, &out_theme->seafoam);
+  (void)cmp_f2_generate_ramp(0x0B6A0B, &out_theme->dark_green);
+  (void)cmp_f2_generate_ramp(0x00B7C3, &out_theme->light_teal);
+  (void)cmp_f2_generate_ramp(0x038387, &out_theme->teal);
+  (void)cmp_f2_generate_ramp(0x005B70, &out_theme->steel);
+  (void)cmp_f2_generate_ramp(0x0078D4, &out_theme->blue);
+  (void)cmp_f2_generate_ramp(0x004E8C, &out_theme->royal_blue);
+  (void)cmp_f2_generate_ramp(0x4F6BED, &out_theme->cornflower);
+  (void)cmp_f2_generate_ramp(0x00275B, &out_theme->navy);
+  (void)cmp_f2_generate_ramp(0x7160E8, &out_theme->lavender);
+  (void)cmp_f2_generate_ramp(0x5C2E91, &out_theme->purple);
+  (void)cmp_f2_generate_ramp(0x881798, &out_theme->grape);
+  (void)cmp_f2_generate_ramp(0xC239B3, &out_theme->berry);
+  (void)cmp_f2_generate_ramp(0xE43BA6, &out_theme->pink);
+  (void)cmp_f2_generate_ramp(0xBF0077, &out_theme->magenta);
+  (void)cmp_f2_generate_ramp(0x770039, &out_theme->plum);
   /* Semantic Token Mapping */
   if (is_dark) {
     /* Layering Tokens - Dark Mode */

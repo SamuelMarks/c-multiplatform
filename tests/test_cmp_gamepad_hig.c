@@ -17,7 +17,6 @@ TEST test_gamepad_rumble(void) {
             cmp_gamepad_trigger_rumble(0, CMP_GAMEPAD_RUMBLE_MEDIUM));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_gamepad_trigger_rumble(1, CMP_GAMEPAD_RUMBLE_SUCCESS));
-
   /* Invalid index */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_gamepad_trigger_rumble(-1, CMP_GAMEPAD_RUMBLE_HEAVY));

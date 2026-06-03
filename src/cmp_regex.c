@@ -94,14 +94,17 @@ int cmp_regex_compile(cmp_regex_t **out_regex, const char *pattern) {
 static int matchhere(const char *regexp, const char *text);
 
 static int matchstar(int c, const char *regexp, const char *text) {
+  int rc = 0;
   do {
     if (matchhere(regexp, text))
       return 1;
   } while (*text != '\0' && (*text++ == c || c == '.'));
-  return 0;
+  rc = 0;
+  return rc;
 }
 
 static int matchhere(const char *regexp, const char *text) {
+  int rc = 0;
   if (regexp[0] == '\0')
     return 1;
   if (regexp[1] == '*')
@@ -110,17 +113,20 @@ static int matchhere(const char *regexp, const char *text) {
     return *text == '\0';
   if (*text != '\0' && (regexp[0] == '.' || regexp[0] == *text))
     return matchhere(regexp + 1, text + 1);
-  return 0;
+  rc = 0;
+  return rc;
 }
 
 static int internal_match(const char *regexp, const char *text) {
+  int rc = 0;
   if (regexp[0] == '^')
     return matchhere(regexp + 1, text);
   do {
     if (matchhere(regexp, text))
       return 1;
   } while (*text++ != '\0');
-  return 0;
+  rc = 0;
+  return rc;
 }
 
 /**

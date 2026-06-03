@@ -110,7 +110,6 @@ TEST test_null_args(void) {
   cmp_segmented_control_create(&sc);
   cmp_stepper_create(&st);
   cmp_slider_create(&sl);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_wheel_picker_set_items(NULL, NULL, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_wheel_picker_set_items(wp, NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_wheel_picker_scroll(NULL, 1.0f));
@@ -129,7 +128,6 @@ TEST test_null_args(void) {
             cmp_segmented_control_get_visuals(sc, NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_segmented_control_get_visuals(sc, &i, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_stepper_set_limits(NULL, 0, 10, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_stepper_set_limits(st, 10, 0, 1)); /* inverted bounds */

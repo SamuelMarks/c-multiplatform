@@ -9,7 +9,6 @@ TEST test_screen_reader_lifecycle(void) {
   cmp_screen_reader_t *reader = NULL;
   int res;
   cmp_a11y_tree_create(&tree);
-
   res = cmp_screen_reader_create(tree, &reader);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_NEQ(NULL, reader);
@@ -26,7 +25,6 @@ TEST test_screen_reader_null_args(void) {
   int res;
   cmp_screen_reader_t *reader = NULL;
   cmp_a11y_tree_create(&tree);
-
   res = cmp_screen_reader_create(NULL, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -40,7 +38,6 @@ TEST test_screen_reader_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
   cmp_screen_reader_create(tree, &reader);
-
   res = cmp_screen_reader_announce(NULL, "Hello");
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -63,9 +60,7 @@ TEST test_screen_reader_operations(void) {
   void *fake_native_node_2 = (void *)0x2000;
   void *fake_native_node_3 = (void *)0x3000;
   cmp_a11y_tree_create(&tree);
-
   cmp_screen_reader_create(tree, &reader);
-
   res = cmp_screen_reader_announce(reader, "Test message");
   ASSERT_EQ(CMP_SUCCESS, res);
 

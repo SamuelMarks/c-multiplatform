@@ -32,7 +32,6 @@ TEST test_ui_breadcrumbs_lifecycle(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_breadcrumbs_add_segment(breadcrumbs, "Home"));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_ui_breadcrumbs_add_segment(breadcrumbs, "Settings"));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_breadcrumbs_destroy(breadcrumbs));
 
   PASS();

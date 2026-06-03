@@ -69,7 +69,6 @@ TEST test_pty_read_write(void) {
             cmp_pty_read(pty, NULL, sizeof(read_buf), &read_len));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_pty_read(pty, read_buf, sizeof(read_buf), NULL));
-
   /* Read initial mock data */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_pty_read(pty, read_buf, sizeof(read_buf), &read_len));

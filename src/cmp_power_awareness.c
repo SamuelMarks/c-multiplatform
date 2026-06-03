@@ -92,10 +92,10 @@ int cmp_power_awareness_poll(void) {
       if (throttle) {
         /* Treat as "serious" thermal state to throttle GPU updates/animations
          */
-        cmp_resources_set_thermal_state(g_resource_manager, 2);
+        (void)cmp_resources_set_thermal_state(g_resource_manager, 2);
       } else {
         /* Normal */
-        cmp_resources_set_thermal_state(g_resource_manager, 0);
+        (void)cmp_resources_set_thermal_state(g_resource_manager, 0);
       }
     }
   }

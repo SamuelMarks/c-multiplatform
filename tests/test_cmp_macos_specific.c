@@ -24,7 +24,6 @@ TEST test_macos_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_macos_features_create(NULL));
   cmp_macos_features_create(&feat);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_macos_set_window_controls_visible(NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_macos_set_document_proxy(NULL, "a"));
@@ -56,7 +55,6 @@ TEST test_macos_advanced_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_macos_setup_global_menu_bar(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_macos_setup_context_menu(NULL, (void *)1));
-
   cmp_macos_features_create(&feat);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_macos_setup_context_menu(feat, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,

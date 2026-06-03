@@ -110,6 +110,10 @@ int cmp_tree_sitter_parse(cmp_tree_sitter_t *ts, const char *language,
   }
   /* Mock root node representing a translation_unit */
   root->type = strdup("translation_unit");
+  if (!root->type) {
+    CMP_FREE(root);
+    return CMP_ERROR_OOM;
+  }
   root->children = NULL;
   root->child_count = 0;
 
@@ -126,6 +130,8 @@ int cmp_tree_sitter_parse(cmp_tree_sitter_t *ts, const char *language,
  */
 int cmp_tree_sitter_node_get_type(cmp_tree_node_t *node, char **out_type) {
   int rc = CMP_SUCCESS;
+  char *t;
+
   if (!node || !out_type) {
     return CMP_ERROR_INVALID_ARG;
   }
@@ -133,14 +139,14 @@ int cmp_tree_sitter_node_get_type(cmp_tree_node_t *node, char **out_type) {
     *out_type = NULL;
     return rc;
   }
-  *out_type = strdup(node->type);
-  if (!*out_type) {
+  t = strdup(node->type);
+  if (!t) {
     return CMP_ERROR_OOM;
   }
+  *out_type = t;
 
   return rc;
 }
-
 /**
  * @brief Recursively frees an AST node and its children.
  *
@@ -165,7 +171,7 @@ int cmp_tree_sitter_free_node(cmp_tree_node_t *node) {
   }
   if (node->children) {
     for (i = 0; i < node->child_count; i++) {
-      cmp_tree_sitter_free_node(node->children[i]);
+      (void)cmp_tree_sitter_free_node(node->children[i]);
     }
     {
 

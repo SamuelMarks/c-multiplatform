@@ -50,7 +50,6 @@ TEST test_cloud_sync_and_files(void) {
   /* Files App Integration */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_cloud_sync_expose_to_files_app(ctx, "Documents/Exports"));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_cloud_sync_ctx_destroy(ctx));
   PASS();
 }
@@ -103,7 +102,6 @@ TEST test_null_args(void) {
             cmp_cloud_sync_expose_to_files_app(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_cloud_sync_expose_to_files_app(cl, NULL));
-
   cmp_payment_ctx_destroy(pm);
   cmp_storekit_ctx_destroy(sk);
   cmp_cloud_sync_ctx_destroy(cl);

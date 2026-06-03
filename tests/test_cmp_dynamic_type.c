@@ -164,10 +164,8 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_a11y_hover_text_get_bubble(NULL, 0, NULL, 0));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_color_verify_contrast_ratio(0, 0, 0, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_a11y_autoplay_avoidance_set(NULL, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_a11y_autoplay_should_play(NULL, NULL));
 

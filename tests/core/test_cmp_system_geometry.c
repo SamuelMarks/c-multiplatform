@@ -61,7 +61,6 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_system_geometry_create(NULL));
   cmp_system_geometry_create(&ctx);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_layout_set_corner_curve_continuous(NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_layout_enforce_pixel_alignment(NULL, 1));
@@ -70,19 +69,16 @@ TEST test_null_args(void) {
             cmp_system_geometry_get_safe_area(NULL, 0, &r));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_system_geometry_get_safe_area(ctx, 0, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_system_geometry_get_layout_margins(NULL, 0, &f, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_system_geometry_get_layout_margins(ctx, 0, NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_system_geometry_get_layout_margins(ctx, 0, &f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_system_geometry_get_readable_content_guide(NULL, 0.0f, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_system_geometry_get_readable_content_guide(ctx, 0.0f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_system_geometry_destroy(NULL));
 
   cmp_system_geometry_destroy(ctx);

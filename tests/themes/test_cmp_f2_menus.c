@@ -98,7 +98,6 @@ TEST test_f2_tabs(void) {
   res = cmp_f2_tab_item_create(&item, "Tab 1");
   ASSERT_EQ(CMP_SUCCESS, res);
   cmp_ui_node_add_child(container, item);
-
   cmp_ui_node_destroy(container);
   PASS();
 }
@@ -116,11 +115,9 @@ TEST test_f2_breadcrumb(void) {
   res = cmp_f2_breadcrumb_item_create(&item1, "Home", 0);
   ASSERT_EQ(CMP_SUCCESS, res);
   cmp_ui_node_add_child(node, item1);
-
   res = cmp_f2_breadcrumb_item_create(&item2, "Settings", 1);
   ASSERT_EQ(CMP_SUCCESS, res);
   cmp_ui_node_add_child(node, item2);
-
   cmp_ui_node_destroy(node);
   PASS();
 }
@@ -182,7 +179,6 @@ TEST test_f2_stepper(void) {
 
   cmp_ui_node_add_child(node, item);
   cmp_ui_node_destroy(node);
-
   PASS();
 }
 

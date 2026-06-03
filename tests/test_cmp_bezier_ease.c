@@ -50,7 +50,6 @@ TEST test_bezier_ease_evaluate(void) {
   /* Linear-ish */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_bezier_ease_create(0.0f, 0.0f, 1.0f, 1.0f, &bezier));
-
   res = cmp_bezier_ease_evaluate(bezier, 0.0f, &val);
   ASSERT_EQ(CMP_SUCCESS, res);
   ASSERT_IN_RANGE(0.0f, val, 0.001f);
@@ -68,7 +67,6 @@ TEST test_bezier_ease_evaluate(void) {
   /* Standard Ease (0.25, 0.1, 0.25, 1.0) */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_bezier_ease_create(0.25f, 0.1f, 0.25f, 1.0f, &bezier));
-
   res = cmp_bezier_ease_evaluate(bezier, 0.5f, &val);
   ASSERT_EQ(CMP_SUCCESS, res);
   /* The standard ease evaluated at t=0.5 is approx 0.802 */

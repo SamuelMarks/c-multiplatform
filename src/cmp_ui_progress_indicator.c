@@ -48,7 +48,7 @@ int cmp_ui_progress_indicator_create(
 
   err = cmp_ui_box_create(&ind->node_fill);
   if (err != CMP_SUCCESS) {
-    cmp_ui_node_destroy(ind->node_root);
+    (void)cmp_ui_node_destroy(ind->node_root);
     if (CMP_FREE(ind) != CMP_SUCCESS)
       LOG_DEBUG("cmp_ui_progress_indicator_create: CMP_FREE ind failed\n");
     return err;

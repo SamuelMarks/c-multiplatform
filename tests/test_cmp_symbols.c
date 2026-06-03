@@ -75,7 +75,6 @@ TEST test_custom_svg_templates(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_symbols_create(&ctx));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_symbols_load_custom_template(ctx, "res/custom.svg", &handle));
-
   node = (cmp_symbol_node_t *)handle;
   ASSERT_STR_EQ("res/custom.svg", node->name);
   ASSERT_EQ(400, node->weight);
@@ -94,7 +93,6 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_symbols_create(NULL));
   cmp_symbols_create(&ctx);
-
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
       cmp_symbols_request(NULL, "star", 400, CMP_SYMBOL_SCALE_MEDIUM, &handle));
@@ -104,7 +102,6 @@ TEST test_null_args(void) {
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
       cmp_symbols_request(ctx, "star", 400, CMP_SYMBOL_SCALE_MEDIUM, NULL));
-
   cmp_symbols_request(ctx, "star", 400, CMP_SYMBOL_SCALE_MEDIUM, &handle);
   node = (cmp_symbol_node_t *)handle;
 
@@ -122,7 +119,6 @@ TEST test_null_args(void) {
             cmp_symbols_set_variable_value(NULL, handle, 0.5f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_symbols_set_variable_value(ctx, NULL, 0.5f));
-
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
       cmp_symbols_trigger_animation(NULL, handle, CMP_SYMBOL_ANIM_BOUNCE, 0));
@@ -135,7 +131,6 @@ TEST test_null_args(void) {
             cmp_symbols_load_custom_template(ctx, NULL, &handle));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_symbols_load_custom_template(ctx, "path", NULL));
-
   CMP_FREE(node->name);
   CMP_FREE(node);
   cmp_symbols_destroy(ctx);

@@ -38,7 +38,6 @@ TEST test_arena_alloc_success(void) {
   int res;
 
   cmp_arena_init(&arena, 1024);
-
   res = cmp_arena_alloc(&arena, 100, &ptr1);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(ptr1 != NULL);
@@ -59,7 +58,6 @@ TEST test_arena_alloc_zero_size(void) {
   int res;
 
   cmp_arena_init(&arena, 1024);
-
   res = cmp_arena_alloc(&arena, 0, &ptr);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(ptr == NULL);
@@ -74,7 +72,6 @@ TEST test_arena_alloc_null(void) {
   int res;
 
   cmp_arena_init(&arena, 1024);
-
   res = cmp_arena_alloc(NULL, 100, &ptr);
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
 
@@ -91,7 +88,6 @@ TEST test_arena_alloc_oom(void) {
   int res;
 
   cmp_arena_init(&arena, 100);
-
   res = cmp_arena_alloc(&arena, 150, &ptr);
   ASSERT_EQ_FMT(CMP_ERROR_OOM, res, "%d");
   ASSERT(ptr == NULL);
@@ -151,7 +147,6 @@ TEST test_pool_alloc_free(void) {
 
   /* Use block size of 16 to ensure proper alignment */
   cmp_pool_init(&pool, 16, 2);
-
   res = cmp_pool_alloc(&pool, &ptr1);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(ptr1 != NULL);
@@ -180,7 +175,6 @@ TEST test_pool_alloc_null(void) {
   int res;
 
   cmp_pool_init(&pool, 16, 2);
-
   res = cmp_pool_alloc(NULL, &ptr);
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
 
@@ -197,7 +191,6 @@ TEST test_pool_alloc_zero_capacity(void) {
   int res;
 
   cmp_pool_init(&pool, 16, 0);
-
   res = cmp_pool_alloc(&pool, &ptr);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT(ptr == NULL);
@@ -211,7 +204,6 @@ TEST test_pool_free_null(void) {
   int res;
 
   cmp_pool_init(&pool, 16, 2);
-
   res = cmp_pool_free(NULL, (void *)1);
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
 
@@ -228,7 +220,6 @@ TEST test_pool_free_bounds_misaligned(void) {
   int res;
 
   cmp_pool_init(&pool, 16, 2);
-
   res = cmp_pool_alloc(&pool, &ptr);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 

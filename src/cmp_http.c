@@ -227,6 +227,7 @@ struct progress_ctx {
 
 static int on_progress_chunk(void *user_data, const void *chunk,
                              size_t length) {
+  int rc = 0;
   struct progress_ctx *ctx = (struct progress_ctx *)user_data;
 
   /* Keep compiler happy if variables unused in non-verbose builds */
@@ -236,7 +237,7 @@ static int on_progress_chunk(void *user_data, const void *chunk,
   if (ctx != NULL && ctx->progress_cb != NULL) {
     ctx->progress_cb(0.0f, ctx->user_data);
   }
-  return 0;
+  return rc;
 }
 
 /**

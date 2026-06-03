@@ -39,17 +39,13 @@ TEST test_ink_ripple_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ink_ripple_release(NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ink_ripple_get_state(NULL, &r, &o, &x, &y));
-
   cmp_ink_ripple_create(&ripple);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ink_ripple_update(ripple, -10.0f));
 
   /* should allow null args for state outputs */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_ink_ripple_get_state(ripple, NULL, NULL, NULL, NULL));
-
   cmp_ink_ripple_destroy(ripple);
-
   PASS();
 }
 

@@ -13,10 +13,8 @@ static void test_coroutine_func(cmp_coroutine_t *co, void *arg) {
 
   ctx->steps++;
   cmp_coroutine_yield(co);
-
   ctx->steps++;
   cmp_coroutine_yield(co);
-
   ctx->steps++;
 }
 
@@ -74,7 +72,8 @@ TEST test_coroutine_lifecycle(void) {
 TEST test_coroutine_null_args(void) {
   cmp_coroutine_t *co = NULL;
 
-  if (cmp_coroutine_system_init() == CMP_ERROR_NOT_FOUND) {
+  int rc = cmp_coroutine_system_init();
+  if (rc == CMP_ERROR_NOT_FOUND) {
     SKIP();
   }
 

@@ -31,7 +31,7 @@ int CMP_API cmp_f2_card_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_card_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_card_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -176,7 +176,7 @@ int CMP_API cmp_f2_accordion_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_accordion_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_accordion_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -282,7 +282,7 @@ int CMP_API cmp_f2_accordion_panel_create(cmp_ui_node_t **out_node,
   res = CMP_MALLOC(sizeof(cmp_f2_accordion_panel_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_accordion_panel_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -371,7 +371,7 @@ int CMP_API cmp_f2_divider_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_divider_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_divider_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -501,7 +501,7 @@ int CMP_API cmp_f2_split_view_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_split_view_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_split_view_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }
@@ -552,7 +552,7 @@ int CMP_API cmp_f2_scroll_view_create(cmp_ui_node_t **out_node) {
   res = CMP_MALLOC(sizeof(cmp_f2_scroll_view_t), (void **)&data);
   if (res != CMP_SUCCESS) {
     LOG_DEBUG("cmp_f2_scroll_view_create: OOM\n");
-    cmp_ui_node_destroy(*out_node);
+    (void)cmp_ui_node_destroy(*out_node);
     *out_node = NULL;
     return CMP_ERROR_OOM;
   }

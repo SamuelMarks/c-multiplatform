@@ -95,18 +95,14 @@ TEST test_null_args(void) {
 
   cmp_permissions_create(&ctx);
   cmp_privacy_indicators_create(&inds);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_permissions_get_status(NULL, CMP_PERMISSION_LOCATION, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_permissions_request(NULL, CMP_PERMISSION_LOCATION));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_privacy_indicators_verify_layout(NULL, NULL, NULL));
-
   cmp_permissions_destroy(ctx);
   cmp_privacy_indicators_destroy(inds);
-
   PASS();
 }
 

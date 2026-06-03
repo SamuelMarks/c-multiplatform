@@ -40,19 +40,16 @@ TEST test_input_layout_null_args(void) {
             cmp_input_layout_add_attachment(NULL, "test.png"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_input_layout_add_attachment(layout, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_input_layout_get_attachment_count(NULL, &count));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_input_layout_get_attachment_count(layout, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_input_layout_update_text(NULL, "test", &height));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_input_layout_update_text(layout, NULL, &height));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_input_layout_update_text(layout, "test", NULL));
-
   cmp_input_layout_destroy(layout);
   PASS();
 }
@@ -67,7 +64,6 @@ TEST test_input_layout_bounds(void) {
   }
   ASSERT_EQ(CMP_ERROR_BOUNDS,
             cmp_input_layout_add_attachment(layout, "test.png"));
-
   cmp_input_layout_destroy(layout);
   PASS();
 }

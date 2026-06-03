@@ -49,7 +49,6 @@ TEST test_cmp_network_status(void) {
             cmp_network_set_status(NULL, CMP_NETWORK_STATUS_ONLINE));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_network_set_status(network, (cmp_network_status_t)999));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_network_destroy(network));
   PASS();
 }

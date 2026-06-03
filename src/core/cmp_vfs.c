@@ -296,7 +296,7 @@ int cmp_vfs_read_file_sync(const char *virtual_path, void **out_buffer,
     cfs_utf8_to_utf16(resolved_path.data, NULL, 0, &req_len);
     if (req_len <= 0) {
       cfs_path_destroy(&p);
-      cmp_string_destroy(&resolved_path);
+      (void)cmp_string_destroy(&resolved_path);
       rc = CMP_ERROR_INVALID_ARG;
       LOG_DEBUG("cmp_vfs_read_file_sync: cfs_utf8_to_utf16 failed\n");
       return rc;
@@ -304,7 +304,7 @@ int cmp_vfs_read_file_sync(const char *virtual_path, void **out_buffer,
     rc = CMP_MALLOC((size_t)req_len * sizeof(wchar_t), (void **)&wpath);
     if (rc != CMP_SUCCESS) {
       cfs_path_destroy(&p);
-      cmp_string_destroy(&resolved_path);
+      (void)cmp_string_destroy(&resolved_path);
       rc = CMP_ERROR_OOM;
       LOG_DEBUG("cmp_vfs_read_file_sync: CMP_MALLOC wpath failed\n");
       return rc;

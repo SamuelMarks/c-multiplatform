@@ -27,7 +27,6 @@ TEST test_forced_colors_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
   cmp_forced_colors_create(&ctx);
-
   res = cmp_forced_colors_strip_background(NULL, &strip);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -51,7 +50,6 @@ TEST test_forced_colors_apply(void) {
   int res;
 
   cmp_forced_colors_create(&ctx);
-
   /* By default, not enabled */
   res = cmp_forced_colors_strip_background(ctx, &strip_bg);
   ASSERT_EQ(CMP_SUCCESS, res);

@@ -33,7 +33,6 @@ TEST test_compositor_anim_null_args(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_compositor_anim_create(CMP_COMPOSITOR_PROP_OPACITY, &anim));
-
   res = cmp_compositor_anim_set_range(anim, NULL, &val);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -63,7 +62,6 @@ TEST test_compositor_anim_opacity_step(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_compositor_anim_create(CMP_COMPOSITOR_PROP_OPACITY, &anim));
-
   memset(&start_val, 0, sizeof(start_val));
   memset(&end_val, 0, sizeof(end_val));
   memset(&out_val, 0, sizeof(out_val));
@@ -73,7 +71,6 @@ TEST test_compositor_anim_opacity_step(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_compositor_anim_set_range(anim, &start_val, &end_val));
-
   /* Step 1: 50% */
   res = cmp_compositor_anim_step(anim, 50.0, 100.0, &out_val, &finished);
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -107,7 +104,6 @@ TEST test_compositor_anim_transform_step(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_compositor_anim_create(CMP_COMPOSITOR_PROP_TRANSFORM, &anim));
-
   memset(&start_val, 0, sizeof(start_val));
   memset(&end_val, 0, sizeof(end_val));
   memset(&out_val, 0, sizeof(out_val));
@@ -119,7 +115,6 @@ TEST test_compositor_anim_transform_step(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_compositor_anim_set_range(anim, &start_val, &end_val));
-
   /* Step 1: 50% */
   res = cmp_compositor_anim_step(anim, 50.0, 100.0, &out_val, &finished);
   ASSERT_EQ(CMP_SUCCESS, res);
@@ -140,7 +135,6 @@ TEST test_compositor_anim_zero_duration(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_compositor_anim_create(CMP_COMPOSITOR_PROP_OPACITY, &anim));
-
   memset(&out_val, 0, sizeof(out_val));
 
   res = cmp_compositor_anim_step(anim, 0.0, 0.0, &out_val, &finished);

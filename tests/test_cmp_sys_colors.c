@@ -32,7 +32,6 @@ TEST test_sys_colors_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
   cmp_sys_colors_create(&ctx);
-
   res = cmp_sys_colors_set(ctx, CMP_SYS_COLOR_CANVAS, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -65,7 +64,6 @@ TEST test_sys_colors_set_resolve(void) {
   int res;
 
   cmp_sys_colors_create(&ctx);
-
   memset(&color_in, 0, sizeof(color_in));
   memset(&color_out, 0, sizeof(color_out));
 

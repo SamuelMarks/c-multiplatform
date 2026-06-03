@@ -62,7 +62,6 @@ TEST test_null_args(void) {
   cmp_macos_material_t m;
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_tab_bar_create(NULL));
   cmp_tab_bar_create(&ctx);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_tab_bar_add_tab(NULL, "T", "I", "R"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_tab_bar_add_tab(ctx, NULL, "I", "R"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_tab_bar_add_tab(ctx, "T", NULL, "R"));
@@ -76,7 +75,6 @@ TEST test_null_args(void) {
             cmp_tab_bar_resolve_layout(ctx, 300.0f, NULL, &m));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_tab_bar_resolve_layout(ctx, 300.0f, &p, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_toolbar_resolve_placement(300.0f, NULL));
 
   cmp_tab_bar_destroy(ctx);

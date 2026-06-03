@@ -56,7 +56,7 @@ static int g_theme_is_dark = 0;
  */
 int cmp_system_theme_init(void) {
 int rc = CMP_SUCCESS;int is_dark = 0;
-  cmp_system_theme_is_dark(&is_dark);
+  (void)cmp_system_theme_is_dark(&is_dark);
   g_theme_is_dark = is_dark;
   /* In a real implementation we would listen to WM_SETTINGCHANGE here. */
   

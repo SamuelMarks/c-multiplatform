@@ -320,7 +320,8 @@ int cmp_ui_command_set_shortcut(cmp_ui_command_t *command_opaque,
   }
 
   if (ctx->shortcut) {
-    cmp_keyboard_shortcut_destroy((cmp_keyboard_shortcut_t *)ctx->shortcut);
+    (void)cmp_keyboard_shortcut_destroy(
+        (cmp_keyboard_shortcut_t *)ctx->shortcut);
   }
   ctx->shortcut = (struct cmp_keyboard_shortcut *)shortcut_opaque;
 

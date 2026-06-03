@@ -165,7 +165,6 @@ TEST test_f2_text_inputs_invalid_args(void) {
   res = cmp_f2_field_create(NULL, input_node, "Label");
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
   cmp_ui_node_destroy(input_node);
-
   res = cmp_f2_searchbox_create(NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 

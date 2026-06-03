@@ -20,16 +20,13 @@ TEST test_phase6_typography_stubs(void) {
             cmp_freetype_glyph_rasterize("test.ttf", 0, &tex, &metrics));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_freetype_glyph_rasterize(NULL, 0, &tex, &metrics));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_harfbuzz_text_shape(&font_stub, "test", 0, &count));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_harfbuzz_text_shape(NULL, "test", 0, &count));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_arabic_indic_shape(&font_stub, "test", &count));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_arabic_indic_shape(NULL, "test", &count));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_bidi_run_split("test", &count, &is_rtl));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_bidi_run_split(NULL, &count, &is_rtl));
 

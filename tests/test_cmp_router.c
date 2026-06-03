@@ -15,10 +15,12 @@ static void *dummy_view_builder(const char *uri) {
 }
 
 static int dummy_guard(const char *to_route, void *user_data) {
+  int rc = 0;
   g_guard_call_count++;
   (void)to_route;
   (void)user_data;
-  return !g_guard_block;
+  rc = !g_guard_block;
+  return rc;
 }
 
 TEST test_router_lifecycle(void) {
@@ -45,7 +47,6 @@ TEST test_router_navigation(void) {
   g_guard_block = 0;
 
   cmp_router_create(&router);
-
   /* Register routes */
   res = cmp_router_register(router, "/home", dummy_view_builder, NULL, NULL);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -68,7 +69,6 @@ TEST test_router_navigation(void) {
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT_STR_EQ("/home", current.data);
   cmp_string_destroy(&current);
-
   /* Push settings */
   res = cmp_router_push(router, "/settings");
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -80,7 +80,6 @@ TEST test_router_navigation(void) {
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT_STR_EQ("/settings", current.data);
   cmp_string_destroy(&current);
-
   /* Pop back to home */
   res = cmp_router_pop(router);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -91,7 +90,6 @@ TEST test_router_navigation(void) {
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT_STR_EQ("/home", current.data);
   cmp_string_destroy(&current);
-
   /* Replace home with new_home */
   res = cmp_router_replace(router, "/new_home");
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -100,7 +98,6 @@ TEST test_router_navigation(void) {
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT_STR_EQ("/new_home", current.data);
   cmp_string_destroy(&current);
-
   /* Test guard blocking */
   g_guard_block = 1;
   res = cmp_router_push(router, "/settings");
@@ -120,7 +117,6 @@ TEST test_router_dynamic_params(void) {
   g_view_call_count = 0;
 
   cmp_router_create(&router);
-
   res =
       cmp_router_register(router, "/user/:id", dummy_view_builder, NULL, NULL);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -133,7 +129,6 @@ TEST test_router_dynamic_params(void) {
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   ASSERT_STR_EQ("/user/42", current.data);
   cmp_string_destroy(&current);
-
   res = cmp_router_push(router, "/user");
   ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND, res, "%d");
 
@@ -162,7 +157,6 @@ TEST test_routing_styles(void) {
                                              NULL, NULL));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_router_register(router, "/details", dummy_builder, NULL, NULL));
-
   /* Push with presentation style */
   ASSERT_EQ(CMP_SUCCESS, cmp_router_push_with_style(
                              router, "/home", CMP_PRESENTATION_STYLE_PUSH));
@@ -180,7 +174,6 @@ TEST test_routing_styles(void) {
   /* Cannot get previous if only 1 item on stack */
   ASSERT_EQ(CMP_ERROR_NOT_FOUND,
             cmp_router_get_previous_title(router, title, 128));
-
   /* Tab switching flushes stack */
   ASSERT_EQ(CMP_SUCCESS, cmp_router_push_with_style(
                              router, "/details", CMP_PRESENTATION_STYLE_PUSH));
@@ -188,7 +181,6 @@ TEST test_routing_styles(void) {
 
   ASSERT_EQ(CMP_ERROR_NOT_FOUND,
             cmp_router_get_previous_title(router, title, 128));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_router_destroy(router));
   PASS();
 }

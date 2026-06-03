@@ -22,8 +22,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  cmp_modality_multiprocess_init(&mod);
-
+  (void)cmp_modality_multiprocess_init(&mod);
   printf("Starting UI in MULTIPROCESS_ACTOR modality...\n");
   /* Background worker processes spawn.
      If a worker crashes, the supervisor revives it via IPC Actor messages. */

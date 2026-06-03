@@ -25,7 +25,6 @@ TEST test_ui_navigation_rail_lifecycle(void) {
             cmp_ui_navigation_rail_set_selected(NULL, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ui_navigation_rail_bind_a11y(NULL, tree));
-
   /* Successful creation */
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_navigation_rail_create(&rail));
   ASSERT_NEQ(NULL, rail);
@@ -53,7 +52,6 @@ TEST test_ui_navigation_rail_lifecycle(void) {
             cmp_ui_navigation_rail_set_selected(rail, -1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ui_navigation_rail_set_selected(rail, 100));
-
   /* Set selection (valid) */
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_navigation_rail_set_selected(rail, 1));
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_navigation_rail_set_selected(rail, 2));

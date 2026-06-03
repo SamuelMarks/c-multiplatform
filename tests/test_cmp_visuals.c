@@ -43,7 +43,6 @@ TEST test_semantic_colors(void) {
   /* Not Found */
   ASSERT_EQ(CMP_ERROR_NOT_FOUND,
             cmp_semantic_colors_resolve(ctx, "doesNotExist", 1, &color));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_semantic_colors_destroy(ctx));
   PASS();
 }
@@ -82,25 +81,21 @@ TEST test_null_args(void) {
 
   cmp_semantic_colors_create(&sc);
   cmp_color_pipeline_create(&pl);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_semantic_colors_resolve(NULL, "label", 0, &color));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_semantic_colors_resolve(sc, NULL, 0, &color));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_semantic_colors_resolve(sc, "label", 0, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_semantic_colors_set_tint_color(NULL, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_semantic_colors_get_tint_color(NULL, &color));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_semantic_colors_get_tint_color(sc, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_semantic_colors_resolve_elevation(NULL, 0, 0, &color));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_semantic_colors_resolve_elevation(sc, 0, 0, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_color_pipeline_supports_p3(NULL, &bool_res));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_color_pipeline_supports_p3(pl, NULL));
@@ -119,7 +114,6 @@ TEST test_null_args(void) {
             cmp_color_srgb_to_oklch(NULL /* color_in */, NULL));
   cmp_semantic_colors_destroy(sc);
   cmp_color_pipeline_destroy(pl);
-
   PASS();
 }
 
@@ -129,14 +123,15 @@ TEST test_golden_image_visual_regression(void) {
   void *pixels = NULL;
   int w, h;
 
+  int rc;
   cmp_window_system_init();
-
   memset(&config, 0, sizeof(cmp_window_config_t));
   config.width = 200;
   config.height = 200;
   config.title = "Golden Image Validation";
 
-  if (cmp_window_create(&config, &window) != CMP_SUCCESS) {
+  rc = cmp_window_create(&config, &window);
+  if (rc != CMP_SUCCESS) {
     window = NULL;
   }
 

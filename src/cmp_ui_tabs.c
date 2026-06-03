@@ -135,8 +135,7 @@ int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
   }
 
   tab_node->type = 3; /* Button structure for click events */
-  cmp_ui_node_add_child(tabs->node_root, tab_node);
-
+  (void)cmp_ui_node_add_child(tabs->node_root, tab_node);
   tabs->tabs[tabs->tab_count].node = tab_node;
   tabs->tabs[tabs->tab_count].is_selected = 0;
 

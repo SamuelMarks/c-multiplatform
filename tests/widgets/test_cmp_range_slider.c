@@ -27,7 +27,6 @@ TEST test_range_slider_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
   cmp_range_slider_create(&slider);
-
   res = cmp_range_slider_set_value(slider, -1, 50.0f); /* Invalid index */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
@@ -42,7 +41,6 @@ TEST test_range_slider_set_value(void) {
   cmp_range_slider_t *slider = NULL;
   int res;
   cmp_range_slider_create(&slider);
-
   res = cmp_range_slider_set_value(slider, 0, 25.0f);
   ASSERT_EQ(CMP_SUCCESS, res);
 

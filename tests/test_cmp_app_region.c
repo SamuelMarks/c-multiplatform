@@ -61,7 +61,6 @@ TEST test_cmp_app_region_hit_test(void) {
             cmp_app_region_hit_test(NULL, 10, 10, &type));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_app_region_hit_test(region, 10, 10, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_app_region_destroy(region));
   PASS();
 }

@@ -17,7 +17,6 @@ TEST test_ui_virtual_list_lifecycle(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ui_virtual_list_get_node(NULL, &node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ui_virtual_list_set_item_count(NULL, 20));
-
   /* Successful creation */
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_virtual_list_create(&list, 10, 48.0f));
   ASSERT_NEQ(NULL, list);

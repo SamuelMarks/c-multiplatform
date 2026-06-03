@@ -10,14 +10,12 @@ TEST test_widget_lifecycle(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_box_create(&dummy_node));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_widget_ctx_create(&ctx, CMP_WIDGET_FAMILY_SYSTEM_MEDIUM));
-
   /* Mount static snapshot */
   ASSERT_EQ(CMP_SUCCESS, cmp_widget_mount_snapshot(ctx, dummy_node));
 
   /* Bind App Intent (Interactive Widget) */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_widget_bind_intent(ctx, dummy_node, "UpdateTaskIntent"));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_widget_ctx_destroy(ctx));
   ASSERT_EQ(CMP_SUCCESS, cmp_ui_node_destroy(dummy_node));
   PASS();
@@ -65,7 +63,6 @@ TEST test_null_args(void) {
             cmp_widget_ctx_create(NULL, CMP_WIDGET_FAMILY_SYSTEM_SMALL));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_widget_ctx_create(&w, CMP_WIDGET_FAMILY_SYSTEM_SMALL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_widget_mount_snapshot(NULL, node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_widget_mount_snapshot(w, NULL));
 

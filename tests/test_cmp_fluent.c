@@ -15,10 +15,8 @@ TEST test_fluent_reveal_lifecycle(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_fluent_reveal_update_pointer(NULL, 100.0f, 200.0f));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_fluent_reveal_update_pointer(reveal, 100.0f, 200.0f));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_fluent_reveal_destroy(NULL));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_fluent_reveal_destroy(reveal));

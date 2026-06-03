@@ -38,7 +38,6 @@ TEST test_android_renderer_init(void) {
             cmp_android_renderer_initialize_fallback(r, NULL, &backend));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_android_renderer_initialize_fallback(r, w, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_android_renderer_destroy(r));
   PASS();
 }

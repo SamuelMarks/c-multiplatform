@@ -35,7 +35,6 @@ TEST test_image_preview_load_base64(void) {
             cmp_image_preview_load_base64(preview, base64, &pixels, NULL, &h));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_image_preview_load_base64(preview, base64, &pixels, &w, NULL));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_image_preview_load_base64(preview, base64, &pixels, &w, &h));
   ASSERT_NEQ(NULL, pixels);
@@ -49,11 +48,9 @@ TEST test_image_preview_load_base64(void) {
   /* Test invalid length */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_image_preview_load_base64(preview, "QQ=", &pixels, &w, &h));
-
   /* Test invalid char */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_image_preview_load_base64(preview, "Q@==", &pixels, &w, &h));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_image_preview_destroy(preview));
   PASS();
 }

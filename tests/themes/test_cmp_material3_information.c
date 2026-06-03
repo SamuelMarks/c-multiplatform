@@ -48,7 +48,6 @@ TEST test_m3_carousel_resolve(void) {
   cmp_m3_carousel_metrics_t m;
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_carousel_resolve(CMP_M3_CAROUSEL_MULTI_BROWSE, NULL));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_carousel_resolve(CMP_M3_CAROUSEL_MULTI_BROWSE, &m));
   ASSERT_EQ(8.0f, m.item_spacing);

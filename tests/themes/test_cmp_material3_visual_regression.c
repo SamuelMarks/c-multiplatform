@@ -18,7 +18,6 @@ TEST test_material3_visual_golden_baseline(void) {
 
   cmp_event_system_init();
   cmp_window_system_init();
-
   config.title = "Material 3 Visual Regression Test";
   config.width = 400;
   config.height = 300;
@@ -44,9 +43,7 @@ TEST test_material3_visual_golden_baseline(void) {
 
   cmp_layout_calculate(btn->layout, 400.0f, 300.0f);
   cmp_window_set_ui_tree(win, btn);
-
   cmp_window_poll_events(win);
-
   res = cmp_test_capture_snapshot(win, &pixels, &width, &height);
   if (res == CMP_SUCCESS && pixels != NULL) {
     ASSERT(width > 0);
@@ -98,7 +95,6 @@ TEST test_material3_mosaic_visual(void) {
 
   cmp_event_system_init();
   cmp_window_system_init();
-
   config.title = "Material 3 Mosaic Headless";
   config.width = 800;
   config.height = 600;
@@ -140,12 +136,9 @@ TEST test_material3_mosaic_visual(void) {
 
   cmp_ui_node_add_child(root, card1);
   cmp_ui_node_add_child(root, card2);
-
   cmp_layout_calculate(root->layout, 800.0f, 600.0f);
   cmp_window_set_ui_tree(win, root);
-
   cmp_window_poll_events(win);
-
   res = cmp_test_capture_snapshot(win, &pixels, &width, &height);
   if (res == CMP_SUCCESS && pixels != NULL) {
     res = cmp_test_compare_golden("material3_mosaic_light.bmp",
@@ -158,7 +151,6 @@ TEST test_material3_mosaic_visual(void) {
   cmp_i18n_set_bidi_direction(CMP_TEXT_DIR_RTL);
   cmp_layout_calculate(root->layout, 800.0f, 600.0f);
   cmp_window_poll_events(win);
-
   res = cmp_test_capture_snapshot(win, &pixels, &width, &height);
   if (res == CMP_SUCCESS && pixels != NULL) {
     res = cmp_test_compare_golden("material3_mosaic_rtl.bmp",
@@ -167,7 +159,6 @@ TEST test_material3_mosaic_visual(void) {
     ASSERT_EQ(0, res);
   }
   cmp_i18n_set_bidi_direction(CMP_TEXT_DIR_LTR);
-
   cmp_window_destroy(win);
   cmp_window_system_shutdown();
   cmp_event_system_shutdown();

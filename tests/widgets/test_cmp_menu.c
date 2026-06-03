@@ -104,13 +104,11 @@ TEST test_null_args(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_menu_create(NULL, CMP_MENU_PRESENTATION_CONTEXT));
   cmp_menu_create(&m, CMP_MENU_PRESENTATION_CONTEXT);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_menu_item_create(NULL, "a", "b", CMP_MENU_ITEM_ROLE_STANDARD));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_menu_item_create(&i, NULL, "b", CMP_MENU_ITEM_ROLE_STANDARD));
   cmp_menu_item_create(&i, "a", "b", CMP_MENU_ITEM_ROLE_STANDARD);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_menu_add_item(NULL, i));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_menu_add_item(m, NULL));
 
@@ -118,10 +116,8 @@ TEST test_null_args(void) {
             cmp_menu_item_create_submenu(NULL, "a", "b", m));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_menu_item_create_submenu(&i, "a", "b", NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_menu_item_set_state(NULL, CMP_MENU_ITEM_STATE_ON));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_menu_resolve_presentation(NULL, &r, &r, &r));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -130,7 +126,6 @@ TEST test_null_args(void) {
             cmp_menu_resolve_presentation(m, &r, NULL, &r));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_menu_resolve_presentation(m, &r, &r, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_menu_item_resolve_visuals(NULL, &r, &c));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_menu_item_resolve_visuals(i, NULL, &c));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_menu_item_resolve_visuals(i, &r, NULL));

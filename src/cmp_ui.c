@@ -104,7 +104,7 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
 
   len = (text_len < 0) ? strlen(text) : (size_t)text_len;
   if (CMP_MALLOC(len + 1, (void **)&text_copy) != CMP_SUCCESS) {
-    cmp_layout_node_destroy(node->layout);
+    (void)cmp_layout_node_destroy(node->layout);
     {
 
       int free_rc_3 = CMP_FREE(node);
@@ -176,7 +176,7 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
 
   len = (label_len < 0) ? strlen(label) : (size_t)label_len;
   if (CMP_MALLOC(len + 1, (void **)&label_copy) != CMP_SUCCESS) {
-    cmp_layout_node_destroy(node->layout);
+    (void)cmp_layout_node_destroy(node->layout);
     {
 
       int free_rc_5 = CMP_FREE(node);
@@ -294,7 +294,7 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
   if (label != NULL) {
     size_t len = strlen(label);
     if (CMP_MALLOC(len + 1, (void **)&label_copy) != CMP_SUCCESS) {
-      cmp_layout_node_destroy(node->layout);
+      (void)cmp_layout_node_destroy(node->layout);
       {
 
         int free_rc_8 = CMP_FREE(node);
@@ -365,7 +365,7 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
   }
 
   if (CMP_MALLOC(sizeof(int), (void **)&group_prop) != CMP_SUCCESS) {
-    cmp_layout_node_destroy(node->layout);
+    (void)cmp_layout_node_destroy(node->layout);
     {
 
       int free_rc_10 = CMP_FREE(node);
@@ -446,7 +446,8 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
   if (strstr(image_path, ".svg") != NULL) {
     void *buffer = NULL;
     size_t size = 0;
-    if (cmp_svg_renderer_create(&renderer, 0.5f) == CMP_SUCCESS) {
+    rc = cmp_svg_renderer_create(&renderer, 0.5f);
+    if (rc == CMP_SUCCESS) {
       if (cmp_vfs_read_file_sync(image_path, &buffer, &size) == CMP_SUCCESS &&
           buffer != NULL) {
         char *svg_str;
@@ -461,7 +462,7 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
             char *end = strchr(start, '"');
             if (end) {
               *end = '\0';
-              cmp_svg_parse_path_str(start, renderer);
+              (void)cmp_svg_parse_path_str(start, renderer);
             }
           }
           {
@@ -502,7 +503,7 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
       }
     }
     if (renderer)
-      cmp_svg_renderer_destroy(renderer);
+      (void)cmp_svg_renderer_destroy(renderer);
   }
 
   *out_node = node;
@@ -557,7 +558,7 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
   }
 
   if (CMP_MALLOC(sizeof(float) * 2, (void **)&bounds) != CMP_SUCCESS) {
-    cmp_layout_node_destroy(node->layout);
+    (void)cmp_layout_node_destroy(node->layout);
     {
 
       int free_rc_16 = CMP_FREE(node);
@@ -673,7 +674,7 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
   }
 
   if (CMP_MALLOC(sizeof(int), (void **)&cols_prop) != CMP_SUCCESS) {
-    cmp_layout_node_destroy(node->layout);
+    (void)cmp_layout_node_destroy(node->layout);
     {
 
       int free_rc_19 = CMP_FREE(node);
@@ -937,8 +938,7 @@ int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child) {
   child->parent = parent;
 
   /* Link Layout Hierarchy */
-  cmp_layout_node_add_child(parent->layout, child->layout);
-
+  (void)cmp_layout_node_add_child(parent->layout, child->layout);
   return rc;
 }
 
@@ -1071,7 +1071,7 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
   }
 
   for (i = 0; i < node->child_count; i++) {
-    cmp_ui_node_destroy(node->children[i]);
+    (void)cmp_ui_node_destroy(node->children[i]);
   }
 
   if (node->children != NULL) {
@@ -1092,7 +1092,7 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
      * single layout node itself by detaching it first to prevent double-free if
      * someone calls cmp_layout_node_destroy manually */
     node->layout->child_count = 0;
-    cmp_layout_node_destroy(node->layout);
+    (void)cmp_layout_node_destroy(node->layout);
   }
 
   if (node->type == 2 && node->properties != NULL) {
@@ -1118,7 +1118,7 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
       }
     }
     if (props[1])
-      cmp_svg_renderer_destroy((cmp_svg_renderer_t *)props[1]);
+      (void)cmp_svg_renderer_destroy((cmp_svg_renderer_t *)props[1]);
     {
 
       int free_rc_29 = CMP_FREE(node->properties);

@@ -63,11 +63,9 @@ TEST test_scroll_velocity_edge_cases(void) {
             cmp_scroll_velocity_push(NULL, &event, 16.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_scroll_velocity_push(tracker, NULL, 16.0f));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_scroll_velocity_get(NULL, &vx, &vy));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_scroll_velocity_get(tracker, NULL, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_scroll_velocity_destroy(tracker));
   PASS();
 }

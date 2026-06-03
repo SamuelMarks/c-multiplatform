@@ -18,7 +18,6 @@ TEST test_f2_visual_golden_baseline(void) {
 
   cmp_event_system_init();
   cmp_window_system_init();
-
   config.title = "F2 Visual Regression Test";
   config.width = 400;
   config.height = 300;
@@ -42,13 +41,10 @@ TEST test_f2_visual_golden_baseline(void) {
   res = cmp_f2_button_create(&btn, "Golden Button", NULL);
   ASSERT_EQ(CMP_SUCCESS, res);
   cmp_f2_button_set_variant(btn, CMP_F2_BUTTON_VARIANT_PRIMARY);
-
   cmp_layout_calculate(btn->layout, 400.0f, 300.0f);
   cmp_window_set_ui_tree(win, btn);
-
   /* Pump events to ensure rendering layout */
   cmp_window_poll_events(win);
-
   /* Capture framebuffer */
   res = cmp_test_capture_snapshot(win, &pixels, &width, &height);
   if (res == CMP_SUCCESS && pixels != NULL) {

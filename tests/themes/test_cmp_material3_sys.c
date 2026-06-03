@@ -16,7 +16,6 @@ TEST test_m3_sys_colors(void) {
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
       cmp_m3_sys_colors_generate(seed, 0, CMP_M3_CONTRAST_STANDARD, NULL));
-
   /* Light Standard */
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_sys_colors_generate(
                              seed, 0, CMP_M3_CONTRAST_STANDARD, &colors));
@@ -28,7 +27,6 @@ TEST test_m3_sys_colors(void) {
   /* Light High */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_sys_colors_generate(seed, 0, CMP_M3_CONTRAST_HIGH, &colors));
-
   /* Dark Standard */
   ASSERT_EQ(CMP_SUCCESS, cmp_m3_sys_colors_generate(
                              seed, 1, CMP_M3_CONTRAST_STANDARD, &colors));
@@ -40,7 +38,6 @@ TEST test_m3_sys_colors(void) {
   /* Dark High */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_sys_colors_generate(seed, 1, CMP_M3_CONTRAST_HIGH, &colors));
-
   PASS();
 }
 
@@ -51,7 +48,6 @@ TEST test_m3_shape_resolve(void) {
   ASSERT_EQ(
       CMP_ERROR_INVALID_ARG,
       cmp_m3_shape_resolve(CMP_M3_SHAPE_SMALL, NULL, NULL, &tr, &bl, &br));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_shape_resolve(CMP_M3_SHAPE_NONE, NULL, &tl, &tr, &bl, &br));
   ASSERT_EQ(0.0f, tl);
@@ -158,7 +154,6 @@ TEST test_m3_state_layer_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_state_layer_resolve(CMP_M3_STATE_HOVER, NULL));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_state_layer_resolve(CMP_M3_STATE_HOVER, &opacity));
   ASSERT_EQ(0.08f, opacity);
@@ -185,7 +180,6 @@ TEST test_m3_state_layer_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_state_layer_resolve((cmp_m3_state_layer_t)999, &opacity));
-
   PASS();
 }
 

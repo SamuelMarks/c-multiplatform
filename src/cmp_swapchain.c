@@ -44,8 +44,7 @@ int cmp_swapchain_create(cmp_window_t *window, cmp_swapchain_mode_t mode,
   ctx->window = window;
   ctx->mode = mode;
   ctx->is_active = 1;
-  cmp_window_get_native_handle(window, &ctx->os_surface_handle);
-
+  (void)cmp_window_get_native_handle(window, &ctx->os_surface_handle);
   /* Configure buffers based on presentation mode */
   if (mode == CMP_SWAPCHAIN_MAILBOX) {
     ctx->buffer_count = 3;     /* Triple buffering */
@@ -170,12 +169,13 @@ int cmp_swapchain_present(cmp_swapchain_t *swapchain) {
  */
 int cmp_swapchain_get_os_surface_handle(cmp_swapchain_t *swapchain,
                                         void **out_handle) {
+  int rc = CMP_SUCCESS;
   struct cmp_swapchain *ctx = (struct cmp_swapchain *)swapchain;
   if (!ctx || !out_handle)
     return CMP_ERROR_INVALID_ARG;
 
   *out_handle = ctx->os_surface_handle;
-  return 0;
+  return rc;
 }
 
 /**

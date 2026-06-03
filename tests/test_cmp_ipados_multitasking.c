@@ -12,7 +12,6 @@ TEST test_ipados_multitasking_lifecycle(void) {
 
   ASSERT_EQ(CMP_SUCCESS,
             cmp_ipados_multitasking_request_scene(mt, "com.example.activity"));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_ipados_multitasking_resolve_layout(
                              mt, 1024.0f, 768.0f, &h, &v));
 
@@ -33,7 +32,6 @@ TEST test_ipados_multitasking_null_args(void) {
                                        NULL, "com.example.activity"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ipados_multitasking_request_scene(mt, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ipados_multitasking_resolve_layout(
                                        NULL, 1024.0f, 768.0f, &h, &v));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_ipados_multitasking_resolve_layout(

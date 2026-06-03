@@ -48,7 +48,6 @@ TEST test_window_lifecycle(void) {
 
   /* Spin briefly to let the paint message dispatch */
   cmp_window_poll_events(window);
-
   res = cmp_window_destroy(window);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 #else
@@ -368,7 +367,6 @@ TEST test_wasm_apis(void) {
   cmp_modality_t mod;
 
   cmp_modality_sync_single_init(&mod);
-
   res = cmp_window_wasm_init("#canvas");
 #if defined(__EMSCRIPTEN__)
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
@@ -602,7 +600,6 @@ TEST test_window_null_args(void) {
   memset(&config, 0, sizeof(config));
 
   cmp_window_system_init();
-
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_window_create(NULL, &window), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_window_create(&config, NULL), "%d");
 

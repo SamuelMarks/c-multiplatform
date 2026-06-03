@@ -18,7 +18,6 @@ TEST test_cupertino_visual_golden_baseline(void) {
 
   cmp_event_system_init();
   cmp_window_system_init();
-
   config.title = "Cupertino Visual Regression Test";
   config.width = 400;
   config.height = 300;
@@ -44,9 +43,7 @@ TEST test_cupertino_visual_golden_baseline(void) {
 
   cmp_layout_calculate(btn->layout, 400.0f, 300.0f);
   cmp_window_set_ui_tree(win, btn);
-
   cmp_window_poll_events(win);
-
   res = cmp_test_capture_snapshot(win, &pixels, &width, &height);
   if (res == CMP_SUCCESS && pixels != NULL) {
     ASSERT(width > 0);

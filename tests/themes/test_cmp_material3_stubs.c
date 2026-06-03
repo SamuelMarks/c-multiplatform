@@ -188,7 +188,6 @@ TEST test_material3_configs(void) {
             cmp_material3_get_spring_config(NULL, &a, &b, &c));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_material3_get_ripple_config(NULL, &a, &b));
-
   cmp_ui_node_destroy(node);
   PASS();
 }

@@ -586,8 +586,7 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
   cv->waiters_count++;
   ReleaseMutex(cv->waiters_count_lock);
 
-  cmp_mutex_unlock(mutex);
-
+  (void)cmp_mutex_unlock(mutex);
   result = WaitForMultipleObjects(2, (const void **)cv->events, 0, 0xFFFFFFFF);
 
   WaitForSingleObject(cv->waiters_count_lock, 0xFFFFFFFF);
@@ -599,7 +598,7 @@ int cmp_cond_wait(cmp_cond_t *cond, cmp_mutex_t *mutex) {
     ResetEvent(cv->events[1]); /* Reset broadcast */
   }
 
-  cmp_mutex_lock(mutex);
+  (void)cmp_mutex_lock(mutex);
 #else
   if (pthread_cond_wait(cond, mutex) != 0) {
     rc = CMP_ERROR_INVALID_ARG;

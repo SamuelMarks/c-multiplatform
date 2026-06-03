@@ -751,6 +751,8 @@ int cmp_color_verify_contrast_ratio(uint32_t foreground_rgba,
   float lum1 = cmp_math_get_luminance(foreground_rgba);
   float lum2 = cmp_math_get_luminance(background_rgba);
   float ratio;
+  (void)lum1;
+  (void)lum2;
 
   if (out_passes_wcag == NULL) {
     rc = CMP_ERROR_INVALID_ARG;

@@ -48,9 +48,11 @@ TEST test_cmp_dpi_update_window_scale(void) {
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 0};
   cmp_window_t *win = NULL;
 
+  int rc;
   ASSERT_EQ(CMP_SUCCESS, cmp_window_system_init());
 
-  if (cmp_window_create(&cfg, &win) != CMP_SUCCESS) {
+  rc = cmp_window_create(&cfg, &win);
+  if (rc != CMP_SUCCESS) {
     win = NULL;
   }
   ASSERT_EQ(CMP_SUCCESS, cmp_dpi_create(&dpi));

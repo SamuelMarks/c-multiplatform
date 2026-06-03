@@ -578,10 +578,14 @@ int cmp_shadow_9patch_generate_blur(cmp_shadow_9patch_t *shadow,
       draw_call.shader_id = 1; /* Horizontal Gaussian blur */
       draw_call.vertex_count = 6;
       rc = cmp_command_buffer_draw(cb, &draw_call);
+      if (rc != CMP_SUCCESS)
+        return rc;
 
       if (rc == CMP_SUCCESS) {
         draw_call.shader_id = 2; /* Vertical Gaussian blur */
         rc = cmp_command_buffer_draw(cb, &draw_call);
+        if (rc != CMP_SUCCESS)
+          return rc;
       }
 
       err_rc = cmp_command_buffer_end(cb);

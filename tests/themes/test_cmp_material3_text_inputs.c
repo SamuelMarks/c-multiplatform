@@ -9,7 +9,6 @@ TEST test_m3_text_field_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_text_field_resolve(CMP_M3_TEXT_FIELD_FILLED, NULL));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_m3_text_field_resolve(CMP_M3_TEXT_FIELD_FILLED, &m));
   ASSERT_EQ(56.0f, m.container_height_single_line);
@@ -32,7 +31,6 @@ TEST test_m3_text_field_resolve(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_m3_text_field_resolve((cmp_m3_text_field_variant_t)999, &m));
-
   PASS();
 }
 

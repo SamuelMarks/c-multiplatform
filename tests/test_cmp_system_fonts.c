@@ -55,8 +55,9 @@ TEST test_cmp_font_fallback_chain(void) {
   cmp_font_t *font_fallback_1 = NULL;
   cmp_font_t *font_fallback_2 = NULL;
 
-  if (cmp_font_load_memory(dummy_ttf, sizeof(dummy_ttf), 16.0f, &font_main) ==
-      CMP_SUCCESS) {
+  int rc =
+      cmp_font_load_memory(dummy_ttf, sizeof(dummy_ttf), 16.0f, &font_main);
+  if (rc == CMP_SUCCESS) {
     if (cmp_font_load_memory(dummy_ttf, sizeof(dummy_ttf), 16.0f,
                              &font_fallback_1) == CMP_SUCCESS) {
       if (cmp_font_load_memory(dummy_ttf, sizeof(dummy_ttf), 16.0f,
@@ -65,7 +66,6 @@ TEST test_cmp_font_fallback_chain(void) {
                   cmp_font_add_fallback(font_main, font_fallback_1));
         ASSERT_EQ(CMP_SUCCESS,
                   cmp_font_add_fallback(font_main, font_fallback_2));
-
         ASSERT_EQ(2, (int)font_main->fallback_count);
         ASSERT(font_main->fallback_capacity >= 2);
         ASSERT_EQ(font_fallback_1, font_main->fallbacks[0]);
@@ -89,7 +89,6 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_system_fonts_create(NULL));
   cmp_system_fonts_create(&ctx);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_system_fonts_request(NULL, CMP_SYSTEM_FONT_SF_PRO,
                                      CMP_TEXT_STYLE_BODY, 400, &font));
@@ -106,7 +105,6 @@ TEST test_null_args(void) {
             cmp_font_set_opentype_features(NULL, 1, 1, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_font_set_variable_axes(NULL, 1.0f, 1.0f));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_system_fonts_get_metrics(ctx, CMP_TEXT_STYLE_BODY, NULL,
                                          &float_out, &float_out));

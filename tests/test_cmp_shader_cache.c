@@ -111,7 +111,6 @@ TEST test_shader_cache_edge_cases(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_shader_cache_save_to_disk(NULL, "file"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_shader_cache_load_from_disk(NULL, "file"));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_shader_cache_create(&cache));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_shader_cache_store(cache, NULL, &shader));
@@ -121,11 +120,9 @@ TEST test_shader_cache_edge_cases(void) {
             cmp_shader_cache_retrieve(cache, NULL, &retrieved));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_shader_cache_retrieve(cache, "key", NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_shader_cache_save_to_disk(cache, NULL));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_shader_cache_load_from_disk(cache, NULL));
-
   /* Load from missing file */
   ASSERT_EQ(CMP_ERROR_IO, cmp_shader_cache_load_from_disk(
                               cache, "this_file_does_not_exist.bin"));

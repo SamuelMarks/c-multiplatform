@@ -307,20 +307,19 @@ int cmp_m3_generate_tonal_palette_hct(float hue, float chroma,
   if (!out_palette)
     return CMP_ERROR_INVALID_ARG;
 
-  cmp_m3_hct_to_srgb(hue, chroma, 0.0f, &out_palette->tone0);
-  cmp_m3_hct_to_srgb(hue, chroma, 10.0f, &out_palette->tone10);
-  cmp_m3_hct_to_srgb(hue, chroma, 20.0f, &out_palette->tone20);
-  cmp_m3_hct_to_srgb(hue, chroma, 30.0f, &out_palette->tone30);
-  cmp_m3_hct_to_srgb(hue, chroma, 40.0f, &out_palette->tone40);
-  cmp_m3_hct_to_srgb(hue, chroma, 50.0f, &out_palette->tone50);
-  cmp_m3_hct_to_srgb(hue, chroma, 60.0f, &out_palette->tone60);
-  cmp_m3_hct_to_srgb(hue, chroma, 70.0f, &out_palette->tone70);
-  cmp_m3_hct_to_srgb(hue, chroma, 80.0f, &out_palette->tone80);
-  cmp_m3_hct_to_srgb(hue, chroma, 90.0f, &out_palette->tone90);
-  cmp_m3_hct_to_srgb(hue, chroma, 95.0f, &out_palette->tone95);
-  cmp_m3_hct_to_srgb(hue, chroma, 99.0f, &out_palette->tone99);
-  cmp_m3_hct_to_srgb(hue, chroma, 100.0f, &out_palette->tone100);
-
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 0.0f, &out_palette->tone0);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 10.0f, &out_palette->tone10);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 20.0f, &out_palette->tone20);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 30.0f, &out_palette->tone30);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 40.0f, &out_palette->tone40);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 50.0f, &out_palette->tone50);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 60.0f, &out_palette->tone60);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 70.0f, &out_palette->tone70);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 80.0f, &out_palette->tone80);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 90.0f, &out_palette->tone90);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 95.0f, &out_palette->tone95);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 99.0f, &out_palette->tone99);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 100.0f, &out_palette->tone100);
   return rc;
 }
 
@@ -338,19 +337,21 @@ int cmp_m3_palettes_generate(cmp_color_t seed,
   if (!out_palettes)
     return CMP_ERROR_INVALID_ARG;
 
-  if (cmp_m3_srgb_to_hct(&seed, &h, &c, &t) != 0) {
+  rc = cmp_m3_srgb_to_hct(&seed, &h, &c, &t);
+  if (rc != 0) {
     return CMP_ERROR_INVALID_ARG;
   }
 
   /* Core Palette math for M3 Baseline */
-  cmp_m3_generate_tonal_palette_hct(h, c, &out_palettes->primary);
-  cmp_m3_generate_tonal_palette_hct(h, c / 3.0f, &out_palettes->secondary);
+  (void)cmp_m3_generate_tonal_palette_hct(h, c, &out_palettes->primary);
+  (void)cmp_m3_generate_tonal_palette_hct(h, c / 3.0f,
+                                          &out_palettes->secondary);
   cmp_m3_generate_tonal_palette_hct(h + 60.0f, c / 2.0f,
                                     &out_palettes->tertiary);
-  cmp_m3_generate_tonal_palette_hct(25.0f, 84.0f, &out_palettes->error);
-  cmp_m3_generate_tonal_palette_hct(h, 4.0f, &out_palettes->neutral);
-  cmp_m3_generate_tonal_palette_hct(h, 8.0f, &out_palettes->neutral_variant);
-
+  (void)cmp_m3_generate_tonal_palette_hct(25.0f, 84.0f, &out_palettes->error);
+  (void)cmp_m3_generate_tonal_palette_hct(h, 4.0f, &out_palettes->neutral);
+  (void)cmp_m3_generate_tonal_palette_hct(h, 8.0f,
+                                          &out_palettes->neutral_variant);
   return rc;
 }
 
@@ -371,9 +372,8 @@ int cmp_m3_generate_tonal_palette(float hue, float chroma, float tone,
   (void)tone; /* We ignore original tone to generate a full spectrum */
 
   /* Material 3 specifically defines these specific tones */
-  cmp_m3_hct_to_srgb(hue, chroma, 40.0f, &out_palette->primary);
-  cmp_m3_hct_to_srgb(hue, chroma, 100.0f, &out_palette->on_primary);
-
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 40.0f, &out_palette->primary);
+  (void)cmp_m3_hct_to_srgb(hue, chroma, 100.0f, &out_palette->on_primary);
   return rc;
 }
 
@@ -551,8 +551,8 @@ int cmp_m3_scheme_monochrome(float hue, float chroma, float tone, int is_dark,
   (void)chroma;
 
   /* Monochrome: 0 Chroma */
-  cmp_m3_hct_to_srgb(hue, 0.0f, is_dark ? 80.0f : 40.0f, &out_palette->primary);
-
+  (void)cmp_m3_hct_to_srgb(hue, 0.0f, is_dark ? 80.0f : 40.0f,
+                           &out_palette->primary);
   return rc;
 }
 

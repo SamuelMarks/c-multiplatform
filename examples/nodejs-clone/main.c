@@ -23,8 +23,7 @@ int main(int argc, char **argv) {
   }
 
   /* Set the Modality to ASYNC_SINGLE_SINGLE */
-  cmp_modality_async_single_init(&mod);
-
+  (void)cmp_modality_async_single_init(&mod);
   /* Here we would setup a HTTP server socket using c-abstract-http via
      cmp_net_*, but for example purposes we just print that it would run the
      async loop. */

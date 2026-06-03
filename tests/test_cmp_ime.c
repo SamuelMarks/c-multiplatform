@@ -46,7 +46,6 @@ TEST test_ime_update(void) {
   long_str[255] = '\0';
 
   cmp_ime_create(&ime);
-
   res = cmp_ime_update_composition(ime, "test string");
   ASSERT_EQ(CMP_SUCCESS, res);
 

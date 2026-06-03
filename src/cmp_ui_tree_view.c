@@ -106,21 +106,22 @@ int cmp_ui_tree_view_add_item(cmp_ui_tree_view_t *tree_view, const char *label,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (cmp_i18n_translate(label, &translated) == 0 && translated.data) {
+  rc = cmp_i18n_translate(label, &translated);
+  if (rc == 0 && translated.data) {
     final_label = translated.data;
   }
 
   err = cmp_ui_text_create(&node_text, final_label, -1);
 
   if (translated.data) {
-    cmp_string_destroy(&translated);
+    (void)cmp_string_destroy(&translated);
   }
 
   if (err != 0) {
     return err;
   }
 
-  cmp_ui_node_add_child(tree_view->node_root, node_text);
+  (void)cmp_ui_node_add_child(tree_view->node_root, node_text);
   tree_view->item_count++;
 
   return rc;

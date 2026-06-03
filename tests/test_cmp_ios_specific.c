@@ -67,7 +67,6 @@ TEST test_ios_reachability(void) {
   /* OS pushes view down 400pts */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_ios_mitigate_reachability_offset(&touch_y, 400.0f));
-
   /* Logical touch hitting the UI should be 200 */
   ASSERT_EQ(200.0f, touch_y);
 
@@ -103,29 +102,24 @@ TEST test_ios_null_args(void) {
             cmp_ios_calculate_keyboard_avoidance(0.0f, 0.0f, 0.0f, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_calculate_keyboard_avoidance(0.0f, 0.0f, 1.0f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_evaluate_pull_to_refresh(0.0f, NULL, &i));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_evaluate_pull_to_refresh(0.0f, &f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_evaluate_sheet_detent_snap(0.0f, 0.0f, &d));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_evaluate_sheet_detent_snap(0.0f, 100.0f, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_mitigate_reachability_offset(NULL, 10.0f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_mitigate_reachability_offset(&f, -1.0f));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_evaluate_context_menu_peek(-0.1f, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_evaluate_context_menu_peek(1.1f, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_ios_evaluate_context_menu_peek(0.5f, NULL));
-
   PASS();
 }
 

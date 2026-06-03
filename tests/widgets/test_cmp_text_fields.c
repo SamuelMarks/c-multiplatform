@@ -21,7 +21,6 @@ TEST test_text_field_configurations(void) {
   /* Accessory View Mount */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_text_field_set_input_accessory_view(ctx, &dummy_node));
-
   /* Secure Entry Overrides */
   ASSERT_EQ(CMP_SUCCESS, cmp_text_field_set_secure_text_entry(ctx, 1));
 
@@ -54,7 +53,6 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_text_field_create(NULL));
   cmp_text_field_create(&tf);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_text_field_set_keyboard_type(NULL, CMP_KEYBOARD_TYPE_DEFAULT));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -67,13 +65,10 @@ TEST test_null_args(void) {
             cmp_text_field_set_spellcheck_enabled(NULL, 0));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_text_field_set_input_accessory_view(NULL, &dummy));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_rich_text_view_create(NULL));
   cmp_rich_text_view_create(&rt);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_rich_text_view_set_data_detectors(NULL, CMP_DATA_DETECTOR_ALL));
-
   cmp_text_field_destroy(tf);
   cmp_rich_text_view_destroy(rt);
   PASS();

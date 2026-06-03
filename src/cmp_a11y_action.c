@@ -226,8 +226,9 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
     cmp_log_debug("cmp_a11y_action_execute: Set focus to node %d\n", node_id);
     break;
 
-  case CMP_A11Y_ACTION_BLUR:
-    if (cmp_event_get_focus() == node_id) {
+  case CMP_A11Y_ACTION_BLUR: {
+    int focused_node = cmp_event_get_focus();
+    if (focused_node == node_id) {
       rc = cmp_event_clear_focus();
       if (rc != CMP_SUCCESS) {
         err_rc = cmp_strerror(rc, &err_str);
@@ -248,6 +249,7 @@ int cmp_a11y_action_execute(cmp_a11y_action_t *action, int node_id,
           node_id);
     }
     break;
+  }
 
   default:
     rc = CMP_ERROR_INVALID_ARG;

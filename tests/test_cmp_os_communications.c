@@ -49,7 +49,6 @@ TEST test_os_communications_focus_shareplay(void) {
   /* Shareplay */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_os_communications_start_shareplay(ctx, "com.app.watch_video"));
-
   /* Share Sheet */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_os_communications_show_share_sheet(
@@ -67,14 +66,12 @@ TEST test_os_communications_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_os_communications_create(NULL));
   cmp_os_communications_create(&ctx);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_communications_register_intent(NULL, "a", "b"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_communications_register_intent(ctx, NULL, "b"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_communications_register_intent(ctx, "a", NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_communications_show_share_sheet(NULL, dummy, "a", "b"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -89,7 +86,6 @@ TEST test_os_communications_null_args(void) {
             cmp_os_communications_broadcast_handoff(ctx, NULL, "b"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_communications_broadcast_handoff(ctx, "a", NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_communications_index_for_spotlight(NULL, "a", "b", "c"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
@@ -98,17 +94,14 @@ TEST test_os_communications_null_args(void) {
             cmp_os_communications_index_for_spotlight(ctx, "a", NULL, "c"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_communications_index_for_spotlight(ctx, "a", "b", NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_communications_evaluate_focus_mode(NULL, &i));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_communications_evaluate_focus_mode(ctx, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_communications_start_shareplay(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_os_communications_start_shareplay(ctx, NULL));
-
   cmp_os_communications_destroy(ctx);
   PASS();
 }

@@ -32,7 +32,6 @@ TEST test_cmp_i18n_strings(void) {
             cmp_i18n_add_string(i18n, "en", "hello", "Hello World"));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_i18n_add_string(i18n, "fr", "hello", "Bonjour le monde"));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_i18n_get_string(i18n, "en", "hello", &value));
   ASSERT_NEQ(NULL, value);
   ASSERT_STR_EQ("Hello World", value);
@@ -48,7 +47,6 @@ TEST test_cmp_i18n_strings(void) {
             cmp_i18n_get_string(i18n, "es", "hello", &value));
   ASSERT_EQ(CMP_ERROR_NOT_FOUND,
             cmp_i18n_get_string(i18n, "en", "goodbye", &value));
-
   /* Null checks */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_i18n_add_string(NULL, "en", "k", "v"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_i18n_add_string(i18n, NULL, "k", "v"));
@@ -130,7 +128,6 @@ TEST test_cmp_i18n_bidi(void) {
   ASSERT_EQ(1, is_rtl);
 
   cmp_i18n_set_bidi_direction(CMP_TEXT_DIR_LTR);
-
   PASS();
 }
 

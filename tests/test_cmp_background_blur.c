@@ -30,7 +30,6 @@ TEST test_cmp_background_blur_invalid_args(void) {
             cmp_background_blur_set_enabled(NULL, NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_background_blur_set_enabled(blur, NULL, 1));
-
   /* Is enabled with NULLs */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_background_blur_is_enabled(NULL, NULL, &is_enabled));
@@ -38,7 +37,6 @@ TEST test_cmp_background_blur_invalid_args(void) {
             cmp_background_blur_is_enabled(blur, NULL, &is_enabled));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_background_blur_is_enabled(blur, (cmp_window_t *)1, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_background_blur_destroy(blur));
   PASS();
 }

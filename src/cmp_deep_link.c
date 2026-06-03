@@ -197,7 +197,7 @@ int cmp_state_restoration_encode(cmp_state_restoration_ctx_t *ctx,
       if (err_rc != CMP_SUCCESS) {
         err_str = "Unknown";
       }
-      cmp_string_destroy(&uri);
+      (void)cmp_string_destroy(&uri);
       cmp_log_debug("cmp_state_restoration_encode: Out of memory: %s\n",
                     err_str);
       return CMP_ERROR_OOM;
@@ -206,7 +206,7 @@ int cmp_state_restoration_encode(cmp_state_restoration_ctx_t *ctx,
     if (strcpy_s(blob, len + 1, uri.data) != 0) {
       cmp_log_debug("cmp_state_restoration_encode: strcpy_s failed\n");
       CMP_FREE(blob);
-      cmp_string_destroy(&uri);
+      (void)cmp_string_destroy(&uri);
       return CMP_ERROR_GENERAL;
     }
 #else

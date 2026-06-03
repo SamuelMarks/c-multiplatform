@@ -49,7 +49,6 @@ TEST test_spring_ease_evaluate(void) {
 
   /* Critically damped spring */
   cmp_spring_ease_create(1.0f, 100.0f, 20.0f, 0.0f, &spring);
-
   /* t=0, val=0 */
   res = cmp_spring_ease_evaluate(spring, 0.0, &val);
   ASSERT_EQ(CMP_SUCCESS, res);

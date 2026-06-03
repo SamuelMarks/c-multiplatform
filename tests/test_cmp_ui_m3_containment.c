@@ -50,10 +50,8 @@ TEST test_card(void) {
 
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
                 cmp_ui_card_create(NULL, CMP_UI_CARD_STYLE_ELEVATED), "%d");
-
   ASSERT_EQ_FMT(CMP_SUCCESS,
                 cmp_ui_card_create(&card, CMP_UI_CARD_STYLE_ELEVATED), "%d");
-
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_card_get_node(NULL, &node), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_ui_card_get_node(card, NULL), "%d");
   ASSERT_EQ_FMT(CMP_SUCCESS, cmp_ui_card_get_node(card, &node), "%d");

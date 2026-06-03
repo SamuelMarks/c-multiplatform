@@ -54,9 +54,11 @@ int cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal, uint32_t bg_color,
   (void)fg_color; /* To be used when setting up text nodes */
 
 #if defined(_WIN32)
-  if (cmp_pty_create(&terminal->pty, "cmd.exe", 80, 24) != 0) {
+  rc = cmp_pty_create(&terminal->pty, "cmd.exe", 80, 24);
+  if (rc != 0) {
 #else
-  if (cmp_pty_create(&terminal->pty, "bash", 80, 24) != 0) {
+  rc = cmp_pty_create(&terminal->pty, "bash", 80, 24);
+  if (rc != 0) {
 #endif
     terminal->pty = NULL;
   }
@@ -78,7 +80,7 @@ int cmp_ui_terminal_destroy(cmp_ui_terminal_t *terminal) {
     return CMP_ERROR_INVALID_ARG;
   }
   if (terminal->pty) {
-    cmp_pty_destroy(terminal->pty);
+    (void)cmp_pty_destroy(terminal->pty);
   }
   if (terminal->node_root) {
     temp_rc = cmp_ui_node_destroy(terminal->node_root);
@@ -138,7 +140,7 @@ int cmp_ui_terminal_append_output(cmp_ui_terminal_t *terminal,
   }
 
   if (terminal->pty) {
-    cmp_pty_write(terminal->pty, output, (unsigned int)strlen(output));
+    (void)cmp_pty_write(terminal->pty, output, (unsigned int)strlen(output));
   }
 
   len = strlen(output);

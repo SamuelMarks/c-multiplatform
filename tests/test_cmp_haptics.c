@@ -34,11 +34,9 @@ TEST test_cmp_haptics_trigger(void) {
             cmp_haptics_trigger(haptics, CMP_HAPTICS_TYPE_HEAVY_IMPACT));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_haptics_trigger(haptics, CMP_HAPTICS_TYPE_SELECTION_CHANGE));
-
   /* Null checks */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_haptics_trigger(NULL, CMP_HAPTICS_TYPE_LIGHT_IMPACT));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_haptics_destroy(haptics));
   PASS();
 }

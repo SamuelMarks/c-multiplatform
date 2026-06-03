@@ -46,7 +46,6 @@ TEST test_cmp_screen_capture_active_window(void) {
             cmp_screen_capture_active_window(capture, &pixels, NULL, &height));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_screen_capture_active_window(capture, &pixels, &width, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_screen_capture_free_pixels(NULL));
 
   ASSERT_EQ(CMP_SUCCESS, cmp_screen_capture_destroy(capture));
@@ -76,7 +75,6 @@ TEST test_cmp_screen_capture_region(void) {
             cmp_screen_capture_region(capture, 10, 20, -1, 200, &pixels));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_screen_capture_region(capture, 10, 20, 100, -1, &pixels));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_screen_capture_destroy(capture));
 
   PASS();

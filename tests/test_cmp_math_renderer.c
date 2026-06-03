@@ -20,7 +20,6 @@ TEST test_math_renderer_parse(void) {
   void *tree = NULL;
 
   cmp_math_renderer_create(&renderer);
-
   ASSERT_EQ(CMP_SUCCESS, cmp_math_renderer_parse(renderer, "x^2", 1, &tree));
   ASSERT_NEQ(NULL, tree);
 

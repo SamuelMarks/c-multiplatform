@@ -14,7 +14,6 @@ TEST test_vfs_theme_save_load(void) {
   size_t size = 0;
 
   cmp_vfs_init();
-
   /* Test valid theme dat */
   f = fopen("theme_valid.dat", "wb");
   if (f) {

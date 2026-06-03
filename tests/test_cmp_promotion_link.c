@@ -34,7 +34,6 @@ TEST test_promotion_drops(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_promotion_link_sync(link, 1));
   ASSERT_EQ(CMP_SUCCESS,
             cmp_promotion_link_request_rate(link, CMP_FRAME_RATE_HIGH));
-
   ASSERT_EQ(CMP_SUCCESS,
             cmp_promotion_link_validate_frame_drops(link, &dropped));
   ASSERT_EQ(0, dropped); /* Perfect A12+ guarantee */
@@ -50,21 +49,17 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_promotion_link_create(NULL));
   cmp_promotion_link_create(&link);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_promotion_link_sync(NULL, 1));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_promotion_link_request_rate(NULL, CMP_FRAME_RATE_HIGH));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_promotion_link_evaluate_vrr(NULL, 0, 0, &r));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_promotion_link_evaluate_vrr(link, 0, 0, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_promotion_link_validate_frame_drops(NULL, &i));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_promotion_link_validate_frame_drops(link, NULL));
-
   cmp_promotion_link_destroy(link);
   PASS();
 }

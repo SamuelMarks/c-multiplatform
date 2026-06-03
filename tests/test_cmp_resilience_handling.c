@@ -28,7 +28,6 @@ TEST test_resilience_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_resilience_create(NULL));
   cmp_resilience_create(&feat);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_resilience_show_empty_state(NULL, node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_resilience_show_empty_state(feat, NULL));
 
@@ -36,24 +35,20 @@ TEST test_resilience_null_args(void) {
             cmp_resilience_show_loading_skeleton(NULL, node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resilience_show_loading_skeleton(feat, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resilience_show_non_blocking_error(NULL, node, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resilience_show_non_blocking_error(feat, NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resilience_show_non_blocking_error(feat, node, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resilience_handle_discard_changes_prompt(NULL, node));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resilience_handle_discard_changes_prompt(feat, NULL));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resilience_graceful_degradation(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_resilience_graceful_degradation(feat, NULL));
-
   cmp_resilience_destroy(feat);
   PASS();
 }

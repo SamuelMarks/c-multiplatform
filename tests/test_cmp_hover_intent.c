@@ -98,7 +98,6 @@ TEST test_hover_intent_edge_cases(void) {
             cmp_hover_intent_process(intent, NULL, 0.0f, &confirmed));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_hover_intent_process(intent, &event, 0.0f, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_hover_intent_destroy(intent));
   PASS();
 }

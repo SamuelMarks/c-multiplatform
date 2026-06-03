@@ -70,17 +70,14 @@ TEST test_null_args(void) {
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_list_create(NULL, CMP_LIST_STYLE_PLAIN));
   cmp_list_create(&list, CMP_LIST_STYLE_PLAIN);
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_list_row_create(NULL, "a"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_list_row_create(&row, NULL));
   cmp_list_row_create(&row, "A");
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_list_add_row(NULL, row));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_list_add_row(list, NULL));
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_list_row_set_separator_inset(NULL, 10.0f));
-
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_list_row_add_swipe_action(
                 NULL, 0, "Delete", CMP_SWIPE_ACTION_STYLE_DESTRUCTIVE, 1));
@@ -97,7 +94,6 @@ TEST test_null_args(void) {
             cmp_list_resolve_metrics(list, &f, NULL, &f));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_list_resolve_metrics(list, &f, &f, NULL));
-
   cmp_list_add_row(list, row);
   cmp_list_destroy(list);
   PASS();

@@ -30,7 +30,6 @@ TEST test_cmp_native_dialog_show_and_result(void) {
   /* Trigger dialog opening (System calls intercepted in tests) */
   ASSERT_EQ(CMP_SUCCESS,
             cmp_native_dialog_show(dialog, CMP_DIALOG_TYPE_FILE_OPEN));
-
   /* Initial result should be NULL */
   ASSERT_EQ(CMP_SUCCESS, cmp_native_dialog_get_result_string(dialog, &result));
   ASSERT_EQ(NULL, result);
@@ -54,7 +53,6 @@ TEST test_cmp_native_dialog_show_and_result(void) {
             cmp_native_dialog_set_result_string(NULL, "test"));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_native_dialog_set_result_string(dialog, NULL));
-
   ASSERT_EQ(CMP_SUCCESS, cmp_native_dialog_destroy(dialog));
   PASS();
 }

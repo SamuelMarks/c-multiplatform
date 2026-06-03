@@ -41,7 +41,6 @@ TEST test_scroll_timeline_evaluate(void) {
   int res;
 
   cmp_scroll_timeline_create(&timeline);
-
   /* 0 / 100 = 0.0 */
   res = cmp_scroll_timeline_evaluate(timeline, 0.0f, 100.0f, &progress);
   ASSERT_EQ(CMP_SUCCESS, res);

@@ -161,8 +161,7 @@ int cmp_ui_segmented_button_add_segment(cmp_ui_segmented_button_t *btn,
    * button implementation */
   (void)icon_name;
 
-  cmp_ui_node_add_child(btn->node_root, seg_node);
-
+  (void)cmp_ui_node_add_child(btn->node_root, seg_node);
   btn->segments[btn->segment_count].node = seg_node;
   btn->segments[btn->segment_count].is_selected = 0;
 
