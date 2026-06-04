@@ -2077,7 +2077,7 @@ int cmp_window_get_clipboard_text(cmp_window_t *window,
 #if defined(__linux__) && !defined(__ANDROID__)
   /* XConvertSelection or Wayland data offer receive */
   (void)type;
-  int rc = cmp_string_init(out_text);
+  rc = cmp_string_init(out_text);
   return rc;
 #else
   (void)type;

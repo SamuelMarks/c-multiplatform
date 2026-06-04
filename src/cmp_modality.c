@@ -1,4 +1,15 @@
 /* clang-format off */
+#if defined(__unix__) || defined(__linux__) || defined(__APPLE__) || defined(__HAIKU__)
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE
+#endif
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 500
+#endif
+#endif
 #include "cmp.h"
 #include "cmp_log.h"
 #include <c_abstract_http/event_loop.h>
