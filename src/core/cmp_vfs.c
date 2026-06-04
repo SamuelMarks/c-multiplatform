@@ -41,6 +41,10 @@
 #endif
 /* clang-format on */
 
+#if !defined(O_EVTONLY)
+#define O_EVTONLY O_RDONLY
+#endif
+
 typedef struct cmp_vfs_mount_entry {
   char *mount_point;
   char *real_path;

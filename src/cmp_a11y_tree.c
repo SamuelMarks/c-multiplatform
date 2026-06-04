@@ -1948,8 +1948,8 @@ int cmp_a11y_tree_serialize(cmp_a11y_tree_t *tree, cmp_ui_node_t *node,
               (traits != 0) ? ", interactable: true" : "");
     strncpy_s(out_buffer, buffer_size, temp_buf, _TRUNCATE);
 #else
-    snprintf(temp_buf, sizeof(temp_buf), "{role: '%s'%s}", role_str,
-             (traits != 0) ? ", interactable: true" : "");
+    sprintf(temp_buf, "{role: '%s'%s}", role_str,
+            (traits != 0) ? ", interactable: true" : "");
     strncpy(out_buffer, temp_buf, buffer_size - 1);
     out_buffer[buffer_size - 1] = '\0';
 #endif

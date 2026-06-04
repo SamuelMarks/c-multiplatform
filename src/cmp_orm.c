@@ -377,7 +377,7 @@ int cmp_orm_set_encryption_key(c_orm_db_t *db, const char *key) {
     return rc;
   }
 #else
-  snprintf(query, sizeof(query), "PRAGMA key = '%s';", key);
+  sprintf(query, "PRAGMA key = '%s';", key);
 #endif
   if (c_orm_execute_raw(db, query) != C_ORM_OK) {
     rc = CMP_ERROR_GENERAL;

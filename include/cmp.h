@@ -3720,11 +3720,11 @@ struct cmp_ui_node {
 
   struct cmp_event_listener_node *event_listeners;
 
-  unsigned int
-      design_language_override : 3; /* 0=Inherit, 1=Material3,
-                                   2=Fluent2, 3=Cupertino, 4=Unstyled */
-  unsigned int
-      density_override : 2; /* 0=Inherit, 1=Compact, 2=Standard, 3=Relaxed */
+  unsigned int design_language_override
+      : 3; /* 0=Inherit, 1=Material3,
+          2=Fluent2, 3=Cupertino, 4=Unstyled */
+  unsigned int density_override
+      : 2; /* 0=Inherit, 1=Compact, 2=Standard, 3=Relaxed */
   unsigned int is_rtl_mirrored : 1; /* 1=Mirror SVG/Rendering for RTL */
 };
 /**
