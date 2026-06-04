@@ -71,6 +71,11 @@ TEST test_modality_null_args(void) {
   PASS();
 }
 
+static void stop_task(void *arg) {
+  cmp_modality_t *mod = (cmp_modality_t *)arg;
+  cmp_modality_stop(mod);
+}
+
 TEST test_modality_sync_single(void) {
   cmp_modality_t mod;
   int res;
@@ -82,27 +87,15 @@ TEST test_modality_sync_single(void) {
   res = cmp_modality_queue_task(&mod, dummy_task, (void *)0x1234);
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  /* Stop it right away so run doesn't block forever */
-  res = cmp_modality_stop(&mod);
+  res = cmp_modality_queue_task(&mod, stop_task, &mod);
   ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_modality_run(&mod);
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  /* Because we stopped it before running, the loop exited immediately
-     before or right after processing the task. The current implementation
-     checks is_running in the while loop. Since we set it to 1 inside run(),
-     stop() before run() gets overwritten. So let's queue a task that stops it.
-   */
-
   res = cmp_modality_destroy(&mod);
   ASSERT_EQ(CMP_SUCCESS, res);
   PASS();
-}
-
-static void stop_task(void *arg) {
-  cmp_modality_t *mod = (cmp_modality_t *)arg;
-  cmp_modality_stop(mod);
 }
 
 /* cppcheck-suppress unusedFunction */

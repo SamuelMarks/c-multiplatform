@@ -85,393 +85,369 @@ CMP_API void cmp_theme_set_default_vtable(const cmp_theme_vtable_t *vtable);
 
 #else  /* Dynamic dispatch mode */
 
-static int cmp_theme_measure_button(const cmp_ui_node_t *node, float *width,
-                                    float *height) {
+static __inline int cmp_theme_measure_button(const cmp_ui_node_t *node,
+                                             float *width, float *height) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->measure_button(node, width, height);
+  }
   return 0;
 }
 
-static int cmp_theme_measure_text_input(const cmp_ui_node_t *node, float *width,
-                                        float *height) {
+static __inline int cmp_theme_measure_text_input(const cmp_ui_node_t *node,
+                                                 float *width, float *height) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->measure_text_input(node, width, height);
+  }
   return 0;
 }
 
-static int cmp_theme_measure_slider(const cmp_ui_node_t *node, float *width,
-                                    float *height) {
+static __inline int cmp_theme_measure_slider(const cmp_ui_node_t *node,
+                                             float *width, float *height) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->measure_slider(node, width, height);
+  }
   return 0;
 }
 
-static int cmp_theme_measure_toggle(const cmp_ui_node_t *node, float *width,
-                                    float *height) {
+static __inline int cmp_theme_measure_toggle(const cmp_ui_node_t *node,
+                                             float *width, float *height) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->measure_toggle(node, width, height);
+  }
   return 0;
 }
 
-static int cmp_theme_measure_checkbox(const cmp_ui_node_t *node, float *width,
-                                      float *height) {
+static __inline int cmp_theme_measure_checkbox(const cmp_ui_node_t *node,
+                                               float *width, float *height) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->measure_checkbox(node, width, height);
+  }
   return 0;
 }
 
-static int cmp_theme_measure_radio(const cmp_ui_node_t *node, float *width,
-                                   float *height) {
+static __inline int cmp_theme_measure_radio(const cmp_ui_node_t *node,
+                                            float *width, float *height) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->measure_radio(node, width, height);
+  }
   return 0;
 }
 
-static int cmp_theme_measure_progress(const cmp_ui_node_t *node, float *width,
-                                      float *height) {
+static __inline int cmp_theme_measure_progress(const cmp_ui_node_t *node,
+                                               float *width, float *height) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->measure_progress(node, width, height);
+  }
   return 0;
 }
 
-static int cmp_theme_measure_dropdown(const cmp_ui_node_t *node, float *width,
-                                      float *height) {
+static __inline int cmp_theme_measure_dropdown(const cmp_ui_node_t *node,
+                                               float *width, float *height) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->measure_dropdown(node, width, height);
+  }
   return 0;
 }
 
-static int cmp_theme_layout_nav_bar(cmp_ui_node_t *node) {
+static __inline int cmp_theme_layout_nav_bar(cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->layout_nav_bar(node);
+  }
   return 0;
 }
 
-static int cmp_theme_layout_tab_bar(cmp_ui_node_t *node) {
+static __inline int cmp_theme_layout_tab_bar(cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->layout_tab_bar(node);
+  }
   return 0;
 }
 
-static int cmp_theme_layout_dialog_content(cmp_ui_node_t *node) {
+static __inline int cmp_theme_layout_dialog_content(cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->layout_dialog_content(node);
+  }
   return 0;
 }
 
-static int cmp_theme_layout_sidebar(cmp_ui_node_t *node) {
+static __inline int cmp_theme_layout_sidebar(cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->layout_sidebar(node);
+  }
   return 0;
 }
 
-static int cmp_theme_draw_button(const cmp_ui_node_t *node) {
+static __inline int cmp_theme_draw_button(const cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->draw_button(node);
+  }
   return 0;
 }
 
-static int cmp_theme_draw_text_input(const cmp_ui_node_t *node) {
+static __inline int cmp_theme_draw_text_input(const cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->draw_text_input(node);
+  }
   return 0;
 }
 
-static int cmp_theme_draw_slider(const cmp_ui_node_t *node) {
+static __inline int cmp_theme_draw_slider(const cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->draw_slider(node);
+  }
   return 0;
 }
 
-static int cmp_theme_draw_toggle(const cmp_ui_node_t *node) {
+static __inline int cmp_theme_draw_toggle(const cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->draw_toggle(node);
+  }
   return 0;
 }
 
-static int cmp_theme_draw_checkbox(const cmp_ui_node_t *node) {
+static __inline int cmp_theme_draw_checkbox(const cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->draw_checkbox(node);
+  }
   return 0;
 }
 
-static int cmp_theme_draw_radio(const cmp_ui_node_t *node) {
+static __inline int cmp_theme_draw_radio(const cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->draw_radio(node);
+  }
   return 0;
 }
 
-static int cmp_theme_draw_progress(const cmp_ui_node_t *node) {
+static __inline int cmp_theme_draw_progress(const cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->draw_progress(node);
+  }
   return 0;
 }
 
-static int cmp_theme_draw_card(const cmp_ui_node_t *node) {
+static __inline int cmp_theme_draw_card(const cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->draw_card(node);
+  }
   return 0;
 }
 
-static int cmp_theme_draw_tooltip(const cmp_ui_node_t *node) {
+static __inline int cmp_theme_draw_tooltip(const cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->draw_tooltip(node);
+  }
   return 0;
 }
 
-static int cmp_theme_draw_menu(const cmp_ui_node_t *node) {
+static __inline int cmp_theme_draw_menu(const cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->draw_menu(node);
+  }
   return 0;
 }
 
-static int cmp_theme_draw_focus_ring(const cmp_ui_node_t *node) {
+static __inline int cmp_theme_draw_focus_ring(const cmp_ui_node_t *node) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->draw_focus_ring(node);
+  }
   return 0;
 }
 
-static int cmp_theme_get_spring_config(const cmp_ui_node_t *node, float *mass,
-                                       float *stiffness, float *damping) {
+static __inline int cmp_theme_get_spring_config(const cmp_ui_node_t *node,
+                                                float *mass, float *stiffness,
+                                                float *damping) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->get_spring_config(node, mass, stiffness, damping);
+  }
   return 0;
 }
 
-static int cmp_theme_get_ripple_config(const cmp_ui_node_t *node,
-                                       float *duration, float *opacity) {
+static __inline int cmp_theme_get_ripple_config(const cmp_ui_node_t *node,
+                                                float *duration,
+                                                float *opacity) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->get_ripple_config(node, duration, opacity);
+  }
   return 0;
 }
 
-static int cmp_theme_get_state_layer_opacity(const cmp_ui_node_t *node,
-                                             int state, float *opacity) {
+static __inline int cmp_theme_get_state_layer_opacity(const cmp_ui_node_t *node,
+                                                      int state,
+                                                      float *opacity) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->get_state_layer_opacity(node, state, opacity);
+  }
   return 0;
 }
 
-static int cmp_theme_get_transition_duration(const cmp_ui_node_t *node,
-                                             float *duration) {
+static __inline int cmp_theme_get_transition_duration(const cmp_ui_node_t *node,
+                                                      float *duration) {
   const cmp_theme_vtable_t *vt = NULL;
   int rc;
   rc = cmp_resolve_vtable(node, &vt);
-  if (rc != 0)
-    if (rc != 0) {
-      return rc;
-    }
-  return rc;
-  if (vt)
+  if (rc != 0) {
+    return rc;
+  }
+  if (vt) {
     return vt->get_transition_duration(node, duration);
+  }
   return 0;
 }
 #endif /* CMP_THEME_MODE_SINGLE_STATIC */
