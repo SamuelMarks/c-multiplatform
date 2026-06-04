@@ -342,7 +342,11 @@ endif()
 FetchContent_Declare(cdd_c GIT_REPOSITORY https://github.com/SamuelMarks/cdd-c.git GIT_TAG master
     UPDATE_COMMAND git fetch origin master COMMAND git reset --hard origin/master
 )
+set(C_CDD_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTING_OLD ${BUILD_TESTING})
+set(BUILD_TESTING OFF)
 FetchContent_MakeAvailable(cdd_c)
+set(BUILD_TESTING ${BUILD_TESTING_OLD})
 if(EXISTS "${cdd_c_SOURCE_DIR}/src/functions/emit/codegen.c")
     file(READ "${cdd_c_SOURCE_DIR}/src/functions/emit/codegen.c" CODEGEN_SRC)
     string(REGEX REPLACE "([ \t]*)char \\*_ast_get_type_from_ref_3 = NULL;\n([ \t]*)char \\*_ast_get_type_from_ref_4 = NULL;\n([ \t]*)char \\*_ast_get_type_from_ref_5 = NULL;\n([ \t]*)size_t i;\n" "" CODEGEN_SRC "${CODEGEN_SRC}")
