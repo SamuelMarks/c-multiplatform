@@ -280,6 +280,7 @@ int cmp_cupertino_draw_button(const cmp_ui_node_t *node) {
   bounds.y = node->layout->computed_rect.y;
   bounds.width = node->layout->computed_rect.width;
   bounds.height = node->layout->computed_rect.height;
+  (void)bounds;
 
   /* systemBlue standard HIG mapping */
   color.r = 0.0f;
@@ -308,6 +309,7 @@ int cmp_cupertino_draw_text_input(const cmp_ui_node_t *node) {
   if (!node || !node->layout)
     return CMP_ERROR_INVALID_ARG;
   bounds = node->layout->computed_rect;
+  (void)bounds;
 
   /* Compute a HIG compliant color for this component to pass to the compositor
    */
@@ -338,6 +340,7 @@ int cmp_cupertino_draw_slider(const cmp_ui_node_t *node) {
   if (!node || !node->layout)
     return CMP_ERROR_INVALID_ARG;
   bounds = node->layout->computed_rect;
+  (void)bounds;
 
   /* Compute a HIG compliant color for this component to pass to the compositor
    */
@@ -368,6 +371,7 @@ int cmp_cupertino_draw_toggle(const cmp_ui_node_t *node) {
   if (!node || !node->layout)
     return CMP_ERROR_INVALID_ARG;
   bounds = node->layout->computed_rect;
+  (void)bounds;
 
   /* Compute a HIG compliant color for this component to pass to the compositor
    */
@@ -398,6 +402,7 @@ int cmp_cupertino_draw_checkbox(const cmp_ui_node_t *node) {
   if (!node || !node->layout)
     return CMP_ERROR_INVALID_ARG;
   bounds = node->layout->computed_rect;
+  (void)bounds;
 
   /* Compute a HIG compliant color for this component to pass to the compositor
    */
@@ -428,6 +433,7 @@ int cmp_cupertino_draw_radio(const cmp_ui_node_t *node) {
   if (!node || !node->layout)
     return CMP_ERROR_INVALID_ARG;
   bounds = node->layout->computed_rect;
+  (void)bounds;
 
   /* Compute a HIG compliant color for this component to pass to the compositor
    */
@@ -458,6 +464,7 @@ int cmp_cupertino_draw_progress(const cmp_ui_node_t *node) {
   if (!node || !node->layout)
     return CMP_ERROR_INVALID_ARG;
   bounds = node->layout->computed_rect;
+  (void)bounds;
 
   /* Compute a HIG compliant color for this component to pass to the compositor
    */
@@ -488,6 +495,7 @@ int cmp_cupertino_draw_card(const cmp_ui_node_t *node) {
   if (!node || !node->layout)
     return CMP_ERROR_INVALID_ARG;
   bounds = node->layout->computed_rect;
+  (void)bounds;
 
   /* Compute a HIG compliant color for this component to pass to the compositor
    */
@@ -518,6 +526,7 @@ int cmp_cupertino_draw_tooltip(const cmp_ui_node_t *node) {
   if (!node || !node->layout)
     return CMP_ERROR_INVALID_ARG;
   bounds = node->layout->computed_rect;
+  (void)bounds;
 
   /* Compute a HIG compliant color for this component to pass to the compositor
    */
@@ -548,6 +557,7 @@ int cmp_cupertino_draw_menu(const cmp_ui_node_t *node) {
   if (!node || !node->layout)
     return CMP_ERROR_INVALID_ARG;
   bounds = node->layout->computed_rect;
+  (void)bounds;
 
   /* Compute a HIG compliant color for this component to pass to the compositor
    */
@@ -578,6 +588,7 @@ int cmp_cupertino_draw_focus_ring(const cmp_ui_node_t *node) {
   if (!node || !node->layout)
     return CMP_ERROR_INVALID_ARG;
   bounds = node->layout->computed_rect;
+  (void)bounds;
 
   /* Compute a HIG compliant color for this component to pass to the compositor
    */

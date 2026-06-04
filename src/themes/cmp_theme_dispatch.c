@@ -6,6 +6,7 @@
 #include "themes/cmp_fluent2.h"
 #include "themes/cmp_material3.h"
 #include "themes/cmp_unstyled.h"
+#include "themes/cmp_theme_dispatch.h"
 /* clang-format on */
 
 /**

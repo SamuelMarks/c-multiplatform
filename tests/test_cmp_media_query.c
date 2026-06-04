@@ -8,8 +8,8 @@
 SUITE(cmp_media_query_suite);
 
 TEST test_media_query_evaluate(void) {
-  cmp_media_query_t query;
-  cmp_media_query_env_t env;
+  cmp_media_query_t query = {0};
+  cmp_media_query_env_t env = {0};
   int matches;
 
   memset(&query, 0, sizeof(cmp_media_query_t));
@@ -37,8 +37,8 @@ TEST test_media_query_evaluate(void) {
 }
 
 TEST test_pointer_media_evaluate(void) {
-  cmp_media_query_t query;
-  cmp_media_query_env_t env;
+  cmp_media_query_t query = {0};
+  cmp_media_query_env_t env = {0};
   int matches;
 
   memset(&query, 0, sizeof(cmp_media_query_t));
@@ -61,8 +61,8 @@ TEST test_pointer_media_evaluate(void) {
 }
 
 TEST test_update_media_evaluate(void) {
-  cmp_media_query_t query;
-  cmp_media_query_env_t env;
+  cmp_media_query_t query = {0};
+  cmp_media_query_env_t env = {0};
   int matches;
 
   memset(&query, 0, sizeof(cmp_media_query_t));
@@ -82,8 +82,8 @@ TEST test_update_media_evaluate(void) {
 }
 
 TEST test_light_level_evaluate(void) {
-  cmp_media_query_t query;
-  cmp_media_query_env_t env;
+  cmp_media_query_t query = {0};
+  cmp_media_query_env_t env = {0};
   int matches;
 
   memset(&query, 0, sizeof(cmp_media_query_t));
@@ -224,13 +224,13 @@ TEST test_resize_observer(void) {
 }
 
 TEST test_null_args(void) {
-  cmp_media_query_t query;
-  cmp_media_query_env_t env;
+  cmp_media_query_t query = {0};
+  cmp_media_query_env_t env = {0};
   int matches;
   cmp_container_ctx_t *ctx = NULL;
-  cmp_container_query_t cq;
-  cmp_style_query_t sq;
-  cmp_rect_t rect;
+  cmp_container_query_t cq = {0};
+  cmp_style_query_t sq = {0};
+  cmp_rect_t rect = {0};
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_media_query_evaluate(NULL, &env, &matches));

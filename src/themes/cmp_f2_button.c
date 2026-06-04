@@ -4,6 +4,7 @@
 #include "themes/cmp_f2_button.h"
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 /* clang-format on */
 
 /**

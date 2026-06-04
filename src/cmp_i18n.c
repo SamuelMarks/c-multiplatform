@@ -160,7 +160,14 @@ int cmp_i18n_format(const char *format_str, cmp_string_t *out_str, ...) {
 #if defined(_MSC_VER)
     written = vsprintf_s(buffer, sizeof(buffer), format_str, args);
 #else
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+#endif
     written = vsprintf(buffer, format_str, args);
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 #endif
   }
 

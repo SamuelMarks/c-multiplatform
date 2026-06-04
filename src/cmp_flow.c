@@ -104,7 +104,6 @@ int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
   float content_top;
   float content_bottom;
   float circle_center_y;
-  float circle_center_x;
   float y_dist;
   float x_dist;
 
@@ -122,7 +121,6 @@ int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
   if (shape_radius > 0.0f) {
     /* Circular wrapping adjustment */
     circle_center_y = float_rect.y + float_rect.height / 2.0f;
-    circle_center_x = float_rect.x + float_rect.width / 2.0f;
 
     /* Check if current text line intersects the circle's vertical bounds */
     if (content_bottom >= float_rect.y &&

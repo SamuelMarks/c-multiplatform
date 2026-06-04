@@ -17,7 +17,7 @@ TEST test_linear_blend_create_destroy(void) {
 
 TEST test_linear_blend_edge_cases(void) {
   cmp_linear_blend_t *blend = NULL;
-  cmp_color_t color;
+  cmp_color_t color = {0};
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_linear_blend_create(0.0f, &blend));
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_linear_blend_create(-1.0f, &blend));

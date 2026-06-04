@@ -713,38 +713,6 @@ int cmp_slider_get_visuals(cmp_slider_t *slider_opaque,
   return rc;
 }
 
-/**
- * @brief cmp_slider_update_from_drag
- *
- * @param slider_opaque Parameter description.
- * @param track_width Parameter description.
- * @param current_x Parameter description.
- * @return Returns 0 on success, or an error code on failure.
- */
-static int cmp_slider_update_from_drag(cmp_slider_t *slider_opaque,
-                                       float track_width, float current_x) {
-  int rc = CMP_SUCCESS;
-  struct cmp_slider *ctx = (struct cmp_slider *)slider_opaque;
-  float ratio;
-
-  if (!ctx || track_width <= 0.0f) {
-    rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("Error in cmp_slider_update_from_drag: Invalid argument\n");
-
-    return rc;
-  }
-
-  ratio = current_x / track_width;
-  if (ratio < 0.0f)
-    ratio = 0.0f;
-  if (ratio > 1.0f)
-    ratio = 1.0f;
-
-  ctx->value = ctx->min_val + (ratio * (ctx->max_val - ctx->min_val));
-
-  return rc;
-}
-
 /* System Dialog Wrappers (Platform-specific implementations to be added in
  * Phase 25) */
 

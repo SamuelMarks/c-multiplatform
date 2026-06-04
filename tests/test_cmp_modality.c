@@ -86,7 +86,7 @@ TEST test_modality_sync_single(void) {
   res = cmp_modality_stop(&mod);
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  /* res = cmp_modality_run(&mod); */
+  res = cmp_modality_run(&mod);
   ASSERT_EQ(CMP_SUCCESS, res);
 
   /* Because we stopped it before running, the loop exited immediately
@@ -105,6 +105,8 @@ static void stop_task(void *arg) {
   cmp_modality_stop(mod);
 }
 
+/* cppcheck-suppress unusedFunction */
+
 TEST test_modality_sync_single_run(void) {
   cmp_modality_t mod;
   int res;
@@ -121,7 +123,7 @@ TEST test_modality_sync_single_run(void) {
   res = cmp_modality_queue_task(&mod, stop_task, &mod);
   ASSERT_EQ(CMP_SUCCESS, res);
 
-  /* res = cmp_modality_run(&mod); */
+  res = cmp_modality_run(&mod);
   ASSERT_EQ(CMP_SUCCESS, res);
 
   ASSERT_EQ(1, g_task_run);
@@ -135,7 +137,7 @@ SUITE(modality_suite) {
   RUN_TEST(test_modality_lifecycle);
   RUN_TEST(test_modality_null_args);
   RUN_TEST(test_modality_sync_single);
-  /* RUN_TEST(test_modality_sync_single_run); */
+  RUN_TEST(test_modality_sync_single_run);
 }
 #ifdef __cplusplus
 extern "C" {

@@ -689,6 +689,8 @@ int cmp_a11y_hover_text_get_bubble(cmp_a11y_hover_text_t *hover_text,
   const char *err_str;
   struct cmp_a11y_hover_text *ht = (struct cmp_a11y_hover_text *)hover_text;
 
+  (void)capacity;
+
   if (ht == NULL || out_text == NULL) {
     rc = CMP_ERROR_INVALID_ARG;
     err_rc = cmp_strerror(rc, &err_str);

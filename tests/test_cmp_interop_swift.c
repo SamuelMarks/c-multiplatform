@@ -7,12 +7,21 @@ TEST test_swift_interop_macros_compilation(void) {
   /* This test primarily exists to ensure the macro expansions do not break
    * C89/MSVC syntax */
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnullability-extension"
+#endif
+
   CMP_ASSUME_NONNULL_BEGIN
   void *CMP_NONNULL test_ptr = (void *)1;
   int *CMP_NULLABLE opt_ptr = NULL;
   (void)test_ptr;
   (void)opt_ptr;
   CMP_ASSUME_NONNULL_END
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
   PASS();
 }

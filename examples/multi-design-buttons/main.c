@@ -10,6 +10,8 @@
 #include "cmp_ui_snackbar.h"
 #include "themes/cmp_f2_button.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 /* clang-format on */
 
 static void on_btn_click(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
