@@ -39,7 +39,10 @@ int rc = CMP_SUCCESS;
     return rc;
 }
 #elif defined(_MSC_VER)
-#include <windows.h>
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <winsock2.h>
 #include <dbghelp.h>
 /* Prevent C4091 */
 #pragma comment(lib, "dbghelp.lib")

@@ -396,7 +396,11 @@ endif()
 
 foreach(tgt c_str_span c89stringutils parson cfs c_cdd c-abstract-http c-orm c-orm-async sqlite3)
   if(TARGET ${tgt})
-    target_compile_options(${tgt} PRIVATE -w)
+    if(MSVC)
+      target_compile_options(${tgt} PRIVATE /W0)
+    else()
+      target_compile_options(${tgt} PRIVATE -w)
+    endif()
   endif()
 endforeach()
 
